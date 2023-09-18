@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { Box, Input, Typography } from '@mui/material';
 import { ReactComponent as ChevronIcon } from '../../assets/images/revamp/chevron-icon.inline.svg';
-import { ReactComponent as TokenImage } from './img.inline.svg';
+import { ReactComponent as DefaultTokenImage } from '../../assets/images/revamp/token-default.inline.svg';
 
 export default function SwapInput({
   label,
   isFrom = false,
   showMax = false,
   asset = {},
+  image = null,
   isLoading,
 }) {
   const { amount, ticker } = asset;
@@ -46,6 +47,7 @@ export default function SwapInput({
           borderColor: error ? '#FF1351' : isFocusedColor,
           borderRadius: '8px',
           p: '16px',
+          pr: '8px',
           display: 'grid',
           gridTemplateColumns: '1fr auto',
           gridTemplateRows: '1fr 1fr',
@@ -89,10 +91,8 @@ export default function SwapInput({
         />
         <Box sx={{ justifySelf: 'end', cursor: 'pointer' }}>
           <Box height="100%" width="min-content" display="flex" gap="8px" alignItems="center">
-            <Box>
-              <TokenImage />
-            </Box>
-            <Box>{ticker}</Box>
+            <Box>{image || <DefaultTokenImage />}</Box>
+            <Box width="max-content">{ticker || 'Select asset'}</Box>
             <Box>
               <ChevronIcon />
             </Box>
@@ -113,7 +113,7 @@ export default function SwapInput({
         ) : (
           <Box />
         )}
-        <Box sx={{ alignSelf: 'end' }}>
+        <Box sx={{ justifySelf: 'end', alignSelf: 'end' }}>
           <Typography variant="caption" color="#6B7384">
             Current balance: {amount} {ticker}
           </Typography>

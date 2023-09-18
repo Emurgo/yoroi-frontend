@@ -18,6 +18,8 @@ import { ReactComponent as SwitchIcon } from '../../../assets/images/revamp/swap
 import { ReactComponent as RefreshIcon } from '../../../assets/images/revamp/refresh-icon.inline.svg';
 import { ReactComponent as InfoIcon } from '../../../assets/images/revamp/info-icon.inline.svg';
 import { ReactComponent as EditIcon } from '../../../assets/images/revamp/edit-icon.inline.svg';
+import { ReactComponent as AdaTokenImage } from './img.inline.svg';
+import { ReactComponent as PoolImage } from './pool.inline.svg';
 import GeneralSettings from '../../../components/settings/categories/general-setting/GeneralSettings';
 import ThemeSettingsBlock from '../../../components/settings/categories/general-setting/ThemeSettingsBlock';
 import AboutYoroiSettingsBlock from '../../../components/settings/categories/general-setting/AboutYoroiSettingsBlock';
@@ -59,7 +61,17 @@ export default function SwapPage(): Node {
           <RefreshIcon />
         </Box>
       </Box>
-      <SwapInput label="Swap from" asset={{ amount: 212, ticker: 'TADA' }} showMax isFrom />
+
+      {/* From Field */}
+      <SwapInput
+        label="Swap from"
+        image={<AdaTokenImage />}
+        asset={{ amount: 212, ticker: 'TADA' }}
+        showMax
+        isFrom
+      />
+
+      {/* Clear and switch */}
       <Box display="flex" alignItems="center" justifyContent="space-between">
         <Box sx={{ cursor: 'pointer' }}>
           <SwitchIcon />
@@ -70,7 +82,11 @@ export default function SwapPage(): Node {
           </Button>
         </Box>
       </Box>
-      <SwapInput label="Swap to" asset={{ amount: 0, ticker: 'USDA' }} />
+
+      {/* To Field */}
+      <SwapInput label="Swap to" asset={{ amount: 0, ticker: '' }} />
+
+      {/* Price between assets */}
       <Box mt="16px">
         <PriceInput
           assets={[
@@ -81,6 +97,8 @@ export default function SwapPage(): Node {
           label="Market price"
         />
       </Box>
+
+      {/* Slippage settings */}
       <Box
         sx={{
           display: 'flex',
@@ -101,8 +119,12 @@ export default function SwapPage(): Node {
           <EditIcon />
         </Box>
       </Box>
+
+      {/* Available pools */}
       <Box>
         <SwapPool
+          image={<PoolImage />}
+          name="Minswap (Auto)"
           assets={[
             { ticker: 'TADA', amount: 20 },
             { ticker: 'USDA', amount: 5 },
