@@ -54,6 +54,7 @@ import {
   connectorSignData,
   connectorGetAssets,
   getTokenMetadataFromIds,
+  MAX_COLLATERAL,
 } from './connector/api';
 import { updateTransactions as ergoUpdateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
 import {
@@ -1445,16 +1446,21 @@ async function handleInjectorMessage(message, sender) {
               ).reduce((acc, next) => Object.assign(acc, next), {});
               const coinsPerUtxoWord =
                     RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord);
-              const utxos = await transformCardanoUtxos(
-                await connectorGetUtxosCardano(
-                  wallet,
-                  valueExpected,
-                  paginate,
-                  coinsPerUtxoWord,
-                  network.NetworkId,
-                ),
-                isCBOR,
-              );
+              let utxos;
+              try {
+                utxos = await transformCardanoUtxos(
+                  await connectorGetUtxosCardano(
+                    wallet,
+                    valueExpected,
+                    paginate,
+                    coinsPerUtxoWord,
+                  ),
+                  isCBOR,
+                );
+              } catch (e) {
+                rpcResponse({ err: e.message });
+                return;
+              }
               rpcResponse({ ok: utxos });
             },
             db,
@@ -1777,7 +1783,7 @@ async function handleInjectorMessage(message, sender) {
       try {
         checkParamCount(1);
         await RustModule.load();
-        let requiredAmount: string = message.params[0];
+        let requiredAmount: string = message.params[0] || String(MAX_COLLATERAL);
         if (!/^\d+$/.test(requiredAmount)) {
           try {
             requiredAmount = RustModule.WalletV4.Value.from_bytes(
