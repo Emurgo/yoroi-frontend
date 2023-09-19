@@ -65,7 +65,7 @@ const messages = defineMessages({
   },
   newVersion: {
     id: 'settings.theme.newVersion',
-    defaultMessage: '!!!Yoroi new version (beta)',
+    defaultMessage: '!!!Yoroi new version',
   },
   selectColorTheme: {
     id: 'settings.theme.selectColorTheme',
@@ -120,7 +120,7 @@ export default class ThemeSettingsBlock extends Component<Props> {
         <Typography
           variant={isRevampLayout ? 'body1' : 'h5'}
           fontWeight={500}
-          mb={isRevampLayout ? '16px' : '12px'}
+          mb={isRevampLayout ? '0px' : '12px'}
           color="grayscale.900"
         >
           {intl.formatMessage(messages.version)}
@@ -140,7 +140,7 @@ export default class ThemeSettingsBlock extends Component<Props> {
           >
             <FormControlLabel
               value={OLD_THEME}
-              control={<Radio size="small" />}
+              control={<Radio sx={{ color: 'primary.500' }} size="small" />}
               label={intl.formatMessage(messages.currentVersion)}
               id="switchToOldVersionButton"
               sx={{
@@ -149,7 +149,14 @@ export default class ThemeSettingsBlock extends Component<Props> {
             />
             <FormControlLabel
               value={NEW_THEME}
-              control={<Radio size="small" />}
+              control={
+                <Radio
+                  sx={{
+                    color: 'primary.500',
+                  }}
+                  size="small"
+                />
+              }
               label={intl.formatMessage(messages.newVersion)}
               id="switchToNewVersionButton"
             />

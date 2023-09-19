@@ -188,7 +188,10 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
               },
             }}
             renderValue={value => (
-              <Typography variant={isRevampLayout ? 'body1' : 'body2'} fontWeight="300">
+              <Typography
+                variant={isRevampLayout ? 'body1' : 'body2'}
+                fontWeight={isRevampLayout ? '400' : '300'}
+              >
                 {/* $FlowFixMe[prop-missing] */}
                 {value} - {currencies.filter(item => item.value === value)[0].name}
               </Typography>
@@ -208,7 +211,7 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
                 sx={{
                   '& span': { fontWeight: 400 },
                 }}
-                mt="6px"
+                mt="16px"
                 mb="35px"
               >
                 <FormattedHTMLMessage {...messages.lastUpdated} values={{ lastUpdated }} />
