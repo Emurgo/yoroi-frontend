@@ -210,24 +210,18 @@ class StakingPageContent extends Component<AllProps> {
       throw new Error(`${nameof(StakingPageContent)} opened for non-reward wallet`);
     }
     if (
-      !delegationRequests.getCurrentDelegation.wasExecuted ||
-      delegationRequests.getCurrentDelegation.isExecuting ||
-      delegationRequests.getCurrentDelegation.result == null
+      !delegationRequests.getDelegatedBalance.wasExecuted ||
+      delegationRequests.getDelegatedBalance.isExecuting ||
+      delegationRequests.getDelegatedBalance.result == null
     ) {
       return null;
     }
 
-    if (delegationRequests.getCurrentDelegation.result.currEpoch == null) return null;
-
-    const currentPools = delegationRequests.getCurrentDelegation.result.currEpoch.pools;
-    const currentPage = this.generated.stores.delegation.selectedPage;
-
-    if (currentPools.length === 0) return null;
-
-    const currentPool = currentPools[0][currentPage];
+    if (delegationRequests.getDelegatedBalance.result.delegation == null) return null;
+    const currentPool = delegationRequests.getDelegatedBalance.result.delegation;
     const meta = this.generated.stores.delegation.getLocalPoolInfo(
       publicDeriver.getParent().getNetworkInfo(),
-      String(currentPool)
+      currentPool,
     );
     if (meta == null) {
       // server hasn't returned information about the stake pool yet
