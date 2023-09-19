@@ -2,7 +2,7 @@
 
 import { Component } from 'react';
 import Dialog from '../../../components/widgets/Dialog';
-import { FormattedHTMLMessage, defineMessages, intlShape } from 'react-intl';
+import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import { ReactComponent as NewThemeIllustration } from '../../../assets/images/new-theme-illustration.inline.svg';
@@ -47,11 +47,6 @@ const messages = defineMessages({
   update6: {
     id: 'wallet.revampAnnouncement.updates.6',
     defaultMessage: '!!!Fiat Pairing',
-  },
-  oldThemeNote: {
-    id: 'wallet.revampAnnouncement.oldThemeNote',
-    defaultMessage:
-      '!!!Enjoy the old version? You’ll have the option to <span class="attention">switch back!</span>!',
   },
 });
 
@@ -143,18 +138,6 @@ export class RevampAnnouncementDialog extends Component<Props> {
                 ))}
               </Box>
             </Box>
-            <Typography
-              variant="body1"
-              fontWeight={500}
-              color="grayscale.900"
-              sx={{
-                '& span.attention': {
-                  color: 'primary.500',
-                },
-              }}
-            >
-              <FormattedHTMLMessage {...messages.oldThemeNote} />
-            </Typography>
           </Stack>
         </Box>
       </Dialog>
