@@ -22,7 +22,7 @@ import ExplorableHash from '../../../widgets/hashWrappers/ExplorableHash';
 import { handleExternalLinkClick } from '../../../../utils/routing';
 import { PublicDeriver } from '../../../../api/ada/lib/storage/models/PublicDeriver';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { Box, Typography } from '@mui/material';
+import { Box, Link, Typography } from '@mui/material';
 import { withLayout } from '../../../../styles/context/layout';
 import type { InjectedLayoutProps } from '../../../../styles/context/layout';
 
@@ -138,7 +138,7 @@ class AboutYoroiSettingsBlock extends Component<Props & InjectedLayoutProps> {
 
   render(): Node {
     const { intl } = this.context;
-    const { wallet, isRevampLayout } = this.props;
+    const { wallet, isRevampLayout, renderLayoutComponent } = this.props;
     let network;
 
     if (wallet) {
@@ -146,7 +146,7 @@ class AboutYoroiSettingsBlock extends Component<Props & InjectedLayoutProps> {
       network = result === true ? 'testnet' : 'mainnet';
     }
 
-    return (
+    const classicLayout = (
       <Box
         sx={{
           pb: '20px',
@@ -224,7 +224,101 @@ class AboutYoroiSettingsBlock extends Component<Props & InjectedLayoutProps> {
         </div>
       </Box>
     );
+
+    const revampLayout = (
+      <Box
+        sx={{
+          pb: '20px',
+          mt: '40px',
+        }}
+      >
+        <Typography component="h2" variant="body1" fontWeight={500} mb="16px" color="grayscale.900">
+          {intl.formatMessage(messages.aboutYoroiLabel)}
+        </Typography>
+
+        {network && (
+          <LabelWithValue
+            label={intl.formatMessage(messages.networkLabel)}
+            value={intl.formatMessage(messages[network])}
+          />
+        )}
+
+        <LabelWithValue
+          label={intl.formatMessage(messages.versionLabel)}
+          value={environment.getVersion()}
+          url={baseGithubUrl + 'releases/'}
+        />
+
+        <LabelWithValue
+          label={intl.formatMessage(messages.commitLabel)}
+          value={environment.commit}
+          url={baseGithubUrl + 'commit/' + environment.commit}
+        />
+
+        {!environment.isProduction() && (
+          <LabelWithValue
+            label={intl.formatMessage(messages.branchLabel)}
+            value={environment.branch}
+            url={baseGithubUrl + 'tree/' + environment.branch}
+          />
+        )}
+
+        <div className={styles.aboutSocial}>
+          <GridFlexContainer rowSize={socialMediaLinks.length}>
+            {socialMediaLinks.map(link => (
+              <LinkButton
+                key={link.url}
+                {...link}
+                textClassName={styles.socialMediaLinkText}
+                onExternalLinkClick={handleExternalLinkClick}
+              />
+            ))}
+          </GridFlexContainer>
+        </div>
+      </Box>
+    );
+
+    return renderLayoutComponent({
+      CLASSIC: classicLayout,
+      REVAMP: revampLayout,
+    });
   }
 }
+
+function LabelWithValue({
+  label,
+  value,
+  url,
+}: {|
+  label: string,
+  value: string,
+  url?: string,
+|}): Node {
+  return (
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <Typography variant="body1" fontWeight={500} color="grayscale.max">
+        {label}
+      </Typography>
+      <Typography
+        {...(url
+          ? {
+              as: Link,
+              href: url,
+              target: '_blank',
+            }
+          : {})}
+        variant="body1"
+        color="grayscale.max"
+        sx={{ textDecoration: 'none' }}
+      >
+        {value}
+      </Typography>
+    </Box>
+  );
+}
+
+LabelWithValue.defaultProps = {
+  url: undefined,
+};
 
 export default (withLayout(AboutYoroiSettingsBlock): ComponentType<Props>);
