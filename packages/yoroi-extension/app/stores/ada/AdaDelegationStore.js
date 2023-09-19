@@ -135,6 +135,7 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
             addresses: [stakingKeyResp.addr.Hash],
           });
           const stateForStakingKey = accountStateResp[stakingKeyResp.addr.Hash];
+          const delegatedPoolId = stateForStakingKey?.delegation;
           const delegatedBalance = delegationRequest.getDelegatedBalance.execute({
             publicDeriver: withStakingKey,
             rewardBalance: new MultiToken(
@@ -148,15 +149,15 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
               defaultToken
             ),
             stakingAddress: stakingKeyResp.addr.Hash,
-            delegation: stateForStakingKey?.delegation ?? null,
+            delegation: delegatedPoolId ?? null,
             allRewards: stateForStakingKey?.rewards ?? null,
           }).promise;
           if (delegatedBalance == null) throw new Error('Should never happen');
 
-          const updatePool = stateForStakingKey?.delegation ?
+          const updatePool = delegatedPoolId != null ?
             this.updatePoolInfo({
               network: publicDeriver.getParent().getNetworkInfo(),
-              allPoolIds: [stateForStakingKey?.delegation],
+              allPoolIds: [delegatedPoolId],
             }) : Promise.resolve();
 
           return await Promise.all([
