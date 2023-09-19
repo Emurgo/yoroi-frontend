@@ -1,26 +1,104 @@
-import { Box } from '@mui/material';
+import { useState } from 'react';
+import { Box, Typography } from '@mui/material';
+import { ReactComponent as AssetDefault } from '../../assets/images/revamp/asset-default.inline.svg';
+import { ReactComponent as NoAssetsFound } from '../../assets/images/revamp/no-assets-found.inline.svg';
 import Dialog from '../widgets/Dialog';
 
 export default function SelectAssetDialog({ assets = [], type, onAssetSelected, onClose }) {
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleAssetSelected = asset => {
+    onAssetSelected(asset);
+    onClose();
+  };
+
+  const handleSearch = e => {
+    setSearchTerm(e.target.value);
+  };
+
+  const filteredAssets = assets.filter(
+    a =>
+      a.name.toLowerCase().includes(searchTerm) ||
+      a.ticker.toLowerCase().includes(searchTerm) ||
+      a.address.toLowerCase().includes(searchTerm)
+  );
+
   return (
     <Dialog title={type} onClose={onClose} closeOnOverlayClick>
-      Local Search here
-      <hr />
-      {assets.map((a, index) =>
-        type === 'from' ? (
-          <FromAssetAndAmountRow
-            key={`${a.address}-${index}`}
-            {...a}
-            onAssetSelected={onAssetSelected}
-          />
-        ) : (
-          <ToAssetAndAmountRow
-            key={`${a.address}-${index}`}
-            {...a}
-            onAssetSelected={onAssetSelected}
-          />
-        )
+      <Box mb="16px">
+        <input
+          type="text"
+          placeholder="Search"
+          style={{
+            border: '1px solid #A7AFC0',
+            borderRadius: '8px',
+            padding: '8px',
+            paddingLeft: '38px',
+            outline: 'none',
+            width: '100%',
+            '&:focus': {
+              borderWidth: '2px',
+            },
+          }}
+          onChange={handleSearch}
+        />
+      </Box>
+      <Box>
+        <Typography variant="body2" color="grayscale.700">
+          {filteredAssets.length} assets {searchTerm ? 'found' : 'available'}
+        </Typography>
+      </Box>
+      {filteredAssets.length !== 0 && (
+        <>
+          {type === 'from' && (
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              sx={{ borderBottom: '1px solid', py: '13px', pr: '4px' }}
+            >
+              <Box>Asset</Box>
+              <Box>Amount</Box>
+            </Box>
+          )}
+          {type === 'to' && (
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              sx={{ borderBottom: '1px solid', py: '13px', pr: '4px' }}
+            >
+              <Box>Asset</Box>
+              <Box>Volume, 24h</Box>
+              <Box>Price %, 24h</Box>
+            </Box>
+          )}
+        </>
       )}
+      <Box py="8px">
+        {filteredAssets.map((a, index) =>
+          type === 'from' ? (
+            <FromAssetAndAmountRow
+              key={`${a.address}-${index}`}
+              {...a}
+              onAssetSelected={handleAssetSelected}
+            />
+          ) : (
+            <ToAssetAndAmountRow
+              key={`${a.address}-${index}`}
+              {...a}
+              onAssetSelected={handleAssetSelected}
+            />
+          )
+        )}
+
+        {filteredAssets.length === 0 && (
+          <Box>
+            <Box>
+              <NoAssetsFound />
+            </Box>
+            <Box>No tpkens found for “{searchTerm}”</Box>
+          </Box>
+        )}
+      </Box>
     </Dialog>
   );
 }
@@ -36,19 +114,37 @@ const FromAssetAndAmountRow = ({
 }) => {
   return (
     <Box
-      display="flex"
-      alignItems="center"
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+        p: '8px',
+        cursor: 'pointer',
+        borderRadius: '8px',
+        '&:hover': { bgcolor: '#F0F3F5' },
+      }}
       onClick={() => onAssetSelected({ name, address, amount, ticker })}
     >
-      <Box>{image}</Box>
-      <Box flexGrow="1" flexShrink="0" width="100%">
-        {name}
-      </Box>
-      <Box>
+      <Box>{image || <AssetDefault />}</Box>
+      <Box flexGrow="1" width="100%">
         <Box>
-          {amount} {ticker}
+          <Typography variant="body1">{name}</Typography>
         </Box>
-        {usdAmount && <Box>{usdAmount} USD</Box>}
+        <Box>
+          <Typography variant="body2" color="#6B7384">
+            {address}
+          </Typography>
+        </Box>
+      </Box>
+      <Box flexShrink="0" display="flex" flexDirection="column" alignItems="flex-end">
+        <Typography variant="body1" color="grayscale.900">
+          <span>{amount}</span>&nbsp;<span>{ticker}</span>
+        </Typography>
+        {usdAmount && (
+          <Typography variant="body2" color="grayscale.600">
+            {usdAmount} USD
+          </Typography>
+        )}
       </Box>
     </Box>
   );
@@ -59,25 +155,45 @@ const ToAssetAndAmountRow = ({
   name,
   address,
   amount,
+  volume24,
+  priceChange100,
   ticker,
   usdAmount,
   onAssetSelected,
 }) => {
   return (
     <Box
-      display="flex"
-      alignItems="center"
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+        p: '8px',
+        cursor: 'pointer',
+        borderRadius: '8px',
+        '&:hover': { bgcolor: '#F0F3F5' },
+      }}
       onClick={() => onAssetSelected({ name, address, amount, ticker })}
     >
-      <Box>{image}</Box>
-      <Box flexGrow="1" flexShrink="0" width="100%">
-        {name}
-      </Box>
-      <Box>
+      <Box>{image || <AssetDefault />}</Box>
+      <Box flexGrow="1" width="100%">
         <Box>
-          {amount} {ticker}
+          <Typography variant="body1">{name}</Typography>
         </Box>
-        {usdAmount && <Box>{usdAmount}</Box>}
+        <Box>
+          <Typography variant="body2" color="#6B7384">
+            {address}
+          </Typography>
+        </Box>
+      </Box>
+      <Box flexShrink="0" display="flex" flexDirection="column" alignItems="flex-end">
+        <Typography variant="body1" color="grayscale.900">
+          <span>{amount}</span>&nbsp;<span>{ticker}</span>
+        </Typography>
+        {usdAmount && (
+          <Typography variant="body2" color="grayscale.600">
+            {usdAmount} USD
+          </Typography>
+        )}
       </Box>
     </Box>
   );

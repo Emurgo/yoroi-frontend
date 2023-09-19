@@ -1,6 +1,6 @@
 import { Box, Input, Typography } from '@mui/material';
 
-export default function PriceInput({ label, assets = [], readonly, isLoading }) {
+export default function PriceInput({ label, price, assets = [], readonly, isLoading }) {
   const [asset1, asset2] = assets;
 
   return (
@@ -47,6 +47,7 @@ export default function PriceInput({ label, assets = [], readonly, isLoading }) 
         placeholder="0"
         bgcolor={readonly ? 'gray.50' : 'common.white'}
         readOnly={readonly}
+        value={price}
       />
       <Box sx={{ justifySelf: 'end' }}>
         <Box height="100%" width="min-content" display="flex" alignItems="center">
