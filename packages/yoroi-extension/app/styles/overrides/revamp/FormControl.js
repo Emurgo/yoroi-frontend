@@ -2,18 +2,19 @@
 
 const RevampFormControl = {
   styleOverrides: {
-    root: {
+    root: ({ theme }) => ({
       paddingBottom: '20px',
       marginBottom: '10px',
       marginTop: '7px',
       '&:hover': {
         '& .MuiInputLabel-root': {
-          color: 'grayscale.900',
-          '&.Mui-disabled': { color: 'grayscale.200' },
-          '&.Mui-error': { color: 'magenta.500' },
+          // color: theme.palette.grayscale[900],
+          color: 'green',
+          '&.Mui-disabled': { color: theme.palette.grayscale[200] },
+          '&.Mui-error': { color: theme.palette.magenta[500] },
         },
       },
-    },
+    }),
   },
   defaultProps: {
     variant: 'outlined',
