@@ -147,6 +147,7 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
               justifyContent: 'center',
               gap: '24px',
               mt: '32px',
+              maxWidth: '700px',
             }}
           >
             {levels.map(level => {

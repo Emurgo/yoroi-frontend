@@ -86,3 +86,12 @@
     }
   }
 }
+
+:global(.YoroiRevamp) .component {
+  min-width: 650px;
+  max-width: unset;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
