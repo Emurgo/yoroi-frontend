@@ -3,7 +3,6 @@
 import { Component } from 'react';
 import Dialog from '../../../components/widgets/Dialog';
 import { defineMessages, intlShape } from 'react-intl';
-import globalMessages from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import { ReactComponent as NewThemeIllustration } from '../../../assets/images/new-theme-illustration.inline.svg';
 import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
@@ -48,6 +47,10 @@ const messages = defineMessages({
     id: 'wallet.revampAnnouncement.updates.6',
     defaultMessage: '!!!Fiat Pairing',
   },
+  goToWalletLabel: {
+    id: 'wallet.revampAnnouncement.goToWalletLabel',
+    defaultMessage: '!!!Go to the wallet',
+  },
 });
 
 type Props = {|
@@ -65,7 +68,7 @@ export class RevampAnnouncementDialog extends Component<Props> {
     const { onClose } = this.props;
     const actions = [
       {
-        label: intl.formatMessage(globalMessages.ok),
+        label: intl.formatMessage(messages.goToWalletLabel),
         onClick: onClose,
         primary: true,
       },

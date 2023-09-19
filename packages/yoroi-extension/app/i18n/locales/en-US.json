@@ -449,6 +449,7 @@
   "wallet.revampAnnouncement.updates.4": "In-app self service Q&As",
   "wallet.revampAnnouncement.updates.5": "In-app get help ticketing",
   "wallet.revampAnnouncement.updates.6": "Fiat Pairing",
+  "wallet.revampAnnouncement.goToWalletLabel": "Go to the wallet",
   "wallet.add.optionDialog.connect.hw.dialogTitle": "Connect to hardware wallet",
   "wallet.add.optionDialog.connect.hw.ledger.learnMoreText": "A Ledger hardware wallet is a small USB device that adds an extra level of security to your wallet. It is more secure because your private key never leaves the hardware wallet. This protects your funds even if your computer is compromised due to malware, phishing attempts, etc.",
   "wallet.add.optionDialog.connect.hw.ledger.title": "Ledger Hardware Wallet",
