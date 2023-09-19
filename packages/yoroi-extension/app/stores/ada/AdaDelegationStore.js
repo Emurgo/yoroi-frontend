@@ -153,7 +153,14 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
           }).promise;
           if (delegatedBalance == null) throw new Error('Should never happen');
 
+          const updatePool = stateForStakingKey?.delegation ?
+            this.updatePoolInfo({
+              network: publicDeriver.getParent().getNetworkInfo(),
+              allPoolIds: [stateForStakingKey?.delegation],
+            }) : Promise.resolve();
+
           return await Promise.all([
+            updatePool,
             delegatedBalance,
           ]);
         } catch (e) {
