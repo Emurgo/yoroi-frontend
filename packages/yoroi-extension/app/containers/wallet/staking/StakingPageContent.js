@@ -119,13 +119,6 @@ class StakingPageContent extends Component<AllProps> {
     if (delegationRequests.error != null) {
       return { error: delegationRequests.error };
     }
-    if (delegationRequests.getCurrentDelegation.result != null) {
-      const currentDelegation = delegationRequests.getCurrentDelegation.result;
-      const currEpochInfo = currentDelegation.currEpoch;
-      if (currEpochInfo == null) {
-        return undefined;
-      }
-    }
     return undefined;
   };
 
@@ -151,14 +144,13 @@ class StakingPageContent extends Component<AllProps> {
     const { actions, stores } = this.generated;
 
     const showRewardAmount =
-      request.delegationRequests.getCurrentDelegation.wasExecuted &&
       request.delegationRequests.getDelegatedBalance.wasExecuted &&
       request.errorIfPresent == null;
 
     const defaultToken = request.publicDeriver.getParent().getDefaultToken();
 
     const currentlyDelegating =
-      (request.delegationRequests.getCurrentDelegation.result?.currEpoch?.pools ?? []).length > 0;
+      request.delegationRequests.getDelegatedBalance.result?.delegation != null;
 
     return (
       <SummaryCard
@@ -337,7 +329,6 @@ class StakingPageContent extends Component<AllProps> {
     const errorIfPresent = this.getErrorInFetch(publicDeriver);
 
     const showRewardAmount =
-      delegationRequests.getCurrentDelegation.wasExecuted &&
       delegationRequests.getDelegatedBalance.wasExecuted &&
       errorIfPresent == null;
 
