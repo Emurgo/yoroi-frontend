@@ -25,14 +25,15 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
   const avatarGenerated = getAvatarFromPoolId(id);
 
   return (
-    <Card>
+    <Card sx={{ border: '1px solid', borderColor: 'grayscale.200', bgcolor: 'background.card' }}>
       <Box
         sx={{
           padding: '15px 24px',
-          borderBottom: '1px solid var(--yoroi-palette-gray-200)',
+          borderBottom: '1px solid',
+          borderBottomColor: 'grayscale.200',
         }}
       >
-        <Typography variant="h5" color="var(--yoroi-palette-gray-900)">
+        <Typography variant="h5" color="grayscale.900">
           {intl.formatMessage(globalMessages.stakePoolDelegated)}
         </Typography>
       </Box>
@@ -45,11 +46,11 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
           )}
         </AvatarWrapper>
         <Box marginLeft="16px" sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-          <Typography color="black" variant="body1" fontWeight="medium" mb="3px">
+          <Typography color="grayscale.max" variant="body1" fontWeight="medium" mb="3px">
             {ticker !== undefined ? `[${ticker}]` : ''} {name}
           </Typography>
           <SocialMediaStakePool
-            color="var(--yoroi-palette-gray-500)"
+            color="grayscale.500"
             websiteUrl={websiteUrl}
             socialLinks={socialLinks}
           />
@@ -58,30 +59,30 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
       <Wrapper justifyContent="space-between" sx={{ paddingBottom: 0 }}>
         {roa != null ? (
           <Box sx={{ display: 'flex', flexFlow: 'column' }}>
-            <Typography variant="caption" fontWeight="500" color="var(--yoroi-palette-gray-500)">
+            <Typography variant="caption" fontWeight="500" color="grayscale.500">
               {intl.formatMessage(globalMessages.roa30d)}
             </Typography>
-            <Typography as="span" color="black" variant="h2">
+            <Typography as="span" color="grayscale.max" variant="h2">
               {roa} %
             </Typography>
           </Box>
         ) : null}
         {poolSize != null && (
           <Box sx={{ display: 'flex', flexFlow: 'column' }}>
-            <Typography variant="caption" fontWeight="500" color="var(--yoroi-palette-gray-500)">
+            <Typography variant="caption" fontWeight="500" color="grayscale.500">
               Pool Size
             </Typography>
-            <Typography as="span" color="black" variant="h2">
+            <Typography as="span" color="grayscale.max" variant="h2">
               {poolSize}
             </Typography>
           </Box>
         )}
         {share != null && (
           <Box sx={{ display: 'flex', flexFlow: 'column' }}>
-            <Typography variant="caption" fontWeight="500" color="var(--yoroi-palette-gray-500)">
+            <Typography variant="caption" fontWeight="500" color="grayscale.500">
               Share
             </Typography>
-            <Typography as="span" color="black" variant="h2">
+            <Typography as="span" color="grayscale.max" variant="h2">
               {share} %
             </Typography>
           </Box>
@@ -89,11 +90,7 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
       </Wrapper>
       {undelegate && (
         <Wrapper>
-          <UndelegateButton
-            sx={{ border: '2px solid #17D1AA', width: '50%' }}
-            color="secondary"
-            onClick={undelegate}
-          >
+          <UndelegateButton sx={{ minWidth: '50%' }} variant="secondary" onClick={undelegate}>
             {intl.formatMessage(globalMessages.undelegateLabel)}
           </UndelegateButton>
         </Wrapper>
@@ -104,7 +101,6 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
 export default (injectIntl(observer(DelegatedStakePoolCard)): ComponentType<Props>);
 
 const Card = styled(Box)({
-  backgroundColor: 'var(--yoroi-palette-common-white)',
   borderRadius: '8px',
   flex: '1 1 100%',
   display: 'flex',
