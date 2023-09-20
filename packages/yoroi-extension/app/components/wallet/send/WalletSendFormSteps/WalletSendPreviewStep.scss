@@ -33,7 +33,6 @@
   .addressToLabel {
     font-size: 16px;
     letter-spacing: 0;
-    color: #6b7384;
     margin-bottom: 8px;
   }
 
@@ -42,7 +41,6 @@
     font-size: 16px;
     letter-spacing: 0;
     line-height: 24px;
-    color: var(--yoroi-palette-gray-900);
   }
 
   .amountWrapper {
@@ -89,11 +87,9 @@
     margin-top: 17px;
     margin-bottom: 40px;
     border-radius: 8px;
-    background: linear-gradient(30.09deg, #244abf 0%, #4760ff 176.73%);
     padding: 24px;
     display: flex;
     justify-content: space-between;
-    color: var(--yoroi-palette-common-white);
 
     .assetsCount {
       text-align: right;

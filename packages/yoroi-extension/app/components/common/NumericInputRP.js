@@ -490,7 +490,7 @@ class AmountInput extends Component<AmountInputProps> {
               right: '10px',
               fontWeight: 400,
               fontSize: '0.75rem',
-              color: 'var(--yoroi-comp-input-text)',
+              color: 'grayscale.900',
             }}
           >
             {intl.formatMessage(messages.feesLabel, { amount: fees })}
@@ -503,7 +503,7 @@ class AmountInput extends Component<AmountInputProps> {
             position: 'absolute',
             bottom: '45px',
             right: error != null && error !== '' ? '45px' : '10px',
-            color: 'var(--yoroi-comp-input-text)',
+            color: 'grayscale.900',
             textTransform: 'uppercase',
           }}
         >
@@ -529,9 +529,9 @@ class AmountInputRevamp extends Component<AmountInputProps> {
     const { intl } = this.context;
 
     return (
-      <div className={styles.component}>
+      <Box className={styles.component} sx={{ '& input::placeholder': { color: 'grayscale.400' } }}>
         <NumericInputRP {...this.props} />
-      </div>
+      </Box>
     );
   }
 }

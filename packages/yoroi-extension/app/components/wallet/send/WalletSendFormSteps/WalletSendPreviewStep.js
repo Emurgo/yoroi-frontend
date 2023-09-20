@@ -402,19 +402,19 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
         {this.renderError()}
         <div className={styles.staleTxWarning}>{this.props.staleTx && staleTxWarning}</div>
         <div>
-          <div className={styles.addressToLabel}>
+          <Box className={styles.addressToLabel} sx={{ color: 'grayscale.600' }}>
             {intl.formatMessage(globalMessages.receiverLabel)}
-          </div>
-          <p className={styles.receiverAddress}>
+          </Box>
+          <Box className={styles.receiverAddress} sx={{ color: 'grayscale.900' }}>
             {this.props.addressToDisplayString(receivers[0])}
-          </p>
+          </Box>
         </div>
         <div className={styles.wrapper}>
           {this.props.transactionSize != null ? (
             <div className={styles.addressToLabelWrapper}>
-              <div className={styles.addressToLabel}>
+              <Box className={styles.addressToLabel} sx={{ color: 'grayscale.600' }}>
                 {intl.formatMessage(globalMessages.walletSendConfirmationTxSizeLabel)}
-              </div>
+              </Box>
               <span className={styles.txSize}>{this.props.transactionSize}</span>
             </div>
           ) : null}
@@ -446,7 +446,10 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
             </div>
           </div>
 
-          <Box className={styles.totalAmountWrapper}>
+          <Box
+            className={styles.totalAmountWrapper}
+            sx={{ bgcolor: 'primary.600', color: 'grayscale.min' }}
+          >
             <div className={styles.totalAmountLabel}>
               {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
             </div>
@@ -459,9 +462,9 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
                 </div>
               )}
 
-              <div className={styles.totalAmountValue}>
+              <Box className={styles.totalAmountValue}>
                 {this.renderTotalAmount(this.props.totalAmount.getDefaultEntry())}
-              </div>
+              </Box>
             </div>
           </Box>
 
@@ -483,8 +486,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
         <div>{this.renderHWWalletInfo()}</div>
 
         <Button
-          variant="contained"
-          color="primary"
+          variant="primary"
           size="large"
           onClick={this.submit.bind(this)}
           disabled={(walletType === 'mnemonic' && !walletPasswordField.isValid) || isSubmitting}

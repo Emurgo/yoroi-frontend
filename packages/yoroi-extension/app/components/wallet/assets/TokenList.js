@@ -131,10 +131,15 @@ function TokenList({ assetsList: list, shouldHideBalance, intl }: Props & Intl):
         justifyContent="space-between"
         alignItems="center"
         borderBottom="1px solid var(--yoroi-palette-gray-200)"
-        padding="16px 24px"
+        paddingBottom="16px"
       >
-        <Typography variant="h5" color="var(--yoroi-palette-gray-900)">
-          {intl.formatMessage(globalMessages.tokens)} ({list.length})
+        <Typography
+          variant="h5"
+          color="var(--yoroi-palette-common-black)"
+          fontWeight={500}
+          fontSize="18px"
+        >
+          {intl.formatMessage(globalMessages.tokens)}: {list.length}
         </Typography>
         <SearchInput
           disableUnderline
@@ -226,7 +231,7 @@ function ListItemLayout({ firstColumn, secondColumn, thirdColumn }) {
     },
   ];
   return (
-    <ListItem sx={{ px: '32px' }}>
+    <ListItem sx={{ px: '0' }}>
       {layoutColumns.map(col => (
         <ListItemText
           key={col.id}

@@ -21,8 +21,7 @@
   display: flex;
   align-items: center;
   width: 100%;
-  padding: 0px;
-  padding: 0px 16px;
+  padding: 0px 8px;
 }
 
 .currency {
@@ -52,7 +51,6 @@
   .name {
     font-size: 14px;
     line-height: 22px;
-    color: #242838;
     font-weight: 500;
   }
 
@@ -61,7 +59,6 @@
     font-size: 12px;
     line-height: 16px;
     letter-spacing: 0.2px;
-    color: #6b7384;
   }
 }
 

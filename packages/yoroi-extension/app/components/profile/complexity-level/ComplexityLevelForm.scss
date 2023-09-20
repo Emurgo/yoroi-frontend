@@ -4,7 +4,8 @@
 .component {
   max-width: 650px;
   margin: 0 auto;
-  margin-top: 65px;
+  margin-top: 24px;
+
   .header {
     color: var(--yoroi-palette-gray-600);
     text-align: center;
@@ -42,7 +43,7 @@
     margin-right: 30px;
     border-radius: 8px;
     background-color: var(--yoroi-palette-common-white);
-    box-shadow: 0 5px 20px 0 rgba(24, 26, 30, 0.08);
+    border: 1px solid #DCE0E9;
     overflow: hidden;
     &:last-child {
       margin-right: 0;

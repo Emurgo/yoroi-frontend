@@ -484,8 +484,7 @@ export default class WalletSendForm extends Component<Props, State> {
               error={invalidMemo}
             />
             <Button
-              variant="contained"
-              color="primary"
+              variant="primary"
               size="large"
               onClick={() => this.onUpdateStep(SEND_FORM_STEP.AMOUNT)}
               disabled={invalidMemo || !receiverField.isValid}
@@ -519,9 +518,9 @@ export default class WalletSendForm extends Component<Props, State> {
                   position: 'absolute',
                   top: '-8px',
                   left: '6px',
-                  backgroundColor: 'var(--yoroi-palette-common-white)',
+                  backgroundColor: 'common.white',
                   paddingX: '4px',
-                  color: shouldSendAll && 'var(--yoroi-comp-input-text-disabled)',
+                  color: shouldSendAll && 'grayscale.200',
                 }}
                 variant="caption2"
               >
@@ -561,10 +560,9 @@ export default class WalletSendForm extends Component<Props, State> {
                 </p>
                 {!isErgo(this.props.selectedNetwork) && (
                   <Button
-                    variant="ternary"
-                    sx={{
-                      width: '51px',
-                    }}
+                    variant="tertiary"
+                    color="secondary"
+                    sx={{ width: '51px' }}
                     disabled={maxSendableAmount.isExecuting}
                     className={classnames([
                       styles.maxBtn,
@@ -611,10 +609,9 @@ export default class WalletSendForm extends Component<Props, State> {
 
             <div className={styles.addButtonsWrapper}>
               <Button
-                variant="ternary"
-                sx={{
-                  marginRight: '16px',
-                }}
+                variant="tertiary"
+                color="primary"
+                sx={{ marginRight: '16px' }}
                 onClick={() => this.props.openDialog(AddTokenDialog)}
                 disabled={this.props.shouldSendAll}
                 startIcon={<PlusIcon />}
@@ -622,7 +619,8 @@ export default class WalletSendForm extends Component<Props, State> {
                 {intl.formatMessage(globalMessages.token)}
               </Button>
               <Button
-                variant="ternary"
+                variant="tertiary"
+                color="primary"
                 onClick={() => this.props.openDialog(AddNFTDialog)}
                 disabled={this.props.shouldSendAll}
                 startIcon={<PlusIcon />}
@@ -633,8 +631,7 @@ export default class WalletSendForm extends Component<Props, State> {
 
             <Box sx={{ marginTop: '60px' }}>
               <Button
-                variant="contained"
-                color="primary"
+                variant="primary"
                 size="large"
                 onClick={() => {
                   this.props.onSubmit();
@@ -665,10 +662,10 @@ export default class WalletSendForm extends Component<Props, State> {
     return (
       <>
         <div className={styles.component}>
-          <div className={styles.wrapper}>
+          <Box className={styles.wrapper} sx={{ bgcolor: 'common.white' }}>
             <SendFormHeader step={currentStep} onUpdateStep={this.onUpdateStep.bind(this)} />
             <div className={styles.formBody}>{this.renderCurrentStep(currentStep)}</div>
-          </div>
+          </Box>
         </div>
       </>
     );
