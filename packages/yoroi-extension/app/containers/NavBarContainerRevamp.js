@@ -27,6 +27,7 @@ import BuySellDialog from '../components/buySell/BuySellDialog';
 import NavBarRevamp from '../components/topbar/NavBarRevamp';
 import NavWalletDetailsRevamp from '../components/topbar/NavWalletDetailsRevamp';
 import WalletListDialog from '../components/topbar/WalletListDialog';
+import BuySellAdaButton from '../components/topbar/BuySellAdaButton';
 
 export type GeneratedData = typeof NavBarContainerRevamp.prototype.generated;
 
