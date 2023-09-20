@@ -51,7 +51,7 @@ function SummaryCard({
   totalRewards,
   totalDelegated,
   getTokenInfo,
-  onOverviewClick: _onOverviewClick,  // todo: remove?
+  onOverviewClick: _onOverviewClick, // todo: remove?
   shouldHideBalance,
   onOpenRewardList,
   unitOfAccount,
@@ -109,36 +109,33 @@ function SummaryCard({
   };
 
   return (
-    <Card>
+    <Card sx={{ border: '1px solid', borderColor: 'grayscale.200', bgcolor: 'background.card' }}>
       <Box
         sx={{
           padding: '15px 24px',
-          borderBottom: '1px solid var(--yoroi-palette-gray-200)',
+          borderBottom: '1px solid',
+          borderColor: 'grayscale.200',
         }}
       >
-        <Typography variant="h5" color="var(--yoroi-palette-gray-900)">
+        <Typography variant="h5" color="grayscale.900">
           {intl.formatMessage(messages.summary)}
         </Typography>
       </Box>
       <Box sx={{ display: 'flex' }}>
-        <InfoRow>
+        <InfoRow sx={{ borderColor: 'grayscale.200' }}>
           <WrapperIcon bgcolor="#EEF1FA">
             <StakingIcon />
           </WrapperIcon>
           <InfoDetails>
-            <Typography
-              variant="body2"
-              color="var(--yoroi-palette-gray-600)"
-              sx={{ textTransform: 'uppercase' }}
-            >
+            <Typography variant="body2" color="grayscale.600" sx={{ textTransform: 'uppercase' }}>
               {intl.formatMessage(globalMessages.totalRewardsLabel)}
             </Typography>
           </InfoDetails>
           <InfoDetails>
-            <Typography variant="h1" fontWeight="400" color="var(--yoroi-palette-gray-900)">
+            <Typography variant="h1" color="grayscale.900">
               {renderAmount(totalRewards)}
             </Typography>
-            <Typography variant="body1" color="var(--yoroi-palette-gray-900)">
+            <Typography variant="body1" color="grayscale.900">
               {renderAmountWithUnitOfAccount(totalRewards)}
             </Typography>
           </InfoDetails>
@@ -146,16 +143,16 @@ function SummaryCard({
               {intl.formatMessage(globalMessages.overview)}
             </OverviewButton> */}
         </InfoRow>
-        <InfoRow>
+        <InfoRow sx={{ borderColor: 'grayscale.200' }}>
           <WrapperIcon bgcolor="#F3FAFF">
             <TotalDelegatedIcon />
           </WrapperIcon>
           <InfoDetails>
-            <Typography variant="body1" color="var(--yoroi-palette-gray-600)" marginBottom="4px">
+            <Typography variant="body1" color="grayscale.600" marginBottom="4px">
               {intl.formatMessage(globalMessages.totalDelegated)}
             </Typography>
             {totalDelegated ? (
-              <Typography variant="h1" fontWeight="400" color="var(--yoroi-palette-gray-900)">
+              <Typography variant="h1" fontWeight="400" color="grayscale.900">
                 {renderAmount(totalDelegated)}
               </Typography>
             ) : (
@@ -163,7 +160,7 @@ function SummaryCard({
                 <LoadingSpinner small />
               </div>
             )}
-            <Typography variant="body1" color="var(--yoroi-palette-gray-900)">
+            <Typography variant="body1" color="grayscale.900">
               {renderAmountWithUnitOfAccount(totalDelegated)}
             </Typography>
           </InfoDetails>
@@ -180,7 +177,6 @@ function SummaryCard({
 export default (injectIntl(observer(SummaryCard)): ComponentType<Props>);
 
 const Card = styled(Box)({
-  backgroundColor: 'var(--yoroi-palette-common-white)',
   borderRadius: '8px',
   flex: '1 1 48.5%',
   maxWidth: '48.5%',
@@ -191,7 +187,6 @@ const InfoRow = styled(Box)({
   margin: '0',
   display: 'flex',
   flexFlow: 'column',
-  borderColor: 'var(--yoroi-palette-gray-200)',
   borderStyle: 'solid',
   borderBottomWidth: '1px',
   gap: 8,

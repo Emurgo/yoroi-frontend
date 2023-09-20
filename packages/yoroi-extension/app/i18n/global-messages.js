@@ -16,6 +16,10 @@ const globalMessages: * = defineMessages({
     id: 'global.receive',
     defaultMessage: '!!!Receive',
   },
+  send: {
+    id: 'wallet.navigation.send',
+    defaultMessage: '!!!Send',
+  },
   yoroi: {
     id: 'global.yoroi',
     defaultMessage: '!!!Yoroi',

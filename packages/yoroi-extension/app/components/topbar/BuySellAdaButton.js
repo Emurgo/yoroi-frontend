@@ -39,12 +39,8 @@ class BuySellAdaButton extends Component<Props & InjectedProps> {
 
     const BuyAdaButtonRevamp = (
       <Button
-        sx={{
-          width: '173px',
-        }}
-        variant="outlined"
-        color="primary"
-        size="large"
+        sx={{ width: '173px' }}
+        variant="secondary"
         onClick={() => this.props.onBuySellClick()}
       >
         {intl.formatMessage(globalMessages.buyAda)}

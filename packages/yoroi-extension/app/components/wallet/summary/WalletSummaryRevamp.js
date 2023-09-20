@@ -1,24 +1,23 @@
 // @flow
-import { Component } from 'react';
 import type { Node } from 'react';
-import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
-import { ReactComponent as ExportTxToFileSvg } from '../../../assets/images/transaction/export.inline.svg';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
+import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { UnconfirmedAmount } from '../../../types/unconfirmedAmountType';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletSummary.scss';
-import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+import BigNumber from 'bignumber.js';
+import { Component } from 'react';
+import { observer } from 'mobx-react';
+import { defineMessages, intlShape } from 'react-intl';
 import { formatValue } from '../../../utils/unit-of-account';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { splitAmount, truncateToken } from '../../../utils/formatters';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { hiddenAmount } from '../../../utils/strings';
-import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';
-import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { Button, Typography } from '@mui/material';
-import { Box, styled } from '@mui/system';
-import BigNumber from 'bignumber.js';
+import { Box } from '@mui/system';
 
 const messages = defineMessages({
   pendingOutgoingConfirmationLabel: {
@@ -160,50 +159,42 @@ export default class WalletSummaryRevamp extends Component<Props> {
   }
 
   render(): Node {
-    const {
-      pendingAmount,
-      isLoadingTransactions,
-      openExportTxToFileDialog,
-    } = this.props;
+    const { pendingAmount, isLoadingTransactions, openExportTxToFileDialog } = this.props;
     const { intl } = this.context;
 
+    const hasPendingAmount = pendingAmount.incoming.length || pendingAmount.outgoing.length;
+
     const content = (
-      <Box
-        id="walletSummary_box"
-        sx={{
-          background: 'var(--yoroi-palette-common-white)',
-          boxShadow:
-            '0 4px 6px 0 #dee2ea, 0 1px 2px 0 rgb(222 226 234 / 82%), 0 2px 4px 0 rgb(222 226 234 / 74%)',
-        }}
-      >
+      <Box id="walletSummary_box" sx={{ background: 'common.white' }}>
         {!isLoadingTransactions && (
           <>
             <Box
               sx={{
-                padding: '24px 30px',
+                marginBottom: '24px',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
               }}
             >
+              <Typography
+                variant="h2"
+                as="p"
+                fontSize="18px"
+                sx={{ fontWeight: 500, color: 'common.black' }}
+              >
+                {intl.formatMessage({ id: 'wallet.summary.page.transactionsLabel' })}
+              </Typography>
               <Button
-                variant="ternary"
-                sx={{
-                  textTransform: 'uppercase',
-                  fontWeight: 'bold',
-                  borderWidth: 2,
-                  width: 'unset',
-                }}
+                variant="secondary"
+                sx={{ textTransform: 'uppercase', margin: '2px' }}
                 onClick={openExportTxToFileDialog}
                 onKeyPress={openExportTxToFileDialog}
                 disabled={isLoadingTransactions}
-                startIcon={<ExportTxToFileSvg />}
               >
                 {intl.formatMessage({ id: 'wallet.transaction.export.exportIcon.tooltip' })}
               </Button>
             </Box>
-            {/* {(pendingAmount.incoming.length > 0 || pendingAmount.outgoing.length > 0) && ( */}
-            <Box sx={{ padding: '16px 30px' }}>
+            <Box sx={{ padding: hasPendingAmount ? '16px 30px' : 0 }}>
               <Typography variant="body1">
                 {this.renderPendingAmount(
                   pendingAmount.incoming,
@@ -217,30 +208,28 @@ export default class WalletSummaryRevamp extends Component<Props> {
                 )}
               </Typography>
             </Box>
-            {/* )} */}
           </>
         )}
         <Box
           sx={{
             display: 'flex',
-            padding: '20px 30px 10px',
-            paddingRight: '68px',
+            padding: '12px 0',
             width: '100%',
             justifyContent: 'space-between',
           }}
         >
-          <Label variant="body2" sx={columnTXStyles.transactionType}>
+          <Typography variant="body2" sx={{ ...columnTXStyles.transactionType, maxWidth: '35%' }}>
             {intl.formatMessage({ id: 'wallet.summary.page.type' })}
-          </Label>
-          <Label variant="body2" sx={columnTXStyles.status}>
+          </Typography>
+          <Typography variant="body2" sx={columnTXStyles.status}>
             {intl.formatMessage({ id: 'wallet.summary.page.status' })}
-          </Label>
-          <Label variant="body2" sx={columnTXStyles.fee}>
+          </Typography>
+          <Typography variant="body2" sx={columnTXStyles.fee}>
             {intl.formatMessage(globalMessages.feeLabel)}
-          </Label>
-          <Label variant="body2" sx={columnTXStyles.amount}>
+          </Typography>
+          <Typography variant="body2" sx={{ ...columnTXStyles.amount, maxWidth: '30%' }}>
             {intl.formatMessage(globalMessages.amountLabel)}
-          </Label>
+          </Typography>
         </Box>
       </Box>
     );
@@ -249,13 +238,9 @@ export default class WalletSummaryRevamp extends Component<Props> {
   }
 }
 
-const Label = styled(Typography)({
-  color: 'var(--yoroi-palette-gray-600)',
-});
-
 export const columnTXStyles = {
-  transactionType: { flex: '1 1 30%', maxWidth: '30%', textAlign: 'left' },
-  status: { flex: '1 1 16%', maxWidth: '16%', textAlign: 'left' },
-  fee: { flex: '1 1 16%', maxWidth: '16%', textAlign: 'right' },
-  amount: { flex: '1 1 25%', maxWidth: '25%', textAlign: 'right' },
+  transactionType: { flex: '1 1 30%', maxWidth: '30%', textAlign: 'left', color: 'grayscale.600' },
+  status: { flex: '1 1 16%', maxWidth: '16%', textAlign: 'left', color: 'grayscale.600' },
+  fee: { flex: '1 1 16%', maxWidth: '16%', textAlign: 'right', color: 'grayscale.600' },
+  amount: { flex: '1 1 25%', maxWidth: '25%', textAlign: 'right', color: 'grayscale.600' },
 };

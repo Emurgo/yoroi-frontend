@@ -189,7 +189,6 @@
   }
   // ========= DETAILS =========
   .content {
-    background-color: var(--yoroi-palette-gray-50);
     padding-left: 24px;
     padding-right: 24px;
 
@@ -271,7 +270,6 @@
       margin-left: 5px;
     }
     .addressList {
-      color: var(--yoroi-palette-gray-600);
       font-size: 14px;
       & > * {
         padding-bottom: 10px;
@@ -295,7 +293,6 @@
       font-size: 14px;
       margin-bottom: 3px;
       line-height: 1.38;
-      color: var(--yoroi-palette-gray-900);
     }
 
     .rowData {
