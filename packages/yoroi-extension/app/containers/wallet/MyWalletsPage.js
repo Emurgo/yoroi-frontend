@@ -30,7 +30,6 @@ import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { withLayout } from '../../styles/context/layout';
 import { Box } from '@mui/system';
-import { Button } from '@mui/material';
 import MyWallets from '../../components/wallet/my-wallets/MyWallets';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import WalletRow from '../../components/wallet/my-wallets/WalletRow';

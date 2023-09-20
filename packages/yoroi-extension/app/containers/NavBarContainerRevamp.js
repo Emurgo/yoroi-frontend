@@ -26,7 +26,6 @@ import { getReceiveAddress } from '../stores/stateless/addressStores';
 import BuySellDialog from '../components/buySell/BuySellDialog';
 import NavBarRevamp from '../components/topbar/NavBarRevamp';
 import NavWalletDetailsRevamp from '../components/topbar/NavWalletDetailsRevamp';
-import BuySellAdaButton from '../components/topbar/BuySellAdaButton';
 import WalletListDialog from '../components/topbar/WalletListDialog';
 
 export type GeneratedData = typeof NavBarContainerRevamp.prototype.generated;
