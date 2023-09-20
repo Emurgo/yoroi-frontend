@@ -114,9 +114,9 @@ class CardanoStakingPage extends Component<AllProps, State> {
             locale={locale}
             bias={stakingListBias}
             totalAda={totalAda}
-            poolList={delegationRequests.getCurrentDelegation.result?.currEpoch?.pools.map(
-              tuple => tuple[0]
-            ) ?? []}
+            poolList={delegationRequests.getDelegatedBalance.result?.delegation != null ?
+              [delegationRequests.getDelegatedBalance.result?.delegation] : []
+            }
             stakepoolSelectedAction={async (poolId) => {
               await this._updatePool(poolId);
               await this._next();
@@ -153,10 +153,8 @@ class CardanoStakingPage extends Component<AllProps, State> {
               locale={locale}
               bias={stakingListBias}
               totalAda={totalAda}
-              poolList={
-                delegationRequests.getCurrentDelegation.result?.currEpoch?.pools.map(
-                  tuple => tuple[0]
-                ) ?? []
+              poolList={delegationRequests.getDelegatedBalance.result?.delegation != null ?
+                [delegationRequests.getDelegatedBalance.result?.delegation] : []
               }
               setFirstPool={pool => {
                 this.setState({ firstPool: pool });
