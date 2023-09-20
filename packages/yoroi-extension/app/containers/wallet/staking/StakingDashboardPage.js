@@ -104,18 +104,11 @@ export default class StakingDashboardPage extends Component<Props> {
     const dashboard = (
       <StakingDashboard
         pageInfo={
-          !delegationRequests.getCurrentDelegation.wasExecuted ||
-          delegationRequests.getCurrentDelegation.isExecuting
+          stakePools.pools == null
             ? undefined
             : {
                 currentPage: this.generated.stores.delegation.selectedPage,
-                numPages: Array.from(
-                  new Set(
-                    delegationRequests.getCurrentDelegation.result?.currEpoch?.pools.map(
-                      tuple => tuple[0]
-                    )
-                  ) ?? []
-                ).length,
+                numPages: stakePools.pools.length,
                 goToPage: page => this.generated.actions.delegation.setSelectedPage.trigger(page),
               }
         }
@@ -413,13 +406,6 @@ export default class StakingDashboardPage extends Component<Props> {
     if (delegationRequests.error != null) {
       return { error: delegationRequests.error };
     }
-    if (delegationRequests.getCurrentDelegation.result != null) {
-      const currentDelegation = delegationRequests.getCurrentDelegation.result;
-      const currEpochInfo = currentDelegation.currEpoch;
-      if (currEpochInfo == null) {
-        return undefined;
-      }
-    }
     return undefined;
   };
 
@@ -581,7 +567,6 @@ export default class StakingDashboardPage extends Component<Props> {
     errorIfPresent: void | {| error: LocalizableError |},
   |}) => Node = request => {
     const showRewardAmount =
-      request.delegationRequests.getCurrentDelegation.wasExecuted &&
       request.delegationRequests.getDelegatedBalance.wasExecuted &&
       request.errorIfPresent == null;
 
@@ -597,7 +582,7 @@ export default class StakingDashboardPage extends Component<Props> {
         : request.delegationRequests.getDelegatedBalance.result.accountPart;
 
     const currentlyDelegating =
-      (request.delegationRequests.getCurrentDelegation.result?.currEpoch?.pools ?? []).length > 0;
+      request.delegationRequests.getDelegatedBalance.result?.delegation != null;
 
     return (
       <UserSummary
