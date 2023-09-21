@@ -52,7 +52,6 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +numberOfTransactions: number,
   +shouldHideBalance: boolean,
   +pendingAmount: UnconfirmedAmount,
   +isLoadingTransactions: boolean,
@@ -185,7 +184,6 @@ export default class WalletSummary extends Component<Props> {
   render(): Node {
     const {
       pendingAmount,
-      numberOfTransactions,
       isLoadingTransactions,
       openExportTxToFileDialog,
     } = this.props;
@@ -198,9 +196,6 @@ export default class WalletSummary extends Component<Props> {
           <BorderedBox>
             {!isLoadingTransactions && (
               <>
-                <div className={styles.numberOfTransactions}>
-                  {intl.formatMessage(messages.numOfTxsLabel)}: <span>{numberOfTransactions}</span>
-                </div>
                 {(pendingAmount.incoming.length > 0 || pendingAmount.outgoing.length > 0) && (
                   <div className={styles.pendingSection}>
                     {this.renderPendingAmount(

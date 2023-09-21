@@ -43,16 +43,19 @@ function AddWalletPageContent(props: Props & Intl): Node {
       imageSrc: CreateWalletLogo,
       label: intl.formatMessage(messages.createWallet),
       onClick: onCreate,
+      id: 'createWalletButton'
     },
     {
       imageSrc: RestoreWalletLogo,
       label: intl.formatMessage(messages.restoreWallet),
       onClick: onRestore,
+      id: 'restoreWalletButton'
     },
     {
       imageSrc: ConnectHardwareWalletLogo,
       label: intl.formatMessage(messages.connectHardwareWallet),
       onClick: onHardwareConnect,
+      id: 'connectHardwareWalletButton'
     }
   ]
 

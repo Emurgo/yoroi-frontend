@@ -1,25 +1,44 @@
 // @flow
 import type { Node, ComponentType } from 'react';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { InjectedOrGenerated } from '../../types/injectedPropsType';
+import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
+import type { GeneratedData as BannerContainerData } from '../banners/BannerContainer';
+import type { ConceptualWalletSettingsCache } from '../../stores/toplevel/WalletSettingsStore';
+import type { DelegationRequests } from '../../stores/toplevel/DelegationStore';
+import type { PublicKeyCache } from '../../stores/toplevel/WalletStore';
+import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
+import type {
+  IGetPublic,
+  IGetLastSyncInfoResponse,
+} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { WalletInfo } from '../../components/buySell/BuySellDialog';
+import type { LayoutComponentMap } from '../../styles/context/layout';
 import { Component } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
-import type { InjectedOrGenerated } from '../../types/injectedPropsType';
-
+import { ROUTES } from '../../routes-config';
+import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import { asGetPublicKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import { MultiToken } from '../../api/common/lib/MultiToken';
+import { genLookupOrFail, getTokenName } from '../../stores/stateless/tokenHelpers';
+import { getReceiveAddress } from '../../stores/stateless/addressStores';
+import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
+import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { withLayout } from '../../styles/context/layout';
+import { Box } from '@mui/system';
 import MyWallets from '../../components/wallet/my-wallets/MyWallets';
 import TopBarLayout from '../../components/layout/TopBarLayout';
-
 import WalletRow from '../../components/wallet/my-wallets/WalletRow';
 import WalletDetails from '../../components/wallet/my-wallets/WalletDetails';
 import WalletCurrency from '../../components/wallet/my-wallets/WalletCurrency';
 import WalletSubRow from '../../components/wallet/my-wallets/WalletSubRow';
 import NavPlate from '../../components/topbar/NavPlate';
-import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import SidebarContainer from '../SidebarContainer';
-import type { GeneratedData as BannerContainerData } from '../banners/BannerContainer';
 import BannerContainer from '../banners/BannerContainer';
-import { ROUTES } from '../../routes-config';
 import NavBar from '../../components/topbar/NavBar';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import WalletSync from '../../components/wallet/my-wallets/WalletSync';
@@ -27,28 +46,8 @@ import moment from 'moment';
 import NavBarAddButton from '../../components/topbar/NavBarAddButton';
 import BuySellAdaButton from '../../components/topbar/BuySellAdaButton';
 import globalMessages from '../../i18n/global-messages';
-import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import { asGetPublicKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { ConceptualWalletSettingsCache } from '../../stores/toplevel/WalletSettingsStore';
-import type { DelegationRequests } from '../../stores/toplevel/DelegationStore';
-import type { PublicKeyCache } from '../../stores/toplevel/WalletStore';
-import type { TxRequests } from '../../stores/toplevel/TransactionsStore';
-import type { IGetPublic } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import { MultiToken } from '../../api/common/lib/MultiToken';
-import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
-import { genLookupOrFail, getTokenName } from '../../stores/stateless/tokenHelpers';
-import { getReceiveAddress } from '../../stores/stateless/addressStores';
 import BuySellDialog from '../../components/buySell/BuySellDialog';
-import type { WalletInfo } from '../../components/buySell/BuySellDialog';
-import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
-import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import NavBarRevamp from '../../components/topbar/NavBarRevamp';
-import { withLayout } from '../../styles/context/layout';
-import type { LayoutComponentMap } from '../../styles/context/layout';
-import { Box } from '@mui/system';
-import { Button } from '@mui/material';
 
 export type GeneratedData = typeof MyWalletsPage.prototype.generated;
 
@@ -240,8 +239,7 @@ class MyWalletsPage extends Component<AllProps> {
       );
     })();
 
-    const txRequests: TxRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
-    const balance = txRequests.requests.getBalanceRequest.result ?? null;
+    const balance = this.generated.stores.transactions.getBalance(publicDeriver);
 
     const withPubKey = asGetPublicKey(publicDeriver);
     const plate =
@@ -250,6 +248,8 @@ class MyWalletsPage extends Component<AllProps> {
     const isRefreshing = this.generated.stores.transactions.isWalletRefreshing(publicDeriver);
 
     const isLoading = this.generated.stores.transactions.isWalletLoading(publicDeriver);
+
+    const lastSyncInfo = this.generated.stores.transactions.getLastSyncInfo(publicDeriver);
 
     return (
       <WalletRow
@@ -272,9 +272,7 @@ class MyWalletsPage extends Component<AllProps> {
         walletPlate={<NavPlate plate={plate} wallet={settingsCache} />}
         walletSync={
           <WalletSync
-            time={
-              txRequests.lastSyncInfo.Time ? moment(txRequests.lastSyncInfo.Time).fromNow() : null
-            }
+            time={lastSyncInfo.Time ? moment(lastSyncInfo.Time).fromNow() : null}
             isRefreshing={isRefreshing}
             isLoading={isLoading}
           />
@@ -418,7 +416,8 @@ class MyWalletsPage extends Component<AllProps> {
         getDefaultTokenInfo: number => $ReadOnly<TokenRow>,
       |},
       transactions: {|
-        getTxRequests: (PublicDeriver<>) => TxRequests,
+        getBalance: (PublicDeriver<>) => MultiToken | null,
+        getLastSyncInfo: (PublicDeriver<>) => IGetLastSyncInfoResponse,
         isWalletRefreshing: (PublicDeriver<>) => boolean,
         isWalletLoading: (PublicDeriver<>) => boolean,
       |},
@@ -459,9 +458,10 @@ class MyWalletsPage extends Component<AllProps> {
           getDefaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfo,
         },
         transactions: {
-          getTxRequests: stores.transactions.getTxRequests,
+          getBalance: stores.transactions.getBalance,
           isWalletRefreshing: stores.transactions.isWalletRefreshing,
           isWalletLoading: stores.transactions.isWalletLoading,
+          getLastSyncInfo: stores.transactions.getLastSyncInfo,
         },
         walletSettings: {
           getConceptualWalletSettingsCache: stores.walletSettings.getConceptualWalletSettingsCache,

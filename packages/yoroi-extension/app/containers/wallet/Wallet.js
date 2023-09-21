@@ -85,8 +85,8 @@ class Wallet extends Component<AllProps> {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver == null) return;
 
-    const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result;
-    const walletHasAssets = !!spendableBalance?.nonDefaultEntries().length;
+    const spendableBalance = this.generated.stores.transactions.balance;
+    const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
 
     const activeCategory = categories.find(category =>
       this.generated.stores.app.currentRoute.startsWith(category.route)
@@ -96,7 +96,10 @@ class Wallet extends Component<AllProps> {
     // ex: a cardano-only page for an Ergo wallet
     // or no category is selected yet (wallet selected for the first time)
     const visibilityContext = { selected: publicDeriver, walletHasAssets };
-    if (!activeCategory?.isVisible(visibilityContext)) {
+    if (
+      !activeCategory?.isVisible(visibilityContext)
+      && activeCategory?.isHiddenButAllowed !== true
+    ) {
       const firstValidCategory = categories.find(c => c.isVisible(visibilityContext));
       if (firstValidCategory == null) {
         throw new Error(`Selected wallet has no valid category`);
@@ -136,8 +139,9 @@ class Wallet extends Component<AllProps> {
     if (selectedWallet == null) throw new Error(`${nameof(Wallet)} no public deriver`);
 
     const isFirstSync = stores.wallets.firstSyncWalletId === selectedWallet.getPublicDeriverId();
-    const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result;
-    const walletHasAssets = !!spendableBalance?.nonDefaultEntries().length;
+    const spendableBalance = this.generated.stores.transactions.balance;
+    const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
+
     const visibilityContext = { selected: selectedWallet, walletHasAssets };
 
     const menu = (
@@ -275,11 +279,7 @@ class Wallet extends Component<AllProps> {
         getLastSelectedWallet: void => ?PublicDeriver<>,
       |},
       router: {| location: any |},
-      transactions: {|
-        getBalanceRequest: {|
-          result: ?MultiToken,
-        |},
-      |},
+      transactions: {| balance: MultiToken | null |},
       profile: {|
         isRevampTheme: boolean,
         isClassicTheme: boolean,
@@ -312,17 +312,7 @@ class Wallet extends Component<AllProps> {
           location: stores.router.location,
         },
         transactions: {
-          getBalanceRequest: (() => {
-            if (stores.wallets.selected == null)
-              return {
-                result: undefined,
-              };
-            const { requests } = stores.transactions.getTxRequests(stores.wallets.selected);
-
-            return {
-              result: requests.getBalanceRequest.result,
-            };
-          })(),
+          balance: stores.transactions.balance,
         },
         profile: {
           isRevampTheme: stores.profile.isRevampTheme,

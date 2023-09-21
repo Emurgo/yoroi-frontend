@@ -11,7 +11,6 @@ function serverToPermission(server /*: string */)/*: string */ {
 }
 
 const Ports = {
-  WebpackDev: 3000,
   DevBackendServer: 21000,
   ErgoMockServer: 21001,
   ReactDevTools: 8097,

@@ -33,7 +33,6 @@ import SeizaFetcher from './SeizaFetcher';
 import type { Notification } from '../../../types/notificationType';
 import config from '../../../config';
 import { handleExternalLinkClick } from '../../../utils/routing';
-import type { TxRequests } from '../../../stores/toplevel/TransactionsStore'
 import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
 import { genLookupOrFail, getTokenName } from '../../../stores/stateless/tokenHelpers';
 import {
@@ -107,8 +106,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
       if (publicDeriver == null) {
         throw new Error(`${nameof(CardanoStakingPage)} no public deriver. Should never happen`);
       }
-      const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
-      const balance = txRequests.requests.getBalanceRequest.result;
+      const balance = this.generated.stores.transactions.getBalance(publicDeriver);
       const isWalletWithNoFunds = balance != null && balance.getDefaultEntry().amount.isZero();
 
       const classicCardanoStakingPage = (
@@ -212,8 +210,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
       throw new Error(`${nameof(CardanoStakingPage)} opened for non-reward wallet`);
     }
 
-    const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
-    const balance = txRequests.requests.getBalanceRequest.result;
+    const balance = this.generated.stores.transactions.getBalance(publicDeriver);
     if (balance == null) {
       return null;
     }
@@ -516,7 +513,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
     stores: {|
       transactions: {|
         hasAnyPending: boolean,
-        getTxRequests: (PublicDeriver<>) => TxRequests,
+        getBalance: (PublicDeriver<>) => MultiToken | null,
         showDelegationBanner: boolean,
       |},
       delegation: {|
@@ -601,7 +598,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
         },
         transactions: {
           hasAnyPending: stores.transactions.hasAnyPending,
-          getTxRequests: stores.transactions.getTxRequests,
+          getBalance: stores.transactions.getBalance,
           showDelegationBanner: stores.transactions.showDelegationBanner,
         },
         tokenInfoStore: {

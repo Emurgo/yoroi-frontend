@@ -203,7 +203,7 @@ export async function copyDbToMemory(
 const populateAndCreate = async (
   storeType: $Values<typeof schema.DataStoreType>
 ): Promise<lf$Database> => {
-  const schemaVersion = 17;
+  const schemaVersion = 18;
   const schemaBuilder = schema.create(schemaName, schemaVersion);
 
   populatePrimitivesDb(schemaBuilder);
@@ -448,5 +448,12 @@ async function onUpgrade(
   }
   if (version >= 3 && version <= 15) {
     await deleteTxTables(rawDb);
+  }
+  if (version < 18) {
+    await rawDb.addTableColumn(
+      'Address',
+      'IsUsed',
+      false
+    );
   }
 }

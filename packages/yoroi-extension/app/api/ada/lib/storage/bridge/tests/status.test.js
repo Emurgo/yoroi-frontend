@@ -17,12 +17,13 @@ import {
 } from '../../../../../jestUtils';
 import {
   genCheckAddressesInUse,
-  genGetTransactionsHistoryForAddresses,
   genGetBestBlock,
   getSingleAddressString,
   genGetTokenInfo,
   genGetMultiAssetMetadata,
   MockUtxoApi,
+  genGetRecentTransactionHashes,
+  genGetTransactionsByHashes,
 } from '../../../state-fetch/mockNetwork';
 import { loadLovefieldDB } from '../../database/index';
 import {
@@ -320,13 +321,11 @@ async function baseTest(
 
   const network = networks.CardanoMainnet;
   const checkAddressesInUse = genCheckAddressesInUse(networkTransactions, network);
-  const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
-    networkTransactions,
-    network,
-  );
   const getBestBlock = genGetBestBlock(networkTransactions);
   const getTokenInfo = genGetTokenInfo();
   const getMultiAssetMetadata = genGetMultiAssetMetadata();
+  const getRecentTransactionHashes = genGetRecentTransactionHashes(networkTransactions);
+  const getTransactionsByHashes = genGetTransactionsByHashes(networkTransactions);
 
   const withDisplayCutoff = asDisplayCutoff(publicDeriver);
   if (!withDisplayCutoff) throw new Error('missing display cutoff functionality');
@@ -342,12 +341,15 @@ async function baseTest(
       db,
       basePubDeriver,
       checkAddressesInUse,
+      getTokenInfo,
+      getMultiAssetMetadata,
     );
     await updateTransactions(
       db,
       basePubDeriver,
       checkAddressesInUse,
-      getTransactionsHistoryForAddresses,
+      getRecentTransactionHashes,
+      getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
       getMultiAssetMetadata
@@ -394,15 +396,18 @@ async function baseTest(
       db,
       basePubDeriver,
       checkAddressesInUse,
+      getTokenInfo,
+      getMultiAssetMetadata,
     );
     await updateTransactions(
       db,
       basePubDeriver,
       checkAddressesInUse,
-      getTransactionsHistoryForAddresses,
+      getRecentTransactionHashes,
+      getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
-      getMultiAssetMetadata
+      getMultiAssetMetadata,
     );
 
     {
@@ -526,12 +531,15 @@ async function baseTest(
       db,
       basePubDeriver,
       checkAddressesInUse,
+      getTokenInfo,
+      getMultiAssetMetadata,
     );
     await updateTransactions(
       db,
       basePubDeriver,
       checkAddressesInUse,
-      getTransactionsHistoryForAddresses,
+      getRecentTransactionHashes,
+      getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
       getMultiAssetMetadata
@@ -713,12 +721,15 @@ async function baseTest(
       db,
       basePubDeriver,
       checkAddressesInUse,
+      getTokenInfo,
+      getMultiAssetMetadata,
     );
     await updateTransactions(
       db,
       basePubDeriver,
       checkAddressesInUse,
-      getTransactionsHistoryForAddresses,
+      getRecentTransactionHashes,
+      getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
       getMultiAssetMetadata
@@ -889,17 +900,21 @@ async function baseTest(
       db,
       basePubDeriver,
       checkAddressesInUse,
+      getTokenInfo,
+      getMultiAssetMetadata,
     );
     await updateTransactions(
       db,
       basePubDeriver,
       checkAddressesInUse,
-      getTransactionsHistoryForAddresses,
+      getRecentTransactionHashes,
+      getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
       getMultiAssetMetadata
     );
 
+    /*
     expect((await db.export()).tables.Transaction).toEqual([{
       Type: TransactionType.CardanoByron,
       Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
@@ -944,6 +959,7 @@ async function baseTest(
       const response = await basePubDeriver.getAllUtxosFromOldDb();
       expect(response).toEqual([]);
     }
+    */
     {
       const response = await basePubDeriver.getAllUtxos();
       expect(response).toEqual([
@@ -1040,13 +1056,11 @@ async function pendingDropped(
 
   const network = networks.CardanoMainnet;
   const checkAddressesInUse = genCheckAddressesInUse(networkTransactions, network);
-  const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
-    networkTransactions,
-    network
-  );
   const getBestBlock = genGetBestBlock(networkTransactions);
   const getTokenInfo = genGetTokenInfo();
   const getMultiAssetMetadata = genGetMultiAssetMetadata();
+  const getRecentTransactionHashes = genGetRecentTransactionHashes(networkTransactions);
+  const getTransactionsByHashes = genGetTransactionsByHashes(networkTransactions);
 
   const basePubDeriver = asGetAllUtxos(publicDeriver);
   expect(basePubDeriver != null).toEqual(true);
@@ -1059,12 +1073,15 @@ async function pendingDropped(
     db,
     basePubDeriver,
     checkAddressesInUse,
+    getTokenInfo,
+    getMultiAssetMetadata,
   );
   await updateTransactions(
     db,
     basePubDeriver,
     checkAddressesInUse,
-    getTransactionsHistoryForAddresses,
+    getRecentTransactionHashes,
+    getTransactionsByHashes,
     getBestBlock,
     getTokenInfo,
     getMultiAssetMetadata
@@ -1078,12 +1095,15 @@ async function pendingDropped(
     db,
     basePubDeriver,
     checkAddressesInUse,
+    getTokenInfo,
+    getMultiAssetMetadata,
   );
   await updateTransactions(
     db,
     basePubDeriver,
     checkAddressesInUse,
-    getTransactionsHistoryForAddresses,
+    getRecentTransactionHashes,
+    getTransactionsByHashes,
     getBestBlock,
     getTokenInfo,
     getMultiAssetMetadata

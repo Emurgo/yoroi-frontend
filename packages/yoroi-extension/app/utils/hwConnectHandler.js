@@ -98,8 +98,8 @@ export class LedgerConnect {
     action: string,
     params: any,
     serial: ?string,
-    dontCloseTab?: boolean = false,
-    useOpenTab?: boolean = false,
+    dontCloseTab?: boolean,
+    useOpenTab?: boolean,
   ): any {
     let tabId;
     if (useOpenTab && this.tabId != null) {
@@ -139,14 +139,16 @@ export class LedgerConnect {
 
   _createLedgerTab(): Promise<number> {
     return new Promise(resolve => {
-      const readyListener = (message, sender) => {
-        if (message === 'ledger-ready') {
+      const readyListener = message => {
+        if (message.type === 'ledger-ready') {
           chrome.runtime.onMessage.removeListener(readyListener);
-          resolve(sender.tab.id);
+          resolve(message.tabId);
         }
       };
       chrome.runtime.onMessage.addListener(readyListener);
-      chrome.tabs.create({ url: `ledger.html?locale=${this.locale}` });
+      chrome.tabs.getCurrent(tab => {
+        chrome.tabs.create({ url: `ledger.html?locale=${this.locale}&mainTabId=${tab.id}` });
+      })
     });
   }
 
