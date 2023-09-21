@@ -30,8 +30,7 @@ var __assign = (this && this.__assign) || function () {
 import * as amplitude from '@amplitude/analytics-browser';
 export var ApiKey = {
     production: 'd44950b777177c2ebee5f21f194c1231',
-    development: '52a980fd5fb8da5fc680687d7e991e18',
-    staging: '53e9e81ab1b50d726a692b81f29a0403'
+    development: '52a980fd5fb8da5fc680687d7e991e18'
 };
 /**
  * Default Amplitude configuration options. Contains tracking plan information.
@@ -47,6 +46,13 @@ export var DefaultConfiguration = __assign({ plan: {
         sourceVersion: '2.0.0'
     }
 });
+var AllWalletsPageViewed = /** @class */ (function () {
+    function AllWalletsPageViewed() {
+        this.event_type = 'All Wallets Page Viewed';
+    }
+    return AllWalletsPageViewed;
+}());
+export { AllWalletsPageViewed };
 var AssetsPageViewed = /** @class */ (function () {
     function AssetsPageViewed() {
         this.event_type = 'Assets Page Viewed';
@@ -133,6 +139,50 @@ var CreateWalletVerifyPhraseWordSelected = /** @class */ (function () {
     return CreateWalletVerifyPhraseWordSelected;
 }());
 export { CreateWalletVerifyPhraseWordSelected };
+var DappPopupAddCollateralPageViewed = /** @class */ (function () {
+    function DappPopupAddCollateralPageViewed() {
+        this.event_type = 'Dapp Popup Add Collateral Page Viewed';
+    }
+    return DappPopupAddCollateralPageViewed;
+}());
+export { DappPopupAddCollateralPageViewed };
+var DappPopupConnectWalletPageViewed = /** @class */ (function () {
+    function DappPopupConnectWalletPageViewed(event_properties) {
+        this.event_properties = event_properties;
+        this.event_type = 'Dapp Popup Connect Wallet Page Viewed';
+        this.event_properties = event_properties;
+    }
+    return DappPopupConnectWalletPageViewed;
+}());
+export { DappPopupConnectWalletPageViewed };
+var DappPopupConnectWalletPasswordPageViewed = /** @class */ (function () {
+    function DappPopupConnectWalletPasswordPageViewed() {
+        this.event_type = 'Dapp Popup Connect Wallet Password Page Viewed';
+    }
+    return DappPopupConnectWalletPasswordPageViewed;
+}());
+export { DappPopupConnectWalletPasswordPageViewed };
+var DappPopupSignTransactionPageViewed = /** @class */ (function () {
+    function DappPopupSignTransactionPageViewed() {
+        this.event_type = 'Dapp Popup Sign Transaction Page Viewed';
+    }
+    return DappPopupSignTransactionPageViewed;
+}());
+export { DappPopupSignTransactionPageViewed };
+var DappPopupSignTransactionSubmitted = /** @class */ (function () {
+    function DappPopupSignTransactionSubmitted() {
+        this.event_type = 'Dapp Popup Sign Transaction Submitted';
+    }
+    return DappPopupSignTransactionSubmitted;
+}());
+export { DappPopupSignTransactionSubmitted };
+var MenuPageViewed = /** @class */ (function () {
+    function MenuPageViewed() {
+        this.event_type = 'Menu Page Viewed';
+    }
+    return MenuPageViewed;
+}());
+export { MenuPageViewed };
 var NftGalleryDetailsImageViewed = /** @class */ (function () {
     function NftGalleryDetailsImageViewed() {
         this.event_type = 'NFT Gallery Details Image Viewed';
@@ -295,6 +345,13 @@ var SettingsPageViewed = /** @class */ (function () {
     return SettingsPageViewed;
 }());
 export { SettingsPageViewed };
+var StakingCenterPageViewed = /** @class */ (function () {
+    function StakingCenterPageViewed() {
+        this.event_type = 'Staking Center Page Viewed';
+    }
+    return StakingCenterPageViewed;
+}());
+export { StakingCenterPageViewed };
 var StakingPageViewed = /** @class */ (function () {
     function StakingPageViewed() {
         this.event_type = 'Staking Page Viewed';
@@ -330,8 +387,10 @@ var SwapCancelationSubmitted = /** @class */ (function () {
 }());
 export { SwapCancelationSubmitted };
 var SwapConfirmedPageViewed = /** @class */ (function () {
-    function SwapConfirmedPageViewed() {
+    function SwapConfirmedPageViewed(event_properties) {
+        this.event_properties = event_properties;
         this.event_type = 'Swap Confirmed  Page Viewed';
+        this.event_properties = event_properties;
     }
     return SwapConfirmedPageViewed;
 }());
@@ -470,6 +529,15 @@ var Ampli = /** @class */ (function () {
         return this.amplitude.identify(amplitudeIdentify, options);
     };
     /**
+     * Flush the event.
+     */
+    Ampli.prototype.flush = function () {
+        if (!this.isInitializedAndEnabled()) {
+            return getVoidPromiseResult();
+        }
+        return this.amplitude.flush();
+    };
+    /**
      * Track event
      *
      * @param event The event to track.
@@ -480,6 +548,18 @@ var Ampli = /** @class */ (function () {
             return getVoidPromiseResult();
         }
         return this.amplitude.track(event, undefined, options);
+    };
+    /**
+     * All Wallets Page Viewed
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/All%20Wallets%20Page%20Viewed)
+     *
+     * This event tracks when a user views the All Wallets page on Menu. Note: only available on Yoroi Mobile.
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.allWalletsPageViewed = function (options) {
+        return this.track(new AllWalletsPageViewed(), options);
     };
     /**
      * Assets Page Viewed
@@ -633,6 +713,79 @@ var Ampli = /** @class */ (function () {
      */
     Ampli.prototype.createWalletVerifyPhraseWordSelected = function (properties, options) {
         return this.track(new CreateWalletVerifyPhraseWordSelected(properties), options);
+    };
+    /**
+     * Dapp Popup Add Collateral Page Viewed
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Dapp%20Popup%20Add%20Collateral%20Page%20Viewed)
+     *
+     * This event tracks when a user views the "Add Collateral" page in the Dapp Connector Popup
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.dappPopupAddCollateralPageViewed = function (options) {
+        return this.track(new DappPopupAddCollateralPageViewed(), options);
+    };
+    /**
+     * Dapp Popup Connect Wallet Page Viewed
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Dapp%20Popup%20Connect%20Wallet%20Page%20Viewed)
+     *
+     * This event is triggered when the dapp connector popup is triggered and the user select the wallet that wants to connect.
+     *
+     * @param properties The event's properties (e.g. wallet_count)
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.dappPopupConnectWalletPageViewed = function (properties, options) {
+        return this.track(new DappPopupConnectWalletPageViewed(properties), options);
+    };
+    /**
+     * Dapp Popup Connect Wallet Password Page Viewed
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Dapp%20Popup%20Connect%20Wallet%20Password%20Page%20Viewed)
+     *
+     * This event tracks when a user attempts to connect their wallet by entering their password in the Dapp Connector popup
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.dappPopupConnectWalletPasswordPageViewed = function (options) {
+        return this.track(new DappPopupConnectWalletPasswordPageViewed(), options);
+    };
+    /**
+     * Dapp Popup Sign Transaction Page Viewed
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Dapp%20Popup%20Sign%20Transaction%20Page%20Viewed)
+     *
+     * This event tracks when a user loads transaction screenThis event tracks when a user signs a transaction within a Dapp popup within a Dapp Connector Popup
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.dappPopupSignTransactionPageViewed = function (options) {
+        return this.track(new DappPopupSignTransactionPageViewed(), options);
+    };
+    /**
+     * Dapp Popup Sign Transaction Submitted
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Dapp%20Popup%20Sign%20Transaction%20Submitted)
+     *
+     * This event tracks the click "confirm" button on submission of a sign transaction request within the Dapp Connector Popup This event tracks the submission of a sign transaction request within the Dapp Popup feature
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.dappPopupSignTransactionSubmitted = function (options) {
+        return this.track(new DappPopupSignTransactionSubmitted(), options);
+    };
+    /**
+     * Menu Page Viewed
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Menu%20Page%20Viewed)
+     *
+     * This event is triggered when a user views the menu page within the application
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.menuPageViewed = function (options) {
+        return this.track(new MenuPageViewed(), options);
     };
     /**
      * NFT Gallery Details Image Viewed
@@ -893,6 +1046,18 @@ var Ampli = /** @class */ (function () {
         return this.track(new SettingsPageViewed(), options);
     };
     /**
+     * Staking Center Page Viewed
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Staking%20Center%20Page%20Viewed)
+     *
+     * This event tracks when a user views the Staking Center page on Staking menu.
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.stakingCenterPageViewed = function (options) {
+        return this.track(new StakingCenterPageViewed(), options);
+    };
+    /**
      * Staking Page Viewed
      *
      * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Staking%20Page%20Viewed)
@@ -958,10 +1123,11 @@ var Ampli = /** @class */ (function () {
      *
      * Owner: Omar Rozak
      *
+     * @param properties The event's properties (e.g. swap_tab)
      * @param options Amplitude event options.
      */
-    Ampli.prototype.swapConfirmedPageViewed = function (options) {
-        return this.track(new SwapConfirmedPageViewed(), options);
+    Ampli.prototype.swapConfirmedPageViewed = function (properties, options) {
+        return this.track(new SwapConfirmedPageViewed(properties), options);
     };
     /**
      * Swap Initiated
