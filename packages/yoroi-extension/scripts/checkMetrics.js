@@ -6,6 +6,7 @@ const EXCLUDE = [
   'load',
   'identify',
   'track',
+  'flush',
 ];
 
 const eventNames = Object.keys(Ampli.prototype).filter(name => !EXCLUDE.includes(name))
