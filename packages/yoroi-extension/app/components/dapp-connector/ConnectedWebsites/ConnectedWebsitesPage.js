@@ -8,7 +8,7 @@ import type { ConceptualWalletSettingsCache } from '../../../stores/toplevel/Wal
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { ReactComponent as NoItemsFoundImg } from '../../../assets/images/dapp-connector/no-websites-connected.inline.svg';
+import { ReactComponent as NoDappsFoundImg } from '../../../assets/images/dapp-connector/no-dapps-connected.inline.svg';
 import { ReactComponent as NoDappsConnected } from '../../../assets/images/revamp/no-dapps-connected.inline.svg';
 import { defineMessages, intlShape } from 'react-intl';
 import { connectorMessages } from '../../../i18n/global-messages';
@@ -47,7 +47,7 @@ const messages = defineMessages({
   },
   connectedDapps: {
     id: 'connector.connected-dapps.title',
-    defaultMessage: '!!!Connected DApps ({numDapps})',
+    defaultMessage: '!!!Connected DApps ({dappsCount})',
   },
   walletsLabel: {
     id: 'connector.connected-dapps.walletsLabel',
@@ -140,7 +140,7 @@ class ConnectedWebsitesPage extends Component<AllProps> {
       <Box>
         <Box mb="15px">
           <Typography fontWeight={500} variant="h5">
-            {intl.formatMessage(messages.connectedDapps, { numDapps: cardanoNodes.length })}
+            {intl.formatMessage(messages.connectedDapps, { dappsCount: cardanoNodes.length })}
           </Typography>
         </Box>
         <Box
@@ -175,8 +175,8 @@ class ConnectedWebsitesPage extends Component<AllProps> {
     const { intl } = this.context;
     const genNoResult = () => (
       <div className={styles.component}>
-        <div className={styles.noItems}>
-          <NoItemsFoundImg />
+        <div className={styles.noDappsFound}>
+          <NoDappsFoundImg />
           <h3>{intl.formatMessage(messages.noWebsitesConnected)} </h3>
           <p>{intl.formatMessage(connectorMessages.messageReadOnly)}</p>
         </div>

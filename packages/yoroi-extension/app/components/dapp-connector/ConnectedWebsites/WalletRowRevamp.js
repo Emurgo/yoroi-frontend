@@ -11,18 +11,11 @@ import { getTokenName } from '../../../stores/stateless/tokenHelpers';
 import { hiddenAmount } from '../../../utils/strings';
 import { ReactComponent as DeleteIcon } from '../../../assets/images/revamp/delete.inline.svg';
 import { ReactComponent as NoDappImage } from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
-import { intlShape, defineMessages } from 'react-intl';
+import { intlShape } from 'react-intl';
 import { splitAmount, truncateToken } from '../../../utils/formatters';
 import { Box, Typography } from '@mui/material';
 import { constructPlate } from '../../topbar/NavPlate';
 import styles from './WalletRow.scss';
-
-const messages = defineMessages({
-  active: {
-    id: 'connector.connect.connectedWallets.active',
-    defaultMessage: '!!!Active',
-  },
-});
 
 type Props = {|
   +url: ?string,
@@ -105,7 +98,6 @@ export default class WalletRowRevamp extends Component<Props, State> {
       websiteIcon,
     } = this.props;
     const { showDeleteIcon } = this.state;
-    const { intl } = this.context;
 
     const [, plateIcon] = constructPlate(plate, 0, '');
 
