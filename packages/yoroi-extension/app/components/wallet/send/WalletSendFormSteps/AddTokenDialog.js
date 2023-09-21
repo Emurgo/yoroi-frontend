@@ -197,7 +197,7 @@ export default class AddTokenDialog extends Component<Props, State> {
     for (const { token, amount, included } of this.state.selectedTokens) {
       const tokenIndex = tokens.findIndex(({ tokenId }) => tokenId === token.TokenId);
       if (tokenIndex !== -1) {
-        if (included) {
+        if (included && amount != null) {
           if (amount.toString() !== tokens[tokenIndex].amount) {
             tokens[tokenIndex].amount = amount.toString();
             changed = true;
@@ -207,7 +207,7 @@ export default class AddTokenDialog extends Component<Props, State> {
           changed = true;
         }
       } else {
-        if (included) {
+        if (included && amount != null) {
           tokens.push({ tokenId: token.TokenId, amount: amount.toString() });
           changed = true;
         }

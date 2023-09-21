@@ -152,7 +152,7 @@ export default class AddNFTDialog extends Component<Props, State> {
     let changed = false;
     const tokens = this.props.plannedTxInfoMap
       .filter(({ token }) => !token.IsDefault)
-      .map(({ token }) => ({ tokenId: token.tokenId }));
+      .map(({ token }) => ({ tokenId: token.TokenId }));
     for (const { token, included } of this.state.selectedTokens) {
       const tokenIndex = tokens.findIndex(({ tokenId }) => tokenId === token.TokenId);
       if (tokenIndex !== -1) {
