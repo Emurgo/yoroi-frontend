@@ -164,7 +164,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
   render(): Node {
     const {
       pendingAmount,
-      numberOfTransactions,
+      //numberOfTransactions,
       isLoadingTransactions,
       openExportTxToFileDialog,
       shouldShowEmptyBanner,
@@ -192,7 +192,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
           >
             {intl.formatMessage({ id: 'wallet.navigation.transactions' })}
           </Typography>
-          {numberOfTransactions !== 0 && !isLoadingTransactions && (
+          { /* numberOfTransactions !== 0 && */ !isLoadingTransactions && (
             <Button
               variant="tertiary"
               color="primary"

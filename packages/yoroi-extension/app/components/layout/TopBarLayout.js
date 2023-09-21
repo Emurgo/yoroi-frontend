@@ -69,6 +69,7 @@ function TopBarLayout({
             }),
             ...(isRevampLayout &&
               asModern !== true &&
+              // $FlowFixMe
               !isModern && {
                 overflow: 'auto',
               }),
