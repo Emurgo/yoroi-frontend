@@ -78,6 +78,17 @@ const initializeYoroi: void => Promise<void> = async () => {
       ampli.connectorPageViewed();
     } else if (pathname === ROUTES.WALLETS.ADD) {
       ampli.createWalletSelectMethodPageViewed();
+    } else if (pathname === ROUTES.WALLETS.RECEIVE.ROOT) {
+      ampli.receivePageViewed();
+    } else if (pathname === ROUTES.SETTINGS.ROOT) {
+      ampli.settingsPageViewed();
+    } else if (
+      pathname === ROUTES.REVAMP.CATALYST_VOTING ||
+        pathname === ROUTES.WALLETS.CATALYST_VOTING
+    ) {
+      ampli.votingPageViewed();
+    } else if (pathname === ROUTES.WALLETS.TRANSACTIONS) {
+      ampli.transactionsPageViewed();
     }
   });
 };
