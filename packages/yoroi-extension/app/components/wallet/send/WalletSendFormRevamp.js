@@ -613,6 +613,9 @@ export default class WalletSendForm extends Component<Props, State> {
                 ampli.sendSelectAssetUpdated({
                   asset_count: assetCount,
                 });
+                ampli.sendSummaryPageViewed({
+                  asset_count: assetCount,
+                });
               }}
               shouldSendAll={shouldSendAll}
             />
