@@ -312,6 +312,9 @@ class Module {
           ),
         ))
         .prefer_pure_change(true)
+        .voting_proposal_deposit(
+          w4.BigNum.from_str('0'),
+        )
         .build()
     );
   }
