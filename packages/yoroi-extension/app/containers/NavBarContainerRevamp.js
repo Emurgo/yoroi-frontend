@@ -23,12 +23,11 @@ import { genLookupOrFail, getTokenName } from '../stores/stateless/tokenHelpers'
 import { networks, isErgo } from '../api/ada/lib/storage/database/prepackaged/networks';
 import { addressToDisplayString } from '../api/ada/lib/storage/bridge/utils';
 import { getReceiveAddress } from '../stores/stateless/addressStores';
-import { Box, Button } from '@mui/material';
 import BuySellDialog from '../components/buySell/BuySellDialog';
 import NavBarRevamp from '../components/topbar/NavBarRevamp';
 import NavWalletDetailsRevamp from '../components/topbar/NavWalletDetailsRevamp';
 import WalletListDialog from '../components/topbar/WalletListDialog';
-import globalMessages from '../i18n/global-messages';
+import BuySellAdaButton from '../components/topbar/BuySellAdaButton';
 
 export type GeneratedData = typeof NavBarContainerRevamp.prototype.generated;
 
@@ -70,7 +69,6 @@ export default class NavBarContainerRevamp extends Component<Props> {
     const { stores } = this.generated;
     const { profile } = stores;
     const walletsStore = stores.wallets;
-    const { intl } = this.context;
 
     const DropdownHead = () => {
       const publicDeriver = walletsStore.selected;
@@ -117,28 +115,11 @@ export default class NavBarContainerRevamp extends Component<Props> {
           menu={this.props.menu}
           walletDetails={walletsStore.selected !== null ? <DropdownHead /> : null}
           buyButton={
-            <Box display="flex" gap="15px">
-              <Button
-                sx={{ width: '120px' }}
-                onClick={() =>
-                  this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.SEND })
-                }
-                variant="secondary"
-              >
-                {intl.formatMessage(globalMessages.send)}
-              </Button>
-              <Button
-                sx={{ width: '120px' }}
-                onClick={() =>
-                  this.generated.actions.router.goToRoute.trigger({
-                    route: ROUTES.WALLETS.RECEIVE.ROOT,
-                  })
-                }
-                variant="secondary"
-              >
-                {intl.formatMessage(globalMessages.receive)}
-              </Button>
-            </Box>
+            <BuySellAdaButton
+              onBuySellClick={() =>
+                this.generated.actions.dialogs.open.trigger({ dialog: BuySellDialog })
+              }
+            />
           }
         />
       </>

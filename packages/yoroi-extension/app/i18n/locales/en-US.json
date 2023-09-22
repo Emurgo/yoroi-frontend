@@ -951,7 +951,7 @@
   "wallet.transaction.export.dialog.includeTxIds": "Include Transaction IDs",
   "wallet.transaction.export.dialog.infoText1": "The entire transaction history within your wallet will be exported to a file.",
   "wallet.transaction.export.dialog.title": "Export transactions to file",
-  "wallet.transaction.export.exportIcon.tooltip": "Export to file",
+  "wallet.transaction.export.exportIcon.tooltip": "Export",
   "wallet.transaction.fee": "Fee",
   "wallet.transaction.memo.add.dialog.actions.submit": "Add",
   "wallet.transaction.memo.delete.dialog.actions.delete": "Delete",

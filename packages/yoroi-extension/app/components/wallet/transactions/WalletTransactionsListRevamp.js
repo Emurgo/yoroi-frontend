@@ -147,9 +147,8 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
     return (
       <Box
         sx={{
-          background: 'common.white',
+          bgcolor: 'common.white',
           padding: '20px 0',
-          marginTop: '2px',
           overflow: 'auto',
         }}
       >

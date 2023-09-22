@@ -35,7 +35,7 @@ const messages = defineMessages({
   },
   exportIconTooltip: {
     id: 'wallet.transaction.export.exportIcon.tooltip',
-    defaultMessage: '!!!Export to file',
+    defaultMessage: '!!!Export',
   },
   dateSection: {
     id: 'wallet.summary.page.dateTime',
