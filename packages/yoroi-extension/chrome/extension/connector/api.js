@@ -97,6 +97,7 @@ import {
 } from '../../../app/config/numbersConfig';
 import { Bip44DerivationLevels, CoinType } from '@emurgo/yoroi-lib';
 import { unwrapStakingKey } from '../../../app/api/ada/lib/storage/bridge/utils';
+import { getRegistrationHistory } from '../../../app/api/ada/lib/storage/bridge/delegationUtils';
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -508,8 +509,11 @@ export async function connectorGetStakeKey(
   const withStakingKey = asGetStakingKey(wallet);
   const stakingKeyResp = await withStakingKey.getStakingKey();
   const stakeCredential = unwrapStakingKey(stakingKeyResp.addr.Hash);
-  // <TODO:Implement isRegistered>
-  return { key: stakeCredential.to_hex(), isRegistered: false };
+  const registrationHistoryResponse = await getRegistrationHistory({
+    publicDeriver: withStakingKey,
+    stakingKeyAddressId: stakingKeyResp.addr.AddressId,
+  });
+  return { key: stakeCredential.to_keyhash().to_hex(), isRegistered: registrationHistoryResponse.current };
 }
 
 export async function connectorGetCardanoRewardAddresses(
