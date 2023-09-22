@@ -480,6 +480,13 @@ export async function connectorGetDRepKey(
   wallet: PublicDeriver<>,
 ): Promise<string> {
   const withPubKey = asGetPublicKey(wallet);
+  if (withPubKey == null) {
+    throw new Error('Unable to get public key from the wallet');
+  }
+  const withLevels = asHasLevels(wallet);
+  if (withLevels == null) {
+    throw new Error('Unable to get derivation levels from the wallet');
+  }
   const publicKeyResp = await withPubKey.getPublicKey();
   const publicKey = RustModule.WalletV4.Bip32PublicKey.from_bytes(
     Buffer.from(publicKeyResp.Hash, 'hex')
@@ -496,7 +503,7 @@ export async function connectorGetDRepKey(
       startLevel: Bip44DerivationLevels.PURPOSE.level,
     },
     startingFrom: {
-      level: wallet.getParent().getPublicDeriverLevel(),
+      level: withLevels.getParent().getPublicDeriverLevel(),
       key: publicKey,
     },
   }).to_raw_key();
@@ -507,13 +514,20 @@ export async function connectorGetStakeKey(
   wallet: PublicDeriver<>,
 ): Promise<{| key: string, isRegistered: boolean |}> {
   const withStakingKey = asGetStakingKey(wallet);
+  if (withStakingKey == null) {
+    throw new Error('Unable to get the stake key')
+  }
   const stakingKeyResp = await withStakingKey.getStakingKey();
   const stakeCredential = unwrapStakingKey(stakingKeyResp.addr.Hash);
   const registrationHistoryResponse = await getRegistrationHistory({
     publicDeriver: withStakingKey,
     stakingKeyAddressId: stakingKeyResp.addr.AddressId,
   });
-  return { key: stakeCredential.to_keyhash().to_hex(), isRegistered: registrationHistoryResponse.current };
+  return {
+    // $FlowFixMe
+    key: stakeCredential.to_keyhash().to_hex(),
+    isRegistered: registrationHistoryResponse.current,
+  };
 }
 
 export async function connectorGetCardanoRewardAddresses(
