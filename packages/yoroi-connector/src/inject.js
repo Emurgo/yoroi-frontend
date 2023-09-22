@@ -179,6 +179,14 @@ class CardanoAPI {
       });
     }
     
+    cip95 = Object.freeze({
+    
+        getPubDRepKey: () => {
+            return CardanoAPI._cardano_rpc_call("get_drep_key", []);
+        },
+    
+    })
+    
     experimental = Object.freeze({
     
       setReturnType: (returnType) => {

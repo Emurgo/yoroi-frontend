@@ -28,6 +28,7 @@ import {
   asHasLevels,
   asHasUtxoChains,
   asGetAllAccounting,
+  asGetPublicKey,
 } from '../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import { ConceptualWallet } from '../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
 import BigNumber from 'bignumber.js';
@@ -79,7 +80,7 @@ import type {
 } from '../../../app/api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type { CardanoAddressedUtxo, } from '../../../app/api/ada/transactions/types';
 import { coinSelectionForValues } from '../../../app/api/ada/transactions/shelley/coinSelection';
-import { derivePrivateByAddressing } from '../../../app/api/ada/lib/cardanoCrypto/utils';
+import { derivePrivateByAddressing, derivePublicByAddressing } from '../../../app/api/ada/lib/cardanoCrypto/utils';
 import { cip8Sign } from '../../../app/connector/api';
 import type { PersistedSubmittedTransaction } from '../../../app/api/localStorage';
 import type { ForeignUtxoFetcher } from '../../../app/connector/stores/ConnectorStore';
@@ -89,6 +90,12 @@ import {
   raii,
 } from '../../../app/api/ada/lib/storage/database/utils';
 import type { TokenRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
+import {
+  ChainDerivations, DREP_KEY_INDEX,
+  HARD_DERIVATION_START,
+  WalletTypePurpose
+} from '../../../app/config/numbersConfig';
+import { Bip44DerivationLevels, CoinType } from '@emurgo/yoroi-lib';
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -465,6 +472,33 @@ export async function connectorGetUnusedAddresses(wallet: PublicDeriver<>): Prom
     getOutputAddressesInSubmittedTxs(wallet.publicDeriverId)
   );
   return result.filter(address => !outputAddressesInSubmittedTxs.has(address));
+}
+
+export async function connectorGetDRepKey(
+  wallet: PublicDeriver<>,
+): Promise<string> {
+  const withPubKey = asGetPublicKey(wallet);
+  const publicKeyResp = await withPubKey.getPublicKey();
+  const publicKey = RustModule.WalletV4.Bip32PublicKey.from_bytes(
+    Buffer.from(publicKeyResp.Hash, 'hex')
+  );
+  const dRepKey = derivePublicByAddressing({
+    addressing: {
+      path: [
+        WalletTypePurpose.CIP1852,
+        CoinType.CARDANO,
+        HARD_DERIVATION_START,
+        ChainDerivations.GOVERNANCE_DREP_KEYS,
+        DREP_KEY_INDEX,
+      ],
+      startLevel: Bip44DerivationLevels.PURPOSE.level,
+    },
+    startingFrom: {
+      level: wallet.getParent().getPublicDeriverLevel(),
+      key: publicKey,
+    },
+  }).to_raw_key();
+  return dRepKey.to_hex();
 }
 
 export async function connectorGetCardanoRewardAddresses(
