@@ -28,7 +28,7 @@ import {
   asHasLevels,
   asHasUtxoChains,
   asGetAllAccounting,
-  asGetPublicKey,
+  asGetPublicKey, asGetStakingKey,
 } from '../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import { ConceptualWallet } from '../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
 import BigNumber from 'bignumber.js';
@@ -96,6 +96,7 @@ import {
   WalletTypePurpose
 } from '../../../app/config/numbersConfig';
 import { Bip44DerivationLevels, CoinType } from '@emurgo/yoroi-lib';
+import { unwrapStakingKey } from '../../../app/api/ada/lib/storage/bridge/utils';
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -499,6 +500,16 @@ export async function connectorGetDRepKey(
     },
   }).to_raw_key();
   return dRepKey.to_hex();
+}
+
+export async function connectorGetStakeKey(
+  wallet: PublicDeriver<>,
+): Promise<{| key: string, isRegistered: boolean |}> {
+  const withStakingKey = asGetStakingKey(wallet);
+  const stakingKeyResp = await withStakingKey.getStakingKey();
+  const stakeCredential = unwrapStakingKey(stakingKeyResp.addr.Hash);
+  // <TODO:Implement isRegistered>
+  return { key: stakeCredential.to_hex(), isRegistered: false };
 }
 
 export async function connectorGetCardanoRewardAddresses(

@@ -58,7 +58,7 @@ import {
   connectorGetAssets,
   getTokenMetadataFromIds,
   MAX_COLLATERAL,
-  connectorGetDRepKey,
+  connectorGetDRepKey, connectorGetStakeKey,
 } from './connector/api';
 import { updateTransactions as ergoUpdateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
 import {
@@ -1342,6 +1342,24 @@ function handleInjectorConnect(port) {
                   async (wallet) => {
                     const dRepKey = await connectorGetDRepKey(wallet);
                     rpcResponse({ ok: dRepKey });
+                  },
+                  db,
+                  localStorageApi,
+                )
+              });
+            } catch (e) {
+              handleError(e);
+            }
+            break;
+          case 'get_stake_key':
+            try {
+              await RustModule.load();
+              await withDb(async (db, localStorageApi) => {
+                await withSelectedWallet(
+                  tabId,
+                  async (wallet) => {
+                    const resp = await connectorGetStakeKey(wallet);
+                    rpcResponse({ ok: resp });
                   },
                   db,
                   localStorageApi,
