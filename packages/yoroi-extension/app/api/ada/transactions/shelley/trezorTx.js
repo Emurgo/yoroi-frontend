@@ -688,11 +688,11 @@ export function toTrezorSignRequest(
       const hash = requiredSigners.get(i);
       const enterpriseAddress = RustModule.WalletV4.EnterpriseAddress.new(
         networkId,
-        RustModule.WalletV4.StakeCredential.from_keyhash(hash),
+        RustModule.WalletV4.Credential.from_keyhash(hash),
       ).to_address().to_hex();
       const stakeAddress = RustModule.WalletV4.RewardAddress.new(
         networkId,
-        RustModule.WalletV4.StakeCredential.from_keyhash(hash),
+        RustModule.WalletV4.Credential.from_keyhash(hash),
       ).to_address().to_hex();
       const ownAddressPath = ownUtxoAddressMap[enterpriseAddress] ||
         ownStakeAddressMap[stakeAddress];
@@ -713,7 +713,7 @@ export function toTrezorSignRequest(
   const certificates = txBody.certs();
   if (certificates) {
     const getPath = (
-      stakeCredential: RustModule.WalletV4.StakeCredential
+      stakeCredential: RustModule.WalletV4.Credential
     ): Array<number> => {
       const rewardAddr = RustModule.WalletV4.RewardAddress.new(
         networkId,

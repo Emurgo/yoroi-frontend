@@ -83,10 +83,10 @@ export function genBaseAddressBatchFunc(
   return (
     indices: Array<number>
   ) => {
-    const stakeKey = RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.hash());
+    const stakeKey = RustModule.WalletV4.Credential.from_keyhash(stakingKey.hash());
     return indices.map(i => {
       const addressKey = addressChain.derive(i).to_raw_key();
-      const paymentKey = RustModule.WalletV4.StakeCredential.from_keyhash(addressKey.hash());
+      const paymentKey = RustModule.WalletV4.Credential.from_keyhash(addressKey.hash());
       const address = RustModule.WalletV4.BaseAddress.new(
         chainNetworkId,
         paymentKey,

@@ -2601,7 +2601,7 @@ async function certificateToDb(
     // and in most cases, people generate these addresses through the CLI anyway
     {
       const rewardAddressHex = RustModule.WasmScope(Module => {
-        const stakeCredential = Module.WalletV4.StakeCredential
+        const stakeCredential = Module.WalletV4.Credential
           .from_bytes(hexToBytes(stakeCredentialHex));
         return bytesToHex(
           Module.WalletV4.RewardAddress
@@ -2617,7 +2617,7 @@ async function certificateToDb(
     }
     {
       const enterpriseAddressHex = RustModule.WasmScope(Module => {
-        const stakeCredential = Module.WalletV4.StakeCredential
+        const stakeCredential = Module.WalletV4.Credential
           .from_bytes(hexToBytes(stakeCredentialHex));
         return Buffer.from(
           Module.WalletV4.EnterpriseAddress
@@ -2711,7 +2711,7 @@ async function certificateToDb(
             bytesToHex(rewardAddress.to_address().to_bytes()),
             bytesToHex(Module.WalletV4.StakeDelegation
               .new(stakeCredentials, poolKeyHash).to_bytes()),
-            bytesToHex(Module.WalletV4.StakeCredential
+            bytesToHex(Module.WalletV4.Credential
               .from_keyhash(poolKeyHash).to_bytes()),
           ]
         });
@@ -2781,7 +2781,7 @@ async function certificateToDb(
               throw new Error(`${nameof(certificateToDb)} expect the pool owner to be a key hash`);
             }
             owners.add(ownerKey);
-            const ownerStakeCredentialHex = bytesToHex(Module.WalletV4.StakeCredential
+            const ownerStakeCredentialHex = bytesToHex(Module.WalletV4.Credential
               .from_keyhash(ownerKey).to_bytes());
             ownerStakeCredentialHexes.push(ownerStakeCredentialHex);
           }
@@ -2820,7 +2820,7 @@ async function certificateToDb(
           );
 
           return [
-            bytesToHex(Module.WalletV4.StakeCredential
+            bytesToHex(Module.WalletV4.Credential
               .from_keyhash(operatorKey).to_bytes()),
             bytesToHex(certificate.to_bytes()),
           ];
@@ -2877,7 +2877,7 @@ async function certificateToDb(
           const poolKeyHash = Module.WalletV4.Ed25519KeyHash
             .from_bytes(hexToBytes(cert.poolKeyHash));
           return [
-            bytesToHex(Module.WalletV4.StakeCredential
+            bytesToHex(Module.WalletV4.Credential
               .from_keyhash(poolKeyHash).to_bytes()),
             bytesToHex(Module.WalletV4.PoolRetirement
               .new(poolKeyHash, cert.epoch).to_bytes()),
