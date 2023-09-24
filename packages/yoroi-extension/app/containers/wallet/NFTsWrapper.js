@@ -8,7 +8,6 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import type { TxRequests } from '../../stores/toplevel/TransactionsStore';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import BannerContainer from '../banners/BannerContainer';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
@@ -33,7 +32,7 @@ const messages = defineMessages({
     id: 'wallet.nftGallary.title',
     defaultMessage: '!!!NFT Gallery',
   },
-})
+});
 @observer
 export default class NFTsWrapper extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
@@ -85,12 +84,7 @@ export default class NFTsWrapper extends Component<Props> {
         tokenInfo: TokenInfoMap,
         getDefaultTokenInfo: number => $ReadOnly<TokenRow>,
       |},
-      transactions: {|
-        getBalanceRequest: {|
-          result: ?MultiToken,
-        |},
-        getTxRequests: (PublicDeriver<>) => TxRequests,
-      |},
+      transactions: {| balance: MultiToken | null |},
       wallets: {| selected: null | PublicDeriver<> |},
       profile: {|
         shouldHideBalance: boolean,
@@ -128,18 +122,7 @@ export default class NFTsWrapper extends Component<Props> {
           getDefaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfo,
         },
         transactions: {
-          getBalanceRequest: (() => {
-            if (stores.wallets.selected == null)
-              return {
-                result: undefined,
-              };
-            const { requests } = stores.transactions.getTxRequests(stores.wallets.selected);
-
-            return {
-              result: requests.getBalanceRequest.result,
-            };
-          })(),
-          getTxRequests: stores.transactions.getTxRequests,
+          balance: stores.transactions.balance,
         },
         profile: {
           shouldHideBalance: stores.profile.shouldHideBalance,

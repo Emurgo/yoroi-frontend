@@ -1,6 +1,6 @@
-// @flow
-
-import { select } from '@storybook/addon-knobs';
+// fixme broken flow
+// eslint-disable-next-line flowtype/require-valid-file-annotation
+import { select, } from '@storybook/addon-knobs';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import { action } from '@storybook/addon-actions';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';

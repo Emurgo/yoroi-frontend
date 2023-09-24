@@ -1,4 +1,4 @@
-// @flow
+//fixme: broken flow
 
 import type { ConceptualWalletSettingsCache } from '../../app/stores/toplevel/WalletSettingsStore';
 import WalletSettingsStore from '../../app/stores/toplevel/WalletSettingsStore';

@@ -39,7 +39,10 @@ class BuySellAdaButton extends Component<Props & InjectedProps> {
 
     const BuyAdaButtonRevamp = (
       <Button
-        sx={{ width: '173px' }}
+        sx={{
+          '&.MuiButton-sizeMedium': { padding: '13px 24px', height: 'unset' },
+          lineHeight: '18px',
+        }}
         variant="secondary"
         onClick={() => this.props.onBuySellClick()}
       >
