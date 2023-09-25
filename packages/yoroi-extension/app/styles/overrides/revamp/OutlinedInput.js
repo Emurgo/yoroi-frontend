@@ -2,6 +2,7 @@
 
 const RevampOutlinedInput = {
   styleOverrides: {
+    // $FlowFixMe
     root: ({ theme }) => ({
       paddingRight: '16px',
       height: '56px',

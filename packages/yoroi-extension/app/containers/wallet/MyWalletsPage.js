@@ -48,9 +48,6 @@ import BuySellAdaButton from '../../components/topbar/BuySellAdaButton';
 import globalMessages from '../../i18n/global-messages';
 import BuySellDialog from '../../components/buySell/BuySellDialog';
 import NavBarRevamp from '../../components/topbar/NavBarRevamp';
-import { withLayout } from '../../styles/context/layout';
-import type { LayoutComponentMap } from '../../styles/context/layout';
-import { Box } from '@mui/system';
 
 export type GeneratedData = typeof MyWalletsPage.prototype.generated;
 

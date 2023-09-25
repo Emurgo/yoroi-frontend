@@ -2,6 +2,7 @@
 
 const RevampInputLabel = {
   styleOverrides: {
+    // $FlowFixMe
     root: ({ theme }) => ({
       color: theme.palette.grayscale[400],
       '&::first-letter': { textTransform: 'uppercase' },

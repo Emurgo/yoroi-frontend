@@ -13,6 +13,7 @@ const RevampTextField = {
     fullWidth: true,
   },
   styleOverrides: {
+    // $FlowFixMe
     root: ({ theme }) => ({
       '.MuiFormHelperText-root': {
         fontSize: '0.75rem',
