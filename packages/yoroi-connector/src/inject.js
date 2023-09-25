@@ -179,6 +179,24 @@ class CardanoAPI {
       });
     }
     
+    cip95 = Object.freeze({
+    
+        getPubDRepKey: () => {
+            return CardanoAPI._cardano_rpc_call("get_drep_key", []);
+        },
+    
+        getRegisteredPubStakeKeys: () => {
+            return CardanoAPI._cardano_rpc_call("get_stake_key", [])
+                .then(({ key, isRegistered }) => isRegistered ? [key] : []);
+        },
+    
+        getUnregisteredPubStakeKeys: () => {
+            return CardanoAPI._cardano_rpc_call("get_stake_key", [])
+                .then(({ key, isRegistered }) => isRegistered ? [] : [key]);
+        },
+    
+    })
+    
     experimental = Object.freeze({
     
       setReturnType: (returnType) => {
