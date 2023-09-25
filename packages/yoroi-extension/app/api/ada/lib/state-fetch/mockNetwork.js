@@ -72,7 +72,7 @@ function fixAddresses(
 
       const enterpriseAddr = RustModule.WalletV4.EnterpriseAddress.new(
         Number.parseInt(config.ChainNetworkId, 10),
-        RustModule.WalletV4.StakeCredential.from_keyhash(
+        RustModule.WalletV4.Credential.from_keyhash(
           RustModule.WalletV4.Ed25519KeyHash.from_bech32(address)
         )
       );
@@ -400,7 +400,7 @@ export function getSingleAddressString(
   if (path[0] === WalletTypePurpose.CIP1852) {
     const addr = RustModule.WalletV4.EnterpriseAddress.new(
       Number.parseInt(baseConfig.ChainNetworkId, 10),
-      RustModule.WalletV4.StakeCredential.from_keyhash(
+      RustModule.WalletV4.Credential.from_keyhash(
         derivedKey.to_public().to_raw_key().hash()
       ),
     );
@@ -431,10 +431,10 @@ export function getMangledAddressString(
   if (path[0] === WalletTypePurpose.CIP1852) {
     const addr = RustModule.WalletV4.BaseAddress.new(
       Number.parseInt(baseConfig.ChainNetworkId, 10),
-      RustModule.WalletV4.StakeCredential.from_keyhash(
+      RustModule.WalletV4.Credential.from_keyhash(
         derivedKey.to_public().to_raw_key().hash()
       ),
-      RustModule.WalletV4.StakeCredential.from_keyhash(
+      RustModule.WalletV4.Credential.from_keyhash(
         RustModule.WalletV4.Ed25519KeyHash.from_bytes(
           stakingKey
         )
@@ -472,10 +472,10 @@ export function getAddressForType(
       const stakingKey = derivePath(rootKey, newPath);
       const addr = RustModule.WalletV4.BaseAddress.new(
         Number.parseInt(baseConfig.ChainNetworkId, 10),
-        RustModule.WalletV4.StakeCredential.from_keyhash(
+        RustModule.WalletV4.Credential.from_keyhash(
           derivedKey.to_public().to_raw_key().hash()
         ),
-        RustModule.WalletV4.StakeCredential.from_keyhash(
+        RustModule.WalletV4.Credential.from_keyhash(
           stakingKey.to_public().to_raw_key().hash()
         ),
       );
@@ -487,7 +487,7 @@ export function getAddressForType(
     case CoreAddressTypes.CARDANO_ENTERPRISE: {
       const addr = RustModule.WalletV4.EnterpriseAddress.new(
         Number.parseInt(baseConfig.ChainNetworkId, 10),
-        RustModule.WalletV4.StakeCredential.from_keyhash(
+        RustModule.WalletV4.Credential.from_keyhash(
           derivedKey.to_public().to_raw_key().hash()
         ),
       );
@@ -496,7 +496,7 @@ export function getAddressForType(
     case CoreAddressTypes.CARDANO_REWARD: {
       const addr = RustModule.WalletV4.RewardAddress.new(
         Number.parseInt(baseConfig.ChainNetworkId, 10),
-        RustModule.WalletV4.StakeCredential.from_keyhash(
+        RustModule.WalletV4.Credential.from_keyhash(
           derivedKey.to_public().to_raw_key().hash()
         ),
       );

@@ -364,7 +364,7 @@ export function toEnterprise(
 
   const singleAddr = RustModule.WalletV4.EnterpriseAddress.new(
     wasmAddr.network_id(),
-    RustModule.WalletV4.StakeCredential.from_keyhash(
+    RustModule.WalletV4.Credential.from_keyhash(
       spendingKey
     ),
   );
@@ -532,7 +532,7 @@ export function getAddressPayload(
 
 export function unwrapStakingKey(
   stakingAddress: string,
-): RustModule.WalletV4.StakeCredential {
+): RustModule.WalletV4.Credential {
   const accountAddress =
     RustModule.WalletV4.RewardAddress.from_address(
       RustModule.WalletV4.Address.from_bytes(

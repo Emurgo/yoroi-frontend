@@ -905,7 +905,7 @@ async function __connectorSignCardanoTx(
     for (const signingKeyHash of totalAdditionalRequiredSignKeys) {
       const requiredKeyHash = RustModule.WalletV4.Ed25519KeyHash
         .from_bytes(hexToBytes(signingKeyHash));
-      const requiredPaymentCred = RustModule.WalletV4.StakeCredential
+      const requiredPaymentCred = RustModule.WalletV4.Credential
         .from_keyhash(requiredKeyHash);
       const requiredAddress = RustModule.WalletV4.BaseAddress.new(
         parsedNetworkId,
