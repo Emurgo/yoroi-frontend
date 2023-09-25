@@ -214,7 +214,7 @@ export default class TransactionRevamp extends Component<Props, State> {
       ? beforeDecimalRewards
       : '+' + beforeDecimalRewards;
 
-    if (request.getRawNumber) {
+    if (request.getRawNumber === true) {
       return adjustedBefore + afterDecimalRewards;
     }
 
