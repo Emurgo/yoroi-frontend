@@ -758,9 +758,68 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       }
     }
 
+    const cip95Info = [];
+    const certs = txBody.certs();
+    if (certs) {
+      for (let i = 0; i < certs.len(); i++) {
+        const cert = certs.get(i);
+        if (!cert) {
+          throw new Error('unexpectedly missing certificate');
+        }
+        const stakeRegistration = cert.as_stake_registration();
+        if (stakeRegistration) {
+          const coin = stakeRegistration.coin()?.toString() ?? null;
+          cip95Info.push({
+            type: 'StakeRegistrationCert',
+            coin,
+          });
+          continue;
+        }
+        const stakeDeregistration = cert.as_stake_deregistration();
+        if (stakeDeregistration) {
+          const coin = stakeDeregistration.coin()?.toString() ?? null;
+          cip95Info.push({
+            type: 'StakeDeregistrationCert',
+            coin,
+          });
+          continue;
+        }
+        const stakeDelegation = cert.as_stake_delegation();
+        if (stakeDelegation) {
+          const keyHash = stakeDelegation.stake_credential().to_keyhash();
+          if (keyHash) {
+            cip95Info.push({
+              type: 'StakeDelegationCert',
+              poolKeyHash: keyHash.to_hex(),
+            });
+          }
+          continue;
+        }
+        const voteDelegation = cert.as_vote_delegation();
+        if (voteDelegation) {
+          const keyHash = voteDelegation.stake_credential().to_keyhash();
+          if (keyHash) {
+            cip95Info.push({
+              type: 'VoteDelegCert',
+              drep: voteDelegation.drep().to_hex(),
+            });
+          }
+          continue;
+        }
+        // ...
+      }
+    }
     runInAction(() => {
-      // $FlowFixMe[prop-missing]
-      this.adaTransaction = { inputs, foreignInputs, outputs, fee, total, amount };
+      this.adaTransaction = {
+        inputs,
+        // $FlowFixMe[prop-missing]
+        foreignInputs,
+        outputs,
+        fee,
+        total,
+        amount,
+        cip95Info,
+      };
     });
   };
 
@@ -849,6 +908,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         fee,
         amount,
         total,
+        cip95Info: [],
       };
     });
   };

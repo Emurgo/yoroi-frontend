@@ -1,6 +1,6 @@
 // @flow
 import type { Node, ComponentType } from 'react';
-import type { ConnectorIntl } from '../../../types';
+import type { ConnectorIntl, Cip95Info } from '../../../types';
 import type { SummaryAssetsData } from '../CardanoSignTxPage';
 import BigNumber from 'bignumber.js';
 import { injectIntl } from 'react-intl';
@@ -37,6 +37,7 @@ type Props = {|
   passwordFormField: Node,
   hwWalletError: ?LocalizableError,
   walletType: string,
+  cip95Info: Array<Cip95Info>,
 |};
 
 function CardanoSignTx({
@@ -46,6 +47,7 @@ function CardanoSignTx({
   passwordFormField,
   hwWalletError,
   walletType,
+  cip95Info,
 }: Props & ConnectorIntl): Node {
   const { total, isOnlyTxFee, sent, received } = txAssetsData;
   const isSendingNativeToken = Number(total.amount) < 0;
@@ -53,6 +55,9 @@ function CardanoSignTx({
 
   return (
     <Box>
+      <Box>
+        <RenderCip95Info cip95Info={cip95Info} />
+      </Box>
       <CardanoSignTxSummary
         renderExplorerHashLink={renderExplorerHashLink}
         txAssetsData={txAssetsData}
@@ -186,3 +191,18 @@ const Panel = ({ children }): Node => (
     {children}
   </Box>
 );
+
+const RenderCip95Info = ({
+  cip95Info
+}): Node => {
+  return [
+    ...cip95Info.filter(c => c.type === 'VoteDelegCert').map((c, i) => {
+      if (c.type !== 'VoteDelegCert') {
+        throw new Error('unexpected type');
+      }
+      return (
+        <span key={`VoteDelegCert${i}`}>Vote delegation to DRep: {c.drep}</span>
+      );
+    })
+  ];
+}
