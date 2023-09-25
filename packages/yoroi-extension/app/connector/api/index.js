@@ -45,10 +45,10 @@ export const _createAuthEntry: (
 
       const address = WasmScope.WalletV4.BaseAddress.new(
         deriver.getParent().networkInfo.NetworkId,
-        WasmScope.WalletV4.StakeCredential.from_keyhash(
+        WasmScope.WalletV4.Credential.from_keyhash(
           derivedSignKey.to_public().hash()
         ),
-        WasmScope.WalletV4.StakeCredential.from_keyhash(
+        WasmScope.WalletV4.Credential.from_keyhash(
           stakingKey.to_public().hash()
         )
       ).to_address();
