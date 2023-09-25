@@ -21,7 +21,7 @@ import { intlShape } from 'react-intl';
 import moment from 'moment';
 import classnames from 'classnames';
 import BigNumber from 'bignumber.js';
-import { Button, Typography } from '@mui/material';
+import { Button, Grid, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { ReactComponent as AddMemoSvg } from '../../../assets/images/revamp/add-memo.inline.svg';
 import { ReactComponent as EditSvg } from '../../../assets/images/edit.inline.svg';
@@ -64,7 +64,6 @@ import {
   stateTranslations,
   messages,
 } from './Transaction';
-import { columnTXStyles } from '../summary/WalletSummaryRevamp';
 
 type Props = {|
   +data: WalletTransaction,
@@ -215,7 +214,7 @@ export default class TransactionRevamp extends Component<Props, State> {
       ? beforeDecimalRewards
       : '+' + beforeDecimalRewards;
 
-    if (request.getRawNumber !== undefined) {
+    if (request.getRawNumber === true) {
       return adjustedBefore + afterDecimalRewards;
     }
 
@@ -236,15 +235,6 @@ export default class TransactionRevamp extends Component<Props, State> {
     const { currency } = this.props.unitOfAccountSetting;
 
     if (this.props.unitOfAccountSetting.enabled) {
-      if (this.props.shouldHideBalance) {
-        return (
-          <>
-            <span>{hiddenAmount}</span>
-            {currency}
-          </>
-        );
-      }
-
       const tokenInfo = this.props.getTokenInfo(request.entry);
       const shiftedAmount = request.entry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
       const ticker = tokenInfo.Metadata.ticker;
@@ -254,6 +244,21 @@ export default class TransactionRevamp extends Component<Props, State> {
       if (currency == null) {
         throw new Error(`unexpected unit of account ${String(currency)}`);
       }
+
+      if (this.props.shouldHideBalance) {
+        return (
+          <>
+            <Typography variant="body1" fontWeight={500} textAlign="right">
+              <span>{hiddenAmount}</span>
+              {ticker}
+            </Typography>
+            <Typography variant="body2" color="grayscale.600" textAlign="right">
+              {hiddenAmount}&nbsp;{currency}
+            </Typography>
+          </>
+        );
+      }
+
       const price = this.props.getHistoricalPrice(ticker, currency, request.timestamp);
       let fiatDisplay;
       if (price != null) {
@@ -274,12 +279,21 @@ export default class TransactionRevamp extends Component<Props, State> {
         );
       }
       return (
-        <>
-          {fiatDisplay}&nbsp;{currency}
-          <Typography variant="body1" color="secondary.600">
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-end',
+            justifyContent: 'center',
+          }}
+        >
+          <Typography variant="body1" fontWeight={500} color="grayscale.900">
             {this.renderAmountDisplay({ entry: request.entry })} {this.getTicker(request.entry)}
           </Typography>
-        </>
+          <Typography variant="body2" color="grayscale.600" textAlign="right">
+            {fiatDisplay}&nbsp;{currency}
+          </Typography>
+        </Box>
       );
     }
 
@@ -287,11 +301,7 @@ export default class TransactionRevamp extends Component<Props, State> {
     const isPositiveNumber = typeof amount === 'string' ? amount.charAt(0) === '+' : false; // eslint-disable-line
 
     return (
-      <Typography
-        variant="body1"
-        fontWeight={500}
-        color={isPositiveNumber ? 'secondary.600' : 'grayscale.900'}
-      >
+      <Typography variant="body1" fontWeight={500} color="grayscale.900">
         {this.renderAmountDisplay({ entry: request.entry })} {this.getTicker(request.entry)}
       </Typography>
     );
@@ -347,20 +357,21 @@ export default class TransactionRevamp extends Component<Props, State> {
       }
       return (
         <>
-          {fiatDisplay}&nbsp;{currency}
-          <Typography variant="body1" color="grayscale.900">
+          <Typography variant="body1" fontWeight={500} color="grayscale.900">
             {beforeDecimalRewards}
             <span className={styles.afterDecimal}>{afterDecimalRewards}</span>{' '}
             {this.getTicker(defaultEntry)}
+          </Typography>
+          <Typography variant="body2" color="grayscale.600" textAlign="right">
+            {fiatDisplay}&nbsp;{currency}
           </Typography>
         </>
       );
     }
 
     return (
-      <Typography variant="body1" color="grayscale.900">
-        {beforeDecimalRewards}
-        {afterDecimalRewards} {this.getTicker(defaultEntry)}
+      <Typography variant="body1" fontWeight={500} color="grayscale.900">
+        {[beforeDecimalRewards, afterDecimalRewards].join('')} {this.getTicker(defaultEntry)}
       </Typography>
     );
   };
@@ -463,7 +474,6 @@ export default class TransactionRevamp extends Component<Props, State> {
     };
 
     return (
-      // eslint-disable-next-line react/no-array-index-key
       <Box
         sx={{
           display: 'grid',
@@ -540,19 +550,22 @@ export default class TransactionRevamp extends Component<Props, State> {
           role="presentation"
           aria-hidden
         >
-          <Box sx={{ display: 'flex' }}>
-            <Box
+          <Grid
+            container
+            sx={{
+              width: '100%',
+            }}
+          >
+            <Grid
+              item
+              xs={4}
               sx={{
                 display: 'flex',
-                justifyContent: 'space-between',
-                width: '100%',
-                alignItems: 'center',
+                gap: '16px',
               }}
             >
+              <TypeIcon type={txType.icon} />
               <Box>
-                <TypeIcon type={txType.icon} />
-              </Box>
-              <Box sx={columnTXStyles.transactionType}>
                 <Typography variant="body1" color="grayscale.900">
                   {txType.msg}
                 </Typography>
@@ -560,61 +573,100 @@ export default class TransactionRevamp extends Component<Props, State> {
                   {moment(data.date).format('hh:mm A')}
                 </Typography>
               </Box>
-              <Box sx={columnTXStyles.status} id="txStatus">
-                {state === TxStatusCodes.IN_BLOCK ? (
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      color: isPendingTransaction ? 'grayscale.400' : 'grayscale.900',
-                      textTransform: 'capitalize',
-                    }}
-                  >
-                    {status}
-                  </Typography>
-                ) : (
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      color: isFailedTransaction
-                        ? 'var(--yoroi-palette-error-100)'
-                        : isPendingTransaction
-                        ? 'grayscale.400'
-                        : 'grayscale.900',
-                      textTransform: 'capitalize',
-                    }}
-                  >
-                    {status}
-                  </Typography>
-                )}
-              </Box>
-              <Typography variant="body1" color="grayscale.900" sx={columnTXStyles.fee} id="txFee">
+            </Grid>
+            <Grid item xs={2} sx={{ textAlign: 'left' }} id="txStatus">
+              {state === TxStatusCodes.IN_BLOCK ? (
+                <Typography
+                  variant="body1"
+                  sx={{
+                    color: isPendingTransaction ? 'grayscale.400' : 'grayscale.900',
+                    textTransform: 'capitalize',
+                  }}
+                >
+                  {status}
+                </Typography>
+              ) : (
+                <Typography
+                  variant="body1"
+                  sx={{
+                    color: isFailedTransaction
+                      ? 'var(--yoroi-palette-error-100)'
+                      : isPendingTransaction
+                      ? 'grayscale.400'
+                      : 'grayscale.900',
+                    textTransform: 'capitalize',
+                  }}
+                >
+                  {status}
+                </Typography>
+              )}
+            </Grid>
+            <Grid
+              item
+              xs={2}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+              }}
+            >
+              <Typography variant="body1" color="grayscale.900" id="txFee">
                 {this.renderFeeDisplay({
                   amount: data.fee,
                   type: data.type,
                   timestamp: data.date.valueOf(),
                 })}
               </Typography>
-              <Box sx={columnTXStyles.amount}>
+            </Grid>
+            <Grid
+              item
+              xs={4}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                gap: '8px',
+              }}
+            >
+              <Box textAlign="right">
                 <Typography
                   variant="body1"
                   fontWeight="500"
                   color="grayscale.900"
                   id="transactionAmount"
+                  textAlign="left"
                 >
                   {this.renderAmountWithUnitOfAccount({
                     entry: data.amount.getDefaultEntry(),
                     timestamp: data.date.valueOf(),
                   })}
                 </Typography>
-                {this.renderAssets({ assets: data.amount.nonDefaultEntries() })}
+                <Typography>
+                  {this.renderAssets({ assets: data.amount.nonDefaultEntries() })}
+                </Typography>
               </Box>
-            </Box>
-            <div className={styles.expandArrowBox}>
-              <span className={arrowClasses}>
-                <ExpandArrow />
-              </span>
-            </div>
-          </Box>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'start',
+                  justifyContent: 'center',
+                  height: '100%',
+                }}
+              >
+                <Box
+                  component="span"
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                  className={arrowClasses}
+                >
+                  <ExpandArrow />
+                </Box>
+              </Box>
+            </Grid>
+          </Grid>
         </Box>
 
         {/* ==== Toggleable Transaction Details ==== */}

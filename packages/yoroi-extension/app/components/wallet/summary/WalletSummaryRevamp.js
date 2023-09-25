@@ -5,17 +5,17 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { UnconfirmedAmount } from '../../../types/unconfirmedAmountType';
+import globalMessages from '../../../i18n/global-messages';
+import styles from './WalletSummary.scss';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import globalMessages from '../../../i18n/global-messages';
-import styles from './WalletSummary.scss';
 import { formatValue } from '../../../utils/unit-of-account';
 import { splitAmount, truncateToken } from '../../../utils/formatters';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { hiddenAmount } from '../../../utils/strings';
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';
-import { Button, Typography } from '@mui/material';
+import { Button, Typography, Grid } from '@mui/material';
 import { Box } from '@mui/system';
 import BigNumber from 'bignumber.js';
 import { ReactComponent as ExportTxToFileSvg } from '../../../assets/images/transaction/export.inline.svg';
@@ -32,7 +32,6 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +numberOfTransactions: number,
   +shouldHideBalance: boolean,
   +pendingAmount: UnconfirmedAmount,
   +isLoadingTransactions: boolean,
@@ -165,7 +164,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
   render(): Node {
     const {
       pendingAmount,
-      numberOfTransactions,
+      //numberOfTransactions,
       isLoadingTransactions,
       openExportTxToFileDialog,
       shouldShowEmptyBanner,
@@ -193,21 +192,24 @@ export default class WalletSummaryRevamp extends Component<Props> {
           >
             {intl.formatMessage({ id: 'wallet.navigation.transactions' })}
           </Typography>
-          {numberOfTransactions !== 0 && (
+          { /* numberOfTransactions !== 0 && */ !isLoadingTransactions && (
             <Button
               variant="tertiary"
               color="primary"
-              sx={{ textTransform: 'uppercase', margin: '2px' }}
+              sx={{
+                textTransform: 'uppercase',
+                margin: '2px',
+                lineHeight: '21px',
+              }}
               onClick={openExportTxToFileDialog}
               onKeyPress={openExportTxToFileDialog}
-              disabled={isLoadingTransactions}
               startIcon={<ExportTxToFileSvg />}
             >
-              {intl.formatMessage({ id: 'wallet.transaction.export.exportIcon.tooltip' })}
+              {intl.formatMessage(globalMessages.exportButtonLabel)}
             </Button>
           )}
         </Box>
-        <Box sx={{ padding: hasPendingAmount ? '16px 30px' : 0 }}>
+        <Box sx={{ pb: hasPendingAmount ? '16px' : 0 }}>
           <Typography variant="body1">
             {this.renderPendingAmount(
               pendingAmount.incoming,
@@ -223,29 +225,34 @@ export default class WalletSummaryRevamp extends Component<Props> {
         </Box>
         {shouldShowEmptyBanner && <Box>{emptyBannerComponent}</Box>}
         {!shouldShowEmptyBanner && !isLoadingTransactions && (
-          <Box
+          <Grid
+            container
             sx={{
-              display: 'flex',
-              padding: '12px 0',
               width: '100%',
-              justifyContent: 'space-between',
+              padding: '12px 0',
               borderBottom: '1px solid',
               borderBottomColor: 'grayscale.200',
             }}
           >
-            <Typography variant="body2" sx={{ ...columnTXStyles.transactionType, maxWidth: '35%' }}>
-              {intl.formatMessage({ id: 'wallet.summary.page.type' })}
-            </Typography>
-            <Typography variant="body2" sx={columnTXStyles.status}>
-              {intl.formatMessage({ id: 'wallet.summary.page.status' })}
-            </Typography>
-            <Typography variant="body2" sx={columnTXStyles.fee}>
-              {intl.formatMessage(globalMessages.feeLabel)}
-            </Typography>
-            <Typography variant="body2" sx={{ ...columnTXStyles.amount, maxWidth: '30%' }}>
-              {intl.formatMessage(globalMessages.amountLabel)}
-            </Typography>
-          </Box>
+            <Grid item xs={4}>
+              <Typography variant="body2">
+                {intl.formatMessage({ id: 'wallet.summary.page.type' })}
+              </Typography>
+            </Grid>
+            <Grid item xs={2} sx={{ textAlign: 'left' }}>
+              <Typography variant="body2">
+                {intl.formatMessage({ id: 'wallet.summary.page.status' })}
+              </Typography>
+            </Grid>
+            <Grid item xs={2} sx={{ textAlign: 'right' }}>
+              <Typography variant="body2">{intl.formatMessage(globalMessages.feeLabel)}</Typography>
+            </Grid>
+            <Grid item xs={4} sx={{ textAlign: 'right', pr: '30px' }}>
+              <Typography variant="body2">
+                {intl.formatMessage(globalMessages.amountLabel)}
+              </Typography>
+            </Grid>
+          </Grid>
         )}
       </Box>
     );

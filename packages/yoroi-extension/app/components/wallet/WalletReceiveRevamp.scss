@@ -90,6 +90,9 @@
 
         .verifyActionBlock,
         .generateURLActionBlock {
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
           button {
             cursor: pointer;
           }
@@ -158,4 +161,3 @@
 .addressHashUsed {
   color: var(--yoroi-palette-gray-600);
 }
-

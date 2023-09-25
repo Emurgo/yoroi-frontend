@@ -21,6 +21,9 @@ import type {
   MultiAssetMintMetadataRequest,
   MultiAssetMintMetadataResponse,
   GetUtxoDataFunc, GetUtxoDataRequest, GetUtxoDataResponse,
+  GetLatestBlockBySlotFunc,
+  GetRecentTransactionHashesRequest, GetRecentTransactionHashesResponse, GetRecentTransactionHashesFunc,
+  GetTransactionsByHashesRequest, GetTransactionsByHashesResponse, GetTransactionsByHashesFunc,
 } from './types';
 import type {
   FilterFunc, FilterUsedRequest, FilterUsedResponse,
@@ -85,6 +88,22 @@ export class BatchedFetcher implements IFetcher {
     )(body)
   )
 
+  getRecentTransactionHashes
+  : GetRecentTransactionHashesRequest => Promise<GetRecentTransactionHashesResponse>
+    = (body) => (
+      batchGetRecentTransactionHashes(
+        this.baseFetcher.getRecentTransactionHashes
+      )(body)
+    );
+
+  getTransactionsByHashes
+  : GetTransactionsByHashesRequest => Promise<GetTransactionsByHashesResponse>
+    = (body) => (
+      batchGetTransactionsByHashes(
+        this.baseFetcher.getTransactionsByHashes
+      )(body)
+    );
+
   getRewardHistory: RewardHistoryRequest => Promise<RewardHistoryResponse> = (body) => (
     batchGetRewardHistory(
       this.baseFetcher.getRewardHistory
@@ -141,6 +160,11 @@ export class BatchedFetcher implements IFetcher {
 
   getUtxoData: GetUtxoDataRequest => Promise<GetUtxoDataResponse> = (body) => (
     batchGetUtxoData(this.baseFetcher.getUtxoData)(body)
+  )
+
+  getLatestBlockBySlot: GetLatestBlockBySlotFunc = async (body) => (
+    // Todo: Implement batching as the max slots per request is 50
+    this.baseFetcher.getLatestBlockBySlot(body)
   )
 }
 
@@ -318,6 +342,30 @@ export function batchGetTransactionsHistoryForAddresses(
       if (error instanceof LocalizableError) throw error;
       throw new GetTxHistoryForAddressesApiError();
     }
+  };
+}
+
+function batchGetRecentTransactionHashes(
+  getRecentTransactionHashes: GetRecentTransactionHashesFunc,
+): GetRecentTransactionHashesFunc {
+  return getRecentTransactionHashes;
+}
+
+function batchGetTransactionsByHashes(
+  getTransactionsByHashes: GetTransactionsByHashesFunc,
+): GetTransactionsByHashesFunc {
+  return async function(
+    body: GetTransactionsByHashesRequest
+  ): Promise<GetTransactionsByHashesResponse> {
+    let txs = [];
+    for (const txHashes of chunk(body.txHashes, 100)) {
+      const batchResult = await getTransactionsByHashes({
+        txHashes,
+        network: body.network,
+      });
+      txs = [ ...txs, ...batchResult ];
+    }
+    return txs;
   };
 }
 

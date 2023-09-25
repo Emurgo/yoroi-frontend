@@ -51,6 +51,27 @@ export const LightRevampButton: any = {
       props: { variant: 'destructive' },
       style: getContainedStyles('magenta', lightTheme),
     },
+    {
+      props: { variant: 'segmented' },
+      style: {
+        minWidth: 'unset',
+        maxWidth: 'unset',
+        width: '40px',
+        height: '40px',
+        padding: '8px',
+        color: 'grayscale.200',
+        '&.MuiButton-sizeMedium': { padding: '8px', height: '40px' },
+        ':hover': {
+          color: 'grayscale.50',
+        },
+        '&.active': {
+          backgroundColor: lightTheme.palette.grayscale[200],
+          ':hover': {
+            backgroundColor: lightTheme.palette.grayscale[50],
+          },
+        },
+      },
+    },
   ],
 };
 

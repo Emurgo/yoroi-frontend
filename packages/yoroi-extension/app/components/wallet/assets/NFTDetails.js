@@ -2,7 +2,16 @@
 import { useState } from 'react';
 import type { Node, ComponentType } from 'react';
 import { Box, styled } from '@mui/system';
-import { Link as LinkMui, Typography, Stack, Tab, Modal, Button, IconButton } from '@mui/material';
+import {
+  Link as LinkMui,
+  Typography,
+  Stack,
+  Tab,
+  Modal,
+  Button,
+  IconButton,
+  Grid,
+} from '@mui/material';
 import { TabContext, TabPanel, TabList } from '@mui/lab';
 import globalMessages from '../../../i18n/global-messages';
 import { injectIntl, defineMessages } from 'react-intl';
@@ -124,7 +133,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
   if (nftInfo == null) return null;
 
   return (
-    <Box sx={{ overflowX: 'hidden' }}>
+    <Box sx={{ height: '101vh' }}>
       <Box sx={{ display: 'inline-block' }}>
         <Typography
           as={Link}
@@ -147,64 +156,84 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
           </Box>
         </Typography>
       </Box>
-      <Stack
-        direction="row"
+      <Grid
+        container
+        columns={10}
         sx={{
           margin: '0 auto',
           minHeight: '520px',
-          marginY: '21px',
-          backgroundColor: 'var(--yoroi-palette-common-white)',
+          mb: '21px',
+          backgroundColor: 'common.white',
           borderRadius: '8px',
-          overflowX: 'auto',
+          height: '100%',
         }}
       >
-        <ImageItem
-          sx={{
-            cursor: nftInfo.image !== null ? 'zoom-in' : 'auto',
-            padding: below1400 ? '10px' : '24px',
-          }}
-          onClick={() => nftInfo.image !== null && setOpen(true)}
-        >
-          <NftImage
-            imageUrl={nftInfo.image}
-            name={nftInfo.name || '-'}
-            width="532px"
-            height="510px"
-          />
-        </ImageItem>
-        <Box flex={1} sx={{ paddingTop: below1400 ? '10px' : '24px', paddingBottom: '22px' }}>
-          <Stack
-            justifyContent="space-between"
-            flexDirection="row"
+        <Grid item xs={4}>
+          <ImageItem
             sx={{
-              paddingBottom: '22px',
-              px: '24px',
+              cursor: nftInfo.image !== null ? 'zoom-in' : 'auto',
+              paddingY: '24px',
+              display: 'block',
+              img: {
+                objectFit: 'unset',
+              },
             }}
+            onClick={() => nftInfo.image !== null && setOpen(true)}
           >
-            <TruncatedText
-              variant="h2"
-              sx={{ width: below1400 ? '200px' : '400px' }}
-              color="var(--yoroi-palette-gray-900)"
-            >
-              {nftInfo.name}
-            </TruncatedText>
+            <NftImage
+              imageUrl={nftInfo.image}
+              name={nftInfo.name || '-'}
+              width="100%"
+              height="auto"
+            />
+          </ImageItem>
+        </Grid>
 
-            <Stack direction="row" spacing={1}>
-              <Link to={ROUTES.NFTS.DETAILS.replace(':nftId', prevNftId) + `?tab=${activeTab}`}>
-                <IconButton
-                  aria-label="Previous"
-                  sx={{ transform: 'rotate(180deg)', width: '32px' }}
+        <Grid
+          item
+          xs={6}
+          sx={{
+            paddingTop: '24px',
+            paddingBottom: '22px',
+          }}
+        >
+          <Box>
+            <Stack
+              justifyContent="space-between"
+              flexDirection="row"
+              sx={{
+                paddingBottom: '22px',
+                px: '24px',
+                height: '100%',
+              }}
+            >
+              <Box>
+                <TruncatedText
+                  variant="h2"
+                  sx={{ width: below1400 ? '200px' : '400px' }}
+                  color="var(--yoroi-palette-gray-900)"
                 >
-                  <Chevron />
-                </IconButton>
-              </Link>
-              <Link to={ROUTES.NFTS.DETAILS.replace(':nftId', nextNftId) + `?tab=${activeTab}`}>
-                <IconButton aria-label="Next" sx={{ width: '32px' }}>
-                  <Chevron />
-                </IconButton>
-              </Link>
+                  {nftInfo.name}
+                </TruncatedText>
+              </Box>
+
+              <Stack direction="row" spacing={1}>
+                <Link to={ROUTES.NFTS.DETAILS.replace(':nftId', prevNftId) + `?tab=${activeTab}`}>
+                  <IconButton
+                    aria-label="Previous"
+                    sx={{ transform: 'rotate(180deg)', width: '32px' }}
+                  >
+                    <Chevron />
+                  </IconButton>
+                </Link>
+                <Link to={ROUTES.NFTS.DETAILS.replace(':nftId', nextNftId) + `?tab=${activeTab}`}>
+                  <IconButton aria-label="Next" sx={{ width: '32px' }}>
+                    <Chevron />
+                  </IconButton>
+                </Link>
+              </Stack>
             </Stack>
-          </Stack>
+          </Box>
           <TabContext value={activeTab}>
             <Box>
               <TabList
@@ -214,6 +243,9 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                   marginX: '24px',
                   borderBottom: 1,
                   borderColor: 'divider',
+                  '.MuiTab-root': {
+                    paddingLeft: '0px',
+                  },
                 }}
                 onChange={(_, newValue) => setActiveTab(newValue)}
                 aria-label="NFTs tabs"
@@ -228,6 +260,10 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                       marginRight: id === tabs[0].id && '24px',
                       textTransform: 'none',
                       fontWeight: 500,
+                      paddingLeft: '0px',
+                      '.MuiTab-root': {
+                        paddingLeft: '0px',
+                      },
                     }}
                     label={intl.formatMessage(label)}
                     value={id}
@@ -299,9 +335,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                 boxShadow: 'none',
                 bgcolor: 'transparent',
                 height: '100%',
-                maxHeight: '400px',
                 overflow: 'auto',
-                width: '600px',
               }}
               value={tabs[1].id}
             >
@@ -325,8 +359,8 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
               </Typography>
             </TabPanel>
           </TabContext>
-        </Box>
-      </Stack>
+        </Grid>
+      </Grid>
       <Modal
         onClose={onClose}
         open={open}

@@ -19,7 +19,7 @@ import { ReactComponent as InfoIcon } from '../../../assets/images/revamp/info.i
 
 import type { AddressTypeName, AddressFilterKind } from '../../../types/AddressFilterTypes';
 import classNames from 'classnames';
-import {Box, Tooltip, Typography } from '@mui/material';
+import { Box, Tooltip, Typography } from '@mui/material';
 
 type AddressStoreSubset = {
   +isActiveStore: boolean,

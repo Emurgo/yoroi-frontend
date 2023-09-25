@@ -8,6 +8,7 @@ module.exports = {
     '@emurgo/cardano-serialization-lib-browser': '@emurgo/cardano-serialization-lib-nodejs',
     'ergo-lib-wasm-browser': 'ergo-lib-wasm-nodejs',
     '@emurgo/cardano-message-signing-browser': '@emurgo/cardano-message-signing-nodejs',
+    '@emurgo/cross-csl-browser': '@emurgo/cross-csl-nodejs',
     '\\.png$': 'lodash/noop.js',
   },
   transformIgnorePatterns: [
@@ -18,5 +19,5 @@ module.exports = {
     './jestSetup',
   ],
   // ignore manifest.test.js file, because it isn't a test
-  testPathIgnorePatterns: ['manifest.test.js'],
+  testPathIgnorePatterns: ['manifest.test.js', 'manifest-mv2.test.js'],
 };
