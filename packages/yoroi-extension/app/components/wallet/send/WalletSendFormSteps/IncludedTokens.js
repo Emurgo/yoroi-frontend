@@ -181,20 +181,7 @@ export default class IncludedTokens extends Component<Props> {
           </Box>
         )}
       </Box>
-      // <div className={styles.component}>
-      // {tokens.length > 0 && (
-      //   <div>
-      //     <h1 className={styles.header}>{intl.formatMessage(globalMessages.tokens)}</h1>
-      //     <div>{this.renderItems(tokens)}</div>
-      //   </div>
-      // )}
-      // {nfts.length > 0 && (
-      //   <div>
-      //     <h1 className={styles.header}>{intl.formatMessage(globalMessages.nfts)}</h1>
-      //     <div>{this.renderItems(nfts)}</div>
-      //   </div>
-      // )}
-      // </div>
+    
     );
   }
 }
