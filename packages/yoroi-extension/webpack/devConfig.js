@@ -1,16 +1,11 @@
 // @flow
-
+const ConfigWebpackPlugin = require('config-webpack');
 const commonConfig = require('./commonConfig');
-const connections = require('../scripts/connections');
-const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
 const path = require('path');
 const webpack = require('webpack');
 
-const host = 'localhost';
 const customPath = path.join(__dirname, './customPublicPath');
-const hotScript =
-  'webpack-hot-middleware/client?path=__webpack_hmr&dynamicPublicPath=true';
 
 const baseDevConfig = (
   networkName /*: string */,
@@ -21,48 +16,38 @@ const baseDevConfig = (
   optimization: commonConfig.optimization,
   experiments: commonConfig.experiments,
   resolve: commonConfig.resolve(),
-  devtool: 'eval-source-map',
+  devtool: 'source-map',
   entry: {
     yoroi: [
       customPath,
-      hotScript,
       path.join(__dirname, '../chrome/extension/index')
-    ],
-    background: [
-      customPath,
-      hotScript,
-      path.join(__dirname, '../chrome/extension/background')
     ],
     ergo: [
       customPath,
-      hotScript,
       path.join(__dirname, '../chrome/extension/connector/index')
     ],
     ledger: [
       customPath,
-      hotScript,
       path.join(__dirname, '../ledger/index')
     ],
   },
-  devMiddleware: {
-    publicPath: `http://${host}:${connections.Ports.WebpackDev}/js`,
-    stats: {
-      colors: true
+  devServer: {
+    devMiddleware: {
+      publicPath: `js`,
+      stats: {
+        colors: true
+      },
+      headers: { 'Access-Control-Allow-Origin': '*' },
+      writeToDisk: true,
     },
-    headers: { 'Access-Control-Allow-Origin': '*' }
-  },
-  hotMiddleware: {
-    path: '/js/__webpack_hmr'
   },
   output: {
     path: path.join(__dirname, '../dev/js'),
     filename: '[name].bundle.js',
-    // Need to so `HtmlWebpackPlugin` knows where to find the js bundles
-    publicPath: `http://localhost:${connections.Ports.WebpackDev}/js/`
+    publicPath: 'js/',
   },
   plugins: [
     ...commonConfig.plugins('dev', networkName),
-    new ReactRefreshWebpackPlugin(),
     new webpack.DefinePlugin(commonConfig.definePlugin(
       networkName,
       false,
@@ -73,10 +58,6 @@ const baseDevConfig = (
     new webpack.IgnorePlugin({
       resourceRegExp: /[^/]+\/[\S]+.prod$/,
     }),
-    new webpack.DefinePlugin({
-      __HOST__: `'${host}'`,
-      __PORT__: connections.Ports.WebpackDev,
-    })
   ],
   module: {
     rules: [
@@ -86,7 +67,6 @@ const baseDevConfig = (
         loader: 'babel-loader',
         exclude: /node_modules/,
         options: {
-          plugins: [[require.resolve('react-refresh/babel'), { skipEnvCheck: true }]],
           cacheDirectory: true,
         },
       },
@@ -107,4 +87,85 @@ const baseDevConfig = (
   }
 });
 
-module.exports = { baseDevConfig };
+const backgroundServiceWorkerConfig = (
+  networkName /*: string */,
+  isNightly /*: boolean */,
+  isLight /* : ?boolean */ = false
+) /*: * */ => ({
+  mode: 'development',
+  experiments: { asyncWebAssembly: true },
+  resolve: commonConfig.resolve(),
+  // could not use the eval option because Chrome manifest v3 prohibits eval()
+  devtool: 'source-map',
+  entry: {
+    background: [
+      path.join(__dirname, '../chrome/extension/background')
+    ],
+  },
+  devServer: {
+    devMiddleware: {
+      writeToDisk: true,
+    },
+    hot: false,
+    liveReload: false,
+  },
+  output: {
+    path: path.join(__dirname, '../dev/js'),
+    filename: 'background-service-worker.js',
+  },
+  plugins: [
+    new ConfigWebpackPlugin(),
+    new webpack.ProvidePlugin({
+      process: 'process/browser',
+    }),
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer'],
+    }),
+    new webpack.DefinePlugin(commonConfig.definePlugin(
+      networkName,
+      false,
+      isNightly,
+      Boolean(isLight)
+    )),
+    new webpack.IgnorePlugin({
+      resourceRegExp: /[^/]+\/[\S]+.prod$/,
+    }),
+    new webpack.optimize.LimitChunkCountPlugin({
+      maxChunks: 1,
+    }),
+    new webpack.NormalModuleReplacementPlugin(
+      /rustLoader/,
+      (resource) => {
+        resource.request = resource.request.replace('rustLoader', 'rustLoaderForBackground')
+      }
+    ),
+  ],
+  module: {
+    rules: [
+      ...commonConfig.rules(true),
+      {
+        test: /\.js$/,
+        loader: 'babel-loader',
+        exclude: /node_modules/,
+        options: {
+          cacheDirectory: true,
+        },
+      },
+      {
+        test: /\.(js|jsx)$/,
+        exclude: [/node_modules/, /pdf\.worker(\.min)?\.js$/],
+        loader: 'babel-loader',
+        options: {
+          cacheDirectory: true,
+        },
+      },
+      {
+        test: /\.(eot|otf|ttf|woff|woff2|gif|png)$/,
+        include: [ path.resolve(__dirname, '../app') ],
+        loader: 'file-loader',
+      },
+    ]
+  }
+});
+
+module.exports = { baseDevConfig, backgroundServiceWorkerConfig };

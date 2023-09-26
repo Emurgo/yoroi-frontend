@@ -1,5 +1,5 @@
-// @flow
-
+// fixme broken flow
+// eslint-disable-next-line flowtype/require-valid-file-annotation
 import type { Node } from 'react';
 
 import { select, boolean } from '@storybook/addon-knobs';

@@ -25,7 +25,6 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver'
 import { asGetPublicKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import environment from '../../environment'
 import { ROUTES } from '../../routes-config'
-import type { TxRequests } from '../../stores/toplevel/TransactionsStore';
 import type { PublicKeyCache } from '../../stores/toplevel/WalletStore';
 import type { IGetPublic } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { WalletChecksum } from '@emurgo/cip4-js';
@@ -79,10 +78,8 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
 
   getWalletInfo(
     publicDeriver: PublicDeriver<>
-    ): {| balance: null | MultiToken, plate: null | WalletChecksum |} {
-    const txRequests: TxRequests = this.generated.stores.transactions
-    .getTxRequests(publicDeriver);
-    const balance = txRequests.requests.getBalanceRequest.result ?? null;
+  ): {| balance: null | MultiToken, plate: null | WalletChecksum |} {
+    const balance = this.generated.stores.transactions.getBalance(publicDeriver);
 
     const withPubKey = asGetPublicKey(publicDeriver);
     const plate = withPubKey == null
@@ -170,7 +167,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
         publicDerivers: Array<PublicDeriver<>>
       |},
       transactions: {|
-        getTxRequests: (PublicDeriver<>) => TxRequests
+        getBalance: (PublicDeriver<>) => MultiToken | null,
       |},
     |},
     getReceiveAddress: typeof getReceiveAddress,
@@ -198,7 +195,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
           getPublicKeyCache: stores.wallets.getPublicKeyCache,
         },
         transactions: {
-          getTxRequests: stores.transactions.getTxRequests,
+          getBalance: stores.transactions.getBalance,
         },
         connector: {
           currentConnectorWhitelist: stores.connector.currentConnectorWhitelist,
