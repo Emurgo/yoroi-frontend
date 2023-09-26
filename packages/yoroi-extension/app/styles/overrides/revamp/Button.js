@@ -171,7 +171,7 @@ function getOutlinedStyles(variant: 'primary' | 'secondary', theme: Object): Obj
 
 function getTertiaryStyles(variant: 'primary' | 'grayscale', theme: Object): Object {
   return {
-    backgroundColor: theme.palette[variant][50],
+    backgroundColor: 'transparent',
     color: theme.palette[variant][500],
     ':hover': {
       backgroundColor: theme.palette.grayscale[50],
