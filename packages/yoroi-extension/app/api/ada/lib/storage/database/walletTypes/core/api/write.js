@@ -99,6 +99,7 @@ export class DeleteAllTransactions {
       publicDeriverId: number,
       txIds: Array<number>,
     |},
+    resetLastSyncInfo: boolean = true,
   ): Promise<void> {
     // 1) delete all transactions from the wallet
     // note: this should cascade delete all related information
@@ -108,6 +109,10 @@ export class DeleteAllTransactions {
       DeleteAllTransactions.ownTables[TransactionSchema.name].properties.TransactionId,
       request.txIds,
     );
+
+    if (!resetLastSyncInfo) {
+      return;
+    }
 
     // 2) reset the last sync time
     const lastSyncInfo = await DeleteAllTransactions.depTables.GetLastSyncForPublicDeriver.forId(

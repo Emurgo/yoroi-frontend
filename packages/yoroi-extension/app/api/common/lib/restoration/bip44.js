@@ -65,7 +65,7 @@ export async function scanBip44Chain(request: {|
   );
 
   return addresses
-    .map((address, i) => {
+    .map(({ address }, i) => {
       return {
         index: i + request.lastUsedIndex + 1,
         insert: async insertRequest => {

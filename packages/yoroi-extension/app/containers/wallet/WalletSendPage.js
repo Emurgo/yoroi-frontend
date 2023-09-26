@@ -197,13 +197,11 @@ class WalletSendPage extends Component<AllProps> {
             uriParams={this.generated.stores.loading.uriParams}
             resetUriParams={this.generated.stores.loading.resetUriParams}
             showMemo={this.showMemo}
-            onAddMemo={() =>
-              this.showMemoDialog({
-                dialog: MemoNoExternalStorageDialog,
-                continuation: this.toggleShowMemo,
-              })
-            }
-            spendableBalance={this.generated.stores.transactions.getBalanceRequest.result}
+            onAddMemo={() => this.showMemoDialog({
+              dialog: MemoNoExternalStorageDialog,
+              continuation: this.toggleShowMemo,
+            })}
+            spendableBalance={this.generated.stores.transactions.balance}
             onAddToken={txBuilderActions.addToken.trigger}
             onRemoveTokens={txBuilderActions.removeTokens.trigger}
             selectedToken={transactionBuilderStore.selectedToken}
@@ -255,13 +253,11 @@ class WalletSendPage extends Component<AllProps> {
           uriParams={this.generated.stores.loading.uriParams}
           resetUriParams={this.generated.stores.loading.resetUriParams}
           showMemo={this.showMemo}
-          onAddMemo={() =>
-            this.showMemoDialog({
-              dialog: MemoNoExternalStorageDialog,
-              continuation: this.toggleShowMemo,
-            })
-          }
-          spendableBalance={this.generated.stores.transactions.getBalanceRequest.result}
+          onAddMemo={() => this.showMemoDialog({
+            dialog: MemoNoExternalStorageDialog,
+            continuation: this.toggleShowMemo,
+          })}
+          spendableBalance={this.generated.stores.transactions.balance}
           onAddToken={txBuilderActions.addToken.trigger}
           selectedToken={transactionBuilderStore.selectedToken}
         />
@@ -566,7 +562,7 @@ class WalletSendPage extends Component<AllProps> {
     return (
       <AddNFTDialog
         onClose={this.generated.actions.dialogs.closeActiveDialog.trigger}
-        spendableBalance={this.generated.stores.transactions.getBalanceRequest.result}
+        spendableBalance={this.generated.stores.transactions.balance}
         getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
         classicTheme={this.generated.stores.profile.isClassicTheme}
         updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
@@ -593,7 +589,7 @@ class WalletSendPage extends Component<AllProps> {
           txBuilderActions.deselectToken.trigger();
           this.generated.actions.dialogs.closeActiveDialog.trigger();
         }}
-        spendableBalance={this.generated.stores.transactions.getBalanceRequest.result}
+        spendableBalance={this.generated.stores.transactions.balance}
         getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
         updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
         calculateMinAda={this.calculateMinAda}
@@ -754,9 +750,7 @@ class WalletSendPage extends Component<AllProps> {
       |},
       transactions: {|
         hasAnyPending: boolean,
-        getBalanceRequest: {|
-          result: ?MultiToken,
-        |},
+        balance: ?MultiToken,
       |},
       uiDialogs: {|
         getParam: <T>(number | string) => T,
@@ -805,17 +799,7 @@ class WalletSendPage extends Component<AllProps> {
         },
         transactions: {
           hasAnyPending: stores.transactions.hasAnyPending,
-          getBalanceRequest: (() => {
-            if (stores.wallets.selected == null)
-              return {
-                result: undefined,
-              };
-            const { requests } = stores.transactions.getTxRequests(stores.wallets.selected);
-
-            return {
-              result: requests.getBalanceRequest.result,
-            };
-          })(),
+          balance: stores.transactions.balance,
         },
         transactionBuilderStore: {
           totalInput: stores.transactionBuilderStore.totalInput,

@@ -136,12 +136,10 @@ export type BaseGetTransactionsRequest = {|
   ...InexactSubset<GetTransactionsRequestOptions>,
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetLastSyncInfo,
   isLocalRequest: boolean,
+  afterTxs?: ?Array<WalletTransaction>,
 |};
-export type GetTransactionsResponse = {
-  transactions: Array<WalletTransaction>,
-  total: number,
-  ...
-};
+export type GetTransactionsResponse = Array<WalletTransaction>;
+
 export type GetTransactionsFunc = (
   request: BaseGetTransactionsRequest
 ) => Promise<GetTransactionsResponse>;

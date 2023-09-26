@@ -45,7 +45,11 @@ export default class AmountDisplay extends Component<Props> {
 
     if (shouldHideBalance) {
       balanceDisplay = <span>{hiddenAmount}</span>;
-      fiatDisplay = <span>{hiddenAmount}</span>;
+      fiatDisplay = (
+        <span>
+          {hiddenAmount} {currency}
+        </span>
+      );
     } else {
       const shiftedAmount = defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
@@ -61,7 +65,7 @@ export default class AmountDisplay extends Component<Props> {
         </>
       );
 
-      if (unitOfAccountSetting.enabled && Boolean(showFiat)) {
+      if (unitOfAccountSetting.enabled) {
         const ticker = tokenInfo.Metadata.ticker;
         if (ticker == null) {
           throw new Error('unexpected main token type');
@@ -85,9 +89,9 @@ export default class AmountDisplay extends Component<Props> {
             {balanceDisplay}&nbsp;{truncateToken(getTokenName(tokenInfo))}
           </p>
         )}
-        {showFiat === true && unitOfAccountSetting.enabled && (
+        {showFiat === true && (
           <p className={styles.fiat}>
-            {fiatDisplay} {currency}
+            {fiatDisplay || '-'} {currency || 'USD'}
           </p>
         )}
       </>
