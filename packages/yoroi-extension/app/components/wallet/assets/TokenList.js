@@ -217,12 +217,20 @@ function TokenList({ assetsList: list, shouldHideBalance, intl }: Props & Intl):
                   </Stack>
                 }
                 thirdColumn={
-                  <ButtonBase disableRipple onClick={() => sortAssets(SORTING_COLUMNS.AMOUNT)}>
-                    <Typography variant="body2" color="grayscale.600" mr="4px">
-                      {intl.formatMessage(assetsMessage.quantity)}
-                    </Typography>
-                    {displayColumnLogo(SORTING_COLUMNS.AMOUNT)}
-                  </ButtonBase>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'flex-end',
+                    }}
+                  >
+                    <ButtonBase disableRipple onClick={() => sortAssets(SORTING_COLUMNS.AMOUNT)}>
+                      <Typography variant="body2" color="grayscale.600" mr="4px">
+                        {intl.formatMessage(assetsMessage.quantity)}
+                      </Typography>
+                      {displayColumnLogo(SORTING_COLUMNS.AMOUNT)}
+                    </ButtonBase>
+                  </Box>
                 }
               />
             </Box>
@@ -328,7 +336,7 @@ function TokenItemRow({ avatar, name, id, amount, isTotalAmount }: TokenItemRowP
           </Box>
         </Typography>
       }
-      thirdColumn={<Typography fontWeight="500">{amount}</Typography>}
+      thirdColumn={<Typography fontWeight="500" textAlign="right">{amount}</Typography>}
     />
   );
 }
