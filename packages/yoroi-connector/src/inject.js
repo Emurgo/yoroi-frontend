@@ -111,13 +111,14 @@ const initialInject = `
 
   window.cardano = {
     ...(window.cardano||{}),
-    '${WALLET_NAME}': {
+    '${WALLET_NAME}': Object.freeze({
       icon: '${ICON_URL}',
       enable: cardano_request_read_access,
       isEnabled: cardano_check_read_access,
       apiVersion: '${API_VERSION}',
       name: '${WALLET_NAME}',
-    }
+      supportedExtensions: Object.freeze([{ cip: 95 }]),
+    })
   };
 })();
 `;
@@ -226,6 +227,10 @@ class CardanoAPI {
       },
       
     }) 
+    
+    getExtensions() {
+        return [{ cip: 95 }];
+    }
     
     getNetworkId() {
       return CardanoAPI._cardano_rpc_call("get_network_id", []);
