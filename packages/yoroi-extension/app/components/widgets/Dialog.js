@@ -67,9 +67,6 @@ function DialogFn(props: Props & InjectedProps): Node {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        '& .MuiBackdrop-root': {
-          background: 'none',
-        },
       }}
     >
       <ModalContainer
@@ -77,6 +74,7 @@ function DialogFn(props: Props & InjectedProps): Node {
         flexDirection="column"
         className={className}
         style={props.styleOverride}
+        boxShadow="0px 13px 20px -1px #00000026"
       >
         {title != null && title !== '' ? (
           <Typography as="h1" variant="body1" className="dialog__title">
