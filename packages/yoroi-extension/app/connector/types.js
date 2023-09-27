@@ -72,9 +72,9 @@ export type Cip95Info = {|
   voterType: number,
   voterHash: string,
   govActionTxId: string,
-  govActionIndex: string,
-  vote: 0 | 1 | 2,
-  anchor: Anchor,
+  govActionIndex: number,
+  vote: number, // 0 | 1 | 2,
+  anchor: Anchor | null,
 |} | {|
   type: 'ProposalProcedure',
   deposit: string,
@@ -82,10 +82,10 @@ export type Cip95Info = {|
   govAction: any, // todo
   anchor: Anchor,
 |} | {|
-  type: 'TresuryValue',
+  type: 'TreasuryValue',
   coin: string,
 |} | {|
-  type: 'TresuryDonation',
+  type: 'TreasuryDonation',
   positiveCoin: string,
 |}
 export type CardanoConnectorSignRequest = {|
