@@ -120,6 +120,12 @@ function getContainedStyles(variant: 'primary' | 'secondary' | 'magenta', theme:
     '& .MuiLoadingButton-loadingIndicator': {
       color: theme.palette.common.white,
     },
+    '& .MuiButton-startIcon svg': {
+      fill: theme.palette.common.white,
+    },
+    '& .MuiButton-startIcon svg path': {
+      fill: theme.palette.common.white,
+    },
   };
 }
 
@@ -150,6 +156,12 @@ function getOutlinedStyles(variant: 'primary' | 'secondary', theme: Object): Obj
     '& .MuiLoadingButton-loadingIndicator': {
       color: theme.palette[variant][600],
     },
+    '& .MuiButton-startIcon svg': {
+      fill: theme.palette[variant][500],
+    },
+    '& .MuiButton-startIcon svg path': {
+      fill: theme.palette[variant][500],
+    },
   };
 }
 
@@ -176,6 +188,12 @@ function getTertiaryStyles(variant: 'primary' | 'grayscale', theme: Object): Obj
     },
     '& .MuiLoadingButton-loadingIndicator': {
       color: theme.palette[variant][600],
+    },
+    '& .MuiButton-startIcon svg': {
+      fill: theme.palette[variant][500],
+    },
+    '& .MuiButton-startIcon svg path': {
+      fill: theme.palette[variant][500],
     },
   };
 }

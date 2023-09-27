@@ -59,7 +59,7 @@ function TopBarLayout({
             boxShadow: !isRevampLayout && showAsCard === true && '0 2px 12px 0 rgba(0, 0, 0, 0.06)',
             borderRadius: !isRevampLayout && showAsCard === true && '8px',
             ...(showInContainer === true && {
-              background: 'var(--yoroi-palette-common-white)',
+              bgcolor: 'common.white',
               width: '100%',
               overflow: 'hidden',
               display: 'flex',
@@ -67,6 +67,12 @@ function TopBarLayout({
               flex: '0 1 auto',
               height: '100%',
             }),
+            ...(isRevampLayout &&
+              asModern !== true &&
+              // $FlowFixMe
+              !isModern && {
+                overflow: 'auto',
+              }),
           }}
         >
           {isRevampLayout && asModern !== true && !isModern ? (
@@ -91,7 +97,8 @@ function TopBarLayout({
                     height: '100%',
                     minHeight: '200px',
                     padding: '24px',
-                    backgroundColor: bgcolor || 'common.white',
+                    pb: 0,
+                    bgcolor: bgcolor || 'common.white',
                   }}
                 >
                   {children}
