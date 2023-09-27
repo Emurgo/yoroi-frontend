@@ -3,7 +3,6 @@ import type { Node, ComponentType } from 'react';
 import type { GeneratedData as BannerContainerData } from '../banners/BannerContainer';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
-import type { GeneratedData as NavBarContainerData } from '../NavBarContainer';
 import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { LayoutComponentMap } from '../../styles/context/layout';
@@ -16,7 +15,6 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 import { withLayout } from '../../styles/context/layout';
 import globalMessages from '../../i18n/global-messages';
 import SwapMenu from '../../components/swap/SwapMenu';
-import NavBarContainer from '../NavBarContainer';
 import BannerContainer from '../banners/BannerContainer';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import SidebarContainer from '../SidebarContainer';
@@ -29,11 +27,13 @@ type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
   +children?: Node,
 |};
+
 type InjectedProps = {|
   +renderLayoutComponent: LayoutComponentMap => Node,
 |};
 
 type AllProps = {| ...Props, ...InjectedProps |};
+
 @observer
 class SwapPageContainer extends Component<AllProps> {
   static defaultProps: {| children: void |} = {
@@ -87,7 +87,6 @@ class SwapPageContainer extends Component<AllProps> {
 
   @computed get generated(): {|
     BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
-    NavBarContainerProps: InjectedOrGenerated<NavBarContainerData>,
     NavBarContainerRevampProps: InjectedOrGenerated<NavBarContainerRevampData>,
     SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
     actions: {|
@@ -115,12 +114,8 @@ class SwapPageContainer extends Component<AllProps> {
     const { stores, actions } = this.props;
     return Object.freeze({
       stores: {
-        router: {
-          location: stores.router.location,
-        },
-        wallets: {
-          selected: stores.wallets.selected,
-        },
+        router: { location: stores.router.location },
+        wallets: { selected: stores.wallets.selected },
       },
       actions: {
         router: {
@@ -128,7 +123,6 @@ class SwapPageContainer extends Component<AllProps> {
         },
       },
       SidebarContainerProps: ({ actions, stores }: InjectedOrGenerated<SidebarContainerData>),
-      NavBarContainerProps: ({ actions, stores }: InjectedOrGenerated<NavBarContainerData>),
       NavBarContainerRevampProps: ({
         actions,
         stores,
