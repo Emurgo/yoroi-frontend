@@ -34,28 +34,19 @@ class NavBarRevamp extends Component<Props> {
     return (
       <Box
         sx={{
-          backgroundColor: 'var(--yoroi-palette-common-white)',
-          boxShadow:
-            '0 4px 6px 0 #dee2ea, 0 1px 2px 0 rgba(222, 226, 234, 0.82), 0 2px 4px 0 rgba(222, 226, 234, 0.74)',
+          backgroundColor: 'common.white',
+          borderBottom: '1px solid',
+          borderBottomColor: 'grayscale.200',
         }}
       >
-        <Box
-          sx={{
-            maxWidth: 'calc(1366px - 90px)',
-            position: 'relative',
-            zIndex: 100,
-            height: menu != null ? '125px' : '90px',
-            margin: 'auto',
-          }}
-        >
+        <Box sx={{ position: 'relative', zIndex: 100, margin: 'auto' }}>
           <Box
             as="header"
             sx={{
-              color: 'var(--yoroi-palette-gray-800)',
+              color: 'grayscale.800',
               display: 'flex',
               alignItems: 'center',
               height: 'inherit',
-              padding: menu != null ? '34px 40px 50px' : '32px 40px',
             }}
           >
             <Box
@@ -64,6 +55,8 @@ class NavBarRevamp extends Component<Props> {
                 alignItems: 'center',
                 width: '100%',
                 justifyContent: 'space-between',
+                margin: '20px 24px',
+                marginBottom: menu != null ? '71px' : '',
               }}
             >
               <Box flex="0 0 auto">{title}</Box>
@@ -71,24 +64,16 @@ class NavBarRevamp extends Component<Props> {
                 sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}
               >
                 {children}
-                {buyButton && <Box sx={{ marginLeft: '24px' }}>{buyButton}</Box>}
+                {buyButton && <Box sx={{ marginLeft: '25px' }}>{buyButton}</Box>}
                 {walletDetails != null && (
-                  <Box sx={{ flex: '0 0 auto', marginLeft: '32px', minWidth: '280px' }}>
+                  <Box sx={{ flex: '0 0 auto', marginLeft: '24px', minWidth: '280px' }}>
                     {walletDetails}
                   </Box>
                 )}
               </Box>
             </Box>
             {menu != null ? (
-              <Box
-                sx={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                }}
-              >
-                {menu}
-              </Box>
+              <Box sx={{ position: 'absolute', bottom: 0, left: 0 }}>{menu}</Box>
             ) : null}
           </Box>
         </Box>

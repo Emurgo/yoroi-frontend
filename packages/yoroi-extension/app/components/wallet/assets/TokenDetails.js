@@ -4,8 +4,8 @@ import { Box } from '@mui/system';
 import { Avatar, Link as LinkMui, Grid, Typography } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
 import { defineMessages, injectIntl } from 'react-intl';
-import { ReactComponent as NoAssetLogo }  from '../../../assets/images/assets-page/asset-no.inline.svg';
-import { ReactComponent as LinkSvg }  from '../../../assets/images/link.inline.svg';
+import { ReactComponent as NoAssetLogo } from '../../../assets/images/assets-page/asset-no.inline.svg';
+import { ReactComponent as LinkSvg } from '../../../assets/images/link.inline.svg';
 import moment from 'moment';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { assetsMessage } from './AssetsList';
@@ -65,7 +65,7 @@ export const tokenMessages: Object = defineMessages({
   },
   description: {
     id: 'wallet.nftGallary.details.description',
-    defaultMessage: '!!!Description'
+    defaultMessage: '!!!Description',
   },
 });
 
@@ -87,7 +87,7 @@ function TokenDetails({ tokenInfo, tokensCount, network, intl }: Props & Intl): 
     <Box>
       <Box
         borderBottom="1px solid var(--yoroi-palette-gray-200)"
-        padding="16px 24px"
+        paddingBottom="16px"
         backgroundColor="var(--yoroi-palette-common-white)"
       >
         <Typography variant="h5" color="var(--yoroi-palette-gray-600)">
@@ -97,19 +97,19 @@ function TokenDetails({ tokenInfo, tokensCount, network, intl }: Props & Intl): 
             replace
             to={ROUTES.ASSETS.ROOT}
             variant="h5"
-            sx={{
-              color: 'var(--yoroi-palette-gray-600)',
-              textDecoration: 'none',
-            }}
+            color="var(--yoroi-palette-common-black)"
+            fontWeight={500}
+            fontSize="18px"
+            sx={{ textDecoration: 'none' }}
           >
-            {intl.formatMessage(globalMessages.tokens)}({tokensCount})
+            {intl.formatMessage(globalMessages.tokens)}: {tokensCount}
           </Typography>
-          <Typography as="span" variant="h5" color="var(--yoroi-palette-gray-900)" ml="4px">
+          <Typography as="span" variant="h5" color="var(--yoroi-palette-common-black)" ml="4px">
             / {tokenInfo.name}
           </Typography>
         </Typography>
       </Box>
-      <Box sx={{ maxWidth: '562px', margin: '0 auto', py: '24px', paddingTop: '57px' }}>
+      <Box sx={{ maxWidth: '600px', margin: '0 auto' }}>
         <Box
           display="flex"
           alignItems="center"
@@ -161,65 +161,59 @@ function TokenDetails({ tokenInfo, tokensCount, network, intl }: Props & Intl): 
               value={tokenInfo.lastUpdatedAt ? moment(tokenInfo.lastUpdatedAt).format('LL') : '-'}
             />
           </Grid>
-          {isCardanoHaskell(network) &&
-          <Grid item xs={4}>
-            <LabelWithValue
-              label={
-                <>
-                  <Typography as="span" display="flex">
-                    {intl.formatMessage(tokenMessages.detailsOn)}
-                    <Typography as="span" ml="4px">
-                      <LinkSvg />
+          {isCardanoHaskell(network) && (
+            <Grid item xs={4}>
+              <LabelWithValue
+                label={
+                  <>
+                    <Typography as="span" display="flex">
+                      {intl.formatMessage(tokenMessages.detailsOn)}
+                      <Typography as="span" ml="4px">
+                        <LinkSvg />
+                      </Typography>
                     </Typography>
-                  </Typography>
-                </>
-              }
-              value={
-                <LinkMui
-                  target="_blank"
-                  href={
-                    networkUrl != null
-                      ? `${networkUrl}/${tokenInfo.policyId}${tokenInfo.assetName}`
-                      : ''
-                  }
-                  disabled={networkUrl === null}
-                  rel="noopener noreferrer"
-                  sx={{ textDecoration: 'none' }}
-                >
-                  {intl.formatMessage(globalMessages.cardanoscan)}
-                </LinkMui>
-              }
-            />
-          </Grid>}
+                  </>
+                }
+                value={
+                  <LinkMui
+                    target="_blank"
+                    href={
+                      networkUrl != null
+                        ? `${networkUrl}/${tokenInfo.policyId}${tokenInfo.assetName}`
+                        : ''
+                    }
+                    disabled={networkUrl === null}
+                    rel="noopener noreferrer"
+                    sx={{ textDecoration: 'none' }}
+                  >
+                    {intl.formatMessage(globalMessages.cardanoscan)}
+                  </LinkMui>
+                }
+              />
+            </Grid>
+          )}
         </Grid>
         <Box marginTop="22px">
           <LabelWithValue
             label={intl.formatMessage(globalMessages.fingerprint)}
-            value={
-              <CopyAddress text={tokenInfo.policyId}>
-                {tokenInfo.policyId}
-              </CopyAddress>
-            }
+            value={<CopyAddress text={tokenInfo.policyId}>{tokenInfo.policyId}</CopyAddress>}
           />
         </Box>
         <Box marginTop="22px">
           <LabelWithValue
             label={intl.formatMessage(tokenMessages.policyId)}
-            value={
-              <CopyAddress text={tokenInfo.policyId}>
-                {tokenInfo.policyId}
-              </CopyAddress>
-            }
+            value={<CopyAddress text={tokenInfo.policyId}>{tokenInfo.policyId}</CopyAddress>}
           />
         </Box>
 
-        {tokenInfo.description &&
-        <Box marginTop="22px">
-          <LabelWithValue
-            label={intl.formatMessage(tokenMessages.description)}
-            value={tokenInfo.description}
-          />
-        </Box>}
+        {tokenInfo.description && (
+          <Box marginTop="22px">
+            <LabelWithValue
+              label={intl.formatMessage(tokenMessages.description)}
+              value={tokenInfo.description}
+            />
+          </Box>
+        )}
       </Box>
     </Box>
   );

@@ -348,6 +348,9 @@ class StakingPageContent extends Component<AllProps> {
                 route: ROUTES.WALLETS.RECEIVE.ROOT,
               });
             }}
+            goToSendPage={() => {
+              this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.SEND });
+            }}
           />
         ) : null}
         {hasNeverDelegated ? null : (

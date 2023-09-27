@@ -25,6 +25,7 @@ import HorizontalLine from '../../components/widgets/HorizontalLine';
 import { withLayout } from '../../styles/context/layout';
 import type { LayoutComponentMap } from '../../styles/context/layout';
 import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
+import { THEMES } from '../../styles/utils';
 
 export const WalletTransferPagePromise: void => Promise<any> = () => import('./WalletTransferPage');
 const WalletTransferPage = lazy(WalletTransferPagePromise);
@@ -87,10 +88,12 @@ class Transfer extends Component<AllProps> {
       return <UnsupportedWallet />;
     }
     const isRevamp = this.generated.stores.profile.isRevampTheme;
+    const currentTheme = this.generated.stores.profile.currentTheme;
+
     return (
       <>
         {!isRevamp && <HorizontalLine />}
-        <BackgroundColoredLayout>
+        <BackgroundColoredLayout isRevamp={isRevamp && currentTheme === THEMES.YOROI_REVAMP}>
           <Suspense fallback={null}>
             <WalletTransferPage
               {...this.generated.WalletTransferPageProps}
@@ -124,6 +127,7 @@ class Transfer extends Component<AllProps> {
       wallets: {| selected: null | PublicDeriver<> |},
       profile: {|
         isRevampTheme: boolean,
+        currentTheme: string,
       |},
     |},
   |} {
@@ -144,6 +148,7 @@ class Transfer extends Component<AllProps> {
         },
         profile: {
           isRevampTheme: stores.profile.isRevampTheme,
+          currentTheme: stores.profile.currentTheme,
         },
       },
       actions: {
