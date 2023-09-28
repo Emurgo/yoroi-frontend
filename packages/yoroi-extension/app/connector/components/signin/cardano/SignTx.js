@@ -257,5 +257,47 @@ const RenderCip95Info = ({
         <span key={`TreasuryDonation${i}`}>Treasury donation: {c.positiveCoin} ADA</span>
       );
     }),
+    ...cip95Info.filter(c => c.type === 'RegDrepCert').map((c, i) => {
+      if (c.type !== 'RegDrepCert') {
+        throw new Error('unexpected type');
+      }
+      return (
+        <div key={`RegDrepCert${i}`}>
+          <p>Register DRep credential with deposit ${c.coin} ADA</p>
+          {c.anchor && (
+            <>
+              <p>URL: {c.anchor.url}</p>
+              <p>Hash: {c.anchor.dataHash}</p>
+            </>
+          )}
+        </div>
+      );
+    }),
+    ...cip95Info.filter(c => c.type === 'UnregDrepCert').map((c, i) => {
+      if (c.type !== 'UnregDrepCert') {
+        throw new Error('unexpected type');
+      }
+      return (
+        <span key={`UnregDrepCert${i}`}>
+          Unregister DRep credential and return ${c.coin} ADA deposit
+        </span>
+      );
+    }),
+    ...cip95Info.filter(c => c.type === 'UpdateDrepCert').map((c, i) => {
+      if (c.type !== 'UpdateDrepCert') {
+        throw new Error('unexpected type');
+      }
+      return (
+        <div key={`UpdateDrepCert${i}`}>
+          <p>Update DRep credential</p>
+          {c.anchor && (
+            <>
+              <p>URL: {c.anchor.url}</p>
+              <p>Hash: {c.anchor.dataHash}</p>
+            </>
+          )}
+        </div>
+      );
+    }),
   ];
 }
