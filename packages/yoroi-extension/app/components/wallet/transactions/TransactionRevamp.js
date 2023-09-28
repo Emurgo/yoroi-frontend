@@ -297,6 +297,9 @@ export default class TransactionRevamp extends Component<Props, State> {
       );
     }
 
+    const amount = this.renderAmountDisplay({ entry: request.entry, getRawNumber: true });
+    const isPositiveNumber = typeof amount === 'string' ? amount.charAt(0) === '+' : false; // eslint-disable-line
+
     return (
       <Typography variant="body1" fontWeight={500} color="grayscale.900">
         {this.renderAmountDisplay({ entry: request.entry })} {this.getTicker(request.entry)}

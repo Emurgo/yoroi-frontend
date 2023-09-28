@@ -56,7 +56,7 @@ export default class NFTImage extends Component<Props, State> {
         }}
       />
     ) : (
-      <img src={imageUrl} alt={name} loading="lazy" />
+      <img width={width} src={imageUrl} alt={name} loading="lazy" />
     );
   }
 }
