@@ -222,12 +222,20 @@ const RenderCip95Info = ({
         </div>
       );
     }),
+    ...cip95Info.filter(c => c.type === 'StakeDelegationCert').map((c, i) => {
+      if (c.type !== 'StakeDelegationCert') {
+        throw new Error('unexpected type');
+      }
+      return (
+        <div key={`StakeDelegationCert${i}`}>Stake delegation to the pool: {c.poolKeyHash}</div>
+      );
+    }),
     ...cip95Info.filter(c => c.type === 'VoteDelegCert').map((c, i) => {
       if (c.type !== 'VoteDelegCert') {
         throw new Error('unexpected type');
       }
       return (
-        <span key={`VoteDelegCert${i}`}>Vote delegation to DRep: {c.drep}</span>
+        <div key={`VoteDelegCert${i}`}>Vote delegation to DRep: {c.drep}</div>
       );
     }),
     ...cip95Info.filter(c => c.type === 'StakeVoteDelegCert').map((c, i) => {
@@ -236,8 +244,8 @@ const RenderCip95Info = ({
       }
       return (
         <div key={`StakeVoteDelegCert${i}`}>
-          <p>Delegate to the stake pool ${c.poolKeyHash}</p>
-          <p>and DRep ${c.drep}</p>
+          <div>Delegate to the stake pool ${c.poolKeyHash}</div>
+          <div>and DRep ${c.drep}</div>
         </div>
       );
     }),
@@ -247,8 +255,8 @@ const RenderCip95Info = ({
       }
       return (
         <div key={`StakeRegDelegCert${i}`}>
-          <p>Register your stake credential with deposit of {c.coin} ADA and delegate to stake pool</p>
-          <p>${c.poolKeyHash}</p>
+          <div>Register your stake credential with deposit of {c.coin} ADA and delegate to stake pool</div>
+          <div>${c.poolKeyHash}</div>
         </div>
       );
     }),
@@ -258,8 +266,8 @@ const RenderCip95Info = ({
       }
       return (
         <div key={`VoteRegDelegCert${i}`}>
-          <p>Register your stake credential with deposit of {c.coin} ADA and delegate to the DRep</p>
-          <p>${c.drep}</p>
+          <div>Register your stake credential with deposit of {c.coin} ADA and delegate to the DRep</div>
+          <div>${c.drep}</div>
         </div>
       );
     }),
@@ -269,18 +277,10 @@ const RenderCip95Info = ({
       }
       return (
         <div key={`StakeVoteRegDelegCert${i}`}>
-          <p>Register your stake credential with deposit of {c.coin} ADA and delegate to the DRep</p>
-          <p>${c.drep} and the stake pool</p>
-          <p>${c.poolKeyHash}</p>
+          <div>Register your stake credential with deposit of {c.coin} ADA and delegate to the DRep</div>
+          <div>${c.drep} and the stake pool</div>
+          <div>${c.poolKeyHash}</div>
         </div>
-      );
-    }),
-    ...cip95Info.filter(c => c.type === 'TreasuryDonation').map((c, i) => {
-      if (c.type !== 'TreasuryDonation') {
-        throw new Error('unexpected type');
-      }
-      return (
-        <span key={`TreasuryDonation${i}`}>Treasury donation: {c.positiveCoin} ADA</span>
       );
     }),
     ...cip95Info.filter(c => c.type === 'RegDrepCert').map((c, i) => {
@@ -289,11 +289,11 @@ const RenderCip95Info = ({
       }
       return (
         <div key={`RegDrepCert${i}`}>
-          <p>Register DRep credential with deposit {c.coin} ADA</p>
+          <div>Register DRep credential with deposit {c.coin} ADA</div>
           {c.anchor && (
             <>
-              <p>URL: {c.anchor.url}</p>
-              <p>Hash: {c.anchor.dataHash}</p>
+              <div>URL: {c.anchor.url}</div>
+              <div>Hash: {c.anchor.dataHash}</div>
             </>
           )}
         </div>
@@ -304,9 +304,9 @@ const RenderCip95Info = ({
         throw new Error('unexpected type');
       }
       return (
-        <span key={`UnregDrepCert${i}`}>
+        <div key={`UnregDrepCert${i}`}>
           Unregister DRep credential and return {c.coin} ADA deposit
-        </span>
+        </div>
       );
     }),
     ...cip95Info.filter(c => c.type === 'UpdateDrepCert').map((c, i) => {
@@ -315,15 +315,50 @@ const RenderCip95Info = ({
       }
       return (
         <div key={`UpdateDrepCert${i}`}>
-          <p>Update DRep credential</p>
+          <div>Update DRep credential</div>
           {c.anchor && (
             <>
-              <p>URL: {c.anchor.url}</p>
-              <p>Hash: {c.anchor.dataHash}</p>
+              <div>URL: {c.anchor.url}</div>
+              <div>Hash: {c.anchor.dataHash}</div>
             </>
           )}
         </div>
       );
     }),
-  ];
+    ...cip95Info.filter(c => c.type === 'TreasuryValue').map((c, i) => {
+      if (c.type !== 'TreasuryValue') {
+        throw new Error('unexpected type');
+      }
+      return (
+        <div key={`TreasuryValue${i}`}>Treasury value: {c.coin} ADA</div>
+      );
+    }),
+    ...cip95Info.filter(c => c.type === 'TreasuryDonation').map((c, i) => {
+      if (c.type !== 'TreasuryDonation') {
+        throw new Error('unexpected type');
+      }
+      return (
+        <div key={`TreasuryDonation${i}`}>Treasury donation: {c.positiveCoin} ADA</div>
+      );
+    }),
+    ...cip95Info.filter(c => c.type === 'VotingProcedure').map((c, i) => {
+      if (c.type !== 'VotingProcedure') {
+        throw new Error('unexpected type');
+      }
+      return (
+        <div key={`VotingProcedure${i}`}>
+          <div>Voter: {c.voterHash}</div>
+          <div>Governance action transaction: {c.govActionTxId}</div>
+          <div>Governance action index: {c.govActionIndex}</div>
+          <div>Vote: {['no', 'yes', 'abstain'][c.vote]}</div>
+          {c.anchor && (
+            <div>
+              <div>URL: {c.anchor.url}</div>
+              <div>Hash: {c.anchor.dataHash}</div>
+            </div>
+          )}
+        </div>
+      );
+    }),
+ ];
 }
