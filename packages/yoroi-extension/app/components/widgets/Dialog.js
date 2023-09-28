@@ -141,11 +141,12 @@ const ModalContainer = styled(Box)(({ theme }) => ({
   maxWidth: theme.name === 'classic' ? '785px' : '560px',
   backgroundColor: 'var(--yoroi-comp-dialog-background)',
   color: 'var(--yoroi-comp-dialog-text)',
-  maxHeight: '80vh',
+  maxHeight: '95vh',
 
   '& .dialog__title': {
     flex: 1,
-    marginBottom: theme.name === 'classic' ? '22px' : '40px',
+    marginBottom: theme.name === 'classic' ? '22px' : '0px',
+    padding: theme.name === 'classic' ? '0' : '24px',
     fontWeight: 500,
     textAlign: 'center',
     textTransform: 'uppercase',

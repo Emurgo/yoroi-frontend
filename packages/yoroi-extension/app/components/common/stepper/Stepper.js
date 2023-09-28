@@ -75,6 +75,7 @@ function Stepper(props: Props & Intl): Node {
                   variant="body2"
                   fontWeight={500}
                   color={isCurrentStep ? 'common.white' : stepColor}
+                  lineHeight="27px"
                 >
                   {idx + 1}
                 </Typography>
