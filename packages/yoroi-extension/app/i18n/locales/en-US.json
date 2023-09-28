@@ -1030,7 +1030,7 @@
   "wallet.voting.dialog.title": "Register for Voting",
   "wallet.voting.dialog.transactionLabel": "Transaction",
   "wallet.voting.keepDelegated": "Your voting power is how much you delegate and the voting rewards will be distributed to your delegation reward address. Please keep delegated until the voting ends.",
-  "wallet.voting.ledgerNanoRequirement": "<a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/catalyst/update-ledger-app/\">Update</a>the Cardano app on your Ledger to version 6 or above with <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://www.ledger.com/ledger-live\"> Ledger Live</a>.",
+  "wallet.voting.ledgerNanoRequirement": "<a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/catalyst/update-ledger-app/\">Update</a> the Cardano app on your Ledger to version 6 or above with <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://www.ledger.com/ledger-live\"> Ledger Live</a>.",
   "wallet.voting.line2": "Before you begin, make sure to complete steps below",
   "wallet.voting.line3": "Download the Catalyst Voting App.",
   "wallet.voting.line4": "Open the Catalyst Voting App and click on the Complete registration button.",
