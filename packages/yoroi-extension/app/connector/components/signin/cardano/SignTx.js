@@ -196,6 +196,32 @@ const RenderCip95Info = ({
   cip95Info
 }): Node => {
   return [
+    ...cip95Info.filter(c => c.type === 'StakeRegistrationCert').map((c, i) => {
+      if (c.type !== 'StakeRegistrationCert') {
+        throw new Error('unexpected type');
+      }
+      return (
+        <div key={`StakeRegistrationCert${i}`}>
+          <span>Register stake credential</span>
+          {c.coin && (
+            <span>with {c.coin} ADA deposit</span>
+          )}
+        </div>
+      );
+    }),
+    ...cip95Info.filter(c => c.type === 'StakeDeregistrationCert').map((c, i) => {
+      if (c.type !== 'StakeDeregistrationCert') {
+        throw new Error('unexpected type');
+      }
+      return (
+        <div key={`StakeDeregistrationCert${i}`}>
+          <span>Deregister stake credential</span>
+          {c.coin && (
+            <span>and return {c.coin} ADA deposit</span>
+          )}
+        </div>
+      );
+    }),
     ...cip95Info.filter(c => c.type === 'VoteDelegCert').map((c, i) => {
       if (c.type !== 'VoteDelegCert') {
         throw new Error('unexpected type');
@@ -221,7 +247,7 @@ const RenderCip95Info = ({
       }
       return (
         <div key={`StakeRegDelegCert${i}`}>
-          <p>Register your stake credential with deposit of ${c.coin} ADA and delegate to stake pool</p>
+          <p>Register your stake credential with deposit of {c.coin} ADA and delegate to stake pool</p>
           <p>${c.poolKeyHash}</p>
         </div>
       );
@@ -232,7 +258,7 @@ const RenderCip95Info = ({
       }
       return (
         <div key={`VoteRegDelegCert${i}`}>
-          <p>Register your stake credential with deposit of ${c.coin} ADA and delegate to the DRep</p>
+          <p>Register your stake credential with deposit of {c.coin} ADA and delegate to the DRep</p>
           <p>${c.drep}</p>
         </div>
       );
@@ -243,7 +269,7 @@ const RenderCip95Info = ({
       }
       return (
         <div key={`StakeVoteRegDelegCert${i}`}>
-          <p>Register your stake credential with deposit of ${c.coin} ADA and delegate to the DRep</p>
+          <p>Register your stake credential with deposit of {c.coin} ADA and delegate to the DRep</p>
           <p>${c.drep} and the stake pool</p>
           <p>${c.poolKeyHash}</p>
         </div>
@@ -263,7 +289,7 @@ const RenderCip95Info = ({
       }
       return (
         <div key={`RegDrepCert${i}`}>
-          <p>Register DRep credential with deposit ${c.coin} ADA</p>
+          <p>Register DRep credential with deposit {c.coin} ADA</p>
           {c.anchor && (
             <>
               <p>URL: {c.anchor.url}</p>
@@ -279,7 +305,7 @@ const RenderCip95Info = ({
       }
       return (
         <span key={`UnregDrepCert${i}`}>
-          Unregister DRep credential and return ${c.coin} ADA deposit
+          Unregister DRep credential and return {c.coin} ADA deposit
         </span>
       );
     }),
