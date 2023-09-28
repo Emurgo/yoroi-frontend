@@ -203,6 +203,59 @@ const RenderCip95Info = ({
       return (
         <span key={`VoteDelegCert${i}`}>Vote delegation to DRep: {c.drep}</span>
       );
-    })
+    }),
+    ...cip95Info.filter(c => c.type === 'StakeVoteDelegCert').map((c, i) => {
+      if (c.type !== 'StakeVoteDelegCert') {
+        throw new Error('unexpected type');
+      }
+      return (
+        <div key={`StakeVoteDelegCert${i}`}>
+          <p>Delegate to the stake pool ${c.poolKeyHash}</p>
+          <p>and DRep ${c.drep}</p>
+        </div>
+      );
+    }),
+    ...cip95Info.filter(c => c.type === 'StakeRegDelegCert').map((c, i) => {
+      if (c.type !== 'StakeRegDelegCert') {
+        throw new Error('unexpected type');
+      }
+      return (
+        <div key={`StakeRegDelegCert${i}`}>
+          <p>Register your stake credential with deposit of ${c.coin} ADA and delegate to stake pool</p>
+          <p>${c.poolKeyHash}</p>
+        </div>
+      );
+    }),
+    ...cip95Info.filter(c => c.type === 'VoteRegDelegCert').map((c, i) => {
+      if (c.type !== 'VoteRegDelegCert') {
+        throw new Error('unexpected type');
+      }
+      return (
+        <div key={`VoteRegDelegCert${i}`}>
+          <p>Register your stake credential with deposit of ${c.coin} ADA and delegate to the DRep</p>
+          <p>${c.drep}</p>
+        </div>
+      );
+    }),
+    ...cip95Info.filter(c => c.type === 'StakeVoteRegDelegCert').map((c, i) => {
+      if (c.type !== 'StakeVoteRegDelegCert') {
+        throw new Error('unexpected type');
+      }
+      return (
+        <div key={`StakeVoteRegDelegCert${i}`}>
+          <p>Register your stake credential with deposit of ${c.coin} ADA and delegate to the DRep</p>
+          <p>${c.drep} and the stake pool</p>
+          <p>${c.poolKeyHash}</p>
+        </div>
+      );
+    }),
+    ...cip95Info.filter(c => c.type === 'TreasuryDonation').map((c, i) => {
+      if (c.type !== 'TreasuryDonation') {
+        throw new Error('unexpected type');
+      }
+      return (
+        <span key={`TreasuryDonation${i}`}>Treasury donation: {c.positiveCoin} ADA</span>
+      );
+    }),
   ];
 }
