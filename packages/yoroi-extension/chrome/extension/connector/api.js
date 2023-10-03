@@ -96,7 +96,6 @@ import {
   WalletTypePurpose
 } from '../../../app/config/numbersConfig';
 import { Bip44DerivationLevels, CoinType } from '@emurgo/yoroi-lib';
-import { unwrapStakingKey } from '../../../app/api/ada/lib/storage/bridge/utils';
 import { getRegistrationHistory } from '../../../app/api/ada/lib/storage/bridge/delegationUtils';
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
@@ -523,19 +522,51 @@ async function _getDRepKeyAndAddressing(
 export async function connectorGetStakeKey(
   wallet: PublicDeriver<>,
 ): Promise<{| key: string, isRegistered: boolean |}> {
+  const withPubKey = asGetPublicKey(wallet);
+  if (withPubKey == null) {
+    throw new Error('Unable to get public key from the wallet');
+  }
+  const withLevels = asHasLevels(wallet);
+  if (withLevels == null) {
+    throw new Error('Unable to get derivation levels from the wallet');
+  }
+  const publicKeyResp = await withPubKey.getPublicKey();
+  const publicKey = RustModule.WalletV4.Bip32PublicKey.from_bytes(
+    Buffer.from(publicKeyResp.Hash, 'hex')
+  );
+  const addressing = {
+    addressing: {
+      path: [
+        WalletTypePurpose.CIP1852,
+        CoinType.CARDANO,
+        HARD_DERIVATION_START,
+        ChainDerivations.CHIMERIC_ACCOUNT,
+        DREP_KEY_INDEX,
+      ],
+      startLevel: Bip44DerivationLevels.PURPOSE.level,
+    },
+  };
+
+  const stakeKey = derivePublicByAddressing({
+    ...addressing,
+    startingFrom: {
+      level: withLevels.getParent().getPublicDeriverLevel(),
+      key: publicKey,
+    },
+  }).to_raw_key();
+
   const withStakingKey = asGetStakingKey(wallet);
   if (withStakingKey == null) {
     throw new Error('Unable to get the stake key')
   }
   const stakingKeyResp = await withStakingKey.getStakingKey();
-  const stakeCredential = unwrapStakingKey(stakingKeyResp.addr.Hash);
   const registrationHistoryResponse = await getRegistrationHistory({
     publicDeriver: withStakingKey,
     stakingKeyAddressId: stakingKeyResp.addr.AddressId,
   });
   return {
     // $FlowFixMe
-    key: stakeCredential.to_keyhash().to_hex(),
+    key: stakeKey.to_hex(),
     isRegistered: registrationHistoryResponse.current,
   };
 }
