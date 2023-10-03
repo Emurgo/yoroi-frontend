@@ -91,7 +91,9 @@ import {
 } from '../../../app/api/ada/lib/storage/database/utils';
 import type { TokenRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
 import {
-  ChainDerivations, DREP_KEY_INDEX,
+  ChainDerivations,
+  STAKING_KEY_INDEX,
+  DREP_KEY_INDEX,
   HARD_DERIVATION_START,
   WalletTypePurpose
 } from '../../../app/config/numbersConfig';
@@ -481,8 +483,10 @@ export async function connectorGetDRepKey(
   return (await _getDRepKeyAndAddressing(wallet))[0].to_hex();
 }
 
-async function _getDRepKeyAndAddressing(
+async function __pubKeyAndAddressingByChainAndIndex(
   wallet: PublicDeriver<>,
+  chainLevelDerivationIndex: number,
+  addressLevelDerivationIndex: number,
 ): Promise<[RustModule.WalletV4.PublicKey, Addressing]> {
   const withPubKey = asGetPublicKey(wallet);
   if (withPubKey == null) {
@@ -502,59 +506,42 @@ async function _getDRepKeyAndAddressing(
         WalletTypePurpose.CIP1852,
         CoinType.CARDANO,
         HARD_DERIVATION_START,
-        ChainDerivations.GOVERNANCE_DREP_KEYS,
-        DREP_KEY_INDEX,
+        chainLevelDerivationIndex,
+        addressLevelDerivationIndex,
       ],
       startLevel: Bip44DerivationLevels.PURPOSE.level,
     },
   };
 
-  const dRepKey = derivePublicByAddressing({
+  const derivedPubKey = derivePublicByAddressing({
     ...addressing,
     startingFrom: {
       level: withLevels.getParent().getPublicDeriverLevel(),
       key: publicKey,
     },
   }).to_raw_key();
-  return [dRepKey, addressing];
+  return [derivedPubKey, addressing];
+}
+
+async function _getDRepKeyAndAddressing(
+  wallet: PublicDeriver<>,
+): Promise<[RustModule.WalletV4.PublicKey, Addressing]> {
+  return __pubKeyAndAddressingByChainAndIndex(
+    wallet,
+    ChainDerivations.GOVERNANCE_DREP_KEYS,
+    DREP_KEY_INDEX,
+  );
 }
 
 export async function connectorGetStakeKey(
   wallet: PublicDeriver<>,
 ): Promise<{| key: string, isRegistered: boolean |}> {
-  const withPubKey = asGetPublicKey(wallet);
-  if (withPubKey == null) {
-    throw new Error('Unable to get public key from the wallet');
-  }
-  const withLevels = asHasLevels(wallet);
-  if (withLevels == null) {
-    throw new Error('Unable to get derivation levels from the wallet');
-  }
-  const publicKeyResp = await withPubKey.getPublicKey();
-  const publicKey = RustModule.WalletV4.Bip32PublicKey.from_bytes(
-    Buffer.from(publicKeyResp.Hash, 'hex')
-  );
-  const addressing = {
-    addressing: {
-      path: [
-        WalletTypePurpose.CIP1852,
-        CoinType.CARDANO,
-        HARD_DERIVATION_START,
-        ChainDerivations.CHIMERIC_ACCOUNT,
-        DREP_KEY_INDEX,
-      ],
-      startLevel: Bip44DerivationLevels.PURPOSE.level,
-    },
-  };
-
-  const stakeKey = derivePublicByAddressing({
-    ...addressing,
-    startingFrom: {
-      level: withLevels.getParent().getPublicDeriverLevel(),
-      key: publicKey,
-    },
-  }).to_raw_key();
-
+  const stakeKey =
+    (await __pubKeyAndAddressingByChainAndIndex(
+      wallet,
+      ChainDerivations.CHIMERIC_ACCOUNT,
+      STAKING_KEY_INDEX,
+    ))[0];
   const withStakingKey = asGetStakingKey(wallet);
   if (withStakingKey == null) {
     throw new Error('Unable to get the stake key')
