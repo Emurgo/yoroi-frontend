@@ -195,7 +195,7 @@ export default class TransactionRevamp extends Component<Props, State> {
 
   renderAmountDisplay: ({|
     entry: TokenEntry,
-    getRawNumber: boolean,
+    getRawNumber?: boolean,
   |}) => Node | string = request => {
     if (this.props.shouldHideBalance) {
       return <span>{hiddenAmount}</span>;
@@ -214,7 +214,7 @@ export default class TransactionRevamp extends Component<Props, State> {
       ? beforeDecimalRewards
       : '+' + beforeDecimalRewards;
 
-    if (request.getRawNumber) {
+    if (request.getRawNumber === true) {
       return adjustedBefore + afterDecimalRewards;
     }
 
@@ -235,15 +235,6 @@ export default class TransactionRevamp extends Component<Props, State> {
     const { currency } = this.props.unitOfAccountSetting;
 
     if (this.props.unitOfAccountSetting.enabled) {
-      if (this.props.shouldHideBalance) {
-        return (
-          <>
-            <span>{hiddenAmount}</span>
-            {currency}
-          </>
-        );
-      }
-
       const tokenInfo = this.props.getTokenInfo(request.entry);
       const shiftedAmount = request.entry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
       const ticker = tokenInfo.Metadata.ticker;
@@ -253,6 +244,21 @@ export default class TransactionRevamp extends Component<Props, State> {
       if (currency == null) {
         throw new Error(`unexpected unit of account ${String(currency)}`);
       }
+
+      if (this.props.shouldHideBalance) {
+        return (
+          <>
+            <Typography variant="body1" fontWeight={500} textAlign="right">
+              <span>{hiddenAmount}</span>
+              {ticker}
+            </Typography>
+            <Typography variant="body2" color="grayscale.600" textAlign="right">
+              {hiddenAmount}&nbsp;{currency}
+            </Typography>
+          </>
+        );
+      }
+
       const price = this.props.getHistoricalPrice(ticker, currency, request.timestamp);
       let fiatDisplay;
       if (price != null) {
@@ -273,16 +279,26 @@ export default class TransactionRevamp extends Component<Props, State> {
         );
       }
       return (
-        <>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-end',
+            justifyContent: 'center',
+          }}
+        >
           <Typography variant="body1" fontWeight={500} color="grayscale.900">
             {this.renderAmountDisplay({ entry: request.entry })} {this.getTicker(request.entry)}
           </Typography>
-          <Typography variant="body2" color="grayscale.600">
+          <Typography variant="body2" color="grayscale.600" textAlign="right">
             {fiatDisplay}&nbsp;{currency}
           </Typography>
-        </>
+        </Box>
       );
     }
+
+    const amount = this.renderAmountDisplay({ entry: request.entry, getRawNumber: true });
+    const isPositiveNumber = typeof amount === 'string' ? amount.charAt(0) === '+' : false; // eslint-disable-line
 
     return (
       <Typography variant="body1" fontWeight={500} color="grayscale.900">
@@ -346,7 +362,7 @@ export default class TransactionRevamp extends Component<Props, State> {
             <span className={styles.afterDecimal}>{afterDecimalRewards}</span>{' '}
             {this.getTicker(defaultEntry)}
           </Typography>
-          <Typography variant="body2" color="grayscale.600">
+          <Typography variant="body2" color="grayscale.600" textAlign="right">
             {fiatDisplay}&nbsp;{currency}
           </Typography>
         </>
@@ -612,23 +628,29 @@ export default class TransactionRevamp extends Component<Props, State> {
                 gap: '8px',
               }}
             >
-              <Typography
-                variant="body1"
-                fontWeight="500"
-                color="grayscale.900"
-                id="transactionAmount"
-              >
-                {this.renderAmountWithUnitOfAccount({
-                  entry: data.amount.getDefaultEntry(),
-                  timestamp: data.date.valueOf(),
-                })}
-              </Typography>
-              {this.renderAssets({ assets: data.amount.nonDefaultEntries() })}
+              <Box textAlign="right">
+                <Typography
+                  variant="body1"
+                  fontWeight="500"
+                  color="grayscale.900"
+                  id="transactionAmount"
+                  textAlign="left"
+                >
+                  {this.renderAmountWithUnitOfAccount({
+                    entry: data.amount.getDefaultEntry(),
+                    timestamp: data.date.valueOf(),
+                  })}
+                </Typography>
+                <Typography>
+                  {this.renderAssets({ assets: data.amount.nonDefaultEntries() })}
+                </Typography>
+              </Box>
               <Box
                 sx={{
                   display: 'flex',
-                  alignItems: 'center',
+                  alignItems: 'start',
                   justifyContent: 'center',
+                  height: '100%',
                 }}
               >
                 <Box

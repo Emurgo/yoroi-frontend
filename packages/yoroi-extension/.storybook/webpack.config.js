@@ -7,7 +7,7 @@ const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin'
 
 // your app's webpack.config.js
 const devConfig = require('../webpack/devConfig');
-const baseProdConfig = require('../webpack/prodConfig');
+const [ baseProdConfig ] = require('../webpack/prodConfig');
 const commonConfig = require('../webpack/commonConfig');
 
 const ENV = 'storybook';

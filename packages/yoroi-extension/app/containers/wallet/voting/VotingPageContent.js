@@ -164,21 +164,11 @@ class VotingPageContent extends Component<Props> {
         registrationStart: nextFund?.registrationStart,
       });
 
-      const fund = {
-        id: 8,
-        name: 'Fund9',
-        registrationStart: '2021-01-27T11:00:00Z',
-        registrationEnd: '2023-08-04T11:00:00Z',
-        votingStart: '2021-08-11T11:00:00Z',
-        votingEnd: '2023-08-25T11:00:00Z',
-        votingPowerThreshold: '450',
-      };
-
       if (currentFund) {
-        const isLate = new Date() >= new Date(Date.parse(fund.registrationEnd));
-        const isEarly = new Date() <= new Date(Date.parse(fund.registrationStart));
-        const isBeforeVoting = new Date() <= new Date(Date.parse(fund.votingStart));
-        const isAfterVoting = new Date() >= new Date(Date.parse(fund.votingEnd));
+        const isLate = new Date() >= new Date(Date.parse(currentFund.registrationEnd));
+        const isEarly = new Date() <= new Date(Date.parse(currentFund.registrationStart));
+        const isBeforeVoting = new Date() <= new Date(Date.parse(currentFund.votingStart));
+        const isAfterVoting = new Date() >= new Date(Date.parse(currentFund.votingEnd));
         const isBetweenVoting = !isBeforeVoting && !isAfterVoting;
 
         if (isEarly) {
@@ -368,11 +358,10 @@ class VotingPageContent extends Component<Props> {
           hasAnyPending: false,
           balance: null,
         };
-      const txRequests = stores.transactions.getTxRequests(selected);
       return {
-        hasAnyPending: (txRequests.requests.pendingRequest.result ?? []).length > 0,
+        hasAnyPending: stores.transactions.hasAnyPending,
         // note: Catalyst balance depends on UTXO balance -- not on rewards
-        balance: txRequests.requests.getBalanceRequest.result,
+        balance: stores.transactions.balance,
       };
     })();
     return Object.freeze({

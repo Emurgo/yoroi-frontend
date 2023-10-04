@@ -18,6 +18,10 @@ const RevampButtonCommonProps: Object = {
       '&.MuiButton-sizeMedium': { padding: '10px', height: '48px' },
       '&.MuiButton-sizeSmall': { padding: '9px 20px' },
       '&:hover': { boxShadow: 'none' },
+      '& span.MuiButton-startIcon': {
+        marginLeft: '0px',
+        marginRight: '6px',
+      },
     },
   },
   defaultProps: { disableRipple: false },
@@ -46,6 +50,27 @@ export const LightRevampButton: any = {
     {
       props: { variant: 'destructive' },
       style: getContainedStyles('magenta', lightTheme),
+    },
+    {
+      props: { variant: 'segmented' },
+      style: {
+        minWidth: 'unset',
+        maxWidth: 'unset',
+        width: '40px',
+        height: '40px',
+        padding: '8px',
+        color: 'grayscale.200',
+        '&.MuiButton-sizeMedium': { padding: '8px', height: '40px' },
+        ':hover': {
+          color: 'grayscale.50',
+        },
+        '&.active': {
+          backgroundColor: lightTheme.palette.grayscale[200],
+          ':hover': {
+            backgroundColor: lightTheme.palette.grayscale[50],
+          },
+        },
+      },
     },
   ],
 };

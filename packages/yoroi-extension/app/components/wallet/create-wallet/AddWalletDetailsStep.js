@@ -187,6 +187,7 @@ export default class AddWalletDetailsStep extends Component<Props> {
               done={walletNameField.isValid}
               error={walletNameField.error}
               autocomplete="off"
+              id="walletNameInput"
             />
 
             <Box>
@@ -199,12 +200,14 @@ export default class AddWalletDetailsStep extends Component<Props> {
                   helperText={
                     walletPasswordField.error || intl.formatMessage(messages.passwordHint)
                   }
+                  id="walletPasswordInput"
                 />
                 <TextField
                   className="repeatedPassword"
                   {...repeatedPasswordField.bind()}
                   done={repeatPassword && repeatedPasswordField.isValid}
                   error={repeatedPasswordField.error}
+                  id="repeatPasswordInput"
                 />
               </Box>
             </Box>

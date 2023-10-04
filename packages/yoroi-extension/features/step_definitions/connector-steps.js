@@ -48,7 +48,7 @@ const connectorPopUpIsDisplayed = async (customWorld: Object) => {
   await customWorld.driver.sleep(2000);
   await customWorld.windowManager.findNewWindowAndSwitchTo(popupConnectorName);
   const windowTitle = await customWorld.driver.getTitle();
-  expect(windowTitle).to.equal('Yoroi Dapp Connector');
+  expect(windowTitle).to.equal('Yoroi dApp Connector');
 };
 
 Given(/^I have opened the mock dApp$/, async function () {

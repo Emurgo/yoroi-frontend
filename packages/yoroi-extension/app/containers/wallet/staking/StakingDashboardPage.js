@@ -36,7 +36,6 @@ import type {
   CurrentTimeRequests,
   TimeCalcRequests,
 } from '../../../stores/base/BaseCardanoTimeStore';
-import type { TxRequests } from '../../../stores/toplevel/TransactionsStore';
 import type { Notification } from '../../../types/notificationType';
 
 import globalMessages from '../../../i18n/global-messages';
@@ -589,8 +588,7 @@ export default class StakingDashboardPage extends Component<Props> {
 
     const defaultToken = request.publicDeriver.getParent().getDefaultToken();
 
-    const txRequests = this.generated.stores.transactions.getTxRequests(request.publicDeriver);
-    const balance = txRequests.requests.getBalanceRequest.result;
+    const balance = this.generated.stores.transactions.balance;
 
     const rewardBalance =
       request.delegationRequests.getDelegatedBalance.result == null
@@ -746,7 +744,7 @@ export default class StakingDashboardPage extends Component<Props> {
         |},
       |},
       transactions: {|
-        getTxRequests: (PublicDeriver<>) => TxRequests,
+        balance: ?MultiToken,
         hasAnyPending: boolean,
       |},
       uiDialogs: {|
@@ -828,7 +826,7 @@ export default class StakingDashboardPage extends Component<Props> {
         },
         transactions: {
           hasAnyPending: stores.transactions.hasAnyPending,
-          getTxRequests: stores.transactions.getTxRequests,
+          balance: stores.transactions.balance,
         },
         delegation: {
           selectedPage: stores.delegation.selectedPage,

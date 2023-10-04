@@ -93,21 +93,18 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
     } = this.props;
 
     const totalAmount = this.getTotalAmount();
-
     const showEyeIconSafe = showEyeIcon != null && showEyeIcon;
-
     const [accountPlateId, iconComponent] = plate ? constructPlate(plate, 0, styles.icon) : [];
+
     return (
       <Box
         sx={{
           display: 'flex',
           flexDirection: 'row',
-          justifyContent: 'center',
-          color: 'gray.900',
+          color: 'grayscale.900',
           border: '1px solid',
           borderColor: 'grayscale.300',
           borderRadius: 1,
-          minWidth: '360px',
           height: '48px',
           ':hover': {
             borderColor: 'primary.600',
@@ -117,7 +114,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
       >
         <div className={styles.outerWrapper}>
           <button type="button" onClick={openWalletInfoDialog} className={styles.contentWrapper}>
-            <div className={classnames([styles.currency])}>{iconComponent}</div>
+            <div className={classnames([styles.plate])}>{iconComponent}</div>
             <div className={styles.content}>
               <div className={styles.walletInfo}>
                 <Typography variant="body2" fontWeight={500} sx={{ color: 'grayscale.900' }}>
@@ -129,7 +126,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
               </div>
               <div className={styles.balance}>
                 <Box
-                  sx={{ color: 'grayscale.max' }}
+                  sx={{ color: 'grayscale.max', height: '100%' }}
                   className={classnames([totalAmount ? styles.amount : styles.spinnerWrapper])}
                 >
                   <AmountDisplay

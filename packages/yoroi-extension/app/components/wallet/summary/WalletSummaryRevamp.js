@@ -5,11 +5,11 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { UnconfirmedAmount } from '../../../types/unconfirmedAmountType';
+import globalMessages from '../../../i18n/global-messages';
+import styles from './WalletSummary.scss';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import globalMessages from '../../../i18n/global-messages';
-import styles from './WalletSummary.scss';
 import { formatValue } from '../../../utils/unit-of-account';
 import { splitAmount, truncateToken } from '../../../utils/formatters';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
@@ -32,7 +32,6 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +numberOfTransactions: number,
   +shouldHideBalance: boolean,
   +pendingAmount: UnconfirmedAmount,
   +isLoadingTransactions: boolean,
@@ -165,7 +164,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
   render(): Node {
     const {
       pendingAmount,
-      numberOfTransactions,
+      //numberOfTransactions,
       isLoadingTransactions,
       openExportTxToFileDialog,
       shouldShowEmptyBanner,
@@ -193,21 +192,24 @@ export default class WalletSummaryRevamp extends Component<Props> {
           >
             {intl.formatMessage({ id: 'wallet.navigation.transactions' })}
           </Typography>
-          {numberOfTransactions !== 0 && (
+          { /* numberOfTransactions !== 0 && */ !isLoadingTransactions && (
             <Button
               variant="tertiary"
               color="primary"
-              sx={{ textTransform: 'uppercase', margin: '2px' }}
+              sx={{
+                textTransform: 'uppercase',
+                margin: '2px',
+                lineHeight: '21px',
+              }}
               onClick={openExportTxToFileDialog}
               onKeyPress={openExportTxToFileDialog}
-              disabled={isLoadingTransactions}
               startIcon={<ExportTxToFileSvg />}
             >
-              {intl.formatMessage({ id: 'wallet.transaction.export.exportIcon.tooltip' })}
+              {intl.formatMessage(globalMessages.exportButtonLabel)}
             </Button>
           )}
         </Box>
-        <Box sx={{ padding: hasPendingAmount ? '16px 30px' : 0 }}>
+        <Box sx={{ pb: hasPendingAmount ? '16px' : 0 }}>
           <Typography variant="body1">
             {this.renderPendingAmount(
               pendingAmount.incoming,

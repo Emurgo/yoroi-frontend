@@ -145,7 +145,7 @@ export default class WalletRow extends Component<Props, State> {
               <div className={styles.websiteIcon}>
                 {websiteIcon ? <img src={websiteIcon} alt={url} /> : <NoDappImage />}
               </div>
-              <div>
+              <div id="WalletRow_url">
                 <Tooltip
                   followCursor
                   placement="top"

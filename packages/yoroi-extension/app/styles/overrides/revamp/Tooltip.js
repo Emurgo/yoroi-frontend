@@ -1,4 +1,5 @@
 // @flow
+// import { } from '../../themes/'
 
 const RevampTooltip = {
   styleOverrides: {
