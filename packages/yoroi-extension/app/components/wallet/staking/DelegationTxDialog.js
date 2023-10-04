@@ -421,7 +421,7 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
               {intl.formatMessage(globalMessages.feeLabel)}
             </Typography>
             <Typography color="grayscale.900">
-              -{formatValue(this.props.transactionFee.getDefaultEntry())} {tokenTicker}
+              {formatValue(this.props.transactionFee.getDefaultEntry())} {tokenTicker}
             </Typography>
           </Box>
         </Box>
