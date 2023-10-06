@@ -24,14 +24,15 @@ type Intl = {|
 
 function EpochProgressWrapper({ epochProgress, intl }: Props & Intl): Node {
   return (
-    <Card>
+    <Card sx={{ border: '1px solid', borderColor: 'grayscale.200', bgcolor: 'background.card' }}>
       <Box
         sx={{
           padding: '15px 24px',
-          borderBottom: '1px solid var(--yoroi-palette-gray-200)',
+          borderBottom: '1px solid',
+          borderColor: 'grayscale.200',
         }}
       >
-        <Typography variant="h5" color="var(--yoroi-palette-gray-900)">
+        <Typography variant="h5" color="grayscale.900">
           {intl.formatMessage(globalMessages.epochProgress)}
         </Typography>
       </Box>
@@ -51,7 +52,6 @@ function EpochProgressWrapper({ epochProgress, intl }: Props & Intl): Node {
 export default (injectIntl(observer(EpochProgressWrapper)): ComponentType<Props>);
 
 const Card = styled(Box)({
-  backgroundColor: 'var(--yoroi-palette-common-white)',
   borderRadius: '8px',
   flex: '1 1 100%',
   display: 'flex',

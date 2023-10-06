@@ -16,6 +16,10 @@ const globalMessages: * = defineMessages({
     id: 'global.receive',
     defaultMessage: '!!!Receive',
   },
+  send: {
+    id: 'wallet.navigation.send',
+    defaultMessage: '!!!Send',
+  },
   yoroi: {
     id: 'global.yoroi',
     defaultMessage: '!!!Yoroi',
@@ -27,6 +31,14 @@ const globalMessages: * = defineMessages({
   token: {
     id: 'global.labels.token',
     defaultMessage: '!!!Token',
+  },
+  addToken: {
+    id: 'global.labels.addToken',
+    defaultMessage: '!!!Add Token',
+  },
+  addNft: {
+    id: 'global.labels.addNft',
+    defaultMessage: '!!!Add NFT',
   },
   nfts: {
     id: 'global.labels.nft',
@@ -1024,7 +1036,7 @@ export const memoMessages: * = defineMessages({
   },
   memoWarning: {
     id: 'wallet.send.form.memoWarning',
-    defaultMessage: '!!!Memos are stored localy only',
+    defaultMessage: '!!!(Optional) Memo is stored locally',
   },
 });
 export const connectorMessages: * = defineMessages({

@@ -3,23 +3,22 @@
 .component {
   display: flex;
   justify-content: center;
+  height: 100%;
 
   .wrapper {
-    width: 756px;
-    min-height: 600px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
   }
 
   .formBody {
-    .receiverStep {
-      padding-top: 40px;
-      padding-right: 40px;
-      padding-bottom: 20px;
-      padding-left: 40px;
-    }
-
+    padding-bottom: 24px;
+    height: 100%;
+    overflow: auto;
     .receiverInput {
       position: relative;
-      margin-top: 20px;
 
       :global {
         .SimpleInput_input {
@@ -79,55 +78,19 @@
       }
     }
 
+    .receiverStep {
+      width: 100%;
+      max-width: 506px;
+      margin: 0 auto;
+    }
+
     .amountStep {
-      padding-top: 65px;
-      padding-right: 40px;
-      padding-bottom: 20px;
-      padding-left: 40px;
+      width: 560px;
+      margin: 0 auto;
       position: relative;
-
-      .calculatingFee {
-        position: absolute;
-        top: 25px;
-        left: 50%;
-        transform: translateX(-50%);
-        color: var(--yoroi-palette-gray-600);
-        font-weight: 400;
-        font-size: 14px;
-        line-height: 22px;
-      }
-
-      .sendError {
-        position: absolute;
-        top: 25px;
-        left: 50%;
-        transform: translateX(-50%);
-        color: var(--yoroi-palette-error-100);
-        font-weight: 400;
-        font-size: 14px;
-        line-height: 22px;
-      }
+      padding-top: 7px;
 
       .amountInput {
-        position: relative;
-        border: 1px solid #a7afc0;
-        border-radius: 8px;
-        padding: 16px 0px;
-
-        .amountInputGrid {
-          margin: 0px 16px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-
-          input {
-            padding: 0px;
-            &:disabled {
-              cursor: not-allowed;
-            }
-          }
-        }
-
         .defaultCoin {
           color: #6b7384;
           font-size: 14px;
@@ -163,22 +126,11 @@
         .maxBtn {
           min-width: 51px;
           min-height: 32px;
-          padding: 8px 12px;
           border: none;
-          color: var(--yoroi-palette-gray-600);
-          background-color: var(--yoroi-palette-gray-50);
           font-weight: 500;
           font-size: 16px;
           line-height: 24px;
           border-radius: 8px;
-
-          &:hover {
-            background: var(--yoroi-palette-gray-200);
-            color: #000000;
-          }
-          &:active {
-            background: var(--yoroi-palette-gray-300);
-          }
 
           &:disabled {
             cursor: not-allowed;
@@ -280,7 +232,6 @@
 
 :global(.YoroiRevamp) .component {
   .wrapper {
-    background: var(--yoroi-palette-common-white);
     border-radius: 8px;
   }
 }
