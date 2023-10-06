@@ -1,41 +1,16 @@
-/* eslint-disable no-nested-ternary */
 // @flow
 import React from 'react';
 import { map } from 'lodash';
 import classnames from 'classnames';
-import type { Node, Element, ComponentType } from 'react';
+import type { Node, ComponentType } from 'react';
 import { Modal, Typography } from '@mui/material';
 import { Box, styled } from '@mui/system';
 import { LoadingButton } from '@mui/lab';
 import { withLayout } from '../../styles/context/layout';
 import { observer } from 'mobx-react';
+import type { Props } from './Dialog';
 
-export type ActionType = {|
-  +label: string,
-  +onClick: void => PossiblyAsync<void>,
-  +primary?: boolean,
-  +danger?: boolean,
-  +isSubmitting?: boolean,
-  +disabled?: boolean,
-  +className?: ?string,
-|};
-
-export type Props = {|
-  +title?: string | Node,
-  +children?: Node,
-  +actions?: Array<ActionType>,
-  +closeButton?: Element<any>,
-  +backButton?: Node,
-  +className?: string,
-  +styleOverride?: { ... },
-  +onClose?: ?(void) => PossiblyAsync<void>,
-  +closeOnOverlayClick?: boolean,
-  +isRevampLayout?: boolean,
-|};
-
-type InjectedProps = {| isRevampLayout: boolean |};
-
-function DialogFn(props: Props & InjectedProps): Node {
+function DialogFn(props: Props): Node {
   const {
     title,
     children,
@@ -128,48 +103,49 @@ DialogFn.defaultProps = {
 
 const ModalContainer = styled(Box)(({ theme }) => ({
   position: 'relative',
-  minWidth: 'var(--yoroi-comp-dialog-min-width-md)',
-  borderRadius: theme.name === 'classic' ? 0 : 8,
-  paddingTop: theme.name === 'classic' ? '25px' : '24px',
-  paddingBottom: theme.name === 'classic' ? '30px' : '24px',
-  maxWidth: theme.name === 'classic' ? '785px' : '560px',
-  backgroundColor: 'var(--yoroi-comp-dialog-background)',
-  color: 'var(--yoroi-comp-dialog-text)',
-  maxHeight: '95vh',
-
+  borderRadius: '8px',
+  paddingTop: '25px',
+  paddingBottom: '24px',
+  maxWidth: 'unset',
+  minWidth: 'unset',
+  backgroundColor: theme.palette.common.white,
+  color: theme.palette.grayscale[900],
+  maxHeight: '80vh',
   '& .dialog__title': {
     flex: 1,
-    marginBottom: theme.name === 'classic' ? '22px' : '0px',
-    padding: theme.name === 'classic' ? '0' : '24px',
+    marginBottom: '25px',
     fontWeight: 500,
     textAlign: 'center',
     textTransform: 'uppercase',
     letterSpacing: 0,
+    lineHeight: '22px',
   },
 }));
-const ModalContent = styled(Box)(({ theme }) => ({
+
+const ModalContent = styled(Box)(() => ({
   overflowX: 'hidden',
   overflowY: 'overlay',
   maxHeight: '60vh',
-  paddingLeft: theme.name === 'classic' ? '30px' : '24px',
-  paddingRight: theme.name === 'classic' ? '30px' : '24px',
+  paddingLeft: '24px',
+  paddingRight: '24px',
 }));
-const ModalFooter = styled(Box)(({ theme }) => ({
+
+const ModalFooter = styled(Box)({
   display: 'flex',
-  paddingLeft: theme.name === 'classic' ? '30px' : '24px',
-  paddingRight: theme.name === 'classic' ? '30px' : '24px',
-  marginTop: theme.name === 'classic' ? '20px' : '34px',
+  paddingLeft: '24px',
+  paddingRight: '24px',
+  marginTop: '24px',
   '& button': {
-    width: '50%',
+    width: ' 50%',
     '&:only-child': {
       margin: 'auto',
       width: '100%',
     },
     '& + button': {
-      marginLeft: '20px',
+      marginLeft: '24px',
     },
   },
-}));
+});
 
 function getBtnVariant(
   danger?: boolean,

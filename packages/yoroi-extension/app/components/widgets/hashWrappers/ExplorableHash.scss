@@ -15,3 +15,17 @@
     @include underline(var(--yoroi-palette-gray-400));
   }
 }
+
+.primaryColor {
+  &:hover {
+    @include underline(#3154cb);
+  }
+
+  &:disabled {
+    @include underline(#a0b3f2);
+  }
+
+  &:visited {
+    @include underline(#1737a3);
+  }
+}

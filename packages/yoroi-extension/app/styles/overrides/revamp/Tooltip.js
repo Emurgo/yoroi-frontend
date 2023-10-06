@@ -3,15 +3,15 @@
 
 const RevampTooltip = {
   styleOverrides: {
-    tooltip: {
-      color: 'var(--yoroi-palette-common-white)',
-      backgroundColor: 'var(--yoroi-palette-common-black)',
+    tooltip: ({ theme }: any): any => ({
+      color: theme.palette.common.white,
+      backgroundColor: theme.palette.grayscale[900],
       borderRadius: 8,
       fontSize: '0.75rem',
       boxShadow: '0 1.5px 5px 0 rgba(0, 0, 0, 0.18)',
       padding: '8px 14px',
-    },
-    arrow: { color: 'var(--yoroi-palette-common-black)' },
+    }),
+    arrow: ({ theme }: any): any => ({ color: theme.palette.grayscale[900] }),
   },
   defaultProps: { arrow: true, placement: 'bottom' },
 };
