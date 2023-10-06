@@ -29,6 +29,8 @@ type Props = {|
 export default class ExplorableHash extends Component<Props> {
   static defaultProps: {|
     placementTooltip: string,
+    primary: boolean,
+    light?: boolean,
   |} = {
     placementTooltip: 'bottom',
     primary: false,

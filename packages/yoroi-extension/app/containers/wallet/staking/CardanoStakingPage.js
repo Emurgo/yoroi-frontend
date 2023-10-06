@@ -502,6 +502,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
             trigger: (params: {|
               password?: string,
               publicDeriver: PublicDeriver<>,
+              dialog?: any,
             |}) => Promise<void>,
           |},
         |},

@@ -30,6 +30,7 @@ export type Props = {|
   +styleOverride?: { ... },
   +onClose?: ?(void) => PossiblyAsync<void>,
   +closeOnOverlayClick?: boolean,
+  +isRevampLayout?: boolean,
 |};
 
 type InjectedProps = {| isRevampLayout: boolean |};
@@ -173,7 +174,7 @@ const ModalFooter = styled(Box)(({ theme }) => ({
 function getBtnVariant(
   danger?: boolean,
   primary?: boolean,
-  isRevampLayout: boolean
+  isRevampLayout?: boolean
 ): {|
   variant: 'contained' | 'outlined' | 'danger' | 'primary' | 'secondary',
   color?: 'primary' | 'secondary' | 'error',

@@ -29,6 +29,7 @@ type Props = {|
   +unitOfAccount: TokenEntry => void | {| currency: string, amount: string |},
   +shouldHideBalance: boolean,
   +graphData: GraphData,
+  +withdrawRewards: void | (void => Promise<void>),
 |};
 
 type Intl = {|

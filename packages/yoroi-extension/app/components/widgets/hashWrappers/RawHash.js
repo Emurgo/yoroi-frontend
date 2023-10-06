@@ -16,7 +16,11 @@ type Props = {|
 
 @observer
 export default class RawHash extends Component<Props> {
-  static defaultProps: {| className: void |} = {
+  static defaultProps: {|
+    className: void,
+    primary: boolean,
+    light?: boolean,
+  |} = {
     className: undefined,
     primary: false,
     light: undefined,

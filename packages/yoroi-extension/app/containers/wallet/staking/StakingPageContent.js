@@ -175,7 +175,7 @@ class StakingPageContent extends Component<AllProps> {
         }
         withdrawRewards={
           this._isRegistered(request.publicDeriver) === true
-            ? () => this.createWithdrawalTx(false) // shouldDeregister=false
+            ? (async () => this.createWithdrawalTx(false)) // shouldDeregister=false
             : undefined
         }
         unitOfAccount={this.toUnitOfAccount}
@@ -270,7 +270,7 @@ class StakingPageContent extends Component<AllProps> {
     return (
       <DelegatedStakePoolCard
         delegatedPool={delegatedPool}
-        undelegate={() => this.createWithdrawalTx(true)} // shouldDeregister=true
+        undelegate={async () => this.createWithdrawalTx(true)} // shouldDeregister=true
       />
     );
   };

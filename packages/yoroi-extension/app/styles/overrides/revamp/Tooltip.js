@@ -3,7 +3,7 @@
 
 const RevampTooltip = {
   styleOverrides: {
-    tooltip: ({ theme }) => ({
+    tooltip: ({ theme }: any): any => ({
       color: theme.palette.common.white,
       backgroundColor: theme.palette.grayscale[900],
       borderRadius: 8,
@@ -11,7 +11,7 @@ const RevampTooltip = {
       boxShadow: '0 1.5px 5px 0 rgba(0, 0, 0, 0.18)',
       padding: '8px 14px',
     }),
-    arrow: ({ theme }) => ({ color: theme.palette.grayscale[900] }),
+    arrow: ({ theme }: any): any => ({ color: theme.palette.grayscale[900] }),
   },
   defaultProps: { arrow: true, placement: 'bottom' },
 };

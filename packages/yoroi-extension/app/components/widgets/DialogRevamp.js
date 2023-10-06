@@ -1,6 +1,4 @@
 // @flow
-
-// @flow
 import React from 'react';
 import { map } from 'lodash';
 import classnames from 'classnames';
@@ -152,7 +150,7 @@ const ModalFooter = styled(Box)({
 function getBtnVariant(
   danger?: boolean,
   primary?: boolean,
-  isRevampLayout: boolean
+  isRevampLayout?: boolean
 ): {|
   variant: 'contained' | 'outlined' | 'danger' | 'primary' | 'secondary',
   color?: 'primary' | 'secondary' | 'error',

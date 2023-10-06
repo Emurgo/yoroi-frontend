@@ -1,11 +1,11 @@
 // @flow
 
-import { Component } from 'react';
 import type { Node } from 'react';
+import { Component } from 'react';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { Box, Typography } from '@mui/material';
 import { defineMessages, intlShape } from 'react-intl';
+import { Box, Typography } from '@mui/material';
 import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
 import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react';
@@ -15,17 +15,16 @@ import { CopyAddress } from '../../../components/wallet/assets/NFTDetails';
 import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
 import { truncateAddress } from '../../../utils/formatters';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
+import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
 import { getDefaultEntryToken } from '../../../stores/toplevel/TokenInfoStore';
-import {
-  genFormatTokenAmount,
-  genLookupOrFail,
-  getTokenName,
-} from '../../../stores/stateless/tokenHelpers';
+import type { DelegationRequests, PoolMeta } from '../../../stores/toplevel/DelegationStore';
+import type { NetworkRow, TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
+import type { SelectedExplorer } from '../../../domain/SelectedExplorer';
+import type { SendUsingTrezorParams } from '../../../actions/ada/trezor-send-actions';
+import { genFormatTokenAmount, genLookupOrFail, getTokenName, } from '../../../stores/stateless/tokenHelpers';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
-import {
-  isLedgerNanoWallet,
-  isTrezorTWallet,
-} from '../../../api/ada/lib/storage/models/ConceptualWallet';
+import { isLedgerNanoWallet, isTrezorTWallet, } from '../../../api/ada/lib/storage/models/ConceptualWallet';
 import { asGetSigningKey } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
 import SpendingPasswordInput from '../../../components/widgets/forms/SpendingPasswordInput';
 import VerticallyCenteredLayout from '../../../components/layout/VerticallyCenteredLayout';
@@ -36,6 +35,10 @@ import ExplorableHashContainer from '../../widgets/ExplorableHashContainer';
 import RawHash from '../../../components/widgets/hashWrappers/RawHash';
 import Warning from '../../../components/common/Warning';
 import DialogRevamp from '../../../components/widgets/DialogRevamp';
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
+import type { SendUsingLedgerParams } from '../../../actions/ada/ledger-send-actions';
+import LocalizableError from '../../../i18n/LocalizableError';
+import type { CreateWithdrawalTxResponse } from '../../../api/ada';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -63,10 +66,10 @@ const messages = defineMessages({
 
 export type GeneratedData = typeof WithdrawRewardsDialog.prototype.generated;
 
-type Props = {
+type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
   +onClose: void => void,
-};
+|};
 
 @observer
 export default class WithdrawRewardsDialog extends Component<Props> {
@@ -130,10 +133,10 @@ export default class WithdrawRewardsDialog extends Component<Props> {
   getTotalBalance: (
     recoveredBalance: MultiToken,
     fee: MultiToken,
-    deregistrations: ?Array<{ +rewardAddress: string, +refund: MultiToken }>
+    deregistrations: ?Array<{| +rewardAddress: string, +refund: MultiToken |}>
   ) => MultiToken = (recoveredBalance, fee, deregistrations) => {
     const baseTotal = recoveredBalance.joinSubtractCopy(fee);
-    if (deregistrations === null) return baseTotal;
+    if (deregistrations == null) return baseTotal;
 
     const refundSum = deregistrations.reduce(
       (sum, curr) => (curr.refund == null ? sum : sum.joinAddCopy(curr.refund)),
@@ -173,7 +176,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
 
     if (currentPools.length === 0) return null;
 
-    const currentPool = currentPools[0][currentPage];
+    const currentPool = currentPools[currentPage][0];
     const network = publicDeriver.getParent().getNetworkInfo();
     const meta = this.generated.stores.delegation.getLocalPoolInfo(network, String(currentPool));
     if (meta == null) {
@@ -340,7 +343,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
               {intl.formatMessage(messages.withdrawalAddress)}
             </Typography>
             <Typography variant="body1" sx={{ '& > div > p': { p: '2px 3px' }, px: '2px' }}>
-              <CopyAddress>
+              <CopyAddress text={receiverAddress}>
                 <ExplorableHashContainer
                   selectedExplorer={selectedExplorer}
                   hash={receiverAddress}
@@ -416,6 +419,16 @@ export default class WithdrawRewardsDialog extends Component<Props> {
 
   @computed get generated(): {|
     actions: {|
+      wallets: {|
+        sendMoney: {|
+          trigger: (params: {|
+            password: string,
+            publicDeriver: PublicDeriver<>,
+            signRequest: ISignRequest<any>,
+            onSuccess?: void => void,
+          |}) => Promise<void>,
+        |},
+      |},
       ada: {|
         ledgerSend: {|
           sendUsingLedgerWallet: {|
@@ -437,16 +450,6 @@ export default class WithdrawRewardsDialog extends Component<Props> {
           |},
           cancel: {| trigger: (params: void) => void |},
         |},
-        wallets: {|
-          sendMoney: {|
-            trigger: (params: {|
-              password: string,
-              publicDeriver: PublicDeriver<>,
-              signRequest: ISignRequest<any>,
-              onSuccess?: void => void,
-            |}) => Promise<void>,
-          |},
-        |},
       |},
     |},
     stores: {|
@@ -464,7 +467,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
             createWithdrawalTx: {|
               reset: void => void,
               error: ?LocalizableError,
-              result: ?ISignRequest<any>,
+              result: ?CreateWithdrawalTxResponse,
             |},
             shouldDeregister: boolean,
           |},

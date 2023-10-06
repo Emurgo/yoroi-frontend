@@ -23,7 +23,11 @@ type Props = {|
 
 @observer
 export default class ExplorableHashContainer extends Component<Props> {
-  static defaultProps: {| placementTooltip: string |} = {
+  static defaultProps: {|
+    placementTooltip: string,
+    primary: boolean,
+    light?: boolean,
+  |} = {
     placementTooltip: 'bottom',
     primary: false,
     light: undefined,

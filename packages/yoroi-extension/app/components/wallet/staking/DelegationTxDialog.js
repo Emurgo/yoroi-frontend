@@ -2,7 +2,7 @@
 
 /* eslint react/jsx-one-expression-per-line: 0 */ // the &nbsp; in the html breaks this
 
-import type { Node } from 'react';
+import type { ComponentType, Node } from 'react';
 import BigNumber from 'bignumber.js';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
