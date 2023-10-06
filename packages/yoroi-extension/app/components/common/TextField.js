@@ -56,6 +56,8 @@ function TextField({
     event.preventDefault();
   };
 
+  const isRevampTheme = theme.name === 'revamp-light';
+
   return (
     <TextFieldBase
       className={className}
@@ -86,7 +88,11 @@ function TextField({
               position="end"
               sx={{ minWidth: '52px', display: 'flex', justifyContent: 'flex-end' }}
             >
-              {Boolean(error) === true ? <ErrorIcon /> : done === true ? <DoneIcon /> : null}
+              {Boolean(error) === true ? (
+                <ErrorIcon />
+              ) : done === true && !isRevampTheme ? (
+                <DoneIcon />
+              ) : null}
               <IconButton
                 aria-label="toggle password visibility"
                 onClick={handleClickShowPassword}
@@ -105,14 +111,22 @@ function TextField({
               position="end"
               sx={{ minWidth: '52px', display: 'flex', justifyContent: 'flex-end' }}
             >
-              {Boolean(error) === true ? <ErrorIcon /> : done === true ? <DoneIcon /> : null}
+              {Boolean(error) === true ? (
+                <ErrorIcon />
+              ) : done === true && !isRevampTheme ? (
+                <DoneIcon />
+              ) : null}
               <IconButton aria-label="QR Code Scanner" onClick={QRHandler} edge="end">
                 <QRLogo />
               </IconButton>
             </InputAdornment>
           ) : (
             <InputAdornment position="end">
-              {Boolean(error) === true ? <ErrorIcon /> : done === true ? <DoneIcon /> : null}
+              {Boolean(error) === true ? (
+                <ErrorIcon />
+              ) : done === true && !isRevampTheme ? (
+                <DoneIcon />
+              ) : null}
             </InputAdornment>
           ),
         placeholder: placeholder != null ? placeholder : '',

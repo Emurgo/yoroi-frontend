@@ -16,7 +16,7 @@ const RevampButtonCommonProps: Object = {
       boxShadow: 'none',
       '&.MuiButton-sizeLarge': { height: '56px' },
       '&.MuiButton-sizeMedium': { padding: '10px', height: '48px' },
-      '&.MuiButton-sizeSmall': { padding: '7px', height: '32px' },
+      '&.MuiButton-sizeSmall': { padding: '9px 20px' },
       '&:hover': { boxShadow: 'none' },
       '& span.MuiButton-startIcon': {
         marginLeft: '0px',
@@ -33,11 +33,11 @@ export const LightRevampButton: any = {
   variants: [
     {
       props: { variant: 'primary' },
-      style: getContainedStyles('primary', lightTheme),
+      style: ({ theme }) => getContainedStyles('primary', theme),
     },
     {
       props: { variant: 'secondary' },
-      style: getOutlinedStyles('primary', lightTheme),
+      style: ({ theme }) => getOutlinedStyles('primary', theme),
     },
     {
       props: { variant: 'tertiary', color: 'primary' },
@@ -119,7 +119,9 @@ function getContainedStyles(variant: 'primary' | 'secondary' | 'magenta', theme:
     },
     '&.Mui-disabled': {
       color: theme.palette.common.white,
-      backgroundColor: theme.palette[variant][200],
+      backgroundColor: theme.palette[variant][300],
+      cursor: 'not-allowed',
+      pointerEvents: 'unset',
     },
     '& .MuiLoadingButton-loadingIndicator': {
       color: theme.palette.common.white,
@@ -156,6 +158,8 @@ function getOutlinedStyles(variant: 'primary' | 'secondary', theme: Object): Obj
       border: '2px solid',
       borderColor: theme.palette[variant][200],
       color: theme.palette[variant][200],
+      cursor: 'not-allowed',
+      pointerEvents: 'unset',
     },
     '& .MuiLoadingButton-loadingIndicator': {
       color: theme.palette[variant][600],
@@ -189,6 +193,8 @@ function getTertiaryStyles(variant: 'primary' | 'grayscale', theme: Object): Obj
       border: '2px solid',
       borderColor: theme.palette[variant][200],
       color: theme.palette[variant][200],
+      cursor: 'not-allowed',
+      pointerEvents: 'unset',
     },
     '& .MuiLoadingButton-loadingIndicator': {
       color: theme.palette[variant][600],

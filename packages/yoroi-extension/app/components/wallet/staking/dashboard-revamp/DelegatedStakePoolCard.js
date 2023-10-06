@@ -28,14 +28,31 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
     <Card sx={{ border: '1px solid', borderColor: 'grayscale.200', bgcolor: 'background.card' }}>
       <Box
         sx={{
-          padding: '15px 24px',
+          padding: '16px 9px 16px 24px',
           borderBottom: '1px solid',
           borderBottomColor: 'grayscale.200',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
-        <Typography variant="h5" color="grayscale.900">
+        <Typography variant="h5" color="common.black" fontWeight={500}>
           {intl.formatMessage(globalMessages.stakePoolDelegated)}
         </Typography>
+        <UndelegateButton
+          variant="text"
+          onClick={undelegate}
+          disabled={!undelegate}
+          sx={{
+            lineHeight: '21px',
+            '&.MuiButton-sizeMedium': {
+              height: 'unset',
+              p: '9px 15px',
+            },
+          }}
+        >
+          {intl.formatMessage(globalMessages.undelegateLabel)}
+        </UndelegateButton>
       </Box>
       <Wrapper sx={{ paddingBottom: 0 }}>
         <AvatarWrapper>
@@ -59,42 +76,47 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
       <Wrapper justifyContent="space-between" sx={{ paddingBottom: 0 }}>
         {roa != null ? (
           <Box sx={{ display: 'flex', flexFlow: 'column' }}>
-            <Typography variant="caption" fontWeight="500" color="grayscale.500">
+            <Typography
+              variant="caption1"
+              color="grayscale.500"
+              sx={{ textTransform: 'uppercase' }}
+            >
               {intl.formatMessage(globalMessages.roa30d)}
             </Typography>
-            <Typography as="span" color="grayscale.max" variant="h2">
+            <Typography as="span" fontWeight={500} color="grayscale.max" variant="h2">
               {roa} %
             </Typography>
           </Box>
         ) : null}
         {poolSize != null && (
           <Box sx={{ display: 'flex', flexFlow: 'column' }}>
-            <Typography variant="caption" fontWeight="500" color="grayscale.500">
-              Pool Size
+            <Typography
+              variant="caption1"
+              color="grayscale.500"
+              sx={{ textTransform: 'uppercase' }}
+            >
+              {intl.formatMessage(globalMessages.poolSize)}
             </Typography>
-            <Typography as="span" color="grayscale.max" variant="h2">
+            <Typography as="span" fontWeight={500} color="grayscale.max" variant="h2">
               {poolSize}
             </Typography>
           </Box>
         )}
         {share != null && (
           <Box sx={{ display: 'flex', flexFlow: 'column' }}>
-            <Typography variant="caption" fontWeight="500" color="grayscale.500">
-              Share
+            <Typography
+              variant="caption1"
+              color="grayscale.500"
+              sx={{ textTransform: 'uppercase' }}
+            >
+              {intl.formatMessage(globalMessages.poolShare)}
             </Typography>
-            <Typography as="span" color="grayscale.max" variant="h2">
+            <Typography as="span" fontWeight={500} color="grayscale.max" variant="h2">
               {share} %
             </Typography>
           </Box>
         )}
       </Wrapper>
-      {undelegate && (
-        <Wrapper>
-          <UndelegateButton sx={{ minWidth: '50%' }} variant="secondary" onClick={undelegate}>
-            {intl.formatMessage(globalMessages.undelegateLabel)}
-          </UndelegateButton>
-        </Wrapper>
-      )}
     </Card>
   );
 }

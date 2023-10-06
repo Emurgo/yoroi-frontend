@@ -418,6 +418,10 @@ const globalMessages: * = defineMessages({
     id: 'global.label.assets',
     defaultMessage: '!!!assets',
   },
+  success: {
+    id: 'global.label.success',
+    defaultMessage: '!!!Success',
+  },
   step1: {
     id: 'transfer.form.instructions.step1.text',
     defaultMessage:
@@ -661,6 +665,10 @@ const globalMessages: * = defineMessages({
     id: 'global.labels.stakepool',
     defaultMessage: '!!!Stakepool Name',
   },
+  stakePoolChecksumAndName: {
+    id: 'global.labels.stakePoolChecksumAndName',
+    defaultMessage: '!!!Stake pool checksum and name',
+  },
   rewardsLabel: {
     id: 'global.labels.rewardsLabel',
     defaultMessage: '!!!Rewards',
@@ -684,6 +692,14 @@ const globalMessages: * = defineMessages({
   unknownPoolLabel: {
     id: 'wallet.staking.pool.unknownLabel',
     defaultMessage: '!!!Unknown pool',
+  },
+  poolSize: {
+    id: 'wallet.staking.pool.size',
+    defaultMessage: '!!!Pool size',
+  },
+  poolShare: {
+    id: 'wallet.staking.pool.share',
+    defaultMessage: '!!!Share',
   },
   sidebarWallets: {
     id: 'sidebar.wallets',
@@ -775,6 +791,10 @@ const globalMessages: * = defineMessages({
     id: 'wallet.staking.rewards.rewardHistory',
     defaultMessage: '!!!Reward History',
   },
+  rewardValue: {
+    id: 'wallet.staking.rewards.rewardValue',
+    defaultMessage: '!!!Reward value',
+  },
   openRewardHistory: {
     id: 'wallet.staking.rewards.openRewardHistory',
     defaultMessage: '!!!Open Reward History',
@@ -782,6 +802,10 @@ const globalMessages: * = defineMessages({
   epochProgress: {
     id: 'wallet.staking.epochProgress',
     defaultMessage: '!!!Epoch Progress',
+  },
+  epochs: {
+    id: 'wallet.staking.epochsLabel',
+    defaultMessage: '!!!Epochs',
   },
   tokens: {
     id: 'wallet.assets.tokens',
