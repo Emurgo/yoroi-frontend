@@ -31,8 +31,8 @@ export class SuccessPageRevamp extends Component<Props> {
         ? undefined
         : [
             {
-              label: this.props.closeInfo.closeLabel,
-              onClick: this.props.closeInfo.onClose,
+              label: closeInfo.closeLabel,
+              onClick: closeInfo.onClose,
               primary: true,
             },
           ];
