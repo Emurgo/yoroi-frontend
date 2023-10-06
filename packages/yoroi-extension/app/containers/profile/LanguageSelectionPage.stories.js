@@ -10,6 +10,7 @@ import { THEMES } from '../../styles/utils';
 import LanguageSelectionPage from './LanguageSelectionPage';
 import { globalKnobs } from '../../../stories/helpers/StoryWrapper';
 import { withScreenshot } from 'storycap';
+import { getTermsOfUse, getPrivacyNotice } from '../../stores/base/BaseProfileStore';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -33,6 +34,8 @@ export const Generic = (): Node => (
             isExecuting: boolean('isExecuting', false),
           },
           isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+          termsOfUse: getTermsOfUse('ada', globalKnobs.locale()),
+          privacyNotice: getPrivacyNotice(globalKnobs.locale()),
         },
         serverConnectionStore: {
           checkAdaServerStatus: select(
@@ -47,6 +50,7 @@ export const Generic = (): Node => (
           resetLocale: { trigger: async (req) => action('resetLocale')(req) },
           updateTentativeLocale: { trigger: action('updateTentativeLocale') },
           commitLocaleToStorage: { trigger: async (req) => action('commitLocaleToStorage')(req) },
+          acceptTermsOfUse: { trigger: async (req) => action('acceptTermsOfUse')(req) },
         }
       }
     }}
@@ -72,6 +76,8 @@ export const NonTier1 = (): Node => (
             isExecuting: boolean('isExecuting', false),
           },
           isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+          termsOfUse: getTermsOfUse('ada', globalKnobs.locale()),
+          privacyNotice: getPrivacyNotice(globalKnobs.locale()),
         },
         serverConnectionStore: {
           checkAdaServerStatus: select(
@@ -86,6 +92,7 @@ export const NonTier1 = (): Node => (
           resetLocale: { trigger: async (req) => action('resetLocale')(req) },
           updateTentativeLocale: { trigger: action('updateTentativeLocale') },
           commitLocaleToStorage: { trigger: async (req) => action('commitLocaleToStorage')(req) },
+          acceptTermsOfUse: { trigger: async (req) => action('acceptTermsOfUse')(req) },
         }
       }
     }}
@@ -108,6 +115,8 @@ export const IsExecuting = (): Node => (
             isExecuting: true,
           },
           isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+          termsOfUse: getTermsOfUse('ada', globalKnobs.locale()),
+          privacyNotice: getPrivacyNotice(globalKnobs.locale()),
         },
         serverConnectionStore: {
           checkAdaServerStatus: select(
@@ -122,6 +131,7 @@ export const IsExecuting = (): Node => (
           resetLocale: { trigger: async (req) => action('resetLocale')(req) },
           updateTentativeLocale: { trigger: action('updateTentativeLocale') },
           commitLocaleToStorage: { trigger: async (req) => action('commitLocaleToStorage')(req) },
+          acceptTermsOfUse: { trigger: async (req) => action('acceptTermsOfUse')(req) },
         }
       }
     }}
@@ -144,6 +154,8 @@ export const ServerError = (): Node => (
             isExecuting: boolean('isExecuting', false),
           },
           isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+          termsOfUse: getTermsOfUse('ada', globalKnobs.locale()),
+          privacyNotice: getPrivacyNotice(globalKnobs.locale()),
         },
         serverConnectionStore: {
           checkAdaServerStatus: ServerStatusErrors.Network,
@@ -154,6 +166,7 @@ export const ServerError = (): Node => (
           resetLocale: { trigger: async (req) => action('resetLocale')(req) },
           updateTentativeLocale: { trigger: action('updateTentativeLocale') },
           commitLocaleToStorage: { trigger: async (req) => action('commitLocaleToStorage')(req) },
+          acceptTermsOfUse: { trigger: async (req) => action('acceptTermsOfUse')(req) },
         }
       }
     }}

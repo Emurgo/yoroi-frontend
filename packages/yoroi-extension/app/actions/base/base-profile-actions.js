@@ -16,4 +16,5 @@ export default class BaseProfileActions {
   updateHideBalance: AsyncAction<void> = new AsyncAction();
   acceptNightly: Action<void> = new Action();
   updateUnitOfAccount: AsyncAction<UnitOfAccountSettingType> = new AsyncAction();
+  optForAnalytics: Action<boolean> = new Action();
 }

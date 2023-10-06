@@ -1006,6 +1006,10 @@ const globalMessages: * = defineMessages({
     id: 'label.confirm.trezor',
     defaultMessage: '!!!Confirm on Trezor',
   },
+  tosAgreement: {
+    id: 'profile.languageSelect.tosAgreement',
+    defaultMessage: '!!!I agree with <span id="tosLink">Terms of Service Agreement</span> and <span id="privacyLink">Privacy Notice</span>',
+  },
 });
 export default globalMessages;
 
