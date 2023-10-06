@@ -260,7 +260,7 @@ export default class TransactionRevamp extends Component<Props, State> {
       }
 
       const price = this.props.getHistoricalPrice(ticker, currency, request.timestamp);
-      let fiatDisplay;
+      let fiatDisplay = '-';
       if (price != null) {
         const amount = calculateAndFormatValue(shiftedAmount, price);
         const [beforeDecimal, afterDecimal] = amount.split('.');
@@ -606,7 +606,7 @@ export default class TransactionRevamp extends Component<Props, State> {
               xs={2}
               sx={{
                 display: 'flex',
-                alignItems: 'center',
+                alignItems: 'flex-start',
                 justifyContent: 'flex-end',
               }}
             >
@@ -623,12 +623,14 @@ export default class TransactionRevamp extends Component<Props, State> {
               xs={4}
               sx={{
                 display: 'flex',
-                alignItems: 'center',
+                alignItems: 'start',
                 justifyContent: 'flex-end',
                 gap: '8px',
               }}
             >
-              <Box textAlign="right">
+              <Box
+                textAlign="right"
+              >
                 <Typography
                   variant="body1"
                   fontWeight="500"
