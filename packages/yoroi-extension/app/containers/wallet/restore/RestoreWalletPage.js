@@ -7,7 +7,6 @@ import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitive
 import type { ConceptualWalletSettingsCache } from '../../../stores/toplevel/WalletSettingsStore';
 import type { ConceptualWallet } from '../../../api/ada/lib/storage/models/ConceptualWallet';
 import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
-import type { TxRequests } from '../../../stores/toplevel/TransactionsStore';
 import type { PublicKeyCache } from '../../../stores/toplevel/WalletStore';
 import type { IGetPublic } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
@@ -97,7 +96,6 @@ export default class RestoreWalletPage extends Component<Props> {
         unitOfAccount: UnitOfAccountSettingType,
         shouldHideBalance: boolean,
       |},
-      transactions: {| getTxRequests: (PublicDeriver<>) => TxRequests |},
       tokenInfoStore: {| tokenInfo: TokenInfoMap |},
       uiDialogs: {| isOpen: any => boolean |},
       walletRestore: {|
@@ -137,7 +135,6 @@ export default class RestoreWalletPage extends Component<Props> {
         walletSettings: {
           getConceptualWalletSettingsCache: stores.walletSettings.getConceptualWalletSettingsCache,
         },
-        transactions: { getTxRequests: stores.transactions.getTxRequests },
         wallets: {
           restoreRequest: {
             isExecuting: stores.wallets.restoreRequest.isExecuting,

@@ -170,11 +170,7 @@ export default class AddNFTDialog extends Component<Props, State> {
     const shouldAddMore = shouldAddMoreTokens(selectedTokens);
     return (
       <Dialog
-        title={
-          fullNftsList.length === 0
-            ? intl.formatMessage(globalMessages.nfts)
-            : intl.formatMessage(messages.nNft, { number: fullNftsList.length })
-        }
+        title={intl.formatMessage(messages.nNft, { number: fullNftsList.length })}
         closeOnOverlayClick={false}
         className={styles.dialog}
         onClose={onClose}
@@ -234,11 +230,11 @@ export default class AddNFTDialog extends Component<Props, State> {
                       sx={{
                         padding: '16px',
                         cursor: 'pointer',
-                        width: '180px',
+                        width: '184px',
                         minHeight: '237px',
                         overflow: 'hidden',
                         border: '2px solid',
-                        borderColor: isIncluded ? 'primary.600' : 'gray.50',
+                        borderColor: isIncluded ? 'primary.600' : 'grayscale.100',
                         borderRadius: '8px',
                         transition: 'border-color 300ms ease',
                         display: 'flex',
@@ -259,7 +255,7 @@ export default class AddNFTDialog extends Component<Props, State> {
                         width="140px"
                         sx={{
                           wordWrap: 'break-word',
-                          textAlign: 'center',
+                          textAlign: 'left',
                           mt: '16px',
                         }}
                       >
@@ -272,29 +268,16 @@ export default class AddNFTDialog extends Component<Props, State> {
             </>
           )}
         </div>
-        {fullNftsList.length !== 0 && (
+        <Box p="24px">
           <Button
-            sx={{
-              width: '100%',
-              color: 'secondary.300',
-              borderTopLeftRadius: '0px',
-              borderTopRightRadius: '0px',
-              borderColor: 'gray.200',
-              ':hover': {
-                bgcolor: 'transparent',
-                borderColor: 'gray.300',
-              },
-              '&.MuiButton-sizeMedium': {
-                height: '81px',
-              },
-            }}
-            disabled={selectedTokens.length === 0 || !shouldAddMore}
+            fullWidth
+            disabled={selectedTokens.length === 0 || !shouldAddMore || currentNftsList.length === 0}
             onClick={this.onAddAll}
-            variant="ternary"
+            variant="primary"
           >
             {intl.formatMessage(globalMessages.confirm)}
           </Button>
-        )}
+        </Box>
       </Dialog>
     );
   }

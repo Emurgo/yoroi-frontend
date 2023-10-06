@@ -32,6 +32,14 @@ const globalMessages: * = defineMessages({
     id: 'global.labels.token',
     defaultMessage: '!!!Token',
   },
+  addToken: {
+    id: 'global.labels.addToken',
+    defaultMessage: '!!!Add Token',
+  },
+  addNft: {
+    id: 'global.labels.addNft',
+    defaultMessage: '!!!Add NFT',
+  },
   nfts: {
     id: 'global.labels.nft',
     defaultMessage: '!!!NFTs',
@@ -998,6 +1006,10 @@ const globalMessages: * = defineMessages({
     id: 'label.confirm.trezor',
     defaultMessage: '!!!Confirm on Trezor',
   },
+  tosAgreement: {
+    id: 'profile.languageSelect.tosAgreement',
+    defaultMessage: '!!!I agree with <span id="tosLink">Terms of Service Agreement</span> and <span id="privacyLink">Privacy Notice</span>',
+  },
 });
 export default globalMessages;
 
@@ -1024,7 +1036,7 @@ export const memoMessages: * = defineMessages({
   },
   memoWarning: {
     id: 'wallet.send.form.memoWarning',
-    defaultMessage: '!!!Memos are stored localy only',
+    defaultMessage: '!!!(Optional) Memo is stored locally',
   },
 });
 export const connectorMessages: * = defineMessages({

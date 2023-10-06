@@ -45,6 +45,7 @@ import {
   GetEncryptionMeta,
   GetDerivationsByPath,
   GetToken,
+  GetAddress,
 } from './read';
 import type { InsertRequest } from '../../walletTypes/common/utils';
 
@@ -135,9 +136,29 @@ export class ModifyAddress {
     [Tables.AddressSchema.name]: Tables.AddressSchema,
     [Tables.AddressMappingSchema.name]: Tables.AddressMappingSchema,
   });
-  static depTables: {|GetEncryptionMeta: typeof GetEncryptionMeta|} = Object.freeze({
+  static depTables: {|
+    GetEncryptionMeta: typeof GetEncryptionMeta,
+    GetAddress: typeof GetAddress,
+  |} = Object.freeze({
     GetEncryptionMeta,
+    GetAddress,
   });
+
+  static async markAsUsed(
+    db: lf$Database,
+    tx: lf$Transaction,
+    keyDerivationIds: Array<number>,
+  ): Promise<void> {
+    const addrMap = await ModifyAddress.depTables.GetAddress.fromCanonical(
+      db, tx, keyDerivationIds, undefined
+    );
+    addOrReplaceRows(
+      db,
+      tx,
+      [...addrMap.values()].flat().map(a => ({ ...a, IsUsed: true })),
+      ModifyAddress.ownTables[Tables.AddressSchema.name].name,
+    );
+  }
 
   static async addForeignByHash(
     db: lf$Database,
@@ -156,6 +177,7 @@ export class ModifyAddress {
         Digest: digests[i],
         Hash: meta.data,
         Type: meta.type,
+        IsUsed: false,
       })),
       ModifyAddress.ownTables[Tables.AddressSchema.name].name,
     );

@@ -25,14 +25,14 @@ import {
   fiveMinute,
   oneSecond,
   halfSecond,
-  quarterMinute, halfMinute,
+  quarterMinute,
+  halfMinute,
 } from '../support/helpers/common-constants';
 import { expect } from 'chai';
 import { satisfies } from 'semver';
 // eslint-disable-next-line import/named
-import { truncateLongName } from '../../app/utils/formatters';
 import stableStringify from 'json-stable-stringify';
-import type { RestorationInput, WalletNames } from '../mock-chain/TestWallets';
+import type { WalletNames } from '../mock-chain/TestWallets';
 import { waitUntilUrlEquals, navigateTo } from '../support/helpers/route-helpers';
 import { promises as fsAsync } from 'fs';
 import type { LocatorObject } from '../support/webdriver';
@@ -50,12 +50,12 @@ import {
   trezorConfirmButton,
   walletNameInput,
   saveDialog,
-  walletRestoreOptionDialog,
+  selectWalletTypeStepBox,
   restoreNormalWallet,
   restoreWalletButton,
   saveButton,
-  byronEraButton,
   createWalletButton,
+  infoDialog,
 } from '../pages/newWalletPages';
 import { allowPubKeysAndSwitchToYoroi, switchToTrezorAndAllow } from './trezor-steps';
 import {
@@ -63,9 +63,10 @@ import {
   inputMnemonicForWallet,
   walletPasswordInput,
   repeatPasswordInput,
-  confirmButton,
   restoringDialogPlate,
-  verifyRestoredInfoDialog,
+  validPhraseText,
+  nextButton,
+  inputWalletInfo,
 } from '../pages/restoreWalletPage';
 import {
   backupPrivacyWarningDialog,
@@ -75,14 +76,15 @@ import {
   iWrittenDownButton,
   mnemonicPhraseText,
   nobodyLooksCheckbox,
-  recoveryPhraseEntryDialog, recoveryPhraseEntryDialogConfirmButton,
+  recoveryPhraseEntryDialog,
+  recoveryPhraseEntryDialogConfirmButton,
   repeatRecoveryPhrase,
   walletInfoDialog,
-  walletRecoveryPhraseDisplayDialog
+  walletRecoveryPhraseDisplayDialog,
 } from '../pages/createWalletPage';
 import * as helpers from '../support/helpers/helpers';
 import { walletSummaryBox } from '../pages/walletTransactionsHistoryPage';
-import { walletNameText, walletPlate, walletSyncingOverlayComponent } from '../pages/walletPage';
+import { walletSyncingOverlayComponent } from '../pages/walletPage';
 import {
   continueButton,
   getTosCheckbox,
@@ -107,6 +109,7 @@ import {
 import { yoroiModern } from '../pages/mainWindowPage';
 import { backgroungTabName, extensionTabName, WindowManager } from '../support/windowManager';
 import { MockDAppWebpage } from '../mock-dApp-webpage';
+import { infoDialogContinueButton } from '../pages/commonDialogPage';
 
 const simpleNodeLogger = require('simple-node-logger');
 
@@ -140,7 +143,7 @@ AfterAll(() => {
 });
 
 // eslint-disable-next-line prefer-arrow-callback
-Before(function(scenario) {
+Before(function (scenario) {
   const pathItems = scenario.sourceLocation.uri.split('/');
   // eslint-disable-next-line no-console
   console.log(
@@ -153,7 +156,7 @@ Before(function(scenario) {
   testProgress.lineNum = scenario.sourceLocation.line;
   testProgress.step = 0;
 
-  const logsDir = `${testRunsDataDir}_${this.getBrowser()}/${testProgress.scenarioName}/`
+  const logsDir = `${testRunsDataDir}_${this.getBrowser()}/${testProgress.scenarioName}/`;
 
   if (!fs.existsSync(logsDir)) {
     fs.mkdirSync(logsDir, { recursive: true });
@@ -175,7 +178,6 @@ Before(function(scenario) {
   this.addToLoggers(this.trezorEmuLogger);
 
   this.sendToAllLoggers(`#### The scenario "${scenario.pickle.name}" has started ####`);
-
 });
 
 Before({ tags: 'not @TestAssuranceChain' }, () => {
@@ -262,7 +264,7 @@ export async function getIndexedDBTablesInfo(customWorld: any, postfix: string =
     'UtxoAtSafePointTable',
     'UtxoDiffToBestBlock',
     'UtxoTransactionInput',
-    'UtxoTransactionOutput'
+    'UtxoTransactionOutput',
   ];
 
   for (const table of tables) {
@@ -270,18 +272,6 @@ export async function getIndexedDBTablesInfo(customWorld: any, postfix: string =
     const dbResponse = await customWorld.getInfoFromIndexedDB(table);
     await writeFile(filePath, JSON.stringify(dbResponse));
   }
-};
-
-export async function getPlates(customWorld: any): Promise<Array<any>> {
-  // check plate in confirmation dialog
-  await customWorld.waitForElement(restoringDialogPlate);
-  let plateElements = await customWorld.findElements(restoringDialogPlate);
-
-  // this makes this function also work for wallets that already exist
-  if (plateElements.length === 0) {
-    plateElements = await customWorld.findElements(walletPlate);
-  }
-  return plateElements;
 }
 
 const writeFile = promisify(fs.writeFile);
@@ -365,10 +355,10 @@ async function getLogs(driver, name, loggingType) {
   await fsAsync.writeFile(consoleLogPath, JSON.stringify(jsonLogs));
 }
 
-async function restoreWallet (
-    customWorld: any,
-    walletEra: string,
-    walletName: WalletNames
+async function restoreWallet(
+  customWorld: any,
+  walletEra: string,
+  walletName: WalletNames
 ): Promise<void> {
   customWorld.webDriverLogger.info(`Step:restoreWallet: Restoring the wallet "${walletName}"`);
   const restoreInfo = testWallets[walletName];
@@ -376,49 +366,38 @@ async function restoreWallet (
 
   await customWorld.click(restoreWalletButton);
   customWorld.webDriverLogger.info(`Step:restoreWallet: Clicked restoreWalletButton`);
-  await customWorld.waitForElement(pickUpCurrencyDialog);
-  await customWorld.click(getCurrencyButton('cardano'));
-  customWorld.webDriverLogger.info(`Step:restoreWallet: Selected currency "cardano"`);
-  await customWorld.waitForElement(walletRestoreOptionDialog);
+  await customWorld.waitForElement(selectWalletTypeStepBox);
 
   await customWorld.click(restoreNormalWallet);
   customWorld.webDriverLogger.info(`Step:restoreWallet: Selected 15-word wallet`);
-  if (walletEra === 'shelley') {
-    await customWorld.click(shelleyEraButton);
-    customWorld.webDriverLogger.info(`Step:restoreWallet: Selected era "shelley"`);
-  } else if (walletEra === 'byron') {
-    await customWorld.click(byronEraButton);
-    customWorld.webDriverLogger.info(`Step:restoreWallet: Selected era "byron"`);
-  } else {
-    throw new Error(`Unknown wallet era: ${walletEra}.`);
-  }
+  // input recovery phrase dialog
   await customWorld.waitForElement(restoreWalletInputPhraseDialog);
-
+  customWorld.webDriverLogger.info(`Step:restoreWallet: Wallet recovery phrase step is displayed`);
   await inputMnemonicForWallet(customWorld, restoreInfo);
   customWorld.webDriverLogger.info(`Step:restoreWallet: Mnemonic phrase is entered`);
-  await customWorld.waitForElement(verifyRestoredInfoDialog);
-  await checkWalletPlate(customWorld, walletName, restoreInfo, walletEra);
+  await customWorld.waitForElement(validPhraseText);
+  await customWorld.click(nextButton);
+  // info panel
+  await customWorld.waitForElement(infoDialog);
+  customWorld.webDriverLogger.info(`Step:restoreWallet: Info panel is displayed`);
+  await customWorld.click(infoDialogContinueButton);
+  customWorld.webDriverLogger.info(`Step:restoreWallet: Info panel is closed`);
+  // wallet info dialog
+  await inputWalletInfo(customWorld, restoreInfo);
+  customWorld.webDriverLogger.info(`Step:restoreWallet: Wallet info is entered`);
+  await checkWalletPlate(customWorld, restoreInfo.plate);
   customWorld.webDriverLogger.info(`Step:restoreWallet: Wallet plate is checked`);
-  await customWorld.waitForElementNotPresent(walletSyncingOverlayComponent);
+  await customWorld.click(nextButton);
   customWorld.webDriverLogger.info(`Step:restoreWallet: Wallet is fully synchronized`);
 }
 
-async function checkWalletPlate(
+export async function checkWalletPlate(
   customWorld: any,
-  walletName: string,
-  restoreInfo: RestorationInput,
-  walletEra?: string
+  expectedWalletPlate: string,
 ): Promise<void> {
-  const plateElements = await getPlates(customWorld);
-  const plateText = await plateElements[0].getText();
-  if (walletEra === 'shelley'){
-    expect(plateText).to.be.equal(restoreInfo.plate);
-  } else if (walletEra === 'byron') {
-    expect(plateText).to.be.equal(restoreInfo.plateByron);
-  }
-
-  await customWorld.click(confirmButton);
-  await customWorld.waitUntilText(walletNameText, truncateLongName(walletName));
+  const plateElement = await customWorld.findElement(restoringDialogPlate);
+  const plateText = await plateElement.getText();
+  expect(plateText).to.be.equal(expectedWalletPlate);
 }
 
 export async function checkErrorByTranslationId(
@@ -475,7 +454,7 @@ Given(/^I create a new Shelley wallet with the name ([^"]*)$/, async function (w
   await repeatRecoveryPhrase(this, rawMnemonicPhrase);
   await checkRecoveryPhrase2Checkboxes(this);
   await this.click(recoveryPhraseEntryDialogConfirmButton);
-})
+});
 
 Given(/^I have completed the basic setup$/, async function () {
   this.webDriverLogger.info(`Step: I have completed the basic setup`);
@@ -790,6 +769,9 @@ Then(/^Revamp. I switch to revamp version$/, async function () {
   await selectSubmenuSettings(this, 'general');
   this.webDriverLogger.info(`Step: -----> We are in the Settings - General`);
   await this.click(revampThemeRadiobutton);
+  this.webDriverLogger.info(`Step: -----> The revamp theme is selected`);
+  await this.click(walletButton);
+  this.webDriverLogger.info(`Step: -----> Switched back to a wallet`);
 });
 
 Then(/^Revamp. I go to the wallet ([^"]*)$/, async function (walletName) {

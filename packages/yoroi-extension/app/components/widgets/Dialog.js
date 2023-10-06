@@ -67,9 +67,6 @@ function DialogFn(props: Props & InjectedProps): Node {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        '& .MuiBackdrop-root': {
-          background: 'none',
-        },
       }}
     >
       <ModalContainer
@@ -77,6 +74,7 @@ function DialogFn(props: Props & InjectedProps): Node {
         flexDirection="column"
         className={className}
         style={props.styleOverride}
+        boxShadow="0px 13px 20px -1px #00000026"
       >
         {title != null && title !== '' ? (
           <Typography as="h1" variant="body1" className="dialog__title">
@@ -139,15 +137,16 @@ const ModalContainer = styled(Box)(({ theme }) => ({
   minWidth: 'var(--yoroi-comp-dialog-min-width-md)',
   borderRadius: theme.name === 'classic' ? 0 : 8,
   paddingTop: theme.name === 'classic' ? '25px' : '24px',
-  paddingBottom: theme.name === 'classic' ? '30px' : '40px',
+  paddingBottom: theme.name === 'classic' ? '30px' : '24px',
   maxWidth: theme.name === 'classic' ? '785px' : '560px',
   backgroundColor: 'var(--yoroi-comp-dialog-background)',
   color: 'var(--yoroi-comp-dialog-text)',
-  maxHeight: '80vh',
+  maxHeight: '95vh',
 
   '& .dialog__title': {
     flex: 1,
-    marginBottom: theme.name === 'classic' ? '22px' : '40px',
+    marginBottom: theme.name === 'classic' ? '22px' : '0px',
+    padding: theme.name === 'classic' ? '0' : '24px',
     fontWeight: 500,
     textAlign: 'center',
     textTransform: 'uppercase',
@@ -158,16 +157,16 @@ const ModalContent = styled(Box)(({ theme }) => ({
   overflowX: 'hidden',
   overflowY: 'overlay',
   maxHeight: '60vh',
-  paddingLeft: theme.name === 'classic' ? '30px' : '40px',
-  paddingRight: theme.name === 'classic' ? '30px' : '40px',
+  paddingLeft: theme.name === 'classic' ? '30px' : '24px',
+  paddingRight: theme.name === 'classic' ? '30px' : '24px',
 }));
 const ModalFooter = styled(Box)(({ theme }) => ({
   display: 'flex',
-  paddingLeft: theme.name === 'classic' ? '30px' : '40px',
-  paddingRight: theme.name === 'classic' ? '30px' : '40px',
+  paddingLeft: theme.name === 'classic' ? '30px' : '24px',
+  paddingRight: theme.name === 'classic' ? '30px' : '24px',
   marginTop: theme.name === 'classic' ? '20px' : '34px',
   '& button': {
-    width: ' 50%',
+    width: '50%',
     '&:only-child': {
       margin: 'auto',
       width: '100%',

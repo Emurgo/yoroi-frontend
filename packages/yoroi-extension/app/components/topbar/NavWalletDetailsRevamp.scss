@@ -7,28 +7,25 @@
   color: var(--yoroi-palette-gray-900);
   border: 1px solid var(--yoroi-palette-gray-300);
   border-radius: 8px;
-  min-width: 360px;
-  height: 56px;
 }
 
 .outerWrapper {
   display: flex;
   align-items: stretch;
+  justify-content: space-between;
   width: 100%;
 }
 
 .contentWrapper {
   display: flex;
   align-items: center;
-  width: 100%;
   padding: 0px 8px;
 }
 
-.currency {
+.plate {
   margin-right: 12px;
   display: flex;
   flex-shrink: 0;
-  border-radius: 50%;
   border: none;
   overflow: hidden;
   width: 32px;
@@ -75,9 +72,9 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: flex-end;
+  align-items: flex-start;
   text-align: left;
-  font-size: 16px;
+  font-size: 12px;
   line-height: 22px;
   width: 100%;
   margin-left: 24px;
@@ -104,8 +101,22 @@
     align-items: center;
     justify-content: flex-end;
 
+    &:first-child {
+      font-size: 14px;
+    }
+
+    &:nth-child(1) {
+      font-size: 14px;
+    }
+
     &:nth-child(2) {
       margin-top: -2px;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      font-size: 12px;
+      font-weight: 400;
     }
   }
 }

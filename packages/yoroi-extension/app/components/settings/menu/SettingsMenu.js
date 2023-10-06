@@ -26,6 +26,10 @@ const messages = defineMessages({
     id: 'settings.menu.externalStorage.link.label',
     defaultMessage: '!!!External Storage',
   },
+  analytics: {
+    id: 'settings.menu.analytics.link.label',
+    defaultMessage: '!!!Analytics',
+  },
 });
 
 type Props = {|
@@ -77,6 +81,11 @@ export default class SettingsMenu extends Component<Props> {
         label: intl.formatMessage(messages.levelOfComplexity),
         route: ROUTES.SETTINGS.LEVEL_OF_COMPLEXITY,
         className: 'levelOfComplexity',
+      },
+      {
+        label: intl.formatMessage(messages.analytics),
+        route: ROUTES.SETTINGS.ANALYTICS,
+        className: 'analytics',
       },
     ];
 

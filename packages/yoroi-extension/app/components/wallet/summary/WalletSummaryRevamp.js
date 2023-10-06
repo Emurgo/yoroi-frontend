@@ -5,19 +5,20 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { UnconfirmedAmount } from '../../../types/unconfirmedAmountType';
+import globalMessages from '../../../i18n/global-messages';
+import styles from './WalletSummary.scss';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import globalMessages from '../../../i18n/global-messages';
-import styles from './WalletSummary.scss';
 import { formatValue } from '../../../utils/unit-of-account';
 import { splitAmount, truncateToken } from '../../../utils/formatters';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { hiddenAmount } from '../../../utils/strings';
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';
-import { Button, Typography } from '@mui/material';
+import { Button, Typography, Grid } from '@mui/material';
 import { Box } from '@mui/system';
 import BigNumber from 'bignumber.js';
+import { ReactComponent as ExportTxToFileSvg } from '../../../assets/images/transaction/export.inline.svg';
 
 const messages = defineMessages({
   pendingOutgoingConfirmationLabel: {
@@ -31,7 +32,6 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +numberOfTransactions: number,
   +shouldHideBalance: boolean,
   +pendingAmount: UnconfirmedAmount,
   +isLoadingTransactions: boolean,
@@ -39,6 +39,8 @@ type Props = {|
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +getHistoricalPrice: (from: string, to: string, timestamp: number) => ?string,
+  +shouldShowEmptyBanner: boolean,
+  +emptyBannerComponent: Node,
 |};
 
 @observer
@@ -162,89 +164,96 @@ export default class WalletSummaryRevamp extends Component<Props> {
   render(): Node {
     const {
       pendingAmount,
-      numberOfTransactions,
+      //numberOfTransactions,
       isLoadingTransactions,
       openExportTxToFileDialog,
+      shouldShowEmptyBanner,
+      emptyBannerComponent,
     } = this.props;
     const { intl } = this.context;
 
     const hasPendingAmount = pendingAmount.incoming.length || pendingAmount.outgoing.length;
 
     const content = (
-      <Box id="walletSummary_box" sx={{ background: 'common.white' }}>
-        {!isLoadingTransactions && (
-          <>
-            <Box
-              sx={{
-                marginBottom: '24px',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
-              <Typography
-                variant="h2"
-                as="p"
-                fontSize="18px"
-                sx={{ fontWeight: 500, color: 'common.black' }}
-              >
-                {intl.formatMessage({ id: 'wallet.summary.page.transactionsLabel' })}:{' '}
-                <Typography
-                  variant="h2"
-                  as="span"
-                  fontSize="18px"
-                  sx={{ fontWeight: 500, color: 'common.black' }}
-                >
-                  {numberOfTransactions}
-                </Typography>
-              </Typography>
-              <Button
-                variant="secondary"
-                sx={{ textTransform: 'uppercase', margin: '2px' }}
-                onClick={openExportTxToFileDialog}
-                onKeyPress={openExportTxToFileDialog}
-                disabled={isLoadingTransactions}
-              >
-                {intl.formatMessage({ id: 'wallet.transaction.export.exportIcon.tooltip' })}
-              </Button>
-            </Box>
-            <Box sx={{ padding: hasPendingAmount ? '16px 30px' : 0 }}>
-              <Typography variant="body1">
-                {this.renderPendingAmount(
-                  pendingAmount.incoming,
-                  intl.formatMessage(messages.pendingIncomingConfirmationLabel)
-                )}
-              </Typography>
-              <Typography variant="body1">
-                {this.renderPendingAmount(
-                  pendingAmount.outgoing,
-                  intl.formatMessage(messages.pendingOutgoingConfirmationLabel)
-                )}
-              </Typography>
-            </Box>
-          </>
-        )}
+      <Box id="walletSummary_box" sx={{ bgcolor: 'common.white' }}>
         <Box
           sx={{
+            marginBottom: '16px',
             display: 'flex',
-            padding: '12px 0',
-            width: '100%',
             justifyContent: 'space-between',
+            alignItems: 'center',
           }}
         >
-          <Typography variant="body2" sx={{ ...columnTXStyles.transactionType, maxWidth: '35%' }}>
-            {intl.formatMessage({ id: 'wallet.summary.page.type' })}
+          <Typography
+            variant="h2"
+            as="p"
+            fontSize="18px"
+            sx={{ fontWeight: 500, color: 'common.black' }}
+          >
+            {intl.formatMessage({ id: 'wallet.navigation.transactions' })}
           </Typography>
-          <Typography variant="body2" sx={columnTXStyles.status}>
-            {intl.formatMessage({ id: 'wallet.summary.page.status' })}
+          { /* numberOfTransactions !== 0 && */ !isLoadingTransactions && (
+            <Button
+              variant="tertiary"
+              color="primary"
+              sx={{
+                textTransform: 'uppercase',
+                margin: '2px',
+                lineHeight: '21px',
+              }}
+              onClick={openExportTxToFileDialog}
+              onKeyPress={openExportTxToFileDialog}
+              startIcon={<ExportTxToFileSvg />}
+            >
+              {intl.formatMessage(globalMessages.exportButtonLabel)}
+            </Button>
+          )}
+        </Box>
+        <Box sx={{ pb: hasPendingAmount ? '16px' : 0 }}>
+          <Typography variant="body1">
+            {this.renderPendingAmount(
+              pendingAmount.incoming,
+              intl.formatMessage(messages.pendingIncomingConfirmationLabel)
+            )}
           </Typography>
-          <Typography variant="body2" sx={columnTXStyles.fee}>
-            {intl.formatMessage(globalMessages.feeLabel)}
-          </Typography>
-          <Typography variant="body2" sx={{ ...columnTXStyles.amount, maxWidth: '30%' }}>
-            {intl.formatMessage(globalMessages.amountLabel)}
+          <Typography variant="body1">
+            {this.renderPendingAmount(
+              pendingAmount.outgoing,
+              intl.formatMessage(messages.pendingOutgoingConfirmationLabel)
+            )}
           </Typography>
         </Box>
+        {shouldShowEmptyBanner && <Box>{emptyBannerComponent}</Box>}
+        {!shouldShowEmptyBanner && !isLoadingTransactions && (
+          <Grid
+            container
+            sx={{
+              width: '100%',
+              padding: '12px 0',
+              borderBottom: '1px solid',
+              borderBottomColor: 'grayscale.200',
+            }}
+          >
+            <Grid item xs={4}>
+              <Typography variant="body2">
+                {intl.formatMessage({ id: 'wallet.summary.page.type' })}
+              </Typography>
+            </Grid>
+            <Grid item xs={2} sx={{ textAlign: 'left' }}>
+              <Typography variant="body2">
+                {intl.formatMessage({ id: 'wallet.summary.page.status' })}
+              </Typography>
+            </Grid>
+            <Grid item xs={2} sx={{ textAlign: 'right' }}>
+              <Typography variant="body2">{intl.formatMessage(globalMessages.feeLabel)}</Typography>
+            </Grid>
+            <Grid item xs={4} sx={{ textAlign: 'right', pr: '30px' }}>
+              <Typography variant="body2">
+                {intl.formatMessage(globalMessages.amountLabel)}
+              </Typography>
+            </Grid>
+          </Grid>
+        )}
       </Box>
     );
 
@@ -256,5 +265,11 @@ export const columnTXStyles = {
   transactionType: { flex: '1 1 30%', maxWidth: '30%', textAlign: 'left', color: 'grayscale.600' },
   status: { flex: '1 1 16%', maxWidth: '16%', textAlign: 'left', color: 'grayscale.600' },
   fee: { flex: '1 1 16%', maxWidth: '16%', textAlign: 'right', color: 'grayscale.600' },
-  amount: { flex: '1 1 25%', maxWidth: '25%', textAlign: 'right', color: 'grayscale.600' },
+  amount: {
+    flex: '1 1 25%',
+    maxWidth: '25%',
+    paddingRight: '24px',
+    textAlign: 'right',
+    color: 'grayscale.600',
+  },
 };
