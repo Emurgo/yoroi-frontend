@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
-import { defineMessages, intlShape  } from 'react-intl';
+import { defineMessages, intlShape } from 'react-intl';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import GeneralSettings from '../../../components/settings/categories/general-setting/GeneralSettings';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
@@ -15,11 +15,13 @@ import type { LanguageType } from '../../../i18n/translations';
 import { THEMES } from '../../../styles/utils';
 import type { Theme } from '../../../styles/utils';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
-import { ReactComponent as AdaCurrency }  from '../../../assets/images/currencies/ADA.inline.svg';
+import { ReactComponent as AdaCurrency } from '../../../assets/images/currencies/ADA.inline.svg';
 import { unitOfAccountDisabledValue } from '../../../types/unitOfAccountType';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { trackSetUnitOfAccount, trackSetLocale } from '../../../api/analytics';
+import { Box, Typography } from '@mui/material';
+import { settingsMenuMessages } from '../../../components/settings/menu/SettingsMenu';
 
 const currencyLabels = defineMessages({
   USD: {
@@ -60,41 +62,41 @@ type GeneratedData = typeof GeneralSettingsPage.prototype.generated;
 
 @observer
 export default class GeneralSettingsPage extends Component<InjectedOrGenerated<GeneratedData>> {
-
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
-  onSelectUnitOfAccount: string => Promise<void> = async (value) => {
-    const unitOfAccount = (value === 'ADA')
-      ? unitOfAccountDisabledValue
-      : { enabled: true, currency: value };
+  onSelectUnitOfAccount: string => Promise<void> = async value => {
+    const unitOfAccount =
+      value === 'ADA' ? unitOfAccountDisabledValue : { enabled: true, currency: value };
     await this.generated.actions.profile.updateUnitOfAccount.trigger(unitOfAccount);
     trackSetUnitOfAccount(value);
   };
 
-  onSelectLanguage: {| locale: string |} => PossiblyAsync<void> = ({ locale }) => {
+  onSelectLanguage: ({| locale: string |}) => PossiblyAsync<void> = ({ locale }) => {
     this.generated.actions.profile.updateLocale.trigger({ locale });
     trackSetLocale(locale);
   };
 
   render(): Node {
+    const { intl } = this.context;
     const profileStore = this.generated.stores.profile;
     const coinPriceStore = this.generated.stores.coinPriceStore;
 
     const isSubmittingLocale = profileStore.setProfileLocaleRequest.isExecuting;
-    const isSubmittingUnitOfAccount = profileStore.setUnitOfAccountRequest.isExecuting
-      || coinPriceStore.refreshCurrentUnit.isExecuting;
+    const isSubmittingUnitOfAccount =
+      profileStore.setUnitOfAccountRequest.isExecuting ||
+      coinPriceStore.refreshCurrentUnit.isExecuting;
     const { currentTheme } = profileStore;
 
     const currencies = profileStore.UNIT_OF_ACCOUNT_OPTIONS.map(c => {
-      const name = this.context.intl.formatMessage(currencyLabels[c.symbol]);
+      const name = intl.formatMessage(currencyLabels[c.symbol]);
       return {
         value: c.symbol,
         label: `${c.symbol} - ${name}`,
         name,
         price: coinPriceStore.getCurrentPrice('ADA', c.symbol),
-        svg: c.svg
+        svg: c.svg,
       };
     });
     currencies.unshift({
@@ -110,7 +112,12 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
       : 'ADA';
 
     return (
-      <>
+      <Box sx={{ pb: profileStore.isRevampTheme ? '50px' : '0px' }}>
+        {profileStore.isRevampTheme && (
+          <Typography variant="h5" fontWeight={500} mb="24px">
+            {intl.formatMessage(settingsMenuMessages.general)}
+          </Typography>
+        )}
         <GeneralSettings
           onSelectLanguage={this.onSelectLanguage}
           isSubmitting={isSubmittingLocale}
@@ -141,14 +148,12 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
                 });
               }
             }
-            this.generated.actions.profile.updateTheme.trigger({ theme })
+            this.generated.actions.profile.updateTheme.trigger({ theme });
           }}
           onExternalLinkClick={handleExternalLinkClick}
         />
-        <AboutYoroiSettingsBlock
-          wallet={this.generated.stores.wallets.selected}
-        />
-      </>
+        <AboutYoroiSettingsBlock wallet={this.generated.stores.wallets.selected} />
+      </Box>
     );
   }
 
@@ -166,10 +171,8 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
           |}) => Promise<void>,
         |},
         updateUnitOfAccount: {|
-          trigger: (
-            params: UnitOfAccountSettingType
-          ) => Promise<void>
-        |}
+          trigger: (params: UnitOfAccountSettingType) => Promise<void>,
+        |},
       |},
       router: {|
         goToRoute: {|
@@ -194,19 +197,20 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
         LANGUAGE_OPTIONS: Array<LanguageType>,
         currentLocale: string,
         currentTheme: Theme,
+        isRevampTheme: boolean,
         setProfileLocaleRequest: {|
           error: ?LocalizableError,
           isExecuting: boolean,
         |},
         UNIT_OF_ACCOUNT_OPTIONS: Array<{|
           svg: string,
-          symbol: string
+          symbol: string,
         |}>,
         setUnitOfAccountRequest: {|
           error: ?LocalizableError,
-          isExecuting: boolean
+          isExecuting: boolean,
         |},
-        unitOfAccount: UnitOfAccountSettingType
+        unitOfAccount: UnitOfAccountSettingType,
       |},
       wallets: {|
         selected: null | PublicDeriver<>,
@@ -214,12 +218,9 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
         getLastSelectedWallet: void => ?PublicDeriver<>,
       |},
       coinPriceStore: {|
-        getCurrentPrice: (
-          from: string,
-          to: string
-        ) => ?string,
+        getCurrentPrice: (from: string, to: string) => ?string,
         lastUpdateTimestamp: null | number,
-        refreshCurrentUnit: {| isExecuting: boolean |}
+        refreshCurrentUnit: {| isExecuting: boolean |},
       |},
     |},
   |} {
@@ -244,6 +245,7 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
           LANGUAGE_OPTIONS: profileStore.LANGUAGE_OPTIONS,
           currentLocale: profileStore.currentLocale,
           currentTheme: profileStore.currentTheme,
+          isRevampTheme: profileStore.isRevampTheme,
           UNIT_OF_ACCOUNT_OPTIONS: profileStore.UNIT_OF_ACCOUNT_OPTIONS,
           unitOfAccount: profileStore.unitOfAccount,
           setUnitOfAccountRequest: {

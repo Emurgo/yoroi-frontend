@@ -22,20 +22,16 @@ type GeneratedData = typeof TermsOfUsePage.prototype.generated;
 
 @observer
 export default class TermsOfUsePage extends Component<InjectedOrGenerated<GeneratedData>> {
-
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   render(): Node {
     const { checkAdaServerStatus } = this.generated.stores.serverConnectionStore;
     const { selected } = this.generated.stores.wallets;
-    const isWalletTestnet = selected == null
-      ? false
-      : isTestnet(selected.getParent().getNetworkInfo());
-    const isWalletErgo = selected == null
-      ? false
-      : isErgo(selected.getParent().getNetworkInfo());
+    const isWalletTestnet =
+      selected == null ? false : isTestnet(selected.getParent().getNetworkInfo());
+    const isWalletErgo = selected == null ? false : isErgo(selected.getParent().getNetworkInfo());
 
     const displayedBanner = checkAdaServerStatus === ServerStatusErrors.Healthy
       ? <TestnetWarningBanner isTestnet={isWalletTestnet} isErgo={isWalletErgo} />
@@ -64,25 +60,25 @@ export default class TermsOfUsePage extends Component<InjectedOrGenerated<Genera
     actions: {|
       profile: {|
         acceptTermsOfUse: {|
-          trigger: (params: void) => Promise<void>
-        |}
-      |}
+          trigger: (params: void) => Promise<void>,
+        |},
+      |},
     |},
     stores: {|
       wallets: {| selected: null | PublicDeriver<> |},
       profile: {|
         setTermsOfUseAcceptanceRequest: {|
           error: ?LocalizableError,
-          isExecuting: boolean
+          isExecuting: boolean,
         |},
         termsOfUse: string,
         privacyNotice: string,
       |},
       serverConnectionStore: {|
-        checkAdaServerStatus: ServerStatusErrorType
-      |}
-    |}
-    |} {
+        checkAdaServerStatus: ServerStatusErrorType,
+      |},
+    |},
+  |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

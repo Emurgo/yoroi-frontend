@@ -536,6 +536,10 @@ const globalMessages: * = defineMessages({
     defaultMessage:
       '!!!These allow you to easily share invoices with friends and businesses by simply clicking a URL.',
   },
+  uriExplanationRevamp: {
+    id: 'global.uriExplanation.revamp',
+    defaultMessage: '!!!Allow URLs to easily share invoices with friends and businesses',
+  },
   copyTooltipMessage: {
     id: 'global.copyTooltipMessage',
     defaultMessage: '!!!Copied',
@@ -924,6 +928,10 @@ const globalMessages: * = defineMessages({
   termsOfUse: {
     id: 'settings.menu.termsOfUse.link.label',
     defaultMessage: '!!!Terms of use',
+  },
+  termsOfService: {
+    id: 'settings.menu.termsOfService.link.label',
+    defaultMessage: '!!!Terms of Service Agreement',
   },
   fromAddresses: {
     id: 'wallet.transaction.addresses.from',
