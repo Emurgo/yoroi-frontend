@@ -25,16 +25,34 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
   const avatarGenerated = getAvatarFromPoolId(id);
 
   return (
-    <Card>
+    <Card sx={{ border: '1px solid', borderColor: 'grayscale.200', bgcolor: 'background.card' }}>
       <Box
         sx={{
-          padding: '15px 24px',
-          borderBottom: '1px solid var(--yoroi-palette-gray-200)',
+          padding: '16px 9px 16px 24px',
+          borderBottom: '1px solid',
+          borderBottomColor: 'grayscale.200',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
-        <Typography variant="h5" color="var(--yoroi-palette-gray-900)">
+        <Typography variant="h5" color="common.black" fontWeight={500}>
           {intl.formatMessage(globalMessages.stakePoolDelegated)}
         </Typography>
+        <UndelegateButton
+          variant="text"
+          onClick={undelegate}
+          disabled={!undelegate}
+          sx={{
+            lineHeight: '21px',
+            '&.MuiButton-sizeMedium': {
+              height: 'unset',
+              p: '9px 15px',
+            },
+          }}
+        >
+          {intl.formatMessage(globalMessages.undelegateLabel)}
+        </UndelegateButton>
       </Box>
       <Wrapper sx={{ paddingBottom: 0 }}>
         <AvatarWrapper>
@@ -45,11 +63,11 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
           )}
         </AvatarWrapper>
         <Box marginLeft="16px" sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-          <Typography color="black" variant="body1" fontWeight="medium" mb="3px">
+          <Typography color="grayscale.max" variant="body1" fontWeight="medium" mb="3px">
             {ticker !== undefined ? `[${ticker}]` : ''} {name}
           </Typography>
           <SocialMediaStakePool
-            color="var(--yoroi-palette-gray-500)"
+            color="grayscale.500"
             websiteUrl={websiteUrl}
             socialLinks={socialLinks}
           />
@@ -58,53 +76,53 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
       <Wrapper justifyContent="space-between" sx={{ paddingBottom: 0 }}>
         {roa != null ? (
           <Box sx={{ display: 'flex', flexFlow: 'column' }}>
-            <Typography variant="caption" fontWeight="500" color="var(--yoroi-palette-gray-500)">
+            <Typography
+              variant="caption1"
+              color="grayscale.500"
+              sx={{ textTransform: 'uppercase' }}
+            >
               {intl.formatMessage(globalMessages.roa30d)}
             </Typography>
-            <Typography as="span" color="black" variant="h2">
+            <Typography as="span" fontWeight={500} color="grayscale.max" variant="h2">
               {roa} %
             </Typography>
           </Box>
         ) : null}
         {poolSize != null && (
           <Box sx={{ display: 'flex', flexFlow: 'column' }}>
-            <Typography variant="caption" fontWeight="500" color="var(--yoroi-palette-gray-500)">
-              Pool Size
+            <Typography
+              variant="caption1"
+              color="grayscale.500"
+              sx={{ textTransform: 'uppercase' }}
+            >
+              {intl.formatMessage(globalMessages.poolSize)}
             </Typography>
-            <Typography as="span" color="black" variant="h2">
+            <Typography as="span" fontWeight={500} color="grayscale.max" variant="h2">
               {poolSize}
             </Typography>
           </Box>
         )}
         {share != null && (
           <Box sx={{ display: 'flex', flexFlow: 'column' }}>
-            <Typography variant="caption" fontWeight="500" color="var(--yoroi-palette-gray-500)">
-              Share
+            <Typography
+              variant="caption1"
+              color="grayscale.500"
+              sx={{ textTransform: 'uppercase' }}
+            >
+              {intl.formatMessage(globalMessages.poolShare)}
             </Typography>
-            <Typography as="span" color="black" variant="h2">
+            <Typography as="span" fontWeight={500} color="grayscale.max" variant="h2">
               {share} %
             </Typography>
           </Box>
         )}
       </Wrapper>
-      {undelegate && (
-        <Wrapper>
-          <UndelegateButton
-            sx={{ border: '2px solid #17D1AA', width: '50%' }}
-            color="secondary"
-            onClick={undelegate}
-          >
-            {intl.formatMessage(globalMessages.undelegateLabel)}
-          </UndelegateButton>
-        </Wrapper>
-      )}
     </Card>
   );
 }
 export default (injectIntl(observer(DelegatedStakePoolCard)): ComponentType<Props>);
 
 const Card = styled(Box)({
-  backgroundColor: 'var(--yoroi-palette-common-white)',
   borderRadius: '8px',
   flex: '1 1 100%',
   display: 'flex',

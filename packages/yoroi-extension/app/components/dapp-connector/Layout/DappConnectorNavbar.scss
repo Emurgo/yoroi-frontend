@@ -1,6 +1,6 @@
 .component {
     background-color: #FFFFFF;
-    box-shadow: 0 2px 5px 3px rgba(0, 0, 0, 0.06);
+    border-bottom: 1px solid #DCE0E9;
 
     .header {
         color: #38393D;
@@ -9,6 +9,6 @@
         font-weight: 500;
         letter-spacing: 0;
         line-height: 28px;
-        padding: 32px 40px;
+        padding: 20px 24px;
     }
 }

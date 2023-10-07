@@ -1,19 +1,20 @@
 // @flow
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { InjectedOrGenerated } from '../../../../types/injectedPropsType';
+import type { StepsList } from '../../../../components/wallet/voting/types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import { intlShape } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { ProgressInfo } from '../../../../stores/ada/VotingStore';
+import { withLayout } from '../../../../styles/context/layout';
 import globalMessages from '../../../../i18n/global-messages';
 import DialogCloseButton from '../../../../components/widgets/DialogCloseButton';
 import Dialog from '../../../../components/widgets/Dialog';
-import type { InjectedOrGenerated } from '../../../../types/injectedPropsType';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import ErrorBlock from '../../../../components/widgets/ErrorBlock';
-import { ProgressInfo } from '../../../../stores/ada/VotingStore';
 import RegisterDialog from '../../../../components/wallet/voting/RegisterDialog';
-import type { StepsList } from '../../../../components/wallet/voting/types';
 
 export type GeneratedData = typeof RegisterDialogContainer.prototype.generated;
 
@@ -27,8 +28,14 @@ type Props = {|
   +classicTheme: boolean,
 |};
 
+type InjectedProps = {|
+  +isRevampLayout: boolean,
+|};
+
+type AllProps = {| ...Props, ...InjectedProps |};
+
 @observer
-export default class RegisterDialogContainer extends Component<Props> {
+class RegisterDialogContainer extends Component<AllProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -51,7 +58,7 @@ export default class RegisterDialogContainer extends Component<Props> {
           try {
             await this.generated.actions.ada.votingTransaction.createTransaction.trigger(
               walletPassword
-              );
+            );
             await submit();
           } catch (error) {
             onError(error);
@@ -60,6 +67,7 @@ export default class RegisterDialogContainer extends Component<Props> {
         isProcessing={votingStore.isActionProcessing}
         cancel={cancel}
         classicTheme={classicTheme}
+        isRevamp={this.props.isRevampLayout}
       />
     );
   }
@@ -148,3 +156,5 @@ export default class RegisterDialogContainer extends Component<Props> {
     });
   }
 }
+
+export default (withLayout(RegisterDialogContainer): ComponentType<Props>);

@@ -1,9 +1,11 @@
 .component {
   width: 100%;
-  padding-top: 40px;
-  padding-right: 40px;
-  padding-bottom: 20px;
-  padding-left: 40px;
+  height: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
   .staleTxWarning {
     margin-bottom: 20px;
@@ -26,14 +28,12 @@
   }
 
   .wrapper {
-    width: 65%;
     height: auto;
   }
 
   .addressToLabel {
     font-size: 16px;
     letter-spacing: 0;
-    color: #6b7384;
     margin-bottom: 8px;
   }
 
@@ -42,15 +42,12 @@
     font-size: 16px;
     letter-spacing: 0;
     line-height: 24px;
-    color: var(--yoroi-palette-gray-900);
   }
 
   .amountWrapper {
-    padding: 12px 0px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-family: Rubik;
     font-size: 16px;
     letter-spacing: 0;
     line-height: 24px;
@@ -86,14 +83,12 @@
   }
 
   .totalAmountWrapper {
-    margin-top: 17px;
-    margin-bottom: 40px;
+    margin-top: 24px;
+    margin-bottom: 8px;
     border-radius: 8px;
-    background: linear-gradient(30.09deg, #244abf 0%, #4760ff 176.73%);
     padding: 24px;
     display: flex;
     justify-content: space-between;
-    color: var(--yoroi-palette-common-white);
 
     .assetsCount {
       text-align: right;
