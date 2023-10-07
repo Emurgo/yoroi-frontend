@@ -28,6 +28,10 @@ export const settingsMenuMessages: Object = defineMessages({
     id: 'settings.menu.externalStorage.link.label',
     defaultMessage: '!!!External Storage',
   },
+  analytics: {
+    id: 'settings.menu.analytics.link.label',
+    defaultMessage: '!!!Analytics',
+  },
 });
 
 type Props = {|
@@ -81,6 +85,11 @@ class SettingsMenu extends Component<Props & InjectedLayoutProps> {
         label: intl.formatMessage(settingsMenuMessages.levelOfComplexity),
         route: ROUTES.SETTINGS.LEVEL_OF_COMPLEXITY,
         className: 'levelOfComplexity',
+      },
+      {
+        label: intl.formatMessage(messages.analytics),
+        route: ROUTES.SETTINGS.ANALYTICS,
+        className: 'analytics',
       },
     ];
 

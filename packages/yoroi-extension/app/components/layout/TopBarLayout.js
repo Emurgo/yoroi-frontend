@@ -17,10 +17,13 @@ type Props = {|
   +showInContainer?: boolean,
   +showAsCard?: boolean,
   +asModern?: boolean,
+  +withPadding?: boolean, // default: true
   +bgcolor?: string,
 |};
 
 type InjectedProps = {| isRevampLayout: boolean, currentTheme: string |};
+
+type AllProps = {| ...Props, ...InjectedProps |};
 /** Adds a top bar above the wrapped node */
 function TopBarLayout({
   banner,
@@ -35,8 +38,9 @@ function TopBarLayout({
   currentTheme,
   isRevampLayout,
   asModern,
+  withPadding,
   bgcolor,
-}: Props & InjectedProps) {
+}: AllProps) {
   const isModern = currentTheme === THEMES.YOROI_MODERN;
 
   const getContentUnderBanner: void => Node = () => {
@@ -50,7 +54,6 @@ function TopBarLayout({
         <Box
           sx={{
             position: 'relative',
-            overflow: 'auto',
             height: '100%',
             '&::-webkit-scrollbar-button': {
               height: '7px',
@@ -58,17 +61,16 @@ function TopBarLayout({
             },
             boxShadow: !isRevampLayout && showAsCard === true && '0 2px 12px 0 rgba(0, 0, 0, 0.06)',
             borderRadius: !isRevampLayout && showAsCard === true && '8px',
-            ...(isRevampLayout && asModern !== true && !isModern
-              ? { overflow: 'auto' }
-              : showInContainer === true && {
-                  bgcolor: 'common.white',
-                  width: '100%',
-                  overflow: 'hidden',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  flex: '0 1 auto',
-                  height: '100%',
-                }),
+            ...(showInContainer === true && {
+              bgcolor: 'common.white',
+              width: '100%',
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
+              flex: '0 1 auto',
+              height: '100%',
+            }),
+            overflow: isRevampLayout && asModern !== true && !isModern ? 'auto' : '',
           }}
         >
           {isRevampLayout && asModern !== true && !isModern ? (
@@ -92,7 +94,7 @@ function TopBarLayout({
                   sx={{
                     height: '100%',
                     minHeight: '200px',
-                    padding: '24px',
+                    padding: typeof withPadding === 'undefined' || withPadding === true ? '24px' : '0px',
                     pb: 0,
                     bgcolor: bgcolor || 'common.white',
                   }}
@@ -108,6 +110,23 @@ function TopBarLayout({
       </>
     );
     if (showInContainer === true) {
+      const boxProperties = {
+        height: '100%',
+        minHeight: '200px',
+        backgroundColor: 'grey.50',
+        maxWidth: '1295px',
+        paddingLeft: '40px',
+        paddingRight: '40px',
+        width: '100%',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
+        maxHeight: 'calc(100vh - 110px)',
+      };
+      if (isRevampLayout && asModern !== true && !isModern) {
+        boxProperties.backgroundColor = 'common.white';
+      }
       return isRevampLayout && asModern !== true && !isModern ? (
         <Box
           sx={{
@@ -124,22 +143,7 @@ function TopBarLayout({
         </Box>
       ) : (
         <Box
-          sx={{
-            height: '100%',
-            minHeight: '200px',
-            backgroundColor: 'grey.50',
-            ...(showInContainer === true && {
-              maxWidth: '1295px',
-              paddingLeft: '40px',
-              paddingRight: '40px',
-              width: '100%',
-              marginLeft: 'auto',
-              marginRight: 'auto',
-              display: 'flex',
-              flexDirection: 'column',
-              maxHeight: 'calc(100vh - 110px)',
-            }),
-          }}
+          sx={boxProperties}
         >
           {content}
         </Box>
@@ -181,10 +185,7 @@ function TopBarLayout({
             display: 'flex',
             flexDirection: 'column',
             position: 'relative',
-            backgroundColor:
-              showInContainer === true && isRevampLayout
-                ? 'common.white'
-                : 'var(--yoroi-palette-gray-50)',
+            backgroundColor: isRevampLayout && asModern !== true && !isModern ? 'common.white' : '',
           }}
         >
           {banner}
@@ -208,5 +209,6 @@ TopBarLayout.defaultProps = {
   showInContainer: false,
   showAsCard: false,
   asModern: false,
+  withPadding: true,
   bgcolor: undefined,
 };

@@ -10,7 +10,7 @@ import { LoadingButton } from '@mui/lab';
 import { withLayout } from '../../styles/context/layout';
 import { observer } from 'mobx-react';
 
-type ActionType = {|
+export type ActionType = {|
   +label: string,
   +onClick: void => PossiblyAsync<void>,
   +primary?: boolean,
@@ -20,7 +20,7 @@ type ActionType = {|
   +className?: ?string,
 |};
 
-type Props = {|
+export type Props = {|
   +title?: string | Node,
   +children?: Node,
   +actions?: Array<ActionType>,
@@ -30,6 +30,7 @@ type Props = {|
   +styleOverride?: { ... },
   +onClose?: ?(void) => PossiblyAsync<void>,
   +closeOnOverlayClick?: boolean,
+  +isRevampLayout?: boolean,
 |};
 
 type InjectedProps = {| isRevampLayout: boolean |};
@@ -94,13 +95,6 @@ function DialogFn(props: Props & InjectedProps): Node {
                 <LoadingButton
                   id={action.primary === true ? 'primaryButton' : 'secondaryButton'}
                   key={i}
-                  // variant={
-                  //   action.danger === true
-                  //     ? 'danger'
-                  //     : action.primary === true
-                  //     ? 'primary'
-                  //     : 'secondary'
-                  // }
                   {...getBtnVariant(action.danger, action.primary, isRevampLayout)}
                   className={buttonClasses}
                   loading={action.isSubmitting}
@@ -137,15 +131,16 @@ const ModalContainer = styled(Box)(({ theme }) => ({
   minWidth: 'var(--yoroi-comp-dialog-min-width-md)',
   borderRadius: theme.name === 'classic' ? 0 : 8,
   paddingTop: theme.name === 'classic' ? '25px' : '24px',
-  paddingBottom: theme.name === 'classic' ? '30px' : '40px',
+  paddingBottom: theme.name === 'classic' ? '30px' : '24px',
   maxWidth: theme.name === 'classic' ? '785px' : '560px',
   backgroundColor: 'var(--yoroi-comp-dialog-background)',
   color: 'var(--yoroi-comp-dialog-text)',
-  maxHeight: '80vh',
+  maxHeight: '95vh',
 
   '& .dialog__title': {
     flex: 1,
-    marginBottom: theme.name === 'classic' ? '22px' : '40px',
+    marginBottom: theme.name === 'classic' ? '22px' : '0px',
+    padding: theme.name === 'classic' ? '0' : '24px',
     fontWeight: 500,
     textAlign: 'center',
     textTransform: 'uppercase',
@@ -156,16 +151,16 @@ const ModalContent = styled(Box)(({ theme }) => ({
   overflowX: 'hidden',
   overflowY: 'overlay',
   maxHeight: '60vh',
-  paddingLeft: theme.name === 'classic' ? '30px' : '40px',
-  paddingRight: theme.name === 'classic' ? '30px' : '40px',
+  paddingLeft: theme.name === 'classic' ? '30px' : '24px',
+  paddingRight: theme.name === 'classic' ? '30px' : '24px',
 }));
 const ModalFooter = styled(Box)(({ theme }) => ({
   display: 'flex',
-  paddingLeft: theme.name === 'classic' ? '30px' : '40px',
-  paddingRight: theme.name === 'classic' ? '30px' : '40px',
+  paddingLeft: theme.name === 'classic' ? '30px' : '24px',
+  paddingRight: theme.name === 'classic' ? '30px' : '24px',
   marginTop: theme.name === 'classic' ? '20px' : '34px',
   '& button': {
-    width: ' 50%',
+    width: '50%',
     '&:only-child': {
       margin: 'auto',
       width: '100%',
@@ -179,7 +174,7 @@ const ModalFooter = styled(Box)(({ theme }) => ({
 function getBtnVariant(
   danger?: boolean,
   primary?: boolean,
-  isRevampLayout: boolean
+  isRevampLayout?: boolean
 ): {|
   variant: 'contained' | 'outlined' | 'danger' | 'primary' | 'secondary',
   color?: 'primary' | 'secondary' | 'error',
@@ -187,11 +182,11 @@ function getBtnVariant(
   if (danger && isRevampLayout) return { variant: 'contained', color: 'error' };
 
   if (isRevampLayout && primary) {
-    return { variant: 'contained', color: 'primary' };
+    return { variant: 'primary' };
   }
 
   if (isRevampLayout && !primary) {
-    return { variant: 'outlined', color: 'primary' };
+    return { variant: 'secondary' };
   }
 
   if (danger === true) return { variant: 'danger' };

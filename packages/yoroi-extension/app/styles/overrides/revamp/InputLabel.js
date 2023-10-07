@@ -2,7 +2,7 @@
 
 const RevampInputLabel = {
   styleOverrides: {
-    root: ({ theme }) => ({
+    root: ({ theme }: any): any => ({
       color: theme.palette.grayscale[900],
       '&::first-letter': { textTransform: 'uppercase' },
       '&.Mui-focused': { color: theme.palette.grayscale[900] },

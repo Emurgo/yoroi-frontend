@@ -36,21 +36,18 @@ import type {
   CurrentTimeRequests,
   TimeCalcRequests,
 } from '../../../stores/base/BaseCardanoTimeStore';
-import type { TxRequests } from '../../../stores/toplevel/TransactionsStore';
 import type { Notification } from '../../../types/notificationType';
 
 import globalMessages from '../../../i18n/global-messages';
 import { computed, observable, runInAction } from 'mobx';
-import { ApiOptions, getApiForNetwork, } from '../../../api/common/utils';
-import type { NetworkRow, TokenRow, } from '../../../api/ada/lib/storage/database/primitives/tables';
+import { ApiOptions, getApiForNetwork } from '../../../api/common/utils';
+import type { NetworkRow, TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import DeregisterDialogContainer from '../../transfer/DeregisterDialogContainer';
 import type { GeneratedData as DeregisterDialogContainerData } from '../../transfer/DeregisterDialogContainer';
 import type { GeneratedData as WithdrawalTxDialogContainerData } from '../../transfer/WithdrawalTxDialogContainer';
 import WithdrawalTxDialogContainer from '../../transfer/WithdrawalTxDialogContainer';
-import {
-  MultiToken,
-} from '../../../api/common/lib/MultiToken';
+import { MultiToken } from '../../../api/common/lib/MultiToken';
 import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
 import { getTokenName, genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../../utils/formatters';
@@ -131,19 +128,21 @@ export default class StakingDashboardPage extends Component<Props> {
         graphData={generateGraphData({
           delegationRequests,
           publicDeriver,
-          currentEpoch:
-            this.generated.stores.time.getCurrentTimeRequests(publicDeriver).currentEpoch,
+          currentEpoch: this.generated.stores.time.getCurrentTimeRequests(publicDeriver)
+            .currentEpoch,
           shouldHideBalance: this.generated.stores.profile.shouldHideBalance,
           getLocalPoolInfo: this.generated.stores.delegation.getLocalPoolInfo,
           tokenInfo: this.generated.stores.tokenInfoStore.tokenInfo,
         })}
         delegationHistory={delegationRequests.getCurrentDelegation.result?.fullHistory}
         epochLength={this.getEpochLengthInDays(publicDeriver)}
-        ticker={truncateToken(getTokenName(
-          this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
-            publicDeriver.getParent().getNetworkInfo().NetworkId
+        ticker={truncateToken(
+          getTokenName(
+            this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
+              publicDeriver.getParent().getNetworkInfo().NetworkId
+            )
           )
-        ))}
+        )}
       />
     );
 
@@ -589,8 +588,7 @@ export default class StakingDashboardPage extends Component<Props> {
 
     const defaultToken = request.publicDeriver.getParent().getDefaultToken();
 
-    const txRequests = this.generated.stores.transactions.getTxRequests(request.publicDeriver);
-    const balance = txRequests.requests.getBalanceRequest.result;
+    const balance = this.generated.stores.transactions.balance;
 
     const rewardBalance =
       request.delegationRequests.getDelegatedBalance.result == null
@@ -606,22 +604,16 @@ export default class StakingDashboardPage extends Component<Props> {
         cannotUnmangleSum={
           unmangledAmountsRequest?.cannotUnmangle ?? new MultiToken([], defaultToken)
         }
-        defaultTokenInfo={
-          this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
-            request.publicDeriver.getParent().getNetworkInfo().NetworkId
-          )
-        }
+        defaultTokenInfo={this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
+          request.publicDeriver.getParent().getNetworkInfo().NetworkId
+        )}
         getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
         onUnmangle={() =>
           this.generated.actions.dialogs.open.trigger({
             dialog: UnmangleTxDialogContainer,
           })
         }
-        totalSum={
-          balance == null
-            ? undefined
-            : balance.joinAddCopy(rewardBalance)
-        }
+        totalSum={balance == null ? undefined : balance.joinAddCopy(rewardBalance)}
         totalRewards={
           !showRewardAmount || request.delegationRequests.getDelegatedBalance.result == null
             ? undefined
@@ -679,8 +671,7 @@ export default class StakingDashboardPage extends Component<Props> {
     if (!isCardanoHaskell(publicDeriver.getParent().getNetworkInfo())) {
       return undefined;
     }
-    const adaDelegationRequests = this.generated.stores.substores.ada.
-      delegation.getDelegationRequests(
+    const adaDelegationRequests = this.generated.stores.substores.ada.delegation.getDelegationRequests(
       publicDeriver
     );
     if (adaDelegationRequests == null) return undefined;
@@ -753,7 +744,7 @@ export default class StakingDashboardPage extends Component<Props> {
         |},
       |},
       transactions: {|
-        getTxRequests: (PublicDeriver<>) => TxRequests,
+        balance: ?MultiToken,
         hasAnyPending: boolean,
       |},
       uiDialogs: {|
@@ -796,7 +787,9 @@ export default class StakingDashboardPage extends Component<Props> {
 
       return {
         getTimeCalcRequests: (undefined: any),
-        getCurrentTimeRequests: () => { throw new Error(`${nameof(StakingDashboardPage)} api not supported`) },
+        getCurrentTimeRequests: () => {
+          throw new Error(`${nameof(StakingDashboardPage)} api not supported`);
+        },
       };
     })();
     return Object.freeze({
@@ -833,7 +826,7 @@ export default class StakingDashboardPage extends Component<Props> {
         },
         transactions: {
           hasAnyPending: stores.transactions.hasAnyPending,
-          getTxRequests: stores.transactions.getTxRequests,
+          balance: stores.transactions.balance,
         },
         delegation: {
           selectedPage: stores.delegation.selectedPage,

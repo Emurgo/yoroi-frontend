@@ -9,32 +9,29 @@ import { Typography } from '@mui/material';
 
 type Props = {|
   minAda: string,
-|}
+|};
 
 export const messages: Object = defineMessages({
-    minAda: {
-        id: 'wallet.send.form.dialog.minAda',
-        defaultMessage: '!!!Min-ADA: {minAda}'
-    },
+  minAda: {
+    id: 'wallet.send.form.dialog.minAda',
+    defaultMessage: '!!!Min-ADA: {minAda}',
+  },
 });
 
 @observer
 export default class MinAda extends Component<Props> {
-    static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-        intl: intlShape.isRequired,
-    };
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+    intl: intlShape.isRequired,
+  };
 
-    render(): Node {
-        const { intl } = this.context;
-        const { minAda } = this.props;
+  render(): Node {
+    const { intl } = this.context;
+    const { minAda } = this.props;
 
-        return (
-          <Typography
-            color='var(--yoroi-palatte-gray-900)'
-            fontSize='14px'
-          >
-            {intl.formatMessage(messages.minAda, { minAda })}
-          </Typography>
-          )
-    }
+    return (
+      <Typography color="grayscale.900" variant="body1">
+        {intl.formatMessage(messages.minAda, { minAda })}
+      </Typography>
+    );
+  }
 }

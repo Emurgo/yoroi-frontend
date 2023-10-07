@@ -35,7 +35,6 @@ import WalletRestoreOptionDialog from '../../components/wallet/add/option-dialog
 import WalletConnectHWOptionDialog from '../../components/wallet/add/option-dialog/WalletConnectHWOptionDialog';
 import WalletTrezorConnectDialogContainer from './dialogs/WalletTrezorConnectDialogContainer';
 import WalletLedgerConnectDialogContainer from './dialogs/WalletLedgerConnectDialogContainer';
-import WalletEraOptionDialogContainer from './dialogs/WalletEraOptionDialogContainer';
 import { getPaperWalletIntro } from '../../stores/toplevel/ProfileStore';
 import WalletPaperDialog from '../../components/wallet/WalletPaperDialog';
 import UserPasswordDialog from '../../components/wallet/add/paper-wallets/UserPasswordDialog';
@@ -531,7 +530,8 @@ const restoreWalletProps: ({|
       duplicatedWallet: null,
     },
     transactions: {
-      getTxRequests: request.lookup.getTransactions,
+      // getTxRequests: request.lookup.getTransactions,
+      getBalance: request.lookup.getBalance,
     },
     yoroiTransfer: {
       status: request.yoroiTransferStep || TransferStatus.UNINITIALIZED,
@@ -636,19 +636,6 @@ export const ErgoRestoreOptions = (): Node => {
         Object.freeze({
           selectedNetwork: networks.ErgoMainnet,
           openDialog: WalletRestoreOptionDialog,
-        })
-      )}
-    />
-  );
-};
-
-export const CardanoEraSelect = (): Node => {
-  return (
-    <AddWalletPage
-      generated={defaultProps(
-        Object.freeze({
-          selectedNetwork: networks.CardanoMainnet,
-          openDialog: WalletEraOptionDialogContainer,
         })
       )}
     />

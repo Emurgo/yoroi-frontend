@@ -10,7 +10,8 @@ type Props = {|
   +size: number,
   +id?: string,
   +includeMargin?: boolean,
-  +addBg?: boolean
+  +addBg?: boolean,
+  +fgColor?: string
 |};
 
 @observer
@@ -28,9 +29,9 @@ export default class QrCodeWrapper extends Component<Props> {
 
   render(): Node {
     // Get QRCode color value from active theme's CSS variable
-    const { id, includeMargin, addBg } = this.props;
+    const { id, includeMargin, addBg, fgColor } = this.props;
     const qrCodeBackgroundColor = addBg === true ? readCssVar('--yoroi-qr-code-background') : '#ffffff';
-    const qrCodeForegroundColor = readCssVar('--yoroi-qr-code-foreground');
+    const qrCodeForegroundColor = fgColor ?? readCssVar('--yoroi-qr-code-foreground');
 
     return (
       <QRCode
