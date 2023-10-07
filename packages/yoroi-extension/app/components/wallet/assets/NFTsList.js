@@ -77,8 +77,9 @@ function NfTsList({ list, intl }: Props & Intl): Node {
       sx={{
         height: 'content',
         width: '100%',
-        bgcolor: 'var(--yoroi-palette-common-white)',
+        bgcolor: 'common.white',
         borderRadius: '8px',
+        p: '24px',
       }}
     >
       <Box
@@ -88,12 +89,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
         marginBottom="30px"
         paddingBottom="16px"
       >
-        <Typography
-          variant="h5"
-          color="var(--yoroi-palette-common-black)"
-          fontWeight={500}
-          fontSize="18px"
-        >
+        <Typography variant="h5" color="common.black" fontWeight={500} fontSize="18px">
           {list.length === 0
             ? intl.formatMessage(globalMessages.sidebarNfts)
             : intl.formatMessage(messages.nftsCount, { number: list.length })}
