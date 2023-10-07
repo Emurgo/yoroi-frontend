@@ -2,7 +2,7 @@
 
 const RevampFormControl = {
   styleOverrides: {
-    root: ({ theme }) => ({
+    root: ({ theme }: any): any => ({
       paddingBottom: '20px',
       marginBottom: '10px',
       marginTop: '7px',

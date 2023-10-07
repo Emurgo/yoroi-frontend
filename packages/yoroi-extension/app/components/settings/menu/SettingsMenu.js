@@ -87,7 +87,7 @@ class SettingsMenu extends Component<Props & InjectedLayoutProps> {
         className: 'levelOfComplexity',
       },
       {
-        label: intl.formatMessage(messages.analytics),
+        label: intl.formatMessage(settingsMenuMessages.analytics),
         route: ROUTES.SETTINGS.ANALYTICS,
         className: 'analytics',
       },
