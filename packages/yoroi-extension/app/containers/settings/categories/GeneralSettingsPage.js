@@ -19,7 +19,6 @@ import { ReactComponent as AdaCurrency } from '../../../assets/images/currencies
 import { unitOfAccountDisabledValue } from '../../../types/unitOfAccountType';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { trackSetUnitOfAccount, trackSetLocale } from '../../../api/analytics';
 import { Box, Typography } from '@mui/material';
 import { settingsMenuMessages } from '../../../components/settings/menu/SettingsMenu';
 

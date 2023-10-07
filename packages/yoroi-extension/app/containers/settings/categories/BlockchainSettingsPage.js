@@ -16,11 +16,7 @@ import NoWalletMessage from '../../wallet/NoWalletMessage';
 import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import type { ExplorerRow } from '../../../api/ada/lib/storage/database/explorers/tables';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
-import type {
-  GetAllExplorersResponse,
-} from '../../../api/ada/lib/storage/bridge/explorers';
 import type { GetAllExplorersResponse } from '../../../api/ada/lib/storage/bridge/explorers';
-import { trackUriPrompt } from '../../../api/analytics';
 import { Typography } from '@mui/material';
 import { settingsMenuMessages } from '../../../components/settings/menu/SettingsMenu';
 
