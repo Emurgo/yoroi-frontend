@@ -14,7 +14,6 @@ import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
-import type { TxRequests } from '../../stores/toplevel/TransactionsStore';
 import NfTsList from '../../components/wallet/assets/NFTsList';
 import { getImageFromTokenMetadata } from '../../utils/nftMetadata';
 import { once } from 'lodash';
@@ -36,7 +35,7 @@ export default class NFTsPageRevamp extends Component<InjectedOrGenerated<Genera
     const publicDeriver = this.generated.stores.wallets.selected;
     // Guard against potential null values
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(NFTsPageRevamp)}.`);
-    const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result;
+    const spendableBalance = this.generated.stores.transactions.balance;
     const getTokenInfo = genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo);
 
     const nftsList = (() => {
@@ -54,11 +53,7 @@ export default class NFTsPageRevamp extends Component<InjectedOrGenerated<Genera
           return {
             name,
             id: getTokenIdentifierIfExists(token.info) ?? '-',
-            image: getImageFromTokenMetadata(
-              policyId,
-              fullName,
-              token.info.Metadata,
-            ),
+            image: getImageFromTokenMetadata(policyId, fullName, token.info.Metadata),
           };
         });
     })();
@@ -74,12 +69,7 @@ export default class NFTsPageRevamp extends Component<InjectedOrGenerated<Genera
         tokenInfo: TokenInfoMap,
         getDefaultTokenInfo: number => $ReadOnly<TokenRow>,
       |},
-      transactions: {|
-        getBalanceRequest: {|
-          result: ?MultiToken,
-        |},
-        getTxRequests: (PublicDeriver<>) => TxRequests,
-      |},
+      transactions: {| balance: MultiToken | null |},
       wallets: {| selected: null | PublicDeriver<> |},
     |},
   |} {
@@ -100,18 +90,7 @@ export default class NFTsPageRevamp extends Component<InjectedOrGenerated<Genera
           getDefaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfo,
         },
         transactions: {
-          getBalanceRequest: (() => {
-            if (stores.wallets.selected == null)
-              return {
-                result: undefined,
-              };
-            const { requests } = stores.transactions.getTxRequests(stores.wallets.selected);
-
-            return {
-              result: requests.getBalanceRequest.result,
-            };
-          })(),
-          getTxRequests: stores.transactions.getTxRequests,
+          balance: stores.transactions.balance,
         },
       },
     });

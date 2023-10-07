@@ -230,12 +230,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
         publicDeriver: withLevels,
         publicDeriverId: request.publicDeriver.publicDeriverId,
         refreshWallet: () => {
-          // clear cache
-          const txRequests = this.stores.transactions
-                .getTxRequests(request.publicDeriver);
-          for (const txRequest of Object.keys(txRequests.requests)) {
-            txRequests.requests[txRequest].reset();
-          }
+          this.stores.transactions.clearCache(request.publicDeriver);
           // currently in the map the promise for this wallet is this resyncing process,
           // we need to remove it before calling refreshing otherwise it's a deadlock
           runInAction(() => {

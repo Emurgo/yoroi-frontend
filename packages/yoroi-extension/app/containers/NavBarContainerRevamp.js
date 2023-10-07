@@ -1,32 +1,33 @@
 // @flow
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { Node } from 'react';
+import type { InjectedOrGenerated } from '../types/injectedPropsType';
+import type { DelegationRequests } from '../stores/toplevel/DelegationStore';
+import type { ConceptualWalletSettingsCache } from '../stores/toplevel/WalletSettingsStore';
+import type { PublicKeyCache } from '../stores/toplevel/WalletStore';
+import type { IGetPublic } from '../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { TokenRow } from '../api/ada/lib/storage/database/primitives/tables';
+import type { TokenInfoMap } from '../stores/toplevel/TokenInfoStore';
+import type { UnitOfAccountSettingType } from '../types/unitOfAccountType';
+import type { WalletsNavigation } from '../api/localStorage';
 import { computed } from 'mobx';
 import { Component } from 'react';
-import type { Node } from 'react';
+import { intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
-import type { InjectedOrGenerated } from '../types/injectedPropsType';
-import NavBarRevamp from '../components/topbar/NavBarRevamp';
 import { ROUTES } from '../routes-config';
 import { ConceptualWallet } from '../api/ada/lib/storage/models/ConceptualWallet/index';
 import { asGetPublicKey } from '../api/ada/lib/storage/models/PublicDeriver/traits';
 import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
-import type { DelegationRequests } from '../stores/toplevel/DelegationStore';
-import type { ConceptualWalletSettingsCache } from '../stores/toplevel/WalletSettingsStore';
-import type { PublicKeyCache } from '../stores/toplevel/WalletStore';
-import type { TxRequests } from '../stores/toplevel/TransactionsStore';
-import type { IGetPublic } from '../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import type { TokenRow } from '../api/ada/lib/storage/database/primitives/tables';
 import { MultiToken } from '../api/common/lib/MultiToken';
-import type { TokenInfoMap } from '../stores/toplevel/TokenInfoStore';
-import BuySellDialog from '../components/buySell/BuySellDialog';
 import { genLookupOrFail, getTokenName } from '../stores/stateless/tokenHelpers';
-import NavWalletDetailsRevamp from '../components/topbar/NavWalletDetailsRevamp';
-import BuySellAdaButton from '../components/topbar/BuySellAdaButton';
-import WalletListDialog from '../components/topbar/WalletListDialog';
 import { networks, isErgo } from '../api/ada/lib/storage/database/prepackaged/networks';
 import { addressToDisplayString } from '../api/ada/lib/storage/bridge/utils';
 import { getReceiveAddress } from '../stores/stateless/addressStores';
-import type { UnitOfAccountSettingType } from '../types/unitOfAccountType';
-import type { WalletsNavigation } from '../api/localStorage';
+import BuySellDialog from '../components/buySell/BuySellDialog';
+import NavBarRevamp from '../components/topbar/NavBarRevamp';
+import NavWalletDetailsRevamp from '../components/topbar/NavWalletDetailsRevamp';
+import WalletListDialog from '../components/topbar/WalletListDialog';
+import BuySellAdaButton from '../components/topbar/BuySellAdaButton';
 
 export type GeneratedData = typeof NavBarContainerRevamp.prototype.generated;
 
@@ -38,6 +39,10 @@ type Props = {|
 
 @observer
 export default class NavBarContainerRevamp extends Component<Props> {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+    intl: intlShape.isRequired,
+  };
+
   static defaultProps: {| menu: void |} = {
     menu: undefined,
   };
@@ -79,8 +84,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
           ? null
           : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
 
-      const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
-      const balance = txRequests.requests.getBalanceRequest.result || null;
+      const balance = this.generated.stores.transactions.getBalance(publicDeriver);
 
       return (
         <NavWalletDetailsRevamp
@@ -127,16 +131,14 @@ export default class NavBarContainerRevamp extends Component<Props> {
     const wallets = this.generated.stores.wallets.publicDerivers;
     let balance;
     if (publicDeriver) {
-      const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
-      balance = txRequests.requests.getBalanceRequest.result;
+      balance = this.generated.stores.transactions.getBalance(publicDeriver);
     }
 
     const ergoWallets = [];
     const cardanoWallets = [];
 
     wallets.forEach(wallet => {
-      const walletTxRequests = this.generated.stores.transactions.getTxRequests(wallet);
-      const walletBalance = walletTxRequests.requests.getBalanceRequest.result || null;
+      const walletBalance = this.generated.stores.transactions.getBalance(wallet);
       const parent = wallet.getParent();
       const settingsCache = this.generated.stores.walletSettings.getConceptualWalletSettingsCache(
         parent
@@ -308,7 +310,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
         getDefaultTokenInfo: number => $ReadOnly<TokenRow>,
       |},
       transactions: {|
-        getTxRequests: (PublicDeriver<>) => TxRequests,
+        getBalance: (PublicDeriver<>) => MultiToken | null,
       |},
       walletSettings: {|
         getConceptualWalletSettingsCache: ConceptualWallet => ConceptualWalletSettingsCache,
@@ -361,7 +363,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
           getDelegationRequests: stores.delegation.getDelegationRequests,
         },
         transactions: {
-          getTxRequests: stores.transactions.getTxRequests,
+          getBalance: stores.transactions.getBalance,
         },
         coinPriceStore: {
           getCurrentPrice: stores.coinPriceStore.getCurrentPrice,

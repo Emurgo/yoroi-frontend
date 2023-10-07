@@ -1,7 +1,6 @@
 // @flow
 import type { Node, ComponentType } from 'react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import type { TxRequests } from '../../../stores/toplevel/TransactionsStore';
 import { useState } from 'react';
 import { defineMessages, injectIntl } from 'react-intl';
 import { Box, Typography } from '@mui/material';
@@ -87,8 +86,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
     const settingsCache = walletSettings.getConceptualWalletSettingsCache(parent);
     const withPubKey = asGetPublicKey(publicDeriver);
     const plate = withPubKey == null ? null : wallets.getPublicKeyCache(withPubKey).plate;
-    const txRequests: TxRequests = transactions.getTxRequests(publicDeriver);
-    const balance = txRequests.requests.getBalanceRequest.result ?? null;
+    const balance = transactions.getBalance(publicDeriver);
 
     const shouldHideBalance = profileData.shouldHideBalance;
     const updateHideBalance = () => profile.updateHideBalance.trigger();

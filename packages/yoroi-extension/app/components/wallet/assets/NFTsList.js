@@ -2,8 +2,6 @@
 import type { ComponentType, Node } from 'react';
 import { Box, styled } from '@mui/system';
 import {
-  ImageList,
-  ImageListItem,
   InputAdornment,
   Stack,
   Typography,
@@ -11,6 +9,7 @@ import {
   OutlinedInput,
   Button,
   IconButton,
+  Grid,
 } from '@mui/material';
 import { ReactComponent as Search } from '../../../assets/images/assets-page/search.inline.svg';
 import { ReactComponent as DefaultNFT } from '../../../assets/images/default-nft.inline.svg';
@@ -26,6 +25,7 @@ import { ROUTES } from '../../../routes-config';
 import { useState, useEffect, useCallback } from 'react';
 import globalMessages from '../../../i18n/global-messages';
 import { urlResolveIpfs } from '../../../coreUtils';
+import classNames from 'classnames';
 import { debounce, } from 'lodash';
 import { ampli } from '../../../../ampli/index';
 
@@ -102,8 +102,9 @@ function NfTsList({ list, intl }: Props & Intl): Node {
       sx={{
         height: 'content',
         width: '100%',
-        bgcolor: 'var(--yoroi-palette-common-white)',
+        bgcolor: 'common.white',
         borderRadius: '8px',
+        p: '24px',
       }}
     >
       <Box
@@ -111,39 +112,23 @@ function NfTsList({ list, intl }: Props & Intl): Node {
         alignItems="center"
         justifyContent="space-between"
         marginBottom="30px"
-        sx={{
-          padding: '16px 24px',
-          borderBottom: '1px solid var(--yoroi-palette-gray-200)',
-        }}
+        paddingBottom="16px"
       >
-        <Typography variant="h5" color="var(--yoroi-palette-gray-900)">
+        <Typography variant="h5" color="common.black" fontWeight={500} fontSize="18px">
           {list.length === 0
             ? intl.formatMessage(globalMessages.sidebarNfts)
             : intl.formatMessage(messages.nftsCount, { number: list.length })}
         </Typography>
         <Box display="flex" alignItems="center">
           <Stack direction="row" spacing={1} marginRight="30px">
-            {listColumnViews.map(Column => (
+            {listColumnViews.map(({ count, Icon, imageDims }) => (
               <Button
-                key={Column.count}
-                onClick={() => setColumnsAndTrack(Column)}
-                sx={{
-                  width: '40px',
-                  height: '40px',
-                  minHeight: '40px',
-                  minWidth: '40px',
-                  padding: '10px',
-                  backgroundColor:
-                    Column.count === columns.count ? 'var(--yoroi-palette-gray-200)' : 'none',
-                  '&:hover': {
-                    backgroundColor:
-                      Column.count !== columns.count
-                        ? 'var(--yoroi-palette-gray-50)'
-                        : 'var(--yoroi-palette-gray-200)',
-                  },
-                }}
+                key={count}
+                onClick={() => setColumnsAndTrack({ count, Icon, imageDims })}
+                className={classNames(count === columns.count && 'active')}
+                variant="segmented"
               >
-                <Column.Icon />
+                <Icon />
               </Button>
             ))}
           </Stack>
@@ -185,24 +170,25 @@ function NfTsList({ list, intl }: Props & Intl): Node {
           </Typography>
         </Stack>
       ) : (
-        <ImageList sx={{ width: '100%', padding: '0px 24px 30px' }} cols={columns.count} gap={24}>
+        <Grid container columns={columns.count} spacing="24px">
           {nftList.map(nft => {
             return (
-              <SLink
-                key={nft.id}
-                to={ROUTES.NFTS.DETAILS.replace(':nftId', nft.id)}
-                onClick={() => { ampli.nftGalleryDetailsPageViewed(); }}
+              <Grid
+                item
+                xs={1}
+                sx={{
+                  aspectRatio: '1/1',
+                }}
               >
-                <NftCardImage
-                  ipfsUrl={nft.image}
-                  name={nft.name}
-                  width={columns.imageDims}
-                  height={columns.imageDims}
-                />
-              </SLink>
+                <SLink key={nft.id} to={ROUTES.NFTS.DETAILS.replace(':nftId', nft.id)}
+                 onClick={() => { ampli.nftGalleryDetailsPageViewed(); }}
+                >
+                  <NftCardImage ipfsUrl={nft.image} name={nft.name} />
+                </SLink>
+              </Grid>
             );
           })}
-        </ImageList>
+        </Grid>
       )}
     </Box>
   );
@@ -264,8 +250,9 @@ export function NftImage({
 
   if (loading) return <Skeleton variant="rectangular" animation="wave" sx={{ width, height }} />;
   return (
-    <img
-      style={{
+    <Box
+      component="img"
+      sx={{
         width,
         height,
         minWidth: width,
@@ -283,31 +270,22 @@ export function NftImage({
   );
 }
 
-function NftCardImage({
-  ipfsUrl,
-  name,
-  width,
-  height,
-}: {|
-  ipfsUrl: string | null,
-  name: string,
-  width: string,
-  height: string,
-|}) {
+function NftCardImage({ ipfsUrl, name }: {| ipfsUrl: string | null, name: string |}) {
   return (
-    <ImageListItem sx={{ height: '100%', width }}>
-      <Box sx={{ width, height, overflow: 'hidden', borderRadius: '4px' }}>
-        <NftImage imageUrl={ipfsUrl} name={name} width={width} height={height} />
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ borderRadius: '4px', overflow: 'hidden', flex: '1 1 auto' }}>
+        <NftImage imageUrl={ipfsUrl} name={name} width="100%" height="100%" />
       </Box>
-      <Typography
-        mt="16px"
-        sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-        minHeight="48px"
-        color="var(--yoroi-palette-gray-900)"
-      >
-        {name}
-      </Typography>
-    </ImageListItem>
+      <Box>
+        <Typography
+          mt="16px"
+          sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+          color="grayscale.900"
+        >
+          {name}
+        </Typography>
+      </Box>
+    </Box>
   );
 }
 

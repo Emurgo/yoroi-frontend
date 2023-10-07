@@ -51,6 +51,14 @@ const AccordionSummary = styled((props /* AccordionSummaryProps */) => (
   <MuiAccordionSummary expandIcon={<ExpandMoreIcon />} {...props} />
 ))(() => ({
   padding: 0,
+  alignItems: 'flex-start',
+  '.MuiAccordionSummary-expandIconWrapper': {
+    width: '24px',
+    height: '24px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   '.MuiAccordionSummary-content': {
     margin: 0,
   },
@@ -85,22 +93,21 @@ export const RewardHistoryItem = ({
   poolAvatar,
   historyList,
 }: RewardHistoryItemProps): Node => {
-  const avatarGenerated = getAvatarFromPoolId(poolId);
+  const avatarGenerated = getAvatarFromPoolId(poolId || poolName);
 
   return (
     <Accordion>
-      <AccordionSummary aria-controls={poolId + '-content'} id={poolId + '-header'}>
+      <AccordionSummary aria-controls={poolId + '-content'} id={poolId || poolName + '-header'}>
         <Box>
           <Box display="block">
-            <Typography color="var(--yoroi-palette-gray-600)">Stake Pool</Typography>
+            <Typography color="grayscale.600">Stake Pool</Typography>
           </Box>
           <Box display="flex">
             <AvatarWrapper>
-              {poolAvatar != null ? (
-                <AvatarImg src={poolAvatar} alt="stake pool logo" />
-              ) : (
-                <AvatarImg src={avatarGenerated} alt="stake pool logo" />
-              )}
+              <AvatarImg
+                src={poolAvatar != null ? poolAvatar : avatarGenerated}
+                alt="stake pool logo"
+              />
             </AvatarWrapper>
             <Typography>{poolName}</Typography>
           </Box>

@@ -7,12 +7,13 @@ type Props = {|
   label: string,
   imageSrc: string,
   onClick(): void,
+  id: string,
 |};
 
 export default function AddWalletCard(props: Props): Node {
-  const { label, imageSrc, onClick } = props;
+  const { label, imageSrc, onClick, id } = props;
   return (
-    <button onClick={onClick} className={styles.component} type="button">
+    <button onClick={onClick} className={styles.component} id={id} type="button">
       <Box>
         <img src={imageSrc} alt={label} />
       </Box>

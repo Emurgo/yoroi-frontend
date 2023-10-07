@@ -38,16 +38,18 @@ function SelectWalletTypeStep(props: Props & Intl): Node {
   return (
     <Stack alignItems="center" justifyContent="center">
       <Stack direction="column" alignItems="center" justifyContent="center" maxWidth="648px">
-        <Box className={styles.container}>
+        <Box className={styles.container} id="selectWalletTypeStepBox">
           <AddWalletCard
             onClick={() => onNext({ type: 'cip1852', extra: undefined, length: 15 })}
             imageSrc={fifteenImg}
             label={intl.formatMessage(messages.fifteenWords)}
+            id="fifteenWordsButton"
           />
           <AddWalletCard
             onClick={() => onNext({ type: 'cip1852', extra: undefined, length: 24 })}
             imageSrc={twentyfourImg}
             label={intl.formatMessage(messages.twentyfourWords)}
+            id="twentyfourWordsButton"
           />
         </Box>
         <Box mt="74px">

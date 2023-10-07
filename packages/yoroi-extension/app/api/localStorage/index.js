@@ -17,6 +17,9 @@ import type { ComplexityLevelType } from '../../types/complexityLevelType';
 import type { WhitelistEntry } from '../../../chrome/extension/connector/types';
 import type { CatalystRoundInfoResponse } from '../ada/lib/state-fetch/types'
 
+declare var chrome;
+declare var browser;
+
 const networkForLocalStorage = String(environment.getNetworkName());
 const storageKeys = {
   USER_LOCALE: networkForLocalStorage + '-USER-LOCALE',
@@ -382,21 +385,25 @@ export type PersistedSubmittedTransaction = {|
   |}>,
 |};
 
-export function persistSubmittedTransactions(
+const STORAGE_API =  window.browser?.storage.local // firefox mv2
+  || window.chrome?.storage.local; // chrome mv2 and mv3
+
+export async function persistSubmittedTransactions(
   submittedTransactions: any,
-): void {
-  localStorage.setItem(
-    storageKeys.SUBMITTED_TRANSACTIONS,
-    JSON.stringify(submittedTransactions)
-  );
+): Promise<void> {
+  await STORAGE_API.set({
+    [storageKeys.SUBMITTED_TRANSACTIONS]: JSON.stringify(submittedTransactions)
+  });
 }
 
-export function loadSubmittedTransactions(): any {
-  const dataStr = localStorage.getItem(storageKeys.SUBMITTED_TRANSACTIONS);
-  if (dataStr == null) {
-    return null;
+export async function loadSubmittedTransactions(): any {
+  const stored = await new Promise(
+    resolve => STORAGE_API.get(storageKeys.SUBMITTED_TRANSACTIONS, resolve)
+  );
+  if (stored == null || stored[storageKeys.SUBMITTED_TRANSACTIONS] == null) {
+    return [];
   }
-  return JSON.parse(dataStr);
+  return JSON.parse(stored[storageKeys.SUBMITTED_TRANSACTIONS]);
 }
 
 export async function loadCatalystRoundInfo(): Promise<?CatalystRoundInfoResponse> {

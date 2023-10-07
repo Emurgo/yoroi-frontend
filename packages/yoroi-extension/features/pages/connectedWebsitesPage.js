@@ -15,7 +15,7 @@ type WalletWithConnectedWebsite = {|
 const walletComponent: LocatorObject = { locator: '.WalletRow_component', method: 'css' };
 const walletNameComponent: LocatorObject = { locator: '.WalletRow_name', method: 'css' };
 const walletRowBalanceField: LocatorObject = { locator: '.WalletRow_balance', method: 'css' };
-const websiteTitleField: LocatorObject = { locator: '.WalletRow_url', method: 'css' };
+const websiteTitleField: LocatorObject = { locator: 'WalletRow_url', method: 'id' };
 const connectionStatusField: LocatorObject = { locator: '.WalletRow_status', method: 'css' };
 const disconnectButtonComponent: LocatorObject = { locator: '.WalletRow_delete', method: 'css' };
 const disconnectButton: LocatorObject = {
@@ -53,7 +53,9 @@ const getWebsiteTitle = async (walletRowElement: WebElement): Promise<string> =>
   const websiteTitleComponent = await walletRowElement.findElement(
     getMethod(websiteTitleField.method)(websiteTitleField.locator)
   );
-  return await websiteTitleComponent.getText();
+  const websiteText = await websiteTitleComponent.getText();
+
+  return websiteText.split('\n')[0];
 };
 
 const getConnectionStatus = async (walletRowElement: WebElement): Promise<string> => {

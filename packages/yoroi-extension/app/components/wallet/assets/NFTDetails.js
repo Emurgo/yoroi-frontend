@@ -2,7 +2,16 @@
 import { useState } from 'react';
 import type { Node, ComponentType } from 'react';
 import { Box, styled } from '@mui/system';
-import { Link as LinkMui, Typography, Stack, Tab, Modal, Button, IconButton } from '@mui/material';
+import {
+  Link as LinkMui,
+  Typography,
+  Stack,
+  Tab,
+  Modal,
+  Button,
+  IconButton,
+  Grid,
+} from '@mui/material';
 import { TabContext, TabPanel, TabList } from '@mui/lab';
 import globalMessages from '../../../i18n/global-messages';
 import { injectIntl, defineMessages } from 'react-intl';
@@ -135,7 +144,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
   if (nftInfo == null) return null;
 
   return (
-    <Box sx={{ overflowX: 'hidden' }}>
+    <Box sx={{ overflowY: 'scroll', height: '100%', p: '24px' }}>
       <Box sx={{ display: 'inline-block' }}>
         <Typography
           as={Link}
@@ -143,7 +152,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
           to={ROUTES.NFTS.ROOT}
           variant="h5"
           sx={{
-            color: 'var(--yoroi-palette-gray-900)',
+            color: 'grayscale.900',
             textDecoration: 'none',
             marginTop: '5px',
             textTransform: 'capitalize',
@@ -158,47 +167,67 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
           </Box>
         </Typography>
       </Box>
-      <Stack
-        direction="row"
+      <Grid
+        container
+        columns={10}
         sx={{
           margin: '0 auto',
           minHeight: '520px',
-          marginY: '21px',
-          backgroundColor: 'var(--yoroi-palette-common-white)',
+          mb: '21px',
+          backgroundColor: 'common.white',
           borderRadius: '8px',
-          overflowX: 'auto',
+          height: '100%',
         }}
       >
-        <ImageItem
-          sx={{
-            cursor: nftInfo.image !== null ? 'zoom-in' : 'auto',
-            padding: below1400 ? '10px' : '24px',
-          }}
-          onClick={() => nftInfo.image !== null && setOpenAndTrack()}
-        >
-          <NftImage
-            imageUrl={nftInfo.image}
-            name={nftInfo.name || '-'}
-            width="532px"
-            height="510px"
-          />
-        </ImageItem>
-        <Box flex={1} sx={{ paddingTop: below1400 ? '10px' : '24px', paddingBottom: '22px' }}>
-          <Stack
-            justifyContent="space-between"
-            flexDirection="row"
+        <Grid item xs={4}>
+          <ImageItem
             sx={{
-              paddingBottom: '22px',
-              px: '24px',
+              cursor: nftInfo.image !== null ? 'zoom-in' : 'auto',
+              paddingY: '24px',
+              display: 'block',
+              img: {
+                objectFit: 'unset',
+              },
             }}
+            onClick={() => nftInfo.image !== null && setOpenAndTrack()}
           >
-            <TruncatedText
-              variant="h2"
-              sx={{ width: below1400 ? '200px' : '400px' }}
-              color="var(--yoroi-palette-gray-900)"
+            <NftImage
+              imageUrl={nftInfo.image}
+              name={nftInfo.name || '-'}
+              width="100%"
+              height="auto"
+            />
+          </ImageItem>
+        </Grid>
+
+        <Grid
+          item
+          xs={6}
+          sx={{
+            paddingTop: '24px',
+            paddingBottom: '22px',
+          }}
+        >
+          <Box>
+            <Stack
+              justifyContent="space-between"
+              flexDirection="row"
+              sx={{
+                paddingBottom: '22px',
+                px: '24px',
+                height: '100%',
+              }}
             >
-              {nftInfo.name}
-            </TruncatedText>
+              <Box>
+                <TruncatedText
+                  variant="h2"
+                  fontWeight={500}
+                  sx={{ width: below1400 ? '200px' : '400px' }}
+                  color="common.black"
+                >
+                  {nftInfo.name}
+                </TruncatedText>
+              </Box>
 
             <Stack direction="row" spacing={1}>
               <Link
@@ -234,6 +263,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
               </Link>
             </Stack>
           </Stack>
+          </Box>
           <TabContext value={activeTab}>
             <Box>
               <TabList
@@ -243,6 +273,10 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                   marginX: '24px',
                   borderBottom: 1,
                   borderColor: 'divider',
+                  '.MuiTab-root': {
+                    paddingX: '0px',
+                    mr: '24px',
+                  },
                 }}
                 onChange={(_, newValue) => setActiveTabAndTrack(newValue)}
                 aria-label="NFTs tabs"
@@ -252,14 +286,13 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                     key={id}
                     sx={{
                       minWidth: 'unset',
-                      paddingX: '0px',
                       width: 'content',
-                      marginRight: id === tabs[0].id && '24px',
                       textTransform: 'none',
                       fontWeight: 500,
                     }}
                     label={intl.formatMessage(label)}
                     value={id}
+                    disableRipple
                   />
                 ))}
               </TabList>
@@ -328,23 +361,23 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                 boxShadow: 'none',
                 bgcolor: 'transparent',
                 height: '100%',
-                maxHeight: '400px',
                 overflow: 'auto',
-                width: '600px',
               }}
               value={tabs[1].id}
             >
               {nftInfo.metadata && (
                 <Button
                   onClick={onCopyMetadata}
-                  variant="text"
                   color="inherit"
-                  sx={{ ml: '-8px', mb: '24px' }}
-                  startIcon={isCopied ? <IconCopied /> : <IconCopy />}
+                  sx={{
+                    ml: '-8px',
+                    mb: '24px',
+                    fontSize: '14px',
+                    color: 'grayscale.900',
+                  }}
+                  endIcon={isCopied ? <IconCopied /> : <IconCopy />}
                 >
-                  <Typography variant="button2" fontWeight="500">
-                    {intl.formatMessage(messages.copyMetadata)}
-                  </Typography>
+                  {intl.formatMessage(messages.copyMetadata)}
                 </Button>
               )}
               <Typography component="pre" variant="body3" lineHeight="22px" fontFamily="monospace">
@@ -354,8 +387,8 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
               </Typography>
             </TabPanel>
           </TabContext>
-        </Box>
-      </Stack>
+        </Grid>
+      </Grid>
       <Modal
         onClose={onClose}
         open={open}
@@ -433,10 +466,12 @@ export function CopyAddress({ text, children }: {| text: string, children: Node 
   };
 
   return (
-    <Stack direction="row" alignItems="center" justifyContent="space-between">
-      <TruncatedText sx={{ width: '90%' }}>{children}</TruncatedText>
+    <Stack direction="row" alignItems="center">
+      <TruncatedText>{children}</TruncatedText>
 
-      <IconButton onClick={onCopy}>{isCopied ? <IconCopied /> : <IconCopy />}</IconButton>
+      <IconButton sx={{ ml: '4px' }} onClick={onCopy}>
+        {isCopied ? <IconCopied /> : <IconCopy />}
+      </IconButton>
     </Stack>
   );
 }

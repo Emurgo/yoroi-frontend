@@ -34,6 +34,7 @@ function StepController(props: Props): Node {
             onClick={onClick}
             disabled={disabled}
             style={{ width: '144px', height: '48px' }}
+            id={type+'Button'}
           >
             {label}
           </Button>
