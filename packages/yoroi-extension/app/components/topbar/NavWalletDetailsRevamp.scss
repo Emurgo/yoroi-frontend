@@ -74,7 +74,7 @@
   justify-content: center;
   align-items: flex-start;
   text-align: left;
-  font-size: 16px;
+  font-size: 12px;
   line-height: 22px;
   width: 100%;
   margin-left: 24px;
@@ -102,6 +102,10 @@
     justify-content: flex-end;
 
     &:first-child {
+      font-size: 14px;
+    }
+
+    &:nth-child(1) {
       font-size: 14px;
     }
 

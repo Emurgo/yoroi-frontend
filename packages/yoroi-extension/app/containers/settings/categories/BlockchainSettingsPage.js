@@ -11,67 +11,69 @@ import registerProtocols from '../../../uri-protocols';
 import environment from '../../../environment';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import LocalizableError from '../../../i18n/LocalizableError';
-import {
-  PublicDeriver,
-} from '../../../api/ada/lib/storage/models/PublicDeriver/index';
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import NoWalletMessage from '../../wallet/NoWalletMessage';
 import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
-import type {
-  ExplorerRow,
-} from '../../../api/ada/lib/storage/database/explorers/tables';
+import type { ExplorerRow } from '../../../api/ada/lib/storage/database/explorers/tables';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
-import type {
-  GetAllExplorersResponse,
-} from '../../../api/ada/lib/storage/bridge/explorers';
+import type { GetAllExplorersResponse } from '../../../api/ada/lib/storage/bridge/explorers';
 import { trackUriPrompt } from '../../../api/analytics';
+import { Typography } from '@mui/material';
+import { settingsMenuMessages } from '../../../components/settings/menu/SettingsMenu';
 
 type GeneratedData = typeof BlockchainSettingsPage.prototype.generated;
 
 @observer
 export default class BlockchainSettingsPage extends Component<InjectedOrGenerated<GeneratedData>> {
-
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   render(): Node {
     const walletsStore = this.generated.stores.wallets;
+    const profileStore = this.generated.stores.profile;
     if (walletsStore.selected == null) {
-      return (<NoWalletMessage />);
+      return <NoWalletMessage />;
     }
     const networkInfo = walletsStore.selected.getParent().getNetworkInfo();
 
     const { stores } = this.generated;
+    const { intl } = this.context;
 
     const isSubmittingExplorer = stores.explorers.setSelectedExplorerRequest.isExecuting;
 
-    const uriSettings = (
-      isCardanoHaskell(networkInfo) &&
-      this.generated.canRegisterProtocol()
-    )
-      ? (
+    const uriSettings =
+      isCardanoHaskell(networkInfo) && this.generated.canRegisterProtocol() ? (
         <UriSettingsBlock
-          registerUriScheme={
-            () => {
-              registerProtocols();
-              trackUriPrompt('allow');
-            }
-          }
+          registerUriScheme={() => {
+            registerProtocols();
+            trackUriPrompt('allow');
+          }}
           isFirefox={environment.userAgentInfo.isFirefox()}
         />
-      )
-      : null;
+      ) : null;
 
     return (
       <>
+        {profileStore.isRevampTheme && (
+          <Typography variant="h5" fontWeight={500} mb="24px">
+            {intl.formatMessage(settingsMenuMessages.blockchain)}
+          </Typography>
+        )}
         <ExplorerSettings
           onSelectExplorer={this.generated.actions.explorers.updateSelectedExplorer.trigger}
           isSubmitting={isSubmittingExplorer}
-          explorers={this.generated.stores.explorers.allExplorers
-            .get(networkInfo.NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
+          explorers={
+            this.generated.stores.explorers.allExplorers.get(networkInfo.NetworkId) ??
+            (() => {
+              throw new Error('No explorer for wallet network');
+            })()
           }
-          selectedExplorer={stores.explorers.selectedExplorer
-            .get(networkInfo.NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
+          selectedExplorer={
+            stores.explorers.selectedExplorer.get(networkInfo.NetworkId) ??
+            (() => {
+              throw new Error('No explorer for wallet network');
+            })()
           }
           error={stores.explorers.setSelectedExplorerRequest.error}
         />
@@ -86,7 +88,7 @@ export default class BlockchainSettingsPage extends Component<InjectedOrGenerate
         updateSelectedExplorer: {|
           trigger: (params: {|
             explorer: $ReadOnly<ExplorerRow>,
-          |}) => Promise<void>
+          |}) => Promise<void>,
         |},
       |},
     |},
@@ -96,15 +98,18 @@ export default class BlockchainSettingsPage extends Component<InjectedOrGenerate
         selectedExplorer: Map<number, SelectedExplorer>,
         setSelectedExplorerRequest: {|
           error: ?LocalizableError,
-          isExecuting: boolean
+          isExecuting: boolean,
         |},
         allExplorers: GetAllExplorersResponse,
       |},
       wallets: {|
-        selected: null | PublicDeriver<>
-      |}
-    |}
-    |} {
+        selected: null | PublicDeriver<>,
+      |},
+      profile: {|
+        isRevampTheme: boolean,
+      |},
+    |},
+  |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -124,6 +129,9 @@ export default class BlockchainSettingsPage extends Component<InjectedOrGenerate
         },
         wallets: {
           selected: stores.wallets.selected,
+        },
+        profile: {
+          isRevampTheme: stores.profile.isRevampTheme,
         },
       },
       actions: {

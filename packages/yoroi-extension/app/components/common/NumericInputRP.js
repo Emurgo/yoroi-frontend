@@ -13,7 +13,6 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import TextField from './TextField';
 import { Box } from '@mui/system';
 import { Typography } from '@mui/material';
-import styles from './AmountInput.scss';
 
 type NumericInputValue = null | number | string | BigNumber;
 
@@ -529,7 +528,23 @@ class AmountInputRevamp extends Component<AmountInputProps> {
     const { intl } = this.context;
 
     return (
-      <Box className={styles.component} sx={{ '& input::placeholder': { color: 'grayscale.400' } }}>
+      <Box
+        sx={{
+          width: '100%',
+          '& > div': {
+            padding: '0px',
+            margin: '0px',
+          },
+          '& input': {
+            border: 'none',
+            outline: 'none',
+            width: '100%',
+            fontSize: '24px',
+            lineHeight: '32px',
+          },
+          '& input::placeholder': { color: 'grayscale.600' },
+        }}
+      >
         <NumericInputRP {...this.props} />
       </Box>
     );

@@ -1,11 +1,10 @@
 // @flow
 import type { Node, ComponentType } from 'react';
 import { Box } from '@mui/system';
-import { Avatar, Link as LinkMui, Grid, Typography } from '@mui/material';
+import { Link as LinkMui, Typography } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
 import { defineMessages, injectIntl } from 'react-intl';
-import { ReactComponent as NoAssetLogo } from '../../../assets/images/assets-page/asset-no.inline.svg';
-import { ReactComponent as LinkSvg } from '../../../assets/images/link.inline.svg';
+import { ReactComponent as ArrowLeft } from '../../../assets/images/assets-page/back-arrow.inline.svg';
 import moment from 'moment';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { assetsMessage } from './AssetsList';
@@ -30,7 +29,6 @@ type Props = {|
     amount: string,
     description: string | null,
   |},
-  tokensCount: number,
   network: $ReadOnly<NetworkRow>,
 |};
 
@@ -67,6 +65,10 @@ export const tokenMessages: Object = defineMessages({
     id: 'wallet.nftGallary.details.description',
     defaultMessage: '!!!Description',
   },
+  back: {
+    id: 'wallet.assets.details.back',
+    defaultMessage: '!!!Back to assets',
+  },
 });
 
 export const getNetworkUrl: ($ReadOnly<NetworkRow>) => string | void = network => {
@@ -79,141 +81,141 @@ export const getNetworkUrl: ($ReadOnly<NetworkRow>) => string | void = network =
   return 'https://testnet.cardanoscan.io/token';
 };
 
-function TokenDetails({ tokenInfo, tokensCount, network, intl }: Props & Intl): Node {
+function TokenDetails({ tokenInfo, network, intl }: Props & Intl): Node {
   if (tokenInfo == null) return null;
   const networkUrl = getNetworkUrl(network);
 
   return (
     <Box>
-      <Box
-        borderBottom="1px solid var(--yoroi-palette-gray-200)"
-        paddingBottom="16px"
-        backgroundColor="var(--yoroi-palette-common-white)"
-      >
-        <Typography variant="h5" color="var(--yoroi-palette-gray-600)">
-          {/* eslint-disable-next-line react/no-unescaped-entities */}
-          <Typography
-            as={Link}
-            replace
-            to={ROUTES.ASSETS.ROOT}
-            variant="h5"
-            color="var(--yoroi-palette-common-black)"
-            fontWeight={500}
-            fontSize="18px"
-            sx={{ textDecoration: 'none' }}
+      <Box backgroundColor="common.white">
+        <Typography
+          as={Link}
+          replace
+          to={ROUTES.ASSETS.ROOT}
+          variant="h5"
+          color="grayscale.900"
+          fontWeight={500}
+          fontSize="18px"
+          sx={{
+            textDecoration: 'none',
+            display: 'flex',
+            gap: '10px',
+            alignItems: 'center',
+            lineHeight: '27px',
+            textTransform: 'uppercase',
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              mb: '1px',
+            }}
           >
-            {intl.formatMessage(globalMessages.tokens)}: {tokensCount}
-          </Typography>
-          <Typography as="span" variant="h5" color="var(--yoroi-palette-common-black)" ml="4px">
-            / {tokenInfo.name}
-          </Typography>
+            <ArrowLeft />
+          </Box>
+          {intl.formatMessage(tokenMessages.back)}
         </Typography>
       </Box>
-      <Box sx={{ maxWidth: '600px', margin: '0 auto' }}>
-        <Box
-          display="flex"
-          alignItems="center"
-          borderBottom="1px solid var(--yoroi-palette-gray-50)"
-          py="20px"
-        >
-          <Avatar variant="round" sx={{ background: 'white', marginRight: '18px' }}>
-            <NoAssetLogo />
-          </Avatar>
-          <Typography variant="h5" color="var(--yoroi-palette-gray-900)">
+      <Box
+        sx={{
+          maxWidth: '600px',
+          margin: '0 auto',
+          display: 'flex',
+          width: '100%',
+          flexDirection: 'column',
+          gap: '24px',
+          height: '100%',
+        }}
+      >
+        <Box display="flex" alignItems="center" py="20px">
+          <Typography variant="h2" fontWeight={500} color="common.black">
             {tokenInfo.name}
           </Typography>
         </Box>
-        <Box borderBottom="1px solid var(--yoroi-palette-gray-50)" py="32px">
-          <Typography variant="body1" color="var(--yoroi-palette-gray-600)">
+        <Box>
+          <Typography variant="body1" color="grayscale.600">
             {intl.formatMessage(assetsMessage.quantity)}
           </Typography>
-          <Typography variant="h3" fontWeight="500" color="var(--yoroi-palette-gray-900)" mt="6px">
+          <Typography variant="body1" color="grayscale.900" mt="6px">
             {tokenInfo.amount}
           </Typography>
         </Box>
-        <Box
-          display="flex"
-          alignItems="center"
-          mt="26px"
-          py="20px"
-          borderBottom="1px solid var(--yoroi-palette-gray-50)"
-        >
-          <Typography variant="h5" color="var(--yoroi-palette-gray-900)">
-            {intl.formatMessage(tokenMessages.details)}
-          </Typography>
-        </Box>
-        <Grid
-          container
-          paddingTop="32px"
-          paddingBottom="24px"
-          borderBottom="1px solid var(--yoroi-palette-gray-50)"
-        >
-          <Grid item xs={4}>
-            <LabelWithValue
-              label={intl.formatMessage(tokenMessages.ticker)}
-              value={tokenInfo.ticker}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            {/* TODO: replace with created date */}
-            <LabelWithValue
-              label={intl.formatMessage(tokenMessages.created)}
-              value={tokenInfo.lastUpdatedAt ? moment(tokenInfo.lastUpdatedAt).format('LL') : '-'}
-            />
-          </Grid>
-          {isCardanoHaskell(network) && (
-            <Grid item xs={4}>
-              <LabelWithValue
-                label={
-                  <>
-                    <Typography as="span" display="flex">
-                      {intl.formatMessage(tokenMessages.detailsOn)}
-                      <Typography as="span" ml="4px">
-                        <LinkSvg />
-                      </Typography>
-                    </Typography>
-                  </>
-                }
-                value={
-                  <LinkMui
-                    target="_blank"
-                    href={
-                      networkUrl != null
-                        ? `${networkUrl}/${tokenInfo.policyId}${tokenInfo.assetName}`
-                        : ''
-                    }
-                    disabled={networkUrl === null}
-                    rel="noopener noreferrer"
-                    sx={{ textDecoration: 'none' }}
-                  >
-                    {intl.formatMessage(globalMessages.cardanoscan)}
-                  </LinkMui>
-                }
-              />
-            </Grid>
-          )}
-        </Grid>
-        <Box marginTop="22px">
-          <LabelWithValue
-            label={intl.formatMessage(globalMessages.fingerprint)}
-            value={<CopyAddress text={tokenInfo.policyId}>{tokenInfo.policyId}</CopyAddress>}
-          />
-        </Box>
-        <Box marginTop="22px">
-          <LabelWithValue
-            label={intl.formatMessage(tokenMessages.policyId)}
-            value={<CopyAddress text={tokenInfo.policyId}>{tokenInfo.policyId}</CopyAddress>}
-          />
-        </Box>
 
         {tokenInfo.description && (
-          <Box marginTop="22px">
+          <Box>
             <LabelWithValue
-              label={intl.formatMessage(tokenMessages.description)}
+              label={intl.formatMessage(tokenMessages.details)}
               value={tokenInfo.description}
             />
           </Box>
         )}
+
+        <LabelWithValue label={intl.formatMessage(tokenMessages.ticker)} value={tokenInfo.ticker} />
+
+        <LabelWithValue
+          label={intl.formatMessage(tokenMessages.created)}
+          value={tokenInfo.lastUpdatedAt ? moment(tokenInfo.lastUpdatedAt).format('LL') : '-'}
+        />
+
+        <LabelWithValue
+          label={intl.formatMessage(globalMessages.fingerprint)}
+          value={
+            <Box
+              sx={{
+                '& > div': {
+                  justifyContent: 'flex-start',
+                  gap: '5px',
+                  '& > p': {
+                    width: 'unset',
+                  },
+                },
+              }}
+            >
+              <CopyAddress text={tokenInfo.id}>{tokenInfo.id}</CopyAddress>
+            </Box>
+          }
+        />
+
+        <LabelWithValue
+          label={intl.formatMessage(tokenMessages.policyId)}
+          value={
+            <Box
+              sx={{
+                '& > div': {
+                  justifyContent: 'flex-start',
+                  gap: '5px',
+                  '& > p': {
+                    width: 'unset',
+                  },
+                },
+              }}
+            >
+              <CopyAddress text={tokenInfo.policyId}>{tokenInfo.policyId}</CopyAddress>
+            </Box>
+          }
+        />
+
+        <Box>
+          <Typography variant="body1" color="grayscale.600">
+            {intl.formatMessage(tokenMessages.detailsOn)}
+          </Typography>
+          <Typography variant="body1" color="grayscale.900" mt="6px">
+            <LinkMui
+              target="_blank"
+              href={
+                networkUrl != null
+                  ? `${networkUrl}/${tokenInfo.policyId}${tokenInfo.assetName}`
+                  : ''
+              }
+              disabled={networkUrl === null}
+              rel="noopener noreferrer"
+              sx={{ textDecoration: 'none' }}
+            >
+              {intl.formatMessage(globalMessages.cardanoscan)}
+            </LinkMui>
+          </Typography>
+        </Box>
       </Box>
     </Box>
   );
@@ -224,8 +226,8 @@ export default (injectIntl(TokenDetails): ComponentType<Props>);
 function LabelWithValue({ label, value }: {| label: string | Node, value: string | Node |}): Node {
   return (
     <Box>
-      <Typography color="var(--yoroi-palette-gray-600)">{label}</Typography>
-      <Typography color="var(--yoroi-palette-gray-900)">{value}</Typography>
+      <Typography color="grayscale.600">{label}</Typography>
+      <Typography color="grayscale.900">{value}</Typography>
     </Box>
   );
 }

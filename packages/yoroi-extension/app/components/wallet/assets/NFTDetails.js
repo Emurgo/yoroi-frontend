@@ -133,7 +133,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
   if (nftInfo == null) return null;
 
   return (
-    <Box sx={{ height: '101vh' }}>
+    <Box sx={{ overflowY: 'scroll', height: '100%', p: '24px' }}>
       <Box sx={{ display: 'inline-block' }}>
         <Typography
           as={Link}
@@ -141,7 +141,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
           to={ROUTES.NFTS.ROOT}
           variant="h5"
           sx={{
-            color: 'var(--yoroi-palette-gray-900)',
+            color: 'grayscale.900',
             textDecoration: 'none',
             marginTop: '5px',
             textTransform: 'capitalize',
@@ -210,8 +210,9 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
               <Box>
                 <TruncatedText
                   variant="h2"
+                  fontWeight={500}
                   sx={{ width: below1400 ? '200px' : '400px' }}
-                  color="var(--yoroi-palette-gray-900)"
+                  color="common.black"
                 >
                   {nftInfo.name}
                 </TruncatedText>
@@ -244,7 +245,8 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                   borderBottom: 1,
                   borderColor: 'divider',
                   '.MuiTab-root': {
-                    paddingLeft: '0px',
+                    paddingX: '0px',
+                    mr: '24px',
                   },
                 }}
                 onChange={(_, newValue) => setActiveTab(newValue)}
@@ -255,18 +257,13 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                     key={id}
                     sx={{
                       minWidth: 'unset',
-                      paddingX: '0px',
                       width: 'content',
-                      marginRight: id === tabs[0].id && '24px',
                       textTransform: 'none',
                       fontWeight: 500,
-                      paddingLeft: '0px',
-                      '.MuiTab-root': {
-                        paddingLeft: '0px',
-                      },
                     }}
                     label={intl.formatMessage(label)}
                     value={id}
+                    disableRipple
                   />
                 ))}
               </TabList>
@@ -342,14 +339,16 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
               {nftInfo.metadata && (
                 <Button
                   onClick={onCopyMetadata}
-                  variant="text"
                   color="inherit"
-                  sx={{ ml: '-8px', mb: '24px' }}
-                  startIcon={isCopied ? <IconCopied /> : <IconCopy />}
+                  sx={{
+                    ml: '-8px',
+                    mb: '24px',
+                    fontSize: '14px',
+                    color: 'grayscale.900',
+                  }}
+                  endIcon={isCopied ? <IconCopied /> : <IconCopy />}
                 >
-                  <Typography variant="button2" fontWeight="500">
-                    {intl.formatMessage(messages.copyMetadata)}
-                  </Typography>
+                  {intl.formatMessage(messages.copyMetadata)}
                 </Button>
               )}
               <Typography component="pre" variant="body3" lineHeight="22px" fontFamily="monospace">
@@ -438,10 +437,12 @@ export function CopyAddress({ text, children }: {| text: string, children: Node 
   };
 
   return (
-    <Stack direction="row" alignItems="center" justifyContent="space-between">
-      <TruncatedText sx={{ width: '90%' }}>{children}</TruncatedText>
+    <Stack direction="row" alignItems="center">
+      <TruncatedText>{children}</TruncatedText>
 
-      <IconButton onClick={onCopy}>{isCopied ? <IconCopied /> : <IconCopy />}</IconButton>
+      <IconButton sx={{ ml: '4px' }} onClick={onCopy}>
+        {isCopied ? <IconCopied /> : <IconCopy />}
+      </IconButton>
     </Stack>
   );
 }

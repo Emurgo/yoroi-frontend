@@ -45,7 +45,6 @@ import type { LayoutComponentMap } from '../../styles/context/layout';
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
 import globalMessages from '../../i18n/global-messages';
 import { withLayout } from '../../styles/context/layout';
-import WalletSendPreviewStepContainer from '../../components/wallet/send/WalletSendFormSteps/WalletSendPreviewStepContainer';
 import AddNFTDialog from '../../components/wallet/send/WalletSendFormSteps/AddNFTDialog';
 import AddTokenDialog from '../../components/wallet/send/WalletSendFormSteps/AddTokenDialog';
 import { trackSend } from '../../api/analytics';
@@ -177,16 +176,18 @@ class WalletSendPage extends Component<AllProps> {
         <>
           <WalletSendFormRevamp
             selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
+            selectedWallet={publicDeriver}
+            selectedExplorer={this.generated.stores.explorers.selectedExplorer}
+            selectedToken={transactionBuilderStore.selectedToken}
             defaultToken={defaultToken}
             getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
             onSubmit={txBuilderActions.updateTentativeTx.trigger}
             totalInput={transactionBuilderStore.totalInput}
             hasAnyPending={hasAnyPending}
-            classicTheme={profile.isClassicTheme}
+            isClassicTheme={profile.isClassicTheme}
+            shouldSendAll={transactionBuilderStore.shouldSendAll}
             updateReceiver={(addr: void | string) => txBuilderActions.updateReceiver.trigger(addr)}
             updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
-            updateMemo={(content: void | string) => txBuilderActions.updateMemo.trigger(content)}
-            shouldSendAll={transactionBuilderStore.shouldSendAll}
             updateSendAllStatus={txBuilderActions.updateSendAllStatus.trigger}
             fee={transactionBuilderStore.fee}
             isCalculatingFee={transactionBuilderStore.createUnsignedTx.isExecuting}
@@ -196,25 +197,35 @@ class WalletSendPage extends Component<AllProps> {
             minAda={transactionBuilderStore.minAda}
             uriParams={this.generated.stores.loading.uriParams}
             resetUriParams={this.generated.stores.loading.resetUriParams}
+            memo={transactionBuilderStore.memo}
             showMemo={this.showMemo}
-            onAddMemo={() => this.showMemoDialog({
-              dialog: MemoNoExternalStorageDialog,
-              continuation: this.toggleShowMemo,
-            })}
+            updateMemo={(content: void | string) => txBuilderActions.updateMemo.trigger(content)}
+            onAddMemo={() =>
+              this.showMemoDialog({
+                dialog: MemoNoExternalStorageDialog,
+                continuation: this.toggleShowMemo,
+              })}
             spendableBalance={this.generated.stores.transactions.balance}
             onAddToken={txBuilderActions.addToken.trigger}
             onRemoveTokens={txBuilderActions.removeTokens.trigger}
-            selectedToken={transactionBuilderStore.selectedToken}
-            previewStep={this.renderTxPreviewStep}
-            openDialog={this.openDialog}
             plannedTxInfoMap={transactionBuilderStore.plannedTxInfoMap}
             isDefaultIncluded={transactionBuilderStore.isDefaultIncluded}
+            openDialog={this.openDialog}
             closeDialog={this.generated.actions.dialogs.closeActiveDialog.trigger}
             isOpen={uiDialogs.isOpen}
+            openTransactionSuccessDialog={this.openTransactionSuccessDialog.bind(this)}
             unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
             getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
             calculateMaxAmount={txBuilderActions.calculateMaxAmount.trigger}
             maxSendableAmount={transactionBuilderStore.maxSendableAmount}
+            signRequest={transactionBuilderStore.tentativeTx}
+            staleTx={transactionBuilderStore.txMismatch}
+            sendMoneyRequest={this.generated.stores.wallets.sendMoneyRequest}
+            sendMoney={this.generated.actions.wallets.sendMoney.trigger}
+            ledgerSendError={this.generated.stores.substores.ada.ledgerSend.error || null}
+            trezorSendError={this.generated.stores.substores.ada.trezorSend.error || null}
+            ledgerSend={this.generated.actions.ada.ledgerSend}
+            trezorSend={this.generated.actions.ada.trezorSend}
           />
           {this.renderDialog()}
         </>
@@ -318,31 +329,6 @@ class WalletSendPage extends Component<AllProps> {
         staleTx={transactionBuilderStore.txMismatch}
         unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
         openTransactionSuccessDialog={this.openTransactionSuccessDialog}
-      />
-    );
-  };
-
-  renderTxPreviewStep: () => Node = () => {
-    const publicDeriver = this.generated.stores.wallets.selected;
-    if (!publicDeriver)
-      throw new Error(`Active wallet required for ${nameof(this.webWalletDoConfirmation)}.`);
-
-    const { transactionBuilderStore } = this.generated.stores;
-    if (!transactionBuilderStore.tentativeTx) {
-      throw new Error(`${nameof(this.webWalletDoConfirmation)}::should never happen`);
-    }
-    const signRequest = transactionBuilderStore.tentativeTx;
-
-    return (
-      <WalletSendPreviewStepContainer
-        {...this.generated.WalletSendConfirmationDialogContainerProps}
-        signRequest={signRequest}
-        staleTx={transactionBuilderStore.txMismatch}
-        isDefaultIncluded={transactionBuilderStore.isDefaultIncluded}
-        unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
-        openTransactionSuccessDialog={this.openTransactionSuccessDialog}
-        minAda={transactionBuilderStore.minAda}
-        plannedTxInfoMap={transactionBuilderStore.plannedTxInfoMap}
       />
     );
   };
@@ -663,6 +649,16 @@ class WalletSendPage extends Component<AllProps> {
           trigger: (params: void) => void,
         |},
       |},
+      wallets: {|
+        sendMoney: {|
+          trigger: (params: {|
+            password: string,
+            publicDeriver: PublicDeriver<>,
+            signRequest: ISignRequest<any>,
+            onSuccess?: void => void,
+          |}) => Promise<void>,
+        |},
+      |},
       dialogs: {|
         closeActiveDialog: {|
           trigger: (params: void) => void,
@@ -722,6 +718,7 @@ class WalletSendPage extends Component<AllProps> {
         txMismatch: boolean,
         isDefaultIncluded: boolean,
         selectedToken: void | $ReadOnly<TokenRow>,
+        memo: void | string,
         maxAssetsAllowed: number,
         plannedTxInfoMap: Array<{|
           token: $ReadOnly<TokenRow>,
@@ -756,7 +753,14 @@ class WalletSendPage extends Component<AllProps> {
         getParam: <T>(number | string) => T,
         isOpen: any => boolean,
       |},
-      wallets: {| selected: null | PublicDeriver<> |},
+      wallets: {|
+        selected: null | PublicDeriver<>,
+        sendMoneyRequest: {|
+          error: ?LocalizableError,
+          isExecuting: boolean,
+          reset: () => void,
+        |},
+      |},
     |},
   |} {
     if (this.props.generated !== undefined) {
@@ -778,6 +782,11 @@ class WalletSendPage extends Component<AllProps> {
         },
         wallets: {
           selected: stores.wallets.selected,
+          sendMoneyRequest: {
+            isExecuting: stores.wallets.sendMoneyRequest.isExecuting,
+            reset: stores.wallets.sendMoneyRequest.reset,
+            error: stores.wallets.sendMoneyRequest.error,
+          },
         },
         tokenInfoStore: {
           tokenInfo: stores.tokenInfoStore.tokenInfo,
@@ -814,6 +823,7 @@ class WalletSendPage extends Component<AllProps> {
             error: stores.transactionBuilderStore.createUnsignedTx.error,
           },
           selectedToken: stores.transactionBuilderStore.selectedToken,
+          memo: stores.transactionBuilderStore.memo,
           plannedTxInfoMap: stores.transactionBuilderStore.plannedTxInfoMap,
           maxAssetsAllowed: stores.transactionBuilderStore.maxAssetsAllowed,
           calculateMinAda: stores.transactionBuilderStore.calculateMinAda,
@@ -842,6 +852,11 @@ class WalletSendPage extends Component<AllProps> {
             trigger: actions.dialogs.push.trigger,
           },
           closeActiveDialog: { trigger: actions.dialogs.closeActiveDialog.trigger },
+        },
+        wallets: {
+          sendMoney: {
+            trigger: actions.wallets.sendMoney.trigger,
+          },
         },
         router: {
           goToRoute: { trigger: actions.router.goToRoute.trigger },
