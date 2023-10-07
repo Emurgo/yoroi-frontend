@@ -795,9 +795,9 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             <IncludedTokens
               tokens={tokens}
               nfts={nfts}
-              onRemoveTokens={(tokens) => {
+              onRemoveTokens={(tokensRemove) => {
                 const assetCount = totalAmount.nonDefaultEntries().length - 1;
-                this.props.onRemoveTokens(tokens);
+                this.props.onRemoveTokens(tokensRemove);
                 ampli.sendSelectAssetUpdated({
                   asset_count: assetCount,
                 });

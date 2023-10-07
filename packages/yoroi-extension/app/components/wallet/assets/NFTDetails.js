@@ -229,40 +229,40 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                 </TruncatedText>
               </Box>
 
-            <Stack direction="row" spacing={1}>
-              <Link
-                to={ROUTES.NFTS.DETAILS.replace(':nftId', prevNftId) + `?tab=${activeTab}`}
-                onClick={
+              <Stack direction="row" spacing={1}>
+                <Link
+                  to={ROUTES.NFTS.DETAILS.replace(':nftId', prevNftId) + `?tab=${activeTab}`}
+                  onClick={
                   () => {
                     ampli.nftGalleryDetailsNavigation({
                       nft_navigation: 'Previous',
                     });
                   }
                 }
-              >
-                <IconButton
-                  aria-label="Previous"
-                  sx={{ transform: 'rotate(180deg)', width: '32px' }}
                 >
-                  <Chevron />
-                </IconButton>
-              </Link>
-              <Link
-                to={ROUTES.NFTS.DETAILS.replace(':nftId', nextNftId) + `?tab=${activeTab}`}
-                onClick={
+                  <IconButton
+                    aria-label="Previous"
+                    sx={{ transform: 'rotate(180deg)', width: '32px' }}
+                  >
+                    <Chevron />
+                  </IconButton>
+                </Link>
+                <Link
+                  to={ROUTES.NFTS.DETAILS.replace(':nftId', nextNftId) + `?tab=${activeTab}`}
+                  onClick={
                   () => {
                     ampli.nftGalleryDetailsNavigation({
                       nft_navigation: 'Next',
                     });
                   }
                 }
-              >
-                <IconButton aria-label="Next" sx={{ width: '32px' }}>
-                  <Chevron />
-                </IconButton>
-              </Link>
+                >
+                  <IconButton aria-label="Next" sx={{ width: '32px' }}>
+                    <Chevron />
+                  </IconButton>
+                </Link>
+              </Stack>
             </Stack>
-          </Stack>
           </Box>
           <TabContext value={activeTab}>
             <Box>

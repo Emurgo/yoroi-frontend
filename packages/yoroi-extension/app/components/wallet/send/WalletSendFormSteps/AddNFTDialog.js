@@ -160,11 +160,9 @@ export default class AddNFTDialog extends Component<Props, State> {
           tokens.splice(tokenIndex, 1);
           changed = true;
         }
-      } else {
-        if (included) {
+      } else if (included) {
           tokens.push({ tokenId: token.TokenId });
           changed = true;
-        }
       }
       if (!included) {
         toRemove.push(token);

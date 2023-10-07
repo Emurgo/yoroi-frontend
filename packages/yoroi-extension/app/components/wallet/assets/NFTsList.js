@@ -180,8 +180,10 @@ function NfTsList({ list, intl }: Props & Intl): Node {
                   aspectRatio: '1/1',
                 }}
               >
-                <SLink key={nft.id} to={ROUTES.NFTS.DETAILS.replace(':nftId', nft.id)}
-                 onClick={() => { ampli.nftGalleryDetailsPageViewed(); }}
+                <SLink
+                  key={nft.id}
+                  to={ROUTES.NFTS.DETAILS.replace(':nftId', nft.id)}
+                  onClick={() => { ampli.nftGalleryDetailsPageViewed(); }}
                 >
                   <NftCardImage ipfsUrl={nft.image} name={nft.name} />
                 </SLink>

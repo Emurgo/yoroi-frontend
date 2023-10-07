@@ -206,11 +206,9 @@ export default class AddTokenDialog extends Component<Props, State> {
           tokens.splice(tokenIndex, 1);
           changed = true;
         }
-      } else {
-        if (included && amount != null) {
+      } else if (included && amount != null) {
           tokens.push({ tokenId: token.TokenId, amount: amount.toString() });
           changed = true;
-        }
       }
       if (!included) {
         toRemove.push(token);

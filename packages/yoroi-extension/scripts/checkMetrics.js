@@ -1,4 +1,5 @@
-import child_process from 'child_process';
+// @flow
+import childProcess from 'child_process';
 import { Ampli } from '../ampli/index';
 
 const EXCLUDE = [
@@ -13,13 +14,13 @@ const eventNames = Object.keys(Ampli.prototype).filter(name => !EXCLUDE.includes
 
 const regExpStr = `ampli\\.(${eventNames.join('|')})\\(`;
 
-const grepOutput = child_process.execSync(`grep -h -o -r --include='*.js' -E '${regExpStr}' app chrome | sort | uniq`).toString('utf8');
+const grepOutput = childProcess.execSync(`grep -h -o -r --include='*.js' -E '${regExpStr}' app chrome | sort | uniq`).toString('utf8');
 
 const seenEventNames =
   grepOutput
     .trim()
     .split('\n')
-    .map(line => line.match(/^ampli\.(.+)\(/)[1])
+    .map(line => line.match(/^ampli\.(.+)\(/)?.[1])
 const seenEventNameSet =  new Set(seenEventNames);
 
 const unseenEventNames = eventNames.filter(name => !seenEventNameSet.has(name));
