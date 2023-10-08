@@ -52,6 +52,7 @@ function InfoDialog(props: Props & Intl): Node {
           maxWidth: 'unset',
         },
       }}
+      id="infoDialog"
     >
       <Box
         sx={{

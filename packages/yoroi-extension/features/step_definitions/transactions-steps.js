@@ -36,12 +36,12 @@ import {
   warningBox,
 } from '../pages/walletSendPage';
 import { navDetailsAmount, sendTab } from '../pages/walletPage';
-import { walletPasswordInput } from '../pages/restoreWalletPage';
 import { delegationTxDialogError } from '../pages/walletDelegationPage';
 import { correctDelegationButton } from '../pages/walletReceivePage';
 import { fiveSeconds, halfSecond, oneMinute } from '../support/helpers/common-constants';
 import { stripZerosFromEnd } from '../support/helpers/transfer-helpers';
 import { getIndexedDBTablesInfo } from './common-steps';
+import { walletPasswordInput } from '../pages/walletDetailsPage';
 
 const filterInputByBrowser = async (customWorld: any, inputData: any): Promise<any> => {
   const browserName = await customWorld.getBrowser();

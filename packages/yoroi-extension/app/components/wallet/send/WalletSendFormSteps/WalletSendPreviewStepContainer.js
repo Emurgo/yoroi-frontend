@@ -17,7 +17,7 @@ import {
 } from '../../../../api/ada/lib/storage/models/ConceptualWallet';
 import type { SendUsingLedgerParams } from '../../../../actions/ada/ledger-send-actions';
 import type { SendUsingTrezorParams } from '../../../../actions/ada/trezor-send-actions';
-import { trackSend } from '../../../../api/analytics';
+import { ampli } from '../../../../../ampli/index';
 
 // TODO: unmagic the constants
 const MAX_VALUE_BYTES = 5000;
@@ -97,7 +97,11 @@ export default class WalletSendPreviewStepContainer extends Component<AllProps> 
     if (selectedWallet == null) throw new Error(`Unexpected missing active wallet`);
     if (signRequest == null) throw new Error('Unexpected missing active signing request');
 
-    const walletType = this._getWalletType(selectedWallet);
+    ampli.sendSummarySubmitted({
+      asset_count: signRequest.totalInput().nonDefaultEntries().length,
+    });
+
+    const walletType = this. _getWalletType(selectedWallet);
     if (walletType === 'ledger') {
       await ledgerSend.sendUsingLedgerWallet.trigger({
         params: { signRequest },
@@ -119,7 +123,6 @@ export default class WalletSendPreviewStepContainer extends Component<AllProps> 
         onSuccess: openTransactionSuccessDialog,
       });
     }
-    trackSend();
   };
 
   render(): Node {

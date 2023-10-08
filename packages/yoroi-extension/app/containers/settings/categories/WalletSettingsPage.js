@@ -27,7 +27,6 @@ import type { SigningKeyCache } from '../../../stores/toplevel/WalletStore';
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { RenameModelFunc } from '../../../api/common/index';
 import type { IGetSigningKey } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import { trackExportWallet } from '../../../api/analytics';
 import { Typography } from '@mui/material';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -119,12 +118,9 @@ export default class WalletSettingsPage extends Component<InjectedOrGenerated<Ge
           }
         />
         <ExportWallet
-          openDialog={() => {
-            actions.dialogs.open.trigger({
-              dialog: ExportWalletDialogContainer,
-            });
-            trackExportWallet();
-          }}
+          openDialog={() => actions.dialogs.open.trigger({
+            dialog: ExportWalletDialogContainer,
+          })}
         />
         <RemoveWallet
           walletName={settingsCache.conceptualWalletName}

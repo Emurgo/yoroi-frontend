@@ -161,7 +161,7 @@ export default class AddWalletDetailsStep extends Component<Props> {
     const descriptionMessage = Boolean(isRecovery) ? messages.restoreDesc : messages.createDesc;
 
     return (
-      <Stack alignItems="center" justifyContent="center">
+      <Stack alignItems="center" justifyContent="center" id="addWalletDetailsStepComponent">
         <Stack direction="column" alignItems="left" justifyContent="center" maxWidth="555px">
           <Stack mb="20px" flexDirection="row" alignItems="center" gap="6px">
             <Typography variant="body1">

@@ -807,7 +807,6 @@ export const AdaWithdrawDialog = (): Node => {
                       ),
                       reset: action('createWithdrawalTx reset'),
                     },
-                    shouldDeregister: false,
                   },
                 },
               },
