@@ -16,7 +16,7 @@ export async function goToSettings(customWorld: Object) {
   await navigateTo.call(customWorld, '/settings/general');
 
   await waitUntilUrlEquals.call(customWorld, '/settings/general');
-  await customWorld.waitForElement(settingsLayoutComponent);
+  await customWorld.waitForElement(settingsMenuLayout);
 }
 
 export async function getComplexityLevelButton(
@@ -41,6 +41,7 @@ export const fullScreenMessage: LocatorObject = {
 
 // Wallet tab
 
+export const walletPage: LocatorObject = { locator: 'walletSettingsPage', method: 'id' };
 export const walletNameInputSelector: LocatorObject = {
   locator: '.SettingsLayout_settingsPane .walletName input',
   method: 'css',
@@ -83,13 +84,23 @@ export const settingsLayoutComponent: LocatorObject = {
   locator: '.SettingsLayout_component',
   method: 'css',
 };
+export const settingsMenuLayout: LocatorObject = {
+  locator: 'settingsMenuLayout',
+  method: 'id',
+};
 export const secondThemeSelected: LocatorObject = {
   locator: '.ThemeSettingsBlock_themesWrapper button:nth-child(2).ThemeSettingsBlock_active',
   method: 'css',
 };
 
-export const oldThemeRadiobutton: LocatorObject = { locator: 'switchToOldVersionButton', method: 'id' };
-export const revampThemeRadiobutton: LocatorObject = { locator: 'switchToNewVersionButton', method: 'id' };
+export const oldThemeRadiobutton: LocatorObject = {
+  locator: 'switchToOldVersionButton',
+  method: 'id',
+};
+export const revampThemeRadiobutton: LocatorObject = {
+  locator: 'switchToNewVersionButton',
+  method: 'id',
+};
 
 // Change password dialog
 

@@ -12,3 +12,15 @@ export const serverErrorBanner: LocatorObject = {
 export const maintenanceBody: LocatorObject = { locator: '.Maintenance_body', method: 'css' };
 
 export const myWalletsPage: LocatorObject = { locator: '.MyWallets_page', method: 'css' };
+
+export const selectWalletButton: LocatorObject = {
+  locator: '.NavWalletDetailsRevamp_contentWrapper',
+  method: 'css',
+};
+
+export const addWalletButton: LocatorObject = { locator: 'addWalletButton', method: 'id' };
+
+export const applySelectedWalletButton: LocatorObject = {
+  locator: 'applyWalletButton',
+  method: 'id',
+};

@@ -69,7 +69,7 @@ export default class WalletSettingsPage extends Component<InjectedOrGenerated<Ge
     );
 
     return (
-      <>
+      <div id="walletSettingsPage">
         {this.getDialog(selectedWallet)}
         {profile.isRevampTheme && (
           <Typography variant="h5" fontWeight={500} mb="24px">
@@ -130,7 +130,7 @@ export default class WalletSettingsPage extends Component<InjectedOrGenerated<Ge
             })
           }
         />
-      </>
+      </div>
     );
   }
 

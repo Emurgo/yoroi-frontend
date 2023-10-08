@@ -12,11 +12,9 @@ import {
   When,
 } from 'cucumber';
 import * as CardanoServer from '../mock-chain/mockCardanoServer';
-import * as ErgoServer from '../mock-chain/mockErgoServer';
 import { logging } from 'selenium-webdriver';
 import { getLogDate } from '../support/helpers/helpers';
 import { testWallets } from '../mock-chain/TestWallets';
-import * as ErgoImporter from '../mock-chain/mockErgoImporter';
 import * as CardanoImporter from '../mock-chain/mockCardanoImporter';
 import {
   testRunsDataDir,
@@ -136,12 +134,10 @@ BeforeAll(() => {
   rimraf.sync(chromeMockServerDataDir);
 
   CardanoServer.getMockServer({});
-  ErgoServer.getMockServer({});
 });
 
 AfterAll(() => {
   CardanoServer.closeMockServer();
-  ErgoServer.closeMockServer();
 });
 
 // eslint-disable-next-line prefer-arrow-callback
@@ -152,7 +148,6 @@ Before(function (scenario) {
     `\n### ${pathItems[pathItems.length - 2]}. The scenario "${scenario.pickle.name}" has started`
   );
   CardanoServer.setExpectedTx(undefined);
-  ErgoServer.setExpectedTx(undefined);
   // cleanup scenario name so it is folder-name friendly
   testProgress.scenarioName = scenario.pickle.name.replace(/[^0-9a-z_ ]/gi, '');
   testProgress.lineNum = scenario.sourceLocation.line;
@@ -184,7 +179,6 @@ Before(function (scenario) {
 
 Before({ tags: 'not @TestAssuranceChain' }, () => {
   CardanoImporter.resetChain(CardanoImporter.MockChain.Standard);
-  ErgoImporter.resetChain();
 });
 Before({ tags: '@TestAssuranceChain' }, () => {
   CardanoImporter.resetChain(CardanoImporter.MockChain.TestAssurance);
@@ -192,11 +186,9 @@ Before({ tags: '@TestAssuranceChain' }, () => {
 
 Before({ tags: '@serverDown' }, () => {
   CardanoServer.closeMockServer();
-  ErgoServer.closeMockServer();
 });
 After({ tags: '@serverDown' }, () => {
   CardanoServer.getMockServer({});
-  ErgoServer.getMockServer({});
 });
 
 Before({ tags: '@serverMaintenance' }, () => {
@@ -279,7 +271,7 @@ export async function getIndexedDBTablesInfo(customWorld: any, postfix: string =
 const writeFile = promisify(fs.writeFile);
 
 // Steps that contain these patterns will trigger screenshots:
-const SCREENSHOT_STEP_PATTERNS = ['I should see', 'I see', 'I click', 'by clicking'];
+const SCREENSHOT_STEP_PATTERNS = ['I should see', 'I see', 'I click', 'by clicking', 'I enter'];
 
 const takeScreenShotsAndLogs = async (customWebDriver, featureName, patterns) => {
   if (patterns.some(pat => featureName.includes(pat))) {
@@ -387,10 +379,12 @@ async function restoreWallet(
   await customWorld.waitForElement(validPhraseText);
   await customWorld.click(nextButton);
   // info panel
-  await customWorld.waitForElement(infoDialog);
-  customWorld.webDriverLogger.info(`Step:restoreWallet: Info panel is displayed`);
-  await customWorld.click(infoDialogContinueButton);
-  customWorld.webDriverLogger.info(`Step:restoreWallet: Info panel is closed`);
+  if (await customWorld.checkIfExists(infoDialog)) {
+    await customWorld.waitForElement(infoDialog);
+    customWorld.webDriverLogger.info(`Step:restoreWallet: Info panel is displayed`);
+    await customWorld.click(infoDialogContinueButton);
+    customWorld.webDriverLogger.info(`Step:restoreWallet: Info panel is closed`);
+  }
   // wallet info dialog
   await inputWalletInfo(customWorld, restoreInfo);
   customWorld.webDriverLogger.info(`Step:restoreWallet: Wallet info is entered`);
@@ -730,35 +724,30 @@ async function importIndexedDB(client, importDir: string) {
   }, JSON.parse(indexedDBData));
 }
 
-let capturedDbState = undefined;
-async function captureDbStae(client) {
+async function captureDbState(client) {
   const rawDb = await client.driver.executeAsyncScript(done => {
     window.yoroi.api.common
       .exportLocalDatabase(window.yoroi.stores.loading.getDatabase())
       .then(done)
       .catch(err => done(err));
   });
-  capturedDbState = JSON.parse(rawDb.toString());
+  return JSON.parse(rawDb.toString());
 }
 async function compareToCapturedDbState(client, excludeSyncTime) {
-  if (capturedDbState == null) throw new Error('Db state was never captured');
-  const rawDb = await client.driver.executeAsyncScript(done => {
-    window.yoroi.api.common
-      .exportLocalDatabase(window.yoroi.stores.loading.getDatabase())
-      .then(done)
-      .catch(err => done(err));
-  });
-  const newState = JSON.parse(rawDb.toString());
+  const firstDBState = await client.getFromLocalStorage('capturedDBState');
+  if (firstDBState == null) throw new Error('Db state was never captured');
+  const newState = await captureDbState(client);
   if (excludeSyncTime) {
-    delete capturedDbState.tables.LastSyncInfo;
+    delete firstDBState.tables.LastSyncInfo;
     delete newState.tables.LastSyncInfo;
   }
-  expect(stableStringify(capturedDbState.tables)).to.equal(stableStringify(newState.tables));
+  expect(stableStringify(firstDBState.tables)).to.equal(stableStringify(newState.tables));
 }
 
 Given(/^I capture DB state snapshot$/, async function () {
   this.webDriverLogger.info(`Step: I capture DB state snapshot`);
-  await captureDbStae(this);
+  const capturedDBState = await captureDbState(this);
+  await this.saveToLocalStorage('capturedDBState', capturedDBState);
 });
 
 Then(/^I compare to DB state snapshot$/, async function () {

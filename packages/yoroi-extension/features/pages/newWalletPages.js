@@ -4,7 +4,10 @@ import type { LocatorObject } from '../support/webdriver';
 
 export const seedPhrasePlaceholder =
   'Tap each word in the correct order to verify your recovery phrase';
-export const connectHwButton: LocatorObject = { locator: '.WalletAdd_btnConnectHW', method: 'css' };
+export const connectHwButton: LocatorObject = {
+  locator: 'connectHardwareWalletButton',
+  method: 'id',
+};
 export const createWalletButton: LocatorObject = {
   locator: 'createWalletButton',
   method: 'id',

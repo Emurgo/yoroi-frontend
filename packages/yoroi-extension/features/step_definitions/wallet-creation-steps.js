@@ -17,7 +17,6 @@ import {
 } from '../pages/newWalletPages';
 import { continueButton } from '../pages/basicSetupPage';
 import { dialogTitle, infoDialog, infoDialogContinueButton } from '../pages/commonDialogPage';
-import { addAdditionalWalletButton } from '../pages/walletPage';
 import {
   addWalletDetailsBox,
   createWalletNameError,
@@ -71,7 +70,7 @@ When(/^I see Recovery Phrase step and remember it$/, async function () {
   await this.click(nextButton);
 });
 
-When(/^I enter the recovery phrase$/, async function () {
+When(/^I repeat the recovery phrase$/, async function () {
   this.webDriverLogger.info(`Step: I enter the recovery phrase`);
   // step 3
   await this.waitForElement(verifyRecoveryPhraseBox);
@@ -212,8 +211,4 @@ Then(/^I should see "Invalid Password" error message:$/, async function (data) {
 Then(/^I see the security warning prior:$/, async function (data) {
   const error = data.hashes()[0];
   await checkErrorByTranslationId(this, securityWarning, error);
-});
-
-Then(/^I click to add an additional wallet$/, async function () {
-  await this.click(addAdditionalWalletButton);
 });
