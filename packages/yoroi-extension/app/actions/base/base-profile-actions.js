@@ -17,4 +17,5 @@ export default class BaseProfileActions {
   acceptNightly: Action<void> = new Action();
   updateUnitOfAccount: AsyncAction<UnitOfAccountSettingType> = new AsyncAction();
   optForAnalytics: Action<boolean> = new Action();
+  markRevampAsAnnounced: AsyncAction < void> = new AsyncAction();
 }

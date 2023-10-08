@@ -20,7 +20,7 @@ import { ampli } from '../../../ampli/index';
 import type { LoadOptionsWithEnvironment } from '../../../ampli/index';
 
 interface CoinPriceStore {
-  refreshCurrentUnit: Request<void => Promise<void>>
+  refreshCurrentUnit: Request<(void) => Promise<void>>;
 }
 
 interface LoadingStore {
@@ -96,6 +96,26 @@ export default class BaseProfileStore
     (string) => Promise<void>
   >(this.api.localStorage.setUserTheme);
 
+  @observable getUserRevampMigrationStatusRequest: Request<
+    (void) => Promise<boolean>
+  > = new Request<(void) => Promise<boolean>>(this.api.localStorage.getUserRevampMigrationStatus);
+
+  @observable setUserRevampMigrationStatusRequest: Request<
+    (boolean) => Promise<void>
+  > = new Request<(boolean) => Promise<void>>(this.api.localStorage.setUserRevampMigrationStatus);
+
+  @observable getUserRevampAnnouncementStatusRequest: Request<
+    (void) => Promise<boolean>
+  > = new Request<(void) => Promise<boolean>>(
+    this.api.localStorage.getUserRevampAnnouncementStatus
+  );
+
+  @observable setUserRevampAnnouncementStatusRequest: Request<
+    (boolean) => Promise<void>
+  > = new Request<(boolean) => Promise<void>>(
+    this.api.localStorage.setUserRevampAnnouncementStatus
+  );
+
   @observable getCustomThemeRequest: Request<(void) => Promise<?string>> = new Request<
     (void) => Promise<?string>
   >(this.api.localStorage.getCustomUserTheme);
@@ -167,13 +187,15 @@ export default class BaseProfileStore
     this.actions.profile.updateUnitOfAccount.listen(this._updateUnitOfAccount);
     this.actions.profile.acceptNightly.listen(this._acceptNightly);
     this.actions.profile.optForAnalytics.listen(this._onOptForAnalytics);
-
+    this.actions.profile.markRevampAsAnnounced.listen(this._markRevampAsAnnounced);
     this.registerReactions([
       this._setBigNumberFormat,
       this._updateMomentJsLocaleAfterLocaleChange,
     ]);
     this._getSelectComplexityLevel(); // eagerly cache
     this.currentTheme; // eagerly cache (note: don't remove -- getter is stateful)
+    this.isRevampAnnounced;
+    this.didUserMigratedToRevampTheme;
     this.stores.loading.registerBlockingLoadingRequest(
       this._loadAcceptedTosVersion()
     );
@@ -252,6 +274,22 @@ export default class BaseProfileStore
     );
   }
 
+  @computed get isRevampAnnounced(): boolean {
+    let { result } = this.getUserRevampAnnouncementStatusRequest;
+
+    if (result == null) {
+      result = this.getUserRevampAnnouncementStatusRequest.execute().result;
+    }
+
+    return result === true;
+  }
+
+  @action
+  _markRevampAsAnnounced: void => Promise<void> = async () => {
+    await this.setUserRevampAnnouncementStatusRequest.execute(true);
+    await this.getUserRevampAnnouncementStatusRequest.execute();
+  };
+
   @action
   _updateTentativeLocale: ({| locale: string |}) => void = request => {
     this.inMemoryLanguage = request.locale;
@@ -307,7 +345,13 @@ export default class BaseProfileStore
     if (result == null) {
       result = this.getThemeRequest.execute().result;
     }
-    if (this.isCurrentThemeSet && result != null) {
+    if (result != null) {
+      if (!this.didUserMigratedToRevampTheme) {
+        this.setUserRevampMigrationStatusRequest.execute(true);
+        this._updateTheme({ theme: THEMES.YOROI_REVAMP });
+        return THEMES.YOROI_REVAMP;
+      }
+
       // verify content is an actual theme
       if (Object.values(THEMES).find(theme => theme === result)) {
         // $FlowExpectedError[incompatible-return]: can safely cast
@@ -315,11 +359,11 @@ export default class BaseProfileStore
       }
     }
 
-    return THEMES.YOROI_MODERN;
+    return THEMES.YOROI_REVAMP;
   }
 
   @computed get isRevampTheme(): boolean {
-    return this.currentTheme === THEMES.YOROI_REVAMP
+    return this.currentTheme === THEMES.YOROI_REVAMP;
   }
 
   @computed get isModernTheme(): boolean {
@@ -345,7 +389,17 @@ export default class BaseProfileStore
   }
 
   @computed get isCurrentThemeSet(): boolean {
-    return this.getThemeRequest.result !== null && this.getThemeRequest.result !== undefined;
+    return this.getThemeRequest.result != null;
+  }
+
+  @computed get didUserMigratedToRevampTheme(): boolean {
+    let { result } = this.getUserRevampMigrationStatusRequest;
+
+    if (result == null) {
+      result = this.getUserRevampMigrationStatusRequest.execute().result;
+    }
+
+    return result === true;
   }
 
   @computed get hasLoadedCurrentTheme(): boolean {
@@ -354,21 +408,19 @@ export default class BaseProfileStore
 
   _updateTheme: ({| theme: string |}) => Promise<void> = async ({ theme }) => {
     // Unset / Clear the Customized Theme from LocalStorage
-    document.documentElement?.removeAttribute('style') // remove css prop
+    document.documentElement?.removeAttribute('style'); // remove css prop
     await this.unsetCustomThemeRequest.execute();
     await this.getCustomThemeRequest.execute(); // eagerly cache
     await this.setThemeRequest.execute(theme);
     await this.getThemeRequest.execute(); // eagerly cache
   };
 
-
-
   _exportTheme: void => Promise<void> = async () => {
     const { getCSSCustomPropObject } = require(`../../styles/utils`);
     const cssCustomPropObject = getCSSCustomPropObject();
     await this.unsetCustomThemeRequest.execute();
     await this.setCustomThemeRequest.execute({
-      cssCustomPropObject
+      cssCustomPropObject,
     });
     await this.getCustomThemeRequest.execute(); // eagerly cache
   };
@@ -497,7 +549,7 @@ export default class BaseProfileStore
       throw new Error('failed to load unit of account setting');
     }
     return this.getUnitOfAccountRequest.result;
-  }
+  };
 
   _updateUnitOfAccount: UnitOfAccountSettingType => Promise<void> = async currency => {
     await this.setUnitOfAccountRequest.execute(currency);
