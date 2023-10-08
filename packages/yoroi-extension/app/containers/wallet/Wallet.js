@@ -265,7 +265,7 @@ class Wallet extends Component<AllProps> {
     actions: {|
       profile: {|
         markRevampAsAnnounced: {|
-          tigger: (params: void) => void,
+          trigger: void => Promise<void>,
         |},
       |},
       dialogs: {|
@@ -364,7 +364,9 @@ class Wallet extends Component<AllProps> {
       },
       actions: {
         profile: {
-          markRevampAsAnnounced: { trigger: actions.profile.markRevampAsAnnounced.trigger },
+          markRevampAsAnnounced: {
+            trigger: actions.profile.markRevampAsAnnounced.trigger,
+          },
         },
         router: {
           goToRoute: { trigger: actions.router.goToRoute.trigger },

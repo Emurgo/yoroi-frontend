@@ -113,16 +113,16 @@ export default class LocalStorageApi {
 
   // ========== Theme Migration ========== //
 
-  getUserRevampMigrationStatus: void => Promise<?string> = () =>
-    getLocalItem(storageKeys.IS_USER_MIGRATED_TO_REVAMP);
+  getUserRevampMigrationStatus: void => Promise<boolean> = async () =>
+    (await getLocalItem(storageKeys.IS_USER_MIGRATED_TO_REVAMP)) === 'true';
 
-  setUserRevampMigrationStatus: boolean => Promise<boolean> = (status) =>
+  setUserRevampMigrationStatus: boolean => Promise<void> = (status) =>
     setLocalItem(storageKeys.IS_USER_MIGRATED_TO_REVAMP, status.toString());
 
   // ========== Revamp Announcement  ========== //
 
-  getUserRevampAnnouncementStatus: void => Promise<?string> = () =>
-    getLocalItem(storageKeys.IS_REVAMP_THEME_ANNOUNCED);
+  getUserRevampAnnouncementStatus: void => Promise<boolean> = async () =>
+    (await getLocalItem(storageKeys.IS_REVAMP_THEME_ANNOUNCED)) === 'true';
 
   setUserRevampAnnouncementStatus: boolean => Promise<void> = (status) =>
     setLocalItem(storageKeys.IS_REVAMP_THEME_ANNOUNCED, status.toString());

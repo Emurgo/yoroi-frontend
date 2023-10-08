@@ -1,6 +1,7 @@
 // @flow
 
 import { Component } from 'react';
+import type { Node } from 'react';
 import Dialog from '../../../components/widgets/Dialog';
 import { defineMessages, intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
@@ -8,6 +9,7 @@ import { ReactComponent as NewThemeIllustration } from '../../../assets/images/n
 import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
 import styles from './RevampAnnouncementDialog.scss';
 import { Box, Stack, Typography } from '@mui/material';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   title: {

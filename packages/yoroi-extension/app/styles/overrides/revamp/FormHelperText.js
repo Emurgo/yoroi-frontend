@@ -2,7 +2,7 @@
 
 const RevampFormHelperText = {
   styleOverrides: {
-    root: ({ theme }) => ({
+    root: ({ theme }: any): any => ({
       color: theme.palette.grayscale[600],
       marginTop: 0,
       marginLeft: '14px',

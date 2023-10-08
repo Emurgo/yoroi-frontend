@@ -18,7 +18,6 @@ import BaseProfileActions from '../../actions/base/base-profile-actions';
 import { CURRENT_TOS_VERSION } from '../../i18n/locales/terms-of-use/ada/index';
 import { ampli } from '../../../ampli/index';
 import type { LoadOptionsWithEnvironment } from '../../../ampli/index';
-import { trackSetLocale, trackUpdateTheme } from '../../api/analytics';
 
 interface CoinPriceStore {
   refreshCurrentUnit: Request<(void) => Promise<void>>;
