@@ -1,18 +1,18 @@
 // @flow
 import { Component } from 'react';
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './AboutYoroiSettingsBlock.scss';
 import { observer } from 'mobx-react';
 
 import GridFlexContainer from '../../../layout/GridFlexContainer';
-import { ReactComponent as githubSvg }  from '../../../../assets/images/social/github.inline.svg';
-import { ReactComponent as youtubeSvg }  from '../../../../assets/images/social/youtube.inline.svg';
-import { ReactComponent as telegramSvg }  from '../../../../assets/images/social/telegram.inline.svg';
-import { ReactComponent as twitterSvg }  from '../../../../assets/images/social/twitter.inline.svg';
-import { ReactComponent as yoroiSvg }  from '../../../../assets/images/yoroi-logo-shape-white.inline.svg';
-import { ReactComponent as facebookSvg }  from '../../../../assets/images/social/facebook.inline.svg';
-import { ReactComponent as mediumSvg }  from '../../../../assets/images/social/medium.inline.svg';
+import { ReactComponent as githubSvg } from '../../../../assets/images/social/github.inline.svg';
+import { ReactComponent as youtubeSvg } from '../../../../assets/images/social/youtube.inline.svg';
+import { ReactComponent as telegramSvg } from '../../../../assets/images/social/telegram.inline.svg';
+import { ReactComponent as twitterSvg } from '../../../../assets/images/social/twitter.inline.svg';
+import { ReactComponent as yoroiSvg } from '../../../../assets/images/yoroi-logo-shape-white.inline.svg';
+import { ReactComponent as facebookSvg } from '../../../../assets/images/social/facebook.inline.svg';
+import { ReactComponent as mediumSvg } from '../../../../assets/images/social/medium.inline.svg';
 
 import environment from '../../../../environment';
 import LinkButton from '../../../widgets/LinkButton';
@@ -22,6 +22,9 @@ import ExplorableHash from '../../../widgets/hashWrappers/ExplorableHash';
 import { handleExternalLinkClick } from '../../../../utils/routing';
 import { PublicDeriver } from '../../../../api/ada/lib/storage/models/PublicDeriver';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { Box, Link, Typography } from '@mui/material';
+import { withLayout } from '../../../../styles/context/layout';
+import type { InjectedLayoutProps } from '../../../../styles/context/layout';
 
 const messages = defineMessages({
   aboutYoroiLabel: {
@@ -66,11 +69,11 @@ const messages = defineMessages({
   },
   mainnet: {
     id: 'settings.general.aboutYoroi.network.mainnet',
-    defaultMessage: '!!!mainnet',
+    defaultMessage: '!!!Mainnet Network',
   },
   testnet: {
     id: 'settings.general.aboutYoroi.network.testnet',
-    defaultMessage: '!!!testnet',
+    defaultMessage: '!!!Testnet Network',
   },
   commitLabel: {
     id: 'settings.general.aboutYoroi.commitLabel',
@@ -82,68 +85,93 @@ const messages = defineMessages({
   },
 });
 
-const socialMediaLinks = [{
-  url: 'https://twitter.com/YoroiWallet',
-  svg: twitterSvg,
-  message: messages.aboutYoroiTwitter
-}, {
-  svgClass: styles.yoroiLogo,
-  url: 'https://yoroi-wallet.com',
-  svg: yoroiSvg,
-  message: messages.aboutYoroiWebsite
-}, {
-  url: 'https://www.facebook.com/Yoroi-wallet-399386000586822/',
-  svg: facebookSvg,
-  message: messages.aboutYoroiFacebook
-}, {
-  url: 'https://www.youtube.com/channel/UCgFQ0hHuPO1QDcyP6t9KZTQ',
-  svg: youtubeSvg,
-  message: messages.aboutYoroiYoutube
-}, {
-  url: 'https://t.me/emurgo',
-  svg: telegramSvg,
-  message: messages.aboutEmurgoTelegram
-}, {
-  url: 'https://medium.com/@emurgo_io',
-  svg: mediumSvg,
-  message: messages.aboutYoroiMedium
-}, {
-  url: 'https://github.com/Emurgo/yoroi-frontend',
-  svg: githubSvg,
-  message: messages.aboutYoroiGithub
-}];
+const socialMediaLinks = [
+  {
+    url: 'https://twitter.com/YoroiWallet',
+    svg: twitterSvg,
+    message: messages.aboutYoroiTwitter,
+  },
+  {
+    svgClass: styles.yoroiLogo,
+    url: 'https://yoroi-wallet.com',
+    svg: yoroiSvg,
+    message: messages.aboutYoroiWebsite,
+  },
+  {
+    url: 'https://www.facebook.com/Yoroi-wallet-399386000586822/',
+    svg: facebookSvg,
+    message: messages.aboutYoroiFacebook,
+  },
+  {
+    url: 'https://www.youtube.com/channel/UCgFQ0hHuPO1QDcyP6t9KZTQ',
+    svg: youtubeSvg,
+    message: messages.aboutYoroiYoutube,
+  },
+  {
+    url: 'https://t.me/emurgo',
+    svg: telegramSvg,
+    message: messages.aboutEmurgoTelegram,
+  },
+  {
+    url: 'https://medium.com/@emurgo_io',
+    svg: mediumSvg,
+    message: messages.aboutYoroiMedium,
+  },
+  {
+    url: 'https://github.com/Emurgo/yoroi-frontend',
+    svg: githubSvg,
+    message: messages.aboutYoroiGithub,
+  },
+];
 
 const baseGithubUrl = 'https://github.com/Emurgo/yoroi-frontend/';
 
 type Props = {|
-  wallet: null | PublicDeriver<>
-|}
+  wallet: null | PublicDeriver<>,
+|};
 
 @observer
-export default class AboutYoroiSettingsBlock extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+class AboutYoroiSettingsBlock extends Component<Props & InjectedLayoutProps> {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   render(): Node {
     const { intl } = this.context;
-    const { wallet } = this.props;
+    const { wallet, isRevampLayout, renderLayoutComponent } = this.props;
     let network;
 
     if (wallet) {
-      const result = isTestnet(wallet.getParent().getNetworkInfo())
-      network = result === true ? 'testnet' : 'mainnet'
+      const result = isTestnet(wallet.getParent().getNetworkInfo());
+      network = result === true ? 'testnet' : 'mainnet';
     }
 
-    return (
-      <div className={styles.component}>
-        <h2>{intl.formatMessage(messages.aboutYoroiLabel)}</h2>
+    const classicLayout = (
+      <Box
+        sx={{
+          pb: '20px',
+          mt: isRevampLayout ? '40px' : '32px',
+          pt: !isRevampLayout && '30px',
+          borderTop: !isRevampLayout && '1px solid var(--yoroi-palette-gray-200)',
+        }}
+        className={styles.component}
+      >
+        <Typography
+          component="h2"
+          variant={isRevampLayout ? 'body1' : 'h5'}
+          fontWeight={500}
+          mb={isRevampLayout ? '16px' : '12px'}
+          color="grayscale.900"
+        >
+          {intl.formatMessage(messages.aboutYoroiLabel)}
+        </Typography>
 
         {network && (
-        <p className={styles.aboutLine}>
-          <strong>{intl.formatMessage(messages.networkLabel)}</strong>&nbsp;
-          {intl.formatMessage(messages[network])}
-        </p>)}
+          <p className={styles.aboutLine}>
+            <strong>{intl.formatMessage(messages.networkLabel)}</strong>&nbsp;
+            {intl.formatMessage(messages[network])}
+          </p>
+        )}
         <div className={styles.aboutLine}>
           <strong>{intl.formatMessage(messages.versionLabel)}</strong>&nbsp;
           <ExplorableHash
@@ -153,9 +181,7 @@ export default class AboutYoroiSettingsBlock extends Component<Props> {
             placementTooltip="bottom"
             onExternalLinkClick={handleExternalLinkClick}
           >
-            <RawHash light={false}>
-              {environment.getVersion()}
-            </RawHash>
+            <RawHash light={false}>{environment.getVersion()}</RawHash>
           </ExplorableHash>
         </div>
         <div className={styles.aboutLine}>
@@ -167,12 +193,10 @@ export default class AboutYoroiSettingsBlock extends Component<Props> {
             placementTooltip="bottom-start"
             onExternalLinkClick={handleExternalLinkClick}
           >
-            <RawHash light={false}>
-              {environment.commit}
-            </RawHash>
+            <RawHash light={false}>{environment.commit}</RawHash>
           </ExplorableHash>
         </div>
-        {!environment.isProduction() &&
+        {!environment.isProduction() && (
           <div className={styles.aboutLine}>
             <strong>{intl.formatMessage(messages.branchLabel)}</strong>&nbsp;
             <ExplorableHash
@@ -182,12 +206,10 @@ export default class AboutYoroiSettingsBlock extends Component<Props> {
               placementTooltip="bottom-start"
               onExternalLinkClick={handleExternalLinkClick}
             >
-              <RawHash light={false}>
-                {environment.branch}
-              </RawHash>
+              <RawHash light={false}>{environment.branch}</RawHash>
             </ExplorableHash>
           </div>
-        }
+        )}
         <div className={styles.aboutSocial}>
           <GridFlexContainer rowSize={socialMediaLinks.length}>
             {socialMediaLinks.map(link => (
@@ -200,9 +222,103 @@ export default class AboutYoroiSettingsBlock extends Component<Props> {
             ))}
           </GridFlexContainer>
         </div>
-      </div>
+      </Box>
     );
+
+    const revampLayout = (
+      <Box
+        sx={{
+          pb: '20px',
+          mt: '40px',
+        }}
+      >
+        <Typography component="h2" variant="body1" fontWeight={500} mb="16px" color="grayscale.900">
+          {intl.formatMessage(messages.aboutYoroiLabel)}
+        </Typography>
+
+        {network && (
+          <LabelWithValue
+            label={intl.formatMessage(messages.networkLabel)}
+            value={intl.formatMessage(messages[network])}
+          />
+        )}
+
+        <LabelWithValue
+          label={intl.formatMessage(messages.versionLabel)}
+          value={environment.getVersion()}
+          url={baseGithubUrl + 'releases/'}
+        />
+
+        <LabelWithValue
+          label={intl.formatMessage(messages.commitLabel)}
+          value={environment.commit}
+          url={baseGithubUrl + 'commit/' + environment.commit}
+        />
+
+        {!environment.isProduction() && (
+          <LabelWithValue
+            label={intl.formatMessage(messages.branchLabel)}
+            value={environment.branch}
+            url={baseGithubUrl + 'tree/' + environment.branch}
+          />
+        )}
+
+        <div className={styles.aboutSocial}>
+          <GridFlexContainer rowSize={socialMediaLinks.length}>
+            {socialMediaLinks.map(link => (
+              <LinkButton
+                key={link.url}
+                {...link}
+                textClassName={styles.socialMediaLinkText}
+                onExternalLinkClick={handleExternalLinkClick}
+              />
+            ))}
+          </GridFlexContainer>
+        </div>
+      </Box>
+    );
+
+    return renderLayoutComponent({
+      CLASSIC: classicLayout,
+      REVAMP: revampLayout,
+    });
   }
-
-
 }
+
+function LabelWithValue({
+  label,
+  value,
+  url,
+}: {|
+  label: string,
+  value: string,
+  url?: string,
+|}): Node {
+  return (
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <Typography variant="body1" fontWeight={500} color="grayscale.max">
+        {label}
+      </Typography>
+      <Typography
+        {...(url
+          ? {
+              as: Link,
+              href: url,
+              target: '_blank',
+            }
+          : {})}
+        variant="body1"
+        color="grayscale.max"
+        sx={{ textDecoration: 'none' }}
+      >
+        {value}
+      </Typography>
+    </Box>
+  );
+}
+
+LabelWithValue.defaultProps = {
+  url: undefined,
+};
+
+export default (withLayout(AboutYoroiSettingsBlock): ComponentType<Props>);

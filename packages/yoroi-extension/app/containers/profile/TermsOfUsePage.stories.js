@@ -7,7 +7,7 @@ import { action } from '@storybook/addon-actions';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import TermsOfUsePage from './TermsOfUsePage';
 import { withScreenshot } from 'storycap';
-import { getTermsOfUse } from '../../stores/base/BaseProfileStore';
+import { getTermsOfUse, getPrivacyNotice } from '../../stores/base/BaseProfileStore';
 import { globalKnobs } from '../../../stories/helpers/StoryWrapper';
 
 export default {
@@ -29,6 +29,7 @@ export const Generic = (): Node => (
             error: null,
           },
           termsOfUse: getTermsOfUse('ada', globalKnobs.locale()),
+          privacyNotice: getPrivacyNotice(globalKnobs.locale()),
         },
         serverConnectionStore: {
           checkAdaServerStatus: select(

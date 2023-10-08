@@ -23,7 +23,6 @@ declare var browser;
 const networkForLocalStorage = String(environment.getNetworkName());
 const storageKeys = {
   USER_LOCALE: networkForLocalStorage + '-USER-LOCALE',
-  TERMS_OF_USE_ACCEPTANCE: networkForLocalStorage + '-TERMS-OF-USE-ACCEPTANCE',
   URI_SCHEME_ACCEPTANCE: networkForLocalStorage + '-URI-SCHEME-ACCEPTANCE',
   COMPLEXITY_LEVEL: networkForLocalStorage + '-COMPLEXITY-LEVEL',
   THEME: networkForLocalStorage + '-THEME',
@@ -36,11 +35,13 @@ const storageKeys = {
   TOGGLE_SIDEBAR: networkForLocalStorage + '-TOGGLE-SIDEBAR',
   WALLETS_NAVIGATION: networkForLocalStorage + '-WALLETS-NAVIGATION',
   SUBMITTED_TRANSACTIONS: 'submittedTransactions',
-  ANALYTICS_INSTANCE_ID: networkForLocalStorage + '-ANALYTICS',
   CATALYST_ROUND_INFO: networkForLocalStorage + '-CATALYST_ROUND_INFO',
   // ========== CONNECTOR   ========== //
   ERGO_CONNECTOR_WHITELIST: 'connector_whitelist',
   SELECTED_WALLET: 'SELECTED_WALLET',
+
+  IS_ANALYTICS_ALLOWED: networkForLocalStorage + '-IS_ANALYTICS_ALLOWED',
+  ACCEPTED_TOS_VERSION: networkForLocalStorage + '-ACCEPTED_TOS_VERSION',
 };
 
 export type SetCustomUserThemeRequest = {|
@@ -68,20 +69,6 @@ export default class LocalStorageApi {
   ) => setLocalItem(storageKeys.USER_LOCALE, locale);
 
   unsetUserLocale: void => Promise<void> = () => removeLocalItem(storageKeys.USER_LOCALE);
-
-  // ========== Terms of Use ========== //
-
-  getTermsOfUseAcceptance: void => Promise<boolean> = () => getLocalItem(
-    storageKeys.TERMS_OF_USE_ACCEPTANCE
-  ).then((accepted) => accepted === 'true');
-
-  setTermsOfUseAcceptance: void => Promise<void> = () => setLocalItem(
-    storageKeys.TERMS_OF_USE_ACCEPTANCE, JSON.stringify(true)
-  );
-
-  unsetTermsOfUseAcceptance: void => Promise<void> = () => removeLocalItem(
-    storageKeys.TERMS_OF_USE_ACCEPTANCE
-  );
 
   // ========== URI Scheme acceptance ========== //
 
@@ -310,9 +297,43 @@ export default class LocalStorageApi {
   setWalletsNavigation: (WalletsNavigation) => Promise<void> = value =>
     setLocalItem(storageKeys.WALLETS_NAVIGATION, JSON.stringify(value));
 
+
+  loadAcceptedTosVersion: () => Promise<?number> = async () => {
+    const raw = await getLocalItem(storageKeys.ACCEPTED_TOS_VERSION);
+    if (!raw) {
+      return undefined;
+    }
+    const version = parseFloat(raw);
+    if (Number.isNaN(version)) {
+      return undefined;
+    }
+    return version;
+  };
+
+  saveAcceptedTosVersion: (version: number) => Promise<void> = async (version) => {
+    await setLocalItem(storageKeys.ACCEPTED_TOS_VERSION, String(version));
+  }
+
+  unsetAcceptedTosVersion: void => Promise<void> =
+    () => removeLocalItem(storageKeys.ACCEPTED_TOS_VERSION);
+
+  loadIsAnalyticsAllowed: () => Promise<?boolean> = async () => {
+    const json = await getLocalItem(storageKeys.IS_ANALYTICS_ALLOWED);
+    if (!json) {
+      return undefined;
+    }
+    return JSON.parse(json);
+  }
+
+  saveIsAnalysticsAllowed: (flag: boolean) => Promise<void> = async (flag) => {
+    await setLocalItem(storageKeys.IS_ANALYTICS_ALLOWED, JSON.stringify(flag));
+  }
+
+  unsetIsAnalyticsAllowed: void => Promise<void> =
+    () => removeLocalItem(storageKeys.IS_ANALYTICS_ALLOWED);
+
   async reset(): Promise<void> {
     await this.unsetUserLocale();
-    await this.unsetTermsOfUseAcceptance();
     await this.unsetUserTheme();
     await this.unsetComplexityLevel();
     await this.unsetLastLaunchVersion();
@@ -321,6 +342,8 @@ export default class LocalStorageApi {
     await this.unsetCoinPricePubKeyData();
     await this.unsetExternalStorage();
     await this.unsetToggleSidebar();
+    await this.unsetAcceptedTosVersion();
+    await this.unsetIsAnalyticsAllowed();
   }
 
   getItem: string => Promise<?string> = (key) => getLocalItem(key);
@@ -381,14 +404,6 @@ export async function loadSubmittedTransactions(): any {
     return [];
   }
   return JSON.parse(stored[storageKeys.SUBMITTED_TRANSACTIONS]);
-}
-
-export async function loadAnalyticsInstanceId(): Promise<?string> {
-  return getLocalItem(storageKeys.ANALYTICS_INSTANCE_ID);
-}
-
-export async function saveAnalyticsInstanceId(id: string): Promise<void> {
-  await setLocalItem(storageKeys.ANALYTICS_INSTANCE_ID, id);
 }
 
 export async function loadCatalystRoundInfo(): Promise<?CatalystRoundInfoResponse> {

@@ -18,7 +18,7 @@ import type { ConceptualWallet } from '../../api/ada/lib/storage/models/Conceptu
 import WalletAccountIcon from './WalletAccountIcon';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import AmountDisplay from '../common/AmountDisplay';
-import { Box, IconButton } from '@mui/material';
+import { Box, IconButton, Typography } from '@mui/material';
 
 type Props = {|
   +onUpdateHideBalance: void => Promise<void>,
@@ -93,22 +93,19 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
     } = this.props;
 
     const totalAmount = this.getTotalAmount();
-
     const showEyeIconSafe = showEyeIcon != null && showEyeIcon;
-
     const [accountPlateId, iconComponent] = plate ? constructPlate(plate, 0, styles.icon) : [];
+
     return (
       <Box
         sx={{
           display: 'flex',
           flexDirection: 'row',
-          justifyContent: 'center',
-          color: 'gray.900',
+          color: 'grayscale.900',
           border: '1px solid',
-          borderColor: 'gray.300',
+          borderColor: 'grayscale.300',
           borderRadius: 1,
-          minWidth: '360px',
-          height: '56px',
+          height: '48px',
           ':hover': {
             borderColor: 'primary.600',
           },
@@ -117,16 +114,21 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
       >
         <div className={styles.outerWrapper}>
           <button type="button" onClick={openWalletInfoDialog} className={styles.contentWrapper}>
-            <div className={classnames([styles.currency])}>{iconComponent}</div>
+            <div className={classnames([styles.plate])}>{iconComponent}</div>
             <div className={styles.content}>
               <div className={styles.walletInfo}>
-                <p className={styles.name}>
+                <Typography variant="body2" fontWeight={500} sx={{ color: 'grayscale.900' }}>
                   {truncateLongName(this.props.wallet.conceptualWalletName)}
-                </p>
-                <p className={styles.plateId}>{accountPlateId}</p>
+                </Typography>
+                <Typography variant="caption1" sx={{ color: 'grayscale.600' }}>
+                  {accountPlateId}
+                </Typography>
               </div>
               <div className={styles.balance}>
-                <div className={classnames([totalAmount ? styles.amount : styles.spinnerWrapper])}>
+                <Box
+                  sx={{ color: 'grayscale.max', height: '100%' }}
+                  className={classnames([totalAmount ? styles.amount : styles.spinnerWrapper])}
+                >
                   <AmountDisplay
                     shouldHideBalance={shouldHideBalance}
                     amount={totalAmount}
@@ -135,7 +137,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
                     unitOfAccountSetting={unitOfAccountSetting}
                     getCurrentPrice={getCurrentPrice}
                   />
-                </div>
+                </Box>
               </div>
             </div>
           </button>
@@ -144,8 +146,8 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
             onClick={onUpdateHideBalance}
             sx={{
               bgcolor: 'primary.600',
-              width: '56px',
-              height: '54px',
+              width: '46px',
+              height: '46px',
               borderTopRightRadius: '6px',
               borderBottomRightRadius: '6px',
               borderTopLeftRadius: '0px',

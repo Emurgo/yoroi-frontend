@@ -53,7 +53,6 @@ import type {
 } from '../../actions/common/wallet-restore-actions';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import { trackWalletCreation } from '../../api/analytics';
 
 type TrezorConnectionResponse = {|
   trezorResp: Success<CardanoPublicKey> | Unsuccessful,
@@ -201,9 +200,6 @@ export default class TrezorConnectStore
         this._onTrezorUIEvent,
       );
 
-      if (this.trezorEventDevice == null) {
-        throw new Error(`${nameof(this._checkAndStoreHWDeviceInfo)} no ${nameof(this.trezorEventDevice)}`);
-      }
       const trezorEventDevice = this.trezorEventDevice;
 
       /** Converts a valid hardware wallet response to a common storable format
@@ -231,21 +227,17 @@ export default class TrezorConnectStore
 
     const { trezorResp, trezorEventDevice } = resp;
 
-    /** This check already done in _validateHWResponse but flow needs this */
-    const device = trezorEventDevice.payload;
-    const { features } = device;
-    if (features == null) {
-      throw new Error('Trezor device hardware info not valid');
-    }
+    const device = trezorEventDevice?.payload;
+    const features = device?.features;
 
     return {
       publicMasterKey: trezorResp.payload.publicKey,
       hwFeatures: {
-        Vendor: features.vendor ?? Config.wallets.hardwareWallet.trezorT.VENDOR,
-        Model: features.model,
-        DeviceId: features.device_id || '',
+        Vendor: features?.vendor ?? Config.wallets.hardwareWallet.trezorT.VENDOR,
+        Model: features?.model ?? Config.wallets.hardwareWallet.trezorT.MODEL,
+        DeviceId: features?.device_id || '',
       },
-      defaultName: device.label || '',
+      defaultName: device?.label || '',
     };
   }
 
@@ -253,7 +245,7 @@ export default class TrezorConnectStore
   _validateHWResponse: TrezorConnectionResponse => boolean = (
     resp,
   ) => {
-    const { trezorResp, trezorEventDevice } = resp;
+    const { trezorResp } = resp;
 
     if (trezorResp && !trezorResp.success) {
       switch (trezorResp.payload.error) {
@@ -274,13 +266,6 @@ export default class TrezorConnectStore
       || trezorResp.payload.publicKey == null
       || trezorResp.payload.publicKey.length <= 0) {
       throw new Error('Invalid public key received from Trezor device');
-    }
-
-    if (trezorEventDevice == null
-      || trezorEventDevice.payload == null
-      || trezorEventDevice.payload.type !== 'acquired'
-      || trezorEventDevice.payload.features == null) {
-      throw new Error('Invalid trezor device event');
     }
 
     return true;
@@ -336,7 +321,6 @@ export default class TrezorConnectStore
     await this._saveHW(
       walletName,
     );
-    trackWalletCreation('hardware');
   };
 
   /** creates new wallet and loads it */

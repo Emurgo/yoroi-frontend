@@ -7,6 +7,7 @@
 .*/.circleci/.*
 <PROJECT_ROOT>/dev/.*
 <PROJECT_ROOT>/build/.*
+<PROJECT_ROOT>/node_modules/@emurgo/cross-csl-browser/node_modules/resolve/test/resolver/malformed_package_json/package.json
 <PROJECT_ROOT>/node_modules/@emurgo/yoroi-lib/node_modules/resolve/test/resolver/malformed_package_json/package.json
 <PROJECT_ROOT>/node_modules/trezor-connect-flow/node_modules/resolve/test/resolver/malformed_package_json/package.json
 
@@ -30,7 +31,7 @@ deprecated-utility=error
 
 [options]
 types_first=true
-include_warnings=true
+include_warnings=false
 esproposal.decorators=ignore
 module.ignore_non_literal_requires=true
 module.name_mapper.extension='scss' -> '<PROJECT_ROOT>/flow/mappers/CSSModule.js.flow'

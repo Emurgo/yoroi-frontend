@@ -11,6 +11,8 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 import { ReactComponent as YoroiModernTheme } from '../../../../assets/images/yoroi-modern-theme.inline.svg';
 import { ReactComponent as YoroiClassicTheme } from '../../../../assets/images/yoroi-classic-theme.inline.svg';
+import ThemeToggler from '../../themeToggler';
+import environment from '../../../../environment';
 
 const messages = defineMessages({
   themeLabel: {
@@ -55,19 +57,19 @@ const messages = defineMessages({
   },
   version: {
     id: 'settings.theme.version',
-    defaultMessage: '!!!Version'
+    defaultMessage: '!!!Version',
   },
   currentVersion: {
     id: 'settings.theme.currentVersion',
-    defaultMessage: '!!!Yoroi current version'
+    defaultMessage: '!!!Yoroi current version',
   },
   newVersion: {
     id: 'settings.theme.newVersion',
-    defaultMessage: '!!!Yoroi new version (beta)'
+    defaultMessage: '!!!Yoroi new version',
   },
   selectColorTheme: {
     id: 'settings.theme.selectColorTheme',
-    defaultMessage: '!!!Select color theme for old version'
+    defaultMessage: '!!!Select color theme for old version',
   },
 });
 
@@ -77,8 +79,8 @@ type Props = {|
   +onExternalLinkClick: MouseEvent => void,
 |};
 
-const NEW_THEME = THEMES.YOROI_REVAMP
-const OLD_THEME = `${THEMES.YOROI_MODERN}-${THEMES.YOROI_CLASSIC}`
+const NEW_THEME = THEMES.YOROI_REVAMP;
+const OLD_THEME = `${THEMES.YOROI_MODERN}-${THEMES.YOROI_CLASSIC}`;
 @observer
 export default class ThemeSettingsBlock extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
@@ -86,12 +88,9 @@ export default class ThemeSettingsBlock extends Component<Props> {
   };
 
   render(): Node {
-    const {
-      currentTheme,
-      onSubmit,
-      onExternalLinkClick,
-    } = this.props;
+    const { currentTheme, onSubmit, onExternalLinkClick } = this.props;
     const { intl } = this.context;
+    const isRevampLayout = currentTheme === THEMES.YOROI_REVAMP;
 
     const blogLink = (
       <Typography
@@ -110,17 +109,29 @@ export default class ThemeSettingsBlock extends Component<Props> {
     );
 
     return (
-      <Box sx={{ borderTop: '1px solid var(--yoroi-palette-gray-200)', paddingY: '24px' }}>
-        <Typography color='var(--yoroi-palette-gray-900)' fontSize='18px' fontWeight='500' marginBottom='10px'>
+      <Box
+        sx={{
+          borderTop: !isRevampLayout && '1px solid var(--yoroi-palette-gray-200)',
+          pb: '20px',
+          mt: isRevampLayout ? '10px' : '0px',
+          py: !isRevampLayout && '24px',
+        }}
+      >
+        <Typography
+          variant={isRevampLayout ? 'body1' : 'h5'}
+          fontWeight={500}
+          mb={isRevampLayout ? '0px' : '12px'}
+          color="grayscale.900"
+        >
           {intl.formatMessage(messages.version)}
         </Typography>
         <Box>
           <RadioGroup
             aria-labelledby="theme-switch-buttons"
             value={currentTheme === NEW_THEME ? NEW_THEME : OLD_THEME}
-            onChange={(e) => {
-              const theme = e.target.value === NEW_THEME ? NEW_THEME : THEMES.YOROI_MODERN
-              onSubmit(theme)
+            onChange={e => {
+              const theme = e.target.value === NEW_THEME ? NEW_THEME : THEMES.YOROI_MODERN;
+              onSubmit(theme);
             }}
             sx={{
               display: 'flex',
@@ -129,72 +140,99 @@ export default class ThemeSettingsBlock extends Component<Props> {
           >
             <FormControlLabel
               value={OLD_THEME}
-              control={<Radio size='small' />}
+              control={<Radio sx={{ color: 'primary.500' }} size="small" />}
               label={intl.formatMessage(messages.currentVersion)}
               id="switchToOldVersionButton"
               sx={{
-                marginRight: '20px'
+                marginRight: '20px',
               }}
             />
             <FormControlLabel
               value={NEW_THEME}
-              control={<Radio size='small' />}
+              control={
+                <Radio
+                  sx={{
+                    color: 'primary.500',
+                  }}
+                  size="small"
+                />
+              }
               label={intl.formatMessage(messages.newVersion)}
               id="switchToNewVersionButton"
             />
           </RadioGroup>
         </Box>
-        {
-          currentTheme !== THEMES.YOROI_REVAMP && (
-            <Box>
-              <Box sx={{ marginTop: '20px' }}>
-                <Typography
-                  variant="h5"
-                  sx={{
-                    fontWeight: 500,
-                    marginBottom: '8px',
-                    color: 'var(--yoroi-support-settings-text)',
-                    fontSize: '18px',
-                  }}
-                >
-                  {intl.formatMessage(messages.selectColorTheme)}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  color="var(--yoroi-support-settings-text)"
-                  sx={{ marginBottom: '2px' }}
-                >
-                  <FormattedHTMLMessage {...messages.themeNote} />
-                </Typography>
-                <Typography variant="body2" color="var(--yoroi-support-settings-text)">
-                  <FormattedMessage {...messages.blog} values={{ blogLink }} />
-                </Typography>
-              </Box>
-
-              <Box sx={{ marginTop: '16px' }}>
-                <RadioGroup
-                  row
-                  value={currentTheme}
-                  onChange={(e) => {
-                    onSubmit(e.target.value)
-                  }}
-                >
-                  <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', marginRight: '24px' }}>
-                    <Box>
-                      <YoroiModernTheme />
-                    </Box>
-                    <FormControlLabel value={THEMES.YOROI_MODERN} control={<Radio size='small' />} label='Modern' />
-                  </Box>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
-                    <YoroiClassicTheme />
-                    <FormControlLabel value={THEMES.YOROI_CLASSIC} control={<Radio size='small' />} label='classic' />
-                  </Box>
-                </RadioGroup>
-              </Box>
+        {false && currentTheme === THEMES.YOROI_REVAMP && environment.isDev() && (
+          <Box sx={{ mt: '20px' }}>
+            <ThemeToggler />
+          </Box>
+        )}
+        {currentTheme !== THEMES.YOROI_REVAMP && (
+          <Box>
+            <Box sx={{ marginTop: '20px' }}>
+              <Typography
+                variant="h5"
+                sx={{
+                  fontWeight: 500,
+                  marginBottom: '8px',
+                  color: 'var(--yoroi-support-settings-text)',
+                  fontSize: '18px',
+                }}
+              >
+                {intl.formatMessage(messages.selectColorTheme)}
+              </Typography>
+              <Typography
+                variant="body2"
+                color="var(--yoroi-support-settings-text)"
+                sx={{ marginBottom: '2px' }}
+              >
+                <FormattedHTMLMessage {...messages.themeNote} />
+              </Typography>
+              <Typography variant="body2" color="var(--yoroi-support-settings-text)">
+                <FormattedMessage {...messages.blog} values={{ blogLink }} />
+              </Typography>
             </Box>
-          )
-        }
+
+            <Box sx={{ marginTop: '16px' }}>
+              <RadioGroup
+                row
+                value={currentTheme}
+                onChange={e => {
+                  onSubmit(e.target.value);
+                }}
+              >
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'flex-start',
+                    marginRight: '24px',
+                  }}
+                >
+                  <Box>
+                    <YoroiModernTheme />
+                  </Box>
+                  <FormControlLabel
+                    value={THEMES.YOROI_MODERN}
+                    control={<Radio size="small" />}
+                    label="Modern"
+                  />
+                </Box>
+                <Box
+                  sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}
+                >
+                  <YoroiClassicTheme />
+                  <FormControlLabel
+                    value={THEMES.YOROI_CLASSIC}
+                    control={<Radio size="small" />}
+                    label="classic"
+                  />
+                </Box>
+              </RadioGroup>
+            </Box>
+          </Box>
+        )}
       </Box>
-    )
+    );
   }
 }
