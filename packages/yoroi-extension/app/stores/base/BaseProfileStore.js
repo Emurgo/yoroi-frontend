@@ -280,7 +280,7 @@ export default class BaseProfileStore
       result = this.getUserRevampAnnouncementStatusRequest.execute().result;
     }
 
-    return result === 'true';
+    return result;
   }
 
   @action
@@ -398,7 +398,7 @@ export default class BaseProfileStore
       result = this.getUserRevampMigrationStatusRequest.execute().result;
     }
 
-    return result === 'true';
+    return result;
   }
 
   @computed get hasLoadedCurrentTheme(): boolean {
