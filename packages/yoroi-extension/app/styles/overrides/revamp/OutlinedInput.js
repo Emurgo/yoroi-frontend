@@ -2,13 +2,12 @@
 
 const RevampOutlinedInput = {
   styleOverrides: {
-    // $FlowFixMe
-    root: ({ theme }) => ({
+    root: ({ theme }: any): any => ({
       paddingRight: '16px',
       height: '56px',
-      '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'grayscale.900' },
+      '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: theme.palette.grayscale[900] },
       '& .MuiOutlinedInput-notchedOutline': {
-        borderColor: 'grayscale.400',
+        borderColor: theme.palette.grayscale[400],
         borderRadius: 8,
         backgroundColor: 'transparent',
         letterSpacing: 'initial',
@@ -22,20 +21,23 @@ const RevampOutlinedInput = {
         borderWidth: '2px',
       },
       '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
-        borderColor: 'grayscale.200',
+        borderColor: theme.palette.grayscale[200],
         backgroundColor: 'transparent',
-        color: 'grayscale.200',
+        color: theme.palette.grayscale[200],
       },
       '&.Mui-error .MuiOutlinedInput-notchedOutline': {
         borderColor: theme.palette.magenta[500],
         borderWidth: '2px',
       },
       '& .MuiOutlinedInput-input': {
-        '&.Mui-disabled': { color: 'grayscale.200', WebkitTextFillColor: 'grayscale.200' },
+        '&.Mui-disabled': {
+          color: theme.palette.grayscale[200],
+          WebkitTextFillColor: theme.palette.grayscale[200],
+        },
       },
-      '& svg': { color: 'grayscale.400' },
-      '&.Mui-focused svg': { color: 'grayscale.600' },
-      '&.Mui-disabled svg': { color: 'grayscale.200' },
+      '& svg': { color: theme.palette.grayscale[400] },
+      '&.Mui-focused svg': { color: theme.palette.grayscale[600] },
+      '&.Mui-disabled svg': { color: theme.palette.grayscale[200] },
     }),
   },
 };
