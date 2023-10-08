@@ -289,7 +289,12 @@ export default class WalletListDialog extends Component<Props, State> {
           >
             <Button
               id="addWalletButton"
-              onClick={onAddWallet} size="large" variant="outlined" color="primary" fullWidth>
+              onClick={onAddWallet}
+              size="large"
+              variant="outlined"
+              color="primary"
+              fullWidth
+            >
               {intl.formatMessage(messages.addWallet)}
             </Button>
             <Button
