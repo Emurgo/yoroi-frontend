@@ -1,7 +1,6 @@
 // @flow
 import type { Node, ComponentType } from 'react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import type { TxRequests } from '../../../stores/toplevel/TransactionsStore';
 import { useState } from 'react';
 import { defineMessages, injectIntl } from 'react-intl';
 import { Box, Typography } from '@mui/material';
@@ -20,6 +19,7 @@ import { ROUTES } from '../../../routes-config';
 import SelectNetworkStep from '../create-wallet/SelectNetworkStep';
 import environment from '../../../environment';
 import { useRestoreWallet } from './hooks';
+import { ampli } from '../../../../ampli/index';
 
 const messages: * = defineMessages({
   title: {
@@ -86,8 +86,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
     const settingsCache = walletSettings.getConceptualWalletSettingsCache(parent);
     const withPubKey = asGetPublicKey(publicDeriver);
     const plate = withPubKey == null ? null : wallets.getPublicKeyCache(withPubKey).plate;
-    const txRequests: TxRequests = transactions.getTxRequests(publicDeriver);
-    const balance = txRequests.requests.getBalanceRequest.result ?? null;
+    const balance = transactions.getBalance(publicDeriver);
 
     const shouldHideBalance = profileData.shouldHideBalance;
     const updateHideBalance = () => profile.updateHideBalance.trigger();
@@ -113,7 +112,10 @@ function RestoreWalletPage(props: Props & Intl): Node {
   };
 
   const recoveryPhraseStepProps = {
-    setCurrentStep,
+    setCurrentStep: (step) => {
+      setCurrentStep(step);
+      ampli.restoreWalletDetailsStepViewed();
+    },
     walletData,
     isDialogOpen,
     openDialog,
@@ -139,6 +141,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
           onSelect={network => {
             profile.setSelectedNetwork.trigger(network);
             setCurrentStep(RESTORE_WALLET_STEPS.SELECT_WALLET_TYPE);
+            ampli.restoreWalletTypeStepViewed();
           }}
           goBack={goToAddWalletScreen}
         />
@@ -157,6 +160,15 @@ function RestoreWalletPage(props: Props & Intl): Node {
 
             walletRestore.setMode.trigger(mode);
             setCurrentStep(RESTORE_WALLET_STEPS.ENTER_RECOVERY_PHRASE);
+            if (mode.length === 15) {
+              ampli.restoreWalletEnterPhraseStepViewed({
+                recovery_phrase_lenght: '15'
+              });
+            } else if (mode.length === 24) {
+              ampli.restoreWalletEnterPhraseStepViewed({
+                recovery_phrase_lenght: '24'
+              });
+            }
           }}
           goBack={() => {
             resetRestoreWalletData();
@@ -217,6 +229,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
               throw new Error('Network must be selected to create a wallet. Should never happen');
 
             restoreWallet({ walletName, walletPassword, recoveryPhrase });
+            ampli.restoreWalletDetailsSubmitted();
           }}
           {...manageDialogsProps}
         />

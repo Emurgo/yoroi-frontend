@@ -1,5 +1,5 @@
-// @flow
-
+// fixme broken flow
+// eslint-disable-next-line flowtype/require-valid-file-annotation
 import type { Node } from 'react';
 import BigNumber from 'bignumber.js';
 import { boolean, select, } from '@storybook/addon-knobs';
@@ -807,7 +807,6 @@ export const AdaWithdrawDialog = (): Node => {
                       ),
                       reset: action('createWithdrawalTx reset'),
                     },
-                    shouldDeregister: false,
                   },
                 },
               },

@@ -93,10 +93,9 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
     } = this.props;
 
     const totalAmount = this.getTotalAmount();
-
     const showEyeIconSafe = showEyeIcon != null && showEyeIcon;
-
     const [accountPlateId, iconComponent] = plate ? constructPlate(plate, 0, styles.icon) : [];
+
     return (
       <Box
         sx={{

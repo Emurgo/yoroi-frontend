@@ -25,11 +25,26 @@
       transition: transform 300ms;
     }
 
-    &.arrowUp {
-      .arrowDownIcon svg {
+    &.revamp {
+      // Not opened
+      .arrowIcon svg {
+        transform: rotate(180deg);
+      }
+
+      // Opened
+      &.activeArrow {
+        .arrowIcon svg {
+          transform: rotate(0deg);
+        }
+      }
+    }
+
+    &.activeArrow {
+      .arrowIcon svg {
         transform: rotate(180deg);
       }
     }
+
     &.activeHead {
       font-weight: 500;
       color: var(--yoroi-palette-secondary-300);

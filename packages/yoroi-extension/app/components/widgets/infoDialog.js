@@ -52,6 +52,7 @@ function InfoDialog(props: Props & Intl): Node {
           maxWidth: 'unset',
         },
       }}
+      id="infoDialog"
     >
       <Box
         sx={{
@@ -111,6 +112,7 @@ function InfoDialog(props: Props & Intl): Node {
             sx={{
               width: '176px',
             }}
+            id="infoDialogContinueButton"
           >
             {intl.formatMessage(globalMessages.continue)}
           </Button>

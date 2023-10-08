@@ -29,8 +29,9 @@ type Props = {|
   +unitOfAccount: TokenEntry => void | {| currency: string, amount: string |},
   +shouldHideBalance: boolean,
   +graphData: GraphData,
-  +epochLength: ?number,
+  +withdrawRewards: void | (void => Promise<void>),
 |};
+
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
@@ -38,7 +39,7 @@ type Intl = {|
 const messages = defineMessages({
   summary: {
     id: 'wallet.staking.summary',
-    defaultMessage: '!!!Summary',
+    defaultMessage: '!!!Rewards Summary',
   },
   dialogSummaryDescription: {
     id: 'wallet.staking.dialogSummaryDescription',
@@ -52,11 +53,11 @@ function SummaryCard({
   totalDelegated,
   getTokenInfo,
   onOverviewClick: _onOverviewClick, // todo: remove?
+  withdrawRewards,
   shouldHideBalance,
   onOpenRewardList,
   unitOfAccount,
   graphData,
-  epochLength,
   intl,
 }: Props & Intl): Node {
   const formatTokenEntry: TokenEntry => Node = tokenEntry => {
@@ -115,27 +116,45 @@ function SummaryCard({
           padding: '15px 24px',
           borderBottom: '1px solid',
           borderColor: 'grayscale.200',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
         }}
       >
-        <Typography variant="h5" color="grayscale.900">
+        <Typography variant="h5" color="common.black" fontWeight={500}>
           {intl.formatMessage(messages.summary)}
         </Typography>
+        <Button
+          variant="primary"
+          sx={{
+            '&.MuiButton-sizeMedium': {
+              height: 'unset',
+              p: '9px 20px',
+            },
+          }}
+          onClick={withdrawRewards}
+          disabled={!withdrawRewards}
+        >
+          {intl.formatMessage(globalMessages.withdrawLabel)}
+        </Button>
       </Box>
       <Box sx={{ display: 'flex' }}>
         <InfoRow sx={{ borderColor: 'grayscale.200' }}>
-          <WrapperIcon bgcolor="#EEF1FA">
-            <StakingIcon />
-          </WrapperIcon>
+          <StakingIcon />
           <InfoDetails>
-            <Typography variant="body2" color="grayscale.600" sx={{ textTransform: 'uppercase' }}>
+            <Typography
+              variant="caption1"
+              color="grayscale.600"
+              sx={{ textTransform: 'uppercase' }}
+            >
               {intl.formatMessage(globalMessages.totalRewardsLabel)}
             </Typography>
           </InfoDetails>
           <InfoDetails>
-            <Typography variant="h1" color="grayscale.900">
+            <Typography variant="h2" color="common.black" fontWeight={500}>
               {renderAmount(totalRewards)}
             </Typography>
-            <Typography variant="body1" color="grayscale.900">
+            <Typography variant="body1" color="grayscale.600" fontWeight={500}>
               {renderAmountWithUnitOfAccount(totalRewards)}
             </Typography>
           </InfoDetails>
@@ -144,15 +163,20 @@ function SummaryCard({
             </OverviewButton> */}
         </InfoRow>
         <InfoRow sx={{ borderColor: 'grayscale.200' }}>
-          <WrapperIcon bgcolor="#F3FAFF">
-            <TotalDelegatedIcon />
-          </WrapperIcon>
+          <TotalDelegatedIcon />
           <InfoDetails>
-            <Typography variant="body1" color="grayscale.600" marginBottom="4px">
+            <Typography
+              variant="caption1"
+              color="grayscale.600"
+              marginBottom="4px"
+              sx={{ textTransform: 'uppercase' }}
+            >
               {intl.formatMessage(globalMessages.totalDelegated)}
             </Typography>
+          </InfoDetails>
+          <InfoDetails>
             {totalDelegated ? (
-              <Typography variant="h1" fontWeight="400" color="grayscale.900">
+              <Typography variant="h2" fontWeight="500" color="common.black">
                 {renderAmount(totalDelegated)}
               </Typography>
             ) : (
@@ -160,17 +184,13 @@ function SummaryCard({
                 <LoadingSpinner small />
               </div>
             )}
-            <Typography variant="body1" color="grayscale.900">
+            <Typography variant="body1" color="grayscale.600" fontWeight={500}>
               {renderAmountWithUnitOfAccount(totalDelegated)}
             </Typography>
           </InfoDetails>
         </InfoRow>
       </Box>
-      <RewardHistoryGraph
-        onOpenRewardList={onOpenRewardList}
-        graphData={graphData}
-        epochLength={epochLength}
-      />
+      <RewardHistoryGraph onOpenRewardList={onOpenRewardList} graphData={graphData} />
     </Card>
   );
 }
@@ -194,15 +214,7 @@ const InfoRow = styled(Box)({
     borderLeftWidth: '1px',
   },
 });
-const WrapperIcon = styled(Box)({
-  borderRadius: '50px',
-  width: '40px',
-  height: '40px',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  marginRight: '24px',
-});
+
 const InfoDetails = styled(Box)({});
 
 // todo: remove?

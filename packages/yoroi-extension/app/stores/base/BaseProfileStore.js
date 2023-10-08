@@ -15,16 +15,31 @@ import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { SUPPORTED_CURRENCIES } from '../../config/unitOfAccount';
 import type { ComplexityLevelType } from '../../types/complexityLevelType';
 import BaseProfileActions from '../../actions/base/base-profile-actions';
+import { CURRENT_TOS_VERSION } from '../../i18n/locales/terms-of-use/ada/index';
+import { ampli } from '../../../ampli/index';
+import type { LoadOptionsWithEnvironment } from '../../../ampli/index';
 import { trackSetLocale, trackUpdateTheme } from '../../api/analytics';
 
 interface CoinPriceStore {
   refreshCurrentUnit: Request<(void) => Promise<void>>;
 }
 
-export default class BaseProfileStore<
-  TStores: { +coinPriceStore: CoinPriceStore, ... },
-  TActions: { +profile: BaseProfileActions, ... }
-> extends Store<TStores, TActions> {
+interface LoadingStore {
+  +registerBlockingLoadingRequest: (promise: Promise<void>) => void
+}
+
+export default class BaseProfileStore
+  <
+    TStores: {
+      +coinPriceStore: CoinPriceStore,
+      +loading: LoadingStore,
+      ...
+    },
+    TActions: { +profile: BaseProfileActions, ... }
+  >
+  extends Store<TStores, TActions>
+{
+
   LANGUAGE_OPTIONS: Array<LanguageType> = [
     ...LANGUAGES,
     ...(!environment.isProduction()
@@ -122,10 +137,6 @@ export default class BaseProfileStore<
     this.api.localStorage.getComplexityLevel
   );
 
-  @observable getTermsOfUseAcceptanceRequest: Request<(void) => Promise<boolean>> = new Request<
-    (void) => Promise<boolean>
-  >(this.api.localStorage.getTermsOfUseAcceptance);
-
   @observable setComplexityLevelRequest: Request<
     (ComplexityLevelType) => Promise<void>
   > = new Request<(ComplexityLevelType) => Promise<void>>(this.api.localStorage.setComplexityLevel);
@@ -158,6 +169,12 @@ export default class BaseProfileStore<
     (void) => Promise<UnitOfAccountSettingType>
   > = new Request(this.api.localStorage.getUnitOfAccount);
 
+  @observable getIsAnalyticsAllowed: Request<
+    (void) => Promise<?boolean>
+  > = new Request(this.api.localStorage.loadIsAnalyticsAllowed);
+
+  @observable _acceptedTosVersion: {| version: ?number |} = { version: undefined };
+
   setup(): void {
     super.setup();
     this.actions.profile.updateLocale.listen(this._updateLocale);
@@ -170,11 +187,49 @@ export default class BaseProfileStore<
     this.actions.profile.updateHideBalance.listen(this._updateHideBalance);
     this.actions.profile.updateUnitOfAccount.listen(this._updateUnitOfAccount);
     this.actions.profile.acceptNightly.listen(this._acceptNightly);
+    this.actions.profile.optForAnalytics.listen(this._onOptForAnalytics);
     this.actions.profile.markRevampAsAnnounced.listen(this._markRevampAsAnnounced);
-    this.registerReactions([this._setBigNumberFormat, this._updateMomentJsLocaleAfterLocaleChange]);
+    this.registerReactions([
+      this._setBigNumberFormat,
+      this._updateMomentJsLocaleAfterLocaleChange,
+    ]);
     this._getSelectComplexityLevel(); // eagerly cache
     this.currentTheme; // eagerly cache (note: don't remove -- getter is stateful)
     this.isRevampAnnounced;
+    this.stores.loading.registerBlockingLoadingRequest(
+      this._loadAcceptedTosVersion()
+    );
+    this.stores.loading.registerBlockingLoadingRequest(
+      (async () => {
+        const option = await this.getIsAnalyticsAllowed.execute()
+        const AMPLI_FLUSH_INTERVAL_MS = 5000;
+        await ampli.load(({
+          environment: environment.isProduction() ? 'production' : 'development',
+          client: {
+            configuration: {
+              optOut: !option,
+              flushIntervalMillis: AMPLI_FLUSH_INTERVAL_MS,
+              trackingOptions: {
+                ipAddress: false,
+              },
+              defaultTracking: false,
+            },
+          },
+        }: LoadOptionsWithEnvironment)).promise;
+
+        if (environment.isDev()) {
+          ampli.client.add({
+            name: 'info-plugin',
+            type: 'enrichment',
+            setup: () => Promise.resolve(),
+            execute: async (event) => {
+              console.info('[metrics]', event.event_type, event.event_properties)
+              return Promise.resolve(event)
+            },
+          });
+        }
+      })()
+    );
   }
 
   teardown(): void {
@@ -252,14 +307,13 @@ export default class BaseProfileStore<
 
   _acceptLocale: void => Promise<void> = async () => {
     // commit in-memory language to storage
-    const locale =
-      this.inMemoryLanguage != null ? this.inMemoryLanguage : BaseProfileStore.getDefaultLocale();
-    await this.setProfileLocaleRequest.execute(locale);
+    await this.setProfileLocaleRequest.execute(
+      this.inMemoryLanguage != null ? this.inMemoryLanguage : BaseProfileStore.getDefaultLocale()
+    );
     await this.getProfileLocaleRequest.execute(); // eagerly cache
     runInAction(() => {
       this.inMemoryLanguage = null;
     });
-    trackSetLocale(locale);
   };
 
   _updateMomentJsLocaleAfterLocaleChange: void => void = () => {
@@ -359,7 +413,6 @@ export default class BaseProfileStore<
     await this.getCustomThemeRequest.execute(); // eagerly cache
     await this.setThemeRequest.execute(theme);
     await this.getThemeRequest.execute(); // eagerly cache
-    trackUpdateTheme(theme);
   };
 
   _exportTheme: void => Promise<void> = async () => {
@@ -386,20 +439,27 @@ export default class BaseProfileStore<
     return getTermsOfUse('ada', this.currentLocale);
   }
 
-  @computed get hasLoadedTermsOfUseAcceptance(): boolean {
-    return (
-      this.getTermsOfUseAcceptanceRequest.wasExecuted &&
-      this.getTermsOfUseAcceptanceRequest.result !== null
-    );
+  @computed get privacyNotice(): string {
+    return getPrivacyNotice(this.currentLocale);
   }
 
   @computed get areTermsOfUseAccepted(): boolean {
-    return this.getTermsOfUseAcceptanceRequest.result === true;
+    return this._acceptedTosVersion.version === CURRENT_TOS_VERSION;
   }
 
-  _getTermsOfUseAcceptance: void => void = () => {
-    this.getTermsOfUseAcceptanceRequest.execute();
-  };
+  _loadAcceptedTosVersion: () => Promise<void> = async () => {
+    const acceptedTosVersion = await this.api.localStorage.loadAcceptedTosVersion();
+    runInAction(() => {
+      this._acceptedTosVersion.version = acceptedTosVersion;
+    });
+  }
+
+  _acceptTermsOfUse: void => Promise<void> = async () => {
+    runInAction(() => {
+      this._acceptedTosVersion.version = CURRENT_TOS_VERSION;
+    });
+    await this.api.localStorage.saveAcceptedTosVersion(CURRENT_TOS_VERSION);
+  }
 
   // ========== Complexity Level Choice ========== //
 
@@ -501,8 +561,41 @@ export default class BaseProfileStore<
   @computed get hasLoadedUnitOfAccount(): boolean {
     return this.getUnitOfAccountRequest.wasExecuted && this.getUnitOfAccountRequest.result !== null;
   }
+
+  _onOptForAnalytics: (boolean) => void = (option) => {
+    this.getIsAnalyticsAllowed.patch(_ => option);
+    this.api.localStorage.saveIsAnalysticsAllowed(option);
+    ampli.client.setOptOut(!option);
+  }
+
+  @computed get isAnalyticsOpted(): boolean {
+    return typeof this.getIsAnalyticsAllowed.result === 'boolean';
+  }
+
+  @computed get analyticsOption(): boolean {
+    const result = this.getIsAnalyticsAllowed.result;
+    if (result === null) {
+      throw new Error('analytics option still loading');
+    }
+    if (result === undefined) {
+      throw new Error('analytics option not determined');
+    }
+    return result;
+  }
 }
 
 export function getTermsOfUse(api: 'ada', currentLocale: string): string {
-  return require(`../../i18n/locales/terms-of-use/${api}/${currentLocale}.md`).default;
+  try {
+    return require(`../../i18n/locales/terms-of-use/${api}/${currentLocale}.md`).default;
+  } catch {
+    return require(`../../i18n/locales/terms-of-use/${api}/en-US.md`).default;
+  }
+}
+
+export function getPrivacyNotice(currentLocale: string): string {
+  try {
+    return require(`../../i18n/locales/privacy-notice/${currentLocale}.md`).default;
+  } catch {
+    return require(`../../i18n/locales/privacy-notice/en-US.md`).default;
+  }
 }

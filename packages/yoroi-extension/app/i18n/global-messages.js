@@ -36,6 +36,14 @@ const globalMessages: * = defineMessages({
     id: 'global.labels.token',
     defaultMessage: '!!!Token',
   },
+  addToken: {
+    id: 'global.labels.addToken',
+    defaultMessage: '!!!Add Token',
+  },
+  addNft: {
+    id: 'global.labels.addNft',
+    defaultMessage: '!!!Add NFT',
+  },
   nfts: {
     id: 'global.labels.nft',
     defaultMessage: '!!!NFTs',
@@ -414,6 +422,10 @@ const globalMessages: * = defineMessages({
     id: 'global.label.assets',
     defaultMessage: '!!!assets',
   },
+  success: {
+    id: 'global.label.success',
+    defaultMessage: '!!!Success',
+  },
   step1: {
     id: 'transfer.form.instructions.step1.text',
     defaultMessage:
@@ -527,6 +539,10 @@ const globalMessages: * = defineMessages({
     id: 'global.uriExplanation',
     defaultMessage:
       '!!!These allow you to easily share invoices with friends and businesses by simply clicking a URL.',
+  },
+  uriExplanationRevamp: {
+    id: 'global.uriExplanation.revamp',
+    defaultMessage: '!!!Allow URLs to easily share invoices with friends and businesses',
   },
   copyTooltipMessage: {
     id: 'global.copyTooltipMessage',
@@ -657,6 +673,10 @@ const globalMessages: * = defineMessages({
     id: 'global.labels.stakepool',
     defaultMessage: '!!!Stakepool Name',
   },
+  stakePoolChecksumAndName: {
+    id: 'global.labels.stakePoolChecksumAndName',
+    defaultMessage: '!!!Stake pool checksum and name',
+  },
   rewardsLabel: {
     id: 'global.labels.rewardsLabel',
     defaultMessage: '!!!Rewards',
@@ -680,6 +700,14 @@ const globalMessages: * = defineMessages({
   unknownPoolLabel: {
     id: 'wallet.staking.pool.unknownLabel',
     defaultMessage: '!!!Unknown pool',
+  },
+  poolSize: {
+    id: 'wallet.staking.pool.size',
+    defaultMessage: '!!!Pool size',
+  },
+  poolShare: {
+    id: 'wallet.staking.pool.share',
+    defaultMessage: '!!!Share',
   },
   sidebarWallets: {
     id: 'sidebar.wallets',
@@ -771,6 +799,10 @@ const globalMessages: * = defineMessages({
     id: 'wallet.staking.rewards.rewardHistory',
     defaultMessage: '!!!Reward History',
   },
+  rewardValue: {
+    id: 'wallet.staking.rewards.rewardValue',
+    defaultMessage: '!!!Reward value',
+  },
   openRewardHistory: {
     id: 'wallet.staking.rewards.openRewardHistory',
     defaultMessage: '!!!Open Reward History',
@@ -778,6 +810,10 @@ const globalMessages: * = defineMessages({
   epochProgress: {
     id: 'wallet.staking.epochProgress',
     defaultMessage: '!!!Epoch Progress',
+  },
+  epochs: {
+    id: 'wallet.staking.epochsLabel',
+    defaultMessage: '!!!Epochs',
   },
   tokens: {
     id: 'wallet.assets.tokens',
@@ -897,6 +933,10 @@ const globalMessages: * = defineMessages({
     id: 'settings.menu.termsOfUse.link.label',
     defaultMessage: '!!!Terms of use',
   },
+  termsOfService: {
+    id: 'settings.menu.termsOfService.link.label',
+    defaultMessage: '!!!Terms of Service Agreement',
+  },
   fromAddresses: {
     id: 'wallet.transaction.addresses.from',
     defaultMessage: '!!!From addresses',
@@ -1002,6 +1042,10 @@ const globalMessages: * = defineMessages({
     id: 'label.confirm.trezor',
     defaultMessage: '!!!Confirm on Trezor',
   },
+  tosAgreement: {
+    id: 'profile.languageSelect.tosAgreement',
+    defaultMessage: '!!!I agree with <span id="tosLink">Terms of Service Agreement</span> and <span id="privacyLink">Privacy Notice</span>',
+  },
 });
 export default globalMessages;
 
@@ -1028,7 +1072,7 @@ export const memoMessages: * = defineMessages({
   },
   memoWarning: {
     id: 'wallet.send.form.memoWarning',
-    defaultMessage: '!!!Memos are stored localy only',
+    defaultMessage: '!!!(Optional) Memo is stored locally',
   },
 });
 export const connectorMessages: * = defineMessages({

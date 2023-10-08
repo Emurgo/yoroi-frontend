@@ -12,32 +12,41 @@ import type { ServerStatusErrorType } from '../../../types/serverStatusErrorType
 type GeneratedData = typeof ComplexityLevelSettingsPage.prototype.generated;
 
 @observer
-export default class ComplexityLevelSettingsPage
-  extends Component<InjectedOrGenerated<GeneratedData>> {
+export default class ComplexityLevelSettingsPage extends Component<
+  InjectedOrGenerated<GeneratedData>
+> {
+  render(): Node {
+    return (
+      <ComplexityLevel
+        complexityLevel={this.generated.stores.profile.selectedComplexityLevel}
+        onSubmit={this.generated.actions.profile.selectComplexityLevel.trigger}
+        isSubmitting={this.generated.stores.profile.setComplexityLevelRequest.isExecuting}
+        error={this.generated.stores.profile.setComplexityLevelRequest.error}
+      />
+    );
+  }
 
   @computed get generated(): {|
     actions: {|
       profile: {|
         selectComplexityLevel: {|
-          trigger: (
-            params: ComplexityLevelType
-          ) => Promise<void>
-        |}
-      |}
+          trigger: (params: ComplexityLevelType) => Promise<void>,
+        |},
+      |},
     |},
     stores: {|
       profile: {|
         selectedComplexityLevel: ?ComplexityLevelType,
         setComplexityLevelRequest: {|
           error: ?LocalizableError,
-          isExecuting: boolean
-        |}
+          isExecuting: boolean,
+        |},
       |},
       serverConnectionStore: {|
-        checkAdaServerStatus: ServerStatusErrorType
-      |}
-    |}
-    |} {
+        checkAdaServerStatus: ServerStatusErrorType,
+      |},
+    |},
+  |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -57,7 +66,7 @@ export default class ComplexityLevelSettingsPage
             error: profileStore.setComplexityLevelRequest.error,
             isExecuting: profileStore.setComplexityLevelRequest.isExecuting,
           },
-          selectedComplexityLevel: profileStore.selectedComplexityLevel
+          selectedComplexityLevel: profileStore.selectedComplexityLevel,
         },
       },
       actions: {
@@ -66,16 +75,5 @@ export default class ComplexityLevelSettingsPage
         },
       },
     });
-  }
-
-  render(): Node {
-    return (
-      <ComplexityLevel
-        complexityLevel={this.generated.stores.profile.selectedComplexityLevel}
-        onSubmit={this.generated.actions.profile.selectComplexityLevel.trigger}
-        isSubmitting={this.generated.stores.profile.setComplexityLevelRequest.isExecuting}
-        error={this.generated.stores.profile.setComplexityLevelRequest.error}
-      />
-    );
   }
 }

@@ -2,7 +2,7 @@
 
 const RevampOutlinedInput = {
   styleOverrides: {
-    root: ({ theme }) => ({
+    root: ({ theme }: any): any => ({
       paddingRight: '16px',
       height: '56px',
       '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: theme.palette.grayscale[900] },
@@ -14,14 +14,21 @@ const RevampOutlinedInput = {
       },
       '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
         borderColor: theme.palette.grayscale[900],
-        border: '2px solid',
+        borderWidth: '2px',
+      },
+      '&.Mui-focused.Mui-error .MuiOutlinedInput-notchedOutline': {
+        borderColor: theme.palette.magenta[500],
+        borderWidth: '2px',
       },
       '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
         borderColor: theme.palette.grayscale[200],
         backgroundColor: 'transparent',
         color: theme.palette.grayscale[200],
       },
-      '&.Mui-error .MuiOutlinedInput-notchedOutline': { borderColor: theme.palette.magenta[500] },
+      '&.Mui-error .MuiOutlinedInput-notchedOutline': {
+        borderColor: theme.palette.magenta[500],
+        borderWidth: '2px',
+      },
       '& .MuiOutlinedInput-input': {
         '&.Mui-disabled': {
           color: theme.palette.grayscale[200],

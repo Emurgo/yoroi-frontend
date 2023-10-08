@@ -18,6 +18,7 @@ const ClassicTooltip = {
     placement: 'bottom',
   },
 };
+
 const ModernTooltip = {
   styleOverrides: {
     tooltip: {

@@ -15,7 +15,16 @@ export const warningCheckboxElement: LocatorObject = {
   method: 'css',
 };
 
+export const infoDialog: LocatorObject = {
+  locator: 'infoDialog',
+  method: 'id',
+};
+export const infoDialogContinueButton: LocatorObject = {
+  locator: 'infoDialogContinueButton',
+  method: 'id',
+};
+
 export const getWarningCheckbox = async (customWorld: Object): Promise<webdriver$WebElement> => {
   const warningCheckboxComponent = await customWorld.findElement(warningCheckboxElement);
   return await warningCheckboxComponent.findElement(By.xpath('//input[@type="checkbox"]'));
-}
+};

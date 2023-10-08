@@ -1,64 +1,33 @@
 // @flow
 
 import { When, Then } from 'cucumber';
-import { By, error, Key } from 'selenium-webdriver';
+import { By, error } from 'selenium-webdriver';
 import i18n from '../support/helpers/i18n-helpers';
 import { expect } from 'chai';
-import { checkErrorByTranslationId, getPlates } from './common-steps';
+import { checkErrorByTranslationId, checkWalletPlate } from './common-steps';
 import {
   cleanRecoverInput,
   enterRecoveryPhrase,
   confirmButton,
   errorInvalidRecoveryPhrase,
-  getWords,
-  recoveryPhraseField,
-  repeatPasswordInput,
-  walletPasswordInput,
+  restoreWalletInputPhraseDialog,
 } from '../pages/restoreWalletPage';
 import { masterKeyInput } from '../pages/walletClaimTransferPage';
 import {
-  byronEraButton,
-  pickUpCurrencyDialog,
   recoveryPhraseDeleteIcon,
   recoveryPhraseError,
-  restoreWalletButton,
-  restore24WordWallet,
   restoreDialogButton,
   restoreNormalWallet,
   shelleyEraButton,
   walletAlreadyExistsComponent,
-  walletRestoreDialog,
-  walletRestoreOptionDialog,
 } from '../pages/newWalletPages';
 import { dialogTitle } from '../pages/commonDialogPage';
+import { repeatPasswordInput, walletPasswordInput } from '../pages/walletDetailsPage';
 
-When(/^I click the restore button for ([^"]*)$/, async function (currency) {
-  await this.click(restoreWalletButton);
-
-  await this.waitForElement(pickUpCurrencyDialog);
-  await this.click({ locator: `.PickCurrencyOptionDialog_${currency}`, method: 'css' });
-
-  await this.waitForElement(walletRestoreOptionDialog);
-});
-
-Then(/^I select Byron-era 15-word wallet$/, async function () {
-  await this.click(restoreNormalWallet);
-  await this.click(byronEraButton);
-  await this.waitForElement(walletRestoreDialog);
-});
 Then(/^I select Shelley-era 15-word wallet$/, async function () {
   await this.click(restoreNormalWallet);
   await this.click(shelleyEraButton);
-  await this.waitForElement(walletRestoreDialog);
-});
-Then(/^I select Shelley-era 24-word wallet$/, async function () {
-  await this.click(restore24WordWallet);
-  await this.waitForElement(walletRestoreDialog);
-});
-
-Then(/^I select bip44 15-word wallet$/, async function () {
-  await this.click(restoreNormalWallet);
-  await this.waitForElement(walletRestoreDialog);
+  await this.waitForElement(restoreWalletInputPhraseDialog);
 });
 
 When(/^I enter the recovery phrase:$/, async function (table) {
@@ -85,19 +54,6 @@ When(/^I can't enter more then 15 words from the recovery phrase:$/, async funct
 When(/^I enter the master key:$/, async function (table) {
   const fields = table.hashes()[0];
   await this.input(masterKeyInput, fields.masterKey);
-});
-
-When(/^I enter one more word to the recovery phrase field:$/, async function (table) {
-  const words = table.hashes()[0];
-  const inputElement = await this.findElement(recoveryPhraseField);
-  try {
-    await inputElement.sendKeys(words.word, Key.RETURN);
-    expect(false, 'Recovery phrase is intractable').to.true;
-  } catch (e) {
-    expect(e instanceof error.ElementNotInteractableError).to.be.true;
-  }
-  const lastWord = await this.findElements(getWords(words.word));
-  expect(lastWord.length).to.be.equal(0);
 });
 
 When(/^I clear the recovery phrase$/, async function () {
@@ -128,19 +84,7 @@ Then(/^I should see an "Invalid recovery phrase" error message$/, async function
 });
 
 Then(/^I should see a plate ([^"]*)$/, async function (plate) {
-  const plateElements = await getPlates(this);
-  const plateText = await plateElements[0].getText();
-  expect(plateText).to.be.equal(plate);
-});
-
-Then(/^I should see a plates$/, async function (table) {
-  const rows = table.hashes();
-
-  const plateElements = await getPlates(this);
-  for (let i = 0; i < rows.length; i++) {
-    const plateText = await plateElements[i].getText();
-    expect(plateText).to.be.equal(rows[i].plate);
-  }
+  await checkWalletPlate(this, plate);
 });
 
 Then(/^I should stay in the restore wallet dialog$/, async function () {

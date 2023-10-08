@@ -45,7 +45,6 @@ import { generateRegistration } from '../../api/ada/lib/cardanoCrypto/catalyst';
 import { derivePublicByAddressing } from '../../api/ada/lib/cardanoCrypto/utils'
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet'
 import type { CatalystRoundInfoResponse } from '../../api/ada/lib/state-fetch/types'
-import { trackCatalystRegistration } from '../../api/analytics';
 import {
   loadCatalystRoundInfo,
   saveCatalystRoundInfo,
@@ -87,7 +86,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
     () => [
       this.stores.wallets.selected,
       // update if tx history changes
-      this.stores.transactions.hash,
+      this.stores.transactions.recent,
     ],
     () => {
       if (this.createVotingRegTx.wasExecuted) {
@@ -409,7 +408,9 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
         },
         refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
       });
-    } else if (isTrezorTWallet(request.publicDeriver.getParent())) {
+      return;
+    }
+    if (isTrezorTWallet(request.publicDeriver.getParent())) {
       await this.stores.substores.ada.wallets.adaSendAndRefresh({
         broadcastRequest: {
           trezor: {
@@ -419,23 +420,23 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
         },
         refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
       });
-    } else {
-      // normal password-based wallet
-      if (request.password == null) {
-        throw new Error(`${nameof(this._signTransaction)} missing password for non-hardware signing`);
-      }
-      await this.stores.substores.ada.wallets.adaSendAndRefresh({
-        broadcastRequest: {
-          normal: {
-            publicDeriver: request.publicDeriver,
-            password: request.password,
-            signRequest: result,
-          },
-        },
-        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
-      });
+      return;
     }
-    trackCatalystRegistration();
+
+    // normal password-based wallet
+    if (request.password == null) {
+      throw new Error(`${nameof(this._signTransaction)} missing password for non-hardware signing`);
+    }
+    await this.stores.substores.ada.wallets.adaSendAndRefresh({
+      broadcastRequest: {
+        normal: {
+          publicDeriver: request.publicDeriver,
+          password: request.password,
+          signRequest: result,
+        },
+      },
+      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
+    });
   };
 
   @action _generateCatalystKey: void => Promise<void> = async () => {

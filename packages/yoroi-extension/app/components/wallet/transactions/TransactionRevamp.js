@@ -195,7 +195,7 @@ export default class TransactionRevamp extends Component<Props, State> {
 
   renderAmountDisplay: ({|
     entry: TokenEntry,
-    getRawNumber: boolean,
+    getRawNumber?: boolean,
   |}) => Node | string = request => {
     if (this.props.shouldHideBalance) {
       return <span>{hiddenAmount}</span>;
@@ -214,7 +214,7 @@ export default class TransactionRevamp extends Component<Props, State> {
       ? beforeDecimalRewards
       : '+' + beforeDecimalRewards;
 
-    if (request.getRawNumber) {
+    if (request.getRawNumber === true) {
       return adjustedBefore + afterDecimalRewards;
     }
 
@@ -260,7 +260,7 @@ export default class TransactionRevamp extends Component<Props, State> {
       }
 
       const price = this.props.getHistoricalPrice(ticker, currency, request.timestamp);
-      let fiatDisplay;
+      let fiatDisplay = '-';
       if (price != null) {
         const amount = calculateAndFormatValue(shiftedAmount, price);
         const [beforeDecimal, afterDecimal] = amount.split('.');
@@ -296,6 +296,9 @@ export default class TransactionRevamp extends Component<Props, State> {
         </Box>
       );
     }
+
+    const amount = this.renderAmountDisplay({ entry: request.entry, getRawNumber: true });
+    const isPositiveNumber = typeof amount === 'string' ? amount.charAt(0) === '+' : false; // eslint-disable-line
 
     return (
       <Typography variant="body1" fontWeight={500} color="grayscale.900">
@@ -603,7 +606,7 @@ export default class TransactionRevamp extends Component<Props, State> {
               xs={2}
               sx={{
                 display: 'flex',
-                alignItems: 'center',
+                alignItems: 'flex-start',
                 justifyContent: 'flex-end',
               }}
             >
@@ -620,12 +623,14 @@ export default class TransactionRevamp extends Component<Props, State> {
               xs={4}
               sx={{
                 display: 'flex',
-                alignItems: 'center',
+                alignItems: 'start',
                 justifyContent: 'flex-end',
                 gap: '8px',
               }}
             >
-              <Box textAlign="right">
+              <Box
+                textAlign="right"
+              >
                 <Typography
                   variant="body1"
                   fontWeight="500"
