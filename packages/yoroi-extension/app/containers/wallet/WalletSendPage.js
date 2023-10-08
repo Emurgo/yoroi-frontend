@@ -232,6 +232,7 @@ class WalletSendPage extends Component<AllProps> {
         </>
       );
     }
+
     return (
       <>
         <WalletSendFormClassic
@@ -629,6 +630,7 @@ class WalletSendPage extends Component<AllProps> {
         addToken: {|
           trigger: (params: {|
             token?: $ReadOnly<TokenRow>,
+            shouldSendAll?: boolean,
             shouldReset?: boolean,
           |}) => void,
         |},
