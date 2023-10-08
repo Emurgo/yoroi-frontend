@@ -164,7 +164,6 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props, Sta
 
             return (
               <Stack
-                item
                 // use the form name key to know when we reset
                 key={form.name + '-word-' + idx}
               >
