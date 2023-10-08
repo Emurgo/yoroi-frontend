@@ -26,6 +26,8 @@ const storageKeys = {
   URI_SCHEME_ACCEPTANCE: networkForLocalStorage + '-URI-SCHEME-ACCEPTANCE',
   COMPLEXITY_LEVEL: networkForLocalStorage + '-COMPLEXITY-LEVEL',
   THEME: networkForLocalStorage + '-THEME',
+  IS_USER_MIGRATED_TO_REVAMP: 'IS_USER_MIGRATED_TO_REVAMP',
+  IS_REVAMP_THEME_ANNOUNCED: 'IS_REVAMP_THEME_ANNOUNCED',
   CUSTOM_THEME: networkForLocalStorage + '-CUSTOM-THEME',
   VERSION: networkForLocalStorage + '-LAST-LAUNCH-VER',
   HIDE_BALANCE: networkForLocalStorage + '-HIDE-BALANCE',
@@ -108,6 +110,22 @@ export default class LocalStorageApi {
   setUserTheme: string => Promise<void> = (theme) => setLocalItem(storageKeys.THEME, theme);
 
   unsetUserTheme: void => Promise<void> = () => removeLocalItem(storageKeys.THEME);
+
+  // ========== Theme Migration ========== //
+
+  getUserRevampMigrationStatus: void => Promise<boolean> = async () =>
+    (await getLocalItem(storageKeys.IS_USER_MIGRATED_TO_REVAMP)) === 'true';
+
+  setUserRevampMigrationStatus: boolean => Promise<void> = (status) =>
+    setLocalItem(storageKeys.IS_USER_MIGRATED_TO_REVAMP, status.toString());
+
+  // ========== Revamp Announcement  ========== //
+
+  getUserRevampAnnouncementStatus: void => Promise<boolean> = async () =>
+    (await getLocalItem(storageKeys.IS_REVAMP_THEME_ANNOUNCED)) === 'true';
+
+  setUserRevampAnnouncementStatus: boolean => Promise<void> = (status) =>
+    setLocalItem(storageKeys.IS_REVAMP_THEME_ANNOUNCED, status.toString());
 
   // ========== Select Wallet ========== //
 
