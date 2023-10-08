@@ -36,15 +36,18 @@ const dialogMessages = defineMessages({
   },
   deregisterExplanationLine1: {
     id: 'wallet.transfer.deregister.line1',
-    defaultMessage: '!!!When withdrawing rewards, you also have the option to deregister the staking key',
+    defaultMessage:
+      '!!!When withdrawing rewards, you also have the option to deregister the staking key',
   },
   deregisterExplanationLine2: {
     id: 'wallet.transfer.deregister.line2',
-    defaultMessage: '!!!Deregistering the staking key will give you back your deposit and undelegate the key from any pool',
+    defaultMessage:
+      '!!!Deregistering the staking key will give you back your deposit and undelegate the key from any pool',
   },
   deregisterExplanationLine3: {
     id: 'wallet.transfer.deregister.line3',
-    defaultMessage: '!!!Keeping the staking key will allow you to withdraw the rewards, but continue delegating to the same pool',
+    defaultMessage:
+      '!!!Keeping the staking key will allow you to withdraw the rewards, but continue delegating to the same pool',
   },
   noNeedToDeregister: {
     id: 'wallet.transfer.deregister.noNeedToDeregister',
@@ -62,7 +65,7 @@ const dialogMessages = defineMessages({
 
 @observer
 export default class DeregisterDialogContainer extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
@@ -81,7 +84,7 @@ export default class DeregisterDialogContainer extends Component<Props> {
   @action
   toggleCheck: void => void = () => {
     this.isChecked = !this.isChecked;
-  }
+  };
 
   render(): Node {
     const { intl } = this.context;
@@ -123,7 +126,9 @@ export default class DeregisterDialogContainer extends Component<Props> {
             <br />
             <li>{intl.formatMessage(dialogMessages.deregisterExplanationLine5)}</li>
           </ol>
-        </WarningBox><br /><br />
+        </WarningBox>
+        <br />
+        <br />
       </DangerousActionDialog>
     );
   }
@@ -132,8 +137,8 @@ export default class DeregisterDialogContainer extends Component<Props> {
     actions: {|
       dialogs: {|
         closeActiveDialog: {|
-          trigger: (params: void) => void
-        |}
+          trigger: (params: void) => void,
+        |},
       |},
       ada: {|
         delegationTransaction: {|
@@ -147,15 +152,15 @@ export default class DeregisterDialogContainer extends Component<Props> {
       profile: {|
         selectedComplexityLevel: ?ComplexityLevelType,
       |},
-    |}
-    |} {
+    |},
+  |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
     if (this.props.stores == null || this.props.actions == null) {
       throw new Error(`${nameof(DeregisterDialogContainer)} no way to generated props`);
     }
-    const { actions, stores, } = this.props;
+    const { actions, stores } = this.props;
     return Object.freeze({
       stores: Object.freeze({
         profile: {

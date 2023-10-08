@@ -4,12 +4,11 @@ import { Component } from 'react';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import type { ComponentType, Node } from 'react';
 import {
-  genFormatTokenAmount,
   genLookupOrFail,
   getTokenIdentifierIfExists,
   getTokenStrictName,
 } from '../../stores/stateless/tokenHelpers';
-import { truncateToken } from '../../utils/formatters';
+import { splitAmount, truncateToken } from '../../utils/formatters';
 import { computed } from 'mobx';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
@@ -55,6 +54,10 @@ class TokenDetailsPageRevamp extends Component<AllProps> {
             .map(token => {
               const policyId = token.entry.identifier.split('.')[0];
               const name = truncateToken(getTokenStrictName(token.info) ?? '-');
+
+              const numberOfDecimals = token.info?.Metadata.numberOfDecimals ?? 0;
+              const shiftedAmount = token.entry.amount.shiftedBy(-numberOfDecimals);
+              const [beforeDecimal, afterDecimal] = splitAmount(shiftedAmount, numberOfDecimals);
               return {
                 policyId,
                 lastUpdatedAt: token.info.Metadata.lastUpdatedAt,
@@ -62,18 +65,13 @@ class TokenDetailsPageRevamp extends Component<AllProps> {
                 assetName: token.entry.identifier.split('.')[1] ?? '',
                 name,
                 id: getTokenIdentifierIfExists(token.info) ?? '-',
-                amount: genFormatTokenAmount(getTokenInfo)(token.entry),
-                description: getDescriptionFromTokenMetadata(
-                  policyId,
-                  name,
-                  token.info.Metadata
-                )
-              }
+                amount: [beforeDecimal, afterDecimal].join(''),
+                description: getDescriptionFromTokenMetadata(policyId, name, token.info.Metadata),
+              };
             });
 
     const { tokenId } = this.props.match.params;
     const tokenInfo = assetsList.find(token => token.id === tokenId);
-    const tokensCount = assetsList.length + 1 // +1 for the default assets
     return (
       <Box
         borderRadius="8px"
@@ -81,7 +79,7 @@ class TokenDetailsPageRevamp extends Component<AllProps> {
         height="content"
         overflow="auto"
       >
-        <TokenDetails tokenInfo={tokenInfo} tokensCount={tokensCount} network={network} />
+        <TokenDetails tokenInfo={tokenInfo} network={network} />
       </Box>
     );
   }

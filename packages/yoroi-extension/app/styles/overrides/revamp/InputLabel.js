@@ -2,9 +2,8 @@
 
 const RevampInputLabel = {
   styleOverrides: {
-    // $FlowFixMe
-    root: ({ theme }) => ({
-      color: theme.palette.grayscale[400],
+    root: ({ theme }: any): any => ({
+      color: theme.palette.grayscale[900],
       '&::first-letter': { textTransform: 'uppercase' },
       '&.Mui-focused': { color: theme.palette.grayscale[900] },
       '&.Mui-disabled': { color: theme.palette.grayscale[200] },

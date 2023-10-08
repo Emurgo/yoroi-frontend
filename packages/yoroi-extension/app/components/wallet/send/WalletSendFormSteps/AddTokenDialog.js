@@ -35,6 +35,7 @@ import MinAda from './MinAda';
 import globalMessages from '../../../../i18n/global-messages';
 import MaxAssetsError from '../MaxAssetsError';
 import OutlinedInput from '@mui/material/OutlinedInput';
+import { ampli } from '../../../../../ampli/index';
 
 type Props = {|
   +onClose: void => void,
@@ -189,7 +190,26 @@ export default class AddTokenDialog extends Component<Props, State> {
 
   onAddAll: void => void = () => {
     const toRemove = [];
+    let changed = false;
+    const tokens = this.props.plannedTxInfoMap
+      .filter(({ token }) => !token.IsDefault)
+      .map(({ token, amount }) => ({ tokenId: token.TokenId, amount }));
     for (const { token, amount, included } of this.state.selectedTokens) {
+      const tokenIndex = tokens.findIndex(({ tokenId }) => tokenId === token.TokenId);
+      if (tokenIndex !== -1) {
+        if (included && amount != null) {
+          if (amount.toString() !== tokens[tokenIndex].amount) {
+            tokens[tokenIndex].amount = amount.toString();
+            changed = true;
+          }
+        } else {
+          tokens.splice(tokenIndex, 1);
+          changed = true;
+        }
+      } else if (included && amount != null) {
+          tokens.push({ tokenId: token.TokenId, amount: amount.toString() });
+          changed = true;
+      }
       if (!included) {
         toRemove.push(token);
         continue;
@@ -205,6 +225,11 @@ export default class AddTokenDialog extends Component<Props, State> {
     }
     this.props.onRemoveTokens(toRemove);
     this.props.onClose();
+    if (changed) {
+      ampli.sendSelectAssetUpdated({
+        asset_count: tokens.length,
+      });
+    }
   };
 
   getMaxAmount: ($ReadOnly<TokenRow>) => BigNumber = tokenInfo => {

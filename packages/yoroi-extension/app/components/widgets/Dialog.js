@@ -10,7 +10,7 @@ import { LoadingButton } from '@mui/lab';
 import { withLayout } from '../../styles/context/layout';
 import { observer } from 'mobx-react';
 
-type ActionType = {|
+export type ActionType = {|
   +label: string,
   +onClick: void => PossiblyAsync<void>,
   +primary?: boolean,
@@ -20,7 +20,7 @@ type ActionType = {|
   +className?: ?string,
 |};
 
-type Props = {|
+export type Props = {|
   +title?: string | Node,
   +children?: Node,
   +actions?: Array<ActionType>,
@@ -30,6 +30,7 @@ type Props = {|
   +styleOverride?: { ... },
   +onClose?: ?(void) => PossiblyAsync<void>,
   +closeOnOverlayClick?: boolean,
+  +isRevampLayout?: boolean,
 |};
 
 type InjectedProps = {| isRevampLayout: boolean |};
@@ -94,13 +95,6 @@ function DialogFn(props: Props & InjectedProps): Node {
                 <LoadingButton
                   id={action.primary === true ? 'primaryButton' : 'secondaryButton'}
                   key={i}
-                  // variant={
-                  //   action.danger === true
-                  //     ? 'danger'
-                  //     : action.primary === true
-                  //     ? 'primary'
-                  //     : 'secondary'
-                  // }
                   {...getBtnVariant(action.danger, action.primary, isRevampLayout)}
                   className={buttonClasses}
                   loading={action.isSubmitting}
@@ -180,7 +174,7 @@ const ModalFooter = styled(Box)(({ theme }) => ({
 function getBtnVariant(
   danger?: boolean,
   primary?: boolean,
-  isRevampLayout: boolean
+  isRevampLayout?: boolean
 ): {|
   variant: 'contained' | 'outlined' | 'danger' | 'primary' | 'secondary',
   color?: 'primary' | 'secondary' | 'error',
@@ -188,11 +182,11 @@ function getBtnVariant(
   if (danger && isRevampLayout) return { variant: 'contained', color: 'error' };
 
   if (isRevampLayout && primary) {
-    return { variant: 'contained', color: 'primary' };
+    return { variant: 'primary' };
   }
 
   if (isRevampLayout && !primary) {
-    return { variant: 'outlined', color: 'primary' };
+    return { variant: 'secondary' };
   }
 
   if (danger === true) return { variant: 'danger' };

@@ -17,24 +17,26 @@ type Props = {|
 
 @observer
 export default class YoroiTransferErrorPage extends Component<Props> {
-  static defaultProps: {|error: void|} = {
-    error: undefined
+  static defaultProps: {| error: void |} = {
+    error: undefined,
   };
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+    intl: intlShape.isRequired,
   };
 
   render(): Node {
     const { intl } = this.context;
     const { error, onCancel, classicTheme } = this.props;
 
-    return (<ErrorPage
-      title={intl.formatMessage(new GenerateTransferTxError())}
-      backButtonLabel={intl.formatMessage(globalMessages.cancel)}
-      onCancel={onCancel}
-      error={error}
-      classicTheme={classicTheme}
-    />);
+    return (
+      <ErrorPage
+        title={intl.formatMessage(new GenerateTransferTxError())}
+        backButtonLabel={intl.formatMessage(globalMessages.cancel)}
+        onCancel={onCancel}
+        error={error}
+        classicTheme={classicTheme}
+      />
+    );
   }
 }

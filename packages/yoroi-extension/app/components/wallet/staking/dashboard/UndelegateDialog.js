@@ -1,6 +1,6 @@
 // @flow
 
-/* eslint react/jsx-one-expression-per-line: 0 */  // the &nbsp; in the html breaks this
+/* eslint react/jsx-one-expression-per-line: 0 */ // the &nbsp; in the html breaks this
 
 import type { Node } from 'react';
 import { Component } from 'react';
@@ -18,12 +18,8 @@ import styles from './UndelegateDialog.scss';
 import AnnotatedLoader from '../../../transfer/AnnotatedLoader';
 import config from '../../../../config';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import {
-  MultiToken,
-} from '../../../../api/common/lib/MultiToken';
-import type {
-  TokenLookupKey,
-} from '../../../../api/common/lib/MultiToken';
+import { MultiToken } from '../../../../api/common/lib/MultiToken';
+import type { TokenLookupKey } from '../../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import { getTokenName } from '../../../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../../../utils/formatters';
@@ -37,14 +33,15 @@ const messages = defineMessages({
   },
   explanationLine2: {
     id: 'wallet.undelegation.transaction.explanationLine2',
-    defaultMessage: '!!!It will take 2 epochs after the end of the current epoch for undelegation to take effect',
+    defaultMessage:
+      '!!!It will take 2 epochs after the end of the current epoch for undelegation to take effect',
   },
 });
 
 type Props = {|
   +staleTx: boolean,
   +transactionFee: MultiToken,
-  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
+  +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +isSubmitting: boolean,
   +onCancel: void => void,
   +onSubmit: ({| password: string |}) => PossiblyAsync<void>,
@@ -55,47 +52,52 @@ type Props = {|
 
 @observer
 export default class UndelegateDialog extends Component<Props> {
-
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
-  form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
-    fields: {
-      walletPassword: {
-        type: 'password',
-        label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
-        placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(globalMessages.walletPasswordFieldPlaceholder) : '',
-        value: '',
-        validators: [({ field }) => {
-          if (field.value === '') {
-            return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
-          }
-          return [true];
-        }],
+  form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
+    {
+      fields: {
+        walletPassword: {
+          type: 'password',
+          label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
+          placeholder: this.props.classicTheme
+            ? this.context.intl.formatMessage(globalMessages.walletPasswordFieldPlaceholder)
+            : '',
+          value: '',
+          validators: [
+            ({ field }) => {
+              if (field.value === '') {
+                return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
+              }
+              return [true];
+            },
+          ],
+        },
+      },
+    },
+    {
+      options: {
+        validateOnChange: true,
+        validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
+      },
+      plugins: {
+        vjf: vjf(),
       },
     }
-  }, {
-    options: {
-      validateOnChange: true,
-      validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
-    },
-    plugins: {
-      vjf: vjf()
-    },
-  });
+  );
 
   submit() {
     this.form.submit({
-      onSuccess: async (form) => {
+      onSuccess: async form => {
         const { walletPassword } = form.values();
         const transactionData = {
           password: walletPassword,
         };
         await this.props.onSubmit(transactionData);
       },
-      onError: () => {}
+      onError: () => {},
     });
   }
 
@@ -123,7 +125,8 @@ export default class UndelegateDialog extends Component<Props> {
     const staleTxWarning = (
       <div className={styles.warningBox}>
         <WarningBox>
-          {intl.formatMessage(globalMessages.staleTxnWarningLine1)}<br />
+          {intl.formatMessage(globalMessages.staleTxnWarningLine1)}
+          <br />
           {intl.formatMessage(globalMessages.staleTxnWarningLine2)}
         </WarningBox>
       </div>
@@ -140,7 +143,7 @@ export default class UndelegateDialog extends Component<Props> {
         disabled: this.props.isSubmitting,
         onClick: this.props.isSubmitting
           ? () => {} // noop
-          : this.props.onCancel
+          : this.props.onCancel,
       },
       {
         label: intl.formatMessage(globalMessages.undelegateLabel),
@@ -179,12 +182,8 @@ export default class UndelegateDialog extends Component<Props> {
       >
         {this.props.staleTx && staleTxWarning}
         <ul className={styles.explanation}>
-          <li>
-            {intl.formatMessage(messages.explanationLine1)}
-          </li>
-          <li>
-            {intl.formatMessage(messages.explanationLine2)}
-          </li>
+          <li>{intl.formatMessage(messages.explanationLine1)}</li>
+          <li>{intl.formatMessage(messages.explanationLine2)}</li>
         </ul>
 
         <div className={styles.walletPasswordFields}>
@@ -202,15 +201,11 @@ export default class UndelegateDialog extends Component<Props> {
           </p>
           {rewardAmount}
         </div>
-        {this.props.error
-          ? (
-            <p className={styles.error}>
-              {intl.formatMessage(this.props.error, this.props.error.values)}
-            </p>
-          )
-          : null
-        }
-
+        {this.props.error ? (
+          <p className={styles.error}>
+            {intl.formatMessage(this.props.error, this.props.error.values)}
+          </p>
+        ) : null}
       </Dialog>
     );
   }

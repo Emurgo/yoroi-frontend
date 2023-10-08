@@ -3,6 +3,7 @@
 import type { LocatorObject } from '../support/webdriver';
 import type { RestorationInput } from '../mock-chain/TestWallets';
 import { Key } from 'selenium-webdriver';
+import { walletNameInput, walletPasswordInput, repeatPasswordInput } from './walletDetailsPage';
 
 export const getWords = (word: string): LocatorObject => {
   return { locator: `//span[contains(text(), '${word}')]`, method: 'xpath' };
@@ -56,21 +57,9 @@ export const cleanRecoverInput: LocatorObject = {
   locator: '.AutocompleteOverridesClassic_autocompleteWrapper input',
   method: 'css',
 };
-export const walletNameInput: LocatorObject = {
-  locator: 'walletNameInput',
-  method: 'id',
-};
 export const confirmRestoreWalletButton: LocatorObject = {
   locator: '.WalletRestoreDialog .primary',
   method: 'css',
-};
-export const walletPasswordInput: LocatorObject = {
-  locator: 'walletPasswordInput',
-  method: 'id',
-};
-export const repeatPasswordInput: LocatorObject = {
-  locator: 'repeatPasswordInput',
-  method: 'id',
 };
 export const confirmButton: LocatorObject = { locator: '.confirmButton', method: 'css' };
 export const confirmConfirmationButton: LocatorObject = {
@@ -80,8 +69,4 @@ export const confirmConfirmationButton: LocatorObject = {
 export const verifyRestoredInfoDialog: LocatorObject = {
   locator: '.WalletRestoreVerifyDialog_dialog',
   method: 'css',
-};
-export const restoringDialogPlate: LocatorObject = {
-  locator: 'walletPlateText',
-  method: 'id',
 };

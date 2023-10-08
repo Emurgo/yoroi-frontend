@@ -10,9 +10,7 @@ import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
 import type { IGetPublic } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { PublicKeyCache } from '../../../stores/toplevel/WalletStore';
-import {
-  asGetPublicKey,
-} from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { asGetPublicKey } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
 import IncludePublicKeyDialog from './IncludePublicKeyDialog';
 import type { GeneratedData as IncludePublicKeyDialogData } from './IncludePublicKeyDialog';
 import type { ComplexityLevelType } from '../../../types/complexityLevelType';
@@ -22,66 +20,7 @@ type GeneratedData = typeof SupportSettingsPage.prototype.generated;
 
 @observer
 export default class SupportSettingsPage extends Component<InjectedOrGenerated<GeneratedData>> {
-
-  @computed get generated(): {|
-    actions: {|
-      dialogs: {|
-        open: {|
-          trigger: (params: {|
-            dialog: any,
-            params?: any
-          |}) => void
-        |},
-      |},
-    |},
-    stores: {|
-      uiDialogs: {|
-        isOpen: any => boolean
-      |},
-      profile: {|
-        selectedComplexityLevel: ?ComplexityLevelType,
-      |},
-      wallets: {|
-        getPublicKeyCache: IGetPublic => PublicKeyCache,
-        selected: null | PublicDeriver<>,
-      |},
-    |},
-    IncludePublicKeyDialogProps: InjectedOrGenerated<IncludePublicKeyDialogData>,
-    |} {
-    if (this.props.generated !== undefined) {
-      return this.props.generated;
-    }
-    if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(SupportSettingsPage)} no way to generated props`);
-    }
-    const { actions, stores } = this.props;
-    return Object.freeze({
-      actions: {
-        dialogs: {
-          open: {
-            trigger: actions.dialogs.open.trigger,
-          },
-        },
-      },
-      stores: {
-        profile: {
-          selectedComplexityLevel: stores.profile.selectedComplexityLevel
-        },
-        uiDialogs: {
-          isOpen: stores.uiDialogs.isOpen,
-        },
-        wallets: {
-          selected: stores.wallets.selected,
-          getPublicKeyCache: stores.wallets.getPublicKeyCache,
-        },
-      },
-      IncludePublicKeyDialogProps: (
-        { actions, stores, }: InjectedOrGenerated<IncludePublicKeyDialogData>
-      ),
-    });
-  }
-
-  getPublicKey: void => (void | string) = () => {
+  getPublicKey: void => void | string = () => {
     const { selected } = this.generated.stores.wallets;
     if (selected == null) {
       return undefined;
@@ -92,9 +31,9 @@ export default class SupportSettingsPage extends Component<InjectedOrGenerated<G
     }
     const { publicKey } = this.generated.stores.wallets.getPublicKeyCache(withPublicKey);
     return publicKey;
-  }
+  };
 
-  handleDownloadLogs: (() => void) = () => {
+  handleDownloadLogs: () => void = () => {
     if (this.generated.stores.profile.selectedComplexityLevel !== ComplexityLevels.Advanced) {
       // if user is a basic user, they probably don't know what is a public and private key
       // or the implications of exporting them
@@ -124,7 +63,7 @@ export default class SupportSettingsPage extends Component<InjectedOrGenerated<G
       );
     }
     return null;
-  }
+  };
 
   render(): Node {
     return (
@@ -136,5 +75,64 @@ export default class SupportSettingsPage extends Component<InjectedOrGenerated<G
         />
       </>
     );
+  }
+
+  @computed get generated(): {|
+    actions: {|
+      dialogs: {|
+        open: {|
+          trigger: (params: {|
+            dialog: any,
+            params?: any,
+          |}) => void,
+        |},
+      |},
+    |},
+    stores: {|
+      uiDialogs: {|
+        isOpen: any => boolean,
+      |},
+      profile: {|
+        selectedComplexityLevel: ?ComplexityLevelType,
+      |},
+      wallets: {|
+        getPublicKeyCache: IGetPublic => PublicKeyCache,
+        selected: null | PublicDeriver<>,
+      |},
+    |},
+    IncludePublicKeyDialogProps: InjectedOrGenerated<IncludePublicKeyDialogData>,
+  |} {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(SupportSettingsPage)} no way to generated props`);
+    }
+    const { actions, stores } = this.props;
+    return Object.freeze({
+      actions: {
+        dialogs: {
+          open: {
+            trigger: actions.dialogs.open.trigger,
+          },
+        },
+      },
+      stores: {
+        profile: {
+          selectedComplexityLevel: stores.profile.selectedComplexityLevel,
+        },
+        uiDialogs: {
+          isOpen: stores.uiDialogs.isOpen,
+        },
+        wallets: {
+          selected: stores.wallets.selected,
+          getPublicKeyCache: stores.wallets.getPublicKeyCache,
+        },
+      },
+      IncludePublicKeyDialogProps: ({
+        actions,
+        stores,
+      }: InjectedOrGenerated<IncludePublicKeyDialogData>),
+    });
   }
 }
