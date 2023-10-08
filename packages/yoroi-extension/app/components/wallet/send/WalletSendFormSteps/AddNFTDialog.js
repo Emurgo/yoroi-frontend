@@ -35,6 +35,7 @@ type Props = {|
   +updateAmount: (?BigNumber) => void,
   +onAddToken: ({|
     token: void | $ReadOnly<TokenRow>,
+    shouldSendAll?: boolean,
     shouldReset?: boolean,
   |}) => void,
   +selectedNetwork: $ReadOnly<NetworkRow>,

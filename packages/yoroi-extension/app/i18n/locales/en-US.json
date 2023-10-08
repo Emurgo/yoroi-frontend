@@ -882,6 +882,7 @@
   "wallet.send.form.sendAll.allTokens": " + all tokens",
   "wallet.send.form.sendAll.customAmount": "Custom Amount",
   "wallet.send.form.sendAll.dropdownAmountLabel": "Send all {currency}",
+  "wallet.send.form.sendAll.dropdownSendNFTLabel": "Send {currency}",
   "wallet.send.form.sendAll.selectedAmountLable": "Amount Options",
   "wallet.send.form.sendingIsDisabled": "Unable to process. Please retry after the previous transaction has been completed.",
   "wallet.send.form.transactionFeeError": "Not enough Ada for fees. Try sending a smaller amount.",

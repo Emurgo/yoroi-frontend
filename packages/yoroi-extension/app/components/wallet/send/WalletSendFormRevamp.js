@@ -158,6 +158,7 @@ type Props = {|
   +defaultToken: $ReadOnly<TokenRow>, // need since no guarantee input in non-null
   +onAddToken: ({|
     token?: $ReadOnly<TokenRow>,
+    shouldSendAll?: boolean,
     shouldReset?: boolean,
   |}) => void,
   +onRemoveTokens: (Array<$ReadOnly<TokenRow>>) => void,

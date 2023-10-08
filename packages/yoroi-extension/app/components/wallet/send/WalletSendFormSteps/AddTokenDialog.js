@@ -44,6 +44,7 @@ type Props = {|
   +selectedNetwork: $ReadOnly<NetworkRow>,
   +onAddToken: ({|
     token: void | $ReadOnly<TokenRow>,
+    shouldSendAll?: boolean,
     shouldReset?: boolean,
   |}) => void,
   +onRemoveTokens: (Array<$ReadOnly<TokenRow>>) => void,
