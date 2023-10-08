@@ -56,6 +56,7 @@ import type { ISignRequest } from '../../../api/common/lib/transactions/ISignReq
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { SendUsingLedgerParams } from '../../../actions/ada/ledger-send-actions';
 import type { SendUsingTrezorParams } from '../../../actions/ada/trezor-send-actions';
+import { ampli } from '../../../../ampli/index';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -240,6 +241,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     isReceiverFieldActive: false,
     isMemoFieldActive: false,
   };
+  maxStep: number = SEND_FORM_STEP.RECEIVER;
 
   bodyRef: any | null = null;
 
@@ -794,7 +796,16 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             <IncludedTokens
               tokens={tokens}
               nfts={nfts}
-              onRemoveTokens={this.props.onRemoveTokens}
+              onRemoveTokens={(tokensRemove) => {
+                const assetCount = totalAmount.nonDefaultEntries().length - 1;
+                this.props.onRemoveTokens(tokensRemove);
+                ampli.sendSelectAssetUpdated({
+                  asset_count: assetCount,
+                });
+                ampli.sendSummaryPageViewed({
+                  asset_count: assetCount,
+                });
+              }}
               shouldSendAll={shouldSendAll}
             />
           </Box>
@@ -929,6 +940,20 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
   onUpdateStep(step: number): void {
     if (step > 3) throw new Error('Invalid Step number.');
     this.setState({ currentStep: step });
+    if (step > this.maxStep) {
+      this.maxStep = step;
+      if (step === SEND_FORM_STEP.AMOUNT) {
+        ampli.sendSelectAssetPageViewed();
+      } else if (step === SEND_FORM_STEP.PREVIEW) {
+        const { totalInput } = this.props;
+        if (totalInput == null) {
+          throw new Error('expect totalInput');
+        }
+        ampli.sendSelectAssetSelected({
+          asset_count: totalInput.nonDefaultEntries().length,
+        });
+      }
+    }
   }
 
   onUpdateMemo(memo: string) {

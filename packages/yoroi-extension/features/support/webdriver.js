@@ -215,6 +215,9 @@ function CustomWorld(cmdInput: WorldInput) {
   this.getValue = async (locator: LocatorObject) =>
     this.getElementBy(locator).getAttribute('value');
 
+  this.getCssValue = async (locator: LocatorObject, cssValue: string) =>
+    this.getElementBy(locator).getCssValue(cssValue);
+
   this.waitForElementLocated = async (locator: LocatorObject) => {
     this.webDriverLogger.info(`Webdriver: Waiting for element "${JSON.stringify(locator)}" to be located`);
     const isLocated = until.elementLocated(getMethod(locator.method)(locator.locator));
@@ -297,12 +300,14 @@ function CustomWorld(cmdInput: WorldInput) {
   };
 
 
-  this.click = async (locator: LocatorObject) => {
+  this.click = async (locator: LocatorObject, numberOfClicks: number = 1) => {
     this.webDriverLogger.info(`Webdriver: Clicking on "${JSON.stringify(locator)}"`);
-    await this.waitForElement(locator);
-    await this.waitEnable(locator);
-    const clickable = await this.getElementBy(locator);
-    await clickable.click();
+    for (let index = 0; index < numberOfClicks; index++) {
+      await this.waitForElement(locator);
+      await this.waitEnable(locator);
+      const clickable = await this.getElementBy(locator);
+      await clickable.click();
+    }
   };
 
   this.input = async (locator: LocatorObject, value) => {
@@ -331,7 +336,7 @@ function CustomWorld(cmdInput: WorldInput) {
     return this.driver.executeScript(`return window.yoroi.api.localStorage.${script}`);
   };
 
-  this.getFromLocalStorage = async key => {
+  this.getFromLocalStorage = async (key) => {
     this.webDriverLogger.info(`Webdriver: Getting item "${key}" from Local Storage`);
     const result = await this.executeLocalStorageScript(`getItem("${key}")`);
     this.webDriverLogger.info(`Webdriver: Result ${JSON.stringify(result)}`);

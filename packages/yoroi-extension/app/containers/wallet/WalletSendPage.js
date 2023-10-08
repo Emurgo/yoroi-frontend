@@ -47,7 +47,7 @@ import globalMessages from '../../i18n/global-messages';
 import { withLayout } from '../../styles/context/layout';
 import AddNFTDialog from '../../components/wallet/send/WalletSendFormSteps/AddNFTDialog';
 import AddTokenDialog from '../../components/wallet/send/WalletSendFormSteps/AddTokenDialog';
-import { trackSend } from '../../api/analytics';
+import { ampli } from '../../../ampli/index';
 
 const messages = defineMessages({
   txConfirmationLedgerNanoLine1: {
@@ -104,6 +104,7 @@ class WalletSendPage extends Component<AllProps> {
     runInAction(() => {
       this.showMemo = this.generated.initialShowMemoState;
     });
+    ampli.sendInitiated();
   }
 
   @action
@@ -399,14 +400,13 @@ class WalletSendPage extends Component<AllProps> {
           messages={messagesLedgerNano}
           isSubmitting={ledgerSendStore.isActionProcessing}
           error={ledgerSendStore.error}
-          onSubmit={() => {
-            ledgerSendAction.sendUsingLedgerWallet.trigger({
+          onSubmit={
+            () => ledgerSendAction.sendUsingLedgerWallet.trigger({
               params: { signRequest },
               publicDeriver,
               onSuccess: this.openTransactionSuccessDialog,
-            });
-            trackSend();
-          }}
+            })
+          }
           onCancel={ledgerSendAction.cancel.trigger}
           unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
           addressToDisplayString={addr =>
@@ -435,14 +435,13 @@ class WalletSendPage extends Component<AllProps> {
           messages={messagesTrezor}
           isSubmitting={trezorSendStore.isActionProcessing}
           error={trezorSendStore.error}
-          onSubmit={() => {
-            trezorSendAction.sendUsingTrezor.trigger({
+          onSubmit={
+            () => trezorSendAction.sendUsingTrezor.trigger({
               params: { signRequest },
               publicDeriver,
               onSuccess: this.openTransactionSuccessDialog,
-            });
-            trackSend();
-          }}
+            })
+          }
           onCancel={trezorSendAction.cancel.trigger}
           unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
           addressToDisplayString={addr =>

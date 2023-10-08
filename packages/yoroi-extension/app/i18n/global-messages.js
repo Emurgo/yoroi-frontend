@@ -8,6 +8,10 @@ import { defineMessages } from 'react-intl';
  */
 
 const globalMessages: * = defineMessages({
+  ok: {
+    id: 'global.ok',
+    defaultMessage: '!!!Ok',
+  },
   buy: {
     id: 'global.buy',
     defaultMessage: '!!!Buy',
