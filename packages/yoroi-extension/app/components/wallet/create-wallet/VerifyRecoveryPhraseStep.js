@@ -82,7 +82,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
   const sortedRecoveryPhrase = useMemo(() => makeSortedPhrase(recoveryPhrase), [recoveryPhrase]);
 
   return (
-    <Stack alignItems="center" justifyContent="center" className={styles.component}>
+    <Stack alignItems="center" justifyContent="center" className={styles.component} id="verifyRecoveryPhraseStepComponent">
       <Stack direction="column" alignItems="left" justifyContent="center" maxWidth="648px">
         <Typography mb="16px">
           <FormattedHTMLMessage {...messages.description} />
@@ -188,6 +188,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                 sx={{
                   width: '123px',
                 }}
+                id={'verifyRecoveryPhraseWord' + idx}
               >
                 <Typography
                   sx={{
@@ -223,7 +224,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
           )}
 
           <Fade in={isValidPhrase}>
-            <Stack gap="10px" direction="row">
+            <Stack gap="10px" direction="row" id="isValidPhraseMessage">
               <VerifiedIcon />
               <Typography variant="body1" fontWeight={500}>
                 {intl.formatMessage(messages.verified)}

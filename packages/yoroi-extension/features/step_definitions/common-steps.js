@@ -61,9 +61,6 @@ import { allowPubKeysAndSwitchToYoroi, switchToTrezorAndAllow } from './trezor-s
 import {
   restoreWalletInputPhraseDialog,
   inputMnemonicForWallet,
-  walletPasswordInput,
-  repeatPasswordInput,
-  restoringDialogPlate,
   validPhraseText,
   nextButton,
   inputWalletInfo,
@@ -106,10 +103,15 @@ import {
   uriAcceptComponent,
   uriPromptForm,
 } from '../pages/uriPromptPage';
-import { yoroiModern } from '../pages/mainWindowPage';
+import { root } from '../pages/mainWindowPage';
 import { backgroungTabName, extensionTabName, WindowManager } from '../support/windowManager';
 import { MockDAppWebpage } from '../mock-dApp-webpage';
 import { infoDialogContinueButton } from '../pages/commonDialogPage';
+import {
+  newWalletDialogPlate,
+  repeatPasswordInput,
+  walletPasswordInput,
+} from '../pages/walletDetailsPage';
 
 const simpleNodeLogger = require('simple-node-logger');
 
@@ -279,27 +281,34 @@ const writeFile = promisify(fs.writeFile);
 // Steps that contain these patterns will trigger screenshots:
 const SCREENSHOT_STEP_PATTERNS = ['I should see', 'I see', 'I click', 'by clicking'];
 
+const takeScreenShotsAndLogs = async (customWebDriver, featureName, patterns) => {
+  if (patterns.some(pat => featureName.includes(pat))) {
+    await takeScreenshot(customWebDriver.driver, featureName);
+    await takePageSnapshot(customWebDriver.driver, featureName);
+
+    const browserName = await customWebDriver.getBrowser();
+    if (browserName !== 'firefox') {
+      await getLogs(customWebDriver.driver, featureName, logging.Type.BROWSER);
+      await getLogs(customWebDriver.driver, featureName, logging.Type.DRIVER);
+    }
+  }
+};
+
 /** Wrap every step to take screenshots for UI-based testing */
 setDefinitionFunctionWrapper((fn, _, pattern) => {
   if (!pattern) {
     return fn;
   }
   return async function (...args) {
-    const ret = await fn.apply(this, args);
-
     // Regex patterns contain non-ascii characters.
     // We want to remove this to get a filename-friendly string
     const cleanString = pattern.toString().replace(/[^0-9a-z_ ]/gi, '');
-    if (SCREENSHOT_STEP_PATTERNS.some(pat => cleanString.includes(pat))) {
-      await takeScreenshot(this.driver, cleanString);
-      await takePageSnapshot(this.driver, cleanString);
 
-      const browserName = await this.getBrowser();
-      if (browserName !== 'firefox') {
-        await getLogs(this.driver, cleanString, logging.Type.BROWSER);
-        await getLogs(this.driver, cleanString, logging.Type.DRIVER);
-      }
-    }
+    await takeScreenShotsAndLogs(this, cleanString + '_before', SCREENSHOT_STEP_PATTERNS);
+
+    const ret = await fn.apply(this, args);
+
+    await takeScreenShotsAndLogs(this, cleanString + '_executed', SCREENSHOT_STEP_PATTERNS);
 
     testProgress.step += 1;
     return ret;
@@ -393,9 +402,9 @@ async function restoreWallet(
 
 export async function checkWalletPlate(
   customWorld: any,
-  expectedWalletPlate: string,
+  expectedWalletPlate: string
 ): Promise<void> {
-  const plateElement = await customWorld.findElement(restoringDialogPlate);
+  const plateElement = await customWorld.findElement(newWalletDialogPlate);
   const plateText = await plateElement.getText();
   expect(plateText).to.be.equal(expectedWalletPlate);
 }
@@ -525,7 +534,7 @@ Given(/^I refresh the page$/, async function () {
   await this.driver.navigate().refresh();
   // wait for page to refresh
   await this.driver.sleep(halfSecond);
-  await this.waitForElement(yoroiModern);
+  await this.waitForElement(root);
 });
 
 Given(/^I restart the browser$/, async function () {
@@ -534,7 +543,7 @@ Given(/^I restart the browser$/, async function () {
   await this.driver.navigate().refresh();
   // wait for page to refresh
   await this.driver.sleep(halfSecond);
-  await this.waitForElement(yoroiModern);
+  await this.waitForElement(root);
 });
 
 Given(/^There is no wallet stored$/, async function () {
@@ -562,7 +571,7 @@ Given(/^I import a snapshot named ([^"]*)$/, async function (snapshotName) {
   // wait for page to refresh
   await this.driver.sleep(oneSecond + halfSecond);
   await this.waitForElementNotPresent(loadingSpinnerComponent);
-  await this.waitForElement(yoroiModern);
+  await this.waitForElement(root);
 });
 
 async function setLedgerWallet(client, serial) {
@@ -793,8 +802,11 @@ Then(/^Debug. Take screenshot$/, async function () {
   const currentTime = getLogDate();
   await takeScreenshot(this.driver, `debug_${currentTime}`);
   await takePageSnapshot(this.driver, `debug_${currentTime}`);
-  await getLogs(this.driver, `debug_${currentTime}`, logging.Type.DRIVER);
-  await getLogs(this.driver, `debug_${currentTime}`, logging.Type.BROWSER);
+  const browserName = await this.getBrowser();
+  if (browserName !== 'firefox') {
+    await getLogs(this.driver, `debug_${currentTime}`, logging.Type.BROWSER);
+    await getLogs(this.driver, `debug_${currentTime}`, logging.Type.DRIVER);
+  }
 });
 
 Then(/^Debug. Make driver sleep for 2 seconds$/, async function () {

@@ -19,7 +19,7 @@ import {
   trezorWalletButton,
 } from '../pages/newWalletPages';
 import { errorBlockComponent, primaryButton } from '../pages/commonDialogPage';
-import { walletNameInput } from '../pages/restoreWalletPage';
+import { walletNameInput } from '../pages/walletDetailsPage';
 import { verifyAddressButton, verifyAddressHWButton } from '../pages/walletReceivePage';
 
 // deprecated

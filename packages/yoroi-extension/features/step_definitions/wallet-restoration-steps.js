@@ -10,8 +10,6 @@ import {
   enterRecoveryPhrase,
   confirmButton,
   errorInvalidRecoveryPhrase,
-  repeatPasswordInput,
-  walletPasswordInput,
   restoreWalletInputPhraseDialog,
 } from '../pages/restoreWalletPage';
 import { masterKeyInput } from '../pages/walletClaimTransferPage';
@@ -24,13 +22,13 @@ import {
   walletAlreadyExistsComponent,
 } from '../pages/newWalletPages';
 import { dialogTitle } from '../pages/commonDialogPage';
+import { repeatPasswordInput, walletPasswordInput } from '../pages/walletDetailsPage';
 
 Then(/^I select Shelley-era 15-word wallet$/, async function () {
   await this.click(restoreNormalWallet);
   await this.click(shelleyEraButton);
   await this.waitForElement(restoreWalletInputPhraseDialog);
 });
-
 
 When(/^I enter the recovery phrase:$/, async function (table) {
   const fields = table.hashes()[0];
