@@ -19,11 +19,12 @@ import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
+import { ROUTES } from '../../../routes-config';
+import { MultiToken } from '../../../api/common/lib/MultiToken';
 import TopBarLayout from '../../../components/layout/TopBarLayout';
 import BannerContainer from '../../banners/BannerContainer';
 import SidebarContainer from '../../SidebarContainer';
 import LocalizableError from '../../../i18n/LocalizableError';
-import { ROUTES } from '../../../routes-config';
 
 export const RestoreWalletPagePromise: void => Promise<any> = () =>
   import('../../../components/wallet/restore/RestoreWalletPage');
@@ -111,6 +112,9 @@ export default class RestoreWalletPage extends Component<Props> {
       walletSettings: {|
         getConceptualWalletSettingsCache: ConceptualWallet => ConceptualWalletSettingsCache,
       |},
+      transactions: {|
+        getBalance: (PublicDeriver<>) => MultiToken | null,
+      |},
     |},
   |} {
     if (this.props.generated !== undefined) {
@@ -148,6 +152,9 @@ export default class RestoreWalletPage extends Component<Props> {
           isValidMnemonic: stores.walletRestore.isValidMnemonic,
           selectedAccount: stores.walletRestore.selectedAccount,
           mode: stores.walletRestore.mode,
+        },
+        transactions: {
+          getBalance: stores.transactions.getBalance,
         },
       },
       actions: {

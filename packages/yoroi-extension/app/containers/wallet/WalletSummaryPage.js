@@ -126,18 +126,11 @@ class WalletSummaryPage extends Component<AllProps> {
     );
 
     if (recent.length > 0) {
-      const noTransactionsFoundLabel = intl.formatMessage(globalMessages.noTransactionsFound);
-
       const mapWalletTransactionLayout = {
         CLASSIC: WalletTransactionsList,
         REVAMP: WalletTransactionsListRevamp,
       };
-      const mapWalletNoTransactionsLayout = {
-        CLASSIC: WalletNoTransactions,
-        REVAMP: WalletNoTransactionsRevamp,
-      };
       const WalletTransactionsListComp = mapWalletTransactionLayout[this.props.selectedLayout];
-      const WalletNoTransactionsComp = mapWalletNoTransactionsLayout[this.props.selectedLayout];
 
       if (isLoading || hasAny) {
         const {
@@ -196,14 +189,20 @@ class WalletSummaryPage extends Component<AllProps> {
             complexityLevel={this.generated.stores.profile.selectedComplexityLevel}
           />
         );
-      } else {
-        walletTransactions = (
-          <WalletNoTransactionsComp
-            label={noTransactionsFoundLabel}
-            classicTheme={profile.isClassicTheme}
-          />
-        );
       }
+    } else {
+      const mapWalletNoTransactionsLayout = {
+        CLASSIC: WalletNoTransactions,
+        REVAMP: WalletNoTransactionsRevamp,
+      };
+      const WalletNoTransactionsComp = mapWalletNoTransactionsLayout[this.props.selectedLayout];
+      const noTransactionsFoundLabel = intl.formatMessage(globalMessages.noTransactionsFound);
+      walletTransactions = (
+        <WalletNoTransactionsComp
+          label={noTransactionsFoundLabel}
+          classicTheme={profile.isClassicTheme}
+        />
+      );
     }
 
     const notification = this._getThisPageActiveNotification();
