@@ -26,7 +26,7 @@ type Props = {|
   |},
 |};
 
-function constructPlate(
+export function constructPlate(
   plate: WalletChecksum,
   saturationFactor: number,
   divClass: string,
