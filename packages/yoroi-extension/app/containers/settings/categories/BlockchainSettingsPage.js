@@ -17,7 +17,6 @@ import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepacka
 import type { ExplorerRow } from '../../../api/ada/lib/storage/database/explorers/tables';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { GetAllExplorersResponse } from '../../../api/ada/lib/storage/bridge/explorers';
-import { trackUriPrompt } from '../../../api/analytics';
 import { Typography } from '@mui/material';
 import { settingsMenuMessages } from '../../../components/settings/menu/SettingsMenu';
 
@@ -45,10 +44,7 @@ export default class BlockchainSettingsPage extends Component<InjectedOrGenerate
     const uriSettings =
       isCardanoHaskell(networkInfo) && this.generated.canRegisterProtocol() ? (
         <UriSettingsBlock
-          registerUriScheme={() => {
-            registerProtocols();
-            trackUriPrompt('allow');
-          }}
+          registerUriScheme={() => registerProtocols()}
           isFirefox={environment.userAgentInfo.isFirefox()}
         />
       ) : null;

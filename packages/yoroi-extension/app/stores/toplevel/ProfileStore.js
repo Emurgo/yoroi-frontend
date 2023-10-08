@@ -10,6 +10,7 @@ import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { ComplexityLevels } from '../../types/complexityLevelType';
 import type { WalletsNavigation } from '../../api/localStorage'
+import { ampli } from '../../../ampli/index';
 
 export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap> {
   @observable __selectedNetwork: void | $ReadOnly<NetworkRow> = undefined;
@@ -31,6 +32,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
           return;
         }
         this.actions.router.goToRoute.trigger({ route });
+        ampli.createWalletLanguagePageViewed();
       },
     },
     {
@@ -41,6 +43,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
           return;
         }
         this.actions.router.goToRoute.trigger({ route });
+        ampli.createWalletTermsPageViewed();
       },
     },
     {

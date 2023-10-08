@@ -13,6 +13,7 @@ import environment from '../../../environment';
 import { makeSortedPhrase } from '../../../utils/recoveryPhrase';
 import globalMessages from '../../../i18n/global-messages';
 import Fade from '@mui/material/Fade';
+import { ampli } from '../../../../ampli/index';
 
 const messages = defineMessages({
   description: {
@@ -73,6 +74,8 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
     const addedWords = new Set(addedWordsIndxes);
     addedWords.add(idx);
     setAddedWordsIndexes(addedWords);
+
+    ampli.createWalletVerifyPhraseWordSelected();
   }
 
   const isValidPhrase = !recoveryPhrase.some((word, idx) => word !== enteredRecoveryPhrase[idx]);

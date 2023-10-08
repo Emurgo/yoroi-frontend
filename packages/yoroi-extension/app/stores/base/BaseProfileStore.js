@@ -15,11 +15,9 @@ import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { SUPPORTED_CURRENCIES } from '../../config/unitOfAccount';
 import type { ComplexityLevelType } from '../../types/complexityLevelType';
 import BaseProfileActions from '../../actions/base/base-profile-actions';
-import {
-  trackSetLocale,
-  trackUpdateTheme
-} from '../../api/analytics';
 import { CURRENT_TOS_VERSION } from '../../i18n/locales/terms-of-use/ada/index';
+import { ampli } from '../../../ampli/index';
+import type { LoadOptionsWithEnvironment } from '../../../ampli/index';
 
 interface CoinPriceStore {
   refreshCurrentUnit: Request<void => Promise<void>>
@@ -181,7 +179,33 @@ export default class BaseProfileStore
     );
     this.stores.loading.registerBlockingLoadingRequest(
       (async () => {
-        await this.getIsAnalyticsAllowed.execute()
+        const option = await this.getIsAnalyticsAllowed.execute()
+        const AMPLI_FLUSH_INTERVAL_MS = 5000;
+        await ampli.load(({
+          environment: environment.isProduction() ? 'production' : 'development',
+          client: {
+            configuration: {
+              optOut: !option,
+              flushIntervalMillis: AMPLI_FLUSH_INTERVAL_MS,
+              trackingOptions: {
+                ipAddress: false,
+              },
+              defaultTracking: false,
+            },
+          },
+        }: LoadOptionsWithEnvironment)).promise;
+
+        if (environment.isDev()) {
+          ampli.client.add({
+            name: 'info-plugin',
+            type: 'enrichment',
+            setup: () => Promise.resolve(),
+            execute: async (event) => {
+              console.info('[metrics]', event.event_type, event.event_properties)
+              return Promise.resolve(event)
+            },
+          });
+        }
       })()
     );
   }
@@ -245,15 +269,13 @@ export default class BaseProfileStore
 
   _acceptLocale: void => Promise<void> = async () => {
     // commit in-memory language to storage
-    const locale = this.inMemoryLanguage != null ?
-          this.inMemoryLanguage :
-          BaseProfileStore.getDefaultLocale();
-    await this.setProfileLocaleRequest.execute(locale);
+    await this.setProfileLocaleRequest.execute(
+      this.inMemoryLanguage != null ? this.inMemoryLanguage : BaseProfileStore.getDefaultLocale()
+    );
     await this.getProfileLocaleRequest.execute(); // eagerly cache
     runInAction(() => {
       this.inMemoryLanguage = null;
     });
-    trackSetLocale(locale);
   };
 
   _updateMomentJsLocaleAfterLocaleChange: void => void = () => {
@@ -337,7 +359,6 @@ export default class BaseProfileStore
     await this.getCustomThemeRequest.execute(); // eagerly cache
     await this.setThemeRequest.execute(theme);
     await this.getThemeRequest.execute(); // eagerly cache
-    trackUpdateTheme(theme);
   };
 
 
@@ -492,6 +513,7 @@ export default class BaseProfileStore
   _onOptForAnalytics: (boolean) => void = (option) => {
     this.getIsAnalyticsAllowed.patch(_ => option);
     this.api.localStorage.saveIsAnalysticsAllowed(option);
+    ampli.client.setOptOut(!option);
   }
 
   @computed get isAnalyticsOpted(): boolean {
