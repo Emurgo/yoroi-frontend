@@ -195,6 +195,7 @@ export default class BaseProfileStore
     this._getSelectComplexityLevel(); // eagerly cache
     this.currentTheme; // eagerly cache (note: don't remove -- getter is stateful)
     this.isRevampAnnounced;
+    this.didUserMigratedToRevampTheme;
     this.stores.loading.registerBlockingLoadingRequest(
       this._loadAcceptedTosVersion()
     );
@@ -344,7 +345,7 @@ export default class BaseProfileStore
     if (result == null) {
       result = this.getThemeRequest.execute().result;
     }
-    if (this.isCurrentThemeSet && result != null) {
+    if (result != null) {
       if (!this.didUserMigratedToRevampTheme) {
         this.setUserRevampMigrationStatusRequest.execute(true);
         this._updateTheme({ theme: THEMES.YOROI_REVAMP });
@@ -388,7 +389,7 @@ export default class BaseProfileStore
   }
 
   @computed get isCurrentThemeSet(): boolean {
-    return this.getThemeRequest.result !== null && this.getThemeRequest.result !== undefined;
+    return this.getThemeRequest.result != null;
   }
 
   @computed get didUserMigratedToRevampTheme(): boolean {
