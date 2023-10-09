@@ -50,6 +50,9 @@ class Transfer extends Component<AllProps> {
   };
 
   render(): Node {
+    if (this.generated.stores.profile.isRevampTheme) {
+      return null;
+    }
     const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />;
     const navbar = (
       <NavBarContainer

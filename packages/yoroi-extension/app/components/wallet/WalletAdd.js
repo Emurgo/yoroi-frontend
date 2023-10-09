@@ -3,13 +3,10 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
-import classnames from 'classnames';
 
-import CustomTooltip from '../widgets/CustomTooltip';
 import MainCards from './add/MainCards';
 import { ReactComponent as LogoYoroiIcon }  from '../../assets/images/yoroi-logo-white.inline.svg';
 import { ReactComponent as SettingsIcon }  from '../../assets/images/sidebar/wallet-settings-2-ic.inline.svg';
-import { ReactComponent as DaedalusIcon }  from '../../assets/images/top-bar/daedalus-migration.inline.svg';
 import { ReactComponent as NightlyLogo }  from '../../assets/images/yoroi-logo-nightly-white.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './WalletAdd.scss';
@@ -49,10 +46,7 @@ export default class WalletAdd extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const {
-      onSettings,
-      onDaedalusTransfer,
-    } = this.props;
+    const { onSettings } = this.props;
     const LogoIcon = this.getLogo();
 
     return (

@@ -142,6 +142,17 @@ export default class YoroiTransferStore extends Store<StoresMap, ActionsMap> {
     });
   }
 
+  setupTransferFundsWithMnemonic: {|
+    recoveryPhrase: string,
+  |} => void = (
+    payload
+  ) => {
+    runInAction(() => {
+      this.recoveryPhrase = payload.recoveryPhrase;
+    });
+    this._updateStatus(TransferStatus.DISPLAY_CHECKSUM);
+  }
+
   generateTransferTx: {|
     ...({| recoveryPhrase: string, |} | {| privateKey: string |}),
     updateStatusCallback: void => void,
