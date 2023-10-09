@@ -102,18 +102,16 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
               route: ROUTES.WALLETS.ROOT,
               publicDeriver: lastSelectedWallet ?? firstWallet,
             });
+          } else if (wallets.publicDerivers.length === 1) {
+            // if user only has 1 wallet, just go to it directly as a shortcut
+            this.actions.router.goToRoute.trigger({
+              route: ROUTES.WALLETS.ROOT,
+              publicDeriver: firstWallet,
+            });
           } else {
-            if (wallets.publicDerivers.length === 1) {
-              // if user only has 1 wallet, just go to it directly as a shortcut
-              this.actions.router.goToRoute.trigger({
-                route: ROUTES.WALLETS.ROOT,
-                publicDeriver: firstWallet,
-              });
-            } else {
-              this.actions.router.goToRoute.trigger({
-                route: ROUTES.MY_WALLETS,
-              });
-            }
+            this.actions.router.goToRoute.trigger({
+              route: ROUTES.MY_WALLETS,
+            });
           }
         }
         if (this.stores.loading.shouldRedirect) {

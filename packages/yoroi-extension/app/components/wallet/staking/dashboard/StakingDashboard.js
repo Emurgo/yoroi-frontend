@@ -16,7 +16,6 @@ import VerticallyCenteredLayout from '../../../layout/VerticallyCenteredLayout';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import { ReactComponent as InvalidURIImg } from '../../../../assets/images/uri/invalid-uri.inline.svg';
 import ErrorBlock from '../../../widgets/ErrorBlock';
-import type { CertificateForKey } from '../../../../api/ada/lib/storage/database/primitives/api/read';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Skeleton, Typography } from '@mui/material';
 
