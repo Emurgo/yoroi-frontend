@@ -139,15 +139,6 @@ export default class ThemeSettingsBlock extends Component<Props> {
             }}
           >
             <FormControlLabel
-              value={OLD_THEME}
-              control={<Radio sx={{ color: 'primary.500' }} size="small" />}
-              label={intl.formatMessage(messages.currentVersion)}
-              id="switchToOldVersionButton"
-              sx={{
-                marginRight: '20px',
-              }}
-            />
-            <FormControlLabel
               value={NEW_THEME}
               control={
                 <Radio
@@ -159,6 +150,15 @@ export default class ThemeSettingsBlock extends Component<Props> {
               }
               label={intl.formatMessage(messages.newVersion)}
               id="switchToNewVersionButton"
+            />
+            <FormControlLabel
+              value={OLD_THEME}
+              control={<Radio sx={{ color: 'primary.500' }} size="small" />}
+              label={intl.formatMessage(messages.currentVersion)}
+              id="switchToOldVersionButton"
+              sx={{
+                marginRight: '20px',
+              }}
             />
           </RadioGroup>
         </Box>
