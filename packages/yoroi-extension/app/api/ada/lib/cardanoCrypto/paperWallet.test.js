@@ -31,8 +31,6 @@ const INVALID_DD_PAPER_1 =
   'shaft fire radar three ginger receive result phrase song staff scorpion food undo will have expire nice uncle dune until lift unlock exist step world slush disagree';
 const INVALID_DD_PAPER_2 =
   'shaft radar fire three ginger receive result phrase song staff scorpion food undo will have expire nice uncle dune until lift unlock exist step world disagree slush';
-const UNEXPECTED_DD_ADDRESS =
-  'DdzFFzCqrht2WKNEFqHvMSumSQpcnMxcYLNNBXPYXyHpRk9M7PqVjZ5ysYzutnruNubzXak2NxT8UWTFQNzc77uzjQ1GtehBRBdAv7xb';
 
 beforeAll(async () => {
   await RustModule.load();

@@ -26,12 +26,7 @@ import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 import { ApiOptions, getApiForNetwork, } from '../../api/common/utils';
 import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils';
-import {
-  HARD_DERIVATION_START,
-  WalletTypePurpose,
-  CoinTypes,
-  ChainDerivations,
-} from '../../config/numbersConfig';
+import { ChainDerivations } from '../../config/numbersConfig';
 import WithdrawalTxDialogContainer from './WithdrawalTxDialogContainer';
 import type { GeneratedData as WithdrawalTxDialogContainerData } from './WithdrawalTxDialogContainer';
 import { genAddressLookup } from '../../stores/stateless/addressStores';
