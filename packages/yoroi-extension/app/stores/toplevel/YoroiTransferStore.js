@@ -26,9 +26,6 @@ import { SendTransactionApiError } from '../../api/common/errors';
 import type {
   Address, Addressing
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import {
-  Bip44DerivationLevels,
-} from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { getReceiveAddress } from '../stateless/addressStores';
 import type { ActionsMap } from '../../actions/index';

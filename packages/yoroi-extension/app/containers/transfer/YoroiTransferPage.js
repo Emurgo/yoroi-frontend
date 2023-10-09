@@ -1,8 +1,5 @@
 // @flow
 import type { Node } from 'react';
-import {
-  validateMnemonic,
-} from 'bip39';
 import { computed, } from 'mobx';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
@@ -10,11 +7,7 @@ import { intlShape, } from 'react-intl';
 import validWords from 'bip39/src/wordlists/english.json';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
-import HardwareDisclaimerPage from './HardwareDisclaimerPage';
-import YoroiTransferFormPage from './YoroiTransferFormPage';
 import YoroiPaperWalletFormPage from './YoroiPaperWalletFormPage';
-import HardwareTransferFormPage from './HardwareTransferFormPage';
-import YoroiTransferKeyFormPage from './YoroiTransferKeyFormPage';
 import YoroiPlatePage from './YoroiPlatePage';
 import YoroiTransferWaitingPage from './YoroiTransferWaitingPage';
 import YoroiTransferErrorPage from './YoroiTransferErrorPage';
