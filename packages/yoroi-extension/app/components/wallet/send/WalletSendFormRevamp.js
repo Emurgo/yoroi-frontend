@@ -538,7 +538,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
       case SEND_FORM_STEP.RECEIVER:
         return (
           <div className={styles.receiverStep}>
-            <div className={styles.receiverInput}>
+            <Box pt='10px'>
               <TextField
                 className="send_form_receiver"
                 {...receiverField.bind()}
@@ -553,10 +553,11 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   this.state.isReceiverFieldActive
                     ? intl.formatMessage(messages.receiverFieldLabelActive)
                     : intl.formatMessage(messages.receiverFieldLabelInactive)
+
                 }
               />
-            </div>
-            <Box sx={{ position: 'relative' }}>
+            </Box>
+            <Box sx={{ position: 'relative', mt: '24px' }}>
               <MemoTextField
                 onChange={e => this.onUpdateMemo(e.target.value)}
                 helperText={
@@ -579,8 +580,8 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               />
               <Typography
                 variant="caption1"
-                color={invalidMemo ? 'magenta.500' : 'grey.500'}
-                sx={{ position: 'absolute', bottom: '12px', right: '0' }}
+                color={invalidMemo ? 'magenta.500' : 'grayscale.600'}
+                sx={{ position: 'absolute', bottom: '5px', right: '0' }}
               >
                 {memo ? memo.length : 0}/{MAX_MEMO_SIZE}
               </Typography>

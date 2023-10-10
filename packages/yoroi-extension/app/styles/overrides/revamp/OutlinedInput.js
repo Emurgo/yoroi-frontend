@@ -4,7 +4,6 @@ const RevampOutlinedInput = {
   styleOverrides: {
     root: ({ theme }: any): any => ({
       paddingRight: '16px',
-      height: '56px',
       '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: theme.palette.grayscale[900] },
       '& .MuiOutlinedInput-notchedOutline': {
         borderColor: theme.palette.grayscale[400],
