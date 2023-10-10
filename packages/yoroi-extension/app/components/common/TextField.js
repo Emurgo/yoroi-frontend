@@ -8,8 +8,6 @@ import { ReactComponent as DoneIcon } from '../../assets/images/forms/done.inlin
 import { ReactComponent as EyeIcon } from '../../assets/images/forms/password-eye-close.inline.svg';
 import { ReactComponent as CloseEyeIcon } from '../../assets/images/forms/password-eye.inline.svg';
 import { ReactComponent as QRLogo } from '../../assets/images/qr-code.inline.svg';
-import { ReactComponent as ClosedEyeIconRevamp } from '../../assets/images/input/icon_24_eye_off.inline.svg';
-import { ReactComponent as OpenedEyeIconRevamp } from '../../assets/images/input/icon_24_eye_on.inline.svg';
 
 type Props = {|
   error?: boolean | string,
@@ -103,7 +101,7 @@ function TextField({
                   height: '40px',
                 }}
               >
-                {getEyeIcon(theme.name, showPassword)}
+                {showPassword ? <CloseEyeIcon /> : <EyeIcon />}
               </IconButton>
             </InputAdornment>
           ) : QRHandler ? (
@@ -151,12 +149,5 @@ TextField.defaultProps = {
   QRHandler: null,
   placeholder: undefined,
 };
-
-function getEyeIcon(theme: 'revamp' | 'classic' | 'modern', showPassword: boolean): Node {
-  if (theme === 'revamp' && !showPassword) return <ClosedEyeIconRevamp />;
-  if (theme === 'revamp' && showPassword) return <OpenedEyeIconRevamp />;
-
-  return showPassword ? <CloseEyeIcon /> : <EyeIcon />;
-}
 
 export default TextField;
