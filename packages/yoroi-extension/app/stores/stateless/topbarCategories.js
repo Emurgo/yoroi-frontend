@@ -51,10 +51,6 @@ const messages = defineMessages({
     id: 'wallet.navigation.assets',
     defaultMessage: '!!!Assets',
   },
-  claimTransfer: {
-    id: 'wallet.navigation.claimTransferADA',
-    defaultMessage: '!!!Claim/Transfer ADA',
-  },
 });
 
 export type TopbarCategory = {|
@@ -165,12 +161,6 @@ export const allSubcategoriesRevamp: Array<TopbarCategory> = [
     className: 'receive',
     route: ROUTES.WALLETS.RECEIVE.ROOT,
     label: messages.receive,
-    isVisible: _request => true,
-  },
-  {
-    className: 'claimTransfer',
-    route: ROUTES.REVAMP.TRANSFER,
-    label: messages.claimTransfer,
     isVisible: _request => true,
   },
   {

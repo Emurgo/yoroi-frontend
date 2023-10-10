@@ -189,16 +189,6 @@ class AddWalletPage extends Component<AllProps> {
               params: { restoreType: { type: 'cip1852', extra: undefined, length: 24 } },
             });
           }}
-          onPaperRestore={
-            // <TODO:PENDING_REMOVAL>
-            getApiForNetwork(selectedNetwork) !== ApiOptions.ada 
-              ? undefined
-              : () =>
-                  actions.dialogs.push.trigger({
-                    dialog: WalletRestoreDialogContainer,
-                    params: { restoreType: { type: 'bip44', extra: 'paper', length: 21 } },
-                  })
-          }
         />
       );
     } else if (uiDialogs.isOpen(WalletRestoreDialogContainer)) {
@@ -281,7 +271,6 @@ class AddWalletPage extends Component<AllProps> {
             onCreate={() => this.openDialogWrapper(WalletCreateDialog)}
             onRestore={() => this.openDialogWrapper(WalletRestoreOptionDialog)}
             onSettings={this._goToSettingsRoot}
-            onDaedalusTransfer={this._goToDaedalusTransferRoot}
           />
           {activeDialog}
         </TopBarLayout>
@@ -314,12 +303,6 @@ class AddWalletPage extends Component<AllProps> {
   _goToSettingsRoot: () => void = () => {
     this.generated.actions.router.goToRoute.trigger({
       route: ROUTES.SETTINGS.ROOT,
-    });
-  };
-
-  _goToDaedalusTransferRoot: () => void = () => {
-    this.generated.actions.router.goToRoute.trigger({
-      route: ROUTES.TRANSFER.DAEDALUS,
     });
   };
 

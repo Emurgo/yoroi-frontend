@@ -1,8 +1,5 @@
 // @flow
 import type { Node } from 'react';
-import {
-  validateMnemonic,
-} from 'bip39';
 import { computed, } from 'mobx';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
@@ -10,11 +7,7 @@ import { intlShape, } from 'react-intl';
 import validWords from 'bip39/src/wordlists/english.json';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
-import HardwareDisclaimerPage from './HardwareDisclaimerPage';
-import YoroiTransferFormPage from './YoroiTransferFormPage';
 import YoroiPaperWalletFormPage from './YoroiPaperWalletFormPage';
-import HardwareTransferFormPage from './HardwareTransferFormPage';
-import YoroiTransferKeyFormPage from './YoroiTransferKeyFormPage';
 import YoroiPlatePage from './YoroiPlatePage';
 import YoroiTransferWaitingPage from './YoroiTransferWaitingPage';
 import YoroiTransferErrorPage from './YoroiTransferErrorPage';
@@ -33,12 +26,7 @@ import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 import { ApiOptions, getApiForNetwork, } from '../../api/common/utils';
 import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils';
-import {
-  HARD_DERIVATION_START,
-  WalletTypePurpose,
-  CoinTypes,
-  ChainDerivations,
-} from '../../config/numbersConfig';
+import { ChainDerivations } from '../../config/numbersConfig';
 import WithdrawalTxDialogContainer from './WithdrawalTxDialogContainer';
 import type { GeneratedData as WithdrawalTxDialogContainerData } from './WithdrawalTxDialogContainer';
 import { genAddressLookup } from '../../stores/stateless/addressStores';
@@ -69,14 +57,6 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
     this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
   }
 
-  setupTransferFundsWithMnemonic: {|
-    recoveryPhrase: string,
-  |} => void = (payload) => {
-    this.generated.actions.yoroiTransfer.setupTransferFundsWithMnemonic.trigger({
-      ...payload,
-    });
-  };
-
   setupTransferFundsWithPaperMnemonic: ((payload: {|
     paperPassword: string,
     recoveryPhrase: string,
@@ -84,18 +64,6 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
     this.generated.actions.yoroiTransfer.setupTransferFundsWithPaperMnemonic.trigger({
       ...payload,
     });
-  };
-
-  setupTransferFundsWithKey: {|
-    key: string,
-  |} => Promise<void> = async (payload) => {
-    const walletsStore = this.generated.stores.wallets;
-    const publicDeriver = walletsStore.selected;
-    if (publicDeriver == null) {
-      throw new Error(`${nameof(this.setupTransferFundsWithKey)} no wallet selected`);
-    }
-    this.generated.actions.yoroiTransfer.setPrivateKey.trigger(payload.key);
-    await this.checkAddresses();
   };
 
   checkAddresses: void => Promise<void> = async () => {
@@ -153,7 +121,6 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
     this.generated.actions.yoroiTransfer.cancelTransferFunds.trigger();
   };
 
-
   render(): null | Node {
     const { stores } = this.generated;
     const { profile } = stores;
@@ -169,37 +136,6 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
     }
 
     switch (yoroiTransfer.status) {
-      case TransferStatus.GETTING_MNEMONICS:
-        return (
-          <YoroiTransferFormPage
-            onSubmit={this.setupTransferFundsWithMnemonic}
-            onBack={this.backToUninitialized}
-            mnemonicValidator={mnemonic => this.generated.stores.walletRestore.isValidMnemonic({
-              mnemonic,
-              mode: { type: 'bip44', extra: undefined, length: config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT },
-            })}
-            validWords={validWords}
-            mnemonicLength={config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT}
-            classicTheme={profile.isClassicTheme}
-          />
-        );
-      case TransferStatus.GETTING_WITHDRAWAL_KEY:
-        return (
-          <YoroiTransferKeyFormPage
-            onSubmit={this.setupTransferFundsWithKey}
-            onBack={this.backToUninitialized}
-            classicTheme={profile.isClassicTheme}
-            derivationPath={[
-              WalletTypePurpose.CIP1852,
-              CoinTypes.CARDANO,
-              // note: we hard-code account #0 because the ITN only supported account #0
-              // which is the main time people would put in a full key with chaincode
-              HARD_DERIVATION_START + 0,
-              ChainDerivations.CHIMERIC_ACCOUNT,
-              0
-            ]}
-          />
-        );
       case TransferStatus.GETTING_PAPER_MNEMONICS:
         return (
           <YoroiPaperWalletFormPage
@@ -213,25 +149,6 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
             mnemonicLength={config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT}
             passwordMatches={_password => true}
             includeLengthCheck={false}
-            classicTheme={profile.isClassicTheme}
-          />
-        );
-      case TransferStatus.HARDWARE_DISCLAIMER:
-        return (
-          <HardwareDisclaimerPage
-            onBack={() => this.generated.actions.yoroiTransfer.cancelTransferFunds.trigger()}
-            onNext={() => this.generated.actions.yoroiTransfer.startHardwareMnemonic.trigger()}
-          />
-        );
-      case TransferStatus.GETTING_HARDWARE_MNEMONIC:
-        return (
-          <HardwareTransferFormPage
-            onSubmit={this.setupTransferFundsWithMnemonic}
-            onBack={this.backToUninitialized}
-            // different hardware wallet support different lengths
-            // so we just allow any length as long as the mnemonic is valid
-            mnemonicValidator={mnemonic => validateMnemonic(mnemonic)}
-            validWords={validWords}
             classicTheme={profile.isClassicTheme}
           />
         );
@@ -338,22 +255,11 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
             getDestinationAddress: void => Promise<{| ...Address, ...InexactSubset<Addressing> |}>
           |}) => Promise<void>
         |},
-        setupTransferFundsWithMnemonic: {|
-          trigger: (params: {|
-            recoveryPhrase: string
-          |}) => void
-        |},
         setupTransferFundsWithPaperMnemonic: {|
           trigger: (params: {|
             paperPassword: string,
             recoveryPhrase: string
           |}) => void
-        |},
-        setPrivateKey: {|
-          trigger: string => void
-        |},
-        startHardwareMnemonic: {|
-          trigger: (params: void) => void
         |},
         transferFunds: {|
           trigger: (params: {|
@@ -470,15 +376,10 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
         yoroiTransfer: {
           backToUninitialized: { trigger: actions.yoroiTransfer.backToUninitialized.trigger },
           cancelTransferFunds: { trigger: actions.yoroiTransfer.cancelTransferFunds.trigger },
-          startHardwareMnemonic: { trigger: actions.yoroiTransfer.startHardwareMnemonic.trigger },
-          setPrivateKey: { trigger: actions.yoroiTransfer.setPrivateKey.trigger },
           transferFunds: { trigger: actions.yoroiTransfer.transferFunds.trigger },
           checkAddresses: { trigger: actions.yoroiTransfer.checkAddresses.trigger },
           setupTransferFundsWithPaperMnemonic: {
             trigger: actions.yoroiTransfer.setupTransferFundsWithPaperMnemonic.trigger
-          },
-          setupTransferFundsWithMnemonic: {
-            trigger: actions.yoroiTransfer.setupTransferFundsWithMnemonic.trigger
           },
         },
       },

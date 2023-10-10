@@ -361,11 +361,6 @@ const WalletsSubpages = (stores, actions) => (
       path={ROUTES.WALLETS.CATALYST_VOTING}
       component={props => <VotingPage {...props} stores={stores} actions={actions} />}
     />
-    <Route
-      exact
-      path={ROUTES.REVAMP.TRANSFER}
-      component={props => <Transfer {...props} stores={stores} actions={actions} />}
-    />
   </Switch>
 );
 

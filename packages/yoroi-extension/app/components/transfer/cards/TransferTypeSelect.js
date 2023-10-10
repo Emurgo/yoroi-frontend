@@ -10,7 +10,6 @@ import { handleExternalLinkClick } from '../../../utils/routing';
 
 type Props = {|
   +onByron: void => void,
-  +onShelley: void => void,
   +ticker: string,
 |};
 
@@ -51,10 +50,7 @@ export default class TransferTypeSelect extends Component<Props> {
               <a onClick={event => handleExternalLinkClick(event)} href="https://yoroi-wallet.com/#/faq/1"> FAQ</a>
             </span>
           </div>
-          <TransferCards
-            onByron={this.props.onByron}
-            onShelley={this.props.onShelley}
-          />
+          <TransferCards onByron={this.props.onByron} />
         </div>
       </div>
     );

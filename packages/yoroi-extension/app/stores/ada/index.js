@@ -6,7 +6,6 @@ import { observable, action } from 'mobx';
 import AdaWalletsStore from './AdaWalletsStore';
 import AdaTransactionsStore from './AdaTransactionsStore';
 import AddressesStore from './AdaAddressesStore';
-import AdaDaedalusTransferStore from './AdaDaedalusTransferStore';
 import AdaYoroiTransferStore from './AdaYoroiTransferStore';
 import TrezorConnectStore from './TrezorConnectStore';
 import TrezorSendStore from './send/TrezorSendStore';
@@ -30,7 +29,6 @@ export const adaStoreClasses = Object.freeze({
   paperWallets: PaperWalletCreateStore,
   transactions: AdaTransactionsStore,
   addresses: AddressesStore,
-  daedalusTransfer: AdaDaedalusTransferStore,
   yoroiTransfer: AdaYoroiTransferStore,
   trezorConnect: TrezorConnectStore,
   trezorSend: TrezorSendStore,
@@ -51,7 +49,6 @@ export type AdaStoresMap = {|
   paperWallets: PaperWalletCreateStore,
   transactions: AdaTransactionsStore,
   addresses: AddressesStore,
-  daedalusTransfer: AdaDaedalusTransferStore,
   yoroiTransfer: AdaYoroiTransferStore,
   trezorConnect: TrezorConnectStore,
   trezorSend: TrezorSendStore,
@@ -72,7 +69,6 @@ const adaStores: WithNullableFields<AdaStoresMap> = observable({
   paperWallets: null,
   transactions: null,
   addresses: null,
-  daedalusTransfer: null,
   yoroiTransfer: null,
   trezorConnect: null,
   trezorSend: null,

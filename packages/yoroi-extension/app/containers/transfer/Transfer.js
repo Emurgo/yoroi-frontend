@@ -1,29 +1,29 @@
 // @flow
+import type { ComponentType, Node } from 'react';
 import { Component, lazy, Suspense } from 'react';
-import type { Node, ComponentType } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import TopBarLayout from '../../components/layout/TopBarLayout';
-import BannerContainer from '../banners/BannerContainer';
 import type { GeneratedData as BannerContainerData } from '../banners/BannerContainer';
+import BannerContainer from '../banners/BannerContainer';
+import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import SidebarContainer from '../SidebarContainer';
 import BackgroundColoredLayout from '../../components/layout/BackgroundColoredLayout';
 import NoWalletMessage from '../wallet/NoWalletMessage';
 import UnsupportedWallet from '../wallet/UnsupportedWallet';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
+import type { GeneratedData as NavBarContainerData } from '../NavBarContainer';
 import NavBarContainer from '../NavBarContainer';
 import globalMessages from '../../i18n/global-messages';
 import type { GeneratedData as WalletTransferPageData } from './WalletTransferPage';
-import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
-import type { GeneratedData as NavBarContainerData } from '../NavBarContainer';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { CoinTypes } from '../../config/numbersConfig';
 import HorizontalLine from '../../components/widgets/HorizontalLine';
-import { withLayout } from '../../styles/context/layout';
 import type { LayoutComponentMap } from '../../styles/context/layout';
+import { withLayout } from '../../styles/context/layout';
 import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
 import { THEMES } from '../../styles/utils';
 
@@ -51,6 +51,9 @@ class Transfer extends Component<AllProps> {
   };
 
   render(): Node {
+    if (this.generated.stores.profile.isRevampTheme) {
+      return null;
+    }
     const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />;
     const navbar = (
       <NavBarContainer
@@ -60,22 +63,16 @@ class Transfer extends Component<AllProps> {
         }
       />
     );
-    const content = this.getContent();
-    const transferClassic = (
+    return (
       <TopBarLayout
         banner={<BannerContainer {...this.generated.BannerContainerProps} />}
         navbar={navbar}
         sidebar={sidebarContainer}
         showInContainer
       >
-        {content}
+        {this.getContent()}
       </TopBarLayout>
     );
-
-    return this.props.renderLayoutComponent({
-      CLASSIC: transferClassic,
-      REVAMP: content,
-    });
   }
 
   getContent: void => Node = () => {
@@ -87,13 +84,10 @@ class Transfer extends Component<AllProps> {
     if (wallet.getParent().getNetworkInfo().CoinType !== CoinTypes.CARDANO) {
       return <UnsupportedWallet />;
     }
-    const isRevamp = this.generated.stores.profile.isRevampTheme;
-    const currentTheme = this.generated.stores.profile.currentTheme;
-
     return (
       <>
-        {!isRevamp && <HorizontalLine />}
-        <BackgroundColoredLayout isRevamp={isRevamp && currentTheme === THEMES.YOROI_REVAMP}>
+        <HorizontalLine />
+        <BackgroundColoredLayout>
           <Suspense fallback={null}>
             <WalletTransferPage
               {...this.generated.WalletTransferPageProps}
