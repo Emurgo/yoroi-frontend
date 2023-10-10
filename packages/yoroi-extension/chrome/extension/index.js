@@ -70,7 +70,7 @@ const initializeYoroi: void => Promise<void> = async () => {
   history.listen(({ pathname }) => {
     if (pathname === ROUTES.ASSETS.ROOT) {
       ampli.assetsPageViewed();
-    } else if (pathname === ROUTES.REVAMP.TRANSFER) {
+    } else if (pathname === ROUTES.TRANSFER) {
       ampli.claimAdaPageViewed();
     } else if (pathname === ROUTES.PROFILE.LANGUAGE_SELECTION) {
       ampli.createWalletLanguagePageViewed();
