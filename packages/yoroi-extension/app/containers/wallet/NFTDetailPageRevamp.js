@@ -94,7 +94,7 @@ class NFTDetailPageRevamp extends Component<AllProps> {
     const tab = urlPrams.get('tab');
 
     return (
-      <Box width="100%" height="100%">
+      <Box sx={{ width: '100%', pb: '50vh' }}>
         <NFTDetails
           nftInfo={nftInfo}
           network={network}

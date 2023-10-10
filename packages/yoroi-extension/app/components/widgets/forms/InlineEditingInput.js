@@ -147,6 +147,7 @@ export default class InlineEditingInput extends Component<Props, State> {
       className,
       styles.component,
       isActive ? null : styles.inactive,
+      inputField.error && styles.error,
     ]);
     const inputStyles = classnames([
       successfullyUpdated ? 'input_animateSuccess' : null,

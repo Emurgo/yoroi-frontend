@@ -8,8 +8,7 @@ const RevampFormControl = {
       marginTop: '7px',
       '&:hover': {
         '& .MuiInputLabel-root': {
-          // color: theme.palette.grayscale[900],
-          color: 'green',
+          color: theme.palette.grayscale[900],
           '&.Mui-disabled': { color: theme.palette.grayscale[200] },
           '&.Mui-error': { color: theme.palette.magenta[500] },
         },

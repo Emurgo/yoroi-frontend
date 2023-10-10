@@ -77,3 +77,19 @@
     }
   }
 }
+
+:global(.YoroiRevamp)  {
+  .component {
+    .error {
+      display: none;
+    }
+    .button  {
+      top: 40%;
+    }
+
+    .savingResultLabel {
+      top: 40%; 
+      transform: unset;
+    }
+  }
+}
