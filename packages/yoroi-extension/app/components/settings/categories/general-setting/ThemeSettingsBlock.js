@@ -61,7 +61,7 @@ const messages = defineMessages({
   },
   currentVersion: {
     id: 'settings.theme.currentVersion',
-    defaultMessage: '!!!Yoroi current version',
+    defaultMessage: '!!!Yoroi old version',
   },
   newVersion: {
     id: 'settings.theme.newVersion',

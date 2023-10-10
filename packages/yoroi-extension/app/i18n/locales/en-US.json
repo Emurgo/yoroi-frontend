@@ -382,7 +382,7 @@
   "settings.support.reportProblem.content": "If the FAQ does not solve the issue you are experiencing, please use our {supportRequestLink} feature.",
   "settings.support.reportProblem.link": "Support request",
   "settings.support.reportProblem.title": "Reporting a problem",
-  "settings.theme.currentVersion": "Yoroi current version",
+  "settings.theme.currentVersion": "Yoroi old version",
   "settings.theme.newVersion": "Yoroi new version",
   "settings.theme.selectColorTheme": "Select color theme for old version",
   "settings.theme.version": "Version",
