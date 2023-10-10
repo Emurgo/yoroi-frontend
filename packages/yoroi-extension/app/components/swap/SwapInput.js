@@ -1,18 +1,37 @@
+// @flow
+import type { Node } from 'react';
 import { useState } from 'react';
 import { Box, Input, Typography } from '@mui/material';
 import { ReactComponent as ChevronIcon } from '../../assets/images/revamp/chevron-icon.inline.svg';
 import { ReactComponent as DefaultTokenImage } from '../../assets/images/revamp/token-default.inline.svg';
 
+type AssetAmount = {|
+  ticker: string,
+  amount: number,
+  walletAmount: number,
+|};
+
+type Props = {|
+  label: string,
+  asset: AssetAmount,
+  onAssetSelect: function,
+  handleAmountChange: function,
+  showMax?: boolean,
+  image?: Node | null,
+  isFrom?: boolean,
+  isLoading?: boolean,
+|};
+
 export default function SwapInput({
+  label,
+  asset,
   isFrom = false,
   showMax = false,
-  asset = {},
   image = null,
-  label,
   isLoading,
   onAssetSelect,
   handleAmountChange,
-}) {
+}: Props): Node {
   const { amount, walletAmount, ticker } = asset;
   const [error, setError] = useState('');
   const [inputValue, setInputValue] = useState(amount);

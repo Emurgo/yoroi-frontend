@@ -101,11 +101,8 @@ export default function SwapPage(): Node {
       {/* Price between assets */}
       <Box mt="16px">
         <PriceInput
-          price="0.234"
-          assets={[
-            { ticker: 'TADA', amount: 20 },
-            { ticker: 'USDA', amount: 5 },
-          ]}
+          baseCurrency={{ ticker: 'TADA', amount: 20 }}
+          quoteCurrency={{ ticker: 'USDA', amount: 5 }}
           readonly={isMarketOrder}
           label="Market price"
         />
