@@ -3,9 +3,9 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { LoadingButton } from '@mui/lab';
-import { MenuItem } from '@mui/material';
+import { MenuItem, Checkbox, FormControlLabel } from '@mui/material';
 import Select from '../../common/Select';
-import { intlShape } from 'react-intl';
+import { intlShape, FormattedHTMLMessage } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { LanguageType } from '../../../i18n/translations';
@@ -14,6 +14,8 @@ import FlagLabel from '../../widgets/FlagLabel';
 import { tier1Languages } from '../../../config/languagesConfig';
 import globalMessages, { listOfTranslators } from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import ReactMarkdown from 'react-markdown';
+import tosStyles from '../terms-of-use/TermsOfUseText.scss';
 
 type Props = {|
   +onSelectLanguage: {| locale: string |} => void,
@@ -22,10 +24,16 @@ type Props = {|
   +isSubmitting: boolean,
   +currentLocale: string,
   +error?: ?LocalizableError,
+  +localizedTermsOfUse: string,
+  +localizedPrivacyNotice: string,
+|};
+
+type State = {|
+  showing: 'form' | 'tos' | 'privacy',
 |};
 
 @observer
-export default class LanguageSelectionForm extends Component<Props> {
+export default class LanguageSelectionForm extends Component<Props, State> {
   static defaultProps: {|error: void|} = {
     error: undefined
   };
@@ -53,15 +61,38 @@ export default class LanguageSelectionForm extends Component<Props> {
       languageId: {
         label: this.context.intl.formatMessage(globalMessages.languageSelectLabel),
         value: this.props.currentLocale,
-      }
+      },
+      tosAgreement: {
+        value: false,
+      },
     }
   });
 
-  render(): Node {
+  state: State = { showing: 'form' };
+
+  onClickTosLabel: (SyntheticEvent<HTMLElement>) => void  = (event) => {
+    const target: Element = (event.target: any);
+
+    if (target.tagName === 'A') {
+      event.preventDefault();
+    }
+    if (target.id === 'tosLink') {
+      this.setState({ showing: 'tos' });
+    } else if (target.id === 'privacyLink') {
+      this.setState({ showing: 'privacy' });
+    }
+  }
+
+  onClickBack: () => void = () => {
+    this.setState({ showing: 'form' });
+  }
+
+  renderForm(): Node {
     const { intl } = this.context;
     const { form } = this;
     const { languages, isSubmitting, currentLocale, error } = this.props;
     const languageId = form.$('languageId');
+    const tosAgreement = form.$('tosAgreement');
     const languageOptions = languages.map(language => ({
       value: language.value,
       label: intl.formatMessage(language.label),
@@ -104,11 +135,32 @@ export default class LanguageSelectionForm extends Component<Props> {
             </p>
           )}
 
+          <FormControlLabel
+            onClick={this.onClickTosLabel}
+            label={
+              <span className={styles.tosAgreement}>
+                <FormattedHTMLMessage {...globalMessages.tosAgreement} />
+              </span>
+            }
+            control={
+              <Checkbox
+                checked={tosAgreement.value}
+                onChange={event => { tosAgreement.value = event.target.checked; }}
+              />
+            }
+            sx={{
+              width: '600px',
+              marginLeft: '0px',
+              marginBottom: '20px',
+            }}
+          />
+
           <LoadingButton
             variant="primary"
             fullWidth
             loading={isSubmitting}
             onClick={this.submit}
+            disabled={!tosAgreement.value}
           >
             {intl.formatMessage(globalMessages.continue)}
           </LoadingButton>
@@ -128,5 +180,34 @@ export default class LanguageSelectionForm extends Component<Props> {
         </div>
       </div>
     );
+  }
+
+  renderMarkdown(markdown: string): Node {
+    const { intl } = this.context;
+    return (
+      <>
+        <div className={styles.component}>
+          <div className={styles.tosBox}>
+            <div className={tosStyles.terms}>
+              <ReactMarkdown source={markdown} escapeHtml={false} />
+            </div>
+          </div>
+        </div>
+        <button type="button" className={styles.back} onClick={this.onClickBack}>
+          &#129120;{intl.formatMessage(globalMessages.backButtonLabel)}
+        </button>
+      </>
+    );
+  }
+
+  render(): Node {
+    const { showing } = this.state;
+    if (showing === 'form') {
+      return this.renderForm();
+    }
+    if (showing === 'tos') {
+      return this.renderMarkdown(this.props.localizedTermsOfUse);
+    }
+    return this.renderMarkdown(this.props.localizedPrivacyNotice);
   }
 }

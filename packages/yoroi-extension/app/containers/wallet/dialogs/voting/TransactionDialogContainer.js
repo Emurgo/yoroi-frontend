@@ -1,22 +1,20 @@
 // @flow
-import type { Node } from 'react';
-import { Component } from 'react';
-import { observer, } from 'mobx-react';
-import { computed, } from 'mobx';
-import { intlShape } from 'react-intl';
+import type { Node, ComponentType } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { InjectedOrGenerated } from '../../../../types/injectedPropsType';
+import type { CreateVotingRegTxFunc } from '../../../../api/ada/index';
+import type { TokenInfoMap } from '../../../../stores/toplevel/TokenInfoStore';
+import type { WalletType, StepsList } from '../../../../components/wallet/voting/types';
+import { Component } from 'react';
+import { observer } from 'mobx-react';
+import { computed } from 'mobx';
+import { intlShape } from 'react-intl';
+import { PublicDeriver } from '../../../../api/ada/lib/storage/models/PublicDeriver/index';
+import { ProgressInfo } from '../../../../stores/ada/VotingStore';
+import { genLookupOrFail } from '../../../../stores/stateless/tokenHelpers';
+import { withLayout } from '../../../../styles/context/layout';
 import VotingRegTxDialog from '../../../../components/wallet/voting/VotingRegTxDialog';
 import LocalizableError from '../../../../i18n/LocalizableError';
-import { PublicDeriver } from '../../../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { CreateVotingRegTxFunc } from '../../../../api/ada/index';
-import { ProgressInfo } from '../../../../stores/ada/VotingStore';
-import type { TokenInfoMap } from '../../../../stores/toplevel/TokenInfoStore';
-import { genLookupOrFail } from '../../../../stores/stateless/tokenHelpers';
-import type {
-  WalletType,
-  StepsList,
-} from '../../../../components/wallet/voting/types';
 
 export type GeneratedData = typeof TransactionDialogContainer.prototype.generated;
 
@@ -30,9 +28,14 @@ type Props = {|
   +onError: Error => void,
   +walletType: WalletType,
 |};
+type InjectedProps = {|
+  +isRevampLayout: boolean,
+|};
+
+type AllProps = {| ...Props, ...InjectedProps |};
 
 @observer
-export default class TransactionDialogContainer extends Component<Props> {
+class TransactionDialogContainer extends Component<AllProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -63,16 +66,16 @@ export default class TransactionDialogContainer extends Component<Props> {
               await this.generated.actions.ada.votingTransaction.signTransaction.trigger({
                 password,
                 publicDeriver: selectedWallet,
-              })
+              });
               await submit();
             } catch (error) {
               onError(error);
             }
-            }
-          }
+          }}
           classicTheme={this.props.classicTheme}
           error={votingStore.error}
           walletType={walletType}
+          isRevamp={this.props.isRevampLayout}
         />
       );
     }
@@ -171,3 +174,4 @@ export default class TransactionDialogContainer extends Component<Props> {
     });
   }
 }
+export default (withLayout(TransactionDialogContainer): ComponentType<Props>);
