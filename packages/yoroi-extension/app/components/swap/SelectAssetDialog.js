@@ -93,11 +93,19 @@ export default function SelectAssetDialog({ assets = [], type, onAssetSelected, 
         )}
 
         {filteredAssets.length === 0 && (
-          <Box>
-            <Box>
+          <Box
+            display="flex"
+            flexDirection="column"
+            gap="16px"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Box mt="60px">
               <NoAssetsFound />
             </Box>
-            <Box>No tpkens found for “{searchTerm}”</Box>
+            <Typography variant="body1" fontWeight={500}>
+              No tpkens found for “{searchTerm}”
+            </Typography>
           </Box>
         )}
       </Box>
