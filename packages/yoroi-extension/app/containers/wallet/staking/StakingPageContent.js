@@ -290,7 +290,7 @@ class StakingPageContent extends Component<AllProps> {
     const currentEpoch = currTimeRequests.currentEpoch;
     const epochLength = getEpochLength();
 
-    const getDateFromEpoch = epoch => {
+    const getDateFromEpoch = (epoch, returnEpochTime = false) => {
       const epochTime = toRealTime({
         absoluteSlotNum: toAbsoluteSlot({
           epoch,
@@ -299,11 +299,15 @@ class StakingPageContent extends Component<AllProps> {
         }),
         timeSinceGenesisFunc: timeSinceGenesis,
       });
+
+      if (returnEpochTime) return epochTime;
+
       const epochMoment = moment(epochTime).format('lll');
       return epochMoment;
     };
 
     const endEpochDate = getDateFromEpoch(currentEpoch);
+    const endEpochDateTime = getDateFromEpoch(currentEpoch, true);
     const previousEpochDate = getDateFromEpoch(currentEpoch - 1);
 
     return (
@@ -312,6 +316,7 @@ class StakingPageContent extends Component<AllProps> {
           startEpochDate: previousEpochDate,
           currentEpoch,
           endEpochDate,
+          endEpochDateTime,
           percentage: Math.floor((100 * currTimeRequests.currentSlot) / epochLength),
         }}
       />
