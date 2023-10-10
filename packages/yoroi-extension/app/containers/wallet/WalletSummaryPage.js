@@ -334,15 +334,6 @@ class WalletSummaryPage extends Component<AllProps> {
 
     const walletSummaryPageRevamp = (
       <Box>
-        <NotificationMessage icon={successIcon} show={!!notification}>
-          {!!notification && (
-            <FormattedHTMLMessage
-              {...notification.message}
-              values={notification.values == null ? undefined : notification.values(intl)}
-            />
-          )}
-        </NotificationMessage>
-
         <WalletSummaryRevamp
           pendingAmount={unconfirmedAmount}
           shouldHideBalance={profile.shouldHideBalance}
