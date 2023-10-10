@@ -8,14 +8,14 @@ export default function PriceInput({ label, price, assets = [], readonly, isLoad
       component="fieldset"
       sx={{
         border: '1px solid',
-        borderColor: 'gray.400',
+        borderColor: 'grayscale.400',
         borderRadius: '8px',
         p: '16px',
         display: 'grid',
         gridTemplateColumns: '1fr auto',
         justifyContent: 'start',
         position: 'relative',
-        bgcolor: readonly ? 'gray.50' : 'common.white',
+        bgcolor: readonly ? 'grayscale.50' : 'common.white',
         columnGap: '6px',
         rowGap: '8px',
       }}
@@ -38,14 +38,14 @@ export default function PriceInput({ label, price, assets = [], readonly, isLoad
           appearance: 'none',
           border: '0',
           outline: 'none',
-          '::placeholder': { color: '#6b7384' },
+          '::placeholder': { color: 'grayscale.600' },
         }}
         component="input"
         type="text"
         variant="body1"
         color="#000"
         placeholder="0"
-        bgcolor={readonly ? 'gray.50' : 'common.white'}
+        bgcolor={readonly ? 'grayscale.50' : 'common.white'}
         readOnly={readonly}
         value={price}
       />

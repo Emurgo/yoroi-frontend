@@ -26,11 +26,13 @@ export default function SelectAssetDialog({ assets = [], type, onAssetSelected, 
   return (
     <Dialog title={type} onClose={onClose} closeOnOverlayClick>
       <Box mb="16px">
-        <input
+        <Box
+          component="input"
           type="text"
           placeholder="Search"
-          style={{
-            border: '1px solid #A7AFC0',
+          sx={{
+            border: '1px solid',
+            borderColor: 'grayscale.400',
             borderRadius: '8px',
             padding: '8px',
             paddingLeft: '38px',
@@ -121,7 +123,7 @@ const FromAssetAndAmountRow = ({
         p: '8px',
         cursor: 'pointer',
         borderRadius: '8px',
-        '&:hover': { bgcolor: '#F0F3F5' },
+        '&:hover': { bgcolor: 'grayscale.50' },
       }}
       onClick={() => onAssetSelected({ name, address, amount, ticker })}
     >
@@ -131,7 +133,7 @@ const FromAssetAndAmountRow = ({
           <Typography variant="body1">{name}</Typography>
         </Box>
         <Box>
-          <Typography variant="body2" color="#6B7384">
+          <Typography variant="body2" color="grayscale.600">
             {address}
           </Typography>
         </Box>
@@ -170,7 +172,7 @@ const ToAssetAndAmountRow = ({
         p: '8px',
         cursor: 'pointer',
         borderRadius: '8px',
-        '&:hover': { bgcolor: '#F0F3F5' },
+        '&:hover': { bgcolor: 'grayscale.50' },
       }}
       onClick={() => onAssetSelected({ name, address, amount, ticker })}
     >
@@ -180,7 +182,7 @@ const ToAssetAndAmountRow = ({
           <Typography variant="body1">{name}</Typography>
         </Box>
         <Box>
-          <Typography variant="body2" color="#6B7384">
+          <Typography variant="body2" color="grayscale.600">
             {address}
           </Typography>
         </Box>

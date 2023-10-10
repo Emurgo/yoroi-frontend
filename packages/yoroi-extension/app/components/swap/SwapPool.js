@@ -32,7 +32,7 @@ export default function SwapPool({ name = '', image = null, assets, isLoading })
         onClick={handleShowFullInfo}
       >
         <Box>{image || <DefaultToken />}</Box>
-        <Typography variant="body1" fontWeight={500} color="#4B6DDE">
+        <Typography variant="body1" fontWeight={500} color="primary.500">
           {name || 'No pool found'}
         </Typography>
         <Box flexGrow="1" flexShrink="0" display="flex" alignItems="center" gap="4px">
@@ -52,19 +52,19 @@ export default function SwapPool({ name = '', image = null, assets, isLoading })
       {showFullInfo && (
         <Box sx={{ display: 'flex', flexFlow: 'column', gap: '8px', mt: '8px' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Box color="#8A92A3" display="flex" alignItems="center" gap="8px">
+            <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
               Min ADA <InfoIcon />
             </Box>
             <Box>0 ADA</Box>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Box color="#8A92A3" display="flex" alignItems="center" gap="8px">
+            <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
               Minimum assets received <InfoIcon />
             </Box>
             <Box>0 ADA</Box>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Box color="#8A92A3" display="flex" alignItems="center" gap="8px">
+            <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
               Fees <InfoIcon />
             </Box>
             <Box>0 ADA</Box>

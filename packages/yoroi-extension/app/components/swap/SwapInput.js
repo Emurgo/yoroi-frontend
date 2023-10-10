@@ -48,7 +48,7 @@ export default function SwapInput({
         sx={{
           borderStyle: 'solid',
           borderWidth: isFocused || error ? '2px' : '1px',
-          borderColor: error ? '#FF1351' : isFocusedColor,
+          borderColor: error ? 'magenta.500' : isFocusedColor,
           borderRadius: '8px',
           p: '16px',
           pr: '8px',
@@ -70,7 +70,7 @@ export default function SwapInput({
             position: 'absolute',
             px: '4px',
             bgcolor: 'common.white',
-            color: error ? '#FF1351' : 'black',
+            color: error ? 'magenta.500' : 'black',
           }}
         >
           {label}
@@ -81,12 +81,12 @@ export default function SwapInput({
             appearance: 'none',
             border: '0',
             outline: 'none',
-            '::placeholder': { color: '#6b7384' },
+            '::placeholder': { color: 'grayscale.600' },
           }}
           component="input"
           type="text"
           variant="body1"
-          color="#000"
+          color="grayscale.max"
           placeholder="0"
           onChange={handleChange}
           value={inputValue}
@@ -108,7 +108,7 @@ export default function SwapInput({
               component="button"
               variant="caption"
               fontWeight={500}
-              sx={{ p: '4px 8px', bgcolor: '#F0F3F5', borderRadius: '8px' }}
+              sx={{ p: '4px 8px', bgcolor: 'grayscale.50', borderRadius: '8px' }}
               onClick={() => {
                 setInputValue(walletAmount);
                 handleAmountChange(walletAmount);
@@ -121,13 +121,13 @@ export default function SwapInput({
           <Box />
         )}
         <Box sx={{ justifySelf: 'end', alignSelf: 'end' }}>
-          <Typography variant="caption" color="#6B7384">
+          <Typography variant="caption" color="grayscale.600">
             Current balance: {walletAmount || 0} {ticker}
           </Typography>
         </Box>
       </Box>
       {error && (
-        <Typography pt="4px" variant="caption" color="#FF1351">
+        <Typography pt="4px" variant="caption" color="magenta.500">
           {error}
         </Typography>
       )}

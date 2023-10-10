@@ -42,7 +42,7 @@ export default function SwapPage(): Node {
             onClick={() => setIsMarketOrder(true)}
             p="8px"
             borderRadius="8px"
-            bgcolor={isMarketOrder ? 'gray.200' : ''}
+            bgcolor={isMarketOrder ? 'grayscale.200' : ''}
           >
             <Typography variant="body1" fontWeight={isMarketOrder ? 500 : 400}>
               Market
@@ -52,7 +52,7 @@ export default function SwapPage(): Node {
             onClick={() => setIsMarketOrder(false)}
             p="8px"
             borderRadius="8px"
-            bgcolor={!isMarketOrder ? 'gray.200' : ''}
+            bgcolor={!isMarketOrder ? 'grayscale.200' : ''}
           >
             <Typography variant="body1" fontWeight={!isMarketOrder ? 500 : 400}>
               Limit
@@ -120,13 +120,13 @@ export default function SwapPage(): Node {
         }}
       >
         <Box display="flex" gap="8px" alignItems="center">
-          <Typography variant="body1" color="#8A92A3">
+          <Typography variant="body1" color="grayscale.500">
             Slippage tolerance
           </Typography>
           <InfoIcon />
         </Box>
         <Box display="flex" gap="4px" alignItems="center">
-          <Typography variant="body1" color="#000">
+          <Typography variant="body1" color="grayscale.max">
             1%
           </Typography>
           <EditIcon />
