@@ -144,7 +144,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
   if (nftInfo == null) return null;
 
   return (
-    <Box sx={{ overflowY: 'scroll', height: '100%', p: '24px' }}>
+    <Box sx={{ p: '24px', width: '100%' }}>
       <Box sx={{ display: 'inline-block' }}>
         <Typography
           as={Link}
@@ -176,10 +176,12 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
           mb: '21px',
           backgroundColor: 'common.white',
           borderRadius: '8px',
-          height: '100%',
         }}
       >
-        <Grid item xs={4}>
+        <Grid
+          item
+          xs={4}
+        >
           <ImageItem
             sx={{
               cursor: nftInfo.image !== null ? 'zoom-in' : 'auto',
@@ -232,13 +234,11 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
               <Stack direction="row" spacing={1}>
                 <Link
                   to={ROUTES.NFTS.DETAILS.replace(':nftId', prevNftId) + `?tab=${activeTab}`}
-                  onClick={
-                  () => {
+                  onClick={() => {
                     ampli.nftGalleryDetailsNavigation({
                       nft_navigation: 'Previous',
                     });
-                  }
-                }
+                  }}
                 >
                   <IconButton
                     aria-label="Previous"
@@ -249,13 +249,11 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                 </Link>
                 <Link
                   to={ROUTES.NFTS.DETAILS.replace(':nftId', nextNftId) + `?tab=${activeTab}`}
-                  onClick={
-                  () => {
+                  onClick={() => {
                     ampli.nftGalleryDetailsNavigation({
                       nft_navigation: 'Next',
                     });
-                  }
-                }
+                  }}
                 >
                   <IconButton aria-label="Next" sx={{ width: '32px' }}>
                     <Chevron />
