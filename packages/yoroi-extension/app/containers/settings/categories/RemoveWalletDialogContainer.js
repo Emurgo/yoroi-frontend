@@ -16,8 +16,7 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import { withLayout } from '../../../styles/context/layout';
 import type { LayoutComponentMap } from '../../../styles/context/layout';
 import { getWalletType } from '../../../stores/toplevel/WalletSettingsStore';
-import type { WalletsNavigation } from '../../../api/localStorage';
-import { trackRemoveWallet } from '../../../api/analytics';
+import type { WalletsNavigation } from '../../../api/localStorage'
 
 export type GeneratedData = typeof RemoveWalletDialogContainer.prototype.generated;
 
@@ -75,7 +74,6 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
         ),
       };
       await this.generated.actions.profile.updateSortedWalletList.trigger(newWalletsNavigation);
-      trackRemoveWallet();
     }
 
     this.props.publicDeriver &&
@@ -100,14 +98,11 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
         onCancel={this.generated.actions.dialogs.closeActiveDialog.trigger}
         primaryButton={{
           label: intl.formatMessage(globalMessages.remove),
-          onClick: () => {
-            if (this.props.publicDeriver != null) {
-              settingsActions.removeWallet.trigger({
-                publicDeriver: this.props.publicDeriver,
-              });
-              trackRemoveWallet();
-            }
-          },
+          onClick: () =>
+            this.props.publicDeriver &&
+            settingsActions.removeWallet.trigger({
+              publicDeriver: this.props.publicDeriver,
+            }),
         }}
         secondaryButton={{
           onClick: this.generated.actions.dialogs.closeActiveDialog.trigger,

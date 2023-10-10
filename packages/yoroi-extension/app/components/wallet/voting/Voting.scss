@@ -9,9 +9,9 @@
     margin-top: 40px;
     margin-bottom: 40px;
     display: flex;
-    :not(:last-child) {
-      margin-right: 16px;
-    }
+    gap: 24px;
+    width: 100%;
+    justify-content: center;
 
     .card {
       background-repeat: no-repeat;
@@ -20,7 +20,7 @@
 
       width: 272px;
       height: 374px;
-      border: 1px solid #C4CAD7;
+      border: 1px solid #c4cad7;
       border-radius: 8px;
       padding: 24px;
 
@@ -50,7 +50,14 @@
         display: flex;
         justify-content: center;
         margin-top: 12px;
+        gap: 16px;
       }
+    }
+
+    .appBadges {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
     }
   }
 

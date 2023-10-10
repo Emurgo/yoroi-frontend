@@ -15,23 +15,14 @@
     letter-spacing: 0;
     line-height: 1.375rem;
   }
+
   .description {
     color: var(--yoroi-palette-gray-600);
     font-size: 1rem;
     line-height: 1.375rem;
     text-align: center;
   }
-  .selected {
-    font-size: 1rem;
-    text-align: center;
-    margin: 1rem 0;
 
-    span {
-      color: var(--yoroi-comp-button-secondary-text);
-      font-weight: bold;
-      text-transform: uppercase;
-    }
-  }
   .cardsWrapper {
     margin: 30px auto;
     display: flex;
@@ -39,15 +30,17 @@
       flex: 1;
     }
   }
+
   .card {
     margin-right: 30px;
     border-radius: 8px;
     background-color: var(--yoroi-palette-common-white);
-    border: 1px solid #DCE0E9;
+    border: 1px solid #dce0e9;
     overflow: hidden;
     &:last-child {
       margin-right: 0;
     }
+
     .cardImage {
       background-color: var(--yoroi-palette-gray-100);
       height: 184px;
@@ -55,12 +48,15 @@
       align-items: center;
       justify-content: center;
     }
+
     .simple {
       background: #f1fdfa;
     }
+
     .advanced {
       background: #f3f5fd;
     }
+
     .cardContent {
       padding: 24px;
       color: var(--yoroi-palette-gray-900);
@@ -89,4 +85,13 @@
       margin-bottom: 1rem;
     }
   }
+}
+
+:global(.YoroiRevamp) .component {
+  min-width: 650px;
+  max-width: unset;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }

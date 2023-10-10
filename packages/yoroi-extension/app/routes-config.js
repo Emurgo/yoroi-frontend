@@ -1,27 +1,4 @@
 // @flow
-// routes to by tracked by analytics
-export const TRACKED_ROUTES: RegExp = new RegExp(
-  '^(' +
-    '(/my-wallets)|' +
-    '(/wallets/add)|' +
-    '(/wallets/transactions)|' +
-    '(/wallets/send)|' +
-    '(/wallets/assets)|' +
-    '(/wallets/receive/.+)|' +
-    '(/wallets/delegation-dashboard)|' +
-    '(/wallets/cardano-delegation)|' +
-    '(/wallets/voting)|' +
-    '(/settings/.+)|' +
-    '(/transfer(/.+)?)|' +
-    '(/send-from-uri)|' +
-    '(/notice-board)|' +
-    '(/staking)|' +
-    '(/assets/.*)|' +
-    '(/connector/connected-websites)|' +
-    '(/experimental/.*)' +
-    ')$'
-);
-
 export const ROUTES = {
   ROOT: '/',
   NIGHTLY_INFO: '/nightly',
@@ -31,6 +8,7 @@ export const ROUTES = {
     TERMS_OF_USE: '/profile/terms-of-use',
     COMPLEXITY_LEVEL: '/profile/complexity-level',
     URI_PROMPT: '/profile/uri-prompt',
+    OPT_FOR_ANALYTICS: '/profile/opt-for-analytics',
   },
   SWITCH: '/switch',
   WALLETS: {
@@ -60,10 +38,10 @@ export const ROUTES = {
     TERMS_OF_USE: '/settings/terms-of-use',
     SUPPORT: '/settings/support',
     LEVEL_OF_COMPLEXITY: '/settings/level-of-complexity',
+    ANALYTICS: '/settings/analytics',
   },
   TRANSFER: {
     ROOT: '/transfer',
-    DAEDALUS: '/transfer/daedalus',
     YOROI: '/transfer/yoroi',
   },
   SEND_FROM_URI: {
@@ -96,8 +74,6 @@ export const ROUTES = {
   },
   // Revamp specific routes:
   REVAMP: {
-    // `transfer` the `wallet`
-    TRANSFER: '/wallets/transfer',
     // `voting` is part of the sidebar
     CATALYST_VOTING: '/voting',
   },

@@ -7,8 +7,8 @@ type Props = {|
   +percentage: number,
   +days: string,
   +currentEpoch: number,
-  +startEpochDate: string,
-  +endEpochDate: string,
+  +startEpochDate: string | Date,
+  +endEpochDate: string | Date,
 |};
 
 export function EpochProgressCard({
@@ -50,7 +50,7 @@ const Title = ({ label, value }: TitleProps): Node => {
 
 type InfoColumnProps = {|
   +label: string,
-  +value: string | number,
+  +value: string | number | Date,
 |};
 const LabelWithValue = ({ label, value }: InfoColumnProps): Node => {
   return (

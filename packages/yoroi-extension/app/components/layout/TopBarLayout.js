@@ -17,10 +17,13 @@ type Props = {|
   +showInContainer?: boolean,
   +showAsCard?: boolean,
   +asModern?: boolean,
+  +withPadding?: boolean, // default: true
   +bgcolor?: string,
 |};
 
 type InjectedProps = {| isRevampLayout: boolean, currentTheme: string |};
+
+type AllProps = {| ...Props, ...InjectedProps |};
 /** Adds a top bar above the wrapped node */
 function TopBarLayout({
   banner,
@@ -35,9 +38,11 @@ function TopBarLayout({
   currentTheme,
   isRevampLayout,
   asModern,
+  withPadding,
   bgcolor,
-}: Props & InjectedProps) {
+}: AllProps) {
   const isModern = currentTheme === THEMES.YOROI_MODERN;
+  const isRevamp = isRevampLayout && asModern !== true && !isModern;
 
   const getContentUnderBanner: void => Node = () => {
     const topbarComponent = <Box sx={{ zIndex: 2 }}>{topbar}</Box>;
@@ -48,16 +53,16 @@ function TopBarLayout({
         {navbar != null ? navbarComponent : null}
         {notification}
         <Box
+          id="inner-content-wrapper"
           sx={{
             position: 'relative',
-            overflow: 'auto',
             height: '100%',
             '&::-webkit-scrollbar-button': {
               height: '7px',
               display: 'block',
             },
-            boxShadow: !isRevampLayout && showAsCard === true && '0 2px 12px 0 rgba(0, 0, 0, 0.06)',
-            borderRadius: !isRevampLayout && showAsCard === true && '8px',
+            boxShadow: !isRevamp && showAsCard === true && '0 2px 12px 0 rgba(0, 0, 0, 0.06)',
+            borderRadius: !isRevamp && showAsCard === true && '8px',
             ...(showInContainer === true && {
               bgcolor: 'common.white',
               width: '100%',
@@ -67,15 +72,10 @@ function TopBarLayout({
               flex: '0 1 auto',
               height: '100%',
             }),
-            ...(isRevampLayout &&
-              asModern !== true &&
-              // $FlowFixMe
-              !isModern && {
-                overflow: 'auto',
-              }),
+            overflow: isRevamp ? 'auto' : 'unset',
           }}
         >
-          {isRevampLayout && asModern !== true && !isModern ? (
+          {isRevamp ? (
             <Box
               sx={{
                 bgcolor: bgcolor || 'common.white',
@@ -96,7 +96,8 @@ function TopBarLayout({
                   sx={{
                     height: '100%',
                     minHeight: '200px',
-                    padding: '24px',
+                    padding:
+                      typeof withPadding === 'undefined' || withPadding === true ? '24px' : '0px',
                     pb: 0,
                     bgcolor: bgcolor || 'common.white',
                   }}
@@ -106,16 +107,24 @@ function TopBarLayout({
               </Box>
             </Box>
           ) : (
-            <Box sx={{ height: '100%', minHeight: '200px' }}>{children}</Box>
+            <Box
+              sx={{
+                height: '100%',
+                minHeight: '200px',
+              }}
+            >
+              {children}
+            </Box>
           )}
         </Box>
       </>
     );
+
     if (showInContainer === true) {
       const boxProperties = {
         height: '100%',
         minHeight: '200px',
-        backgroundColor: 'grey.50',
+        backgroundColor: isRevamp ? 'common.white' : 'var(--yoroi-palette-gray-50)',
         maxWidth: '1295px',
         paddingLeft: '40px',
         paddingRight: '40px',
@@ -125,11 +134,11 @@ function TopBarLayout({
         display: 'flex',
         flexDirection: 'column',
         maxHeight: 'calc(100vh - 110px)',
+        overflow: isRevamp ? 'unset' : 'hidden',
+        pb: isRevamp ? '0px' : '100px',
       };
-      if (isRevampLayout && asModern !== true && !isModern) {
-        boxProperties.backgroundColor = 'common.white';
-      }
-      return isRevampLayout && asModern !== true && !isModern ? (
+
+      return isRevamp ? (
         <Box
           sx={{
             maxWidth: '100%',
@@ -144,11 +153,7 @@ function TopBarLayout({
           {content}
         </Box>
       ) : (
-        <Box
-          sx={boxProperties}
-        >
-          {content}
-        </Box>
+        <Box sx={boxProperties}>{content}</Box>
       );
     }
     return content;
@@ -187,15 +192,7 @@ function TopBarLayout({
             display: 'flex',
             flexDirection: 'column',
             position: 'relative',
-            backgroundColor:
-              showInContainer === true && isRevampLayout
-                ? 'common.white'
-                : 'var(--yoroi-palette-gray-50)',
-            ...(isRevampLayout &&
-              asModern !== true &&
-              !isModern && {
-                backgroundColor: 'common.white',
-              }),
+            backgroundColor: isRevamp ? 'common.white' : 'var(--yoroi-palette-gray-50)',
           }}
         >
           {banner}
@@ -219,5 +216,6 @@ TopBarLayout.defaultProps = {
   showInContainer: false,
   showAsCard: false,
   asModern: false,
+  withPadding: true,
   bgcolor: undefined,
 };

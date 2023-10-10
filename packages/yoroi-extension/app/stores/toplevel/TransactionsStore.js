@@ -53,7 +53,6 @@ import {
   loadSubmittedTransactions,
   persistSubmittedTransactions,
 } from '../../api/localStorage';
-import { FETCH_TXS_BATCH_SIZE } from '../../api/ada';
 import LegacyTransactionsStore from './LegacyTransactionsStore';
 import type { Api } from '../../api/index';
 import { getAllAddressesForWallet } from '../../api/ada/lib/storage/bridge/traitUtils';
@@ -571,7 +570,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const result = await tailRequest.promise;
     runInAction(() => {
       state.txs.splice(state.txs.length, 0, ...result);
-      state.hasMoreToLoad = result.length === FETCH_TXS_BATCH_SIZE;
+      state.hasMoreToLoad = result.length > 0;
     });
 
     await this._afterLoadingNewTxs(

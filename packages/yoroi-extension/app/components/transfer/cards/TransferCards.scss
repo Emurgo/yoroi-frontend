@@ -17,13 +17,7 @@
 
 .heroCardsItemBg {
   &.bgByronMainnet {
-    background-image: url(../../../assets/images/claim/byron-mainnet.inline.svg);
-  }
-  &.bgShelleyTestnet {
-    background-image: url(../../../assets/images/claim/shelley-testnet.inline.svg);
-  }
-  &.bgShelleyMainnet {
-    background-image: url(../../../assets/images/claim/shelley-mainnet.inline.svg);
+    background-image: url(../../../assets/images/add-wallet/option-dialog/restore-paper-wallet-modern.inline.svg);
   }
 }
 

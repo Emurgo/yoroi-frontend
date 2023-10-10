@@ -13,7 +13,6 @@ import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 
 import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
 import LocalizableError from '../../../i18n/LocalizableError';
-import { trackResyncWallet } from '../../../api/analytics';
 
 export type GeneratedData = typeof ResyncWalletDialogContainer.prototype.generated;
 
@@ -66,7 +65,6 @@ export default class ResyncWalletDialogContainer extends Component<Props> {
               publicDeriver: this.props.publicDeriver,
             });
             this.generated.actions.dialogs.closeActiveDialog.trigger();
-            trackResyncWallet();
           }
         }}
         onCancel={this.generated.actions.dialogs.closeActiveDialog.trigger}

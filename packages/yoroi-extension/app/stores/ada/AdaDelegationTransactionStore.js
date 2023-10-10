@@ -4,22 +4,18 @@ import { observable, action, reaction } from 'mobx';
 import BigNumber from 'bignumber.js';
 import Store from '../base/Store';
 import LocalizedRequest from '../lib/LocalizedRequest';
-import type {
-  CreateDelegationTxFunc,
-  CreateWithdrawalTxResponse,
-} from '../../api/ada';
+import type { CreateDelegationTxFunc, CreateWithdrawalTxResponse } from '../../api/ada';
 import { buildRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 import {
-  asGetAllUtxos, asHasUtxoChains, asGetAllAccounting, asGetPublicKey,
+  asGetAllUtxos,
+  asHasUtxoChains,
+  asGetAllAccounting,
+  asGetPublicKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import {
-  PublicDeriver,
-} from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import { getCardanoHaskellBaseConfig, } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import {
-  genTimeToSlot,
-} from '../../api/ada/lib/storage/bridge/timeUtils';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { genTimeToSlot } from '../../api/ada/lib/storage/bridge/timeUtils';
 import {
   isLedgerNanoWallet,
   isTrezorTWallet,
@@ -27,17 +23,18 @@ import {
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import { trackDelegation } from '../../api/analytics';
 
 export default class AdaDelegationTransactionStore extends Store<StoresMap, ActionsMap> {
-
   @observable selectedPools: Array<string>;
 
-  @observable createWithdrawalTx: LocalizedRequest<DeferredCall<CreateWithdrawalTxResponse>>
-    = new LocalizedRequest<DeferredCall<CreateWithdrawalTxResponse>>(request => request());
+  @observable createWithdrawalTx: LocalizedRequest<
+    DeferredCall<CreateWithdrawalTxResponse>
+  > = new LocalizedRequest<DeferredCall<CreateWithdrawalTxResponse>>(request => request());
 
-  @observable createDelegationTx: LocalizedRequest<CreateDelegationTxFunc>
-    = new LocalizedRequest<CreateDelegationTxFunc>(this.api.ada.createDelegationTx);
+  @observable
+  createDelegationTx: LocalizedRequest<CreateDelegationTxFunc> = new LocalizedRequest<CreateDelegationTxFunc>(
+    this.api.ada.createDelegationTx
+  );
 
   @observable shouldDeregister: boolean = false;
 
@@ -45,7 +42,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
   @observable isStale: boolean = false;
 
   // eslint-disable-next-line no-restricted-syntax
-  _updateTxBuilderReaction: (void => mixed) = reaction(
+  _updateTxBuilderReaction: void => mixed = reaction(
     () => [
       this.stores.wallets.selected,
       // update if tx history changes
@@ -56,22 +53,24 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
         this.markStale(true);
       }
     }
-  )
+  );
 
   @action
-  _setPools: Array<string> => Promise<void> = async (pools) => {
+  _setPools: (Array<string>) => Promise<void> = async pools => {
     this.selectedPools = pools;
     if (pools.length > 0) {
       try {
         await this.stores.delegation.poolInfoQuery.execute(pools);
-      } catch (_e) { /* error handled by request */ }
+      } catch (_e) {
+        /* error handled by request */
+      }
     }
-  }
+  };
 
   @action.bound
-  markStale: boolean => void = (status) => {
+  markStale: boolean => void = status => {
     this.isStale = status;
-  }
+  };
 
   setup(): void {
     super.setup();
@@ -87,15 +86,15 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
   }
 
   @action
-  _setShouldDeregister: boolean => void = (shouldDeregister) => {
+  _setShouldDeregister: boolean => void = shouldDeregister => {
     this.shouldDeregister = shouldDeregister;
-  }
+  };
 
   @action
-  _createTransaction: {|
+  _createTransaction: ({|
     publicDeriver: PublicDeriver<>,
     poolRequest: string | void,
-  |} => Promise<void> = async (request) => {
+  |}) => Promise<void> = async request => {
     const withUtxos = asGetAllUtxos(request.publicDeriver);
     if (withUtxos == null) {
       throw new Error(`${nameof(this._createTransaction)} missing utxo functionality`);
@@ -114,24 +113,26 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     }
     const basePubDeriver = withPublicKey;
 
-    const delegationRequests = this.stores.delegation.getDelegationRequests(
-      request.publicDeriver
-    );
+    const delegationRequests = this.stores.delegation.getDelegationRequests(request.publicDeriver);
     const adaDelegationRequests = this.stores.substores.ada.delegation.getDelegationRequests(
       request.publicDeriver
     );
     if (delegationRequests == null || adaDelegationRequests == null) {
-      throw new Error(`${nameof(AdaDelegationTransactionStore)}::${nameof(this._createTransaction)} called for non-reward wallet`);
+      throw new Error(
+        `${nameof(AdaDelegationTransactionStore)}::${nameof(
+          this._createTransaction
+        )} called for non-reward wallet`
+      );
     }
 
-    const fullConfig = getCardanoHaskellBaseConfig(
-      withHasUtxoChains.getParent().getNetworkInfo(),
-    );
+    const fullConfig = getCardanoHaskellBaseConfig(withHasUtxoChains.getParent().getNetworkInfo());
     const timeToSlot = await genTimeToSlot(fullConfig);
-    const absSlotNumber = new BigNumber(timeToSlot({
-      // use server time for TTL if connected to server
-      time: this.stores.serverConnectionStore.serverTime ?? new Date(),
-    }).slot);
+    const absSlotNumber = new BigNumber(
+      timeToSlot({
+        // use server time for TTL if connected to server
+        time: this.stores.serverConnectionStore.serverTime ?? new Date(),
+      }).slot
+    );
 
     const defaultToken = request.publicDeriver.getParent().getDefaultToken();
 
@@ -139,8 +140,9 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
       publicDeriver: basePubDeriver,
       poolRequest: request.poolRequest,
       registrationStatus: adaDelegationRequests.getRegistrationHistory.result?.current ?? false,
-      valueInAccount: delegationRequests.getDelegatedBalance.result?.accountPart
-        ?? new MultiToken([], defaultToken),
+      valueInAccount:
+        delegationRequests.getDelegatedBalance.result?.accountPart ??
+        new MultiToken([], defaultToken),
       absSlotNumber,
     }).promise;
     if (delegationTxPromise == null) {
@@ -149,12 +151,12 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     await delegationTxPromise;
 
     this.markStale(false);
-  }
+  };
 
   @action
-  _createWithdrawalTxForWallet: {|
+  _createWithdrawalTxForWallet: ({|
     publicDeriver: PublicDeriver<>,
-  |} => Promise<void> = async (request) => {
+  |}) => Promise<void> = async request => {
     this.createWithdrawalTx.reset();
 
     const withUtxos = asGetAllUtxos(request.publicDeriver);
@@ -167,7 +169,9 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     }
     const withStakingKey = asGetAllAccounting(withHasUtxoChains);
     if (withStakingKey == null) {
-      throw new Error(`${nameof(this._createWithdrawalTxForWallet)} missing staking key functionality`);
+      throw new Error(
+        `${nameof(this._createWithdrawalTxForWallet)} missing staking key functionality`
+      );
     }
 
     const stakingKeyDbRow = await withStakingKey.getStakingKey();
@@ -176,32 +180,37 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
       request.publicDeriver.getParent().getNetworkInfo()
     );
     const timeToSlot = await genTimeToSlot(fullConfig);
-    const absSlotNumber = new BigNumber(timeToSlot({
-      // use server time for TTL if connected to server
-      time: this.stores.serverConnectionStore.serverTime ?? new Date(),
-    }).slot);
+    const absSlotNumber = new BigNumber(
+      timeToSlot({
+        // use server time for TTL if connected to server
+        time: this.stores.serverConnectionStore.serverTime ?? new Date(),
+      }).slot
+    );
 
     const unsignedTx = await this.createWithdrawalTx.execute(async () => {
       return await this.api.ada.createWithdrawalTx({
         publicDeriver: withHasUtxoChains,
         getAccountState: this.stores.substores.ada.stateFetchStore.fetcher.getAccountState,
         absSlotNumber,
-        withdrawals: [{
-          addressing: stakingKeyDbRow.addressing,
-          rewardAddress: stakingKeyDbRow.addr.Hash,
-          shouldDeregister: this.shouldDeregister,
-        }],
+        withdrawals: [
+          {
+            addressing: stakingKeyDbRow.addressing,
+            rewardAddress: stakingKeyDbRow.addr.Hash,
+            shouldDeregister: this.shouldDeregister,
+          },
+        ],
       });
     }).promise;
 
     if (unsignedTx == null) throw new Error(`Should never happen`);
-  }
+  };
 
   @action
-  _signTransaction: {|
-    password?: string,
+  _signTransaction: ({|
     publicDeriver: PublicDeriver<>,
-  |} => Promise<void> = async (request) => {
+    password?: string,
+    dialog?: any,
+  |}) => Promise<void> = async request => {
     const result = this.createDelegationTx.result;
     if (result == null) {
       throw new Error(`${nameof(this._signTransaction)} no tx to broadcast`);
@@ -216,7 +225,9 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
         },
         refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
       });
-    } else if (isTrezorTWallet(request.publicDeriver.getParent())) {
+      return;
+    }
+    if (isTrezorTWallet(request.publicDeriver.getParent())) {
       await this.stores.substores.ada.wallets.adaSendAndRefresh({
         broadcastRequest: {
           trezor: {
@@ -226,32 +237,35 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
         },
         refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
       });
-    } else {
-      // normal password-based wallet
-      if (request.password == null) {
-        throw new Error(`${nameof(this._signTransaction)} missing password for non-hardware signing`);
-      }
-      await this.stores.substores.ada.wallets.adaSendAndRefresh({
-        broadcastRequest: {
-          normal: {
-            publicDeriver: request.publicDeriver,
-            password: request.password,
-            signRequest: result.signTxRequest,
-          },
-        },
-        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
-      });
+      return;
     }
-    trackDelegation();
-  }
+    // normal password-based wallet
+    if (request.password == null) {
+      throw new Error(
+        `${nameof(this._signTransaction)} missing password for non-hardware signing`
+      );
+    }
+    await this.stores.substores.ada.wallets.adaSendAndRefresh({
+      broadcastRequest: {
+        normal: {
+          publicDeriver: request.publicDeriver,
+          password: request.password,
+          signRequest: result.signTxRequest,
+        },
+      },
+      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
+    });
+    if (request.dialog) this.actions.dialogs.open.trigger({ dialog: request.dialog });
+  };
 
   _complete: void => void = () => {
     this.actions.dialogs.closeActiveDialog.trigger();
     this.goToDashboardRoute();
-  }
+  };
 
   goToDashboardRoute(): void {
-    const route = buildRoute(ROUTES.WALLETS.DELEGATION_DASHBOARD);
+    const isRevamp = this.stores.profile.isRevampTheme;
+    const route = buildRoute(isRevamp ? ROUTES.STAKING : ROUTES.WALLETS.DELEGATION_DASHBOARD);
     this.actions.router.goToRoute.trigger({ route });
   }
 

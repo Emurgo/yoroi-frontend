@@ -2,9 +2,8 @@
 import { Component } from 'react';
 import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
-import { Button } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { intlShape } from 'react-intl';
-import styles from './UriSettingsBlock.scss';
 import globalMessages from '../../../../i18n/global-messages';
 import { observable, runInAction } from 'mobx';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -33,9 +32,23 @@ class UriSettingsBlock extends Component<Props & InjectedProps> {
     const isDisabled = this.props.isFirefox && this.hasPressed;
 
     return (
-      <div className={styles.component}>
-        <h2 className={styles.title}>{intl.formatMessage(globalMessages.uriSchemeLabel)}</h2>
-        <p>{intl.formatMessage(globalMessages.uriExplanation)}</p>
+      <Box
+        sx={{
+          pb: '24px',
+          pt: !isRevampLayout && '24px',
+          borderTop: !isRevampLayout && '1px solid',
+          borderColor: !isRevampLayout && 'var(--yoroi-palette-gray-200)',
+        }}
+      >
+        <Typography variant={isRevampLayout ? 'body1' : 'h5'} fontWeight={500} mb="12px">
+          {intl.formatMessage(globalMessages.uriSchemeLabel)}
+        </Typography>
+
+        <Typography variant={isRevampLayout ? 'body1' : 'body2'} color="common.black">
+          {intl.formatMessage(
+            isRevampLayout ? globalMessages.uriExplanationRevamp : globalMessages.uriExplanation
+          )}
+        </Typography>
 
         <Button
           className="allowButton"
@@ -48,13 +61,16 @@ class UriSettingsBlock extends Component<Props & InjectedProps> {
           }}
           disabled={isDisabled}
           sx={{
-            width: '287px',
-            marginTop: '20px',
+            width: isRevampLayout ? 'fit-content' : '287px',
+            marginTop: isRevampLayout ? '40px' : '20px',
+            '&.MuiButton-sizeMedium': {
+              p: isRevampLayout && '13px 24px',
+            },
           }}
         >
           {intl.formatMessage(globalMessages.allowLabel)}
         </Button>
-      </div>
+      </Box>
     );
   }
 }

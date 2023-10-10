@@ -2,10 +2,10 @@
 
 import type { Node } from 'react';
 
-import { boolean, select, } from '@storybook/addon-knobs';
+import { boolean, select } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import { withScreenshot } from 'storycap';
-import { walletLookup, } from '../../../../stories/helpers/WalletCache';
+import { walletLookup } from '../../../../stories/helpers/WalletCache';
 import { genShelleyCip1852DummyWithCache } from '../../../../stories/helpers/cardano/ShelleyCip1852Mocks';
 import { wrapSettings } from '../../../Routes';
 import { mockSettingsProps } from '../Settings.mock';
@@ -21,10 +21,10 @@ export default {
   decorators: [withScreenshot],
 };
 
-const defaultSettingsPageProps: {|
+const defaultSettingsPageProps: ({|
   selected: null | PublicDeriver<>,
   lastUpdatedTimestamp: null | number,
-|} => * = (request) => ({
+|}) => * = request => ({
   stores: {
     explorers: {
       setSelectedExplorerRequest: {
@@ -37,10 +37,13 @@ const defaultSettingsPageProps: {|
     wallets: {
       selected: request.selected,
     },
+    profile: {
+      isRevampTheme: false,
+    },
   },
   actions: {
     explorers: {
-      updateSelectedExplorer: { trigger: async (req) => action('updateSelectedExplorer')(req) },
+      updateSelectedExplorer: { trigger: async req => action('updateSelectedExplorer')(req) },
     },
   },
   canRegisterProtocol: () => boolean('canRegisterProtocol', true),
@@ -65,17 +68,15 @@ export const Generic = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
-    (<BlockchainSettingsPage
+    <BlockchainSettingsPage
       generated={defaultSettingsPageProps({
         selected: wallet.publicDeriver,
-        lastUpdatedTimestamp: lastUpdatedTimestamp === lastUpdateCases.Never
-          ? null
-          : new Date().getTime(),
+        lastUpdatedTimestamp:
+          lastUpdatedTimestamp === lastUpdateCases.Never ? null : new Date().getTime(),
       })}
-    />)
+    />
   );
 };
-
 
 export const NoWallet = (): Node => {
   const selected = null;
@@ -86,11 +87,11 @@ export const NoWallet = (): Node => {
       selected,
       ...lookup,
     }),
-    (<BlockchainSettingsPage
+    <BlockchainSettingsPage
       generated={defaultSettingsPageProps({
         selected,
         lastUpdatedTimestamp: null,
       })}
-    />)
+    />
   );
 };

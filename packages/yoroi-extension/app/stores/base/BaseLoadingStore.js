@@ -32,7 +32,13 @@ export default class BaseLoadingStore<TStores, TActions> extends Store<TStores, 
       async () => await loadLovefieldDB(schema.DataStoreType.INDEXED_DB)
     );
 
+  blockingLoadingRequests: Array<Promise<void>> = [];
+
   setup(): void {
+  }
+
+  registerBlockingLoadingRequest(promise: Promise<void>): void {
+    this.blockingLoadingRequests.push(promise);
   }
 
   load(env: 'connector' | 'extension'): void {
@@ -43,7 +49,8 @@ export default class BaseLoadingStore<TStores, TActions> extends Store<TStores, 
         this.loadRustRequest.execute(
           (env === 'extension') ? [ 'dontLoadMessagesSigning' ] : []
         ).promise,
-        this.loadPersistentDbRequest.execute().promise
+        this.loadPersistentDbRequest.execute().promise,
+        ...this.blockingLoadingRequests,
       ])
       .then(async () => {
         Logger.debug(`[yoroi] closing other instances`);
