@@ -1,8 +1,27 @@
+// @flow
+import type { Node } from 'react';
 import { Box, Input, Typography } from '@mui/material';
 
-export default function PriceInput({ label, assets = [], readonly, isLoading }) {
-  const [asset1, asset2] = assets;
+type AssetAmount = {|
+  ticker: string,
+  amount: number,
+|};
 
+type Props = {|
+  label: string,
+  baseCurrency: AssetAmount,
+  quoteCurrency: AssetAmount,
+  readonly?: boolean,
+  isLoading?: boolean,
+|};
+
+export default function PriceInput({
+  label,
+  baseCurrency,
+  quoteCurrency,
+  readonly = false,
+  isLoading = false,
+}: Props): Node {
   return (
     <Box
       component="fieldset"
@@ -47,12 +66,13 @@ export default function PriceInput({ label, assets = [], readonly, isLoading }) 
         placeholder="0"
         bgcolor={readonly ? 'gray.50' : 'common.white'}
         readOnly={readonly}
+        value={baseCurrency.amount / quoteCurrency.amount}
       />
       <Box sx={{ justifySelf: 'end' }}>
         <Box height="100%" width="min-content" display="flex" alignItems="center">
-          <Box>{asset1.ticker}</Box>
+          <Box>{baseCurrency.ticker}</Box>
           <Box>/</Box>
-          <Box>{asset2.ticker}</Box>
+          <Box>{quoteCurrency.ticker}</Box>
         </Box>
       </Box>
     </Box>
