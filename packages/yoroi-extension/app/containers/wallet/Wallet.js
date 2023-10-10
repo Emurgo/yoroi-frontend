@@ -80,6 +80,10 @@ class Wallet extends Component<AllProps> {
     const isRevamp = this.generated.stores.profile.isRevampTheme;
     const categories = isRevamp ? allSubcategoriesRevamp : allCategories;
 
+    if (isRevamp && this.generated.stores.app.currentRoute.startsWith(ROUTES.TRANSFER.ROOT)) {
+      return ROUTES.WALLETS.TRANSACTIONS;
+    }
+
     // void -> this route is fine for this wallet type
     // string -> what you should be redirected to
     const publicDeriver = this.generated.stores.wallets.selected;

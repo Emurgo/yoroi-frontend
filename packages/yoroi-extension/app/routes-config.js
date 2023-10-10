@@ -63,7 +63,6 @@ export const ROUTES = {
   },
   TRANSFER: {
     ROOT: '/transfer',
-    DAEDALUS: '/transfer/daedalus',
     YOROI: '/transfer/yoroi',
   },
   SEND_FROM_URI: {
@@ -96,8 +95,6 @@ export const ROUTES = {
   },
   // Revamp specific routes:
   REVAMP: {
-    // `transfer` the `wallet`
-    TRANSFER: '/wallets/transfer',
     // `voting` is part of the sidebar
     CATALYST_VOTING: '/voting',
   }

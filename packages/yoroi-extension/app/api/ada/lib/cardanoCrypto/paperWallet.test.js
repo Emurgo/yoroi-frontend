@@ -4,7 +4,6 @@ import '../test-config';
 import { schema } from 'lovefield';
 import { validateMnemonic } from 'bip39';
 import {
-  getCryptoDaedalusWalletFromMnemonics,
   generateWalletRootKey,
 } from './cryptoWallet';
 import {
@@ -12,9 +11,6 @@ import {
   unscramblePaperAdaMnemonic,
   scramblePaperAdaMnemonic,
 } from './paperWallet';
-import {
-  getAddressesKeys,
-} from '../../transactions/transfer/legacyDaedalus';
 import { RustModule } from './rustLoader';
 import { generateByronPlate } from './plate';
 import {
@@ -35,8 +31,6 @@ const INVALID_DD_PAPER_1 =
   'shaft fire radar three ginger receive result phrase song staff scorpion food undo will have expire nice uncle dune until lift unlock exist step world slush disagree';
 const INVALID_DD_PAPER_2 =
   'shaft radar fire three ginger receive result phrase song staff scorpion food undo will have expire nice uncle dune until lift unlock exist step world disagree slush';
-const UNEXPECTED_DD_ADDRESS =
-  'DdzFFzCqrht2WKNEFqHvMSumSQpcnMxcYLNNBXPYXyHpRk9M7PqVjZ5ysYzutnruNubzXak2NxT8UWTFQNzc77uzjQ1GtehBRBdAv7xb';
 
 beforeAll(async () => {
   await RustModule.load();
@@ -73,25 +67,6 @@ test('Unscramble Daedalus paper produces 12 valid words', async () => {
   expect(count).toEqual(config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT);
   if (words == null) throw new Error('failed to unscramble in test');
   expect(validateMnemonic(words)).toEqual(true);
-});
-
-test('Unscramble Daedalus paper matches expected address', async () => {
-  const [words] = unscramblePaperAdaMnemonic(
-    VALID_DD_PAPER.words,
-    config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT
-  );
-  expect(words).toBeTruthy();
-  if (words != null) {
-    const daedalusWallet = getCryptoDaedalusWalletFromMnemonics(words);
-    const checker = RustModule.WalletV2.DaedalusAddressChecker.new(daedalusWallet);
-    const addressMap = getAddressesKeys({
-      checker,
-      fullUtxo: [VALID_DD_PAPER.address, UNEXPECTED_DD_ADDRESS]
-    });
-    expect(VALID_DD_PAPER.address in addressMap).toEqual(true);
-    expect(UNEXPECTED_DD_ADDRESS in addressMap).toEqual(false);
-    expect(addressMap[VALID_DD_PAPER.address].to_hex()).toEqual(VALID_DD_PAPER.privateKey);
-  }
 });
 
 const VALID_YOROI_PAPER = {

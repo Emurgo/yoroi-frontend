@@ -146,12 +146,9 @@ const genBaseProps: {|
     yoroiTransfer: {
       backToUninitialized: { trigger: action('backToUninitialized') },
       cancelTransferFunds: { trigger: action('cancelTransferFunds') },
-      startHardwareMnemonic: { trigger: action('startHardwareMnemonic') },
-      setPrivateKey: { trigger: action('setPrivateKey') },
       transferFunds: { trigger: async (req) => action('transferFunds')(req) },
       checkAddresses: { trigger: async (req) => action('checkAddresses')(req) },
       setupTransferFundsWithPaperMnemonic: { trigger: action('setupTransferFundsWithPaperMnemonic') },
-      setupTransferFundsWithMnemonic: { trigger: action('setupTransferFundsWithMnemonic') },
     },
   },
   WithdrawalTxDialogContainerProps: {

@@ -14,7 +14,6 @@ import TransactionsStore from './toplevel/TransactionsStore';
 import AddressesStore from './toplevel/AddressesStore';
 import TimeStore from './toplevel/TimeStore';
 import WalletRestoreStore from './toplevel/WalletRestoreStore';
-import DaedalusTransferStore from './toplevel/DaedalusTransferStore';
 import YoroiTransferStore from './toplevel/YoroiTransferStore';
 import TransactionBuilderStore from './toplevel/TransactionBuilderStore';
 import DelegationStore from './toplevel/DelegationStore';
@@ -54,7 +53,6 @@ const storeClasses = Object.freeze({
   walletSettings: WalletSettingsStore,
   transactionBuilderStore: TransactionBuilderStore,
   delegation: DelegationStore,
-  daedalusTransfer: DaedalusTransferStore,
   yoroiTransfer: YoroiTransferStore,
   explorers: ExplorerStore,
   connector: ConnectorStore,
@@ -81,7 +79,6 @@ export type StoresMap = {|
   walletRestore: WalletRestoreStore,
   walletSettings: WalletSettingsStore,
   transactionBuilderStore: TransactionBuilderStore,
-  daedalusTransfer: DaedalusTransferStore,
   delegation: DelegationStore,
   yoroiTransfer: YoroiTransferStore,
   explorers: ExplorerStore,
