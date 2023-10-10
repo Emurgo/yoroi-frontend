@@ -9,13 +9,13 @@ import {
   isCardanoHaskell,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
-import { ReactComponent as transactionsIcon }  from '../../assets/images/wallet-nav/tab-transactions.inline.svg';
-import { ReactComponent as sendIcon }  from '../../assets/images/wallet-nav/tab-send.inline.svg';
-import { ReactComponent as receiveIcon }  from '../../assets/images/wallet-nav/tab-receive.inline.svg';
-import { ReactComponent as dashboardIcon }  from '../../assets/images/wallet-nav/tab-dashboard.inline.svg';
-import { ReactComponent as delegationListIcon }  from '../../assets/images/wallet-nav/tab-delegation_list.inline.svg';
-import { ReactComponent as votingIcon }  from '../../assets/images/wallet-nav/voting.inline.svg';
-import { ReactComponent as assetsIcon }  from '../../assets/images/assets-page/assets.inline.svg';
+import { ReactComponent as transactionsIcon } from '../../assets/images/wallet-nav/tab-transactions.inline.svg';
+import { ReactComponent as sendIcon } from '../../assets/images/wallet-nav/tab-send.inline.svg';
+import { ReactComponent as receiveIcon } from '../../assets/images/wallet-nav/tab-receive.inline.svg';
+import { ReactComponent as dashboardIcon } from '../../assets/images/wallet-nav/tab-dashboard.inline.svg';
+import { ReactComponent as delegationListIcon } from '../../assets/images/wallet-nav/tab-delegation_list.inline.svg';
+import { ReactComponent as votingIcon } from '../../assets/images/wallet-nav/voting.inline.svg';
+import { ReactComponent as assetsIcon } from '../../assets/images/assets-page/assets.inline.svg';
 import environment from '../../environment';
 
 const messages = defineMessages({
@@ -50,10 +50,6 @@ const messages = defineMessages({
   assets: {
     id: 'wallet.navigation.assets',
     defaultMessage: '!!!Assets',
-  },
-  claimTransfer: {
-    id: 'wallet.navigation.claimTransferADA',
-    defaultMessage: '!!!Claim/Transfer ADA',
   },
 });
 
@@ -135,13 +131,14 @@ export const CARDANO_DELEGATION: TopbarCategory = registerCategory({
   label: messages.delegationById,
   isVisible: request => {
     const networkId = request.selected.getParent().getNetworkInfo().NetworkId;
-    return asGetStakingKey(request.selected) != null &&
+    return (
+      asGetStakingKey(request.selected) != null &&
       isCardanoHaskell(request.selected.getParent().getNetworkInfo()) &&
-      (environment.isTest()
-        || networkId === networks.CardanoTestnet.NetworkId
-        || networkId === networks.CardanoPreprodTestnet.NetworkId
-        || networkId === networks.CardanoPreviewTestnet.NetworkId
-      );
+      (environment.isTest() ||
+        networkId === networks.CardanoTestnet.NetworkId ||
+        networkId === networks.CardanoPreprodTestnet.NetworkId ||
+        networkId === networks.CardanoPreviewTestnet.NetworkId)
+    );
   },
   isHiddenButAllowed: true,
 });
@@ -167,9 +164,9 @@ export const allSubcategoriesRevamp: Array<TopbarCategory> = [
     isVisible: _request => true,
   },
   {
-    className: 'claimTransfer',
-    route: ROUTES.REVAMP.TRANSFER,
-    label: messages.claimTransfer,
-    isVisible: _request => true,
-  }
+    className: CARDANO_DELEGATION.className,
+    route: CARDANO_DELEGATION.route,
+    label: CARDANO_DELEGATION.label,
+    isVisible: CARDANO_DELEGATION.isVisible,
+  },
 ];

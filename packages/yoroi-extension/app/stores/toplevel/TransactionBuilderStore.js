@@ -474,7 +474,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   _updateAmount: (
     value: ?BigNumber,
     shouldSendAll?: boolean,
-  ) => void = (value, shouldSendAll = false) => {
+  ) => void = (value, shouldSendAll) => {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) throw new Error(`${nameof(this._updateAmount)} requires wallet to be selected`);
     const network = publicDeriver.getParent().getNetworkInfo();
@@ -510,8 +510,9 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   @action
   _addToken: ({|
     token: void | $ReadOnly<TokenRow>,
+    shouldSendAll: void | boolean,
     shouldReset?: boolean,
-  |}) => void = ({ token, shouldReset }) => {
+  |}) => void = ({ token, shouldReset, shouldSendAll }) => {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) throw new Error(`${nameof(this._addToken)} requires wallet to be selected`);
     const network = publicDeriver.getParent().getNetworkInfo();
@@ -519,7 +520,8 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     const selectedToken = (
       token ?? this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId)
     );
-    const tokensToAdd = [{ token: selectedToken }]
+    const tokensToAdd = [{ token: selectedToken, shouldSendAll: shouldSendAll || false }]
+
     if (shouldReset === true) {
       this.plannedTxInfoMap = tokensToAdd;
     } else {

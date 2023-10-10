@@ -8,8 +8,6 @@ import { ReactComponent as DoneIcon } from '../../assets/images/forms/done.inlin
 import { ReactComponent as EyeIcon } from '../../assets/images/forms/password-eye-close.inline.svg';
 import { ReactComponent as CloseEyeIcon } from '../../assets/images/forms/password-eye.inline.svg';
 import { ReactComponent as QRLogo } from '../../assets/images/qr-code.inline.svg';
-import { ReactComponent as ClosedEyeIconRevamp } from '../../assets/images/input/icon_24_eye_off.inline.svg';
-import { ReactComponent as OpenedEyeIconRevamp } from '../../assets/images/input/icon_24_eye_on.inline.svg';
 
 type Props = {|
   error?: boolean | string,
@@ -56,6 +54,8 @@ function TextField({
     event.preventDefault();
   };
 
+  const isRevampTheme = theme.name === 'revamp-light';
+
   return (
     <TextFieldBase
       className={className}
@@ -86,7 +86,11 @@ function TextField({
               position="end"
               sx={{ minWidth: '52px', display: 'flex', justifyContent: 'flex-end' }}
             >
-              {Boolean(error) === true ? <ErrorIcon /> : done === true ? <DoneIcon /> : null}
+              {Boolean(error) === true ? (
+                <ErrorIcon />
+              ) : done === true && !isRevampTheme ? (
+                <DoneIcon />
+              ) : null}
               <IconButton
                 aria-label="toggle password visibility"
                 onClick={handleClickShowPassword}
@@ -97,7 +101,7 @@ function TextField({
                   height: '40px',
                 }}
               >
-                {getEyeIcon(theme.name, showPassword)}
+                {showPassword ? <CloseEyeIcon /> : <EyeIcon />}
               </IconButton>
             </InputAdornment>
           ) : QRHandler ? (
@@ -105,14 +109,22 @@ function TextField({
               position="end"
               sx={{ minWidth: '52px', display: 'flex', justifyContent: 'flex-end' }}
             >
-              {Boolean(error) === true ? <ErrorIcon /> : done === true ? <DoneIcon /> : null}
+              {Boolean(error) === true ? (
+                <ErrorIcon />
+              ) : done === true && !isRevampTheme ? (
+                <DoneIcon />
+              ) : null}
               <IconButton aria-label="QR Code Scanner" onClick={QRHandler} edge="end">
                 <QRLogo />
               </IconButton>
             </InputAdornment>
           ) : (
             <InputAdornment position="end">
-              {Boolean(error) === true ? <ErrorIcon /> : done === true ? <DoneIcon /> : null}
+              {Boolean(error) === true ? (
+                <ErrorIcon />
+              ) : done === true && !isRevampTheme ? (
+                <DoneIcon />
+              ) : null}
             </InputAdornment>
           ),
         placeholder: placeholder != null ? placeholder : '',
@@ -137,12 +149,5 @@ TextField.defaultProps = {
   QRHandler: null,
   placeholder: undefined,
 };
-
-function getEyeIcon(theme: 'revamp' | 'classic' | 'modern', showPassword: boolean): Node {
-  if (theme === 'revamp' && !showPassword) return <ClosedEyeIconRevamp />;
-  if (theme === 'revamp' && showPassword) return <OpenedEyeIconRevamp />;
-
-  return showPassword ? <CloseEyeIcon /> : <EyeIcon />;
-}
 
 export default TextField;

@@ -244,7 +244,8 @@ export function getMockServer(settings: {
             `Wrong transaction payload. Expected ${expectedTxBase64[0]} and found ${req.body.signedTx}`
           );
           // throw new Error(
-          //   `Wrong transaction payload. Expected ${expectedTxBase64[0]} and found ${req.body.signedTx}`
+          //   `Wrong transaction payload.
+          //    Expected ${expectedTxBase64[0]} and found ${req.body.signedTx}`
           // );
         }
         methodLogger.logRequest(JSON.stringify(req.body));

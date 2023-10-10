@@ -334,15 +334,6 @@ class WalletSummaryPage extends Component<AllProps> {
 
     const walletSummaryPageRevamp = (
       <Box>
-        <NotificationMessage icon={successIcon} show={!!notification}>
-          {!!notification && (
-            <FormattedHTMLMessage
-              {...notification.message}
-              values={notification.values == null ? undefined : notification.values(intl)}
-            />
-          )}
-        </NotificationMessage>
-
         <WalletSummaryRevamp
           pendingAmount={unconfirmedAmount}
           shouldHideBalance={profile.shouldHideBalance}
@@ -360,14 +351,6 @@ class WalletSummaryPage extends Component<AllProps> {
           shouldShowEmptyBanner={!isLoadingMore && !hasAny}
           emptyBannerComponent={
             <WalletEmptyBanner
-              goToReceivePage={() => {
-                this.generated.actions.router.goToRoute.trigger({
-                  route: ROUTES.WALLETS.RECEIVE.ROOT,
-                });
-              }}
-              goToSendPage={() => {
-                this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.SEND });
-              }}
               onBuySellClick={() =>
                 this.generated.actions.dialogs.open.trigger({ dialog: BuySellDialog })
               }
