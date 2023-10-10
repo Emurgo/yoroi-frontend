@@ -25,7 +25,6 @@ import HorizontalLine from '../../components/widgets/HorizontalLine';
 import type { LayoutComponentMap } from '../../styles/context/layout';
 import { withLayout } from '../../styles/context/layout';
 import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
-import { THEMES } from '../../styles/utils';
 
 export const WalletTransferPagePromise: void => Promise<any> = () => import('./WalletTransferPage');
 const WalletTransferPage = lazy(WalletTransferPagePromise);
