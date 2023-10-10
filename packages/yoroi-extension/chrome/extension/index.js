@@ -89,6 +89,8 @@ const initializeYoroi: void => Promise<void> = async () => {
       ampli.votingPageViewed();
     } else if (pathname === ROUTES.WALLETS.TRANSACTIONS) {
       ampli.transactionsPageViewed();
+    } else if (pathname === ROUTES.STAKING) {
+      ampli.stakingCenterPageViewed();
     }
   });
 };

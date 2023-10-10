@@ -28,6 +28,7 @@ import NavBarRevamp from '../components/topbar/NavBarRevamp';
 import NavWalletDetailsRevamp from '../components/topbar/NavWalletDetailsRevamp';
 import WalletListDialog from '../components/topbar/WalletListDialog';
 import BuySellAdaButton from '../components/topbar/BuySellAdaButton';
+import { ampli } from '../../ampli/index';
 
 export type GeneratedData = typeof NavBarContainerRevamp.prototype.generated;
 
@@ -101,6 +102,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
           unitOfAccountSetting={profile.unitOfAccount}
           getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
           openWalletInfoDialog={() => {
+            ampli.allWalletsPageViewed();
             this.generated.actions.dialogs.open.trigger({ dialog: WalletListDialog });
           }}
         />

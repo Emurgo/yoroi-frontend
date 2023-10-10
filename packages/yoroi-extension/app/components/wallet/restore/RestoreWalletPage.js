@@ -184,9 +184,15 @@ function RestoreWalletPage(props: Props & Intl): Node {
       component: (
         <EnterRecoveryPhraseStep
           {...recoveryPhraseStepProps}
-          checkValidPhrase={phrase =>
-            walletData.isValidMnemonic({ mnemonic: phrase, mode: walletData.mode })
-          }
+          checkValidPhrase={phrase => {
+            const isValid = walletData.isValidMnemonic(
+              { mnemonic: phrase, mode: walletData.mode }
+            );
+            ampli.restoreWalletEnterPhraseStepStatus(
+              { recovery_prhase_status: isValid }
+            );
+            return isValid;
+          }}
           openDuplicatedWallet={lastDuplicatedWallet => {
             resetRestoreWalletData();
             walletsActions.setActiveWallet.trigger({ wallet: lastDuplicatedWallet });
