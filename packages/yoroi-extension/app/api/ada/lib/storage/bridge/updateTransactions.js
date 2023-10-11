@@ -2766,20 +2766,7 @@ async function certificateToDb(
           const owners = Module.WalletV4.Ed25519KeyHashes.new();
           for (let j = 0; j < cert.poolParams.poolOwners.length; j++) {
             const owner = cert.poolParams.poolOwners[j];
-            // The owners property of the pool parameter is a set of stake key hashes
-            // of the owners. But the values returned from the backend are a set of
-            // stake addresses which are "a single header byte identifying their type
-            // and the network, followed by 28 bytes of payload identifying either a
-            // stake key hash or a script hash" (CIP19). So we convert the stake
-            // address to a key hash (equivalent to removing the header byte).
-            const ownerKey = Module.WalletV4.RewardAddress.from_address(
-              Module.WalletV4.Address.from_bytes(
-                Buffer.from(owner, 'hex')
-              )
-            )?.payment_cred().to_keyhash();
-            if (!ownerKey) {
-              throw new Error(`${nameof(certificateToDb)} expect the pool owner to be a key hash`);
-            }
+            const ownerKey = Module.WalletV4.Ed25519KeyHash.from_hex(owner);
             owners.add(ownerKey);
             const ownerStakeCredentialHex = bytesToHex(Module.WalletV4.Credential
               .from_keyhash(ownerKey).to_bytes());
