@@ -181,17 +181,20 @@ export default class AddWalletDetailsStep extends Component<Props> {
             </Box>
           </Stack>
           <Box onSubmit={e => e.preventDefault()} component="form" autoComplete="off">
-            <TextField
-              className="walletName"
-              {...walletNameField.bind()}
-              done={walletNameField.isValid}
-              error={walletNameField.error}
-              autocomplete="off"
-              id="walletNameInput"
-            />
+            <Box mb="8px">
+              <TextField
+                className="walletName"
+                {...walletNameField.bind()}
+                done={walletNameField.isValid}
+                error={walletNameField.error}
+                helperText=" "
+                autocomplete="off"
+                id="walletNameInput"
+              />
+            </Box>
 
             <Box>
-              <Box>
+              <Box mb="8px">
                 <TextField
                   className="walletPassword"
                   {...walletPasswordField.bind()}
@@ -202,6 +205,8 @@ export default class AddWalletDetailsStep extends Component<Props> {
                   }
                   id="walletPasswordInput"
                 />
+              </Box>
+              <Box mb="8px">
                 <TextField
                   className="repeatedPassword"
                   {...repeatedPasswordField.bind()}
