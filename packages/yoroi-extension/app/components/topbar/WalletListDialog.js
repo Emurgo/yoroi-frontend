@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import Dialog from '../widgets/Dialog';
+import DialogRevamp from '../widgets/DialogRevamp';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import styles from './WalletListDialog.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -185,7 +185,7 @@ export default class WalletListDialog extends Component<Props, State> {
     const walletsTotal = this.renderWalletsTotal();
 
     return (
-      <Dialog
+      <DialogRevamp
         className={styles.component}
         title={intl.formatMessage(globalMessages.changeWallet)}
         closeOnOverlayClick
@@ -306,14 +306,13 @@ export default class WalletListDialog extends Component<Props, State> {
                 this.isCurrentWallet(this.state.selectedWallet, 'global')
               }
               fullWidth
-              variant="contained"
-              color="primary"
+              variant="primary"
             >
               {intl.formatMessage(messages.applyWallet)}
             </Button>
           </Stack>
         </Box>
-      </Dialog>
+      </DialogRevamp>
     );
   }
 

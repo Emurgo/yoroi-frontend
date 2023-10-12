@@ -543,6 +543,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 className="send_form_receiver"
                 {...receiverField.bind()}
                 error={receiverField.error}
+                helperText=' '
                 onFocus={() => {
                   this.setReceiverFieldStatus(true);
                 }}
@@ -553,11 +554,10 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   this.state.isReceiverFieldActive
                     ? intl.formatMessage(messages.receiverFieldLabelActive)
                     : intl.formatMessage(messages.receiverFieldLabelInactive)
-
                 }
               />
             </Box>
-            <Box sx={{ position: 'relative', mt: '24px' }}>
+            <Box sx={{ position: 'relative', mt: '8px' }}>
               <MemoTextField
                 onChange={e => this.onUpdateMemo(e.target.value)}
                 helperText={
