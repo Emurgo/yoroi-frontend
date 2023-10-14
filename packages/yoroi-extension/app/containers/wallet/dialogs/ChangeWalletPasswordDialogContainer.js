@@ -52,7 +52,8 @@ export default class ChangeWalletPasswordDialogContainer extends Component<Props
         }}
         isSubmitting={changeSigningKeyRequest.isExecuting}
         error={changeSigningKeyRequest.error}
-        classicTheme={profile.isClassicTheme}
+        isClassicTheme={profile.isClassicTheme}
+        isRevampTheme={profile.isRevampTheme}
       />
     );
   }
@@ -80,7 +81,7 @@ export default class ChangeWalletPasswordDialogContainer extends Component<Props
       |}
     |},
     stores: {|
-      profile: {| isClassicTheme: boolean |},
+      profile: {| isClassicTheme: boolean, isRevampTheme: boolean |},
       uiDialogs: {|
         getActiveData: <T>(number | string) => (void |T),
       |},
@@ -113,6 +114,7 @@ export default class ChangeWalletPasswordDialogContainer extends Component<Props
         },
         profile: {
           isClassicTheme: stores.profile.isClassicTheme,
+          isRevampTheme: stores.profile.isRevampTheme,
         },
         uiDialogs: {
           getActiveData: stores.uiDialogs.getActiveData,
