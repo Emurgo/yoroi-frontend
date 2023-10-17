@@ -114,7 +114,9 @@ export default function SwapInput({
         />
         <Box sx={{ justifySelf: 'end', cursor: 'pointer' }} onClick={onAssetSelect}>
           <Box height="100%" width="min-content" display="flex" gap="8px" alignItems="center">
-            <Box>{image || <DefaultTokenImage />}</Box>
+            <Box width="24px" height="24px" sx={{ '& > svg': { width: '100%', height: '100%' } }}>
+              {ticker ? image || <DefaultTokenImage /> : <DefaultTokenImage />}
+            </Box>
             <Box width="max-content">{ticker || 'Select asset'}</Box>
             <Box>
               <ChevronIcon />

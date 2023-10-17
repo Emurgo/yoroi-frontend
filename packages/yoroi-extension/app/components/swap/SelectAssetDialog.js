@@ -56,10 +56,20 @@ export default function SelectAssetDialog({ assets = [], type, onAssetSelected, 
             <Box
               display="flex"
               justifyContent="space-between"
-              sx={{ borderBottom: '1px solid', py: '13px', pr: '4px' }}
+              sx={{
+                borderBottom: '1px solid',
+                borderColor: 'grayscale.200',
+                color: 'grayscale.600',
+                py: '13px',
+                pr: '4px',
+              }}
             >
-              <Box>Asset</Box>
-              <Box>Amount</Box>
+              <Box>
+                <Typography variant="body2">Asset</Typography>
+              </Box>
+              <Box>
+                <Typography variant="body2">Amount</Typography>
+              </Box>
             </Box>
           )}
           {type === 'to' && (
