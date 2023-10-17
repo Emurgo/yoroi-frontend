@@ -132,9 +132,9 @@ const YoroiThemesPagePromise = () => import('./containers/experimental/yoroiThem
 const YoroiThemesPage = React.lazy(YoroiThemesPagePromise);
 
 // SWAP
-const SwapPagePromise = () => import('./containers/swap/categories/SwapPage');
+const SwapPagePromise = () => import('./containers/swap/asset-swap/SwapPage');
 const SwapPage = React.lazy(SwapPagePromise);
-const SwapOrdersPagePromise = () => import('./containers/swap/categories/OrdersPage');
+const SwapOrdersPagePromise = () => import('./containers/swap/orders/OrdersPage');
 const SwapOrdersPage = React.lazy(SwapOrdersPagePromise);
 
 export const LazyLoadPromises: Array<() => any> = [

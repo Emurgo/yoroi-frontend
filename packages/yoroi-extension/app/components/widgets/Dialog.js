@@ -128,11 +128,11 @@ DialogFn.defaultProps = {
 
 const ModalContainer = styled(Box)(({ theme }) => ({
   position: 'relative',
-  minWidth: 'var(--yoroi-comp-dialog-min-width-md)',
+  minWidth: theme.name === 'classic' ? 'var(--yoroi-comp-dialog-min-width-md)' : '612px',
   borderRadius: theme.name === 'classic' ? 0 : 8,
-  paddingTop: theme.name === 'classic' ? '25px' : '24px',
+  paddingTop: theme.name === 'classic' ? '25px' : '0px',
   paddingBottom: theme.name === 'classic' ? '30px' : '24px',
-  maxWidth: theme.name === 'classic' ? '785px' : '560px',
+  maxWidth: theme.name === 'classic' ? '785px' : '824px',
   backgroundColor: 'var(--yoroi-comp-dialog-background)',
   color: 'var(--yoroi-comp-dialog-text)',
   maxHeight: '95vh',
@@ -145,15 +145,21 @@ const ModalContainer = styled(Box)(({ theme }) => ({
     textAlign: 'center',
     textTransform: 'uppercase',
     letterSpacing: 0,
+    display: 'block',
+    borderBottom: '1px solid',
+    borderBottomColor: theme.palette.grayscale['200'],
   },
 }));
+
 const ModalContent = styled(Box)(({ theme }) => ({
   overflowX: 'hidden',
   overflowY: 'overlay',
   maxHeight: '60vh',
   paddingLeft: theme.name === 'classic' ? '30px' : '24px',
   paddingRight: theme.name === 'classic' ? '30px' : '24px',
+  paddingTop: theme.name === 'classic' ? '0px' : '16px',
 }));
+
 const ModalFooter = styled(Box)(({ theme }) => ({
   display: 'flex',
   paddingLeft: theme.name === 'classic' ? '30px' : '24px',

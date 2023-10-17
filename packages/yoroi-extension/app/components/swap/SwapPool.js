@@ -1,10 +1,17 @@
+import { useState } from 'react';
 import { Box, Input, Typography } from '@mui/material';
 import { ReactComponent as ChevronIcon } from '../../assets/images/revamp/chevron-icon.inline.svg';
 import { ReactComponent as InfoIcon } from '../../assets/images/revamp/info-icon.inline.svg';
 import { ReactComponent as DefaultToken } from '../../assets/images/revamp/token-default.inline.svg';
-import { useState } from 'react';
 
-export default function SwapPool({ name = '', image = null, assets, isLoading }) {
+export default function SwapPool({
+  name = '',
+  isAuto = false,
+  image = null,
+  assets,
+  isLoading,
+  onSelectPool,
+}) {
   const [showFullInfo, setShowFullInfo] = useState(false);
 
   const handleShowFullInfo = () => setShowFullInfo(p => !p);
@@ -32,8 +39,16 @@ export default function SwapPool({ name = '', image = null, assets, isLoading })
         onClick={handleShowFullInfo}
       >
         <Box>{image || <DefaultToken />}</Box>
-        <Typography variant="body1" fontWeight={500} color="primary.500">
-          {name || 'No pool found'}
+        <Typography
+          onClick={e => {
+            e.stopPropagation();
+            onSelectPool();
+          }}
+          variant="body1"
+          fontWeight={500}
+          color="primary.500"
+        >
+          {name ? `${name} ${isAuto ? '(Auto)' : ''}` : 'No pool found'}
         </Typography>
         <Box flexGrow="1" flexShrink="0" display="flex" alignItems="center" gap="4px">
           <Box>Total:</Box>
