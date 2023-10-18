@@ -1,6 +1,6 @@
 // @flow
 
-import crypto from 'crypto';
+import * as crypto from 'crypto';
 
 export function getInitialSeeds(): {|
   AddressSeed: number,

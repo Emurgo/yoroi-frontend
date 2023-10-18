@@ -127,7 +127,7 @@ function deriveAddress(
   if (request.address.type === AddressType.ENTERPRISE_KEY) {
     return RustModule.WalletV4.EnterpriseAddress.new(
       request.network.networkId,
-      RustModule.WalletV4.StakeCredential.from_keyhash(
+      RustModule.WalletV4.Credential.from_keyhash(
         spendingKey.to_public().to_raw_key().hash()
       ),
     ).to_address();
@@ -140,7 +140,7 @@ function deriveAddress(
     );
     return RustModule.WalletV4.PointerAddress.new(
       request.network.networkId,
-      RustModule.WalletV4.StakeCredential.from_keyhash(
+      RustModule.WalletV4.Credential.from_keyhash(
         spendingKey.to_public().to_raw_key().hash()
       ),
       pointer,
@@ -149,7 +149,7 @@ function deriveAddress(
   if (request.address.type === AddressType.REWARD_KEY) {
     return RustModule.WalletV4.RewardAddress.new(
       request.network.networkId,
-      RustModule.WalletV4.StakeCredential.from_keyhash(
+      RustModule.WalletV4.Credential.from_keyhash(
         spendingKey.to_public().to_raw_key().hash()
       ),
     ).to_address();
@@ -172,10 +172,10 @@ function deriveAddress(
     }
     return RustModule.WalletV4.BaseAddress.new(
       request.network.networkId,
-      RustModule.WalletV4.StakeCredential.from_keyhash(
+      RustModule.WalletV4.Credential.from_keyhash(
         spendingKey.to_public().to_raw_key().hash()
       ),
-      RustModule.WalletV4.StakeCredential.from_keyhash(stakingKeyHash),
+      RustModule.WalletV4.Credential.from_keyhash(stakingKeyHash),
     ).to_address();
   }
   throw new Error(`Unrecognized address type ${JSON.stringify(request)}`);
@@ -356,7 +356,7 @@ class MockLedgerConnect {
         }
         const { keyPath } = cert.params.stakeCredential;
         const stakingKey = derivePath(selectedWallet.rootKey, keyPath).to_raw_key();
-        const stakeCredential = RustModule.WalletV4.StakeCredential.from_keyhash(
+        const stakeCredential = RustModule.WalletV4.Credential.from_keyhash(
           stakingKey.to_public().hash()
         );
         if (cert.type === CertificateType.STAKE_REGISTRATION) {
@@ -422,7 +422,7 @@ class MockLedgerConnect {
 
         const rewardAddress = RustModule.WalletV4.RewardAddress.new(
           request.params.tx.network.networkId,
-          RustModule.WalletV4.StakeCredential.from_keyhash(
+          RustModule.WalletV4.Credential.from_keyhash(
             stakingKey.to_public().hash()
           )
         );

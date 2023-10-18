@@ -905,12 +905,12 @@ describe('Create signed transactions', () => {
       [
         RustModule.WalletV4.Certificate.new_stake_registration(
           RustModule.WalletV4.StakeRegistration.new(
-            RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.to_public().hash())
+            RustModule.WalletV4.Credential.from_keyhash(stakingKey.to_public().hash())
           )
         ),
         RustModule.WalletV4.Certificate.new_stake_delegation(
           RustModule.WalletV4.StakeDelegation.new(
-            RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.to_public().hash()),
+            RustModule.WalletV4.Credential.from_keyhash(stakingKey.to_public().hash()),
             RustModule.WalletV4.Ed25519KeyHash.from_bytes(Buffer.from('1b268f4cba3faa7e36d8a0cc4adca2096fb856119412ee7330f692b5', 'hex'))
           )
         ),
@@ -963,7 +963,7 @@ describe('Create signed transactions', () => {
       ),
     );
     const stakingKey = accountPrivateKey.derive(2).derive(STAKING_KEY_INDEX).to_raw_key();
-    const stakingKeyCredential = RustModule.WalletV4.StakeCredential.from_keyhash(
+    const stakingKeyCredential = RustModule.WalletV4.Credential.from_keyhash(
       stakingKey.to_public().hash()
     );
 

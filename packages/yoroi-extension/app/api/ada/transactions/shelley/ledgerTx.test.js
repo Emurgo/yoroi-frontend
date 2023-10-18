@@ -291,7 +291,7 @@ test('Create Ledger transaction', async () => {
   );
   const stakingKey = accountKey.derive(ChainDerivations.CHIMERIC_ACCOUNT).derive(0);
 
-  const stakeCredential = RustModule.WalletV4.StakeCredential.from_keyhash(
+  const stakeCredential = RustModule.WalletV4.Credential.from_keyhash(
     stakingKey.to_raw_key().to_public().hash()
   );
   certs.add(RustModule.WalletV4.Certificate.new_stake_registration(

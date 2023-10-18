@@ -1548,7 +1548,7 @@ export default class AdaApi {
       );
 
       const allUtxosForKey = filterAddressesByStakingKey<ElementOf<IGetAllUtxosResponse>>(
-        RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.hash()),
+        RustModule.WalletV4.Credential.from_keyhash(stakingKey.hash()),
         allUtxo,
         false,
       );
@@ -1578,7 +1578,7 @@ export default class AdaApi {
 
       const stakeCredentialHex = RustModule.WasmScope(Scope => {
         return Buffer.from(
-            Scope.WalletV4.StakeCredential
+            Scope.WalletV4.Credential
               .from_keyhash(stakingKey.hash())
               .to_bytes()
           ).toString('hex')
@@ -2166,8 +2166,8 @@ export default class AdaApi {
       const chainNetworkId = Number.parseInt(config.ChainNetworkId, 10);
       const receiveAddress = RustModule.WalletV4.BaseAddress.new(
         chainNetworkId,
-        RustModule.WalletV4.StakeCredential.from_keyhash(firstInternalPayment),
-        RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey),
+        RustModule.WalletV4.Credential.from_keyhash(firstInternalPayment),
+        RustModule.WalletV4.Credential.from_keyhash(stakingKey),
       );
 
       const addresses = [
@@ -2571,7 +2571,7 @@ function getDifferenceAfterTx(
 ): MultiToken {
 
   const accountKeyString = RustModule.WasmScope(Scope => {
-    const stakeCredential = Scope.WalletV4.StakeCredential.from_keyhash(stakingKey.hash());
+    const stakeCredential = Scope.WalletV4.Credential.from_keyhash(stakingKey.hash());
     return Buffer.from(stakeCredential.to_bytes()).toString('hex')
   })
 

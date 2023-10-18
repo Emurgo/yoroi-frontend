@@ -134,7 +134,7 @@ export default class AdaYoroiTransferStore extends Store<StoresMap, ActionsMap> 
       throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this.generateTransferTxForRewardAccount)} no key specified`);
     })();
 
-    const stakeCredential = RustModule.WalletV4.StakeCredential.from_keyhash(
+    const stakeCredential = RustModule.WalletV4.Credential.from_keyhash(
       stakingKey.to_public().hash()
     );
 
