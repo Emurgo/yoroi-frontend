@@ -519,6 +519,8 @@ test('create tx', async () => {
       certs: null,
       collateral: null,
       collateral_return: null,
+      current_treasury_value: null,
+      donation: null,
       fee: '187369',
       inputs: [
         {
@@ -613,6 +615,8 @@ test('create tx', async () => {
       ttl: '70866176',
       update: null,
       validity_start_interval: null,
+      voting_procedures: null,
+      voting_proposals: null,
       withdrawals: null
     },
     is_valid: true,

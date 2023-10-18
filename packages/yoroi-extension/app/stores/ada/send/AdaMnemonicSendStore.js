@@ -92,7 +92,7 @@ export default class AdaMnemonicSendStore extends Store<StoresMap, ActionsMap> {
         });
         if (request.signRequest.neededStakingKeyHashes.neededHashes.has(
           Buffer.from(
-            RustModule.WalletV4.StakeCredential.from_keyhash(
+            RustModule.WalletV4.Credential.from_keyhash(
               stakingKey.to_public().hash()
             ).to_bytes()
           ).toString('hex')
