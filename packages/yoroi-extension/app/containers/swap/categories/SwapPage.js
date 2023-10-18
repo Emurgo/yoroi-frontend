@@ -146,7 +146,7 @@ export default function SwapPage(): Node {
       {(openedDialog === 'from' || openedDialog === 'to') && (
         <SelectAssetDialog
           assets={[
-            { name: 'TADA', ticker: 'TADA', walletAmount: 212, address: 'TADA' },
+            { name: 'TADA', ticker: 'TADA', walletAmount: 212, usdPrice: 0.26, address: 'TADA' },
             {
               name: 'Anzens USD',
               ticker: 'USDA',
