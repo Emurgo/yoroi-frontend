@@ -200,6 +200,8 @@ export default function SwapForm() {
               walletAmount: 212,
               usdPrice: 0.29,
               address: 'TADA',
+              adaPrice: 1,
+              volume24h: 0,
             },
             {
               image: <UsdaTokenImage />,
@@ -208,6 +210,9 @@ export default function SwapForm() {
               walletAmount: 10,
               amount: 0,
               address: 'addr1asdl4bl0f328dsckmx23443mllsdkfj32e4',
+              adaPrice: 0.26,
+              volume24h: 10200033322,
+              priceChange100: '-2.45%',
             },
           ]}
           type={openedDialog}

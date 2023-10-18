@@ -3,8 +3,17 @@ import { Box, Typography } from '@mui/material';
 import { ReactComponent as AssetDefault } from '../../assets/images/revamp/asset-default.inline.svg';
 import { ReactComponent as NoAssetsFound } from '../../assets/images/revamp/no-assets-found.inline.svg';
 import { ReactComponent as SearchIcon } from '../../assets/images/revamp/icons/search.inline.svg';
+import { ReactComponent as WalletIcon } from '../../assets/images/revamp/icons/wallet.inline.svg';
+import { ReactComponent as ArrowTopIcon } from '../../assets/images/revamp/icons/arrow-top.inline.svg';
+import { ReactComponent as ArrowBottomIcon } from '../../assets/images/revamp/icons/arrow-bottom.inline.svg';
 import { truncateAddressShort } from '../../utils/formatters';
 import Dialog from '../widgets/Dialog';
+import Table from '../common/table/Table';
+
+const fromTemplateColumns = '1fr minmax(auto, 136px)';
+const toTemplateColumns = '1fr minmax(auto, 152px) minmax(auto, 136px)';
+const fromColumns = ['Asset', 'Amount'];
+const toColumns = ['Asset', 'Volume, 24h', 'Price %, 24h'];
 
 export default function SelectAssetDialog({ assets = [], type, onAssetSelected, onClose }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -40,6 +49,7 @@ export default function SelectAssetDialog({ assets = [], type, onAssetSelected, 
             top: '50%',
             transform: 'translateY(-50%)',
             display: 'inline-flex',
+            color: 'grayscale.600',
           }}
         >
           <SearchIcon />
@@ -70,58 +80,23 @@ export default function SelectAssetDialog({ assets = [], type, onAssetSelected, 
         </Typography>
       </Box>
       {filteredAssets.length !== 0 && (
-        <>
-          {type === 'from' && (
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              sx={{
-                borderBottom: '1px solid',
-                borderColor: 'grayscale.200',
-                color: 'grayscale.600',
-                py: '13px',
-                pr: '4px',
-              }}
-            >
-              <Box>
-                <Typography variant="body2">Asset</Typography>
-              </Box>
-              <Box>
-                <Typography variant="body2">Amount</Typography>
-              </Box>
-            </Box>
-          )}
-          {type === 'to' && (
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              sx={{ borderBottom: '1px solid', py: '13px', pr: '4px' }}
-            >
-              <Box>Asset</Box>
-              <Box>Volume, 24h</Box>
-              <Box>Price %, 24h</Box>
-            </Box>
-          )}
-        </>
+        <Table
+          rowGap="0px"
+          columnNames={type === 'from' ? fromColumns : toColumns}
+          gridTemplateColumns={type === 'from' ? fromTemplateColumns : toTemplateColumns}
+        >
+          {filteredAssets.map((a, index) => (
+            <AssetAndAmountRow
+              key={`${a.address}-${index}`}
+              {...a}
+              type={type}
+              onAssetSelected={handleAssetSelected}
+            />
+          ))}
+        </Table>
       )}
-      <Box py="8px">
-        {filteredAssets.map((a, index) =>
-          type === 'from' ? (
-            <FromAssetAndAmountRow
-              key={`${a.address}-${index}`}
-              {...a}
-              onAssetSelected={handleAssetSelected}
-            />
-          ) : (
-            <ToAssetAndAmountRow
-              key={`${a.address}-${index}`}
-              {...a}
-              onAssetSelected={handleAssetSelected}
-            />
-          )
-        )}
-
-        {filteredAssets.length === 0 && (
+      {filteredAssets.length === 0 && (
+        <Box py="8px">
           <Box
             display="flex"
             flexDirection="column"
@@ -133,107 +108,129 @@ export default function SelectAssetDialog({ assets = [], type, onAssetSelected, 
               <NoAssetsFound />
             </Box>
             <Typography variant="body1" fontWeight={500}>
-              No tpkens found for “{searchTerm}”
+              {type === 'from'
+                ? `No tokens found for “${searchTerm}”`
+                : 'No asset was found to swap'}
             </Typography>
           </Box>
-        )}
-      </Box>
+        </Box>
+      )}
     </Dialog>
   );
 }
 
-const FromAssetAndAmountRow = ({
+const AssetAndAmountRow = ({
   image = null,
+  type,
   name,
   address,
   walletAmount,
   ticker,
   usdPrice,
+  adaPrice,
+  volume24h,
+  priceChange100 = '',
   onAssetSelected,
 }) => {
-  return (
-    <Box
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '12px',
-        p: '8px',
-        cursor: 'pointer',
-        borderRadius: '8px',
-        '&:hover': { bgcolor: 'grayscale.50' },
-      }}
-      onClick={() => onAssetSelected({ name, address, walletAmount, ticker })}
-    >
-      <Box>{image || <AssetDefault />}</Box>
-      <Box flexGrow="1" width="100%">
-        <Box>
-          <Typography variant="body1">{name}</Typography>
-        </Box>
-        <Box>
-          <Typography variant="body2" color="grayscale.600">
-            {truncateAddressShort(address, 17)}
-          </Typography>
-        </Box>
-      </Box>
-      <Box flexShrink="0" display="flex" flexDirection="column" alignItems="flex-end">
-        <Typography variant="body1" color="grayscale.900">
-          <span>{walletAmount}</span>&nbsp;<span>{ticker}</span>
-        </Typography>
-        {usdPrice && (
-          <Typography variant="body2" color="grayscale.600">
-            {(walletAmount * usdPrice).toFixed(2)} USD
-          </Typography>
-        )}
-      </Box>
-    </Box>
-  );
-};
+  const isFrom = type === 'from';
+  const priceNotChanged = Number(priceChange100.replace('-', '').replace('%', '')) === 0;
+  const priceIncreased = priceChange100 && priceChange100.charAt(0) !== '-';
+  const priceChange24h = priceChange100.replace('-', '') || '0%';
 
-const ToAssetAndAmountRow = ({
-  image = null,
-  name,
-  address,
-  amount,
-  volume24,
-  priceChange100,
-  ticker,
-  usdAmount,
-  onAssetSelected,
-}) => {
   return (
     <Box
       sx={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '12px',
+        display: 'grid',
+        columnGap: '8px',
         p: '8px',
         cursor: 'pointer',
         borderRadius: '8px',
+        gridColumn: '1/-1',
+        gridTemplateColumns: isFrom ? fromTemplateColumns : toTemplateColumns,
         '&:hover': { bgcolor: 'grayscale.50' },
       }}
-      onClick={() => onAssetSelected({ name, address, amount, ticker })}
+      onClick={() => onAssetSelected({ address, ticker })}
     >
-      <Box>{image || <AssetDefault />}</Box>
-      <Box flexGrow="1" width="100%">
-        <Box>
-          <Typography variant="body1">{name}</Typography>
-        </Box>
-        <Box>
-          <Typography variant="body2" color="grayscale.600">
-            {truncateAddressShort(address, 17)}
-          </Typography>
+      <Box sx={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+        <Box display="inline-flex">{image || <AssetDefault />}</Box>
+        <Box flexGrow="1" width="100%">
+          <Box display="flex" alignItems="center" gap="8px">
+            <Typography fontWeight={500} variant="body1">
+              {name}
+            </Typography>
+            {!isFrom && (
+              <Box component="span" color="secondary.600">
+                <WalletIcon />
+              </Box>
+            )}
+          </Box>
+          <Box>
+            <Typography variant="body2" color="grayscale.600">
+              {truncateAddressShort(address, 17)}
+            </Typography>
+          </Box>
         </Box>
       </Box>
-      <Box flexShrink="0" display="flex" flexDirection="column" alignItems="flex-end">
-        <Typography variant="body1" color="grayscale.900">
-          <span>{amount}</span>&nbsp;<span>{ticker}</span>
-        </Typography>
-        {usdAmount && (
-          <Typography variant="body2" color="grayscale.600">
-            {usdAmount} USD
+
+      {!isFrom && (
+        <>
+          {volume24h ? (
+            <Box
+              alignSelf="center"
+              flexShrink="0"
+              display="flex"
+              flexDirection="column"
+              alignItems="flex-end"
+            >
+              <Typography variant="body1" color="grayscale.900">
+                <span>{volume24h}</span>&nbsp;<span>{ticker}</span>
+              </Typography>
+              {adaPrice && volume24h && (
+                <Typography variant="body2" color="grayscale.600">
+                  {(volume24h * adaPrice).toFixed(2)} ADA
+                </Typography>
+              )}
+            </Box>
+          ) : null}
+          {priceChange100 && (
+            <Box
+              alignSelf="center"
+              p="16px"
+              color={
+                priceNotChanged ? 'grayscale.900' : priceIncreased ? 'secondary.600' : 'magenta.500'
+              }
+              display="flex"
+              alignItems="center"
+              justifyContent="flex-end"
+              gap="8px"
+            >
+              {!priceNotChanged && (
+                <Box>{priceIncreased ? <ArrowTopIcon /> : <ArrowBottomIcon />}</Box>
+              )}
+              <Box>{priceChange24h}</Box>
+            </Box>
+          )}
+        </>
+      )}
+
+      {isFrom && (
+        <Box
+          alignSelf="center"
+          flexShrink="0"
+          display="flex"
+          flexDirection="column"
+          alignItems="flex-end"
+        >
+          <Typography variant="body1" color="grayscale.900">
+            <span>{walletAmount}</span>&nbsp;<span>{ticker}</span>
           </Typography>
-        )}
-      </Box>
+          {usdPrice && (
+            <Typography variant="body2" color="grayscale.600">
+              {(walletAmount * usdPrice).toFixed(2)} USD
+            </Typography>
+          )}
+        </Box>
+      )}
     </Box>
   );
 };
