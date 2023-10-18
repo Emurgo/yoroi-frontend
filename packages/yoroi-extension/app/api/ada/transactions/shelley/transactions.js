@@ -553,7 +553,7 @@ export async function newAdaUnsignedTxFromUtxo(
   auxiliaryData: RustModule.WalletV4.AuxiliaryData | void,
 ): Promise<V4UnsignedTxUtxoResponse> {
   await RustModule.load();
-  setRuntime(RustModule.CrossCsl.init());
+  setRuntime(RustModule.CrossCsl.init);
 
   const defaultNetworkConfig = {
     linearFee: {
@@ -563,6 +563,12 @@ export async function newAdaUnsignedTxFromUtxo(
     coinsPerUtxoWord: protocolParams.coinsPerUtxoWord,
     poolDeposit: protocolParams.poolDeposit,
     keyDeposit: protocolParams.keyDeposit,
+    maxValueSize: 5000,
+    maxTxSize: 16384,
+    memPriceFrom: 577,
+    memPriceTo: 1000,
+    stepPriceFrom: 721,
+    stepPriceTo: 10000000,
   };
 
   const utxoSet = new UTxOSet(
