@@ -10,7 +10,7 @@ const RevampButtonCommonProps: Object = {
       borderRadius: 8,
       fontWeight: 500,
       fontFamily: 'Rubik',
-      lineHeight: '22px',
+      lineHeight: '19px',
       textTransform: 'uppercase',
       padding: '16px',
       boxShadow: 'none',

@@ -197,7 +197,7 @@ const resolve = () /*: * */ => ({
     path: require.resolve('path-browserify'),
     stream: require.resolve('stream-browserify'),
     zlib: require.resolve('browserify-zlib'),
-    crypto: require.resolve('crypto-browserify'),
+    crypto: path.resolve(__dirname, '../app/api/crypto.js'),
     buffer: require.resolve('buffer'),
   },
   alias: { process: 'process/browser', }
