@@ -198,6 +198,7 @@ export default function SwapForm() {
               name: 'TADA',
               ticker: 'TADA',
               walletAmount: 212,
+              usdPrice: 0.29,
               address: 'TADA',
             },
             {
