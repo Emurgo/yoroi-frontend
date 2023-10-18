@@ -3,8 +3,8 @@ import type { Node } from 'react';
 import { useState } from 'react';
 import { Box, Button } from '@mui/material';
 import SwapForm from './SwapForm';
-import SwapConfirmationStep from './ConfirmationStep';
-import TxSubmittedStep from './TxSubmittedStep';
+// import SwapConfirmationStep from './ConfirmationStep';
+// import TxSubmittedStep from './TxSubmittedStep';
 
 export default function SwapPage(): Node {
   const [step, setStep] = useState(0);
@@ -17,7 +17,7 @@ export default function SwapPage(): Node {
     <Box display="flex" flexDirection="column" height="100%">
       <Box sx={{ flexGrow: '1', overflowY: 'auto' }}>
         {step === 0 && <SwapForm />}
-        {step === 1 && <SwapConfirmationStep />}
+        {/* {step === 1 && <SwapConfirmationStep />}
         {step === 2 && (
           <TxSubmittedStep
             onTryAgain={() => {
@@ -26,7 +26,7 @@ export default function SwapPage(): Node {
             }}
             isSuccessful={isSuccessful}
           />
-        )}
+        )} */}
       </Box>
       {step < 2 && (
         <Box
