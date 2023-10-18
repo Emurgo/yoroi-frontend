@@ -11,6 +11,7 @@ import { ReactComponent as QRLogo } from '../../assets/images/qr-code.inline.svg
 
 type Props = {|
   error?: boolean | string,
+  helperText?: string,
   done?: boolean,
   type?: string,
   className?: string,
@@ -32,6 +33,7 @@ function TextField({
   value,
   disabled,
   error,
+  helperText,
   done,
   type,
   inputRef,
@@ -65,7 +67,7 @@ function TextField({
       disabled={disabled}
       autoFocus={autoFocus}
       inputRef={inputRef}
-      helperText={error}
+      helperText={error || helperText}
       onBlur={onBlur}
       onChange={onChange}
       type={type !== 'password' ? type : showPassword ? 'text' : 'password'}
@@ -137,6 +139,7 @@ TextField.defaultProps = {
   label: '',
   done: false,
   error: '',
+  helperText: ' ',
   className: '',
   disabled: false,
   InputLabelProps: null,
