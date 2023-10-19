@@ -55,7 +55,11 @@ import {
   asAddressedUtxo as asAddressedUtxoCardano,
   multiTokenFromCardanoValue,
 } from '../../../app/api/ada/transactions/utils';
-import type { RemoteUnspentOutput } from '../../../app/api/ada/lib/state-fetch/types'
+import type {
+  RemoteUnspentOutput,
+  AccountStateRequest,
+  AccountStateResponse,
+} from '../../../app/api/ada/lib/state-fetch/types';
 import {
   signTransaction as shelleySignTransaction,
   toLibUTxO,
@@ -106,7 +110,6 @@ import {
   WalletTypePurpose
 } from '../../../app/config/numbersConfig';
 import { Bip44DerivationLevels, CoinType } from '@emurgo/yoroi-lib';
-import { getRegistrationHistory } from '../../../app/api/ada/lib/storage/bridge/delegationUtils';
 
 axios.defaults.adapter = fetchAdapter;
 
@@ -496,6 +499,7 @@ async function _getDRepKeyAndAddressing(
 
 export async function connectorGetStakeKey(
   wallet: PublicDeriver<>,
+  getAccountState: AccountStateRequest => Promise<AccountStateResponse>,
 ): Promise<{| key: string, isRegistered: boolean |}> {
   const stakeKey =
     (await __pubKeyAndAddressingByChainAndIndex(
@@ -508,14 +512,17 @@ export async function connectorGetStakeKey(
     throw new Error('Unable to get the stake key')
   }
   const stakingKeyResp = await withStakingKey.getStakingKey();
-  const registrationHistoryResponse = await getRegistrationHistory({
-    publicDeriver: withStakingKey,
-    stakingKeyAddressId: stakingKeyResp.addr.AddressId,
-  });
+  const accountState = await getAccountState(
+    {
+      addresses: [stakingKeyResp.addr.Hash],
+      network: wallet.getParent().getNetworkInfo(),
+    }
+  );
+  const stakeKeyHex = stakeKey.to_hex();
   return {
     // $FlowFixMe
-    key: stakeKey.to_hex(),
-    isRegistered: registrationHistoryResponse.current,
+    key: stakeKeyHex,
+    isRegistered: accountState[stakeKeyHex]?.stakeRegistered ?? false,
   };
 }
 
