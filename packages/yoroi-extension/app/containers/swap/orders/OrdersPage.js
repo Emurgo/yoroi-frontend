@@ -6,6 +6,7 @@ import { mockOpenOrders, mockCompletedOrders } from './mockData';
 import Table from '../../../components/common/table/Table';
 import CancelSwapOrderDialog from '../../../components/swap/CancelOrderDialog';
 import AssetPair from '../../../components/common/assets/AssetPair';
+import Tabs from '../../../components/common/tabs/Tabs';
 
 const orderColumns = [
   'Pair (From / To)',
@@ -28,24 +29,20 @@ export default function SwapOrdersPage(): Node {
   return (
     <>
       <Box>
-        <Box
-          sx={{
-            cursor: 'pointer',
-            mb: '24px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <TabButton
-            label="Open orders"
-            isActive={!showCompletedOrders}
-            onClick={() => setShowCompletedOrders(false)}
-          />
-          <TabButton
-            label="Completed orders"
-            isActive={showCompletedOrders}
-            onClick={() => setShowCompletedOrders(true)}
+        <Box sx={{ mb: '24px' }}>
+          <Tabs
+            tabs={[
+              {
+                label: 'Open orders',
+                isActive: !showCompletedOrders,
+                onClick: () => setShowCompletedOrders(false),
+              },
+              {
+                label: 'Completed orders',
+                isActive: showCompletedOrders,
+                onClick: () => setShowCompletedOrders(true),
+              },
+            ]}
           />
         </Box>
         <Table

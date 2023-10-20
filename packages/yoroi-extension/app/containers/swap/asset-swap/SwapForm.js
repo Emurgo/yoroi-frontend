@@ -13,6 +13,7 @@ import SelectAssetDialog from '../../../components/swap/SelectAssetDialog';
 import SlippageDialog from '../../../components/swap/SlippageDialog';
 import SelectPoolDialog from '../../../components/swap/SelectPoolDialog';
 import SwapPool from '../../../components/swap/SwapPool';
+import Tabs from '../../../components/common/tabs/Tabs';
 
 export default function SwapForm() {
   const [isMarketOrder, setIsMarketOrder] = useState(true);
@@ -54,28 +55,12 @@ export default function SwapForm() {
     <>
       <Box width="100%" mx="auto" maxWidth="506px" display="flex" flexDirection="column" gap="16px">
         <Box display="flex" alignItems="center" justifyContent="space-between" mb="16px">
-          <Box sx={{ cursor: 'pointer' }} display="flex" alignItems="center">
-            <Box
-              onClick={() => setIsMarketOrder(true)}
-              p="8px"
-              borderRadius="8px"
-              bgcolor={isMarketOrder ? 'grayscale.200' : ''}
-            >
-              <Typography variant="body1" fontWeight={500}>
-                Market
-              </Typography>
-            </Box>
-            <Box
-              onClick={() => setIsMarketOrder(false)}
-              p="8px"
-              borderRadius="8px"
-              bgcolor={!isMarketOrder ? 'grayscale.200' : ''}
-            >
-              <Typography variant="body1" fontWeight={500}>
-                Limit
-              </Typography>
-            </Box>
-          </Box>
+          <Tabs
+            tabs={[
+              { label: 'Market', isActive: isMarketOrder, onClick: () => setIsMarketOrder(true) },
+              { label: 'Limit', isActive: !isMarketOrder, onClick: () => setIsMarketOrder(false) },
+            ]}
+          />
           <Box sx={{ cursor: 'pointer' }}>
             <RefreshIcon />
           </Box>
