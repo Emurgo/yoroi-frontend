@@ -156,9 +156,9 @@ const AssetAndAmountRow = ({
         <Box flexGrow="1" width="100%">
           <Box display="flex" alignItems="center" gap="8px">
             <Typography fontWeight={500} variant="body1">
-              {name}
+              {name !== address && `[${ticker}]`} {name}
             </Typography>
-            {!isFrom && (
+            {!isFrom && walletAmount > 0 && (
               <Box component="span" color="secondary.600">
                 <WalletIcon />
               </Box>

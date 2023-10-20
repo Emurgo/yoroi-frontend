@@ -66,13 +66,13 @@ export default function PriceInput({
         placeholder="0"
         bgcolor={readonly ? 'grayscale.50' : 'common.white'}
         readOnly={readonly}
-        value={baseCurrency.amount / quoteCurrency.amount}
+        value={baseCurrency.amount / quoteCurrency.amount || 0}
       />
       <Box sx={{ justifySelf: 'end' }}>
         <Box height="100%" width="min-content" display="flex" alignItems="center">
-          <Box>{baseCurrency.ticker}</Box>
+          <Box>{baseCurrency.ticker || '-'}</Box>
           <Box>/</Box>
-          <Box>{quoteCurrency.ticker}</Box>
+          <Box>{quoteCurrency.ticker || '-'}</Box>
         </Box>
       </Box>
     </Box>

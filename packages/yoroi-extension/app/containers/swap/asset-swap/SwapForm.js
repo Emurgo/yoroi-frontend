@@ -6,6 +6,7 @@ import { ReactComponent as InfoIcon } from '../../../assets/images/revamp/info-i
 import { ReactComponent as EditIcon } from '../../../assets/images/revamp/edit-icon.inline.svg';
 import { ReactComponent as AdaTokenImage } from './img.inline.svg';
 import { ReactComponent as UsdaTokenImage } from './usda.inline.svg';
+import { ReactComponent as MilkTokenImage } from './milk.inline.svg';
 import { ReactComponent as PoolImage } from './pool.inline.svg';
 import { ReactComponent as SundaeImage } from './sundae.inline.svg';
 import { ReactComponent as MuesliImage } from './muesli.inline.svg';
@@ -41,6 +42,42 @@ const poolList = [
     liquidity: '265,906,545',
     fee: 0.4,
     deposit: 2.5,
+  },
+];
+
+const fromAssets = [
+  {
+    image: <AdaTokenImage />,
+    name: 'TADA',
+    ticker: 'TADA',
+    walletAmount: 212,
+    usdPrice: 0.29,
+    address: 'TADA',
+    adaPrice: 1,
+    volume24h: 0,
+  },
+];
+
+const toAssets = [
+  {
+    image: <UsdaTokenImage />,
+    name: 'Anzens USD',
+    ticker: 'USDA',
+    walletAmount: 0,
+    address: 'addr1asdl4bl0f328dsckmx23443mllsdkfj32e4',
+    adaPrice: 0.26,
+    volume24h: 10200033322,
+    priceChange100: '-2.45%',
+  },
+  {
+    image: <MilkTokenImage />,
+    name: 'MILK',
+    ticker: 'MILK',
+    walletAmount: 5,
+    address: 'addr13sdlsad3f328dsckmx23443mllsdkf944f',
+    adaPrice: 0.26,
+    volume24h: 20033322,
+    priceChange100: '1.09%',
   },
 ];
 
@@ -192,29 +229,7 @@ export default function SwapForm() {
       {/* Dialogs */}
       {(openedDialog === 'from' || openedDialog === 'to') && (
         <SelectAssetDialog
-          assets={[
-            {
-              image: <AdaTokenImage />,
-              name: 'TADA',
-              ticker: 'TADA',
-              walletAmount: 212,
-              usdPrice: 0.29,
-              address: 'TADA',
-              adaPrice: 1,
-              volume24h: 0,
-            },
-            {
-              image: <UsdaTokenImage />,
-              name: 'Anzens USD',
-              ticker: 'USDA',
-              walletAmount: 10,
-              amount: 0,
-              address: 'addr1asdl4bl0f328dsckmx23443mllsdkfj32e4',
-              adaPrice: 0.26,
-              volume24h: 10200033322,
-              priceChange100: '-2.45%',
-            },
-          ]}
+          assets={openedDialog === 'from' ? fromAssets : toAssets}
           type={openedDialog}
           onAssetSelected={asset => handleSelectedAsset(asset, openedDialog)}
           onClose={() => handleOpenedDialog('')}
