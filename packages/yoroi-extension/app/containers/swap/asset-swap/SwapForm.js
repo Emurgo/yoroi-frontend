@@ -10,10 +10,12 @@ import { defaultFromAsset, defaultToAsset, fromAssets, toAssets } from './mockDa
 import SwapInput from '../../../components/swap/SwapInput';
 import PriceInput from '../../../components/swap/PriceInput';
 import SelectAssetDialog from '../../../components/swap/SelectAssetDialog';
+import SlippageDialog from '../../../components/swap/SlippageDialog';
 
 export default function SwapForm() {
   const [isMarketOrder, setIsMarketOrder] = useState(true);
   const [openedDialog, setOpenedDialog] = useState('');
+  const [slippage, setSlippage] = useState('1');
   const [fromAsset, setFromAsset] = useState(defaultFromAsset);
   const [toAsset, setToAsset] = useState(defaultToAsset);
 
@@ -120,6 +122,31 @@ export default function SwapForm() {
             label="Market price"
           />
         </Box>
+
+        {/* Slippage settings */}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <Box display="flex" gap="8px" alignItems="center">
+            <Typography variant="body1" color="grayscale.500">
+              Slippage tolerance
+            </Typography>
+            <InfoIcon />
+          </Box>
+          <Box
+            onClick={() => handleOpenedDialog('slippage')}
+            sx={{ cursor: 'pointer', display: 'flex', gap: '4px', alignItems: 'center' }}
+          >
+            <Typography variant="body1" color="grayscale.max">
+              {slippage}%
+            </Typography>
+            <EditIcon />
+          </Box>
+        </Box>
       </Box>
 
       {/* Dialogs */}
@@ -128,6 +155,14 @@ export default function SwapForm() {
           assets={openedDialog === 'from' ? fromAssets : toAssets}
           type={openedDialog}
           onAssetSelected={asset => handleSelectedAsset(asset, openedDialog)}
+          onClose={() => handleOpenedDialog('')}
+        />
+      )}
+
+      {openedDialog === 'slippage' && (
+        <SlippageDialog
+          currentSlippage={slippage}
+          onSlippageApplied={setSlippage}
           onClose={() => handleOpenedDialog('')}
         />
       )}
