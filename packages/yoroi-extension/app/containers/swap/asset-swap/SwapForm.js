@@ -4,8 +4,8 @@ import { ReactComponent as SwitchIcon } from '../../../assets/images/revamp/icon
 import { ReactComponent as RefreshIcon } from '../../../assets/images/revamp/icons/refresh.inline.svg';
 import { ReactComponent as InfoIcon } from '../../../assets/images/revamp/icons/info.inline.svg';
 import { ReactComponent as EditIcon } from '../../../assets/images/revamp/icons/edit.inline.svg';
-import { ReactComponent as AdaTokenImage } from './mockAssets/ada.inline.svg';
-import { ReactComponent as UsdaTokenImage } from './mockAssets/usda.inline.svg';
+import { ReactComponent as AdaTokenImage } from '../mockAssets/ada.inline.svg';
+import { ReactComponent as UsdaTokenImage } from '../mockAssets/usda.inline.svg';
 import { defaultFromAsset, defaultToAsset, fromAssets, poolList, toAssets } from './mockData';
 import SwapInput from '../../../components/swap/SwapInput';
 import PriceInput from '../../../components/swap/PriceInput';
