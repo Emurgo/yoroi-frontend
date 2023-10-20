@@ -15,7 +15,7 @@ import SelectPoolDialog from '../../../components/swap/SelectPoolDialog';
 import SwapPool from '../../../components/swap/SwapPool';
 import Tabs from '../../../components/common/tabs/Tabs';
 
-export default function SwapForm() {
+export default function SwapForm({ onLimitSwap }) {
   const [isMarketOrder, setIsMarketOrder] = useState(true);
   const [openedDialog, setOpenedDialog] = useState('');
   const [pool, setPool] = useState(poolList[0]);
@@ -58,7 +58,14 @@ export default function SwapForm() {
           <Tabs
             tabs={[
               { label: 'Market', isActive: isMarketOrder, onClick: () => setIsMarketOrder(true) },
-              { label: 'Limit', isActive: !isMarketOrder, onClick: () => setIsMarketOrder(false) },
+              {
+                label: 'Limit',
+                isActive: !isMarketOrder,
+                onClick: () => {
+                  setIsMarketOrder(false);
+                  onLimitSwap();
+                },
+              },
             ]}
           />
           <Box sx={{ cursor: 'pointer' }}>
