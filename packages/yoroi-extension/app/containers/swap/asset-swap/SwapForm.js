@@ -6,15 +6,18 @@ import { ReactComponent as InfoIcon } from '../../../assets/images/revamp/icons/
 import { ReactComponent as EditIcon } from '../../../assets/images/revamp/icons/edit.inline.svg';
 import { ReactComponent as AdaTokenImage } from './mockAssets/ada.inline.svg';
 import { ReactComponent as UsdaTokenImage } from './mockAssets/usda.inline.svg';
-import { defaultFromAsset, defaultToAsset, fromAssets, toAssets } from './mockData';
+import { defaultFromAsset, defaultToAsset, fromAssets, poolList, toAssets } from './mockData';
 import SwapInput from '../../../components/swap/SwapInput';
 import PriceInput from '../../../components/swap/PriceInput';
 import SelectAssetDialog from '../../../components/swap/SelectAssetDialog';
 import SlippageDialog from '../../../components/swap/SlippageDialog';
+import SelectPoolDialog from '../../../components/swap/SelectPoolDialog';
+import SwapPool from '../../../components/swap/SwapPool';
 
 export default function SwapForm() {
   const [isMarketOrder, setIsMarketOrder] = useState(true);
   const [openedDialog, setOpenedDialog] = useState('');
+  const [pool, setPool] = useState(poolList[0]);
   const [slippage, setSlippage] = useState('1');
   const [fromAsset, setFromAsset] = useState(defaultFromAsset);
   const [toAsset, setToAsset] = useState(defaultToAsset);
@@ -147,6 +150,20 @@ export default function SwapForm() {
             <EditIcon />
           </Box>
         </Box>
+
+        {/* Available pools */}
+        <Box>
+          <SwapPool
+            image={pool.image}
+            name={pool.name}
+            isAuto={pool.isAuto}
+            onSelectPool={() => handleOpenedDialog('pool')}
+            assets={[
+              { ticker: 'TADA', amount: 20 },
+              { ticker: 'USDA', amount: 5 },
+            ]}
+          />
+        </Box>
       </Box>
 
       {/* Dialogs */}
@@ -163,6 +180,15 @@ export default function SwapForm() {
         <SlippageDialog
           currentSlippage={slippage}
           onSlippageApplied={setSlippage}
+          onClose={() => handleOpenedDialog('')}
+        />
+      )}
+
+      {openedDialog === 'pool' && (
+        <SelectPoolDialog
+          currentPool={pool.name}
+          poolList={poolList}
+          onPoolSelected={setPool}
           onClose={() => handleOpenedDialog('')}
         />
       )}

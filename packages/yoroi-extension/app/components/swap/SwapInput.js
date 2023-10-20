@@ -58,7 +58,7 @@ export default function SwapInput({
     setInputValue(e.target.value);
   };
 
-  const isFocusedColor = isFocused ? 'black' : 'gray.400';
+  const isFocusedColor = isFocused ? 'grayscale.max' : 'grayscale.400';
 
   return (
     <Box>
