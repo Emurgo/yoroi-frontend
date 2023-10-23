@@ -2,9 +2,8 @@
 import type { Node } from 'react';
 import type { StoresMap } from './stores/index';
 import type { ActionsMap } from './actions/index';
-import type { InjectedOrGenerated } from './types/injectedPropsType';
+import type { InjectedOrGenerated, InjectedProps } from './types/injectedPropsType';
 import type { GeneratedData as SettingsData } from './containers/settings/Settings';
-import type { GeneratedData as SwapData } from './containers/swap/SwapPageContainer';
 import type { GeneratedData as WalletData } from './containers/wallet/Wallet';
 import type { GeneratedData as ReceiveData } from './containers/wallet/Receive';
 import type { ConfigType } from '../config/config-types';
@@ -476,7 +475,7 @@ const NFTsSubPages = (stores, actions) => (
   </Switch>
 );
 
-export function wrapSwap(swapProps: InjectedOrGenerated<SwapData>, children: Node): Node {
+export function wrapSwap(swapProps: InjectedProps, children: Node): Node {
   return (
     <SwapProvider publicDeriver={swapProps.stores.wallets.selected}>
       <SwapPageContainer {...swapProps}>

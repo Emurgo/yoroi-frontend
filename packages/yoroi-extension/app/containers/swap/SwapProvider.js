@@ -9,21 +9,25 @@ import {
 } from '@yoroi/swap';
 import { asGetStakingKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { unwrapStakingKey } from '../../api/ada/lib/storage/bridge/utils';
+import type { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 
 type Props = {|
   children?: Node,
+  publicDeriver: PublicDeriver<> | null,
 |};
 
 function SwapProvider({ children, publicDeriver }: Props): Node {
+  if (!publicDeriver) throw new Error(`${nameof(SwapProvider)} requires a wallet to be selected`);
+
   const [stakingKey, setStakingKey] = useState(null);
   const defaultToken = publicDeriver.getParent().getDefaultToken();
 
-  const withStakingKey = asGetStakingKey(publicDeriver);
-  if (withStakingKey == null) {
-    throw new Error(`${nameof(SwapProvider)} missing staking key functionality`);
-  }
-
   useEffect(() => {
+    const withStakingKey = asGetStakingKey(publicDeriver);
+    if (withStakingKey == null) {
+      throw new Error(`${nameof(SwapProvider)} missing staking key functionality`);
+    }
+
     withStakingKey
       .getStakingKey()
       .then(stakingKeyResp => {
