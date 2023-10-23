@@ -21,6 +21,7 @@ import { ColorModeProvider } from './styles/context/mode';
 import { CssBaseline } from '@mui/material';
 import { globalStyles } from './styles/globalStyles';
 import Support from './components/widgets/Support';
+import SwapProvider from './containers/swap/SwapProvider';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData(locales);
