@@ -688,6 +688,7 @@ export function genGetAccountState(
         rewards: stateForAddr.rewards.toString(),
         withdrawals: stateForAddr.withdrawals.toString(),
         delegation: delegations[address] ?? null,
+        stakeRegistered: true,
       };
     }
     return result;

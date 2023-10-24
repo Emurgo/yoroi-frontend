@@ -288,6 +288,7 @@ export type RemoteAccountState = {|
   rewards: string, // all the rewards every added
   withdrawals: string, // all the withdrawals that have ever happened
   delegation: string | null, // hex pool ID the stake key currently delegates to
+  stakeRegistered: boolean,
 |};
 export type AccountStateResponse = {|
   [key: string]: null | RemoteAccountState,

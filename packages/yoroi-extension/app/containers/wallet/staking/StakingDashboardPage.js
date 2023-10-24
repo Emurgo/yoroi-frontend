@@ -674,13 +674,7 @@ export default class StakingDashboardPage extends Component<Props> {
     ) {
       return undefined;
     }
-    if (delegationRequests.getDelegatedBalance.result.delegation || (
-      delegationRequests.getDelegatedBalance.result.allRewards != null &&
-      delegationRequests.getDelegatedBalance.result.allRewards !== '0'
-    )) {
-      return true;
-    }
-    return false;
+    return delegationRequests.getDelegatedBalance.result.stakeRegistered;
   };
 
   @computed get generated(): {|

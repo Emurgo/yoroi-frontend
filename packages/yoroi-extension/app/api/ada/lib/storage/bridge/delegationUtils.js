@@ -49,6 +49,7 @@ export async function getDelegatedBalance(
     accountPart: request.rewardBalance,
     delegation: request.delegation,
     allRewards: request.allRewards,
+    stakeRegistered: request.stakeRegistered,
   };
 }
 
