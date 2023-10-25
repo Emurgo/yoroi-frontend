@@ -939,11 +939,12 @@ chrome.runtime.onMessage.addListener(
   // Returning `true` is required by Firefox, see:
   // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage
   (message, sender, sendResponse) => {
-    // only one of the branch of the two functions should run
-    yoroiMessageHandler(message, sender, sendResponse);
-    // eslint-disable-next-line no-floating-promise/no-floating-promise
-    handleInjectorMessage(message, sender);
-    return true;
+    return Promise.all([
+      // only one of the branch of the two functions should run
+      yoroiMessageHandler(message, sender, sendResponse),
+      // eslint-disable-next-line no-floating-promise/no-floating-promise
+      handleInjectorMessage(message, sender),
+    ]);
   }
 );
 
