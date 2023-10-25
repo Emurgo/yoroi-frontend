@@ -206,6 +206,7 @@
   "global.why": "This can be used to:",
   "global.wrongNetwork.address": "This address is on a different network. Please retype.",
   "global.yoroi": "Yoroi",
+  "global.yoroi.intro": "Light wallet for Cardano assets",
   "incorrectTime.line1": "WARNING: time on your computer does not match the server. This can cause unexpected results",
   "incorrectTime.line2": "Time difference:",
   "incorrectTime.line3": "Synchronize time on your device to resolve this issue",

@@ -28,6 +28,10 @@ const globalMessages: * = defineMessages({
     id: 'global.yoroi',
     defaultMessage: '!!!Yoroi',
   },
+  yoroiIntro: {
+    id: 'global.yoroi.intro',
+    defaultMessage: '!!!Light wallet for Cardano assets',
+  },
   here: {
     id: 'global.util.here',
     defaultMessage: '!!!here',
