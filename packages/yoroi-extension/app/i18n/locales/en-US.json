@@ -261,6 +261,7 @@
   "profile.complexityLevel.subtitle": "We understand blockchain can be difficult, which is why we try and keep the interface as simple as possible for you",
   "profile.complexityLevel.title": "Level of Interface Complexity",
   "profile.languageSelect.form.languageSelectLabel": "Select your language",
+  "profile.languageSelect.form.languageSelectLabelShort": "Select language",
   "profile.languageSelect.title": "Language Select",
   "profile.languageSelect.tosAgreement": "I agree with <span id=\"tosLink\">Terms of Service Agreement</span> and <span id=\"privacyLink\">Privacy Notice</span>",
   "profile.nightly.acknowledgedRisks": "I Understand the risk",

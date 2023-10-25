@@ -439,6 +439,10 @@ const globalMessages: * = defineMessages({
     id: 'profile.languageSelect.form.languageSelectLabel',
     defaultMessage: '!!!Select your language',
   },
+  languageSelectLabelShort: {
+    id: 'profile.languageSelect.form.languageSelectLabelShort',
+    defaultMessage: '!!!Select language',
+  },
   languageSelectLabelInfo: {
     id: 'settings.general.languageSelect.labelInfo',
     defaultMessage: '!!!The selected language translation is fully provided by the community',
@@ -1032,7 +1036,8 @@ const globalMessages: * = defineMessages({
   },
   tosAgreement: {
     id: 'profile.languageSelect.tosAgreement',
-    defaultMessage: '!!!I agree with <span id="tosLink">Terms of Service Agreement</span> and <span id="privacyLink">Privacy Notice</span>',
+    defaultMessage:
+      '!!!I agree with <span id="tosLink">Terms of Service Agreement</span> and <span id="privacyLink">Privacy Notice</span>',
   },
 });
 export default globalMessages;
