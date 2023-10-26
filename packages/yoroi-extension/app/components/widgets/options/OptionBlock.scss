@@ -138,14 +138,6 @@
           &.ergo {
             background-image: url(../../../assets/images/my-wallets/symbol_ergo.inline.svg);
           }
-          &.legacyDaedalus {
-            background-image: url(../../../assets/images/add-wallet/option-dialog/daedalus-modern.inline.svg);
-          }
-          &.masterKey {
-            background-image: url(../../../assets/images/add-wallet/option-dialog/Master_key.inline.svg);
-            background-position: center 15px !important;
-            background-size: 50px;
-          }
           &.alonzoWhiteTestnet {
             background-image: url(../../../assets/images/my-wallets/symbol_adaTestnet.inline.svg);
           }
@@ -173,14 +165,6 @@
           &.restorePaperWallet {
             background-image: url(../../../assets/images/add-wallet/option-dialog/restore-paper-wallet-classic.inline.svg);
           }
-          &.bgByronMainnet {
-            background-image: url(../../../assets/images/claim/byron-mainnet.inline.svg);
-            background-position: center 20px !important;
-          }
-          &.bgShelleyMainnet {
-            background-image: url(../../../assets/images/claim/shelley-mainnet.inline.svg);
-            background-position: center 20px !important;
-          }
         }
       }
     }
@@ -206,14 +190,6 @@
           }
           &.ergo {
             background-image: url(../../../assets/images/my-wallets/symbol_ergo.inline.svg);
-          }
-          &.legacyDaedalus {
-            background-image: url(../../../assets/images/add-wallet/option-dialog/daedalus-modern.inline.svg);
-          }
-          &.masterKey {
-            background-image: url(../../../assets/images/add-wallet/option-dialog/Master_key.inline.svg);
-            background-position: center 15px !important;
-            background-size: 50px;
           }
           &.alonzoWhiteTestnet {
             background-image: url(../../../assets/images/my-wallets/symbol_adaTestnet.inline.svg);
@@ -242,14 +218,6 @@
           &.restorePaperWallet {
             background-image: url(../../../assets/images/add-wallet/option-dialog/restore-paper-wallet-modern.inline.svg);
           }
-          &.bgByronMainnet {
-            background-image: url(../../../assets/images/claim/byron-mainnet.inline.svg);
-            background-position: center 20px !important;
-          }
-          &.bgShelleyMainnet {
-            background-image: url(../../../assets/images/claim/shelley-mainnet.inline.svg);
-            background-position: center 20px !important;
-          }
         }
       }
     }
@@ -276,14 +244,6 @@
           &.ergo {
             background-image: url(../../../assets/images/my-wallets/symbol_ergo.inline.svg);
           }
-          &.legacyDaedalus {
-            background-image: url(../../../assets/images/add-wallet/option-dialog/daedalus-modern.inline.svg);
-          }
-          &.masterKey {
-            background-image: url(../../../assets/images/add-wallet/option-dialog/Master_key.inline.svg);
-            background-position: center 15px !important;
-            background-size: 50px;
-          }
           // CONNECT HARDWARE WALLET
           &.connectLedger {
             background-image: url(../../../assets/images/add-wallet/option-dialog/connect-ledger-modern.inline.svg);
@@ -307,14 +267,6 @@
           }
           &.restorePaperWallet {
             background-image: url(../../../assets/images/add-wallet/option-dialog/restore-paper-wallet-modern.inline.svg);
-          }
-          &.bgByronMainnet {
-            background-image: url(../../../assets/images/claim/byron-mainnet.inline.svg);
-            background-position: center 20px !important;
-          }
-          &.bgShelleyMainnet {
-            background-image: url(../../../assets/images/claim/shelley-mainnet.inline.svg);
-            background-position: center 20px !important;
           }
         }
       }

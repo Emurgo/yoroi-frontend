@@ -8,8 +8,6 @@ type Props = {|
   +onClose: void => void,
   +onRestore15: void => void,
   +onRestore24: void | (void => void),
-  // <TODO:PENDING_REMOVAL>
-  +onPaperRestore: void | (void => void),
 |};
 
 @observer
@@ -21,8 +19,6 @@ export default class WalletRestoreOptionDialogContainer extends Component<Props>
         onCancel={this.props.onClose}
         onRestore15={this.props.onRestore15}
         onRestore24={this.props.onRestore24}
-        // <TODO:PENDING_REMOVAL>
-        onPaperRestore={this.props.onPaperRestore}
       />
     );
   }

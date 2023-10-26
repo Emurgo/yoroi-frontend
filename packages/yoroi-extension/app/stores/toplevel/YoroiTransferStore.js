@@ -26,9 +26,6 @@ import { SendTransactionApiError } from '../../api/common/errors';
 import type {
   Address, Addressing
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import {
-  Bip44DerivationLevels,
-} from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { getReceiveAddress } from '../stateless/addressStores';
 import type { ActionsMap } from '../../actions/index';
@@ -82,9 +79,6 @@ export default class YoroiTransferStore extends Store<StoresMap, ActionsMap> {
     super.setup();
     const actions = this.actions.yoroiTransfer;
     actions.startTransferFunds.listen(this._startTransferFunds);
-    actions.startHardwareMnemonic.listen(this._startHardwareMnemonic);
-    actions.setPrivateKey.listen(this._setPrivateKey);
-    actions.setupTransferFundsWithMnemonic.listen(this.setupTransferFundsWithMnemonic);
     actions.setupTransferFundsWithPaperMnemonic.listen(
       this._errorWrapper(this._setupTransferFundsWithPaperMnemonic)
     );
@@ -107,35 +101,7 @@ export default class YoroiTransferStore extends Store<StoresMap, ActionsMap> {
     runInAction(() => {
       this.mode = payload.source;
     });
-    if (payload.source.extra === 'paper') {
-      this._updateStatus(TransferStatus.GETTING_PAPER_MNEMONICS);
-      return;
-    }
-    if (payload.source.extra === 'ledger' || payload.source.extra === 'trezor') {
-      this._updateStatus(TransferStatus.HARDWARE_DISCLAIMER);
-      return;
-    }
-    if (payload.source.extra === 'privateKey') {
-      const { derivationLevel } = payload.source;
-      if (derivationLevel === 0) {
-        this._updateStatus(TransferStatus.GETTING_MASTER_KEY);
-      } else if (derivationLevel === Bip44DerivationLevels.ADDRESS.level) {
-        this._updateStatus(TransferStatus.GETTING_WITHDRAWAL_KEY);
-      } else {
-        throw new Error(`${nameof(this._startTransferFunds)} unexpected level ${derivationLevel}`);
-      }
-      return;
-    }
-    this._updateStatus(TransferStatus.GETTING_MNEMONICS);
-  }
-
-  _startHardwareMnemonic: void => void = () => {
-    this._updateStatus(TransferStatus.GETTING_HARDWARE_MNEMONIC);
-  }
-
-  @action
-  _setPrivateKey: string => void = (key) => {
-    this.privateKey = key;
+    this._updateStatus(TransferStatus.GETTING_PAPER_MNEMONICS);
   }
 
   nextInternalAddress: (

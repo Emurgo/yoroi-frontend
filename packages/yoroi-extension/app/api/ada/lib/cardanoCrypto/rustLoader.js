@@ -18,7 +18,7 @@ const MAX_TX_BYTES = 16384;
 type RustModuleLoadFlags = 'dontLoadMessagesSigning';
 
 function isWasmPointer(o: ?any): boolean {
-  return o != null && (typeof o.ptr === 'number') && (typeof o.free === 'function');
+  return o != null && (typeof o.__wbg_ptr === 'number') && (typeof o.free === 'function');
 }
 
 /*
@@ -70,7 +70,7 @@ function createWasmScope(): {|
    * This way ANY wasm pointer produced within the callback will be automatically destroyed,
    * but only as long as it's created using the injected proxied module reference.
    */
-  const scope: Array<{ ptr: number, free: () => void, ... }> = [];
+  const scope: Array<{ __wbg_ptr: number, free: () => void, ... }> = [];
   function recursiveProxy<E>(originalObject: E): E {
     if (!isProxiable(originalObject)) {
       return originalObject;
@@ -136,13 +136,13 @@ function createWasmScope(): {|
     free: () => {
       scope.forEach(x => {
         // Checking just to avoid a null-pointer crash
-        if (x.ptr !== 0) {
+        if (x.__wbg_ptr !== 0) {
           x.free()
         }
       });
     },
     size: () => scope.length,
-    isFree: () => scope.every(x => x.ptr === 0),
+    isFree: () => scope.every(x => x.__wbg_ptr === 0),
   }
 }
 
