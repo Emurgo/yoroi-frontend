@@ -481,6 +481,20 @@ function connectContinuation(
   }
 }
 
+const YOROI_MESSAGES = Object.freeze({
+  CONNECT_RESPONSE: 'connect_response',
+  SIGN_CONFIRMED: 'sign_confirmed',
+  SIGN_REJECTED: 'sign_rejected',
+  SIGN_ERROR: 'sign_error',
+  SIGN_WINDOW_RETRIEVE_DATA: 'tx_sign_window_retrieve_data',
+  CONNECT_WINDOW_RETRIEVE_DATA: 'connect_retrieve_data',
+  REMOVE_WALLET_FROM_WHITELIST: 'remove_wallet_from_whitelist',
+  GET_CONNECTED_SITES: 'get_connected_sites',
+  GET_PROTOCOL: 'get_protocol',
+  GET_UTXOS_ADDRESSES: 'get_utxos/addresses',
+});
+
+const isYoroiMessage = ({ type }) => Object.values(YOROI_MESSAGES).includes(type);
 
 // messages from other parts of Yoroi (i.e. the UI for the connector)
 const yoroiMessageHandler = async (
@@ -550,7 +564,7 @@ const yoroiMessageHandler = async (
     });
   }
 
-  if (request.type === 'connect_response') {
+  if (request.type === YOROI_MESSAGES.CONNECT_RESPONSE) {
     const { tabId } = request;
     if (tabId == null) return;
     const connection = await getConnectedSite(tabId);
@@ -577,7 +591,7 @@ const yoroiMessageHandler = async (
         await deleteConnectedSite(tabId);
       }
     }
-  } else if (request.type === 'sign_confirmed') {
+  } else if (request.type === YOROI_MESSAGES.SIGN_CONFIRMED) {
     const connection = await getConnectedSite(request.tabId);
     if (connection == null) {
       throw new ConnectorError({
@@ -769,7 +783,7 @@ const yoroiMessageHandler = async (
     }
     delete connection.pendingSigns[String(request.uid)];
     await setConnectedSite(request.tabId, connection);
-  } else if (request.type === 'sign_rejected') {
+  } else if (request.type === YOROI_MESSAGES.SIGN_REJECTED) {
     const connection = await getConnectedSite(request.tabId);
     const responseData = connection?.pendingSigns[String(request.uid)];
     if (connection && responseData) {
@@ -797,7 +811,7 @@ const yoroiMessageHandler = async (
       // eslint-disable-next-line no-console
       console.error(`couldn't find tabId: ${request.tabId}`);
     }
-  } else if (request.type === 'sign_error') {
+  } else if (request.type === YOROI_MESSAGES.SIGN_ERROR) {
     const connection = await getConnectedSite(request.tabId);
     const responseData = connection?.pendingSigns[String(request.uid)];
     if (connection && responseData) {
@@ -825,7 +839,7 @@ const yoroiMessageHandler = async (
       // eslint-disable-next-line no-console
       console.error(`couldn't find tabId: ${request.tabId}`);
     }
-  } else if (request.type === 'tx_sign_window_retrieve_data') {
+  } else if (request.type === YOROI_MESSAGES.SIGN_WINDOW_RETRIEVE_DATA) {
     await new Promise(resolve => { setTimeout(resolve, 1); });
     const connectedSites = await getAllConnectedSites();
     for (const tabId of Object.keys(connectedSites)) {
@@ -848,7 +862,7 @@ const yoroiMessageHandler = async (
         }
       }
     }
-  } else if (request.type === 'connect_retrieve_data') {
+  } else if (request.type === YOROI_MESSAGES.CONNECT_WINDOW_RETRIEVE_DATA) {
     const connectedSites = await getAllConnectedSites();
 
     for (const tabId of Object.keys(connectedSites)) {
@@ -869,7 +883,7 @@ const yoroiMessageHandler = async (
       }
     }
     sendResponse(null);
-  } else if (request.type === 'remove_wallet_from_whitelist') {
+  } else if (request.type === YOROI_MESSAGES.REMOVE_WALLET_FROM_WHITELIST) {
     const connectedSites = await getAllConnectedSites();
     for (const tabId of Object.keys(connectedSites)) {
       const site = connectedSites[tabId];
@@ -878,18 +892,18 @@ const yoroiMessageHandler = async (
         break;
       }
     }
-  } else if (request.type === 'get_connected_sites') {
+  } else if (request.type === YOROI_MESSAGES.GET_CONNECTED_SITES) {
     const activeSites: Array<ConnectedSite> =
       (Object.values(await getAllConnectedSites()): any);
 
     sendResponse(({
       sites: activeSites.map(site => site.url),
     }: ConnectedSites));
-  } else if (request.type === 'get_protocol') {
+  } else if (request.type === YOROI_MESSAGES.GET_PROTOCOL) {
     const connectionProtocol = await getFromStorage(STORAGE_KEY_CONNECTION_PROTOCOL) ||
       'cardano';
     sendResponse({ type: connectionProtocol })
-  } else if (request.type === 'get_utxos/addresses') {
+  } else if (request.type === YOROI_MESSAGES.GET_UTXOS_ADDRESSES) {
     try {
       await withDb(async (db, localStorageApi) => {
         await withSelectedWallet(
@@ -936,14 +950,14 @@ const yoroiMessageHandler = async (
 };
 
 chrome.runtime.onMessage.addListener(
-  // Returning `true` is required by Firefox, see:
-  // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage
   (message, sender, sendResponse) => {
-    // only one of the branch of the two functions should run
-    yoroiMessageHandler(message, sender, sendResponse);
-    // eslint-disable-next-line no-floating-promise/no-floating-promise
-    handleInjectorMessage(message, sender);
-    return true;
+    if (isYoroiMessage(message)) {
+      // Returning `true` is required by Firefox, see:
+      // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage
+      yoroiMessageHandler(message, sender, sendResponse);
+      return true;
+    }
+    return handleInjectorMessage(message, sender);
   }
 );
 
