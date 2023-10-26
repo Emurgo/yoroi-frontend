@@ -956,9 +956,8 @@ chrome.runtime.onMessage.addListener(
       // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage
       yoroiMessageHandler(message, sender, sendResponse);
       return true;
-    } else {
-      return handleInjectorMessage(message, sender);
     }
+    return handleInjectorMessage(message, sender);
   }
 );
 
