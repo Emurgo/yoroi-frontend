@@ -895,8 +895,8 @@ async function newAdaUnsignedTxFromUtxoForConnector(
   if (requiredSigners != null) {
     txBuilder.addRequiredSigners(requiredSigners);
   }
-  if (Object.keys(auxiliaryData.metadata ?? {}).length > 0) {
-    const metadata = auxiliaryData.metadata;
+  const metadata = auxiliaryData.metadata ?? {};
+  if (Object.keys(metadata).length > 0) {
     const record = {};
     for (const tag of Object.keys(metadata)) {
       record[parseInt(tag, 10)] = metadata[tag];
