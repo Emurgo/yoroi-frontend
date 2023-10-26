@@ -26,14 +26,11 @@ class IntroBanner extends Component<Props & InjectedLayoutProps> {
   };
 
   getLogo: void => string = () => {
-    if (this.props.isNightly) {
-      return NightlyLogo;
-    }
+    if (this.props.isNightly) return NightlyLogo;
     return YoroiLogo;
   };
 
   getRevampLogo: void => string = () => {
-    // todo: add the new nightly logo
     if (this.props.isNightly) return YoroiRevampNightlyLogo;
     return YoroiRevampLogo;
   };

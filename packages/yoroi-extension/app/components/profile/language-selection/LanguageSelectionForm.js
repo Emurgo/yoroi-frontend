@@ -3,7 +3,7 @@ import { Component } from 'react';
 import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import { LoadingButton } from '@mui/lab';
-import { MenuItem, Checkbox, FormControlLabel, Typography, Box } from '@mui/material';
+import { MenuItem, Checkbox, FormControlLabel, Typography, Box, Button } from '@mui/material';
 import Select from '../../common/Select';
 import { intlShape, FormattedHTMLMessage } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
@@ -18,6 +18,7 @@ import ReactMarkdown from 'react-markdown';
 import tosStyles from '../terms-of-use/TermsOfUseText.scss';
 import { withLayout } from '../../../styles/context/layout';
 import type { InjectedLayoutProps } from '../../../styles/context/layout';
+import { ReactComponent as BackIcon } from '../../../assets/images/assets-page/backarrow.inline.svg';
 
 type Props = {|
   +onSelectLanguage: ({| locale: string |}) => void,
@@ -293,7 +294,8 @@ class LanguageSelectionForm extends Component<Props & InjectedLayoutProps, State
 
   renderMarkdown(markdown: string): Node {
     const { intl } = this.context;
-    return (
+    const { renderLayoutComponent } = this.props;
+    const classicLayout = (
       <>
         <div className={styles.component}>
           <div className={styles.tosBox}>
@@ -307,6 +309,35 @@ class LanguageSelectionForm extends Component<Props & InjectedLayoutProps, State
         </button>
       </>
     );
+
+    const revampLayout = (
+      <>
+        <Box mt="48px" maxWidth="648px" mx="auto" pb="20px">
+          <div className={styles.tosBox}>
+            <div className={tosStyles.terms}>
+              <ReactMarkdown source={markdown} escapeHtml={false} />
+            </div>
+          </div>
+        </Box>
+        <Button
+          sx={{
+            color: 'grayscale.900',
+            position: 'absolute',
+            top: '24px',
+            left: '24px',
+          }}
+          startIcon={<BackIcon />}
+          onClick={this.onClickBack}
+        >
+          {intl.formatMessage(globalMessages.backButtonLabel)}
+        </Button>
+      </>
+    );
+
+    return renderLayoutComponent({
+      CLASSIC: classicLayout,
+      REVAMP: revampLayout,
+    });
   }
 
   render(): Node {
