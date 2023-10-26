@@ -1,5 +1,3 @@
-
-
 .component {
   ul {
     margin-top: 16px;
@@ -25,7 +23,7 @@
       display: list-item;
       line-height: 1.38;
       font-size: 14px;
-      color: var(--yoroi-palette-gray-800);
+      color: #383e54;
 
       & + li {
         margin-top: 8px;
@@ -47,15 +45,19 @@
   }
 
   .learnMore {
-    color: var(--yoroi-palette-primary-200);
+    color: #4b6dde;
     text-decoration: none;
   }
 
   .skip {
     text-align: center;
     cursor: pointer;
-    margin-top: 16px;
-    margin-bottom: 16px;
+    margin-top: 8px;
+    margin-bottom: 24px;
+
+    & button {
+      text-transform: uppercase;
+    }
   }
 
   .accept {
@@ -72,6 +74,9 @@
   }
 
   .illustration {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin-top: 16px;
   }
 }
