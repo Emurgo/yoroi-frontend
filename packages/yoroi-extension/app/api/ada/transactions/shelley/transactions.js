@@ -829,7 +829,7 @@ async function newAdaUnsignedTxFromUtxoForConnector(
   |},
 ): Promise<V4UnsignedTxUtxoResponse> {
   await RustModule.load();
-  setRuntime(RustModule.CrossCsl.init());
+  setRuntime(RustModule.CrossCsl.init);
 
   const defaultNetworkConfig = {
     linearFee: {
@@ -839,6 +839,12 @@ async function newAdaUnsignedTxFromUtxoForConnector(
     coinsPerUtxoWord: protocolParams.coinsPerUtxoWord,
     poolDeposit: protocolParams.poolDeposit,
     keyDeposit: protocolParams.keyDeposit,
+    maxValueSize: 5000,
+    maxTxSize: 16384,
+    memPriceFrom: 577,
+    memPriceTo: 1000,
+    stepPriceFrom: 721,
+    stepPriceTo: 10000000,
   };
 
   const utxoSet = new UTxOSet(
@@ -889,8 +895,13 @@ async function newAdaUnsignedTxFromUtxoForConnector(
   if (requiredSigners != null) {
     txBuilder.addRequiredSigners(requiredSigners);
   }
-  if (auxiliaryData.metadata) {
-    txBuilder.withMetadata(auxiliaryData.metadata);
+  if (Object.keys(auxiliaryData.metadata ?? {}).length > 0) {
+    const metadata = auxiliaryData.metadata;
+    const record = {};
+    for (const tag of Object.keys(metadata)) {
+      record[parseInt(tag, 10)] = metadata[tag];
+    }
+    txBuilder.withMetadata(record);
   }
   if (auxiliaryData.nativeScripts) {
     txBuilder.addNativeScripts(auxiliaryData.nativeScripts);
