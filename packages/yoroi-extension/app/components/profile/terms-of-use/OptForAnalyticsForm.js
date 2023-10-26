@@ -10,6 +10,8 @@ import { LoadingButton } from '@mui/lab';
 import Switch from '@mui/material/Switch';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { ReactComponent as AnalyticsIllustration } from '../../../assets/images/analytics-illustration.inline.svg';
+import { ReactComponent as YesIcon } from '../../../assets/images/yes.inline.svg';
+import { ReactComponent as NoIcon } from '../../../assets/images/no.inline.svg';
 import { Box, Typography } from '@mui/material';
 
 const messages = defineMessages({
@@ -86,6 +88,14 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
     const isStartupScreen = variant === 'startup';
     const isSettingsScreen = variant === 'settings';
 
+    const analyticsDetails = [
+      [YesIcon, messages.line1],
+      [YesIcon, messages.line2],
+      [NoIcon, messages.line3],
+      [NoIcon, messages.line4],
+      [NoIcon, messages.line5],
+    ];
+
     return (
       <Box mt={isStartupScreen ? '16px' : '0px'} className={styles.component}>
         <div className={variant === 'startup' ? styles.centeredBox : ''}>
@@ -107,19 +117,24 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
             </Typography>
           )}
 
-          <ul>
-            <li className={styles.yes}>{intl.formatMessage(messages.line1)}</li>
-            <li className={styles.yes}>{intl.formatMessage(messages.line2)}</li>
-            <li className={styles.no}>
-              <FormattedHTMLMessage {...messages.line3} />
-            </li>
-            <li className={styles.no}>
-              <FormattedHTMLMessage {...messages.line4} />
-            </li>
-            <li className={styles.no}>
-              <FormattedHTMLMessage {...messages.line5} />
-            </li>
-          </ul>
+          <Box my="16px">
+            {analyticsDetails.map(([Icon, msg]) => (
+              <Box
+                key={msg.id}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  gap: '8px',
+                }}
+              >
+                <Icon />
+                <Typography>
+                  <FormattedHTMLMessage {...msg} />
+                </Typography>
+              </Box>
+            ))}
+          </Box>
 
           <Box
             sx={{

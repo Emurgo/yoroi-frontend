@@ -9,6 +9,8 @@
       font-size: 0.8em;
       background-size: contain;
       background-repeat: no-repeat;
+      width: 16px;
+      height: 16px;
     }
 
     li.yes::before {
@@ -54,6 +56,8 @@
     cursor: pointer;
     margin-top: 8px;
     margin-bottom: 24px;
+    font-weight: 500;
+    padding: 9px 20px;
 
     & button {
       text-transform: uppercase;
