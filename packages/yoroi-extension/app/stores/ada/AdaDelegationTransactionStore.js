@@ -117,7 +117,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     const delegationRequests = this.stores.delegation.getDelegationRequests(
       request.publicDeriver
     );
-    const adaDelegationRequests = this.stores.substores.ada.delegation.getDelegationRequests(
+    const adaDelegationRequests = this.stores.delegation.getDelegationRequests(
       request.publicDeriver
     );
     if (delegationRequests == null || adaDelegationRequests == null) {
@@ -138,7 +138,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     const delegationTxPromise = this.createDelegationTx.execute({
       publicDeriver: basePubDeriver,
       poolRequest: request.poolRequest,
-      registrationStatus: adaDelegationRequests.getRegistrationHistory.result?.current ?? false,
+      registrationStatus: adaDelegationRequests.getDelegatedBalance.result?.stakeRegistered === true,
       valueInAccount: delegationRequests.getDelegatedBalance.result?.accountPart
         ?? new MultiToken([], defaultToken),
       absSlotNumber,

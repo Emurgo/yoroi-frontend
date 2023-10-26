@@ -55,18 +55,6 @@ class Wallet extends Component<AllProps> {
   };
 
   componentDidMount() {
-    const { wallets } = this.generated.stores;
-    const publicDeriver = wallets.selected;
-    const publicDerivers = wallets.publicDerivers;
-    const isRevamp = this.generated.stores.profile.isRevampTheme;
-
-    if (publicDeriver == null && isRevamp && publicDerivers.length !== 0) {
-      const lastSelectedWallet = wallets.getLastSelectedWallet();
-      this.generated.actions.wallets.setActiveWallet.trigger({
-        wallet: lastSelectedWallet ?? publicDerivers[0],
-      });
-    }
-
     // reroute to the default path for the wallet
     const newRoute = this.checkRoute();
     if (newRoute != null) {

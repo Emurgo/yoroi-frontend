@@ -95,7 +95,7 @@ class VotingPageContent extends Component<Props> {
     if (delegationRequests == null) {
       throw new Error(`${nameof(this.isDelegated)} called for non-reward wallet`);
     }
-    const currentDelegation = delegationRequests.getCurrentDelegation;
+    const currentDelegation = delegationRequests.getDelegatedBalance;
 
     if (
       !currentDelegation.wasExecuted ||
@@ -104,10 +104,7 @@ class VotingPageContent extends Component<Props> {
     ) {
       return undefined;
     }
-    if (
-      !currentDelegation.result.currEpoch ||
-      currentDelegation.result.currEpoch.pools.length === 0
-    ) {
+    if (currentDelegation.result.delegation == null) {
       return false;
     }
     return true;
