@@ -4,7 +4,6 @@
   "description": "",
   "scripts": {
     "keygen": "crx keygen",
-    "ergo": "npm start --prefix example-ergo",
     "cardano": "npm start --prefix example-cardano",
     "prod:compress": "node ../../scripts/compress",
     "prod:custom": "node ./build.js",
