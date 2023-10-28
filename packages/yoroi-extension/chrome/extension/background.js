@@ -49,6 +49,7 @@ import {
   connectorGetAssets,
   getTokenMetadataFromIds,
   MAX_COLLATERAL,
+  connectorGetDRepKey, connectorGetStakeKey,
 } from './connector/api';
 import {
   updateTransactions as cardanoUpdateTransactions
@@ -1376,6 +1377,47 @@ async function handleInjectorMessage(message, sender) {
               } else {
                 rpcResponse({ ok: await addressesToBech(addresses) });
               }
+            },
+            db,
+            localStorageApi,
+          )
+        });
+      } catch (e) {
+        handleError(e);
+      }
+      break;
+    case 'get_drep_key':
+      try {
+        await RustModule.load();
+        await withDb(async (db, localStorageApi) => {
+          await withSelectedWallet(
+            tabId,
+            async (wallet) => {
+              const dRepKey = await connectorGetDRepKey(wallet);
+              rpcResponse({ ok: dRepKey });
+            },
+            db,
+            localStorageApi,
+          )
+        });
+      } catch (e) {
+        handleError(e);
+      }
+      break;
+    case 'get_stake_key':
+      try {
+        await RustModule.load();
+        await withDb(async (db, localStorageApi) => {
+          await withSelectedWallet(
+            tabId,
+            async (wallet) => {
+              const stateFetcher: CardanoIFetcher =
+                    await getCardanoStateFetcher(localStorageApi);
+              const resp = await connectorGetStakeKey(
+                wallet,
+                stateFetcher.getAccountState,
+              );
+              rpcResponse({ ok: resp });
             },
             db,
             localStorageApi,

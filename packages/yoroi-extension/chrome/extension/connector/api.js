@@ -23,6 +23,7 @@ import {
   asHasLevels,
   asHasUtxoChains,
   asGetAllAccounting,
+  asGetPublicKey, asGetStakingKey,
 } from '../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import { ConceptualWallet } from '../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
 import BigNumber from 'bignumber.js';
@@ -54,7 +55,11 @@ import {
   asAddressedUtxo as asAddressedUtxoCardano,
   multiTokenFromCardanoValue,
 } from '../../../app/api/ada/transactions/utils';
-import type { RemoteUnspentOutput } from '../../../app/api/ada/lib/state-fetch/types'
+import type {
+  RemoteUnspentOutput,
+  AccountStateRequest,
+  AccountStateResponse,
+} from '../../../app/api/ada/lib/state-fetch/types';
 import {
   signTransaction as shelleySignTransaction,
   toLibUTxO,
@@ -72,7 +77,10 @@ import type {
   HaskellShelleyTxSignRequest
 } from '../../../app/api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type { CardanoAddressedUtxo, } from '../../../app/api/ada/transactions/types';
-import { derivePrivateByAddressing } from '../../../app/api/ada/lib/cardanoCrypto/utils';
+import {
+  derivePrivateByAddressing,
+  derivePublicByAddressing,
+} from '../../../app/api/ada/lib/cardanoCrypto/utils';
 import { cip8Sign } from '../../../app/connector/api';
 import type { PersistedSubmittedTransaction } from '../../../app/api/localStorage';
 import type { ForeignUtxoFetcher } from '../../../app/connector/stores/ConnectorStore';
@@ -94,6 +102,14 @@ import { setRuntime, } from '@emurgo/yoroi-eutxo-txs';
 import {
   NotEnoughMoneyToSendError as LibNotEnoughMoneyToSendError
 } from'@emurgo/yoroi-eutxo-txs/dist/errors';
+import {
+  ChainDerivations,
+  STAKING_KEY_INDEX,
+  DREP_KEY_INDEX,
+  HARD_DERIVATION_START,
+  WalletTypePurpose
+} from '../../../app/config/numbersConfig';
+import { Bip44DerivationLevels, CoinType } from '@emurgo/yoroi-lib';
 
 axios.defaults.adapter = fetchAdapter;
 
@@ -425,6 +441,91 @@ export async function connectorGetUnusedAddresses(wallet: PublicDeriver<>): Prom
   return result.filter(address => !outputAddressesInSubmittedTxs.has(address));
 }
 
+export async function connectorGetDRepKey(
+  wallet: PublicDeriver<>,
+): Promise<string> {
+  return (await _getDRepKeyAndAddressing(wallet))[0].to_hex();
+}
+
+async function __pubKeyAndAddressingByChainAndIndex(
+  wallet: PublicDeriver<>,
+  chainLevelDerivationIndex: number,
+  addressLevelDerivationIndex: number,
+): Promise<[RustModule.WalletV4.PublicKey, Addressing]> {
+  const withPubKey = asGetPublicKey(wallet);
+  if (withPubKey == null) {
+    throw new Error('Unable to get public key from the wallet');
+  }
+  const withLevels = asHasLevels(wallet);
+  if (withLevels == null) {
+    throw new Error('Unable to get derivation levels from the wallet');
+  }
+  const publicKeyResp = await withPubKey.getPublicKey();
+  const publicKey = RustModule.WalletV4.Bip32PublicKey.from_bytes(
+    Buffer.from(publicKeyResp.Hash, 'hex')
+  );
+  const addressing = {
+    addressing: {
+      path: [
+        WalletTypePurpose.CIP1852,
+        CoinType.CARDANO,
+        HARD_DERIVATION_START,
+        chainLevelDerivationIndex,
+        addressLevelDerivationIndex,
+      ],
+      startLevel: Bip44DerivationLevels.PURPOSE.level,
+    },
+  };
+
+  const derivedPubKey = derivePublicByAddressing({
+    ...addressing,
+    startingFrom: {
+      level: withLevels.getParent().getPublicDeriverLevel(),
+      key: publicKey,
+    },
+  }).to_raw_key();
+  return [derivedPubKey, addressing];
+}
+
+async function _getDRepKeyAndAddressing(
+  wallet: PublicDeriver<>,
+): Promise<[RustModule.WalletV4.PublicKey, Addressing]> {
+  return __pubKeyAndAddressingByChainAndIndex(
+    wallet,
+    ChainDerivations.GOVERNANCE_DREP_KEYS,
+    DREP_KEY_INDEX,
+  );
+}
+
+export async function connectorGetStakeKey(
+  wallet: PublicDeriver<>,
+  getAccountState: AccountStateRequest => Promise<AccountStateResponse>,
+): Promise<{| key: string, isRegistered: boolean |}> {
+  const stakeKey =
+    (await __pubKeyAndAddressingByChainAndIndex(
+      wallet,
+      ChainDerivations.CHIMERIC_ACCOUNT,
+      STAKING_KEY_INDEX,
+    ))[0];
+  const withStakingKey = asGetStakingKey(wallet);
+  if (withStakingKey == null) {
+    throw new Error('Unable to get the stake key')
+  }
+  const stakingKeyResp = await withStakingKey.getStakingKey();
+  const accountState = await getAccountState(
+    {
+      addresses: [stakingKeyResp.addr.Hash],
+      network: wallet.getParent().getNetworkInfo(),
+    }
+  );
+  const stakeKeyHex = stakeKey.to_hex();
+  return {
+    // $FlowFixMe
+    key: stakeKeyHex,
+    isRegistered: accountState[stakeKeyHex]?.stakeRegistered ?? false,
+  };
+}
+
 export async function connectorGetCardanoRewardAddresses(
   wallet: PublicDeriver<>,
 ): Promise<Address[]> {
@@ -492,6 +593,109 @@ function getTxRequiredSigningKeys(
     }
   }
   return set;
+}
+
+function getCip95RequiredSignKeys(
+  txBody: RustModule.WalletV4.TransactionBody,
+): Set<string> {
+  const result: Set<string> = new Set();
+
+  const certs = txBody.certs();
+  if (certs) {
+    for (let i = 0; i < certs.len(); i++) {
+      const cert = certs.get(i);
+      if (!cert) {
+        throw new Error('unexpectedly missing certificate');
+      }
+      const stakeDeregistration = cert.as_stake_deregistration();
+      if (stakeDeregistration) {
+        const keyHash = stakeDeregistration.stake_credential().to_keyhash();
+        if (keyHash) {
+          result.add(keyHash.to_hex());
+        }
+        continue;
+      }
+      const stakeDelegation = cert.as_stake_delegation();
+      if (stakeDelegation) {
+        const keyHash = stakeDelegation.stake_credential().to_keyhash();
+        if (keyHash) {
+          result.add(keyHash.to_hex());
+        }
+        continue;
+      }
+      const voteDelegation = cert.as_vote_delegation();
+      if (voteDelegation) {
+        const keyHash = voteDelegation.stake_credential().to_keyhash();
+        if (keyHash) {
+          result.add(keyHash.to_hex());
+        }
+        continue;
+      }
+      const stakeVoteDelegation = cert.as_stake_and_vote_delegation();
+      if (stakeVoteDelegation) {
+        const keyHash = stakeVoteDelegation.stake_credential().to_keyhash();
+        if (keyHash) {
+          result.add(keyHash.to_hex());
+        }
+        continue;
+      }
+      const stakeRegDelegation = cert.as_stake_registration_and_delegation();
+      if (stakeRegDelegation) {
+        const keyHash = stakeRegDelegation.stake_credential().to_keyhash();
+        if (keyHash) {
+          result.add(keyHash.to_hex());
+        }
+        continue;
+      }
+      const voteRegDelegation = cert.as_vote_registration_and_delegation();
+      if (voteRegDelegation) {
+        const keyHash = voteRegDelegation.stake_credential().to_keyhash();
+        if (keyHash) {
+          result.add(keyHash.to_hex());
+        }
+        continue;
+      }
+      const stakeRegVoteDeletion = cert.as_stake_vote_registration_and_delegation();
+      if (stakeRegVoteDeletion) {
+        const keyHash = stakeRegVoteDeletion.stake_credential().to_keyhash();
+        if (keyHash) {
+          result.add(keyHash.to_hex());
+        }
+        continue;
+      }
+      const unregDrep = cert.as_drep_deregistration();
+      if (unregDrep) {
+        const keyHash = unregDrep.voting_credential().to_keyhash();
+        if (keyHash) {
+          result.add(keyHash.to_hex());
+        }
+        continue;
+      }
+      const updateDrep = cert.as_drep_update();
+      if (updateDrep) {
+        const keyHash = updateDrep.voting_credential().to_keyhash();
+        if (keyHash) {
+          result.add(keyHash.to_hex());
+        }
+        continue;
+      }
+    }
+  }
+
+  const voters = txBody.voting_procedures()?.get_voters();
+  if (voters) {
+    for (let i = 0; i < voters.len(); i++) {
+      const voter = voters.get(i);
+      if (!voter) {
+        throw new Error('unexpectedly missing voter');
+      }
+      const keyHash = voter.to_drep_cred()?.to_keyhash();
+      if (keyHash) {
+        result.add(keyHash.to_hex());
+      }
+    }
+  }
+  return result;
 }
 
 /**
@@ -563,9 +767,11 @@ async function __connectorSignCardanoTx(
 
   const requiredTxSignKeys = getTxRequiredSigningKeys(txBody);
   const requiredScriptSignKeys = getScriptRequiredSigningKeys(witnessSet, RustModule);
+  const requiredCip95SignKeys = getCip95RequiredSignKeys(txBody);
   const totalAdditionalRequiredSignKeys = new Set<string>([
     ...requiredTxSignKeys,
     ...requiredScriptSignKeys,
+    ...requiredCip95SignKeys,
   ]);
 
   console.log('totalAdditionalRequiredSignKeys', [...totalAdditionalRequiredSignKeys]);
@@ -640,6 +846,15 @@ async function __connectorSignCardanoTx(
       if (totalAdditionalRequiredSignKeys.has(address.slice(2))) {
         otherRequiredSigners.push({ address, addressing });
       }
+    }
+    const [ drepKey, addressing ] = await _getDRepKeyAndAddressing(publicDeriver);
+    const drepCred = drepKey.hash().to_hex();
+    if (totalAdditionalRequiredSignKeys.has(drepCred)) {
+      const address = RustModule.WalletV4.RewardAddress.new(
+        0, // strictly speaking should use `ChainNetworkId` but doesn't matter
+        RustModule.WalletV4.Credential.from_keyhash(drepKey.hash()),
+      ).to_address().to_hex();
+      otherRequiredSigners.push({ address, ...addressing });
     }
     console.log('otherRequiredSigners', [...otherRequiredSigners]);
   }
