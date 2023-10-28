@@ -1,38 +1,4 @@
 .component {
-  ul {
-    margin-top: 16px;
-    margin-bottom: 16px;
-
-    li::before {
-      content: '               '; // Hair Space (U+200A)
-      margin-right: 0.4em;
-      font-size: 0.8em;
-      background-size: contain;
-      background-repeat: no-repeat;
-      width: 16px;
-      height: 16px;
-    }
-
-    li.yes::before {
-      background-image: url(../../../assets/images/yes.inline.svg);
-    }
-    li.no::before {
-      background-image: url(../../../assets/images/no.inline.svg);
-    }
-
-    li {
-      font-weight: 400;
-      display: list-item;
-      line-height: 1.38;
-      font-size: 14px;
-      color: #383e54;
-
-      & + li {
-        margin-top: 8px;
-      }
-    }
-  }
-
   .centeredBox {
     margin: 0 auto;
     width: max-content;

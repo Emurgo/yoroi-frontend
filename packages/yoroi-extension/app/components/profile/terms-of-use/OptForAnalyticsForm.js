@@ -7,12 +7,12 @@ import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './OptForAnalyticsForm.scss';
 import { LoadingButton } from '@mui/lab';
-import Switch from '@mui/material/Switch';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { ReactComponent as AnalyticsIllustration } from '../../../assets/images/analytics-illustration.inline.svg';
 import { ReactComponent as YesIcon } from '../../../assets/images/yes.inline.svg';
 import { ReactComponent as NoIcon } from '../../../assets/images/no.inline.svg';
 import { Box, Typography } from '@mui/material';
+import { RevampSwitch } from '../../widgets/Switch';
 
 const messages = defineMessages({
   title: {
@@ -104,7 +104,7 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
           )}
 
           {isSettingsScreen ? (
-            <div className={styles.share}>{intl.formatMessage(messages.share)}</div>
+            <Box my="24px">{intl.formatMessage(messages.share)}</Box>
           ) : (
             <div className={styles.illustration}>
               <AnalyticsIllustration />
@@ -140,7 +140,7 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
             sx={{
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
+              justifyContent: isStartupScreen ? 'center' : 'flex-start',
             }}
           >
             <a
@@ -153,14 +153,19 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
             </a>
           </Box>
 
-          {variant === 'settings' ? (
+          {isSettingsScreen ? (
             <FormControlLabel
               label={intl.formatMessage(messages.allow)}
               control={
-                <Switch checked={isOptedIn} onChange={event => this.onOpt(event.target.checked)} />
+                <Box ml="8px">
+                  <RevampSwitch
+                    checked={isOptedIn}
+                    onChange={event => this.onOpt(event.target.checked)}
+                  />
+                </Box>
               }
               labelPlacement="start"
-              sx={{ marginLeft: '0px', marginTop: '16px' }}
+              sx={{ marginLeft: '0px', marginTop: '40px' }}
             />
           ) : (
             <>
