@@ -47,12 +47,15 @@ export async function getDelegatedBalance(
   return {
     utxoPart,
     accountPart: request.rewardBalance,
+    delegation: request.delegation,
+    allRewards: request.allRewards,
+    stakeRegistered: request.stakeRegistered,
   };
 }
 
 export function addrContainsAccountKey(
   address: string,
-  targetAccountKey: RustModule.WalletV4.StakeCredential | string,
+  targetAccountKey: RustModule.WalletV4.Credential | string,
   acceptTypeMismatch: boolean,
 ): boolean {
   const wasmAddr = normalizeToAddress(address);
@@ -83,7 +86,7 @@ export function addrContainsAccountKey(
 }
 
 export function filterAddressesByStakingKey<T: { +address: string, ... }>(
-  stakingKey: RustModule.WalletV4.StakeCredential,
+  stakingKey: RustModule.WalletV4.Credential,
   utxos: $ReadOnlyArray<$ReadOnly<T>>,
   acceptTypeMismatch: boolean,
 ): $ReadOnlyArray<$ReadOnly<T>> {
@@ -290,7 +293,7 @@ export function createCertificate(
   isRegistered: boolean,
   poolRequest: void | string,
 ): Array<RustModule.WalletV4.Certificate> {
-  const credential = RustModule.WalletV4.StakeCredential.from_keyhash(
+  const credential = RustModule.WalletV4.Credential.from_keyhash(
     stakingKey.hash()
   );
 

@@ -342,7 +342,7 @@ function formatLedgerCertificates(
   addressingMap: string => (void | { +path: Array<number>, ... }),
 ): Array<Certificate> {
   const getPath = (
-    stakeCredential: RustModule.WalletV4.StakeCredential
+    stakeCredential: RustModule.WalletV4.Credential
   ): Array<number> => {
     const rewardAddr = RustModule.WalletV4.RewardAddress.new(
       networkId,
@@ -644,6 +644,7 @@ export function toLedgerSignRequest(
   ownStakeAddressMap: AddressMap,
   addressedUtxos: Array<CardanoAddressedUtxo>,
   rawTxBody: Buffer,
+  additionalRequiredSigners: Array<string> = [],
 ): SignTransactionRequest {
   const parsedCbor = cbor.decode(rawTxBody);
 
@@ -830,23 +831,37 @@ export function toLedgerSignRequest(
     );
   }
 
+  function getRequiredSignerHashHexes(): Array<string> {
+    const set = new Set<string>();
+    const requiredSigners = txBody.required_signers();
+    if (requiredSigners) {
+      for (let i = 0; i < requiredSigners.len(); i++) {
+        set.add(requiredSigners.get(i).to_hex());
+      }
+    }
+    return [...set];
+  }
+
   const additionalWitnessPaths = [];
   const formattedRequiredSigners = [];
-  const requiredSigners = txBody.required_signers();
-  if (requiredSigners) {
-    for (let i = 0; i < requiredSigners.len(); i++) {
-      const hash = requiredSigners.get(i);
-      const enterpriseAddress = RustModule.WalletV4.EnterpriseAddress.new(
+  RustModule.WasmScope(Module => {
+    function hashHexToOwnAddressPath(hashHex: string): ?Array<number> {
+      const hash = Module.WalletV4.Ed25519KeyHash.from_hex(hashHex);
+      const enterpriseAddress = Module.WalletV4.EnterpriseAddress.new(
         networkId,
-        RustModule.WalletV4.StakeCredential.from_keyhash(hash),
+        Module.WalletV4.Credential.from_keyhash(hash),
       ).to_address().to_hex();
-      const stakeAddress = RustModule.WalletV4.RewardAddress.new(
+      const stakeAddress = Module.WalletV4.RewardAddress.new(
         networkId,
-        RustModule.WalletV4.StakeCredential.from_keyhash(hash),
+        Module.WalletV4.Credential.from_keyhash(hash),
       ).to_address().to_hex();
-      const ownAddressPath = ownUtxoAddressMap[enterpriseAddress] ||
+      return ownUtxoAddressMap[enterpriseAddress] ||
         ownStakeAddressMap[stakeAddress];
-      if (ownAddressPath) {
+    }
+    const requiredSignerHashHexes = getRequiredSignerHashHexes();
+    for (const hashHex of requiredSignerHashHexes) {
+      const ownAddressPath = hashHexToOwnAddressPath(hashHex);
+      if (ownAddressPath != null) {
         formattedRequiredSigners.push({
           type: TxRequiredSignerType.PATH,
           path: ownAddressPath,
@@ -855,11 +870,17 @@ export function toLedgerSignRequest(
       } else {
         formattedRequiredSigners.push({
           type: TxRequiredSignerType.HASH,
-          hashHex: hash.to_hex(),
+          hashHex,
         });
       }
     }
-  }
+    for (const additionalHashHex of (additionalRequiredSigners || [])) {
+      const ownAddressPath = hashHexToOwnAddressPath(additionalHashHex);
+      if (ownAddressPath != null) {
+        additionalWitnessPaths.push(ownAddressPath);
+      }
+    }
+  });
 
   function addressingMap(addr: string): void | {| +path: Array<number> |} {
     const path = ownUtxoAddressMap[addr] || ownStakeAddressMap[addr];
@@ -950,7 +971,7 @@ export function toLedgerSignRequest(
         })) ?? null,
       scriptDataHashHex: txBody.script_data_hash()?.to_hex() ??  null,
       collateralInputs: formattedCollateral,
-      requiredSigners: requiredSigners ? formattedRequiredSigners : null,
+      requiredSigners: formattedRequiredSigners.length > 0 ? formattedRequiredSigners : null,
       includeNetworkId: txBody.network_id() != null,
       collateralOutput: formattedCollateralReturn,
       totalCollateral: txBody.total_collateral()?.to_str() ?? null,

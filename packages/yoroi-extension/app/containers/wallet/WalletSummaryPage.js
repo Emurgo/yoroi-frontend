@@ -41,7 +41,6 @@ import type { DelegationRequests } from '../../stores/toplevel/DelegationStore';
 import type { PublicDeriverSettingsCache } from '../../stores/toplevel/WalletSettingsStore';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
-import type { GetTransactionsRequestOptions } from '../../api/common/index';
 import type { UnconfirmedAmount } from '../../types/unconfirmedAmountType';
 import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
 import { genAddressLookup } from '../../stores/stateless/addressStores';
@@ -82,14 +81,14 @@ class WalletSummaryPage extends Component<AllProps> {
     const { wallets } = this.generated.stores;
     const {
       hasAny,
-      totalAvailable,
+      hasMoreToLoad,
       recent,
-      searchOptions,
-      recentTransactionsRequest,
+      isLoadingMore,
       lastSyncInfo,
       unconfirmedAmount,
       isExporting,
       exportError,
+      isLoading,
     } = this.generated.stores.transactions;
     const publicDeriver = wallets.selected;
     let walletTransactions = null;
@@ -100,9 +99,6 @@ class WalletSummaryPage extends Component<AllProps> {
     }
 
     const { exportTransactionsToFile, closeExportTransactionDialog } = actions.transactions;
-
-    const isLoadingTx =
-      !recentTransactionsRequest.wasExecuted || recentTransactionsRequest.isExecuting;
 
     const walletId = this.generated.stores.memos.getIdForWallet(publicDeriver);
 
@@ -129,26 +125,17 @@ class WalletSummaryPage extends Component<AllProps> {
       this.notificationElementId
     );
 
-    if (searchOptions) {
-      const { limit } = searchOptions;
-      const noTransactionsFoundLabel = intl.formatMessage(globalMessages.noTransactionsFound);
-
+    if (recent.length > 0) {
       const mapWalletTransactionLayout = {
         CLASSIC: WalletTransactionsList,
         REVAMP: WalletTransactionsListRevamp,
       };
-      const mapWalletNoTransactionsLayout = {
-        CLASSIC: WalletNoTransactions,
-        REVAMP: WalletNoTransactionsRevamp,
-      };
       const WalletTransactionsListComp = mapWalletTransactionLayout[this.props.selectedLayout];
-      const WalletNoTransactionsComp = mapWalletNoTransactionsLayout[this.props.selectedLayout];
 
-      if (!recentTransactionsRequest.wasExecuted || hasAny) {
+      if (isLoading || hasAny) {
         const {
           assuranceMode,
         } = this.generated.stores.walletSettings.getPublicDeriverSettingsCache(publicDeriver);
-
         walletTransactions = (
           <WalletTransactionsListComp
             transactions={recent}
@@ -162,8 +149,8 @@ class WalletSummaryPage extends Component<AllProps> {
                 throw new Error('No explorer for wallet network');
               })()
             }
-            isLoadingTransactions={isLoadingTx}
-            hasMoreToLoad={totalAvailable > limit}
+            isLoadingTransactions={isLoadingMore}
+            hasMoreToLoad={hasMoreToLoad}
             onLoadMore={() => actions.transactions.loadMoreTransactions.trigger(publicDeriver)}
             assuranceMode={assuranceMode}
             shouldHideBalance={profile.shouldHideBalance}
@@ -202,14 +189,20 @@ class WalletSummaryPage extends Component<AllProps> {
             complexityLevel={this.generated.stores.profile.selectedComplexityLevel}
           />
         );
-      } else {
-        walletTransactions = (
-          <WalletNoTransactionsComp
-            label={noTransactionsFoundLabel}
-            classicTheme={profile.isClassicTheme}
-          />
-        );
       }
+    } else {
+      const mapWalletNoTransactionsLayout = {
+        CLASSIC: WalletNoTransactions,
+        REVAMP: WalletNoTransactionsRevamp,
+      };
+      const WalletNoTransactionsComp = mapWalletNoTransactionsLayout[this.props.selectedLayout];
+      const noTransactionsFoundLabel = intl.formatMessage(globalMessages.noTransactionsFound);
+      walletTransactions = (
+        <WalletNoTransactionsComp
+          label={noTransactionsFoundLabel}
+          classicTheme={profile.isClassicTheme}
+        />
+      );
     }
 
     const notification = this._getThisPageActiveNotification();
@@ -259,7 +252,6 @@ class WalletSummaryPage extends Component<AllProps> {
           )}
         </NotificationMessage>
         <WalletSummary
-          numberOfTransactions={totalAvailable}
           pendingAmount={unconfirmedAmount}
           shouldHideBalance={profile.shouldHideBalance}
           isLoadingTransactions={
@@ -267,7 +259,7 @@ class WalletSummaryPage extends Component<AllProps> {
              * only use first load
              * to avoid wallet summary disappearing when wallet tx list is updating
              */
-            !recentTransactionsRequest.wasExecuted
+            isLoading
           }
           openExportTxToFileDialog={this.openExportTransactionDialog}
           unitOfAccountSetting={profile.unitOfAccount}
@@ -363,7 +355,7 @@ class WalletSummaryPage extends Component<AllProps> {
             />
           )}
         </NotificationMessage>
-        {!recentTransactionsRequest.wasExecuted || hasAny ? null : (
+        {isLoading || hasAny ? null : (
           <WalletEmptyBanner
             goToReceivePage={() => {
               this.generated.actions.router.goToRoute.trigger({
@@ -376,7 +368,6 @@ class WalletSummaryPage extends Component<AllProps> {
           />
         )}
         <WalletSummaryRevamp
-          numberOfTransactions={totalAvailable}
           pendingAmount={unconfirmedAmount}
           shouldHideBalance={profile.shouldHideBalance}
           isLoadingTransactions={
@@ -384,7 +375,7 @@ class WalletSummaryPage extends Component<AllProps> {
              * only use first load
              * to avoid wallet summary disappearing when wallet tx list is updating
              */
-            !recentTransactionsRequest.wasExecuted
+            isLoading
           }
           openExportTxToFileDialog={this.openExportTransactionDialog}
           unitOfAccountSetting={profile.unitOfAccount}
@@ -627,13 +618,10 @@ class WalletSummaryPage extends Component<AllProps> {
         toggleIncludeTxIds: void => void,
         lastSyncInfo: IGetLastSyncInfoResponse,
         recent: Array<WalletTransaction>,
-        recentTransactionsRequest: {|
-          isExecuting: boolean,
-          wasExecuted: boolean,
-        |},
-        searchOptions: ?GetTransactionsRequestOptions,
-        totalAvailable: number,
+        isLoadingMore: boolean,
+        hasMoreToLoad: boolean,
         unconfirmedAmount: UnconfirmedAmount,
+        isLoading: boolean,
       |},
       uiDialogs: {|
         getParam: <T>(number | string) => T,
@@ -698,19 +686,16 @@ class WalletSummaryPage extends Component<AllProps> {
         },
         transactions: {
           hasAny: stores.transactions.hasAny,
-          totalAvailable: stores.transactions.totalAvailable,
+          hasMoreToLoad: stores.transactions.hasMoreToLoad,
           recent: stores.transactions.recent,
-          searchOptions: stores.transactions.searchOptions,
-          recentTransactionsRequest: {
-            isExecuting: stores.transactions.recentTransactionsRequest.isExecuting,
-            wasExecuted: stores.transactions.recentTransactionsRequest.wasExecuted,
-          },
+          isLoadingMore: stores.transactions.isLoadingMore,
           lastSyncInfo: stores.transactions.lastSyncInfo,
           unconfirmedAmount: stores.transactions.unconfirmedAmount,
           isExporting: stores.transactions.isExporting,
           exportError: stores.transactions.exportError,
           shouldIncludeTxIds: stores.transactions.shouldIncludeTxIds,
           toggleIncludeTxIds: stores.transactions.toggleIncludeTxIds,
+          isLoading: stores.transactions.isLoading,
         },
         addresses: {
           addressSubgroupMap: stores.addresses.addressSubgroupMap,

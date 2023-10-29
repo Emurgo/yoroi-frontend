@@ -15,6 +15,8 @@ import type {
   HistoryFunc,
   BestBlockFunc,
   UtxoData,
+  GetTransactionsByHashesFunc,
+  GetRecentTransactionHashesFunc,
 } from '../../app/api/ada/lib/state-fetch/types';
 import { ShelleyCertificateTypes } from '../../app/api/ada/lib/state-fetch/types';
 import type { FilterFunc } from '../../app/api/common/lib/state-fetch/currencySpecificTypes';
@@ -32,6 +34,8 @@ import {
   getMangledAddressString,
   toRemoteByronTx,
   MockUtxoApi,
+  genGetTransactionsByHashes,
+  genGetRecentTransactionHashes,
 } from '../../app/api/ada/lib/state-fetch/mockNetwork';
 import { networks } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
 import {
@@ -2182,6 +2186,12 @@ const utxoForAddresses: AddressUtxoFunc = genUtxoForAddresses(
   networks.CardanoMainnet
 );
 const utxoSumForAddresses: UtxoSumFunc = genUtxoSumForAddresses(utxoForAddresses);
+
+const getTransactionsByHashes: GetTransactionsByHashesFunc =
+  genGetTransactionsByHashes(transactions);
+const getRecentTransactionHashes: GetRecentTransactionHashesFunc =
+  genGetRecentTransactionHashes(transactions);
+
 const sendTx = (request: SignedRequestInternal): SignedResponse => {
   logger.info(`mockCardanoImporter: Send TX\n${JSON.stringify(request)}`);
   const remoteTx = toRemoteByronTx(transactions, request);
@@ -2243,6 +2253,8 @@ const getAccountState: AccountStateFunc = async request => {
         remainingAmount: totalRewards.minus(totalWithdrawals).toString(),
         rewards: totalRewards.toString(),
         withdrawals: totalWithdrawals.toString(),
+        delegation: 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207',
+        stakeRegistered: true,
       },
     ],
     [
@@ -2253,6 +2265,8 @@ const getAccountState: AccountStateFunc = async request => {
         remainingAmount: totalRewards.minus(totalWithdrawals).toString(),
         rewards: totalRewards.toString(),
         withdrawals: totalWithdrawals.toString(),
+        delegation: 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207',
+        stakeRegistered: true,
       },
     ],
     [
@@ -2263,6 +2277,8 @@ const getAccountState: AccountStateFunc = async request => {
         remainingAmount: totalRewards.minus(totalWithdrawals).toString(),
         rewards: totalRewards.toString(),
         withdrawals: totalWithdrawals.toString(),
+        delegation: 'c34a7f59c556633dc88ec25c9743c5ebca3705e179a54db5638941cb',
+        stakeRegistered: true,
       },
     ],
     [
@@ -2273,6 +2289,8 @@ const getAccountState: AccountStateFunc = async request => {
         remainingAmount: totalRewards.minus(totalWithdrawals).toString(),
         rewards: totalRewards.toString(),
         withdrawals: totalWithdrawals.toString(),
+        delegation: 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207',
+        stakeRegistered: true,
       },
     ],
   ]);
@@ -2345,4 +2363,6 @@ export default {
   getAccountState,
   getUtxoData,
   mockUtxoApi,
+  getRecentTransactionHashes,
+  getTransactionsByHashes,
 };

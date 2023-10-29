@@ -1,5 +1,5 @@
-// @flow
-
+// fixme broken flow
+// eslint-disable-next-line flowtype/require-valid-file-annotation
 import type { Node } from 'react';
 
 import { boolean, select } from '@storybook/addon-knobs';
@@ -36,7 +36,7 @@ import { buildRoute } from '../../utils/routing';
 import { InvalidWitnessError } from '../../api/common/errors';
 import WalletSendConfirmationDialog from '../../components/wallet/send/WalletSendConfirmationDialog';
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
-import { defaultAssets, isJormungandr, isErgo } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { defaultAssets, isErgo } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { mockFromDefaults, getDefaultEntryTokenInfo, mockDefaultToken } from '../../stores/toplevel/TokenInfoStore';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import BigNumber from 'bignumber.js';
@@ -498,7 +498,6 @@ export const LedgerConfirmationDialog = (): Node => {
     ledgerErrorCases,
     ledgerErrorCases.None
   );
-  const network = wallet.publicDeriver.getParent().getNetworkInfo();
 
   const defaultToken = mockDefaultToken(
     wallet.publicDeriver.getParent().getNetworkInfo().NetworkId,
@@ -509,7 +508,7 @@ export const LedgerConfirmationDialog = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
-    !isJormungandr(network) && (<WalletSendPage
+    <WalletSendPage
       generated={genBaseProps({
         wallet,
         balance: new MultiToken([], defaultToken),
@@ -545,7 +544,7 @@ export const LedgerConfirmationDialog = (): Node => {
           }
         }
       })}
-    />)
+    />
   );
 };
 
@@ -562,7 +561,6 @@ export const TrezorConfirmationDialog = (): Node => {
     trezorErrorCases,
     trezorErrorCases.None
   );
-  const network = wallet.publicDeriver.getParent().getNetworkInfo();
 
   const defaultToken = mockDefaultToken(
     wallet.publicDeriver.getParent().getNetworkInfo().NetworkId,
@@ -573,7 +571,7 @@ export const TrezorConfirmationDialog = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
-    !isJormungandr(network) && (<WalletSendPage
+    <WalletSendPage
       generated={genBaseProps({
         wallet,
         balance: new MultiToken([], defaultToken),
@@ -609,6 +607,6 @@ export const TrezorConfirmationDialog = (): Node => {
           }
         }
       })}
-    />)
+    />
   );
 };

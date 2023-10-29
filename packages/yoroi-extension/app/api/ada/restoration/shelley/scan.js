@@ -54,7 +54,7 @@ export async function addShelleyChimericAccountAddress(
 |}> {
   const accountAddr = RustModule.WalletV4.RewardAddress.new(
     chainNetworkId,
-    RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.hash()),
+    RustModule.WalletV4.Credential.from_keyhash(stakingKey.hash()),
   );
   await addByHash({
     ...insertRequest,
@@ -80,7 +80,7 @@ export async function addShelleyUtxoAddress(
 |}> {
   const wasmEnterpriseAddr = RustModule.WalletV4.EnterpriseAddress.new(
     networkId,
-    RustModule.WalletV4.StakeCredential.from_keyhash(keyHash)
+    RustModule.WalletV4.Credential.from_keyhash(keyHash)
   );
   if (wasmEnterpriseAddr == null) {
     throw new Error(`${nameof(addShelleyUtxoAddress)} address is not an enterprise address`);
@@ -88,7 +88,7 @@ export async function addShelleyUtxoAddress(
   const baseAddr = RustModule.WalletV4.BaseAddress.new(
     networkId,
     wasmEnterpriseAddr.payment_cred(),
-    RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.hash())
+    RustModule.WalletV4.Credential.from_keyhash(stakingKey.hash())
   );
   await addByHash({
     ...insertRequest,
@@ -137,7 +137,7 @@ async function scanChain(request: {|
    */
 
   return addresses
-    .map((address, i) => {
+    .map(({ address, isUsed }, i) => {
       return {
         index: i + request.lastUsedIndex + 1,
         insert: async insertRequest => {
@@ -149,6 +149,8 @@ async function scanChain(request: {|
             Number.parseInt(config.ChainNetworkId, 10),
           );
         },
+        isUsed,
+        address,
       };
     });
 }

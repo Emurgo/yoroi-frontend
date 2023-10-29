@@ -1,5 +1,5 @@
-// @flow
-
+// fixme broken flow
+// eslint-disable-next-line flowtype/require-valid-file-annotation
 import { select, } from '@storybook/addon-knobs';
 import type { Node } from 'react';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
@@ -7,7 +7,6 @@ import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import { action } from '@storybook/addon-actions';
 import { withScreenshot } from 'storycap';
 import type { GeneratedData as YoroiTransferPageData } from './YoroiTransferPage';
-import type { GeneratedData as DaedalusTransferPageData } from './DaedalusTransferPage';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import WalletSettingsStore from '../../stores/toplevel/WalletSettingsStore';
 import TransactionsStore from '../../stores/toplevel/TransactionsStore';
@@ -15,8 +14,6 @@ import DelegationStore from '../../stores/toplevel/DelegationStore';
 import WalletStore from '../../stores/toplevel/WalletStore';
 import type { GeneratedData } from './Transfer';
 import Transfer from './Transfer';
-import { ComplexityLevels } from '../../types/complexityLevelType';
-import { DisclaimerStatus } from './options/ShelleyEraOptionDialogContainer';
 import { mockFromDefaults, getDefaultEntryTokenInfo, } from '../../stores/toplevel/TokenInfoStore';
 import { defaultAssets, } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
@@ -30,9 +27,9 @@ export const mockTransferProps: {
   selected: null | PublicDeriver<>,
   dialog?: any,
   YoroiTransferPageProps?: YoroiTransferPageData,
-  DaedalusTransferPageProps?: DaedalusTransferPageData,
+  DaedalusTransferPageProps?: void,
   publicDerivers: Array<PublicDeriver<>>,
-  shelleyRewardDisclaimer?: void | $Values<typeof DisclaimerStatus>,
+  shelleyRewardDisclaimer?: void,
   getConceptualWalletSettingsCache:
     typeof WalletSettingsStore.prototype.getConceptualWalletSettingsCache,
   getPublicKeyCache:
@@ -159,90 +156,10 @@ export const mockTransferProps: {
             startTransferFunds: { trigger: action('startTransferFunds') },
           },
         },
-        ByronEraOptionDialogContainerProps: {
-          generated: {
-            stores: {
-              profile: {
-                selectedComplexityLevel: select(
-                  'complexityLevel',
-                  ComplexityLevels,
-                  ComplexityLevels.Advanced
-                ),
-              },
-            },
-            actions: {
-              daedalusTransfer: {
-                startTransferFunds: { trigger: action('startTransferFunds') },
-                startTransferPaperFunds: { trigger: action('startTransferPaperFunds') },
-                startTransferMasterKey: { trigger: action('startTransferMasterKey') },
-              },
-              yoroiTransfer: {
-                startTransferFunds: { trigger: action('startTransferFunds') },
-              },
-            },
-          },
-        },
-        ShelleyEraOptionDialogContainerProps: {
-          generated: {
-            stores: {
-              wallets: {
-                selected: request.selected,
-              },
-              uiDialogs: {
-                getActiveData: (key) => ({
-                  disclaimer: request.shelleyRewardDisclaimer,
-                  continuation: () => {},
-                }[key]),
-              },
-            },
-            actions: {
-              ada: {
-                delegationTransaction: {
-                  setShouldDeregister: {
-                    trigger: action('setShouldDeregister'),
-                  },
-                },
-              },
-              yoroiTransfer: {
-                startTransferFunds: { trigger: action('startTransferFunds') },
-              },
-              dialogs: {
-                updateDataForActiveDialog: { trigger: action('updateDataForActiveDialog') },
-              },
-            },
-            DeregisterDialogContainerProps: {
-              generated: {
-                stores: {
-                  profile: {
-                    selectedComplexityLevel: select(
-                      'complexityLevel',
-                      ComplexityLevels,
-                      ComplexityLevels.Advanced
-                    ),
-                  },
-                },
-                actions: {
-                  ada: {
-                    delegationTransaction: {
-                      setShouldDeregister: {
-                        trigger: action('setShouldDeregister'),
-                      },
-                    },
-                  },
-                  dialogs: {
-                    closeActiveDialog: { trigger: action('closeActiveDialog') },
-                  },
-                },
-              },
-            },
-          },
-        },
         YoroiTransferPageProps: request.YoroiTransferPageProps
           ? { generated: request.YoroiTransferPageProps }
           : null,
-        DaedalusTransferPageProps: request.DaedalusTransferPageProps
-          ? { generated: request.DaedalusTransferPageProps }
-          : null,
+        DaedalusTransferPageProps: null,
       },
     },
     BannerContainerProps: {

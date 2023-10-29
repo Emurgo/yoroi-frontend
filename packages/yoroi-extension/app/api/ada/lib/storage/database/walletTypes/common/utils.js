@@ -24,6 +24,8 @@ export type TreeInsert<T={ KeyDerivationId: number, ... }> = Array<{|
   index: number,
   insert: InsertRequest => Promise<T>,
   children?: TreeInsert<any>,
+  address?: string,
+  isUsed?: boolean,
 |}>;
 
 export type TreeResultStart<Row> = {|

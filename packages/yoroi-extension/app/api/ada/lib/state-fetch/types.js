@@ -46,7 +46,7 @@ export type HistoryRequest = {|
   addresses: Array<string>,
   after?: {|
     block: string,
-    tx: string,
+    tx?: string,
   |},
   untilBlock: string,
 |};
@@ -287,6 +287,8 @@ export type RemoteAccountState = {|
   remainingAmount: string, // current remaining awards
   rewards: string, // all the rewards every added
   withdrawals: string, // all the withdrawals that have ever happened
+  delegation: string | null, // hex pool ID the stake key currently delegates to
+  stakeRegistered: boolean,
 |};
 export type AccountStateResponse = {|
   [key: string]: null | RemoteAccountState,
@@ -420,3 +422,54 @@ export type UtxoData = {|
 export type GetUtxoDataResponse = Array<UtxoData | null>;
 
 export type GetUtxoDataFunc = (body: GetUtxoDataRequest) => Promise<GetUtxoDataResponse>;
+
+// getLastBlockBySlot
+
+type EpochNo = number;
+type SlotNo = number;
+type RelativeSlot = [EpochNo, SlotNo];
+export type GetLatestBlockBySlotReq = {|
+  ...BackendNetworkInfo,
+  slots: Array<RelativeSlot>,
+|};
+export type GetLatestBlockBySlotRes = {|
+  blockHashes: {|
+    [key: RelativeSlot]: string | null,
+  |}
+|}
+export type GetLatestBlockBySlotFunc =
+  (body: GetLatestBlockBySlotReq) => Promise<GetLatestBlockBySlotRes>
+
+export type GetRecentTransactionHashesRequest = {|
+  ...BackendNetworkInfo,
+  addresses: Array<string>,
+  before: {|
+    blockHash: string,
+    txHash?: ?string,
+  |},
+|};
+
+export type GetRecentTransactionHashesResponse = {|
+  [address: string]: Array<{|
+    txHash: string,
+    blockHash: string,
+    txBlockIndex: number,
+    epoch: number,
+    slot: number,
+  |}>
+|};
+
+export type GetRecentTransactionHashesFunc = (
+  body: GetRecentTransactionHashesRequest
+) => Promise<GetRecentTransactionHashesResponse>;
+
+export type GetTransactionsByHashesRequest = {|
+  ...BackendNetworkInfo,
+  txHashes: Array<string>,
+|};
+
+export type GetTransactionsByHashesResponse = Array<RemoteTransaction>;
+
+export type GetTransactionsByHashesFunc = (
+  body: GetTransactionsByHashesRequest
+) => Promise<GetTransactionsByHashesResponse>;

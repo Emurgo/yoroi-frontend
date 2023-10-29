@@ -55,18 +55,6 @@ class Wallet extends Component<AllProps> {
   };
 
   componentDidMount() {
-    const { wallets } = this.generated.stores;
-    const publicDeriver = wallets.selected;
-    const publicDerivers = wallets.publicDerivers;
-    const isRevamp = this.generated.stores.profile.isRevampTheme;
-
-    if (publicDeriver == null && isRevamp && publicDerivers.length !== 0) {
-      const lastSelectedWallet = wallets.getLastSelectedWallet();
-      this.generated.actions.wallets.setActiveWallet.trigger({
-        wallet: lastSelectedWallet ?? publicDerivers[0],
-      });
-    }
-
     // reroute to the default path for the wallet
     const newRoute = this.checkRoute();
     if (newRoute != null) {
@@ -80,13 +68,17 @@ class Wallet extends Component<AllProps> {
     const isRevamp = this.generated.stores.profile.isRevampTheme;
     const categories = isRevamp ? allSubcategoriesRevamp : allCategories;
 
+    if (isRevamp && this.generated.stores.app.currentRoute.startsWith(ROUTES.TRANSFER.ROOT)) {
+      return ROUTES.WALLETS.TRANSACTIONS;
+    }
+
     // void -> this route is fine for this wallet type
     // string -> what you should be redirected to
     const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver == null) return;
 
-    const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result;
-    const walletHasAssets = !!spendableBalance?.nonDefaultEntries().length;
+    const spendableBalance = this.generated.stores.transactions.balance;
+    const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
 
     const activeCategory = categories.find(category =>
       this.generated.stores.app.currentRoute.startsWith(category.route)
@@ -139,8 +131,9 @@ class Wallet extends Component<AllProps> {
     if (selectedWallet == null) throw new Error(`${nameof(Wallet)} no public deriver`);
 
     const isFirstSync = stores.wallets.firstSyncWalletId === selectedWallet.getPublicDeriverId();
-    const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result;
-    const walletHasAssets = !!spendableBalance?.nonDefaultEntries().length;
+    const spendableBalance = this.generated.stores.transactions.balance;
+    const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
+
     const visibilityContext = { selected: selectedWallet, walletHasAssets };
 
     const menu = (
@@ -278,11 +271,7 @@ class Wallet extends Component<AllProps> {
         getLastSelectedWallet: void => ?PublicDeriver<>,
       |},
       router: {| location: any |},
-      transactions: {|
-        getBalanceRequest: {|
-          result: ?MultiToken,
-        |},
-      |},
+      transactions: {| balance: MultiToken | null |},
       profile: {|
         isRevampTheme: boolean,
         isClassicTheme: boolean,
@@ -315,17 +304,7 @@ class Wallet extends Component<AllProps> {
           location: stores.router.location,
         },
         transactions: {
-          getBalanceRequest: (() => {
-            if (stores.wallets.selected == null)
-              return {
-                result: undefined,
-              };
-            const { requests } = stores.transactions.getTxRequests(stores.wallets.selected);
-
-            return {
-              result: requests.getBalanceRequest.result,
-            };
-          })(),
+          balance: stores.transactions.balance,
         },
         profile: {
           isRevampTheme: stores.profile.isRevampTheme,

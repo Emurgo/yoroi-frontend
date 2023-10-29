@@ -14,7 +14,6 @@ import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
-import type { TxRequests } from '../../stores/toplevel/TransactionsStore';
 import type { Match, Location } from 'react-router-dom';
 import { withRouter } from 'react-router-dom';
 import { Box } from '@mui/system';
@@ -43,7 +42,7 @@ class NFTDetailPageRevamp extends Component<AllProps> {
     // Guard against potential null values
     if (!publicDeriver)
       throw new Error(`Active wallet requiTokenDetails for ${nameof(NFTDetailPageRevamp)}.`);
-    const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result;
+    const spendableBalance = this.generated.stores.transactions.balance;
     const getTokenInfo = genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo);
     const network = publicDeriver.getParent().getNetworkInfo();
 
@@ -75,7 +74,7 @@ class NFTDetailPageRevamp extends Component<AllProps> {
                   token.info.Metadata
                 ),
                 author: getAuthorFromTokenMetadata(policyId, fullName, token.info.Metadata),
-                // $FlowFixMe
+                // $FlowFixMe[prop-missing]
                 metadata: token.info.Metadata?.assetMintMetadata?.[0] || null,
               };
             });
@@ -113,12 +112,7 @@ class NFTDetailPageRevamp extends Component<AllProps> {
         tokenInfo: TokenInfoMap,
         getDefaultTokenInfo: number => $ReadOnly<TokenRow>,
       |},
-      transactions: {|
-        getBalanceRequest: {|
-          result: ?MultiToken,
-        |},
-        getTxRequests: (PublicDeriver<>) => TxRequests,
-      |},
+      transactions: {| balance: MultiToken | null |},
       wallets: {| selected: null | PublicDeriver<> |},
     |},
   |} {
@@ -139,18 +133,7 @@ class NFTDetailPageRevamp extends Component<AllProps> {
           getDefaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfo,
         },
         transactions: {
-          getBalanceRequest: (() => {
-            if (stores.wallets.selected == null)
-              return {
-                result: undefined,
-              };
-            const { requests } = stores.transactions.getTxRequests(stores.wallets.selected);
-
-            return {
-              result: requests.getBalanceRequest.result,
-            };
-          })(),
-          getTxRequests: stores.transactions.getTxRequests,
+          balance: stores.transactions.balance,
         },
       },
     });

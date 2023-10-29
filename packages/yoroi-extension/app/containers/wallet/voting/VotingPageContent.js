@@ -95,7 +95,7 @@ class VotingPageContent extends Component<Props> {
     if (delegationRequests == null) {
       throw new Error(`${nameof(this.isDelegated)} called for non-reward wallet`);
     }
-    const currentDelegation = delegationRequests.getCurrentDelegation;
+    const currentDelegation = delegationRequests.getDelegatedBalance;
 
     if (
       !currentDelegation.wasExecuted ||
@@ -104,10 +104,7 @@ class VotingPageContent extends Component<Props> {
     ) {
       return undefined;
     }
-    if (
-      !currentDelegation.result.currEpoch ||
-      currentDelegation.result.currEpoch.pools.length === 0
-    ) {
+    if (currentDelegation.result.delegation == null) {
       return false;
     }
     return true;
@@ -358,11 +355,10 @@ class VotingPageContent extends Component<Props> {
           hasAnyPending: false,
           balance: null,
         };
-      const txRequests = stores.transactions.getTxRequests(selected);
       return {
-        hasAnyPending: (txRequests.requests.pendingRequest.result ?? []).length > 0,
+        hasAnyPending: stores.transactions.hasAnyPending,
         // note: Catalyst balance depends on UTXO balance -- not on rewards
-        balance: txRequests.requests.getBalanceRequest.result,
+        balance: stores.transactions.balance,
       };
     })();
     return Object.freeze({

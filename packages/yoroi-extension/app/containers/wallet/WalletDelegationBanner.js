@@ -99,7 +99,7 @@ function WalletDelegationBanner({
         >
           <Box sx={{ display: 'flex' }}>
             <AvatarWrapper>
-              {avatar ? (
+              {avatar != null ? (
                 <AvatarImg src={avatar} alt={name} />
               ) : (
                 <AvatarImg src={avatarGenerated} alt={name} />

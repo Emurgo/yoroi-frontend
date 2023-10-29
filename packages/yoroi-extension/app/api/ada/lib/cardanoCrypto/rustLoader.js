@@ -18,7 +18,7 @@ const MAX_TX_BYTES = 16384;
 type RustModuleLoadFlags = 'dontLoadMessagesSigning';
 
 function isWasmPointer(o: ?any): boolean {
-  return o != null && (typeof o.ptr === 'number') && (typeof o.free === 'function');
+  return o != null && (typeof o.__wbg_ptr === 'number') && (typeof o.free === 'function');
 }
 
 /*
@@ -70,7 +70,7 @@ function createWasmScope(): {|
    * This way ANY wasm pointer produced within the callback will be automatically destroyed,
    * but only as long as it's created using the injected proxied module reference.
    */
-  const scope: Array<{ ptr: number, free: () => void, ... }> = [];
+  const scope: Array<{ __wbg_ptr: number, free: () => void, ... }> = [];
   function recursiveProxy<E>(originalObject: E): E {
     if (!isProxiable(originalObject)) {
       return originalObject;
@@ -136,13 +136,13 @@ function createWasmScope(): {|
     free: () => {
       scope.forEach(x => {
         // Checking just to avoid a null-pointer crash
-        if (x.ptr !== 0) {
+        if (x.__wbg_ptr !== 0) {
           x.free()
         }
       });
     },
     size: () => scope.length,
-    isFree: () => scope.every(x => x.ptr === 0),
+    isFree: () => scope.every(x => x.__wbg_ptr === 0),
   }
 }
 
@@ -152,6 +152,7 @@ class Module {
   _wasmv4: WasmV4;
   _ergo: SigmaRust;
   _messageSigning: WasmMessageSigning;
+  _crossCsl: any;
 
   async load(flags: Array<RustModuleLoadFlags> = []): Promise<void> {
     if (
@@ -159,6 +160,7 @@ class Module {
         || this._wasmv3 != null
         || this._wasmv4 != null
         || this._messageSigning != null
+        || this._crossCsl != null
     ) return;
     this._wasmv2 = await import('cardano-wallet-browser');
     // this is used only by the now defunct jormungandr wallet
@@ -170,6 +172,7 @@ class Module {
     } else {
       this._messageSigning = await import('@emurgo/cardano-message-signing-browser/cardano_message_signing');
     }
+    this._crossCsl = await import('@emurgo/cross-csl-browser');
   }
 
   __WasmScopeInternal<T>(callback: Module => T): {|
@@ -246,6 +249,9 @@ class Module {
   get WalletV4(): WasmV4 {
     return this._wasmv4;
   }
+  get CrossCsl(): any {
+    return this._crossCsl;
+  }
   WalletV4TxBuilderFromConfig(config: {
     +LinearFee: {|
       +coefficient: string,
@@ -315,6 +321,8 @@ class Module {
         .build()
     );
   }
+
+  // <TODO:PENDING_REMOVAL> Ergo
   // Need to expose through a getter to get Flow to detect the type correctly
   get SigmaRust(): SigmaRust {
     return this._ergo;

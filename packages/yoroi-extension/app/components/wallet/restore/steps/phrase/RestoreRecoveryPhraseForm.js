@@ -164,7 +164,6 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props, Sta
 
             return (
               <Stack
-                item
                 // use the form name key to know when we reset
                 key={form.name + '-word-' + idx}
               >
@@ -244,7 +243,7 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props, Sta
         <Fade in={isValidPhrase}>
           <Stack gap="10px" direction="row" mt="12px" alignItems="center">
             <VerifiedIcon />
-            <Typography variant="body1" fontWeight={500}>
+            <Typography variant="body1" fontWeight={500} id="validPhraseMessage">
               {intl.formatMessage(messages.verified)}
             </Typography>
           </Stack>

@@ -7,7 +7,6 @@ import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitive
 import type { ConceptualWalletSettingsCache } from '../../../stores/toplevel/WalletSettingsStore';
 import type { ConceptualWallet } from '../../../api/ada/lib/storage/models/ConceptualWallet';
 import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
-import type { TxRequests } from '../../../stores/toplevel/TransactionsStore';
 import type { PublicKeyCache } from '../../../stores/toplevel/WalletStore';
 import type { IGetPublic } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
@@ -20,11 +19,12 @@ import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
+import { ROUTES } from '../../../routes-config';
+import { MultiToken } from '../../../api/common/lib/MultiToken';
 import TopBarLayout from '../../../components/layout/TopBarLayout';
 import BannerContainer from '../../banners/BannerContainer';
 import SidebarContainer from '../../SidebarContainer';
 import LocalizableError from '../../../i18n/LocalizableError';
-import { ROUTES } from '../../../routes-config';
 
 export const RestoreWalletPagePromise: void => Promise<any> = () =>
   import('../../../components/wallet/restore/RestoreWalletPage');
@@ -97,7 +97,6 @@ export default class RestoreWalletPage extends Component<Props> {
         unitOfAccount: UnitOfAccountSettingType,
         shouldHideBalance: boolean,
       |},
-      transactions: {| getTxRequests: (PublicDeriver<>) => TxRequests |},
       tokenInfoStore: {| tokenInfo: TokenInfoMap |},
       uiDialogs: {| isOpen: any => boolean |},
       walletRestore: {|
@@ -112,6 +111,9 @@ export default class RestoreWalletPage extends Component<Props> {
       |},
       walletSettings: {|
         getConceptualWalletSettingsCache: ConceptualWallet => ConceptualWalletSettingsCache,
+      |},
+      transactions: {|
+        getBalance: (PublicDeriver<>) => MultiToken | null,
       |},
     |},
   |} {
@@ -137,7 +139,6 @@ export default class RestoreWalletPage extends Component<Props> {
         walletSettings: {
           getConceptualWalletSettingsCache: stores.walletSettings.getConceptualWalletSettingsCache,
         },
-        transactions: { getTxRequests: stores.transactions.getTxRequests },
         wallets: {
           restoreRequest: {
             isExecuting: stores.wallets.restoreRequest.isExecuting,
@@ -151,6 +152,9 @@ export default class RestoreWalletPage extends Component<Props> {
           isValidMnemonic: stores.walletRestore.isValidMnemonic,
           selectedAccount: stores.walletRestore.selectedAccount,
           mode: stores.walletRestore.mode,
+        },
+        transactions: {
+          getBalance: stores.transactions.getBalance,
         },
       },
       actions: {

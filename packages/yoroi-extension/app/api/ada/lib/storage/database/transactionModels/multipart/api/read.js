@@ -9,7 +9,7 @@ import type {
 } from '../../../primitives/tables';
 import { TransactionType } from '../../../primitives/tables';
 import { GetCertificates, AssociateToken } from '../../../primitives/api/read';
-import type { CardanoByronTxIO, CardanoShelleyTxIO, JormungandrTxIO, ErgoTxIO } from '../tables';
+import type { CardanoByronTxIO, CardanoShelleyTxIO, ErgoTxIO } from '../tables';
 
 import {
   AssociateTxWithAccountingIOs,
@@ -63,78 +63,6 @@ export class CardanoByronAssociateTxWithIOs {
       txType: TransactionType.CardanoByron,
       transaction,
       ...getOrThrow(utxo.get(transaction)),
-      tokens: tokens.map(token => ({
-        TokenList: token.TokenList,
-        Token: {
-          TokenId: token.Token.TokenId,
-          Identifier: token.Token.Identifier,
-          NetworkId: token.Token.NetworkId,
-        },
-      })),
-    }));
-    return fullTx;
-  }
-}
-
-export class JormungandrAssociateTxWithIOs {
-  static ownTables: {||} = Object.freeze({});
-  static depTables: {|
-    AssociateTxWithAccountingIOs: typeof AssociateTxWithAccountingIOs,
-    AssociateTxWithUtxoIOs: typeof AssociateTxWithUtxoIOs,
-    GetCertificates: typeof GetCertificates,
-    AssociateToken: typeof AssociateToken,
-  |} = Object.freeze({
-    AssociateTxWithAccountingIOs,
-    AssociateTxWithUtxoIOs,
-    GetCertificates,
-    AssociateToken,
-  });
-
-  static async getIOsForTx(
-    db: lf$Database,
-    tx: lf$Transaction,
-    request: {|
-      txs: $ReadOnlyArray<$ReadOnly<TransactionRow>>,
-      networkId: number,
-    |},
-  ): Promise<Array<JormungandrTxIO>> {
-    if (request.txs.length === 0) return [];
-
-    const { depTables } = JormungandrAssociateTxWithIOs;
-    const accounting = await depTables.AssociateTxWithAccountingIOs.getIOsForTx(
-      db, tx, { txs: request.txs }
-    );
-    const utxo = await depTables.AssociateTxWithUtxoIOs.getIOsForTx(
-      db, tx, { txs: request.txs }
-    );
-
-    const tokens = await depTables.AssociateToken.join(
-      db, tx,
-      {
-        listIds: request.txs.flatMap(transaction => {
-          const utxoEntries = getOrThrow(utxo.get(transaction));
-          const accountingEntries = getOrThrow(accounting.get(transaction));
-          return [
-            ...utxoEntries.utxoInputs.map(entry => entry.TokenListId),
-            ...utxoEntries.utxoOutputs.map(entry => entry.TokenListId),
-            ...accountingEntries.accountingInputs.map(entry => entry.TokenListId),
-            ...accountingEntries.accountingOutputs.map(entry => entry.TokenListId),
-          ];
-        }),
-        networkId: request.networkId,
-      }
-    );
-
-    const certsForTxs = await depTables.GetCertificates.forTransactions(
-      db, tx,
-      { txIds: request.txs.map(transaction => transaction.TransactionId) },
-    );
-    const fullTx = request.txs.map(transaction  => ({
-      txType: TransactionType.Jormungandr,
-      transaction,
-      certificates: certsForTxs.get(transaction.TransactionId) ?? [],
-      ...getOrThrow(utxo.get(transaction)),
-      ...getOrThrow(accounting.get(transaction)),
       tokens: tokens.map(token => ({
         TokenList: token.TokenList,
         Token: {

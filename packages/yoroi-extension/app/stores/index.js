@@ -14,15 +14,12 @@ import TransactionsStore from './toplevel/TransactionsStore';
 import AddressesStore from './toplevel/AddressesStore';
 import TimeStore from './toplevel/TimeStore';
 import WalletRestoreStore from './toplevel/WalletRestoreStore';
-import DaedalusTransferStore from './toplevel/DaedalusTransferStore';
 import YoroiTransferStore from './toplevel/YoroiTransferStore';
 import TransactionBuilderStore from './toplevel/TransactionBuilderStore';
 import DelegationStore from './toplevel/DelegationStore';
 import setupAdaStores from './ada/index';
 import setupErgoStores from './ergo/index';
-import setupJormungandrStores from './jormungandr/index';
 import type { AdaStoresMap } from './ada/index';
-import type { JormungandrStoresMap } from './jormungandr/index';
 import type { ErgoStoresMap } from './ergo/index';
 import { RouterStore } from 'mobx-react-router';
 import type { ActionsMap } from '../actions/index';
@@ -56,7 +53,6 @@ const storeClasses = Object.freeze({
   walletSettings: WalletSettingsStore,
   transactionBuilderStore: TransactionBuilderStore,
   delegation: DelegationStore,
-  daedalusTransfer: DaedalusTransferStore,
   yoroiTransfer: YoroiTransferStore,
   explorers: ExplorerStore,
   connector: ConnectorStore,
@@ -83,14 +79,12 @@ export type StoresMap = {|
   walletRestore: WalletRestoreStore,
   walletSettings: WalletSettingsStore,
   transactionBuilderStore: TransactionBuilderStore,
-  daedalusTransfer: DaedalusTransferStore,
   delegation: DelegationStore,
   yoroiTransfer: YoroiTransferStore,
   explorers: ExplorerStore,
   connector: ConnectorStore,
   substores: {|
     ada: AdaStoresMap,
-    jormungandr: JormungandrStoresMap,
     ergo: ErgoStoresMap,
   |},
   // $FlowFixMe[value-as-type]
@@ -176,14 +170,12 @@ export default (action(
      * But we only want to actually initialize it if it is the currency in use */
     stores.substores = {
       ada: setupAdaStores((stores: any), api, actions),
-      jormungandr: setupJormungandrStores((stores: any), api, actions),
       ergo: setupErgoStores((stores: any), api, actions),
     };
 
     const loadedStores: StoresMap = (stores: any);
     initializeSubstore<ErgoStoresMap>(loadedStores.substores[ApiOptions.ergo]);
     initializeSubstore<AdaStoresMap>(loadedStores.substores[ApiOptions.ada]);
-    initializeSubstore<JormungandrStoresMap>(loadedStores.substores[ApiOptions.jormungandr]);
 
     // Perform load after all setup is done to ensure migration can modify store state
     loadedStores.loading.load('extension');

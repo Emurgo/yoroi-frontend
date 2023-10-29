@@ -288,29 +288,6 @@ function _rawGenHashToIdsFunc(
           finalMapping,
           hash
         );
-      } else if (address.type === CoreAddressTypes.JORMUNGANDR_GROUP) {
-        // for group addresses we have to look at the payment key
-        // to see if there exists a canonical address
-        const wasmAddress = Scope.WalletV3.Address.from_bytes(
-          Buffer.from(address.data, 'hex')
-        );
-        const groupAddress = wasmAddress.to_group_address();
-        if (groupAddress == null) throw new Error(`${nameof(rawGenHashToIdsFunc)} Should never happen`);
-        const canonical = Scope.WalletV3.Address.single_from_public_key(
-          groupAddress.get_spending_key(),
-          wasmAddress.get_discrimination()
-        );
-        const hash = Buffer.from(canonical.as_bytes()).toString('hex');
-        await addFromCanonical(
-          request.db,
-          request.tx,
-          deps,
-          notFoundWithoutCanonical,
-          ownAddressIds,
-          address,
-          finalMapping,
-          hash
-        );
       } else {
         notFoundWithoutCanonical.push(address);
       }

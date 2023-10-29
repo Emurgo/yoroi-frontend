@@ -12,7 +12,6 @@ import AddressesActions from './common/addresses-actions';
 import TimeActions from './common/time-actions';
 import TransactionsActions from './common/transactions-actions';
 import WalletRestoreActions from './common/wallet-restore-actions';
-import DaedalusTransferActions from './common/daedalus-transfer-actions';
 import YoroiTransferActions from './common/yoroi-transfer-actions';
 import TxBuilderActions from './common/tx-builder-actions';
 import ExplorerActions from './common/explorer-actions';
@@ -20,10 +19,8 @@ import DelegationActions from './common/delegation-actions';
 import WalletSettingsActions from './common/wallet-settings-actions';
 import adaActionsMap from './ada/index';
 import ergoActionsMap from './ergo/index';
-import jormungandrActionsMap from './jormungandr/index';
 import type { AdaActionsMap } from './ada/index';
 import type { ErgoActionsMap } from './ergo/index';
-import type { JormungandrActionsMap } from './jormungandr/index';
 import  ConnectorActionsMap from '../connector/actions/connector-actions';
 import ServerConnectionActions from './server-connection-actions';
 
@@ -35,7 +32,6 @@ export type ActionsMap = {|
   profile: ProfileActions,
   dialogs: DialogsActions,
   notifications: NotificationsActions,
-  daedalusTransfer: DaedalusTransferActions,
   yoroiTransfer: YoroiTransferActions,
   memos: MemosActions,
   loading: LoadingActions,
@@ -49,7 +45,6 @@ export type ActionsMap = {|
   explorers: ExplorerActions,
   ada: AdaActionsMap,
   ergo: ErgoActionsMap,
-  jormungandr: JormungandrActionsMap,
   connector: ConnectorActionsMap,
   serverConnection: ServerConnectionActions,
 |};
@@ -62,7 +57,6 @@ const actionsMap: ActionsMap = Object.freeze({
   profile: new ProfileActions(),
   dialogs: new DialogsActions(),
   notifications: new NotificationsActions(),
-  daedalusTransfer: new DaedalusTransferActions(),
   yoroiTransfer: new YoroiTransferActions(),
   memos: new MemosActions(),
   loading: new LoadingActions(),
@@ -77,7 +71,6 @@ const actionsMap: ActionsMap = Object.freeze({
   connector: new ConnectorActionsMap(),
   ada: adaActionsMap,
   ergo: ergoActionsMap,
-  jormungandr: jormungandrActionsMap,
   serverConnection: new ServerConnectionActions(),
 });
 

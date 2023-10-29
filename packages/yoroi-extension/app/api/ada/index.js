@@ -69,7 +69,6 @@ import type {
   GetForeignAddressesRequest,
   GetForeignAddressesResponse,
   GetTransactionsRequestOptions,
-  GetTransactionsResponse,
   RefreshPendingTransactionsRequest,
   RefreshPendingTransactionsResponse,
   RemoveAllTransactionsRequest,
@@ -126,13 +125,14 @@ import type {
   AccountStateFunc,
   AddressUtxoFunc,
   BestBlockFunc,
-  HistoryFunc,
   MultiAssetMintMetadataFunc,
   SendFunc,
   SignedRequest,
   SignedResponse,
   TokenInfoFunc,
   RemoteUnspentOutput,
+  GetRecentTransactionHashesFunc,
+  GetTransactionsByHashesFunc,
 } from './lib/state-fetch/types';
 import type { FilterFunc, } from '../common/lib/state-fetch/currencySpecificTypes';
 import { getChainAddressesForDisplay, } from './lib/storage/models/utils';
@@ -171,6 +171,7 @@ import { GetDerivationSpecific, } from './lib/storage/database/walletTypes/commo
 import { bytesToHex, hexToBytes, hexToUtf } from '../../coreUtils';
 import type { PersistedSubmittedTransaction } from '../localStorage';
 import type { ForeignUtxoFetcher } from '../../connector/stores/ConnectorStore';
+import type WalletTransaction from '../../domain/WalletTransaction';
 
 // ADA specific Request / Response params
 
@@ -234,11 +235,13 @@ export type GetChainAddressesForDisplayFunc = (
 // refreshTransactions
 
 export type AdaGetTransactionsRequest = {|
-  getTransactionsHistoryForAddresses: HistoryFunc,
   checkAddressesInUse: FilterFunc,
   getBestBlock: BestBlockFunc,
   getTokenInfo: TokenInfoFunc,
   getMultiAssetMetadata: MultiAssetMintMetadataFunc,
+  afterTxs?: ?Array<WalletTransaction>,
+  getRecentTransactionHashes: GetRecentTransactionHashesFunc,
+  getTransactionsByHashes: GetTransactionsByHashesFunc,
 |};
 
 // notices
@@ -578,6 +581,8 @@ export type GetTransactionRowsToExportFunc = (
 
 export const DEFAULT_ADDRESSES_PER_PAPER = 1;
 
+export const FETCH_TXS_BATCH_SIZE = 20;
+
 export default class AdaApi {
 
   // noinspection JSMethodCanBeStatic
@@ -661,36 +666,63 @@ export default class AdaApi {
     }
   }
 
+  /*
+    3 scenarios when this function is invoked:
+    1. To load locally the initial txs: isLocalRequest === true, afterTxs == null;
+    2. To fetch the newest transactions from network: isLocalRequest === false, afterTxs == null,
+    3. To fetch transactions after some transactions from network:
+         isLocalRequest = false, afterTxs != null
+   */
   async refreshTransactions(
     request: {|
       ...BaseGetTransactionsRequest,
       ...AdaGetTransactionsRequest,
     |},
-  ): Promise<GetTransactionsResponse> {
+  ): Promise<Array<WalletTransaction>> {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.refreshTransactions)} called`);
-    const { skip = 0, limit } = request;
+
     try {
-      if (!request.isLocalRequest) {
-        await updateUtxos(
+      let fetchedTxs;
+      if (request.isLocalRequest) {
+        fetchedTxs = await getAllTransactions({
+          publicDeriver: request.publicDeriver,
+          skip: 0,
+          limit: FETCH_TXS_BATCH_SIZE,
+        });
+      } else {
+        if (!request.afterTxs) {
+          await updateUtxos(
+            request.publicDeriver.getDb(),
+            request.publicDeriver,
+            request.checkAddressesInUse,
+            request.getTokenInfo,
+            request.getMultiAssetMetadata,
+          );
+        }
+
+        let after;
+        if (request.afterTxs && request.afterTxs.length > 0) {
+          const lastTx = request.afterTxs[request.afterTxs.length - 1];
+          if (lastTx.block) {
+            after = {
+              blockHash: lastTx.block.Hash,
+              txHash: lastTx.txid,
+            };
+          }
+        }
+
+        fetchedTxs = await updateTransactions(
           request.publicDeriver.getDb(),
           request.publicDeriver,
           request.checkAddressesInUse,
-        );
-        await updateTransactions(
-          request.publicDeriver.getDb(),
-          request.publicDeriver,
-          request.checkAddressesInUse,
-          request.getTransactionsHistoryForAddresses,
+          request.getRecentTransactionHashes,
+          request.getTransactionsByHashes,
           request.getBestBlock,
           request.getTokenInfo,
-          request.getMultiAssetMetadata
+          request.getMultiAssetMetadata,
+          after,
         );
       }
-      const fetchedTxs = await getAllTransactions({
-        publicDeriver: request.publicDeriver,
-        skip,
-        limit,
-      },);
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.refreshTransactions)} success: ` + stringifyData(fetchedTxs));
 
       const mappedTransactions = fetchedTxs.txs.map(tx => {
@@ -712,10 +744,7 @@ export default class AdaApi {
         }
         throw new Error(`${nameof(this.refreshTransactions)} unknown tx type ${tx.type}`);
       });
-      return {
-        transactions: mappedTransactions,
-        total: mappedTransactions.length
-      };
+      return mappedTransactions;
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.refreshTransactions)} error: ` + stringifyError(error));
       if (error instanceof LocalizableError) throw error;
@@ -1009,17 +1038,6 @@ export default class AdaApi {
         request.network
       ).reduce((acc, next) => Object.assign(acc, next), {});
 
-      const protocolParams = {
-        keyDeposit: RustModule.WalletV4.BigNum.from_str(config.KeyDeposit),
-        linearFee: RustModule.WalletV4.LinearFee.new(
-          RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
-          RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
-        ),
-        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord),
-        poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
-        networkId: request.network.NetworkId,
-      };
-
       let unsignedTxResponse;
       const trxMetadata =
         request.metadata !== undefined ? createMetadata(request.metadata): undefined;
@@ -1033,7 +1051,16 @@ export default class AdaApi {
           receiver,
           request.utxos,
           request.absSlotNumber,
-          protocolParams,
+          {
+            keyDeposit: RustModule.WalletV4.BigNum.from_str(config.KeyDeposit),
+            linearFee: RustModule.WalletV4.LinearFee.new(
+              RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
+              RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
+            ),
+            coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord),
+            poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
+            networkId: request.network.NetworkId,
+          },
           trxMetadata,
         );
       } else {
@@ -1067,14 +1094,14 @@ export default class AdaApi {
         if (otherAddresses.length > 1) {
           throw new Error(`${nameof(this.createUnsignedTxForUtxos)} can't send to more than one address`);
         }
-        unsignedTxResponse = shelleyNewAdaUnsignedTx(
+        unsignedTxResponse = await shelleyNewAdaUnsignedTx(
           otherAddresses.length === 1
             ? [{
               address: otherAddresses[0].address,
               amount: builtSendTokenList(
                 request.defaultToken,
                 request.tokens,
-                request.utxos.map(utxo => multiTokenFromRemote(utxo, protocolParams.networkId)),
+                request.utxos.map(utxo => multiTokenFromRemote(utxo, request.network.NetworkId)),
               ),
             }]
             : [],
@@ -1084,7 +1111,14 @@ export default class AdaApi {
           },
           request.utxos,
           request.absSlotNumber,
-          protocolParams,
+          {
+            keyDeposit: config.KeyDeposit,
+            linearFeeCoefficient: config.LinearFee.coefficient,
+            linearFeeConstant: config.LinearFee.constant,
+            coinsPerUtxoWord: config.CoinsPerUtxoWord,
+            poolDeposit: config.PoolDeposit,
+            networkId: request.network.NetworkId,
+          },
           [],
           [],
           false,
@@ -1248,14 +1282,12 @@ export default class AdaApi {
     ).reduce((acc, next) => Object.assign(acc, next), {});
 
     const protocolParams = {
-      keyDeposit: RustModule.WalletV4.BigNum.from_str(config.KeyDeposit),
-      linearFee: RustModule.WalletV4.LinearFee.new(
-        RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
-        RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
-      ),
-      coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord),
-      poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
-      networkId: network.NetworkId,
+      keyDeposit: config.KeyDeposit,
+      linearFeeCoefficient: config.LinearFee.coefficient,
+      linearFeeConstant: config.LinearFee.constant,
+      coinsPerUtxoWord: config.CoinsPerUtxoWord,
+      poolDeposit: config.PoolDeposit,
+      networkId: request.publicDeriver.getParent().networkInfo.NetworkId,
     };
 
     const defaultToken = request.publicDeriver.getParent().getDefaultToken();
@@ -1384,7 +1416,7 @@ export default class AdaApi {
           const minAmount = Scope.WalletV4.min_ada_required(
             cardanoValueFromMultiToken(amount),
             dataHash != null,
-            protocolParams.coinsPerUtxoWord,
+            RustModule.WalletV4.BigNum.from_str(protocolParams.coinsPerUtxoWord),
           );
 
           if ((new BigNumber(minAmount.to_str())).gt(new BigNumber(target.value ?? '0'))) {
@@ -1421,7 +1453,7 @@ export default class AdaApi {
       nativeScripts,
     };
 
-    const unsignedTxResponse = shelleyNewAdaUnsignedTxForConnector(
+    const unsignedTxResponse = await shelleyNewAdaUnsignedTxForConnector(
       outputs,
       mint,
       auxiliaryData,
@@ -1464,14 +1496,12 @@ export default class AdaApi {
       ).reduce((acc, next) => Object.assign(acc, next), {});
 
       const protocolParams = {
-        keyDeposit: RustModule.WalletV4.BigNum.from_str(config.KeyDeposit),
-        linearFee: RustModule.WalletV4.LinearFee.new(
-          RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
-          RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
-        ),
-        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord),
-        poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
-        networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+        keyDeposit: config.KeyDeposit,
+        linearFeeCoefficient: config.LinearFee.coefficient,
+        linearFeeConstant: config.LinearFee.constant,
+        coinsPerUtxoWord: config.CoinsPerUtxoWord,
+        poolDeposit: config.PoolDeposit,
+        networkId: request.publicDeriver.getParent().networkInfo.NetworkId,
       };
 
       const publicKeyDbRow = await request.publicDeriver.getPublicKey();
@@ -1503,7 +1533,7 @@ export default class AdaApi {
       if (changeAddr == null) {
         throw new Error(`${nameof(this.createDelegationTx)} no internal addresses left. Should never happen`);
       }
-      const unsignedTx = shelleyNewAdaUnsignedTx(
+      const unsignedTx = await shelleyNewAdaUnsignedTx(
         [],
         {
           address: changeAddr.addr.Hash,
@@ -1518,7 +1548,7 @@ export default class AdaApi {
       );
 
       const allUtxosForKey = filterAddressesByStakingKey<ElementOf<IGetAllUtxosResponse>>(
-        RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.hash()),
+        RustModule.WalletV4.Credential.from_keyhash(stakingKey.hash()),
         allUtxo,
         false,
       );
@@ -1548,7 +1578,7 @@ export default class AdaApi {
 
       const stakeCredentialHex = RustModule.WasmScope(Scope => {
         return Buffer.from(
-            Scope.WalletV4.StakeCredential
+            Scope.WalletV4.Credential
               .from_keyhash(stakingKey.hash())
               .to_bytes()
           ).toString('hex')
@@ -1591,14 +1621,12 @@ export default class AdaApi {
       ).reduce((acc, next) => Object.assign(acc, next), {});
 
       const protocolParams = {
-        keyDeposit: RustModule.WalletV4.BigNum.from_str(config.KeyDeposit),
-        linearFee: RustModule.WalletV4.LinearFee.new(
-          RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
-          RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
-        ),
-        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord),
-        poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
-        networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+        keyDeposit: config.KeyDeposit,
+        linearFeeCoefficient: config.LinearFee.coefficient,
+        linearFeeConstant: config.LinearFee.constant,
+        coinsPerUtxoWord: config.CoinsPerUtxoWord,
+        poolDeposit: config.PoolDeposit,
+        networkId: request.publicDeriver.getParent().networkInfo.NetworkId,
       };
 
       const utxos = await request.publicDeriver.getAllUtxos();
@@ -1685,7 +1713,7 @@ export default class AdaApi {
       if (finalWithdrawals.length === 0 && certificates.length === 0) {
         throw new RewardAddressEmptyError();
       }
-      const unsignedTxResponse = shelleyNewAdaUnsignedTx(
+      const unsignedTxResponse = await shelleyNewAdaUnsignedTx(
         [],
         {
           address: changeAddr.addr.Hash,
@@ -1754,14 +1782,12 @@ export default class AdaApi {
       ).reduce((acc, next) => Object.assign(acc, next), {});
 
       const protocolParams = {
-        keyDeposit: RustModule.WalletV4.BigNum.from_str(config.KeyDeposit),
-        linearFee: RustModule.WalletV4.LinearFee.new(
-          RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
-          RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
-        ),
-        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord),
-        poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
-        networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+        keyDeposit: config.KeyDeposit,
+        linearFeeCoefficient: config.LinearFee.coefficient,
+        linearFeeConstant: config.LinearFee.constant,
+        coinsPerUtxoWord: config.CoinsPerUtxoWord,
+        poolDeposit: config.PoolDeposit,
+        networkId: request.publicDeriver.getParent().networkInfo.NetworkId,
       };
 
       const allUtxo = await request.publicDeriver.getAllUtxos();
@@ -1789,7 +1815,7 @@ export default class AdaApi {
         trxMetadata = request.normalWallet.metadata;
       }
 
-      const unsignedTx = shelleyNewAdaUnsignedTx(
+      const unsignedTx = await shelleyNewAdaUnsignedTx(
         [],
         {
           address: changeAddr.addr.Hash,
@@ -2140,8 +2166,8 @@ export default class AdaApi {
       const chainNetworkId = Number.parseInt(config.ChainNetworkId, 10);
       const receiveAddress = RustModule.WalletV4.BaseAddress.new(
         chainNetworkId,
-        RustModule.WalletV4.StakeCredential.from_keyhash(firstInternalPayment),
-        RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey),
+        RustModule.WalletV4.Credential.from_keyhash(firstInternalPayment),
+        RustModule.WalletV4.Credential.from_keyhash(stakingKey),
       );
 
       const addresses = [
@@ -2545,7 +2571,7 @@ function getDifferenceAfterTx(
 ): MultiToken {
 
   const accountKeyString = RustModule.WasmScope(Scope => {
-    const stakeCredential = Scope.WalletV4.StakeCredential.from_keyhash(stakingKey.hash());
+    const stakeCredential = Scope.WalletV4.Credential.from_keyhash(stakingKey.hash());
     return Buffer.from(stakeCredential.to_bytes()).toString('hex')
   })
 
