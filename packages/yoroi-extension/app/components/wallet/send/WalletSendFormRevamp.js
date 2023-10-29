@@ -538,12 +538,12 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
       case SEND_FORM_STEP.RECEIVER:
         return (
           <div className={styles.receiverStep}>
-            <Box pt='10px'>
+            <Box pt="10px">
               <TextField
                 className="send_form_receiver"
                 {...receiverField.bind()}
                 error={receiverField.error}
-                helperText=' '
+                helperText=" "
                 onFocus={() => {
                   this.setReceiverFieldStatus(true);
                 }}
@@ -677,6 +677,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   decimalPlaces={this.getNumDecimals()}
                   disabled={shouldSendAll}
                   error={amountInputError}
+                  helperText=""
                   currency={truncateToken(getTokenName(this.props.defaultToken))}
                   fees={formatValue(transactionFee.getDefaultEntry())}
                   total={formatValue(totalAmount.getDefaultEntry())}
@@ -701,11 +702,11 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 {!isErgo(this.props.selectedNetwork) && (
                   <Button
                     variant="tertiary"
-                    size="small"
                     color="secondary"
+                    size="small"
                     sx={{
                       '&.MuiButton-sizeSmall': {
-                        padding: '4px 8px',
+                        lineHeight: '17px',
                       },
                     }}
                     disabled={maxSendableAmount.isExecuting}
@@ -797,7 +798,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             <IncludedTokens
               tokens={tokens}
               nfts={nfts}
-              onRemoveTokens={(tokensRemove) => {
+              onRemoveTokens={tokensRemove => {
                 const assetCount = totalAmount.nonDefaultEntries().length - 1;
                 this.props.onRemoveTokens(tokensRemove);
                 ampli.sendSelectAssetUpdated({
