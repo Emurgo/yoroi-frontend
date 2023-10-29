@@ -804,9 +804,6 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 ampli.sendSelectAssetUpdated({
                   asset_count: assetCount,
                 });
-                ampli.sendSummaryPageViewed({
-                  asset_count: assetCount,
-                });
               }}
               shouldSendAll={shouldSendAll}
             />
@@ -952,6 +949,9 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
           throw new Error('expect totalInput');
         }
         ampli.sendSelectAssetSelected({
+          asset_count: totalInput.nonDefaultEntries().length,
+        });
+        ampli.sendSummaryPageViewed({
           asset_count: totalInput.nonDefaultEntries().length,
         });
       }
