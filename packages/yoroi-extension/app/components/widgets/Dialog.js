@@ -140,7 +140,7 @@ const ModalContainer = styled(Box)(({ theme }) => ({
   '& .dialog__title': {
     flex: 1,
     marginBottom: theme.name === 'classic' ? '22px' : '0px',
-    padding: theme.name === 'classic' ? '0' : '24px',
+    padding: theme.name === 'classic' ? '0' : '0px 24px 24px',
     fontWeight: 500,
     textAlign: 'center',
     textTransform: 'uppercase',
