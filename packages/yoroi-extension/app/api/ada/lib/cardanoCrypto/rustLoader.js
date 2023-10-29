@@ -321,6 +321,8 @@ class Module {
         .build()
     );
   }
+
+  // <TODO:PENDING_REMOVAL> Ergo
   // Need to expose through a getter to get Flow to detect the type correctly
   get SigmaRust(): SigmaRust {
     return this._ergo;
