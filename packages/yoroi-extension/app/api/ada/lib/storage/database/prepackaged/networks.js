@@ -267,6 +267,7 @@ export function isCardanoHaskell(
   ) return true;
   return false;
 }
+// <TODO:PENDING_REMOVAL> Ergo
 export function isErgo(
   network: $ReadOnly<NetworkRow>,
 ): boolean {
@@ -284,6 +285,7 @@ export function getCardanoHaskellBaseConfig(
   return (network.BaseConfig: any); // cast to return type
 }
 
+// <TODO:PENDING_REMOVAL> Ergo
 export function getErgoBaseConfig(
   network: $ReadOnly<NetworkRow>,
 ): ErgoBaseConfig {
@@ -318,6 +320,7 @@ export const defaultAssets: Array<
         }
       }];
     }
+    // <TODO:PENDING_REMOVAL> Ergo
     if (isErgo(network)) {
       return [{
         NetworkId: network.NetworkId,
