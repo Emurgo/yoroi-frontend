@@ -268,6 +268,7 @@ const defaultChangeWalletPasswordDialogContainerProps: void => * = _request => (
     },
     profile: {
       isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+      isRevampTheme: globalKnobs.currentTheme() === THEMES.YOROI_REVAMP,
     },
     uiDialogs: {
       getActiveData: key =>

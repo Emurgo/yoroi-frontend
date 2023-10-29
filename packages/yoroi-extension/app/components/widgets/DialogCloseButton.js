@@ -1,6 +1,6 @@
 // @flow
 import { Component } from 'react';
-import type { Node } from 'react';
+import type { ComponentType, Node } from 'react';
 import { observer } from 'mobx-react';
 
 import { ReactComponent as CloseCross } from '../../assets/images/cross-dark.inline.svg';
@@ -12,6 +12,7 @@ import type { InjectedLayoutProps } from '../../styles/context/layout';
 type Props = {|
   +onClose?: void => PossiblyAsync<void>,
   +icon?: ?string,
+  +isRevampLayout?: boolean,
 |};
 
 @observer
