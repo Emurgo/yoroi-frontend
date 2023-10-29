@@ -116,7 +116,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     const delegationRequests = this.stores.delegation.getDelegationRequests(
       request.publicDeriver
     );
-    const adaDelegationRequests = this.stores.delegation.getDelegationRequests(
+    const adaDelegationRequests = this.stores.substores.ada.delegation.getDelegationRequests(
       request.publicDeriver
     );
     if (delegationRequests == null || adaDelegationRequests == null) {
