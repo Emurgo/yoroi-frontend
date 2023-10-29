@@ -15,6 +15,7 @@ const RevampTextField = {
   styleOverrides: {
     // $FlowFixMe
     root: ({ theme }) => ({
+      margin: '8px 0px',
       '.MuiFormHelperText-root': {
         fontSize: '0.75rem',
         '&.Mui-error': {
