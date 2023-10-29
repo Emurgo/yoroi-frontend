@@ -6,7 +6,7 @@ import { Switch } from '@mui/material';
 const height = 24;
 const width = 44;
 
-export const RevampSwitch = styled((props: SwitchProps) => (
+export const RevampSwitch: any = styled((props: any) => (
   <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />
 ))(({ theme }) => ({
   width,

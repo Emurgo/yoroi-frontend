@@ -81,4 +81,4 @@ class IntroBanner extends Component<Props & InjectedLayoutProps> {
   }
 }
 
-export default (withLayout(IntroBanner): ComponentType<IntroBanner>);
+export default (withLayout(IntroBanner): ComponentType<Props>);
