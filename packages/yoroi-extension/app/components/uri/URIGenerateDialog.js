@@ -8,7 +8,6 @@ import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import NumericInputRP from '../common/NumericInputRP';
 import globalMessages from '../../i18n/global-messages';
@@ -24,6 +23,7 @@ import { getTokenName } from '../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
 
 import styles from './URIGenerateDialog.scss';
+import ThemedDialog from '../widgets/ThemedDialog';
 
 const messages = defineMessages({
   uriGenerateDialogTitle: {
@@ -59,70 +59,70 @@ type Props = {|
 
 @observer
 export default class URIGenerateDialog extends Component<Props> {
-
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
-  getAmountLabel: (() => string) = (): string => {
+  getAmountLabel: () => string = (): string => {
     const label = this.context.intl.formatMessage(messages.uriGenerateDialogAmountLabel, {
       currency: truncateToken(getTokenName(this.props.tokenInfo)),
     });
 
     return label;
-  }
+  };
 
   // FORM VALIDATION
-  form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
-    fields: {
-      receiver: {
-        label: this.context.intl.formatMessage(messages.uriGenerateDialogAddressLabel),
-        value: this.props.walletAddress,
+  form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
+    {
+      fields: {
+        receiver: {
+          label: this.context.intl.formatMessage(messages.uriGenerateDialogAddressLabel),
+          value: this.props.walletAddress,
+        },
+        amount: {
+          label: truncateToken(this.getAmountLabel()),
+          placeholder: `0.${'0'.repeat(this.props.tokenInfo.Metadata.numberOfDecimals)}`,
+          value: null,
+          validators: [
+            async ({ field }) => {
+              const amountValue: string = field.value;
+              if (amountValue === '') {
+                return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
+              }
+              const formattedAmount = new BigNumber(
+                formattedAmountToNaturalUnits(
+                  amountValue,
+                  this.props.tokenInfo.Metadata.numberOfDecimals
+                )
+              );
+              return await this.props.validateAmount(formattedAmount, this.props.tokenInfo);
+            },
+          ],
+        },
       },
-      amount: {
-        label: truncateToken(this.getAmountLabel()),
-        placeholder: `0.${'0'.repeat(this.props.tokenInfo.Metadata.numberOfDecimals)}`,
-        value: null,
-        validators: [async ({ field }) => {
-          const amountValue: string = field.value;
-          if (amountValue === '') {
-            return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
-          }
-          const formattedAmount = new BigNumber(formattedAmountToNaturalUnits(
-            amountValue,
-            this.props.tokenInfo.Metadata.numberOfDecimals
-          ));
-          return await this.props.validateAmount(formattedAmount, this.props.tokenInfo);
-        }],
+    },
+    {
+      options: {
+        showErrorsOnInit: false,
+        validateOnBlur: false,
+        validateOnChange: true,
+        validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
       },
-    },
-  }, {
-    options: {
-      showErrorsOnInit: false,
-      validateOnBlur: false,
-      validateOnChange: true,
-      validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
-    },
-    plugins: {
-      vjf: vjf()
-    },
-  });
+      plugins: {
+        vjf: vjf(),
+      },
+    }
+  );
 
   componentDidMount(): void {
     const amountField = this.form.$('amount');
-    amountField.set(
-      'value',
-      this.props.amount != null ? this.props.amount.toString() : ''
-    );
+    amountField.set('value', this.props.amount != null ? this.props.amount.toString() : '');
   }
 
   render(): Node {
     const { onClose, onGenerate } = this.props;
 
-    const dialogClasses = classnames([
-      styles.component,
-      'URIGenerateDialog',
-    ]);
+    const dialogClasses = classnames([styles.component, 'URIGenerateDialog']);
 
     const { form } = this;
     const { intl } = this.context;
@@ -132,7 +132,7 @@ export default class URIGenerateDialog extends Component<Props> {
     const amountFieldProps = amountField.bind();
 
     return (
-      <Dialog
+      <ThemedDialog
         title={intl.formatMessage(messages.uriGenerateDialogTitle)}
         className={dialogClasses}
         closeOnOverlayClick={false}
@@ -141,17 +141,7 @@ export default class URIGenerateDialog extends Component<Props> {
       >
         <div>
           <div className={styles.receiverInput}>
-            <TextField
-              sx={{
-                '& .MuiInputBase-input': {
-                  fontFamily: 'RobotoMono',
-                  fontWeight: 300,
-                },
-              }}
-              className="receiver"
-              {...receiverField.bind()}
-              disabled
-            />
+            <TextField className="receiver" {...receiverField.bind()} disabled />
           </div>
           <div className={styles.amountField}>
             <NumericInputRP
@@ -180,7 +170,7 @@ export default class URIGenerateDialog extends Component<Props> {
             {this.context.intl.formatMessage(messages.uriGenerateDialogConfirmLabel)}
           </Button>
         </div>
-      </Dialog>
+      </ThemedDialog>
     );
   }
 }
