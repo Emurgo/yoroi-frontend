@@ -2,7 +2,7 @@
 
 import { Component } from 'react';
 import type { Node } from 'react';
-import Dialog from '../../../components/widgets/Dialog';
+import DialogRevamp from '../../../components/widgets/DialogRevamp';
 import { defineMessages, intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
 import { ReactComponent as NewThemeIllustration } from '../../../assets/images/new-theme-illustration.inline.svg';
@@ -76,7 +76,7 @@ export class RevampAnnouncementDialog extends Component<Props> {
       },
     ];
     return (
-      <Dialog
+      <DialogRevamp
         title={intl.formatMessage(messages.title)}
         className={styles.dialog}
         onClose={onClose}
@@ -145,7 +145,7 @@ export class RevampAnnouncementDialog extends Component<Props> {
             </Box>
           </Stack>
         </Box>
-      </Dialog>
+      </DialogRevamp>
     );
   }
 }

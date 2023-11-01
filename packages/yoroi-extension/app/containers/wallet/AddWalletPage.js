@@ -284,7 +284,12 @@ class AddWalletPage extends Component<AllProps> {
     const addWalletPageRevamp = (
       <TopBarLayout
         banner={<BannerContainer {...this.generated.BannerContainerProps} />}
-        sidebar={<SidebarContainer {...this.generated.SidebarContainerProps} />}
+        sidebar={
+          <SidebarContainer
+            {...this.generated.SidebarContainerProps}
+            onLogoClick={() => goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS })}
+          />
+        }
       >
         <AddWalletPageRevamp
           onHardwareConnect={() => this.openDialogWrapper(WalletConnectHWOptionDialog)}

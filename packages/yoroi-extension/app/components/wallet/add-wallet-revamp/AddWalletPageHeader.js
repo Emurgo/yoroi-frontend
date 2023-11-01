@@ -11,10 +11,6 @@ import globalMessages from '../../../i18n/global-messages';
 import { ReactComponent as BackIcon } from '../../../assets/images/assets-page/backarrow.inline.svg';
 
 const messages: * = defineMessages({
-  subtitle: {
-    id: 'wallet.add.page.revamp.subtitle',
-    defaultMessage: '!!!Light wallet for Cardano assets',
-  },
   backButtonLabel: {
     id: 'wallet.add.page.revamp.backButtonLabel',
     defaultMessage: '!!!Back to current wallet',
@@ -69,7 +65,7 @@ export default class AddWalletPageHeader extends Component<Props> {
             {intl.formatMessage(globalMessages.yoroi)}
           </Typography>
           <Typography variant="body1" fontWeight={500} color="primary.600">
-            {intl.formatMessage(messages.subtitle)}
+            {intl.formatMessage(globalMessages.yoroiIntro)}
           </Typography>
         </Box>
       </Box>
