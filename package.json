@@ -6,7 +6,7 @@
     "flow": "lerna run flow --stream",
     "test": "lerna run test --stream",
     "translations:purge": "lerna run translations:purge -- stream",
-    "dev:all": "concurrently \"npm run dev:stable --prefix  packages/yoroi-extension\" \"npm run cardano --prefix packages/yoroi-connector\" \"npm run ergo --prefix packages/yoroi-connector\" "
+    "dev:all": "concurrently \"npm run dev:stable --prefix  packages/yoroi-extension\" \"npm run cardano --prefix packages/yoroi-connector\" "
   },
   "husky": {
     "hooks": {
