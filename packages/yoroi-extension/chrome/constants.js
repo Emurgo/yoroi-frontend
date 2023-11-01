@@ -44,6 +44,5 @@ export function genCSP(request: {|
 
 export const injectedScripts = [
   'cardanoApiInject.js',
-  'ergoApiInject.js',
   'initialInject.js',
 ];
