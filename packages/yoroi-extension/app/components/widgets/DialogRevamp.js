@@ -68,9 +68,6 @@ function DialogFn(props: Props): Node {
                 action.primary === true ? 'primary' : 'secondary',
               ]);
 
-              console.log({
-                ...getBtnVariant(action.danger, action.primary, isRevampLayout),
-              });
               return (
                 <LoadingButton
                   id={action.primary === true ? 'primaryButton' : 'secondaryButton'}

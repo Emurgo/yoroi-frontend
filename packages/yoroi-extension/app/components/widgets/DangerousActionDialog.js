@@ -13,7 +13,7 @@ import styles from './DangerousActionDialog.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { withLayout } from '../../styles/context/layout';
 import type { InjectedLayoutProps } from '../../styles/context/layout';
-import { Box } from '@mui/material';
+import { Box, FormControlLabel, Checkbox as MuiCheckbox } from '@mui/material';
 
 type Props = {|
   +title: string,
@@ -43,7 +43,7 @@ class DangerousActionDialog extends Component<Props & InjectedLayoutProps> {
 
   render(): Node {
     const { intl } = this.context;
-    const { isSubmitting, error, isRevampLayout } = this.props;
+    const { isSubmitting, error, renderLayoutComponent } = this.props;
 
     const dialogClasses = classnames(['removeWalletDialog', styles.dialog]);
 
@@ -70,6 +70,52 @@ class DangerousActionDialog extends Component<Props & InjectedLayoutProps> {
       },
     ];
 
+    const classicLayout = (
+      <div>
+        {this.props.children}
+        <div className={styles.checkbox}>
+          <CheckboxLabel
+            label={this.props.checkboxAcknowledge}
+            onChange={this.props.toggleCheck}
+            checked={this.props.isSubmitting || this.props.isChecked}
+          />
+        </div>
+
+        {error ? <p className={styles.error}>{intl.formatMessage(error, error.values)}</p> : null}
+      </div>
+    );
+
+    const revampLayout = (
+      <Box maxWidth="600px" minHeight="145px">
+        {this.props.children}
+        <Box>
+          <FormControlLabel
+            label={this.props.checkboxAcknowledge}
+            control={
+              <MuiCheckbox
+                onChange={this.props.toggleCheck}
+                checked={this.props.isSubmitting || this.props.isChecked}
+                sx={{
+                  marginRight: '8px',
+                  width: '16px',
+                  height: '16px',
+                }}
+              />
+            }
+            sx={{
+              marginLeft: '-0px',
+            }}
+          />
+        </Box>
+        {error ? <p className={styles.error}>{intl.formatMessage(error, error.values)}</p> : null}
+      </Box>
+    );
+
+    const content = renderLayoutComponent({
+      CLASSIC: classicLayout,
+      REVAMP: revampLayout,
+    });
+
     return (
       <ThemedDialog
         title={this.props.title}
@@ -79,18 +125,7 @@ class DangerousActionDialog extends Component<Props & InjectedLayoutProps> {
         className={dialogClasses}
         closeButton={<DialogCloseButton onClose={this.props.onCancel} />}
       >
-        <Box maxWidth={isRevampLayout ? '600px' : 'unset'}>
-          {this.props.children}
-          <div className={styles.checkbox}>
-            <CheckboxLabel
-              label={this.props.checkboxAcknowledge}
-              onChange={this.props.toggleCheck}
-              checked={this.props.isSubmitting || this.props.isChecked}
-            />
-          </div>
-
-          {error ? <p className={styles.error}>{intl.formatMessage(error, error.values)}</p> : null}
-        </Box>
+        {content}
       </ThemedDialog>
     );
   }
