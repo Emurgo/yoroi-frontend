@@ -67,6 +67,10 @@ function DialogFn(props: Props): Node {
                 action.className != null ? action.className : null,
                 action.primary === true ? 'primary' : 'secondary',
               ]);
+
+              console.log({
+                ...getBtnVariant(action.danger, action.primary, isRevampLayout),
+              });
               return (
                 <LoadingButton
                   id={action.primary === true ? 'primaryButton' : 'secondaryButton'}
@@ -156,7 +160,7 @@ function getBtnVariant(
   variant: 'contained' | 'outlined' | 'danger' | 'primary' | 'secondary',
   color?: 'primary' | 'secondary' | 'error',
 |} {
-  if (danger && isRevampLayout) return { variant: 'contained', color: 'error' };
+  if (danger && isRevampLayout) return { variant: 'destructive' };
 
   if (isRevampLayout && primary) {
     return { variant: 'primary' };
@@ -166,7 +170,7 @@ function getBtnVariant(
     return { variant: 'secondary' };
   }
 
-  if (danger === true) return { variant: 'danger' };
+  if (danger === true) return { variant: 'primary' };
   if (primary === true) return { variant: 'primary' };
   return { variant: 'secondary' };
 }

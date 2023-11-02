@@ -1,16 +1,19 @@
 // @flow
 import { Component } from 'react';
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { intlShape } from 'react-intl';
 import DialogCloseButton from './DialogCloseButton';
-import Dialog from './Dialog';
+import ThemedDialog from './ThemedDialog';
 import globalMessages from '../../i18n/global-messages';
 import LocalizableError from '../../i18n/LocalizableError';
 import CheckboxLabel from '../common/CheckboxLabel';
 import styles from './DangerousActionDialog.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { withLayout } from '../../styles/context/layout';
+import type { InjectedLayoutProps } from '../../styles/context/layout';
+import { Box } from '@mui/material';
 
 type Props = {|
   +title: string,
@@ -33,14 +36,14 @@ type Props = {|
 |};
 
 @observer
-export default class DangerousActionDialog extends Component<Props> {
+class DangerousActionDialog extends Component<Props & InjectedLayoutProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   render(): Node {
     const { intl } = this.context;
-    const { isSubmitting, error } = this.props;
+    const { isSubmitting, error, isRevampLayout } = this.props;
 
     const dialogClasses = classnames(['removeWalletDialog', styles.dialog]);
 
@@ -68,7 +71,7 @@ export default class DangerousActionDialog extends Component<Props> {
     ];
 
     return (
-      <Dialog
+      <ThemedDialog
         title={this.props.title}
         actions={actions}
         closeOnOverlayClick={false}
@@ -76,18 +79,21 @@ export default class DangerousActionDialog extends Component<Props> {
         className={dialogClasses}
         closeButton={<DialogCloseButton onClose={this.props.onCancel} />}
       >
-        {this.props.children}
+        <Box maxWidth={isRevampLayout ? '600px' : 'unset'}>
+          {this.props.children}
+          <div className={styles.checkbox}>
+            <CheckboxLabel
+              label={this.props.checkboxAcknowledge}
+              onChange={this.props.toggleCheck}
+              checked={this.props.isSubmitting || this.props.isChecked}
+            />
+          </div>
 
-        <div className={styles.checkbox}>
-          <CheckboxLabel
-            label={this.props.checkboxAcknowledge}
-            onChange={this.props.toggleCheck}
-            checked={this.props.isSubmitting || this.props.isChecked}
-          />
-        </div>
-
-        {error ? <p className={styles.error}>{intl.formatMessage(error, error.values)}</p> : null}
-      </Dialog>
+          {error ? <p className={styles.error}>{intl.formatMessage(error, error.values)}</p> : null}
+        </Box>
+      </ThemedDialog>
     );
   }
 }
+
+export default (withLayout(DangerousActionDialog): ComponentType<Props>);
