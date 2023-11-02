@@ -937,7 +937,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     const votingProposals = txBody.voting_proposals();
     if (votingProposals) {
       for (let i = 0; i < votingProposals.len(); i++) {
-        const votingProposal = votingProposals.get(i);
+        const _votingProposal = votingProposals.get(i);
         //  wait for CSL update
       }
     }
