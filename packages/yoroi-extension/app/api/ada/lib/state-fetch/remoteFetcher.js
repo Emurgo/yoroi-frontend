@@ -34,6 +34,7 @@ import type {
   GetRecentTransactionHashesResponse,
   GetTransactionsByHashesRequest,
   GetTransactionsByHashesResponse,
+  GetProtocolParametersFunc,
 } from './types';
 import type { FilterUsedRequest, FilterUsedResponse, } from '../../../common/lib/state-fetch/currencySpecificTypes';
 
@@ -597,5 +598,21 @@ export class RemoteFetcher implements IFetcher {
           blockHashes: {},
         }
       });
+  }
+
+  getProtocolParameters: GetProtocolParametersFunc = async (body) => {
+    const { BackendService } = body.network.Backend;
+    if (BackendService == null) throw new Error(`${nameof(this.getUtxoData)} missing backend url`);
+    return axios(
+      `${BackendService}/api/v2.1/protocolParameters`,
+      {
+        method: 'get',
+        timeout: 2 * CONFIG.app.walletRefreshInterval,
+        headers: {
+          'yoroi-version': this.getLastLaunchVersion(),
+          'yoroi-locale': this.getCurrentLocale()
+        }
+      }
+    ).then(response => response.data);
   }
 }

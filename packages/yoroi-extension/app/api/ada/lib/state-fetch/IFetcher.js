@@ -17,6 +17,7 @@ import type {
   GetLatestBlockBySlotReq, GetLatestBlockBySlotRes,
   GetRecentTransactionHashesRequest, GetRecentTransactionHashesResponse,
   GetTransactionsByHashesRequest, GetTransactionsByHashesResponse,
+  GetProtocolParametersRequest, ProtocolParameters,
 } from './types';
 import type {
   FilterUsedRequest, FilterUsedResponse,
@@ -43,5 +44,5 @@ export interface IFetcher {
     : GetRecentTransactionHashesRequest => Promise<GetRecentTransactionHashesResponse>;
   getTransactionsByHashes
     : GetTransactionsByHashesRequest => Promise<GetTransactionsByHashesResponse>;
-
+  getProtocolParameters: GetProtocolParametersRequest => Promise<ProtocolParameters>;
 }

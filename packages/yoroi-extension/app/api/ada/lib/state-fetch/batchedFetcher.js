@@ -24,6 +24,7 @@ import type {
   GetLatestBlockBySlotFunc,
   GetRecentTransactionHashesRequest, GetRecentTransactionHashesResponse, GetRecentTransactionHashesFunc,
   GetTransactionsByHashesRequest, GetTransactionsByHashesResponse, GetTransactionsByHashesFunc,
+  GetProtocolParametersFunc,
 } from './types';
 import type {
   FilterFunc, FilterUsedRequest, FilterUsedResponse,
@@ -165,6 +166,10 @@ export class BatchedFetcher implements IFetcher {
   getLatestBlockBySlot: GetLatestBlockBySlotFunc = async (body) => (
     // Todo: Implement batching as the max slots per request is 50
     this.baseFetcher.getLatestBlockBySlot(body)
+  )
+
+  getProtocolParameters: GetProtocolParametersFunc = async (body) => (
+    this.baseFetcher.getProtocolParameters(body)
   )
 }
 

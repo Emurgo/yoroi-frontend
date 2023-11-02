@@ -38,7 +38,11 @@ import type { HWFeatures, } from './lib/storage/database/walletTypes/core/tables
 import { Bip44DerivationLevels, flattenInsertTree, } from './lib/storage/database/walletTypes/bip44/api/utils';
 import type { CoreAddressT } from './lib/storage/database/primitives/enums';
 import { CoreAddressTypes, TxStatusCodes, } from './lib/storage/database/primitives/enums';
-import type { NetworkRow, TokenRow, } from './lib/storage/database/primitives/tables';
+import type {
+  NetworkRow,
+  TokenRow,
+  CardanoHaskellShelleyBaseConfig,
+} from './lib/storage/database/primitives/tables';
 import { TransactionType } from './lib/storage/database/primitives/tables';
 import { PublicDeriver, } from './lib/storage/models/PublicDeriver/index';
 import {
@@ -133,6 +137,7 @@ import type {
   RemoteUnspentOutput,
   GetRecentTransactionHashesFunc,
   GetTransactionsByHashesFunc,
+  GetProtocolParametersFunc,
 } from './lib/state-fetch/types';
 import type { FilterFunc, } from '../common/lib/state-fetch/currencySpecificTypes';
 import { getChainAddressesForDisplay, } from './lib/storage/models/utils';
@@ -165,7 +170,12 @@ import type { DefaultTokenEntry } from '../common/lib/MultiToken';
 import { MultiToken } from '../common/lib/MultiToken';
 import { getReceiveAddress } from '../../stores/stateless/addressStores';
 import { generateRegistrationMetadata } from './lib/cardanoCrypto/catalyst';
-import { GetAddress, GetPathWithSpecific, } from './lib/storage/database/primitives/api/read';
+import {
+  GetAddress,
+  GetPathWithSpecific,
+  GetNetworks,
+} from './lib/storage/database/primitives/api/read';
+import { ModifyNetworks } from './lib/storage/database/primitives/api/write';
 import { getAllSchemaTables, mapToTables, raii, } from './lib/storage/database/utils';
 import { GetDerivationSpecific, } from './lib/storage/database/walletTypes/common/api/read';
 import { bytesToHex, hexToBytes, hexToUtf } from '../../coreUtils';
@@ -582,6 +592,12 @@ export type GetTransactionRowsToExportFunc = (
 export const DEFAULT_ADDRESSES_PER_PAPER = 1;
 
 export const FETCH_TXS_BATCH_SIZE = 20;
+
+const UPDATE_NETWORK_IDS = [
+  0, // Cardano Mainnet
+  250, // Preprod Testnet
+  350, // Preview Testnet
+];
 
 export default class AdaApi {
 
@@ -2553,8 +2569,68 @@ export default class AdaApi {
     }
     return utxos;
   }
+
+  async updateProtocolParametersForCardanoNetworks(
+    db: lf$Database,
+    getProtocolParameters: GetProtocolParametersFunc,
+  ): Promise<Array<NetworkRow>> {
+    const networks = (await raii(
+      db,
+      getAllSchemaTables(db, GetNetworks),
+      tx => GetNetworks.get(db, tx),
+    )).filter(network => UPDATE_NETWORK_IDS.includes(network.NetworkId));
+
+    const changedNetworks: Array<NetworkRow> = [];
+
+    for (const network of networks) {
+      let params;
+      try {
+        params = await getProtocolParameters({
+          network
+        });
+      } catch {
+        continue;
+      }
+
+      const newNetwork: Object = {};
+      // $FlowFixMe[invalid-tuple-index] we know this is Cardano config not Ergo
+      if (merge(newNetwork, network.BaseConfig[1], params)) {
+        // $FlowFixMe[invalid-tuple-index] we know this is Cardano config not Ergo
+        network.BaseConfig[1] = (newNetwork: CardanoHaskellShelleyBaseConfig);
+        changedNetworks.push((Object.freeze(network): any));
+      }
+    }
+
+    await raii(
+      db,
+      getAllSchemaTables(db, ModifyNetworks),
+      async tx => {
+        return await ModifyNetworks.upsert(db, tx, changedNetworks);
+      }
+    );
+
+    return changedNetworks;
+  }
 }
 // ========== End of class AdaApi =========
+
+function merge(result: Object, destination: Object, source: Object): boolean {
+  let changed = false;
+  for (const key in destination) {
+    if (typeof destination[key] === 'object') {
+      changed = changed || merge(result[key] = {}, destination[key], (source || {})[key]);
+    } else if (source == null || source[key] == null) {
+      result[key] = destination[key];
+    } else if (
+      typeof source[key] === typeof destination[key] &&
+        destination[key] !== source[key]
+    ) {
+      result[key] = source[key];
+      changed = true;
+    }
+  }
+  return changed;
+}
 
 /**
  * Sending the transaction may affect the amount delegated in a few ways:

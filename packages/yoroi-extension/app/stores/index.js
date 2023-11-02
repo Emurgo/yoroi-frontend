@@ -31,6 +31,8 @@ import TokenInfoStore from './toplevel/TokenInfoStore';
 import ExplorerStore from './toplevel/ExplorerStore';
 import ServerConnectionStore from './toplevel/ServerConnectionStore';
 import ConnectorStore from './toplevel/DappConnectorStore'
+import ProtocolParametersStore from './toplevel/ProtocolParametersStore';
+
 /** Map of var name to class. Allows dynamic lookup of class so we can init all stores one loop */
 const storeClasses = Object.freeze({
   stateFetchStore: StateFetchStore,
@@ -56,6 +58,7 @@ const storeClasses = Object.freeze({
   yoroiTransfer: YoroiTransferStore,
   explorers: ExplorerStore,
   connector: ConnectorStore,
+  protocolParameters: ProtocolParametersStore,
   // note: purposely exclude substores and router
 });
 
@@ -89,6 +92,7 @@ export type StoresMap = {|
   |},
   // $FlowFixMe[value-as-type]
   router: RouterStore,
+  protocolParameters: ProtocolParametersStore<StoresMap>,
 |};
 
 /** Constant that represents the stores across the lifetime of the application */
@@ -123,6 +127,7 @@ const stores: StoresMap = (observable({
   substores: null,
   router: null,
   connector: null,
+  protocolParameters: null,
 }): any);
 
 function initializeSubstore<T: {...}>(
