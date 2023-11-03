@@ -6,7 +6,7 @@ import { ReactComponent as NoTransactionModernSvg }  from '../../../assets/image
 type Props = {|
   message: string,
 |};
-export const ListEmpty = ({ message }: Props): Node => {
+export function ListEmpty({ message }: Props): Node {
   return (
     <Stack
       sx={{
@@ -23,4 +23,4 @@ export const ListEmpty = ({ message }: Props): Node => {
       </Typography>
     </Stack>
   );
-};
+}

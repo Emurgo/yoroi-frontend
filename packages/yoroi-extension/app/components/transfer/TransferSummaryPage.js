@@ -345,6 +345,8 @@ export default class TransferSummaryPage extends Component<Props> {
             <div className={styles.amountLabel}>
               {intl.formatMessage(messages.recoveredBalanceLabel)}
             </div>
+            {/* // <TODO:CHECK_LINT> */}
+            {/* eslint-disable-next-line no-constant-condition */}
             {unitOfAccountSetting.enabled /* tmp */ && false ? (
               <>
                 <div className={styles.amount}>
@@ -373,6 +375,8 @@ export default class TransferSummaryPage extends Component<Props> {
             <div className={styles.feesLabel}>
               {intl.formatMessage(messages.transactionFeeLabel)}
             </div>
+            {/* // <TODO:CHECK_LINT> */}
+            {/* eslint-disable-next-line no-constant-condition */}
             {unitOfAccountSetting.enabled /* tmp */ && false ? (
               <>
                 <div className={styles.fees}>
@@ -402,6 +406,8 @@ export default class TransferSummaryPage extends Component<Props> {
           <div className={styles.totalAmountLabel}>
             {intl.formatMessage(globalMessages.finalBalanceLabel)}
           </div>
+          {/* // <TODO:CHECK_LINT> */}
+          {/* eslint-disable-next-line no-constant-condition */}
           {unitOfAccountSetting.enabled /* tmp */ && false ? (
             <>
               <div className={styles.totalAmount}>

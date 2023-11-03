@@ -47,7 +47,6 @@ export class Cip1852Wallet
     this.#signingLevel = row.SignerLevel;
     this.#privateDeriverLevel = privateDeriverLevel;
     this.#privateDeriverKeyDerivationId = privateDeriverKeyDerivationId;
-    return this;
   }
 
   getDerivationTables: void => Map<number, string> = () => {

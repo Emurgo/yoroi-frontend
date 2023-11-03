@@ -142,7 +142,7 @@ class NumericInputRP extends Component<NumericInputProps, State> {
       `^([-])?([0-9${decimalSeparator}${groupSeparator}]+)?$`
     );
     const validInputNoSignsRegExp = new RegExp(`^([0-9${decimalSeparator}${groupSeparator}]+)?$`);
-    const validInputOnlyIntegersRegExp = new RegExp(`^([0-9]+)?$`);
+    const validInputOnlyIntegersRegExp = /^([0-9]+)?$/;
     // $FlowFixMe[sketchy-null-bool]
     let validInputRegex = allowSigns ? validInputSignsRegExp : validInputNoSignsRegExp;
     // $FlowFixMe[sketchy-null-bool]

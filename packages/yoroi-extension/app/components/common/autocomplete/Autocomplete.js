@@ -216,6 +216,8 @@ function Autocomplete({
                   : item;
                 return (
                   <Box
+                    {/* // <TODO:CHECK_LINT> */}
+                    {/* eslint-disable-next-line react/no-array-index-key */}
                     key={`${item}${index}`}
                     sx={{
                       padding: '16px',

@@ -37,9 +37,9 @@ import {
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { range } from 'lodash';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
-import { derivePublicByAddressing } from '../../lib/cardanoCrypto/utils';
 import blake2b from 'blake2b';
 import cbor from 'cbor';
+import { derivePublicByAddressing } from '../../lib/cardanoCrypto/deriveUtils';
 
 // ==================== TREZOR ==================== //
 /** Generate a payload for Trezor SignTx */

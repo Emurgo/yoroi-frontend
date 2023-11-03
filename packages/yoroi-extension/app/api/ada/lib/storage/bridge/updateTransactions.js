@@ -2985,7 +2985,8 @@ function compareAndSetIfNewAddressSetHash(id: number, addresses: Array<string>):
   const requestAddresseHash = ObjectHash.sha1(requestAddresseSet);
   const localStorageKey = `TMP/UTXO_REQUEST_ADDRESSES_HASH/${id}`;
   const prevRequestAddressHash = localStorage.getItem(localStorageKey);
-  const isUpdating = prevRequestAddressHash == null || prevRequestAddressHash !== requestAddresseHash;
+  const isUpdating = prevRequestAddressHash == null
+    || prevRequestAddressHash !== requestAddresseHash;
   if (isUpdating) {
     // <TODO:REMOVE_AFTER_YOROI_LIB_UPGRADE>
     console.debug('/// utxo state must be cleared:', id, requestAddresseHash, prevRequestAddressHash);

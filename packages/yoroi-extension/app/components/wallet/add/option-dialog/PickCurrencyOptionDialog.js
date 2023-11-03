@@ -76,44 +76,40 @@ export default class PickCurrencyOptionDialog extends Component<Props> {
               onSubmit={this.props.onCardano}
             />
             {(!environment.isProduction() || environment.isNightly() || environment.isTest()) &&
-              <>
-                <OptionBlock
-                  parentName="PickCurrencyOptionDialog"
-                  type="cardanoTestnet"
-                  title="Cardano Preprod Testnet"
-                  onSubmit={this.props.onCardanoPreprodTestnet}
-                  learnMoreText={
-                    <>
-                      {intl.formatMessage(messages.testnetDescription)}<br />
-                      <a
-                        href="https://testnets.cardano.org/"
-                        onClick={event => this.props.onExternalLinkClick(event)}
-                      >
-                        {intl.formatMessage(globalMessages.learnMore)}
-                      </a>
-                    </>}
-                />
-              </>
+              <OptionBlock
+                parentName="PickCurrencyOptionDialog"
+                type="cardanoTestnet"
+                title="Cardano Preprod Testnet"
+                onSubmit={this.props.onCardanoPreprodTestnet}
+                learnMoreText={
+                  <>
+                    {intl.formatMessage(messages.testnetDescription)}<br />
+                    <a
+                      href="https://testnets.cardano.org/"
+                      onClick={event => this.props.onExternalLinkClick(event)}
+                    >
+                      {intl.formatMessage(globalMessages.learnMore)}
+                    </a>
+                  </>}
+              />
             }
             {(!environment.isProduction() || environment.isNightly() || environment.isTest()) &&
-              <>
-                <OptionBlock
-                  parentName="PickCurrencyOptionDialog"
-                  type="cardanoTestnet"
-                  title="Cardano Preview Testnet"
-                  onSubmit={this.props.onCardanoPreviewTestnet}
-                  learnMoreText={
-                    <>
-                      {intl.formatMessage(messages.testnetDescription)}<br />
-                      <a
-                        href="https://testnets.cardano.org/"
-                        onClick={event => this.props.onExternalLinkClick(event)}
-                      >
-                        {intl.formatMessage(globalMessages.learnMore)}
-                      </a>
-                    </>}
-                />
-              </>
+              <OptionBlock
+                parentName="PickCurrencyOptionDialog"
+                type="cardanoTestnet"
+                title="Cardano Preview Testnet"
+                onSubmit={this.props.onCardanoPreviewTestnet}
+                learnMoreText={
+                  <>
+                    {intl.formatMessage(messages.testnetDescription)}<br />
+                    <a
+                      href="https://testnets.cardano.org/"
+                      onClick={event => this.props.onExternalLinkClick(event)}
+                    >
+                      {intl.formatMessage(globalMessages.learnMore)}
+                    </a>
+                  </>}
+              />
             }
           </ul>
         </div>

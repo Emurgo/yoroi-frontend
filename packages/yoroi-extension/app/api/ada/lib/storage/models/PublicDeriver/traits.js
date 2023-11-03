@@ -126,7 +126,6 @@ import type {
 } from './index';
 import { ConceptualWallet } from '../ConceptualWallet/index';
 import { RustModule } from '../../../cardanoCrypto/rustLoader';
-import { derivePublicByAddressing } from '../../../cardanoCrypto/utils';
 import {
   isCardanoHaskell,
 } from '../../database/prepackaged/networks';
@@ -138,6 +137,7 @@ import {
 import type {
   Utxo,
 } from '@emurgo/yoroi-lib/dist/utxo/models';
+import { derivePublicByAddressing } from '../../../cardanoCrypto/deriveUtils';
 
 interface Empty {}
 type HasPrivateDeriverDependencies = IPublicDeriver<ConceptualWallet & IHasPrivateDeriver>;

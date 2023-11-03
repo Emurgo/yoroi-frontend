@@ -51,7 +51,6 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
     this.hardwareInfo = data.hardwareInfo;
     this.networkInfo = data.networkInfo;
     this.defaultToken = data.defaultToken;
-    return this;
   }
 
   getDb(): lf$Database {

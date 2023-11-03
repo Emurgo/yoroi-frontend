@@ -18,7 +18,6 @@ import {
 } from '../../../common/errors';
 
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
-import { derivePrivateByAddressing } from '../../lib/cardanoCrypto/utils';
 
 import { Bip44DerivationLevels, } from '../../lib/storage/database/walletTypes/bip44/api/utils';
 import type { Address, Addressing, } from '../../lib/storage/models/PublicDeriver/interfaces';
@@ -49,6 +48,7 @@ import {
   OverflowError,
 } from'@emurgo/yoroi-eutxo-txs/dist/errors';
 import blake2b from 'blake2b';
+import { derivePrivateByAddressing } from '../../lib/cardanoCrypto/deriveUtils';
 
 /**
  * based off what the cardano-wallet team found worked empirically

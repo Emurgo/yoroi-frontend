@@ -42,7 +42,6 @@ import cryptoRandomString from 'crypto-random-string';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { generateRegistration } from '../../api/ada/lib/cardanoCrypto/catalyst';
-import { derivePublicByAddressing } from '../../api/ada/lib/cardanoCrypto/utils'
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet'
 import type { CatalystRoundInfoResponse } from '../../api/ada/lib/state-fetch/types'
 import { trackCatalystRegistration } from '../../api/analytics';
@@ -51,6 +50,7 @@ import {
   saveCatalystRoundInfo,
 } from '../../api/localStorage';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
+import { derivePublicByAddressing } from '../../api/ada/lib/cardanoCrypto/deriveUtils';
 
 export const ProgressStep = Object.freeze({
   GENERATE: 0,

@@ -83,9 +83,8 @@ export default class YoroiThemesPage extends Component<Props, State> {
                           ))}
                         </ul>
                       </div>
-                  )
-                }
-
+                    )
+                  }
                 return ''
               })}
               </div>

@@ -85,44 +85,42 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
     ];
 
     return (
-      <>
-        <div className={styles.component}>
-          <div className={styles.description}>{intl.formatMessage(messages.subtitle)}</div>
-          <div className={styles.selected}>
-            {complexityLevel && (
-              <>
-                {intl.formatMessage(messages.labelSelectedLevel)} :{' '}
-                <Box component="span" className="currentLevel">
-                  {complexityLevel}
-                </Box>
-              </>
+      <div className={styles.component}>
+        <div className={styles.description}>{intl.formatMessage(messages.subtitle)}</div>
+        <div className={styles.selected}>
+          {complexityLevel && (
+          <>
+            {intl.formatMessage(messages.labelSelectedLevel)} :{' '}
+            <Box component="span" className="currentLevel">
+              {complexityLevel}
+            </Box>
+          </>
             )}
-          </div>
-          <div className={styles.cardsWrapper}>
-            {levels.map(level => (
-              <div className={styles.card} key={level.key}>
-                <div className={classnames([styles.cardImage, styles[level.key]])}>
-                  {level.image}
+        </div>
+        <div className={styles.cardsWrapper}>
+          {levels.map(level => (
+            <div className={styles.card} key={level.key}>
+              <div className={classnames([styles.cardImage, styles[level.key]])}>
+                {level.image}
+              </div>
+              <div className={styles.cardContent}>
+                <div>
+                  <h3>{level.name}</h3>
+                  <p>{level.description}</p>
                 </div>
-                <div className={styles.cardContent}>
-                  <div>
-                    <h3>{level.name}</h3>
-                    <p>{level.description}</p>
-                  </div>
-                  <LoadingButton
+                <LoadingButton
                     variant={isRevampLayout ? 'contained' : 'primary'}
                     loading={isSubmitting}
                     disabled={complexityLevel === level.key}
                     onClick={() => this.props.onSubmit(level.key)}
-                  >
-                    {intl.formatMessage(messages.labelChoose)}
-                  </LoadingButton>
-                </div>
+                >
+                  {intl.formatMessage(messages.labelChoose)}
+                </LoadingButton>
               </div>
+            </div>
             ))}
-          </div>
         </div>
-      </>
+      </div>
     );
   }
 }

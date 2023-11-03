@@ -1,3 +1,4 @@
+// @flow
 import type { Node } from 'react';
 import { useState } from 'react';
 import { IconButton, Stack, Typography } from '@mui/material';

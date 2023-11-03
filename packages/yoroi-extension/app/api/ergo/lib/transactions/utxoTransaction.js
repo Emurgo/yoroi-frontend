@@ -19,7 +19,7 @@ import { PRIMARY_ASSET_CONSTANTS } from '../../../ada/lib/storage/database/primi
 import { MultiToken, } from '../../../common/lib/MultiToken';
 import { toErgoBoxJSON } from './utils';
 
-const SIGMA_CONSTANT_ADDRESS_PK_MATCHER_REG = new RegExp(/^08cd([0-9a-fA-F]+)$/);
+const SIGMA_CONSTANT_ADDRESS_PK_MATCHER_REG = /^08cd([0-9a-fA-F]+)$/;
 
 type TxOutput = {|
   ...Address,

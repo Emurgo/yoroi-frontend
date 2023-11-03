@@ -74,8 +74,6 @@ implements IPublicDeriver<Parent>, IRename, IGetLastSyncInfo {
     const utxoApi = new UtxoApi(BackendService);
     this.utxoStorageApi = new UtxoStorageApi(this.publicDeriverId);
     this.utxoService = new UtxoService(utxoApi, this.utxoStorageApi);
-
-    return this;
   }
 
   getDb(): lf$Database {

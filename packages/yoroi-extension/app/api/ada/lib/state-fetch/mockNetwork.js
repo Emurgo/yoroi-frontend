@@ -7,15 +7,24 @@ import type {
   AddressUtxoRequest, AddressUtxoResponse, AddressUtxoFunc,
   UtxoSumRequest, UtxoSumResponse, UtxoSumFunc,
   RewardHistoryFunc,
-  AccountStateRequest, AccountStateResponse, AccountStateFunc,
-  PoolInfoRequest, PoolInfoResponse, PoolInfoFunc,
-  RemoteTransaction, RemoteUnspentOutput,
+  AccountStateRequest,
+  AccountStateResponse,
+  AccountStateFunc,
+  PoolInfoRequest,
+  PoolInfoResponse,
+  PoolInfoFunc,
+  RemoteTransaction,
+  RemoteUnspentOutput,
   SignedRequestInternal,
   RemoteTransactionInput,
   TokenInfoFunc,
   MultiAssetMintMetadataFunc,
-  GetTransactionsByHashesRequest, GetTransactionsByHashesResponse, GetTransactionsByHashesFunc,
-  GetRecentTransactionHashesRequest, GetRecentTransactionHashesResponse, GetRecentTransactionHashesFunc,
+  GetTransactionsByHashesRequest,
+  GetTransactionsByHashesResponse,
+  GetTransactionsByHashesFunc,
+  GetRecentTransactionHashesRequest,
+  GetRecentTransactionHashesResponse,
+  GetRecentTransactionHashesFunc,
 } from './types';
 import type {
   FilterUsedRequest, FilterUsedResponse, FilterFunc,
@@ -919,7 +928,11 @@ export class MockUtxoApi implements UtxoApiContract {
       if (txInAfterBestblocks && lastFoundBestBlock == null) {
         lastFoundBestBlock = tx.block_hash;
       }
-      if (txInAfterBestblocks && lastFoundSafeBlock == null && i <= this._getLastSafeBlockTxIndex()) {
+      if (
+        txInAfterBestblocks
+        && lastFoundSafeBlock == null
+        && i <= this._getLastSafeBlockTxIndex()
+      ) {
         lastFoundSafeBlock = tx.block_hash;
       }
 
