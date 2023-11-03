@@ -32,7 +32,7 @@ type State = {|
 class App extends Component<Props, State> {
   @observable mergedMessages: null | {| [key: string]: string |} = null;
 
-  componentDidMount: () => void = () => {
+  componentDidMount() {
     autorun(async () => {
       const _mergedMessages = {
         ...(await translations['en-US']),

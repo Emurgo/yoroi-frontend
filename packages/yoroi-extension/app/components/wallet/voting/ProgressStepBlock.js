@@ -34,6 +34,7 @@ export default class ProgressStepBlock extends Component<Props> {
         currentStep={currentStep}
         stepState={progressInfo.stepState}
         classicTheme={classicTheme}
-      />);
+      />
+    );
   }
 }

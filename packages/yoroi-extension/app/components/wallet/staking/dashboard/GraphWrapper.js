@@ -34,11 +34,15 @@ export type GraphItems = {|
   +poolName: string,
 |};
 
-const GraphTabs: {|
+function GraphTabs({
+  tabs,
+  selected,
+  setSelected,
+}: {|
   tabs: Array<string>,
   selected: number,
   setSelected: number => void,
-|} => Node = ({ tabs, selected, setSelected, }) => {
+|}): Node {
   return (
     <ul className={styles.tabsWrapper}>
       {
@@ -96,15 +100,7 @@ const GraphTabs: {|
 //   );
 // };
 
-export const Graph: {|
-  data: Array<GraphItems>,
-  epochTitle: string,
-  stakepoolNameTitle: string,
-  xAxisLabel: string,
-  yAxisLabel: string,
-  primaryBarLabel: string,
-  hideYAxis: boolean,
-|} => Node = ({
+export function Graph({
   data,
   epochTitle,
   stakepoolNameTitle,
@@ -112,7 +108,15 @@ export const Graph: {|
   yAxisLabel,
   primaryBarLabel,
   hideYAxis,
-}) => {
+}: {|
+  data: Array<GraphItems>,
+  epochTitle: string,
+  stakepoolNameTitle: string,
+  xAxisLabel: string,
+  yAxisLabel: string,
+  primaryBarLabel: string,
+  hideYAxis: boolean,
+|}): Node {
 
   const graphVars = {
     axisTickColor: readCssVar('--yoroi-dashboard-graph-axis-tick-color'),
@@ -128,9 +132,17 @@ export const Graph: {|
     !hideYAxis ? value : '∗∗∗ '
   );
 
-  const GraphTooltip = (
-    { active, payload, label }: {| active: boolean, payload: ?[any], label: string |}
-  ) => {
+  // <TODO:CHECK_LINT>
+  // eslint-disable-next-line react/no-unstable-nested-components
+  function GraphTooltip({
+    active,
+    payload,
+    label,
+  }: {|
+    active: boolean,
+    payload: ?[any],
+    label: string,
+  |}) {
     if (active && payload != null) {
       return (
         <div className={styles.tooltip}>
@@ -150,7 +162,7 @@ export const Graph: {|
       );
     }
     return null;
-  };
+  }
 
   // $FlowExpectedError[prop-missing] props are passed implicitly which causes a flow error
   const graphTooltip = (<GraphTooltip />);

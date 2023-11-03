@@ -210,7 +210,7 @@ export default class UserSummary extends Component<Props> {
         <p className={styles.value}>
           {unitOfAccount.amount} {unitOfAccount.currency}
         </p>
-      ): <></>
+      ) : null
 
     return (
       <>
@@ -220,6 +220,8 @@ export default class UserSummary extends Component<Props> {
     );
   }
 
+  // <TODO:CHECK_LINT>
+  // eslint-disable-next-line react/no-unused-class-component-methods
   formatWithAmount: ($npm$ReactIntl$MessageDescriptor, TokenEntry) => Node = (
     message,
     tokenEntry,
@@ -248,12 +250,8 @@ export default class UserSummary extends Component<Props> {
       .decimalPlaces(tokenInfo.Metadata.numberOfDecimals)
       .toString();
     const amountNode = this.props.shouldHideBalance
-      ? <>{hiddenAmount}</>
-      : (
-        <>
-          {tokenAmount}
-        </>
-      );
+      ? hiddenAmount
+      : tokenAmount;
     return (
       <>
         <span>

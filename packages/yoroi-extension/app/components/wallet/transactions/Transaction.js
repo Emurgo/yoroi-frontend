@@ -344,6 +344,7 @@ export default class Transaction extends Component<Props, State> {
   |}) => ?Node = request => {
     const { currency } = this.props.unitOfAccountSetting;
 
+    // <TODO:CHECK_LINT>
     if (false && /* temporarily disable */ this.props.unitOfAccountSetting.enabled) {
       if (this.props.shouldHideBalance) {
         return (
@@ -429,6 +430,7 @@ export default class Transaction extends Component<Props, State> {
       numberOfDecimals
     );
 
+    // <TODO:CHECK_LINT>
     if (false && /* temporarily disable */ this.props.unitOfAccountSetting.enabled) {
       const { currency } = this.props.unitOfAccountSetting;
       const ticker = tokenInfo.Metadata.ticker;

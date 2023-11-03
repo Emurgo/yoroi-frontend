@@ -195,6 +195,7 @@ export default class WalletSummary extends Component<Props> {
         <div className={styles.middleBlock}>
           <BorderedBox>
             {!isLoadingTransactions && (
+              // eslint-disable-next-line react/jsx-no-useless-fragment
               <>
                 {(pendingAmount.incoming.length > 0 || pendingAmount.outgoing.length > 0) && (
                   <div className={styles.pendingSection}>

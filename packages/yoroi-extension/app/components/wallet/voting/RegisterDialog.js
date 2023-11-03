@@ -88,7 +88,8 @@ export default class RegisterDialog extends Component<Props> {
             isSubmitting={isProcessing}
           />
         </div>
-      </Dialog>);
+      </Dialog>
+    );
   }
 
   _submitForm: void => Promise<void> = async () => {

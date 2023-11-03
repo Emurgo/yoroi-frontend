@@ -914,7 +914,7 @@ const icons = {
   error: ErrorIcon,
 };
 
-const TypeIcon = ({ type }) => {
+function TypeIcon({ type }) {
   const Icon = icons[type];
   return <Box sx={{ width: 40, height: 40 }}>{Icon && <Icon />}</Box>;
-};
+}

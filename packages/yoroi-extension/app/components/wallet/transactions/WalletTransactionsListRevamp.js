@@ -68,7 +68,11 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
     // Japanese - YYYY/MM/DD
   }
 
+  // <TODO:CHECK_LINT>
+  // eslint-disable-next-line react/no-unused-class-component-methods
   list: HTMLElement;
+  // <TODO:CHECK_LINT>
+  // eslint-disable-next-line react/no-unused-class-component-methods
   loadingSpinner: ?LoadingSpinner;
   localizedDateFormat: 'MM/DD/YYYY';
 
@@ -138,6 +142,8 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
       <div className={styles.loading}>
         <LoadingSpinner
           ref={component => {
+            // <TODO:CHECK_LINT>
+            // eslint-disable-next-line react/no-unused-class-component-methods
             this.loadingSpinner = component;
           }}
         />

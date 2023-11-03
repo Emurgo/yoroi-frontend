@@ -101,7 +101,8 @@ export default class ConfirmPinDialog extends Component<Props> {
             allowEmptyInput={false}
           />
         </div>
-      </Dialog>);
+      </Dialog>
+    );
   }
 
   _submitForm: void => Promise<void> = async () => {
