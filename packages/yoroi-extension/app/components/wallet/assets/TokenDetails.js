@@ -17,7 +17,7 @@ import {
   isTestnet,
 } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import { CopyAddress } from './NFTDetails';
+import { CopyAddress } from './TruncatedText';
 
 type Props = {|
   tokenInfo: void | {|
@@ -165,14 +165,12 @@ function TokenDetails({ tokenInfo, tokensCount, network, intl }: Props & Intl): 
           <Grid item xs={4}>
             <LabelWithValue
               label={
-                <>
-                  <Typography as="span" display="flex">
-                    {intl.formatMessage(tokenMessages.detailsOn)}
-                    <Typography as="span" ml="4px">
-                      <LinkSvg />
-                    </Typography>
+                <Typography as="span" display="flex">
+                  {intl.formatMessage(tokenMessages.detailsOn)}
+                  <Typography as="span" ml="4px">
+                    <LinkSvg />
                   </Typography>
-                </>
+                </Typography>
               }
               value={
                 <LinkMui

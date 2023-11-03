@@ -153,46 +153,44 @@ function TokenList({ assetsList: list, shouldHideBalance, intl }: Props & Intl):
           <ListEmpty message={intl.formatMessage(assetsMessage.noAssetFound)} />
         </Stack>
       ) : (
-        <>
-          <List>
-            <ListItemLayout
-              firstColumn={
-                <ButtonBase disableRipple onClick={() => sortAssets(SORTING_COLUMNS.NAME)}>
-                  <Typography variant="body2" color="var(--yoroi-palette-gray-400)" mr="4px">
-                    {intl.formatMessage(assetsMessage.nameAndTicker)}
-                  </Typography>
-                  {displayColumnLogo(SORTING_COLUMNS.NAME)}
-                </ButtonBase>
-              }
-              secondColumn={
-                <Stack direction="row" alignItems="center" spacing="4px">
-                  <Typography variant="body2" color="var(--yoroi-palette-gray-400)">
-                    {intl.formatMessage(globalMessages.fingerprint)}
-                  </Typography>
-                  <Info />
-                </Stack>
-              }
-              thirdColumn={
-                <ButtonBase disableRipple onClick={() => sortAssets(SORTING_COLUMNS.AMOUNT)}>
-                  <Typography variant="body2" color="var(--yoroi-palette-gray-400)" mr="4px">
-                    {intl.formatMessage(assetsMessage.quantity)}
-                  </Typography>
-                  {displayColumnLogo(SORTING_COLUMNS.AMOUNT)}
-                </ButtonBase>
-              }
-            />
+        <List>
+          <ListItemLayout
+            firstColumn={
+              <ButtonBase disableRipple onClick={() => sortAssets(SORTING_COLUMNS.NAME)}>
+                <Typography variant="body2" color="var(--yoroi-palette-gray-400)" mr="4px">
+                  {intl.formatMessage(assetsMessage.nameAndTicker)}
+                </Typography>
+                {displayColumnLogo(SORTING_COLUMNS.NAME)}
+              </ButtonBase>
+            }
+            secondColumn={
+              <Stack direction="row" alignItems="center" spacing="4px">
+                <Typography variant="body2" color="var(--yoroi-palette-gray-400)">
+                  {intl.formatMessage(globalMessages.fingerprint)}
+                </Typography>
+                <Info />
+              </Stack>
+            }
+            thirdColumn={
+              <ButtonBase disableRipple onClick={() => sortAssets(SORTING_COLUMNS.AMOUNT)}>
+                <Typography variant="body2" color="var(--yoroi-palette-gray-400)" mr="4px">
+                  {intl.formatMessage(assetsMessage.quantity)}
+                </Typography>
+                {displayColumnLogo(SORTING_COLUMNS.AMOUNT)}
+              </ButtonBase>
+            }
+          />
 
-            {assetsList.map(token => (
-              <TokenItemRow
-                key={token.id}
-                avatar={<NoAssetLogo />}
-                name={token.name}
-                id={token.id}
-                amount={shouldHideBalance ? hiddenAmount : token.amount}
-              />
-            ))}
-          </List>
-        </>
+          {assetsList.map(token => (
+            <TokenItemRow
+              key={token.id}
+              avatar={<NoAssetLogo />}
+              name={token.name}
+              id={token.id}
+              amount={shouldHideBalance ? hiddenAmount : token.amount}
+            />
+          ))}
+        </List>
       )}
     </Stack>
   );

@@ -28,6 +28,8 @@ function StepController(props: Props): Node {
         const isPrimary = type === 'primary';
         return (
           <Button
+            // <TODO:CHECK_LINT>
+            // eslint-disable-next-line react/no-array-index-key
             key={idx}
             variant={isPrimary ? 'contained' : 'outlined'}
             color="primary"

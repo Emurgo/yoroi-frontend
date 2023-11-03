@@ -43,6 +43,7 @@ export default class HelpLinkBlock extends Component<Props> {
           {intl.formatMessage(messages.helpLinkYoroiWithLedgerText)}
           <ExternalLinkSVG />
         </a>
-      </div>);
+      </div>
+    );
   }
 }

@@ -141,6 +141,7 @@ export default class CheckDialog extends Component<Props> {
           <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
         }
         <HelpLinkBlock onExternalLinkClick={onExternalLinkClick} />
-      </Dialog>);
+      </Dialog>
+    );
   }
 }

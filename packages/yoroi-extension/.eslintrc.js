@@ -60,7 +60,7 @@ module.exports = {
     'react/prefer-stateless-function': 'off',
     'react/no-unused-prop-types': 'off',
     'react/prop-types': 0,
-    'react/require-default-props': 1,
+    'react/require-default-props': 0,
     'react/sort-comp': 0,
     'react/static-property-placement': ['warn', 'static public field'],
     'react/state-in-constructor': ['warn', 'never'],
