@@ -44,21 +44,3 @@
     line-height: 20px;
   }
 }
-
-.ergoWarning {
-  height: 90px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: red;
-  .shelleyTestnetWarningIcon {
-    margin-right: 9px;
-  }
-  .text {
-    text-transform: uppercase;
-    color: var(--yoroi-palette-common-white);
-    font-size: 12px;
-    letter-spacing: 1px;
-    line-height: 20px;
-  }
-}

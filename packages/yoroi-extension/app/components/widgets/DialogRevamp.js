@@ -44,6 +44,7 @@ function DialogFn(props: Props): Node {
         justifyContent: 'center',
         alignItems: 'center',
       }}
+      disableAutoFocus
     >
       <ModalContainer
         display="flex"

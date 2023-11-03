@@ -16,7 +16,6 @@ import VerticallyCenteredLayout from '../../../layout/VerticallyCenteredLayout';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import { ReactComponent as InvalidURIImg } from '../../../../assets/images/uri/invalid-uri.inline.svg';
 import ErrorBlock from '../../../widgets/ErrorBlock';
-import type { CertificateForKey } from '../../../../api/ada/lib/storage/database/primitives/api/read';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Skeleton, Typography } from '@mui/material';
 
@@ -75,7 +74,7 @@ type Props = {|
     +numPages: number,
     +goToPage: number => void,
   |},
-  +delegationHistory: ?Array<CertificateForKey>,
+  +hideGraph: boolean,
   +epochLength: ?number,
   +ticker: string,
 |};
@@ -87,17 +86,13 @@ export default class StakingDashboard extends Component<Props> {
   };
 
   render(): Node {
-    const { graphData } = this.props;
+    const { graphData, hideGraph } = this.props;
 
     const pendingTxWarningComponent = this.props.hasAnyPending ? (
       <div className={styles.warningBox}>
         <WarningBox>{this.context.intl.formatMessage(messages.pendingTxWarning)}</WarningBox>
       </div>
     ) : null;
-
-    // don't show anything when user has never delegated
-    const hideGraph =
-      this.props.delegationHistory != null && this.props.delegationHistory.length === 0;
 
     const graphs = hideGraph ? null : (
       <div className={styles.graphsWrapper}>

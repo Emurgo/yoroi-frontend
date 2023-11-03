@@ -88,7 +88,7 @@ function TextField({
               position="end"
               sx={{ minWidth: '52px', display: 'flex', justifyContent: 'flex-end' }}
             >
-              {Boolean(error) === true ? (
+              {Boolean(error) === true && !isRevampTheme ? (
                 <ErrorIcon />
               ) : done === true && !isRevampTheme ? (
                 <DoneIcon />
@@ -111,7 +111,7 @@ function TextField({
               position="end"
               sx={{ minWidth: '52px', display: 'flex', justifyContent: 'flex-end' }}
             >
-              {Boolean(error) === true ? (
+              {Boolean(error) === true && !isRevampTheme ? (
                 <ErrorIcon />
               ) : done === true && !isRevampTheme ? (
                 <DoneIcon />
@@ -122,7 +122,7 @@ function TextField({
             </InputAdornment>
           ) : (
             <InputAdornment position="end">
-              {Boolean(error) === true ? (
+              {Boolean(error) === true && !isRevampTheme ? (
                 <ErrorIcon />
               ) : done === true && !isRevampTheme ? (
                 <DoneIcon />
