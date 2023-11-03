@@ -65,6 +65,7 @@ export default class MemoNoExternalStorageDialog extends Component<Props> {
         <div className={styles.content}>
           <p>{intl.formatMessage(messages.connectContent)}</p>
         </div>
-      </Dialog>);
+      </Dialog>
+    );
   }
 }

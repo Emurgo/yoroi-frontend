@@ -53,7 +53,8 @@ export default class AddMemoDialog extends Component<Props, State> {
     isSubmitting: false,
   };
 
-  // $FlowFixMe[value-as-type]
+  // <TODO:CHECK_LINT>
+  // eslint-disable-next-line react/no-unused-class-component-methods
   memoContentInput: TextField;
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
@@ -137,12 +138,15 @@ export default class AddMemoDialog extends Component<Props, State> {
       >
         <TextField
           className={styles.memoContent}
+          // <TODO:CHECK_LINT>
+          // eslint-disable-next-line react/no-unused-class-component-methods
           inputRef={(input) => { this.memoContentInput = input; }}
           {...memoContentField.bind()}
           done={memoContentField.isValid}
           error={memoContentField.error}
         />
         { error ? (<ErrorBlock error={error} />) : null }
-      </Dialog>);
+      </Dialog>
+    );
   }
 }

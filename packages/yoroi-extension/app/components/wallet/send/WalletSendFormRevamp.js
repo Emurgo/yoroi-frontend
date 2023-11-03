@@ -663,14 +663,12 @@ export default class WalletSendForm extends Component<Props, State> {
   render(): Node {
     const { currentStep } = this.state;
     return (
-      <>
-        <div className={styles.component}>
-          <div className={styles.wrapper}>
-            <SendFormHeader step={currentStep} onUpdateStep={this.onUpdateStep.bind(this)} />
-            <div className={styles.formBody}>{this.renderCurrentStep(currentStep)}</div>
-          </div>
+      <div className={styles.component}>
+        <div className={styles.wrapper}>
+          <SendFormHeader step={currentStep} onUpdateStep={this.onUpdateStep.bind(this)} />
+          <div className={styles.formBody}>{this.renderCurrentStep(currentStep)}</div>
         </div>
-      </>
+      </div>
     );
   }
 

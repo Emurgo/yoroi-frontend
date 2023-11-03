@@ -79,6 +79,8 @@ export default class ExportPublicKeyDialog extends Component<Props> {
   |} => Node = (walletInfo) => {
     return (
       <>
+        {/* // <TODO:CHECK_LINT> */}
+        {/* eslint-disable-next-line react/no-unknown-property */}
         <div align="center">
           <QrCodeWrapper
             value={JSON.stringify(walletInfo)}

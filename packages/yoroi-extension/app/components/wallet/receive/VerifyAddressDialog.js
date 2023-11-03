@@ -102,7 +102,8 @@ export default class VerifyAddressDialog extends Component<Props> {
         {this.renderSpendingKey()}
         {this.renderPointer()}
         { this.props.error ? (<ErrorBlock error={this.props.error} />) : null }
-      </Dialog>);
+      </Dialog>
+    );
   }
 
   renderAddressBlock: void => Node = () => {
@@ -146,6 +147,8 @@ export default class VerifyAddressDialog extends Component<Props> {
   renderQrCode: void => Node = () => {
     return (
       <>
+        {/* // <TODO:CHECK_LINT> */}
+        {/* eslint-disable-next-line react/no-unknown-property */}
         <div align="center">
           <QrCodeWrapper
             value={this.props.addressInfo.address}

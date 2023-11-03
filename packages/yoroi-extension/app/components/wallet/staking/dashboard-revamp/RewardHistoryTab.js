@@ -16,8 +16,8 @@ import MuiAccordion from '@mui/material/Accordion';
 import MuiAccordionSummary from '@mui/material/AccordionSummary';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
 
-const ExpandMoreIcon = () => (
-  <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+function ExpandMoreIcon() {
+  return <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
       fillRule="evenodd"
       clipRule="evenodd"
@@ -25,7 +25,7 @@ const ExpandMoreIcon = () => (
       fill="#6B7384"
     />
   </svg>
-);
+}
 
 const Accordion = styled((props /* AccordionProps */) => (
   <MuiAccordion
@@ -79,12 +79,12 @@ type RewardHistoryItemProps = {|
 |};
 type Intl = {| intl: $npm$ReactIntl$IntlShape |};
 
-export const RewardHistoryItem = ({
+export function RewardHistoryItem({
   poolId,
   poolName,
   poolAvatar,
   historyList,
-}: RewardHistoryItemProps): Node => {
+}: RewardHistoryItemProps): Node {
   const avatarGenerated = getAvatarFromPoolId(poolId);
 
   return (
@@ -128,7 +128,7 @@ export const RewardHistoryItem = ({
       </AccordionDetails>
     </Accordion>
   );
-};
+}
 
 type RewardHistoryTabProps = {|
   graphData: GraphRewardData,

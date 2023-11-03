@@ -35,6 +35,6 @@ export default class MinAda extends Component<Props> {
           >
             {intl.formatMessage(messages.minAda, { minAda })}
           </Typography>
-          )
+        )
     }
 }

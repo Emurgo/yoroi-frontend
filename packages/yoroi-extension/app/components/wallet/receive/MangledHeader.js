@@ -36,34 +36,32 @@ export default class MangledHeader extends Component<Props> {
     const { intl } = this.context;
 
     return (
-      <>
-        <WarningHeader
-          message={(
-            <>
-              <p>
-                {intl.formatMessage(
-                  messages.warning1,
-                  { ticker: this.props.ticker }
-                )}
-              </p><br />
-              <p>
-                {intl.formatMessage(addressSubgroupName.mangled)}&nbsp;
-                <FormattedHTMLMessage {...globalMessages.auditAddressWarning} />
-              </p>
-            </>
-          )}
-        >
-          {this.props.hasMangledUtxo && (
-            <Button
-              variant="primary"
-              onClick={this.props.onClick}
-              sx={{ width: 'max-content' , marginTop: '16px' }}
-            >
-              {intl.formatMessage(messages.fixLabel)}
-            </Button>
-          )}
-        </WarningHeader>
-      </>
+      <WarningHeader
+        message={(
+          <>
+            <p>
+              {intl.formatMessage(
+                messages.warning1,
+                { ticker: this.props.ticker }
+              )}
+            </p><br />
+            <p>
+              {intl.formatMessage(addressSubgroupName.mangled)}&nbsp;
+              <FormattedHTMLMessage {...globalMessages.auditAddressWarning} />
+            </p>
+          </>
+        )}
+      >
+        {this.props.hasMangledUtxo && (
+          <Button
+            variant="primary"
+            onClick={this.props.onClick}
+            sx={{ width: 'max-content' , marginTop: '16px' }}
+          >
+            {intl.formatMessage(messages.fixLabel)}
+          </Button>
+        )}
+      </WarningHeader>
     );
   }
 }

@@ -67,7 +67,7 @@ function SummaryCard({
       .split('.');
 
     const amountNode = shouldHideBalance ? (
-      <>{hiddenAmount}</>
+      {hiddenAmount}
     ) : (
       <>
         {splitAmount[0]}

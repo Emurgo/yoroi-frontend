@@ -221,55 +221,53 @@ export default class AddNFTDialog extends Component<Props, State> {
               </h1>
             </div>
           ) : (
-            <>
-              <div className={styles.nftsGrid}>
-                {currentNftsList.map(nft => {
-                  const isIncluded = this.isTokenIncluded(nft.info);
-                  return (
-                    <Box
-                      component="button"
-                      key={nft.info.Identifier}
-                      className={styles.nftCard}
-                      onClick={() => this.onSelect(nft.info)}
+            <div className={styles.nftsGrid}>
+              {currentNftsList.map(nft => {
+                const isIncluded = this.isTokenIncluded(nft.info);
+                return (
+                  <Box
+                    component="button"
+                    key={nft.info.Identifier}
+                    className={styles.nftCard}
+                    onClick={() => this.onSelect(nft.info)}
+                    sx={{
+                      padding: '16px',
+                      cursor: 'pointer',
+                      width: '180px',
+                      minHeight: '237px',
+                      overflow: 'hidden',
+                      border: '2px solid',
+                      borderColor: isIncluded ? 'primary.600' : 'gray.50',
+                      borderRadius: '8px',
+                      transition: 'border-color 300ms ease',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'flex-start',
+                    }}
+                  >
+                    <NFTImage
+                      image={nft.image ?? null}
+                      name={nft.name}
+                      width="141px"
+                      height="141px"
+                    />
+                    <Typography
+                      variant="body1"
+                      color="gray.900"
+                      width="140px"
                       sx={{
-                        padding: '16px',
-                        cursor: 'pointer',
-                        width: '180px',
-                        minHeight: '237px',
-                        overflow: 'hidden',
-                        border: '2px solid',
-                        borderColor: isIncluded ? 'primary.600' : 'gray.50',
-                        borderRadius: '8px',
-                        transition: 'border-color 300ms ease',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'flex-start',
+                        wordWrap: 'break-word',
+                        textAlign: 'center',
+                        mt: '16px',
                       }}
                     >
-                      <NFTImage
-                        image={nft.image ?? null}
-                        name={nft.name}
-                        width="141px"
-                        height="141px"
-                      />
-                      <Typography
-                        variant="body1"
-                        color="gray.900"
-                        width="140px"
-                        sx={{
-                          wordWrap: 'break-word',
-                          textAlign: 'center',
-                          mt: '16px',
-                        }}
-                      >
-                        {nft.name}
-                      </Typography>
-                    </Box>
-                  );
-                })}
-              </div>
-            </>
+                      {nft.name}
+                    </Typography>
+                  </Box>
+                );
+              })}
+            </div>
           )}
         </div>
         {fullNftsList.length !== 0 && (

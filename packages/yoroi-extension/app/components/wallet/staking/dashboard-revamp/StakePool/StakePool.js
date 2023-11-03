@@ -17,13 +17,13 @@ import type { SocialLinks } from '../../../../../containers/wallet/staking/Seiza
 // eslint-disable-next-line react/require-default-props
 type Props = {| socialLinks?: SocialLinks, websiteUrl?: string, +color: string |};
 
-const SocialExternalLink = ({ href, children }: {| href: string, children: Node |}): Node => (
-  <StyledLink href={href} target="_blank" rel="noreferrer noopener">
+function SocialExternalLink({ href, children }: {| href: string, children: Node |}): Node {
+  return <StyledLink href={href} target="_blank" rel="noreferrer noopener">
     {children}
   </StyledLink>
-);
+}
 
-export const SocialMediaStakePool = ({ socialLinks, websiteUrl, color }: Props): Node => {
+export function SocialMediaStakePool({ socialLinks, websiteUrl, color }: Props): Node {
   const twitter = socialLinks?.tw;
   const telegram = socialLinks?.tg;
   const facebook = socialLinks?.fb;
@@ -76,12 +76,12 @@ export const SocialMediaStakePool = ({ socialLinks, websiteUrl, color }: Props):
       ) : null}
     </List>
   );
-};
+}
 
 type HelperTooltipProps = {|
   +message: string | Node,
 |};
-export const HelperTooltip = ({ message }: HelperTooltipProps): Node => {
+export function HelperTooltip({ message }: HelperTooltipProps): Node {
   return (
     <Tooltip title={<Typography variant="body2">{message}</Typography>} arrow placement="right">
       <Box display="inline-flex">
@@ -89,4 +89,4 @@ export const HelperTooltip = ({ message }: HelperTooltipProps): Node => {
       </Box>
     </Tooltip>
   );
-};
+}

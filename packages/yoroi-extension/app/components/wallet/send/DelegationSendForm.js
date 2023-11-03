@@ -155,6 +155,7 @@ export default class DelegationSendForm extends Component<Props> {
         sx={{ margin: '30px auto 0', display: 'block' }}
       >
         {intl.formatMessage(globalMessages.nextButtonLabel)}
-      </Button>);
+      </Button>
+    );
   }
 }

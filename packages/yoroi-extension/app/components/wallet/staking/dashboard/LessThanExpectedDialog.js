@@ -68,6 +68,7 @@ export default class LessThanExpectedDialog extends Component<Props> {
           <li key="4">{intl.formatMessage(messages.reason4)}</li>
           <li key="5">{intl.formatMessage(messages.reason5)}</li>
         </ul>
-      </Dialog>);
+      </Dialog>
+    );
   }
 }

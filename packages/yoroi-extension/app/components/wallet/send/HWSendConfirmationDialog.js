@@ -235,6 +235,7 @@ export default class HWSendConfirmationDialog extends Component<Props> {
         {amountBlock}
         {totalAmountBlock}
         <ErrorBlock error={error} />
-      </Dialog>);
+      </Dialog>
+    );
   }
 }

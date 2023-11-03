@@ -35,7 +35,10 @@ export default class RewardGraphClean extends Component<Props> {
     } = this.props;
 
     const formatYAxis = value => (!hideYAxis ? value : '∗∗∗ ');
-    const GraphTooltip = ({
+
+    // <TODO:CHECK_LINT>
+    // eslint-disable-next-line react/no-unstable-nested-components
+    function GraphTooltip({
       active,
       payload,
       label,
@@ -43,7 +46,7 @@ export default class RewardGraphClean extends Component<Props> {
       active: boolean,
       payload: ?[any],
       label: string,
-    |}) => {
+    |}) {
       if (active && payload != null) {
         const { poolName } = payload[0].payload;
         const values = [
@@ -84,7 +87,7 @@ export default class RewardGraphClean extends Component<Props> {
         );
       }
       return null;
-    };
+    }
 
     // $FlowExpectedError[prop-missing] props are passed implicitly which causes a flow error
     const graphTooltip = <GraphTooltip />;

@@ -11,7 +11,7 @@ import {
 import BigNumber from 'bignumber.js';
 import { defineMessages, intlShape } from 'react-intl';
 import { AmountInputRevamp } from '../../../common/NumericInputRP';
-import { ReactComponent as CloseIcon} from '../../../../assets/images/forms/close-small.inline.svg';
+import { ReactComponent as CloseIcon } from '../../../../assets/images/forms/close-small.inline.svg';
 import type { FormattedTokenDisplay } from '../../../../utils/wallet'
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';

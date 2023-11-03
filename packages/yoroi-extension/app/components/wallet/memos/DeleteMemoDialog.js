@@ -88,6 +88,7 @@ export default class DeleteMemoDialog extends Component<Props, State> {
           { error ? (<ErrorBlock error={error} />) : null }
           <FormattedHTMLMessage {...messages.deleteMemoContent} />
         </div>
-      </Dialog>);
+      </Dialog>
+    );
   }
 }

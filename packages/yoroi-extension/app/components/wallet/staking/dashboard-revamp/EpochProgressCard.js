@@ -38,7 +38,7 @@ type TitleProps = {|
   +label: string,
   +value: string | number,
 |};
-const Title = ({ label, value }: TitleProps): Node => {
+function Title({ label, value }: TitleProps): Node {
   return (
     <Box>
       <Typography fontWeight="500" color="primary.600">
@@ -46,13 +46,13 @@ const Title = ({ label, value }: TitleProps): Node => {
       </Typography>
     </Box>
   );
-};
+}
 
 type InfoColumnProps = {|
   +label: string,
   +value: string | number | Date,
 |};
-const LabelWithValue = ({ label, value }: InfoColumnProps): Node => {
+function LabelWithValue({ label, value }: InfoColumnProps): Node {
   return (
     <Box>
       <Typography
@@ -66,9 +66,9 @@ const LabelWithValue = ({ label, value }: InfoColumnProps): Node => {
       <Typography color="var(--yoroi-palette-gray-900)">{value}</Typography>
     </Box>
   );
-};
+}
 
-const Graph = ({ value, days }): Node => {
+function Graph({ value, days }): Node {
   return (
     <Box mr="8px" position="relative" display="flex" justifyContent="center">
       <CircularProgress
@@ -110,4 +110,4 @@ const Graph = ({ value, days }): Node => {
       </Box>
     </Box>
   );
-};
+}

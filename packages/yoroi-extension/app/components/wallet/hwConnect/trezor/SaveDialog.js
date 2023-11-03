@@ -199,7 +199,8 @@ export default class SaveDialog extends Component<Props> {
           <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
         }
         <HelpLinkBlock onExternalLinkClick={onExternalLinkClick} />
-      </Dialog>);
+      </Dialog>
+    );
   }
 
   save: void => void = () => {

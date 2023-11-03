@@ -165,6 +165,7 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props, Sta
             return (
               <Stack
                 // use the form name key to know when we reset
+                // eslint-disable-next-line react/no-array-index-key
                 key={form.name + '-word-' + idx}
               >
                 <Box
