@@ -14,7 +14,7 @@ import type {
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import type { MessageType } from '../../ledger/types/cmn';
 
-declare var chrome;
+declare var chrome: any;
 
 export type ExtendedPublicKeyResp<Response> = {|
   response: Response,

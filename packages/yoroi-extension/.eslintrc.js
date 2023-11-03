@@ -73,7 +73,7 @@ module.exports = {
     'no-plusplus': 0,
     'no-bitwise': 0,
     'no-underscore-dangle': 0,
-    'no-console': 1,
+    'no-console': 0,
     'no-mixed-operators': 0,
     'no-multi-assign': 0,
     'no-undef-init': 0, // need this to improve Flow type inference
@@ -90,7 +90,7 @@ module.exports = {
     'no-useless-escape': 1,
     'prefer-const': 1,
     'object-curly-spacing': 1,
-    'spaced-comment': 1,
+    'spaced-comment': 0,
     quotes: ['error', 'single', { avoidEscape: true, allowTemplateLiterals: true }],
     'import/imports-first': 1,
     'react/jsx-indent': 1,
@@ -110,6 +110,7 @@ module.exports = {
       2,
       { object: 'TrezorConnect', message: 'Use TrezorWrapper instead to minimize Trezor iframe lifespan', },
     ],
+    'no-promise-executor-return': 0,
   },
   plugins: [
     'import',

@@ -23,7 +23,7 @@ import { Stack, Typography, Box } from '@mui/material';
 import { TIPS_DIALOGS, isDialogShownBefore } from './steps';
 import { ReactComponent as InfoIcon } from '../../../assets/images/info-icon-primary.inline.svg';
 
-const messages: * = defineMessages({
+const messages: any = defineMessages({
   createDesc: {
     id: 'wallet.create.forthStep.description',
     defaultMessage:

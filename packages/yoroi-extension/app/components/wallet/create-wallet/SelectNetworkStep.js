@@ -11,7 +11,7 @@ import styles from './SelectNetworkStep.scss';
 import globalMessages from '../../../i18n/global-messages';
 import StepController from './StepController';
 
-const messages: * = defineMessages({
+const messages: any = defineMessages({
   title: {
     id: 'wallet.create.selectNetwork.title',
     defaultMessage: '!!!Select network',

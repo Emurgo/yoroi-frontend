@@ -20,7 +20,7 @@ import SelectNetworkStep from '../create-wallet/SelectNetworkStep';
 import environment from '../../../environment';
 import { useRestoreWallet } from './hooks';
 
-const messages: * = defineMessages({
+const messages: any = defineMessages({
   title: {
     id: 'wallet.restore.title',
     defaultMessage: '!!!Restore existing wallet',

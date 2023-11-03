@@ -1,6 +1,6 @@
 // @flow
 
-import { render } from 'react-dom';
+import ReactDOM from 'react-dom';
 import { action, configure } from 'mobx';
 import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';
 import { createHashHistory } from 'history';
@@ -46,8 +46,8 @@ const initializeYoroi: void => Promise<void> = async () => {
     })
   };
 
-  const root = document.querySelector('#root');
-  if (root == null) {
+  const rootElement = document.querySelector('#root');
+  if (rootElement == null) {
     throw new Error('Root element not found.');
   }
   Logger.debug(`[yoroi] root located`);
@@ -62,7 +62,8 @@ const initializeYoroi: void => Promise<void> = async () => {
     }
   }
 
-  render(
+  const root = ReactDOM.createRoot(rootElement);
+  root.render(
     <App stores={stores} actions={actions} history={history} />,
     root
   );

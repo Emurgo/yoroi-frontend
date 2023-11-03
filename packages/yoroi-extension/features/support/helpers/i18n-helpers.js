@@ -4,12 +4,12 @@ import { IntlProvider } from 'react-intl';
 
 const DEFAULT_LANGUAGE = 'en-US';
 
-declare var yoroi;
+declare var yoroi: any;
 
 export default {
   setActiveLanguage: async (
     client: any,
-    { language }: {| language: string,  |} = {}
+    { language }: {| language?: string,  |} = {}
   ): Promise<void> => (
     await client.executeScript(locale => {
       yoroi.actions.profile.updateTentativeLocale.trigger({ locale });

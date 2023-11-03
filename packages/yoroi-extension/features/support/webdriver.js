@@ -1,7 +1,7 @@
 // @flow
 
 import { setWorldConstructor } from 'cucumber';
-import { Builder, Key, until, error, promise, WebElement, logging } from 'selenium-webdriver';
+import { Builder, Key, until, error, promise, WebDriver, WebElement, logging } from 'selenium-webdriver';
 import chrome from 'selenium-webdriver/chrome';
 import firefox from 'selenium-webdriver/firefox';
 import path from 'path';
@@ -23,7 +23,7 @@ const firefoxBin = process.env.FIREFOX_BIN != null
   ? process.env.FIREFOX_BIN
   : '/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox-bin';
 
-function encode(file) {
+function encode(file: any) {
   return fs.readFileSync(file, { encoding: 'base64' });
 }
 
@@ -127,7 +127,9 @@ export type LocatorObject = {|
     | 'tagName',
 |};
 
-function CustomWorld(cmdInput: WorldInput) {
+export type HasDriver = { driver: WebDriver, ... };
+
+function CustomWorld(this: any, cmdInput: WorldInput) {
   let builder;
   switch (cmdInput.parameters.browser) {
     case 'brave': {

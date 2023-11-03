@@ -19,7 +19,7 @@ export default class FullscreenLayout extends Component<Props, State> {
     children: undefined
   };
 
-  contentRef: ?ElementRef<*>;
+  contentRef: ?ElementRef<any>;
 
   state: State = {
     height: Number.MAX_SAFE_INTEGER

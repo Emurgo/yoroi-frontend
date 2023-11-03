@@ -3,7 +3,7 @@
 import LocalizableError from '../i18n/LocalizableError';
 import { defineMessages } from 'react-intl';
 
-const errors: * = defineMessages({
+const errors: any = defineMessages({
   transactionHashMismatchError: {
     id: 'wallet.hw.tx.hash.error',
     defaultMessage: '!!!The transaction hash computed by Yoroi extension and that by the device mismatch.',

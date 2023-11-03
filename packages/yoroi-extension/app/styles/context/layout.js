@@ -1,6 +1,6 @@
 // @flow
-import React from 'react';
 import type { Node } from 'react';
+import React from 'react';
 import { THEMES } from '../utils';
 
 export type Layouts = 'CLASSIC' | 'REVAMP';
@@ -16,24 +16,23 @@ export type InjectedLayoutProps = {|
 
 const LayoutContext = React.createContext();
 
-const LayoutProvider = (props: Object): Node => {
+function LayoutProvider(props: Object): Node {
   const { layout } = props;
   const localLayout: Layouts = layout === THEMES.YOROI_REVAMP ? 'REVAMP' : 'CLASSIC';
-
+  // <TODO:CHECK_LINT>
+  // eslint-disable-next-line react/jsx-no-constructed-context-values
+  const value = {
+    selectedLayout: localLayout,
+    isRevampLayout: localLayout === 'REVAMP',
+    renderLayoutComponent: (layoutMap: LayoutComponentMap = {}) => layoutMap[localLayout],
+  };
   return (
     <LayoutContext.Provider
-      value={{
-        selectedLayout: localLayout,
-        isRevampLayout: localLayout === 'REVAMP',
-        renderLayoutComponent: (layoutMap: LayoutComponentMap = {}) => {
-          const selectedComponent = layoutMap[localLayout];
-          return selectedComponent;
-        },
-      }}
+      value={value}
       {...props}
     />
   );
-};
+}
 
 function useLayout(): Object {
   const context = React.useContext(LayoutContext);
@@ -43,9 +42,11 @@ function useLayout(): Object {
   return context;
 }
 
-const withLayout = (WrappedComponent: Function): Function => props => {
-  const layoutProps = useLayout();
-  return <WrappedComponent {...props} {...layoutProps} />;
+const withLayout: (Function => Function) = WrappedComponent => {
+  return function (props) {
+    const layoutProps = useLayout();
+    return <WrappedComponent {...props} {...layoutProps} />;
+  };
 };
 
 export { LayoutProvider, useLayout, withLayout };

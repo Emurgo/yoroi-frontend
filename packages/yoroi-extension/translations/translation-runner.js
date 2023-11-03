@@ -10,7 +10,7 @@ if (!fs.existsSync(messagesDirectory)) {
   throw new Error();
 }
 
-function disableWhitelistFile(langResults) {
+function disableWhitelistFile(langResults: { whitelistFilepath: any, ... }) {
   // we hijack this hook to modify an otherwise unrelated property
   // this causes a downstream function that writes whitelists to write to dev/null
   // kind of hacky but this suppresses generation of pointless whitelist files

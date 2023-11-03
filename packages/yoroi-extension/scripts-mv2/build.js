@@ -6,7 +6,7 @@ const tasks = require('./tasks');
 const argv = require('minimist')(process.argv.slice(2));
 const { buildAndCopyInjector } = require('../scripts/utils');
 
-const exec = cmd => {
+const exec = (cmd: string) => {
   const r = shell.exec(cmd);
   if (r.code !== 0) {
     process.exit(r);

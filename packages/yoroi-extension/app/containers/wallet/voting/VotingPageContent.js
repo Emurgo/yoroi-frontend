@@ -31,7 +31,7 @@ import type { CatalystRoundInfoResponse } from '../../../api/ada/lib/state-fetch
 export type GeneratedData = typeof VotingPageContent.prototype.generated;
 type Props = InjectedOrGenerated<GeneratedData>;
 
-const messages: * = defineMessages({
+const messages: any = defineMessages({
   mainTitle: {
     id: 'wallet.registrationOver.mainTitle',
     defaultMessage: '!!!Registration is now closed.',

@@ -20,20 +20,21 @@
 flow/declarations/
 
 [lints]
-sketchy-null=warn
-sketchy-number=warn
-unnecessary-optional-chain=warn
+sketchy-null=off
+sketchy-number=off
+unnecessary-optional-chain=off
 ambiguous-object-type=error
-unnecessary-invariant=warn
-deprecated-utility=error
+unnecessary-invariant=off
+;deprecated-utility=error
 # re-enable this if it's ever shipped as part of Flow
 # no-floating-promises=warn
 
 [options]
 types_first=true
-include_warnings=true
+include_warnings=false
 esproposal.decorators=ignore
 module.ignore_non_literal_requires=true
+experimental.this_annot=true
 module.name_mapper.extension='scss' -> '<PROJECT_ROOT>/flow/mappers/CSSModule.js.flow'
 module.name_mapper.extension='png' -> '<PROJECT_ROOT>/flow/mappers/WebpackAsset.js.flow'
 module.name_mapper.extension='jpg' -> '<PROJECT_ROOT>/flow/mappers/WebpackAsset.js.flow'

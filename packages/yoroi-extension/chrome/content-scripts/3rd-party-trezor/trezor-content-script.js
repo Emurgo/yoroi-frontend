@@ -1,7 +1,7 @@
 // @flow
 
 /*::
-declare var chrome;
+declare var chrome: any;
 */
 
 /*

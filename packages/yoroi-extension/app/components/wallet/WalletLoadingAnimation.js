@@ -9,7 +9,7 @@ import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Stack, Typography } from '@mui/material';
 import dotFlashingStyles from '../widgets/DotFlashing.scss';
 
-const messages: * = defineMessages({
+const messages: any = defineMessages({
   walletLoading: {
     id: 'wallet.create.walletLoading',
     defaultMessage: '!!!Preparing your wallet',

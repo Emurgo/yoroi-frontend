@@ -7,7 +7,7 @@ import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import BigNumber from 'bignumber.js';
 
-export const messages: * = defineMessages({
+export const messages: any = defineMessages({
   title: {
     id: 'wallet.insufficientFunds.title',
     defaultMessage: '!!!Insufficient funds.',

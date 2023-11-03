@@ -83,7 +83,7 @@ import { hexToBytes } from '../../app/coreUtils';
 import { mergeWitnessSets } from './connector/utils';
 
 /*::
-declare var chrome;
+declare var chrome: any;
 */
 
 const onYoroiIconClicked = () => {
@@ -318,7 +318,7 @@ async function withDb<T>(
 async function createFetcher(
   fetcherType: Function,
   localStorageApi: LocalStorageApi,
-): * {
+): any{
   const locale = await localStorageApi.getUserLocale() ?? 'en-US';
   return new fetcherType(
     () => environment.getVersion(),

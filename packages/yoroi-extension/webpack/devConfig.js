@@ -11,7 +11,7 @@ const baseDevConfig = (
   networkName /*: string */,
   isNightly /*: boolean */,
   isLight /* : ?boolean */ = false
-) /*: * */ => ({
+) /*: any*/ => ({
   mode: 'development',
   optimization: commonConfig.optimization,
   experiments: commonConfig.experiments,
@@ -91,7 +91,7 @@ const backgroundServiceWorkerConfig = (
   networkName /*: string */,
   isNightly /*: boolean */,
   isLight /* : ?boolean */ = false
-) /*: * */ => ({
+) /*: any*/ => ({
   mode: 'development',
   experiments: { asyncWebAssembly: true },
   resolve: commonConfig.resolve(),

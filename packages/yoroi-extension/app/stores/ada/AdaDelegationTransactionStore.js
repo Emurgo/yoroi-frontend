@@ -138,7 +138,8 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     const delegationTxPromise = this.createDelegationTx.execute({
       publicDeriver: basePubDeriver,
       poolRequest: request.poolRequest,
-      registrationStatus: adaDelegationRequests.getDelegatedBalance.result?.stakeRegistered === true,
+      registrationStatus: adaDelegationRequests
+        .getDelegatedBalance.result?.stakeRegistered === true,
       valueInAccount: delegationRequests.getDelegatedBalance.result?.accountPart
         ?? new MultiToken([], defaultToken),
       absSlotNumber,

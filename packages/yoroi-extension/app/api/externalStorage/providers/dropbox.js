@@ -23,6 +23,7 @@ import type {
   GetMetadataExternalTxMemoResponse, FetchFolderExternalTxMemoResponse,
   CreateFolderExternalTxMemoResponse
 } from './IProvider';
+import { objHasOwnProperty } from '../../../../rootUtils';
 
 export default class DropboxApi implements IProvider {
   authorizeUrl: string = `https://www.dropbox.com/oauth2/authorize?client_id=${DROPBOX_CLIENT_ID}&response_type=token&redirect_uri=${ROUTES.ROOT}#/`;
@@ -100,14 +101,14 @@ export default class DropboxApi implements IProvider {
     })
       .then((response) => {
         if (
-          !Object.prototype.hasOwnProperty.call(response, '.tag')
-          || !Object.prototype.hasOwnProperty.call(response, 'name')
+          !objHasOwnProperty(response, '.tag')
+          || !objHasOwnProperty(response, 'name')
         ) {
           throw new Error('Should never happen');
         }
         return {
           tag: response['.tag'],
-          lastUpdated: Object.prototype.hasOwnProperty.call(response, 'server_modified')
+          lastUpdated: objHasOwnProperty(response, 'server_modified')
             // $FlowFixMe[incompatible-use]
             && response.server_modified != null
             ? moment(response.server_modified, 'YYYY-MM-DDTHH:mm:ssZ').toDate()
@@ -189,14 +190,14 @@ export default class DropboxApi implements IProvider {
       .then((response) => {
         return response.entries
           .filter(entry => (
-            Object.prototype.hasOwnProperty.call(entry, '.tag')
-            && Object.prototype.hasOwnProperty.call(entry, 'name')
+            objHasOwnProperty(entry, '.tag')
+            && objHasOwnProperty(entry, 'name')
           ))
           .map(entry => {
             return {
               tx: entry.name.substr(0, entry.name.length - this.memoExt.length),
               deleted: entry['.tag'] === 'deleted',
-              lastUpdated: Object.prototype.hasOwnProperty.call(entry, 'server_modified')
+              lastUpdated: objHasOwnProperty(entry, 'server_modified')
                 // $FlowFixMe[incompatible-use]
                 && entry.server_modified != null
                 ? moment(entry.server_modified, 'YYYY-MM-DDTHH:mm:ssZ').toDate()

@@ -24,7 +24,7 @@ export default {
   decorators: [withScreenshot],
 };
 
-export const GettingMnemonics = (): Node => {
+export function GettingMnemonics(): Node {
   const linkCases = {
     Send: 0,
     Invalid: 1,
@@ -105,4 +105,4 @@ export const GettingMnemonics = (): Node => {
       }}
     />
   );
-};
+}

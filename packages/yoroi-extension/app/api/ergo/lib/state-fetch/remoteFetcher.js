@@ -58,10 +58,10 @@ function errClass(Err: Function): (* => Function) {
 type AxiosGet<T> = {|
   responseMapper?: Object => T,
   callerName: string,
-  errorFactory: (error: *) => Function,
+  errorFactory: (error: any) => Function,
 |};
 type AxiosPost<T> = {|
-  data?: *,
+  data?: any,
   ...AxiosGet<T>,
 |};
 type AxiosParams<T> = AxiosGet<T> | AxiosPost<T>;
@@ -70,7 +70,7 @@ type AxiosFunc<T> = (string, AxiosParams<T>) => Promise<T>
 
 function axiosRequest<T>(fetcher: RemoteFetcher, method: AxiosMethod): AxiosFunc<T> {
   return (url, params) => {
-    const debug = (s: string, p: *) => {
+    const debug = (s: string, p: any) => {
       // eslint-disable-next-line no-console
       console.debug(`AXIOS[${method}][${url}] ${s} > `, cloneDeep(p));
     };
@@ -141,14 +141,14 @@ export class RemoteFetcher implements IFetcher {
   axiosGet: <T>(string, {|
     responseMapper?: Object => T,
     callerName: string,
-    errorFactory: (error: *) => Function,
+    errorFactory: (error: any) => Function,
   |}) => Promise<T> = axiosRequest(this, 'get');
 
   axiosPost: <T>(string, {|
-    data: *,
+    data: any,
     responseMapper?: Object => T,
     callerName: string,
-    errorFactory: (error: *) => Function,
+    errorFactory: (error: any) => Function,
   |}) => Promise<T> = axiosRequest(this, 'post');
 
 

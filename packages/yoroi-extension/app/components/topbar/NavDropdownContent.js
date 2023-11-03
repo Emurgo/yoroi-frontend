@@ -10,7 +10,7 @@ type Props = {|
   +contentComponents?: ?Node,
   +onAddWallet: void => void,
   +onClickOutside: void => void,
-  +buttonRef: ?ElementRef<*>;
+  +buttonRef: ?ElementRef<any>;
   +openBuySellDialog: void => void,
 |};
 
@@ -23,7 +23,7 @@ export default class NavDropdownContent extends Component<Props, State> {
   static defaultProps: {|contentComponents: void|} = {
     contentComponents: undefined,
   };
-  contentRef: ?ElementRef<*>;
+  contentRef: ?ElementRef<any>;
 
   state: State = {
     maxHeight: Number.MAX_SAFE_INTEGER

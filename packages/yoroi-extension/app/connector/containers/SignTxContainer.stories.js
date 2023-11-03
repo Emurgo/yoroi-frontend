@@ -86,7 +86,7 @@ const message = (id: number) => ({
 });
 
 const genBaseProps: {|
-  wallet: *,
+  wallet: any,
   isLoading?: true,
 |} => * = (request) => {
   const parsedTokenMetadata = decodeErgoTokenInfo(tokenInfo.registers);

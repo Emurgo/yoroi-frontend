@@ -21,7 +21,7 @@ import { createAuthEntry } from '../api';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 
 type GeneratedData = typeof ConnectContainer.prototype.generated;
-declare var chrome;
+declare var chrome: any;
 
 type State = {|
   isAppAuth: boolean,

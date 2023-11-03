@@ -17,7 +17,7 @@ Then(/^I decrease last launch version$/, async function () {
   });
 });
 
-declare var yoroi;
+declare var yoroi: any;
 
 async function getLastLaunchVersion(client: any) {
   return await client.executeScript(() => yoroi.stores.profile.lastLaunchVersion);

@@ -11,7 +11,7 @@ import RestoreWalletLogo from '../../../assets/images/add-wallet/restore-wallet-
 import AddWalletCard from './AddWalletCard';
 
 
-const messages: * = defineMessages({
+const messages: any = defineMessages({
   createWallet: {
     id: 'wallet.add.page.revamp.createWallet',
     defaultMessage: '!!!Create new wallet',

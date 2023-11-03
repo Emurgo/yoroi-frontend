@@ -11,7 +11,7 @@ import {
 import { CHANGELLY_URL, POOLS_UI_URL_FOR_YOROI } from './manifestEnvs'
 import pkg from '../package.json';
 
-export default (isDebug: boolean, shouldInjectConnector: boolean): * => buildManifest({
+export default (isDebug: boolean, shouldInjectConnector: boolean): any=> buildManifest({
   description: '[dev] Cardano ADA wallet',
   defaultTitle: '[dev] Yoroi',
   contentSecurityPolicy: genCSP({

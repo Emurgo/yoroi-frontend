@@ -85,8 +85,8 @@ const genTokenInfoMap = (network) => {
 const genBaseProps: {|
   wallet: PossibleCacheTypes,
   dialogInfo?: {|
-    sendMoneyRequest: *,
-    transactionBuilderStore: *,
+    sendMoneyRequest: any,
+    transactionBuilderStore: any,
   |},
   noExternalStorage?: boolean,
   initialShowMemoState?: boolean,

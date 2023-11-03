@@ -16,7 +16,7 @@ const baseDevConfig = (
   networkName /*: string */,
   isNightly /*: boolean */,
   isLight /* : ?boolean */ = false
-) /*: * */ => ({
+) /*: any*/ => ({
   mode: 'development',
   optimization: commonConfig.optimization,
   experiments: commonConfig.experiments,

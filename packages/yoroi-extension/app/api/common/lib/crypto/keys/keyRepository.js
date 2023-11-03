@@ -202,7 +202,7 @@ const KeyDerivationMixin = (
   superclass: Class<KeyDerivationDependencies>,
 ) => (class KeyDerivation extends superclass {
 });
-const KeyDerivation: * = Mixin<
+const KeyDerivation: any = Mixin<
   KeyDerivationDependencies,
   Empty,
 >(KeyDerivationMixin);
@@ -226,7 +226,7 @@ const PrivateKeyMixin = (
   superclass: Class<PrivateKeyDependencies>,
 ) => (class PrivateKey extends superclass {
 });
-const PrivateKey: * = Mixin<
+const PrivateKey: any = Mixin<
   PrivateKeyDependencies,
   Empty,
 >(PrivateKeyMixin);
@@ -250,7 +250,7 @@ const PublicKeyMixin = (
   superclass: Class<PublicKeyDependencies>,
 ) => (class PublicKey extends superclass {
 });
-const PublicKey: * = Mixin<
+const PublicKey: any = Mixin<
   PublicKeyDependencies,
   Empty,
 >(PublicKeyMixin);

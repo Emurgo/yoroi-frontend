@@ -6,7 +6,7 @@ import {
 } from './constants';
 import pkg from '../package.json';
 
-export default (): * => buildManifest({
+export default (): any=> buildManifest({
   description: 'A simple, secure and fast Cardano ADA wallet.',
   defaultTitle: 'Yoroi Shelley Testnet',
   titleOverride: true,

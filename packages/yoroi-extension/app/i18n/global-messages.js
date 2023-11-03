@@ -7,7 +7,7 @@ import { defineMessages } from 'react-intl';
  * We instead store the shared messages in this file
  */
 
-const globalMessages: * = defineMessages({
+const globalMessages: any = defineMessages({
   buy: {
     id: 'global.buy',
     defaultMessage: '!!!Buy',
@@ -985,7 +985,7 @@ const globalMessages: * = defineMessages({
 });
 export default globalMessages;
 
-export const memoMessages: * = defineMessages({
+export const memoMessages: any = defineMessages({
   memoLabel: {
     id: 'global.labels.memo',
     defaultMessage: '!!!Memo',
@@ -1011,7 +1011,7 @@ export const memoMessages: * = defineMessages({
     defaultMessage: '!!!Memos are stored localy only',
   },
 });
-export const connectorMessages: * = defineMessages({
+export const connectorMessages: any = defineMessages({
   connectedWebsites: {
     id: 'global.connector.connectedWebsites',
     defaultMessage: '!!!Connected Websites',

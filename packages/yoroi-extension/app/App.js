@@ -4,10 +4,10 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { Router } from 'react-router-dom';
 import type { RouterHistory } from 'react-router-dom';
-import { addLocaleData, IntlProvider } from 'react-intl';
+import { IntlProvider } from 'react-intl';
 import { observable, autorun, runInAction } from 'mobx';
 import { Routes } from './Routes';
-import { locales, translations } from './i18n/translations';
+import { translations } from './i18n/translations';
 import type { StoresMap } from './stores';
 import type { ActionsMap } from './actions';
 import { changeToplevelTheme, MuiThemes } from './styles/utils';
@@ -22,9 +22,6 @@ import { CssBaseline } from '@mui/material';
 import { globalStyles } from './styles/globalStyles';
 import Support from './components/widgets/Support';
 import { trackNavigation } from './api/analytics';
-
-// https://github.com/yahoo/react-intl/wiki#loading-locale-data
-addLocaleData(locales);
 
 type Props = {|
   +stores: StoresMap,

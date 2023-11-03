@@ -603,7 +603,8 @@ class WalletSendPage extends Component<AllProps> {
   };
 
   @computed get generated(): {|
-    WalletSendConfirmationDialogContainerProps: InjectedOrGenerated<WalletSendConfirmationDialogContainerData>,
+    WalletSendConfirmationDialogContainerProps:
+      InjectedOrGenerated<WalletSendConfirmationDialogContainerData>,
     actions: {|
       ada: {|
         ledgerSend: {|

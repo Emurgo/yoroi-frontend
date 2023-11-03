@@ -231,12 +231,10 @@ class MyWalletsPage extends Component<AllProps> {
         }
       );
       return (
-        <>
-          <WalletCurrency
-            currency={getTokenName(defaultTokenInfo)}
-            tooltipText={undefined /* TODO */}
-          />
-        </>
+        <WalletCurrency
+          currency={getTokenName(defaultTokenInfo)}
+          tooltipText={undefined /* TODO */}
+        />
       );
     })();
 

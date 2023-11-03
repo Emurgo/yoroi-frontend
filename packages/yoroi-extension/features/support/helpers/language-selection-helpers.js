@@ -8,7 +8,7 @@ import {
 
 export const waitForVisibleLanguageSelection = async (
   customWorld: any,
-  { isHidden }: {| isHidden: boolean, |} = {}
+  { isHidden }: {| isHidden?: boolean, |} = {}
 ): Promise<void> => {
   if (isHidden) {
     return customWorld.waitForElementNotPresent(languageSelectionForm);

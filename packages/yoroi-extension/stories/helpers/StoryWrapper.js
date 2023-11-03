@@ -3,20 +3,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { addLocaleData, IntlProvider } from 'react-intl';
-import en from 'react-intl/locale-data/en';
-import ko from 'react-intl/locale-data/ko';
-import ja from 'react-intl/locale-data/ja';
-import zh from 'react-intl/locale-data/zh';
-import ru from 'react-intl/locale-data/ru';
-import de from 'react-intl/locale-data/de';
-import fr from 'react-intl/locale-data/fr';
-import nl from 'react-intl/locale-data/nl';
-import pt from 'react-intl/locale-data/pt';
-import id from 'react-intl/locale-data/id';
-import es from 'react-intl/locale-data/es';
-import it from 'react-intl/locale-data/it';
-import tr from 'react-intl/locale-data/tr';
+import { IntlProvider } from 'react-intl';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 import { observable, autorun, runInAction } from 'mobx';
@@ -40,23 +27,6 @@ import { LayoutProvider } from '../../app/styles/context/layout';
 /**
  * This whole file is meant to mirror code in App.js
  */
-
-// https://github.com/yahoo/react-intl/wiki#loading-locale-data
-addLocaleData([
-  ...en,
-  ...ko,
-  ...ja,
-  ...zh,
-  ...ru,
-  ...de,
-  ...fr,
-  ...nl,
-  ...pt,
-  ...id,
-  ...es,
-  ...it,
-  ...tr,
-]);
 
 // TODO: should remove this as it's deprecated in Storybook v6
 // but knobs-preset seems to have an issue in the alpha build

@@ -42,9 +42,10 @@ const addressesLimit = 50;
 const txsLimit = 20;
 
 function _validateAddressesReq(
-  { addresses }: { addresses: Array<string>, ... } = {},
+  body: { addresses?: Array<string>, ... },
   localLogger: LocalLogger
 ): boolean {
+  const { addresses } = body ?? {};
   localLogger.logInfo(`Validate Addresses request`);
   if (!addresses || addresses.length > addressesLimit || addresses.length === 0) {
     localLogger.logError(`Addresses request length should be (0, ${addressesLimit})`);
@@ -243,9 +244,6 @@ export function getMockServer(settings: {
           localLogger.logError(
             `Wrong transaction payload. Expected ${expectedTxBase64[0]} and found ${req.body.signedTx}`
           );
-          // throw new Error(
-          //   `Wrong transaction payload. Expected ${expectedTxBase64[0]} and found ${req.body.signedTx}`
-          // );
         }
         methodLogger.logRequest(JSON.stringify(req.body));
 

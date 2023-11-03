@@ -81,9 +81,7 @@ export default class RegisterDialogContainer extends Component<Props> {
         closeButton={<DialogCloseButton onClose={this.props.cancel} />}
         actions={dialogBackButton}
       >
-        <>
-          <ErrorBlock error={error} />
-        </>
+        <ErrorBlock error={error} />
       </Dialog>
     );
   };

@@ -145,7 +145,7 @@ const HasPrivateDeriverMixin = (
   superclass: Class<HasPrivateDeriverDependencies>,
 ) => (class HasPrivateDeriver extends superclass {
 });
-export const HasPrivateDeriver: * = Mixin<
+export const HasPrivateDeriver: any = Mixin<
   HasPrivateDeriverDependencies,
   Empty,
 >(HasPrivateDeriverMixin);
@@ -163,7 +163,7 @@ const HasLevelsMixin = (
   superclass: Class<HasLevelsDependencies>,
 ) => (class HasLevels extends superclass {
 });
-export const HasLevels: * = Mixin<
+export const HasLevels: any = Mixin<
   HasLevelsDependencies,
   Empty,
 >(HasLevelsMixin);
@@ -181,7 +181,7 @@ const HasSignMixin = (
   superclass: Class<HasSignDependencies>,
 ) => (class HasSign extends superclass {
 });
-export const HasSign: * = Mixin<
+export const HasSign: any = Mixin<
   HasSignDependencies,
   Empty,
 >(HasSignMixin);
@@ -526,7 +526,7 @@ const GetAllUtxosMixin = (
   }
 });
 
-export const GetAllUtxos: * = Mixin<
+export const GetAllUtxos: any = Mixin<
   GetAllUtxosDependencies,
   IGetAllUtxos,
 >(GetAllUtxosMixin);
@@ -663,7 +663,7 @@ const GetAllAccountingMixin = (
   }
 });
 
-export const GetAllAccounting: * = Mixin<
+export const GetAllAccounting: any = Mixin<
   GetAllAccountingDependencies,
   GetAllAccountingFuncs,
 >(GetAllAccountingMixin);
@@ -689,7 +689,7 @@ const GetStakingKeyMixin = (
 ) => (class GetStakingKey extends superclass implements IGetStakingKey {
 });
 
-export const GetStakingKey: * = Mixin<
+export const GetStakingKey: any = Mixin<
   GetStakingKeyDependencies,
   IGetStakingKey,
 >(GetStakingKeyMixin);
@@ -798,7 +798,7 @@ const AddBip44FromPublicMixin = (
     );
   }
 });
-export const AddBip44FromPublic: * = Mixin<
+export const AddBip44FromPublic: any = Mixin<
   AddBip44FromPublicDependencies,
   IAddBip44FromPublic,
 >(AddBip44FromPublicMixin);
@@ -1038,7 +1038,7 @@ const DisplayCutoffMixin = (
   }
 });
 
-export const DisplayCutoff: * = Mixin<
+export const DisplayCutoff: any = Mixin<
   DisplayCutoffDependencies,
   IDisplayCutoff,
 >(DisplayCutoffMixin);
@@ -1118,7 +1118,7 @@ const CardanoBip44PickReceiveMixin = (
     );
   }
 });
-export const CardanoBip44PickReceive: * = Mixin<
+export const CardanoBip44PickReceive: any = Mixin<
   CardanoBip44PickReceiveMixinDependencies,
   IPickReceive
 >(CardanoBip44PickReceiveMixin);
@@ -1187,7 +1187,7 @@ const ErgoBip44PickReceiveMixin = (
     );
   }
 });
-export const ErgoBip44PickReceive: * = Mixin<
+export const ErgoBip44PickReceive: any = Mixin<
   ErgoBip44PickReceiveMixinDependencies,
   IPickReceive
 >(ErgoBip44PickReceiveMixin);
@@ -1269,7 +1269,7 @@ const Cip1852PickReceiveMixin = (
     );
   }
 });
-export const Cip1852PickReceive: * = Mixin<
+export const Cip1852PickReceive: any = Mixin<
   Cip1852PickReceiveMixinDependencies,
   IPickReceive
 >(Cip1852PickReceiveMixin);
@@ -1284,7 +1284,7 @@ const PickReceiveMixin = (
 ) => (class PickReceive extends superclass implements IPickReceive {
 });
 
-export const PickReceive: * = Mixin<
+export const PickReceive: any = Mixin<
   PickReceiveDependencies,
   IPickReceive,
 >(PickReceiveMixin);
@@ -1437,7 +1437,7 @@ const HasUtxoChainsMixin = (
   }
 });
 
-export const HasUtxoChains: * = Mixin<
+export const HasUtxoChains: any = Mixin<
   HasUtxoChainsDependencies,
   IHasUtxoChains
 >(HasUtxoChainsMixin);
@@ -1533,7 +1533,7 @@ const GetPublicKeyMixin = (
     );
   }
 });
-export const GetPublicKey: * = Mixin<
+export const GetPublicKey: any = Mixin<
   GetPublicKeyDependencies,
   IGetPublic
 >(GetPublicKeyMixin);
@@ -1714,7 +1714,7 @@ const GetSigningKeyMixin = (
   }
 });
 
-export const GetSigningKey: * = Mixin<
+export const GetSigningKey: any = Mixin<
   GetSigningKeyDependencies,
   IGetSigningKey,
 >(GetSigningKeyMixin);
@@ -1788,7 +1788,7 @@ const ScanLegacyCardanoAccountUtxoMixin = (
   }
 });
 
-const ScanLegacyCardanoAccountUtxo: * = Mixin<
+const ScanLegacyCardanoAccountUtxo: any = Mixin<
   ScanLegacyCardanoAccountUtxoDependencies,
   IScanAccountUtxo,
 >(ScanLegacyCardanoAccountUtxoMixin);
@@ -1868,7 +1868,7 @@ const ScanShelleyAccountUtxoMixin = (
   }
 });
 
-const ScanShelleyAccountUtxo: * = Mixin<
+const ScanShelleyAccountUtxo: any = Mixin<
   ScanShelleyAccountUtxoDependencies,
   IScanAccountUtxo,
 >(ScanShelleyAccountUtxoMixin);
@@ -1940,7 +1940,7 @@ const ScanErgoAccountUtxoMixin = (
   }
 });
 
-const ScanErgoAccountUtxo: * = Mixin<
+const ScanErgoAccountUtxo: any = Mixin<
   ScanErgoAccountUtxoDependencies,
   IScanAccountUtxo,
 >(ScanErgoAccountUtxoMixin);
@@ -2006,7 +2006,7 @@ const ScanErgoChainUtxoMixin = (
   }
 });
 
-const ScanErgoChainUtxo: * = Mixin<
+const ScanErgoChainUtxo: any = Mixin<
   ScanErgoChainUtxoDependencies,
   IScanChainUtxo,
 >(ScanErgoChainUtxoMixin);
@@ -2178,7 +2178,7 @@ const ScanUtxoAccountAddressesMixin = (
   }
 });
 
-export const ScanUtxoAccountAddresses: * = Mixin<
+export const ScanUtxoAccountAddresses: any = Mixin<
   ScanUtxoAccountAddressesDependencies,
   IScanAddresses,
 >(ScanUtxoAccountAddressesMixin);
@@ -2333,7 +2333,7 @@ const ScanUtxoChainAddressesMixin = (
   }
 });
 
-export const ScanUtxoChainAddresses: * = Mixin<
+export const ScanUtxoChainAddresses: any = Mixin<
   ScanUtxoChainAddressesDependencies,
   IScanAddresses,
 >(ScanUtxoChainAddressesMixin);
@@ -2419,7 +2419,7 @@ const GetUtxoBalanceMixin = (
   }
 });
 
-export const GetUtxoBalance: * = Mixin<
+export const GetUtxoBalance: any = Mixin<
   GetUtxoBalanceDependencies,
   IGetUtxoBalance,
 >(GetUtxoBalanceMixin);
@@ -2445,7 +2445,7 @@ const ScanAddressesMixin = (
 ) => (class ScanAddresses extends superclass implements IScanAddresses {
 });
 
-export const ScanAddresses: * = Mixin<
+export const ScanAddresses: any = Mixin<
   ScanAddressesDependencies,
   IScanAddresses,
 >(ScanAddressesMixin);
@@ -2478,7 +2478,7 @@ const GetBalanceMixin = (
   }
 });
 
-export const GetBalance: * = Mixin<
+export const GetBalance: any = Mixin<
   GetBalanceDependencies,
   IGetBalance,
 >(GetBalanceMixin);

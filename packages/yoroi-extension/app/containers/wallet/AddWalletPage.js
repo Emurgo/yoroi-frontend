@@ -307,15 +307,24 @@ class AddWalletPage extends Component<AllProps> {
   };
 
   @computed get generated(): {|
-    BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
-    CreatePaperWalletDialogContainerProps: InjectedOrGenerated<CreatePaperWalletDialogContainerData>,
-    SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
-    WalletBackupDialogContainerProps: InjectedOrGenerated<WalletBackupDialogContainerData>,
-    WalletCreateDialogContainerProps: InjectedOrGenerated<WalletCreateDialogContainerData>,
-    WalletLedgerConnectDialogContainerProps: InjectedOrGenerated<WalletLedgerConnectDialogContainerData>,
-    WalletPaperDialogContainerProps: InjectedOrGenerated<WalletPaperDialogContainerData>,
-    WalletRestoreDialogContainerProps: InjectedOrGenerated<WalletRestoreDialogContainerData>,
-    WalletTrezorConnectDialogContainerProps: InjectedOrGenerated<WalletTrezorConnectDialogContainerData>,
+    BannerContainerProps:
+      InjectedOrGenerated<BannerContainerData>,
+    CreatePaperWalletDialogContainerProps:
+      InjectedOrGenerated<CreatePaperWalletDialogContainerData>,
+    SidebarContainerProps:
+      InjectedOrGenerated<SidebarContainerData>,
+    WalletBackupDialogContainerProps:
+      InjectedOrGenerated<WalletBackupDialogContainerData>,
+    WalletCreateDialogContainerProps:
+      InjectedOrGenerated<WalletCreateDialogContainerData>,
+    WalletLedgerConnectDialogContainerProps:
+      InjectedOrGenerated<WalletLedgerConnectDialogContainerData>,
+    WalletPaperDialogContainerProps:
+      InjectedOrGenerated<WalletPaperDialogContainerData>,
+    WalletRestoreDialogContainerProps:
+      InjectedOrGenerated<WalletRestoreDialogContainerData>,
+    WalletTrezorConnectDialogContainerProps:
+      InjectedOrGenerated<WalletTrezorConnectDialogContainerData>,
     actions: {|
       ada: {|
         ledgerConnect: {|

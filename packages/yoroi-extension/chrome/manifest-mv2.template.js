@@ -34,7 +34,7 @@ export default ({
   enableProtocolHandlers: boolean,
   shouldInjectConnector: boolean,
 |} */
-)/* : * */ => { // eslint-disable-line function-paren-newline
+)/* : any*/ => { // eslint-disable-line function-paren-newline
   const icons = iconOverride == null
     ? {
       /* eslint-disable quote-props */

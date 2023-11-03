@@ -29,7 +29,7 @@ export default class NavDropdown extends Component<Props, State> {
     isExpanded: false,
   };
 
-  buttonRef: ?ElementRef<*>;
+  buttonRef: ?ElementRef<any>;
 
   constructor(props: Props) {
     super(props);

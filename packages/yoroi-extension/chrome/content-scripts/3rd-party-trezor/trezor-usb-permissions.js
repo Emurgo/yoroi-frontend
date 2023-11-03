@@ -4,7 +4,7 @@ Handling messages from usb permissions iframe
 */
 
 /*::
-declare var chrome;
+declare var chrome: any;
 */
 
 const VERSION = '8.1.26';

@@ -24,7 +24,7 @@ export default class AdaTransactionsStore extends Store<StoresMap, ActionsMap> {
     const txs: GetTransactionsResponse = await this.api.ada.refreshTransactions({
       ...request,
       getRecentTransactionHashes: stateFetcher.getRecentTransactionHashes,
-      getTransactionsByHashes: stateFetcher.getTransactionsByHashes, 
+      getTransactionsByHashes: stateFetcher.getTransactionsByHashes,
       checkAddressesInUse: stateFetcher.checkAddressesInUse,
       getBestBlock: stateFetcher.getBestBlock,
       getTokenInfo: stateFetcher.getTokenInfo,

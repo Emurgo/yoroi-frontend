@@ -46,9 +46,9 @@ const getRoute = (id) => buildRoute(
 );
 
 const defaultProps: ({|
-  wallet: *,
+  wallet: any,
   openDialog?: Object,
-  VotingRegistrationDialogProps?: *,
+  VotingRegistrationDialogProps?: any,
   balance: ?MultiToken,
   hasAnyPending: boolean,
 |}) => any  = request => ({
@@ -139,9 +139,9 @@ const defaultProps: ({|
 });
 
 const genVotingRegistrationDialogProps: ({|
-  progressInfo: *,
-  TransactionDialogProps?: *,
-  RegisterDialogProps?: *,
+  progressInfo: any,
+  TransactionDialogProps?: any,
+  RegisterDialogProps?: any,
 |}) => * = request => ({
   stores: {
     profile: {
@@ -208,9 +208,9 @@ const genVotingRegistrationDialogProps: ({|
 })
 
 const genRegisterDialogProps: ({|
-  progressInfo: *,
-  error: *,
-  shelleyTrx: *,
+  progressInfo: any,
+  error: any,
+  shelleyTrx: any,
 |}) => * = request => ({
   actions: {
     ada: {
@@ -238,10 +238,10 @@ const genRegisterDialogProps: ({|
 })
 
 const genTransactionDialogProps: ({|
-  progressInfo: *,
-  error: *,
-  shelleyTrx: *,
-  wallet: *,
+  progressInfo: any,
+  error: any,
+  shelleyTrx: any,
+  wallet: any,
 |}) => * = request => ({
   actions: {
     ada: {

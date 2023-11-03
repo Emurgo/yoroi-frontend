@@ -12,7 +12,7 @@ import AddWalletCard from '../../../add-wallet-revamp/AddWalletCard';
 import styles from './SelectWalletTypeStep.scss';
 import globalMessages from '../../../../../i18n/global-messages';
 
-const messages: * = defineMessages({
+const messages: any = defineMessages({
   fifteenWords: {
     id: 'wallet.restore.type.fifteen',
     defaultMessage: '!!!15-word recovery phrase',

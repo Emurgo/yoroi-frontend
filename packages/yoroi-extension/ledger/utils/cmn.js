@@ -12,10 +12,11 @@ import {
   OPERATION_NAME,
 } from '../types/enum';
 import { TRANSPORT_EXCHANGE_TIMEOUT_MS } from '../const';
+import { objHasOwnProperty } from '../../rootUtils';
 
 const HARDENED = 0x80000000;
 
-const TUTORIAL_LINK = {};
+const TUTORIAL_LINK: { [string]: string } = {};
 TUTORIAL_LINK[DEVICE_CODE.NANO_S + OPERATION_NAME.GET_EXTENDED_PUBLIC_KEY] = 'https://youtu.be/CJkMBYGqh84?t=170';
 TUTORIAL_LINK[DEVICE_CODE.NANO_S + OPERATION_NAME.GET_EXTENDED_PUBLIC_KEYS] = 'https://youtu.be/CJkMBYGqh84?t=170';
 TUTORIAL_LINK[DEVICE_CODE.NANO_S + OPERATION_NAME.SIGN_TX] = 'https://youtu.be/CJkMBYGqh84?t=285';
@@ -47,13 +48,13 @@ export const pathToString: (BIP32Path) => string = (hdPath) => {
  * @param {*} err
  */
 export const ledgerErrToMessage = (err: any): any => {
-  const isU2FError = (error) => !!error && !!(error).metaData;
-  const isStringError = (error) => typeof error === 'string';
+  const isU2FError = (error: any) => !!error && !!(error).metaData;
+  const isStringError = (error: any) => typeof error === 'string';
 
   // https://developers.yubico.com/U2F/Libraries/Client_error_codes.html
-  const isErrorWithId = (error) => (
-    Object.prototype.hasOwnProperty.call(error, 'id') &&
-    Object.prototype.hasOwnProperty.call(error, 'message')
+  const isErrorWithId = (error: any) => (
+    objHasOwnProperty(error, 'id') &&
+    objHasOwnProperty(error, 'message')
   );
 
   if (isU2FError(err)) {
@@ -142,7 +143,7 @@ export const formatError = (err: any): string => {
     return 'null';
   }
 
-  const ngFilter = (keyName) => {
+  const ngFilter = (keyName: any) => {
     if (keyName === 'stack') {
       return false;
     }
@@ -151,7 +152,7 @@ export const formatError = (err: any): string => {
 
   const formatted = Object.keys(err)
     .filter(key => ngFilter(key))
-    .reduce((obj, key) => {
+    .reduce((obj: { [any]: any }, key) => {
       obj[key] = err[key];
       return obj;
     }, {});

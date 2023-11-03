@@ -11,7 +11,7 @@ import {
 } from './constants';
 import pkg from '../package.json';
 
-export default (isDebug: boolean, shouldInjectConnector: boolean): * => buildManifest({
+export default (isDebug: boolean, shouldInjectConnector: boolean): any=> buildManifest({
   description: '[localhost] Cardano ADA wallet',
   defaultTitle: '[localhost] Yoroi',
   contentSecurityPolicy: genCSP({

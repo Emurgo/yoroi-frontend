@@ -28,6 +28,8 @@ export default class DebugWalletDialogContainer extends Component<Props> {
     );
   }
 
+  // <TODO:CHECK_LINT>
+  // eslint-disable-next-line react/no-unused-class-component-methods
   @computed get generated(): {||} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
@@ -45,9 +47,11 @@ export function createDebugWalletDialog(
   onClose: void => void,
   props: InjectedOrGenerated<GeneratedData>,
 ): (void => Node) {
-  return (() => <DebugWalletDialogContainer
-    {...props}
-    checksumTextPart={checksumTextPart}
-    onClose={onClose}
-  />);
+  return (function() {
+    return <DebugWalletDialogContainer
+      {...props}
+      checksumTextPart={checksumTextPart}
+      onClose={onClose}
+    />;
+  });
 }

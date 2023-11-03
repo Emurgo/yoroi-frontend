@@ -67,15 +67,15 @@ export default {
 const defaultProps: ({|
   openDialog?: Object,
   getParam?: <T>(number | string) => T,
-  selectedNetwork: *,
-  WalletCreateDialogContainerProps?: *,
-  WalletPaperDialogContainerProps?: *,
-  CreatePaperWalletDialogContainerProps?: *,
-  WalletBackupDialogContainerProps?: *,
-  WalletRestoreDialogContainerProps?: *,
-  WalletTrezorConnectDialogContainerProps?: *,
-  WalletLedgerConnectDialogContainerProps?: *,
-  UpgradeTxDialogContainerProps?: *,
+  selectedNetwork: any,
+  WalletCreateDialogContainerProps?: any,
+  WalletPaperDialogContainerProps?: any,
+  CreatePaperWalletDialogContainerProps?: any,
+  WalletBackupDialogContainerProps?: any,
+  WalletRestoreDialogContainerProps?: any,
+  WalletTrezorConnectDialogContainerProps?: any,
+  WalletLedgerConnectDialogContainerProps?: any,
+  UpgradeTxDialogContainerProps?: any,
 |}) => * = request => ({
   stores: {
     profile: {
@@ -191,18 +191,18 @@ const defaultProps: ({|
   },
 });
 
-export const MainPage = (): Node => (
-  <AddWalletPage
+export function MainPage(): Node {
+  return <AddWalletPage
     generated={defaultProps(
       Object.freeze({
         selectedNetwork: networks.CardanoMainnet,
       })
     )}
   />
-);
+}
 
-export const CurrencySelect = (): Node => (
-  <AddWalletPage
+export function CurrencySelect(): Node {
+  return <AddWalletPage
     generated={defaultProps(
       Object.freeze({
         openDialog: WalletCreateDialog,
@@ -228,10 +228,10 @@ export const CurrencySelect = (): Node => (
       })
     )}
   />
-);
+}
 
-export const CreateWalletStart = (): Node => (
-  <AddWalletPage
+export function CreateWalletStart(): Node {
+  return <AddWalletPage
     generated={defaultProps(
       Object.freeze({
         selectedNetwork: networks.CardanoMainnet,
@@ -257,7 +257,7 @@ export const CreateWalletStart = (): Node => (
       })
     )}
   />
-);
+}
 
 const creationRecoveryPhrase = 'horse horse wash ten deny mix fuel dinner mutual lesson possible soda hurdle march advice'.split(
   ' '
@@ -301,7 +301,7 @@ const walletBackupProps: ({|
   },
 });
 
-export const CreateWalletPrivacyDialog = (): Node => {
+export function CreateWalletPrivacyDialog(): Node {
   const countdownCases = Object.freeze({
     CountingDown: 10,
     Elapsed: 0,
@@ -332,9 +332,9 @@ export const CreateWalletPrivacyDialog = (): Node => {
       )}
     />
   );
-};
+}
 
-export const CreateWalletRecoveryPhraseDisplay = (): Node => {
+export function CreateWalletRecoveryPhraseDisplay(): Node {
   const countdownCases = Object.freeze({
     CountingDown: 10,
     Elapsed: 0,
@@ -365,9 +365,9 @@ export const CreateWalletRecoveryPhraseDisplay = (): Node => {
       )}
     />
   );
-};
+}
 
-export const CreateWalletRecoveryPhraseEnter = (): Node => {
+export function CreateWalletRecoveryPhraseEnter(): Node {
   const entryCases = Object.freeze({
     None: 0,
     Single: 1,
@@ -430,9 +430,9 @@ export const CreateWalletRecoveryPhraseEnter = (): Node => {
       )}
     />
   );
-};
+}
 
-export const CreateWalletFinalConfirm = (): Node => {
+export function CreateWalletFinalConfirm(): Node {
   const isTermDeviceAccepted = boolean('isTermDeviceAccepted', false);
   const isTermRecoveryAccepted = boolean('isTermRecoveryAccepted', false);
   return (
@@ -461,7 +461,7 @@ export const CreateWalletFinalConfirm = (): Node => {
       )}
     />
   );
-};
+}
 
 const restoreWalletProps: ({|
   step: *,
@@ -616,7 +616,7 @@ const restoreWalletProps: ({|
   },
 });
 
-export const CardanoRestoreOptions = (): Node => {
+export function CardanoRestoreOptions(): Node {
   return (
     <AddWalletPage
       generated={defaultProps(
@@ -627,9 +627,9 @@ export const CardanoRestoreOptions = (): Node => {
       )}
     />
   );
-};
+}
 
-export const ErgoRestoreOptions = (): Node => {
+export function ErgoRestoreOptions(): Node {
   return (
     <AddWalletPage
       generated={defaultProps(
@@ -640,9 +640,9 @@ export const ErgoRestoreOptions = (): Node => {
       )}
     />
   );
-};
+}
 
-export const RestoreWalletStart = (): Node => {
+export function RestoreWalletStart(): Node {
   const modeOptions: {| [key: string]: RestoreModeType |} = {
     SHELLEY15: { type: 'cip1852', extra: undefined, length: 15 },
     PAPER: {
@@ -696,9 +696,9 @@ export const RestoreWalletStart = (): Node => {
       )}
     />
   );
-};
+}
 
-export const RestoreVerify = (): Node => {
+export function RestoreVerify(): Node {
   const modeOptions: {| [key: string]: RestoreModeType |} = {
     BYRON: { type: 'bip44', extra: undefined, length: 15 },
     SHELLEY15: { type: 'cip1852', extra: undefined, length: 15 },
@@ -747,9 +747,9 @@ export const RestoreVerify = (): Node => {
       )}
     />
   );
-};
+}
 
-export const RestoreLegacyExplanation = (): Node => {
+export function RestoreLegacyExplanation(): Node {
   const selectedNetwork = networks.CardanoMainnet;
   const lookup = walletLookup([]);
   return (
@@ -776,9 +776,9 @@ export const RestoreLegacyExplanation = (): Node => {
       )}
     />
   );
-};
+}
 
-export const RestoreUpgradeRestoringAddresses = (): Node => {
+export function RestoreUpgradeRestoringAddresses(): Node {
   const selectedNetwork = networks.CardanoMainnet;
   const lookup = walletLookup([]);
   return (
@@ -801,9 +801,9 @@ export const RestoreUpgradeRestoringAddresses = (): Node => {
       )}
     />
   );
-};
+}
 
-export const RestoreUpgradeCheckingAddresses = (): Node => {
+export function RestoreUpgradeCheckingAddresses(): Node {
   const selectedNetwork = networks.CardanoMainnet;
   const lookup = walletLookup([]);
   return (
@@ -826,9 +826,9 @@ export const RestoreUpgradeCheckingAddresses = (): Node => {
       )}
     />
   );
-};
+}
 
-export const RestoreUpgradeGeneratingTx = (): Node => {
+export function RestoreUpgradeGeneratingTx(): Node {
   const selectedNetwork = networks.CardanoMainnet;
   const lookup = walletLookup([]);
   return (
@@ -851,9 +851,9 @@ export const RestoreUpgradeGeneratingTx = (): Node => {
       )}
     />
   );
-};
+}
 
-export const RestoreUpgradeReadyToTransfer = (): Node => {
+export function RestoreUpgradeReadyToTransfer(): Node {
   const selectedNetwork = networks.CardanoMainnet;
   const lookup = walletLookup([]);
   return (
@@ -876,9 +876,9 @@ export const RestoreUpgradeReadyToTransfer = (): Node => {
       )}
     />
   );
-};
+}
 
-export const RestoreUpgradeError = (): Node => {
+export function RestoreUpgradeError(): Node {
   const selectedNetwork = networks.CardanoMainnet;
   const lookup = walletLookup([]);
 
@@ -903,9 +903,9 @@ export const RestoreUpgradeError = (): Node => {
       )}
     />
   );
-};
+}
 
-export const RestoreUpgradeNoNeed = (): Node => {
+export function RestoreUpgradeNoNeed(): Node {
   const selectedNetwork = networks.CardanoMainnet;
   const lookup = walletLookup([]);
   return (
@@ -929,9 +929,9 @@ export const RestoreUpgradeNoNeed = (): Node => {
       )}
     />
   );
-};
+}
 
-export const HardwareOptions = (): Node => {
+export function HardwareOptions(): Node {
   return (
     <AddWalletPage
       generated={defaultProps(
@@ -942,7 +942,7 @@ export const HardwareOptions = (): Node => {
       )}
     />
   );
-};
+}
 
 const trezorPops: ({|
   trezorConnect: *,
@@ -985,7 +985,7 @@ const trezorPops: ({|
   },
 });
 
-export const TrezorCheck = (): Node => {
+export function TrezorCheck(): Node {
   const selectedNetwork = networks.CardanoMainnet;
   return (
     <AddWalletPage
@@ -1013,9 +1013,9 @@ export const TrezorCheck = (): Node => {
       )}
     />
   );
-};
+}
 
-export const TrezorConnect = (): Node => {
+export function TrezorConnect(): Node {
   const isActionProcessing = boolean('isActionProcessing', false);
   const getErrorValue = () => select('errorCases', trezorErrorCases, trezorErrorCases.None);
   const step = () => {
@@ -1054,9 +1054,9 @@ export const TrezorConnect = (): Node => {
       )}
     />
   );
-};
+}
 
-export const TrezorSave = (): Node => {
+export function TrezorSave(): Node {
   const isActionProcessing = boolean('isActionProcessing', false);
   const errorCases = Object.freeze({
     None: undefined,
@@ -1100,7 +1100,7 @@ export const TrezorSave = (): Node => {
       )}
     />
   );
-};
+}
 
 const ledgerProps: ({|
   ledgerConnect: *,
@@ -1148,7 +1148,7 @@ const ledgerProps: ({|
   UpgradeTxDialogContainerProps: request.UpgradeTxDialogContainerProps || (null: any),
 });
 
-export const LedgerCheck = (): Node => {
+export function LedgerCheck(): Node {
   const selectedNetwork = networks.CardanoMainnet;
   return (
     <AddWalletPage
@@ -1176,9 +1176,9 @@ export const LedgerCheck = (): Node => {
       )}
     />
   );
-};
+}
 
-export const LedgerConnect = (): Node => {
+export function LedgerConnect(): Node {
   const isActionProcessing = boolean('isActionProcessing', false);
   const getErrorValue = () => select('errorCases', ledgerErrorCases, ledgerErrorCases.None);
   const step = () => {
@@ -1217,9 +1217,9 @@ export const LedgerConnect = (): Node => {
       )}
     />
   );
-};
+}
 
-export const LedgerSave = (): Node => {
+export function LedgerSave(): Node {
   const isActionProcessing = boolean('isActionProcessing', false);
   const errorCases = Object.freeze({
     None: undefined,
@@ -1263,7 +1263,7 @@ export const LedgerSave = (): Node => {
       )}
     />
   );
-};
+}
 
 const genDefaultGroupMap: boolean => Map<
   Class<IAddressTypeStore>,
@@ -1280,7 +1280,7 @@ const genDefaultGroupMap: boolean => Map<
   );
 };
 
-export const LedgerUpgrade = (): Node => {
+export function LedgerUpgrade(): Node {
   const selectedNetwork = networks.CardanoMainnet;
   const wallet = genShelleyCIP1852SigningWalletWithCache(ConceptualWalletId => ({
     ConceptualWalletId,
@@ -1377,10 +1377,10 @@ export const LedgerUpgrade = (): Node => {
       )}
     />
   );
-};
+}
 
-export const PaperWalletCreate = (): Node => (
-  <AddWalletPage
+export function PaperWalletCreate(): Node {
+  return <AddWalletPage
     generated={defaultProps(
       Object.freeze({
         selectedNetwork: networks.CardanoMainnet,
@@ -1403,7 +1403,7 @@ export const PaperWalletCreate = (): Node => (
       })
     )}
   />
-);
+}
 
 const paperWalletMockActions = {
   dialogs: {
@@ -1424,7 +1424,7 @@ const paperWalletMockActions = {
   },
 };
 
-export const PaperWalletUserPasswordDialog = (): Node => {
+export function PaperWalletUserPasswordDialog(): Node {
   const passwordCases = {
     Untouched: 0,
     TooShort: 1,
@@ -1493,9 +1493,9 @@ export const PaperWalletUserPasswordDialog = (): Node => {
       )}
     />
   );
-};
+}
 
-export const PaperWalletCreateDialog = (): Node => {
+export function PaperWalletCreateDialog(): Node {
   const modifiedSteps = {
     undefined: 'undefined',
     ...PdfGenSteps,
@@ -1561,7 +1561,7 @@ export const PaperWalletCreateDialog = (): Node => {
       )}
     />
   );
-};
+}
 
 const constructedPaperWallet = {
   addresses: [
@@ -1579,7 +1579,7 @@ const constructedPaperWallet = {
   },
 };
 
-export const PaperWalletVerifyDialog = (): Node => {
+export function PaperWalletVerifyDialog(): Node {
   const mnemonicCases = getValidationMnemonicCases(21);
   const mnemonicsValue = () => select('mnemonicCases', mnemonicCases, mnemonicCases.Empty);
   const correctPassword = 'asdfasdfasdf';
@@ -1640,9 +1640,9 @@ export const PaperWalletVerifyDialog = (): Node => {
       )}
     />
   );
-};
+}
 
-export const PaperWalletFinalizeDialog = (): Node => {
+export function PaperWalletFinalizeDialog(): Node {
   const selectedNetwork = networks.CardanoMainnet;
   return (
     <AddWalletPage
@@ -1690,4 +1690,4 @@ export const PaperWalletFinalizeDialog = (): Node => {
       )}
     />
   );
-};
+}

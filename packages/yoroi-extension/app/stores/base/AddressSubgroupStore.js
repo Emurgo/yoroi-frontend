@@ -96,7 +96,6 @@ export class AddressBookSubgroup extends AddressTypeStore implements IAddressTyp
         storeName: data.name,
       }),
     });
-    return this;
   }
 }
 export class ByronAllAddressesSubgroup extends AddressTypeStore implements IAddressTypeStore {
@@ -110,7 +109,6 @@ export class ByronAllAddressesSubgroup extends AddressTypeStore implements IAddr
         type: CoreAddressTypes.CARDANO_LEGACY,
       }),
     });
-    return this;
   }
 }
 export class ByronExternalAddressesSubgroup extends AddressTypeStore implements IAddressTypeStore {
@@ -128,7 +126,6 @@ export class ByronExternalAddressesSubgroup extends AddressTypeStore implements 
         }),
       }),
     });
-    return this;
   }
 }
 export class ByronInternalAddressesSubgroup extends AddressTypeStore implements IAddressTypeStore {
@@ -143,7 +140,6 @@ export class ByronInternalAddressesSubgroup extends AddressTypeStore implements 
         chainsRequest: { chainId: ChainDerivations.INTERNAL },
       }),
     });
-    return this;
   }
 }
 export class BaseExternalAddressesSubgroup extends AddressTypeStore implements IAddressTypeStore {
@@ -161,7 +157,6 @@ export class BaseExternalAddressesSubgroup extends AddressTypeStore implements I
         }),
       }),
     });
-    return this;
   }
 }
 export class BaseInternalAddressesSubgroup extends AddressTypeStore implements IAddressTypeStore {
@@ -179,7 +174,6 @@ export class BaseInternalAddressesSubgroup extends AddressTypeStore implements I
         }),
       }),
     });
-    return this;
   }
 }
 export class BaseMangledAddressesSubgroup extends AddressTypeStore implements IAddressTypeStore {
@@ -194,7 +188,6 @@ export class BaseMangledAddressesSubgroup extends AddressTypeStore implements IA
         type: CoreAddressTypes.CARDANO_BASE,
       }),
     });
-    return this;
   }
 }
 export class EnterpriseExternalAddressesSubgroup
@@ -213,7 +206,6 @@ export class EnterpriseExternalAddressesSubgroup
         }),
       }),
     });
-    return this;
   }
 }
 export class EnterpriseInternalAddressesSubgroup
@@ -232,7 +224,6 @@ export class EnterpriseInternalAddressesSubgroup
         }),
       }),
     });
-    return this;
   }
 }
 export class RewardAddressesSubgroup extends AddressTypeStore implements IAddressTypeStore {
@@ -247,7 +238,6 @@ export class RewardAddressesSubgroup extends AddressTypeStore implements IAddres
         type: CoreAddressTypes.CARDANO_REWARD,
       }),
     });
-    return this;
   }
 }
 
@@ -262,7 +252,6 @@ export class P2PKAllAddressesSubgroup extends AddressTypeStore implements IAddre
         type: CoreAddressTypes.ERGO_P2PK,
       }),
     });
-    return this;
   }
 }
 export class P2PKExternalAddressesSubgroup extends AddressTypeStore implements IAddressTypeStore {
@@ -280,7 +269,6 @@ export class P2PKExternalAddressesSubgroup extends AddressTypeStore implements I
         }),
       }),
     });
-    return this;
   }
 }
 export class P2PKInternalAddressesSubgroup extends AddressTypeStore implements IAddressTypeStore {
@@ -295,6 +283,5 @@ export class P2PKInternalAddressesSubgroup extends AddressTypeStore implements I
         chainsRequest: { chainId: ChainDerivations.INTERNAL },
       }),
     });
-    return this;
   }
 }

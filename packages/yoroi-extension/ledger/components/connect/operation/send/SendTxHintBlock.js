@@ -494,7 +494,7 @@ export default class SendTxHintBlock extends React.Component<Props> {
 
             const nextStep1 = ++stepNumber;
             const nextStep2 = ++stepNumber;
-            const result = [
+            const result: Array<any> = [
               (<HintBlock
                 key={nextStep1}
                 number={nextStep1}

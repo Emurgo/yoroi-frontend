@@ -9,7 +9,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { withLayout } from '../../../styles/context/layout';
 
-export const messages: * = defineMessages({
+export const messages: any = defineMessages({
   titleLabel: {
     id: 'wallet.settings.resync.label',
     defaultMessage: '!!!Resync wallet with the blockchain',

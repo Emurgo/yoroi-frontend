@@ -20,7 +20,7 @@ export default class StyleVariableLoader extends React.Component<Props> {
   }
 
   updateCSSVariables(variables: { [key: string]: string }) {
-    _.map(variables, (value, prop) => {
+    _.map(variables, (value: string, prop: string) => {
       if (document.documentElement) {
         document.documentElement.style.setProperty(prop, value);
       }

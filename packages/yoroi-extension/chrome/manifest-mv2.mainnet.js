@@ -12,7 +12,7 @@ import pkg from '../package.json';
 
 import { POOLS_UI_URL_FOR_YOROI, CHANGELLY_URL } from './manifestEnvs';
 
-export default (isDebug: boolean, shouldInjectConnector: boolean): * => buildManifest({
+export default (isDebug: boolean, shouldInjectConnector: boolean): any=> buildManifest({
   description: 'A simple, secure and fast Cardano ADA wallet.',
   defaultTitle: 'Yoroi',
   titleOverride: true,

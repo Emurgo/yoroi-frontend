@@ -12,7 +12,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 /* eslint-disable no-console */
 
-const plugins = (folder /*: string */, _networkName /*: string */) /*: * */ => {
+const plugins = (folder /*: string */, _networkName /*: string */) /*: any*/ => {
   const pageTitle = 'Yoroi';
 
   return [
@@ -79,7 +79,7 @@ const plugins = (folder /*: string */, _networkName /*: string */) /*: * */ => {
   ];
 };
 
-const rules /*: boolean => Array<*> */ = (_isDev) => [
+const rules /*: boolean => Array<any> */ = (_isDev) => [
   // Pdfjs Worker webpack config, reference to issue: https://github.com/mozilla/pdf.js/issues/7612#issuecomment-315179422
   {
     test: /pdf\.worker(\.min)?\.js$/,
@@ -196,7 +196,7 @@ const optimization = {
   }
 };
 
-const resolve = () /*: * */ => ({
+const resolve = () /*: any*/ => ({
   extensions: ['*', '.js', '.wasm'],
   fallback: {
     fs: false,
@@ -214,7 +214,7 @@ const definePlugin = (
   isProd /*: boolean */,
   isNightly /*: boolean */,
   isLight /*: boolean */ = false
-) /*: * */ => {
+) /*: any*/ => {
   return {
     'process.env': {
       NODE_ENV: JSON.stringify(isProd ? 'production' : 'development'),

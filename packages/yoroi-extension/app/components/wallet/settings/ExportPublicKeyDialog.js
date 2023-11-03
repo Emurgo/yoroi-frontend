@@ -12,7 +12,7 @@ import QrCodeWrapper from '../../widgets/QrCodeWrapper';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { toDerivationPathString } from '../../../api/common/lib/crypto/keys/path';
 
-export const messages: * = defineMessages({
+export const messages: any = defineMessages({
   publicKeyExplanationLine1: {
     id: 'wallet.settings.publicExport.explanationLine1',
     defaultMessage: `!!!The below you can find your wallet's <strong>public</strong> key information.`,

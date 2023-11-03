@@ -13,7 +13,7 @@ import { ReactComponent as InfoIcon } from '../../../assets/images/info-icon-pri
 import globalMessages from '../../../i18n/global-messages';
 import type { ManageDialogsProps } from './CreateWalletPage';
 
-const messages: * = defineMessages({
+const messages: any = defineMessages({
   description: {
     id: 'wallet.create.secondStep.description',
     defaultMessage: '!!!Click <strong>“Show recovery phrase”</strong> below to reveal and keep it.',

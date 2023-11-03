@@ -186,7 +186,7 @@ const PublicFromPrivateMixin = (
     );
   }
 });
-export const PublicFromPrivate: * = Mixin<
+export const PublicFromPrivate: any = Mixin<
   PublicFromPrivateDependencies,
   IDerivePublicFromPrivate,
 >(PublicFromPrivateMixin);
@@ -293,7 +293,7 @@ const GetPrivateDeriverKeyMixin = (
   }
 });
 
-export const GetPrivateDeriverKey: * = Mixin<
+export const GetPrivateDeriverKey: any = Mixin<
   GetPrivateDeriverKeyDependencies,
   IGetPrivateDeriverKey,
 >(GetPrivateDeriverKeyMixin);
@@ -359,7 +359,7 @@ const AdhocPublicDeriverMixin = (
     );
   }
 });
-export const AdhocPublicDeriver: * = Mixin<
+export const AdhocPublicDeriver: any = Mixin<
   AdhocPublicDeriverDepenencies,
   IAdhocPublicDeriver,
 >(AdhocPublicDeriverMixin);

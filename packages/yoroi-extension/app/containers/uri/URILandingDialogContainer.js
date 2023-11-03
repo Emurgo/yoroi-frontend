@@ -36,6 +36,8 @@ export default class URILandingDialogContainer extends Component<Props> {
     this.showDisclaimer = !this.showDisclaimer;
   }
 
+  // <TODO:CHECK_LINT>
+  // eslint-disable-next-line react/no-unused-class-component-methods
   onSubmit: void => void = () => {
     this.toggleShowDisclaimer();
   };

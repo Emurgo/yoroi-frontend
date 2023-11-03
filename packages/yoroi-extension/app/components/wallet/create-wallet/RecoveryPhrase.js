@@ -17,7 +17,7 @@ type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
 
-const messages: * = defineMessages({
+const messages: any = defineMessages({
   showRecoveryPhraseBtn: {
     id: 'wallet.create.secondStep.showRecoveryPhraseBtn',
     defaultMessage: '!!!Show recovery phrase',

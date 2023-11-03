@@ -6,7 +6,7 @@ import FullscreenMessage from '../../components/wallet/layouts/FullscreenMessage
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
-export const messages: * = defineMessages({
+export const messages: any = defineMessages({
   title: {
     id: 'wallet.unsupported.title',
     defaultMessage: '!!!This wallet type is incompatible.',

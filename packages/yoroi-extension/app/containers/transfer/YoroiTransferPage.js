@@ -53,6 +53,8 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
     intl: intlShape.isRequired,
   };
 
+  // <TODO:CHECK_LINT>
+  // eslint-disable-next-line react/no-unused-class-component-methods
   goToCreateWallet: void => void = () => {
     this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
   }

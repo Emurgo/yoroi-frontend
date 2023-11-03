@@ -17,9 +17,8 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
   // REQUESTS
 
   @observable
-  generateWalletRecoveryPhraseRequest: Request<GenerateWalletRecoveryPhraseFunc> = new Request<GenerateWalletRecoveryPhraseFunc>(
-    this.api.ada.generateWalletRecoveryPhrase
-  );
+  generateWalletRecoveryPhraseRequest: Request<GenerateWalletRecoveryPhraseFunc> =
+    new Request<GenerateWalletRecoveryPhraseFunc>(this.api.ada.generateWalletRecoveryPhrase);
 
   setup(): void {
     super.setup();

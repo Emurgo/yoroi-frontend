@@ -208,7 +208,7 @@ const mockAddressInfo = {
   },
 };
 
-export const Wallets = (): Node => {
+export function Wallets(): Node {
   const wallets = [
     genWallet(),
     genWallet(),
@@ -226,9 +226,9 @@ export const Wallets = (): Node => {
       getReceiveAddress: async () => mockAddressInfo,
     })}
   />);
-};
+}
 
-export const BuySellAddressList = (): Node => {
+export function BuySellAddressList(): Node {
   const wallets = [
     genWallet(),
     genWallet(),
@@ -247,4 +247,4 @@ export const BuySellAddressList = (): Node => {
       getReceiveAddress: async () => mockAddressInfo,
     })}
   />);
-};
+}

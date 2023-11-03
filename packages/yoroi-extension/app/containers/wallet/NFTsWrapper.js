@@ -41,6 +41,8 @@ export default class NFTsWrapper extends Component<Props> {
   static defaultProps: {| children: void |} = {
     children: undefined,
   };
+  // <TODO:CHECK_LINT>
+  // eslint-disable-next-line react/no-unused-class-component-methods
   isActivePage: string => boolean = route => {
     const { location } = this.generated.stores.router;
     if (location) {

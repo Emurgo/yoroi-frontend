@@ -17,10 +17,14 @@ export const mockWalletProps: ({
   selected: null | PublicDeriver<>,
   publicDerivers: Array<PublicDeriver<>>,
   getWalletWarnings?: (PublicDeriver<>) => WarningList,
-  getConceptualWalletSettingsCache: typeof WalletSettingsStore.prototype.getConceptualWalletSettingsCache,
-  getPublicKeyCache: typeof WalletStore.prototype.getPublicKeyCache,
-  getTransactions: typeof TransactionsStore.prototype.getTxRequests,
-  getDelegation: typeof DelegationStore.prototype.getDelegationRequests,
+  getConceptualWalletSettingsCache:
+    typeof WalletSettingsStore.prototype.getConceptualWalletSettingsCache,
+  getPublicKeyCache:
+    typeof WalletStore.prototype.getPublicKeyCache,
+  getTransactions:
+    typeof TransactionsStore.prototype.getTxRequests,
+  getDelegation:
+    typeof DelegationStore.prototype.getDelegationRequests,
   location: string,
   ...
 }) => {| generated: GeneratedData |} = request => ({

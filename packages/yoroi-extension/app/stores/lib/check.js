@@ -2,7 +2,7 @@
 
 import type { ApiOptionType } from '../../api/common/utils';
 
-export function checkAndCall<TArgs: *>(
+export function checkAndCall<TArgs: any>(
   expectedAPI: ApiOptionType,
   getAPI: void => (void | ApiOptionType),
   func: (...args: TArgs) => void,
@@ -15,7 +15,7 @@ export function checkAndCall<TArgs: *>(
   };
 }
 
-export function checkAndCallAsync<TArgs: *>(
+export function checkAndCallAsync<TArgs: any>(
   expectedAPI: ApiOptionType,
   getAPI: void => (void | ApiOptionType),
   func: (...args: TArgs) => Promise<void>,
@@ -43,12 +43,12 @@ export function buildCheckAndCall(
 }
 
 // just use this since it's easier to read typeof fakeFunc than a giant ugly type definition
-function fakeAsyncFunc<TArgs: *>(
+function fakeAsyncFunc<TArgs: any>(
   func: (...args: TArgs) => Promise<void>,
 ): (...args: TArgs) => Promise<void> {
   return func;
 }
-function fakeSyncFunc<TArgs: *>(
+function fakeSyncFunc<TArgs: any>(
   func: (...args: TArgs) => void,
 ): (...args: TArgs) => void {
   return func;

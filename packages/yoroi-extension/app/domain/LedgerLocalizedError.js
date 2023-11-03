@@ -10,7 +10,7 @@ import {
   stringifyError
 } from '../utils/logging';
 
-export const ledgerErrors: * = defineMessages({
+export const ledgerErrors: any = defineMessages({
   cancelOnDeviceError101: {
     id: 'wallet.hw.ledger.common.error.101',
     defaultMessage: '!!!Operation cancelled on Ledger device.',
@@ -54,7 +54,7 @@ export function convertToLocalizableError(error: Error): LocalizableError {
     localizableError = error;
   } else if (error && error.message) {
     {
-      const serialRegex = new RegExp('Error: Incorrect hardware wallet. This wallet was created with a device with serial ID ([0-9a-fA-F]+), but you are currently using ([0-9a-fA-F]+).');
+      const serialRegex = /Error: Incorrect hardware wallet. This wallet was created with a device with serial ID ([0-9a-fA-F]+), but you are currently using ([0-9a-fA-F]+)./;
       const serialRegexMatch = serialRegex.exec(error.message);
       if (serialRegexMatch) {
         return new IncorrectDeviceError({
@@ -65,7 +65,7 @@ export function convertToLocalizableError(error: Error): LocalizableError {
     }
     {
       // note: match all for supported version because it can be any semver expression
-      const versionRegex = new RegExp('Incorrect Cardano app version. Supports version (.*) but you have version ([0-9.]\\.[0-9.]\\.[0-9.])');
+      const versionRegex = /Incorrect Cardano app version. Supports version (.*) but you have version ([0-9.]\.[0-9.]\.[0-9.])/;
       const versionRegexMatch = versionRegex.exec(error.message);
       if (versionRegexMatch) {
         return new IncorrectVersionError({

@@ -7,7 +7,7 @@ import { Stack, Box, Typography } from '@mui/material';
 import { CREATE_WALLET_SETPS } from './steps';
 import { ReactComponent as StepMarkIcon } from '../../../assets/images/add-wallet/step-mark.inline.svg';
 
-const messages: * = defineMessages({
+const messages: any = defineMessages({
   firstStep: {
     id: 'wallet.create.firstStep',
     defaultMessage: '!!!Learn about recovery phrase',

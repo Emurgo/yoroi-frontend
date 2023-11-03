@@ -15,7 +15,7 @@ const ENV = 'storybook';
 module.exports = async ({ config, mode } /*: {|
   mode: 'PRODUCTION' | 'DEVELOPMENT',
   config: any,
-|}*/) /*: * */ => {
+|}*/) /*: any*/ => {
   const isNightly = "false";
   const isLight = "false";
   const isProduction = mode === 'PRODUCTION';

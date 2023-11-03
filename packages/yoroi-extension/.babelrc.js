@@ -24,7 +24,7 @@ const nodePlugins = {
 // https://babeljs.io/docs/en/config-files#config-function-api
 type ApiType = { env: (void | string | Array<string>) => (string | boolean), ... };
 */
-module.exports = function (api /*: ApiType */) /*: * */ {
+module.exports = function (api /*: ApiType */) /*: any*/ {
   return {
     presets: [
       [
@@ -72,6 +72,7 @@ module.exports = function (api /*: ApiType */) /*: * */ {
       '@babel/plugin-syntax-dynamic-import',
       'add-module-exports',
       '@babel/plugin-proposal-class-properties',
+      '@babel/plugin-proposal-private-property-in-object',
       '@babel/plugin-proposal-private-methods',
       '@babel/plugin-proposal-export-default-from',
       '@babel/plugin-proposal-export-namespace-from',

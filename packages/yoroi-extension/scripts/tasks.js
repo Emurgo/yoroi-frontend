@@ -7,7 +7,7 @@ import fs from 'fs';
 import path from 'path';
 import { overrideForNightly } from '../chrome/manifest.template';
 
-exports.copyAssets = (type: string, env: string) => {
+export const copyAssets = (type: string, env: string) => {
   rm('-rf', type);
   mkdir(type);
   mkdir(`${type}/js`);
@@ -42,7 +42,8 @@ const buildManifest = (
 };
 
 const manifestTypes = values(NetworkType);
-exports.buildManifests = (
+
+export const buildManifests = (
   isDebug: boolean,
   isNightly: boolean,
   shouldInjectConnector: boolean

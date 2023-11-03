@@ -17,7 +17,7 @@ import type { ComplexityLevelType } from '../../types/complexityLevelType';
 import type { WhitelistEntry } from '../../../chrome/extension/connector/types';
 import type { CatalystRoundInfoResponse } from '../ada/lib/state-fetch/types'
 
-declare var chrome;
+declare var chrome: any;
 declare var browser;
 
 const networkForLocalStorage = String(environment.getNetworkName());

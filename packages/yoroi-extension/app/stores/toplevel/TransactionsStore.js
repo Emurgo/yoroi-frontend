@@ -120,9 +120,8 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   getTransactionRowsToExportRequest: LocalizedRequest<
     ((void) => Promise<void>) => Promise<void>
   > = new LocalizedRequest<((void) => Promise<void>) => Promise<void>>(func => func());
-  exportTransactions: LocalizedRequest<ExportTransactionsFunc> = new LocalizedRequest<ExportTransactionsFunc>(
-    this.api.export.exportTransactions
-  );
+  exportTransactions: LocalizedRequest<ExportTransactionsFunc> =
+    new LocalizedRequest<ExportTransactionsFunc>(this.api.export.exportTransactions);
   @observable isExporting: boolean = false;
   @observable exportError: ?LocalizableError;
   @observable shouldIncludeTxIds: boolean = false;

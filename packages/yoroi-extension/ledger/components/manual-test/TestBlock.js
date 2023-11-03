@@ -39,6 +39,7 @@ import type {
 } from '../../types/cmn';
 
 import styles from './TestBlock.scss';
+import { mapOwnProperties } from '../../../rootUtils';
 
 const MainnetIds = Object.freeze({
   protocolMagic: 764824073, // for legacy Byron-era addresses
@@ -127,11 +128,9 @@ export default class TestBlock extends React.Component<Props, State> {
 
     const transportSelection = (
       <div className={styles.transportSelection}>
-        {Object.keys(TRANSPORT_ID).map(key => {
-          if (Object.prototype.hasOwnProperty.call(TRANSPORT_ID, key)) {
-            const transportId = TRANSPORT_ID[key];
-            return (
-              <span key={transportId}>
+        {mapOwnProperties(TRANSPORT_ID, (transportId) => {
+          return (
+            <span key={transportId}>
                 <input
                   key={transportId}
                   type="radio"
@@ -142,9 +141,7 @@ export default class TestBlock extends React.Component<Props, State> {
                 />
                 <label className={styles.tranportLabel} htmlFor={transportId}>{transportId}</label>
               </span>
-            );
-          }
-          return null;
+          );
         })}
       </div>
     );

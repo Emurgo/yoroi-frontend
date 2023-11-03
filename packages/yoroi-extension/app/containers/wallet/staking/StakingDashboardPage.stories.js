@@ -92,18 +92,18 @@ const getRoute = (id) => buildRoute(
 
 const genBaseProps: {|
   wallet: PossibleCacheTypes,
-  lookup: *,
-  transactionBuilderStore?: *,
-  openDialog?: *,
-  sendMoneyRequest?: *,
-  delegationTransaction?: *,
-  allowToggleHidden?: *,
+  lookup: any,
+  transactionBuilderStore?: any,
+  openDialog?: any,
+  sendMoneyRequest?: any,
+  delegationTransaction?: any,
+  allowToggleHidden?: any,
   mangledInfo?: {|
     addresses: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
   |},
-  getLocalPoolInfo: *,
+  getLocalPoolInfo: any,
   forceRegistration?: (void | boolean),
-  withdrawalTxProps?: *,
+  withdrawalTxProps?: any,
   getParam?: <T>(number | string) => T,
 |} => * = (request) => {
   const sendErrorCases = {
@@ -470,7 +470,7 @@ const stakingKeyCases = {
   ChangePools: 5,
 };
 function getStakingInfo(
-  publicDeriver: *,
+  publicDeriver: any,
   stakingCase: $Values<typeof stakingKeyCases>,
   canUnmangleAmount: MultiToken,
 ): DelegationRequests {
@@ -587,7 +587,7 @@ function getStakingInfo(
 }
 
 function getAdaStakingInfo(
-  publicDeriver: *,
+  publicDeriver: any,
   delegationRequests: void | DelegationRequests,
 ): AdaDelegationRequests {
   const getRegistrationHistory: CachedRequest<GetRegistrationHistoryFunc> = new CachedRequest(

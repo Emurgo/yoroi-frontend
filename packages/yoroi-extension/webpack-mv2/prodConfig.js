@@ -17,7 +17,7 @@ type EnvParams = {|
   isLight: "true" | "false"
 |};
 */
-const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
+const baseProdConfig = (env /*: EnvParams */) /*: any*/ => ({
   mode: 'production',
   optimization: commonConfig.optimization,
   experiments: commonConfig.experiments,

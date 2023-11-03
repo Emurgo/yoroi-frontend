@@ -13,7 +13,7 @@ import globalMessages from '../../../i18n/global-messages';
 import type { ManageDialogsProps } from './CreateWalletPage';
 import { messages as infoDialogMessages } from '../../widgets/infoDialog';
 
-const messages: * = defineMessages({
+const messages: any = defineMessages({
   description: {
     id: 'wallet.create.firstStep.description',
     defaultMessage:
@@ -102,7 +102,7 @@ function _LearnAboutRecoveryPhrase(props: Props & Intl): Node {
   );
 }
 
-const text: * = defineMessages({
+const text: any = defineMessages({
   shortDescription: {
     id: 'wallet.create.firstStep.shortDescription',
     defaultMessage:

@@ -5,7 +5,7 @@ import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { defineMessages, injectIntl } from 'react-intl';
 import YoroiLogo from '../../../assets/images/yoroi-logo-shape-blue.inline.svg';
 
-const messages: * = defineMessages({
+const messages: any = defineMessages({
   title: {
     id: 'wallet.create.page.title',
     defaultMessage: '!!!Create a Wallet',

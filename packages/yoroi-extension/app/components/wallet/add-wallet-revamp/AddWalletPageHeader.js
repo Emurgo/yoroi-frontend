@@ -10,7 +10,7 @@ import { Typography, Box, Button } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
 import { ReactComponent as BackIcon } from '../../../assets/images/assets-page/backarrow.inline.svg';
 
-const messages: * = defineMessages({
+const messages: any = defineMessages({
   subtitle: {
     id: 'wallet.add.page.revamp.subtitle',
     defaultMessage: '!!!Light wallet for Cardano assets',

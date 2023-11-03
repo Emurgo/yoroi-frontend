@@ -9,7 +9,7 @@ import { Button } from '@mui/material';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { withLayout } from '../../../styles/context/layout';
 
-export const messages: * = defineMessages({
+export const messages: any = defineMessages({
   titleLabel: {
     id: 'wallet.settings.remove.label',
     defaultMessage: '!!!Remove wallet',

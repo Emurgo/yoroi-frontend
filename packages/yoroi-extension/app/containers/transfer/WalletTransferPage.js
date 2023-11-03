@@ -31,6 +31,8 @@ export default class WalletTransferPage extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
+  // <TODO:CHECK_LINT>
+  // eslint-disable-next-line react/no-unused-class-component-methods
   onClose: void => void = () => {
     this.generated.actions.dialogs.closeActiveDialog.trigger();
   };
