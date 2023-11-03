@@ -12,10 +12,10 @@ export default {
   decorators: [withScreenshot],
 };
 
-export const Generic = (): Node => (
-  <MaintenancePage
+export function Generic(): Node {
+  return <MaintenancePage
     generated={{
       handleExternalLinkClick: action('External link click'),
     }}
   />
-);
+}

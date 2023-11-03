@@ -20,8 +20,8 @@ const PotentialErrors = {
   UnableToLoadError: new UnableToLoadError(),
 };
 
-export const Generic = (): Node => (
-  <LoadingPage
+export function Generic(): Node {
+  return <LoadingPage
     generated={{
       stores: {
         profile: {
@@ -41,12 +41,12 @@ export const Generic = (): Node => (
       downloadLogs: action('Download logs'),
     }}
   />
-);
+}
 
 /* ===== Notable variations ===== */
 
-export const NoLocale = (): Node => (
-  <LoadingPage
+export function NoLocale(): Node {
+  return <LoadingPage
     generated={{
       stores: {
         profile: {
@@ -66,10 +66,10 @@ export const NoLocale = (): Node => (
       downloadLogs: action('Download logs'),
     }}
   />
-);
+}
 
-export const NoTheme = (): Node => (
-  <LoadingPage
+export function NoTheme(): Node {
+  return <LoadingPage
     generated={{
       stores: {
         profile: {
@@ -89,10 +89,10 @@ export const NoTheme = (): Node => (
       downloadLogs: action('Download logs'),
     }}
   />
-);
+}
 
-export const StorageLoadFailed = (): Node => (
-  <LoadingPage
+export function StorageLoadFailed(): Node {
+  return <LoadingPage
     generated={{
       stores: {
         profile: {
@@ -108,10 +108,10 @@ export const StorageLoadFailed = (): Node => (
       downloadLogs: action('Download logs'),
     }}
   />
-);
+}
 
-export const UnknownLoadFailed = (): Node => (
-  <LoadingPage
+export function UnknownLoadFailed(): Node {
+  return <LoadingPage
     generated={{
       stores: {
         profile: {
@@ -127,4 +127,4 @@ export const UnknownLoadFailed = (): Node => (
       downloadLogs: action('Download logs'),
     }}
   />
-);
+}

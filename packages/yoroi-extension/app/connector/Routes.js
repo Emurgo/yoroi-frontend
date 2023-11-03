@@ -11,12 +11,12 @@ import Layout from './components/layout/Layout';
 import SignTxContainer from './containers/SignTxContainer';
 import LoadingPage from '../containers/LoadingPage';
 
-export const Routes = (stores: StoresMap, actions: ActionsMap): Node => {
+export function Routes(stores: StoresMap, actions: ActionsMap): Node {
   if (stores.loading.isLoading) {
     return <LoadingPage stores={stores} actions={actions} />;
   }
   return wrapPages(getContent(stores, actions));
-};
+}
 
 const getContent = (stores, actions) => (
   <Switch>

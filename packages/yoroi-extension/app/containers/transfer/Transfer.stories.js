@@ -19,7 +19,7 @@ export default {
   decorators: [withScreenshot],
 };
 
-export const MainPage = (): Node => {
+export function MainPage(): Node {
   const wallet = genShelleyCip1852DummyWithCache();
   const walletCases = {
     NoWallet: 0,
@@ -41,4 +41,4 @@ export const MainPage = (): Node => {
       ...lookup,
     })}
   />);
-};
+}

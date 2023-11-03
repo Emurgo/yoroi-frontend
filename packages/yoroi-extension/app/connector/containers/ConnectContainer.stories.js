@@ -31,7 +31,7 @@ export default {
   ],
 };
 
-export const Generic = (): Node => {
+export function Generic(): Node {
   const wallet = genErgoSigningWalletWithCache();
 
   const walletsState = select(
@@ -101,4 +101,4 @@ export const Generic = (): Node => {
       }}
     />
   );
-};
+}

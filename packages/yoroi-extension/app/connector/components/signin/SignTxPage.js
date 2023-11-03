@@ -221,6 +221,7 @@ class SignTxPage extends Component<Props, State> {
     if (tokenInfo == null) return this.displayUnAvailableToken(request.entry);
     const shiftedAmount = request.entry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
+    // <TODO:CHECK_LINT>
     if (false && this.props.unitOfAccountSetting.enabled === true) {
       const { currency } = this.props.unitOfAccountSetting;
       const price = this.props.getCurrentPrice(request.entry.identifier, currency);

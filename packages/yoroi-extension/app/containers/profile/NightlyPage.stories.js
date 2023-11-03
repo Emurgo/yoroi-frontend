@@ -12,8 +12,8 @@ export default {
   decorators: [withScreenshot],
 };
 
-export const Generic = (): Node => (
-  <NightlyPage
+export function Generic(): Node {
+  return <NightlyPage
     generated={{
       actions: {
         profile: {
@@ -22,6 +22,6 @@ export const Generic = (): Node => (
       }
     }}
   />
-);
+}
 
 /* ===== Notable variations ===== */

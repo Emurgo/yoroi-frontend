@@ -111,6 +111,7 @@ module.exports = {
       { object: 'TrezorConnect', message: 'Use TrezorWrapper instead to minimize Trezor iframe lifespan', },
     ],
     'no-promise-executor-return': 0,
+    'jsx-a11y/control-has-associated-label': 0,
   },
   plugins: [
     'import',

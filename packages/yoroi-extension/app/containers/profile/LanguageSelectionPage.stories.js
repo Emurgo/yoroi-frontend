@@ -17,8 +17,8 @@ export default {
   decorators: [withScreenshot],
 };
 
-export const Generic = (): Node => (
-  <LanguageSelectionPage
+export function Generic(): Node {
+  return <LanguageSelectionPage
     generated={{
       stores: {
         wallets: {
@@ -51,12 +51,12 @@ export const Generic = (): Node => (
       }
     }}
   />
-);
+}
 
 /* ===== Notable variations ===== */
 
-export const NonTier1 = (): Node => (
-  <LanguageSelectionPage
+export function NonTier1(): Node {
+  return <LanguageSelectionPage
     generated={{
       stores: {
         wallets: {
@@ -90,10 +90,10 @@ export const NonTier1 = (): Node => (
       }
     }}
   />
-);
+}
 
-export const IsExecuting = (): Node => (
-  <LanguageSelectionPage
+export function IsExecuting(): Node {
+  return <LanguageSelectionPage
     generated={{
       stores: {
         wallets: {
@@ -126,10 +126,10 @@ export const IsExecuting = (): Node => (
       }
     }}
   />
-);
+}
 
-export const ServerError = (): Node => (
-  <LanguageSelectionPage
+export function ServerError(): Node {
+  return <LanguageSelectionPage
     generated={{
       stores: {
         wallets: {
@@ -158,4 +158,4 @@ export const ServerError = (): Node => (
       }
     }}
   />
-);
+}

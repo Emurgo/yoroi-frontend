@@ -8,7 +8,7 @@ export const checkIfElementsInArrayAreUnique = function (arr: Array<string>): bo
 
 export function getMethod(
   locatorMethod: string
-): function {
+): string => any {
   switch (locatorMethod) {
     case 'id': {
       return By.id;
@@ -45,7 +45,7 @@ export function getLogDate(): string {
 }
 
 export function getCircularReplacer(): Object {
-  const seen = new WeakSet();
+  const seen = new WeakSet<any>();
   return (key, value) => {
     if (typeof value === 'object' && value !== null) {
       if (seen.has(value)) {

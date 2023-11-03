@@ -10,6 +10,6 @@ export default {
   decorators: [withScreenshot],
 };
 
-export const Generic = (): Node => (
-  <CrashPage />
-);
+export function Generic(): Node {
+  return <CrashPage />
+}

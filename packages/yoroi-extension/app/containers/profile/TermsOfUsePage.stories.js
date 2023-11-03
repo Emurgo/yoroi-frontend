@@ -16,8 +16,8 @@ export default {
   decorators: [withScreenshot],
 };
 
-export const Generic = (): Node => (
-  <TermsOfUsePage
+export function Generic(): Node {
+  return <TermsOfUsePage
     generated={{
       stores: {
         wallets: {
@@ -45,6 +45,6 @@ export const Generic = (): Node => (
       }
     }}
   />
-);
+}
 
 /* ===== Notable variations ===== */

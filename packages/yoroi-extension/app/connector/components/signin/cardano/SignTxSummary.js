@@ -103,8 +103,8 @@ function CardanoSignTxSummary({
 
 export default (injectIntl(CardanoSignTxSummary): ComponentType<Props>);
 
-const Separator = () => (
-  <Box
+function Separator() {
+  return <Box
     sx={{
       height: '1px',
       width: '100%',
@@ -113,4 +113,4 @@ const Separator = () => (
       mb: '16px',
     }}
   />
-);
+}

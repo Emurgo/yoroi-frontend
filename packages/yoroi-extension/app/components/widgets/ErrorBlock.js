@@ -34,6 +34,7 @@ export default class ErrorBlock extends Component<Props> {
     return (
       <div className={styles.component}>
         <span>{errorText}</span>
-      </div>);
+      </div>
+    );
   }
 }

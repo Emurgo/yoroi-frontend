@@ -290,8 +290,8 @@ class CardanoUtxoDetails extends Component<Props> {
   }
 }
 
-const Panel = ({ children, withMargin = true }) => (
-  <Box
+function Panel({ children, withMargin = true }) {
+  return <Box
     sx={{
       border: '1px solid #DCE0E9',
       borderRadius: '8px',
@@ -301,10 +301,10 @@ const Panel = ({ children, withMargin = true }) => (
   >
     {children}
   </Box>
-);
+}
 
-const Separator = () => (
-  <Box sx={{ height: '1px', width: '100%', backgroundColor: '#DCE0E9', mt: '16px', mb: '16px' }} />
-);
+function Separator() {
+  return <Box sx={{ height: '1px', width: '100%', backgroundColor: '#DCE0E9', mt: '16px', mb: '16px' }} />
+}
 
 export default CardanoUtxoDetails;

@@ -17,6 +17,8 @@ export default class LoadingSpinner extends Component<Props> {
     light: false,
   };
 
+  // <TODO:CHECK_LINT>
+  // eslint-disable-next-line react/no-unused-class-component-methods
   root: ?HTMLElement;
 
   render(): Node {
@@ -29,6 +31,15 @@ export default class LoadingSpinner extends Component<Props> {
         ? styles.smallSize
         : styles.standardSize,
     ]);
-    return <div className={componentClasses} ref={(div) => { this.root = div; }} />;
+    return <div
+      className={componentClasses}
+      ref={
+        (div) => {
+          // <TODO:CHECK_LINT>
+          // eslint-disable-next-line react/no-unused-class-component-methods
+          this.root = div;
+        }
+      }
+    />;
   }
 }

@@ -54,6 +54,8 @@ export default class NavBarContainerRevamp extends Component<Props> {
     this.generated.actions.router.goToRoute.trigger({ route, publicDeriver: newWallet });
   };
 
+  // <TODO:CHECK_LINT>
+  // eslint-disable-next-line react/no-unused-class-component-methods
   openDialogWrapper: any => void = dialog => {
     this.generated.actions.router.goToRoute.trigger({ route: ROUTES.MY_WALLETS });
     this.generated.actions.dialogs.open.trigger({ dialog });
@@ -64,11 +66,15 @@ export default class NavBarContainerRevamp extends Component<Props> {
     const { profile } = stores;
     const walletsStore = stores.wallets;
 
-    const DropdownHead = () => {
+    const self = this;
+
+    // <TODO:CHECK_LINT>
+    // eslint-disable-next-line react/no-unstable-nested-components
+    function DropdownHead() {
       const publicDeriver = walletsStore.selected;
       if (publicDeriver == null) return null;
       const parent = publicDeriver.getParent();
-      const settingsCache = this.generated.stores.walletSettings.getConceptualWalletSettingsCache(
+      const settingsCache = self.generated.stores.walletSettings.getConceptualWalletSettingsCache(
         parent
       );
 
@@ -76,30 +82,30 @@ export default class NavBarContainerRevamp extends Component<Props> {
       const plate =
         withPubKey == null
           ? null
-          : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
+          : self.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
 
-      const balance = this.generated.stores.transactions.getBalance(publicDeriver);
+      const balance = self.generated.stores.transactions.getBalance(publicDeriver);
 
       return (
         <NavWalletDetailsRevamp
           plate={plate}
           wallet={settingsCache}
-          onUpdateHideBalance={this.updateHideBalance}
+          onUpdateHideBalance={self.updateHideBalance}
           shouldHideBalance={profile.shouldHideBalance}
-          rewards={this.getRewardBalance(publicDeriver)}
+          rewards={self.getRewardBalance(publicDeriver)}
           walletAmount={balance}
-          getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
-          defaultToken={this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
+          getTokenInfo={genLookupOrFail(self.generated.stores.tokenInfoStore.tokenInfo)}
+          defaultToken={self.generated.stores.tokenInfoStore.getDefaultTokenInfo(
             publicDeriver.getParent().getNetworkInfo().NetworkId
           )}
           unitOfAccountSetting={profile.unitOfAccount}
-          getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
+          getCurrentPrice={self.generated.stores.coinPriceStore.getCurrentPrice}
           openWalletInfoDialog={() => {
-            this.generated.actions.dialogs.open.trigger({ dialog: WalletListDialog });
+            self.generated.actions.dialogs.open.trigger({ dialog: WalletListDialog });
           }}
         />
       );
-    };
+    }
 
     return (
       <>
@@ -200,9 +206,8 @@ export default class NavBarContainerRevamp extends Component<Props> {
   ) => {
     const infoWallets = wallets.map(async (wallet: PublicDeriver<>) => {
       const parent: ConceptualWallet = wallet.getParent();
-      const settingsCache: ConceptualWalletSettingsCache = this.generated.stores.walletSettings.getConceptualWalletSettingsCache(
-        parent
-      );
+      const settingsCache: ConceptualWalletSettingsCache =
+        this.generated.stores.walletSettings.getConceptualWalletSettingsCache(parent);
 
       const defaultToken = this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
         wallet.getParent().getNetworkInfo().NetworkId

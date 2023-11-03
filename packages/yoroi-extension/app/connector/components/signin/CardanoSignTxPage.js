@@ -275,6 +275,8 @@ class SignTxPage extends Component<Props, State> {
     };
   };
 
+  // <TODO:CHECK_LINT>
+  // eslint-disable-next-line react/no-unused-class-component-methods
   getAssetsExplorerLink: Object = () => {
     return null;
   };

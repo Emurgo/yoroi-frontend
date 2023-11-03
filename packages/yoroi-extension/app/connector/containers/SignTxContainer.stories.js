@@ -182,21 +182,21 @@ const genBaseProps: {|
   };
 };
 
-export const Loading = (): Node => {
+export function Loading(): Node {
   const wallet = genErgoSigningWalletWithCache();
   return (
     <SignTxContainer
       generated={genBaseProps(Object.freeze({ wallet, isLoading: true }))}
     />
   );
-};
+}
 
 
-export const Generic = (): Node => {
+export function Generic(): Node {
   const wallet = genErgoSigningWalletWithCache();
   return (
     <SignTxContainer
       generated={genBaseProps(Object.freeze({ wallet }))}
     />
   );
-};
+}

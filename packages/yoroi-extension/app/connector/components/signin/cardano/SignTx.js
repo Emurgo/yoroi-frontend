@@ -98,7 +98,7 @@ function CardanoSignTx({
 
 export default (injectIntl(CardanoSignTx): ComponentType<Props>);
 
-const ExpandableAssetsPanel = ({
+function ExpandableAssetsPanel({
   intl,
   assets = [],
   total,
@@ -106,7 +106,7 @@ const ExpandableAssetsPanel = ({
   action,
   hasNativeToken,
   renderExplorerHashLink,
-}): Node => {
+}): Node {
   const [isExpanded, setIsExpanded] = useState(false);
   const isExpandable = assets.length > 1;
   const { assetsSent, assetsReceived, noAssetsSent, noAssetsReceived } = connectorMessages;
@@ -165,18 +165,18 @@ const ExpandableAssetsPanel = ({
       )}
     </Panel>
   );
-};
+}
 
-const AsseetValueDisplay = ({ children }): Node => (
-  <Box mt="16px" id="asseetValueDisplayBox">
+function AsseetValueDisplay({ children }): Node {
+  return <Box mt="16px" id="asseetValueDisplayBox">
     <Typography textAlign="right" color="#242838">
       {children}
     </Typography>
   </Box>
-);
+}
 
-const Panel = ({ children }): Node => (
-  <Box
+function Panel({ children }): Node {
+  return <Box
     mt="32px"
     width="100%"
     p="16px"
@@ -185,4 +185,4 @@ const Panel = ({ children }): Node => (
   >
     {children}
   </Box>
-);
+}

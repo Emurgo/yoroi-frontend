@@ -16,8 +16,8 @@ export default {
   decorators: [withScreenshot],
 };
 
-export const Generic = (): Node => (
-  <UriPromptPage
+export function Generic(): Node {
+  return <UriPromptPage
     generated={{
       stores: {
         wallets: {
@@ -41,6 +41,6 @@ export const Generic = (): Node => (
       }
     }}
   />
-);
+}
 
 /* ===== Notable variations ===== */

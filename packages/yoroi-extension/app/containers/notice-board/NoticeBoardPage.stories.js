@@ -56,7 +56,7 @@ const ButtonCases = Object.freeze({
   HasMore: 1,
   HasMoreLoading: 2,
 });
-export const Generic = (): Node => {
+export function Generic(): Node {
   const buttonState = () => select(
     'loadButton',
     ButtonCases,
@@ -119,6 +119,6 @@ export const Generic = (): Node => {
       }}
     />
   );
-};
+}
 
 /* ===== Notable variations ===== */

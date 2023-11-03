@@ -8,7 +8,7 @@ type Props = {|
   +max?: number,
 |};
 
-const ProgressBar = (props: Props): Node => {
+function ProgressBar(props: Props): Node {
   const step = props.step ?? 1;
   const max = props.max ?? 3;
 
@@ -22,7 +22,7 @@ const ProgressBar = (props: Props): Node => {
       />
     </div>
   );
-};
+}
 
 export default ProgressBar;
 

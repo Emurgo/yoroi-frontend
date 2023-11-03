@@ -14,8 +14,8 @@ export default {
   decorators: [withScreenshot],
 };
 
-export const Generic = (): Node => (
-  <ComplexityLevelPage
+export function Generic(): Node {
+  return <ComplexityLevelPage
     generated={{
       stores: {
         wallets: {
@@ -43,4 +43,4 @@ export const Generic = (): Node => (
       }
     }}
   />
-);
+}

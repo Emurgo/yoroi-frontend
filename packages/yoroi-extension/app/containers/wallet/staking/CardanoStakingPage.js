@@ -189,8 +189,8 @@ class CardanoStakingPage extends Component<AllProps, State> {
           onNext={async () => (this._next())}
         />
         {this._displayPoolInfo()}
-      </div>);
-
+      </div>
+    );
   }
 
   _getTotalAda: ?MultiToken => ?number = () => {

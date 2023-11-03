@@ -175,6 +175,8 @@ class ConnectPage extends Component<Props & InjectedProps> {
     });
   };
 
+  // <TODO:CHECK_LINT>
+  // eslint-disable-next-line react/no-unused-class-component-methods
   onCancel: void => void = () => {
     this.props.onCancel();
   };
