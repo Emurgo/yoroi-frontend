@@ -204,6 +204,8 @@ function Autocomplete({
         }}
       >
         {isOpen && (
+          // <TODO:CHECK_LINT>
+          // eslint-disable-next-line react/jsx-no-useless-fragment
           <>
             {filteredList.length === 0 ? (
               <Box sx={{ padding: '16px', bgcolor: 'var(--yoroi-palette-common-white)' }}>
@@ -216,8 +218,8 @@ function Autocomplete({
                   : item;
                 return (
                   <Box
-                    {/* // <TODO:CHECK_LINT> */}
-                    {/* eslint-disable-next-line react/no-array-index-key */}
+                    // <TODO:CHECK_LINT>
+                    // eslint-disable-next-line react/no-array-index-key
                     key={`${item}${index}`}
                     sx={{
                       padding: '16px',

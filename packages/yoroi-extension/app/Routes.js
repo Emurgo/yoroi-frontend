@@ -168,168 +168,171 @@ export const LazyLoadPromises: Array<() => any> = [
 declare var CONFIG: ConfigType;
 
 /* eslint-disable max-len */
-export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
-  <Suspense fallback={null}>
+export function Routes(stores: StoresMap, actions: ActionsMap): Node {
+  const wrapper = storesActionsWrapper(stores, actions);
+  return <Suspense fallback={null}>
     <Switch>
       <Route
         exact
         path={ROUTES.ROOT}
-        component={props => <LoadingPage {...props} stores={stores} actions={actions} />}
+        component={wrapper(LoadingPage)}
       />
       <Route
         exact
         path={ROUTES.NIGHTLY_INFO}
-        component={props => <NightlyPage {...props} stores={stores} actions={actions} />}
+        component={wrapper(NightlyPage)}
       />
       <Route
         exact
         path={ROUTES.PROFILE.LANGUAGE_SELECTION}
-        component={props => <LanguageSelectionPage {...props} stores={stores} actions={actions} />}
+        component={wrapper(LanguageSelectionPage)}
       />
       <Route
         exact
         path={ROUTES.PROFILE.COMPLEXITY_LEVEL}
-        component={props => <ComplexityLevelPage {...props} stores={stores} actions={actions} />}
+        component={wrapper(ComplexityLevelPage)}
       />
       <Route
         exact
         path={ROUTES.PROFILE.TERMS_OF_USE}
-        component={props => <TermsOfUsePage {...props} stores={stores} actions={actions} />}
+        component={wrapper(TermsOfUsePage)}
       />
       <Route
         exact
         path={ROUTES.PROFILE.URI_PROMPT}
-        component={props => <UriPromptPage {...props} stores={stores} actions={actions} />}
+        component={wrapper(UriPromptPage)}
       />
       <Route
         exact
         path={ROUTES.MY_WALLETS}
-        component={props => <MyWalletsPage {...props} stores={stores} actions={actions} />}
+        component={wrapper(MyWalletsPage)}
       />
       <Route
         exact
         path={ROUTES.STAKING}
-        component={props => <StakingPage {...props} stores={stores} actions={actions} />}
+        component={wrapper(StakingPage)}
       />
       <Route
         path={ROUTES.ASSETS.ROOT}
         component={props =>
-          wrapAssets({ ...props, stores, actions }, AssetsSubpages(stores, actions))
+          wrapAssets({ ...props, stores, actions }, AssetsSubpages(wrapper))
         }
       />
       <Route
         path={ROUTES.NFTS.ROOT}
-        component={props => wrapNFTs({ ...props, stores, actions }, NFTsSubPages(stores, actions))}
+        component={props => wrapNFTs({ ...props, stores, actions }, NFTsSubPages(wrapper))}
       />
       <Route
         exact
         path={ROUTES.WALLETS.ADD}
-        component={props => <AddWalletPage {...props} stores={stores} actions={actions} />}
+        component={wrapper(AddWalletPage)}
       />
       <Route
         exact
         path={ROUTES.WALLETS.RESTORE_WALLET}
-        component={props => <RestoreWalletPage {...props} stores={stores} actions={actions} />}
+        component={wrapper(RestoreWalletPage)}
       />
       <Route
         exact
         path={ROUTES.WALLETS.CREATE_NEW_WALLET}
-        component={props => <CreateWalletPage {...props} stores={stores} actions={actions} />}
+        component={wrapper(CreateWalletPage)}
       />
       <Route
         exact
         path={ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES}
-        component={props => <ConnectedWebsitesPage {...props} stores={stores} actions={actions} />}
+        component={wrapper(ConnectedWebsitesPage)}
       />
       <Route
         exact
         path={ROUTES.EXPERIMENTAL.YOROI_PALETTE}
-        component={props => <YoroiPalettePage {...props} stores={stores} actions={actions} />}
+        component={wrapper(YoroiPalettePage)}
       />
       <Route
         exact
         path={ROUTES.EXPERIMENTAL.THEMES}
-        component={props => <YoroiThemesPage {...props} stores={stores} actions={actions} />}
+        component={wrapper(YoroiThemesPage)}
       />
       <Route
         path={ROUTES.WALLETS.ROOT}
         component={props =>
-          wrapWallet({ ...props, stores, actions }, WalletsSubpages(stores, actions))
+          wrapWallet({ ...props, stores, actions }, WalletsSubpages(wrapper, stores, actions))
         }
       />
       <Route
         path={ROUTES.SETTINGS.ROOT}
         component={props =>
-          wrapSettings({ ...props, stores, actions }, SettingsSubpages(stores, actions))
+          wrapSettings({ ...props, stores, actions }, SettingsSubpages(wrapper))
         }
       />
       <Route
         path={ROUTES.TRANSFER.ROOT}
-        component={props => <Transfer {...props} stores={stores} actions={actions} />}
+        component={wrapper(Transfer)}
       />
       <Route
         exact
         path={ROUTES.SEND_FROM_URI.ROOT}
-        component={props => <URILandingPage {...props} stores={stores} actions={actions} />}
+        component={wrapper(URILandingPage)}
       />
       <Route
         exact
         path={ROUTES.OAUTH_FROM_EXTERNAL.DROPBOX}
-        component={props => <OAuthDropboxPage {...props} stores={stores} actions={actions} />}
+        component={wrapper(OAuthDropboxPage)}
       />
       <Route
         exact
         path={ROUTES.NOTICE_BOARD.ROOT}
-        component={props => <NoticeBoardPage {...props} stores={stores} actions={actions} />}
+        component={wrapper(NoticeBoardPage)}
       />
       <Route
         exact
         path={ROUTES.SWITCH}
-        component={props => <WalletSwitch {...props} stores={stores} actions={actions} />}
+        component={wrapper(WalletSwitch)}
       />
       <Route
         exact
         path={ROUTES.REVAMP.CATALYST_VOTING}
-        component={props => <VotingPage {...props} stores={stores} actions={actions} />}
+        component={wrapper(VotingPage)}
       />
       <Redirect to={ROUTES.MY_WALLETS} />
     </Switch>
   </Suspense>
-);
+}
 
-const WalletsSubpages = (stores, actions) => (
-  <Switch>
+function WalletsSubpages(wrapper: Function => Function, stores, actions) {
+  return <Switch>
     <Route
       exact
       path={ROUTES.WALLETS.TRANSACTIONS}
-      component={props => <WalletSummaryPage {...props} stores={stores} actions={actions} />}
+      component={wrapper(WalletSummaryPage)}
     />
     <Route
       exact
       path={ROUTES.WALLETS.SEND}
-      component={props => <WalletSendPage {...props} stores={stores} actions={actions} />}
+      component={wrapper(WalletSendPage)}
     />
     <Route
       path={ROUTES.WALLETS.ASSETS}
-      component={props => <WalletAssetsPage {...props} stores={stores} actions={actions} />}
+      component={wrapper(WalletAssetsPage)}
     />
     <Route
       path={ROUTES.WALLETS.RECEIVE.ROOT}
       component={props =>
         wrapReceive(
           { ...props, stores, actions },
-          <WalletReceivePage {...props} stores={stores} actions={actions} />
+          wrapper(WalletReceivePage)
         )
       }
     />
     <Route
       exact
       path={ROUTES.WALLETS.DELEGATION_DASHBOARD}
-      component={props => <StakingDashboardPage {...props} stores={stores} actions={actions} />}
+      component={wrapper(StakingDashboardPage)}
     />
     <Route
       exact
       path={ROUTES.WALLETS.ADAPOOL_DELEGATION_SIMPLE}
+      // <TODO:CHECK_LINT>
+      // eslint-disable-next-line react/no-unstable-nested-components
       component={props => (
         <CardanoStakingPage
           {...props}
@@ -342,90 +345,92 @@ const WalletsSubpages = (stores, actions) => (
     <Route
       exact
       path={ROUTES.WALLETS.CARDANO_DELEGATION}
-      component={props => <CardanoStakingPage {...props} stores={stores} actions={actions} />}
+      component={wrapper(CardanoStakingPage)}
     />
     <Route
       exact
       path={ROUTES.WALLETS.CATALYST_VOTING}
-      component={props => <VotingPage {...props} stores={stores} actions={actions} />}
+      component={wrapper(VotingPage)}
     />
   </Switch>
-);
+}
 
-const SettingsSubpages = (stores, actions) => (
-  <Switch>
+function SettingsSubpages(wrapper: Function => Function) {
+  return <Switch>
     <Route
       exact
       path={ROUTES.SETTINGS.GENERAL}
-      component={props => <GeneralSettingsPage {...props} stores={stores} actions={actions} />}
+      component={wrapper(GeneralSettingsPage)}
     />
     <Route
       exact
       path={ROUTES.SETTINGS.BLOCKCHAIN}
-      component={props => <BlockchainSettingsPage {...props} stores={stores} actions={actions} />}
+      component={wrapper(BlockchainSettingsPage)}
     />
     <Route
       exact
       path={ROUTES.SETTINGS.TERMS_OF_USE}
-      component={props => <TermsOfUseSettingsPage {...props} stores={stores} actions={actions} />}
+      component={wrapper(TermsOfUseSettingsPage)}
     />
     <Route
       exact
       path={ROUTES.SETTINGS.WALLET}
-      component={props => <WalletSettingsPage {...props} stores={stores} actions={actions} />}
+      component={wrapper(WalletSettingsPage)}
     />
     <Route
       exact
       path={ROUTES.SETTINGS.EXTERNAL_STORAGE}
-      component={props => (
-        <ExternalStorageSettingsPage {...props} stores={stores} actions={actions} />
-      )}
+      component={wrapper(ExternalStorageSettingsPage)}
     />
     <Route
       exact
       path={ROUTES.SETTINGS.SUPPORT}
-      component={props => <SupportSettingsPage {...props} stores={stores} actions={actions} />}
+      component={wrapper(SupportSettingsPage)}
     />
     <Route
       exact
       path={ROUTES.SETTINGS.LEVEL_OF_COMPLEXITY}
-      component={props => (
-        <ComplexityLevelSettingsPage {...props} stores={stores} actions={actions} />
-      )}
+      component={wrapper(ComplexityLevelSettingsPage)}
     />
     <Redirect to={ROUTES.SETTINGS.GENERAL} />
   </Switch>
-);
+}
 
-const AssetsSubpages = (stores, actions) => (
-  <Switch>
+function AssetsSubpages(wrapper: (Function => Function)) {
+  return <Switch>
     <Route
       exact
       path={ROUTES.ASSETS.ROOT}
-      component={props => <TokensPageRevamp {...props} stores={stores} actions={actions} />}
+      component={wrapper(TokensPageRevamp)}
     />
     <Route
       exact
       path={ROUTES.ASSETS.DETAILS}
-      component={props => <TokensDetailPageRevamp {...props} stores={stores} actions={actions} />}
+      component={wrapper(TokensDetailPageRevamp)}
     />
   </Switch>
-);
+}
 
-const NFTsSubPages = (stores, actions) => (
-  <Switch>
+function storesActionsWrapper(stores, actions): Function => Function {
+  return Component => function(props) {
+    return <Component {...props} stores={stores} actions={actions} />
+  }
+}
+
+function NFTsSubPages(wrapper: Function => Function) {
+  return <Switch>
     <Route
       exact
       path={ROUTES.NFTS.ROOT}
-      component={props => <NFTsPageRevamp {...props} stores={stores} actions={actions} />}
+      component={wrapper(NFTsPageRevamp)}
     />
     <Route
       exact
       path={ROUTES.NFTS.DETAILS}
-      component={props => <NFTDetailPageRevamp {...props} stores={stores} actions={actions} />}
+      component={wrapper(NFTDetailPageRevamp)}
     />
   </Switch>
-);
+}
 
 export function wrapSettings(
   settingsProps: InjectedOrGenerated<SettingsData>,
