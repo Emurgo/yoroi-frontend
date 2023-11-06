@@ -1,7 +1,7 @@
 // @flow
 import { useEffect, useState } from 'react';
 import type { Node, ComponentType } from 'react';
-import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Stack, Typography, Box } from '@mui/material';
@@ -45,7 +45,7 @@ function SaveRecoveryPhraseStep(props: Props & Intl): Node {
       <Stack direction="column" alignItems="left" justifyContent="center" maxWidth="700px">
         <Stack mb="8px" flexDirection="row" alignItems="center" gap="6px">
           <Typography>
-            <FormattedHTMLMessage {...messages.description} />
+            <FormattedMessage {...messages.description} />
           </Typography>
           <Box
             sx={{ cursor: 'pointer' }}

@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import classnames from 'classnames';
 import { LoadingButton } from '@mui/lab';
 import LocalizableError from '../../../i18n/LocalizableError';
@@ -112,7 +112,7 @@ class StandardHeader extends Component<Props & InjectedLayoutProps> {
           </CopyableAddress>
           <div className={styles.postCopyMargin} />
           <div className={styles.instructionsText}>
-            <FormattedHTMLMessage {...messages.walletReceiveInstructions} />
+            <FormattedMessage {...messages.walletReceiveInstructions} />
           </div>
           {generateAddressForm}
           {error ? (

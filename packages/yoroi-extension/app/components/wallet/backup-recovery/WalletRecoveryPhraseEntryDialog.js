@@ -4,7 +4,7 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import CheckboxLabel from '../../common/CheckboxLabel';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import WalletRecoveryPhraseMnemonic from './WalletRecoveryPhraseMnemonic';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import DialogBackButton from '../../widgets/DialogBackButton';
@@ -200,7 +200,7 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
           <div>
             <div className={styles.checkbox}>
               <CheckboxLabel
-                label={<FormattedHTMLMessage {...messages.termDevice} />}
+                label={<FormattedMessage {...messages.termDevice} />}
                 onChange={onAcceptTermDevice}
                 checked={isTermDeviceAccepted}
                 labelProps={{

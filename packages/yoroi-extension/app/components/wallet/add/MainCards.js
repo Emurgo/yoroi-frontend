@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import classnames from 'classnames';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
@@ -70,7 +70,7 @@ export default class MainCards extends Component<Props> {
               <div className={styles.tooltip}>
                 <CustomTooltip
                   toolTip={
-                    <div><FormattedHTMLMessage {...messages.connectToHWTooltip} /></div>
+                    <div><FormattedMessage {...messages.connectToHWTooltip} /></div>
                   }
                 />
               </div>
@@ -90,7 +90,7 @@ export default class MainCards extends Component<Props> {
               <div className={styles.tooltip}>
                 <CustomTooltip
                   toolTip={
-                    <div><FormattedHTMLMessage {...messages.createTooltip} /></div>
+                    <div><FormattedMessage {...messages.createTooltip} /></div>
                   }
                 />
               </div>
@@ -112,7 +112,7 @@ export default class MainCards extends Component<Props> {
               <div className={styles.tooltip}>
                 <CustomTooltip
                   toolTip={
-                    <div><FormattedHTMLMessage {...messages.restoreTooltip} /></div>
+                    <div><FormattedMessage {...messages.restoreTooltip} /></div>
                   }
                 />
               </div>

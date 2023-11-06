@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 
 import globalMessages from '../../../i18n/global-messages';
 
@@ -84,7 +84,7 @@ export default class GeneratePinDialog extends Component<Props> {
         />
 
         <div className={classnames([styles.lineText, styles.firstItem, styles.importantText])}>
-          <FormattedHTMLMessage {...messages.line1} />
+          <FormattedMessage {...messages.line1} />
         </div>
         {pinCards}
       </Dialog>

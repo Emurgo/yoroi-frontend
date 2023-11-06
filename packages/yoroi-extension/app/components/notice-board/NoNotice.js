@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
+import { intlShape, defineMessages, FormattedMessage } from 'react-intl';
 
 import { ReactComponent as NoNoticeClassicSvg }  from '../../assets/images/transaction/no-transactions-yet.classic.inline.svg';
 import { ReactComponent as NoNoticeModernSvg }  from '../../assets/images/transaction/no-transactions-yet.modern.inline.svg';
@@ -44,7 +44,7 @@ export default class NoNotice extends Component<Props> {
             {intl.formatMessage(messages.notDelegatedYet)}
           </div>
           <div>
-            <FormattedHTMLMessage
+            <FormattedMessage
               {...messages.chooseAPool}
               values={{ ticker: this.props.ticker }}
             />

@@ -1,7 +1,7 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './ExportPublicKeyDialog.scss';
 import { observer } from 'mobx-react';
@@ -57,8 +57,8 @@ export default class ExportPublicKeyDialog extends Component<Props> {
       >
         <div className={styles.component}>
           <div className={styles.header}>
-            <p><FormattedHTMLMessage {...messages.publicKeyExplanationLine1} /></p>
-            <p><FormattedHTMLMessage {...globalMessages.publicKeyExplanation} /></p>
+            <p><FormattedMessage {...messages.publicKeyExplanationLine1} /></p>
+            <p><FormattedMessage {...globalMessages.publicKeyExplanation} /></p>
             <p>{intl.formatMessage(globalMessages.whyUse)}</p>
             <ul>
               <li key="1">{intl.formatMessage(messages.reason1)}</li>

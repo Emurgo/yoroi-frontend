@@ -1,7 +1,7 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
+import { intlShape, defineMessages, FormattedMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import moment from 'moment';
 
@@ -111,7 +111,7 @@ export default class NoticeBlock extends Component<Props> {
     switch (notice.kind) {
       case NoticeKind.STAKE_DELEGATED:
         title = (
-          <FormattedHTMLMessage
+          <FormattedMessage
             {...messages.titleStakeDelegated}
             values={{ poolTicker }}
           />);
@@ -120,7 +120,7 @@ export default class NoticeBlock extends Component<Props> {
         break;
       case NoticeKind.STAKE_UNDELEGATED:
         title = (
-          <FormattedHTMLMessage
+          <FormattedMessage
             {...messages.titleStakeUndelegated}
             values={{ poolTicker }}
           />);
@@ -129,12 +129,12 @@ export default class NoticeBlock extends Component<Props> {
         break;
       case NoticeKind.STAKE_REDELEGATED:
         title = (
-          <FormattedHTMLMessage
+          <FormattedMessage
             {...messages.titleStakeRedelegated}
             values={{ poolTicker }}
           />);
         subMessage =  (
-          <FormattedHTMLMessage
+          <FormattedMessage
             {...messages.subMessageStakeRedelegated}
             values={{ poolTicker: notice.oldPoolTicker }}
           />);
@@ -143,7 +143,7 @@ export default class NoticeBlock extends Component<Props> {
       case NoticeKind.FEE_CHANGED:
         title = intl.formatMessage(messages.titlefeeChanged);
         subMessage =  (
-          <FormattedHTMLMessage
+          <FormattedMessage
             {...messages.subMessageFeeChanged}
             values={{ oldFee: notice.oldFee, newFee: notice.newFee, currency: 'ADA' }}
           />);
@@ -152,7 +152,7 @@ export default class NoticeBlock extends Component<Props> {
       case NoticeKind.COST_CHANGED:
         title = intl.formatMessage(messages.titleCostChanged);
         subMessage =  (
-          <FormattedHTMLMessage
+          <FormattedMessage
             {...messages.subMessageCostChanged}
             values={{ oldCost: notice.oldCost, newCost: notice.newCost, currency: 'ADA' }}
           />);
@@ -161,7 +161,7 @@ export default class NoticeBlock extends Component<Props> {
       case NoticeKind.REWARD_RECEIVED:
         title = intl.formatMessage(messages.titleRewardRecieved);
         subMessage =  (
-          <FormattedHTMLMessage
+          <FormattedMessage
             {...messages.subMessageRewardRecieved}
             values={{ rewardAmount: notice.rewardAmount, epochNumber: notice.epochNumber, currency: 'ADA' }}
           />);
@@ -169,7 +169,7 @@ export default class NoticeBlock extends Component<Props> {
         break;
       case NoticeKind.POOL_TO_RETIRE:
         title = (
-          <FormattedHTMLMessage
+          <FormattedMessage
             {...messages.titlePoolToRetire}
             values={{ poolTicker }}
           />);

@@ -3,7 +3,7 @@ import type { ComponentType, Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Button } from '@mui/material';
@@ -86,7 +86,7 @@ class Voting extends Component<Props & InjectedProps> {
             <span>3</span>
           </div>
           <div className={classnames([styles.lineText, styles.step2Text])}>
-            <FormattedHTMLMessage {...messages.trezorTRequirement} />
+            <FormattedMessage {...messages.trezorTRequirement} />
           </div>
         </div>
       );
@@ -98,7 +98,7 @@ class Voting extends Component<Props & InjectedProps> {
             <span>3</span>
           </div>
           <div className={classnames([styles.lineText, styles.step2Text])}>
-            <FormattedHTMLMessage {...messages.ledgerNanoRequirement} />
+            <FormattedMessage {...messages.ledgerNanoRequirement} />
           </div>
         </div>
       );

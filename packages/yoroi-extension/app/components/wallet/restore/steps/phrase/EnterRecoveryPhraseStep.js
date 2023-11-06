@@ -3,7 +3,7 @@ import type { Node, ComponentType } from 'react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import type { ManageDialogsProps } from '../../../dialogs/types';
 import { useState } from 'react';
-import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import { Stack, Box, Typography } from '@mui/material';
 import { RESTORE_WALLET_STEPS } from '../../steps';
@@ -94,7 +94,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
         maxWidth={mode.length === 15 ? '636px' : '760px'}
       >
         <Typography mb="16px">
-          <FormattedHTMLMessage {...messages.description} />
+          <FormattedMessage {...messages.description} />
         </Typography>
 
         <RestoreRecoveryPhraseForm

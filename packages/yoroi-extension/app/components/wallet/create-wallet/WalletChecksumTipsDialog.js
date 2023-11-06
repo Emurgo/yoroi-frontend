@@ -2,7 +2,7 @@
 import type { Node, ComponentType } from 'react';
 import InfoDialog from '../../widgets/infoDialog';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { defineMessages, injectIntl, FormattedMessage, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { Typography, Box } from '@mui/material';
 import { observer } from 'mobx-react';
 
@@ -66,7 +66,7 @@ function WalletChecksumTipsDialog(props: Props & Intl): Node {
         </Box>
         <Box component="li">
           <Typography variant="body1" color="grey.800">
-            <FormattedHTMLMessage {...messages.secondTip} values={{ plateText: plateTextPart }} />
+            <FormattedMessage {...messages.secondTip} values={{ plateText: plateTextPart }} />
           </Typography>
         </Box>
         <Box component="li">

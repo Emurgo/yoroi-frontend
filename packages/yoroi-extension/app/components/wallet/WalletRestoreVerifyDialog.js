@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { defineMessages, FormattedHTMLMessage, intlShape } from 'react-intl';
+import { defineMessages, FormattedMessage, intlShape } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import styles from './WalletRestoreVerifyDialog.scss';
 import DialogBackButton from '../widgets/DialogBackButton';
@@ -151,17 +151,17 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
         <ul>
           <li className={styles.smallTopMargin}>
             <span>
-              <FormattedHTMLMessage {...messages.walletRestoreVerifyIntroLine2} />
+              <FormattedMessage {...messages.walletRestoreVerifyIntroLine2} />
             </span>
           </li>
           <li className={styles.smallTopMargin}>
             <span>
-              <FormattedHTMLMessage {...messages.walletRestoreVerifyIntroLine3} />
+              <FormattedMessage {...messages.walletRestoreVerifyIntroLine3} />
             </span>
           </li>
           <li className={styles.smallTopMargin}>
             <span>
-              <FormattedHTMLMessage {...messages.walletRestoreVerifyIntroLine4} />
+              <FormattedMessage {...messages.walletRestoreVerifyIntroLine4} />
             </span>
           </li>
         </ul>

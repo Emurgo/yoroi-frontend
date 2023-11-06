@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import WarningHeader from './WarningHeader';
 import { Button } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
@@ -47,7 +47,7 @@ export default class MangledHeader extends Component<Props> {
             </p><br />
             <p>
               {intl.formatMessage(addressSubgroupName.mangled)}&nbsp;
-              <FormattedHTMLMessage {...globalMessages.auditAddressWarning} />
+              <FormattedMessage {...globalMessages.auditAddressWarning} />
             </p>
           </>
         )}

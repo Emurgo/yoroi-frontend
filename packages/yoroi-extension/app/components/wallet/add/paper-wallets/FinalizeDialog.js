@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import Dialog from '../../../widgets/Dialog';
 import globalMessages from '../../../../i18n/global-messages';
@@ -103,10 +103,10 @@ export default class FinalizeDialog extends Component<Props> {
         <span>{intl.formatMessage(messages.paperFinalizeIntroLine1)}</span><br />
         <ul>
           <li className={styles.smallTopMargin}>
-            <span><FormattedHTMLMessage {...messages.paperFinalizeIntroLine2} /></span>
+            <span><FormattedMessage {...messages.paperFinalizeIntroLine2} /></span>
           </li>
           <li className={styles.smallTopMargin}>
-            <span><FormattedHTMLMessage {...messages.paperFinalizeIntroLine3} /></span>
+            <span><FormattedMessage {...messages.paperFinalizeIntroLine3} /></span>
           </li>
         </ul>
 

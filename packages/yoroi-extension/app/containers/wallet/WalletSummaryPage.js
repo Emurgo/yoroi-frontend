@@ -3,7 +3,7 @@ import type { ComponentType, Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed, runInAction, observable } from 'mobx';
-import { intlShape, FormattedHTMLMessage } from 'react-intl';
+import { intlShape, FormattedMessage } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import type { Notification } from '../../types/notificationType';
 import NotificationMessage from '../../components/widgets/NotificationMessage';
@@ -245,7 +245,7 @@ class WalletSummaryPage extends Component<AllProps> {
       <VerticalFlexContainer>
         <NotificationMessage icon={successIcon} show={!!notification}>
           {!!notification && (
-            <FormattedHTMLMessage
+            <FormattedMessage
               {...notification.message}
               values={notification.values == null ? undefined : notification.values(intl)}
             />
@@ -349,7 +349,7 @@ class WalletSummaryPage extends Component<AllProps> {
       <VerticalFlexContainer>
         <NotificationMessage icon={successIcon} show={!!notification}>
           {!!notification && (
-            <FormattedHTMLMessage
+            <FormattedMessage
               {...notification.message}
               values={notification.values == null ? undefined : notification.values(intl)}
             />

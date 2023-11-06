@@ -4,7 +4,7 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import TextField from '../../../common/TextField'
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
@@ -173,8 +173,8 @@ export default class UserPasswordDialog extends Component<Props> {
 
         <div className={classicTheme ? headerMixin.headerBlockClassic : headerMixin.headerBlock}>
           <span>{intl.formatMessage(messages.paperPasswordIntroLine1)}</span><br />
-          <span><FormattedHTMLMessage {...messages.paperPasswordIntroLine2} /></span><br />
-          <span><FormattedHTMLMessage {...messages.paperPasswordIntroLine3} /></span><br />
+          <span><FormattedMessage {...messages.paperPasswordIntroLine2} /></span><br />
+          <span><FormattedMessage {...messages.paperPasswordIntroLine3} /></span><br />
         </div>
 
         <div className={styles.paperPassword}>

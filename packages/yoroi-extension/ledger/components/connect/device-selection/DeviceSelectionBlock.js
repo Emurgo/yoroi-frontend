@@ -2,7 +2,7 @@
 import React from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
+import { intlShape, defineMessages, FormattedMessage } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import type {
@@ -135,13 +135,13 @@ export default class DeviceSelectionBlock extends React.Component<Props> {
             <div className={styles.deviceKnown}>
               <div className={styles.knowInfoBlock}>
                 <div className={styles.knownInfoText}>
-                  <FormattedHTMLMessage {...message.knownInfo1} values={{ deviceName }} />
+                  <FormattedMessage {...message.knownInfo1} values={{ deviceName }} />
                 </div>
                 <div className={styles.knownInfoText}>
                   {intl.formatMessage(message.knownInfo2)}
                 </div>
                 <div className={styles.knownInfoText}>
-                  <FormattedHTMLMessage {...message.knownInfo3} />
+                  <FormattedMessage {...message.knownInfo3} />
                 </div>
               </div>
               <div className={styles.continueButtonBlock}>

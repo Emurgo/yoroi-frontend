@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { FormControlLabel, Radio, RadioGroup, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { defineMessages, intlShape, FormattedMessage, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import { THEMES } from '../../../../styles/utils';
 import type { Theme } from '../../../../styles/utils';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -164,7 +164,7 @@ export default class ThemeSettingsBlock extends Component<Props> {
                   color="var(--yoroi-support-settings-text)"
                   sx={{ marginBottom: '2px' }}
                 >
-                  <FormattedHTMLMessage {...messages.themeNote} />
+                  <FormattedMessage {...messages.themeNote} />
                 </Typography>
                 <Typography variant="body2" color="var(--yoroi-support-settings-text)">
                   <FormattedMessage {...messages.blog} values={{ blogLink }} />

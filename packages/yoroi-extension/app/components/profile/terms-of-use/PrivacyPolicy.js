@@ -1,7 +1,7 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import styles from './PrivacyPolicy.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -51,10 +51,10 @@ export default class PrivacyPolicy extends Component<Props> {
         <div className={styles.text}>
           {intl.formatMessage(messages.header)}
           <ul>
-            <li><FormattedHTMLMessage {...messages.neverTrack} /></li>
-            <li><FormattedHTMLMessage {...messages.neverIP} /></li>
-            <li><FormattedHTMLMessage {...messages.neverSell} /></li>
-            <li><FormattedHTMLMessage {...messages.neverAnalytics} /></li>
+            <li><FormattedMessage {...messages.neverTrack} /></li>
+            <li><FormattedMessage {...messages.neverIP} /></li>
+            <li><FormattedMessage {...messages.neverSell} /></li>
+            <li><FormattedMessage {...messages.neverAnalytics} /></li>
           </ul>
           {intl.formatMessage(messages.serverLogs)}
         </div>

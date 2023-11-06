@@ -3,7 +3,7 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 
@@ -41,7 +41,7 @@ export default class MaxAssetsError extends Component<Props> {
               {intl.formatMessage(globalMessages.errorLabel)}
             </Typography>
             <Typography color='var(--yoroi-palette-gray-900)'>
-              <FormattedHTMLMessage
+              <FormattedMessage
                 {...messages.maxNumberAllowed}
                 values={{ number: this.props.maxAssetsAllowed }}
               />

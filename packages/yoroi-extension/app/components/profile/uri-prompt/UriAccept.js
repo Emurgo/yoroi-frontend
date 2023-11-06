@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Button } from '@mui/material';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import styles from './UriAccept.scss';
 import { ReactComponent as UriPrompt }  from '../../../assets/images/uri/uri-prompt.inline.svg';
 import globalMessages from '../../../i18n/global-messages';
@@ -39,7 +39,7 @@ export default class UriAccept extends Component<Props> {
           </span>
 
           <div className={styles.explanation}>
-            <FormattedHTMLMessage {...messages.seePrompt} />
+            <FormattedMessage {...messages.seePrompt} />
           </div>
 
           <div className={styles.buttonsWrapper}>

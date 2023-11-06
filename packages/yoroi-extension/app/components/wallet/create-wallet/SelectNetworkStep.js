@@ -1,6 +1,6 @@
 // @flow
 import type { Node, ComponentType } from 'react';
-import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Stack, Typography, Box } from '@mui/material';
@@ -69,7 +69,7 @@ function SelectNetworkStep(props: Props & Intl): Node {
       <Stack direction="column" alignItems="center" justifyContent="center" mb="72px">
         <Stack mb="38px" mt="24px" flexDirection="row" alignItems="center" gap="6px">
           <Typography>
-            <FormattedHTMLMessage {...messages.description} />
+            <FormattedMessage {...messages.description} />
           </Typography>
         </Stack>
 

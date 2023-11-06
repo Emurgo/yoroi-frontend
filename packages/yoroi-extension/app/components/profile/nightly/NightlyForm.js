@@ -4,7 +4,7 @@ import type { ComponentType, Node } from 'react';
 import { observer } from 'mobx-react';
 import { Button } from '@mui/material';
 import CheckboxLabel from '../../common/CheckboxLabel';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import styles from './NightlyForm.scss';
 import globalMessages from '../../../i18n/global-messages';
 import { ReactComponent as NightlyIcon } from '../../../assets/images/yoroi-nightly-icon.inline.svg';
@@ -82,7 +82,7 @@ class NightlyForm extends Component<Props & InjectedLayoutProps, State> {
             <NightlyIcon />
           </div>
           <div className={styles.content}>
-            <FormattedHTMLMessage {...messages.header} />
+            <FormattedMessage {...messages.header} />
             <br />
             <br />
             <div className={styles.header}>{intl.formatMessage(messages.warningHeader)}</div>

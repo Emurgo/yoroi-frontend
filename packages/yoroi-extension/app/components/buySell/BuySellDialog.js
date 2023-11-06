@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, useIntl } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import { truncateAddress } from '../../utils/formatters';
@@ -56,9 +56,6 @@ type State = {|
 
 @observer
 export default class BuySellDialog extends Component<Props, State> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
 
   state: State = {
     addressSelected: null,
@@ -66,7 +63,7 @@ export default class BuySellDialog extends Component<Props, State> {
   };
 
   async componentDidMount () {
-    const { intl } = this.context;
+    const intl = useIntl();
 
     const resp = await this.props.genWalletList()
     const wallets = [
@@ -116,7 +113,7 @@ export default class BuySellDialog extends Component<Props, State> {
   )
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = useIntl();
 
     if (this.state.walletList == null) {
       return (

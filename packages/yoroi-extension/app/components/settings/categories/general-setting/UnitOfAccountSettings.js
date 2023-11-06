@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import Select from '../../../common/Select';
 import { MenuItem, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import styles from './UnitOfAccountSettings.scss';
@@ -130,9 +130,9 @@ export default class UnitOfAccountSettings extends Component<Props> {
           {intl.formatMessage(messages.unitOfAccountTitle)}
         </h2>
 
-        <p><FormattedHTMLMessage {...messages.note} /></p>
+        <p><FormattedMessage {...messages.note} /></p>
 
-        <p><FormattedHTMLMessage {...messages.lastUpdated} values={{ lastUpdated }} /></p>
+        <p><FormattedMessage {...messages.lastUpdated} values={{ lastUpdated }} /></p>
 
         <Select
           formControlProps={{ sx: { marginTop: '40px' } }}

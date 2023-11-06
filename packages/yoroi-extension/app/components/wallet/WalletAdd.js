@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 
 import MainCards from './add/MainCards';
 import { ReactComponent as LogoYoroiIcon }  from '../../assets/images/yoroi-logo-white.inline.svg';
@@ -64,7 +64,7 @@ export default class WalletAdd extends Component<Props> {
             <div className={styles.heroLeft}>
               <span className={styles.heroLogo}><LogoIcon width="156" height="50" /></span>
               <h2 className={styles.heroTitle}>
-                <FormattedHTMLMessage {...(messages.title)} />
+                <FormattedMessage {...(messages.title)} />
               </h2>
               <h3 className={styles.heroSubTitle}>{intl.formatMessage(messages.subTitle)}</h3>
             </div>

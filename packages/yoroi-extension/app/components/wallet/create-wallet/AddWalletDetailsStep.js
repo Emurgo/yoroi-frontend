@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { ManageDialogsProps } from './CreateWalletPage';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import StepController from './StepController';
@@ -165,7 +165,7 @@ export default class AddWalletDetailsStep extends Component<Props> {
         <Stack direction="column" alignItems="left" justifyContent="center" maxWidth="555px">
           <Stack mb="20px" flexDirection="row" alignItems="center" gap="6px">
             <Typography variant="body1">
-              <FormattedHTMLMessage {...descriptionMessage} />
+              <FormattedMessage {...descriptionMessage} />
             </Typography>
             <Box
               component="button"

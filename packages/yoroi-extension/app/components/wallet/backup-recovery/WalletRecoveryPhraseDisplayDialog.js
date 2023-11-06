@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import WalletRecoveryPhraseMnemonic from './WalletRecoveryPhraseMnemonic';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import DialogBackButton from '../../widgets/DialogBackButton';
@@ -71,7 +71,7 @@ export default class WalletRecoveryPhraseDisplayDialog extends Component<Props> 
         {!classicTheme && <span className={styles.recoveryImage}><RecoveryPhraseSvg /></span>}
 
         <WalletRecoveryInstructions
-          instructionsText={<FormattedHTMLMessage {...messages.backupInstructions} />}
+          instructionsText={<FormattedMessage {...messages.backupInstructions} />}
         />
         <WalletRecoveryPhraseMnemonic phrase={recoveryPhrase} classicTheme={classicTheme} />
       </Dialog>

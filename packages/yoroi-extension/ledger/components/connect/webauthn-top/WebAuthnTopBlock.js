@@ -2,7 +2,7 @@
 import React from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
+import { intlShape, defineMessages, FormattedMessage } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import imgWarningIcon from '../../../assets/img/warning-icon.svg';
@@ -50,7 +50,7 @@ export default class WebAuthnTopBlock extends React.Component<Props> {
             alt="Warning Icon"
           />
           <div className={styles.text}>
-            {<FormattedHTMLMessage {...messages.noteText} />}
+            {<FormattedMessage {...messages.noteText} />}
           </div>
         </div>
       </div>
