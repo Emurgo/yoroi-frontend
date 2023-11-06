@@ -6,6 +6,7 @@ import VerticallyCenteredLayout from '../../layout/VerticallyCenteredLayout';
 import FullscreenLayout from '../../layout/FullscreenLayout';
 import { observer } from 'mobx-react';
 import { withLayout } from '../../../styles/context/layout';
+import type { InjectedLayoutProps } from '../../../styles/context/layout';
 import { Box, Stack, Typography } from '@mui/material';
 
 type Props = {|
@@ -15,7 +16,7 @@ type Props = {|
 |};
 
 @observer
-class FullscreenMessage extends Component<Props> {
+class FullscreenMessage extends Component<Props & InjectedLayoutProps> {
   static defaultProps: {| image: void |} = {
     image: undefined,
   };

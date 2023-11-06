@@ -154,7 +154,7 @@ function getBtnVariant(
   primary?: boolean,
   isRevampLayout?: boolean
 ): {|
-  variant: 'contained' | 'outlined' | 'danger' | 'primary' | 'secondary',
+  variant: 'contained' | 'outlined' | 'danger' | 'primary' | 'secondary' | 'destructive',
   color?: 'primary' | 'secondary' | 'error',
 |} {
   if (danger && isRevampLayout) return { variant: 'destructive' };
