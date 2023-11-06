@@ -57,7 +57,7 @@ export interface IAddressTypeUiSubset {
   +wasExecuted: boolean,
 }
 export interface IAddressTypeStore {
-  constructor(data: SubgroupCtorData): IAddressTypeStore;
+  constructor(data: SubgroupCtorData): ?IAddressTypeStore;
   +all: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
   +wasExecuted: boolean,
   +addObservedWallet: PublicDeriver<> => void,

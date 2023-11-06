@@ -77,7 +77,7 @@ export function getTokenIdentifierIfExists(
   if (tokenRow.IsDefault) return undefined;
   if (tokenRow.Metadata.type === 'Cardano') {
     const { policyId, assetName } = tokenRow.Metadata;
-    const assetFingerprint = new AssetFingerprint(
+    const assetFingerprint = AssetFingerprint.fromParts(
       Buffer.from(policyId, 'hex'),
       Buffer.from(assetName, 'hex')
     );

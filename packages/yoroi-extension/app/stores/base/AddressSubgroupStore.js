@@ -87,7 +87,7 @@ export class AddressTypeStore {
 }
 
 export class AddressBookSubgroup extends AddressTypeStore implements IAddressTypeStore {
-  constructor(data: SubgroupCtorData): IAddressTypeStore {
+  constructor(data: SubgroupCtorData): ?IAddressTypeStore {
     super({
       stores: data.stores,
       actions: data.actions,
@@ -99,7 +99,7 @@ export class AddressBookSubgroup extends AddressTypeStore implements IAddressTyp
   }
 }
 export class ByronAllAddressesSubgroup extends AddressTypeStore implements IAddressTypeStore {
-  constructor(data: SubgroupCtorData): IAddressTypeStore {
+  constructor(data: SubgroupCtorData): ?IAddressTypeStore {
     super({
       stores: data.stores,
       actions: data.actions,
@@ -112,7 +112,7 @@ export class ByronAllAddressesSubgroup extends AddressTypeStore implements IAddr
   }
 }
 export class ByronExternalAddressesSubgroup extends AddressTypeStore implements IAddressTypeStore {
-  constructor(data: SubgroupCtorData): IAddressTypeStore {
+  constructor(data: SubgroupCtorData): ?IAddressTypeStore {
     super({
       stores: data.stores,
       actions: data.actions,
@@ -129,7 +129,7 @@ export class ByronExternalAddressesSubgroup extends AddressTypeStore implements 
   }
 }
 export class ByronInternalAddressesSubgroup extends AddressTypeStore implements IAddressTypeStore {
-  constructor(data: SubgroupCtorData): IAddressTypeStore {
+  constructor(data: SubgroupCtorData): ?IAddressTypeStore {
     super({
       stores: data.stores,
       actions: data.actions,
@@ -143,7 +143,7 @@ export class ByronInternalAddressesSubgroup extends AddressTypeStore implements 
   }
 }
 export class BaseExternalAddressesSubgroup extends AddressTypeStore implements IAddressTypeStore {
-  constructor(data: SubgroupCtorData): IAddressTypeStore {
+  constructor(data: SubgroupCtorData): ?IAddressTypeStore {
     super({
       stores: data.stores,
       actions: data.actions,
@@ -160,7 +160,7 @@ export class BaseExternalAddressesSubgroup extends AddressTypeStore implements I
   }
 }
 export class BaseInternalAddressesSubgroup extends AddressTypeStore implements IAddressTypeStore {
-  constructor(data: SubgroupCtorData): IAddressTypeStore {
+  constructor(data: SubgroupCtorData): ?IAddressTypeStore {
     super({
       stores: data.stores,
       actions: data.actions,
@@ -177,7 +177,7 @@ export class BaseInternalAddressesSubgroup extends AddressTypeStore implements I
   }
 }
 export class BaseMangledAddressesSubgroup extends AddressTypeStore implements IAddressTypeStore {
-  constructor(data: SubgroupCtorData): IAddressTypeStore {
+  constructor(data: SubgroupCtorData): ?IAddressTypeStore {
     super({
       stores: data.stores,
       actions: data.actions,
@@ -192,7 +192,7 @@ export class BaseMangledAddressesSubgroup extends AddressTypeStore implements IA
 }
 export class EnterpriseExternalAddressesSubgroup
   extends AddressTypeStore implements IAddressTypeStore {
-  constructor(data: SubgroupCtorData): IAddressTypeStore {
+  constructor(data: SubgroupCtorData): ?IAddressTypeStore {
     super({
       stores: data.stores,
       actions: data.actions,
@@ -210,7 +210,7 @@ export class EnterpriseExternalAddressesSubgroup
 }
 export class EnterpriseInternalAddressesSubgroup
   extends AddressTypeStore implements IAddressTypeStore {
-  constructor(data: SubgroupCtorData): IAddressTypeStore {
+  constructor(data: SubgroupCtorData): ?IAddressTypeStore {
     super({
       stores: data.stores,
       actions: data.actions,
@@ -227,7 +227,7 @@ export class EnterpriseInternalAddressesSubgroup
   }
 }
 export class RewardAddressesSubgroup extends AddressTypeStore implements IAddressTypeStore {
-  constructor(data: SubgroupCtorData): IAddressTypeStore {
+  constructor(data: SubgroupCtorData): ?IAddressTypeStore {
     super({
       stores: data.stores,
       actions: data.actions,
@@ -242,7 +242,7 @@ export class RewardAddressesSubgroup extends AddressTypeStore implements IAddres
 }
 
 export class P2PKAllAddressesSubgroup extends AddressTypeStore implements IAddressTypeStore {
-  constructor(data: SubgroupCtorData): IAddressTypeStore {
+  constructor(data: SubgroupCtorData): ?IAddressTypeStore {
     super({
       stores: data.stores,
       actions: data.actions,
@@ -255,7 +255,7 @@ export class P2PKAllAddressesSubgroup extends AddressTypeStore implements IAddre
   }
 }
 export class P2PKExternalAddressesSubgroup extends AddressTypeStore implements IAddressTypeStore {
-  constructor(data: SubgroupCtorData): IAddressTypeStore {
+  constructor(data: SubgroupCtorData): ?IAddressTypeStore {
     super({
       stores: data.stores,
       actions: data.actions,
@@ -272,7 +272,7 @@ export class P2PKExternalAddressesSubgroup extends AddressTypeStore implements I
   }
 }
 export class P2PKInternalAddressesSubgroup extends AddressTypeStore implements IAddressTypeStore {
-  constructor(data: SubgroupCtorData): IAddressTypeStore {
+  constructor(data: SubgroupCtorData): ?IAddressTypeStore {
     super({
       stores: data.stores,
       actions: data.actions,
