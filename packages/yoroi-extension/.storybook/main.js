@@ -8,7 +8,7 @@ module.exports = {
     '../app/connector/containers/**/*.stories.js',
   ],
   addons: [
-    '@storybook/addon-knobs/register',
+    '@storybook/addon-knobs',
     '@storybook/addon-actions',
     '@storybook/addon-links',
     '@storybook/addon-viewport',
