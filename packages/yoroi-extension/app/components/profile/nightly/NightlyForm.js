@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { ComponentType, Node } from 'react';
 import { observer } from 'mobx-react';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, FormControlLabel, Typography } from '@mui/material';
 import CheckboxLabel from '../../common/CheckboxLabel';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import styles from './NightlyForm.scss';
@@ -123,7 +123,7 @@ class NightlyForm extends Component<Props & InjectedLayoutProps, State> {
 
     const revampLayout = (
       <Box>
-        <Box maxWidth="420px" mx="auto">
+        <Box maxWidth="424px" mx="auto">
           <Box
             sx={{
               display: 'flex',
@@ -214,6 +214,7 @@ class NightlyForm extends Component<Props & InjectedLayoutProps, State> {
               disabled={!this.state.acknowledgedRisks}
               sx={{
                 width: 'fit-content',
+                lineHeight: '22px',
                 '&.MuiButton-sizeMedium': {
                   padding: '13px 24px',
                 },
