@@ -1,7 +1,7 @@
 // @flow
 import React, { Suspense } from 'react';
 import type { Node } from 'react';
-import { Route, Redirect, Switch } from 'react-router-dom';
+import { Route, Navigate as Redirect, Routes as Switch } from 'react-router-dom';
 import { ROUTES } from './routes-config';
 import type { StoresMap } from './stores/index';
 import type { ActionsMap } from './actions/index';
