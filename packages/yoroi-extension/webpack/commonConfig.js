@@ -191,7 +191,7 @@ const optimization = {
 };
 
 const resolve = () /*: any*/ => ({
-  extensions: ['*', '.js', '.wasm'],
+  extensions: ['.*', '.js', '.wasm'],
   fallback: {
     fs: false,
     path: require.resolve('path-browserify'),
@@ -199,6 +199,7 @@ const resolve = () /*: any*/ => ({
     zlib: require.resolve('browserify-zlib'),
     crypto: require.resolve('crypto-browserify'),
     buffer: require.resolve('buffer'),
+    querystring: require.resolve('querystring-es3'),
   },
   alias: { process: 'process/browser', }
 });
