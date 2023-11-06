@@ -174,8 +174,12 @@ function WalletDelegationBanner({
           <Link
             as={Button}
             variant="secondary"
-            sx={{ textDecoration: 'none' }}
-            size="small"
+            sx={{
+              textDecoration: 'none',
+              '&.MuiButton-sizeMedium': {
+                padding: '9px 20px',
+              },
+            }}
             href="https://emurgohelpdesk.zendesk.com/hc/en-us/articles/4412946533903-What-is-delegation-Is-it-the-same-as-staking-"
             target="_blank"
             rel="noreferrer noopener"
@@ -184,13 +188,16 @@ function WalletDelegationBanner({
           </Link>
           <Button
             variant="primary"
-            size="small"
-            // onClick={() => onDelegateClick(id)}
+            sx={{
+              '&.MuiButton-sizeMedium': {
+                padding: '9px 20px',
+              },
+            }}
             onClick={() =>
               onDelegateClick(
-                isTestnet
-                  ? '7facad662e180ce45e5c504957cd1341940c72a708728f7ecfc6e349' // Testnet pool: https://preprod.cardanoscan.io/pool/7facad662e180ce45e5c504957cd1341940c72a708728f7ecfc6e349
-                  : id
+                // Testnet pool:
+                // https://preprod.cardanoscan.io/pool/7facad662e180ce45e5c504957cd1341940c72a708728f7ecfc6e349
+                isTestnet ? '7facad662e180ce45e5c504957cd1341940c72a708728f7ecfc6e349' : id
               )
             }
             disabled={isWalletWithNoFunds}

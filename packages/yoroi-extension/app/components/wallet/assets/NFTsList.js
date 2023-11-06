@@ -26,7 +26,7 @@ import { useState, useEffect, useCallback } from 'react';
 import globalMessages from '../../../i18n/global-messages';
 import { urlResolveIpfs } from '../../../coreUtils';
 import classNames from 'classnames';
-import { debounce, } from 'lodash';
+import { debounce } from 'lodash';
 import { ampli } from '../../../../ampli/index';
 
 const SEARCH_ACTIVATE_DEBOUNCE_WAIT = 1000;
@@ -73,17 +73,17 @@ function NfTsList({ list, intl }: Props & Intl): Node {
 
   const [nftList, setNftList] = useState([...list]);
   const [keyword, setKeyword] = useState('');
-  const trackSearch = useCallback(debounce(
-    (nftCount: number, nftSearchTerm: string) => {
-      if (nftSearchTerm !== '' ) {
+  const trackSearch = useCallback(
+    debounce((nftCount: number, nftSearchTerm: string) => {
+      if (nftSearchTerm !== '') {
         ampli.nftGallerySearchActivated({
           nft_count: nftCount,
           nft_search_term: nftSearchTerm,
-        })
+        });
       }
-    },
-    SEARCH_ACTIVATE_DEBOUNCE_WAIT,
-  ), []);
+    }, SEARCH_ACTIVATE_DEBOUNCE_WAIT),
+    []
+  );
 
   useEffect(() => {
     const regExp = new RegExp(keyword, 'gi');
@@ -93,7 +93,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
     });
     setNftList(filteredAssetsList);
     if (keyword !== '') {
-      trackSearch(filteredAssetsList.length, keyword)
+      trackSearch(filteredAssetsList.length, keyword);
     }
   }, [keyword, list]);
 
@@ -165,7 +165,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
           spacing={2}
         >
           <NotFound />
-          <Typography variant="h3" color="var(--yoroi-palette-gray-900)">
+          <Typography variant="h5" fontWeight={500} color="common.black">
             {intl.formatMessage(!list.length ? messages.noNFTsAdded : messages.noResultsFound)}
           </Typography>
         </Stack>
@@ -183,7 +183,9 @@ function NfTsList({ list, intl }: Props & Intl): Node {
                 <SLink
                   key={nft.id}
                   to={ROUTES.NFTS.DETAILS.replace(':nftId', nft.id)}
-                  onClick={() => { ampli.nftGalleryDetailsPageViewed(); }}
+                  onClick={() => {
+                    ampli.nftGalleryDetailsPageViewed();
+                  }}
                 >
                   <NftCardImage ipfsUrl={nft.image} name={nft.name} />
                 </SLink>

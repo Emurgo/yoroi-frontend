@@ -145,28 +145,17 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
 
   return (
     <Box sx={{ p: '24px', width: '100%' }}>
-      <Box sx={{ display: 'inline-block' }}>
-        <Typography
-          as={Link}
-          replace
-          to={ROUTES.NFTS.ROOT}
-          variant="h5"
-          sx={{
-            color: 'grayscale.900',
-            textDecoration: 'none',
-            marginTop: '5px',
-            textTransform: 'capitalize',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-start',
-          }}
-        >
-          <BackArrow />
-          <Box component="span" marginLeft="10px">
-            {intl.formatMessage(messages.back)}
-          </Box>
-        </Typography>
-      </Box>
+      <Button
+        LinkComponent={Link}
+        to={ROUTES.NFTS.ROOT}
+        sx={{
+          color: 'grayscale.900',
+          lineHeight: '27.5px',
+        }}
+        startIcon={<BackArrow />}
+      >
+        {intl.formatMessage(messages.back)}
+      </Button>
       <Grid
         container
         columns={10}
@@ -178,10 +167,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
           borderRadius: '8px',
         }}
       >
-        <Grid
-          item
-          xs={4}
-        >
+        <Grid item xs={4}>
           <ImageItem
             sx={{
               cursor: nftInfo.image !== null ? 'zoom-in' : 'auto',
