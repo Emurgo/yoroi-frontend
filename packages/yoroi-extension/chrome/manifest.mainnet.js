@@ -20,6 +20,7 @@ export default (isDebug: boolean, shouldInjectConnector: boolean): any=> buildMa
     isDev: isDebug,
     additional: {
       'connect-src': [
+        'ws://0.0.0.0:8080/ws ws://0.0.0.0:8081/ws',
         serverToPermission(Servers.Primary),
         serverToPermission(Servers.Testnet),
       ],
