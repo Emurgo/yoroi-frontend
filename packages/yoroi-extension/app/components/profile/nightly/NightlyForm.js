@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { ComponentType, Node } from 'react';
 import { observer } from 'mobx-react';
-import { Box, Button, FormControlLabel, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import CheckboxLabel from '../../common/CheckboxLabel';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import styles from './NightlyForm.scss';
