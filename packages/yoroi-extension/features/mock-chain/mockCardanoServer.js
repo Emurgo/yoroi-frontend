@@ -42,7 +42,7 @@ const addressesLimit = 50;
 const txsLimit = 20;
 
 function _validateAddressesReq(
-  body: { addresses?: Array<string>, ... },
+  body: { addresses: Array<string>, ... },
   localLogger: LocalLogger
 ): boolean {
   const { addresses } = body ?? {};

@@ -57,14 +57,12 @@ export default class UiDialogsStore<
   isOpen: any => boolean = (
     dialog: any
   ): boolean => (
-    // flowlint-next-line unnecessary-optional-chain:off
     this.dialogList[this.dialogList.length - 1]?.dialog === dialog
   )
 
   getParam: <T>(number | string) => (void | T) = <T>(
     key: (number | string)
   ): (void | T) => (
-    // flowlint-next-line unnecessary-optional-chain:off
     this.dialogList[this.dialogList.length - 1]?.paramsForActiveDialog.get(key)
   );
 
