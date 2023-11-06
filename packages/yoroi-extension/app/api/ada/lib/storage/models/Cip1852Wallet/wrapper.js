@@ -41,7 +41,7 @@ export class Cip1852Wallet
     row: $ReadOnly<Cip1852WrapperRow>,
     privateDeriverLevel: number | null,
     privateDeriverKeyDerivationId: number | null,
-  ): Cip1852Wallet {
+  ): ?Cip1852Wallet {
     super(conceptualWalletCtorData);
     this.#publicDeriverLevel = row.PublicDeriverLevel;
     this.#signingLevel = row.SignerLevel;

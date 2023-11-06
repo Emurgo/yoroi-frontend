@@ -17,5 +17,5 @@ export interface IBip44Wallet {
     row: $ReadOnly<Bip44WrapperRow>,
     privateDeriverLevel: number | null,
     privateDeriverKeyDerivationId: number | null,
-  ): IBip44Wallet;
+  ): ?IBip44Wallet;
 }

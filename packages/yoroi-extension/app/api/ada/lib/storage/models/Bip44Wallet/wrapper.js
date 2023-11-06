@@ -50,7 +50,7 @@ export class Bip44Wallet
     row: $ReadOnly<Bip44WrapperRow>,
     privateDeriverLevel: number | null,
     privateDeriverKeyDerivationId: number | null,
-  ): Bip44Wallet {
+  ): ?Bip44Wallet {
     super(conceptualWalletCtorData);
     this.#publicDeriverLevel = row.PublicDeriverLevel;
     this.#signingLevel = row.SignerLevel;
