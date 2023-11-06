@@ -162,6 +162,7 @@ const rules /*: boolean => Array<any> */ = (_isDev) => [
       options: {
         svgoConfig: {
           plugins: [{
+            name: 'preset-default',
             removeViewBox: false
           }]
         }

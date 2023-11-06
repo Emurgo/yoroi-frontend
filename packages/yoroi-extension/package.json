@@ -203,7 +203,7 @@
     "@svgr/webpack": "8.1.0",
     "@vespaiach/axios-fetch-adapter": "^0.3.1",
     "async-mutex": "^0.4.0",
-    "axios": "1.6.0",
+    "axios": "0.27.2",
     "bech32": "2.0.0",
     "bignumber.js": "9.1.2",
     "bip32": "4.0.0",
