@@ -44,7 +44,7 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
   networkInfo: $ReadOnly<NetworkRow>;
   defaultToken: $ReadOnly<TokenRow>;
 
-  constructor(data: IConceptualWalletConstructor): IConceptualWallet {
+  constructor(data: IConceptualWalletConstructor): ?IConceptualWallet {
     this.db = data.db;
     this.#conceptualWalletId = data.conceptualWalletId;
     this.walletType = data.walletType;

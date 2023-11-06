@@ -48,7 +48,7 @@ export type IConceptualWalletConstructor = {|
 |};
 
 export interface IConceptualWallet {
-  constructor(data: IConceptualWalletConstructor): IConceptualWallet;
+  constructor(data: IConceptualWalletConstructor): ?IConceptualWallet;
   getWalletType(): WalletType;
   getHwWalletMeta(): ?$ReadOnly<HwWalletMetaRow>;
   getDb(): lf$Database;

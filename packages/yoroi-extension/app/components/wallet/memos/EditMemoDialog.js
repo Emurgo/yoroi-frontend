@@ -51,7 +51,7 @@ export default class EditMemoDialog extends Component<Props, State> {
 
   // <TODO:CHECK_LINT>
   // eslint-disable-next-line react/no-unused-class-component-methods
-  memoContentInput: TextField;
+  memoContentInput: typeof TextField;
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {

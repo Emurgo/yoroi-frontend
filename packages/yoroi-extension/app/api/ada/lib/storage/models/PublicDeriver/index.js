@@ -61,7 +61,7 @@ implements IPublicDeriver<Parent>, IRename, IGetLastSyncInfo {
   /**
    * This constructor it will NOT populate functionality from db
    */
-  constructor(data: IPublicDeriverConstructor<Parent>): PublicDeriver<Parent> {
+  constructor(data: IPublicDeriverConstructor<Parent>): ?PublicDeriver<Parent> {
     this.publicDeriverId = data.publicDeriverId;
     this.parent = data.parent;
     this.pathToPublic = data.pathToPublic;

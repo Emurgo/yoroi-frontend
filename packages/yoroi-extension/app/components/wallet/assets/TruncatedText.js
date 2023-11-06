@@ -8,7 +8,7 @@ import { styled } from '@mui/system';
 
 // Requrie predefined with
 // jone -> jo..
-export const TruncatedText = styled(Typography)({
+export const TruncatedText: any = styled(Typography)({
   whiteSpace: 'nowrap',
   overflow: 'hidden',
   textOverflow: 'ellipsis',

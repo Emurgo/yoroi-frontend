@@ -103,7 +103,7 @@ export type IPublicDeriverConstructor<+Parent: IConceptualWallet> = {
   ...
 };
 export interface IPublicDeriver<+Parent: ConceptualWallet = ConceptualWallet> {
-  constructor(data: IPublicDeriverConstructor<Parent>): IPublicDeriver<Parent>;
+  constructor(data: IPublicDeriverConstructor<Parent>): ?IPublicDeriver<Parent>;
   getDb(): lf$Database;
   getPublicDeriverId(): number;
   getParent(): Parent;

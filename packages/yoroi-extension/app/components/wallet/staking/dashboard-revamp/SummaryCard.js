@@ -67,7 +67,7 @@ function SummaryCard({
       .split('.');
 
     const amountNode = shouldHideBalance ? (
-      { hiddenAmount }
+      <span>{hiddenAmount} </span>
     ) : (
       <>
         {splitAmount[0]}
@@ -76,7 +76,7 @@ function SummaryCard({
     );
     return (
       <>
-        <span>{amountNode} </span>
+        {amountNode}
         {truncateToken(getTokenName(tokenInfo))}
       </>
     );
