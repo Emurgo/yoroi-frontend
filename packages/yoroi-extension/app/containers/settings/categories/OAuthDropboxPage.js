@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { computed } from 'mobx';
-import { Redirect } from 'react-router-dom';
+import { Navigate as Redirect } from 'react-router-dom';
 import { observer } from 'mobx-react';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import { ExternalStorageList } from '../../../domain/ExternalStorage';
