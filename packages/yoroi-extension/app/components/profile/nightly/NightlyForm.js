@@ -123,7 +123,7 @@ class NightlyForm extends Component<Props & InjectedLayoutProps, State> {
 
     const revampLayout = (
       <Box>
-        <Box maxWidth="420px" mx="auto">
+        <Box maxWidth="424px" mx="auto">
           <Box
             sx={{
               display: 'flex',
@@ -214,6 +214,7 @@ class NightlyForm extends Component<Props & InjectedLayoutProps, State> {
               disabled={!this.state.acknowledgedRisks}
               sx={{
                 width: 'fit-content',
+                lineHeight: '22px',
                 '&.MuiButton-sizeMedium': {
                   padding: '13px 24px',
                 },
