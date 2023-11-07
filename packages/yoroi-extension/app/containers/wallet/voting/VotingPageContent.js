@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
-import { defineMessages, intlShape } from 'react-intl';
+import { FormattedHTMLMessage, defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import Voting from '../../../components/wallet/voting/Voting';
@@ -34,12 +34,12 @@ type Props = InjectedOrGenerated<GeneratedData>;
 const messages: * = defineMessages({
   mainTitle: {
     id: 'wallet.registrationOver.mainTitle',
-    defaultMessage: '!!!Registration is now closed.',
+    defaultMessage: '!!!Registration is not available',
   },
   mainSubtitle: {
     id: 'wallet.registrationOver.mainSubtitle',
     defaultMessage:
-      '!!!The registration period for fund {roundNumber} has ended. For more information, check the Catalyst app.',
+      '!!!The registration period for fund {roundNumber} has ended. For more information, check the <a href="https://projectcatalyst.io/get-involved/become-a-voter" target="_blank"> Catalyst app. </a>',
   },
   unavailableTitle: {
     id: 'wallet.registrationOver.unavailableTitle',
@@ -207,14 +207,16 @@ class VotingPageContent extends Component<Props> {
           if (isAfterVoting) {
             /* if we after the voting date (= between funds) and no next funds
             will dispaly "round is over" */
-            let subtitle = intl.formatMessage(messages.mainSubtitle, {
-              roundNumber: currentFund.id,
-            });
-
-            // Check for the next funds if we are after voting
-            if (nextFund) {
-              subtitle = nextFundRegistrationSubtitle;
-            }
+            const subtitle = nextFund ? (
+              nextFundRegistrationSubtitle
+            ) : (
+              <FormattedHTMLMessage
+                {...messages.mainSubtitle}
+                values={{
+                  roundNumber: currentFund.id,
+                }}
+              />
+            );
 
             return (
               <RegistrationOver

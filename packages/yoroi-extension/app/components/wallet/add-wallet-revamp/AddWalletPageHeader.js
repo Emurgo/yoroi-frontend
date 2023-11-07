@@ -35,13 +35,12 @@ export default class AddWalletPageHeader extends Component<Props> {
     return (
       <Box>
         {hasAnyWallets && (
-          <Button sx={{ color: 'gray.900' }} onClick={goToCurrentWallet}>
-            <Box mr="10px">
-              <BackIcon />
-            </Box>
-            <Typography variant="button2" fontWeight={500} color="gray.900">
-              {intl.formatMessage(messages.backButtonLabel)}
-            </Typography>
+          <Button
+            sx={{ color: 'grayscale.900', lineHeight: '27px' }}
+            startIcon={<BackIcon />}
+            onClick={goToCurrentWallet}
+          >
+            {intl.formatMessage(messages.backButtonLabel)}
           </Button>
         )}
         <Box
