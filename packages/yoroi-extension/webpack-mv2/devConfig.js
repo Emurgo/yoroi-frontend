@@ -2,7 +2,6 @@
 
 const commonConfig = require('./commonConfig');
 const connections = require('../scripts-mv2/connections');
-const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
 const path = require('path');
 const webpack = require('webpack');
@@ -62,7 +61,6 @@ const baseDevConfig = (
   },
   plugins: [
     ...commonConfig.plugins('dev', networkName),
-    new ReactRefreshWebpackPlugin(),
     new webpack.DefinePlugin(commonConfig.definePlugin(
       networkName,
       false,
