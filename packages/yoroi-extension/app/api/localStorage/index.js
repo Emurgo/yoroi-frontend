@@ -44,6 +44,8 @@ const storageKeys = {
 
   IS_ANALYTICS_ALLOWED: networkForLocalStorage + '-IS_ANALYTICS_ALLOWED',
   ACCEPTED_TOS_VERSION: networkForLocalStorage + '-ACCEPTED_TOS_VERSION',
+  TESTNET_BANNER_DISPLAY: networkForLocalStorage + '-TESTNET_BANNER_DISPLAY',
+  DEV_BANNER_DISPLAY: networkForLocalStorage + '-DEV_BANNER_DISPLAY',
 };
 
 export type SetCustomUserThemeRequest = {|
@@ -347,8 +349,35 @@ export default class LocalStorageApi {
     await setLocalItem(storageKeys.IS_ANALYTICS_ALLOWED, JSON.stringify(flag));
   }
 
+  hideWarningBanner: void => Promise<void> = async (banner, date) => {
+    if(storageKeys[banner]) {
+      return await setLocalItem(storageKeys[banner], JSON.stringify(date))
+    }
+
+    return Promise.resolve()
+  }
+
+  getWarningBannerDisplay: () => Promise<boolean> = async (banner) => {
+    if(!storageKeys[banner]) return Promise.resolve(true);
+
+    const storedDate = await getLocalItem(storageKeys[banner]);
+    
+    if(!storedDate) return Promise.resolve(true);
+
+    const storedDatetime = new Date(storedDate).getTime();
+    const now = Date.now()
+
+    if(storedDate + 86400 < now) {
+      await setLocalItem(storageKeys[banner], "null");
+      return Promise.resolve(true);
+    }
+
+    return Promise.resolve(false);
+  };
+
   unsetIsAnalyticsAllowed: void => Promise<void> =
     () => removeLocalItem(storageKeys.IS_ANALYTICS_ALLOWED);
+
 
   async reset(): Promise<void> {
     await this.unsetUserLocale();
