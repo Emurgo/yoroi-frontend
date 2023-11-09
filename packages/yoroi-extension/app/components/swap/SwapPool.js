@@ -5,18 +5,16 @@ import { ReactComponent as InfoIcon } from '../../assets/images/revamp/icons/inf
 import { ReactComponent as DefaultToken } from '../../assets/images/revamp/token-default.inline.svg';
 
 export default function SwapPool({
-  name = '',
-  isAuto = false,
-  image = null,
-  assets,
+  minAda,
+  minAssets,
+  fees,
+  baseCurrency,
+  quoteCurrency,
   isLoading,
-  onSelectPool,
 }) {
   const [showFullInfo, setShowFullInfo] = useState(false);
 
   const handleShowFullInfo = () => setShowFullInfo(p => !p);
-
-  const [asset1, asset2] = assets;
 
   return (
     <Box
@@ -38,27 +36,23 @@ export default function SwapPool({
         }}
         onClick={handleShowFullInfo}
       >
-        <Box>{image || <DefaultToken />}</Box>
-        <Typography
-          onClick={e => {
-            e.stopPropagation();
-            onSelectPool();
-          }}
-          variant="body1"
-          fontWeight={500}
-          color="primary.500"
-        >
-          {name ? `${name} ${isAuto ? '(Auto)' : ''}` : 'No pool found'}
-        </Typography>
         <Box flexGrow="1" flexShrink="0" display="flex" alignItems="center" gap="4px">
           <Box>Total:</Box>
-          <Box>
-            {asset2.amount} {asset2.ticker}
-          </Box>
-          <Box>+</Box>
-          <Box>
-            {asset1.amount} {asset1.ticker}
-          </Box>
+          {quoteCurrency.amount ? (
+            <Box>
+              {quoteCurrency.amount} {quoteCurrency.ticker}
+            </Box>
+          ) : (
+            <Box>0 {baseCurrency.ticker}</Box>
+          )}
+          {baseCurrency.amount && (
+            <>
+              {quoteCurrency.amount && <Box>+</Box>}
+              <Box>
+                {baseCurrency.amount} {baseCurrency.ticker}
+              </Box>
+            </>
+          )}
         </Box>
         <Box sx={{ transform: showFullInfo ? 'rotate(180deg)' : 'rotate(0deg)' }}>
           <ChevronDownIcon />
@@ -73,7 +67,7 @@ export default function SwapPool({
                 <InfoIcon />
               </Box>
             </Box>
-            <Box>0 ADA</Box>
+            <Box>{minAda} ADA</Box>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
@@ -82,7 +76,7 @@ export default function SwapPool({
                 <InfoIcon />
               </Box>
             </Box>
-            <Box>0 ADA</Box>
+            <Box>{minAssets} ADA</Box>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
@@ -91,7 +85,7 @@ export default function SwapPool({
                 <InfoIcon />
               </Box>
             </Box>
-            <Box>0 ADA</Box>
+            <Box>{fees} ADA</Box>
           </Box>
         </Box>
       )}

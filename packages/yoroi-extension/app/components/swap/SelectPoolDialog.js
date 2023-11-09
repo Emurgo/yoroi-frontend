@@ -3,9 +3,9 @@ import { Box, Typography } from '@mui/material';
 import Dialog from '../widgets/Dialog';
 import Table from '../common/table/Table';
 
-const tableColumns = ['DEX name', 'Asset price', 'Liquidity', 'DEX fee. %', 'Deposit. ADA'];
+const tableColumns = ['DEX name', 'Price', 'TVL', 'DEX fee', 'Liquidity provider fee'];
 
-const templateColumns = 'minmax(auto, 208px) 120px 200px 96px 136px';
+const templateColumns = 'minmax(auto, 208px) 120px 200px 90px 160px';
 
 export default function SelectPoolDialog({ currentPool, poolList = [], onPoolSelected, onClose }) {
   const handlePoolSelected = pool => {
@@ -32,11 +32,14 @@ export default function SelectPoolDialog({ currentPool, poolList = [], onPoolSel
                 alignItems: 'center',
                 borderColor: currentPool === name ? 'primary.600' : 'transparent',
                 gridTemplateColumns: templateColumns,
+                columnGap: '8px',
                 '&:hover': { bgcolor: 'grayscale.50' },
               }}
             >
               <Box sx={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <Box>{image}</Box>
+                <Box width="32px" height="32px">
+                  {image}
+                </Box>
                 <Typography component="span" variant="body1" fontWeight={500}>
                   {name}
                 </Typography>

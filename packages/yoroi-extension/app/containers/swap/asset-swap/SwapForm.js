@@ -153,15 +153,39 @@ export default function SwapForm() {
 
         {/* Available pools */}
         <Box>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              mb: '16px',
+            }}
+          >
+            <Box display="flex" gap="8px" alignItems="center">
+              <Typography variant="body1" color="grayscale.500">
+                DEX
+              </Typography>
+              <InfoIcon />
+            </Box>
+            <Box
+              onClick={() => !isMarketOrder && handleOpenedDialog('pool')}
+              sx={{ cursor: 'pointer', display: 'flex', gap: '4px', alignItems: 'center' }}
+            >
+              <Box sx={{ width: '24px', height: '24px' }}>{pool.image || <DefaultToken />}</Box>
+              <Typography variant="body1" color="grayscale.max">
+                {pool.name ? `${pool.name} ${pool.isAuto ? '(Auto)' : ''}` : 'No pool found'}
+              </Typography>
+
+              {!isMarketOrder && <EditIcon />}
+            </Box>
+          </Box>
+
           <SwapPool
-            image={pool.image}
-            name={pool.name}
-            isAuto={pool.isAuto}
-            onSelectPool={() => handleOpenedDialog('pool')}
-            assets={[
-              { ticker: 'TADA', amount: 20 },
-              { ticker: 'USDA', amount: 5 },
-            ]}
+            fees="0"
+            minAda="0"
+            minAssets="0"
+            baseCurrency={fromAsset}
+            quoteCurrency={toAsset}
           />
         </Box>
       </Box>
