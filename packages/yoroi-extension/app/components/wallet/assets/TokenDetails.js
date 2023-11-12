@@ -17,7 +17,7 @@ import {
   isTestnet,
 } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import { CopyAddress } from './NFTDetails';
+import { CopyAddress } from './TruncatedText';
 
 type Props = {|
   tokenInfo: void | {|

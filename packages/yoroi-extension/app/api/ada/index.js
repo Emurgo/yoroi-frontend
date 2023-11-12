@@ -82,7 +82,7 @@ import {
   signTransaction as shelleySignTransaction,
 } from './transactions/shelley/transactions';
 import { generateAdaMnemonic, generateWalletRootKey, } from './lib/cardanoCrypto/cryptoWallet';
-import { derivePrivateByAddressing, derivePublicByAddressing, v4PublicToV2, } from './lib/cardanoCrypto/utils';
+import { v4PublicToV2, } from './lib/cardanoCrypto/utils';
 import { isValidBip39Mnemonic, } from '../common/lib/crypto/wallet';
 import { generateByronPlate } from './lib/cardanoCrypto/plate';
 import {
@@ -172,6 +172,7 @@ import { bytesToHex, hexToBytes, hexToUtf } from '../../coreUtils';
 import type { PersistedSubmittedTransaction } from '../localStorage';
 import type { ForeignUtxoFetcher } from '../../connector/stores/ConnectorStore';
 import type WalletTransaction from '../../domain/WalletTransaction';
+import { derivePrivateByAddressing, derivePublicByAddressing } from './lib/cardanoCrypto/deriveByAddressing';
 
 // ADA specific Request / Response params
 
