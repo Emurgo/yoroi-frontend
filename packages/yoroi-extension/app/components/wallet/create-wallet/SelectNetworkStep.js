@@ -47,6 +47,10 @@ function SelectNetworkStep(props: Props & Intl): Node {
       name: 'Cardano Preview Testnet',
       networkInfo: networks.CardanoPreviewTestnet,
     },
+    {
+      name: 'Cardano Sancho Testnet',
+      networkInfo: networks.CardanoSanchoTestnet,
+    },
   ];
 
   return (
