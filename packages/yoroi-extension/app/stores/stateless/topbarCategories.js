@@ -137,7 +137,8 @@ export const CARDANO_DELEGATION: TopbarCategory = registerCategory({
       (environment.isTest() ||
         networkId === networks.CardanoTestnet.NetworkId ||
         networkId === networks.CardanoPreprodTestnet.NetworkId ||
-        networkId === networks.CardanoPreviewTestnet.NetworkId)
+        networkId === networks.CardanoPreviewTestnet.NetworkId ||
+        networkId === networks.CardanoSanchoTestnet.NetworkId)
     );
   },
   isHiddenButAllowed: true,

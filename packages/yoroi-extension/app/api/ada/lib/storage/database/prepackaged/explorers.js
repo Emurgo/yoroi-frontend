@@ -155,12 +155,32 @@ const CardanoPreviewTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
   },
 ];
 
+// <TODO:SANCHO FIX WHEN EXPLORER AVAILABLE>
+const CardanoSanchoTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
+  {
+    ExplorerId: 6_50,
+    NetworkId: networks.CardanoSanchoTestnet.NetworkId,
+    IsBackup: true,
+    Endpoints: {
+      address: 'https://preview.cardanoscan.io/address/',
+      transaction: 'https://preview.cardanoscan.io/transaction/',
+      pool: 'https://preview.cardanoscan.io/pool/',
+      stakeAddress: 'https://preview.cardanoscan.io/stakeKey/',
+      token: 'https://preview.cardanoscan.io/token/',
+    },
+    Name: 'CardanoScan',
+  },
+];
+
 export const prepackagedExplorers: Map<number, $ReadOnlyArray<$ReadOnly<ExplorerRow>>> = new Map([
   [networks.CardanoMainnet.NetworkId, CardanoMainnetExplorers],
   [networks.CardanoTestnet.NetworkId, CardanoTestnetExplorers],
   [networks.CardanoPreprodTestnet.NetworkId, CardanoPreprodTestnetExplorers],
   [networks.CardanoPreviewTestnet.NetworkId, CardanoPreviewTestnetExplorers],
+  [networks.CardanoSanchoTestnet.NetworkId, CardanoSanchoTestnetExplorers],
+  // <TODO:PENDING_REMOVAL> Ergo
   [networks.ErgoMainnet.NetworkId, ErgoExplorers],
+  // <TODO:PENDING_REMOVAL> Alonzo
   [networks.AlonzoTestnet.NetworkId, AlonzoTestnetExplorers],
 ]);
 const getOrThrow = function<T> (input: ?T): T {
@@ -181,9 +201,14 @@ export const prepackagedDefaultExplorers:
     [networks.CardanoPreviewTestnet.NetworkId, getOrThrow(
       CardanoPreviewTestnetExplorers.find(explorer => explorer.IsBackup)
     )],
+    [networks.CardanoSanchoTestnet.NetworkId, getOrThrow(
+      CardanoSanchoTestnetExplorers.find(explorer => explorer.IsBackup)
+    )],
+  // <TODO:PENDING_REMOVAL> Ergo
     [networks.ErgoMainnet.NetworkId, getOrThrow(
       ErgoExplorers.find(explorer => explorer.IsBackup)
     )],
+  // <TODO:PENDING_REMOVAL> Alonzo
     [networks.AlonzoTestnet.NetworkId, getOrThrow(
       AlonzoTestnetExplorers.find(explorer => explorer.IsBackup)
     )],
