@@ -39,7 +39,10 @@ import type { LayoutComponentMap } from '../../../styles/context/layout';
 import { Box } from '@mui/system';
 import type { PoolData } from './SeizaFetcher';
 import type { WalletChecksum } from '@emurgo/cip4-js';
-import { isTestnet } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import {
+  isCardanoHaskell,
+  isTestnet,
+} from '../../../api/ada/lib/storage/database/prepackaged/networks';
 
 export type GeneratedData = typeof CardanoStakingPage.prototype.generated;
 
@@ -109,10 +112,12 @@ class CardanoStakingPage extends Component<AllProps, State> {
             locale={locale}
             bias={stakingListBias}
             totalAda={totalAda}
-            poolList={delegationRequests.getDelegatedBalance.result?.delegation != null ?
-              [delegationRequests.getDelegatedBalance.result?.delegation] : []
+            poolList={
+              delegationRequests.getDelegatedBalance.result?.delegation != null
+                ? [delegationRequests.getDelegatedBalance.result?.delegation]
+                : []
             }
-            stakepoolSelectedAction={async (poolId) => {
+            stakepoolSelectedAction={async poolId => {
               await this._updatePool(poolId);
               await this._next();
             }}
@@ -141,6 +146,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
               isTestnet={isTestnet(publicDeriver.getParent().getNetworkInfo())}
             />
           ) : null}
+
           <Box sx={{ iframe: { minHeight: '60vh' } }}>
             {this.getDialog()}
             <SeizaFetcher
@@ -148,8 +154,10 @@ class CardanoStakingPage extends Component<AllProps, State> {
               locale={locale}
               bias={stakingListBias}
               totalAda={totalAda}
-              poolList={delegationRequests.getDelegatedBalance.result?.delegation != null ?
-                [delegationRequests.getDelegatedBalance.result?.delegation] : []
+              poolList={
+                delegationRequests.getDelegatedBalance.result?.delegation != null
+                  ? [delegationRequests.getDelegatedBalance.result?.delegation]
+                  : []
               }
               setFirstPool={pool => {
                 this.setState({ firstPool: pool });
@@ -168,6 +176,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
         REVAMP: revampCardanoStakingPage,
       });
     }
+
     return (
       <div>
         {this.getDialog()}
@@ -244,9 +253,8 @@ class CardanoStakingPage extends Component<AllProps, State> {
   _displayPoolInfo: void => void | Node = () => {
     const { intl } = this.context;
     const selectedWallet = this.generated.stores.wallets.selected;
-    if (selectedWallet == null) {
-      return null;
-    }
+    if (selectedWallet == null) return null;
+
     const selectedPoolInfo = this._getPoolInfo(selectedWallet);
     if (selectedPoolInfo == null) return;
 
@@ -470,6 +478,9 @@ class CardanoStakingPage extends Component<AllProps, State> {
   };
 
   _isRegistered: (PublicDeriver<>) => ?boolean = publicDeriver => {
+    if (!isCardanoHaskell(publicDeriver.getParent().getNetworkInfo())) {
+      return undefined;
+    }
     const delegationRequests = this.generated.stores.delegation.getDelegationRequests(
       publicDeriver
     );
@@ -481,13 +492,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
     ) {
       return undefined;
     }
-    if (delegationRequests.getDelegatedBalance.result.delegation || (
-      delegationRequests.getDelegatedBalance.result.allRewards != null &&
-      delegationRequests.getDelegatedBalance.result.allRewards !== '0'
-    )) {
-      return true;
-    }
-    return false;
+    return delegationRequests.getDelegatedBalance.result.stakeRegistered;
   };
 
   @computed get generated(): {|
@@ -701,6 +706,6 @@ class CardanoStakingPage extends Component<AllProps, State> {
       },
     });
   }
-};
+}
 
 export default (withLayout(CardanoStakingPage): ComponentType<Props>);
