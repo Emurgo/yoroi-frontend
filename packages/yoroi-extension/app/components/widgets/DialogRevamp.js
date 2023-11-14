@@ -54,7 +54,12 @@ function DialogFn(props: Props): Node {
         boxShadow="0px 13px 20px -1px #00000026"
       >
         {title != null && title !== '' ? (
-          <Typography as="h1" variant="body1" className="dialog__title">
+          <Typography
+            as="h1"
+            variant="body1"
+            className="dialog__title"
+            id='dialogRevampTitle'
+          >
             {title}
           </Typography>
         ) : null}
