@@ -395,6 +395,7 @@ class SignTxPage extends Component<Props, State> {
                 id="walletPassword"
               />
             }
+            cip95Info={txData.cip95Info}
           />
         </Box>
       );
