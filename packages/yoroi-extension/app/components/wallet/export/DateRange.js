@@ -1,6 +1,6 @@
 // @flow
-import { Component } from 'react'
-import type { Node } from 'react'
+import { Component } from 'react';
+import type { Node } from 'react';
 import TextField from '@mui/material/TextField';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -9,6 +9,7 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import moment from 'moment';
+import { ReactComponent as CalendarIcon } from '../../../assets/images/calendar.inline.svg';
 
 const messages = defineMessages({
   startDate: {
@@ -31,14 +32,13 @@ type Props = {|
     endDate: Date | null,
   |},
   setStartDate(Date | null): void,
-  setEndDate(Date| null): void
-|}
+  setEndDate(Date | null): void,
+|};
 
 @observer
 export default class ExportTransactionDialog extends Component<Props> {
-
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+    intl: intlShape.isRequired,
   };
 
   render(): Node {
@@ -60,7 +60,7 @@ export default class ExportTransactionDialog extends Component<Props> {
         setDateHandler: setEndDate,
         minDate: date.startDate !== null ? date.startDate : undefined,
       },
-    ]
+    ];
 
     return (
       <LocalizationProvider dateAdapter={AdapterMoment}>
@@ -72,16 +72,21 @@ export default class ExportTransactionDialog extends Component<Props> {
             maxDate={moment()} // Today
             minDate={minDate}
             onChange={setDateHandler}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                sx={{ mb: '10px' }}
-              />
-            )}
+            renderInput={params => {
+              console.log({ params });
+              return (
+                <TextField
+                  {...params}
+                  sx={{ mb: '24px' }}
+                  InputProps={{
+                    endAdornment: <CalendarIcon />,
+                  }}
+                />
+              );
+            }}
           />
         ))}
       </LocalizationProvider>
-    )
+    );
   }
 }
-

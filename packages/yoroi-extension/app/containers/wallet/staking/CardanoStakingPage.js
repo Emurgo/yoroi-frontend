@@ -2,7 +2,7 @@
 import type { Node, ComponentType } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { computed, observable, runInAction, } from 'mobx';
+import { computed, observable, runInAction } from 'mobx';
 import { intlShape } from 'react-intl';
 import type { NetworkRow, TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 
@@ -10,17 +10,13 @@ import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import DelegationSendForm from '../../../components/wallet/send/DelegationSendForm';
 import LocalizableError from '../../../i18n/LocalizableError';
-import type {
-  CreateDelegationTxFunc,
-} from '../../../api/ada/index';
+import type { CreateDelegationTxFunc } from '../../../api/ada/index';
 import Dialog from '../../../components/widgets/Dialog';
-import {
-  EPOCH_REWARD_DENOMINATOR,
-} from '../../../config/numbersConfig';
+import { EPOCH_REWARD_DENOMINATOR } from '../../../config/numbersConfig';
 import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import globalMessages from '../../../i18n/global-messages';
-import { ReactComponent as InvalidURIImg }  from '../../../assets/images/uri/invalid-uri.inline.svg';
+import { ReactComponent as InvalidURIImg } from '../../../assets/images/uri/invalid-uri.inline.svg';
 import ErrorBlock from '../../../components/widgets/ErrorBlock';
 import AnnotatedLoader from '../../../components/transfer/AnnotatedLoader';
 import DelegationSuccessDialog from '../../../components/wallet/staking/DelegationSuccessDialog';
@@ -35,9 +31,7 @@ import config from '../../../config';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
 import { genLookupOrFail, getTokenName } from '../../../stores/stateless/tokenHelpers';
-import {
-  MultiToken,
-} from '../../../api/common/lib/MultiToken';
+import { MultiToken } from '../../../api/common/lib/MultiToken';
 import WalletDelegationBanner from '../WalletDelegationBanner';
 import { truncateToken } from '../../../utils/formatters';
 import { withLayout } from '../../../styles/context/layout';
@@ -45,6 +39,7 @@ import type { LayoutComponentMap } from '../../../styles/context/layout';
 import { Box } from '@mui/system';
 import type { PoolData } from './SeizaFetcher';
 import type { WalletChecksum } from '@emurgo/cip4-js';
+import { isTestnet } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 
 export type GeneratedData = typeof CardanoStakingPage.prototype.generated;
 
@@ -60,7 +55,7 @@ type AllProps = {| ...Props, ...InjectedProps |};
 
 @observer
 class CardanoStakingPage extends Component<AllProps, State> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
   state: State = {
@@ -70,7 +65,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
 
   cancel: void => void = () => {
     this.generated.actions.ada.delegationTransaction.reset.trigger({ justTransaction: true });
-  }
+  };
   async componentWillUnmount() {
     this.generated.actions.ada.delegationTransaction.reset.trigger({ justTransaction: false });
     await this.generated.actions.ada.delegationTransaction.setPools.trigger([]);
@@ -111,7 +106,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
       ) ? [delegationRequests.getDelegatedBalance.result?.delegation] : [];
             
       const classicCardanoStakingPage = (
-        <div id='classicCardanoStakingPage'>
+        <div id="classicCardanoStakingPage">
           {this.getDialog()}
           <SeizaFetcher
             urlTemplate={urlTemplate}
@@ -132,7 +127,6 @@ class CardanoStakingPage extends Component<AllProps, State> {
           {!this._isRegistered(publicDeriver) ? (
             <WalletDelegationBanner
               isOpen={this.generated.stores.transactions.showDelegationBanner}
-              onClose={this.generated.actions.transactions.closeDelegationBanner.trigger}
               onDelegateClick={async poolId => {
                 await this._updatePool(poolId);
                 await this._next();
@@ -146,6 +140,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
                   )
                 )
               )}
+              isTestnet={isTestnet(publicDeriver.getParent().getNetworkInfo())}
             />
           ) : null}
           <Box sx={{ iframe: { minHeight: '60vh' } }}>
@@ -171,8 +166,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
       return this.props.renderLayoutComponent({
         CLASSIC: classicCardanoStakingPage,
         REVAMP: revampCardanoStakingPage,
-      })
-
+      });
     }
     return (
       <div>
@@ -186,14 +180,14 @@ class CardanoStakingPage extends Component<AllProps, State> {
             // eslint-disable-next-line no-unused-vars
             const _ = this._updatePool(poolId);
           }}
-          onNext={async () => (this._next())}
+          onNext={async () => this._next()}
         />
         {this._displayPoolInfo()}
-      </div>);
-
+      </div>
+    );
   }
 
-  _getTotalAda: ?MultiToken => ?number = () => {
+  _getTotalAda: (?MultiToken) => ?number = () => {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(CardanoStakingPage)} no public deriver. Should never happen`);
@@ -213,25 +207,24 @@ class CardanoStakingPage extends Component<AllProps, State> {
       delegationRequests.getDelegatedBalance.result == null
         ? new MultiToken([], publicDeriver.getParent().getDefaultToken())
         : delegationRequests.getDelegatedBalance.result.accountPart;
-    const tokenInfo = genLookupOrFail(
-      this.generated.stores.tokenInfoStore.tokenInfo
-    )(rewardBalance.getDefaultEntry());
+    const tokenInfo = genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)(
+      rewardBalance.getDefaultEntry()
+    );
     return balance
       .joinAddCopy(rewardBalance)
       .getDefaultEntry()
-      .amount
-      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
+      .amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
       .toNumber();
-  }
+  };
 
-  _updatePool: ?string => Promise<void> = async (poolId) => {
+  _updatePool: (?string) => Promise<void> = async poolId => {
     this.generated.stores.delegation.poolInfoQuery.reset();
     if (poolId == null) {
       await this.generated.actions.ada.delegationTransaction.setPools.trigger([]);
       return;
     }
     await this.generated.actions.ada.delegationTransaction.setPools.trigger([poolId]);
-  }
+  };
 
   _next: void => Promise<void> = async () => {
     const selectedWallet = this.generated.stores.wallets.selected;
@@ -246,9 +239,9 @@ class CardanoStakingPage extends Component<AllProps, State> {
       poolRequest: delegationTransaction.selectedPools[0],
       publicDeriver: selectedWallet,
     });
-  }
+  };
 
-  _displayPoolInfo: void => (void | Node) = () => {
+  _displayPoolInfo: void => void | Node = () => {
     const { intl } = this.context;
     const selectedWallet = this.generated.stores.wallets.selected;
     if (selectedWallet == null) {
@@ -262,26 +255,32 @@ class CardanoStakingPage extends Component<AllProps, State> {
       message: globalMessages.copyTooltipMessage,
     };
 
-    const moreInfo = selectedPoolInfo.info?.homepage != null
-      ? {
-        openPoolPage: handleExternalLinkClick,
-        url: selectedPoolInfo.info.homepage,
-      }
-      : undefined;
+    const moreInfo =
+      selectedPoolInfo.info?.homepage != null
+        ? {
+            openPoolPage: handleExternalLinkClick,
+            url: selectedPoolInfo.info.homepage,
+          }
+        : undefined;
 
     return (
       <StakePool
         purpose="delegation"
-        poolName={selectedPoolInfo.info?.name
-            ?? intl.formatMessage(globalMessages.unknownPoolLabel)
+        poolName={
+          selectedPoolInfo.info?.name ?? intl.formatMessage(globalMessages.unknownPoolLabel)
         }
         data={{
           description: selectedPoolInfo.info?.description ?? undefined,
           /* TODO: fill once we know this from the backend */
         }}
-        selectedExplorer={this.generated.stores.explorers.selectedExplorer.get(
-          selectedWallet.getParent().getNetworkInfo().NetworkId
-        ) ?? (() => { throw new Error('No explorer for wallet network'); })()}
+        selectedExplorer={
+          this.generated.stores.explorers.selectedExplorer.get(
+            selectedWallet.getParent().getNetworkInfo().NetworkId
+          ) ??
+          (() => {
+            throw new Error('No explorer for wallet network');
+          })()
+        }
         hash={selectedPoolInfo.poolId}
         moreInfo={moreInfo}
         classicTheme={this.generated.stores.profile.isClassicTheme}
@@ -297,28 +296,29 @@ class CardanoStakingPage extends Component<AllProps, State> {
             });
           }
         }}
-        notification={this.notificationElementId == null
-          ? null
-          : this.generated.stores.uiNotifications.getTooltipActiveNotification(
-            this.notificationElementId
-          )
+        notification={
+          this.notificationElementId == null
+            ? null
+            : this.generated.stores.uiNotifications.getTooltipActiveNotification(
+                this.notificationElementId
+              )
         }
         undelegate={undefined}
       />
     );
   };
 
-  _getPoolInfo: PublicDeriver<> => (void | PoolMeta) = (publicDeriver) => {
+  _getPoolInfo: (PublicDeriver<>) => void | PoolMeta = publicDeriver => {
     const { delegationTransaction } = this.generated.stores.substores.ada;
     return delegationTransaction.selectedPools.length === 0
       ? undefined
       : this.generated.stores.delegation.getLocalPoolInfo(
-        publicDeriver.getParent().getNetworkInfo(),
-        delegationTransaction.selectedPools[0],
-      );
+          publicDeriver.getParent().getNetworkInfo(),
+          delegationTransaction.selectedPools[0]
+        );
   };
 
-  _errorDialog: LocalizableError => Node = (error) => {
+  _errorDialog: LocalizableError => Node = error => {
     const { intl } = this.context;
     const dialogBackButton = [
       {
@@ -336,19 +336,20 @@ class CardanoStakingPage extends Component<AllProps, State> {
         actions={dialogBackButton}
       >
         <>
-          <center><InvalidURIImg /></center>
-          <ErrorBlock
-            error={error}
-          />
+          <center>
+            <InvalidURIImg />
+          </center>
+          <ErrorBlock error={error} />
         </>
       </Dialog>
     );
-  }
+  };
 
-  getDialog: void => (void | Node) = () => {
+  getDialog: void => void | Node = () => {
     const { intl } = this.context;
     const { delegationTransaction } = this.generated.stores.substores.ada;
     const delegationTx = delegationTransaction.createDelegationTx.result;
+    const uiDialogs = this.generated.stores.uiDialogs;
 
     const selectedWallet = this.generated.stores.wallets.selected;
     if (selectedWallet == null) {
@@ -356,14 +357,19 @@ class CardanoStakingPage extends Component<AllProps, State> {
     }
 
     const networkInfo = selectedWallet.getParent().getNetworkInfo();
-    const currentParams = networkInfo.BaseConfig
-      .reduce((acc, next) => Object.assign(acc, next), {});
+    const currentParams = networkInfo.BaseConfig.reduce(
+      (acc, next) => Object.assign(acc, next),
+      {}
+    );
 
-    const approximateReward = (tokenEntry) => {
+    const approximateReward = tokenEntry => {
       const tokenRow = this.generated.stores.tokenInfoStore.tokenInfo
         .get(tokenEntry.networkId.toString())
         ?.get(tokenEntry.identifier);
-      if (tokenRow == null) throw new Error(`${nameof(CardanoStakingPage)} no token info for ${JSON.stringify(tokenEntry)}`);
+      if (tokenRow == null)
+        throw new Error(
+          `${nameof(CardanoStakingPage)} no token info for ${JSON.stringify(tokenEntry)}`
+        );
 
       return {
         amount: tokenEntry.amount
@@ -373,7 +379,8 @@ class CardanoStakingPage extends Component<AllProps, State> {
       };
     };
 
-    const showSignDialog = this.generated.stores.wallets.sendMoneyRequest.isExecuting ||
+    const showSignDialog =
+      this.generated.stores.wallets.sendMoneyRequest.isExecuting ||
       !this.generated.stores.wallets.sendMoneyRequest.wasExecuted ||
       this.generated.stores.wallets.sendMoneyRequest.error != null;
 
@@ -416,40 +423,42 @@ class CardanoStakingPage extends Component<AllProps, State> {
       return (
         <DelegationTxDialog
           staleTx={delegationTransaction.isStale}
-          poolName={selectedPoolInfo.info?.name
-            ?? intl.formatMessage(globalMessages.unknownPoolLabel)
+          poolName={
+            selectedPoolInfo.info?.name ?? intl.formatMessage(globalMessages.unknownPoolLabel)
           }
           poolHash={delegationTransaction.selectedPools[0]}
           transactionFee={delegationTx.signTxRequest.fee()}
           amountToDelegate={delegationTx.totalAmountToDelegate}
-          approximateReward={
-            approximateReward(delegationTx.totalAmountToDelegate.getDefaultEntry())
-          }
+          approximateReward={approximateReward(
+            delegationTx.totalAmountToDelegate.getDefaultEntry()
+          )}
           getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
-          isSubmitting={
-            this.generated.stores.wallets.sendMoneyRequest.isExecuting
-          }
+          isSubmitting={this.generated.stores.wallets.sendMoneyRequest.isExecuting}
           isHardware={
             selectedWallet.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET
           }
           onCancel={this.cancel}
-          onSubmit={({ password }) => (
-            this.generated.actions.ada.delegationTransaction.signTransaction.trigger({
+          onSubmit={async ({ password }) => {
+            await this.generated.actions.ada.delegationTransaction.signTransaction.trigger({
               password,
               publicDeriver: selectedWallet,
-            })
-          )}
+              dialog: DelegationSuccessDialog,
+            });
+          }}
           classicTheme={this.generated.stores.profile.isClassicTheme}
           error={this.generated.stores.wallets.sendMoneyRequest.error}
-          selectedExplorer={this.generated.stores.explorers.selectedExplorer
-            .get(
+          selectedExplorer={
+            this.generated.stores.explorers.selectedExplorer.get(
               selectedWallet.getParent().getNetworkInfo().NetworkId
-            ) ?? (() => { throw new Error('No explorer for wallet network'); })()
+            ) ??
+            (() => {
+              throw new Error('No explorer for wallet network');
+            })()
           }
         />
       );
     }
-    if (delegationTx != null && !showSignDialog) {
+    if (uiDialogs.isOpen(DelegationSuccessDialog)) {
       return (
         <DelegationSuccessDialog
           onClose={this.generated.actions.ada.delegationTransaction.complete.trigger}
@@ -458,7 +467,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
       );
     }
     return undefined;
-  }
+  };
 
   _isRegistered: (PublicDeriver<>) => ?boolean = publicDeriver => {
     const delegationRequests = this.generated.stores.delegation.getDelegationRequests(
@@ -485,13 +494,13 @@ class CardanoStakingPage extends Component<AllProps, State> {
       ada: {|
         delegationTransaction: {|
           complete: {|
-            trigger: void => void
+            trigger: void => void,
           |},
           createTransaction: {|
             trigger: (params: {|
               poolRequest: string | void,
-              publicDeriver: PublicDeriver<>
-            |}) => Promise<void>
+              publicDeriver: PublicDeriver<>,
+            |}) => Promise<void>,
           |},
           reset: {| trigger: (params: {| justTransaction: boolean |}) => void |},
           setPools: {|
@@ -500,25 +509,26 @@ class CardanoStakingPage extends Component<AllProps, State> {
           signTransaction: {|
             trigger: (params: {|
               password?: string,
-              publicDeriver: PublicDeriver<>
-            |}) => Promise<void>
-          |}
-        |}
+              publicDeriver: PublicDeriver<>,
+              dialog?: any,
+            |}) => Promise<void>,
+          |},
+        |},
       |},
       dialogs: {|
         closeActiveDialog: {|
-          trigger: (params: void) => void
+          trigger: (params: void) => void,
         |},
         open: {|
           trigger: (params: {|
             dialog: any,
-            params?: any
-          |}) => void
-        |}
+            params?: any,
+          |}) => void,
+        |},
       |},
       notifications: {|
-        open: {| trigger: (params: Notification) => void |}
-      |}
+        open: {| trigger: (params: Notification) => void |},
+      |},
     |},
     stores: {|
       transactions: {|
@@ -527,10 +537,8 @@ class CardanoStakingPage extends Component<AllProps, State> {
         showDelegationBanner: boolean,
       |},
       delegation: {|
-        getDelegationRequests: (
-          PublicDeriver<>
-        ) => void | DelegationRequests,
-        getLocalPoolInfo: ($ReadOnly<NetworkRow>, string) => (void | PoolMeta),
+        getDelegationRequests: (PublicDeriver<>) => void | DelegationRequests,
+        getLocalPoolInfo: ($ReadOnly<NetworkRow>, string) => void | PoolMeta,
         poolInfoQuery: {|
           error: ?LocalizableError,
           isExecuting: boolean,
@@ -558,28 +566,28 @@ class CardanoStakingPage extends Component<AllProps, State> {
             |},
             isStale: boolean,
             selectedPools: Array<string>,
-          |}
-        |}
+          |},
+        |},
       |},
       uiDialogs: {|
         getParam: <T>(number | string) => T,
-        isOpen: any => boolean
+        isOpen: any => boolean,
       |},
       uiNotifications: {|
         getTooltipActiveNotification: string => ?Notification,
-        isOpen: string => boolean
+        isOpen: string => boolean,
       |},
       wallets: {|
         sendMoneyRequest: {|
           error: ?LocalizableError,
           isExecuting: boolean,
-          wasExecuted: boolean
+          wasExecuted: boolean,
         |},
         selected: null | PublicDeriver<>,
         activeWalletPlate: ?WalletChecksum,
-      |}
-    |}
-    |} {
+      |},
+    |},
+  |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -687,5 +695,6 @@ class CardanoStakingPage extends Component<AllProps, State> {
       },
     });
   }
-}
-export default (withLayout(CardanoStakingPage): ComponentType<Props>)
+};
+
+export default (withLayout(CardanoStakingPage): ComponentType<Props>);

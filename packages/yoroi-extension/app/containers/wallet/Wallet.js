@@ -31,6 +31,7 @@ import SubMenu from '../../components/topbar/SubMenu';
 import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
 import WalletSyncingOverlay from '../../components/wallet/syncingOverlay/WalletSyncingOverlay';
 import WalletLoadingAnimation from '../../components/wallet/WalletLoadingAnimation';
+import { RevampAnnouncementDialog } from './dialogs/RevampAnnouncementDialog';
 
 export type GeneratedData = typeof Wallet.prototype.generated;
 
@@ -62,6 +63,9 @@ class Wallet extends Component<AllProps> {
         route: newRoute,
       });
     }
+
+    if (!this.generated.stores.profile.isRevampAnnounced)
+      this.generated.actions.dialogs.open.trigger({ dialog: RevampAnnouncementDialog });
   }
 
   checkRoute(): void | string {
@@ -212,6 +216,7 @@ class Wallet extends Component<AllProps> {
       >
         {warning}
         {this.props.children}
+        {this.getDialogs()}
       </TopBarLayout>
     ) : (
       <TopBarLayout sidebar={sidebarContainer}>
@@ -230,12 +235,42 @@ class Wallet extends Component<AllProps> {
     return warnings[warnings.length - 1]();
   };
 
+  getDialogs: void => Node = () => {
+    const isOpen = this.generated.stores.uiDialogs.isOpen;
+    if (isOpen(RevampAnnouncementDialog))
+      return (
+        <RevampAnnouncementDialog
+          onClose={() => {
+            this.generated.actions.profile.markRevampAsAnnounced.trigger();
+            this.generated.actions.dialogs.closeActiveDialog.trigger();
+          }}
+        />
+      );
+    return null;
+  };
+
   @computed get generated(): {|
     BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
     NavBarContainerProps: InjectedOrGenerated<NavBarContainerData>,
     NavBarContainerRevampProps: InjectedOrGenerated<NavBarContainerRevampData>,
     SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
     actions: {|
+      profile: {|
+        markRevampAsAnnounced: {|
+          trigger: void => Promise<void>,
+        |},
+      |},
+      dialogs: {|
+        closeActiveDialog: {|
+          trigger: (params: void) => void,
+        |},
+        open: {|
+          trigger: (params: {|
+            dialog: any,
+            params?: any,
+          |}) => void,
+        |},
+      |},
       router: {|
         goToRoute: {|
           trigger: (params: {|
@@ -275,6 +310,10 @@ class Wallet extends Component<AllProps> {
       profile: {|
         isRevampTheme: boolean,
         isClassicTheme: boolean,
+        isRevampAnnounced: boolean,
+      |},
+      uiDialogs: {|
+        isOpen: any => boolean,
       |},
     |},
   |} {
@@ -309,15 +348,30 @@ class Wallet extends Component<AllProps> {
         profile: {
           isRevampTheme: stores.profile.isRevampTheme,
           isClassicTheme: stores.profile.isClassicTheme,
+          isRevampAnnounced: stores.profile.isRevampAnnounced,
+        },
+        uiDialogs: {
+          isOpen: stores.uiDialogs.isOpen,
         },
       },
       actions: {
+        profile: {
+          markRevampAsAnnounced: {
+            trigger: actions.profile.markRevampAsAnnounced.trigger,
+          },
+        },
         router: {
           goToRoute: { trigger: actions.router.goToRoute.trigger },
           redirect: { trigger: actions.router.redirect.trigger },
         },
         wallets: {
           setActiveWallet: { trigger: actions.wallets.setActiveWallet.trigger },
+        },
+        dialogs: {
+          open: { trigger: actions.dialogs.open.trigger },
+          closeActiveDialog: {
+            trigger: actions.dialogs.closeActiveDialog.trigger,
+          },
         },
       },
       SidebarContainerProps: ({ actions, stores }: InjectedOrGenerated<SidebarContainerData>),

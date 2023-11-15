@@ -59,11 +59,11 @@ const LabelWithValue = ({ label, value }: InfoColumnProps): Node => {
         style={{ textTransform: 'uppercase' }}
         variant="caption"
         mb="4px"
-        color="var(--yoroi-palette-gray-600)"
+        color="grayscale.600"
       >
         {label}
       </Typography>
-      <Typography color="var(--yoroi-palette-gray-900)">{value}</Typography>
+      <Typography color="grayscale.900">{value}</Typography>
     </Box>
   );
 };
@@ -87,9 +87,7 @@ const Graph = ({ value, days }): Node => {
         size={120}
         thickness={7}
         variant="determinate"
-        sx={{
-          color: 'var(--yoroi-palette-gray-50)',
-        }}
+        sx={{ color: 'grayscale.50' }}
         value={100}
       />
       <Box
@@ -101,10 +99,10 @@ const Graph = ({ value, days }): Node => {
           textAlign: 'center',
         }}
       >
-        <Typography variant="h4" color="var(--yoroi-palette-gray-900)">
+        <Typography variant="h4" color="grayscale.900">
           {value}%
         </Typography>
-        <Typography variant="caption1" fontSize="12px" color="var(--yoroi-palette-gray-600)">
+        <Typography variant="caption1" fontSize="12px" color="grayscale.600">
           {days} days
         </Typography>
       </Box>

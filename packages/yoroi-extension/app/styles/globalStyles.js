@@ -3,76 +3,71 @@
 import type { Node } from 'react';
 import { GlobalStyles } from '@mui/material';
 
-const getColorPath = (
-  themePalette: any,
-  color: string,
-  ) => {
-
-    const path = []
-    for (const entery of Object.entries(themePalette)) {
-      const [key, value] = entery
-      if (typeof value === 'object') {
-        // $FlowFixMe[incompatible-call]
-        for (const valueEntery of Object.entries(value)) {
-          if (valueEntery[1] === color) {
-            path.push(key, valueEntery[0])
-            break
-          }
+const getColorPath = (themePalette: any, color: string) => {
+  const path = [];
+  for (const entery of Object.entries(themePalette)) {
+    const [key, value] = entery;
+    if (typeof value === 'object') {
+      // $FlowFixMe[incompatible-call]
+      for (const valueEntery of Object.entries(value)) {
+        if (valueEntery[1] === color) {
+          path.push(key, valueEntery[0]);
+          break;
         }
       }
-
-      if (path.length !== 0) break
     }
-    return path
-}
+
+    if (path.length !== 0) break;
+  }
+  return path;
+};
 
 export type DesignToken = {|
   parent: string,
   child: string,
   hex: string,
   path: string[],
-|}
+|};
 
 type NameToHex = {|
   name: string,
   hex: string,
-|}
+|};
 
 type FormatedPalette = {|
   designTokens: DesignToken[],
   nameToHex: NameToHex[],
-|}
+|};
 
 export const formatPalette = (palette: any, theme: any): FormatedPalette => {
   const formatedPalette: FormatedPalette = {
     nameToHex: [],
-    designTokens: []
-  }
-
+    designTokens: [],
+  };
 
   for (const name of Object.keys(palette)) {
-
-    if(typeof palette[name] === 'string' && palette[name].startsWith('var')) {
-      const secondColorName = palette[name].slice(4, -1)
-      const secondColorHex = palette[secondColorName]
-      const path = getColorPath(theme.palette, secondColorHex)
+    if (typeof palette[name] === 'string' && palette[name].startsWith('var')) {
+      const secondColorName = palette[name].slice(4, -1);
+      const secondColorHex = palette[secondColorName];
+      const path = getColorPath(theme.palette, secondColorHex);
       formatedPalette.designTokens.push({
         parent: name,
         child: secondColorName,
         hex: secondColorHex,
-        path
-      })
+        path,
+      });
     } else {
       formatedPalette.nameToHex.push({
-        name, hex: palette[name]
-      })
+        name,
+        hex: palette[name],
+      });
     }
   }
 
-  return formatedPalette
-}
+  return formatedPalette;
+};
 
-export function getMainYoroiPalette(theme: Object): { [string]: string|number } {
+export function getMainYoroiPalette(theme: Object): { [string]: string | number } {
   return {
     /*
       CSS variables follow the same name as mui using kebab case syntax
@@ -100,36 +95,56 @@ export function getMainYoroiPalette(theme: Object): { [string]: string|number } 
     '--yoroi-palette-secondary-300': theme.palette.secondary['300'],
     '--yoroi-palette-secondary-contrastText': theme.palette.secondary.contrastText,
 
-    '--yoroi-palette-error-50': theme.palette.error['50'],
-    '--yoroi-palette-error-100': theme.palette.error['100'],
-    '--yoroi-palette-error-200': theme.palette.error['200'],
+    '--yoroi-palette-error-50': theme.palette?.error['50'],
+    '--yoroi-palette-error-100': theme.palette?.error['100'],
+    '--yoroi-palette-error-200': theme.palette?.error['200'],
 
     '--yoroi-palette-cyan-50': theme.palette.cyan['50'],
     '--yoroi-palette-cyan-100': theme.palette.cyan['100'],
 
-    '--yoroi-palette-gray-50': theme.palette.gray['50'],
-    '--yoroi-palette-gray-100': theme.palette.gray['100'],
-    '--yoroi-palette-gray-200': theme.palette.gray['200'],
-    '--yoroi-palette-gray-300': theme.palette.gray['300'],
-    '--yoroi-palette-gray-400': theme.palette.gray['400'],
-    '--yoroi-palette-gray-500': theme.palette.gray['500'],
-    '--yoroi-palette-gray-600': theme.palette.gray['600'],
-    '--yoroi-palette-gray-700': theme.palette.gray['700'],
-    '--yoroi-palette-gray-800': theme.palette.gray['800'],
-    '--yoroi-palette-gray-900': theme.palette.gray['900'],
+    '--yoroi-palette-gray-50': (theme.palette.grey ? theme.palette.grey : theme.palette.grayscale)[
+      '50'
+    ],
+    '--yoroi-palette-gray-100': (theme.palette.grey ? theme.palette.grey : theme.palette.grayscale)[
+      '100'
+    ],
+    '--yoroi-palette-gray-200': (theme.palette.grey ? theme.palette.grey : theme.palette.grayscale)[
+      '200'
+    ],
+    '--yoroi-palette-gray-300': (theme.palette.grey ? theme.palette.grey : theme.palette.grayscale)[
+      '300'
+    ],
+    '--yoroi-palette-gray-400': (theme.palette.grey ? theme.palette.grey : theme.palette.grayscale)[
+      '400'
+    ],
+    '--yoroi-palette-gray-500': (theme.palette.grey ? theme.palette.grey : theme.palette.grayscale)[
+      '500'
+    ],
+    '--yoroi-palette-gray-600': (theme.palette.grey ? theme.palette.grey : theme.palette.grayscale)[
+      '600'
+    ],
+    '--yoroi-palette-gray-700': (theme.palette.grey ? theme.palette.grey : theme.palette.grayscale)[
+      '700'
+    ],
+    '--yoroi-palette-gray-800': (theme.palette.grey ? theme.palette.grey : theme.palette.grayscale)[
+      '800'
+    ],
+    '--yoroi-palette-gray-900': (theme.palette.grey ? theme.palette.grey : theme.palette.grayscale)[
+      '900'
+    ],
     '--yoroi-palette-background-overlay': theme.palette.background.overlay,
 
-    '--yoroi-palette-tx-status-pending-background': theme.palette.txStatus.pending.background,
-    '--yoroi-palette-tx-status-pending-text': theme.palette.txStatus.pending.text,
-    '--yoroi-palette-tx-status-pending-stripes': theme.palette.txStatus.pending.stripes,
-    '--yoroi-palette-tx-status-high-background': theme.palette.txStatus.high.background,
-    '--yoroi-palette-tx-status-high-text': theme.palette.txStatus.high.text,
-    '--yoroi-palette-tx-status-failed-background': theme.palette.txStatus.failed.background,
-    '--yoroi-palette-tx-status-failed-text': theme.palette.txStatus.failed.text,
-    '--yoroi-palette-tx-status-medium-background': theme.palette.txStatus.medium.background,
-    '--yoroi-palette-tx-status-medium-text': theme.palette.txStatus.medium.text,
-    '--yoroi-palette-tx-status-low-background': theme.palette.txStatus.low.background,
-    '--yoroi-palette-tx-status-low-text': theme.palette.txStatus.low.text,
+    '--yoroi-palette-tx-status-pending-background': theme.palette.txStatus?.pending.background,
+    '--yoroi-palette-tx-status-pending-text': theme.palette.txStatus?.pending.text,
+    '--yoroi-palette-tx-status-pending-stripes': theme.palette.txStatus?.pending.stripes,
+    '--yoroi-palette-tx-status-high-background': theme.palette.txStatus?.high.background,
+    '--yoroi-palette-tx-status-high-text': theme.palette.txStatus?.high.text,
+    '--yoroi-palette-tx-status-failed-background': theme.palette.txStatus?.failed.background,
+    '--yoroi-palette-tx-status-failed-text': theme.palette.txStatus?.failed.text,
+    '--yoroi-palette-tx-status-medium-background': theme.palette.txStatus?.medium.background,
+    '--yoroi-palette-tx-status-medium-text': theme.palette.txStatus?.medium.text,
+    '--yoroi-palette-tx-status-low-background': theme.palette.txStatus?.low.background,
+    '--yoroi-palette-tx-status-low-text': theme.palette.txStatus?.low.text,
 
     '--yoroi-palette-background-banner-warning': theme.palette.background.banner.warning,
     '--yoroi-palette-background-walletAdd-title': theme.palette.background.walletAdd.title,
@@ -219,7 +234,8 @@ export function getMainYoroiPalette(theme: Object): { [string]: string|number } 
 
     /* === TODO: FIX AND UNIFY ALL CSS VARIABLES === */
     '--yoroi-wallet-add-option-dialog-item-title-color': 'var(--yoroi-palette-gray-900)',
-    '--yoroi-wallet-add-option-dialog-item-learn-more-button-bg-color': 'var(--yoroi-palette-gray-50)',
+    '--yoroi-wallet-add-option-dialog-item-learn-more-button-bg-color':
+      'var(--yoroi-palette-gray-50)',
     '--yoroi-transactions-icon-type-expend-background-color': '#15d1aa',
     '--yoroi-transactions-icon-type-income-background-color': '#9ab2d9',
     '--yoroi-transactions-icon-type-exchange-background-color': '#10aca4',
@@ -238,7 +254,8 @@ export function getMainYoroiPalette(theme: Object): { [string]: string|number } 
     '--yoroi-hw-connect-dialog-middle-block-common-error-background-color':
       theme.name === 'classic' ? '#fdf1f0' : '#ffffff',
 
-    '--yoroi-terms-of-use-text-color': theme.name === 'classic' ? '#121327' : '#38293d',
+    '--yoroi-terms-of-use-text-color':
+      theme.name === 'classic' ? '#121327' : theme.name === 'revamp-light' ? '#242838' : '#38293d',
     '--yoroi-loading-background-color': '#fafbfc',
 
     '--yoroi-support-settings-text': theme.name === 'classic' ? '#121327' : '#2b2c32',
@@ -251,31 +268,31 @@ export function getMainYoroiPalette(theme: Object): { [string]: string|number } 
 
     ...(theme.name === 'modern'
       ? {
-        // Dashboard
-        '--yoroi-dashboard-label-underline-color': 'rgba(135, 145, 173, 0.8)',
-        '--yoroi-dashboard-card-shadow-color': 'rgba(24, 26, 30, 0.08)',
-        '--yoroi-dashboard-card-border-color': 'rgba(77, 32, 192, 0.08)',
-        '--yoroi-dashboard-card-vertical-separator-color': '#E6E6E6',
-        '--yoroi-dashboard-card-nodelegation-background-color': '#F9FBFF',
-        '--yoroi-dashboard-tooltip-background-color': 'rgba(56, 57, 61, 0.75)',
-        '--yoroi-dashboard-stakepool-head-background-color': '#F4F6FC',
-        '--yoroi-dashboard-epoch-time-background': '#F0F3F5',
-        '--yoroi-dashboard-percentage-epoch-base': '#B7C3ED',
-        '--yoroi-dashboard-percentage-epoch-circle': '#3154CB',
-        '--yoroi-dashboard-percentage-stake-base': '#FFEDF2',
-        '--yoroi-dashboard-percentage-stake-circle': '#FF1755',
-        '--yoroi-dashboard-graph-tab-color': '#ADAEB6',
-        '--yoroi-dashboard-graph-active-tab-color': '#3D60CD',
-        '--yoroi-dashboard-graph-radio-color': '#93979C',
-        '--yoroi-dashboard-graph-axis-tick-color': '#ADAEB6',
-        '--yoroi-dashboard-graph-axis-text-color': '#38393D',
-        '--yoroi-dashboard-graph-bar-hover-background-color': '#D9DDE0',
-        '--yoroi-dashboard-graph-bar-primary-color': '#6D80FF',
-        '--yoroi-dashboard-graph-bar-secondary-color': '#1A44B7',
-        '--yoroi-dashboard-graph-bar-width': 16,
-        '--yoroi-dashboard-graph-tooltip-text-color': '#FFFFFF',
-        '--yoroi-dashboard-graph-tooltip-background': 'rgba(56, 57, 61, 0.7)',
-      }
+          // Dashboard
+          '--yoroi-dashboard-label-underline-color': 'rgba(135, 145, 173, 0.8)',
+          '--yoroi-dashboard-card-shadow-color': 'rgba(24, 26, 30, 0.08)',
+          '--yoroi-dashboard-card-border-color': 'rgba(77, 32, 192, 0.08)',
+          '--yoroi-dashboard-card-vertical-separator-color': '#E6E6E6',
+          '--yoroi-dashboard-card-nodelegation-background-color': '#F9FBFF',
+          '--yoroi-dashboard-tooltip-background-color': 'rgba(56, 57, 61, 0.75)',
+          '--yoroi-dashboard-stakepool-head-background-color': '#F4F6FC',
+          '--yoroi-dashboard-epoch-time-background': '#F0F3F5',
+          '--yoroi-dashboard-percentage-epoch-base': '#B7C3ED',
+          '--yoroi-dashboard-percentage-epoch-circle': '#3154CB',
+          '--yoroi-dashboard-percentage-stake-base': '#FFEDF2',
+          '--yoroi-dashboard-percentage-stake-circle': '#FF1755',
+          '--yoroi-dashboard-graph-tab-color': '#ADAEB6',
+          '--yoroi-dashboard-graph-active-tab-color': '#3D60CD',
+          '--yoroi-dashboard-graph-radio-color': '#93979C',
+          '--yoroi-dashboard-graph-axis-tick-color': '#ADAEB6',
+          '--yoroi-dashboard-graph-axis-text-color': '#38393D',
+          '--yoroi-dashboard-graph-bar-hover-background-color': '#D9DDE0',
+          '--yoroi-dashboard-graph-bar-primary-color': '#6D80FF',
+          '--yoroi-dashboard-graph-bar-secondary-color': '#1A44B7',
+          '--yoroi-dashboard-graph-bar-width': 16,
+          '--yoroi-dashboard-graph-tooltip-text-color': '#FFFFFF',
+          '--yoroi-dashboard-graph-tooltip-background': 'rgba(56, 57, 61, 0.7)',
+        }
       : null),
   };
 }
@@ -284,7 +301,6 @@ const globalStyles = (theme: Object): Node => {
   return (
     <GlobalStyles
       styles={{
-
         ':root': getMainYoroiPalette(theme),
 
         /* === GLOBAL STYLES === */
@@ -357,7 +373,7 @@ const globalStyles = (theme: Object): Node => {
           },
         },
         html: {
-          overflow: 'hidden'
+          overflow: 'hidden',
         },
         body: {
           /* To remove background color for Chrome Inputs */

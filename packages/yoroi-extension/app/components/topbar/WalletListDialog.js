@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import Dialog from '../widgets/Dialog';
+import DialogRevamp from '../widgets/DialogRevamp';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import styles from './WalletListDialog.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -185,7 +185,7 @@ export default class WalletListDialog extends Component<Props, State> {
     const walletsTotal = this.renderWalletsTotal();
 
     return (
-      <Dialog
+      <DialogRevamp
         className={styles.component}
         title={intl.formatMessage(globalMessages.changeWallet)}
         closeOnOverlayClick
@@ -206,7 +206,7 @@ export default class WalletListDialog extends Component<Props, State> {
               </button>
             </div>
           </div>
-          <Box sx={{ overflow: 'auto', maxHeight: '50vh', overflowY: 'auto', paddingX: '40px' }}>
+          <Box sx={{ overflow: 'auto',  overflowY: 'auto', paddingX: '40px', height: '400px' }}>
             {cardanoWalletsIdx.length > 0 && (
               <div className={styles.sectionHeader}>
                 <h1>{intl.formatMessage(messages.cardano)}</h1>
@@ -277,35 +277,42 @@ export default class WalletListDialog extends Component<Props, State> {
               </Droppable>
             </DragDropContext>
           </Box>
-        </Box>
-        <Stack
-          spacing={1}
-          direction="row"
-          sx={{
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '40px',
-            borderTop: '1px solid var(--yoroi-palette-gray-100)',
-          }}
-        >
-          <Button onClick={onAddWallet} size="large" variant="outlined" color="primary" fullWidth>
-            {intl.formatMessage(messages.addWallet)}
-          </Button>
-          <Button
-            onClick={this.onSelect}
-            size="large"
-            disabled={
-              this.state.selectedWallet === null ||
-              this.isCurrentWallet(this.state.selectedWallet, 'global')
-            }
-            fullWidth
-            variant="contained"
-            color="primary"
+          <Stack
+            spacing={1}
+            direction="row"
+            sx={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '40px',
+              borderTop: '1px solid var(--yoroi-palette-gray-100)',
+            }}
           >
-            {intl.formatMessage(messages.applyWallet)}
-          </Button>
-        </Stack>
-      </Dialog>
+            <Button
+              id="addWalletButton"
+              onClick={onAddWallet}
+              size="large"
+              variant="outlined"
+              color="primary"
+              fullWidth
+            >
+              {intl.formatMessage(messages.addWallet)}
+            </Button>
+            <Button
+              id="applyWalletButton"
+              onClick={this.onSelect}
+              size="large"
+              disabled={
+                this.state.selectedWallet === null ||
+                this.isCurrentWallet(this.state.selectedWallet, 'global')
+              }
+              fullWidth
+              variant="primary"
+            >
+              {intl.formatMessage(messages.applyWallet)}
+            </Button>
+          </Stack>
+        </Box>
+      </DialogRevamp>
     );
   }
 

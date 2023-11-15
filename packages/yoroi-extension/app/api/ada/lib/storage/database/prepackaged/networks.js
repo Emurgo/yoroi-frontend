@@ -247,6 +247,46 @@ export const networks = Object.freeze({
     CoinType: CoinTypes.CARDANO,
     Fork: CardanoForks.Haskell,
   }: NetworkRow),
+  CardanoSanchoTestnet: ({
+    NetworkId: 4_50,
+    NetworkName: 'Cardano Sancho Testnet',
+    Backend: {
+      BackendService: environment.isTest()
+        ? 'http://localhost:21000'
+        : 'https://sanchonet-backend.yoroiwallet.com',
+      WebSocket: environment.isTest()
+        ? 'ws://localhost:21000'
+        : 'wss://sanchonet-backend.yoroiwallet.com:443',
+      TokenInfoService:
+        'https://stage-cdn.yoroiwallet.com',
+    },
+    BaseConfig: ([
+      Object.freeze({
+        StartAt: 0,
+        ChainNetworkId: '0',
+        ByronNetworkId: 4,
+        GenesisDate: '1686789000000',
+        SlotsPerEpoch: 4320,
+        SlotDuration: 20,
+      }),
+      Object.freeze({
+        StartAt: 0,
+        SlotsPerEpoch: 86400,
+        SlotDuration: 1,
+        PerEpochPercentageReward: 69344,
+        LinearFee: {
+          coefficient: '44',
+          constant: '155381',
+        },
+        CoinsPerUtxoWord: '34482',
+        MinimumUtxoVal: '1000000',
+        PoolDeposit: '500000000',
+        KeyDeposit: '2000000',
+      })
+    ]: CardanoHaskellBaseConfig),
+    CoinType: CoinTypes.CARDANO,
+    Fork: CardanoForks.Haskell,
+  }: NetworkRow),
 });
 
 export function isTestnet(
@@ -254,7 +294,8 @@ export function isTestnet(
 ): boolean {
   return network.NetworkId === networks.CardanoTestnet.NetworkId
     || network.NetworkId === networks.CardanoPreprodTestnet.NetworkId
-    || network.NetworkId === networks.CardanoPreviewTestnet.NetworkId;
+    || network.NetworkId === networks.CardanoPreviewTestnet.NetworkId
+    || network.NetworkId === networks.CardanoSanchoTestnet.NetworkId;
 
 }
 
@@ -312,6 +353,8 @@ export const defaultAssets: Array<
             (network === networks.CardanoTestnet
               || network === networks.CardanoPreprodTestnet
               || network === networks.CardanoPreviewTestnet
+              || network === networks.CardanoSanchoTestnet
+              // <TODO:PENDING_REMOVAL> Alonzo
               || network === networks.AlonzoTestnet)
               ? 'TADA'
               : 'ADA',

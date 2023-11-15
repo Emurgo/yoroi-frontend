@@ -5,14 +5,14 @@
   font-weight: 500;
 
   .explanation {
-    li::before {
+    .line::before {
       content: '●';
       margin-right: 0.4em;
       font-size: 0.8em;
       color: var(--yoroi-palette-gray-400);
     }
 
-    li {
+    .line {
       display: list-item;
       margin-left: 12px;
       margin-top: 8px;
@@ -74,12 +74,13 @@
   }
 }
 
-:global(.YoroiModern), :global(.YoroiRevamp) {
-  .dialog  {
+:global(.YoroiModern),
+:global(.YoroiRevamp) {
+  .dialog {
     min-width: var(--yoroi-comp-dialog-min-width-lg);
     max-width: var(--yoroi-comp-dialog-min-width-lg);
     font-weight: 400;
-    
+
     .walletPassword {
       margin-top: 0;
     }

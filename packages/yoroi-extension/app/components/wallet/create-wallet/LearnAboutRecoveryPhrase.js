@@ -138,7 +138,7 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
   const tips = [text.firstTip, text.secondTip, text.thirdTip, text.fourthTip, text.fifthTip];
 
   return (
-    <Stack alignItems="center" justifyContent="center">
+    <Stack alignItems="center" justifyContent="center" id="learnAboutRecoveryPhraseComponent">
       <Stack maxWidth="648px">
         <Typography mb="16px" variant="body1">
           <FormattedHTMLMessage {...text.shortDescription} />

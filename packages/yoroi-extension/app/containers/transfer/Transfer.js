@@ -120,6 +120,7 @@ class Transfer extends Component<AllProps> {
       wallets: {| selected: null | PublicDeriver<> |},
       profile: {|
         isRevampTheme: boolean,
+        currentTheme: string,
       |},
     |},
   |} {
@@ -140,6 +141,7 @@ class Transfer extends Component<AllProps> {
         },
         profile: {
           isRevampTheme: stores.profile.isRevampTheme,
+          currentTheme: stores.profile.currentTheme,
         },
       },
       actions: {

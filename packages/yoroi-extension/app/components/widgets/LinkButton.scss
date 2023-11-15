@@ -22,8 +22,17 @@ $blockHeight: 27px;
 
   .icon {
     margin-right: 8px;
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     vertical-align: middle;
+
+    & span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     svg {
       width: 20px;
       height: 20px;

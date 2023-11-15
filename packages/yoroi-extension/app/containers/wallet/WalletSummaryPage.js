@@ -15,8 +15,6 @@ import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import WalletTransactionsList from '../../components/wallet/transactions/WalletTransactionsList';
 import WalletTransactionsListRevamp from '../../components/wallet/transactions/WalletTransactionsListRevamp';
 import WalletSummary from '../../components/wallet/summary/WalletSummary';
-import WalletNoTransactions from '../../components/wallet/transactions/WalletNoTransactions';
-import WalletNoTransactionsRevamp from '../../components/wallet/transactions/WalletNoTransactionsRevamp';
 import VerticalFlexContainer from '../../components/layout/VerticalFlexContainer';
 import ExportTransactionDialog from '../../components/wallet/export/ExportTransactionDialog';
 import AddMemoDialog from '../../components/wallet/memos/AddMemoDialog';
@@ -53,6 +51,7 @@ import type { LayoutComponentMap } from '../../styles/context/layout';
 import WalletSummaryRevamp from '../../components/wallet/summary/WalletSummaryRevamp';
 import BuySellDialog from '../../components/buySell/BuySellDialog';
 import WalletEmptyBanner from './WalletEmptyBanner';
+import { Box } from '@mui/material';
 
 export type GeneratedData = typeof WalletSummaryPage.prototype.generated;
 type Props = InjectedOrGenerated<GeneratedData>;
@@ -130,6 +129,7 @@ class WalletSummaryPage extends Component<AllProps> {
         CLASSIC: WalletTransactionsList,
         REVAMP: WalletTransactionsListRevamp,
       };
+
       const WalletTransactionsListComp = mapWalletTransactionLayout[this.props.selectedLayout];
 
       if (isLoading || hasAny) {
@@ -189,41 +189,28 @@ class WalletSummaryPage extends Component<AllProps> {
             complexityLevel={this.generated.stores.profile.selectedComplexityLevel}
           />
         );
+      } else {
+        walletTransactions = null;
       }
-    } else {
-      const mapWalletNoTransactionsLayout = {
-        CLASSIC: WalletNoTransactions,
-        REVAMP: WalletNoTransactionsRevamp,
-      };
-      const WalletNoTransactionsComp = mapWalletNoTransactionsLayout[this.props.selectedLayout];
-      const noTransactionsFoundLabel = intl.formatMessage(globalMessages.noTransactionsFound);
-      walletTransactions = (
-        <WalletNoTransactionsComp
-          label={noTransactionsFoundLabel}
-          classicTheme={profile.isClassicTheme}
-        />
-      );
     }
 
     const notification = this._getThisPageActiveNotification();
 
-    let exportDialog;
+    let exportDialog = (
+      <Dialog
+        title={intl.formatMessage(globalMessages.processingLabel)}
+        closeOnOverlayClick={false}
+      >
+        <VerticalFlexContainer>
+          <LoadingSpinner />
+        </VerticalFlexContainer>
+      </Dialog>
+    );
 
     const delegationStore = this.generated.stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
 
-    if (!this.readyToExportHistory({ delegationRequests, publicDeriver })) {
-      exportDialog = (
-        <Dialog
-          title={intl.formatMessage(globalMessages.processingLabel)}
-          closeOnOverlayClick={false}
-        >
-          <VerticalFlexContainer>
-            <LoadingSpinner />
-          </VerticalFlexContainer>
-        </Dialog>
-      );
-    } else {
+    if (this.readyToExportHistory({ delegationRequests, publicDeriver })) {
       exportDialog = (
         <ExportTransactionDialog
           isActionProcessing={isExporting}
@@ -346,27 +333,7 @@ class WalletSummaryPage extends Component<AllProps> {
     );
 
     const walletSummaryPageRevamp = (
-      <VerticalFlexContainer>
-        <NotificationMessage icon={successIcon} show={!!notification}>
-          {!!notification && (
-            <FormattedHTMLMessage
-              {...notification.message}
-              values={notification.values == null ? undefined : notification.values(intl)}
-            />
-          )}
-        </NotificationMessage>
-        {isLoading || hasAny ? null : (
-          <WalletEmptyBanner
-            goToReceivePage={() => {
-              this.generated.actions.router.goToRoute.trigger({
-                route: ROUTES.WALLETS.RECEIVE.ROOT,
-              });
-            }}
-            onBuySellClick={() =>
-              this.generated.actions.dialogs.open.trigger({ dialog: BuySellDialog })
-            }
-          />
-        )}
+      <Box>
         <WalletSummaryRevamp
           pendingAmount={unconfirmedAmount}
           shouldHideBalance={profile.shouldHideBalance}
@@ -381,6 +348,14 @@ class WalletSummaryPage extends Component<AllProps> {
           unitOfAccountSetting={profile.unitOfAccount}
           getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
           getHistoricalPrice={this.generated.stores.coinPriceStore.getHistoricalPrice}
+          shouldShowEmptyBanner={!isLoadingMore && !hasAny}
+          emptyBannerComponent={
+            <WalletEmptyBanner
+              onBuySellClick={() =>
+                this.generated.actions.dialogs.open.trigger({ dialog: BuySellDialog })
+              }
+            />
+          }
         />
 
         {walletTransactions}
@@ -458,7 +433,7 @@ class WalletSummaryPage extends Component<AllProps> {
             }}
           />
         ) : null}
-      </VerticalFlexContainer>
+      </Box>
     );
 
     return this.props.renderLayoutComponent({

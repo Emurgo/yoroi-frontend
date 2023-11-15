@@ -24,6 +24,8 @@ import {
   transferButton,
 } from '../pages/daedalusTransferPage';
 import { activeNavTab } from '../pages/walletPage';
+import { connectHwButton, createWalletButton, restoreWalletButton } from '../pages/newWalletPages';
+import { expect } from 'chai';
 
 Before({ tags: '@withWebSocketConnection' }, () => {
   closeMockServer();
@@ -84,6 +86,16 @@ When(/^I confirm Daedalus transfer funds$/, async function () {
 
 Then(/^I should see the Create wallet screen$/, async function () {
   await this.waitForElement(walletAddComponent);
+});
+
+Then(/^Revamp. I should see the Create wallet screen$/, async function () {
+  const createButtonIsDisplayed = await this.checkIfExists(createWalletButton);
+  const restoreButtonIsDisplayed = await this.checkIfExists(restoreWalletButton);
+  const connectHWButtonIsDisplayed = await this.checkIfExists(connectHwButton);
+
+  expect(
+    createButtonIsDisplayed && restoreButtonIsDisplayed && connectHWButtonIsDisplayed
+  ).to.be.true;
 });
 
 Then(/^I should see the Receive screen$/, async function () {

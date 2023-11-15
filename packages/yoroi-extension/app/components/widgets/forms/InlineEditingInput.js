@@ -1,6 +1,6 @@
 // @flow
-import { Component, } from 'react';
-import type { Node } from 'react';
+import { Component } from 'react';
+import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
@@ -10,6 +10,9 @@ import vjf from 'mobx-react-form/lib/validators/VJF';
 import styles from './InlineEditingInput.scss';
 import config from '../../../config';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { withLayout } from '../../../styles/context/layout';
+import type { InjectedLayoutProps } from '../../../styles/context/layout';
+import { Button } from '@mui/material';
 
 const messages = defineMessages({
   change: {
@@ -23,7 +26,7 @@ const messages = defineMessages({
   changesSaved: {
     id: 'inline.editing.input.changesSaved',
     defaultMessage: '!!!Your changes have been saved',
-  }
+  },
 });
 
 type Props = {|
@@ -46,44 +49,44 @@ type State = {|
 |};
 
 @observer
-export default class InlineEditingInput extends Component<Props, State> {
-  static defaultProps: {|className: void|} = {
-    className: undefined
+class InlineEditingInput extends Component<Props & InjectedLayoutProps, State> {
+  static defaultProps: {| className: void |} = {
+    className: undefined,
   };
 
   state: State = {
     isActive: false,
   };
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
-  validator: ReactToolboxMobxForm = new ReactToolboxMobxForm({
-    fields: {
-      inputField: {
-        value: this.props.inputFieldValue,
-        validators: [({ field }) => (
-          [
-            this.props.isValid(field.value),
-            this.props.validationErrorMessage
-          ]
-        )],
-      }
+  validator: ReactToolboxMobxForm = new ReactToolboxMobxForm(
+    {
+      fields: {
+        inputField: {
+          value: this.props.inputFieldValue,
+          validators: [
+            ({ field }) => [this.props.isValid(field.value), this.props.validationErrorMessage],
+          ],
+        },
+      },
+    },
+    {
+      options: {
+        validateOnChange: true,
+        validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
+      },
+      plugins: {
+        vjf: vjf(),
+      },
     }
-  }, {
-    options: {
-      validateOnChange: true,
-      validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
-    },
-    plugins: {
-      vjf: vjf()
-    },
-  });
+  );
 
-  submit: (() => void) = () => {
+  submit: () => void = () => {
     this.validator.submit({
-      onSuccess: async (form) => {
+      onSuccess: async form => {
         const { inputField } = form.values();
         if (inputField !== this.props.inputFieldValue) {
           await this.props.onSubmit(inputField);
@@ -92,36 +95,75 @@ export default class InlineEditingInput extends Component<Props, State> {
           this.props.onCancelEditing();
         }
         this.setState({ isActive: false });
-      }
+      },
     });
   };
 
-  handleInputKeyDown: ((event: KeyboardEvent) => void) = (event: KeyboardEvent) => {
-    if (event.which === 13) { // ENTER key
+  handleInputKeyDown: (event: KeyboardEvent) => void = (event: KeyboardEvent) => {
+    if (event.which === 13) {
+      // ENTER key
       this.onBlur();
     }
-    if (event.which === 27) { // ESCAPE key
+    if (event.which === 27) {
+      // ESCAPE key
       this.onCancel();
     }
   };
 
-  onFocus: (() => void) = () => {
+  onFocus: () => void = () => {
     this.setState({ isActive: true });
     this.props.onStartEditing();
   };
 
-  onBlur: (() => void) = () => {
+  onBlur: () => void = () => {
     if (this.state.isActive) {
       this.submit();
     }
   };
 
-  onCancel: (() => void) = () => {
+  onCancel: () => void = () => {
     const inputField = this.validator.$('inputField');
     inputField.value = this.props.inputFieldValue;
     this.setState({ isActive: false });
     this.props.onCancelEditing();
   };
+
+  renderCancelButton(): Node {
+    const { isActive, isRevampLayout } = this.props;
+    const { intl } = this.context;
+    const { validator } = this;
+    const inputField = validator.$('inputField');
+
+    if (!isActive) return null;
+
+    if (isRevampLayout)
+      return (
+        <Button
+          type="button"
+          onMouseDown={this.onCancel}
+          size="small"
+          sx={{
+            color: 'grayscale.900',
+            position: 'absolute',
+            top: '50%',
+            right: '13px',
+            transform: 'translateY(-80%)',
+          }}
+        >
+          {intl.formatMessage(messages.cancel)}
+        </Button>
+      );
+
+    return (
+      <button
+        type="button"
+        className={classnames([styles.button, inputField.error ? styles.error : ''])}
+        onMouseDown={this.onCancel}
+      >
+        {intl.formatMessage(messages.cancel)}
+      </button>
+    );
+  }
 
   componentDidUpdate(): void {
     if (this.props.isActive && this.inputField) {
@@ -147,10 +189,11 @@ export default class InlineEditingInput extends Component<Props, State> {
       className,
       styles.component,
       isActive ? null : styles.inactive,
+      inputField.error && styles.error,
     ]);
     const inputStyles = classnames([
       successfullyUpdated ? 'input_animateSuccess' : null,
-      isActive ? null : 'input_cursorPointer'
+      isActive ? null : 'input_cursorPointer',
     ]);
 
     return (
@@ -161,7 +204,6 @@ export default class InlineEditingInput extends Component<Props, State> {
         role="presentation"
         aria-hidden
       >
-
         <TextField
           className={inputStyles}
           type="text"
@@ -171,27 +213,21 @@ export default class InlineEditingInput extends Component<Props, State> {
           onChange={inputField.onChange}
           onKeyDown={event => this.handleInputKeyDown(event)}
           error={isActive ? inputField.error : ''}
-          inputRef={(input) => { this.inputField = input; }}
+          inputRef={input => {
+            this.inputField = input;
+          }}
         />
 
-        {isActive && (
-          <button
-            type="button"
-            className={classnames([styles.button, inputField.error ? styles.error : ''])}
-            onMouseDown={this.onCancel}
-          >
-            {intl.formatMessage(messages.cancel)}
-          </button>
-        )}
+        {this.renderCancelButton()}
 
         {successfullyUpdated && (
           <div className={styles.savingResultLabel}>
             {intl.formatMessage(messages.changesSaved)}
           </div>
         )}
-
       </div>
     );
   }
-
 }
+
+export default (withLayout(InlineEditingInput): ComponentType<Props>);

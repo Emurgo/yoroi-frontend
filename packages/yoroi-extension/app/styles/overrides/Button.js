@@ -1,5 +1,5 @@
 // @flow
-import { revampBaseTheme } from '../themes/revamp-base-theme';
+import { revampBaseTheme } from '../themes/revamp/light-theme-mui';
 
 const ClassicButton: any = {
   styleOverrides: {
@@ -354,45 +354,45 @@ const RevampButton: any = {
         padding: '8px',
         fontSize: '0.875rem',
         backgroundColor: 'transparent',
-        color: revampBaseTheme.palette.gray[600],
+        color: revampBaseTheme.palette.grayscale[600],
         border: '1px solid',
-        borderColor: revampBaseTheme.palette.gray[400],
+        borderColor: revampBaseTheme.palette.grayscale[400],
         ':hover': {
-          borderColor: revampBaseTheme.palette.gray[500],
+          borderColor: revampBaseTheme.palette.grayscale[500],
         },
         '&.Mui-active': {
-          backgroundColor: revampBaseTheme.palette.gray[50],
+          backgroundColor: revampBaseTheme.palette.grayscale[50],
         },
         '&.Mui-disabled': {
           border: '1px solid',
           opacity: 0.4,
-          borderColor: revampBaseTheme.palette.gray[400],
-          color: revampBaseTheme.palette.gray[600],
+          borderColor: revampBaseTheme.palette.grayscale[400],
+          color: revampBaseTheme.palette.grayscale[600],
         },
         '& .MuiLoadingButton-loadingIndicator': {
-          color: revampBaseTheme.palette.gray[600],
+          color: revampBaseTheme.palette.grayscale[600],
         },
       },
     },
     {
       props: { variant: 'contained', color: 'error' },
       style: {
-        backgroundColor: revampBaseTheme.palette.error[200],
+        backgroundColor: revampBaseTheme.palette.magenta[300],
         color: revampBaseTheme.palette.common.white,
         border: 0,
         ':hover': {
-          backgroundColor: revampBaseTheme.palette.error[100],
+          backgroundColor: revampBaseTheme.palette.magenta[100],
         },
         '&.Mui-active': {
-          backgroundColor: revampBaseTheme.palette.error[200],
+          backgroundColor: revampBaseTheme.palette.magenta[300],
         },
         '&.Mui-disabled': {
-          backgroundColor: revampBaseTheme.palette.error[200],
+          backgroundColor: revampBaseTheme.palette.magenta[300],
           color: revampBaseTheme.palette.common.white,
           opacity: 0.4,
         },
         '& .MuiLoadingButton-loadingIndicator': {
-          color: revampBaseTheme.palette.error[200],
+          color: revampBaseTheme.palette.magenta[300],
         },
       },
     },
@@ -400,26 +400,26 @@ const RevampButton: any = {
       props: { variant: 'outlined', color: 'error' },
       style: {
         backgroundColor: revampBaseTheme.palette.common.white,
-        color: revampBaseTheme.palette.error[500],
+        color: revampBaseTheme.palette.magenta[500],
         border: '2px solid',
-        borderColor: revampBaseTheme.palette.error[500],
+        borderColor: revampBaseTheme.palette.magenta[500],
         ':hover': {
           border: '2px solid',
-          color: revampBaseTheme.palette.error[400],
-          borderColor: revampBaseTheme.palette.error[400],
+          color: revampBaseTheme.palette.magenta[400],
+          borderColor: revampBaseTheme.palette.magenta[400],
         },
         ':active': {
-          borderColor: revampBaseTheme.palette.error[400],
+          borderColor: revampBaseTheme.palette.magenta[400],
         },
         ':focus': {
-          borderColor: revampBaseTheme.palette.error[400],
+          borderColor: revampBaseTheme.palette.magenta[400],
         },
         '&.Mui-disabled': {
           border: '2px solid',
           opacity: 0.4,
         },
         '& .MuiLoadingButton-loadingIndicator': {
-          color: revampBaseTheme.palette.error[500],
+          color: revampBaseTheme.palette.magenta[500],
         },
       },
     },
