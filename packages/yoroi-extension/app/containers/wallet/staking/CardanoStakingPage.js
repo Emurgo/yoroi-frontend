@@ -103,6 +103,10 @@ class CardanoStakingPage extends Component<AllProps, State> {
       }
       const balance = this.generated.stores.transactions.getBalance(publicDeriver);
       const isWalletWithNoFunds = balance != null && balance.getDefaultEntry().amount.isZero();
+      const poolList = (
+        delegationRequests.getDelegatedBalance.result?.delegation != null &&
+          this._isRegistered(publicDeriver)
+      ) ? [delegationRequests.getDelegatedBalance.result?.delegation] : [];
 
       const classicCardanoStakingPage = (
         <div id="classicCardanoStakingPage">
@@ -112,12 +116,8 @@ class CardanoStakingPage extends Component<AllProps, State> {
             locale={locale}
             bias={stakingListBias}
             totalAda={totalAda}
-            poolList={
-              delegationRequests.getDelegatedBalance.result?.delegation != null
-                ? [delegationRequests.getDelegatedBalance.result?.delegation]
-                : []
-            }
-            stakepoolSelectedAction={async poolId => {
+            poolList={poolList}
+            stakepoolSelectedAction={async (poolId) => {
               await this._updatePool(poolId);
               await this._next();
             }}
@@ -154,11 +154,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
               locale={locale}
               bias={stakingListBias}
               totalAda={totalAda}
-              poolList={
-                delegationRequests.getDelegatedBalance.result?.delegation != null
-                  ? [delegationRequests.getDelegatedBalance.result?.delegation]
-                  : []
-              }
+              poolList={poolList}
               setFirstPool={pool => {
                 this.setState({ firstPool: pool });
               }}
