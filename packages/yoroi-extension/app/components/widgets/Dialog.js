@@ -153,7 +153,10 @@ const CloseButton = ({ onClose, closeButton }) => (
 
 const ModalContainer = styled(Box)(({ theme }) => ({
   position: 'relative',
-  minWidth: theme.name === 'classic' ? 'var(--yoroi-comp-dialog-min-width-md)' : '612px',
+  minWidth:
+    theme.name === 'classic' || theme.name === 'modern'
+      ? 'var(--yoroi-comp-dialog-min-width-md)'
+      : '612px',
   borderRadius: theme.name === 'classic' ? 0 : 8,
   paddingTop: theme.name === 'classic' ? '25px' : '0px',
   paddingBottom: theme.name === 'classic' ? '30px' : '24px',
