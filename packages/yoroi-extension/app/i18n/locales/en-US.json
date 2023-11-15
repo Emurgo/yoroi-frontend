@@ -325,6 +325,8 @@
   "settings.menu.termsOfUse.link.label": "Terms of use",
   "settings.menu.termsOfService.link.label": "Terms of Service Agreement",
   "settings.menu.wallet.link.label": "Wallet",
+  "swap.menu.swap": "Asset swap",
+  "swap.menu.orders": "Orders",
   "settings.noexternal.dialog.content": "Your memos are stored locally. They will not automatically sync with other Yoroi instances and will be lost if you delete Yoroi",
   "settings.noexternal.dialog.title": "No external storage",
   "settings.paperWallet.createPaper.label": "Create Paper Wallet",
