@@ -129,7 +129,7 @@ export default class StakingDashboardPage extends Component<Props> {
           getLocalPoolInfo: this.generated.stores.delegation.getLocalPoolInfo,
           tokenInfo: this.generated.stores.tokenInfoStore.tokenInfo,
         })}
-        hideGraph={!this._isRegistered(publicDeriver)}
+        isUnregistered={!this._isRegistered(publicDeriver)}
         epochLength={this.getEpochLengthInDays(publicDeriver)}
         ticker={truncateToken(getTokenName(
           this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
