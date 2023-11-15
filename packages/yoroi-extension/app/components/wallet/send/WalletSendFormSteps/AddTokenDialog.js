@@ -21,7 +21,6 @@ import { getTokens } from '../../../../utils/wallet';
 import { Box } from '@mui/system';
 import { formattedAmountToNaturalUnits } from '../../../../utils/formatters';
 import Dialog from '../../../widgets/Dialog';
-import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import styles from './AddTokenDialog.scss';
 import { ReactComponent as SearchIcon } from '../../../../assets/images/assets-page/search.inline.svg';
 import { ReactComponent as ArrowsListFromBottom } from '../../../../assets/images/assets-page/arrows-list-from-bottom.inline.svg';
@@ -208,8 +207,8 @@ export default class AddTokenDialog extends Component<Props, State> {
           changed = true;
         }
       } else if (included && amount != null) {
-          tokens.push({ tokenId: token.TokenId, amount: amount.toString() });
-          changed = true;
+        tokens.push({ tokenId: token.TokenId, amount: amount.toString() });
+        changed = true;
       }
       if (!included) {
         toRemove.push(token);
@@ -343,7 +342,7 @@ export default class AddTokenDialog extends Component<Props, State> {
         closeOnOverlayClick={false}
         className={styles.dialog}
         onClose={onClose}
-        closeButton={<DialogCloseButton />}
+        withCloseButton
       >
         <Box py="24px" className={styles.component}>
           <Box sx={{ width: '100%' }}>

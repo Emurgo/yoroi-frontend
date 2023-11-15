@@ -4,7 +4,7 @@ import type { Node, Element, ComponentType } from 'react';
 import React from 'react';
 import classnames from 'classnames';
 import { map } from 'lodash';
-import { Modal, Typography } from '@mui/material';
+import { IconButton, Modal, Typography } from '@mui/material';
 import { Box, styled } from '@mui/system';
 import { LoadingButton } from '@mui/lab';
 import { withLayout } from '../../styles/context/layout';
@@ -141,13 +141,17 @@ const CloseButton = ({ onClose, closeButton }) => (
     sx={{
       position: 'absolute',
       display: 'inline-flex',
-      right: '24px',
-      top: '24px',
+      right: '16px',
+      top: '16px',
       cursor: 'pointer',
     }}
     onClick={onClose}
   >
-    {closeButton || <CrossIcon />}
+    {closeButton || (
+      <IconButton>
+        <CrossIcon />
+      </IconButton>
+    )}
   </Box>
 );
 
