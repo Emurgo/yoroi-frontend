@@ -15,10 +15,12 @@ import { splitAmount, truncateToken } from '../../../utils/formatters';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { hiddenAmount } from '../../../utils/strings';
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';
-import { Button, Typography, Grid } from '@mui/material';
+import { Button, Typography, Grid, Stack } from '@mui/material';
 import { Box } from '@mui/system';
 import BigNumber from 'bignumber.js';
 import { ReactComponent as ExportTxToFileSvg } from '../../../assets/images/transaction/export.inline.svg';
+import LoadingSpinner from '../../widgets/LoadingSpinner';
+import FullscreenLayout from '../../layout/FullscreenLayout';
 
 const messages = defineMessages({
   pendingOutgoingConfirmationLabel: {
@@ -164,7 +166,6 @@ export default class WalletSummaryRevamp extends Component<Props> {
   render(): Node {
     const {
       pendingAmount,
-      //numberOfTransactions,
       isLoadingTransactions,
       openExportTxToFileDialog,
       shouldShowEmptyBanner,
@@ -174,7 +175,16 @@ export default class WalletSummaryRevamp extends Component<Props> {
 
     const hasPendingAmount = pendingAmount.incoming.length || pendingAmount.outgoing.length;
 
-    const content = (
+    if (isLoadingTransactions)
+      return (
+        <FullscreenLayout>
+          <Stack alignItems="center" justifyContent="center" height="50vh">
+            <LoadingSpinner />
+          </Stack>
+        </FullscreenLayout>
+      );
+
+    return (
       <Box id="walletSummary_box" sx={{ bgcolor: 'common.white' }}>
         <Box
           sx={{
@@ -192,7 +202,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
           >
             {intl.formatMessage({ id: 'wallet.navigation.transactions' })}
           </Typography>
-          { /* numberOfTransactions !== 0 && */ !isLoadingTransactions && (
+          {!isLoadingTransactions && (
             <Button
               variant="tertiary"
               color="primary"
@@ -256,8 +266,6 @@ export default class WalletSummaryRevamp extends Component<Props> {
         )}
       </Box>
     );
-
-    return content;
   }
 }
 
