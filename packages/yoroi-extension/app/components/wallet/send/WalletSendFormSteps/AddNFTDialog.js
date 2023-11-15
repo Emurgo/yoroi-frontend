@@ -5,7 +5,6 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import Dialog from '../../../widgets/Dialog';
-import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import styles from './AddNFTDialog.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { MultiToken } from '../../../../api/common/lib/MultiToken';
@@ -195,7 +194,7 @@ export default class AddNFTDialog extends Component<Props, State> {
         closeOnOverlayClick={false}
         className={styles.dialog}
         onClose={onClose}
-        closeButton={<DialogCloseButton />}
+        withCloseButton
       >
         <div className={styles.component}>
           <Box sx={{ position: 'relative', width: '100%' }}>
