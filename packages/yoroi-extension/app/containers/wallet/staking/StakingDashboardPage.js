@@ -258,7 +258,7 @@ export default class StakingDashboardPage extends Component<Props> {
           upcomingRewards.unshift(
             this.generateUpcomingRewardInfo({
               epoch: currTimeRequests.currentEpoch + i + 1,
-              pools: currEpochCert.pools,
+              pools: isRegistered ? currEpochCert.pools : [],
               toAbsoluteSlot,
               toRealTime,
               timeSinceGenesis,
@@ -271,7 +271,7 @@ export default class StakingDashboardPage extends Component<Props> {
           upcomingRewards.unshift(
             this.generateUpcomingRewardInfo({
               epoch: currTimeRequests.currentEpoch + 2,
-              pools: result.prevEpoch.pools,
+              pools: isRegistered ? result.prevEpoch.pools : [],
               toAbsoluteSlot,
               toRealTime,
               timeSinceGenesis,
@@ -284,7 +284,7 @@ export default class StakingDashboardPage extends Component<Props> {
           upcomingRewards.unshift(
             this.generateUpcomingRewardInfo({
               epoch: currTimeRequests.currentEpoch + 1,
-              pools: result.prevPrevEpoch.pools,
+              pools: isRegistered ? result.prevPrevEpoch.pools : [],
               toAbsoluteSlot,
               toRealTime,
               timeSinceGenesis,
@@ -298,7 +298,7 @@ export default class StakingDashboardPage extends Component<Props> {
           upcomingRewards.unshift(
             this.generateUpcomingRewardInfo({
               epoch: currTimeRequests.currentEpoch,
-              pools: result.prevPrevPrevEpoch.pools,
+              pools: isRegistered ? result.prevPrevPrevEpoch.pools : [],
               toAbsoluteSlot,
               toRealTime,
               timeSinceGenesis,
@@ -653,7 +653,8 @@ export default class StakingDashboardPage extends Component<Props> {
         isDelegated={
           showRewardAmount &&
           request.delegationRequests.getDelegatedBalance.result !== null &&
-          currentlyDelegating
+          currentlyDelegating &&
+          this._isRegistered(request.publicDeriver) === true
         }
       />
     );
