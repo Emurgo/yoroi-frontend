@@ -57,6 +57,7 @@ function CardanoSignTx({
     <Box>
       <Box>
         <RenderCip95Info cip95Info={cip95Info} />
+        <br />
       </Box>
       <CardanoSignTxSummary
         renderExplorerHashLink={renderExplorerHashLink}
@@ -195,6 +196,14 @@ const Panel = ({ children }): Node => (
 const RenderCip95Info = ({
   cip95Info
 }): Node => {
+  function renderCoin(c) {
+    try {
+      return new BigNumber(c).div(1_000_000).toString();
+    } catch (e) {
+      console.error(e);
+      return String(c);
+    }
+  }
   return [
     ...cip95Info.filter(c => c.type === 'StakeRegistrationCert').map((c, i) => {
       if (c.type !== 'StakeRegistrationCert') {
@@ -204,7 +213,7 @@ const RenderCip95Info = ({
         <div key={`StakeRegistrationCert${i}`}>
           <span>Register stake credential</span>
           {c.coin && (
-            <span>with {c.coin} ADA deposit</span>
+            <span>with {renderCoin(c.coin)} ADA deposit</span>
           )}
         </div>
       );
@@ -217,7 +226,7 @@ const RenderCip95Info = ({
         <div key={`StakeDeregistrationCert${i}`}>
           <span>Deregister stake credential</span>
           {c.coin && (
-            <span>and return {c.coin} ADA deposit</span>
+            <span>and return {renderCoin(c.coin)} ADA deposit</span>
           )}
         </div>
       );
@@ -255,7 +264,7 @@ const RenderCip95Info = ({
       }
       return (
         <div key={`StakeRegDelegCert${i}`}>
-          <div>Register your stake credential with deposit of {c.coin} ADA and delegate to stake pool</div>
+          <div>Register your stake credential with deposit of {renderCoin(c.coin)} ADA and delegate to stake pool</div>
           <div>${c.poolKeyHash}</div>
         </div>
       );
@@ -266,7 +275,7 @@ const RenderCip95Info = ({
       }
       return (
         <div key={`VoteRegDelegCert${i}`}>
-          <div>Register your stake credential with deposit of {c.coin} ADA and delegate to the DRep</div>
+          <div>Register your stake credential with deposit of {renderCoin(c.coin)} ADA and delegate to the DRep</div>
           <div>${c.drep}</div>
         </div>
       );
@@ -277,7 +286,7 @@ const RenderCip95Info = ({
       }
       return (
         <div key={`StakeVoteRegDelegCert${i}`}>
-          <div>Register your stake credential with deposit of {c.coin} ADA and delegate to the DRep</div>
+          <div>Register your stake credential with deposit of {renderCoin(c.coin)} ADA and delegate to the DRep</div>
           <div>${c.drep} and the stake pool</div>
           <div>${c.poolKeyHash}</div>
         </div>
@@ -289,7 +298,7 @@ const RenderCip95Info = ({
       }
       return (
         <div key={`RegDrepCert${i}`}>
-          <div>Register DRep credential with deposit {c.coin} ADA</div>
+          <div>Register DRep credential with deposit {renderCoin(c.coin)} ADA</div>
           {c.anchor && (
             <>
               <div>URL: {c.anchor.url}</div>
@@ -305,7 +314,7 @@ const RenderCip95Info = ({
       }
       return (
         <div key={`UnregDrepCert${i}`}>
-          Unregister DRep credential and return {c.coin} ADA deposit
+          Unregister DRep credential and return {renderCoin(c.coin)} ADA deposit
         </div>
       );
     }),
@@ -330,7 +339,7 @@ const RenderCip95Info = ({
         throw new Error('unexpected type');
       }
       return (
-        <div key={`TreasuryValue${i}`}>Treasury value: {c.coin} ADA</div>
+        <div key={`TreasuryValue${i}`}>Treasury value: {renderCoin(c.coin)} ADA</div>
       );
     }),
     ...cip95Info.filter(c => c.type === 'TreasuryDonation').map((c, i) => {
@@ -338,7 +347,7 @@ const RenderCip95Info = ({
         throw new Error('unexpected type');
       }
       return (
-        <div key={`TreasuryDonation${i}`}>Treasury donation: {c.positiveCoin} ADA</div>
+        <div key={`TreasuryDonation${i}`}>Treasury donation: {renderCoin(c.positiveCoin)} ADA</div>
       );
     }),
     ...cip95Info.filter(c => c.type === 'VotingProcedure').map((c, i) => {
