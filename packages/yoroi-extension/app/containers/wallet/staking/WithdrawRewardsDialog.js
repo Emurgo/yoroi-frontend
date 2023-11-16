@@ -284,8 +284,10 @@ export default class WithdrawRewardsDialog extends Component<Props> {
         closeOnOverlayClick={false}
         onClose={this.props.onClose}
         closeButton={<DialogCloseButton />}
+        scrollableContentClass="WithdrawRewards"
+        styleOverride={{ width: '648px' }}
       >
-        <Box maxWidth="580px">
+        <Box className="WithdrawRewards" overflowY="auto" maxHeight="70vh" maxWidth="604px">
           {shouldDeregister && (
             <Box mb="24px">
               <Warning>

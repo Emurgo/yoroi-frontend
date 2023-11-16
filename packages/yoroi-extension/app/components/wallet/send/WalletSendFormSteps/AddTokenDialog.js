@@ -341,14 +341,27 @@ export default class AddTokenDialog extends Component<Props, State> {
             ? intl.formatMessage(globalMessages.tokens)
             : intl.formatMessage(messages.nTokens, { number: fullTokensList.length })
         }
+        actions={[
+          {
+            disabled:
+              fullTokensList.length === 0 ||
+              hasSelectedTokensIncluded.length === 0 ||
+              !this.isValidAmounts() ||
+              !shouldAddMore,
+            onClick: this.onAddAll,
+            primary: true,
+            label: intl.formatMessage(globalMessages.confirm),
+          },
+        ]}
         closeOnOverlayClick={false}
         className={styles.dialog}
         onClose={onClose}
         withCloseButton
+        scrollableContentClass="CurrentTokensList"
       >
         <Box className={styles.component}>
           <Box sx={{ width: '100%' }}>
-            <Box sx={{ position: 'relative', mx: '24px' }}>
+            <Box sx={{ position: 'relative' }}>
               <Box
                 sx={{
                   position: 'absolute',
@@ -383,7 +396,7 @@ export default class AddTokenDialog extends Component<Props, State> {
             </Box>
           )}
           {!shouldAddMore && (
-            <Box sx={{ marginTop: '10px', px: '24px' }}>
+            <Box sx={{ marginTop: '10px' }}>
               <MaxAssetsError maxAssetsAllowed={10} />
             </Box>
           )}
@@ -403,7 +416,6 @@ export default class AddTokenDialog extends Component<Props, State> {
                 borderBottom="1px solid"
                 borderBottomColor="grayscale.200"
                 className={styles.columns}
-                px="24px"
               >
                 <li>
                   <button type="button" onClick={() => this.sortTokens(SORTING_COLUMNS.LABEL)}>
@@ -434,8 +446,8 @@ export default class AddTokenDialog extends Component<Props, State> {
                 height="320px"
                 overflow="auto"
                 pr={currentTokensList.length > 4 ? '4px' : '24px'}
-                pl="24px"
                 pt="10px"
+                className="CurrentTokensList"
               >
                 {currentTokensList.map(token => (
                   <SingleTokenRow
@@ -452,21 +464,6 @@ export default class AddTokenDialog extends Component<Props, State> {
               </Box>
             </Box>
           )}
-        </Box>
-        <Box px="24px" pt="24px">
-          <Button
-            fullWidth
-            disabled={
-              fullTokensList.length === 0 ||
-              hasSelectedTokensIncluded.length === 0 ||
-              !this.isValidAmounts() ||
-              !shouldAddMore
-            }
-            onClick={this.onAddAll}
-            variant="primary"
-          >
-            {intl.formatMessage(globalMessages.confirm)}
-          </Button>
         </Box>
       </Dialog>
     );

@@ -197,6 +197,18 @@ export default class AddNFTDialog extends Component<Props, State> {
         className={styles.dialog}
         onClose={onClose}
         withCloseButton
+        scrollableContentClass={styles.nftsGrid}
+        actions={[
+          {
+            disabled:
+              hasSelectedTokensIncluded.length === 0 ||
+              !shouldAddMore ||
+              currentNftsList.length === 0,
+            onClick: this.onAddAll,
+            primary: true,
+            label: intl.formatMessage(globalMessages.confirm),
+          },
+        ]}
       >
         <div className={styles.component}>
           <Box sx={{ position: 'relative', width: '100%' }}>
@@ -290,20 +302,6 @@ export default class AddNFTDialog extends Component<Props, State> {
             </>
           )}
         </div>
-        <Box px="24px" pt="24px">
-          <Button
-            fullWidth
-            disabled={
-              hasSelectedTokensIncluded.length === 0 ||
-              !shouldAddMore ||
-              currentNftsList.length === 0
-            }
-            onClick={this.onAddAll}
-            variant="primary"
-          >
-            {intl.formatMessage(globalMessages.confirm)}
-          </Button>
-        </Box>
       </Dialog>
     );
   }

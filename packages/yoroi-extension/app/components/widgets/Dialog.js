@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 // @flow
 import type { Node, Element, ComponentType } from 'react';
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import classnames from 'classnames';
 import { map } from 'lodash';
 import { IconButton, Modal, Typography } from '@mui/material';
@@ -29,6 +29,7 @@ export type Props = {|
   +withCloseButton?: boolean,
   +backButton?: Node,
   +className?: string,
+  +scrollableContentClass?: string,
   +styleOverride?: { ... },
   +onClose?: ?(void) => PossiblyAsync<void>,
   +closeOnOverlayClick?: boolean,
@@ -48,8 +49,32 @@ function DialogFn(props: Props & InjectedProps): Node {
     closeButton,
     withCloseButton,
     backButton,
+    scrollableContentClass,
     isRevampLayout,
   } = props;
+
+  const hasScroll = useRef(null);
+  const [contentHasScroll, setContentHasScroll] = useState(false);
+
+  useEffect(() => {
+    console.log('🚀 > hasScroll:', hasScroll);
+    if (hasScroll.current === true) return;
+
+    setTimeout(() => {
+      const el = document.querySelector(
+        scrollableContentClass ? `.${scrollableContentClass}` : '.ModalContent'
+      );
+
+      if (el.clientHeight < el.scrollHeight) {
+        hasScroll.current = true;
+        el.style.marginRight = '-24px';
+      } else {
+        hasScroll.current = false;
+      }
+
+      setContentHasScroll(hasScroll.current);
+    }, 50);
+  }, [children]);
 
   const hasCloseButton = withCloseButton || closeButton;
 
@@ -81,15 +106,16 @@ function DialogFn(props: Props & InjectedProps): Node {
         className={className}
         style={props.styleOverride}
         boxShadow="0px 13px 20px -1px #00000026"
+        contentHasScroll={contentHasScroll}
       >
         {title != null && title !== '' ? (
           <Typography as="h1" variant="body1" className="dialog__title">
             {title}
           </Typography>
         ) : null}
-        {children != null ? <ModalContent>{children}</ModalContent> : null}
+        {children != null ? <ModalContent className="ModalContent">{children}</ModalContent> : null}
         {actions && actions.length > 0 && (
-          <ModalFooter>
+          <ModalFooter contentHasScroll={contentHasScroll}>
             {map(actions, (action, i: number) => {
               const buttonClasses = classnames([
                 // Keep classnames for testing
@@ -131,6 +157,7 @@ DialogFn.defaultProps = {
   closeButton: undefined,
   backButton: undefined,
   className: undefined,
+  scrollableContentClass: undefined,
   styleOverride: undefined,
   onClose: undefined,
   closeOnOverlayClick: false,
@@ -155,7 +182,7 @@ const CloseButton = ({ onClose, closeButton }) => (
   </Box>
 );
 
-const ModalContainer = styled(Box)(({ theme }) => ({
+const ModalContainer = styled(Box)(({ theme, contentHasScroll }) => ({
   position: 'relative',
   minWidth:
     theme.name === 'classic' || theme.name === 'modern'
@@ -178,7 +205,12 @@ const ModalContainer = styled(Box)(({ theme }) => ({
     textTransform: 'uppercase',
     letterSpacing: 0,
     display: 'block',
-    borderBottom: theme.name === 'classic' || theme.name === 'modern' ? '' : '1px solid',
+    borderBottom:
+      theme.name === 'classic' || theme.name === 'modern'
+        ? ''
+        : contentHasScroll
+        ? '1px solid'
+        : '',
     borderBottomColor:
       theme.name === 'classic' || theme.name === 'modern'
         ? theme.palette.gray['200']
@@ -189,20 +221,26 @@ const ModalContainer = styled(Box)(({ theme }) => ({
 const ModalContent = styled(Box)(({ theme }) => ({
   overflowX: 'hidden',
   overflowY: 'overlay',
-  maxHeight: '60vh',
+  maxHeight: '70vh',
   paddingLeft: theme.name === 'classic' ? '30px' : '24px',
   paddingRight: theme.name === 'classic' ? '30px' : '24px',
   paddingTop: theme.name === 'classic' ? '0px' : '24px',
   paddingBottom: theme.name === 'classic' || theme.name === 'modern' ? '0px' : '24px',
 }));
 
-const ModalFooter = styled(Box)(({ theme }) => ({
+const ModalFooter = styled(Box)(({ theme, contentHasScroll }) => ({
   display: 'flex',
   paddingLeft: theme.name === 'classic' ? '30px' : '24px',
   paddingRight: theme.name === 'classic' ? '30px' : '24px',
   paddingTop: theme.name === 'classic' || theme.name === 'modern' ? '0' : '24px',
   paddingBottom: theme.name === 'classic' || theme.name === 'modern' ? '0' : '24px',
   marginTop: theme.name === 'classic' ? '20px' : '0px',
+  borderTop:
+    theme.name === 'classic' || theme.name === 'modern' ? '' : contentHasScroll ? '1px solid' : '',
+  borderTopColor:
+    theme.name === 'classic' || theme.name === 'modern'
+      ? theme.palette.gray['200']
+      : theme.palette.grayscale['200'],
   '& button': {
     width: '50%',
     '&:only-child': {
