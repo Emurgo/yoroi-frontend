@@ -165,6 +165,7 @@ export default class URIGenerateDialog extends Component<Props> {
               label={this.getAmountLabel()}
               error={amountField.error}
               done={amountField.isValid}
+              placeholder="0"
               allowSigns={false}
               autoFocus
             />
