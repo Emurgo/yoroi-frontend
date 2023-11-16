@@ -74,7 +74,7 @@ type Props = {|
     +numPages: number,
     +goToPage: number => void,
   |},
-  +hideGraph: boolean,
+  +isUnregistered: boolean,
   +epochLength: ?number,
   +ticker: string,
 |};
@@ -86,7 +86,7 @@ export default class StakingDashboard extends Component<Props> {
   };
 
   render(): Node {
-    const { graphData, hideGraph } = this.props;
+    const { graphData, isUnregistered } = this.props;
 
     const pendingTxWarningComponent = this.props.hasAnyPending ? (
       <div className={styles.warningBox}>
@@ -94,7 +94,7 @@ export default class StakingDashboard extends Component<Props> {
       </div>
     ) : null;
 
-    const graphs = hideGraph ? null : (
+    const graphs = isUnregistered ? null : (
       <div className={styles.graphsWrapper}>
         {this._displayGraph(graphData.rewardsGraphData)}
         {/* <GraphWrapper
@@ -121,7 +121,7 @@ export default class StakingDashboard extends Component<Props> {
           </div>
           <div className={styles.bodyWrapper}>
             {graphs}
-            {this.displayStakePools(hideGraph)}
+            {this.displayStakePools(isUnregistered)}
           </div>
         </div>
       </div>
@@ -165,10 +165,10 @@ export default class StakingDashboard extends Component<Props> {
     );
   };
 
-  displayStakePools: boolean => Node = hideGraph => {
+  displayStakePools: boolean => Node = isUnregistered => {
     const width = classnames([
       // if they've delegated before we need to make space for the chart
-      !hideGraph ? styles.stakePoolMaxWidth : null,
+      !isUnregistered ? styles.stakePoolMaxWidth : null,
       styles.stakePool,
     ]);
     const { intl } = this.context;
@@ -207,13 +207,13 @@ export default class StakingDashboard extends Component<Props> {
       );
     }
     const currPool = this.props.pageInfo.currentPage;
-    if (this.props.stakePools.pools.length === 0) {
+    if (this.props.stakePools.pools.length === 0 || isUnregistered) {
       return (
         <div className={width}>
           <InformativeError
             title={intl.formatMessage(emptyDashboardMessages.title, { ticker: this.props.ticker })}
             text={
-              !hideGraph
+              !isUnregistered
                 ? // no need to explain to user how to delegate their ADA if they've done it before
                   null
                 : intl.formatMessage(emptyDashboardMessages.text)
