@@ -46,7 +46,6 @@ export default class ErrorPage extends Component<Props> {
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={onCancel}
-        className={styles.dialog}
       >
         <div className={styles.component}>
           <div>

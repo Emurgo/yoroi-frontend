@@ -58,7 +58,7 @@ export class SuccessPageRevamp extends Component<Props> {
           >
             <SuccessImg />
           </Box>
-          <Typography variant="body2" color="gray.900" textAlign="left" mt="4px" mb="24px">
+          <Typography variant="body1" color="grayscale.900" textAlign="left" mt="4px">
             {text}
           </Typography>
           {this.props.closeInfo == null && <LoadingSpinner />}

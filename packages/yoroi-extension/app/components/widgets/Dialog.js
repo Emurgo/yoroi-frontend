@@ -4,7 +4,7 @@ import type { Node, Element, ComponentType } from 'react';
 import React, { useEffect, useRef, useState } from 'react';
 import classnames from 'classnames';
 import { map } from 'lodash';
-import { IconButton, Modal, Typography } from '@mui/material';
+import { IconButton, Modal, Typography, alpha } from '@mui/material';
 import { Box, styled } from '@mui/system';
 import { LoadingButton } from '@mui/lab';
 import { withLayout } from '../../styles/context/layout';
@@ -57,23 +57,25 @@ function DialogFn(props: Props & InjectedProps): Node {
   const [contentHasScroll, setContentHasScroll] = useState(false);
 
   useEffect(() => {
-    console.log('🚀 > hasScroll:', hasScroll);
-    if (hasScroll.current === true) return;
-
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       const el = document.querySelector(
         scrollableContentClass ? `.${scrollableContentClass}` : '.ModalContent'
       );
 
+      if (!el) return;
+
       if (el.clientHeight < el.scrollHeight) {
-        hasScroll.current = true;
+        setContentHasScroll(true);
         el.style.marginRight = '-24px';
       } else {
-        hasScroll.current = false;
+        setContentHasScroll(false);
+        el.style.marginRight = '0';
       }
+    }, 30);
 
-      setContentHasScroll(hasScroll.current);
-    }, 50);
+    return () => {
+      clearTimeout(timeout);
+    };
   }, [children]);
 
   const hasCloseButton = withCloseButton || closeButton;
@@ -94,7 +96,9 @@ function DialogFn(props: Props & InjectedProps): Node {
             }
       }
       sx={{
-        background: 'var(--yoroi-comp-dialog-overlay-background-color)',
+        bgcolor: isRevampLayout
+          ? alpha('#121F4D', 0.7) // primary.900 70%
+          : 'var(--yoroi-comp-dialog-overlay-background-color)',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -187,7 +191,7 @@ const ModalContainer = styled(Box)(({ theme, contentHasScroll }) => ({
   minWidth:
     theme.name === 'classic' || theme.name === 'modern'
       ? 'var(--yoroi-comp-dialog-min-width-md)'
-      : '612px',
+      : '648px',
   borderRadius: theme.name === 'classic' ? 0 : 8,
   paddingTop: theme.name === 'classic' ? '25px' : '0px',
   paddingBottom: theme.name === 'classic' ? '30px' : '0px',
