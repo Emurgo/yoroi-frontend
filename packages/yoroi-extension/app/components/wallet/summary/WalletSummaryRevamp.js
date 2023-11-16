@@ -177,7 +177,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
 
     if (isLoadingTransactions)
       return (
-        <FullscreenLayout>
+        <FullscreenLayout bottomPadding={0}>
           <Stack alignItems="center" justifyContent="center" height="50vh">
             <LoadingSpinner />
           </Stack>
