@@ -90,6 +90,7 @@ export class RevampAnnouncementDialog extends Component<Props> {
             flexDirection: 'column',
             gap: '24px',
           }}
+          id='dialogRevampBox'
         >
           <Typography
             variant="body1"

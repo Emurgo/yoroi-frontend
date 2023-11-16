@@ -38,6 +38,10 @@
 
 :global(.YoroiRevamp) {
   .dialog {
+    p {
+      font-size: 16px;
+    }
+
     .checkbox {
       padding-bottom: 0px;
     }
