@@ -161,8 +161,8 @@ export default class AddNFTDialog extends Component<Props, State> {
           changed = true;
         }
       } else if (included) {
-          tokens.push({ tokenId: token.TokenId });
-          changed = true;
+        tokens.push({ tokenId: token.TokenId });
+        changed = true;
       }
       if (!included) {
         toRemove.push(token);
@@ -188,6 +188,8 @@ export default class AddNFTDialog extends Component<Props, State> {
     const { onClose, calculateMinAda, shouldAddMoreTokens } = this.props;
     const { currentNftsList, fullNftsList, selectedTokens } = this.state;
     const shouldAddMore = shouldAddMoreTokens(selectedTokens);
+    const hasSelectedTokensIncluded = selectedTokens.filter(t => t.included);
+
     return (
       <Dialog
         title={intl.formatMessage(messages.nNft, { number: fullNftsList.length })}
@@ -288,10 +290,14 @@ export default class AddNFTDialog extends Component<Props, State> {
             </>
           )}
         </div>
-        <Box p="24px">
+        <Box px="24px" pt="24px">
           <Button
             fullWidth
-            disabled={selectedTokens.length === 0 || !shouldAddMore || currentNftsList.length === 0}
+            disabled={
+              hasSelectedTokensIncluded.length === 0 ||
+              !shouldAddMore ||
+              currentNftsList.length === 0
+            }
             onClick={this.onAddAll}
             variant="primary"
           >

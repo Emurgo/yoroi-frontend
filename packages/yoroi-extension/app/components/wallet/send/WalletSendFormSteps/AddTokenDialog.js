@@ -332,6 +332,8 @@ export default class AddTokenDialog extends Component<Props, State> {
     const shouldAddMore = shouldAddMoreTokens(
       selectedTokens.map(({ token, included }) => ({ token, included }))
     );
+    const hasSelectedTokensIncluded = selectedTokens.filter(t => t.included);
+
     return (
       <Dialog
         title={
@@ -344,7 +346,7 @@ export default class AddTokenDialog extends Component<Props, State> {
         onClose={onClose}
         withCloseButton
       >
-        <Box py="24px" className={styles.component}>
+        <Box className={styles.component}>
           <Box sx={{ width: '100%' }}>
             <Box sx={{ position: 'relative', mx: '24px' }}>
               <Box
@@ -451,12 +453,12 @@ export default class AddTokenDialog extends Component<Props, State> {
             </Box>
           )}
         </Box>
-        <Box p="24px">
+        <Box px="24px" pt="24px">
           <Button
             fullWidth
             disabled={
               fullTokensList.length === 0 ||
-              selectedTokens.length === 0 ||
+              hasSelectedTokensIncluded.length === 0 ||
               !this.isValidAmounts() ||
               !shouldAddMore
             }

@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import DialogRevamp from '../widgets/DialogRevamp';
+import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import styles from './WalletListDialog.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -185,7 +185,7 @@ export default class WalletListDialog extends Component<Props, State> {
     const walletsTotal = this.renderWalletsTotal();
 
     return (
-      <DialogRevamp
+      <Dialog
         className={styles.component}
         title={intl.formatMessage(globalMessages.changeWallet)}
         closeOnOverlayClick
@@ -206,7 +206,7 @@ export default class WalletListDialog extends Component<Props, State> {
               </button>
             </div>
           </div>
-          <Box sx={{ overflow: 'auto',  overflowY: 'auto', paddingX: '40px', height: '400px' }}>
+          <Box sx={{ overflow: 'auto', overflowY: 'auto', paddingX: '24px', height: '400px' }}>
             {cardanoWalletsIdx.length > 0 && (
               <div className={styles.sectionHeader}>
                 <h1>{intl.formatMessage(messages.cardano)}</h1>
@@ -280,19 +280,13 @@ export default class WalletListDialog extends Component<Props, State> {
           <Stack
             spacing={1}
             direction="row"
-            sx={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '40px',
-              borderTop: '1px solid var(--yoroi-palette-gray-100)',
-            }}
+            sx={{ alignItems: 'center', justifyContent: 'center', padding: '24px' }}
           >
             <Button
               id="addWalletButton"
               onClick={onAddWallet}
               size="large"
-              variant="outlined"
-              color="primary"
+              variant="secondary"
               fullWidth
             >
               {intl.formatMessage(messages.addWallet)}
@@ -312,7 +306,7 @@ export default class WalletListDialog extends Component<Props, State> {
             </Button>
           </Stack>
         </Box>
-      </DialogRevamp>
+      </Dialog>
     );
   }
 

@@ -20,7 +20,7 @@ class ThemedDialog extends Component<Props & InjectedLayoutProps> {
       closeButton,
       backButton,
     } = this.props;
-    const Dialog = isRevampLayout ? DialogRevamp : DialogClassic;
+    const Dialog = DialogClassic;
 
     const dialogProps = {
       title,

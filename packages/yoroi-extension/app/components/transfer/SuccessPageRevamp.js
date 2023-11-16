@@ -7,7 +7,7 @@ import DialogCloseButton from '../widgets/DialogCloseButton';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 import { Box, Typography } from '@mui/material';
 import { ReactComponent as SuccessImg } from '../../assets/images/transfer-success.inline.svg';
-import DialogRevamp from '../widgets/DialogRevamp';
+import Dialog from '../widgets/Dialog';
 
 type Props = {|
   +title: string,
@@ -38,7 +38,7 @@ export class SuccessPageRevamp extends Component<Props> {
           ];
 
     return (
-      <DialogRevamp
+      <Dialog
         title={title}
         actions={actions}
         closeOnOverlayClick={false}
@@ -63,7 +63,7 @@ export class SuccessPageRevamp extends Component<Props> {
           </Typography>
           {this.props.closeInfo == null && <LoadingSpinner />}
         </Box>
-      </DialogRevamp>
+      </Dialog>
     );
   }
 }

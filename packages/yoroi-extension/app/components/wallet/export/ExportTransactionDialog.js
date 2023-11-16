@@ -6,8 +6,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { TransactionRowsToExportRequest } from '../../../actions/common/transactions-actions';
-import ClassicDialog from '../../widgets/Dialog';
-import DialogRevamp from '../../widgets/DialogRevamp';
+import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ErrorBlock from '../../widgets/ErrorBlock';
 import globalMessages from '../../../i18n/global-messages';
@@ -109,8 +108,6 @@ class ExportTransactionDialog extends Component<Props & InjectedLayoutProps, Sta
         onClick: () => submit({ startDate, endDate }),
       },
     ];
-
-    const Dialog = isRevampLayout ? DialogRevamp : ClassicDialog;
 
     return (
       <Dialog
