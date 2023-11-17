@@ -191,6 +191,25 @@ export default class WalletListDialog extends Component<Props, State> {
         closeOnOverlayClick
         closeButton={<DialogCloseButton />}
         onClose={this.props.close}
+        actions={[
+          {
+            id: 'addWalletButton',
+            onClick: onAddWallet,
+            size: 'large',
+            label: intl.formatMessage(messages.addWallet),
+          },
+          {
+            id: 'applyWalletButton',
+            onClick: this.onSelect,
+            size: 'large',
+            disabled:
+              this.state.selectedWallet === null ||
+              this.isCurrentWallet(this.state.selectedWallet, 'global'),
+            primary: true,
+            label: intl.formatMessage(messages.applyWallet),
+          },
+        ]}
+        scrollableContentClass="WalletList"
       >
         <Box>
           <div className={styles.header}>
@@ -206,7 +225,7 @@ export default class WalletListDialog extends Component<Props, State> {
               </button>
             </div>
           </div>
-          <Box sx={{ overflow: 'auto', overflowY: 'auto', paddingX: '24px', height: '400px' }}>
+          <Box className="WalletList" sx={{ overflow: 'auto', overflowY: 'auto', height: '400px' }}>
             {cardanoWalletsIdx.length > 0 && (
               <div className={styles.sectionHeader}>
                 <h1>{intl.formatMessage(messages.cardano)}</h1>
@@ -277,34 +296,6 @@ export default class WalletListDialog extends Component<Props, State> {
               </Droppable>
             </DragDropContext>
           </Box>
-          <Stack
-            spacing={1}
-            direction="row"
-            sx={{ alignItems: 'center', justifyContent: 'center', padding: '24px' }}
-          >
-            <Button
-              id="addWalletButton"
-              onClick={onAddWallet}
-              size="large"
-              variant="secondary"
-              fullWidth
-            >
-              {intl.formatMessage(messages.addWallet)}
-            </Button>
-            <Button
-              id="applyWalletButton"
-              onClick={this.onSelect}
-              size="large"
-              disabled={
-                this.state.selectedWallet === null ||
-                this.isCurrentWallet(this.state.selectedWallet, 'global')
-              }
-              fullWidth
-              variant="primary"
-            >
-              {intl.formatMessage(messages.applyWallet)}
-            </Button>
-          </Stack>
         </Box>
       </Dialog>
     );

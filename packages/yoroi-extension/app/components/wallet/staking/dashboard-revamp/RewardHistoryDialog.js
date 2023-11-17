@@ -17,7 +17,6 @@ import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import VerticallyCenteredLayout from '../../../layout/VerticallyCenteredLayout';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import { groupByPoolName } from '../utils';
-import styles from './RewardHistoryDialog.scss';
 
 const messages = defineMessages({
   epoch: {
@@ -53,49 +52,49 @@ function RewardHistoryDialog({ graphData, onClose, intl }: Props & Intl): Node {
 
   return (
     <Dialog
-      styleOverride={{ minWidth: '673px' }}
       title={intl.formatMessage(globalMessages.rewardHistory)}
       closeOnOverlayClick={false}
       closeButton={<DialogCloseButton onClose={onClose} />}
       onClose={onClose}
-      className={styles.dialog}
     >
-      <Typography mb="24px" variant="body1" fontWeight={500}>
-        {intl.formatMessage(globalMessages.rewardsListLabel)} ({rewardList.length})
-      </Typography>
-      <Box>
-        {graphData.rewardsGraphData.error && (
-          <div>
-            <center>
-              <InvalidURIImg />
-            </center>
-            <ErrorBlock error={graphData.rewardsGraphData.error} />
-          </div>
-        )}
-        {rewardList == null ? (
-          <VerticallyCenteredLayout>
-            <LoadingSpinner />
-          </VerticallyCenteredLayout>
-        ) : (
-          Object.entries(rewardsByPoolName ?? {}).map(([poolName, data]) => (
-            <RewardHistoryItem
-              key={poolName}
-              // $FlowFixMe[incompatible-use]: Object entries flow type
-              poolId={data.poolId}
-              poolName={poolName || '-'}
-              // $FlowFixMe[incompatible-use]: Object entries flow type
-              poolAvatar={data.poolAvatar}
-              // $FlowFixMe[incompatible-use]: Object entries flow type
-              historyList={data.map(item => ({
-                // TODO: Make sure it's "received" in all use cases
-                type: intl.formatMessage(messages.epoch, { number: item.name }),
-                date: item.date,
-                balance: item.primary,
-                currency: item.currency,
-              }))}
-            />
-          ))
-        )}
+      <Box maxWidth="600px">
+        <Typography mb="24px" variant="body1" fontWeight={500}>
+          {intl.formatMessage(globalMessages.rewardsListLabel)} ({rewardList.length})
+        </Typography>
+        <Box>
+          {graphData.rewardsGraphData.error && (
+            <div>
+              <center>
+                <InvalidURIImg />
+              </center>
+              <ErrorBlock error={graphData.rewardsGraphData.error} />
+            </div>
+          )}
+          {rewardList == null ? (
+            <VerticallyCenteredLayout>
+              <LoadingSpinner />
+            </VerticallyCenteredLayout>
+          ) : (
+            Object.entries(rewardsByPoolName ?? {}).map(([poolName, data]) => (
+              <RewardHistoryItem
+                key={poolName}
+                // $FlowFixMe[incompatible-use]: Object entries flow type
+                poolId={data.poolId}
+                poolName={poolName || '-'}
+                // $FlowFixMe[incompatible-use]: Object entries flow type
+                poolAvatar={data.poolAvatar}
+                // $FlowFixMe[incompatible-use]: Object entries flow type
+                historyList={data.map(item => ({
+                  // TODO: Make sure it's "received" in all use cases
+                  type: intl.formatMessage(messages.epoch, { number: item.name }),
+                  date: item.date,
+                  balance: item.primary,
+                  currency: item.currency,
+                }))}
+              />
+            ))
+          )}
+        </Box>
       </Box>
     </Dialog>
   );

@@ -154,7 +154,7 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
     return (
       <>
         <div align="center">
-          <QrCodeWrapper value={this.props.addressInfo.address} size={152} />
+          <QrCodeWrapper fgColor="black" value={this.props.addressInfo.address} size={152} />
         </div>
         <br />
         <br />

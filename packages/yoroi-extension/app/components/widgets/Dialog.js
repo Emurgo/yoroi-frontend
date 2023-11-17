@@ -19,6 +19,8 @@ export type ActionType = {|
   +isSubmitting?: boolean,
   +disabled?: boolean,
   +className?: ?string,
+  +id?: ?string,
+  +size?: ?string,
 |};
 
 export type Props = {|
@@ -78,6 +80,8 @@ function DialogFn(props: Props & InjectedProps): Node {
     };
   }, [children]);
 
+  const hasActions = actions && actions.length > 0;
+
   const hasCloseButton = withCloseButton || closeButton;
 
   const hasSubmitting =
@@ -117,8 +121,15 @@ function DialogFn(props: Props & InjectedProps): Node {
             {title}
           </Typography>
         ) : null}
-        {children != null ? <ModalContent className="ModalContent">{children}</ModalContent> : null}
-        {actions && actions.length > 0 && (
+        {children != null ? (
+          <ModalContent
+            pb={contentHasScroll || !hasActions ? '24px' : '0px !important'}
+            className="ModalContent"
+          >
+            {children}
+          </ModalContent>
+        ) : null}
+        {hasActions && (
           <ModalFooter contentHasScroll={contentHasScroll}>
             {map(actions, (action, i: number) => {
               const buttonClasses = classnames([
@@ -128,13 +139,14 @@ function DialogFn(props: Props & InjectedProps): Node {
               ]);
               return (
                 <LoadingButton
-                  id={action.primary === true ? 'primaryButton' : 'secondaryButton'}
+                  id={action.id ?? action.primary === true ? 'primaryButton' : 'secondaryButton'}
                   key={i}
                   {...getBtnVariant(action.danger, action.primary, isRevampLayout)}
                   className={buttonClasses}
                   loading={action.isSubmitting}
                   onClick={action.onClick}
                   disabled={action.disabled === true || action.isSubmitting === true}
+                  size={action.size}
                 >
                   {action.label}
                 </LoadingButton>
@@ -234,6 +246,7 @@ const ModalContent = styled(Box)(({ theme }) => ({
 
 const ModalFooter = styled(Box)(({ theme, contentHasScroll }) => ({
   display: 'flex',
+  gap: '24px',
   paddingLeft: theme.name === 'classic' ? '30px' : '24px',
   paddingRight: theme.name === 'classic' ? '30px' : '24px',
   paddingTop: theme.name === 'classic' || theme.name === 'modern' ? '0' : '24px',
@@ -247,13 +260,7 @@ const ModalFooter = styled(Box)(({ theme, contentHasScroll }) => ({
       : theme.palette.grayscale['200'],
   '& button': {
     width: '50%',
-    '&:only-child': {
-      margin: 'auto',
-      width: '100%',
-    },
-    '& + button': {
-      marginLeft: '20px',
-    },
+    '&:only-child': { width: '100%' },
   },
 }));
 
