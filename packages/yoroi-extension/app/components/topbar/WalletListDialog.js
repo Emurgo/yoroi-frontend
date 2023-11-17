@@ -1,27 +1,26 @@
 // @flow
-import { BigNumber } from 'bignumber.js';
 import type { Node } from 'react';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
+import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+import type { WalletsNavigation } from '../../api/localStorage';
+import { BigNumber } from 'bignumber.js';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
+import { ReactComponent as IconEyeOpen } from '../../assets/images/my-wallets/icon_eye_open.inline.svg';
+import { ReactComponent as IconEyeClosed } from '../../assets/images/my-wallets/icon_eye_closed.inline.svg';
+import { MultiToken } from '../../api/common/lib/MultiToken';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import { Box } from '@mui/system';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import styles from './WalletListDialog.scss';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { ReactComponent as IconEyeOpen } from '../../assets/images/my-wallets/icon_eye_open.inline.svg';
-import { ReactComponent as IconEyeClosed } from '../../assets/images/my-wallets/icon_eye_closed.inline.svg';
-import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
-import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import { MultiToken } from '../../api/common/lib/MultiToken';
 import WalletCard from './WalletCard';
-import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import globalMessages from '../../i18n/global-messages';
-import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import AmountDisplay, { FiatDisplay } from '../common/AmountDisplay';
-import type { WalletsNavigation } from '../../api/localStorage';
-import { Button, Stack } from '@mui/material';
-import { Box } from '@mui/system';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 
 const messages = defineMessages({
   addWallet: {

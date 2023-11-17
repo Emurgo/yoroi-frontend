@@ -3,30 +3,18 @@
 /* eslint react/jsx-one-expression-per-line: 0 */ // the &nbsp; in the html breaks this
 
 import type { Node, ComponentType } from 'react';
-import { Component } from 'react';
-import { observer } from 'mobx-react';
-import classnames from 'classnames';
-import { defineMessages, intlShape } from 'react-intl';
-import { toDerivationPathString } from '../../../api/common/lib/crypto/keys/path';
-
-import QrCodeWrapper from '../../widgets/QrCodeWrapper';
-import DialogClassic from '../../widgets/Dialog';
-import DialogRevamp from '../../widgets/DialogRevamp';
-import DialogCloseButton from '../../widgets/DialogCloseButton';
-import ErrorBlock from '../../widgets/ErrorBlock';
-import RawHash from '../../widgets/hashWrappers/RawHash';
-import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
-import { SelectedExplorer } from '../../../domain/SelectedExplorer';
-
-import LocalizableError from '../../../i18n/LocalizableError';
-import globalMessages from '../../../i18n/global-messages';
-import styles from './VerifyAddressDialog.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { truncateAddress } from '../../../utils/formatters';
-import CopyableAddress from '../../widgets/CopyableAddress';
 import type { Notification } from '../../../types/notificationType';
 import type { StandardAddress } from '../../../types/AddressFilterTypes';
 import type { Addressing } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { ComplexityLevelType } from '../../../types/complexityLevelType';
+import type { InjectedLayoutProps } from '../../../styles/context/layout';
+import { Component } from 'react';
+import { observer } from 'mobx-react';
+import { defineMessages, intlShape } from 'react-intl';
+import { toDerivationPathString } from '../../../api/common/lib/crypto/keys/path';
+import { SelectedExplorer } from '../../../domain/SelectedExplorer';
+import { truncateAddress } from '../../../utils/formatters';
 import { CoreAddressTypes } from '../../../api/ada/lib/storage/database/primitives/enums';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 import {
@@ -34,10 +22,19 @@ import {
   getCardanoSpendingKeyHash,
   normalizeToAddress,
 } from '../../../api/ada/lib/storage/bridge/utils';
-import type { ComplexityLevelType } from '../../../types/complexityLevelType';
 import { ComplexityLevels } from '../../../types/complexityLevelType';
 import { withLayout } from '../../../styles/context/layout';
-import type { InjectedLayoutProps } from '../../../styles/context/layout';
+import classnames from 'classnames';
+import QrCodeWrapper from '../../widgets/QrCodeWrapper';
+import Dialog from '../../widgets/Dialog';
+import DialogCloseButton from '../../widgets/DialogCloseButton';
+import ErrorBlock from '../../widgets/ErrorBlock';
+import RawHash from '../../widgets/hashWrappers/RawHash';
+import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
+import LocalizableError from '../../../i18n/LocalizableError';
+import globalMessages from '../../../i18n/global-messages';
+import styles from './VerifyAddressDialog.scss';
+import CopyableAddress from '../../widgets/CopyableAddress';
 
 const messages = defineMessages({
   addressDetailsTitleLabel: {
@@ -78,7 +75,6 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
 
   render(): Node {
     const { intl } = this.context;
-    const { isRevampLayout } = this.props;
 
     const dialogActions = !this.props.isHardware
       ? []
@@ -90,8 +86,6 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
             onClick: this.props.verify,
           },
         ];
-
-    const Dialog = isRevampLayout ? DialogClassic : DialogRevamp;
 
     return (
       <Dialog

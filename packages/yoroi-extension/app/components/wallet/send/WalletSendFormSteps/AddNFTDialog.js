@@ -1,31 +1,31 @@
 // @flow
 /* eslint react/jsx-one-expression-per-line: 0 */ // the &nbsp; in the html breaks this
-import { Component } from 'react';
 import type { Node } from 'react';
-import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
-import Dialog from '../../../widgets/Dialog';
-import styles from './AddNFTDialog.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { MultiToken } from '../../../../api/common/lib/MultiToken';
-import { ReactComponent as SearchIcon } from '../../../../assets/images/assets-page/search.inline.svg';
-import { ReactComponent as NoItemsFoundImg } from '../../../../assets/images/assets-page/no-nfts.inline.svg';
-import { getNFTs } from '../../../../utils/wallet';
 import type { FormattedNFTDisplay } from '../../../../utils/wallet';
-import BigNumber from 'bignumber.js';
 import type { TokenLookupKey } from '../../../../api/common/lib/MultiToken';
 import type {
   TokenRow,
   NetworkRow,
 } from '../../../../api/ada/lib/storage/database/primitives/tables';
-import { Button, OutlinedInput, Typography } from '@mui/material';
+import { Component } from 'react';
+import { observer } from 'mobx-react';
+import { defineMessages, intlShape } from 'react-intl';
+import { MultiToken } from '../../../../api/common/lib/MultiToken';
+import { ReactComponent as SearchIcon } from '../../../../assets/images/assets-page/search.inline.svg';
+import { ReactComponent as NoItemsFoundImg } from '../../../../assets/images/assets-page/no-nfts.inline.svg';
+import { getNFTs } from '../../../../utils/wallet';
+import { OutlinedInput, Typography } from '@mui/material';
 import { isCardanoHaskell } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
+import { Box } from '@mui/system';
+import { ampli } from '../../../../../ampli/index';
 import MinAda from './MinAda';
+import Dialog from '../../../widgets/Dialog';
+import styles from './AddNFTDialog.scss';
+import BigNumber from 'bignumber.js';
 import NFTImage from './NFTImage';
 import globalMessages from '../../../../i18n/global-messages';
 import MaxAssetsError from '../MaxAssetsError';
-import { Box } from '@mui/system';
-import { ampli } from '../../../../../ampli/index';
 
 type Props = {|
   +onClose: void => void,

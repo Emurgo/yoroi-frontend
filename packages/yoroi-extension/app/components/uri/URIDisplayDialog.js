@@ -2,22 +2,20 @@
 import type { Node } from 'react';
 import type { Notification } from '../../types/notificationType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import classnames from 'classnames';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, defineMessages } from 'react-intl';
 import { buildURI } from '../../utils/URIHandling';
 import { ReactComponent as InfoIcon } from '../../assets/images/revamp/icons/info.inline.svg';
+import { Box, Typography } from '@mui/material';
+import classnames from 'classnames';
 import Dialog from '../widgets/Dialog';
 import DialogBackButton from '../widgets/DialogBackButton';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import QrCodeWrapper from '../widgets/QrCodeWrapper';
-import WarningBox from '../widgets/WarningBox';
 import CopyableAddress from '../widgets/CopyableAddress';
 import BigNumber from 'bignumber.js';
-
 import styles from './URIDisplayDialog.scss';
-import { Box, Typography } from '@mui/material';
 import globalMessages from '../../i18n/global-messages';
 
 const messages = defineMessages({

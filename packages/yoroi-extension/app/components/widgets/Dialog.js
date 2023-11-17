@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 // @flow
 import type { Node, Element, ComponentType } from 'react';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import classnames from 'classnames';
 import { map } from 'lodash';
 import { IconButton, Modal, Typography, alpha } from '@mui/material';
@@ -55,7 +55,6 @@ function DialogFn(props: Props & InjectedProps): Node {
     isRevampLayout,
   } = props;
 
-  const hasScroll = useRef(null);
   const [contentHasScroll, setContentHasScroll] = useState(false);
 
   useEffect(() => {
@@ -206,7 +205,7 @@ const ModalContainer = styled(Box)(({ theme, contentHasScroll }) => ({
       : '648px',
   borderRadius: theme.name === 'classic' ? 0 : 8,
   paddingTop: theme.name === 'classic' ? '25px' : '0px',
-  paddingBottom: theme.name === 'classic' ? '30px' : '0px',
+  paddingBottom: theme.name === 'classic' || theme.name === 'modern' ? '30px' : '0px',
   maxWidth: theme.name === 'classic' ? '785px' : '824px',
   backgroundColor: 'var(--yoroi-comp-dialog-background)',
   color: 'var(--yoroi-comp-dialog-text)',
