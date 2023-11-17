@@ -824,7 +824,7 @@
   "wallet.send.confirmationDialog.totalLabel": "Total",
   "wallet.send.confirmationDialog.txSizeLabel": "Size (bytes)",
   "wallet.send.confirmationDialog.walletPasswordFieldPlaceholder": "Type your spending password",
-  "wallet.send.confirmationDialog.walletPasswordLabel": "Spending password",
+  "wallet.send.confirmationDialog.walletPasswordLabel": "Password",
   "wallet.send.form.addAssets": "Add assets",
   "wallet.send.form.amount.minimumRequiredADA": "Minimum required is {number} ADA",
   "wallet.send.form.calculatingFee": "Calculating the fee, please wait.",

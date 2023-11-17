@@ -655,7 +655,7 @@ const globalMessages: * = defineMessages({
   },
   walletPasswordLabel: {
     id: 'wallet.send.confirmationDialog.walletPasswordLabel',
-    defaultMessage: '!!!Spending password',
+    defaultMessage: '!!!Password',
   },
   walletPasswordFieldPlaceholder: {
     id: 'wallet.send.confirmationDialog.walletPasswordFieldPlaceholder',
