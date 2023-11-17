@@ -22,9 +22,16 @@ import type { NetworkRow, TokenRow } from '../../../api/ada/lib/storage/database
 import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
 import type { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { SendUsingTrezorParams } from '../../../actions/ada/trezor-send-actions';
-import { genFormatTokenAmount, genLookupOrFail, getTokenName, } from '../../../stores/stateless/tokenHelpers';
+import {
+  genFormatTokenAmount,
+  genLookupOrFail,
+  getTokenName,
+} from '../../../stores/stateless/tokenHelpers';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
-import { isLedgerNanoWallet, isTrezorTWallet, } from '../../../api/ada/lib/storage/models/ConceptualWallet';
+import {
+  isLedgerNanoWallet,
+  isTrezorTWallet,
+} from '../../../api/ada/lib/storage/models/ConceptualWallet';
 import { asGetSigningKey } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
 import SpendingPasswordInput from '../../../components/widgets/forms/SpendingPasswordInput';
 import VerticallyCenteredLayout from '../../../components/layout/VerticallyCenteredLayout';
@@ -34,7 +41,7 @@ import YoroiTransferErrorPage from '../../transfer/YoroiTransferErrorPage';
 import ExplorableHashContainer from '../../widgets/ExplorableHashContainer';
 import RawHash from '../../../components/widgets/hashWrappers/RawHash';
 import Warning from '../../../components/common/Warning';
-import DialogRevamp from '../../../components/widgets/DialogRevamp';
+import Dialog from '../../../components/widgets/Dialog';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
 import type { SendUsingLedgerParams } from '../../../actions/ada/ledger-send-actions';
 import LocalizableError from '../../../i18n/LocalizableError';
@@ -215,7 +222,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
     const tentativeTx = createWithdrawalTx.result;
     if (!tentativeTx)
       return (
-        <DialogRevamp
+        <Dialog
           title={intl.formatMessage(globalMessages.processingLabel)}
           closeOnOverlayClick={false}
         >
@@ -226,7 +233,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
               </VerticallyCenteredLayout>
             </LegacyTransferLayout>
           </Box>
-        </DialogRevamp>
+        </Dialog>
       );
     const receivers = tentativeTx.receivers(true);
     const receiverAddress = addressToDisplayString(receivers[0], network);
@@ -258,7 +265,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
     if (!selectedExplorer) throw new Error('No explorer for wallet network');
 
     return (
-      <DialogRevamp
+      <Dialog
         title={intl.formatMessage(messages.dialogTitle)}
         actions={[
           {
@@ -277,8 +284,10 @@ export default class WithdrawRewardsDialog extends Component<Props> {
         closeOnOverlayClick={false}
         onClose={this.props.onClose}
         closeButton={<DialogCloseButton />}
+        scrollableContentClass="WithdrawRewards"
+        styleOverride={{ width: '648px' }}
       >
-        <Box maxWidth="600px">
+        <Box className="WithdrawRewards" overflowY="auto" maxHeight="70vh" maxWidth="604px">
           {shouldDeregister && (
             <Box mb="24px">
               <Warning>
@@ -413,7 +422,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
             </Box>
           ) : null}
         </Box>
-      </DialogRevamp>
+      </Dialog>
     );
   }
 

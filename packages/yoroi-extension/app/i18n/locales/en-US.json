@@ -191,6 +191,7 @@
   "global.language.spanish": "Español",
   "global.language.turkish": "Turkish",
   "global.language.vietnamese": "Vietnamese",
+  "global.dialogs.important": "Important",
   "global.ok": "Ok",
   "global.passwordInstructionsPaperWallet": "Note: Paper Wallet password needs to be at least <strong>10 characters</strong> long.",
   "global.publicKey.explanation": "Public keys allow seeing the wallet history for the wallet, but does <strong>not</strong> allow to spend or move the funds in any way (private key is <strong>not</strong> included)",

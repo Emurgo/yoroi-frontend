@@ -14,27 +14,27 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import { MultiToken } from '../../../../api/common/lib/MultiToken';
-import { Button, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import { isCardanoHaskell } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 import { compareNumbers, compareStrings } from '../../assets/AssetsList';
 import { getTokens } from '../../../../utils/wallet';
 import { Box } from '@mui/system';
 import { formattedAmountToNaturalUnits } from '../../../../utils/formatters';
-import Dialog from '../../../widgets/Dialog';
-import styles from './AddTokenDialog.scss';
 import { ReactComponent as SearchIcon } from '../../../../assets/images/assets-page/search.inline.svg';
 import { ReactComponent as ArrowsListFromBottom } from '../../../../assets/images/assets-page/arrows-list-from-bottom.inline.svg';
 import { ReactComponent as ArrowsListFromTop } from '../../../../assets/images/assets-page/arrows-list-from-top.inline.svg';
 import { ReactComponent as InfoIcon } from '../../../../assets/images/revamp/fingerprint-info.inline.svg';
 import { ReactComponent as ArrowsList } from '../../../../assets/images/assets-page/arrows-list.inline.svg';
 import { ReactComponent as NoItemsFoundImg } from '../../../../assets/images/assets-page/no-tokens.inline.svg';
+import { ampli } from '../../../../../ampli/index';
+import Dialog from '../../../widgets/Dialog';
+import styles from './AddTokenDialog.scss';
 import SingleTokenRow from './SingleTokenRow';
 import BigNumber from 'bignumber.js';
 import MinAda from './MinAda';
 import globalMessages from '../../../../i18n/global-messages';
 import MaxAssetsError from '../MaxAssetsError';
 import OutlinedInput from '@mui/material/OutlinedInput';
-import { ampli } from '../../../../../ampli/index';
 
 type Props = {|
   +onClose: void => void,
@@ -332,6 +332,8 @@ export default class AddTokenDialog extends Component<Props, State> {
     const shouldAddMore = shouldAddMoreTokens(
       selectedTokens.map(({ token, included }) => ({ token, included }))
     );
+    const hasSelectedTokensIncluded = selectedTokens.filter(t => t.included);
+
     return (
       <Dialog
         title={
@@ -339,14 +341,27 @@ export default class AddTokenDialog extends Component<Props, State> {
             ? intl.formatMessage(globalMessages.tokens)
             : intl.formatMessage(messages.nTokens, { number: fullTokensList.length })
         }
+        actions={[
+          {
+            disabled:
+              fullTokensList.length === 0 ||
+              hasSelectedTokensIncluded.length === 0 ||
+              !this.isValidAmounts() ||
+              !shouldAddMore,
+            onClick: this.onAddAll,
+            primary: true,
+            label: intl.formatMessage(globalMessages.confirm),
+          },
+        ]}
         closeOnOverlayClick={false}
         className={styles.dialog}
         onClose={onClose}
         withCloseButton
+        scrollableContentClass="CurrentTokensList"
       >
-        <Box py="24px" className={styles.component}>
+        <Box className={styles.component}>
           <Box sx={{ width: '100%' }}>
-            <Box sx={{ position: 'relative', mx: '24px' }}>
+            <Box sx={{ position: 'relative' }}>
               <Box
                 sx={{
                   position: 'absolute',
@@ -381,7 +396,7 @@ export default class AddTokenDialog extends Component<Props, State> {
             </Box>
           )}
           {!shouldAddMore && (
-            <Box sx={{ marginTop: '10px', px: '24px' }}>
+            <Box sx={{ marginTop: '10px' }}>
               <MaxAssetsError maxAssetsAllowed={10} />
             </Box>
           )}
@@ -401,7 +416,6 @@ export default class AddTokenDialog extends Component<Props, State> {
                 borderBottom="1px solid"
                 borderBottomColor="grayscale.200"
                 className={styles.columns}
-                px="24px"
               >
                 <li>
                   <button type="button" onClick={() => this.sortTokens(SORTING_COLUMNS.LABEL)}>
@@ -432,8 +446,8 @@ export default class AddTokenDialog extends Component<Props, State> {
                 height="320px"
                 overflow="auto"
                 pr={currentTokensList.length > 4 ? '4px' : '24px'}
-                pl="24px"
                 pt="10px"
+                className="CurrentTokensList"
               >
                 {currentTokensList.map(token => (
                   <SingleTokenRow
@@ -450,21 +464,6 @@ export default class AddTokenDialog extends Component<Props, State> {
               </Box>
             </Box>
           )}
-        </Box>
-        <Box p="24px">
-          <Button
-            fullWidth
-            disabled={
-              fullTokensList.length === 0 ||
-              selectedTokens.length === 0 ||
-              !this.isValidAmounts() ||
-              !shouldAddMore
-            }
-            onClick={this.onAddAll}
-            variant="primary"
-          >
-            {intl.formatMessage(globalMessages.confirm)}
-          </Button>
         </Box>
       </Dialog>
     );
