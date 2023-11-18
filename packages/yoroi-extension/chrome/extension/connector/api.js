@@ -595,7 +595,7 @@ function getTxRequiredSigningKeys(
   return set;
 }
 
-function getCip95RequiredSignKeys(
+function getCertificatesRequiredSignKeys(
   txBody: RustModule.WalletV4.TransactionBody,
 ): Set<string> {
   const result: Set<string> = new Set();
@@ -676,6 +676,14 @@ function getCip95RequiredSignKeys(
         const keyHash = updateDrep.voting_credential().to_keyhash();
         if (keyHash) {
           result.add(keyHash.to_hex());
+        }
+        continue;
+      }
+      const poolRegCert = cert.as_pool_registration();
+      if (poolRegCert) {
+        const hashes = poolRegCert.pool_params().pool_owners();
+        for (let j = 0; j < hashes.len(); j++) {
+          result.add(hashes.get(j).to_hex());
         }
         continue;
       }
@@ -765,13 +773,10 @@ async function __connectorSignCardanoTx(
     throw new Error(`missing chains functionality`);
   }
 
-  const requiredTxSignKeys = getTxRequiredSigningKeys(txBody);
-  const requiredScriptSignKeys = getScriptRequiredSigningKeys(witnessSet, RustModule);
-  const requiredCip95SignKeys = getCip95RequiredSignKeys(txBody);
   const totalAdditionalRequiredSignKeys = new Set<string>([
-    ...requiredTxSignKeys,
-    ...requiredScriptSignKeys,
-    ...requiredCip95SignKeys,
+    ...getTxRequiredSigningKeys(txBody),
+    ...getScriptRequiredSigningKeys(witnessSet, RustModule),
+    ...getCertificatesRequiredSignKeys(txBody),
   ]);
 
   console.log('totalAdditionalRequiredSignKeys', [...totalAdditionalRequiredSignKeys]);
