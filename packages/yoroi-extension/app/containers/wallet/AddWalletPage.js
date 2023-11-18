@@ -141,6 +141,9 @@ class AddWalletPage extends Component<AllProps> {
           onCardanoPreviewTestnet={() =>
             actions.profile.setSelectedNetwork.trigger(networks.CardanoPreviewTestnet)
           }
+          onCardanoSanchoTestnet={() =>
+            actions.profile.setSelectedNetwork.trigger(networks.CardanoSanchoTestnet)
+          }
         />
       );
     } else if (uiDialogs.isOpen(WalletCreateDialog)) {

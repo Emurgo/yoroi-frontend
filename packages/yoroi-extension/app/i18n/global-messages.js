@@ -84,6 +84,10 @@ const globalMessages: * = defineMessages({
     id: 'wallet.nav.type.ledger',
     defaultMessage: '!!!Ledger wallet',
   },
+  important: {
+    id: 'global.dialogs.important',
+    defaultMessage: '!!!Important',
+  },
   fieldIsRequired: {
     id: 'global.errors.fieldIsRequired',
     defaultMessage: '!!!This field is required.',

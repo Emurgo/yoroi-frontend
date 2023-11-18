@@ -19,8 +19,14 @@ import type {
 } from '../../../chrome/extension/connector/types';
 import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
-import type { CardanoConnectorSignRequest, SignSubmissionErrorType, TxDataInput, TxDataOutput, } from '../types';
 import { LoadingWalletStates } from '../types';
+import type {
+  CardanoConnectorSignRequest,
+  SignSubmissionErrorType,
+  TxDataInput,
+  TxDataOutput,
+  Anchor,
+} from '../types';
 import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 import type { GetUtxoDataResponse, RemoteUnspentOutput, UtxoData, } from '../../api/ada/lib/state-fetch/types';
 import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
@@ -758,9 +764,209 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       }
     }
 
+    const cip95Info = [];
+    const certs = txBody.certs();
+    if (certs) {
+      for (let i = 0; i < certs.len(); i++) {
+        const cert = certs.get(i);
+        if (!cert) {
+          throw new Error('unexpectedly missing certificate');
+        }
+        const stakeRegistration = cert.as_stake_registration();
+        if (stakeRegistration) {
+          const coin = stakeRegistration.coin()?.toString() ?? null;
+          cip95Info.push({
+            type: 'StakeRegistrationCert',
+            coin,
+          });
+          continue;
+        }
+        const stakeDeregistration = cert.as_stake_deregistration();
+        if (stakeDeregistration) {
+          const coin = stakeDeregistration.coin()?.toString() ?? null;
+          cip95Info.push({
+            type: 'StakeDeregistrationCert',
+            coin,
+          });
+          continue;
+        }
+        const stakeDelegation = cert.as_stake_delegation();
+        if (stakeDelegation) {
+          const keyHash = stakeDelegation.stake_credential().to_keyhash();
+          if (keyHash) {
+            cip95Info.push({
+              type: 'StakeDelegationCert',
+              poolKeyHash: keyHash.to_hex(),
+            });
+          }
+          continue;
+        }
+        const voteDelegation = cert.as_vote_delegation();
+        if (voteDelegation) {
+          const keyHash = voteDelegation.stake_credential().to_keyhash();
+          if (keyHash) {
+            cip95Info.push({
+              type: 'VoteDelegCert',
+              drep: voteDelegation.drep().to_hex(),
+            });
+          }
+          continue;
+        }
+        const stakeVoteDelegation = cert.as_stake_and_vote_delegation();
+        if (stakeVoteDelegation) {
+          const keyHash = stakeVoteDelegation.stake_credential().to_keyhash();
+          if (keyHash) {
+            cip95Info.push({
+              type: 'StakeVoteDelegCert',
+              drep: stakeVoteDelegation.drep().to_hex(),
+              poolKeyHash: stakeVoteDelegation.pool_keyhash().to_hex(),
+            });
+          }
+          continue;
+        }
+        const stakeRegDelegation = cert.as_stake_registration_and_delegation();
+        if (stakeRegDelegation) {
+          const keyHash = stakeRegDelegation.stake_credential().to_keyhash();
+          if (keyHash) {
+            cip95Info.push({
+              type: 'StakeRegDelegCert',
+              poolKeyHash: stakeRegDelegation.pool_keyhash().to_hex(),
+              coin: stakeRegDelegation.coin().to_str(),
+            });
+          }
+          continue;
+        }
+        const voteRegDelegation = cert.as_vote_registration_and_delegation();
+        if (voteRegDelegation) {
+          const keyHash = voteRegDelegation.stake_credential().to_keyhash();
+          if (keyHash) {
+            cip95Info.push({
+              type: 'VoteRegDelegCert',
+              drep: voteRegDelegation.drep().to_hex(),
+              coin: voteRegDelegation.coin().to_str(),
+            });
+          }
+          continue;
+        }
+        const stakeRegVoteDeletion = cert.as_stake_vote_registration_and_delegation();
+        if (stakeRegVoteDeletion) {
+          const keyHash = stakeRegVoteDeletion.stake_credential().to_keyhash();
+          if (keyHash) {
+            cip95Info.push({
+              type: 'StakeVoteRegDelegCert',
+              poolKeyHash: stakeRegVoteDeletion.pool_keyhash().to_hex(),
+              drep: stakeRegVoteDeletion.drep().to_hex(),
+              coin: stakeRegVoteDeletion.coin().to_str(),
+            });
+          }
+          continue;
+        }
+        const regDrep = cert.as_drep_registration();
+        if (regDrep) {
+          const keyHash = regDrep.voting_credential().to_keyhash();
+          if (keyHash) {
+            cip95Info.push({
+              type: 'RegDrepCert',
+              coin: regDrep.coin().to_str(),
+              anchor: deserializeAnchor(regDrep.anchor()),
+            });
+          }
+          continue;
+        }
+        const unregDrep = cert.as_drep_deregistration();
+        if (unregDrep) {
+          const keyHash = unregDrep.voting_credential().to_keyhash();
+          if (keyHash) {
+            cip95Info.push({
+              type: 'UnregDrepCert',
+              coin: unregDrep.coin().to_str(),
+            });
+          }
+          continue;
+        }
+        const updateDrep = cert.as_drep_update();
+        if (updateDrep) {
+          const keyHash = updateDrep.voting_credential().to_keyhash();
+          if (keyHash) {
+            cip95Info.push({
+              type: 'UpdateDrepCert',
+              anchor: deserializeAnchor(updateDrep.anchor()),
+            });
+          }
+          continue;
+        }
+      }
+    }
+    const votingProcedures = txBody.voting_procedures();
+    if (votingProcedures) {
+      const voters = votingProcedures.get_voters();
+      for (let i = 0; i < voters.len(); i++) {
+        const voter = voters.get(i);
+        if (!voter) {
+          throw new Error('unexpectedly missing voter');
+        }
+        const govActionIds = votingProcedures.get_governance_action_ids_by_voter(
+          voter
+        );
+        for (let j = 0; i < govActionIds.len(); j++) {
+          const govActionId = govActionIds.get(j);
+          if (!govActionId) {
+            throw new Error('unexpectedly missing governance action id');
+          }
+          const votingProcedure = votingProcedures.get(voter, govActionId);
+          if (!votingProcedure) {
+            throw new Error('unexpectedly missing voting procedure');
+          }
+          cip95Info.push({
+            type: 'VotingProcedure',
+            voterType: voter.kind(),
+            voterHash: voter.to_constitutional_committee_hot_cred()?.to_scripthash()?.to_hex() ||
+              voter.to_constitutional_committee_hot_cred()?.to_keyhash()?.to_hex() ||
+              voter.to_drep_cred()?.to_scripthash()?.to_hex() ||
+              voter.to_drep_cred()?.to_keyhash()?.to_hex() ||
+              voter.to_staking_pool_key_hash()?.to_hex() ||
+              (() => { throw new Error('unexpected voter'); })(),
+            govActionTxId: govActionId.transaction_id().to_hex(),
+            govActionIndex: govActionId.index(),
+            vote: votingProcedure.vote_kind(),
+            anchor: deserializeAnchor(votingProcedure.anchor()),
+          });
+        }
+      }
+    }
+    const votingProposals = txBody.voting_proposals();
+    if (votingProposals) {
+      for (let i = 0; i < votingProposals.len(); i++) {
+        // eslint-disable-next-line no-unused-vars
+        const _votingProposal = votingProposals.get(i);
+        //  wait for CSL update
+      }
+    }
+    const currentTreasuryValue = txBody.current_treasury_value();
+    if (currentTreasuryValue) {
+      cip95Info.push({
+        type: 'TreasuryValue',
+        coin: currentTreasuryValue.to_str(),
+      });
+    }
+    const donation = txBody.donation();
+    if (donation) {
+      cip95Info.push({
+        type: 'TreasuryDonation',
+        positiveCoin: donation.to_str(),
+      });
+    }
     runInAction(() => {
-      // $FlowFixMe[prop-missing]
-      this.adaTransaction = { inputs, foreignInputs, outputs, fee, total, amount };
+      this.adaTransaction = {
+        inputs,
+        // $FlowFixMe[prop-missing]
+        foreignInputs,
+        outputs,
+        fee,
+        total,
+        amount,
+        cip95Info,
+      };
     });
   };
 
@@ -849,6 +1055,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         fee,
         amount,
         total,
+        cip95Info: [],
       };
     });
   };
@@ -1277,3 +1484,16 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
   }
 }
+
+function deserializeAnchor(anchor: ?RustModule.WalletV4.Anchor): Anchor | null {
+  if (!anchor) {
+    return null;
+  }
+  return {
+    url: anchor.url().url(),
+    dataHash: anchor.anchor_data_hash().to_hex(),
+  };
+}
+
+
+

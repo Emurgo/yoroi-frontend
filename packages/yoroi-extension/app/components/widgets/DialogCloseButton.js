@@ -28,15 +28,7 @@ class DialogCloseButton extends Component<Props & InjectedLayoutProps> {
     const Svg = icon != null && icon !== '' ? icon : defaultIcon;
 
     return (
-      <IconButton
-        onClick={onClose}
-        sx={{
-          position: 'absolute',
-          top: isRevampLayout ? '15px' : '18px',
-          right: isRevampLayout ? '12px' : '30px',
-          marginLeft: '5px',
-        }}
-      >
+      <IconButton onClick={onClose} sx={{ position: 'relative' }}>
         <Svg />
       </IconButton>
     );
