@@ -685,6 +685,7 @@ function getCertificatesRequiredSignKeys(
         for (let i = 0; i < hashes.len(); i++) {
           result.add(hashes.get(i).to_hex());
         }
+        continue;
       }
     }
   }
