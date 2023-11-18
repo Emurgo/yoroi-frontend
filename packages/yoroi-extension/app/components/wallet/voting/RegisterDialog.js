@@ -22,7 +22,7 @@ const messages = defineMessages({
   line1: {
     id: 'wallet.voting.dialog.step.register.line1',
     defaultMessage:
-      '!!!Enter your spending password to be able to generate the required certificate for voting.',
+      '!!!Enter your password to be able to generate the required certificate for voting.',
   },
 });
 

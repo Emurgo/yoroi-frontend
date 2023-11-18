@@ -36,7 +36,7 @@ const messages = defineMessages({
   line1: {
     id: 'wallet.voting.dialog.step.trx.line1',
     defaultMessage:
-      '!!!Confirm your spending password to register in the blockchain the certificate previously generated for voting.',
+      '!!!Confirm your password to register in the blockchain the certificate previously generated for voting.',
   },
   txConfirmationTrezorTLine1: {
     id: 'wallet.voting.dialog.step.trx.trezor.info.line.1',
