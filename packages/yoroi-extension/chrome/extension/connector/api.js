@@ -682,8 +682,8 @@ function getCertificatesRequiredSignKeys(
       const poolRegCert = cert.as_pool_registration();
       if (poolRegCert) {
         const hashes = poolRegCert.pool_params().pool_owners();
-        for (let i = 0; i < hashes.len(); i++) {
-          result.add(hashes.get(i).to_hex());
+        for (let j = 0; j < hashes.len(); j++) {
+          result.add(hashes.get(j).to_hex());
         }
         continue;
       }
