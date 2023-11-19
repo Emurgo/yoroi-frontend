@@ -2253,6 +2253,8 @@ const getAccountState: AccountStateFunc = async request => {
         remainingAmount: totalRewards.minus(totalWithdrawals).toString(),
         rewards: totalRewards.toString(),
         withdrawals: totalWithdrawals.toString(),
+        delegation: 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207',
+        stakeRegistered: true,
       },
     ],
     [
@@ -2263,6 +2265,8 @@ const getAccountState: AccountStateFunc = async request => {
         remainingAmount: totalRewards.minus(totalWithdrawals).toString(),
         rewards: totalRewards.toString(),
         withdrawals: totalWithdrawals.toString(),
+        delegation: 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207',
+        stakeRegistered: true,
       },
     ],
     [
@@ -2273,6 +2277,8 @@ const getAccountState: AccountStateFunc = async request => {
         remainingAmount: totalRewards.minus(totalWithdrawals).toString(),
         rewards: totalRewards.toString(),
         withdrawals: totalWithdrawals.toString(),
+        delegation: 'c34a7f59c556633dc88ec25c9743c5ebca3705e179a54db5638941cb',
+        stakeRegistered: true,
       },
     ],
     [
@@ -2283,6 +2289,8 @@ const getAccountState: AccountStateFunc = async request => {
         remainingAmount: totalRewards.minus(totalWithdrawals).toString(),
         rewards: totalRewards.toString(),
         withdrawals: totalWithdrawals.toString(),
+        delegation: 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207',
+        stakeRegistered: true,
       },
     ],
   ]);

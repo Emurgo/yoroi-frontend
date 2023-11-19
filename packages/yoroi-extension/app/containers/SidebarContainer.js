@@ -11,12 +11,12 @@ import SidebarRevamp from '../components/topbar/SidebarRevamp';
 import { withLayout } from '../styles/context/layout';
 import type { LayoutComponentMap } from '../styles/context/layout';
 import type { DelegationRequests } from '../stores/toplevel/DelegationStore';
+import { ROUTES } from '../routes-config';
 
 export type GeneratedData = typeof SidebarContainer.prototype.generated;
 
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
-  +onLogoClick?: void => void,
 |};
 type InjectedProps = {|
   +selectedLayout: string,
@@ -30,16 +30,9 @@ class SidebarContainer extends Component<AllProps> {
     await this.generated.actions.profile.toggleSidebar.trigger();
   };
 
-  static defaultProps: {|
-    onLogoClick: void,
-  |} = {
-    onLogoClick: undefined,
-  };
-
   render(): Node {
     const { stores, actions } = this.generated;
     const { profile } = stores;
-    const { onLogoClick } = this.props;
 
     const SidebarComponent = (
       <Sidebar
@@ -63,7 +56,12 @@ class SidebarContainer extends Component<AllProps> {
 
     const SidebarRevampComponent = (
       <SidebarRevamp
-        onLogoClick={onLogoClick}
+        onLogoClick={() => {
+          actions.router.goToRoute.trigger({
+            route: ROUTES.WALLETS.TRANSACTIONS,
+            publicDeriver: stores.wallets.selected,
+          });
+        }}
         onCategoryClicked={category => {
           actions.router.goToRoute.trigger({
             route: category.route,

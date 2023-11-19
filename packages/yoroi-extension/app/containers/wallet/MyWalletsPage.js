@@ -74,18 +74,9 @@ class MyWalletsPage extends Component<AllProps> {
     await this.generated.actions.profile.updateHideBalance.trigger();
   };
 
-  componentDidMount() {
-    const isRevamp = this.generated.stores.profile.isRevampTheme;
-    if (isRevamp) {
-      this.generated.actions.router.goToRoute.trigger({
-        route: ROUTES.WALLETS.ROOT,
-      });
-    } else {
-      this.generated.actions.wallets.unselectWallet.trigger();
-    }
-  }
-
-  handleWalletNavItemClick: (PublicDeriver<>) => void = publicDeriver => {
+  handleWalletNavItemClick: PublicDeriver<> => void = (
+    publicDeriver
+  ) => {
     this.generated.actions.router.goToRoute.trigger({
       route: ROUTES.WALLETS.ROOT,
       publicDeriver,

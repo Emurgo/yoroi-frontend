@@ -37,6 +37,7 @@ type Props = {|
   +onCardano: void => void,
   +onCardanoPreprodTestnet: void => void,
   +onCardanoPreviewTestnet: void => void,
+  +onCardanoSanchoTestnet: void => void,
   +onExternalLinkClick: MouseEvent => void,
 |};
 
@@ -102,6 +103,26 @@ export default class PickCurrencyOptionDialog extends Component<Props> {
                   type="cardanoTestnet"
                   title="Cardano Preview Testnet"
                   onSubmit={this.props.onCardanoPreviewTestnet}
+                  learnMoreText={
+                    <>
+                      {intl.formatMessage(messages.testnetDescription)}<br />
+                      <a
+                        href="https://testnets.cardano.org/"
+                        onClick={event => this.props.onExternalLinkClick(event)}
+                      >
+                        {intl.formatMessage(globalMessages.learnMore)}
+                      </a>
+                    </>}
+                />
+              </>
+            }
+            {(!environment.isProduction() || environment.isNightly() || environment.isTest()) &&
+              <>
+                <OptionBlock
+                  parentName="PickCurrencyOptionDialog"
+                  type="cardanoTestnet"
+                  title="Cardano Sancho Testnet"
+                  onSubmit={this.props.onCardanoSanchoTestnet}
                   learnMoreText={
                     <>
                       {intl.formatMessage(messages.testnetDescription)}<br />
