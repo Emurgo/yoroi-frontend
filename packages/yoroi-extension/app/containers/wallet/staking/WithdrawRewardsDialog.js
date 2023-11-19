@@ -169,21 +169,16 @@ export default class WithdrawRewardsDialog extends Component<Props> {
     }
 
     if (
-      !delegationRequests.getCurrentDelegation.wasExecuted ||
-      delegationRequests.getCurrentDelegation.isExecuting ||
-      delegationRequests.getCurrentDelegation.result == null
+      !delegationRequests.getDelegatedBalance.wasExecuted ||
+      delegationRequests.getDelegatedBalance.isExecuting ||
+      delegationRequests.getDelegatedBalance.result == null
     ) {
       return null;
     }
 
-    if (delegationRequests.getCurrentDelegation.result.currEpoch == null) return null;
+    const currentPool = delegationRequests.getDelegatedBalance.result.delegation;
+    if (currentPool == null) return null;
 
-    const currentPools = delegationRequests.getCurrentDelegation.result.currEpoch.pools;
-    const currentPage = this.generated.stores.delegation.selectedPage;
-
-    if (currentPools.length === 0) return null;
-
-    const currentPool = currentPools[currentPage][0];
     const network = publicDeriver.getParent().getNetworkInfo();
     const meta = this.generated.stores.delegation.getLocalPoolInfo(network, String(currentPool));
     if (meta == null) {
