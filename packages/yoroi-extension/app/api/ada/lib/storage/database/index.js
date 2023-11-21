@@ -219,12 +219,66 @@ const populateAndCreate = async (
   populateExplorerDb(schemaBuilder);
   populateUtxoDb(schemaBuilder);
 
-  const db = await schemaBuilder.connect({
-    storeType,
-    onUpgrade,
-  });
+  let db;
+  try {
+    db = await schemaBuilder.connect({
+      storeType,
+      onUpgrade,
+    });
+  } catch (error) {
+    if (error.code === 201 /* Lovefield error code for dup pk */) {
+      await fixLovefieldDuplicatePrimaryKey(error.message);
+      return populateAndCreate(storeType);
+    }
+    throw error;
+  }
   return db;
 };
+
+async function fixLovefieldDuplicatePrimaryKey(errorMessage: string): Promise<void> {
+  const makeError = (message) => new Error(
+    `Error when fixing ${errorMessage}: ${message}`
+  );
+  const params = new URL(errorMessage).searchParams;
+  const [storeName, keyName] = String(params.get('p0')).split('.');
+  if (keyName !== 'pk' + storeName) {
+    throw makeError('unexpected key name');
+  }
+  const fieldName = storeName + 'Id';
+  const dupVal = params.get('p1');
+
+  const toPromise = (request, errMsg) => new Promise((resolve, reject) => {
+    request.onerror = (_event) => {
+      reject(makeError(errMsg));
+    };
+    request.onsuccess = (_event) => {
+      resolve(request.result);
+    };
+  });
+
+  const db = await toPromise(
+    window.indexedDB.open('yoroi-schema'),
+    'could not open DB',
+  );
+  
+  const store = db
+    .transaction([storeName], 'readwrite')
+    .objectStore(storeName);
+
+  const allObjects = await toPromise(
+    store.getAll(),
+    'could not get all objects',
+  );
+  const dupObjects = allObjects.filter(
+    obj => String(obj.value[fieldName]) === dupVal
+  );
+  for (const dupObj of dupObjects.slice(1)) {
+    await toPromise(
+      store.delete(dupObj.id),
+      'could not delete duplicate object',
+    );
+  }
+}
 
 export async function clear(
   db: lf$Database,
