@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import { Box, Input, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
 type AssetAmount = {|
   ticker: string,
@@ -12,7 +12,6 @@ type Props = {|
   baseCurrency: AssetAmount,
   quoteCurrency: AssetAmount,
   readonly?: boolean,
-  isLoading?: boolean,
 |};
 
 export default function PriceInput({
@@ -20,7 +19,6 @@ export default function PriceInput({
   baseCurrency,
   quoteCurrency,
   readonly = false,
-  isLoading = false,
 }: Props): Node {
   return (
     <Box

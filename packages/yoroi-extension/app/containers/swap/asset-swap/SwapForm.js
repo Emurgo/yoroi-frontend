@@ -1,9 +1,8 @@
+// @flow
 import { useState } from 'react';
-import { Box, Button, Input, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { ReactComponent as SwitchIcon } from '../../../assets/images/revamp/icons/switch.inline.svg';
 import { ReactComponent as RefreshIcon } from '../../../assets/images/revamp/icons/refresh.inline.svg';
-import { ReactComponent as InfoIcon } from '../../../assets/images/revamp/icons/info.inline.svg';
-import { ReactComponent as EditIcon } from '../../../assets/images/revamp/icons/edit.inline.svg';
 import { ReactComponent as AdaTokenImage } from './img.inline.svg';
 import { ReactComponent as UsdaTokenImage } from './usda.inline.svg';
 import SwapInput from '../../../components/swap/SwapInput';
@@ -17,6 +16,8 @@ export default function SwapForm() {
   const [fromAsset, setFromAsset] = useState(defaultFromAsset);
   const [toAsset, setToAsset] = useState(defaultToAsset);
 
+  // <TODO:CHECK_LINT>
+  // eslint-disable-next-line no-unused-vars
   const handleOpenedDialog = type => setOpenedDialog(type);
 
   const handleSwitchSelectedAssets = () => {

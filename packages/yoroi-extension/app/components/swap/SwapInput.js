@@ -1,7 +1,7 @@
 // @flow
 import type { Node } from 'react';
 import { useState } from 'react';
-import { Box, Input, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { ReactComponent as ChevronDownIcon } from '../../assets/images/revamp/icons/chevron-down.inline.svg';
 import { ReactComponent as DefaultTokenImage } from '../../assets/images/revamp/token-default.inline.svg';
 
@@ -19,7 +19,6 @@ type Props = {|
   showMax?: boolean,
   image?: Node | null,
   isFrom?: boolean,
-  isLoading?: boolean,
 |};
 
 export default function SwapInput({
@@ -28,7 +27,6 @@ export default function SwapInput({
   isFrom = false,
   showMax = false,
   image = null,
-  isLoading,
   onAssetSelect,
   handleAmountChange,
 }: Props): Node {
