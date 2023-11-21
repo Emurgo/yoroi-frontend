@@ -4,8 +4,6 @@ import { useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import { ReactComponent as SwitchIcon } from '../../../assets/images/revamp/icons/switch.inline.svg';
 import { ReactComponent as RefreshIcon } from '../../../assets/images/revamp/icons/refresh.inline.svg';
-import { ReactComponent as AdaTokenImage } from './mockAssets/ada.inline.svg';
-import { ReactComponent as UsdaTokenImage } from './mockAssets/usda.inline.svg';
 import { defaultFromAsset, defaultToAsset, fromAssets, toAssets } from './mockData';
 import SwapInput from '../../../components/swap/SwapInput';
 import PriceInput from '../../../components/swap/PriceInput';
@@ -79,7 +77,7 @@ export default function SwapForm(): Node {
           label="Swap from"
           image={fromAsset.image}
           asset={fromAsset}
-          onAssetSelect={() => handleOpenedDialog('from')}
+          onAssetSelect={() => setOpenedDialog('from')}
           handleAmountChange={amount => handleAmountChange(amount, 'from')}
           showMax
           isFrom
@@ -105,7 +103,7 @@ export default function SwapForm(): Node {
           label="Swap to"
           image={toAsset.image}
           asset={toAsset}
-          onAssetSelect={() => handleOpenedDialog('to')}
+          onAssetSelect={() => setOpenedDialog('to')}
           handleAmountChange={amount => handleAmountChange(amount, 'to')}
         />
 
@@ -126,7 +124,7 @@ export default function SwapForm(): Node {
           assets={openedDialog === 'from' ? fromAssets : toAssets}
           type={openedDialog}
           onAssetSelected={asset => handleSelectedAsset(asset, openedDialog)}
-          onClose={() => handleOpenedDialog('')}
+          onClose={() => setOpenedDialog('')}
         />
       )}
     </>
