@@ -62,19 +62,23 @@ export const ROUTES = {
   },
   NFTS: {
     ROOT: '/nfts',
-    DETAILS: '/nfts/:nftId'
+    DETAILS: '/nfts/:nftId',
   },
   DAPP_CONNECTOR: {
-    CONNECTED_WEBSITES: '/connector/connected-websites'
+    CONNECTED_WEBSITES: '/connector/connected-websites',
   },
   EXPERIMENTAL: {
     YOROI_PALETTE: '/experimental/yoroi-palette',
     YOROI_COMPONENTS: '/experimental/components',
-    THEMES: '/experimental/themes'
+    THEMES: '/experimental/themes',
   },
   // Revamp specific routes:
   REVAMP: {
     // `voting` is part of the sidebar
     CATALYST_VOTING: '/voting',
-  }
+  },
+  SWAP: {
+    ROOT: '/swap',
+    ORDERS: '/swap/orders',
+  },
 };
