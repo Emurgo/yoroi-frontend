@@ -28,9 +28,11 @@ export const ChainDerivations = Object.freeze({
   EXTERNAL: 0,
   INTERNAL: 1,
   CHIMERIC_ACCOUNT: 2,
+  GOVERNANCE_DREP_KEYS: 3,
 });
 
 export const STAKING_KEY_INDEX = 0;
+export const DREP_KEY_INDEX = 0;
 
 /**
  * Constant K as defined in Ouroboros Classic

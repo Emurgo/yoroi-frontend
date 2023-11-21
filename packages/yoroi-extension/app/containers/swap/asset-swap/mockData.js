@@ -1,8 +1,9 @@
+// @flow
 import { ReactComponent as AdaTokenImage } from './mockAssets/ada.inline.svg';
 import { ReactComponent as UsdaTokenImage } from './mockAssets/usda.inline.svg';
 import { ReactComponent as MilkTokenImage } from './mockAssets/milk.inline.svg';
 
-export const defaultFromAsset = {
+export const defaultFromAsset: any = {
   image: <AdaTokenImage />,
   name: 'TADA',
   ticker: 'TADA',
@@ -13,9 +14,16 @@ export const defaultFromAsset = {
   volume24h: 0,
 };
 
-export const defaultToAsset = { amount: '', walletAmount: 0, ticker: '' };
+export const defaultToAsset = {
+  amount: '',
+  walletAmount: 0,
+  ticker: '',
+  address: '',
+  name: '',
+  image: null,
+};
 
-export const fromAssets = [
+export const fromAssets: Array<any> = [
   {
     image: <AdaTokenImage />,
     name: 'TADA',
@@ -28,7 +36,7 @@ export const fromAssets = [
   },
 ];
 
-export const toAssets = [
+export const toAssets: Array<any> = [
   {
     image: <UsdaTokenImage />,
     name: 'Anzens USD',

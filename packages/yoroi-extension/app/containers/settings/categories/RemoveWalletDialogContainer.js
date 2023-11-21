@@ -16,7 +16,7 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import { withLayout } from '../../../styles/context/layout';
 import type { LayoutComponentMap } from '../../../styles/context/layout';
 import { getWalletType } from '../../../stores/toplevel/WalletSettingsStore';
-import type { WalletsNavigation } from '../../../api/localStorage'
+import type { WalletsNavigation } from '../../../api/localStorage';
 
 export type GeneratedData = typeof RemoveWalletDialogContainer.prototype.generated;
 

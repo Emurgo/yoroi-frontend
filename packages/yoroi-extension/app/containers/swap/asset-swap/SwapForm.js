@@ -1,25 +1,21 @@
+// @flow
+import type { Node } from 'react';
 import { useState } from 'react';
-import { Box, Button, Input, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { ReactComponent as SwitchIcon } from '../../../assets/images/revamp/icons/switch.inline.svg';
 import { ReactComponent as RefreshIcon } from '../../../assets/images/revamp/icons/refresh.inline.svg';
-import { ReactComponent as InfoIcon } from '../../../assets/images/revamp/icons/info.inline.svg';
-import { ReactComponent as EditIcon } from '../../../assets/images/revamp/icons/edit.inline.svg';
-import { ReactComponent as AdaTokenImage } from './mockAssets/ada.inline.svg';
-import { ReactComponent as UsdaTokenImage } from './mockAssets/usda.inline.svg';
 import { defaultFromAsset, defaultToAsset, fromAssets, toAssets } from './mockData';
 import SwapInput from '../../../components/swap/SwapInput';
 import PriceInput from '../../../components/swap/PriceInput';
 import SelectAssetDialog from '../../../components/swap/SelectAssetDialog';
 import SlippageDialog from '../../../components/swap/SlippageDialog';
 
-export default function SwapForm() {
+export default function SwapForm(): Node {
   const [isMarketOrder, setIsMarketOrder] = useState(true);
   const [openedDialog, setOpenedDialog] = useState('');
   const [slippage, setSlippage] = useState('1');
   const [fromAsset, setFromAsset] = useState(defaultFromAsset);
   const [toAsset, setToAsset] = useState(defaultToAsset);
-
-  const handleOpenedDialog = type => setOpenedDialog(type);
 
   const handleSwitchSelectedAssets = () => {
     setFromAsset(toAsset);
@@ -83,7 +79,7 @@ export default function SwapForm() {
           label="Swap from"
           image={fromAsset.image}
           asset={fromAsset}
-          onAssetSelect={() => handleOpenedDialog('from')}
+          onAssetSelect={() => setOpenedDialog('from')}
           handleAmountChange={amount => handleAmountChange(amount, 'from')}
           showMax
           isFrom
@@ -109,7 +105,7 @@ export default function SwapForm() {
           label="Swap to"
           image={toAsset.image}
           asset={toAsset}
-          onAssetSelect={() => handleOpenedDialog('to')}
+          onAssetSelect={() => setOpenedDialog('to')}
           handleAmountChange={amount => handleAmountChange(amount, 'to')}
         />
 
@@ -155,7 +151,7 @@ export default function SwapForm() {
           assets={openedDialog === 'from' ? fromAssets : toAssets}
           type={openedDialog}
           onAssetSelected={asset => handleSelectedAsset(asset, openedDialog)}
-          onClose={() => handleOpenedDialog('')}
+          onClose={() => setOpenedDialog('')}
         />
       )}
 
