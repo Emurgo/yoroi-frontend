@@ -27,7 +27,7 @@ export default function SwapInput({
 }: Props): Node {
   const { amount, walletAmount, ticker } = asset;
   const [error, setError] = useState('');
-  const [inputValue, setInputValue] = useState(amount);
+  const [inputValue, setInputValue] = useState(amount || '');
   const [isFocused, setIsFocused] = useState(false);
 
   const handleChange = e => {

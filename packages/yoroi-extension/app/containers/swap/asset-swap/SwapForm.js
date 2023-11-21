@@ -4,24 +4,14 @@ import { useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import { ReactComponent as SwitchIcon } from '../../../assets/images/revamp/icons/switch.inline.svg';
 import { ReactComponent as RefreshIcon } from '../../../assets/images/revamp/icons/refresh.inline.svg';
-import { ReactComponent as AdaTokenImage } from './img.inline.svg';
-import { ReactComponent as UsdaTokenImage } from './usda.inline.svg';
+import { defaultFromAsset, defaultToAsset, fromAssets, toAssets } from './mockData';
 import SwapInput from '../../../components/swap/SwapInput';
 import PriceInput from '../../../components/swap/PriceInput';
-
-const defaultFromAsset = {
-  amount: '',
-  ticker: 'TADA',
-  walletAmount: 212,
-};
-const defaultToAsset = {
-  amount: '',
-  ticker: '',
-  walletAmount: 0,
-};
+import SelectAssetDialog from '../../../components/swap/SelectAssetDialog';
 
 export default function SwapForm(): Node {
   const [isMarketOrder, setIsMarketOrder] = useState(true);
+  const [openedDialog, setOpenedDialog] = useState('');
   const [fromAsset, setFromAsset] = useState(defaultFromAsset);
   const [toAsset, setToAsset] = useState(defaultToAsset);
 
@@ -40,77 +30,103 @@ export default function SwapForm(): Node {
     setToAsset(defaultToAsset);
   };
 
+  const handleSelectedAsset = (asset, type) => {
+    const isFrom = type === 'from';
+    const setFunc = isFrom ? setFromAsset : setToAsset;
+
+    const assetToSet = (isFrom ? fromAssets : toAssets).find(a => a.address === asset.address);
+
+    if (!assetToSet) return;
+
+    setFunc(assetToSet);
+  };
+
   return (
-    <Box width="100%" mx="auto" maxWidth="506px" display="flex" flexDirection="column" gap="16px">
-      <Box display="flex" alignItems="center" justifyContent="space-between" mb="16px">
-        <Box sx={{ cursor: 'pointer' }} display="flex" alignItems="center">
-          <Box
-            onClick={() => setIsMarketOrder(true)}
-            p="8px"
-            borderRadius="8px"
-            bgcolor={isMarketOrder ? 'grayscale.200' : ''}
-          >
-            <Typography variant="body1" fontWeight={500}>
-              Market
-            </Typography>
+    <>
+      <Box width="100%" mx="auto" maxWidth="506px" display="flex" flexDirection="column" gap="16px">
+        <Box display="flex" alignItems="center" justifyContent="space-between" mb="16px">
+          <Box sx={{ cursor: 'pointer' }} display="flex" alignItems="center">
+            <Box
+              onClick={() => setIsMarketOrder(true)}
+              p="8px"
+              borderRadius="8px"
+              bgcolor={isMarketOrder ? 'grayscale.200' : ''}
+            >
+              <Typography variant="body1" fontWeight={500}>
+                Market
+              </Typography>
+            </Box>
+            <Box
+              onClick={() => setIsMarketOrder(false)}
+              p="8px"
+              borderRadius="8px"
+              bgcolor={!isMarketOrder ? 'grayscale.200' : ''}
+            >
+              <Typography variant="body1" fontWeight={500}>
+                Limit
+              </Typography>
+            </Box>
           </Box>
-          <Box
-            onClick={() => setIsMarketOrder(false)}
-            p="8px"
-            borderRadius="8px"
-            bgcolor={!isMarketOrder ? 'grayscale.200' : ''}
-          >
-            <Typography variant="body1" fontWeight={500}>
-              Limit
-            </Typography>
+          <Box sx={{ cursor: 'pointer' }}>
+            <RefreshIcon />
           </Box>
         </Box>
-        <Box sx={{ cursor: 'pointer' }}>
-          <RefreshIcon />
-        </Box>
-      </Box>
 
-      {/* From Field */}
-      <SwapInput
-        label="Swap from"
-        image={fromAsset.ticker.includes('ADA') ? <AdaTokenImage /> : <UsdaTokenImage />}
-        asset={fromAsset}
-        onAssetSelect={() => null}
-        handleAmountChange={amount => handleAmountChange(amount, 'from')}
-        showMax
-        isFrom
-      />
-
-      {/* Clear and switch */}
-      <Box display="flex" alignItems="center" justifyContent="space-between">
-        <Box sx={{ cursor: 'pointer', color: 'primary.500' }} onClick={handleSwitchSelectedAssets}>
-          <SwitchIcon />
-        </Box>
-        <Box>
-          <Button onClick={handleResetForm} variant="tertiary" color="primary">
-            Clear
-          </Button>
-        </Box>
-      </Box>
-
-      {/* To Field */}
-      <SwapInput
-        label="Swap to"
-        image={toAsset.ticker.includes('ADA') ? <AdaTokenImage /> : <UsdaTokenImage />}
-        asset={toAsset}
-        onAssetSelect={() => null}
-        handleAmountChange={amount => handleAmountChange(amount, 'to')}
-      />
-
-      {/* Price between assets */}
-      <Box mt="16px">
-        <PriceInput
-          baseCurrency={fromAsset}
-          quoteCurrency={toAsset}
-          readonly={isMarketOrder}
-          label="Market price"
+        {/* From Field */}
+        <SwapInput
+          label="Swap from"
+          image={fromAsset.image}
+          asset={fromAsset}
+          onAssetSelect={() => setOpenedDialog('from')}
+          handleAmountChange={amount => handleAmountChange(amount, 'from')}
+          showMax
+          isFrom
         />
+
+        {/* Clear and switch */}
+        <Box display="flex" alignItems="center" justifyContent="space-between">
+          <Box
+            sx={{ cursor: 'pointer', color: 'primary.500' }}
+            onClick={handleSwitchSelectedAssets}
+          >
+            <SwitchIcon />
+          </Box>
+          <Box>
+            <Button onClick={handleResetForm} variant="tertiary" color="primary">
+              Clear
+            </Button>
+          </Box>
+        </Box>
+
+        {/* To Field */}
+        <SwapInput
+          label="Swap to"
+          image={toAsset.image}
+          asset={toAsset}
+          onAssetSelect={() => setOpenedDialog('to')}
+          handleAmountChange={amount => handleAmountChange(amount, 'to')}
+        />
+
+        {/* Price between assets */}
+        <Box mt="16px">
+          <PriceInput
+            baseCurrency={fromAsset}
+            quoteCurrency={toAsset}
+            readonly={isMarketOrder}
+            label="Market price"
+          />
+        </Box>
       </Box>
-    </Box>
+
+      {/* Dialogs */}
+      {(openedDialog === 'from' || openedDialog === 'to') && (
+        <SelectAssetDialog
+          assets={openedDialog === 'from' ? fromAssets : toAssets}
+          type={openedDialog}
+          onAssetSelected={asset => handleSelectedAsset(asset, openedDialog)}
+          onClose={() => setOpenedDialog('')}
+        />
+      )}
+    </>
   );
 }
