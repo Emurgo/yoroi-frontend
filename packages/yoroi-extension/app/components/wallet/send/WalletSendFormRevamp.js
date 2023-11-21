@@ -3,7 +3,7 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { reaction } from 'mobx';
-import { Button, Typography, TextField as MemoTextField, Box } from '@mui/material';
+import { Button, Typography, TextField as MemoTextField, Box, styled } from '@mui/material';
 import TextField from '../../common/TextField';
 import { defineMessages, intlShape } from 'react-intl';
 import { isValidMemoOptional } from '../../../utils/validations';
@@ -538,12 +538,12 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
       case SEND_FORM_STEP.RECEIVER:
         return (
           <div className={styles.receiverStep}>
-            <Box pt='10px'>
+            <Box pt="10px">
               <TextField
                 className="send_form_receiver"
                 {...receiverField.bind()}
                 error={receiverField.error}
-                helperText=' '
+                helperText=" "
                 onFocus={() => {
                   this.setReceiverFieldStatus(true);
                 }}
@@ -677,6 +677,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   decimalPlaces={this.getNumDecimals()}
                   disabled={shouldSendAll}
                   error={amountInputError}
+                  helperText=""
                   currency={truncateToken(getTokenName(this.props.defaultToken))}
                   fees={formatValue(transactionFee.getDefaultEntry())}
                   total={formatValue(totalAmount.getDefaultEntry())}
@@ -701,11 +702,11 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 {!isErgo(this.props.selectedNetwork) && (
                   <Button
                     variant="tertiary"
-                    size="small"
                     color="secondary"
+                    size="small"
                     sx={{
                       '&.MuiButton-sizeSmall': {
-                        padding: '4px 8px',
+                        lineHeight: '17px',
                       },
                     }}
                     disabled={maxSendableAmount.isExecuting}
@@ -797,13 +798,10 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             <IncludedTokens
               tokens={tokens}
               nfts={nfts}
-              onRemoveTokens={(tokensRemove) => {
+              onRemoveTokens={tokensRemove => {
                 const assetCount = totalAmount.nonDefaultEntries().length - 1;
                 this.props.onRemoveTokens(tokensRemove);
                 ampli.sendSelectAssetUpdated({
-                  asset_count: assetCount,
-                });
-                ampli.sendSummaryPageViewed({
                   asset_count: assetCount,
                 });
               }}
@@ -851,34 +849,31 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     switch (step) {
       case SEND_FORM_STEP.RECEIVER:
         return (
-          <Button
+          <ActionButton
             key="receiver-next"
             variant="primary"
             size="medium"
-            sx={{ width: '128px' }}
             onClick={() => this.onUpdateStep(SEND_FORM_STEP.AMOUNT)}
             disabled={invalidMemo || !receiverField.isValid}
           >
             {intl.formatMessage(globalMessages.nextButtonLabel)}
-          </Button>
+          </ActionButton>
         );
       case SEND_FORM_STEP.AMOUNT:
         return (
           <>
-            <Button
+            <ActionButton
               key="amount-back"
               variant="secondary"
               size="medium"
               onClick={() => this.onUpdateStep(SEND_FORM_STEP.RECEIVER)}
-              sx={{ width: '128px' }}
             >
               {intl.formatMessage(globalMessages.backButtonLabel)}
-            </Button>
-            <Button
+            </ActionButton>
+            <ActionButton
               key="amount-next"
               variant="primary"
               size="medium"
-              sx={{ width: '128px' }}
               onClick={() => {
                 this.props.onSubmit();
                 this.onUpdateStep(SEND_FORM_STEP.PREVIEW);
@@ -891,7 +886,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               }
             >
               {intl.formatMessage(globalMessages.nextButtonLabel)}
-            </Button>
+            </ActionButton>
           </>
         );
       default:
@@ -953,6 +948,9 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
         ampli.sendSelectAssetSelected({
           asset_count: totalInput.nonDefaultEntries().length,
         });
+        ampli.sendSummaryPageViewed({
+          asset_count: totalInput.nonDefaultEntries().length,
+        });
       }
     }
   }
@@ -995,3 +993,10 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     return `${convertedAmount} ${currency}`;
   }
 }
+
+const ActionButton: any = styled(Button)(() => ({
+  minWidth: '128px',
+  '&.MuiButton-sizeMedium': {
+    padding: '13px 24px',
+  },
+}));

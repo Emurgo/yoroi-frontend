@@ -1,16 +1,14 @@
 // @flow
 import type { Node } from 'react';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import { Component } from 'react';
 import { computed, action, observable } from 'mobx';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import globalMessages from '../../../i18n/global-messages';
 import { messages } from '../../../components/wallet/settings/ResyncBlock';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-
-import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
-
+import globalMessages from '../../../i18n/global-messages';
 import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
 import LocalizableError from '../../../i18n/LocalizableError';
 
@@ -24,13 +22,14 @@ type Props = {|
 const dialogMessages = defineMessages({
   warning: {
     id: 'wallet.settings.resync.warning',
-    defaultMessage: '!!!This will also cause failed transactions to disappear as they are not stored on the blockchain.',
+    defaultMessage:
+      '!!!This will also cause failed transactions to disappear as they are not stored on the blockchain.',
   },
 });
 
 @observer
 export default class ResyncWalletDialogContainer extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
@@ -44,7 +43,7 @@ export default class ResyncWalletDialogContainer extends Component<Props> {
   toggleCheck: void => void = () => {
     if (this.generated.stores.walletSettings.clearHistory.isExecuting) return;
     this.isChecked = !this.isChecked;
-  }
+  };
 
   render(): Node {
     const { intl } = this.context;
@@ -60,16 +59,17 @@ export default class ResyncWalletDialogContainer extends Component<Props> {
         error={settingsStore.clearHistory.error}
         primaryButton={{
           label: intl.formatMessage(globalMessages.resyncButtonLabel),
+          danger: false,
           onClick: async () => {
             await this.generated.actions.walletSettings.resyncHistory.trigger({
               publicDeriver: this.props.publicDeriver,
             });
             this.generated.actions.dialogs.closeActiveDialog.trigger();
-          }
+          },
         }}
         onCancel={this.generated.actions.dialogs.closeActiveDialog.trigger}
         secondaryButton={{
-          onClick: this.generated.actions.dialogs.closeActiveDialog.trigger
+          onClick: this.generated.actions.dialogs.closeActiveDialog.trigger,
         }}
       >
         <p>{intl.formatMessage(messages.resyncExplanation)}</p>
@@ -82,27 +82,27 @@ export default class ResyncWalletDialogContainer extends Component<Props> {
     actions: {|
       dialogs: {|
         closeActiveDialog: {|
-          trigger: (params: void) => void
-        |}
+          trigger: (params: void) => void,
+        |},
       |},
       walletSettings: {|
         resyncHistory: {|
           trigger: (params: {|
-            publicDeriver: PublicDeriver<>
-          |}) => Promise<void>
-        |}
-      |}
+            publicDeriver: PublicDeriver<>,
+          |}) => Promise<void>,
+        |},
+      |},
     |},
     stores: {|
       walletSettings: {|
         clearHistory: {|
           error: ?LocalizableError,
           isExecuting: boolean,
-          reset: () => void
-        |}
-      |}
-    |}
-    |} {
+          reset: () => void,
+        |},
+      |},
+    |},
+  |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }

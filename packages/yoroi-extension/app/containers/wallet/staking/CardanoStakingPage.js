@@ -39,7 +39,10 @@ import type { LayoutComponentMap } from '../../../styles/context/layout';
 import { Box } from '@mui/system';
 import type { PoolData } from './SeizaFetcher';
 import type { WalletChecksum } from '@emurgo/cip4-js';
-import { isTestnet } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import {
+  isCardanoHaskell,
+  isTestnet,
+} from '../../../api/ada/lib/storage/database/prepackaged/networks';
 
 export type GeneratedData = typeof CardanoStakingPage.prototype.generated;
 
@@ -90,9 +93,6 @@ class CardanoStakingPage extends Component<AllProps, State> {
       throw new Error(`${nameof(SeizaFetcher)} opened for non-reward wallet`);
     }
 
-    const delegationHistory = delegationRequests.getCurrentDelegation.result?.fullHistory;
-    const hasNeverDelegated = delegationHistory != null && delegationHistory.length === 0;
-
     if (urlTemplate != null) {
       const totalAda = this._getTotalAda();
       const locale = this.generated.stores.profile.currentLocale;
@@ -103,6 +103,10 @@ class CardanoStakingPage extends Component<AllProps, State> {
       }
       const balance = this.generated.stores.transactions.getBalance(publicDeriver);
       const isWalletWithNoFunds = balance != null && balance.getDefaultEntry().amount.isZero();
+      const poolList = (
+        delegationRequests.getDelegatedBalance.result?.delegation != null &&
+          this._isRegistered(publicDeriver)
+      ) ? [delegationRequests.getDelegatedBalance.result?.delegation] : [];
 
       const classicCardanoStakingPage = (
         <div id="classicCardanoStakingPage">
@@ -112,12 +116,8 @@ class CardanoStakingPage extends Component<AllProps, State> {
             locale={locale}
             bias={stakingListBias}
             totalAda={totalAda}
-            poolList={
-              delegationRequests.getCurrentDelegation.result?.currEpoch?.pools.map(
-                tuple => tuple[0]
-              ) ?? []
-            }
-            stakepoolSelectedAction={async poolId => {
+            poolList={poolList}
+            stakepoolSelectedAction={async (poolId) => {
               await this._updatePool(poolId);
               await this._next();
             }}
@@ -127,7 +127,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
 
       const revampCardanoStakingPage = (
         <>
-          {hasNeverDelegated ? (
+          {!this._isRegistered(publicDeriver) ? (
             <WalletDelegationBanner
               isOpen={this.generated.stores.transactions.showDelegationBanner}
               onDelegateClick={async poolId => {
@@ -146,6 +146,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
               isTestnet={isTestnet(publicDeriver.getParent().getNetworkInfo())}
             />
           ) : null}
+
           <Box sx={{ iframe: { minHeight: '60vh' } }}>
             {this.getDialog()}
             <SeizaFetcher
@@ -153,11 +154,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
               locale={locale}
               bias={stakingListBias}
               totalAda={totalAda}
-              poolList={
-                delegationRequests.getCurrentDelegation.result?.currEpoch?.pools.map(
-                  tuple => tuple[0]
-                ) ?? []
-              }
+              poolList={poolList}
               setFirstPool={pool => {
                 this.setState({ firstPool: pool });
               }}
@@ -175,6 +172,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
         REVAMP: revampCardanoStakingPage,
       });
     }
+
     return (
       <div>
         {this.getDialog()}
@@ -251,9 +249,8 @@ class CardanoStakingPage extends Component<AllProps, State> {
   _displayPoolInfo: void => void | Node = () => {
     const { intl } = this.context;
     const selectedWallet = this.generated.stores.wallets.selected;
-    if (selectedWallet == null) {
-      return null;
-    }
+    if (selectedWallet == null) return null;
+
     const selectedPoolInfo = this._getPoolInfo(selectedWallet);
     if (selectedPoolInfo == null) return;
 
@@ -476,6 +473,24 @@ class CardanoStakingPage extends Component<AllProps, State> {
     return undefined;
   };
 
+  _isRegistered: (PublicDeriver<>) => ?boolean = publicDeriver => {
+    if (!isCardanoHaskell(publicDeriver.getParent().getNetworkInfo())) {
+      return undefined;
+    }
+    const delegationRequests = this.generated.stores.delegation.getDelegationRequests(
+      publicDeriver
+    );
+    if (delegationRequests == null) return undefined;
+    if (
+      !delegationRequests.getDelegatedBalance.wasExecuted ||
+      delegationRequests.getDelegatedBalance.isExecuting ||
+      delegationRequests.getDelegatedBalance.result == null
+    ) {
+      return undefined;
+    }
+    return delegationRequests.getDelegatedBalance.result.stakeRegistered;
+  };
+
   @computed get generated(): {|
     actions: {|
       transactions: {|
@@ -687,6 +702,6 @@ class CardanoStakingPage extends Component<AllProps, State> {
       },
     });
   }
-};
+}
 
 export default (withLayout(CardanoStakingPage): ComponentType<Props>);

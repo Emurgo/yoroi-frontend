@@ -1,10 +1,10 @@
 // @flow
-import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import BigNumber from 'bignumber.js';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './AssetsList.scss';
+import { Component } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { ReactComponent as NoAssetLogo } from '../../../assets/images/assets-page/asset-no.inline.svg';
 import { ReactComponent as ArrowsListFromBottom } from '../../../assets/images/assets-page/arrows-list-from-bottom.inline.svg';
