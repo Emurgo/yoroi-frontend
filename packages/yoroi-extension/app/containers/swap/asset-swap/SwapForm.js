@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'react';
 import { useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import { ReactComponent as SwitchIcon } from '../../../assets/images/revamp/icons/switch.inline.svg';
@@ -8,17 +9,21 @@ import { ReactComponent as UsdaTokenImage } from './usda.inline.svg';
 import SwapInput from '../../../components/swap/SwapInput';
 import PriceInput from '../../../components/swap/PriceInput';
 
-const defaultFromAsset = { amount: '', walletAmount: 212, ticker: 'TADA' };
-const defaultToAsset = { amount: '', walletAmount: 0, ticker: '' };
+const defaultFromAsset = {
+  amount: '',
+  ticker: 'TADA',
+  walletAmount: 212,
+};
+const defaultToAsset = {
+  amount: '',
+  ticker: '',
+  walletAmount: 0,
+};
 
-export default function SwapForm() {
+export default function SwapForm(): Node {
   const [isMarketOrder, setIsMarketOrder] = useState(true);
   const [fromAsset, setFromAsset] = useState(defaultFromAsset);
   const [toAsset, setToAsset] = useState(defaultToAsset);
-
-  // <TODO:CHECK_LINT>
-  // eslint-disable-next-line no-unused-vars
-  const handleOpenedDialog = type => setOpenedDialog(type);
 
   const handleSwitchSelectedAssets = () => {
     setFromAsset(toAsset);

@@ -4,12 +4,7 @@ import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { ReactComponent as ChevronDownIcon } from '../../assets/images/revamp/icons/chevron-down.inline.svg';
 import { ReactComponent as DefaultTokenImage } from '../../assets/images/revamp/token-default.inline.svg';
-
-type AssetAmount = {|
-  ticker: string,
-  amount: number,
-  walletAmount: number,
-|};
+import type { AssetAmount } from './types';
 
 type Props = {|
   label: string,
