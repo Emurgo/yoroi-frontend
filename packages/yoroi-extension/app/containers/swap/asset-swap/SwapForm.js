@@ -6,6 +6,7 @@ import { ReactComponent as SwitchIcon } from '../../../assets/images/revamp/icon
 import { ReactComponent as InfoIcon } from '../../../assets/images/revamp/icons/info.inline.svg';
 import { ReactComponent as EditIcon } from '../../../assets/images/revamp/icons/edit.inline.svg';
 import { ReactComponent as RefreshIcon } from '../../../assets/images/revamp/icons/refresh.inline.svg';
+import { ReactComponent as DefaultToken } from '../../../assets/images/revamp/token-default.inline.svg';
 import { defaultFromAsset, defaultToAsset, fromAssets, poolList, toAssets } from './mockData';
 import SwapInput from '../../../components/swap/SwapInput';
 import PriceInput from '../../../components/swap/PriceInput';
@@ -169,8 +170,7 @@ export default function SwapForm(): Node {
               onClick={() => !isMarketOrder && setOpenedDialog('pool')}
               sx={{ cursor: 'pointer', display: 'flex', gap: '4px', alignItems: 'center' }}
             >
-              {/* <TODO:CHECK wth is DefaultToken? it doesn't exist> */}
-              <Box sx={{ width: '24px', height: '24px' }}>{pool.image /* || <DefaultToken /> */}</Box>
+              <Box sx={{ width: '24px', height: '24px' }}>{pool.image || <DefaultToken />}</Box>
               <Typography variant="body1" color="grayscale.max">
                 {pool.name ? `${pool.name} ${pool.isAuto ? '(Auto)' : ''}` : 'No pool found'}
               </Typography>

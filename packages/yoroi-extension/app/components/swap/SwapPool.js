@@ -1,8 +1,8 @@
+// @flow
 import { useState } from 'react';
-import { Box, Input, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import { ReactComponent as ChevronDownIcon } from '../../assets/images/revamp/icons/chevron-down.inline.svg';
 import { ReactComponent as InfoIcon } from '../../assets/images/revamp/icons/info.inline.svg';
-import { ReactComponent as DefaultToken } from '../../assets/images/revamp/token-default.inline.svg';
 
 export default function SwapPool({
   minAda,
@@ -10,7 +10,6 @@ export default function SwapPool({
   fees,
   baseCurrency,
   quoteCurrency,
-  isLoading,
 }) {
   const [showFullInfo, setShowFullInfo] = useState(false);
 

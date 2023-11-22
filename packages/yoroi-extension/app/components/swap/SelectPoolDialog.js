@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react';
+// @flow
 import { Box, Typography } from '@mui/material';
 import Dialog from '../widgets/Dialog';
 import Table from '../common/table/Table';
