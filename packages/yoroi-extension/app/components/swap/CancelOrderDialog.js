@@ -5,7 +5,17 @@ import Dialog from '../widgets/Dialog';
 import AssetPair from '../common/assets/AssetPair';
 import TextField from '../common/TextField';
 
-export default function CancelSwapOrderDialog({ order, onCancelOrder, onClose }) {
+type Props = {|
+  order: any,
+  onCancelOrder: void => void,
+  onClose: void => void,
+|};
+
+export default function CancelSwapOrderDialog({
+  order,
+  onCancelOrder,
+  onClose,
+}: Props): React$Node {
   const handleCancelOrder = () => {
     onCancelOrder();
     onClose();

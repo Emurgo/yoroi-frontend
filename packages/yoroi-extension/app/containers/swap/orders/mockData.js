@@ -7,7 +7,7 @@ import { ReactComponent as MinswapImage } from '../mockAssets/minswap.inline.svg
 import { ReactComponent as SundaeImage } from '../mockAssets/sundae.inline.svg';
 import { ReactComponent as MuesliImage } from '../mockAssets/muesli.inline.svg';
 
-export const mockOpenOrders = [
+export const mockOpenOrders: Array<any> = [
   {
     from: { image: <AdaTokenImage />, ticker: 'ADA' },
     to: { image: <UsdaTokenImage />, ticker: 'USDA' },
@@ -32,7 +32,7 @@ export const mockOpenOrders = [
   },
 ];
 
-export const mockCompletedOrders = [
+export const mockCompletedOrders: Array<any> = [
   {
     to: { image: <MilkTokenImage />, ticker: 'MILK' },
     from: { image: <UsdaTokenImage />, ticker: 'USDA' },
