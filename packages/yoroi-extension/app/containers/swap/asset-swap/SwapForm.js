@@ -3,6 +3,8 @@ import type { Node } from 'react';
 import { useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import { ReactComponent as SwitchIcon } from '../../../assets/images/revamp/icons/switch.inline.svg';
+import { ReactComponent as InfoIcon } from '../../../assets/images/revamp/icons/info.inline.svg';
+import { ReactComponent as EditIcon } from '../../../assets/images/revamp/icons/edit.inline.svg';
 import { ReactComponent as RefreshIcon } from '../../../assets/images/revamp/icons/refresh.inline.svg';
 import { defaultFromAsset, defaultToAsset, fromAssets, toAssets } from './mockData';
 import SwapInput from '../../../components/swap/SwapInput';
@@ -134,7 +136,7 @@ export default function SwapForm(): Node {
             <InfoIcon />
           </Box>
           <Box
-            onClick={() => handleOpenedDialog('slippage')}
+            onClick={() => setOpenedDialog('slippage')}
             sx={{ cursor: 'pointer', display: 'flex', gap: '4px', alignItems: 'center' }}
           >
             <Typography variant="body1" color="grayscale.max">
@@ -159,7 +161,7 @@ export default function SwapForm(): Node {
         <SlippageDialog
           currentSlippage={slippage}
           onSlippageApplied={setSlippage}
-          onClose={() => handleOpenedDialog('')}
+          onClose={() => setOpenedDialog('')}
         />
       )}
     </>

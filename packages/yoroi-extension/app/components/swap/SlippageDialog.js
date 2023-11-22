@@ -1,8 +1,12 @@
+// @flow
 import { useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
-import { ReactComponent as AssetDefault } from '../../assets/images/revamp/asset-default.inline.svg';
-import { ReactComponent as NoAssetsFound } from '../../assets/images/revamp/no-assets-found.inline.svg';
 import Dialog from '../widgets/Dialog';
+// <TODO:CHECK_LINT>
+// eslint-disable-next-line no-unused-vars
+import { ReactComponent as AssetDefault } from '../../assets/images/revamp/asset-default.inline.svg';
+// eslint-disable-next-line no-unused-vars
+import { ReactComponent as NoAssetsFound } from '../../assets/images/revamp/no-assets-found.inline.svg';
 
 const defaultSlippages = ['0', '0.1', '0.5', '1', '2', '3', '5', '10'];
 
@@ -27,8 +31,9 @@ export default function SlippageDialog({ currentSlippage, onSlippageApplied, onC
 
   const readonly = defaultSlippages.includes(selectedSlippage);
 
+  // <TODO:CHECK_INTL>
   return (
-    <Dialog title={'Slippage tolerance'} onClose={onClose} withCloseButton closeOnOverlayClick>
+    <Dialog title="Slippage tolerance" onClose={onClose} withCloseButton closeOnOverlayClick>
       <Box maxWidth="564px">
         <Box>
           <Typography variant="body1" color="grayscale.800">
