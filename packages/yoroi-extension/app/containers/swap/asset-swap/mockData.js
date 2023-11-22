@@ -1,10 +1,10 @@
-// @flow
-import { ReactComponent as AdaTokenImage } from './mockAssets/ada.inline.svg';
-import { ReactComponent as UsdaTokenImage } from './mockAssets/usda.inline.svg';
-import { ReactComponent as MilkTokenImage } from './mockAssets/milk.inline.svg';
-import { ReactComponent as MinswapImage } from './mockAssets/minswap.inline.svg';
-import { ReactComponent as SundaeImage } from './mockAssets/sundae.inline.svg';
-import { ReactComponent as MuesliImage } from './mockAssets/muesli.inline.svg';
+//@flow
+import { ReactComponent as AdaTokenImage } from '../mockAssets/ada.inline.svg';
+import { ReactComponent as UsdaTokenImage } from '../mockAssets/usda.inline.svg';
+import { ReactComponent as MilkTokenImage } from '../mockAssets/milk.inline.svg';
+import { ReactComponent as MinswapImage } from '../mockAssets/minswap.inline.svg';
+import { ReactComponent as SundaeImage } from '../mockAssets/sundae.inline.svg';
+import { ReactComponent as MuesliImage } from '../mockAssets/muesli.inline.svg';
 
 export const defaultFromAsset: any = {
   image: <AdaTokenImage />,

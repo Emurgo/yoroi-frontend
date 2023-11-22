@@ -10,15 +10,19 @@ type Props = {|
   rowGap?: string,
   columnGap?: string,
   columnAlignment?: Array<string>,
+  columnLeftPaddings?: Array<string>,
+  columnRightPaddings?: Array<string>,
 |};
 
 export default function Table({
   children,
   rowGap,
   columnGap,
-  columnAlignment = ['left'],
   columnNames,
   gridTemplateColumns,
+  columnAlignment = ['left'],
+  columnLeftPaddings = ['8px'],
+  columnRightPaddings = ['0px'],
 }: Props): Node {
   return (
     <Box
@@ -37,8 +41,8 @@ export default function Table({
           textAlign={columnAlignment[i] ? columnAlignment[i] : 'right'}
           pt="13px"
           pb="5px" // 5px + 8px of gap = 13px
-          pr={i === 0 ? '0' : '8px'}
-          pl={i === 0 ? '8px' : '0px'}
+          pr={columnRightPaddings[i] ? columnRightPaddings[i] : '8px'}
+          pl={columnLeftPaddings[i] ? columnLeftPaddings[i] : '0px'}
           color="grayscale.600"
         >
           {name}

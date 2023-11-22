@@ -2,8 +2,8 @@
 import { Box, Typography } from '@mui/material';
 import { ReactComponent as InfoIcon } from '../../../assets/images/revamp/icons/info.inline.svg';
 import { ReactComponent as AssetDefault } from '../../../assets/images/revamp/asset-default.inline.svg';
-import { ReactComponent as AdaTokenImage } from './mockAssets/ada.inline.svg';
-import { ReactComponent as UsdaTokenImage } from './mockAssets/usda.inline.svg';
+import { ReactComponent as AdaTokenImage } from '../mockAssets/ada.inline.svg';
+import { ReactComponent as UsdaTokenImage } from '../mockAssets/usda.inline.svg';
 import TextField from '../../../components/common/TextField';
 import type { AssetAmount } from '../../../components/swap/types';
 
