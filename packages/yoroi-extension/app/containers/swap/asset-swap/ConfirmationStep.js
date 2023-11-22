@@ -129,7 +129,7 @@ const AssetRow = ({
       }}
     >
       <Box flexShrink="0" width="48px" height="48px">
-        {image || <AssetDefault/>}
+        {image || <AssetDefault />}
       </Box>
       <Box flexGrow="1" width="100%">
         <Box>
