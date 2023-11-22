@@ -1,3 +1,4 @@
+// @flow
 import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { ReactComponent as AssetDefault } from '../../assets/images/revamp/asset-default.inline.svg';
@@ -9,6 +10,7 @@ import { ReactComponent as ArrowBottomIcon } from '../../assets/images/revamp/ic
 import { truncateAddressShort } from '../../utils/formatters';
 import Dialog from '../widgets/Dialog';
 import Table from '../common/table/Table';
+import type { AssetAmount } from './types';
 
 const fromTemplateColumns = '1fr minmax(auto, 136px)';
 const toTemplateColumns = '1fr minmax(auto, 152px) minmax(auto, 136px)';
@@ -16,10 +18,29 @@ const toTemplateColumns = '1fr minmax(auto, 152px) minmax(auto, 136px)';
 const fromColumns = ['Asset', 'Amount'];
 const toColumns = ['Asset', 'Volume, 24h', 'Price %, 24h'];
 
-export default function SelectAssetDialog({ assets = [], type, onAssetSelected, onClose }) {
+type Props = {|
+  assets: Array<AssetAmount>,
+  type: string,
+  onAssetSelected: AssetAmount => void,
+  onClose: void => void,
+|}
+
+export default function SelectAssetDialog(
+  {
+    assets = [],
+    type,
+    onAssetSelected,
+    onClose,
+  }: Props
+): React$Node {
   const [searchTerm, setSearchTerm] = useState('');
+
+  // <TODO:CHECK_LINT>
+  // eslint-disable-next-line no-unused-vars
   const [sortBy, setSortBy] = useState('');
 
+  // <TODO:CHECK_LINT>
+  // eslint-disable-next-line no-unused-vars
   const handleSortBy = sort => {
     setSortBy(sort);
   };
@@ -89,7 +110,7 @@ export default function SelectAssetDialog({ assets = [], type, onAssetSelected, 
           {filteredAssets.map((a, index) => (
             <AssetAndAmountRow
               key={`${a.address}-${index}`}
-              {...a}
+              asset={a}
               type={type}
               onAssetSelected={handleAssetSelected}
             />
@@ -123,20 +144,29 @@ export default function SelectAssetDialog({ assets = [], type, onAssetSelected, 
 const AssetAndAmountRow = ({
   image = null,
   type,
-  name,
-  address,
-  walletAmount,
-  ticker,
-  usdPrice,
-  adaPrice,
-  volume24h,
+  asset,
+  usdPrice = null,
+  adaPrice = null,
+  volume24h = null,
   priceChange100 = '',
   onAssetSelected,
 }) => {
+  const {
+    name = null,
+    address,
+    walletAmount,
+    ticker,
+  } = asset;
   const isFrom = type === 'from';
   const priceNotChanged = Number(priceChange100.replace('-', '').replace('%', '')) === 0;
   const priceIncreased = priceChange100 && priceChange100.charAt(0) !== '-';
   const priceChange24h = priceChange100.replace('-', '') || '0%';
+
+  const priceColor = (): string => {
+    if (priceNotChanged) return 'grayscale.900';
+    if (priceIncreased) return 'secondary.600';
+    return 'magenta.500';
+  }
 
   return (
     <Box
@@ -150,7 +180,7 @@ const AssetAndAmountRow = ({
         gridTemplateColumns: isFrom ? fromTemplateColumns : toTemplateColumns,
         '&:hover': { bgcolor: 'grayscale.50' },
       }}
-      onClick={() => onAssetSelected({ address, ticker })}
+      onClick={() => onAssetSelected(asset)}
     >
       <Box sx={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
         <Box display="inline-flex">{image || <AssetDefault />}</Box>
@@ -197,9 +227,7 @@ const AssetAndAmountRow = ({
             <Box
               alignSelf="center"
               p="16px"
-              color={
-                priceNotChanged ? 'grayscale.900' : priceIncreased ? 'secondary.600' : 'magenta.500'
-              }
+              color={priceColor()}
               display="flex"
               alignItems="center"
               justifyContent="flex-end"

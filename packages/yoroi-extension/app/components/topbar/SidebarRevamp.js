@@ -6,7 +6,7 @@ import type { SidebarCategoryRevamp } from '../../stores/stateless/sidebarCatego
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import { Box, Link } from '@mui/material';
-import { ReactComponent as YoroiLogo } from '../../assets/images/sidebar/yoroi_logo.inline.svg';
+import { ReactComponent as YoroiLogo } from '../../assets/images/sidebar/revamp/yoroi-logo.inline.svg';
 import SideBarCategoryRevamp from './SideBarCategoryRevamp';
 import styles from './SidebarRevamp.scss';
 import globalMessages from '../../i18n/global-messages';

@@ -122,6 +122,10 @@ export async function migrateToLatest(
     ['<4.18', async () => {
       return await populateNewUtxodata(persistentDb);
     }],
+    ['<4.23', async () => {
+      // Ergo sunset
+      return await removeErgoDevices(persistentDb);
+    }],
   ];
 
   let appliedMigration = false;

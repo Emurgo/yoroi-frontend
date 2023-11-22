@@ -1,8 +1,17 @@
+//@flow
 import { Box, Button, Typography } from '@mui/material';
 import { ReactComponent as TxSuccessfulImage } from '../../../assets/images/revamp/tx-successful.inline.svg';
 import { ReactComponent as TxFailureImage } from '../../../assets/images/revamp/tx-failure.inline.svg';
 
-export default function TxSubmittedStep({ isSuccessful, onTryAgain }) {
+type Props = {|
+  isSuccessful: boolean,
+  onTryAgain: void => void,
+|};
+
+export default function TxSubmittedStep({
+  isSuccessful,
+  onTryAgain,
+}: Props): React$Node {
   return (
     <Box
       display="flex"

@@ -188,12 +188,12 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   }
 
   @computed get recent(): Array<WalletTransaction> {
-    if (this.isErgoWalletSelected()) {
-      return this.ergoTransactionsStore.recent;
-    }
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return [];
 
+    if (this.isErgoWalletSelected()) {
+      return this.ergoTransactionsStore.recent;
+    }
     const { txs } = this.getTxHistoryState(publicDeriver);
     return  [
       ...this.getSubmittedTransactions(publicDeriver),
