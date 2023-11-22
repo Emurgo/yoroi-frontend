@@ -17,7 +17,7 @@ export const defaultFromAsset: any = {
   volume24h: 0,
 };
 
-export const defaultToAsset = {
+export const defaultToAsset: any = {
   amount: '',
   walletAmount: 0,
   ticker: '',
@@ -62,7 +62,7 @@ export const toAssets: Array<any> = [
   },
 ];
 
-export const poolList = [
+export const poolList: Array<any> = [
   {
     name: 'Minswap',
     image: <MinswapImage />,
