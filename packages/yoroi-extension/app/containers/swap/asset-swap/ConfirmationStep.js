@@ -1,7 +1,7 @@
+//@flow
 import { Box, Typography } from '@mui/material';
 import { ReactComponent as InfoIcon } from '../../../assets/images/revamp/icons/info.inline.svg';
 import { ReactComponent as AssetDefault } from '../../../assets/images/revamp/asset-default.inline.svg';
-import { ReactComponent as MinswapImage } from './mockAssets/minswap.inline.svg';
 import { ReactComponent as AdaTokenImage } from './mockAssets/ada.inline.svg';
 import { ReactComponent as UsdaTokenImage } from './mockAssets/usda.inline.svg';
 import TextField from '../../../components/common/TextField';
@@ -60,10 +60,10 @@ export default function SwapConfirmationStep({ poolInfo = {} }) {
             </Box>
           }
         />
-        <SummaryRow col1={'Slippage tolerance'} col2={'1%'} withInfo />
-        <SummaryRow col1={'Min ADA'} col2={'2 ADA'} withInfo />
-        <SummaryRow col1={'Minimum assets received'} col2={'2.99 USDA'} withInfo />
-        <SummaryRow col1={'Fees'} col2={'0 ADA'} withInfo />
+        <SummaryRow col1="Slippage tolerance" col2="1%" withInfo />
+        <SummaryRow col1="Min ADA" col2="2 ADA" withInfo />
+        <SummaryRow col1="Minimum assets received" col2="2.99 USDA" withInfo />
+        <SummaryRow col1="Fees" col2="0 ADA" withInfo />
         <Box p="16px" bgcolor="#244ABF" borderRadius="8px" color="common.white">
           <Box display="flex" justifyContent="space-between">
             <Box>Total</Box>

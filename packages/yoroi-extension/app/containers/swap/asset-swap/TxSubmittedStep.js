@@ -1,3 +1,4 @@
+//@flow
 import { Box, Button, Typography } from '@mui/material';
 import { ReactComponent as TxSuccessfulImage } from '../../../assets/images/revamp/tx-successful.inline.svg';
 import { ReactComponent as TxFailureImage } from '../../../assets/images/revamp/tx-failure.inline.svg';

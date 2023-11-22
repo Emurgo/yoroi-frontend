@@ -15,6 +15,9 @@ export default function SwapPage(): Node {
   const [isSuccessful, setIsSuccessful] = useState(false);
 
   const handleNextStep = () => setStep(s => s + 1);
+
+  // <TODO:CHECK_LINT>
+  // eslint-disable-next-line no-unused-vars
   const handlePrevStep = () => setStep(s => s - 1);
 
   return (
