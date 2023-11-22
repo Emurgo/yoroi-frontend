@@ -1,3 +1,4 @@
+//@flow
 import { Box } from '@mui/material';
 
 export default function AssetPair({ from, to, sx = {} }) {

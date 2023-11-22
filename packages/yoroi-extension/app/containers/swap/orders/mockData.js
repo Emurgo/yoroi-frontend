@@ -1,3 +1,4 @@
+// @flow
 import { ReactComponent as AdaTokenImage } from '../mockAssets/ada.inline.svg';
 import { ReactComponent as UsdaTokenImage } from '../mockAssets/usda.inline.svg';
 import { ReactComponent as MilkTokenImage } from '../mockAssets/milk.inline.svg';
