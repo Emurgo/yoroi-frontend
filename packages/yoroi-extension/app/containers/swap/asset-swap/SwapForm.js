@@ -1,11 +1,12 @@
+// @flow
+import type { Node } from 'react';
 import { useState } from 'react';
-import { Box, Button, Input, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { ReactComponent as SwitchIcon } from '../../../assets/images/revamp/icons/switch.inline.svg';
-import { ReactComponent as RefreshIcon } from '../../../assets/images/revamp/icons/refresh.inline.svg';
 import { ReactComponent as InfoIcon } from '../../../assets/images/revamp/icons/info.inline.svg';
 import { ReactComponent as EditIcon } from '../../../assets/images/revamp/icons/edit.inline.svg';
-import { ReactComponent as AdaTokenImage } from '../mockAssets/ada.inline.svg';
-import { ReactComponent as UsdaTokenImage } from '../mockAssets/usda.inline.svg';
+import { ReactComponent as RefreshIcon } from '../../../assets/images/revamp/icons/refresh.inline.svg';
+import { ReactComponent as DefaultToken } from '../../../assets/images/revamp/token-default.inline.svg';
 import { defaultFromAsset, defaultToAsset, fromAssets, poolList, toAssets } from './mockData';
 import SwapInput from '../../../components/swap/SwapInput';
 import PriceInput from '../../../components/swap/PriceInput';
@@ -15,15 +16,13 @@ import SelectPoolDialog from '../../../components/swap/SelectPoolDialog';
 import SwapPool from '../../../components/swap/SwapPool';
 import Tabs from '../../../components/common/tabs/Tabs';
 
-export default function SwapForm() {
+export default function SwapForm(): Node {
   const [isMarketOrder, setIsMarketOrder] = useState(true);
   const [openedDialog, setOpenedDialog] = useState('');
   const [pool, setPool] = useState(poolList[0]);
   const [slippage, setSlippage] = useState('1');
   const [fromAsset, setFromAsset] = useState(defaultFromAsset);
   const [toAsset, setToAsset] = useState(defaultToAsset);
-
-  const handleOpenedDialog = type => setOpenedDialog(type);
 
   const handleSwitchSelectedAssets = () => {
     setFromAsset(toAsset);
@@ -71,7 +70,7 @@ export default function SwapForm() {
           label="Swap from"
           image={fromAsset.image}
           asset={fromAsset}
-          onAssetSelect={() => handleOpenedDialog('from')}
+          onAssetSelect={() => setOpenedDialog('from')}
           handleAmountChange={amount => handleAmountChange(amount, 'from')}
           showMax
           isFrom
@@ -97,7 +96,7 @@ export default function SwapForm() {
           label="Swap to"
           image={toAsset.image}
           asset={toAsset}
-          onAssetSelect={() => handleOpenedDialog('to')}
+          onAssetSelect={() => setOpenedDialog('to')}
           handleAmountChange={amount => handleAmountChange(amount, 'to')}
         />
 
@@ -126,7 +125,7 @@ export default function SwapForm() {
             <InfoIcon />
           </Box>
           <Box
-            onClick={() => handleOpenedDialog('slippage')}
+            onClick={() => setOpenedDialog('slippage')}
             sx={{ cursor: 'pointer', display: 'flex', gap: '4px', alignItems: 'center' }}
           >
             <Typography variant="body1" color="grayscale.max">
@@ -138,15 +137,39 @@ export default function SwapForm() {
 
         {/* Available pools */}
         <Box>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              mb: '16px',
+            }}
+          >
+            <Box display="flex" gap="8px" alignItems="center">
+              <Typography variant="body1" color="grayscale.500">
+                DEX
+              </Typography>
+              <InfoIcon />
+            </Box>
+            <Box
+              onClick={() => !isMarketOrder && setOpenedDialog('pool')}
+              sx={{ cursor: 'pointer', display: 'flex', gap: '4px', alignItems: 'center' }}
+            >
+              <Box sx={{ width: '24px', height: '24px' }}>{pool.image || <DefaultToken />}</Box>
+              <Typography variant="body1" color="grayscale.max">
+                {pool.name ? `${pool.name} ${pool.isAuto ? '(Auto)' : ''}` : 'No pool found'}
+              </Typography>
+
+              {!isMarketOrder && <EditIcon />}
+            </Box>
+          </Box>
+
           <SwapPool
-            image={pool.image}
-            name={pool.name}
-            isAuto={pool.isAuto}
-            onSelectPool={() => handleOpenedDialog('pool')}
-            assets={[
-              { ticker: 'TADA', amount: 20 },
-              { ticker: 'USDA', amount: 5 },
-            ]}
+            fees="0"
+            minAda="0"
+            minAssets="0"
+            baseCurrency={fromAsset}
+            quoteCurrency={toAsset}
           />
         </Box>
       </Box>
@@ -157,7 +180,7 @@ export default function SwapForm() {
           assets={openedDialog === 'from' ? fromAssets : toAssets}
           type={openedDialog}
           onAssetSelected={asset => handleSelectedAsset(asset, openedDialog)}
-          onClose={() => handleOpenedDialog('')}
+          onClose={() => setOpenedDialog('')}
         />
       )}
 
@@ -165,7 +188,7 @@ export default function SwapForm() {
         <SlippageDialog
           currentSlippage={slippage}
           onSlippageApplied={setSlippage}
-          onClose={() => handleOpenedDialog('')}
+          onClose={() => setOpenedDialog('')}
         />
       )}
 
@@ -174,7 +197,7 @@ export default function SwapForm() {
           currentPool={pool.name}
           poolList={poolList}
           onPoolSelected={setPool}
-          onClose={() => handleOpenedDialog('')}
+          onClose={() => setOpenedDialog('')}
         />
       )}
     </>

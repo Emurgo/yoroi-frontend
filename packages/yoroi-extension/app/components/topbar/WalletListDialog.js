@@ -1,27 +1,26 @@
 // @flow
-import { BigNumber } from 'bignumber.js';
 import type { Node } from 'react';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
+import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+import type { WalletsNavigation } from '../../api/localStorage';
+import { BigNumber } from 'bignumber.js';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import DialogRevamp from '../widgets/DialogRevamp';
-import DialogCloseButton from '../widgets/DialogCloseButton';
-import styles from './WalletListDialog.scss';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { ReactComponent as IconEyeOpen } from '../../assets/images/my-wallets/icon_eye_open.inline.svg';
 import { ReactComponent as IconEyeClosed } from '../../assets/images/my-wallets/icon_eye_closed.inline.svg';
-import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
-import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { MultiToken } from '../../api/common/lib/MultiToken';
-import WalletCard from './WalletCard';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import globalMessages from '../../i18n/global-messages';
-import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
-import AmountDisplay, { FiatDisplay } from '../common/AmountDisplay';
-import type { WalletsNavigation } from '../../api/localStorage';
-import { Button, Stack } from '@mui/material';
 import { Box } from '@mui/system';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
+import Dialog from '../widgets/Dialog';
+import DialogCloseButton from '../widgets/DialogCloseButton';
+import styles from './WalletListDialog.scss';
+import WalletCard from './WalletCard';
+import globalMessages from '../../i18n/global-messages';
+import AmountDisplay, { FiatDisplay } from '../common/AmountDisplay';
 
 const messages = defineMessages({
   addWallet: {
@@ -185,12 +184,31 @@ export default class WalletListDialog extends Component<Props, State> {
     const walletsTotal = this.renderWalletsTotal();
 
     return (
-      <DialogRevamp
+      <Dialog
         className={styles.component}
         title={intl.formatMessage(globalMessages.changeWallet)}
         closeOnOverlayClick
         closeButton={<DialogCloseButton />}
         onClose={this.props.close}
+        actions={[
+          {
+            id: 'addWalletButton',
+            onClick: onAddWallet,
+            size: 'large',
+            label: intl.formatMessage(messages.addWallet),
+          },
+          {
+            id: 'applyWalletButton',
+            onClick: this.onSelect,
+            size: 'large',
+            disabled:
+              this.state.selectedWallet === null ||
+              this.isCurrentWallet(this.state.selectedWallet, 'global'),
+            primary: true,
+            label: intl.formatMessage(messages.applyWallet),
+          },
+        ]}
+        scrollableContentClass="WalletList"
       >
         <Box>
           <div className={styles.header}>
@@ -206,7 +224,7 @@ export default class WalletListDialog extends Component<Props, State> {
               </button>
             </div>
           </div>
-          <Box sx={{ overflow: 'auto',  overflowY: 'auto', paddingX: '40px', height: '400px' }}>
+          <Box className="WalletList" sx={{ overflow: 'auto', overflowY: 'auto', height: '400px' }}>
             {cardanoWalletsIdx.length > 0 && (
               <div className={styles.sectionHeader}>
                 <h1>{intl.formatMessage(messages.cardano)}</h1>
@@ -277,42 +295,8 @@ export default class WalletListDialog extends Component<Props, State> {
               </Droppable>
             </DragDropContext>
           </Box>
-          <Stack
-            spacing={1}
-            direction="row"
-            sx={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '40px',
-              borderTop: '1px solid var(--yoroi-palette-gray-100)',
-            }}
-          >
-            <Button
-              id="addWalletButton"
-              onClick={onAddWallet}
-              size="large"
-              variant="outlined"
-              color="primary"
-              fullWidth
-            >
-              {intl.formatMessage(messages.addWallet)}
-            </Button>
-            <Button
-              id="applyWalletButton"
-              onClick={this.onSelect}
-              size="large"
-              disabled={
-                this.state.selectedWallet === null ||
-                this.isCurrentWallet(this.state.selectedWallet, 'global')
-              }
-              fullWidth
-              variant="primary"
-            >
-              {intl.formatMessage(messages.applyWallet)}
-            </Button>
-          </Stack>
         </Box>
-      </DialogRevamp>
+      </Dialog>
     );
   }
 

@@ -17,7 +17,7 @@ import type { ComplexityLevelType } from '../../types/complexityLevelType';
 import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
 import LocalizableError from '../../i18n/LocalizableError';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import { isErgo, isTestnet } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { isTestnet } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 const messages = defineMessages({
   title: {
@@ -41,11 +41,8 @@ export default class ComplexityLevelPage extends Component<InjectedOrGenerated<G
     const isWalletTestnet = selected == null
       ? false
       : isTestnet(selected.getParent().getNetworkInfo());
-    const isWalletErgo = selected == null
-      ? false
-      : isErgo(selected.getParent().getNetworkInfo());
     const displayedBanner = checkAdaServerStatus === ServerStatusErrors.Healthy
-      ? <TestnetWarningBanner isTestnet={isWalletTestnet} isErgo={isWalletErgo} />
+      ? <TestnetWarningBanner isTestnet={isWalletTestnet} />
       : <ServerErrorBanner errorType={checkAdaServerStatus} />;
 
     const topbarTitle = (

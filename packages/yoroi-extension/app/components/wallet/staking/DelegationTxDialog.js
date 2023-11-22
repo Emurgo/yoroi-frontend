@@ -34,7 +34,6 @@ import { withLayout } from '../../../styles/context/layout';
 import type { InjectedLayoutProps } from '../../../styles/context/layout';
 import { toSvg } from 'jdenticon';
 import { CopyAddress } from '../assets/NFTDetails';
-import DialogRevamp from '../../widgets/DialogRevamp';
 
 const messages = defineMessages({
   delegationTips: {
@@ -260,7 +259,7 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
     );
 
     const revampLayout = (
-      <DialogRevamp
+      <Dialog
         title={intl.formatMessage(
           isRevampLayout
             ? globalMessages.delegateLabel
@@ -441,7 +440,7 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
             </Typography>
           </Box>
         ) : null}
-      </DialogRevamp>
+      </Dialog>
     );
 
     return this.props.renderLayoutComponent({
