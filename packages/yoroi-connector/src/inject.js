@@ -86,16 +86,11 @@ function getFavicons(url) {
 }
 
 let connected = false;
-let ergoApiInjected = false;
 let cardanoApiInjected = false;
 
 function disconnectWallet(protocol) {
     connected = false;
-    if (protocol === 'ergo') {
-        window.dispatchEvent(new Event("ergo_wallet_disconnected"));
-    } else {
-        window.dispatchEvent(new Event("yoroi_wallet_disconnected"));
-    }
+    window.dispatchEvent(new Event("yoroi_wallet_disconnected"));
 }
 
 function listenToBackgroundServiceWorker() {
@@ -104,29 +99,6 @@ function listenToBackgroundServiceWorker() {
         // alert("content script message: " + JSON.stringify(message));
         if (message.type === "connector_rpc_response") {
             window.postMessage(message, location.origin);
-        } else if (message.type === "yoroi_connect_response/ergo") {
-            if (message.success) {
-                connectedProtocolHolder[0] = 'ergo';
-                if (!ergoApiInjected) {
-                    // inject full API here
-                    if (await injectIntoPage('ergoApiInject')) {
-                        ergoApiInjected = true;
-                    } else {
-                        console.error()
-                        window.postMessage({
-                            type: "connector_connected",
-                            err: {
-                                code: API_INTERNAL_ERROR,
-                                info: "failed to inject Ergo API"
-                            }
-                        }, location.origin);
-                    }
-                }
-            }
-            window.postMessage({
-                type: "connector_connected",
-                success: message.success
-            }, location.origin);
         } else if (message.type === "yoroi_connect_response/cardano") {
             if (message.success) {
                 connectedProtocolHolder[0] = 'cardano';
@@ -161,7 +133,7 @@ function listenToBackgroundServiceWorker() {
 
 async function handleConnectorConnectRequest(event, protocol) {
     const requestIdentification = event.data.requestIdentification;
-    if ((ergoApiInjected || (cardanoApiInjected && !requestIdentification)) && connected) {
+    if ((cardanoApiInjected && !requestIdentification) && connected) {
         // we can skip communication - API injected + hasn't been disconnected
         window.postMessage({
             type: "connector_connected",
@@ -216,7 +188,7 @@ async function connectorEventListener(event) {
     const dataType = event.data.type;
     if (dataType === "connector_rpc_request") {
         await handleConnectorRpcRequest(event);
-    } else if (dataType === "connector_connect_request/ergo" || dataType === 'connector_connect_request/cardano') {
+    } else if (dataType === 'connector_connect_request/cardano') {
         const protocol = dataType.split('/')[1];
         await handleConnectorConnectRequest(event, protocol);
     } else if (dataType === 'scripted_injected') {

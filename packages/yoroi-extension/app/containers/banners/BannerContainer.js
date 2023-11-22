@@ -13,7 +13,7 @@ import environment from '../../environment';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import { isTestnet, isCardanoHaskell, isErgo } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { isTestnet, isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import { getTokenName, genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
@@ -27,11 +27,10 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
   render(): Node {
     const serverStatus = this.generated.stores.serverConnectionStore.checkAdaServerStatus;
 
-    const { selected, publicDerivers } = this.generated.stores.wallets;
+    const { selected } = this.generated.stores.wallets;
     const isWalletTestnet = selected == null
       ? false
       : isTestnet(selected.getParent().getNetworkInfo());
-    const isAnyWalletErgo = publicDerivers?.some(w => isErgo(w.getParent().getNetworkInfo())) ?? false;
 
     const deprecationBanner = this.getDeprecationBanner();
     return (
@@ -45,7 +44,7 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
         {serverStatus !== ServerStatusErrors.Healthy && (
           <ServerErrorBanner errorType={serverStatus} />
         )}
-        <TestnetWarningBanner isTestnet={isWalletTestnet} isErgo={isAnyWalletErgo} />
+        <TestnetWarningBanner isTestnet={isWalletTestnet} />
         {!environment.isProduction() && <NotProductionBanner />}
         {deprecationBanner}
       </>

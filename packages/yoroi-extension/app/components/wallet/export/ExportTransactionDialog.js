@@ -1,5 +1,5 @@
 // @flow
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
@@ -14,6 +14,9 @@ import CheckboxLabel from '../../common/CheckboxLabel';
 import DateRange from './DateRange';
 import { Box } from '@mui/system';
 import { Moment } from 'moment';
+import { withLayout } from '../../../styles/context/layout';
+import type { InjectedLayoutProps } from '../../../styles/context/layout';
+import { Checkbox, FormControlLabel } from '@mui/material';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -46,7 +49,7 @@ type State = {|
 |};
 
 @observer
-export default class ExportTransactionDialog extends Component<Props, State> {
+class ExportTransactionDialog extends Component<Props & InjectedLayoutProps, State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -71,6 +74,7 @@ export default class ExportTransactionDialog extends Component<Props, State> {
       cancel,
       toggleIncludeTxIds,
       shouldIncludeTxIds,
+      isRevampLayout,
     } = this.props;
     const { startDate, endDate } = this.state;
     const infoBlock = (
@@ -80,9 +84,10 @@ export default class ExportTransactionDialog extends Component<Props, State> {
           fontSize: '15px',
           lineHeight: 1.2,
           opacity: 0.7,
-          textAlign: 'center',
-          padding: '10px 0 0 0',
-          mb: '25px',
+          textAlign: 'left',
+          paddingTop: '10px',
+          color: 'grayscale.900',
+          mb: '24px',
         }}
       >
         <span>{intl.formatMessage(messages.infoText1)}</span>
@@ -113,23 +118,42 @@ export default class ExportTransactionDialog extends Component<Props, State> {
         closeButton={<DialogCloseButton />}
         onClose={cancel}
       >
-        {infoBlock}
-        <DateRange
-          date={{ startDate, endDate }}
-          setStartDate={date => {
-            this.setState({ startDate: date });
-          }}
-          setEndDate={date => {
-            this.setState({ endDate: date });
-          }}
-        />
-        <CheckboxLabel
-          label={intl.formatMessage(messages.includeTxIds)}
-          onChange={toggleIncludeTxIds}
-          checked={shouldIncludeTxIds}
-        />
-        {error && <ErrorBlock error={error} />}
+        <Box width={isRevampLayout ? '600px' : '100%'}>
+          {infoBlock}
+          <DateRange
+            date={{ startDate, endDate }}
+            setStartDate={date => {
+              this.setState({ startDate: date });
+            }}
+            setEndDate={date => {
+              this.setState({ endDate: date });
+            }}
+          />
+
+          {isRevampLayout ? (
+            <FormControlLabel
+              sx={{
+                ml: '-1px',
+                '.MuiCheckbox-root': {
+                  mr: '10px',
+                },
+              }}
+              control={<Checkbox checked={shouldIncludeTxIds} onChange={toggleIncludeTxIds} />}
+              label={intl.formatMessage(messages.includeTxIds)}
+            />
+          ) : (
+            <CheckboxLabel
+              label={intl.formatMessage(messages.includeTxIds)}
+              onChange={toggleIncludeTxIds}
+              checked={shouldIncludeTxIds}
+            />
+          )}
+
+          {error && <ErrorBlock error={error} />}
+        </Box>
       </Dialog>
     );
   }
 }
+
+export default (withLayout(ExportTransactionDialog): ComponentType<Props>);

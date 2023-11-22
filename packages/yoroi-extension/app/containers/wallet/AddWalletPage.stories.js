@@ -41,10 +41,7 @@ import UserPasswordDialog from '../../components/wallet/add/paper-wallets/UserPa
 import { ProgressStep as PaperWalletProgressStep } from '../../stores/ada/PaperWalletCreateStore';
 import { PdfGenSteps } from '../../api/ada/paperWallet/paperWalletPdf';
 import { ROUTES } from '../../routes-config';
-import {
-  defaultAssets,
-  networks
-} from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { defaultAssets, networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 import config from '../../config';
 import {
@@ -80,6 +77,7 @@ const defaultProps: ({|
   stores: {
     profile: {
       selectedNetwork: request.selectedNetwork,
+      isRevampTheme: false,
     },
     uiDialogs: {
       hasOpen: request.openDialog != null,

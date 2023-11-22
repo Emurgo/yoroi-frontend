@@ -28,6 +28,14 @@ const globalMessages: * = defineMessages({
     id: 'global.yoroi',
     defaultMessage: '!!!Yoroi',
   },
+  yoroiNightly: {
+    id: 'global.yoroiNightly',
+    defaultMessage: '!!!Yoroi Nightly',
+  },
+  yoroiIntro: {
+    id: 'global.yoroi.intro',
+    defaultMessage: '!!!Light wallet for Cardano assets',
+  },
   here: {
     id: 'global.util.here',
     defaultMessage: '!!!here',
@@ -75,6 +83,10 @@ const globalMessages: * = defineMessages({
   ledgerWallet: {
     id: 'wallet.nav.type.ledger',
     defaultMessage: '!!!Ledger wallet',
+  },
+  important: {
+    id: 'global.dialogs.important',
+    defaultMessage: '!!!Important',
   },
   fieldIsRequired: {
     id: 'global.errors.fieldIsRequired',
@@ -438,6 +450,10 @@ const globalMessages: * = defineMessages({
   languageSelectLabel: {
     id: 'profile.languageSelect.form.languageSelectLabel',
     defaultMessage: '!!!Select your language',
+  },
+  languageSelectLabelShort: {
+    id: 'profile.languageSelect.form.languageSelectLabelShort',
+    defaultMessage: '!!!Select language',
   },
   languageSelectLabelInfo: {
     id: 'settings.general.languageSelect.labelInfo',
@@ -1032,7 +1048,8 @@ const globalMessages: * = defineMessages({
   },
   tosAgreement: {
     id: 'profile.languageSelect.tosAgreement',
-    defaultMessage: '!!!I agree with <span id="tosLink">Terms of Service Agreement</span> and <span id="privacyLink">Privacy Notice</span>',
+    defaultMessage:
+      '!!!I agree with <span id="tosLink">Terms of Service Agreement</span> and <span id="privacyLink">Privacy Notice</span>',
   },
 });
 export default globalMessages;

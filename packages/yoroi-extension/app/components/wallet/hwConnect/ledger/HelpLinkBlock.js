@@ -10,8 +10,8 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   helpLinkYoroiWithLedger: {
-    id: 'wallet.connect.ledger.dialog.common.step.link.helpYoroiWithLedger',
-    defaultMessage: '!!!https://emurgo.io/en/blog/how-to-use-ledger-nano-s-with-yoroi-cardano',
+    id: 'wallet.connect.ledger.dialog.common.step.link.helpYoroiWithLedger_v2',
+    defaultMessage: '!!!https://emurgohelpdesk.zendesk.com/hc/en-us/articles/4415580907279',
   },
   helpLinkYoroiWithLedgerText: {
     id: 'wallet.connect.ledger.dialog.common.step.link.helpYoroiWithLedger.text',

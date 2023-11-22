@@ -1,3 +1,4 @@
+//@flow
 import type { Node } from 'react';
 import { Box, Typography } from '@mui/material';
 import Separator from '../separator/Separator';
