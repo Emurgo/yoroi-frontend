@@ -10,7 +10,15 @@ import { ReactComponent as NoAssetsFound } from '../../assets/images/revamp/no-a
 
 const defaultSlippages = ['0', '0.1', '0.5', '1', '2', '3', '5', '10'];
 
-export default function SlippageDialog({ currentSlippage, onSlippageApplied, onClose }) {
+type Props = {|
+  currentSlippage: string,
+  onSlippageApplied: string => void,
+  onClose: void => void,
+|};
+
+export default function SlippageDialog(
+  { currentSlippage, onSlippageApplied, onClose }: Props
+): React$Node {
   const [selectedSlippage, setSelectedSlippage] = useState(currentSlippage);
   const [manualSlippage, setManualSlippage] = useState(currentSlippage);
   const [isManual, setIsManual] = useState(!defaultSlippages.includes(currentSlippage));
@@ -22,10 +30,9 @@ export default function SlippageDialog({ currentSlippage, onSlippageApplied, onC
 
   const handleSlippageChange = e => {
     let val = e.target.value.replace(/[^\d.-]+/g, '');
-
-    if (Number(val) > 100) val = 100;
-    else if (Number(val) < 0) val = 0;
-
+    const number = Number(val);
+    if (number > 100) val = '100';
+    else if (number < 0) val = '0';
     setManualSlippage(val);
   };
 
