@@ -26,7 +26,7 @@ export default function SelectPoolDialog({
   };
 
   return (
-    <Dialog title={'Select dex'} onClose={onClose} withCloseButton closeOnOverlayClick>
+    <Dialog title="Select dex" onClose={onClose} withCloseButton closeOnOverlayClick>
       <Table gridTemplateColumns={templateColumns} columnNames={tableColumns}>
         {poolList.map(pool => {
           const { image, name, price, liquidity, fee, deposit } = pool;
