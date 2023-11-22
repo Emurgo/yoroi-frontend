@@ -7,7 +7,19 @@ const tableColumns = ['DEX name', 'Price', 'TVL', 'DEX fee', 'Liquidity provider
 
 const templateColumns = 'minmax(auto, 208px) 120px 200px 90px 160px';
 
-export default function SelectPoolDialog({ currentPool, poolList = [], onPoolSelected, onClose }) {
+type Props = {|
+  currentPool: string,
+  poolList: Array<any>,
+  onPoolSelected: any => void,
+  onClose: void => void,
+|};
+
+export default function SelectPoolDialog({
+  currentPool,
+  poolList = [],
+  onPoolSelected,
+  onClose,
+}: Props): React$Node {
   const handlePoolSelected = pool => {
     onPoolSelected(pool);
     onClose();
