@@ -103,7 +103,9 @@ const OrderRow = ({ isCompleted = false, handleCancel, ...order }) => (
   </>
 );
 
-const TabButton = ({ label, isActive, onClick }) => (
+// <TODO:CHECK_LINT>
+// eslint-disable-next-line no-unused-vars
+const TabButton = ({ label, isActive, onClick }): React$Node => (
   <Box onClick={onClick} p="8px" borderRadius="8px" bgcolor={isActive ? 'grayscale.200' : ''}>
     <Typography variant="body1" fontWeight={500}>
       {label}

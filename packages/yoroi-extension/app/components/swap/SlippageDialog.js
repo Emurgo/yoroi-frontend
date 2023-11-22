@@ -7,7 +7,6 @@ import Dialog from '../widgets/Dialog';
 import { ReactComponent as AssetDefault } from '../../assets/images/revamp/asset-default.inline.svg';
 // eslint-disable-next-line no-unused-vars
 import { ReactComponent as NoAssetsFound } from '../../assets/images/revamp/no-assets-found.inline.svg';
-import Dialog from '../widgets/Dialog';
 import Tabs from '../common/tabs/Tabs';
 
 const defaultSlippages = ['0', '0.1', '0.5', '1', '2', '3', '5', '10'];
