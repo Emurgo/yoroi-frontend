@@ -44,6 +44,7 @@ function DialogFn(props: Props): Node {
         justifyContent: 'center',
         alignItems: 'center',
       }}
+      disableAutoFocus
     >
       <ModalContainer
         display="flex"
@@ -53,7 +54,12 @@ function DialogFn(props: Props): Node {
         boxShadow="0px 13px 20px -1px #00000026"
       >
         {title != null && title !== '' ? (
-          <Typography as="h1" variant="body1" className="dialog__title">
+          <Typography
+            as="h1"
+            variant="body1"
+            className="dialog__title"
+            id='dialogRevampTitle'
+          >
             {title}
           </Typography>
         ) : null}
@@ -66,6 +72,7 @@ function DialogFn(props: Props): Node {
                 action.className != null ? action.className : null,
                 action.primary === true ? 'primary' : 'secondary',
               ]);
+
               return (
                 <LoadingButton
                   id={action.primary === true ? 'primaryButton' : 'secondaryButton'}
@@ -152,10 +159,10 @@ function getBtnVariant(
   primary?: boolean,
   isRevampLayout?: boolean
 ): {|
-  variant: 'contained' | 'outlined' | 'danger' | 'primary' | 'secondary',
+  variant: 'contained' | 'outlined' | 'danger' | 'primary' | 'secondary' | 'destructive',
   color?: 'primary' | 'secondary' | 'error',
 |} {
-  if (danger && isRevampLayout) return { variant: 'contained', color: 'error' };
+  if (danger && isRevampLayout) return { variant: 'destructive' };
 
   if (isRevampLayout && primary) {
     return { variant: 'primary' };
@@ -165,7 +172,7 @@ function getBtnVariant(
     return { variant: 'secondary' };
   }
 
-  if (danger === true) return { variant: 'danger' };
+  if (danger === true) return { variant: 'primary' };
   if (primary === true) return { variant: 'primary' };
   return { variant: 'secondary' };
 }

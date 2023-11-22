@@ -737,6 +737,7 @@ export async function removeAllTransactions(
   );
 }
 
+// <TODO:PENDING_REMOVAL> Ergo
 export async function updateTransactions(
   db: lf$Database,
   publicDeriver: IPublicDeriver<ConceptualWallet>,

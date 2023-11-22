@@ -9,10 +9,13 @@ import TxSubmittedStep from './TxSubmittedStep';
 
 export default function SwapPage(): Node {
   const [step, setStep] = useState(0);
+
+  // <TODO:CHECK_LINT>
+  // eslint-disable-next-line no-unused-vars
   const [isSuccessful, setIsSuccessful] = useState(false);
 
-  const handleNextStep = () => setStep(step => step + 1);
-  const handlePrevStep = () => setStep(step => step - 1);
+  const handleNextStep = () => setStep(s => s + 1);
+  const handlePrevStep = () => setStep(s => s - 1);
 
   return (
     <Box display="flex" flexDirection="column" height="100%">

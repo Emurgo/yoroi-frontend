@@ -14,7 +14,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import { isErgo, isTestnet } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { isTestnet } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import IntroBanner from '../../components/profile/language-selection/IntroBanner';
 import environment from '../../environment';
 
@@ -29,12 +29,12 @@ export default class TermsOfUsePage extends Component<InjectedOrGenerated<Genera
   render(): Node {
     const { checkAdaServerStatus } = this.generated.stores.serverConnectionStore;
     const { selected } = this.generated.stores.wallets;
-    const isWalletTestnet =
-      selected == null ? false : isTestnet(selected.getParent().getNetworkInfo());
-    const isWalletErgo = selected == null ? false : isErgo(selected.getParent().getNetworkInfo());
+    const isWalletTestnet = selected == null
+      ? false
+      : isTestnet(selected.getParent().getNetworkInfo());
 
     const displayedBanner = checkAdaServerStatus === ServerStatusErrors.Healthy
-      ? <TestnetWarningBanner isTestnet={isWalletTestnet} isErgo={isWalletErgo} />
+      ? <TestnetWarningBanner isTestnet={isWalletTestnet} />
       : <ServerErrorBanner errorType={checkAdaServerStatus} />;
     return (
       <TopBarLayout

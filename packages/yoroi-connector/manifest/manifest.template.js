@@ -5,7 +5,7 @@ module.exports = ({
 }) => ({
   "name": displayName,
   "version": version,
-  "description": "Allows the Yoroi extension to interface with dApps following the Ergo EIP-0012 spec.",
+  "description": "Allows the Yoroi extension to interface with dApps",
   "background": {
     "scripts": ["background.js"],
     "persistent": false

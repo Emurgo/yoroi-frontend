@@ -14,10 +14,16 @@ export type GetDelegatedBalanceRequest = {|
   publicDeriver: PublicDeriver<> & IGetStakingKey,
   rewardBalance: MultiToken,
   stakingAddress: string,
+  delegation: string | null,
+  allRewards: string | null,
+  stakeRegistered: ?boolean,
 |};
 export type GetDelegatedBalanceResponse = {|
   utxoPart: MultiToken,
   accountPart: MultiToken,
+  delegation: string | null,
+  allRewards: string | null,
+  stakeRegistered: ?boolean,
 |};
 export type GetDelegatedBalanceFunc = (
   request: GetDelegatedBalanceRequest

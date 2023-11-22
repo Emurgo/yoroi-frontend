@@ -7,11 +7,12 @@ import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './OptForAnalyticsForm.scss';
 import { LoadingButton } from '@mui/lab';
-import Switch from '@mui/material/Switch';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import {
-  ReactComponent as AnalyticsIllustration
-}  from '../../../assets/images/analytics-illustration.inline.svg';
+import { ReactComponent as AnalyticsIllustration } from '../../../assets/images/analytics-illustration.inline.svg';
+import { ReactComponent as YesIcon } from '../../../assets/images/yes.inline.svg';
+import { ReactComponent as NoIcon } from '../../../assets/images/no.inline.svg';
+import { Box, Typography } from '@mui/material';
+import { RevampSwitch } from '../../widgets/Switch';
 
 const messages = defineMessages({
   title: {
@@ -20,7 +21,8 @@ const messages = defineMessages({
   },
   share: {
     id: 'profile.analytics.share',
-    defaultMessage: '!!!Share user insights to help us fine tune Yoroi to better serve user preferences and needs.',
+    defaultMessage:
+      '!!!Share user insights to help us fine tune Yoroi to better serve user preferences and needs.',
   },
   line1: {
     id: 'profile.analytics.line1',
@@ -57,7 +59,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  onOpt: (boolean) => void,
+  onOpt: boolean => void,
   variant: 'startup' | 'settings',
   isOptedIn: boolean,
 |};
@@ -68,40 +70,79 @@ type State = {|
 
 @observer
 export default class OptForAnalyticsForm extends Component<Props, State> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   state: State = { isSubmitting: false };
 
-  onOpt: (boolean) => void = (isOptIn) => {
+  onOpt: boolean => void = isOptIn => {
     this.setState({ isSubmitting: true });
     this.props.onOpt(isOptIn);
-  }
+  };
 
   render(): Node {
     const { intl } = this.context;
     const { variant, isOptedIn } = this.props;
 
+    const isStartupScreen = variant === 'startup';
+    const isSettingsScreen = variant === 'settings';
+
+    const analyticsDetails = [
+      [YesIcon, messages.line1],
+      [YesIcon, messages.line2],
+      [NoIcon, messages.line3],
+      [NoIcon, messages.line4],
+      [NoIcon, messages.line5],
+    ];
+
     return (
-      <div className={styles.component}>
+      <Box mt={isStartupScreen ? '16px' : '0px'} className={styles.component}>
         <div className={variant === 'startup' ? styles.centeredBox : ''}>
-          <div className={styles.title}>{intl.formatMessage(messages.title)}</div>
-          {variant === 'settings' ? (
-            <div className={styles.share}>{intl.formatMessage(messages.share)}</div>
-          ): (
+          {isSettingsScreen && (
+            <div className={styles.title}>{intl.formatMessage(messages.title)}</div>
+          )}
+
+          {isSettingsScreen ? (
+            <Box my="24px">{intl.formatMessage(messages.share)}</Box>
+          ) : (
             <div className={styles.illustration}>
               <AnalyticsIllustration />
             </div>
           )}
-          <ul>
-            <li className={styles.yes}>{intl.formatMessage(messages.line1)}</li>
-            <li className={styles.yes}>{intl.formatMessage(messages.line2)}</li>
-            <li className={styles.no}><FormattedHTMLMessage {...messages.line3} /></li>
-            <li className={styles.no}><FormattedHTMLMessage {...messages.line4} /></li>
-            <li className={styles.no}><FormattedHTMLMessage {...messages.line5} /></li>
-          </ul>
-          <div>
+
+          {isStartupScreen && (
+            <Typography variant="h5" fontWeight={500} mt="16px">
+              {intl.formatMessage(messages.title)}
+            </Typography>
+          )}
+
+          <Box my="16px">
+            {analyticsDetails.map(([Icon, msg]) => (
+              <Box
+                key={msg.id}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  gap: '8px',
+                }}
+              >
+                <Icon />
+                <Typography>
+                  <FormattedHTMLMessage {...msg} />
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: isStartupScreen ? 'center' : 'flex-start',
+            }}
+          >
             <a
               target="_blank"
               rel="noreferrer"
@@ -110,19 +151,21 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
             >
               {intl.formatMessage(messages.learnMore)}
             </a>
-          </div>
+          </Box>
 
-          {variant === 'settings' ? (
+          {isSettingsScreen ? (
             <FormControlLabel
               label={intl.formatMessage(messages.allow)}
               control={
-                <Switch
-                  checked={isOptedIn}
-                  onChange={event => this.onOpt(event.target.checked)}
-                />
+                <Box ml="8px">
+                  <RevampSwitch
+                    checked={isOptedIn}
+                    onChange={event => this.onOpt(event.target.checked)}
+                  />
+                </Box>
               }
               labelPlacement="start"
-              sx={{ marginLeft: '0px', marginTop: '16px' }}
+              sx={{ marginLeft: '0px', marginTop: '40px' }}
             />
           ) : (
             <>
@@ -143,8 +186,7 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
             </>
           )}
         </div>
-      </div>
+      </Box>
     );
   }
 }
-
