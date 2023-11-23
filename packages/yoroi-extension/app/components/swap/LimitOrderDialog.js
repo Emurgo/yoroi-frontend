@@ -54,7 +54,7 @@ export default function LimitOrderDialog({
 type SummaryRowProps = {|
   col1: Node,
   col2: Node,
-  withInfo: boolean,
+  withInfo?: boolean,
 |};
 
 const SummaryRow = ({ col1, col2, withInfo = false }: SummaryRowProps): Node => (

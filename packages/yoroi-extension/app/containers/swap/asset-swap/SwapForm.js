@@ -16,7 +16,11 @@ import SelectPoolDialog from '../../../components/swap/SelectPoolDialog';
 import SwapPool from '../../../components/swap/SwapPool';
 import Tabs from '../../../components/common/tabs/Tabs';
 
-export default function SwapForm({ onLimitSwap }): React$Node {
+type Props = {|
+  onLimitSwap: void => void,
+|};
+
+export default function SwapForm({ onLimitSwap }: Props): React$Node {
   const [isMarketOrder, setIsMarketOrder] = useState(true);
   const [openedDialog, setOpenedDialog] = useState('');
   const [pool, setPool] = useState(poolList[0]);
