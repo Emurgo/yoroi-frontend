@@ -1,5 +1,4 @@
 // @flow
-import type { Node } from 'react';
 import { useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import { ReactComponent as SwitchIcon } from '../../../assets/images/revamp/icons/switch.inline.svg';
@@ -16,7 +15,11 @@ import SelectPoolDialog from '../../../components/swap/SelectPoolDialog';
 import SwapPool from '../../../components/swap/SwapPool';
 import Tabs from '../../../components/common/tabs/Tabs';
 
-export default function SwapForm(): Node {
+type Props = {|
+  onLimitSwap: void => void,
+|};
+
+export default function SwapForm({ onLimitSwap }: Props): React$Node {
   const [isMarketOrder, setIsMarketOrder] = useState(true);
   const [openedDialog, setOpenedDialog] = useState('');
   const [pool, setPool] = useState(poolList[0]);
@@ -57,7 +60,14 @@ export default function SwapForm(): Node {
           <Tabs
             tabs={[
               { label: 'Market', isActive: isMarketOrder, onClick: () => setIsMarketOrder(true) },
-              { label: 'Limit', isActive: !isMarketOrder, onClick: () => setIsMarketOrder(false) },
+              {
+                label: 'Limit',
+                isActive: !isMarketOrder,
+                onClick: () => {
+                  setIsMarketOrder(false);
+                  onLimitSwap();
+                },
+              },
             ]}
           />
           <Box sx={{ cursor: 'pointer' }}>
