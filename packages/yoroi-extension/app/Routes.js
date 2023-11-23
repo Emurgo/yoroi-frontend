@@ -2,9 +2,8 @@
 import type { Node } from 'react';
 import type { StoresMap } from './stores/index';
 import type { ActionsMap } from './actions/index';
-import type { InjectedOrGenerated } from './types/injectedPropsType';
+import type { InjectedOrGenerated, InjectedProps } from './types/injectedPropsType';
 import type { GeneratedData as SettingsData } from './containers/settings/Settings';
-import type { GeneratedData as SwapData } from './containers/swap/SwapPageContainer';
 import type { GeneratedData as WalletData } from './containers/wallet/Wallet';
 import type { GeneratedData as ReceiveData } from './containers/wallet/Receive';
 import type { ConfigType } from '../config/config-types';
@@ -32,6 +31,7 @@ import Settings from './containers/settings/Settings';
 import SwapPageContainer from './containers/swap/SwapPageContainer';
 import AssetsWrapper from './containers/wallet/AssetsWrapper';
 import NFTsWrapper from './containers/wallet/NFTsWrapper';
+import SwapProvider from './containers/swap/SwapProvider';
 
 // PAGES
 const LanguageSelectionPagePromise = () => import('./containers/profile/LanguageSelectionPage');
@@ -285,6 +285,7 @@ export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
           wrapSettings({ ...props, stores, actions }, SettingsSubpages(stores, actions))
         }
       />
+
       <Route
         path={ROUTES.SWAP.ROOT}
         component={props => wrapSwap({ ...props, stores, actions }, SwapSubpages(stores, actions))}
@@ -474,11 +475,13 @@ const NFTsSubPages = (stores, actions) => (
   </Switch>
 );
 
-export function wrapSwap(swapProps: InjectedOrGenerated<SwapData>, children: Node): Node {
+export function wrapSwap(swapProps: InjectedProps, children: Node): Node {
   return (
-    <SwapPageContainer {...swapProps}>
-      <Suspense fallback={null}>{children}</Suspense>
-    </SwapPageContainer>
+    <SwapProvider publicDeriver={swapProps.stores.wallets.selected}>
+      <SwapPageContainer {...swapProps}>
+        <Suspense fallback={null}>{children}</Suspense>
+      </SwapPageContainer>
+    </SwapProvider>
   );
 }
 
