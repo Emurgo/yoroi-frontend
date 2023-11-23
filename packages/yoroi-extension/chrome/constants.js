@@ -27,6 +27,8 @@ export function genCSP(request: {|
   frameSrc.push('https://emurgo.github.io/');
   frameSrc.push('https://www.youtube.com/')
 
+  // Analytics
+  connectSrc.push('https://analytics.emurgo-rnd.com/');
   connectSrc.push('https://api2.amplitude.com');
 
   // unsafe-inline is unfortunately required by style-loader (even in production builds)

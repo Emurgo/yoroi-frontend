@@ -22,7 +22,8 @@ import { getTokenName } from '../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
 
 import styles from './URIGenerateDialog.scss';
-import ThemedDialog from '../widgets/ThemedDialog';
+// import ThemedDialog from '../widgets/ThemedDialog';
+import Dialog from '../widgets/Dialog';
 
 const messages = defineMessages({
   uriGenerateDialogTitle: {
@@ -140,7 +141,7 @@ export default class URIGenerateDialog extends Component<Props> {
     ];
 
     return (
-      <ThemedDialog
+      <Dialog
         title={intl.formatMessage(messages.uriGenerateDialogTitle)}
         actions={actions}
         className={dialogClasses}
@@ -165,12 +166,13 @@ export default class URIGenerateDialog extends Component<Props> {
               label={this.getAmountLabel()}
               error={amountField.error}
               done={amountField.isValid}
+              placeholder="0"
               allowSigns={false}
               autoFocus
             />
           </div>
         </div>
-      </ThemedDialog>
+      </Dialog>
     );
   }
 }

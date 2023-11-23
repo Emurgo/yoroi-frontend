@@ -3,6 +3,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  max-width: 600px;
 
   .search {
     border-radius: 8px;
@@ -94,16 +95,5 @@
       text-align: center;
       margin-top: 16px;
     }
-  }
-}
-
-.dialog {
-  min-width: 670px !important;
-  padding: 0 !important;
-
-  & > div {
-    padding-left: 0px !important;
-    max-height: unset;
-    padding-right: 0px !important;
   }
 }

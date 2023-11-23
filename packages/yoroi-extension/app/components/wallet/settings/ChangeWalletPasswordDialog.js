@@ -8,8 +8,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
-import DialogClassic from '../../widgets/Dialog';
-import DialogRevamp from '../../widgets/DialogRevamp';
+import Dialog from '../../widgets/Dialog';
 import { isValidWalletPassword, isValidRepeatPassword } from '../../../utils/validations';
 import globalMessages from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
@@ -141,7 +140,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
   render(): Node {
     const { form } = this;
     const { intl } = this.context;
-    const { onCancel, isSubmitting, dialogData, error, isClassicTheme, isRevampTheme } = this.props;
+    const { onCancel, isSubmitting, dialogData, error, isClassicTheme } = this.props;
 
     const dialogClasses = classnames(['changePasswordDialog', styles.dialog]);
 
@@ -175,8 +174,6 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
         isSubmitting: this.props.isSubmitting,
       },
     ];
-
-    const Dialog = isRevampTheme ? DialogRevamp : DialogClassic;
 
     return (
       <Dialog

@@ -5,9 +5,7 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import { ROUTES } from '../../routes-config';
-import globalMessages from '../../i18n/global-messages';
 import SubMenu from '../topbar/SubMenu';
-import environmnent from '../../environment';
 
 const messages = defineMessages({
   assetSwapLabel: {

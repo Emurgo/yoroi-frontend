@@ -4,6 +4,8 @@ elif [ $1 = "stable-mv2" ];
 then RELEASE_TYPE="stable-mv2"
 elif [ $1 = "nightly" ];
 then RELEASE_TYPE="nightly"
+elif [ $1 = "nightly-mv2" ];
+then RELEASE_TYPE="nightly-mv2"
 else
   echo "First parameter is expected 'stable', 'stable-mv2', or 'nightly'"
   return 1
