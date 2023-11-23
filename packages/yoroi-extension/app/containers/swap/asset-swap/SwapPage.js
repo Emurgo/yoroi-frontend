@@ -64,7 +64,7 @@ export default function SwapPage(): Node {
         <LimitOrderDialog
           limitPrice={9}
           marketPrice={4}
-          exchangePair={`ADA/USDA`}
+          exchangePair="ADA/USDA"
           onConfirm={() => handleOpenedDialog('')}
           onClose={() => handleOpenedDialog('')}
         />

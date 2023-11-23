@@ -1,5 +1,4 @@
 // @flow
-import type { Node } from 'react';
 import { useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import { ReactComponent as SwitchIcon } from '../../../assets/images/revamp/icons/switch.inline.svg';

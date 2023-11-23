@@ -1,6 +1,5 @@
 // @flow
 import type { Node } from 'react';
-import { useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import { ReactComponent as InfoIcon } from '../../assets/images/revamp/icons/info.inline.svg';
 import Dialog from '../widgets/Dialog';
