@@ -235,37 +235,6 @@ export function asProverResult(input: any): ProverResult {
   throw ConnectorError.invalidRequest(`invalid ProverResult: ${JSON.stringify(input)}`);
 }
 
-export type SignedTx = {|
-  id: TxId,
-  inputs: SignedInput[],
-  dataInputs: DataInput[],
-  outputs: ErgoBoxJson[],
-  size: number,
-|};
-
-export function asSignedTx(
-  input: any,
-  wasmInstance: typeof RustModule.SigmaRust
-): SignedTx {
-  try {
-    if (typeof input === 'object' &&
-        Array.isArray(input.inputs) &&
-        Array.isArray(input.dataInputs) &&
-        Array.isArray(input.outputs)) {
-      return {
-        id: asTxId(input.id),
-        inputs: input.inputs.map(asSignedInput),
-        dataInputs: input.dataInputs.map(asDataInput),
-        outputs: input.outputs.map(output => asBox(output, wasmInstance)),
-        size: input.size
-      };
-    }
-  } catch (err) {
-    throw ConnectorError.invalidRequest(`invalid SignedTx: ${JSON.stringify(input)} due to ${err}`);
-  }
-  throw ConnectorError.invalidRequest(`invalid SignedTx: ${JSON.stringify(input)}`);
-}
-
 export type TokenAmount = {|
   tokenId: TokenId,
   amount: Value,
@@ -531,13 +500,6 @@ export type GetConnectedSitesData = {|
 export type GetConnectionProtocolData = {|
   type: 'get_protocol',
 |}
-
-// when a tx is submitted we mark those as potentially spent and filter
-// utxo/balance/etc calls for them until they can be confirmed as spent or not
-export type PendingTransaction = {|
-  submittedTime: Date,
-  tx: SignedTx,
-|};
 
 // Errors: Yoroi-only
 

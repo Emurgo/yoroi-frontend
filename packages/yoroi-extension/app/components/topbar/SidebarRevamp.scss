@@ -38,12 +38,6 @@
     bottom: 0;
     background: rgba(255, 255, 255, 0.5);
   }
-  & svg {
-    transform: scale(0.9);
-  }
-  & svg > path {
-    fill: white;
-  }
 }
 
 .categories {

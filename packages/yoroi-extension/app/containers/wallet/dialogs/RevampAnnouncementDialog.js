@@ -83,14 +83,7 @@ export class RevampAnnouncementDialog extends Component<Props> {
         closeButton={<DialogCloseButton onClose={onClose} />}
         actions={actions}
       >
-        <Box
-          sx={{
-            py: '24px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '24px',
-          }}
-        >
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '24px' }} id="dialogRevampBox">
           <Typography
             variant="body1"
             sx={{

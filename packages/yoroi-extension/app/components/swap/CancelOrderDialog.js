@@ -1,13 +1,21 @@
-import { useState } from 'react';
+//@flow
 import { Box, Button, Typography } from '@mui/material';
-import { ReactComponent as AssetDefault } from '../../assets/images/revamp/asset-default.inline.svg';
-import { ReactComponent as NoAssetsFound } from '../../assets/images/revamp/no-assets-found.inline.svg';
 import { ReactComponent as InfoIcon } from '../../assets/images/revamp/icons/info.inline.svg';
 import Dialog from '../widgets/Dialog';
 import AssetPair from '../common/assets/AssetPair';
 import TextField from '../common/TextField';
 
-export default function CancelSwapOrderDialog({ order, onCancelOrder, onClose }) {
+type Props = {|
+  order: any,
+  onCancelOrder: void => void,
+  onClose: void => void,
+|};
+
+export default function CancelSwapOrderDialog({
+  order,
+  onCancelOrder,
+  onClose,
+}: Props): React$Node {
   const handleCancelOrder = () => {
     onCancelOrder();
     onClose();

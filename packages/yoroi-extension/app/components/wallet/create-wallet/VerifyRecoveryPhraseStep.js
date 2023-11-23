@@ -218,7 +218,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
 
         <Box height="28px" mt="16px">
           {wrongWordIdx !== null && (
-            <Typography variant="body2" color="error.100">
+            <Typography variant="body2" color="error.100" id="incorrectOrderMessage">
               {intl.formatMessage(messages.incorrectOrder)}
             </Typography>
           )}

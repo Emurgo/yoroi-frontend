@@ -19,7 +19,7 @@ import type { LanguageType } from '../../i18n/translations';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import { isErgo, isTestnet } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { isTestnet } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 const messages = defineMessages({
   title: {
@@ -68,16 +68,13 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
     const isWalletTestnet = selected == null
       ? false
       : isTestnet(selected.getParent().getNetworkInfo());
-    const isWalletErgo = selected == null
-      ? false
-      : isErgo(selected.getParent().getNetworkInfo());
     const topBar = generated.stores.profile.isClassicTheme ? (
       <TopBar
         title={topBarTitle}
       />) : undefined;
     const displayedBanner = generated.stores
       .serverConnectionStore.checkAdaServerStatus === ServerStatusErrors.Healthy
-      ? <TestnetWarningBanner isTestnet={isWalletTestnet} isErgo={isWalletErgo} />
+      ? <TestnetWarningBanner isTestnet={isWalletTestnet} />
       : <ServerErrorBanner errorType={
         generated.stores.serverConnectionStore.checkAdaServerStatus
       }
