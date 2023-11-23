@@ -7,6 +7,7 @@ import Dialog from '../widgets/Dialog';
 import { ReactComponent as AssetDefault } from '../../assets/images/revamp/asset-default.inline.svg';
 // eslint-disable-next-line no-unused-vars
 import { ReactComponent as NoAssetsFound } from '../../assets/images/revamp/no-assets-found.inline.svg';
+import Tabs from '../common/tabs/Tabs';
 
 const defaultSlippages = ['0', '0.1', '0.5', '1', '2', '3', '5', '10'];
 
@@ -53,39 +54,26 @@ export default function SlippageDialog(
             will not be executed if the price moves by more than this amount.
           </Typography>
         </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          {defaultSlippages.map(val => (
-            <Box
-              key={val}
-              p="8px"
-              sx={{
-                cursor: 'pointer',
-                borderRadius: '8px',
-                bgcolor: val === selectedSlippage && !isManual ? 'grayscale.200' : '',
-              }}
-              onClick={() => setSelectedSlippage(val)}
-            >
-              <Typography variant="body1" fontWeight={500}>
-                {val}%
-              </Typography>
-            </Box>
-          ))}
-          <Box
-            p="8px"
-            sx={{
-              cursor: 'pointer',
-              borderRadius: '8px',
-              bgcolor: isManual ? 'grayscale.200' : '',
-            }}
-            onClick={() => {
-              setIsManual(true);
-              setSelectedSlippage('');
-            }}
-          >
-            <Typography variant="body1" fontWeight={500}>
-              Manual
-            </Typography>
-          </Box>
+        <Box display="flex" justifyContent="flex-start">
+          <Tabs
+            tabs={defaultSlippages
+              .map(val => ({
+                label: `${val}%`,
+                isActive: val === selectedSlippage && !isManual,
+                onClick: () => {
+                  setIsManual(false);
+                  setSelectedSlippage(val);
+                },
+              }))
+              .concat({
+                label: 'Manual',
+                isActive: isManual,
+                onClick: () => {
+                  setIsManual(true);
+                  setSelectedSlippage('');
+                },
+              })}
+          />
         </Box>
         <Box my="16px">
           <Box
