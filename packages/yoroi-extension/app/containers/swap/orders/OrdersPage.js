@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import { Fragment, useState } from 'react';
+import { useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import { mockOpenOrders, mockCompletedOrders } from './mockData';
 import Table from '../../../components/common/table/Table';
@@ -55,7 +55,7 @@ export default function SwapOrdersPage(): Node {
           {showCompletedOrders
             ? mockCompletedOrders.map(order => <OrderRow isCompleted key={order.txId} {...order} />)
             : mockOpenOrders.map(order => (
-                <OrderRow key={order.txId} handleCancel={() => setCancelOrder(order)} {...order} />
+              <OrderRow key={order.txId} handleCancel={() => setCancelOrder(order)} {...order} />
               ))}
         </Table>
       </Box>
@@ -73,9 +73,9 @@ export default function SwapOrdersPage(): Node {
 const OrderRow = ({ isCompleted = false, handleCancel, ...order }) => (
   <>
     <AssetPair sx={{ py: '20px' }} from={order.from} to={order.to} />
-    <Box textAlign={'right'}>{order.price}</Box>
-    <Box textAlign={'right'}>{order.amount}</Box>
-    <Box textAlign={'right'}>
+    <Box textAlign="right">{order.price}</Box>
+    <Box textAlign="right">{order.amount}</Box>
+    <Box textAlign="right">
       <Box>
         {order.total} {order.to.ticker}
       </Box>
@@ -103,7 +103,9 @@ const OrderRow = ({ isCompleted = false, handleCancel, ...order }) => (
   </>
 );
 
-const TabButton = ({ label, isActive, onClick }) => (
+// <TODO:CHECK_LINT>
+// eslint-disable-next-line no-unused-vars
+const TabButton = ({ label, isActive, onClick }): React$Node => (
   <Box onClick={onClick} p="8px" borderRadius="8px" bgcolor={isActive ? 'grayscale.200' : ''}>
     <Typography variant="body1" fontWeight={500}>
       {label}

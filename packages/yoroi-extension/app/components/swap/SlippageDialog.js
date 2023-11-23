@@ -1,13 +1,25 @@
+// @flow
 import { useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
-import { ReactComponent as AssetDefault } from '../../assets/images/revamp/asset-default.inline.svg';
-import { ReactComponent as NoAssetsFound } from '../../assets/images/revamp/no-assets-found.inline.svg';
 import Dialog from '../widgets/Dialog';
+// <TODO:CHECK_LINT>
+// eslint-disable-next-line no-unused-vars
+import { ReactComponent as AssetDefault } from '../../assets/images/revamp/asset-default.inline.svg';
+// eslint-disable-next-line no-unused-vars
+import { ReactComponent as NoAssetsFound } from '../../assets/images/revamp/no-assets-found.inline.svg';
 import Tabs from '../common/tabs/Tabs';
 
 const defaultSlippages = ['0', '0.1', '0.5', '1', '2', '3', '5', '10'];
 
-export default function SlippageDialog({ currentSlippage, onSlippageApplied, onClose }) {
+type Props = {|
+  currentSlippage: string,
+  onSlippageApplied: string => void,
+  onClose: void => void,
+|};
+
+export default function SlippageDialog(
+  { currentSlippage, onSlippageApplied, onClose }: Props
+): React$Node {
   const [selectedSlippage, setSelectedSlippage] = useState(currentSlippage);
   const [manualSlippage, setManualSlippage] = useState(currentSlippage);
   const [isManual, setIsManual] = useState(!defaultSlippages.includes(currentSlippage));
@@ -19,17 +31,17 @@ export default function SlippageDialog({ currentSlippage, onSlippageApplied, onC
 
   const handleSlippageChange = e => {
     let val = e.target.value.replace(/[^\d.-]+/g, '');
-
-    if (Number(val) > 100) val = 100;
-    else if (Number(val) < 0) val = 0;
-
+    const number = Number(val);
+    if (number > 100) val = '100';
+    else if (number < 0) val = '0';
     setManualSlippage(val);
   };
 
   const readonly = defaultSlippages.includes(selectedSlippage);
 
+  // <TODO:CHECK_INTL>
   return (
-    <Dialog title={'Slippage tolerance'} onClose={onClose} withCloseButton closeOnOverlayClick>
+    <Dialog title="Slippage tolerance" onClose={onClose} withCloseButton closeOnOverlayClick>
       <Box maxWidth="564px">
         <Box>
           <Typography variant="body1" color="grayscale.800">

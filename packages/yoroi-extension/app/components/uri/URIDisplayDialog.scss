@@ -1,38 +1,27 @@
 .component {
-  min-width: var(--yoroi-comp-dialog-min-width-lg) !important;
-  max-width: var(--yoroi-comp-dialog-min-width-lg) !important;
-
   :global {
     .Dialog_title {
       margin-bottom: 24px;
     }
-
-    .CopyableAddress_copyIconBig {
-      & > svg {
-        margin-top: -7px;
-      }
-    }
   }
 
   .uriDisplay {
-    width: 90%;
     margin-left: auto;
     margin-right: auto;
-    margin-bottom: 24px;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
 
     .uri {
       font-weight: 400;
       word-break: break-all;
       font-size: 16px;
       line-height: 24px;
-      text-align: center;
+      text-align: left;
     }
   }
 
   .qrCode {
-    margin: 34px auto 20px auto;
+    margin: 24px auto;
     text-align: center;
   }
 }

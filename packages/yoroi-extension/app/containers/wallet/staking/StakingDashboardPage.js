@@ -102,18 +102,11 @@ export default class StakingDashboardPage extends Component<Props> {
     const dashboard = (
       <StakingDashboard
         pageInfo={
-          !delegationRequests.getCurrentDelegation.wasExecuted ||
-          delegationRequests.getCurrentDelegation.isExecuting
+          stakePools.pools == null
             ? undefined
             : {
                 currentPage: this.generated.stores.delegation.selectedPage,
-                numPages: Array.from(
-                  new Set(
-                    delegationRequests.getCurrentDelegation.result?.currEpoch?.pools.map(
-                      tuple => tuple[0]
-                    )
-                  ) ?? []
-                ).length,
+                numPages: stakePools.pools.length,
                 goToPage: page => this.generated.actions.delegation.setSelectedPage.trigger(page),
               }
         }
@@ -134,7 +127,7 @@ export default class StakingDashboardPage extends Component<Props> {
           getLocalPoolInfo: this.generated.stores.delegation.getLocalPoolInfo,
           tokenInfo: this.generated.stores.tokenInfoStore.tokenInfo,
         })}
-        delegationHistory={delegationRequests.getCurrentDelegation.result?.fullHistory}
+        isUnregistered={!this._isRegistered(publicDeriver)}
         epochLength={this.getEpochLengthInDays(publicDeriver)}
         ticker={truncateToken(
           getTokenName(
@@ -265,7 +258,7 @@ export default class StakingDashboardPage extends Component<Props> {
           upcomingRewards.unshift(
             this.generateUpcomingRewardInfo({
               epoch: currTimeRequests.currentEpoch + i + 1,
-              pools: currEpochCert.pools,
+              pools: isRegistered ? currEpochCert.pools : [],
               toAbsoluteSlot,
               toRealTime,
               timeSinceGenesis,
@@ -278,7 +271,7 @@ export default class StakingDashboardPage extends Component<Props> {
           upcomingRewards.unshift(
             this.generateUpcomingRewardInfo({
               epoch: currTimeRequests.currentEpoch + 2,
-              pools: result.prevEpoch.pools,
+              pools: isRegistered ? result.prevEpoch.pools : [],
               toAbsoluteSlot,
               toRealTime,
               timeSinceGenesis,
@@ -291,7 +284,7 @@ export default class StakingDashboardPage extends Component<Props> {
           upcomingRewards.unshift(
             this.generateUpcomingRewardInfo({
               epoch: currTimeRequests.currentEpoch + 1,
-              pools: result.prevPrevEpoch.pools,
+              pools: isRegistered ? result.prevPrevEpoch.pools : [],
               toAbsoluteSlot,
               toRealTime,
               timeSinceGenesis,
@@ -305,7 +298,7 @@ export default class StakingDashboardPage extends Component<Props> {
           upcomingRewards.unshift(
             this.generateUpcomingRewardInfo({
               epoch: currTimeRequests.currentEpoch,
-              pools: result.prevPrevPrevEpoch.pools,
+              pools: isRegistered ? result.prevPrevPrevEpoch.pools : [],
               toAbsoluteSlot,
               toRealTime,
               timeSinceGenesis,
@@ -413,13 +406,6 @@ export default class StakingDashboardPage extends Component<Props> {
     if (delegationRequests.error != null) {
       return { error: delegationRequests.error };
     }
-    if (delegationRequests.getCurrentDelegation.result != null) {
-      const currentDelegation = delegationRequests.getCurrentDelegation.result;
-      const currEpochInfo = currentDelegation.currEpoch;
-      if (currEpochInfo == null) {
-        return undefined;
-      }
-    }
     return undefined;
   };
 
@@ -430,17 +416,18 @@ export default class StakingDashboardPage extends Component<Props> {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
     }
     if (
-      !delegationRequests.getCurrentDelegation.wasExecuted ||
-      delegationRequests.getCurrentDelegation.isExecuting ||
-      delegationRequests.getCurrentDelegation.result == null
+      !delegationRequests.getDelegatedBalance.wasExecuted ||
+      delegationRequests.getDelegatedBalance.isExecuting ||
+      delegationRequests.getDelegatedBalance.result == null
     ) {
       return { pools: null };
     }
-    if (delegationRequests.getCurrentDelegation.result.currEpoch == null) {
+    if (delegationRequests.getDelegatedBalance.result.delegation == null) {
       return { pools: [] };
     }
-    const currentPools = delegationRequests.getCurrentDelegation.result.currEpoch.pools;
-
+    const currentPools = [
+      [delegationRequests.getDelegatedBalance.result.delegation, 1]
+    ];
     const tooltipNotification = {
       duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
       message: globalMessages.copyTooltipMessage,
@@ -580,7 +567,6 @@ export default class StakingDashboardPage extends Component<Props> {
     errorIfPresent: void | {| error: LocalizableError |},
   |}) => Node = request => {
     const showRewardAmount =
-      request.delegationRequests.getCurrentDelegation.wasExecuted &&
       request.delegationRequests.getDelegatedBalance.wasExecuted &&
       request.errorIfPresent == null;
 
@@ -596,7 +582,7 @@ export default class StakingDashboardPage extends Component<Props> {
         : request.delegationRequests.getDelegatedBalance.result.accountPart;
 
     const currentlyDelegating =
-      (request.delegationRequests.getCurrentDelegation.result?.currEpoch?.pools ?? []).length > 0;
+      request.delegationRequests.getDelegatedBalance.result?.delegation != null;
 
     return (
       <UserSummary
@@ -661,7 +647,8 @@ export default class StakingDashboardPage extends Component<Props> {
         isDelegated={
           showRewardAmount &&
           request.delegationRequests.getDelegatedBalance.result !== null &&
-          currentlyDelegating
+          currentlyDelegating &&
+          this._isRegistered(request.publicDeriver) === true
         }
       />
     );
@@ -671,11 +658,18 @@ export default class StakingDashboardPage extends Component<Props> {
     if (!isCardanoHaskell(publicDeriver.getParent().getNetworkInfo())) {
       return undefined;
     }
-    const adaDelegationRequests = this.generated.stores.substores.ada.delegation.getDelegationRequests(
+    const delegationRequests = this.generated.stores.delegation.getDelegationRequests(
       publicDeriver
     );
-    if (adaDelegationRequests == null) return undefined;
-    return adaDelegationRequests.getRegistrationHistory.result?.current;
+    if (delegationRequests == null) return undefined;
+    if (
+      !delegationRequests.getDelegatedBalance.wasExecuted ||
+      delegationRequests.getDelegatedBalance.isExecuting ||
+      delegationRequests.getDelegatedBalance.result == null
+    ) {
+      return undefined;
+    }
+    return delegationRequests.getDelegatedBalance.result.stakeRegistered;
   };
 
   @computed get generated(): {|

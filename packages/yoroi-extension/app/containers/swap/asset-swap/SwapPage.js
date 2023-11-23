@@ -11,10 +11,16 @@ import LimitOrderDialog from '../../../components/swap/LimitOrderDialog';
 export default function SwapPage(): Node {
   const [step, setStep] = useState(0);
   const [openedDialog, setOpenedDialog] = useState('');
+
+  // <TODO:CHECK_LINT>
+  // eslint-disable-next-line no-unused-vars
   const [isSuccessful, setIsSuccessful] = useState(false);
 
-  const handleNextStep = () => setStep(step => step + 1);
-  const handlePrevStep = () => setStep(step => step - 1);
+  const handleNextStep = () => setStep(s => s + 1);
+
+  // <TODO:CHECK_LINT>
+  // eslint-disable-next-line no-unused-vars
+  const handlePrevStep = () => setStep(s => s - 1);
 
   const handleOpenedDialog = dialog => setOpenedDialog(dialog);
 
@@ -58,7 +64,7 @@ export default function SwapPage(): Node {
         <LimitOrderDialog
           limitPrice={9}
           marketPrice={4}
-          exchangePair={`ADA/USDA`}
+          exchangePair="ADA/USDA"
           onConfirm={() => handleOpenedDialog('')}
           onClose={() => handleOpenedDialog('')}
         />

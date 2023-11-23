@@ -1,6 +1,5 @@
 // @flow
 import type { Node } from 'react';
-import { useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import { ReactComponent as InfoIcon } from '../../assets/images/revamp/icons/info.inline.svg';
 import Dialog from '../widgets/Dialog';
@@ -54,7 +53,7 @@ export default function LimitOrderDialog({
 type SummaryRowProps = {|
   col1: Node,
   col2: Node,
-  withInfo: boolean,
+  withInfo?: boolean,
 |};
 
 const SummaryRow = ({ col1, col2, withInfo = false }: SummaryRowProps): Node => (
