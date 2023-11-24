@@ -22,7 +22,7 @@ const messages = defineMessages({
   },
   incorrectWalletPasswordError: {
     id: 'api.errors.IncorrectPasswordError',
-    defaultMessage: '!!!Incorrect spending password. Please retype.',
+    defaultMessage: '!!!Incorrect password. Please retype.',
   },
   walletAlreadyRestoredError: {
     id: 'api.errors.WalletAlreadyRestoredError',

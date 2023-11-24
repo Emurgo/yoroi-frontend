@@ -1,24 +1,9 @@
 .component {
-  font-size: 16px;
-  min-width: 673px !important;
-  max-height: 90vh;
-  padding-right: 0 !important;
-  padding-bottom: 0px !important;
-
-  & > div {
-    padding: 0px;
-    max-height: unset !important;
-  }
-
   .header {
     position: sticky;
     top: 0px;
     background: var(--yoroi-comp-dialog-background);
     padding-bottom: 14px;
-
-    padding-top: 14px;
-    padding-left: 40px;
-
   }
 
   .totalInfo {
@@ -47,7 +32,7 @@
   }
 
   .sectionHeader {
-    color: #A7AFC0;
+    color: #a7afc0;
     font-size: 14px;
     margin-top: 26px;
   }
@@ -59,4 +44,3 @@
     overflow-y: auto;
   }
 }
-

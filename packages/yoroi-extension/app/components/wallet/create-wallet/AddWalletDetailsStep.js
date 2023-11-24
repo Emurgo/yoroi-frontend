@@ -161,7 +161,7 @@ export default class AddWalletDetailsStep extends Component<Props> {
     const descriptionMessage = Boolean(isRecovery) ? messages.restoreDesc : messages.createDesc;
 
     return (
-      <Stack alignItems="center" justifyContent="center">
+      <Stack alignItems="center" justifyContent="center" id="addWalletDetailsStepComponent">
         <Stack direction="column" alignItems="left" justifyContent="center" maxWidth="555px">
           <Stack mb="20px" flexDirection="row" alignItems="center" gap="6px">
             <Typography variant="body1">
@@ -181,17 +181,20 @@ export default class AddWalletDetailsStep extends Component<Props> {
             </Box>
           </Stack>
           <Box onSubmit={e => e.preventDefault()} component="form" autoComplete="off">
-            <TextField
-              className="walletName"
-              {...walletNameField.bind()}
-              done={walletNameField.isValid}
-              error={walletNameField.error}
-              autocomplete="off"
-              id="walletNameInput"
-            />
+            <Box mb="8px">
+              <TextField
+                className="walletName"
+                {...walletNameField.bind()}
+                done={walletNameField.isValid}
+                error={walletNameField.error}
+                helperText=" "
+                autocomplete="off"
+                id="walletNameInput"
+              />
+            </Box>
 
             <Box>
-              <Box>
+              <Box mb="8px">
                 <TextField
                   className="walletPassword"
                   {...walletPasswordField.bind()}
@@ -202,6 +205,8 @@ export default class AddWalletDetailsStep extends Component<Props> {
                   }
                   id="walletPasswordInput"
                 />
+              </Box>
+              <Box mb="8px">
                 <TextField
                   className="repeatedPassword"
                   {...repeatedPasswordField.bind()}

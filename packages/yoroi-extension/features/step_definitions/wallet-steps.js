@@ -3,9 +3,9 @@
 import { When, Then } from 'cucumber';
 import { truncateLongName } from '../../app/utils/formatters';
 import { myWalletsPage } from '../pages/mainWindowPage';
-import { walletNameInput } from '../pages/restoreWalletPage';
 import { walletNameText, walletNavBackButton } from '../pages/walletPage';
 import { walletButtonClassic } from '../pages/sidebarPage';
+import { walletNameInput } from '../pages/walletDetailsPage';
 
 When(/^I enter the name "([^"]*)"$/, async function (walletName) {
   await this.input(walletNameInput, walletName);

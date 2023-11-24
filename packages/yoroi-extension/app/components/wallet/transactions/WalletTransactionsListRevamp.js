@@ -147,9 +147,8 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
     return (
       <Box
         sx={{
-          background: 'var(--yoroi-palette-common-white)',
-          padding: '20px 30px',
-          marginTop: '2px',
+          bgcolor: 'common.white',
+          padding: '20px 0',
           overflow: 'auto',
         }}
       >
@@ -163,7 +162,7 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
             }}
             key={`${this.getTransactionKey(group.transactions)}`}
           >
-            <Typography variant="body2" color="var(--yoroi-palette-gray-600)">
+            <Typography variant="body2" color="grayscale.600">
               {this.localizedDate(group.date)}
             </Typography>
             <Box>

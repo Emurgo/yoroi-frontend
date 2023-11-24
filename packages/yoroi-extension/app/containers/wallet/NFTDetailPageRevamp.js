@@ -84,17 +84,17 @@ class NFTDetailPageRevamp extends Component<AllProps> {
     const nftsCount = nftsList.length;
     const nftInfo = nftsList[currentNftIdx];
 
-    const nextNftId = currentNftIdx === nftsCount - 1 ?
-    nftsList[0]?.id : nftsList[currentNftIdx + 1]?.id
+    const nextNftId =
+      currentNftIdx === nftsCount - 1 ? nftsList[0]?.id : nftsList[currentNftIdx + 1]?.id;
 
-    const prevNftId = currentNftIdx === 0 ?
-    nftsList[nftsCount - 1]?.id : nftsList[currentNftIdx - 1]?.id
+    const prevNftId =
+      currentNftIdx === 0 ? nftsList[nftsCount - 1]?.id : nftsList[currentNftIdx - 1]?.id;
 
     const urlPrams = new URLSearchParams(this.props.location.search);
-    const tab = urlPrams.get('tab')
+    const tab = urlPrams.get('tab');
 
     return (
-      <Box width="100%" height="100%">
+      <Box sx={{ width: '100%', pb: '50vh' }}>
         <NFTDetails
           nftInfo={nftInfo}
           network={network}

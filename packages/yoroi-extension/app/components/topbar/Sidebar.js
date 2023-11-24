@@ -9,9 +9,9 @@ import classnames from 'classnames';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
-import { ReactComponent as yoroiLogo }  from '../../assets/images/sidebar/yoroi_logo.inline.svg';
-import { ReactComponent as yoroiLogoExpanded }  from '../../assets/images/sidebar/yoroi_logo_expanded.inline.svg';
-import { ReactComponent as toggleIcon }  from '../../assets/images/sidebar/open_sidebar.inline.svg';
+import { ReactComponent as yoroiLogo } from '../../assets/images/sidebar/yoroi-logo.inline.svg';
+import { ReactComponent as yoroiLogoExpanded } from '../../assets/images/sidebar/yoroi-logo-expanded.inline.svg';
+import { ReactComponent as toggleIcon } from '../../assets/images/sidebar/open-sidebar.inline.svg';
 import globalMessages from '../../i18n/global-messages';
 
 type Props = {|
@@ -20,7 +20,7 @@ type Props = {|
   +isActiveCategory?: SidebarCategory => boolean,
   +onCategoryClicked?: SidebarCategory => void,
   +onToggleSidebar: void => Promise<void>,
-  +isSidebarExpanded: boolean
+  +isSidebarExpanded: boolean,
 |};
 
 @observer
@@ -48,7 +48,7 @@ export default class Sidebar extends Component<Props> {
       isActiveCategory,
       onCategoryClicked,
       isSidebarExpanded,
-      onToggleSidebar
+      onToggleSidebar,
     } = this.props;
 
     const ToggleIcon = toggleIcon;
@@ -62,33 +62,31 @@ export default class Sidebar extends Component<Props> {
           {isSidebarExpanded ? <YoroiLogoExpanded /> : <YoroiLogo />}
         </div>
         <div className={styles.categories}>
-          {categories ? categories.map(category => {
-            return (
-              <SideBarCategory
-                key={category.className}
-                icon={category.icon}
-                active={isActiveCategory !== undefined && isActiveCategory(category)}
-                label={category.label}
-                showLabel={isSidebarExpanded}
-                onClick={() => {
-                  if (onCategoryClicked) {
-                    onCategoryClicked(category);
-                  }
-                }}
-              />
-            );
-          }) : null}
+          {categories
+            ? categories.map(category => {
+                return (
+                  <SideBarCategory
+                    key={category.className}
+                    icon={category.icon}
+                    active={isActiveCategory !== undefined && isActiveCategory(category)}
+                    label={category.label}
+                    showLabel={isSidebarExpanded}
+                    onClick={() => {
+                      if (onCategoryClicked) {
+                        onCategoryClicked(category);
+                      }
+                    }}
+                  />
+                );
+              })
+            : null}
         </div>
 
-        <div
-          className={classnames(
-            isSidebarExpanded ? styles.footer : null
-          )}
-        >
+        <div className={classnames(isSidebarExpanded ? styles.footer : null)}>
           <a
             className={styles.faq}
-            href='https://emurgohelpdesk.zendesk.com/hc/en-us/categories/4412619927695-Yoroi'
-            target='_blank'
+            href="https://emurgohelpdesk.zendesk.com/hc/en-us/categories/4412619927695-Yoroi"
+            target="_blank"
             rel="noreferrer"
           >
             {intl.formatMessage(globalMessages.sidebarFaq)}
@@ -98,14 +96,10 @@ export default class Sidebar extends Component<Props> {
             onClick={onToggleSidebar}
             className={classnames([
               styles.toggleButton,
-              isSidebarExpanded ? styles.toggleActive : null
+              isSidebarExpanded ? styles.toggleActive : null,
             ])}
           >
-            <span
-              className={classnames(
-                isSidebarExpanded ? styles.iconRotate : null
-              )}
-            >
+            <span className={classnames(isSidebarExpanded ? styles.iconRotate : null)}>
               <ToggleIcon />
             </span>
           </button>

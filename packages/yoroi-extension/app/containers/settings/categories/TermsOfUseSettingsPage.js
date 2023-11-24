@@ -10,8 +10,7 @@ type GeneratedData = typeof TermsOfUseSettingsPage.prototype.generated;
 
 @observer
 export default class TermsOfUseSettingsPage extends Component<InjectedOrGenerated<GeneratedData>> {
-
-  @computed get generated(): {|stores: {|profile: {|termsOfUse: string|}|}|} {
+  @computed get generated(): {| stores: {| profile: {| termsOfUse: string |} |} |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -29,10 +28,6 @@ export default class TermsOfUseSettingsPage extends Component<InjectedOrGenerate
 
   render(): Node {
     const { termsOfUse } = this.generated.stores.profile;
-    return (
-      <TermsOfUseSettings
-        localizedTermsOfUse={termsOfUse}
-      />
-    );
+    return <TermsOfUseSettings localizedTermsOfUse={termsOfUse} />;
   }
 }

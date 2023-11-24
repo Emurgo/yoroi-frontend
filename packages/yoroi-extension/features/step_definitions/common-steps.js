@@ -12,11 +12,9 @@ import {
   When,
 } from 'cucumber';
 import * as CardanoServer from '../mock-chain/mockCardanoServer';
-import * as ErgoServer from '../mock-chain/mockErgoServer';
 import { logging } from 'selenium-webdriver';
 import { getLogDate } from '../support/helpers/helpers';
 import { testWallets } from '../mock-chain/TestWallets';
-import * as ErgoImporter from '../mock-chain/mockErgoImporter';
 import * as CardanoImporter from '../mock-chain/mockCardanoImporter';
 import {
   testRunsDataDir,
@@ -61,9 +59,6 @@ import { allowPubKeysAndSwitchToYoroi, switchToTrezorAndAllow } from './trezor-s
 import {
   restoreWalletInputPhraseDialog,
   inputMnemonicForWallet,
-  walletPasswordInput,
-  repeatPasswordInput,
-  restoringDialogPlate,
   validPhraseText,
   nextButton,
   inputWalletInfo,
@@ -106,10 +101,15 @@ import {
   uriAcceptComponent,
   uriPromptForm,
 } from '../pages/uriPromptPage';
-import { yoroiModern } from '../pages/mainWindowPage';
+import { root } from '../pages/mainWindowPage';
 import { backgroungTabName, extensionTabName, WindowManager } from '../support/windowManager';
 import { MockDAppWebpage } from '../mock-dApp-webpage';
 import { infoDialogContinueButton } from '../pages/commonDialogPage';
+import {
+  newWalletDialogPlate,
+  repeatPasswordInput,
+  walletPasswordInput,
+} from '../pages/walletDetailsPage';
 
 const simpleNodeLogger = require('simple-node-logger');
 
@@ -134,12 +134,10 @@ BeforeAll(() => {
   rimraf.sync(chromeMockServerDataDir);
 
   CardanoServer.getMockServer({});
-  ErgoServer.getMockServer({});
 });
 
 AfterAll(() => {
   CardanoServer.closeMockServer();
-  ErgoServer.closeMockServer();
 });
 
 // eslint-disable-next-line prefer-arrow-callback
@@ -150,7 +148,6 @@ Before(function (scenario) {
     `\n### ${pathItems[pathItems.length - 2]}. The scenario "${scenario.pickle.name}" has started`
   );
   CardanoServer.setExpectedTx(undefined);
-  ErgoServer.setExpectedTx(undefined);
   // cleanup scenario name so it is folder-name friendly
   testProgress.scenarioName = scenario.pickle.name.replace(/[^0-9a-z_ ]/gi, '');
   testProgress.lineNum = scenario.sourceLocation.line;
@@ -182,7 +179,6 @@ Before(function (scenario) {
 
 Before({ tags: 'not @TestAssuranceChain' }, () => {
   CardanoImporter.resetChain(CardanoImporter.MockChain.Standard);
-  ErgoImporter.resetChain();
 });
 Before({ tags: '@TestAssuranceChain' }, () => {
   CardanoImporter.resetChain(CardanoImporter.MockChain.TestAssurance);
@@ -190,11 +186,9 @@ Before({ tags: '@TestAssuranceChain' }, () => {
 
 Before({ tags: '@serverDown' }, () => {
   CardanoServer.closeMockServer();
-  ErgoServer.closeMockServer();
 });
 After({ tags: '@serverDown' }, () => {
   CardanoServer.getMockServer({});
-  ErgoServer.getMockServer({});
 });
 
 Before({ tags: '@serverMaintenance' }, () => {
@@ -277,7 +271,20 @@ export async function getIndexedDBTablesInfo(customWorld: any, postfix: string =
 const writeFile = promisify(fs.writeFile);
 
 // Steps that contain these patterns will trigger screenshots:
-const SCREENSHOT_STEP_PATTERNS = ['I should see', 'I see', 'I click', 'by clicking'];
+const SCREENSHOT_STEP_PATTERNS = ['I should see', 'I see', 'I click', 'by clicking', 'I enter'];
+
+const takeScreenShotsAndLogs = async (customWebDriver, featureName, patterns) => {
+  if (patterns.some(pat => featureName.includes(pat))) {
+    await takeScreenshot(customWebDriver.driver, featureName);
+    await takePageSnapshot(customWebDriver.driver, featureName);
+
+    const browserName = await customWebDriver.getBrowser();
+    if (browserName !== 'firefox') {
+      await getLogs(customWebDriver.driver, featureName, logging.Type.BROWSER);
+      await getLogs(customWebDriver.driver, featureName, logging.Type.DRIVER);
+    }
+  }
+};
 
 /** Wrap every step to take screenshots for UI-based testing */
 setDefinitionFunctionWrapper((fn, _, pattern) => {
@@ -285,21 +292,15 @@ setDefinitionFunctionWrapper((fn, _, pattern) => {
     return fn;
   }
   return async function (...args) {
-    const ret = await fn.apply(this, args);
-
     // Regex patterns contain non-ascii characters.
     // We want to remove this to get a filename-friendly string
     const cleanString = pattern.toString().replace(/[^0-9a-z_ ]/gi, '');
-    if (SCREENSHOT_STEP_PATTERNS.some(pat => cleanString.includes(pat))) {
-      await takeScreenshot(this.driver, cleanString);
-      await takePageSnapshot(this.driver, cleanString);
 
-      const browserName = await this.getBrowser();
-      if (browserName !== 'firefox') {
-        await getLogs(this.driver, cleanString, logging.Type.BROWSER);
-        await getLogs(this.driver, cleanString, logging.Type.DRIVER);
-      }
-    }
+    await takeScreenShotsAndLogs(this, cleanString + '_before', SCREENSHOT_STEP_PATTERNS);
+
+    const ret = await fn.apply(this, args);
+
+    await takeScreenShotsAndLogs(this, cleanString + '_executed', SCREENSHOT_STEP_PATTERNS);
 
     testProgress.step += 1;
     return ret;
@@ -378,10 +379,12 @@ async function restoreWallet(
   await customWorld.waitForElement(validPhraseText);
   await customWorld.click(nextButton);
   // info panel
-  await customWorld.waitForElement(infoDialog);
-  customWorld.webDriverLogger.info(`Step:restoreWallet: Info panel is displayed`);
-  await customWorld.click(infoDialogContinueButton);
-  customWorld.webDriverLogger.info(`Step:restoreWallet: Info panel is closed`);
+  if (await customWorld.checkIfExists(infoDialog)) {
+    await customWorld.waitForElement(infoDialog);
+    customWorld.webDriverLogger.info(`Step:restoreWallet: Info panel is displayed`);
+    await customWorld.click(infoDialogContinueButton);
+    customWorld.webDriverLogger.info(`Step:restoreWallet: Info panel is closed`);
+  }
   // wallet info dialog
   await inputWalletInfo(customWorld, restoreInfo);
   customWorld.webDriverLogger.info(`Step:restoreWallet: Wallet info is entered`);
@@ -393,9 +396,9 @@ async function restoreWallet(
 
 export async function checkWalletPlate(
   customWorld: any,
-  expectedWalletPlate: string,
+  expectedWalletPlate: string
 ): Promise<void> {
-  const plateElement = await customWorld.findElement(restoringDialogPlate);
+  const plateElement = await customWorld.findElement(newWalletDialogPlate);
   const plateText = await plateElement.getText();
   expect(plateText).to.be.equal(expectedWalletPlate);
 }
@@ -525,7 +528,7 @@ Given(/^I refresh the page$/, async function () {
   await this.driver.navigate().refresh();
   // wait for page to refresh
   await this.driver.sleep(halfSecond);
-  await this.waitForElement(yoroiModern);
+  await this.waitForElement(root);
 });
 
 Given(/^I restart the browser$/, async function () {
@@ -534,7 +537,7 @@ Given(/^I restart the browser$/, async function () {
   await this.driver.navigate().refresh();
   // wait for page to refresh
   await this.driver.sleep(halfSecond);
-  await this.waitForElement(yoroiModern);
+  await this.waitForElement(root);
 });
 
 Given(/^There is no wallet stored$/, async function () {
@@ -562,7 +565,7 @@ Given(/^I import a snapshot named ([^"]*)$/, async function (snapshotName) {
   // wait for page to refresh
   await this.driver.sleep(oneSecond + halfSecond);
   await this.waitForElementNotPresent(loadingSpinnerComponent);
-  await this.waitForElement(yoroiModern);
+  await this.waitForElement(root);
 });
 
 async function setLedgerWallet(client, serial) {
@@ -721,35 +724,30 @@ async function importIndexedDB(client, importDir: string) {
   }, JSON.parse(indexedDBData));
 }
 
-let capturedDbState = undefined;
-async function captureDbStae(client) {
+async function captureDbState(client) {
   const rawDb = await client.driver.executeAsyncScript(done => {
     window.yoroi.api.common
       .exportLocalDatabase(window.yoroi.stores.loading.getDatabase())
       .then(done)
       .catch(err => done(err));
   });
-  capturedDbState = JSON.parse(rawDb.toString());
+  return JSON.parse(rawDb.toString());
 }
 async function compareToCapturedDbState(client, excludeSyncTime) {
-  if (capturedDbState == null) throw new Error('Db state was never captured');
-  const rawDb = await client.driver.executeAsyncScript(done => {
-    window.yoroi.api.common
-      .exportLocalDatabase(window.yoroi.stores.loading.getDatabase())
-      .then(done)
-      .catch(err => done(err));
-  });
-  const newState = JSON.parse(rawDb.toString());
+  const firstDBState = await client.getFromLocalStorage('capturedDBState');
+  if (firstDBState == null) throw new Error('Db state was never captured');
+  const newState = await captureDbState(client);
   if (excludeSyncTime) {
-    delete capturedDbState.tables.LastSyncInfo;
+    delete firstDBState.tables.LastSyncInfo;
     delete newState.tables.LastSyncInfo;
   }
-  expect(stableStringify(capturedDbState.tables)).to.equal(stableStringify(newState.tables));
+  expect(stableStringify(firstDBState.tables)).to.equal(stableStringify(newState.tables));
 }
 
 Given(/^I capture DB state snapshot$/, async function () {
   this.webDriverLogger.info(`Step: I capture DB state snapshot`);
-  await captureDbStae(this);
+  const capturedDBState = await captureDbState(this);
+  await this.saveToLocalStorage('capturedDBState', capturedDBState);
 });
 
 Then(/^I compare to DB state snapshot$/, async function () {
@@ -793,8 +791,11 @@ Then(/^Debug. Take screenshot$/, async function () {
   const currentTime = getLogDate();
   await takeScreenshot(this.driver, `debug_${currentTime}`);
   await takePageSnapshot(this.driver, `debug_${currentTime}`);
-  await getLogs(this.driver, `debug_${currentTime}`, logging.Type.DRIVER);
-  await getLogs(this.driver, `debug_${currentTime}`, logging.Type.BROWSER);
+  const browserName = await this.getBrowser();
+  if (browserName !== 'firefox') {
+    await getLogs(this.driver, `debug_${currentTime}`, logging.Type.BROWSER);
+    await getLogs(this.driver, `debug_${currentTime}`, logging.Type.DRIVER);
+  }
 });
 
 Then(/^Debug. Make driver sleep for 2 seconds$/, async function () {
