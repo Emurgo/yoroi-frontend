@@ -136,6 +136,9 @@ import type {
   MultiAssetMintMetadataFunc,
   GetRecentTransactionHashesFunc,
   GetTransactionsByHashesFunc,
+  MultiAssetSupplyFunc,
+  MultiAssetMintMetadataResponse,
+  MultiAssetSupplyResponse,
 } from '../../state-fetch/types';
 import {
   ShelleyCertificateTypes,
@@ -164,15 +167,6 @@ type TxData = {|
     ...UserAnnotation,
   |}>,
 |};
-
-type TokensMintMetadata = {|
-...{[key: string]: TokenMintMetadata[]}
-|}
-
-type TokenMintMetadata = {|
-key: string,
-metadata: any
-|}
 
 async function rawGetAllTxIds(
   db: lf$Database,
@@ -918,6 +912,7 @@ export async function updateUtxos(
   checkAddressesInUse: FilterFunc,
   getTokenInfo: TokenInfoFunc,
   getMultiAssetMintMetadata: MultiAssetMintMetadataFunc,
+  getMultiAssetSupply: MultiAssetSupplyFunc,
 ): Promise<void> {
   const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
   const derivationTables = withLevels == null
@@ -1023,6 +1018,7 @@ export async function updateUtxos(
         tokenIds,
         getTokenInfo,
         getMultiAssetMintMetadata,
+        getMultiAssetSupply,
         publicDeriver.getParent().getNetworkInfo(),
       )
     )
@@ -1043,6 +1039,7 @@ export async function updateTransactions(
   getBestBlock: BestBlockFunc,
   getTokenInfo: TokenInfoFunc,
   getMultiAssetMetadata: MultiAssetMintMetadataFunc,
+  getMultiAssetSupply: MultiAssetSupplyFunc,
   after?: ?After,
 ): Promise<TxData> {
   const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
@@ -1116,6 +1113,7 @@ export async function updateTransactions(
           derivationTables,
           getTokenInfo,
           getMultiAssetMetadata,
+          getMultiAssetSupply,
           after,
         );
       }
@@ -1382,6 +1380,7 @@ async function rawUpdateTransactions(
   derivationTables: Map<number, string>,
   getTokenInfo: TokenInfoFunc,
   getMultiAssetMetadata: MultiAssetMintMetadataFunc,
+  getMultiAssetSupply: MultiAssetSupplyFunc,
   after: ?After,
 ): Promise<TxData> {
   const network = publicDeriver.getParent().getNetworkInfo();
@@ -1536,7 +1535,8 @@ async function rawUpdateTransactions(
         toAbsoluteSlotNumber,
         derivationTables,
         getTokenInfo,
-        getMultiAssetMetadata
+        getMultiAssetMetadata,
+        getMultiAssetSupply,
       }
     );
   } else {
@@ -1617,6 +1617,7 @@ async function updateTransactionBatch(
     defaultToken: DefaultTokenEntry,
     getTokenInfo: TokenInfoFunc,
     getMultiAssetMetadata: MultiAssetMintMetadataFunc,
+    getMultiAssetSupply: MultiAssetSupplyFunc,
   |}
 ): Promise<Array<{|
   ...(CardanoByronTxIO | CardanoShelleyTxIO),
@@ -1734,7 +1735,8 @@ async function updateTransactionBatch(
     tokenIds,
     request.getTokenInfo,
     request.getMultiAssetMetadata,
-    request.network
+    request.getMultiAssetSupply,
+    request.network,
   );
 
   // 3) Add new transactions
@@ -2125,33 +2127,37 @@ function genShelleyIOGen(
   };
 }
 
-export async function getTokenMintMetadata(
+export async function getTokenMintMetadataAndSupply(
   tokenIds: string[],
   getMultiAssetMetadata: MultiAssetMintMetadataFunc,
-  network: $ReadOnly<NetworkRow>)
-: Promise<$ReadOnly<TokensMintMetadata>> {
-  if (!tokenIds || tokenIds.length === 0) return {};
-
-  const nativeAssets = tokenIds
+  getMultiAssetSupply: MultiAssetSupplyFunc,
+  network: $ReadOnly<NetworkRow>
+) : Promise<[
+  $ReadOnly<MultiAssetMintMetadataResponse>,
+  $ReadOnly<MultiAssetSupplyResponse>,
+]> {
+  const assets = (tokenIds||[])
     .filter(t => t.indexOf('.') !== -1)
     .map(t => {
       const parts = t.split('.');
-      const assetName = parts[1];
+      const assetNameHex = parts[1];
+      const assetNameASCII = Buffer.from(assetNameHex, 'hex').toString();
       const policyId = parts[0];
       return {
-        nameHex: assetName,
-        policy: policyId
+        name: assetNameASCII,
+        policy: policyId,
       };
     });
 
-  if (!nativeAssets || nativeAssets.length === 0) return {};
+  if (assets.length === 0)
+    return [{}, {}];
 
-  const tokensMintMetadata = await getMultiAssetMetadata({
-    network,
-    assets: nativeAssets
-  });
+  const [tokensMintMetadata, tokensSupply] = await Promise.all([
+    getMultiAssetMetadata({ network, assets }),
+    getMultiAssetSupply({ network, assets }),
+  ]);
 
-  return tokensMintMetadata;
+  return [tokensMintMetadata, tokensSupply];
 };
 
 const TOKEN_INFO_CACHE_TIME = 1 * 60 * 60 * 1000;
@@ -2166,6 +2172,7 @@ export async function genCardanoAssetMap(
   tokenIds: Array<string>,
   getTokenInfo: TokenInfoFunc,
   getMultiAssetMetadata: MultiAssetMintMetadataFunc,
+  getMultiAssetSupply: MultiAssetSupplyFunc,
   network: $ReadOnly<NetworkRow>,
 ): Promise<Map<string, $ReadOnly<TokenRow>>> {
   const existingDbRows = (await deps.GetToken.fromIdentifier(
@@ -2206,7 +2213,13 @@ export async function genCardanoAssetMap(
   } catch {
     tokenInfoResponse = {};
   }
-  const metadata = await getTokenMintMetadata(tokenIds, getMultiAssetMetadata, network);
+
+  const [metadata, supply] = await getTokenMintMetadataAndSupply(
+    tokenIds,
+    getMultiAssetMetadata,
+    getMultiAssetSupply,
+    network,
+  );
 
   const databaseInsert = updatingTokenIds
     .map(tokenId => {
@@ -2247,18 +2260,18 @@ export async function genCardanoAssetMap(
       const assetName = Buffer.from(parts.name.name()).toString('hex');
       const policyId = Buffer.from(parts.policyId.to_bytes()).toString('hex');
 
-      const assetNameInMetadata = Buffer.from(assetName, 'hex').toString();
-      const identifierInMetadata = `${policyId}.${assetNameInMetadata}`;
-
-      const tokenMetadata = metadata[identifierInMetadata];
+      const assetNameASCII = Buffer.from(assetName, 'hex').toString();
+      const identifierASCII = `${policyId}.${assetNameASCII}`;
+      const tokenMetadata = metadata[identifierASCII];
+      const tokenSupplyStr = supply[identifierASCII];
 
       let isNft = false;
 
       let assetMintMetadata: CardanoAssetMintMetadata[] = [];
       if (tokenMetadata) {
-        if (tokenMetadata.filter(m => m.key === '721').length > 0) {
-          isNft = true;
-        }
+        const hasMediaMetadata = tokenMetadata.filter(m => m.key === '721').length > 0;
+        const hasOnlyOneUnit = tokenSupplyStr === '1';
+        isNft = hasMediaMetadata && hasOnlyOneUnit;
 
         assetMintMetadata = tokenMetadata.map(m => {
           const metaObj: CardanoAssetMintMetadata = {};

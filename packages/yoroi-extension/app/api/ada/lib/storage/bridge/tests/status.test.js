@@ -23,7 +23,7 @@ import {
   genGetMultiAssetMetadata,
   MockUtxoApi,
   genGetRecentTransactionHashes,
-  genGetTransactionsByHashes,
+  genGetTransactionsByHashes, genGetMultiAssetSupply,
 } from '../../../state-fetch/mockNetwork';
 import { loadLovefieldDB } from '../../database/index';
 import {
@@ -324,6 +324,7 @@ async function baseTest(
   const getBestBlock = genGetBestBlock(networkTransactions);
   const getTokenInfo = genGetTokenInfo();
   const getMultiAssetMetadata = genGetMultiAssetMetadata();
+  const getMultiAssetSupply = genGetMultiAssetSupply();
   const getRecentTransactionHashes = genGetRecentTransactionHashes(networkTransactions);
   const getTransactionsByHashes = genGetTransactionsByHashes(networkTransactions);
 
@@ -343,6 +344,7 @@ async function baseTest(
       checkAddressesInUse,
       getTokenInfo,
       getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
     await updateTransactions(
       db,
@@ -352,7 +354,8 @@ async function baseTest(
       getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
-      getMultiAssetMetadata
+      getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
 
     {
@@ -398,6 +401,7 @@ async function baseTest(
       checkAddressesInUse,
       getTokenInfo,
       getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
     await updateTransactions(
       db,
@@ -408,6 +412,7 @@ async function baseTest(
       getBestBlock,
       getTokenInfo,
       getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
 
     {
@@ -533,6 +538,7 @@ async function baseTest(
       checkAddressesInUse,
       getTokenInfo,
       getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
     await updateTransactions(
       db,
@@ -542,7 +548,8 @@ async function baseTest(
       getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
-      getMultiAssetMetadata
+      getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
 
     {
@@ -723,6 +730,7 @@ async function baseTest(
       checkAddressesInUse,
       getTokenInfo,
       getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
     await updateTransactions(
       db,
@@ -732,7 +740,8 @@ async function baseTest(
       getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
-      getMultiAssetMetadata
+      getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
 
     {
@@ -902,6 +911,7 @@ async function baseTest(
       checkAddressesInUse,
       getTokenInfo,
       getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
     await updateTransactions(
       db,
@@ -911,7 +921,8 @@ async function baseTest(
       getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
-      getMultiAssetMetadata
+      getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
 
     /*
@@ -1059,6 +1070,7 @@ async function pendingDropped(
   const getBestBlock = genGetBestBlock(networkTransactions);
   const getTokenInfo = genGetTokenInfo();
   const getMultiAssetMetadata = genGetMultiAssetMetadata();
+  const getMultiAssetSupply = genGetMultiAssetSupply();
   const getRecentTransactionHashes = genGetRecentTransactionHashes(networkTransactions);
   const getTransactionsByHashes = genGetTransactionsByHashes(networkTransactions);
 
@@ -1075,6 +1087,7 @@ async function pendingDropped(
     checkAddressesInUse,
     getTokenInfo,
     getMultiAssetMetadata,
+    getMultiAssetSupply,
   );
   await updateTransactions(
     db,
@@ -1084,7 +1097,8 @@ async function pendingDropped(
     getTransactionsByHashes,
     getBestBlock,
     getTokenInfo,
-    getMultiAssetMetadata
+    getMultiAssetMetadata,
+    getMultiAssetSupply,
   );
 
   // remove it from backend
@@ -1097,6 +1111,7 @@ async function pendingDropped(
     checkAddressesInUse,
     getTokenInfo,
     getMultiAssetMetadata,
+    getMultiAssetSupply,
   );
   await updateTransactions(
     db,
@@ -1106,7 +1121,8 @@ async function pendingDropped(
     getTransactionsByHashes,
     getBestBlock,
     getTokenInfo,
-    getMultiAssetMetadata
+    getMultiAssetMetadata,
+    getMultiAssetSupply,
   );
 
   expect((await db.export()).tables.Transaction).toEqual([

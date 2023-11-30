@@ -23,7 +23,7 @@ import {
   genGetMultiAssetMetadata,
   MockUtxoApi,
   genGetRecentTransactionHashes,
-  genGetTransactionsByHashes,
+  genGetTransactionsByHashes, genGetMultiAssetSupply,
 } from '../../../state-fetch/mockNetwork';
 import {
   HARD_DERIVATION_START,
@@ -226,6 +226,7 @@ async function syncingSimpleTransaction(
   const getBestBlock = genGetBestBlock(txHistory);
   const getTokenInfo = genGetTokenInfo();
   const getMultiAssetMetadata = genGetMultiAssetMetadata();
+  const getMultiAssetSupply = genGetMultiAssetSupply();
   const getRecentTransactionHashes = genGetRecentTransactionHashes(txHistory);
   const getTransactionsByHashes = genGetTransactionsByHashes(txHistory);
 
@@ -248,7 +249,8 @@ async function syncingSimpleTransaction(
       basePubDeriver,
       checkAddressesInUse,
       getTokenInfo,
-      getMultiAssetMetadata
+      getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
     await updateTransactions(
       db,
@@ -258,7 +260,8 @@ async function syncingSimpleTransaction(
       getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
-      getMultiAssetMetadata
+      getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
 
     {
@@ -352,7 +355,8 @@ async function syncingSimpleTransaction(
       basePubDeriver,
       checkAddressesInUse,
       getTokenInfo,
-      getMultiAssetMetadata
+      getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
     await updateTransactions(
       db,
@@ -362,7 +366,8 @@ async function syncingSimpleTransaction(
       getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
-      getMultiAssetMetadata
+      getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
 
     {

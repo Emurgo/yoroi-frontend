@@ -25,7 +25,7 @@ import type {
   UtxoSumResponse,
   CatalystRoundInfoRequest,
   CatalystRoundInfoResponse,
-  MultiAssetMintMetadataRequest,
+  MultiAssetRequest,
   MultiAssetMintMetadataResponse,
   GetUtxoDataRequest,
   GetUtxoDataResponse,
@@ -33,7 +33,7 @@ import type {
   GetRecentTransactionHashesRequest,
   GetRecentTransactionHashesResponse,
   GetTransactionsByHashesRequest,
-  GetTransactionsByHashesResponse,
+  GetTransactionsByHashesResponse, MultiAssetSupplyResponse,
 } from './types';
 import type { FilterUsedRequest, FilterUsedResponse, } from '../../../common/lib/state-fetch/currencySpecificTypes';
 
@@ -528,7 +528,7 @@ export class RemoteFetcher implements IFetcher {
       });
   }
 
-  getMultiAssetMintMetadata: MultiAssetMintMetadataRequest
+  getMultiAssetMintMetadata: MultiAssetRequest
     => Promise<MultiAssetMintMetadataResponse> = async (body) => {
       const { BackendService } = body.network.Backend;
       if (BackendService == null) throw new Error(`${nameof(this.getMultiAssetMintMetadata)} missing backend url`);
@@ -543,6 +543,34 @@ export class RemoteFetcher implements IFetcher {
       ).then(response => response.data)
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getMultiAssetMintMetadata)} error: ` + stringifyError(error));
+        return {};
+      });
+  }
+
+  getMultiAssetSupply: MultiAssetRequest
+    => Promise<MultiAssetSupplyResponse> = async (body) => {
+      const { BackendService } = body.network.Backend;
+      if (BackendService == null) throw new Error(`${nameof(this.getMultiAssetSupply)} missing backend url`);
+      return await axios(
+        `${BackendService}/api/multiAsset/supply`,
+        {
+          method: 'post',
+          data: {
+            assets: body.assets
+          }
+        }
+      ).then(response => {
+        // Mapping the supplies into strings for secure processing
+        // <TODO:REMOVE_WHEN_RESOLVED https://emurgo.atlassian.net/browse/YB-145>
+        const assetsMap = response.data.supplies || {};
+        const result = {};
+        for (const k of Object.keys(assetsMap)) {
+          result[k] = String(assetsMap[k]);
+        }
+        return result;
+      })
+      .catch((error) => {
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getMultiAssetSupply)} error: ` + stringifyError(error));
         return {};
       });
   }
