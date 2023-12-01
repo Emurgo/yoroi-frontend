@@ -33,6 +33,26 @@ function hexToValidAsciiOrNothing(hexString: string): void | string {
   return isAscii ? String.fromCharCode(...bytes) : undefined;
 }
 
+/**
+ * https://github.com/cardano-foundation/CIPs/tree/master/CIP-0067
+ */
+// function getCip67Tag(assetNameHEX: string): ?string {
+//   const bytes = Buffer.from(assetNameHEX, 'hex');
+//   // [ 0000 | 16 bits label_num | 8 bits checksum | 0000 ]
+//   if (bytes.length >= 4) {
+//     const [a, b, c, d] = bytes;
+//     // check 4-zero-bit brackets
+//     if ((a & 0b11110000) === 0 && (d & 0b00001111) === 0) {
+//       // (0000 xxxx) (xxxx yyyy) (yyyy zzzz) (zzzz 0000)
+//       const middleByte = (byte1, byte2) => ((byte1 & 0b1111) << 4) & ((byte2 & 0b11110000) >> 4)
+//       const xByte = middleByte(a, b);
+//       const yByte = middleByte(b, c);
+//       const zByte = middleByte(c, d);
+//
+//     }
+//   }
+// }
+
 function decodeAssetNameIfASCII(assetName: ?string): void | string {
   if (assetName == null || assetName.length === 0 || !isHexadecimal(assetName)) {
     return undefined;
@@ -60,7 +80,9 @@ export function getTokenStrictName(
     return tokenRow.Metadata.longName;
   }
   if (tokenRow.Metadata.type === 'Cardano') {
-    return decodeAssetNameIfASCII(tokenRow.Metadata.assetName);
+    const assetName = tokenRow.Metadata.assetName;
+    const maybeAsciiName = decodeAssetNameIfASCII(assetName);
+    return maybeAsciiName ?? assetName;
   }
   return undefined;
 }
