@@ -2140,11 +2140,10 @@ export async function getTokenMintMetadataAndSupply(
     .filter(t => t.indexOf('.') !== -1)
     .map(t => {
       const parts = t.split('.');
-      const assetNameHex = parts[1];
-      const assetNameASCII = Buffer.from(assetNameHex, 'hex').toString();
       const policyId = parts[0];
+      const assetNameHex = parts[1];
       return {
-        name: assetNameASCII,
+        nameHex: assetNameHex,
         policy: policyId,
       };
     });
@@ -2260,10 +2259,8 @@ export async function genCardanoAssetMap(
       const assetName = Buffer.from(parts.name.name()).toString('hex');
       const policyId = Buffer.from(parts.policyId.to_bytes()).toString('hex');
 
-      const assetNameASCII = Buffer.from(assetName, 'hex').toString();
-      const identifierASCII = `${policyId}.${assetNameASCII}`;
-      const tokenMetadata = metadata[identifierASCII];
-      const tokenSupplyStr = supply[identifierASCII];
+      const tokenMetadata = metadata[tokenId];
+      const tokenSupplyStr = supply[tokenId];
 
       let isNft = false;
 
