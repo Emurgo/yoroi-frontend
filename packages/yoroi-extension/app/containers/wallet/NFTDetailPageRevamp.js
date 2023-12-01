@@ -60,14 +60,15 @@ class NFTDetailPageRevamp extends Component<AllProps> {
               const policyId = token.entry.identifier.split('.')[0];
               const fullName = getTokenStrictName(token.info);
               const name = truncateToken(fullName ?? '-');
+              const assetNameHex = token.entry.identifier.split('.')[1] ?? '';
               return {
                 policyId,
                 name,
                 lastUpdatedAt: token.info.Metadata.lastUpdatedAt,
                 ticker: token.info.Metadata.ticker ?? '-',
-                assetName: token.entry.identifier.split('.')[1] ?? '',
+                assetName: assetNameHex,
                 id: getTokenIdentifierIfExists(token.info) ?? '-',
-                image: getImageFromTokenMetadata(policyId, fullName, token.info.Metadata),
+                image: getImageFromTokenMetadata(policyId, assetNameHex, token.info.Metadata),
                 description: getDescriptionFromTokenMetadata(
                   policyId,
                   fullName,
