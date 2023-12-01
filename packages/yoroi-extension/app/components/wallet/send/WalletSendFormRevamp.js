@@ -445,12 +445,14 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     const nfts = plannedTxInfoMap
       .filter(({ token }) => token.IsNFT === true)
       .map(({ token }) => {
-        const policyId = token.Identifier.split('.')[0];
+        const split = token.Identifier.split('.');
+        const policyId = split[0];
+        const hexName = split[1] ?? '';
         const fullName = getTokenStrictName(token);
         const name = truncateToken(fullName ?? '-');
         return {
           name,
-          image: getImageFromTokenMetadata(policyId, fullName, token.Metadata),
+          image: getImageFromTokenMetadata(policyId, hexName, token.Metadata),
           info: token,
         };
       });

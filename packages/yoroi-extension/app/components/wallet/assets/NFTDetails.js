@@ -100,7 +100,7 @@ const tabs = [
 ];
 
 function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props & Intl): Node {
-  const nftImage = urlResolveIpfs(nftInfo.image);
+  const nftImage = urlResolveIpfs(nftInfo?.image);
   const networkUrl = getNetworkUrl(network);
   const [activeTab, setActiveTab] = useState(tab !== null ? tab : tabs[0].id); // Overview tab
   const setActiveTabAndTrack = function (tabId: string) {

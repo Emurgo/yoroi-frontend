@@ -57,10 +57,11 @@ class NFTDetailPageRevamp extends Component<AllProps> {
             }))
             .filter(item => item.info.IsNFT)
             .map(token => {
-              const policyId = token.entry.identifier.split('.')[0];
+              const split = token.entry.identifier.split('.');
+              const policyId = split[0];
+              const assetNameHex = split[1] ?? '';
               const fullName = getTokenStrictName(token.info);
               const name = truncateToken(fullName ?? '-');
-              const assetNameHex = token.entry.identifier.split('.')[1] ?? '';
               return {
                 policyId,
                 name,
