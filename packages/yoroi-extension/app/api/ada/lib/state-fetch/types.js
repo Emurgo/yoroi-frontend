@@ -386,7 +386,7 @@ export type MultiAssetRequest = {|
 |};
 
 export type MultiAssetRequestAsset = {|
-  name: string,
+  nameHex: string,
   policy: string
 |}
 
