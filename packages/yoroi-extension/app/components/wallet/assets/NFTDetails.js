@@ -100,6 +100,7 @@ const tabs = [
 ];
 
 function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props & Intl): Node {
+  const nftImage = urlResolveIpfs(nftInfo.image);
   const networkUrl = getNetworkUrl(network);
   const [activeTab, setActiveTab] = useState(tab !== null ? tab : tabs[0].id); // Overview tab
   const setActiveTabAndTrack = function (tabId: string) {
@@ -170,17 +171,17 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
         <Grid item xs={4}>
           <ImageItem
             sx={{
-              cursor: nftInfo.image !== null ? 'zoom-in' : 'auto',
+              cursor: nftImage !== null ? 'zoom-in' : 'auto',
               paddingY: '24px',
               display: 'block',
               img: {
                 objectFit: 'unset',
               },
             }}
-            onClick={() => nftInfo.image !== null && setOpenAndTrack()}
+            onClick={() => nftImage !== null && setOpenAndTrack()}
           >
             <NftImage
-              imageUrl={nftInfo.image}
+              imageUrl={nftImage}
               name={nftInfo.name || '-'}
               width="100%"
               height="auto"
@@ -393,7 +394,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
         >
           <img
             style={{ objectFit: 'cover', maxWidth: '100%', maxHeight: '100%' }}
-            src={urlResolveIpfs(nftInfo.image)}
+            src={nftImage}
             alt={nftInfo.name}
             title={nftInfo.name}
             loading="lazy"
