@@ -1,5 +1,6 @@
 // @flow
 
+import crc8 from 'crc/crc8';
 import type { TokenInfoMap } from '../toplevel/TokenInfoStore';
 import type {
   TokenLookupKey, TokenEntry,
@@ -17,7 +18,7 @@ export function getTokenName(
     ...,
   }>,
 ): string {
-  const strictName = getTokenStrictName(tokenRow);
+  const strictName = getTokenStrictName(tokenRow)?.name;
   if (strictName != null) return strictName;
   const identifier = getTokenIdentifierIfExists(tokenRow);
   if (identifier != null) return identifier;
@@ -36,34 +37,50 @@ function hexToValidAsciiOrNothing(hexString: string): void | string {
 /**
  * https://github.com/cardano-foundation/CIPs/tree/master/CIP-0067
  */
-// function getCip67Tag(assetNameHEX: string): ?string {
-//   const bytes = Buffer.from(assetNameHEX, 'hex');
-//   // [ 0000 | 16 bits label_num | 8 bits checksum | 0000 ]
-//   if (bytes.length >= 4) {
-//     const [a, b, c, d] = bytes;
-//     // check 4-zero-bit brackets
-//     if ((a & 0b11110000) === 0 && (d & 0b00001111) === 0) {
-//       // (0000 xxxx) (xxxx yyyy) (yyyy zzzz) (zzzz 0000)
-//       const middleByte = (byte1, byte2) => ((byte1 & 0b1111) << 4) & ((byte2 & 0b11110000) >> 4)
-//       const xByte = middleByte(a, b);
-//       const yByte = middleByte(b, c);
-//       const zByte = middleByte(c, d);
-//
-//     }
-//   }
-// }
+function getCip67Tag(assetNameHEX: string): {| hexName: string, tag: ?string |} {
+  const bytes = Buffer.from(assetNameHEX, 'hex');
+  // [ 0000 | 16 bits label_num | 8 bits checksum | 0000 ]
+  if (bytes.length >= 4) {
+    const [a, b, c, d] = bytes;
+    // check 4-zero-bit brackets
+    if ((a & 0b11110000) === 0 && (d & 0b00001111) === 0) {
+      /*
+       * The 3 significant bytes are encoded within 4 bytes as:
+       * (0000 xxxx) (xxxx yyyy) (yyyy zzzz) (zzzz 0000)
+       */
+      const middleByte = (byte1, byte2) => ((byte1 & 0b1111) << 4) | ((byte2 & 0b11110000) >> 4)
+      const xByte = middleByte(a, b);
+      const yByte = middleByte(b, c);
+      const zByte = middleByte(c, d);
+      if (crc8([xByte, yByte]) === zByte) {
+        return {
+          tag: String((xByte << 8) | yByte),
+          hexName: bytes.subarray(4).toString('hex'),
+        };
+      }
+    }
+  }
+  return {
+    tag: null,
+    hexName: assetNameHEX,
+  };
+}
 
-function decodeAssetNameIfASCII(assetName: ?string): void | string {
+function decodeAssetNameIfASCII(assetName: ?string): void | {| ascii: string, cip67Tag: ?string |} {
   if (assetName == null || assetName.length === 0 || !isHexadecimal(assetName)) {
     return undefined;
   }
-  const asciiName = hexToValidAsciiOrNothing(assetName);
-  return ASCII_ASSET_NAME_BLACKLIST.has(asciiName) ? undefined : asciiName;
+  const { tag, hexName } = getCip67Tag(assetName);
+  const asciiName = hexToValidAsciiOrNothing(hexName);
+  if (asciiName == null || ASCII_ASSET_NAME_BLACKLIST.has(asciiName)) {
+    return undefined;
+  }
+  return { ascii: asciiName, cip67Tag: tag };
 }
 
 export function assetNameFromIdentifier(identifier: string): string {
   const [, name ] = identifier.split('.');
-  return decodeAssetNameIfASCII(name) || name;
+  return decodeAssetNameIfASCII(name)?.ascii ?? name;
 }
 
 export function getTokenStrictName(
@@ -72,17 +89,20 @@ export function getTokenStrictName(
     Metadata: TokenMetadata,
     ...,
   }>,
-): void | string {
+): void | {| name: string, cip67Tag: ?string |} {
   if (tokenRow.Metadata.ticker != null) {
-    return tokenRow.Metadata.ticker;
+    return { name: tokenRow.Metadata.ticker, cip67Tag: null };
   }
   if (tokenRow.Metadata.longName != null) {
-    return tokenRow.Metadata.longName;
+    return { name: tokenRow.Metadata.longName, cip67Tag: null };
   }
   if (tokenRow.Metadata.type === 'Cardano') {
     const assetName = tokenRow.Metadata.assetName;
     const maybeAsciiName = decodeAssetNameIfASCII(assetName);
-    return maybeAsciiName ?? assetName;
+    if (maybeAsciiName) {
+      return { name: maybeAsciiName.ascii, cip67Tag: maybeAsciiName.cip67Tag };
+    }
+    return { name: assetName, cip67Tag: null };
   }
   return undefined;
 }

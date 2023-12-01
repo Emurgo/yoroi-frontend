@@ -552,7 +552,7 @@ export class RemoteFetcher implements IFetcher {
       const { BackendService } = body.network.Backend;
       if (BackendService == null) throw new Error(`${nameof(this.getMultiAssetSupply)} missing backend url`);
       return await axios(
-        `${BackendService}/api/multiAsset/supply`,
+        `${BackendService}/api/multiAsset/supply?numberFormat=string`,
         {
           method: 'post',
           data: {

@@ -40,7 +40,7 @@ export const getTokens: GetTokenFunc = (spendableBalance, getTokenInfo) => {
             return {
                 value: token.info.TokenId,
                 info: token.info,
-                label: truncateToken(getTokenStrictName(token.info) ?? getTokenIdentifierIfExists(token.info) ?? '-'),
+                label: truncateToken(getTokenStrictName(token.info)?.name ?? getTokenIdentifierIfExists(token.info) ?? '-'),
                 id: (getTokenIdentifierIfExists(token.info) ?? '-'),
                 amount,
             }
@@ -65,7 +65,7 @@ export const getNFTs: GetNFTFunc = (spendableBalance, getTokenInfo) => {
         const split = token.entry.identifier.split('.');
         const policyId = split[0];
         const hexName = split[1] ?? '';
-        const fullName = getTokenStrictName(token.info);
+        const fullName = getTokenStrictName(token.info)?.name;
         const name = truncateToken(fullName ?? '-');
         return {
             name,
