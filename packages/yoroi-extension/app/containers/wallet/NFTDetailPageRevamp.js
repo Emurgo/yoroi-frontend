@@ -61,9 +61,8 @@ class NFTDetailPageRevamp extends Component<AllProps> {
               const policyId = split[0];
               const assetNameHex = split[1] ?? '';
               const strictName = getTokenStrictName(token.info);
-              const fullName = strictName?.cip67Tag != null ?
-                `(${strictName.cip67Tag}) ${strictName.name}`
-                : strictName?.name;
+              const cip67PRefix = strictName.cip67Tag != null ? `(${strictName.cip67Tag}) ` : '';
+              const fullName = cip67PRefix + strictName.name;
               const name = truncateToken(fullName ?? '-');
               return {
                 policyId,

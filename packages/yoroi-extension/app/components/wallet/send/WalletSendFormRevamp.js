@@ -434,7 +434,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
 
         return {
           label: truncateToken(
-            getTokenStrictName(token)?.name ?? getTokenIdentifierIfExists(token) ?? '-'
+            getTokenStrictName(token).name ?? getTokenIdentifierIfExists(token) ?? '-'
           ),
           amount: formattedAmount,
           info: token,
@@ -448,7 +448,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
         const split = token.Identifier.split('.');
         const policyId = split[0];
         const hexName = split[1] ?? '';
-        const fullName = getTokenStrictName(token)?.name;
+        const fullName = getTokenStrictName(token).name;
         const name = truncateToken(fullName ?? '-');
         return {
           name,

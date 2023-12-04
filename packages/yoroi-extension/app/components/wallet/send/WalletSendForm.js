@@ -397,7 +397,7 @@ export default class WalletSendForm extends Component<Props> {
             value: token.info.TokenId,
             info: token.info,
             label: truncateToken(
-              getTokenStrictName(token.info)?.name ?? getTokenIdentifierIfExists(token.info) ?? '-'
+              getTokenStrictName(token.info).name ?? getTokenIdentifierIfExists(token.info) ?? '-'
             ),
             id: getTokenIdentifierIfExists(token.info) ?? '-',
             amount,

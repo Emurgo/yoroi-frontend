@@ -18,7 +18,7 @@ export function getTokenName(
     ...,
   }>,
 ): string {
-  const strictName = getTokenStrictName(tokenRow)?.name;
+  const strictName = getTokenStrictName(tokenRow).name;
   if (strictName != null) return strictName;
   const identifier = getTokenIdentifierIfExists(tokenRow);
   if (identifier != null) return identifier;
@@ -66,21 +66,21 @@ function getCip67Tag(assetNameHEX: string): {| hexName: string, tag: ?string |} 
   };
 }
 
-function decodeAssetNameIfASCII(assetName: ?string): void | {| ascii: string, cip67Tag: ?string |} {
+function decodeAssetNameIfASCII(assetName: ?string): {| ascii: ?string, cip67Tag: ?string |} {
   if (assetName == null || assetName.length === 0 || !isHexadecimal(assetName)) {
-    return undefined;
+    return { ascii: null, cip67Tag: null };
   }
   const { tag, hexName } = getCip67Tag(assetName);
   const asciiName = hexToValidAsciiOrNothing(hexName);
   if (asciiName == null || ASCII_ASSET_NAME_BLACKLIST.has(asciiName)) {
-    return undefined;
+    return { ascii: null, cip67Tag: null };
   }
   return { ascii: asciiName, cip67Tag: tag };
 }
 
 export function assetNameFromIdentifier(identifier: string): string {
   const [, name ] = identifier.split('.');
-  return decodeAssetNameIfASCII(name)?.ascii ?? name;
+  return decodeAssetNameIfASCII(name).ascii ?? name;
 }
 
 export function getTokenStrictName(
@@ -89,7 +89,7 @@ export function getTokenStrictName(
     Metadata: TokenMetadata,
     ...,
   }>,
-): void | {| name: string, cip67Tag: ?string |} {
+): {| name: ?string, cip67Tag: ?string |} {
   if (tokenRow.Metadata.ticker != null) {
     return { name: tokenRow.Metadata.ticker, cip67Tag: null };
   }
@@ -99,12 +99,12 @@ export function getTokenStrictName(
   if (tokenRow.Metadata.type === 'Cardano') {
     const assetName = tokenRow.Metadata.assetName;
     const maybeAsciiName = decodeAssetNameIfASCII(assetName);
-    if (maybeAsciiName) {
+    if (maybeAsciiName.ascii != null) {
       return { name: maybeAsciiName.ascii, cip67Tag: maybeAsciiName.cip67Tag };
     }
     return { name: assetName, cip67Tag: null };
   }
-  return undefined;
+  return { name: null, cip67Tag: null };
 }
 
 export function getTokenIdentifierIfExists(

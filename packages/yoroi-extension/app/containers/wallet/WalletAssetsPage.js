@@ -43,7 +43,7 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
             numberOfDecimals
           );
           return {
-            name: truncateToken(getTokenStrictName(token.info)?.name ?? '-'),
+            name: truncateToken(getTokenStrictName(token.info).name ?? '-'),
             id: (getTokenIdentifierIfExists(token.info) ?? '-'),
             amount: [beforeDecimal, afterDecimal].join(''),
             amountForSorting: shiftedAmount,

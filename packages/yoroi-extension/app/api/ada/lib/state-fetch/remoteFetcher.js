@@ -559,16 +559,7 @@ export class RemoteFetcher implements IFetcher {
             assets: body.assets
           }
         }
-      ).then(response => {
-        // Mapping the supplies into strings for secure processing
-        // <TODO:REMOVE_WHEN_RESOLVED https://emurgo.atlassian.net/browse/YB-145>
-        const assetsMap = response.data.supplies || {};
-        const result = {};
-        for (const k of Object.keys(assetsMap)) {
-          result[k] = String(assetsMap[k]);
-        }
-        return result;
-      })
+      ).then(response => response.data.supplies)
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getMultiAssetSupply)} error: ` + stringifyError(error));
         return {};
