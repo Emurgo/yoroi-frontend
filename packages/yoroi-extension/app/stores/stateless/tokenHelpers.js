@@ -1,6 +1,7 @@
 // @flow
 
-import crc8 from 'crc/crc8';
+// $FlowFixMe[cannot-resolve-module]
+import crc8 from 'crc/crc8'; // eslint-disable-line import/no-unresolved
 import type { TokenInfoMap } from '../toplevel/TokenInfoStore';
 import type {
   TokenLookupKey, TokenEntry,
@@ -73,7 +74,7 @@ function decodeAssetNameIfASCII(assetName: ?string): {| ascii: ?string, cip67Tag
   const { tag, hexName } = getCip67Tag(assetName);
   const asciiName = hexToValidAsciiOrNothing(hexName);
   if (asciiName == null || ASCII_ASSET_NAME_BLACKLIST.has(asciiName)) {
-    return { ascii: null, cip67Tag: null };
+    return { ascii: null, cip67Tag: tag };
   }
   return { ascii: asciiName, cip67Tag: tag };
 }
