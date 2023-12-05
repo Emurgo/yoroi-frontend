@@ -102,7 +102,7 @@ class ConnectedWebsitesPage extends Component<AllProps> {
     }
 
     const cardanoNodes = whitelistEntries
-      .map(({ url, protocol, publicDeriverId, image }) => {
+      .map(({ url, protocol, publicDeriverId, image }, entryIndex) => {
         const wallet = wallets.find(
           cacheEntry => cacheEntry.getPublicDeriverId() === publicDeriverId
         );
@@ -126,6 +126,7 @@ class ConnectedWebsitesPage extends Component<AllProps> {
             shouldHideBalance={this.props.shouldHideBalance}
             getTokenInfo={this.props.getTokenInfo}
             settingsCache={this.props.getConceptualWallet(wallet)}
+            id={'walletRow_' + entryIndex}
           />,
         ];
       })
