@@ -751,7 +751,7 @@ function createTxHandler(e) {
     return bytesToHex(name);
   }
 
-  const tokenAssetName = "";
+  const tokenAssetName = "V42";
   const nftAssetName = `V42/NFT#${Math.floor(Math.random() * 1000000000)}`;
   const tokenAssetNameHex = convertAssetNameToHEX(tokenAssetName);
   const nftAssetNameHex = convertAssetNameToHEX(nftAssetName);
@@ -782,9 +782,9 @@ function createTxHandler(e) {
 
   /****** FLAGS ******/
   let includeDefaultInputs = true;
-  let includeDefaultOutputs = false;
+  let includeDefaultOutputs = true;
   let includeDefaultTargets = true;
-  let includeAssetTargets = false;
+  let includeAssetTargets = true;
   //-----------------//
   const nativeScriptInputUtxoId = null;
   const plutusScriptInputUtxoId = null;
@@ -906,27 +906,27 @@ function createTxHandler(e) {
           assetName: tokenAssetNameHex,
           amount: "42",
         },
-        // {
-        //   script: mintScriptHex,
-        //   storeScriptOnChain: true,
-        //   assetName: nftAssetNameHex,
-        //   metadata: {
-        //     tag: 721,
-        //     json: JSON.stringify({
-        //       name: nftAssetName,
-        //       description: `V42 NFT Collection`,
-        //       mediaType: "image/png",
-        //       image: "ipfs://QmRhTTbUrPYEw3mJGGhQqQST9k86v1DPBiTTWJGKDJsVFw",
-        //       files: [
-        //         {
-        //           name: nftAssetName,
-        //           mediaType: "image/png",
-        //           src: "ipfs://QmRhTTbUrPYEw3mJGGhQqQST9k86v1DPBiTTWJGKDJsVFw",
-        //         },
-        //       ],
-        //     }),
-        //   },
-        // },
+        {
+          script: mintScriptHex,
+          storeScriptOnChain: true,
+          assetName: nftAssetNameHex,
+          metadata: {
+            tag: 721,
+            json: JSON.stringify({
+              name: nftAssetName,
+              description: `V42 NFT Collection`,
+              mediaType: "image/png",
+              image: "ipfs://QmRhTTbUrPYEw3mJGGhQqQST9k86v1DPBiTTWJGKDJsVFw",
+              files: [
+                {
+                  name: nftAssetName,
+                  mediaType: "image/png",
+                  src: "ipfs://QmRhTTbUrPYEw3mJGGhQqQST9k86v1DPBiTTWJGKDJsVFw",
+                },
+              ],
+            }),
+          },
+        },
       ],
     });
   }
