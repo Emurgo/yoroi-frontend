@@ -57,17 +57,21 @@ class NFTDetailPageRevamp extends Component<AllProps> {
             }))
             .filter(item => item.info.IsNFT)
             .map(token => {
-              const policyId = token.entry.identifier.split('.')[0];
-              const fullName = getTokenStrictName(token.info);
+              const split = token.entry.identifier.split('.');
+              const policyId = split[0];
+              const assetNameHex = split[1] ?? '';
+              const strictName = getTokenStrictName(token.info);
+              const cip67PRefix = strictName.cip67Tag != null ? `(${strictName.cip67Tag}) ` : '';
+              const fullName = cip67PRefix + (strictName.name ?? '');
               const name = truncateToken(fullName ?? '-');
               return {
                 policyId,
                 name,
                 lastUpdatedAt: token.info.Metadata.lastUpdatedAt,
                 ticker: token.info.Metadata.ticker ?? '-',
-                assetName: token.entry.identifier.split('.')[1] ?? '',
+                assetName: assetNameHex,
                 id: getTokenIdentifierIfExists(token.info) ?? '-',
-                image: getImageFromTokenMetadata(policyId, fullName, token.info.Metadata),
+                image: getImageFromTokenMetadata(policyId, assetNameHex, token.info.Metadata),
                 description: getDescriptionFromTokenMetadata(
                   policyId,
                   fullName,

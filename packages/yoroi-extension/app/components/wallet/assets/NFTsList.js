@@ -213,7 +213,7 @@ export function NftImage({
   width,
   height,
 }: {|
-  imageUrl: string | null,
+  imageUrl: ?string,
   name: string,
   width: string,
   height: string,

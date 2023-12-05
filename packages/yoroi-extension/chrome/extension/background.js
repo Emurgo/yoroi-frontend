@@ -372,6 +372,7 @@ async function syncWallet(
             stateFetcher.getBestBlock,
             stateFetcher.getTokenInfo,
             stateFetcher.getMultiAssetMintMetadata,
+            stateFetcher.getMultiAssetSupply,
           )
         } else {
           throw new Error('non-cardano wallet. Should not happen');

@@ -2,20 +2,38 @@
 
 import BigNumber from 'bignumber.js';
 import type {
-  HistoryRequest, HistoryResponse, HistoryFunc,
-  BestBlockRequest, BestBlockResponse, BestBlockFunc,
-  AddressUtxoRequest, AddressUtxoResponse, AddressUtxoFunc,
-  UtxoSumRequest, UtxoSumResponse, UtxoSumFunc,
+  HistoryRequest,
+  HistoryResponse,
+  HistoryFunc,
+  BestBlockRequest,
+  BestBlockResponse,
+  BestBlockFunc,
+  AddressUtxoRequest,
+  AddressUtxoResponse,
+  AddressUtxoFunc,
+  UtxoSumRequest,
+  UtxoSumResponse,
+  UtxoSumFunc,
   RewardHistoryFunc,
-  AccountStateRequest, AccountStateResponse, AccountStateFunc,
-  PoolInfoRequest, PoolInfoResponse, PoolInfoFunc,
-  RemoteTransaction, RemoteUnspentOutput,
+  AccountStateRequest,
+  AccountStateResponse,
+  AccountStateFunc,
+  PoolInfoRequest,
+  PoolInfoResponse,
+  PoolInfoFunc,
+  RemoteTransaction,
+  RemoteUnspentOutput,
   SignedRequestInternal,
   RemoteTransactionInput,
   TokenInfoFunc,
   MultiAssetMintMetadataFunc,
-  GetTransactionsByHashesRequest, GetTransactionsByHashesResponse, GetTransactionsByHashesFunc,
-  GetRecentTransactionHashesRequest, GetRecentTransactionHashesResponse, GetRecentTransactionHashesFunc,
+  GetTransactionsByHashesRequest,
+  GetTransactionsByHashesResponse,
+  GetTransactionsByHashesFunc,
+  GetRecentTransactionHashesRequest,
+  GetRecentTransactionHashesResponse,
+  GetRecentTransactionHashesFunc,
+  MultiAssetSupplyFunc,
 } from './types';
 import type {
   FilterUsedRequest, FilterUsedResponse, FilterFunc,
@@ -730,6 +748,10 @@ export function genGetMultiAssetMetadata(
   return async (_) => ({});
 }
 
+export function genGetMultiAssetSupply(
+): MultiAssetSupplyFunc {
+  return async (_) => ({});
+}
 
 export class MockUtxoApi implements UtxoApiContract {
   blockchain: Array<RemoteTransaction>;
