@@ -1733,7 +1733,9 @@ async function handleInjectorMessage(message, sender) {
                   await connectorGenerateReorgTx(
                     wallet,
                     usedUtxoIds,
-                    reorgTargetAmount,
+                    // `requiredAmount` is used here instead of the `reorgTargetAmount`
+                    // this is by design to minimise the number of collateral utxos
+                    requiredAmount,
                     addressedUtxos,
                     submittedTxs,
                   );
