@@ -1722,60 +1722,63 @@ async function handleInjectorMessage(message, sender) {
                 return;
               }
 
-              // not enough suitable UTXOs for collateral
-              // see if we can re-organize the UTXOs
-              // `utxosToUse` are UTXOs that are already picked
-              // `reorgTargetAmount` is the amount still needed
-              const usedUtxoIds = utxosToUse.map(utxo => utxo.utxo_id);
-              try {
-                await connectorGenerateReorgTx(
-                  wallet,
-                  usedUtxoIds,
-                  reorgTargetAmount,
-                  addressedUtxos,
-                  submittedTxs,
-                );
-              } catch (error) {
-                if (error instanceof NotEnoughMoneyToSendError) {
-                  rpcResponse({
-                    err: {
-                      code: APIErrorCodes.API_INTERNAL_ERROR,
-                      info: 'not enough UTXOs'
-                    }
-                  });
-                  return;
-                }
-                throw error;
-              }
-              // we can get enough collaterals after re-organization
-              // pop-up the UI
-              const connection = await getConnectedSite(tabId);
-              if (connection == null) {
-                throw new Error(
-                  `ERR - get_collateral_utxos could not find connection with tabId = ${tabId}`
-                );
-              }
+              if (reorgTargetAmount != null) {
 
-              await confirmSign(
-                tabId,
-                {
-                  type: 'tx-reorg/cardano',
-                  tx: {
+                // not enough suitable UTXOs for collateral
+                // see if we can re-organize the UTXOs
+                // `utxosToUse` are UTXOs that are already picked
+                // `reorgTargetAmount` is the amount still needed
+                const usedUtxoIds = utxosToUse.map(utxo => utxo.utxo_id);
+                try {
+                  await connectorGenerateReorgTx(
+                    wallet,
                     usedUtxoIds,
                     reorgTargetAmount,
-                    utxos: walletUtxos,
+                    addressedUtxos,
+                    submittedTxs,
+                  );
+                } catch (error) {
+                  if (error instanceof NotEnoughMoneyToSendError) {
+                    rpcResponse({
+                      err: {
+                        code: APIErrorCodes.API_INTERNAL_ERROR,
+                        info: 'not enough UTXOs'
+                      }
+                    });
+                    return;
+                  }
+                  throw error;
+                }
+                // we can get enough collaterals after re-organization
+                // pop-up the UI
+                const connection = await getConnectedSite(tabId);
+                if (connection == null) {
+                  throw new Error(
+                    `ERR - get_collateral_utxos could not find connection with tabId = ${tabId}`
+                  );
+                }
+
+                await confirmSign(
+                  tabId,
+                  {
+                    type: 'tx-reorg/cardano',
+                    tx: {
+                      usedUtxoIds,
+                      reorgTargetAmount,
+                      utxos: walletUtxos,
+                    },
+                    uid: message.uid,
                   },
-                  uid: message.uid,
-                },
-                connection,
-                {
-                  type: 'cardano-reorg-tx',
-                  utxosToUse,
-                  isCBOR,
-                },
-                message.protocol,
-                message.uid,
-              );
+                  connection,
+                  {
+                    type: 'cardano-reorg-tx',
+                    utxosToUse,
+                    isCBOR,
+                  },
+                  message.protocol,
+                  message.uid,
+                );
+              }
             },
             db,
             localStorageApi,
