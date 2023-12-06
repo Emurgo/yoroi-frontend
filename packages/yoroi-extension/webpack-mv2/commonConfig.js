@@ -218,8 +218,18 @@ const definePlugin = (
   return {
     'process.env': {
       NODE_ENV: JSON.stringify(isProd ? 'production' : 'development'),
-      COMMIT: JSON.stringify(shell.exec('git rev-parse HEAD', { silent: true }).trim()),
-      BRANCH: JSON.stringify(shell.exec('git rev-parse --abbrev-ref HEAD', { silent: true }).trim()),
+      COMMIT: JSON.stringify(
+        shell.exec(
+          'if [ -e ../../COMMIT ]; then cat ../../COMMIT; else git rev-parse HEAD; fi',
+          { silent: true }
+        ).trim()
+      ),
+      BRANCH: JSON.stringify(
+        shell.exec(
+          'if [ -e ../../BRANCH ]; then cat ../../BRANCH; else git rev-parse --abbrev-ref HEAD; fi',
+          { silent: true }
+        ).trim()
+      ),
       NIGHTLY: isNightly,
       POOLS_UI_URL_FOR_YOROI: JSON.stringify(manifestEnvs.POOLS_UI_URL_FOR_YOROI),
       IS_LIGHT: isLight ,
