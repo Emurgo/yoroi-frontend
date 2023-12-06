@@ -91,7 +91,8 @@ class AddWalletPage extends Component<AllProps> {
   };
 
   componentDidMount() {
-    this.generated.actions.wallets.unselectWallet.trigger();
+    const { isRevampTheme } = this.generated.stores.profile;
+    if (!isRevampTheme) this.generated.actions.wallets.unselectWallet.trigger();
   }
 
   render(): Node {
@@ -139,6 +140,9 @@ class AddWalletPage extends Component<AllProps> {
           }
           onCardanoPreviewTestnet={() =>
             actions.profile.setSelectedNetwork.trigger(networks.CardanoPreviewTestnet)
+          }
+          onCardanoSanchoTestnet={() =>
+            actions.profile.setSelectedNetwork.trigger(networks.CardanoSanchoTestnet)
           }
         />
       );
@@ -364,7 +368,7 @@ class AddWalletPage extends Component<AllProps> {
       |},
     |},
     stores: {|
-      profile: {| selectedNetwork: void | $ReadOnly<NetworkRow> |},
+      profile: {| selectedNetwork: void | $ReadOnly<NetworkRow>, isRevampTheme: boolean |},
       uiDialogs: {|
         hasOpen: boolean,
         getParam: <T>(number | string) => void | T,
@@ -384,6 +388,7 @@ class AddWalletPage extends Component<AllProps> {
       stores: {
         profile: {
           selectedNetwork: stores.profile.selectedNetwork,
+          isRevampTheme: stores.profile.isRevampTheme,
         },
         uiDialogs: {
           hasOpen: stores.uiDialogs.hasOpen,

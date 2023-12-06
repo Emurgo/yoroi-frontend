@@ -2,28 +2,51 @@
 
 import BigNumber from 'bignumber.js';
 import type {
-  AddressUtxoRequest, AddressUtxoResponse,
-  TxBodiesRequest, TxBodiesResponse,
-  UtxoSumRequest, UtxoSumResponse,
-  HistoryRequest, HistoryResponse,
-  RewardHistoryFunc, RewardHistoryRequest, RewardHistoryResponse,
-  PoolInfoFunc, PoolInfoRequest, PoolInfoResponse,
-  TokenInfoFunc, TokenInfoRequest, TokenInfoResponse,
-  AccountStateFunc, AccountStateRequest, AccountStateResponse,
-  CatalystRoundInfoFunc,CatalystRoundInfoRequest, CatalystRoundInfoResponse,
-  SignedRequest, SignedResponse,
-  BestBlockRequest, BestBlockResponse,
+  AddressUtxoRequest,
+  AddressUtxoResponse,
+  TxBodiesRequest,
+  TxBodiesResponse,
+  UtxoSumRequest,
+  UtxoSumResponse,
+  HistoryRequest,
+  HistoryResponse,
+  RewardHistoryFunc,
+  RewardHistoryRequest,
+  RewardHistoryResponse,
+  PoolInfoFunc,
+  PoolInfoRequest,
+  PoolInfoResponse,
+  TokenInfoFunc,
+  TokenInfoRequest,
+  TokenInfoResponse,
+  AccountStateFunc,
+  AccountStateRequest,
+  AccountStateResponse,
+  CatalystRoundInfoFunc,
+  CatalystRoundInfoRequest,
+  CatalystRoundInfoResponse,
+  SignedRequest,
+  SignedResponse,
+  BestBlockRequest,
+  BestBlockResponse,
   AddressUtxoFunc,
   HistoryFunc,
   TxBodiesFunc,
   UtxoSumFunc,
   RemoteTransaction,
-  MultiAssetMintMetadataRequest,
+  MultiAssetRequest,
   MultiAssetMintMetadataResponse,
-  GetUtxoDataFunc, GetUtxoDataRequest, GetUtxoDataResponse,
+  GetUtxoDataFunc,
+  GetUtxoDataRequest,
+  GetUtxoDataResponse,
   GetLatestBlockBySlotFunc,
-  GetRecentTransactionHashesRequest, GetRecentTransactionHashesResponse, GetRecentTransactionHashesFunc,
-  GetTransactionsByHashesRequest, GetTransactionsByHashesResponse, GetTransactionsByHashesFunc,
+  GetRecentTransactionHashesRequest,
+  GetRecentTransactionHashesResponse,
+  GetRecentTransactionHashesFunc,
+  GetTransactionsByHashesRequest,
+  GetTransactionsByHashesResponse,
+  GetTransactionsByHashesFunc,
+  MultiAssetSupplyResponse,
 } from './types';
 import type {
   FilterFunc, FilterUsedRequest, FilterUsedResponse,
@@ -122,12 +145,29 @@ export class BatchedFetcher implements IFetcher {
   )
 
   getMultiAssetMintMetadata
-  : MultiAssetMintMetadataRequest => Promise<MultiAssetMintMetadataResponse>
+  : MultiAssetRequest => Promise<MultiAssetMintMetadataResponse>
     = async (body) => {
       const { network, assets } = body;
       const assetChunks = chunk(assets, MINT_METADATA_REQUEST_PAGE_SIZE);
       const responses = await Promise.all(assetChunks.map(
         batch => this.baseFetcher.getMultiAssetMintMetadata({ network, assets: batch })
+      ));
+      const result = {};
+      for (const response of responses) {
+        for (const [key, value] of Object.entries(response)) {
+          result[key] = value;
+        }
+      }
+      return result;
+    }
+
+  getMultiAssetSupply
+  : MultiAssetRequest => Promise<MultiAssetSupplyResponse>
+    = async (body) => {
+      const { network, assets } = body;
+      const assetChunks = chunk(assets, MINT_METADATA_REQUEST_PAGE_SIZE);
+      const responses = await Promise.all(assetChunks.map(
+        batch => this.baseFetcher.getMultiAssetSupply({ network, assets: batch })
       ));
       const result = {};
       for (const response of responses) {

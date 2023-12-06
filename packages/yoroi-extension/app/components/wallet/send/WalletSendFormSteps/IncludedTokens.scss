@@ -17,12 +17,13 @@
         align-items: center;
         justify-content: space-between;
         margin-bottom: 12px;
+        gap: 16px;
 
         .token {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            width: 270px;
+            width: 246px;
             height: 55px;
             color: #242838;
             line-height: 24px;
@@ -68,12 +69,13 @@
         align-items: center;
         justify-content: space-between;
         margin-bottom: 12px;
+        gap: 16px;
 
         .nft {
             display: flex;
             align-items: center;
             justify-content: flex-start;
-            width: 270px;
+            width: 246px;
             height: 55px;
             color: #242838;
             line-height: 24px;

@@ -183,10 +183,12 @@ export default class BaseCoinPriceStore
             response.pubKeyDataSignature
           );
         }
+
         if (!this.pubKeyData) {
           throw new Error('missing pubKeyData - should never happen');
         }
-        if (!verifyTicker(response.ticker, this.pubKeyData)) {
+
+        if (response.ticker.from === 'ERG' && !verifyTicker(response.ticker, this.pubKeyData)) {
           throw new Error('Invalid ticker signature: ' + JSON.stringify(response.ticker));
         }
 

@@ -1,36 +1,39 @@
 // @flow
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
+import type { InjectedOrGenerated } from '../../../../types/injectedPropsType';
+import type { GeneratedData as TransactionDialogData } from './TransactionDialogContainer';
+import type { GeneratedData as RegisterDialogData } from './RegisterDialogContainer';
+import type { WalletType } from '../../../../components/wallet/voting/types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
-
-import type { InjectedOrGenerated } from '../../../../types/injectedPropsType';
 import { Logger } from '../../../../utils/logging';
 import { handleExternalLinkClick } from '../../../../utils/routing';
+import { withLayout } from '../../../../styles/context/layout';
+import { ProgressStep, ProgressInfo } from '../../../../stores/ada/VotingStore';
 import GeneratePinDialog from '../../../../components/wallet/voting/GeneratePinDialog';
 import ConfirmPinDialog from '../../../../components/wallet/voting/ConfirmPinDialog';
 import QrCodeDialog from '../../../../components/wallet/voting/QrCodeDialog';
 import TransactionDialogContainer from './TransactionDialogContainer';
 import RegisterDialogContainer from './RegisterDialogContainer';
-import type { GeneratedData as TransactionDialogData } from './TransactionDialogContainer';
-import type { GeneratedData as RegisterDialogData } from './RegisterDialogContainer';
-import { ProgressStep, ProgressInfo } from '../../../../stores/ada/VotingStore';
-import type { WalletType } from '../../../../components/wallet/voting/types';
 import globalMessages from '../../../../i18n/global-messages';
-import CreateTxExecutingDialog from '../../../../components/wallet/voting/CreateTxExecutingDialog'
+import CreateTxExecutingDialog from '../../../../components/wallet/voting/CreateTxExecutingDialog';
 
 export type GeneratedData = typeof VotingRegistrationDialogContainer.prototype.generated;
-
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
   +onClose: void => void,
   +walletType: WalletType,
 |};
+type InjectedProps = {|
+  +isRevampLayout: boolean,
+|};
+
+type AllProps = {| ...Props, ...InjectedProps |};
 
 @observer
-export default class VotingRegistrationDialogContainer extends Component<Props> {
-
-  cancel: (() => void) = () => {
+class VotingRegistrationDialogContainer extends Component<AllProps> {
+  cancel: () => void = () => {
     this.props.onClose();
     this.generated.actions.ada.votingActions.cancel.trigger();
   };
@@ -45,7 +48,7 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
   render(): null | Node {
     const votingStore = this.generated.stores.substores.ada.votingStore;
     if (votingStore.createVotingRegTx.isExecuting) {
-      return (<CreateTxExecutingDialog />);
+      return <CreateTxExecutingDialog />;
     }
 
     const { profile } = this.generated.stores;
@@ -54,11 +57,9 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
     const stepsList = [
       { step: ProgressStep.GENERATE, message: globalMessages.stepPin },
       { step: ProgressStep.CONFIRM, message: globalMessages.stepConfirm },
-      ...(
-        walletType === 'mnemonic' ?
-          [{ step: ProgressStep.REGISTER, message: globalMessages.registerLabel }] :
-          []
-      ),
+      ...(walletType === 'mnemonic'
+        ? [{ step: ProgressStep.REGISTER, message: globalMessages.registerLabel }]
+        : []),
       { step: ProgressStep.TRANSACTION, message: globalMessages.transactionLabel },
       { step: ProgressStep.QR_CODE, message: globalMessages.stepQrCode },
     ];
@@ -76,11 +77,14 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
             cancel={this.cancel}
             classicTheme={profile.isClassicTheme}
             onBack={this.props.onClose}
-          />);
+            isRevamp={this.props.isRevampLayout}
+          />
+        );
         break;
       case ProgressStep.CONFIRM:
         component = (
           <ConfirmPinDialog
+            isRevamp={this.props.isRevampLayout}
             stepsList={stepsList}
             progressInfo={votingStore.progressInfo}
             goBack={votingActions.goBackToGenerate.trigger}
@@ -88,13 +92,13 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
             error={votingActions.submitConfirmError.trigger}
             cancel={this.cancel}
             classicTheme={profile.isClassicTheme}
-            pinValidation={(enteredPin)=>{
-                const pin = votingStore.pin.join('');
-                return pin === enteredPin;
-              }
-            }
+            pinValidation={enteredPin => {
+              const pin = votingStore.pin.join('');
+              return pin === enteredPin;
+            }}
             isProcessing={votingStore.isActionProcessing}
-          />);
+          />
+        );
         break;
       case ProgressStep.REGISTER:
         component = (
@@ -106,7 +110,8 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
             cancel={this.cancel}
             classicTheme={profile.isClassicTheme}
             onError={votingActions.submitRegisterError.trigger}
-          />);
+          />
+        );
         break;
       case ProgressStep.TRANSACTION:
         component = (
@@ -119,7 +124,8 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
             goBack={votingActions.goBackToRegister.trigger}
             onError={votingActions.submitTransactionError.trigger}
             walletType={walletType}
-          />);
+          />
+        );
         break;
       case ProgressStep.QR_CODE:
         component = (
@@ -131,10 +137,15 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
             cancel={this.cancel}
             classicTheme={profile.isClassicTheme}
             votingKey={votingStore.encryptedKey}
-          />);
+          />
+        );
         break;
       default:
-        Logger.error(`${nameof(VotingRegistrationDialogContainer)}::${nameof(this.render)}: something unexpected happened`);
+        Logger.error(
+          `${nameof(VotingRegistrationDialogContainer)}::${nameof(
+            this.render
+          )}: something unexpected happened`
+        );
         break;
     }
 
@@ -149,34 +160,34 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
           cancel: {| trigger: (params: void) => void |},
           submitGenerate: {| trigger: (params: void) => void |},
           goBackToGenerate: {|
-            trigger: (params: void) => void
+            trigger: (params: void) => void,
           |},
           submitConfirm: {|
-            trigger: (params: void) => void
+            trigger: (params: void) => void,
           |},
           submitConfirmError: {|
-            trigger: (params: void) => void
+            trigger: (params: void) => void,
           |},
           submitRegister: {|
-            trigger: (params: void) => void
+            trigger: (params: void) => void,
           |},
           submitRegisterError: {|
-            trigger: (params: Error) => void
+            trigger: (params: Error) => void,
           |},
           goBackToRegister: {|
-            trigger: (params: void) => void
+            trigger: (params: void) => void,
           |},
           submitTransaction: {|
-            trigger: (params: void) => void
+            trigger: (params: void) => void,
           |},
           submitTransactionError: {|
-            trigger: (params: Error) => void
+            trigger: (params: Error) => void,
           |},
           finishQRCode: {|
-            trigger: (params: void) => void
+            trigger: (params: void) => void,
           |},
-        |}
-      |}
+        |},
+      |},
     |},
     stores: {|
       profile: {|
@@ -193,12 +204,12 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
               isExecuting: boolean,
             |},
           |},
-        |}
-      |}
+        |},
+      |},
     |},
     TransactionDialogProps: InjectedOrGenerated<TransactionDialogData>,
     RegisterDialogProps: InjectedOrGenerated<RegisterDialogData>,
-    |} {
+  |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -235,7 +246,9 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
               trigger: actions.ada.voting.goBackToGenerate.trigger,
             },
             submitConfirm: {
-              trigger: () => { actions.ada.voting.submitConfirm.trigger() },
+              trigger: () => {
+                actions.ada.voting.submitConfirm.trigger();
+              },
             },
             submitConfirmError: {
               trigger: actions.ada.voting.submitConfirmError.trigger,
@@ -265,10 +278,10 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
         },
         generateCatalystKey: { trigger: actions.ada.voting.generateCatalystKey.trigger },
       },
-      TransactionDialogProps:
-        ({ actions, stores, }: InjectedOrGenerated<TransactionDialogData>),
-      RegisterDialogProps:
-        ({ actions, stores, }: InjectedOrGenerated<RegisterDialogData>),
+      TransactionDialogProps: ({ actions, stores }: InjectedOrGenerated<TransactionDialogData>),
+      RegisterDialogProps: ({ actions, stores }: InjectedOrGenerated<RegisterDialogData>),
     });
   }
 }
+
+export default (withLayout(VotingRegistrationDialogContainer): ComponentType<Props>);

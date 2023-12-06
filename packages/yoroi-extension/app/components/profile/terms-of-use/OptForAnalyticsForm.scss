@@ -1,0 +1,52 @@
+.component {
+  .centeredBox {
+    margin: 0 auto;
+    width: max-content;
+  }
+
+  .title {
+    font-family: Rubik;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 26px;
+    letter-spacing: 0px;
+  }
+
+  .learnMore {
+    color: #4b6dde;
+    text-decoration: none;
+  }
+
+  .skip {
+    text-align: center;
+    cursor: pointer;
+    margin-top: 8px;
+    margin-bottom: 24px;
+    font-weight: 500;
+    padding: 9px 20px;
+
+    & button {
+      text-transform: uppercase;
+    }
+  }
+
+  .accept {
+    width: min-content;
+    margin: 0 auto;
+    button {
+      min-width: 133px;
+    }
+  }
+
+  .share {
+    margin-top: 16px;
+    margin-bottom: 16px;
+  }
+
+  .illustration {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 16px;
+  }
+}
