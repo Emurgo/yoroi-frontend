@@ -676,9 +676,10 @@ const yoroiMessageHandler = async (
           rpcResponse({ err: 'unexpected error' });
           return;
         }
-        const { utxosToUse, isCBOR } = responseData.continuationData;
+        const { isCBOR } = responseData.continuationData;
         const utxos = await transformCardanoUtxos(
-          [...utxosToUse, ...(request.tx: any)],
+          // Only one utxo from the result of the reorg transaction is packed and returned here
+          [...(request.tx: any)],
           isCBOR
         );
         rpcResponse({ ok: utxos });
@@ -1727,7 +1728,7 @@ async function handleInjectorMessage(message, sender) {
                 // not enough suitable UTXOs for collateral
                 // see if we can re-organize the UTXOs
                 // `utxosToUse` are UTXOs that are already picked
-                // `reorgTargetAmount` is the amount still needed
+                // `requiredAmount` is the amount needed to respond
                 const usedUtxoIds = utxosToUse.map(utxo => utxo.utxo_id);
                 try {
                   await connectorGenerateReorgTx(
@@ -1766,7 +1767,7 @@ async function handleInjectorMessage(message, sender) {
                     type: 'tx-reorg/cardano',
                     tx: {
                       usedUtxoIds,
-                      reorgTargetAmount,
+                      reorgTargetAmount: requiredAmount,
                       utxos: walletUtxos,
                     },
                     uid: message.uid,
