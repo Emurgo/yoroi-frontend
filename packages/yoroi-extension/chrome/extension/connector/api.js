@@ -314,6 +314,8 @@ export async function connectorGetUtxosCardano(
 export const MAX_COLLATERAL: BigNumber = new BigNumber('5000000');
 // only consider UTXO value <= (${requiredAmount} + 1 ADA)
 const MAX_PER_UTXO_SURPLUS = new BigNumber('2000000');
+// Max allowed collateral inputs in a tx by protocol
+export const MAX_COLLATERAL_COUNT: number = 3;
 
 type GetCollateralUtxosRespose = {|
   utxosToUse: Array<RemoteUnspentOutput>,
@@ -344,11 +346,18 @@ export async function connectorGetCollateralUtxos(
     (utxo1, utxo2) => (new BigNumber(utxo1.amount)).comparedTo(utxo2.amount)
   )
   const utxosToUse = []
-  let sum = new BigNumber('0')
-  let enough = false
+  let sum = new BigNumber('0');
+  let enough = false;
   for (const utxo of utxosToConsider) {
-    utxosToUse.push(utxo)
-    sum = sum.plus(utxo.amount)
+    utxosToUse.push(utxo);
+    sum = sum.plus(utxo.amount);
+    while (
+      utxosToUse.length > MAX_COLLATERAL_COUNT
+      || sum.minus(utxosToUse[0].amount).gte(required)
+    ) {
+      const removedUtxo = utxosToUse.shift();
+      sum = sum.minus(removedUtxo.amount);
+    }
     if (sum.gte(required)) {
       enough = true
       break

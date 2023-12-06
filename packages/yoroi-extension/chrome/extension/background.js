@@ -1664,7 +1664,9 @@ async function handleInjectorMessage(message, sender) {
       try {
         checkParamCount(1);
         await RustModule.load();
-        let requiredAmount: string = message.params[0] || String(MAX_COLLATERAL);
+        const firstParam = message.params[0];
+        const definedRequiredAmount = !!firstParam;
+        let requiredAmount: string = firstParam || String(MAX_COLLATERAL);
         if (!/^\d+$/.test(requiredAmount)) {
           try {
             requiredAmount = RustModule.WalletV4.Value.from_bytes(
@@ -1705,8 +1707,11 @@ async function handleInjectorMessage(message, sender) {
                 }),
                 submittedTxs,
               );
+              const isEnough = reorgTargetAmount == null;
+              const someCollateralIsSelected = utxosToUse.length > 0;
+              const canAnswer = isEnough || (someCollateralIsSelected && !definedRequiredAmount)
               // do have enough
-              if (reorgTargetAmount == null) {
+              if (canAnswer) {
                 const utxos = await transformCardanoUtxos(
                   utxosToUse,
                   isCBOR
