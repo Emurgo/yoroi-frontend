@@ -355,6 +355,7 @@ export async function connectorGetCollateralUtxos(
       utxosToUse.length > MAX_COLLATERAL_COUNT
       || sum.minus(utxosToUse[0].amount).gte(required)
     ) {
+      // Removing the first (hence the smallest) utxo from the list
       const removedUtxo = utxosToUse.shift()
       sum = sum.minus(removedUtxo.amount)
     }
