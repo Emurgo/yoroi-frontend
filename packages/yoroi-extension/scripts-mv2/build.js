@@ -15,6 +15,8 @@ const exec = cmd => {
 
 // override NODE_ENV for ConfigWebpackPlugin
 process.env.NODE_CONFIG_ENV = argv.env;
+// this is hack to prevent `config` from loading `test.json` when the host name is "test"
+process.env.HOST = 'no such named config file';
 const isNightly = argv.nightly != null;
 const shouldInjectConnector = argv.dontInjectConnector === undefined;
 

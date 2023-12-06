@@ -6,7 +6,8 @@
     "flow": "lerna run flow --stream",
     "test": "lerna run test --stream",
     "translations:purge": "lerna run translations:purge -- stream",
-    "dev:all": "concurrently \"npm run dev:stable --prefix  packages/yoroi-extension\" \"npm run cardano --prefix packages/yoroi-connector\" "
+    "dev:all": "concurrently \"npm run dev:stable --prefix  packages/yoroi-extension\" \"npm run cardano --prefix packages/yoroi-connector\" ",
+    "archive:src": "func() { git rev-parse HEAD > COMMIT && git rev-parse --abbrev-ref HEAD > BRANCH && git archive --format zip --add-file COMMIT --add-file BRANCH -o $1 HEAD && rm COMMIT BRANCH; }; func"
   },
   "husky": {
     "hooks": {
