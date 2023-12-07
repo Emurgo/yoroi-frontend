@@ -533,19 +533,19 @@ const globalMessages: * = defineMessages({
   },
   newPasswordLabel: {
     id: 'wallet.settings.changePassword.dialog.newPasswordLabel',
-    defaultMessage: '!!!New spending password',
+    defaultMessage: '!!!New password',
   },
   newPasswordFieldPlaceholder: {
     id: 'wallet.settings.changePassword.dialog.newPasswordFieldPlaceholder',
-    defaultMessage: '!!!Type new spending password',
+    defaultMessage: '!!!Type new password',
   },
   repeatPasswordLabel: {
     id: 'wallet.settings.changePassword.dialog.repeatPasswordLabel',
-    defaultMessage: '!!!Repeat new spending password',
+    defaultMessage: '!!!Repeat new password',
   },
   repeatPasswordFieldPlaceholder: {
     id: 'wallet.settings.changePassword.dialog.repeatPasswordFieldPlaceholder',
-    defaultMessage: '!!!Type new spending password',
+    defaultMessage: '!!!Type new password',
   },
   uriSchemeLabel: {
     id: 'global.uriSchemeTitleLabel',
@@ -655,11 +655,11 @@ const globalMessages: * = defineMessages({
   },
   walletPasswordLabel: {
     id: 'wallet.send.confirmationDialog.walletPasswordLabel',
-    defaultMessage: '!!!Spending password',
+    defaultMessage: '!!!Password',
   },
   walletPasswordFieldPlaceholder: {
     id: 'wallet.send.confirmationDialog.walletPasswordFieldPlaceholder',
-    defaultMessage: '!!!Type your spending password',
+    defaultMessage: '!!!Type your password',
   },
   txGeneration: {
     id: 'wallet.delegation.transaction.generation',

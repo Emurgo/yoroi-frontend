@@ -359,7 +359,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
         throw new Error(`${nameof(this._createTransaction)} missing staking key functionality`);
       }
       if (spendingPassword === null) {
-        throw new Error(`${nameof(this._createTransaction)} expect a spending password`);
+        throw new Error(`${nameof(this._createTransaction)} expect a password`);
       }
       const stakingKey = await genOwnStakingKey({
         publicDeriver: withStakingKey,

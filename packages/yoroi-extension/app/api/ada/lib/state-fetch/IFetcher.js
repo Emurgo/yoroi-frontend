@@ -12,11 +12,11 @@ import type {
   CatalystRoundInfoRequest, CatalystRoundInfoResponse,
   BestBlockRequest, BestBlockResponse,
   TokenInfoRequest, TokenInfoResponse,
-  MultiAssetMintMetadataRequest, MultiAssetMintMetadataResponse,
+  MultiAssetRequest, MultiAssetMintMetadataResponse,
   GetUtxoDataRequest, GetUtxoDataResponse,
   GetLatestBlockBySlotReq, GetLatestBlockBySlotRes,
   GetRecentTransactionHashesRequest, GetRecentTransactionHashesResponse,
-  GetTransactionsByHashesRequest, GetTransactionsByHashesResponse,
+  GetTransactionsByHashesRequest, GetTransactionsByHashesResponse, MultiAssetSupplyResponse,
 } from './types';
 import type {
   FilterUsedRequest, FilterUsedResponse,
@@ -35,8 +35,10 @@ export interface IFetcher {
   getCatalystRoundInfo(body: CatalystRoundInfoRequest): Promise<CatalystRoundInfoResponse>;
   getTokenInfo(body: TokenInfoRequest): Promise<TokenInfoResponse>;
   checkAddressesInUse(body: FilterUsedRequest): Promise<FilterUsedResponse>;
-  getMultiAssetMintMetadata(body: MultiAssetMintMetadataRequest)
+  getMultiAssetMintMetadata(body: MultiAssetRequest)
     : Promise<MultiAssetMintMetadataResponse>;
+  getMultiAssetSupply(body: MultiAssetRequest)
+    : Promise<MultiAssetSupplyResponse>;
   getUtxoData(body: GetUtxoDataRequest): Promise<GetUtxoDataResponse>;
   getLatestBlockBySlot(body: GetLatestBlockBySlotReq): Promise<GetLatestBlockBySlotRes>;
   getRecentTransactionHashes

@@ -222,7 +222,7 @@ function TokenList({ assetsList: list, shouldHideBalance, intl }: Props & Intl):
               <TokenItemRow
                 key={token.id}
                 avatar={<DefaultAssetLogo />}
-                name={token.name}
+                name={token.name || '-'}
                 id={token.id}
                 amount={shouldHideBalance ? hiddenAmount : token.amount}
               />

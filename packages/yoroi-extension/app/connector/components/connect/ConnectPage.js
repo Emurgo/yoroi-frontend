@@ -48,7 +48,7 @@ const messages = defineMessages({
   connectWalletAuthRequest: {
     id: 'connector.label.connectWalletAuthRequest',
     defaultMessage:
-      '!!!The dApp requests to use your wallet identity for authentication. Enter your spending password to confirm.',
+      '!!!The dApp requests to use your wallet identity for authentication. Enter your password to confirm.',
   },
   yourWallets: {
     id: 'connector.label.yourWallets',
