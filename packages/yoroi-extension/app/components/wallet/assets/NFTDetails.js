@@ -422,43 +422,6 @@ const ImageItem = styled(Box)({
   },
 });
 
-// Requrie predefined with
-// jone -> jo..
-const TruncatedText = styled(Typography)({
-  whiteSpace: 'nowrap',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-});
-
-export function CopyAddress({ text, children }: {| text: string, children: Node |}): Node {
-  const [isCopied, setCopy] = useState(false);
-
-  const onCopy = async () => {
-    setCopy(false);
-
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopy(true);
-    } catch (error) {
-      setCopy(false);
-    }
-
-    setTimeout(() => {
-      setCopy(false);
-    }, 2500); // 2.5 sec
-  };
-
-  return (
-    <Stack direction="row" alignItems="center">
-      <TruncatedText>{children}</TruncatedText>
-
-      <IconButton sx={{ ml: '4px' }} onClick={onCopy}>
-        {isCopied ? <IconCopied /> : <IconCopy />}
-      </IconButton>
-    </Stack>
-  );
-}
-
 function LabelWithValue({ label, value }: {| label: string | Node, value: string | Node |}): Node {
   return (
     <Box>

@@ -33,7 +33,7 @@ import { Box, Tooltip, Typography } from '@mui/material';
 import { withLayout } from '../../../styles/context/layout';
 import type { InjectedLayoutProps } from '../../../styles/context/layout';
 import { toSvg } from 'jdenticon';
-import { CopyAddress } from '../assets/NFTDetails';
+import { CopyAddress } from '../assets/TruncatedText';
 
 const messages = defineMessages({
   delegationTips: {
