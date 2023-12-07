@@ -1417,7 +1417,6 @@ async function handleInjectorMessage(message, sender) {
                     await getCardanoStateFetcher(localStorageApi);
               const resp = await connectorGetStakeKey(
                 wallet,
-                stateFetcher.getAccountState,
               );
               rpcResponse({ ok: resp });
             },
