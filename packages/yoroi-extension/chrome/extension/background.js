@@ -676,9 +676,10 @@ const yoroiMessageHandler = async (
           rpcResponse({ err: 'unexpected error' });
           return;
         }
-        const { utxosToUse, isCBOR } = responseData.continuationData;
+        const { isCBOR } = responseData.continuationData;
         const utxos = await transformCardanoUtxos(
-          [...utxosToUse, ...(request.tx: any)],
+          // Only one utxo from the result of the reorg transaction is packed and returned here
+          [...(request.tx: any)],
           isCBOR
         );
         rpcResponse({ ok: utxos });
@@ -1664,7 +1665,9 @@ async function handleInjectorMessage(message, sender) {
       try {
         checkParamCount(1);
         await RustModule.load();
-        let requiredAmount: string = message.params[0] || String(MAX_COLLATERAL);
+        const firstParam = message.params[0];
+        const definedRequiredAmount = !!firstParam;
+        let requiredAmount: string = firstParam || String(MAX_COLLATERAL);
         if (!/^\d+$/.test(requiredAmount)) {
           try {
             requiredAmount = RustModule.WalletV4.Value.from_bytes(
@@ -1705,8 +1708,11 @@ async function handleInjectorMessage(message, sender) {
                 }),
                 submittedTxs,
               );
+              const isEnough = reorgTargetAmount == null;
+              const someCollateralIsSelected = utxosToUse.length > 0;
+              const canAnswer = isEnough || (someCollateralIsSelected && !definedRequiredAmount)
               // do have enough
-              if (reorgTargetAmount == null) {
+              if (canAnswer) {
                 const utxos = await transformCardanoUtxos(
                   utxosToUse,
                   isCBOR
@@ -1717,60 +1723,65 @@ async function handleInjectorMessage(message, sender) {
                 return;
               }
 
-              // not enough suitable UTXOs for collateral
-              // see if we can re-organize the UTXOs
-              // `utxosToUse` are UTXOs that are already picked
-              // `reorgTargetAmount` is the amount still needed
-              const usedUtxoIds = utxosToUse.map(utxo => utxo.utxo_id);
-              try {
-                await connectorGenerateReorgTx(
-                  wallet,
-                  usedUtxoIds,
-                  reorgTargetAmount,
-                  addressedUtxos,
-                  submittedTxs,
-                );
-              } catch (error) {
-                if (error instanceof NotEnoughMoneyToSendError) {
-                  rpcResponse({
-                    err: {
-                      code: APIErrorCodes.API_INTERNAL_ERROR,
-                      info: 'not enough UTXOs'
-                    }
-                  });
-                  return;
-                }
-                throw error;
-              }
-              // we can get enough collaterals after re-organization
-              // pop-up the UI
-              const connection = await getConnectedSite(tabId);
-              if (connection == null) {
-                throw new Error(
-                  `ERR - get_collateral_utxos could not find connection with tabId = ${tabId}`
-                );
-              }
+              if (reorgTargetAmount != null) {
 
-              await confirmSign(
-                tabId,
-                {
-                  type: 'tx-reorg/cardano',
-                  tx: {
+                // not enough suitable UTXOs for collateral
+                // see if we can re-organize the UTXOs
+                // `utxosToUse` are UTXOs that are already picked
+                // `requiredAmount` is the amount needed to respond
+                const usedUtxoIds = utxosToUse.map(utxo => utxo.utxo_id);
+                try {
+                  await connectorGenerateReorgTx(
+                    wallet,
                     usedUtxoIds,
-                    reorgTargetAmount,
-                    utxos: walletUtxos,
+                    // `requiredAmount` is used here instead of the `reorgTargetAmount`
+                    // this is by design to minimise the number of collateral utxos
+                    requiredAmount,
+                    addressedUtxos,
+                    submittedTxs,
+                  );
+                } catch (error) {
+                  if (error instanceof NotEnoughMoneyToSendError) {
+                    rpcResponse({
+                      err: {
+                        code: APIErrorCodes.API_INTERNAL_ERROR,
+                        info: 'not enough UTXOs'
+                      }
+                    });
+                    return;
+                  }
+                  throw error;
+                }
+                // we can get enough collaterals after re-organization
+                // pop-up the UI
+                const connection = await getConnectedSite(tabId);
+                if (connection == null) {
+                  throw new Error(
+                    `ERR - get_collateral_utxos could not find connection with tabId = ${tabId}`
+                  );
+                }
+
+                await confirmSign(
+                  tabId,
+                  {
+                    type: 'tx-reorg/cardano',
+                    tx: {
+                      usedUtxoIds,
+                      reorgTargetAmount: requiredAmount,
+                      utxos: walletUtxos,
+                    },
+                    uid: message.uid,
                   },
-                  uid: message.uid,
-                },
-                connection,
-                {
-                  type: 'cardano-reorg-tx',
-                  utxosToUse,
-                  isCBOR,
-                },
-                message.protocol,
-                message.uid,
-              );
+                  connection,
+                  {
+                    type: 'cardano-reorg-tx',
+                    utxosToUse,
+                    isCBOR,
+                  },
+                  message.protocol,
+                  message.uid,
+                );
+              }
             },
             db,
             localStorageApi,
