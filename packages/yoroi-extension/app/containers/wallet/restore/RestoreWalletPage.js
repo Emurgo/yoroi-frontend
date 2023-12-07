@@ -19,7 +19,6 @@ import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
-import { ROUTES } from '../../../routes-config';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import TopBarLayout from '../../../components/layout/TopBarLayout';
 import BannerContainer from '../../banners/BannerContainer';
@@ -41,12 +40,7 @@ export default class RestoreWalletPage extends Component<Props> {
     return (
       <TopBarLayout
         banner={<BannerContainer {...this.generated.BannerContainerProps} />}
-        sidebar={
-          <SidebarContainer
-            {...this.generated.SidebarContainerProps}
-            onLogoClick={() => actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })}
-          />
-        }
+        sidebar={<SidebarContainer {...this.generated.SidebarContainerProps} />}
         bgcolor="common.white"
       >
         <RestoreWalletPageComponent

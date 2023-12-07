@@ -14,6 +14,7 @@ export default class DelegationTransactionActions {
   signTransaction: AsyncAction<{|
     password?: string,
     publicDeriver: PublicDeriver<>,
+    dialog?: any,
   |}> = new AsyncAction();
   setShouldDeregister: Action<boolean> = new Action();
   complete: Action<void> = new Action();

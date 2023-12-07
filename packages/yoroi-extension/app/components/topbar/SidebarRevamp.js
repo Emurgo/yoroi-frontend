@@ -1,13 +1,14 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { SidebarCategoryRevamp } from '../../stores/stateless/sidebarCategories';
 import { observer } from 'mobx-react';
+import { intlShape } from 'react-intl';
+import { Box, Link } from '@mui/material';
+import { ReactComponent as YoroiLogo } from '../../assets/images/sidebar/revamp/yoroi-logo.inline.svg';
 import SideBarCategoryRevamp from './SideBarCategoryRevamp';
 import styles from './SidebarRevamp.scss';
-import type { SidebarCategoryRevamp } from '../../stores/stateless/sidebarCategories';
-import { intlShape } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { ReactComponent as YoroiLogo } from '../../assets/images/sidebar/yoroi_logo.inline.svg';
 import globalMessages from '../../i18n/global-messages';
 
 type Props = {|
@@ -43,7 +44,7 @@ export default class SidebarRevamp extends Component<Props> {
     const { categories, isActiveCategory, onCategoryClicked, onLogoClick } = this.props;
 
     return (
-      <div className={styles.wrapper}>
+      <Box className={styles.wrapper}>
         {this.props.children}
         <div className={styles.header}>
           {onLogoClick ? (
@@ -74,15 +75,20 @@ export default class SidebarRevamp extends Component<Props> {
               })
             : null}
         </div>
-        <a
+        <Link
           className={styles.faq}
           href="https://emurgohelpdesk.zendesk.com/hc/en-us/categories/4412619927695-Yoroi"
           target="_blank"
           rel="noreferrer"
+          sx={{
+            color: 'grayscale.50',
+            bgcolor: 'primary.700',
+            '&:hover': { bgcolor: 'primary.800' },
+          }}
         >
           {intl.formatMessage(globalMessages.sidebarFaq)}
-        </a>
-      </div>
+        </Link>
+      </Box>
     );
   }
 }

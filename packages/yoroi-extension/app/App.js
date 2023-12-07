@@ -17,11 +17,10 @@ import MaintenancePage from './containers/MaintenancePage';
 import CrashPage from './containers/CrashPage';
 import { Logger } from './utils/logging';
 import { LayoutProvider } from './styles/context/layout';
-import { ThemeProvider } from '@mui/material/styles';
+import { ColorModeProvider } from './styles/context/mode';
 import { CssBaseline } from '@mui/material';
 import { globalStyles } from './styles/globalStyles';
 import Support from './components/widgets/Support';
-import { trackNavigation } from './api/analytics';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData(locales);
@@ -49,9 +48,6 @@ class App extends Component<Props, State> {
       runInAction(() => {
         this.mergedMessages = _mergedMessages;
       });
-    });
-    this.props.history.listen(({ pathname }) => {
-      trackNavigation(pathname);
     });
   };
 
@@ -96,7 +92,7 @@ class App extends Component<Props, State> {
     return (
       <div style={{ height: '100%' }}>
         <LayoutProvider layout={currentTheme}>
-          <ThemeProvider theme={muiTheme}>
+          <ColorModeProvider currentTheme={currentTheme}>
             <CssBaseline />
             {globalStyles(muiTheme)}
             <ThemeManager cssVariables={themeVars} />
@@ -104,7 +100,7 @@ class App extends Component<Props, State> {
             <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
               {this.getContent()}
             </IntlProvider>
-          </ThemeProvider>
+          </ColorModeProvider>
         </LayoutProvider>
       </div>
     );

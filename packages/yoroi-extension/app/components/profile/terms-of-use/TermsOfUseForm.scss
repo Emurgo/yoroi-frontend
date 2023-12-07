@@ -18,7 +18,7 @@
 
   .centeredBox {
     margin: 0 auto;
-    width: 800px;
+    width: 536px;
   }
 
   .error {
@@ -27,11 +27,44 @@
     margin-bottom: 1rem;
   }
 
-  .checkbox {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-right: 15px;
-    padding-top: 40px;
+  .title {
+    font-family: Rubik;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 26px;
+    letter-spacing: 0px;
+    text-align: center;
   }
+
+  .text {
+    font-family: Rubik;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    letter-spacing: 0px;
+    text-align: center;
+    width: 424px;
+    margin: 40px auto;
+  }
+
+  .agreement {
+    margin: 10px auto;
+    width: max-content;
+  }
+
+  .submit {
+    margin: auto;
+    width: max-content;
+  }
+
+  .tosAgreement>span>span {
+    color: var(--yoroi-palette-primary-200);
+  }
+}
+
+.back {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  cursor: pointer;
 }

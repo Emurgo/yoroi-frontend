@@ -2,8 +2,12 @@
 
 import type { LocatorObject } from '../support/webdriver';
 
-export const seedPhrasePlaceholder = 'Tap each word in the correct order to verify your recovery phrase';
-export const connectHwButton: LocatorObject = { locator: '.WalletAdd_btnConnectHW', method: 'css' };
+export const seedPhrasePlaceholder =
+  'Tap each word in the correct order to verify your recovery phrase';
+export const connectHwButton: LocatorObject = {
+  locator: 'connectHardwareWalletButton',
+  method: 'id',
+};
 export const createWalletButton: LocatorObject = {
   locator: 'createWalletButton',
   method: 'id',
@@ -36,7 +40,7 @@ export const restore24WordWallet: LocatorObject = {
 export const infoDialog: LocatorObject = {
   locator: 'walletRestorationInfoDialog',
   method: 'id',
-}
+};
 export const getCurrencyButton = (currency: string): LocatorObject => {
   return { locator: `.PickCurrencyOptionDialog_${currency}`, method: 'css' };
 };
@@ -83,16 +87,8 @@ export const createPersonalWalletButton: LocatorObject = {
   locator: '.WalletCreateDialog .primary',
   method: 'css',
 };
-export const createWalletPasswordHelperText: LocatorObject = {
-  locator: '//p[starts-with(@id, "walletPassword") and contains(@id, "-helper-text")]',
-  method: 'xpath',
-};
 export const walletRecoveryPhraseMnemonicComponent: LocatorObject = {
   locator: '.WalletRecoveryPhraseMnemonic_component',
-  method: 'css',
-};
-export const createWalletNameError: LocatorObject = {
-  locator: '.walletName .MuiFormHelperText-root',
   method: 'css',
 };
 export const createWalletPasswordError: LocatorObject = {
@@ -120,7 +116,7 @@ export const clearButton: LocatorObject = {
 export const getRecoveryPhraseWord = (indexNumber: number): LocatorObject => {
   return {
     locator: `//div[@class='WalletRecoveryPhraseEntryDialog_words']//button[${indexNumber}]`,
-    method: 'xpath'
+    method: 'xpath',
   };
 };
 

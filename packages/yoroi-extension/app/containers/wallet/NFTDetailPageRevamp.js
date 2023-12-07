@@ -57,17 +57,21 @@ class NFTDetailPageRevamp extends Component<AllProps> {
             }))
             .filter(item => item.info.IsNFT)
             .map(token => {
-              const policyId = token.entry.identifier.split('.')[0];
-              const fullName = getTokenStrictName(token.info);
+              const split = token.entry.identifier.split('.');
+              const policyId = split[0];
+              const assetNameHex = split[1] ?? '';
+              const strictName = getTokenStrictName(token.info);
+              const cip67PRefix = strictName.cip67Tag != null ? `(${strictName.cip67Tag}) ` : '';
+              const fullName = cip67PRefix + (strictName.name ?? '');
               const name = truncateToken(fullName ?? '-');
               return {
                 policyId,
                 name,
                 lastUpdatedAt: token.info.Metadata.lastUpdatedAt,
                 ticker: token.info.Metadata.ticker ?? '-',
-                assetName: token.entry.identifier.split('.')[1] ?? '',
+                assetName: assetNameHex,
                 id: getTokenIdentifierIfExists(token.info) ?? '-',
-                image: getImageFromTokenMetadata(policyId, fullName, token.info.Metadata),
+                image: getImageFromTokenMetadata(policyId, assetNameHex, token.info.Metadata),
                 description: getDescriptionFromTokenMetadata(
                   policyId,
                   fullName,
@@ -84,17 +88,17 @@ class NFTDetailPageRevamp extends Component<AllProps> {
     const nftsCount = nftsList.length;
     const nftInfo = nftsList[currentNftIdx];
 
-    const nextNftId = currentNftIdx === nftsCount - 1 ?
-    nftsList[0]?.id : nftsList[currentNftIdx + 1]?.id
+    const nextNftId =
+      currentNftIdx === nftsCount - 1 ? nftsList[0]?.id : nftsList[currentNftIdx + 1]?.id;
 
-    const prevNftId = currentNftIdx === 0 ?
-    nftsList[nftsCount - 1]?.id : nftsList[currentNftIdx - 1]?.id
+    const prevNftId =
+      currentNftIdx === 0 ? nftsList[nftsCount - 1]?.id : nftsList[currentNftIdx - 1]?.id;
 
     const urlPrams = new URLSearchParams(this.props.location.search);
-    const tab = urlPrams.get('tab')
+    const tab = urlPrams.get('tab');
 
     return (
-      <Box width="100%" height="100%">
+      <Box sx={{ width: '100%', pb: '50vh' }}>
         <NFTDetails
           nftInfo={nftInfo}
           network={network}

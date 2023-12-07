@@ -7,16 +7,8 @@ import { expect } from 'chai';
 import { checkErrorByTranslationId } from './common-steps';
 import {
   clearButton,
-  createPersonalWalletButton,
   createWalletButton,
-  createWalletNameError,
   createWalletPasswordError,
-  createWalletPasswordHelperText,
-  createWalletPasswordInput,
-  createWalletRepeatPasswordInput,
-  getCurrencyButton,
-  getRecoveryPhraseWord,
-  pickUpCurrencyDialog,
   recoveryPhraseButton,
   recoveryPhraseConfirmButton,
   securityWarning,
@@ -24,45 +16,126 @@ import {
   walletRecoveryPhraseMnemonicComponent,
 } from '../pages/newWalletPages';
 import { continueButton } from '../pages/basicSetupPage';
-import { dialogTitle } from '../pages/commonDialogPage';
-import { addAdditionalWalletButton } from '../pages/walletPage';
+import { dialogTitle, infoDialog, infoDialogContinueButton } from '../pages/commonDialogPage';
+import {
+  addWalletDetailsBox,
+  createWalletNameError,
+  createWalletWarning,
+  createWalletPasswordHelperText,
+  enterFullRecoveryPhrase,
+  getFullRecoveryPhrase,
+  getRecoveryPhraseWord,
+  isValidPhraseMessage,
+  nextButton,
+  recoveryPhraseBox,
+  toggleRecoveryPhraseBlurButton,
+  verifyRecoveryPhraseBox,
+  createWalletRepeatPasswordHelperText,
+} from '../pages/createWalletPage';
+import {
+  walletNameInput,
+  walletPasswordInput,
+  repeatPasswordInput,
+  newWalletDialogPlate,
+} from '../pages/walletDetailsPage';
 
 When(/^I click the create button$/, async function () {
   await this.click(createWalletButton);
 });
 
-When(/^I select the currency ([^"]*)$/, async function (currency) {
-  await this.waitForElement(pickUpCurrencyDialog);
-  await this.click(getCurrencyButton(currency));
+When(/^I see Create Wallet warning step and continue$/, async function () {
+  this.webDriverLogger.info(`Step: I see Create Wallet warning step and continue`);
+  await this.waitForElement(createWalletWarning);
+  await this.click(nextButton);
+});
+
+When(/^I see Recovery Phrase step and remember it$/, async function () {
+  this.webDriverLogger.info(`Step: I see Recovery Phrase step and remember it`);
+  // info modal window
+  await this.waitForElement(infoDialog);
+  await this.click(infoDialogContinueButton);
+  // step 2
+  await this.waitForElement(recoveryPhraseBox);
+  // checking for blurring
+  const singleWordLocator = getRecoveryPhraseWord(0);
+  const wordCssValueBlured = await this.getCssValue(singleWordLocator, 'filter');
+  expect(wordCssValueBlured).to.include('blur');
+  await this.click(toggleRecoveryPhraseBlurButton);
+  const wordCssValueUnblured = await this.getCssValue(singleWordLocator, 'filter');
+  expect(wordCssValueUnblured).to.equal('none');
+  // "remembering" the phrase
+  const fullPhrase = await getFullRecoveryPhrase(this);
+  await this.saveToLocalStorage('recoveryPhrase', fullPhrase);
+  // next
+  await this.click(nextButton);
+});
+
+When(/^I repeat the recovery phrase$/, async function () {
+  this.webDriverLogger.info(`Step: I enter the recovery phrase`);
+  // step 3
+  await this.waitForElement(verifyRecoveryPhraseBox);
+  const savedRecoveryPhrase = await this.getFromLocalStorage('recoveryPhrase');
+  // entering the phrase
+  await enterFullRecoveryPhrase(this, savedRecoveryPhrase);
+  // the phrase is verified and correct
+  const isValidMessageHidden =
+    (await this.getCssValue(isValidPhraseMessage, 'visibility')) === 'hidden';
+  expect(isValidMessageHidden).to.be.false;
+  // click next
+  await this.click(nextButton);
+});
+
+When(/^I enter wallet details:$/, async function (table) {
+  this.webDriverLogger.info(`Step: I enter wallet details:`);
+  // step 4
+  await this.waitForElement(addWalletDetailsBox);
+  // info modal window
+  await this.waitForElement(infoDialog);
+  await this.click(infoDialogContinueButton);
+  const fields = table.hashes()[0];
+  // enter wallet name
+  await this.input(walletNameInput, fields.walletName);
+  // enter wallet password
+  await this.input(walletPasswordInput, fields.password);
+  // repeat wallet password
+  await this.input(repeatPasswordInput, fields.repeatedPassword);
+  // check wallet plate is displayed
+  await this.waitForElement(newWalletDialogPlate);
 });
 
 When(/^I enter the created wallet password:$/, async function (table) {
   const fields = table.hashes()[0];
-  await this.input(createWalletPasswordInput, fields.password);
-  await this.input(createWalletRepeatPasswordInput, fields.repeatedPassword);
+  await this.input(walletPasswordInput, fields.password);
+  await this.input(repeatPasswordInput, fields.repeatedPassword);
 });
 
 When(/^I clear the created wallet password ([^"]*)$/, async function (password) {
-  await this.clearInputUpdatingForm(createWalletPasswordInput, password.length);
+  await this.clearInputUpdatingForm(walletPasswordInput, password.length);
 });
 
-When(/^I click the "Create personal wallet" button$/, async function () {
-  await this.click(createPersonalWalletButton);
+When(/^I click the "Create" button$/, async function () {
+  this.webDriverLogger.info(`Step: I click the "Create" button`);
+  await this.click(nextButton, 2);
 });
 
 Then(/^I should see the invalid password error message:$/, async function (data) {
+  this.webDriverLogger.info(`Step: I should see the invalid password error message`);
   const error = data.hashes()[0];
+  await this.waitForElement(createWalletPasswordHelperText);
   await checkErrorByTranslationId(this, createWalletPasswordHelperText, error);
 });
 
-Then(/^I see the submit button is disabled$/, async function () {
-  const dialogElement = await this.driver.findElement(
-    By.xpath('//div[contains(@class, "Dialog")]')
-  );
-  const disabledButton = await dialogElement.findElement(
-    By.xpath('.//button[contains(@class, "primary")]')
-  );
-  const buttonState = await disabledButton.isEnabled();
+Then(/^I should see the invalid repeat password error message:$/, async function (data) {
+  this.webDriverLogger.info(`Step: I should see the invalid repeat password error message`);
+  const error = data.hashes()[0];
+  await this.waitForElement(createWalletRepeatPasswordHelperText);
+  await checkErrorByTranslationId(this, createWalletRepeatPasswordHelperText, error);
+});
+
+Then(/^I see the Create button is disabled$/, async function () {
+  this.webDriverLogger.info(`Step: I see the Create button is disabled`);
+  const createButton = await this.findElement(nextButton);
+  const buttonState = await createButton.isEnabled();
   expect(buttonState).to.be.false;
 });
 
@@ -124,13 +197,11 @@ Then(/^I should stay in the create wallet dialog$/, async function () {
   await this.waitUntilText(dialogTitle, createMessage.toUpperCase(), 2000);
 });
 
-Then(
-  /^I should see "Wallet name requires at least 1 and at most 40 letters." error message:$/,
-  async function (data) {
-    const error = data.hashes()[0];
-    await checkErrorByTranslationId(this, createWalletNameError, error);
-  }
-);
+Then(/^I should see the invalid wallet name error message:$/, async function (data) {
+  const error = data.hashes()[0];
+  await this.waitForElement(createWalletNameError);
+  await checkErrorByTranslationId(this, createWalletNameError, error);
+});
 
 Then(/^I should see "Invalid Password" error message:$/, async function (data) {
   const error = data.hashes()[0];
@@ -140,8 +211,4 @@ Then(/^I should see "Invalid Password" error message:$/, async function (data) {
 Then(/^I see the security warning prior:$/, async function (data) {
   const error = data.hashes()[0];
   await checkErrorByTranslationId(this, securityWarning, error);
-});
-
-Then(/^I click to add an additional wallet$/, async function () {
-  await this.click(addAdditionalWalletButton);
 });

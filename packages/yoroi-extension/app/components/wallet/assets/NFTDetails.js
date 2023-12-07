@@ -2,8 +2,17 @@
 import type { ComponentType, Node } from 'react';
 import { useState } from 'react';
 import { Box, styled } from '@mui/system';
-import { Button, IconButton, Link as LinkMui, Modal, Stack, Tab, Typography } from '@mui/material';
-import { TabContext, TabList, TabPanel } from '@mui/lab';
+import {
+  Link as LinkMui,
+  Typography,
+  Stack,
+  Tab,
+  Modal,
+  Button,
+  IconButton,
+  Grid,
+} from '@mui/material';
+import { TabContext, TabPanel, TabList } from '@mui/lab';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { defineMessages, injectIntl } from 'react-intl';
@@ -20,6 +29,7 @@ import { NftImage } from './NFTsList';
 import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { truncateAddress, truncateAddressShort } from '../../../utils/formatters';
 import { urlResolveIpfs } from '../../../coreUtils';
+import { ampli } from '../../../../ampli/index';
 import { CopyAddress, TruncatedText } from './TruncatedText';
 
 type Props = {|
@@ -88,8 +98,15 @@ const tabs = [
 ];
 
 function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props & Intl): Node {
+  const nftImage = urlResolveIpfs(nftInfo?.image);
   const networkUrl = getNetworkUrl(network);
   const [activeTab, setActiveTab] = useState(tab !== null ? tab : tabs[0].id); // Overview tab
+  const setActiveTabAndTrack = function (tabId: string) {
+    setActiveTab(tabId);
+    ampli.nftGalleryDetailsTab({
+      nft_tab: tabId === 'overview' ? 'Overview' : 'Metadata',
+    });
+  };
   const [open, setOpen] = useState(false);
   const [isCopied, setCopy] = useState(false);
   const below1400 = useMediaQuery('(max-width:1400px)');
@@ -107,6 +124,10 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
     }
   };
   const onClose = () => setOpen(false);
+  const setOpenAndTrack = () => {
+    setOpen(true);
+    ampli.nftGalleryDetailsImageViewed();
+  };
   function displayAddr(addr: string): string {
     if (below1250 === true) {
       return truncateAddressShort(addr);
@@ -122,87 +143,110 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
   if (nftInfo == null) return null;
 
   return (
-    <Box sx={{ overflowX: 'hidden' }}>
-      <Box sx={{ display: 'inline-block' }}>
-        <Typography
-          as={Link}
-          replace
-          to={ROUTES.NFTS.ROOT}
-          variant="h5"
-          sx={{
-            color: 'var(--yoroi-palette-gray-900)',
-            textDecoration: 'none',
-            marginTop: '5px',
-            textTransform: 'capitalize',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-start',
-          }}
-        >
-          <BackArrow />
-          <Box component="span" marginLeft="10px">
-            {intl.formatMessage(messages.back)}
-          </Box>
-        </Typography>
-      </Box>
-      <Stack
-        direction="row"
+    <Box sx={{ p: '24px', width: '100%' }}>
+      <Button
+        LinkComponent={Link}
+        to={ROUTES.NFTS.ROOT}
+        sx={{
+          color: 'grayscale.900',
+          lineHeight: '27.5px',
+        }}
+        startIcon={<BackArrow />}
+      >
+        {intl.formatMessage(messages.back)}
+      </Button>
+      <Grid
+        container
+        columns={10}
         sx={{
           margin: '0 auto',
           minHeight: '520px',
-          marginY: '21px',
-          backgroundColor: 'var(--yoroi-palette-common-white)',
+          mb: '21px',
+          backgroundColor: 'common.white',
           borderRadius: '8px',
-          overflowX: 'auto',
         }}
       >
-        <ImageItem
-          sx={{
-            cursor: nftInfo.image !== null ? 'zoom-in' : 'auto',
-            padding: below1400 ? '10px' : '24px',
-          }}
-          onClick={() => nftInfo.image !== null && setOpen(true)}
-        >
-          <NftImage
-            imageUrl={nftInfo.image}
-            name={nftInfo.name || '-'}
-            width="532px"
-            height="510px"
-          />
-        </ImageItem>
-        <Box flex={1} sx={{ paddingTop: below1400 ? '10px' : '24px', paddingBottom: '22px' }}>
-          <Stack
-            justifyContent="space-between"
-            flexDirection="row"
+        <Grid item xs={4}>
+          <ImageItem
             sx={{
-              paddingBottom: '22px',
-              px: '24px',
+              cursor: nftImage !== null ? 'zoom-in' : 'auto',
+              paddingY: '24px',
+              display: 'block',
+              img: {
+                objectFit: 'unset',
+              },
             }}
+            onClick={() => nftImage !== null && setOpenAndTrack()}
           >
-            <TruncatedText
-              variant="h2"
-              sx={{ width: below1400 ? '200px' : '400px' }}
-              color="var(--yoroi-palette-gray-900)"
-            >
-              {nftInfo.name}
-            </TruncatedText>
+            <NftImage
+              imageUrl={nftImage}
+              name={nftInfo.name || '-'}
+              width="100%"
+              height="auto"
+            />
+          </ImageItem>
+        </Grid>
 
-            <Stack direction="row" spacing={1}>
-              <Link to={ROUTES.NFTS.DETAILS.replace(':nftId', prevNftId) + `?tab=${activeTab}`}>
-                <IconButton
-                  aria-label="Previous"
-                  sx={{ transform: 'rotate(180deg)', width: '32px' }}
+        <Grid
+          item
+          xs={6}
+          sx={{
+            paddingTop: '24px',
+            paddingBottom: '22px',
+          }}
+        >
+          <Box>
+            <Stack
+              justifyContent="space-between"
+              flexDirection="row"
+              sx={{
+                paddingBottom: '22px',
+                px: '24px',
+                height: '100%',
+              }}
+            >
+              <Box>
+                <TruncatedText
+                  variant="h2"
+                  fontWeight={500}
+                  sx={{ width: below1400 ? '200px' : '400px' }}
+                  color="common.black"
                 >
-                  <Chevron />
-                </IconButton>
-              </Link>
-              <Link to={ROUTES.NFTS.DETAILS.replace(':nftId', nextNftId) + `?tab=${activeTab}`}>
-                <IconButton aria-label="Next" sx={{ width: '32px' }}>
-                  <Chevron />
-                </IconButton>
-              </Link>
+                  {nftInfo.name}
+                </TruncatedText>
+              </Box>
+
+              <Stack direction="row" spacing={1}>
+                <Link
+                  to={ROUTES.NFTS.DETAILS.replace(':nftId', prevNftId) + `?tab=${activeTab}`}
+                  onClick={() => {
+                    ampli.nftGalleryDetailsNavigation({
+                      nft_navigation: 'Previous',
+                    });
+                  }}
+                >
+                  <IconButton
+                    aria-label="Previous"
+                    sx={{ transform: 'rotate(180deg)', width: '32px' }}
+                  >
+                    <Chevron />
+                  </IconButton>
+                </Link>
+                <Link
+                  to={ROUTES.NFTS.DETAILS.replace(':nftId', nextNftId) + `?tab=${activeTab}`}
+                  onClick={() => {
+                    ampli.nftGalleryDetailsNavigation({
+                      nft_navigation: 'Next',
+                    });
+                  }}
+                >
+                  <IconButton aria-label="Next" sx={{ width: '32px' }}>
+                    <Chevron />
+                  </IconButton>
+                </Link>
+              </Stack>
             </Stack>
-          </Stack>
+          </Box>
           <TabContext value={activeTab}>
             <Box>
               <TabList
@@ -212,8 +256,12 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                   marginX: '24px',
                   borderBottom: 1,
                   borderColor: 'divider',
+                  '.MuiTab-root': {
+                    paddingX: '0px',
+                    mr: '24px',
+                  },
                 }}
-                onChange={(_, newValue) => setActiveTab(newValue)}
+                onChange={(_, newValue) => setActiveTabAndTrack(newValue)}
                 aria-label="NFTs tabs"
               >
                 {tabs.map(({ label, id }) => (
@@ -221,14 +269,13 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                     key={id}
                     sx={{
                       minWidth: 'unset',
-                      paddingX: '0px',
                       width: 'content',
-                      marginRight: id === tabs[0].id && '24px',
                       textTransform: 'none',
                       fontWeight: 500,
                     }}
                     label={intl.formatMessage(label)}
                     value={id}
+                    disableRipple
                   />
                 ))}
               </TabList>
@@ -297,23 +344,23 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                 boxShadow: 'none',
                 bgcolor: 'transparent',
                 height: '100%',
-                maxHeight: '400px',
                 overflow: 'auto',
-                width: '600px',
               }}
               value={tabs[1].id}
             >
               {nftInfo.metadata && (
                 <Button
                   onClick={onCopyMetadata}
-                  variant="text"
                   color="inherit"
-                  sx={{ ml: '-8px', mb: '24px' }}
-                  startIcon={isCopied ? <IconCopied /> : <IconCopy />}
+                  sx={{
+                    ml: '-8px',
+                    mb: '24px',
+                    fontSize: '14px',
+                    color: 'grayscale.900',
+                  }}
+                  endIcon={isCopied ? <IconCopied /> : <IconCopy />}
                 >
-                  <Typography variant="button2" fontWeight="500">
-                    {intl.formatMessage(messages.copyMetadata)}
-                  </Typography>
+                  {intl.formatMessage(messages.copyMetadata)}
                 </Button>
               )}
               <Typography component="pre" variant="body3" lineHeight="22px" fontFamily="monospace">
@@ -323,8 +370,8 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
               </Typography>
             </TabPanel>
           </TabContext>
-        </Box>
-      </Stack>
+        </Grid>
+      </Grid>
       <Modal
         onClose={onClose}
         open={open}
@@ -345,7 +392,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
         >
           <img
             style={{ objectFit: 'cover', maxWidth: '100%', maxHeight: '100%' }}
-            src={urlResolveIpfs(nftInfo.image)}
+            src={nftImage}
             alt={nftInfo.name}
             title={nftInfo.name}
             loading="lazy"
@@ -374,6 +421,43 @@ const ImageItem = styled(Box)({
     borderRadius: '8px',
   },
 });
+
+// Requrie predefined with
+// jone -> jo..
+const TruncatedText = styled(Typography)({
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+});
+
+export function CopyAddress({ text, children }: {| text: string, children: Node |}): Node {
+  const [isCopied, setCopy] = useState(false);
+
+  const onCopy = async () => {
+    setCopy(false);
+
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopy(true);
+    } catch (error) {
+      setCopy(false);
+    }
+
+    setTimeout(() => {
+      setCopy(false);
+    }, 2500); // 2.5 sec
+  };
+
+  return (
+    <Stack direction="row" alignItems="center">
+      <TruncatedText>{children}</TruncatedText>
+
+      <IconButton sx={{ ml: '4px' }} onClick={onCopy}>
+        {isCopied ? <IconCopied /> : <IconCopy />}
+      </IconButton>
+    </Stack>
+  );
+}
 
 function LabelWithValue({ label, value }: {| label: string | Node, value: string | Node |}): Node {
   return (

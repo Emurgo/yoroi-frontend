@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import ConnectPage from '../components/connect/ConnectPage';
 import { observer } from 'mobx-react';
-import { computed } from 'mobx';
+import { computed, autorun } from 'mobx';
 import type { InjectedOrGeneratedConnector } from '../../types/injectedPropsType';
 import type {
   PublicDeriverCache,
@@ -19,6 +19,7 @@ import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import { createAuthEntry } from '../api';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import { ampli } from '../../../ampli/index';
 
 type GeneratedData = typeof ConnectContainer.prototype.generated;
 declare var chrome;
@@ -53,6 +54,18 @@ export default class ConnectContainer extends Component<
       tabId: chromeMessage?.tabId,
     });
   };
+
+  componentDidMount() {
+    autorun(() => {
+      if (
+        this.generated.stores.connector.loadingWallets === LoadingWalletStates.SUCCESS
+      ) {
+        ampli.dappPopupConnectWalletPageViewed({
+          wallet_count: this.generated.stores.connector.filteredWallets.length,
+        });
+      }
+    });
+  }
 
   // eslint-disable-next-line camelcase
   UNSAFE_componentWillMount() {
@@ -102,6 +115,8 @@ export default class ConnectContainer extends Component<
       image: chromeMessage.imgBase64Url,
     });
     await connector.updateConnectorWhitelist.trigger({ whitelist });
+
+    await ampli.dappPopupConnectWalletPasswordPageViewed();
 
     chrome.runtime.sendMessage(
       ({

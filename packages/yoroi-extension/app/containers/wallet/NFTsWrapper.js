@@ -32,7 +32,7 @@ const messages = defineMessages({
     id: 'wallet.nftGallary.title',
     defaultMessage: '!!!NFT Gallery',
   },
-})
+});
 @observer
 export default class NFTsWrapper extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
@@ -68,6 +68,7 @@ export default class NFTsWrapper extends Component<Props> {
             title={<NavBarTitle title={intl.formatMessage(messages.NFTGallery)} />}
           />
         }
+        withPadding={false}
       >
         {this.props.children}
       </TopBarLayout>

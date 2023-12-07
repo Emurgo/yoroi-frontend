@@ -29,8 +29,7 @@ function StepController(props: Props): Node {
         return (
           <Button
             key={idx}
-            variant={isPrimary ? 'contained' : 'outlined'}
-            color="primary"
+            variant={isPrimary ? 'primary' : 'secondary'}
             disableRipple={false}
             onClick={onClick}
             disabled={disabled}

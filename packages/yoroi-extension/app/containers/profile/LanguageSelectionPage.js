@@ -55,6 +55,8 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
   };
 
   onSubmit: {| locale: string |} => Promise<void> = async (_values) => {
+    // Important! The order of triggering these two events must not be exchanged!
+    await this.generated.actions.profile.acceptTermsOfUse.trigger();
     await this.generated.actions.profile.commitLocaleToStorage.trigger();
   };
 
@@ -93,6 +95,8 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
           currentLocale={generated.stores.profile.currentLocale}
           languages={generated.stores.profile.LANGUAGE_OPTIONS}
           error={generated.stores.profile.setProfileLocaleRequest.error}
+          localizedTermsOfUse={this.generated.stores.profile.termsOfUse}
+          localizedPrivacyNotice={this.generated.stores.profile.privacyNotice}
         />
       </TopBarLayout>
     );
@@ -113,7 +117,10 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
         |},
         updateTentativeLocale: {|
           trigger: (params: {| locale: string |}) => void
-        |}
+        |},
+        acceptTermsOfUse: {|
+          trigger: (params: void) => Promise<void>
+        |},
       |}
     |},
     stores: {|
@@ -126,7 +133,9 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
         setProfileLocaleRequest: {|
           error: ?LocalizableError,
           isExecuting: boolean
-        |}
+        |},
+        termsOfUse: string,
+        privacyNotice: string,
       |},
       serverConnectionStore: {|
         checkAdaServerStatus: ServerStatusErrorType
@@ -155,6 +164,8 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
             error: profileStore.setProfileLocaleRequest.error,
             isExecuting: profileStore.setProfileLocaleRequest.isExecuting,
           },
+          termsOfUse: profileStore.termsOfUse,
+          privacyNotice: profileStore.privacyNotice,
         },
         serverConnectionStore: {
           checkAdaServerStatus: stores.serverConnectionStore.checkAdaServerStatus,
@@ -165,6 +176,7 @@ export default class LanguageSelectionPage extends Component<InjectedOrGenerated
           resetLocale: { trigger: actions.profile.resetLocale.trigger },
           updateTentativeLocale: { trigger: actions.profile.updateTentativeLocale.trigger },
           commitLocaleToStorage: { trigger: actions.profile.commitLocaleToStorage.trigger },
+          acceptTermsOfUse: { trigger: actions.profile.acceptTermsOfUse.trigger },
         },
       },
     });
