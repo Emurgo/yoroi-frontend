@@ -14,6 +14,7 @@ export const WalletTypePurpose = Object.freeze({
 export type WalletTypePurposeT = $Values<typeof WalletTypePurpose>;
 export const CoinTypes = Object.freeze({
   CARDANO: 2147485463, // HARD_DERIVATION_START + 1815;
+  // <TODO:PENDING_REMOVAL> Ergo
   ERGO: 2147484077, // HARD_DERIVATION_START + 429;
 });
 export type CoinTypesT = $Values<typeof CoinTypes>;

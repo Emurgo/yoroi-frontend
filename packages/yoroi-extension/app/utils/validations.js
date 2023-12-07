@@ -5,7 +5,7 @@ import { MAX_MEMO_SIZE } from '../config/externalStorageConfig';
 import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
 import { defineMessages, } from 'react-intl';
 import type { NetworkRow, TokenRow } from '../api/ada/lib/storage/database/primitives/tables';
-import { isCardanoHaskell, isErgo, getCardanoHaskellBaseConfig, getErgoBaseConfig } from '../api/ada/lib/storage/database/prepackaged/networks';
+import { isCardanoHaskell, getCardanoHaskellBaseConfig } from '../api/ada/lib/storage/database/prepackaged/networks';
 import { getTokenName } from '../stores/stateless/tokenHelpers';
 import { truncateToken } from './formatters';
 
@@ -133,14 +133,7 @@ export function getMinimumValue(
   if (isCardanoHaskell(network)) {
     const config = getCardanoHaskellBaseConfig(network)
       .reduce((acc, next) => Object.assign(acc, next), {});
-
     return new BigNumber(config.MinimumUtxoVal);
-  }
-  if (isErgo(network)) {
-    const config = getErgoBaseConfig(network)
-      .reduce((acc, next) => Object.assign(acc, next), {});
-
-    return new BigNumber(config.MinimumBoxValue);
   }
   return new BigNumber(0);
 }

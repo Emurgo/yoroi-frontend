@@ -55,21 +55,10 @@ export type CardanoHaskellBaseConfig = [
   $ReadOnly<CardanoHaskellShelleyBaseConfig>
 ];
 
-export type ErgoGenesisBaseConfig = {|
-  ...CommonBaseConfig,
-  MinimumBoxValue: string,
-  FeeAddress: string,
-|};
-export type ErgoBaseConfig = [$ReadOnly<ErgoGenesisBaseConfig>];
-
 // unfortunate hack to get around the fact tuple spreading is broken in Flow
 export type CardanoHaskellConfig = $ReadOnly<InexactSubset<{|
   ...$ElementType<CardanoHaskellBaseConfig, 0>,
   ...$ElementType<CardanoHaskellBaseConfig, 1>,
-|}>>;
-
-export type ErgoConfig = $ReadOnly<InexactSubset<{|
-  ...$ElementType<ErgoBaseConfig, 0>,
 |}>>;
 
 export type NetworkInsert = {|
@@ -91,7 +80,7 @@ export type NetworkInsert = {|
    * Only updates to fields specified here.
    * For these updates, you need to query a full node for current parameters
    */
-  BaseConfig: CardanoHaskellBaseConfig | ErgoBaseConfig,
+  BaseConfig: CardanoHaskellBaseConfig,
   /**
    * Some currencies have totally different implementations that use the same coin type
    * To differentiate these, we need some identifier of the fork
@@ -260,6 +249,7 @@ export type DbBlock = {|
 export const TransactionType = Object.freeze({
   CardanoByron: 0,
   CardanoShelley: 1,
+  // <TODO:PENDING_REMOVAL> Ergo
   Ergo: 2_00,
 });
 
@@ -295,6 +285,7 @@ export type CardanoShelleyTransactionInsert = {|
   ...TransactionInsertBase,
 |};
 
+// <TODO:PENDING_REMOVAL> Ergo
 export type ErgoTransactionInsert = {|
   Type: $PropertyType<typeof TransactionType, 'Ergo'>,
   Extra: null,

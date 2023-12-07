@@ -11,8 +11,6 @@ import { assetsMessage } from './AssetsList';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../routes-config';
 import {
-  isCardanoHaskell,
-  isErgo,
   isTestnet,
 } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
@@ -72,13 +70,9 @@ export const tokenMessages: Object = defineMessages({
 });
 
 export const getNetworkUrl: ($ReadOnly<NetworkRow>) => string | void = network => {
-  if (isErgo(network)) {
-    return;
-  }
-  if (isCardanoHaskell(network) && !isTestnet(network)) {
-    return 'https://cardanoscan.io/token';
-  }
-  return 'https://testnet.cardanoscan.io/token';
+  return isTestnet(network)
+    ? 'https://testnet.cardanoscan.io/token'
+    : 'https://cardanoscan.io/token';
 };
 
 function TokenDetails({ tokenInfo, network, intl }: Props & Intl): Node {
