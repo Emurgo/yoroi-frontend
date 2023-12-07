@@ -52,7 +52,6 @@ import {
   loadSubmittedTransactions,
   persistSubmittedTransactions,
 } from '../../api/localStorage';
-import LegacyTransactionsStore from './LegacyTransactionsStore';
 import type { Api } from '../../api/index';
 import { getAllAddressesForWallet } from '../../api/ada/lib/storage/bridge/traitUtils';
 import { toRequestAddresses } from '../../api/ada/lib/storage/bridge/updateTransactions'
@@ -127,10 +126,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   @observable shouldIncludeTxIds: boolean = false;
 
   ongoingRefreshing: Map<number, Promise<void>> = observable.map({});
-
-  constructor(stores: StoresMap, api: Api, actions: ActionsMap) {
-    super(stores, api, actions);
-  }
 
   setup(): void {
     super.setup();

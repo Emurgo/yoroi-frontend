@@ -249,8 +249,6 @@ export type DbBlock = {|
 export const TransactionType = Object.freeze({
   CardanoByron: 0,
   CardanoShelley: 1,
-  // <TODO:PENDING_REMOVAL> Ergo
-  Ergo: 2_00,
 });
 
 export type TransactionInsertBase = {|
@@ -285,17 +283,9 @@ export type CardanoShelleyTransactionInsert = {|
   ...TransactionInsertBase,
 |};
 
-// <TODO:PENDING_REMOVAL> Ergo
-export type ErgoTransactionInsert = {|
-  Type: $PropertyType<typeof TransactionType, 'Ergo'>,
-  Extra: null,
-  ...TransactionInsertBase
-|};
-
 export type TransactionInsert =
   CardanoByronTransactionInsert |
-  CardanoShelleyTransactionInsert |
-  ErgoTransactionInsert;
+  CardanoShelleyTransactionInsert;
 
 export type TransactionRow = {|
   TransactionId: number,
@@ -461,22 +451,8 @@ export type CommonMetadata = {|
   // Otherwise it is null or not present.
   lastUpdatedAt?: ?string,
 |};
+
 export type TokenMetadata = {|
-  +type: 'Ergo',
-  /**
-    * This field is just an optimization for rollbacks
-    * With this, we just need to check if the most recent metadata exists
-    * and if we need to rollback, rollback in descending order
-    * note: null -> not in the chain (possible rolled back)
-    * note: 0 for ERG
-  */
-  +height: number | null,
-  // empty string for ERG
-  +boxId: string,
-  // based on https://github.com/ergoplatform/eips/blob/master/eip-0004.md
-  ...CommonMetadata,
-  +description: null | string,
-|} | {|
   +type: 'Cardano',
   // empty string for ADA
   +policyId: string,
@@ -492,7 +468,6 @@ export type TokenInsert = {|
   IsDefault: boolean,
   Digest: number,
   /**
-   * For Ergo, this is the tokenId (box id of first input in tx)
    * for Cardano, this is policyId || assetName
    * Note: we don't use null for the primary token of the chain
    * As some blockchains have multiple primary tokens

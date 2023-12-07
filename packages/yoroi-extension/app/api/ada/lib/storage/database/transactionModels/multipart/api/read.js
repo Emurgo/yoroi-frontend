@@ -9,7 +9,7 @@ import type {
 } from '../../../primitives/tables';
 import { TransactionType } from '../../../primitives/tables';
 import { GetCertificates, AssociateToken } from '../../../primitives/api/read';
-import type { CardanoByronTxIO, CardanoShelleyTxIO, ErgoTxIO } from '../tables';
+import type { CardanoByronTxIO, CardanoShelleyTxIO } from '../tables';
 
 import {
   AssociateTxWithAccountingIOs,

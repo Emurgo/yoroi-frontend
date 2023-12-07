@@ -15,11 +15,6 @@ export const CardanoForks = Object.freeze({
   Haskell: 0,
 });
 
-// <TODO:PENDING_REMOVAL> Ergo
-export const ErgoForks = Object.freeze({
-  Primary: 0,
-});
-
 export const networks = Object.freeze({
   CardanoMainnet: ({
     NetworkId: 0,

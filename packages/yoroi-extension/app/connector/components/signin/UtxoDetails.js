@@ -1,27 +1,25 @@
 /* eslint-disable no-nested-ternary */
 // @flow
 import type { Node } from 'react';
+import React, { Component } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { intlShape } from 'react-intl';
 import type { Notification } from '../../../types/notificationType';
-import type { TokenLookupKey, TokenEntry } from '../../../api/common/lib/MultiToken';
+import type { TokenEntry, TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import type { Tx } from '../../../../chrome/extension/connector/types';
 import type { TxDataInput, TxDataOutput } from '../../types';
-import React, { Component } from 'react';
-import { intlShape } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import CopyableAddress from '../../../components/widgets/CopyableAddress';
 import { splitAmount, truncateAddressShort, truncateToken } from '../../../utils/formatters';
-import { getTokenName, getTokenIdentifierIfExists } from '../../../stores/stateless/tokenHelpers';
+import { getTokenIdentifierIfExists, getTokenName } from '../../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
-import { mintedTokenInfo } from '../../../../chrome/extension/connector/utils';
-import { Logger } from '../../../utils/logging';
 import { Box } from '@mui/system';
 import { Typography } from '@mui/material';
 
@@ -68,13 +66,6 @@ class UtxoDetails extends Component<Props> {
 
   // Tokens can be minted inside the transaction so we have to look it up there first
   _resolveTokenInfo: TokenEntry => $ReadOnly<TokenRow> | null = tokenEntry => {
-    const { tx } = this.props;
-    const mintedTokens = mintedTokenInfo(tx, Logger.info);
-    const mintedToken = mintedTokens.find(t => tokenEntry.identifier === t.Identifier);
-    if (mintedToken != null) {
-      return mintedToken;
-    }
-
     return this.props.getTokenInfo(tokenEntry);
   };
 

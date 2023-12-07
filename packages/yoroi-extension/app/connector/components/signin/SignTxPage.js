@@ -2,19 +2,15 @@
 // @flow
 // eslint-disable-next-line no-unused-vars
 import type { Node } from 'react';
+import { Component } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { defineMessages, intlShape } from 'react-intl';
 import type { Notification } from '../../../types/notificationType';
-import type {
-  DefaultTokenEntry,
-  TokenLookupKey,
-  TokenEntry,
-} from '../../../api/common/lib/MultiToken';
+import type { DefaultTokenEntry, TokenEntry, TokenLookupKey, } from '../../../api/common/lib/MultiToken';
 import type { NetworkRow, TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import type { PublicDeriverCache, Tx } from '../../../../chrome/extension/connector/types';
-import { Component } from 'react';
-import { intlShape, defineMessages } from 'react-intl';
 import { Button, Typography } from '@mui/material';
 import TextField from '../../../components/common/TextField';
 import globalMessages from '../../../i18n/global-messages';
@@ -23,12 +19,10 @@ import config from '../../../config';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import { splitAmount, truncateAddressShort, truncateToken } from '../../../utils/formatters';
-import { getTokenName, getTokenIdentifierIfExists } from '../../../stores/stateless/tokenHelpers';
+import { getTokenIdentifierIfExists, getTokenName } from '../../../stores/stateless/tokenHelpers';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
-import { mintedTokenInfo } from '../../../../chrome/extension/connector/utils';
-import { Logger } from '../../../utils/logging';
 import UtxoDetails from './UtxoDetails';
 import SignTxTabs from './SignTxTabs';
 import { Box } from '@mui/system';
@@ -194,13 +188,6 @@ class SignTxPage extends Component<Props, State> {
 
   // Tokens can be minted inside the transaction so we have to look it up there first
   _resolveTokenInfo: TokenEntry => $ReadOnly<TokenRow> | null = tokenEntry => {
-    const { tx } = this.props;
-    const mintedTokens = mintedTokenInfo(tx, Logger.info);
-    const mintedToken = mintedTokens.find(t => tokenEntry.identifier === t.Identifier);
-    if (mintedToken != null) {
-      return mintedToken;
-    }
-
     return this.props.getTokenInfo(tokenEntry);
   };
 

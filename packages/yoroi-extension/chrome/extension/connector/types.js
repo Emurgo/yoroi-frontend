@@ -256,6 +256,7 @@ export function asTokenId(input: any): TokenId {
   throw ConnectorError.invalidRequest(`invalid TokenId: ${JSON.stringify(input)}`);
 }
 
+// <TODO:PENDING_REMOVAL> Ergo
 export type Tx = {|
   inputs: UnsignedInput[],
   dataInputs: DataInput[],
