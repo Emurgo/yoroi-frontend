@@ -21,7 +21,13 @@ import {
   getNotificationMessage,
   walletSummaryComponent,
 } from '../pages/walletTransactionsHistoryPage';
-import { maintenanceBody, serverErrorBanner } from '../pages/mainWindowPage';
+import {
+  addWalletButton,
+  applySelectedWalletButton,
+  maintenanceBody,
+  selectWalletButton,
+  serverErrorBanner,
+} from '../pages/mainWindowPage';
 import { getRewardValue, getTotalAdaValue } from '../pages/dashboardPage';
 
 Then(/^I should see the balance number "([^"]*)"$/, async function (number) {
@@ -30,13 +36,18 @@ Then(/^I should see the balance number "([^"]*)"$/, async function (number) {
 
 Then(/^I should see the Total ADA is equal to "([^"]*)"$/, async function (expectedTotalAda) {
   const realTotalAda = await getTotalAdaValue(this);
-  expect(parseFloat(expectedTotalAda), `The Total ADA is different from the expected`).to.be.equal(realTotalAda);
-})
+  expect(parseFloat(expectedTotalAda), `The Total ADA is different from the expected`).to.be.equal(
+    realTotalAda
+  );
+});
 
 Then(/^I should see the Reward is equal to "([^"]*)"$/, async function (expectedRewardAmount) {
   const realRewardAmount = await getRewardValue(this);
-  expect(parseFloat(expectedRewardAmount), `The Total ADA is different from the expected`).to.be.equal(realRewardAmount);
-})
+  expect(
+    parseFloat(expectedRewardAmount),
+    `The Total ADA is different from the expected`
+  ).to.be.equal(realRewardAmount);
+});
 
 Then(/^I should see send transaction screen$/, async function () {
   await this.waitForElement(receiverInput);
@@ -98,6 +109,8 @@ Then(/^I should see my balance hidden$/, async function () {
 
 Then(/^I switch to "([^"]*)" from the dropdown$/, async function (walletName) {
   await switchToWallet(this, walletName);
+  await this.waitEnable(applySelectedWalletButton);
+  await this.click(applySelectedWalletButton);
 });
 
 Then(/^I select buy-sell from the dropdown$/, async function () {
@@ -107,4 +120,11 @@ Then(/^I select buy-sell from the dropdown$/, async function () {
 
 Then(/^I should see the pre-filled address "([^"]*)"$/, async function (address) {
   await this.waitUntilContainsText(buyDialogAddress, truncateAddress(address));
+});
+
+Then(/^I click to add an additional wallet$/, async function () {
+  await this.waitForElement(selectWalletButton);
+  await this.click(selectWalletButton);
+  await this.waitForElement(addWalletButton);
+  await this.click(addWalletButton);
 });

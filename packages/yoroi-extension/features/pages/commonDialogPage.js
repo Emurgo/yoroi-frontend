@@ -15,6 +15,10 @@ export const warningCheckboxElement: LocatorObject = {
   method: 'css',
 };
 
+export const infoDialog: LocatorObject = {
+  locator: 'infoDialog',
+  method: 'id',
+};
 export const infoDialogContinueButton: LocatorObject = {
   locator: 'infoDialogContinueButton',
   method: 'id',

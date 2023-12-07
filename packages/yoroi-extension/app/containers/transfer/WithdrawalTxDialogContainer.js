@@ -17,7 +17,6 @@ import {
 } from '../../api/common/lib/MultiToken';
 import type { NetworkRow, TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { getDefaultEntryToken } from '../../stores/toplevel/TokenInfoStore';
-import { trackWithdrawal } from '../../api/analytics';
 
 export type GeneratedData = typeof WithdrawalTxDialogContainer.prototype.generated;
 
@@ -35,10 +34,7 @@ export default class WithdrawalTxDialogContainer extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const {
-      createWithdrawalTx,
-      shouldDeregister,
-    } = this.generated.stores.substores.ada.delegationTransaction;
+    const { createWithdrawalTx } = this.generated.stores.substores.ada.delegationTransaction;
 
     if (this.generated.stores.profile.selectedNetwork == null) {
       throw new Error(`${nameof(WithdrawalTxDialogContainer)} no selected network`);
@@ -55,9 +51,7 @@ export default class WithdrawalTxDialogContainer extends Component<Props> {
           label: intl.formatMessage(globalMessages.cancel),
         }}
         onSubmit={{
-          trigger: () => {
-            trackWithdrawal(shouldDeregister);
-          },
+          trigger: () => {}, // nothing extra to do
           label: intl.formatMessage(globalMessages.confirm),
         }}
         transactionRequest={createWithdrawalTx}
@@ -103,7 +97,6 @@ export default class WithdrawalTxDialogContainer extends Component<Props> {
               error: ?LocalizableError,
               result: ?ISignRequest<any>
             |},
-            shouldDeregister: boolean,
           |},
         |},
       |},
@@ -135,7 +128,6 @@ export default class WithdrawalTxDialogContainer extends Component<Props> {
                 result: stores.substores.ada.delegationTransaction.createWithdrawalTx.result,
                 reset: stores.substores.ada.delegationTransaction.createWithdrawalTx.reset,
               },
-              shouldDeregister: stores.substores.ada.delegationTransaction.shouldDeregister,
             },
           },
         },

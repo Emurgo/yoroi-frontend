@@ -12,6 +12,10 @@ import { Action } from '../../../app/actions/lib/Action';
 import App from '../../../app/connector/App';
 import BigNumber from 'bignumber.js';
 import { addCloseListener, TabIdKeys } from '../../../app/utils/tabManager';
+import environment from '../../../app/environment';
+import { ampli } from '../../../ampli/index';
+import type { LoadOptionsWithEnvironment } from '../../../ampli/index';
+import LocalStorageApi from '../../../app/api/localStorage';
 
 // run MobX in strict mode
 configure({ enforceActions: 'always' });
@@ -41,6 +45,21 @@ const initializeErgoConnector: void => Promise<void> = async () => {
   if (root == null) {
     throw new Error('Root element not found.');
   }
+  const AMPLI_FLUSH_INTERVAL_MS = 5000;
+  const isAnalyticsAllowd = (new LocalStorageApi()).loadIsAnalyticsAllowed();
+  await ampli.load(({
+    environment: environment.isProduction() ? 'production' : 'development',
+    client: {
+      configuration: {
+        optOut: !isAnalyticsAllowd,
+        flushIntervalMillis: AMPLI_FLUSH_INTERVAL_MS,
+        trackingOptions: {
+          ipAddress: false,
+        },
+        defaultTracking: false,
+      },
+    },
+  }: LoadOptionsWithEnvironment)).promise;
 
   render(<App stores={stores} actions={actions} history={history} />, root);
 };

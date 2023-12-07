@@ -5,16 +5,17 @@ import { Box } from '@mui/system';
 
 type Props = {|
   +children: Node,
+  +isRevamp?: boolean,
 |};
 
-function BackgroundColoredLayout({ children }: Props): Node {
+function BackgroundColoredLayout({ children, isRevamp = false }: Props): Node {
   return (
     <Box
       sx={{
         overflow: 'auto',
         height: '100%',
-        padding: '30px',
-        background: 'var(--yoroi-palette-gray-50)',
+        padding: isRevamp ? 0 : '30px',
+        backgroundColor: isRevamp ? 'common.white' : 'var(--yoroi-palette-gray-50)',
       }}
     >
       {children}

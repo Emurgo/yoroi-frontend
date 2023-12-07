@@ -1,20 +1,17 @@
 // @flow
 
 import type { Node } from 'react';
-import { select, boolean, } from '@storybook/addon-knobs';
+import { select, boolean } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import WalletSettingsPage from './WalletSettingsPage';
 import { withScreenshot } from 'storycap';
 import { THEMES } from '../../../styles/utils';
+import { globalKnobs } from '../../../../stories/helpers/StoryWrapper';
 import {
-  globalKnobs,
-} from '../../../../stories/helpers/StoryWrapper';
-import {
-  genShelleyCip1852DummyWithCache, genShelleyCIP1852SigningWalletWithCache,
+  genShelleyCip1852DummyWithCache,
+  genShelleyCIP1852SigningWalletWithCache,
 } from '../../../../stories/helpers/cardano/ShelleyCip1852Mocks';
-import {
-  walletLookup,
-} from '../../../../stories/helpers/WalletCache';
+import { walletLookup } from '../../../../stories/helpers/WalletCache';
 import { IncorrectWalletPasswordError } from '../../../api/common/errors';
 import ChangeWalletPasswordDialogContainer from '../../wallet/dialogs/ChangeWalletPasswordDialogContainer';
 import RemoveWalletDialogContainer from './RemoveWalletDialogContainer';
@@ -35,16 +32,15 @@ export default {
 
 /* ===== Notable variations ===== */
 
-const defaultSettingsPageProps: {|
+const defaultSettingsPageProps: ({|
   selected: null | PublicDeriver<>,
-  getConceptualWalletSettingsCache:
-    typeof WalletSettingsStore.prototype.getConceptualWalletSettingsCache,
-  getSigningKeyCache:
-    typeof WalletStore.prototype.getSigningKeyCache,
-|} => * = (request) => ({
+  getConceptualWalletSettingsCache: typeof WalletSettingsStore.prototype.getConceptualWalletSettingsCache,
+  getSigningKeyCache: typeof WalletStore.prototype.getSigningKeyCache,
+|}) => * = request => ({
   stores: {
     profile: {
       isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+      isRevampTheme: false,
     },
     walletSettings: {
       getConceptualWalletSettingsCache: request.getConceptualWalletSettingsCache,
@@ -70,7 +66,7 @@ const defaultSettingsPageProps: {|
       startEditingWalletField: { trigger: action('startEditingWalletField') },
       stopEditingWalletField: { trigger: action('stopEditingWalletField') },
       cancelEditingWalletField: { trigger: action('cancelEditingWalletField') },
-      renameConceptualWallet: { trigger: async (req) => action('renameConceptualWallet')(req) },
+      renameConceptualWallet: { trigger: async req => action('renameConceptualWallet')(req) },
     },
     dialogs: {
       open: { trigger: action('open') },
@@ -129,11 +125,7 @@ export const EditName = (): Node => {
         Editing: 1,
         Done: 2,
       };
-      const nameValue = () => select(
-        'nameCases',
-        nameCases,
-        nameCases.Untouched,
-      );
+      const nameValue = () => select('nameCases', nameCases, nameCases.Untouched);
       return (
         <WalletSettingsPage
           generated={{
@@ -164,17 +156,11 @@ export const PasswordUpdateTime = (): Node => {
       Never: 0,
       Previously: 1,
     };
-    const lastUpdateValue = () => select(
-      'lastUpdateCases',
-      lastUpdateCases,
-      lastUpdateCases.Never,
-    );
+    const lastUpdateValue = () => select('lastUpdateCases', lastUpdateCases, lastUpdateCases.Never);
     const wallet = genShelleyCIP1852SigningWalletWithCache();
-    wallet.getSigningKeyCache = (publicDeriver) => ({
+    wallet.getSigningKeyCache = publicDeriver => ({
       publicDeriver,
-      signingKeyUpdateDate: lastUpdateValue() === lastUpdateCases.Never
-        ? null
-        : new Date(0),
+      signingKeyUpdateDate: lastUpdateValue() === lastUpdateCases.Never ? null : new Date(0),
     });
     const lookup = walletLookup([wallet]);
     return wrapSettings(
@@ -236,7 +222,7 @@ export const ResyncWallet = (): Node => {
               ...settingPageProps.stores,
               uiDialogs: {
                 ...settingPageProps.stores.uiDialogs,
-                isOpen: (clazz) => clazz === ResyncWalletDialogContainer,
+                isOpen: clazz => clazz === ResyncWalletDialogContainer,
               },
             },
             // dialog is close so no need to give props
@@ -252,11 +238,11 @@ export const ResyncWallet = (): Node => {
                       isExecuting: boolean('isExecuting', false),
                       error: undefined,
                     },
-                  }
+                  },
                 },
                 actions: {
                   walletSettings: {
-                    resyncHistory: { trigger: async (req) => action('resyncHistory')(req) },
+                    resyncHistory: { trigger: async req => action('resyncHistory')(req) },
                   },
                   dialogs: {
                     closeActiveDialog: { trigger: action('closeActiveDialog') },
@@ -271,7 +257,7 @@ export const ResyncWallet = (): Node => {
   );
 };
 
-const defaultChangeWalletPasswordDialogContainerProps: void => * = (_request) => ({
+const defaultChangeWalletPasswordDialogContainerProps: void => * = _request => ({
   stores: {
     walletSettings: {
       changeSigningKeyRequest: {
@@ -282,18 +268,20 @@ const defaultChangeWalletPasswordDialogContainerProps: void => * = (_request) =>
     },
     profile: {
       isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+      isRevampTheme: globalKnobs.currentTheme() === THEMES.YOROI_REVAMP,
     },
     uiDialogs: {
-      getActiveData: (key) => ({
-        currentPasswordValue: '',
-        newPasswordValue: '',
-        repeatedPasswordValue: '',
-      }[key]),
+      getActiveData: key =>
+        ({
+          currentPasswordValue: '',
+          newPasswordValue: '',
+          repeatedPasswordValue: '',
+        }[key]),
     },
   },
   actions: {
     walletSettings: {
-      updateSigningPassword: { trigger: async (req) => action('updateSigningPassword')(req) },
+      updateSigningPassword: { trigger: async req => action('updateSigningPassword')(req) },
     },
     dialogs: {
       updateDataForActiveDialog: { trigger: action('updateDataForActiveDialog') },
@@ -322,11 +310,7 @@ export const EditPassword = (): Node => {
         None: undefined,
         WrongPassword: new IncorrectWalletPasswordError(),
       };
-      const errorValue = () => select(
-        'errorCases',
-        errorCases,
-        errorCases.None,
-      );
+      const errorValue = () => select('errorCases', errorCases, errorCases.None);
       const passwordCases = {
         Untouched: 0,
         TooShort: 1,
@@ -334,11 +318,7 @@ export const EditPassword = (): Node => {
         Correct: 3,
         All: 4,
       };
-      const passwordValue = () => select(
-        'passwordCases',
-        passwordCases,
-        passwordCases.Untouched,
-      );
+      const passwordValue = () => select('passwordCases', passwordCases, passwordCases.Untouched);
       const getCurrentPassword = () => {
         const val = passwordValue();
         return val === passwordCases.All ? 'asdfasdfasdf' : '';
@@ -368,7 +348,7 @@ export const EditPassword = (): Node => {
               ...settingPageProps.stores,
               uiDialogs: {
                 ...settingPageProps.stores.uiDialogs,
-                isOpen: (clazz) => clazz === ChangeWalletPasswordDialogContainer,
+                isOpen: clazz => clazz === ChangeWalletPasswordDialogContainer,
               },
               wallets: {
                 ...settingPageProps.stores.wallets,
@@ -390,12 +370,13 @@ export const EditPassword = (): Node => {
                   },
                   uiDialogs: {
                     ...defaultProps.stores.uiDialogs,
-                    getActiveData: (key) => ({
-                      ...defaultProps.stores.uiDialogs.getActiveData(key),
-                      currentPasswordValue: getCurrentPassword(),
-                      newPasswordValue: getNewPassword(),
-                      repeatedPasswordValue: getRepeatPassword(),
-                    }[key]),
+                    getActiveData: key =>
+                      ({
+                        ...defaultProps.stores.uiDialogs.getActiveData(key),
+                        currentPasswordValue: getCurrentPassword(),
+                        newPasswordValue: getNewPassword(),
+                        repeatedPasswordValue: getRepeatPassword(),
+                      }[key]),
                   },
                 },
               },
@@ -433,7 +414,7 @@ export const RemoveWallet = (): Node => {
               ...settingPageProps.stores,
               uiDialogs: {
                 ...settingPageProps.stores.uiDialogs,
-                isOpen: (clazz) => clazz === RemoveWalletDialogContainer,
+                isOpen: clazz => clazz === RemoveWalletDialogContainer,
               },
             },
             ChangeWalletPasswordDialogContainerProps: (null: any),
@@ -452,7 +433,7 @@ export const RemoveWallet = (): Node => {
                 },
                 actions: {
                   walletSettings: {
-                    removeWallet: { trigger: async (req) => action('removeWallet')(req) },
+                    removeWallet: { trigger: async req => action('removeWallet')(req) },
                   },
                   dialogs: {
                     closeActiveDialog: { trigger: action('closeActiveDialog') },
@@ -491,7 +472,7 @@ export const ExportWallet = (): Node => {
               ...settingPageProps.stores,
               uiDialogs: {
                 ...settingPageProps.stores.uiDialogs,
-                isOpen: (clazz) => clazz === ExportWalletDialogContainer,
+                isOpen: clazz => clazz === ExportWalletDialogContainer,
               },
             },
             ChangeWalletPasswordDialogContainerProps: (null: any),

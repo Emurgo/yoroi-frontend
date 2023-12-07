@@ -20,17 +20,17 @@ type Props = {|
 
 @observer
 export default class ErrorPage extends Component<Props> {
-  static defaultProps: {|error: void|} = {
-    error: undefined
+  static defaultProps: {| error: void |} = {
+    error: undefined,
   };
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+    intl: intlShape.isRequired,
   };
 
   render(): Node {
     const { intl } = this.context;
-    const { error, onCancel, title, backButtonLabel, } = this.props;
+    const { error, onCancel, title, backButtonLabel } = this.props;
 
     const actions = [
       {
@@ -46,20 +46,12 @@ export default class ErrorPage extends Component<Props> {
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={onCancel}
-        className={styles.dialog}
       >
         <div className={styles.component}>
           <div>
             <div className={styles.body}>
-              <div className={styles.title}>
-                {title}
-              </div>
-
-              {error && (
-                <p className={styles.error}>
-                  {intl.formatMessage(error, error.values)}
-                </p>
-              )}
+              <div className={styles.title}>{title}</div>
+              {error && <p className={styles.error}>{intl.formatMessage(error, error.values)}</p>}
             </div>
           </div>
         </div>

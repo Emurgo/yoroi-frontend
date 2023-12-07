@@ -3,38 +3,39 @@
 /* eslint react/jsx-one-expression-per-line: 0 */ // the &nbsp; in the html breaks this
 
 import type { Node } from 'react';
-import React, { Component } from 'react';
-import { observer } from 'mobx-react';
-import TextField from '../../../common/TextField';
-import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
-import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
-import vjf from 'mobx-react-form/lib/validators/VJF';
-import globalMessages from '../../../../i18n/global-messages';
-import styles from './WalletSendPreviewStep.scss';
-import config from '../../../../config';
-import { SelectedExplorer } from '../../../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../../../types/unitOfAccountType';
-import { calculateAndFormatValue } from '../../../../utils/unit-of-account';
-import WarningBox from '../../../widgets/WarningBox';
 import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor } from 'react-intl';
-import { truncateToken } from '../../../../utils/formatters';
-import { MultiToken } from '../../../../api/common/lib/MultiToken';
 import type { TokenLookupKey, TokenEntry } from '../../../../api/common/lib/MultiToken';
 import type {
   TokenRow,
   NetworkRow,
 } from '../../../../api/ada/lib/storage/database/primitives/tables';
+import type LocalizableError from '../../../../i18n/LocalizableError';
+import { observer } from 'mobx-react';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
+import { SelectedExplorer } from '../../../../domain/SelectedExplorer';
+import { calculateAndFormatValue } from '../../../../utils/unit-of-account';
+import { truncateToken } from '../../../../utils/formatters';
+import { MultiToken } from '../../../../api/common/lib/MultiToken';
 import { getTokenName, genFormatTokenAmount } from '../../../../stores/stateless/tokenHelpers';
-import AssetsDropdown from './AssetsDropdown';
-import { Button, Link, Tooltip, Typography } from '@mui/material';
-import LoadingSpinner from '../../../widgets/LoadingSpinner';
+import { Button, Link, Stack, Tooltip, Typography } from '@mui/material';
 import { getNFTs, getTokens } from '../../../../utils/wallet';
 import { IncorrectWalletPasswordError } from '../../../../api/common/errors';
 import { isCardanoHaskell } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 import { Box } from '@mui/system';
 import { ReactComponent as InfoIcon } from '../../../../assets/images/attention-big-light.inline.svg';
+import React, { Component } from 'react';
+import TextField from '../../../common/TextField';
+import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
+import vjf from 'mobx-react-form/lib/validators/VJF';
+import globalMessages from '../../../../i18n/global-messages';
+import styles from './WalletSendPreviewStep.scss';
+import config from '../../../../config';
+import WarningBox from '../../../widgets/WarningBox';
+import AssetsDropdown from './AssetsDropdown';
+import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import ErrorBlock from '../../../widgets/ErrorBlock';
-import type LocalizableError from '../../../../i18n/LocalizableError';
+import { SEND_FORM_STEP } from '../../../../types/WalletSendTypes';
 
 type Props = {|
   +staleTx: boolean,
@@ -62,6 +63,7 @@ type Props = {|
   +walletType: 'trezor' | 'ledger' | 'mnemonic',
   +ledgerSendError: ?LocalizableError,
   +trezorSendError: ?LocalizableError,
+  +onUpdateStep: (step: number) => void,
 |};
 
 type State = {|
@@ -70,6 +72,10 @@ type State = {|
 |};
 
 const messages = defineMessages({
+  receiverLabel: {
+    id: 'wallet.send.form.preview.receiverLabel',
+    defaultMessage: '!!!Receiver wallet address',
+  },
   nAssets: {
     id: 'wallet.send.form.preview.nAssets',
     defaultMessage: '!!!{number} Assets',
@@ -188,7 +194,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
     return calculateAndFormatValue(shiftedAmount, coinPrice);
   };
 
-  renderSingleAmount: TokenEntry => Node = entry => {
+  renderDefaultTokenAmount: TokenEntry => Node = entry => {
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
     return (
       <div className={styles.amount}>
@@ -285,7 +291,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
             <Tooltip
               placement="top"
               title={
-                <Typography>
+                <Typography textAlign="center">
                   <FormattedMessage
                     {...messages.minAdaHelp}
                     values={{ moreDetails: moreDetailsLink }}
@@ -357,7 +363,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
     if (walletType === 'trezor') {
       return messages.sendUsingTrezorT;
     }
-    return globalMessages.sendButtonLabel;
+    return globalMessages.confirm;
   }
 
   renderError(): Node {
@@ -399,39 +405,54 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
 
     return (
       <div className={styles.component}>
-        {this.renderError()}
-        <div className={styles.staleTxWarning}>{this.props.staleTx && staleTxWarning}</div>
-        <div>
-          <div className={styles.addressToLabel}>
-            {intl.formatMessage(globalMessages.receiverLabel)}
-          </div>
-          <p className={styles.receiverAddress}>
-            {this.props.addressToDisplayString(receivers[0])}
-          </p>
-        </div>
-        <div className={styles.wrapper}>
-          {this.props.transactionSize != null ? (
-            <div className={styles.addressToLabelWrapper}>
-              <div className={styles.addressToLabel}>
-                {intl.formatMessage(globalMessages.walletSendConfirmationTxSizeLabel)}
-              </div>
-              <span className={styles.txSize}>{this.props.transactionSize}</span>
+        <Box
+          sx={{
+            width: '100%',
+            overflowY: 'scroll',
+          }}
+        >
+          <Box width="506px" mx="auto">
+            {this.renderError()}
+            <div className={styles.staleTxWarning}>{this.props.staleTx && staleTxWarning}</div>
+            <div>
+              <Box mb="8px">
+                <Typography variant="body1" color="grayscale.600">
+                  {intl.formatMessage(messages.receiverLabel)}
+                </Typography>
+              </Box>
+              <Box>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    color: 'grayscale.900',
+                    overflowWrap: 'break-word',
+                  }}
+                >
+                  {this.props.addressToDisplayString(receivers[0])}
+                </Typography>
+              </Box>
             </div>
-          ) : null}
 
-          <div className={styles.amountFeesWrapper}>
-            {amount.nonDefaultEntries().length > 0 && (
-              <AssetsDropdown
-                tokens={getTokens(amount, this.props.getTokenInfo)}
-                nfts={getNFTs(amount, this.props.getTokenInfo)}
-              />
-            )}
-            <div className={styles.amountWrapper}>
-              <div className={styles.amountLabel}>{this._amountLabel()}</div>
-              <div className={styles.amountValue}>
-                {this.renderSingleAmount(amount.getDefaultEntry())}
+            <Box
+              className={styles.totalAmountWrapper}
+              sx={{ bgcolor: 'primary.600', color: 'grayscale.min' }}
+            >
+              <div className={styles.totalAmountLabel}>
+                {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
               </div>
-            </div>
+              <div>
+                <Box className={styles.totalAmountValue}>
+                  {this.renderTotalAmount(this.props.totalAmount.getDefaultEntry())}
+                </Box>
+                {amount.nonDefaultEntries().length > 0 && (
+                  <div className={styles.assetsCount}>
+                    {intl.formatMessage(messages.nAssets, {
+                      number: amount.nonDefaultEntries().length,
+                    })}
+                  </div>
+                )}
+              </div>
+            </Box>
 
             <div className={styles.feesWrapper}>
               <div className={styles.feesLabel}>
@@ -444,54 +465,79 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
                 })}
               </div>
             </div>
-          </div>
 
-          <Box className={styles.totalAmountWrapper}>
-            <div className={styles.totalAmountLabel}>
-              {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
-            </div>
-            <div>
-              {amount.nonDefaultEntries().length > 0 && (
-                <div className={styles.assetsCount}>
-                  {intl.formatMessage(messages.nAssets, {
-                    number: amount.nonDefaultEntries().length,
-                  })}
-                </div>
-              )}
-
-              <div className={styles.totalAmountValue}>
-                {this.renderTotalAmount(this.props.totalAmount.getDefaultEntry())}
+            <div className={styles.amountWrapper}>
+              <div className={styles.amountLabel}>{this._amountLabel()}</div>
+              <div className={styles.amountValue}>
+                {this.renderDefaultTokenAmount(amount.getDefaultEntry())}
               </div>
             </div>
+
+            <div className={styles.wrapper}>
+              {this.props.transactionSize != null ? (
+                <div className={styles.addressToLabelWrapper}>
+                  <Box className={styles.addressToLabel} sx={{ color: 'grayscale.600' }}>
+                    {intl.formatMessage(globalMessages.walletSendConfirmationTxSizeLabel)}
+                  </Box>
+                  <span className={styles.txSize}>{this.props.transactionSize}</span>
+                </div>
+              ) : null}
+
+              <Box>
+                {amount.nonDefaultEntries().length > 0 && (
+                  <AssetsDropdown
+                    tokens={getTokens(amount, this.props.getTokenInfo)}
+                    nfts={getNFTs(amount, this.props.getTokenInfo)}
+                  />
+                )}
+              </Box>
+
+              {walletType === 'mnemonic' && (
+                <TextField
+                  type="password"
+                  {...walletPasswordField.bind()}
+                  disabled={isSubmitting}
+                  onChange={e => {
+                    this.setState({ passwordError: null });
+                    walletPasswordField.set('value', e.target.value);
+                  }}
+                  error={walletPasswordField.error || passwordError}
+                  sx={{ mt: '24px' }}
+                />
+              )}
+            </div>
+
+            <div>{this.renderHWWalletInfo()}</div>
           </Box>
+        </Box>
 
-          {walletType === 'mnemonic' && (
-            <TextField
-              type="password"
-              className={styles.walletPassword}
-              {...walletPasswordField.bind()}
-              disabled={isSubmitting}
-              onChange={e => {
-                this.setState({ passwordError: null });
-                walletPasswordField.set('value', e.target.value);
-              }}
-              error={walletPasswordField.error || passwordError}
-            />
-          )}
-        </div>
-
-        <div>{this.renderHWWalletInfo()}</div>
-
-        <Button
-          variant="contained"
-          color="primary"
-          size="large"
-          onClick={this.submit.bind(this)}
-          disabled={(walletType === 'mnemonic' && !walletPasswordField.isValid) || isSubmitting}
-          sx={{ display: 'block', padding: '0px', marginTop: '9px', width: '173px' }}
-        >
-          {isSubmitting ? <LoadingSpinner light /> : intl.formatMessage(this.getSendButtonText())}
-        </Button>
+        <Box mt="auto" width="100%">
+          <Stack gap="24px" alignItems="center" justifyContent="center" direction="row" mt="24px">
+            <Button
+              key="amount-back"
+              variant="secondary"
+              size="medium"
+              onClick={() => this.props.onUpdateStep(SEND_FORM_STEP.AMOUNT)}
+              sx={{ width: '128px' }}
+            >
+              {intl.formatMessage(globalMessages.backButtonLabel)}
+            </Button>
+            <Button
+              key="amount-next"
+              variant="primary"
+              size="medium"
+              sx={{ width: '128px' }}
+              onClick={this.submit.bind(this)}
+              disabled={(walletType === 'mnemonic' && !walletPasswordField.isValid) || isSubmitting}
+            >
+              {isSubmitting ? (
+                <LoadingSpinner light />
+              ) : (
+                intl.formatMessage(this.getSendButtonText())
+              )}
+            </Button>
+          </Stack>
+        </Box>
       </div>
     );
   }

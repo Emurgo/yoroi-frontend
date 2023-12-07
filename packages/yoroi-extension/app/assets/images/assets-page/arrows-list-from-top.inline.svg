@@ -1,11 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="12px" height="16px" viewBox="0 0 12 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <title>icon/arrows_list_from top</title>
-    <g id="icon/arrows_list_from-top" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g>
-            <rect id="Rectangle" x="0" y="0" width="12" height="16"></rect>
-            <polygon id="Triangle" fill="#6B7384" transform="translate(6.000000, 12.000000) scale(1, -1) translate(-6.000000, -12.000000) " points="6 10 10 14 2 14"></polygon>
-            <polygon id="Triangle-Copy" fill="#C4CAD7" points="6 2 10 6 2 6"></polygon>
-        </g>
-    </g>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M11.5588 18.7626C11.614 18.8372 11.682 18.897 11.758 18.9379C11.834 18.9788 11.9164 19 11.9998 19C12.0832 19 12.1656 18.9788 12.2416 18.9379C12.3177 18.897 12.3856 18.8372 12.4409 18.7626L15.8494 14.1753C16.1883 13.7204 15.9179 13 15.4084 13H8.59124C8.08228 13 7.81187 13.7204 8.15018 14.176L11.5588 18.7626Z" fill="#8A92A3"/>
+<path d="M11.5588 5.23744C11.614 5.16279 11.682 5.10303 11.758 5.06209C11.834 5.02116 11.9164 5 11.9998 5C12.0832 5 12.1656 5.02116 12.2416 5.06209C12.3177 5.10303 12.3856 5.16279 12.4409 5.23744L15.8494 9.82475C16.1883 10.2796 15.9179 11 15.4084 11H8.59124C8.08228 11 7.81187 10.2796 8.15018 9.82404L11.5588 5.23744Z" fill="black"/>
 </svg>

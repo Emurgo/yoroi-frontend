@@ -10,7 +10,6 @@ import { buildCheckAndCall } from '../lib/check';
 import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import { trackWalletCreation } from '../../api/analytics';
 import { HARD_DERIVATION_START } from '../../config/numbersConfig';
 
 export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
@@ -142,8 +141,6 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
       });
       return wallet;
     }).promise;
-
-    trackWalletCreation('created');
   };
 
   _createWallet: {|
@@ -169,7 +166,5 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
       });
       return wallet;
     }).promise;
-
-    trackWalletCreation('created');
   };
 }

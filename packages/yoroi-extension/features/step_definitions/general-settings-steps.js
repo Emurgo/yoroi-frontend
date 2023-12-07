@@ -16,6 +16,7 @@ import {
   goToSettings,
   languageSelector,
   secondThemeSelected,
+  walletPage,
 } from '../pages/settingsPage';
 import type { LocatorObject } from '../support/webdriver';
 import { adaToFiatPricesMainUrl, oneSecond } from '../support/helpers/common-constants';
@@ -31,10 +32,7 @@ When(/^I click on secondary menu "([^"]*)" item$/, async function (buttonName) {
   const formattedButtonName = camelCase(buttonName);
   const buttonSelector = `.SubMenuItem_component.${formattedButtonName}`;
   await this.click({ locator: buttonSelector, method: 'css' });
-  await this.waitForElement({
-    locator: `.SubMenuItem_component.SubMenuItem_active.${formattedButtonName}`,
-    method: 'css',
-  });
+  await this.waitForElement(walletPage);
 });
 
 When(/^I select second theme$/, async function () {
@@ -116,9 +114,10 @@ Then(
     );
 
     const expectedValueNotFixed = adaValue * value;
-    const expectedValue = expectedValueNotFixed < 1
-      ? expectedValueNotFixed.toFixed(6)
-      : expectedValueNotFixed.toFixed(2);
+    const expectedValue =
+      expectedValueNotFixed < 1
+        ? expectedValueNotFixed.toFixed(6)
+        : expectedValueNotFixed.toFixed(2);
     expect(amountDisplayFiatValue).to.equal(`${expectedValue} ${currency}`);
   }
 );

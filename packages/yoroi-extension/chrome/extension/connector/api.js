@@ -314,6 +314,8 @@ export async function connectorGetUtxosCardano(
 export const MAX_COLLATERAL: BigNumber = new BigNumber('5000000');
 // only consider UTXO value <= (${requiredAmount} + 1 ADA)
 const MAX_PER_UTXO_SURPLUS = new BigNumber('2000000');
+// Max allowed collateral inputs in a tx by protocol
+export const MAX_COLLATERAL_COUNT: number = 3;
 
 type GetCollateralUtxosRespose = {|
   utxosToUse: Array<RemoteUnspentOutput>,
@@ -349,6 +351,14 @@ export async function connectorGetCollateralUtxos(
   for (const utxo of utxosToConsider) {
     utxosToUse.push(utxo)
     sum = sum.plus(utxo.amount)
+    while (
+      utxosToUse.length > MAX_COLLATERAL_COUNT
+      || sum.minus(utxosToUse[0].amount).gte(required)
+    ) {
+      // Removing the first (hence the smallest) utxo from the list
+      const removedUtxo = utxosToUse.shift()
+      sum = sum.minus(removedUtxo.amount)
+    }
     if (sum.gte(required)) {
       enough = true
       break
@@ -1182,7 +1192,7 @@ export async function connectorRecordSubmittedCardanoTransaction(
   await persistSubmittedTransactions(submittedTxs);
 }
 
-const REORG_OUTPUT_AMOUNT  = '1000000';
+const MIN_REORG_OUTPUT_AMOUNT  = '1000000';
 
 export async function connectorGenerateReorgTx(
   publicDeriver: PublicDeriver<>,
@@ -1214,23 +1224,18 @@ export async function connectorGenerateReorgTx(
   const unusedAddresses = await connectorGetUnusedAddresses(
     publicDeriver
   );
-  const includeTargets = [];
-  const collateralOutputAddressSet = new Set<string>();
-  const reorgOutputCount = (new BigNumber(reorgTargetAmount))
-        .div(REORG_OUTPUT_AMOUNT)
-        .integerValue(BigNumber.ROUND_CEIL)
-        .toNumber();
-  if (reorgOutputCount > unusedAddresses.length) {
-    throw new Error('unexpected: too many collaterals required');
+  if (unusedAddresses.length === 0) {
+    throw new Error('unexpected: no unused addresses available');
   }
-  for (let i = 0; i < reorgOutputCount; i++) {
-    includeTargets.push({
-      address: unusedAddresses[i],
-      isForeign: false,
-      value: REORG_OUTPUT_AMOUNT,
-    });
-    collateralOutputAddressSet.add(unusedAddresses[i]);
-  }
+  const reorgOutputValue = BigNumber
+    .max(reorgTargetAmount, MIN_REORG_OUTPUT_AMOUNT)
+    .toString();
+  const includeTargets = [{
+    address: unusedAddresses[0],
+    isForeign: false,
+    value: reorgOutputValue,
+  }];
+  const collateralOutputAddressSet = new Set<string>([unusedAddresses[0]]);
   const dontUseUtxoIds = new Set(usedUtxoIds);
   const adaApi = new AdaApi();
   const unsignedTx = await adaApi.createUnsignedTxForConnector(

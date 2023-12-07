@@ -67,7 +67,7 @@ export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object
   createWallet({
     name: ('small-single-tx': WalletNames),
     mnemonic: 'eight country switch draw meat scout mystery blade tip drift useless good keep usage title',
-    plate: '',
+    plate: 'ZDDC-9858',
     plateByron: 'EAJD-7036',
     deviceId: '',
   }),
@@ -81,7 +81,7 @@ export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object
   createWallet({
     name: ('many-tx-wallet': WalletNames),
     mnemonic: 'final autumn bacon fold horse scissors act pole country focus task blush basket move view',
-    plate: 'ZKTZ-4614',
+    plate: 'LAST-7650',
     plateByron: '',
     deviceId: '',
   }),

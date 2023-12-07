@@ -1,5 +1,7 @@
 // @flow
 
+// $FlowFixMe[cannot-resolve-module]
+import crc8 from 'crc/crc8'; // eslint-disable-line import/no-unresolved
 import type { TokenInfoMap } from '../toplevel/TokenInfoStore';
 import type {
   TokenLookupKey, TokenEntry,
@@ -17,7 +19,7 @@ export function getTokenName(
     ...,
   }>,
 ): string {
-  const strictName = getTokenStrictName(tokenRow);
+  const strictName = getTokenStrictName(tokenRow).name;
   if (strictName != null) return strictName;
   const identifier = getTokenIdentifierIfExists(tokenRow);
   if (identifier != null) return identifier;
@@ -33,17 +35,53 @@ function hexToValidAsciiOrNothing(hexString: string): void | string {
   return isAscii ? String.fromCharCode(...bytes) : undefined;
 }
 
-function decodeAssetNameIfASCII(assetName: ?string): void | string {
-  if (assetName == null || assetName.length === 0 || !isHexadecimal(assetName)) {
-    return undefined;
+/**
+ * https://github.com/cardano-foundation/CIPs/tree/master/CIP-0067
+ */
+function getCip67Tag(assetNameHEX: string): {| hexName: string, tag: ?string |} {
+  const bytes = Buffer.from(assetNameHEX, 'hex');
+  // [ 0000 | 16 bits label_num | 8 bits checksum | 0000 ]
+  if (bytes.length >= 4) {
+    const [a, b, c, d] = bytes;
+    // check 4-zero-bit brackets
+    if ((a & 0b11110000) === 0 && (d & 0b00001111) === 0) {
+      /*
+       * The 3 significant bytes are encoded within 4 bytes as:
+       * (0000 xxxx) (xxxx yyyy) (yyyy zzzz) (zzzz 0000)
+       */
+      const middleByte = (byte1, byte2) => ((byte1 & 0b1111) << 4) | ((byte2 & 0b11110000) >> 4)
+      const xByte = middleByte(a, b);
+      const yByte = middleByte(b, c);
+      const zByte = middleByte(c, d);
+      if (crc8([xByte, yByte]) === zByte) {
+        return {
+          tag: String((xByte << 8) | yByte),
+          hexName: bytes.subarray(4).toString('hex'),
+        };
+      }
+    }
   }
-  const asciiName = hexToValidAsciiOrNothing(assetName);
-  return ASCII_ASSET_NAME_BLACKLIST.has(asciiName) ? undefined : asciiName;
+  return {
+    tag: null,
+    hexName: assetNameHEX,
+  };
+}
+
+function decodeAssetNameIfASCII(assetName: ?string): {| ascii: ?string, cip67Tag: ?string |} {
+  if (assetName == null || assetName.length === 0 || !isHexadecimal(assetName)) {
+    return { ascii: null, cip67Tag: null };
+  }
+  const { tag, hexName } = getCip67Tag(assetName);
+  const asciiName = hexToValidAsciiOrNothing(hexName);
+  if (asciiName == null || ASCII_ASSET_NAME_BLACKLIST.has(asciiName)) {
+    return { ascii: null, cip67Tag: tag };
+  }
+  return { ascii: asciiName, cip67Tag: tag };
 }
 
 export function assetNameFromIdentifier(identifier: string): string {
   const [, name ] = identifier.split('.');
-  return decodeAssetNameIfASCII(name) || name;
+  return decodeAssetNameIfASCII(name).ascii ?? name;
 }
 
 export function getTokenStrictName(
@@ -52,17 +90,22 @@ export function getTokenStrictName(
     Metadata: TokenMetadata,
     ...,
   }>,
-): void | string {
+): {| name: ?string, cip67Tag: ?string |} {
   if (tokenRow.Metadata.ticker != null) {
-    return tokenRow.Metadata.ticker;
+    return { name: tokenRow.Metadata.ticker, cip67Tag: null };
   }
   if (tokenRow.Metadata.longName != null) {
-    return tokenRow.Metadata.longName;
+    return { name: tokenRow.Metadata.longName, cip67Tag: null };
   }
   if (tokenRow.Metadata.type === 'Cardano') {
-    return decodeAssetNameIfASCII(tokenRow.Metadata.assetName);
+    const assetName = tokenRow.Metadata.assetName;
+    const maybeAsciiName = decodeAssetNameIfASCII(assetName);
+    if (maybeAsciiName.ascii != null) {
+      return { name: maybeAsciiName.ascii, cip67Tag: maybeAsciiName.cip67Tag };
+    }
+    return { name: assetName, cip67Tag: null };
   }
-  return undefined;
+  return { name: null, cip67Tag: null };
 }
 
 export function getTokenIdentifierIfExists(

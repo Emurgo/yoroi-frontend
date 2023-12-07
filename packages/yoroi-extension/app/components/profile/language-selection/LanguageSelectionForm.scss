@@ -16,6 +16,13 @@
     text-align: center;
     margin-bottom: 1rem;
   }
+
+  .tosBox {
+    width: 648px;
+  }
+  .tosAgreement>span>span {
+    color: var(--yoroi-palette-primary-200);
+  }
 }
 
 .info {
@@ -39,4 +46,11 @@
     letter-spacing: 0.5px;
     line-height: 1.38;
   }
+}
+
+.back {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  cursor: pointer;
 }

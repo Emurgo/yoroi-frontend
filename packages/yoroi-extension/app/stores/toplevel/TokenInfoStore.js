@@ -109,6 +109,7 @@ export default class TokenInfoStore<
             tokenIds,
             this.stores.substores.ada.stateFetchStore.fetcher.getTokenInfo,
             this.stores.substores.ada.stateFetchStore.fetcher.getMultiAssetMintMetadata,
+            this.stores.substores.ada.stateFetchStore.fetcher.getMultiAssetSupply,
             network,
           )
         )

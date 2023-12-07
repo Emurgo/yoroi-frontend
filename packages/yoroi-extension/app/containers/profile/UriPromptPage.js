@@ -21,7 +21,6 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { isTestnet } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import { trackUriPrompt } from '../../api/analytics';
 
 type GeneratedData = typeof UriPromptPage.prototype.generated;
 
@@ -40,12 +39,10 @@ export default class UriPromptPage extends Component<InjectedOrGenerated<Generat
     runInAction(() => {
       this.isAccepted = true;
     });
-    trackUriPrompt('allow');
   };
 
   onSkip: void => void = () => {
     this.generated.actions.profile.acceptUriScheme.trigger()
-    trackUriPrompt('skip');
   };
 
   onBack: void => void = () => {
