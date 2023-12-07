@@ -3,7 +3,6 @@
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { PublicDeriver } from '../../../app/api/ada/lib/storage/models/PublicDeriver/index';
 import { MultiToken } from '../../../app/api/common/lib/MultiToken';
-import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import type CardanoTxRequest from '../../../app/api/ada';
 import type { RemoteUnspentOutput } from '../../../app/api/ada/lib/state-fetch/types';
 import type { IGetAllUtxosResponse } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
@@ -21,81 +20,6 @@ export function asAddress(input: any): Address {
     return input;
   }
   throw ConnectorError.invalidRequest(`invalid Address: ${JSON.stringify(input)}`);
-}
-
-export function asBoxCandidate(
-  input: any,
-  // wasmInstance: typeof RustModule.SigmaRust
-): ErgoBoxCandidateJson {
-  try {
-    if (typeof input === 'object' &&
-        Array.isArray(input?.assets) &&
-        typeof input.additionalRegisters === 'object' &&
-        typeof input.creationHeight === 'number') {
-      const registers = Object.entries(input.additionalRegisters).map(([k, v]) => {
-        if (typeof k === 'string' && k.match(/^R[4-9]$/) != null) {
-          if (typeof v === 'string') {
-            return [k, v];
-          }
-        }
-        throw ConnectorError.invalidRequest(`additionalRegisters: Must be strings of the form "R4" to "R9": : ${JSON.stringify(input)}`);
-      });
-      return {
-        value: asValue(input.value),
-        ergoTree: asErgoTree(input.ergoTree),
-        assets: input.assets.map(asTokenAmount),
-        additionalRegisters: Object.fromEntries(registers),
-        creationHeight: input.creationHeight
-      };
-    }
-  } catch (err) {
-    throw ConnectorError.invalidRequest(`Box invalid structure: ${JSON.stringify(input)} due to ${err}`);
-  }
-  throw ConnectorError.invalidRequest(`Box invalid structure: ${JSON.stringify(input)}`);
-}
-
-export function asBox(
-  input: any,
-  wasmInstance: typeof RustModule.SigmaRust
-): ErgoBoxJson {
-  try {
-    if (typeof input === 'object' &&
-        Array.isArray(input?.assets) &&
-        typeof input.additionalRegisters === 'object' &&
-        typeof input.creationHeight === 'number' &&
-        typeof input.index === 'number' &&
-        input.index >= 0) {
-      const registers = Object.entries(input.additionalRegisters).map(([k, v]) => {
-        if (typeof k === 'string' && k.match(/^R[4-9]$/) != null) {
-          if (typeof v === 'string') {
-            return [k, v];
-          }
-        }
-        throw ConnectorError.invalidRequest(`additionalRegisters: Must be strings of the form "R4" to "R9": : ${JSON.stringify(input)}`);
-      });
-      const boxJson = {
-        boxId: asBoxId(input.boxId),
-        value: asValue(input.value),
-        ergoTree: asErgoTree(input.ergoTree),
-        assets: input.assets.map(asTokenAmount),
-        additionalRegisters: Object.fromEntries(registers),
-        creationHeight: input.creationHeight,
-        transactionId: asTxId(input.transactionId),
-        index: input.index
-      };
-
-      {
-        // we just want to validate that the boxID matches the content
-        const wasmBox = wasmInstance.ErgoBox.from_json(JSON.stringify(boxJson));
-        wasmBox.free();
-      }
-
-      return boxJson;
-    }
-  } catch (err) {
-    throw ConnectorError.invalidRequest(`Box invalid structure: ${JSON.stringify(input)} due to ${err}`);
-  }
-  throw ConnectorError.invalidRequest(`Box invalid structure: ${JSON.stringify(input)}`);
 }
 
 // hex string box id
@@ -144,38 +68,12 @@ export function asContextExtension(input: any): ErgoContextExtension {
   throw ConnectorError.invalidRequest(`ContextExtension must be a map: : ${JSON.stringify(input)}`);
 }
 
-// hex-encoded bytes
-export type ErgoTree = string;
-
-export function asErgoTree(input: any): ErgoTree {
-  if (typeof input === 'string') {
-    return input;
-  }
-  throw ConnectorError.invalidRequest(`invalid ErgoTree: : ${JSON.stringify(input)}`);
-}
-
+// <TODO:PENDING_REMOVAL> Ergo
 export type DataInput = {|
     boxId: ErgoBoxId,
 |};
 
-export function asDataInput(input: any): DataInput {
-  return {
-    boxId: asBoxId(input?.boxId)
-  };
-}
-
-export type SignedInput = {|
-  boxId: ErgoBoxId,
-  spendingProof: ProverResult,
-|};
-
-export function asSignedInput(input: any): SignedInput {
-  return {
-    boxId: asBoxId(input?.boxId),
-    spendingProof: asProverResult(input?.spendingProof)
-  };
-}
-
+// <TODO:PENDING_REMOVAL> Ergo
 export type UnsignedInput = {|
   extension: ErgoContextExtension,
   boxId: ErgoBoxId,
@@ -190,16 +88,6 @@ export type UnsignedInput = {|
   transactionId: string,
   index: number
 |};
-
-export function asUnsignedInput(
-  input: any,
-  wasmInstance: typeof RustModule.SigmaRust
-): UnsignedInput {
-  return {
-    extension: asContextExtension(input?.extension),
-    ...asBox(input, wasmInstance),
-  };
-}
 
 export type Paginate = {|
   page: number,
@@ -268,27 +156,6 @@ export type CardanoTx = {|
   partialSign: boolean,
   tabId: number,
 |};
-
-export function asTx(
-  tx: any,
-  wasmInstance: typeof RustModule.SigmaRust
-): Tx {
-  try {
-    if (typeof tx === 'object' &&
-        Array.isArray(tx.inputs) &&
-        Array.isArray(tx.dataInputs) &&
-        Array.isArray(tx.outputs)) {
-      return {
-        inputs: tx.inputs.map(input => asUnsignedInput(input, wasmInstance)),
-        dataInputs: tx.dataInputs.map(asDataInput),
-        outputs: tx.outputs.map(output => asBoxCandidate(output /* , wasmInstance */)),
-      };
-    }
-  } catch (err) {
-    throw ConnectorError.invalidRequest(`invalid Tx: ${JSON.stringify(tx)} due to ${err}`);
-  }
-  throw ConnectorError.invalidRequest(`invalid Tx: ${JSON.stringify(tx)}`);
-}
 
 export type TxId = string;
 

@@ -34,14 +34,12 @@ const { RustModule } = require('../app/api/ada/lib/cardanoCrypto/rustLoader');
 const wasmv2 = require('cardano-wallet');
 const wasmv3 = require('@emurgo/js-chain-libs-node/js_chain_libs');
 const wasmv4 = require('@emurgo/cardano-serialization-lib-nodejs/cardano_serialization_lib');
-const ergo = require('ergo-lib-wasm-nodejs');
 
 RustModule._wasmv2 = wasmv2;
 // $FlowExpectedError[incompatible-type] nodejs & browser API have same interface so it's okay
 RustModule._wasmv3 = wasmv3;
 // $FlowExpectedError[incompatible-type] nodejs & browser API have same interface so it's okay
 RustModule._wasmv4 = wasmv4;
-RustModule._ergo = ergo;
 
 const { getMockServer } = require('../features/mock-chain/mockCardanoServer');
 const { MockChain, resetChain } = require('../features/mock-chain/mockCardanoImporter');

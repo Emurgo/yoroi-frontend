@@ -52,7 +52,6 @@ import {
   loadSubmittedTransactions,
   persistSubmittedTransactions,
 } from '../../api/localStorage';
-import type { Api } from '../../api/index';
 import { getAllAddressesForWallet } from '../../api/ada/lib/storage/bridge/traitUtils';
 import { toRequestAddresses } from '../../api/ada/lib/storage/bridge/updateTransactions'
 import type { TransactionExportRow } from '../../api/export';

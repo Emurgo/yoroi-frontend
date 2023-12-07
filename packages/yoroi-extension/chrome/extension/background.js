@@ -25,7 +25,6 @@ import {
   APIErrorCodes,
   asPaginate,
   asTokenId,
-  asTx,
   asValue,
   ConnectorError,
   DataSignErrorCodes,
@@ -1131,46 +1130,6 @@ async function handleInjectorMessage(message, sender) {
           message.protocol,
           message.uid,
         );
-      } catch (e) {
-        handleError(e);
-      }
-      break;
-    case 'sign_tx_input':
-      try {
-        checkParamCount(2);
-        await withDb(async (db, localStorageApi) => {
-          await withSelectedWallet(
-            tabId,
-            async (_wallet, connection) => {
-              if (connection == null) {
-                Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
-                rpcResponse(undefined); // shouldn't happen
-                return
-              }
-              await RustModule.load();
-              const tx = asTx(message.params[0], RustModule.SigmaRust);
-              const txIndex = message.params[1];
-              if (typeof txIndex !== 'number') {
-                throw ConnectorError.invalidRequest(`invalid tx input: ${txIndex}`);
-              }
-              await confirmSign(
-                tabId,
-                {
-                  type: 'tx_input',
-                  tx,
-                  index: txIndex,
-                  uid: message.uid
-                },
-                connection,
-                { type: 'cardano-tx-input' },
-                message.protocol,
-                message.uid,
-              );
-            },
-            db,
-            localStorageApi,
-          )
-        });
       } catch (e) {
         handleError(e);
       }

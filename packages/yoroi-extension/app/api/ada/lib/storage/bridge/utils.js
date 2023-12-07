@@ -67,22 +67,6 @@ export function addressToKind(
   }
 }
 
-// <TODO:PENDING_REMOVAL> Ergo
-export function ergoAddressToType(address: RustModule.SigmaRust.NetworkAddress): CoreAddressT {
-  switch (address.address().address_type_prefix()) {
-    case RustModule.SigmaRust.AddressTypePrefix.P2Pk:
-      return CoreAddressTypes.ERGO_P2PK;
-    case RustModule.SigmaRust.AddressTypePrefix.Pay2Sh:
-      return CoreAddressTypes.ERGO_P2SH;
-    case RustModule.SigmaRust.AddressTypePrefix.Pay2S:
-      return CoreAddressTypes.ERGO_P2S;
-    default:
-      throw new Error(
-        `${nameof(ergoAddressToType)} unknown Ergo address type ${address.to_base58()}`
-      );
-  }
-}
-
 export function isValidReceiveAddress(
   bech32: string,
   network: $ReadOnly<NetworkRow>
@@ -281,13 +265,6 @@ export function normalizeToAddress(addr: string): void | RustModule.WalletV4.Add
   }
 
   return undefined;
-}
-
-export function isErgoAddress(kind: CoreAddressT): boolean {
-  if (kind === CoreAddressTypes.ERGO_P2PK) return true;
-  if (kind === CoreAddressTypes.ERGO_P2SH) return true;
-  if (kind === CoreAddressTypes.ERGO_P2S) return true;
-  return false;
 }
 
 export function toEnterprise(address: string): void | RustModule.WalletV4.EnterpriseAddress {
