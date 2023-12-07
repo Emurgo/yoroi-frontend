@@ -144,13 +144,6 @@ export function asTokenId(input: any): TokenId {
   throw ConnectorError.invalidRequest(`invalid TokenId: ${JSON.stringify(input)}`);
 }
 
-// <TODO:PENDING_REMOVAL> Ergo
-export type Tx = {|
-  inputs: UnsignedInput[],
-  dataInputs: DataInput[],
-  outputs: ErgoBoxCandidateJson[],
-|};
-
 export type CardanoTx = {|
   tx: string,
   partialSign: boolean,
@@ -283,15 +276,6 @@ export type Protocol = {|
 export type RpcUid = number;
 
 export type PendingSignData = {|
-  type: 'tx',
-  uid: RpcUid,
-  tx: Tx,
-|} | {|
-  type: 'tx_input',
-  uid: RpcUid,
-  tx: Tx,
-  index: number,
-|} | {|
   type: 'data',
   uid: RpcUid,
   address: Address,
@@ -312,7 +296,7 @@ export type PendingSignData = {|
 
 export type ConfirmedSignData = {|
   type: 'sign_confirmed',
-  tx: Tx | CardanoTx | CardanoTxRequest | Array<RemoteUnspentOutput> | null,
+  tx: CardanoTx | CardanoTxRequest | Array<RemoteUnspentOutput> | null,
   uid: RpcUid,
   tabId: number,
   pw: string,
