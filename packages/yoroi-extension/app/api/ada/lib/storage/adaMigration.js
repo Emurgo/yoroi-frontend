@@ -32,7 +32,6 @@ import { getAllSchemaTables, raii, } from './database/utils';
 import type { BlockRow } from './database/primitives/tables';
 import { GetBlock } from './database/primitives/api/read';
 import { ModifyUtxoAtSafePoint } from './database/utxo/api/write';
-import { CoinTypes } from '../../../../config/numbersConfig';
 
 export async function migrateToLatest(
   localStorageApi: LocalStorageApi,
@@ -320,7 +319,8 @@ async function removeErgoDevices(
   for (const publicDeriver of wallets) {
     // INLINED CHECK FOR ERGO THAT WE WILL KEEP FOR SOME TIME
     const networkInfo = publicDeriver.getParent().getNetworkInfo();
-    const isErgoNetwork = networkInfo.CoinType === CoinTypes.ERGO;
+    // ERGO coin type is hardcoded (HARD_DERIVATION_START + 429)
+    const isErgoNetwork = networkInfo.CoinType === 2147484077;
     if (!isErgoNetwork) {
       continue;
     }

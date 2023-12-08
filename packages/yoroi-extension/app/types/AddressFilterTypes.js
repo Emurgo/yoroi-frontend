@@ -60,6 +60,7 @@ export const AddressGroupTypes = Object.freeze({
   byron: 'byron',
   addressBook: 'addressBook',
   group: 'group',
+  // <TODO:PENDING_REMOVAL> Ergo
   p2pk: 'p2pk',
 });
 

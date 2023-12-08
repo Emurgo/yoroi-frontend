@@ -12,10 +12,10 @@ export const WalletTypePurpose = Object.freeze({
   CIP1852: 2147485500, // HARD_DERIVATION_START + 1852;
 });
 export type WalletTypePurposeT = $Values<typeof WalletTypePurpose>;
+
+// <TODO:PENDING_REMOVAL> Legacy
 export const CoinTypes = Object.freeze({
   CARDANO: 2147485463, // HARD_DERIVATION_START + 1815;
-  // <TODO:PENDING_REMOVAL> Ergo
-  ERGO: 2147484077, // HARD_DERIVATION_START + 429;
 });
 export type CoinTypesT = $Values<typeof CoinTypes>;
 

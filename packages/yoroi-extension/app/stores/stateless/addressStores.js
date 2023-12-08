@@ -12,9 +12,6 @@ import {
   EnterpriseExternalAddressesSubgroup,
   EnterpriseInternalAddressesSubgroup,
   RewardAddressesSubgroup,
-  P2PKAllAddressesSubgroup,
-  P2PKExternalAddressesSubgroup,
-  P2PKInternalAddressesSubgroup,
 } from '../base/AddressSubgroupStore';
 import { CoinTypes, } from '../../config/numbersConfig';
 import type { CoinTypesT, } from '../../config/numbersConfig';
@@ -267,54 +264,6 @@ export const REWARD_ADDRESS: AddressSubgroupMeta<
   isHidden: request => request.result == null || request.result.length === 0,
 });
 
-export const P2PK_ALL: AddressSubgroupMeta<
-  P2PKAllAddressesSubgroup
-> = registerAddressSubgroup({
-  isRelated: request => (
-    matchParent(request.selected, parent => parent instanceof Bip44Wallet) &&
-    asHasUtxoChains(request.selected) == null &&
-    matchCoinType(request.selected, coinType => coinType === CoinTypes.ERGO)
-  ),
-  class: P2PKAllAddressesSubgroup,
-  validFilters: standardFilter,
-  name: {
-    subgroup: AddressSubgroup.all,
-    group: AddressGroupTypes.p2pk,
-  },
-  isHidden: _request => false,
-});
-export const P2PK_EXTERNAL: AddressSubgroupMeta<
-  P2PKExternalAddressesSubgroup
-> = registerAddressSubgroup({
-  isRelated: request => (
-    matchParent(request.selected, parent => parent instanceof Bip44Wallet) &&
-    asHasUtxoChains(request.selected) != null &&
-    matchCoinType(request.selected, coinType => coinType === CoinTypes.ERGO)
-  ),
-  class: P2PKExternalAddressesSubgroup,
-  validFilters: standardFilter,
-  name: {
-    subgroup: AddressSubgroup.external,
-    group: AddressGroupTypes.p2pk,
-  },
-  isHidden: _request => false,
-});
-export const P2PK_INTERNAL: AddressSubgroupMeta<
-  P2PKInternalAddressesSubgroup
-> = registerAddressSubgroup({
-  isRelated: request => (
-    matchParent(request.selected, parent => parent instanceof Bip44Wallet) &&
-    asHasUtxoChains(request.selected) != null &&
-    matchCoinType(request.selected, coinType => coinType === CoinTypes.ERGO)
-  ),
-  class: P2PKInternalAddressesSubgroup,
-  validFilters: standardFilter,
-  name: {
-    subgroup: AddressSubgroup.internal,
-    group: AddressGroupTypes.p2pk,
-  },
-  isHidden: _request => false,
-});
 export const ADDRESS_BOOK: AddressSubgroupMeta<
   AddressBookSubgroup
 > = registerAddressSubgroup({
