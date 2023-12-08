@@ -156,7 +156,7 @@ class AboutYoroiSettingsBlock extends Component<Props & InjectedLayoutProps> {
         }}
         className={styles.component}
       >
-        <Typography
+        <Typography component="div"
           component="h2"
           variant={isRevampLayout ? 'body1' : 'h5'}
           fontWeight={500}
@@ -167,10 +167,10 @@ class AboutYoroiSettingsBlock extends Component<Props & InjectedLayoutProps> {
         </Typography>
 
         {network && (
-          <p className={styles.aboutLine}>
+          <div className={styles.aboutLine}>
             <strong>{intl.formatMessage(messages.networkLabel)}</strong>&nbsp;
             {intl.formatMessage(messages[network])}
-          </p>
+          </div>
         )}
         <div className={styles.aboutLine}>
           <strong>{intl.formatMessage(messages.versionLabel)}</strong>&nbsp;
@@ -232,7 +232,7 @@ class AboutYoroiSettingsBlock extends Component<Props & InjectedLayoutProps> {
           mt: '40px',
         }}
       >
-        <Typography component="h2" variant="body1" fontWeight={500} mb="16px" color="grayscale.900">
+        <Typography component="div" component="h2" variant="body1" fontWeight={500} mb="16px" color="grayscale.900">
           {intl.formatMessage(messages.aboutYoroiLabel)}
         </Typography>
 
@@ -296,10 +296,10 @@ function LabelWithValue({
 |}): Node {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-      <Typography variant="body1" fontWeight={500} color="grayscale.max">
+      <Typography component="div" variant="body1" fontWeight={500} color="grayscale.max">
         {label}
       </Typography>
-      <Typography
+      <Typography component="div"
         {...(url
           ? {
               as: Link,

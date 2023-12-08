@@ -57,9 +57,9 @@ export default class ExportPublicKeyDialog extends Component<Props> {
       >
         <div className={styles.component}>
           <div className={styles.header}>
-            <p><FormattedHTMLMessage {...messages.publicKeyExplanationLine1} /></p>
-            <p><FormattedHTMLMessage {...globalMessages.publicKeyExplanation} /></p>
-            <p>{intl.formatMessage(globalMessages.whyUse)}</p>
+            <div><FormattedHTMLMessage {...messages.publicKeyExplanationLine1} /></div>
+            <div><FormattedHTMLMessage {...globalMessages.publicKeyExplanation} /></div>
+            <div>{intl.formatMessage(globalMessages.whyUse)}</div>
             <ul>
               <li key="1">{intl.formatMessage(messages.reason1)}</li>
               <li key="2">{intl.formatMessage(messages.reason2)}</li>

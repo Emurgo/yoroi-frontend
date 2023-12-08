@@ -84,7 +84,7 @@ export class RevampAnnouncementDialog extends Component<Props> {
         actions={actions}
       >
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: '24px' }} id="dialogRevampBox">
-          <Typography
+          <Typography component="div"
             variant="body1"
             sx={{
               textAlign: 'center',
@@ -96,7 +96,7 @@ export class RevampAnnouncementDialog extends Component<Props> {
 
           <NewThemeIllustration />
           <Stack gap="16px">
-            <Typography color="grayscale.900" variant="body1" fontWeight={500}>
+            <Typography component="div" color="grayscale.900" variant="body1" fontWeight={500}>
               {intl.formatMessage(messages.updatesSectionTitle)}
             </Typography>
 
@@ -116,7 +116,7 @@ export class RevampAnnouncementDialog extends Component<Props> {
                 }}
               >
                 {[messages.update1, messages.update2, messages.update3].map(message => (
-                  <Typography component="li" variant="body1" color="grayscale.900">
+                  <Typography component="div" component="li" variant="body1" color="grayscale.900">
                     {intl.formatMessage(message)}
                   </Typography>
                 ))}
@@ -130,7 +130,7 @@ export class RevampAnnouncementDialog extends Component<Props> {
                 }}
               >
                 {[messages.update4, messages.update5, messages.update6].map(message => (
-                  <Typography component="li" variant="body1" color="grayscale.900">
+                  <Typography component="div" component="li" variant="body1" color="grayscale.900">
                     {intl.formatMessage(message)}
                   </Typography>
                 ))}

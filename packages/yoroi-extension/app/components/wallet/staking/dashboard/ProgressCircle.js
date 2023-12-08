@@ -29,7 +29,7 @@ export default class ProgressCircle extends Component<Props> {
           }
         >
           {percentage}%
-          {text !== null && <p className={styles.text}>{text}</p>}
+          {text !== null && <div className={styles.text}>{text}</div>}
         </div>
         <svg viewBox="0 0 36 36" className={styles.chart}>
           <path

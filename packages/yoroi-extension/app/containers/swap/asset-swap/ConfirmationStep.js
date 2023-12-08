@@ -15,14 +15,14 @@ export default function SwapConfirmationStep({ poolInfo = {} }: Props): React$No
   return (
     <Box width="100%" mx="auto" maxWidth="506px" display="flex" flexDirection="column" gap="24px">
       <Box textAlign="center">
-        <Typography variant="h4" fontWeight={500}>
+        <Typography component="div" variant="h4" fontWeight={500}>
           Confirm swap transaction
         </Typography>
       </Box>
       <Box display="flex" gap="16px" flexDirection="column">
         <Box>
           <Box>
-            <Typography variant="body1" color="grayscale.500">
+            <Typography component="div" variant="body1" color="grayscale.500">
               Swap From
             </Typography>
           </Box>
@@ -41,7 +41,7 @@ export default function SwapConfirmationStep({ poolInfo = {} }: Props): React$No
         </Box>
         <Box>
           <Box>
-            <Typography variant="body1" color="grayscale.500">
+            <Typography component="div" variant="body1" color="grayscale.500">
               Swap To
             </Typography>
           </Box>
@@ -65,7 +65,7 @@ export default function SwapConfirmationStep({ poolInfo = {} }: Props): React$No
           col2={
             <Box display="flex" alignItems="center" gap="8px">
               <Box display="inline-flex">{poolInfo.image}</Box>
-              <Typography variant="body1" color="primary.500" fontWeight={500}>
+              <Typography component="div" variant="body1" color="primary.500" fontWeight={500}>
                 {poolInfo.name} {poolInfo.isAuto ? '(Auto)' : null}
               </Typography>
             </Box>
@@ -78,13 +78,13 @@ export default function SwapConfirmationStep({ poolInfo = {} }: Props): React$No
         <Box p="16px" bgcolor="#244ABF" borderRadius="8px" color="common.white">
           <Box display="flex" justifyContent="space-between">
             <Box>Total</Box>
-            <Typography fontSize="20px" fontWeight="500">
+            <Typography component="div" fontSize="20px" fontWeight="500">
               11 ADA
             </Typography>
           </Box>
           <Box display="flex" justifyContent="space-between">
             <Box />
-            <Typography variant="body1">4.32 USD</Typography>
+            <Typography component="div" variant="body1">4.32 USD</Typography>
           </Box>
         </Box>
       </Box>
@@ -133,20 +133,20 @@ const AssetRow = ({
       </Box>
       <Box flexGrow="1" width="100%">
         <Box>
-          <Typography variant="body1">{name}</Typography>
+          <Typography component="div" variant="body1">{name}</Typography>
         </Box>
         <Box>
-          <Typography variant="body2" color="grayscale.600">
+          <Typography component="div" variant="body2" color="grayscale.600">
             {address}
           </Typography>
         </Box>
       </Box>
       <Box flexShrink="0" display="flex" flexDirection="column" alignItems="flex-end">
-        <Typography variant="body1" color="grayscale.900">
+        <Typography component="div" variant="body1" color="grayscale.900">
           <span>{amount}</span>&nbsp;<span>{ticker}</span>
         </Typography>
         {usdAmount && (
-          <Typography variant="body2" color="grayscale.600">
+          <Typography component="div" variant="body2" color="grayscale.600">
             {usdAmount} USD
           </Typography>
         )}
@@ -158,7 +158,7 @@ const AssetRow = ({
 const SummaryRow = ({ col1, col2, withInfo = false }) => (
   <Box display="flex" alignItems="center" justifyContent="space-between">
     <Box display="flex" alignItems="center">
-      <Typography variant="body1" color="grayscale.500">
+      <Typography component="div" variant="body1" color="grayscale.500">
         {col1}
       </Typography>
       {withInfo ? (
@@ -168,7 +168,7 @@ const SummaryRow = ({ col1, col2, withInfo = false }) => (
       ) : null}
     </Box>
     <Box>
-      <Typography variant="body1">{col2}</Typography>
+      <Typography component="div" variant="body1">{col2}</Typography>
     </Box>
   </Box>
 );

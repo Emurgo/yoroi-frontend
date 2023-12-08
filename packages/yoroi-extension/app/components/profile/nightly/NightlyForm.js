@@ -134,10 +134,10 @@ class NightlyForm extends Component<Props & InjectedLayoutProps, State> {
             }}
           >
             <NightlyIconRevamp />
-            <Typography variant="h1" fontWeight={500} mb="8px" mt="24px" lineHeight="24px">
+            <Typography component="div" variant="h1" fontWeight={500} mb="8px" mt="24px" lineHeight="24px">
               {intl.formatMessage(globalMessages.yoroiNightly)}
             </Typography>
-            <Typography variant="body1" fontWeight={500} lineHeight="24px">
+            <Typography component="div" variant="body1" fontWeight={500} lineHeight="24px">
               {intl.formatMessage(messages.nightlySlogan)}
             </Typography>
           </Box>
@@ -148,12 +148,12 @@ class NightlyForm extends Component<Props & InjectedLayoutProps, State> {
               gap: '30px',
             }}
           >
-            <Typography variant="body1" lineHeight="24px">
+            <Typography component="div" variant="body1" lineHeight="24px">
               <FormattedHTMLMessage {...messages.header} />
             </Typography>
 
             <Box>
-              <Typography variant="body1" lineHeight="24px">
+              <Typography component="div" variant="body1" lineHeight="24px">
                 {intl.formatMessage(messages.warningHeader)}
               </Typography>
               <Box
@@ -163,17 +163,17 @@ class NightlyForm extends Component<Props & InjectedLayoutProps, State> {
                   pl: '4px',
                 }}
               >
-                <Typography component="li" variant="body1" lineHeight="24px">
+                <Typography component="div" component="li" variant="body1" lineHeight="24px">
                   {intl.formatMessage(messages.warning1)}
                 </Typography>
-                <Typography component="li" variant="body1" lineHeight="24px">
+                <Typography component="div" component="li" variant="body1" lineHeight="24px">
                   {intl.formatMessage(messages.warning2)}
                 </Typography>
               </Box>
             </Box>
 
             <Box>
-              <Typography variant="body1" lineHeight="24px">
+              <Typography component="div" variant="body1" lineHeight="24px">
                 {intl.formatMessage(messages.recommendationHeader)}
               </Typography>
               <Box
@@ -183,10 +183,10 @@ class NightlyForm extends Component<Props & InjectedLayoutProps, State> {
                   pl: '4px',
                 }}
               >
-                <Typography component="li" variant="body1" lineHeight="24px">
+                <Typography component="div" component="li" variant="body1" lineHeight="24px">
                   {intl.formatMessage(messages.recommendation1)}
                 </Typography>
-                <Typography component="li" variant="body1" lineHeight="24px">
+                <Typography component="div" component="li" variant="body1" lineHeight="24px">
                   {intl.formatMessage(messages.recommendation2)}
                 </Typography>
               </Box>

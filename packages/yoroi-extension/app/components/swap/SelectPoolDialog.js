@@ -52,27 +52,27 @@ export default function SelectPoolDialog({
                 <Box width="32px" height="32px">
                   {image}
                 </Box>
-                <Typography component="span" variant="body1" fontWeight={500}>
+                <Typography component="div" component="span" variant="body1" fontWeight={500}>
                   {name}
                 </Typography>
               </Box>
               <Box textAlign="right">
-                <Typography component="span" variant="body1">
+                <Typography component="div" component="span" variant="body1">
                   {price} ADA
                 </Typography>
               </Box>
               <Box textAlign="right">
-                <Typography component="span" variant="body1">
+                <Typography component="div" component="span" variant="body1">
                   {liquidity}
                 </Typography>
               </Box>
               <Box textAlign="right">
-                <Typography component="span" variant="body1">
+                <Typography component="div" component="span" variant="body1">
                   {fee}%
                 </Typography>
               </Box>
               <Box textAlign="right">
-                <Typography component="span" variant="body1">
+                <Typography component="div" component="span" variant="body1">
                   {deposit}
                 </Typography>
               </Box>

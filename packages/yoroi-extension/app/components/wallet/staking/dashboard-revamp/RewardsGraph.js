@@ -58,19 +58,19 @@ export default class RewardGraph extends Component<Props> {
               borderRadius: '4px',
             }}
           >
-            <p>
+            <div>
               <span>{epochTitle}:</span>&nbsp;
               <span>{label}</span>
-            </p>
-            <p>
+            </div>
+            <div>
               <span>{primaryBarLabel}:</span>&nbsp;
               <span>{payload[0].value}</span>
-            </p>
+            </div>
             {poolName && (
-              <p>
+              <div>
                 <span>{stakepoolNameTitle}:</span>&nbsp;
                 <span>{payload[0].payload.poolName}</span>
-              </p>
+              </div>
             )}
           </Box>
         );
@@ -82,7 +82,7 @@ export default class RewardGraph extends Component<Props> {
     const graphTooltip = <GraphTooltip />;
     return (
       <>
-        <Typography
+        <Typography component="div"
           variant="body1"
           color="var(--yoroi-palette-gray-600)"
           sx={{

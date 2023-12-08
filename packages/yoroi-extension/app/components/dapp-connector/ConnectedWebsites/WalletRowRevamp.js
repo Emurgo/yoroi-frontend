@@ -131,10 +131,10 @@ export default class WalletRowRevamp extends Component<Props, State> {
             {plateIcon}
           </Box>
           <div>
-            <Typography variant="caption1" color="grayscale.900" id="connectedWalletNameLabel">
+            <Typography component="div" variant="caption1" color="grayscale.900" id="connectedWalletNameLabel">
               {settingsCache.conceptualWalletName}
             </Typography>
-            <Typography variant="body2" fontWeight={500} id="connectedWalletBalanceLabel">
+            <Typography component="div" variant="body2" fontWeight={500} id="connectedWalletBalanceLabel">
               {this.renderAmountDisplay({
                 shouldHideBalance,
                 amount: balance,
@@ -146,7 +146,7 @@ export default class WalletRowRevamp extends Component<Props, State> {
           <Box width="32px" height="32px" borderRadius="50%" overflow="hidden">
             {websiteIcon ? <img width="100%" src={websiteIcon} alt={url} /> : <NoDappImage />}
           </Box>
-          <Typography
+          <Typography component="div"
             variant="body1"
             color="grayscale.900"
             sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}

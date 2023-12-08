@@ -117,12 +117,12 @@ export default class WalletReceiveRevamp extends Component<Props> {
     const { intl } = this.context;
 
     const header = (
-      <Typography component="h2" variant="body2" color="grayscale.500" textAlign="right">
+      <Typography component="div" component="h2" variant="body2" color="grayscale.500" textAlign="right">
         {intl.formatMessage(messages.outputAmountUTXO)}
       </Typography>
     );
     const body = address => (
-      <Typography variant="body1" color="grayscale.900" textAlign="right">
+      <Typography component="div" variant="body1" color="grayscale.900" textAlign="right">
         {address.values != null ? (
           <span>{this.getAmount(address.values.getDefaultEntry())}</span>
         ) : (
@@ -153,16 +153,16 @@ export default class WalletReceiveRevamp extends Component<Props> {
           borderBottomColor="grayscale.200"
           className={styles.generatedAddressesGrid}
         >
-          <Typography color="grayscale.600" component="h2" variant="body2">
+          <Typography component="div" color="grayscale.600" component="h2" variant="body2">
             {intl.formatMessage(messages.generatedAddressesSectionTitle)}
           </Typography>
           {valueBlock.header}
           {onGeneratePaymentURI != null && (
-            <Typography color="grayscale.600" component="h2" variant="body2" textAlign="right">
+            <Typography component="div" color="grayscale.600" component="h2" variant="body2" textAlign="right">
               {intl.formatMessage(messages.generateURLLabel)}
             </Typography>
           )}
-          <Typography color="grayscale.600" component="h2" variant="body2" textAlign="right">
+          <Typography component="div" color="grayscale.600" component="h2" variant="body2" textAlign="right">
             {intl.formatMessage(messages.verifyAddressLabel)}
           </Typography>
         </Box>
@@ -199,7 +199,7 @@ export default class WalletReceiveRevamp extends Component<Props> {
                   }
                 >
                   <RawHash light={address.isUsed === true}>
-                    <Typography variant="body1" color="grayscale.900">
+                    <Typography component="div" variant="body1" color="grayscale.900">
                       {truncateAddressShort(address.address, 16)}
                     </Typography>
                   </RawHash>
@@ -259,7 +259,7 @@ export default class WalletReceiveRevamp extends Component<Props> {
           <div className={styles.notFound}>
             <NoTransactionModernSvg />
             <h1>{intl.formatMessage(messages.noResultsFoundLabel)}</h1>
-            <p>{intl.formatMessage(messages.notFoundAnyAddresses)}</p>
+            <div>{intl.formatMessage(messages.notFoundAnyAddresses)}</div>
           </div>
         </div>
       );

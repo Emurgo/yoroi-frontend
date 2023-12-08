@@ -256,7 +256,7 @@ class AddCollateralPage extends Component<Props, State> {
     return (
       <Box overflowWrap="break-word" display="flex" height="100%" flexDirection="column">
         <Box maxWidth={480} margin="0 auto" padding="32px" flex="1" flexGrow="1" overflow="auto">
-          <Typography
+          <Typography component="div"
             textAlign="center"
             color="gray.900"
             variant="h4"
@@ -270,7 +270,7 @@ class AddCollateralPage extends Component<Props, State> {
           <Box textAlign="center" my="32px">
             <AddCollateralIcon />
           </Box>
-          <Typography>
+          <Typography component="div">
             <FormattedMessage
               {...messages.reorgMessage}
               values={{
@@ -291,8 +291,8 @@ class AddCollateralPage extends Component<Props, State> {
               gap="16px"
             >
               <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Typography>{intl.formatMessage(globalMessages.amount)}</Typography>
-                <Typography id="addCollateralAmountTitle">
+                <Typography component="div">{intl.formatMessage(globalMessages.amount)}</Typography>
+                <Typography component="div" id="addCollateralAmountTitle">
                   {this.renderAmountDisplay({
                     entry: {
                       identifier: txData.fee.tokenId,
@@ -303,8 +303,8 @@ class AddCollateralPage extends Component<Props, State> {
                 </Typography>
               </Box>
               <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Typography>{intl.formatMessage(signTxMessages.transactionFee)}</Typography>
-                <Typography id="addCollateralFeeTitle">
+                <Typography component="div">{intl.formatMessage(signTxMessages.transactionFee)}</Typography>
+                <Typography component="div" id="addCollateralFeeTitle">
                   {this.renderAmountDisplay({
                     entry: {
                       identifier: txData.fee.tokenId,

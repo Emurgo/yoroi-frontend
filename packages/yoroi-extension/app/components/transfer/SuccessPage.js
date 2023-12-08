@@ -55,7 +55,7 @@ class SuccessPage extends Component<Props & InjectedLayoutProps> {
         <div className={styles.component}>
           <div>
             <div className={styles.successImg} />
-            <Typography
+            <Typography component="div"
               variant="body1"
               color={isRevampLayout ? 'primary' : 'secondary.300'}
               textAlign="center"
@@ -64,7 +64,7 @@ class SuccessPage extends Component<Props & InjectedLayoutProps> {
             >
               {title}
             </Typography>
-            <Typography
+            <Typography component="div"
               variant="body2"
               color="gray.900"
               textAlign="center"

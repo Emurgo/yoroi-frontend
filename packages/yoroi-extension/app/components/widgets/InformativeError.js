@@ -20,7 +20,7 @@ export default class InformativeError extends Component<Props> {
         <div className={styles.text}>
           <h3 className={styles.title}>{this.props.title}</h3>
           {this.props.text != null && (
-            <p className={styles.paragraph}>{this.props.text}</p>
+            <div className={styles.paragraph}>{this.props.text}</div>
           )}
         </div>
         <EmptyIllustration />

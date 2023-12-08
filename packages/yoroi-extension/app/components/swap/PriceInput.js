@@ -47,7 +47,7 @@ export default function PriceInput({
         {label}
       </Box>
 
-      <Typography
+      <Typography component="div"
         sx={{
           appearance: 'none',
           border: '0',

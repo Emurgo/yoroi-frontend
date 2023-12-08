@@ -194,7 +194,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
             alignItems: 'center',
           }}
         >
-          <Typography
+          <Typography component="div"
             variant="h2"
             as="p"
             fontSize="18px"
@@ -220,13 +220,13 @@ export default class WalletSummaryRevamp extends Component<Props> {
           )}
         </Box>
         <Box sx={{ pb: hasPendingAmount ? '16px' : 0 }}>
-          <Typography variant="body1">
+          <Typography component="div" variant="body1">
             {this.renderPendingAmount(
               pendingAmount.incoming,
               intl.formatMessage(messages.pendingIncomingConfirmationLabel)
             )}
           </Typography>
-          <Typography variant="body1">
+          <Typography component="div" variant="body1">
             {this.renderPendingAmount(
               pendingAmount.outgoing,
               intl.formatMessage(messages.pendingOutgoingConfirmationLabel)
@@ -245,20 +245,20 @@ export default class WalletSummaryRevamp extends Component<Props> {
             }}
           >
             <Grid item xs={4}>
-              <Typography variant="body2">
+              <Typography component="div" variant="body2">
                 {intl.formatMessage({ id: 'wallet.summary.page.type' })}
               </Typography>
             </Grid>
             <Grid item xs={2} sx={{ textAlign: 'left' }}>
-              <Typography variant="body2">
+              <Typography component="div" variant="body2">
                 {intl.formatMessage({ id: 'wallet.summary.page.status' })}
               </Typography>
             </Grid>
             <Grid item xs={2} sx={{ textAlign: 'right' }}>
-              <Typography variant="body2">{intl.formatMessage(globalMessages.feeLabel)}</Typography>
+              <Typography component="div" variant="body2">{intl.formatMessage(globalMessages.feeLabel)}</Typography>
             </Grid>
             <Grid item xs={4} sx={{ textAlign: 'right', pr: '30px' }}>
-              <Typography variant="body2">
+              <Typography component="div" variant="body2">
                 {intl.formatMessage(globalMessages.amountLabel)}
               </Typography>
             </Grid>

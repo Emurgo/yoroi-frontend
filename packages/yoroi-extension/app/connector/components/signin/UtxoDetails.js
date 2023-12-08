@@ -161,7 +161,7 @@ class UtxoDetails extends Component<Props> {
         backgroundColor={request.addressIndex % 2 === 0 ? 'initial' : '#EEF7FC'}
         borderRadius="8px"
       >
-        <Typography py="4px">{request.addressIndex + 1}</Typography>
+        <Typography component="div" py="4px">{request.addressIndex + 1}</Typography>
         <CopyableAddress
           hash={this.props.addressToDisplayString(request.address.address)}
           elementId={notificationElementId}
@@ -176,7 +176,7 @@ class UtxoDetails extends Component<Props> {
             light
             linkType="address"
           >
-            <Typography as="span" color="var(--yoroi-palette-gray-600)">
+            <Typography component="div" as="span" color="var(--yoroi-palette-gray-600)">
               {truncateAddressShort(this.props.addressToDisplayString(request.address.address), 10)}
             </Typography>
           </ExplorableHashContainer>
@@ -214,11 +214,11 @@ class UtxoDetails extends Component<Props> {
       <Box p="8px" px="0">
         <Box marginBottom="40px">
           <Box display="grid" gridTemplateColumns="180px 1fr" px="16px" pb="10px">
-            <Typography variant="body1" fontWeight="500" color="var(--yoroi-palette-gray-900)">
+            <Typography component="div" variant="body1" fontWeight="500" color="var(--yoroi-palette-gray-900)">
               {intl.formatMessage(globalMessages.fromAddresses)}{' '}
               <span>({txData.inputs().length})</span>
             </Typography>
-            <Typography
+            <Typography component="div"
               textAlign="right"
               variant="body1"
               fontWeight="500"
@@ -240,11 +240,11 @@ class UtxoDetails extends Component<Props> {
         </Box>
         <Box>
           <Box display="grid" gridTemplateColumns="180px 1fr" px="16px" pb="10px">
-            <Typography variant="body1" fontWeight="500" color="var(--yoroi-palette-gray-900)">
+            <Typography component="div" variant="body1" fontWeight="500" color="var(--yoroi-palette-gray-900)">
               {intl.formatMessage(globalMessages.toAddresses)}{' '}
               <span>({txData.outputs().length})</span>
             </Typography>
-            <Typography
+            <Typography component="div"
               textAlign="right"
               variant="body1"
               fontWeight="500"

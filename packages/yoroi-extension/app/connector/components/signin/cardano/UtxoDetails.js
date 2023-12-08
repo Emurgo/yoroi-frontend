@@ -157,7 +157,7 @@ class CardanoUtxoDetails extends Component<Props> {
             light
             linkType="address"
           >
-            <Typography as="span" color="#242838">
+            <Typography component="div" as="span" color="#242838">
               {truncateAddressShort(addressHash, 10)}
             </Typography>
           </ExplorableHashContainer>
@@ -196,13 +196,13 @@ class CardanoUtxoDetails extends Component<Props> {
       <Box>
         <Box>
           <Box pb="10px">
-            <Typography variant="body1" fontWeight="500" color="#000">
+            <Typography component="div" variant="body1" fontWeight="500" color="#000">
               {intl.formatMessage(connectorMessages.fromAddresses, { qty: txData.inputs.length })}
             </Typography>
           </Box>
           <Panel>
             <Box>
-              <Typography variant="body1" fontWeight="500" color="#4A5065">
+              <Typography component="div" variant="body1" fontWeight="500" color="#4A5065">
                 {intl.formatMessage(connectorMessages.yourAddresses)}
               </Typography>
               <Box id="fromAddressesBox-yourInputs">
@@ -221,7 +221,7 @@ class CardanoUtxoDetails extends Component<Props> {
               <>
                 <Separator />
                 <Box>
-                  <Typography variant="body1" fontWeight="500" color="#4A5065">
+                  <Typography component="div" variant="body1" fontWeight="500" color="#4A5065">
                     {intl.formatMessage(connectorMessages.foreignAddresses)}
                   </Typography>
                   <Box id="fromAddressesBox-foreignInputs">
@@ -241,13 +241,13 @@ class CardanoUtxoDetails extends Component<Props> {
         </Box>
         <Box>
           <Box pb="10px">
-            <Typography variant="body1" fontWeight="500" color="#000">
+            <Typography component="div" variant="body1" fontWeight="500" color="#000">
               {intl.formatMessage(connectorMessages.toAddresses, { qty: txData.outputs.length })}
             </Typography>
           </Box>
           <Panel withMargin={false}>
             <Box>
-              <Typography variant="body1" fontWeight="500" color="#4A5065">
+              <Typography component="div" variant="body1" fontWeight="500" color="#4A5065">
                 {intl.formatMessage(connectorMessages.yourAddresses)}
               </Typography>
               <Box id="toAddressesBox-yourOutputs">
@@ -267,7 +267,7 @@ class CardanoUtxoDetails extends Component<Props> {
               <>
                 <Separator />
                 <Box id="toAddressesBox-foreignOutputs">
-                  <Typography variant="body1" fontWeight="500" color="#4A5065">
+                  <Typography component="div" variant="body1" fontWeight="500" color="#4A5065">
                     {intl.formatMessage(connectorMessages.foreignAddresses)}
                   </Typography>
                   <Box>

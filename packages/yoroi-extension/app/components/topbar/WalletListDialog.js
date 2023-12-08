@@ -215,8 +215,8 @@ export default class WalletListDialog extends Component<Props, State> {
             <div className={styles.totalInfo}>
               {walletsTotal !== undefined && (
                 <div className={styles.amount}>
-                  <p className={styles.label}>{intl.formatMessage(messages.totalBalance)}</p>
-                  <p className={styles.value}>{walletsTotal}</p>
+                  <div className={styles.label}>{intl.formatMessage(messages.totalBalance)}</div>
+                  <div className={styles.value}>{walletsTotal}</div>
                 </div>
               )}
               <button type="button" className={styles.toggleButton} onClick={onUpdateHideBalance}>

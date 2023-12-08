@@ -580,7 +580,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     : intl.formatMessage(messages.memoFieldLabelInactive)
                 }
               />
-              <Typography
+              <Typography component="div"
                 variant="caption1"
                 color={invalidMemo ? 'magenta.500' : 'grayscale.600'}
                 sx={{ position: 'absolute', bottom: '5px', right: '0' }}
@@ -594,7 +594,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
         return (
           <Box className={styles.amountStep}>
             {isCalculatingFee && (
-              <Typography
+              <Typography component="div"
                 variant="caption1"
                 sx={{
                   position: 'absolute',
@@ -609,7 +609,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             )}
 
             {!isDefaultIncluded && (
-              <Typography
+              <Typography component="div"
                 variant="caption1"
                 sx={{
                   position: 'absolute',
@@ -640,7 +640,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     }),
               }}
             >
-              <Typography
+              <Typography component="div"
                 sx={{
                   position: 'absolute',
                   top: '-8px',
@@ -697,7 +697,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   placeholder="0"
                 />
 
-                <Typography variant="button2" color="grey.600" fontWeight={500} mr="12px">
+                <Typography component="div" variant="button2" color="grey.600" fontWeight={500} mr="12px">
                   {isErgo(this.props.selectedNetwork) ? 'ERG' : 'ADA'}
                 </Typography>
 
@@ -754,7 +754,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 </Box>
               )}
               {isDefaultIncluded && (
-                <Typography
+                <Typography component="div"
                   sx={{
                     position: 'absolute',
                     bottom: '-25px',

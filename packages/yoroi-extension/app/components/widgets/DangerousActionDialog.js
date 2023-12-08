@@ -82,7 +82,7 @@ class DangerousActionDialog extends Component<Props & InjectedLayoutProps> {
           />
         </div>
 
-        {error ? <p className={styles.error}>{intl.formatMessage(error, error.values)}</p> : null}
+        {error ? <div className={styles.error}>{intl.formatMessage(error, error.values)}</div> : null}
       </div>
     );
 
@@ -102,7 +102,7 @@ class DangerousActionDialog extends Component<Props & InjectedLayoutProps> {
             sx={{ marginLeft: '-0px' }}
           />
         </Box>
-        {error ? <p className={styles.error}>{intl.formatMessage(error, error.values)}</p> : null}
+        {error ? <div className={styles.error}>{intl.formatMessage(error, error.values)}</div> : null}
       </Box>
     );
 

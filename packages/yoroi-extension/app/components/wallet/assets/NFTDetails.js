@@ -318,7 +318,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                 {isCardanoHaskell(network) && (
                   <LabelWithValue
                     label={
-                      <Typography as="span" display="flex">
+                      <Typography component="div" as="span" display="flex">
                         {intl.formatMessage(tokenMessages.detailsOn)}
                       </Typography>
                     }
@@ -365,7 +365,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                   {intl.formatMessage(messages.copyMetadata)}
                 </Button>
               )}
-              <Typography component="pre" variant="body3" lineHeight="22px" fontFamily="monospace">
+              <Typography component="div" component="pre" variant="body3" lineHeight="22px" fontFamily="monospace">
                 {nftInfo.metadata
                   ? JSON.stringify(nftInfo.metadata, null, 2)
                   : intl.formatMessage(messages.missingMetadata)}
@@ -464,8 +464,8 @@ export function CopyAddress({ text, children }: {| text: string, children: Node 
 function LabelWithValue({ label, value }: {| label: string | Node, value: string | Node |}): Node {
   return (
     <Box>
-      <Typography color="var(--yoroi-palette-gray-600)">{label}</Typography>
-      <Typography color="var(--yoroi-palette-gray-900)">{value}</Typography>
+      <Typography component="div" color="var(--yoroi-palette-gray-600)">{label}</Typography>
+      <Typography component="div" color="var(--yoroi-palette-gray-900)">{value}</Typography>
     </Box>
   );
 }

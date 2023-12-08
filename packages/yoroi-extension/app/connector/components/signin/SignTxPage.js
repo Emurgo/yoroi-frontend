@@ -273,7 +273,7 @@ class SignTxPage extends Component<Props, State> {
         connectionContent={
           <Box paddingTop="8px" overflowWrap="break-word">
             <Box pt="32px">
-              <Typography color="var(--yoroi-palette-gray-900)" variant="h5" marginBottom="8px">
+              <Typography component="div" color="var(--yoroi-palette-gray-900)" variant="h5" marginBottom="8px">
                 {intl.formatMessage(signTxMessages.totals)}
               </Typography>
               <Box
@@ -292,8 +292,8 @@ class SignTxPage extends Component<Props, State> {
                   py="6px"
                   px="10px"
                 >
-                  <Typography>{intl.formatMessage(signTxMessages.transactionFee)}</Typography>
-                  <Typography>
+                  <Typography component="div">{intl.formatMessage(signTxMessages.transactionFee)}</Typography>
+                  <Typography component="div">
                     {this.renderAmountDisplay({
                       entry: {
                         ...txData.fee().getDefaultEntry(),
@@ -313,8 +313,8 @@ class SignTxPage extends Component<Props, State> {
                   backgroundColor="primary.600"
                   color="var(--yoroi-palette-common-white)"
                 >
-                  <Typography>{intl.formatMessage(signTxMessages.totalAmount)}</Typography>
-                  <Typography variant="h3">
+                  <Typography component="div">{intl.formatMessage(signTxMessages.totalAmount)}</Typography>
+                  <Typography component="div" variant="h3">
                     {this.renderAmountDisplay({
                       entry: {
                         ...amount.getDefaultEntry(),

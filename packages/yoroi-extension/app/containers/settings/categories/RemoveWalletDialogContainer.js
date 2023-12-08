@@ -108,8 +108,8 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
           onClick: this.generated.actions.dialogs.closeActiveDialog.trigger,
         }}
       >
-        <p>{intl.formatMessage(messages.removeExplanation)}</p>
-        <p>{intl.formatMessage(dialogMessages.warning2)}</p>
+        <div>{intl.formatMessage(messages.removeExplanation)}</div>
+        <div>{intl.formatMessage(dialogMessages.warning2)}</div>
       </DangerousActionDialog>
     );
     const DangerousActionDialogRevamp = (
@@ -129,8 +129,8 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
           onClick: this.generated.actions.dialogs.closeActiveDialog.trigger,
         }}
       >
-        <p>{intl.formatMessage(messages.removeExplanation)}</p>
-        <p>{intl.formatMessage(dialogMessages.warning2)}</p>
+        <div>{intl.formatMessage(messages.removeExplanation)}</div>
+        <div>{intl.formatMessage(dialogMessages.warning2)}</div>
       </DangerousActionDialog>
     );
 

@@ -291,7 +291,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
             <Tooltip
               placement="top"
               title={
-                <Typography textAlign="center">
+                <Typography component="div" textAlign="center">
                   <FormattedMessage
                     {...messages.minAdaHelp}
                     values={{ moreDetails: moreDetailsLink }}
@@ -416,12 +416,12 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
             <div className={styles.staleTxWarning}>{this.props.staleTx && staleTxWarning}</div>
             <div>
               <Box mb="8px">
-                <Typography variant="body1" color="grayscale.600">
+                <Typography component="div" variant="body1" color="grayscale.600">
                   {intl.formatMessage(messages.receiverLabel)}
                 </Typography>
               </Box>
               <Box>
-                <Typography
+                <Typography component="div"
                   variant="body1"
                   sx={{
                     color: 'grayscale.900',

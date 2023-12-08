@@ -39,7 +39,7 @@ export default class CustomTooltip extends Component<Props> {
         ])}
       >
         <Tooltip
-          title={<Typography variant="body3">{toolTip}</Typography>}
+          title={<Typography component="div" variant="body3">{toolTip}</Typography>}
           placement="top"
         >
           <span className={styles.infoIcon}>

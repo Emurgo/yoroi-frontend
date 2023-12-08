@@ -93,7 +93,7 @@ export default class ThemeSettingsBlock extends Component<Props> {
     const isRevampLayout = currentTheme === THEMES.YOROI_REVAMP;
 
     const blogLink = (
-      <Typography
+      <Typography component="div"
         as="a"
         variant="body2"
         href={intl.formatMessage(messages.blogLinkUrl)}
@@ -117,7 +117,7 @@ export default class ThemeSettingsBlock extends Component<Props> {
           py: !isRevampLayout && '24px',
         }}
       >
-        <Typography
+        <Typography component="div"
           variant={isRevampLayout ? 'body1' : 'h5'}
           fontWeight={500}
           mb={isRevampLayout ? '0px' : '12px'}
@@ -170,7 +170,7 @@ export default class ThemeSettingsBlock extends Component<Props> {
         {currentTheme !== THEMES.YOROI_REVAMP && (
           <Box>
             <Box sx={{ marginTop: '20px' }}>
-              <Typography
+              <Typography component="div"
                 variant="h5"
                 sx={{
                   fontWeight: 500,
@@ -181,14 +181,14 @@ export default class ThemeSettingsBlock extends Component<Props> {
               >
                 {intl.formatMessage(messages.selectColorTheme)}
               </Typography>
-              <Typography
+              <Typography component="div"
                 variant="body2"
                 color="var(--yoroi-support-settings-text)"
                 sx={{ marginBottom: '2px' }}
               >
                 <FormattedHTMLMessage {...messages.themeNote} />
               </Typography>
-              <Typography variant="body2" color="var(--yoroi-support-settings-text)">
+              <Typography component="div" variant="body2" color="var(--yoroi-support-settings-text)">
                 <FormattedMessage {...messages.blog} values={{ blogLink }} />
               </Typography>
             </Box>

@@ -82,10 +82,10 @@ function CardanoSignTxSummary({
       sx={{ background: 'linear-gradient(30.09deg, #244ABF 0%, #4760FF 176.73%)' }}
     >
       <Box display="flex" justifyContent="space-between" alignItems="center" id="signTxMessagesSummaryBox">
-        <Typography variant="b1" fontWeight={500}>
+        <Typography component="div" variant="b1" fontWeight={500}>
           {intl.formatMessage(signTxMessages.summary)}
         </Typography>
-        <Typography variant="h3" fontSize="24px" textAlign="right" id="signTxMessagesSummaryBox-total">
+        <Typography component="div" variant="h3" fontSize="24px" textAlign="right" id="signTxMessagesSummaryBox-total">
           {showOnlyTxFee ? total.fee : total.total} {total.ticker}
         </Typography>
       </Box>
