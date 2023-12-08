@@ -93,9 +93,6 @@ export async function migrateToLatest(
       const ledgerDeviceWasRemove = await removeLedgerDevices(persistentDb);
       return txHistoryWasReset || ledgerDeviceWasRemove;
     }],
-    ['<3.7.0', async () => {
-      return await removeErgoDevices(persistentDb);
-    }],
     ['<3.8.0', async () => {
       return await cardanoTxHistoryReset(persistentDb);
     }],
@@ -324,7 +321,6 @@ async function removeErgoDevices(
     if (!isErgoNetwork) {
       continue;
     }
-    // recall: at this point, we only supported Ergo on nightly
     await removePublicDeriver({
       publicDeriver,
       conceptualWallet: publicDeriver.getParent(),

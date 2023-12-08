@@ -22,73 +22,6 @@ export function asAddress(input: any): Address {
   throw ConnectorError.invalidRequest(`invalid Address: ${JSON.stringify(input)}`);
 }
 
-// hex string box id
-export type ErgoBoxId = string;
-
-export function asBoxId(input: any): ErgoBoxId {
-  if (typeof input === 'string') {
-    return input;
-  }
-  throw ConnectorError.invalidRequest(`invalid BoxId: ${JSON.stringify(input)}`);
-}
-
-// hex bytes of sigma-rust encoding
-type ErgoConstant = string;
-
-export function asConstant(input: any): ErgoConstant {
-  if (typeof input === 'string') {
-    return input;
-  }
-  throw ConnectorError.invalidRequest(`invalid Constant: : ${JSON.stringify(input)}`);
-}
-
-// empty object is for P2PK
-// values map is from id to hex-encoded Sigma-state value
-type ErgoContextExtension = {||} | {|
-  values: {| [string]: string |}
-|};
-
-export function asContextExtension(input: any): ErgoContextExtension {
-  if (typeof input === 'object') {
-    if (Object.entries(input).length === 0) {
-      // flow complains without the freeze
-      return Object.freeze({});
-    }
-    if (Array.isArray(input.values)) {
-      return {
-        values: Object.fromEntries(Object.entries(input.values).map(([k, v]) => {
-          if (typeof k === 'string' && typeof v === 'string') {
-            return [k, v];
-          }
-          throw ConnectorError.invalidRequest(`ContextExtension must map from string -> string: ${JSON.stringify(input)}`);
-        }))
-      };
-    }
-  }
-  throw ConnectorError.invalidRequest(`ContextExtension must be a map: : ${JSON.stringify(input)}`);
-}
-
-// <TODO:PENDING_REMOVAL> Ergo
-export type DataInput = {|
-    boxId: ErgoBoxId,
-|};
-
-// <TODO:PENDING_REMOVAL> Ergo
-export type UnsignedInput = {|
-  extension: ErgoContextExtension,
-  boxId: ErgoBoxId,
-  value: string,
-  ergoTree: string,
-  assets: Array<{|
-    tokenId: string, // hex
-    amount: string,
-  |}>,
-  creationHeight: number,
-  additionalRegisters: {| [key: string]: string |},
-  transactionId: string,
-  index: number
-|};
-
 export type Paginate = {|
   page: number,
   limit: number,
@@ -107,21 +40,6 @@ export function asPaginate(input: any): Paginate {
 export type PaginateError = {|
     maxSize: number,
 |};
-
-export type ProverResult = {|
-    proofBytes: string,
-    extension: ErgoContextExtension,
-|};
-
-export function asProverResult(input: any): ProverResult {
-  if (typeof input === 'object' && typeof input.proofBytes === 'string') {
-    return {
-      proofBytes: input.proofBytes,
-      extension: asContextExtension(input.extension)
-    };
-  }
-  throw ConnectorError.invalidRequest(`invalid ProverResult: ${JSON.stringify(input)}`);
-}
 
 export type TokenAmount = {|
   tokenId: TokenId,
@@ -246,7 +164,7 @@ export type WalletAuthEntry = {|
 
 export type WhitelistEntry = {|
   url: string,
-  protocol: 'ergo' | 'cardano',
+  protocol: 'cardano',
   publicDeriverId: number,
   appAuthID: ?string,
   auth: ?WalletAuthEntry,
@@ -258,7 +176,7 @@ export type ConnectingMessage = {|
   url: string,
   appAuthID?: string,
   imgBase64Url: string,
-  protocol: 'ergo' | 'cardano',
+  protocol: 'cardano',
 |};
 export type SigningMessage = {|
   publicDeriverId: number,
@@ -271,7 +189,7 @@ export type ConnectedSites = {|
 |};
 
 export type Protocol = {|
-  type: 'ergo' | 'cardano'
+  type: 'cardano'
 |}
 export type RpcUid = number;
 

@@ -149,6 +149,7 @@ async function handleConnectorConnectRequest(event, protocol) {
           .then(imgBase64Url => {
               const message = {
                   imgBase64Url,
+                  // <TODO:PENDING_REMOVAL> Protocol
                   type: `yoroi_connect_request/${protocol}`,
                   connectParameters: {
                       url: location.hostname,

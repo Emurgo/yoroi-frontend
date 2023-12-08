@@ -6,7 +6,6 @@
  */
 export const PRIMARY_ASSET_CONSTANTS = {
   Cardano: '',
-  Ergo: '',
 };
 
 export const CoreAddressTypes = Object.freeze({
@@ -15,12 +14,6 @@ export const CoreAddressTypes = Object.freeze({
   CARDANO_PTR: 2,
   CARDANO_ENTERPRISE: 3,
   CARDANO_REWARD: 4,
-  // <TODO:PENDING_REMOVAL> Ergo
-  ERGO_P2PK: 2_00,
-  // <TODO:PENDING_REMOVAL> Ergo
-  ERGO_P2SH: 2_01,
-  // <TODO:PENDING_REMOVAL> Ergo
-  ERGO_P2S: 2_02,
 });
 export type CoreAddressT = $Values<typeof CoreAddressTypes>;
 

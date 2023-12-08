@@ -176,8 +176,8 @@ type PendingSign = {|
 
 type ConnectedSite = {|
   url: string,
-  // <TODO:PENDING_REMOVAL> Ergo protocol
-  protocol: 'cardano' | 'ergo',
+  // <TODO:PENDING_REMOVAL> Legacy
+  protocol: 'cardano',
   appAuthID?: string,
   status: ConnectedStatus,
   pendingSigns: {| [uid: string]: PendingSign |},
@@ -912,8 +912,8 @@ async function confirmSign(
 async function findWhitelistedConnection(
   url: string,
   requestIdentification?: boolean,
-  // <TODO:PENDING_REMOVAL> Ergo protocol
-  protocol: 'cardano' | 'ergo',
+  // <TODO:PENDING_REMOVAL> Legacy
+  protocol: 'cardano',
   localStorageApi: LocalStorageApi,
 ): Promise<?WhitelistEntry> {
   const isAuthRequested = Boolean(requestIdentification);
@@ -937,11 +937,12 @@ async function confirmConnect(
     url: string,
     requestIdentification?: boolean,
     onlySilent?: boolean,
-    // <TODO:PENDING_REMOVAL> Ergo protocol
-    protocol: 'cardano' | 'ergo',
+    // <TODO:PENDING_REMOVAL> Protocol
+    protocol: 'cardano',
   |},
   localStorageApi: LocalStorageApi,
 ): Promise<void> {
+  // <TODO:PENDING_REMOVAL> Protocol
   const { url, requestIdentification, onlySilent, protocol } = connectParameters;
   const isAuthRequested = Boolean(requestIdentification);
   const appAuthID = isAuthRequested ? url : undefined;
@@ -1206,11 +1207,9 @@ async function handleInjectorMessage(message, sender) {
           await withSelectedWallet(
             tabId,
             async (wallet) => {
-              const connectionProtocol = await getFromStorage(STORAGE_KEY_CONNECTION_PROTOCOL) ||
-                    'cardano';
               await RustModule.load();
               const balance =
-                    await connectorGetBalance(wallet, tokenId, connectionProtocol);
+                    await connectorGetBalance(wallet, tokenId);
               if (isCBOR && tokenId === '*' && !(typeof balance === 'string')) {
                 const W4 = RustModule.WalletV4;
                 const value = W4.Value.new(

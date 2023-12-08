@@ -60,8 +60,6 @@ export const AddressGroupTypes = Object.freeze({
   byron: 'byron',
   addressBook: 'addressBook',
   group: 'group',
-  // <TODO:PENDING_REMOVAL> Ergo
-  p2pk: 'p2pk',
 });
 
 const commonDescriptions = defineMessages({
@@ -92,10 +90,6 @@ export const addressGroupsTooltip: $ObjMap<typeof AddressGroupTypes, ToMessage> 
       id: 'wallet.address.category.addressBook',
       defaultMessage: '!!!Addresses that do not belong to you, but are relevant to your wallet',
     },
-    p2pk: {
-      id: 'wallet.address.category.p2pk',
-      defaultMessage: '!!!Addresses generated directly from a public key',
-    },
   })
 });
 export const addressGroupName: $ObjMap<typeof AddressGroupTypes, ToMessage> = Object.freeze({
@@ -116,10 +110,6 @@ export const addressGroupName: $ObjMap<typeof AddressGroupTypes, ToMessage> = Ob
     group: {
       id: 'wallet.receive.navigation.groupLabel',
       defaultMessage: '!!!Group'
-    },
-    p2pk: {
-      id: 'wallet.receive.navigation.p2pkLabel',
-      defaultMessage: '!!!P2PK'
     },
     addressBook: {
       id: 'wallet.receive.navigation.AddressBook',

@@ -104,9 +104,6 @@ function bigNumberToValue(x: BigNumber): Value {
 export async function connectorGetBalance(
   wallet: PublicDeriver<>,
   tokenId: TokenId,
-  // <TODO:PENDING_REMOVAL>
-  // eslint-disable-next-line no-unused-vars
-  protocol: 'cardano' | 'ergo',
 ): Promise<AccountBalance | Value> {
   if (tokenId === 'ERG' || tokenId === 'ADA' || tokenId === 'TADA') {
     // can directly query for balance
