@@ -2014,16 +2014,6 @@
         "Name": "CardanoExplorer"
       },
       {
-        "ExplorerId": 300,
-        "NetworkId": 200,
-        "IsBackup": true,
-        "Endpoints": {
-          "address": "https://explorer.ergoplatform.com/en/addresses/",
-          "transaction": "https://explorer.ergoplatform.com/en/transactions/"
-        },
-        "Name": "ErgoPlatform"
-      },
-      {
         "ExplorerId": 500,
         "NetworkId": 400,
         "IsBackup": true,

@@ -1,10 +1,10 @@
 {
-  "name": "test-ergo-dapp",
+  "name": "test-cardano-dapp",
   "version": "0.1.0",
   "description": "test dApp to interact with the Yoroi dApp Connector",
   "main": "index.js",
   "bin": {
-    "test-ergo-dapp": ".bin/test-ergo-dapp.js"
+    "test-cardano-dapp": ".bin/test-cardano-dapp.js"
   },
   "scripts": {
     "build": "webpack --config webpack.config.js",
