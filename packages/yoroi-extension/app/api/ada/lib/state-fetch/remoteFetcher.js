@@ -613,6 +613,12 @@ export class RemoteFetcher implements IFetcher {
           'yoroi-locale': this.getCurrentLocale()
         }
       }
-    ).then(response => response.data);
+    ).then(response => ({
+      LinearFee: response.data.linearFee,
+      MinimumUtxoVal: response.data.minimumUtxoVal,
+      CoinsPerUtxoWord: response.data.coinsPerUtxoWord,
+      PoolDeposit: response.data.poolDeposit,
+      KeyDeposit: response.data.keyDeposit,
+    }));
   }
 }
