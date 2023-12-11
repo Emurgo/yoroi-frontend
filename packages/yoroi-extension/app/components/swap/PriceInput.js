@@ -1,7 +1,7 @@
 // @flow
 import type { Node } from 'react';
 import { Box, Typography } from '@mui/material';
-import type { AssetAmount } from './types'
+import type { AssetAmount } from './types';
 import { BigNumber } from 'bignumber.js';
 
 type Props = {|
@@ -61,7 +61,7 @@ export default function PriceInput({
         placeholder="0"
         bgcolor={readonly ? 'grayscale.50' : 'common.white'}
         readOnly={readonly}
-        value={(new BigNumber(baseCurrency.amount)).div(quoteCurrency.amount).toString()}
+        value={new BigNumber(baseCurrency.amount || 0).div(quoteCurrency.amount || 0).toString()}
       />
       <Box sx={{ justifySelf: 'end' }}>
         <Box height="100%" width="min-content" display="flex" alignItems="center">

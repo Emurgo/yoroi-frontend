@@ -30,6 +30,7 @@ export function genCSP(request: {|
   // Analytics
   connectSrc.push('https://analytics.emurgo-rnd.com/');
   connectSrc.push('https://api2.amplitude.com');
+  connectSrc.push('https://api.muesliswap.com');
 
   // unsafe-inline is unfortunately required by style-loader (even in production builds)
   const evalStyle = "'unsafe-inline'";

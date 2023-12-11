@@ -1,5 +1,5 @@
 // @flow
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import { ReactComponent as SwitchIcon } from '../../../assets/images/revamp/icons/switch.inline.svg';
 import { ReactComponent as InfoIcon } from '../../../assets/images/revamp/icons/info.inline.svg';
@@ -14,18 +14,46 @@ import SlippageDialog from '../../../components/swap/SlippageDialog';
 import SelectPoolDialog from '../../../components/swap/SelectPoolDialog';
 import SwapPool from '../../../components/swap/SwapPool';
 import Tabs from '../../../components/common/tabs/Tabs';
+import {
+  makeLimitOrder,
+  makePossibleMarketOrder,
+  useSwap,
+  useSwapCreateOrder,
+  useSwapPoolsByPair,
+} from '@yoroi/swap';
+import useSwapForm from './hooks';
 
 type Props = {|
   onLimitSwap: void => void,
 |};
 
 export default function SwapForm({ onLimitSwap }: Props): React$Node {
-  const [isMarketOrder, setIsMarketOrder] = useState(true);
   const [openedDialog, setOpenedDialog] = useState('');
-  const [pool, setPool] = useState(poolList[0]);
-  const [slippage, setSlippage] = useState('1');
-  const [fromAsset, setFromAsset] = useState(defaultFromAsset);
-  const [toAsset, setToAsset] = useState(defaultToAsset);
+  const {
+    isMarketOrder,
+    pool,
+    fromAsset,
+    toAsset,
+    setIsMarketOrder,
+    setPool,
+    setFromAsset,
+    setToAsset,
+  } = useSwapForm();
+
+  const { orderData, unsignedTxChanged, poolPairsChanged } = useSwap();
+
+  // useSwapPoolsByPair(
+  //   {
+  //     tokenA: orderData.amounts.sell.tokenId,
+  //     tokenB: orderData.amounts.buy.tokenId,
+  //   },
+  //   {
+  //     enabled: true,
+  //     onSuccess: pools => {
+  //       poolPairsChanged(pools);
+  //     },
+  //   }
+  // );
 
   const handleSwitchSelectedAssets = () => {
     setFromAsset(toAsset);
@@ -139,7 +167,7 @@ export default function SwapForm({ onLimitSwap }: Props): React$Node {
             sx={{ cursor: 'pointer', display: 'flex', gap: '4px', alignItems: 'center' }}
           >
             <Typography variant="body1" color="grayscale.max">
-              {slippage}%
+              {orderData.slippage}%
             </Typography>
             <EditIcon />
           </Box>
@@ -194,13 +222,7 @@ export default function SwapForm({ onLimitSwap }: Props): React$Node {
         />
       )}
 
-      {openedDialog === 'slippage' && (
-        <SlippageDialog
-          currentSlippage={slippage}
-          onSlippageApplied={setSlippage}
-          onClose={() => setOpenedDialog('')}
-        />
-      )}
+      {openedDialog === 'slippage' && <SlippageDialog onClose={() => setOpenedDialog('')} />}
 
       {openedDialog === 'pool' && (
         <SelectPoolDialog

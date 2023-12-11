@@ -23,31 +23,15 @@ export default function SwapInput({
   showMax = false,
   image = null,
   onAssetSelect,
+  error = '',
   handleAmountChange,
 }: Props): Node {
   const { amount, walletAmount, ticker } = asset;
-  const [error, setError] = useState('');
   const [inputValue, setInputValue] = useState(amount || '');
   const [isFocused, setIsFocused] = useState(false);
 
   const handleChange = e => {
-    if (e.target.value === '') {
-      setError('');
-      setInputValue('');
-      return;
-    }
-
-    const val = Number(e.target.value);
-    const checkAmount = isFrom ? walletAmount : Infinity;
-
-    if (val !== 0 && val > checkAmount) {
-      setError('Not enough balance');
-    } else if (Number.isNaN(val)) {
-      setError('Invalid amount');
-    } else {
-      handleAmountChange(val);
-    }
-
+    handleAmountChange(e.target.value);
     setInputValue(e.target.value);
   };
 

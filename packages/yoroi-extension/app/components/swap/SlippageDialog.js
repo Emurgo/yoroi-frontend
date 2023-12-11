@@ -8,24 +8,25 @@ import { ReactComponent as AssetDefault } from '../../assets/images/revamp/asset
 // eslint-disable-next-line no-unused-vars
 import { ReactComponent as NoAssetsFound } from '../../assets/images/revamp/no-assets-found.inline.svg';
 import Tabs from '../common/tabs/Tabs';
+import { useSwap } from '@yoroi/swap';
 
 const defaultSlippages = ['0', '0.1', '0.5', '1', '2', '3', '5', '10'];
 
 type Props = {|
-  currentSlippage: string,
-  onSlippageApplied: string => void,
   onClose: void => void,
 |};
 
-export default function SlippageDialog(
-  { currentSlippage, onSlippageApplied, onClose }: Props
-): React$Node {
-  const [selectedSlippage, setSelectedSlippage] = useState(currentSlippage);
+export default function SlippageDialog({ onClose }: Props): React$Node {
+  const {
+    slippageChanged,
+    orderData: { slippage: currentSlippage },
+  } = useSwap();
+  const [selectedSlippage, setSelectedSlippage] = useState(currentSlippage || '1');
   const [manualSlippage, setManualSlippage] = useState(currentSlippage);
   const [isManual, setIsManual] = useState(!defaultSlippages.includes(currentSlippage));
 
   const handleSlippageApply = () => {
-    onSlippageApplied(isManual ? manualSlippage : selectedSlippage);
+    slippageChanged(isManual ? manualSlippage : selectedSlippage);
     onClose();
   };
 
