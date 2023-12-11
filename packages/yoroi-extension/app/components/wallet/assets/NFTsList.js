@@ -133,7 +133,6 @@ function NfTsList({ list, intl }: Props & Intl): Node {
             ))}
           </Stack>
           <SearchInput
-            disableUnderline
             value={keyword}
             onChange={e => setKeyword(e.target.value)}
             placeholder={intl.formatMessage(messages.searchNFTs)}
