@@ -304,7 +304,7 @@ function TokenItemRow({ avatar, name, id, amount, isTotalAmount }: TokenItemRowP
               width: '70%',
             }}
             color="primary.600"
-            to={id !== '-' && ROUTES.ASSETS.DETAILS.replace(':tokenId', id)}
+            to={id === '-' ? '#' :  ROUTES.ASSETS.DETAILS.replace(':tokenId', id)}
           >
             {name}
           </Typography>
