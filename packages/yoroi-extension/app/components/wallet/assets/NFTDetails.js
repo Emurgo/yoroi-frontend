@@ -365,7 +365,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                   {intl.formatMessage(messages.copyMetadata)}
                 </Button>
               )}
-              <Typography component="div" component="pre" variant="body3" lineHeight="22px" fontFamily="monospace">
+              <Typography component="pre" variant="body3" lineHeight="22px" fontFamily="monospace">
                 {nftInfo.metadata
                   ? JSON.stringify(nftInfo.metadata, null, 2)
                   : intl.formatMessage(messages.missingMetadata)}

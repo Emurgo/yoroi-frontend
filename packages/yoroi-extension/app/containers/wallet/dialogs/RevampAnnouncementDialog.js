@@ -116,7 +116,7 @@ export class RevampAnnouncementDialog extends Component<Props> {
                 }}
               >
                 {[messages.update1, messages.update2, messages.update3].map(message => (
-                  <Typography component="div" component="li" variant="body1" color="grayscale.900">
+                  <Typography component="li" variant="body1" color="grayscale.900">
                     {intl.formatMessage(message)}
                   </Typography>
                 ))}
@@ -130,7 +130,7 @@ export class RevampAnnouncementDialog extends Component<Props> {
                 }}
               >
                 {[messages.update4, messages.update5, messages.update6].map(message => (
-                  <Typography component="div" component="li" variant="body1" color="grayscale.900">
+                  <Typography component="li" variant="body1" color="grayscale.900">
                     {intl.formatMessage(message)}
                   </Typography>
                 ))}

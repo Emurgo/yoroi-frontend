@@ -505,7 +505,7 @@ export default class TransactionRevamp extends Component<Props, State> {
           </ExplorableHashContainer>
         </CopyableAddress>
         <Box textAlign="center">{this.generateAddressButton(request.address.address)}</Box>
-        <Typography component="div" textAlign="center" component="span" variant="caption1" color="grayscale.600">
+        <Typography textAlign="center" component="span" variant="caption1" color="grayscale.600">
           {renderAmount(request.address.value.getDefaultEntry())}
         </Typography>
         {request.address.value.nonDefaultEntries().map(entry => (

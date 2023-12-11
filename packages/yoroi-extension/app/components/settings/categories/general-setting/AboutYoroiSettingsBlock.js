@@ -232,7 +232,7 @@ class AboutYoroiSettingsBlock extends Component<Props & InjectedLayoutProps> {
           mt: '40px',
         }}
       >
-        <Typography component="div" component="h2" variant="body1" fontWeight={500} mb="16px" color="grayscale.900">
+        <Typography component="h2" variant="body1" fontWeight={500} mb="16px" color="grayscale.900">
           {intl.formatMessage(messages.aboutYoroiLabel)}
         </Typography>
 

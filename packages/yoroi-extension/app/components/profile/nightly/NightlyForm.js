@@ -163,10 +163,10 @@ class NightlyForm extends Component<Props & InjectedLayoutProps, State> {
                   pl: '4px',
                 }}
               >
-                <Typography component="div" component="li" variant="body1" lineHeight="24px">
+                <Typography component="li" variant="body1" lineHeight="24px">
                   {intl.formatMessage(messages.warning1)}
                 </Typography>
-                <Typography component="div" component="li" variant="body1" lineHeight="24px">
+                <Typography component="li" variant="body1" lineHeight="24px">
                   {intl.formatMessage(messages.warning2)}
                 </Typography>
               </Box>
@@ -183,10 +183,10 @@ class NightlyForm extends Component<Props & InjectedLayoutProps, State> {
                   pl: '4px',
                 }}
               >
-                <Typography component="div" component="li" variant="body1" lineHeight="24px">
+                <Typography component="li" variant="body1" lineHeight="24px">
                   {intl.formatMessage(messages.recommendation1)}
                 </Typography>
-                <Typography component="div" component="li" variant="body1" lineHeight="24px">
+                <Typography component="li" variant="body1" lineHeight="24px">
                   {intl.formatMessage(messages.recommendation2)}
                 </Typography>
               </Box>

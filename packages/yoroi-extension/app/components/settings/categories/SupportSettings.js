@@ -102,7 +102,7 @@ class SupportSettings extends Component<Props & InjectedProps> {
     return (
       <Box>
         {isRevampLayout && (
-          <Typography component="div" component="h5" variant="h5" mb="24px" color="common.black" fontWeight={500}>
+          <Typography component="h5" variant="h5" mb="24px" color="common.black" fontWeight={500}>
             {intl.formatMessage(globalMessages.support)}
           </Typography>
         )}
