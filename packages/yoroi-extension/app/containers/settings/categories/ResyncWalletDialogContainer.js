@@ -72,8 +72,8 @@ export default class ResyncWalletDialogContainer extends Component<Props> {
           onClick: this.generated.actions.dialogs.closeActiveDialog.trigger,
         }}
       >
-        <div>{intl.formatMessage(messages.resyncExplanation)}</div>
-        <div>{intl.formatMessage(dialogMessages.warning)}</div>
+        <p>{intl.formatMessage(messages.resyncExplanation)}</p>
+        <p>{intl.formatMessage(dialogMessages.warning)}</p>
       </DangerousActionDialog>
     );
   }

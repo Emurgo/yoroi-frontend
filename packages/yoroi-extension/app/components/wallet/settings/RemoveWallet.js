@@ -47,7 +47,7 @@ class RemoveWallet extends Component<Props & InjectedProps> {
           borderColor: !isRevampLayout && 'var(--yoroi-palette-gray-200)',
         }}
       >
-        <Typography component="div"
+        <Typography
           variant={isRevampLayout ? 'body1' : 'h5'}
           fontWeight={500}
           mb={isRevampLayout ? '16px' : '12px'}
@@ -56,7 +56,7 @@ class RemoveWallet extends Component<Props & InjectedProps> {
           {intl.formatMessage(messages.titleLabel)}
         </Typography>
 
-        <Typography component="div"
+        <Typography
           variant={isRevampLayout ? 'body1' : 'body2'}
           color="common.black"
           mb={isRevampLayout ? '16px' : '12px'}
