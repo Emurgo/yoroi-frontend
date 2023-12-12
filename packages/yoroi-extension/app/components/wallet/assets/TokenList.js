@@ -293,7 +293,7 @@ function TokenItemRow({ avatar, name, id, amount, isTotalAmount }: TokenItemRowP
           <Box sx={{ mr: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {avatar}
           </Box>
-          <Typography component="div"
+          <Typography
             as={isTotalAmount !== false ? 'span' : Link}
             variant="body1"
             sx={{

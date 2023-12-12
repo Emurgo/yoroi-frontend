@@ -302,7 +302,7 @@ class ConnectPage extends Component<Props & InjectedProps> {
               <Box marginTop="16px">
                 <Typography component="div" variant="body-1" fontWeight="400" color="gray.900">
                   {intl.formatMessage(messages.subtitle)}{' '}
-                  <Typography component="div" as="span" variant="body-1" fontWeight="500">
+                  <Typography as="span" variant="body-1" fontWeight="500">
                     {url}
                   </Typography>
                 </Typography>

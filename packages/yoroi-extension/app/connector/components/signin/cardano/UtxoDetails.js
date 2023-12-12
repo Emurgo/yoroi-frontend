@@ -157,7 +157,7 @@ class CardanoUtxoDetails extends Component<Props> {
             light
             linkType="address"
           >
-            <Typography component="div" as="span" color="#242838">
+            <Typography as="span" color="#242838">
               {truncateAddressShort(addressHash, 10)}
             </Typography>
           </ExplorableHashContainer>

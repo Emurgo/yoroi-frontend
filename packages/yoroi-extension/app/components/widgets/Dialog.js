@@ -117,7 +117,7 @@ function DialogFn(props: Props & InjectedProps): Node {
         contentHasScroll={contentHasScroll}
       >
         {title != null && title !== '' ? (
-          <Typography component="div" as="h1" variant="body1" className="dialog__title" id="dialogTitle">
+          <Typography as="h1" variant="body1" className="dialog__title" id="dialogTitle">
             {title}
           </Typography>
         ) : null}

@@ -151,7 +151,7 @@ function RewardHistoryTab({
   const rewardsByPoolName = useMemo(() => groupByPoolName(rewardList), []);
   return (
     <Box>
-      <Typography component="div"
+      <Typography
         as="button"
         variant="body2"
         color="var(--yoroi-palette-gray-600)"

@@ -93,7 +93,7 @@ export default class ThemeSettingsBlock extends Component<Props> {
     const isRevampLayout = currentTheme === THEMES.YOROI_REVAMP;
 
     const blogLink = (
-      <Typography component="div"
+      <Typography
         as="a"
         variant="body2"
         href={intl.formatMessage(messages.blogLinkUrl)}

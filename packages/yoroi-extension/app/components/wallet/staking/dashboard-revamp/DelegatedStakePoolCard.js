@@ -83,7 +83,7 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
             >
               {intl.formatMessage(globalMessages.roa30d)}
             </Typography>
-            <Typography component="div" as="span" fontWeight={500} color="grayscale.max" variant="h2">
+            <Typography as="span" fontWeight={500} color="grayscale.max" variant="h2">
               {roa} %
             </Typography>
           </Box>
@@ -97,7 +97,7 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
             >
               {intl.formatMessage(globalMessages.poolSize)}
             </Typography>
-            <Typography component="div" as="span" fontWeight={500} color="grayscale.max" variant="h2">
+            <Typography as="span" fontWeight={500} color="grayscale.max" variant="h2">
               {poolSize}
             </Typography>
           </Box>
@@ -111,7 +111,7 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
             >
               {intl.formatMessage(globalMessages.poolShare)}
             </Typography>
-            <Typography component="div" as="span" fontWeight={500} color="grayscale.max" variant="h2">
+            <Typography as="span" fontWeight={500} color="grayscale.max" variant="h2">
               {share} %
             </Typography>
           </Box>

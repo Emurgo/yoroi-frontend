@@ -88,7 +88,7 @@ function TokenDetails({ tokenInfo, network, intl }: Props & Intl): Node {
   return (
     <Box>
       <Box backgroundColor="common.white">
-        <Typography component="div"
+        <Typography
           as={Link}
           replace
           to={ROUTES.ASSETS.ROOT}

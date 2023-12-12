@@ -194,7 +194,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
             alignItems: 'center',
           }}
         >
-          <Typography component="div"
+          <Typography
             variant="h2"
             as="p"
             fontSize="18px"

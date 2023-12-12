@@ -318,7 +318,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                 {isCardanoHaskell(network) && (
                   <LabelWithValue
                     label={
-                      <Typography component="div" as="span" display="flex">
+                      <Typography as="span" display="flex">
                         {intl.formatMessage(tokenMessages.detailsOn)}
                       </Typography>
                     }

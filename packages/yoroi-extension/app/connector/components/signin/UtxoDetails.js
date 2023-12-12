@@ -176,7 +176,7 @@ class UtxoDetails extends Component<Props> {
             light
             linkType="address"
           >
-            <Typography component="div" as="span" color="var(--yoroi-palette-gray-600)">
+            <Typography as="span" color="var(--yoroi-palette-gray-600)">
               {truncateAddressShort(this.props.addressToDisplayString(request.address.address), 10)}
             </Typography>
           </ExplorableHashContainer>

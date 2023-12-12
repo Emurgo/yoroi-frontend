@@ -221,7 +221,7 @@ export default class TransactionRevamp extends Component<Props, State> {
     return (
       <>
         {adjustedBefore}
-        <Typography component="div" as="span" fontWeight="inherit" fontSize="inherit">
+        <Typography as="span" fontWeight="inherit" fontSize="inherit">
           {afterDecimalRewards}
         </Typography>
       </>
@@ -271,7 +271,7 @@ export default class TransactionRevamp extends Component<Props, State> {
           <>
             {beforeDecimalWithSign}
             {afterDecimal && (
-              <Typography component="div" as="span" fontWeight="inherit" fontSize="inherit">
+              <Typography as="span" fontWeight="inherit" fontSize="inherit">
                 .{afterDecimal}
               </Typography>
             )}
@@ -314,7 +314,7 @@ export default class TransactionRevamp extends Component<Props, State> {
   |}) => Node = request => {
     if (request.type === transactionTypes.INCOME) {
       return (
-        <Typography component="div" as="span" fontSize="inherit">
+        <Typography as="span" fontSize="inherit">
           -
         </Typography>
       );
