@@ -983,36 +983,6 @@ const trezorPops: ({|
   },
 });
 
-export const TrezorCheck = (): Node => {
-  const selectedNetwork = networks.CardanoMainnet;
-  return (
-    <AddWalletPage
-      generated={defaultProps(
-        Object.freeze({
-          openDialog: WalletTrezorConnectDialogContainer,
-          selectedNetwork,
-          // eslint-disable-next-line no-unused-vars
-          getParam: <T>() => ({ type: 'bip44', extra: 'trezor' }),
-          WalletTrezorConnectDialogContainerProps: {
-            generated: trezorPops({
-              selectedNetwork,
-              trezorConnect: {
-                progressInfo: {
-                  currentStep: ProgressStep.CHECK,
-                  stepState: StepState.LOAD,
-                },
-                isActionProcessing: boolean('isActionProcessing', false),
-                error: undefined,
-                defaultWalletName: 'Test wallet',
-              },
-            }),
-          },
-        })
-      )}
-    />
-  );
-};
-
 export const TrezorConnect = (): Node => {
   const isActionProcessing = boolean('isActionProcessing', false);
   const getErrorValue = () => select('errorCases', trezorErrorCases, trezorErrorCases.None);

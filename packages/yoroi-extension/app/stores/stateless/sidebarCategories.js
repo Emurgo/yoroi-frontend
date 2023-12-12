@@ -66,17 +66,6 @@ export const BACK_TO_ADD: SidebarCategory = registerCategory({
   isVisible: request => !request.hasAnyWallets,
 });
 
-export const BACK_TO_MY_WALLETS: SidebarCategory = registerCategory({
-  className: 'go-back',
-  route: ROUTES.MY_WALLETS,
-  icon: goBackIcon,
-  label: globalMessages.goBack,
-  isVisible: request =>
-    request.hasAnyWallets &&
-    request.selected == null &&
-    matchRoute(ROUTES.WALLETS.ADD, request.currentRoute) !== false,
-});
-
 export const SETTINGS: SidebarCategory = registerCategory({
   className: 'settings',
   route: ROUTES.SETTINGS.ROOT,
