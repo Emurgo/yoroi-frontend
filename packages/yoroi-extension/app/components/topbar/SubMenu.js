@@ -24,18 +24,21 @@ class SubMenu extends Component<AllProps> {
   render(): Node {
     const { onItemClick, isActiveItem, options } = this.props;
 
+    const isRevamp = this.props.isRevampLayout;
     return (
       <div className={styles.componentWrapper} id="subMenu">
-        <div className={this.props.isRevampLayout ? styles.componentRevamp : styles.component} id="settingsMenuLayout">
-          {options.filter(Boolean).map(({ label, route, className }) => (
-            <SubMenuItem
-              key={label}
-              label={label}
-              onClick={() => onItemClick(route)}
-              active={isActiveItem(route)}
-              className={className}
-            />
-          ))}
+        <div className={isRevamp ? styles.componentRevamp : styles.component} id="settingsMenuLayout">
+          {options
+            .filter(o => o != null && (isRevamp || !o.revampOnly))
+            .map(({ label, route, className }) => (
+              <SubMenuItem
+                key={label}
+                label={label}
+                onClick={() => onItemClick(route)}
+                active={isActiveItem(route)}
+                className={className}
+              />
+            ))}
         </div>
       </div>
     );
