@@ -6,14 +6,17 @@ import styles from './SubMenu.scss';
 import { withLayout } from '../../styles/context/layout';
 import SubMenuItem from './SubMenuItem';
 
+export type SubMenuOption = {|
+  +label: string,
+  route: string,
+  className: string,
+  hidden?: boolean,
+|};
+
 type Props = {|
   +isActiveItem: string => boolean,
   +onItemClick: string => void,
-  +options: Array<{|
-    +label: string,
-    route: string,
-    className: string,
-  |}>,
+  +options: Array<SubMenuOption>,
 |};
 type InjectedProps = {|
   +isRevampLayout: boolean,
@@ -28,7 +31,9 @@ class SubMenu extends Component<AllProps> {
     return (
       <div className={styles.componentWrapper} id="subMenu">
         <div className={isRevamp ? styles.componentRevamp : styles.component} id="settingsMenuLayout">
-          {options.map(({ label, route, className }) => (
+          {options
+            .filter(o => !o.hidden)
+            .map(({ label, route, className }) => (
               <SubMenuItem
                 key={label}
                 label={label}
