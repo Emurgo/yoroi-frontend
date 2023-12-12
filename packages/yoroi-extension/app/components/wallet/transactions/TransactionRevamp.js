@@ -248,11 +248,11 @@ export default class TransactionRevamp extends Component<Props, State> {
       if (this.props.shouldHideBalance) {
         return (
           <>
-            <Typography component="div" variant="body1" fontWeight={500} textAlign="right">
+            <Typography variant="body1" fontWeight={500} textAlign="right">
               <span>{hiddenAmount}</span>
               {ticker}
             </Typography>
-            <Typography component="div" variant="body2" color="grayscale.600" textAlign="right">
+            <Typography variant="body2" color="grayscale.600" textAlign="right">
               {hiddenAmount}&nbsp;{currency}
             </Typography>
           </>
@@ -287,10 +287,10 @@ export default class TransactionRevamp extends Component<Props, State> {
             justifyContent: 'center',
           }}
         >
-          <Typography component="div" variant="body1" fontWeight={500} color="grayscale.900">
+          <Typography variant="body1" fontWeight={500} color="grayscale.900">
             {this.renderAmountDisplay({ entry: request.entry })} {this.getTicker(request.entry)}
           </Typography>
-          <Typography component="div" variant="body2" color="grayscale.600" textAlign="right">
+          <Typography variant="body2" color="grayscale.600" textAlign="right">
             {fiatDisplay}&nbsp;{currency}
           </Typography>
         </Box>
@@ -301,7 +301,7 @@ export default class TransactionRevamp extends Component<Props, State> {
     const isPositiveNumber = typeof amount === 'string' ? amount.charAt(0) === '+' : false; // eslint-disable-line
 
     return (
-      <Typography component="div" variant="body1" fontWeight={500} color="grayscale.900">
+      <Typography variant="body1" fontWeight={500} color="grayscale.900">
         {this.renderAmountDisplay({ entry: request.entry })} {this.getTicker(request.entry)}
       </Typography>
     );
@@ -357,12 +357,12 @@ export default class TransactionRevamp extends Component<Props, State> {
       }
       return (
         <>
-          <Typography component="div" variant="body1" fontWeight={500} color="grayscale.900">
+          <Typography variant="body1" fontWeight={500} color="grayscale.900">
             {beforeDecimalRewards}
             <span className={styles.afterDecimal}>{afterDecimalRewards}</span>{' '}
             {this.getTicker(defaultEntry)}
           </Typography>
-          <Typography component="div" variant="body2" color="grayscale.600" textAlign="right">
+          <Typography variant="body2" color="grayscale.600" textAlign="right">
             {fiatDisplay}&nbsp;{currency}
           </Typography>
         </>
@@ -370,7 +370,7 @@ export default class TransactionRevamp extends Component<Props, State> {
     }
 
     return (
-      <Typography component="div" variant="body1" fontWeight={500} color="grayscale.900">
+      <Typography variant="body1" fontWeight={500} color="grayscale.900">
         {[beforeDecimalRewards, afterDecimalRewards].join('')} {this.getTicker(defaultEntry)}
       </Typography>
     );
@@ -447,7 +447,7 @@ export default class TransactionRevamp extends Component<Props, State> {
       const fingerprint = this.getFingerprint(entry);
       return (
         <div className={styles.fee}>
-          <Typography component="div" color="grayscale.600" variant="caption1">
+          <Typography color="grayscale.600" variant="caption1">
             {this.renderAmountDisplay({
               entry: {
                 ...entry,
@@ -462,7 +462,7 @@ export default class TransactionRevamp extends Component<Props, State> {
               light
               linkType="token"
             >
-              <Typography component="div" variant="caption1" color="grayscale.600">
+              <Typography variant="caption1" color="grayscale.600">
                 {this.getTicker(entry)}
               </Typography>
             </ExplorableHashContainer>
@@ -499,7 +499,7 @@ export default class TransactionRevamp extends Component<Props, State> {
             light
             linkType="address"
           >
-            <Typography component="div" variant="caption1" color="grayscale.600">
+            <Typography variant="caption1" color="grayscale.600">
               {truncateAddressShort(this.props.addressToDisplayString(request.address.address))}
             </Typography>
           </ExplorableHashContainer>
@@ -566,17 +566,17 @@ export default class TransactionRevamp extends Component<Props, State> {
             >
               <TypeIcon type={txType.icon} />
               <Box>
-                <Typography component="div" variant="body1" color="grayscale.900">
+                <Typography variant="body1" color="grayscale.900">
                   {txType.msg}
                 </Typography>
-                <Typography component="div" variant="caption1" color="grayscale.600">
+                <Typography variant="caption1" color="grayscale.600">
                   {moment(data.date).format('hh:mm A')}
                 </Typography>
               </Box>
             </Grid>
             <Grid item xs={2} sx={{ textAlign: 'left' }} id="txStatus">
               {state === TxStatusCodes.IN_BLOCK ? (
-                <Typography component="div"
+                <Typography
                   variant="body1"
                   sx={{
                     color: isPendingTransaction ? 'grayscale.400' : 'grayscale.900',
@@ -586,7 +586,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                   {status}
                 </Typography>
               ) : (
-                <Typography component="div"
+                <Typography
                   variant="body1"
                   sx={{
                     color: isFailedTransaction
@@ -631,7 +631,8 @@ export default class TransactionRevamp extends Component<Props, State> {
               <Box
                 textAlign="right"
               >
-                <Typography component="div"
+                <Typography
+                  component="div"
                   variant="body1"
                   fontWeight="500"
                   color="grayscale.900"
@@ -709,14 +710,14 @@ export default class TransactionRevamp extends Component<Props, State> {
                       alignItems: 'center',
                     }}
                   >
-                    <Typography component="div" variant="caption1">
+                    <Typography variant="caption1">
                       {intl.formatMessage(globalMessages.fromAddresses)}:{' '}
                       <span style={{ fontWeight: 500 }}>{data.addresses.from.length}</span>
                     </Typography>
-                    <Typography component="div" variant="caption1" textAlign="center">
+                    <Typography variant="caption1" textAlign="center">
                       {intl.formatMessage(messages.addressType)}
                     </Typography>
-                    <Typography component="div" variant="caption1" textAlign="center">
+                    <Typography variant="caption1" textAlign="center">
                       {intl.formatMessage(globalMessages.amountLabel)}
                     </Typography>
                   </Box>
@@ -744,14 +745,14 @@ export default class TransactionRevamp extends Component<Props, State> {
                       alignItems: 'center',
                     }}
                   >
-                    <Typography component="div" variant="caption1">
+                    <Typography variant="caption1">
                       {intl.formatMessage(globalMessages.toAddresses)}:{' '}
                       <span style={{ fontWeight: 500 }}>{data.addresses.to.length}</span>
                     </Typography>
-                    <Typography component="div" variant="caption1" textAlign="center">
+                    <Typography variant="caption1" textAlign="center">
                       {intl.formatMessage(messages.addressType)}
                     </Typography>
-                    <Typography component="div" variant="caption1" textAlign="center">
+                    <Typography variant="caption1" textAlign="center">
                       {intl.formatMessage(globalMessages.amountLabel)}
                     </Typography>
                   </Box>
@@ -774,10 +775,10 @@ export default class TransactionRevamp extends Component<Props, State> {
                 <Box flexShrink={0}>
                   {state === TxStatusCodes.IN_BLOCK && this.props.numberOfConfirmations != null && (
                     <Box display="flex" gap="8px" mb="16px" flexDirection="column">
-                      <Typography component="div" variant="caption1" fontWeight={500}>
+                      <Typography variant="caption1" fontWeight={500}>
                         {intl.formatMessage(messages.assuranceLevel)}
                       </Typography>
-                      <Typography component="div" variant="caption1" color="grayscale.600">
+                      <Typography variant="caption1" color="grayscale.600">
                         <span className={styles.assuranceLevel}>{status}</span>.{' '}
                         <span className="confirmationCount">
                           {this.props.numberOfConfirmations}
@@ -788,7 +789,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                   )}
 
                   <Box display="flex" gap="8px" mt="16px" flexDirection="column">
-                    <Typography component="div" variant="caption1" fontWeight={500}>
+                    <Typography variant="caption1" fontWeight={500}>
                       {intl.formatMessage(globalMessages.transactionId)}
                     </Typography>
                     <ExplorableHashContainer
@@ -797,7 +798,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                       light
                       linkType="transaction"
                     >
-                      <Typography component="div"
+                      <Typography
                         variant="caption1"
                         color="grayscale.600"
                         className={classnames('txid' /* for tests */)}
@@ -847,7 +848,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                         className="addMemoButton" // for tests
                         startIcon={<AddMemoSvg />}
                       >
-                        <Typography component="div" variant="button2" fontWeight={500}>
+                        <Typography variant="button2" fontWeight={500}>
                           {intl.formatMessage(memoMessages.addMemo)}
                         </Typography>
                       </Button>
@@ -886,7 +887,7 @@ export default class TransactionRevamp extends Component<Props, State> {
         }}
         onClick={addressInfo.goToRoute}
       >
-        <Typography component="div" variant="caption1">{addressInfo.name}</Typography>
+        <Typography variant="caption1">{addressInfo.name}</Typography>
       </Box>
     );
   };
@@ -938,14 +939,14 @@ export default class TransactionRevamp extends Component<Props, State> {
               px: '24px',
             }}
           >
-            <Typography component="div" variant="caption1">
+            <Typography variant="caption1">
               {intl.formatMessage(globalMessages.withdrawalsLabel)}:{' '}
               <span style={{ fontWeight: 500 }}>{data.withdrawals.length}</span>
             </Typography>
-            <Typography component="div" variant="caption1" textAlign="center">
+            <Typography variant="caption1" textAlign="center">
               {intl.formatMessage(messages.addressType)}
             </Typography>
-            <Typography component="div" variant="caption1" textAlign="center">
+            <Typography variant="caption1" textAlign="center">
               {intl.formatMessage(globalMessages.amountLabel)}
             </Typography>
           </Box>
@@ -970,12 +971,12 @@ export default class TransactionRevamp extends Component<Props, State> {
 
     const wrapCertificateText = (node, manyCerts) => (
       <Box display="flex" flexDirection="column" gap="8px" px="24px" mt="24px">
-        <Typography component="div" variant="caption1" fontWeight={500}>
+        <Typography variant="caption1" fontWeight={500}>
           {manyCerts
             ? intl.formatMessage(messages.certificatesLabel)
             : intl.formatMessage(messages.certificateLabel)}
         </Typography>
-        <Typography component="div" variant="caption1" color="grayscale.600">
+        <Typography variant="caption1" color="grayscale.600">
           {node}
         </Typography>
       </Box>
