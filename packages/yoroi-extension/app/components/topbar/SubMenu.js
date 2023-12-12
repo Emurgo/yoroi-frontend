@@ -13,6 +13,7 @@ type Props = {|
     +label: string,
     route: string,
     className: string,
+    revampOnly?: boolean,
   |}>,
 |};
 type InjectedProps = {|
