@@ -48,7 +48,7 @@ class Settings extends Component<AllProps> {
 
   isActivePage: string => boolean = route => {
     const { location } = this.generated.stores.router;
-    if (location) {
+    if (route && location) {
       return location.pathname === buildRoute(route);
     }
     return false;

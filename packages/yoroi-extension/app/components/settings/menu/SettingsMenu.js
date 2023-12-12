@@ -47,7 +47,7 @@ class SettingsMenu extends Component<Props & InjectedLayoutProps> {
   render(): Node {
     const { intl } = this.context;
     const { onItemClick, isActiveItem, isRevampLayout } = this.props;
-
+    const isProduction = environmnent.isProduction();
     const settingOptions: Array<Object> = [
       {
         label: intl.formatMessage(settingsMenuMessages.general),
@@ -64,10 +64,11 @@ class SettingsMenu extends Component<Props & InjectedLayoutProps> {
         route: ROUTES.SETTINGS.WALLET,
         className: 'wallet',
       },
-      !environmnent.isProduction() && {
+      {
         label: intl.formatMessage(settingsMenuMessages.externalStorage),
         route: ROUTES.SETTINGS.EXTERNAL_STORAGE,
         className: 'externalStorage',
+        visible: !isProduction,
       },
       {
         label: intl.formatMessage(
@@ -90,9 +91,9 @@ class SettingsMenu extends Component<Props & InjectedLayoutProps> {
         label: intl.formatMessage(settingsMenuMessages.analytics),
         route: ROUTES.SETTINGS.ANALYTICS,
         className: 'analytics',
-        revampOnly: true,
+        visible: isRevampLayout,
       },
-    ];
+    ].filter(({ visible }) => visible !== false);
 
     return (
       <SubMenu options={settingOptions} onItemClick={onItemClick} isActiveItem={isActiveItem} />

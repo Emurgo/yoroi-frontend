@@ -13,7 +13,6 @@ type Props = {|
     +label: string,
     route: string,
     className: string,
-    revampOnly?: boolean,
   |}>,
 |};
 type InjectedProps = {|
@@ -29,9 +28,7 @@ class SubMenu extends Component<AllProps> {
     return (
       <div className={styles.componentWrapper} id="subMenu">
         <div className={isRevamp ? styles.componentRevamp : styles.component} id="settingsMenuLayout">
-          {options
-            .filter(o => o != null && (isRevamp || !o.revampOnly))
-            .map(({ label, route, className }) => (
+          {options.map(({ label, route, className }) => (
               <SubMenuItem
                 key={label}
                 label={label}
