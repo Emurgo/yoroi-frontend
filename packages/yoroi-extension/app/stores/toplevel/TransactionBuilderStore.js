@@ -14,7 +14,6 @@ import type {
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import {
   isCardanoHaskell, getCardanoHaskellBaseConfig,
-  isErgo,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import {
   genTimeToSlot,
@@ -157,19 +156,6 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     // Note: the exact number might change in the future
     return this.isDefaultIncluded ? 11 : 10
   }
-
-  // ================
-  //   tentative tx
-  // ================
-
-  // eslint-disable-next-line no-restricted-syntax
-  _mismatchReaction: void => mixed = reaction(
-    () => [
-      this.plannedTx,
-      this.tentativeTx,
-    ],
-    () => runInAction(() => { this.txMismatch = this._txMismatch(); })
-  );
 
   // ==============
   //   planned tx
@@ -334,7 +320,6 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       return;
     }
 
-    const plannedTxInfoMap = this.plannedTxInfoMap;
     const receiver = this.receiver;
     if (receiver == null) return;
 
@@ -348,10 +333,6 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     }
 
     const network = withUtxos.getParent().getNetworkInfo();
-    const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId);
-    const isIncludeDefaultToken = !!plannedTxInfoMap.find(
-      ({ token }) => token.Identifier === defaultToken.Identifier
-    )
 
     if (isCardanoHaskell(network)) {
       const withHasUtxoChains = asHasUtxoChains(withUtxos);
@@ -373,45 +354,6 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
         filter: this.filter,
         absSlotNumber,
         metadata: this.metadata,
-      }));
-    } else if (isErgo(network)) {
-      const lastSync = this.stores.transactions.getLastSyncInfo(publicDeriver);
-      const txFee = new BigNumber(
-        RustModule.SigmaRust.BoxValue.SAFE_USER_MIN().as_i64().to_str()
-      ).plus(100000); // slightly higher than default fee
-
-      const genTokenList: PlannedTxInfoMap => Array<$ReadOnly<{|
-        token: $ReadOnly<TokenRow>,
-        amount?: string,
-        shouldSendAll?: boolean,
-      |}>> = (userInput) => {
-        const tokens: PlannedTxInfoMap = [...userInput];
-        if (!isIncludeDefaultToken) {
-          // if the user is sending a token, we need to make sure the resulting box
-          // has at least the minimum amount of ERG in it
-          tokens.push({
-            token: defaultToken,
-            // amount: RustModule.SigmaRust.BoxValue.SAFE_USER_MIN().as_i64().to_str(),
-            // kind of hacky.
-            // We use a larger amount for tokens
-            // in hopes it covers any smart contract execution cost
-            amount: new BigNumber(10000000).toString()
-          });
-        }
-        return tokens.map((txEntry) => ({
-          token: txEntry.token,
-          amount: txEntry.amount,
-          shouldSendAll: txEntry.shouldSendAll,
-        }));
-      }
-
-      await this.createUnsignedTx.execute(() => this.api.ergo.createUnsignedTx({
-        publicDeriver: withUtxos,
-        receiver,
-        tokens: genTokenList(plannedTxInfoMap),
-        filter: this.filter,
-        currentHeight: lastSync.Height,
-        txFee,
       }));
     } else {
       throw new Error(`${nameof(TransactionBuilderStore)}::${nameof(this._updateTxBuilder)} network not supported`);

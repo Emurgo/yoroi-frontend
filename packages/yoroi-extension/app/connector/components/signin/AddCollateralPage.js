@@ -24,7 +24,6 @@ import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashC
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { CardanoConnectorSignRequest, SignSubmissionErrorType } from '../../types';
 import { Box } from '@mui/system';
-import { signTxMessages } from './SignTxPage';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import { LoadingButton } from '@mui/lab';
 import { ReactComponent as AddCollateralIcon } from '../../../assets/images/dapp-connector/add-collateral.inline.svg';
@@ -53,12 +52,15 @@ const messages = defineMessages({
   },
   reorgMessage: {
     id: 'connector.signin.reorg.message',
-    defaultMessage:
-      '!!!To interact with {smartContractsLink} in Cardano you should add collateral, which means to make a 0 ADA transaction.{lineBreak}{lineBreak}It is a guarantee that prevent from failing smart contracts and scams. {learnMoreLink} about collateral.',
+    defaultMessage:'!!!To interact with {smartContractsLink} in Cardano you should add collateral, which means to make a 0 ADA transaction.{lineBreak}{lineBreak}It is a guarantee that prevent from failing smart contracts and scams. {learnMoreLink} about collateral.',
   },
   sendError: {
     id: 'connector.signin.error.sendError',
     defaultMessage: '!!!An error occured when sending the transaction.',
+  },
+  transactionFee: {
+    id: 'connector.signin.transactionFee',
+    defaultMessage: '!!!Transaction Fee',
   },
 });
 
@@ -303,7 +305,7 @@ class AddCollateralPage extends Component<Props, State> {
                 </Typography>
               </Box>
               <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Typography component="div">{intl.formatMessage(signTxMessages.transactionFee)}</Typography>
+                <Typography component="div">{intl.formatMessage(messages.transactionFee)}</Typography>
                 <Typography component="div" id="addCollateralFeeTitle">
                   {this.renderAmountDisplay({
                     entry: {

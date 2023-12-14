@@ -33,7 +33,7 @@ const baseDevConfig = (
       hotScript,
       path.join(__dirname, '../chrome/extension/background')
     ],
-    ergo: [
+    connector: [
       customPath,
       hotScript,
       path.join(__dirname, '../chrome/extension/connector/index')

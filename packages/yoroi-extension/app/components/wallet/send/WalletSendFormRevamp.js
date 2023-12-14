@@ -40,7 +40,6 @@ import BigNumber from 'bignumber.js';
 import classnames from 'classnames';
 import SendFormHeader from './SendFormHeader';
 import { SEND_FORM_STEP } from '../../../types/WalletSendTypes';
-import { isErgo } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { ReactComponent as PlusIcon } from '../../../assets/images/plus.inline.svg';
 import AddNFTDialog from './WalletSendFormSteps/AddNFTDialog';
 import AddTokenDialog from './WalletSendFormSteps/AddTokenDialog';
@@ -697,26 +696,23 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   placeholder="0"
                 />
 
-                <Typography component="div" variant="button2" color="grey.600" fontWeight={500} mr="12px">
-                  {isErgo(this.props.selectedNetwork) ? 'ERG' : 'ADA'}
-                </Typography>
+                <Typography component="div" variant="button2" color="grey.600" fontWeight={500} mr="12px">ADA</Typography>
 
-                {!isErgo(this.props.selectedNetwork) && (
-                  <Button
-                    variant="tertiary"
-                    color="secondary"
-                    size="small"
-                    sx={{
+                <Button
+                  variant="tertiary"
+                  color="secondary"
+                  size="small"
+                  sx={{
                       '&.MuiButton-sizeSmall': {
                         lineHeight: '17px',
                       },
                     }}
-                    disabled={maxSendableAmount.isExecuting}
-                    className={classnames([
+                  disabled={maxSendableAmount.isExecuting}
+                  className={classnames([
                       styles.maxBtn,
                       maxSendableAmount.isExecuting && styles.maxButtonSpinning,
                     ])}
-                    onClick={() => {
+                  onClick={() => {
                       const hasTokens =
                         spendableBalance && spendableBalance.nonDefaultEntries().length !== 0;
                       if (hasTokens || !spendableBalance) {
@@ -734,10 +730,9 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                         this.props.updateSendAllStatus(true);
                       }
                     }}
-                  >
-                    {intl.formatMessage(messages.max)}
-                  </Button>
-                )}
+                >
+                  {intl.formatMessage(messages.max)}
+                </Button>
               </Box>
               {showFiat && (
                 <Box

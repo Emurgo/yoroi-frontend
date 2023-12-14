@@ -84,19 +84,6 @@ const CardanoMainnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
   },
 ];
 
-const ErgoExplorers: Array<$ReadOnly<ExplorerRow>> = [
-  {
-    ExplorerId: 3_00,
-    NetworkId: networks.ErgoMainnet.NetworkId,
-    IsBackup: true,
-    Endpoints: {
-      address: 'https://explorer.ergoplatform.com/en/addresses/',
-      transaction: 'https://explorer.ergoplatform.com/en/transactions/',
-    },
-    Name: 'ErgoPlatform',
-  },
-];
-
 const CardanoTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
   {
     ExplorerId: 4_00,
@@ -123,19 +110,6 @@ const CardanoPreprodTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
       token: 'https://testnet.cardanoscan.io/token/',
     },
     Name: 'CardanoScan',
-  },
-];
-
-const AlonzoTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
-  {
-    ExplorerId: 5_00,
-    NetworkId: networks.AlonzoTestnet.NetworkId,
-    IsBackup: true,
-    Endpoints: {
-      address: 'https://explorer.alonzo-white.dev.cardano.org/en/address?address=',
-      transaction: 'https://explorer.alonzo-white.dev.cardano.org/en/transaction?id=',
-    },
-    Name: 'CardanoExplorer',
   },
 ];
 
@@ -174,14 +148,11 @@ const CardanoSanchoTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
 
 export const prepackagedExplorers: Map<number, $ReadOnlyArray<$ReadOnly<ExplorerRow>>> = new Map([
   [networks.CardanoMainnet.NetworkId, CardanoMainnetExplorers],
+  // <TODO:PENDING_REMOVAL> Legacy Testnet
   [networks.CardanoTestnet.NetworkId, CardanoTestnetExplorers],
   [networks.CardanoPreprodTestnet.NetworkId, CardanoPreprodTestnetExplorers],
   [networks.CardanoPreviewTestnet.NetworkId, CardanoPreviewTestnetExplorers],
   [networks.CardanoSanchoTestnet.NetworkId, CardanoSanchoTestnetExplorers],
-  // <TODO:PENDING_REMOVAL> Ergo
-  [networks.ErgoMainnet.NetworkId, ErgoExplorers],
-  // <TODO:PENDING_REMOVAL> Alonzo
-  [networks.AlonzoTestnet.NetworkId, AlonzoTestnetExplorers],
 ]);
 const getOrThrow = function<T> (input: ?T): T {
   if (input == null) throw new Error('No backup explorer for type');
@@ -192,6 +163,7 @@ export const prepackagedDefaultExplorers:
     [networks.CardanoMainnet.NetworkId, getOrThrow(
       CardanoMainnetExplorers.find(explorer => explorer.IsBackup)
     )],
+  // <TODO:PENDING_REMOVAL> Legacy Testnet
     [networks.CardanoTestnet.NetworkId, getOrThrow(
       CardanoTestnetExplorers.find(explorer => explorer.IsBackup)
     )],
@@ -203,13 +175,5 @@ export const prepackagedDefaultExplorers:
     )],
     [networks.CardanoSanchoTestnet.NetworkId, getOrThrow(
       CardanoSanchoTestnetExplorers.find(explorer => explorer.IsBackup)
-    )],
-  // <TODO:PENDING_REMOVAL> Ergo
-    [networks.ErgoMainnet.NetworkId, getOrThrow(
-      ErgoExplorers.find(explorer => explorer.IsBackup)
-    )],
-  // <TODO:PENDING_REMOVAL> Alonzo
-    [networks.AlonzoTestnet.NetworkId, getOrThrow(
-      AlonzoTestnetExplorers.find(explorer => explorer.IsBackup)
     )],
   ]);

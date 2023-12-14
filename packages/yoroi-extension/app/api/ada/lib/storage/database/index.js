@@ -480,26 +480,6 @@ async function onUpgrade(
       TransactionType.CardanoByron
     );
   }
-  if (version >= 3 && version <= 14) {
-    await rawDb.addTableColumn(
-      'UtxoTransactionOutput',
-      'ErgoBoxId',
-      // recall: at the time we only supported Cardano
-      null
-    );
-    await rawDb.addTableColumn(
-      'UtxoTransactionOutput',
-      'ErgoCreationHeight',
-      // recall: at the time we only supported Cardano
-      null
-    );
-    await rawDb.addTableColumn(
-      'UtxoTransactionOutput',
-      'ErgoTree',
-      // recall: at the time we only supported Cardano
-      null
-    );
-  }
   if (version >= 3 && version <= 15) {
     await deleteTxTables(rawDb);
   }
