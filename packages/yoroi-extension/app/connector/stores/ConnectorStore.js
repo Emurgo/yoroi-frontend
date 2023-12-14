@@ -13,20 +13,19 @@ import type {
   PublicDeriverCache,
   RemoveWalletFromWhitelistData,
   SigningMessage,
-  Tx,
   TxSignWindowRetrieveData,
   WhitelistEntry,
 } from '../../../chrome/extension/connector/types';
 import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
-import { LoadingWalletStates } from '../types';
 import type {
+  Anchor,
   CardanoConnectorSignRequest,
   SignSubmissionErrorType,
   TxDataInput,
   TxDataOutput,
-  Anchor,
 } from '../types';
+import { LoadingWalletStates } from '../types';
 import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 import type { GetUtxoDataResponse, RemoteUnspentOutput, UtxoData, } from '../../api/ada/lib/state-fetch/types';
 import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
@@ -43,9 +42,7 @@ import Store from '../../stores/base/Store';
 import { getWallets } from '../../api/common/index';
 import {
   getCardanoHaskellBaseConfig,
-  getErgoBaseConfig,
   isCardanoHaskell,
-  isErgo,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import {
   asGetBalance,
@@ -54,13 +51,8 @@ import {
   asHasLevels,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { MultiToken } from '../../api/common/lib/MultiToken';
-import { addErgoAssets } from '../../api/ergo/lib/storage/bridge/updateTransactions';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import { ErgoExternalTxSignRequest } from '../../api/ergo/lib/transactions/ErgoExternalTxSignRequest';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import { toRemoteUtxo } from '../../api/ergo/lib/transactions/utils';
-import { mintedTokenInfo } from '../../../chrome/extension/connector/utils';
-import { Logger } from '../../utils/logging';
 import { asAddressedUtxo, multiTokenFromCardanoValue, multiTokenFromRemote, } from '../../api/ada/transactions/utils';
 import {
   connectorGenerateReorgTx,
@@ -226,13 +218,14 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @observable loadingWallets: $Values<typeof LoadingWalletStates> = LoadingWalletStates.IDLE;
   @observable errorWallets: string = '';
   @observable wallets: Array<PublicDeriverCache> = [];
+
+  // <TODO:PENDING_REMOVAL> LEGACY we don't have multiple protocols anymore
   /**
-   * - `filteredWallets`: includes only cardano or ergo wallets according to the `protocol`
+   * - `filteredWallets`: includes only wallets according to the `protocol`
    *   it will be displyed to the user at the `connect` screen for the user to choose
    *   which wallet to connect
    * - `allWallets`: list of all wallets the user have in yoroi
    *    Will be displayed in the on the `connected webists screen` as we need all wallets
-   *    not only ergo or cardano ones
    */
   @observable filteredWallets: Array<PublicDeriverCache> = [];
   @observable allWallets: Array<PublicDeriverCache> = [];
@@ -500,24 +493,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     try {
       const wallets = await getWallets({ db: persistentDb });
 
-      const protocol = this.protocol;
-      const isProtocolErgo = protocol === 'ergo';
-      const isProtocolCardano = protocol === 'cardano';
-      const isProtocolDefined = isProtocolErgo || isProtocolCardano;
-      const protocolFilter = wallet => {
-        const isWalletErgo = isErgo(wallet.getParent().getNetworkInfo());
-        return isProtocolErgo === isWalletErgo;
-      };
-      const filteredWallets = isProtocolDefined ? wallets.filter(protocolFilter) : wallets;
-
-      if (
-        this.signingMessage?.sign.type !== 'tx/cardano' &&
-        this.signingMessage?.sign.type !== 'tx-reorg/cardano'
-      ) {
-        await this._getTxAssets(filteredWallets);
-      }
-
-      const filteredWalletsResult = await parseWalletsList(filteredWallets);
+      const filteredWalletsResult = await parseWalletsList(wallets);
       const allWallets = await parseWalletsList(wallets);
 
       runInAction(() => {
@@ -542,56 +518,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         this.loadingWallets = LoadingWalletStates.REJECTED;
         this.errorWallets = err.message;
       });
-    }
-  };
-
-  // for Ergo wallets only
-  _getTxAssets: (Array<PublicDeriver<>>) => Promise<void> = async publicDerivers => {
-    const persistentDb = this.stores.loading.getDatabase();
-    if (persistentDb == null) {
-      throw new Error(`${nameof(this._getWallets)} db not loaded. Should never happen`);
-    }
-    if (this.signingMessage == null) return;
-    const { signingMessage } = this;
-
-    const selectedWallet = publicDerivers.find(
-      wallet => wallet.getPublicDeriverId() === signingMessage.publicDeriverId
-    );
-    if (selectedWallet == null) return;
-
-    if (!signingMessage.sign.tx) return;
-    // Because this function is only invoked for a Ergo wallet, we know the type
-    // of `tx` must be `Tx`
-    const tx: Tx = (signingMessage.sign.tx: any);
-    // it's possible we minted assets in this tx, so looking them up will fail
-    const mintedTokenIds = mintedTokenInfo(tx, Logger.info).map(t => t.Identifier);
-    const tokenIdentifiers = Array.from(
-      new Set([
-        ...tx.inputs.flatMap(output => output.assets).map(asset => asset.tokenId),
-        ...tx.outputs.flatMap(output => output.assets).map(asset => asset.tokenId),
-        // force inclusion of primary token for chain
-        selectedWallet.getParent().getDefaultToken().defaultIdentifier,
-      ])
-    ).filter(id => !mintedTokenIds.includes(id));
-    const stateFetcher = this.stores.substores.ergo.stateFetchStore.fetcher;
-    try {
-      await addErgoAssets({
-        db: selectedWallet.getDb(),
-        tokenIdentifiers,
-        getAssetInfo: async req => {
-          try {
-            return await stateFetcher.getAssetInfo(req);
-          } catch (e) {
-            // eslint-disable-next-line no-console
-            console.error('Aseet info request failed', e);
-            return {};
-          }
-        },
-        network: selectedWallet.getParent().getNetworkInfo(),
-      });
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Failed to add ergo assets!', error);
     }
   };
 
@@ -1175,34 +1101,13 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     return { total, amount };
   }
 
+  // <TODO:PENDING_REMOVAL> ?? LEGACY?
   @computed get signingRequest(): ?ISignRequest<any> {
     if (this.signingMessage == null) return;
     const { signingMessage } = this;
     const selectedWallet = this.connectedWallet;
     if (selectedWallet == null) return undefined;
     if (!signingMessage.sign.tx) return undefined;
-
-    const network = selectedWallet.publicDeriver.getParent().getNetworkInfo();
-    if (isErgo(network)) {
-      // Since this is Ergo, we know the type of `tx` must be `Tx`.
-      const tx: Tx = (signingMessage.sign: any).tx;
-
-      const config = getErgoBaseConfig(network).reduce((acc, next) => Object.assign(acc, next), {});
-      const networkSettingSnapshot = {
-        NetworkId: network.NetworkId,
-        ChainNetworkId: (Number.parseInt(config.ChainNetworkId, 10): any),
-        FeeAddress: config.FeeAddress,
-      };
-      return new ErgoExternalTxSignRequest({
-        inputUtxos: tx.inputs.map(
-          // eslint-disable-next-line no-unused-vars
-          ({ extension, ...rest }) => toRemoteUtxo(rest, networkSettingSnapshot.ChainNetworkId)
-        ),
-        unsignedTx: RustModule.SigmaRust.UnsignedTransaction.from_json(JSON.stringify(tx)),
-        changeAddr: [],
-        networkSettingSnapshot,
-      });
-    }
     // If this is Cardano wallet, the return value is ignored
     return undefined;
   }

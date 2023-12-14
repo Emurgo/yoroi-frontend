@@ -14,7 +14,6 @@ import { TransactionType, } from '../../../primitives/tables';
 import type {
   CardanoByronTxIO,
   CardanoShelleyTxIO,
-  ErgoTxIO,
 } from '../tables';
 import type {
   UtxoTransactionInputInsert,
@@ -195,85 +194,6 @@ export class ModifyCardanoShelleyTx {
       certificates,
       ...utxo,
       accountingInputs: accounting.accountingInputs,
-      tokens: newTokenListEntries.map(entry => ({
-        TokenList: entry,
-        Token: {
-          TokenId: entry.TokenId,
-          Identifier: tokenList.filter(
-            item => item.TokenList.TokenId === entry.TokenId
-          )[0].identifier,
-          NetworkId: tokenList.filter(
-            item => item.TokenList.TokenId === entry.TokenId
-          )[0].networkId,
-        }
-      })),
-    };
-  }
-}
-
-export class ModifyErgoTx {
-  static ownTables: {||} = Object.freeze({});
-  static depTables: {|
-    ModifyTransaction: typeof ModifyTransaction,
-    ModifyUtxoTransaction: typeof ModifyUtxoTransaction,
-    ModifyTokenList: typeof ModifyTokenList,
-  |} = Object.freeze({
-    ModifyTransaction,
-    ModifyUtxoTransaction,
-    ModifyTokenList,
-  });
-
-  static async addTxWithIOs(
-    db: lf$Database,
-    tx: lf$Transaction,
-    request: {|
-      networkId: number,
-      block: null | BlockInsert,
-      transaction: (blockId: null | number) => TransactionInsert,
-      ioGen: (txRowId: number) => {|
-        utxoInputs: Array<UtxoTransactionInputInsert>,
-        utxoOutputs: Array<UtxoTransactionOutputInsert>,
-        tokenList: Array<{|
-          TokenList: TokenListInsert,
-          identifier: string,
-          networkId: number,
-        |}>,
-      |},
-    |},
-  ): Promise<{|
-    ...WithNullableFields<DbBlock>,
-    ...ErgoTxIO,
-  |}> {
-    const {
-      block, transaction,
-    } = request;
-
-    const newTx = await ModifyErgoTx.depTables.ModifyTransaction.addNew(
-      db, tx,
-      { block, transaction, }
-    );
-
-    const {
-      utxoInputs, utxoOutputs, tokenList
-    } = request.ioGen(newTx.transaction.TransactionId);
-
-    const utxo = await ModifyErgoTx.depTables.ModifyUtxoTransaction.addIOsToTx(
-      db, tx, {
-        utxoInputs,
-        utxoOutputs,
-      }
-    );
-
-    // add assets
-    const newTokenListEntries = await ModifyErgoTx.depTables.ModifyTokenList.upsert(
-      db, tx,
-      tokenList.map(entry => entry.TokenList)
-    );
-
-    return {
-      txType: TransactionType.Ergo,
-      ...newTx,
-      ...utxo,
       tokens: newTokenListEntries.map(entry => ({
         TokenList: entry,
         Token: {

@@ -4,7 +4,7 @@ import type { CoreAddressT } from '../database/primitives/enums';
 import { CoreAddressTypes } from '../database/primitives/enums';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 import type { NetworkRow } from '../database/primitives/tables';
-import { isCardanoHaskell, isErgo } from '../database/prepackaged/networks';
+import { isCardanoHaskell } from '../database/prepackaged/networks';
 import { defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import { bech32 as bech32Module } from 'bech32';
@@ -60,32 +60,10 @@ export function addressToKind(
         }
         throw new Error(`${nameof(addressToKind)} unknown address type`);
       }
-      if (isErgo(network)) {
-        const ergoAddress =
-          parseAs === 'bytes'
-            ? Scope.SigmaRust.NetworkAddress.from_bytes(Buffer.from(address, 'hex'))
-            : Scope.SigmaRust.NetworkAddress.from_base58(address);
-        return ergoAddressToType(ergoAddress);
-      }
       throw new Error(`${nameof(addressToKind)} not implemented for network ${network.NetworkId}`);
     });
   } catch (e1) {
     throw new Error(`${nameof(addressToKind)} failed to parse address type ${e1} ${address}`);
-  }
-}
-
-export function ergoAddressToType(address: RustModule.SigmaRust.NetworkAddress): CoreAddressT {
-  switch (address.address().address_type_prefix()) {
-    case RustModule.SigmaRust.AddressTypePrefix.P2Pk:
-      return CoreAddressTypes.ERGO_P2PK;
-    case RustModule.SigmaRust.AddressTypePrefix.Pay2Sh:
-      return CoreAddressTypes.ERGO_P2SH;
-    case RustModule.SigmaRust.AddressTypePrefix.Pay2S:
-      return CoreAddressTypes.ERGO_P2S;
-    default:
-      throw new Error(
-        `${nameof(ergoAddressToType)} unknown Ergo address type ${address.to_base58()}`
-      );
   }
 }
 
@@ -119,15 +97,6 @@ export function isValidReceiveAddress(
 
   const kind = tryAddressToKind(bech32, 'bech32', network);
   if (kind == null) {
-    return [false, messages.invalidAddress];
-  }
-  if (isErgo(network)) {
-    if (kind === CoreAddressTypes.ERGO_P2SH) {
-      return [false, messages.cannotSendToP2SH];
-    }
-    if (isErgoAddress(kind)) {
-      return true;
-    }
     return [false, messages.invalidAddress];
   }
   if (isCardanoHaskell(network)) {
@@ -298,13 +267,6 @@ export function normalizeToAddress(addr: string): void | RustModule.WalletV4.Add
   return undefined;
 }
 
-export function isErgoAddress(kind: CoreAddressT): boolean {
-  if (kind === CoreAddressTypes.ERGO_P2PK) return true;
-  if (kind === CoreAddressTypes.ERGO_P2SH) return true;
-  if (kind === CoreAddressTypes.ERGO_P2S) return true;
-  return false;
-}
-
 export function toEnterprise(address: string): void | RustModule.WalletV4.EnterpriseAddress {
   if (RustModule.WalletV4.ByronAddress.is_valid(address)) {
     return undefined;
@@ -372,10 +334,6 @@ export function addressToDisplayString(address: string, network: $ReadOnly<Netwo
       }
       return byronAddr.to_base58();
     }
-    if (isErgo(network)) {
-      const ergoAddr = RustModule.SigmaRust.NetworkAddress.from_bytes(Buffer.from(address, 'hex'));
-      return ergoAddr.to_base58();
-    }
     throw new Error(
       `${nameof(addressToDisplayString)} not implemented for network ${network.NetworkId}`
     );
@@ -407,10 +365,6 @@ export function getAddressPayload(address: string, network: $ReadOnly<NetworkRow
         return Buffer.from(wasmAddr.to_bytes()).toString('hex');
       }
       return byronAddr.to_base58();
-    }
-    if (isErgo(network)) {
-      const ergoAddr = RustModule.SigmaRust.NetworkAddress.from_base58(address);
-      return Buffer.from(ergoAddr.to_bytes()).toString('hex');
     }
     throw new Error(
       `${nameof(getAddressPayload)} not implemented for network ${network.NetworkId}`

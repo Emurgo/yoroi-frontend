@@ -184,8 +184,7 @@ export default class ConnectContainer extends Component<
     const wallets = this.generated.stores.connector.filteredWallets;
     const error = this.generated.stores.connector.errorWallets;
     const loadingWallets = this.generated.stores.connector.loadingWallets;
-    const protocol = this.generated.stores.connector.protocol;
-    const network = protocol === 'ergo' ? 'ERG' : 'Cardano';
+    const network = 'Cardano';
     const isSelectWalletHardware =
       this.state.selectedWallet.deriver?.getParent().getWalletType() !==
       WalletTypeOption.WEB_WALLET;
@@ -246,6 +245,7 @@ export default class ConnectContainer extends Component<
         currentConnectorWhitelist: Array<WhitelistEntry>,
         errorWallets: string,
         loadingWallets: $Values<typeof LoadingWalletStates>,
+        // <TODO:PENDING_REMOVAL> Protocol
         protocol: ?string,
       |},
       tokenInfoStore: {|

@@ -20,7 +20,7 @@ import { asGetPublicKey } from '../api/ada/lib/storage/models/PublicDeriver/trai
 import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
 import { MultiToken } from '../api/common/lib/MultiToken';
 import { genLookupOrFail, getTokenName } from '../stores/stateless/tokenHelpers';
-import { networks, isErgo } from '../api/ada/lib/storage/database/prepackaged/networks';
+import { networks } from '../api/ada/lib/storage/database/prepackaged/networks';
 import { addressToDisplayString } from '../api/ada/lib/storage/bridge/utils';
 import { getReceiveAddress } from '../stores/stateless/addressStores';
 import BuySellDialog from '../components/buySell/BuySellDialog';
@@ -136,7 +136,6 @@ export default class NavBarContainerRevamp extends Component<Props> {
       balance = this.generated.stores.transactions.getBalance(publicDeriver);
     }
 
-    const ergoWallets = [];
     const cardanoWallets = [];
 
     wallets.forEach(wallet => {
@@ -163,15 +162,13 @@ export default class NavBarContainerRevamp extends Component<Props> {
         shouldHideBalance: this.generated.stores.profile.shouldHideBalance,
       };
 
-      if (isErgo(wallet.getParent().getNetworkInfo())) ergoWallets.push(walletMap);
-      else cardanoWallets.push(walletMap);
+      cardanoWallets.push(walletMap);
     });
 
     if (this.generated.stores.uiDialogs.isOpen(WalletListDialog)) {
       return (
         <WalletListDialog
           cardanoWallets={cardanoWallets}
-          ergoWallets={ergoWallets}
           onSelect={this.onSelectWallet}
           selectedWallet={this.generated.stores.wallets.selected}
           close={this.generated.actions.dialogs.closeActiveDialog.trigger}
