@@ -157,19 +157,6 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     return this.isDefaultIncluded ? 11 : 10
   }
 
-  // ================
-  //   tentative tx
-  // ================
-
-  // eslint-disable-next-line no-restricted-syntax
-  _mismatchReaction: void => mixed = reaction(
-    () => [
-      this.plannedTx,
-      this.tentativeTx,
-    ],
-    () => runInAction(() => { this.txMismatch = this._txMismatch(); })
-  );
-
   // ==============
   //   planned tx
   // ==============
