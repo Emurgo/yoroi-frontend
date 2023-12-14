@@ -34,7 +34,7 @@ export default class ReadOnlyInput extends Component<Props> {
       classicTheme,
     } = this.props;
     const { intl } = this.context;
-    const buttonLabel = intl.formatMessage(globalMessages[isSet ? 'change' : 'create']);
+    const buttonLabel = intl.formatMessage(isSet ? globalMessages.change : globalMessages.create);
 
     const mainClasses = classnames([
       styles.component,
