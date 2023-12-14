@@ -106,6 +106,7 @@ module.exports = {
     'flowtype/no-primitive-constructor-types': 2,
     'flowtype/no-dupe-keys': 2,
     'no-extra-boolean-cast': 0,
+    'react/jsx-first-prop-new-line': 0,
     'no-restricted-properties': [
       2,
       { object: 'TrezorConnect', message: 'Use TrezorWrapper instead to minimize Trezor iframe lifespan', },
