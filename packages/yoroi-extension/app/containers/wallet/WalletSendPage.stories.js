@@ -8,23 +8,19 @@ import WalletSendPage from './WalletSendPage';
 import { THEMES } from '../../styles/utils';
 import { withScreenshot } from 'storycap';
 import {
+  genUnitOfAccount,
   globalKnobs,
   ledgerErrorCases,
-  trezorErrorCases,
-  mockTrezorMeta,
   mockLedgerMeta,
-  genUnitOfAccount,
+  mockTrezorMeta,
+  trezorErrorCases,
 } from '../../../stories/helpers/StoryWrapper';
+import type { PossibleCacheTypes } from '../../../stories/helpers/WalletCache';
 import { walletLookup } from '../../../stories/helpers/WalletCache';
 import {
   genShelleyCIP1852SigningWalletWithCache,
   genTentativeShelleyTx,
 } from '../../../stories/helpers/cardano/ShelleyCip1852Mocks';
-import {
-  genErgoSigningWalletWithCache,
-  genTentativeErgoTx,
-} from '../../../stories/helpers/ergo/ErgoMocks';
-import type { PossibleCacheTypes } from '../../../stories/helpers/WalletCache';
 import MemoNoExternalStorageDialog from '../../components/wallet/memos/MemoNoExternalStorageDialog';
 import { wrapWallet } from '../../Routes';
 import { mockWalletProps } from './Wallet.mock';
@@ -34,14 +30,9 @@ import { buildRoute } from '../../utils/routing';
 import { InvalidWitnessError } from '../../api/common/errors';
 import WalletSendConfirmationDialog from '../../components/wallet/send/WalletSendConfirmationDialog';
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
-import { defaultAssets, isErgo } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import {
-  mockFromDefaults,
-  getDefaultEntryTokenInfo,
-  mockDefaultToken,
-} from '../../stores/toplevel/TokenInfoStore';
+import { defaultAssets } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { getDefaultEntryTokenInfo, mockDefaultToken, mockFromDefaults, } from '../../stores/toplevel/TokenInfoStore';
 import { MultiToken } from '../../api/common/lib/MultiToken';
-import BigNumber from 'bignumber.js';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -51,32 +42,8 @@ export default {
 
 const getRoute = id => buildRoute(ROUTES.WALLETS.SEND, { id });
 
-const genTokenInfoMap = network => {
-  const map = mockFromDefaults(defaultAssets);
-
-  if (isErgo(network)) {
-    map
-      .get(network.NetworkId.toString())
-      ?.set('f2b5c4e4883555b882e3a5919967883aade9e0494290f29e0e3069f5ce9eabe4', {
-        Digest: 1234,
-        TokenId: 1234,
-        NetworkId: network.NetworkId,
-        Identifier: 'f2b5c4e4883555b882e3a5919967883aade9e0494290f29e0e3069f5ce9eabe4',
-        IsDefault: false,
-        IsNFT: false,
-        Metadata: {
-          type: 'Ergo',
-          height: 0,
-          boxId: 'dc18a160f90e139f4813759d86db87b7f80db228de8f6b8c493da954042881ef',
-          ticker: null,
-          longName: 'Cool Token',
-          numberOfDecimals: 3, // units per ERG
-          description: null,
-        },
-      });
-  }
-
-  return map;
+const genTokenInfoMap = () => {
+  return mockFromDefaults(defaultAssets);
 };
 
 const genBaseProps: ({|
@@ -288,37 +255,6 @@ export const UserInput = (): Node => {
   );
 };
 
-export const MultiAsset = (): Node => {
-  const wallet = genErgoSigningWalletWithCache();
-  const lookup = walletLookup([wallet]);
-
-  const defaultToken = mockDefaultToken(
-    wallet.publicDeriver.getParent().getNetworkInfo().NetworkId
-  );
-  return wrapWallet(
-    mockWalletProps({
-      location: getRoute(wallet.publicDeriver.getPublicDeriverId()),
-      selected: wallet.publicDeriver,
-      ...lookup,
-    }),
-    <WalletSendPage
-      generated={genBaseProps({
-        wallet,
-        balance: new MultiToken(
-          [
-            {
-              identifier: 'f2b5c4e4883555b882e3a5919967883aade9e0494290f29e0e3069f5ce9eabe4',
-              networkId: wallet.publicDeriver.getParent().getNetworkInfo().NetworkId,
-              amount: new BigNumber(1000),
-            },
-          ],
-          defaultToken
-        ),
-      })}
-    />
-  );
-};
-
 export const MemoDialog = (): Node => {
   const wallet = genShelleyCIP1852SigningWalletWithCache();
   const lookup = walletLookup([wallet]);
@@ -370,60 +306,6 @@ export const RegularConfirmationDialog = (): Node => {
   const lookup = walletLookup([wallet]);
 
   const { tentativeTx, inputAmount, fee } = genTentativeShelleyTx(wallet.publicDeriver);
-  const errorCases = Object.freeze({
-    None: undefined,
-    InvalidWitness: new InvalidWitnessError(),
-  });
-  const getErrorValue = () => select('errorCases', errorCases, errorCases.None);
-
-  const defaultToken = mockDefaultToken(
-    wallet.publicDeriver.getParent().getNetworkInfo().NetworkId
-  );
-  return wrapWallet(
-    mockWalletProps({
-      location: getRoute(wallet.publicDeriver.getPublicDeriverId()),
-      selected: wallet.publicDeriver,
-      ...lookup,
-    }),
-    <WalletSendPage
-      generated={genBaseProps({
-        wallet,
-        balance: new MultiToken([], defaultToken),
-        dialogInfo: {
-          sendMoneyRequest: {
-            isExecuting: boolean('isExecuting', false),
-            reset: action('reset'),
-            error: getErrorValue(),
-          },
-          transactionBuilderStore: {
-            totalInput: inputAmount,
-            fee,
-            shouldSendAll: false,
-            tentativeTx,
-            txMismatch: boolean('txMismatch', false),
-            createUnsignedTx: {
-              isExecuting: false,
-              error: undefined,
-            },
-            selectedToken: undefined,
-            plannedTxInfoMap: [],
-            maxAssetsAllowed: 10,
-            calculateMinAda: () => '1',
-            isDefaultIncluded: false,
-            minAda: undefined,
-            maxSendableAmount: { isExecuting: false, error: undefined, result: undefined },
-          },
-        },
-      })}
-    />
-  );
-};
-
-export const MultiAssetConfirmationDialog = (): Node => {
-  const wallet = genErgoSigningWalletWithCache();
-  const lookup = walletLookup([wallet]);
-
-  const { tentativeTx, inputAmount, fee } = genTentativeErgoTx(wallet.publicDeriver);
   const errorCases = Object.freeze({
     None: undefined,
     InvalidWitness: new InvalidWitnessError(),

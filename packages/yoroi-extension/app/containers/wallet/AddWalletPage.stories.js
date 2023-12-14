@@ -627,19 +627,6 @@ export const CardanoRestoreOptions = (): Node => {
   );
 };
 
-export const ErgoRestoreOptions = (): Node => {
-  return (
-    <AddWalletPage
-      generated={defaultProps(
-        Object.freeze({
-          selectedNetwork: networks.ErgoMainnet,
-          openDialog: WalletRestoreOptionDialog,
-        })
-      )}
-    />
-  );
-};
-
 export const RestoreWalletStart = (): Node => {
   const modeOptions: {| [key: string]: RestoreModeType |} = {
     SHELLEY15: { type: 'cip1852', extra: undefined, length: 15 },

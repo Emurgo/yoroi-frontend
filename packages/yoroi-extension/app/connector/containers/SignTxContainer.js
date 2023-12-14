@@ -17,9 +17,8 @@ import { observer } from 'mobx-react';
 import { computed, observable, runInAction } from 'mobx';
 import config from '../../config';
 import globalMessages from '../../i18n/global-messages';
-import SignTxPage from '../components/signin/SignTxPage';
 import CardanoSignTxPage from '../components/signin/CardanoSignTxPage';
-import { genLookupOrFail, genLookupOrNull } from '../../stores/stateless/tokenHelpers';
+import { genLookupOrNull } from '../../stores/stateless/tokenHelpers';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
 import FullscreenLayout from '../../components/layout/FullscreenLayout';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
@@ -174,30 +173,6 @@ export default class SignTxContainer extends Component<
 
     // TODO: handle other sign types
     switch (signingMessage.sign.type) {
-      case 'tx': {
-        const txData = this.generated.stores.connector.signingRequest;
-        if (txData == null) return this.renderLoading();
-        component = (
-          <SignTxPage
-            shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
-            selectedWallet={selectedWallet}
-            onCopyAddressTooltip={handleCopyAddressTooltip}
-            notification={notification}
-            tx={signingMessage.sign.tx}
-            txData={txData}
-            getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
-            defaultToken={selectedWallet.publicDeriver.getParent().getDefaultToken()}
-            network={selectedWallet.publicDeriver.getParent().getNetworkInfo()}
-            onConfirm={handleConfirm}
-            onCancel={this.onCancel}
-            addressToDisplayString={getAddressToDisplay}
-            getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
-            selectedExplorer={selectedExplorer}
-            unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
-          />
-        );
-        break;
-      }
       case 'tx-reorg/cardano': {
         const txData = this.generated.stores.connector.adaTransaction;
         if (txData == null && signData == null) return this.renderLoading();

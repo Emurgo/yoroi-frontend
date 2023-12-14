@@ -41,7 +41,6 @@ import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import CardanoUtxoDetails from './cardano/UtxoDetails';
 import { Box } from '@mui/system';
 import SignTxTabs from './SignTxTabs';
-import { signTxMessages } from './SignTxPage';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import { ReactComponent as ExternalLinkIcon } from '../../assets/images/external-link.inline.svg';
 import CardanoSignTx from './cardano/SignTx';
@@ -58,6 +57,10 @@ const messages = defineMessages({
   sendError: {
     id: 'connector.signin.error.sendError',
     defaultMessage: '!!!An error occured when sending the transaction.',
+  },
+  signMessage: {
+    id: 'connector.signin.signMessage',
+    defaultMessage: '!!!Sign Message',
   },
 });
 
@@ -425,7 +428,7 @@ class SignTxPage extends Component<Props, State> {
       content = (
         <Box>
           <Typography color="#4A5065" variant="body1" fontWeight={500} mb="16px" id="signMessageTitle">
-            {intl.formatMessage(signTxMessages.signMessage)}
+            {intl.formatMessage(messages.signMessage)}
           </Typography>
           <Box
             width="100%"
