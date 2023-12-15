@@ -40,7 +40,6 @@ import BigNumber from 'bignumber.js';
 import classnames from 'classnames';
 import SendFormHeader from './SendFormHeader';
 import { SEND_FORM_STEP } from '../../../types/WalletSendTypes';
-import { isErgo } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { ReactComponent as PlusIcon } from '../../../assets/images/plus.inline.svg';
 import AddNFTDialog from './WalletSendFormSteps/AddNFTDialog';
 import AddTokenDialog from './WalletSendFormSteps/AddTokenDialog';
@@ -580,7 +579,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     : intl.formatMessage(messages.memoFieldLabelInactive)
                 }
               />
-              <Typography
+              <Typography component="div"
                 variant="caption1"
                 color={invalidMemo ? 'magenta.500' : 'grayscale.600'}
                 sx={{ position: 'absolute', bottom: '5px', right: '0' }}
@@ -594,7 +593,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
         return (
           <Box className={styles.amountStep}>
             {isCalculatingFee && (
-              <Typography
+              <Typography component="div"
                 variant="caption1"
                 sx={{
                   position: 'absolute',
@@ -609,7 +608,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             )}
 
             {!isDefaultIncluded && (
-              <Typography
+              <Typography component="div"
                 variant="caption1"
                 sx={{
                   position: 'absolute',
@@ -640,7 +639,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     }),
               }}
             >
-              <Typography
+              <Typography component="div"
                 sx={{
                   position: 'absolute',
                   top: '-8px',
@@ -697,26 +696,25 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   placeholder="0"
                 />
 
-                <Typography variant="button2" color="grey.600" fontWeight={500} mr="12px">
-                  {isErgo(this.props.selectedNetwork) ? 'ERG' : 'ADA'}
+                <Typography component="div" variant="button2" color="grey.600" fontWeight={500} mr="12px">
+                  ADA
                 </Typography>
 
-                {!isErgo(this.props.selectedNetwork) && (
-                  <Button
-                    variant="tertiary"
-                    color="secondary"
-                    size="small"
-                    sx={{
+                <Button
+                  variant="tertiary"
+                  color="secondary"
+                  size="small"
+                  sx={{
                       '&.MuiButton-sizeSmall': {
                         lineHeight: '17px',
                       },
                     }}
-                    disabled={maxSendableAmount.isExecuting}
-                    className={classnames([
+                  disabled={maxSendableAmount.isExecuting}
+                  className={classnames([
                       styles.maxBtn,
                       maxSendableAmount.isExecuting && styles.maxButtonSpinning,
                     ])}
-                    onClick={() => {
+                  onClick={() => {
                       const hasTokens =
                         spendableBalance && spendableBalance.nonDefaultEntries().length !== 0;
                       if (hasTokens || !spendableBalance) {
@@ -734,10 +732,9 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                         this.props.updateSendAllStatus(true);
                       }
                     }}
-                  >
-                    {intl.formatMessage(messages.max)}
-                  </Button>
-                )}
+                >
+                  {intl.formatMessage(messages.max)}
+                </Button>
               </Box>
               {showFiat && (
                 <Box
@@ -754,7 +751,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 </Box>
               )}
               {isDefaultIncluded && (
-                <Typography
+                <Typography component="div"
                   sx={{
                     position: 'absolute',
                     bottom: '-25px',

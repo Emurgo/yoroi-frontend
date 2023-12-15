@@ -117,7 +117,7 @@ class TermsOfUseForm extends Component<Props & InjectedLayoutProps, State> {
             </LoadingButton>
           </div>
 
-          {error && <p className={styles.error}>{intl.formatMessage(error, error.values)}</p>}
+          {error && <div className={styles.error}>{intl.formatMessage(error, error.values)}</div>}
         </div>
       </div>
     );
@@ -136,10 +136,10 @@ class TermsOfUseForm extends Component<Props & InjectedLayoutProps, State> {
             mx: 'auto',
           }}
         >
-          <Typography variant="h5" fontWeight={500} maxWidth="350px">
+          <Typography component="div" variant="h5" fontWeight={500} maxWidth="350px">
             {intl.formatMessage(messages.updateTitle)}
           </Typography>
-          <Typography variant="body1" maxWidth="450px">
+          <Typography component="div" variant="body1" maxWidth="450px">
             {intl.formatMessage(messages.updateText)}
           </Typography>
 
@@ -190,7 +190,7 @@ class TermsOfUseForm extends Component<Props & InjectedLayoutProps, State> {
             </LoadingButton>
           </Box>
 
-          {error && <p className={styles.error}>{intl.formatMessage(error, error.values)}</p>}
+          {error && <div className={styles.error}>{intl.formatMessage(error, error.values)}</div>}
         </Box>
       </Box>
     );

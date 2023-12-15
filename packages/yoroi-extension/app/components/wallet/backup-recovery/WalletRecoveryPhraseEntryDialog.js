@@ -140,9 +140,9 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
         ))}
       </div>
     ) : (
-      <p className={styles.phrasePlaceholder}>
+      <div className={styles.phrasePlaceholder}>
         {intl.formatMessage(messages.verificationInstructions)}
-      </p>
+      </div>
     );
 
     const phraseDoesNotMatchError =

@@ -25,7 +25,6 @@ import {
   APIErrorCodes,
   asPaginate,
   asTokenId,
-  asTx,
   asValue,
   ConnectorError,
   DataSignErrorCodes,
@@ -177,8 +176,8 @@ type PendingSign = {|
 
 type ConnectedSite = {|
   url: string,
-  // <TODO:PENDING_REMOVAL> Ergo protocol
-  protocol: 'cardano' | 'ergo',
+  // <TODO:PENDING_REMOVAL> Legacy
+  protocol: 'cardano',
   appAuthID?: string,
   status: ConnectedStatus,
   pendingSigns: {| [uid: string]: PendingSign |},
@@ -913,8 +912,8 @@ async function confirmSign(
 async function findWhitelistedConnection(
   url: string,
   requestIdentification?: boolean,
-  // <TODO:PENDING_REMOVAL> Ergo protocol
-  protocol: 'cardano' | 'ergo',
+  // <TODO:PENDING_REMOVAL> Legacy
+  protocol: 'cardano',
   localStorageApi: LocalStorageApi,
 ): Promise<?WhitelistEntry> {
   const isAuthRequested = Boolean(requestIdentification);
@@ -938,11 +937,12 @@ async function confirmConnect(
     url: string,
     requestIdentification?: boolean,
     onlySilent?: boolean,
-    // <TODO:PENDING_REMOVAL> Ergo protocol
-    protocol: 'cardano' | 'ergo',
+    // <TODO:PENDING_REMOVAL> Protocol
+    protocol: 'cardano',
   |},
   localStorageApi: LocalStorageApi,
 ): Promise<void> {
+  // <TODO:PENDING_REMOVAL> Protocol
   const { url, requestIdentification, onlySilent, protocol } = connectParameters;
   const isAuthRequested = Boolean(requestIdentification);
   const appAuthID = isAuthRequested ? url : undefined;
@@ -1135,46 +1135,6 @@ async function handleInjectorMessage(message, sender) {
         handleError(e);
       }
       break;
-    case 'sign_tx_input':
-      try {
-        checkParamCount(2);
-        await withDb(async (db, localStorageApi) => {
-          await withSelectedWallet(
-            tabId,
-            async (_wallet, connection) => {
-              if (connection == null) {
-                Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
-                rpcResponse(undefined); // shouldn't happen
-                return
-              }
-              await RustModule.load();
-              const tx = asTx(message.params[0], RustModule.SigmaRust);
-              const txIndex = message.params[1];
-              if (typeof txIndex !== 'number') {
-                throw ConnectorError.invalidRequest(`invalid tx input: ${txIndex}`);
-              }
-              await confirmSign(
-                tabId,
-                {
-                  type: 'tx_input',
-                  tx,
-                  index: txIndex,
-                  uid: message.uid
-                },
-                connection,
-                { type: 'cardano-tx-input' },
-                message.protocol,
-                message.uid,
-              );
-            },
-            db,
-            localStorageApi,
-          )
-        });
-      } catch (e) {
-        handleError(e);
-      }
-      break;
     case 'sign_data':
       try {
         const rawAddress = message.params[0];
@@ -1247,11 +1207,9 @@ async function handleInjectorMessage(message, sender) {
           await withSelectedWallet(
             tabId,
             async (wallet) => {
-              const connectionProtocol = await getFromStorage(STORAGE_KEY_CONNECTION_PROTOCOL) ||
-                    'cardano';
               await RustModule.load();
               const balance =
-                    await connectorGetBalance(wallet, tokenId, connectionProtocol);
+                    await connectorGetBalance(wallet, tokenId);
               if (isCBOR && tokenId === '*' && !(typeof balance === 'string')) {
                 const W4 = RustModule.WalletV4;
                 const value = W4.Value.new(

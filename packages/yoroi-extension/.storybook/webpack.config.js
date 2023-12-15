@@ -63,7 +63,6 @@ module.exports = async ({ config, mode } /*: {|
         ...config.resolve.alias,
         // mysteriously we need to alias this for Storybook
         'cardano-wallet-browser': 'cardano-wallet-browser/cardano_wallet_browser',
-        'ergo-lib-wasm-browser': 'ergo-lib-wasm-browser/ergo_lib_wasm',
       },
     },
     experiments: {

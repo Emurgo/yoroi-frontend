@@ -260,7 +260,7 @@ async function fixLovefieldDuplicatePrimaryKey(errorMessage: string): Promise<vo
     window.indexedDB.open('yoroi-schema'),
     'could not open DB',
   );
-  
+
   const store = db
     .transaction([storeName], 'readwrite')
     .objectStore(storeName);
@@ -478,26 +478,6 @@ async function onUpgrade(
       'Ordinal',
       // recall: certificates weren't supported at this time
       TransactionType.CardanoByron
-    );
-  }
-  if (version >= 3 && version <= 14) {
-    await rawDb.addTableColumn(
-      'UtxoTransactionOutput',
-      'ErgoBoxId',
-      // recall: at the time we only supported Cardano
-      null
-    );
-    await rawDb.addTableColumn(
-      'UtxoTransactionOutput',
-      'ErgoCreationHeight',
-      // recall: at the time we only supported Cardano
-      null
-    );
-    await rawDb.addTableColumn(
-      'UtxoTransactionOutput',
-      'ErgoTree',
-      // recall: at the time we only supported Cardano
-      null
     );
   }
   if (version >= 3 && version <= 15) {

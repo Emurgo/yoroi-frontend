@@ -70,7 +70,7 @@ function InfoDialog(props: Props & Intl): Node {
           flexDirection: 'column',
         }}
       >
-        <Typography
+        <Typography component="div"
           sx={{
             display: 'block',
             fontSize: '16px',

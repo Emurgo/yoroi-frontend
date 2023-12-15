@@ -425,8 +425,8 @@ const ImageItem = styled(Box)({
 function LabelWithValue({ label, value }: {| label: string | Node, value: string | Node |}): Node {
   return (
     <Box>
-      <Typography color="var(--yoroi-palette-gray-600)">{label}</Typography>
-      <Typography color="var(--yoroi-palette-gray-900)">{value}</Typography>
+      <Typography component="div" color="var(--yoroi-palette-gray-600)">{label}</Typography>
+      <Typography component="div" color="var(--yoroi-palette-gray-900)">{value}</Typography>
     </Box>
   );
 }

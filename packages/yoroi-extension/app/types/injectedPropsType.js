@@ -4,7 +4,7 @@ import type { ActionsMap } from '../actions/index';
 import type { StoresMap as StoresConnectorMap } from '../connector/stores/index';
 import type { ActionsMap as ActionsConnectorMap } from '../connector/actions/index';
 
-type InjectedProps = {|
+export type InjectedProps = {|
   +stores: StoresMap,
   +actions: ActionsMap,
 |};

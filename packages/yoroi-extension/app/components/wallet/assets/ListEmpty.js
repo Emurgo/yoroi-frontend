@@ -18,7 +18,7 @@ export const ListEmpty = ({ message }: Props): Node => {
       spacing={2}
     >
       <NoTransactionModernSvg />
-      <Typography variant="h3" color="var(--yoroi-palette-gray-900)">
+      <Typography component="div" variant="h3" color="var(--yoroi-palette-gray-900)">
         {message}
       </Typography>
     </Stack>

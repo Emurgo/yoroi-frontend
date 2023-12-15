@@ -1,26 +1,25 @@
 // @flow
-import { ROUTES } from '../../routes-config';
 import type { MessageDescriptor } from 'react-intl';
+import { ROUTES } from '../../routes-config';
 import globalMessages, { connectorMessages } from '../../i18n/global-messages';
-import { ReactComponent as walletsIcon }  from '../../assets/images/sidebar/my_wallets.inline.svg';
-import { ReactComponent as transferIcon }  from '../../assets/images/sidebar/transfer_wallets.inline.svg';
-import { ReactComponent as settingsIcon }  from '../../assets/images/sidebar/wallet-settings-2-ic.inline.svg';
-import { ReactComponent as goBackIcon }  from '../../assets/images/top-bar/back-arrow-white.inline.svg';
-import { ReactComponent as dappConnectorIcon }  from '../../assets/images/dapp-connector/dapp-connector.inline.svg';
-import { ReactComponent as noticeBoardIcon }  from '../../assets/images/notice-board/notice-board.inline.svg';
 import { matchRoute } from '../../utils/routing';
-import environment from '../../environment';
 import { asGetStakingKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-
-import { ReactComponent as walletIcon }  from '../../assets/images/sidebar/revamp/wallet.inline.svg';
-import { ReactComponent as stakingIcon }  from '../../assets/images/sidebar/revamp/staking.inline.svg';
-import { ReactComponent as assetsIcon }  from '../../assets/images/sidebar/revamp/assets.inline.svg';
+import { ReactComponent as walletsIcon } from '../../assets/images/sidebar/my_wallets.inline.svg';
+import { ReactComponent as transferIcon } from '../../assets/images/sidebar/transfer_wallets.inline.svg';
+import { ReactComponent as settingsIcon } from '../../assets/images/sidebar/wallet-settings-2-ic.inline.svg';
+import { ReactComponent as goBackIcon } from '../../assets/images/top-bar/back-arrow-white.inline.svg';
+import { ReactComponent as dappConnectorIcon } from '../../assets/images/dapp-connector/dapp-connector.inline.svg';
+import { ReactComponent as noticeBoardIcon } from '../../assets/images/notice-board/notice-board.inline.svg';
+import { ReactComponent as walletIcon } from '../../assets/images/sidebar/revamp/wallet.inline.svg';
+import { ReactComponent as stakingIcon } from '../../assets/images/sidebar/revamp/staking.inline.svg';
+import { ReactComponent as assetsIcon } from '../../assets/images/sidebar/revamp/assets.inline.svg';
 import { ReactComponent as nftsIcon } from '../../assets/images/sidebar/revamp/nfts.inline.svg';
-import { ReactComponent as votingIcon }  from '../../assets/images/sidebar/revamp/voting.inline.svg';
-// import { ReactComponent as swapIcon }  from '../../assets/images/sidebar/revamp/swap.inline.svg';
-import { ReactComponent as settingIcon }  from '../../assets/images/sidebar/revamp/setting.inline.svg';
+import { ReactComponent as votingIcon } from '../../assets/images/sidebar/revamp/voting.inline.svg';
+import { ReactComponent as swapIcon } from '../../assets/images/sidebar/revamp/swap.inline.svg';
+import { ReactComponent as settingIcon } from '../../assets/images/sidebar/revamp/setting.inline.svg';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import environment from '../../environment';
 
 export type SidebarCategory = {|
   +className: string,
@@ -67,17 +66,6 @@ export const BACK_TO_ADD: SidebarCategory = registerCategory({
   isVisible: request => !request.hasAnyWallets,
 });
 
-export const BACK_TO_MY_WALLETS: SidebarCategory = registerCategory({
-  className: 'go-back',
-  route: ROUTES.MY_WALLETS,
-  icon: goBackIcon,
-  label: globalMessages.goBack,
-  isVisible: request =>
-    request.hasAnyWallets &&
-    request.selected == null &&
-    matchRoute(ROUTES.WALLETS.ADD, request.currentRoute) !== false,
-});
-
 export const SETTINGS: SidebarCategory = registerCategory({
   className: 'settings',
   route: ROUTES.SETTINGS.ROOT,
@@ -93,7 +81,6 @@ export const TRANSFER_PAGE: SidebarCategory = registerCategory({
   label: globalMessages.sidebarTransfer,
   isVisible: _request => true,
 });
-
 
 export const CONNECTED_WEBSITES: SidebarCategory = registerCategory({
   className: 'dapp-connector',
@@ -111,11 +98,11 @@ export const NOTICE_BOARD: SidebarCategory = registerCategory({
 });
 
 type isVisibleFunc = ({|
-    hasAnyWallets: boolean,
-    selected: null | PublicDeriver<>,
-    currentRoute: string,
-    isRewardWallet: isRewardWalletFunc,
-  |}) => boolean;
+  hasAnyWallets: boolean,
+  selected: null | PublicDeriver<>,
+  currentRoute: string,
+  isRewardWallet: isRewardWalletFunc,
+|}) => boolean;
 
 type isRewardWalletFunc = (PublicDeriver<>) => boolean;
 
@@ -132,28 +119,31 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
   // Open `/wallets` only if the user is on any other page other than `/wallets/add`
   makeWalletCategory(
     ROUTES.WALLETS.ROOT,
-    ({ currentRoute, hasAnyWallets }) => currentRoute !== ROUTES.WALLETS.ADD && hasAnyWallets,
+    ({ currentRoute, hasAnyWallets }) => currentRoute !== ROUTES.WALLETS.ADD && hasAnyWallets
   ),
   // Open `/wallets/transactions` if the user is on the `/wallet/add`
   makeWalletCategory(
     ROUTES.WALLETS.TRANSACTIONS,
-    ({ currentRoute, hasAnyWallets }) => currentRoute === ROUTES.WALLETS.ADD && hasAnyWallets,
+    ({ currentRoute, hasAnyWallets }) => currentRoute === ROUTES.WALLETS.ADD && hasAnyWallets
   ),
   // If user didn't restored any wallets, it should redirect to the add wallet page.
-  makeWalletCategory(
-    ROUTES.WALLETS.ADD,
-    ({ hasAnyWallets }) => !hasAnyWallets,
-  ),
+  makeWalletCategory(ROUTES.WALLETS.ADD, ({ hasAnyWallets }) => !hasAnyWallets),
   {
     className: 'staking',
     route: ROUTES.STAKING,
     icon: stakingIcon,
     label: globalMessages.sidebarStaking,
-    isVisible: ({ selected, isRewardWallet }) => (
+    isVisible: ({ selected, isRewardWallet }) =>
       !!selected &&
       isCardanoHaskell(selected.getParent().getNetworkInfo()) &&
-      isRewardWallet(selected)
-    ),
+      isRewardWallet(selected),
+  },
+  {
+    className: 'swap',
+    route: ROUTES.SWAP.ROOT,
+    icon: swapIcon,
+    label: globalMessages.sidebarSwap,
+    isVisible: () => environment.isDev(),
   },
   {
     className: 'assets',
@@ -221,5 +211,5 @@ function makeWalletCategory(route: string, isVisible: isVisibleFunc): SidebarCat
     icon: walletIcon,
     label: globalMessages.walletLabel,
     isVisible,
-  }
-};
+  };
+}

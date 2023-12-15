@@ -36,12 +36,12 @@ export default class TokenOptionRow extends Component<Props> {
             fontSize: '1rem',
           }}
         >
-          <Typography sx={{ flex: 1 }}>{this.props.displayName}</Typography>
-          {notOnlyName && <Typography flex={1}>{this.props.amount}</Typography>}
+          <Typography component="div" sx={{ flex: 1 }}>{this.props.displayName}</Typography>
+          {notOnlyName && <Typography component="div" flex={1}>{this.props.amount}</Typography>}
         </Box>
         <Box>
           {notOnlyName && (
-            <Typography
+            <Typography component="div"
               sx={{ color: '#6B7384', fontSize: '0.875rem', letterSpacing: 0, lineHeight: '22px' }}
             >
               {this.props.id}

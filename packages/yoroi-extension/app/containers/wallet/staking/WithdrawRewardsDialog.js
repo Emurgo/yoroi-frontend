@@ -286,14 +286,14 @@ export default class WithdrawRewardsDialog extends Component<Props> {
           {shouldDeregister && (
             <Box mb="24px">
               <Warning>
-                <Typography variant="body1">
+                <Typography component="div" variant="body1">
                   {intl.formatMessage(messages.deregistrationWarning)}
                 </Typography>
               </Warning>
             </Box>
           )}
           <Box mb="16px" px="5px">
-            <Typography variant="body1" color="grayscale.600">
+            <Typography component="div" variant="body1" color="grayscale.600">
               {intl.formatMessage(globalMessages.stakePoolChecksumAndName)}
             </Typography>
             <Box
@@ -316,16 +316,16 @@ export default class WithdrawRewardsDialog extends Component<Props> {
                   src={avatarGenerated}
                 />
               </Box>
-              <Typography variant="body1" color="grayscale.900">
+              <Typography component="div" variant="body1" color="grayscale.900">
                 {name}
               </Typography>
             </Box>
           </Box>
           <Box>
-            <Typography variant="body1" color="grayscale.600" px="4px">
+            <Typography component="div" variant="body1" color="grayscale.600" px="4px">
               {intl.formatMessage(globalMessages.stakePoolHash)}
             </Typography>
-            <Typography variant="body1" sx={{ '& > div > p': { p: '2px 3px' }, px: '2px' }}>
+            <Typography component="div" variant="body1" sx={{ '& > div > p': { p: '2px 3px' }, px: '2px' }}>
               <CopyAddress text={currentPool}>
                 <ExplorableHashContainer
                   selectedExplorer={selectedExplorer}
@@ -343,10 +343,10 @@ export default class WithdrawRewardsDialog extends Component<Props> {
             </Typography>
           </Box>
           <Box>
-            <Typography variant="body1" color="grayscale.600" px="5px">
+            <Typography component="div" variant="body1" color="grayscale.600" px="5px">
               {intl.formatMessage(messages.withdrawalAddress)}
             </Typography>
-            <Typography variant="body1" sx={{ '& > div > p': { p: '2px 3px' }, px: '2px' }}>
+            <Typography component="div" variant="body1" sx={{ '& > div > p': { p: '2px 3px' }, px: '2px' }}>
               <CopyAddress text={receiverAddress}>
                 <ExplorableHashContainer
                   selectedExplorer={selectedExplorer}
@@ -374,26 +374,26 @@ export default class WithdrawRewardsDialog extends Component<Props> {
             borderColor="grayscale.200"
           >
             <Box minWidth="180px">
-              <Typography variant="body1" color="grayscale.600" mb="4px">
+              <Typography component="div" variant="body1" color="grayscale.600" mb="4px">
                 {intl.formatMessage(messages.accumulatedRewards)}
               </Typography>
-              <Typography variant="body1" color="grayscale.900">
+              <Typography component="div" variant="body1" color="grayscale.900">
                 {formatValue(recoveredBalance.getDefaultEntry())} {ticker}
               </Typography>
             </Box>
             <Box minWidth="180px">
-              <Typography variant="body1" color="grayscale.600" mb="4px">
+              <Typography component="div" variant="body1" color="grayscale.600" mb="4px">
                 {intl.formatMessage(globalMessages.feeLabel)}
               </Typography>
-              <Typography variant="body1" color="grayscale.900">
+              <Typography component="div" variant="body1" color="grayscale.900">
                 {formatValue(txFee.getDefaultEntry())} {ticker}
               </Typography>
             </Box>
             <Box minWidth="180px">
-              <Typography variant="body1" color="grayscale.600" mb="4px">
+              <Typography component="div" variant="body1" color="grayscale.600" mb="4px">
                 {intl.formatMessage(globalMessages.finalBalanceLabel)}
               </Typography>
-              <Typography variant="body1" color="grayscale.900">
+              <Typography component="div" variant="body1" color="grayscale.900">
                 {formatValue(finalRewards.getDefaultEntry())} {ticker}
               </Typography>
             </Box>
@@ -411,7 +411,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
                 mb: '2px',
               }}
             >
-              <Typography variant="caption1" color="magenta.500">
+              <Typography component="div" variant="caption1" color="magenta.500">
                 {intl.formatMessage(error, error.values)}
               </Typography>
             </Box>

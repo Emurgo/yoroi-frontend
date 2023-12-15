@@ -162,9 +162,9 @@ export default class URIVerifyDialog extends Component<Props> {
             </div>
           )}
         </div>
-        <p className={styles.textBlock}>
+        <div className={styles.textBlock}>
           {intl.formatMessage(messages.uriVerifyDialogText)}
-        </p>
+        </div>
       </Dialog>
     );
   }

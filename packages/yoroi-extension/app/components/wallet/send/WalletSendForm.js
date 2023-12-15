@@ -496,10 +496,10 @@ export default class WalletSendForm extends Component<Props> {
                 disabled
               >
                 <Box width="100%" display="flex">
-                  <Typography variant="body2" flex="1">
+                  <Typography component="div" variant="body2" flex="1">
                     {intl.formatMessage(globalMessages.name)}
                   </Typography>
-                  <Typography variant="body2" flex="1">
+                  <Typography component="div" variant="body2" flex="1">
                     {intl.formatMessage(globalMessages.amount)}
                   </Typography>
                 </Box>
@@ -552,7 +552,7 @@ export default class WalletSendForm extends Component<Props> {
             labelId="amount-options-select"
             disabled={this.props.selectedToken?.IsNFT}
             renderValue={value => (
-              <Typography sx={{ textTransform: 'uppercase' }}>
+              <Typography component="div" sx={{ textTransform: 'uppercase' }}>
                 {sendAmountOptions.find(item => item.value === value)?.label ?? '-'}
               </Typography>
             )}
@@ -592,9 +592,9 @@ export default class WalletSendForm extends Component<Props> {
           <div className={tokenListClasses}>
             <h1>{intl.formatMessage(messages.willSendAll)}</h1>
             {tokenOptions.map(token => (
-              <p key={token.id}>
+              <div key={token.id}>
                 {token.amount} {token.label}
-              </p>
+              </div>
             ))}
           </div>
 
