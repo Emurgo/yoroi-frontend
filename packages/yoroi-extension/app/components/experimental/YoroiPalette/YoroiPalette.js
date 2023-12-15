@@ -85,10 +85,10 @@ export default class YoroiPalettePage extends Component<Props, State> {
                     backgroundColor: color.hex
                 }}
               />
-              <p className={styles.colorHex}>
+              <div className={styles.colorHex}>
                 {String(color.hex)}
-              </p>
-              <p className={styles.colorName}>{color.name}</p>
+              </div>
+              <div className={styles.colorName}>{color.name}</div>
             </div>
             ))}
         </div>
@@ -131,7 +131,7 @@ export default class YoroiPalettePage extends Component<Props, State> {
                 border: '1px solid var(--yoroi-palette-gray-200)',
               }}
             />
-            <p>{subRow.text}</p>
+            <div>{subRow.text}</div>
           </li>
           {i < subRows.length -1 && <li className={styles.arrowDown}><ArrowDown /></li>}
         </>

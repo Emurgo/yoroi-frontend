@@ -30,7 +30,7 @@ function ConnectionInfo({ intl, connectedWebsite, connectedWallet }: Props & Con
 
   return (
     <Box>
-      <Typography color="#4A5065" variant="body1" fontWeight={500} mb="16px">
+      <Typography component="div" color="#4A5065" variant="body1" fontWeight={500} mb="16px">
         {intl.formatMessage(messages.connectedTo)}
       </Typography>
       <Box display="flex" alignItems="center">
@@ -53,12 +53,12 @@ function ConnectionInfo({ intl, connectedWebsite, connectedWallet }: Props & Con
             <NoDappIcon />
           )}
         </Box>
-        <Typography variant="body1" fontWeight="400" color="#242838">
+        <Typography component="div" variant="body1" fontWeight="400" color="#242838">
           {url}
         </Typography>
       </Box>
       <Box mt="32px">
-        <Typography color="#4A5065" variant="body1" fontWeight={500} mb="16px">
+        <Typography component="div" color="#4A5065" variant="body1" fontWeight={500} mb="16px">
           {intl.formatMessage(connectorMessages.fromWallet)}
         </Typography>
         <ConnectedWallet publicDeriver={connectedWallet} />

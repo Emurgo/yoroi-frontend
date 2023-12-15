@@ -114,9 +114,9 @@ export default class DeregisterDialogContainer extends Component<Props> {
         isSubmitting={false}
         error={undefined}
       >
-        <p>{intl.formatMessage(dialogMessages.deregisterExplanationLine1)}</p>
-        <p>{intl.formatMessage(dialogMessages.deregisterExplanationLine3)}</p>
-        <p>{intl.formatMessage(dialogMessages.deregisterExplanationLine2)}</p>
+        <div>{intl.formatMessage(dialogMessages.deregisterExplanationLine1)}</div>
+        <div>{intl.formatMessage(dialogMessages.deregisterExplanationLine3)}</div>
+        <div>{intl.formatMessage(dialogMessages.deregisterExplanationLine2)}</div>
         <WarningBox>
           <ol>
             <br />

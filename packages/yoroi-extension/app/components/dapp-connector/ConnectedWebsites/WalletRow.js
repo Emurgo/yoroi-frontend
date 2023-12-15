@@ -118,7 +118,7 @@ export default class WalletRow extends Component<Props, State> {
           onMouseLeave={this.hideDeleteIcon}
           className={styles.component}
         >
-          <p className={styles.name}>
+          <div className={styles.name}>
             {settingsCache.conceptualWalletName}
             {settingsCache && (
               <span>
@@ -126,19 +126,19 @@ export default class WalletRow extends Component<Props, State> {
                 &#183; <WalletType wallet={settingsCache} />
               </span>
             )}
-          </p>
+          </div>
           <div className={styles.rowWrapper}>
             <div>
               <div className={styles.card}>
                 <div className={styles.avatar}>
                   <NavPlate plate={plate} wallet={settingsCache} />
                 </div>
-                <p className={styles.balance}>
+                <div className={styles.balance}>
                   {this.renderAmountDisplay({
                     shouldHideBalance,
                     amount: balance,
                   })}
-                </p>
+                </div>
               </div>
             </div>
             <div className={styles.dapp}>
@@ -149,9 +149,9 @@ export default class WalletRow extends Component<Props, State> {
                 <Tooltip
                   followCursor
                   placement="top"
-                  title={<Typography variant="body3">{url}</Typography>}
+                  title={<Typography component="div" variant="body3">{url}</Typography>}
                 >
-                  <Typography
+                  <Typography component="div"
                     variant="body1"
                     sx={{
                       fontWeight: '500',
@@ -165,7 +165,7 @@ export default class WalletRow extends Component<Props, State> {
                   </Typography>
                 </Tooltip>
                 {isActiveSite && (
-                  <p className={styles.status}>{intl.formatMessage(messages.active)}</p>
+                  <div className={styles.status}>{intl.formatMessage(messages.active)}</div>
                 )}
               </div>
             </div>

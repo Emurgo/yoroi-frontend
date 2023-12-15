@@ -370,7 +370,7 @@ class SignTxPage extends Component<Props, State> {
           <ErrorBlock error={hwWalletError} />
           {Boolean(this.props.tx) && (
             <Box>
-              <Typography>Transaction:</Typography>
+              <Typography component="div">Transaction:</Typography>
               <textarea rows="10" style={{ width: '100%' }} disabled value={this.props.tx} />
             </Box>
           )}
@@ -427,7 +427,7 @@ class SignTxPage extends Component<Props, State> {
       // signing data
       content = (
         <Box>
-          <Typography color="#4A5065" variant="body1" fontWeight={500} mb="16px" id="signMessageTitle">
+          <Typography component="div" color="#4A5065" variant="body1" fontWeight={500} mb="16px" id="signMessageTitle">
             {intl.formatMessage(messages.signMessage)}
           </Typography>
           <Box

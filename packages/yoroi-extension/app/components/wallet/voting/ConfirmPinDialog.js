@@ -93,7 +93,7 @@ export default class ConfirmPinDialog extends Component<Props> {
               steps={stepsList.map(step => ({ message: step.message, stepId: String(step.step) }))}
               setCurrentStep={() => goBack()}
             />
-            <Typography
+            <Typography component="div"
               textAlign="center"
               pt="24px"
               pb="40px"

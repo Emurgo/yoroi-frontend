@@ -62,7 +62,7 @@ export function find721metadata(
   }
   if (
     isArray(asset.files) &&
-      asset.files.every(({name, mediaType, src }) => (
+      asset.files.every(({ name, mediaType, src }) => (
         typeof name === 'string' &&
           typeof mediaType === 'string' &&
           (

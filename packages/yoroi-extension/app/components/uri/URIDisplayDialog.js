@@ -79,11 +79,11 @@ export default class URIDisplayDialog extends Component<Props> {
               <Box component="span" color="grayscale.max">
                 <InfoIcon />
               </Box>
-              <Typography variant="body1" fontWeight={500}>
+              <Typography component="div" variant="body1" fontWeight={500}>
                 {intl.formatMessage(globalMessages.important)}
               </Typography>
             </Box>
-            <Typography variant="body1" color="grayscale.max">
+            <Typography component="div" variant="body1" color="grayscale.max">
               {intl.formatMessage(messages.usabilityWarning)}
             </Typography>
           </Box>

@@ -103,7 +103,7 @@ export default class NavDropdownRow extends Component<Props> {
     }
     return (
       <div className={styles.head}>
-        <p className={styles.title}>{this.props.title}</p>
+        <div className={styles.title}>{this.props.title}</div>
       </div>
     );
   }

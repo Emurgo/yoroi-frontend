@@ -72,10 +72,10 @@ function CardanoSignTx({
       />
       <Panel id="signTxAdditionalInfoPanel">
         <Box display="flex" justifyContent="space-between" alignItems="flex-start" id="signTxAdditionalInfoPanelBox">
-          <Typography color="#4A5065" fontWeight={500}>
+          <Typography component="div" color="#4A5065" fontWeight={500}>
             {intl.formatMessage(messages.transactionFee)}
           </Typography>
-          <Typography textAlign="right" color="#242838" id="signTxAdditionalInfoPanelBox-fee">
+          <Typography component="div" textAlign="right" color="#242838" id="signTxAdditionalInfoPanelBox-fee">
             {total.fee} {total.ticker}
           </Typography>
         </Box>
@@ -135,7 +135,7 @@ const ExpandableAssetsPanel = ({
         sx={{ cursor: 'pointer' }}
         onClick={() => setIsExpanded(expanded => !expanded)}
       >
-        <Typography color="#4A5065" fontWeight={500}>
+        <Typography component="div" color="#4A5065" fontWeight={500}>
           {panelTitle}
         </Typography>
         {isExpandable && (
@@ -182,7 +182,7 @@ const ExpandableAssetsPanel = ({
 
 const AsseetValueDisplay = ({ children }): Node => (
   <Box mt="16px" id="asseetValueDisplayBox">
-    <Typography textAlign="right" color="#242838">
+    <Typography component="div" textAlign="right" color="#242838">
       {children}
     </Typography>
   </Box>

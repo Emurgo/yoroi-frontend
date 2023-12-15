@@ -38,7 +38,7 @@ export default class WalletNoTransactionsRevamp extends Component<Props> {
         >
           <NoTransactionSvg />
         </Box>
-        <Typography variant="h5" color="var(--yoroi-palette-gray-900)">
+        <Typography component="div" variant="h5" color="var(--yoroi-palette-gray-900)">
           {this.props.label}
         </Typography>
       </Box>

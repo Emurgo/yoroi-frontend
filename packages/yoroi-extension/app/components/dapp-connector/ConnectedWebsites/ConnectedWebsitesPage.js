@@ -75,10 +75,10 @@ class ConnectedWebsitesPage extends Component<AllProps> {
         <Box mt="-24px" display="flex" flexDirection="column" alignItems="center" gap="16px">
           <NoDappsConnected />
           <Box textAlign="center">
-            <Typography variant="h5" fontWeight={500} mb="8px">
+            <Typography component="div" variant="h5" fontWeight={500} mb="8px">
               {intl.formatMessage(messages.noWebsitesConnected)}
             </Typography>
-            <Typography variant="body1" color="grayscale.600">
+            <Typography component="div" variant="body1" color="grayscale.600">
               {intl.formatMessage(connectorMessages.messageReadOnly)}
             </Typography>
           </Box>
@@ -132,7 +132,7 @@ class ConnectedWebsitesPage extends Component<AllProps> {
     return (
       <Box>
         <Box mb="15px">
-          <Typography fontWeight={500} variant="h5">
+          <Typography component="div" fontWeight={500} variant="h5">
             {intl.formatMessage(messages.connectedDapps, { dappsCount: cardanoNodes.length })}
           </Typography>
         </Box>
@@ -149,10 +149,10 @@ class ConnectedWebsitesPage extends Component<AllProps> {
           }}
         >
           <Box width="100%">
-            <Typography variant="body2">{intl.formatMessage(messages.walletsLabel)}</Typography>
+            <Typography component="div" variant="body2">{intl.formatMessage(messages.walletsLabel)}</Typography>
           </Box>
           <Box width="100%">
-            <Typography variant="body2">{intl.formatMessage(messages.dappsLabel)}</Typography>
+            <Typography component="div" variant="body2">{intl.formatMessage(messages.dappsLabel)}</Typography>
           </Box>
         </Box>
         <Box mt="16px">{cardanoNodes}</Box>
@@ -171,7 +171,7 @@ class ConnectedWebsitesPage extends Component<AllProps> {
         <div className={styles.noDappsFound}>
           <NoDappsFoundImg />
           <h3>{intl.formatMessage(messages.noWebsitesConnected)} </h3>
-          <p>{intl.formatMessage(connectorMessages.messageReadOnly)}</p>
+          <div>{intl.formatMessage(connectorMessages.messageReadOnly)}</div>
         </div>
       </div>
     );
@@ -217,8 +217,8 @@ class ConnectedWebsitesPage extends Component<AllProps> {
       <div className={styles.component}>
         <div className={styles.container}>
           <div className={styles.header}>
-            <p>{intl.formatMessage(messages.walletsLabel)}</p>
-            <p>{intl.formatMessage(messages.dappsLabel)}</p>
+            <div>{intl.formatMessage(messages.walletsLabel)}</div>
+            <div>{intl.formatMessage(messages.dappsLabel)}</div>
           </div>
           <div>
             {cardanoNodes.length > 0 && (

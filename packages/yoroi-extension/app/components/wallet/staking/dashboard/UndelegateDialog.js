@@ -164,10 +164,10 @@ export default class UndelegateDialog extends Component<Props> {
         .toFormat(tokenInfo.Metadata.numberOfDecimals);
 
       return (
-        <p className={styles.rewardAmount}>
+        <div className={styles.rewardAmount}>
           {formattedAmount}&nbsp;
           {truncateToken(getTokenName(tokenInfo))}
-        </p>
+        </div>
       );
     })();
 
@@ -196,15 +196,15 @@ export default class UndelegateDialog extends Component<Props> {
           />
         </div>
         <div className={styles.headerBlock}>
-          <p className={styles.header}>
+          <div className={styles.header}>
             {intl.formatMessage(globalMessages.walletSendConfirmationFeesLabel)}
-          </p>
+          </div>
           {rewardAmount}
         </div>
         {this.props.error ? (
-          <p className={styles.error}>
+          <div className={styles.error}>
             {intl.formatMessage(this.props.error, this.props.error.values)}
-          </p>
+          </div>
         ) : null}
       </Dialog>
     );
