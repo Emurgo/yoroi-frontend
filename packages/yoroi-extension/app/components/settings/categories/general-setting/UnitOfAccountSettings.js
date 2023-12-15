@@ -146,7 +146,7 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
         className={componentClassNames}
       >
         {dialog}
-        <Typography component="div"
+        <Typography
           component="h2"
           variant={isRevampLayout ? 'body1' : 'h5'}
           fontWeight={500}

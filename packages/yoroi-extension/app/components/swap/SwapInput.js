@@ -88,7 +88,7 @@ export default function SwapInput({
           {label}
         </Box>
 
-        <Typography component="div"
+        <Typography
           sx={{
             appearance: 'none',
             border: '0',
@@ -118,7 +118,7 @@ export default function SwapInput({
         </Box>
         {!error && showMax ? (
           <Box>
-            <Typography component="div"
+            <Typography
               component="button"
               variant="caption"
               fontWeight={500}

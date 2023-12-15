@@ -156,7 +156,7 @@ class AboutYoroiSettingsBlock extends Component<Props & InjectedLayoutProps> {
         }}
         className={styles.component}
       >
-        <Typography component="div"
+        <Typography
           component="h2"
           variant={isRevampLayout ? 'body1' : 'h5'}
           fontWeight={500}
