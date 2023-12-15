@@ -1594,23 +1594,6 @@
       },
       {
         "Digest": 6.262633522161549e-167,
-        "NetworkId": 200,
-        "Identifier": "",
-        "IsDefault": true,
-        "IsNFT": false,
-        "Metadata": {
-          "type": "Ergo",
-          "height": 0,
-          "boxId": "",
-          "ticker": "ERG",
-          "longName": null,
-          "numberOfDecimals": 9,
-          "description": null
-        },
-        "TokenId": 3
-      },
-      {
-        "Digest": 6.262633522161549e-167,
         "NetworkId": 300,
         "Identifier": "",
         "IsDefault": true,
