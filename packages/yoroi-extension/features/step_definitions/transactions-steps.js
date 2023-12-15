@@ -72,15 +72,6 @@ Given(/^I have a wallet with funds$/, async function () {
   await getIndexedDBTablesInfo(this, 'first_wallet_synced');
 });
 
-Given(/^I have an ERGO wallet with funds$/, async function () {
-  await this.waitUntilContainsText(
-    navDetailsAmount,
-    'ERG',
-    oneMinute
-  );
-  await walletIsEmpty(this);
-});
-
 When(/^I go to the send transaction screen$/, async function () {
   await this.click(sendTab);
 });
