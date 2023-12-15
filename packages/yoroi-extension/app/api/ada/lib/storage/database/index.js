@@ -260,7 +260,7 @@ async function fixLovefieldDuplicatePrimaryKey(errorMessage: string): Promise<vo
     window.indexedDB.open('yoroi-schema'),
     'could not open DB',
   );
-  
+
   const store = db
     .transaction([storeName], 'readwrite')
     .objectStore(storeName);

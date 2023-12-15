@@ -181,7 +181,7 @@ export default class IncludedTokens extends Component<Props> {
           </Box>
         )}
       </Box>
-    
+
     );
   }
 }

@@ -52,7 +52,7 @@ const messages = defineMessages({
   },
   reorgMessage: {
     id: 'connector.signin.reorg.message',
-    defaultMessage:'!!!To interact with {smartContractsLink} in Cardano you should add collateral, which means to make a 0 ADA transaction.{lineBreak}{lineBreak}It is a guarantee that prevent from failing smart contracts and scams. {learnMoreLink} about collateral.',
+    defaultMessage: '!!!To interact with {smartContractsLink} in Cardano you should add collateral, which means to make a 0 ADA transaction.{lineBreak}{lineBreak}It is a guarantee that prevent from failing smart contracts and scams. {learnMoreLink} about collateral.',
   },
   sendError: {
     id: 'connector.signin.error.sendError',
