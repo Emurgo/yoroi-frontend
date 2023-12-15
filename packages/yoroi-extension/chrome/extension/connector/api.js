@@ -105,7 +105,7 @@ export async function connectorGetBalance(
   wallet: PublicDeriver<>,
   tokenId: TokenId,
 ): Promise<AccountBalance | Value> {
-  if (tokenId === 'ERG' || tokenId === 'ADA' || tokenId === 'TADA') {
+  if (tokenId === 'ADA' || tokenId === 'TADA') {
     // can directly query for balance
     const canGetBalance = asGetBalance(wallet);
     if (canGetBalance != null) {
