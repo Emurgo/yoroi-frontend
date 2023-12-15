@@ -31,7 +31,7 @@ export default class WarningHeader extends Component<Props> {
         <div className={styles.header}>
           <div className={styles.warningSection}>
             <div className={styles.attentionLabel}>
-              <p>{intl.formatMessage(globalMessages.attentionHeaderText)}</p>
+              <div>{intl.formatMessage(globalMessages.attentionHeaderText)}</div>
             </div>
             <div className={styles.text}>
               {this.props.message}

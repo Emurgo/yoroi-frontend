@@ -35,7 +35,7 @@ export default function Table({
       }}
     >
       {columnNames.map((name, i) => (
-        <Typography
+        <Typography component="div"
           variant="body2"
           key={name}
           textAlign={columnAlignment[i] ? columnAlignment[i] : 'right'}

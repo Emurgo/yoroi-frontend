@@ -54,7 +54,7 @@ export default class TransactionSuccessDialog extends Component<Props> {
       >
         <Stack alignItems="center">
           <SuccessImg />
-          <Typography
+          <Typography component="div"
             color="gray.700"
             fontWeight={500}
             mt="16px"

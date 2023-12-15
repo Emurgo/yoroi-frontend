@@ -123,15 +123,15 @@ function TokenDetails({ tokenInfo, network, intl }: Props & Intl): Node {
         }}
       >
         <Box display="flex" alignItems="center" py="20px">
-          <Typography variant="h2" fontWeight={500} color="common.black">
+          <Typography component="div" variant="h2" fontWeight={500} color="common.black">
             {tokenInfo.name}
           </Typography>
         </Box>
         <Box>
-          <Typography variant="body1" color="grayscale.600">
+          <Typography component="div" variant="body1" color="grayscale.600">
             {intl.formatMessage(assetsMessage.quantity)}
           </Typography>
-          <Typography variant="body1" color="grayscale.900" mt="6px">
+          <Typography component="div" variant="body1" color="grayscale.900" mt="6px">
             {tokenInfo.amount}
           </Typography>
         </Box>
@@ -191,10 +191,10 @@ function TokenDetails({ tokenInfo, network, intl }: Props & Intl): Node {
         />
 
         <Box>
-          <Typography variant="body1" color="grayscale.600">
+          <Typography component="div" variant="body1" color="grayscale.600">
             {intl.formatMessage(tokenMessages.detailsOn)}
           </Typography>
-          <Typography variant="body1" color="grayscale.900" mt="6px">
+          <Typography component="div" variant="body1" color="grayscale.900" mt="6px">
             <LinkMui
               target="_blank"
               href={
@@ -220,8 +220,8 @@ export default (injectIntl(TokenDetails): ComponentType<Props>);
 function LabelWithValue({ label, value }: {| label: string | Node, value: string | Node |}): Node {
   return (
     <Box>
-      <Typography color="grayscale.600">{label}</Typography>
-      <Typography color="grayscale.900">{value}</Typography>
+      <Typography component="div" color="grayscale.600">{label}</Typography>
+      <Typography component="div" color="grayscale.900">{value}</Typography>
     </Box>
   );
 }

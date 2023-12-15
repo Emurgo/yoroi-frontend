@@ -68,12 +68,12 @@ function DuplicatedWalletDialog(props: Props & Intl): Node {
         }}
       >
         <Box>
-          <Typography sx={{ fontWeight: '500', textTransform: 'uppercase', textAlign: 'center' }}>
+          <Typography component="div" sx={{ fontWeight: '500', textTransform: 'uppercase', textAlign: 'center' }}>
             {intl.formatMessage(messages.dialogTitle)}
           </Typography>
         </Box>
         <Box sx={{ flex: 1, mb: '24px' }}>
-          <Typography textAlign="left" variant="body1" fontWeight="400" mb="16px">
+          <Typography component="div" textAlign="left" variant="body1" fontWeight="400" mb="16px">
             {intl.formatMessage(messages.title)}
           </Typography>
           <Box component="ul" sx={{ listStyle: 'outside', mt: '16px' }}>

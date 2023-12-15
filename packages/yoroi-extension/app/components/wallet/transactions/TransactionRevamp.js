@@ -610,7 +610,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                 justifyContent: 'flex-end',
               }}
             >
-              <Typography variant="body1" color="grayscale.900" id="txFee">
+              <Typography component="div" variant="body1" color="grayscale.900" id="txFee">
                 {this.renderFeeDisplay({
                   amount: data.fee,
                   type: data.type,
@@ -632,6 +632,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                 textAlign="right"
               >
                 <Typography
+                  component="div"
                   variant="body1"
                   fontWeight="500"
                   color="grayscale.900"
@@ -643,7 +644,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                     timestamp: data.date.valueOf(),
                   })}
                 </Typography>
-                <Typography>
+                <Typography component="div">
                   {this.renderAssets({ assets: data.amount.nonDefaultEntries() })}
                 </Typography>
               </Box>

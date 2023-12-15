@@ -117,7 +117,7 @@ class SupportSettings extends Component<Props & InjectedProps> {
           {sections.map(({ title, text }) => {
             return (
               <Box key={title.id}>
-                <Typography
+                <Typography component="div"
                   variant={isRevampLayout ? 'body1' : 'h5'}
                   color={isRevampLayout ? 'grayscale.900' : 'var(--yoroi-support-settings-text)'}
                   fontWeight={500}
@@ -125,7 +125,7 @@ class SupportSettings extends Component<Props & InjectedProps> {
                 >
                   {intl.formatMessage(title)}
                 </Typography>
-                <Typography
+                <Typography component="div"
                   sx={{
                     '& a': {
                       color: isRevampLayout ? 'primary.500' : 'var(--yoroi-support-settings-text)',

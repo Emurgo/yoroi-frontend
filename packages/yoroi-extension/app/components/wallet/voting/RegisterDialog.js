@@ -77,7 +77,7 @@ export default class RegisterDialog extends Component<Props> {
               steps={stepsList.map(step => ({ message: step.message, stepId: String(step.step) }))}
               setCurrentStep={() => {}}
             />
-            <Typography
+            <Typography component="div"
               textAlign="center"
               pt="24px"
               pb="40px"

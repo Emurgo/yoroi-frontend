@@ -74,8 +74,8 @@ export default class IncludePublicKeyDialog extends Component<Props> {
           }
         }}
       >
-        <p><FormattedHTMLMessage {...dialogMessages.includeKeyExplanationLine1} /></p>
-        <p><FormattedHTMLMessage {...globalMessages.publicKeyExplanation} /></p>
+        <div><FormattedHTMLMessage {...dialogMessages.includeKeyExplanationLine1} /></div>
+        <div><FormattedHTMLMessage {...globalMessages.publicKeyExplanation} /></div>
       </DangerousActionDialog>
     );
   }

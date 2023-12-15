@@ -43,7 +43,7 @@ export default class ReceiveNavButtonRevamp extends Component<Props> {
         color={isTopLvl && isActive ? 'primary.600' : 'grayscale.600'}
       >
         <Box display="flex" alignItems="center" gap="6px">
-          <Typography variant="body1" fontWeight={this.props.isActive ? 500 : 400}>
+          <Typography component="div" variant="body1" fontWeight={this.props.isActive ? 500 : 400}>
             {this.props.label}
           </Typography>
           <Box component="span" color="grayscale.600" sx={{ '& path': { fill: 'currentcolor' } }}>

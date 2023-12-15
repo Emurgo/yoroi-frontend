@@ -31,7 +31,7 @@ export default function Tabs({ tabs = [] }: Props): Node {
 
 const TabButton = ({ label, isActive, onClick }: TabProps): Node => (
   <Box onClick={onClick} p="8px" borderRadius="8px" bgcolor={isActive ? 'grayscale.200' : ''}>
-    <Typography variant="body1" fontWeight={500}>
+    <Typography component="div" variant="body1" fontWeight={500}>
       {label}
     </Typography>
   </Box>

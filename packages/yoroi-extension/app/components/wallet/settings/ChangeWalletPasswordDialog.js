@@ -217,7 +217,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
           />
         </div>
 
-        {error ? <p className={styles.error}>{intl.formatMessage(error, error.values)}</p> : null}
+        {error ? <div className={styles.error}>{intl.formatMessage(error, error.values)}</div> : null}
       </Dialog>
     );
   }

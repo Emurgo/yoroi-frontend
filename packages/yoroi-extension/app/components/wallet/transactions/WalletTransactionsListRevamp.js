@@ -162,7 +162,7 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
             }}
             key={`${this.getTransactionKey(group.transactions)}`}
           >
-            <Typography variant="body2" color="grayscale.600">
+            <Typography component="div" variant="body2" color="grayscale.600">
               {this.localizedDate(group.date)}
             </Typography>
             <Box>

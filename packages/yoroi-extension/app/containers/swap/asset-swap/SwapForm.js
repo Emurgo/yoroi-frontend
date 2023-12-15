@@ -129,7 +129,7 @@ export default function SwapForm({ onLimitSwap }: Props): React$Node {
           }}
         >
           <Box display="flex" gap="8px" alignItems="center">
-            <Typography variant="body1" color="grayscale.500">
+            <Typography component="div" variant="body1" color="grayscale.500">
               Slippage tolerance
             </Typography>
             <InfoIcon />
@@ -138,7 +138,7 @@ export default function SwapForm({ onLimitSwap }: Props): React$Node {
             onClick={() => setOpenedDialog('slippage')}
             sx={{ cursor: 'pointer', display: 'flex', gap: '4px', alignItems: 'center' }}
           >
-            <Typography variant="body1" color="grayscale.max">
+            <Typography component="div" variant="body1" color="grayscale.max">
               {slippage}%
             </Typography>
             <EditIcon />
@@ -156,7 +156,7 @@ export default function SwapForm({ onLimitSwap }: Props): React$Node {
             }}
           >
             <Box display="flex" gap="8px" alignItems="center">
-              <Typography variant="body1" color="grayscale.500">
+              <Typography component="div" variant="body1" color="grayscale.500">
                 DEX
               </Typography>
               <InfoIcon />
@@ -166,7 +166,7 @@ export default function SwapForm({ onLimitSwap }: Props): React$Node {
               sx={{ cursor: 'pointer', display: 'flex', gap: '4px', alignItems: 'center' }}
             >
               <Box sx={{ width: '24px', height: '24px' }}>{pool.image || <DefaultToken />}</Box>
-              <Typography variant="body1" color="grayscale.max">
+              <Typography component="div" variant="body1" color="grayscale.max">
                 {pool.name ? `${pool.name} ${pool.isAuto ? '(Auto)' : ''}` : 'No pool found'}
               </Typography>
 
