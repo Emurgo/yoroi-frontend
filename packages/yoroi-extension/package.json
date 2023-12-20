@@ -34,7 +34,7 @@
     "test-win": "SET NODE_ENV=jest && jest",
     "eslint": "eslint app features chrome scripts webpack/*.js --quiet",
     "test:build": "npm run prod:build-mv2 -- --env 'test' && npm run prod:compress -- --env 'test' --app-id 'yoroi' --codebase 'https://yoroiwallet.com/dw/yoroi-test-extension.crx' --key ./e2etest-key.pem",
-    "test:build:mainnet": "npm run prod:build -- --env 'mainnet' && npm run prod:compress -- --env 'test' --app-id 'yoroi' --codebase 'https://yoroiwallet.com/dw/yoroi-test-extension.crx' --key ./e2etest-key.pem",
+    "test:build:mainnet": "npm run prod:build-mv2 -- --env 'mainnet' && npm run prod:compress -- --env 'test' --app-id 'yoroi' --codebase 'https://yoroiwallet.com/dw/yoroi-test-extension.crx' --key ./e2etest-key.pem",
     "test:clean:logs": "find . -type d -name \"testRunsData_*\" -exec rm -r {} +",
     "test:run:base": "mkdir reports & npm run test:clean:logs && NODE_ENV=cucumber cucumber-js --require-module '@babel/register' --compiler es6:@babel/register -f json:./reports/cucumberReport.json",
     "test:run:e2e:chrome": "npm run test:run:base -- --world-parameters '{\"browser\":\"chrome\"}' features/*.feature --tags 'not @ignore' --tags 'not @dApp' --tags 'not @smoke' --tags 'not @Trezor'",
