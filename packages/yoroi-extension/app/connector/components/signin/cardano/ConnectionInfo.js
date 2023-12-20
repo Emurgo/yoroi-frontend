@@ -53,7 +53,7 @@ function ConnectionInfo({ intl, connectedWebsite, connectedWallet }: Props & Con
             <NoDappIcon />
           )}
         </Box>
-        <Typography component="div" variant="body1" fontWeight="400" color="#242838">
+        <Typography component="div" variant="body1" fontWeight="400" color="#242838" id="connectedToUrl">
           {url}
         </Typography>
       </Box>
