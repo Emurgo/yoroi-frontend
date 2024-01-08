@@ -10,5 +10,5 @@ export default function useSwapForm() {
 
   const { state = {}, actions } = context;
 
-  return { state, actions };
+  return { ...state, ...actions };
 }

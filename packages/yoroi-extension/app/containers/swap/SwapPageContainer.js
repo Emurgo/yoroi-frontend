@@ -6,6 +6,8 @@ import type { GeneratedData as SidebarContainerData } from '../SidebarContainer'
 import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { LayoutComponentMap } from '../../styles/context/layout';
+import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
+import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { Component } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
@@ -13,6 +15,8 @@ import { intlShape } from 'react-intl';
 import { buildRoute } from '../../utils/routing';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { withLayout } from '../../styles/context/layout';
+import { MultiToken } from '../../api/common/lib/MultiToken';
+import { SwapPageProvider } from './context/swap-page';
 import globalMessages from '../../i18n/global-messages';
 import SwapMenu from '../../components/swap/SwapMenu';
 import BannerContainer from '../banners/BannerContainer';
@@ -54,7 +58,7 @@ class SwapPageContainer extends Component<AllProps> {
 
   render(): Node {
     const { children } = this.props;
-    const { actions } = this.generated;
+    const { actions, stores } = this.generated;
     const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />;
 
     const menu = (
@@ -80,7 +84,7 @@ class SwapPageContainer extends Component<AllProps> {
         showInContainer
         showAsCard
       >
-        {children}
+        <SwapPageProvider initialSwapPageState={{ stores }}>{children}</SwapPageProvider>
       </TopBarLayout>
     );
   }
@@ -103,6 +107,15 @@ class SwapPageContainer extends Component<AllProps> {
     stores: {|
       router: {| location: any |},
       wallets: {| selected: null | PublicDeriver<> |},
+      tokenInfoStore: {|
+        tokenInfo: TokenInfoMap,
+        getDefaultTokenInfo: number => $ReadOnly<TokenRow>,
+      |},
+      transactions: {|
+        balance: ?MultiToken,
+        assetDeposit: MultiToken | null,
+        getBalance: (PublicDeriver<>) => MultiToken | null,
+      |},
     |},
   |} {
     if (this.props.generated !== undefined) {
@@ -116,6 +129,14 @@ class SwapPageContainer extends Component<AllProps> {
       stores: {
         router: { location: stores.router.location },
         wallets: { selected: stores.wallets.selected },
+        tokenInfoStore: {
+          tokenInfo: stores.tokenInfoStore.tokenInfo,
+          getDefaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfo,
+        },
+        transactions: {
+          balance: stores.transactions.balance,
+          assetDeposit: stores.transactions.assetDeposit,
+        },
       },
       actions: {
         router: {

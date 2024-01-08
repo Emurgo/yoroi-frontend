@@ -1,25 +1,25 @@
 // @flow
 import { useState } from 'react';
 import { Box } from '@mui/material';
+import { useSwap } from '@yoroi/swap';
 import { ReactComponent as ChevronDownIcon } from '../../assets/images/revamp/icons/chevron-down.inline.svg';
 import { ReactComponent as InfoIcon } from '../../assets/images/revamp/icons/info.inline.svg';
-import type { AssetAmount } from './types';
 
-type Props = {|
-  minAda: string,
-  minAssets: string,
-  fees: string,
-  baseCurrency: AssetAmount,
-  quoteCurrency: AssetAmount,
-|};
+export default function SwapPool(): React$Node {
+  const { orderData } = useSwap();
+  const { amounts, selectedPoolCalculation: calculation } = orderData;
+  // const {} = calculation;
 
-export default function SwapPool({
-  minAda,
-  minAssets,
-  fees,
-  baseCurrency,
-  quoteCurrency,
-}: Props): React$Node {
+  const isSellPrimary = amounts.sell.tokenId === wallet.primaryTokenInfo.id;
+  // Quantities.zero case would only happen on an API error where the price in Ada of Ada were missing
+  const total = isSellPrimary
+    ? calculation.ptTotalValueSpent?.quantity ?? Quantities.zero
+    : amounts.sell.quantity;
+  const formattedSellText = `${total} ${tokenToSellName}`;
+  const formattedFeeText = `${Quantities.format(
+    Quantities.sum([cost.batcherFee.quantity, cost.frontendFeeInfo.fee.quantity]),
+    wallet.primaryTokenInfo.decimals ?? 0
+  )} ${wallet.primaryTokenInfo.ticker}`;
   const [showFullInfo, setShowFullInfo] = useState(false);
 
   const handleShowFullInfo = () => setShowFullInfo(p => !p);

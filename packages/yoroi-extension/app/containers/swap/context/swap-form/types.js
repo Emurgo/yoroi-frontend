@@ -1,34 +1,36 @@
 // @flow
-import type { RefObject, InputHTMLAttributes } from 'react';
+import type { AssetAmount } from '../../../../components/swap/types';
 
-export enum SwapFormActionType {
-  SellTouched = 'sellTouched',
-  BuyTouched = 'buyTouched',
-  SwitchTouched = 'switchTouched',
-  SwitchTokens = 'switchTokens',
-  PoolTouched = 'poolTouched',
-  PoolDefaulted = 'poolDefaulted',
-  ClearSwapForm = 'clearSwapForm',
-  ResetSwapForm = 'resetSwapForm',
-  CanSwapChanged = 'canSwapChanged',
-  BuyInputValueChanged = 'buyInputValueChanged',
-  SellInputValueChanged = 'sellInputValueChanged',
-  LimitPriceInputValueChanged = 'limitPriceInputValueChanged',
-  SellAmountErrorChanged = 'sellAmountErrorChanged',
-  BuyAmountErrorChanged = 'buyAmountErrorChanged',
-}
+export const SwapFormActionTypeValues = Object.freeze({
+  SellTouched: 'sellTouched',
+  BuyTouched: 'buyTouched',
+  SwitchTouched: 'switchTouched',
+  SwitchTokens: 'switchTokens',
+  PoolTouched: 'poolTouched',
+  PoolDefaulted: 'poolDefaulted',
+  ClearSwapForm: 'clearSwapForm',
+  ResetSwapForm: 'resetSwapForm',
+  CanSwapChanged: 'canSwapChanged',
+  BuyInputValueChanged: 'buyInputValueChanged',
+  SellInputValueChanged: 'sellInputValueChanged',
+  LimitPriceInputValueChanged: 'limitPriceInputValueChanged',
+  SellAmountErrorChanged: 'sellAmountErrorChanged',
+  BuyAmountErrorChanged: 'buyAmountErrorChanged',
+});
 
-export type SwapFormState = {
+export type SwapFormActionType = $Values<typeof SwapFormActionTypeValues>;
+
+export type SwapFormState = {|
   sellQuantity: {|
     isTouched: boolean,
     disabled: boolean,
-    error: string | undefined,
+    error: string | null,
     displayValue: string,
   |},
   buyQuantity: {|
     isTouched: boolean,
     disabled: boolean,
-    error: string | undefined,
+    error: string | null,
     displayValue: string,
   |},
   selectedPool: {|
@@ -38,26 +40,18 @@ export type SwapFormState = {
     displayValue: string,
   |},
   canSwap: boolean,
-};
+|};
 
 export type SwapFormAction =
-  | { type: SwapFormActionType.SellTouched }
-  | { type: SwapFormActionType.BuyTouched }
-  | { type: SwapFormActionType.SwitchTouched }
-  | { type: SwapFormActionType.PoolTouched }
-  | { type: SwapFormActionType.PoolDefaulted }
-  | { type: SwapFormActionType.ClearSwapForm }
-  | { type: SwapFormActionType.ResetSwapForm }
-  | { type: SwapFormActionType.CanSwapChanged, canSwap: boolean }
-  | { type: SwapFormActionType.SellInputValueChanged, value: string }
-  | { type: SwapFormActionType.BuyInputValueChanged, value: string }
-  | { type: SwapFormActionType.SellAmountErrorChanged, error: string | undefined }
-  | { type: SwapFormActionType.LimitPriceInputValueChanged, value: string }
-  | { type: SwapFormActionType.BuyAmountErrorChanged, error: string | undefined };
+  | {| type: SwapFormActionType |}
+  | {| type: SwapFormActionType, token: AssetAmount |}
+  | {| type: SwapFormActionType, canSwap: boolean |}
+  | {| type: SwapFormActionType, value: string |}
+  | {| type: SwapFormActionType, error: string | null |};
 
-export type SwapFormActions = {
-  sellTouched: () => void,
-  buyTouched: () => void,
+export type SwapFormActions = {|
+  sellTouched: (token?: AssetAmount) => void,
+  buyTouched: (token?: AssetAmount) => void,
   switchTouched: () => void,
   switchTokens: () => void,
   poolTouched: () => void,
@@ -68,16 +62,16 @@ export type SwapFormActions = {
   buyInputValueChanged: (value: string) => void,
   sellInputValueChanged: (value: string) => void,
   limitPriceInputValueChanged: (value: string) => void,
-  buyAmountErrorChanged: (error: string | undefined) => void,
-  sellAmountErrorChanged: (error: string | undefined) => void,
-};
+  buyAmountErrorChanged: (error: string | null) => void,
+  sellAmountErrorChanged: (error: string | null) => void,
+|};
 
 export type SwapFormContext = {|
   ...SwapFormState,
   ...SwapFormActions,
-  sellInputRef: RefObject<InputHTMLAttributes> | undefined,
-  buyInputRef: RefObject<InputHTMLAttributes> | undefined,
-  limitInputRef: RefObject<InputHTMLAttributes> | undefined,
+  sellInputRef: any | null,
+  buyInputRef: any | null,
+  limitInputRef: any | null,
   onChangeSellQuantity: (text: string) => void,
   onChangeBuyQuantity: (text: string) => void,
   onChangeLimitPrice: (text: string) => void,

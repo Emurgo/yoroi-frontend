@@ -67,33 +67,6 @@
 //     orderData.type,
 //   ])
 
-//   const clearErrors = useCallback(() => {
-//     if (state.sellQuantity.error !== undefined) actions.sellAmountErrorChanged(undefined)
-//     if (state.buyQuantity.error !== undefined) actions.buyAmountErrorChanged(undefined)
-//   }, [actions, state.buyQuantity.error, state.sellQuantity.error])
-
-//   const onChangeSellQuantity = useCallback(
-//     (text: string) => {
-//       const [input, quantity] = Quantities.parseFromText(text, sellTokenInfo.decimals ?? 0, numberLocale)
-//       sellQuantityChanged(quantity)
-//       actions.sellInputValueChanged(text === '' ? '' : input)
-
-//       clearErrors()
-//     },
-//     [actions, clearErrors, numberLocale, sellQuantityChanged, sellTokenInfo.decimals],
-//   )
-
-//   const onChangeBuyQuantity = useCallback(
-//     (text: string) => {
-//       const [input, quantity] = Quantities.parseFromText(text, buyTokenInfo.decimals ?? 0, numberLocale)
-//       buyQuantityChanged(quantity)
-//       actions.buyInputValueChanged(text === '' ? '' : input)
-
-//       clearErrors()
-//     },
-//     [buyTokenInfo.decimals, numberLocale, buyQuantityChanged, actions, clearErrors],
-//   )
-
 //   const onChangeLimitPrice = useCallback(
 //     (text: string) => {
 //       const [formattedPrice, price] = Quantities.parseFromText(
@@ -264,14 +237,6 @@
 //   ])
 
 //   useEffect(() => {
-//     updateSellInput()
-//   }, [sellQuantity, updateSellInput])
-
-//   useEffect(() => {
-//     updateBuyInput()
-//   }, [buyQuantity, updateBuyInput])
-
-//   useEffect(() => {
 //     updateLimitPrice()
 //   }, [orderData.limitPrice, orderData.selectedPoolCalculation?.prices.market, orderData.type, updateLimitPrice])
 
@@ -292,9 +257,12 @@
 //   return <SwapFormContext.Provider value={context}>{children}</SwapFormContext.Provider>
 // }
 
-import type { SwapFormState, SwapFormActionType, SwapFormAction } from './types';
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import type { SwapFormState, SwapFormAction } from './types';
+import type { AssetAmount } from '../../../../components/swap/types';
+import { SwapFormActionTypeValues } from './types';
+import { useState, useCallback, useEffect, useMemo, useReducer } from 'react';
 import { useSwap } from '@yoroi/swap';
+// import { Quantities } from '../../../../utils/quantities';
 import PropTypes from 'prop-types';
 import Context from './context';
 
@@ -306,12 +274,14 @@ export const defaultSwapFormState: SwapFormState = Object.freeze({
     disabled: false,
     error: undefined,
     displayValue: '',
+    tokenInfo: {},
   },
   buyQuantity: {
     isTouched: false,
     disabled: false,
     error: undefined,
     displayValue: '',
+    tokenInfo: {},
   },
   selectedPool: { isTouched: false },
   limitPrice: { displayValue: '' },
@@ -319,8 +289,6 @@ export const defaultSwapFormState: SwapFormState = Object.freeze({
 });
 
 export default function SwapFormProvider({ initialSwapFormProvider, children }) {
-  const [swapFormState, setState] = useState();
-
   const {
     orderData,
     resetState,
@@ -333,102 +301,144 @@ export default function SwapFormProvider({ initialSwapFormProvider, children }) 
 
   const swapFormReducer = (state: SwapFormState, action: SwapFormAction) => {
     const draft = Object.assign({}, state);
+    console.log('🚀 > draft:', draft);
 
     switch (action.type) {
-      case SwapFormActionType.ResetSwapForm:
-        return defaultState;
-      case SwapFormActionType.ClearSwapForm:
-        return state;
-      case SwapFormActionType.SellTouched:
+      case SwapFormActionTypeValues.ResetSwapForm:
+        return Object.assign({}, defaultSwapFormState);
+      case SwapFormActionTypeValues.ClearSwapForm:
+        return Object.assign({}, state);
+      case SwapFormActionTypeValues.SellTouched:
         draft.sellQuantity.isTouched = true;
         draft.sellQuantity.displayValue = '';
         draft.sellQuantity.error = undefined;
+        draft.sellQuantity.tokenInfo = action.token;
+
         break;
-      case SwapFormActionType.BuyTouched:
+      case SwapFormActionTypeValues.BuyTouched:
         draft.buyQuantity.isTouched = true;
         draft.buyQuantity.displayValue = '';
         draft.buyQuantity.error = undefined;
+        draft.buyQuantity.tokenInfo = action.token;
         break;
-      case SwapFormActionType.SwitchTouched:
+      case SwapFormActionTypeValues.SwitchTouched:
         draft.sellQuantity.isTouched = state.buyQuantity.isTouched;
         draft.buyQuantity.isTouched = state.sellQuantity.isTouched;
         draft.sellQuantity.displayValue = state.buyQuantity.displayValue;
         draft.buyQuantity.displayValue = state.sellQuantity.displayValue;
+        draft.buyQuantity.tokenInfo = state.sellQuantity.tokenInfo;
+        draft.sellQuantity.tokenInfo = state.buyQuantity.tokenInfo;
         draft.sellQuantity.error = undefined;
         draft.buyQuantity.error = undefined;
         break;
-      case SwapFormActionType.PoolTouched:
+      case SwapFormActionTypeValues.PoolTouched:
         draft.selectedPool.isTouched = true;
         break;
-      case SwapFormActionType.PoolDefaulted:
-        draft.selectedPool = defaultState.selectedPool;
+      case SwapFormActionTypeValues.PoolDefaulted:
+        draft.selectedPool = defaultSwapFormState.selectedPool;
         break;
-      case SwapFormActionType.CanSwapChanged:
+      case SwapFormActionTypeValues.CanSwapChanged:
         draft.canSwap = action.canSwap;
         break;
-      case SwapFormActionType.SellInputValueChanged:
+      case SwapFormActionTypeValues.SellInputValueChanged:
         if (state.sellQuantity.isTouched) draft.sellQuantity.displayValue = action.value;
         break;
-      case SwapFormActionType.BuyInputValueChanged:
+      case SwapFormActionTypeValues.BuyInputValueChanged:
         if (state.buyQuantity.isTouched) draft.buyQuantity.displayValue = action.value;
         break;
-      case SwapFormActionType.LimitPriceInputValueChanged:
+      case SwapFormActionTypeValues.LimitPriceInputValueChanged:
         draft.limitPrice.displayValue = action.value;
         break;
-      case SwapFormActionType.SellAmountErrorChanged:
+      case SwapFormActionTypeValues.SellAmountErrorChanged:
         draft.sellQuantity.error = action.error;
         break;
-      case SwapFormActionType.BuyAmountErrorChanged:
+      case SwapFormActionTypeValues.BuyAmountErrorChanged:
         draft.buyQuantity.error = action.error;
         break;
       default:
         throw new Error(`swapFormReducer invalid action`);
     }
 
+    console.log('🚀 > draft 2:', draft);
     return draft;
   };
 
-  const [state, dispatch] = useReducer(swapFormReducer, {
+  const [swapFormState, dispatch] = useReducer(swapFormReducer, {
     ...defaultSwapFormState,
     ...initialSwapFormProvider,
   });
 
   const actions = useMemo(
     () => ({
-      sellTouched: () => dispatch({ type: SwapFormActionType.SellTouched }),
-      buyTouched: () => dispatch({ type: SwapFormActionType.BuyTouched }),
-      switchTouched: () => dispatch({ type: SwapFormActionType.SwitchTouched }),
+      sellTouched: (token?: AssetAmount) =>
+        dispatch({ type: SwapFormActionTypeValues.SellTouched, token }),
+      buyTouched: (token?: AssetAmount) =>
+        dispatch({ type: SwapFormActionTypeValues.BuyTouched, token }),
+      switchTouched: () => dispatch({ type: SwapFormActionTypeValues.SwitchTouched }),
       switchTokens: () => {
         switchTokens();
-        dispatch({ type: SwapFormActionType.SwitchTouched });
+        dispatch({ type: SwapFormActionTypeValues.SwitchTouched });
       },
-      poolTouched: () => dispatch({ type: SwapFormActionType.PoolTouched }),
-      poolDefaulted: () => dispatch({ type: SwapFormActionType.PoolDefaulted }),
+      poolTouched: () => dispatch({ type: SwapFormActionTypeValues.PoolTouched }),
+      poolDefaulted: () => dispatch({ type: SwapFormActionTypeValues.PoolDefaulted }),
       clearSwapForm: () => {
         resetQuantities();
-        dispatch({ type: SwapFormActionType.ClearSwapForm });
+        console.log('🚀 > resetQuantities');
+        dispatch({ type: SwapFormActionTypeValues.ClearSwapForm });
       },
       resetSwapForm: () => {
         resetState();
-        dispatch({ type: SwapFormActionType.ResetSwapForm });
+        console.log('🚀 > resetState');
+        dispatch({ type: SwapFormActionTypeValues.ResetSwapForm });
       },
       canSwapChanged: (canSwap: boolean) =>
-        dispatch({ type: SwapFormActionType.CanSwapChanged, canSwap }),
+        dispatch({ type: SwapFormActionTypeValues.CanSwapChanged, canSwap }),
       buyInputValueChanged: (value: string) =>
-        dispatch({ type: SwapFormActionType.BuyInputValueChanged, value }),
+        dispatch({ type: SwapFormActionTypeValues.BuyInputValueChanged, value }),
       sellInputValueChanged: (value: string) =>
-        dispatch({ type: SwapFormActionType.SellInputValueChanged, value }),
+        dispatch({ type: SwapFormActionTypeValues.SellInputValueChanged, value }),
       limitPriceInputValueChanged: (value: string) =>
-        dispatch({ type: SwapFormActionType.LimitPriceInputValueChanged, value }),
+        dispatch({ type: SwapFormActionTypeValues.LimitPriceInputValueChanged, value }),
       buyAmountErrorChanged: (error: string | undefined) =>
-        dispatch({ type: SwapFormActionType.BuyAmountErrorChanged, error }),
+        dispatch({ type: SwapFormActionTypeValues.BuyAmountErrorChanged, error }),
       sellAmountErrorChanged: (error: string | undefined) =>
-        dispatch({ type: SwapFormActionType.SellAmountErrorChanged, error }),
+        dispatch({ type: SwapFormActionTypeValues.SellAmountErrorChanged, error }),
     }),
     []
   );
 
-  return <Context.Provider value={{ state: swapFormState, actions }}>{children}</Context.Provider>;
+  const clearErrors = useCallback(() => {
+    if (swapFormState.sellQuantity.error !== undefined) actions.sellAmountErrorChanged(undefined);
+    if (swapFormState.buyQuantity.error !== undefined) actions.buyAmountErrorChanged(undefined);
+  }, [actions, swapFormState.buyQuantity.error, swapFormState.sellQuantity.error]);
+
+  const onChangeSellQuantity = useCallback(
+    (text: string) => {
+      sellQuantityChanged(Number(text));
+      actions.sellInputValueChanged(text === '' ? '' : text);
+
+      clearErrors();
+    },
+    [actions, clearErrors, sellQuantityChanged]
+  );
+
+  const onChangeBuyQuantity = useCallback(
+    (text: string) => {
+      buyQuantityChanged(Number(text));
+      actions.buyInputValueChanged(text === '' ? '' : text);
+
+      clearErrors();
+    },
+    [buyQuantityChanged, actions, clearErrors]
+  );
+
+  const allActions = { ...actions, onChangeSellQuantity, onChangeBuyQuantity };
+
+  return (
+    <Context.Provider value={{ state: swapFormState, actions: allActions }}>
+      {children}
+    </Context.Provider>
+  );
 }
 
 SwapFormProvider.propTypes = {

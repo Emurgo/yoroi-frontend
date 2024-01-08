@@ -23,7 +23,7 @@ const toColumns = ['Asset', 'Volume, 24h', 'Price %, 24h'];
 type Props = {|
   assets: Array<AssetAmount>,
   type: string,
-  onAssetSelected: AssetAmount => void,
+  onAssetSelected: any => void,
   onClose: void => void,
 |};
 
@@ -34,8 +34,6 @@ export default function SelectAssetDialog({
   onClose,
 }: Props): React$Node {
   const [searchTerm, setSearchTerm] = useState('');
-  const { onlyVerifiedTokens } = useSwapTokensOnlyVerified();
-  console.log('🚀 > onlyVerifiedTokens:', onlyVerifiedTokens);
   // <TODO:CHECK_LINT>
   // eslint-disable-next-line no-unused-vars
   const [sortBy, setSortBy] = useState('');
@@ -55,12 +53,14 @@ export default function SelectAssetDialog({
     setSearchTerm(e.target.value);
   };
 
-  const filteredAssets = onlyVerifiedTokens.filter(
-    a =>
-      a.name.toLowerCase().includes(searchTerm) ||
-      a.ticker.toLowerCase().includes(searchTerm) ||
-      a.address.toLowerCase().includes(searchTerm)
-  );
+  const filteredAssets =
+    assets.filter(
+      a =>
+        a.name.toLowerCase().includes(searchTerm) ||
+        a.ticker.toLowerCase().includes(searchTerm) ||
+        a.id.toLowerCase().includes(searchTerm) ||
+        a.fingerprint.toLowerCase().includes(searchTerm)
+    ) || [];
 
   return (
     <Dialog title={`Swap ${type}`} onClose={onClose} withCloseButton closeOnOverlayClick>
@@ -110,7 +110,7 @@ export default function SelectAssetDialog({
         >
           {filteredAssets.map((a, index) => (
             <AssetAndAmountRow
-              key={`${a.address}-${index}`}
+              key={`${a.id}-${index}`}
               asset={a}
               type={type}
               onAssetSelected={handleAssetSelected}
@@ -151,7 +151,7 @@ const AssetAndAmountRow = ({
   priceChange100 = '',
   onAssetSelected,
 }) => {
-  const { name = null, image = '', fingerprint: address, walletAmount, ticker } = asset;
+  const { name = null, image = '', fingerprint: address, id, amount, ticker } = asset;
   //   {
   //     "id": "984394dcc0b08ea12d72b8833292e3c3197d7a8ac89aad61d2f5aa9e.45415254485f746f6b656e",
   //     "group": "984394dcc0b08ea12d72b8833292e3c3197d7a8ac89aad61d2f5aa9e",
@@ -216,9 +216,9 @@ const AssetAndAmountRow = ({
         <Box flexGrow="1" width="100%">
           <Box display="flex" alignItems="center" gap="8px">
             <Typography fontWeight={500} variant="body1">
-              {name !== address && `[${ticker}]`} {name}
+              {(name !== address || name !== id) && name !== ticker && `[${ticker}]`} {name}
             </Typography>
-            {!isFrom && walletAmount > 0 && (
+            {!isFrom && Number(amount) > 0 && (
               <Box component="span" color="secondary.600">
                 <WalletIcon />
               </Box>
@@ -226,7 +226,7 @@ const AssetAndAmountRow = ({
           </Box>
           <Box>
             <Typography variant="body2" color="grayscale.600">
-              {truncateAddressShort(address, 17)}
+              {truncateAddressShort(address || id, 17) || 'Cardano'}
             </Typography>
           </Box>
         </Box>
@@ -280,11 +280,11 @@ const AssetAndAmountRow = ({
           alignItems="flex-end"
         >
           <Typography variant="body1" color="grayscale.900">
-            <span>{walletAmount}</span>&nbsp;<span>{ticker}</span>
+            <span>{amount}</span>&nbsp;<span>{ticker}</span>
           </Typography>
           {usdPrice && (
             <Typography variant="body2" color="grayscale.600">
-              {(walletAmount * usdPrice).toFixed(2)} USD
+              {(amount * usdPrice).toFixed(2)} USD
             </Typography>
           )}
         </Box>
