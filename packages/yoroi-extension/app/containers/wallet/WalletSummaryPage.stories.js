@@ -32,7 +32,7 @@ import { wrapWallet } from '../../Routes';
 import {
   INITIAL_SEARCH_LIMIT,
   SEARCH_SKIP,
-} from '../../stores/toplevel/TransactionsStore';
+} from '../../stores/toplevel/LegacyTransactionsStore';
 import ExportTransactionDialog from '../../components/wallet/export/ExportTransactionDialog';
 import WalletTransaction from '../../domain/WalletTransaction';
 import CardanoByronTransaction from '../../domain/CardanoByronTransaction';

@@ -77,10 +77,6 @@ import type {
   HaskellShelleyTxSignRequest
 } from '../../../app/api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type { CardanoAddressedUtxo, } from '../../../app/api/ada/transactions/types';
-import {
-  derivePrivateByAddressing,
-  derivePublicByAddressing,
-} from '../../../app/api/ada/lib/cardanoCrypto/utils';
 import { cip8Sign } from '../../../app/connector/api';
 import type { PersistedSubmittedTransaction } from '../../../app/api/localStorage';
 import type { ForeignUtxoFetcher } from '../../../app/connector/stores/ConnectorStore';
@@ -110,6 +106,10 @@ import {
   WalletTypePurpose
 } from '../../../app/config/numbersConfig';
 import { Bip44DerivationLevels, CoinType } from '@emurgo/yoroi-lib';
+import {
+  derivePrivateByAddressing,
+  derivePublicByAddressing
+} from '../../../app/api/ada/lib/cardanoCrypto/deriveByAddressing';
 
 axios.defaults.adapter = fetchAdapter;
 
