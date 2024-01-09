@@ -11,7 +11,7 @@ import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react';
 import globalMessages from '../../../i18n/global-messages';
 import { toSvg } from 'jdenticon';
-import { CopyAddress } from '../../../components/wallet/assets/NFTDetails';
+import { CopyAddress } from '../../../components/wallet/assets/TruncatedText';
 import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
 import { truncateAddress } from '../../../utils/formatters';
 import { MultiToken } from '../../../api/common/lib/MultiToken';

@@ -32,8 +32,8 @@ import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 import type {
   ConceptualWallet
 } from '../../../api/ada/lib/storage/models/ConceptualWallet/index';
-import { derivePublicByAddressing } from '../../../api/ada/lib/cardanoCrypto/utils';
 import { generateRegistrationMetadata } from '../../../api/ada/lib/cardanoCrypto/catalyst';
+import { derivePublicByAddressing } from '../../../api/ada/lib/cardanoCrypto/deriveByAddressing';
 
 /** Note: Handles Trezor Signing */
 export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {

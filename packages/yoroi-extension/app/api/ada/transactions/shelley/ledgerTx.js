@@ -39,8 +39,8 @@ import {
 import {
   ChainDerivations,
 } from '../../../../config/numbersConfig';
-import { derivePublicByAddressing } from '../../lib/cardanoCrypto/utils';
 import cbor from 'cbor';
+import { derivePublicByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
 
 // ==================== LEDGER ==================== //
 /** Generate a payload for Ledger SignTx */
