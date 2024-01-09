@@ -119,15 +119,15 @@ export async function createTrezorSignTxPayload(
     request = {
       ...request,
       auxiliaryData: {
-        governanceRegistrationParameters: {
+        cVoteRegistrationParameters: {
           delegations: [
             {
-              votingPublicKey: votingPublicKey.replace(/^0x/, ''),
+              votePublicKey: votingPublicKey.replace(/^0x/, ''),
               weight: 1,
             }
           ],
           stakingPath: stakingKeyPath,
-          rewardAddressParameters: {
+          paymentAddressParameters: {
             addressType: CardanoAddressType.BASE,
             path: paymentKeyPath,
             stakingPath: stakingKeyPath,
