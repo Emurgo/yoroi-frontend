@@ -191,7 +191,7 @@
     "@emurgo/cross-csl-browser": "3.2.1",
     "@emurgo/js-chain-libs": "0.7.1",
     "@emurgo/yoroi-eutxo-txs": "0.0.1-alpha.6",
-    "@emurgo/yoroi-lib": "0.14.2-beta.1",
+    "@emurgo/yoroi-lib": "0.14.2",
     "@ledgerhq/hw-transport-u2f": "5.36.0-deprecated",
     "@ledgerhq/hw-transport-webauthn": "5.36.0-deprecated",
     "@ledgerhq/hw-transport-webhid": "5.51.1",
