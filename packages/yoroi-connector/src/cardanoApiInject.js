@@ -104,7 +104,7 @@
     }) 
 
     getExtensions() {
-        return [{ cip: 95 }];
+      return Promise.resolve([{ cip: 95 }]);
     }
 
     getNetworkId() {
