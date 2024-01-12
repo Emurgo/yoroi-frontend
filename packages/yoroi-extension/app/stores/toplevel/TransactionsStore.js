@@ -342,7 +342,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
     let result;
     if (isEmptyHistory) {
-      console.log('>>>>>>>>>>>>>> INITIAL TAIL REQUEST!')
       /*
        * TAIL REQUEST IS USED WHEN FIRST SYNC OR EMPRY WALLET
        */
@@ -356,7 +355,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       }
       result = await tailRequest.promise;
     } else {
-      console.log('>>>>>>>>>>>>>> FOLLOWING HEAD REQUEST!')
       /*
        * HEAD REQUEST IS USED WITH `AFTER` REFERENCE
        * WHEN NON-EMPTY WALLET
@@ -364,7 +362,8 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       headRequest.invalidate({ immediately: false });
       headRequest.execute({
         publicDeriver,
-        isLocalRequest: request.isLocalRequest
+        isLocalRequest: false,
+        afterTx: txHistoryState.txs[0],
       });
       if (headRequest.promise == null) {
         throw new Error('unexpected nullish headRequest.promise');
@@ -491,7 +490,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const { tailRequest } = state.requests;
 
     const beforeTx = state.txs[state.txs.length-1];
-    console.log('>>>>>>>>>>>>>> TAIL REQUEST BEFORE: ', beforeTx.block.Hash, beforeTx.txid);
 
     tailRequest.invalidate({ immediately: false });
     tailRequest.execute({

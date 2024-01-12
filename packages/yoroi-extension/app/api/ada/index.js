@@ -122,6 +122,7 @@ import type {
   BestBlockFunc,
   GetRecentTransactionHashesFunc,
   GetTransactionsByHashesFunc,
+  HistoryFunc,
   MultiAssetMintMetadataFunc,
   MultiAssetSupplyFunc,
   RemoteUnspentOutput,
@@ -240,6 +241,7 @@ export type AdaGetTransactionsRequest = {|
   afterTx?: ?WalletTransaction,
   getRecentTransactionHashes: GetRecentTransactionHashesFunc,
   getTransactionsByHashes: GetTransactionsByHashesFunc,
+  getTransactionHistory: HistoryFunc,
 |};
 
 // notices
@@ -709,6 +711,7 @@ export default class AdaApi {
           request.publicDeriver.getDb(),
           request.publicDeriver,
           request.checkAddressesInUse,
+          request.getTransactionHistory,
           request.getRecentTransactionHashes,
           request.getTransactionsByHashes,
           request.getBestBlock,

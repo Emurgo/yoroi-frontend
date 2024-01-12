@@ -140,6 +140,7 @@ import type {
   MultiAssetMintMetadataResponse,
   MultiAssetSupplyResponse,
   TxSummary,
+  HistoryFunc,
 } from '../../state-fetch/types';
 import {
   ShelleyCertificateTypes,
@@ -1035,6 +1036,7 @@ export async function updateTransactions(
   db: lf$Database,
   publicDeriver: IPublicDeriver<ConceptualWallet>,
   checkAddressesInUse: FilterFunc,
+  getTransactionHistory: HistoryFunc,
   getRecentTransactionHashes: GetRecentTransactionHashesFunc,
   getTransactionsByHashes: GetTransactionsByHashesFunc,
   getBestBlock: BestBlockFunc,
@@ -1109,6 +1111,7 @@ export async function updateTransactions(
           remainingDeps,
           publicDeriver,
           lastSyncInfo,
+          getTransactionHistory,
           getRecentTransactionHashes,
           getTransactionsByHashes,
           getBestBlock,
@@ -1377,6 +1380,7 @@ async function rawUpdateTransactions(
   |},
   publicDeriver: IPublicDeriver<>,
   lastSyncInfo: $ReadOnly<LastSyncInfoRow>,
+  getTransactionHistory: HistoryFunc,
   getRecentTransactionHashes: GetRecentTransactionHashesFunc,
   getTransactionsByHashes: GetTransactionsByHashesFunc,
   getBestBlock: BestBlockFunc,
@@ -1393,24 +1397,23 @@ async function rawUpdateTransactions(
     getCardanoHaskellBaseConfig(network)
   );
 
-  let untilBlock;
+  if (before != null && after != null) {
+    throw new Error('Only one of `before` or `after` should be used for a resync');
+  }
 
-  if (before) {
-    untilBlock = before.blockHash;
-  } else {
-    const bestBlock = await getBestBlock({
-      network,
-    });
-    untilBlock = bestBlock.hash;
+  const bestBlock = await getBestBlock({ network });
+  const untilBlock = before == null ? bestBlock.hash : before.blockHash;
+  const shouldUpdateLastSync = before == null;
 
+
+  if (shouldUpdateLastSync) {
     // update last sync
     const slotInRemote = (bestBlock.epoch == null || bestBlock.slot == null)
-          ? null
-          : toAbsoluteSlotNumber({
-            epoch: bestBlock.epoch,
-            slot: bestBlock.slot,
-          });
-
+      ? null
+      : toAbsoluteSlotNumber({
+        epoch: bestBlock.epoch,
+        slot: bestBlock.slot,
+      });
     await deps.ModifyLastSyncInfo.overrideLastSyncInfo(
       db, dbTx,
       {
@@ -1426,8 +1429,9 @@ async function rawUpdateTransactions(
   let txHashes;
 
   if (untilBlock != null) {
+
     // address syncing has been done by scanUtxos so no need to do it here again
-    //  get new txs from fetcher
+    // get new txs from fetcher
     // important: get addresses for our wallet AFTER scanning for new addresses
     const { txIds, addresses } = await rawGetAllTxIds(
       db, dbTx,
@@ -1443,61 +1447,42 @@ async function rawUpdateTransactions(
       derivationTables,
     );
 
-    const recentTxHashesResult = await getRecentTransactionHashes({
-      network,
-      addresses: toRequestAddresses(addresses),
-      before: {
-        blockHash: untilBlock,
-        txHash: before?.txHash,
-      },
-    });
-    const summaries: Array<TxSummary> =
-      Object.values(recentTxHashesResult).flat()
-        .filter(createFilterUniqueBy(x => x.txHash));
-    summaries.sort((a: TxSummary, b: TxSummary) => {
-      // DESC ordering (b < a)
-      return b.epoch - a.epoch || b.slot - a.slot;
-    });
-    txHashes = summaries.slice(0,20).map(x => x.txHash);
-
-    const allExistingTxHashes = new Set(
-      (await rawGetTransactions(
-        db, dbTx,
-        {
-          GetPathWithSpecific: deps.GetPathWithSpecific,
-          GetAddress: deps.GetAddress,
-          CardanoByronAssociateTxWithIOs: deps.CardanoByronAssociateTxWithIOs,
-          CardanoShelleyAssociateTxWithIOs: deps.CardanoShelleyAssociateTxWithIOs,
-          AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
-          AssociateTxWithAccountingIOs: deps.AssociateTxWithAccountingIOs,
-          GetTxAndBlock: deps.GetTxAndBlock,
-          GetDerivationSpecific: deps.GetDerivationSpecific,
-          GetCertificates: deps.GetCertificates,
-        },
-        {
-          publicDeriver,
-          getTxAndBlock: async (hashes) => await deps.GetTxAndBlock.byTime(
-            db, dbTx,
-            {
-              txIds: hashes,
-            }
-          )
-        },
-        derivationTables,
-      )).txs
-        // pending txs needs to be updated, so exclude them from existing
-        .filter(tx => tx.block != null)
-        .map(tx => tx.transaction.Hash)
-    );
-
-    const missingTxHashSet = new Set(txHashes.filter(hash => !allExistingTxHashes.has(hash)));
-
-    const txsFromNetwork = await getTransactionsByHashes(
-      {
+    let txsFromNetwork;
+    if (after != null) {
+      /*
+       * HEAD
+       */
+      txsFromNetwork = await getTransactionHistory({
         network,
-        txHashes: [...missingTxHashSet],
-      }
-    );
+        addresses: toRequestAddresses(addresses),
+        after: {
+          block: after.blockHash,
+          tx: after.txHash,
+        },
+        untilBlock,
+      })
+    } else {
+      /*
+       * TAIL
+       */
+      const recentTxHashesResult = await getRecentTransactionHashes({
+        network,
+        addresses: toRequestAddresses(addresses),
+        before: {
+          blockHash: untilBlock,
+          txHash: before?.txHash,
+        },
+      });
+      const summaries: Array<TxSummary> =
+        Object.values(recentTxHashesResult).flat()
+          .filter(createFilterUniqueBy(x => x.txHash));
+      summaries.sort((a: TxSummary, b: TxSummary) => {
+        // DESC ordering (b < a)
+        return b.epoch - a.epoch || b.slot - a.slot;
+      });
+      txHashes = summaries.slice(0,20).map(x => x.txHash);
+      txsFromNetwork = await getTransactionsByHashes({ network, txHashes });
+    }
 
     const ourIds = new Set(
       Object.keys(addresses)
