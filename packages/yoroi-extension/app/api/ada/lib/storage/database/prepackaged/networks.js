@@ -32,8 +32,8 @@ export const networks = Object.freeze({
       WebSocket: environment.isTest()
         ? 'ws://localhost:21000'
         : 'wss://iohk-mainnet.yoroiwallet.com:443',
-      TokenInfoService:
-        'https://cdn.yoroiwallet.com',
+      TokenInfoService: 'https://cdn.yoroiwallet.com',
+      BackendServiceZero: 'https://yoroi-backend-zero-mainnet.emurgornd.com', 
     },
     BaseConfig: ([
       Object.freeze({
@@ -177,8 +177,8 @@ export const networks = Object.freeze({
       WebSocket: environment.isTest()
         ? 'ws://localhost:21000'
         : 'wss://preprod-backend.yoroiwallet.com:443',
-      TokenInfoService:
-        'https://stage-cdn.yoroiwallet.com',
+      TokenInfoService: 'https://stage-cdn.yoroiwallet.com',
+      BackendServiceZero: 'https://yoroi-backend-zero-preprod.emurgornd.com', 
     },
     BaseConfig: ([
       Object.freeze({
@@ -217,8 +217,8 @@ export const networks = Object.freeze({
       WebSocket: environment.isTest()
         ? 'ws://localhost:21000'
         : 'wss://preview-backend.emurgornd.com:443',
-      TokenInfoService:
-        'https://stage-cdn.yoroiwallet.com',
+      TokenInfoService: 'https://stage-cdn.yoroiwallet.com',
+      BackendServiceZero: 'https://yoroi-backend-zero-previes.emurgornd.com', 
     },
     BaseConfig: ([
       Object.freeze({
@@ -257,8 +257,8 @@ export const networks = Object.freeze({
       WebSocket: environment.isTest()
         ? 'ws://localhost:21000'
         : 'wss://sanchonet-backend.yoroiwallet.com:443',
-      TokenInfoService:
-        'https://stage-cdn.yoroiwallet.com',
+      TokenInfoService: 'https://stage-cdn.yoroiwallet.com',
+      BackendServiceZero: 'https://yoroi-backend-zero-sanchonet.emurgornd.com', 
     },
     BaseConfig: ([
       Object.freeze({

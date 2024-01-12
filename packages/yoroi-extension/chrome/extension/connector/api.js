@@ -522,7 +522,7 @@ export async function connectorGetStakeKey(
     throw new Error('Unable to get the stake key')
   }
   const stakingKeyResp = await withStakingKey.getStakingKey();
-  const backendService = wallet.getParent().getNetworkInfo().Backend.BackendService;
+  const backendService = wallet.getParent().getNetworkInfo().Backend.BackendServiceZero;
   if (!backendService) {
     throw new Error('unexpected missing backend service');
   }
