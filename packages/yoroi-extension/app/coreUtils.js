@@ -34,6 +34,8 @@ export function createFilterUniqueBy<T, K>(getter: T => K): T => boolean {
   const set = new Set();
   return t => {
     const k = getter(t);
+    // false && <ignored> - when set already has entry
+    // true && set.add - when doesn't have
     return !set.has(k) && set.add(k) && true;
   }
 }
