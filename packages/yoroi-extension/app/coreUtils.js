@@ -30,7 +30,16 @@ export function urlResolveIpfs<T: ?string>(url: T): T {
   return url?.replace('ipfs://', 'https://ipfs.io/ipfs/');
 }
 
-export function createFilterUniqueBy<T, K>(getter: T => K): T => boolean {
+/**
+ * Creates a function like Predicate<T> which will filter out duplicates.
+ * Can be used to pass into higher order collection calls like `.filter`.
+ *
+ * @param getter - a function that resolves every element T
+ *  into the value that will be used for the uniqueness check. Identity by default.
+ * @return {function(*)} - that takes any elements T and returns false
+ *  in case it duplicates any previously passed element. True by default.
+ */
+export function createFilterUniqueBy<T>(getter: T => any = x => x): T => boolean {
   const set = new Set();
   return t => {
     const k = getter(t);
