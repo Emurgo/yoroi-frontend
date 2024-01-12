@@ -1457,7 +1457,7 @@ async function rawUpdateTransactions(
         addresses: toRequestAddresses(addresses),
         after: {
           block: after.blockHash,
-          tx: after.txHash,
+          tx: after.txHash || undefined,
         },
         untilBlock,
       })
@@ -1474,7 +1474,8 @@ async function rawUpdateTransactions(
         },
       });
       const summaries: Array<TxSummary> =
-        Object.values(recentTxHashesResult).flat()
+        // $FlowFixMe[incompatible-cast]
+        (Object.values(recentTxHashesResult).flat(): Array<TxSummary>)
           .filter(createFilterUniqueBy(x => x.txHash));
       summaries.sort((a: TxSummary, b: TxSummary) => {
         // DESC ordering (b < a)

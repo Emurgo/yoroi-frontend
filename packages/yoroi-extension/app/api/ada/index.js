@@ -701,7 +701,7 @@ export default class AdaApi {
         }
 
         const resolveReference: ?WalletTransaction => ?ReferenceTx = ref => {
-          return ref ? {
+          return ref?.block ? {
             blockHash: ref.block.Hash,
             txHash: ref.txid,
           } : undefined;
