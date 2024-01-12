@@ -25,7 +25,7 @@ export function getTokenName(
   return '-';
 }
 
-function resolveNameProperties(name: ?string): { name: string, cip67Tag: ?string } {
+function resolveNameProperties(name: ?string): {| name: string, cip67Tag: ?string |} {
   if (name == null || name.length === 0 || !isHexadecimal(name)) {
     return { name: '', cip67Tag: null };
   }
