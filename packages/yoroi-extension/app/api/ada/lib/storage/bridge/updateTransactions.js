@@ -139,6 +139,7 @@ import type {
   MultiAssetSupplyFunc,
   MultiAssetMintMetadataResponse,
   MultiAssetSupplyResponse,
+  TxSummary,
 } from '../../state-fetch/types';
 import {
   ShelleyCertificateTypes,
@@ -157,7 +158,7 @@ import type {
   DefaultTokenEntry,
 } from '../../../../common/lib/MultiToken';
 import { UtxoStorageApi } from '../models/utils';
-import { bytesToHex, hexToBytes } from '../../../../../coreUtils';
+import { bytesToHex, createFilterUniqueBy, hexToBytes } from '../../../../../coreUtils';
 
 type TxData = {|
   addressLookupMap: Map<number, string>,
@@ -1426,9 +1427,7 @@ async function rawUpdateTransactions(
 
   if (untilBlock != null) {
     // address syncing has been done by scanUtxos so no need to do it here again
-
     //  get new txs from fetcher
-
     // important: get addresses for our wallet AFTER scanning for new addresses
     const { txIds, addresses } = await rawGetAllTxIds(
       db, dbTx,
@@ -1452,10 +1451,14 @@ async function rawUpdateTransactions(
         txHash: before?.txHash,
       },
     });
-
-    // should use Object.values(recentTxHashesResult) but flow couldn't infer the type
-    txHashes = Object.keys(recentTxHashesResult).map(addr => recentTxHashesResult[addr])
-      .flatMap(txs => txs.map(tx => tx.txHash));
+    const summaries: Array<TxSummary> =
+      Object.values(recentTxHashesResult).flat()
+        .filter(createFilterUniqueBy(x => x.txHash));
+    summaries.sort((a: TxSummary, b: TxSummary) => {
+      // DESC ordering (b < a)
+      return b.epoch - a.epoch || b.slot - a.slot;
+    });
+    txHashes = summaries.slice(0,20).map(x => x.txHash);
 
     const allExistingTxHashes = new Set(
       (await rawGetTransactions(

@@ -29,3 +29,11 @@ export function urlResolveIpfs<T: ?string>(url: T): T {
   // $FlowFixMe
   return url?.replace('ipfs://', 'https://ipfs.io/ipfs/');
 }
+
+export function createFilterUniqueBy<T, K>(getter: T => K): T => boolean {
+  const set = new Set();
+  return t => {
+    const k = getter(t);
+    return !set.has(k) && set.add(k) && true;
+  }
+}

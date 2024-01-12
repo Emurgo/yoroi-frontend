@@ -456,14 +456,15 @@ export type GetRecentTransactionHashesRequest = {|
   |},
 |};
 
+export type TxSummary = {|
+  txHash: string,
+  blockHash: string,
+  txBlockIndex: number,
+  epoch: number,
+  slot: number,
+|};
 export type GetRecentTransactionHashesResponse = {|
-  [address: string]: Array<{|
-    txHash: string,
-    blockHash: string,
-    txBlockIndex: number,
-    epoch: number,
-    slot: number,
-  |}>
+  [address: string]: Array<TxSummary>
 |};
 
 export type GetRecentTransactionHashesFunc = (
