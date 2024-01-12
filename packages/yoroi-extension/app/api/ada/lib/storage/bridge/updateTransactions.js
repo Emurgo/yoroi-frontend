@@ -1025,7 +1025,7 @@ export async function updateUtxos(
   );
 }
 
-type After = {|
+export type ReferenceTx = {|
   blockHash: string,
   txHash: ?string,
 |};
@@ -1040,7 +1040,8 @@ export async function updateTransactions(
   getTokenInfo: TokenInfoFunc,
   getMultiAssetMetadata: MultiAssetMintMetadataFunc,
   getMultiAssetSupply: MultiAssetSupplyFunc,
-  after?: ?After,
+  after?: ?ReferenceTx,
+  before?: ?ReferenceTx,
 ): Promise<TxData> {
   const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
   const derivationTables = withLevels == null
@@ -1115,6 +1116,7 @@ export async function updateTransactions(
           getMultiAssetMetadata,
           getMultiAssetSupply,
           after,
+          before,
         );
       }
     );
@@ -1381,7 +1383,8 @@ async function rawUpdateTransactions(
   getTokenInfo: TokenInfoFunc,
   getMultiAssetMetadata: MultiAssetMintMetadataFunc,
   getMultiAssetSupply: MultiAssetSupplyFunc,
-  after: ?After,
+  after: ?ReferenceTx,
+  before: ?ReferenceTx,
 ): Promise<TxData> {
   const network = publicDeriver.getParent().getNetworkInfo();
   // TODO: consider passing this function in as an argument instead of generating it here
@@ -1391,8 +1394,8 @@ async function rawUpdateTransactions(
 
   let untilBlock;
 
-  if (after) {
-    untilBlock = after.blockHash;
+  if (before) {
+    untilBlock = before.blockHash;
   } else {
     const bestBlock = await getBestBlock({
       network,
@@ -1446,7 +1449,7 @@ async function rawUpdateTransactions(
       addresses: toRequestAddresses(addresses),
       before: {
         blockHash: untilBlock,
-        txHash: after?.txHash,
+        txHash: before?.txHash,
       },
     });
 

@@ -136,7 +136,8 @@ export type BaseGetTransactionsRequest = {|
   ...InexactSubset<GetTransactionsRequestOptions>,
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetLastSyncInfo,
   isLocalRequest: boolean,
-  afterTxs?: ?Array<WalletTransaction>,
+  beforeTx?: ?WalletTransaction,
+  afterTx?: ?WalletTransaction,
 |};
 export type GetTransactionsResponse = Array<WalletTransaction>;
 
