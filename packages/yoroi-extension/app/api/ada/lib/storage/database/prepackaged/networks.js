@@ -26,6 +26,7 @@ export const networks = Object.freeze({
         : 'https://api.yoroiwallet.com',
       TokenInfoService:
         'https://cdn.yoroiwallet.com',
+      BackendServiceZero: 'https://zero.yoroiwallet.com', 
     },
     BaseConfig: ([
       Object.freeze({
@@ -101,6 +102,7 @@ export const networks = Object.freeze({
         : 'https://preprod-backend.yoroiwallet.com',
       TokenInfoService:
         'https://stage-cdn.yoroiwallet.com',
+      BackendServiceZero: 'https://yoroi-backend-zero-preprod.emurgornd.com', 
     },
     BaseConfig: ([
       Object.freeze({
@@ -138,6 +140,7 @@ export const networks = Object.freeze({
         : 'https://preview-backend.emurgornd.com',
       TokenInfoService:
         'https://stage-cdn.yoroiwallet.com',
+      BackendServiceZero: 'https://yoroi-backend-zero-previes.emurgornd.com', 
     },
     BaseConfig: ([
       Object.freeze({
@@ -175,6 +178,7 @@ export const networks = Object.freeze({
         : 'https://sanchonet-backend.yoroiwallet.com',
       TokenInfoService:
         'https://stage-cdn.yoroiwallet.com',
+      BackendServiceZero: 'https://yoroi-backend-zero-sanchonet.emurgornd.com', 
     },
     BaseConfig: ([
       Object.freeze({
