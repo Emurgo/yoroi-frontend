@@ -30,7 +30,7 @@ function resolveNameProperties(name: ?string): {| name: string, cip67Tag: ?strin
     return { name: '', cip67Tag: null };
   }
   const { asciiName, hexName, cip67Tag } =
-    AssetNameUtils.resolveProperties(name ?? '');
+    AssetNameUtils.resolveProperties(name);
   return {
     name: asciiName ?? hexName,
     cip67Tag: cip67Tag?.toString(10),
