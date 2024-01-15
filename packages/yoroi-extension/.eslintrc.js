@@ -25,7 +25,7 @@ module.exports = {
     'comma-dangle': 'off',
     'generator-star-spacing': 'off',
     'import/no-unresolved': ['error', {
-      ignore: ['js-chain-libs', 'cardano-wallet-browser', 'ergo-lib-wasm-browser']
+      ignore: ['js-chain-libs', 'cardano-wallet-browser']
     }],
     'import/no-extraneous-dependencies': 'off',
     'import/no-dynamic-require': 'off',
@@ -106,6 +106,7 @@ module.exports = {
     'flowtype/no-primitive-constructor-types': 2,
     'flowtype/no-dupe-keys': 2,
     'no-extra-boolean-cast': 0,
+    'react/jsx-first-prop-new-line': 0,
     'no-restricted-properties': [
       2,
       { object: 'TrezorConnect', message: 'Use TrezorWrapper instead to minimize Trezor iframe lifespan', },

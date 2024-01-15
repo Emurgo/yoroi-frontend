@@ -22,7 +22,7 @@ const messages = defineMessages({
   line1: {
     id: 'wallet.voting.dialog.step.register.line1',
     defaultMessage:
-      '!!!Enter your spending password to be able to generate the required certificate for voting.',
+      '!!!Enter your password to be able to generate the required certificate for voting.',
   },
 });
 
@@ -77,7 +77,7 @@ export default class RegisterDialog extends Component<Props> {
               steps={stepsList.map(step => ({ message: step.message, stepId: String(step.step) }))}
               setCurrentStep={() => {}}
             />
-            <Typography
+            <Typography component="div"
               textAlign="center"
               pt="24px"
               pb="40px"

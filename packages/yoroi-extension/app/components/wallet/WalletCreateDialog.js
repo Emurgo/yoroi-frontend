@@ -34,11 +34,11 @@ const messages = defineMessages({
   },
   repeatPasswordLabel: {
     id: 'wallet.create.dialog.repeatPasswordLabel',
-    defaultMessage: '!!!Repeat spending password',
+    defaultMessage: '!!!Repeat password',
   },
   repeatPasswordFieldPlaceholder: {
     id: 'wallet.create.dialog.repeatPasswordFieldPlaceholder',
-    defaultMessage: '!!!Repeat spending password',
+    defaultMessage: '!!!Repeat password',
   },
 });
 

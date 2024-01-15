@@ -242,9 +242,9 @@ class StakingPageContent extends Component<AllProps> {
     const delegatedPool = {
       id: String(currentPool),
       name,
-      roa: '5.1',
-      poolSize: 2560000,
-      share: '0.3',
+      roa: '-',
+      poolSize: '-',
+      share: '-',
       websiteUrl: meta.info?.homepage,
       ticker: meta.info?.ticker,
     };

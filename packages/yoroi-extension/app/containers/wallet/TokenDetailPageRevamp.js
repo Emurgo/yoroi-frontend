@@ -53,7 +53,7 @@ class TokenDetailsPageRevamp extends Component<AllProps> {
             .filter(item => item.info.IsNFT === false)
             .map(token => {
               const policyId = token.entry.identifier.split('.')[0];
-              const name = truncateToken(getTokenStrictName(token.info) ?? '-');
+              const name = truncateToken(getTokenStrictName(token.info).name ?? '-');
 
               const numberOfDecimals = token.info?.Metadata.numberOfDecimals ?? 0;
               const shiftedAmount = token.entry.amount.shiftedBy(-numberOfDecimals);

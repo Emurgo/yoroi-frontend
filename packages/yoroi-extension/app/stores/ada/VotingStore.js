@@ -20,7 +20,6 @@ import {
 import {
   isCardanoHaskell,
   getCardanoHaskellBaseConfig,
-  isErgo,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { genTimeToSlot } from '../../api/ada/lib/storage/bridge/timeUtils';
 import { generatePrivateKeyForCatalyst } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
@@ -42,7 +41,6 @@ import cryptoRandomString from 'crypto-random-string';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { generateRegistration } from '../../api/ada/lib/cardanoCrypto/catalyst';
-import { derivePublicByAddressing } from '../../api/ada/lib/cardanoCrypto/utils'
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet'
 import type { CatalystRoundInfoResponse } from '../../api/ada/lib/state-fetch/types'
 import {
@@ -50,6 +48,7 @@ import {
   saveCatalystRoundInfo,
 } from '../../api/localStorage';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
+import { derivePublicByAddressing } from '../../api/ada/lib/cardanoCrypto/deriveByAddressing';
 
 export const ProgressStep = Object.freeze({
   GENERATE: 0,
@@ -139,7 +138,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
       this.loadingCatalystRoundInfo = true
     })
     const publicDeriver = this.stores.wallets.selected;
-    if (!publicDeriver || isErgo(publicDeriver.getParent().getNetworkInfo())) {
+    if (!publicDeriver) {
       runInAction(() => {
         this.loadingCatalystRoundInfo = false
       })
@@ -359,7 +358,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
         throw new Error(`${nameof(this._createTransaction)} missing staking key functionality`);
       }
       if (spendingPassword === null) {
-        throw new Error(`${nameof(this._createTransaction)} expect a spending password`);
+        throw new Error(`${nameof(this._createTransaction)} expect a password`);
       }
       const stakingKey = await genOwnStakingKey({
         publicDeriver: withStakingKey,

@@ -62,7 +62,7 @@ export default class ConnectExternalStorageDialog extends Component<Props> {
       >
         <div className={styles.content}>
           <span className={styles.icon}><LinkExternalStorageSvg /></span>
-          <p>{intl.formatMessage(messages.connectContent)}</p>
+          <div>{intl.formatMessage(messages.connectContent)}</div>
         </div>
       </Dialog>);
   }

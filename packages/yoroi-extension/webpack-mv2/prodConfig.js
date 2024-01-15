@@ -31,7 +31,7 @@ const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
       customPath,
       path.join(__dirname, '../chrome/extension/background')
     ],
-    ergo: [
+    connector: [
       customPath,
       path.join(__dirname, '../chrome/extension/connector/index')
     ],

@@ -95,12 +95,12 @@ export default class OverviewModal extends Component<Props> {
         closeButton={<DialogCloseButton onClose={onClose} />}
         onClose={onClose}
       >
-        <Typography color="var(--yoroi-palette-gray-900)">
+        <Typography component="div" color="var(--yoroi-palette-gray-900)">
           {intl.formatMessage(messages.overviewContent)}
         </Typography>
         <Box display="flex" alignItems="center" py="50px">
           <Box display="flex" alignItems="center" flex="1">
-            <Typography mr="6px">{intl.formatMessage(messages.availableTotalRewards)}</Typography>
+            <Typography component="div" mr="6px">{intl.formatMessage(messages.availableTotalRewards)}</Typography>
             <HelperTooltip
               message={
                 <FormattedMessage
@@ -112,10 +112,10 @@ export default class OverviewModal extends Component<Props> {
           </Box>
 
           <Box flex="1">
-            <Typography variant="h1" fontWeight="400" color="var(--yoroi-palette-gray-900)">
+            <Typography component="div" variant="h1" fontWeight="400" color="var(--yoroi-palette-gray-900)">
               {this.renderAmount(totalRewards)}
             </Typography>
-            <Typography variant="body1" color="var(--yoroi-palette-gray-900)">
+            <Typography component="div" variant="body1" color="var(--yoroi-palette-gray-900)">
               {this.renderAmountWithUnitOfAccount(totalRewards)}
             </Typography>
           </Box>

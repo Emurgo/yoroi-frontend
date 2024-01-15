@@ -82,7 +82,7 @@ import {
   signTransaction as shelleySignTransaction,
 } from './transactions/shelley/transactions';
 import { generateAdaMnemonic, generateWalletRootKey, } from './lib/cardanoCrypto/cryptoWallet';
-import { derivePrivateByAddressing, derivePublicByAddressing, v4PublicToV2, } from './lib/cardanoCrypto/utils';
+import { v4PublicToV2, } from './lib/cardanoCrypto/utils';
 import { isValidBip39Mnemonic, } from '../common/lib/crypto/wallet';
 import { generateByronPlate } from './lib/cardanoCrypto/plate';
 import {
@@ -132,7 +132,7 @@ import type {
   TokenInfoFunc,
   RemoteUnspentOutput,
   GetRecentTransactionHashesFunc,
-  GetTransactionsByHashesFunc,
+  GetTransactionsByHashesFunc, MultiAssetSupplyFunc,
 } from './lib/state-fetch/types';
 import type { FilterFunc, } from '../common/lib/state-fetch/currencySpecificTypes';
 import { getChainAddressesForDisplay, } from './lib/storage/models/utils';
@@ -172,6 +172,7 @@ import { bytesToHex, hexToBytes, hexToUtf } from '../../coreUtils';
 import type { PersistedSubmittedTransaction } from '../localStorage';
 import type { ForeignUtxoFetcher } from '../../connector/stores/ConnectorStore';
 import type WalletTransaction from '../../domain/WalletTransaction';
+import { derivePrivateByAddressing, derivePublicByAddressing } from './lib/cardanoCrypto/deriveByAddressing';
 
 // ADA specific Request / Response params
 
@@ -239,6 +240,7 @@ export type AdaGetTransactionsRequest = {|
   getBestBlock: BestBlockFunc,
   getTokenInfo: TokenInfoFunc,
   getMultiAssetMetadata: MultiAssetMintMetadataFunc,
+  getMultiAssetSupply: MultiAssetSupplyFunc,
   afterTxs?: ?Array<WalletTransaction>,
   getRecentTransactionHashes: GetRecentTransactionHashesFunc,
   getTransactionsByHashes: GetTransactionsByHashesFunc,
@@ -697,6 +699,7 @@ export default class AdaApi {
             request.checkAddressesInUse,
             request.getTokenInfo,
             request.getMultiAssetMetadata,
+            request.getMultiAssetSupply,
           );
         }
 
@@ -720,6 +723,7 @@ export default class AdaApi {
           request.getBestBlock,
           request.getTokenInfo,
           request.getMultiAssetMetadata,
+          request.getMultiAssetSupply,
           after,
         );
       }

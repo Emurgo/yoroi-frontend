@@ -8,7 +8,6 @@
 import type { BigNum, LinearFee, TransactionBuilder } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 
 import * as WasmV4 from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
-import * as SigmaRust from 'ergo-lib-wasm-browser';
 import * as WasmMessageSigning from '@emurgo/cardano-message-signing-browser/cardano_message_signing';
 import * as CrossCslBrowser from '@emurgo/cross-csl-browser';
 
@@ -214,10 +213,6 @@ class Module {
 
   get WalletV4(): typeof WasmV4 {
     return WasmV4;
-  }
-
-  get SigmaRust(): typeof SigmaRust {
-    return SigmaRust;
   }
 
   get MessageSigning(): typeof WasmMessageSigning {

@@ -60,10 +60,10 @@ export default class AddWalletPageHeader extends Component<Props> {
           >
             <img src={YoroiLogo} alt="Yoroi" />
           </Box>
-          <Typography variant="h1" fontWeight={500} color="primary.600" mb="8px">
+          <Typography component="div" variant="h1" fontWeight={500} color="primary.600" mb="8px">
             {intl.formatMessage(globalMessages.yoroi)}
           </Typography>
-          <Typography variant="body1" fontWeight={500} color="primary.600">
+          <Typography component="div" variant="body1" fontWeight={500} color="primary.600">
             {intl.formatMessage(globalMessages.yoroiIntro)}
           </Typography>
         </Box>

@@ -51,7 +51,7 @@ export default class ErrorPage extends Component<Props> {
           <div>
             <div className={styles.body}>
               <div className={styles.title}>{title}</div>
-              {error && <p className={styles.error}>{intl.formatMessage(error, error.values)}</p>}
+              {error && <div className={styles.error}>{intl.formatMessage(error, error.values)}</div>}
             </div>
           </div>
         </div>

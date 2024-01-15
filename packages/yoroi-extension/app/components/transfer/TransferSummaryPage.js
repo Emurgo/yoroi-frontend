@@ -436,9 +436,9 @@ export default class TransferSummaryPage extends Component<Props> {
         <div className={styles.errorWrapper}>
           {
             error && !isSubmitting && (
-              <p className={styles.error}>
+              <div className={styles.error}>
                 {intl.formatMessage(error, error.values)}
-              </p>
+              </div>
             )
           }
         </div>

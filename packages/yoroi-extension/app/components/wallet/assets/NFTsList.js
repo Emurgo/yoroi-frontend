@@ -114,7 +114,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
         marginBottom="30px"
         paddingBottom="16px"
       >
-        <Typography variant="h5" color="common.black" fontWeight={500} fontSize="18px">
+        <Typography component="div" variant="h5" color="common.black" fontWeight={500} fontSize="18px">
           {list.length === 0
             ? intl.formatMessage(globalMessages.sidebarNfts)
             : intl.formatMessage(messages.nftsCount, { number: list.length })}
@@ -133,7 +133,6 @@ function NfTsList({ list, intl }: Props & Intl): Node {
             ))}
           </Stack>
           <SearchInput
-            disableUnderline
             value={keyword}
             onChange={e => setKeyword(e.target.value)}
             placeholder={intl.formatMessage(messages.searchNFTs)}
@@ -165,7 +164,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
           spacing={2}
         >
           <NotFound />
-          <Typography variant="h5" fontWeight={500} color="common.black">
+          <Typography component="div" variant="h5" fontWeight={500} color="common.black">
             {intl.formatMessage(!list.length ? messages.noNFTsAdded : messages.noResultsFound)}
           </Typography>
         </Stack>
@@ -213,7 +212,7 @@ export function NftImage({
   width,
   height,
 }: {|
-  imageUrl: string | null,
+  imageUrl: ?string,
   name: string,
   width: string,
   height: string,
@@ -281,7 +280,7 @@ function NftCardImage({ ipfsUrl, name }: {| ipfsUrl: string | null, name: string
         <NftImage imageUrl={ipfsUrl} name={name} width="100%" height="100%" />
       </Box>
       <Box>
-        <Typography
+        <Typography component="div"
           mt="16px"
           sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
           color="grayscale.900"

@@ -287,9 +287,9 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
 
         {error
           ? (
-            <p className={styles.error}>
+            <div className={styles.error}>
               {intl.formatMessage(error, error.values)}
-            </p>
+            </div>
           )
           : null
         }

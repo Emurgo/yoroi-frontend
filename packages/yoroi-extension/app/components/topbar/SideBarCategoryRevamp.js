@@ -45,7 +45,7 @@ export default class SideBarCategoryRevamp extends Component<Props> {
           <SvgElem />
         </span>
         {label ? (
-          <Typography variant="caption2" className={styles.label}>
+          <Typography component="div" variant="caption2" className={styles.label}>
             {intl.formatMessage(label)}
           </Typography>
         ) : null}
@@ -62,7 +62,7 @@ export default class SideBarCategoryRevamp extends Component<Props> {
         <span className={styles.icon}>
           <SvgElem />
         </span>
-        {label ? <Typography variant="caption2">{intl.formatMessage(label)}</Typography> : null}
+        {label ? <Typography component="div" variant="caption2">{intl.formatMessage(label)}</Typography> : null}
       </a>
     );
   }
