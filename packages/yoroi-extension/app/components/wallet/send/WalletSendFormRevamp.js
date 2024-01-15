@@ -56,6 +56,9 @@ import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver
 import type { SendUsingLedgerParams } from '../../../actions/ada/ledger-send-actions';
 import type { SendUsingTrezorParams } from '../../../actions/ada/trezor-send-actions';
 import { ampli } from '../../../../ampli/index';
+import { resolverApiMaker } from '@yoroi/resolver';
+import { Resolver } from '@yoroi/types';
+import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -298,6 +301,15 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
         amountField.set('value', formatValue(relatedEntry));
       }
     );
+
+    this.resolverApi = resolverApiMaker({
+      apiConfig: {
+        [Resolver.NameServer.Unstoppable]: {
+          apiKey: 'czsajliz-wxgu6tujd1zqq7hey_pclfqhdjsqolsxjfsurgh',
+        },
+      },
+      csl: RustModule.CrossCsl.init('yoroi/resolver'),
+    });
   }
 
   componentWillUnmount(): void {
@@ -319,7 +331,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             : '',
           value: this.props.uriParams ? this.props.uriParams.address : '',
           validators: [
-            ({ field }) => {
+            async ({ field }) => {
               const receiverValue = field.value;
               if (receiverValue === '') {
                 this.props.updateReceiver();
@@ -334,6 +346,10 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   this.props.updateReceiver();
                 }
               };
+
+              const resolve = receiverValue;
+              const res = await this.resolverApi.getCardanoAddresses({ resolve, strategy: 'first' });
+              console.log('>>>> ', resolve, res);
 
               const isValid = isValidReceiveAddress(receiverValue, this.props.selectedNetwork);
               if (isValid === true) {
