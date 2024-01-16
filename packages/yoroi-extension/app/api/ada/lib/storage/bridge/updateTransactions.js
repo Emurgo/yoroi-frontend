@@ -1460,7 +1460,8 @@ async function rawUpdateTransactions(
           tx: after.txHash || undefined,
         },
         untilBlock,
-      })
+      });
+      txHashes = txsFromNetwork.map(tx => tx.hash);
     } else {
       /*
        * TAIL
