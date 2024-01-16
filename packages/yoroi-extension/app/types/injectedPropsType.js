@@ -9,22 +9,27 @@ export type InjectedProps = {|
   +actions: ActionsMap,
 |};
 
+// <TODO:PENDING_REMOVAL>
 type GeneratedProps<T> = {|
   +generated: T,
 |};
 
+// <TODO:PENDING_REMOVAL>
 export type InjectedOrGenerated<T> = InjectedProps | GeneratedProps<T>;
 
 // DAPP CONNECTOR
-type InjectedConnectorProps = {|
+export type InjectedConnectorProps = {|
   +stores: StoresConnectorMap,
   +actions: ActionsConnectorMap,
 |};
 
+// <TODO:PENDING_REMOVAL>
 export type InjectedOrGeneratedConnector<T> = InjectedConnectorProps | GeneratedProps<T>;
 
-type JointInjectedProps = {|
+export type JointInjectedProps = {|
   +stores: StoresMap | StoresConnectorMap,
   +actions: ActionsMap | ActionsConnectorMap,
 |};
+
+// <TODO:PENDING_REMOVAL>
 export type JointInjectedOrGenerated<T> = JointInjectedProps | GeneratedProps<T>;
