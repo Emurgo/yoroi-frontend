@@ -26,13 +26,17 @@ export default function SelectSellTokenFromList({ onClose }: Props): Node {
   const {
     buyQuantity: { isTouched: isBuyTouched },
     sellQuantity: { isTouched: isSellTouched },
+    sellTokenInfo = {},
     sellTouched,
     switchTokens,
   } = useSwapForm();
 
   const handleAssetSelected = token => {
     const { id, decimals } = token;
-    const shouldUpdateToken = id !== orderData.amounts.sell.tokenId || !isSellTouched;
+    const shouldUpdateToken =
+      id !== orderData.amounts.sell.tokenId ||
+      !isSellTouched ||
+      decimals !== sellTokenInfo.decimals;
     const shouldSwitchTokens = id === orderData.amounts.buy.tokenId && isBuyTouched;
     // useCase - switch tokens when selecting the same already selected token on the other side
     if (shouldSwitchTokens) {

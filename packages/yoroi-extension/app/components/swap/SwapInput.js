@@ -1,18 +1,18 @@
 // @flow
 import type { Node } from 'react';
+import type { AssetAmount } from './types';
 import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { ReactComponent as ChevronDownIcon } from '../../assets/images/revamp/icons/chevron-down.inline.svg';
 import { ReactComponent as DefaultTokenImage } from '../../assets/images/revamp/token-default.inline.svg';
-import type { AssetAmount } from './types';
+import assetDefault from '../../assets/images/revamp/token-default.inline.svg';
 
 type Props = {|
   label: string,
-  amount: AssetAmount,
+  tokenInfo: AssetAmount,
   onAssetSelect: function,
   handleAmountChange: function,
   showMax?: boolean,
-  image?: Node | null,
   isFrom?: boolean,
   value?: string,
   touched: boolean,
@@ -24,17 +24,16 @@ export default function SwapInput({
   label,
   isFrom = false,
   showMax = false,
-  image = null,
   onAssetSelect,
   error = '',
   handleAmountChange,
   value,
-  amount,
+  tokenInfo,
   touched,
   inputRef,
   inputEditable = true,
 }: Props): Node {
-  const { amount: quantity = undefined, ...rest } = amount;
+  const { amount: quantity = undefined, image, ...rest } = tokenInfo || {};
 
   const [inputValue, setInputValue] = useState(value || '');
   const [isFocused, setIsFocused] = useState(false);
@@ -45,6 +44,8 @@ export default function SwapInput({
   };
 
   const isFocusedColor = isFocused ? 'grayscale.max' : 'grayscale.400';
+  const isIpfs = image?.startsWith('ipfs://');
+  const imgSrc = isIpfs ? image.replace('ipfs://', 'https://ipfs.io/ipfs/') : image;
 
   return (
     <Box>
@@ -105,8 +106,15 @@ export default function SwapInput({
               height="24px"
               sx={{ overflowY: 'hidden', '& > svg': { width: '100%', height: '100%' } }}
             >
-              {rest.image ? (
-                <img src={rest.image} width="100%" /> || <DefaultTokenImage />
+              {imgSrc ? (
+                <img
+                  width="100%"
+                  src={imgSrc}
+                  alt=""
+                  onError={e => {
+                    e.target.src = assetDefault;
+                  }}
+                />
               ) : (
                 <DefaultTokenImage />
               )}

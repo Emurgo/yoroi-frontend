@@ -56,10 +56,11 @@ export default function SelectAssetDialog({
   const filteredAssets =
     assets.filter(
       a =>
-        a.name.toLowerCase().includes(searchTerm) ||
-        a.ticker.toLowerCase().includes(searchTerm) ||
-        a.id.toLowerCase().includes(searchTerm) ||
-        a.fingerprint.toLowerCase().includes(searchTerm)
+        Boolean(a) &&
+        (a.name.toLowerCase().includes(searchTerm) ||
+          a.ticker.toLowerCase().includes(searchTerm) ||
+          a.id.toLowerCase().includes(searchTerm) ||
+          a.fingerprint.toLowerCase().includes(searchTerm))
     ) || [];
 
   return (
@@ -164,6 +165,8 @@ const AssetAndAmountRow = ({
   //     "ticker": "EARTH",
   //     "metadatas": {}
   // }
+  const isIpfs = image?.startsWith('ipfs://');
+  const imgSrc = isIpfs ? image.replace('ipfs://', 'https://ipfs.io/ipfs/') : image;
   const isFrom = type === 'from';
   const priceNotChanged = Number(priceChange100.replace('-', '').replace('%', '')) === 0;
   const priceIncreased = priceChange100 && priceChange100.charAt(0) !== '-';
@@ -200,10 +203,10 @@ const AssetAndAmountRow = ({
           flexShrink="0"
           borderRadius="8px"
         >
-          {image ? (
+          {imgSrc ? (
             <img
               width="100%"
-              src={image}
+              src={imgSrc}
               alt={name}
               onError={e => {
                 e.target.src = assetDefault;
