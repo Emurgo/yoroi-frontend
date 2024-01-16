@@ -30,7 +30,7 @@ import {
   genGetMultiAssetMetadata,
   MockUtxoApi,
   genGetRecentTransactionHashes,
-  genGetTransactionsByHashes, genGetMultiAssetSupply,
+  genGetTransactionsByHashes, genGetMultiAssetSupply, genGetTransactionsHistoryForAddresses,
 } from '../../../state-fetch/mockNetwork';
 import { loadLovefieldDB } from '../../database/index';
 
@@ -401,6 +401,7 @@ async function syncingSimpleTransaction(
   const getTokenInfo = genGetTokenInfo();
   const getMultiAssetMetadata = genGetMultiAssetMetadata();
   const getMultiAssetSupply = genGetMultiAssetSupply();
+  const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(txHistory, network);
   const getRecentTransactionHashes = genGetRecentTransactionHashes(txHistory);
   const getTransactionsByHashes = genGetTransactionsByHashes(txHistory);
 
@@ -429,6 +430,7 @@ async function syncingSimpleTransaction(
       db,
       withUtxos1,
       checkAddressesInUse,
+      getTransactionsHistoryForAddresses,
       getRecentTransactionHashes,
       getTransactionsByHashes,
       getBestBlock,
@@ -479,6 +481,7 @@ async function syncingSimpleTransaction(
       db,
       withUtxos2,
       checkAddressesInUse,
+      getTransactionsHistoryForAddresses,
       getRecentTransactionHashes,
       getTransactionsByHashes,
       getBestBlock,
@@ -516,6 +519,7 @@ async function syncingSimpleTransaction(
       db,
       withUtxos2,
       checkAddressesInUse,
+      getTransactionsHistoryForAddresses,
       getRecentTransactionHashes,
       getTransactionsByHashes,
       getBestBlock,
@@ -570,6 +574,7 @@ async function syncingSimpleTransaction(
       db,
       withUtxos2,
       checkAddressesInUse,
+      getTransactionsHistoryForAddresses,
       getRecentTransactionHashes,
       getTransactionsByHashes,
       getBestBlock,
