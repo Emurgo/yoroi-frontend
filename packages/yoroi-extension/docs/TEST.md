@@ -82,15 +82,3 @@ npm run create-report
 The html report file will be automatically opened in your browser.
 
 The report file `cucumberReport.html` will be located in the `reports` folder.
-
-### Storybook
-
-You can easily inspect the whole UI by running Storybook. It is useful for developing also because it supports hot-reload.
-
-```bash
-npm run storybook:watch
-```
-
-The Storybook is uploaded to this URL: https://yoroi-extension-storybook.netlify.com/
-
-To update the build used by the URL, you can run `npm run storybook:publish`
