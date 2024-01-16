@@ -1572,7 +1572,6 @@ async function rawUpdateTransactions(
   );
 
   const txHashSet = new Set(txHashes);
-  console.log('>>>> txHashSet', [...txHashSet]);
   return {
     txs: txs.txs.filter(tx => txHashSet.has(tx.transaction.Hash)),
     addressLookupMap: txs.addressLookupMap,
