@@ -116,7 +116,7 @@ const HelperTooltipComp = ({
 }: HelperTooltipProps & InjectedLayoutProps): Node => {
   return (
     <Tooltip
-      title={<Typography variant="body2">{message}</Typography>}
+      title={<Typography component="div" variant="body2">{message}</Typography>}
       arrow
       placement={placement || 'right'}
     >

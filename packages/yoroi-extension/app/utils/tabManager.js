@@ -27,7 +27,7 @@ declare var chrome;
  */
 export const TabIdKeys = Object.freeze({
   Primary: 'openTabId',
-  ErgoConnector: 'openTabId-ErgoConnector',
+  YoroiConnector: 'openTabId-YoroiConnector',
 });
 const thisWindowId = Date.now().toString();
 

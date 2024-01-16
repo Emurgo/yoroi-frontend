@@ -62,7 +62,7 @@ export function find721metadata(
   }
   if (
     isArray(asset.files) &&
-      asset.files.every(({name, mediaType, src }) => (
+      asset.files.every(({ name, mediaType, src }) => (
         typeof name === 'string' &&
           typeof mediaType === 'string' &&
           (
@@ -82,15 +82,15 @@ export function find721metadata(
 
 export function getImageFromTokenMetadata(
   policyId: string,
-  name: string | void,
+  assetNameHEX: string | void,
   tokenMetadata: TokenMetadata,
 ): string | null {
-  if (tokenMetadata.type !== 'Cardano' || name == null) {
+  if (tokenMetadata.type !== 'Cardano' || assetNameHEX == null) {
     return null;
   }
   const nftMetadata = find721metadata(
     policyId,
-    name,
+    assetNameHEX,
     tokenMetadata.assetMintMetadata,
   );
 

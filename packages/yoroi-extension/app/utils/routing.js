@@ -31,7 +31,7 @@ export const buildRoute = (pattern: string, params: ParamsT): string => {
   const reTokens = /<(.*?)>/g;
   const reSlashTokens = /_!slash!_/g;
 
-  let routePath = pattern;
+  let routePath = pattern || '';
   const tokens = {};
 
   if (params) {

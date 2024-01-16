@@ -29,7 +29,7 @@ import type {
   IGetPublic, IGetPublicRequest, IGetPublicResponse,
   IGetUtxoBalance, IGetUtxoBalanceRequest, IGetUtxoBalanceResponse,
   IScanAccountRequest, IScanAccountResponse, IScanAccountUtxo,
-  IScanChainRequest, IScanChainResponse, IScanChainUtxo,
+  IScanChainUtxo,
   IGetBalance, IGetBalanceRequest, IGetBalanceResponse,
   IGetAllAccountingAddressesRequest, IGetAllAccountingAddressesResponse,
   IGetAllAccounting,
@@ -109,8 +109,7 @@ import type {
 import { ModifyKey, ModifyAddress, } from '../../database/primitives/api/write';
 
 import { v2genAddressBatchFunc, } from '../../../../restoration/byron/scan';
-import { ergoGenAddressBatchFunc, } from '../../../../../ergo/lib/restoration/scan';
-import { scanBip44Chain, scanBip44Account, } from '../../../../../common/lib/restoration/bip44';
+import { scanBip44Account, } from '../../../../../common/lib/restoration/bip44';
 import { scanShelleyCip1852Account } from '../../../../restoration/shelley/scan';
 
 import {
@@ -126,11 +125,9 @@ import type {
 } from './index';
 import { ConceptualWallet } from '../ConceptualWallet/index';
 import { RustModule } from '../../../cardanoCrypto/rustLoader';
-import { derivePublicByAddressing } from '../../../cardanoCrypto/utils';
 import {
   isCardanoHaskell,
 } from '../../database/prepackaged/networks';
-import { BIP32PublicKey, deriveKey } from '../../../../../common/lib/crypto/keys/keyRepository';
 import {
   GetUtxoAtSafePoint,
   GetUtxoDiffToBestBlock,
@@ -138,6 +135,7 @@ import {
 import type {
   Utxo,
 } from '@emurgo/yoroi-lib/dist/utxo/models';
+import { derivePublicByAddressing } from '../../../cardanoCrypto/deriveByAddressing';
 
 interface Empty {}
 type HasPrivateDeriverDependencies = IPublicDeriver<ConceptualWallet & IHasPrivateDeriver>;
@@ -1123,75 +1121,6 @@ export const CardanoBip44PickReceive: * = Mixin<
   IPickReceive
 >(CardanoBip44PickReceiveMixin);
 
-// =====================
-//   ErgoBip44Receive
-// =====================
-
-type ErgoBip44PickReceiveMixinDependencies = IPublicDeriver<>;
-const ErgoBip44PickReceiveMixin = (
-  superclass: Class<ErgoBip44PickReceiveMixinDependencies>,
-) => (class ErgoBip44PickReceive extends superclass implements IPickReceive {
-  rawPickReceive: (
-    lf$Transaction,
-    {|
-      GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetAddress: Class<GetAddress>,
-      GetDerivationSpecific: Class<GetDerivationSpecific>,
-    |},
-    IPickReceiveRequest,
-    Map<number, string>,
-  ) => Promise<IPickReceiveResponse> = async (
-    _tx,
-    _deps,
-    body,
-    _derivationTables,
-  ) => {
-    const legacyAddr = body.addrs
-      .filter(addr => addr.Type === CoreAddressTypes.ERGO_P2PK);
-    if (legacyAddr.length !== 1) throw new Error(`${nameof(ErgoBip44PickReceive)}::${nameof(this.rawPickReceive)} no legacy address found`);
-    return {
-      addr: legacyAddr[0],
-      row: body.row,
-      addressing: body.addressing,
-    };
-  }
-
-  pickReceive: IPickReceiveRequest => Promise<IPickReceiveResponse> = async (
-    body,
-  ) => {
-    const withLevels = asHasLevels<ConceptualWallet>(this);
-    const derivationTables = withLevels == null
-      ? new Map()
-      : withLevels.getParent().getDerivationTables();
-    const deps = Object.freeze({
-      GetPathWithSpecific,
-      GetAddress,
-      GetDerivationSpecific,
-    });
-    const depTables = Object
-      .keys(deps)
-      .map(key => deps[key])
-      .flatMap(table => getAllSchemaTables(super.getDb(), table));
-    return await raii<IPickReceiveResponse>(
-      super.getDb(),
-      [
-        ...depTables,
-        ...mapToTables(super.getDb(), derivationTables),
-      ],
-      async tx => this.rawPickReceive(
-        tx,
-        deps,
-        body,
-        derivationTables,
-      )
-    );
-  }
-});
-export const ErgoBip44PickReceive: * = Mixin<
-  ErgoBip44PickReceiveMixinDependencies,
-  IPickReceive
->(ErgoBip44PickReceiveMixin);
-
 // =======================
 //   Cip1852PickReceive
 // =======================
@@ -1886,144 +1815,6 @@ export function asScanShelleyAccountUtxoInstance<
   return undefined;
 }
 
-// =======================
-//   ScanErgoAccountUtxo
-// =======================
-
-type ScanErgoAccountUtxoDependencies = IPublicDeriver<>;
-const ScanErgoAccountUtxoMixin = (
-  superclass: Class<ScanErgoAccountUtxoDependencies>,
-) => (class ScanErgoAccountUtxo extends superclass implements IScanAccountUtxo {
-  rawScanAccount: (
-    lf$Transaction,
-    {|
-      GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetAddress: Class<GetAddress>,
-      GetDerivationSpecific: Class<GetDerivationSpecific>,
-    |},
-    IScanAccountRequest,
-    Map<number, string>,
-  ) => Promise<IScanAccountResponse> = async (
-    _tx,
-    _deps,
-    body,
-    _derivationTables,
-  ): Promise<IScanAccountResponse> => {
-    const key = BIP32PublicKey.fromBuffer(Buffer.from(body.accountPublicKey, 'hex'));
-
-    const network = this.getParent().getNetworkInfo();
-    const chainNetworkId = ((
-      Number.parseInt(network.BaseConfig[0].ChainNetworkId, 10): any
-    ): $Values<typeof RustModule.SigmaRust.NetworkPrefix>);
-
-    return await scanBip44Account({
-      generateInternalAddresses: ergoGenAddressBatchFunc(
-        deriveKey(key, ChainDerivations.INTERNAL).key,
-        chainNetworkId
-      ),
-      generateExternalAddresses: ergoGenAddressBatchFunc(
-        deriveKey(key, ChainDerivations.EXTERNAL).key,
-        chainNetworkId
-      ),
-      lastUsedInternal: body.lastUsedInternal,
-      lastUsedExternal: body.lastUsedExternal,
-      network: this.getParent().getNetworkInfo(),
-      checkAddressesInUse: body.checkAddressesInUse,
-      addByHash: rawGenAddByHash(
-        new Set([
-          ...body.internalAddresses,
-          ...body.externalAddresses,
-        ])
-      ),
-      type: CoreAddressTypes.ERGO_P2PK,
-    });
-  }
-});
-
-const ScanErgoAccountUtxo: * = Mixin<
-  ScanErgoAccountUtxoDependencies,
-  IScanAccountUtxo,
->(ScanErgoAccountUtxoMixin);
-const ScanErgoAccountUtxoInstance = (
-  (ScanErgoAccountUtxo: any): ReturnType<typeof ScanErgoAccountUtxoMixin>
-);
-export function asScanErgoAccountUtxoInstance<
-  T: IPublicDeriver<any>
->(
-  obj: T
-): void | (IScanAccountUtxo & ScanErgoAccountUtxoDependencies & T) {
-  if (obj instanceof ScanErgoAccountUtxoInstance) {
-    return obj;
-  }
-  return undefined;
-}
-
-// ======================
-//   ScanErgoChainUtxo
-// ======================
-
-type ScanErgoChainUtxoDependencies = IPublicDeriver<ConceptualWallet & IHasLevels>;
-const ScanErgoChainUtxoMixin = (
-  superclass: Class<ScanErgoChainUtxoDependencies>,
-) => (class ScanErgoChainUtxo extends superclass implements IScanChainUtxo {
-  rawScanChain: (
-    lf$Transaction,
-    {|
-      GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetAddress: Class<GetAddress>,
-      GetDerivationSpecific: Class<GetDerivationSpecific>,
-    |},
-    IScanChainRequest,
-    Map<number, string>,
-  ) => Promise<IScanChainResponse> = async (
-    _tx,
-    _deps,
-    body,
-    _derivationTables,
-  ): Promise<IScanChainResponse> => {
-    const key = BIP32PublicKey.fromBuffer(Buffer.from(body.chainPublicKey, 'hex'));
-
-    const network = this.getParent().getNetworkInfo();
-    const networkId = ((
-      Number.parseInt(network.BaseConfig[0].ChainNetworkId, 10): any
-    ): $Values<typeof RustModule.SigmaRust.NetworkPrefix>);
-
-    return await scanBip44Chain({
-      generateAddressFunc: ergoGenAddressBatchFunc(
-        key.key,
-        networkId
-      ),
-      lastUsedIndex: body.lastUsedIndex,
-      network: this.getParent().getNetworkInfo(),
-      checkAddressesInUse: body.checkAddressesInUse,
-      addByHash: rawGenAddByHash(
-        new Set([
-          ...body.addresses,
-        ])
-      ),
-      type: CoreAddressTypes.ERGO_P2PK,
-    });
-  }
-});
-
-const ScanErgoChainUtxo: * = Mixin<
-  ScanErgoChainUtxoDependencies,
-  IScanChainUtxo,
->(ScanErgoChainUtxoMixin);
-const ScanErgoChainUtxoInstance = (
-  (ScanErgoChainUtxo: any): ReturnType<typeof ScanErgoChainUtxoMixin>
-);
-export function asScanErgoChainUtxoInstance<
-  T: IPublicDeriver<any>
->(
-  obj: T
-): void | (IScanChainUtxo & ScanErgoChainUtxoDependencies & T) {
-  if (obj instanceof ScanErgoChainUtxoInstance) {
-    return obj;
-  }
-  return undefined;
-}
-
 // ===================
 //   ScanUtxoAccount
 // ===================
@@ -2514,7 +2305,6 @@ const traitFuncLookup: {
 } = {
   /* eslint-disable quote-props */
   '2147485463': addTraitsForCardanoBip44,
-  '2147484077': addTraitsForErgoBip44,
   /* eslint-enable quote-props */
 };
 
@@ -2573,84 +2363,6 @@ export async function addTraitsForCardanoBip44(
     if (publicKey !== null) {
       currClass = GetPublicKey(currClass);
       currClass = ScanLegacyCardanoAccountUtxo(currClass);
-      currClass = ScanUtxoAccountAddresses(currClass);
-      currClass = ScanAddresses(currClass);
-    }
-  } else if (publicKey !== null) {
-    currClass = GetPublicKey(currClass);
-  }
-
-  if (request.conceptualWallet.getSigningLevel() !== null) {
-    currClass = GetSigningKey(currClass);
-  }
-  currClass = GetUtxoBalance(currClass);
-  currClass = GetBalance(currClass);
-
-  return { finalClass: currClass, };
-}
-export async function addTraitsForErgoBip44(
-  request: AddBip44TraitsRequest
-): Promise<AddBip44TraitsResponse> {
-  let currClass = request.startClass;
-  /**
-   * WARNING: If you get a weird error about dependencies in this function
-   * There is a high chance it has to do with initialization order
-   * If a trait X is added after trait Y
-   * X must come before Y in this file (even if X doesn't depend on Y)
-   */
-  currClass = HasPrivateDeriver(currClass);
-  currClass = HasLevels(currClass);
-  currClass = HasSign(currClass);
-  currClass = (GetAllUtxos(currClass): Class<IGetAllUtxos & Bip44PublicDeriver>);
-
-  let publicKey;
-  {
-    const deps = Object.freeze({
-      GetKeyForPublicDeriver,
-    });
-    const depTables = Object
-      .keys(deps)
-      .map(key => deps[key])
-      .flatMap(table => getAllSchemaTables(request.db, table));
-    publicKey = await raii<null | $ReadOnly<KeyRow>>(
-      request.db,
-      depTables,
-      async tx => {
-        const derivationAndKey = await deps.GetKeyForPublicDeriver.get(
-          request.db, tx,
-          request.pubDeriver.PublicDeriverId,
-          true,
-          false,
-        );
-        if (derivationAndKey.publicKey === undefined) {
-          throw new StaleStateError(`${nameof(addTraitsForErgoBip44)} publicKey`);
-        }
-        return derivationAndKey.publicKey;
-      }
-    );
-  }
-
-  currClass = AddBip44FromPublic(currClass);
-  currClass = PickReceive(ErgoBip44PickReceive(currClass));
-
-  if (request.conceptualWallet.getPublicDeriverLevel() === Bip44DerivationLevels.CHAIN.level) {
-    currClass = DisplayCutoff(currClass);
-
-    if (publicKey !== null) {
-      currClass = GetPublicKey(currClass);
-      currClass = ScanErgoChainUtxo(currClass);
-      currClass = ScanUtxoChainAddresses(currClass);
-      currClass = ScanAddresses(currClass);
-    }
-  } else if (
-    request.conceptualWallet.getPublicDeriverLevel() === Bip44DerivationLevels.ACCOUNT.level
-  ) {
-    currClass = DisplayCutoff(currClass);
-
-    currClass = HasUtxoChains(currClass);
-    if (publicKey !== null) {
-      currClass = GetPublicKey(currClass);
-      currClass = ScanErgoAccountUtxo(currClass);
       currClass = ScanUtxoAccountAddresses(currClass);
       currClass = ScanAddresses(currClass);
     }

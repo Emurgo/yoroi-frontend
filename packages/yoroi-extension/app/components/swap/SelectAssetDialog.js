@@ -98,7 +98,7 @@ export default function SelectAssetDialog({
         />
       </Box>
       <Box>
-        <Typography variant="body2" color="grayscale.700">
+        <Typography component="div" variant="body2" color="grayscale.700">
           {filteredAssets.length} assets {searchTerm ? 'found' : 'available'}
         </Typography>
       </Box>
@@ -130,7 +130,7 @@ export default function SelectAssetDialog({
             <Box mt="60px">
               <NoAssetsFound />
             </Box>
-            <Typography variant="body1" fontWeight={500}>
+            <Typography component="div" variant="body1" fontWeight={500}>
               {type === 'from'
                 ? `No tokens found for “${searchTerm}”`
                 : 'No asset was found to swap'}
@@ -215,7 +215,7 @@ const AssetAndAmountRow = ({
         </Box>
         <Box flexGrow="1" width="100%">
           <Box display="flex" alignItems="center" gap="8px">
-            <Typography fontWeight={500} variant="body1">
+            <Typography component="div" fontWeight={500} variant="body1">
               {(name !== address || name !== id) && name !== ticker && `[${ticker}]`} {name}
             </Typography>
             {!isFrom && Number(amount) > 0 && (
@@ -225,7 +225,7 @@ const AssetAndAmountRow = ({
             )}
           </Box>
           <Box>
-            <Typography variant="body2" color="grayscale.600">
+            <Typography component="div" variant="body2" color="grayscale.600">
               {truncateAddressShort(address || id, 17) || 'Cardano'}
             </Typography>
           </Box>
@@ -242,11 +242,11 @@ const AssetAndAmountRow = ({
               flexDirection="column"
               alignItems="flex-end"
             >
-              <Typography variant="body1" color="grayscale.900">
+              <Typography component="div" variant="body1" color="grayscale.900">
                 <span>{volume24h}</span>&nbsp;<span>{ticker}</span>
               </Typography>
               {adaPrice && volume24h && (
-                <Typography variant="body2" color="grayscale.600">
+                <Typography component="div" variant="body2" color="grayscale.600">
                   {(volume24h * adaPrice).toFixed(2)} ADA
                 </Typography>
               )}
@@ -279,11 +279,11 @@ const AssetAndAmountRow = ({
           flexDirection="column"
           alignItems="flex-end"
         >
-          <Typography variant="body1" color="grayscale.900">
+          <Typography component="div" variant="body1" color="grayscale.900">
             <span>{amount}</span>&nbsp;<span>{ticker}</span>
           </Typography>
           {usdPrice && (
-            <Typography variant="body2" color="grayscale.600">
+            <Typography component="div" variant="body2" color="grayscale.600">
               {(amount * usdPrice).toFixed(2)} USD
             </Typography>
           )}

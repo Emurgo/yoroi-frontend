@@ -19,15 +19,15 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 const messages = defineMessages({
   dialogTitleChangePassword: {
     id: 'wallet.settings.changePassword.dialog.title.changePassword',
-    defaultMessage: '!!!Change spending password',
+    defaultMessage: '!!!Change password',
   },
   currentPasswordLabel: {
     id: 'wallet.settings.changePassword.dialog.currentPasswordLabel',
-    defaultMessage: '!!!Current spending password',
+    defaultMessage: '!!!Current password',
   },
   currentPasswordFieldPlaceholder: {
     id: 'wallet.settings.changePassword.dialog.currentPasswordFieldPlaceholder',
-    defaultMessage: '!!!Type current spending password',
+    defaultMessage: '!!!Type current password',
   },
 });
 
@@ -217,7 +217,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
           />
         </div>
 
-        {error ? <p className={styles.error}>{intl.formatMessage(error, error.values)}</p> : null}
+        {error ? <div className={styles.error}>{intl.formatMessage(error, error.values)}</div> : null}
       </Dialog>
     );
   }

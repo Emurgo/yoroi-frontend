@@ -93,7 +93,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
         justifyContent="center"
         maxWidth={mode.length === 15 ? '636px' : '760px'}
       >
-        <Typography mb="16px">
+        <Typography component="div" mb="16px">
           <FormattedHTMLMessage {...messages.description} />
         </Typography>
 

@@ -433,9 +433,9 @@ export default class WalletRestoreDialog extends Component<Props> {
         )}
 
         {error && (
-          <p className={styles.error}>
+          <div className={styles.error}>
             {intl.formatMessage(error, error.values)}
-          </p>
+          </div>
         )}
 
       </Dialog>

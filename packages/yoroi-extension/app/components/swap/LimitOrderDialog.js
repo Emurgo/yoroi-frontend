@@ -28,7 +28,7 @@ export default function LimitOrderDialog({
     <Dialog title="Limit price" onClose={onClose} withCloseButton closeOnOverlayClick>
       <Box display="flex" maxWidth="648px" mt="8px" mb="24px" flexDirection="column" gap="24px">
         <Box>
-          <Typography variant="body1" color="grayscale.900">
+          <Typography component="div" variant="body1" color="grayscale.900">
             Are you sure you want to proceed this order with the limit price that is 10% or more
             higher than the market price?
           </Typography>
@@ -59,7 +59,7 @@ type SummaryRowProps = {|
 const SummaryRow = ({ col1, col2, withInfo = false }: SummaryRowProps): Node => (
   <Box display="flex" alignItems="center" justifyContent="space-between">
     <Box display="flex" alignItems="center">
-      <Typography variant="body1" color="grayscale.500">
+      <Typography component="div" variant="body1" color="grayscale.500">
         {col1}
       </Typography>
       {withInfo ? (
@@ -69,7 +69,7 @@ const SummaryRow = ({ col1, col2, withInfo = false }: SummaryRowProps): Node => 
       ) : null}
     </Box>
     <Box>
-      <Typography variant="body1">{col2}</Typography>
+      <Typography component="div" variant="body1">{col2}</Typography>
     </Box>
   </Box>
 );

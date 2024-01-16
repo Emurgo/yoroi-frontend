@@ -100,7 +100,7 @@ export const RewardHistoryItem = ({
       <AccordionSummary aria-controls={poolId + '-content'} id={poolId || poolName + '-header'}>
         <Box>
           <Box display="block">
-            <Typography color="grayscale.600">Stake Pool</Typography>
+            <Typography component="div" color="grayscale.600">Stake Pool</Typography>
           </Box>
           <Box display="flex">
             <AvatarWrapper>
@@ -109,7 +109,7 @@ export const RewardHistoryItem = ({
                 alt="stake pool logo"
               />
             </AvatarWrapper>
-            <Typography>{poolName}</Typography>
+            <Typography component="div">{poolName}</Typography>
           </Box>
         </Box>
       </AccordionSummary>
@@ -119,14 +119,14 @@ export const RewardHistoryItem = ({
             // eslint-disable-next-line react/no-array-index-key
             <Box key={idx} display="flex" justifyContent="space-between" alignItems="center">
               <Box>
-                <Typography mb="2px" color="var(--yoroi-palette-gray-900)">
+                <Typography component="div" mb="2px" color="var(--yoroi-palette-gray-900)">
                   {type}
                 </Typography>
-                <Typography variant="body2" color="var(--yoroi-palette-gray-600)">
+                <Typography component="div" variant="body2" color="var(--yoroi-palette-gray-600)">
                   {date}
                 </Typography>
               </Box>
-              <Typography fontWeight={500} variant="body2">
+              <Typography component="div" fontWeight={500} variant="body2">
                 + {balance}
               </Typography>
             </Box>

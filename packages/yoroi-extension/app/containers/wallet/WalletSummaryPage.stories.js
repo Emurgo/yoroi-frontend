@@ -29,10 +29,6 @@ import AddMemoDialog from '../../components/wallet/memos/AddMemoDialog';
 import EditMemoDialog from '../../components/wallet/memos/EditMemoDialog';
 import DeleteMemoDialog from '../../components/wallet/memos/DeleteMemoDialog';
 import { wrapWallet } from '../../Routes';
-import {
-  INITIAL_SEARCH_LIMIT,
-  SEARCH_SKIP,
-} from '../../stores/toplevel/TransactionsStore';
 import ExportTransactionDialog from '../../components/wallet/export/ExportTransactionDialog';
 import WalletTransaction from '../../domain/WalletTransaction';
 import CardanoByronTransaction from '../../domain/CardanoByronTransaction';
@@ -69,6 +65,9 @@ export default {
   component: WalletSummaryPage,
   decorators: [withScreenshot],
 };
+
+const INITIAL_SEARCH_LIMIT = 1;
+const SEARCH_SKIP = 1;
 
 const actions = {
   notifications: {

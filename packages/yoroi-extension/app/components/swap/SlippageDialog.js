@@ -45,12 +45,12 @@ export default function SlippageDialog({ onClose }: Props): React$Node {
     <Dialog title="Slippage tolerance" onClose={onClose} withCloseButton closeOnOverlayClick>
       <Box maxWidth="564px">
         <Box>
-          <Typography variant="body1" color="grayscale.800">
+          <Typography component="div" variant="body1" color="grayscale.800">
             Default Slippage Tolerance
           </Typography>
         </Box>
         <Box py="8px">
-          <Typography variant="body2" color="grayscale.700">
+          <Typography component="div" variant="body2" color="grayscale.700">
             Slippage tolerance is set as a percentage of the total swap value. Your transactions
             will not be executed if the price moves by more than this amount.
           </Typography>
@@ -126,7 +126,7 @@ export default function SlippageDialog({ onClose }: Props): React$Node {
           </Box>
         </Box>
         <Box my="24px" p="16px" pt="12px" bgcolor="yellow.100" borderRadius="8px">
-          <Typography variant="body1" color="grayscale.max">
+          <Typography component="div" variant="body1" color="grayscale.max">
             When the slippage tolerance is set really high, it allows the transaction to still
             complete despite large price swings. This can open the door to front-running and
             sandwich attacks.

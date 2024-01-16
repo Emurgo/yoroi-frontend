@@ -56,9 +56,9 @@ export default class RewardClaimDisclaimer extends Component<Props> {
         <div className={styles.component}>
           <div>
             <div className={styles.body}>
-              <p className={styles.message}>
+              <div className={styles.message}>
                 {intl.formatMessage(messages.disclaimer)}
-              </p>
+              </div>
             </div>
           </div>
         </div>

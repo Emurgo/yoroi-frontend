@@ -10,7 +10,6 @@ import BaseCardanoTimeStore from '../../app/stores/base/BaseCardanoTimeStore';
 import { PublicDeriver } from '../../app/api/ada/lib/storage/models/PublicDeriver';
 import type { ByronCacheValue } from './cardano/ByronMocks';
 import type { ShelleyCip1852CacheValue } from './cardano/ShelleyCip1852Mocks';
-import type { ErgoCacheValue } from './ergo/ErgoMocks';
 
 export type CardanoCacheValue = {|
   publicDeriver: PublicDeriver<>,
@@ -35,8 +34,7 @@ export type CardanoCacheValue = {|
 
 export type PossibleCacheTypes =
   ByronCacheValue |
-  ShelleyCip1852CacheValue |
-  ErgoCacheValue;
+  ShelleyCip1852CacheValue;
 
 export function walletLookup(wallets: $ReadOnlyArray<PossibleCacheTypes>): {|
   publicDerivers: Array<PublicDeriver<>>,

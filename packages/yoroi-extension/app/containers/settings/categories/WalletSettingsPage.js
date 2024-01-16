@@ -72,7 +72,7 @@ export default class WalletSettingsPage extends Component<InjectedOrGenerated<Ge
       <div id="walletSettingsPage">
         {this.getDialog(selectedWallet)}
         {profile.isRevampTheme && (
-          <Typography variant="h5" fontWeight={500} mb="24px">
+          <Typography component="div" variant="h5" fontWeight={500} mb="24px">
             {intl.formatMessage(globalMessages.walletLabel)}
           </Typography>
         )}

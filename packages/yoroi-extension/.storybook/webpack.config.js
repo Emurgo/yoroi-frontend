@@ -3,7 +3,6 @@
 const path = require('path');
 const webpack = require('webpack');
 const ConfigWebpackPlugin = require('config-webpack');
-const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
 // your app's webpack.config.js
 const devConfig = require('../webpack/devConfig');
@@ -37,7 +36,6 @@ module.exports = async ({ config, mode } /*: {|
     plugins: [
       ...config.plugins,
       new ConfigWebpackPlugin(),
-      new ReactRefreshWebpackPlugin(),
       new webpack.DefinePlugin(commonConfig.definePlugin(ENV, isProduction, isNightly === 'true')),
       new webpack.ProvidePlugin({
         process: 'process/browser',
@@ -65,7 +63,6 @@ module.exports = async ({ config, mode } /*: {|
         ...config.resolve.alias,
         // mysteriously we need to alias this for Storybook
         'cardano-wallet-browser': 'cardano-wallet-browser/cardano_wallet_browser',
-        'ergo-lib-wasm-browser': 'ergo-lib-wasm-browser/ergo_lib_wasm',
       },
     },
     experiments: {

@@ -8,7 +8,6 @@ import type {
   TransactionBuilder
 } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 import typeof * as WasmV4 from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
-import typeof * as SigmaRust from 'ergo-lib-wasm-browser';
 import typeof * as WasmMessageSigning from '@emurgo/cardano-message-signing-browser/cardano_message_signing';
 
 // TODO: unmagic the constants
@@ -150,7 +149,6 @@ class Module {
   _wasmv2: WasmV2;
   _wasmv3: WasmV3;
   _wasmv4: WasmV4;
-  _ergo: SigmaRust;
   _messageSigning: WasmMessageSigning;
   _crossCsl: any;
 
@@ -166,7 +164,6 @@ class Module {
     // this is used only by the now defunct jormungandr wallet
     this._wasmv3 = ((null: any): WasmV3);
     this._wasmv4 = await import('@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib');
-    this._ergo = await import('ergo-lib-wasm-browser');
     if (flags.includes('dontLoadMessagesSigning')) {
       this._messageSigning = ((null: any): WasmMessageSigning);
     } else {
@@ -322,11 +319,6 @@ class Module {
     );
   }
 
-  // <TODO:PENDING_REMOVAL> Ergo
-  // Need to expose through a getter to get Flow to detect the type correctly
-  get SigmaRust(): SigmaRust {
-    return this._ergo;
-  }
   get MessageSigning(): WasmMessageSigning {
     return this._messageSigning;
   }

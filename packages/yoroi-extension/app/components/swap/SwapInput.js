@@ -136,13 +136,13 @@ export default function SwapInput({
           <Box minHeight="31px" />
         )}
         <Box sx={{ justifySelf: 'end', alignSelf: 'end' }}>
-          <Typography variant="caption" color="grayscale.600">
+          <Typography component="div" variant="caption" color="grayscale.600">
             Current balance: {quantity || 0} {rest.ticker}
           </Typography>
         </Box>
       </Box>
       {error && (
-        <Typography pt="4px" variant="caption" color="magenta.500">
+        <Typography component="div" pt="4px" variant="caption" color="magenta.500">
           {error}
         </Typography>
       )}

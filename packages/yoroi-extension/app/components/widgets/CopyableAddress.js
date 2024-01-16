@@ -62,7 +62,7 @@ export default class CopyableAddress extends Component<Props> {
     const tooltipComponent = (
       <Tooltip
         title={
-          <Typography variant="body3">
+          <Typography component="div" variant="body3">
             {notification && notification.id === elementId
               ? intl.formatMessage(notification.message)
               : intl.formatMessage(copyableMessages.copyTooltipMessage)}
@@ -77,7 +77,11 @@ export default class CopyableAddress extends Component<Props> {
     );
 
     return (
-      <Box sx={sx} className={classnames([styles.component, darkVariant === true && styles.componentDark])}>
+      <Box
+        sx={sx}
+        className={classnames([styles.component, darkVariant === true && styles.componentDark])}
+        id="copyableAddress"
+      >
         <span>{this.props.children}</span>
         <CopyToClipboard
           text={hash}

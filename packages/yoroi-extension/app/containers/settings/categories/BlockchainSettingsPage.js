@@ -52,7 +52,7 @@ export default class BlockchainSettingsPage extends Component<InjectedOrGenerate
     return (
       <>
         {profileStore.isRevampTheme && (
-          <Typography variant="h5" fontWeight={500} mb="24px">
+          <Typography component="div" variant="h5" fontWeight={500} mb="24px">
             {intl.formatMessage(settingsMenuMessages.blockchain)}
           </Typography>
         )}

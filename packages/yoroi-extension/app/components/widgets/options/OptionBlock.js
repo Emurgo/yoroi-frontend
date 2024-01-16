@@ -78,7 +78,7 @@ export default class OptionBlock extends Component<Props, State> {
               <div>
                 <div className={learnMoreTextBlockClasses}>
                   <div className={styles.learnMoreTextWrapper}>
-                    <p className={styles.learnMoreText}>{learnMoreText}</p>
+                    <div className={styles.learnMoreText}>{learnMoreText}</div>
                   </div>
                 </div>
                 <button

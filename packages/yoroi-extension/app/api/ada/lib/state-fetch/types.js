@@ -374,21 +374,28 @@ export type CatalystRoundInfoFunc = (body: CatalystRoundInfoRequest)
 
 // Multi Asset Mint Metadata
 
-export type MultiAssetMintMetadataFunc = (body: MultiAssetMintMetadataRequest)
+export type MultiAssetMintMetadataFunc = (body: MultiAssetRequest)
   => Promise<MultiAssetMintMetadataResponse>;
 
-export type MultiAssetMintMetadataRequest = {|
+export type MultiAssetSupplyFunc = (body: MultiAssetRequest)
+  => Promise<MultiAssetSupplyResponse>;
+
+export type MultiAssetRequest = {|
   ...BackendNetworkInfo,
-  assets: MultiAssetMintMetadataRequestAsset[]
+  assets: MultiAssetRequestAsset[]
 |};
 
-export type MultiAssetMintMetadataRequestAsset = {|
+export type MultiAssetRequestAsset = {|
   nameHex: string,
   policy: string
 |}
 
 export type MultiAssetMintMetadataResponse = {|
   ...{[key: string]: MultiAssetMintMetadataResponseAsset[]}
+|}
+
+export type MultiAssetSupplyResponse = {|
+  ...{[key: string]: string}
 |}
 
 export type MultiAssetMintMetadataResponseAsset = {|
@@ -449,14 +456,15 @@ export type GetRecentTransactionHashesRequest = {|
   |},
 |};
 
+export type TxSummary = {|
+  txHash: string,
+  blockHash: string,
+  txBlockIndex: number,
+  epoch: number,
+  slot: number,
+|};
 export type GetRecentTransactionHashesResponse = {|
-  [address: string]: Array<{|
-    txHash: string,
-    blockHash: string,
-    txBlockIndex: number,
-    epoch: number,
-    slot: number,
-  |}>
+  [address: string]: Array<TxSummary>
 |};
 
 export type GetRecentTransactionHashesFunc = (

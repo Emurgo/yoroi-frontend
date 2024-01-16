@@ -66,13 +66,13 @@ function SelectNetworkStep(props: Props & Intl): Node {
         <Box sx={{ width: '56px', height: '48px', mb: '38px' }}>
           <img src={YoroiLogo} alt="Yoroi" title="Yoroi" />
         </Box>
-        <Typography variant="h3" fontWeight={500}>
+        <Typography component="div" variant="h3" fontWeight={500}>
           {intl.formatMessage(messages.title)}
         </Typography>
       </Box>
       <Stack direction="column" alignItems="center" justifyContent="center" mb="72px">
         <Stack mb="38px" mt="24px" flexDirection="row" alignItems="center" gap="6px">
-          <Typography>
+          <Typography component="div">
             <FormattedHTMLMessage {...messages.description} />
           </Typography>
         </Stack>
@@ -85,7 +85,7 @@ function SelectNetworkStep(props: Props & Intl): Node {
               key={name}
               onClick={() => onSelect(networkInfo)}
             >
-              <Typography variant="h3" fontWeight={500}>
+              <Typography component="div" variant="h3" fontWeight={500}>
                 {name}
               </Typography>
             </Box>

@@ -11,7 +11,6 @@ import {
   defaultAssets,
   networks,
   isCardanoHaskell,
-  isErgo,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type {
   DefaultTokenEntry,
@@ -23,11 +22,9 @@ import {
 import { GetToken } from '../../api/ada/lib/storage/database/primitives/api/read';
 import { ModifyToken } from '../../api/ada/lib/storage/database/primitives/api/write';
 import { genCardanoAssetMap } from '../../api/ada/lib/storage/bridge/updateTransactions';
-import { addErgoAssets } from '../../api/ergo/lib/storage/bridge/updateTransactions';
 import type WalletsActions from '../../actions/wallet-actions';
 import type TransactionsStore from './TransactionsStore';
 import type { IFetcher as IFetcherCardano } from '../../api/ada/lib/state-fetch/IFetcher';
-import type { IFetcher as IFetcherErgo } from '../../api/ergo/lib/state-fetch/IFetcher';
 
 export type TokenInfoMap = Map<
   string, // network ID. String because mobx requires string for observable maps
@@ -48,13 +45,6 @@ export default class TokenInfoStore<
       +ada: {
         +stateFetchStore: {
           +fetcher: IFetcherCardano,
-          ...
-        },
-        ...
-      },
-      +ergo: {
-        +stateFetchStore: {
-          +fetcher: IFetcherErgo,
           ...
         },
         ...
@@ -109,27 +99,10 @@ export default class TokenInfoStore<
             tokenIds,
             this.stores.substores.ada.stateFetchStore.fetcher.getTokenInfo,
             this.stores.substores.ada.stateFetchStore.fetcher.getMultiAssetMintMetadata,
+            this.stores.substores.ada.stateFetchStore.fetcher.getMultiAssetSupply,
             network,
           )
         )
-      );
-    } else if (isErgo(network)) {
-      assetMap = await addErgoAssets(
-        {
-          db,
-          tokenIdentifiers: tokenIds,
-          getAssetInfo: async (req) => {
-            try {
-              return await
-              this.stores.substores.ergo.stateFetchStore.fetcher.getAssetInfo(req);
-            } catch (e) {
-              // eslint-disable-next-line no-console
-              console.error('Aseet info request failed', e);
-              return Object.fromEntries(tokenIds.map(tokenId => [tokenId, ({}: any)]));;
-            }
-          },
-          network,
-        }
       );
     } else {
       throw new Error('unexpected wallet type');

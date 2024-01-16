@@ -15,7 +15,7 @@ type GeneratedProps<T> = {|
 
 export type InjectedOrGenerated<T> = InjectedProps | GeneratedProps<T>;
 
-// ERGO CONNECTOR
+// DAPP CONNECTOR
 type InjectedConnectorProps = {|
   +stores: StoresConnectorMap,
   +actions: ActionsConnectorMap,

@@ -24,7 +24,7 @@ export default function CancelSwapOrderDialog({
     <Dialog title="Cancel order" onClose={onClose} withCloseButton closeOnOverlayClick>
       <Box display="flex" mt="8px" mb="24px" flexDirection="column" gap="16px">
         <Box>
-          <Typography variant="body1">Are you sure you want to cancel this order?</Typography>
+          <Typography component="div" variant="body1">Are you sure you want to cancel this order?</Typography>
         </Box>
         <AssetPair from={order.from} to={order.to} />
         <Box display="flex" flexDirection="column" gap="8px">
@@ -60,7 +60,7 @@ export default function CancelSwapOrderDialog({
 const SummaryRow = ({ col1, col2, withInfo = false }) => (
   <Box display="flex" alignItems="center" justifyContent="space-between">
     <Box display="flex" alignItems="center">
-      <Typography variant="body1" color="grayscale.500">
+      <Typography component="div" variant="body1" color="grayscale.500">
         {col1}
       </Typography>
       {withInfo ? (
@@ -70,7 +70,7 @@ const SummaryRow = ({ col1, col2, withInfo = false }) => (
       ) : null}
     </Box>
     <Box>
-      <Typography variant="body1">{col2}</Typography>
+      <Typography component="div" variant="body1">{col2}</Typography>
     </Box>
   </Box>
 );

@@ -8,14 +8,6 @@ import { defineMessages } from 'react-intl';
  */
 
 const globalMessages: * = defineMessages({
-  ok: {
-    id: 'global.ok',
-    defaultMessage: '!!!Ok',
-  },
-  buy: {
-    id: 'global.buy',
-    defaultMessage: '!!!Buy',
-  },
   receive: {
     id: 'global.receive',
     defaultMessage: '!!!Receive',
@@ -40,10 +32,6 @@ const globalMessages: * = defineMessages({
     id: 'global.util.here',
     defaultMessage: '!!!here',
   },
-  token: {
-    id: 'global.labels.token',
-    defaultMessage: '!!!Token',
-  },
   addToken: {
     id: 'global.labels.addToken',
     defaultMessage: '!!!Add Token',
@@ -60,10 +48,6 @@ const globalMessages: * = defineMessages({
     id: 'global.labels.password',
     defaultMessage: '!!!Password',
   },
-  receiverLabel: {
-    id: 'wallet.send.form.receiver.label',
-    defaultMessage: '!!!Receiver',
-  },
   standardWallet: {
     id: 'wallet.nav.type.standard',
     defaultMessage: '!!!Standard wallet',
@@ -71,10 +55,6 @@ const globalMessages: * = defineMessages({
   transactionFee: {
     id: 'wallet.send.preview.transactionFee',
     defaultMessage: '!!!Transaction Fee',
-  },
-  paperWallet: {
-    id: 'wallet.nav.type.paper',
-    defaultMessage: '!!!Paper wallet',
   },
   trezorWallet: {
     id: 'wallet.nav.type.trezor',
@@ -406,10 +386,6 @@ const globalMessages: * = defineMessages({
     id: 'wallet.connect.trezor.error.103',
     defaultMessage: '!!!Cancelled. Please retry.',
   },
-  hwConnectDialogSaveError101: {
-    id: 'wallet.connect.hw.dialog.step.save.error.101',
-    defaultMessage: '!!!Failed to save. Please check your Internet connection and retry.',
-  },
   walletCreatedNotificationMessage: {
     id: 'wallet.summary.page.walletCreatedNotificationMessage',
     defaultMessage: '!!!You have successfully created a new wallet',
@@ -473,10 +449,6 @@ const globalMessages: * = defineMessages({
     // empty string can't be translated in CrowdIn so we use underscore instead
     defaultMessage: '_',
   },
-  passwordInstructionsPaperWallet: {
-    id: 'global.passwordInstructionsPaperWallet',
-    defaultMessage: '!!!Note: Paper Wallet password needs to be at least 10 characters long.',
-  },
   paperPasswordLabel: {
     id: 'wallet.restore.dialog.paperPasswordLabel',
     defaultMessage: '!!!Paper wallet password',
@@ -492,10 +464,6 @@ const globalMessages: * = defineMessages({
   allowLabel: {
     id: 'global.label.allow',
     defaultMessage: '!!!Allow',
-  },
-  supportRequestLinkUrl: {
-    id: 'settings.support.faq.supportRequestLinkURL',
-    defaultMessage: '!!!https://yoroi-wallet.com/support/',
   },
   contactSupport: {
     id: 'global.contact',
@@ -533,19 +501,19 @@ const globalMessages: * = defineMessages({
   },
   newPasswordLabel: {
     id: 'wallet.settings.changePassword.dialog.newPasswordLabel',
-    defaultMessage: '!!!New spending password',
+    defaultMessage: '!!!New password',
   },
   newPasswordFieldPlaceholder: {
     id: 'wallet.settings.changePassword.dialog.newPasswordFieldPlaceholder',
-    defaultMessage: '!!!Type new spending password',
+    defaultMessage: '!!!Type new password',
   },
   repeatPasswordLabel: {
     id: 'wallet.settings.changePassword.dialog.repeatPasswordLabel',
-    defaultMessage: '!!!Repeat new spending password',
+    defaultMessage: '!!!Repeat new password',
   },
   repeatPasswordFieldPlaceholder: {
     id: 'wallet.settings.changePassword.dialog.repeatPasswordFieldPlaceholder',
-    defaultMessage: '!!!Type new spending password',
+    defaultMessage: '!!!Type new password',
   },
   uriSchemeLabel: {
     id: 'global.uriSchemeTitleLabel',
@@ -563,15 +531,6 @@ const globalMessages: * = defineMessages({
   copyTooltipMessage: {
     id: 'global.copyTooltipMessage',
     defaultMessage: '!!!Copied',
-  },
-  transferInstructionsText: {
-    id: 'transfer.instructions.instructions.text',
-    defaultMessage:
-      '!!!Before you can transfer funds, you must create a Yoroi wallet and back it up. Upon completion, you will receive a 15-word recovery phrase which can be used to restore your Yoroi wallet at any time.',
-  },
-  transferInstructionsButton: {
-    id: 'transfer.instructions.instructions.button.label',
-    defaultMessage: '!!!Create Yoroi wallet',
   },
   attentionTitle: {
     id: 'transfer.instructions.attention.title.label',
@@ -644,22 +603,17 @@ const globalMessages: * = defineMessages({
     defaultMessage:
       '!!!Wallets created before July 29th, 2020 are Byron-era wallets and cannot delegate.',
   },
-  hardwareTransferInstructions: {
-    id: 'transfer.instructions.hardware.disclaimer.instructions1',
-    defaultMessage:
-      '!!!When you originally setup your hardware wallet, you were asked to write down a recovery phrase on a piece of paper. Entering this phrase will allow you to transfer your funds out of your hardware wallet and into the current wallet.',
-  },
   sendButtonLabel: {
     id: 'wallet.send.confirmationDialog.submit',
     defaultMessage: '!!!Send',
   },
   walletPasswordLabel: {
     id: 'wallet.send.confirmationDialog.walletPasswordLabel',
-    defaultMessage: '!!!Spending password',
+    defaultMessage: '!!!Password',
   },
   walletPasswordFieldPlaceholder: {
     id: 'wallet.send.confirmationDialog.walletPasswordFieldPlaceholder',
-    defaultMessage: '!!!Type your spending password',
+    defaultMessage: '!!!Type your password',
   },
   txGeneration: {
     id: 'wallet.delegation.transaction.generation',
@@ -724,10 +678,6 @@ const globalMessages: * = defineMessages({
   sidebarSettings: {
     id: 'sidebar.settings',
     defaultMessage: '!!!Settings',
-  },
-  experimental: {
-    id: 'sidebar.experimental',
-    defaultMessage: '!!!Experimental',
   },
   sidebarTransfer: {
     id: 'sidebar.transfer',
@@ -844,25 +794,9 @@ const globalMessages: * = defineMessages({
     id: 'myWallets.wallets.neverSync',
     defaultMessage: '!!!Never synced',
   },
-  hardwareWalletLabel: {
-    id: 'yoroiTransfer.start.instructions.hardware',
-    defaultMessage: '!!!Hardware wallet',
-  },
-  yoroiPaperLabel: {
-    id: 'yoroiTransfer.start.instructions.yoroiPaper',
-    defaultMessage: '!!!Yoroi paper wallet',
-  },
-  addToAddressbookLabel: {
-    id: 'global.label.addToAddressbook',
-    defaultMessage: '!!!Add to address book',
-  },
   createWalletLabel: {
     id: 'wallet.add.page.create.title',
     defaultMessage: '!!!Create Wallet',
-  },
-  paperWalletLabel: {
-    id: 'wallet.add.optionDialog.restore.paperWallet.title',
-    defaultMessage: '!!!Paper Wallet',
   },
   allLabel: {
     id: 'wallet.receive.navigation.allLabel',
@@ -908,14 +842,6 @@ const globalMessages: * = defineMessages({
   shelleyLabel: {
     id: 'global.labels.shelleyLabel',
     defaultMessage: '!!!Shelley',
-  },
-  spendingKeyLabel: {
-    id: 'global.labels.spendingKey',
-    defaultMessage: '!!!Spending key',
-  },
-  stakingKeyLabel: {
-    id: 'global.labels.stakingKey',
-    defaultMessage: '!!!Staking key',
   },
   spendingKeyHashLabel: {
     id: 'global.labels.spendingKeyHash',
@@ -965,18 +891,6 @@ const globalMessages: * = defineMessages({
     id: 'global.key.label',
     defaultMessage: '!!!Key',
   },
-  invalidKeyLengthLabel: {
-    id: 'global.invalidKeyLength.label',
-    defaultMessage: '!!!Invalid key. Should be {length} characters long.',
-  },
-  invalidKeyLength2Label: {
-    id: 'global.invalidKeyLength2.label',
-    defaultMessage: '!!!Invalid key. Should one of {lengths}.',
-  },
-  invalidKeyFormatLabel: {
-    id: 'global.invalidKeyFormat.label',
-    defaultMessage: '!!!Invalid key. Should be hexadecimal-encoded.',
-  },
   stepPin: {
     id: 'wallet.voting.dialog.stepPin',
     defaultMessage: '!!!PIN',
@@ -1004,10 +918,6 @@ const globalMessages: * = defineMessages({
   confirmPin: {
     id: 'wallet.voting.dialog.confirmPin',
     defaultMessage: '!!!Confirm PIN',
-  },
-  completeLabel: {
-    id: 'wallet.voting.dialog.completeLabel',
-    defaultMessage: '!!!complete',
   },
   pinDoesNotMatch: {
     id: 'global.errors.pinDoesNotMatch',
