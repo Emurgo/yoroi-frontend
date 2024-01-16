@@ -21,7 +21,6 @@ const Servers = {
   // this allows connecting to multiple different backends for different currencies
   Primary: '*.yoroiwallet.com',
   Testnet: '*.emurgornd.com',
-  Muesliswap: 'api.muesliswap.com',
 };
 
 module.exports = {
