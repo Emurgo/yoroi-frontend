@@ -1460,7 +1460,8 @@ async function rawUpdateTransactions(
           tx: after.txHash || undefined,
         },
         untilBlock,
-      })
+      });
+      txHashes = txsFromNetwork.map(tx => tx.hash);
     } else {
       /*
        * TAIL
@@ -1571,6 +1572,7 @@ async function rawUpdateTransactions(
   );
 
   const txHashSet = new Set(txHashes);
+  console.log('>>>> txHashSet', [...txHashSet]);
   return {
     txs: txs.txs.filter(tx => txHashSet.has(tx.transaction.Hash)),
     addressLookupMap: txs.addressLookupMap,
