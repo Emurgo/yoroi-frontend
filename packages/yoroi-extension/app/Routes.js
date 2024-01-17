@@ -2,8 +2,7 @@
 import type { Node } from 'react';
 import type { StoresMap } from './stores/index';
 import type { ActionsMap } from './actions/index';
-import type { InjectedOrGenerated, InjectedProps } from './types/injectedPropsType';
-import type { GeneratedData as ReceiveData } from './containers/wallet/Receive';
+import type { InjectedProps } from './types/injectedPropsType';
 import type { ConfigType } from '../config/config-types';
 import { Route, Redirect, Switch } from 'react-router-dom';
 import { ROUTES } from './routes-config';
@@ -517,6 +516,6 @@ export function wrapWallet(walletProps: InjectedProps, children: Node): Node {
   );
 }
 
-export function wrapReceive(receiveProps: InjectedOrGenerated<ReceiveData>, children: Node): Node {
+export function wrapReceive(receiveProps: InjectedProps, children: Node): Node {
   return <Receive {...receiveProps}>{children}</Receive>;
 }

@@ -552,7 +552,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
             action(() => {
               existingWarnings.dialogs.pop();
             }),
-            { stores: this.stores, actions: this.actions }
           )
         );
       }
