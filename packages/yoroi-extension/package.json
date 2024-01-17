@@ -192,7 +192,7 @@
     "@vespaiach/axios-fetch-adapter": "^0.3.0",
     "@yoroi/swap": "^1.1.0",
     "@yoroi/types": "1.5.0",
-    "@yoroi/resolver": "1.5.1-beta.1",
+    "@yoroi/resolver": "2.0.0",
     "async-mutex": "^0.3.1",
     "axios": "0.21.1",
     "bech32": "2.0.0",

@@ -308,7 +308,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
           apiKey: 'czsajliz-wxgu6tujd1zqq7hey_pclfqhdjsqolsxjfsurgh',
         },
       },
-      csl: RustModule.CrossCsl.init('yoroi/resolver'),
+      cslFactory: RustModule.CrossCsl.init,
     });
   }
 
