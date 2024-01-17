@@ -13,6 +13,7 @@ import type {
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import AdaApi from '../../api/ada';
 
 export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> {
   setup(): void {
@@ -149,7 +150,7 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
         `${nameof(AdaWalletRestoreStore)}::${nameof(this.isValidMnemonic)} missing length`
       );
     }
-    return this.api.ada.constructor.isValidMnemonic({
+    return AdaApi.isValidMnemonic({
       mnemonic,
       numberOfWords: request.mode.length,
     });
