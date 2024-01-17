@@ -85,6 +85,8 @@ export type PublicKeyCache = {|
   publicKey: string,
 |};
 
+export type SendMoneyRequest = Request<DeferredCall<{| txId: string |}>>;
+
 /**
  * The base wallet store that contains the shared logic
  * dealing with wallets / accounts.
@@ -122,7 +124,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   });
   @observable isImportActive: boolean = false;
 
-  @observable sendMoneyRequest: Request<DeferredCall<{| txId: string |}>> = new Request<
+  @observable sendMoneyRequest: SendMoneyRequest = new Request<
     DeferredCall<{| txId: string |}>
   >(request => request());
 
@@ -562,7 +564,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
             action(() => {
               existingWarnings.dialogs.pop();
             }),
-            { stores: this.stores, actions: this.actions }
           )
         );
       }

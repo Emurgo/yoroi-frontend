@@ -53,9 +53,11 @@ import { getImageFromTokenMetadata } from '../../../utils/nftMetadata';
 import WalletSendPreviewStepContainer from './WalletSendFormSteps/WalletSendPreviewStepContainer';
 import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { SendUsingLedgerParams } from '../../../actions/ada/ledger-send-actions';
-import type { SendUsingTrezorParams } from '../../../actions/ada/trezor-send-actions';
 import { ampli } from '../../../../ampli/index';
+import TrezorSendActions from '../../../actions/ada/trezor-send-actions';
+import LedgerSendActions from '../../../actions/ada/ledger-send-actions';
+import type { SendMoneyRequest } from '../../../stores/toplevel/WalletStore';
+import type { MaxSendableAmountRequest } from '../../../stores/toplevel/TransactionBuilderStore';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -176,20 +178,12 @@ type Props = {|
   +closeDialog: void => void,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?string,
-  +maxSendableAmount: {|
-    error: ?LocalizableError,
-    isExecuting: boolean,
-    result: ?BigNumber,
-  |},
+  +maxSendableAmount: MaxSendableAmountRequest,
   +calculateMaxAmount: void => Promise<void>,
   +signRequest: null | ISignRequest<any>,
   +staleTx: boolean,
   +openTransactionSuccessDialog: void => void,
-  +sendMoneyRequest: {|
-    error: ?LocalizableError,
-    isExecuting: boolean,
-    reset: () => void,
-  |},
+  +sendMoneyRequest: SendMoneyRequest,
   +sendMoney: (params: {|
     password: string,
     publicDeriver: PublicDeriver<>,
@@ -198,27 +192,8 @@ type Props = {|
   |}) => Promise<void>,
   +ledgerSendError: null | LocalizableError,
   +trezorSendError: null | LocalizableError,
-  +ledgerSend: {|
-    cancel: {| trigger: (params: void) => void |},
-    init: {| trigger: (params: void) => void |},
-    sendUsingLedgerWallet: {|
-      trigger: (params: {|
-        params: SendUsingLedgerParams,
-        publicDeriver: PublicDeriver<>,
-        onSuccess?: void => void,
-      |}) => Promise<void>,
-    |},
-  |},
-  +trezorSend: {|
-    cancel: {| trigger: (params: void) => void |},
-    sendUsingTrezor: {|
-      trigger: (params: {|
-        params: SendUsingTrezorParams,
-        publicDeriver: PublicDeriver<>,
-        onSuccess?: void => void,
-      |}) => Promise<void>,
-    |},
-  |},
+  +ledgerSend: LedgerSendActions,
+  +trezorSend: TrezorSendActions,
 |};
 
 type State = {|
