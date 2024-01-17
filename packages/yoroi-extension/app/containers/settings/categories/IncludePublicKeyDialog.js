@@ -1,20 +1,18 @@
 // @flow
 import type { Node } from 'react';
 import { Component } from 'react';
-import { computed, action, observable } from 'mobx';
+import { action, observable } from 'mobx';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
-import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
+import type { InjectedProps } from '../../../types/injectedPropsType';
 
 import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
 
-export type GeneratedData = typeof IncludePublicKeyDialog.prototype.generated;
-
 type Props = {|
-  ...InjectedOrGenerated<GeneratedData>,
+  ...InjectedProps,
   +downloadIncludingKey: void => void,
   +downloadExcludingKey: void => void,
 |};
@@ -58,19 +56,19 @@ export default class IncludePublicKeyDialog extends Component<Props> {
         toggleCheck={this.toggleCheck}
         isSubmitting={false}
         error={undefined}
-        onCancel={this.generated.actions.dialogs.closeActiveDialog.trigger}
+        onCancel={this.props.actions.dialogs.closeActiveDialog.trigger}
         primaryButton={{
           label: intl.formatMessage(dialogMessages.withKey),
           onClick: () => {
             this.props.downloadIncludingKey();
-            this.generated.actions.dialogs.closeActiveDialog.trigger();
+            this.props.actions.dialogs.closeActiveDialog.trigger();
           }
         }}
         secondaryButton={{
           label: intl.formatMessage(dialogMessages.withoutKey),
           onClick: () => {
             this.props.downloadExcludingKey();
-            this.generated.actions.dialogs.closeActiveDialog.trigger();
+            this.props.actions.dialogs.closeActiveDialog.trigger();
           }
         }}
       >
@@ -78,34 +76,5 @@ export default class IncludePublicKeyDialog extends Component<Props> {
         <div><FormattedHTMLMessage {...globalMessages.publicKeyExplanation} /></div>
       </DangerousActionDialog>
     );
-  }
-
-  @computed get generated(): {|
-    actions: {|
-      dialogs: {|
-        closeActiveDialog: {|
-          trigger: (params: void) => void
-        |}
-      |},
-    |},
-    stores: {|
-    |}
-    |} {
-    if (this.props.generated !== undefined) {
-      return this.props.generated;
-    }
-    if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(IncludePublicKeyDialog)} no way to generated props`);
-    }
-    const { actions, } = this.props;
-    return Object.freeze({
-      stores: Object.freeze({
-      }),
-      actions: {
-        dialogs: {
-          closeActiveDialog: { trigger: actions.dialogs.closeActiveDialog.trigger },
-        },
-      },
-    });
   }
 }
