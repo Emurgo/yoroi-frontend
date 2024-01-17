@@ -12,7 +12,6 @@ import WalletStore from './toplevel/WalletStore';
 import WalletSettingsStore from './toplevel/WalletSettingsStore';
 import TransactionsStore from './toplevel/TransactionsStore';
 import AddressesStore from './toplevel/AddressesStore';
-import TimeStore from './toplevel/TimeStore';
 import WalletRestoreStore from './toplevel/WalletRestoreStore';
 import YoroiTransferStore from './toplevel/YoroiTransferStore';
 import TransactionBuilderStore from './toplevel/TransactionBuilderStore';
@@ -45,7 +44,6 @@ const storeClasses = Object.freeze({
   loading: LoadingStore,
   wallets: WalletStore,
   addresses: AddressesStore,
-  time: TimeStore,
   transactions: TransactionsStore,
   walletRestore: WalletRestoreStore,
   walletSettings: WalletSettingsStore,
@@ -72,7 +70,6 @@ export type StoresMap = {|
   loading: LoadingStore,
   wallets: WalletStore,
   addresses: AddressesStore,
-  time: TimeStore,
   transactions: TransactionsStore,
   walletRestore: WalletRestoreStore,
   walletSettings: WalletSettingsStore,
@@ -108,7 +105,6 @@ const stores: StoresMap = (observable({
   loading: null,
   wallets: null,
   addresses: null,
-  time: null,
   transactions: null,
   walletRestore: null,
   walletSettings: null,
