@@ -3,11 +3,8 @@ import type { Node } from 'react';
 import type { StoresMap } from './stores/index';
 import type { ActionsMap } from './actions/index';
 import type { InjectedOrGenerated, InjectedProps } from './types/injectedPropsType';
-import type { GeneratedData as SettingsData } from './containers/settings/Settings';
-import type { GeneratedData as WalletData } from './containers/wallet/Wallet';
 import type { GeneratedData as ReceiveData } from './containers/wallet/Receive';
 import type { ConfigType } from '../config/config-types';
-import type { GeneratedData as AssetsData } from './containers/wallet/AssetsWrapper';
 import { Route, Redirect, Switch } from 'react-router-dom';
 import { ROUTES } from './routes-config';
 import React, { Suspense } from 'react';
@@ -486,7 +483,7 @@ export function wrapSwap(swapProps: InjectedProps, children: Node): Node {
 }
 
 export function wrapSettings(
-  settingsProps: InjectedOrGenerated<SettingsData>,
+  settingsProps: InjectedProps,
   children: Node
 ): Node {
   return (
@@ -496,7 +493,7 @@ export function wrapSettings(
   );
 }
 
-export function wrapAssets(assetsProps: InjectedOrGenerated<AssetsData>, children: Node): Node {
+export function wrapAssets(assetsProps: InjectedProps, children: Node): Node {
   return (
     <AssetsWrapper {...assetsProps}>
       <Suspense fallback={null}>{children}</Suspense>
@@ -504,7 +501,7 @@ export function wrapAssets(assetsProps: InjectedOrGenerated<AssetsData>, childre
   );
 }
 
-export function wrapNFTs(assetsProps: InjectedOrGenerated<AssetsData>, children: Node): Node {
+export function wrapNFTs(assetsProps: InjectedProps, children: Node): Node {
   return (
     <NFTsWrapper {...assetsProps}>
       <Suspense fallback={null}>{children}</Suspense>
@@ -512,7 +509,7 @@ export function wrapNFTs(assetsProps: InjectedOrGenerated<AssetsData>, children:
   );
 }
 
-export function wrapWallet(walletProps: InjectedOrGenerated<WalletData>, children: Node): Node {
+export function wrapWallet(walletProps: InjectedProps, children: Node): Node {
   return (
     <Wallet {...walletProps}>
       <Suspense fallback={null}>{children}</Suspense>
