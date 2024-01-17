@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
 
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedPropsType';
 
 import TransferTypeSelect from '../../components/transfer/cards/TransferTypeSelect';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
@@ -15,7 +15,7 @@ import { truncateToken } from '../../utils/formatters';
 import config from '../../config';
 
 type Props = {|
-  ...InjectedProps,
+  ...StoresAndActionsProps,
   publicDeriver: PublicDeriver<>,
 |};
 

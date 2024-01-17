@@ -11,10 +11,10 @@ import {
   asGetPublicKey,
 } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
 
-import type { InjectedProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
 
 type Props = {|
-  ...InjectedProps,
+  ...StoresAndActionsProps,
   publicDeriver: void | PublicDeriver<>,
 |};
 

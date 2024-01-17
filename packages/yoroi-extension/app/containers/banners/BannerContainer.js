@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedPropsType';
 import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
 import ByronDeprecationBanner from './ByronDeprecationBanner';
 import NotProductionBanner from '../../components/topbar/banners/NotProductionBanner';
@@ -16,7 +16,7 @@ import { getTokenName, genLookupOrFail } from '../../stores/stateless/tokenHelpe
 import { truncateToken } from '../../utils/formatters';
 
 @observer
-export default class BannerContainer extends Component<InjectedProps> {
+export default class BannerContainer extends Component<StoresAndActionsProps> {
 
   render(): Node {
     const serverStatus = this.props.stores.serverConnectionStore.checkAdaServerStatus;

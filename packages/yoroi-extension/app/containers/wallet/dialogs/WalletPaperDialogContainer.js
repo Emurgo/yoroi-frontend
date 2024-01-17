@@ -2,12 +2,12 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import type { InjectedProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
 import UserPasswordDialog from '../../../components/wallet/add/paper-wallets/UserPasswordDialog';
 import PaperWalletDialog from '../../../components/wallet/WalletPaperDialog';
 
 type Props = {|
-  ...InjectedProps,
+  ...StoresAndActionsProps,
   +onClose: void => void,
 |};
 

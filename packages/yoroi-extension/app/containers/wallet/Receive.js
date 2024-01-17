@@ -1,7 +1,7 @@
 // @flow
 import type { Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedPropsType';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
@@ -12,7 +12,7 @@ import { Box } from '@mui/material';
 import ReceiveWithNavigation from '../../components/wallet/layouts/ReceiveWithNavigation';
 
 type Props = {|
-  ...InjectedProps,
+  ...StoresAndActionsProps,
   +children?: Node,
 |};
 

@@ -1,7 +1,7 @@
 // @flow
 import { observer } from 'mobx-react';
 import { Component } from 'react';
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedPropsType';
 import type { ComponentType, Node } from 'react';
 import {
   genLookupOrFail,
@@ -20,7 +20,7 @@ import {
 } from '../../utils/nftMetadata';
 
 type Props = {|
-  ...InjectedProps,
+  ...StoresAndActionsProps,
 |};
 type MatchProps = {|
   match: Match,

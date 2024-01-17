@@ -5,13 +5,13 @@ import { observer } from 'mobx-react';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import SupportSettings from '../../../components/settings/categories/SupportSettings';
 import { downloadLogs } from '../../../utils/logging';
-import type { InjectedProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
 import { asGetPublicKey } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
 import IncludePublicKeyDialog from './IncludePublicKeyDialog';
 import { ComplexityLevels } from '../../../types/complexityLevelType';
 
 @observer
-export default class SupportSettingsPage extends Component<InjectedProps> {
+export default class SupportSettingsPage extends Component<StoresAndActionsProps> {
   getPublicKey: void => void | string = () => {
     const { selected } = this.props.stores.wallets;
     if (selected == null) {

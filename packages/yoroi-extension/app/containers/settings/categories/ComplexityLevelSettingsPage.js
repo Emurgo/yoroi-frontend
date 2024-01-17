@@ -2,11 +2,11 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import type { InjectedProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
 import ComplexityLevel from '../../../components/profile/complexity-level/ComplexityLevelForm';
 
 @observer
-export default class ComplexityLevelSettingsPage extends Component<InjectedProps> {
+export default class ComplexityLevelSettingsPage extends Component<StoresAndActionsProps> {
   render(): Node {
     return (
       <ComplexityLevel

@@ -1,7 +1,7 @@
 // @flow
 import { observer } from 'mobx-react';
 import { Component } from 'react';
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedPropsType';
 import type { Node } from 'react';
 import {
   genLookupOrFail,
@@ -15,7 +15,7 @@ import { once } from 'lodash';
 import { ampli } from '../../../ampli/index';
 
 @observer
-export default class NFTsPageRevamp extends Component<InjectedProps> {
+export default class NFTsPageRevamp extends Component<StoresAndActionsProps> {
   trackPageViewed: (number) => void = once((nftCount) => {
     setTimeout(() => {
       ampli.nftGalleryPageViewed({

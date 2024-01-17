@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { action, observable } from 'mobx';
 import { intlShape, } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedPropsType';
 import LegacyTransferLayout from '../../components/transfer/LegacyTransferLayout';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import YoroiTransferErrorPage from './YoroiTransferErrorPage';
@@ -33,7 +33,7 @@ import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 declare var CONFIG: ConfigType;
 
 type Props = {|
-  ...InjectedProps,
+  ...StoresAndActionsProps,
   +onClose: {|
     +trigger: void => void,
     +label: string,

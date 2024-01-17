@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedPropsType';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import BannerContainer from '../banners/BannerContainer';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
@@ -14,7 +14,7 @@ import { buildRoute } from '../../utils/routing';
 import { matchPath } from 'react-router';
 
 type Props = {|
-  ...InjectedProps,
+  ...StoresAndActionsProps,
   +children?: Node,
 |};
 

@@ -4,7 +4,7 @@ import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { InjectedProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
 import TopBarLayout from '../../../components/layout/TopBarLayout';
 import BannerContainer from '../../banners/BannerContainer';
 import SidebarContainer from '../../SidebarContainer';
@@ -18,7 +18,7 @@ import type { LayoutComponentMap } from '../../../styles/context/layout';
 export const VotingPageContentPromise = () => import('./VotingPageContent');
 const VotingPageContent = lazy(VotingPageContentPromise);
 
-type Props = InjectedProps;
+type Props = StoresAndActionsProps;
 type InjectedLayoutProps = {| +renderLayoutComponent: LayoutComponentMap => Node |};
 type AllProps = {|
   ...Props,

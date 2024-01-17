@@ -5,7 +5,7 @@ import { action, observable, runInAction } from 'mobx';
 import type { Node, ComponentType } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
 import { ROUTES } from '../../routes-config';
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedPropsType';
 
 import WalletSendFormClassic from '../../components/wallet/send/WalletSendForm';
 import WalletSendFormRevamp from '../../components/wallet/send/WalletSendFormRevamp';
@@ -60,7 +60,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  ...InjectedProps,
+  ...StoresAndActionsProps,
 |};
 type InjectedLayoutProps = {|
   +renderLayoutComponent: LayoutComponentMap => Node,

@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import type { InjectedProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
 import React, { Component, Suspense } from 'react';
 import { observer } from 'mobx-react';
 import { Box } from '@mui/material';
@@ -13,7 +13,7 @@ export const RestoreWalletPagePromise: void => Promise<any> = () =>
 const RestoreWalletPageComponent = React.lazy(RestoreWalletPagePromise);
 
 @observer
-export default class RestoreWalletPage extends Component<InjectedProps> {
+export default class RestoreWalletPage extends Component<StoresAndActionsProps> {
   render(): Node {
     const { stores, actions } = this.props;
     const { hasAnyWallets } = stores.wallets;

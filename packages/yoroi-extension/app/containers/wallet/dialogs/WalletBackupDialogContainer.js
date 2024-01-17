@@ -3,10 +3,10 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import WalletBackupDialog from '../../../components/wallet/WalletBackupDialog';
-import type { InjectedProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
 
 type Props = {|
-  ...InjectedProps,
+  ...StoresAndActionsProps,
   +onClose: void => void,
 |};
 

@@ -4,7 +4,7 @@ import { Component } from 'react';
 import { action, observable } from 'mobx';
 import { observer } from 'mobx-react';
 
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedPropsType';
 
 import URILandingDialog from '../../components/uri/URILandingDialog';
 import URIVerifyDialog from '../../components/uri/URIVerifyDialog';
@@ -14,7 +14,7 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 
 type Props = {|
-  ...InjectedProps,
+  ...StoresAndActionsProps,
   +onClose: void => void,
   +onConfirm: void => void,
   +firstSelectedWallet: null | PublicDeriver<>,

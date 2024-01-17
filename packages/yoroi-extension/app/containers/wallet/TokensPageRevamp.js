@@ -1,7 +1,7 @@
 // @flow
 import { observer } from 'mobx-react';
 import { Component } from 'react';
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedPropsType';
 import type { Node } from 'react';
 import {
   genLookupOrFail,
@@ -12,7 +12,7 @@ import { splitAmount, truncateToken } from '../../utils/formatters';
 import TokensPage from '../../components/wallet/assets/Tokens';
 
 @observer
-export default class TokensPageRevamp extends Component<InjectedProps> {
+export default class TokensPageRevamp extends Component<StoresAndActionsProps> {
   render(): Node {
     const publicDeriver = this.props.stores.wallets.selected;
     // Guard against potential null values

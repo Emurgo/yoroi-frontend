@@ -5,14 +5,14 @@ import { observable, runInAction } from 'mobx';
 import { observer } from 'mobx-react';
 import globalMessages from '../../i18n/global-messages';
 import WalletRestoreVerifyDialog from '../../components/wallet/WalletRestoreVerifyDialog';
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedPropsType';
 import config from '../../config';
 import { generatePlates } from '../../stores/toplevel/WalletRestoreStore';
 import type { PlateWithMeta } from '../../stores/toplevel/WalletRestoreStore';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 
 type Props = {|
-  ...InjectedProps,
+  ...StoresAndActionsProps,
   +accountIndex: number,
   +onNext: void => PossiblyAsync<void>,
   +onCancel: void => void,

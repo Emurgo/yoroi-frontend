@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import type { InjectedConnectorProps } from '../../types/injectedPropsType';
+import type { ConnectorStoresAndActionsProps } from '../../types/injectedPropsType';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { observable, runInAction } from 'mobx';
@@ -24,7 +24,7 @@ import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWal
 
 @observer
 export default class SignTxContainer extends Component<
-  InjectedConnectorProps
+  ConnectorStoresAndActionsProps
 > {
   @observable notificationElementId: string = '';
 

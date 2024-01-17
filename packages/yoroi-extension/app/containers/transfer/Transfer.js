@@ -4,7 +4,7 @@ import { Component, lazy, Suspense } from 'react';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedPropsType';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import BannerContainer from '../banners/BannerContainer';
 import SidebarContainer from '../SidebarContainer';
@@ -23,7 +23,7 @@ export const WalletTransferPagePromise: void => Promise<any> = () => import('./W
 const WalletTransferPage = lazy(WalletTransferPagePromise);
 
 type Props = {|
-  ...InjectedProps,
+  ...StoresAndActionsProps,
   +children?: Node,
 |};
 

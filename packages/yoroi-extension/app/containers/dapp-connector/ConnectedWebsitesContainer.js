@@ -4,7 +4,7 @@ import { Component, lazy, Suspense } from 'react';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedPropsType';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import BannerContainer from '../banners/BannerContainer';
 import { withLayout } from '../../styles/context/layout';
@@ -27,7 +27,7 @@ export const ConnectedWebsitesPagePromise: void => Promise<any> = () =>
   import('../../components/dapp-connector/ConnectedWebsites/ConnectedWebsitesPage');
 const ConnectedWebsitesPage = lazy(ConnectedWebsitesPagePromise);
 
-type Props = InjectedProps;
+type Props = StoresAndActionsProps;
 
 type InjectedLayoutProps = {| +renderLayoutComponent: LayoutComponentMap => Node |};
 type AllProps = {| ...Props, ...InjectedLayoutProps |};

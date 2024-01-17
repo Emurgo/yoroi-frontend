@@ -9,7 +9,7 @@ import NavBarContainer from '../NavBarContainer';
 import SettingsMenu from '../../components/settings/menu/SettingsMenu';
 import BannerContainer from '../banners/BannerContainer';
 import { buildRoute } from '../../utils/routing';
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedPropsType';
 
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import SidebarContainer from '../SidebarContainer';
@@ -20,7 +20,7 @@ import type { LayoutComponentMap } from '../../styles/context/layout';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
 
 type Props = {|
-  ...InjectedProps,
+  ...StoresAndActionsProps,
   +children?: Node,
 |};
 type InjectedLayoutProps = {|

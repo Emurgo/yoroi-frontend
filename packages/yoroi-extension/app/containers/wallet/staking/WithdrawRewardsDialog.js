@@ -2,7 +2,7 @@
 
 import type { Node } from 'react';
 import { Component } from 'react';
-import type { InjectedProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, intlShape } from 'react-intl';
 import { Box, Typography } from '@mui/material';
@@ -62,7 +62,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  ...InjectedProps,
+  ...StoresAndActionsProps,
   +onClose: void => void,
 |};
 

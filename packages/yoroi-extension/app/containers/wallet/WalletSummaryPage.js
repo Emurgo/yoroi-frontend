@@ -11,7 +11,7 @@ import Dialog from '../../components/widgets/Dialog';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import globalMessages from '../../i18n/global-messages';
 import { ReactComponent as successIcon } from '../../assets/images/success-small.inline.svg';
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedPropsType';
 import WalletTransactionsList from '../../components/wallet/transactions/WalletTransactionsList';
 import WalletTransactionsListRevamp from '../../components/wallet/transactions/WalletTransactionsListRevamp';
 import WalletSummary from '../../components/wallet/summary/WalletSummary';
@@ -36,7 +36,7 @@ import BuySellDialog from '../../components/buySell/BuySellDialog';
 import WalletEmptyBanner from './WalletEmptyBanner';
 import { Box } from '@mui/material';
 
-type Props = InjectedProps;
+type Props = StoresAndActionsProps;
 type InjectedLayoutProps = {|
   +renderLayoutComponent: LayoutComponentMap => Node,
   +selectedLayout: string,

@@ -4,12 +4,12 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import CenteredLayout from '../components/layout/CenteredLayout';
 import Loading from '../components/loading/Loading';
-import type { JointInjectedProps } from '../types/injectedPropsType';
+import type { JointStoresAndActionsProps } from '../types/injectedPropsType';
 import { handleExternalLinkClick } from '../utils/routing';
 import { downloadLogs } from '../utils/logging';
 
 @observer
-export default class LoadingPage extends Component<JointInjectedProps> {
+export default class LoadingPage extends Component<JointStoresAndActionsProps> {
 
   render(): Node {
     return (

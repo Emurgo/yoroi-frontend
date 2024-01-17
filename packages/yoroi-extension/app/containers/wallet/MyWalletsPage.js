@@ -1,7 +1,7 @@
 // @flow
 import type { Node, ComponentType } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedPropsType';
 import type { ConceptualWalletSettingsCache } from '../../stores/toplevel/WalletSettingsStore';
 import type { WalletInfo } from '../../components/buySell/BuySellDialog';
 import type { LayoutComponentMap } from '../../styles/context/layout';
@@ -38,7 +38,7 @@ import globalMessages from '../../i18n/global-messages';
 import BuySellDialog from '../../components/buySell/BuySellDialog';
 import NavBarRevamp from '../../components/topbar/NavBarRevamp';
 
-type Props = InjectedProps;
+type Props = StoresAndActionsProps;
 
 type InjectedLayoutProps = {| +renderLayoutComponent: LayoutComponentMap => Node |};
 type AllProps = {| ...Props, ...InjectedLayoutProps |};

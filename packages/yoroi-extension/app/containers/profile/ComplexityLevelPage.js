@@ -7,7 +7,7 @@ import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
 import { defineMessages, intlShape } from 'react-intl';
 import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedPropsType';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -22,7 +22,7 @@ const messages = defineMessages({
 });
 
 @observer
-export default class ComplexityLevelPage extends Component<InjectedProps> {
+export default class ComplexityLevelPage extends Component<StoresAndActionsProps> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };

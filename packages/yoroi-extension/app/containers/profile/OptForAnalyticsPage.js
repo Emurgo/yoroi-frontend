@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedPropsType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
@@ -11,7 +11,7 @@ import environment from '../../environment';
 import OptForAnalyticsForm from '../../components/profile/terms-of-use/OptForAnalyticsForm';
 
 @observer
-export default class OptForAnalyticsPage extends Component<InjectedProps> {
+export default class OptForAnalyticsPage extends Component<StoresAndActionsProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };

@@ -11,7 +11,7 @@ import TopBarLayout from '../../components/layout/TopBarLayout';
 import UriPromptForm from '../../components/profile/uri-prompt/UriPromptForm';
 import UriAccept from '../../components/profile/uri-prompt/UriAccept';
 
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedPropsType';
 import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
@@ -21,7 +21,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { isTestnet } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 @observer
-export default class UriPromptPage extends Component<InjectedProps> {
+export default class UriPromptPage extends Component<StoresAndActionsProps> {
 
   @observable
   isAccepted: boolean = false;

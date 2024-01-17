@@ -1,7 +1,7 @@
 // @flow
 import type { ComponentType, Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { InjectedProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
 import type { LayoutComponentMap } from '../../../styles/context/layout';
 import type { ConfigType } from '../../../../config/config-types';
 import type { DelegationRequests } from '../../../stores/toplevel/DelegationStore';
@@ -38,7 +38,7 @@ import WithdrawRewardsDialog from './WithdrawRewardsDialog';
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 type Props = {|
-  ...InjectedProps,
+  ...StoresAndActionsProps,
   actions: any,
   stores: any,
 |};

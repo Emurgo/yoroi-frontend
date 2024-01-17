@@ -7,12 +7,12 @@ import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
-import type { InjectedProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
 
 import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
 
 type Props = {|
-  ...InjectedProps,
+  ...StoresAndActionsProps,
   +downloadIncludingKey: void => void,
   +downloadExcludingKey: void => void,
 |};

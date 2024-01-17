@@ -4,7 +4,7 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, defineMessages } from 'react-intl';
 
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedPropsType';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import BannerContainer from '../banners/BannerContainer';
 import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
@@ -23,7 +23,7 @@ const messages = defineMessages({
 });
 
 @observer
-export default class NoticeBoardPage extends Component<InjectedProps> {
+export default class NoticeBoardPage extends Component<StoresAndActionsProps> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };

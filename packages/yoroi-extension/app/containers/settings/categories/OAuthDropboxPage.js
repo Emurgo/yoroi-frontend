@@ -3,11 +3,11 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import { observer } from 'mobx-react';
-import type { InjectedProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
 import { ExternalStorageList } from '../../../domain/ExternalStorage';
 
 type Props = {|
-  ...InjectedProps,
+  ...StoresAndActionsProps,
   match: {|
     params: {|
       token: string,

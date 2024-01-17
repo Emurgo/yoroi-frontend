@@ -4,7 +4,7 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { observable, runInAction, } from 'mobx';
 import UserPasswordDialog from '../../../components/wallet/add/paper-wallets/UserPasswordDialog';
-import type { InjectedProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
 import config from '../../../config';
 import { ProgressStep } from '../../../stores/ada/PaperWalletCreateStore';
 import { Logger } from '../../../utils/logging';
@@ -28,7 +28,7 @@ const messages = defineMessages({
 
 @observer
 export default class CreatePaperWalletDialogContainer
-  extends Component<InjectedProps> {
+  extends Component<StoresAndActionsProps> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired

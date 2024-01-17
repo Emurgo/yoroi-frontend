@@ -3,7 +3,7 @@ import type { ComponentType, Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import Sidebar from '../components/topbar/Sidebar';
-import type { InjectedProps } from '../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../types/injectedPropsType';
 import { allCategories, allCategoriesRevamp } from '../stores/stateless/sidebarCategories';
 import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
 import SidebarRevamp from '../components/topbar/SidebarRevamp';
@@ -12,7 +12,7 @@ import type { LayoutComponentMap } from '../styles/context/layout';
 import { ROUTES } from '../routes-config';
 
 type Props = {|
-  ...InjectedProps,
+  ...StoresAndActionsProps,
 |};
 type InjectedLayoutProps = {|
   +selectedLayout: string,

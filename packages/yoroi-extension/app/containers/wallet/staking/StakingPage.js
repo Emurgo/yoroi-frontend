@@ -1,7 +1,7 @@
 // @flow
 import { Component, Suspense, lazy } from 'react';
 import type { Node } from 'react';
-import type { InjectedProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
 import type { ConfigType } from '../../../../config/config-types';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -20,7 +20,7 @@ const StakingPageContent = lazy(StakingPageContentPromise);
 declare var CONFIG: ConfigType;
 
 @observer
-class StakingPage extends Component<InjectedProps> {
+class StakingPage extends Component<StoresAndActionsProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };

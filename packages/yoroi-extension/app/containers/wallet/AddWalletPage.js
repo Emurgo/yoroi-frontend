@@ -1,6 +1,6 @@
 // @flow
 import type { Node, ComponentType } from 'react';
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedPropsType';
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { LayoutComponentMap } from '../../styles/context/layout';
@@ -41,7 +41,7 @@ export const AddAnotherWalletPromise: void => Promise<any> = () =>
   import('../../components/wallet/add/AddAnotherWallet');
 const AddAnotherWallet = lazy(AddAnotherWalletPromise);
 
-type Props = InjectedProps;
+type Props = StoresAndActionsProps;
 type InjectedLayoutProps = {| +renderLayoutComponent: LayoutComponentMap => Node |};
 type AllProps = {| ...Props, ...InjectedLayoutProps |};
 

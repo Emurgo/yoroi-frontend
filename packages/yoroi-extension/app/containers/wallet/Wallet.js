@@ -13,7 +13,7 @@ import NavBarBack from '../../components/topbar/NavBarBack';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { ROUTES } from '../../routes-config';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedPropsType';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { allCategories, allSubcategoriesRevamp } from '../../stores/stateless/topbarCategories';
 import { withLayout } from '../../styles/context/layout';
@@ -27,7 +27,7 @@ import WalletLoadingAnimation from '../../components/wallet/WalletLoadingAnimati
 import { RevampAnnouncementDialog } from './dialogs/RevampAnnouncementDialog';
 
 type Props = {|
-  ...InjectedProps,
+  ...StoresAndActionsProps,
   +children: Node,
 |};
 type InjectedLayoutProps = {| +renderLayoutComponent: LayoutComponentMap => Node |};

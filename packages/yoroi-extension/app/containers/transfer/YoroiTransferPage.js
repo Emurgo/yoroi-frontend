@@ -4,7 +4,7 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, } from 'react-intl';
 import validWords from 'bip39/src/wordlists/english.json';
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedPropsType';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import YoroiPaperWalletFormPage from './YoroiPaperWalletFormPage';
 import YoroiPlatePage from './YoroiPlatePage';
@@ -30,7 +30,7 @@ import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 const SUCCESS_PAGE_STAY_TIME = 5 * 1000;
 
 @observer
-export default class YoroiTransferPage extends Component<InjectedProps> {
+export default class YoroiTransferPage extends Component<StoresAndActionsProps> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,

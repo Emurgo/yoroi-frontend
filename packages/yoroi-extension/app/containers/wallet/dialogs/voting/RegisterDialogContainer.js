@@ -1,7 +1,7 @@
 // @flow
 import type { Node, ComponentType } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { InjectedProps } from '../../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../../types/injectedPropsType';
 import type { StepsList } from '../../../../components/wallet/voting/types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
@@ -15,7 +15,7 @@ import ErrorBlock from '../../../../components/widgets/ErrorBlock';
 import RegisterDialog from '../../../../components/wallet/voting/RegisterDialog';
 
 type Props = {|
-  ...InjectedProps,
+  ...StoresAndActionsProps,
   +stepsList: StepsList,
   +submit: void => PossiblyAsync<void>,
   +cancel: void => void,

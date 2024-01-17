@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import GeneralSettings from '../../../components/settings/categories/general-setting/GeneralSettings';
-import type { InjectedProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
 import ThemeSettingsBlock from '../../../components/settings/categories/general-setting/ThemeSettingsBlock';
 import AboutYoroiSettingsBlock from '../../../components/settings/categories/general-setting/AboutYoroiSettingsBlock';
 import UnitOfAccountSettings from '../../../components/settings/categories/general-setting/UnitOfAccountSettings';
@@ -52,7 +52,7 @@ const currencyLabels = defineMessages({
 });
 
 @observer
-export default class GeneralSettingsPage extends Component<InjectedProps> {
+export default class GeneralSettingsPage extends Component<StoresAndActionsProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };

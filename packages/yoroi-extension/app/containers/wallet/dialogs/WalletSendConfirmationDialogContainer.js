@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import type { InjectedProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
 import WalletSendConfirmationDialog from '../../../components/wallet/send/WalletSendConfirmationDialog';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
@@ -19,7 +19,7 @@ type DialogProps = {|
   +unitOfAccountSetting: UnitOfAccountSettingType,
 |};
 type Props = {|
-  ...InjectedProps,
+  ...StoresAndActionsProps,
   ...DialogProps,
   +openTransactionSuccessDialog: () => void,
 |};

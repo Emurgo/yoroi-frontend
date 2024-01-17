@@ -1,7 +1,7 @@
 // @flow
 import type { Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { InjectedProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
 import { Component } from 'react';
 import { action, observable } from 'mobx';
 import { observer } from 'mobx-react';
@@ -12,7 +12,7 @@ import globalMessages from '../../../i18n/global-messages';
 import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
 
 type Props = {|
-  ...InjectedProps,
+  ...StoresAndActionsProps,
   publicDeriver: PublicDeriver<>,
 |};
 

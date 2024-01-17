@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { observable, runInAction } from 'mobx';
 import { intlShape } from 'react-intl';
 
-import type { InjectedProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import DelegationSendForm from '../../../components/wallet/send/DelegationSendForm';
 import LocalizableError from '../../../i18n/LocalizableError';
@@ -39,7 +39,7 @@ import {
 } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 
 type Props = {|
-  ...InjectedProps,
+  ...StoresAndActionsProps,
   urlTemplate: ?string,
 |};
 type InjectedLayoutProps = {|

@@ -1,7 +1,7 @@
 // @flow
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { Node } from 'react';
-import type { InjectedProps } from '../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../types/injectedPropsType';
 import type { ConceptualWalletSettingsCache } from '../stores/toplevel/WalletSettingsStore';
 import { Component } from 'react';
 import { intlShape } from 'react-intl';
@@ -23,7 +23,7 @@ import BuySellAdaButton from '../components/topbar/BuySellAdaButton';
 import { ampli } from '../../ampli/index';
 
 type Props = {|
-  ...InjectedProps,
+  ...StoresAndActionsProps,
   title: Node,
   menu?: Node,
 |};

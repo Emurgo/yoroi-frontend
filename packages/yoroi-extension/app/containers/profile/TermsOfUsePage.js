@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import TermsOfUseForm from '../../components/profile/terms-of-use/TermsOfUseForm';
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedPropsType';
 import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
@@ -15,7 +15,7 @@ import IntroBanner from '../../components/profile/language-selection/IntroBanner
 import environment from '../../environment';
 
 @observer
-export default class TermsOfUsePage extends Component<InjectedProps> {
+export default class TermsOfUsePage extends Component<StoresAndActionsProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };

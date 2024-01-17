@@ -3,11 +3,11 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import ChangeWalletPasswordDialog from '../../../components/wallet/settings/ChangeWalletPasswordDialog';
-import type { InjectedProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 
 type Props = {|
-  ...InjectedProps,
+  ...StoresAndActionsProps,
   publicDeriver: PublicDeriver<>,
 |};
 

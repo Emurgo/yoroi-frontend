@@ -1,6 +1,6 @@
 // @flow
 import type { Node, ComponentType } from 'react';
-import type { InjectedProps } from '../../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../../types/injectedPropsType';
 import type { WalletType } from '../../../../components/wallet/voting/types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
@@ -17,7 +17,7 @@ import globalMessages from '../../../../i18n/global-messages';
 import CreateTxExecutingDialog from '../../../../components/wallet/voting/CreateTxExecutingDialog';
 
 type Props = {|
-  ...InjectedProps,
+  ...StoresAndActionsProps,
   +onClose: void => void,
   +walletType: WalletType,
 |};

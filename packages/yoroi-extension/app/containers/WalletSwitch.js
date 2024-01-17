@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import type { InjectedProps } from '../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../types/injectedPropsType';
 
 import TopBarLayout from '../components/layout/TopBarLayout';
 
@@ -11,7 +11,7 @@ import BannerContainer from './banners/BannerContainer';
 import NavBar from '../components/topbar/NavBar';
 
 @observer
-export default class WalletSwitch extends Component<InjectedProps> {
+export default class WalletSwitch extends Component<StoresAndActionsProps> {
 
   componentDidMount() {
     // this is a temporary state as the wallet is switching wallets.

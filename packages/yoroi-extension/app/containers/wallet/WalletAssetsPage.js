@@ -2,13 +2,13 @@
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import type { Node } from 'react';
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedPropsType';
 import { genLookupOrFail, getTokenIdentifierIfExists, getTokenStrictName } from '../../stores/stateless/tokenHelpers';
 import { splitAmount, truncateToken } from '../../utils/formatters';
 import AssetsPage from '../../components/wallet/assets/AssetsPage';
 
 @observer
-export default class WalletAssetsPage extends Component<InjectedProps> {
+export default class WalletAssetsPage extends Component<StoresAndActionsProps> {
 
   render(): Node {
     const publicDeriver = this.props.stores.wallets.selected;

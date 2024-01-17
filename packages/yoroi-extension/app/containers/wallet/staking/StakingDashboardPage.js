@@ -5,7 +5,7 @@ import { intlShape } from 'react-intl';
 import moment from 'moment';
 import { observer } from 'mobx-react';
 
-import type { InjectedProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
 import StakingDashboard from '../../../components/wallet/staking/dashboard/StakingDashboard';
 import UserSummary from '../../../components/wallet/staking/dashboard/UserSummary';
 import StakePool from '../../../components/wallet/staking/dashboard/StakePool';
@@ -39,7 +39,7 @@ import { truncateToken } from '../../../utils/formatters';
 import { generateGraphData } from '../../../utils/graph';
 
 @observer
-export default class StakingDashboardPage extends Component<InjectedProps> {
+export default class StakingDashboardPage extends Component<StoresAndActionsProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };

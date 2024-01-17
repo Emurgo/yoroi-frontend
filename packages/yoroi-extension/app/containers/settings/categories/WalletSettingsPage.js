@@ -11,7 +11,7 @@ import ExportWallet from '../../../components/wallet/settings/ExportWallet';
 import RemoveWalletDialogContainer from './RemoveWalletDialogContainer';
 import ExportWalletDialogContainer from './ExportWalletDialogContainer';
 import ResyncWalletDialogContainer from './ResyncWalletDialogContainer';
-import type { InjectedProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
 import { isValidWalletName } from '../../../utils/validations';
 import ChangeWalletPasswordDialogContainer from '../../wallet/dialogs/ChangeWalletPasswordDialogContainer';
 import { asGetSigningKey } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
@@ -22,7 +22,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 
 @observer
-export default class WalletSettingsPage extends Component<InjectedProps> {
+export default class WalletSettingsPage extends Component<StoresAndActionsProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };

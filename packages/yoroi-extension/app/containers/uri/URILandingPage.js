@@ -3,13 +3,13 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { ROUTES } from '../../routes-config';
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedPropsType';
 import URILandingDialogContainer from './URILandingDialogContainer';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { isValidReceiveAddress } from '../../api/ada/lib/storage/bridge/utils';
 
 @observer
-export default class URILandingPage extends Component<InjectedProps> {
+export default class URILandingPage extends Component<StoresAndActionsProps> {
   onClose: void => void = () => {
     this.props.actions.dialogs.closeActiveDialog.trigger();
     this.props.actions.router.goToRoute.trigger({ route: ROUTES.MY_WALLETS });

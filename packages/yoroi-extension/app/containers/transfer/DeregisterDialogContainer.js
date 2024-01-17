@@ -6,14 +6,14 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedPropsType';
 import { ComplexityLevels } from '../../types/complexityLevelType';
 import WarningBox from '../../components/widgets/WarningBox';
 
 import DangerousActionDialog from '../../components/widgets/DangerousActionDialog';
 
 type Props = {|
-  ...InjectedProps,
+  ...StoresAndActionsProps,
   +onNext: void => void,
   +alwaysShowDeregister: boolean,
 |};

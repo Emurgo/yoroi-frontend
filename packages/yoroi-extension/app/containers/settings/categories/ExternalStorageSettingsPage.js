@@ -4,10 +4,10 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { handleExternalClick } from '../../../utils/routing';
 import ExternalStorageSettings from '../../../components/settings/categories/ExternalStorageSettings';
-import type { InjectedProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
 
 @observer
-export default class ExternalStorageSettingsPage extends Component<InjectedProps> {
+export default class ExternalStorageSettingsPage extends Component<StoresAndActionsProps> {
 
   onConnect: string => void = (authorizeUrl) => {
     // Open authorize url

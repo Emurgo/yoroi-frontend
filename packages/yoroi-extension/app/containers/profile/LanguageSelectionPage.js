@@ -8,7 +8,7 @@ import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
 import TopBar from '../../components/topbar/TopBar';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import LanguageSelectionForm from '../../components/profile/language-selection/LanguageSelectionForm';
-import type { InjectedProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedPropsType';
 import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
 import IntroBanner from '../../components/profile/language-selection/IntroBanner';
@@ -24,7 +24,7 @@ const messages = defineMessages({
 });
 
 @observer
-export default class LanguageSelectionPage extends Component<InjectedProps> {
+export default class LanguageSelectionPage extends Component<StoresAndActionsProps> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
@@ -53,7 +53,7 @@ export default class LanguageSelectionPage extends Component<InjectedProps> {
     await this.props.actions.profile.commitLocaleToStorage.trigger();
   };
 
-  renderByron(props: InjectedProps): Node {
+  renderByron(props: StoresAndActionsProps): Node {
     const topBarTitle = (
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
     );
