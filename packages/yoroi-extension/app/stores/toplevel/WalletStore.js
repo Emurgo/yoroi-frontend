@@ -353,22 +353,20 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     publicDeriver: PublicDeriver<>,
     lastSyncInfo: IGetLastSyncInfoResponse,
   |}) => void = request => {
-    const apiType = getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo());
-
-    const stores = this.stores.substores[apiType];
+    const adaSubstores = this.stores.substores.ada;
     this.stores.addresses.addObservedWallet(request.publicDeriver);
     this.stores.transactions.addObservedWallet(request);
-    stores.time.addObservedTime(request.publicDeriver);
+    adaSubstores.time.addObservedTime(request.publicDeriver);
     if (asGetStakingKey(request.publicDeriver) != null) {
-      if (!stores.delegation) {
+      if (!adaSubstores.delegation) {
         throw new Error(
           `${nameof(
             this.registerObserversForNewWallet
           )} wallet has staking key but currency doesn't support delegation`
         );
       }
-      stores.delegation.addObservedWallet(request.publicDeriver);
-      stores.delegation.refreshDelegation(request.publicDeriver);
+      adaSubstores.delegation.addObservedWallet(request.publicDeriver);
+      adaSubstores.delegation.refreshDelegation(request.publicDeriver);
     }
   };
 

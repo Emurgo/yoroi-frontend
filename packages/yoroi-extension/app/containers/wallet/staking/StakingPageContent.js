@@ -76,7 +76,7 @@ class StakingPageContent extends Component<AllProps> {
   };
 
   async componentDidMount() {
-    const timeStore = this.props.stores.time;
+    const timeStore = this.props.stores.substores.ada.time;
     const publicDeriver = this.props.stores.wallets.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(StakingPageContent)} no public deriver. Should never happen`);
@@ -102,7 +102,7 @@ class StakingPageContent extends Component<AllProps> {
   };
 
   getEpochLengthInDays: (PublicDeriver<>) => ?number = publicDeriver => {
-    const timeStore = this.props.stores.time;
+    const timeStore = this.props.stores.substores.ada.time;
     const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
     const getEpochLength = timeCalcRequests.requests.currentEpochLength.result;
     if (getEpochLength == null) return null;
@@ -182,7 +182,7 @@ class StakingPageContent extends Component<AllProps> {
         graphData={generateGraphData({
           delegationRequests: request.delegationRequests,
           publicDeriver: request.publicDeriver,
-          currentEpoch: stores.time.getCurrentTimeRequests(request.publicDeriver).currentEpoch,
+          currentEpoch: stores.substores.ada.time.getCurrentTimeRequests(request.publicDeriver).currentEpoch,
           shouldHideBalance: stores.profile.shouldHideBalance,
           getLocalPoolInfo: stores.delegation.getLocalPoolInfo,
           tokenInfo: stores.tokenInfoStore.tokenInfo,
@@ -253,7 +253,7 @@ class StakingPageContent extends Component<AllProps> {
   };
 
   getEpochProgress: (PublicDeriver<>) => Node | void = publicDeriver => {
-    const timeStore = this.props.stores.time;
+    const timeStore = this.props.stores.substores.ada.time;
     const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
     const currTimeRequests = timeStore.getCurrentTimeRequests(publicDeriver);
     const toAbsoluteSlot = timeCalcRequests.requests.toAbsoluteSlot.result;
@@ -445,7 +445,7 @@ class StakingPageContent extends Component<AllProps> {
             graphData={generateGraphData({
               delegationRequests,
               publicDeriver,
-              currentEpoch: stores.time.getCurrentTimeRequests(publicDeriver).currentEpoch,
+              currentEpoch: stores.substores.ada.time.getCurrentTimeRequests(publicDeriver).currentEpoch,
               shouldHideBalance: stores.profile.shouldHideBalance,
               getLocalPoolInfo: stores.delegation.getLocalPoolInfo,
               tokenInfo: stores.tokenInfoStore.tokenInfo,
