@@ -21,7 +21,6 @@ import {
 } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { ApiOptions, getApiForNetwork } from '../../api/common/utils';
 import { validateAmount, getMinimumValue } from '../../utils/validations';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
@@ -331,13 +330,6 @@ class WalletSendPage extends Component<AllProps> {
     const publicDeriver = this.props.stores.wallets.selected;
     if (!publicDeriver)
       throw new Error(`Active wallet required for ${nameof(this.webWalletDoConfirmation)}.`);
-    const selectedApiType = getApiForNetwork(publicDeriver.getParent().getNetworkInfo());
-
-    if (selectedApiType !== ApiOptions.ada) {
-      throw new Error(`${nameof(this.hardwareWalletDoConfirmation)} not ADA API type`);
-    }
-    const adaApi = ApiOptions.ada;
-
     const { transactionBuilderStore } = this.props.stores;
     // Guard against potential null values
     if (!publicDeriver) throw new Error('Active wallet required for hardwareWalletDoConfirmation.');
@@ -373,9 +365,9 @@ class WalletSendPage extends Component<AllProps> {
         infoLine2: globalMessages.txConfirmationLedgerNanoLine2,
         sendUsingHWButtonLabel: messages.sendUsingLedgerNano,
       };
-      const ledgerSendAction = this.props.actions[adaApi].ledgerSend;
+      const ledgerSendAction = this.props.actions.ada.ledgerSend;
       ledgerSendAction.init.trigger();
-      const ledgerSendStore = this.props.stores.substores[adaApi].ledgerSend;
+      const ledgerSendStore = this.props.stores.substores.ada.ledgerSend;
       hwSendConfirmationDialog = (
         <HWSendConfirmationDialog
           staleTx={transactionBuilderStore.txMismatch}
@@ -409,8 +401,8 @@ class WalletSendPage extends Component<AllProps> {
         infoLine2: globalMessages.txConfirmationTrezorTLine2,
         sendUsingHWButtonLabel: messages.sendUsingTrezorT,
       };
-      const trezorSendAction = this.props.actions[adaApi].trezorSend;
-      const trezorSendStore = this.props.stores.substores[adaApi].trezorSend;
+      const trezorSendAction = this.props.actions.ada.trezorSend;
+      const trezorSendStore = this.props.stores.substores.ada.trezorSend;
       hwSendConfirmationDialog = (
         <HWSendConfirmationDialog
           staleTx={transactionBuilderStore.txMismatch}

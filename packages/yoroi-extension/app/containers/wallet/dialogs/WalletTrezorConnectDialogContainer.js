@@ -12,7 +12,6 @@ import ConnectDialog from '../../../components/wallet/hwConnect/trezor/ConnectDi
 import SaveDialog from '../../../components/wallet/hwConnect/trezor/SaveDialog';
 
 import { ProgressStep } from '../../../types/HWConnectStoreTypes';
-import { getApiForNetwork, ApiOptions } from '../../../api/common/utils';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { RestoreModeType, } from '../../../actions/common/wallet-restore-actions';
 
@@ -40,22 +39,14 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
   }
 
   cancel: void => void = () => {
-    const api = getApiForNetwork(this.getSelectedNetwork());
     this.props.onClose();
-    if (api !== ApiOptions.ada) {
-      throw new Error(`${nameof(WalletTrezorConnectDialogContainer)}::${nameof(this.cancel)} not ADA API`);
-    }
-    this.props.actions[ApiOptions.ada].trezorConnect.cancel.trigger();
+    this.props.actions.ada.trezorConnect.cancel.trigger();
   };
 
   render(): null | Node {
-    const api = getApiForNetwork(this.getSelectedNetwork());
-    if (api !== ApiOptions.ada) {
-      throw new Error(`${nameof(WalletTrezorConnectDialogContainer)}::${nameof(this.render)} not ADA API`);
-    }
     const { profile } = this.props.stores;
-    const trezorConnectStore = this.props.stores.substores[ApiOptions.ada].trezorConnect;
-    const hwConnectActions = this.props.actions[ApiOptions.ada].trezorConnect;
+    const trezorConnectStore = this.props.stores.substores.ada.trezorConnect;
+    const hwConnectActions = this.props.actions.ada.trezorConnect;
 
     let component = null;
 

@@ -36,8 +36,6 @@ import { asGetPublicKey, asHasLevels, } from '../../../api/ada/lib/storage/model
 import {
   ConceptualWallet
 } from '../../../api/ada/lib/storage/models/ConceptualWallet/index';
-import { buildCheckAndCall } from '../../lib/check';
-import { getApiForNetwork, ApiOptions } from '../../../api/common/utils';
 import { HaskellShelleyTxSignRequest } from '../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type {
   Addressing,
@@ -61,27 +59,19 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
   setup(): void {
     super.setup();
     const ledgerSendAction = this.actions.ada.ledgerSend;
-
-    const { syncCheck, asyncCheck } = buildCheckAndCall(
-      ApiOptions.ada,
-      () => {
-        if (this.stores.profile.selectedNetwork == null) return undefined;
-        return getApiForNetwork(this.stores.profile.selectedNetwork);
-      }
-    );
-    ledgerSendAction.init.listen(syncCheck(this._init));
-    ledgerSendAction.sendUsingLedgerWallet.listen(asyncCheck(this._sendWrapper));
+    ledgerSendAction.init.listen(this._init);
+    ledgerSendAction.sendUsingLedgerWallet.listen(this._sendWrapper);
     ledgerSendAction.sendUsingLedgerKey.listen(
       // drop the return type
-      asyncCheck(async (request) => {
+      async (request) => {
         await this.stores.wallets.sendAndRefresh({
           publicDeriver: undefined,
           broadcastRequest: async () => await this.signAndBroadcast(request),
           refreshWallet: async () => {}
         })
-      })
+      }
     );
-    ledgerSendAction.cancel.listen(syncCheck(this._cancel));
+    ledgerSendAction.cancel.listen(this._cancel);
   }
 
   /** setup() is called when stores are being created

@@ -20,7 +20,6 @@ import YoroiTransferWaitingPage from '../../transfer/YoroiTransferWaitingPage';
 import SuccessPage from '../../../components/transfer/SuccessPage';
 import { TransferStatus } from '../../../types/TransferTypes';
 import ErrorPage from '../../../components/transfer/ErrorPage';
-import { ApiOptions, getApiForNetwork } from '../../../api/common/utils';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
 import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
@@ -250,10 +249,6 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
   }
 
   _transferDialogContent(): null | Node {
-    const selectedAPI = getApiForNetwork(this.getSelectedNetwork());
-    if (selectedAPI !== ApiOptions.ada) {
-      throw new Error(`${nameof(this._transferDialogContent)} not set to ADA API`);
-    }
     const { yoroiTransfer } = this.props.stores;
 
     const walletRestoreActions = this.props.actions.walletRestore;

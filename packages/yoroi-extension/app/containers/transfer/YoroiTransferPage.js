@@ -16,7 +16,6 @@ import { TransferStatus, } from '../../types/TransferTypes';
 import { ROUTES } from '../../routes-config';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { ApiOptions, getApiForNetwork, } from '../../api/common/utils';
 import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils';
 import { ChainDerivations } from '../../config/numbersConfig';
 import WithdrawalTxDialogContainer from './WithdrawalTxDialogContainer';
@@ -112,10 +111,6 @@ export default class YoroiTransferPage extends Component<StoresAndActionsProps> 
     const publicDeriver = this.props.stores.wallets.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(this.checkAddresses)} no wallet selected`);
-    }
-    const api = getApiForNetwork(publicDeriver.getParent().getNetworkInfo());
-    if (api !== ApiOptions.ada) {
-      throw new Error(`${nameof(YoroiTransferPage)} not ADA API type`);
     }
 
     switch (yoroiTransfer.status) {

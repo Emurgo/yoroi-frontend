@@ -24,7 +24,6 @@ import type {
   IGetLastSyncInfoResponse,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
-import { getApiForNetwork, } from '../../api/common/utils';
 import type { UnconfirmedAmount } from '../../types/unconfirmedAmountType';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
@@ -517,8 +516,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   |}) => void = (
     request
   ) => {
-    const apiType = getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo());
-
     const foundRequest = find(
       this.txHistoryStates,
       { publicDeriver: request.publicDeriver }
@@ -534,15 +531,15 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       hasMoreToLoad: true, // assuming yes until actually loaded and found otherwise
       requests: {
         headRequest: new CachedRequest<GetTransactionsFunc>(
-          this.stores.substores[apiType].transactions.refreshTransactions
+          this.stores.substores.ada.transactions.refreshTransactions
         ),
         tailRequest: new CachedRequest<GetTransactionsFunc>(
-          this.stores.substores[apiType].transactions.refreshTransactions
+          this.stores.substores.ada.transactions.refreshTransactions
         ),
         getBalanceRequest: new CachedRequest<GetBalanceFunc>(this.api.common.getBalance),
         getAssetDepositRequest: new CachedRequest<GetBalanceFunc>(this.api.common.getAssetDeposit),
         pendingRequest: new CachedRequest<RefreshPendingTransactionsFunc>(
-          this.stores.substores[apiType].transactions.refreshPendingTransactions
+          this.stores.substores.ada.transactions.refreshPendingTransactions
         ),
       },
     });

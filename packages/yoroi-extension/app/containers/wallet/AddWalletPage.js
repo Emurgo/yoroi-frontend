@@ -8,7 +8,6 @@ import { Component, lazy } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import { ROUTES } from '../../routes-config';
-import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
 import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { withLayout } from '../../styles/context/layout';
 import { Box } from '@mui/material';
@@ -82,29 +81,21 @@ class AddWalletPage extends Component<AllProps> {
       if (selectedNetwork === undefined) {
         throw new Error(`${nameof(AddWalletPage)} no API selected`);
       }
-      const api = getApiForNetwork(selectedNetwork);
       actions.dialogs.push.trigger({
         dialog: WalletTrezorConnectDialogContainer,
         params: { restoreType: { type, extra: 'trezor' } },
       });
-      if (api !== ApiOptions.ada) {
-        throw new Error(`${nameof(AddWalletPage)} not ADA API type`);
-      }
-      this.props.actions[ApiOptions.ada].trezorConnect.init.trigger();
+      this.props.actions.ada.trezorConnect.init.trigger();
     };
     const openLedgerConnectDialog = (type: string) => {
       if (selectedNetwork === undefined) {
         throw new Error(`${nameof(AddWalletPage)} no API selected`);
       }
-      const api = getApiForNetwork(selectedNetwork);
       actions.dialogs.push.trigger({
         dialog: WalletLedgerConnectDialogContainer,
         params: { restoreType: { type, extra: 'ledger' } },
       });
-      if (api !== ApiOptions.ada) {
-        throw new Error(`${nameof(AddWalletPage)} not ADA API type`);
-      }
-      this.props.actions[ApiOptions.ada].ledgerConnect.init.trigger();
+      this.props.actions.ada.ledgerConnect.init.trigger();
     };
 
     let activeDialog = null;

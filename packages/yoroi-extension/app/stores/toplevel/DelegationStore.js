@@ -15,7 +15,6 @@ import type {
 } from '../../api/common/lib/storage/bridge/delegationUtils';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import LocalizableError from '../../i18n/LocalizableError';
-import { getApiForNetwork } from '../../api/common/utils';
 import {
   PoolMissingApiError,
 } from '../../api/common/errors';
@@ -61,9 +60,8 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     = new LocalizedRequest<Array<string> => Promise<void>>(async poolIds => {
       const { selectedNetwork } = this.stores.profile;
       if (selectedNetwork == null) throw new Error(`${nameof(DelegationStore)} no network selected`);
-      const api = getApiForNetwork(selectedNetwork);
-      if (this.stores.substores[api].delegation) {
-        await this.stores.substores[api].delegation.updatePoolInfo({
+      if (this.stores.substores.ada.delegation) {
+        await this.stores.substores.ada.delegation.updatePoolInfo({
           network: selectedNetwork,
           allPoolIds: poolIds,
         });

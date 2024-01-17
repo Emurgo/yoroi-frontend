@@ -21,7 +21,6 @@ import type { AdaStoresMap } from './ada/index';
 import { RouterStore } from 'mobx-react-router';
 import type { ActionsMap } from '../actions/index';
 import type { Api } from '../api/index';
-import { ApiOptions } from '../api/common/utils';
 import StateFetchStore from './toplevel/StateFetchStore';
 import CoinPriceStore from './toplevel/CoinPriceStore';
 import TokenInfoStore from './toplevel/TokenInfoStore';
@@ -166,7 +165,7 @@ export default (action(
     };
 
     const loadedStores: StoresMap = (stores: any);
-    initializeSubstore<AdaStoresMap>(loadedStores.substores[ApiOptions.ada]);
+    initializeSubstore<AdaStoresMap>(loadedStores.substores.ada);
 
     // Perform load after all setup is done to ensure migration can modify store state
     loadedStores.loading.load('extension');

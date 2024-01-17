@@ -13,7 +13,6 @@ import SaveDialog from '../../../components/wallet/hwConnect/ledger/SaveDialog';
 import UpgradeTxDialogContainer from '../../transfer/UpgradeTxDialogContainer';
 
 import { ProgressStep } from '../../../types/HWConnectStoreTypes';
-import { getApiForNetwork, ApiOptions } from '../../../api/common/utils';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { RestoreModeType, } from '../../../actions/common/wallet-restore-actions';
 
@@ -36,12 +35,8 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
   }
 
   cancel: (() => void) = () => {
-    const api = getApiForNetwork(this.getSelectedNetwork());
-    if (api !== ApiOptions.ada) {
-      throw new Error(`${nameof(WalletLedgerConnectDialogContainer)}::${nameof(this.cancel)} not ADA API`);
-    }
     this.props.onClose();
-    this.props.actions[ApiOptions.ada].ledgerConnect.cancel.trigger();
+    this.props.actions.ada.ledgerConnect.cancel.trigger();
   };
 
   componentDidMount() {
@@ -50,14 +45,10 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
   }
 
   render(): null | Node {
-    const api = getApiForNetwork(this.getSelectedNetwork());
-    if (api !== ApiOptions.ada) {
-      throw new Error(`${nameof(WalletLedgerConnectDialogContainer)}::${nameof(this.render)} not ADA API`);
-    }
     const { actions, stores } = this.props;
     const { profile } = this.props.stores;
-    const ledgerConnectStore = this.props.stores.substores[ApiOptions.ada].ledgerConnect;
-    const hwConnectActions = this.props.actions[ApiOptions.ada].ledgerConnect;
+    const ledgerConnectStore = this.props.stores.substores.ada.ledgerConnect;
+    const hwConnectActions = this.props.actions.ada.ledgerConnect;
 
     let component = null;
 

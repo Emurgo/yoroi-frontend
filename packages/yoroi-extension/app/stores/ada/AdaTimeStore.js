@@ -24,10 +24,6 @@ import type {
   TimeSinceGenesisFunc,
   ToRealTimeFunc,
 } from '../../api/common/lib/storage/bridge/timeUtils';
-import {
-  buildCheckAndCall,
-} from '../lib/check';
-import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
 import type { CurrentTimeRequests } from '../base/BaseCardanoTimeStore';
 import { isCardanoHaskell, getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
@@ -38,14 +34,7 @@ export default class AdaTimeStore extends BaseCardanoTimeStore {
 
   setup(): void {
     super.setup();
-    const { asyncCheck } = buildCheckAndCall(
-      ApiOptions.ada,
-      () => {
-        if (this.stores.profile.selectedNetwork == null) return undefined;
-        return getApiForNetwork(this.stores.profile.selectedNetwork);
-      }
-    );
-    this.actions.time.tick.listen(asyncCheck(this._updateTime));
+    this.actions.time.tick.listen(this._updateTime);
   }
 
   @action addObservedTime: PublicDeriver<> => void = (
