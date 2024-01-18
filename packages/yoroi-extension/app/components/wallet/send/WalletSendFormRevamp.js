@@ -590,7 +590,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
           <div className={styles.receiverStep}>
             <Box pt="10px" sx={{ position: 'relative', mt: '8px' }}>
               <TextField
-                done={this.state.domainResolverIsSuccess}
+                done={this.state.domainResolvedAddress != null}
                 isLoading={this.state.domainResolverIsLoading}
                 className="send_form_receiver"
                 {...receiverField.bind()}
