@@ -59,6 +59,7 @@ import type { SendUsingTrezorParams } from '../../../actions/ada/trezor-send-act
 import { ampli } from '../../../../ampli/index';
 import type { DomainResolverFunc, DomainResolverResponse } from '../../../stores/ada/AdaAddressesStore';
 import { isResolvableDomain } from '@yoroi/resolver';
+import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -232,6 +233,7 @@ type State = {|
   isReceiverFieldActive: boolean,
   domainResolverMessage: ?string,
   domainResolverIsLoading: boolean,
+  domainResolverIsSuccess: boolean,
 |};
 
 @observer
@@ -247,6 +249,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     isMemoFieldActive: false,
     domainResolverMessage: null,
     domainResolverIsLoading: false,
+    domainResolverIsSuccess: false,
   };
   maxStep: number = SEND_FORM_STEP.RECEIVER;
 
@@ -344,24 +347,34 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               };
 
               let domainResolverMessage;
-              const isDomainResolvable = isResolvableDomain(receiverValue);
+              let domainResolverIsSuccess = false;
+              let isDomainResolvable = false;
 
-              if (isDomainResolvable) {
-                this.setState({ domainResolverIsLoading: true });
-                const res: ?DomainResolverResponse =
-                  await this.props.resolveDomainAddress(receiverValue);
-                if (res == null) {
-                  domainResolverMessage = 'Address not found';
-                } else if (res.address != null) {
-                  receiverValue = res.address;
-                  domainResolverMessage = `Resolved ${res.nameServer}: ${truncateAddress(res.address)}`;
-                } else if (res.error === 'forbidden') {
-                  domainResolverMessage = `${res.nameServer}: access forbidden, you might need a VPN`;
-                } else {
-                  domainResolverMessage = `${res.nameServer}: unexpected error`;
+              const isMainnet = this.props.selectedNetwork.NetworkId === networks.CardanoMainnet.NetworkId;
+              if (isMainnet) {
+                isDomainResolvable = isResolvableDomain(receiverValue);
+                if (isDomainResolvable) {
+                  this.setState({ domainResolverIsLoading: true });
+                  const res: ?DomainResolverResponse =
+                    await this.props.resolveDomainAddress(receiverValue);
+                  if (res == null) {
+                    domainResolverMessage = 'Address not found';
+                  } else if (res.address != null) {
+                    receiverValue = res.address;
+                    domainResolverMessage = `Resolved ${res.nameServer}: ${truncateAddress(res.address)}`;
+                    domainResolverIsSuccess = true;
+                  } else if (res.error === 'forbidden') {
+                    domainResolverMessage = `${res.nameServer}: access forbidden, you might need a VPN`;
+                  } else {
+                    domainResolverMessage = `${res.nameServer}: unexpected error`;
+                  }
                 }
+                this.setState({
+                  domainResolverMessage,
+                  domainResolverIsSuccess,
+                  domainResolverIsLoading: false
+                });
               }
-              this.setState({ domainResolverMessage, domainResolverIsLoading: false });
 
               const isValid = isValidReceiveAddress(receiverValue, this.props.selectedNetwork);
               if (isValid === true) {
@@ -572,6 +585,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
           <div className={styles.receiverStep}>
             <Box pt="10px">
               <TextField
+                done={this.state.domainResolverIsSuccess}
                 isLoading={this.state.domainResolverIsLoading}
                 className="send_form_receiver"
                 {...receiverField.bind()}

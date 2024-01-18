@@ -134,7 +134,7 @@ function TextField({
             <InputAdornment position="end">
               {Boolean(error) === true && !isRevampTheme ? (
                 <ErrorIcon />
-              ) : done === true && !isRevampTheme ? (
+              ) : done === true ? (
                 <DoneIcon />
               ) : null}
             </InputAdornment>
@@ -161,6 +161,7 @@ TextField.defaultProps = {
   revamp: false,
   QRHandler: null,
   placeholder: undefined,
+  isLoading: false,
 };
 
 export default TextField;
