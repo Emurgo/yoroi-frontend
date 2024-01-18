@@ -232,8 +232,8 @@ type State = {|
   isMemoFieldActive: boolean,
   isReceiverFieldActive: boolean,
   domainResolverMessage: ?string,
+  domainResolvedAddress: ?string,
   domainResolverIsLoading: boolean,
-  domainResolverIsSuccess: boolean,
 |};
 
 @observer
@@ -248,8 +248,8 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     isReceiverFieldActive: false,
     isMemoFieldActive: false,
     domainResolverMessage: null,
+    domainResolvedAddress: null,
     domainResolverIsLoading: false,
-    domainResolverIsSuccess: false,
   };
   maxStep: number = SEND_FORM_STEP.RECEIVER;
 
@@ -334,6 +334,11 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               let receiverValue = field.value;
               if (receiverValue === '') {
                 this.props.updateReceiver();
+                this.setState({
+                  domainResolverMessage: null,
+                  domainResolvedAddress: null,
+                  domainResolverIsLoading: false
+                });
                 return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
               }
               const updateReceiver = (isValid: boolean) => {
@@ -347,7 +352,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               };
 
               let domainResolverMessage;
-              let domainResolverIsSuccess = false;
+              let domainResolvedAddress;
               let isDomainResolvable = false;
 
               const isMainnet = this.props.selectedNetwork.NetworkId === networks.CardanoMainnet.NetworkId;
@@ -361,8 +366,8 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     domainResolverMessage = 'Address not found';
                   } else if (res.address != null) {
                     receiverValue = res.address;
-                    domainResolverMessage = `Resolved ${res.nameServer}: ${truncateAddress(res.address)}`;
-                    domainResolverIsSuccess = true;
+                    domainResolvedAddress = res.address;
+                    domainResolverMessage = res.nameServer;
                   } else if (res.error === 'forbidden') {
                     domainResolverMessage = `${res.nameServer}: access forbidden, you might need a VPN`;
                   } else {
@@ -371,7 +376,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 }
                 this.setState({
                   domainResolverMessage,
-                  domainResolverIsSuccess,
+                  domainResolvedAddress,
                   domainResolverIsLoading: false
                 });
               }
@@ -583,7 +588,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
       case SEND_FORM_STEP.RECEIVER:
         return (
           <div className={styles.receiverStep}>
-            <Box pt="10px">
+            <Box pt="10px" sx={{ position: 'relative', mt: '8px' }}>
               <TextField
                 done={this.state.domainResolverIsSuccess}
                 isLoading={this.state.domainResolverIsLoading}
@@ -603,6 +608,15 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     : intl.formatMessage(messages.receiverFieldLabelInactive)
                 }
               />
+              <Typography component="div"
+                variant="caption1"
+                color={invalidMemo ? 'magenta.500' : 'grayscale.600'}
+                sx={{ position: 'absolute', bottom: '10px', right: '0' }}
+              >
+                {this.state.domainResolvedAddress
+                  ? 'Related address: ' + truncateAddress(this.state.domainResolvedAddress, 20)
+                  : null}
+              </Typography>
             </Box>
             <Box sx={{ position: 'relative', mt: '8px' }}>
               <MemoTextField

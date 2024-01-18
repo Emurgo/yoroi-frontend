@@ -87,10 +87,10 @@ export function truncateStakePool(addr: string): string {
   return truncateFormatter(addr, 18);
 }
 
-export function truncateAddress(addr: string): string {
+export function truncateAddress(addr: string, cutoff: number = 40): string {
   // needs to be enough for any bech32 prefix & header and bech32 checksum
   // 40 empirically works well with bech32 and still fits in small spaces and dialogs
-  return truncateFormatter(addr, 40);
+  return truncateFormatter(addr, cutoff);
 }
 
 /**

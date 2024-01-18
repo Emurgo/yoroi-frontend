@@ -71,9 +71,9 @@ const RESOLVER: [?{| getCardanoAddresses: ({| resolve: string |}) => Promise<any
 
 function resolveNameServerName(nameServerTag: string): string {
   switch (nameServerTag) {
-    case Resolver.NameServer.Handle: return 'AdaHandle'
+    case Resolver.NameServer.Handle: return 'ADA Handle'
     case Resolver.NameServer.Cns: return 'CNS'
-    case Resolver.NameServer.Unstoppable: return 'UnstoppableDomains'
+    case Resolver.NameServer.Unstoppable: return 'Unstoppable Domains'
     default: return nameServerTag
   }
 }
