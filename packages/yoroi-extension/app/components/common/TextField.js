@@ -8,6 +8,7 @@ import { ReactComponent as DoneIcon } from '../../assets/images/forms/done.inlin
 import { ReactComponent as EyeIcon } from '../../assets/images/forms/password-eye-close.inline.svg';
 import { ReactComponent as CloseEyeIcon } from '../../assets/images/forms/password-eye.inline.svg';
 import { ReactComponent as QRLogo } from '../../assets/images/qr-code.inline.svg';
+import LoadingSpinner from '../widgets/LoadingSpinner';
 
 type Props = {|
   error?: boolean | string,
@@ -26,6 +27,7 @@ type Props = {|
   revamp?: boolean,
   placeholder?: string,
   QRHandler?: Function,
+  isLoading?: boolean,
 |};
 
 function TextField({
@@ -45,6 +47,7 @@ function TextField({
   revamp,
   QRHandler,
   placeholder,
+  isLoading,
   ...props
 }: Props): Node {
   const theme = useTheme();
@@ -83,7 +86,14 @@ function TextField({
         ...((Boolean(revamp) ? { disableUnderline: true } : {}): any),
         ...((theme.name === 'classic' ? { notched: false } : {}): any),
         endAdornment:
-          type === 'password' ? (
+          isLoading ? (
+            <InputAdornment
+              position="end"
+              sx={{ marginTop: '-30px' }}
+            >
+              <LoadingSpinner />
+            </InputAdornment>
+          ) : (type === 'password') ? (
             <InputAdornment
               position="end"
               sx={{ minWidth: '52px', display: 'flex', justifyContent: 'flex-end' }}

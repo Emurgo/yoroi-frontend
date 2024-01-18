@@ -71,11 +71,11 @@ const messages = defineMessages({
   },
   receiverFieldLabelInactive: {
     id: 'wallet.send.form.receiver.label.inactive',
-    defaultMessage: '!!!Enter wallet address',
+    defaultMessage: '!!!Receiver address, ADA Handle, or domains',
   },
   receiverFieldLabelActive: {
     id: 'wallet.send.form.receiver.label.active',
-    defaultMessage: '!!!Receiver address',
+    defaultMessage: '!!!Receiver address, ADA Handle, or domains',
   },
   memoFieldLabelInactive: {
     id: 'wallet.send.form.memo.label.inactive',
@@ -231,6 +231,7 @@ type State = {|
   isMemoFieldActive: boolean,
   isReceiverFieldActive: boolean,
   domainResolverMessage: ?string,
+  domainResolverIsLoading: boolean,
 |};
 
 @observer
@@ -245,6 +246,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     isReceiverFieldActive: false,
     isMemoFieldActive: false,
     domainResolverMessage: null,
+    domainResolverIsLoading: false,
   };
   maxStep: number = SEND_FORM_STEP.RECEIVER;
 
@@ -345,6 +347,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               const isDomainResolvable = isResolvableDomain(receiverValue);
 
               if (isDomainResolvable) {
+                this.setState({ domainResolverIsLoading: true });
                 const res: ?DomainResolverResponse =
                   await this.props.resolveDomainAddress(receiverValue);
                 if (res == null) {
@@ -358,7 +361,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   domainResolverMessage = `${res.nameServer}: unexpected error`;
                 }
               }
-              this.setState({ domainResolverMessage });
+              this.setState({ domainResolverMessage, domainResolverIsLoading: false });
 
               const isValid = isValidReceiveAddress(receiverValue, this.props.selectedNetwork);
               if (isValid === true) {
@@ -569,6 +572,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
           <div className={styles.receiverStep}>
             <Box pt="10px">
               <TextField
+                isLoading={this.state.domainResolverIsLoading}
                 className="send_form_receiver"
                 {...receiverField.bind()}
                 error={receiverField.error}
