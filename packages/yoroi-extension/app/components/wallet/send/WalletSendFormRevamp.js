@@ -78,6 +78,14 @@ const messages = defineMessages({
     id: 'wallet.send.form.receiver.label.active',
     defaultMessage: '!!!Receiver address, ADA Handle, or domains',
   },
+  receiverFieldLabelUnresolvedAddress: {
+    id: 'wallet.send.form.receiver.label.unresolvedAddress',
+    defaultMessage: '!!!Address not found',
+  },
+  receiverFieldLabelResolvedAddress: {
+    id: 'wallet.send.form.receiver.label.resolvedAddress',
+    defaultMessage: '!!!Related address',
+  },
   memoFieldLabelInactive: {
     id: 'wallet.send.form.memo.label.inactive',
     defaultMessage: '!!!Enter memo',
@@ -231,8 +239,12 @@ type State = {|
   invalidMemo: boolean,
   isMemoFieldActive: boolean,
   isReceiverFieldActive: boolean,
+  domainResolverResult: ?{|
+    nameServer: string,
+    handle: string,
+    address: string,
+  |},
   domainResolverMessage: ?string,
-  domainResolvedAddress: ?string,
   domainResolverIsLoading: boolean,
 |};
 
@@ -247,8 +259,8 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     currentStep: SEND_FORM_STEP.RECEIVER,
     isReceiverFieldActive: false,
     isMemoFieldActive: false,
+    domainResolverResult: null,
     domainResolverMessage: null,
-    domainResolvedAddress: null,
     domainResolverIsLoading: false,
   };
   maxStep: number = SEND_FORM_STEP.RECEIVER;
@@ -335,8 +347,8 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               if (receiverValue === '') {
                 this.props.updateReceiver();
                 this.setState({
+                  domainResolverResult: null,
                   domainResolverMessage: null,
-                  domainResolvedAddress: null,
                   domainResolverIsLoading: false
                 });
                 return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
@@ -351,23 +363,28 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 }
               };
 
-              let domainResolverMessage;
-              let domainResolvedAddress;
+              let domainResolverResult = null;
+              let domainResolverMessage = null;
               let isDomainResolvable = false;
 
               const isMainnet = this.props.selectedNetwork.NetworkId === networks.CardanoMainnet.NetworkId;
               if (isMainnet) {
                 isDomainResolvable = isResolvableDomain(receiverValue);
                 if (isDomainResolvable) {
+                  const handle = receiverValue;
                   this.setState({ domainResolverIsLoading: true });
                   const res: ?DomainResolverResponse =
                     await this.props.resolveDomainAddress(receiverValue);
                   if (res == null) {
-                    domainResolverMessage = 'Address not found';
+                    domainResolverMessage = this.context.intl
+                      .formatMessage(messages.receiverFieldLabelUnresolvedAddress);
                   } else if (res.address != null) {
                     receiverValue = res.address;
-                    domainResolvedAddress = res.address;
-                    domainResolverMessage = res.nameServer;
+                    domainResolverResult = {
+                      handle,
+                      address: res.address,
+                      nameServer: res.nameServer,
+                    };
                   } else if (res.error === 'forbidden') {
                     domainResolverMessage = `${res.nameServer}: access forbidden, you might need a VPN`;
                   } else {
@@ -375,8 +392,8 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   }
                 }
                 this.setState({
+                  domainResolverResult,
                   domainResolverMessage,
-                  domainResolvedAddress,
                   domainResolverIsLoading: false
                 });
               }
@@ -595,7 +612,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 className="send_form_receiver"
                 {...receiverField.bind()}
                 error={receiverField.error}
-                helperText={this.state.domainResolverMessage}
+                helperText={this.state.domainResolverResult?.nameServer ?? this.state.domainResolverMessage}
                 onFocus={() => {
                   this.setReceiverFieldStatus(true);
                 }}
@@ -608,15 +625,16 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     : intl.formatMessage(messages.receiverFieldLabelInactive)
                 }
               />
-              <Typography component="div"
-                variant="caption1"
-                color={invalidMemo ? 'magenta.500' : 'grayscale.600'}
-                sx={{ position: 'absolute', bottom: '10px', right: '0' }}
-              >
-                {this.state.domainResolvedAddress
-                  ? 'Related address: ' + truncateAddress(this.state.domainResolvedAddress, 20)
-                  : null}
-              </Typography>
+              {this.state.domainResolverResult ? (
+                <Typography component="div"
+                  variant="caption1"
+                  color={invalidMemo ? 'magenta.500' : 'grayscale.600'}
+                  sx={{ position: 'absolute', bottom: '10px', right: '0' }}
+                >
+                  {intl.formatMessage(messages.receiverFieldLabelResolvedAddress)}:
+                  {truncateAddress(this.state.domainResolverResult.address, 20)}
+                </Typography>
+              ) : null}
             </Box>
             <Box sx={{ position: 'relative', mt: '8px' }}>
               <MemoTextField
@@ -890,6 +908,10 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             trezorSend={this.props.trezorSend}
             selectedExplorer={this.props.selectedExplorer}
             selectedWallet={this.props.selectedWallet}
+            receiverHandle={this.state.domainResolverResult ? {
+              nameServer: this.state.domainResolverResult.nameServer,
+              handle: this.state.domainResolverResult.handle,
+            } : null}
           />
         );
       default:
