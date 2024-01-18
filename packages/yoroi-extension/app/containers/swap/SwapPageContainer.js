@@ -136,6 +136,7 @@ class SwapPageContainer extends Component<AllProps> {
         transactions: {
           balance: stores.transactions.balance,
           assetDeposit: stores.transactions.assetDeposit,
+          getBalance: stores.transactions.getBalance,
         },
       },
       actions: {

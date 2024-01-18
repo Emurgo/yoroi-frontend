@@ -15,15 +15,15 @@ export default function SelectBuyTokenFromList({ onClose }: Props): Node {
 
   const walletVerifiedAssets = useMemo(() => {
     const pt = walletAssets.find(a => a.id === '');
-    return [pt].concat(
-      onlyVerifiedTokens
-        .map(ovt => {
+    return [pt]
+      .concat(
+        onlyVerifiedTokens.map(ovt => {
           const vft = walletAssets.find(a => a.fingerprint === ovt.fingerprint);
           if (vft) return { ...ovt, ...vft };
           return ovt;
         })
-        .filter(Boolean)
-    );
+      )
+      .filter(Boolean);
   }, [onlyVerifiedTokens, walletAssets]);
 
   const { buyTokenInfoChanged, orderData, resetQuantities } = useSwap();
@@ -45,7 +45,7 @@ export default function SelectBuyTokenFromList({ onClose }: Props): Node {
     }
 
     if (shouldUpdateToken) {
-      buyTokenInfoChanged({ decimals: decimals ?? 0, id: id });
+      buyTokenInfoChanged({ decimals: decimals ?? 0, id });
       buyTouched(token);
     }
 

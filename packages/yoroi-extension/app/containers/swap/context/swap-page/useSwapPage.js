@@ -1,7 +1,8 @@
-import { useContext, useEffect, useState } from 'react';
+//@flow
+import { useContext } from 'react';
 import SwapPageContext from './context';
 
-export default function useSwapPage() {
+export default function useSwapPage(): any {
   const context = useContext(SwapPageContext);
 
   if (context === undefined) {

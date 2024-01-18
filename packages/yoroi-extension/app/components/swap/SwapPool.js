@@ -1,28 +1,28 @@
 // @flow
-import { useState } from 'react';
+// import { useState } from 'react';
 import { Box } from '@mui/material';
-import { useSwap } from '@yoroi/swap';
-import { ReactComponent as ChevronDownIcon } from '../../assets/images/revamp/icons/chevron-down.inline.svg';
-import { ReactComponent as InfoIcon } from '../../assets/images/revamp/icons/info.inline.svg';
+// import { useSwap } from '@yoroi/swap';
+// import { ReactComponent as ChevronDownIcon } from '../../assets/images/revamp/icons/chevron-down.inline.svg';
+// import { ReactComponent as InfoIcon } from '../../assets/images/revamp/icons/info.inline.svg';
 
 export default function SwapPool(): React$Node {
-  const { orderData } = useSwap();
-  const { amounts, selectedPoolCalculation: calculation } = orderData;
+  // const { orderData } = useSwap();
+  // const { amounts, selectedPoolCalculation: calculation } = orderData;
   // const {} = calculation;
 
-  const isSellPrimary = amounts.sell.tokenId === wallet.primaryTokenInfo.id;
-  // Quantities.zero case would only happen on an API error where the price in Ada of Ada were missing
-  const total = isSellPrimary
-    ? calculation.ptTotalValueSpent?.quantity ?? Quantities.zero
-    : amounts.sell.quantity;
-  const formattedSellText = `${total} ${tokenToSellName}`;
-  const formattedFeeText = `${Quantities.format(
-    Quantities.sum([cost.batcherFee.quantity, cost.frontendFeeInfo.fee.quantity]),
-    wallet.primaryTokenInfo.decimals ?? 0
-  )} ${wallet.primaryTokenInfo.ticker}`;
-  const [showFullInfo, setShowFullInfo] = useState(false);
+  // const isSellPrimary = amounts.sell.tokenId === wallet.primaryTokenInfo.id;
+  // // Quantities.zero case would only happen on an API error where the price in Ada of Ada were missing
+  // const total = isSellPrimary
+  //   ? calculation.ptTotalValueSpent?.quantity ?? Quantities.zero
+  //   : amounts.sell.quantity;
+  // const formattedSellText = `${total} ${tokenToSellName}`;
+  // const formattedFeeText = `${Quantities.format(
+  //   Quantities.sum([cost.batcherFee.quantity, cost.frontendFeeInfo.fee.quantity]),
+  //   wallet.primaryTokenInfo.decimals ?? 0
+  // )} ${wallet.primaryTokenInfo.ticker}`;
+  // const [showFullInfo, setShowFullInfo] = useState(false);
 
-  const handleShowFullInfo = () => setShowFullInfo(p => !p);
+  // const handleShowFullInfo = () => setShowFullInfo(p => !p);
 
   return (
     <Box
@@ -35,7 +35,7 @@ export default function SwapPool(): React$Node {
         p: '16px',
       }}
     >
-      <Box
+      {/* <Box
         sx={{
           display: 'flex',
           alignItems: 'center',
@@ -96,7 +96,7 @@ export default function SwapPool(): React$Node {
             <Box>{fees} ADA</Box>
           </Box>
         </Box>
-      )}
+      )} */}
     </Box>
   );
 }

@@ -1,9 +1,12 @@
 // @flow
 import type { Node } from 'react';
-import { useEffect, useState } from 'react';
+import {
+  // useEffect,
+  useState,
+} from 'react';
 import { Box, Button } from '@mui/material';
 import { poolList } from './mockData';
-import { useSwap, useSwapTokensOnlyVerified } from '@yoroi/swap';
+// import { useSwap, useSwapTokensOnlyVerified } from '@yoroi/swap';
 import SwapForm from './SwapForm';
 import SwapConfirmationStep from './ConfirmationStep';
 import TxSubmittedStep from './TxSubmittedStep';

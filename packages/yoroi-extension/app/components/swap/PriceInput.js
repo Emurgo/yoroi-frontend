@@ -2,9 +2,9 @@
 import type { Node } from 'react';
 import { Box, Typography } from '@mui/material';
 import type { AssetAmount } from './types';
-import { BigNumber } from 'bignumber.js';
-import { useSwap } from '@yoroi/swap';
-import { useSwapForm } from '../../containers/swap/context/swap-form';
+// import { BigNumber } from 'bignumber.js';
+// import { useSwap } from '@yoroi/swap';
+// import { useSwapForm } from '../../containers/swap/context/swap-form';
 
 type Props = {|
   label: string,
@@ -19,10 +19,10 @@ export default function PriceInput({
   quoteCurrency = {},
   readonly = false,
 }: Props): Node {
-  const { orderData } = useSwap();
+  // const { orderData } = useSwap();
   // const { sellQuantity, buyQuantity } = useSwapForm();
   // console.log('🚀 > sellQuantity, buyQuantity:', sellQuantity, buyQuantity)
-  const selectedPoolCalculation = orderData.selectedPoolCalculation || {};
+  // const selectedPoolCalculation = orderData.selectedPoolCalculation || {};
   return (
     <Box
       component="fieldset"

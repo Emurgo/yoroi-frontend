@@ -12,27 +12,20 @@ type Props = {|
   onAssetSelect: function,
   handleAmountChange: function,
   showMax?: boolean,
-  image?: Node | null,
-  isFrom?: boolean,
   value?: string,
-  touched: boolean,
-  inputRef: any | null,
+  touched?: boolean,
+  inputRef?: any | null,
   error: string | null,
 |};
 
 export default function SwapInput({
   label,
-  isFrom = false,
   showMax = false,
-  image = null,
   onAssetSelect,
   error = '',
   handleAmountChange,
   value,
   amount,
-  touched,
-  inputRef,
-  inputEditable = true,
 }: Props): Node {
   const { amount: quantity = undefined, ...rest } = amount;
 
@@ -106,7 +99,7 @@ export default function SwapInput({
               sx={{ overflowY: 'hidden', '& > svg': { width: '100%', height: '100%' } }}
             >
               {rest.image ? (
-                <img src={rest.image} width="100%" /> || <DefaultTokenImage />
+                <img src={rest.image} alt="" width="100%" /> || <DefaultTokenImage />
               ) : (
                 <DefaultTokenImage />
               )}
