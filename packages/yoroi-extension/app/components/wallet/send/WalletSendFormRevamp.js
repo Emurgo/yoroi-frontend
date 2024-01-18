@@ -601,18 +601,19 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     const showFiat =
       this.props.unitOfAccountSetting.enabled && this.props.unitOfAccountSetting.currency;
 
+    const domainResolverResult = this.state.domainResolverResult;
     switch (step) {
       case SEND_FORM_STEP.RECEIVER:
         return (
           <div className={styles.receiverStep}>
             <Box pt="10px" sx={{ position: 'relative', mt: '8px' }}>
               <TextField
-                done={this.state.domainResolvedAddress != null}
+                done={domainResolverResult != null}
                 isLoading={this.state.domainResolverIsLoading}
                 className="send_form_receiver"
                 {...receiverField.bind()}
                 error={receiverField.error}
-                helperText={this.state.domainResolverResult?.nameServer ?? this.state.domainResolverMessage}
+                helperText={domainResolverResult?.nameServer ?? this.state.domainResolverMessage}
                 onFocus={() => {
                   this.setReceiverFieldStatus(true);
                 }}
@@ -625,14 +626,14 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     : intl.formatMessage(messages.receiverFieldLabelInactive)
                 }
               />
-              {this.state.domainResolverResult ? (
+              {domainResolverResult != null ? (
                 <Typography component="div"
                   variant="caption1"
                   color={invalidMemo ? 'magenta.500' : 'grayscale.600'}
                   sx={{ position: 'absolute', bottom: '10px', right: '0' }}
                 >
                   {intl.formatMessage(messages.receiverFieldLabelResolvedAddress)}:
-                  {truncateAddress(this.state.domainResolverResult.address, 20)}
+                  {truncateAddress(domainResolverResult.address, 20)}
                 </Typography>
               ) : null}
             </Box>
@@ -908,9 +909,9 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             trezorSend={this.props.trezorSend}
             selectedExplorer={this.props.selectedExplorer}
             selectedWallet={this.props.selectedWallet}
-            receiverHandle={this.state.domainResolverResult ? {
-              nameServer: this.state.domainResolverResult.nameServer,
-              handle: this.state.domainResolverResult.handle,
+            receiverHandle={domainResolverResult ? {
+              nameServer: domainResolverResult.nameServer,
+              handle: domainResolverResult.handle,
             } : null}
           />
         );
