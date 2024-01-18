@@ -8,7 +8,7 @@ import assetDefault from '../../assets/images/revamp/token-default.inline.svg';
 
 type Props = {|
   label: string,
-  tokenInfo: AssetAmount,
+  tokenInfo: AssetAmount | Object,
   onAssetSelect: function,
   handleAmountChange: function,
   showMax?: boolean,

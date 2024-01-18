@@ -5,7 +5,6 @@ import {
   genLookupOrFail,
   getTokenIdentifierIfExists,
   getTokenName,
-  getTokenStrictName,
 } from '../../stores/stateless/tokenHelpers';
 import { splitAmount, truncateToken } from '../../utils/formatters';
 import useSwapPage from './context/swap-page/useSwapPage';

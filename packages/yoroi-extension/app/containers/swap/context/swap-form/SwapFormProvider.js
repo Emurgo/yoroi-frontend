@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import type { SwapFormState, SwapFormAction } from './types';
 import type { AssetAmount } from '../../../../components/swap/types';
 import { SwapFormActionTypeValues } from './types';
-import { useCallback, useMemo, useReducer } from 'react';
+import { useCallback, useReducer } from 'react';
 import { useSwap } from '@yoroi/swap';
 // import { Quantities } from '../../../../utils/quantities';
 import Context from './context';
@@ -67,14 +67,12 @@ export default function SwapFormProvider({ initialSwapFormProvider, children }: 
         draft.buyTokenInfo = action.token;
         break;
       case SwapFormActionTypeValues.SwitchTouched:
-        const sellTokenInfo = { ...state.sellTokenInfo };
-        const buyTokenInfo = { ...state.buyTokenInfo };
         draft.sellQuantity.isTouched = state.buyQuantity.isTouched;
         draft.buyQuantity.isTouched = state.sellQuantity.isTouched;
         draft.sellQuantity.displayValue = state.buyQuantity.displayValue;
         draft.buyQuantity.displayValue = state.sellQuantity.displayValue;
-        draft.buyTokenInfo = sellTokenInfo;
-        draft.sellTokenInfo = buyTokenInfo;
+        draft.buyTokenInfo = { ...state.sellTokenInfo };
+        draft.sellTokenInfo = { ...state.buyTokenInfo };
         draft.sellQuantity.error = null;
         draft.buyQuantity.error = null;
         break;
@@ -88,10 +86,10 @@ export default function SwapFormProvider({ initialSwapFormProvider, children }: 
         draft.canSwap = action.canSwap ?? false;
         break;
       case SwapFormActionTypeValues.SellInputValueChanged:
-        if (state.sellQuantity.isTouched) draft.sellQuantity.displayValue = action.value || '';
+        draft.sellQuantity.displayValue = (state.sellQuantity.isTouched && action.value) || '';
         break;
       case SwapFormActionTypeValues.BuyInputValueChanged:
-        if (state.buyQuantity.isTouched) draft.buyQuantity.displayValue = action.value || '';
+        draft.buyQuantity.displayValue = (state.buyQuantity.isTouched && action.value) || '';
         break;
       case SwapFormActionTypeValues.LimitPriceInputValueChanged:
         draft.limitPrice.displayValue = action.value || '';
@@ -141,9 +139,9 @@ export default function SwapFormProvider({ initialSwapFormProvider, children }: 
       dispatch({ type: SwapFormActionTypeValues.SellInputValueChanged, value }),
     limitPriceInputValueChanged: (value: string) =>
       dispatch({ type: SwapFormActionTypeValues.LimitPriceInputValueChanged, value }),
-    buyAmountErrorChanged: (error: string | undefined) =>
+    buyAmountErrorChanged: (error: string | null) =>
       dispatch({ type: SwapFormActionTypeValues.BuyAmountErrorChanged, error }),
-    sellAmountErrorChanged: (error: string | undefined) =>
+    sellAmountErrorChanged: (error: string | null) =>
       dispatch({ type: SwapFormActionTypeValues.SellAmountErrorChanged, error }),
   };
 
