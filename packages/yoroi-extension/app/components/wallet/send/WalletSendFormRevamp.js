@@ -22,6 +22,7 @@ import type { TokenRow, NetworkRow } from '../../../api/ada/lib/storage/database
 import {
   formattedAmountToBigNumber,
   formattedAmountToNaturalUnits,
+  truncateAddress,
   truncateToken,
 } from '../../../utils/formatters';
 import config from '../../../config';
@@ -56,9 +57,8 @@ import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver
 import type { SendUsingLedgerParams } from '../../../actions/ada/ledger-send-actions';
 import type { SendUsingTrezorParams } from '../../../actions/ada/trezor-send-actions';
 import { ampli } from '../../../../ampli/index';
-import { resolverApiMaker } from '@yoroi/resolver';
-import { Resolver } from '@yoroi/types';
-import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
+import type { DomainResolverFunc, DomainResolverResponse } from '../../../stores/ada/AdaAddressesStore';
+import { isResolvableDomain } from '@yoroi/resolver';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -136,6 +136,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
+  +resolveDomainAddress: DomainResolverFunc,
   +selectedNetwork: $ReadOnly<NetworkRow>,
   +selectedWallet: PublicDeriver<>,
   +selectedExplorer: Map<number, SelectedExplorer>,
@@ -229,6 +230,7 @@ type State = {|
   invalidMemo: boolean,
   isMemoFieldActive: boolean,
   isReceiverFieldActive: boolean,
+  domainResolverMessage: ?string,
 |};
 
 @observer
@@ -242,6 +244,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     currentStep: SEND_FORM_STEP.RECEIVER,
     isReceiverFieldActive: false,
     isMemoFieldActive: false,
+    domainResolverMessage: null,
   };
   maxStep: number = SEND_FORM_STEP.RECEIVER;
 
@@ -301,15 +304,6 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
         amountField.set('value', formatValue(relatedEntry));
       }
     );
-
-    this.resolverApi = resolverApiMaker({
-      apiConfig: {
-        [Resolver.NameServer.Unstoppable]: {
-          apiKey: 'czsajliz-wxgu6tujd1zqq7hey_pclfqhdjsqolsxjfsurgh',
-        },
-      },
-      cslFactory: RustModule.CrossCsl.init,
-    });
   }
 
   componentWillUnmount(): void {
@@ -332,7 +326,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
           value: this.props.uriParams ? this.props.uriParams.address : '',
           validators: [
             async ({ field }) => {
-              const receiverValue = field.value;
+              let receiverValue = field.value;
               if (receiverValue === '') {
                 this.props.updateReceiver();
                 return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
@@ -347,17 +341,35 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 }
               };
 
-              const resolve = receiverValue;
-              const res = await this.resolverApi.getCardanoAddresses({ resolve, strategy: 'first' });
-              console.log('>>>> ', resolve, res);
+              let domainResolverMessage;
+              const isDomainResolvable = isResolvableDomain(receiverValue);
+
+              if (isDomainResolvable) {
+                const res: ?DomainResolverResponse =
+                  await this.props.resolveDomainAddress(receiverValue);
+                if (res == null) {
+                  domainResolverMessage = 'Address not found';
+                } else if (res.address != null) {
+                  receiverValue = res.address;
+                  domainResolverMessage = `Resolved ${res.nameServer}: ${truncateAddress(res.address)}`;
+                } else if (res.error === 'forbidden') {
+                  domainResolverMessage = `${res.nameServer}: access forbidden, you might need a VPN`;
+                } else {
+                  domainResolverMessage = `${res.nameServer}: unexpected error`;
+                }
+              }
+              this.setState({ domainResolverMessage });
 
               const isValid = isValidReceiveAddress(receiverValue, this.props.selectedNetwork);
               if (isValid === true) {
                 updateReceiver(true);
-                return [isValid];
+                return [isValid, 'qwe'];
               }
               updateReceiver(isValid[0]);
-              return [isValid[0], this.context.intl.formatMessage(isValid[1])];
+              const fieldError = isDomainResolvable
+                ? domainResolverMessage
+                : this.context.intl.formatMessage(isValid[1]);
+              return [isValid[0], fieldError];
             },
           ],
         },
@@ -560,7 +572,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 className="send_form_receiver"
                 {...receiverField.bind()}
                 error={receiverField.error}
-                helperText=" "
+                helperText={this.state.domainResolverMessage}
                 onFocus={() => {
                   this.setReceiverFieldStatus(true);
                 }}

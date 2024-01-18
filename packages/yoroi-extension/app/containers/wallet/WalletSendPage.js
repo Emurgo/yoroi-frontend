@@ -48,6 +48,7 @@ import { withLayout } from '../../styles/context/layout';
 import AddNFTDialog from '../../components/wallet/send/WalletSendFormSteps/AddNFTDialog';
 import AddTokenDialog from '../../components/wallet/send/WalletSendFormSteps/AddTokenDialog';
 import { ampli } from '../../../ampli/index';
+import type { DomainResolverFunc } from '../../stores/ada/AdaAddressesStore';
 
 const messages = defineMessages({
   txConfirmationLedgerNanoLine1: {
@@ -176,6 +177,7 @@ class WalletSendPage extends Component<AllProps> {
       return (
         <>
           <WalletSendFormRevamp
+            resolveDomainAddress={this.generated.stores.substores.ada.addresses.resolveDomainAddress}
             selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
             selectedWallet={publicDeriver}
             selectedExplorer={this.generated.stores.explorers.selectedExplorer}
@@ -736,6 +738,9 @@ class WalletSendPage extends Component<AllProps> {
       |},
       substores: {|
         ada: {|
+          addresses: {|
+            resolveDomainAddress: DomainResolverFunc,
+          |},
           ledgerSend: {|
             error: ?LocalizableError,
             isActionProcessing: boolean,
@@ -836,6 +841,9 @@ class WalletSendPage extends Component<AllProps> {
         },
         substores: {
           ada: {
+            addresses: {
+              resolveDomainAddress: adaStore.addresses.resolveDomainAddress,
+            },
             ledgerSend: {
               isActionProcessing: adaStore.ledgerSend.isActionProcessing,
               error: adaStore.ledgerSend.error,

@@ -18,6 +18,9 @@ import {
 } from '../../api/ada/lib/storage/bridge/delegationUtils';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import { isResolvableDomain, resolverApiMaker } from '@yoroi/resolver';
+import { Api, Resolver } from '@yoroi/types';
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
 export async function filterMangledAddresses(request: {|
   publicDeriver: PublicDeriver<>,
@@ -54,7 +57,74 @@ export async function filterMangledAddresses(request: {|
   }));
 }
 
+export type DomainResolverResponseError = 'forbidden' | 'unexpected';
+
+export type DomainResolverResponse = {|
+  nameServer: string,
+  address: ?string,
+  error: ?DomainResolverResponseError,
+|};
+
+export type DomainResolverFunc = string => Promise<?DomainResolverResponse>;
+
+const RESOLVER: [?{| getCardanoAddresses: ({| resolve: string |}) => Promise<any> |}] = [null];
+
+function resolveNameServerName(nameServerTag: string): string {
+  switch (nameServerTag) {
+    case Resolver.NameServer.Handle: return 'AdaHandle'
+    case Resolver.NameServer.Cns: return 'CNS'
+    case Resolver.NameServer.Unstoppable: return 'UnstoppableDomains'
+    default: return nameServerTag
+  }
+}
+
 export default class AdaAddressesStore extends Store<StoresMap, ActionsMap> {
+
+  setup(): void {
+    super.setup();
+    RESOLVER[0] = resolverApiMaker({
+      apiConfig: {
+        [Resolver.NameServer.Unstoppable]: {
+          apiKey: 'czsajliz-wxgu6tujd1zqq7hey_pclfqhdjsqolsxjfsurgh',
+        },
+      },
+      cslFactory: RustModule.CrossCsl.init,
+    });
+  }
+
+  async resolveDomainAddress(resolve: string): Promise<?DomainResolverResponse> {
+    if (RESOLVER[0] == null || !isResolvableDomain(resolve)) {
+      return Promise.resolve(null);
+    }
+    const res = await RESOLVER[0].getCardanoAddresses({ resolve });
+    let resultSuccess: ?DomainResolverResponse = null;
+    let resultForbidden: ?DomainResolverResponse = null;
+    let resultUnexpected: ?DomainResolverResponse = null;
+    res.forEach(({  nameServer, address, error  }) => {
+      const resolvedNameServer = resolveNameServerName(nameServer);
+      if (address != null) {
+        if (resultSuccess == null) {
+          resultSuccess = { nameServer: resolvedNameServer, address, error: null };
+        }
+      } else if (
+        error instanceof Resolver.Errors.InvalidDomain
+        || error instanceof Resolver.Errors.UnsupportedTld
+        || error instanceof Resolver.Errors.NotFound
+      ) {
+        // ignore
+      } else if (error instanceof Api.Errors.Forbidden) {
+        if (resultForbidden == null) {
+          resultForbidden = { nameServer: resolvedNameServer, error: 'forbidden', address: null };
+        }
+      } else {
+        if (resultUnexpected == null) {
+          resultUnexpected = { nameServer: resolvedNameServer, error: 'unexpected', address: null };
+        }
+        console.error(`Error resolving domain address @ ${nameServer}`, error)
+      }
+    });
+    return Promise.resolve(resultSuccess ?? resultForbidden ?? resultUnexpected ?? null);
+  }
 
   storewiseFilter: {|
     publicDeriver: PublicDeriver<>,
