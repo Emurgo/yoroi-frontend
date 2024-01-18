@@ -50,7 +50,7 @@ export default function SelectBuyTokenFromList({ onClose }: Props): Node {
     }
 
     if (shouldUpdateToken) {
-      buyTokenInfoChanged({ decimals: decimals ?? 0, id: id });
+      buyTokenInfoChanged({ decimals: decimals ?? 0, id });
       buyTouched(token);
     }
 

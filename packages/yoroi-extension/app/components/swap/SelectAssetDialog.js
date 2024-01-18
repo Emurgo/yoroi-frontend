@@ -2,17 +2,15 @@
 import type { AssetAmount } from './types';
 import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
-import { ReactComponent as AssetDefault } from '../../assets/images/revamp/asset-default.inline.svg';
-import assetDefault from '../../assets/images/revamp/asset-default.inline.svg';
 import { ReactComponent as NoAssetsFound } from '../../assets/images/revamp/no-assets-found.inline.svg';
 import { ReactComponent as SearchIcon } from '../../assets/images/revamp/icons/search.inline.svg';
 import { ReactComponent as WalletIcon } from '../../assets/images/revamp/icons/wallet.inline.svg';
 import { ReactComponent as ArrowTopIcon } from '../../assets/images/revamp/icons/arrow-top.inline.svg';
 import { ReactComponent as ArrowBottomIcon } from '../../assets/images/revamp/icons/arrow-bottom.inline.svg';
 import { truncateAddressShort } from '../../utils/formatters';
+import assetDefault from '../../assets/images/revamp/asset-default.inline.svg';
 import Dialog from '../widgets/Dialog';
 import Table from '../common/table/Table';
-import { useSwapTokensOnlyVerified } from '@yoroi/swap';
 
 const fromTemplateColumns = '1fr minmax(auto, 136px)';
 const toTemplateColumns = '1fr minmax(auto, 152px) minmax(auto, 136px)';
@@ -34,15 +32,11 @@ export default function SelectAssetDialog({
   onClose,
 }: Props): React$Node {
   const [searchTerm, setSearchTerm] = useState('');
-  // <TODO:CHECK_LINT>
-  // eslint-disable-next-line no-unused-vars
-  const [sortBy, setSortBy] = useState('');
+  // const [sortBy, setSortBy] = useState('');
 
-  // <TODO:CHECK_LINT>
-  // eslint-disable-next-line no-unused-vars
-  const handleSortBy = sort => {
-    setSortBy(sort);
-  };
+  // const handleSortBy = sort => {
+  //   setSortBy(sort);
+  // };
 
   const handleAssetSelected = asset => {
     onAssetSelected(asset);
@@ -203,18 +197,14 @@ const AssetAndAmountRow = ({
           flexShrink="0"
           borderRadius="8px"
         >
-          {imgSrc ? (
-            <img
-              width="100%"
-              src={imgSrc}
-              alt={name}
-              onError={e => {
-                e.target.src = assetDefault;
-              }}
-            />
-          ) : (
-            <AssetDefault />
-          )}
+          <img
+            width="100%"
+            src={imgSrc}
+            alt={name}
+            onError={e => {
+              e.target.src = assetDefault;
+            }}
+          />
         </Box>
         <Box flexGrow="1" width="100%">
           <Box display="flex" alignItems="center" gap="8px">
@@ -287,7 +277,7 @@ const AssetAndAmountRow = ({
           </Typography>
           {usdPrice && (
             <Typography component="div" variant="body2" color="grayscale.600">
-              {(amount * usdPrice).toFixed(2)} USD
+              {(Number(amount) * usdPrice).toFixed(2)} USD
             </Typography>
           )}
         </Box>

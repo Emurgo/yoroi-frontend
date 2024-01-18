@@ -1,24 +1,24 @@
 // @flow
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import { ReactComponent as SwitchIcon } from '../../../assets/images/revamp/icons/switch.inline.svg';
 import { ReactComponent as InfoIcon } from '../../../assets/images/revamp/icons/info.inline.svg';
 import { ReactComponent as EditIcon } from '../../../assets/images/revamp/icons/edit.inline.svg';
 import { ReactComponent as RefreshIcon } from '../../../assets/images/revamp/icons/refresh.inline.svg';
-import { ReactComponent as DefaultToken } from '../../../assets/images/revamp/token-default.inline.svg';
-import { defaultFromAsset, defaultToAsset, fromAssets, poolList, toAssets } from './mockData';
-import SwapInput from '../../../components/swap/SwapInput';
+// import { ReactComponent as DefaultToken } from '../../../assets/images/revamp/token-default.inline.svg';
+// import { defaultFromAsset, defaultToAsset, fromAssets, poolList, toAssets } from './mockData';
+// import SwapInput from '../../../components/swap/SwapInput';
 import PriceInput from '../../../components/swap/PriceInput';
-import SelectAssetDialog from '../../../components/swap/SelectAssetDialog';
+// import SelectAssetDialog from '../../../components/swap/SelectAssetDialog';
 import SlippageDialog from '../../../components/swap/SlippageDialog';
-import SelectPoolDialog from '../../../components/swap/SelectPoolDialog';
-import SwapPool from '../../../components/swap/SwapPool';
+// import SelectPoolDialog from '../../../components/swap/SelectPoolDialog';
+// import SwapPool from '../../../components/swap/SwapPool';
 import Tabs from '../../../components/common/tabs/Tabs';
 import {
-  makeLimitOrder,
-  makePossibleMarketOrder,
+  // makeLimitOrder,
+  // makePossibleMarketOrder,
   useSwap,
-  useSwapCreateOrder,
+  // useSwapCreateOrder,
   useSwapPoolsByPair,
 } from '@yoroi/swap';
 import { useSwapForm } from '../context/swap-form';
@@ -34,16 +34,20 @@ type Props = {|
 export default function SwapForm({ onLimitSwap }: Props): React$Node {
   const [openedDialog, setOpenedDialog] = useState('');
   const {
-    sellQuantity: { isTouched: isSellTouched },
-    buyQuantity: { isTouched: isBuyTouched },
-    sellAmountErrorChanged,
-    poolDefaulted,
-    canSwap,
+    // sellQuantity: { isTouched: isSellTouched },
+    // buyQuantity: { isTouched: isBuyTouched },
+    // sellAmountErrorChanged,
+    // poolDefaulted,
+    // canSwap,
     resetSwapForm,
     switchTokens,
   } = useSwapForm();
 
-  const { orderData, unsignedTxChanged, poolPairsChanged } = useSwap();
+  const {
+    orderData,
+    // unsignedTxChanged,
+    poolPairsChanged,
+  } = useSwap();
   console.log('🚀 > orderData:', orderData);
 
   useSwapPoolsByPair(
@@ -73,7 +77,7 @@ export default function SwapForm({ onLimitSwap }: Props): React$Node {
         <Box display="flex" alignItems="center" justifyContent="space-between" mb="16px">
           <Tabs
             tabs={[
-              { label: 'Market', isActive: true, onClick: () => null },
+              { label: 'Market', isActive: true, onClick: () => undefined },
               {
                 label: 'Limit',
                 isActive: false,
@@ -114,7 +118,7 @@ export default function SwapForm({ onLimitSwap }: Props): React$Node {
           <PriceInput
             // baseCurrency={fromAsset}
             // quoteCurrency={toAsset}
-            readonly={true}
+            readonly
             label="Market price"
           />
         </Box>

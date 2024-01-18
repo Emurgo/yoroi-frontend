@@ -4,7 +4,6 @@ import type { AssetAmount } from './types';
 import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { ReactComponent as ChevronDownIcon } from '../../assets/images/revamp/icons/chevron-down.inline.svg';
-import { ReactComponent as DefaultTokenImage } from '../../assets/images/revamp/token-default.inline.svg';
 import assetDefault from '../../assets/images/revamp/token-default.inline.svg';
 
 type Props = {|
@@ -13,25 +12,20 @@ type Props = {|
   onAssetSelect: function,
   handleAmountChange: function,
   showMax?: boolean,
-  isFrom?: boolean,
   value?: string,
-  touched: boolean,
-  inputRef: any | null,
+  touched?: boolean,
+  inputRef?: any | null,
   error: string | null,
 |};
 
 export default function SwapInput({
   label,
-  isFrom = false,
   showMax = false,
   onAssetSelect,
   error = '',
   handleAmountChange,
   value,
   tokenInfo,
-  touched,
-  inputRef,
-  inputEditable = true,
 }: Props): Node {
   const { amount: quantity = undefined, image, ...rest } = tokenInfo || {};
 
@@ -106,18 +100,14 @@ export default function SwapInput({
               height="24px"
               sx={{ overflowY: 'hidden', '& > svg': { width: '100%', height: '100%' } }}
             >
-              {imgSrc ? (
-                <img
-                  width="100%"
-                  src={imgSrc}
-                  alt=""
-                  onError={e => {
-                    e.target.src = assetDefault;
-                  }}
-                />
-              ) : (
-                <DefaultTokenImage />
-              )}
+              <img
+                width="100%"
+                src={imgSrc || assetDefault}
+                alt=""
+                onError={e => {
+                  e.target.src = assetDefault;
+                }}
+              />
             </Box>
             <Box width="max-content">{rest.ticker || 'Select asset'}</Box>
             <Box display="inline-flex">

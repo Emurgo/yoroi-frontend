@@ -17,7 +17,7 @@ export default function SelectSellTokenFromList({ onClose }: Props): Node {
       .map(a => {
         const vft = onlyVerifiedTokens.find(ovt => ovt.fingerprint === a.fingerprint);
         if (a.id === '' || vft) return { ...a, ...vft };
-        return false;
+        return undefined;
       })
       .filter(Boolean);
   }, [onlyVerifiedTokens, assets]);
@@ -46,7 +46,7 @@ export default function SelectSellTokenFromList({ onClose }: Props): Node {
 
     if (shouldUpdateToken) {
       sellTouched(token);
-      sellTokenInfoChanged({ id: id, decimals: decimals ?? 0 });
+      sellTokenInfoChanged({ id, decimals: decimals ?? 0 });
     }
 
     onClose();

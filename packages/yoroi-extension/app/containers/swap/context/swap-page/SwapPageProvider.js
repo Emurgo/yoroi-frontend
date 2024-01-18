@@ -1,7 +1,7 @@
 // @flow
+import type { Node } from 'react';
 import type { SwapPageState } from './types';
-import { useState, useCallback, useEffect, useMemo, useReducer } from 'react';
-import PropTypes from 'prop-types';
+import { useState } from 'react';
 import Context from './context';
 
 const defaultSwapPageState: SwapPageState = {
@@ -16,12 +16,7 @@ type Props = {|
 export default function SwapPageProvider({
   initialSwapPageState = defaultSwapPageState,
   children,
-}: Props) {
-  const [swapPageState, setState] = useState(initialSwapPageState);
+}: Props): Node {
+  const [swapPageState] = useState(initialSwapPageState);
   return <Context.Provider value={{ state: swapPageState }}>{children}</Context.Provider>;
 }
-
-SwapPageProvider.propTypes = {
-  children: PropTypes.node,
-  value: PropTypes.object,
-};

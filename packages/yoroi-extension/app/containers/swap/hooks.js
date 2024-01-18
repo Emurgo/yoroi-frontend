@@ -1,3 +1,4 @@
+//@flow
 import { useMemo } from 'react';
 import adaLogo from './mockAssets/ada.inline.svg';
 import {
@@ -9,7 +10,7 @@ import {
 import { splitAmount, truncateToken } from '../../utils/formatters';
 import useSwapPage from './context/swap-page/useSwapPage';
 
-export function useTokenInfo({ tokenId }) {
+export function useTokenInfo({ tokenId }: {| tokenId: string |}): any {
   const { spendableBalance, tokenInfo } = useSwapPage();
   const getTokenInfo = genLookupOrFail(tokenInfo);
 
@@ -20,7 +21,7 @@ export function useTokenInfo({ tokenId }) {
   return getTokenInfo(assetEntry);
 }
 
-export function useAssets() {
+export function useAssets(): Array<any> {
   const { spendableBalance, tokenInfo } = useSwapPage();
   const getTokenInfo = genLookupOrFail(tokenInfo);
 
@@ -50,7 +51,7 @@ export function useAssets() {
           kind: token.info?.IsNFT ? 'nft' : 'ft',
           amount: [beforeDecimal, afterDecimal].join(''),
           amountForSorting: shiftedAmount,
-          description: token.info?.Metadata.description,
+          description: '',
           metadatas: token.info?.Metadata,
           image: id ? '' : adaLogo,
         };

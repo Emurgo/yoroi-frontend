@@ -1,4 +1,4 @@
-// @flow
+//@flow
 import type { SwapFormContext } from './types';
 import { createContext } from 'react';
 import { defaultSwapFormState } from './SwapFormProvider';
@@ -31,5 +31,6 @@ const initialSwapFormContext: SwapFormContext = {
   onChangeLimitPrice: missingInit,
 };
 
-const context = createContext<SwapFormContext>(initialSwapFormContext);
+// $FlowFixMe
+const context = createContext(initialSwapFormContext);
 export default context;

@@ -1,5 +1,4 @@
 //@flow
-import type { Node } from 'react';
 
 export type AssetAmount = {|
   id: string,
@@ -11,4 +10,6 @@ export type AssetAmount = {|
   image: string,
   kind: string,
   ticker: string,
+  amount: string,
+  address: string,
 |};

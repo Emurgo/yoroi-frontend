@@ -1,7 +1,8 @@
-import { useContext, useEffect, useState } from 'react';
+//@flow
+import { useContext } from 'react';
 import SwapFormContext from './context';
 
-export default function useSwapForm() {
+export default function useSwapForm(): any {
   const context = useContext(SwapFormContext);
 
   if (context === undefined) {

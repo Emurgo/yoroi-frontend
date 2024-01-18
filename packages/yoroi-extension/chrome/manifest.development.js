@@ -20,7 +20,6 @@ export default (isDebug: boolean, shouldInjectConnector: boolean): * => buildMan
       'connect-src': [
         serverToPermission(Servers.Primary),
         serverToPermission(Servers.Testnet),
-        serverToPermission(Servers.Muesliswap),
       ],
       'frame-src': [
         POOLS_UI_URL_FOR_YOROI,
