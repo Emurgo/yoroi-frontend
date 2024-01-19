@@ -14,6 +14,7 @@ type Props = {|
   error?: boolean | string,
   helperText?: string,
   done?: boolean,
+  greenCheck?: boolean,
   type?: string,
   className?: string,
   value: any,
@@ -37,6 +38,7 @@ function TextField({
   error,
   helperText,
   done,
+  greenCheck,
   type,
   inputRef,
   className,
@@ -134,7 +136,7 @@ function TextField({
             <InputAdornment position="end">
               {Boolean(error) === true && !isRevampTheme ? (
                 <ErrorIcon />
-              ) : done === true ? (
+              ) : ((done === true && !isRevampTheme) || greenCheck) ? (
                 <DoneIcon />
               ) : null}
             </InputAdornment>
@@ -148,6 +150,7 @@ function TextField({
 TextField.defaultProps = {
   label: '',
   done: false,
+  greenCheck: false,
   error: '',
   helperText: ' ',
   className: '',
