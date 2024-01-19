@@ -21,7 +21,6 @@ import type { StoresMap } from '../index';
 import { isResolvableDomain, resolverApiMaker } from '@yoroi/resolver';
 import { Api, Resolver } from '@yoroi/types';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import { observable } from 'mobx';
 
 export async function filterMangledAddresses(request: {|
   publicDeriver: PublicDeriver<>,

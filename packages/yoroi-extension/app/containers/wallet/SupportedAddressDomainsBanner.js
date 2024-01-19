@@ -1,10 +1,9 @@
 // @flow
 import type { Node, ComponentType } from 'react';
 import { Box } from '@mui/system';
-import { Button, Stack, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import { injectIntl, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import globalMessages from '../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import { Resolver } from '@yoroi/types';
 import { resolveAddressDomainNameServerName } from '../../stores/ada/AdaAddressesStore';
