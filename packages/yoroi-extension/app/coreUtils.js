@@ -48,3 +48,7 @@ export function createFilterUniqueBy<T>(getter: T => any = x => x): T => boolean
     return !set.has(k) && set.add(k) && true;
   }
 }
+
+export function listValues<T>(obj: { [any]: T }): T[] {
+  return ((Object.values(obj): any): T[]);
+}

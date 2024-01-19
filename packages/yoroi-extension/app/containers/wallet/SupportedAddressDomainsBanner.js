@@ -10,6 +10,7 @@ import { Resolver } from '@yoroi/types';
 import { resolveAddressDomainNameServerName } from '../../stores/ada/AdaAddressesStore';
 import DialogCloseButton from '../../components/widgets/DialogCloseButton';
 import { CloseButton } from '../../components/widgets/Dialog';
+import { listValues } from '../../coreUtils';
 
 type Props = {|
   onClose: () => void,
@@ -27,7 +28,7 @@ const messages = defineMessages({
 });
 
 function SupportedAddressDomainsBanner({ onClose, intl }: Props & Intl): Node {
-  const nameServerNames = Object.values(Resolver.NameServer).map(resolveAddressDomainNameServerName);
+  const nameServerNames = listValues<string>(Resolver.NameServer).map(resolveAddressDomainNameServerName);
   nameServerNames.sort();
   return (
     <Box>
