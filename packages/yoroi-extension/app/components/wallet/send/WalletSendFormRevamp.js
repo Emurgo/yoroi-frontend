@@ -83,6 +83,14 @@ const messages = defineMessages({
     id: 'wallet.send.form.receiver.label.unresolvedAddress',
     defaultMessage: '!!!Address not found',
   },
+  receiverFieldLabelForbiddenAccess: {
+    id: 'wallet.send.form.receiver.label.forbiddenAccess',
+    defaultMessage: '!!!access forbidden, you might need a VPN',
+  },
+  receiverFieldLabelUnexpectedError: {
+    id: 'wallet.send.form.receiver.label.unexpectedError',
+    defaultMessage: '!!!unexpected error',
+  },
   receiverFieldLabelResolvedAddress: {
     id: 'wallet.send.form.receiver.label.resolvedAddress',
     defaultMessage: '!!!Related address',
@@ -391,9 +399,13 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                       nameServer: res.nameServer,
                     };
                   } else if (res.error === 'forbidden') {
-                    domainResolverMessage = `${res.nameServer}: access forbidden, you might need a VPN`;
+                    domainResolverMessage = `${res.nameServer}: ${
+                      this.context.intl.formatMessage(messages.receiverFieldLabelForbiddenAccess)
+                    }`;
                   } else {
-                    domainResolverMessage = `${res.nameServer}: unexpected error`;
+                    domainResolverMessage = `${res.nameServer}: ${
+                      this.context.intl.formatMessage(messages.receiverFieldLabelUnexpectedError)
+                    }`;
                   }
                 }
                 this.setState({
