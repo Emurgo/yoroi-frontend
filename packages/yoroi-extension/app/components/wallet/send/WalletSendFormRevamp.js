@@ -439,7 +439,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               const isValid = isValidReceiveAddress(receiverValue, this.props.selectedNetwork);
               if (isValid === true) {
                 updateReceiver(true);
-                return [isValid, 'qwe'];
+                return [isValid];
               }
               updateReceiver(isValid[0]);
               const fieldError = isDomainResolvable
