@@ -49,6 +49,12 @@ export function createFilterUniqueBy<T>(getter: T => any = x => x): T => boolean
   }
 }
 
+/**
+ * Calls `Object.values` and performs force type-casting.
+ *
+ * @param obj - any object
+ * @return {T[]} - the array of values force-casted as T
+ */
 export function listValues<T>(obj: { [any]: T }): T[] {
   return ((Object.values(obj): any): T[]);
 }
