@@ -22,7 +22,7 @@ import type { TokenRow, NetworkRow } from '../../../api/ada/lib/storage/database
 import {
   formattedAmountToBigNumber,
   formattedAmountToNaturalUnits,
-  truncateAddress,
+  truncateAddressShort,
   truncateToken,
 } from '../../../utils/formatters';
 import config from '../../../config';
@@ -666,7 +666,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   sx={{ position: 'absolute', bottom: '10px', right: '0' }}
                 >
                   {intl.formatMessage(messages.receiverFieldLabelResolvedAddress)}:
-                  {truncateAddress(domainResolverResult.address, 20)}
+                  {truncateAddressShort(domainResolverResult.address)}
                 </Typography>
               ) : null}
             </Box>

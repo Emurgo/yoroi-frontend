@@ -125,16 +125,20 @@ export default class AdaAddressesStore extends Store<StoresMap, ActionsMap> {
       return Promise.resolve(null);
     }
     const res = await getCardanoAddresses({ resolve });
-    let resultSuccess: ?DomainResolverResponse = null;
     let resultForbidden: ?DomainResolverResponse = null;
     let resultUnexpected: ?DomainResolverResponse = null;
-    res.forEach(({  nameServer, address, error  }) => {
+    for (const { nameServer, address, error } of res) {
       const resolvedNameServer = resolveAddressDomainNameServerName(nameServer);
       if (address != null) {
-        if (resultSuccess == null) {
-          resultSuccess = { nameServer: resolvedNameServer, address, error: null };
-        }
-      } else if (
+        // Return success right away
+        const resultSuccess: DomainResolverResponse =
+          { nameServer: resolvedNameServer, address, error: null };
+        return Promise.resolve(resultSuccess);
+      }
+      /* Non-success results are stored but not returned yet
+       * in case next iterations might have success
+       */
+      if (
         error instanceof Resolver.Errors.InvalidDomain
         || error instanceof Resolver.Errors.UnsupportedTld
         || error instanceof Resolver.Errors.NotFound
@@ -148,10 +152,10 @@ export default class AdaAddressesStore extends Store<StoresMap, ActionsMap> {
         if (resultUnexpected == null) {
           resultUnexpected = { nameServer: resolvedNameServer, error: 'unexpected', address: null };
         }
-        console.error(`Error resolving domain address @ ${nameServer}`, error)
+        console.error(`Error resolving domain address @ ${nameServer} (${error?.constructor?.name})`, error)
       }
-    });
-    return Promise.resolve(resultSuccess ?? resultForbidden ?? resultUnexpected ?? null);
+    }
+    return Promise.resolve(resultForbidden ?? resultUnexpected ?? null);
   }
 
   storewiseFilter: {|
