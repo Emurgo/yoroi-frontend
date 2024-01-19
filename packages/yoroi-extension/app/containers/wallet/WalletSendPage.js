@@ -186,7 +186,11 @@ class WalletSendPage extends Component<AllProps> {
       return (
         <>
           <WalletSendFormRevamp
-            resolveDomainAddress={this.generated.stores.substores.ada.addresses.resolveDomainAddress}
+            resolveDomainAddress={
+              this.generated.stores.substores.ada.addresses.domainResolverSupported()
+                ? this.generated.stores.substores.ada.addresses.resolveDomainAddress
+                : null
+            }
             supportedAddressDomainBannerState={{
               isDisplayed: this.showSupportedAddressDomainBanner,
               onClose: this.onSupportedAddressDomainBannerClose,
@@ -752,6 +756,7 @@ class WalletSendPage extends Component<AllProps> {
       substores: {|
         ada: {|
           addresses: {|
+            domainResolverSupported: () => boolean,
             resolveDomainAddress: DomainResolverFunc,
             getSupportedAddressDomainBannerState: () => boolean,
             setSupportedAddressDomainBannerState: (boolean) => void,
@@ -857,6 +862,8 @@ class WalletSendPage extends Component<AllProps> {
         substores: {
           ada: {
             addresses: {
+              domainResolverSupported:
+                adaStore.addresses.domainResolverSupported.bind(adaStore.addresses),
               resolveDomainAddress:
                 adaStore.addresses.resolveDomainAddress.bind(adaStore.addresses),
               getSupportedAddressDomainBannerState:

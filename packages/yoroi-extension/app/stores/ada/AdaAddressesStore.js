@@ -21,6 +21,7 @@ import type { StoresMap } from '../index';
 import { isResolvableDomain, resolverApiMaker } from '@yoroi/resolver';
 import { Api, Resolver } from '@yoroi/types';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export async function filterMangledAddresses(request: {|
   publicDeriver: PublicDeriver<>,
@@ -90,6 +91,14 @@ export default class AdaAddressesStore extends Store<StoresMap, ActionsMap> {
       },
       cslFactory: RustModule.CrossCsl.init,
     });
+  }
+
+  domainResolverSupported(): boolean {
+    const selectedWallet = this.stores.wallets.selected;
+    if (selectedWallet == null) {
+      return true;
+    }
+    return selectedWallet.getParent().getNetworkInfo().NetworkId === networks.CardanoMainnet.NetworkId;
   }
 
   getSupportedAddressDomainBannerState(): boolean {

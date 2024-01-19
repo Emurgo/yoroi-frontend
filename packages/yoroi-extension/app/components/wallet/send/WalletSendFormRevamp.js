@@ -71,12 +71,12 @@ const messages = defineMessages({
     id: 'wallet.send.form.receiver.hint',
     defaultMessage: '!!!Wallet Address',
   },
-  receiverFieldLabelInactive: {
+  receiverFieldLabelDefault: {
     id: 'wallet.send.form.receiver.label.inactive',
-    defaultMessage: '!!!Receiver address, ADA Handle, or domains',
+    defaultMessage: '!!!Receiver address',
   },
-  receiverFieldLabelActive: {
-    id: 'wallet.send.form.receiver.label.active',
+  receiverFieldLabelResolverSupported: {
+    id: 'wallet.send.form.receiver.label.resolverSupported',
     defaultMessage: '!!!Receiver address, ADA Handle, or domains',
   },
   receiverFieldLabelUnresolvedAddress: {
@@ -154,7 +154,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +resolveDomainAddress: DomainResolverFunc,
+  +resolveDomainAddress: ?DomainResolverFunc,
   +supportedAddressDomainBannerState: {|
     isDisplayed: boolean,
     onClose: () => void,
@@ -352,14 +352,13 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     let isDomainResolvable = false;
     let domainResolverMessage = null;
     let resolvedAddress = null;
-    const isMainnet = this.props.selectedNetwork.NetworkId === networks.CardanoMainnet.NetworkId;
-    if (isMainnet) {
+    const { resolveDomainAddress } = this.props;
+    if (resolveDomainAddress != null) {
       isDomainResolvable = isResolvableDomain(handle);
       let domainResolverResult = null;
       if (isDomainResolvable) {
         this.setState({ domainResolverIsLoading: true });
-        const res: ?DomainResolverResponse =
-          await this.props.resolveDomainAddress(handle);
+        const res: ?DomainResolverResponse = await resolveDomainAddress(handle);
         if (res == null) {
           domainResolverMessage = this.context.intl
             .formatMessage(messages.receiverFieldLabelUnresolvedAddress);
@@ -398,7 +397,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     {
       fields: {
         receiver: {
-          label: this.context.intl.formatMessage(messages.receiverFieldLabelInactive),
+          label: this.context.intl.formatMessage(messages.receiverFieldLabelDefault),
           placeholder: this.props.isClassicTheme
             ? this.context.intl.formatMessage(messages.receiverHint)
             : '',
@@ -640,11 +639,12 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
       this.props.unitOfAccountSetting.enabled && this.props.unitOfAccountSetting.currency;
 
     const domainResolverResult = this.state.domainResolverResult;
+    const domainResolverSupported = this.props.resolveDomainAddress != null;
     switch (step) {
       case SEND_FORM_STEP.RECEIVER:
         return (
           <div className={styles.receiverStep}>
-            {this.props.supportedAddressDomainBannerState.isDisplayed ? (
+            {(domainResolverSupported && this.props.supportedAddressDomainBannerState.isDisplayed) ? (
               <Box>
                 <SupportedAddressDomainsBanner
                   onClose={this.props.supportedAddressDomainBannerState.onClose}
@@ -666,9 +666,9 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   if (!receiverField.value) this.setReceiverFieldStatus(false);
                 }}
                 label={
-                  this.state.isReceiverFieldActive
-                    ? intl.formatMessage(messages.receiverFieldLabelActive)
-                    : intl.formatMessage(messages.receiverFieldLabelInactive)
+                  domainResolverSupported
+                    ? intl.formatMessage(messages.receiverFieldLabelResolverSupported)
+                    : intl.formatMessage(messages.receiverFieldLabelDefault)
                 }
               />
               {domainResolverResult != null ? (
