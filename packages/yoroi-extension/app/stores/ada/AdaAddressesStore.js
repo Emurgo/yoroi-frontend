@@ -67,8 +67,6 @@ export type DomainResolverResponse = {|
 
 export type DomainResolverFunc = string => Promise<?DomainResolverResponse>;
 
-const RESOLVER: [?{| getCardanoAddresses: ({| resolve: string |}) => Promise<any> |}] = [null];
-
 function resolveNameServerName(nameServerTag: string): string {
   switch (nameServerTag) {
     case Resolver.NameServer.Handle: return 'ADA Handle'
@@ -80,9 +78,11 @@ function resolveNameServerName(nameServerTag: string): string {
 
 export default class AdaAddressesStore extends Store<StoresMap, ActionsMap> {
 
+  _domainResolverApi: ?{| getCardanoAddresses: ({| resolve: string |}) => Promise<any> |} = null;
+
   setup(): void {
     super.setup();
-    RESOLVER[0] = resolverApiMaker({
+    this._domainResolverApi = resolverApiMaker({
       apiConfig: {
         [Resolver.NameServer.Unstoppable]: {
           apiKey: 'czsajliz-wxgu6tujd1zqq7hey_pclfqhdjsqolsxjfsurgh',
@@ -93,10 +93,11 @@ export default class AdaAddressesStore extends Store<StoresMap, ActionsMap> {
   }
 
   async resolveDomainAddress(resolve: string): Promise<?DomainResolverResponse> {
-    if (RESOLVER[0] == null || !isResolvableDomain(resolve)) {
+    const { getCardanoAddresses } = this._domainResolverApi ?? {};
+    if (getCardanoAddresses == null || !isResolvableDomain(resolve)) {
       return Promise.resolve(null);
     }
-    const res = await RESOLVER[0].getCardanoAddresses({ resolve });
+    const res = await getCardanoAddresses({ resolve });
     let resultSuccess: ?DomainResolverResponse = null;
     let resultForbidden: ?DomainResolverResponse = null;
     let resultUnexpected: ?DomainResolverResponse = null;

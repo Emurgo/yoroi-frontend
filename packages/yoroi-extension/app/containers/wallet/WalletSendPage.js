@@ -842,7 +842,7 @@ class WalletSendPage extends Component<AllProps> {
         substores: {
           ada: {
             addresses: {
-              resolveDomainAddress: adaStore.addresses.resolveDomainAddress,
+              resolveDomainAddress: adaStore.addresses.resolveDomainAddress.bind(adaStore.addresses),
             },
             ledgerSend: {
               isActionProcessing: adaStore.ledgerSend.isActionProcessing,
