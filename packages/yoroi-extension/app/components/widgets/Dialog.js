@@ -179,7 +179,7 @@ DialogFn.defaultProps = {
   closeOnOverlayClick: false,
 };
 
-const CloseButton = ({ onClose, closeButton }) => (
+export const CloseButton = ({ onClose, closeButton }) => (
   <Box
     sx={{
       position: 'absolute',

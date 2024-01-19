@@ -21,6 +21,7 @@ import type { StoresMap } from '../index';
 import { isResolvableDomain, resolverApiMaker } from '@yoroi/resolver';
 import { Api, Resolver } from '@yoroi/types';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import { observable } from 'mobx';
 
 export async function filterMangledAddresses(request: {|
   publicDeriver: PublicDeriver<>,
@@ -67,7 +68,7 @@ export type DomainResolverResponse = {|
 
 export type DomainResolverFunc = string => Promise<?DomainResolverResponse>;
 
-function resolveNameServerName(nameServerTag: string): string {
+export function resolveAddressDomainNameServerName(nameServerTag: string): string {
   switch (nameServerTag) {
     case Resolver.NameServer.Handle: return 'ADA Handle'
     case Resolver.NameServer.Cns: return 'CNS'
@@ -92,6 +93,24 @@ export default class AdaAddressesStore extends Store<StoresMap, ActionsMap> {
     });
   }
 
+  getSupportedAddressDomainBannerState(): boolean {
+    const selectedWallet = this.stores.wallets.selected;
+    if (selectedWallet == null) {
+      return true;
+    }
+    const id = String(selectedWallet.publicDeriverId);
+    return !this.api.localStorage.getFlag(`SupportedAddressDomainBannerState/${id}/closed`);
+  }
+
+  setSupportedAddressDomainBannerState(isDisplayed: boolean): void {
+    const selectedWallet = this.stores.wallets.selected;
+    if (selectedWallet == null) {
+      return;
+    }
+    const id = String(selectedWallet.publicDeriverId);
+    this.api.localStorage.setFlag(`SupportedAddressDomainBannerState/${id}/closed`, !isDisplayed);
+  }
+
   async resolveDomainAddress(resolve: string): Promise<?DomainResolverResponse> {
     const { getCardanoAddresses } = this._domainResolverApi ?? {};
     if (getCardanoAddresses == null || !isResolvableDomain(resolve)) {
@@ -102,7 +121,7 @@ export default class AdaAddressesStore extends Store<StoresMap, ActionsMap> {
     let resultForbidden: ?DomainResolverResponse = null;
     let resultUnexpected: ?DomainResolverResponse = null;
     res.forEach(({  nameServer, address, error  }) => {
-      const resolvedNameServer = resolveNameServerName(nameServer);
+      const resolvedNameServer = resolveAddressDomainNameServerName(nameServer);
       if (address != null) {
         if (resultSuccess == null) {
           resultSuccess = { nameServer: resolvedNameServer, address, error: null };

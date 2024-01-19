@@ -832,6 +832,7 @@
   "wallet.send.form.receiver.label.inactive": "Receiver address, ADA Handle, or domains",
   "wallet.send.form.receiver.label.unresolvedAddress": "Address not found",
   "wallet.send.form.receiver.label.resolvedAddress": "Related address",
+  "wallet.send.form.receiver.supportedAddressDomainsBanner.title": "Yoroi supports",
   "wallet.send.form.revamp.receiver.label": "Enter address",
   "wallet.send.form.revamp.transactionFee": "Transaction fee",
   "wallet.send.form.sendAll.allTokens": " + all tokens",

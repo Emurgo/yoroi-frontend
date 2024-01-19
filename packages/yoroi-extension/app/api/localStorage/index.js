@@ -38,6 +38,7 @@ const storageKeys = {
   WALLETS_NAVIGATION: networkForLocalStorage + '-WALLETS-NAVIGATION',
   SUBMITTED_TRANSACTIONS: 'submittedTransactions',
   CATALYST_ROUND_INFO: networkForLocalStorage + '-CATALYST_ROUND_INFO',
+  FLAGS: networkForLocalStorage + '-FLAGS',
   // ========== CONNECTOR   ========== //
   DAPP_CONNECTOR_WHITELIST: 'connector_whitelist',
   SELECTED_WALLET: 'SELECTED_WALLET',
@@ -296,6 +297,15 @@ export default class LocalStorageApi {
     }
   }
 
+  // ========== FLAGS ========== //
+
+  getFlag: string => boolean = (flag) => {
+    return localStorage.getItem(`${storageKeys.FLAGS}/${flag}`) === 'true';
+  }
+
+  setFlag: (string, boolean) => void = (flag, state) => {
+    localStorage.setItem(`${storageKeys.FLAGS}/${flag}`, String(state));
+  }
 
   // ========== Sort wallets - Revamp ========== //
   getWalletsNavigation: void => Promise<?WalletsNavigation> = async () => {

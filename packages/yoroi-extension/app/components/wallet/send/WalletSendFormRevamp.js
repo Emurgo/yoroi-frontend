@@ -60,6 +60,7 @@ import { ampli } from '../../../../ampli/index';
 import type { DomainResolverFunc, DomainResolverResponse } from '../../../stores/ada/AdaAddressesStore';
 import { isResolvableDomain } from '@yoroi/resolver';
 import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import SupportedAddressDomainsBanner from '../../../containers/wallet/SupportedAddressDomainsBanner';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -146,6 +147,10 @@ const messages = defineMessages({
 
 type Props = {|
   +resolveDomainAddress: DomainResolverFunc,
+  +supportedAddressDomainBannerState: {|
+    isDisplayed: boolean,
+    onClose: () => void,
+  |},
   +selectedNetwork: $ReadOnly<NetworkRow>,
   +selectedWallet: PublicDeriver<>,
   +selectedExplorer: Map<number, SelectedExplorer>,
@@ -606,6 +611,13 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
       case SEND_FORM_STEP.RECEIVER:
         return (
           <div className={styles.receiverStep}>
+            {this.props.supportedAddressDomainBannerState.isDisplayed ? (
+              <Box>
+                <SupportedAddressDomainsBanner
+                  onClose={this.props.supportedAddressDomainBannerState.onClose}
+                />
+              </Box>
+            ) : null}
             <Box pt="10px" sx={{ position: 'relative', mt: '8px' }}>
               <TextField
                 greenCheck={domainResolverResult != null}
