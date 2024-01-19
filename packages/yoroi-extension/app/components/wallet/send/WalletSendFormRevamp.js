@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { reaction } from 'mobx';
+import { action, reaction } from 'mobx';
 import { Button, Typography, TextField as MemoTextField, Box, styled } from '@mui/material';
 import TextField from '../../common/TextField';
 import { defineMessages, intlShape } from 'react-intl';
@@ -344,6 +344,55 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     }
   }
 
+  @action async resolveDomainAddress(handle: string): Promise<{|
+    isDomainResolvable: boolean,
+    domainResolverMessage: ?string,
+    resolvedAddress: ?string,
+  |}> {
+    let isDomainResolvable = false;
+    let domainResolverMessage = null;
+    let resolvedAddress = null;
+    const isMainnet = this.props.selectedNetwork.NetworkId === networks.CardanoMainnet.NetworkId;
+    if (isMainnet) {
+      isDomainResolvable = isResolvableDomain(handle);
+      let domainResolverResult = null;
+      if (isDomainResolvable) {
+        this.setState({ domainResolverIsLoading: true });
+        const res: ?DomainResolverResponse =
+          await this.props.resolveDomainAddress(handle);
+        if (res == null) {
+          domainResolverMessage = this.context.intl
+            .formatMessage(messages.receiverFieldLabelUnresolvedAddress);
+        } else if (res.address != null) {
+          resolvedAddress = res.address;
+          domainResolverResult = {
+            handle,
+            address: res.address,
+            nameServer: res.nameServer,
+          };
+        } else if (res.error === 'forbidden') {
+          domainResolverMessage = `${res.nameServer}: ${
+            this.context.intl.formatMessage(messages.receiverFieldLabelForbiddenAccess)
+          }`;
+        } else {
+          domainResolverMessage = `${res.nameServer}: ${
+            this.context.intl.formatMessage(messages.receiverFieldLabelUnexpectedError)
+          }`;
+        }
+      }
+      this.setState({
+        domainResolverResult,
+        domainResolverMessage,
+        domainResolverIsLoading: false
+      });
+    }
+    return {
+      isDomainResolvable,
+      domainResolverMessage,
+      resolvedAddress,
+    }
+  }
+
   // FORM VALIDATION
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
@@ -376,44 +425,16 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 }
               };
 
-              let domainResolverResult = null;
-              let domainResolverMessage = null;
-              let isDomainResolvable = false;
-
-              const isMainnet = this.props.selectedNetwork.NetworkId === networks.CardanoMainnet.NetworkId;
-              if (isMainnet) {
-                isDomainResolvable = isResolvableDomain(receiverValue);
-                if (isDomainResolvable) {
-                  const handle = receiverValue;
-                  this.setState({ domainResolverIsLoading: true });
-                  const res: ?DomainResolverResponse =
-                    await this.props.resolveDomainAddress(receiverValue);
-                  if (res == null) {
-                    domainResolverMessage = this.context.intl
-                      .formatMessage(messages.receiverFieldLabelUnresolvedAddress);
-                  } else if (res.address != null) {
-                    receiverValue = res.address;
-                    domainResolverResult = {
-                      handle,
-                      address: res.address,
-                      nameServer: res.nameServer,
-                    };
-                  } else if (res.error === 'forbidden') {
-                    domainResolverMessage = `${res.nameServer}: ${
-                      this.context.intl.formatMessage(messages.receiverFieldLabelForbiddenAccess)
-                    }`;
-                  } else {
-                    domainResolverMessage = `${res.nameServer}: ${
-                      this.context.intl.formatMessage(messages.receiverFieldLabelUnexpectedError)
-                    }`;
-                  }
-                }
-                this.setState({
-                  domainResolverResult,
-                  domainResolverMessage,
-                  domainResolverIsLoading: false
-                });
+              // DOMAIN RESOLVER
+              const {
+                isDomainResolvable,
+                domainResolverMessage,
+                resolvedAddress,
+              } = await this.resolveDomainAddress(receiverValue);
+              if (resolvedAddress != null) {
+                receiverValue = resolvedAddress;
               }
+              ////////////////////
 
               const isValid = isValidReceiveAddress(receiverValue, this.props.selectedNetwork);
               if (isValid === true) {
@@ -471,7 +492,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
         showErrorsOnInit: this.props.uriParams,
         validateOnBlur: false,
         validateOnChange: true,
-        validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
+        validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT_LONGER,
       },
       plugins: {
         vjf: vjf(),

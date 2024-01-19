@@ -33,6 +33,7 @@ export default Object.freeze({
     }
   }),
   forms: Object.freeze({
-    FORM_VALIDATION_DEBOUNCE_WAIT: 1000
+    FORM_VALIDATION_DEBOUNCE_WAIT: 500,
+    FORM_VALIDATION_DEBOUNCE_WAIT_LONGER: 1000,
   }),
 });
