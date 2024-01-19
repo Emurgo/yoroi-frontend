@@ -59,7 +59,6 @@ import type { SendUsingTrezorParams } from '../../../actions/ada/trezor-send-act
 import { ampli } from '../../../../ampli/index';
 import type { DomainResolverFunc, DomainResolverResponse } from '../../../stores/ada/AdaAddressesStore';
 import { isResolvableDomain } from '@yoroi/resolver';
-import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import SupportedAddressDomainsBanner from '../../../containers/wallet/SupportedAddressDomainsBanner';
 
 const messages = defineMessages({
@@ -251,7 +250,6 @@ type State = {|
   currentStep: number,
   invalidMemo: boolean,
   isMemoFieldActive: boolean,
-  isReceiverFieldActive: boolean,
   domainResolverResult: ?{|
     nameServer: string,
     handle: string,
@@ -270,7 +268,6 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
   state: State = {
     invalidMemo: false,
     currentStep: SEND_FORM_STEP.RECEIVER,
-    isReceiverFieldActive: false,
     isMemoFieldActive: false,
     domainResolverResult: null,
     domainResolverMessage: null,
@@ -507,13 +504,10 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     return info.Metadata.numberOfDecimals;
   }
 
-  setReceiverFieldStatus: boolean => void = isReceiverFieldActive => {
-    this.setState({ isReceiverFieldActive });
-  };
-
   setMemoFieldStatus: boolean => void = isMemoFieldActive => {
     this.setState({ isMemoFieldActive });
   };
+
   getTokensAndNFTs: MultiToken => [
     FormattedTokenDisplay[],
     FormattedNFTDisplay[]
@@ -659,12 +653,6 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 {...receiverField.bind()}
                 error={receiverField.error}
                 helperText={domainResolverResult?.nameServer ?? this.state.domainResolverMessage}
-                onFocus={() => {
-                  this.setReceiverFieldStatus(true);
-                }}
-                onBlur={() => {
-                  if (!receiverField.value) this.setReceiverFieldStatus(false);
-                }}
                 label={
                   domainResolverSupported
                     ? intl.formatMessage(messages.receiverFieldLabelResolverSupported)
