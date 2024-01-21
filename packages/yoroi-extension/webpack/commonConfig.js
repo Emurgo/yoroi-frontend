@@ -199,8 +199,8 @@ const resolve = () /*: * */ => ({
     zlib: require.resolve('browserify-zlib'),
     crypto: require.resolve('crypto-browserify'),
     buffer: require.resolve('buffer'),
-    util: require.resolve('util/'),
     assert: require.resolve('assert/'),
+    util: require.resolve('util/'),
   },
   alias: { process: 'process/browser', }
 });

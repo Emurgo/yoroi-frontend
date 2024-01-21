@@ -49,6 +49,9 @@ import { ApiOptions, getApiForNetwork } from '../../../api/common/utils';
 import RewardHistoryDialog from '../../../components/wallet/staking/dashboard-revamp/RewardHistoryDialog';
 import DelegatedStakePoolCard from '../../../components/wallet/staking/dashboard-revamp/DelegatedStakePoolCard';
 import WithdrawRewardsDialog from './WithdrawRewardsDialog';
+import { PoolInfo } from '@emurgo/yoroi-lib';
+import { formatLovelacesHumanReadableShort, roundOneDecimal, roundTwoDecimal } from '../../../utils/formatters';
+import { maybe } from '../../../coreUtils';
 
 export type GeneratedData = typeof StakingPageContent.prototype.generated;
 // populated by ConfigWebpackPlugin
@@ -227,38 +230,30 @@ class StakingPageContent extends Component<AllProps> {
     }
 
     if (delegationRequests.getDelegatedBalance.result.delegation == null) return null;
+    const networkInfo = publicDeriver.getParent().getNetworkInfo();
     const currentPool = delegationRequests.getDelegatedBalance.result.delegation;
-    const meta = this.generated.stores.delegation.getLocalPoolInfo(
-      publicDeriver.getParent().getNetworkInfo(),
-      currentPool
-    );
-    if (meta == null) {
+    const poolMeta = this.generated.stores.delegation.getLocalPoolInfo(networkInfo, currentPool);
+    const { stake, roa, saturation, pic } = this.generated.stores.delegation.getLocalRemotePoolInfo(networkInfo, currentPool) ?? {};
+    if (poolMeta == null) {
       // server hasn't returned information about the stake pool yet
       return null;
     }
     const { intl } = this.context;
-    const name = meta.info?.name ?? intl.formatMessage(globalMessages.unknownPoolLabel);
-    // TODO: remove placeholders
+
+    const name = poolMeta.info?.name ?? intl.formatMessage(globalMessages.unknownPoolLabel);
+
+    console.log('>> getLocalRemotePoolInfo', stake, roa, saturation, pic);
+
     const delegatedPool = {
       id: String(currentPool),
       name,
-      roa: '-',
-      poolSize: '-',
-      share: '-',
-      websiteUrl: meta.info?.homepage,
-      ticker: meta.info?.ticker,
+      avatar: pic,
+      roa: maybe(roa, roundTwoDecimal),
+      poolSize: maybe(stake, formatLovelacesHumanReadableShort),
+      share: maybe(saturation, s => roundOneDecimal(s*100)),
+      websiteUrl: poolMeta.info?.homepage,
+      ticker: poolMeta.info?.ticker,
     };
-
-    // TODO: implement this eventually
-    // const stakePoolMeta = {
-    // avatar: '',
-    // websiteUrl: '',
-    // roa: ' 5.08%',
-    // socialLinks: {
-    //   fb: '',
-    //   tw: '',
-    //  },
-    // };
 
     return (
       <DelegatedStakePoolCard
@@ -529,6 +524,7 @@ class StakingPageContent extends Component<AllProps> {
       delegation: {|
         selectedPage: number,
         getLocalPoolInfo: ($ReadOnly<NetworkRow>, string) => void | PoolMeta,
+        getLocalRemotePoolInfo: ($ReadOnly<NetworkRow>, string) => void | PoolInfo,
         getDelegationRequests: (PublicDeriver<>) => void | DelegationRequests,
       |},
       profile: {|
@@ -589,6 +585,7 @@ class StakingPageContent extends Component<AllProps> {
         delegation: {
           selectedPage: stores.delegation.selectedPage,
           getLocalPoolInfo: stores.delegation.getLocalPoolInfo,
+          getLocalRemotePoolInfo: stores.delegation.getLocalRemotePoolInfo,
           getDelegationRequests: stores.delegation.getDelegationRequests,
         },
         uiDialogs: {

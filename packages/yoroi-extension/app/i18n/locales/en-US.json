@@ -905,6 +905,7 @@
   "wallet.staking.overview": "Overview",
   "wallet.staking.overviewContent": "Your rewards are automatically staked. You don’t need to withdraw it everytime because you pay a transaction fee.",
   "wallet.staking.pool.share": "Share",
+  "wallet.staking.pool.saturation": "Saturation",
   "wallet.staking.pool.size": "Pool size",
   "wallet.staking.pool.unknownLabel": "Unknown pool",
   "wallet.staking.rewards.openRewardHistory": "Open Reward History",

@@ -58,3 +58,29 @@ export function createFilterUniqueBy<T>(getter: T => any = x => x): T => boolean
 export function listValues<T>(obj: { [any]: T }): T[] {
   return ((Object.values(obj): any): T[]);
 }
+
+/**
+ * Aggregates an array of key-value tuples into a map
+ */
+export function entriesIntoMap<K,V>(col: Array<[K,V]>): { [K]: V } {
+  return entriesIntoMapBy<[K,V],K,V>(col, x => x);
+}
+
+/**
+ * Converts each object in the array into a key-value tuple, using the provided function,
+ * and then aggregates tuples into a map
+ */
+export function entriesIntoMapBy<T,K,V>(col: Array<T>, f: (T => [K,V])): { [K]: V } {
+  return col.reduce((map, e) => {
+    const [k, v] = f(e);
+    map[k] = v;
+    return map;
+  }, {});
+}
+
+/**
+ * Maps t if != null, otherwise returns same t
+ */
+export function maybe<T,R>(t: ?T, f: T => R): ?R {
+  return t == null ? t : f(t);
+}
