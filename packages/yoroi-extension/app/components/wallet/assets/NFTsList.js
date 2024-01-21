@@ -24,7 +24,7 @@ import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../routes-config';
 import { useState, useEffect, useCallback } from 'react';
 import globalMessages from '../../../i18n/global-messages';
-import { urlResolveIpfs } from '../../../coreUtils';
+import { urlResolveForIpfsAndCorsproxy } from '../../../coreUtils';
 import classNames from 'classnames';
 import { debounce } from 'lodash';
 import { ampli } from '../../../../ampli/index';
@@ -219,7 +219,7 @@ export function NftImage({
 |}): Node {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const url = urlResolveIpfs(imageUrl);
+  const url = urlResolveForIpfsAndCorsproxy(imageUrl);
 
   useEffect(() => {
     if (url !== null)

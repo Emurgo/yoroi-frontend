@@ -25,9 +25,12 @@ export function logErr<T>(f: () => T, msg: (string | (Error) => string)): T {
  * In case the URL is at the IPFS protocol it will be resolved into HTTPS.
  * In any other case there will be no change in the returned result.
  */
-export function urlResolveIpfs<T: ?string>(url: T): T {
-  // $FlowFixMe
-  return url?.replace('ipfs://', 'https://ipfs.io/ipfs/');
+export function urlResolveForIpfsAndCorsproxy<T: ?string | ?Array<string>>(url: T): T {
+  const resolveArray = (u: string | Array<string>): string => Array.isArray(u) ? u.join('') : u;
+  const resolveString = (u: string): string => u.startsWith('ipfs://')
+    ? url.replace('ipfs://', 'https://ipfs.io/ipfs/')
+    : `https://corsproxy.io/?${u}`;
+  return maybe(url, compose(resolveArray, resolveString));
 }
 
 /**
@@ -81,6 +84,10 @@ export function entriesIntoMapBy<T,K,V>(col: Array<T>, f: (T => [K,V])): { [K]: 
 /**
  * Maps t if != null, otherwise returns same t
  */
-export function maybe<T,R>(t: ?T, f: T => R): ?R {
+export function maybe<T,R>(t: ?T, f: T => ?R): ?R {
   return t == null ? t : f(t);
+}
+
+export function compose<A,B,C>(f1: A => ?B, f2: B => ?C): (?A => ?C) {
+  return a => maybe(maybe(a, f1), f2);
 }

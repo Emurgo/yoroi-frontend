@@ -242,8 +242,6 @@ class StakingPageContent extends Component<AllProps> {
 
     const name = poolMeta.info?.name ?? intl.formatMessage(globalMessages.unknownPoolLabel);
 
-    console.log('>> getLocalRemotePoolInfo', stake, roa, saturation, pic);
-
     const delegatedPool = {
       id: String(currentPool),
       name,

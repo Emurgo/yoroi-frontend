@@ -38,6 +38,7 @@ export function genCSP(request: {|
   // Pool info
   connectSrc.push('https://a.cexplorer.io/');
   imgSrc.push('https://img.cexplorer.io/');
+  imgSrc.push('https://corsproxy.io/');
 
   // unsafe-inline is unfortunately required by style-loader (even in production builds)
   const evalStyle = "'unsafe-inline'";
