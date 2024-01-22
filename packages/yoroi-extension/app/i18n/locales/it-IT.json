@@ -23,7 +23,6 @@
   "api.errors.getRewardHistoryApiError": "Errore ricevuto dal server durante l'ottenimento della cronologia delle ricompense.",
   "api.errors.getTxHistoryForAddressesApiError": "Errore ricevuto dal server durante il recupero delle transazioni.",
   "api.errors.getUtxosForAddressesApiError": "Errore ricevuto dal server durante l'acquisizione UTxOs.",
-  "api.errors.getUtxosSumsForAddressesApiError": "Errore ricevuto dal server durante il recupero del saldo.",
   "api.errors.hardwareUnsupportedError": "Questa azione non è supportata per l'hardware attualmente selezionato.",
   "api.errors.histoicalCoinPriceError": "I dati storici sul prezzo delle monete non sono al momento disponibili.",
   "api.errors.invalidMnemonicError": "La frase inserita non è valida, si prega di controllare.",

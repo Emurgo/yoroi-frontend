@@ -2,7 +2,6 @@
 
 import type {
   AddressUtxoRequest, AddressUtxoResponse,
-  UtxoSumRequest, UtxoSumResponse,
   HistoryRequest, HistoryResponse,
   RewardHistoryRequest, RewardHistoryResponse,
   AccountStateRequest, AccountStateResponse,
@@ -23,7 +22,6 @@ import type {
 
 export interface IFetcher {
   getUTXOsForAddresses(body: AddressUtxoRequest): Promise<AddressUtxoResponse>;
-  getUTXOsSumsForAddresses(body: UtxoSumRequest): Promise<UtxoSumResponse>;
   getTransactionsHistoryForAddresses(body: HistoryRequest): Promise<HistoryResponse>;
   getRewardHistory(body: RewardHistoryRequest): Promise<RewardHistoryResponse>;
   getBestBlock(body: BestBlockRequest): Promise<BestBlockResponse>;

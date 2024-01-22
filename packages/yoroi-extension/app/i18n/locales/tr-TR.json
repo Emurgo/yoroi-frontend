@@ -23,7 +23,6 @@
   "api.errors.getRewardHistoryApiError": "Ödül geçmişi alınırken sunucudan hata alındı.",
   "api.errors.getTxHistoryForAddressesApiError": "İşlemler alınırken sunucudan hata alındı.",
   "api.errors.getUtxosForAddressesApiError": "UTxOs alınırken sunucudan hata alındı.",
-  "api.errors.getUtxosSumsForAddressesApiError": "Bakiye alınırken sunucudan hata alındı.",
   "api.errors.hardwareUnsupportedError": "Bu eylem şu an seçili donanım için desteklenmiyor.",
   "api.errors.histoicalCoinPriceError": "Geçmiş kripto para fiyat verileri şu anda mevcut değil.",
   "api.errors.invalidMnemonicError": "Geçersiz kurtarma sözcüğü girildi, lütfen kontrol edin.",

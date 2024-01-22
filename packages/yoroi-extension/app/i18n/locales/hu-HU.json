@@ -26,7 +26,6 @@
   "api.errors.getTxHistoryForAddressesApiError": "Error received from server while getting transactions.",
   "api.errors.getUtxoDataError": "Error received from server while getting UTXO data",
   "api.errors.getUtxosForAddressesApiError": "Error received from server while getting UTxOs.",
-  "api.errors.getUtxosSumsForAddressesApiError": "Error received from server while getting balance.",
   "api.errors.hardwareUnsupportedError": "This action is incompatible with the hardware.",
   "api.errors.histoicalCoinPriceError": "There is no historical coin price data available.",
   "api.errors.invalidMnemonicError": "Invalid phrase entered, please check.",

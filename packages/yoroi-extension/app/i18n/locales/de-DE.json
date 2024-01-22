@@ -23,7 +23,6 @@
   "api.errors.getRewardHistoryApiError": "Fehler vom Server beim Abrufen der Ertragshistorie.",
   "api.errors.getTxHistoryForAddressesApiError": "Fehler vom Server beim Abrufen der Transaktionen.",
   "api.errors.getUtxosForAddressesApiError": "Fehler vom Server beim Abrufen der UTxOs.",
-  "api.errors.getUtxosSumsForAddressesApiError": "Fehler vom Server beim Abrufen der Kontostände.",
   "api.errors.hardwareUnsupportedError": "Diese Aktion ist mit der derzeit ausgewählten Hardware nicht unterstützt.",
   "api.errors.histoicalCoinPriceError": "Der historische Kursverkauf ist derzeit nicht verfügbar.",
   "api.errors.invalidMnemonicError": "Do not translate.",

@@ -23,7 +23,6 @@
   "api.errors.getRewardHistoryApiError": "報酬履歴の取得中にサーバーからエラーを受信しました。",
   "api.errors.getTxHistoryForAddressesApiError": "トランザクション取得中にサーバーからエラーを受信しました。",
   "api.errors.getUtxosForAddressesApiError": "UTxOの取得中にサーバーからエラーを受信しました。",
-  "api.errors.getUtxosSumsForAddressesApiError": "残高の取得中にサーバーからエラーを受信しました。",
   "api.errors.hardwareUnsupportedError": "This action is not supported for the currently selected hardware.",
   "api.errors.histoicalCoinPriceError": "コインの価格データの履歴にアクセスできません。",
   "api.errors.invalidMnemonicError": "入力されたフレーズは無効です。もう一度確認してください。",

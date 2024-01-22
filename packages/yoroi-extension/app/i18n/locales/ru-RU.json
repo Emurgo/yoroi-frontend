@@ -23,7 +23,6 @@
   "api.errors.getRewardHistoryApiError": "Получена ошибка от сервера при получении истории вознаграждений.",
   "api.errors.getTxHistoryForAddressesApiError": "Получена ошибка от сервера при получении транзакций.",
   "api.errors.getUtxosForAddressesApiError": "Получена ошибка от сервера при получении UTxOs.",
-  "api.errors.getUtxosSumsForAddressesApiError": "Получена ошибка от сервера при получении баланса.",
   "api.errors.hardwareUnsupportedError": "This action is not supported for the currently selected hardware.",
   "api.errors.histoicalCoinPriceError": "Historical coin price data not available now.",
   "api.errors.invalidMnemonicError": "Введена неверная фраза, пожалуйста, проверьте.",

@@ -22,7 +22,6 @@
   "api.errors.getBalanceError": "Error while getting balance.",
   "api.errors.getTxHistoryForAddressesApiError": "Error received from server while getting transactions.",
   "api.errors.getUtxosForAddressesApiError": "Error received from server while getting UTxOs.",
-  "api.errors.getUtxosSumsForAddressesApiError": "Error received from server while getting balance.",
   "api.errors.invalidCertificateError": "Invalid certificate.",
   "api.errors.invalidMnemonicError": "Invalid phrase entered, please check.",
   "api.errors.invalidWitnessError": "The signature is invalid.",

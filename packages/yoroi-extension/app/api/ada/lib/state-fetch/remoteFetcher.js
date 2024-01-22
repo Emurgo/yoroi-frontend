@@ -50,7 +50,6 @@ import {
   GetRewardHistoryApiError,
   GetTxHistoryForAddressesApiError,
   GetUtxosForAddressesApiError,
-  GetUtxosSumsForAddressesApiError,
   InvalidWitnessError,
   RollbackApiError,
   SendTransactionApiError,
@@ -118,37 +117,6 @@ export class RemoteFetcher implements IFetcher {
       }
       return utxo;
     });
-  }
-
-  getUTXOsSumsForAddresses: UtxoSumRequest => Promise<UtxoSumResponse> = (body) => {
-    const { BackendService } = body.network.Backend;
-    if (BackendService == null) throw new Error(`${nameof(this.getUTXOsSumsForAddresses)} missing backend url`);
-    return axios(
-      `${BackendService}/api/txs/utxoSumForAddresses`,
-      {
-        method: 'post',
-        timeout: 2 * CONFIG.app.walletRefreshInterval,
-        data: {
-          addresses: body.addresses
-        },
-        headers: {
-          'yoroi-version': this.getLastLaunchVersion(),
-          'yoroi-locale': this.getCurrentLocale()
-        }
-      }
-    ).then(response => {
-      const result: UtxoSumResponse = response.data;
-      if (result.assets == null) {
-        // replace non-existent w/ empty array to handle Allegra -> Mary transition
-        // $FlowExpectedError[cannot-write]
-        result.assets = [];
-      }
-      return result;
-    })
-      .catch((error) => {
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getUTXOsSumsForAddresses)} error: ` + stringifyError(error));
-        throw new GetUtxosSumsForAddressesApiError();
-      });
   }
 
   getTransactionsHistoryForAddresses: HistoryRequest => Promise<HistoryResponse> = (body) => {

@@ -59,7 +59,6 @@ import { chunk } from 'lodash';
 import {
   CheckAddressesInUseApiError,
   GetAllUTXOsForAddressesError,
-  GetUtxosSumsForAddressesApiError,
   GetTxHistoryForAddressesApiError,
   GetRewardHistoryApiError,
   GetAccountStateApiError,
@@ -94,10 +93,6 @@ export class BatchedFetcher implements IFetcher {
 
   getUTXOsForAddresses: AddressUtxoRequest => Promise<AddressUtxoResponse> = (body) => (
     batchUTXOsForAddresses(this.baseFetcher.getUTXOsForAddresses)(body)
-  )
-
-  getUTXOsSumsForAddresses: UtxoSumRequest => Promise<UtxoSumResponse> = (body) => (
-    batchGetUTXOsSumsForAddresses(this.baseFetcher.getUTXOsSumsForAddresses)(body)
   )
 
   getTransactionsHistoryForAddresses: HistoryRequest => Promise<HistoryResponse> = (body) => (
@@ -229,60 +224,6 @@ function batchUTXOsForAddresses(
       Logger.error(`batchedFetcher:::${nameof(batchUTXOsForAddresses)} error: ` + stringifyError(error));
       if (error instanceof LocalizableError) throw error;
       throw new GetAllUTXOsForAddressesError();
-    }
-  };
-}
-
-export function batchGetUTXOsSumsForAddresses(
-  getUTXOsSumsForAddresses: UtxoSumFunc,
-): UtxoSumFunc {
-  return async function (body: UtxoSumRequest): Promise<UtxoSumResponse> {
-    try {
-      // batch all addresses into chunks for API
-      const groupsOfAddresses = chunk(body.addresses, addressesLimit);
-      const promises =
-        groupsOfAddresses.map(groupOfAddresses => getUTXOsSumsForAddresses({
-          network: body.network,
-          addresses: groupOfAddresses,
-        }));
-      const partialAmounts: Array<UtxoSumResponse> = await Promise.all(promises);
-
-      // sum all chunks together
-      let sum: BigNumber = new BigNumber(0);
-      const assetMap = new Map<string, ReadonlyElementOf<$PropertyType<UtxoSumResponse, 'assets'>>>();
-      for (const partial of partialAmounts) {
-        sum = sum.plus(
-          partial.sum != null && partial.sum !== '' // undefined if no addresses in the batch has any balance
-              ? new BigNumber(partial.sum)
-              : new BigNumber(0)
-        );
-        for (const asset of partial.assets) {
-          const currentVal = assetMap.get(asset.assetId)?.amount ?? '0';
-          assetMap.set(
-            asset.assetId,
-            {
-              ...asset,
-              amount: new BigNumber(currentVal).plus(asset.amount).toString(),
-            },
-          );
-        }
-      }
-      if (sum.isZero()) {
-        return {
-          sum: null,
-          assets: [],
-        };
-      }
-      return {
-        sum: sum.toString(),
-        assets: Array.from(assetMap.entries()).map(entry => ({
-          ...entry[1]
-        })),
-      };
-    } catch (error) {
-      Logger.error(`batchedFetcher::${nameof(batchGetUTXOsSumsForAddresses)} error: ` + stringifyError(error));
-      if (error instanceof LocalizableError) throw error;
-      throw new GetUtxosSumsForAddressesApiError();
     }
   };
 }

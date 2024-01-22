@@ -88,10 +88,6 @@ const messages = defineMessages({
     id: 'api.errors.getUtxosForAddressesApiError',
     defaultMessage: '!!!Error received from server while getting UTXOs.',
   },
-  getUtxosSumsForAddressesApiError: {
-    id: 'api.errors.getUtxosSumsForAddressesApiError',
-    defaultMessage: '!!!Error received from server while getting balance.',
-  },
   getTxHistoryForAddressesApiError: {
     id: 'api.errors.getTxHistoryForAddressesApiError',
     defaultMessage: '!!!Error received from server while getting txs.',
@@ -346,15 +342,6 @@ export class GetUtxosForAddressesApiError extends LocalizableError {
     super({
       id: messages.getUtxosForAddressesApiError.id,
       defaultMessage: messages.getUtxosForAddressesApiError.defaultMessage || '',
-    });
-  }
-}
-
-export class GetUtxosSumsForAddressesApiError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.getUtxosSumsForAddressesApiError.id,
-      defaultMessage: messages.getUtxosSumsForAddressesApiError.defaultMessage || '',
     });
   }
 }

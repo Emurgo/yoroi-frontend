@@ -24,7 +24,6 @@
   "api.errors.getRewardHistoryApiError": "Error received from server while getting reward history.",
   "api.errors.getTxHistoryForAddressesApiError": "取得 txs 時出現伺服器錯誤。",
   "api.errors.getUtxosForAddressesApiError": "取得 UTxOs 時出現伺服器錯誤。",
-  "api.errors.getUtxosSumsForAddressesApiError": "取得餘額時出現伺服器錯誤。",
   "api.errors.hardwareUnsupportedError": "This action is not supported for the currently selected hardware.",
   "api.errors.histoicalCoinPriceError": "Historical coin price data not available now.",
   "api.errors.invalidMnemonicError": "輸入的短語無效, 請檢查",
