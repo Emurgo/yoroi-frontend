@@ -1,60 +1,52 @@
 // @flow
 import type { Node, ComponentType } from 'react';
+import type { InjectedOrGenerated } from '../../types/injectedPropsType';
+import type { GeneratedData as BannerContainerData } from '../banners/BannerContainer';
+import type { GeneratedData as WalletCreateDialogContainerData } from './dialogs/WalletCreateDialogContainer';
+import type { GeneratedData as WalletBackupDialogContainerData } from './dialogs/WalletBackupDialogContainer';
+import type { GeneratedData as WalletRestoreDialogContainerData } from './dialogs/WalletRestoreDialogContainer';
+import type { GeneratedData as WalletTrezorConnectDialogContainerData } from './dialogs/WalletTrezorConnectDialogContainer';
+import type { GeneratedData as WalletLedgerConnectDialogContainerData } from './dialogs/WalletLedgerConnectDialogContainer';
+import type { GeneratedData as WalletPaperDialogContainerData } from './dialogs/WalletPaperDialogContainer';
+import type { GeneratedData as CreatePaperWalletDialogContainerData } from './dialogs/CreatePaperWalletDialogContainer';
+import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
+import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import type { LayoutComponentMap } from '../../styles/context/layout';
 import { Component, lazy } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import { intlShape } from 'react-intl';
-
 import { ROUTES } from '../../routes-config';
-import type { InjectedOrGenerated } from '../../types/injectedPropsType';
+import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { withLayout } from '../../styles/context/layout';
+import { Box } from '@mui/material';
 import globalMessages from '../../i18n/global-messages';
-
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import BannerContainer from '../banners/BannerContainer';
-import type { GeneratedData as BannerContainerData } from '../banners/BannerContainer';
 import WalletAdd from '../../components/wallet/WalletAdd';
-
 import WalletCreateDialogContainer from './dialogs/WalletCreateDialogContainer';
-import type { GeneratedData as WalletCreateDialogContainerData } from './dialogs/WalletCreateDialogContainer';
 import WalletCreateDialog from '../../components/wallet/WalletCreateDialog';
 import WalletBackupDialogContainer from './dialogs/WalletBackupDialogContainer';
-import type { GeneratedData as WalletBackupDialogContainerData } from './dialogs/WalletBackupDialogContainer';
 import WalletBackupDialog from '../../components/wallet/WalletBackupDialog';
-
 import PickCurrencyDialogContainer from './dialogs/PickCurrencyDialogContainer';
-
 import WalletRestoreOptionDialogContainer from './dialogs/WalletRestoreOptionDialogContainer';
 import WalletRestoreDialogContainer from './dialogs/WalletRestoreDialogContainer';
-import type { GeneratedData as WalletRestoreDialogContainerData } from './dialogs/WalletRestoreDialogContainer';
 import WalletRestoreOptionDialog from '../../components/wallet/add/option-dialog/WalletRestoreOptionDialog';
-
 import WalletConnectHWOptionDialogContainer from './dialogs/WalletConnectHWOptionDialogContainer';
 import WalletConnectHWOptionDialog from '../../components/wallet/add/option-dialog/WalletConnectHWOptionDialog';
 import WalletTrezorConnectDialogContainer from './dialogs/WalletTrezorConnectDialogContainer';
-import type { GeneratedData as WalletTrezorConnectDialogContainerData } from './dialogs/WalletTrezorConnectDialogContainer';
 import WalletLedgerConnectDialogContainer from './dialogs/WalletLedgerConnectDialogContainer';
-import type { GeneratedData as WalletLedgerConnectDialogContainerData } from './dialogs/WalletLedgerConnectDialogContainer';
-
 import WalletPaperDialog from '../../components/wallet/WalletPaperDialog';
 import WalletPaperDialogContainer from './dialogs/WalletPaperDialogContainer';
-import type { GeneratedData as WalletPaperDialogContainerData } from './dialogs/WalletPaperDialogContainer';
 import CreatePaperWalletDialogContainer from './dialogs/CreatePaperWalletDialogContainer';
-import type { GeneratedData as CreatePaperWalletDialogContainerData } from './dialogs/CreatePaperWalletDialogContainer';
 import UserPasswordDialog from '../../components/wallet/add/paper-wallets/UserPasswordDialog';
-
 import SidebarContainer from '../SidebarContainer';
-import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import NavBar from '../../components/topbar/NavBar';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
-
-import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import { withLayout } from '../../styles/context/layout';
-import type { LayoutComponentMap } from '../../styles/context/layout';
 import AddWalletPageRevamp from './AddWalletPageRevamp';
 
 export const AddAnotherWalletPromise: void => Promise<any> = () =>
@@ -91,7 +83,8 @@ class AddWalletPage extends Component<AllProps> {
   };
 
   componentDidMount() {
-    this.generated.actions.wallets.unselectWallet.trigger();
+    const { isRevampTheme } = this.generated.stores.profile;
+    if (!isRevampTheme) this.generated.actions.wallets.unselectWallet.trigger();
   }
 
   render(): Node {
@@ -139,6 +132,9 @@ class AddWalletPage extends Component<AllProps> {
           }
           onCardanoPreviewTestnet={() =>
             actions.profile.setSelectedNetwork.trigger(networks.CardanoPreviewTestnet)
+          }
+          onCardanoSanchoTestnet={() =>
+            actions.profile.setSelectedNetwork.trigger(networks.CardanoSanchoTestnet)
           }
         />
       );
@@ -278,16 +274,8 @@ class AddWalletPage extends Component<AllProps> {
     }
 
     const goToRoute = this.generated.actions.router.goToRoute;
-    const addWalletPageRevamp = (
-      <TopBarLayout
-        banner={<BannerContainer {...this.generated.BannerContainerProps} />}
-        sidebar={
-          <SidebarContainer
-            {...this.generated.SidebarContainerProps}
-            onLogoClick={() => goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS })}
-          />
-        }
-      >
+    const addWalletPageComponent = (
+      <>
         <AddWalletPageRevamp
           onHardwareConnect={() => this.openDialogWrapper(WalletConnectHWOptionDialog)}
           onCreate={() => goToRoute.trigger({ route: ROUTES.WALLETS.CREATE_NEW_WALLET })}
@@ -296,6 +284,19 @@ class AddWalletPage extends Component<AllProps> {
           hasAnyWallets={hasAnyWallets}
         />
         {activeDialog}
+      </>
+    );
+
+    const addWalletPageRevamp = !hasAnyWallets ? (
+      <Box py="48px" height="100vh" sx={{ overflowY: 'auto' }}>
+        {addWalletPageComponent}
+      </Box>
+    ) : (
+      <TopBarLayout
+        banner={<BannerContainer {...this.generated.BannerContainerProps} />}
+        sidebar={<SidebarContainer {...this.generated.SidebarContainerProps} />}
+      >
+        {addWalletPageComponent}
       </TopBarLayout>
     );
 
@@ -369,7 +370,7 @@ class AddWalletPage extends Component<AllProps> {
       |},
     |},
     stores: {|
-      profile: {| selectedNetwork: void | $ReadOnly<NetworkRow> |},
+      profile: {| selectedNetwork: void | $ReadOnly<NetworkRow>, isRevampTheme: boolean |},
       uiDialogs: {|
         hasOpen: boolean,
         getParam: <T>(number | string) => void | T,
@@ -389,6 +390,7 @@ class AddWalletPage extends Component<AllProps> {
       stores: {
         profile: {
           selectedNetwork: stores.profile.selectedNetwork,
+          isRevampTheme: stores.profile.isRevampTheme,
         },
         uiDialogs: {
           hasOpen: stores.uiDialogs.hasOpen,

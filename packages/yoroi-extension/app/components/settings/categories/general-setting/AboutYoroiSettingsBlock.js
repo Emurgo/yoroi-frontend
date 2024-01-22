@@ -167,10 +167,10 @@ class AboutYoroiSettingsBlock extends Component<Props & InjectedLayoutProps> {
         </Typography>
 
         {network && (
-          <p className={styles.aboutLine}>
+          <div className={styles.aboutLine}>
             <strong>{intl.formatMessage(messages.networkLabel)}</strong>&nbsp;
             {intl.formatMessage(messages[network])}
-          </p>
+          </div>
         )}
         <div className={styles.aboutLine}>
           <strong>{intl.formatMessage(messages.versionLabel)}</strong>&nbsp;
@@ -296,10 +296,10 @@ function LabelWithValue({
 |}): Node {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-      <Typography variant="body1" fontWeight={500} color="grayscale.max">
+      <Typography component="div" variant="body1" fontWeight={500} color="grayscale.max">
         {label}
       </Typography>
-      <Typography
+      <Typography component="div"
         {...(url
           ? {
               as: Link,

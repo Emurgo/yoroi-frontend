@@ -1,17 +1,17 @@
 // @flow
-import React, { Component, Suspense } from 'react';
 import type { Node } from 'react';
-import { observer } from 'mobx-react';
-import { computed } from 'mobx';
-import TopBarLayout from '../../components/layout/TopBarLayout';
-import BannerContainer from '../banners/BannerContainer';
 import type { GeneratedData as BannerContainerData } from '../banners/BannerContainer';
-import SidebarContainer from '../SidebarContainer';
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import React, { Component, Suspense } from 'react';
+import { observer } from 'mobx-react';
+import { computed } from 'mobx';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
-import { ROUTES } from '../../routes-config';
+import { Box } from '@mui/material';
+import TopBarLayout from '../../components/layout/TopBarLayout';
+import BannerContainer from '../banners/BannerContainer';
+import SidebarContainer from '../SidebarContainer';
 
 export const CreateWalletPagePromise: void => Promise<any> = () =>
   import('../../components/wallet/create-wallet/CreateWalletPage');
@@ -24,31 +24,35 @@ type Props = InjectedOrGenerated<GeneratedData>;
 export default class CreateWalletPageContainer extends Component<Props> {
   render(): Node {
     const { stores, actions } = this.generated;
+    const { hasAnyWallets } = stores.wallets;
 
-    return (
+    const createWalletPageComponent = (
+      <Suspense fallback={null}>
+        <CreateWalletPage
+          genWalletRecoveryPhrase={stores.substores.ada.wallets.genWalletRecoveryPhrase}
+          createWallet={actions.ada.wallets.createWallet.trigger}
+          setSelectedNetwork={actions.profile.setSelectedNetwork.trigger}
+          selectedNetwork={stores.profile.selectedNetwork}
+          openDialog={dialog => this.generated.actions.dialogs.open.trigger({ dialog })}
+          closeDialog={this.generated.actions.dialogs.closeActiveDialog.trigger}
+          isDialogOpen={stores.uiDialogs.isOpen}
+          goToRoute={route => actions.router.goToRoute.trigger({ route })}
+        />
+      </Suspense>
+    );
+
+    return hasAnyWallets ? (
       <TopBarLayout
         banner={<BannerContainer {...this.generated.BannerContainerProps} />}
-        sidebar={
-          <SidebarContainer
-            {...this.generated.SidebarContainerProps}
-            onLogoClick={() => actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })}
-          />
-        }
+        sidebar={<SidebarContainer {...this.generated.SidebarContainerProps} />}
         bgcolor="common.white"
       >
-        <Suspense fallback={null}>
-          <CreateWalletPage
-            genWalletRecoveryPhrase={stores.substores.ada.wallets.genWalletRecoveryPhrase}
-            createWallet={actions.ada.wallets.createWallet.trigger}
-            setSelectedNetwork={actions.profile.setSelectedNetwork.trigger}
-            selectedNetwork={stores.profile.selectedNetwork}
-            openDialog={dialog => this.generated.actions.dialogs.open.trigger({ dialog })}
-            closeDialog={this.generated.actions.dialogs.closeActiveDialog.trigger}
-            isDialogOpen={stores.uiDialogs.isOpen}
-            goToRoute={route => actions.router.goToRoute.trigger({ route })}
-          />
-        </Suspense>
+        {createWalletPageComponent}
       </TopBarLayout>
+    ) : (
+      <Box py="48px" height="100vh" sx={{ overflowY: 'auto' }}>
+        {createWalletPageComponent}
+      </Box>
     );
   }
 
@@ -107,6 +111,7 @@ export default class CreateWalletPageContainer extends Component<Props> {
       profile: {|
         selectedNetwork: void | $ReadOnly<NetworkRow>,
       |},
+      wallets: {| hasAnyWallets: boolean |},
     |},
   |} {
     if (this.props.generated !== undefined) {
@@ -130,6 +135,9 @@ export default class CreateWalletPageContainer extends Component<Props> {
         },
         profile: {
           selectedNetwork: stores.profile.selectedNetwork,
+        },
+        wallets: {
+          hasAnyWallets: stores.wallets.hasAnyWallets,
         },
       },
       actions: {

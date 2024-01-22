@@ -2,7 +2,7 @@
 
 import { Component } from 'react';
 import type { Node } from 'react';
-import DialogRevamp from '../../../components/widgets/DialogRevamp';
+import Dialog from '../../../components/widgets/Dialog';
 import { defineMessages, intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
 import { ReactComponent as NewThemeIllustration } from '../../../assets/images/new-theme-illustration.inline.svg';
@@ -76,22 +76,15 @@ export class RevampAnnouncementDialog extends Component<Props> {
       },
     ];
     return (
-      <DialogRevamp
+      <Dialog
         title={intl.formatMessage(messages.title)}
         className={styles.dialog}
         onClose={onClose}
         closeButton={<DialogCloseButton onClose={onClose} />}
         actions={actions}
       >
-        <Box
-          sx={{
-            py: '24px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '24px',
-          }}
-        >
-          <Typography
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '24px' }} id="dialogRevampBox">
+          <Typography component="div"
             variant="body1"
             sx={{
               textAlign: 'center',
@@ -103,7 +96,7 @@ export class RevampAnnouncementDialog extends Component<Props> {
 
           <NewThemeIllustration />
           <Stack gap="16px">
-            <Typography color="grayscale.900" variant="body1" fontWeight={500}>
+            <Typography component="div" color="grayscale.900" variant="body1" fontWeight={500}>
               {intl.formatMessage(messages.updatesSectionTitle)}
             </Typography>
 
@@ -145,7 +138,7 @@ export class RevampAnnouncementDialog extends Component<Props> {
             </Box>
           </Stack>
         </Box>
-      </DialogRevamp>
+      </Dialog>
     );
   }
 }

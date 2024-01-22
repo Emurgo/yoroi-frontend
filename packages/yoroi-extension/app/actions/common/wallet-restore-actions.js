@@ -14,6 +14,7 @@ export type PaperWalletRestoreMeta = {|
   paperPassword: string,
 |};
 
+// <TODO:PENDING_REMOVAL> BIP44 , PAPER
 export type RestoreModeType =
   | {|
       type: 'bip44',

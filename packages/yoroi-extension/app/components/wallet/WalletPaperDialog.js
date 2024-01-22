@@ -122,7 +122,7 @@ export default class PaperWalletDialog extends Component<Props> {
           ))}
         </Select>
 
-        {error && <p className={styles.error}>{intl.formatMessage(error, error.values)}</p>}
+        {error && <div className={styles.error}>{intl.formatMessage(error, error.values)}</div>}
       </Dialog>
     );
   }

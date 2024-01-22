@@ -32,8 +32,11 @@ const RevampTextField = {
         backgroundColor: theme.palette.grayscale[50],
       },
       '.MuiInputLabel-root.Mui-disabled': {
-        color: theme.palette.grayscale[900],
+        color: theme.palette.common.black,
         backgroundColor: theme.palette.common.white,
+      },
+      '& .MuiInputLabel-root': {
+        color: theme.palette.grayscale[600],
       },
     }),
   },

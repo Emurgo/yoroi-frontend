@@ -18,9 +18,7 @@ import YoroiTransferStore from './toplevel/YoroiTransferStore';
 import TransactionBuilderStore from './toplevel/TransactionBuilderStore';
 import DelegationStore from './toplevel/DelegationStore';
 import setupAdaStores from './ada/index';
-import setupErgoStores from './ergo/index';
 import type { AdaStoresMap } from './ada/index';
-import type { ErgoStoresMap } from './ergo/index';
 import { RouterStore } from 'mobx-react-router';
 import type { ActionsMap } from '../actions/index';
 import type { Api } from '../api/index';
@@ -88,7 +86,6 @@ export type StoresMap = {|
   connector: ConnectorStore,
   substores: {|
     ada: AdaStoresMap,
-    ergo: ErgoStoresMap,
   |},
   // $FlowFixMe[value-as-type]
   router: RouterStore,
@@ -175,11 +172,9 @@ export default (action(
      * But we only want to actually initialize it if it is the currency in use */
     stores.substores = {
       ada: setupAdaStores((stores: any), api, actions),
-      ergo: setupErgoStores((stores: any), api, actions),
     };
 
     const loadedStores: StoresMap = (stores: any);
-    initializeSubstore<ErgoStoresMap>(loadedStores.substores[ApiOptions.ergo]);
     initializeSubstore<AdaStoresMap>(loadedStores.substores[ApiOptions.ada]);
 
     // Perform load after all setup is done to ensure migration can modify store state

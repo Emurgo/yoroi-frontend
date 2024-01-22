@@ -1,51 +1,36 @@
 // @flow
 
-import type {
-  AccountBalance,
-  Address,
-  CardanoTx,
-  Paginate,
-  TokenId,
-  Value,
-  Asset,
-} from './types';
+import type { AccountBalance, Address, Asset, CardanoTx, Paginate, TokenId, Value, } from './types';
 import { ConnectorError, TxSendErrorCodes } from './types';
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
-import type {
-  Addressing,
-  IPublicDeriver,
-} from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { Addressing, IPublicDeriver, } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { PublicDeriver, } from '../../../app/api/ada/lib/storage/models/PublicDeriver/index';
 import {
+  asGetAllAccounting,
   asGetAllUtxos,
   asGetBalance,
+  asGetPublicKey,
   asGetSigningKey,
+  asGetStakingKey,
   asHasLevels,
   asHasUtxoChains,
-  asGetAllAccounting,
-  asGetPublicKey, asGetStakingKey,
 } from '../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import { ConceptualWallet } from '../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
 import BigNumber from 'bignumber.js';
 
-import {
-  CannotSendBelowMinimumValueError,
-  NotEnoughMoneyToSendError,
-} from '../../../app/api/common/errors';
+import { CannotSendBelowMinimumValueError, NotEnoughMoneyToSendError, } from '../../../app/api/common/errors';
 
 import axios from 'axios';
 
-import {
-  CoreAddressTypes,
-  TxStatusCodes,
-} from '../../../app/api/ada/lib/storage/database/primitives/enums';
+import { CoreAddressTypes, TxStatusCodes, } from '../../../app/api/ada/lib/storage/database/primitives/enums';
 import type { FullAddressPayload } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 import {
-  getAllAddressesForDisplay,
   getAddressRowsForWallet,
+  getAllAddressesForDisplay,
 } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 import { getReceiveAddress } from '../../../app/stores/stateless/addressStores';
 
+import type { PersistedSubmittedTransaction } from '../../../app/api/localStorage';
 import LocalStorageApi, {
   loadSubmittedTransactions,
   persistSubmittedTransactions,
@@ -56,17 +41,15 @@ import {
   multiTokenFromCardanoValue,
 } from '../../../app/api/ada/transactions/utils';
 import type {
-  RemoteUnspentOutput,
   AccountStateRequest,
   AccountStateResponse,
+  RemoteUnspentOutput,
 } from '../../../app/api/ada/lib/state-fetch/types';
 import {
   signTransaction as shelleySignTransaction,
   toLibUTxO,
 } from '../../../app/api/ada/transactions/shelley/transactions';
-import {
-  getCardanoHaskellBaseConfig,
-} from '../../../app/api/ada/lib/storage/database/prepackaged/networks';
+import { getCardanoHaskellBaseConfig, } from '../../../app/api/ada/lib/storage/database/prepackaged/networks';
 import { genTimeToSlot } from '../../../app/api/ada/lib/storage/bridge/timeUtils';
 import type CardanoTxRequest from '../../../app/api/ada';
 import AdaApi from '../../../app/api/ada';
@@ -77,39 +60,28 @@ import type {
   HaskellShelleyTxSignRequest
 } from '../../../app/api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type { CardanoAddressedUtxo, } from '../../../app/api/ada/transactions/types';
-import {
-  derivePrivateByAddressing,
-  derivePublicByAddressing,
-} from '../../../app/api/ada/lib/cardanoCrypto/utils';
 import { cip8Sign } from '../../../app/connector/api';
-import type { PersistedSubmittedTransaction } from '../../../app/api/localStorage';
 import type { ForeignUtxoFetcher } from '../../../app/connector/stores/ConnectorStore';
 import { GetToken } from '../../../app/api/ada/lib/storage/database/primitives/api/read';
-import {
-  getAllSchemaTables,
-  raii,
-} from '../../../app/api/ada/lib/storage/database/utils';
+import { getAllSchemaTables, raii, } from '../../../app/api/ada/lib/storage/database/utils';
 import type { TokenRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
 import fetchAdapter from '@vespaiach/axios-fetch-adapter';
-import {
-  UTxOSet,
-  Value as LibValue,
-  Amount,
-  NativeAssets,
-} from '@emurgo/yoroi-eutxo-txs/dist/classes';
+import { Amount, NativeAssets, UTxOSet, Value as LibValue, } from '@emurgo/yoroi-eutxo-txs/dist/classes';
 import { coinSelectionClassificationStrategy } from '@emurgo/yoroi-eutxo-txs/dist/tx-builder';
 import { setRuntime, } from '@emurgo/yoroi-eutxo-txs';
-import {
-  NotEnoughMoneyToSendError as LibNotEnoughMoneyToSendError
-} from'@emurgo/yoroi-eutxo-txs/dist/errors';
+import { NotEnoughMoneyToSendError as LibNotEnoughMoneyToSendError } from '@emurgo/yoroi-eutxo-txs/dist/errors';
 import {
   ChainDerivations,
-  STAKING_KEY_INDEX,
   DREP_KEY_INDEX,
   HARD_DERIVATION_START,
+  STAKING_KEY_INDEX,
   WalletTypePurpose
 } from '../../../app/config/numbersConfig';
 import { Bip44DerivationLevels, CoinType } from '@emurgo/yoroi-lib';
+import {
+  derivePrivateByAddressing,
+  derivePublicByAddressing
+} from '../../../app/api/ada/lib/cardanoCrypto/deriveByAddressing';
 
 axios.defaults.adapter = fetchAdapter;
 
@@ -135,11 +107,8 @@ function bigNumberToValue(x: BigNumber): Value {
 export async function connectorGetBalance(
   wallet: PublicDeriver<>,
   tokenId: TokenId,
-  // <TODO:PENDING_REMOVAL>
-  // eslint-disable-next-line no-unused-vars
-  protocol: 'cardano' | 'ergo',
 ): Promise<AccountBalance | Value> {
-  if (tokenId === 'ERG' || tokenId === 'ADA' || tokenId === 'TADA') {
+  if (tokenId === 'ADA' || tokenId === 'TADA') {
     // can directly query for balance
     const canGetBalance = asGetBalance(wallet);
     if (canGetBalance != null) {
@@ -314,6 +283,8 @@ export async function connectorGetUtxosCardano(
 export const MAX_COLLATERAL: BigNumber = new BigNumber('5000000');
 // only consider UTXO value <= (${requiredAmount} + 1 ADA)
 const MAX_PER_UTXO_SURPLUS = new BigNumber('2000000');
+// Max allowed collateral inputs in a tx by protocol
+export const MAX_COLLATERAL_COUNT: number = 3;
 
 type GetCollateralUtxosRespose = {|
   utxosToUse: Array<RemoteUnspentOutput>,
@@ -349,6 +320,14 @@ export async function connectorGetCollateralUtxos(
   for (const utxo of utxosToConsider) {
     utxosToUse.push(utxo)
     sum = sum.plus(utxo.amount)
+    while (
+      utxosToUse.length > MAX_COLLATERAL_COUNT
+      || sum.minus(utxosToUse[0].amount).gte(required)
+    ) {
+      // Removing the first (hence the smallest) utxo from the list
+      const removedUtxo = utxosToUse.shift()
+      sum = sum.minus(removedUtxo.amount)
+    }
     if (sum.gte(required)) {
       enough = true
       break
@@ -535,21 +514,10 @@ export async function connectorGetCardanoRewardAddresses(
 
 export async function connectorGetChangeAddress(wallet: PublicDeriver<>): Promise<Address> {
   const change = await getReceiveAddress(wallet);
-  if (change !== undefined) {
-    const hash = change.addr.Hash;
-    await RustModule.load();
-    // Note: SimgaRust only works for ergo
-    // RustModule.walletV2 works for cardano but doesn't not have from_bytes and to_base58 methods
-    const walletType = wallet.parent.defaultToken.Metadata.type
-
-    if(walletType === 'Cardano') {
-      return hash
-    }
-    return RustModule.SigmaRust.NetworkAddress
-        .from_bytes(Buffer.from(hash, 'hex'))
-        .to_base58();
+  if (change == null) {
+    throw new Error('could not get change address - this should never happen');
   }
-  throw new Error('could not get change address - this should never happen');
+  return change.addr.Hash
 }
 
 export type BoxLike = {
@@ -595,7 +563,7 @@ function getTxRequiredSigningKeys(
   return set;
 }
 
-function getCip95RequiredSignKeys(
+function getCertificatesRequiredSignKeys(
   txBody: RustModule.WalletV4.TransactionBody,
 ): Set<string> {
   const result: Set<string> = new Set();
@@ -676,6 +644,14 @@ function getCip95RequiredSignKeys(
         const keyHash = updateDrep.voting_credential().to_keyhash();
         if (keyHash) {
           result.add(keyHash.to_hex());
+        }
+        continue;
+      }
+      const poolRegCert = cert.as_pool_registration();
+      if (poolRegCert) {
+        const hashes = poolRegCert.pool_params().pool_owners();
+        for (let j = 0; j < hashes.len(); j++) {
+          result.add(hashes.get(j).to_hex());
         }
         continue;
       }
@@ -765,13 +741,10 @@ async function __connectorSignCardanoTx(
     throw new Error(`missing chains functionality`);
   }
 
-  const requiredTxSignKeys = getTxRequiredSigningKeys(txBody);
-  const requiredScriptSignKeys = getScriptRequiredSigningKeys(witnessSet, RustModule);
-  const requiredCip95SignKeys = getCip95RequiredSignKeys(txBody);
   const totalAdditionalRequiredSignKeys = new Set<string>([
-    ...requiredTxSignKeys,
-    ...requiredScriptSignKeys,
-    ...requiredCip95SignKeys,
+    ...getTxRequiredSigningKeys(txBody),
+    ...getScriptRequiredSigningKeys(witnessSet, RustModule),
+    ...getCertificatesRequiredSignKeys(txBody),
   ]);
 
   console.log('totalAdditionalRequiredSignKeys', [...totalAdditionalRequiredSignKeys]);
@@ -1177,7 +1150,7 @@ export async function connectorRecordSubmittedCardanoTransaction(
   await persistSubmittedTransactions(submittedTxs);
 }
 
-const REORG_OUTPUT_AMOUNT  = '1000000';
+const MIN_REORG_OUTPUT_AMOUNT  = '1000000';
 
 export async function connectorGenerateReorgTx(
   publicDeriver: PublicDeriver<>,
@@ -1209,23 +1182,18 @@ export async function connectorGenerateReorgTx(
   const unusedAddresses = await connectorGetUnusedAddresses(
     publicDeriver
   );
-  const includeTargets = [];
-  const collateralOutputAddressSet = new Set<string>();
-  const reorgOutputCount = (new BigNumber(reorgTargetAmount))
-        .div(REORG_OUTPUT_AMOUNT)
-        .integerValue(BigNumber.ROUND_CEIL)
-        .toNumber();
-  if (reorgOutputCount > unusedAddresses.length) {
-    throw new Error('unexpected: too many collaterals required');
+  if (unusedAddresses.length === 0) {
+    throw new Error('unexpected: no unused addresses available');
   }
-  for (let i = 0; i < reorgOutputCount; i++) {
-    includeTargets.push({
-      address: unusedAddresses[i],
-      isForeign: false,
-      value: REORG_OUTPUT_AMOUNT,
-    });
-    collateralOutputAddressSet.add(unusedAddresses[i]);
-  }
+  const reorgOutputValue = BigNumber
+    .max(reorgTargetAmount, MIN_REORG_OUTPUT_AMOUNT)
+    .toString();
+  const includeTargets = [{
+    address: unusedAddresses[0],
+    isForeign: false,
+    value: reorgOutputValue,
+  }];
+  const collateralOutputAddressSet = new Set<string>([unusedAddresses[0]]);
   const dontUseUtxoIds = new Set(usedUtxoIds);
   const adaApi = new AdaApi();
   const unsignedTx = await adaApi.createUnsignedTxForConnector(

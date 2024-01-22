@@ -1,8 +1,9 @@
 // @flow
 
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+
 const commonConfig = require('./commonConfig');
 const connections = require('../scripts-mv2/connections');
-const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
 const path = require('path');
 const webpack = require('webpack');
@@ -33,7 +34,7 @@ const baseDevConfig = (
       hotScript,
       path.join(__dirname, '../chrome/extension/background')
     ],
-    ergo: [
+    connector: [
       customPath,
       hotScript,
       path.join(__dirname, '../chrome/extension/connector/index')
@@ -62,7 +63,6 @@ const baseDevConfig = (
   },
   plugins: [
     ...commonConfig.plugins('dev', networkName),
-    new ReactRefreshWebpackPlugin(),
     new webpack.DefinePlugin(commonConfig.definePlugin(
       networkName,
       false,
@@ -76,7 +76,8 @@ const baseDevConfig = (
     new webpack.DefinePlugin({
       __HOST__: `'${host}'`,
       __PORT__: connections.Ports.WebpackDev,
-    })
+    }),
+    new ReactRefreshWebpackPlugin(),
   ],
   module: {
     rules: [

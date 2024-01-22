@@ -3,7 +3,6 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { Button } from '@mui/material';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
@@ -23,7 +22,8 @@ import { getTokenName } from '../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
 
 import styles from './URIGenerateDialog.scss';
-import ThemedDialog from '../widgets/ThemedDialog';
+// import ThemedDialog from '../widgets/ThemedDialog';
+import Dialog from '../widgets/Dialog';
 
 const messages = defineMessages({
   uriGenerateDialogTitle: {
@@ -131,9 +131,19 @@ export default class URIGenerateDialog extends Component<Props> {
     const amountField = form.$('amount');
     const amountFieldProps = amountField.bind();
 
+    const actions = [
+      {
+        label: this.context.intl.formatMessage(messages.uriGenerateDialogConfirmLabel),
+        onClick: onGenerate.bind(this, receiverField.value, amountField.value),
+        primary: true,
+        disabled: !amountField.isValid,
+      },
+    ];
+
     return (
-      <ThemedDialog
+      <Dialog
         title={intl.formatMessage(messages.uriGenerateDialogTitle)}
+        actions={actions}
         className={dialogClasses}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
@@ -156,21 +166,13 @@ export default class URIGenerateDialog extends Component<Props> {
               label={this.getAmountLabel()}
               error={amountField.error}
               done={amountField.isValid}
+              placeholder="0"
               allowSigns={false}
               autoFocus
             />
           </div>
-
-          <Button
-            variant="primary"
-            onClick={onGenerate.bind(this, receiverField.value, amountField.value)}
-            disabled={!amountField.isValid}
-            sx={{ margin: '30px auto 0', display: 'block', width: '400px' }}
-          >
-            {this.context.intl.formatMessage(messages.uriGenerateDialogConfirmLabel)}
-          </Button>
         </div>
-      </ThemedDialog>
+      </Dialog>
     );
   }
 }

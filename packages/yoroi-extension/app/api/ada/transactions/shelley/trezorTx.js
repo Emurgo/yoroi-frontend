@@ -37,9 +37,9 @@ import {
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { range } from 'lodash';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
-import { derivePublicByAddressing } from '../../lib/cardanoCrypto/utils';
 import blake2b from 'blake2b';
 import cbor from 'cbor';
+import { derivePublicByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
 
 // ==================== TREZOR ==================== //
 /** Generate a payload for Trezor SignTx */
@@ -119,15 +119,15 @@ export async function createTrezorSignTxPayload(
     request = {
       ...request,
       auxiliaryData: {
-        governanceRegistrationParameters: {
+        cVoteRegistrationParameters: {
           delegations: [
             {
-              votingPublicKey: votingPublicKey.replace(/^0x/, ''),
+              votePublicKey: votingPublicKey.replace(/^0x/, ''),
               weight: 1,
             }
           ],
           stakingPath: stakingKeyPath,
-          rewardAddressParameters: {
+          paymentAddressParameters: {
             addressType: CardanoAddressType.BASE,
             path: paymentKeyPath,
             stakingPath: stakingKeyPath,

@@ -14,13 +14,13 @@ import type {
   WalletRestoreMeta,
   RestoreModeType,
 } from '../../../actions/common/wallet-restore-actions';
-import React, { Component } from 'react';
+import React, { Component, Suspense } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
-import { ROUTES } from '../../../routes-config';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
+import { Box } from '@mui/material';
 import TopBarLayout from '../../../components/layout/TopBarLayout';
 import BannerContainer from '../../banners/BannerContainer';
 import SidebarContainer from '../../SidebarContainer';
@@ -37,18 +37,10 @@ type Props = InjectedOrGenerated<GeneratedData>;
 export default class RestoreWalletPage extends Component<Props> {
   render(): Node {
     const { stores, actions } = this.generated;
+    const { hasAnyWallets } = stores.wallets;
 
-    return (
-      <TopBarLayout
-        banner={<BannerContainer {...this.generated.BannerContainerProps} />}
-        sidebar={
-          <SidebarContainer
-            {...this.generated.SidebarContainerProps}
-            onLogoClick={() => actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })}
-          />
-        }
-        bgcolor="common.white"
-      >
+    const restoreWalletPageComponent = (
+      <Suspense fallback={null}>
         <RestoreWalletPageComponent
           restoreWallet={actions.walletRestore.restoreWallet.trigger}
           stores={stores}
@@ -57,7 +49,21 @@ export default class RestoreWalletPage extends Component<Props> {
           closeDialog={this.generated.actions.dialogs.closeActiveDialog.trigger}
           isDialogOpen={stores.uiDialogs.isOpen}
         />
+      </Suspense>
+    );
+
+    return hasAnyWallets ? (
+      <TopBarLayout
+        banner={<BannerContainer {...this.generated.BannerContainerProps} />}
+        sidebar={<SidebarContainer {...this.generated.SidebarContainerProps} />}
+        bgcolor="common.white"
+      >
+        {restoreWalletPageComponent}
       </TopBarLayout>
+    ) : (
+      <Box py="48px" height="100vh" sx={{ overflowY: 'auto' }}>
+        {restoreWalletPageComponent}
+      </Box>
     );
   }
 
@@ -108,6 +114,7 @@ export default class RestoreWalletPage extends Component<Props> {
         restoreRequest: {| error: ?LocalizableError, isExecuting: boolean, reset: () => void |},
         publicDerivers: Array<PublicDeriver<>>,
         getPublicKeyCache: IGetPublic => PublicKeyCache,
+        hasAnyWallets: boolean,
       |},
       walletSettings: {|
         getConceptualWalletSettingsCache: ConceptualWallet => ConceptualWalletSettingsCache,
@@ -147,6 +154,7 @@ export default class RestoreWalletPage extends Component<Props> {
           },
           getPublicKeyCache: stores.wallets.getPublicKeyCache,
           publicDerivers: stores.wallets.publicDerivers,
+          hasAnyWallets: stores.wallets.hasAnyWallets,
         },
         walletRestore: {
           isValidMnemonic: stores.walletRestore.isValidMnemonic,

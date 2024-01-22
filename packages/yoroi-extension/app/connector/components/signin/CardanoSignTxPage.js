@@ -41,7 +41,6 @@ import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import CardanoUtxoDetails from './cardano/UtxoDetails';
 import { Box } from '@mui/system';
 import SignTxTabs from './SignTxTabs';
-import { signTxMessages } from './SignTxPage';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import { ReactComponent as ExternalLinkIcon } from '../../assets/images/external-link.inline.svg';
 import CardanoSignTx from './cardano/SignTx';
@@ -58,6 +57,10 @@ const messages = defineMessages({
   sendError: {
     id: 'connector.signin.error.sendError',
     defaultMessage: '!!!An error occured when sending the transaction.',
+  },
+  signMessage: {
+    id: 'connector.signin.signMessage',
+    defaultMessage: '!!!Sign Message',
   },
 });
 
@@ -367,7 +370,7 @@ class SignTxPage extends Component<Props, State> {
           <ErrorBlock error={hwWalletError} />
           {Boolean(this.props.tx) && (
             <Box>
-              <Typography>Transaction:</Typography>
+              <Typography component="div">Transaction:</Typography>
               <textarea rows="10" style={{ width: '100%' }} disabled value={this.props.tx} />
             </Box>
           )}
@@ -395,6 +398,7 @@ class SignTxPage extends Component<Props, State> {
                 id="walletPassword"
               />
             }
+            cip95Info={txData.cip95Info}
           />
         </Box>
       );
@@ -423,8 +427,8 @@ class SignTxPage extends Component<Props, State> {
       // signing data
       content = (
         <Box>
-          <Typography color="#4A5065" variant="body1" fontWeight={500} mb="16px" id="signMessageTitle">
-            {intl.formatMessage(signTxMessages.signMessage)}
+          <Typography component="div" color="#4A5065" variant="body1" fontWeight={500} mb="16px" id="signMessageTitle">
+            {intl.formatMessage(messages.signMessage)}
           </Typography>
           <Box
             width="100%"

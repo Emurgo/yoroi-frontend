@@ -29,15 +29,6 @@ export type CardanoShelleyTxIO = {|
    ...DbTokenInfo,
   +certificates: Array<CertificatePart>,
 |};
-export type ErgoTxIO = {|
-  +txType: $PropertyType<typeof TransactionType, "Ergo">,
-  +transaction: $ReadOnly<{|
-    ...$PropertyType<DbTransaction, 'transaction'>,
-    +Type: $PropertyType<typeof TransactionType, "Ergo">,
-  |}>,
-  ...DbUtxoInputs, ...DbUtxoOutputs,
-  ...DbTokenInfo,
-|};
 
 export const populateMultipartTransactionsDb = (_schemaBuilder: lf$schema$Builder) => {
   // Does nothing for now but may be used in the future

@@ -9,7 +9,6 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import moment from 'moment';
-import { ReactComponent as CalendarIcon } from '../../../assets/images/calendar.inline.svg';
 
 const messages = defineMessages({
   startDate: {
@@ -72,17 +71,13 @@ export default class ExportTransactionDialog extends Component<Props> {
             maxDate={moment()} // Today
             minDate={minDate}
             onChange={setDateHandler}
+            slotProps={{
+              textField: {
+                helperText: 'MM/DD/YYYY',
+              },
+            }}
             renderInput={params => {
-              console.log({ params });
-              return (
-                <TextField
-                  {...params}
-                  sx={{ mb: '24px' }}
-                  InputProps={{
-                    endAdornment: <CalendarIcon />,
-                  }}
-                />
-              );
+              return <TextField {...params} sx={{ mb: '24px' }} />;
             }}
           />
         ))}

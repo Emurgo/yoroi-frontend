@@ -11,7 +11,7 @@ import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react';
 import globalMessages from '../../../i18n/global-messages';
 import { toSvg } from 'jdenticon';
-import { CopyAddress } from '../../../components/wallet/assets/NFTDetails';
+import { CopyAddress } from '../../../components/wallet/assets/TruncatedText';
 import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
 import { truncateAddress } from '../../../utils/formatters';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
@@ -22,9 +22,16 @@ import type { NetworkRow, TokenRow } from '../../../api/ada/lib/storage/database
 import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
 import type { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { SendUsingTrezorParams } from '../../../actions/ada/trezor-send-actions';
-import { genFormatTokenAmount, genLookupOrFail, getTokenName, } from '../../../stores/stateless/tokenHelpers';
+import {
+  genFormatTokenAmount,
+  genLookupOrFail,
+  getTokenName,
+} from '../../../stores/stateless/tokenHelpers';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
-import { isLedgerNanoWallet, isTrezorTWallet, } from '../../../api/ada/lib/storage/models/ConceptualWallet';
+import {
+  isLedgerNanoWallet,
+  isTrezorTWallet,
+} from '../../../api/ada/lib/storage/models/ConceptualWallet';
 import { asGetSigningKey } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
 import SpendingPasswordInput from '../../../components/widgets/forms/SpendingPasswordInput';
 import VerticallyCenteredLayout from '../../../components/layout/VerticallyCenteredLayout';
@@ -34,7 +41,7 @@ import YoroiTransferErrorPage from '../../transfer/YoroiTransferErrorPage';
 import ExplorableHashContainer from '../../widgets/ExplorableHashContainer';
 import RawHash from '../../../components/widgets/hashWrappers/RawHash';
 import Warning from '../../../components/common/Warning';
-import DialogRevamp from '../../../components/widgets/DialogRevamp';
+import Dialog from '../../../components/widgets/Dialog';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
 import type { SendUsingLedgerParams } from '../../../actions/ada/ledger-send-actions';
 import LocalizableError from '../../../i18n/LocalizableError';
@@ -162,21 +169,16 @@ export default class WithdrawRewardsDialog extends Component<Props> {
     }
 
     if (
-      !delegationRequests.getCurrentDelegation.wasExecuted ||
-      delegationRequests.getCurrentDelegation.isExecuting ||
-      delegationRequests.getCurrentDelegation.result == null
+      !delegationRequests.getDelegatedBalance.wasExecuted ||
+      delegationRequests.getDelegatedBalance.isExecuting ||
+      delegationRequests.getDelegatedBalance.result == null
     ) {
       return null;
     }
 
-    if (delegationRequests.getCurrentDelegation.result.currEpoch == null) return null;
+    const currentPool = delegationRequests.getDelegatedBalance.result.delegation;
+    if (currentPool == null) return null;
 
-    const currentPools = delegationRequests.getCurrentDelegation.result.currEpoch.pools;
-    const currentPage = this.generated.stores.delegation.selectedPage;
-
-    if (currentPools.length === 0) return null;
-
-    const currentPool = currentPools[currentPage][0];
     const network = publicDeriver.getParent().getNetworkInfo();
     const meta = this.generated.stores.delegation.getLocalPoolInfo(network, String(currentPool));
     if (meta == null) {
@@ -215,7 +217,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
     const tentativeTx = createWithdrawalTx.result;
     if (!tentativeTx)
       return (
-        <DialogRevamp
+        <Dialog
           title={intl.formatMessage(globalMessages.processingLabel)}
           closeOnOverlayClick={false}
         >
@@ -226,7 +228,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
               </VerticallyCenteredLayout>
             </LegacyTransferLayout>
           </Box>
-        </DialogRevamp>
+        </Dialog>
       );
     const receivers = tentativeTx.receivers(true);
     const receiverAddress = addressToDisplayString(receivers[0], network);
@@ -258,7 +260,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
     if (!selectedExplorer) throw new Error('No explorer for wallet network');
 
     return (
-      <DialogRevamp
+      <Dialog
         title={intl.formatMessage(messages.dialogTitle)}
         actions={[
           {
@@ -277,19 +279,21 @@ export default class WithdrawRewardsDialog extends Component<Props> {
         closeOnOverlayClick={false}
         onClose={this.props.onClose}
         closeButton={<DialogCloseButton />}
+        scrollableContentClass="WithdrawRewards"
+        styleOverride={{ width: '648px' }}
       >
-        <Box maxWidth="600px">
+        <Box className="WithdrawRewards" overflowY="auto" maxHeight="70vh" maxWidth="604px">
           {shouldDeregister && (
             <Box mb="24px">
               <Warning>
-                <Typography variant="body1">
+                <Typography component="div" variant="body1">
                   {intl.formatMessage(messages.deregistrationWarning)}
                 </Typography>
               </Warning>
             </Box>
           )}
           <Box mb="16px" px="5px">
-            <Typography variant="body1" color="grayscale.600">
+            <Typography component="div" variant="body1" color="grayscale.600">
               {intl.formatMessage(globalMessages.stakePoolChecksumAndName)}
             </Typography>
             <Box
@@ -312,16 +316,16 @@ export default class WithdrawRewardsDialog extends Component<Props> {
                   src={avatarGenerated}
                 />
               </Box>
-              <Typography variant="body1" color="grayscale.900">
+              <Typography component="div" variant="body1" color="grayscale.900">
                 {name}
               </Typography>
             </Box>
           </Box>
           <Box>
-            <Typography variant="body1" color="grayscale.600" px="4px">
+            <Typography component="div" variant="body1" color="grayscale.600" px="4px">
               {intl.formatMessage(globalMessages.stakePoolHash)}
             </Typography>
-            <Typography variant="body1" sx={{ '& > div > p': { p: '2px 3px' }, px: '2px' }}>
+            <Typography component="div" variant="body1" sx={{ '& > div > p': { p: '2px 3px' }, px: '2px' }}>
               <CopyAddress text={currentPool}>
                 <ExplorableHashContainer
                   selectedExplorer={selectedExplorer}
@@ -339,10 +343,10 @@ export default class WithdrawRewardsDialog extends Component<Props> {
             </Typography>
           </Box>
           <Box>
-            <Typography variant="body1" color="grayscale.600" px="5px">
+            <Typography component="div" variant="body1" color="grayscale.600" px="5px">
               {intl.formatMessage(messages.withdrawalAddress)}
             </Typography>
-            <Typography variant="body1" sx={{ '& > div > p': { p: '2px 3px' }, px: '2px' }}>
+            <Typography component="div" variant="body1" sx={{ '& > div > p': { p: '2px 3px' }, px: '2px' }}>
               <CopyAddress text={receiverAddress}>
                 <ExplorableHashContainer
                   selectedExplorer={selectedExplorer}
@@ -370,26 +374,26 @@ export default class WithdrawRewardsDialog extends Component<Props> {
             borderColor="grayscale.200"
           >
             <Box minWidth="180px">
-              <Typography variant="body1" color="grayscale.600" mb="4px">
+              <Typography component="div" variant="body1" color="grayscale.600" mb="4px">
                 {intl.formatMessage(messages.accumulatedRewards)}
               </Typography>
-              <Typography variant="body1" color="grayscale.900">
+              <Typography component="div" variant="body1" color="grayscale.900">
                 {formatValue(recoveredBalance.getDefaultEntry())} {ticker}
               </Typography>
             </Box>
             <Box minWidth="180px">
-              <Typography variant="body1" color="grayscale.600" mb="4px">
+              <Typography component="div" variant="body1" color="grayscale.600" mb="4px">
                 {intl.formatMessage(globalMessages.feeLabel)}
               </Typography>
-              <Typography variant="body1" color="grayscale.900">
+              <Typography component="div" variant="body1" color="grayscale.900">
                 {formatValue(txFee.getDefaultEntry())} {ticker}
               </Typography>
             </Box>
             <Box minWidth="180px">
-              <Typography variant="body1" color="grayscale.600" mb="4px">
+              <Typography component="div" variant="body1" color="grayscale.600" mb="4px">
                 {intl.formatMessage(globalMessages.finalBalanceLabel)}
               </Typography>
-              <Typography variant="body1" color="grayscale.900">
+              <Typography component="div" variant="body1" color="grayscale.900">
                 {formatValue(finalRewards.getDefaultEntry())} {ticker}
               </Typography>
             </Box>
@@ -407,13 +411,13 @@ export default class WithdrawRewardsDialog extends Component<Props> {
                 mb: '2px',
               }}
             >
-              <Typography variant="caption1" color="magenta.500">
+              <Typography component="div" variant="caption1" color="magenta.500">
                 {intl.formatMessage(error, error.values)}
               </Typography>
             </Box>
           ) : null}
         </Box>
-      </DialogRevamp>
+      </Dialog>
     );
   }
 

@@ -1,22 +1,21 @@
 // @flow
-import type { Node, ComponentType } from 'react';
+import type { ComponentType, Node } from 'react';
 import { Component } from 'react';
-import { computed, action, observable } from 'mobx';
+import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { messages } from '../../../components/wallet/settings/RemoveWallet';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 
 import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
 import LocalizableError from '../../../i18n/LocalizableError';
-import { withLayout } from '../../../styles/context/layout';
 import type { LayoutComponentMap } from '../../../styles/context/layout';
-import { getWalletType } from '../../../stores/toplevel/WalletSettingsStore';
-import type { WalletsNavigation } from '../../../api/localStorage'
+import { withLayout } from '../../../styles/context/layout';
+import type { WalletsNavigation } from '../../../api/localStorage';
 
 export type GeneratedData = typeof RemoveWalletDialogContainer.prototype.generated;
 
@@ -65,11 +64,10 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
     const walletsNavigation = this.generated.stores.profile.walletsNavigation;
 
     if (this.props.publicDeriver) {
-      const walletType = getWalletType(this.props.publicDeriver);
       const newWalletsNavigation = {
         ...walletsNavigation,
         // $FlowFixMe[invalid-computed-prop]
-        [walletType]: walletsNavigation[walletType].filter(
+        'cardano': walletsNavigation.cardano.filter(
           walletId => walletId !== selectedWalletId
         ),
       };

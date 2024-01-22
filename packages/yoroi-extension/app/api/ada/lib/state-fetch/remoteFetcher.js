@@ -25,7 +25,7 @@ import type {
   UtxoSumResponse,
   CatalystRoundInfoRequest,
   CatalystRoundInfoResponse,
-  MultiAssetMintMetadataRequest,
+  MultiAssetRequest,
   MultiAssetMintMetadataResponse,
   GetUtxoDataRequest,
   GetUtxoDataResponse,
@@ -35,6 +35,7 @@ import type {
   GetTransactionsByHashesRequest,
   GetTransactionsByHashesResponse,
   GetProtocolParametersFunc,
+  MultiAssetSupplyResponse,
 } from './types';
 import type { FilterUsedRequest, FilterUsedResponse, } from '../../../common/lib/state-fetch/currencySpecificTypes';
 
@@ -529,7 +530,7 @@ export class RemoteFetcher implements IFetcher {
       });
   }
 
-  getMultiAssetMintMetadata: MultiAssetMintMetadataRequest
+  getMultiAssetMintMetadata: MultiAssetRequest
     => Promise<MultiAssetMintMetadataResponse> = async (body) => {
       const { BackendService } = body.network.Backend;
       if (BackendService == null) throw new Error(`${nameof(this.getMultiAssetMintMetadata)} missing backend url`);
@@ -544,6 +545,25 @@ export class RemoteFetcher implements IFetcher {
       ).then(response => response.data)
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getMultiAssetMintMetadata)} error: ` + stringifyError(error));
+        return {};
+      });
+  }
+
+  getMultiAssetSupply: MultiAssetRequest
+    => Promise<MultiAssetSupplyResponse> = async (body) => {
+      const { BackendService } = body.network.Backend;
+      if (BackendService == null) throw new Error(`${nameof(this.getMultiAssetSupply)} missing backend url`);
+      return await axios(
+        `${BackendService}/api/multiAsset/supply?numberFormat=string`,
+        {
+          method: 'post',
+          data: {
+            assets: body.assets
+          }
+        }
+      ).then(response => response.data.supplies)
+      .catch((error) => {
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getMultiAssetSupply)} error: ` + stringifyError(error));
         return {};
       });
   }

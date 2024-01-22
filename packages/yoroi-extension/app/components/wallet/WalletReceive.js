@@ -313,7 +313,7 @@ export default class WalletReceive extends Component<Props> {
           <div className={styles.notFound}>
             <NoTransactionModernSvg />
             <h1>{intl.formatMessage(messages.noResultsFoundLabel)}</h1>
-            <p>{intl.formatMessage(messages.notFoundAnyAddresses)}</p>
+            <div>{intl.formatMessage(messages.notFoundAnyAddresses)}</div>
           </div>
         </div>
       );

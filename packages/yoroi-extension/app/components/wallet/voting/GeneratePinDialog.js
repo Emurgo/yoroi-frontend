@@ -75,7 +75,7 @@ export default class GeneratePinDialog extends Component<Props> {
                 justifyContent: 'center',
               }}
             >
-              <Typography variant="body1" color="grayscale.600">
+              <Typography component="div" variant="body1" color="grayscale.600">
                 {value}
               </Typography>
             </Box>
@@ -105,7 +105,7 @@ export default class GeneratePinDialog extends Component<Props> {
               steps={stepsList.map(step => ({ message: step.message, stepId: String(step.step) }))}
               setCurrentStep={() => {}}
             />
-            <Typography
+            <Typography component="div"
               textAlign="center"
               pt="24px"
               pb="40px"

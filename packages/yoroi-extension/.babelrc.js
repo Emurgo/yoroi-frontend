@@ -12,7 +12,6 @@ const nodePlugins = {
         'cardano-wallet-browser': 'cardano-wallet',
         '@emurgo/js-chain-libs': '@emurgo/js-chain-libs-node',
         '@emurgo/cardano-serialization-lib-browser': '@emurgo/cardano-serialization-lib-nodejs',
-        'ergo-lib-wasm-browser': 'ergo-lib-wasm-nodejs',
         '@emurgo/cardano-message-signing-browser': '@emurgo/cardano-message-signing-nodejs',
         '@emurgo/cross-csl-browser': '@emurgo/cross-csl-nodejs',
       }

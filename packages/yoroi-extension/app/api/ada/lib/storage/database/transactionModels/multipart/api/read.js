@@ -9,7 +9,7 @@ import type {
 } from '../../../primitives/tables';
 import { TransactionType } from '../../../primitives/tables';
 import { GetCertificates, AssociateToken } from '../../../primitives/api/read';
-import type { CardanoByronTxIO, CardanoShelleyTxIO, ErgoTxIO } from '../tables';
+import type { CardanoByronTxIO, CardanoShelleyTxIO } from '../tables';
 
 import {
   AssociateTxWithAccountingIOs,
@@ -144,62 +144,6 @@ export class CardanoShelleyAssociateTxWithIOs {
       accountingInputs: getOrThrow(accounting.get(transaction)).accountingInputs,
       tokens,
     }));
-    return fullTx;
-  }
-}
-
-export class ErgoAssociateTxWithIOs {
-  static ownTables: {||} = Object.freeze({});
-  static depTables: {|
-    AssociateTxWithUtxoIOs: typeof AssociateTxWithUtxoIOs,
-    AssociateToken: typeof AssociateToken,
-  |} = Object.freeze({
-    AssociateTxWithUtxoIOs,
-    AssociateToken,
-  });
-
-  static async getIOsForTx(
-    db: lf$Database,
-    tx: lf$Transaction,
-    request: {|
-      txs: $ReadOnlyArray<$ReadOnly<TransactionRow>>,
-      networkId: number,
-    |},
-  ): Promise<Array<ErgoTxIO>> {
-    const utxo = await ErgoAssociateTxWithIOs.depTables.AssociateTxWithUtxoIOs.getIOsForTx(
-      db, tx, { txs: request.txs }
-    );
-
-    const tokens = await CardanoByronAssociateTxWithIOs.depTables.AssociateToken.join(
-      db, tx,
-      {
-        listIds: request.txs.flatMap(transaction => {
-          const utxoEntries = getOrThrow(utxo.get(transaction));
-          return [
-            ...utxoEntries.utxoInputs.map(entry => entry.TokenListId),
-            ...utxoEntries.utxoOutputs.map(entry => entry.TokenListId),
-          ];
-        }),
-        networkId: request.networkId,
-      }
-    );
-
-    const fullTx = request.txs.map(transaction  => {
-      const txRow = getOrThrow(utxo.get(transaction));
-      return {
-        txType: TransactionType.Ergo,
-        transaction,
-        ...txRow,
-        tokens: tokens.map(token => ({
-          TokenList: token.TokenList,
-          Token: {
-            TokenId: token.Token.TokenId,
-            Identifier: token.Token.Identifier,
-            NetworkId: token.Token.NetworkId,
-          },
-        })),
-      };
-    });
     return fullTx;
   }
 }

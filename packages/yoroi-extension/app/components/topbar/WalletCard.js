@@ -166,13 +166,13 @@ export default class WalletCard extends Component<Props, State> {
                   />
                 </div>
                 <div className={styles.extraInfo}>
-                  <p className={styles.label}>
+                  <div className={styles.label}>
                     {intl.formatMessage(messages.tokenTypes)}{' '}
                     <span className={styles.value}>{tokenTypes}</span>
-                  </p>
-                  <p className={styles.label}>
+                  </div>
+                  <div className={styles.label}>
                     NFTs <span className={styles.value}>{nfts}</span>
-                  </p>
+                  </div>
                 </div>
               </div>
             </div>

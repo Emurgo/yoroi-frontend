@@ -36,7 +36,7 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
           justifyContent: 'space-between',
         }}
       >
-        <Typography variant="h5" color="common.black" fontWeight={500}>
+        <Typography component="div" variant="h5" color="common.black" fontWeight={500}>
           {intl.formatMessage(globalMessages.stakePoolDelegated)}
         </Typography>
         <UndelegateButton
@@ -63,7 +63,7 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
           )}
         </AvatarWrapper>
         <Box marginLeft="16px" sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-          <Typography color="grayscale.max" variant="body1" fontWeight="medium" mb="3px">
+          <Typography component="div" color="grayscale.max" variant="body1" fontWeight="medium" mb="3px">
             {ticker !== undefined ? `[${ticker}]` : ''} {name}
           </Typography>
           <SocialMediaStakePool
@@ -76,7 +76,7 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
       <Wrapper justifyContent="space-between" sx={{ paddingBottom: 0 }}>
         {roa != null ? (
           <Box sx={{ display: 'flex', flexFlow: 'column' }}>
-            <Typography
+            <Typography component="div"
               variant="caption1"
               color="grayscale.500"
               sx={{ textTransform: 'uppercase' }}
@@ -90,7 +90,7 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
         ) : null}
         {poolSize != null && (
           <Box sx={{ display: 'flex', flexFlow: 'column' }}>
-            <Typography
+            <Typography component="div"
               variant="caption1"
               color="grayscale.500"
               sx={{ textTransform: 'uppercase' }}
@@ -104,7 +104,7 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
         )}
         {share != null && (
           <Box sx={{ display: 'flex', flexFlow: 'column' }}>
-            <Typography
+            <Typography component="div"
               variant="caption1"
               color="grayscale.500"
               sx={{ textTransform: 'uppercase' }}

@@ -1,6 +1,6 @@
 // @flow
+import type { ComponentType, Node } from 'react';
 import { useState } from 'react';
-import type { Node, ComponentType } from 'react';
 import { Box, styled } from '@mui/system';
 import {
   Link as LinkMui,
@@ -14,25 +14,23 @@ import {
 } from '@mui/material';
 import { TabContext, TabPanel, TabList } from '@mui/lab';
 import globalMessages from '../../../i18n/global-messages';
-import { injectIntl, defineMessages } from 'react-intl';
+import type { $npm$ReactIntl$IntlShape } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
 import { ReactComponent as BackArrow } from '../../../assets/images/assets-page/backarrow.inline.svg';
 import { ReactComponent as IconCopy } from '../../../assets/images/copy.inline.svg';
 import { ReactComponent as IconCopied } from '../../../assets/images/copied.inline.svg';
 import { ReactComponent as Chevron } from '../../../assets/images/assets-page/chevron-right.inline.svg';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../routes-config';
 import { getNetworkUrl, tokenMessages } from './TokenDetails';
-import type {
-  NetworkRow,
-  CardanoAssetMintMetadata,
-} from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { CardanoAssetMintMetadata, NetworkRow, } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { NftImage } from './NFTsList';
 import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { truncateAddress, truncateAddressShort } from '../../../utils/formatters';
 import { urlResolveIpfs } from '../../../coreUtils';
 import { ampli } from '../../../../ampli/index';
+import { CopyAddress, TruncatedText } from './TruncatedText';
 
 type Props = {|
   nftInfo: void | {
@@ -100,6 +98,7 @@ const tabs = [
 ];
 
 function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props & Intl): Node {
+  const nftImage = urlResolveIpfs(nftInfo?.image);
   const networkUrl = getNetworkUrl(network);
   const [activeTab, setActiveTab] = useState(tab !== null ? tab : tabs[0].id); // Overview tab
   const setActiveTabAndTrack = function (tabId: string) {
@@ -145,28 +144,17 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
 
   return (
     <Box sx={{ p: '24px', width: '100%' }}>
-      <Box sx={{ display: 'inline-block' }}>
-        <Typography
-          as={Link}
-          replace
-          to={ROUTES.NFTS.ROOT}
-          variant="h5"
-          sx={{
-            color: 'grayscale.900',
-            textDecoration: 'none',
-            marginTop: '5px',
-            textTransform: 'capitalize',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-start',
-          }}
-        >
-          <BackArrow />
-          <Box component="span" marginLeft="10px">
-            {intl.formatMessage(messages.back)}
-          </Box>
-        </Typography>
-      </Box>
+      <Button
+        LinkComponent={Link}
+        to={ROUTES.NFTS.ROOT}
+        sx={{
+          color: 'grayscale.900',
+          lineHeight: '27.5px',
+        }}
+        startIcon={<BackArrow />}
+      >
+        {intl.formatMessage(messages.back)}
+      </Button>
       <Grid
         container
         columns={10}
@@ -178,23 +166,20 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
           borderRadius: '8px',
         }}
       >
-        <Grid
-          item
-          xs={4}
-        >
+        <Grid item xs={4}>
           <ImageItem
             sx={{
-              cursor: nftInfo.image !== null ? 'zoom-in' : 'auto',
+              cursor: nftImage !== null ? 'zoom-in' : 'auto',
               paddingY: '24px',
               display: 'block',
               img: {
                 objectFit: 'unset',
               },
             }}
-            onClick={() => nftInfo.image !== null && setOpenAndTrack()}
+            onClick={() => nftImage !== null && setOpenAndTrack()}
           >
             <NftImage
-              imageUrl={nftInfo.image}
+              imageUrl={nftImage}
               name={nftInfo.name || '-'}
               width="100%"
               height="auto"
@@ -407,7 +392,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
         >
           <img
             style={{ objectFit: 'cover', maxWidth: '100%', maxHeight: '100%' }}
-            src={urlResolveIpfs(nftInfo.image)}
+            src={nftImage}
             alt={nftInfo.name}
             title={nftInfo.name}
             loading="lazy"
@@ -437,48 +422,11 @@ const ImageItem = styled(Box)({
   },
 });
 
-// Requrie predefined with
-// jone -> jo..
-const TruncatedText = styled(Typography)({
-  whiteSpace: 'nowrap',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-});
-
-export function CopyAddress({ text, children }: {| text: string, children: Node |}): Node {
-  const [isCopied, setCopy] = useState(false);
-
-  const onCopy = async () => {
-    setCopy(false);
-
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopy(true);
-    } catch (error) {
-      setCopy(false);
-    }
-
-    setTimeout(() => {
-      setCopy(false);
-    }, 2500); // 2.5 sec
-  };
-
-  return (
-    <Stack direction="row" alignItems="center">
-      <TruncatedText>{children}</TruncatedText>
-
-      <IconButton sx={{ ml: '4px' }} onClick={onCopy}>
-        {isCopied ? <IconCopied /> : <IconCopy />}
-      </IconButton>
-    </Stack>
-  );
-}
-
 function LabelWithValue({ label, value }: {| label: string | Node, value: string | Node |}): Node {
   return (
     <Box>
-      <Typography color="var(--yoroi-palette-gray-600)">{label}</Typography>
-      <Typography color="var(--yoroi-palette-gray-900)">{value}</Typography>
+      <Typography component="div" color="var(--yoroi-palette-gray-600)">{label}</Typography>
+      <Typography component="div" color="var(--yoroi-palette-gray-900)">{value}</Typography>
     </Box>
   );
 }

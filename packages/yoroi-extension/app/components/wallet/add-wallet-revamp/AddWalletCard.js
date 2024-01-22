@@ -17,7 +17,7 @@ export default function AddWalletCard(props: Props): Node {
       <Box>
         <img src={imageSrc} alt={label} />
       </Box>
-      <Typography variant="h3" fontWeight={500} textAlign="center" padding="0px 40px" mt="16px">
+      <Typography component="div" variant="h3" fontWeight={500} textAlign="center" padding="0px 40px" mt="16px">
         {label}
       </Typography>
     </button>

@@ -4,13 +4,11 @@ import type { Node, ComponentType } from 'react';
 import type { Props } from './Dialog';
 import { withLayout } from '../../styles/context/layout';
 import type { InjectedLayoutProps } from '../../styles/context/layout';
-import DialogClassic from './Dialog';
-import DialogRevamp from './DialogRevamp';
+import Dialog from './Dialog';
 
 class ThemedDialog extends Component<Props & InjectedLayoutProps> {
   render(): Node {
     const {
-      isRevampLayout,
       children,
       title,
       actions,
@@ -20,7 +18,6 @@ class ThemedDialog extends Component<Props & InjectedLayoutProps> {
       closeButton,
       backButton,
     } = this.props;
-    const Dialog = isRevampLayout ? DialogRevamp : DialogClassic;
 
     const dialogProps = {
       title,
@@ -31,6 +28,7 @@ class ThemedDialog extends Component<Props & InjectedLayoutProps> {
       className,
       backButton,
     };
+
     return <Dialog {...dialogProps}>{children}</Dialog>;
   }
 }

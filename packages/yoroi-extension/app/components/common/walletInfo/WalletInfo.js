@@ -135,8 +135,8 @@ export default class WalletInfo extends Component<Props> {
     const truncatedName = truncateLongName(walletName);
 
     return (
-      <Tooltip title={<Typography variant="body3">{walletName}</Typography>}>
-        <Typography variant="body-2-medium">{truncatedName}</Typography>
+      <Tooltip title={<Typography component="div" variant="body3">{walletName}</Typography>}>
+        <Typography component="div" variant="body-2-medium">{truncatedName}</Typography>
       </Tooltip>
     );
   };

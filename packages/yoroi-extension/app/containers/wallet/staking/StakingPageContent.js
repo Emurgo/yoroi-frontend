@@ -158,8 +158,7 @@ class StakingPageContent extends Component<AllProps> {
     const { actions, stores } = this.generated;
 
     const showRewardAmount =
-      request.delegationRequests.getDelegatedBalance.wasExecuted &&
-      request.errorIfPresent == null;
+      request.delegationRequests.getDelegatedBalance.wasExecuted && request.errorIfPresent == null;
 
     const defaultToken = request.publicDeriver.getParent().getDefaultToken();
 
@@ -175,7 +174,7 @@ class StakingPageContent extends Component<AllProps> {
         }
         withdrawRewards={
           this._isRegistered(request.publicDeriver) === true
-            ? (async () => this.createWithdrawalTx(false)) // shouldDeregister=false
+            ? async () => this.createWithdrawalTx(false) // shouldDeregister=false
             : undefined
         }
         unitOfAccount={this.toUnitOfAccount}
@@ -231,7 +230,7 @@ class StakingPageContent extends Component<AllProps> {
     const currentPool = delegationRequests.getDelegatedBalance.result.delegation;
     const meta = this.generated.stores.delegation.getLocalPoolInfo(
       publicDeriver.getParent().getNetworkInfo(),
-      currentPool,
+      currentPool
     );
     if (meta == null) {
       // server hasn't returned information about the stake pool yet
@@ -243,9 +242,9 @@ class StakingPageContent extends Component<AllProps> {
     const delegatedPool = {
       id: String(currentPool),
       name,
-      roa: '5.1',
-      poolSize: 2560000,
-      share: '0.3',
+      roa: '-',
+      poolSize: '-',
+      share: '-',
       websiteUrl: meta.info?.homepage,
       ticker: meta.info?.ticker,
     };
@@ -357,8 +356,7 @@ class StakingPageContent extends Component<AllProps> {
     const errorIfPresent = this.getErrorInFetch(publicDeriver);
 
     const showRewardAmount =
-      delegationRequests.getDelegatedBalance.wasExecuted &&
-      errorIfPresent == null;
+      delegationRequests.getDelegatedBalance.wasExecuted && errorIfPresent == null;
 
     return (
       <Box>
@@ -369,7 +367,8 @@ class StakingPageContent extends Component<AllProps> {
             }
           />
         ) : null}
-        {!this._isRegistered(publicDeriver) ? null : (
+
+        {this._isRegistered(publicDeriver) ? (
           <WrapperCards>
             {this.getUserSummary({ delegationRequests, publicDeriver, errorIfPresent })}
             <RightCardsWrapper>
@@ -378,12 +377,14 @@ class StakingPageContent extends Component<AllProps> {
               {!errorIfPresent && this.getEpochProgress(publicDeriver)}
             </RightCardsWrapper>
           </WrapperCards>
-        )}
+        ) : null}
+
         <CardanoStakingPage
           stores={this.props.stores}
           actions={this.props.actions}
           urlTemplate={CONFIG.poolExplorer.simpleTemplate}
         />
+
         {uiDialogs.isOpen(OverviewModal) ? (
           <OverviewModal
             onClose={this.onClose}

@@ -176,13 +176,6 @@ var DappPopupSignTransactionSubmitted = /** @class */ (function () {
     return DappPopupSignTransactionSubmitted;
 }());
 export { DappPopupSignTransactionSubmitted };
-var MenuPageViewed = /** @class */ (function () {
-    function MenuPageViewed() {
-        this.event_type = 'Menu Page Viewed';
-    }
-    return MenuPageViewed;
-}());
-export { MenuPageViewed };
 var NftGalleryDetailsImageViewed = /** @class */ (function () {
     function NftGalleryDetailsImageViewed() {
         this.event_type = 'NFT Gallery Details Image Viewed';
@@ -352,13 +345,6 @@ var StakingCenterPageViewed = /** @class */ (function () {
     return StakingCenterPageViewed;
 }());
 export { StakingCenterPageViewed };
-var StakingPageViewed = /** @class */ (function () {
-    function StakingPageViewed() {
-        this.event_type = 'Staking Page Viewed';
-    }
-    return StakingPageViewed;
-}());
-export { StakingPageViewed };
 var SwapAssetFromChanged = /** @class */ (function () {
     function SwapAssetFromChanged(event_properties) {
         this.event_properties = event_properties;
@@ -452,6 +438,13 @@ var VotingPageViewed = /** @class */ (function () {
     return VotingPageViewed;
 }());
 export { VotingPageViewed };
+var WalletPageViewed = /** @class */ (function () {
+    function WalletPageViewed() {
+        this.event_type = 'Wallet Page Viewed';
+    }
+    return WalletPageViewed;
+}());
+export { WalletPageViewed };
 var getVoidPromiseResult = function () { return ({ promise: Promise.resolve() }); };
 // prettier-ignore
 var Ampli = /** @class */ (function () {
@@ -776,18 +769,6 @@ var Ampli = /** @class */ (function () {
         return this.track(new DappPopupSignTransactionSubmitted(), options);
     };
     /**
-     * Menu Page Viewed
-     *
-     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Menu%20Page%20Viewed)
-     *
-     * This event is triggered when a user views the menu page within the application
-     *
-     * @param options Amplitude event options.
-     */
-    Ampli.prototype.menuPageViewed = function (options) {
-        return this.track(new MenuPageViewed(), options);
-    };
-    /**
      * NFT Gallery Details Image Viewed
      *
      * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/NFT%20Gallery%20Details%20Image%20Viewed)
@@ -917,7 +898,7 @@ var Ampli = /** @class */ (function () {
      *
      * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Restore%20Wallet%20Enter%20Phrase%20Step%20Status)
      *
-     * Event has no description in tracking plan.
+     * This events tracks the validation of the recovery phrase is verified, once the user insert the latest word. The output can be positive or negative and we do save that in he property: recovery*prhase*status
      *
      * @param properties The event's properties (e.g. recovery_prhase_status)
      * @param options Amplitude event options.
@@ -1056,18 +1037,6 @@ var Ampli = /** @class */ (function () {
      */
     Ampli.prototype.stakingCenterPageViewed = function (options) {
         return this.track(new StakingCenterPageViewed(), options);
-    };
-    /**
-     * Staking Page Viewed
-     *
-     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Staking%20Page%20Viewed)
-     *
-     * This event tracks when a user views the Staking page.
-     *
-     * @param options Amplitude event options.
-     */
-    Ampli.prototype.stakingPageViewed = function (options) {
-        return this.track(new StakingPageViewed(), options);
     };
     /**
      * Swap Asset From Changed
@@ -1226,6 +1195,18 @@ var Ampli = /** @class */ (function () {
      */
     Ampli.prototype.votingPageViewed = function (options) {
         return this.track(new VotingPageViewed(), options);
+    };
+    /**
+     * Wallet Page Viewed
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Wallet%20Page%20Viewed)
+     *
+     * ThThis event tracks when a user views the wallet page. Wallet page is the deffault page when the user logs in to the app (Once the initial setup is done)
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.walletPageViewed = function (options) {
+        return this.track(new WalletPageViewed(), options);
     };
     return Ampli;
 }());
