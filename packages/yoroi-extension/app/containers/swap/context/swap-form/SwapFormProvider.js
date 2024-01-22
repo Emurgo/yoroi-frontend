@@ -7,6 +7,7 @@ import { useCallback, useReducer } from 'react';
 import { useSwap } from '@yoroi/swap';
 // import { Quantities } from '../../../../utils/quantities';
 import Context from './context';
+import { Quantities } from '../../../../utils/quantities';
 
 // const PRECISION = 14;
 
@@ -34,6 +35,8 @@ type Props = {|
   initialSwapFormProvider?: SwapFormState,
   children: any,
 |};
+
+const numberLocale = ',';
 
 export default function SwapFormProvider({ initialSwapFormProvider, children }: Props): Node {
   const {
@@ -152,8 +155,9 @@ export default function SwapFormProvider({ initialSwapFormProvider, children }: 
 
   const onChangeSellQuantity = useCallback(
     (text: string) => {
-      sellQuantityChanged(Number(text));
-      actions.sellInputValueChanged(text === '' ? '' : text);
+      const [input, quantity] = Quantities.parseFromText(text, 6, numberLocale);
+      sellQuantityChanged(quantity);
+      actions.sellInputValueChanged(text === '' ? '' : input);
 
       clearErrors();
     },
@@ -162,8 +166,9 @@ export default function SwapFormProvider({ initialSwapFormProvider, children }: 
 
   const onChangeBuyQuantity = useCallback(
     (text: string) => {
-      buyQuantityChanged(Number(text));
-      actions.buyInputValueChanged(text === '' ? '' : text);
+      const [input, quantity] = Quantities.parseFromText(text, 8, numberLocale);
+      buyQuantityChanged(quantity);
+      actions.buyInputValueChanged(text === '' ? '' : input);
 
       clearErrors();
     },

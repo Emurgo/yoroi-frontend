@@ -115,12 +115,7 @@ export default function SwapForm({ onLimitSwap }: Props): React$Node {
 
         {/* Price between assets */}
         <Box mt="16px">
-          <PriceInput
-            // baseCurrency={fromAsset}
-            // quoteCurrency={toAsset}
-            readonly
-            label="Market price"
-          />
+          <PriceInput label="Market price" />
         </Box>
 
         {/* Slippage settings */}
