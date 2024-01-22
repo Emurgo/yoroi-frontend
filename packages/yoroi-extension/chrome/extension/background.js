@@ -366,6 +366,7 @@ async function syncWallet(
             wallet.getDb(),
             wallet,
             stateFetcher.checkAddressesInUse,
+            stateFetcher.getTransactionsHistoryForAddresses,
             stateFetcher.getRecentTransactionHashes,
             stateFetcher.getTransactionsByHashes,
             stateFetcher.getBestBlock,

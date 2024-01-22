@@ -330,31 +330,62 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       return;
     }
 
+    const txHistoryState = this.getTxHistoryState(request.publicDeriver);
+    const isEmptyHistory = txHistoryState.txs.length === 0;
+
     const {
+      tailRequest,
       headRequest,
       getBalanceRequest,
       getAssetDepositRequest
-    } = this.getTxHistoryState(request.publicDeriver).requests;
+    } = txHistoryState.requests;
 
-    headRequest.invalidate({ immediately: false });
-    headRequest.execute({
-      publicDeriver,
-      isLocalRequest: request.isLocalRequest
-    });
-    if (headRequest.promise == null) {
-      throw new Error('unexpected nullish headRequest.promise');
-    }
-    const result = await headRequest.promise;
-    const { txs } = this.getTxHistoryState(request.publicDeriver);
-    runInAction(() => {
-      for (let i = 0; i < result.length; i++) {
-        const tx = result[i];
-        if (tx.txid === txs[0]?.txid) {
-          break;
-        }
-        txs.splice(i, 0, tx);
+    let result;
+    if (isEmptyHistory) {
+      /*
+       * TAIL REQUEST IS USED WHEN FIRST SYNC OR EMPRY WALLET
+       */
+      tailRequest.invalidate({ immediately: false });
+      tailRequest.execute({
+        publicDeriver,
+        isLocalRequest: request.isLocalRequest
+      });
+      if (tailRequest.promise == null) {
+        throw new Error('unexpected nullish tailRequest.promise');
       }
-    });
+      result = await tailRequest.promise;
+    } else {
+      /*
+       * HEAD REQUEST IS USED WITH `AFTER` REFERENCE
+       * WHEN NON-EMPTY WALLET
+       */
+      headRequest.invalidate({ immediately: false });
+      headRequest.execute({
+        publicDeriver,
+        isLocalRequest: false,
+        afterTx: txHistoryState.txs[0],
+      });
+      if (headRequest.promise == null) {
+        throw new Error('unexpected nullish headRequest.promise');
+      }
+      result = await headRequest.promise;
+    }
+    {
+      /**
+       * Adding received txs to the start of the existing history
+       */
+      const { txs } = this.getTxHistoryState(request.publicDeriver);
+      runInAction(() => {
+        for (let i = 0; i < result.length; i++) {
+          const tx = result[i];
+          if (tx.txid === txs[0]?.txid) {
+            // In case received tx matches with the existing one - stop
+            break;
+          }
+          txs.splice(i, 0, tx);
+        }
+      });
+    }
 
     // update last sync (note: changes even if no new transaction is found)
     {
@@ -458,11 +489,13 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const state = this.getTxHistoryState(publicDeriver);
     const { tailRequest } = state.requests;
 
+    const beforeTx = state.txs[state.txs.length-1];
+
     tailRequest.invalidate({ immediately: false });
     tailRequest.execute({
       publicDeriver: withLevels,
       isLocalRequest: false,
-      afterTxs: state.txs,
+      beforeTx,
     });
     if (!tailRequest.promise) throw new Error('should never happen');
     const result = await tailRequest.promise;
@@ -500,7 +533,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       txs: [],
       hasMoreToLoad: true, // assuming yes until actually loaded and found otherwise
       requests: {
-        // note: this captures the right API for the wallet
         headRequest: new CachedRequest<GetTransactionsFunc>(
           this.stores.substores[apiType].transactions.refreshTransactions
         ),

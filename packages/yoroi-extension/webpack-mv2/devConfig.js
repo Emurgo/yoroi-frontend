@@ -1,5 +1,7 @@
 // @flow
 
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+
 const commonConfig = require('./commonConfig');
 const connections = require('../scripts-mv2/connections');
 
@@ -74,7 +76,8 @@ const baseDevConfig = (
     new webpack.DefinePlugin({
       __HOST__: `'${host}'`,
       __PORT__: connections.Ports.WebpackDev,
-    })
+    }),
+    new ReactRefreshWebpackPlugin(),
   ],
   module: {
     rules: [
