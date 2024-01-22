@@ -20,7 +20,7 @@ export function find721metadata(
     return null;
   }
   const metadata = metadataWrapper['721'];
-  if (metadata.version && metadata.version !== '1.0') {
+  if (metadata.version && (metadata.version !== '1.0' && metadata.version !== '2.0')) {
     return null;
   }
 
