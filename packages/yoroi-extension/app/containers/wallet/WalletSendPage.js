@@ -48,6 +48,7 @@ import { withLayout } from '../../styles/context/layout';
 import AddNFTDialog from '../../components/wallet/send/WalletSendFormSteps/AddNFTDialog';
 import AddTokenDialog from '../../components/wallet/send/WalletSendFormSteps/AddTokenDialog';
 import { ampli } from '../../../ampli/index';
+import type { DomainResolverFunc } from '../../stores/ada/AdaAddressesStore';
 
 const messages = defineMessages({
   txConfirmationLedgerNanoLine1: {
@@ -88,6 +89,7 @@ class WalletSendPage extends Component<AllProps> {
   };
 
   @observable showMemo: boolean = false;
+  @observable showSupportedAddressDomainBanner: boolean = true;
 
   closeTransactionSuccessDialog: void => void = () => {
     this.generated.actions.dialogs.closeActiveDialog.trigger();
@@ -103,6 +105,8 @@ class WalletSendPage extends Component<AllProps> {
   componentDidMount(): void {
     runInAction(() => {
       this.showMemo = this.generated.initialShowMemoState;
+      this.showSupportedAddressDomainBanner =
+        this.generated.stores.substores.ada.addresses.getSupportedAddressDomainBannerState();
     });
     ampli.sendInitiated();
   }
@@ -118,6 +122,12 @@ class WalletSendPage extends Component<AllProps> {
     this.generated.actions.dialogs.push.trigger({
       dialog,
     });
+  };
+
+  @action
+  onSupportedAddressDomainBannerClose: void => void = () => {
+    this.generated.stores.substores.ada.addresses.setSupportedAddressDomainBannerState(false);
+    this.showSupportedAddressDomainBanner = false;
   };
 
   _getNumDecimals(): number {
@@ -176,6 +186,15 @@ class WalletSendPage extends Component<AllProps> {
       return (
         <>
           <WalletSendFormRevamp
+            resolveDomainAddress={
+              this.generated.stores.substores.ada.addresses.domainResolverSupported()
+                ? this.generated.stores.substores.ada.addresses.resolveDomainAddress
+                : null
+            }
+            supportedAddressDomainBannerState={{
+              isDisplayed: this.showSupportedAddressDomainBanner,
+              onClose: this.onSupportedAddressDomainBannerClose,
+            }}
             selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
             selectedWallet={publicDeriver}
             selectedExplorer={this.generated.stores.explorers.selectedExplorer}
@@ -736,6 +755,12 @@ class WalletSendPage extends Component<AllProps> {
       |},
       substores: {|
         ada: {|
+          addresses: {|
+            domainResolverSupported: () => boolean,
+            resolveDomainAddress: DomainResolverFunc,
+            getSupportedAddressDomainBannerState: () => boolean,
+            setSupportedAddressDomainBannerState: (boolean) => void,
+          |},
           ledgerSend: {|
             error: ?LocalizableError,
             isActionProcessing: boolean,
@@ -836,6 +861,16 @@ class WalletSendPage extends Component<AllProps> {
         },
         substores: {
           ada: {
+            addresses: {
+              domainResolverSupported:
+                adaStore.addresses.domainResolverSupported.bind(adaStore.addresses),
+              resolveDomainAddress:
+                adaStore.addresses.resolveDomainAddress.bind(adaStore.addresses),
+              getSupportedAddressDomainBannerState:
+                adaStore.addresses.getSupportedAddressDomainBannerState.bind(adaStore.addresses),
+              setSupportedAddressDomainBannerState:
+                adaStore.addresses.setSupportedAddressDomainBannerState.bind(adaStore.addresses),
+            },
             ledgerSend: {
               isActionProcessing: adaStore.ledgerSend.isActionProcessing,
               error: adaStore.ledgerSend.error,

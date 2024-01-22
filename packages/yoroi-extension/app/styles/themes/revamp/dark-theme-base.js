@@ -80,6 +80,7 @@ export const darkTheme = {
       },
       gradients: {
         walletEmptyCard: 'linear-gradient(180deg, #93F5E1 0%, #C6F7ED 100%)',
+        supportedAddressDomainsBanner: 'linear-gradient(260deg, #E4E8F7 0%, #C6F7ED 100%)',
         primary: 'linear-gradient(269.97deg, #E4E8F7 0%, #C6F7ED 100%)',
       },
     },
