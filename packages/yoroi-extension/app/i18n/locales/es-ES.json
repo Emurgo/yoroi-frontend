@@ -22,8 +22,6 @@
   "api.errors.getPoolInfoApiError": "Error recibido del servidor al obtener la información del pool.",
   "api.errors.getRewardHistoryApiError": "Error recibido del servidor al obtener el historial de recompensas.",
   "api.errors.getTxHistoryForAddressesApiError": "Error recibido del servidor al obtener las transacciones.",
-  "api.errors.getTxsBodiesForUTXOsApiError": "Error recibido del servidor al obtener los TxBodies.",
-  "api.errors.getTxsBodiesForUTXOsError": "Error recibido de la llamada a la API al intentar obtener los TxBodies.",
   "api.errors.getUtxosForAddressesApiError": "Error recibido del servidor al obtener los UTxOs.",
   "api.errors.getUtxosSumsForAddressesApiError": "Error recibido del servidor al obtener el saldo.",
   "api.errors.hardwareUnsupportedError": "Esta acción no está soportada para el hardware seleccionado.",

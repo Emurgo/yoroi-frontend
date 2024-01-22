@@ -12,15 +12,6 @@ export type AddressUtxoRequest = {|
 export type AddressUtxoResponse = Array<RemoteUnspentOutput>;
 export type AddressUtxoFunc = (body: AddressUtxoRequest) => Promise<AddressUtxoResponse>;
 
-// getTxsBodiesForUTXOs
-
-export type TxBodiesRequest = {|
-  ...BackendNetworkInfo,
-  txsHashes: Array<string>,
-|};
-export type TxBodiesResponse = { [key: string]:string, ... };
-export type TxBodiesFunc = (body: TxBodiesRequest) => Promise<TxBodiesResponse>;
-
 // getUTXOsSumsForAddresses
 
 export type UtxoSumRequest = {|

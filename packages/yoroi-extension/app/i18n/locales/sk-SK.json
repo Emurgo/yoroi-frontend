@@ -22,8 +22,6 @@
   "api.errors.getPoolInfoApiError": "Error received from server while getting pool info.",
   "api.errors.getRewardHistoryApiError": "Error received from server while getting reward history.",
   "api.errors.getTxHistoryForAddressesApiError": "Pri získavaní transakcií server vrátil chybu.",
-  "api.errors.getTxsBodiesForUTXOsApiError": "Pri získavaní TxBodies server vrátil chybu.",
-  "api.errors.getTxsBodiesForUTXOsError": "API volanie vrátilo pri získavaní TxBodies chybu.",
   "api.errors.getUtxosForAddressesApiError": "Pri získavaní UTxOs server vrátil chybu.",
   "api.errors.getUtxosSumsForAddressesApiError": "Pri získavaní zostatku server vrátil chybu.",
   "api.errors.hardwareUnsupportedError": "Táto akcia nie je momentálne pre daný hardvér podporovaná.",

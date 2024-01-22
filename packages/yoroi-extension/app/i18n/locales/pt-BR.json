@@ -22,8 +22,6 @@
   "api.errors.getPoolInfoApiError": "Erro recebido do servidor ao obter o informações da pool.",
   "api.errors.getRewardHistoryApiError": "Erro recebido do servidor ao obter o histórico de recompensas.",
   "api.errors.getTxHistoryForAddressesApiError": "Erro recebido do servidor durante a solicitação de transações.",
-  "api.errors.getTxsBodiesForUTXOsApiError": "Erro recebido do servidor ao obter os TxBodies.",
-  "api.errors.getTxsBodiesForUTXOsError": "Erro recebido na chamada do método da API ao obter TxBodies.",
   "api.errors.getUtxosForAddressesApiError": "Erro recebido do servidor ao obter UTxOs.",
   "api.errors.getUtxosSumsForAddressesApiError": "Erro recebido do servidor ao obter o saldo",
   "api.errors.hardwareUnsupportedError": "Esta ação não é compatível com a versão atual do hardware selecionado.",

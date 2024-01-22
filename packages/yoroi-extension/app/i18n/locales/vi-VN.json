@@ -24,8 +24,6 @@
   "api.errors.getRewardHistoryApiError": "Lỗi khi đọc lịch sử phần thưởng.",
   "api.errors.getTokenInfoApiError": "Có lỗi từ máy chủ khi nhận thông tin tài sản.",
   "api.errors.getTxHistoryForAddressesApiError": "Lỗi khi đọc giao dịch.",
-  "api.errors.getTxsBodiesForUTXOsApiError": "Lỗi khi đọc TxBodies.",
-  "api.errors.getTxsBodiesForUTXOsError": "Lỗi từ việc gọi Api trong khi đọc TxBodies.",
   "api.errors.getUtxoDataError": "Đã nhận được lỗi từ máy chủ khi nhận dữ liệu UTXO",
   "api.errors.getUtxosForAddressesApiError": "Lỗi khi đọc UTxO.",
   "api.errors.getUtxosSumsForAddressesApiError": "Lỗi khi đọc số dư.",

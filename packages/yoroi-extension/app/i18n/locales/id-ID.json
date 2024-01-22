@@ -22,8 +22,6 @@
   "api.errors.getPoolInfoApiError": "Error received from server while getting pool info.",
   "api.errors.getRewardHistoryApiError": "Error received from server while getting reward history.",
   "api.errors.getTxHistoryForAddressesApiError": "Error dari server saat pengambilan transaksi.",
-  "api.errors.getTxsBodiesForUTXOsApiError": "Error dari server saat pengambilan TxBodies.",
-  "api.errors.getTxsBodiesForUTXOsError": "Error dari fungsi Api saat pengambilan TxBodies.",
   "api.errors.getUtxosForAddressesApiError": "Error dari fungsi API saat mengambil UTxO.",
   "api.errors.getUtxosSumsForAddressesApiError": "Error dari server saat pengambilan saldo.",
   "api.errors.hardwareUnsupportedError": "This action is not supported for the currently selected hardware.",

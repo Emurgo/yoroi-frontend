@@ -49,7 +49,6 @@ import {
   GetCatalystRoundInfoApiError,
   GetRewardHistoryApiError,
   GetTxHistoryForAddressesApiError,
-  GetTxsBodiesForUTXOsApiError,
   GetUtxosForAddressesApiError,
   GetUtxosSumsForAddressesApiError,
   InvalidWitnessError,
@@ -119,29 +118,6 @@ export class RemoteFetcher implements IFetcher {
       }
       return utxo;
     });
-  }
-
-  getTxsBodiesForUTXOs: TxBodiesRequest => Promise<TxBodiesResponse> = (body) => {
-    const { BackendService } = body.network.Backend;
-    if (BackendService == null) throw new Error(`${nameof(this.getTxsBodiesForUTXOs)} missing backend url`);
-    return axios(
-      `${BackendService}/api/txs/txBodies`,
-      {
-        method: 'post',
-        timeout: 2 * CONFIG.app.walletRefreshInterval,
-        data: {
-          txsHashes: body.txsHashes
-        },
-        headers: {
-          'yoroi-version': this.getLastLaunchVersion(),
-          'yoroi-locale': this.getCurrentLocale()
-        }
-      }
-    ).then(response => response.data)
-      .catch((error) => {
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getTxsBodiesForUTXOs)} error: ` + stringifyError(error));
-        throw new GetTxsBodiesForUTXOsApiError();
-      });
   }
 
   getUTXOsSumsForAddresses: UtxoSumRequest => Promise<UtxoSumResponse> = (body) => {

@@ -59,7 +59,6 @@ import { chunk } from 'lodash';
 import {
   CheckAddressesInUseApiError,
   GetAllUTXOsForAddressesError,
-  GetTxsBodiesForUTXOsError,
   GetUtxosSumsForAddressesApiError,
   GetTxHistoryForAddressesApiError,
   GetRewardHistoryApiError,
@@ -95,10 +94,6 @@ export class BatchedFetcher implements IFetcher {
 
   getUTXOsForAddresses: AddressUtxoRequest => Promise<AddressUtxoResponse> = (body) => (
     batchUTXOsForAddresses(this.baseFetcher.getUTXOsForAddresses)(body)
-  )
-
-  getTxsBodiesForUTXOs: TxBodiesRequest => Promise<TxBodiesResponse> = (body) => (
-    batchTxsBodiesForInputs(this.baseFetcher.getTxsBodiesForUTXOs)(body)
   )
 
   getUTXOsSumsForAddresses: UtxoSumRequest => Promise<UtxoSumResponse> = (body) => (
@@ -234,40 +229,6 @@ function batchUTXOsForAddresses(
       Logger.error(`batchedFetcher:::${nameof(batchUTXOsForAddresses)} error: ` + stringifyError(error));
       if (error instanceof LocalizableError) throw error;
       throw new GetAllUTXOsForAddressesError();
-    }
-  };
-}
-
-/** List of Body hashes for a list of utxos by batching backend requests */
-function batchTxsBodiesForInputs(
-  getTxsBodiesForUTXOs: TxBodiesFunc,
-): TxBodiesFunc {
-  return async function (body: TxBodiesRequest): Promise<TxBodiesResponse> {
-    try {
-      // split up all txs into chunks of equal size
-      const groupsOfTxsHashes = chunk(body.txsHashes, CONFIG.app.txsBodiesRequestSize);
-
-      // convert chunks into list of Promises that call the backend-service
-      const promises = groupsOfTxsHashes
-        .map(groupOfTxsHashes => getTxsBodiesForUTXOs({
-          network: body.network,
-          txsHashes: groupOfTxsHashes,
-        }));
-
-      // Sum up all the utxo
-      return Promise.all(promises)
-        .then(groupsOfTxBodies => {
-          const bodies = groupsOfTxBodies
-            .reduce((acc, groupOfTxBodies) => Object.assign(acc, groupOfTxBodies), {});
-          if (body.txsHashes.length !== Object.keys(bodies).length) {
-            throw new GetTxsBodiesForUTXOsError();
-          }
-          return bodies;
-        });
-    } catch (error) {
-      Logger.error(`batchedFetcher::${nameof(batchTxsBodiesForInputs)} error: ` + stringifyError(error));
-      if (error instanceof LocalizableError) throw error;
-      throw new GetTxsBodiesForUTXOsError();
     }
   };
 }
