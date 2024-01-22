@@ -20,6 +20,6 @@
   "dependencies": {
     "@emurgo/cip4-js": "1.0.6",
     "@download/blockies": "1.0.3",
-    "bignumber.js": "^9.0.1"
+    "bignumber.js": "9.0.1"
   }
 }
