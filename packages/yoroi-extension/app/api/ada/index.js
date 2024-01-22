@@ -594,9 +594,9 @@ export const DEFAULT_ADDRESSES_PER_PAPER = 1;
 export const FETCH_TXS_BATCH_SIZE = 20;
 
 const UPDATE_NETWORK_IDS = [
-  0, // Cardano Mainnet
-  250, // Preprod Testnet
-  350, // Preview Testnet
+  networks.CardanoMainnet.NetworkId,
+  networks.CardanoPreprodTestnet.NetworkId,
+  networks.CardanoPreviewTestnet.NetworkId
 ];
 
 export default class AdaApi {
