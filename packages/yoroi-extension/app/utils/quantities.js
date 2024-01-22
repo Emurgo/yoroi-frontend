@@ -1,50 +1,61 @@
-import { Balance, Numbers } from '@yoroi/types';
+// @flow
 import BigNumber from 'bignumber.js';
 import { asQuantity } from './asQuantity';
 
+type NumbersLocale = {|
+  prefix?: string,
+  decimalSeparator: string,
+  groupSeparator?: string,
+  groupSize?: number,
+  secondaryGroupSize?: number,
+  fractionGroupSize?: number,
+  fractionGroupSeparator?: string,
+  suffix?: string,
+|};
+
 export const Quantities = {
-  sum: (quantities: Array<Balance.Quantity>) => {
+  sum: (quantities: Array<number | string>): string => {
     return quantities
       .reduce((result, current) => result.plus(current), new BigNumber(0))
       .toString(10);
   },
-  max: (...quantities: Array<Balance.Quantity>) => {
+  max: (...quantities: Array<number | string>): string => {
     return BigNumber.max(...quantities).toString(10);
   },
-  diff: (quantity1: Balance.Quantity, quantity2: Balance.Quantity) => {
+  diff: (quantity1: string, quantity2: string): string => {
     return new BigNumber(quantity1).minus(new BigNumber(quantity2)).toString(10);
   },
-  negated: (quantity: Balance.Quantity) => {
+  negated: (quantity: string): string => {
     return new BigNumber(quantity).negated().toString(10);
   },
-  product: (quantities: Array<Balance.Quantity>) => {
+  product: (quantities: Array<number | string>): string => {
     return quantities.reduce((result, quantity) => {
       const x = new BigNumber(result).times(new BigNumber(quantity));
 
       return x.toString(10);
     }, '1');
   },
-  quotient: (quantity1: Balance.Quantity, quantity2: Balance.Quantity) => {
+  quotient: (quantity1: string, quantity2: string): string => {
     return new BigNumber(quantity1).dividedBy(new BigNumber(quantity2)).toString(10);
   },
-  isGreaterThan: (quantity1: Balance.Quantity, quantity2: Balance.Quantity) => {
+  isGreaterThan: (quantity1: string, quantity2: string): boolean => {
     return new BigNumber(quantity1).isGreaterThan(new BigNumber(quantity2));
   },
-  isGreaterThanOrEqualTo: (quantity1: Balance.Quantity, quantity2: Balance.Quantity) => {
+  isGreaterThanOrEqualTo: (quantity1: string, quantity2: string): boolean => {
     return new BigNumber(quantity1).isGreaterThanOrEqualTo(new BigNumber(quantity2));
   },
-  decimalPlaces: (quantity: Balance.Quantity, precision: number) => {
+  decimalPlaces: (quantity: string, precision: number): string => {
     return new BigNumber(quantity).decimalPlaces(precision).toString(10);
   },
-  denominated: (quantity: Balance.Quantity, denomination: number) => {
+  denominated: (quantity: string, denomination: number): string => {
     return Quantities.quotient(quantity, new BigNumber(10).pow(denomination).toString(10));
   },
-  integer: (quantity: Balance.Quantity, denomination: number) => {
+  integer: (quantity: string, denomination: number): string => {
     return new BigNumber(quantity).decimalPlaces(denomination).shiftedBy(denomination).toString(10);
   },
   zero: '0',
-  isZero: (quantity: Balance.Quantity) => new BigNumber(quantity).isZero(),
-  isAtomic: (quantity: Balance.Quantity, denomination: number) => {
+  isZero: (quantity: string): boolean => new BigNumber(quantity).isZero(),
+  isAtomic: (quantity: string, denomination: number): boolean => {
     const absoluteQuantity = new BigNumber(quantity).decimalPlaces(denomination).abs();
     const minimalFractionalPart = new BigNumber(10).pow(new BigNumber(denomination).negated());
 
@@ -53,12 +64,12 @@ export const Quantities = {
   parseFromText: (
     text: string,
     denomination: number,
-    format: Numbers.Locale,
-    precision = denomination
-  ): [string, Balance.Quantity] => {
+    format: NumbersLocale,
+    precision: number = denomination
+  ): [string, string] => {
     const { decimalSeparator } = format;
     const invalid = new RegExp(`[^0-9${decimalSeparator}]`, 'g');
-    const sanitized = text === '' ? '' : text.replaceAll(invalid, '');
+    const sanitized = text === '' ? '' : text.replace(invalid, '');
 
     if (sanitized === '') return ['', Quantities.zero];
     if (sanitized.startsWith(decimalSeparator)) return [`0${decimalSeparator}`, Quantities.zero];
@@ -97,7 +108,7 @@ export const Quantities = {
 
     return [input, quantity];
   },
-  format: (quantity: Balance.Quantity, denomination: number, precision?: number) => {
+  format: (quantity: string, denomination: number, precision?: number): string => {
     if (precision === undefined)
       return new BigNumber(Quantities.denominated(quantity, denomination)).toFormat();
     return new BigNumber(Quantities.denominated(quantity, denomination))

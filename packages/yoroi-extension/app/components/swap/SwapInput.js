@@ -121,8 +121,7 @@ export default function SwapInput({
               fontWeight={500}
               sx={{ p: '4px 8px', bgcolor: 'grayscale.50', borderRadius: '8px' }}
               onClick={() => {
-                setInputValue(quantity);
-                // handleAmountChange(quantity);
+                handleAmountChange(quantity);
               }}
             >
               MAX

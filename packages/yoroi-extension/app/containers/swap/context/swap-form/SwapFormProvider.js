@@ -36,7 +36,7 @@ type Props = {|
   children: any,
 |};
 
-const numberLocale = ',';
+const numberLocale = { decimalSeparator: ',' };
 
 export default function SwapFormProvider({ initialSwapFormProvider, children }: Props): Node {
   const {
