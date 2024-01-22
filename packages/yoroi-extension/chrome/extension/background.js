@@ -1389,6 +1389,7 @@ async function handleInjectorMessage(message, sender) {
       break;
     case `get_change_address`:
       try {
+        await RustModule.load();
         await withDb(async (db, localStorageApi) => {
           await withSelectedWallet(
             tabId,
