@@ -235,9 +235,9 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     if (!publicDeriver) {
       throw new Error(`${nameof(TransactionsStore)}::${nameof(this.isLoading)} no wallet selected`);
     }
-    const { headRequest } = this.getTxHistoryState(publicDeriver).requests;
+    const { headRequest, tailRequest } = this.getTxHistoryState(publicDeriver).requests;
 
-    return !headRequest.wasExecuted;
+    return !headRequest.wasExecuted && !tailRequest.wasExecuted;
   }
 
   @computed get assetDeposit(): MultiToken | null {

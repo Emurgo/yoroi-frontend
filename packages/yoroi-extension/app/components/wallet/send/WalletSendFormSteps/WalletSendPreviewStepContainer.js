@@ -75,6 +75,10 @@ type Props = {|
   |},
   selectedExplorer: Map<number, SelectedExplorer>,
   selectedWallet: PublicDeriver<>,
+  receiverHandle: ?{|
+    nameServer: string,
+    handle: string,
+  |},
 |};
 
 type AllProps = {|
@@ -136,6 +140,7 @@ export default class WalletSendPreviewStepContainer extends Component<AllProps> 
       isClassicTheme,
       getTokenInfo,
       getCurrentPrice,
+      receiverHandle,
     } = this.props;
 
     if (selectedWallet == null)
@@ -153,6 +158,7 @@ export default class WalletSendPreviewStepContainer extends Component<AllProps> 
 
     return (
       <WalletSendPreviewStep
+        receiverHandle={receiverHandle}
         staleTx={this.props.staleTx}
         selectedExplorer={
           selectedExplorer.get(selectedWallet.getParent().getNetworkInfo().NetworkId) ??

@@ -54,6 +54,10 @@ export function genCSP(request: {|
   connectSrc.push('https://analytics.emurgo-rnd.com/');
   connectSrc.push('https://api2.amplitude.com/');
 
+  // Resolver
+  connectSrc.push('https://api.handle.me/');
+  connectSrc.push('https://api.unstoppabledomains.com/');
+
   // wasm-eval is needed to compile WebAssembly in the browser
   // note: wasm-eval is not standardized but empirically works in Firefox & Chrome https://github.com/w3c/webappsec-csp/pull/293
   const evalSrc = "'wasm-eval'";
