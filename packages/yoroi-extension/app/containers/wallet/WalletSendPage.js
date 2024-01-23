@@ -36,6 +36,7 @@ import { withLayout } from '../../styles/context/layout';
 import AddNFTDialog from '../../components/wallet/send/WalletSendFormSteps/AddNFTDialog';
 import AddTokenDialog from '../../components/wallet/send/WalletSendFormSteps/AddTokenDialog';
 import { ampli } from '../../../ampli/index';
+import type { DomainResolverFunc } from '../../stores/ada/AdaAddressesStore';
 
 const messages = defineMessages({
   txConfirmationLedgerNanoLine1: {
@@ -74,6 +75,7 @@ class WalletSendPage extends Component<AllProps> {
   };
 
   @observable showMemo: boolean = false;
+  @observable showSupportedAddressDomainBanner: boolean = true;
 
   closeTransactionSuccessDialog: void => void = () => {
     this.props.actions.dialogs.closeActiveDialog.trigger();
@@ -89,6 +91,8 @@ class WalletSendPage extends Component<AllProps> {
   componentDidMount(): void {
     runInAction(() => {
       this.showMemo = false;
+      this.showSupportedAddressDomainBanner =
+        this.props.stores.substores.ada.addresses.getSupportedAddressDomainBannerState();
     });
     ampli.sendInitiated();
   }
@@ -104,6 +108,12 @@ class WalletSendPage extends Component<AllProps> {
     this.props.actions.dialogs.push.trigger({
       dialog,
     });
+  };
+
+  @action
+  onSupportedAddressDomainBannerClose: void => void = () => {
+    this.props.stores.substores.ada.addresses.setSupportedAddressDomainBannerState(false);
+    this.showSupportedAddressDomainBanner = false;
   };
 
   _getNumDecimals(): number {
@@ -162,6 +172,15 @@ class WalletSendPage extends Component<AllProps> {
       return (
         <>
           <WalletSendFormRevamp
+            resolveDomainAddress={
+              this.generated.stores.substores.ada.addresses.domainResolverSupported()
+                ? this.generated.stores.substores.ada.addresses.resolveDomainAddress
+                : null
+            }
+            supportedAddressDomainBannerState={{
+              isDisplayed: this.showSupportedAddressDomainBanner,
+              onClose: this.onSupportedAddressDomainBannerClose,
+            }}
             selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
             selectedWallet={publicDeriver}
             selectedExplorer={this.props.stores.explorers.selectedExplorer}

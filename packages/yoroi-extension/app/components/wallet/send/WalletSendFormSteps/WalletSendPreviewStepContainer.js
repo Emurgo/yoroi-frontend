@@ -53,6 +53,10 @@ type Props = {|
   +trezorSend: TrezorSendActions,
   selectedExplorer: Map<number, SelectedExplorer>,
   selectedWallet: PublicDeriver<>,
+  receiverHandle: ?{|
+    nameServer: string,
+    handle: string,
+  |},
 |};
 
 @observer
@@ -109,6 +113,7 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
       isClassicTheme,
       getTokenInfo,
       getCurrentPrice,
+      receiverHandle,
     } = this.props;
 
     if (selectedWallet == null)
@@ -126,6 +131,7 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
 
     return (
       <WalletSendPreviewStep
+        receiverHandle={receiverHandle}
         staleTx={this.props.staleTx}
         selectedExplorer={
           selectedExplorer.get(selectedWallet.getParent().getNetworkInfo().NetworkId) ??
