@@ -161,7 +161,7 @@ import type {
   RestoreWalletResponse,
   SendTokenList,
 } from '../common/types';
-import { getCardanoHaskellBaseConfig, } from './lib/storage/database/prepackaged/networks';
+import { getCardanoHaskellBaseConfig, networks, } from './lib/storage/database/prepackaged/networks';
 import { toSenderUtxos, } from './transactions/transfer/utils';
 import type { DefaultTokenEntry } from '../common/lib/MultiToken';
 import { MultiToken } from '../common/lib/MultiToken';
