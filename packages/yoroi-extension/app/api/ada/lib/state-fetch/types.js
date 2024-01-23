@@ -12,33 +12,6 @@ export type AddressUtxoRequest = {|
 export type AddressUtxoResponse = Array<RemoteUnspentOutput>;
 export type AddressUtxoFunc = (body: AddressUtxoRequest) => Promise<AddressUtxoResponse>;
 
-// getTxsBodiesForUTXOs
-
-export type TxBodiesRequest = {|
-  ...BackendNetworkInfo,
-  txsHashes: Array<string>,
-|};
-export type TxBodiesResponse = { [key: string]:string, ... };
-export type TxBodiesFunc = (body: TxBodiesRequest) => Promise<TxBodiesResponse>;
-
-// getUTXOsSumsForAddresses
-
-export type UtxoSumRequest = {|
-  ...BackendNetworkInfo,
-  addresses: Array<string>,
-|};
-export type UtxoSumResponse = {|
-  +sum: ?string,
-  +assets: $ReadOnlyArray<$ReadOnly<{
-    +amount: string,
-    +assetId: string,
-    +policyId: string,
-    +name: string,
-    ...
-  }>>,
-|};
-export type UtxoSumFunc = (body: UtxoSumRequest) => Promise<UtxoSumResponse>;
-
 // getTransactionsHistoryForAddresses
 
 export type HistoryRequest = {|
