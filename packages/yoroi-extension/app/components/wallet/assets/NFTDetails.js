@@ -28,7 +28,7 @@ import type { CardanoAssetMintMetadata, NetworkRow, } from '../../../api/ada/lib
 import { NftImage } from './NFTsList';
 import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { truncateAddress, truncateAddressShort } from '../../../utils/formatters';
-import { urlResolveIpfs } from '../../../coreUtils';
+import { urlResolveForIpfsAndCorsproxy } from '../../../coreUtils';
 import { ampli } from '../../../../ampli/index';
 import { CopyAddress, TruncatedText } from './TruncatedText';
 
@@ -98,7 +98,7 @@ const tabs = [
 ];
 
 function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props & Intl): Node {
-  const nftImage = urlResolveIpfs(nftInfo?.image);
+  const nftImage = urlResolveForIpfsAndCorsproxy(nftInfo?.image);
   const networkUrl = getNetworkUrl(network);
   const [activeTab, setActiveTab] = useState(tab !== null ? tab : tabs[0].id); // Overview tab
   const setActiveTabAndTrack = function (tabId: string) {

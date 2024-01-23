@@ -109,7 +109,7 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
               color="grayscale.500"
               sx={{ textTransform: 'uppercase' }}
             >
-              {intl.formatMessage(globalMessages.poolShare)}
+              {intl.formatMessage(globalMessages.poolSaturation)}
             </Typography>
             <Typography as="span" fontWeight={500} color="grayscale.max" variant="h2">
               {share} %

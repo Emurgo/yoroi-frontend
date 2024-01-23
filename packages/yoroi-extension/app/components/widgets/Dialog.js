@@ -179,7 +179,13 @@ DialogFn.defaultProps = {
   closeOnOverlayClick: false,
 };
 
-const CloseButton = ({ onClose, closeButton }) => (
+export const CloseButton = ({
+  onClose,
+  closeButton,
+}: {|
+  onClose: ?(void) => PossiblyAsync<void>,
+  closeButton: React$Node,
+|}): React$Node => (
   <Box
     sx={{
       position: 'absolute',
