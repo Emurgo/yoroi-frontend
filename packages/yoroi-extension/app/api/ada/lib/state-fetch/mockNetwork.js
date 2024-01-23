@@ -11,9 +11,6 @@ import type {
   AddressUtxoRequest,
   AddressUtxoResponse,
   AddressUtxoFunc,
-  UtxoSumRequest,
-  UtxoSumResponse,
-  UtxoSumFunc,
   RewardHistoryFunc,
   AccountStateRequest,
   AccountStateResponse,
@@ -368,44 +365,6 @@ export function genUtxoForAddresses(
     }
     const result = Array.from(utxoMap.values());
     return result;
-  };
-}
-
-export function genUtxoSumForAddresses(
-  getAddressUtxo: AddressUtxoFunc,
-): UtxoSumFunc {
-  return async (
-    body: UtxoSumRequest,
-  ): Promise<UtxoSumResponse> => {
-    const utxos = await getAddressUtxo(body);
-    if (utxos.length === 0) {
-      return {
-        sum: null,
-        assets: [],
-      };
-    }
-    // sum all chunks together
-    let sum: BigNumber = new BigNumber(0);
-    const assetMap = new Map<string, ReadonlyElementOf<$PropertyType<UtxoSumResponse, 'assets'>>>();
-    for (const partial of utxos) {
-      sum = sum.plus(new BigNumber(partial.amount));
-      for (const asset of partial.assets) {
-        const currentVal = assetMap.get(asset.assetId)?.amount ?? new BigNumber(0);
-        assetMap.set(
-          asset.assetId,
-          {
-            ...asset,
-            amount: new BigNumber(currentVal).plus(asset.amount).toString(),
-          },
-        );
-      }
-    }
-    return {
-      sum: sum.toString(),
-      assets: Array.from(assetMap.entries()).map(entry => ({
-        ...entry[1],
-      })),
-    };
   };
 }
 

@@ -671,6 +671,10 @@ const globalMessages: * = defineMessages({
     id: 'wallet.staking.pool.share',
     defaultMessage: '!!!Share',
   },
+  poolSaturation: {
+    id: 'wallet.staking.pool.saturation',
+    defaultMessage: '!!!Saturation',
+  },
   sidebarWallets: {
     id: 'sidebar.wallets',
     defaultMessage: '!!!My wallets',
