@@ -46,8 +46,7 @@ import type { StoresMap } from '../index';
 import { PoolInfoApi } from '@emurgo/yoroi-lib';
 import { entriesIntoMap } from '../../coreUtils';
 import type { PoolInfo } from '@emurgo/yoroi-lib';
-import type { PoolInfoResponse } from '../../api/ada/lib/state-fetch/types';
-import type { RemotePool } from '../../api/ada/lib/state-fetch/types';
+import type { PoolInfoResponse, RemotePool } from '../../api/ada/lib/state-fetch/types';
 
 export type AdaDelegationRequests = {|
   publicDeriver: PublicDeriver<>,
