@@ -1,16 +1,16 @@
 // @flow
+import type { AssetAmount } from './types';
 import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
-import { ReactComponent as AssetDefault } from '../../assets/images/revamp/asset-default.inline.svg';
 import { ReactComponent as NoAssetsFound } from '../../assets/images/revamp/no-assets-found.inline.svg';
 import { ReactComponent as SearchIcon } from '../../assets/images/revamp/icons/search.inline.svg';
 import { ReactComponent as WalletIcon } from '../../assets/images/revamp/icons/wallet.inline.svg';
 import { ReactComponent as ArrowTopIcon } from '../../assets/images/revamp/icons/arrow-top.inline.svg';
 import { ReactComponent as ArrowBottomIcon } from '../../assets/images/revamp/icons/arrow-bottom.inline.svg';
 import { truncateAddressShort } from '../../utils/formatters';
+import assetDefault from '../../assets/images/revamp/asset-default.inline.svg';
 import Dialog from '../widgets/Dialog';
 import Table from '../common/table/Table';
-import type { AssetAmount } from './types';
 
 const fromTemplateColumns = '1fr minmax(auto, 136px)';
 const toTemplateColumns = '1fr minmax(auto, 152px) minmax(auto, 136px)';
@@ -21,29 +21,22 @@ const toColumns = ['Asset', 'Volume, 24h', 'Price %, 24h'];
 type Props = {|
   assets: Array<AssetAmount>,
   type: string,
-  onAssetSelected: AssetAmount => void,
+  onAssetSelected: any => void,
   onClose: void => void,
-|}
+|};
 
-export default function SelectAssetDialog(
-  {
-    assets = [],
-    type,
-    onAssetSelected,
-    onClose,
-  }: Props
-): React$Node {
+export default function SelectAssetDialog({
+  assets = [],
+  type,
+  onAssetSelected,
+  onClose,
+}: Props): React$Node {
   const [searchTerm, setSearchTerm] = useState('');
+  // const [sortBy, setSortBy] = useState('');
 
-  // <TODO:CHECK_LINT>
-  // eslint-disable-next-line no-unused-vars
-  const [sortBy, setSortBy] = useState('');
-
-  // <TODO:CHECK_LINT>
-  // eslint-disable-next-line no-unused-vars
-  const handleSortBy = sort => {
-    setSortBy(sort);
-  };
+  // const handleSortBy = sort => {
+  //   setSortBy(sort);
+  // };
 
   const handleAssetSelected = asset => {
     onAssetSelected(asset);
@@ -54,12 +47,14 @@ export default function SelectAssetDialog(
     setSearchTerm(e.target.value);
   };
 
-  const filteredAssets = assets.filter(
-    a =>
-      a.name.toLowerCase().includes(searchTerm) ||
-      a.ticker.toLowerCase().includes(searchTerm) ||
-      a.address.toLowerCase().includes(searchTerm)
-  );
+  const filteredAssets =
+    assets.filter(
+      a =>
+        a.name.toLowerCase().includes(searchTerm) ||
+        a.ticker.toLowerCase().includes(searchTerm) ||
+        a.id.toLowerCase().includes(searchTerm) ||
+        a.fingerprint.toLowerCase().includes(searchTerm)
+    ) || [];
 
   return (
     <Dialog title={`Swap ${type}`} onClose={onClose} withCloseButton closeOnOverlayClick>
@@ -109,7 +104,7 @@ export default function SelectAssetDialog(
         >
           {filteredAssets.map((a, index) => (
             <AssetAndAmountRow
-              key={`${a.address}-${index}`}
+              key={`${a.id}-${index}`}
               asset={a}
               type={type}
               onAssetSelected={handleAssetSelected}
@@ -142,7 +137,6 @@ export default function SelectAssetDialog(
 }
 
 const AssetAndAmountRow = ({
-  image = null,
   type,
   asset,
   usdPrice = null,
@@ -151,12 +145,19 @@ const AssetAndAmountRow = ({
   priceChange100 = '',
   onAssetSelected,
 }) => {
-  const {
-    name = null,
-    address,
-    walletAmount,
-    ticker,
-  } = asset;
+  const { name = null, image = '', fingerprint: address, id, amount, ticker } = asset;
+  //   {
+  //     "id": "984394dcc0b08ea12d72b8833292e3c3197d7a8ac89aad61d2f5aa9e.45415254485f746f6b656e",
+  //     "group": "984394dcc0b08ea12d72b8833292e3c3197d7a8ac89aad61d2f5aa9e",
+  //     "fingerprint": "asset1lr7d44kvy8q8dqnat5macsj6matcvk046hdyeh",
+  //     "name": "EARTH_token",
+  //     "decimals": 6,
+  //     "description": "$EARTH token for use within the Unbounded.Earth metaverse",
+  //     "image": "https://tokens.muesliswap.com/static/img/tokens/984394dcc0b08ea12d72b8833292e3c3197d7a8ac89aad61d2f5aa9e.45415254485f746f6b656e.png",
+  //     "kind": "ft",
+  //     "ticker": "EARTH",
+  //     "metadatas": {}
+  // }
   const isFrom = type === 'from';
   const priceNotChanged = Number(priceChange100.replace('-', '').replace('%', '')) === 0;
   const priceIncreased = priceChange100 && priceChange100.charAt(0) !== '-';
@@ -166,7 +167,7 @@ const AssetAndAmountRow = ({
     if (priceNotChanged) return 'grayscale.900';
     if (priceIncreased) return 'secondary.600';
     return 'magenta.500';
-  }
+  };
 
   return (
     <Box
@@ -183,13 +184,31 @@ const AssetAndAmountRow = ({
       onClick={() => onAssetSelected(asset)}
     >
       <Box sx={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-        <Box display="inline-flex">{image || <AssetDefault />}</Box>
+        <Box
+          display="inline-flex"
+          alignItems="center"
+          justifyContent="center"
+          width="48px"
+          height="48px"
+          overflow="hidden"
+          flexShrink="0"
+          borderRadius="8px"
+        >
+          <img
+            width="100%"
+            src={image || assetDefault}
+            alt={name}
+            onError={e => {
+              e.target.src = assetDefault;
+            }}
+          />
+        </Box>
         <Box flexGrow="1" width="100%">
           <Box display="flex" alignItems="center" gap="8px">
             <Typography component="div" fontWeight={500} variant="body1">
-              {name !== address && `[${ticker}]`} {name}
+              {(name !== address || name !== id) && name !== ticker && `[${ticker}]`} {name}
             </Typography>
-            {!isFrom && walletAmount > 0 && (
+            {!isFrom && Number(amount) > 0 && (
               <Box component="span" color="secondary.600">
                 <WalletIcon />
               </Box>
@@ -197,7 +216,7 @@ const AssetAndAmountRow = ({
           </Box>
           <Box>
             <Typography component="div" variant="body2" color="grayscale.600">
-              {truncateAddressShort(address, 17)}
+              {truncateAddressShort(address || id, 17) || 'Cardano'}
             </Typography>
           </Box>
         </Box>
@@ -251,11 +270,11 @@ const AssetAndAmountRow = ({
           alignItems="flex-end"
         >
           <Typography component="div" variant="body1" color="grayscale.900">
-            <span>{walletAmount}</span>&nbsp;<span>{ticker}</span>
+            <span>{amount}</span>&nbsp;<span>{ticker}</span>
           </Typography>
           {usdPrice && (
             <Typography component="div" variant="body2" color="grayscale.600">
-              {(walletAmount * usdPrice).toFixed(2)} USD
+              {(Number(amount) * usdPrice).toFixed(2)} USD
             </Typography>
           )}
         </Box>

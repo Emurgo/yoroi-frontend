@@ -10,7 +10,7 @@ const templateColumns = 'minmax(auto, 208px) 120px 200px 90px 160px';
 type Props = {|
   currentPool: string,
   poolList: Array<any>,
-  onPoolSelected: any => void,
+  onPoolSelected(pool: any): void,
   onClose: void => void,
 |};
 

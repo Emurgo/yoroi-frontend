@@ -25,6 +25,7 @@ import RestoreWalletPage, {
 import CreateWalletPage, {
   CreateWalletPagePromise,
 } from './containers/wallet/CreateWalletPageContainer';
+import { QueryClient, QueryClientProvider } from 'react-query';
 import LoadingPage from './containers/LoadingPage';
 import Wallet from './containers/wallet/Wallet';
 import Settings from './containers/settings/Settings';
@@ -476,12 +477,15 @@ const NFTsSubPages = (stores, actions) => (
 );
 
 export function wrapSwap(swapProps: InjectedProps, children: Node): Node {
+  const queryClient = new QueryClient();
   return (
-    <SwapProvider publicDeriver={swapProps.stores.wallets.selected}>
-      <SwapPageContainer {...swapProps}>
-        <Suspense fallback={null}>{children}</Suspense>
-      </SwapPageContainer>
-    </SwapProvider>
+    <QueryClientProvider client={queryClient}>
+      <SwapProvider publicDeriver={swapProps.stores.wallets.selected}>
+        <SwapPageContainer {...swapProps}>
+          <Suspense fallback={null}>{children}</Suspense>
+        </SwapPageContainer>
+      </SwapProvider>
+    </QueryClientProvider>
   );
 }
 
