@@ -1,13 +1,8 @@
 // @flow
 
-import BigNumber from 'bignumber.js';
 import type {
   AddressUtxoRequest,
   AddressUtxoResponse,
-  TxBodiesRequest,
-  TxBodiesResponse,
-  UtxoSumRequest,
-  UtxoSumResponse,
   HistoryRequest,
   HistoryResponse,
   RewardHistoryFunc,
@@ -31,8 +26,6 @@ import type {
   BestBlockResponse,
   AddressUtxoFunc,
   HistoryFunc,
-  TxBodiesFunc,
-  UtxoSumFunc,
   RemoteTransaction,
   MultiAssetRequest,
   MultiAssetMintMetadataResponse,
