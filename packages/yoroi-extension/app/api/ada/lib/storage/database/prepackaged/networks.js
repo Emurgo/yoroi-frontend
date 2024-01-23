@@ -23,6 +23,9 @@ export const networks = Object.freeze({
       BackendService: environment.isTest()
         ? 'http://localhost:21000'
         : 'https://iohk-mainnet.yoroiwallet.com',
+      BackendServiceZero: environment.isTest()
+        ? 'http://localhost:21000'
+        : 'https://yoroi-backend-zero-mainnet.emurgornd.com',
       WebSocket: environment.isTest()
         ? 'ws://localhost:21000'
         : 'wss://iohk-mainnet.yoroiwallet.com:443',
@@ -104,6 +107,9 @@ export const networks = Object.freeze({
       BackendService: environment.isTest()
         ? 'http://localhost:21000'
         : 'https://preprod-backend.yoroiwallet.com',
+      BackendServiceZero: environment.isTest()
+        ? 'http://localhost:21000'
+        : 'https://yoroi-backend-zero-preprod.emurgornd.com',
       WebSocket: environment.isTest()
         ? 'ws://localhost:21000'
         : 'wss://preprod-backend.yoroiwallet.com:443',
@@ -144,6 +150,9 @@ export const networks = Object.freeze({
       BackendService: environment.isTest()
         ? 'http://localhost:21000'
         : 'https://preview-backend.emurgornd.com',
+      BackendServiceZero: environment.isTest()
+        ? 'http://localhost:21000'
+        : 'https://yoroi-backend-zero-preview.emurgornd.com',
       WebSocket: environment.isTest()
         ? 'ws://localhost:21000'
         : 'wss://preview-backend.emurgornd.com:443',

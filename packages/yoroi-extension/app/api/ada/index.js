@@ -2573,7 +2573,7 @@ export default class AdaApi {
     db: lf$Database,
     getProtocolParameters: GetProtocolParametersFunc,
   ): Promise<Array<NetworkRow>> {
-    const networks = (await raii(
+    const dbNetworks = (await raii(
       db,
       getAllSchemaTables(db, GetNetworks),
       tx => GetNetworks.get(db, tx),
@@ -2581,19 +2581,21 @@ export default class AdaApi {
 
     const changedNetworks: Array<NetworkRow> = [];
 
-    for (const network of networks) {
+    for (const network of dbNetworks) {
       let params;
       try {
-        params = await getProtocolParameters({
-          network
-        });
-      } catch {
+        params = await getProtocolParameters({ network });
+      } catch(e) {
+        console.error(
+          `Failed to upgrade protocol params for
+           '${network.NetworkId}' (${network.NetworkName})`, e);
         continue;
       }
 
-      const newNetwork: Object = {};
       // $FlowFixMe[invalid-tuple-index] we know this is Cardano config not Ergo
-      if (merge(newNetwork, network.BaseConfig[1], params)) {
+      const { changed, merged: newNetwork } =
+        merge(network.BaseConfig[1], params);
+      if (changed) {
         // $FlowFixMe[invalid-tuple-index] we know this is Cardano config not Ergo
         network.BaseConfig[1] = (newNetwork: CardanoHaskellShelleyBaseConfig);
         changedNetworks.push((Object.freeze(network): any));
@@ -2613,22 +2615,27 @@ export default class AdaApi {
 }
 // ========== End of class AdaApi =========
 
-function merge(result: Object, destination: Object, source: Object): boolean {
-  let changed = false;
-  for (const key in destination) {
-    if (typeof destination[key] === 'object') {
-      changed = changed || merge(result[key] = {}, destination[key], (source || {})[key]);
-    } else if (source == null || source[key] == null) {
-      result[key] = destination[key];
-    } else if (
-      typeof source[key] === typeof destination[key] &&
-        destination[key] !== source[key]
-    ) {
-      result[key] = source[key];
-      changed = true;
+function merge(destination: Object, source: Object): {| changed: boolean, merged: Object |} {
+  function internalRecursiveMerge(result: Object, dest: Object, src: Object): boolean {
+    let changed = false;
+    for (const key in dest) {
+      if (typeof dest[key] === 'object') {
+        changed = changed || internalRecursiveMerge(result[key] = {}, dest[key], (src || {})[key]);
+      } else if (src == null || src[key] == null) {
+        result[key] = dest[key];
+      } else if (
+        typeof src[key] === typeof dest[key] &&
+        dest[key] !== src[key]
+      ) {
+        result[key] = src[key];
+        changed = true;
+      }
     }
+    return changed;
   }
-  return changed;
+  const merged: Object = {};
+  const changed = internalRecursiveMerge(merged, destination, source);
+  return { changed, merged };
 }
 
 /**
