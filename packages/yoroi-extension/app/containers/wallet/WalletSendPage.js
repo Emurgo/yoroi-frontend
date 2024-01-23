@@ -36,7 +36,6 @@ import { withLayout } from '../../styles/context/layout';
 import AddNFTDialog from '../../components/wallet/send/WalletSendFormSteps/AddNFTDialog';
 import AddTokenDialog from '../../components/wallet/send/WalletSendFormSteps/AddTokenDialog';
 import { ampli } from '../../../ampli/index';
-import type { DomainResolverFunc } from '../../stores/ada/AdaAddressesStore';
 
 const messages = defineMessages({
   txConfirmationLedgerNanoLine1: {
@@ -173,8 +172,8 @@ class WalletSendPage extends Component<AllProps> {
         <>
           <WalletSendFormRevamp
             resolveDomainAddress={
-              this.generated.stores.substores.ada.addresses.domainResolverSupported()
-                ? this.generated.stores.substores.ada.addresses.resolveDomainAddress
+              this.props.stores.substores.ada.addresses.domainResolverSupported()
+                ? this.props.stores.substores.ada.addresses.resolveDomainAddress
                 : null
             }
             supportedAddressDomainBannerState={{

@@ -34,7 +34,6 @@ import { generateGraphData } from '../../../utils/graph';
 import RewardHistoryDialog from '../../../components/wallet/staking/dashboard-revamp/RewardHistoryDialog';
 import DelegatedStakePoolCard from '../../../components/wallet/staking/dashboard-revamp/DelegatedStakePoolCard';
 import WithdrawRewardsDialog from './WithdrawRewardsDialog';
-import type { PoolInfo } from '@emurgo/yoroi-lib';
 import { formatLovelacesHumanReadableShort, roundOneDecimal, roundTwoDecimal } from '../../../utils/formatters';
 import { compose, maybe } from '../../../coreUtils';
 
