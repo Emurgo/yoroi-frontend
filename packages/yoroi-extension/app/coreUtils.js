@@ -26,8 +26,9 @@ export function logErr<T>(f: () => T, msg: (string | (Error) => string)): T {
  * In any other case there will be no change in the returned result.
  */
 export function urlResolveForIpfsAndCorsproxy<T: ?string>(url: T): T {
+  // $FlowIgnore
   return maybe(url, (u: string): string => u.startsWith('ipfs://')
-    ? url.replace('ipfs://', 'https://ipfs.io/ipfs/')
+    ? u.replace('ipfs://', 'https://ipfs.io/ipfs/')
     : `https://corsproxy.io/${u}`);
 }
 
@@ -73,10 +74,10 @@ export function entriesIntoMap<K,V>(col: Array<[K,V]>): { [K]: V } {
  */
 export function entriesIntoMapBy<T,K,V>(col: Array<T>, f: (T => [K,V])): { [K]: V } {
   return col.reduce((map, e) => {
-    const [k, v] = f(e);
+    const [k, v]: [K, V] = f(e);
     map[k] = v;
     return map;
-  }, {});
+  },({}: { [K]: V }));
 }
 
 /**
@@ -86,6 +87,9 @@ export function maybe<T,R>(t: ?T, f: T => ?R): ?R {
   return t == null ? t : f(t);
 }
 
-export function compose<A,B,C>(f1: A => ?B, f2: B => ?C): (?A => ?C) {
-  return a => maybe(maybe(a, f1), f2);
+/**
+ * Composes two functions in a null-safe manner
+ */
+export function compose<A,B,C>(f1: A => ?B, f2: B => ?C): (A => ?C) {
+  return a => maybe(f1(a), f2);
 }

@@ -49,9 +49,9 @@ import { ApiOptions, getApiForNetwork } from '../../../api/common/utils';
 import RewardHistoryDialog from '../../../components/wallet/staking/dashboard-revamp/RewardHistoryDialog';
 import DelegatedStakePoolCard from '../../../components/wallet/staking/dashboard-revamp/DelegatedStakePoolCard';
 import WithdrawRewardsDialog from './WithdrawRewardsDialog';
-import { PoolInfo } from '@emurgo/yoroi-lib';
+import type { PoolInfo } from '@emurgo/yoroi-lib';
 import { formatLovelacesHumanReadableShort, roundOneDecimal, roundTwoDecimal } from '../../../utils/formatters';
-import { maybe } from '../../../coreUtils';
+import { compose, maybe } from '../../../coreUtils';
 
 export type GeneratedData = typeof StakingPageContent.prototype.generated;
 // populated by ConfigWebpackPlugin
@@ -231,9 +231,11 @@ class StakingPageContent extends Component<AllProps> {
 
     if (delegationRequests.getDelegatedBalance.result.delegation == null) return null;
     const networkInfo = publicDeriver.getParent().getNetworkInfo();
-    const currentPool = delegationRequests.getDelegatedBalance.result.delegation;
-    const poolMeta = this.generated.stores.delegation.getLocalPoolInfo(networkInfo, currentPool);
-    const { stake, roa, saturation, pic } = this.generated.stores.delegation.getLocalRemotePoolInfo(networkInfo, currentPool) ?? {};
+    const currentPool: ?string = delegationRequests.getDelegatedBalance.result?.delegation;
+    const poolMeta = maybe(currentPool,
+        s => this.generated.stores.delegation.getLocalPoolInfo(networkInfo, s));
+    const { stake, roa, saturation, pic } = maybe(currentPool,
+        s => this.generated.stores.delegation.getLocalRemotePoolInfo(networkInfo, s)) ?? {};
     if (poolMeta == null) {
       // server hasn't returned information about the stake pool yet
       return null;
@@ -246,9 +248,9 @@ class StakingPageContent extends Component<AllProps> {
       id: String(currentPool),
       name,
       avatar: pic,
-      roa: maybe(roa, roundTwoDecimal),
+      roa: maybe(roa, compose(Number, roundTwoDecimal)),
       poolSize: maybe(stake, formatLovelacesHumanReadableShort),
-      share: maybe(saturation, s => roundOneDecimal(s*100)),
+      share: maybe(saturation, s => roundOneDecimal(Number(s)*100)),
       websiteUrl: poolMeta.info?.homepage,
       ticker: poolMeta.info?.ticker,
     };

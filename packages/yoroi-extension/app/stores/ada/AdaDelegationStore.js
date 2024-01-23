@@ -45,7 +45,9 @@ import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { PoolInfoApi } from '@emurgo/yoroi-lib';
 import { entriesIntoMap } from '../../coreUtils';
-import { PoolInfo } from '@emurgo/yoroi-lib';
+import type { PoolInfo } from '@emurgo/yoroi-lib';
+import type { PoolInfoResponse } from '../../api/ada/lib/state-fetch/types';
+import type { RemotePool } from '../../api/ada/lib/state-fetch/types';
 
 export type AdaDelegationRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -260,22 +262,23 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
   |} => Promise<void> = async (request) => {
     // update pool information
     const poolsCachedForNetwork = new Set<string>(this.stores.delegation.poolInfo
-      .filter(next => next.networkId === request.network.NetworkId));
+      .filter(next => next.networkId === request.network.NetworkId)
+      .map(next => next.poolId));
     const poolsToQuery = request.allPoolIds.filter(pool => !poolsCachedForNetwork.has(pool));
     const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
-    const poolInfoPromise = stateFetcher.getPoolInfo({
+    const poolInfoPromise: Promise<PoolInfoResponse> = stateFetcher.getPoolInfo({
       network: request.network,
       poolIds: poolsToQuery,
     });
-    const remotePoolInfoPromises =
+    const remotePoolInfoPromises: Array<Promise<[string, PoolInfo | null]>> =
       poolsToQuery.map(id => new PoolInfoApi(axios).getPool(id).then(res => [id, res]));
-    const [poolInfoResp, ...remotePoolInfoResps] =
-      await Promise.all([poolInfoPromise, ...remotePoolInfoPromises]);
-    const remoteInfoMap = entriesIntoMap<string, void | PoolInfo>(remotePoolInfoResps);
+    const [poolInfoResp, remotePoolInfoResps]: [PoolInfoResponse, Array<[string, PoolInfo | null]>] =
+      await Promise.all([poolInfoPromise, Promise.all(remotePoolInfoPromises)]);
+    const remoteInfoMap = entriesIntoMap<string, PoolInfo | null>(remotePoolInfoResps);
     runInAction(() => {
       for (const poolId of Object.keys(poolInfoResp)) {
-        const poolInfo = poolInfoResp[poolId];
-        const remotePoolInfo = remoteInfoMap[poolId];
+        const poolInfo: (RemotePool | null) = poolInfoResp[poolId];
+        const poolRemoteInfo = remoteInfoMap[poolId];
         if (poolInfo == null) continue;
         this.stores.delegation.poolInfo.push({
           networkId: request.network.NetworkId,
@@ -290,7 +293,7 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
             },
             history: poolInfo.history,
           },
-          remotePoolInfo,
+          poolRemoteInfo,
         });
       }
     });

@@ -22,7 +22,7 @@ import {
 import type { MangledAmountFunc } from '../stateless/mangledAddresses';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import { PoolInfo } from '@emurgo/yoroi-lib';
+import type { PoolInfo } from '@emurgo/yoroi-lib';
 
 export type DelegationRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -82,7 +82,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     networkId: number,
     poolId: string,
     poolInfo: PoolMeta,
-    poolRemoteInfo: void | PoolInfo,
+    poolRemoteInfo: PoolInfo | null,
   |}> = [];
 
   /**
@@ -133,7 +133,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     $ReadOnly<NetworkRow>,
     string,
   ) => void | PoolInfo = (network, poolId) => {
-    return find(this.poolInfo, { networkId: network.NetworkId, poolId })?.remotePoolInfo;
+    return find(this.poolInfo, { networkId: network.NetworkId, poolId })?.poolRemoteInfo ?? undefined;
   }
 
   @action.bound
