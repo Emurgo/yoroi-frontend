@@ -2196,22 +2196,27 @@ export async function genCardanoAssetMap(
 
   const updatingTokenIds = tokenIds.filter(token => !noNeedForUpdateTokens.has(token));
 
-  let tokenInfoResponse;
-  try {
-    tokenInfoResponse = await getTokenInfo({
-      network,
-      tokenIds: updatingTokenIds.map(id => id.split('.').join(''))
-    });
-  } catch {
-    tokenInfoResponse = {};
-  }
+  const tokenInfoPromise = getTokenInfo({
+    network,
+    tokenIds: updatingTokenIds.map(id => id.split('.').join(''))
+  });
 
-  const [metadata, supply] = await getTokenMintMetadataAndSupply(
+  const tokenMintMetadataAndSupplyPromise = getTokenMintMetadataAndSupply(
     tokenIds,
     getMultiAssetMetadata,
     getMultiAssetSupply,
     network,
   );
+
+  let tokenInfoResponse = {};
+  let metadata = {};
+  let supply = {};
+  try {
+    [tokenInfoResponse, [metadata, supply]] =
+      await Promise.all(tokenInfoPromise, tokenMintMetadataAndSupplyPromise);
+  } catch(e) {
+    console.error('Failed to query token info, metadata, or supply', e);
+  }
 
   const databaseInsert = updatingTokenIds
     .map(tokenId => {
