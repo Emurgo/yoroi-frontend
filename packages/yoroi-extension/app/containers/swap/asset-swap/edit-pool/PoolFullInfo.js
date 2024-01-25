@@ -4,7 +4,7 @@ import { useSwap } from '@yoroi/swap';
 import { useSwapForm } from '../../context/swap-form';
 import { Quantities } from '../../../../utils/quantities';
 
-export default function SwapPoolFullInfo() {
+export default function SwapPoolFullInfo({ totalFees }) {
   const { orderData } = useSwap();
   const { buyTokenInfo } = useSwapForm();
   const buyToken = orderData.tokens?.buyInfo;
@@ -21,10 +21,6 @@ export default function SwapPoolFullInfo() {
 
   // TODO: do not hadcode pt decimals and ticker
   const deposit = `${Quantities.format(cost.deposit.quantity, 6)} ADA`;
-  const totalFees = `${Quantities.format(
-    Quantities.sum([cost.batcherFee.quantity, cost.frontendFeeInfo.fee.quantity]),
-    6
-  )} ADA`;
 
   return (
     <Box sx={{ display: 'flex', flexFlow: 'column', gap: '8px', mt: '8px' }}>
@@ -44,7 +40,7 @@ export default function SwapPoolFullInfo() {
             <InfoIcon />
           </Box>
         </Box>
-        <Box>{totalFees}</Box>
+        <Box>{totalFees} ADA</Box>
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">

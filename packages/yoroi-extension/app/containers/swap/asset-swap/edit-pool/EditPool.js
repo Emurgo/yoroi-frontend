@@ -6,16 +6,47 @@ import { useSwap } from '@yoroi/swap';
 import { capitalize } from 'lodash';
 import SwapPoolIcon from '../../../../components/swap/SwapPoolIcon';
 import SwapPoolFullInfo from './PoolFullInfo';
+import { useSwapForm } from '../../context/swap-form';
+import { Quantities } from '../../../../utils/quantities';
 
 export default function EditSwapPool({ handleEditPool }) {
   const [showFullInfo, setShowFullInfo] = useState(false);
   const { orderData } = useSwap();
 
-  console.log('🚀 ~ EditSwapPool ~ orderData:', orderData);
+  const { selectedPoolCalculation: calculation, amounts, bestPoolCalculation, type } = orderData;
+  console.log('🚀 ~ EditSwapPool ~ amounts:', amounts);
 
-  const isLimitOrder = orderData.type === 'limit';
-  const bestPool = orderData.bestPoolCalculation?.pool || {};
-  const pool = orderData.selectedPoolCalculation?.pool || {};
+  const {
+    buyQuantity: { isTouched: isBuyTouched },
+    sellQuantity: { isTouched: isSellTouched },
+    sellTokenInfo,
+  } = useSwapForm();
+
+  if (!isBuyTouched || !isSellTouched || calculation === undefined) return null;
+
+  const { cost, pool } = calculation;
+
+  const sellTokenIsPtToken = amounts.sell.tokenId === '';
+  const sumQty = [cost.batcherFee.quantity, cost.frontendFeeInfo.fee.quantity];
+
+  if (sellTokenIsPtToken) {
+    sumQty.push(amounts.sell.quantity);
+  }
+
+  // TODO: do not hardcode pt ticker
+  const totalFees = Quantities.format(Quantities.sum(sumQty), 6);
+  const sellTokenTotal = sellTokenIsPtToken
+    ? `${totalFees} ADA`
+    : `${Quantities.format(amounts.sell.quantity, sellTokenInfo?.decimals ?? 0)} ${
+        sellTokenInfo?.ticker ?? ''
+      }`;
+
+  const titleTotalFeesFormatted = `Total: ${
+    !sellTokenIsPtToken ? `${sellTokenTotal} + ${totalFees} ADA` : sellTokenTotal
+  }`;
+
+  const isLimitOrder = type === 'limit';
+  const bestPool = bestPoolCalculation?.pool || {};
   const isAutoPool = bestPool.poolId === pool.poolId;
 
   const handleShowFullInfo = () => setShowFullInfo(p => !p);
@@ -48,7 +79,7 @@ export default function EditSwapPool({ handleEditPool }) {
           </Typography>
           {pool.provider && (
             <Typography component="div" variant="body1" color="grayscale.max">
-              Total: 0
+              {titleTotalFeesFormatted}
             </Typography>
           )}
         </Box>
@@ -63,7 +94,7 @@ export default function EditSwapPool({ handleEditPool }) {
         </Box>
       </Box>
 
-      {showFullInfo && <SwapPoolFullInfo />}
+      {showFullInfo && <SwapPoolFullInfo totalFees={totalFees} />}
     </Box>
   );
 }
