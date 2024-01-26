@@ -177,7 +177,7 @@
     "@emurgo/cardano-serialization-lib-browser": "12.0.0-alpha.15",
     "@emurgo/cip14-js": "2.0.0",
     "@emurgo/cip4-js": "1.0.5",
-    "@emurgo/cross-csl-browser": "4.0.0-alpha.1",
+    "@emurgo/cross-csl-browser": "4.1.0",
     "@emurgo/js-chain-libs": "0.7.1",
     "@emurgo/yoroi-eutxo-txs": "0.0.1-alpha.7",
     "@emurgo/yoroi-lib": "0.14.4-beta.3",
