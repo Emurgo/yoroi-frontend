@@ -1,28 +1,26 @@
 // @flow
 
-import { observable, action, } from 'mobx';
+import { action, observable, } from 'mobx';
 import { find } from 'lodash';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import {
-  PublicDeriver,
-} from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import { PublicDeriver, } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import Store from '../base/Store';
 import type {
+  GetCurrentDelegationFunc,
   GetDelegatedBalanceFunc,
   RewardHistoryFunc,
-  GetCurrentDelegationFunc,
 } from '../../api/common/lib/storage/bridge/delegationUtils';
+import { GetDelegatedBalanceResponse } from '../../api/common/lib/storage/bridge/delegationUtils';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import LocalizableError from '../../i18n/LocalizableError';
 import { getApiForNetwork } from '../../api/common/utils';
-import {
-  PoolMissingApiError,
-} from '../../api/common/errors';
+import { PoolMissingApiError, } from '../../api/common/errors';
 import type { MangledAmountFunc } from '../stateless/mangledAddresses';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import type { PoolInfo } from '@emurgo/yoroi-lib';
+import { MultiToken } from '../../api/common/lib/MultiToken';
 
 export type DelegationRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -120,6 +118,28 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     if (foundRequest) return foundRequest;
 
     return undefined; // can happen if the wallet is not a Shelley wallet
+  }
+
+  _getDelegatedBalabceResult: PublicDeriver<> => ?GetDelegatedBalanceResponse = (publicDeriver) => {
+    const delegationRequest = this.stores.delegation.getDelegationRequests(publicDeriver);
+    if (delegationRequest == null) return null;
+    return delegationRequest.getDelegatedBalance.result;
+  }
+
+  getRewardBalance: PublicDeriver<> => ?MultiToken = (publicDeriver) => {
+    if (this.stores.transactions.hasPendingWithdrawals(publicDeriver)) {
+      // In case we have a pending tx that already spends the rewards
+      return null;
+    }
+    return this._getDelegatedBalabceResult(publicDeriver)?.accountPart ?? null;
+  }
+
+  getDelegatedPoolId: PublicDeriver<> => ?string = (publicDeriver) => {
+    return this._getDelegatedBalabceResult(publicDeriver)?.delegation ?? null;
+  }
+
+  isStakeRegistered: PublicDeriver<> => ?boolean = (publicDeriver) => {
+    return this._getDelegatedBalabceResult(publicDeriver)?.stakeRegistered ?? null;
   }
 
   getLocalPoolInfo: (

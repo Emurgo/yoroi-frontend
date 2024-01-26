@@ -86,13 +86,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
     const selectedPlate = this.generated.stores.wallets.activeWalletPlate;
     const stakingListBias = selectedPlate?.TextPart || 'bias';
 
-    const delegationRequests = this.generated.stores.delegation.getDelegationRequests(
-      selectedWallet
-    );
-    if (delegationRequests == null) {
-      throw new Error(`${nameof(SeizaFetcher)} opened for non-reward wallet`);
-    }
-
+    const delegatedPoolId = this.generated.stores.delegation.getDelegatedPoolId(selectedWallet);
     if (urlTemplate != null) {
       const totalAda = this._getTotalAda();
       const locale = this.generated.stores.profile.currentLocale;
@@ -103,10 +97,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
       }
       const balance = this.generated.stores.transactions.getBalance(publicDeriver);
       const isWalletWithNoFunds = balance != null && balance.getDefaultEntry().amount.isZero();
-      const poolList = (
-        delegationRequests.getDelegatedBalance.result?.delegation != null &&
-          this._isRegistered(publicDeriver)
-      ) ? [delegationRequests.getDelegatedBalance.result?.delegation] : [];
+      const poolList = (delegatedPoolId != null && this._isRegistered(publicDeriver)) ? [delegatedPoolId] : [];
 
       const classicCardanoStakingPage = (
         <div id="classicCardanoStakingPage">
@@ -199,19 +190,12 @@ class CardanoStakingPage extends Component<AllProps, State> {
     }
 
     const delegationStore = this.generated.stores.delegation;
-    const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
-    if (delegationRequests == null) {
-      throw new Error(`${nameof(CardanoStakingPage)} opened for non-reward wallet`);
-    }
-
     const balance = this.generated.stores.transactions.getBalance(publicDeriver);
     if (balance == null) {
       return null;
     }
-    const rewardBalance =
-      delegationRequests.getDelegatedBalance.result == null
-        ? new MultiToken([], publicDeriver.getParent().getDefaultToken())
-        : delegationRequests.getDelegatedBalance.result.accountPart;
+    const rewardBalance = delegationStore.getRewardBalance(publicDeriver)
+      ?? new MultiToken([], publicDeriver.getParent().getDefaultToken());
     const tokenInfo = genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)(
       rewardBalance.getDefaultEntry()
     );
@@ -474,21 +458,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
   };
 
   _isRegistered: (PublicDeriver<>) => ?boolean = publicDeriver => {
-    if (!isCardanoHaskell(publicDeriver.getParent().getNetworkInfo())) {
-      return undefined;
-    }
-    const delegationRequests = this.generated.stores.delegation.getDelegationRequests(
-      publicDeriver
-    );
-    if (delegationRequests == null) return undefined;
-    if (
-      !delegationRequests.getDelegatedBalance.wasExecuted ||
-      delegationRequests.getDelegatedBalance.isExecuting ||
-      delegationRequests.getDelegatedBalance.result == null
-    ) {
-      return undefined;
-    }
-    return delegationRequests.getDelegatedBalance.result.stakeRegistered;
+    return this.generated.stores.delegation.isStakeRegistered(publicDeriver);
   };
 
   @computed get generated(): {|
@@ -545,6 +515,9 @@ class CardanoStakingPage extends Component<AllProps, State> {
       |},
       delegation: {|
         getDelegationRequests: (PublicDeriver<>) => void | DelegationRequests,
+        getRewardBalance: (PublicDeriver<>) => ?MultiToken,
+        getDelegatedPoolId: (PublicDeriver<>) => ?string,
+        isStakeRegistered: (PublicDeriver<>) => ?boolean,
         getLocalPoolInfo: ($ReadOnly<NetworkRow>, string) => void | PoolMeta,
         poolInfoQuery: {|
           error: ?LocalizableError,
@@ -632,6 +605,9 @@ class CardanoStakingPage extends Component<AllProps, State> {
         },
         delegation: {
           getDelegationRequests: stores.delegation.getDelegationRequests,
+          getRewardBalance: stores.delegation.getRewardBalance,
+          getDelegatedPoolId: stores.delegation.getDelegatedPoolId,
+          isStakeRegistered: stores.delegation.isStakeRegistered,
           getLocalPoolInfo: stores.delegation.getLocalPoolInfo,
           poolInfoQuery: {
             isExecuting: stores.delegation.poolInfoQuery.isExecuting,

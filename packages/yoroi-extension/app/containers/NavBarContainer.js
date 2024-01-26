@@ -183,20 +183,8 @@ export default class NavBarContainer extends Component<Props> {
     );
   }
 
-  /**
-   * undefined => wallet is not a reward wallet
-   * null => still calculating
-   * value => done calculating
-   */
-  getRewardBalance: (PublicDeriver<>) => null | void | MultiToken = publicDeriver => {
-    const delegationRequest = this.generated.stores.delegation.getDelegationRequests(publicDeriver);
-    if (delegationRequest == null) return undefined;
-
-    const balanceResult = delegationRequest.getDelegatedBalance.result;
-    if (balanceResult == null) {
-      return null;
-    }
-    return balanceResult.accountPart;
+  getRewardBalance: (PublicDeriver<>) => ?MultiToken = publicDeriver => {
+    return this.generated.stores.delegation.getRewardBalance(publicDeriver);
   };
 
   @computed get generated(): {|
@@ -235,6 +223,7 @@ export default class NavBarContainer extends Component<Props> {
       app: {| currentRoute: string |},
       delegation: {|
         getDelegationRequests: (PublicDeriver<>) => void | DelegationRequests,
+        getRewardBalance: (PublicDeriver<>) => ?MultiToken,
       |},
       profile: {|
         shouldHideBalance: boolean,
@@ -292,6 +281,7 @@ export default class NavBarContainer extends Component<Props> {
         },
         delegation: {
           getDelegationRequests: stores.delegation.getDelegationRequests,
+          getRewardBalance: stores.delegation.getRewardBalance,
         },
         transactions: {
           balance: stores.transactions.balance,

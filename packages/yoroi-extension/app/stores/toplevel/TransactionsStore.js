@@ -857,6 +857,14 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       .map(tx => tx.transaction);
   };
 
+  hasPendingWithdrawals: (PublicDeriver<>) => boolean = (publicDeriver) => {
+    return this._submittedTransactions.some(tx => {
+      return tx.publicDeriverId === publicDeriver.publicDeriverId
+      // <TODO:PENDING_REMOVAL> legacy type check, fix so the type is always this
+      && tx.transaction instanceof CardanoShelleyTransaction && tx.transaction.withdrawals.length > 0;
+    });
+  }
+
   @action
   clearSubmittedTransactions: (PublicDeriver<>) => void = publicDeriver => {
     for (let i = 0; i < this._submittedTransactions.length; ) {

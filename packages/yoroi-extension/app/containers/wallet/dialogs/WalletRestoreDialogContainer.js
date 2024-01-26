@@ -107,15 +107,8 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
     await this.generated.actions.profile.updateHideBalance.trigger();
   };
 
-  getRewardBalance: (PublicDeriver<>) => null | void | MultiToken = publicDeriver => {
-    const delegationRequest = this.generated.stores.delegation.getDelegationRequests(publicDeriver);
-    if (delegationRequest == null) return undefined;
-
-    const balanceResult = delegationRequest.getDelegatedBalance.result;
-    if (balanceResult == null) {
-      return null;
-    }
-    return balanceResult.accountPart;
+  getRewardBalance: (PublicDeriver<>) => ?MultiToken = publicDeriver => {
+    return this.generated.stores.delegation.getRewardBalance(publicDeriver);
   };
 
   openToTransactions: (PublicDeriver<>) => void = publicDeriver => {
@@ -441,6 +434,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
       |},
       delegation: {|
         getDelegationRequests: (PublicDeriver<>) => void | DelegationRequests,
+        getRewardBalance: (PublicDeriver<>) => ?MultiToken,
       |},
       walletRestore: {|
         recoveryResult: void | {|
@@ -505,6 +499,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         },
         delegation: {
           getDelegationRequests: stores.delegation.getDelegationRequests,
+          getRewardBalance: stores.delegation.getRewardBalance,
         },
         wallets: {
           restoreRequest: {
