@@ -120,7 +120,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     return undefined; // can happen if the wallet is not a Shelley wallet
   }
 
-  _getDelegatedBalabceResult: PublicDeriver<> => ?GetDelegatedBalanceResponse = (publicDeriver) => {
+  _getDelegatedBalanceResult: PublicDeriver<> => ?GetDelegatedBalanceResponse = (publicDeriver) => {
     const delegationRequest = this.stores.delegation.getDelegationRequests(publicDeriver);
     if (delegationRequest == null) return null;
     return delegationRequest.getDelegatedBalance.result;
@@ -131,15 +131,15 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
       // In case we have a pending tx that already spends the rewards
       return null;
     }
-    return this._getDelegatedBalabceResult(publicDeriver)?.accountPart ?? null;
+    return this._getDelegatedBalanceResult(publicDeriver)?.accountPart ?? null;
   }
 
   getDelegatedPoolId: PublicDeriver<> => ?string = (publicDeriver) => {
-    return this._getDelegatedBalabceResult(publicDeriver)?.delegation ?? null;
+    return this._getDelegatedBalanceResult(publicDeriver)?.delegation ?? null;
   }
 
   isStakeRegistered: PublicDeriver<> => ?boolean = (publicDeriver) => {
-    return this._getDelegatedBalabceResult(publicDeriver)?.stakeRegistered ?? null;
+    return this._getDelegatedBalanceResult(publicDeriver)?.stakeRegistered ?? null;
   }
 
   getLocalPoolInfo: (
