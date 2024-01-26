@@ -168,7 +168,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
       return this.props.walletAmount;
     }
     if (this.props.walletAmount == null) {
-      return null;
+      return this.props.rewards;
     }
     return this.props.rewards.joinAddCopy(this.props.walletAmount);
   };
