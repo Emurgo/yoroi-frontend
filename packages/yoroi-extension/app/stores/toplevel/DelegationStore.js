@@ -10,8 +10,8 @@ import type {
   GetCurrentDelegationFunc,
   GetDelegatedBalanceFunc,
   RewardHistoryFunc,
+  GetDelegatedBalanceResponse,
 } from '../../api/common/lib/storage/bridge/delegationUtils';
-import type { GetDelegatedBalanceResponse } from '../../api/common/lib/storage/bridge/delegationUtils';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import LocalizableError from '../../i18n/LocalizableError';
 import { getApiForNetwork } from '../../api/common/utils';

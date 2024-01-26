@@ -39,10 +39,7 @@ import type { LayoutComponentMap } from '../../../styles/context/layout';
 import { Box } from '@mui/system';
 import type { PoolData } from './SeizaFetcher';
 import type { WalletChecksum } from '@emurgo/cip4-js';
-import {
-  isCardanoHaskell,
-  isTestnet,
-} from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import { isTestnet } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 
 export type GeneratedData = typeof CardanoStakingPage.prototype.generated;
 
