@@ -27,7 +27,7 @@ type Props = {|
 
 @observer
 export default class WalletDetails extends Component<Props> {
-  static defaultProps: {| infoText: void, rewards: null |} = {
+  static defaultProps: {| infoText: void |} = {
     infoText: undefined,
   };
 
