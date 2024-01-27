@@ -127,10 +127,10 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
   }
 
   getRewardBalance: PublicDeriver<> => ?MultiToken = (publicDeriver) => {
-    if (this.stores.transactions.hasPendingWithdrawals(publicDeriver)) {
-      // In case we have a pending tx that already spends the rewards
-      return null;
-    }
+    // if (this.stores.transactions.hasPendingWithdrawals(publicDeriver)) {
+    //   // In case we have a pending tx that already spends the rewards
+    //   return null;
+    // }
     return this._getDelegatedBalanceResult(publicDeriver)?.accountPart ?? null;
   }
 
