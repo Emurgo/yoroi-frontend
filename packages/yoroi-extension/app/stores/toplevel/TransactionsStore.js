@@ -48,10 +48,7 @@ import { PRIMARY_ASSET_CONSTANTS } from '../../api/ada/lib/storage/database/prim
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
 import moment from 'moment';
-import {
-  loadSubmittedTransactions,
-  persistSubmittedTransactions,
-} from '../../api/localStorage';
+import { loadSubmittedTransactions, persistSubmittedTransactions, } from '../../api/localStorage';
 import { getAllAddressesForWallet } from '../../api/ada/lib/storage/bridge/traitUtils';
 import { toRequestAddresses } from '../../api/ada/lib/storage/bridge/updateTransactions'
 import type { TransactionExportRow } from '../../api/export';
@@ -113,6 +110,15 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   @observable showDelegationBanner: boolean = true;
 
   @observable _submittedTransactions: Array<SubmittedTransactionEntry> = [];
+
+  /*
+   * This transient state only used to store a flag that a reward withdrawal has been processed for some wallet.
+   * Needed to cancel out the utxo balance being synced before the reward balance which was causing a higher
+   * total balance to be displayed for few seconds.
+   *
+   * NOT PERSISTED
+   */
+  @observable _processedWithdrawals: Array<number> = [];
 
   getTransactionRowsToExportRequest: LocalizedRequest<
     ((void) => Promise<void>) => Promise<void>
@@ -277,12 +283,14 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   _afterLoadingNewTxs: (
     Array<WalletTransaction>,
     PublicDeriver<>,
-  ) => Promise<void> = async (result, publicDeriver) => {
+  ) => Promise<void> = async (result: Array<WalletTransaction>, publicDeriver: PublicDeriver<>) => {
     const timestamps: Set<number> = new Set();
     const remoteTransactionIds: Set<string> = new Set();
-    for (const { txid, date } of result) {
+    let walletHasWithdrawal = false;
+    for (const { txid, date, withdrawals } of result) {
       timestamps.add(date.valueOf());
       remoteTransactionIds.add(txid);
+      walletHasWithdrawal = walletHasWithdrawal || (withdrawals?.length > 0);
     }
     const defaultTokenInfo = this.stores.tokenInfoStore.getDefaultTokenInfo(
       publicDeriver.getParent().getNetworkInfo().NetworkId,
@@ -299,6 +307,9 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
     let submittedTransactionsChanged = false;
     runInAction(() => {
+      if (walletHasWithdrawal) {
+        this._processedWithdrawals.push(publicDeriver.publicDeriverId);
+      }
       for (let i = 0; i < this._submittedTransactions.length; ) {
         if (remoteTransactionIds.has(this._submittedTransactions[i].transaction.txid)) {
           this._submittedTransactions.splice(i, 1);
@@ -857,12 +868,18 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       .map(tx => tx.transaction);
   };
 
-  hasPendingWithdrawals: (PublicDeriver<>) => boolean = (publicDeriver) => {
-    return this._submittedTransactions.some(tx => {
-      return tx.publicDeriverId === publicDeriver.publicDeriverId
-      // <TODO:PENDING_REMOVAL> legacy type check, fix so the type is always this
-      && tx.transaction instanceof CardanoShelleyTransaction && tx.transaction.withdrawals.length > 0;
-    });
+  hasProcessedWithdrawals: (PublicDeriver<>) => boolean = (publicDeriver) => {
+    return this._processedWithdrawals.includes(publicDeriver.publicDeriverId);
+  }
+
+  clearProcessedWithdrawals: (PublicDeriver<>) => boolean = (publicDeriver) => {
+    for (let i = 0; i < this._processedWithdrawals.length; ) {
+      if (this._processedWithdrawals[i] === publicDeriver.publicDeriverId) {
+        this._processedWithdrawals.splice(i, 1);
+      } else {
+        i++;
+      }
+    }
   }
 
   @action
