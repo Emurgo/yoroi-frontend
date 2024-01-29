@@ -122,8 +122,6 @@ export const generateGraphData: ({|
   getLocalPoolInfo: ($ReadOnly<NetworkRow>, string) => void | PoolMeta,
   tokenInfo: TokenInfoMap,
 |}) => GraphData = request => {
-  // const timeStore = this.props.stores.substores.ada.time;
-  // const currTimeRequests = timeStore.getCurrentTimeRequests(request.publicDeriver);
   return {
     rewardsGraphData: {
       error: request.delegationRequests.rewardHistory.error,
