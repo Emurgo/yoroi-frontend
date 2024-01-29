@@ -192,7 +192,7 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
     publicDeriver: PublicDeriver<>,
     expectedSerial: string | void,
   |} => Promise<{| txId: string |}> = async (request) => {
-    let ledgerConnect: LedgerConnect;
+    let ledgerConnect: ?LedgerConnect;
     try {
       Logger.debug(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcast)} called: ` + stringifyData(request));
 
@@ -319,7 +319,9 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
       Logger.error(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcast)} error: ` + stringifyError(error));
       throw new convertToLocalizableError(error);
     } finally {
-      ledgerConnect && ledgerConnect.dispose();
+      if (ledgerConnect != null) {
+        ledgerConnect.dispose();
+      }
     }
   };
 

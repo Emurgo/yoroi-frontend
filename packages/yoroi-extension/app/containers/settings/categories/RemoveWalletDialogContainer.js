@@ -71,10 +71,11 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
       await this.props.actions.profile.updateSortedWalletList.trigger(newWalletsNavigation);
     }
 
-    this.props.publicDeriver &&
+    if (this.props.publicDeriver != null) {
       settingsActions.removeWallet.trigger({
         publicDeriver: this.props.publicDeriver,
       });
+    }
   };
 
   render(): Node {

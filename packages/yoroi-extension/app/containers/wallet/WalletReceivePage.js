@@ -102,8 +102,6 @@ class WalletReceivePage extends Component<AllProps> {
     const publicDeriver = this.props.stores.wallets.selected;
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(WalletReceivePage)}.`);
 
-    this.props.stores.tokenInfoStore.tokenInfo.get;
-
     const addressTypeStore = this.getTypeStore(publicDeriver);
 
     if (addressTypeStore == null || !addressTypeStore.request.wasExecuted) {
