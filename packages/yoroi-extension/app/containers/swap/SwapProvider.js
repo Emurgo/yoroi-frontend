@@ -1,5 +1,7 @@
 // @flow
-import { useMemo, type Node, useState, useEffect } from 'react';
+import type { Node } from 'react';
+import type { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
+import { useMemo, useState, useEffect } from 'react';
 import {
   supportedProviders,
   swapApiMaker,
@@ -9,7 +11,6 @@ import {
 } from '@yoroi/swap';
 import { asGetStakingKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { unwrapStakingKey } from '../../api/ada/lib/storage/bridge/utils';
-import type { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 
 type Props = {|
   children?: Node,
@@ -58,7 +59,7 @@ function SwapProvider({ children, publicDeriver }: Props): Node {
   const swapApi = useMemo(
     () =>
       swapApiMaker({
-        isMainnet: false,
+        isMainnet: true,
         stakingKey,
         primaryTokenId: defaultToken.defaultIdentifier,
         supportedProviders,

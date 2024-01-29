@@ -3,11 +3,15 @@ import type { Node, ComponentType } from 'react';
 import type { StoresAndActionsProps } from '../../types/injectedPropsType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { LayoutComponentMap } from '../../styles/context/layout';
+import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
+import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import { buildRoute } from '../../utils/routing';
 import { withLayout } from '../../styles/context/layout';
+import { MultiToken } from '../../api/common/lib/MultiToken';
+import { SwapPageProvider } from './context/swap-page';
 import globalMessages from '../../i18n/global-messages';
 import SwapMenu from '../../components/swap/SwapMenu';
 import BannerContainer from '../banners/BannerContainer';
@@ -74,7 +78,7 @@ class SwapPageContainer extends Component<AllProps> {
         showInContainer
         showAsCard
       >
-        {children}
+        <SwapPageProvider initialSwapPageState={{ stores }}>{children}</SwapPageProvider>
       </TopBarLayout>
     );
   }

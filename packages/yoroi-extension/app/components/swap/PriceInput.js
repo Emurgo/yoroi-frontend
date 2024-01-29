@@ -1,22 +1,28 @@
 // @flow
 import type { Node } from 'react';
 import { Box, Typography } from '@mui/material';
-import type { AssetAmount } from './types'
-import { BigNumber } from 'bignumber.js';
+import type { AssetAmount } from './types';
+// import { BigNumber } from 'bignumber.js';
+// import { useSwap } from '@yoroi/swap';
+// import { useSwapForm } from '../../containers/swap/context/swap-form';
 
 type Props = {|
   label: string,
-  baseCurrency: AssetAmount,
-  quoteCurrency: AssetAmount,
+  baseCurrency?: AssetAmount,
+  quoteCurrency?: AssetAmount,
   readonly?: boolean,
 |};
 
 export default function PriceInput({
   label,
-  baseCurrency,
-  quoteCurrency,
+  baseCurrency = {},
+  quoteCurrency = {},
   readonly = false,
 }: Props): Node {
+  // const { orderData } = useSwap();
+  // const { sellQuantity, buyQuantity } = useSwapForm();
+  // console.log('🚀 > sellQuantity, buyQuantity:', sellQuantity, buyQuantity)
+  // const selectedPoolCalculation = orderData.selectedPoolCalculation || {};
   return (
     <Box
       component="fieldset"
@@ -61,7 +67,7 @@ export default function PriceInput({
         placeholder="0"
         bgcolor={readonly ? 'grayscale.50' : 'common.white'}
         readOnly={readonly}
-        value={(new BigNumber(baseCurrency.amount)).div(quoteCurrency.amount).toString()}
+        // value={Number(1 / Number(selectedPoolCalculation.prices.base))}
       />
       <Box sx={{ justifySelf: 'end' }}>
         <Box height="100%" width="min-content" display="flex" alignItems="center">

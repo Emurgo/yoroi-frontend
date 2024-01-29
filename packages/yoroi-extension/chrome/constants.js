@@ -30,6 +30,7 @@ export function genCSP(request: {|
   // Analytics
   connectSrc.push('https://analytics.emurgo-rnd.com/');
   connectSrc.push('https://api2.amplitude.com');
+  connectSrc.push('https://api.muesliswap.com');
 
   // Resolver
   connectSrc.push('https://api.handle.me/');
