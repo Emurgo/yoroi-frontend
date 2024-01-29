@@ -392,7 +392,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
         >
           <img
             style={{ objectFit: 'cover', maxWidth: '100%', maxHeight: '100%' }}
-            src={nftImage}
+            src={urlResolveForIpfsAndCorsproxy(nftImage)}
             alt={nftInfo.name}
             title={nftInfo.name}
             loading="lazy"
