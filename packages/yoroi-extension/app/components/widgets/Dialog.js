@@ -106,6 +106,7 @@ function DialogFn(props: Props & InjectedProps): Node {
         justifyContent: 'center',
         alignItems: 'center',
       }}
+      id="dialogWindow"
     >
       <ModalContainer
         display="flex"
@@ -116,7 +117,7 @@ function DialogFn(props: Props & InjectedProps): Node {
         contentHasScroll={contentHasScroll}
       >
         {title != null && title !== '' ? (
-          <Typography as="h1" variant="body1" className="dialog__title">
+          <Typography as="h1" variant="body1" className="dialog__title" id="dialogTitle">
             {title}
           </Typography>
         ) : null}
@@ -178,7 +179,13 @@ DialogFn.defaultProps = {
   closeOnOverlayClick: false,
 };
 
-const CloseButton = ({ onClose, closeButton }) => (
+export const CloseButton = ({
+  onClose,
+  closeButton,
+}: {|
+  onClose: ?(void) => PossiblyAsync<void>,
+  closeButton: React$Node,
+|}): React$Node => (
   <Box
     sx={{
       position: 'absolute',

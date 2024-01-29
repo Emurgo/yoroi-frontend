@@ -113,9 +113,9 @@ export default class StandardHeader extends Component<Props> {
           </div>
           {generateAddressForm}
           {error ? (
-            <p className={styles.error}>{intl.formatMessage(error)}</p>
+            <div className={styles.error}>{intl.formatMessage(error)}</div>
           ) : (
-            <p className={styles.error}>&nbsp;</p>
+            <div className={styles.error}>&nbsp;</div>
           )}
         </div>
         <div className={styles.qrCode}>

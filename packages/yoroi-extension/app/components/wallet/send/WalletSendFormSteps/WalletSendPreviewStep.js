@@ -42,6 +42,10 @@ type Props = {|
   +selectedExplorer: SelectedExplorer,
   +amount: MultiToken,
   +receivers: Array<string>,
+  +receiverHandle: ?{|
+    nameServer: string,
+    handle: string,
+  |},
   +totalAmount: MultiToken,
   +transactionFee: MultiToken,
   +transactionSize: ?string,
@@ -72,6 +76,10 @@ type State = {|
 |};
 
 const messages = defineMessages({
+  receiverHandleLabel: {
+    id: 'wallet.send.form.preview.receiverHandleLabel',
+    defaultMessage: '!!!Receiver',
+  },
   receiverLabel: {
     id: 'wallet.send.form.preview.receiverLabel',
     defaultMessage: '!!!Receiver wallet address',
@@ -291,7 +299,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
             <Tooltip
               placement="top"
               title={
-                <Typography textAlign="center">
+                <Typography component="div" textAlign="center">
                   <FormattedMessage
                     {...messages.minAdaHelp}
                     values={{ moreDetails: moreDetailsLink }}
@@ -403,6 +411,8 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
       </div>
     );
 
+    const { receiverHandle } = this.props;
+
     return (
       <div className={styles.component}>
         <Box
@@ -414,14 +424,34 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
           <Box width="506px" mx="auto">
             {this.renderError()}
             <div className={styles.staleTxWarning}>{this.props.staleTx && staleTxWarning}</div>
+            {receiverHandle ? (
+              <div style={{ marginBottom: '20px' }}>
+                <Box mb="8px">
+                  <Typography component="div" variant="body1" color="grayscale.600">
+                    {intl.formatMessage(messages.receiverHandleLabel)}
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography component="div"
+                    variant="body1"
+                    sx={{
+                      color: 'grayscale.900',
+                      overflowWrap: 'break-word',
+                    }}
+                  >
+                    {receiverHandle.nameServer}: {receiverHandle.handle}
+                  </Typography>
+                </Box>
+              </div>
+            ) : null}
             <div>
               <Box mb="8px">
-                <Typography variant="body1" color="grayscale.600">
+                <Typography component="div" variant="body1" color="grayscale.600">
                   {intl.formatMessage(messages.receiverLabel)}
                 </Typography>
               </Box>
               <Box>
-                <Typography
+                <Typography component="div"
                   variant="body1"
                   sx={{
                     color: 'grayscale.900',

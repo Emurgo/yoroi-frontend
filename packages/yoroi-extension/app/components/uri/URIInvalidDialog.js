@@ -86,9 +86,9 @@ export default class URIInvalidDialog extends Component<Props> {
             {
               address !== null ? (
                 <>
-                  <p>{intl.formatMessage(messages.uriInvalidDialogInvalidAddressText1)}</p>
+                  <div>{intl.formatMessage(messages.uriInvalidDialogInvalidAddressText1)}</div>
                   <br />
-                  <p>{intl.formatMessage(messages.uriInvalidDialogInvalidAddressText2)}</p>
+                  <div>{intl.formatMessage(messages.uriInvalidDialogInvalidAddressText2)}</div>
                   <br />
                   <RawHash light>
                     <span className={styles.address}>
@@ -99,9 +99,9 @@ export default class URIInvalidDialog extends Component<Props> {
               ):
               (
                 <>
-                  <p>{intl.formatMessage(messages.uriInvalidDialogWarningText1)}</p>
+                  <div>{intl.formatMessage(messages.uriInvalidDialogWarningText1)}</div>
                   <br />
-                  <p>{intl.formatMessage(messages.uriInvalidDialogWarningText2)}</p>
+                  <div>{intl.formatMessage(messages.uriInvalidDialogWarningText2)}</div>
                 </>
               )
             }

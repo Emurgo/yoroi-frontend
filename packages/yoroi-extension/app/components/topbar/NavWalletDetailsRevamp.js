@@ -117,10 +117,10 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
             <div className={classnames([styles.plate])}>{iconComponent}</div>
             <div className={styles.content}>
               <div className={styles.walletInfo}>
-                <Typography variant="body2" fontWeight={500} sx={{ color: 'grayscale.900' }}>
+                <Typography component="div" variant="body2" fontWeight={500} sx={{ color: 'grayscale.900' }}>
                   {truncateLongName(this.props.wallet.conceptualWalletName)}
                 </Typography>
-                <Typography variant="caption1" sx={{ color: 'grayscale.600' }}>
+                <Typography component="div" variant="caption1" sx={{ color: 'grayscale.600' }}>
                   {accountPlateId}
                 </Typography>
               </div>

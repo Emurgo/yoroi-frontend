@@ -52,10 +52,8 @@ export type WalletNames =
   'dump-wallet' |
   'ledger-wallet' |
   'trezor-wallet' |
-  'ergo-simple-wallet' |
   'shelley-enterprise' |
   'shelley-mangled' |
-  'ergo-token-wallet' |
   'cardano-token-wallet' |
   'First-Smoke-Test-Wallet' |
   'Second-Smoke-Test-Wallet' |
@@ -182,20 +180,6 @@ export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object
     name: ('shelley-mangled': WalletNames),
     mnemonic: 'weekend december choose maid rack helmet canoe bridge strike section lift autumn route practice seat',
     plate: 'JCEH-5025',
-    plateByron: '',
-    deviceId: '',
-  }),
-  createWallet({
-    name: ('ergo-simple-wallet': WalletNames),
-    mnemonic: 'eight country switch draw meat scout mystery blade tip drift useless good keep usage title',
-    plate: 'CXTP-1821',
-    plateByron: '',
-    deviceId: '',
-  }),
-  createWallet({
-    name: ('ergo-token-wallet': WalletNames),
-    mnemonic: 'rent sword help dynamic enhance collect biology drama agent raven grape bike march length leisure',
-    plate: 'AZTH-1588',
     plateByron: '',
     deviceId: '',
   }),

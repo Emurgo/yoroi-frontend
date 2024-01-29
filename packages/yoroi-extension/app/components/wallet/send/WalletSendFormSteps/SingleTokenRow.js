@@ -80,16 +80,16 @@ export default class SingleTokenRow extends Component<Props> {
               <div className={styles.logo}>
                 <NoAssetLogo />
               </div>
-              <Typography variant="body1" color="primary.600" className={styles.label}>
+              <Typography component="div" variant="body1" color="primary.600" className={styles.label}>
                 {token.label.startsWith('asset')
                   ? truncateAddressShort(token.label, 14)
                   : token.label}
               </Typography>
             </div>
-            <Typography variant="body1" color="grayscale.900">
+            <Typography component="div" variant="body1" color="grayscale.900">
               {truncateAddressShort(token.id, 14)}
             </Typography>
-            <p className={styles.amount}>{displayAmount}</p>
+            <div className={styles.amount}>{displayAmount}</div>
           </button>
         ) : (
           <Box
@@ -101,12 +101,12 @@ export default class SingleTokenRow extends Component<Props> {
               <div className={styles.logo}>
                 <NoAssetLogo />
               </div>
-              <Typography variant="body1" color="primary.600" className={styles.label}>
+              <Typography component="div" variant="body1" color="primary.600" className={styles.label}>
                 {token.label}
               </Typography>
             </div>
             <div>
-              <Typography variant="body1" color="grayscale.900">
+              <Typography component="div" variant="body1" color="grayscale.900">
                 {truncateAddressShort(token.id, 14)}
               </Typography>
             </div>
@@ -127,9 +127,9 @@ export default class SingleTokenRow extends Component<Props> {
               {' '}
               <CloseIcon />{' '}
             </button>
-            <p className={styles.error}>
+            <div className={styles.error}>
               {!isValid && intl.formatMessage(messages.notEnoughMoneyToSendError)}
-            </p>
+            </div>
           </Box>
         )}
       </div>

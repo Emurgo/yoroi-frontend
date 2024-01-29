@@ -15,6 +15,7 @@ import {
 import type { Network, } from '../../../config/config-types';
 import { createHardwareWallet, createStandardBip44Wallet, } from './lib/storage/bridge/walletBuilder/byron';
 import { createHardwareCip1852Wallet, createStandardCip1852Wallet, } from './lib/storage/bridge/walletBuilder/shelley';
+import type { ReferenceTx } from './lib/storage/bridge/updateTransactions';
 import {
   getAllTransactions,
   getForeignAddresses,
@@ -41,11 +42,7 @@ import { CoreAddressTypes, TxStatusCodes, } from './lib/storage/database/primiti
 import type { NetworkRow, TokenRow, } from './lib/storage/database/primitives/tables';
 import { TransactionType } from './lib/storage/database/primitives/tables';
 import { PublicDeriver, } from './lib/storage/models/PublicDeriver/index';
-import {
-  asDisplayCutoff,
-  asHasLevels,
-  asGetAllUtxos,
-} from './lib/storage/models/PublicDeriver/traits';
+import { asDisplayCutoff, asGetAllUtxos, asHasLevels, } from './lib/storage/models/PublicDeriver/traits';
 import { ConceptualWallet } from './lib/storage/models/ConceptualWallet/index';
 import type { IHasLevels } from './lib/storage/models/ConceptualWallet/interfaces';
 import type {
@@ -111,13 +108,11 @@ import type {
   CardanoUtxoScriptWitness,
   V4UnsignedTxAddressedUtxoResponse,
 } from './transactions/types';
-import {
-  HaskellShelleyTxSignRequest,
-} from './transactions/shelley/HaskellShelleyTxSignRequest';
 import type {
   LedgerNanoCatalystRegistrationTxSignData,
   TrezorTCatalystRegistrationTxSignData,
 } from './transactions/shelley/HaskellShelleyTxSignRequest';
+import { HaskellShelleyTxSignRequest, } from './transactions/shelley/HaskellShelleyTxSignRequest';
 import type { SignTransactionRequest } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 
@@ -125,14 +120,16 @@ import type {
   AccountStateFunc,
   AddressUtxoFunc,
   BestBlockFunc,
+  GetRecentTransactionHashesFunc,
+  GetTransactionsByHashesFunc,
+  HistoryFunc,
   MultiAssetMintMetadataFunc,
+  MultiAssetSupplyFunc,
+  RemoteUnspentOutput,
   SendFunc,
   SignedRequest,
   SignedResponse,
   TokenInfoFunc,
-  RemoteUnspentOutput,
-  GetRecentTransactionHashesFunc,
-  GetTransactionsByHashesFunc, MultiAssetSupplyFunc,
 } from './lib/state-fetch/types';
 import type { FilterFunc, } from '../common/lib/state-fetch/currencySpecificTypes';
 import { getChainAddressesForDisplay, } from './lib/storage/models/utils';
@@ -241,9 +238,10 @@ export type AdaGetTransactionsRequest = {|
   getTokenInfo: TokenInfoFunc,
   getMultiAssetMetadata: MultiAssetMintMetadataFunc,
   getMultiAssetSupply: MultiAssetSupplyFunc,
-  afterTxs?: ?Array<WalletTransaction>,
+  afterTx?: ?WalletTransaction,
   getRecentTransactionHashes: GetRecentTransactionHashesFunc,
   getTransactionsByHashes: GetTransactionsByHashesFunc,
+  getTransactionHistory: HistoryFunc,
 |};
 
 // notices
@@ -670,10 +668,9 @@ export default class AdaApi {
 
   /*
     3 scenarios when this function is invoked:
-    1. To load locally the initial txs: isLocalRequest === true, afterTxs == null;
-    2. To fetch the newest transactions from network: isLocalRequest === false, afterTxs == null,
-    3. To fetch transactions after some transactions from network:
-         isLocalRequest = false, afterTxs != null
+    1. To load locally the initial txs: isLocalRequest === true, afterTx == null, beforeTx == null;
+    2. To fetch the newest transactions from network: isLocalRequest === false, afterTx != null,
+    3. To fetch older transactions: isLocalRequest = false, beforeTx != null
    */
   async refreshTransactions(
     request: {|
@@ -692,7 +689,7 @@ export default class AdaApi {
           limit: FETCH_TXS_BATCH_SIZE,
         });
       } else {
-        if (!request.afterTxs) {
+        if (!request.beforeTx) {
           await updateUtxos(
             request.publicDeriver.getDb(),
             request.publicDeriver,
@@ -703,28 +700,26 @@ export default class AdaApi {
           );
         }
 
-        let after;
-        if (request.afterTxs && request.afterTxs.length > 0) {
-          const lastTx = request.afterTxs[request.afterTxs.length - 1];
-          if (lastTx.block) {
-            after = {
-              blockHash: lastTx.block.Hash,
-              txHash: lastTx.txid,
-            };
-          }
-        }
+        const resolveReference: ?WalletTransaction => ?ReferenceTx = ref => {
+          return ref?.block ? {
+            blockHash: ref.block.Hash,
+            txHash: ref.txid,
+          } : undefined;
+        };
 
         fetchedTxs = await updateTransactions(
           request.publicDeriver.getDb(),
           request.publicDeriver,
           request.checkAddressesInUse,
+          request.getTransactionHistory,
           request.getRecentTransactionHashes,
           request.getTransactionsByHashes,
           request.getBestBlock,
           request.getTokenInfo,
           request.getMultiAssetMetadata,
           request.getMultiAssetSupply,
-          after,
+          resolveReference(request.afterTx),
+          resolveReference(request.beforeTx),
         );
       }
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.refreshTransactions)} success: ` + stringifyData(fetchedTxs));

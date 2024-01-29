@@ -112,7 +112,7 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
           )}
 
           {isStartupScreen && (
-            <Typography variant="h5" fontWeight={500} mt="16px">
+            <Typography component="div" variant="h5" fontWeight={500} mt="16px">
               {intl.formatMessage(messages.title)}
             </Typography>
           )}
@@ -129,7 +129,7 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
                 }}
               >
                 <Icon />
-                <Typography>
+                <Typography component="div">
                   <FormattedHTMLMessage {...msg} />
                 </Typography>
               </Box>

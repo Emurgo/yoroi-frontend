@@ -29,7 +29,7 @@ export default class WalletRecoveryPhraseMnemonic extends Component<Props> {
     return (
       <div>
         <div className={componentClasses}>{phrase}</div>
-        <p className={styles.errorText}>{phraseDoesNotMatch}</p>
+        <div className={styles.errorText}>{phraseDoesNotMatch}</div>
       </div>
     );
   }

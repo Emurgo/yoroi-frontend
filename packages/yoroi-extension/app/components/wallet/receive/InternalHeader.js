@@ -46,12 +46,12 @@ export default class InternalHeader extends Component<Props> {
       <WarningHeader
         message={(
           <div className={styles.component}>
-            <p>{intl.formatMessage(messages.warning1)}</p><br />
-            <p><FormattedMessage {...globalMessages.blogLearnMore} values={{ blogLink }} /></p>
-            <p>
+            <div>{intl.formatMessage(messages.warning1)}</div><br />
+            <div><FormattedMessage {...globalMessages.blogLearnMore} values={{ blogLink }} /></div>
+            <div>
               {intl.formatMessage(addressSubgroupName.internal)}&nbsp;
               <FormattedHTMLMessage {...globalMessages.auditAddressWarning} />
-            </p>
+            </div>
           </div>
         )}
       />

@@ -44,7 +44,7 @@ function SaveRecoveryPhraseStep(props: Props & Intl): Node {
     <Stack alignItems="center" justifyContent="center">
       <Stack direction="column" alignItems="left" justifyContent="center" maxWidth="700px">
         <Stack mb="8px" flexDirection="row" alignItems="center" gap="6px">
-          <Typography>
+          <Typography component="div">
             <FormattedHTMLMessage {...messages.description} />
           </Typography>
           <Box

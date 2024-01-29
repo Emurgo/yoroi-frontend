@@ -18,9 +18,7 @@ import ExplorerActions from './common/explorer-actions';
 import DelegationActions from './common/delegation-actions';
 import WalletSettingsActions from './common/wallet-settings-actions';
 import adaActionsMap from './ada/index';
-import ergoActionsMap from './ergo/index';
 import type { AdaActionsMap } from './ada/index';
-import type { ErgoActionsMap } from './ergo/index';
 import  ConnectorActionsMap from '../connector/actions/connector-actions';
 import ServerConnectionActions from './server-connection-actions';
 
@@ -44,7 +42,6 @@ export type ActionsMap = {|
   delegation: DelegationActions,
   explorers: ExplorerActions,
   ada: AdaActionsMap,
-  ergo: ErgoActionsMap,
   connector: ConnectorActionsMap,
   serverConnection: ServerConnectionActions,
 |};
@@ -70,7 +67,6 @@ const actionsMap: ActionsMap = Object.freeze({
   explorers: new ExplorerActions(),
   connector: new ConnectorActionsMap(),
   ada: adaActionsMap,
-  ergo: ergoActionsMap,
   serverConnection: new ServerConnectionActions(),
 });
 

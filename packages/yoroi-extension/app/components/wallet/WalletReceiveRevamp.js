@@ -122,7 +122,7 @@ export default class WalletReceiveRevamp extends Component<Props> {
       </Typography>
     );
     const body = address => (
-      <Typography variant="body1" color="grayscale.900" textAlign="right">
+      <Typography component="div" variant="body1" color="grayscale.900" textAlign="right">
         {address.values != null ? (
           <span>{this.getAmount(address.values.getDefaultEntry())}</span>
         ) : (
@@ -199,7 +199,7 @@ export default class WalletReceiveRevamp extends Component<Props> {
                   }
                 >
                   <RawHash light={address.isUsed === true}>
-                    <Typography variant="body1" color="grayscale.900">
+                    <Typography component="div" variant="body1" color="grayscale.900">
                       {truncateAddressShort(address.address, 16)}
                     </Typography>
                   </RawHash>
@@ -259,7 +259,7 @@ export default class WalletReceiveRevamp extends Component<Props> {
           <div className={styles.notFound}>
             <NoTransactionModernSvg />
             <h1>{intl.formatMessage(messages.noResultsFoundLabel)}</h1>
-            <p>{intl.formatMessage(messages.notFoundAnyAddresses)}</p>
+            <div>{intl.formatMessage(messages.notFoundAnyAddresses)}</div>
           </div>
         </div>
       );

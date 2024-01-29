@@ -348,7 +348,7 @@ class WalletSummaryPage extends Component<AllProps> {
           unitOfAccountSetting={profile.unitOfAccount}
           getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
           getHistoricalPrice={this.generated.stores.coinPriceStore.getHistoricalPrice}
-          shouldShowEmptyBanner={!isLoading && !isLoadingMore && !hasAny}
+          shouldShowEmptyBanner={!isLoading && !hasAny}
           emptyBannerComponent={
             <WalletEmptyBanner
               onBuySellClick={() =>

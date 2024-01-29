@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { reaction } from 'mobx';
+import { action, reaction } from 'mobx';
 import { Button, Typography, TextField as MemoTextField, Box, styled } from '@mui/material';
 import TextField from '../../common/TextField';
 import { defineMessages, intlShape } from 'react-intl';
@@ -22,6 +22,7 @@ import type { TokenRow, NetworkRow } from '../../../api/ada/lib/storage/database
 import {
   formattedAmountToBigNumber,
   formattedAmountToNaturalUnits,
+  truncateAddressShort,
   truncateToken,
 } from '../../../utils/formatters';
 import config from '../../../config';
@@ -40,7 +41,6 @@ import BigNumber from 'bignumber.js';
 import classnames from 'classnames';
 import SendFormHeader from './SendFormHeader';
 import { SEND_FORM_STEP } from '../../../types/WalletSendTypes';
-import { isErgo } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { ReactComponent as PlusIcon } from '../../../assets/images/plus.inline.svg';
 import AddNFTDialog from './WalletSendFormSteps/AddNFTDialog';
 import AddTokenDialog from './WalletSendFormSteps/AddTokenDialog';
@@ -57,6 +57,9 @@ import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver
 import type { SendUsingLedgerParams } from '../../../actions/ada/ledger-send-actions';
 import type { SendUsingTrezorParams } from '../../../actions/ada/trezor-send-actions';
 import { ampli } from '../../../../ampli/index';
+import type { DomainResolverFunc, DomainResolverResponse } from '../../../stores/ada/AdaAddressesStore';
+import { isResolvableDomain } from '@yoroi/resolver';
+import SupportedAddressDomainsBanner from '../../../containers/wallet/SupportedAddressDomainsBanner';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -67,13 +70,29 @@ const messages = defineMessages({
     id: 'wallet.send.form.receiver.hint',
     defaultMessage: '!!!Wallet Address',
   },
-  receiverFieldLabelInactive: {
+  receiverFieldLabelDefault: {
     id: 'wallet.send.form.receiver.label.inactive',
-    defaultMessage: '!!!Enter wallet address',
-  },
-  receiverFieldLabelActive: {
-    id: 'wallet.send.form.receiver.label.active',
     defaultMessage: '!!!Receiver address',
+  },
+  receiverFieldLabelResolverSupported: {
+    id: 'wallet.send.form.receiver.label.resolverSupported',
+    defaultMessage: '!!!Receiver address, ADA Handle, or domains',
+  },
+  receiverFieldLabelUnresolvedAddress: {
+    id: 'wallet.send.form.receiver.label.unresolvedAddress',
+    defaultMessage: '!!!Address not found',
+  },
+  receiverFieldLabelForbiddenAccess: {
+    id: 'wallet.send.form.receiver.label.forbiddenAccess',
+    defaultMessage: '!!!access forbidden, you might need a VPN',
+  },
+  receiverFieldLabelUnexpectedError: {
+    id: 'wallet.send.form.receiver.label.unexpectedError',
+    defaultMessage: '!!!unexpected error',
+  },
+  receiverFieldLabelResolvedAddress: {
+    id: 'wallet.send.form.receiver.label.resolvedAddress',
+    defaultMessage: '!!!Related address',
   },
   memoFieldLabelInactive: {
     id: 'wallet.send.form.memo.label.inactive',
@@ -134,6 +153,11 @@ const messages = defineMessages({
 });
 
 type Props = {|
+  +resolveDomainAddress: ?DomainResolverFunc,
+  +supportedAddressDomainBannerState: {|
+    isDisplayed: boolean,
+    onClose: () => void,
+  |},
   +selectedNetwork: $ReadOnly<NetworkRow>,
   +selectedWallet: PublicDeriver<>,
   +selectedExplorer: Map<number, SelectedExplorer>,
@@ -226,7 +250,13 @@ type State = {|
   currentStep: number,
   invalidMemo: boolean,
   isMemoFieldActive: boolean,
-  isReceiverFieldActive: boolean,
+  domainResolverResult: ?{|
+    nameServer: string,
+    handle: string,
+    address: string,
+  |},
+  domainResolverMessage: ?string,
+  domainResolverIsLoading: boolean,
 |};
 
 @observer
@@ -238,8 +268,10 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
   state: State = {
     invalidMemo: false,
     currentStep: SEND_FORM_STEP.RECEIVER,
-    isReceiverFieldActive: false,
     isMemoFieldActive: false,
+    domainResolverResult: null,
+    domainResolverMessage: null,
+    domainResolverIsLoading: false,
   };
   maxStep: number = SEND_FORM_STEP.RECEIVER;
 
@@ -309,21 +341,74 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     }
   }
 
+  @action async resolveDomainAddress(handle: string): Promise<{|
+    isDomainResolvable: boolean,
+    domainResolverMessage: ?string,
+    resolvedAddress: ?string,
+  |}> {
+    let isDomainResolvable = false;
+    let domainResolverMessage = null;
+    let resolvedAddress = null;
+    const { resolveDomainAddress } = this.props;
+    if (resolveDomainAddress != null) {
+      isDomainResolvable = isResolvableDomain(handle);
+      let domainResolverResult = null;
+      if (isDomainResolvable) {
+        this.setState({ domainResolverIsLoading: true });
+        const res: ?DomainResolverResponse = await resolveDomainAddress(handle);
+        if (res == null) {
+          domainResolverMessage = this.context.intl
+            .formatMessage(messages.receiverFieldLabelUnresolvedAddress);
+        } else if (res.address != null) {
+          resolvedAddress = res.address;
+          domainResolverResult = {
+            handle,
+            address: res.address,
+            nameServer: res.nameServer,
+          };
+        } else if (res.error === 'forbidden') {
+          domainResolverMessage = `${res.nameServer}: ${
+            this.context.intl.formatMessage(messages.receiverFieldLabelForbiddenAccess)
+          }`;
+        } else {
+          domainResolverMessage = `${res.nameServer}: ${
+            this.context.intl.formatMessage(messages.receiverFieldLabelUnexpectedError)
+          }`;
+        }
+      }
+      this.setState({
+        domainResolverResult,
+        domainResolverMessage,
+        domainResolverIsLoading: false
+      });
+    }
+    return {
+      isDomainResolvable,
+      domainResolverMessage,
+      resolvedAddress,
+    }
+  }
+
   // FORM VALIDATION
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
       fields: {
         receiver: {
-          label: this.context.intl.formatMessage(messages.receiverFieldLabelInactive),
+          label: this.context.intl.formatMessage(messages.receiverFieldLabelDefault),
           placeholder: this.props.isClassicTheme
             ? this.context.intl.formatMessage(messages.receiverHint)
             : '',
           value: this.props.uriParams ? this.props.uriParams.address : '',
           validators: [
-            ({ field }) => {
-              const receiverValue = field.value;
+            async ({ field }) => {
+              let receiverValue = field.value;
               if (receiverValue === '') {
                 this.props.updateReceiver();
+                this.setState({
+                  domainResolverResult: null,
+                  domainResolverMessage: null,
+                  domainResolverIsLoading: false
+                });
                 return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
               }
               const updateReceiver = (isValid: boolean) => {
@@ -336,13 +421,27 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 }
               };
 
+              // DOMAIN RESOLVER
+              const {
+                isDomainResolvable,
+                domainResolverMessage,
+                resolvedAddress,
+              } = await this.resolveDomainAddress(receiverValue);
+              if (resolvedAddress != null) {
+                receiverValue = resolvedAddress;
+              }
+              ////////////////////
+
               const isValid = isValidReceiveAddress(receiverValue, this.props.selectedNetwork);
               if (isValid === true) {
                 updateReceiver(true);
                 return [isValid];
               }
               updateReceiver(isValid[0]);
-              return [isValid[0], this.context.intl.formatMessage(isValid[1])];
+              const fieldError = isDomainResolvable
+                ? domainResolverMessage
+                : this.context.intl.formatMessage(isValid[1]);
+              return [isValid[0], fieldError];
             },
           ],
         },
@@ -389,7 +488,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
         showErrorsOnInit: this.props.uriParams,
         validateOnBlur: false,
         validateOnChange: true,
-        validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
+        validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT_LONGER,
       },
       plugins: {
         vjf: vjf(),
@@ -405,13 +504,10 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     return info.Metadata.numberOfDecimals;
   }
 
-  setReceiverFieldStatus: boolean => void = isReceiverFieldActive => {
-    this.setState({ isReceiverFieldActive });
-  };
-
   setMemoFieldStatus: boolean => void = isMemoFieldActive => {
     this.setState({ isMemoFieldActive });
   };
+
   getTokensAndNFTs: MultiToken => [
     FormattedTokenDisplay[],
     FormattedNFTDisplay[]
@@ -536,28 +632,43 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     const showFiat =
       this.props.unitOfAccountSetting.enabled && this.props.unitOfAccountSetting.currency;
 
+    const domainResolverResult = this.state.domainResolverResult;
+    const domainResolverSupported = this.props.resolveDomainAddress != null;
     switch (step) {
       case SEND_FORM_STEP.RECEIVER:
         return (
           <div className={styles.receiverStep}>
-            <Box pt="10px">
+            {(domainResolverSupported && this.props.supportedAddressDomainBannerState.isDisplayed) ? (
+              <Box>
+                <SupportedAddressDomainsBanner
+                  onClose={this.props.supportedAddressDomainBannerState.onClose}
+                />
+              </Box>
+            ) : null}
+            <Box pt="10px" sx={{ position: 'relative', mt: '8px' }}>
               <TextField
+                greenCheck={domainResolverResult != null}
+                isLoading={this.state.domainResolverIsLoading}
                 className="send_form_receiver"
                 {...receiverField.bind()}
                 error={receiverField.error}
-                helperText=" "
-                onFocus={() => {
-                  this.setReceiverFieldStatus(true);
-                }}
-                onBlur={() => {
-                  if (!receiverField.value) this.setReceiverFieldStatus(false);
-                }}
+                helperText={domainResolverResult?.nameServer ?? this.state.domainResolverMessage}
                 label={
-                  this.state.isReceiverFieldActive
-                    ? intl.formatMessage(messages.receiverFieldLabelActive)
-                    : intl.formatMessage(messages.receiverFieldLabelInactive)
+                  domainResolverSupported
+                    ? intl.formatMessage(messages.receiverFieldLabelResolverSupported)
+                    : intl.formatMessage(messages.receiverFieldLabelDefault)
                 }
               />
+              {domainResolverResult != null ? (
+                <Typography component="div"
+                  variant="caption1"
+                  color={invalidMemo ? 'magenta.500' : 'grayscale.600'}
+                  sx={{ position: 'absolute', bottom: '10px', right: '0' }}
+                >
+                  {intl.formatMessage(messages.receiverFieldLabelResolvedAddress)}:
+                  {truncateAddressShort(domainResolverResult.address)}
+                </Typography>
+              ) : null}
             </Box>
             <Box sx={{ position: 'relative', mt: '8px' }}>
               <MemoTextField
@@ -580,7 +691,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     : intl.formatMessage(messages.memoFieldLabelInactive)
                 }
               />
-              <Typography
+              <Typography component="div"
                 variant="caption1"
                 color={invalidMemo ? 'magenta.500' : 'grayscale.600'}
                 sx={{ position: 'absolute', bottom: '5px', right: '0' }}
@@ -594,7 +705,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
         return (
           <Box className={styles.amountStep}>
             {isCalculatingFee && (
-              <Typography
+              <Typography component="div"
                 variant="caption1"
                 sx={{
                   position: 'absolute',
@@ -609,7 +720,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             )}
 
             {!isDefaultIncluded && (
-              <Typography
+              <Typography component="div"
                 variant="caption1"
                 sx={{
                   position: 'absolute',
@@ -640,7 +751,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     }),
               }}
             >
-              <Typography
+              <Typography component="div"
                 sx={{
                   position: 'absolute',
                   top: '-8px',
@@ -697,26 +808,25 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   placeholder="0"
                 />
 
-                <Typography variant="button2" color="grey.600" fontWeight={500} mr="12px">
-                  {isErgo(this.props.selectedNetwork) ? 'ERG' : 'ADA'}
+                <Typography component="div" variant="button2" color="grey.600" fontWeight={500} mr="12px">
+                  ADA
                 </Typography>
 
-                {!isErgo(this.props.selectedNetwork) && (
-                  <Button
-                    variant="tertiary"
-                    color="secondary"
-                    size="small"
-                    sx={{
+                <Button
+                  variant="tertiary"
+                  color="secondary"
+                  size="small"
+                  sx={{
                       '&.MuiButton-sizeSmall': {
                         lineHeight: '17px',
                       },
                     }}
-                    disabled={maxSendableAmount.isExecuting}
-                    className={classnames([
+                  disabled={maxSendableAmount.isExecuting}
+                  className={classnames([
                       styles.maxBtn,
                       maxSendableAmount.isExecuting && styles.maxButtonSpinning,
                     ])}
-                    onClick={() => {
+                  onClick={() => {
                       const hasTokens =
                         spendableBalance && spendableBalance.nonDefaultEntries().length !== 0;
                       if (hasTokens || !spendableBalance) {
@@ -734,10 +844,9 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                         this.props.updateSendAllStatus(true);
                       }
                     }}
-                  >
-                    {intl.formatMessage(messages.max)}
-                  </Button>
-                )}
+                >
+                  {intl.formatMessage(messages.max)}
+                </Button>
               </Box>
               {showFiat && (
                 <Box
@@ -754,7 +863,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 </Box>
               )}
               {isDefaultIncluded && (
-                <Typography
+                <Typography component="div"
                   sx={{
                     position: 'absolute',
                     bottom: '-25px',
@@ -833,6 +942,10 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             trezorSend={this.props.trezorSend}
             selectedExplorer={this.props.selectedExplorer}
             selectedWallet={this.props.selectedWallet}
+            receiverHandle={domainResolverResult ? {
+              nameServer: domainResolverResult.nameServer,
+              handle: domainResolverResult.handle,
+            } : null}
           />
         );
       default:

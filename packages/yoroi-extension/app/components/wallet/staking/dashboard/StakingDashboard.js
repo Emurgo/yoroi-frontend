@@ -190,7 +190,7 @@ export default class StakingDashboard extends Component<Props> {
     ) {
       return (
         <div className={width}>
-          <Typography fontWeight="500" fontSize="18px" lineHeight="22px" marginBottom="16px">
+          <Typography component="div" fontWeight="500" fontSize="18px" lineHeight="22px" marginBottom="16px">
             {intl.formatMessage(messages.title)}
           </Typography>
           <Skeleton

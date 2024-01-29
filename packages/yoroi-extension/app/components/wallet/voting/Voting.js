@@ -135,11 +135,11 @@ class Voting extends Component<Props & InjectedProps, State> {
         {pendingTxWarningComponent}
 
         <Box sx={{ maxWidth: '612px', mx: 'auto' }} className={styles.voting}>
-          <Typography variant="h3" fontWeight={500}>
+          <Typography component="div" variant="h3" fontWeight={500}>
             {intl.formatMessage(messages.lineTitle, { fundName })}
           </Typography>
 
-          <Typography variant="body1" color="grayscale.800" mt="16px" mb="24px">
+          <Typography component="div" variant="body1" color="grayscale.800" mt="16px" mb="24px">
             {intl.formatMessage(messages.line2)}
           </Typography>
 
@@ -157,7 +157,7 @@ class Voting extends Component<Props & InjectedProps, State> {
                   <ExclamationIcon />
                 </div>
                 <Box sx={{ flexGrow: '1' }}>
-                  <Typography variant="body1" fontWeight={500} color="grayscale.900">
+                  <Typography component="div" variant="body1" fontWeight={500} color="grayscale.900">
                     Disclamer
                   </Typography>
                 </Box>
@@ -168,7 +168,7 @@ class Voting extends Component<Props & InjectedProps, State> {
                   <CrossIcon />
                 </Box>
               </Box>
-              <Typography variant="body1" color="grayscale.900">
+              <Typography component="div" variant="body1" color="grayscale.900">
                 {intl.formatMessage(
                   this.props.isDelegated ? messages.keepDelegated : messages.notDelegated
                 )}

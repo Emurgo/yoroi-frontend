@@ -201,15 +201,15 @@ export default class UserSummary extends Component<Props> {
     );
 
     const entryNode = (
-      <p className={styles.value}>
+      <div className={styles.value}>
         {this.formatTokenEntry(token.getDefaultEntry())}
-      </p>
+      </div>
     );
     const unitOfAccountNode = unitOfAccount
       ? (
-        <p className={styles.value}>
+        <div className={styles.value}>
           {unitOfAccount.amount} {unitOfAccount.currency}
-        </p>
+        </div>
       ): <></>
 
     return (

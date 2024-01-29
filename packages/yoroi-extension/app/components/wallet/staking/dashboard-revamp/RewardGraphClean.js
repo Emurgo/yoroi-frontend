@@ -65,10 +65,10 @@ export default class RewardGraphClean extends Component<Props> {
               .filter(value => value !== null && value.length > 0)
               .map(([key, value], idx) => (
                 <Stack direction="row" mb="2px">
-                  <Typography width={idx === 2 ? '100px' : 'content'} mr="3px" variant="caption1">
+                  <Typography component="div" width={idx === 2 ? '100px' : 'content'} mr="3px" variant="caption1">
                     {key}:
                   </Typography>
-                  <Typography
+                  <Typography component="div"
                     sx={{
                       wordWrap: 'break-word',
                       maxWidth: '300px',
