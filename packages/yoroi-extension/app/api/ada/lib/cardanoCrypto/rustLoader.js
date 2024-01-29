@@ -9,6 +9,7 @@ import type {
 } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 import typeof * as WasmV4 from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 import typeof * as WasmMessageSigning from '@emurgo/cardano-message-signing-browser/cardano_message_signing';
+import typeof * as CrossCsl from '@emurgo/cross-csl-browser';
 
 // TODO: unmagic the constants
 const MAX_VALUE_BYTES = 5000;
@@ -150,7 +151,7 @@ class Module {
   _wasmv3: WasmV3;
   _wasmv4: WasmV4;
   _messageSigning: WasmMessageSigning;
-  _crossCsl: any;
+  _crossCsl: CrossCsl;
 
   async load(flags: Array<RustModuleLoadFlags> = []): Promise<void> {
     if (
@@ -246,7 +247,7 @@ class Module {
   get WalletV4(): WasmV4 {
     return this._wasmv4;
   }
-  get CrossCsl(): any {
+  get CrossCsl(): CrossCsl {
     return this._crossCsl;
   }
   WalletV4TxBuilderFromConfig(config: {
