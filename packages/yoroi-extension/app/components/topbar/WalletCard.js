@@ -1,23 +1,20 @@
 // @flow
-import { Component } from 'react';
 import type { Node } from 'react';
+import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape, defineMessages } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor } from 'react-intl';
+import { defineMessages, intlShape } from 'react-intl';
 import styles from './WalletCard.scss';
 import WalletAccountIcon from './WalletAccountIcon';
+import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import classnames from 'classnames';
 import type { WalletChecksum } from '@emurgo/cip4-js';
-import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import { isLedgerNanoWallet, isTrezorTWallet, } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import globalMessages from '../../i18n/global-messages';
-import {
-  isLedgerNanoWallet,
-  isTrezorTWallet,
-} from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import { ReactComponent as DragIcon }  from '../../assets/images/add-wallet/wallet-list/drag.inline.svg';
+import { ReactComponent as DragIcon } from '../../assets/images/add-wallet/wallet-list/drag.inline.svg';
 import { Draggable } from 'react-beautiful-dnd';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import AmountDisplay from '../common/AmountDisplay';
@@ -192,14 +189,8 @@ export default class WalletCard extends Component<Props, State> {
     );
   }
 
-  getTotalAmount: void => null | MultiToken = () => {
-    if (this.props.rewards === undefined) {
-      return this.props.walletAmount;
-    }
-    if (this.props.rewards === null || this.props.walletAmount === null) {
-      return null;
-    }
-    return this.props.rewards.joinAddCopy(this.props.walletAmount);
+  getTotalAmount: void => ?MultiToken = () => {
+    return MultiToken.sumOrEitherNotNull(this.props.walletAmount, this.props.rewards);
   };
 
   countTokenTypes: void => {|tokenTypes: number, nfts: number|} = () => {

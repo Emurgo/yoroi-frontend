@@ -167,14 +167,8 @@ export default class NavWalletDetails extends Component<Props> {
     );
   }
 
-  getTotalAmount: void => (null | MultiToken) = () => {
-    if (this.props.rewards === undefined) {
-      return this.props.walletAmount;
-    }
-    if (this.props.rewards === null || this.props.walletAmount === null) {
-      return null;
-    }
-    return this.props.walletAmount.joinAddCopy(this.props.rewards);
+  getTotalAmount: void => ?MultiToken = () => {
+    return MultiToken.sumOrEitherNotNull(this.props.walletAmount, this.props.rewards);
   }
 
   renderAmountDisplay: {|
