@@ -13,8 +13,6 @@ import {
 } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { ROUTES } from '../../../routes-config';
 import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
-import { getApiForNetwork, ApiOptions } from '../../../api/common/utils';
-import { buildCheckAndCall } from '../../lib/check';
 import { genOwnStakingKey } from '../../../api/ada/index';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 import type { ActionsMap } from '../../../actions/index';
@@ -25,14 +23,7 @@ export default class AdaMnemonicSendStore extends Store<StoresMap, ActionsMap> {
   setup(): void {
     super.setup();
     const { wallets, } = this.actions;
-    const { asyncCheck } = buildCheckAndCall(
-      ApiOptions.ada,
-      () => {
-        if (this.stores.profile.selectedNetwork == null) return undefined;
-        return getApiForNetwork(this.stores.profile.selectedNetwork);
-      }
-    );
-    wallets.sendMoney.listen(asyncCheck(this._sendMoney));
+    wallets.sendMoney.listen(this._sendMoney);
   }
 
   /** Send money and then return to transaction screen */

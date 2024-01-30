@@ -4,8 +4,6 @@ import { action } from 'mobx';
 import Store from '../base/Store';
 
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
-import { buildCheckAndCall } from '../lib/check';
-import { ApiOptions, getApiForNetwork } from '../../api/common/utils';
 import { ApiMethodNotYetImplementedError } from '../lib/Request';
 import type {
   Address,
@@ -13,20 +11,17 @@ import type {
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import AdaApi from '../../api/ada';
 
 export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> {
   setup(): void {
     super.setup();
     this.reset();
     const actions = this.actions.walletRestore;
-    const { syncCheck, asyncCheck } = buildCheckAndCall(ApiOptions.ada, () => {
-      if (this.stores.profile.selectedNetwork == null) return undefined;
-      return getApiForNetwork(this.stores.profile.selectedNetwork);
-    });
-    actions.transferFromLegacy.listen(asyncCheck(this._transferFromLegacy));
-    actions.startRestore.listen(asyncCheck(this._restoreToDb));
-    actions.restoreWallet.listen(asyncCheck(this._restoreWallet));
-    actions.reset.listen(syncCheck(this.reset));
+    actions.transferFromLegacy.listen(this._transferFromLegacy);
+    actions.startRestore.listen(this._restoreToDb);
+    actions.restoreWallet.listen(this._restoreWallet);
+    actions.reset.listen(this.reset);
   }
 
   _transferFromLegacy: void => Promise<void> = async () => {
@@ -149,7 +144,7 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
         `${nameof(AdaWalletRestoreStore)}::${nameof(this.isValidMnemonic)} missing length`
       );
     }
-    return this.api.ada.constructor.isValidMnemonic({
+    return AdaApi.isValidMnemonic({
       mnemonic,
       numberOfWords: request.mode.length,
     });

@@ -2,12 +2,8 @@
 import type { Node } from 'react';
 import type { StoresMap } from './stores/index';
 import type { ActionsMap } from './actions/index';
-import type { InjectedOrGenerated, InjectedProps } from './types/injectedPropsType';
-import type { GeneratedData as SettingsData } from './containers/settings/Settings';
-import type { GeneratedData as WalletData } from './containers/wallet/Wallet';
-import type { GeneratedData as ReceiveData } from './containers/wallet/Receive';
+import type { StoresAndActionsProps } from './types/injectedPropsType';
 import type { ConfigType } from '../config/config-types';
-import type { GeneratedData as AssetsData } from './containers/wallet/AssetsWrapper';
 import { Route, Redirect, Switch } from 'react-router-dom';
 import { ROUTES } from './routes-config';
 import React, { Suspense } from 'react';
@@ -476,7 +472,7 @@ const NFTsSubPages = (stores, actions) => (
   </Switch>
 );
 
-export function wrapSwap(swapProps: InjectedProps, children: Node): Node {
+export function wrapSwap(swapProps: StoresAndActionsProps, children: Node): Node {
   const queryClient = new QueryClient();
   return (
     <QueryClientProvider client={queryClient}>
@@ -490,7 +486,7 @@ export function wrapSwap(swapProps: InjectedProps, children: Node): Node {
 }
 
 export function wrapSettings(
-  settingsProps: InjectedOrGenerated<SettingsData>,
+  settingsProps: StoresAndActionsProps,
   children: Node
 ): Node {
   return (
@@ -500,7 +496,7 @@ export function wrapSettings(
   );
 }
 
-export function wrapAssets(assetsProps: InjectedOrGenerated<AssetsData>, children: Node): Node {
+export function wrapAssets(assetsProps: StoresAndActionsProps, children: Node): Node {
   return (
     <AssetsWrapper {...assetsProps}>
       <Suspense fallback={null}>{children}</Suspense>
@@ -508,7 +504,7 @@ export function wrapAssets(assetsProps: InjectedOrGenerated<AssetsData>, childre
   );
 }
 
-export function wrapNFTs(assetsProps: InjectedOrGenerated<AssetsData>, children: Node): Node {
+export function wrapNFTs(assetsProps: StoresAndActionsProps, children: Node): Node {
   return (
     <NFTsWrapper {...assetsProps}>
       <Suspense fallback={null}>{children}</Suspense>
@@ -516,7 +512,7 @@ export function wrapNFTs(assetsProps: InjectedOrGenerated<AssetsData>, children:
   );
 }
 
-export function wrapWallet(walletProps: InjectedOrGenerated<WalletData>, children: Node): Node {
+export function wrapWallet(walletProps: StoresAndActionsProps, children: Node): Node {
   return (
     <Wallet {...walletProps}>
       <Suspense fallback={null}>{children}</Suspense>
@@ -524,6 +520,6 @@ export function wrapWallet(walletProps: InjectedOrGenerated<WalletData>, childre
   );
 }
 
-export function wrapReceive(receiveProps: InjectedOrGenerated<ReceiveData>, children: Node): Node {
+export function wrapReceive(receiveProps: StoresAndActionsProps, children: Node): Node {
   return <Receive {...receiveProps}>{children}</Receive>;
 }

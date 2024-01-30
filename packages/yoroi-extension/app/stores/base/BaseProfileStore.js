@@ -18,6 +18,7 @@ import BaseProfileActions from '../../actions/base/base-profile-actions';
 import { CURRENT_TOS_VERSION } from '../../i18n/locales/terms-of-use/ada/index';
 import { ampli } from '../../../ampli/index';
 import type { LoadOptionsWithEnvironment } from '../../../ampli/index';
+import { noop } from '../../coreUtils';
 
 interface CoinPriceStore {
   refreshCurrentUnit: Request<(void) => Promise<void>>;
@@ -193,9 +194,9 @@ export default class BaseProfileStore
       this._updateMomentJsLocaleAfterLocaleChange,
     ]);
     this._getSelectComplexityLevel(); // eagerly cache
-    this.currentTheme; // eagerly cache (note: don't remove -- getter is stateful)
-    this.isRevampAnnounced;
-    this.didUserMigratedToRevampTheme;
+    noop(this.currentTheme); // eagerly cache (note: don't remove -- getter is stateful)
+    noop(this.isRevampAnnounced);
+    noop(this.didUserMigratedToRevampTheme);
     this.stores.loading.registerBlockingLoadingRequest(
       this._loadAcceptedTosVersion()
     );
