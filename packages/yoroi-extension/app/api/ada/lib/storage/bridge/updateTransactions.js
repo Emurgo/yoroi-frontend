@@ -2213,7 +2213,7 @@ export async function genCardanoAssetMap(
   let supply = {};
   try {
     [tokenInfoResponse, [metadata, supply]] =
-      await Promise.all(tokenInfoPromise, tokenMintMetadataAndSupplyPromise);
+      await Promise.all([tokenInfoPromise, tokenMintMetadataAndSupplyPromise]);
   } catch(e) {
     console.error('Failed to query token info, metadata, or supply', e);
   }
