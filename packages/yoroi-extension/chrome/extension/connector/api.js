@@ -82,6 +82,7 @@ import {
   derivePrivateByAddressing,
   derivePublicByAddressing
 } from '../../../app/api/ada/lib/cardanoCrypto/deriveByAddressing';
+import { GovernanceApi } from '@emurgo/yoroi-lib/dist/governance/emurgo-api';
 
 axios.defaults.adapter = fetchAdapter;
 
@@ -478,7 +479,6 @@ async function _getDRepKeyAndAddressing(
 
 export async function connectorGetStakeKey(
   wallet: PublicDeriver<>,
-  getAccountState: AccountStateRequest => Promise<AccountStateResponse>,
 ): Promise<{| key: string, isRegistered: boolean |}> {
   const stakeKey =
     (await __pubKeyAndAddressingByChainAndIndex(
@@ -491,17 +491,20 @@ export async function connectorGetStakeKey(
     throw new Error('Unable to get the stake key')
   }
   const stakingKeyResp = await withStakingKey.getStakingKey();
-  const accountState = await getAccountState(
-    {
-      addresses: [stakingKeyResp.addr.Hash],
-      network: wallet.getParent().getNetworkInfo(),
-    }
+  const backendService = wallet.getParent().getNetworkInfo().Backend.BackendServiceZero;
+  if (!backendService) {
+    throw new Error('unexpected missing backend service');
+  }
+  const govApi = new GovernanceApi(
+    axios,
+    backendService,
   );
+  const stakingState = await govApi.getStakingState(stakingKeyResp.addr.Hash);
   const stakeKeyHex = stakeKey.to_hex();
   return {
     // $FlowFixMe
     key: stakeKeyHex,
-    isRegistered: accountState[stakeKeyHex]?.stakeRegistered ?? false,
+    isRegistered: 'registration' in stakingState,
   };
 }
 
