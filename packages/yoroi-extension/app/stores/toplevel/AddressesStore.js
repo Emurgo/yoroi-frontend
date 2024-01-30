@@ -19,7 +19,6 @@ import type {
 import {
   Logger,
 } from '../../utils/logging';
-import { getApiForNetwork } from '../../api/common/utils';
 import type { AddressFilterKind, StandardAddress, AddressTypeName, } from '../../types/AddressFilterTypes';
 import { AddressFilter, } from '../../types/AddressFilterTypes';
 import {
@@ -134,9 +133,7 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
     storeName: AddressTypeName,
     type: CoreAddressT,
   |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
-    const apiType = getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo());
-
-    const allAddresses = await this.api[apiType].getAllAddressesForDisplay({
+    const allAddresses = await this.api.ada.getAllAddressesForDisplay({
       publicDeriver: request.publicDeriver,
       type: request.type,
     });
@@ -162,9 +159,7 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
     if (withLevels == null) {
       throw new Error(`${nameof(this._wrapForeign)} missing levels`);
     }
-    const apiType = getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo());
-
-    const allAddresses = await this.api[apiType].getForeignAddresses({
+    const allAddresses = await this.api.ada.getForeignAddresses({
       publicDeriver: withLevels,
     });
 
@@ -188,8 +183,6 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
     type: CoreAddressT,
     chainsRequest: IHasUtxoChainsRequest,
   |}=> Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
-    const apiType = getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo());
-
     const withHasUtxoChains = asHasUtxoChains(
       request.publicDeriver
     );
@@ -197,7 +190,7 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
       Logger.error(`${nameof(this._wrapForChainAddresses)} incorrect public deriver`);
       return Promise.resolve([]);
     }
-    const addresses = await this.api[apiType].getChainAddressesForDisplay({
+    const addresses = await this.api.ada.getChainAddressesForDisplay({
       publicDeriver: withHasUtxoChains,
       chainsRequest: request.chainsRequest,
       type: request.type,
@@ -221,9 +214,7 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
     storeName: AddressTypeName,
     addresses: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
   |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
-    const apiType = getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo());
-
-    return await this.stores.substores[apiType].addresses.storewiseFilter(request);
+    return await this.stores.substores.ada.addresses.storewiseFilter(request);
   }
 
   _createAddressIfNeeded: {|
