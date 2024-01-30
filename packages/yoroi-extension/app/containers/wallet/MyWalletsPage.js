@@ -325,7 +325,7 @@ class MyWalletsPage extends Component<AllProps> {
   };
 
   getRewardBalance: (PublicDeriver<>) => ?MultiToken = publicDeriver => {
-    return this.generated.stores.delegation.getRewardBalance(publicDeriver);
+    return this.props.stores.delegation.getRewardBalance(publicDeriver);
   };
 }
 export default (withLayout(MyWalletsPage): ComponentType<Props>);

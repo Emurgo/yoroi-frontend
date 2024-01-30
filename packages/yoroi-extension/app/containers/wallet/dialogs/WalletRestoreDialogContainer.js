@@ -88,7 +88,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
   };
 
   getRewardBalance: (PublicDeriver<>) => ?MultiToken = publicDeriver => {
-    return this.generated.stores.delegation.getRewardBalance(publicDeriver);
+    return this.props.stores.delegation.getRewardBalance(publicDeriver);
   };
 
   openToTransactions: (PublicDeriver<>) => void = publicDeriver => {

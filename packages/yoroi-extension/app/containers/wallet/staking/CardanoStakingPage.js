@@ -78,7 +78,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
     const selectedPlate = this.props.stores.wallets.activeWalletPlate;
     const stakingListBias = selectedPlate?.TextPart || 'bias';
 
-    const delegatedPoolId = this.generated.stores.delegation.getDelegatedPoolId(selectedWallet);
+    const delegatedPoolId = this.props.stores.delegation.getDelegatedPoolId(selectedWallet);
     if (urlTemplate != null) {
       const totalAda = this._getTotalAda();
       const locale = this.props.stores.profile.currentLocale;
@@ -181,14 +181,14 @@ class CardanoStakingPage extends Component<AllProps, State> {
       throw new Error(`${nameof(CardanoStakingPage)} no public deriver. Should never happen`);
     }
 
-    const delegationStore = this.generated.stores.delegation;
-    const balance = this.generated.stores.transactions.getBalance(publicDeriver);
+    const delegationStore = this.props.stores.delegation;
+    const balance = this.props.stores.transactions.getBalance(publicDeriver);
     if (balance == null) {
       return null;
     }
     const rewardBalance = delegationStore.getRewardBalance(publicDeriver)
       ?? new MultiToken([], publicDeriver.getParent().getDefaultToken());
-    const tokenInfo = genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)(
+    const tokenInfo = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)(
       rewardBalance.getDefaultEntry()
     );
     return balance
@@ -450,7 +450,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
   };
 
   _isRegistered: (PublicDeriver<>) => ?boolean = publicDeriver => {
-    return this.generated.stores.delegation.isStakeRegistered(publicDeriver);
+    return this.props.stores.delegation.isStakeRegistered(publicDeriver);
   };
 }
 

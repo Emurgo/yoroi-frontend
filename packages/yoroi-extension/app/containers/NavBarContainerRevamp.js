@@ -230,6 +230,6 @@ export default class NavBarContainerRevamp extends Component<Props> {
   };
 
   getRewardBalance: (PublicDeriver<>) => null | void | MultiToken = publicDeriver => {
-    return this.generated.stores.delegation.getRewardBalance(publicDeriver);
+    return this.props.stores.delegation.getRewardBalance(publicDeriver);
   };
 }

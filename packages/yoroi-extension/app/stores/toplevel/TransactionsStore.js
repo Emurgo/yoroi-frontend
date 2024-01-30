@@ -286,10 +286,13 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const timestamps: Set<number> = new Set();
     const remoteTransactionIds: Set<string> = new Set();
     let walletHasWithdrawal = false;
-    for (const { txid, date, withdrawals } of result) {
+    for (const tx of result) {
+      const { txid, date } = tx;
       timestamps.add(date.valueOf());
       remoteTransactionIds.add(txid);
-      walletHasWithdrawal = walletHasWithdrawal || (withdrawals?.length > 0);
+      if (tx instanceof CardanoShelleyTransaction && tx.withdrawals.length > 0) {
+        walletHasWithdrawal = true;
+      }
     }
     const defaultTokenInfo = this.stores.tokenInfoStore.getDefaultTokenInfo(
       publicDeriver.getParent().getNetworkInfo().NetworkId,
@@ -869,7 +872,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     return this._processedWithdrawals.includes(publicDeriver.publicDeriverId);
   }
 
-  clearProcessedWithdrawals: (PublicDeriver<>) => boolean = (publicDeriver) => {
+  clearProcessedWithdrawals: (PublicDeriver<>) => void = (publicDeriver) => {
     for (let i = 0; i < this._processedWithdrawals.length; ) {
       if (this._processedWithdrawals[i] === publicDeriver.publicDeriverId) {
         this._processedWithdrawals.splice(i, 1);

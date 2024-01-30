@@ -14,7 +14,6 @@ import type {
 } from '../../api/common/lib/storage/bridge/delegationUtils';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import LocalizableError from '../../i18n/LocalizableError';
-import { getApiForNetwork } from '../../api/common/utils';
 import { PoolMissingApiError, } from '../../api/common/errors';
 import type { MangledAmountFunc } from '../stateless/mangledAddresses';
 import type { ActionsMap } from '../../actions/index';
