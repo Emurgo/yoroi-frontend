@@ -91,6 +91,7 @@ import {
 } from '../../domain/HardwareWalletLocalizedError';
 import { wrapWithFrame } from '../../stores/lib/TrezorWrapper';
 import { ampli } from '../../../ampli/index';
+import { noop } from '../../coreUtils';
 
 export function connectorCall<T, R>(message: T): Promise<R> {
   return new Promise((resolve, reject) => {
@@ -273,7 +274,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     this._getConnectingMsg();
     this._getSigningMsg();
     this._getProtocol();
-    this.currentConnectorWhitelist;
+    noop(this.currentConnectorWhitelist);
   }
 
   teardown(): void {
