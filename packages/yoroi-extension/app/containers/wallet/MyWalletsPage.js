@@ -218,6 +218,7 @@ class MyWalletsPage extends Component<AllProps> {
     })();
 
     const balance = this.props.stores.transactions.getBalance(publicDeriver);
+    const rewards = this.props.stores.delegation.getRewardBalance(publicDeriver);
 
     const withPubKey = asGetPublicKey(publicDeriver);
     const plate =
@@ -237,7 +238,7 @@ class MyWalletsPage extends Component<AllProps> {
         walletSumDetails={
           <WalletDetails
             walletAmount={balance}
-            rewards={this.getRewardBalance(publicDeriver)}
+            rewards={rewards}
             // TODO: This should be probably bound to an individual wallet
             onUpdateHideBalance={this.updateHideBalance}
             shouldHideBalance={this.props.stores.profile.shouldHideBalance}
@@ -322,10 +323,6 @@ class MyWalletsPage extends Component<AllProps> {
     );
 
     return walletSubRow;
-  };
-
-  getRewardBalance: (PublicDeriver<>) => ?MultiToken = publicDeriver => {
-    return this.props.stores.delegation.getRewardBalance(publicDeriver);
   };
 }
 export default (withLayout(MyWalletsPage): ComponentType<Props>);

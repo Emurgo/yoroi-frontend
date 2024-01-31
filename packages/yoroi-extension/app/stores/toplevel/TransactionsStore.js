@@ -309,11 +309,12 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
     let submittedTransactionsChanged = false;
     runInAction(() => {
-      if (walletHasWithdrawal) {
-        this._processedWithdrawals.push(publicDeriver.publicDeriverId);
-      }
       for (let i = 0; i < this._submittedTransactions.length; ) {
         if (remoteTransactionIds.has(this._submittedTransactions[i].transaction.txid)) {
+          if (walletHasWithdrawal) {
+            // Set local processed withdrawals only if there was a pending local transaction
+            this._processedWithdrawals.push(publicDeriver.publicDeriverId);
+          }
           this._submittedTransactions.splice(i, 1);
           submittedTransactionsChanged = true;
         } else {

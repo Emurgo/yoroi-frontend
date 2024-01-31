@@ -87,10 +87,6 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
     await this.props.actions.profile.updateHideBalance.trigger();
   };
 
-  getRewardBalance: (PublicDeriver<>) => ?MultiToken = publicDeriver => {
-    return this.props.stores.delegation.getRewardBalance(publicDeriver);
-  };
-
   openToTransactions: (PublicDeriver<>) => void = publicDeriver => {
     this.props.actions.wallets.setActiveWallet.trigger({
       wallet: publicDeriver,
@@ -155,6 +151,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           ? null
           : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
         const balance = this.props.stores.transactions.getBalance(publicDeriver);
+        const rewards = this.props.stores.delegation.getRewardBalance(publicDeriver);
 
         return (
           <WalletAlreadyExistDialog
@@ -162,7 +159,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
             walletSumDetails={
               <WalletDetails
                 walletAmount={balance}
-                rewards={this.getRewardBalance(publicDeriver)}
+                rewards={rewards}
                 onUpdateHideBalance={this.updateHideBalance}
                 shouldHideBalance={this.props.stores.profile.shouldHideBalance}
                 getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}

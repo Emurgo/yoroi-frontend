@@ -76,6 +76,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
           : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
 
       const balance = this.props.stores.transactions.getBalance(publicDeriver);
+      const rewards = this.props.stores.delegation.getRewardBalance(publicDeriver);
 
       return (
         <NavWalletDetailsRevamp
@@ -83,7 +84,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
           wallet={settingsCache}
           onUpdateHideBalance={this.updateHideBalance}
           shouldHideBalance={profile.shouldHideBalance}
-          rewards={this.getRewardBalance(publicDeriver)}
+          rewards={rewards}
           walletAmount={balance}
           getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
           defaultToken={this.props.stores.tokenInfoStore.getDefaultTokenInfo(
@@ -129,11 +130,10 @@ export default class NavBarContainerRevamp extends Component<Props> {
     const cardanoWallets = [];
 
     wallets.forEach(wallet => {
-      const walletBalance = this.props.stores.transactions.getBalance(wallet);
+      const walletAmount = this.props.stores.transactions.getBalance(wallet);
+      const rewards = this.props.stores.delegation.getRewardBalance(wallet);
       const parent = wallet.getParent();
-      const settingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(
-        parent
-      );
+      const settingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(parent);
 
       const withPubKey = asGetPublicKey(wallet);
       const plate =
@@ -143,8 +143,8 @@ export default class NavBarContainerRevamp extends Component<Props> {
 
       const walletMap = {
         walletId: wallet.getPublicDeriverId(),
-        rewards: this.getRewardBalance(wallet),
-        walletAmount: walletBalance,
+        rewards,
+        walletAmount,
         getTokenInfo: genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo),
         plate,
         wallet,
@@ -227,9 +227,5 @@ export default class NavBarContainerRevamp extends Component<Props> {
       acc.push(next);
       return acc;
     }, []);
-  };
-
-  getRewardBalance: (PublicDeriver<>) => null | void | MultiToken = publicDeriver => {
-    return this.props.stores.delegation.getRewardBalance(publicDeriver);
   };
 }
