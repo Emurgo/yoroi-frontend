@@ -15,9 +15,10 @@ import {
   isLedgerNanoWallet,
   isTrezorTWallet,
 } from '../../../../api/ada/lib/storage/models/ConceptualWallet';
-import type { SendUsingLedgerParams } from '../../../../actions/ada/ledger-send-actions';
-import type { SendUsingTrezorParams } from '../../../../actions/ada/trezor-send-actions';
 import { ampli } from '../../../../../ampli/index';
+import TrezorSendActions from '../../../../actions/ada/trezor-send-actions';
+import LedgerSendActions from '../../../../actions/ada/ledger-send-actions';
+import type { SendMoneyRequest } from '../../../../stores/toplevel/WalletStore';
 
 // TODO: unmagic the constants
 const MAX_VALUE_BYTES = 5000;
@@ -39,11 +40,7 @@ type Props = {|
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +isClassicTheme: boolean,
   +openTransactionSuccessDialog: void => void,
-  +sendMoneyRequest: {|
-    error: ?LocalizableError,
-    isExecuting: boolean,
-    reset: () => void,
-  |},
+  +sendMoneyRequest: SendMoneyRequest,
   +sendMoney: (params: {|
     password: string,
     publicDeriver: PublicDeriver<>,
@@ -52,38 +49,18 @@ type Props = {|
   |}) => Promise<void>,
   +ledgerSendError: null | LocalizableError,
   +trezorSendError: null | LocalizableError,
-  +ledgerSend: {|
-    cancel: {| trigger: (params: void) => void |},
-    init: {| trigger: (params: void) => void |},
-    sendUsingLedgerWallet: {|
-      trigger: (params: {|
-        params: SendUsingLedgerParams,
-        publicDeriver: PublicDeriver<>,
-        onSuccess?: void => void,
-      |}) => Promise<void>,
-    |},
-  |},
-  +trezorSend: {|
-    cancel: {| trigger: (params: void) => void |},
-    sendUsingTrezor: {|
-      trigger: (params: {|
-        params: SendUsingTrezorParams,
-        publicDeriver: PublicDeriver<>,
-        onSuccess?: void => void,
-      |}) => Promise<void>,
-    |},
-  |},
+  +ledgerSend: LedgerSendActions,
+  +trezorSend: TrezorSendActions,
   selectedExplorer: Map<number, SelectedExplorer>,
   selectedWallet: PublicDeriver<>,
-|};
-
-type AllProps = {|
-  ...Props,
-  +openTransactionSuccessDialog: () => void,
+  receiverHandle: ?{|
+    nameServer: string,
+    handle: string,
+  |},
 |};
 
 @observer
-export default class WalletSendPreviewStepContainer extends Component<AllProps> {
+export default class WalletSendPreviewStepContainer extends Component<Props> {
   componentWillUnmount() {
     this.props.sendMoneyRequest.reset();
     this.props.ledgerSend.cancel.trigger();
@@ -136,6 +113,7 @@ export default class WalletSendPreviewStepContainer extends Component<AllProps> 
       isClassicTheme,
       getTokenInfo,
       getCurrentPrice,
+      receiverHandle,
     } = this.props;
 
     if (selectedWallet == null)
@@ -153,6 +131,7 @@ export default class WalletSendPreviewStepContainer extends Component<AllProps> 
 
     return (
       <WalletSendPreviewStep
+        receiverHandle={receiverHandle}
         staleTx={this.props.staleTx}
         selectedExplorer={
           selectedExplorer.get(selectedWallet.getParent().getNetworkInfo().NetworkId) ??

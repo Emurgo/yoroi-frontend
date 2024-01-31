@@ -299,7 +299,9 @@ class SignTxPage extends Component<Props, State> {
       [defaultEntry].concat(curr.value.nonDefaultEntries()).forEach(e => {
         if (!newAcc.some(a => a.tokenInfo?.Identifier === e.identifier) && e.identifier) {
           const tokenInfo = this.props.getTokenInfo(e);
-          tokenInfo && newAcc.push({ tokenInfo, amount: e.amount });
+          if (tokenInfo != null) {
+            newAcc.push({ tokenInfo, amount: e.amount });
+          };
         }
       });
 

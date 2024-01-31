@@ -366,6 +366,7 @@ async function syncWallet(
             wallet.getDb(),
             wallet,
             stateFetcher.checkAddressesInUse,
+            stateFetcher.getTransactionsHistoryForAddresses,
             stateFetcher.getRecentTransactionHashes,
             stateFetcher.getTransactionsByHashes,
             stateFetcher.getBestBlock,
@@ -1390,6 +1391,7 @@ async function handleInjectorMessage(message, sender) {
       break;
     case `get_change_address`:
       try {
+        await RustModule.load();
         await withDb(async (db, localStorageApi) => {
           await withSelectedWallet(
             tabId,

@@ -15,13 +15,13 @@ import type {
 } from '../../api/common/lib/storage/bridge/delegationUtils';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import LocalizableError from '../../i18n/LocalizableError';
-import { getApiForNetwork } from '../../api/common/utils';
 import {
   PoolMissingApiError,
 } from '../../api/common/errors';
 import type { MangledAmountFunc } from '../stateless/mangledAddresses';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import type { PoolInfo } from '@emurgo/yoroi-lib';
 
 export type DelegationRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -61,9 +61,8 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     = new LocalizedRequest<Array<string> => Promise<void>>(async poolIds => {
       const { selectedNetwork } = this.stores.profile;
       if (selectedNetwork == null) throw new Error(`${nameof(DelegationStore)} no network selected`);
-      const api = getApiForNetwork(selectedNetwork);
-      if (this.stores.substores[api].delegation) {
-        await this.stores.substores[api].delegation.updatePoolInfo({
+      if (this.stores.substores.ada.delegation) {
+        await this.stores.substores.ada.delegation.updatePoolInfo({
           network: selectedNetwork,
           allPoolIds: poolIds,
         });
@@ -81,6 +80,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     networkId: number,
     poolId: string,
     poolInfo: PoolMeta,
+    poolRemoteInfo: PoolInfo | null,
   |}> = [];
 
   /**
@@ -125,6 +125,13 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     string,
   ) => void | PoolMeta = (network, poolId) => {
     return find(this.poolInfo, { networkId: network.NetworkId, poolId })?.poolInfo;
+  }
+
+  getLocalRemotePoolInfo: (
+    $ReadOnly<NetworkRow>,
+    string,
+  ) => void | PoolInfo = (network, poolId) => {
+    return find(this.poolInfo, { networkId: network.NetworkId, poolId })?.poolRemoteInfo ?? undefined;
   }
 
   @action.bound

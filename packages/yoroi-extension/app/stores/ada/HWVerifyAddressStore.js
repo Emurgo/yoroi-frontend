@@ -156,7 +156,9 @@ export default class HWVerifyAddressStore extends Store<StoresMap, ActionsMap> {
     } catch (error) {
       this._setError(ledgerErrorToLocalized(error));
     } finally {
-      this.ledgerConnect && this.ledgerConnect.dispose();
+      if (this.ledgerConnect != null) {
+        this.ledgerConnect.dispose();
+      }
       this.ledgerConnect = undefined;
       Logger.info(`${nameof(HWVerifyAddressStore)}::${nameof(this.ledgerVerifyAddress)} finalized`);
     }
@@ -176,7 +178,9 @@ export default class HWVerifyAddressStore extends Store<StoresMap, ActionsMap> {
   }
 
   @action _closeAddressDetailDialog: void => void = () => {
-    this.ledgerConnect && this.ledgerConnect.dispose();
+    if (this.ledgerConnect != null) {
+      this.ledgerConnect.dispose();
+    }
     this.ledgerConnect = undefined;
     this.selectedAddress = null;
     this._setError(null);

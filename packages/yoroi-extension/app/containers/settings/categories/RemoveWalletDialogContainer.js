@@ -1,7 +1,7 @@
 // @flow
 import type { ComponentType, Node } from 'react';
 import { Component } from 'react';
-import { action, computed, observable } from 'mobx';
+import { action, observable } from 'mobx';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, intlShape } from 'react-intl';
@@ -9,30 +9,27 @@ import globalMessages from '../../../i18n/global-messages';
 import { messages } from '../../../components/wallet/settings/RemoveWallet';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 
-import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
 
 import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
-import LocalizableError from '../../../i18n/LocalizableError';
 import type { LayoutComponentMap } from '../../../styles/context/layout';
 import { withLayout } from '../../../styles/context/layout';
-import type { WalletsNavigation } from '../../../api/localStorage';
-
-export type GeneratedData = typeof RemoveWalletDialogContainer.prototype.generated;
 
 type Props = {|
-  ...InjectedOrGenerated<GeneratedData>,
+  ...StoresAndActionsProps,
   publicDeriver: void | PublicDeriver<>,
 |};
-type InjectedProps = {|
+type InjectedLayoutProps = {|
   +renderLayoutComponent: LayoutComponentMap => Node,
 |};
-type AllProps = {| ...Props, ...InjectedProps |};
+type AllProps = {| ...Props, ...InjectedLayoutProps |};
 
 const dialogMessages = defineMessages({
   warning2: {
     id: 'wallet.settings.delete.warning2',
     defaultMessage:
-      '!!!Please double-check you still have the means to restore access to this wallet. If you cannot, removing the wallet may result in irreversible loss of funds.',
+      '!!!Please double-check you still have the means to restore access to this wallet.' +
+      ' If you cannot, removing the wallet may result in irreversible loss of funds.',
   },
   accept: {
     id: 'wallet.settings.delete.accept',
@@ -47,21 +44,21 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
   };
 
   componentWillUnmount() {
-    this.generated.stores.walletSettings.removeWalletRequest.reset();
+    this.props.stores.walletSettings.removeWalletRequest.reset();
   }
 
   @observable isChecked: boolean = false;
 
   @action
   toggleCheck: void => void = () => {
-    if (this.generated.stores.walletSettings.removeWalletRequest.isExecuting) return;
+    if (this.props.stores.walletSettings.removeWalletRequest.isExecuting) return;
     this.isChecked = !this.isChecked;
   };
 
   removeWalletRevamp: void => Promise<void> = async () => {
-    const settingsActions = this.generated.actions.walletSettings;
+    const settingsActions = this.props.actions.walletSettings;
     const selectedWalletId = this.props.publicDeriver?.getPublicDeriverId();
-    const walletsNavigation = this.generated.stores.profile.walletsNavigation;
+    const walletsNavigation = this.props.stores.profile.walletsNavigation;
 
     if (this.props.publicDeriver) {
       const newWalletsNavigation = {
@@ -71,19 +68,20 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
           walletId => walletId !== selectedWalletId
         ),
       };
-      await this.generated.actions.profile.updateSortedWalletList.trigger(newWalletsNavigation);
+      await this.props.actions.profile.updateSortedWalletList.trigger(newWalletsNavigation);
     }
 
-    this.props.publicDeriver &&
+    if (this.props.publicDeriver != null) {
       settingsActions.removeWallet.trigger({
         publicDeriver: this.props.publicDeriver,
       });
+    }
   };
 
   render(): Node {
     const { intl } = this.context;
-    const settingsStore = this.generated.stores.walletSettings;
-    const settingsActions = this.generated.actions.walletSettings;
+    const settingsStore = this.props.stores.walletSettings;
+    const settingsActions = this.props.actions.walletSettings;
 
     const DangerousActionDialogClassic = (
       <DangerousActionDialog
@@ -93,7 +91,7 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
         toggleCheck={this.toggleCheck}
         isSubmitting={settingsStore.removeWalletRequest.isExecuting}
         error={settingsStore.removeWalletRequest.error}
-        onCancel={this.generated.actions.dialogs.closeActiveDialog.trigger}
+        onCancel={this.props.actions.dialogs.closeActiveDialog.trigger}
         primaryButton={{
           label: intl.formatMessage(globalMessages.remove),
           onClick: () =>
@@ -103,7 +101,7 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
             }),
         }}
         secondaryButton={{
-          onClick: this.generated.actions.dialogs.closeActiveDialog.trigger,
+          onClick: this.props.actions.dialogs.closeActiveDialog.trigger,
         }}
       >
         <p>{intl.formatMessage(messages.removeExplanation)}</p>
@@ -118,13 +116,13 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
         toggleCheck={this.toggleCheck}
         isSubmitting={settingsStore.removeWalletRequest.isExecuting}
         error={settingsStore.removeWalletRequest.error}
-        onCancel={this.generated.actions.dialogs.closeActiveDialog.trigger}
+        onCancel={this.props.actions.dialogs.closeActiveDialog.trigger}
         primaryButton={{
           label: intl.formatMessage(globalMessages.remove),
           onClick: this.removeWalletRevamp,
         }}
         secondaryButton={{
-          onClick: this.generated.actions.dialogs.closeActiveDialog.trigger,
+          onClick: this.props.actions.dialogs.closeActiveDialog.trigger,
         }}
       >
         <p>{intl.formatMessage(messages.removeExplanation)}</p>
@@ -135,81 +133,6 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
     return this.props.renderLayoutComponent({
       CLASSIC: DangerousActionDialogClassic,
       REVAMP: DangerousActionDialogRevamp,
-    });
-  }
-
-  @computed get generated(): {|
-    actions: {|
-      profile: {|
-        updateSortedWalletList: {|
-          trigger: WalletsNavigation => Promise<void>,
-        |},
-      |},
-      dialogs: {|
-        closeActiveDialog: {|
-          trigger: (params: void) => void,
-        |},
-      |},
-      walletSettings: {|
-        removeWallet: {|
-          trigger: (params: {|
-            publicDeriver: PublicDeriver<>,
-          |}) => Promise<void>,
-        |},
-      |},
-    |},
-    stores: {|
-      profile: {|
-        walletsNavigation: WalletsNavigation,
-      |},
-      walletSettings: {|
-        removeWalletRequest: {|
-          error: ?LocalizableError,
-          isExecuting: boolean,
-          reset: () => void,
-        |},
-      |},
-      wallets: {|
-        publicDerivers: Array<PublicDeriver<>>,
-      |},
-    |},
-  |} {
-    if (this.props.generated !== undefined) {
-      return this.props.generated;
-    }
-    if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(RemoveWalletDialogContainer)} no way to generated props`);
-    }
-    const { actions, stores } = this.props;
-    const settingActions = actions.walletSettings;
-    const settingStore = stores.walletSettings;
-    return Object.freeze({
-      stores: {
-        wallets: {
-          publicDerivers: stores.wallets.publicDerivers,
-        },
-        profile: {
-          walletsNavigation: stores.profile.walletsNavigation,
-        },
-        walletSettings: {
-          removeWalletRequest: {
-            reset: settingStore.removeWalletRequest.reset,
-            isExecuting: settingStore.removeWalletRequest.isExecuting,
-            error: settingStore.removeWalletRequest.error,
-          },
-        },
-      },
-      actions: {
-        profile: {
-          updateSortedWalletList: { trigger: actions.profile.updateSortedWalletList.trigger },
-        },
-        walletSettings: {
-          removeWallet: { trigger: settingActions.removeWallet.trigger },
-        },
-        dialogs: {
-          closeActiveDialog: { trigger: actions.dialogs.closeActiveDialog.trigger },
-        },
-      },
     });
   }
 }

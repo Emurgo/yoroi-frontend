@@ -139,6 +139,8 @@ import type {
   MultiAssetSupplyFunc,
   MultiAssetMintMetadataResponse,
   MultiAssetSupplyResponse,
+  TxSummary,
+  HistoryFunc,
 } from '../../state-fetch/types';
 import {
   ShelleyCertificateTypes,
@@ -157,7 +159,7 @@ import type {
   DefaultTokenEntry,
 } from '../../../../common/lib/MultiToken';
 import { UtxoStorageApi } from '../models/utils';
-import { bytesToHex, hexToBytes } from '../../../../../coreUtils';
+import { bytesToHex, createFilterUniqueBy, hexToBytes } from '../../../../../coreUtils';
 
 type TxData = {|
   addressLookupMap: Map<number, string>,
@@ -1025,7 +1027,7 @@ export async function updateUtxos(
   );
 }
 
-type After = {|
+export type ReferenceTx = {|
   blockHash: string,
   txHash: ?string,
 |};
@@ -1034,13 +1036,15 @@ export async function updateTransactions(
   db: lf$Database,
   publicDeriver: IPublicDeriver<ConceptualWallet>,
   checkAddressesInUse: FilterFunc,
+  getTransactionHistory: HistoryFunc,
   getRecentTransactionHashes: GetRecentTransactionHashesFunc,
   getTransactionsByHashes: GetTransactionsByHashesFunc,
   getBestBlock: BestBlockFunc,
   getTokenInfo: TokenInfoFunc,
   getMultiAssetMetadata: MultiAssetMintMetadataFunc,
   getMultiAssetSupply: MultiAssetSupplyFunc,
-  after?: ?After,
+  after?: ?ReferenceTx,
+  before?: ?ReferenceTx,
 ): Promise<TxData> {
   const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
   const derivationTables = withLevels == null
@@ -1107,6 +1111,7 @@ export async function updateTransactions(
           remainingDeps,
           publicDeriver,
           lastSyncInfo,
+          getTransactionHistory,
           getRecentTransactionHashes,
           getTransactionsByHashes,
           getBestBlock,
@@ -1115,6 +1120,7 @@ export async function updateTransactions(
           getMultiAssetMetadata,
           getMultiAssetSupply,
           after,
+          before,
         );
       }
     );
@@ -1374,6 +1380,7 @@ async function rawUpdateTransactions(
   |},
   publicDeriver: IPublicDeriver<>,
   lastSyncInfo: $ReadOnly<LastSyncInfoRow>,
+  getTransactionHistory: HistoryFunc,
   getRecentTransactionHashes: GetRecentTransactionHashesFunc,
   getTransactionsByHashes: GetTransactionsByHashesFunc,
   getBestBlock: BestBlockFunc,
@@ -1381,7 +1388,8 @@ async function rawUpdateTransactions(
   getTokenInfo: TokenInfoFunc,
   getMultiAssetMetadata: MultiAssetMintMetadataFunc,
   getMultiAssetSupply: MultiAssetSupplyFunc,
-  after: ?After,
+  after: ?ReferenceTx,
+  before: ?ReferenceTx,
 ): Promise<TxData> {
   const network = publicDeriver.getParent().getNetworkInfo();
   // TODO: consider passing this function in as an argument instead of generating it here
@@ -1389,24 +1397,23 @@ async function rawUpdateTransactions(
     getCardanoHaskellBaseConfig(network)
   );
 
-  let untilBlock;
+  if (before != null && after != null) {
+    throw new Error('Only one of `before` or `after` should be used for a resync');
+  }
 
-  if (after) {
-    untilBlock = after.blockHash;
-  } else {
-    const bestBlock = await getBestBlock({
-      network,
-    });
-    untilBlock = bestBlock.hash;
+  const bestBlock = await getBestBlock({ network });
+  const untilBlock = before == null ? bestBlock.hash : before.blockHash;
+  const shouldUpdateLastSync = before == null;
 
+
+  if (shouldUpdateLastSync) {
     // update last sync
     const slotInRemote = (bestBlock.epoch == null || bestBlock.slot == null)
-          ? null
-          : toAbsoluteSlotNumber({
-            epoch: bestBlock.epoch,
-            slot: bestBlock.slot,
-          });
-
+      ? null
+      : toAbsoluteSlotNumber({
+        epoch: bestBlock.epoch,
+        slot: bestBlock.slot,
+      });
     await deps.ModifyLastSyncInfo.overrideLastSyncInfo(
       db, dbTx,
       {
@@ -1422,10 +1429,9 @@ async function rawUpdateTransactions(
   let txHashes;
 
   if (untilBlock != null) {
+
     // address syncing has been done by scanUtxos so no need to do it here again
-
-    //  get new txs from fetcher
-
+    // get new txs from fetcher
     // important: get addresses for our wallet AFTER scanning for new addresses
     const { txIds, addresses } = await rawGetAllTxIds(
       db, dbTx,
@@ -1441,57 +1447,44 @@ async function rawUpdateTransactions(
       derivationTables,
     );
 
-    const recentTxHashesResult = await getRecentTransactionHashes({
-      network,
-      addresses: toRequestAddresses(addresses),
-      before: {
-        blockHash: untilBlock,
-        txHash: after?.txHash,
-      },
-    });
-
-    // should use Object.values(recentTxHashesResult) but flow couldn't infer the type
-    txHashes = Object.keys(recentTxHashesResult).map(addr => recentTxHashesResult[addr])
-      .flatMap(txs => txs.map(tx => tx.txHash));
-
-    const allExistingTxHashes = new Set(
-      (await rawGetTransactions(
-        db, dbTx,
-        {
-          GetPathWithSpecific: deps.GetPathWithSpecific,
-          GetAddress: deps.GetAddress,
-          CardanoByronAssociateTxWithIOs: deps.CardanoByronAssociateTxWithIOs,
-          CardanoShelleyAssociateTxWithIOs: deps.CardanoShelleyAssociateTxWithIOs,
-          AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
-          AssociateTxWithAccountingIOs: deps.AssociateTxWithAccountingIOs,
-          GetTxAndBlock: deps.GetTxAndBlock,
-          GetDerivationSpecific: deps.GetDerivationSpecific,
-          GetCertificates: deps.GetCertificates,
-        },
-        {
-          publicDeriver,
-          getTxAndBlock: async (hashes) => await deps.GetTxAndBlock.byTime(
-            db, dbTx,
-            {
-              txIds: hashes,
-            }
-          )
-        },
-        derivationTables,
-      )).txs
-        // pending txs needs to be updated, so exclude them from existing
-        .filter(tx => tx.block != null)
-        .map(tx => tx.transaction.Hash)
-    );
-
-    const missingTxHashSet = new Set(txHashes.filter(hash => !allExistingTxHashes.has(hash)));
-
-    const txsFromNetwork = await getTransactionsByHashes(
-      {
+    let txsFromNetwork;
+    if (after != null) {
+      /*
+       * HEAD
+       */
+      txsFromNetwork = await getTransactionHistory({
         network,
-        txHashes: [...missingTxHashSet],
-      }
-    );
+        addresses: toRequestAddresses(addresses),
+        after: {
+          block: after.blockHash,
+          tx: after.txHash || undefined,
+        },
+        untilBlock,
+      });
+      txHashes = txsFromNetwork.map(tx => tx.hash);
+    } else {
+      /*
+       * TAIL
+       */
+      const recentTxHashesResult = await getRecentTransactionHashes({
+        network,
+        addresses: toRequestAddresses(addresses),
+        before: {
+          blockHash: untilBlock,
+          txHash: before?.txHash,
+        },
+      });
+      const summaries: Array<TxSummary> =
+        // $FlowFixMe[incompatible-cast]
+        (Object.values(recentTxHashesResult).flat(): Array<TxSummary>)
+          .filter(createFilterUniqueBy(x => x.txHash));
+      summaries.sort((a: TxSummary, b: TxSummary) => {
+        // DESC ordering (b < a)
+        return b.epoch - a.epoch || b.slot - a.slot;
+      });
+      txHashes = summaries.slice(0,20).map(x => x.txHash);
+      txsFromNetwork = await getTransactionsByHashes({ network, txHashes });
+    }
 
     const ourIds = new Set(
       Object.keys(addresses)
@@ -2203,22 +2196,27 @@ export async function genCardanoAssetMap(
 
   const updatingTokenIds = tokenIds.filter(token => !noNeedForUpdateTokens.has(token));
 
-  let tokenInfoResponse;
-  try {
-    tokenInfoResponse = await getTokenInfo({
-      network,
-      tokenIds: updatingTokenIds.map(id => id.split('.').join(''))
-    });
-  } catch {
-    tokenInfoResponse = {};
-  }
+  const tokenInfoPromise = getTokenInfo({
+    network,
+    tokenIds: updatingTokenIds.map(id => id.split('.').join(''))
+  });
 
-  const [metadata, supply] = await getTokenMintMetadataAndSupply(
+  const tokenMintMetadataAndSupplyPromise = getTokenMintMetadataAndSupply(
     tokenIds,
     getMultiAssetMetadata,
     getMultiAssetSupply,
     network,
   );
+
+  let tokenInfoResponse = {};
+  let metadata = {};
+  let supply = {};
+  try {
+    [tokenInfoResponse, [metadata, supply]] =
+      await Promise.all([tokenInfoPromise, tokenMintMetadataAndSupplyPromise]);
+  } catch(e) {
+    console.error('Failed to query token info, metadata, or supply', e);
+  }
 
   const databaseInsert = updatingTokenIds
     .map(tokenId => {

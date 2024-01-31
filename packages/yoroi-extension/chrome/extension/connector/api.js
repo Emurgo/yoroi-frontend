@@ -240,7 +240,7 @@ export async function connectorGetUtxosCardano(
     return Promise.resolve(paginateResults(formattedUtxos, paginate));
   }
 
-  setRuntime(RustModule.CrossCsl.init());
+  setRuntime(RustModule.CrossCsl.init);
 
   const utxoSet = new UTxOSet(
     await Promise.all(
