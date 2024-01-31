@@ -52,6 +52,7 @@ import { getAllAddressesForWallet } from '../../api/ada/lib/storage/bridge/trait
 import { toRequestAddresses } from '../../api/ada/lib/storage/bridge/updateTransactions'
 import type { TransactionExportRow } from '../../api/export';
 import type { HistoryRequest } from '../../api/ada/lib/state-fetch/types';
+import appConfig from '../../config';
 
 
 export type TxHistoryState = {|
@@ -347,43 +348,34 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const txHistoryState = this.getTxHistoryState(request.publicDeriver);
     const isEmptyHistory = txHistoryState.txs.length === 0;
 
+    if (isEmptyHistory) {
+      /*
+       * TAIL REQUEST IS USED WHEN FIRST SYNC OR EMPTY WALLET
+       */
+      return await this._loadMore(request.publicDeriver);
+    }
+
+    /*
+     * HEAD REQUEST IS USED WITH `AFTER` REFERENCE
+     * WHEN NON-EMPTY WALLET
+     */
+
     const {
-      tailRequest,
       headRequest,
       getBalanceRequest,
       getAssetDepositRequest
     } = txHistoryState.requests;
 
-    let result;
-    if (isEmptyHistory) {
-      /*
-       * TAIL REQUEST IS USED WHEN FIRST SYNC OR EMPRY WALLET
-       */
-      tailRequest.invalidate({ immediately: false });
-      tailRequest.execute({
-        publicDeriver,
-        isLocalRequest: request.isLocalRequest
-      });
-      if (tailRequest.promise == null) {
-        throw new Error('unexpected nullish tailRequest.promise');
-      }
-      result = await tailRequest.promise;
-    } else {
-      /*
-       * HEAD REQUEST IS USED WITH `AFTER` REFERENCE
-       * WHEN NON-EMPTY WALLET
-       */
-      headRequest.invalidate({ immediately: false });
-      headRequest.execute({
-        publicDeriver,
-        isLocalRequest: false,
-        afterTx: txHistoryState.txs[0],
-      });
-      if (headRequest.promise == null) {
-        throw new Error('unexpected nullish headRequest.promise');
-      }
-      result = await headRequest.promise;
+    headRequest.invalidate({ immediately: false });
+    headRequest.execute({
+      publicDeriver,
+      isLocalRequest: false,
+      afterTx: txHistoryState.txs[0],
+    });
+    if (headRequest.promise == null) {
+      throw new Error('unexpected nullish headRequest.promise');
     }
+    const result = await headRequest.promise;
     {
       /**
        * Adding received txs to the start of the existing history
@@ -511,13 +503,12 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       isLocalRequest: false,
       beforeTx,
     });
-    if (!tailRequest.promise) throw new Error('should never happen');
+    if (!tailRequest.promise) throw new Error('unexpected nullish tailRequest.promise');
     const result = await tailRequest.promise;
     runInAction(() => {
       state.txs.splice(state.txs.length, 0, ...result);
-      state.hasMoreToLoad = result.length > 0;
+      state.hasMoreToLoad = result.length >= appConfig.wallets.MAX_RECENT_TXS_PER_LOAD;
     });
-
     await this._afterLoadingNewTxs(
       result,
       publicDeriver,
