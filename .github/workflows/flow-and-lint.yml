@@ -1,6 +1,9 @@
 name: Flow and lint
 
 on:
+  workflow_dispatch:
+  pull_request:
+    types: [ opened, ready_for_review ]
   pull_request_review:
     types: [ submitted ]
 
