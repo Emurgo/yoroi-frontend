@@ -28,7 +28,6 @@ import { asGetPublicKey } from '../../../api/ada/lib/storage/models/PublicDerive
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
 import NavPlate from '../../../components/topbar/NavPlate';
 import WalletDetails from '../../../components/wallet/my-wallets/WalletDetails';
-import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { ROUTES } from '../../../routes-config';
 
 const messages = defineMessages({
