@@ -71,6 +71,10 @@
                 .then(({ key, isRegistered }) => isRegistered ? [] : [key]);
         },
     
+        signData(address, payload) {
+          return CardanoAPI._cardano_rpc_call("cip95_sign_data", [address, payload]);
+        },
+
     })
 
     experimental = Object.freeze({
