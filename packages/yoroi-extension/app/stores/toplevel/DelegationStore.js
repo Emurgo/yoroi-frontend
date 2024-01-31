@@ -1,27 +1,25 @@
 // @flow
 
-import { observable, action, } from 'mobx';
+import { action, observable, } from 'mobx';
 import { find } from 'lodash';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import {
-  PublicDeriver,
-} from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import { PublicDeriver, } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import Store from '../base/Store';
 import type {
+  GetCurrentDelegationFunc,
   GetDelegatedBalanceFunc,
   RewardHistoryFunc,
-  GetCurrentDelegationFunc,
+  GetDelegatedBalanceResponse,
 } from '../../api/common/lib/storage/bridge/delegationUtils';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import LocalizableError from '../../i18n/LocalizableError';
-import {
-  PoolMissingApiError,
-} from '../../api/common/errors';
+import { PoolMissingApiError, } from '../../api/common/errors';
 import type { MangledAmountFunc } from '../stateless/mangledAddresses';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import type { PoolInfo } from '@emurgo/yoroi-lib';
+import { MultiToken } from '../../api/common/lib/MultiToken';
 
 export type DelegationRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -118,6 +116,29 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     if (foundRequest) return foundRequest;
 
     return undefined; // can happen if the wallet is not a Shelley wallet
+  }
+
+  _getDelegatedBalanceResult: PublicDeriver<> => ?GetDelegatedBalanceResponse = (publicDeriver) => {
+    const delegationRequest = this.stores.delegation.getDelegationRequests(publicDeriver);
+    if (delegationRequest == null) return null;
+    return delegationRequest.getDelegatedBalance.result;
+  }
+
+  getRewardBalance: PublicDeriver<> => ?MultiToken = (publicDeriver) => {
+    if (this.stores.transactions.hasProcessedWithdrawals(publicDeriver)) {
+      // In case we have a processed withdrawal for the wallet
+      // We cancel out any still present reward, in case it has not synced yet
+      return null;
+    }
+    return this._getDelegatedBalanceResult(publicDeriver)?.accountPart ?? null;
+  }
+
+  getDelegatedPoolId: PublicDeriver<> => ?string = (publicDeriver) => {
+    return this._getDelegatedBalanceResult(publicDeriver)?.delegation ?? null;
+  }
+
+  isStakeRegistered: PublicDeriver<> => ?boolean = (publicDeriver) => {
+    return this._getDelegatedBalanceResult(publicDeriver)?.stakeRegistered ?? null;
   }
 
   getLocalPoolInfo: (

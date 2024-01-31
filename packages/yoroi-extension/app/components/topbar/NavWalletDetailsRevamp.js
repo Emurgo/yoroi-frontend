@@ -25,12 +25,7 @@ type Props = {|
   +shouldHideBalance: boolean,
   +highlightTitle?: boolean,
   +showEyeIcon?: boolean,
-  /**
-   * undefined => wallet is not a reward wallet
-   * null => still calculating
-   * value => done calculating
-   */
-  +rewards: null | void | MultiToken,
+  +rewards: ?MultiToken,
   +walletAmount: null | MultiToken,
   +infoText?: string,
   +showDetails?: boolean,
@@ -168,13 +163,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
     );
   }
 
-  getTotalAmount: void => null | MultiToken = () => {
-    if (this.props.rewards === undefined) {
-      return this.props.walletAmount;
-    }
-    if (this.props.rewards === null || this.props.walletAmount === null) {
-      return null;
-    }
-    return this.props.rewards.joinAddCopy(this.props.walletAmount);
+  getTotalAmount: void => ?MultiToken = () => {
+    return MultiToken.sumOrEitherNotNull(this.props.walletAmount, this.props.rewards);
   };
 }

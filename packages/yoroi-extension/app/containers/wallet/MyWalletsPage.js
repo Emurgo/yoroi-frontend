@@ -12,7 +12,6 @@ import { ROUTES } from '../../routes-config';
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { asGetPublicKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import { MultiToken } from '../../api/common/lib/MultiToken';
 import { genLookupOrFail, getTokenName } from '../../stores/stateless/tokenHelpers';
 import { getReceiveAddress } from '../../stores/stateless/addressStores';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
@@ -218,6 +217,7 @@ class MyWalletsPage extends Component<AllProps> {
     })();
 
     const balance = this.props.stores.transactions.getBalance(publicDeriver);
+    const rewards = this.props.stores.delegation.getRewardBalance(publicDeriver);
 
     const withPubKey = asGetPublicKey(publicDeriver);
     const plate =
@@ -237,7 +237,7 @@ class MyWalletsPage extends Component<AllProps> {
         walletSumDetails={
           <WalletDetails
             walletAmount={balance}
-            rewards={this.getRewardBalance(publicDeriver)}
+            rewards={rewards}
             // TODO: This should be probably bound to an individual wallet
             onUpdateHideBalance={this.updateHideBalance}
             shouldHideBalance={this.props.stores.profile.shouldHideBalance}
@@ -322,22 +322,6 @@ class MyWalletsPage extends Component<AllProps> {
     );
 
     return walletSubRow;
-  };
-
-  /**
-   * undefined => wallet is not a reward wallet
-   * null => still calculating
-   * value => done calculating
-   */
-  getRewardBalance: (PublicDeriver<>) => null | void | MultiToken = publicDeriver => {
-    const delegationRequest = this.props.stores.delegation.getDelegationRequests(publicDeriver);
-    if (delegationRequest == null) return undefined;
-
-    const balanceResult = delegationRequest.getDelegatedBalance.result;
-    if (balanceResult == null) {
-      return null;
-    }
-    return balanceResult.accountPart;
   };
 }
 export default (withLayout(MyWalletsPage): ComponentType<Props>);

@@ -28,7 +28,6 @@ import { asGetPublicKey } from '../../../api/ada/lib/storage/models/PublicDerive
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
 import NavPlate from '../../../components/topbar/NavPlate';
 import WalletDetails from '../../../components/wallet/my-wallets/WalletDetails';
-import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { ROUTES } from '../../../routes-config';
 
 const messages = defineMessages({
@@ -85,17 +84,6 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
 
   updateHideBalance: void => Promise<void> = async () => {
     await this.props.actions.profile.updateHideBalance.trigger();
-  };
-
-  getRewardBalance: (PublicDeriver<>) => null | void | MultiToken = publicDeriver => {
-    const delegationRequest = this.props.stores.delegation.getDelegationRequests(publicDeriver);
-    if (delegationRequest == null) return undefined;
-
-    const balanceResult = delegationRequest.getDelegatedBalance.result;
-    if (balanceResult == null) {
-      return null;
-    }
-    return balanceResult.accountPart;
   };
 
   openToTransactions: (PublicDeriver<>) => void = publicDeriver => {
@@ -162,6 +150,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           ? null
           : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
         const balance = this.props.stores.transactions.getBalance(publicDeriver);
+        const rewards = this.props.stores.delegation.getRewardBalance(publicDeriver);
 
         return (
           <WalletAlreadyExistDialog
@@ -169,7 +158,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
             walletSumDetails={
               <WalletDetails
                 walletAmount={balance}
-                rewards={this.getRewardBalance(publicDeriver)}
+                rewards={rewards}
                 onUpdateHideBalance={this.updateHideBalance}
                 shouldHideBalance={this.props.stores.profile.shouldHideBalance}
                 getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
