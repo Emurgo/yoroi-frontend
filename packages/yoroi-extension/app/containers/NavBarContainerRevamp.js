@@ -10,7 +10,6 @@ import { ROUTES } from '../routes-config';
 import { ConceptualWallet } from '../api/ada/lib/storage/models/ConceptualWallet/index';
 import { asGetPublicKey } from '../api/ada/lib/storage/models/PublicDeriver/traits';
 import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
-import { MultiToken } from '../api/common/lib/MultiToken';
 import { genLookupOrFail, getTokenName } from '../stores/stateless/tokenHelpers';
 import { networks } from '../api/ada/lib/storage/database/prepackaged/networks';
 import { addressToDisplayString } from '../api/ada/lib/storage/bridge/utils';

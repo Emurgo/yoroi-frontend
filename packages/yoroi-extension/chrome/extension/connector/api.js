@@ -1242,6 +1242,11 @@ export async function getAddressing(
     return rewardAddressing;
   }
 
+  const [ dRepPubKey, dRepAddressing ] = await _getDRepKeyAndAddressing(publicDeriver);
+  if (dRepPubKey.hash().to_hex() === address) {
+    return dRepAddressing;
+  }
+
   const withUtxos = asGetAllUtxos(publicDeriver);
   if (!withUtxos) {
     throw new Error('unable to get UTxO addresses from public deriver');
