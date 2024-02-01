@@ -1236,6 +1236,7 @@ Object {
     Object {
       "Backend": Object {
         "BackendService": "https://iohk-mainnet.yoroiwallet.com",
+        "BackendServiceZero": "https://yoroi-backend-zero-mainnet.emurgornd.com",
         "TokenInfoService": "https://cdn.yoroiwallet.com",
         "WebSocket": "wss://iohk-mainnet.yoroiwallet.com:443",
       },
@@ -1249,7 +1250,7 @@ Object {
           "StartAt": 0,
         },
         Object {
-          "CoinsPerUtxoWord": "34482",
+          "CoinsPerUtxoByte": "4310",
           "KeyDeposit": "2000000",
           "LinearFee": Object {
             "coefficient": "44",
@@ -1284,7 +1285,7 @@ Object {
           "StartAt": 0,
         },
         Object {
-          "CoinsPerUtxoWord": "34482",
+          "CoinsPerUtxoByte": "4310",
           "KeyDeposit": "2000000",
           "LinearFee": Object {
             "coefficient": "44",
@@ -1306,6 +1307,7 @@ Object {
     Object {
       "Backend": Object {
         "BackendService": "https://preprod-backend.yoroiwallet.com",
+        "BackendServiceZero": "https://yoroi-backend-zero-preprod.emurgornd.com",
         "TokenInfoService": "https://stage-cdn.yoroiwallet.com",
         "WebSocket": "wss://preprod-backend.yoroiwallet.com:443",
       },
@@ -1319,7 +1321,7 @@ Object {
           "StartAt": 0,
         },
         Object {
-          "CoinsPerUtxoWord": "34482",
+          "CoinsPerUtxoByte": "4310",
           "KeyDeposit": "2000000",
           "LinearFee": Object {
             "coefficient": "44",
@@ -1341,6 +1343,7 @@ Object {
     Object {
       "Backend": Object {
         "BackendService": "https://preview-backend.emurgornd.com",
+        "BackendServiceZero": "https://yoroi-backend-zero-preview.emurgornd.com",
         "TokenInfoService": "https://stage-cdn.yoroiwallet.com",
         "WebSocket": "wss://preview-backend.emurgornd.com:443",
       },
@@ -1354,7 +1357,7 @@ Object {
           "StartAt": 0,
         },
         Object {
-          "CoinsPerUtxoWord": "34482",
+          "CoinsPerUtxoByte": "4310",
           "KeyDeposit": "2000000",
           "LinearFee": Object {
             "coefficient": "44",
@@ -1389,7 +1392,7 @@ Object {
           "StartAt": 0,
         },
         Object {
-          "CoinsPerUtxoWord": "34482",
+          "CoinsPerUtxoByte": "4310",
           "KeyDeposit": "2000000",
           "LinearFee": Object {
             "coefficient": "44",

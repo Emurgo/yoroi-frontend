@@ -90,12 +90,12 @@ type SubmittedTransactionEntry = {|
   usedUtxos: Array<{| txHash: string, index: number |}>,
 |};
 
-function getCoinsPerUtxoWord(network: $ReadOnly<NetworkRow>): RustModule.WalletV4.BigNum {
+function getCoinsPerUtxoByte(network: $ReadOnly<NetworkRow>): RustModule.WalletV4.BigNum {
   const config = getCardanoHaskellBaseConfig(network).reduce(
     (acc, next) => Object.assign(acc, next),
     {}
   );
-  return RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord);
+  return RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoByte);
 }
 
 function newMultiToken(
@@ -405,12 +405,11 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const networkInfo = deriverParent.getNetworkInfo();
     const defaultToken = deriverParent.getDefaultToken();
     const isCardano = isCardanoHaskell(networkInfo);
-    const coinsPerUtxoWord = isCardano
-      ? getCoinsPerUtxoWord(networkInfo)
+    const coinsPerUtxoByte = isCardano
+      ? getCoinsPerUtxoByte(networkInfo)
       : RustModule.WalletV4.BigNum.zero();
 
     // <TODO:PLUTUS_SUPPORT>
-    const utxoHasDataHash = false;
 
     await (async () => {
       const canGetBalance = asGetBalance(publicDeriver);
@@ -435,11 +434,19 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
             const deposits: Array<RustModule.WalletV4.BigNum> = addressedUtxos.map(
               (u: CardanoAddressedUtxo) => {
                 try {
-                  return WalletV4.min_ada_required(
+                  const output = RustModule.WalletV4.TransactionOutput.new(
+                    // fixme: using a dummy common base address here. This is the longest address
+                    // to ensure safety but and not optimum.
+                    RustModule.WalletV4.Address.from_hex('0'.repeat(114)),
                     // $FlowFixMe[prop-missing]
                     cardanoValueFromRemoteFormat(u),
-                    utxoHasDataHash,
-                    coinsPerUtxoWord
+                  );
+                  // todo: set data hash here if necessary
+                  return WalletV4.min_ada_for_output(
+                    output,
+                    RustModule.WalletV4.DataCost.new_coins_per_byte(
+                      coinsPerUtxoByte
+                    ),
                   );
                 } catch (e) {
                   // eslint-disable-next-line no-console

@@ -83,7 +83,7 @@ export function sendAllUnsignedTx(
   absSlotNumber: BigNumber,
   protocolParams: {|
     linearFee: RustModule.WalletV4.LinearFee,
-    coinsPerUtxoWord: RustModule.WalletV4.BigNum,
+    coinsPerUtxoByte: RustModule.WalletV4.BigNum,
     poolDeposit: RustModule.WalletV4.BigNum,
     keyDeposit: RustModule.WalletV4.BigNum,
     networkId: number,
@@ -294,7 +294,7 @@ export function sendAllUnsignedTxFromUtxo(
   absSlotNumber: BigNumber,
   protocolParams: {|
     linearFee: RustModule.WalletV4.LinearFee,
-    coinsPerUtxoWord: RustModule.WalletV4.BigNum,
+    coinsPerUtxoByte: RustModule.WalletV4.BigNum,
     poolDeposit: RustModule.WalletV4.BigNum,
     keyDeposit: RustModule.WalletV4.BigNum,
     networkId: number,
@@ -399,7 +399,7 @@ export async function newAdaUnsignedTx(
   protocolParams: {|
     linearFeeCoefficient: string,
     linearFeeConstant: string,
-    coinsPerUtxoWord: string,
+    coinsPerUtxoByte: string,
     poolDeposit: string,
     keyDeposit: string,
     networkId: number,
@@ -467,7 +467,7 @@ export async function newAdaUnsignedTxForConnector(
   protocolParams: {|
     linearFeeCoefficient: string,
     linearFeeConstant: string,
-    coinsPerUtxoWord: string,
+    coinsPerUtxoByte: string,
     poolDeposit: string,
     keyDeposit: string,
     networkId: number,
@@ -539,7 +539,7 @@ export async function newAdaUnsignedTxFromUtxo(
   protocolParams: {|
     linearFeeCoefficient: string,
     linearFeeConstant: string,
-    coinsPerUtxoWord: string,
+    coinsPerUtxoByte: string,
     poolDeposit: string,
     keyDeposit: string,
     networkId: number,
@@ -560,7 +560,7 @@ export async function newAdaUnsignedTxFromUtxo(
       coefficient: protocolParams.linearFeeCoefficient,
       constant: protocolParams.linearFeeConstant,
     },
-    coinsPerUtxoWord: protocolParams.coinsPerUtxoWord,
+    coinsPerUtxoByte: protocolParams.coinsPerUtxoByte,
     poolDeposit: protocolParams.poolDeposit,
     keyDeposit: protocolParams.keyDeposit,
     maxValueSize: 5000,
@@ -718,7 +718,7 @@ export async function maxSendableADA(
         RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
         RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
       ),
-      coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord),
+      coinsPerUtxoByte: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoByte),
       poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
       networkId: network.NetworkId,
     };
@@ -822,7 +822,7 @@ async function newAdaUnsignedTxFromUtxoForConnector(
   protocolParams: {|
     linearFeeCoefficient: string,
     linearFeeConstant: string,
-    coinsPerUtxoWord: string,
+    coinsPerUtxoByte: string,
     poolDeposit: string,
     keyDeposit: string,
     networkId: number,
@@ -836,7 +836,7 @@ async function newAdaUnsignedTxFromUtxoForConnector(
       coefficient: protocolParams.linearFeeCoefficient,
       constant: protocolParams.linearFeeConstant,
     },
-    coinsPerUtxoWord: protocolParams.coinsPerUtxoWord,
+    coinsPerUtxoByte: protocolParams.coinsPerUtxoByte,
     poolDeposit: protocolParams.poolDeposit,
     keyDeposit: protocolParams.keyDeposit,
     maxValueSize: 5000,
@@ -1184,7 +1184,7 @@ export function genFilterSmallUtxo(request: {|
   const txBuilder = RustModule.WalletV4TxBuilder({
       linearFee: request.protocolParams.linearFee,
       // no need for the following parameters just to calculate the fee of adding a UTXO
-      coinsPerUtxoWord: RustModule.WalletV4.BigNum.zero(),
+      coinsPerUtxoByte: RustModule.WalletV4.BigNum.zero(),
       poolDeposit: RustModule.WalletV4.BigNum.zero(),
       keyDeposit: RustModule.WalletV4.BigNum.zero(),
   });

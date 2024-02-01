@@ -1073,7 +1073,7 @@ export default class AdaApi {
               RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
               RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
             ),
-            coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord),
+            coinsPerUtxoByte: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoByte),
             poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
             networkId: request.network.NetworkId,
           },
@@ -1131,7 +1131,7 @@ export default class AdaApi {
             keyDeposit: config.KeyDeposit,
             linearFeeCoefficient: config.LinearFee.coefficient,
             linearFeeConstant: config.LinearFee.constant,
-            coinsPerUtxoWord: config.CoinsPerUtxoWord,
+            coinsPerUtxoByte: config.CoinsPerUtxoByte,
             poolDeposit: config.PoolDeposit,
             networkId: request.network.NetworkId,
           },
@@ -1301,7 +1301,7 @@ export default class AdaApi {
       keyDeposit: config.KeyDeposit,
       linearFeeCoefficient: config.LinearFee.coefficient,
       linearFeeConstant: config.LinearFee.constant,
-      coinsPerUtxoWord: config.CoinsPerUtxoWord,
+      coinsPerUtxoByte: config.CoinsPerUtxoByte,
       poolDeposit: config.PoolDeposit,
       networkId: request.publicDeriver.getParent().networkInfo.NetworkId,
     };
@@ -1429,10 +1429,19 @@ export default class AdaApi {
       } else {
         RustModule.WasmScope(Scope => {
           // ensureRequiredMinimalValue is true
-          const minAmount = Scope.WalletV4.min_ada_required(
+          const output = RustModule.WalletV4.TransactionOutput.new(
+            Scope.WalletV4.Address.from_hex(target.address),
             cardanoValueFromMultiToken(amount),
-            dataHash != null,
-            RustModule.WalletV4.BigNum.from_str(protocolParams.coinsPerUtxoWord),
+          );
+          if (dataHash) {
+            output.set_data_hash(Scope.WalletV4.DataHash.from_hex(dataHash));
+          }
+
+          const minAmount = Scope.WalletV4.min_ada_for_output(
+            output,
+            RustModule.WalletV4.DataCost.new_coins_per_byte(
+              RustModule.WalletV4.BigNum.from_str(protocolParams.coinsPerUtxoByte)
+            ),
           );
 
           if ((new BigNumber(minAmount.to_str())).gt(new BigNumber(target.value ?? '0'))) {
@@ -1515,7 +1524,7 @@ export default class AdaApi {
         keyDeposit: config.KeyDeposit,
         linearFeeCoefficient: config.LinearFee.coefficient,
         linearFeeConstant: config.LinearFee.constant,
-        coinsPerUtxoWord: config.CoinsPerUtxoWord,
+        coinsPerUtxoByte: config.CoinsPerUtxoByte,
         poolDeposit: config.PoolDeposit,
         networkId: request.publicDeriver.getParent().networkInfo.NetworkId,
       };
@@ -1640,7 +1649,7 @@ export default class AdaApi {
         keyDeposit: config.KeyDeposit,
         linearFeeCoefficient: config.LinearFee.coefficient,
         linearFeeConstant: config.LinearFee.constant,
-        coinsPerUtxoWord: config.CoinsPerUtxoWord,
+        coinsPerUtxoByte: config.CoinsPerUtxoByte,
         poolDeposit: config.PoolDeposit,
         networkId: request.publicDeriver.getParent().networkInfo.NetworkId,
       };
@@ -1801,7 +1810,7 @@ export default class AdaApi {
         keyDeposit: config.KeyDeposit,
         linearFeeCoefficient: config.LinearFee.coefficient,
         linearFeeConstant: config.LinearFee.constant,
-        coinsPerUtxoWord: config.CoinsPerUtxoWord,
+        coinsPerUtxoByte: config.CoinsPerUtxoByte,
         poolDeposit: config.PoolDeposit,
         networkId: request.publicDeriver.getParent().networkInfo.NetworkId,
       };
