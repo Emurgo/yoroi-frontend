@@ -472,7 +472,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
           return newMultiToken(defaultToken);
         },
       });
-      this.stores.substores.ada.delegation.refreshDelegation(publicDeriver);
+      this.stores.substores.ada.delegation.refreshDelegation(request.publicDeriver);
       if (!getBalanceRequest.promise || !getAssetDepositRequest.promise)
         throw new Error('should never happen');
       await Promise.all([getBalanceRequest.promise, getAssetDepositRequest.promise]);
