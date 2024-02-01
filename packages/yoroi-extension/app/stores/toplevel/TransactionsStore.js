@@ -10,6 +10,7 @@ import type { GetBalanceFunc } from '../../api/common/types';
 import type {
   ExportTransactionsFunc,
   GetTransactionsFunc,
+  GetTransactionsResponse,
   RefreshPendingTransactionsFunc,
 } from '../../api/common/index';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
@@ -53,8 +54,6 @@ import { toRequestAddresses } from '../../api/ada/lib/storage/bridge/updateTrans
 import type { TransactionExportRow } from '../../api/export';
 import type { HistoryRequest } from '../../api/ada/lib/state-fetch/types';
 import appConfig from '../../config';
-import type { GetTransactionsResponse } from '../../api/common/index';
-
 
 export type TxHistoryState = {|
   publicDeriver: PublicDeriver<>,
@@ -360,7 +359,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       /*
        * TAIL REQUEST IS USED WHEN FIRST SYNC OR EMPTY WALLET
        */
-      result = await this._internalLoadMore(request.publicDeriver);
+      result = await this._internalTailRequestForTxs(request.publicDeriver);
     } else {
       /*
        * HEAD REQUEST IS USED WITH `AFTER` REFERENCE
@@ -484,9 +483,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     );
   }
 
-
-
-  _internalLoadMore: (
+  _internalTailRequestForTxs: (
     PublicDeriver<> & IGetLastSyncInfo,
   ) => Promise<GetTransactionsResponse> = async (
     publicDeriver: PublicDeriver<> & IGetLastSyncInfo,
@@ -520,7 +517,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   ) => Promise<void> = async (
     publicDeriver: PublicDeriver<> & IGetLastSyncInfo,
   ) => {
-    const result = await this._internalLoadMore(publicDeriver);
+    const result = await this._internalTailRequestForTxs(publicDeriver);
     await this._afterLoadingNewTxs(result, publicDeriver);
   }
 
