@@ -53,7 +53,7 @@ import { toRequestAddresses } from '../../api/ada/lib/storage/bridge/updateTrans
 import type { TransactionExportRow } from '../../api/export';
 import type { HistoryRequest } from '../../api/ada/lib/state-fetch/types';
 import appConfig from '../../config';
-import { GetTransactionsResponse } from '../../api/common/index';
+import type { GetTransactionsResponse } from '../../api/common/index';
 
 
 export type TxHistoryState = {|
