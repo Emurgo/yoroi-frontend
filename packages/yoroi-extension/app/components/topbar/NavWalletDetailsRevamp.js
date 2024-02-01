@@ -19,6 +19,7 @@ import WalletAccountIcon from './WalletAccountIcon';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import AmountDisplay from '../common/AmountDisplay';
 import { Box, IconButton, Typography } from '@mui/material';
+import { maybe } from '../../coreUtils';
 
 type Props = {|
   +onUpdateHideBalance: void => Promise<void>,
@@ -164,6 +165,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
   }
 
   getTotalAmount: void => ?MultiToken = () => {
-    return MultiToken.sumOrEitherNotNull(this.props.walletAmount, this.props.rewards);
+    return maybe(this.props.walletAmount,
+      w => this.props.rewards?.joinAddCopy(w) ?? w)
   };
 }
