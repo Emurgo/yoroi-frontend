@@ -53,6 +53,7 @@ import { toRequestAddresses } from '../../api/ada/lib/storage/bridge/updateTrans
 import type { TransactionExportRow } from '../../api/export';
 import type { HistoryRequest } from '../../api/ada/lib/state-fetch/types';
 import appConfig from '../../config';
+import { GetTransactionsResponse } from '../../api/common/index';
 
 
 export type TxHistoryState = {|
@@ -348,49 +349,49 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const txHistoryState = this.getTxHistoryState(request.publicDeriver);
     const isEmptyHistory = txHistoryState.txs.length === 0;
 
-    if (isEmptyHistory) {
-      /*
-       * TAIL REQUEST IS USED WHEN FIRST SYNC OR EMPTY WALLET
-       */
-      return await this._loadMore(request.publicDeriver);
-    }
-
-    /*
-     * HEAD REQUEST IS USED WITH `AFTER` REFERENCE
-     * WHEN NON-EMPTY WALLET
-     */
-
     const {
       headRequest,
       getBalanceRequest,
       getAssetDepositRequest
     } = txHistoryState.requests;
 
-    headRequest.invalidate({ immediately: false });
-    headRequest.execute({
-      publicDeriver,
-      isLocalRequest: false,
-      afterTx: txHistoryState.txs[0],
-    });
-    if (headRequest.promise == null) {
-      throw new Error('unexpected nullish headRequest.promise');
-    }
-    const result = await headRequest.promise;
-    {
-      /**
-       * Adding received txs to the start of the existing history
+    let result;
+    if (isEmptyHistory) {
+      /*
+       * TAIL REQUEST IS USED WHEN FIRST SYNC OR EMPTY WALLET
        */
-      const { txs } = this.getTxHistoryState(request.publicDeriver);
-      runInAction(() => {
-        for (let i = 0; i < result.length; i++) {
-          const tx = result[i];
-          if (tx.txid === txs[0]?.txid) {
-            // In case received tx matches with the existing one - stop
-            break;
-          }
-          txs.splice(i, 0, tx);
-        }
+      result = await this._internalLoadMore(request.publicDeriver);
+    } else {
+      /*
+       * HEAD REQUEST IS USED WITH `AFTER` REFERENCE
+       * WHEN NON-EMPTY WALLET
+       */
+      headRequest.invalidate({ immediately: false });
+      headRequest.execute({
+        publicDeriver,
+        isLocalRequest: false,
+        afterTx: txHistoryState.txs[0],
       });
+      if (headRequest.promise == null) {
+        throw new Error('unexpected nullish headRequest.promise');
+      }
+      result = await headRequest.promise;
+      {
+        /**
+         * Adding received txs to the start of the existing history
+         */
+        const { txs } = this.getTxHistoryState(request.publicDeriver);
+        runInAction(() => {
+          for (let i = 0; i < result.length; i++) {
+            const tx = result[i];
+            if (tx.txid === txs[0]?.txid) {
+              // In case received tx matches with the existing one - stop
+              break;
+            }
+            txs.splice(i, 0, tx);
+          }
+        });
+      }
     }
 
     // update last sync (note: changes even if no new transaction is found)
@@ -483,9 +484,11 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     );
   }
 
-  @action _loadMore: (
+
+
+  _internalLoadMore: (
     PublicDeriver<> & IGetLastSyncInfo,
-  ) => Promise<void> = async (
+  ) => Promise<GetTransactionsResponse> = async (
     publicDeriver: PublicDeriver<> & IGetLastSyncInfo,
   ) => {
     const withLevels = asHasLevels<ConceptualWallet, IGetLastSyncInfo>(publicDeriver);
@@ -509,10 +512,16 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       state.txs.splice(state.txs.length, 0, ...result);
       state.hasMoreToLoad = result.length >= appConfig.wallets.MAX_RECENT_TXS_PER_LOAD;
     });
-    await this._afterLoadingNewTxs(
-      result,
-      publicDeriver,
-    );
+    return result;
+  }
+
+  @action _loadMore: (
+    PublicDeriver<> & IGetLastSyncInfo,
+  ) => Promise<void> = async (
+    publicDeriver: PublicDeriver<> & IGetLastSyncInfo,
+  ) => {
+    const result = await this._internalLoadMore(publicDeriver);
+    await this._afterLoadingNewTxs(result, publicDeriver);
   }
 
   /** Add a new public deriver to track and refresh the data */
