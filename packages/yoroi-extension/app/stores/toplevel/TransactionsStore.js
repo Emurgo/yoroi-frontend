@@ -10,6 +10,7 @@ import type { GetBalanceFunc } from '../../api/common/types';
 import type {
   ExportTransactionsFunc,
   GetTransactionsFunc,
+  GetTransactionsResponse,
   RefreshPendingTransactionsFunc,
 } from '../../api/common/index';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
@@ -52,7 +53,7 @@ import { getAllAddressesForWallet } from '../../api/ada/lib/storage/bridge/trait
 import { toRequestAddresses } from '../../api/ada/lib/storage/bridge/updateTransactions'
 import type { TransactionExportRow } from '../../api/export';
 import type { HistoryRequest } from '../../api/ada/lib/state-fetch/types';
-
+import appConfig from '../../config';
 
 export type TxHistoryState = {|
   publicDeriver: PublicDeriver<>,
@@ -348,7 +349,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const isEmptyHistory = txHistoryState.txs.length === 0;
 
     const {
-      tailRequest,
       headRequest,
       getBalanceRequest,
       getAssetDepositRequest
@@ -357,17 +357,9 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     let result;
     if (isEmptyHistory) {
       /*
-       * TAIL REQUEST IS USED WHEN FIRST SYNC OR EMPRY WALLET
+       * TAIL REQUEST IS USED WHEN FIRST SYNC OR EMPTY WALLET
        */
-      tailRequest.invalidate({ immediately: false });
-      tailRequest.execute({
-        publicDeriver,
-        isLocalRequest: request.isLocalRequest
-      });
-      if (tailRequest.promise == null) {
-        throw new Error('unexpected nullish tailRequest.promise');
-      }
-      result = await tailRequest.promise;
+      result = await this._internalTailRequestForTxs(request.publicDeriver);
     } else {
       /*
        * HEAD REQUEST IS USED WITH `AFTER` REFERENCE
@@ -383,22 +375,22 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
         throw new Error('unexpected nullish headRequest.promise');
       }
       result = await headRequest.promise;
-    }
-    {
-      /**
-       * Adding received txs to the start of the existing history
-       */
-      const { txs } = this.getTxHistoryState(request.publicDeriver);
-      runInAction(() => {
-        for (let i = 0; i < result.length; i++) {
-          const tx = result[i];
-          if (tx.txid === txs[0]?.txid) {
-            // In case received tx matches with the existing one - stop
-            break;
+      {
+        /**
+         * Adding received txs to the start of the existing history
+         */
+        const { txs } = this.getTxHistoryState(request.publicDeriver);
+        runInAction(() => {
+          for (let i = 0; i < result.length; i++) {
+            const tx = result[i];
+            if (tx.txid === txs[0]?.txid) {
+              // In case received tx matches with the existing one - stop
+              break;
+            }
+            txs.splice(i, 0, tx);
           }
-          txs.splice(i, 0, tx);
-        }
-      });
+        });
+      }
     }
 
     // update last sync (note: changes even if no new transaction is found)
@@ -491,9 +483,9 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     );
   }
 
-  @action _loadMore: (
+  _internalTailRequestForTxs: (
     PublicDeriver<> & IGetLastSyncInfo,
-  ) => Promise<void> = async (
+  ) => Promise<GetTransactionsResponse> = async (
     publicDeriver: PublicDeriver<> & IGetLastSyncInfo,
   ) => {
     const withLevels = asHasLevels<ConceptualWallet, IGetLastSyncInfo>(publicDeriver);
@@ -511,17 +503,22 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       isLocalRequest: false,
       beforeTx,
     });
-    if (!tailRequest.promise) throw new Error('should never happen');
+    if (!tailRequest.promise) throw new Error('unexpected nullish tailRequest.promise');
     const result = await tailRequest.promise;
     runInAction(() => {
       state.txs.splice(state.txs.length, 0, ...result);
-      state.hasMoreToLoad = result.length > 0;
+      state.hasMoreToLoad = result.length >= appConfig.wallets.MAX_RECENT_TXS_PER_LOAD;
     });
+    return result;
+  }
 
-    await this._afterLoadingNewTxs(
-      result,
-      publicDeriver,
-    );
+  @action _loadMore: (
+    PublicDeriver<> & IGetLastSyncInfo,
+  ) => Promise<void> = async (
+    publicDeriver: PublicDeriver<> & IGetLastSyncInfo,
+  ) => {
+    const result = await this._internalTailRequestForTxs(publicDeriver);
+    await this._afterLoadingNewTxs(result, publicDeriver);
   }
 
   /** Add a new public deriver to track and refresh the data */
