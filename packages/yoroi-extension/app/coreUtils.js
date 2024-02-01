@@ -94,6 +94,19 @@ export function compose<A,B,C>(f1: A => ?B, f2: B => ?C): (A => ?C) {
   return a => maybe(f1(a), f2);
 }
 
+/**
+ * Does nothing
+ */
 export function noop(..._: any[]) {
   // noop
+}
+
+/**
+ * Return arg in case it's not nullish, otherwise fail
+ */
+export function nonNull<T>(t: ?T): T {
+  if (t == null) {
+    throw new Error('unexpected nullish value');
+  }
+  return t;
 }
