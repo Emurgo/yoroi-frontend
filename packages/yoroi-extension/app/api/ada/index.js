@@ -596,7 +596,8 @@ export const FETCH_TXS_BATCH_SIZE = 20;
 const UPDATE_NETWORK_IDS = [
   networks.CardanoMainnet.NetworkId,
   networks.CardanoPreprodTestnet.NetworkId,
-  networks.CardanoPreviewTestnet.NetworkId
+  networks.CardanoPreviewTestnet.NetworkId,
+  networks.CardanoSanchoTestnet.NetworkId,
 ];
 
 export default class AdaApi {

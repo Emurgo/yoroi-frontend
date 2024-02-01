@@ -575,10 +575,7 @@ export class RemoteFetcher implements IFetcher {
       }
     ).then(response => ({
       LinearFee: response.data.linearFee,
-      // <TODO:FIX> This param does not exist anymore and is not in the response, we need to upgrade locally to not rely on it
-      MinimumUtxoVal: response.data.minimumUtxoVal,
-      // <TODO:FIX> This param is replaced with `coinsPerUtxoByte` we need to upgrade to use the new one entirely locally
-      CoinsPerUtxoWord: response.data.coinsPerUtxoWord,
+      CoinsPerUtxoByte: response.data.coinsPerUtxoByte,
       PoolDeposit: response.data.poolDeposit,
       KeyDeposit: response.data.keyDeposit,
     }));

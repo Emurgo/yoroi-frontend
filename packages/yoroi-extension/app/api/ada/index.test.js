@@ -655,8 +655,7 @@ test('update protcol parameters', async () => {
       coefficient: '42',
       constant: '42',
     },
-    MinimumUtxoVal: '42',
-    CoinsPerUtxoWord: '42',
+    CoinsPerUtxoByte: '42',
     PoolDeposit: '42',
     KeyDeposit: '42',
   };
