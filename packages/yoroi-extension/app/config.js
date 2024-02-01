@@ -13,6 +13,7 @@ export default Object.freeze({
     WALLET_RECOVERY_PHRASE_WORD_COUNT: (15: 15),
     DAEDALUS_SHELLEY_RECOVERY_PHRASE_WORD_COUNT: (24: 24),
     YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT: (21: 21),
+    MAX_RECENT_TXS_PER_LOAD: (20: 20),
     hardwareWallet: {
       trezorT: {
         VENDOR: 'trezor.io',

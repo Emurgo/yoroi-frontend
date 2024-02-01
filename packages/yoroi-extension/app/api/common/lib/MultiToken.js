@@ -26,16 +26,6 @@ export class MultiToken {
   values: Array<TokenEntry>;
   defaults: DefaultTokenEntry;
 
-  /**
-   * If both passed tokens are not null - they are added.
-   * If either is null - the one not null is returned.
-   * If both is null - null is returned.
-   */
-  static sumOrEitherNotNull(token1: ?MultiToken, token2: ?MultiToken): ?MultiToken {
-    if (token1 == null || token2 == null) return token1 ?? token2;
-    return token1.joinAddCopy(token2);
-  }
-
   static from(multiTokenData: {|
     values: Array<{| identifier: string, networkId: number, amount: string |}>,
     defaults: DefaultTokenEntry,

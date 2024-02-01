@@ -15,7 +15,6 @@ import { ROUTES } from '../routes-config';
 import { asGetPublicKey } from '../api/ada/lib/storage/models/PublicDeriver/traits';
 import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { MultiToken } from '../api/common/lib/MultiToken';
 import { genLookupOrFail } from '../stores/stateless/tokenHelpers';
 import BuySellDialog from '../components/buySell/BuySellDialog';
 import globalMessages from '../i18n/global-messages';
@@ -57,7 +56,8 @@ export default class NavBarContainer extends Component<Props> {
     const wallets = this.props.stores.wallets.publicDerivers;
 
     const walletComponents = wallets.map(wallet => {
-      const balance = this.props.stores.transactions.balance;
+      const balance = this.props.stores.transactions.getBalance(wallet);
+      const rewards = this.props.stores.delegation.getRewardBalance(wallet);
       const lastSyncInfo = this.props.stores.transactions.lastSyncInfo;
 
       const parent = wallet.getParent();
@@ -81,9 +81,9 @@ export default class NavBarContainer extends Component<Props> {
           detailComponent={
             <NavWalletDetails
               walletAmount={balance}
+              rewards={rewards}
               onUpdateHideBalance={this.updateHideBalance}
               shouldHideBalance={profile.shouldHideBalance}
-              rewards={this.getRewardBalance(wallet)}
               getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
               defaultToken={this.props.stores.tokenInfoStore.getDefaultTokenInfo(
                 wallet.getParent().getNetworkInfo().NetworkId
@@ -114,13 +114,14 @@ export default class NavBarContainer extends Component<Props> {
           return <NoWalletsDropdown />;
         }
 
-        const balance = this.props.stores.transactions.balance;
+        const balance = this.props.stores.transactions.getBalance(publicDeriver);
+        const rewards = this.props.stores.delegation.getRewardBalance(publicDeriver);
 
         return (
           <NavWalletDetails
             onUpdateHideBalance={this.updateHideBalance}
             shouldHideBalance={profile.shouldHideBalance}
-            rewards={this.getRewardBalance(publicDeriver)}
+            rewards={rewards}
             walletAmount={balance}
             getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
             defaultToken={this.props.stores.tokenInfoStore.getDefaultTokenInfo(
@@ -168,8 +169,4 @@ export default class NavBarContainer extends Component<Props> {
       <NavBar title={this.props.title} walletPlate={getPlate()} walletDetails={dropdownComponent} />
     );
   }
-
-  getRewardBalance: (PublicDeriver<>) => ?MultiToken = publicDeriver => {
-    return this.props.stores.delegation.getRewardBalance(publicDeriver);
-  };
 }

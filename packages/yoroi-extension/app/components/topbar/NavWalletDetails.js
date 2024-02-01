@@ -1,29 +1,27 @@
-
 // @flow
+import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import type { Node } from 'react';
 import classnames from 'classnames';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape, } from 'react-intl';
 import { truncateToken } from '../../utils/formatters';
 
 import globalMessages from '../../i18n/global-messages';
 import styles from './NavWalletDetails.scss';
-import { ReactComponent as IconEyeOpen }  from '../../assets/images/my-wallets/icon_eye_open.inline.svg';
-import { ReactComponent as IconEyeClosed }  from '../../assets/images/my-wallets/icon_eye_closed.inline.svg';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { ReactComponent as IconEyeOpen } from '../../assets/images/my-wallets/icon_eye_open.inline.svg';
+import { ReactComponent as IconEyeClosed } from '../../assets/images/my-wallets/icon_eye_closed.inline.svg';
 import WalletCurrency from '../wallet/my-wallets/WalletCurrency';
 import { hiddenAmount } from '../../utils/strings';
+import type { TokenLookupKey, } from '../../api/common/lib/MultiToken';
 import { MultiToken } from '../../api/common/lib/MultiToken';
-import type {
-  TokenLookupKey,
-} from '../../api/common/lib/MultiToken';
 import { getTokenName } from '../../stores/stateless/tokenHelpers';
 import { calculateAndFormatValue } from '../../utils/unit-of-account';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 import { Box } from '@mui/system';
+import { maybe } from '../../coreUtils';
 
 type Props = {|
   +onUpdateHideBalance: void => Promise<void>,
@@ -168,7 +166,8 @@ export default class NavWalletDetails extends Component<Props> {
   }
 
   getTotalAmount: void => ?MultiToken = () => {
-    return MultiToken.sumOrEitherNotNull(this.props.walletAmount, this.props.rewards);
+    return maybe(this.props.walletAmount,
+      w => this.props.rewards?.joinAddCopy(w) ?? w)
   }
 
   renderAmountDisplay: {|

@@ -19,6 +19,7 @@ import { Draggable } from 'react-beautiful-dnd';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import AmountDisplay from '../common/AmountDisplay';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
+import { maybe } from '../../coreUtils';
 
 const messages = defineMessages({
   tokenTypes: {
@@ -190,7 +191,8 @@ export default class WalletCard extends Component<Props, State> {
   }
 
   getTotalAmount: void => ?MultiToken = () => {
-    return MultiToken.sumOrEitherNotNull(this.props.walletAmount, this.props.rewards);
+    return maybe(this.props.walletAmount,
+      w => this.props.rewards?.joinAddCopy(w) ?? w)
   };
 
   countTokenTypes: void => {|tokenTypes: number, nfts: number|} = () => {
