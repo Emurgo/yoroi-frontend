@@ -1,5 +1,5 @@
-import type { Node } from 'react';
 // @flow
+import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
