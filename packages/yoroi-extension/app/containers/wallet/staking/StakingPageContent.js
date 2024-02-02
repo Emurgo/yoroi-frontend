@@ -21,7 +21,6 @@ import { Box, styled } from '@mui/system';
 import SummaryCard from '../../../components/wallet/staking/dashboard-revamp/SummaryCard';
 import EpochProgressWrapper from '../../../components/wallet/staking/dashboard-revamp/EpochProgressWrapper';
 import OverviewModal from '../../../components/wallet/staking/dashboard-revamp/OverviewDialog';
-import LocalizableError from '../../../i18n/LocalizableError';
 import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer';
 import DeregisterDialogContainer from '../../transfer/DeregisterDialogContainer';
