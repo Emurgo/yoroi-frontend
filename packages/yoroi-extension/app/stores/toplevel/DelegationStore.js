@@ -20,6 +20,7 @@ import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import type { PoolInfo } from '@emurgo/yoroi-lib';
 import { MultiToken } from '../../api/common/lib/MultiToken';
+import { maybe } from '../../coreUtils';
 
 export type DelegationRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -123,6 +124,12 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
   // <TODO:PENDING_REMOVAL> legacy after removing bip44
   isRewardWallet: PublicDeriver<> => boolean = (publicDeriver) => {
     return this.getDelegationRequests(publicDeriver) != null;
+  }
+
+  canUnmangleSomeUtxo: PublicDeriver<> => boolean = (publicDeriver) => {
+    const canUnmangleAmount: ?MultiToken = this.getDelegationRequests(publicDeriver)
+      ?.mangledAmounts.result?.canUnmangle;
+    return maybe(canUnmangleAmount, t => t.getDefault().gt(0)) ?? false;
   }
 
   isExecutedDelegatedBalance: PublicDeriver<> => boolean = (publicDeriver) => {

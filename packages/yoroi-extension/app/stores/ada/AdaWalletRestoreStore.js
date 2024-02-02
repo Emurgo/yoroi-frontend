@@ -142,6 +142,7 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
     }
     return AdaApi.isValidMnemonic({
       mnemonic,
+      // $FlowIgnore[prop-missing]
       numberOfWords: request.mode.length ?? 0,
     });
   };
