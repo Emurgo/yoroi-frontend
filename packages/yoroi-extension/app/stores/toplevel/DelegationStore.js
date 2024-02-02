@@ -119,9 +119,13 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
   }
 
   _getDelegatedBalanceResult: PublicDeriver<> => ?GetDelegatedBalanceResponse = (publicDeriver) => {
-    const delegationRequest = this.stores.delegation.getDelegationRequests(publicDeriver);
+    const delegationRequest = this.getDelegationRequests(publicDeriver);
     if (delegationRequest == null) return null;
     return delegationRequest.getDelegatedBalance.result;
+  }
+
+  isExecutedDelegatedBalance: PublicDeriver<> => boolean = (publicDeriver) => {
+    return this.getDelegationRequests(publicDeriver)?.getDelegatedBalance.wasExecuted === true;
   }
 
   getRewardBalance: PublicDeriver<> => ?MultiToken = (publicDeriver) => {
@@ -133,8 +137,20 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     return this._getDelegatedBalanceResult(publicDeriver)?.accountPart ?? null;
   }
 
+  getDelegatedUtxoBalance: PublicDeriver<> => ?MultiToken = (publicDeriver) => {
+    return this._getDelegatedBalanceResult(publicDeriver)?.utxoPart ?? null;
+  }
+
   getDelegatedPoolId: PublicDeriver<> => ?string = (publicDeriver) => {
     return this._getDelegatedBalanceResult(publicDeriver)?.delegation ?? null;
+  }
+
+  isCurrentlyDelegating: PublicDeriver<> => boolean = (publicDeriver) => {
+    return this.getDelegatedPoolId(publicDeriver) != null;
+  }
+
+  isStakeRegistered: PublicDeriver<> => ?boolean = (publicDeriver) => {
+    return this._getDelegatedBalanceResult(publicDeriver)?.stakeRegistered ?? null;
   }
 
   isStakeRegistered: PublicDeriver<> => ?boolean = (publicDeriver) => {

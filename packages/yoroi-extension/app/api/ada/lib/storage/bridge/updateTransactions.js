@@ -261,7 +261,7 @@ export async function rawGetTransactions(
   ...UserAnnotation,
 |}>,
 |}> {
-  const publicDeriver = request.publicDeriver;
+  const { publicDeriver } = request;
   const {
     addresses,
     txIds,
@@ -275,7 +275,7 @@ export async function rawGetTransactions(
       GetDerivationSpecific: deps.GetDerivationSpecific,
       GetCertificates: deps.GetCertificates,
     },
-    { publicDeriver: publicDeriver },
+    { publicDeriver },
     derivationTables,
   );
   const blockMap = new Map<number, null | $ReadOnly<BlockRow>>();
