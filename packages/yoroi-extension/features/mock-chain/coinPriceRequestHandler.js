@@ -8,13 +8,14 @@ import type {
 
 const CURRENCIES = ['BTC', 'ETH', 'USD', 'KRW', 'JPY', 'EUR', 'CNY'];
 
-function genPrivKeyFunc(key: string) {
-  return () => RustModule.WalletV3.PrivateKey.from_extended_bytes(Buffer.from(
-    key,
-    'hex',
-  ));
+function genPrivKeyFunc(key: string): void => RustModule.WalletV4.PrivateKey {
+  return () => RustModule.WalletV4.PrivateKey
+    .from_extended_bytes(Buffer.from(key, 'hex'));
 }
-let getPrivKey = genPrivKeyFunc('c8fc9467abae3c3396854ed25c59cc1d9a8ef3db9772f4cb0f074181ba4cad57eaa923bc58cbf6aff0aa34541e015d6cb6cf74b48d35f05f0ec4a907df64bad2');
+let getPrivKey = genPrivKeyFunc(
+  // eslint-disable-next-line max-len
+  'c8fc9467abae3c3396854ed25c59cc1d9a8ef3db9772f4cb0f074181ba4cad57eaa923bc58cbf6aff0aa34541e015d6cb6cf74b48d35f05f0ec4a907df64bad2'
+);
 
 let pubKeyDataReplacement;
 let pubKeyDataSignature;
