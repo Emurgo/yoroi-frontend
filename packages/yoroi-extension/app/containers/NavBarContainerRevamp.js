@@ -43,7 +43,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
 
   onSelectWallet: (PublicDeriver<>) => void = newWallet => {
     const { delegation, app } = this.props.stores;
-    const isRewardWallet = !!delegation.getDelegationRequests(newWallet);
+    const isRewardWallet = delegation.isRewardWallet(newWallet);
     const isStakingPage = app.currentRoute === ROUTES.STAKING;
 
     const route = !isRewardWallet && isStakingPage ? ROUTES.WALLETS.ROOT : app.currentRoute;

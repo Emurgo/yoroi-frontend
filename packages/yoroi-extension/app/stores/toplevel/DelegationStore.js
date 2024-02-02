@@ -120,6 +120,11 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     return delegationRequest.getDelegatedBalance.result;
   }
 
+  // <TODO:PENDING_REMOVAL> legacy after removing bip44
+  isRewardWallet: PublicDeriver<> => boolean = (publicDeriver) => {
+    return this.getDelegationRequests(publicDeriver) != null;
+  }
+
   isExecutedDelegatedBalance: PublicDeriver<> => boolean = (publicDeriver) => {
     return this.getDelegationRequests(publicDeriver)?.getDelegatedBalance.wasExecuted === true;
   }
