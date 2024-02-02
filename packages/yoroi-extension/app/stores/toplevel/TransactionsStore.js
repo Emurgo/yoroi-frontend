@@ -286,13 +286,13 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   ) => Promise<void> = async (result: Array<WalletTransaction>, publicDeriver: PublicDeriver<>) => {
     const timestamps: Set<number> = new Set();
     const remoteTransactionIds: Set<string> = new Set();
-    let walletHasWithdrawal = false;
+    const withdrawalIds = new Set<string>();
     for (const tx of result) {
       const { txid, date } = tx;
       timestamps.add(date.valueOf());
       remoteTransactionIds.add(txid);
       if (tx instanceof CardanoShelleyTransaction && tx.withdrawals.length > 0) {
-        walletHasWithdrawal = true;
+        withdrawalIds.add(txid);
       }
     }
     const defaultTokenInfo = this.stores.tokenInfoStore.getDefaultTokenInfo(
@@ -309,12 +309,15 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     });
 
     let submittedTransactionsChanged = false;
+    let addedProcessedWithdrawal = false;
     runInAction(() => {
       for (let i = 0; i < this._submittedTransactions.length; ) {
-        if (remoteTransactionIds.has(this._submittedTransactions[i].transaction.txid)) {
-          if (walletHasWithdrawal) {
+        const txId = this._submittedTransactions[i].transaction.txid;
+        if (remoteTransactionIds.has(txId)) {
+          if (withdrawalIds.has(txId) && !addedProcessedWithdrawal) {
             // Set local processed withdrawals only if there was a pending local transaction
             this._processedWithdrawals.push(publicDeriver.publicDeriverId);
+            addedProcessedWithdrawal = true;
           }
           this._submittedTransactions.splice(i, 1);
           submittedTransactionsChanged = true;
@@ -472,10 +475,15 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
           return newMultiToken(defaultToken);
         },
       });
-      this.stores.substores.ada.delegation.refreshDelegation(request.publicDeriver);
+      const refreshDelegationPromise =
+        this.stores.substores.ada.delegation.refreshDelegation(request.publicDeriver);
       if (!getBalanceRequest.promise || !getAssetDepositRequest.promise)
         throw new Error('should never happen');
-      await Promise.all([getBalanceRequest.promise, getAssetDepositRequest.promise]);
+      await Promise.all([
+        getBalanceRequest.promise,
+        getAssetDepositRequest.promise,
+        refreshDelegationPromise,
+      ]);
     })();
 
     await this._afterLoadingNewTxs(
