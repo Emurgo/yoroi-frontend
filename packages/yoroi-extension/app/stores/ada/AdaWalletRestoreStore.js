@@ -137,16 +137,12 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
   |}) => boolean = request => {
     const { mnemonic } = request;
     if (request.mode.extra === 'paper') {
+      // <TODO:PENDING_REMOVAL> paper
       return this.api.ada.isValidPaperMnemonic({ mnemonic, numberOfWords: request.mode.length });
-    }
-    if (!request.mode.length) {
-      throw new Error(
-        `${nameof(AdaWalletRestoreStore)}::${nameof(this.isValidMnemonic)} missing length`
-      );
     }
     return AdaApi.isValidMnemonic({
       mnemonic,
-      numberOfWords: request.mode.length,
+      numberOfWords: request.mode.length ?? 0,
     });
   };
 }

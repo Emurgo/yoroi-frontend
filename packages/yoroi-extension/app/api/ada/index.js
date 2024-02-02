@@ -1884,12 +1884,14 @@ export default class AdaApi {
     return isValidBip39Mnemonic(request.mnemonic, request.numberOfWords);
   }
 
+  // <TODO:PENDING_REMOVAL> paper
   isValidPaperMnemonic(
     request: IsValidPaperMnemonicRequest
   ): IsValidPaperMnemonicResponse {
     return isValidEnglishAdaPaperMnemonic(request.mnemonic, request.numberOfWords);
   }
 
+  // <TODO:PENDING_REMOVAL> paper
   unscramblePaperMnemonic(
     request: UnscramblePaperMnemonicRequest
   ): UnscramblePaperMnemonicResponse {

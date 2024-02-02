@@ -120,6 +120,7 @@ export default class YoroiTransferStore extends Store<StoresMap, ActionsMap> {
     };
   }
 
+  // <TODO:PENDING_REMOVAL> paper
   _setupTransferFundsWithPaperMnemonic: {|
     recoveryPhrase: string,
     paperPassword: string,
