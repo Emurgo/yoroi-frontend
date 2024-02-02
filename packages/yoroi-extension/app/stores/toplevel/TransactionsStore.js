@@ -489,7 +489,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     boolean,
   ) => Promise<GetTransactionsResponse> = async (
     publicDeriver: PublicDeriver<> & IGetLastSyncInfo,
-    isLocalRequest = false,
+    isLocalRequest,
   ) => {
     const withLevels = asHasLevels<ConceptualWallet, IGetLastSyncInfo>(publicDeriver);
     if (withLevels == null) {
@@ -520,7 +520,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   ) => Promise<void> = async (
     publicDeriver: PublicDeriver<> & IGetLastSyncInfo,
   ) => {
-    const result = await this._internalTailRequestForTxs(publicDeriver);
+    const result = await this._internalTailRequestForTxs(publicDeriver, false);
     await this._afterLoadingNewTxs(result, publicDeriver);
   }
 
