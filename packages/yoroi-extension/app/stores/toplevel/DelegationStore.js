@@ -108,14 +108,10 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     this.selectedPage = 0;
   }
 
-  // TODO: refine input type to staking key wallets only
   getDelegationRequests: PublicDeriver<> => void | DelegationRequests = (
     publicDeriver
   ) => {
-    const foundRequest = find(this.delegationRequests, { publicDeriver });
-    if (foundRequest) return foundRequest;
-
-    return undefined; // can happen if the wallet is not a Shelley wallet
+    return find(this.delegationRequests, { publicDeriver });
   }
 
   _getDelegatedBalanceResult: PublicDeriver<> => ?GetDelegatedBalanceResponse = (publicDeriver) => {
