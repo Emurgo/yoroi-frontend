@@ -362,7 +362,10 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       /*
        * TAIL REQUEST IS USED WHEN FIRST SYNC OR EMPTY WALLET
        */
-      result = await this._internalTailRequestForTxs(request.publicDeriver);
+      result = await this._internalTailRequestForTxs({
+        publicDeriver: request.publicDeriver,
+        isLocalRequest: request.isLocalRequest,
+      });
     } else {
       /*
        * HEAD REQUEST IS USED WITH `AFTER` REFERENCE
@@ -371,6 +374,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       headRequest.invalidate({ immediately: false });
       headRequest.execute({
         publicDeriver,
+        // HEAD request is never local by logic
         isLocalRequest: false,
         afterTx: txHistoryState.txs[0],
       });
@@ -492,11 +496,13 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     );
   }
 
-  _internalTailRequestForTxs: (
-    PublicDeriver<> & IGetLastSyncInfo,
-  ) => Promise<GetTransactionsResponse> = async (
+  _internalTailRequestForTxs: ({|
     publicDeriver: PublicDeriver<> & IGetLastSyncInfo,
-  ) => {
+    isLocalRequest?: boolean,
+  |}) => Promise<GetTransactionsResponse> = async ({
+    publicDeriver,
+    isLocalRequest = false,
+  }) => {
     const withLevels = asHasLevels<ConceptualWallet, IGetLastSyncInfo>(publicDeriver);
     if (withLevels == null) {
       throw new Error(`${nameof(this._loadMore)} no levels`);
@@ -509,7 +515,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     tailRequest.invalidate({ immediately: false });
     tailRequest.execute({
       publicDeriver: withLevels,
-      isLocalRequest: false,
+      isLocalRequest,
       beforeTx,
     });
     if (!tailRequest.promise) throw new Error('unexpected nullish tailRequest.promise');
@@ -526,7 +532,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   ) => Promise<void> = async (
     publicDeriver: PublicDeriver<> & IGetLastSyncInfo,
   ) => {
-    const result = await this._internalTailRequestForTxs(publicDeriver);
+    const result = await this._internalTailRequestForTxs({ publicDeriver });
     await this._afterLoadingNewTxs(result, publicDeriver);
   }
 
