@@ -327,9 +327,8 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       this.publicDerivers.push(...newWithCachedData);
     });
     setTimeout(async () => {
-      for (const publicDeriver of newWithCachedData) {
-        await this.refreshWalletFromLocalOnLaunch(publicDeriver);
-      }
+      await Promise.all(newWithCachedData
+        .map(w => this.refreshWalletFromLocalOnLaunch(w)));
       // This should correctly handle both states of `paralletSync`, both
       // initially and when it changes.
       // The initial case is straightforward.
