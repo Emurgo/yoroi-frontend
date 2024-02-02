@@ -359,7 +359,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       /*
        * TAIL REQUEST IS USED WHEN FIRST SYNC OR EMPTY WALLET
        */
-      result = await this._internalTailRequestForTxs(request.publicDeriver);
+      result = await this._internalTailRequestForTxs(request.publicDeriver, request.isLocalRequest);
     } else {
       /*
        * HEAD REQUEST IS USED WITH `AFTER` REFERENCE
@@ -368,7 +368,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       headRequest.invalidate({ immediately: false });
       headRequest.execute({
         publicDeriver,
-        isLocalRequest: false,
+        isLocalRequest: request.isLocalRequest,
         afterTx: txHistoryState.txs[0],
       });
       if (headRequest.promise == null) {
@@ -486,8 +486,10 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
   _internalTailRequestForTxs: (
     PublicDeriver<> & IGetLastSyncInfo,
+    boolean,
   ) => Promise<GetTransactionsResponse> = async (
     publicDeriver: PublicDeriver<> & IGetLastSyncInfo,
+    isLocalRequest = false,
   ) => {
     const withLevels = asHasLevels<ConceptualWallet, IGetLastSyncInfo>(publicDeriver);
     if (withLevels == null) {
@@ -501,7 +503,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     tailRequest.invalidate({ immediately: false });
     tailRequest.execute({
       publicDeriver: withLevels,
-      isLocalRequest: false,
+      isLocalRequest,
       beforeTx,
     });
     if (!tailRequest.promise) throw new Error('unexpected nullish tailRequest.promise');
