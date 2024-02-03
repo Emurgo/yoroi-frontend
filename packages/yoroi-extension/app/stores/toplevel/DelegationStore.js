@@ -15,13 +15,12 @@ import type {
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import LocalizableError from '../../i18n/LocalizableError';
 import { PoolMissingApiError, } from '../../api/common/errors';
-import type { MangledAmountFunc } from '../stateless/mangledAddresses';
+import type { MangledAmountFunc, MangledAmountsResponse } from '../stateless/mangledAddresses';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import type { PoolInfo } from '@emurgo/yoroi-lib';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { maybe } from '../../coreUtils';
-import type { MangledAmountsResponse } from '../stateless/mangledAddresses';
 
 export type DelegationRequests = {|
   publicDeriver: PublicDeriver<>,
