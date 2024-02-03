@@ -21,6 +21,7 @@ import type { StoresMap } from '../index';
 import type { PoolInfo } from '@emurgo/yoroi-lib';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { maybe } from '../../coreUtils';
+import type { MangledAmountsResponse } from '../stateless/mangledAddresses';
 
 export type DelegationRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -117,8 +118,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
 
   _getDelegatedBalanceResult: PublicDeriver<> => ?GetDelegatedBalanceResponse = (publicDeriver) => {
     const delegationRequest = this.getDelegationRequests(publicDeriver);
-    if (delegationRequest == null) return null;
-    return delegationRequest.getDelegatedBalance.result;
+    return delegationRequest?.getDelegatedBalance.result || null;
   }
 
   // <TODO:PENDING_REMOVAL> legacy after removing bip44
@@ -130,6 +130,18 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     const canUnmangleAmount: ?MultiToken = this.getDelegationRequests(publicDeriver)
       ?.mangledAmounts.result?.canUnmangle;
     return maybe(canUnmangleAmount, t => t.getDefault().gt(0)) ?? false;
+  }
+
+  getMangledAmountsOrZero: PublicDeriver<> => MangledAmountsResponse = (publicDeriver) => {
+    const resp: ?MangledAmountsResponse = this.getDelegationRequests(publicDeriver)?.mangledAmounts.result;
+    return {
+      canUnmangle: resp?.canUnmangle ?? publicDeriver.getParent().getDefaultMultiToken(),
+      cannotUnmangle: resp?.cannotUnmangle ?? publicDeriver.getParent().getDefaultMultiToken(),
+    };
+  }
+
+  hasRewardHistory: PublicDeriver<> => boolean = (publicDeriver) => {
+    return this.getDelegationRequests(publicDeriver)?.rewardHistory.result != null;
   }
 
   isExecutedDelegatedBalance: PublicDeriver<> => boolean = (publicDeriver) => {
@@ -145,6 +157,11 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     return this._getDelegatedBalanceResult(publicDeriver)?.accountPart ?? null;
   }
 
+  getRewardBalanceOrZero: PublicDeriver<> => MultiToken = (publicDeriver) => {
+    return this.getRewardBalance(publicDeriver)
+      ?? publicDeriver.getParent().getDefaultMultiToken();
+  }
+
   getDelegatedUtxoBalance: PublicDeriver<> => ?MultiToken = (publicDeriver) => {
     return this._getDelegatedBalanceResult(publicDeriver)?.utxoPart ?? null;
   }
@@ -155,10 +172,6 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
 
   isCurrentlyDelegating: PublicDeriver<> => boolean = (publicDeriver) => {
     return this.getDelegatedPoolId(publicDeriver) != null;
-  }
-
-  isStakeRegistered: PublicDeriver<> => ?boolean = (publicDeriver) => {
-    return this._getDelegatedBalanceResult(publicDeriver)?.stakeRegistered ?? null;
   }
 
   isStakeRegistered: PublicDeriver<> => ?boolean = (publicDeriver) => {

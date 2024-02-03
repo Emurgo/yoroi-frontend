@@ -35,6 +35,7 @@ import WithdrawalTxDialogContainer from '../../transfer/WithdrawalTxDialogContai
 import { getTokenName, genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../../utils/formatters';
 import { generateGraphData } from '../../../utils/graph';
+import { maybe } from '../../../coreUtils';
 
 @observer
 export default class StakingDashboardPage extends Component<StoresAndActionsProps> {
@@ -75,8 +76,11 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
 
     const rewardInfo = this.getRewardInfo(publicDeriver);
 
-    const errorIfPresent = this.getErrorInFetch(publicDeriver);
-    const stakePools = errorIfPresent == null ? this.getStakePools(publicDeriver) : errorIfPresent;
+    const errorIfPresent = maybe(delegationRequests.error, error => ({ error }));
+    const stakePools = errorIfPresent ?? this.getStakePools(publicDeriver);
+
+    const showRewardAmount = errorIfPresent == null
+      && this.props.stores.delegation.isExecutedDelegatedBalance(publicDeriver);
 
     const dashboard = (
       <StakingDashboard
@@ -92,9 +96,8 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
         hasAnyPending={this.props.stores.transactions.hasAnyPending}
         stakePools={stakePools}
         userSummary={this._generateUserSummary({
-          delegationRequests,
           publicDeriver,
-          errorIfPresent,
+          showRewardAmount,
         })}
         upcomingRewards={rewardInfo?.rewardPopup}
         graphData={generateGraphData({
@@ -376,18 +379,6 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
     };
   };
 
-  getErrorInFetch: (PublicDeriver<>) => void | {| error: LocalizableError |} = publicDeriver => {
-    const delegationStore = this.props.stores.delegation;
-    const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
-    if (delegationRequests == null) {
-      throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
-    }
-    if (delegationRequests.error != null) {
-      return { error: delegationRequests.error };
-    }
-    return undefined;
-  };
-
   getStakePools: (PublicDeriver<>) => {| pools: null | Array<Node | void> |} = publicDeriver => {
     const delegationStore = this.props.stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
@@ -545,23 +536,16 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
   };
 
   _generateUserSummary: ({|
-    delegationRequests: DelegationRequests,
     publicDeriver: PublicDeriver<>,
-    errorIfPresent: void | {| error: LocalizableError |},
+    showRewardAmount: boolean,
   |}) => Node = request => {
-    const showRewardAmount =
-      request.delegationRequests.getDelegatedBalance.wasExecuted &&
-      request.errorIfPresent == null;
 
-    const unmangledAmountsRequest = request.delegationRequests.mangledAmounts.result;
-
-    const { publicDeriver } = request;
+    const { publicDeriver, showRewardAmount } = request;
+    const { stores } = this.props;
 
     const balance = this.props.stores.transactions.balance;
-
-    const rewardBalance =
-      this.props.stores.delegation.getRewardBalance(publicDeriver)
-        ?? publicDeriver.getParent().getDefaultMultiToken();
+    const mangledAmounts = stores.delegation.getMangledAmountsOrZero(publicDeriver);
+    const rewardBalance = this.props.stores.delegation.getRewardBalanceOrZero(publicDeriver);
 
     const stakeRegistered =
       this.props.stores.delegation.isStakeRegistered(publicDeriver) === true;
@@ -571,10 +555,8 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
 
     return (
       <UserSummary
-        canUnmangleSum={unmangledAmountsRequest?.canUnmangle ?? publicDeriver.getParent().getDefaultMultiToken()}
-        cannotUnmangleSum={
-          unmangledAmountsRequest?.cannotUnmangle ?? publicDeriver.getParent().getDefaultMultiToken()
-        }
+        canUnmangleSum={mangledAmounts.canUnmangle}
+        cannotUnmangleSum={mangledAmounts.cannotUnmangle}
         defaultTokenInfo={this.props.stores.tokenInfoStore.getDefaultTokenInfo(
           publicDeriver.getParent().getNetworkInfo().NetworkId
         )}

@@ -99,33 +99,18 @@ class StakingPageContent extends Component<AllProps> {
 
   getStakePoolMeta: (PublicDeriver<>) => Node = publicDeriver => {
     const delegationStore = this.props.stores.delegation;
-    const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
-    if (delegationRequests == null) {
-      throw new Error(`${nameof(StakingPageContent)} opened for non-reward wallet`);
-    }
-    if (
-      !delegationRequests.getDelegatedBalance.wasExecuted ||
-      delegationRequests.getDelegatedBalance.isExecuting ||
-      delegationRequests.getDelegatedBalance.result == null
-    ) {
-      return null;
-    }
+    const currentPool = delegationStore.getDelegatedPoolId(publicDeriver);
+    if (currentPool == null) return null;
 
-    if (delegationRequests.getDelegatedBalance.result.delegation == null) return null;
     const networkInfo = publicDeriver.getParent().getNetworkInfo();
-    const currentPool: ?string = delegationRequests.getDelegatedBalance.result?.delegation;
-    const poolMeta = maybe(currentPool,
-        s => this.props.stores.delegation.getLocalPoolInfo(networkInfo, s));
-    const { stake, roa, saturation, pic } = maybe(currentPool,
-        s => this.props.stores.delegation.getLocalRemotePoolInfo(networkInfo, s)) ?? {};
+    const poolMeta = delegationStore.getLocalPoolInfo(networkInfo, currentPool);
+    const { stake, roa, saturation, pic } = delegationStore.getLocalRemotePoolInfo(networkInfo, currentPool) ?? {};
     if (poolMeta == null) {
       // server hasn't returned information about the stake pool yet
       return null;
     }
     const { intl } = this.context;
-
     const name = poolMeta.info?.name ?? intl.formatMessage(globalMessages.unknownPoolLabel);
-
     const delegatedPool = {
       id: String(currentPool),
       name,
@@ -136,7 +121,6 @@ class StakingPageContent extends Component<AllProps> {
       websiteUrl: poolMeta.info?.homepage,
       ticker: poolMeta.info?.ticker,
     };
-
     return (
       <DelegatedStakePoolCard
         delegatedPool={delegatedPool}
@@ -232,9 +216,8 @@ class StakingPageContent extends Component<AllProps> {
 
     const errorIfPresent = maybe(delegationRequests.error, error => ({ error }));
 
-    const showRewardAmount =
-      stores.delegation.isExecutedDelegatedBalance(publicDeriver)
-      && errorIfPresent == null;
+    const showRewardAmount = errorIfPresent == null
+      && stores.delegation.isExecutedDelegatedBalance(publicDeriver);
 
     const isStakeRegistered = stores.delegation.isStakeRegistered(publicDeriver);
     const currentlyDelegating = stores.delegation.isCurrentlyDelegating(publicDeriver);
