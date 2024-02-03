@@ -14,11 +14,9 @@ import type { BoxInfo } from '../../../components/wallet/staking/dashboard/Upcom
 import LessThanExpectedDialog from '../../../components/wallet/staking/dashboard/LessThanExpectedDialog';
 import { digestForHash } from '../../../api/ada/lib/storage/database/primitives/api/utils';
 import { handleExternalLinkClick } from '../../../utils/routing';
-import LocalizableError from '../../../i18n/LocalizableError';
 import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer';
 import config from '../../../config';
 import type { PoolTuples } from '../../../api/common/lib/storage/bridge/delegationUtils';
-import type {  DelegationRequests } from '../../../stores/toplevel/DelegationStore';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type {
