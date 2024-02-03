@@ -29,6 +29,7 @@ import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver
 import NavPlate from '../../../components/topbar/NavPlate';
 import WalletDetails from '../../../components/wallet/my-wallets/WalletDetails';
 import { ROUTES } from '../../../routes-config';
+import { MultiToken } from '../../../api/common/lib/MultiToken';
 
 const messages = defineMessages({
   walletUpgradeNoop: {
@@ -149,8 +150,8 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         const plate = withPubKey == null
           ? null
           : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
-        const balance = this.props.stores.transactions.getBalance(publicDeriver);
-        const rewards = this.props.stores.delegation.getRewardBalance(publicDeriver);
+        const balance: ?MultiToken = this.props.stores.transactions.getBalance(publicDeriver);
+        const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(publicDeriver);
 
         return (
           <WalletAlreadyExistDialog

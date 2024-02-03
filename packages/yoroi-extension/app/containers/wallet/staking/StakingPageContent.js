@@ -222,7 +222,7 @@ class StakingPageContent extends Component<AllProps> {
     const isStakeRegistered = stores.delegation.isStakeRegistered(publicDeriver);
     const currentlyDelegating = stores.delegation.isCurrentlyDelegating(publicDeriver);
     const delegatedUtxo = stores.delegation.getDelegatedUtxoBalance(publicDeriver);
-    const delegatedRewards = stores.delegation.getRewardBalance(publicDeriver);
+    const delegatedRewards = stores.delegation.getRewardBalanceOrZero(publicDeriver);
 
     return (
       <Box>
@@ -254,7 +254,7 @@ class StakingPageContent extends Component<AllProps> {
               totalDelegated={(() => {
                 if (!showRewardAmount) return undefined;
                 return currentlyDelegating
-                  ? maybe(delegatedUtxo, w => delegatedRewards?.joinAddCopy(w) ?? w)
+                  ? maybe(delegatedUtxo, w => delegatedRewards.joinAddCopy(w))
                   : publicDeriver.getDefaultMultiToken();
               })()}
               graphData={generateGraphData({

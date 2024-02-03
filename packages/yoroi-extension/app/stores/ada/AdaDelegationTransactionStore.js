@@ -129,8 +129,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
       publicDeriver: basePubDeriver,
       poolRequest: request.poolRequest,
       registrationStatus: this.stores.delegation.isStakeRegistered(publicDeriver) === true,
-      valueInAccount: this.stores.delegation.getRewardBalance(publicDeriver)
-        ?? publicDeriver.getParent().getDefaultMultiToken(),
+      valueInAccount: this.stores.delegation.getRewardBalanceOrZero(publicDeriver),
       absSlotNumber,
     }).promise;
     if (delegationTxPromise == null) {

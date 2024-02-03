@@ -147,17 +147,13 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     return this.getDelegationRequests(publicDeriver)?.getDelegatedBalance.wasExecuted === true;
   }
 
-  getRewardBalance: PublicDeriver<> => ?MultiToken = (publicDeriver) => {
+  getRewardBalanceOrZero: PublicDeriver<> => MultiToken = (publicDeriver) => {
     if (this.stores.transactions.hasProcessedWithdrawals(publicDeriver)) {
       // In case we have a processed withdrawal for the wallet
       // We cancel out any still present reward, in case it has not synced yet
-      return null;
+      return publicDeriver.getParent().getDefaultMultiToken();
     }
-    return this._getDelegatedBalanceResult(publicDeriver)?.accountPart ?? null;
-  }
-
-  getRewardBalanceOrZero: PublicDeriver<> => MultiToken = (publicDeriver) => {
-    return this.getRewardBalance(publicDeriver)
+    return this._getDelegatedBalanceResult(publicDeriver)?.accountPart
       ?? publicDeriver.getParent().getDefaultMultiToken();
   }
 

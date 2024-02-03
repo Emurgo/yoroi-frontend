@@ -184,8 +184,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
     if (balance == null) {
       return null;
     }
-    const rewardBalance = delegationStore.getRewardBalance(publicDeriver)
-      ?? new MultiToken([], publicDeriver.getParent().getDefaultToken());
+    const rewardBalance = delegationStore.getRewardBalanceOrZero(publicDeriver);
     const tokenInfo = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)(
       rewardBalance.getDefaultEntry()
     );
