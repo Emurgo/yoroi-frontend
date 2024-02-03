@@ -73,33 +73,6 @@ class VotingPageContent extends Component<StoresAndActionsProps> {
     this.props.actions.dialogs.open.trigger({ dialog: VotingRegistrationDialogContainer });
   };
 
-  get isDelegated(): ?boolean {
-    const publicDeriver = this.props.stores.wallets.selected;
-    const delegationStore = this.props.stores.delegation;
-
-    if (!publicDeriver) {
-      throw new Error(`${nameof(this.isDelegated)} no public deriver. Should never happen`);
-    }
-
-    const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
-    if (delegationRequests == null) {
-      throw new Error(`${nameof(this.isDelegated)} called for non-reward wallet`);
-    }
-    const currentDelegation = delegationRequests.getDelegatedBalance;
-
-    if (
-      !currentDelegation.wasExecuted ||
-      currentDelegation.isExecuting ||
-      currentDelegation.result == null
-    ) {
-      return undefined;
-    }
-    if (currentDelegation.result.delegation == null) {
-      return false;
-    }
-    return true;
-  }
-
   render(): Node {
     const { intl } = this.context;
     const { actions, stores } = this.props;
@@ -270,6 +243,13 @@ class VotingPageContent extends Component<StoresAndActionsProps> {
       );
     }
 
+    const publicDeriver = this.props.stores.wallets.selected;
+    if (!publicDeriver) {
+      throw new Error(`${nameof(this.render)} no public deriver. Should never happen`);
+    }
+    const delegationStore = this.props.stores.delegation;
+    const isDelegating = delegationStore.isCurrentlyDelegating(publicDeriver);
+
     /*
     At this point we are sure that we have current funds
     I added the "5" for two reasons
@@ -286,7 +266,7 @@ class VotingPageContent extends Component<StoresAndActionsProps> {
           start={this.start}
           hasAnyPending={this.props.stores.transactions.hasAnyPending}
           onExternalLinkClick={handleExternalLinkClick}
-          isDelegated={this.isDelegated === true}
+          isDelegated={isDelegating}
           name={fundName}
           walletType={walletType}
         />
