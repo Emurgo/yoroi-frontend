@@ -13,12 +13,10 @@ import SaveDialog from '../../../components/wallet/hwConnect/trezor/SaveDialog';
 
 import { ProgressStep } from '../../../types/HWConnectStoreTypes';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import type { RestoreModeType, } from '../../../actions/common/wallet-restore-actions';
 
 type Props = {|
   ...StoresAndActionsProps,
   +onClose: (void) => void,
-  +mode: RestoreModeType,
   +onBack: void => void,
 |};
 
@@ -31,11 +29,6 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
       throw new Error(`${nameof(WalletTrezorConnectDialogContainer)} no API selected`);
     }
     return selectedNetwork;
-  }
-
-  componentDidMount() {
-    const { trezorConnect } = this.props.actions.ada;
-    trezorConnect.setMode.trigger(this.props.mode);
   }
 
   cancel: void => void = () => {

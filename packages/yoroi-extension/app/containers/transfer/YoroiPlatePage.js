@@ -31,7 +31,6 @@ export default class YoroiPlatePage extends Component<Props> {
     const plates = generatePlates(
       yoroiTransfer.recoveryPhrase,
       this.props.accountIndex,
-      yoroiTransfer.mode,
       this.getSelectedNetwork(),
     );
     runInAction(() => {

@@ -59,7 +59,7 @@ type Props = {|
 
 function RestoreWalletPage(props: Props & Intl): Node {
   const { intl, stores, actions, restoreWallet, isDialogOpen, openDialog, closeDialog } = props;
-  const { walletRestore, profile, router, wallets: walletsActions } = actions;
+  const { profile, router, wallets: walletsActions } = actions;
   const {
     walletRestore: walletData,
     profile: profileData,
@@ -158,7 +158,6 @@ function RestoreWalletPage(props: Props & Intl): Node {
             if (!environment.isDev() && !environment.isNightly())
               profile.setSelectedNetwork.trigger(networks.CardanoMainnet);
 
-            walletRestore.setMode.trigger(mode);
             setCurrentStep(RESTORE_WALLET_STEPS.ENTER_RECOVERY_PHRASE);
             if (mode.length === 15) {
               ampli.restoreWalletEnterPhraseStepViewed({
@@ -204,7 +203,6 @@ function RestoreWalletPage(props: Props & Intl): Node {
 
             const existingWallet = await isWalletExist(
               importedWallets,
-              walletData.mode.type,
               enteredRecoveryPhrase,
               accountIndex,
               profileData.selectedNetwork
