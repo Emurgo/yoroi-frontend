@@ -213,6 +213,7 @@ type SetWhitelistFunc = ({|
 export type ForeignUtxoFetcher = (Array<string>) => Promise<Array<?RemoteUnspentOutput>>;
 
 export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
+  @observable unrecoverableError: string | null = null;
   @observable connectingMessage: ?ConnectingMessage = null;
   @observable whiteList: Array<WhitelistEntry> = [];
 
@@ -567,13 +568,16 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       const transaction = RustModule.WalletV4.FixedTransaction.from_bytes(bytes);
       this.rawTxBody = Buffer.from(transaction.raw_body());
       txBody = transaction.body();
-    } catch (originalErr) {
+    } catch {
       try {
         // Try parsing as body for backward compatibility
         txBody = RustModule.WalletV4.TransactionBody.from_bytes(bytes);
         this.rawTxBody = bytes;
-      } catch (_e) {
-        throw originalErr;
+      } catch {
+        runInAction(() => {
+          this.unrecoverableError = 'Unable to parse input transaction.';
+        });
+        return;
       }
     }
 
