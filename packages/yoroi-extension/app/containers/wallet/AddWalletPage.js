@@ -80,6 +80,7 @@ class AddWalletPage extends Component<AllProps> {
       actions.dialogs.push.trigger({
         dialog: WalletTrezorConnectDialogContainer,
       });
+      // <TODO:HW_REFACTOR>
       this.props.actions.ada.trezorConnect.init.trigger();
     };
     const openLedgerConnectDialog = () => {
@@ -89,6 +90,7 @@ class AddWalletPage extends Component<AllProps> {
       actions.dialogs.push.trigger({
         dialog: WalletLedgerConnectDialogContainer,
       });
+      // <TODO:HW_REFACTOR>
       this.props.actions.ada.ledgerConnect.init.trigger();
     };
 

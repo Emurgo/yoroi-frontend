@@ -72,7 +72,6 @@ test('Restore wallet for transfer', async () => {
       .to_public(),
     checkAddressesInUse,
     accountIndex,
-    transferSource: 'bip44',
     network: networks.CardanoMainnet,
   });
 

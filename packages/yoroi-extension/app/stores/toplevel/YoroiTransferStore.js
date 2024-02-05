@@ -162,7 +162,7 @@ export default class YoroiTransferStore extends Store<StoresMap, ActionsMap> {
       throw new Error(`${nameof(YoroiTransferStore)}::${nameof(this.checkAddresses)} currency doesn't support Yoroi transfer`);
     }
     const { yoroiTransfer } = this.stores.substores.ada;
-    return await yoroiTransfer.generateTransferTx(
+    return await yoroiTransfer.generateTransferTxForByron(
       request,
     );
   }

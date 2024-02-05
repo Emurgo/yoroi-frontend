@@ -9,7 +9,6 @@ import {
   ChainDerivations,
   CoinTypes,
   HARD_DERIVATION_START,
-  STAKING_KEY_INDEX,
   WalletTypePurpose,
 } from '../../config/numbersConfig';
 import type { Network, } from '../../../config/config-types';
@@ -102,7 +101,6 @@ import {
 import LocalizableError from '../../i18n/LocalizableError';
 import { scanBip44Account, } from '../common/lib/restoration/bip44';
 import { v2genAddressBatchFunc, } from './restoration/byron/scan';
-import { scanShelleyCip1852Account } from './restoration/shelley/scan';
 import type {
   CardanoAddressedUtxo,
   CardanoUtxoScriptWitness,
@@ -514,7 +512,6 @@ export type GenerateWalletRecoveryPhraseFunc = (
 
 export type RestoreWalletForTransferRequest = {|
   accountPubKey: RustModule.WalletV4.Bip32PublicKey,
-  transferSource: 'cip1852' | 'bip44',
   accountIndex: number,
   checkAddressesInUse: FilterFunc,
   network: $ReadOnly<NetworkRow>,
@@ -2035,50 +2032,26 @@ export default class AdaApi {
         return Promise.resolve();
       };
 
-      let insertTree;
-      if (request.transferSource === 'bip44') {
-        const key = RustModule.WalletV2.Bip44AccountPublic.new(
-          v4PublicToV2(request.accountPubKey),
-          RustModule.WalletV2.DerivationScheme.v2(),
-        );
-        insertTree = await scanBip44Account({
-          network: request.network,
-          generateInternalAddresses: v2genAddressBatchFunc(
-            key.bip44_chain(false),
-            config.ByronNetworkId,
-          ),
-          generateExternalAddresses: v2genAddressBatchFunc(
-            key.bip44_chain(true),
-            config.ByronNetworkId,
-          ),
-          lastUsedInternal: -1,
-          lastUsedExternal: -1,
-          checkAddressesInUse,
-          addByHash,
-          type: CoreAddressTypes.CARDANO_LEGACY,
-        });
-      } else if (request.transferSource === 'cip1852') {
-        const stakingKey = request.accountPubKey
-          .derive(ChainDerivations.CHIMERIC_ACCOUNT)
-          .derive(STAKING_KEY_INDEX)
-          .to_raw_key();
-
-        const cip1852InsertTree = await scanShelleyCip1852Account({
-          network: request.network,
-          accountPublicKey: Buffer.from(request.accountPubKey.as_bytes()).toString('hex'),
-          lastUsedInternal: -1,
-          lastUsedExternal: -1,
-          checkAddressesInUse,
-          addByHash,
-          stakingKey,
-        });
-
-        insertTree = cip1852InsertTree.filter(child => (
-          child.index === ChainDerivations.EXTERNAL || child.index === ChainDerivations.INTERNAL
-        ));
-      } else {
-        throw new Error(`${nameof(this.restoreWalletForTransfer)} unexpected wallet type ${request.transferSource}`);
-      }
+      const key = RustModule.WalletV2.Bip44AccountPublic.new(
+        v4PublicToV2(request.accountPubKey),
+        RustModule.WalletV2.DerivationScheme.v2(),
+      );
+      const insertTree = await scanBip44Account({
+        network: request.network,
+        generateInternalAddresses: v2genAddressBatchFunc(
+          key.bip44_chain(false),
+          config.ByronNetworkId,
+        ),
+        generateExternalAddresses: v2genAddressBatchFunc(
+          key.bip44_chain(true),
+          config.ByronNetworkId,
+        ),
+        lastUsedInternal: -1,
+        lastUsedExternal: -1,
+        checkAddressesInUse,
+        addByHash,
+        type: CoreAddressTypes.CARDANO_LEGACY,
+      });
       const flattenedTree = flattenInsertTree(insertTree);
 
       const addressResult = [];
@@ -2133,18 +2106,6 @@ export default class AdaApi {
         accountPubKey: request.bip44AccountPubKey,
         accountIndex: request.accountIndex,
         checkAddressesInUse: request.checkAddressesInUse,
-        transferSource: 'bip44',
-        network: request.network,
-      });
-
-      // it's possible that wallet software created the Shelley wallet off the bip44 path
-      // instead of the cip1852 path like required in the CIP1852 spec
-      // so just in case, we check these addresses also
-      const wrongCip1852Addresses = await this.restoreWalletForTransfer({
-        accountPubKey: request.bip44AccountPubKey,
-        accountIndex: request.accountIndex,
-        checkAddressesInUse: request.checkAddressesInUse,
-        transferSource: 'cip1852',
         network: request.network,
       });
 
@@ -2174,7 +2135,6 @@ export default class AdaApi {
 
       const addresses = [
         ...bip44Addresses.addresses,
-        ...wrongCip1852Addresses.addresses,
       ].map(address => ({
         address: address.address,
         addressing: {
