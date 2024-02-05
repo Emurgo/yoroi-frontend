@@ -31,7 +31,7 @@ import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 import { ApiOptions, getApiForNetwork } from '../../api/common/utils';
-import { validateAmount, getMinimumValue } from '../../utils/validations';
+import { validateAmount } from '../../utils/validations';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
@@ -260,10 +260,7 @@ class WalletSendPage extends Component<AllProps> {
             validateAmount(
               amount,
               transactionBuilderStore.selectedToken ?? defaultToken,
-              getMinimumValue(
-                publicDeriver.getParent().getNetworkInfo(),
-                transactionBuilderStore.selectedToken?.IsDefault ?? true
-              ),
+              transactionBuilderStore.minAda.getDefault(),
               this.context.intl
             )
           }
@@ -745,7 +742,7 @@ class WalletSendPage extends Component<AllProps> {
           amount?: string,
           shouldSendAll?: boolean,
         |}>,
-        minAda: ?MultiToken,
+        minAda: MultiToken,
         calculateMinAda: (Array<{| token: $ReadOnly<TokenRow> |}>) => string,
         maxSendableAmount: {|
           error: ?LocalizableError,

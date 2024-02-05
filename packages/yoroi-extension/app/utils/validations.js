@@ -4,8 +4,7 @@ import isInt from 'validator/lib/isInt';
 import { MAX_MEMO_SIZE } from '../config/externalStorageConfig';
 import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
 import { defineMessages, } from 'react-intl';
-import type { NetworkRow, TokenRow } from '../api/ada/lib/storage/database/primitives/tables';
-import { isCardanoHaskell, getCardanoHaskellBaseConfig } from '../api/ada/lib/storage/database/prepackaged/networks';
+import type { TokenRow } from '../api/ada/lib/storage/database/primitives/tables';
 import { getTokenName } from '../stores/stateless/tokenHelpers';
 import { truncateToken } from './formatters';
 
@@ -120,20 +119,4 @@ export async function validateAmount(
     ];
   }
   return [true, undefined];
-}
-
-export function getMinimumValue(
-  network: $ReadOnly<NetworkRow>,
-  isToken: boolean,
-): BigNumber {
-  if (isToken) {
-    // when sending a token, Yoroi will handle making sure the minimum value is in the UTXO
-    return new BigNumber(0);
-  }
-  if (isCardanoHaskell(network)) {
-    const config = getCardanoHaskellBaseConfig(network)
-      .reduce((acc, next) => Object.assign(acc, next), {});
-    return new BigNumber(config.MinimumUtxoVal);
-  }
-  return new BigNumber(0);
 }
