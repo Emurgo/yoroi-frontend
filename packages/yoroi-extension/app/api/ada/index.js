@@ -2628,7 +2628,8 @@ function merge(destination: Object, source: Object): {| changed: boolean, merged
     let changed = false;
     for (const key in dest) {
       if (typeof dest[key] === 'object') {
-        changed = changed || internalRecursiveMerge(result[key] = {}, dest[key], (src || {})[key]);
+        result[key] = {}
+        changed = changed || internalRecursiveMerge(result[key], dest[key], src?.[key]);
       } else if (src == null || src[key] == null) {
         result[key] = dest[key];
       } else if (
