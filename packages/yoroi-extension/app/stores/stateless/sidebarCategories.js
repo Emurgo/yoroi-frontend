@@ -79,7 +79,7 @@ export const TRANSFER_PAGE: SidebarCategory = registerCategory({
   route: ROUTES.TRANSFER.ROOT,
   icon: transferIcon,
   label: globalMessages.sidebarTransfer,
-  isVisible: _request => true,
+  isVisible: r => r.selected != null,
 });
 
 export const CONNECTED_WEBSITES: SidebarCategory = registerCategory({

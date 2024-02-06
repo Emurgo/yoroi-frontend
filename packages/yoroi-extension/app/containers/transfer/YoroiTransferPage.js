@@ -144,7 +144,7 @@ export default class YoroiTransferPage extends Component<StoresAndActionsProps> 
       case TransferStatus.READY_TO_TRANSFER: {
         const { transferTx } = yoroiTransfer;
         if (transferTx == null) {
-          return null; // TODO: throw error? Shouldn't happen
+          return null; // don't care since this is pending removal
         }
         const { intl } = this.context;
         return (
@@ -152,7 +152,8 @@ export default class YoroiTransferPage extends Component<StoresAndActionsProps> 
             form={null}
             transferTx={transferTx}
             selectedExplorer={this.props.stores.explorers.selectedExplorer
-              .get(publicDeriver.getParent().getNetworkInfo().NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
+              .get(publicDeriver.getParent().getNetworkInfo().NetworkId)
+                ?? (() => { throw new Error('No explorer for wallet network'); })()
             }
             getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
             onSubmit={{
