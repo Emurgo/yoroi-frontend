@@ -30,12 +30,10 @@ export default function SwapInput({
 }: Props): Node {
   const { amount: quantity = undefined, image, ...rest } = tokenInfo || {};
 
-  const [inputValue, setInputValue] = useState(value || '');
   const [isFocused, setIsFocused] = useState(false);
 
   const handleChange = e => {
     handleAmountChange(e.target.value);
-    setInputValue(e.target.value);
   };
 
   const isFocusedColor = isFocused ? 'grayscale.max' : 'grayscale.400';
@@ -89,7 +87,7 @@ export default function SwapInput({
           color="grayscale.max"
           placeholder="0"
           onChange={handleChange}
-          value={inputValue}
+          value={value}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
         />
@@ -123,8 +121,7 @@ export default function SwapInput({
               fontWeight={500}
               sx={{ p: '4px 8px', bgcolor: 'grayscale.50', borderRadius: '8px' }}
               onClick={() => {
-                setInputValue(quantity);
-                // handleAmountChange(quantity);
+                handleAmountChange(quantity);
               }}
             >
               MAX
