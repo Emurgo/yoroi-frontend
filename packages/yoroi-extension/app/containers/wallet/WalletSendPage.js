@@ -21,15 +21,6 @@ import {
 } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { SendUsingLedgerParams } from '../../actions/ada/ledger-send-actions';
-import type { SendUsingTrezorParams } from '../../actions/ada/trezor-send-actions';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { UriParams } from '../../utils/URIHandling';
-import { SelectedExplorer } from '../../domain/SelectedExplorer';
-import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
-import LocalizableError from '../../i18n/LocalizableError';
-import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
-import { ApiOptions, getApiForNetwork } from '../../api/common/utils';
 import { validateAmount } from '../../utils/validations';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
