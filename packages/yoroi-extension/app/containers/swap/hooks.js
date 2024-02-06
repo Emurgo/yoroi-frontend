@@ -42,7 +42,7 @@ export function useAssets(): Array<any> {
           id,
           group: token.info?.Metadata.policyId,
           fingerprint: getTokenIdentifierIfExists(token.info) ?? '',
-          name: !Boolean(id)
+          name: id == null
             ? token.info?.Metadata.ticker
             : truncateToken(getTokenName(token.info)),
           decimals: token.info?.Metadata.numberOfDecimals,
