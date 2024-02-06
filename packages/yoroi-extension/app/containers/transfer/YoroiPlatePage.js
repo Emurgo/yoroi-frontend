@@ -23,11 +23,6 @@ export default class YoroiPlatePage extends Component<Props> {
 
   async componentDidMount() {
     const { yoroiTransfer } = this.props.stores;
-
-    if (!yoroiTransfer.mode) {
-      throw new Error(`${nameof(YoroiPlatePage)} no mode selected`);
-    }
-
     const plates = generatePlates(
       yoroiTransfer.recoveryPhrase,
       this.props.accountIndex,

@@ -8,7 +8,7 @@ import type {
 } from '../../types/TransferTypes';
 import { yoroiTransferTxFromAddresses } from '../../api/ada/transactions/transfer/legacyYoroi';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import { generateWalletRootKey, generateLedgerWalletRootKey, } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
+import { generateWalletRootKey, } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import {
   HARD_DERIVATION_START,
   WalletTypePurpose,
@@ -70,23 +70,11 @@ export default class AdaYoroiTransferStore extends Store<StoresMap, ActionsMap> 
 
   // <TODO:PENDING_REMOVAL> paper
   generateTransferTxForByron: {|
-    ...({| recoveryPhrase: string, |} | {| privateKey: string |}),
+    recoveryPhrase: string,
     updateStatusCallback: void => void,
     getDestinationAddress: void => Promise<{| ...Address, ...InexactSubset<Addressing> |}>,
   |} => Promise<TransferTx> = async (request) => {
-    const rootPk = (() => {
-      if (request.privateKey != null) {
-        return RustModule.WalletV4.Bip32PrivateKey.from_bytes(
-          Buffer.from(request.privateKey, 'hex')
-        );
-      }
-      if (request.recoveryPhrase != null) {
-        return this.stores.yoroiTransfer.mode?.extra === 'ledger'
-          ? generateLedgerWalletRootKey(request.recoveryPhrase)
-          : generateWalletRootKey(request.recoveryPhrase);
-      }
-      throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this.generateTransferTxForByron)} no key specified`);
-    })();
+    const rootPk = generateWalletRootKey(request.recoveryPhrase);
 
     // 1) get receive address
     const destinationAddress = await request.getDestinationAddress();

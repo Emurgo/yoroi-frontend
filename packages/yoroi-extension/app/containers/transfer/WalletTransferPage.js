@@ -12,7 +12,6 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import YoroiTransferPage from './YoroiTransferPage';
 import { genLookupOrFail, getTokenName, } from '../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../utils/formatters';
-import config from '../../config';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -29,14 +28,9 @@ export default class WalletTransferPage extends Component<Props> {
     this.props.actions.dialogs.closeActiveDialog.trigger();
   };
 
+  // <TODO:PENDING_REMOVAL> paper
   startTransferYoroiPaperFunds: void => void = () => {
-    this.props.actions.yoroiTransfer.startTransferFunds.trigger({
-      source: {
-        type: 'bip44',
-        extra: 'paper',
-        length: config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT,
-      },
-    });
+    this.props.actions.yoroiTransfer.startTransferFunds.trigger();
   }
 
   render(): Node {
