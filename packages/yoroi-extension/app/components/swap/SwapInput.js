@@ -1,57 +1,43 @@
 // @flow
 import type { Node } from 'react';
+import type { AssetAmount } from './types';
 import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { ReactComponent as ChevronDownIcon } from '../../assets/images/revamp/icons/chevron-down.inline.svg';
-import { ReactComponent as DefaultTokenImage } from '../../assets/images/revamp/token-default.inline.svg';
-import type { AssetAmount } from './types';
+import assetDefault from '../../assets/images/revamp/token-default.inline.svg';
+import { urlResolveForIpfsAndCorsproxy } from '../../coreUtils';
 
 type Props = {|
   label: string,
-  asset: AssetAmount,
+  tokenInfo: AssetAmount | Object,
   onAssetSelect: function,
   handleAmountChange: function,
   showMax?: boolean,
-  image?: Node | null,
-  isFrom?: boolean,
+  value?: string,
+  touched?: boolean,
+  inputRef?: any | null,
+  error: string | null,
 |};
 
 export default function SwapInput({
   label,
-  asset,
-  isFrom = false,
   showMax = false,
-  image = null,
   onAssetSelect,
+  error = '',
   handleAmountChange,
+  value,
+  tokenInfo,
 }: Props): Node {
-  const { amount, walletAmount, ticker } = asset;
-  const [error, setError] = useState('');
-  const [inputValue, setInputValue] = useState(amount || '');
+  const { amount: quantity = undefined, image, ...rest } = tokenInfo || {};
+
   const [isFocused, setIsFocused] = useState(false);
 
   const handleChange = e => {
-    if (e.target.value === '') {
-      setError('');
-      setInputValue('');
-      return;
-    }
-
-    const val = Number(e.target.value);
-    const checkAmount = isFrom ? walletAmount : Infinity;
-
-    if (val !== 0 && val > checkAmount) {
-      setError('Not enough balance');
-    } else if (Number.isNaN(val)) {
-      setError('Invalid amount');
-    } else {
-      handleAmountChange(val);
-    }
-
-    setInputValue(e.target.value);
+    handleAmountChange(e.target.value);
   };
 
   const isFocusedColor = isFocused ? 'grayscale.max' : 'grayscale.400';
+  const imgSrc = urlResolveForIpfsAndCorsproxy(image);
 
   return (
     <Box>
@@ -101,16 +87,27 @@ export default function SwapInput({
           color="grayscale.max"
           placeholder="0"
           onChange={handleChange}
-          value={inputValue}
+          value={value}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
         />
         <Box sx={{ justifySelf: 'end', cursor: 'pointer' }} onClick={onAssetSelect}>
           <Box height="100%" width="min-content" display="flex" gap="8px" alignItems="center">
-            <Box width="24px" height="24px" sx={{ '& > svg': { width: '100%', height: '100%' } }}>
-              {ticker ? image || <DefaultTokenImage /> : <DefaultTokenImage />}
+            <Box
+              width="24px"
+              height="24px"
+              sx={{ overflowY: 'hidden', '& > svg': { width: '100%', height: '100%' } }}
+            >
+              <img
+                width="100%"
+                src={imgSrc || assetDefault}
+                alt=""
+                onError={e => {
+                  e.target.src = assetDefault;
+                }}
+              />
             </Box>
-            <Box width="max-content">{ticker || 'Select asset'}</Box>
+            <Box width="max-content">{rest.ticker || 'Select asset'}</Box>
             <Box display="inline-flex">
               <ChevronDownIcon />
             </Box>
@@ -124,8 +121,7 @@ export default function SwapInput({
               fontWeight={500}
               sx={{ p: '4px 8px', bgcolor: 'grayscale.50', borderRadius: '8px' }}
               onClick={() => {
-                setInputValue(walletAmount);
-                handleAmountChange(walletAmount);
+                handleAmountChange(quantity);
               }}
             >
               MAX
@@ -136,7 +132,7 @@ export default function SwapInput({
         )}
         <Box sx={{ justifySelf: 'end', alignSelf: 'end' }}>
           <Typography component="div" variant="caption" color="grayscale.600">
-            Current balance: {walletAmount || 0} {ticker}
+            Current balance: {quantity || 0} {rest.ticker}
           </Typography>
         </Box>
       </Box>

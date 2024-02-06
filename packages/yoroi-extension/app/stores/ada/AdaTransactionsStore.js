@@ -49,18 +49,11 @@ export default class AdaTransactionsStore extends Store<StoresMap, ActionsMap> {
     signRequest,
     txId,
   ) => {
-    const defaultNetworkId = publicDeriver.getParent().getNetworkInfo().NetworkId;
-    const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(
-      defaultNetworkId,
-    );
     const { usedUtxos, transaction } = await this.api.ada.createSubmittedTransactionData(
       publicDeriver,
       signRequest,
       txId,
-      defaultNetworkId,
-      defaultToken,
     );
-
     this.stores.transactions.recordSubmittedTransaction(
       publicDeriver,
       transaction,

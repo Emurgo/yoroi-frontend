@@ -5,52 +5,70 @@ import { ReactComponent as SwitchIcon } from '../../../assets/images/revamp/icon
 import { ReactComponent as InfoIcon } from '../../../assets/images/revamp/icons/info.inline.svg';
 import { ReactComponent as EditIcon } from '../../../assets/images/revamp/icons/edit.inline.svg';
 import { ReactComponent as RefreshIcon } from '../../../assets/images/revamp/icons/refresh.inline.svg';
-import { ReactComponent as DefaultToken } from '../../../assets/images/revamp/token-default.inline.svg';
-import { defaultFromAsset, defaultToAsset, fromAssets, poolList, toAssets } from './mockData';
-import SwapInput from '../../../components/swap/SwapInput';
+// import { ReactComponent as DefaultToken } from '../../../assets/images/revamp/token-default.inline.svg';
+// import { defaultFromAsset, defaultToAsset, fromAssets, poolList, toAssets } from './mockData';
+// import SwapInput from '../../../components/swap/SwapInput';
 import PriceInput from '../../../components/swap/PriceInput';
-import SelectAssetDialog from '../../../components/swap/SelectAssetDialog';
+// import SelectAssetDialog from '../../../components/swap/SelectAssetDialog';
 import SlippageDialog from '../../../components/swap/SlippageDialog';
-import SelectPoolDialog from '../../../components/swap/SelectPoolDialog';
-import SwapPool from '../../../components/swap/SwapPool';
+// import SelectPoolDialog from '../../../components/swap/SelectPoolDialog';
+// import SwapPool from '../../../components/swap/SwapPool';
 import Tabs from '../../../components/common/tabs/Tabs';
+import {
+  // makeLimitOrder,
+  // makePossibleMarketOrder,
+  useSwap,
+  // useSwapCreateOrder,
+  useSwapPoolsByPair,
+} from '@yoroi/swap';
+import { useSwapForm } from '../context/swap-form';
+import EditSellAmount from './edit-sell-amount/EditSellAmount';
+import EditBuyAmount from './edit-buy-amount/EditBuyAmount';
+import SelectBuyTokenFromList from './edit-buy-amount/SelectBuyTokenFromList';
+import SelectSellTokenFromList from './edit-sell-amount/SelectSellTokenFromList';
 
 type Props = {|
   onLimitSwap: void => void,
 |};
 
 export default function SwapForm({ onLimitSwap }: Props): React$Node {
-  const [isMarketOrder, setIsMarketOrder] = useState(true);
   const [openedDialog, setOpenedDialog] = useState('');
-  const [pool, setPool] = useState(poolList[0]);
-  const [slippage, setSlippage] = useState('1');
-  const [fromAsset, setFromAsset] = useState(defaultFromAsset);
-  const [toAsset, setToAsset] = useState(defaultToAsset);
+  const {
+    // sellQuantity: { isTouched: isSellTouched },
+    // buyQuantity: { isTouched: isBuyTouched },
+    // sellAmountErrorChanged,
+    // poolDefaulted,
+    // canSwap,
+    resetSwapForm,
+    switchTokens,
+  } = useSwapForm();
+
+  const {
+    orderData,
+    // unsignedTxChanged,
+    poolPairsChanged,
+  } = useSwap();
+  console.log('🚀 > orderData:', orderData);
+
+  useSwapPoolsByPair(
+    {
+      tokenA: orderData.amounts.sell.tokenId,
+      tokenB: orderData.amounts.buy.tokenId,
+    },
+    {
+      enabled: true,
+      onSuccess: pools => {
+        poolPairsChanged(pools);
+      },
+    }
+  );
 
   const handleSwitchSelectedAssets = () => {
-    setFromAsset(toAsset);
-    setToAsset(fromAsset);
-  };
-
-  const handleAmountChange = (amount, type) => {
-    const func = type === 'from' ? setFromAsset : setToAsset;
-    func(p => ({ ...p, amount }));
+    switchTokens();
   };
 
   const handleResetForm = () => {
-    setFromAsset(defaultFromAsset);
-    setToAsset(defaultToAsset);
-  };
-
-  const handleSelectedAsset = (asset, type) => {
-    const isFrom = type === 'from';
-    const setFunc = isFrom ? setFromAsset : setToAsset;
-
-    const assetToSet = (isFrom ? fromAssets : toAssets).find(a => a.address === asset.address);
-
-    if (!assetToSet) return;
-
-    setFunc(assetToSet);
+    resetSwapForm();
   };
 
   return (
@@ -59,12 +77,11 @@ export default function SwapForm({ onLimitSwap }: Props): React$Node {
         <Box display="flex" alignItems="center" justifyContent="space-between" mb="16px">
           <Tabs
             tabs={[
-              { label: 'Market', isActive: isMarketOrder, onClick: () => setIsMarketOrder(true) },
+              { label: 'Market', isActive: true, onClick: () => undefined },
               {
                 label: 'Limit',
-                isActive: !isMarketOrder,
+                isActive: false,
                 onClick: () => {
-                  setIsMarketOrder(false);
                   onLimitSwap();
                 },
               },
@@ -76,15 +93,7 @@ export default function SwapForm({ onLimitSwap }: Props): React$Node {
         </Box>
 
         {/* From Field */}
-        <SwapInput
-          label="Swap from"
-          image={fromAsset.image}
-          asset={fromAsset}
-          onAssetSelect={() => setOpenedDialog('from')}
-          handleAmountChange={amount => handleAmountChange(amount, 'from')}
-          showMax
-          isFrom
-        />
+        <EditSellAmount onAssetSelect={() => setOpenedDialog('from')} />
 
         {/* Clear and switch */}
         <Box display="flex" alignItems="center" justifyContent="space-between">
@@ -102,22 +111,11 @@ export default function SwapForm({ onLimitSwap }: Props): React$Node {
         </Box>
 
         {/* To Field */}
-        <SwapInput
-          label="Swap to"
-          image={toAsset.image}
-          asset={toAsset}
-          onAssetSelect={() => setOpenedDialog('to')}
-          handleAmountChange={amount => handleAmountChange(amount, 'to')}
-        />
+        <EditBuyAmount onAssetSelect={() => setOpenedDialog('to')} />
 
         {/* Price between assets */}
         <Box mt="16px">
-          <PriceInput
-            baseCurrency={fromAsset}
-            quoteCurrency={toAsset}
-            readonly={isMarketOrder}
-            label="Market price"
-          />
+          <PriceInput label="Market price" />
         </Box>
 
         {/* Slippage settings */}
@@ -139,7 +137,7 @@ export default function SwapForm({ onLimitSwap }: Props): React$Node {
             sx={{ cursor: 'pointer', display: 'flex', gap: '4px', alignItems: 'center' }}
           >
             <Typography component="div" variant="body1" color="grayscale.max">
-              {slippage}%
+              {orderData.slippage}%
             </Typography>
             <EditIcon />
           </Box>
@@ -155,14 +153,14 @@ export default function SwapForm({ onLimitSwap }: Props): React$Node {
               mb: '16px',
             }}
           >
-            <Box display="flex" gap="8px" alignItems="center">
+            {/* <Box display="flex" gap="8px" alignItems="center">
               <Typography component="div" variant="body1" color="grayscale.500">
                 DEX
               </Typography>
               <InfoIcon />
             </Box>
             <Box
-              onClick={() => !isMarketOrder && setOpenedDialog('pool')}
+              onClick={() => false && setOpenedDialog('pool')}
               sx={{ cursor: 'pointer', display: 'flex', gap: '4px', alignItems: 'center' }}
             >
               <Box sx={{ width: '24px', height: '24px' }}>{pool.image || <DefaultToken />}</Box>
@@ -170,46 +168,27 @@ export default function SwapForm({ onLimitSwap }: Props): React$Node {
                 {pool.name ? `${pool.name} ${pool.isAuto ? '(Auto)' : ''}` : 'No pool found'}
               </Typography>
 
-              {!isMarketOrder && <EditIcon />}
-            </Box>
+              <EditIcon />
+            </Box> */}
           </Box>
 
-          <SwapPool
-            fees="0"
-            minAda="0"
-            minAssets="0"
-            baseCurrency={fromAsset}
-            quoteCurrency={toAsset}
-          />
+          {/* <SwapPool /> */}
         </Box>
       </Box>
 
       {/* Dialogs */}
-      {(openedDialog === 'from' || openedDialog === 'to') && (
-        <SelectAssetDialog
-          assets={openedDialog === 'from' ? fromAssets : toAssets}
-          type={openedDialog}
-          onAssetSelected={asset => handleSelectedAsset(asset, openedDialog)}
-          onClose={() => setOpenedDialog('')}
-        />
-      )}
+      {openedDialog === 'from' && <SelectSellTokenFromList onClose={() => setOpenedDialog('')} />}
+      {openedDialog === 'to' && <SelectBuyTokenFromList onClose={() => setOpenedDialog('')} />}
 
-      {openedDialog === 'slippage' && (
-        <SlippageDialog
-          currentSlippage={slippage}
-          onSlippageApplied={setSlippage}
-          onClose={() => setOpenedDialog('')}
-        />
-      )}
+      {openedDialog === 'slippage' && <SlippageDialog onClose={() => setOpenedDialog('')} />}
 
-      {openedDialog === 'pool' && (
+      {/* {openedDialog === 'pool' && (
         <SelectPoolDialog
-          currentPool={pool.name}
+          currentPool={'test'}
           poolList={poolList}
-          onPoolSelected={setPool}
           onClose={() => setOpenedDialog('')}
         />
-      )}
+      )} */}
     </>
   );
 }

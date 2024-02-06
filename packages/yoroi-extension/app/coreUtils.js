@@ -93,3 +93,7 @@ export function maybe<T,R>(t: ?T, f: T => ?R): ?R {
 export function compose<A,B,C>(f1: A => ?B, f2: B => ?C): (A => ?C) {
   return a => maybe(f1(a), f2);
 }
+
+export function noop(..._: any[]) {
+  // noop
+}

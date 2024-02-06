@@ -107,7 +107,7 @@ export default class AdaAddressesStore extends Store<StoresMap, ActionsMap> {
       return true;
     }
     const id = String(selectedWallet.publicDeriverId);
-    return !this.api.localStorage.getFlag(`SupportedAddressDomainBannerState/${id}/closed`);
+    return !this.api.localStorage.getFlag(`w${id}/SupportedAddressDomainBannerState/closed`);
   }
 
   setSupportedAddressDomainBannerState(isDisplayed: boolean): void {
@@ -116,7 +116,7 @@ export default class AdaAddressesStore extends Store<StoresMap, ActionsMap> {
       return;
     }
     const id = String(selectedWallet.publicDeriverId);
-    this.api.localStorage.setFlag(`SupportedAddressDomainBannerState/${id}/closed`, !isDisplayed);
+    this.api.localStorage.setFlag(`w${id}/SupportedAddressDomainBannerState/closed`, !isDisplayed);
   }
 
   async resolveDomainAddress(resolve: string): Promise<?DomainResolverResponse> {

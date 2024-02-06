@@ -1,22 +1,29 @@
 // @flow
 import type { Node } from 'react';
 import { Box, Typography } from '@mui/material';
-import type { AssetAmount } from './types'
-import { BigNumber } from 'bignumber.js';
+import { Quantities } from '../../utils/quantities';
+// import { BigNumber } from 'bignumber.js';
+import { useSwap } from '@yoroi/swap';
+import { PRICE_PRECISION } from './common';
+import { useSwapForm } from '../../containers/swap/context/swap-form';
 
 type Props = {|
   label: string,
-  baseCurrency: AssetAmount,
-  quoteCurrency: AssetAmount,
-  readonly?: boolean,
 |};
 
-export default function PriceInput({
-  label,
-  baseCurrency,
-  quoteCurrency,
-  readonly = false,
-}: Props): Node {
+export default function PriceInput({ label }: Props): Node {
+  const { orderData } = useSwap();
+  const { sellTokenInfo, buyTokenInfo } = useSwapForm();
+
+  const prices = orderData.selectedPoolCalculation?.prices;
+  const formattedPrice = Quantities.format(
+    prices?.market ?? Quantities.zero,
+    orderData.tokens.priceDenomination,
+    PRICE_PRECISION
+  );
+
+  const readonly = orderData.type === 'market';
+
   return (
     <Box
       component="fieldset"
@@ -61,13 +68,13 @@ export default function PriceInput({
         placeholder="0"
         bgcolor={readonly ? 'grayscale.50' : 'common.white'}
         readOnly={readonly}
-        value={(new BigNumber(baseCurrency.amount)).div(quoteCurrency.amount).toString()}
+        value={formattedPrice}
       />
       <Box sx={{ justifySelf: 'end' }}>
         <Box height="100%" width="min-content" display="flex" alignItems="center">
-          <Box>{baseCurrency.ticker || '-'}</Box>
+          <Box>{sellTokenInfo?.ticker || '-'}</Box>
           <Box>/</Box>
-          <Box>{quoteCurrency.ticker || '-'}</Box>
+          <Box>{buyTokenInfo?.ticker || '-'}</Box>
         </Box>
       </Box>
     </Box>

@@ -19,19 +19,15 @@ import WalletAccountIcon from './WalletAccountIcon';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import AmountDisplay from '../common/AmountDisplay';
 import { Box, IconButton, Typography } from '@mui/material';
+import { maybe } from '../../coreUtils';
 
 type Props = {|
   +onUpdateHideBalance: void => Promise<void>,
   +shouldHideBalance: boolean,
   +highlightTitle?: boolean,
   +showEyeIcon?: boolean,
-  /**
-   * undefined => wallet is not a reward wallet
-   * null => still calculating
-   * value => done calculating
-   */
-  +rewards: null | void | MultiToken,
-  +walletAmount: null | MultiToken,
+  +rewards: MultiToken,
+  +walletAmount: ?MultiToken,
   +infoText?: string,
   +showDetails?: boolean,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
@@ -168,13 +164,8 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
     );
   }
 
-  getTotalAmount: void => null | MultiToken = () => {
-    if (this.props.rewards === undefined) {
-      return this.props.walletAmount;
-    }
-    if (this.props.rewards === null || this.props.walletAmount === null) {
-      return null;
-    }
-    return this.props.rewards.joinAddCopy(this.props.walletAmount);
+  getTotalAmount: void => ?MultiToken = () => {
+    return maybe(this.props.walletAmount,
+      w => this.props.rewards.joinAddCopy(w))
   };
 }

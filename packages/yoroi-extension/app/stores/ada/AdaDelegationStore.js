@@ -145,9 +145,7 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
             publicDeriver: withStakingKey,
             rewardBalance: new MultiToken(
               [{
-                amount: new BigNumber(stateForStakingKey == null
-                  ? 0
-                  : stateForStakingKey.remainingAmount),
+                amount: new BigNumber(stateForStakingKey?.remainingAmount ?? 0),
                 networkId: defaultToken.defaultNetworkId,
                 identifier: defaultToken.defaultIdentifier,
               }],

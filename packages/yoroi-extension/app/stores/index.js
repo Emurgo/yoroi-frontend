@@ -12,7 +12,6 @@ import WalletStore from './toplevel/WalletStore';
 import WalletSettingsStore from './toplevel/WalletSettingsStore';
 import TransactionsStore from './toplevel/TransactionsStore';
 import AddressesStore from './toplevel/AddressesStore';
-import TimeStore from './toplevel/TimeStore';
 import WalletRestoreStore from './toplevel/WalletRestoreStore';
 import YoroiTransferStore from './toplevel/YoroiTransferStore';
 import TransactionBuilderStore from './toplevel/TransactionBuilderStore';
@@ -22,7 +21,6 @@ import type { AdaStoresMap } from './ada/index';
 import { RouterStore } from 'mobx-react-router';
 import type { ActionsMap } from '../actions/index';
 import type { Api } from '../api/index';
-import { ApiOptions } from '../api/common/utils';
 import StateFetchStore from './toplevel/StateFetchStore';
 import CoinPriceStore from './toplevel/CoinPriceStore';
 import TokenInfoStore from './toplevel/TokenInfoStore';
@@ -47,7 +45,6 @@ const storeClasses = Object.freeze({
   loading: LoadingStore,
   wallets: WalletStore,
   addresses: AddressesStore,
-  time: TimeStore,
   transactions: TransactionsStore,
   walletRestore: WalletRestoreStore,
   walletSettings: WalletSettingsStore,
@@ -75,7 +72,6 @@ export type StoresMap = {|
   loading: LoadingStore,
   wallets: WalletStore,
   addresses: AddressesStore,
-  time: TimeStore,
   transactions: TransactionsStore,
   walletRestore: WalletRestoreStore,
   walletSettings: WalletSettingsStore,
@@ -112,7 +108,6 @@ const stores: StoresMap = (observable({
   loading: null,
   wallets: null,
   addresses: null,
-  time: null,
   transactions: null,
   walletRestore: null,
   walletSettings: null,
@@ -175,7 +170,7 @@ export default (action(
     };
 
     const loadedStores: StoresMap = (stores: any);
-    initializeSubstore<AdaStoresMap>(loadedStores.substores[ApiOptions.ada]);
+    initializeSubstore<AdaStoresMap>(loadedStores.substores.ada);
 
     // Perform load after all setup is done to ensure migration can modify store state
     loadedStores.loading.load('extension');

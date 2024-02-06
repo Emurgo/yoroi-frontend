@@ -10,6 +10,7 @@ import type { GetBalanceFunc } from '../../api/common/types';
 import type {
   ExportTransactionsFunc,
   GetTransactionsFunc,
+  GetTransactionsResponse,
   RefreshPendingTransactionsFunc,
 } from '../../api/common/index';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
@@ -24,7 +25,6 @@ import type {
   IGetLastSyncInfoResponse,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
-import { getApiForNetwork, } from '../../api/common/utils';
 import type { UnconfirmedAmount } from '../../types/unconfirmedAmountType';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
@@ -48,15 +48,12 @@ import { PRIMARY_ASSET_CONSTANTS } from '../../api/ada/lib/storage/database/prim
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
 import moment from 'moment';
-import {
-  loadSubmittedTransactions,
-  persistSubmittedTransactions,
-} from '../../api/localStorage';
+import { loadSubmittedTransactions, persistSubmittedTransactions, } from '../../api/localStorage';
 import { getAllAddressesForWallet } from '../../api/ada/lib/storage/bridge/traitUtils';
 import { toRequestAddresses } from '../../api/ada/lib/storage/bridge/updateTransactions'
 import type { TransactionExportRow } from '../../api/export';
 import type { HistoryRequest } from '../../api/ada/lib/state-fetch/types';
-
+import appConfig from '../../config';
 
 export type TxHistoryState = {|
   publicDeriver: PublicDeriver<>,
@@ -113,6 +110,15 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   @observable showDelegationBanner: boolean = true;
 
   @observable _submittedTransactions: Array<SubmittedTransactionEntry> = [];
+
+  /*
+   * This transient state only used to store a flag that a reward withdrawal has been processed for some wallet.
+   * Needed to cancel out the utxo balance being synced before the reward balance which was causing a higher
+   * total balance to be displayed for few seconds.
+   *
+   * NOT PERSISTED
+   */
+  @observable _processedWithdrawals: Array<number> = [];
 
   getTransactionRowsToExportRequest: LocalizedRequest<
     ((void) => Promise<void>) => Promise<void>
@@ -277,12 +283,17 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   _afterLoadingNewTxs: (
     Array<WalletTransaction>,
     PublicDeriver<>,
-  ) => Promise<void> = async (result, publicDeriver) => {
+  ) => Promise<void> = async (result: Array<WalletTransaction>, publicDeriver: PublicDeriver<>) => {
     const timestamps: Set<number> = new Set();
     const remoteTransactionIds: Set<string> = new Set();
-    for (const { txid, date } of result) {
+    const withdrawalIds = new Set<string>();
+    for (const tx of result) {
+      const { txid, date } = tx;
       timestamps.add(date.valueOf());
       remoteTransactionIds.add(txid);
+      if (tx instanceof CardanoShelleyTransaction && tx.withdrawals.length > 0) {
+        withdrawalIds.add(txid);
+      }
     }
     const defaultTokenInfo = this.stores.tokenInfoStore.getDefaultTokenInfo(
       publicDeriver.getParent().getNetworkInfo().NetworkId,
@@ -298,9 +309,16 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     });
 
     let submittedTransactionsChanged = false;
+    let addedProcessedWithdrawal = false;
     runInAction(() => {
       for (let i = 0; i < this._submittedTransactions.length; ) {
-        if (remoteTransactionIds.has(this._submittedTransactions[i].transaction.txid)) {
+        const txId = this._submittedTransactions[i].transaction.txid;
+        if (remoteTransactionIds.has(txId)) {
+          if (withdrawalIds.has(txId) && !addedProcessedWithdrawal) {
+            // Set local processed withdrawals only if there was a pending local transaction
+            this._processedWithdrawals.push(publicDeriver.publicDeriverId);
+            addedProcessedWithdrawal = true;
+          }
           this._submittedTransactions.splice(i, 1);
           submittedTransactionsChanged = true;
         } else {
@@ -334,7 +352,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const isEmptyHistory = txHistoryState.txs.length === 0;
 
     const {
-      tailRequest,
       headRequest,
       getBalanceRequest,
       getAssetDepositRequest
@@ -343,17 +360,12 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     let result;
     if (isEmptyHistory) {
       /*
-       * TAIL REQUEST IS USED WHEN FIRST SYNC OR EMPRY WALLET
+       * TAIL REQUEST IS USED WHEN FIRST SYNC OR EMPTY WALLET
        */
-      tailRequest.invalidate({ immediately: false });
-      tailRequest.execute({
-        publicDeriver,
-        isLocalRequest: request.isLocalRequest
+      result = await this._internalTailRequestForTxs({
+        publicDeriver: request.publicDeriver,
+        isLocalRequest: request.isLocalRequest,
       });
-      if (tailRequest.promise == null) {
-        throw new Error('unexpected nullish tailRequest.promise');
-      }
-      result = await tailRequest.promise;
     } else {
       /*
        * HEAD REQUEST IS USED WITH `AFTER` REFERENCE
@@ -362,6 +374,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       headRequest.invalidate({ immediately: false });
       headRequest.execute({
         publicDeriver,
+        // HEAD request is never local by logic
         isLocalRequest: false,
         afterTx: txHistoryState.txs[0],
       });
@@ -369,22 +382,22 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
         throw new Error('unexpected nullish headRequest.promise');
       }
       result = await headRequest.promise;
-    }
-    {
-      /**
-       * Adding received txs to the start of the existing history
-       */
-      const { txs } = this.getTxHistoryState(request.publicDeriver);
-      runInAction(() => {
-        for (let i = 0; i < result.length; i++) {
-          const tx = result[i];
-          if (tx.txid === txs[0]?.txid) {
-            // In case received tx matches with the existing one - stop
-            break;
+      {
+        /**
+         * Adding received txs to the start of the existing history
+         */
+        const { txs } = this.getTxHistoryState(request.publicDeriver);
+        runInAction(() => {
+          for (let i = 0; i < result.length; i++) {
+            const tx = result[i];
+            if (tx.txid === txs[0]?.txid) {
+              // In case received tx matches with the existing one - stop
+              break;
+            }
+            txs.splice(i, 0, tx);
           }
-          txs.splice(i, 0, tx);
-        }
-      });
+        });
+      }
     }
 
     // update last sync (note: changes even if no new transaction is found)
@@ -473,9 +486,15 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
           return newMultiToken(defaultToken);
         },
       });
+      const refreshDelegationPromise =
+        this.stores.substores.ada.delegation.refreshDelegation(request.publicDeriver);
       if (!getBalanceRequest.promise || !getAssetDepositRequest.promise)
         throw new Error('should never happen');
-      await Promise.all([getBalanceRequest.promise, getAssetDepositRequest.promise]);
+      await Promise.all([
+        getBalanceRequest.promise,
+        getAssetDepositRequest.promise,
+        refreshDelegationPromise,
+      ]);
     })();
 
     await this._afterLoadingNewTxs(
@@ -484,11 +503,13 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     );
   }
 
-  @action _loadMore: (
-    PublicDeriver<> & IGetLastSyncInfo,
-  ) => Promise<void> = async (
+  _internalTailRequestForTxs: ({|
     publicDeriver: PublicDeriver<> & IGetLastSyncInfo,
-  ) => {
+    isLocalRequest?: boolean,
+  |}) => Promise<GetTransactionsResponse> = async ({
+    publicDeriver,
+    isLocalRequest = false,
+  }) => {
     const withLevels = asHasLevels<ConceptualWallet, IGetLastSyncInfo>(publicDeriver);
     if (withLevels == null) {
       throw new Error(`${nameof(this._loadMore)} no levels`);
@@ -501,20 +522,25 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     tailRequest.invalidate({ immediately: false });
     tailRequest.execute({
       publicDeriver: withLevels,
-      isLocalRequest: false,
+      isLocalRequest,
       beforeTx,
     });
-    if (!tailRequest.promise) throw new Error('should never happen');
+    if (!tailRequest.promise) throw new Error('unexpected nullish tailRequest.promise');
     const result = await tailRequest.promise;
     runInAction(() => {
       state.txs.splice(state.txs.length, 0, ...result);
-      state.hasMoreToLoad = result.length > 0;
+      state.hasMoreToLoad = result.length >= appConfig.wallets.MAX_RECENT_TXS_PER_LOAD;
     });
+    return result;
+  }
 
-    await this._afterLoadingNewTxs(
-      result,
-      publicDeriver,
-    );
+  @action _loadMore: (
+    PublicDeriver<> & IGetLastSyncInfo,
+  ) => Promise<void> = async (
+    publicDeriver: PublicDeriver<> & IGetLastSyncInfo,
+  ) => {
+    const result = await this._internalTailRequestForTxs({ publicDeriver });
+    await this._afterLoadingNewTxs(result, publicDeriver);
   }
 
   /** Add a new public deriver to track and refresh the data */
@@ -524,8 +550,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   |}) => void = (
     request
   ) => {
-    const apiType = getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo());
-
     const foundRequest = find(
       this.txHistoryStates,
       { publicDeriver: request.publicDeriver }
@@ -541,15 +565,15 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       hasMoreToLoad: true, // assuming yes until actually loaded and found otherwise
       requests: {
         headRequest: new CachedRequest<GetTransactionsFunc>(
-          this.stores.substores[apiType].transactions.refreshTransactions
+          this.stores.substores.ada.transactions.refreshTransactions
         ),
         tailRequest: new CachedRequest<GetTransactionsFunc>(
-          this.stores.substores[apiType].transactions.refreshTransactions
+          this.stores.substores.ada.transactions.refreshTransactions
         ),
         getBalanceRequest: new CachedRequest<GetBalanceFunc>(this.api.common.getBalance),
         getAssetDepositRequest: new CachedRequest<GetBalanceFunc>(this.api.common.getAssetDeposit),
         pendingRequest: new CachedRequest<RefreshPendingTransactionsFunc>(
-          this.stores.substores[apiType].transactions.refreshPendingTransactions
+          this.stores.substores.ada.transactions.refreshPendingTransactions
         ),
       },
     });
@@ -863,6 +887,20 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       .filter(({ publicDeriverId }) => publicDeriverId === publicDeriver.publicDeriverId)
       .map(tx => tx.transaction);
   };
+
+  hasProcessedWithdrawals: (PublicDeriver<>) => boolean = (publicDeriver) => {
+    return this._processedWithdrawals.includes(publicDeriver.publicDeriverId);
+  }
+
+  clearProcessedWithdrawals: (PublicDeriver<>) => void = (publicDeriver) => {
+    for (let i = 0; i < this._processedWithdrawals.length; ) {
+      if (this._processedWithdrawals[i] === publicDeriver.publicDeriverId) {
+        this._processedWithdrawals.splice(i, 1);
+      } else {
+        i++;
+      }
+    }
+  }
 
   @action
   clearSubmittedTransactions: (PublicDeriver<>) => void = publicDeriver => {

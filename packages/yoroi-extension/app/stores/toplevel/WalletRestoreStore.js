@@ -15,7 +15,6 @@ import {
   generateWalletRootKey as generateAdaWalletRootKey,
   generateLedgerWalletRootKey,
 } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
-import { getApiForNetwork } from '../../api/common/utils';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import {
   isCardanoHaskell,
@@ -202,8 +201,7 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
   |}) => boolean = request => {
     const { selectedNetwork } = this.stores.profile;
     if (selectedNetwork == null) throw new Error(`${nameof(this.isValidMnemonic)} no API selected`);
-    const api = getApiForNetwork(selectedNetwork);
-    return this.stores.substores[api].walletRestore.isValidMnemonic(request);
+    return this.stores.substores.ada.walletRestore.isValidMnemonic(request);
   };
 }
 
