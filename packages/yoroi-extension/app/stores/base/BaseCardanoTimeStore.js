@@ -103,7 +103,11 @@ export default class BaseCardanoTimeStore extends Store<StoresMap, ActionsMap> {
     const currentRelativeTime = toRelativeSlotNumber(currentAbsoluteSlot.slot);
 
     runInAction(() => {
-      currTimeRequests.currentEpoch = currentRelativeTime.epoch;
+      if (currTimeRequests.currentEpoch !== currentRelativeTime.epoch) {
+        // Clearing processed withdrawals in case epoch changes
+        this.stores.transactions.clearProcessedWithdrawals(selected);
+        currTimeRequests.currentEpoch = currentRelativeTime.epoch;
+      }
       currTimeRequests.currentSlot = currentRelativeTime.slot;
       currTimeRequests.msIntoSlot = currentAbsoluteSlot.msIntoSlot;
     });

@@ -4,7 +4,6 @@ import type {
   SignedRequestInternal,
   SignedResponse,
   RemoteTransaction,
-  UtxoSumFunc,
   PoolInfoFunc,
   AddressUtxoFunc,
   RewardHistoryRequest,
@@ -28,7 +27,6 @@ import {
   genGetBestBlock,
   genCheckAddressesInUse,
   genUtxoForAddresses,
-  genUtxoSumForAddresses,
   getSingleAddressString,
   getAddressForType,
   getMangledAddressString,
@@ -2185,7 +2183,6 @@ const utxoForAddresses: AddressUtxoFunc = genUtxoForAddresses(
   getBestBlock,
   networks.CardanoMainnet
 );
-const utxoSumForAddresses: UtxoSumFunc = genUtxoSumForAddresses(utxoForAddresses);
 
 const getTransactionsByHashes: GetTransactionsByHashesFunc =
   genGetTransactionsByHashes(transactions);
@@ -2352,7 +2349,6 @@ const getUtxoData = (txHash: string, txIndex: number): UtxoData | null => {
 
 export default {
   utxoForAddresses,
-  utxoSumForAddresses,
   usedAddresses,
   getApiStatus,
   history,

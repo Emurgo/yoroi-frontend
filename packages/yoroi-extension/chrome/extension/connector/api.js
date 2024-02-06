@@ -240,7 +240,7 @@ export async function connectorGetUtxosCardano(
     return Promise.resolve(paginateResults(formattedUtxos, paginate));
   }
 
-  setRuntime(RustModule.CrossCsl.init());
+  setRuntime(RustModule.CrossCsl.init);
 
   const utxoSet = new UTxOSet(
     await Promise.all(
@@ -1240,6 +1240,11 @@ export async function getAddressing(
   );
   if (rewardAddressing) {
     return rewardAddressing;
+  }
+
+  const [ dRepPubKey, dRepAddressing ] = await _getDRepKeyAndAddressing(publicDeriver);
+  if (dRepPubKey.hash().to_hex() === address) {
+    return dRepAddressing;
   }
 
   const withUtxos = asGetAllUtxos(publicDeriver);

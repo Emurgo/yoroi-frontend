@@ -105,7 +105,7 @@ export async function getUtxoDelegatedBalance(
 ): Promise<MultiToken> {
   const withUtxos = asGetAllUtxos(publicDeriver);
   if (withUtxos == null) {
-    return new MultiToken([], publicDeriver.getParent().getDefaultToken());
+    return publicDeriver.getParent().getDefaultMultiToken();
   }
   const basePubDeriver = withUtxos;
 
@@ -128,7 +128,7 @@ export async function getUtxoDelegatedBalance(
       })),
       publicDeriver.getParent().getDefaultToken()
     )),
-    new MultiToken([], publicDeriver.getParent().getDefaultToken())
+    publicDeriver.getParent().getDefaultMultiToken(),
   );
 
   return utxoSum;

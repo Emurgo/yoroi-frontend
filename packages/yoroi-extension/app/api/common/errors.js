@@ -80,14 +80,6 @@ const messages = defineMessages({
     id: 'api.errors.getAllUTXOsForAddressesError',
     defaultMessage: '!!!Error received from api method call while getting utxos.',
   },
-  getTxsBodiesForUTXOsError: {
-    id: 'api.errors.getTxsBodiesForUTXOsError',
-    defaultMessage: '!!!Error received from api method call while getting TxBodies.',
-  },
-  getTxsBodiesForUTXOsApiError: {
-    id: 'api.errors.getTxsBodiesForUTXOsApiError',
-    defaultMessage: '!!!Error received from server while getting TxBodies.',
-  },
   discoverAddressesError: {
     id: 'api.errors.discoverAddressesError',
     defaultMessage: '!!!Error received from api method call while discovering addresses.',
@@ -95,10 +87,6 @@ const messages = defineMessages({
   getUtxosForAddressesApiError: {
     id: 'api.errors.getUtxosForAddressesApiError',
     defaultMessage: '!!!Error received from server while getting UTXOs.',
-  },
-  getUtxosSumsForAddressesApiError: {
-    id: 'api.errors.getUtxosSumsForAddressesApiError',
-    defaultMessage: '!!!Error received from server while getting balance.',
   },
   getTxHistoryForAddressesApiError: {
     id: 'api.errors.getTxHistoryForAddressesApiError',
@@ -354,33 +342,6 @@ export class GetUtxosForAddressesApiError extends LocalizableError {
     super({
       id: messages.getUtxosForAddressesApiError.id,
       defaultMessage: messages.getUtxosForAddressesApiError.defaultMessage || '',
-    });
-  }
-}
-
-export class GetTxsBodiesForUTXOsError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.getTxsBodiesForUTXOsError.id,
-      defaultMessage: messages.getTxsBodiesForUTXOsError.defaultMessage || '',
-    });
-  }
-}
-
-export class GetTxsBodiesForUTXOsApiError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.getTxsBodiesForUTXOsApiError.id,
-      defaultMessage: messages.getTxsBodiesForUTXOsApiError.defaultMessage || '',
-    });
-  }
-}
-
-export class GetUtxosSumsForAddressesApiError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.getUtxosSumsForAddressesApiError.id,
-      defaultMessage: messages.getUtxosSumsForAddressesApiError.defaultMessage || '',
     });
   }
 }

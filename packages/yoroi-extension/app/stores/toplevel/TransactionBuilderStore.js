@@ -43,6 +43,9 @@ export type PlannedTxInfoMap = Array<{|
   amount?: string,
 |}>;
 
+export type MaxSendableAmountRequest =
+  LocalizedRequest<DeferredCall<BigNumber>>;
+
 /**
  * TODO: we make the following assumptions
  * - only single output for transaction
@@ -71,7 +74,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   @observable createUnsignedTx: LocalizedRequest<DeferredCall<ISignRequest<any>>>
     = new LocalizedRequest<DeferredCall<ISignRequest<any>>>(async func => await func());
 
-  @observable maxSendableAmount: LocalizedRequest<DeferredCall<BigNumber>>
+  @observable maxSendableAmount: MaxSendableAmountRequest
     = new LocalizedRequest<DeferredCall<BigNumber>>(async func => await func());
 
   @observable memo: void | string;

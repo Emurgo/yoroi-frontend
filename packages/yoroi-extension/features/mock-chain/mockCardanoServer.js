@@ -4,8 +4,6 @@ import { create, bodyParser, defaults } from 'json-server';
 import type {
   AddressUtxoRequest,
   AddressUtxoResponse,
-  UtxoSumRequest,
-  UtxoSumResponse,
   HistoryRequest,
   HistoryResponse,
   AccountStateRequest,
@@ -179,21 +177,6 @@ export function getMockServer(settings: {
         const utxoForAddresses = await mockImporter.utxoForAddresses(req.body);
         methodLogger.logResponseSuccess(JSON.stringify(utxoForAddresses));
         res.send(utxoForAddresses);
-      }
-    );
-
-    server.post(
-      '/api/txs/utxoSumForAddresses',
-      async (
-        req: { body: UtxoSumRequest, ... },
-        res: { send(arg: UtxoSumResponse): any, ... }
-      ): Promise<void> => {
-        const methodLogger = localLogger.getMethodLogger('POST', '/api/txs/utxoSumForAddresses');
-        chai.assert.isTrue(_validateAddressesReq(req.body, localLogger));
-        methodLogger.logRequest(JSON.stringify(req.body));
-        const utxoSumForAddresses = await mockImporter.utxoSumForAddresses(req.body);
-        methodLogger.logResponseSuccess(JSON.stringify(utxoSumForAddresses));
-        res.send(utxoSumForAddresses);
       }
     );
 
