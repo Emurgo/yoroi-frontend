@@ -1490,9 +1490,10 @@ export default class AdaApi {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.createDelegationTx)} called`);
 
     try {
-      const config = getCardanoHaskellBaseConfig(
-        request.publicDeriver.getParent().getNetworkInfo()
-      ).reduce((acc, next) => Object.assign(acc, next), {});
+      const { publicDeriver } = request;
+      const networkInfo = publicDeriver.getParent().getNetworkInfo();
+      const config = getCardanoHaskellBaseConfig(networkInfo)
+        .reduce((acc, next) => Object.assign(acc, next), {});
 
       const protocolParams = {
         keyDeposit: config.KeyDeposit,
@@ -1500,10 +1501,10 @@ export default class AdaApi {
         linearFeeConstant: config.LinearFee.constant,
         coinsPerUtxoWord: config.CoinsPerUtxoWord,
         poolDeposit: config.PoolDeposit,
-        networkId: request.publicDeriver.getParent().networkInfo.NetworkId,
+        networkId: networkInfo.NetworkId,
       };
 
-      const publicKeyDbRow = await request.publicDeriver.getPublicKey();
+      const publicKeyDbRow = await publicDeriver.getPublicKey();
       if (publicKeyDbRow.IsEncrypted) {
         throw new Error(`${nameof(AdaApi)}::${nameof(this.createDelegationTx)} public key is encrypted`);
       }
@@ -1511,11 +1512,11 @@ export default class AdaApi {
         Buffer.from(publicKeyDbRow.Hash, 'hex')
       );
 
-      const stakingKeyDbRow = await request.publicDeriver.getStakingKey();
+      const stakingKeyDbRow = await publicDeriver.getStakingKey();
       const stakingKey = derivePublicByAddressing({
         addressing: stakingKeyDbRow.addressing,
         startingFrom: {
-          level: request.publicDeriver.getParent().getPublicDeriverLevel(),
+          level: publicDeriver.getParent().getPublicDeriverLevel(),
           key: publicKey,
         },
       }).to_raw_key();
@@ -1526,9 +1527,9 @@ export default class AdaApi {
         request.poolRequest
       );
 
-      const allUtxo = await request.publicDeriver.getAllUtxos();
+      const allUtxo = await publicDeriver.getAllUtxos();
       const addressedUtxo = asAddressedUtxo(allUtxo);
-      const changeAddr = await getReceiveAddress(request.publicDeriver);
+      const changeAddr = await getReceiveAddress(publicDeriver);
       if (changeAddr == null) {
         throw new Error(`${nameof(this.createDelegationTx)} no internal addresses left. Should never happen`);
       }
@@ -1559,16 +1560,16 @@ export default class AdaApi {
           amount: new BigNumber(token.TokenList.Amount),
           networkId: token.Token.NetworkId,
         })),
-        request.publicDeriver.getParent().getDefaultToken()
+        publicDeriver.getParent().getDefaultToken()
       )),
-      new MultiToken([], request.publicDeriver.getParent().getDefaultToken())
+        publicDeriver.getParent().getDefaultMultiToken()
     );
 
       const differenceAfterTx = getDifferenceAfterTx(
         unsignedTx,
         allUtxo,
         stakingKey,
-        request.publicDeriver.getParent().getDefaultToken(),
+        publicDeriver.getParent().getDefaultToken(),
       );
 
       const totalAmountToDelegate = utxoSum
@@ -1592,7 +1593,7 @@ export default class AdaApi {
           ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
           KeyDeposit: new BigNumber(config.KeyDeposit),
           PoolDeposit: new BigNumber(config.PoolDeposit),
-          NetworkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+          NetworkId: networkInfo.NetworkId,
         },
         neededStakingKeyHashes: {
           neededHashes: new Set([stakeCredentialHex]),
@@ -1883,12 +1884,14 @@ export default class AdaApi {
     return isValidBip39Mnemonic(request.mnemonic, request.numberOfWords);
   }
 
+  // <TODO:PENDING_REMOVAL> paper
   isValidPaperMnemonic(
     request: IsValidPaperMnemonicRequest
   ): IsValidPaperMnemonicResponse {
     return isValidEnglishAdaPaperMnemonic(request.mnemonic, request.numberOfWords);
   }
 
+  // <TODO:PENDING_REMOVAL> paper
   unscramblePaperMnemonic(
     request: UnscramblePaperMnemonicRequest
   ): UnscramblePaperMnemonicResponse {
@@ -2351,8 +2354,6 @@ export default class AdaApi {
     publicDeriver: PublicDeriver<>,
     signRequest: HaskellShelleyTxSignRequest,
     txId: string,
-    defaultNetworkId: number,
-    defaultToken: $ReadOnly<TokenRow>,
   ): Promise<{|
     transaction: CardanoShelleyTransaction,
     usedUtxos: Array<{| txHash: string, index: number |}>
@@ -2388,13 +2389,7 @@ export default class AdaApi {
     const ownAddresses = new Set(
       utxoAddresses.map(a => a.Hash)
     );
-    const amount = new MultiToken(
-      [],
-      {
-        defaultNetworkId,
-        defaultIdentifier: defaultToken.Identifier,
-      },
-    );
+    const amount = publicDeriver.getParent().getDefaultMultiToken();
     for (const input of signRequest.inputs()) {
       amount.joinSubtractMutable(input.value);
     }

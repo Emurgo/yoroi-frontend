@@ -15,11 +15,12 @@ import type {
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import LocalizableError from '../../i18n/LocalizableError';
 import { PoolMissingApiError, } from '../../api/common/errors';
-import type { MangledAmountFunc } from '../stateless/mangledAddresses';
+import type { MangledAmountFunc, MangledAmountsResponse } from '../stateless/mangledAddresses';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import type { PoolInfo } from '@emurgo/yoroi-lib';
 import { MultiToken } from '../../api/common/lib/MultiToken';
+import { maybe } from '../../coreUtils';
 
 export type DelegationRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -108,33 +109,64 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     this.selectedPage = 0;
   }
 
-  // TODO: refine input type to staking key wallets only
   getDelegationRequests: PublicDeriver<> => void | DelegationRequests = (
     publicDeriver
   ) => {
-    const foundRequest = find(this.delegationRequests, { publicDeriver });
-    if (foundRequest) return foundRequest;
-
-    return undefined; // can happen if the wallet is not a Shelley wallet
+    return find(this.delegationRequests, { publicDeriver });
   }
 
   _getDelegatedBalanceResult: PublicDeriver<> => ?GetDelegatedBalanceResponse = (publicDeriver) => {
-    const delegationRequest = this.stores.delegation.getDelegationRequests(publicDeriver);
-    if (delegationRequest == null) return null;
-    return delegationRequest.getDelegatedBalance.result;
+    const delegationRequest = this.getDelegationRequests(publicDeriver);
+    return delegationRequest?.getDelegatedBalance.result || null;
   }
 
-  getRewardBalance: PublicDeriver<> => ?MultiToken = (publicDeriver) => {
+  // <TODO:PENDING_REMOVAL> legacy after removing bip44
+  isRewardWallet: PublicDeriver<> => boolean = (publicDeriver) => {
+    return this.getDelegationRequests(publicDeriver) != null;
+  }
+
+  canUnmangleSomeUtxo: PublicDeriver<> => boolean = (publicDeriver) => {
+    const canUnmangleAmount: ?MultiToken = this.getDelegationRequests(publicDeriver)
+      ?.mangledAmounts.result?.canUnmangle;
+    return maybe(canUnmangleAmount, t => t.getDefault().gt(0)) ?? false;
+  }
+
+  getMangledAmountsOrZero: PublicDeriver<> => MangledAmountsResponse = (publicDeriver) => {
+    const resp: ?MangledAmountsResponse = this.getDelegationRequests(publicDeriver)?.mangledAmounts.result;
+    return {
+      canUnmangle: resp?.canUnmangle ?? publicDeriver.getParent().getDefaultMultiToken(),
+      cannotUnmangle: resp?.cannotUnmangle ?? publicDeriver.getParent().getDefaultMultiToken(),
+    };
+  }
+
+  hasRewardHistory: PublicDeriver<> => boolean = (publicDeriver) => {
+    return this.getDelegationRequests(publicDeriver)?.rewardHistory.result != null;
+  }
+
+  isExecutedDelegatedBalance: PublicDeriver<> => boolean = (publicDeriver) => {
+    return this.getDelegationRequests(publicDeriver)?.getDelegatedBalance.wasExecuted === true;
+  }
+
+  getRewardBalanceOrZero: PublicDeriver<> => MultiToken = (publicDeriver) => {
     if (this.stores.transactions.hasProcessedWithdrawals(publicDeriver)) {
       // In case we have a processed withdrawal for the wallet
       // We cancel out any still present reward, in case it has not synced yet
-      return null;
+      return publicDeriver.getParent().getDefaultMultiToken();
     }
-    return this._getDelegatedBalanceResult(publicDeriver)?.accountPart ?? null;
+    return this._getDelegatedBalanceResult(publicDeriver)?.accountPart
+      ?? publicDeriver.getParent().getDefaultMultiToken();
+  }
+
+  getDelegatedUtxoBalance: PublicDeriver<> => ?MultiToken = (publicDeriver) => {
+    return this._getDelegatedBalanceResult(publicDeriver)?.utxoPart ?? null;
   }
 
   getDelegatedPoolId: PublicDeriver<> => ?string = (publicDeriver) => {
     return this._getDelegatedBalanceResult(publicDeriver)?.delegation ?? null;
+  }
+
+  isCurrentlyDelegating: PublicDeriver<> => boolean = (publicDeriver) => {
+    return this.getDelegatedPoolId(publicDeriver) != null;
   }
 
   isStakeRegistered: PublicDeriver<> => ?boolean = (publicDeriver) => {
