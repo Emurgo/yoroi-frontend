@@ -93,9 +93,6 @@ const StakingDashboardPage = React.lazy(StakingDashboardPagePromise);
 const CardanoStakingPagePromise = () => import('./containers/wallet/staking/CardanoStakingPage');
 const CardanoStakingPage = React.lazy(CardanoStakingPagePromise);
 
-const NoticeBoardPagePromise = () => import('./containers/notice-board/NoticeBoardPage');
-const NoticeBoardPage = React.lazy(NoticeBoardPagePromise);
-
 const ComplexityLevelSettingsPagePromise = () =>
   import('./containers/settings/categories/ComplexityLevelSettingsPage');
 const ComplexityLevelSettingsPage = React.lazy(ComplexityLevelSettingsPagePromise);
@@ -159,7 +156,6 @@ export const LazyLoadPromises: Array<() => any> = [
   ReceivePromise,
   StakingDashboardPagePromise,
   CardanoStakingPagePromise,
-  NoticeBoardPagePromise,
   VotingPageContentPromise,
   ComplexityLevelSettingsPagePromise,
   ComplexityLevelPagePromise,
@@ -300,11 +296,6 @@ export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
         exact
         path={ROUTES.OAUTH_FROM_EXTERNAL.DROPBOX}
         component={props => <OAuthDropboxPage {...props} stores={stores} actions={actions} />}
-      />
-      <Route
-        exact
-        path={ROUTES.NOTICE_BOARD.ROOT}
-        component={props => <NoticeBoardPage {...props} stores={stores} actions={actions} />}
       />
       <Route
         exact
