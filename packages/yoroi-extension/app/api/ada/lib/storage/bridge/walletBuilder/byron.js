@@ -120,6 +120,7 @@ export async function getAccountDefaultDerivations(
   ];
 }
 
+// <TODO:PENDING_REMOVAL> bip44 (used only in tests)
 export async function createStandardBip44Wallet(request: {|
   db: lf$Database,
   rootPk: RustModule.WalletV2.Bip44RootPrivateKey,

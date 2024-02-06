@@ -41,7 +41,6 @@ test('Restore wallet', async () => {
     walletPassword: '123',
     network: networks.CardanoMainnet,
     accountIndex: HARD_DERIVATION_START + 0,
-    mode: 'bip44',
   };
 
   const response = await AdaApi.prototype.restoreWallet(restoreRequest);
@@ -52,7 +51,7 @@ test('Restore wallet', async () => {
   if (asGetPublicKeyInstance != null) {
     const pubKey = await asGetPublicKeyInstance.getPublicKey();
     const plate = legacyWalletChecksum(pubKey.Hash);
-    expect(plate.TextPart).toEqual('DBJL-9530');
+    expect(plate.TextPart).toEqual('SKLE-8430');
   }
 });
 

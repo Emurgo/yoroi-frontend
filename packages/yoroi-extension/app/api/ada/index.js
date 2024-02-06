@@ -12,7 +12,7 @@ import {
   WalletTypePurpose,
 } from '../../config/numbersConfig';
 import type { Network, } from '../../../config/config-types';
-import { createHardwareWallet, createStandardBip44Wallet, } from './lib/storage/bridge/walletBuilder/byron';
+import { createHardwareWallet, } from './lib/storage/bridge/walletBuilder/byron';
 import { createHardwareCip1852Wallet, createStandardCip1852Wallet, } from './lib/storage/bridge/walletBuilder/shelley';
 import type { ReferenceTx } from './lib/storage/bridge/updateTransactions';
 import {
@@ -858,10 +858,7 @@ export default class AdaApi {
   }
 
   async createWallet(
-    request: {|
-      mode: 'bip44' | 'cip1852',
-      ...CreateWalletRequest,
-    |},
+    request: CreateWalletRequest,
   ): Promise<CreateWalletResponse> {
     // creating a wallet is the same as restoring a wallet
     return await this.restoreWallet(request);
@@ -1916,10 +1913,7 @@ export default class AdaApi {
    * Creates wallet and saves result to DB
   */
   async restoreWallet(
-    request: {|
-      mode: 'bip44' | 'cip1852',
-      ...RestoreWalletRequest,
-    |}
+    request: RestoreWalletRequest
   ): Promise<RestoreWalletResponse> {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.restoreWallet)} called`);
     const { recoveryPhrase, walletName, walletPassword, } = request;
@@ -1931,57 +1925,25 @@ export default class AdaApi {
       // Note: we only restore for 0th account
       const rootPk = generateWalletRootKey(recoveryPhrase);
       const newPubDerivers = [];
-      if (request.mode === 'bip44') {
-        const wallet = await createStandardBip44Wallet({
-          db: request.db,
-          rootPk: RustModule.WalletV2.Bip44RootPrivateKey.new(
-            RustModule.WalletV2.PrivateKey.from_hex(
-              Buffer.from(rootPk.as_bytes()).toString('hex')
-            ),
-            RustModule.WalletV2.DerivationScheme.v2()
-          ),
-          password: walletPassword,
-          accountIndex: request.accountIndex,
-          walletName,
-          accountName: '', // set account name empty now
-          network: request.network,
-        });
-
-        const bip44Wallet = await Bip44Wallet.createBip44Wallet(
-          request.db,
-          wallet.bip44WrapperRow,
-        );
-        for (const pubDeriver of wallet.publicDeriver) {
-          newPubDerivers.push(await PublicDeriver.createPublicDeriver(
-            pubDeriver.publicDeriverResult,
-            bip44Wallet,
-          ));
-        }
-      } else if (request.mode === 'cip1852') {
-        const wallet = await createStandardCip1852Wallet({
-          db: request.db,
-          rootPk,
-          password: walletPassword,
-          accountIndex: request.accountIndex,
-          walletName,
-          accountName: '', // set account name empty now
-          network: request.network,
-        });
-
-        const cip1852Wallet = await Cip1852Wallet.createCip1852Wallet(
-          request.db,
-          wallet.cip1852WrapperRow,
-        );
-        for (const pubDeriver of wallet.publicDeriver) {
-          newPubDerivers.push(await PublicDeriver.createPublicDeriver(
-            pubDeriver.publicDeriverResult,
-            cip1852Wallet,
-          ));
-        }
-      } else {
-        throw new Error(`${nameof(this.restoreWallet)} unknown restoration mode`);
+      const wallet = await createStandardCip1852Wallet({
+        db: request.db,
+        rootPk,
+        password: walletPassword,
+        accountIndex: request.accountIndex,
+        walletName,
+        accountName: '', // set account name empty now
+        network: request.network,
+      });
+      const cip1852Wallet = await Cip1852Wallet.createCip1852Wallet(
+        request.db,
+        wallet.cip1852WrapperRow,
+      );
+      for (const pubDeriver of wallet.publicDeriver) {
+        newPubDerivers.push(await PublicDeriver.createPublicDeriver(
+          pubDeriver.publicDeriverResult,
+          cip1852Wallet,
+        ));
       }
-
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.restoreWallet)} success`);
       return {
         publicDerivers: newPubDerivers,
@@ -2197,6 +2159,7 @@ export default class AdaApi {
     }
   }
 
+  // <TODO:BIP44> CANNOT BE BIP44
   async createHardwareWallet(
     request: CreateHardwareWalletRequest
   ): Promise<CreateHardwareWalletResponse> {
@@ -2209,6 +2172,7 @@ export default class AdaApi {
       if (request.addressing.startLevel !== Bip44DerivationLevels.PURPOSE.level) {
         throw new Error(`${nameof(AdaApi)}::${nameof(this.createHardwareWallet)} bad addressing start level`);
       }
+      // <TODO:PENDING_REMOVAL> bip44
       if (request.addressing.path[0] === WalletTypePurpose.BIP44) {
         const wallet = await createHardwareWallet({
           db: request.db,

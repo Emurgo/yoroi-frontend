@@ -75,7 +75,6 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
     const accountIndex = this.stores.walletRestore.selectedAccount;
     await this.stores.wallets.restoreRequest.execute(async () => {
       const wallet = await this.api.ada.restoreWallet({
-        mode: 'cip1852',
         db: persistentDb,
         recoveryPhrase: phrase,
         walletName,
@@ -103,7 +102,6 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
     const accountIndex = this.stores.walletRestore.selectedAccount;
     await this.stores.wallets.restoreRequest.execute(async () => {
       const wallet = await this.api.ada.restoreWallet({
-        mode: 'cip1852',
         db: persistentDb,
         recoveryPhrase,
         walletName,
