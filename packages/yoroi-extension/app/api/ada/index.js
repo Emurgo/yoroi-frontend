@@ -1,5 +1,4 @@
 // @flow
-import moment from 'moment';
 import BigNumber from 'bignumber.js';
 import type { lf$Database } from 'lovefield';
 import { fullErrStr, Logger, stringifyData, stringifyError } from '../../utils/logging';
@@ -65,7 +64,6 @@ import type {
   BaseGetTransactionsRequest,
   GetForeignAddressesRequest,
   GetForeignAddressesResponse,
-  GetTransactionsRequestOptions,
   RefreshPendingTransactionsRequest,
   RefreshPendingTransactionsResponse,
   RemoveAllTransactionsRequest,
