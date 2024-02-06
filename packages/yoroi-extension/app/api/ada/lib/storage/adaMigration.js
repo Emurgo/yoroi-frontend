@@ -201,6 +201,7 @@ async function bip44Migration(
  * This migrates to a new storage format to allow multiple wallets and different kinds of wallets
  * see v2 storage spec for more details
  */
+// <TODO:PENDING_REMOVAL> legacy migration
 export async function storageV2Migration(
   persistentDb: lf$Database,
 ): Promise<boolean> {

@@ -12,7 +12,6 @@ import {
   WalletTypePurpose,
 } from '../../config/numbersConfig';
 import type { Network, } from '../../../config/config-types';
-import { createHardwareWallet, } from './lib/storage/bridge/walletBuilder/byron';
 import { createHardwareCip1852Wallet, createStandardCip1852Wallet, } from './lib/storage/bridge/walletBuilder/shelley';
 import type { ReferenceTx } from './lib/storage/bridge/updateTransactions';
 import {
@@ -32,7 +31,6 @@ import {
 import type { TransactionMetadata } from './lib/storage/bridge/metadataUtils';
 import { createMetadata } from './lib/storage/bridge/metadataUtils';
 
-import { Bip44Wallet, } from './lib/storage/models/Bip44Wallet/wrapper';
 import { Cip1852Wallet, } from './lib/storage/models/Cip1852Wallet/wrapper';
 import type { HWFeatures, } from './lib/storage/database/walletTypes/core/tables';
 import { Bip44DerivationLevels, flattenInsertTree, } from './lib/storage/database/walletTypes/bip44/api/utils';
@@ -1964,6 +1962,7 @@ export default class AdaApi {
   /**
    * Restore all addresses like restoreWallet() but do not touch storage.
    */
+  // <TODO:PENDING_REMOVAL> paper
   async restoreWalletForTransfer(
     request: RestoreWalletForTransferRequest
   ): Promise<RestoreWalletForTransferResponse> {
@@ -2159,91 +2158,48 @@ export default class AdaApi {
     }
   }
 
-  // <TODO:BIP44> CANNOT BE BIP44
   async createHardwareWallet(
     request: CreateHardwareWalletRequest
   ): Promise<CreateHardwareWalletResponse> {
     try {
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.createHardwareWallet)} called`);
-      const config = getCardanoHaskellBaseConfig(
-        request.network
-      ).reduce((acc, next) => Object.assign(acc, next), {});
-
       if (request.addressing.startLevel !== Bip44DerivationLevels.PURPOSE.level) {
         throw new Error(`${nameof(AdaApi)}::${nameof(this.createHardwareWallet)} bad addressing start level`);
       }
-      // <TODO:PENDING_REMOVAL> bip44
-      if (request.addressing.path[0] === WalletTypePurpose.BIP44) {
-        const wallet = await createHardwareWallet({
-          db: request.db,
-          settings: RustModule.WalletV2.BlockchainSettings.from_json({
-            protocol_magic: config.ByronNetworkId
-          }),
-          accountPublicKey: RustModule.WalletV2.Bip44AccountPublic.new(
-            RustModule.WalletV2.PublicKey.from_hex(request.publicKey),
-            RustModule.WalletV2.DerivationScheme.v2()
-          ),
-          accountIndex: request.addressing.path[
-            Bip44DerivationLevels.ACCOUNT.level - request.addressing.startLevel
-          ],
-          walletName: request.walletName,
-          accountName: '',
-          hwWalletMetaInsert: request.hwFeatures,
-          network: request.network,
-        });
-
-        const bip44Wallet = await Bip44Wallet.createBip44Wallet(
-          request.db,
-          wallet.bip44WrapperRow,
-        );
-
-        if (wallet.publicDeriver.length !== 1) {
-          throw new Error(`${nameof(AdaApi)}::${nameof(this.createHardwareWallet)} should only do 1 HW derivation at a time`);
-        }
-        const pubDeriverResult = wallet.publicDeriver[0].publicDeriverResult;
-        const newPubDeriver = await PublicDeriver.createPublicDeriver(
-          pubDeriverResult,
-          bip44Wallet,
-        );
-        Logger.debug(`${nameof(AdaApi)}::${nameof(this.restoreWallet)} success`);
-        return {
-          publicDeriver: newPubDeriver,
-        };
+      if (request.addressing.path[0] !== WalletTypePurpose.CIP1852) {
+        throw new Error(`${nameof(this.createHardwareWallet)} unknown restoration mode`);
       }
-      if (request.addressing.path[0] === WalletTypePurpose.CIP1852) {
-        const wallet = await createHardwareCip1852Wallet({
-          db: request.db,
-          accountPublicKey: RustModule.WalletV4.Bip32PublicKey.from_bytes(
-            Buffer.from(request.publicKey, 'hex')
-          ),
-          accountIndex: request.addressing.path[
-            Bip44DerivationLevels.ACCOUNT.level - request.addressing.startLevel
+      const wallet = await createHardwareCip1852Wallet({
+        db: request.db,
+        accountPublicKey: RustModule.WalletV4.Bip32PublicKey.from_bytes(
+          Buffer.from(request.publicKey, 'hex')
+        ),
+        accountIndex: request.addressing.path[
+        Bip44DerivationLevels.ACCOUNT.level - request.addressing.startLevel
           ],
-          walletName: request.walletName,
-          accountName: '',
-          hwWalletMetaInsert: request.hwFeatures,
-          network: request.network,
-        });
+        walletName: request.walletName,
+        accountName: '',
+        hwWalletMetaInsert: request.hwFeatures,
+        network: request.network,
+      });
 
-        const cip1852Wallet = await Cip1852Wallet.createCip1852Wallet(
-          request.db,
-          wallet.cip1852WrapperRow,
-        );
+      const cip1852Wallet = await Cip1852Wallet.createCip1852Wallet(
+        request.db,
+        wallet.cip1852WrapperRow,
+      );
 
-        if (wallet.publicDeriver.length !== 1) {
-          throw new Error(`${nameof(AdaApi)}::${nameof(this.createHardwareWallet)} should only do 1 HW derivation at a time`);
-        }
-        const pubDeriverResult = wallet.publicDeriver[0].publicDeriverResult;
-        const newPubDeriver = await PublicDeriver.createPublicDeriver(
-          pubDeriverResult,
-          cip1852Wallet,
-        );
-        Logger.debug(`${nameof(AdaApi)}::${nameof(this.restoreWallet)} success`);
-        return {
-          publicDeriver: newPubDeriver,
-        };
+      if (wallet.publicDeriver.length !== 1) {
+        throw new Error(`${nameof(AdaApi)}::${nameof(this.createHardwareWallet)} should only do 1 HW derivation at a time`);
       }
-      throw new Error(`${nameof(this.createHardwareWallet)} unknown restoration mode`);
+      const pubDeriverResult = wallet.publicDeriver[0].publicDeriverResult;
+      const newPubDeriver = await PublicDeriver.createPublicDeriver(
+        pubDeriverResult,
+        cip1852Wallet,
+      );
+      Logger.debug(`${nameof(AdaApi)}::${nameof(this.restoreWallet)} success`);
+      return {
+        publicDeriver: newPubDeriver,
+      };
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.createHardwareWallet)} error: ` + stringifyError(error));
 
