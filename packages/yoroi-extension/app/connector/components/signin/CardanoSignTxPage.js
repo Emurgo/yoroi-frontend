@@ -214,7 +214,7 @@ class SignTxPage extends Component<Props, State> {
         selectedExplorer={this.props.selectedExplorer}
         hash={fingerprint}
         light
-        linkType="address"
+        linkType="token"
       >
         <span>{truncateAddressShort(getTokenName(tokenInfo), 10)}</span> <ExternalLinkIcon />
       </ExplorableHashContainer>
