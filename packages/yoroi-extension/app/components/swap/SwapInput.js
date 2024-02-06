@@ -1,14 +1,15 @@
 // @flow
 import type { Node } from 'react';
+import type { AssetAmount } from './types';
 import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { ReactComponent as ChevronDownIcon } from '../../assets/images/revamp/icons/chevron-down.inline.svg';
-import { ReactComponent as DefaultTokenImage } from '../../assets/images/revamp/token-default.inline.svg';
-import type { AssetAmount } from './types';
+import assetDefault from '../../assets/images/revamp/token-default.inline.svg';
+import { urlResolveForIpfsAndCorsproxy } from '../../coreUtils';
 
 type Props = {|
   label: string,
-  amount: AssetAmount,
+  tokenInfo: AssetAmount | Object,
   onAssetSelect: function,
   handleAmountChange: function,
   showMax?: boolean,
@@ -25,9 +26,9 @@ export default function SwapInput({
   error = '',
   handleAmountChange,
   value,
-  amount,
+  tokenInfo,
 }: Props): Node {
-  const { amount: quantity = undefined, ...rest } = amount;
+  const { amount: quantity = undefined, image, ...rest } = tokenInfo || {};
 
   const [inputValue, setInputValue] = useState(value || '');
   const [isFocused, setIsFocused] = useState(false);
@@ -38,6 +39,7 @@ export default function SwapInput({
   };
 
   const isFocusedColor = isFocused ? 'grayscale.max' : 'grayscale.400';
+  const imgSrc = urlResolveForIpfsAndCorsproxy(image);
 
   return (
     <Box>
@@ -98,11 +100,14 @@ export default function SwapInput({
               height="24px"
               sx={{ overflowY: 'hidden', '& > svg': { width: '100%', height: '100%' } }}
             >
-              {rest.image ? (
-                <img src={rest.image} alt="" width="100%" /> || <DefaultTokenImage />
-              ) : (
-                <DefaultTokenImage />
-              )}
+              <img
+                width="100%"
+                src={imgSrc || assetDefault}
+                alt=""
+                onError={e => {
+                  e.target.src = assetDefault;
+                }}
+              />
             </Box>
             <Box width="max-content">{rest.ticker || 'Select asset'}</Box>
             <Box display="inline-flex">

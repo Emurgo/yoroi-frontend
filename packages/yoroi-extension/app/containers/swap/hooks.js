@@ -5,7 +5,6 @@ import {
   genLookupOrFail,
   getTokenIdentifierIfExists,
   getTokenName,
-  getTokenStrictName,
 } from '../../stores/stateless/tokenHelpers';
 import { splitAmount, truncateToken } from '../../utils/formatters';
 import useSwapPage from './context/swap-page/useSwapPage';
@@ -37,16 +36,17 @@ export function useAssets(): Array<any> {
       .map(token => {
         const numberOfDecimals = token.info?.Metadata.numberOfDecimals ?? 0;
         const id = token.info.Identifier;
-        // console.log('🚀 > token.info:', JSON.parse(JSON.stringify(token.info)));
         const shiftedAmount = token.entry.amount.shiftedBy(-numberOfDecimals);
         const [beforeDecimal, afterDecimal] = splitAmount(shiftedAmount, numberOfDecimals);
         return {
           id,
           group: token.info?.Metadata.policyId,
           fingerprint: getTokenIdentifierIfExists(token.info) ?? '',
-          name: truncateToken(getTokenStrictName(token.info)?.name ?? '-'),
+          name: id == null
+            ? token.info?.Metadata.ticker
+            : truncateToken(getTokenName(token.info)),
           decimals: token.info?.Metadata.numberOfDecimals,
-          ticker: token.info?.Metadata.ticker ?? truncateToken(getTokenName(token.info) ?? '-'),
+          ticker: token.info?.Metadata.ticker ?? truncateToken(getTokenName(token.info)),
           kind: token.info?.IsNFT ? 'nft' : 'ft',
           amount: [beforeDecimal, afterDecimal].join(''),
           amountForSorting: shiftedAmount,
