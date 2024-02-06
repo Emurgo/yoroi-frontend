@@ -302,7 +302,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
 
     const minAmount = RustModule.WalletV4.min_ada_for_output(
       RustModule.WalletV4.TransactionOutput.new(
-        // fixme: using a dummy common base address here. This is the longest address
+        // using a dummy common base address here. This is the longest address
         // to ensure safety but and not optimum.
         RustModule.WalletV4.Address.from_hex('0'.repeat(114)),
         cardanoValueFromMultiToken(fakeMultitoken),

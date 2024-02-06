@@ -448,7 +448,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
               (u: CardanoAddressedUtxo) => {
                 try {
                   const output = RustModule.WalletV4.TransactionOutput.new(
-                    // fixme: using a dummy common base address here. This is the longest address
+                    // using a dummy common base address here. This is the longest address
                     // to ensure safety but and not optimum.
                     RustModule.WalletV4.Address.from_hex('0'.repeat(114)),
                     // $FlowFixMe[prop-missing]
