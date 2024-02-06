@@ -25,7 +25,7 @@ module.exports = {
     'comma-dangle': 'off',
     'generator-star-spacing': 'off',
     'import/no-unresolved': ['error', {
-      ignore: ['js-chain-libs', 'cardano-wallet-browser']
+      ignore: ['cardano-wallet-browser']
     }],
     'import/no-extraneous-dependencies': 'off',
     'import/no-dynamic-require': 'off',
