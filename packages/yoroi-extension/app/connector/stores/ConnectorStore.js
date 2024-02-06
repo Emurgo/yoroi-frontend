@@ -652,6 +652,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       ownAddresses
     );
 
+    let foreignInputDetails = [];
     if (foreignInputs.length) {
       const foreignUtxos = await this.stores.substores.ada.stateFetchStore.fetcher.getUtxoData({
         network: connectedWallet.publicDeriver.getParent().networkInfo,
@@ -682,7 +683,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           return;
         }
         const value = multiTokenFromRemote(foreignUtxo.output, defaultToken.NetworkId);
-        inputs.push({
+        foreignInputDetails.push({
           address: Buffer.from(
             RustModule.WalletV4.Address.from_bech32(foreignUtxo.output.address).to_bytes()
           ).toString('hex'),
@@ -886,8 +887,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     runInAction(() => {
       this.adaTransaction = {
         inputs,
-        // $FlowFixMe[prop-missing]
-        foreignInputs,
+        foreignInputs: foreignInputDetails,
         outputs,
         fee,
         total,

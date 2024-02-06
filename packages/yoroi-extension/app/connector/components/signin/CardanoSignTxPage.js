@@ -17,7 +17,6 @@ import type {
 import type {
   CardanoConnectorSignRequest,
   SignSubmissionErrorType,
-  TxDataOutput,
 } from '../../types';
 import type LocalizableError from '../../../i18n/LocalizableError';
 import { Component } from 'react';
@@ -282,33 +281,6 @@ class SignTxPage extends Component<Props, State> {
     return null;
   };
 
-  getUniqueAssets: (
-    Array<TxDataOutput>
-  ) => Array<{|
-    tokenInfo: ?$ReadOnly<TokenRow>,
-    amount: BigNumber,
-  |}> = assets => {
-    return assets.reduce((acc, curr) => {
-      const newAcc: Array<{|
-        tokenInfo: ?$ReadOnly<TokenRow>,
-        amount: BigNumber,
-      |}> = [].concat(acc);
-
-      const defaultEntry = curr.value.getDefaultEntry();
-
-      [defaultEntry].concat(curr.value.nonDefaultEntries()).forEach(e => {
-        if (!newAcc.some(a => a.tokenInfo?.Identifier === e.identifier) && e.identifier) {
-          const tokenInfo = this.props.getTokenInfo(e);
-          if (tokenInfo != null) {
-            newAcc.push({ tokenInfo, amount: e.amount });
-          };
-        }
-      });
-
-      return newAcc;
-    }, []);
-  };
-
   getSummaryAssetsData: void => SummaryAssetsData = () => {
     const { txData } = this.props;
 
@@ -323,10 +295,31 @@ class SignTxPage extends Component<Props, State> {
       const defaultTokenId = txData.amount.defaults.defaultIdentifier;
       const defaultTokenAmount = txData.amount.get(defaultTokenId) ?? new BigNumber('0');
       const txFeeAmount = new BigNumber(txData.fee.amount);
-      const sentAssets = this.getUniqueAssets(txData.outputs.filter(o => !o.isForeign));
-      const receivedAssets = this.getUniqueAssets(
-        txData.inputs.map(i => ({ ...i, isForeign: false }))
-      );
+
+      const assets = txData.amount.nonDefaultEntries();
+      for (const asset of assets) {
+        const assetInfo = {
+          amount: asset.amount,
+          // todo: properly query the backend (but don't block the UI) instead of using a default
+          tokenInfo: this.props.getTokenInfo(asset) ?? {
+            Identifier: asset.identifier,
+            IsDefault: false,
+            Metadata: {
+              type: 'Cardano',
+              policyId: asset.identifier.split('.')[0],
+              assetName: asset.identifier.split('.')[1],
+              numberOfDecimals: 0,
+              ticker: null,
+              longName: null,
+            },
+          },
+        };
+        if (asset.amount.isPositive()) {
+          assetsData.received.push(assetInfo);
+        } else {
+          assetsData.sent.push(assetInfo);
+        }
+      }
 
       // only tx fee (no sign) & one asset sent/received
       assetsData.total = this.getDisplayAmount({
@@ -337,12 +330,6 @@ class SignTxPage extends Component<Props, State> {
       });
 
       assetsData.isOnlyTxFee = defaultTokenAmount.toNumber() === 0;
-
-      // More than 1 asset sent/received (rather is NFT or not)
-      if (sentAssets.length > 1 || receivedAssets.length > 1) {
-        assetsData.sent = sentAssets.filter(Boolean);
-        assetsData.received = receivedAssets.filter(Boolean);
-      }
     }
     return assetsData;
   };
