@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { ReactComponent as ChevronDownIcon } from '../../assets/images/revamp/icons/chevron-down.inline.svg';
 import assetDefault from '../../assets/images/revamp/token-default.inline.svg';
+import { urlResolveForIpfsAndCorsproxy } from '../../coreUtils';
 
 type Props = {|
   label: string,
@@ -38,8 +39,7 @@ export default function SwapInput({
   };
 
   const isFocusedColor = isFocused ? 'grayscale.max' : 'grayscale.400';
-  const isIpfs = image?.startsWith('ipfs://');
-  const imgSrc = isIpfs ? image.replace('ipfs://', 'https://ipfs.io/ipfs/') : image;
+  const imgSrc = urlResolveForIpfsAndCorsproxy(image);
 
   return (
     <Box>
