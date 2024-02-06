@@ -7,7 +7,6 @@ import type {
   CertificateRelationType,
   CoreAddressT,
 } from './enums';
-import type { CertificateKindType } from '@emurgo/js-chain-libs/js_chain_libs';
 import typeof { CertificateKind } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 import type { KeyKindType } from '../../../../../common/lib/crypto/keys/types';
 import type { CoinTypesT } from '../../../../../../config/numbersConfig';
@@ -319,7 +318,7 @@ export type CertificatePart = {|
 export type CertificateInsert = {|
   TransactionId: number,
   Ordinal: number, // transactions can contain multiple certificates in some blockchains
-  Kind: CertificateKindType | $Values<CertificateKind>,
+  Kind: $Values<CertificateKind>,
   Payload: string,
 |};
 export type CertificateRow = {|

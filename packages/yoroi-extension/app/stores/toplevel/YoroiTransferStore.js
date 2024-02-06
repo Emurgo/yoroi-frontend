@@ -20,7 +20,6 @@ import {
   unscramblePaperAdaMnemonic,
 } from '../../api/ada/lib/cardanoCrypto/paperWallet';
 import config from '../../config';
-import { getApiForNetwork } from '../../api/common/utils';
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 import { SendTransactionApiError } from '../../api/common/errors';
 import type {
@@ -121,6 +120,7 @@ export default class YoroiTransferStore extends Store<StoresMap, ActionsMap> {
     };
   }
 
+  // <TODO:PENDING_REMOVAL> paper
   _setupTransferFundsWithPaperMnemonic: {|
     recoveryPhrase: string,
     paperPassword: string,
@@ -158,11 +158,10 @@ export default class YoroiTransferStore extends Store<StoresMap, ActionsMap> {
     if (this.stores.profile.selectedNetwork == null) {
       throw new Error(`${nameof(YoroiTransferStore)}::${nameof(this.generateTransferTx)} no network selected`);
     }
-    const selectedApiType = getApiForNetwork(this.stores.profile.selectedNetwork);
-    if (!this.stores.substores[selectedApiType].yoroiTransfer) {
+    if (!this.stores.substores.ada.yoroiTransfer) {
       throw new Error(`${nameof(YoroiTransferStore)}::${nameof(this.checkAddresses)} currency doesn't support Yoroi transfer`);
     }
-    const { yoroiTransfer } = this.stores.substores[selectedApiType];
+    const { yoroiTransfer } = this.stores.substores.ada;
     return await yoroiTransfer.generateTransferTx(
       request,
     );
@@ -308,9 +307,8 @@ export default class YoroiTransferStore extends Store<StoresMap, ActionsMap> {
     this.mode = undefined;
 
     if (this.stores.profile.selectedNetwork != null) {
-      const selectedApiType = getApiForNetwork(this.stores.profile.selectedNetwork);
-      if (this.stores.substores[selectedApiType].yoroiTransfer) {
-        this.stores.substores[selectedApiType].yoroiTransfer.reset();
+      if (this.stores.substores.ada.yoroiTransfer) {
+        this.stores.substores.ada.yoroiTransfer.reset();
       }
     }
   }

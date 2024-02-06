@@ -7,7 +7,6 @@ import { PublicDeriver, } from '../../api/ada/lib/storage/models/PublicDeriver/i
 import { ConceptualWallet, } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import Store from '../base/Store';
 import type { ChangeModelPasswordFunc, RemoveAllTransactionsFunc, RenameModelFunc } from '../../api/common';
-import { getApiForNetwork } from '../../api/common/utils';
 import Request from '../lib/LocalizedRequest';
 import { asGetSigningKey, asHasLevels, } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type { IConceptualWallet, } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
@@ -46,7 +45,6 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
 
   @observable clearHistory: Request<RemoveAllTransactionsFunc>
     = new Request<RemoveAllTransactionsFunc>(async (req) => {
-      const apiType = getApiForNetwork(req.publicDeriver.getParent().getNetworkInfo());
       const ongoingRefreshing = this.stores.transactions.ongoingRefreshing.get(
         req.publicDeriverId
       );
@@ -58,7 +56,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
         }
       }
 
-      const promise = this.api[apiType].removeAllTransactions(req);
+      const promise = this.api.ada.removeAllTransactions(req);
 
       runInAction(() => {
         this.stores.transactions.ongoingRefreshing.set(

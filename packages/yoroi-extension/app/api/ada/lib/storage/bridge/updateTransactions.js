@@ -152,9 +152,6 @@ import type {
 import { addressToKind, } from './utils';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 import { Bech32Prefix } from '../../../../../config/stringConfig';
-import {
-  MultiToken,
-} from '../../../../common/lib/MultiToken';
 import type {
   DefaultTokenEntry,
 } from '../../../../common/lib/MultiToken';
@@ -264,6 +261,7 @@ export async function rawGetTransactions(
   ...UserAnnotation,
 |}>,
 |}> {
+  const { publicDeriver } = request;
   const {
     addresses,
     txIds,
@@ -277,7 +275,7 @@ export async function rawGetTransactions(
       GetDerivationSpecific: deps.GetDerivationSpecific,
       GetCertificates: deps.GetCertificates,
     },
-    { publicDeriver: request.publicDeriver },
+    { publicDeriver },
     derivationTables,
   );
   const blockMap = new Map<number, null | $ReadOnly<BlockRow>>();
@@ -291,7 +289,7 @@ export async function rawGetTransactions(
       txs: txs
         .map(txWithBlock => txWithBlock.Transaction)
         .filter(tx => tx.Type === TransactionType.CardanoByron),
-      networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+      networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
     }
   );
   const shelleyWithIOs = await deps.CardanoShelleyAssociateTxWithIOs.getIOsForTx(
@@ -300,7 +298,7 @@ export async function rawGetTransactions(
       txs: txs
         .map(txWithBlock => txWithBlock.Transaction)
         .filter(tx => tx.Type === TransactionType.CardanoShelley),
-      networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+      networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
     }
   );
   const txsWithIOs = [
@@ -337,7 +335,7 @@ export async function rawGetTransactions(
     }
   }
 
-  const defaultToken = request.publicDeriver.getParent().getDefaultToken();
+  const defaultToken = publicDeriver.getParent().getDefaultToken();
 
   const result = txsWithIOs.map((tx: CardanoByronTxIO | CardanoShelleyTxIO) => ({
     ...tx,
@@ -362,10 +360,10 @@ export async function rawGetTransactions(
         *    So that wouldn't be quite accurate either.
         *    Again, it's easier to say it's just whoever gets it
       */
-      ownImplicitInput: new MultiToken([], defaultToken),
+      ownImplicitInput: publicDeriver.getParent().getDefaultMultiToken(),
       ownImplicitOutput: (() => {
         if (tx.txType === TransactionType.CardanoShelley) {
-          const implicitOutputSum = new MultiToken([], defaultToken);
+          const implicitOutputSum = publicDeriver.getParent().getDefaultMultiToken();
           for (const cert of tx.certificates) {
             if (
               cert.certificate.Kind !==
@@ -412,7 +410,7 @@ export async function rawGetTransactions(
           }
           return implicitOutputSum;
         }
-        return new MultiToken([], defaultToken);
+        return publicDeriver.getParent().getDefaultMultiToken();
       })(),
       defaultToken,
     })
@@ -2196,22 +2194,27 @@ export async function genCardanoAssetMap(
 
   const updatingTokenIds = tokenIds.filter(token => !noNeedForUpdateTokens.has(token));
 
-  let tokenInfoResponse;
-  try {
-    tokenInfoResponse = await getTokenInfo({
-      network,
-      tokenIds: updatingTokenIds.map(id => id.split('.').join(''))
-    });
-  } catch {
-    tokenInfoResponse = {};
-  }
+  const tokenInfoPromise = getTokenInfo({
+    network,
+    tokenIds: updatingTokenIds.map(id => id.split('.').join(''))
+  });
 
-  const [metadata, supply] = await getTokenMintMetadataAndSupply(
+  const tokenMintMetadataAndSupplyPromise = getTokenMintMetadataAndSupply(
     tokenIds,
     getMultiAssetMetadata,
     getMultiAssetSupply,
     network,
   );
+
+  let tokenInfoResponse = {};
+  let metadata = {};
+  let supply = {};
+  try {
+    [tokenInfoResponse, [metadata, supply]] =
+      await Promise.all([tokenInfoPromise, tokenMintMetadataAndSupplyPromise]);
+  } catch(e) {
+    console.error('Failed to query token info, metadata, or supply', e);
+  }
 
   const databaseInsert = updatingTokenIds
     .map(tokenId => {
