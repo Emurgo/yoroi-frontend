@@ -4,9 +4,9 @@ import '../../test-config';
 import { schema, } from 'lovefield';
 import type { lf$Database } from 'lovefield';
 import { setLocalItem } from '../../../../localStorage/primitives';
-import oldStorageMemory from './__yoroi_snashots__/historical-version-1_9_0/software/localStorage.json'
-import oldStorageTrezor from './__yoroi_snashots__/historical-version-1_9_0/trezor/localStorage.json';
-import oldStorageLedger from './__yoroi_snashots__/historical-version-1_9_0/ledger/localStorage.json';
+import oldStorageMemory from './__yoroi_snapshots__/historical-version-1_9_0/software/localStorage.json'
+import oldStorageTrezor from './__yoroi_snapshots__/historical-version-1_9_0/trezor/localStorage.json';
+import oldStorageLedger from './__yoroi_snapshots__/historical-version-1_9_0/ledger/localStorage.json';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 import {
   dumpByVersion,
