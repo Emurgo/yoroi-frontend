@@ -1,5 +1,5 @@
 // @flow
-import { observable, action, computed, runInAction } from 'mobx';
+import { action, computed, observable, runInAction } from 'mobx';
 import { debounce, find } from 'lodash';
 import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
@@ -10,18 +10,18 @@ import config from '../../config';
 import globalMessages from '../../i18n/global-messages';
 import type { Notification } from '../../types/notificationType';
 import type { GetWalletsFunc } from '../../api/common/index';
-import type { CreateWalletResponse, RestoreWalletResponse } from '../../api/common/types';
 import { getWallets } from '../../api/common/index';
+import type { CreateWalletResponse, RestoreWalletResponse } from '../../api/common/types';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
-  asGetSigningKey,
   asGetPublicKey,
+  asGetSigningKey,
   asGetStakingKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   IGetLastSyncInfoResponse,
-  IGetSigningKey,
   IGetPublic,
+  IGetSigningKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { Logger, stringifyError } from '../../utils/logging';
@@ -351,20 +351,14 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     publicDeriver: PublicDeriver<>,
     lastSyncInfo: IGetLastSyncInfoResponse,
   |}) => void = request => {
-    const adaSubstores = this.stores.substores.ada;
-    this.stores.addresses.addObservedWallet(request.publicDeriver);
-    this.stores.transactions.addObservedWallet(request);
-    adaSubstores.time.addObservedTime(request.publicDeriver);
+    const { addresses, transactions, substores } = this.stores;
+    addresses.addObservedWallet(request.publicDeriver);
+    transactions.addObservedWallet(request);
+    const { time, delegation } = substores.ada;
+    time.addObservedTime(request.publicDeriver);
     if (asGetStakingKey(request.publicDeriver) != null) {
-      if (!adaSubstores.delegation) {
-        throw new Error(
-          `${nameof(
-            this.registerObserversForNewWallet
-          )} wallet has staking key but currency doesn't support delegation`
-        );
-      }
-      adaSubstores.delegation.addObservedWallet(request.publicDeriver);
-      adaSubstores.delegation.refreshDelegation(request.publicDeriver);
+      delegation.addObservedWallet(request.publicDeriver);
+      delegation.refreshDelegation(request.publicDeriver);
     }
   };
 

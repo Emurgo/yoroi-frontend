@@ -30,7 +30,7 @@ const mnemonicToSeedHex = (mnemonic: string, password: ?string): string => {
   return pbkdf2(mnemonicBuffer, saltBuffer, 2048, 32, 'sha512').toString('hex');
 };
 
-// <TODO:PENDING_REMOVAL> Legacy
+// <TODO:PENDING_REMOVAL> paper
 /** Check validity of paper mnemonic (including checksum) */
 export const isValidEnglishAdaPaperMnemonic = (
   phrase: string,
@@ -49,7 +49,7 @@ export const isValidEnglishAdaPaperMnemonic = (
   return false;
 };
 
-// <TODO:PENDING_REMOVAL> Legacy
+// <TODO:PENDING_REMOVAL> paper
 /** Check validity of paper mnemonic (including checksum) */
 export const unscramblePaperAdaMnemonic = (
   phrase: string,

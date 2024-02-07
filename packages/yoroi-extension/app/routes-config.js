@@ -42,7 +42,6 @@ export const ROUTES = {
   },
   TRANSFER: {
     ROOT: '/transfer',
-    YOROI: '/transfer/yoroi',
   },
   SEND_FROM_URI: {
     ROOT: '/send-from-uri',

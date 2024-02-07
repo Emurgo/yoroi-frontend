@@ -26,8 +26,8 @@ type Props = {|
   +shouldHideBalance: boolean,
   +highlightTitle?: boolean,
   +showEyeIcon?: boolean,
-  +rewards: ?MultiToken,
-  +walletAmount: null | MultiToken,
+  +rewards: MultiToken,
+  +walletAmount: ?MultiToken,
   +infoText?: string,
   +showDetails?: boolean,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
@@ -166,6 +166,6 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
 
   getTotalAmount: void => ?MultiToken = () => {
     return maybe(this.props.walletAmount,
-      w => this.props.rewards?.joinAddCopy(w) ?? w)
+      w => this.props.rewards.joinAddCopy(w))
   };
 }
