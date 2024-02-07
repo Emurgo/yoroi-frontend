@@ -52,49 +52,67 @@ export default function EditSwapPool({ handleEditPool }) {
   const handleShowFullInfo = () => setShowFullInfo(p => !p);
 
   return (
-    <Box
-      sx={{
-        border: '1px solid',
-        borderColor: 'grayscale.400',
-        borderRadius: '8px',
-        position: 'relative',
-        bgcolor: 'common.white',
-        p: '16px',
-      }}
-      onClick={handleShowFullInfo}
-    >
+    <Box>
       <Box
         sx={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
+          mb: '16px',
         }}
       >
         <Box display="flex" gap="8px" alignItems="center">
-          <SwapPoolIcon provider={pool.provider} />
-          <Typography component="div" variant="body1" fontWeight={500} color="primary.500">
-            {pool.provider
-              ? `${capitalize(pool.provider)} ${isAutoPool ? '(Auto)' : ''}`
-              : 'No pool found'}
+          <Typography component="div" variant="body1" color="grayscale.500">
+            DEX
           </Typography>
+        </Box>
+        <Box sx={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+          <Box display="flex" gap="8px" alignItems="center">
+            <SwapPoolIcon provider={pool.provider} />
+            <Typography component="div" variant="body1" color="grayscale.max">
+              {pool.provider
+                ? `${capitalize(pool.provider)} ${isAutoPool ? '(Auto)' : ''}`
+                : 'No pool found'}
+            </Typography>
+            {isLimitOrder && (
+              <Box sx={{ cursor: 'pointer' }} onClick={isLimitOrder ? handleEditPool : undefined}>
+                <EditIcon />
+              </Box>
+            )}
+          </Box>
+        </Box>
+      </Box>
+      <Box
+        sx={{
+          border: '1px solid',
+          borderColor: 'grayscale.400',
+          borderRadius: '8px',
+          position: 'relative',
+          bgcolor: 'common.white',
+          p: '16px',
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+          onClick={handleShowFullInfo}
+        >
           {pool.provider && (
             <Typography component="div" variant="body1" color="grayscale.max">
               {titleTotalFeesFormatted}
             </Typography>
           )}
-        </Box>
-        <Box
-          onClick={isLimitOrder ? handleEditPool : undefined}
-          sx={{ cursor: 'pointer', display: 'flex', gap: '4px', alignItems: 'center' }}
-        >
-          {isLimitOrder && <EditIcon />}
-          <Box sx={{ transform: showFullInfo ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-            <ChevronDownIcon />
+          <Box sx={{ cursor: 'pointer', display: 'flex', gap: '4px', alignItems: 'center' }}>
+            <Box sx={{ transform: showFullInfo ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+              <ChevronDownIcon />
+            </Box>
           </Box>
         </Box>
+        {showFullInfo && <SwapPoolFullInfo totalFees={totalFees} />}
       </Box>
-
-      {showFullInfo && <SwapPoolFullInfo totalFees={totalFees} />}
     </Box>
   );
 }
