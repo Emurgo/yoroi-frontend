@@ -1,3 +1,4 @@
+// @flow
 import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { ReactComponent as EditIcon } from '../../../../assets/images/revamp/icons/edit.inline.svg';

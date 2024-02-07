@@ -1,3 +1,4 @@
+// @flow
 import { Box } from '@mui/material';
 import { ReactComponent as DefaultToken } from '../../assets/images/revamp/token-default.inline.svg';
 import { ReactComponent as MinswapImage } from '../../assets/images/revamp/dex/minswap.inline.svg';

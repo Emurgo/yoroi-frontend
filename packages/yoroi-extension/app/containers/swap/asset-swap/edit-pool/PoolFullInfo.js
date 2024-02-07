@@ -1,3 +1,4 @@
+// @flow
 import { Box } from '@mui/material';
 import { ReactComponent as InfoIcon } from '../../../../assets/images/revamp/icons/info.inline.svg';
 import { useSwap } from '@yoroi/swap';
