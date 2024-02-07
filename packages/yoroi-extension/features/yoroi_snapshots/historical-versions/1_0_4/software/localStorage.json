@@ -1,7 +1,0 @@
-{
-	"ACCOUNT": "{\"account\":0,\"root_cached_key\":\"379781925856984b0938cfab3b847323cf4e5c784a56bc045e9e23e2ee60114bd039a78aa4e2021b08cdb89fdb56e9c3c05c93be40a002bf541b2ed408cb1e9b\",\"derivation_scheme\":\"V2\"}",
-	"WALLET": "{\"adaWallet\":{\"cwAccountsNumber\":1,\"cwAmount\":{\"getCCoin\":\"4300447\"},\"cwId\":\"1\",\"cwMeta\":{\"cwAssurance\":\"CWANormal\",\"cwName\":\"Wallet\",\"cwUnit\":0},\"cwPassphraseLU\":\"2019-07-31T17:03:56+03:00\"},\"masterKey\":\"074976c245d6bbed70eae053adb91e295e601bf3fa8d9373ab5df79b09d80d296eceb0b74d4e394339982f37f327a3f4d6f121f40548f3ce65e11b8d0b79352d0c25bb739065ec728c87c8e964139200b0a3a3769281eb9bc74bb0c387ce0d6bf07d44ffd203ee56dfbd577ba84fa4c70f60e7458fffda0f0ff17f4ed3adbfa3570642672782eb5f514f2261ee12c642d45c856fd671244b1115a21d\"}",
-	"LAST_BLOCK_NUMBER": "\"2917405\"",
-	"test-USER-LOCALE": "en-US",
-	"test-TERMS-OF-USE-ACCEPTANCE": "true"
-}

@@ -1,7 +1,0 @@
-{
-	"ACCOUNT": "{\"root_cached_key\":\"bc772da2ba5a37bad47f51d6a4476b236aa6734b5cd79c81706d5018d3203f6c05d510314991bfd73c2a3e9da72d2e1205b54cf6342f588a4fbbaaa98e58211b\",\"derivation_scheme\":\"V2\",\"account\":0}",
-	"WALLET": "{\"adaWallet\":{\"cwAccountsNumber\":1,\"cwAmount\":{\"getCCoin\":\"9677490\"},\"cwId\":\"1\",\"cwMeta\":{\"cwAssurance\":\"CWANormal\",\"cwName\":\"Trezorro\",\"cwUnit\":0},\"cwType\":\"CWTHardware\",\"cwPassphraseLU\":\"2019-07-31T16:19:40+03:00\",\"cwHardwareInfo\":{\"vendor\":\"trezor.io\",\"model\":\"T\",\"deviceId\":\"C875BA9D0C571FF4B8718FAA\",\"label\":\"Trezorro\",\"majorVersion\":2,\"minorVersion\":1,\"patchVersion\":1,\"language\":\"english\",\"publicMasterKey\":\"bc772da2ba5a37bad47f51d6a4476b236aa6734b5cd79c81706d5018d3203f6c05d510314991bfd73c2a3e9da72d2e1205b54cf6342f588a4fbbaaa98e58211b\"}}}",
-	"LAST_BLOCK_NUMBER": "2917271",
-	"test-USER-LOCALE": "en-US",
-	"test-TERMS-OF-USE-ACCEPTANCE": "true"
-}
