@@ -1,9 +1,0 @@
-{
-	"ACCOUNT": "{\"account\":0,\"root_cached_key\":\"76bca341ea86128125b49999ea1799fcd0d005a64b9150c33ed4648a3c11b20c26ea85882a1616bbf4ffae3fae6debe77169a3b299ec226409e2def1bffd35a9\",\"derivation_scheme\":\"V2\"}",
-	"test-TERMS-OF-USE-ACCEPTANCE": "true",
-	"LAST_BLOCK_NUMBER": "2916986",
-	"test-USER-LOCALE": "en-US",
-	"openTabId": "1564573428545",
-	"WALLET": "{\"adaWallet\":{\"cwAccountsNumber\":1,\"cwAmount\":{\"getCCoin\":\"3084182\"},\"cwId\":\"1\",\"cwMeta\":{\"cwAssurance\":\"CWANormal\",\"cwName\":\"Yoroi-Ledger\",\"cwUnit\":0},\"cwType\":\"CWTHardware\",\"cwPassphraseLU\":\"2019-07-31T14:44:40+03:00\",\"cwHardwareInfo\":{\"publicMasterKey\":\"76bca341ea86128125b49999ea1799fcd0d005a64b9150c33ed4648a3c11b20c26ea85882a1616bbf4ffae3fae6debe77169a3b299ec226409e2def1bffd35a9\",\"vendor\":\"ledger.com\",\"model\":\"NanoS\",\"deviceId\":\"\",\"label\":\"\",\"majorVersion\":1,\"minorVersion\":0,\"patchVersion\":0,\"language\":\"\"}},\"lastReceiveAddressIndex\":77}",
-	"test-LAST-LAUNCH-VER": "1.5.0"
-}
