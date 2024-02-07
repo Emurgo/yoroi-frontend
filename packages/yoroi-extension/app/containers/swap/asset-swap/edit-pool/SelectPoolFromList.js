@@ -1,7 +1,11 @@
 // @flow
 import SelectPoolDialog from '../../../../components/swap/SelectPoolDialog';
 
-export default function SelectSwapPoolFromList({ onClose }) {
+type Props = {|
+  +onClose: void => void,
+|}
+
+export default function SelectSwapPoolFromList({ onClose }: Props): React$Node {
   // TODO: provide proper pool list
   return <SelectPoolDialog
     onPoolSelected={() => {}}

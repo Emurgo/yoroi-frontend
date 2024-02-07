@@ -18,7 +18,11 @@ const poolIcons = {
   //   spectrum: Icon.SpectrumSwap,
 };
 
-export default function SwapPoolIcon({ provider }) {
+type Props = {|
+  +provider: string,
+|}
+
+export default function SwapPoolIcon({ provider }: Props): React$Node {
   return (
     <Box sx={{ width: '24px', height: '24px' }}>{poolIcons[provider] || <DefaultToken />}</Box>
   );

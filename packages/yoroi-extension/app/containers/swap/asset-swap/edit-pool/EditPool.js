@@ -11,7 +11,11 @@ import { useSwapForm } from '../../context/swap-form';
 import { Quantities } from '../../../../utils/quantities';
 import { maybe } from '../../../../coreUtils';
 
-export default function EditSwapPool({ handleEditPool }) {
+type Props = {|
+  +handleEditPool: void => void,
+|}
+
+export default function EditSwapPool({ handleEditPool }: Props): React$Node {
   const [showFullInfo, setShowFullInfo] = useState(false);
   const { orderData } = useSwap();
 

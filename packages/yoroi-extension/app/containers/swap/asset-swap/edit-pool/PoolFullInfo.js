@@ -5,7 +5,11 @@ import { useSwap } from '@yoroi/swap';
 import { useSwapForm } from '../../context/swap-form';
 import { Quantities } from '../../../../utils/quantities';
 
-export default function SwapPoolFullInfo({ totalFees }) {
+type Props = {|
+  +totalFees: string,
+|}
+
+export default function SwapPoolFullInfo({ totalFees }: Props): React$Node {
   const { orderData } = useSwap();
   const { buyTokenInfo } = useSwapForm();
   const buyToken = orderData.tokens?.buyInfo;
