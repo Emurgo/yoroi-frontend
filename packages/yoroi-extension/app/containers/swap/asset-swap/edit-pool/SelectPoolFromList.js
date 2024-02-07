@@ -10,7 +10,7 @@ export default function SelectSwapPoolFromList({ onClose }: Props): React$Node {
   return <SelectPoolDialog
     onPoolSelected={() => {}}
     poolList={[]}
-    currentPool={'test'}
+    currentPool='test'
     onClose={onClose}
   />;
 }
