@@ -54,8 +54,9 @@ export default function SwapFormProvider({ initialSwapFormProvider, children }: 
   const { quantity: buyQuantity } = orderData.amounts.buy;
   const { quantity: sellQuantity } = orderData.amounts.sell;
 
-  const buyInputRef = useRef<TextInput | null>(null);
-  const sellInputRef = useRef<TextInput | null>(null);
+  // TODO: fix the types for TextInput
+  const buyInputRef = useRef/*<TextInput | null>*/(null);
+  const sellInputRef = useRef/*<TextInput | null>*/(null);
   // const limitInputRef = useRef<TextInput | null>(null)
 
   const swapFormReducer = (state: SwapFormState, action: SwapFormAction) => {

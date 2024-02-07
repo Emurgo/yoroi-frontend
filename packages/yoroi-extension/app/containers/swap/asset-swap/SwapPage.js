@@ -81,7 +81,7 @@ export default function SwapPage(): Node {
       <Box display="flex" flexDirection="column" height="100%">
         <Box sx={{ flexGrow: '1', overflowY: 'auto' }}>
           {step === 0 && <SwapForm onLimitSwap={() => handleOpenedDialog('limitOrder')} />}
-          {step === 1 && <SwapConfirmationStep />}
+          {step === 1 && <SwapConfirmationStep poolInfo={{}} />}
           {step === 2 && (
             <TxSubmittedStep
               isSuccessful={isSuccessful}

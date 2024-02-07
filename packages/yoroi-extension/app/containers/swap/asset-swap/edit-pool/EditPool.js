@@ -8,6 +8,7 @@ import SwapPoolIcon from '../../../../components/swap/SwapPoolIcon';
 import SwapPoolFullInfo from './PoolFullInfo';
 import { useSwapForm } from '../../context/swap-form';
 import { Quantities } from '../../../../utils/quantities';
+import { maybe } from '../../../../coreUtils';
 
 export default function EditSwapPool({ handleEditPool }) {
   const [showFullInfo, setShowFullInfo] = useState(false);
@@ -70,9 +71,8 @@ export default function EditSwapPool({ handleEditPool }) {
           <Box display="flex" gap="8px" alignItems="center">
             <SwapPoolIcon provider={pool.provider} />
             <Typography component="div" variant="body1" color="grayscale.max">
-              {pool.provider
-                ? `${capitalize(pool.provider)} ${isAutoPool ? '(Auto)' : ''}`
-                : 'No pool found'}
+              {maybe(pool.provider, p => `${capitalize(p)} ${isAutoPool ? '(Auto)' : ''}`)
+                ?? 'No pool found'}
             </Typography>
             {isLimitOrder && (
               <Box sx={{ cursor: 'pointer' }} onClick={isLimitOrder ? handleEditPool : undefined}>
