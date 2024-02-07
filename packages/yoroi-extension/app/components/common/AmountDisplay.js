@@ -17,7 +17,7 @@ type Props = {|
   +showFiat?: boolean,
   +shouldHideBalance: boolean,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
-  +amount: null | MultiToken,
+  +amount: ?MultiToken,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?string,
 |};

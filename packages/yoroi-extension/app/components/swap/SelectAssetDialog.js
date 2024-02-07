@@ -11,6 +11,7 @@ import { truncateAddressShort } from '../../utils/formatters';
 import assetDefault from '../../assets/images/revamp/asset-default.inline.svg';
 import Dialog from '../widgets/Dialog';
 import Table from '../common/table/Table';
+import { urlResolveForIpfsAndCorsproxy } from '../../coreUtils';
 
 const fromTemplateColumns = '1fr minmax(auto, 136px)';
 const toTemplateColumns = '1fr minmax(auto, 152px) minmax(auto, 136px)';
@@ -159,8 +160,7 @@ const AssetAndAmountRow = ({
   //     "ticker": "EARTH",
   //     "metadatas": {}
   // }
-  const isIpfs = image?.startsWith('ipfs://');
-  const imgSrc = isIpfs ? image.replace('ipfs://', 'https://ipfs.io/ipfs/') : image;
+  const imgSrc = urlResolveForIpfsAndCorsproxy(image);
   const isFrom = type === 'from';
   const priceNotChanged = Number(priceChange100.replace('-', '').replace('%', '')) === 0;
   const priceIncreased = priceChange100 && priceChange100.charAt(0) !== '-';
