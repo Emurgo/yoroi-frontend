@@ -23,7 +23,7 @@ export default function SwapPoolFullInfo({ totalFees }) {
   const deposit = `${Quantities.format(cost.deposit.quantity, 6)} ADA`;
 
   return (
-    <Box sx={{ display: 'flex', flexFlow: 'column', gap: '8px', mt: '8px' }}>
+    <Box sx={{ display: 'flex', flexFlow: 'column', gap: '8px' }}>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
           Min ADA{' '}

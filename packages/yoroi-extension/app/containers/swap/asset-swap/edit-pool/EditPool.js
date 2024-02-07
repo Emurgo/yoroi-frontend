@@ -14,7 +14,6 @@ export default function EditSwapPool({ handleEditPool }) {
   const { orderData } = useSwap();
 
   const { selectedPoolCalculation: calculation, amounts, bestPoolCalculation, type } = orderData;
-  console.log('🚀 ~ EditSwapPool ~ amounts:', amounts);
 
   const {
     buyQuantity: { isTouched: isBuyTouched },
@@ -94,7 +93,16 @@ export default function EditSwapPool({ handleEditPool }) {
         </Box>
       </Box>
 
-      {showFullInfo && <SwapPoolFullInfo totalFees={totalFees} />}
+      {showFullInfo && (
+        <Box mt="8px">
+          <SwapPoolFullInfo
+            totalFees={Quantities.format(
+              Quantities.sum([cost.batcherFee.quantity, cost.frontendFeeInfo.fee.quantity]),
+              6
+            )}
+          />
+        </Box>
+      )}
     </Box>
   );
 }

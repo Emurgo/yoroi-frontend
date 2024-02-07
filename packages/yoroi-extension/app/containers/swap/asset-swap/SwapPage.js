@@ -1,11 +1,8 @@
 // @flow
 import type { Node } from 'react';
-import {
-  // useEffect,
-  useState,
-} from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Button } from '@mui/material';
-// import { useSwap, useSwapTokensOnlyVerified } from '@yoroi/swap';
+import { useSwap, useSwapTokensOnlyVerified } from '@yoroi/swap';
 import SwapForm from './SwapForm';
 import SwapConfirmationStep from './ConfirmationStep';
 import TxSubmittedStep from './TxSubmittedStep';
@@ -17,31 +14,22 @@ export default function SwapPage(): Node {
   const [openedDialog, setOpenedDialog] = useState('');
 
   // state data
-  // const wallet = useSelectedWallet();
-  // const {
-  //   aggregatorTokenId,
-  //   lpTokenHeldChanged,
-  //   frontendFeeTiers,
-  //   frontendFeeTiersChanged,
-  //   sellTokenInfoChanged,
-  //   primaryTokenInfoChanged,
-  // } = useSwap();
-  // // const lpTokenHeld = useBalance({ wallet, tokenId: aggregatorTokenId });
+  const {
+    // aggregatorTokenId,
+    // lpTokenHeldChanged,
+    // frontendFeeTiers,
+    // frontendFeeTiersChanged,
+    sellTokenInfoChanged,
+    primaryTokenInfoChanged,
+  } = useSwap();
+  // const lpTokenHeld = useBalance({ wallet, tokenId: aggregatorTokenId });
 
   // // initialize sell with / and primary token
-  // useEffect(() => {
-  //   const ptInfo = {
-  //     decimals: wallet.primaryTokenInfo.decimals ?? 0,
-  //     id: wallet.primaryTokenInfo.id,
-  //   };
-  //   sellTokenInfoChanged(ptInfo);
-  //   primaryTokenInfoChanged(ptInfo);
-  // }, [
-  //   primaryTokenInfoChanged,
-  //   sellTokenInfoChanged,
-  //   wallet.primaryTokenInfo.decimals,
-  //   wallet.primaryTokenInfo.id,
-  // ]);
+  useEffect(() => {
+    const ptInfo = { decimals: 6, id: '' };
+    sellTokenInfoChanged(ptInfo);
+    primaryTokenInfoChanged(ptInfo);
+  }, [primaryTokenInfoChanged, sellTokenInfoChanged]);
 
   // // update the fee tiers
   // useEffect(() => {
@@ -59,10 +47,10 @@ export default function SwapPage(): Node {
   // }, [aggregatorTokenId, lpTokenHeld, lpTokenHeldChanged]);
 
   // // pre load swap tokens
-  // const { refetch } = useSwapTokensOnlyVerified({ suspense: false, enabled: false });
-  // useEffect(() => {
-  //   refetch();
-  // }, [refetch]);
+  const { refetch } = useSwapTokensOnlyVerified({ suspense: false, enabled: false });
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   // <TODO:CHECK_LINT>
   // eslint-disable-next-line no-unused-vars

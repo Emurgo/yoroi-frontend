@@ -1,17 +1,26 @@
 //@flow
-// import type { AssetAmount } from '../../../components/swap/types';
+import type { AssetAmount } from '../../../components/swap/types';
 import { Box, Typography } from '@mui/material';
 import { ReactComponent as InfoIcon } from '../../../assets/images/revamp/icons/info.inline.svg';
-// import { ReactComponent as AssetDefault } from '../../../assets/images/revamp/asset-default.inline.svg';
-// import AdaTokenImage from '../mockAssets/ada.inline.svg';
-// import UsdaTokenImage from '../mockAssets/usda.inline.svg';
+import assetDefault from '../../../assets/images/revamp/asset-default.inline.svg';
 import TextField from '../../../components/common/TextField';
+import { useSwapForm } from '../context/swap-form';
+import SwapPoolFullInfo from './edit-pool/PoolFullInfo';
+import { useSwap } from '@yoroi/swap';
+import SwapPoolIcon from '../../../components/swap/SwapPoolIcon';
+import { capitalize } from 'lodash';
 
-type Props = {|
-  poolInfo: any,
-|};
+export default function SwapConfirmationStep(): React$Node {
+  const { orderData } = useSwap();
+  const { buyTokenInfo, sellTokenInfo } = useSwapForm();
 
-export default function SwapConfirmationStep({ poolInfo = {} }: Props): React$Node {
+  const { selectedPoolCalculation: calculation, amounts, bestPoolCalculation, type } = orderData;
+
+  const { pool } = calculation;
+
+  const bestPool = bestPoolCalculation?.pool || {};
+  const isAutoPool = bestPool.poolId === pool.poolId;
+
   return (
     <Box width="100%" mx="auto" maxWidth="506px" display="flex" flexDirection="column" gap="24px">
       <Box textAlign="center">
@@ -27,17 +36,7 @@ export default function SwapConfirmationStep({ poolInfo = {} }: Props): React$No
             </Typography>
           </Box>
           <Box>
-            {/* <AssetRow
-              asset={{
-                image: AdaTokenImage,
-                name: 'ADA',
-                ticker: 'ADA',
-                address: 'Cardano',
-                amount: '9',
-                walletAmount: 0,
-                decimals: 6,
-              }}
-            /> */}
+            <AssetRow asset={sellTokenInfo} />
           </Box>
         </Box>
         <Box>
@@ -47,17 +46,7 @@ export default function SwapConfirmationStep({ poolInfo = {} }: Props): React$No
             </Typography>
           </Box>
           <Box>
-            {/* <AssetRow
-              asset={{
-                image: UsdaTokenImage,
-                name: '[USDA] Anzens',
-                ticker: 'USDA',
-                address: 'asse1maasdafsfs3245s2asddadsadfww6hv343',
-                amount: '9',
-                walletAmount: 0,
-                decimals: 6,
-              }}
-            /> */}
+            <AssetRow asset={buyTokenInfo} />
           </Box>
         </Box>
       </Box>
@@ -65,29 +54,27 @@ export default function SwapConfirmationStep({ poolInfo = {} }: Props): React$No
         <SummaryRow
           col1="Dex"
           col2={
-            <Box display="flex" alignItems="center" gap="8px">
-              <Box display="inline-flex">{poolInfo.image}</Box>
-              <Typography component="div" variant="body1" color="primary.500" fontWeight={500}>
-                {poolInfo.name} {poolInfo.isAuto ? '(Auto)' : null}
+            <Box display="flex" gap="8px" alignItems="center">
+              <SwapPoolIcon provider={pool.provider} />
+              <Typography component="div" variant="body1" fontWeight={500} color="primary.500">
+                {`${capitalize(pool.provider)} ${isAutoPool ? '(Auto)' : ''}`}
               </Typography>
             </Box>
           }
         />
-        <SummaryRow col1="Slippage tolerance" col2="1%" withInfo />
-        <SummaryRow col1="Min ADA" col2="2 ADA" withInfo />
-        <SummaryRow col1="Minimum assets received" col2="2.99 USDA" withInfo />
-        <SummaryRow col1="Fees" col2="0 ADA" withInfo />
+        <SummaryRow col1="Slippage tolerance" col2={`${orderData.slippage}%`} withInfo />
+        <SwapPoolFullInfo />
         <Box p="16px" bgcolor="#244ABF" borderRadius="8px" color="common.white">
           <Box display="flex" justifyContent="space-between">
             <Box>Total</Box>
             <Typography component="div" fontSize="20px" fontWeight="500">
-              11 ADA
+              WIP
             </Typography>
           </Box>
           <Box display="flex" justifyContent="space-between">
             <Box />
             <Typography component="div" variant="body1">
-              4.32 USD
+              WIP
             </Typography>
           </Box>
         </Box>
@@ -107,50 +94,57 @@ export default function SwapConfirmationStep({ poolInfo = {} }: Props): React$No
   );
 }
 
-// type AssetRowProps = {|
-//   asset: AssetAmount,
-//   usdAmount?: string,
-// |};
+type AssetRowProps = {|
+  asset: AssetAmount,
+  usdAmount?: string,
+|};
 
-// const AssetRow = ({ asset, usdAmount = null }: AssetRowProps) => {
-//   const { image = null, name, address, amount, ticker } = asset;
-//   return (
-//     <Box
-//       sx={{
-//         display: 'flex',
-//         alignItems: 'center',
-//         gap: '12px',
-//         p: '8px',
-//       }}
-//     >
-//       <Box flexShrink="0" width="48px" height="48px">
-//         {image || <AssetDefault />}
-//       </Box>
-//       <Box flexGrow="1" width="100%">
-//         <Box>
-//           <Typography component="div" variant="body1">
-//             {name}
-//           </Typography>
-//         </Box>
-//         <Box>
-//           <Typography component="div" variant="body2" color="grayscale.600">
-//             {address}
-//           </Typography>
-//         </Box>
-//       </Box>
-//       <Box flexShrink="0" display="flex" flexDirection="column" alignItems="flex-end">
-//         <Typography component="div" variant="body1" color="grayscale.900">
-//           <span>{amount}</span>&nbsp;<span>{ticker}</span>
-//         </Typography>
-//         {usdAmount && (
-//           <Typography component="div" variant="body2" color="grayscale.600">
-//             {usdAmount} USD
-//           </Typography>
-//         )}
-//       </Box>
-//     </Box>
-//   );
-// };
+const AssetRow = ({ asset, usdAmount = null }: AssetRowProps) => {
+  const { image = null, name, address, amount, ticker } = asset;
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+        p: '8px',
+      }}
+    >
+      <Box flexShrink="0" width="48px" height="48px">
+        <img
+          src={image}
+          alt=""
+          width="100%"
+          onError={img => {
+            img.src = assetDefault;
+          }}
+        />
+      </Box>
+      <Box flexGrow="1" width="100%">
+        <Box>
+          <Typography component="div" variant="body1">
+            {name}
+          </Typography>
+        </Box>
+        <Box>
+          <Typography component="div" variant="body2" color="grayscale.600">
+            {address}
+          </Typography>
+        </Box>
+      </Box>
+      <Box flexShrink="0" display="flex" flexDirection="column" alignItems="flex-end">
+        <Typography component="div" variant="body1" color="grayscale.900">
+          <span>{amount}</span>&nbsp;<span>{ticker}</span>
+        </Typography>
+        {usdAmount && (
+          <Typography component="div" variant="body2" color="grayscale.600">
+            {usdAmount} USD
+          </Typography>
+        )}
+      </Box>
+    </Box>
+  );
+};
 
 const SummaryRow = ({ col1, col2, withInfo = false }) => (
   <Box display="flex" alignItems="center" justifyContent="space-between">
