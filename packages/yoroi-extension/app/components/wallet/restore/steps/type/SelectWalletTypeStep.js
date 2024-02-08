@@ -28,8 +28,8 @@ type Intl = {|
 |};
 
 type Props = {|
-  onNext(mode: RestoreModeType): void,
-  goBack(): void,
+  onNext: RestoreModeType => void,
+  goBack: void => void,
 |};
 
 function SelectWalletTypeStep(props: Props & Intl): Node {

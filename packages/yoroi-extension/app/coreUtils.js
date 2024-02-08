@@ -94,6 +94,16 @@ export function compose<A,B,C>(f1: A => ?B, f2: B => ?C): (A => ?C) {
   return a => maybe(f1(a), f2);
 }
 
-export function noop(..._: any[]) {
+/**
+ * Does nothing
+ */
+export function noop(..._: any[]): void {
   // noop
+}
+
+/**
+ * Throws an error
+ */
+export function fail<T>(...params: any[]): T {
+  throw new Error(...params);
 }

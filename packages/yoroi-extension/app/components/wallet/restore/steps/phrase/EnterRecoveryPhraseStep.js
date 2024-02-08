@@ -28,23 +28,23 @@ type Intl = {|
 |};
 
 type Props = {|
-  walletData: any,
+  length: number,
   initialRecoveryPhrase: string,
   duplicatedWalletData: any,
-  openDuplicatedWallet(duplicatedWallet: PublicDeriver<>): void,
-  setCurrentStep(stepId: string): void,
-  checkValidPhrase(enteredPhrase: string): boolean,
-  onSubmit(phrase: string): PossiblyAsync<PublicDeriver<> | typeof undefined>,
+  openDuplicatedWallet: PublicDeriver<> => void,
+  setCurrentStep: string => void,
+  checkValidPhrase: string => boolean,
+  onSubmit: string => PossiblyAsync<?PublicDeriver<>>,
   ...ManageDialogsProps,
 |};
 
-function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
+function EnterRecoveryPhraseStep(props: Props & Intl): Node {
   const [enableNext, setEnableNext] = useState(false);
   const [duplicatedWallet, setDuplicatedWallet] = useState(null);
   const {
     intl,
     setCurrentStep,
-    walletData,
+    length,
     checkValidPhrase,
     onSubmit,
     openDuplicatedWallet,
@@ -56,8 +56,6 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
   } = props;
 
   const isActiveDialog = isDialogOpen(DuplicatedWalletDialog);
-
-  const mode = walletData.mode;
 
   function goNextStepCallback() {
     return () => setCurrentStep(RESTORE_WALLET_STEPS.ADD_WALLET_DETAILS);
@@ -91,14 +89,14 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
         direction="column"
         alignItems="left"
         justifyContent="center"
-        maxWidth={mode.length === 15 ? '636px' : '760px'}
+        maxWidth={length === 15 ? '636px' : '760px'}
       >
         <Typography component="div" mb="16px">
           <FormattedHTMLMessage {...messages.description} />
         </Typography>
 
         <RestoreRecoveryPhraseForm
-          numberOfMnemonics={mode.length}
+          numberOfMnemonics={length}
           isValidMnemonic={checkMnemonic}
           onSubmit={handleSubmit}
           initialRecoveryPhrase={initialRecoveryPhrase}
@@ -134,4 +132,4 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
   );
 }
 
-export default (injectIntl(observer(VerifyRecoveryPhraseStep)): ComponentType<Props>);
+export default (injectIntl(observer(EnterRecoveryPhraseStep)): ComponentType<Props>);
