@@ -21,7 +21,6 @@ import environment from '../../../environment';
 import { useRestoreWallet } from './hooks';
 import { ampli } from '../../../../ampli/index';
 import { runInAction } from 'mobx';
-import { fail } from '../../../coreUtils';
 import type { RestoreModeType } from '../../../actions/common/wallet-restore-actions';
 
 const messages: * = defineMessages({
@@ -127,7 +126,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
     [RESTORE_WALLET_STEPS.SELECT_NETWORK]: {
       stepId: RESTORE_WALLET_STEPS.SELECT_NETWORK,
       message: messages.firstStep,
-      component: () => (
+      component: (
         <SelectNetworkStep
           onSelect={network => {
             profile.setSelectedNetwork.trigger(network);
@@ -141,7 +140,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
     [RESTORE_WALLET_STEPS.SELECT_WALLET_TYPE]: {
       stepId: RESTORE_WALLET_STEPS.SELECT_WALLET_TYPE,
       message: messages.firstStep,
-      component: () => (
+      component: (
         <SelectWalletTypeStep
           onNext={mode => {
             resetRestoreWalletData();
@@ -166,10 +165,9 @@ function RestoreWalletPage(props: Props & Intl): Node {
     [RESTORE_WALLET_STEPS.ENTER_RECOVERY_PHRASE]: {
       stepId: RESTORE_WALLET_STEPS.ENTER_RECOVERY_PHRASE,
       message: messages.secondStep,
-      component: () => (
+      component: (
         <EnterRecoveryPhraseStep
-          // $FlowFixMe[prop-missing]
-          length={selectedRestoreMode?.length ?? fail('No mnemonic length is selected!')}
+          mode={selectedRestoreMode}
           initialRecoveryPhrase={recoveryPhrase}
           duplicatedWalletData={getDuplicatedWalletData()}
           isDialogOpen={isDialogOpen}
@@ -217,7 +215,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
     [RESTORE_WALLET_STEPS.ADD_WALLET_DETAILS]: {
       stepId: RESTORE_WALLET_STEPS.ADD_WALLET_DETAILS,
       message: messages.thirdStep,
-      component: () => (
+      component: (
         <AddWalletDetailsStep
           isRecovery
           prevStep={() => setCurrentStep(RESTORE_WALLET_STEPS.ENTER_RECOVERY_PHRASE)}
@@ -241,7 +239,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
     .map(key => ({ stepId: steps[key].stepId, message: steps[key].message }))
     .filter(step => step.stepId !== RESTORE_WALLET_STEPS.SELECT_NETWORK);
 
-  const CurrentStep = steps[currentStep].component();
+  const CurrentStep = steps[currentStep].component;
 
   if (currentStep === RESTORE_WALLET_STEPS.SELECT_NETWORK) return CurrentStep;
 
