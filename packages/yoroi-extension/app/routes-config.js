@@ -50,9 +50,6 @@ export const ROUTES = {
     DROPBOX: '/foo', // TODO: think about this. GET params don't work well with react-router I think
     // DROPBOX: '/access_token=:token&token_type=:token_type&uid=:uid&account_id=:account_id',
   },
-  NOTICE_BOARD: {
-    ROOT: '/notice-board',
-  },
   // revamp
   STAKING: '/staking',
   ASSETS: {
