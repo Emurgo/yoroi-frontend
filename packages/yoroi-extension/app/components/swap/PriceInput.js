@@ -68,10 +68,10 @@ export default function PriceInput({ label }: Props): Node {
         placeholder="0"
         bgcolor={readonly ? 'grayscale.50' : 'common.white'}
         readOnly={readonly}
-        value={formattedPrice}
+        value={sellTokenInfo?.ticker && buyTokenInfo?.ticker ? formattedPrice : '0'}
       />
       <Box sx={{ justifySelf: 'end' }}>
-        <Box height="100%" width="min-content" display="flex" alignItems="center">
+        <Box height="100%" width="max-content" display="flex" alignItems="center">
           <Box>{sellTokenInfo?.ticker || '-'}</Box>
           <Box>/</Box>
           <Box>{buyTokenInfo?.ticker || '-'}</Box>
