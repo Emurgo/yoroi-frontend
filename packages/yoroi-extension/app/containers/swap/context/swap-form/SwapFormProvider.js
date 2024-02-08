@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import type { SwapFormState, SwapFormAction } from './types';
 import type { AssetAmount } from '../../../../components/swap/types';
 import { SwapFormActionTypeValues } from './types';
-import { useCallback, useReducer } from 'react';
+import { useCallback, useEffect, useReducer, useRef } from 'react';
 import { useSwap } from '@yoroi/swap';
 // import { Quantities } from '../../../../utils/quantities';
 import Context from './context';
@@ -24,7 +24,9 @@ export const defaultSwapFormState: SwapFormState = Object.freeze({
     error: null,
     displayValue: '',
   },
-  sellTokenInfo: {},
+  sellTokenInfo: {
+    tokenId: '',
+  },
   buyTokenInfo: {},
   selectedPool: { isTouched: false },
   limitPrice: { displayValue: '' },
@@ -40,7 +42,7 @@ const numberLocale = { decimalSeparator: ',' };
 
 export default function SwapFormProvider({ initialSwapFormProvider, children }: Props): Node {
   const {
-    // orderData,
+    orderData,
     resetState,
     buyQuantityChanged,
     sellQuantityChanged,
@@ -48,6 +50,14 @@ export default function SwapFormProvider({ initialSwapFormProvider, children }: 
     // limitPriceChanged,
     resetQuantities,
   } = useSwap();
+
+  const { quantity: buyQuantity } = orderData.amounts.buy;
+  const { quantity: sellQuantity } = orderData.amounts.sell;
+
+  // TODO: fix the types for TextInput
+  const buyInputRef = useRef/*<TextInput | null>*/(null);
+  const sellInputRef = useRef/*<TextInput | null>*/(null);
+  // const limitInputRef = useRef<TextInput | null>(null)
 
   const swapFormReducer = (state: SwapFormState, action: SwapFormAction) => {
     const draft = { ...state };
@@ -155,7 +165,11 @@ export default function SwapFormProvider({ initialSwapFormProvider, children }: 
 
   const onChangeSellQuantity = useCallback(
     (text: string) => {
-      const [input, quantity] = Quantities.parseFromText(text, 6, numberLocale);
+      const [input, quantity] = Quantities.parseFromText(
+        text,
+        swapFormState.sellTokenInfo.decimals ?? 0,
+        numberLocale
+      );
       sellQuantityChanged(quantity);
       actions.sellInputValueChanged(text === '' ? '' : input);
 
@@ -166,7 +180,11 @@ export default function SwapFormProvider({ initialSwapFormProvider, children }: 
 
   const onChangeBuyQuantity = useCallback(
     (text: string) => {
-      const [input, quantity] = Quantities.parseFromText(text, 8, numberLocale);
+      const [input, quantity] = Quantities.parseFromText(
+        text,
+        swapFormState.buyTokenInfo.decimals ?? 0,
+        numberLocale
+      );
       buyQuantityChanged(quantity);
       actions.buyInputValueChanged(text === '' ? '' : input);
 
@@ -175,7 +193,37 @@ export default function SwapFormProvider({ initialSwapFormProvider, children }: 
     [buyQuantityChanged, actions, clearErrors]
   );
 
-  const allActions = { ...actions, onChangeSellQuantity, onChangeBuyQuantity };
+  const updateSellInput = useCallback(() => {
+    if (swapFormState.sellQuantity.isTouched && !sellInputRef?.current?.isFocused()) {
+      actions.sellInputValueChanged(
+        Quantities.format(sellQuantity, swapFormState.sellTokenInfo.decimals ?? 0)
+      );
+    }
+  }, [sellQuantity, swapFormState.sellTokenInfo.decimals, swapFormState.sellQuantity.isTouched]);
+
+  const updateBuyInput = useCallback(() => {
+    if (swapFormState.buyQuantity.isTouched && !buyInputRef?.current?.isFocused()) {
+      actions.buyInputValueChanged(
+        Quantities.format(buyQuantity, swapFormState.buyTokenInfo.decimals ?? 0)
+      );
+    }
+  }, [swapFormState.buyTokenInfo.decimals, buyQuantity, swapFormState.buyQuantity.isTouched]);
+
+  useEffect(() => {
+    updateSellInput();
+  }, [sellQuantity, updateSellInput]);
+
+  useEffect(() => {
+    updateBuyInput();
+  }, [buyQuantity, updateBuyInput]);
+
+  const allActions = {
+    ...actions,
+    buyInputRef,
+    sellInputRef,
+    onChangeSellQuantity,
+    onChangeBuyQuantity,
+  };
 
   return (
     <Context.Provider value={{ state: swapFormState, actions: allActions }}>

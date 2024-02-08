@@ -5,14 +5,8 @@ import { ReactComponent as SwitchIcon } from '../../../assets/images/revamp/icon
 import { ReactComponent as InfoIcon } from '../../../assets/images/revamp/icons/info.inline.svg';
 import { ReactComponent as EditIcon } from '../../../assets/images/revamp/icons/edit.inline.svg';
 import { ReactComponent as RefreshIcon } from '../../../assets/images/revamp/icons/refresh.inline.svg';
-// import { ReactComponent as DefaultToken } from '../../../assets/images/revamp/token-default.inline.svg';
-// import { defaultFromAsset, defaultToAsset, fromAssets, poolList, toAssets } from './mockData';
-// import SwapInput from '../../../components/swap/SwapInput';
 import PriceInput from '../../../components/swap/PriceInput';
-// import SelectAssetDialog from '../../../components/swap/SelectAssetDialog';
 import SlippageDialog from '../../../components/swap/SlippageDialog';
-// import SelectPoolDialog from '../../../components/swap/SelectPoolDialog';
-// import SwapPool from '../../../components/swap/SwapPool';
 import Tabs from '../../../components/common/tabs/Tabs';
 import {
   // makeLimitOrder,
@@ -26,6 +20,8 @@ import EditSellAmount from './edit-sell-amount/EditSellAmount';
 import EditBuyAmount from './edit-buy-amount/EditBuyAmount';
 import SelectBuyTokenFromList from './edit-buy-amount/SelectBuyTokenFromList';
 import SelectSellTokenFromList from './edit-sell-amount/SelectSellTokenFromList';
+import EditSwapPool from './edit-pool/EditPool';
+import SelectSwapPoolFromList from './edit-pool/SelectPoolFromList';
 
 type Props = {|
   onLimitSwap: void => void,
@@ -48,7 +44,6 @@ export default function SwapForm({ onLimitSwap }: Props): React$Node {
     // unsignedTxChanged,
     poolPairsChanged,
   } = useSwap();
-  console.log('🚀 > orderData:', orderData);
 
   useSwapPoolsByPair(
     {
@@ -144,51 +139,14 @@ export default function SwapForm({ onLimitSwap }: Props): React$Node {
         </Box>
 
         {/* Available pools */}
-        <Box>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              mb: '16px',
-            }}
-          >
-            {/* <Box display="flex" gap="8px" alignItems="center">
-              <Typography component="div" variant="body1" color="grayscale.500">
-                DEX
-              </Typography>
-              <InfoIcon />
-            </Box>
-            <Box
-              onClick={() => false && setOpenedDialog('pool')}
-              sx={{ cursor: 'pointer', display: 'flex', gap: '4px', alignItems: 'center' }}
-            >
-              <Box sx={{ width: '24px', height: '24px' }}>{pool.image || <DefaultToken />}</Box>
-              <Typography component="div" variant="body1" color="grayscale.max">
-                {pool.name ? `${pool.name} ${pool.isAuto ? '(Auto)' : ''}` : 'No pool found'}
-              </Typography>
-
-              <EditIcon />
-            </Box> */}
-          </Box>
-
-          {/* <SwapPool /> */}
-        </Box>
+        <EditSwapPool handleEditPool={() => setOpenedDialog('pool')} />
       </Box>
 
       {/* Dialogs */}
       {openedDialog === 'from' && <SelectSellTokenFromList onClose={() => setOpenedDialog('')} />}
       {openedDialog === 'to' && <SelectBuyTokenFromList onClose={() => setOpenedDialog('')} />}
-
       {openedDialog === 'slippage' && <SlippageDialog onClose={() => setOpenedDialog('')} />}
-
-      {/* {openedDialog === 'pool' && (
-        <SelectPoolDialog
-          currentPool={'test'}
-          poolList={poolList}
-          onClose={() => setOpenedDialog('')}
-        />
-      )} */}
+      {openedDialog === 'pool' && <SelectSwapPoolFromList onClose={() => setOpenedDialog('')} />}
     </>
   );
 }
