@@ -5,7 +5,6 @@ import ProfileStore from './toplevel/ProfileStore';
 import WalletBackupStore from './toplevel/WalletBackupStore';
 import UiDialogsStore from './toplevel/UiDialogsStore';
 import UiNotificationsStore from './toplevel/UiNotificationsStore';
-import NoticeBoardStore from './toplevel/NoticeBoardStore';
 import LoadingStore from './toplevel/LoadingStore';
 import MemosStore from './toplevel/MemosStore';
 import WalletStore from './toplevel/WalletStore';
@@ -39,7 +38,6 @@ const storeClasses = Object.freeze({
   walletBackup: WalletBackupStore,
   uiDialogs: UiDialogsStore,
   uiNotifications: UiNotificationsStore,
-  noticeBoard: NoticeBoardStore,
   loading: LoadingStore,
   wallets: WalletStore,
   addresses: AddressesStore,
@@ -65,7 +63,6 @@ export type StoresMap = {|
   walletBackup: WalletBackupStore,
   uiDialogs: UiDialogsStore<{||}, ActionsMap>,
   uiNotifications: UiNotificationsStore<{||}, ActionsMap>,
-  noticeBoard: NoticeBoardStore,
   loading: LoadingStore,
   wallets: WalletStore,
   addresses: AddressesStore,
@@ -100,7 +97,6 @@ const stores: StoresMap = (observable({
   walletBackup: null,
   uiDialogs: null,
   uiNotifications: null,
-  noticeBoard: null,
   loading: null,
   wallets: null,
   addresses: null,
