@@ -72,12 +72,9 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
     if (selectedNetwork == null)
       throw new Error(`${nameof(this._restoreToDb)} no network selected`);
 
-    const { mode } = this.stores.walletRestore;
-    if (mode == null) throw new Error(`${nameof(this._restoreToDb)} Unknown restoration type`);
     const accountIndex = this.stores.walletRestore.selectedAccount;
     await this.stores.wallets.restoreRequest.execute(async () => {
       const wallet = await this.api.ada.restoreWallet({
-        mode: mode.type,
         db: persistentDb,
         recoveryPhrase: phrase,
         walletName,
@@ -102,12 +99,9 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
     if (selectedNetwork == null)
       throw new Error(`${nameof(this._restoreToDb)} no network selected`);
 
-    const { mode } = this.stores.walletRestore;
-    if (mode == null) throw new Error(`${nameof(this._restoreToDb)} Unknown restoration type`);
     const accountIndex = this.stores.walletRestore.selectedAccount;
     await this.stores.wallets.restoreRequest.execute(async () => {
       const wallet = await this.api.ada.restoreWallet({
-        mode: mode.type,
         db: persistentDb,
         recoveryPhrase,
         walletName,

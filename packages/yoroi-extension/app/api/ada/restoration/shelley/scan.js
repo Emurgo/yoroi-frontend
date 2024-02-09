@@ -155,6 +155,7 @@ async function scanChain(request: {|
     });
 }
 
+// <TODO:PENDING_REMOVAL> legacy
 export async function scanShelleyCip1852Account(request: {|
   accountPublicKey: string,
   lastUsedInternal: number,

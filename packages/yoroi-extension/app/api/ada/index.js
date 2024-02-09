@@ -8,11 +8,9 @@ import {
   ChainDerivations,
   CoinTypes,
   HARD_DERIVATION_START,
-  STAKING_KEY_INDEX,
   WalletTypePurpose,
 } from '../../config/numbersConfig';
 import type { Network, } from '../../../config/config-types';
-import { createHardwareWallet, createStandardBip44Wallet, } from './lib/storage/bridge/walletBuilder/byron';
 import { createHardwareCip1852Wallet, createStandardCip1852Wallet, } from './lib/storage/bridge/walletBuilder/shelley';
 import type { ReferenceTx } from './lib/storage/bridge/updateTransactions';
 import {
@@ -32,7 +30,6 @@ import {
 import type { TransactionMetadata } from './lib/storage/bridge/metadataUtils';
 import { createMetadata } from './lib/storage/bridge/metadataUtils';
 
-import { Bip44Wallet, } from './lib/storage/models/Bip44Wallet/wrapper';
 import { Cip1852Wallet, } from './lib/storage/models/Cip1852Wallet/wrapper';
 import type { HWFeatures, } from './lib/storage/database/walletTypes/core/tables';
 import { Bip44DerivationLevels, flattenInsertTree, } from './lib/storage/database/walletTypes/bip44/api/utils';
@@ -99,7 +96,6 @@ import {
 import LocalizableError from '../../i18n/LocalizableError';
 import { scanBip44Account, } from '../common/lib/restoration/bip44';
 import { v2genAddressBatchFunc, } from './restoration/byron/scan';
-import { scanShelleyCip1852Account } from './restoration/shelley/scan';
 import type {
   CardanoAddressedUtxo,
   CardanoUtxoScriptWitness,
@@ -499,7 +495,6 @@ export type GenerateWalletRecoveryPhraseFunc = (
 
 export type RestoreWalletForTransferRequest = {|
   accountPubKey: RustModule.WalletV4.Bip32PublicKey,
-  transferSource: 'cip1852' | 'bip44',
   accountIndex: number,
   checkAddressesInUse: FilterFunc,
   network: $ReadOnly<NetworkRow>,
@@ -806,10 +801,7 @@ export default class AdaApi {
   }
 
   async createWallet(
-    request: {|
-      mode: 'bip44' | 'cip1852',
-      ...CreateWalletRequest,
-    |},
+    request: CreateWalletRequest,
   ): Promise<CreateWalletResponse> {
     // creating a wallet is the same as restoring a wallet
     return await this.restoreWallet(request);
@@ -1864,10 +1856,7 @@ export default class AdaApi {
    * Creates wallet and saves result to DB
   */
   async restoreWallet(
-    request: {|
-      mode: 'bip44' | 'cip1852',
-      ...RestoreWalletRequest,
-    |}
+    request: RestoreWalletRequest
   ): Promise<RestoreWalletResponse> {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.restoreWallet)} called`);
     const { recoveryPhrase, walletName, walletPassword, } = request;
@@ -1879,57 +1868,25 @@ export default class AdaApi {
       // Note: we only restore for 0th account
       const rootPk = generateWalletRootKey(recoveryPhrase);
       const newPubDerivers = [];
-      if (request.mode === 'bip44') {
-        const wallet = await createStandardBip44Wallet({
-          db: request.db,
-          rootPk: RustModule.WalletV2.Bip44RootPrivateKey.new(
-            RustModule.WalletV2.PrivateKey.from_hex(
-              Buffer.from(rootPk.as_bytes()).toString('hex')
-            ),
-            RustModule.WalletV2.DerivationScheme.v2()
-          ),
-          password: walletPassword,
-          accountIndex: request.accountIndex,
-          walletName,
-          accountName: '', // set account name empty now
-          network: request.network,
-        });
-
-        const bip44Wallet = await Bip44Wallet.createBip44Wallet(
-          request.db,
-          wallet.bip44WrapperRow,
-        );
-        for (const pubDeriver of wallet.publicDeriver) {
-          newPubDerivers.push(await PublicDeriver.createPublicDeriver(
-            pubDeriver.publicDeriverResult,
-            bip44Wallet,
-          ));
-        }
-      } else if (request.mode === 'cip1852') {
-        const wallet = await createStandardCip1852Wallet({
-          db: request.db,
-          rootPk,
-          password: walletPassword,
-          accountIndex: request.accountIndex,
-          walletName,
-          accountName: '', // set account name empty now
-          network: request.network,
-        });
-
-        const cip1852Wallet = await Cip1852Wallet.createCip1852Wallet(
-          request.db,
-          wallet.cip1852WrapperRow,
-        );
-        for (const pubDeriver of wallet.publicDeriver) {
-          newPubDerivers.push(await PublicDeriver.createPublicDeriver(
-            pubDeriver.publicDeriverResult,
-            cip1852Wallet,
-          ));
-        }
-      } else {
-        throw new Error(`${nameof(this.restoreWallet)} unknown restoration mode`);
+      const wallet = await createStandardCip1852Wallet({
+        db: request.db,
+        rootPk,
+        password: walletPassword,
+        accountIndex: request.accountIndex,
+        walletName,
+        accountName: '', // set account name empty now
+        network: request.network,
+      });
+      const cip1852Wallet = await Cip1852Wallet.createCip1852Wallet(
+        request.db,
+        wallet.cip1852WrapperRow,
+      );
+      for (const pubDeriver of wallet.publicDeriver) {
+        newPubDerivers.push(await PublicDeriver.createPublicDeriver(
+          pubDeriver.publicDeriverResult,
+          cip1852Wallet,
+        ));
       }
-
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.restoreWallet)} success`);
       return {
         publicDerivers: newPubDerivers,
@@ -1950,6 +1907,7 @@ export default class AdaApi {
   /**
    * Restore all addresses like restoreWallet() but do not touch storage.
    */
+  // <TODO:PENDING_REMOVAL> paper
   async restoreWalletForTransfer(
     request: RestoreWalletForTransferRequest
   ): Promise<RestoreWalletForTransferResponse> {
@@ -1980,50 +1938,26 @@ export default class AdaApi {
         return Promise.resolve();
       };
 
-      let insertTree;
-      if (request.transferSource === 'bip44') {
-        const key = RustModule.WalletV2.Bip44AccountPublic.new(
-          v4PublicToV2(request.accountPubKey),
-          RustModule.WalletV2.DerivationScheme.v2(),
-        );
-        insertTree = await scanBip44Account({
-          network: request.network,
-          generateInternalAddresses: v2genAddressBatchFunc(
-            key.bip44_chain(false),
-            config.ByronNetworkId,
-          ),
-          generateExternalAddresses: v2genAddressBatchFunc(
-            key.bip44_chain(true),
-            config.ByronNetworkId,
-          ),
-          lastUsedInternal: -1,
-          lastUsedExternal: -1,
-          checkAddressesInUse,
-          addByHash,
-          type: CoreAddressTypes.CARDANO_LEGACY,
-        });
-      } else if (request.transferSource === 'cip1852') {
-        const stakingKey = request.accountPubKey
-          .derive(ChainDerivations.CHIMERIC_ACCOUNT)
-          .derive(STAKING_KEY_INDEX)
-          .to_raw_key();
-
-        const cip1852InsertTree = await scanShelleyCip1852Account({
-          network: request.network,
-          accountPublicKey: Buffer.from(request.accountPubKey.as_bytes()).toString('hex'),
-          lastUsedInternal: -1,
-          lastUsedExternal: -1,
-          checkAddressesInUse,
-          addByHash,
-          stakingKey,
-        });
-
-        insertTree = cip1852InsertTree.filter(child => (
-          child.index === ChainDerivations.EXTERNAL || child.index === ChainDerivations.INTERNAL
-        ));
-      } else {
-        throw new Error(`${nameof(this.restoreWalletForTransfer)} unexpected wallet type ${request.transferSource}`);
-      }
+      const key = RustModule.WalletV2.Bip44AccountPublic.new(
+        v4PublicToV2(request.accountPubKey),
+        RustModule.WalletV2.DerivationScheme.v2(),
+      );
+      const insertTree = await scanBip44Account({
+        network: request.network,
+        generateInternalAddresses: v2genAddressBatchFunc(
+          key.bip44_chain(false),
+          config.ByronNetworkId,
+        ),
+        generateExternalAddresses: v2genAddressBatchFunc(
+          key.bip44_chain(true),
+          config.ByronNetworkId,
+        ),
+        lastUsedInternal: -1,
+        lastUsedExternal: -1,
+        checkAddressesInUse,
+        addByHash,
+        type: CoreAddressTypes.CARDANO_LEGACY,
+      });
       const flattenedTree = flattenInsertTree(insertTree);
 
       const addressResult = [];
@@ -2078,18 +2012,6 @@ export default class AdaApi {
         accountPubKey: request.bip44AccountPubKey,
         accountIndex: request.accountIndex,
         checkAddressesInUse: request.checkAddressesInUse,
-        transferSource: 'bip44',
-        network: request.network,
-      });
-
-      // it's possible that wallet software created the Shelley wallet off the bip44 path
-      // instead of the cip1852 path like required in the CIP1852 spec
-      // so just in case, we check these addresses also
-      const wrongCip1852Addresses = await this.restoreWalletForTransfer({
-        accountPubKey: request.bip44AccountPubKey,
-        accountIndex: request.accountIndex,
-        checkAddressesInUse: request.checkAddressesInUse,
-        transferSource: 'cip1852',
         network: request.network,
       });
 
@@ -2119,7 +2041,6 @@ export default class AdaApi {
 
       const addresses = [
         ...bip44Addresses.addresses,
-        ...wrongCip1852Addresses.addresses,
       ].map(address => ({
         address: address.address,
         addressing: {
@@ -2187,84 +2108,43 @@ export default class AdaApi {
   ): Promise<CreateHardwareWalletResponse> {
     try {
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.createHardwareWallet)} called`);
-      const config = getCardanoHaskellBaseConfig(
-        request.network
-      ).reduce((acc, next) => Object.assign(acc, next), {});
-
       if (request.addressing.startLevel !== Bip44DerivationLevels.PURPOSE.level) {
         throw new Error(`${nameof(AdaApi)}::${nameof(this.createHardwareWallet)} bad addressing start level`);
       }
-      if (request.addressing.path[0] === WalletTypePurpose.BIP44) {
-        const wallet = await createHardwareWallet({
-          db: request.db,
-          settings: RustModule.WalletV2.BlockchainSettings.from_json({
-            protocol_magic: config.ByronNetworkId
-          }),
-          accountPublicKey: RustModule.WalletV2.Bip44AccountPublic.new(
-            RustModule.WalletV2.PublicKey.from_hex(request.publicKey),
-            RustModule.WalletV2.DerivationScheme.v2()
-          ),
-          accountIndex: request.addressing.path[
-            Bip44DerivationLevels.ACCOUNT.level - request.addressing.startLevel
-          ],
-          walletName: request.walletName,
-          accountName: '',
-          hwWalletMetaInsert: request.hwFeatures,
-          network: request.network,
-        });
-
-        const bip44Wallet = await Bip44Wallet.createBip44Wallet(
-          request.db,
-          wallet.bip44WrapperRow,
-        );
-
-        if (wallet.publicDeriver.length !== 1) {
-          throw new Error(`${nameof(AdaApi)}::${nameof(this.createHardwareWallet)} should only do 1 HW derivation at a time`);
-        }
-        const pubDeriverResult = wallet.publicDeriver[0].publicDeriverResult;
-        const newPubDeriver = await PublicDeriver.createPublicDeriver(
-          pubDeriverResult,
-          bip44Wallet,
-        );
-        Logger.debug(`${nameof(AdaApi)}::${nameof(this.restoreWallet)} success`);
-        return {
-          publicDeriver: newPubDeriver,
-        };
+      if (request.addressing.path[0] !== WalletTypePurpose.CIP1852) {
+        throw new Error(`${nameof(this.createHardwareWallet)} unknown restoration mode`);
       }
-      if (request.addressing.path[0] === WalletTypePurpose.CIP1852) {
-        const wallet = await createHardwareCip1852Wallet({
-          db: request.db,
-          accountPublicKey: RustModule.WalletV4.Bip32PublicKey.from_bytes(
-            Buffer.from(request.publicKey, 'hex')
-          ),
-          accountIndex: request.addressing.path[
-            Bip44DerivationLevels.ACCOUNT.level - request.addressing.startLevel
+      const wallet = await createHardwareCip1852Wallet({
+        db: request.db,
+        accountPublicKey: RustModule.WalletV4.Bip32PublicKey.from_bytes(
+          Buffer.from(request.publicKey, 'hex')
+        ),
+        accountIndex: request.addressing.path[
+        Bip44DerivationLevels.ACCOUNT.level - request.addressing.startLevel
           ],
-          walletName: request.walletName,
-          accountName: '',
-          hwWalletMetaInsert: request.hwFeatures,
-          network: request.network,
-        });
+        walletName: request.walletName,
+        accountName: '',
+        hwWalletMetaInsert: request.hwFeatures,
+        network: request.network,
+      });
 
-        const cip1852Wallet = await Cip1852Wallet.createCip1852Wallet(
-          request.db,
-          wallet.cip1852WrapperRow,
-        );
+      const cip1852Wallet = await Cip1852Wallet.createCip1852Wallet(
+        request.db,
+        wallet.cip1852WrapperRow,
+      );
 
-        if (wallet.publicDeriver.length !== 1) {
-          throw new Error(`${nameof(AdaApi)}::${nameof(this.createHardwareWallet)} should only do 1 HW derivation at a time`);
-        }
-        const pubDeriverResult = wallet.publicDeriver[0].publicDeriverResult;
-        const newPubDeriver = await PublicDeriver.createPublicDeriver(
-          pubDeriverResult,
-          cip1852Wallet,
-        );
-        Logger.debug(`${nameof(AdaApi)}::${nameof(this.restoreWallet)} success`);
-        return {
-          publicDeriver: newPubDeriver,
-        };
+      if (wallet.publicDeriver.length !== 1) {
+        throw new Error(`${nameof(AdaApi)}::${nameof(this.createHardwareWallet)} should only do 1 HW derivation at a time`);
       }
-      throw new Error(`${nameof(this.createHardwareWallet)} unknown restoration mode`);
+      const pubDeriverResult = wallet.publicDeriver[0].publicDeriverResult;
+      const newPubDeriver = await PublicDeriver.createPublicDeriver(
+        pubDeriverResult,
+        cip1852Wallet,
+      );
+      Logger.debug(`${nameof(AdaApi)}::${nameof(this.restoreWallet)} success`);
+      return {
+        publicDeriver: newPubDeriver,
+      };
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.createHardwareWallet)} error: ` + stringifyError(error));
 

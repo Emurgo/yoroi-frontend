@@ -2,7 +2,7 @@
 import type {
   CardanoAddressedUtxo,
 } from '../types';
-import { verifyFromBip44Root }  from '../../lib/storage/models/utils';
+import { verifyFromDerivationRoot }  from '../../lib/storage/models/utils';
 import type {
   DeviceOwnedAddress,
   Withdrawal,
@@ -188,7 +188,7 @@ function _transformToLedgerInputs(
   inputs: Array<CardanoAddressedUtxo>
 ): Array<TxInput> {
   for (const input of inputs) {
-    verifyFromBip44Root(input.addressing);
+    verifyFromDerivationRoot(input.addressing);
   }
   return inputs.map(input => ({
     txHashHex: input.tx_hash,
@@ -276,7 +276,7 @@ function _transformToLedgerOutputs(request: {|
 
     const changeAddr = request.changeAddrs.find(change => jsAddr === change.address);
     if (changeAddr != null) {
-      verifyFromBip44Root(changeAddr.addressing);
+      verifyFromDerivationRoot(changeAddr.addressing);
       const addressParams = toLedgerAddressParameters({
         networkId: request.networkId,
         address,
@@ -536,7 +536,7 @@ export function buildSignedTransaction(
   const seenBootstrapWit = new Set<string>();
 
   for (const utxo of senderUtxos) {
-    verifyFromBip44Root(utxo.addressing);
+    verifyFromDerivationRoot(utxo.addressing);
 
     const witness = findWitness(utxo.addressing.path);
     const addressKey = derivePublicByAddressing({
@@ -587,7 +587,7 @@ export function buildSignedTransaction(
       path: witness.path,
       startLevel: 1,
     };
-    verifyFromBip44Root(addressing);
+    verifyFromDerivationRoot(addressing);
     if (witness.path[Bip44DerivationLevels.CHAIN.level - 1] === ChainDerivations.CHIMERIC_ACCOUNT) {
       const stakingKey = derivePublicByAddressing({
         addressing,
@@ -999,7 +999,7 @@ export function buildConnectorSignedTransaction(
       path: witness.path,
       startLevel: 1,
     };
-    verifyFromBip44Root(addressing);
+    verifyFromDerivationRoot(addressing);
 
     const witnessKey = derivePublicByAddressing({
       addressing,

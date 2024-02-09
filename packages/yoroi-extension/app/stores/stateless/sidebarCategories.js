@@ -70,7 +70,7 @@ export const SETTINGS: SidebarCategory = registerCategory({
   route: ROUTES.SETTINGS.ROOT,
   icon: settingsIcon,
   label: globalMessages.sidebarSettings,
-  isVisible: _request => true,
+  isVisible: r => r.selected != null,
 });
 
 export const TRANSFER_PAGE: SidebarCategory = registerCategory({
@@ -78,7 +78,7 @@ export const TRANSFER_PAGE: SidebarCategory = registerCategory({
   route: ROUTES.TRANSFER.ROOT,
   icon: transferIcon,
   label: globalMessages.sidebarTransfer,
-  isVisible: _request => true,
+  isVisible: r => r.selected != null,
 });
 
 export const CONNECTED_WEBSITES: SidebarCategory = registerCategory({
