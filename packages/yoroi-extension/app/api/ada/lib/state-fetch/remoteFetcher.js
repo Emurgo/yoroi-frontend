@@ -29,7 +29,9 @@ import type {
   GetRecentTransactionHashesRequest,
   GetRecentTransactionHashesResponse,
   GetTransactionsByHashesRequest,
-  GetTransactionsByHashesResponse, MultiAssetSupplyResponse,
+  GetTransactionsByHashesResponse,
+  GetProtocolParametersFunc,
+  MultiAssetSupplyResponse,
 } from './types';
 import type { FilterUsedRequest, FilterUsedResponse, } from '../../../common/lib/state-fetch/currencySpecificTypes';
 
@@ -556,5 +558,26 @@ export class RemoteFetcher implements IFetcher {
           blockHashes: {},
         }
       });
+  }
+
+  getProtocolParameters: GetProtocolParametersFunc = async (body) => {
+    const { BackendServiceZero } = body.network.Backend;
+    if (BackendServiceZero == null) throw new Error(`${nameof(this.getProtocolParameters)} missing backend zero url`);
+    return axios(
+      `${BackendServiceZero}/protocolparameters`,
+      {
+        method: 'get',
+        timeout: 2 * CONFIG.app.walletRefreshInterval,
+        headers: {
+          'yoroi-version': this.getLastLaunchVersion(),
+          'yoroi-locale': this.getCurrentLocale()
+        }
+      }
+    ).then(response => ({
+      LinearFee: response.data.linearFee,
+      CoinsPerUtxoByte: response.data.coinsPerUtxoByte,
+      PoolDeposit: response.data.poolDeposit,
+      KeyDeposit: response.data.keyDeposit,
+    }));
   }
 }

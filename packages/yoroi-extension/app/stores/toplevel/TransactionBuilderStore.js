@@ -124,12 +124,14 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   }
 
   @computed get
-  minAda(): ?MultiToken {
+  minAda(): MultiToken {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) throw new Error(`${nameof(this.minAda)} requires wallet to be selected`);
     const network = publicDeriver.getParent().getNetworkInfo();
     const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId)
-    if (!isCardanoHaskell(network)) return;
+    if (!isCardanoHaskell(network)) {
+      throw new Error('expect only cardano network');
+    }
 
     let minAmount;
     if (this.isDefaultIncluded && this.plannedTxInfoMap.length === 1) {
@@ -298,10 +300,16 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       getDefaultEntryToken(defaultToken)
     );
 
-    const minAmount = RustModule.WalletV4.min_ada_required(
-      cardanoValueFromMultiToken(fakeMultitoken),
-      false,
-      RustModule.WalletV4.BigNum.from_str(squashedConfig.CoinsPerUtxoWord)
+    const minAmount = RustModule.WalletV4.min_ada_for_output(
+      RustModule.WalletV4.TransactionOutput.new(
+        // using a dummy common base address here. This is the longest address
+        // to ensure safety but and not optimum.
+        RustModule.WalletV4.Address.from_hex('0'.repeat(114)),
+        cardanoValueFromMultiToken(fakeMultitoken),
+      ),
+      RustModule.WalletV4.DataCost.new_coins_per_byte(
+        RustModule.WalletV4.BigNum.from_str(squashedConfig.CoinsPerUtxoByte)
+      ),
     );
 
     return minAmount.to_str();

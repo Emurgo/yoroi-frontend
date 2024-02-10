@@ -44,8 +44,7 @@ export type CardanoHaskellShelleyBaseConfig = {|
     +coefficient: string,
     +constant: string,
   |};
-  +MinimumUtxoVal: string,
-  +CoinsPerUtxoWord: string,
+  +CoinsPerUtxoByte: string,
   +PoolDeposit: string,
   +KeyDeposit: string,
 |};
@@ -66,6 +65,7 @@ export type NetworkInsert = {|
   CoinType: CoinTypesT,
   Backend: {|
     BackendService?: string,
+    BackendServiceZero?: string,
     TokenInfoService?: string,
     WebSocket?: string,
   |},

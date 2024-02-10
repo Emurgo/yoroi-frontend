@@ -35,7 +35,11 @@ import type { HWFeatures, } from './lib/storage/database/walletTypes/core/tables
 import { Bip44DerivationLevels, flattenInsertTree, } from './lib/storage/database/walletTypes/bip44/api/utils';
 import type { CoreAddressT } from './lib/storage/database/primitives/enums';
 import { CoreAddressTypes, TxStatusCodes, } from './lib/storage/database/primitives/enums';
-import type { NetworkRow, TokenRow, } from './lib/storage/database/primitives/tables';
+import type {
+  NetworkRow,
+  TokenRow,
+  CardanoHaskellShelleyBaseConfig,
+} from './lib/storage/database/primitives/tables';
 import { TransactionType } from './lib/storage/database/primitives/tables';
 import { PublicDeriver, } from './lib/storage/models/PublicDeriver/index';
 import { asDisplayCutoff, asGetAllUtxos, asHasLevels, } from './lib/storage/models/PublicDeriver/traits';
@@ -123,6 +127,7 @@ import type {
   SignedRequest,
   SignedResponse,
   TokenInfoFunc,
+  GetProtocolParametersFunc,
 } from './lib/state-fetch/types';
 import type { FilterFunc, } from '../common/lib/state-fetch/currencySpecificTypes';
 import { getChainAddressesForDisplay, } from './lib/storage/models/utils';
@@ -149,13 +154,18 @@ import type {
   RestoreWalletResponse,
   SendTokenList,
 } from '../common/types';
-import { getCardanoHaskellBaseConfig, } from './lib/storage/database/prepackaged/networks';
+import { getCardanoHaskellBaseConfig, networks, } from './lib/storage/database/prepackaged/networks';
 import { toSenderUtxos, } from './transactions/transfer/utils';
 import type { DefaultTokenEntry } from '../common/lib/MultiToken';
 import { MultiToken } from '../common/lib/MultiToken';
 import { getReceiveAddress } from '../../stores/stateless/addressStores';
 import { generateRegistrationMetadata } from './lib/cardanoCrypto/catalyst';
-import { GetAddress, GetPathWithSpecific, } from './lib/storage/database/primitives/api/read';
+import {
+  GetAddress,
+  GetPathWithSpecific,
+  GetNetworks,
+} from './lib/storage/database/primitives/api/read';
+import { ModifyNetworks } from './lib/storage/database/primitives/api/write';
 import { getAllSchemaTables, mapToTables, raii, } from './lib/storage/database/utils';
 import { GetDerivationSpecific, } from './lib/storage/database/walletTypes/common/api/read';
 import { bytesToHex, hexToBytes, hexToUtf } from '../../coreUtils';
@@ -562,6 +572,13 @@ export type GetTransactionRowsToExportFunc = (
 export const DEFAULT_ADDRESSES_PER_PAPER = 1;
 
 export const FETCH_TXS_BATCH_SIZE = 20;
+
+const UPDATE_NETWORK_IDS = [
+  networks.CardanoMainnet.NetworkId,
+  networks.CardanoPreprodTestnet.NetworkId,
+  networks.CardanoPreviewTestnet.NetworkId,
+  networks.CardanoSanchoTestnet.NetworkId,
+];
 
 export default class AdaApi {
 
@@ -993,7 +1010,7 @@ export default class AdaApi {
               RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
               RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
             ),
-            coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord),
+            coinsPerUtxoByte: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoByte),
             poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
             networkId: request.network.NetworkId,
           },
@@ -1051,7 +1068,7 @@ export default class AdaApi {
             keyDeposit: config.KeyDeposit,
             linearFeeCoefficient: config.LinearFee.coefficient,
             linearFeeConstant: config.LinearFee.constant,
-            coinsPerUtxoWord: config.CoinsPerUtxoWord,
+            coinsPerUtxoByte: config.CoinsPerUtxoByte,
             poolDeposit: config.PoolDeposit,
             networkId: request.network.NetworkId,
           },
@@ -1221,7 +1238,7 @@ export default class AdaApi {
       keyDeposit: config.KeyDeposit,
       linearFeeCoefficient: config.LinearFee.coefficient,
       linearFeeConstant: config.LinearFee.constant,
-      coinsPerUtxoWord: config.CoinsPerUtxoWord,
+      coinsPerUtxoByte: config.CoinsPerUtxoByte,
       poolDeposit: config.PoolDeposit,
       networkId: request.publicDeriver.getParent().networkInfo.NetworkId,
     };
@@ -1349,10 +1366,19 @@ export default class AdaApi {
       } else {
         RustModule.WasmScope(Scope => {
           // ensureRequiredMinimalValue is true
-          const minAmount = Scope.WalletV4.min_ada_required(
+          const output = RustModule.WalletV4.TransactionOutput.new(
+            Scope.WalletV4.Address.from_hex(target.address),
             cardanoValueFromMultiToken(amount),
-            dataHash != null,
-            RustModule.WalletV4.BigNum.from_str(protocolParams.coinsPerUtxoWord),
+          );
+          if (dataHash) {
+            output.set_data_hash(Scope.WalletV4.DataHash.from_hex(dataHash));
+          }
+
+          const minAmount = Scope.WalletV4.min_ada_for_output(
+            output,
+            RustModule.WalletV4.DataCost.new_coins_per_byte(
+              RustModule.WalletV4.BigNum.from_str(protocolParams.coinsPerUtxoByte)
+            ),
           );
 
           if ((new BigNumber(minAmount.to_str())).gt(new BigNumber(target.value ?? '0'))) {
@@ -1436,7 +1462,7 @@ export default class AdaApi {
         keyDeposit: config.KeyDeposit,
         linearFeeCoefficient: config.LinearFee.coefficient,
         linearFeeConstant: config.LinearFee.constant,
-        coinsPerUtxoWord: config.CoinsPerUtxoWord,
+        coinsPerUtxoByte: config.CoinsPerUtxoByte,
         poolDeposit: config.PoolDeposit,
         networkId: networkInfo.NetworkId,
       };
@@ -1561,7 +1587,7 @@ export default class AdaApi {
         keyDeposit: config.KeyDeposit,
         linearFeeCoefficient: config.LinearFee.coefficient,
         linearFeeConstant: config.LinearFee.constant,
-        coinsPerUtxoWord: config.CoinsPerUtxoWord,
+        coinsPerUtxoByte: config.CoinsPerUtxoByte,
         poolDeposit: config.PoolDeposit,
         networkId: request.publicDeriver.getParent().networkInfo.NetworkId,
       };
@@ -1722,7 +1748,7 @@ export default class AdaApi {
         keyDeposit: config.KeyDeposit,
         linearFeeCoefficient: config.LinearFee.coefficient,
         linearFeeConstant: config.LinearFee.constant,
-        coinsPerUtxoWord: config.CoinsPerUtxoWord,
+        coinsPerUtxoByte: config.CoinsPerUtxoByte,
         poolDeposit: config.PoolDeposit,
         networkId: request.publicDeriver.getParent().networkInfo.NetworkId,
       };
@@ -2375,8 +2401,76 @@ export default class AdaApi {
     }
     return utxos;
   }
+
+  async updateProtocolParametersForCardanoNetworks(
+    db: lf$Database,
+    getProtocolParameters: GetProtocolParametersFunc,
+  ): Promise<Array<NetworkRow>> {
+    const dbNetworks = (await raii(
+      db,
+      getAllSchemaTables(db, GetNetworks),
+      tx => GetNetworks.get(db, tx),
+    )).filter(network => UPDATE_NETWORK_IDS.includes(network.NetworkId));
+
+    const changedNetworks: Array<NetworkRow> = [];
+
+    for (const network of dbNetworks) {
+      let params;
+      try {
+        params = await getProtocolParameters({ network });
+      } catch(e) {
+        console.error(
+          `Failed to upgrade protocol params for
+           '${network.NetworkId}' (${network.NetworkName})`, e);
+        continue;
+      }
+
+      // $FlowFixMe[invalid-tuple-index] we know this is Cardano config not Ergo
+      const { changed, merged: newNetwork } =
+        merge(network.BaseConfig[1], params);
+      if (changed) {
+        // $FlowFixMe[invalid-tuple-index] we know this is Cardano config not Ergo
+        network.BaseConfig[1] = (newNetwork: CardanoHaskellShelleyBaseConfig);
+        changedNetworks.push((Object.freeze(network): any));
+      }
+    }
+
+    await raii(
+      db,
+      getAllSchemaTables(db, ModifyNetworks),
+      async tx => {
+        return await ModifyNetworks.upsert(db, tx, changedNetworks);
+      }
+    );
+
+    return changedNetworks;
+  }
 }
 // ========== End of class AdaApi =========
+
+function merge(destination: Object, source: Object): {| changed: boolean, merged: Object |} {
+  function internalRecursiveMerge(result: Object, dest: Object, src: Object): boolean {
+    let changed = false;
+    for (const key in dest) {
+      if (typeof dest[key] === 'object') {
+        result[key] = {}
+        changed = changed || internalRecursiveMerge(result[key], dest[key], src?.[key]);
+      } else if (src == null || src[key] == null) {
+        result[key] = dest[key];
+      } else if (
+        typeof src[key] === typeof dest[key] &&
+        dest[key] !== src[key]
+      ) {
+        result[key] = src[key];
+        changed = true;
+      }
+    }
+    return changed;
+  }
+  const merged: Object = {};
+  const changed = internalRecursiveMerge(merged, destination, source);
+  return { changed, merged };
+}
 
 /**
  * Sending the transaction may affect the amount delegated in a few ways:

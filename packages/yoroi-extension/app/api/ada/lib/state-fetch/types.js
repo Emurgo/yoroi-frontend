@@ -454,3 +454,21 @@ export type GetTransactionsByHashesResponse = Array<RemoteTransaction>;
 export type GetTransactionsByHashesFunc = (
   body: GetTransactionsByHashesRequest
 ) => Promise<GetTransactionsByHashesResponse>;
+
+export type ProtocolParameters = {|
+  +LinearFee: {|
+    +coefficient: string,
+    +constant: string,
+  |};
+  +CoinsPerUtxoByte: string,
+  +PoolDeposit: string,
+  +KeyDeposit: string,
+|};
+
+export type GetProtocolParametersRequest = {|
+  ...BackendNetworkInfo,
+|};
+
+export type GetProtocolParametersFunc = (
+  body: GetProtocolParametersRequest
+) => Promise<ProtocolParameters>;

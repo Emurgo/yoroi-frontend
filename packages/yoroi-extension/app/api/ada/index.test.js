@@ -370,8 +370,7 @@ test('create tx', async () => {
             coefficient: '44',
             constant: '155381'
           },
-          CoinsPerUtxoWord: '34482',
-          MinimumUtxoVal: '1000000',
+          CoinsPerUtxoByte: '4310',
           PoolDeposit: '500000000',
           KeyDeposit: '2000000'
         }
@@ -632,3 +631,60 @@ test('create tx', async () => {
   expect(txJson).toEqual(ref);
 
 });
+
+test('update protcol parameters', async () => {
+  // restore a wallet
+  const restoreRequest = {
+    db,
+    recoveryPhrase: TX_TEST_MNEMONIC_1,
+    walletName: 'mywallet',
+    walletPassword: '123',
+    network: networks.CardanoMainnet,
+    accountIndex: HARD_DERIVATION_START + 0,
+    mode: 'bip44',
+  };
+
+  await AdaApi.prototype.restoreWallet(restoreRequest);
+
+  // update protocol parameters
+  const NEW_PARAMS = {
+    LinearFee: {
+      coefficient: '42',
+      constant: '42',
+    },
+    CoinsPerUtxoByte: '42',
+    PoolDeposit: '42',
+    KeyDeposit: '42',
+  };
+
+  const changedNetworks = await AdaApi.prototype.updateProtocolParametersForCardanoNetworks(
+    db,
+    async ({ network }) => {
+      if (network.NetworkName === 'Cardano Mainnet') {
+        return NEW_PARAMS;
+      }
+      throw new Error('no update');
+    }
+  );
+
+  expect(changedNetworks.length).toBe(1);
+
+  for (const key in NEW_PARAMS) {
+    if (Object.prototype.hasOwnProperty.call(NEW_PARAMS, key)) {
+      // $FlowFixMe[invalid-tuple-index] we know this is Cardano config not Ergo
+      expect(changedNetworks[0].BaseConfig[1][key]).toEqual(NEW_PARAMS[key]);
+    }
+  }
+
+  // reload to ensure db update has taken place
+  const reloadResponse = await AdaApi.prototype.restoreWallet(restoreRequest);
+  const reloadedNetwork = reloadResponse.publicDerivers[0].getParent().getNetworkInfo();
+  for (const key in NEW_PARAMS) {
+    if (Object.prototype.hasOwnProperty.call(NEW_PARAMS, key)) {
+      // $FlowFixMe[invalid-tuple-index] we know this is Cardano config not Ergo
+      expect(reloadedNetwork.BaseConfig[1][key]).toEqual(NEW_PARAMS[key]);
+    }
+  }
+
+});
+

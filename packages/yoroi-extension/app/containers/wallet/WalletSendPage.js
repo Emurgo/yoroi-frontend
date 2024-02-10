@@ -21,7 +21,7 @@ import {
 } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { validateAmount, getMinimumValue } from '../../utils/validations';
+import { validateAmount } from '../../utils/validations';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
@@ -245,10 +245,7 @@ class WalletSendPage extends Component<AllProps> {
             validateAmount(
               amount,
               transactionBuilderStore.selectedToken ?? defaultToken,
-              getMinimumValue(
-                publicDeriver.getParent().getNetworkInfo(),
-                transactionBuilderStore.selectedToken?.IsDefault ?? true
-              ),
+              transactionBuilderStore.minAda.getDefault(),
               this.context.intl
             )
           }
