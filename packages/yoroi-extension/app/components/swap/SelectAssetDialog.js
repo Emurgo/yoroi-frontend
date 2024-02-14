@@ -11,6 +11,7 @@ import { truncateAddressShort } from '../../utils/formatters';
 import assetDefault from '../../assets/images/revamp/asset-default.inline.svg';
 import Dialog from '../widgets/Dialog';
 import Table from '../common/table/Table';
+import { urlResolveForIpfsAndCorsproxy } from '../../coreUtils';
 
 const fromTemplateColumns = '1fr minmax(auto, 136px)';
 const toTemplateColumns = '1fr minmax(auto, 152px) minmax(auto, 136px)';
@@ -50,10 +51,11 @@ export default function SelectAssetDialog({
   const filteredAssets =
     assets.filter(
       a =>
-        a.name.toLowerCase().includes(searchTerm) ||
-        a.ticker.toLowerCase().includes(searchTerm) ||
-        a.id.toLowerCase().includes(searchTerm) ||
-        a.fingerprint.toLowerCase().includes(searchTerm)
+        Boolean(a) &&
+        (a.name.toLowerCase().includes(searchTerm) ||
+          a.ticker.toLowerCase().includes(searchTerm) ||
+          a.id.toLowerCase().includes(searchTerm) ||
+          a.fingerprint.toLowerCase().includes(searchTerm))
     ) || [];
 
   return (
@@ -158,6 +160,7 @@ const AssetAndAmountRow = ({
   //     "ticker": "EARTH",
   //     "metadatas": {}
   // }
+  const imgSrc = urlResolveForIpfsAndCorsproxy(image);
   const isFrom = type === 'from';
   const priceNotChanged = Number(priceChange100.replace('-', '').replace('%', '')) === 0;
   const priceIncreased = priceChange100 && priceChange100.charAt(0) !== '-';
@@ -196,7 +199,7 @@ const AssetAndAmountRow = ({
         >
           <img
             width="100%"
-            src={image || assetDefault}
+            src={imgSrc}
             alt={name}
             onError={e => {
               e.target.src = assetDefault;

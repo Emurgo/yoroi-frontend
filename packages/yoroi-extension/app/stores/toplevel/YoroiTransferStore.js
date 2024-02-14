@@ -1,30 +1,17 @@
 // @flow
-import { observable, action, runInAction } from 'mobx';
+import { action, observable, runInAction } from 'mobx';
 import { defineMessages } from 'react-intl';
 import { isEqual } from 'lodash';
-import {
-  Logger,
-  stringifyError
-} from '../../utils/logging';
+import { Logger, stringifyError } from '../../utils/logging';
 import Store from '../base/Store';
-import LocalizableError, {
-  localizedError
-} from '../../i18n/LocalizableError';
-import type {
-  TransferStatusT,
-  TransferTx,
-} from '../../types/TransferTypes';
+import LocalizableError, { localizedError } from '../../i18n/LocalizableError';
+import type { TransferStatusT, TransferTx, } from '../../types/TransferTypes';
 import { TransferStatus, } from '../../types/TransferTypes';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import {
-  unscramblePaperAdaMnemonic,
-} from '../../api/ada/lib/cardanoCrypto/paperWallet';
+import { unscramblePaperAdaMnemonic, } from '../../api/ada/lib/cardanoCrypto/paperWallet';
 import config from '../../config';
-import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 import { SendTransactionApiError } from '../../api/common/errors';
-import type {
-  Address, Addressing
-} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { Address, Addressing } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { getReceiveAddress } from '../stateless/addressStores';
 import type { ActionsMap } from '../../actions/index';
@@ -36,8 +23,6 @@ export default class YoroiTransferStore extends Store<StoresMap, ActionsMap> {
   @observable error: ?LocalizableError = null;
   @observable transferTx: ?TransferTx = null;
   @observable recoveryPhrase: string = '';
-  @observable privateKey: void | string = undefined;
-  @observable mode: RestoreModeType | void = undefined;
 
   // eslint-disable-next-line no-restricted-syntax
   _asyncErrorWrapper: (<PT, RT>(
@@ -94,12 +79,7 @@ export default class YoroiTransferStore extends Store<StoresMap, ActionsMap> {
     this.reset();
   }
 
-  _startTransferFunds: {|
-    source: RestoreModeType,
-  |} => void = (payload) => {
-    runInAction(() => {
-      this.mode = payload.source;
-    });
+  _startTransferFunds: void => void = () => {
     this._updateStatus(TransferStatus.GETTING_PAPER_MNEMONICS);
   }
 
@@ -120,6 +100,7 @@ export default class YoroiTransferStore extends Store<StoresMap, ActionsMap> {
     };
   }
 
+  // <TODO:PENDING_REMOVAL> paper
   _setupTransferFundsWithPaperMnemonic: {|
     recoveryPhrase: string,
     paperPassword: string,
@@ -150,7 +131,7 @@ export default class YoroiTransferStore extends Store<StoresMap, ActionsMap> {
   }
 
   generateTransferTx: {|
-    ...({| recoveryPhrase: string, |} | {| privateKey: string |}),
+    recoveryPhrase: string,
     updateStatusCallback: void => void,
     getDestinationAddress: void => Promise<{| ...Address, ...InexactSubset<Addressing> |}>,
   |} => Promise<TransferTx> = async (request) => {
@@ -161,7 +142,7 @@ export default class YoroiTransferStore extends Store<StoresMap, ActionsMap> {
       throw new Error(`${nameof(YoroiTransferStore)}::${nameof(this.checkAddresses)} currency doesn't support Yoroi transfer`);
     }
     const { yoroiTransfer } = this.stores.substores.ada;
-    return await yoroiTransfer.generateTransferTx(
+    return await yoroiTransfer.generateTransferTxForByron(
       request,
     );
   }
@@ -172,11 +153,8 @@ export default class YoroiTransferStore extends Store<StoresMap, ActionsMap> {
     payload
   ): Promise<void> => {
     this._updateStatus(TransferStatus.CHECKING_ADDRESSES);
-    const keyInfo = this.privateKey != null
-      ? { privateKey: this.privateKey }
-      : { recoveryPhrase: this.recoveryPhrase };
     const transferTx = await this.generateTransferTx({
-      ...keyInfo,
+      recoveryPhrase: this.recoveryPhrase,
       updateStatusCallback: () => this._updateStatus(TransferStatus.GENERATING_TX),
       getDestinationAddress: payload.getDestinationAddress,
     });
@@ -223,11 +201,8 @@ export default class YoroiTransferStore extends Store<StoresMap, ActionsMap> {
       if (!payload.rebuildTx) {
         return oldTx;
       }
-      const keyInfo = this.privateKey != null
-        ? { privateKey: this.privateKey }
-        : { recoveryPhrase: this.recoveryPhrase };
       const newTx = await this.generateTransferTx({
-        ...keyInfo,
+        recoveryPhrase: this.recoveryPhrase,
         updateStatusCallback: () => {},
         getDestinationAddress: payload.getDestinationAddress,
       });
@@ -300,10 +275,8 @@ export default class YoroiTransferStore extends Store<StoresMap, ActionsMap> {
     this.status = TransferStatus.UNINITIALIZED;
     this.error = null;
     this.transferTx = null;
-    this.privateKey = undefined;
     this.stores.wallets.sendMoneyRequest.reset();
     this.recoveryPhrase = '';
-    this.mode = undefined;
 
     if (this.stores.profile.selectedNetwork != null) {
       if (this.stores.substores.ada.yoroiTransfer) {

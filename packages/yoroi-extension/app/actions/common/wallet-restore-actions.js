@@ -9,11 +9,6 @@ export type WalletRestoreMeta = {|
   walletPassword: string,
 |};
 
-export type PaperWalletRestoreMeta = {|
-  ...WalletRestoreMeta,
-  paperPassword: string,
-|};
-
 // <TODO:PENDING_REMOVAL> BIP44 , PAPER
 export type RestoreModeType =
   | {|
@@ -44,20 +39,14 @@ export type RestoreModeType =
   | {|
       type: 'bip44' | 'cip1852',
       extra: 'ledger' | 'trezor',
-    |}
-  | {|
-      type: 'cip1852',
-      extra: 'privateKey',
-      derivationLevel: number,
     |};
 
 export default class WalletRestoreActions {
-  submitFields: AsyncAction<PaperWalletRestoreMeta> = new AsyncAction();
+  submitFields: AsyncAction<WalletRestoreMeta> = new AsyncAction();
   startRestore: AsyncAction<void> = new AsyncAction();
   restoreWallet: AsyncAction<WalletRestoreMeta> = new AsyncAction();
   verifyMnemonic: AsyncAction<void> = new AsyncAction();
   startCheck: AsyncAction<void> = new AsyncAction();
-  setMode: Action<RestoreModeType> = new Action();
   reset: Action<void> = new Action();
   back: Action<void> = new Action();
   transferFromLegacy: AsyncAction<void> = new AsyncAction();

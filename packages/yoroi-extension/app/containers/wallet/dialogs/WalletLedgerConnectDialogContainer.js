@@ -14,12 +14,10 @@ import UpgradeTxDialogContainer from '../../transfer/UpgradeTxDialogContainer';
 
 import { ProgressStep } from '../../../types/HWConnectStoreTypes';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import type { RestoreModeType, } from '../../../actions/common/wallet-restore-actions';
 
 type Props = {|
   ...StoresAndActionsProps,
   +onClose: void => void,
-  +mode: RestoreModeType,
   +onBack: void => void,
 |};
 
@@ -38,11 +36,6 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
     this.props.onClose();
     this.props.actions.ada.ledgerConnect.cancel.trigger();
   };
-
-  componentDidMount() {
-    const { ledgerConnect } = this.props.actions.ada;
-    ledgerConnect.setMode.trigger(this.props.mode);
-  }
 
   render(): null | Node {
     const { actions, stores } = this.props;

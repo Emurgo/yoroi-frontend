@@ -1,9 +1,0 @@
-{
-	"ACCOUNT": "{\"account\":0,\"root_cached_key\":\"b2938f29eb965952b03baaf010b0f5fe4a2c116a1e255274c9ace24deb72450ce1c045821c42ed11b33db3124b1551793e76b8ad187efb92b28969b92bb95964\",\"derivation_scheme\":\"V2\"}",
-	"test-TERMS-OF-USE-ACCEPTANCE": "true",
-	"LAST_BLOCK_NUMBER": "2917165",
-	"test-USER-LOCALE": "en-US",
-	"openTabId": "1564576966892",
-	"WALLET": "{\"adaWallet\":{\"cwAccountsNumber\":1,\"cwAmount\":{\"getCCoin\":\"4300447\"},\"cwId\":\"1\",\"cwMeta\":{\"cwAssurance\":\"CWANormal\",\"cwName\":\"Wallet\",\"cwUnit\":0},\"cwType\":\"CWTWeb\",\"cwPassphraseLU\":\"2019-07-31T15:43:57+03:00\"},\"masterKey\":\"c2b7efb89f8ebf25bbf3ceb43bb48265ac7153ceeb8ed58855c9f308e88439b89c495274211a00e24dc0b6e2363648429830b174e6bfdb7aaf9260b6749d0579e02da16903527dc61fff65dad9b90da12098b6f12e53d6d09026655c6194b0e54588a2c47a18e366b2471ab26216b8fbc6aeefb786acd3c5572b0bc1a5df30bcda316ccca10f512260a5f7aa4f9504de4e79841271e9d5fa6a44b989\",\"lastReceiveAddressIndex\":142}",
-	"test-LAST-LAUNCH-VER": "1.5.0"
-}

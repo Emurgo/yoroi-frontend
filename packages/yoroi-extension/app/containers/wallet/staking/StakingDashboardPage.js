@@ -14,11 +14,9 @@ import type { BoxInfo } from '../../../components/wallet/staking/dashboard/Upcom
 import LessThanExpectedDialog from '../../../components/wallet/staking/dashboard/LessThanExpectedDialog';
 import { digestForHash } from '../../../api/ada/lib/storage/database/primitives/api/utils';
 import { handleExternalLinkClick } from '../../../utils/routing';
-import LocalizableError from '../../../i18n/LocalizableError';
 import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer';
 import config from '../../../config';
 import type { PoolTuples } from '../../../api/common/lib/storage/bridge/delegationUtils';
-import type {  DelegationRequests } from '../../../stores/toplevel/DelegationStore';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type {
@@ -30,13 +28,12 @@ import type {
 
 import globalMessages from '../../../i18n/global-messages';
 import { observable, runInAction } from 'mobx';
-import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import DeregisterDialogContainer from '../../transfer/DeregisterDialogContainer';
 import WithdrawalTxDialogContainer from '../../transfer/WithdrawalTxDialogContainer';
-import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { getTokenName, genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../../utils/formatters';
 import { generateGraphData } from '../../../utils/graph';
+import { maybe } from '../../../coreUtils';
 
 @observer
 export default class StakingDashboardPage extends Component<StoresAndActionsProps> {
@@ -77,8 +74,11 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
 
     const rewardInfo = this.getRewardInfo(publicDeriver);
 
-    const errorIfPresent = this.getErrorInFetch(publicDeriver);
-    const stakePools = errorIfPresent == null ? this.getStakePools(publicDeriver) : errorIfPresent;
+    const errorIfPresent = maybe(delegationRequests.error, error => ({ error }));
+    const stakePools = errorIfPresent ?? this.getStakePools(publicDeriver);
+
+    const showRewardAmount = errorIfPresent == null
+      && this.props.stores.delegation.isExecutedDelegatedBalance(publicDeriver);
 
     const dashboard = (
       <StakingDashboard
@@ -94,9 +94,8 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
         hasAnyPending={this.props.stores.transactions.hasAnyPending}
         stakePools={stakePools}
         userSummary={this._generateUserSummary({
-          delegationRequests,
           publicDeriver,
-          errorIfPresent,
+          showRewardAmount,
         })}
         upcomingRewards={rewardInfo?.rewardPopup}
         graphData={generateGraphData({
@@ -108,7 +107,7 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
           getLocalPoolInfo: this.props.stores.delegation.getLocalPoolInfo,
           tokenInfo: this.props.stores.tokenInfoStore.tokenInfo,
         })}
-        isUnregistered={!this._isRegistered(publicDeriver)}
+        isUnregistered={!this.props.stores.delegation.isStakeRegistered(publicDeriver)}
         epochLength={this.getEpochLengthInDays(publicDeriver)}
         ticker={truncateToken(
           getTokenName(
@@ -165,7 +164,7 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
     }
 
-    const isRegistered = this._isRegistered(publicDeriver);
+    const isRegistered = this.props.stores.delegation.isStakeRegistered(publicDeriver);
 
     let rewardInfo = undefined;
     if (
@@ -378,18 +377,6 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
     };
   };
 
-  getErrorInFetch: (PublicDeriver<>) => void | {| error: LocalizableError |} = publicDeriver => {
-    const delegationStore = this.props.stores.delegation;
-    const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
-    if (delegationRequests == null) {
-      throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
-    }
-    if (delegationRequests.error != null) {
-      return { error: delegationRequests.error };
-    }
-    return undefined;
-  };
-
   getStakePools: (PublicDeriver<>) => {| pools: null | Array<Node | void> |} = publicDeriver => {
     const delegationStore = this.props.stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
@@ -547,36 +534,29 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
   };
 
   _generateUserSummary: ({|
-    delegationRequests: DelegationRequests,
     publicDeriver: PublicDeriver<>,
-    errorIfPresent: void | {| error: LocalizableError |},
+    showRewardAmount: boolean,
   |}) => Node = request => {
-    const showRewardAmount =
-      request.delegationRequests.getDelegatedBalance.wasExecuted &&
-      request.errorIfPresent == null;
 
-    const unmangledAmountsRequest = request.delegationRequests.mangledAmounts.result;
-
-    const defaultToken = request.publicDeriver.getParent().getDefaultToken();
+    const { publicDeriver, showRewardAmount } = request;
+    const { stores } = this.props;
 
     const balance = this.props.stores.transactions.balance;
+    const mangledAmounts = stores.delegation.getMangledAmountsOrZero(publicDeriver);
+    const rewardBalance = this.props.stores.delegation.getRewardBalanceOrZero(publicDeriver);
 
-    const rewardBalance =
-      request.delegationRequests.getDelegatedBalance.result == null
-        ? new MultiToken([], defaultToken)
-        : request.delegationRequests.getDelegatedBalance.result.accountPart;
+    const stakeRegistered =
+      this.props.stores.delegation.isStakeRegistered(publicDeriver) === true;
 
     const currentlyDelegating =
-      request.delegationRequests.getDelegatedBalance.result?.delegation != null;
+      this.props.stores.delegation.getDelegatedPoolId(publicDeriver) != null;
 
     return (
       <UserSummary
-        canUnmangleSum={unmangledAmountsRequest?.canUnmangle ?? new MultiToken([], defaultToken)}
-        cannotUnmangleSum={
-          unmangledAmountsRequest?.cannotUnmangle ?? new MultiToken([], defaultToken)
-        }
+        canUnmangleSum={mangledAmounts.canUnmangle}
+        cannotUnmangleSum={mangledAmounts.cannotUnmangle}
         defaultTokenInfo={this.props.stores.tokenInfoStore.getDefaultTokenInfo(
-          request.publicDeriver.getParent().getNetworkInfo().NetworkId
+          publicDeriver.getParent().getNetworkInfo().NetworkId
         )}
         getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
         onUnmangle={() =>
@@ -585,22 +565,16 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
           })
         }
         totalSum={balance == null ? undefined : balance.joinAddCopy(rewardBalance)}
-        totalRewards={
-          !showRewardAmount || request.delegationRequests.getDelegatedBalance.result == null
-            ? undefined
-            : request.delegationRequests.getDelegatedBalance.result.accountPart
-        }
+        totalRewards={showRewardAmount ? rewardBalance : undefined}
         openLearnMore={() =>
           this.props.actions.dialogs.open.trigger({
             dialog: LessThanExpectedDialog,
           })
         }
         withdrawRewards={
-          this._isRegistered(request.publicDeriver) === true
-            ? () => {
-                this.props.actions.dialogs.open.trigger({ dialog: DeregisterDialogContainer });
-              }
-            : undefined
+          stakeRegistered ? () => {
+            this.props.actions.dialogs.open.trigger({ dialog: DeregisterDialogContainer });
+          } : undefined
         }
         unitOfAccount={_entry => {
           // temporarily disabled
@@ -630,30 +604,11 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
         }}
         shouldHideBalance={this.props.stores.profile.shouldHideBalance}
         isDelegated={
-          showRewardAmount &&
-          request.delegationRequests.getDelegatedBalance.result !== null &&
-          currentlyDelegating &&
-          this._isRegistered(request.publicDeriver) === true
+          showRewardAmount
+          && stakeRegistered
+          && currentlyDelegating
         }
       />
     );
-  };
-
-  _isRegistered: (PublicDeriver<>) => ?boolean = publicDeriver => {
-    if (!isCardanoHaskell(publicDeriver.getParent().getNetworkInfo())) {
-      return undefined;
-    }
-    const delegationRequests = this.props.stores.delegation.getDelegationRequests(
-      publicDeriver
-    );
-    if (delegationRequests == null) return undefined;
-    if (
-      !delegationRequests.getDelegatedBalance.wasExecuted ||
-      delegationRequests.getDelegatedBalance.isExecuting ||
-      delegationRequests.getDelegatedBalance.result == null
-    ) {
-      return undefined;
-    }
-    return delegationRequests.getDelegatedBalance.result.stakeRegistered;
   };
 }
