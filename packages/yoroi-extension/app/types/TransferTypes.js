@@ -5,9 +5,7 @@ import {
 
 export const TransferStatus = Object.freeze({
   UNINITIALIZED: 0,
-  GETTING_MNEMONICS: 1,
   GETTING_PAPER_MNEMONICS: 2,
-  GETTING_MASTER_KEY: 3,
   RESTORING_ADDRESSES: 4,
   CHECKING_ADDRESSES: 5,
   GENERATING_TX: 6,
@@ -15,9 +13,6 @@ export const TransferStatus = Object.freeze({
   ERROR: 8,
   SUCCESS: 9,
   DISPLAY_CHECKSUM: 10,
-  HARDWARE_DISCLAIMER: 11,
-  GETTING_HARDWARE_MNEMONIC: 12,
-  GETTING_WITHDRAWAL_KEY: 13,
 });
 export type TransferStatusT = $Values<typeof TransferStatus>;
 

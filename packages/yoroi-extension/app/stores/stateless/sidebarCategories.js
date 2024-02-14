@@ -9,7 +9,6 @@ import { ReactComponent as transferIcon } from '../../assets/images/sidebar/tran
 import { ReactComponent as settingsIcon } from '../../assets/images/sidebar/wallet-settings-2-ic.inline.svg';
 import { ReactComponent as goBackIcon } from '../../assets/images/top-bar/back-arrow-white.inline.svg';
 import { ReactComponent as dappConnectorIcon } from '../../assets/images/dapp-connector/dapp-connector.inline.svg';
-import { ReactComponent as noticeBoardIcon } from '../../assets/images/notice-board/notice-board.inline.svg';
 import { ReactComponent as walletIcon } from '../../assets/images/sidebar/revamp/wallet.inline.svg';
 import { ReactComponent as stakingIcon } from '../../assets/images/sidebar/revamp/staking.inline.svg';
 import { ReactComponent as assetsIcon } from '../../assets/images/sidebar/revamp/assets.inline.svg';
@@ -71,7 +70,7 @@ export const SETTINGS: SidebarCategory = registerCategory({
   route: ROUTES.SETTINGS.ROOT,
   icon: settingsIcon,
   label: globalMessages.sidebarSettings,
-  isVisible: _request => true,
+  isVisible: r => r.selected != null,
 });
 
 export const TRANSFER_PAGE: SidebarCategory = registerCategory({
@@ -79,7 +78,7 @@ export const TRANSFER_PAGE: SidebarCategory = registerCategory({
   route: ROUTES.TRANSFER.ROOT,
   icon: transferIcon,
   label: globalMessages.sidebarTransfer,
-  isVisible: _request => true,
+  isVisible: r => r.selected != null,
 });
 
 export const CONNECTED_WEBSITES: SidebarCategory = registerCategory({
@@ -88,13 +87,6 @@ export const CONNECTED_WEBSITES: SidebarCategory = registerCategory({
   icon: dappConnectorIcon,
   label: connectorMessages.dappConnector,
   isVisible: _request => !environment.isLight,
-});
-
-export const NOTICE_BOARD: SidebarCategory = registerCategory({
-  className: 'notice-board',
-  route: ROUTES.NOTICE_BOARD.ROOT,
-  icon: noticeBoardIcon,
-  isVisible: _request => !environment.isProduction(),
 });
 
 type isVisibleFunc = ({|

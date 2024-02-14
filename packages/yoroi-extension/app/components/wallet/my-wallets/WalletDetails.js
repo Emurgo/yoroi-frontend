@@ -19,7 +19,7 @@ type Props = {|
   +onUpdateHideBalance: void => Promise<void>,
   +shouldHideBalance: boolean,
   +rewards: ?MultiToken,
-  +walletAmount: null | MultiToken,
+  +walletAmount: ?MultiToken,
   +infoText?: string,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +isRefreshing: boolean,

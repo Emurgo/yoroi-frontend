@@ -36,6 +36,7 @@ import BuySellAdaButton from '../../components/topbar/BuySellAdaButton';
 import globalMessages from '../../i18n/global-messages';
 import BuySellDialog from '../../components/buySell/BuySellDialog';
 import NavBarRevamp from '../../components/topbar/NavBarRevamp';
+import { MultiToken } from '../../api/common/lib/MultiToken';
 
 type Props = StoresAndActionsProps;
 
@@ -216,8 +217,8 @@ class MyWalletsPage extends Component<AllProps> {
       );
     })();
 
-    const balance = this.props.stores.transactions.getBalance(publicDeriver);
-    const rewards = this.props.stores.delegation.getRewardBalance(publicDeriver);
+    const balance: ?MultiToken = this.props.stores.transactions.getBalance(publicDeriver);
+    const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(publicDeriver);
 
     const withPubKey = asGetPublicKey(publicDeriver);
     const plate =

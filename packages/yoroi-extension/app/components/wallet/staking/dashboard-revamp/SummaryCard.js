@@ -19,13 +19,14 @@ import { getTokenName } from '../../../../stores/stateless/tokenHelpers';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import type { GraphData } from '../dashboard/StakingDashboard';
 import RewardHistoryGraph from './RewardHistoryGraph';
+import { maybe } from '../../../../coreUtils';
 
 type Props = {|
   +onOverviewClick: Function,
   +onOpenRewardList: Function,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
-  +totalRewards: void | MultiToken,
-  +totalDelegated: void | MultiToken,
+  +totalRewards: ?MultiToken,
+  +totalDelegated: ?MultiToken,
   +unitOfAccount: TokenEntry => void | {| currency: string, amount: string |},
   +shouldHideBalance: boolean,
   +graphData: GraphData,
@@ -83,30 +84,14 @@ function SummaryCard({
     );
   };
 
-  const renderAmount: (void | MultiToken) => Node = token => {
-    if (token == null) {
-      return null;
-    }
-
-    return formatTokenEntry(token.getDefaultEntry());
+  const renderAmount: (?MultiToken) => ?Node = token => {
+    return maybe(token, t => formatTokenEntry(t.getDefaultEntry()));
   };
 
-  const renderAmountWithUnitOfAccount: (void | MultiToken) => Node = token => {
-    if (token == null) {
-      return null;
-    }
-
-    const unitOfAccountCalculated = unitOfAccount(token.getDefaultEntry());
-
-    if (!unitOfAccountCalculated) {
-      return null;
-    }
-
-    if (shouldHideBalance) {
-      return `${hiddenAmount}  ${unitOfAccountCalculated.currency}`;
-    }
-
-    return `${unitOfAccountCalculated.amount} ${unitOfAccountCalculated.currency}`;
+  const renderAmountWithUnitOfAccount: (?MultiToken) => ?Node = token => {
+    const unitOfAccountCalculated = maybe(token, t => unitOfAccount(t.getDefaultEntry()));
+    return maybe(unitOfAccountCalculated,
+      u => `${shouldHideBalance ? hiddenAmount : u.amount} ${u.currency}`);
   };
 
   return (

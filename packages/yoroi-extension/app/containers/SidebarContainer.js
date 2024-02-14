@@ -70,7 +70,7 @@ class SidebarContainer extends Component<AllProps> {
             selected: this.props.stores.wallets.selected,
             currentRoute: this.props.stores.app.currentRoute,
             isRewardWallet: (publicDeriver: PublicDeriver<>) =>
-              stores.delegation.getDelegationRequests(publicDeriver) != null,
+              stores.delegation.isRewardWallet(publicDeriver),
           })
         )}
       />
