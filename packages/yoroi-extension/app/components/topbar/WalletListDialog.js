@@ -176,13 +176,13 @@ export default class WalletListDialog extends Component<Props, State> {
         onClose={this.props.close}
         actions={[
           {
-            id: 'addWalletButton',
+            id: 'walletListDialog-addWallet-button',
             onClick: onAddWallet,
             size: 'large',
             label: intl.formatMessage(messages.addWallet),
           },
           {
-            id: 'applyWalletButton',
+            id: 'walletListDialog-applyWallet-button',
             onClick: this.onSelect,
             size: 'large',
             disabled:
