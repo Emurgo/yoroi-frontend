@@ -15,19 +15,13 @@ export function v4PublicToV2(
 
 export async function isWalletExist(
   publicDerivers: Array<PublicDeriver<>>,
-  mode: 'bip44' | 'cip1852',
   recoveryPhrase: string,
   accountIndex: number,
   selectedNetwork: $ReadOnly<NetworkRow>
 ): Promise<PublicDeriver<> | void> {
-  if (mode !== 'bip44' && mode !== 'cip1852') {
-    throw new Error(`${nameof(isWalletExist)} unknown restoration mode`);
-  }
   const rootPk = cardanoGenerateWalletRootKey(recoveryPhrase);
-  // <TODO:PENDING_REMOVAL> BIP44
-  const purpose = mode === 'cip1852' ? WalletTypePurpose.CIP1852 : WalletTypePurpose.BIP44;
   const accountPublicKey = rootPk
-    .derive(purpose)
+    .derive(WalletTypePurpose.CIP1852)
     .derive(CoinTypes.CARDANO)
     .derive(accountIndex)
     .to_public();

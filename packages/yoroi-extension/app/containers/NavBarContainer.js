@@ -18,6 +18,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { genLookupOrFail } from '../stores/stateless/tokenHelpers';
 import BuySellDialog from '../components/buySell/BuySellDialog';
 import globalMessages from '../i18n/global-messages';
+import { MultiToken } from '../api/common/lib/MultiToken';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -56,8 +57,8 @@ export default class NavBarContainer extends Component<Props> {
     const wallets = this.props.stores.wallets.publicDerivers;
 
     const walletComponents = wallets.map(wallet => {
-      const balance = this.props.stores.transactions.getBalance(wallet);
-      const rewards = this.props.stores.delegation.getRewardBalance(wallet);
+      const balance: ?MultiToken = this.props.stores.transactions.getBalance(wallet);
+      const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(wallet);
       const lastSyncInfo = this.props.stores.transactions.lastSyncInfo;
 
       const parent = wallet.getParent();
@@ -114,8 +115,8 @@ export default class NavBarContainer extends Component<Props> {
           return <NoWalletsDropdown />;
         }
 
-        const balance = this.props.stores.transactions.getBalance(publicDeriver);
-        const rewards = this.props.stores.delegation.getRewardBalance(publicDeriver);
+        const balance: ?MultiToken = this.props.stores.transactions.getBalance(publicDeriver);
+        const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(publicDeriver);
 
         return (
           <NavWalletDetails

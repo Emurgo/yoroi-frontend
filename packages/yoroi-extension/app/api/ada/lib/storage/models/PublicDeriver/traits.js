@@ -45,7 +45,7 @@ import type {
 } from '../ConceptualWallet/interfaces';
 
 import {
-  rawGetBip44AddressesByPath,
+  rawGetAddressesByDerivationPath,
   rawGetNextUnusedIndex,
   updateCutoffFromInsert,
   getBalanceForUtxos,
@@ -453,7 +453,7 @@ const GetAllUtxosMixin = (
   ): Promise<IGetAllUtxoAddressesResponse> => {
     // TODO: some way to know if single chain is an account or not
     if (this.getParent().getPublicDeriverLevel() >= Bip44DerivationLevels.CHAIN.level) {
-      return rawGetBip44AddressesByPath(
+      return rawGetAddressesByDerivationPath(
         super.getDb(), tx,
         deps,
         {
@@ -467,7 +467,7 @@ const GetAllUtxosMixin = (
         derivationTables,
       );
     }
-    const externalAddresses = await rawGetBip44AddressesByPath(
+    const externalAddresses = await rawGetAddressesByDerivationPath(
       super.getDb(), tx,
       deps,
       {
@@ -480,7 +480,7 @@ const GetAllUtxosMixin = (
       },
       derivationTables,
     );
-    const internalAddresses = await rawGetBip44AddressesByPath(
+    const internalAddresses = await rawGetAddressesByDerivationPath(
       super.getDb(), tx,
       deps,
       {
@@ -569,7 +569,7 @@ const GetAllAccountingMixin = (
       // we only allow this on accounts instead of any level < ACCOUNT.level to simplify the code
       throw new Error(`${nameof(GetAllAccounting)}::${nameof(this.rawGetAllAccountingAddresses)} incorrect pubderiver level`);
     }
-    return rawGetBip44AddressesByPath(
+    return rawGetAddressesByDerivationPath(
       super.getDb(), tx,
       deps,
       {
@@ -1257,7 +1257,7 @@ const HasUtxoChainsMixin = (
     if (this.getParent().getPublicDeriverLevel() !== Bip44DerivationLevels.ACCOUNT.level) {
       throw new Error(`${nameof(HasUtxoChains)}::${nameof(this.rawGetAddressesForChain)} incorrect pubderiver level`);
     }
-    return rawGetBip44AddressesByPath(
+    return rawGetAddressesByDerivationPath(
       super.getDb(), tx,
       deps,
       {
@@ -2030,7 +2030,7 @@ const ScanUtxoChainAddressesMixin = (
       null
     );
 
-    const addresses = await rawGetBip44AddressesByPath(
+    const addresses = await rawGetAddressesByDerivationPath(
       super.getDb(), tx,
       {
         GetAddress: deps.GetAddress,

@@ -192,7 +192,7 @@ export async function parseWalletsList(
     const canGetBalance = asGetBalance(currentWallet);
     const balance =
       canGetBalance == null
-        ? new MultiToken([], currentWallet.getParent().getDefaultToken())
+        ? currentWallet.getParent().getDefaultMultiToken()
         : await canGetBalance.getBalance();
     result.push({
       publicDeriver: currentWallet,

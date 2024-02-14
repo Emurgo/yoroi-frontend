@@ -20,6 +20,7 @@ import NavWalletDetailsRevamp from '../components/topbar/NavWalletDetailsRevamp'
 import WalletListDialog from '../components/topbar/WalletListDialog';
 import BuySellAdaButton from '../components/topbar/BuySellAdaButton';
 import { ampli } from '../../ampli/index';
+import { MultiToken } from '../api/common/lib/MultiToken';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -43,7 +44,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
 
   onSelectWallet: (PublicDeriver<>) => void = newWallet => {
     const { delegation, app } = this.props.stores;
-    const isRewardWallet = !!delegation.getDelegationRequests(newWallet);
+    const isRewardWallet = delegation.isRewardWallet(newWallet);
     const isStakingPage = app.currentRoute === ROUTES.STAKING;
 
     const route = !isRewardWallet && isStakingPage ? ROUTES.WALLETS.ROOT : app.currentRoute;
@@ -74,8 +75,8 @@ export default class NavBarContainerRevamp extends Component<Props> {
           ? null
           : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
 
-      const balance = this.props.stores.transactions.getBalance(publicDeriver);
-      const rewards = this.props.stores.delegation.getRewardBalance(publicDeriver);
+      const balance: ?MultiToken = this.props.stores.transactions.getBalance(publicDeriver);
+      const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(publicDeriver);
 
       return (
         <NavWalletDetailsRevamp
@@ -130,7 +131,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
 
     wallets.forEach(wallet => {
       const walletAmount = this.props.stores.transactions.getBalance(wallet);
-      const rewards = this.props.stores.delegation.getRewardBalance(wallet);
+      const rewards = this.props.stores.delegation.getRewardBalanceOrZero(wallet);
       const parent = wallet.getParent();
       const settingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(parent);
 

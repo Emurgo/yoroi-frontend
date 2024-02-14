@@ -11,12 +11,8 @@ type Props = {|
 export default function EditBuyAmount({ onAssetSelect }: Props): Node {
   const { orderData } = useSwap();
   const {
-    buyQuantity: {
-      isTouched: isBuyTouched,
-      displayValue: buyDisplayValue,
-      error: buyError,
-      tokenInfo,
-    },
+    buyQuantity: { isTouched: isBuyTouched, displayValue: buyDisplayValue, error: buyError },
+    buyTokenInfo = {},
     onChangeBuyQuantity,
     buyInputRef,
   } = useSwapForm();
@@ -28,7 +24,7 @@ export default function EditBuyAmount({ onAssetSelect }: Props): Node {
       label="Swap To"
       handleAmountChange={onChangeBuyQuantity}
       value={buyDisplayValue}
-      amount={tokenInfo}
+      tokenInfo={buyTokenInfo}
       onAssetSelect={onAssetSelect}
       touched={isBuyTouched}
       inputRef={buyInputRef}
