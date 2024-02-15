@@ -11,7 +11,6 @@ import {
   asGetBalance,
   asGetPublicKey,
   asGetSigningKey,
-  asGetStakingKey,
   asHasLevels,
   asHasUtxoChains,
 } from '../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
@@ -486,22 +485,23 @@ export async function connectorGetStakeKey(
       ChainDerivations.CHIMERIC_ACCOUNT,
       STAKING_KEY_INDEX,
     ))[0];
-  const withStakingKey = asGetStakingKey(wallet);
-  if (withStakingKey == null) {
-    throw new Error('Unable to get the stake key')
-  }
-  const stakingKeyResp = await withStakingKey.getStakingKey();
+  const network = wallet.getParent().getNetworkInfo();
+  const stakeAddrHex = RustModule.WasmScope(Module => {
+    return Module.WalletV4.RewardAddress.new(
+      Number.parseInt(network.BaseConfig[0].ChainNetworkId, 10),
+      Module.WalletV4.Credential.from_keyhash(stakeKey.hash()),
+    ).to_address().to_hex();
+  });
   const accountState = await getAccountState(
     {
-      addresses: [stakingKeyResp.addr.Hash],
-      network: wallet.getParent().getNetworkInfo(),
+      addresses: [stakeAddrHex],
+      network,
     }
   );
-  const stakeKeyHex = stakeKey.to_hex();
   return {
     // $FlowFixMe
-    key: stakeKeyHex,
-    isRegistered: accountState[stakeKeyHex]?.stakeRegistered ?? false,
+    key: stakeKey.to_hex(),
+    isRegistered: accountState[stakeAddrHex]?.stakeRegistered ?? false,
   };
 }
 

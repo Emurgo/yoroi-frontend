@@ -81,23 +81,18 @@ export default class TransferSendPage extends Component<Props> {
     if (selected == null) {
       throw new Error(`${nameof(TransferSendPage)} no wallet selected`);
     }
+    const signRequest = this.props.transactionRequest.result;
+    if (signRequest == null) return;
     if (this.spendingPasswordForm == null) {
-      if (this.props.transactionRequest.result == null) return;
-      const signRequest = this.props.transactionRequest.result;
-
       if (isTrezorTWallet(selected.getParent())) {
         await this.props.actions.ada.trezorSend.sendUsingTrezor.trigger({
-          params: {
-            signRequest,
-          },
+          params: { signRequest },
           publicDeriver: selected,
         });
       }
       if (isLedgerNanoWallet(selected.getParent())) {
         await this.props.actions.ada.ledgerSend.sendUsingLedgerWallet.trigger({
-          params: {
-            signRequest,
-          },
+          params: { signRequest },
           publicDeriver: selected,
         });
       }
@@ -108,10 +103,8 @@ export default class TransferSendPage extends Component<Props> {
       this.spendingPasswordForm.submit({
         onSuccess: async (form) => {
           const { walletPassword } = form.values();
-
-          if (this.props.transactionRequest.result == null) return;
           await this.props.actions.wallets.sendMoney.trigger({
-            signRequest: this.props.transactionRequest.result,
+            signRequest,
             password: walletPassword,
             publicDeriver: selected,
           });
