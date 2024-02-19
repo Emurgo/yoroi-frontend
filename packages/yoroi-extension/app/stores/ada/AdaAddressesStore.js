@@ -71,7 +71,7 @@ export type DomainResolverFunc = string => Promise<?DomainResolverResponse>;
 export function resolveAddressDomainNameServerName(nameServerTag: string): string {
   switch (nameServerTag) {
     case Resolver.NameServer.Handle: return 'ADA Handle'
-    case Resolver.NameServer.Cns: return 'CNS'
+    case Resolver.NameServer.Cns: return 'Cardano Name Service (CNS)'
     case Resolver.NameServer.Unstoppable: return 'Unstoppable Domains'
     default: return nameServerTag
   }
