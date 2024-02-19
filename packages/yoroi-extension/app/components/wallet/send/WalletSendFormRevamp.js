@@ -158,6 +158,7 @@ const messages = defineMessages({
   },
 });
 
+// <TODO:REORGANISE> too many props
 type Props = {|
   +resolveDomainAddress: ?DomainResolverFunc,
   +supportedAddressDomainBannerState: {|
@@ -622,13 +623,13 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
         return (
           <div className={styles.receiverStep}>
             {(domainResolverSupported && this.props.supportedAddressDomainBannerState.isDisplayed) ? (
-              <Box>
+              <Box pb="10px">
                 <SupportedAddressDomainsBanner
                   onClose={this.props.supportedAddressDomainBannerState.onClose}
                 />
               </Box>
             ) : null}
-            <Box pt="10px" sx={{ position: 'relative' }}>
+            <Box sx={{ position: 'relative' }}>
               <TextField
                 greenCheck={domainResolverResult != null}
                 isLoading={this.state.domainResolverIsLoading}
