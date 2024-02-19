@@ -67,6 +67,7 @@ export function addressToKind(
   }
 }
 
+// <TODO:FIX> THIS IS TERRIBLE, messages in api and the return type is awful
 export function isValidReceiveAddress(
   bech32: string,
   network: $ReadOnly<NetworkRow>
