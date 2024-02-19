@@ -649,7 +649,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   color={invalidMemo ? 'magenta.500' : 'grayscale.600'}
                   sx={{ position: 'absolute', bottom: '10px', right: '0' }}
                 >
-                  {intl.formatMessage(messages.receiverFieldLabelResolvedAddress)}:
+                  {intl.formatMessage(messages.receiverFieldLabelResolvedAddress)}:&nbsp;
                   {truncateAddressShort(domainResolverResult.address)}
                 </Typography>
               ) : null}
