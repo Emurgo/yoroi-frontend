@@ -628,7 +628,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 />
               </Box>
             ) : null}
-            <Box pt="10px" sx={{ position: 'relative', mt: '8px' }}>
+            <Box pt="10px" sx={{ position: 'relative' }}>
               <TextField
                 greenCheck={domainResolverResult != null}
                 isLoading={this.state.domainResolverIsLoading}
