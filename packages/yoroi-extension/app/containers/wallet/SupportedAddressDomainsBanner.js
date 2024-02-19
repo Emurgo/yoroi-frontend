@@ -9,7 +9,7 @@ import { Resolver } from '@yoroi/types';
 import { resolveAddressDomainNameServerName } from '../../stores/ada/AdaAddressesStore';
 import DialogCloseButton from '../../components/widgets/DialogCloseButton';
 import { CloseButton } from '../../components/widgets/Dialog';
-import { listValues } from '../../coreUtils';
+import { listValues, sorted } from '../../coreUtils';
 
 type Props = {|
   onClose: () => void,
@@ -22,13 +22,19 @@ type Intl = {|
 const messages = defineMessages({
   title: {
     id: 'wallet.send.form.receiver.supportedAddressDomainsBanner.title',
-    defaultMessage: '!!!Yoroi supports',
+    defaultMessage: '!!!Yoroi supports more addresses',
+  },
+  message: {
+    id: 'wallet.send.form.receiver.supportedAddressDomainsBanner.message',
+    defaultMessage: '!!!Yoroi offers a unique chance to use custom and lightning-fast alternatives to the traditional wallet address, such as:',
   },
 });
 
 function SupportedAddressDomainsBanner({ onClose, intl }: Props & Intl): Node {
-  const nameServerNames = listValues<string>(Resolver.NameServer).map(resolveAddressDomainNameServerName);
-  nameServerNames.sort();
+  const nameServerNames = sorted(
+    listValues<string>(Resolver.NameServer)
+      .map(resolveAddressDomainNameServerName)
+  );
   return (
     <Box>
       <Box
@@ -37,19 +43,27 @@ function SupportedAddressDomainsBanner({ onClose, intl }: Props & Intl): Node {
           borderRadius: '8px',
           overflowY: 'hidden',
           position: 'relative',
-          padding: '24px',
+          padding: '16px',
+          paddingTop: '12px',
         }}
         id='walletEmptyBanner'
       >
         <CloseButton
           onClose={onClose}
           closeButton={<DialogCloseButton isRevampLayout />}
+          sx={{
+            right: '4px',
+            top: '4px',
+          }}
         />
         <Box>
-          <Typography component="div" variant="h4" color="common.black" fontWeight={500} mb="8px">
-            {intl.formatMessage(messages.title)}:
+          <Typography component="div" color="common.black" fontWeight={500} fontSize='16px' mb="8px">
+            {intl.formatMessage(messages.title)}
           </Typography>
-          <Typography component="div" variant="body1" color="common.black" maxWidth="500px">
+          <Typography component="div" color="common.black" fontWeight={400} fontSize='16px'>
+            {intl.formatMessage(messages.message)}
+          </Typography>
+          <Typography component="div" fontWeight={500} paddingLeft='10px'>
             {nameServerNames.map((name, idx) => (
               <><span>• {name}</span>{idx < nameServerNames.length-1 ? (<br />) : null}</>
             ))}

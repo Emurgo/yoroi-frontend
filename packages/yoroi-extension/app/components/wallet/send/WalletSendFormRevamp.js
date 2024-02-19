@@ -82,7 +82,7 @@ const messages = defineMessages({
   },
   receiverFieldLabelUnresolvedAddress: {
     id: 'wallet.send.form.receiver.label.unresolvedAddress',
-    defaultMessage: '!!!Address not found',
+    defaultMessage: '!!!Receiver address, ADA Handle or domain you entered doesn\'t exist. Please double-check it and try again',
   },
   receiverFieldLabelForbiddenAccess: {
     id: 'wallet.send.form.receiver.label.forbiddenAccess',
@@ -91,6 +91,10 @@ const messages = defineMessages({
   receiverFieldLabelUnexpectedError: {
     id: 'wallet.send.form.receiver.label.unexpectedError',
     defaultMessage: '!!!unexpected error',
+  },
+  receiverFieldLabelInvalidAddress: {
+    id: 'wallet.send.form.receiver.label.invalidAddress',
+    defaultMessage: '!!!Please enter a valid receiver address, ADA Handle or domain',
   },
   receiverFieldLabelResolvedAddress: {
     id: 'wallet.send.form.receiver.label.resolvedAddress',
@@ -412,10 +416,14 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 updateReceiver(true);
                 return [isValid];
               }
-              updateReceiver(isValid[0]);
+              const [result, errorMessage, errorType] = isValid;
+              updateReceiver(result);
               const fieldError = isDomainResolvable
                 ? domainResolverMessage
-                : this.context.intl.formatMessage(isValid[1]);
+                : this.context.intl.formatMessage(errorType === 1
+                  ? messages.receiverFieldLabelInvalidAddress
+                  : errorMessage
+                );
               return [isValid[0], fieldError];
             },
           ],
