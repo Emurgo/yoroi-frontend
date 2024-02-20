@@ -423,7 +423,9 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
         >
           <Box width="506px" mx="auto">
             {this.renderError()}
-            <div className={styles.staleTxWarning}>{this.props.staleTx && staleTxWarning}</div>
+            {this.props.staleTx ? (
+              <div className={styles.staleTxWarning}>{staleTxWarning}</div>
+            ) : null}
             {receiverHandle ? (
               <div style={{ marginBottom: '20px' }}>
                 <Box mb="8px">

@@ -62,6 +62,15 @@ export function listValues<T>(obj: { [any]: T }): T[] {
 }
 
 /**
+ * Returns a sorted copy
+ */
+export function sorted<T>(arr: T[]): T[] {
+  const res = [...arr];
+  res.sort();
+  return res;
+}
+
+/**
  * Aggregates an array of key-value tuples into a map
  */
 export function entriesIntoMap<K,V>(col: Array<[K,V]>): { [K]: V } {
@@ -92,4 +101,8 @@ export function maybe<T,R>(t: ?T, f: T => ?R): ?R {
  */
 export function compose<A,B,C>(f1: A => ?B, f2: B => ?C): (A => ?C) {
   return a => maybe(f1(a), f2);
+}
+
+export function noop(..._: any[]) {
+  // noop
 }

@@ -24,6 +24,9 @@ import { MultiToken } from '../../api/common/lib/MultiToken';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 
+export type CreateWithdrawalTxRequest =
+  LocalizedRequest<DeferredCall<CreateWithdrawalTxResponse>>;
+
 export default class AdaDelegationTransactionStore extends Store<StoresMap, ActionsMap> {
   @observable selectedPools: Array<string>;
 

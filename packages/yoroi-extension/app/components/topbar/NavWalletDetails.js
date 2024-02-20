@@ -1,41 +1,34 @@
-
 // @flow
+import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import type { Node } from 'react';
 import classnames from 'classnames';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape, } from 'react-intl';
 import { truncateToken } from '../../utils/formatters';
 
 import globalMessages from '../../i18n/global-messages';
 import styles from './NavWalletDetails.scss';
-import { ReactComponent as IconEyeOpen }  from '../../assets/images/my-wallets/icon_eye_open.inline.svg';
-import { ReactComponent as IconEyeClosed }  from '../../assets/images/my-wallets/icon_eye_closed.inline.svg';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { ReactComponent as IconEyeOpen } from '../../assets/images/my-wallets/icon_eye_open.inline.svg';
+import { ReactComponent as IconEyeClosed } from '../../assets/images/my-wallets/icon_eye_closed.inline.svg';
 import WalletCurrency from '../wallet/my-wallets/WalletCurrency';
 import { hiddenAmount } from '../../utils/strings';
+import type { TokenLookupKey, } from '../../api/common/lib/MultiToken';
 import { MultiToken } from '../../api/common/lib/MultiToken';
-import type {
-  TokenLookupKey,
-} from '../../api/common/lib/MultiToken';
 import { getTokenName } from '../../stores/stateless/tokenHelpers';
 import { calculateAndFormatValue } from '../../utils/unit-of-account';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 import { Box } from '@mui/system';
+import { maybe } from '../../coreUtils';
 
 type Props = {|
   +onUpdateHideBalance: void => Promise<void>,
   +shouldHideBalance: boolean,
   +highlightTitle?: boolean,
   +showEyeIcon?: boolean,
-  /**
-    * undefined => wallet is not a reward wallet
-    * null => still calculating
-    * value => done calculating
-  */
-  +rewards: null | void | MultiToken,
+  +rewards: ?MultiToken,
   +walletAmount: null | MultiToken,
   +infoText?: string,
   +showDetails?: boolean,
@@ -82,11 +75,7 @@ export default class NavWalletDetails extends Component<Props> {
 
     const totalAmount = this.getTotalAmount();
 
-    const showsRewards = (
-      this.props.rewards !== undefined &&
-      showDetails !== null &&
-      showDetails === true
-    );
+    const showsRewards = showDetails === true;
     const showEyeIconSafe = showEyeIcon != null && showEyeIcon;
     const { unitOfAccountSetting } = this.props;
     return (
@@ -152,11 +141,6 @@ export default class NavWalletDetails extends Component<Props> {
                       </div>
                     </div>
                     }
-                    {this.props.rewards === undefined && (
-                    <div className={styles.info}>
-                      {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
-                    </div>
-                    )}
                   </>
                 )}
               </div>
@@ -181,14 +165,9 @@ export default class NavWalletDetails extends Component<Props> {
     );
   }
 
-  getTotalAmount: void => (null | MultiToken) = () => {
-    if (this.props.rewards === undefined) {
-      return this.props.walletAmount;
-    }
-    if (this.props.rewards === null || this.props.walletAmount === null) {
-      return null;
-    }
-    return this.props.walletAmount.joinAddCopy(this.props.rewards);
+  getTotalAmount: void => ?MultiToken = () => {
+    return maybe(this.props.walletAmount,
+      w => this.props.rewards?.joinAddCopy(w) ?? w)
   }
 
   renderAmountDisplay: {|

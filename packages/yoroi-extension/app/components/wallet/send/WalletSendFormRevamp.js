@@ -54,12 +54,14 @@ import { getImageFromTokenMetadata } from '../../../utils/nftMetadata';
 import WalletSendPreviewStepContainer from './WalletSendFormSteps/WalletSendPreviewStepContainer';
 import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { SendUsingLedgerParams } from '../../../actions/ada/ledger-send-actions';
-import type { SendUsingTrezorParams } from '../../../actions/ada/trezor-send-actions';
 import { ampli } from '../../../../ampli/index';
 import type { DomainResolverFunc, DomainResolverResponse } from '../../../stores/ada/AdaAddressesStore';
 import { isResolvableDomain } from '@yoroi/resolver';
 import SupportedAddressDomainsBanner from '../../../containers/wallet/SupportedAddressDomainsBanner';
+import TrezorSendActions from '../../../actions/ada/trezor-send-actions';
+import LedgerSendActions from '../../../actions/ada/ledger-send-actions';
+import type { SendMoneyRequest } from '../../../stores/toplevel/WalletStore';
+import type { MaxSendableAmountRequest } from '../../../stores/toplevel/TransactionBuilderStore';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -80,7 +82,7 @@ const messages = defineMessages({
   },
   receiverFieldLabelUnresolvedAddress: {
     id: 'wallet.send.form.receiver.label.unresolvedAddress',
-    defaultMessage: '!!!Address not found',
+    defaultMessage: '!!!Receiver address, ADA Handle or domain you entered doesn\'t exist. Please double-check it and try again',
   },
   receiverFieldLabelForbiddenAccess: {
     id: 'wallet.send.form.receiver.label.forbiddenAccess',
@@ -89,6 +91,10 @@ const messages = defineMessages({
   receiverFieldLabelUnexpectedError: {
     id: 'wallet.send.form.receiver.label.unexpectedError',
     defaultMessage: '!!!unexpected error',
+  },
+  receiverFieldLabelInvalidAddress: {
+    id: 'wallet.send.form.receiver.label.invalidAddress',
+    defaultMessage: '!!!Please enter a valid receiver address, ADA Handle or domain',
   },
   receiverFieldLabelResolvedAddress: {
     id: 'wallet.send.form.receiver.label.resolvedAddress',
@@ -152,6 +158,7 @@ const messages = defineMessages({
   },
 });
 
+// <TODO:REORGANISE> too many props
 type Props = {|
   +resolveDomainAddress: ?DomainResolverFunc,
   +supportedAddressDomainBannerState: {|
@@ -201,20 +208,12 @@ type Props = {|
   +closeDialog: void => void,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?string,
-  +maxSendableAmount: {|
-    error: ?LocalizableError,
-    isExecuting: boolean,
-    result: ?BigNumber,
-  |},
+  +maxSendableAmount: MaxSendableAmountRequest,
   +calculateMaxAmount: void => Promise<void>,
   +signRequest: null | ISignRequest<any>,
   +staleTx: boolean,
   +openTransactionSuccessDialog: void => void,
-  +sendMoneyRequest: {|
-    error: ?LocalizableError,
-    isExecuting: boolean,
-    reset: () => void,
-  |},
+  +sendMoneyRequest: SendMoneyRequest,
   +sendMoney: (params: {|
     password: string,
     publicDeriver: PublicDeriver<>,
@@ -223,27 +222,8 @@ type Props = {|
   |}) => Promise<void>,
   +ledgerSendError: null | LocalizableError,
   +trezorSendError: null | LocalizableError,
-  +ledgerSend: {|
-    cancel: {| trigger: (params: void) => void |},
-    init: {| trigger: (params: void) => void |},
-    sendUsingLedgerWallet: {|
-      trigger: (params: {|
-        params: SendUsingLedgerParams,
-        publicDeriver: PublicDeriver<>,
-        onSuccess?: void => void,
-      |}) => Promise<void>,
-    |},
-  |},
-  +trezorSend: {|
-    cancel: {| trigger: (params: void) => void |},
-    sendUsingTrezor: {|
-      trigger: (params: {|
-        params: SendUsingTrezorParams,
-        publicDeriver: PublicDeriver<>,
-        onSuccess?: void => void,
-      |}) => Promise<void>,
-    |},
-  |},
+  +ledgerSend: LedgerSendActions,
+  +trezorSend: TrezorSendActions,
 |};
 
 type State = {|
@@ -437,10 +417,14 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 updateReceiver(true);
                 return [isValid];
               }
-              updateReceiver(isValid[0]);
+              const [result, errorMessage, errorType] = isValid;
+              updateReceiver(result);
               const fieldError = isDomainResolvable
                 ? domainResolverMessage
-                : this.context.intl.formatMessage(isValid[1]);
+                : this.context.intl.formatMessage(errorType === 1
+                  ? messages.receiverFieldLabelInvalidAddress
+                  : errorMessage
+                );
               return [isValid[0], fieldError];
             },
           ],
@@ -639,13 +623,13 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
         return (
           <div className={styles.receiverStep}>
             {(domainResolverSupported && this.props.supportedAddressDomainBannerState.isDisplayed) ? (
-              <Box>
+              <Box pb="10px">
                 <SupportedAddressDomainsBanner
                   onClose={this.props.supportedAddressDomainBannerState.onClose}
                 />
               </Box>
             ) : null}
-            <Box pt="10px" sx={{ position: 'relative', mt: '8px' }}>
+            <Box sx={{ position: 'relative' }}>
               <TextField
                 greenCheck={domainResolverResult != null}
                 isLoading={this.state.domainResolverIsLoading}
@@ -665,7 +649,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   color={invalidMemo ? 'magenta.500' : 'grayscale.600'}
                   sx={{ position: 'absolute', bottom: '10px', right: '0' }}
                 >
-                  {intl.formatMessage(messages.receiverFieldLabelResolvedAddress)}:
+                  {intl.formatMessage(messages.receiverFieldLabelResolvedAddress)}:&nbsp;
                   {truncateAddressShort(domainResolverResult.address)}
                 </Typography>
               ) : null}

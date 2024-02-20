@@ -1137,6 +1137,7 @@ async function handleInjectorMessage(message, sender) {
       }
       break;
     case 'sign_data':
+    case 'cip95_sign_data':
       try {
         const rawAddress = message.params[0];
         const payload = message.params[1];

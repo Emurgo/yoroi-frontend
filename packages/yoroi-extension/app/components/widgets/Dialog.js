@@ -182,9 +182,11 @@ DialogFn.defaultProps = {
 export const CloseButton = ({
   onClose,
   closeButton,
+  sx,
 }: {|
   onClose: ?(void) => PossiblyAsync<void>,
   closeButton: React$Node,
+  sx?: any,
 |}): React$Node => (
   <Box
     sx={{
@@ -193,6 +195,7 @@ export const CloseButton = ({
       right: '16px',
       top: '16px',
       cursor: 'pointer',
+      ...(sx ?? {}),
     }}
     onClick={onClose}
   >

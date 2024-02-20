@@ -1,20 +1,15 @@
 // @flow
 import type { Node } from 'react';
 import { Component } from 'react';
-import { computed } from 'mobx';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
-import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
 import EpochProgress from '../../../components/wallet/staking/dashboard/EpochProgress';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { CurrentTimeRequests, TimeCalcRequests } from '../../../stores/base/BaseCardanoTimeStore';
-import { ApiOptions, getApiForNetwork } from '../../../api/common/utils';
-
-export type GeneratedData = typeof EpochProgressContainer.prototype.generated;
 
 type Props = {|
-  ...InjectedOrGenerated<GeneratedData>,
+  ...StoresAndActionsProps,
   +publicDeriver: PublicDeriver<>,
   +showTooltip: boolean,
 |};
@@ -26,7 +21,7 @@ export default class EpochProgressContainer extends Component<Props> {
   };
 
   async componentDidMount() {
-    const timeStore = this.generated.stores.time;
+    const timeStore = this.props.stores.substores.ada.time;
     if (this.props.publicDeriver == null) {
       throw new Error(`${nameof(EpochProgressContainer)} no public deriver. Should never happen`);
     }
@@ -42,7 +37,7 @@ export default class EpochProgressContainer extends Component<Props> {
   };
 
   render(): Node {
-    const timeStore = this.generated.stores.time;
+    const timeStore = this.props.stores.substores.ada.time;
     const timeCalcRequests = timeStore.getTimeCalcRequests(this.props.publicDeriver);
     const currTimeRequests = timeStore.getCurrentTimeRequests(this.props.publicDeriver);
 
@@ -80,46 +75,4 @@ export default class EpochProgressContainer extends Component<Props> {
       />
     );
   }
-
-  @computed get generated(): {|
-    stores: {|
-      time: {|
-        getCurrentTimeRequests: (
-          PublicDeriver<>
-        ) => CurrentTimeRequests,
-        getTimeCalcRequests: (
-          PublicDeriver<>
-        ) => TimeCalcRequests
-      |}
-    |}
-    |} {
-    if (this.props.generated !== undefined) {
-      return this.props.generated;
-    }
-    if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(EpochProgressContainer)} no way to generated props`);
-    }
-    const { stores, } = this.props;
-
-    const selected = stores.wallets.selected;
-    if (selected == null) {
-      throw new Error(`${nameof(EpochProgressContainer)} no wallet selected`);
-    }
-    const api = getApiForNetwork(selected.getParent().getNetworkInfo());
-    const time = (() => {
-      if (api === ApiOptions.ada) {
-        return {
-          getTimeCalcRequests: stores.substores.ada.time.getTimeCalcRequests,
-          getCurrentTimeRequests: stores.substores.ada.time.getCurrentTimeRequests,
-        };
-      }
-      throw new Error(`${nameof(EpochProgressContainer)} api not supported`);
-    })();
-    return Object.freeze({
-      stores: {
-        time,
-      },
-    });
-  }
-
 }

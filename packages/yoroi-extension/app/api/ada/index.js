@@ -2398,6 +2398,9 @@ export default class AdaApi {
     for (const input of signRequest.inputs()) {
       amount.joinSubtractMutable(input.value);
     }
+    for (const withdrawal of signRequest.withdrawals()) {
+      amount.joinSubtractMutable(withdrawal.amount);
+    }
     let isIntraWallet = true;
     for (const output of signRequest.outputs()) {
       if (ownAddresses.has(output.address)) {
