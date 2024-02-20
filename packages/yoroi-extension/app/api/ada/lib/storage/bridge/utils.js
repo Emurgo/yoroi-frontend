@@ -67,10 +67,11 @@ export function addressToKind(
   }
 }
 
+// <TODO:FIX> THIS IS TERRIBLE, messages in api and the return type is awful
 export function isValidReceiveAddress(
   bech32: string,
   network: $ReadOnly<NetworkRow>
-): true | [false, $Exact<$npm$ReactIntl$MessageDescriptor>] {
+): true | [false, $Exact<$npm$ReactIntl$MessageDescriptor>, number] {
   const messages = defineMessages({
     invalidAddress: {
       id: 'wallet.send.form.errors.invalidAddress',
@@ -97,11 +98,11 @@ export function isValidReceiveAddress(
 
   const kind = tryAddressToKind(bech32, 'bech32', network);
   if (kind == null) {
-    return [false, messages.invalidAddress];
+    return [false, messages.invalidAddress, 1];
   }
   if (isCardanoHaskell(network)) {
     if (kind === CoreAddressTypes.CARDANO_REWARD) {
-      return [false, messages.cannotSendToReward];
+      return [false, messages.cannotSendToReward, 2];
     }
     if (isCardanoHaskellAddress(kind)) {
       const addr = normalizeToAddress(bech32);
@@ -109,11 +110,11 @@ export function isValidReceiveAddress(
 
       const expectedNetworkId = Number.parseInt(network.BaseConfig[0].ChainNetworkId, 10);
       if (addr.network_id() !== expectedNetworkId) {
-        return [false, messages.wrongNetwork];
+        return [false, messages.wrongNetwork, 3];
       }
       return true;
     }
-    return [false, messages.invalidAddress];
+    return [false, messages.invalidAddress, 1];
   }
 
   throw new Error(
