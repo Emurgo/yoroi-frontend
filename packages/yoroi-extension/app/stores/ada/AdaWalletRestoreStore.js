@@ -72,12 +72,9 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
     if (selectedNetwork == null)
       throw new Error(`${nameof(this._restoreToDb)} no network selected`);
 
-    const { mode } = this.stores.walletRestore;
-    if (mode == null) throw new Error(`${nameof(this._restoreToDb)} Unknown restoration type`);
     const accountIndex = this.stores.walletRestore.selectedAccount;
     await this.stores.wallets.restoreRequest.execute(async () => {
       const wallet = await this.api.ada.restoreWallet({
-        mode: mode.type,
         db: persistentDb,
         recoveryPhrase: phrase,
         walletName,
@@ -102,12 +99,9 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
     if (selectedNetwork == null)
       throw new Error(`${nameof(this._restoreToDb)} no network selected`);
 
-    const { mode } = this.stores.walletRestore;
-    if (mode == null) throw new Error(`${nameof(this._restoreToDb)} Unknown restoration type`);
     const accountIndex = this.stores.walletRestore.selectedAccount;
     await this.stores.wallets.restoreRequest.execute(async () => {
       const wallet = await this.api.ada.restoreWallet({
-        mode: mode.type,
         db: persistentDb,
         recoveryPhrase,
         walletName,
@@ -137,16 +131,13 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
   |}) => boolean = request => {
     const { mnemonic } = request;
     if (request.mode.extra === 'paper') {
+      // <TODO:PENDING_REMOVAL> paper
       return this.api.ada.isValidPaperMnemonic({ mnemonic, numberOfWords: request.mode.length });
-    }
-    if (!request.mode.length) {
-      throw new Error(
-        `${nameof(AdaWalletRestoreStore)}::${nameof(this.isValidMnemonic)} missing length`
-      );
     }
     return AdaApi.isValidMnemonic({
       mnemonic,
-      numberOfWords: request.mode.length,
+      // $FlowIgnore[prop-missing]
+      numberOfWords: request.mode.length ?? 0,
     });
   };
 }

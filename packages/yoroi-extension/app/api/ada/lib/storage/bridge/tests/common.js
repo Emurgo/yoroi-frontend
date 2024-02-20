@@ -22,6 +22,7 @@ import type { NetworkRow } from '../../database/primitives/tables';
 
 const privateDeriverPassword = 'greatest_password_ever';
 
+// <TODO:PENDING_REMOVAL> bip44
 export async function setup(
   db: lf$Database,
   walletMnemonic: string,
@@ -33,6 +34,7 @@ export async function setup(
   throw new Error(`${nameof(setup)} Unexpected purpose ` + purposeForTest);
 }
 
+// <TODO:PENDING_REMOVAL> bip44
 export async function setupBip44(
   db: lf$Database,
   walletMnemonic: string,

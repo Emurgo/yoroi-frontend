@@ -137,9 +137,10 @@ function DialogFn(props: Props & InjectedProps): Node {
                 action.className != null ? action.className : null,
                 action.primary === true ? 'primary' : 'secondary',
               ]);
+              const buttonLabel = action.label.toLowerCase().replace(/ /gi, '') + '-'
               return (
                 <LoadingButton
-                  id={action.id ?? action.primary === true ? 'primaryButton' : 'secondaryButton'}
+                  id={action.id ?? 'dialog-' + buttonLabel + 'button'}
                   key={i}
                   {...getBtnVariant(action.danger, action.primary, isRevampLayout)}
                   className={buttonClasses}

@@ -125,7 +125,6 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
     if (selectedNetwork == null) throw new Error(`${nameof(this._createInDb)} no network selected`);
     await this.stores.wallets.createWalletRequest.execute(async () => {
       const wallet = await this.api.ada.createWallet({
-        mode: 'cip1852',
         db: persistentDb,
         walletName: this.stores.walletBackup.name,
         walletPassword: this.stores.walletBackup.password,
@@ -150,7 +149,6 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
     if (selectedNetwork == null) throw new Error(`${nameof(this._createInDb)} no network selected`);
     await this.stores.wallets.createWalletRequest.execute(async () => {
       const wallet = await this.api.ada.createWallet({
-        mode: 'cip1852',
         db: persistentDb,
         walletName: request.walletName,
         walletPassword: request.walletPassword,

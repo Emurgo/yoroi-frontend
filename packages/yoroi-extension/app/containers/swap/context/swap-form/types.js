@@ -21,15 +21,15 @@ export const SwapFormActionTypeValues = Object.freeze({
 export type SwapFormActionType = $Values<typeof SwapFormActionTypeValues>;
 
 export type SwapFormState = {|
+  sellTokenInfo: Object,
   sellQuantity: {|
-    tokenInfo: Object,
     isTouched: boolean,
     disabled: boolean,
     error: string | null,
     displayValue: string,
   |},
+  buyTokenInfo: Object,
   buyQuantity: {|
-    tokenInfo: Object,
     isTouched: boolean,
     disabled: boolean,
     error: string | null,

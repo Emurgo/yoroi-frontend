@@ -27,6 +27,8 @@ import type { Bip44ChainInsert } from '../../../ada/lib/storage/database/walletT
 declare var CONFIG: ConfigType;
 const addressRequestSize = CONFIG.app.addressRequestSize;
 
+// <TODO:PENDING_REMOVAL> bip44
+
 export async function addAddrForType(
   addByHash: AddByHashFunc,
   insertRequest: InsertRequest,
@@ -80,6 +82,7 @@ export async function scanBip44Chain(request: {|
     });
 }
 
+// <TODO:PENDING_REMOVAL> bip44
 export async function scanBip44Account(request: {|
   generateInternalAddresses: GenerateAddressFunc,
   generateExternalAddresses: GenerateAddressFunc,
