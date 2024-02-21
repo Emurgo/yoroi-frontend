@@ -631,6 +631,14 @@ function getCertificatesRequiredSignKeys(
         }
         continue;
       }
+      const regDrep = cert.as_drep_registration();
+      if (regDrep) {
+        const keyHash = regDrep.voting_credential().to_keyhash();
+        if (keyHash) {
+          result.add(keyHash.to_hex());
+        }
+        continue;
+      }
       const unregDrep = cert.as_drep_deregistration();
       if (unregDrep) {
         const keyHash = unregDrep.voting_credential().to_keyhash();
