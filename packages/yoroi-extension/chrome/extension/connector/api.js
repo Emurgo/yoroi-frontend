@@ -563,6 +563,62 @@ function getTxRequiredSigningKeys(
   return set;
 }
 
+type CertToKeyhashFuncs<CertType> = [
+  RustModule.WalletV4.Certificate => CertType | void,
+  CertType => RustModule.WalletV4.Ed25519KeyHash | Array<RustModule.WalletV4.Ed25519KeyHash> | void,
+];
+
+const CERT_TO_KEYHASH_FUNCS = [
+  ([
+    cert => cert.as_stake_deregistration(),
+    cert => cert.stake_credential().to_keyhash(),
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.StakeDeregistration>),
+  ([
+    cert => cert.as_stake_delegation(),
+    cert => cert.stake_credential().to_keyhash(),
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.StakeDelegation>),
+  ([
+    cert => cert.as_vote_delegation(),
+    cert => cert.stake_credential().to_keyhash(),
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.VoteDelegation>),
+  ([
+    cert => cert.as_stake_and_vote_delegation(),
+    cert => cert.stake_credential().to_keyhash(),
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.StakeAndVoteDelegation>),
+  ([
+    cert => cert.as_stake_registration_and_delegation(),
+    cert => cert.stake_credential().to_keyhash(),
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.StakeRegistrationAndDelegation>),
+
+  ([
+    cert => cert.as_stake_vote_registration_and_delegation(),
+    cert => cert.stake_credential().to_keyhash(),
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.StakeVoteRegistrationAndDelegation>),
+  ([
+    cert => cert.as_drep_registration(),
+    cert => cert.voting_credential().to_keyhash(),
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.DrepRegistration>),
+  ([
+    cert => cert.as_drep_deregistration(),
+    cert => cert.voting_credential().to_keyhash(),
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.DrepDeregistration>),
+  ([
+    cert => cert.as_drep_update(),
+    cert => cert.voting_credential().to_keyhash(),
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.DrepUpdate>),
+  ([
+    cert => cert.as_pool_registration(),
+    cert => {
+      const result = [];
+      const hashes = cert.pool_params().pool_owners();
+      for (let j = 0; j < hashes.len(); j++) {
+        result.push(hashes.get(j));
+      }
+      return result;
+    },
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.PoolRegistration>),
+];
+
 function getCertificatesRequiredSignKeys(
   txBody: RustModule.WalletV4.TransactionBody,
 ): Set<string> {
@@ -575,85 +631,20 @@ function getCertificatesRequiredSignKeys(
       if (!cert) {
         throw new Error('unexpectedly missing certificate');
       }
-      const stakeDeregistration = cert.as_stake_deregistration();
-      if (stakeDeregistration) {
-        const keyHash = stakeDeregistration.stake_credential().to_keyhash();
-        if (keyHash) {
-          result.add(keyHash.to_hex());
+      for (const [convertFunc, getKeyhashFunc] of CERT_TO_KEYHASH_FUNCS) {
+        const typedCert = convertFunc(cert);
+        if (typedCert) {
+          // $FlowFixMe[incompatible-call]
+          const getKeyhashResult = getKeyhashFunc(typedCert);
+          if (Array.isArray(getKeyhashResult)) {
+            for (const keyHash of getKeyhashResult) {
+              result.add(keyHash.to_hex());
+            }
+          } else if (getKeyhashResult) {
+            result.add(getKeyhashResult.to_hex());
+          }
+          break;
         }
-        continue;
-      }
-      const stakeDelegation = cert.as_stake_delegation();
-      if (stakeDelegation) {
-        const keyHash = stakeDelegation.stake_credential().to_keyhash();
-        if (keyHash) {
-          result.add(keyHash.to_hex());
-        }
-        continue;
-      }
-      const voteDelegation = cert.as_vote_delegation();
-      if (voteDelegation) {
-        const keyHash = voteDelegation.stake_credential().to_keyhash();
-        if (keyHash) {
-          result.add(keyHash.to_hex());
-        }
-        continue;
-      }
-      const stakeVoteDelegation = cert.as_stake_and_vote_delegation();
-      if (stakeVoteDelegation) {
-        const keyHash = stakeVoteDelegation.stake_credential().to_keyhash();
-        if (keyHash) {
-          result.add(keyHash.to_hex());
-        }
-        continue;
-      }
-      const stakeRegDelegation = cert.as_stake_registration_and_delegation();
-      if (stakeRegDelegation) {
-        const keyHash = stakeRegDelegation.stake_credential().to_keyhash();
-        if (keyHash) {
-          result.add(keyHash.to_hex());
-        }
-        continue;
-      }
-      const voteRegDelegation = cert.as_vote_registration_and_delegation();
-      if (voteRegDelegation) {
-        const keyHash = voteRegDelegation.stake_credential().to_keyhash();
-        if (keyHash) {
-          result.add(keyHash.to_hex());
-        }
-        continue;
-      }
-      const stakeRegVoteDeletion = cert.as_stake_vote_registration_and_delegation();
-      if (stakeRegVoteDeletion) {
-        const keyHash = stakeRegVoteDeletion.stake_credential().to_keyhash();
-        if (keyHash) {
-          result.add(keyHash.to_hex());
-        }
-        continue;
-      }
-      const unregDrep = cert.as_drep_deregistration();
-      if (unregDrep) {
-        const keyHash = unregDrep.voting_credential().to_keyhash();
-        if (keyHash) {
-          result.add(keyHash.to_hex());
-        }
-        continue;
-      }
-      const updateDrep = cert.as_drep_update();
-      if (updateDrep) {
-        const keyHash = updateDrep.voting_credential().to_keyhash();
-        if (keyHash) {
-          result.add(keyHash.to_hex());
-        }
-        continue;
-      }
-      const poolRegCert = cert.as_pool_registration();
-      if (poolRegCert) {
-        const hashes = poolRegCert.pool_params().pool_owners();
-        for (let j = 0; j < hashes.len(); j++) {
-          result.add(hashes.get(j).to_hex());
-        }
-        continue;
       }
     }
   }
