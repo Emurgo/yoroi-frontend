@@ -2980,6 +2980,126 @@ async function certificateToDb(
         }));
         break;
       }
+      case ShelleyCertificateTypes.VoteDelegation: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.VoteDelegation,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.StakeVoteDelegation: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.StakeAndVoteDelegation,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.StakeRegistrationDelegation: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.StakeRegistrationAndDelegation,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.VoteRegistrationDelegation: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.VoteRegistrationAndDelegation,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.StakeVoteRegistrationDelegation: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.StakeVoteRegistrationAndDelegation,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.AuthCommitteeHot: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.CommitteeHotAuth,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.ResignCommitteeCold: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.CommitteeColdResign,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.RegisterDrep: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.DrepRegistration,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.UnregisterDrep: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.DrepDeregistration,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.UpdateDrep: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.DrepUpdate,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
       default: throw new Error(`${nameof(certificateToDb)} unknown cert kind ` + cert.kind);
     }
   }
