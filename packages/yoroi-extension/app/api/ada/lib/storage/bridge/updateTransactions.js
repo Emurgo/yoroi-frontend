@@ -2371,6 +2371,7 @@ async function networkTxToDbTx(
     return id;
   };
 
+  // <TODO:PENDING_REMOVAL> Byron Legacy: this should be impossible now, we are not syncing history from pre-Shelley
   const byronTxs = [];
   const shelleyTxs = [];
 
