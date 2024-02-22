@@ -50,6 +50,7 @@ import type { PoolInfoResponse, RemotePool } from '../../api/ada/lib/state-fetch
 
 export type AdaDelegationRequests = {|
   publicDeriver: PublicDeriver<>,
+  // <TODO:PENDING_REMOVAL> Legacy unused
   getRegistrationHistory: CachedRequest<GetRegistrationHistoryFunc>,
 |};
 
@@ -66,6 +67,7 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
       publicDeriver,
       mangledAmounts: new CachedRequest<MangledAmountFunc>(getUnmangleAmounts),
       getDelegatedBalance: new CachedRequest<GetDelegatedBalanceFunc>(getDelegatedBalance),
+      // <TODO:PENDING_REMOVAL> Legacy (local history tx)
       getCurrentDelegation: new CachedRequest<GetCurrentDelegationFunc>(getCurrentDelegation),
       rewardHistory: new CachedRequest<RewardHistoryFunc>(async (address) => {
         // we need to defer this call because the store may not be initialized yet
@@ -98,6 +100,7 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
     });
     this.delegationRequests.push({
       publicDeriver,
+      // <TODO:PENDING_REMOVAL> Legacy unused
       getRegistrationHistory: new CachedRequest<GetRegistrationHistoryFunc>(getRegistrationHistory),
     });
   }

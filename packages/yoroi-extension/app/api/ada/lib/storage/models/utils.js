@@ -538,6 +538,7 @@ export async function updateCutoffFromInsert(
   }
 }
 
+// <TODO:PENDING_REMOVAL> Legacy (local history tx)
 export async function getCertificates(
   db: lf$Database,
   addressIds: Array<number>,

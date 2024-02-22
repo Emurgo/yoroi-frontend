@@ -134,6 +134,7 @@ export async function getUtxoDelegatedBalance(
   return utxoSum;
 }
 
+// <TODO:PENDING_REMOVAL> Legacy (local history tx)
 export async function getCertificateHistory(request: {|
   publicDeriver: PublicDeriver<> & IGetStakingKey,
   stakingKeyAddressId: number,
@@ -166,7 +167,7 @@ export async function getCertificateHistory(request: {|
   return filteredList;
 }
 
-
+// <TODO:PENDING_REMOVAL> Legacy (local history tx)
 export async function getCurrentDelegation(
   request: GetCurrentDelegationRequest,
 ): Promise<GetCurrentDelegationResponse> {
@@ -247,6 +248,7 @@ export type GetRegistrationHistoryFunc = (
   request: GetRegistrationHistoryRequest
 ) => Promise<GetRegistrationHistoryResponse>;
 
+// <TODO:PENDING_REMOVAL> Legacy (local history tx)
 export async function getRegistrationHistory(
   request: GetRegistrationHistoryRequest,
 ): Promise<GetRegistrationHistoryResponse> {
