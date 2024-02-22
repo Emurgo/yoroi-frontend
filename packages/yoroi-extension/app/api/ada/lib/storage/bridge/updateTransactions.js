@@ -1750,6 +1750,8 @@ async function updateTransactionBatch(
     genNextTokenListId,
   );
   const newsTxsIdSet = new Set();
+
+  // <TODO:PENDING_REMOVAL> Byron Legacy: this should be impossible now, we are not syncing history from pre-Shelley
   for (const newTx of byronTxs) {
     const result = await deps.ModifyCardanoByronTx.addTxWithIOs(
       db,
