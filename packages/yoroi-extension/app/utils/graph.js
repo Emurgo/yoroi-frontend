@@ -27,9 +27,6 @@ const generateRewardGraphData: ({|
   if (history == null) {
     return null;
   }
-  if (!request.delegationRequests.getCurrentDelegation.wasExecuted) {
-    return null;
-  }
   let historyIterator = 0;
 
   // the reward history endpoint doesn't contain entries when the reward was 0
