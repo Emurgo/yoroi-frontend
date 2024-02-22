@@ -1,40 +1,24 @@
 // @flow
 
 import BigNumber from 'bignumber.js';
-import {
-  getCertificates,
-} from '../models/utils';
+import { getCertificates, } from '../models/utils';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
-import {
-  asGetAllUtxos,
-} from '../models/PublicDeriver/traits';
-import {
-  PublicDeriver,
-} from '../models/PublicDeriver/index';
-import {
-  normalizeToAddress,
-  unwrapStakingKey,
-} from './utils';
+import { asGetAllUtxos, } from '../models/PublicDeriver/traits';
+import { PublicDeriver, } from '../models/PublicDeriver/index';
+import { normalizeToAddress, unwrapStakingKey, } from './utils';
 import { TxStatusCodes, } from '../database/primitives/enums';
 import type { CertificateInsert } from '../database/primitives/tables';
 import type {
-  GetDelegatedBalanceRequest,
-  GetDelegatedBalanceResponse,
   GetCurrentDelegationRequest,
   GetCurrentDelegationResponse,
+  GetDelegatedBalanceRequest,
+  GetDelegatedBalanceResponse,
   PoolTuples,
 } from '../../../../common/lib/storage/bridge/delegationUtils';
 import typeof { CertificateKind } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
-import type {
-  IGetStakingKey,
-  IGetAllUtxosResponse,
-} from '../models/PublicDeriver/interfaces';
-import type {
-  CertificateForKey,
-} from '../database/primitives/api/read';
-import {
-  MultiToken,
-} from '../../../../common/lib/MultiToken';
+import type { IGetAllUtxosResponse, IGetStakingKey, } from '../models/PublicDeriver/interfaces';
+import type { CertificateForKey, } from '../database/primitives/api/read';
+import { MultiToken, } from '../../../../common/lib/MultiToken';
 
 export async function getDelegatedBalance(
   request: GetDelegatedBalanceRequest,
@@ -234,43 +218,6 @@ export async function getCurrentDelegation(
     ...result,
     allPoolIds: Array.from(seenPools)
   };
-}
-
-export type GetRegistrationHistoryRequest = {|
-  publicDeriver: PublicDeriver<> & IGetStakingKey,
-  stakingKeyAddressId: number,
-|};
-export type GetRegistrationHistoryResponse = {|
-  current: boolean,
-  fullHistory: Array<CertificateForKey>,
-|};
-export type GetRegistrationHistoryFunc = (
-  request: GetRegistrationHistoryRequest
-) => Promise<GetRegistrationHistoryResponse>;
-
-// <TODO:PENDING_REMOVAL> Legacy (local history tx)
-export async function getRegistrationHistory(
-  request: GetRegistrationHistoryRequest,
-): Promise<GetRegistrationHistoryResponse> {
-  const delegations = await getCertificateHistory({
-    publicDeriver: request.publicDeriver,
-    stakingKeyAddressId: request.stakingKeyAddressId,
-    kindFilter: [
-      RustModule.WalletV4.CertificateKind.StakeDeregistration,
-      RustModule.WalletV4.CertificateKind.StakeRegistration
-    ]
-  });
-
-  const result = {
-    current: (
-      delegations.length === 0
-        ? false
-        : delegations[0].certificate.Kind === RustModule.WalletV4.CertificateKind.StakeRegistration
-    ),
-    fullHistory: delegations,
-  };
-
-  return result;
 }
 
 export function certificateToPoolList(

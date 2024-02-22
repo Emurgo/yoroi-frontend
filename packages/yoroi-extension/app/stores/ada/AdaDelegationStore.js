@@ -22,7 +22,6 @@ import type {
 import {
   getDelegatedBalance,
   getCurrentDelegation,
-  getRegistrationHistory,
 } from '../../api/ada/lib/storage/bridge/delegationUtils';
 import type {
   GetDelegatedBalanceFunc,
@@ -37,7 +36,6 @@ import {
 import { isCardanoHaskell, getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { DelegationRequests, } from '../toplevel/DelegationStore';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import type { GetRegistrationHistoryResponse, GetRegistrationHistoryFunc } from '../../api/ada/lib/storage/bridge/delegationUtils';
 import type { MangledAmountFunc } from '../stateless/mangledAddresses';
 import { getUnmangleAmounts } from '../stateless/mangledAddresses';
 import { MultiToken } from '../../api/common/lib/MultiToken';
@@ -48,10 +46,9 @@ import { entriesIntoMap } from '../../coreUtils';
 import type { PoolInfo } from '@emurgo/yoroi-lib';
 import type { PoolInfoResponse, RemotePool } from '../../api/ada/lib/state-fetch/types';
 
+// <TODO:PENDING_REMOVAL> Check if ever needed
 export type AdaDelegationRequests = {|
   publicDeriver: PublicDeriver<>,
-  // <TODO:PENDING_REMOVAL> Legacy unused
-  getRegistrationHistory: CachedRequest<GetRegistrationHistoryFunc>,
 |};
 
 export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
@@ -100,8 +97,6 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
     });
     this.delegationRequests.push({
       publicDeriver,
-      // <TODO:PENDING_REMOVAL> Legacy unused
-      getRegistrationHistory: new CachedRequest<GetRegistrationHistoryFunc>(getRegistrationHistory),
     });
   }
 
@@ -187,19 +182,6 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
         allPoolIds: currentDelegation.allPoolIds,
       }));
 
-      const adaSpecific = (async () => {
-        const adaDelegationRequest = this.getDelegationRequests(publicDeriver);
-        if (adaDelegationRequest == null) {
-          return Promise.resolve();
-        }
-        const registrationHistory = await this._getRegistrationHistory({
-          publicDeriver: withStakingKey,
-          stakingKeyAddressId: stakingKeyResp.addr.AddressId,
-          delegationRequest: adaDelegationRequest,
-        });
-        return registrationHistory;
-      })();
-
       const rewardHistory = delegationRequest.rewardHistory.execute(
         stakingKeyResp.addr.Hash
       ).promise;
@@ -208,24 +190,10 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
         accountStateCalcs,
         delegationHistory,
         rewardHistory,
-        adaSpecific,
       ]);
     } catch (e) {
       Logger.error(`${nameof(AdaDelegationStore)}::${nameof(this.refreshDelegation)} error: ` + stringifyError(e));
     }
-  }
-
-  _getRegistrationHistory: {|
-    publicDeriver: PublicDeriver<> & IGetStakingKey,
-    stakingKeyAddressId: number,
-    delegationRequest: AdaDelegationRequests,
-  |} => Promise<GetRegistrationHistoryResponse> = async (request) => {
-    const currentDelegation = await request.delegationRequest.getRegistrationHistory.execute({
-      publicDeriver: request.publicDeriver,
-      stakingKeyAddressId: request.stakingKeyAddressId,
-    }).promise;
-    if (currentDelegation == null) throw new Error('Should never happen');
-    return currentDelegation;
   }
 
   _getDelegationHistory: {|
@@ -342,9 +310,6 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
           requests.getDelegatedBalance.invalidate();
           requests.getCurrentDelegation.invalidate();
         }
-        for (const requests of this.delegationRequests) {
-          requests.getRegistrationHistory.invalidate();
-        }
         await triggerRefresh();
       },
     ));
@@ -361,9 +326,6 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
           requests.getDelegatedBalance.invalidate();
           requests.getCurrentDelegation.invalidate();
           requests.rewardHistory.invalidate();
-        }
-        for (const requests of this.delegationRequests) {
-          requests.getRegistrationHistory.invalidate();
         }
         await triggerRefresh();
       },
