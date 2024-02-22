@@ -51,7 +51,6 @@ import {
   GetAddress,
   GetPathWithSpecific,
   GetDerivationsByPath,
-  GetCertificates,
   GetKeyDerivation,
 } from '../database/primitives/api/read';
 import {
@@ -66,7 +65,6 @@ import type { UtxoTxOutput } from '../database/transactionModels/utxo/api/read';
 import { Bip44DerivationLevels } from '../database/walletTypes/bip44/api/utils';
 import type {
   GetPathWithSpecificByTreeRequest,
-  CertificateForKey,
 } from '../database/primitives/api/read';
 import {
   GetUtxoTxOutputsWithTx,
