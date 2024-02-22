@@ -538,25 +538,6 @@ export async function updateCutoffFromInsert(
   }
 }
 
-// <TODO:PENDING_REMOVAL> Legacy (local history tx)
-export async function getCertificates(
-  db: lf$Database,
-  addressIds: Array<number>,
-): Promise<Array<CertificateForKey>> {
-  const deps = Object.freeze({
-    GetCertificates,
-  });
-  const depTables = Object
-    .keys(deps)
-    .map(key => deps[key])
-    .flatMap(table => getAllSchemaTables(db, table));
-  return await raii<PromisslessReturnType<typeof getCertificates>>(
-    db,
-    depTables,
-    async dbTx => await deps.GetCertificates.forAddress(db, dbTx, { addressIds })
-  );
-}
-
 export function verifyFromDerivationRoot(request: $ReadOnly<{|
   ...$PropertyType<Addressing, 'addressing'>,
 |}>): void {
