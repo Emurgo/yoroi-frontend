@@ -152,8 +152,8 @@ export function getDescriptionFromTokenMetadata(
   if (typeof nftMetadata.description === 'string') {
     return nftMetadata.description;
   }
-  if (typeof nftMetadata.description?.[0] === 'string') {
-    return nftMetadata.description[0];
+  if (Array.isArray(nftMetadata.description)) {
+    return nftMetadata.description.join('');
   }
   return null;
 }

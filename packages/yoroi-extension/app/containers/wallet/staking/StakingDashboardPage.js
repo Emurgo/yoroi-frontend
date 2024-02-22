@@ -141,6 +141,7 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
     return epochLengthInDays;
   };
 
+  // <TODO:PENDING_REMOVAL> LEGACY UI
   getRewardInfo: (
     PublicDeriver<>
   ) => void | {|
@@ -173,8 +174,11 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
         delegationRequests.getCurrentDelegation.isExecuting
       )
     ) {
+
+      // <TODO:PENDING_REMOVAL> Legacy (local history tx)
       const { result } = delegationRequests.getCurrentDelegation;
 
+      // <TODO:PENDING_REMOVAL> LEGACY UI: upcoming rewards are to be removed
       if (result == null || result.currEpoch == null) {
         rewardInfo = {
           rewardPopup: (
@@ -333,6 +337,7 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
     );
   };
 
+  // <TODO:PENDING_REMOVAL> LEGACY UI
   generateUpcomingRewardInfo: ({|
     publicDeriver: PublicDeriver<>,
     epoch: number,
@@ -423,7 +428,7 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
               }
             : undefined;
 
-        // TODO: implement this eventually
+        // <TODO:PENDING_REMOVAL> LEGACY UI
         const stakePoolMeta = {
           // percentage: '30',
           // fullness: '18',

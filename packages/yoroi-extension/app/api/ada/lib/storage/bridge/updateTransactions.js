@@ -1750,6 +1750,8 @@ async function updateTransactionBatch(
     genNextTokenListId,
   );
   const newsTxsIdSet = new Set();
+
+  // <TODO:PENDING_REMOVAL> Byron Legacy: this should be impossible now, we are not syncing history from pre-Shelley
   for (const newTx of byronTxs) {
     const result = await deps.ModifyCardanoByronTx.addTxWithIOs(
       db,
@@ -2371,6 +2373,7 @@ async function networkTxToDbTx(
     return id;
   };
 
+  // <TODO:PENDING_REMOVAL> Byron Legacy: this should be impossible now, we are not syncing history from pre-Shelley
   const byronTxs = [];
   const shelleyTxs = [];
 
@@ -2977,6 +2980,126 @@ async function certificateToDb(
             ...info,
             CertificateId: certId,
           }))
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.VoteDelegation: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.VoteDelegation,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.StakeVoteDelegation: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.StakeAndVoteDelegation,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.StakeRegistrationDelegation: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.StakeRegistrationAndDelegation,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.VoteRegistrationDelegation: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.VoteRegistrationAndDelegation,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.StakeVoteRegistrationDelegation: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.StakeVoteRegistrationAndDelegation,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.AuthCommitteeHot: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.CommitteeHotAuth,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.ResignCommitteeCold: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.CommitteeColdResign,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.RegisterDrep: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.DrepRegistration,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.UnregisterDrep: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.DrepDeregistration,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.UpdateDrep: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.DrepUpdate,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
         }));
         break;
       }

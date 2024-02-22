@@ -65,6 +65,7 @@ type Props = {|
   +unregistered: void | boolean,
 |};
 
+// <TODO:PENDING_REMOVAL> LEGACY UI: upcoming rewards are to be removed
 @observer
 export default class UpcomingRewards extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
