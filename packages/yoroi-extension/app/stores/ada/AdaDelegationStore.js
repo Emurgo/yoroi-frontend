@@ -1,9 +1,8 @@
 // @flow
 
 import axios from 'axios';
-import { action, observable, reaction, runInAction } from 'mobx';
+import { action, reaction, runInAction } from 'mobx';
 import BigNumber from 'bignumber.js';
-import { find } from 'lodash';
 import Store from '../base/Store';
 import {
   Logger,
@@ -46,14 +45,7 @@ import { entriesIntoMap } from '../../coreUtils';
 import type { PoolInfo } from '@emurgo/yoroi-lib';
 import type { PoolInfoResponse, RemotePool } from '../../api/ada/lib/state-fetch/types';
 
-// <TODO:PENDING_REMOVAL> Check if ever needed
-export type AdaDelegationRequests = {|
-  publicDeriver: PublicDeriver<>,
-|};
-
 export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
-
-  @observable delegationRequests: Array<AdaDelegationRequests> = [];
 
   _recalculateDelegationInfoDisposer: Array<void => void> = [];
 
@@ -94,9 +86,6 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
           : [];
       }),
       error: undefined,
-    });
-    this.delegationRequests.push({
-      publicDeriver,
     });
   }
 
@@ -265,16 +254,6 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
         });
       }
     });
-  }
-
-  // TODO: refine input type to staking key wallets only
-  getDelegationRequests: PublicDeriver<> => void | AdaDelegationRequests = (
-    publicDeriver
-  ) => {
-    const foundRequest = find(this.delegationRequests, { publicDeriver });
-    if (foundRequest) return foundRequest;
-
-    return undefined; // can happen if the wallet is not a Shelley wallet
   }
 
   @action.bound
