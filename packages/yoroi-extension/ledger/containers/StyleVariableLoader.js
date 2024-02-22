@@ -1,7 +1,7 @@
 // @flow //
 import React from 'react';
 import type { Node } from 'react';
-import { map } from 'lodash'; // is this really needed?
+import { map } from 'lodash';
 
 type Props = {|variables: { [key: string]: string }|};
 
