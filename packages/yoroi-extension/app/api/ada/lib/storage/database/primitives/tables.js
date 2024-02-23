@@ -67,7 +67,6 @@ export type NetworkInsert = {|
   Backend: {|
     BackendService?: string,
     TokenInfoService?: string,
-    WebSocket?: string,
   |},
   /**
    * Starting configuration for the wallet.

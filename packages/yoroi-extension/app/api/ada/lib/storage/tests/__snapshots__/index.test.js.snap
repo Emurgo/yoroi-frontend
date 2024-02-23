@@ -1239,7 +1239,6 @@ Object {
       "Backend": Object {
         "BackendService": "https://iohk-mainnet.yoroiwallet.com",
         "TokenInfoService": "https://cdn.yoroiwallet.com",
-        "WebSocket": "wss://iohk-mainnet.yoroiwallet.com:443",
       },
       "BaseConfig": Array [
         Object {
@@ -1274,7 +1273,6 @@ Object {
       "Backend": Object {
         "BackendService": "https://testnet-backend.yoroiwallet.com",
         "TokenInfoService": "https://stage-cdn.yoroiwallet.com",
-        "WebSocket": "wss://testnet-backend.yoroiwallet.com:443",
       },
       "BaseConfig": Array [
         Object {
@@ -1309,7 +1307,6 @@ Object {
       "Backend": Object {
         "BackendService": "https://preprod-backend.yoroiwallet.com",
         "TokenInfoService": "https://stage-cdn.yoroiwallet.com",
-        "WebSocket": "wss://preprod-backend.yoroiwallet.com:443",
       },
       "BaseConfig": Array [
         Object {
@@ -1344,7 +1341,6 @@ Object {
       "Backend": Object {
         "BackendService": "https://preview-backend.emurgornd.com",
         "TokenInfoService": "https://stage-cdn.yoroiwallet.com",
-        "WebSocket": "wss://preview-backend.emurgornd.com:443",
       },
       "BaseConfig": Array [
         Object {
@@ -1379,7 +1375,6 @@ Object {
       "Backend": Object {
         "BackendService": "https://sanchonet-backend.yoroiwallet.com",
         "TokenInfoService": "https://stage-cdn.yoroiwallet.com",
-        "WebSocket": "wss://sanchonet-backend.yoroiwallet.com:443",
       },
       "BaseConfig": Array [
         Object {
