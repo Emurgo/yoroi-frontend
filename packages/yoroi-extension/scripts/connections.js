@@ -4,7 +4,7 @@ function portToPermission(port /*: number */) /*: string */ {
   return `http://localhost:${port} https://localhost:${port}`;
 }
 function serverToPermission(server /*: string */) /*: string */ {
-  return `https://${server} wss://${server}:443`;
+  return `https://${server}`;
 }
 
 const Ports = {
