@@ -145,7 +145,8 @@ const ExpandableAssetsPanel = ({
         )}
       </Box>
 
-      {(hasNativeToken || assets.length !== 0) && (
+      {((total.amount.startsWith('-') && action === 'sent') || (
+        !total.amount.startsWith('-') && action === 'received')) && (
         <AsseetValueDisplay>
           {total.amount} {total.ticker}
         </AsseetValueDisplay>
