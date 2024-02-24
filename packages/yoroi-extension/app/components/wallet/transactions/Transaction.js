@@ -161,6 +161,46 @@ export const shelleyCertificateKinds: Object = {
       id: 'wallet.transaction.certificate.StakeDelegation',
       defaultMessage: '!!!Stake delegation',
     },
+    VoteDelegation: {
+      id: 'wallet.transaction.certificate.VoteDelegation',
+      defaultMessage: '!!!Vote delegation',
+    },
+    StakeAndVoteDelegation: {
+      id: 'wallet.transaction.certificate.StakeAndVoteDelegation',
+      defaultMessage: '!!!Staking and voting delegation',
+    },
+    StakeRegistrationAndDelegation: {
+      id: 'wallet.transaction.certificate.StakeRegistrationAndDelegation',
+      defaultMessage: '!!!Stake credential registration and staking delegation',
+    },
+    VoteRegistrationAndDelegation: {
+      id: 'wallet.transaction.certificate.VoteRegistrationAndDelegation',
+      defaultMessage: '!!!Stake credential registration and voting delegation',
+    },
+    StakeVoteRegistrationAndDelegation: {
+      id: 'wallet.transaction.certificate.StakeVoteRegistrationAndDelegation',
+      defaultMessage: '!!!Stake credential registration and staking and voting delegation',
+    },
+    CommitteeHotAuth: {
+      id: 'wallet.transaction.certificate.CommitteeHotAuth',
+      defaultMessage: '!!!Constitutional committee authorization',
+    },
+    CommitteeColdResign: {
+      id: 'wallet.transaction.certificate.CommitteeColdResign',
+      defaultMessage: '!!!Constitional committee resignment',
+    },
+    DrepRegistration: {
+      id: 'wallet.transaction.certificate.DrepRegistration',
+      defaultMessage: '!!!DRep credential registration',
+    },
+    DrepDeregistration: {
+      id: 'wallet.transaction.certificate.DrepDeregistration',
+      defaultMessage: '!!!DRep credential retirement',
+    },
+    DrepUpdate: {
+      id: 'wallet.transaction.certificate.DrepUpdate',
+      defaultMessage: '!!!DRep metadata update',
+    },
   }),
 };
 

@@ -24,11 +24,8 @@ import { maybe } from '../../coreUtils';
 
 export type DelegationRequests = {|
   publicDeriver: PublicDeriver<>,
-  /** Note: this says nothing about what this is delegated to
-   * Notably, it could be delegated to nothing!
-   * use getCurrentDelegation if you want to know what (if any) pool is being delegated to
-   */
   getDelegatedBalance: CachedRequest<GetDelegatedBalanceFunc>,
+  // <TODO:PENDING_REMOVAL> Legacy (local history tx)
   getCurrentDelegation: CachedRequest<GetCurrentDelegationFunc>,
   rewardHistory: CachedRequest<RewardHistoryFunc>,
   mangledAmounts: CachedRequest<MangledAmountFunc>,
