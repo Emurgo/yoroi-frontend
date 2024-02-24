@@ -8,11 +8,13 @@ import { ReactComponent as DoneIcon } from '../../assets/images/forms/done.inlin
 import { ReactComponent as EyeIcon } from '../../assets/images/forms/password-eye-close.inline.svg';
 import { ReactComponent as CloseEyeIcon } from '../../assets/images/forms/password-eye.inline.svg';
 import { ReactComponent as QRLogo } from '../../assets/images/qr-code.inline.svg';
+import LoadingSpinner from '../widgets/LoadingSpinner';
 
 type Props = {|
   error?: boolean | string,
   helperText?: string,
   done?: boolean,
+  greenCheck?: boolean,
   type?: string,
   className?: string,
   value: any,
@@ -26,6 +28,7 @@ type Props = {|
   revamp?: boolean,
   placeholder?: string,
   QRHandler?: Function,
+  isLoading?: boolean,
 |};
 
 function TextField({
@@ -35,6 +38,7 @@ function TextField({
   error,
   helperText,
   done,
+  greenCheck,
   type,
   inputRef,
   className,
@@ -45,6 +49,7 @@ function TextField({
   revamp,
   QRHandler,
   placeholder,
+  isLoading,
   ...props
 }: Props): Node {
   const theme = useTheme();
@@ -83,12 +88,19 @@ function TextField({
         ...((Boolean(revamp) ? { disableUnderline: true } : {}): any),
         ...((theme.name === 'classic' ? { notched: false } : {}): any),
         endAdornment:
-          type === 'password' ? (
+          isLoading ? (
+            <InputAdornment
+              position="end"
+              sx={{ marginTop: '-30px' }}
+            >
+              <LoadingSpinner />
+            </InputAdornment>
+          ) : (type === 'password') ? (
             <InputAdornment
               position="end"
               sx={{ minWidth: '52px', display: 'flex', justifyContent: 'flex-end' }}
             >
-              {Boolean(error) === true ? (
+              {Boolean(error) === true && !isRevampTheme ? (
                 <ErrorIcon />
               ) : done === true && !isRevampTheme ? (
                 <DoneIcon />
@@ -111,7 +123,7 @@ function TextField({
               position="end"
               sx={{ minWidth: '52px', display: 'flex', justifyContent: 'flex-end' }}
             >
-              {Boolean(error) === true ? (
+              {Boolean(error) === true && !isRevampTheme ? (
                 <ErrorIcon />
               ) : done === true && !isRevampTheme ? (
                 <DoneIcon />
@@ -122,9 +134,9 @@ function TextField({
             </InputAdornment>
           ) : (
             <InputAdornment position="end">
-              {Boolean(error) === true ? (
+              {Boolean(error) === true && !isRevampTheme ? (
                 <ErrorIcon />
-              ) : done === true && !isRevampTheme ? (
+              ) : ((done === true && !isRevampTheme) || greenCheck) ? (
                 <DoneIcon />
               ) : null}
             </InputAdornment>
@@ -138,6 +150,7 @@ function TextField({
 TextField.defaultProps = {
   label: '',
   done: false,
+  greenCheck: false,
   error: '',
   helperText: ' ',
   className: '',
@@ -151,6 +164,7 @@ TextField.defaultProps = {
   revamp: false,
   QRHandler: null,
   placeholder: undefined,
+  isLoading: false,
 };
 
 export default TextField;

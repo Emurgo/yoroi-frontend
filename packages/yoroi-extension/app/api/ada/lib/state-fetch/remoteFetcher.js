@@ -19,13 +19,9 @@ import type {
   SignedResponse,
   TokenInfoRequest,
   TokenInfoResponse,
-  TxBodiesRequest,
-  TxBodiesResponse,
-  UtxoSumRequest,
-  UtxoSumResponse,
   CatalystRoundInfoRequest,
   CatalystRoundInfoResponse,
-  MultiAssetMintMetadataRequest,
+  MultiAssetRequest,
   MultiAssetMintMetadataResponse,
   GetUtxoDataRequest,
   GetUtxoDataResponse,
@@ -33,7 +29,7 @@ import type {
   GetRecentTransactionHashesRequest,
   GetRecentTransactionHashesResponse,
   GetTransactionsByHashesRequest,
-  GetTransactionsByHashesResponse,
+  GetTransactionsByHashesResponse, MultiAssetSupplyResponse,
 } from './types';
 import type { FilterUsedRequest, FilterUsedResponse, } from '../../../common/lib/state-fetch/currencySpecificTypes';
 
@@ -49,9 +45,7 @@ import {
   GetCatalystRoundInfoApiError,
   GetRewardHistoryApiError,
   GetTxHistoryForAddressesApiError,
-  GetTxsBodiesForUTXOsApiError,
   GetUtxosForAddressesApiError,
-  GetUtxosSumsForAddressesApiError,
   InvalidWitnessError,
   RollbackApiError,
   SendTransactionApiError,
@@ -119,60 +113,6 @@ export class RemoteFetcher implements IFetcher {
       }
       return utxo;
     });
-  }
-
-  getTxsBodiesForUTXOs: TxBodiesRequest => Promise<TxBodiesResponse> = (body) => {
-    const { BackendService } = body.network.Backend;
-    if (BackendService == null) throw new Error(`${nameof(this.getTxsBodiesForUTXOs)} missing backend url`);
-    return axios(
-      `${BackendService}/api/txs/txBodies`,
-      {
-        method: 'post',
-        timeout: 2 * CONFIG.app.walletRefreshInterval,
-        data: {
-          txsHashes: body.txsHashes
-        },
-        headers: {
-          'yoroi-version': this.getLastLaunchVersion(),
-          'yoroi-locale': this.getCurrentLocale()
-        }
-      }
-    ).then(response => response.data)
-      .catch((error) => {
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getTxsBodiesForUTXOs)} error: ` + stringifyError(error));
-        throw new GetTxsBodiesForUTXOsApiError();
-      });
-  }
-
-  getUTXOsSumsForAddresses: UtxoSumRequest => Promise<UtxoSumResponse> = (body) => {
-    const { BackendService } = body.network.Backend;
-    if (BackendService == null) throw new Error(`${nameof(this.getUTXOsSumsForAddresses)} missing backend url`);
-    return axios(
-      `${BackendService}/api/txs/utxoSumForAddresses`,
-      {
-        method: 'post',
-        timeout: 2 * CONFIG.app.walletRefreshInterval,
-        data: {
-          addresses: body.addresses
-        },
-        headers: {
-          'yoroi-version': this.getLastLaunchVersion(),
-          'yoroi-locale': this.getCurrentLocale()
-        }
-      }
-    ).then(response => {
-      const result: UtxoSumResponse = response.data;
-      if (result.assets == null) {
-        // replace non-existent w/ empty array to handle Allegra -> Mary transition
-        // $FlowExpectedError[cannot-write]
-        result.assets = [];
-      }
-      return result;
-    })
-      .catch((error) => {
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getUTXOsSumsForAddresses)} error: ` + stringifyError(error));
-        throw new GetUtxosSumsForAddressesApiError();
-      });
   }
 
   getTransactionsHistoryForAddresses: HistoryRequest => Promise<HistoryResponse> = (body) => {
@@ -528,7 +468,7 @@ export class RemoteFetcher implements IFetcher {
       });
   }
 
-  getMultiAssetMintMetadata: MultiAssetMintMetadataRequest
+  getMultiAssetMintMetadata: MultiAssetRequest
     => Promise<MultiAssetMintMetadataResponse> = async (body) => {
       const { BackendService } = body.network.Backend;
       if (BackendService == null) throw new Error(`${nameof(this.getMultiAssetMintMetadata)} missing backend url`);
@@ -543,6 +483,25 @@ export class RemoteFetcher implements IFetcher {
       ).then(response => response.data)
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getMultiAssetMintMetadata)} error: ` + stringifyError(error));
+        return {};
+      });
+  }
+
+  getMultiAssetSupply: MultiAssetRequest
+    => Promise<MultiAssetSupplyResponse> = async (body) => {
+      const { BackendService } = body.network.Backend;
+      if (BackendService == null) throw new Error(`${nameof(this.getMultiAssetSupply)} missing backend url`);
+      return await axios(
+        `${BackendService}/api/multiAsset/supply?numberFormat=string`,
+        {
+          method: 'post',
+          data: {
+            assets: body.assets
+          }
+        }
+      ).then(response => response.data.supplies)
+      .catch((error) => {
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getMultiAssetSupply)} error: ` + stringifyError(error));
         return {};
       });
   }

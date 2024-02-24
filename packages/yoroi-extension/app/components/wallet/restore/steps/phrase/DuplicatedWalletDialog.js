@@ -45,6 +45,7 @@ function DuplicatedWalletDialog(props: Props & Intl): Node {
       open={open}
       onClose={onClose}
       TransitionComponent={Transition}
+      id='duplicatedWalletDialog-dialog'
       sx={{
         background: 'rgb(18 31 77 / 70%)',
         display: 'flex',
@@ -68,12 +69,16 @@ function DuplicatedWalletDialog(props: Props & Intl): Node {
         }}
       >
         <Box>
-          <Typography sx={{ fontWeight: '500', textTransform: 'uppercase', textAlign: 'center' }}>
+          <Typography
+            component="div"
+            sx={{ fontWeight: '500', textTransform: 'uppercase', textAlign: 'center' }}
+            id='duplicatedWalletDialog-dialogTitle-text'
+          >
             {intl.formatMessage(messages.dialogTitle)}
           </Typography>
         </Box>
         <Box sx={{ flex: 1, mb: '24px' }}>
-          <Typography textAlign="left" variant="body1" fontWeight="400" mb="16px">
+          <Typography component="div" textAlign="left" variant="body1" fontWeight="400" mb="16px">
             {intl.formatMessage(messages.title)}
           </Typography>
           <Box component="ul" sx={{ listStyle: 'outside', mt: '16px' }}>
@@ -98,6 +103,7 @@ function DuplicatedWalletDialog(props: Props & Intl): Node {
             disableRipple={false}
             onClick={onClose}
             style={{ width: '100%', height: '48px', fontSize: '16px' }}
+            id='duplicatedWalletDialog-cancel-button'
           >
             {intl.formatMessage(globalMessages.cancel)}
           </Button>
@@ -107,6 +113,7 @@ function DuplicatedWalletDialog(props: Props & Intl): Node {
             disableRipple={false}
             onClick={onNext}
             style={{ width: '100%', height: '48px', fontSize: '16px' }}
+            id='duplicatedWalletDialog-openWallet-button'
           >
             {intl.formatMessage(messages.openWallet)}
           </Button>

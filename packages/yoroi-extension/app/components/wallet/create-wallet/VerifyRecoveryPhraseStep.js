@@ -84,7 +84,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
   return (
     <Stack alignItems="center" justifyContent="center" className={styles.component} id="verifyRecoveryPhraseStepComponent">
       <Stack direction="column" alignItems="left" justifyContent="center" maxWidth="648px">
-        <Typography mb="16px">
+        <Typography component="div" mb="16px">
           <FormattedHTMLMessage {...messages.description} />
         </Typography>
 
@@ -118,7 +118,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                     ml: '4px',
                   }}
                 >
-                  <Typography
+                  <Typography component="div"
                     sx={{
                       display: 'block',
                       cursor: 'default',
@@ -149,7 +149,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                     variant="body1"
                     color="primary.600"
                   >
-                    <Typography variant="body1" color="primary.400" width="20px">
+                    <Typography component="div" variant="body1" color="primary.400" width="20px">
                       {idx + 1}.
                     </Typography>
                     {word !== null &&
@@ -190,7 +190,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                 }}
                 id={'verifyRecoveryPhraseWord' + idx}
               >
-                <Typography
+                <Typography component="div"
                   sx={{
                     width: '100%',
                     whiteSpace: 'nowrap',
@@ -218,7 +218,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
 
         <Box height="28px" mt="16px">
           {wrongWordIdx !== null && (
-            <Typography variant="body2" color="error.100">
+            <Typography component="div" variant="body2" color="error.100" id="incorrectOrderMessage">
               {intl.formatMessage(messages.incorrectOrder)}
             </Typography>
           )}
@@ -226,7 +226,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
           <Fade in={isValidPhrase}>
             <Stack gap="10px" direction="row" id="isValidPhraseMessage">
               <VerifiedIcon />
-              <Typography variant="body1" fontWeight={500}>
+              <Typography component="div" variant="body1" fontWeight={500}>
                 {intl.formatMessage(messages.verified)}
               </Typography>
             </Stack>

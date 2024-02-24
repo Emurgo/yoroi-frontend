@@ -112,10 +112,10 @@ export default class Loading extends Component<Props> {
     );
 
     return (
-      <p>
+      <div>
         <FormattedMessage {...globalMessages.logsContent} values={{ downloadLogsLink }} /><br />
         <FormattedMessage {...globalMessages.forMoreHelp} values={{ supportRequestLink }} />
-      </p>
+      </div>
     );
   };
 

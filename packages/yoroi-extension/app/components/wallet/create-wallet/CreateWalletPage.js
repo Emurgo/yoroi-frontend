@@ -88,6 +88,8 @@ function CreateWalletPage(props: Props): Node {
     [CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE]: (
       <LearnAboutRecoveryPhrase
         nextStep={() => {
+          if (!environment.isDev() && !environment.isNightly())
+            setSelectedNetwork(networks.CardanoMainnet);
           setCurrentStepAndTrack(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE);
           if (recoveryPhrase === null) {
             genWalletRecoveryPhrase()

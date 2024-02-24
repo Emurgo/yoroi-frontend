@@ -26,6 +26,7 @@ const CardanoMainnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
       address: 'https://adastat.net/addresses/',
       transaction: 'https://adastat.net/transactions/',
       pool: 'https://adastat.net/pools/',
+      token: 'https://adastat.net/tokens/',
     },
     Name: 'AdaStat',
   },
@@ -44,12 +45,13 @@ const CardanoMainnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
     NetworkId: networks.CardanoMainnet.NetworkId,
     IsBackup: false,
     Endpoints: {
-      stakeAddress: 'https://adaex.org/',
-      address: 'https://adaex.org/',
-      transaction: 'https://adaex.org/',
-      pool: 'https://adapools.org/pool/',
+      address: 'https://cexplorer.io/address/',
+      transaction: 'https://cexplorer.io/tx/',
+      pool: 'https://cexplorer.io/pool/',
+      stakeAddress: 'https://cexplorer.io/stake/',
+      token: 'https://cexplorer.io/asset/',
     },
-    Name: 'ADAex.org',
+    Name: 'Cexplorer',
   },
   {
     ExplorerId: 1_02,
@@ -84,19 +86,6 @@ const CardanoMainnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
   },
 ];
 
-const ErgoExplorers: Array<$ReadOnly<ExplorerRow>> = [
-  {
-    ExplorerId: 3_00,
-    NetworkId: networks.ErgoMainnet.NetworkId,
-    IsBackup: true,
-    Endpoints: {
-      address: 'https://explorer.ergoplatform.com/en/addresses/',
-      transaction: 'https://explorer.ergoplatform.com/en/transactions/',
-    },
-    Name: 'ErgoPlatform',
-  },
-];
-
 const CardanoTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
   {
     ExplorerId: 4_00,
@@ -126,19 +115,6 @@ const CardanoPreprodTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
   },
 ];
 
-const AlonzoTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
-  {
-    ExplorerId: 5_00,
-    NetworkId: networks.AlonzoTestnet.NetworkId,
-    IsBackup: true,
-    Endpoints: {
-      address: 'https://explorer.alonzo-white.dev.cardano.org/en/address?address=',
-      transaction: 'https://explorer.alonzo-white.dev.cardano.org/en/transaction?id=',
-    },
-    Name: 'CardanoExplorer',
-  },
-];
-
 const CardanoPreviewTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
   {
     ExplorerId: 5_50,
@@ -155,13 +131,30 @@ const CardanoPreviewTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
   },
 ];
 
+// <TODO:SANCHO FIX WHEN EXPLORER AVAILABLE>
+const CardanoSanchoTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
+  {
+    ExplorerId: 6_50,
+    NetworkId: networks.CardanoSanchoTestnet.NetworkId,
+    IsBackup: true,
+    Endpoints: {
+      address: 'https://sancho.cexplorer.io/address/',
+      transaction: 'https://sancho.cexplorer.io/tx/',
+      pool: 'https://sancho.cexplorer.io/pool/',
+      stakeAddress: 'https://sancho.cexplorer.io/stake/',
+      token: 'https://sancho.cexplorer.io/asset/',
+    },
+    Name: 'Cexplorer',
+  },
+];
+
 export const prepackagedExplorers: Map<number, $ReadOnlyArray<$ReadOnly<ExplorerRow>>> = new Map([
   [networks.CardanoMainnet.NetworkId, CardanoMainnetExplorers],
+  // <TODO:PENDING_REMOVAL> Legacy Testnet
   [networks.CardanoTestnet.NetworkId, CardanoTestnetExplorers],
   [networks.CardanoPreprodTestnet.NetworkId, CardanoPreprodTestnetExplorers],
   [networks.CardanoPreviewTestnet.NetworkId, CardanoPreviewTestnetExplorers],
-  [networks.ErgoMainnet.NetworkId, ErgoExplorers],
-  [networks.AlonzoTestnet.NetworkId, AlonzoTestnetExplorers],
+  [networks.CardanoSanchoTestnet.NetworkId, CardanoSanchoTestnetExplorers],
 ]);
 const getOrThrow = function<T> (input: ?T): T {
   if (input == null) throw new Error('No backup explorer for type');
@@ -172,6 +165,7 @@ export const prepackagedDefaultExplorers:
     [networks.CardanoMainnet.NetworkId, getOrThrow(
       CardanoMainnetExplorers.find(explorer => explorer.IsBackup)
     )],
+  // <TODO:PENDING_REMOVAL> Legacy Testnet
     [networks.CardanoTestnet.NetworkId, getOrThrow(
       CardanoTestnetExplorers.find(explorer => explorer.IsBackup)
     )],
@@ -181,10 +175,7 @@ export const prepackagedDefaultExplorers:
     [networks.CardanoPreviewTestnet.NetworkId, getOrThrow(
       CardanoPreviewTestnetExplorers.find(explorer => explorer.IsBackup)
     )],
-    [networks.ErgoMainnet.NetworkId, getOrThrow(
-      ErgoExplorers.find(explorer => explorer.IsBackup)
-    )],
-    [networks.AlonzoTestnet.NetworkId, getOrThrow(
-      AlonzoTestnetExplorers.find(explorer => explorer.IsBackup)
+    [networks.CardanoSanchoTestnet.NetworkId, getOrThrow(
+      CardanoSanchoTestnetExplorers.find(explorer => explorer.IsBackup)
     )],
   ]);

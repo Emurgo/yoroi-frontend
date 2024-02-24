@@ -47,6 +47,9 @@ export async function getDelegatedBalance(
   return {
     utxoPart,
     accountPart: request.rewardBalance,
+    delegation: request.delegation,
+    allRewards: request.allRewards,
+    stakeRegistered: request.stakeRegistered,
   };
 }
 
@@ -102,7 +105,7 @@ export async function getUtxoDelegatedBalance(
 ): Promise<MultiToken> {
   const withUtxos = asGetAllUtxos(publicDeriver);
   if (withUtxos == null) {
-    return new MultiToken([], publicDeriver.getParent().getDefaultToken());
+    return publicDeriver.getParent().getDefaultMultiToken();
   }
   const basePubDeriver = withUtxos;
 
@@ -125,12 +128,13 @@ export async function getUtxoDelegatedBalance(
       })),
       publicDeriver.getParent().getDefaultToken()
     )),
-    new MultiToken([], publicDeriver.getParent().getDefaultToken())
+    publicDeriver.getParent().getDefaultMultiToken(),
   );
 
   return utxoSum;
 }
 
+// <TODO:PENDING_REMOVAL> Legacy (local history tx)
 export async function getCertificateHistory(request: {|
   publicDeriver: PublicDeriver<> & IGetStakingKey,
   stakingKeyAddressId: number,
@@ -163,7 +167,7 @@ export async function getCertificateHistory(request: {|
   return filteredList;
 }
 
-
+// <TODO:PENDING_REMOVAL> Legacy (local history tx)
 export async function getCurrentDelegation(
   request: GetCurrentDelegationRequest,
 ): Promise<GetCurrentDelegationResponse> {
@@ -244,6 +248,7 @@ export type GetRegistrationHistoryFunc = (
   request: GetRegistrationHistoryRequest
 ) => Promise<GetRegistrationHistoryResponse>;
 
+// <TODO:PENDING_REMOVAL> Legacy (local history tx)
 export async function getRegistrationHistory(
   request: GetRegistrationHistoryRequest,
 ): Promise<GetRegistrationHistoryResponse> {

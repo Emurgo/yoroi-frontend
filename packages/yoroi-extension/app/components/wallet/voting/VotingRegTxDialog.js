@@ -36,7 +36,7 @@ const messages = defineMessages({
   line1: {
     id: 'wallet.voting.dialog.step.trx.line1',
     defaultMessage:
-      '!!!Confirm your spending password to register in the blockchain the certificate previously generated for voting.',
+      '!!!Confirm your password to register in the blockchain the certificate previously generated for voting.',
   },
   txConfirmationTrezorTLine1: {
     id: 'wallet.voting.dialog.step.trx.trezor.info.line.1',
@@ -221,9 +221,9 @@ export default class VotingRegTxDialog extends Component<Props> {
         </div>
         {spendingPasswordForm}
         {this.props.error ? (
-          <p className={styles.error}>
+          <div className={styles.error}>
             {intl.formatMessage(this.props.error, this.props.error.values)}
-          </p>
+          </div>
         ) : null}
       </Dialog>
     );

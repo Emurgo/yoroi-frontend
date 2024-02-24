@@ -1,10 +1,10 @@
 // @flow
-import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import BigNumber from 'bignumber.js';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './AssetsList.scss';
+import { Component } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { ReactComponent as NoAssetLogo } from '../../../assets/images/assets-page/asset-no.inline.svg';
 import { ReactComponent as ArrowsListFromBottom } from '../../../assets/images/assets-page/arrows-list-from-bottom.inline.svg';
@@ -225,9 +225,9 @@ export default class AssetsList extends Component<Props, State> {
           {assetDeposit && (
             <div className={styles.lockedAssets}>
               <div className={styles.lockedAssetsAmount}>
-                <p className={styles.label}>
+                <div className={styles.label}>
                   {intl.formatMessage(globalMessages.assetDepositLabel)} &nbsp;
-                </p>
+                </div>
                 {this.renderAmountDisplay()}
               </div>
             </div>
@@ -242,19 +242,19 @@ export default class AssetsList extends Component<Props, State> {
             <ul className={styles.columns}>
               <li>
                 <button type="button" onClick={() => this.sortAssets(SORTING_COLUMNS.NAME)}>
-                  <p className={styles.headerText}>
+                  <div className={styles.headerText}>
                     {intl.formatMessage(assetsMessage.nameAndTicker)}
-                  </p>
+                  </div>
                   {this.displayColumnLogo(SORTING_COLUMNS.NAME)}
                 </button>
               </li>
               <li>
-                <p className={styles.headerText}>{intl.formatMessage(assetsMessage.identifier)}</p>
+                <div className={styles.headerText}>{intl.formatMessage(assetsMessage.identifier)}</div>
                 {/* <Info /> TODO: identifier info? */}
               </li>
               <li>
                 <button type="button" onClick={() => this.sortAssets(SORTING_COLUMNS.AMOUNT)}>
-                  <p className={styles.headerText}>{intl.formatMessage(assetsMessage.quantity)}</p>
+                  <div className={styles.headerText}>{intl.formatMessage(assetsMessage.quantity)}</div>
                   {this.displayColumnLogo(SORTING_COLUMNS.AMOUNT)}
                 </button>
               </li>

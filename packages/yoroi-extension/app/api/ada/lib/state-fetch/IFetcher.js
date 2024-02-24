@@ -2,8 +2,6 @@
 
 import type {
   AddressUtxoRequest, AddressUtxoResponse,
-  TxBodiesRequest, TxBodiesResponse,
-  UtxoSumRequest, UtxoSumResponse,
   HistoryRequest, HistoryResponse,
   RewardHistoryRequest, RewardHistoryResponse,
   AccountStateRequest, AccountStateResponse,
@@ -12,11 +10,11 @@ import type {
   CatalystRoundInfoRequest, CatalystRoundInfoResponse,
   BestBlockRequest, BestBlockResponse,
   TokenInfoRequest, TokenInfoResponse,
-  MultiAssetMintMetadataRequest, MultiAssetMintMetadataResponse,
+  MultiAssetRequest, MultiAssetMintMetadataResponse,
   GetUtxoDataRequest, GetUtxoDataResponse,
   GetLatestBlockBySlotReq, GetLatestBlockBySlotRes,
   GetRecentTransactionHashesRequest, GetRecentTransactionHashesResponse,
-  GetTransactionsByHashesRequest, GetTransactionsByHashesResponse,
+  GetTransactionsByHashesRequest, GetTransactionsByHashesResponse, MultiAssetSupplyResponse,
 } from './types';
 import type {
   FilterUsedRequest, FilterUsedResponse,
@@ -24,8 +22,6 @@ import type {
 
 export interface IFetcher {
   getUTXOsForAddresses(body: AddressUtxoRequest): Promise<AddressUtxoResponse>;
-  getTxsBodiesForUTXOs(body: TxBodiesRequest): Promise<TxBodiesResponse>;
-  getUTXOsSumsForAddresses(body: UtxoSumRequest): Promise<UtxoSumResponse>;
   getTransactionsHistoryForAddresses(body: HistoryRequest): Promise<HistoryResponse>;
   getRewardHistory(body: RewardHistoryRequest): Promise<RewardHistoryResponse>;
   getBestBlock(body: BestBlockRequest): Promise<BestBlockResponse>;
@@ -35,8 +31,10 @@ export interface IFetcher {
   getCatalystRoundInfo(body: CatalystRoundInfoRequest): Promise<CatalystRoundInfoResponse>;
   getTokenInfo(body: TokenInfoRequest): Promise<TokenInfoResponse>;
   checkAddressesInUse(body: FilterUsedRequest): Promise<FilterUsedResponse>;
-  getMultiAssetMintMetadata(body: MultiAssetMintMetadataRequest)
+  getMultiAssetMintMetadata(body: MultiAssetRequest)
     : Promise<MultiAssetMintMetadataResponse>;
+  getMultiAssetSupply(body: MultiAssetRequest)
+    : Promise<MultiAssetSupplyResponse>;
   getUtxoData(body: GetUtxoDataRequest): Promise<GetUtxoDataResponse>;
   getLatestBlockBySlot(body: GetLatestBlockBySlotReq): Promise<GetLatestBlockBySlotRes>;
   getRecentTransactionHashes

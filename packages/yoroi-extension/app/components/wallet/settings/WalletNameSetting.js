@@ -73,7 +73,7 @@ class WalletNameSetting extends Component<Props & InjectedLayoutProps> {
     return (
       <>
         {isRevampLayout && (
-          <Typography variant="body1" fontWeight={500} mb="16px">
+          <Typography component="div" variant="body1" fontWeight={500} mb="16px">
             {intl.formatMessage(messages.title)}
           </Typography>
         )}
@@ -92,7 +92,7 @@ class WalletNameSetting extends Component<Props & InjectedLayoutProps> {
             successfullyUpdated={!isSubmitting && lastUpdatedField === 'name' && !isInvalid}
             classicTheme={classicTheme}
           />
-          {error && <p className={styles.error}>{intl.formatMessage(error, error.values)}</p>}
+          {error && <div className={styles.error}>{intl.formatMessage(error, error.values)}</div>}
         </Box>
       </>
     );

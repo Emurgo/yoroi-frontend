@@ -63,7 +63,7 @@ export default class MemoNoExternalStorageDialog extends Component<Props> {
         onClose={onCancel}
       >
         <div className={styles.content}>
-          <p>{intl.formatMessage(messages.connectContent)}</p>
+          <div>{intl.formatMessage(messages.connectContent)}</div>
         </div>
       </Dialog>);
   }

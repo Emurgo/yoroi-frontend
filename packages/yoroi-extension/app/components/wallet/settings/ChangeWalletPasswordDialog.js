@@ -19,15 +19,15 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 const messages = defineMessages({
   dialogTitleChangePassword: {
     id: 'wallet.settings.changePassword.dialog.title.changePassword',
-    defaultMessage: '!!!Change spending password',
+    defaultMessage: '!!!Change password',
   },
   currentPasswordLabel: {
     id: 'wallet.settings.changePassword.dialog.currentPasswordLabel',
-    defaultMessage: '!!!Current spending password',
+    defaultMessage: '!!!Current password',
   },
   currentPasswordFieldPlaceholder: {
     id: 'wallet.settings.changePassword.dialog.currentPasswordFieldPlaceholder',
-    defaultMessage: '!!!Type current spending password',
+    defaultMessage: '!!!Type current password',
   },
 });
 
@@ -37,80 +37,91 @@ type Props = {|
     +newPasswordValue: void | string,
     +repeatedPasswordValue: void | string,
   |},
-  +onSave: {| oldPassword: string, newPassword: string |} => PossiblyAsync<void>,
+  +onSave: ({| oldPassword: string, newPassword: string |}) => PossiblyAsync<void>,
   +onCancel: void => void,
-  +onDataChange: { [key: string]: any, ... } => void,
+  +onDataChange: ({ [key: string]: any, ... }) => void,
   +onPasswordSwitchToggle: void => void,
   +isSubmitting: boolean,
   +error: ?LocalizableError,
-  +classicTheme: boolean,
+  +isClassicTheme: boolean,
+  +isRevampTheme: boolean,
 |};
 
 @observer
 export default class ChangeWalletPasswordDialog extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
-  form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
-    fields: {
-      currentPassword: {
-        type: 'password',
-        label: this.context.intl.formatMessage(messages.currentPasswordLabel),
-        placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(messages.currentPasswordFieldPlaceholder) : '',
-        value: this.props.dialogData.currentPasswordValue,
+  form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
+    {
+      fields: {
+        currentPassword: {
+          type: 'password',
+          label: this.context.intl.formatMessage(messages.currentPasswordLabel),
+          placeholder: this.props.isClassicTheme
+            ? this.context.intl.formatMessage(messages.currentPasswordFieldPlaceholder)
+            : '',
+          value: this.props.dialogData.currentPasswordValue,
+        },
+        walletPassword: {
+          type: 'password',
+          label: this.context.intl.formatMessage(globalMessages.newPasswordLabel),
+          placeholder: this.props.isClassicTheme
+            ? this.context.intl.formatMessage(globalMessages.newPasswordFieldPlaceholder)
+            : '',
+          value: this.props.dialogData.newPasswordValue,
+          validators: [
+            ({ field, form }) => {
+              const repeatPasswordField = form.$('repeatPassword');
+              if (repeatPasswordField.value.length > 0) {
+                repeatPasswordField.validate({ showErrors: true });
+              }
+              return [
+                isValidWalletPassword(field.value),
+                this.context.intl.formatMessage(globalMessages.invalidWalletPassword),
+              ];
+            },
+          ],
+        },
+        repeatPassword: {
+          type: 'password',
+          label: this.context.intl.formatMessage(globalMessages.repeatPasswordLabel),
+          placeholder: this.props.isClassicTheme
+            ? this.context.intl.formatMessage(globalMessages.repeatPasswordFieldPlaceholder)
+            : '',
+          value: this.props.dialogData.repeatedPasswordValue,
+          validators: [
+            ({ field, form }) => {
+              const walletPassword = form.$('walletPassword').value;
+              if (walletPassword.length === 0) return [true];
+              return [
+                isValidRepeatPassword(walletPassword, field.value),
+                this.context.intl.formatMessage(globalMessages.invalidRepeatPassword),
+              ];
+            },
+          ],
+        },
       },
-      walletPassword: {
-        type: 'password',
-        label: this.context.intl.formatMessage(globalMessages.newPasswordLabel),
-        placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(globalMessages.newPasswordFieldPlaceholder) : '',
-        value: this.props.dialogData.newPasswordValue,
-        validators: [({ field, form }) => {
-          const repeatPasswordField = form.$('repeatPassword');
-          if (repeatPasswordField.value.length > 0) {
-            repeatPasswordField.validate({ showErrors: true });
-          }
-          return [
-            isValidWalletPassword(field.value),
-            this.context.intl.formatMessage(globalMessages.invalidWalletPassword)
-          ];
-        }],
+    },
+    {
+      options: {
+        showErrorsOnInit:
+          Object.keys(this.props.dialogData)
+            .map(key => this.props.dialogData[key])
+            .filter(val => val !== '' && val != null).length > 0,
+        validateOnChange: true,
+        validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
       },
-      repeatPassword: {
-        type: 'password',
-        label: this.context.intl.formatMessage(globalMessages.repeatPasswordLabel),
-        placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(globalMessages.repeatPasswordFieldPlaceholder) : '',
-        value: this.props.dialogData.repeatedPasswordValue,
-        validators: [({ field, form }) => {
-          const walletPassword = form.$('walletPassword').value;
-          if (walletPassword.length === 0) return [true];
-          return [
-            isValidRepeatPassword(walletPassword, field.value),
-            this.context.intl.formatMessage(globalMessages.invalidRepeatPassword)
-          ];
-        }],
+      plugins: {
+        vjf: vjf(),
       },
     }
-  }, {
-    options: {
-      showErrorsOnInit: Object.keys(this.props.dialogData)
-        .map(key => this.props.dialogData[key])
-        .filter(val => val !== '' && val != null)
-        .length > 0,
-      validateOnChange: true,
-      validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
-    },
-    plugins: {
-      vjf: vjf()
-    },
-  });
+  );
 
-  submit: (() => void) = () => {
+  submit: () => void = () => {
     this.form.submit({
-      onSuccess: async (form) => {
+      onSuccess: async form => {
         const { currentPassword, walletPassword } = form.values();
         const passwordData = {
           oldPassword: currentPassword || null,
@@ -122,34 +133,24 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
     });
   };
 
-  handleDataChange: ((key: string, value: string) => void) = (key, value) => {
+  handleDataChange: (key: string, value: string) => void = (key, value) => {
     this.props.onDataChange({ [key]: value });
   };
 
   render(): Node {
     const { form } = this;
     const { intl } = this.context;
-    const {
-      onCancel,
-      isSubmitting,
-      dialogData,
-      error,
-      classicTheme,
-    } = this.props;
+    const { onCancel, isSubmitting, dialogData, error, isClassicTheme } = this.props;
 
     const dialogClasses = classnames(['changePasswordDialog', styles.dialog]);
 
-    const walletPasswordFieldsClasses = classnames([
-      styles.walletPasswordFields
-    ]);
+    const walletPasswordFieldsClasses = classnames([styles.walletPasswordFields]);
 
-    const confirmButtonClasses = classnames([
-      'confirmButton',
-    ]);
+    const confirmButtonClasses = classnames(['confirmButton']);
 
     const newPasswordClasses = classnames([
       'newPassword',
-      classicTheme ? styles.newPasswordClassic : '',
+      isClassicTheme ? styles.newPasswordClassic : '',
     ]);
 
     const currentPasswordField = form.$('currentPassword');
@@ -159,10 +160,9 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
     const newPassword = newPasswordField.value;
     const repeatedPassword = repeatedPasswordField.value;
 
-    const disabledCondition = isSubmitting || !(
-      isValidWalletPassword(newPassword)
-      && isValidRepeatPassword(newPassword, repeatedPassword)
-    );
+    const disabledCondition =
+      isSubmitting ||
+      !(isValidWalletPassword(newPassword) && isValidRepeatPassword(newPassword, repeatedPassword));
 
     const actions = [
       {
@@ -184,13 +184,12 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
         className={dialogClasses}
         closeButton={<DialogCloseButton onClose={onCancel} />}
       >
-
         <div className={styles.walletPassword}>
           <TextField
             type="password"
             className="currentPassword"
             value={dialogData.currentPasswordValue}
-            onChange={(value) => this.handleDataChange('currentPasswordValue', value)}
+            onChange={value => this.handleDataChange('currentPasswordValue', value)}
             {...currentPasswordField.bind()}
             error={currentPasswordField.error}
           />
@@ -201,7 +200,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
             type="password"
             className={newPasswordClasses}
             value={dialogData.newPasswordValue}
-            onChange={(value) => this.handleDataChange('newPasswordValue', value)}
+            onChange={value => this.handleDataChange('newPasswordValue', value)}
             {...newPasswordField.bind()}
             done={newPasswordField.isValid}
             error={newPasswordField.error}
@@ -211,24 +210,15 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
             type="password"
             className="repeatedPassword"
             value={dialogData.repeatedPasswordValue}
-            onChange={(value) => this.handleDataChange('repeatedPasswordValue', value)}
+            onChange={value => this.handleDataChange('repeatedPasswordValue', value)}
             {...repeatedPasswordField.bind()}
             done={repeatedPassword && repeatedPasswordField.isValid}
             error={repeatedPasswordField.error}
           />
         </div>
 
-        {error
-          ? (
-            <p className={styles.error}>
-              {intl.formatMessage(error, error.values)}
-            </p>
-          )
-          : null
-        }
-
+        {error ? <div className={styles.error}>{intl.formatMessage(error, error.values)}</div> : null}
       </Dialog>
     );
   }
-
 }

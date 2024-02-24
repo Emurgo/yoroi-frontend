@@ -54,7 +54,29 @@
           }
       });
     }
+
+    cip95 = Object.freeze({
     
+        getPubDRepKey: () => {
+            return CardanoAPI._cardano_rpc_call("get_drep_key", []);
+        },
+    
+        getRegisteredPubStakeKeys: () => {
+            return CardanoAPI._cardano_rpc_call("get_stake_key", [])
+                .then(({ key, isRegistered }) => isRegistered ? [key] : []);
+        },
+    
+        getUnregisteredPubStakeKeys: () => {
+            return CardanoAPI._cardano_rpc_call("get_stake_key", [])
+                .then(({ key, isRegistered }) => isRegistered ? [] : [key]);
+        },
+    
+        signData(address, payload) {
+          return CardanoAPI._cardano_rpc_call("cip95_sign_data", [address, payload]);
+        },
+
+    })
+
     experimental = Object.freeze({
     
       setReturnType: (returnType) => {
@@ -84,7 +106,11 @@
       },
       
     }) 
-    
+
+    getExtensions() {
+      return Promise.resolve([{ cip: 95 }]);
+    }
+
     getNetworkId() {
       return CardanoAPI._cardano_rpc_call("get_network_id", []);
     }

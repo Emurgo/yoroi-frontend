@@ -20,10 +20,6 @@ export function find721metadata(
     return null;
   }
   const metadata = metadataWrapper['721'];
-  if (metadata.version && metadata.version !== '1.0') {
-    return null;
-  }
-
   const assetName = Array.from(Buffer.from(assetNameHex, 'hex')).map(
     c => String.fromCharCode(c)
   ).join('');
@@ -62,7 +58,7 @@ export function find721metadata(
   }
   if (
     isArray(asset.files) &&
-      asset.files.every(({name, mediaType, src }) => (
+      asset.files.every(({ name, mediaType, src }) => (
         typeof name === 'string' &&
           typeof mediaType === 'string' &&
           (
@@ -82,15 +78,15 @@ export function find721metadata(
 
 export function getImageFromTokenMetadata(
   policyId: string,
-  name: string | void,
+  assetNameHEX: string | void,
   tokenMetadata: TokenMetadata,
 ): string | null {
-  if (tokenMetadata.type !== 'Cardano' || name == null) {
+  if (tokenMetadata.type !== 'Cardano' || assetNameHEX == null) {
     return null;
   }
   const nftMetadata = find721metadata(
     policyId,
-    name,
+    assetNameHEX,
     tokenMetadata.assetMintMetadata,
   );
 
@@ -156,8 +152,8 @@ export function getDescriptionFromTokenMetadata(
   if (typeof nftMetadata.description === 'string') {
     return nftMetadata.description;
   }
-  if (typeof nftMetadata.description?.[0] === 'string') {
-    return nftMetadata.description[0];
+  if (Array.isArray(nftMetadata.description)) {
+    return nftMetadata.description.join('');
   }
   return null;
 }

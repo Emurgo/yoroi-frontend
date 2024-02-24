@@ -1,31 +1,20 @@
 // @flow
 
-/* eslint react/jsx-one-expression-per-line: 0 */  // the &nbsp; in the html breaks this
+/* eslint react/jsx-one-expression-per-line: 0 */ // the &nbsp; in the html breaks this
 
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { Notification } from '../../../types/notificationType';
+import type { StandardAddress } from '../../../types/AddressFilterTypes';
+import type { Addressing } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { ComplexityLevelType } from '../../../types/complexityLevelType';
+import type { InjectedLayoutProps } from '../../../styles/context/layout';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
 import { toDerivationPathString } from '../../../api/common/lib/crypto/keys/path';
-
-import QrCodeWrapper from '../../widgets/QrCodeWrapper';
-import Dialog from '../../widgets/Dialog';
-import DialogCloseButton from '../../widgets/DialogCloseButton';
-import ErrorBlock from '../../widgets/ErrorBlock';
-import RawHash from '../../widgets/hashWrappers/RawHash';
-import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
-
-import LocalizableError from '../../../i18n/LocalizableError';
-import globalMessages from '../../../i18n/global-messages';
-import styles from './VerifyAddressDialog.scss';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { truncateAddress } from '../../../utils/formatters';
-import CopyableAddress from '../../widgets/CopyableAddress';
-import type { Notification } from '../../../types/notificationType';
-import type { StandardAddress, } from '../../../types/AddressFilterTypes';
-import type { Addressing } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { CoreAddressTypes } from '../../../api/ada/lib/storage/database/primitives/enums';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 import {
@@ -33,8 +22,19 @@ import {
   getCardanoSpendingKeyHash,
   normalizeToAddress,
 } from '../../../api/ada/lib/storage/bridge/utils';
-import type { ComplexityLevelType } from '../../../types/complexityLevelType';
 import { ComplexityLevels } from '../../../types/complexityLevelType';
+import { withLayout } from '../../../styles/context/layout';
+import classnames from 'classnames';
+import QrCodeWrapper from '../../widgets/QrCodeWrapper';
+import Dialog from '../../widgets/Dialog';
+import DialogCloseButton from '../../widgets/DialogCloseButton';
+import ErrorBlock from '../../widgets/ErrorBlock';
+import RawHash from '../../widgets/hashWrappers/RawHash';
+import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
+import LocalizableError from '../../../i18n/LocalizableError';
+import globalMessages from '../../../i18n/global-messages';
+import styles from './VerifyAddressDialog.scss';
+import CopyableAddress from '../../widgets/CopyableAddress';
 
 const messages = defineMessages({
   addressDetailsTitleLabel: {
@@ -62,29 +62,30 @@ type Props = {|
 |};
 
 @observer
-export default class VerifyAddressDialog extends Component<Props> {
-
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   getLabelStyle: void => string = () => {
-    return this.props.classicTheme ?
-      'SimpleFormField_label FormFieldOverridesClassic_label' :
-      styles.label;
-  }
+    return this.props.classicTheme
+      ? 'SimpleFormField_label FormFieldOverridesClassic_label'
+      : styles.label;
+  };
 
   render(): Node {
     const { intl } = this.context;
 
     const dialogActions = !this.props.isHardware
       ? []
-      : [{
-        label: intl.formatMessage(messages.verifyAddressButtonLabel),
-        primary: true,
-        isSubmitting: this.props.isActionProcessing,
-        onClick: this.props.verify,
-      }];
+      : [
+          {
+            label: intl.formatMessage(messages.verifyAddressButtonLabel),
+            primary: true,
+            isSubmitting: this.props.isActionProcessing,
+            onClick: this.props.verify,
+          },
+        ];
 
     return (
       <Dialog
@@ -101,8 +102,9 @@ export default class VerifyAddressDialog extends Component<Props> {
         {this.renderStakingKey()}
         {this.renderSpendingKey()}
         {this.renderPointer()}
-        { this.props.error ? (<ErrorBlock error={this.props.error} />) : null }
-      </Dialog>);
+        {this.props.error ? <ErrorBlock error={this.props.error} /> : null}
+      </Dialog>
+    );
   }
 
   renderAddressBlock: void => Node = () => {
@@ -117,9 +119,7 @@ export default class VerifyAddressDialog extends Component<Props> {
           <CopyableAddress
             hash={this.props.addressInfo.address}
             elementId={notificationId}
-            onCopyAddress={
-              () => this.props.onCopyAddressTooltip(notificationId)
-            }
+            onCopyAddress={() => this.props.onCopyAddressTooltip(notificationId)}
             notification={this.props.notification}
             placementTooltip="bottom-start"
           >
@@ -127,9 +127,10 @@ export default class VerifyAddressDialog extends Component<Props> {
               light={false}
               selectedExplorer={this.props.selectedExplorer}
               hash={this.props.addressInfo.address}
-              linkType={this.props.addressInfo.type === CoreAddressTypes.CARDANO_REWARD
-                ? 'stakeAddress'
-                : 'address'
+              linkType={
+                this.props.addressInfo.type === CoreAddressTypes.CARDANO_REWARD
+                  ? 'stakeAddress'
+                  : 'address'
               }
             >
               <RawHash light={false} className={styles.hash}>
@@ -141,27 +142,24 @@ export default class VerifyAddressDialog extends Component<Props> {
         <br />
       </>
     );
-  }
+  };
 
   renderQrCode: void => Node = () => {
     return (
       <>
         <div align="center">
-          <QrCodeWrapper
-            value={this.props.addressInfo.address}
-            size={152}
-          />
+          <QrCodeWrapper fgColor="black" value={this.props.addressInfo.address} size={152} />
         </div>
         <br />
         <br />
       </>
     );
-  }
+  };
 
   /** we always show the staking key
    *  because hardware wallets will display the staking key on the device
    */
-  renderStakingKey: (void) => Node = () => {
+  renderStakingKey: void => Node = () => {
     const { intl } = this.context;
     const { type: addrType, address } = this.props.addressInfo;
 
@@ -192,9 +190,9 @@ export default class VerifyAddressDialog extends Component<Props> {
         <br />
       </>
     );
-  }
+  };
 
-  renderSpendingKey: (void) => Node = () => {
+  renderSpendingKey: void => Node = () => {
     const { intl } = this.context;
 
     // this is useful for querying servers & debugging. Not so useful for the average user.
@@ -228,10 +226,10 @@ export default class VerifyAddressDialog extends Component<Props> {
         <br />
       </>
     );
-  }
+  };
 
   /** hardware wallets display the pointer information on the device */
-  renderPointer: (void) => Node = () => {
+  renderPointer: void => Node = () => {
     const { intl } = this.context;
 
     if (this.props.addressInfo.type !== CoreAddressTypes.CARDANO_PTR) {
@@ -244,7 +242,7 @@ export default class VerifyAddressDialog extends Component<Props> {
       )?.stake_pointer();
       if (wasmAddr == null) return null; // should never happen
 
-      return [wasmAddr.slot(), wasmAddr.tx_index(), wasmAddr.cert_index()]
+      return [wasmAddr.slot(), wasmAddr.tx_index(), wasmAddr.cert_index()];
     });
 
     if (addrInfo == null) return null; // should never happen
@@ -264,9 +262,9 @@ export default class VerifyAddressDialog extends Component<Props> {
         <br />
       </>
     );
-  }
+  };
 
-  renderPath: (void | $PropertyType<Addressing, 'addressing'>) => Node = (addressing) => {
+  renderPath: (void | $PropertyType<Addressing, 'addressing'>) => Node = addressing => {
     if (addressing == null) return null;
     const { intl } = this.context;
     const derivationClasses = classnames([styles.derivation]);
@@ -276,12 +274,12 @@ export default class VerifyAddressDialog extends Component<Props> {
           {intl.formatMessage(globalMessages.derivationPathLabel)}
         </span>
         <div className={derivationClasses}>
-          <div className={styles.hash}>
-            {toDerivationPathString(addressing.path)}
-          </div>
+          <div className={styles.hash}>{toDerivationPathString(addressing.path)}</div>
         </div>
         <br />
       </>
     );
-  }
+  };
 }
+
+export default (withLayout(VerifyAddressDialog): ComponentType<Props>);

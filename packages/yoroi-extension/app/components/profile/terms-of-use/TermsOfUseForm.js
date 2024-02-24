@@ -1,9 +1,9 @@
 // @flow
 import { Component } from 'react';
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import { LoadingButton } from '@mui/lab';
-import { Checkbox, FormControlLabel, } from '@mui/material';
+import { Box, Button, Checkbox, FormControlLabel, Typography } from '@mui/material';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './TermsOfUseForm.scss';
@@ -11,6 +11,9 @@ import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import ReactMarkdown from 'react-markdown';
 import tosStyles from './TermsOfUseText.scss';
+import { withLayout } from '../../../styles/context/layout';
+import type { InjectedLayoutProps } from '../../../styles/context/layout';
+import { ReactComponent as BackIcon } from '../../../assets/images/assets-page/backarrow.inline.svg';
 
 const messages = defineMessages({
   updateTitle: {
@@ -19,7 +22,8 @@ const messages = defineMessages({
   },
   updateText: {
     id: 'profile.termsOfUse.updateText',
-    defaultMessage: '!!!We have updated our Terms of Service Agreement and Privacy Policy to enhance your experience. Please review and accept them to keep enjoying Yoroi.',
+    defaultMessage:
+      '!!!We have updated our Terms of Service Agreement and Privacy Policy to enhance your experience. Please review and accept them to keep enjoying Yoroi.',
   },
 });
 
@@ -37,7 +41,7 @@ type State = {|
 |};
 
 @observer
-export default class TermsOfUseForm extends Component<Props, State> {
+class TermsOfUseForm extends Component<Props & InjectedLayoutProps, State> {
   static defaultProps: {| error: void |} = {
     error: undefined,
   };
@@ -55,7 +59,7 @@ export default class TermsOfUseForm extends Component<Props, State> {
     this.setState(prevState => ({ areTermsOfUseAccepted: !prevState.areTermsOfUseAccepted }));
   }
 
-  onClickTosLabel: (SyntheticEvent<HTMLElement>) => void  = (event) => {
+  onClickTosLabel: (SyntheticEvent<HTMLElement>) => void = event => {
     const target: Element = (event.target: any);
 
     if (target.tagName === 'A') {
@@ -66,26 +70,22 @@ export default class TermsOfUseForm extends Component<Props, State> {
     } else if (target.id === 'privacyLink') {
       this.setState({ showing: 'privacy' });
     }
-  }
+  };
 
   onClickBack: () => void = () => {
     this.setState({ showing: 'form' });
-  }
+  };
 
   renderForm(): Node {
     const { intl } = this.context;
-    const { isSubmitting, error } = this.props;
+    const { isSubmitting, error, renderLayoutComponent } = this.props;
     const { areTermsOfUseAccepted } = this.state;
 
-    return (
+    const classicLayout = (
       <div className={styles.component}>
         <div className={styles.centeredBox}>
-          <div className={styles.title}>
-            {intl.formatMessage(messages.updateTitle)}
-          </div>
-          <div className={styles.text}>
-            {intl.formatMessage(messages.updateText)}
-          </div>
+          <div className={styles.title}>{intl.formatMessage(messages.updateTitle)}</div>
+          <div className={styles.text}>{intl.formatMessage(messages.updateText)}</div>
 
           <div className={styles.agreement}>
             <FormControlLabel
@@ -117,15 +117,95 @@ export default class TermsOfUseForm extends Component<Props, State> {
             </LoadingButton>
           </div>
 
-          {error && <p className={styles.error}>{intl.formatMessage(error, error.values)}</p>}
+          {error && <div className={styles.error}>{intl.formatMessage(error, error.values)}</div>}
         </div>
       </div>
     );
+
+    const revampLayout = (
+      <Box mt="48px">
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            maxWidth: '536px',
+            textAlign: 'center',
+            gap: '24px',
+            mx: 'auto',
+          }}
+        >
+          <Typography component="div" variant="h5" fontWeight={500} maxWidth="350px">
+            {intl.formatMessage(messages.updateTitle)}
+          </Typography>
+          <Typography component="div" variant="body1" maxWidth="450px">
+            {intl.formatMessage(messages.updateText)}
+          </Typography>
+
+          <div className={styles.agreement}>
+            <FormControlLabel
+              onClick={this.onClickTosLabel}
+              label={
+                <Box
+                  sx={{
+                    '& span > span': {
+                      color: 'primary.600',
+                    },
+                  }}
+                >
+                  <FormattedHTMLMessage {...globalMessages.tosAgreement} />
+                </Box>
+              }
+              control={
+                <Checkbox
+                  checked={areTermsOfUseAccepted}
+                  onChange={this.toggleAcceptance.bind(this)}
+                />
+              }
+              sx={{ margin: '0px' }}
+            />
+          </div>
+
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <LoadingButton
+              variant="primary"
+              disabled={!areTermsOfUseAccepted}
+              onClick={this.props.onSubmit}
+              loading={isSubmitting}
+              sx={{
+                width: 'fit-content',
+                '&.MuiButton-sizeMedium': {
+                  padding: '13px 24px',
+                },
+              }}
+            >
+              {intl.formatMessage(globalMessages.continue)}
+            </LoadingButton>
+          </Box>
+
+          {error && <div className={styles.error}>{intl.formatMessage(error, error.values)}</div>}
+        </Box>
+      </Box>
+    );
+
+    return renderLayoutComponent({
+      CLASSIC: classicLayout,
+      REVAMP: revampLayout,
+    });
   }
 
   renderMarkdown(markdown: string): Node {
     const { intl } = this.context;
-    return (
+    const { renderLayoutComponent } = this.props;
+
+    const classicLayout = (
       <>
         <div className={styles.component}>
           <div className={styles.tosBox}>
@@ -141,6 +221,33 @@ export default class TermsOfUseForm extends Component<Props, State> {
         </div>
       </>
     );
+    const revampLayout = (
+      <>
+        <Box mt="48px" maxWidth="648px" mx="auto" pb="20px">
+          <div className={styles.tosBox}>
+            <div className={tosStyles.terms}>
+              <ReactMarkdown source={markdown} escapeHtml={false} />
+            </div>
+          </div>
+        </Box>
+        <Button
+          sx={{
+            color: 'grayscale.900',
+            position: 'absolute',
+            top: '24px',
+            left: '24px',
+          }}
+          startIcon={<BackIcon />}
+          onClick={this.onClickBack}
+        >
+          {intl.formatMessage(globalMessages.backButtonLabel)}
+        </Button>
+      </>
+    );
+    return renderLayoutComponent({
+      CLASSIC: classicLayout,
+      REVAMP: revampLayout,
+    });
   }
 
   render(): Node {
@@ -154,3 +261,5 @@ export default class TermsOfUseForm extends Component<Props, State> {
     return this.renderMarkdown(this.props.localizedPrivacyNotice);
   }
 }
+
+export default (withLayout(TermsOfUseForm): ComponentType<Props>);

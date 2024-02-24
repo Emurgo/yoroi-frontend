@@ -24,11 +24,13 @@ export default class AdaTransactionsStore extends Store<StoresMap, ActionsMap> {
     const txs: GetTransactionsResponse = await this.api.ada.refreshTransactions({
       ...request,
       getRecentTransactionHashes: stateFetcher.getRecentTransactionHashes,
-      getTransactionsByHashes: stateFetcher.getTransactionsByHashes, 
+      getTransactionsByHashes: stateFetcher.getTransactionsByHashes,
       checkAddressesInUse: stateFetcher.checkAddressesInUse,
       getBestBlock: stateFetcher.getBestBlock,
       getTokenInfo: stateFetcher.getTokenInfo,
-      getMultiAssetMetadata: stateFetcher.getMultiAssetMintMetadata
+      getMultiAssetMetadata: stateFetcher.getMultiAssetMintMetadata,
+      getMultiAssetSupply: stateFetcher.getMultiAssetSupply,
+      getTransactionHistory: stateFetcher.getTransactionsHistoryForAddresses,
     });
 
     return txs;
@@ -47,18 +49,11 @@ export default class AdaTransactionsStore extends Store<StoresMap, ActionsMap> {
     signRequest,
     txId,
   ) => {
-    const defaultNetworkId = publicDeriver.getParent().getNetworkInfo().NetworkId;
-    const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(
-      defaultNetworkId,
-    );
     const { usedUtxos, transaction } = await this.api.ada.createSubmittedTransactionData(
       publicDeriver,
       signRequest,
       txId,
-      defaultNetworkId,
-      defaultToken,
     );
-
     this.stores.transactions.recordSubmittedTransaction(
       publicDeriver,
       transaction,

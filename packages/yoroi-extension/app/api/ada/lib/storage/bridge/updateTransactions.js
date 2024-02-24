@@ -136,6 +136,11 @@ import type {
   MultiAssetMintMetadataFunc,
   GetRecentTransactionHashesFunc,
   GetTransactionsByHashesFunc,
+  MultiAssetSupplyFunc,
+  MultiAssetMintMetadataResponse,
+  MultiAssetSupplyResponse,
+  TxSummary,
+  HistoryFunc,
 } from '../../state-fetch/types';
 import {
   ShelleyCertificateTypes,
@@ -147,14 +152,11 @@ import type {
 import { addressToKind, } from './utils';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 import { Bech32Prefix } from '../../../../../config/stringConfig';
-import {
-  MultiToken,
-} from '../../../../common/lib/MultiToken';
 import type {
   DefaultTokenEntry,
 } from '../../../../common/lib/MultiToken';
 import { UtxoStorageApi } from '../models/utils';
-import { bytesToHex, hexToBytes } from '../../../../../coreUtils';
+import { bytesToHex, createFilterUniqueBy, hexToBytes } from '../../../../../coreUtils';
 
 type TxData = {|
   addressLookupMap: Map<number, string>,
@@ -164,15 +166,6 @@ type TxData = {|
     ...UserAnnotation,
   |}>,
 |};
-
-type TokensMintMetadata = {|
-...{[key: string]: TokenMintMetadata[]}
-|}
-
-type TokenMintMetadata = {|
-key: string,
-metadata: any
-|}
 
 async function rawGetAllTxIds(
   db: lf$Database,
@@ -268,6 +261,7 @@ export async function rawGetTransactions(
   ...UserAnnotation,
 |}>,
 |}> {
+  const { publicDeriver } = request;
   const {
     addresses,
     txIds,
@@ -281,7 +275,7 @@ export async function rawGetTransactions(
       GetDerivationSpecific: deps.GetDerivationSpecific,
       GetCertificates: deps.GetCertificates,
     },
-    { publicDeriver: request.publicDeriver },
+    { publicDeriver },
     derivationTables,
   );
   const blockMap = new Map<number, null | $ReadOnly<BlockRow>>();
@@ -295,7 +289,7 @@ export async function rawGetTransactions(
       txs: txs
         .map(txWithBlock => txWithBlock.Transaction)
         .filter(tx => tx.Type === TransactionType.CardanoByron),
-      networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+      networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
     }
   );
   const shelleyWithIOs = await deps.CardanoShelleyAssociateTxWithIOs.getIOsForTx(
@@ -304,7 +298,7 @@ export async function rawGetTransactions(
       txs: txs
         .map(txWithBlock => txWithBlock.Transaction)
         .filter(tx => tx.Type === TransactionType.CardanoShelley),
-      networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+      networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
     }
   );
   const txsWithIOs = [
@@ -341,7 +335,7 @@ export async function rawGetTransactions(
     }
   }
 
-  const defaultToken = request.publicDeriver.getParent().getDefaultToken();
+  const defaultToken = publicDeriver.getParent().getDefaultToken();
 
   const result = txsWithIOs.map((tx: CardanoByronTxIO | CardanoShelleyTxIO) => ({
     ...tx,
@@ -366,10 +360,10 @@ export async function rawGetTransactions(
         *    So that wouldn't be quite accurate either.
         *    Again, it's easier to say it's just whoever gets it
       */
-      ownImplicitInput: new MultiToken([], defaultToken),
+      ownImplicitInput: publicDeriver.getParent().getDefaultMultiToken(),
       ownImplicitOutput: (() => {
         if (tx.txType === TransactionType.CardanoShelley) {
-          const implicitOutputSum = new MultiToken([], defaultToken);
+          const implicitOutputSum = publicDeriver.getParent().getDefaultMultiToken();
           for (const cert of tx.certificates) {
             if (
               cert.certificate.Kind !==
@@ -416,7 +410,7 @@ export async function rawGetTransactions(
           }
           return implicitOutputSum;
         }
-        return new MultiToken([], defaultToken);
+        return publicDeriver.getParent().getDefaultMultiToken();
       })(),
       defaultToken,
     })
@@ -918,6 +912,7 @@ export async function updateUtxos(
   checkAddressesInUse: FilterFunc,
   getTokenInfo: TokenInfoFunc,
   getMultiAssetMintMetadata: MultiAssetMintMetadataFunc,
+  getMultiAssetSupply: MultiAssetSupplyFunc,
 ): Promise<void> {
   const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
   const derivationTables = withLevels == null
@@ -1023,13 +1018,14 @@ export async function updateUtxos(
         tokenIds,
         getTokenInfo,
         getMultiAssetMintMetadata,
+        getMultiAssetSupply,
         publicDeriver.getParent().getNetworkInfo(),
       )
     )
   );
 }
 
-type After = {|
+export type ReferenceTx = {|
   blockHash: string,
   txHash: ?string,
 |};
@@ -1038,12 +1034,15 @@ export async function updateTransactions(
   db: lf$Database,
   publicDeriver: IPublicDeriver<ConceptualWallet>,
   checkAddressesInUse: FilterFunc,
+  getTransactionHistory: HistoryFunc,
   getRecentTransactionHashes: GetRecentTransactionHashesFunc,
   getTransactionsByHashes: GetTransactionsByHashesFunc,
   getBestBlock: BestBlockFunc,
   getTokenInfo: TokenInfoFunc,
   getMultiAssetMetadata: MultiAssetMintMetadataFunc,
-  after?: ?After,
+  getMultiAssetSupply: MultiAssetSupplyFunc,
+  after?: ?ReferenceTx,
+  before?: ?ReferenceTx,
 ): Promise<TxData> {
   const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
   const derivationTables = withLevels == null
@@ -1110,13 +1109,16 @@ export async function updateTransactions(
           remainingDeps,
           publicDeriver,
           lastSyncInfo,
+          getTransactionHistory,
           getRecentTransactionHashes,
           getTransactionsByHashes,
           getBestBlock,
           derivationTables,
           getTokenInfo,
           getMultiAssetMetadata,
+          getMultiAssetSupply,
           after,
+          before,
         );
       }
     );
@@ -1376,13 +1378,16 @@ async function rawUpdateTransactions(
   |},
   publicDeriver: IPublicDeriver<>,
   lastSyncInfo: $ReadOnly<LastSyncInfoRow>,
+  getTransactionHistory: HistoryFunc,
   getRecentTransactionHashes: GetRecentTransactionHashesFunc,
   getTransactionsByHashes: GetTransactionsByHashesFunc,
   getBestBlock: BestBlockFunc,
   derivationTables: Map<number, string>,
   getTokenInfo: TokenInfoFunc,
   getMultiAssetMetadata: MultiAssetMintMetadataFunc,
-  after: ?After,
+  getMultiAssetSupply: MultiAssetSupplyFunc,
+  after: ?ReferenceTx,
+  before: ?ReferenceTx,
 ): Promise<TxData> {
   const network = publicDeriver.getParent().getNetworkInfo();
   // TODO: consider passing this function in as an argument instead of generating it here
@@ -1390,24 +1395,23 @@ async function rawUpdateTransactions(
     getCardanoHaskellBaseConfig(network)
   );
 
-  let untilBlock;
+  if (before != null && after != null) {
+    throw new Error('Only one of `before` or `after` should be used for a resync');
+  }
 
-  if (after) {
-    untilBlock = after.blockHash;
-  } else {
-    const bestBlock = await getBestBlock({
-      network,
-    });
-    untilBlock = bestBlock.hash;
+  const bestBlock = await getBestBlock({ network });
+  const untilBlock = before == null ? bestBlock.hash : before.blockHash;
+  const shouldUpdateLastSync = before == null;
 
+
+  if (shouldUpdateLastSync) {
     // update last sync
     const slotInRemote = (bestBlock.epoch == null || bestBlock.slot == null)
-          ? null
-          : toAbsoluteSlotNumber({
-            epoch: bestBlock.epoch,
-            slot: bestBlock.slot,
-          });
-
+      ? null
+      : toAbsoluteSlotNumber({
+        epoch: bestBlock.epoch,
+        slot: bestBlock.slot,
+      });
     await deps.ModifyLastSyncInfo.overrideLastSyncInfo(
       db, dbTx,
       {
@@ -1423,10 +1427,9 @@ async function rawUpdateTransactions(
   let txHashes;
 
   if (untilBlock != null) {
+
     // address syncing has been done by scanUtxos so no need to do it here again
-
-    //  get new txs from fetcher
-
+    // get new txs from fetcher
     // important: get addresses for our wallet AFTER scanning for new addresses
     const { txIds, addresses } = await rawGetAllTxIds(
       db, dbTx,
@@ -1442,57 +1445,44 @@ async function rawUpdateTransactions(
       derivationTables,
     );
 
-    const recentTxHashesResult = await getRecentTransactionHashes({
-      network,
-      addresses: toRequestAddresses(addresses),
-      before: {
-        blockHash: untilBlock,
-        txHash: after?.txHash,
-      },
-    });
-
-    // should use Object.values(recentTxHashesResult) but flow couldn't infer the type
-    txHashes = Object.keys(recentTxHashesResult).map(addr => recentTxHashesResult[addr])
-      .flatMap(txs => txs.map(tx => tx.txHash));
-
-    const allExistingTxHashes = new Set(
-      (await rawGetTransactions(
-        db, dbTx,
-        {
-          GetPathWithSpecific: deps.GetPathWithSpecific,
-          GetAddress: deps.GetAddress,
-          CardanoByronAssociateTxWithIOs: deps.CardanoByronAssociateTxWithIOs,
-          CardanoShelleyAssociateTxWithIOs: deps.CardanoShelleyAssociateTxWithIOs,
-          AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
-          AssociateTxWithAccountingIOs: deps.AssociateTxWithAccountingIOs,
-          GetTxAndBlock: deps.GetTxAndBlock,
-          GetDerivationSpecific: deps.GetDerivationSpecific,
-          GetCertificates: deps.GetCertificates,
-        },
-        {
-          publicDeriver,
-          getTxAndBlock: async (hashes) => await deps.GetTxAndBlock.byTime(
-            db, dbTx,
-            {
-              txIds: hashes,
-            }
-          )
-        },
-        derivationTables,
-      )).txs
-        // pending txs needs to be updated, so exclude them from existing
-        .filter(tx => tx.block != null)
-        .map(tx => tx.transaction.Hash)
-    );
-
-    const missingTxHashSet = new Set(txHashes.filter(hash => !allExistingTxHashes.has(hash)));
-
-    const txsFromNetwork = await getTransactionsByHashes(
-      {
+    let txsFromNetwork;
+    if (after != null) {
+      /*
+       * HEAD
+       */
+      txsFromNetwork = await getTransactionHistory({
         network,
-        txHashes: [...missingTxHashSet],
-      }
-    );
+        addresses: toRequestAddresses(addresses),
+        after: {
+          block: after.blockHash,
+          tx: after.txHash || undefined,
+        },
+        untilBlock,
+      });
+      txHashes = txsFromNetwork.map(tx => tx.hash);
+    } else {
+      /*
+       * TAIL
+       */
+      const recentTxHashesResult = await getRecentTransactionHashes({
+        network,
+        addresses: toRequestAddresses(addresses),
+        before: {
+          blockHash: untilBlock,
+          txHash: before?.txHash,
+        },
+      });
+      const summaries: Array<TxSummary> =
+        // $FlowFixMe[incompatible-cast]
+        (Object.values(recentTxHashesResult).flat(): Array<TxSummary>)
+          .filter(createFilterUniqueBy(x => x.txHash));
+      summaries.sort((a: TxSummary, b: TxSummary) => {
+        // DESC ordering (b < a)
+        return b.epoch - a.epoch || b.slot - a.slot;
+      });
+      txHashes = summaries.slice(0,20).map(x => x.txHash);
+      txsFromNetwork = await getTransactionsByHashes({ network, txHashes });
+    }
 
     const ourIds = new Set(
       Object.keys(addresses)
@@ -1536,7 +1526,8 @@ async function rawUpdateTransactions(
         toAbsoluteSlotNumber,
         derivationTables,
         getTokenInfo,
-        getMultiAssetMetadata
+        getMultiAssetMetadata,
+        getMultiAssetSupply,
       }
     );
   } else {
@@ -1617,6 +1608,7 @@ async function updateTransactionBatch(
     defaultToken: DefaultTokenEntry,
     getTokenInfo: TokenInfoFunc,
     getMultiAssetMetadata: MultiAssetMintMetadataFunc,
+    getMultiAssetSupply: MultiAssetSupplyFunc,
   |}
 ): Promise<Array<{|
   ...(CardanoByronTxIO | CardanoShelleyTxIO),
@@ -1734,7 +1726,8 @@ async function updateTransactionBatch(
     tokenIds,
     request.getTokenInfo,
     request.getMultiAssetMetadata,
-    request.network
+    request.getMultiAssetSupply,
+    request.network,
   );
 
   // 3) Add new transactions
@@ -1757,6 +1750,8 @@ async function updateTransactionBatch(
     genNextTokenListId,
   );
   const newsTxsIdSet = new Set();
+
+  // <TODO:PENDING_REMOVAL> Byron Legacy: this should be impossible now, we are not syncing history from pre-Shelley
   for (const newTx of byronTxs) {
     const result = await deps.ModifyCardanoByronTx.addTxWithIOs(
       db,
@@ -2125,33 +2120,36 @@ function genShelleyIOGen(
   };
 }
 
-export async function getTokenMintMetadata(
+export async function getTokenMintMetadataAndSupply(
   tokenIds: string[],
   getMultiAssetMetadata: MultiAssetMintMetadataFunc,
-  network: $ReadOnly<NetworkRow>)
-: Promise<$ReadOnly<TokensMintMetadata>> {
-  if (!tokenIds || tokenIds.length === 0) return {};
-
-  const nativeAssets = tokenIds
+  getMultiAssetSupply: MultiAssetSupplyFunc,
+  network: $ReadOnly<NetworkRow>
+) : Promise<[
+  $ReadOnly<MultiAssetMintMetadataResponse>,
+  $ReadOnly<MultiAssetSupplyResponse>,
+]> {
+  const assets = (tokenIds||[])
     .filter(t => t.indexOf('.') !== -1)
     .map(t => {
       const parts = t.split('.');
-      const assetName = parts[1];
       const policyId = parts[0];
+      const assetNameHex = parts[1];
       return {
-        nameHex: assetName,
-        policy: policyId
+        nameHex: assetNameHex,
+        policy: policyId,
       };
     });
 
-  if (!nativeAssets || nativeAssets.length === 0) return {};
+  if (assets.length === 0)
+    return [{}, {}];
 
-  const tokensMintMetadata = await getMultiAssetMetadata({
-    network,
-    assets: nativeAssets
-  });
+  const [tokensMintMetadata, tokensSupply] = await Promise.all([
+    getMultiAssetMetadata({ network, assets }),
+    getMultiAssetSupply({ network, assets }),
+  ]);
 
-  return tokensMintMetadata;
+  return [tokensMintMetadata, tokensSupply];
 };
 
 const TOKEN_INFO_CACHE_TIME = 1 * 60 * 60 * 1000;
@@ -2166,6 +2164,7 @@ export async function genCardanoAssetMap(
   tokenIds: Array<string>,
   getTokenInfo: TokenInfoFunc,
   getMultiAssetMetadata: MultiAssetMintMetadataFunc,
+  getMultiAssetSupply: MultiAssetSupplyFunc,
   network: $ReadOnly<NetworkRow>,
 ): Promise<Map<string, $ReadOnly<TokenRow>>> {
   const existingDbRows = (await deps.GetToken.fromIdentifier(
@@ -2197,16 +2196,27 @@ export async function genCardanoAssetMap(
 
   const updatingTokenIds = tokenIds.filter(token => !noNeedForUpdateTokens.has(token));
 
-  let tokenInfoResponse;
+  const tokenInfoPromise = getTokenInfo({
+    network,
+    tokenIds: updatingTokenIds.map(id => id.split('.').join(''))
+  });
+
+  const tokenMintMetadataAndSupplyPromise = getTokenMintMetadataAndSupply(
+    tokenIds,
+    getMultiAssetMetadata,
+    getMultiAssetSupply,
+    network,
+  );
+
+  let tokenInfoResponse = {};
+  let metadata = {};
+  let supply = {};
   try {
-    tokenInfoResponse = await getTokenInfo({
-      network,
-      tokenIds: updatingTokenIds.map(id => id.split('.').join(''))
-    });
-  } catch {
-    tokenInfoResponse = {};
+    [tokenInfoResponse, [metadata, supply]] =
+      await Promise.all([tokenInfoPromise, tokenMintMetadataAndSupplyPromise]);
+  } catch(e) {
+    console.error('Failed to query token info, metadata, or supply', e);
   }
-  const metadata = await getTokenMintMetadata(tokenIds, getMultiAssetMetadata, network);
 
   const databaseInsert = updatingTokenIds
     .map(tokenId => {
@@ -2247,18 +2257,16 @@ export async function genCardanoAssetMap(
       const assetName = Buffer.from(parts.name.name()).toString('hex');
       const policyId = Buffer.from(parts.policyId.to_bytes()).toString('hex');
 
-      const assetNameInMetadata = Buffer.from(assetName, 'hex').toString();
-      const identifierInMetadata = `${policyId}.${assetNameInMetadata}`;
-
-      const tokenMetadata = metadata[identifierInMetadata];
+      const tokenMetadata = metadata[tokenId];
+      const tokenSupplyStr = supply[tokenId];
 
       let isNft = false;
 
       let assetMintMetadata: CardanoAssetMintMetadata[] = [];
       if (tokenMetadata) {
-        if (tokenMetadata.filter(m => m.key === '721').length > 0) {
-          isNft = true;
-        }
+        const hasMediaMetadata = tokenMetadata.filter(m => m.key === '721').length > 0;
+        const hasOnlyOneUnit = tokenSupplyStr === '1';
+        isNft = hasMediaMetadata && hasOnlyOneUnit;
 
         assetMintMetadata = tokenMetadata.map(m => {
           const metaObj: CardanoAssetMintMetadata = {};
@@ -2365,6 +2373,7 @@ async function networkTxToDbTx(
     return id;
   };
 
+  // <TODO:PENDING_REMOVAL> Byron Legacy: this should be impossible now, we are not syncing history from pre-Shelley
   const byronTxs = [];
   const shelleyTxs = [];
 
@@ -2971,6 +2980,126 @@ async function certificateToDb(
             ...info,
             CertificateId: certId,
           }))
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.VoteDelegation: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.VoteDelegation,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.StakeVoteDelegation: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.StakeAndVoteDelegation,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.StakeRegistrationDelegation: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.StakeRegistrationAndDelegation,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.VoteRegistrationDelegation: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.VoteRegistrationAndDelegation,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.StakeVoteRegistrationDelegation: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.StakeVoteRegistrationAndDelegation,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.AuthCommitteeHot: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.CommitteeHotAuth,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.ResignCommitteeCold: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.CommitteeColdResign,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.RegisterDrep: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.DrepRegistration,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.UnregisterDrep: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.DrepDeregistration,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.UpdateDrep: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.DrepUpdate,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
         }));
         break;
       }

@@ -18,6 +18,10 @@ import {
 } from '../../api/ada/lib/storage/bridge/delegationUtils';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import { isResolvableDomain, resolverApiMaker } from '@yoroi/resolver';
+import { Api, Resolver } from '@yoroi/types';
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export async function filterMangledAddresses(request: {|
   publicDeriver: PublicDeriver<>,
@@ -54,7 +58,105 @@ export async function filterMangledAddresses(request: {|
   }));
 }
 
+export type DomainResolverResponseError = 'forbidden' | 'unexpected';
+
+export type DomainResolverResponse = {|
+  nameServer: string,
+  address: ?string,
+  error: ?DomainResolverResponseError,
+|};
+
+export type DomainResolverFunc = string => Promise<?DomainResolverResponse>;
+
+export function resolveAddressDomainNameServerName(nameServerTag: string): string {
+  switch (nameServerTag) {
+    case Resolver.NameServer.Handle: return 'ADA Handle'
+    case Resolver.NameServer.Cns: return 'Cardano Name Service (CNS)'
+    case Resolver.NameServer.Unstoppable: return 'Unstoppable Domains'
+    default: return nameServerTag
+  }
+}
+
 export default class AdaAddressesStore extends Store<StoresMap, ActionsMap> {
+
+  _domainResolverApi: ?{| getCardanoAddresses: ({| resolve: string |}) => Promise<any> |} = null;
+
+  setup(): void {
+    super.setup();
+    this._domainResolverApi = resolverApiMaker({
+      apiConfig: {
+        [Resolver.NameServer.Unstoppable]: {
+          apiKey: 'czsajliz-wxgu6tujd1zqq7hey_pclfqhdjsqolsxjfsurgh',
+        },
+      },
+      cslFactory: RustModule.CrossCsl.init,
+    });
+  }
+
+  domainResolverSupported(): boolean {
+    const selectedWallet = this.stores.wallets.selected;
+    if (selectedWallet == null) {
+      return true;
+    }
+    return selectedWallet.getParent().getNetworkInfo().NetworkId === networks.CardanoMainnet.NetworkId;
+  }
+
+  getSupportedAddressDomainBannerState(): boolean {
+    const selectedWallet = this.stores.wallets.selected;
+    if (selectedWallet == null) {
+      return true;
+    }
+    const id = String(selectedWallet.publicDeriverId);
+    return !this.api.localStorage.getFlag(`w${id}/SupportedAddressDomainBannerState/closed`);
+  }
+
+  setSupportedAddressDomainBannerState(isDisplayed: boolean): void {
+    const selectedWallet = this.stores.wallets.selected;
+    if (selectedWallet == null) {
+      return;
+    }
+    const id = String(selectedWallet.publicDeriverId);
+    this.api.localStorage.setFlag(`w${id}/SupportedAddressDomainBannerState/closed`, !isDisplayed);
+  }
+
+  async resolveDomainAddress(resolve: string): Promise<?DomainResolverResponse> {
+    const { getCardanoAddresses } = this._domainResolverApi ?? {};
+    if (getCardanoAddresses == null || !isResolvableDomain(resolve)) {
+      return Promise.resolve(null);
+    }
+    const res = await getCardanoAddresses({ resolve });
+    let resultForbidden: ?DomainResolverResponse = null;
+    let resultUnexpected: ?DomainResolverResponse = null;
+    for (const { nameServer, address, error } of res) {
+      const resolvedNameServer = resolveAddressDomainNameServerName(nameServer);
+      if (address != null) {
+        // Return success right away
+        const resultSuccess: DomainResolverResponse =
+          { nameServer: resolvedNameServer, address, error: null };
+        return Promise.resolve(resultSuccess);
+      }
+      /* Non-success results are stored but not returned yet
+       * in case next iterations might have success
+       */
+      if (
+        error instanceof Resolver.Errors.InvalidDomain
+        || error instanceof Resolver.Errors.UnsupportedTld
+        || error instanceof Resolver.Errors.NotFound
+      ) {
+        // ignore
+      } else if (error instanceof Api.Errors.Forbidden) {
+        if (resultForbidden == null) {
+          resultForbidden = { nameServer: resolvedNameServer, error: 'forbidden', address: null };
+        }
+      } else {
+        if (resultUnexpected == null) {
+          resultUnexpected = { nameServer: resolvedNameServer, error: 'unexpected', address: null };
+        }
+        console.error(`Error resolving domain address @ ${nameServer} (${error?.constructor?.name})`, error)
+      }
+    }
+    return Promise.resolve(resultForbidden ?? resultUnexpected ?? null);
+  }
 
   storewiseFilter: {|
     publicDeriver: PublicDeriver<>,

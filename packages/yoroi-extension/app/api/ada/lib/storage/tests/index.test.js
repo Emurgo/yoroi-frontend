@@ -58,6 +58,7 @@ beforeAll(async () => {
   await RustModule.load();
 });
 
+// <TODO:PENDING_REMOVAL> bip44, test needs to be updated
 test('Can add and fetch address in wallet', async (done) => {
   const network =  networks.CardanoMainnet;
 

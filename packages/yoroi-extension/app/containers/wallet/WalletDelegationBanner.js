@@ -105,10 +105,10 @@ function WalletDelegationBanner({
         <StakingIllustration height="300px" />
       </Box>
       <Box>
-        <Typography variant="h3" fontWeight={500} color="comon.black" marginBottom="4px">
+        <Typography component="div" variant="h3" fontWeight={500} color="comon.black" marginBottom="4px">
           {intl.formatMessage(emptyDashboardMessages.title, { ticker })}
         </Typography>
-        <Typography variant="body1" color="common.black">
+        <Typography component="div" variant="body1" color="common.black">
           {intl.formatMessage(messages.delegateNow)}
         </Typography>
         <Box sx={{ display: 'flex', mb: '16px', mt: '24px' }}>
@@ -119,7 +119,7 @@ function WalletDelegationBanner({
               <AvatarImg src={avatarGenerated} alt={name} />
             )}
           </AvatarWrapper>
-          <Typography color="common.black" variant="body1" fontWeight={500}>
+          <Typography component="div" color="common.black" variant="body1" fontWeight={500}>
             {name}
           </Typography>
         </Box>
@@ -133,7 +133,7 @@ function WalletDelegationBanner({
         >
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Typography variant="body1" fontWeight={500} color="common.black">
+              <Typography component="div" variant="body1" fontWeight={500} color="common.black">
                 {intl.formatMessage(globalMessages.roa30d)}
               </Typography>
               <HelperTooltip
@@ -141,13 +141,13 @@ function WalletDelegationBanner({
                 placement="top"
               />
             </Box>
-            <Typography variant="body1" color="common.black">
+            <Typography component="div" variant="body1" color="common.black">
               {estimatedRoa30d}
             </Typography>
           </Box>
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Typography variant="body1" fontWeight={500} color="common.black">
+              <Typography component="div" variant="body1" fontWeight={500} color="common.black">
                 {intl.formatMessage(messages.firstReward)}
               </Typography>
               <HelperTooltip
@@ -155,12 +155,12 @@ function WalletDelegationBanner({
                 placement="top"
               />
             </Box>
-            <Typography variant="body1" color="common.black">
+            <Typography component="div" variant="body1" color="common.black">
               {intl.formatMessage(messages.firstRewardDetails)}
             </Typography>
           </Box>
           <Box>
-            <Typography variant="body1" fontWeight={500} color="common.black">
+            <Typography component="div" variant="body1" fontWeight={500} color="common.black">
               {intl.formatMessage(messages.socialMedia)}
             </Typography>
             <SocialMediaStakePool
@@ -174,8 +174,12 @@ function WalletDelegationBanner({
           <Link
             as={Button}
             variant="secondary"
-            sx={{ textDecoration: 'none' }}
-            size="small"
+            sx={{
+              textDecoration: 'none',
+              '&.MuiButton-sizeMedium': {
+                padding: '9px 20px',
+              },
+            }}
             href="https://emurgohelpdesk.zendesk.com/hc/en-us/articles/4412946533903-What-is-delegation-Is-it-the-same-as-staking-"
             target="_blank"
             rel="noreferrer noopener"
@@ -184,13 +188,16 @@ function WalletDelegationBanner({
           </Link>
           <Button
             variant="primary"
-            size="small"
-            // onClick={() => onDelegateClick(id)}
+            sx={{
+              '&.MuiButton-sizeMedium': {
+                padding: '9px 20px',
+              },
+            }}
             onClick={() =>
               onDelegateClick(
-                isTestnet
-                  ? '7facad662e180ce45e5c504957cd1341940c72a708728f7ecfc6e349' // Testnet pool: https://preprod.cardanoscan.io/pool/7facad662e180ce45e5c504957cd1341940c72a708728f7ecfc6e349
-                  : id
+                // Testnet pool:
+                // https://preprod.cardanoscan.io/pool/7facad662e180ce45e5c504957cd1341940c72a708728f7ecfc6e349
+                isTestnet ? '7facad662e180ce45e5c504957cd1341940c72a708728f7ecfc6e349' : id
               )
             }
             disabled={isWalletWithNoFunds}

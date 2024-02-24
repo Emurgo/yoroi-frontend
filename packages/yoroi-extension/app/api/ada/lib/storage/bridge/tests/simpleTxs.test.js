@@ -24,7 +24,7 @@ import {
   genGetMultiAssetMetadata,
   MockUtxoApi,
   genGetRecentTransactionHashes,
-  genGetTransactionsByHashes,
+  genGetTransactionsByHashes, genGetMultiAssetSupply, genGetTransactionsHistoryForAddresses,
 } from '../../../state-fetch/mockNetwork';
 import {
   HARD_DERIVATION_START,
@@ -317,6 +317,8 @@ async function syncingSimpleTransaction(
   const getBestBlock = genGetBestBlock(txHistory);
   const getTokenInfo = genGetTokenInfo();
   const getMultiAssetMetadata = genGetMultiAssetMetadata();
+  const getMultiAssetSupply = genGetMultiAssetSupply();
+  const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(txHistory, network);
   const getRecentTransactionHashes = genGetRecentTransactionHashes(txHistory);
   const getTransactionsByHashes = genGetTransactionsByHashes(txHistory);
 
@@ -341,16 +343,19 @@ async function syncingSimpleTransaction(
       checkAddressesInUse,
       getTokenInfo,
       getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
     await updateTransactions(
       db,
       basePubDeriver,
       checkAddressesInUse,
+      getTransactionsHistoryForAddresses,
       getRecentTransactionHashes,
       getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
-      getMultiAssetMetadata
+      getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
 
     {
@@ -445,16 +450,19 @@ async function syncingSimpleTransaction(
       checkAddressesInUse,
       getTokenInfo,
       getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
     await updateTransactions(
       db,
       basePubDeriver,
       checkAddressesInUse,
+      getTransactionsHistoryForAddresses,
       getRecentTransactionHashes,
       getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
-      getMultiAssetMetadata
+      getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
 
     const dbDump2 = (await db.export()).tables;
@@ -582,16 +590,19 @@ async function syncingSimpleTransaction(
       checkAddressesInUse,
       getTokenInfo,
       getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
     await updateTransactions(
       db,
       basePubDeriver,
       checkAddressesInUse,
+      getTransactionsHistoryForAddresses,
       getRecentTransactionHashes,
       getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
-      getMultiAssetMetadata
+      getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
 
     {
@@ -631,16 +642,19 @@ async function syncingSimpleTransaction(
       checkAddressesInUse,
       getTokenInfo,
       getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
     await updateTransactions(
       db,
       basePubDeriver,
       checkAddressesInUse,
+      getTransactionsHistoryForAddresses,
       getRecentTransactionHashes,
       getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
-      getMultiAssetMetadata
+      getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
 
     {
@@ -670,16 +684,19 @@ async function syncingSimpleTransaction(
       checkAddressesInUse,
       getTokenInfo,
       getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
     await updateTransactions(
       db,
       basePubDeriver,
       checkAddressesInUse,
+      getTransactionsHistoryForAddresses,
       getRecentTransactionHashes,
       getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
-      getMultiAssetMetadata
+      getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
 
     {
@@ -719,16 +736,19 @@ async function syncingSimpleTransaction(
       checkAddressesInUse,
       getTokenInfo,
       getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
     await updateTransactions(
       db,
       basePubDeriver,
       checkAddressesInUse,
+      getTransactionsHistoryForAddresses,
       getRecentTransactionHashes,
       getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
-      getMultiAssetMetadata
+      getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
 
     {
@@ -795,6 +815,8 @@ async function utxoCreatedAndUsed(
   const getBestBlock = genGetBestBlock(txHistory);
   const getTokenInfo = genGetTokenInfo();
   const getMultiAssetMetadata = genGetMultiAssetMetadata();
+  const getMultiAssetSupply = genGetMultiAssetSupply();
+  const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(txHistory, network);
   const getRecentTransactionHashes = genGetRecentTransactionHashes(txHistory);
   const getTransactionsByHashes = genGetTransactionsByHashes(txHistory);
 
@@ -821,16 +843,19 @@ async function utxoCreatedAndUsed(
       checkAddressesInUse,
       getTokenInfo,
       getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
     await updateTransactions(
       db,
       basePubDeriver,
       checkAddressesInUse,
+      getTransactionsHistoryForAddresses,
       getRecentTransactionHashes,
       getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
-      getMultiAssetMetadata
+      getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
 
     {

@@ -16,7 +16,6 @@ import VerticallyCenteredLayout from '../../../layout/VerticallyCenteredLayout';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import { ReactComponent as InvalidURIImg } from '../../../../assets/images/uri/invalid-uri.inline.svg';
 import ErrorBlock from '../../../widgets/ErrorBlock';
-import type { CertificateForKey } from '../../../../api/ada/lib/storage/database/primitives/api/read';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Skeleton, Typography } from '@mui/material';
 
@@ -75,7 +74,7 @@ type Props = {|
     +numPages: number,
     +goToPage: number => void,
   |},
-  +delegationHistory: ?Array<CertificateForKey>,
+  +isUnregistered: boolean,
   +epochLength: ?number,
   +ticker: string,
 |};
@@ -87,7 +86,7 @@ export default class StakingDashboard extends Component<Props> {
   };
 
   render(): Node {
-    const { graphData } = this.props;
+    const { graphData, isUnregistered } = this.props;
 
     const pendingTxWarningComponent = this.props.hasAnyPending ? (
       <div className={styles.warningBox}>
@@ -95,11 +94,7 @@ export default class StakingDashboard extends Component<Props> {
       </div>
     ) : null;
 
-    // don't show anything when user has never delegated
-    const hideGraph =
-      this.props.delegationHistory != null && this.props.delegationHistory.length === 0;
-
-    const graphs = hideGraph ? null : (
+    const graphs = isUnregistered ? null : (
       <div className={styles.graphsWrapper}>
         {this._displayGraph(graphData.rewardsGraphData)}
         {/* <GraphWrapper
@@ -126,7 +121,7 @@ export default class StakingDashboard extends Component<Props> {
           </div>
           <div className={styles.bodyWrapper}>
             {graphs}
-            {this.displayStakePools(hideGraph)}
+            {this.displayStakePools(isUnregistered)}
           </div>
         </div>
       </div>
@@ -170,10 +165,10 @@ export default class StakingDashboard extends Component<Props> {
     );
   };
 
-  displayStakePools: boolean => Node = hideGraph => {
+  displayStakePools: boolean => Node = isUnregistered => {
     const width = classnames([
       // if they've delegated before we need to make space for the chart
-      !hideGraph ? styles.stakePoolMaxWidth : null,
+      !isUnregistered ? styles.stakePoolMaxWidth : null,
       styles.stakePool,
     ]);
     const { intl } = this.context;
@@ -195,7 +190,7 @@ export default class StakingDashboard extends Component<Props> {
     ) {
       return (
         <div className={width}>
-          <Typography fontWeight="500" fontSize="18px" lineHeight="22px" marginBottom="16px">
+          <Typography component="div" fontWeight="500" fontSize="18px" lineHeight="22px" marginBottom="16px">
             {intl.formatMessage(messages.title)}
           </Typography>
           <Skeleton
@@ -212,13 +207,13 @@ export default class StakingDashboard extends Component<Props> {
       );
     }
     const currPool = this.props.pageInfo.currentPage;
-    if (this.props.stakePools.pools.length === 0) {
+    if (this.props.stakePools.pools.length === 0 || isUnregistered) {
       return (
         <div className={width}>
           <InformativeError
             title={intl.formatMessage(emptyDashboardMessages.title, { ticker: this.props.ticker })}
             text={
-              !hideGraph
+              !isUnregistered
                 ? // no need to explain to user how to delegate their ADA if they've done it before
                   null
                 : intl.formatMessage(emptyDashboardMessages.text)

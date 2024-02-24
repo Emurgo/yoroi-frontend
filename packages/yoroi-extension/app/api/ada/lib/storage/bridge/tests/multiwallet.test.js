@@ -30,7 +30,7 @@ import {
   genGetMultiAssetMetadata,
   MockUtxoApi,
   genGetRecentTransactionHashes,
-  genGetTransactionsByHashes,
+  genGetTransactionsByHashes, genGetMultiAssetSupply, genGetTransactionsHistoryForAddresses,
 } from '../../../state-fetch/mockNetwork';
 import { loadLovefieldDB } from '../../database/index';
 
@@ -400,6 +400,8 @@ async function syncingSimpleTransaction(
   const getBestBlock = genGetBestBlock(txHistory);
   const getTokenInfo = genGetTokenInfo();
   const getMultiAssetMetadata = genGetMultiAssetMetadata();
+  const getMultiAssetSupply = genGetMultiAssetSupply();
+  const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(txHistory, network);
   const getRecentTransactionHashes = genGetRecentTransactionHashes(txHistory);
   const getTransactionsByHashes = genGetTransactionsByHashes(txHistory);
 
@@ -421,17 +423,20 @@ async function syncingSimpleTransaction(
       withUtxos1,
       checkAddressesInUse,
       getTokenInfo,
-      getMultiAssetMetadata
+      getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
     await updateTransactions(
       db,
       withUtxos1,
       checkAddressesInUse,
+      getTransactionsHistoryForAddresses,
       getRecentTransactionHashes,
       getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
-      getMultiAssetMetadata
+      getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
     await checkPub1HasTx(purposeForTest, publicDeriver1);
 
@@ -469,17 +474,20 @@ async function syncingSimpleTransaction(
       withUtxos2,
       checkAddressesInUse,
       getTokenInfo,
-      getMultiAssetMetadata
+      getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
     await updateTransactions(
       db,
       withUtxos2,
       checkAddressesInUse,
+      getTransactionsHistoryForAddresses,
       getRecentTransactionHashes,
       getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
-      getMultiAssetMetadata
+      getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
     await checkPub2HasTx(purposeForTest, publicDeriver2);
     {
@@ -504,17 +512,20 @@ async function syncingSimpleTransaction(
       withUtxos2,
       checkAddressesInUse,
       getTokenInfo,
-      getMultiAssetMetadata
+      getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
     await updateTransactions(
       db,
       withUtxos2,
       checkAddressesInUse,
+      getTransactionsHistoryForAddresses,
       getRecentTransactionHashes,
       getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
-      getMultiAssetMetadata
+      getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
     await checkPub2IsEmpty(publicDeriver2);
     {
@@ -556,17 +567,20 @@ async function syncingSimpleTransaction(
       withUtxos2,
       checkAddressesInUse,
       getTokenInfo,
-      getMultiAssetMetadata
+      getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
     await updateTransactions(
       db,
       withUtxos2,
       checkAddressesInUse,
+      getTransactionsHistoryForAddresses,
       getRecentTransactionHashes,
       getTransactionsByHashes,
       getBestBlock,
       getTokenInfo,
-      getMultiAssetMetadata
+      getMultiAssetMetadata,
+      getMultiAssetSupply,
     );
 
     await checkPub2HasTx(purposeForTest, publicDeriver2);

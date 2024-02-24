@@ -297,9 +297,6 @@ export default class TransactionRevamp extends Component<Props, State> {
       );
     }
 
-    const amount = this.renderAmountDisplay({ entry: request.entry, getRawNumber: true });
-    const isPositiveNumber = typeof amount === 'string' ? amount.charAt(0) === '+' : false; // eslint-disable-line
-
     return (
       <Typography variant="body1" fontWeight={500} color="grayscale.900">
         {this.renderAmountDisplay({ entry: request.entry })} {this.getTicker(request.entry)}
@@ -610,7 +607,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                 justifyContent: 'flex-end',
               }}
             >
-              <Typography variant="body1" color="grayscale.900" id="txFee">
+              <Typography component="div" variant="body1" color="grayscale.900" id="txFee">
                 {this.renderFeeDisplay({
                   amount: data.fee,
                   type: data.type,
@@ -632,6 +629,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                 textAlign="right"
               >
                 <Typography
+                  component="div"
                   variant="body1"
                   fontWeight="500"
                   color="grayscale.900"
@@ -643,7 +641,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                     timestamp: data.date.valueOf(),
                   })}
                 </Typography>
-                <Typography>
+                <Typography component="div">
                   {this.renderAssets({ assets: data.amount.nonDefaultEntries() })}
                 </Typography>
               </Box>
@@ -910,6 +908,26 @@ export default class TransactionRevamp extends Component<Props, State> {
           return intl.formatMessage(shelleyCertificateKinds.GenesisKeyDelegation);
         case Scope.WalletV4.CertificateKind.MoveInstantaneousRewardsCert:
           return intl.formatMessage(shelleyCertificateKinds.MoveInstantaneousRewardsCert);
+        case Scope.WalletV4.CertificateKind.VoteDelegation:
+          return intl.formatMessage(shelleyCertificateKinds.VoteDelegation);
+        case Scope.WalletV4.CertificateKind.StakeAndVoteDelegation:
+          return intl.formatMessage(shelleyCertificateKinds.StakeAndVoteDelegation);
+        case Scope.WalletV4.CertificateKind.StakeRegistrationAndDelegation:
+          return intl.formatMessage(shelleyCertificateKinds.StakeRegistrationAndDelegation);
+        case Scope.WalletV4.CertificateKind.VoteRegistrationAndDelegation:
+          return intl.formatMessage(shelleyCertificateKinds.VoteRegistrationAndDelegation);
+        case Scope.WalletV4.CertificateKind.StakeVoteRegistrationAndDelegation:
+          return intl.formatMessage(shelleyCertificateKinds.StakeVoteRegistrationAndDelegation);
+        case Scope.WalletV4.CertificateKind.CommitteeHotAuth:
+          return intl.formatMessage(shelleyCertificateKinds.CommitteeHotAuth);
+        case Scope.WalletV4.CertificateKind.CommitteeColdResign:
+          return intl.formatMessage(shelleyCertificateKinds.CommitteeColdResign);
+        case Scope.WalletV4.CertificateKind.DrepRegistration:
+          return intl.formatMessage(shelleyCertificateKinds.DrepRegistration);
+        case Scope.WalletV4.CertificateKind.DrepDeregistration:
+          return intl.formatMessage(shelleyCertificateKinds.DrepDeregistration);
+        case Scope.WalletV4.CertificateKind.DrepUpdate:
+          return intl.formatMessage(shelleyCertificateKinds.DrepUpdate);
         default: {
           throw new Error(`${nameof(this.shelleyCertificateToText)} unexpected kind ${kind}`);
         }
@@ -956,6 +974,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                 data,
                 address,
                 addressIndex,
+                transform: amount => amount.abs().negated(),
               });
             })}
           </div>

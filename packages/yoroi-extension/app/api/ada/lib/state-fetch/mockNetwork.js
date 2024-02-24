@@ -2,20 +2,35 @@
 
 import BigNumber from 'bignumber.js';
 import type {
-  HistoryRequest, HistoryResponse, HistoryFunc,
-  BestBlockRequest, BestBlockResponse, BestBlockFunc,
-  AddressUtxoRequest, AddressUtxoResponse, AddressUtxoFunc,
-  UtxoSumRequest, UtxoSumResponse, UtxoSumFunc,
+  HistoryRequest,
+  HistoryResponse,
+  HistoryFunc,
+  BestBlockRequest,
+  BestBlockResponse,
+  BestBlockFunc,
+  AddressUtxoRequest,
+  AddressUtxoResponse,
+  AddressUtxoFunc,
   RewardHistoryFunc,
-  AccountStateRequest, AccountStateResponse, AccountStateFunc,
-  PoolInfoRequest, PoolInfoResponse, PoolInfoFunc,
-  RemoteTransaction, RemoteUnspentOutput,
+  AccountStateRequest,
+  AccountStateResponse,
+  AccountStateFunc,
+  PoolInfoRequest,
+  PoolInfoResponse,
+  PoolInfoFunc,
+  RemoteTransaction,
+  RemoteUnspentOutput,
   SignedRequestInternal,
   RemoteTransactionInput,
   TokenInfoFunc,
   MultiAssetMintMetadataFunc,
-  GetTransactionsByHashesRequest, GetTransactionsByHashesResponse, GetTransactionsByHashesFunc,
-  GetRecentTransactionHashesRequest, GetRecentTransactionHashesResponse, GetRecentTransactionHashesFunc,
+  GetTransactionsByHashesRequest,
+  GetTransactionsByHashesResponse,
+  GetTransactionsByHashesFunc,
+  GetRecentTransactionHashesRequest,
+  GetRecentTransactionHashesResponse,
+  GetRecentTransactionHashesFunc,
+  MultiAssetSupplyFunc,
 } from './types';
 import type {
   FilterUsedRequest, FilterUsedResponse, FilterFunc,
@@ -50,6 +65,7 @@ import type {
   UtxoDiffSincePointRequest
 } from '@emurgo/yoroi-lib/dist/utxo/models';
 import { UtxoApiResult, } from '@emurgo/yoroi-lib/dist/utxo/models';
+import { ShelleyCertificateTypes } from './types';
 
 function byronAddressToHex(byronAddrOrHex: string): string {
   if (RustModule.WalletV4.ByronAddress.is_valid(byronAddrOrHex)) {
@@ -352,44 +368,6 @@ export function genUtxoForAddresses(
   };
 }
 
-export function genUtxoSumForAddresses(
-  getAddressUtxo: AddressUtxoFunc,
-): UtxoSumFunc {
-  return async (
-    body: UtxoSumRequest,
-  ): Promise<UtxoSumResponse> => {
-    const utxos = await getAddressUtxo(body);
-    if (utxos.length === 0) {
-      return {
-        sum: null,
-        assets: [],
-      };
-    }
-    // sum all chunks together
-    let sum: BigNumber = new BigNumber(0);
-    const assetMap = new Map<string, ReadonlyElementOf<$PropertyType<UtxoSumResponse, 'assets'>>>();
-    for (const partial of utxos) {
-      sum = sum.plus(new BigNumber(partial.amount));
-      for (const asset of partial.assets) {
-        const currentVal = assetMap.get(asset.assetId)?.amount ?? new BigNumber(0);
-        assetMap.set(
-          asset.assetId,
-          {
-            ...asset,
-            amount: new BigNumber(currentVal).plus(asset.amount).toString(),
-          },
-        );
-      }
-    }
-    return {
-      sum: sum.toString(),
-      assets: Array.from(assetMap.entries()).map(entry => ({
-        ...entry[1],
-      })),
-    };
-  };
-}
-
 export function getSingleAddressString(
   mnemonic: string,
   path: Array<number>,
@@ -653,6 +631,7 @@ export function genGetAccountState(
 
     const addressSet = new Set(body.addresses);
     // 2) calculate the withdrawal for each address
+    const delegations = {};
     for (const tx of blockchain) {
       if (tx.type !== 'shelley') continue;
       for (const withdrawal of tx.withdrawals) {
@@ -663,6 +642,11 @@ export function genGetAccountState(
           };
 
           currVal.withdrawals = currVal.withdrawals.plus(withdrawal.amount);
+        }
+      }
+      for (const cert of tx.certificates) {
+        if (cert.kind === ShelleyCertificateTypes.StakeDelegation) {
+          delegations[cert.rewardAddress] = cert.poolKeyHash;
         }
       }
     }
@@ -680,6 +664,8 @@ export function genGetAccountState(
         remainingAmount: stateForAddr.rewards.minus(stateForAddr.withdrawals).toString(),
         rewards: stateForAddr.rewards.toString(),
         withdrawals: stateForAddr.withdrawals.toString(),
+        delegation: delegations[address] ?? null,
+        stakeRegistered: true,
       };
     }
     return result;
@@ -721,6 +707,10 @@ export function genGetMultiAssetMetadata(
   return async (_) => ({});
 }
 
+export function genGetMultiAssetSupply(
+): MultiAssetSupplyFunc {
+  return async (_) => ({});
+}
 
 export class MockUtxoApi implements UtxoApiContract {
   blockchain: Array<RemoteTransaction>;

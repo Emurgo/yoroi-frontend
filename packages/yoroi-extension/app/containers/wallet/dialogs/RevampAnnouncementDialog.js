@@ -83,15 +83,8 @@ export class RevampAnnouncementDialog extends Component<Props> {
         closeButton={<DialogCloseButton onClose={onClose} />}
         actions={actions}
       >
-        <Box
-          sx={{
-            py: '24px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '24px',
-          }}
-        >
-          <Typography
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '24px' }} id="dialogRevampBox">
+          <Typography component="div"
             variant="body1"
             sx={{
               textAlign: 'center',
@@ -103,7 +96,7 @@ export class RevampAnnouncementDialog extends Component<Props> {
 
           <NewThemeIllustration />
           <Stack gap="16px">
-            <Typography color="grayscale.900" variant="body1" fontWeight={500}>
+            <Typography component="div" color="grayscale.900" variant="body1" fontWeight={500}>
               {intl.formatMessage(messages.updatesSectionTitle)}
             </Typography>
 
