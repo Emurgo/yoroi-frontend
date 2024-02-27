@@ -75,7 +75,6 @@ module.exports = function (api /*: ApiType */) /*: * */ {
       '@babel/plugin-proposal-export-namespace-from',
     ],
     env: {
-      cucumber: nodePlugins,
       test: nodePlugins,
       jest: nodePlugins,
     }
