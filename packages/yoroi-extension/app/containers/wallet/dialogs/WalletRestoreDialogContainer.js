@@ -299,7 +299,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         }
         return (
           <SuccessPage
-            title={intl.formatMessage(globalMessages.pdfGenDone)}
+            title={intl.formatMessage(globalMessages.success)}
             text={intl.formatMessage(messages.walletUpgradeNoop)}
             classicTheme={profile.isClassicTheme}
             closeInfo={{
