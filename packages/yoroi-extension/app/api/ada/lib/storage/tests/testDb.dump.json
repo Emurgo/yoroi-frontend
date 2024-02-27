@@ -8,7 +8,6 @@
         "NetworkName": "Cardano Mainnet",
         "Backend": {
           "BackendService": "https://iohk-mainnet.yoroiwallet.com",
-          "WebSocket": "wss://iohk-mainnet.yoroiwallet.com:443",
           "TokenInfoService": "https://cdn.yoroiwallet.com"
         },
         "BaseConfig": [
@@ -43,7 +42,6 @@
         "NetworkName": "Cardano Testnet",
         "Backend": {
           "BackendService": "https://testnet-backend.yoroiwallet.com",
-          "WebSocket": "wss://testnet-backend.yoroiwallet.com:443",
           "TokenInfoService": "https://stage-cdn.yoroiwallet.com"
         },
         "BaseConfig": [

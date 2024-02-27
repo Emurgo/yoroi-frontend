@@ -3,16 +3,12 @@
 function portToPermission(port /*: number */) /*: string */ {
   return `http://localhost:${port} https://localhost:${port}`;
 }
-function portToSocketPermission(port /*: number */) /*: string */ {
-  return `ws://localhost:${port} wss://localhost:${port}`;
-}
 function serverToPermission(server /*: string */) /*: string */ {
-  return `https://${server} wss://${server}:443`;
+  return `https://${server}`;
 }
 
 const Ports = {
   DevBackendServer: 21000,
-  ErgoMockServer: 21001,
   ReactDevTools: 8097,
 };
 
@@ -24,7 +20,6 @@ const Servers = {
 
 module.exports = {
   portToPermission,
-  portToSocketPermission,
   Ports,
   serverToPermission,
   Servers,
