@@ -18,6 +18,7 @@ import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { isWalletExist } from '../../api/ada/lib/cardanoCrypto/utils';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
+import AdaApi from '../../api/ada';
 
 const messages = defineMessages({
   walletRestoreVerifyAccountIdLabel: {
@@ -154,12 +155,13 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
 
   isValidMnemonic: ({|
     mnemonic: string,
-    // <TODO:PENDING_REMOVAL> paper
     mode: RestoreModeType,
   |}) => boolean = request => {
-    const { selectedNetwork } = this.stores.profile;
-    if (selectedNetwork == null) throw new Error(`${nameof(this.isValidMnemonic)} no API selected`);
-    return this.stores.substores.ada.walletRestore.isValidMnemonic(request);
+    return AdaApi.isValidMnemonic({
+      mnemonic: request.mnemonic,
+      // $FlowIgnore[prop-missing]
+      numberOfWords: request.mode.length ?? 0,
+    });
   };
 }
 

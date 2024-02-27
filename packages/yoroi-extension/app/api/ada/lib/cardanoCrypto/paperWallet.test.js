@@ -9,10 +9,8 @@ import {
 import {
   isValidEnglishAdaPaperMnemonic,
   unscramblePaperAdaMnemonic,
-  scramblePaperAdaMnemonic,
 } from './paperWallet';
 import { RustModule } from './rustLoader';
-import { generateByronPlate } from './plate';
 import {
   silenceLogsForTesting,
 } from '../../../../utils/logging';
@@ -95,20 +93,6 @@ test('Is valid Yoroi paper mnemonic', () => {
   )).toEqual(false);
 });
 
-test('Scramble then unscramble Yoroi paper wallet is no-op', () => {
-  const password = 'testpasswordtest';
-  const scrambled = scramblePaperAdaMnemonic(
-    VALID_YOROI_PAPER.originalWords,
-    password,
-  );
-  const [words] = unscramblePaperAdaMnemonic(
-    scrambled,
-    config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT,
-    password
-  );
-  expect(words).toEqual(VALID_YOROI_PAPER.originalWords);
-});
-
 test('Unscramble Yoroi paper matches expected address', async () => {
   const [words] = unscramblePaperAdaMnemonic(
     VALID_YOROI_PAPER.scrambledWords,
@@ -120,17 +104,9 @@ test('Unscramble Yoroi paper matches expected address', async () => {
   if (baseConfig.ByronNetworkId == null) {
     throw new Error(`missing Byron network id`);
   }
-  const { ByronNetworkId } = baseConfig;
   expect(words).toBeTruthy();
   if (words != null) {
     const rootPk = generateWalletRootKey(words);
     expect(Buffer.from(rootPk.as_bytes()).toString('hex')).toEqual(VALID_YOROI_PAPER.privateKey);
-    const plate = generateByronPlate(
-      rootPk,
-      0, // account index
-      1, // address count
-      ByronNetworkId
-    );
-    expect(plate.addresses[0]).toEqual(VALID_YOROI_PAPER.byronAddress);
   }
 });
