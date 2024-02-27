@@ -7,7 +7,6 @@ import { PublicDeriver, } from '../../api/ada/lib/storage/models/PublicDeriver/i
 import LocalizedRequest from '../lib/LocalizedRequest';
 import Store from '../base/Store';
 import type {
-  GetCurrentDelegationFunc,
   GetDelegatedBalanceFunc,
   RewardHistoryFunc,
   GetDelegatedBalanceResponse,
@@ -25,8 +24,6 @@ import { maybe } from '../../coreUtils';
 export type DelegationRequests = {|
   publicDeriver: PublicDeriver<>,
   getDelegatedBalance: CachedRequest<GetDelegatedBalanceFunc>,
-  // <TODO:PENDING_REMOVAL> Legacy (local history tx)
-  getCurrentDelegation: CachedRequest<GetCurrentDelegationFunc>,
   rewardHistory: CachedRequest<RewardHistoryFunc>,
   mangledAmounts: CachedRequest<MangledAmountFunc>,
   error: LocalizableError | any;

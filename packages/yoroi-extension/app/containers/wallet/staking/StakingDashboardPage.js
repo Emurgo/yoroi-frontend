@@ -2,29 +2,19 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { intlShape } from 'react-intl';
-import moment from 'moment';
 import { observer } from 'mobx-react';
 
 import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
 import StakingDashboard from '../../../components/wallet/staking/dashboard/StakingDashboard';
 import UserSummary from '../../../components/wallet/staking/dashboard/UserSummary';
 import StakePool from '../../../components/wallet/staking/dashboard/StakePool';
-import UpcomingRewards from '../../../components/wallet/staking/dashboard/UpcomingRewards';
-import type { BoxInfo } from '../../../components/wallet/staking/dashboard/UpcomingRewards';
 import LessThanExpectedDialog from '../../../components/wallet/staking/dashboard/LessThanExpectedDialog';
 import { digestForHash } from '../../../api/ada/lib/storage/database/primitives/api/utils';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer';
 import config from '../../../config';
-import type { PoolTuples } from '../../../api/common/lib/storage/bridge/delegationUtils';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type {
-  ToRealTimeFunc,
-  ToAbsoluteSlotNumberFunc,
-  CurrentEpochLengthFunc,
-  TimeSinceGenesisFunc,
-} from '../../../api/common/lib/storage/bridge/timeUtils';
 
 import globalMessages from '../../../i18n/global-messages';
 import { observable, runInAction } from 'mobx';
@@ -72,8 +62,6 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
     }
 
-    const rewardInfo = this.getRewardInfo(publicDeriver);
-
     const errorIfPresent = maybe(delegationRequests.error, error => ({ error }));
     const stakePools = errorIfPresent ?? this.getStakePools(publicDeriver);
 
@@ -97,7 +85,6 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
           publicDeriver,
           showRewardAmount,
         })}
-        upcomingRewards={rewardInfo?.rewardPopup}
         graphData={generateGraphData({
           delegationRequests,
           publicDeriver,
@@ -139,247 +126,6 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
     const epochLengthInSeconds = getEpochLength() * getSlotLength();
     const epochLengthInDays = epochLengthInSeconds / (60 * 60 * 24);
     return epochLengthInDays;
-  };
-
-  // <TODO:PENDING_REMOVAL> LEGACY UI
-  getRewardInfo: (
-    PublicDeriver<>
-  ) => void | {|
-    rewardPopup: Node,
-    showWarning: boolean,
-  |} = publicDeriver => {
-    const timeStore = this.props.stores.substores.ada.time;
-    const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
-    const currTimeRequests = timeStore.getCurrentTimeRequests(publicDeriver);
-    const toAbsoluteSlot = timeCalcRequests.requests.toAbsoluteSlot.result;
-    if (toAbsoluteSlot == null) return undefined;
-    const toRealTime = timeCalcRequests.requests.toRealTime.result;
-    if (toRealTime == null) return undefined;
-    const timeSinceGenesis = timeCalcRequests.requests.timeSinceGenesis.result;
-    if (timeSinceGenesis == null) return undefined;
-    const getEpochLength = timeCalcRequests.requests.currentEpochLength.result;
-    if (getEpochLength == null) return undefined;
-    const delegationStore = this.props.stores.delegation;
-    const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
-    if (delegationRequests == null) {
-      throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
-    }
-
-    const isRegistered = this.props.stores.delegation.isStakeRegistered(publicDeriver);
-
-    let rewardInfo = undefined;
-    if (
-      !(
-        !delegationRequests.getCurrentDelegation.wasExecuted ||
-        delegationRequests.getCurrentDelegation.isExecuting
-      )
-    ) {
-
-      // <TODO:PENDING_REMOVAL> Legacy (local history tx)
-      const { result } = delegationRequests.getCurrentDelegation;
-
-      // <TODO:PENDING_REMOVAL> LEGACY UI: upcoming rewards are to be removed
-      if (result == null || result.currEpoch == null) {
-        rewardInfo = {
-          rewardPopup: (
-            <UpcomingRewards
-              unregistered={isRegistered === false}
-              useEndOfEpoch
-              content={[
-                this.generateUpcomingRewardInfo({
-                  epoch: currTimeRequests.currentEpoch,
-                  pools: [],
-                  toAbsoluteSlot,
-                  toRealTime,
-                  timeSinceGenesis,
-                  getEpochLength,
-                  publicDeriver,
-                  isCurrentEpoch: true,
-                }),
-                this.generateUpcomingRewardInfo({
-                  epoch: currTimeRequests.currentEpoch + 1,
-                  pools: [],
-                  toAbsoluteSlot,
-                  toRealTime,
-                  timeSinceGenesis,
-                  getEpochLength,
-                  publicDeriver,
-                }),
-                this.generateUpcomingRewardInfo({
-                  epoch: currTimeRequests.currentEpoch + 2,
-                  pools: [],
-                  toAbsoluteSlot,
-                  toRealTime,
-                  timeSinceGenesis,
-                  getEpochLength,
-                  publicDeriver,
-                }),
-                this.generateUpcomingRewardInfo({
-                  epoch: currTimeRequests.currentEpoch + 3,
-                  pools: [],
-                  toAbsoluteSlot,
-                  toRealTime,
-                  timeSinceGenesis,
-                  getEpochLength,
-                  publicDeriver,
-                }),
-              ]}
-              showWarning={false}
-              onExternalLinkClick={handleExternalLinkClick}
-              baseUrl=""
-            />
-          ),
-          showWarning: false,
-        };
-      } else {
-        const currEpochCert = result.currEpoch;
-
-        // first reward is slower than the rest
-        // it takes 2 epochs for stake delegation to update
-        // then after the start of the 3rd epoch, you get the reward
-        const upcomingRewards: Array<BoxInfo> = [];
-        for (let i = 5; i >= 2; i--) {
-          upcomingRewards.unshift(
-            this.generateUpcomingRewardInfo({
-              epoch: currTimeRequests.currentEpoch + i + 1,
-              pools: isRegistered ? currEpochCert.pools : [],
-              toAbsoluteSlot,
-              toRealTime,
-              timeSinceGenesis,
-              getEpochLength,
-              publicDeriver,
-            })
-          );
-        }
-        if (result.prevEpoch) {
-          upcomingRewards.unshift(
-            this.generateUpcomingRewardInfo({
-              epoch: currTimeRequests.currentEpoch + 2,
-              pools: isRegistered ? result.prevEpoch.pools : [],
-              toAbsoluteSlot,
-              toRealTime,
-              timeSinceGenesis,
-              getEpochLength,
-              publicDeriver,
-            })
-          );
-        }
-        if (result.prevPrevEpoch) {
-          upcomingRewards.unshift(
-            this.generateUpcomingRewardInfo({
-              epoch: currTimeRequests.currentEpoch + 1,
-              pools: isRegistered ? result.prevPrevEpoch.pools : [],
-              toAbsoluteSlot,
-              toRealTime,
-              timeSinceGenesis,
-              getEpochLength,
-              publicDeriver,
-            })
-          );
-        }
-
-        if (result.prevPrevPrevEpoch) {
-          upcomingRewards.unshift(
-            this.generateUpcomingRewardInfo({
-              epoch: currTimeRequests.currentEpoch,
-              pools: isRegistered ? result.prevPrevPrevEpoch.pools : [],
-              toAbsoluteSlot,
-              toRealTime,
-              timeSinceGenesis,
-              getEpochLength,
-              publicDeriver,
-              isCurrentEpoch: true,
-            })
-          );
-        }
-
-        const poolExplorerLink = this.props.stores.explorers.selectedExplorer
-          .get(publicDeriver.getParent().getNetworkInfo().NetworkId)
-          ?.getOrDefault('pool');
-
-        const upcomingTuples = ((upcomingRewards.slice(0, 4): any): [
-          ?BoxInfo,
-          ?BoxInfo,
-          ?BoxInfo,
-          ?BoxInfo
-        ]);
-        const rewardPopup = (
-          <UpcomingRewards
-            unregistered={isRegistered === false}
-            useEndOfEpoch
-            content={upcomingTuples}
-            showWarning={upcomingRewards.length === 4}
-            onExternalLinkClick={handleExternalLinkClick}
-            baseUrl={poolExplorerLink?.baseUrl}
-          />
-        );
-        rewardInfo = {
-          rewardPopup,
-          showWarning: upcomingRewards.length === 4,
-        };
-      }
-    }
-
-    return (
-      rewardInfo ?? {
-        rewardPopup: (
-          <UpcomingRewards
-            unregistered={isRegistered === false}
-            useEndOfEpoch
-            content={[null, null, null, null]}
-            showWarning={false}
-            onExternalLinkClick={handleExternalLinkClick}
-            baseUrl=""
-          />
-        ),
-        showWarning: false,
-      }
-    );
-  };
-
-  // <TODO:PENDING_REMOVAL> LEGACY UI
-  generateUpcomingRewardInfo: ({|
-    publicDeriver: PublicDeriver<>,
-    epoch: number,
-    pools: Array<PoolTuples>,
-    toRealTime: ToRealTimeFunc,
-    getEpochLength: CurrentEpochLengthFunc,
-    toAbsoluteSlot: ToAbsoluteSlotNumberFunc,
-    timeSinceGenesis: TimeSinceGenesisFunc,
-    isCurrentEpoch?: boolean,
-  |}) => BoxInfo = request => {
-    const endEpochTime = request.toRealTime({
-      absoluteSlotNum: request.toAbsoluteSlot({
-        epoch: request.epoch,
-        // Rewards are calculated at the start of the epoch but distributed at the end
-        slot: request.getEpochLength(),
-      }),
-      timeSinceGenesisFunc: request.timeSinceGenesis,
-    });
-    const endEpochMoment = moment(endEpochTime);
-
-    const miniPoolInfo = request.pools.map(pool => {
-      const meta = this.props.stores.delegation.getLocalPoolInfo(
-        request.publicDeriver.getParent().getNetworkInfo(),
-        pool[0]
-      );
-      if (meta == null) {
-        return { id: pool };
-      }
-      return { id: pool, ticker: meta.info?.ticker, name: meta.info?.name };
-    });
-    return {
-      pools: miniPoolInfo,
-      epoch: request.epoch,
-      time: [
-        endEpochMoment.format('MMM Do'),
-        endEpochMoment.format('hh'),
-        endEpochMoment.format('mm'),
-        endEpochMoment.format('ss'),
-        endEpochMoment.format('A'),
-      ],
-      isCurrentEpoch: request.isCurrentEpoch,
-    };
   };
 
   getStakePools: (PublicDeriver<>) => {| pools: null | Array<Node | void> |} = publicDeriver => {

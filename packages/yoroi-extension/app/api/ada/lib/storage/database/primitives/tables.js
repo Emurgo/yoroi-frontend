@@ -318,7 +318,7 @@ export type CertificateInsert = {|
   TransactionId: number,
   Ordinal: number, // transactions can contain multiple certificates in some blockchains
   Kind: $Values<CertificateKind>,
-  // <TODO:PENDING_REMOVAL> Check if ever needed
+  // <TODO:PENDING_REMOVAL> Needs redesign
   Payload: string,
 |};
 export type CertificateRow = {|
@@ -348,7 +348,6 @@ export type CertificateAddressRow = {|
   ...CertificateAddressInsert,
 |};
 
-// <TODO:PENDING_REMOVAL> Check if ever needed
 export const CertificateAddressSchema: {|
   +name: 'CertificateAddress',
   properties: $ObjMapi<CertificateAddressRow, ToSchemaProp>,

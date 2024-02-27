@@ -1,9 +1,8 @@
 // @flow
 
 import axios from 'axios';
-import { action, observable, reaction, runInAction } from 'mobx';
+import { action, reaction, runInAction } from 'mobx';
 import BigNumber from 'bignumber.js';
-import { find } from 'lodash';
 import Store from '../base/Store';
 import {
   Logger,
@@ -16,28 +15,15 @@ import {
 import {
   asGetStakingKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import type {
-  IGetStakingKey,
-} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import {
   getDelegatedBalance,
-  getCurrentDelegation,
-  getRegistrationHistory,
 } from '../../api/ada/lib/storage/bridge/delegationUtils';
 import type {
   GetDelegatedBalanceFunc,
-  GetCurrentDelegationFunc,
-  GetCurrentDelegationResponse,
   RewardHistoryFunc
 } from '../../api/common/lib/storage/bridge/delegationUtils';
-import {
-  genToRelativeSlotNumber,
-  genTimeToSlot,
-} from '../../api/ada/lib/storage/bridge/timeUtils';
-import { isCardanoHaskell, getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import type { DelegationRequests, } from '../toplevel/DelegationStore';
+import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import type { GetRegistrationHistoryResponse, GetRegistrationHistoryFunc } from '../../api/ada/lib/storage/bridge/delegationUtils';
 import type { MangledAmountFunc } from '../stateless/mangledAddresses';
 import { getUnmangleAmounts } from '../stateless/mangledAddresses';
 import { MultiToken } from '../../api/common/lib/MultiToken';
@@ -48,15 +34,7 @@ import { entriesIntoMap } from '../../coreUtils';
 import type { PoolInfo } from '@emurgo/yoroi-lib';
 import type { PoolInfoResponse, RemotePool } from '../../api/ada/lib/state-fetch/types';
 
-export type AdaDelegationRequests = {|
-  publicDeriver: PublicDeriver<>,
-  // <TODO:PENDING_REMOVAL> Legacy unused
-  getRegistrationHistory: CachedRequest<GetRegistrationHistoryFunc>,
-|};
-
 export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
-
-  @observable delegationRequests: Array<AdaDelegationRequests> = [];
 
   _recalculateDelegationInfoDisposer: Array<void => void> = [];
 
@@ -67,8 +45,6 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
       publicDeriver,
       mangledAmounts: new CachedRequest<MangledAmountFunc>(getUnmangleAmounts),
       getDelegatedBalance: new CachedRequest<GetDelegatedBalanceFunc>(getDelegatedBalance),
-      // <TODO:PENDING_REMOVAL> Legacy (local history tx)
-      getCurrentDelegation: new CachedRequest<GetCurrentDelegationFunc>(getCurrentDelegation),
       rewardHistory: new CachedRequest<RewardHistoryFunc>(async (address) => {
         // we need to defer this call because the store may not be initialized yet
         // by the time this constructor is called
@@ -97,11 +73,6 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
           : [];
       }),
       error: undefined,
-    });
-    this.delegationRequests.push({
-      publicDeriver,
-      // <TODO:PENDING_REMOVAL> Legacy unused
-      getRegistrationHistory: new CachedRequest<GetRegistrationHistoryFunc>(getRegistrationHistory),
     });
   }
 
@@ -178,82 +149,17 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
         }
       })();
 
-      const delegationHistory = this._getDelegationHistory({
-        publicDeriver: withStakingKey,
-        stakingKeyAddressId: stakingKeyResp.addr.AddressId,
-        delegationRequest,
-      }).then(currentDelegation => this.updatePoolInfo({
-        network: publicDeriver.getParent().getNetworkInfo(),
-        allPoolIds: currentDelegation.allPoolIds,
-      }));
-
-      const adaSpecific = (async () => {
-        const adaDelegationRequest = this.getDelegationRequests(publicDeriver);
-        if (adaDelegationRequest == null) {
-          return Promise.resolve();
-        }
-        const registrationHistory = await this._getRegistrationHistory({
-          publicDeriver: withStakingKey,
-          stakingKeyAddressId: stakingKeyResp.addr.AddressId,
-          delegationRequest: adaDelegationRequest,
-        });
-        return registrationHistory;
-      })();
-
       const rewardHistory = delegationRequest.rewardHistory.execute(
         stakingKeyResp.addr.Hash
       ).promise;
 
       await Promise.all([
         accountStateCalcs,
-        delegationHistory,
         rewardHistory,
-        adaSpecific,
       ]);
     } catch (e) {
       Logger.error(`${nameof(AdaDelegationStore)}::${nameof(this.refreshDelegation)} error: ` + stringifyError(e));
     }
-  }
-
-  _getRegistrationHistory: {|
-    publicDeriver: PublicDeriver<> & IGetStakingKey,
-    stakingKeyAddressId: number,
-    delegationRequest: AdaDelegationRequests,
-  |} => Promise<GetRegistrationHistoryResponse> = async (request) => {
-    const currentDelegation = await request.delegationRequest.getRegistrationHistory.execute({
-      publicDeriver: request.publicDeriver,
-      stakingKeyAddressId: request.stakingKeyAddressId,
-    }).promise;
-    if (currentDelegation == null) throw new Error('Should never happen');
-    return currentDelegation;
-  }
-
-  _getDelegationHistory: {|
-    publicDeriver: PublicDeriver<> & IGetStakingKey,
-    stakingKeyAddressId: number,
-    delegationRequest: DelegationRequests,
-  |} => Promise<GetCurrentDelegationResponse> = async (request) => {
-    const adaConfig = getCardanoHaskellBaseConfig(
-      request.publicDeriver.getParent().getNetworkInfo()
-    );
-    // TODO: use time store instead?
-    const toRelativeSlotNumber = await genToRelativeSlotNumber(adaConfig);
-    const timeToSlot = await genTimeToSlot(adaConfig);
-    const currentEpoch = toRelativeSlotNumber(
-      timeToSlot({
-        time: new Date(),
-      }).slot
-    ).epoch;
-
-    // re-calculate which pools we've delegated to
-    const currentDelegation = await request.delegationRequest.getCurrentDelegation.execute({
-      publicDeriver: request.publicDeriver,
-      stakingKeyAddressId: request.stakingKeyAddressId,
-      toRelativeSlotNumber,
-      currentEpoch,
-    }).promise;
-    if (currentDelegation == null) throw new Error('Should never happen');
-    return currentDelegation;
   }
 
   updatePoolInfo: {|
@@ -299,16 +205,6 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
     });
   }
 
-  // TODO: refine input type to staking key wallets only
-  getDelegationRequests: PublicDeriver<> => void | AdaDelegationRequests = (
-    publicDeriver
-  ) => {
-    const foundRequest = find(this.delegationRequests, { publicDeriver });
-    if (foundRequest) return foundRequest;
-
-    return undefined; // can happen if the wallet is not a Shelley wallet
-  }
-
   @action.bound
   _startWatch: void => void = () => {
     const triggerRefresh = async () => {
@@ -340,10 +236,6 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
         for (const requests of this.stores.delegation.delegationRequests) {
           requests.mangledAmounts.invalidate();
           requests.getDelegatedBalance.invalidate();
-          requests.getCurrentDelegation.invalidate();
-        }
-        for (const requests of this.delegationRequests) {
-          requests.getRegistrationHistory.invalidate();
         }
         await triggerRefresh();
       },
@@ -359,11 +251,7 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
         for (const requests of this.stores.delegation.delegationRequests) {
           requests.mangledAmounts.invalidate();
           requests.getDelegatedBalance.invalidate();
-          requests.getCurrentDelegation.invalidate();
           requests.rewardHistory.invalidate();
-        }
-        for (const requests of this.delegationRequests) {
-          requests.getRegistrationHistory.invalidate();
         }
         await triggerRefresh();
       },
