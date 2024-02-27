@@ -476,7 +476,6 @@ export class ModifyTransaction {
 
 export type AddCertificateRequest = {|
   certificate: CertificateInsert,
-  // <TODO:PENDING_REMOVAL> Check if ever needed
   relatedAddresses: number => $ReadOnlyArray<CertificateAddressInsert>,
 |};
 export class ModifyCertificate {

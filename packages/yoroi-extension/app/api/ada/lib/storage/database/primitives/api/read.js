@@ -932,11 +932,9 @@ export class GetCertificates {
   static ownTables: {|
     Block: typeof Tables.BlockSchema,
     Certificate: typeof Tables.CertificateSchema,
-    // <TODO:PENDING_REMOVAL> Check if ever needed
     CertificateAddress: typeof Tables.CertificateAddressSchema,
     Transaction: typeof Tables.TransactionSchema,
   |} = Object.freeze({
-    // <TODO:PENDING_REMOVAL> Check if ever needed
     [Tables.CertificateAddressSchema.name]: Tables.CertificateAddressSchema,
     [Tables.CertificateSchema.name]: Tables.CertificateSchema,
     [Tables.TransactionSchema.name]: Tables.TransactionSchema,
@@ -944,7 +942,7 @@ export class GetCertificates {
   });
   static depTables: {||} = Object.freeze({});
 
-  // <TODO:PENDING_REMOVAL> Legacy (local history tx)
+  // <TODO:PENDING_REMOVAL> needs redesign
   static async forAddress(
     db: lf$Database,
     tx: lf$Transaction,

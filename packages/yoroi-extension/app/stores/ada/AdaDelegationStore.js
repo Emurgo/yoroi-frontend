@@ -15,25 +15,14 @@ import {
 import {
   asGetStakingKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import type {
-  IGetStakingKey,
-} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import {
   getDelegatedBalance,
-  getCurrentDelegation,
 } from '../../api/ada/lib/storage/bridge/delegationUtils';
 import type {
   GetDelegatedBalanceFunc,
-  GetCurrentDelegationFunc,
-  GetCurrentDelegationResponse,
   RewardHistoryFunc
 } from '../../api/common/lib/storage/bridge/delegationUtils';
-import {
-  genToRelativeSlotNumber,
-  genTimeToSlot,
-} from '../../api/ada/lib/storage/bridge/timeUtils';
-import { isCardanoHaskell, getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import type { DelegationRequests, } from '../toplevel/DelegationStore';
+import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { MangledAmountFunc } from '../stateless/mangledAddresses';
 import { getUnmangleAmounts } from '../stateless/mangledAddresses';
@@ -56,8 +45,6 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
       publicDeriver,
       mangledAmounts: new CachedRequest<MangledAmountFunc>(getUnmangleAmounts),
       getDelegatedBalance: new CachedRequest<GetDelegatedBalanceFunc>(getDelegatedBalance),
-      // <TODO:PENDING_REMOVAL> Legacy (local history tx)
-      getCurrentDelegation: new CachedRequest<GetCurrentDelegationFunc>(getCurrentDelegation),
       rewardHistory: new CachedRequest<RewardHistoryFunc>(async (address) => {
         // we need to defer this call because the store may not be initialized yet
         // by the time this constructor is called
@@ -162,55 +149,17 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
         }
       })();
 
-      const delegationHistory = this._getDelegationHistory({
-        publicDeriver: withStakingKey,
-        stakingKeyAddressId: stakingKeyResp.addr.AddressId,
-        delegationRequest,
-      }).then(currentDelegation => this.updatePoolInfo({
-        network: publicDeriver.getParent().getNetworkInfo(),
-        allPoolIds: currentDelegation.allPoolIds,
-      }));
-
       const rewardHistory = delegationRequest.rewardHistory.execute(
         stakingKeyResp.addr.Hash
       ).promise;
 
       await Promise.all([
         accountStateCalcs,
-        delegationHistory,
         rewardHistory,
       ]);
     } catch (e) {
       Logger.error(`${nameof(AdaDelegationStore)}::${nameof(this.refreshDelegation)} error: ` + stringifyError(e));
     }
-  }
-
-  _getDelegationHistory: {|
-    publicDeriver: PublicDeriver<> & IGetStakingKey,
-    stakingKeyAddressId: number,
-    delegationRequest: DelegationRequests,
-  |} => Promise<GetCurrentDelegationResponse> = async (request) => {
-    const adaConfig = getCardanoHaskellBaseConfig(
-      request.publicDeriver.getParent().getNetworkInfo()
-    );
-    // TODO: use time store instead?
-    const toRelativeSlotNumber = await genToRelativeSlotNumber(adaConfig);
-    const timeToSlot = await genTimeToSlot(adaConfig);
-    const currentEpoch = toRelativeSlotNumber(
-      timeToSlot({
-        time: new Date(),
-      }).slot
-    ).epoch;
-
-    // re-calculate which pools we've delegated to
-    const currentDelegation = await request.delegationRequest.getCurrentDelegation.execute({
-      publicDeriver: request.publicDeriver,
-      stakingKeyAddressId: request.stakingKeyAddressId,
-      toRelativeSlotNumber,
-      currentEpoch,
-    }).promise;
-    if (currentDelegation == null) throw new Error('Should never happen');
-    return currentDelegation;
   }
 
   updatePoolInfo: {|
@@ -287,7 +236,6 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
         for (const requests of this.stores.delegation.delegationRequests) {
           requests.mangledAmounts.invalidate();
           requests.getDelegatedBalance.invalidate();
-          requests.getCurrentDelegation.invalidate();
         }
         await triggerRefresh();
       },
@@ -303,7 +251,6 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
         for (const requests of this.stores.delegation.delegationRequests) {
           requests.mangledAmounts.invalidate();
           requests.getDelegatedBalance.invalidate();
-          requests.getCurrentDelegation.invalidate();
           requests.rewardHistory.invalidate();
         }
         await triggerRefresh();
