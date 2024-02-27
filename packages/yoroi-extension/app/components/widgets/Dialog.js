@@ -40,7 +40,7 @@ export type Props = {|
 
 type InjectedProps = {| isRevampLayout: boolean |};
 
-function DialogFn(props: Props & InjectedProps): Node {
+function Dialog(props: Props & InjectedProps): Node {
   const {
     title,
     children,
@@ -167,7 +167,7 @@ function DialogFn(props: Props & InjectedProps): Node {
   );
 }
 
-DialogFn.defaultProps = {
+Dialog.defaultProps = {
   title: undefined,
   children: undefined,
   actions: undefined,
@@ -297,4 +297,4 @@ function getBtnVariant(
   return { variant: 'secondary' };
 }
 
-export default (withLayout(observer(DialogFn)): ComponentType<Props>);
+export default (withLayout(observer(Dialog)): ComponentType<Props>);
