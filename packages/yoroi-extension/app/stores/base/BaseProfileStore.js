@@ -208,7 +208,7 @@ export default class BaseProfileStore
   }
 
   _isAnalyticsAllowed: () => Promise<void> = async () => {
-    const isAnalyticsAllowed = await this.getIsAnalyticsAllowed.execute()
+    const isAnalyticsAllowed = await this.getIsAnalyticsAllowed.execute();
     const AMPLI_FLUSH_INTERVAL_MS = 5000;
     await ampli.load(({
       environment: environment.isProduction() ? 'production' : 'development',
@@ -566,10 +566,10 @@ export default class BaseProfileStore
     return this.getUnitOfAccountRequest.wasExecuted && this.getUnitOfAccountRequest.result !== null;
   }
 
-  _onOptForAnalytics: (boolean) => void = (option) => {
-    this.getIsAnalyticsAllowed.patch(_ => option);
-    this.api.localStorage.saveIsAnalysticsAllowed(option);
-    ampli.client.setOptOut(!option);
+  _onOptForAnalytics: (boolean) => void = (isAnalyticsAllowed) => {
+    this.getIsAnalyticsAllowed.patch(_ => isAnalyticsAllowed);
+    this.api.localStorage.saveIsAnalysticsAllowed(isAnalyticsAllowed);
+    ampli.client.setOptOut(!isAnalyticsAllowed);
   }
 
   @computed get isAnalyticsOpted(): boolean {
