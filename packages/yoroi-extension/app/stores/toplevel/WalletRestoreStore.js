@@ -7,7 +7,6 @@ import type {
   RestoreModeType,
   WalletRestoreMeta,
 } from '../../actions/common/wallet-restore-actions';
-import type { PlateResponse } from '../../api/common/lib/crypto/plate';
 import { generateShelleyPlate } from '../../api/ada/lib/cardanoCrypto/plate';
 import { HARD_DERIVATION_START } from '../../config/numbersConfig';
 import { generateWalletRootKey as generateAdaWalletRootKey, } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
@@ -19,6 +18,7 @@ import type { StoresMap } from '../index';
 import { isWalletExist } from '../../api/ada/lib/cardanoCrypto/utils';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import AdaApi from '../../api/ada';
+import type { PlateResponse } from '../../api/ada/lib/cardanoCrypto/plate';
 
 const messages = defineMessages({
   walletRestoreVerifyAccountIdLabel: {

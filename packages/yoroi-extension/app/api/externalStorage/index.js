@@ -16,7 +16,7 @@ import type {
   DownloadExternalTxMemoResponse,
   FetchFilenameExternalTxMemoRequest, FetchFilenameExternalTxMemoResponse,
   FetchFolderExternalTxMemoResponse, CreateFolderExternalTxMemoResponse
-} from './providers/IProvider';
+} from './providers/IProvider.types';
 import { ExternalStorageList } from '../../domain/ExternalStorage';
 import type { SelectedExternalStorageProvider } from '../../domain/ExternalStorage';
 

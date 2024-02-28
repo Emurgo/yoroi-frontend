@@ -39,11 +39,8 @@ import type {
   GetTransactionsByHashesRequest,
   GetTransactionsByHashesResponse,
   GetTransactionsByHashesFunc,
-  MultiAssetSupplyResponse,
+  MultiAssetSupplyResponse, FilterUsedRequest, FilterUsedResponse, FilterFunc,
 } from './types';
-import type {
-  FilterFunc, FilterUsedRequest, FilterUsedResponse,
-} from '../../../common/lib/state-fetch/currencySpecificTypes';
 import LocalizableError from '../../../../i18n/LocalizableError';
 
 import type { IFetcher } from './IFetcher.types';

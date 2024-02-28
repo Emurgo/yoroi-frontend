@@ -30,11 +30,8 @@ import type {
   GetRecentTransactionHashesRequest,
   GetRecentTransactionHashesResponse,
   GetRecentTransactionHashesFunc,
-  MultiAssetSupplyFunc,
+  MultiAssetSupplyFunc, FilterUsedRequest, FilterUsedResponse, FilterFunc,
 } from './types';
-import type {
-  FilterUsedRequest, FilterUsedResponse, FilterFunc,
-} from '../../../common/lib/state-fetch/currencySpecificTypes';
 import { RollbackApiError, } from '../../../common/errors';
 import { toEnterprise, addressToKind, toHexOrBase58 } from '../storage/bridge/utils';
 import { CoreAddressTypes } from '../storage/database/primitives/enums';

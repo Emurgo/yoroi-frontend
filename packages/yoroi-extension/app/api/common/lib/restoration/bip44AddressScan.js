@@ -2,10 +2,8 @@
 // @flow
 
 import { range } from 'lodash';
-import type {
-  FilterFunc,
-} from '../state-fetch/currencySpecificTypes';
 import type { NetworkRow } from '../../../ada/lib/storage/database/primitives/tables';
+import type { FilterFunc } from '../../../ada/lib/state-fetch/types';
 
 type AddressInfo = {|
   address: string,
