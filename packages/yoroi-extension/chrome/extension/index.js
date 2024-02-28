@@ -29,8 +29,6 @@ BigNumber.DEBUG = true;
 // Entry point into our application
 const initializeYoroi: void => Promise<void> = async () => {
 
-  await RustModule.load();
-
   const api = await setupApi();
   const router = new RouterStore();
   const hashHistory = createHashHistory();
