@@ -202,12 +202,12 @@ export default class BaseProfileStore
       'load-tos-version',
     );
     this.stores.loading.registerBlockingLoadingRequest(
-      this._isAnalyticsAllowed(),
+      this._loadWhetherAnalyticsAllowed(),
       'load-analytics-flag',
     );
   }
 
-  _isAnalyticsAllowed: () => Promise<void> = async () => {
+  _loadWhetherAnalyticsAllowed: () => Promise<void> = async () => {
     const isAnalyticsAllowed = await this.getIsAnalyticsAllowed.execute();
     const AMPLI_FLUSH_INTERVAL_MS = 5000;
     if (ampli.load == null || typeof ampli.load !== 'function') {
