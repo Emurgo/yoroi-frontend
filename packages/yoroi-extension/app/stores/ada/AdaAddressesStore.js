@@ -89,7 +89,7 @@ export default class AdaAddressesStore extends Store<StoresMap, ActionsMap> {
           apiKey: 'czsajliz-wxgu6tujd1zqq7hey_pclfqhdjsqolsxjfsurgh',
         },
       },
-      cslFactory: () => RustModule.CrossCsl.init(),
+      cslFactory: (ctx) => RustModule.CrossCsl.init(ctx),
     });
   }
 

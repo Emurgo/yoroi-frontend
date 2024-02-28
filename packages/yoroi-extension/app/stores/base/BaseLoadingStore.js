@@ -32,7 +32,7 @@ export default class BaseLoadingStore<TStores, TActions> extends Store<TStores, 
       () => loadLovefieldDB(schema.DataStoreType.INDEXED_DB)
     );
 
-  __blockingLoadingRequests: Array<[Request<() => void>, name]> = [];
+  __blockingLoadingRequests: Array<[Request<() => Promise<void>>, string]> = [];
 
   setup(): void {
   }
@@ -45,6 +45,7 @@ export default class BaseLoadingStore<TStores, TActions> extends Store<TStores, 
     const rustLoadingParams = (env === 'extension') ? ['dontLoadMessagesSigning'] : [];
     Promise
       .all([
+        // $FlowIgnore[invalid-tuple-arity]
         this.loadRustRequest.execute(rustLoadingParams),
         this.loadPersistentDbRequest.execute(),
         ...(this.__blockingLoadingRequests.map(([r]) => r.execute())),
