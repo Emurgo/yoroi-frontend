@@ -1,17 +1,17 @@
 // @flow
 import type { lf$Database, lf$lovefieldExport, } from 'lovefield';
 import { schema, } from 'lovefield';
-import { observable, computed, runInAction } from 'mobx';
+import { computed, observable, runInAction } from 'mobx';
 import Store from './Store';
 import environment from '../../environment';
 import LocalizableError from '../../i18n/LocalizableError';
-import { UnableToLoadError, StorageLoadError } from '../../i18n/errors';
+import { StorageLoadError, UnableToLoadError } from '../../i18n/errors';
 import Request from '../lib/LocalizedRequest';
 import type { MigrationRequest } from '../../api/common/migration';
 import { migrateAndRefresh } from '../../api/common/migration';
 import { Logger, stringifyError } from '../../utils/logging';
 import { closeOtherInstances } from '../../utils/tabManager';
-import { loadLovefieldDB, importOldDb, } from '../../api/ada/lib/storage/database/index';
+import { importOldDb, loadLovefieldDB, } from '../../api/ada/lib/storage/database/index';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
 /** Load dependencies before launching the app */
@@ -43,14 +43,11 @@ export default class BaseLoadingStore<TStores, TActions> extends Store<TStores, 
 
   load(env: 'connector' | 'extension'): void {
     const rustLoadingParams = (env === 'extension') ? ['dontLoadMessagesSigning'] : [];
-    const rustLoaderPromise = this.loadRustRequest.execute(rustLoadingParams).promise;
-    const dbLoaderPromise = this.loadPersistentDbRequest.execute().promise;
-    const blockingPromises = this.__blockingLoadingRequests.map(([r]) => r.execute().promise);
     Promise
       .all([
-        rustLoaderPromise,
-        dbLoaderPromise,
-        ...blockingPromises,
+        this.loadRustRequest.execute(rustLoadingParams),
+        this.loadPersistentDbRequest.execute(),
+        ...(this.__blockingLoadingRequests.map(([r]) => r.execute())),
       ])
       .then(async () => {
         Logger.debug(`[yoroi] closing other instances`);
