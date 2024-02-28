@@ -46,7 +46,7 @@ import type {
 } from '../../../common/lib/state-fetch/currencySpecificTypes';
 import LocalizableError from '../../../../i18n/LocalizableError';
 
-import type { IFetcher } from './IFetcher';
+import type { IFetcher } from './IFetcher.types';
 
 import { chunk } from 'lodash';
 import {

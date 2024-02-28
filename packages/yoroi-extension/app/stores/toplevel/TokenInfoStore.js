@@ -24,7 +24,7 @@ import { ModifyToken } from '../../api/ada/lib/storage/database/primitives/api/w
 import { genCardanoAssetMap } from '../../api/ada/lib/storage/bridge/updateTransactions';
 import type WalletsActions from '../../actions/wallet-actions';
 import type TransactionsStore from './TransactionsStore';
-import type { IFetcher as IFetcherCardano } from '../../api/ada/lib/state-fetch/IFetcher';
+import type { IFetcher as IFetcherCardano } from '../../api/ada/lib/state-fetch/IFetcher.types';
 
 export type TokenInfoMap = Map<
   string, // network ID. String because mobx requires string for observable maps

@@ -81,7 +81,18 @@ const plugins = (folder /*: string */, _networkName /*: string */) /*: * */ => {
       // Source directories
       directories: [path.join(__dirname, '../app')],
       // Exclude patterns
-      exclude: ['*.test.js', '*.snap', '*.md'],
+      exclude: [
+        '*.test.js',
+        '*.forTests.*',
+        '**/__mocks__/*',
+        '*.snap',
+        '*.dump.json',
+        '*.md',
+        '*.types.*',
+        'types.js',
+        'interfaces.js',
+        'rustLoaderForBackground.js',
+      ],
       // Root directory (optional)
       root: __dirname,
     }),

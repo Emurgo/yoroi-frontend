@@ -17,7 +17,7 @@ import {
 
 import type {
   TreeInsert, InsertRequest,
-} from '../../../ada/lib/storage/database/walletTypes/common/utils';
+} from '../../../ada/lib/storage/database/walletTypes/common/utils.types';
 import type { AddByHashFunc, } from '../storage/bridge/hashMapper';
 import type { NetworkRow, CanonicalAddressInsert } from '../../../ada/lib/storage/database/primitives/tables';
 import type { CoreAddressT } from '../../../ada/lib/storage/database/primitives/enums';
