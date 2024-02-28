@@ -17,7 +17,6 @@ import { LazyLoadPromises } from '../../app/Routes';
 import environment from '../../app/environment';
 import { ampli } from '../../ampli/index';
 import { ROUTES } from '../../app/routes-config';
-import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 
 // run MobX in strict mode
 configure({ enforceActions: 'always' });
