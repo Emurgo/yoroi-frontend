@@ -343,12 +343,9 @@ export default class LocalStorageApi {
   unsetAcceptedTosVersion: void => Promise<void> =
     () => removeLocalItem(storageKeys.ACCEPTED_TOS_VERSION);
 
-  loadIsAnalyticsAllowed: () => Promise<?boolean> = async () => {
+  loadIsAnalyticsAllowed: () => Promise<boolean> = async () => {
     const json = await getLocalItem(storageKeys.IS_ANALYTICS_ALLOWED);
-    if (!json) {
-      return undefined;
-    }
-    return JSON.parse(json);
+    return json === 'true';
   }
 
   saveIsAnalysticsAllowed: (flag: boolean) => Promise<void> = async (flag) => {
