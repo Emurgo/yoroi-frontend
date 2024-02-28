@@ -210,6 +210,9 @@ export default class BaseProfileStore
   _isAnalyticsAllowed: () => Promise<void> = async () => {
     const isAnalyticsAllowed = await this.getIsAnalyticsAllowed.execute();
     const AMPLI_FLUSH_INTERVAL_MS = 5000;
+    if (ampli.load == null || typeof ampli.load !== 'function') {
+      throw new Error(`ampli.load is not available or not a function (${typeof ampli.load})`)
+    }
     await ampli.load(({
       environment: environment.isProduction() ? 'production' : 'development',
       client: {
