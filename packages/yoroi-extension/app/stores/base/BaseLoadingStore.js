@@ -1,7 +1,7 @@
 // @flow
 import type { lf$Database, lf$lovefieldExport, } from 'lovefield';
 import { schema, } from 'lovefield';
-import { observable, computed, when, runInAction } from 'mobx';
+import { observable, computed, runInAction } from 'mobx';
 import Store from './Store';
 import environment from '../../environment';
 import LocalizableError from '../../i18n/LocalizableError';
@@ -29,35 +29,40 @@ export default class BaseLoadingStore<TStores, TActions> extends Store<TStores, 
   // note: never get anything but result except for the .error inside this file
   @observable loadPersistentDbRequest: Request<void => Promise<lf$Database>>
     = new Request<void => Promise<lf$Database>>(
-      async () => await loadLovefieldDB(schema.DataStoreType.INDEXED_DB)
+      () => loadLovefieldDB(schema.DataStoreType.INDEXED_DB)
     );
 
-  blockingLoadingRequests: Array<Promise<void>> = [];
+  __blockingLoadingRequests: Array<[Request<() => void>, name]> = [];
 
   setup(): void {
   }
 
-  registerBlockingLoadingRequest(promise: Promise<void>): void {
-    this.blockingLoadingRequests.push(promise);
+  registerBlockingLoadingRequest(promise: Promise<void>, name: string): void {
+    this.__blockingLoadingRequests.push([new Request(() => promise), name]);
   }
 
   load(env: 'connector' | 'extension'): void {
-    when(() => this.isLoading, this.postLoadingScreenEnd.bind(this));
+    const rustLoadingParams = (env === 'extension') ? ['dontLoadMessagesSigning'] : [];
+    const rustLoaderPromise = this.loadRustRequest.execute(rustLoadingParams).promise;
+    const dbLoaderPromise = this.loadPersistentDbRequest.execute().promise;
+    const blockingPromises = this.__blockingLoadingRequests.map(([r]) => r.execute().promise);
     Promise
       .all([
-        // $FlowFixMe[invalid-tuple-arity]: this is correct, flow is confused
-        this.loadRustRequest.execute(
-          (env === 'extension') ? [ 'dontLoadMessagesSigning' ] : []
-        ).promise,
-        this.loadPersistentDbRequest.execute().promise,
-        ...this.blockingLoadingRequests,
+        rustLoaderPromise,
+        dbLoaderPromise,
+        ...blockingPromises,
       ])
       .then(async () => {
         Logger.debug(`[yoroi] closing other instances`);
         await closeOtherInstances(this.getTabIdKey.bind(this)());
         Logger.debug(`[yoroi] loading persistent db`);
         const persistentDb = this.loadPersistentDbRequest.result;
-        if (persistentDb == null) throw new Error(`${nameof(BaseLoadingStore)}::${nameof(this.load)} load db was not loaded. Should never happen`);
+        if (persistentDb == null) {
+          throw new Error(
+            `${nameof(BaseLoadingStore)}::${nameof(this.load)}
+             DB was not loaded. Should never happen`
+          );
+        }
         Logger.debug(`[yoroi] check migrations`);
         await this.migrationRequest.execute({
           localStorageApi: this.api.localStorage,
@@ -69,20 +74,29 @@ export default class BaseLoadingStore<TStores, TActions> extends Store<TStores, 
         runInAction(() => {
           this.error = null;
           this._loading = false;
+          this.postLoadingScreenEnd();
           Logger.debug(`[yoroi] loading ended`);
         });
         return undefined;
-      }).catch((error) => {
-        Logger.error(`${nameof(BaseLoadingStore)}::${nameof(this.load)} Unable to load libraries ` + stringifyError(error));
-        if (this.loadPersistentDbRequest.error != null) {
-          runInAction(() => {
-            this.error = new StorageLoadError();
-          });
-        } else {
-          runInAction(() => {
-            this.error = new UnableToLoadError();
-          });
-        }
+      })
+      .catch((error) => {
+        const isRustLoadError = this.loadRustRequest.error != null;
+        const isDbLoadError = this.loadPersistentDbRequest.error != null;
+        const failedBlockingLoadingRequestName =
+          this.__blockingLoadingRequests.find(([r]) => r.error != null)?.[1];
+        const errorType =
+          (isRustLoadError && 'rust')
+          || (isDbLoadError && 'db')
+          || failedBlockingLoadingRequestName
+          || 'unclear';
+        Logger.error(
+          `${nameof(BaseLoadingStore)}::${nameof(this.load)}
+           Unable to load libraries (error type: ${errorType}) `
+          + stringifyError(error)
+        );
+        runInAction(() => {
+          this.error = isDbLoadError ? new StorageLoadError() : new UnableToLoadError();
+        });
       });
   }
 

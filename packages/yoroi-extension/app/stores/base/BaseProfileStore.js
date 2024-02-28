@@ -25,7 +25,7 @@ interface CoinPriceStore {
 }
 
 interface LoadingStore {
-  +registerBlockingLoadingRequest: (promise: Promise<void>) => void
+  +registerBlockingLoadingRequest: (promise: Promise<void>, name: string) => void
 }
 
 export default class BaseProfileStore
@@ -198,39 +198,42 @@ export default class BaseProfileStore
     noop(this.isRevampAnnounced);
     noop(this.didUserMigratedToRevampTheme);
     this.stores.loading.registerBlockingLoadingRequest(
-      this._loadAcceptedTosVersion()
+      this._loadAcceptedTosVersion(),
+      'load-tos-version',
     );
     this.stores.loading.registerBlockingLoadingRequest(
-      (async () => {
-        const option = await this.getIsAnalyticsAllowed.execute()
-        const AMPLI_FLUSH_INTERVAL_MS = 5000;
-        await ampli.load(({
-          environment: environment.isProduction() ? 'production' : 'development',
-          client: {
-            configuration: {
-              optOut: !option,
-              flushIntervalMillis: AMPLI_FLUSH_INTERVAL_MS,
-              trackingOptions: {
-                ipAddress: false,
-              },
-              defaultTracking: false,
-            },
-          },
-        }: LoadOptionsWithEnvironment)).promise;
-
-        if (environment.isDev()) {
-          ampli.client.add({
-            name: 'info-plugin',
-            type: 'enrichment',
-            setup: () => Promise.resolve(),
-            execute: async (event) => {
-              console.info('[metrics]', event.event_type, event.event_properties)
-              return Promise.resolve(event)
-            },
-          });
-        }
-      })()
+      this._isAnalyticsAllowed(),
+      'load-analytics-flag',
     );
+  }
+
+  _isAnalyticsAllowed: () => Promise<void> = async () => {
+    const isAnalyticsAllowed = await this.getIsAnalyticsAllowed.execute()
+    const AMPLI_FLUSH_INTERVAL_MS = 5000;
+    await ampli.load(({
+      environment: environment.isProduction() ? 'production' : 'development',
+      client: {
+        configuration: {
+          optOut: !isAnalyticsAllowed,
+          flushIntervalMillis: AMPLI_FLUSH_INTERVAL_MS,
+          trackingOptions: {
+            ipAddress: false,
+          },
+          defaultTracking: false,
+        },
+      },
+    }: LoadOptionsWithEnvironment)).promise;
+    if (environment.isDev()) {
+      ampli.client.add({
+        name: 'info-plugin',
+        type: 'enrichment',
+        setup: () => Promise.resolve(),
+        execute: async (event) => {
+          console.info('[metrics]', event.event_type, event.event_properties)
+          return Promise.resolve(event)
+        },
+      });
+    }
   }
 
   teardown(): void {
