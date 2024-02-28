@@ -10,7 +10,6 @@ import {
   HARD_DERIVATION_START,
   WalletTypePurpose,
 } from '../../config/numbersConfig';
-import type { Network, } from '../../../config/config-types';
 import { createHardwareCip1852Wallet, createStandardCip1852Wallet, } from './lib/storage/bridge/walletBuilder/shelley';
 import type { ReferenceTx } from './lib/storage/bridge/updateTransactions';
 import {
@@ -76,12 +75,6 @@ import {
 import { generateAdaMnemonic, generateWalletRootKey, } from './lib/cardanoCrypto/cryptoWallet';
 import { v4PublicToV2, } from './lib/cardanoCrypto/utils';
 import { isValidBip39Mnemonic, } from '../common/lib/crypto/wallet';
-import { generateByronPlate } from './lib/cardanoCrypto/plate';
-import {
-  isValidEnglishAdaPaperMnemonic,
-  scramblePaperAdaMnemonic,
-  unscramblePaperAdaMnemonic,
-} from './lib/cardanoCrypto/paperWallet';
 import type { CardanoSignTransaction } from 'trezor-connect-flow';
 import { createTrezorSignTxPayload, } from './transactions/shelley/trezorTx';
 import { createLedgerSignTxPayload, } from './transactions/shelley/ledgerTx';
@@ -134,12 +127,9 @@ import {
   multiTokenFromCardanoValue,
   multiTokenFromRemote,
 } from './transactions/utils';
-import type { PdfGenStepType } from './paperWallet/paperWalletPdf';
-import { generateAdaPaperPdf } from './paperWallet/paperWalletPdf';
 import type { TransactionExportRow } from '../export';
 
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
-import type { WalletChecksum } from '@emurgo/cip4-js';
 import type {
   CreateWalletRequest,
   CreateWalletResponse,
@@ -165,36 +155,6 @@ import type WalletTransaction from '../../domain/WalletTransaction';
 import { derivePrivateByAddressing, derivePublicByAddressing } from './lib/cardanoCrypto/deriveByAddressing';
 
 // ADA specific Request / Response params
-
-// createAdaPaper
-
-export type CreateAdaPaperRequest = {|
-  password: string,
-  numAddresses?: number,
-  network: $ReadOnly<NetworkRow>,
-|};
-export type AdaPaper = {|
-  addresses: Array<string>,
-  scrambledWords: Array<string>,
-  plate: WalletChecksum,
-|};
-export type CreateAdaPaperFunc = (
-  request: CreateAdaPaperRequest
-) => Promise<AdaPaper>;
-
-// createAdaPaperPdf
-
-export type CreateAdaPaperPdfRequest = {|
-  paper: AdaPaper,
-  network: Network,
-  printAccountPlate?: boolean,
-  updateStatus?: PdfGenStepType => boolean,
-|};
-
-export type CreateAdaPaperPdfResponse = ?Blob;
-export type CreateAdaPaperPdfFunc = (
-  request: CreateAdaPaperPdfRequest
-) => Promise<CreateAdaPaperPdfResponse>;
 
 // getAllAddressesForDisplay
 
@@ -460,28 +420,6 @@ export type SaveLastReceiveAddressIndexFunc = (
   request: SaveLastReceiveAddressIndexRequest
 ) => Promise<SaveLastReceiveAddressIndexResponse>;
 
-// isValidPaperMnemonic
-
-export type IsValidPaperMnemonicRequest = {|
-  mnemonic: string,
-  numberOfWords: number,
-|};
-export type IsValidPaperMnemonicResponse = boolean;
-export type IsValidPaperMnemonicFunc = (
-  request: IsValidPaperMnemonicRequest
-) => IsValidPaperMnemonicResponse;
-
-// unscramblePaperMnemonic
-
-export type UnscramblePaperMnemonicRequest = {|
-  mnemonic: string,
-  numberOfWords: number,
-  password?: string,
-|};
-export type UnscramblePaperMnemonicResponse = [?string, number];
-export type UnscramblePaperMnemonicFunc = (
-  request: UnscramblePaperMnemonicRequest
-) => UnscramblePaperMnemonicResponse;
 
 // generateWalletRecoveryPhrase
 
@@ -559,59 +497,9 @@ export type GetTransactionRowsToExportFunc = (
   request: GetTransactionRowsToExportRequest
 ) => Promise<GetTransactionRowsToExportResponse>;
 
-export const DEFAULT_ADDRESSES_PER_PAPER = 1;
-
 export const FETCH_TXS_BATCH_SIZE = 20;
 
 export default class AdaApi {
-
-  // noinspection JSMethodCanBeStatic
-  createAdaPaper(
-    request: CreateAdaPaperRequest
-  ): AdaPaper {
-    const words = generateAdaMnemonic();
-    const rootPk = generateWalletRootKey(words.join(' '));
-    const scrambledWords = scramblePaperAdaMnemonic(
-      words.join(' '),
-      request.password
-    ).split(' ');
-
-    const config = getCardanoHaskellBaseConfig(
-      request.network
-    ).reduce((acc, next) => Object.assign(acc, next), {});
-
-    const { addresses, plate } = generateByronPlate(
-      rootPk,
-      0, // paper wallets always use account 0
-      request.numAddresses != null ? request.numAddresses : DEFAULT_ADDRESSES_PER_PAPER,
-      config.ByronNetworkId
-    );
-    return { addresses, scrambledWords, plate };
-  }
-
-  async createAdaPaperPdf(
-    {
-      paper,
-      network,
-      printAccountPlate,
-      updateStatus
-    }: CreateAdaPaperPdfRequest
-  ): Promise<CreateAdaPaperPdfResponse> {
-    const { addresses, scrambledWords, plate } = paper;
-    // noinspection UnnecessaryLocalVariableJS
-    const res : Promise<CreateAdaPaperPdfResponse> = generateAdaPaperPdf({
-      words: scrambledWords,
-      addresses,
-      plate: printAccountPlate === true ? plate : undefined,
-      network,
-    }, s => {
-      Logger.info('[PaperWalletRender] ' + s);
-      if (updateStatus) {
-        updateStatus(s);
-      }
-    });
-    return res;
-  }
 
   /**
    * addresses get cutoff if there is a DisplayCutoff set
@@ -1819,20 +1707,6 @@ export default class AdaApi {
     request: IsValidMnemonicRequest,
   ): IsValidMnemonicResponse {
     return isValidBip39Mnemonic(request.mnemonic, request.numberOfWords);
-  }
-
-  // <TODO:PENDING_REMOVAL> paper
-  isValidPaperMnemonic(
-    request: IsValidPaperMnemonicRequest
-  ): IsValidPaperMnemonicResponse {
-    return isValidEnglishAdaPaperMnemonic(request.mnemonic, request.numberOfWords);
-  }
-
-  // <TODO:PENDING_REMOVAL> paper
-  unscramblePaperMnemonic(
-    request: UnscramblePaperMnemonicRequest
-  ): UnscramblePaperMnemonicResponse {
-    return unscramblePaperAdaMnemonic(request.mnemonic, request.numberOfWords, request.password);
   }
 
   generateWalletRecoveryPhrase(): Promise<GenerateWalletRecoveryPhraseResponse> {

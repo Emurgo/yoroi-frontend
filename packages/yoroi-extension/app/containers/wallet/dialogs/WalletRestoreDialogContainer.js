@@ -117,9 +117,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         const wordsCount = mode.length;
         return (
           <WalletRestoreDialog
-            mnemonicValidator={mnemonic =>
-              this.props.stores.walletRestore.isValidMnemonic({ mnemonic, mode })
-            }
+            mnemonicValidator={mnemonic => walletRestore.isValidMnemonic({ mnemonic, mode })}
             validWords={validWords}
             numberOfMnemonics={wordsCount}
             onSubmit={meta => actions.walletRestore.submitFields.trigger(meta)}
@@ -301,7 +299,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         }
         return (
           <SuccessPage
-            title={intl.formatMessage(globalMessages.pdfGenDone)}
+            title={intl.formatMessage(globalMessages.success)}
             text={intl.formatMessage(messages.walletUpgradeNoop)}
             classicTheme={profile.isClassicTheme}
             closeInfo={{
