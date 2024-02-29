@@ -111,6 +111,7 @@ module.exports = {
       2,
       { object: 'TrezorConnect', message: 'Use TrezorWrapper instead to minimize Trezor iframe lifespan', },
     ],
+    'import/no-unused-modules': [1, { unusedExports: true }],
   },
   plugins: [
     'import',
