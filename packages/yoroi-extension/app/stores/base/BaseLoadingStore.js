@@ -38,6 +38,7 @@ export default class BaseLoadingStore<TStores, TActions> extends Store<TStores, 
   }
 
   registerBlockingLoadingRequest(promise: Promise<void>, name: string): void {
+    // promises are wrapped as requests to easier check their errors later
     this.__blockingLoadingRequests.push([new Request(() => promise), name]);
   }
 
