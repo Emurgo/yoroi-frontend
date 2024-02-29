@@ -2308,6 +2308,10 @@ const traitFuncLookup: {
   /* eslint-enable quote-props */
 };
 
+export function isSupportedBip44CoinType(coinType: string): boolean {
+  return traitFuncLookup[coinType] != null;
+}
+
 export async function addTraitsForCardanoBip44(
   request: AddBip44TraitsRequest
 ): Promise<AddBip44TraitsResponse> {
@@ -2385,7 +2389,11 @@ export async function addTraitsForBip44Child(
   ...AddBip44TraitsResponse,
   pathToPublic: Array<number>,
 |}> {
-  const traitFunc = traitFuncLookup[request.conceptualWallet.getNetworkInfo().CoinType.toString()];
+  const coinType = request.conceptualWallet.getNetworkInfo().CoinType.toString();
+  const traitFunc = traitFuncLookup[coinType];
+  if (traitFunc == null) {
+    throw new Error(`No trait function found for coin type: ${coinType}`);
+  }
   const { finalClass } = await traitFunc(request);
 
   let pathToPublic;

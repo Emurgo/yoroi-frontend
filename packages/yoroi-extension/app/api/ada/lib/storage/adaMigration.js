@@ -99,10 +99,6 @@ export async function migrateToLatest(
     ['<4.18', async () => {
       return await populateNewUtxodata(persistentDb);
     }],
-    ['<4.23', async () => {
-      // Ergo sunset
-      return await removeErgoDevices(persistentDb);
-    }],
   ];
 
   let appliedMigration = false;
@@ -296,31 +292,6 @@ async function removeLedgerDevices(
       continue;
     }
     // recall: at this time we didn't support multi-account
-    await removePublicDeriver({
-      publicDeriver,
-      conceptualWallet: publicDeriver.getParent(),
-    });
-    removedAWallet = true;
-  }
-  return removedAWallet;
-}
-
-async function removeErgoDevices(
-  persistentDb: lf$Database,
-): Promise<boolean> {
-  const wallets = await loadWalletsFromStorage(persistentDb);
-  if (wallets.length === 0) {
-    return false;
-  }
-  let removedAWallet = false;
-  for (const publicDeriver of wallets) {
-    // INLINED CHECK FOR ERGO THAT WE WILL KEEP FOR SOME TIME
-    const networkInfo = publicDeriver.getParent().getNetworkInfo();
-    // ERGO coin type is hardcoded (HARD_DERIVATION_START + 429)
-    const isErgoNetwork = networkInfo.CoinType === 2147484077;
-    if (!isErgoNetwork) {
-      continue;
-    }
     await removePublicDeriver({
       publicDeriver,
       conceptualWallet: publicDeriver.getParent(),
