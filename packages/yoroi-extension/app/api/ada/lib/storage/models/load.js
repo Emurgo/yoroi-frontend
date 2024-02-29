@@ -49,11 +49,15 @@ export async function loadWalletsFromStorage(
         );
         bip44Map.set(entry.Bip44Wrapper.ConceptualWalletId, bip44Wallet);
       }
-      const publicDeriver = await PublicDeriver.createPublicDeriver(
-        entry.PublicDeriver,
-        bip44Wallet,
-      );
-      result.push(publicDeriver);
+      try {
+        const publicDeriver = await PublicDeriver.createPublicDeriver(
+          entry.PublicDeriver,
+          bip44Wallet,
+        );
+        result.push(publicDeriver);
+      } catch (e) {
+        console.error('Failed to load a BIP44 wallet', e);
+      }
     }
   }
   // Cip1852

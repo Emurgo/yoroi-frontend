@@ -2385,7 +2385,11 @@ export async function addTraitsForBip44Child(
   ...AddBip44TraitsResponse,
   pathToPublic: Array<number>,
 |}> {
-  const traitFunc = traitFuncLookup[request.conceptualWallet.getNetworkInfo().CoinType.toString()];
+  const coinType = request.conceptualWallet.getNetworkInfo().CoinType.toString();
+  const traitFunc = traitFuncLookup[coinType];
+  if (traitFunc == null) {
+    throw new Error(`No trait function found for coin type: ${coinType}`);
+  }
   const { finalClass } = await traitFunc(request);
 
   let pathToPublic;
