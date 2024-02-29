@@ -2308,6 +2308,10 @@ const traitFuncLookup: {
   /* eslint-enable quote-props */
 };
 
+export function isSupportedBip44CoinType(coinType: string): boolean {
+  return traitFuncLookup[coinType] != null;
+}
+
 export async function addTraitsForCardanoBip44(
   request: AddBip44TraitsRequest
 ): Promise<AddBip44TraitsResponse> {
