@@ -301,31 +301,6 @@ async function removeLedgerDevices(
   return removedAWallet;
 }
 
-async function removeErgoDevices(
-  persistentDb: lf$Database,
-): Promise<boolean> {
-  const wallets = await loadWalletsFromStorage(persistentDb);
-  if (wallets.length === 0) {
-    return false;
-  }
-  let removedAWallet = false;
-  for (const publicDeriver of wallets) {
-    // INLINED CHECK FOR ERGO THAT WE WILL KEEP FOR SOME TIME
-    const networkInfo = publicDeriver.getParent().getNetworkInfo();
-    // ERGO coin type is hardcoded (HARD_DERIVATION_START + 429)
-    const isErgoNetwork = networkInfo.CoinType === 2147484077;
-    if (!isErgoNetwork) {
-      continue;
-    }
-    await removePublicDeriver({
-      publicDeriver,
-      conceptualWallet: publicDeriver.getParent(),
-    });
-    removedAWallet = true;
-  }
-  return removedAWallet;
-}
-
 export async function populateNewUtxodata(
   persistentDb: lf$Database,
 ): Promise<boolean> {
