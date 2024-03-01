@@ -443,3 +443,15 @@ export async function loadCatalystRoundInfo(): Promise<?CatalystRoundInfoRespons
 export async function saveCatalystRoundInfo(data: CatalystRoundInfoResponse): Promise<void> {
   await setLocalItem(storageKeys.CATALYST_ROUND_INFO, JSON.stringify(data));
 }
+
+export function asyncLocalStorageWrapper(): {|
+  getItem(key: string): Promise<string | null>,
+  setItem(key: string, value: string): Promise<void>,
+  removeItem(key: string): Promise<void>,
+|} {
+  return {
+    getItem: key => getLocalItem(key).then(x => x ?? null),
+    setItem: setLocalItem,
+    removeItem: removeLocalItem,
+  }
+}
