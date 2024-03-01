@@ -942,6 +942,7 @@ export class GetCertificates {
   });
   static depTables: {||} = Object.freeze({});
 
+  // <TODO:PENDING_REMOVAL> needs redesign
   static async forAddress(
     db: lf$Database,
     tx: lf$Transaction,

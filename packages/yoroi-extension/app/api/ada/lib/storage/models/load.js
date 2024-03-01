@@ -16,6 +16,7 @@ import {
   GetAllBip44Wallets,
 } from '../database/walletTypes/bip44/api/read';
 import { GetAllCip1852Wallets } from '../database/walletTypes/cip1852/api/read';
+import { isSupportedBip44CoinType } from './PublicDeriver/traits';
 
 export async function loadWalletsFromStorage(
   db: lf$Database,
@@ -47,13 +48,22 @@ export async function loadWalletsFromStorage(
           db,
           entry.Bip44Wrapper,
         );
+        const bip44CoinType = bip44Wallet.networkInfo.CoinType.toString();
+        if (!isSupportedBip44CoinType(bip44CoinType)) {
+          // skip for ergo
+          continue;
+        }
         bip44Map.set(entry.Bip44Wrapper.ConceptualWalletId, bip44Wallet);
       }
-      const publicDeriver = await PublicDeriver.createPublicDeriver(
-        entry.PublicDeriver,
-        bip44Wallet,
-      );
-      result.push(publicDeriver);
+      try {
+        const publicDeriver = await PublicDeriver.createPublicDeriver(
+          entry.PublicDeriver,
+          bip44Wallet,
+        );
+        result.push(publicDeriver);
+      } catch (e) {
+        console.error('Failed to load a BIP44 wallet', e);
+      }
     }
   }
   // Cip1852

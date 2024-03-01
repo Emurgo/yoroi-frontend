@@ -349,7 +349,6 @@ test('create tx', async () => {
       NetworkName: 'Cardano Legacy Testnet',
       Backend: {
         BackendService: 'https://testnet-backend.yoroiwallet.com',
-        WebSocket: 'wss://testnet-backend.yoroiwallet.com:443',
         TokenInfoService: 'https://stage-cdn.yoroiwallet.com'
       },
       BaseConfig: [

@@ -62,6 +62,15 @@ export function listValues<T>(obj: { [any]: T }): T[] {
 }
 
 /**
+ * Returns a sorted copy
+ */
+export function sorted<T>(arr: T[]): T[] {
+  const res = [...arr];
+  res.sort();
+  return res;
+}
+
+/**
  * Aggregates an array of key-value tuples into a map
  */
 export function entriesIntoMap<K,V>(col: Array<[K,V]>): { [K]: V } {

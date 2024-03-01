@@ -67,7 +67,6 @@ export type NetworkInsert = {|
   Backend: {|
     BackendService?: string,
     TokenInfoService?: string,
-    WebSocket?: string,
   |},
   /**
    * Starting configuration for the wallet.
@@ -319,6 +318,7 @@ export type CertificateInsert = {|
   TransactionId: number,
   Ordinal: number, // transactions can contain multiple certificates in some blockchains
   Kind: $Values<CertificateKind>,
+  // <TODO:PENDING_REMOVAL> Needs redesign
   Payload: string,
 |};
 export type CertificateRow = {|
@@ -347,6 +347,7 @@ export type CertificateAddressRow = {|
   CertificateAddressId: number,
   ...CertificateAddressInsert,
 |};
+
 export const CertificateAddressSchema: {|
   +name: 'CertificateAddress',
   properties: $ObjMapi<CertificateAddressRow, ToSchemaProp>,

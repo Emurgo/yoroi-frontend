@@ -1,8 +1,9 @@
 // @flow
+import type { ComponentType, Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { action, observable, runInAction } from 'mobx';
-import type { Node, ComponentType } from 'react';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, intlShape } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import type { StoresAndActionsProps } from '../../types/injectedPropsType';
@@ -15,24 +16,20 @@ import WalletSendConfirmationDialogContainer from './dialogs/WalletSendConfirmat
 import WalletSendConfirmationDialog from '../../components/wallet/send/WalletSendConfirmationDialog';
 import MemoNoExternalStorageDialog from '../../components/wallet/memos/MemoNoExternalStorageDialog';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
-import {
-  isLedgerNanoWallet,
-  isTrezorTWallet,
-} from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import { isLedgerNanoWallet, isTrezorTWallet, } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { validateAmount, getMinimumValue } from '../../utils/validations';
+import { getMinimumValue, validateAmount } from '../../utils/validations';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
 import TransactionSuccessDialog from '../../components/wallet/send/TransactionSuccessDialog';
 import type { LayoutComponentMap } from '../../styles/context/layout';
+import { withLayout } from '../../styles/context/layout';
 
 // Hardware Wallet Confirmation
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
 import globalMessages from '../../i18n/global-messages';
-import { withLayout } from '../../styles/context/layout';
 import AddNFTDialog from '../../components/wallet/send/WalletSendFormSteps/AddNFTDialog';
 import AddTokenDialog from '../../components/wallet/send/WalletSendFormSteps/AddTokenDialog';
 import { ampli } from '../../../ampli/index';
@@ -168,14 +165,14 @@ class WalletSendPage extends Component<AllProps> {
     );
 
     if (this.props.selectedLayout === 'REVAMP') {
+      const addressStore = this.props.stores.substores.ada.addresses;
+      const resolveDomainAddressFunc = addressStore.domainResolverSupported()
+        ? addressStore.resolveDomainAddress.bind(addressStore)
+        : null;
       return (
         <>
           <WalletSendFormRevamp
-            resolveDomainAddress={
-              this.props.stores.substores.ada.addresses.domainResolverSupported()
-                ? this.props.stores.substores.ada.addresses.resolveDomainAddress
-                : null
-            }
+            resolveDomainAddress={resolveDomainAddressFunc}
             supportedAddressDomainBannerState={{
               isDisplayed: this.showSupportedAddressDomainBanner,
               onClose: this.onSupportedAddressDomainBannerClose,

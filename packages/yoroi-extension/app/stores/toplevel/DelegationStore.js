@@ -7,7 +7,6 @@ import { PublicDeriver, } from '../../api/ada/lib/storage/models/PublicDeriver/i
 import LocalizedRequest from '../lib/LocalizedRequest';
 import Store from '../base/Store';
 import type {
-  GetCurrentDelegationFunc,
   GetDelegatedBalanceFunc,
   RewardHistoryFunc,
   GetDelegatedBalanceResponse,
@@ -24,12 +23,7 @@ import { maybe } from '../../coreUtils';
 
 export type DelegationRequests = {|
   publicDeriver: PublicDeriver<>,
-  /** Note: this says nothing about what this is delegated to
-   * Notably, it could be delegated to nothing!
-   * use getCurrentDelegation if you want to know what (if any) pool is being delegated to
-   */
   getDelegatedBalance: CachedRequest<GetDelegatedBalanceFunc>,
-  getCurrentDelegation: CachedRequest<GetCurrentDelegationFunc>,
   rewardHistory: CachedRequest<RewardHistoryFunc>,
   mangledAmounts: CachedRequest<MangledAmountFunc>,
   error: LocalizableError | any;

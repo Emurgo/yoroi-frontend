@@ -33,17 +33,16 @@ const initializeDappConnector: void => Promise<void> = async () => {
   const history = syncHistoryWithStore(hashHistory, router);
   const stores = createStores(api, actions);
 
-  // <TODO:PENDING_REMOVAL> ??? USAGE?
-  // window.ergo = {
-  //   api,
-  //   actions,
-  //   translations,
-  //   stores,
-  //   reset: action(() => {
-  //     Action.resetAllActions();
-  //     createStores(api, actions);
-  //   }),
-  // };
+  window.yoroi = {
+    api,
+    actions,
+    translations,
+    stores,
+    reset: action(() => {
+      Action.resetAllActions();
+      createStores(api, actions);
+    }),
+  };
 
   const root = document.querySelector('#root-yoroi-connector');
   if (root == null) {

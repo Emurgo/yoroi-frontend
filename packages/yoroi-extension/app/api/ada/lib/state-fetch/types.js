@@ -172,6 +172,18 @@ export const ShelleyCertificateTypes = Object.freeze({
   PoolRetirement: 'PoolRetirement',
   GenesisKeyDelegation: 'GenesisKeyDelegation',
   MoveInstantaneousRewardsCert: 'MoveInstantaneousRewardsCert',
+  Registration: 'Registration',
+  Unregistration: 'Unregistration',
+  VoteDelegation: 'VoteDelegation',
+  StakeVoteDelegation: 'StakeVoteDelegation',
+  StakeRegistrationDelegation: 'StakeRegistrationDelegation',
+  VoteRegistrationDelegation: 'VoteRegistrationDelegation',
+  StakeVoteRegistrationDelegation: 'StakeVoteRegistrationDelegation',
+  AuthCommitteeHot: 'AuthCommitteeHot',
+  ResignCommitteeCold: 'ResignCommitteeCold',
+  RegisterDrep: 'RegisterDrep',
+  UnregisterDrep: 'UnregisterDrep',
+  UpdateDrep: 'UpdateDrep',
 });
 
 export type RemoteStakeRegistrationCert = {|
@@ -223,6 +235,81 @@ export type RemoteMoveInstantaneousRewardsCert = {|
   +pot: $Values<MIRPot>,
   +rewards: {| [stake_credential: string]: string /* coin */ |},
 |};
+export type RegistrationCert = {|
+  +addrKeyHash: string | null,
+  +scriptHash: string | null,
+  +coin: string,
+|};
+export type UnregistrationCert = {|
+  +addrKeyHash: string | null,
+  +scriptHash: string | null,
+  +coin: string,
+|};
+export type VoteDelegationCert = {|
+  +addrKeyHash: string | null,
+  +scriptHash: string | null,
+  +drep: Drep,
+|};
+export type StakeVoteDelegationCert = {|
+  +addrKeyHash: string | null,
+  +scriptHash: string | null,
+  +drep: Drep,
+  +poolKeyHash: string | null,
+|};
+export type StakeRegistrationDelegationCert = {|
+  +addrKeyHash: string | null,
+  +scriptHash: string | null,
+  +coin: string,
+  +poolKeyHash: string | null,
+|};
+export type VoteRegistrationDelegationCert = {|
+  +addrKeyHash: string | null,
+  +scriptHash: string | null,
+  +drep: Drep,
+  +coin: string
+|};
+export type Drep = {|
+  +type: 'addr_keyhash' | 'scripthash' | 'abstain' | 'no_confidence',
+  +addrKeyHash: string | null,
+  +scriptHash: string | null,
+|};
+export type StakeVoteRegistrationDelegationCert = {|
+  +addrKeyHash: string | null,
+  +scriptHash: string | null,
+  +poolKeyHash: string | null,
+  +drep: Drep,
+  +coin: string,
+|};
+export type AuthCommitteeHotCert = {|
+  +coldAddrKeyHash: string | null,
+  +coldScriptHash: string | null,
+  +hotdAddrKeyHash: string | null,
+  +hotScriptHash: string | null,
+|};
+export type ResignCommitteeColdCert = {|
+  +coldAddrKeyHash: string | null,
+  +coldScriptHash: string | null,
+|};
+type Anchor = {|
+  +anchor_url: string,
+  +anchor_data_hash: string,
+|};
+export type RegisterDrepCert = {|
+  +drepAddrKeyHash: string | null,
+  +drepScriptHash: string | null,
+  +coin: string,
+  +anchor: Anchor | null
+|};
+export type UnregisterDrepCert = {|
+  +drepAddrKeyHash: string | null,
+  +drepScriptHash: string | null,
+  +coin: string,
+|};
+export type UpdateDrepCert = {|
+  +drepAddrKeyHash: string | null,
+  +drepScriptHash: string | null,
+  +anchor: Anchor | null,
+|};
 export type RemoteCertificate = {|
   certIndex: number,
   ...({|
@@ -246,6 +333,42 @@ export type RemoteCertificate = {|
   |} | {|
     +kind: typeof ShelleyCertificateTypes.MoveInstantaneousRewardsCert,
     ...RemoteMoveInstantaneousRewardsCert,
+  |} | {|
+    +kind: typeof ShelleyCertificateTypes.Registration,
+    ...RegistrationCert,
+  |} | {|
+    +kind: typeof ShelleyCertificateTypes.Unregistration,
+    ...UnregistrationCert,
+  |} | {|
+    +kind: typeof ShelleyCertificateTypes.VoteDelegation,
+    ...VoteDelegationCert,
+  |} | {|
+    +kind: typeof ShelleyCertificateTypes.StakeVoteDelegation,
+    ...StakeVoteDelegationCert,
+  |} | {|
+    +kind: typeof ShelleyCertificateTypes.StakeRegistrationDelegation,
+    ...StakeRegistrationDelegationCert,
+  |} | {|
+    +kind: typeof ShelleyCertificateTypes.VoteRegistrationDelegation,
+    ...VoteRegistrationDelegationCert,
+  |} | {|
+    +kind: typeof ShelleyCertificateTypes.StakeVoteRegistrationDelegation,
+    ...StakeVoteRegistrationDelegationCert,
+  |} | {|
+    +kind: typeof ShelleyCertificateTypes.AuthCommitteeHot,
+    ...AuthCommitteeHotCert,
+  |} | {|
+    +kind: typeof ShelleyCertificateTypes.ResignCommitteeCold,
+    ...ResignCommitteeColdCert,
+  |} | {|
+    +kind: typeof ShelleyCertificateTypes.RegisterDrep,
+    ...RegisterDrepCert,
+  |} | {|
+    +kind: typeof ShelleyCertificateTypes.UnregisterDrep,
+    ...UnregisterDrepCert,
+  |} | {|
+    +kind: typeof ShelleyCertificateTypes.UpdateDrep,
+    ...UpdateDrepCert,
   |})
 |};
 

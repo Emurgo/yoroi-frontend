@@ -80,10 +80,6 @@ const globalMessages: * = defineMessages({
     id: 'global.errors.invalidWalletPassword',
     defaultMessage: '!!!Password requires at least 10 characters.',
   },
-  invalidPaperPassword: {
-    id: 'global.errors.invalidPaperPassword',
-    defaultMessage: '!!!Password requires at least 10 characters.',
-  },
   invalidRepeatPassword: {
     id: 'global.errors.invalidRepeatPassword',
     defaultMessage: '!!!Passwords do not match. Please retype.',
@@ -581,10 +577,6 @@ const globalMessages: * = defineMessages({
   walletUpgrade: {
     id: 'wallet.backup.dialog.legacy.upgrade',
     defaultMessage: `!!!Wallet Upgrade`,
-  },
-  pdfGenDone: {
-    id: 'settings.paperWallet.dialog.createPaper.done',
-    defaultMessage: '!!!All done!',
   },
   dateToday: {
     id: 'wallet.summary.page.todayLabel',

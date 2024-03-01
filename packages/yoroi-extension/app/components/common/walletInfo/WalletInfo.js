@@ -70,16 +70,16 @@ export default class WalletInfo extends Component<Props> {
         <div className={styles.plateAndName}>
           {iconComponent}
           <div className={styles.content}>
-            <div className={styles.name}>
+            <div className={styles.name} id='walletInfo-walletName-text'>
               {this.generateNameElem(this.props.wallet.conceptualWalletName)}
             </div>
             <div className={styles.type}>
-              <div className={styles.plate}>{accountPlateId}</div>
+              <div className={styles.plate} id='walletInfo-walletPlate-text'>{accountPlateId}</div>
             </div>
           </div>
         </div>
         <div className={styles.amountAndHideIcon}>
-          <div className={styles.amount}>
+          <div className={styles.amount} id='walletInfo-amount-text'>
             {this.renderAmountDisplay({ shouldHideBalance, amount: walletAmount })}
           </div>
           <button type="button" className={styles.toggleButton} onClick={onUpdateHideBalance}>

@@ -1,7 +1,7 @@
 // @flow //
 import React from 'react';
 import type { Node } from 'react';
-import _ from 'lodash'; // is this really needed?
+import { map } from 'lodash';
 
 type Props = {|variables: { [key: string]: string }|};
 
@@ -20,7 +20,7 @@ export default class StyleVariableLoader extends React.Component<Props> {
   }
 
   updateCSSVariables(variables: { [key: string]: string }) {
-    _.map(variables, (value, prop) => {
+    map(variables, (value, prop) => {
       if (document.documentElement) {
         document.documentElement.style.setProperty(prop, value);
       }

@@ -908,6 +908,26 @@ export default class TransactionRevamp extends Component<Props, State> {
           return intl.formatMessage(shelleyCertificateKinds.GenesisKeyDelegation);
         case Scope.WalletV4.CertificateKind.MoveInstantaneousRewardsCert:
           return intl.formatMessage(shelleyCertificateKinds.MoveInstantaneousRewardsCert);
+        case Scope.WalletV4.CertificateKind.VoteDelegation:
+          return intl.formatMessage(shelleyCertificateKinds.VoteDelegation);
+        case Scope.WalletV4.CertificateKind.StakeAndVoteDelegation:
+          return intl.formatMessage(shelleyCertificateKinds.StakeAndVoteDelegation);
+        case Scope.WalletV4.CertificateKind.StakeRegistrationAndDelegation:
+          return intl.formatMessage(shelleyCertificateKinds.StakeRegistrationAndDelegation);
+        case Scope.WalletV4.CertificateKind.VoteRegistrationAndDelegation:
+          return intl.formatMessage(shelleyCertificateKinds.VoteRegistrationAndDelegation);
+        case Scope.WalletV4.CertificateKind.StakeVoteRegistrationAndDelegation:
+          return intl.formatMessage(shelleyCertificateKinds.StakeVoteRegistrationAndDelegation);
+        case Scope.WalletV4.CertificateKind.CommitteeHotAuth:
+          return intl.formatMessage(shelleyCertificateKinds.CommitteeHotAuth);
+        case Scope.WalletV4.CertificateKind.CommitteeColdResign:
+          return intl.formatMessage(shelleyCertificateKinds.CommitteeColdResign);
+        case Scope.WalletV4.CertificateKind.DrepRegistration:
+          return intl.formatMessage(shelleyCertificateKinds.DrepRegistration);
+        case Scope.WalletV4.CertificateKind.DrepDeregistration:
+          return intl.formatMessage(shelleyCertificateKinds.DrepDeregistration);
+        case Scope.WalletV4.CertificateKind.DrepUpdate:
+          return intl.formatMessage(shelleyCertificateKinds.DrepUpdate);
         default: {
           throw new Error(`${nameof(this.shelleyCertificateToText)} unexpected kind ${kind}`);
         }

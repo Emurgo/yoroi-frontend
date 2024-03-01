@@ -3,7 +3,6 @@
 import {
   Ports,
   portToPermission,
-  portToSocketPermission,
 } from '../scripts-mv2/connections';
 
 export function genCSP(request: {|
@@ -36,7 +35,6 @@ export function genCSP(request: {|
     connectSrc.push(portToPermission(Ports.WebpackDev));
     connectSrc.push(portToPermission(Ports.DevBackendServe));
     connectSrc.push(portToPermission(Ports.ReactDevTools));
-    connectSrc.push(portToSocketPermission(Ports.WebpackDev));
 
     imgSrc.push(portToPermission(Ports.WebpackDev));
   }

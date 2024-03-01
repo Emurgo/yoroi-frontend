@@ -19,6 +19,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils';
 import { genAddressLookup } from '../../stores/stateless/addressStores';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
+import { isValidEnglishAdaPaperMnemonic } from '../../api/ada/lib/cardanoCrypto/paperWallet';
 
 // Stay this long on the success page, then jump to the wallet transactions page
 const SUCCESS_PAGE_STAY_TIME = 5 * 1000;
@@ -114,10 +115,10 @@ export default class YoroiTransferPage extends Component<StoresAndActionsProps> 
           <YoroiPaperWalletFormPage
             onSubmit={this.setupTransferFundsWithPaperMnemonic}
             onBack={this.backToUninitialized}
-            mnemonicValidator={mnemonic => this.props.stores.walletRestore.isValidMnemonic({
+            mnemonicValidator={mnemonic => isValidEnglishAdaPaperMnemonic(
               mnemonic,
-              mode: { type: 'bip44', extra: 'paper', length: config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT },
-            })}
+              config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT,
+            )}
             validWords={validWords}
             mnemonicLength={config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT}
             passwordMatches={_password => true}

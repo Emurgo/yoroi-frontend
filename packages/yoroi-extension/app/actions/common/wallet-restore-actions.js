@@ -14,9 +14,7 @@ export type RestoreModeType =
   | {|
       type: 'bip44',
       extra: void,
-      length:
-        | typeof config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT
-        | typeof config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT,
+      length: typeof config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT,
     |}
   | {|
       type: 'cip1852',
@@ -31,9 +29,7 @@ export type RestoreModeType =
       // but we did allow paper wallet restoration
       type: 'bip44' | 'cip1852',
       extra: 'paper',
-      length:
-        | typeof config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT
-        | typeof config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT,
+      length: typeof config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT,
       chain?: number,
     |}
   | {|

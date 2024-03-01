@@ -213,6 +213,7 @@ type SetWhitelistFunc = ({|
 export type ForeignUtxoFetcher = (Array<string>) => Promise<Array<?RemoteUnspentOutput>>;
 
 export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
+  @observable unrecoverableError: string | null = null;
   @observable connectingMessage: ?ConnectingMessage = null;
   @observable whiteList: Array<WhitelistEntry> = [];
 
@@ -567,13 +568,16 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       const transaction = RustModule.WalletV4.FixedTransaction.from_bytes(bytes);
       this.rawTxBody = Buffer.from(transaction.raw_body());
       txBody = transaction.body();
-    } catch (originalErr) {
+    } catch {
       try {
         // Try parsing as body for backward compatibility
         txBody = RustModule.WalletV4.TransactionBody.from_bytes(bytes);
         this.rawTxBody = bytes;
-      } catch (_e) {
-        throw originalErr;
+      } catch {
+        runInAction(() => {
+          this.unrecoverableError = 'Unable to parse input transaction.';
+        });
+        return;
       }
     }
 
@@ -652,6 +656,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       ownAddresses
     );
 
+    let foreignInputDetails = [];
     if (foreignInputs.length) {
       const foreignUtxos = await this.stores.substores.ada.stateFetchStore.fetcher.getUtxoData({
         network: connectedWallet.publicDeriver.getParent().networkInfo,
@@ -682,7 +687,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           return;
         }
         const value = multiTokenFromRemote(foreignUtxo.output, defaultToken.NetworkId);
-        inputs.push({
+        foreignInputDetails.push({
           address: Buffer.from(
             RustModule.WalletV4.Address.from_bech32(foreignUtxo.output.address).to_bytes()
           ).toString('hex'),
@@ -886,8 +891,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     runInAction(() => {
       this.adaTransaction = {
         inputs,
-        // $FlowFixMe[prop-missing]
-        foreignInputs,
+        foreignInputs: foreignInputDetails,
         outputs,
         fee,
         total,
