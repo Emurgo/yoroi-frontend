@@ -70,6 +70,7 @@ class ResyncBlock extends Component<Props & InjectedProps> {
             marginTop: !isRevampLayout && '20px',
             width: isRevampLayout ? 'fit-content' : '400px',
           }}
+          id="settings:wallet-resyncWallet-button"
         >
           {this.context.intl.formatMessage(globalMessages.resyncButtonLabel)}
         </Button>
