@@ -176,13 +176,13 @@ export default class WalletListDialog extends Component<Props, State> {
         onClose={this.props.close}
         actions={[
           {
-            id: 'walletListDialog-addWallet-button',
+            id: 'changeWalletDialog-addWallet-button',
             onClick: onAddWallet,
             size: 'large',
             label: intl.formatMessage(messages.addWallet),
           },
           {
-            id: 'walletListDialog-applyWallet-button',
+            id: 'changeWalletDialog-applyWallet-button',
             onClick: this.onSelect,
             size: 'large',
             disabled:
@@ -193,6 +193,7 @@ export default class WalletListDialog extends Component<Props, State> {
           },
         ]}
         scrollableContentClass="WalletList"
+        id="changeWalletDialog"
       >
         <Box>
           <div className={styles.header}>
@@ -208,7 +209,11 @@ export default class WalletListDialog extends Component<Props, State> {
               </button>
             </div>
           </div>
-          <Box className="WalletList" sx={{ overflow: 'auto', overflowY: 'auto', height: '400px' }}>
+          <Box
+            className="WalletList"
+            sx={{ overflow: 'auto', overflowY: 'auto', height: '400px' }}
+            id="changeWalletDialog-walletList-box"
+          >
             {cardanoWalletsIdx.length > 0 && (
               <div className={styles.sectionHeader}>
                 <h1>{intl.formatMessage(messages.cardano)}</h1>
@@ -235,6 +240,7 @@ export default class WalletListDialog extends Component<Props, State> {
                               {...wallet}
                               unitOfAccountSetting={unitOfAccountSetting}
                               getCurrentPrice={getCurrentPrice}
+                              id="changeWalletDialog:walletsList"
                             />
                           );
                         })
