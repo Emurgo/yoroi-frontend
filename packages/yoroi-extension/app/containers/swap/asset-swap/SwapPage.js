@@ -1,22 +1,55 @@
 // @flow
 import type { Node } from 'react';
 import {
-  // useEffect,
+  useEffect,
   useState,
 } from 'react';
 import { Box, Button } from '@mui/material';
-// import { useSwap, useSwapTokensOnlyVerified } from '@yoroi/swap';
 import SwapForm from './SwapForm';
 import SwapConfirmationStep from './ConfirmationStep';
 import TxSubmittedStep from './TxSubmittedStep';
 import LimitOrderDialog from '../../../components/swap/LimitOrderDialog';
 import { SwapFormProvider } from '../context/swap-form';
+import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
+import { useSwap } from '@yoroi/swap';
+import { runInAction } from 'mobx';
 
-export default function SwapPage(): Node {
+export default function SwapPage(props: StoresAndActionsProps): Node {
   const [step, setStep] = useState(0);
   const [openedDialog, setOpenedDialog] = useState('');
 
+  const { slippage, slippageChanged, orderData: { slippage: defaultSlippage } } = useSwap();
+  const [slippageValue, setSlippageValue] = useState(String(defaultSlippage));
+
+  useEffect(() => {
+    slippage.read()
+      .then(storedSlippage => {
+        if (storedSlippage > 0) {
+          runInAction(() => {
+            setSlippageValue(String(storedSlippage));
+            if (storedSlippage !== defaultSlippage) {
+              slippageChanged(storedSlippage);
+            }
+          })
+        }
+        return null;
+      })
+      .catch(e => {
+        console.error('Failed to load stored slippage', e);
+      })
+  });
+
+  const onSetNewSlippage = (newSlippage: number): void => {
+    runInAction(() => {
+      slippage.save(newSlippage);
+      slippageChanged(newSlippage);
+      setSlippageValue(String(newSlippage));
+    });
+  }
+
   // state data
+  const wallet = props.stores.wallets.selected;
+
   // const wallet = useSelectedWallet();
   // const {
   //   aggregatorTokenId,
@@ -80,7 +113,13 @@ export default function SwapPage(): Node {
     <SwapFormProvider>
       <Box display="flex" flexDirection="column" height="100%">
         <Box sx={{ flexGrow: '1', overflowY: 'auto' }}>
-          {step === 0 && <SwapForm onLimitSwap={() => handleOpenedDialog('limitOrder')} />}
+          {step === 0 && (
+            <SwapForm
+              slippageValue={slippageValue}
+              onSetNewSlippage={onSetNewSlippage}
+              onLimitSwap={() => handleOpenedDialog('limitOrder')}
+            />
+          )}
           {/* TODO: provide proper pool prop */}
           {step === 1 && <SwapConfirmationStep poolInfo={{}} />}
           {step === 2 && (

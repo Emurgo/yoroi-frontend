@@ -8,27 +8,26 @@ import { ReactComponent as AssetDefault } from '../../assets/images/revamp/asset
 // eslint-disable-next-line no-unused-vars
 import { ReactComponent as NoAssetsFound } from '../../assets/images/revamp/no-assets-found.inline.svg';
 import Tabs from '../common/tabs/Tabs';
-import { useSwap } from '@yoroi/swap';
 
 const defaultSlippages = ['0', '0.1', '0.5', '1', '2', '3', '5', '10'];
 
 type Props = {|
+  onSetNewSlippage: number => void,
   onClose: void => void,
+  slippageValue: string,
 |};
 
-export default function SlippageDialog({ onClose }: Props): React$Node {
-  const {
-    slippageChanged,
-    orderData: { slippage: defaultSlippage },
-    slippage,
-  } = useSwap();
-  const [selectedSlippage, setSelectedSlippage] = useState(String(defaultSlippage));
-  const [isManualSlippage, setIsManualSlippage] = useState(!defaultSlippages.includes(String(defaultSlippage)));
+export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValue }: Props): React$Node {
+  const [selectedSlippage, setSelectedSlippage] = useState(slippageValue);
+  const [isManualSlippage, setIsManualSlippage] = useState(!defaultSlippages.includes(slippageValue));
 
   const handleSlippageApply = () => {
-    slippage.save(selectedSlippage);
-    slippageChanged(selectedSlippage);
-    onClose();
+    try {
+      onSetNewSlippage(parseFloat(selectedSlippage));
+      onClose();
+    } catch (e) {
+      console.error(`Failed to apply new slippage: "${selectedSlippage}"`, e);
+    }
   };
 
   const handleSlippageChange = e => {

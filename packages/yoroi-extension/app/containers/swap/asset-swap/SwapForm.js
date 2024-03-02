@@ -25,10 +25,13 @@ import SelectSwapPoolFromList from './edit-pool/SelectPoolFromList';
 
 type Props = {|
   onLimitSwap: void => void,
+  slippageValue: string,
+  onSetNewSlippage: number => void,
 |};
 
-export default function SwapForm({ onLimitSwap }: Props): React$Node {
+export default function SwapForm({ onLimitSwap, slippageValue, onSetNewSlippage }: Props): React$Node {
   const [openedDialog, setOpenedDialog] = useState('');
+  const [isLimitSelected, setIsLimitSelected] = useState(false);
   const {
     // sellQuantity: { isTouched: isSellTouched },
     // buyQuantity: { isTouched: isBuyTouched },
@@ -72,14 +75,8 @@ export default function SwapForm({ onLimitSwap }: Props): React$Node {
         <Box display="flex" alignItems="center" justifyContent="space-between" mb="16px">
           <Tabs
             tabs={[
-              { label: 'Market', isActive: true, onClick: () => undefined },
-              {
-                label: 'Limit',
-                isActive: false,
-                onClick: () => {
-                  onLimitSwap();
-                },
-              },
+              { label: 'Market', isActive: !isLimitSelected, onClick: () => setIsLimitSelected(false) },
+              { label: 'Limit', isActive: isLimitSelected, onClick: () => setIsLimitSelected(true) },
             ]}
           />
           <Box sx={{ cursor: 'pointer' }}>
@@ -132,7 +129,7 @@ export default function SwapForm({ onLimitSwap }: Props): React$Node {
             sx={{ cursor: 'pointer', display: 'flex', gap: '4px', alignItems: 'center' }}
           >
             <Typography component="div" variant="body1" color="grayscale.max">
-              {orderData.slippage}%
+              {slippageValue}%
             </Typography>
             <EditIcon />
           </Box>
@@ -145,7 +142,13 @@ export default function SwapForm({ onLimitSwap }: Props): React$Node {
       {/* Dialogs */}
       {openedDialog === 'from' && <SelectSellTokenFromList onClose={() => setOpenedDialog('')} />}
       {openedDialog === 'to' && <SelectBuyTokenFromList onClose={() => setOpenedDialog('')} />}
-      {openedDialog === 'slippage' && <SlippageDialog onClose={() => setOpenedDialog('')} />}
+      {openedDialog === 'slippage' && (
+        <SlippageDialog
+          slippageValue={slippageValue}
+          onSetNewSlippage={onSetNewSlippage}
+          onClose={() => setOpenedDialog('')}
+        />
+      )}
       {openedDialog === 'pool' && <SelectSwapPoolFromList onClose={() => setOpenedDialog('')} />}
     </>
   );
