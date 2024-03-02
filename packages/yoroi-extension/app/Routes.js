@@ -29,6 +29,9 @@ import SwapPageContainer from './containers/swap/SwapPageContainer';
 import AssetsWrapper from './containers/wallet/AssetsWrapper';
 import NFTsWrapper from './containers/wallet/NFTsWrapper';
 import SwapProvider from './containers/swap/SwapProvider';
+import { Stack } from '@mui/material';
+import LoadingSpinner from './components/widgets/LoadingSpinner';
+import FullscreenLayout from './components/layout/FullscreenLayout';
 
 // PAGES
 const LanguageSelectionPagePromise = () => import('./containers/profile/LanguageSelectionPage');
@@ -465,11 +468,18 @@ const NFTsSubPages = (stores, actions) => (
 
 export function wrapSwap(swapProps: StoresAndActionsProps, children: Node): Node {
   const queryClient = new QueryClient();
+  const loader = (
+    <FullscreenLayout bottomPadding={0}>
+      <Stack alignItems="center" justifyContent="center" height="50vh">
+        <LoadingSpinner />
+      </Stack>
+    </FullscreenLayout>
+  );
   return (
     <QueryClientProvider client={queryClient}>
       <SwapProvider publicDeriver={swapProps.stores.wallets.selected}>
         <SwapPageContainer {...swapProps}>
-          <Suspense fallback={null}>{children}</Suspense>
+          <Suspense fallback={loader}>{children}</Suspense>
         </SwapPageContainer>
       </SwapProvider>
     </QueryClientProvider>

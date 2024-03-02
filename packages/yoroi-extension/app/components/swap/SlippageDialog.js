@@ -19,14 +19,15 @@ type Props = {|
 export default function SlippageDialog({ onClose }: Props): React$Node {
   const {
     slippageChanged,
-    orderData: { slippage: currentSlippage },
+    orderData: { slippage: defaultSlippage },
+    slippage,
   } = useSwap();
-  const [selectedSlippage, setSelectedSlippage] = useState(currentSlippage || '1');
-  const [manualSlippage, setManualSlippage] = useState(currentSlippage);
-  const [isManual, setIsManual] = useState(!defaultSlippages.includes(currentSlippage));
+  const [selectedSlippage, setSelectedSlippage] = useState(String(defaultSlippage));
+  const [isManualSlippage, setIsManualSlippage] = useState(!defaultSlippages.includes(String(defaultSlippage)));
 
   const handleSlippageApply = () => {
-    slippageChanged(isManual ? manualSlippage : selectedSlippage);
+    slippage.save(selectedSlippage);
+    slippageChanged(selectedSlippage);
     onClose();
   };
 
@@ -35,10 +36,10 @@ export default function SlippageDialog({ onClose }: Props): React$Node {
     const number = Number(val);
     if (number > 100) val = '100';
     else if (number < 0) val = '0';
-    setManualSlippage(val);
+    setSelectedSlippage(val);
   };
 
-  const readonly = defaultSlippages.includes(selectedSlippage);
+  const readonly = !isManualSlippage;
 
   // <TODO:CHECK_INTL>
   return (
@@ -60,18 +61,17 @@ export default function SlippageDialog({ onClose }: Props): React$Node {
             tabs={defaultSlippages
               .map(val => ({
                 label: `${val}%`,
-                isActive: val === selectedSlippage && !isManual,
+                isActive: !isManualSlippage && val === selectedSlippage,
                 onClick: () => {
-                  setIsManual(false);
+                  setIsManualSlippage(false);
                   setSelectedSlippage(val);
                 },
               }))
               .concat({
                 label: 'Manual',
-                isActive: isManual,
+                isActive: isManualSlippage,
                 onClick: () => {
-                  setIsManual(true);
-                  setSelectedSlippage('');
+                  setIsManualSlippage(true);
                 },
               })}
           />
@@ -121,7 +121,7 @@ export default function SlippageDialog({ onClose }: Props): React$Node {
               onChange={handleSlippageChange}
               bgcolor={readonly ? 'grayscale.50' : 'common.white'}
               readOnly={readonly}
-              value={isManual ? manualSlippage : selectedSlippage}
+              value={selectedSlippage}
             />
           </Box>
         </Box>
