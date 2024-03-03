@@ -5,12 +5,9 @@ import SelectAssetDialog from '../../../../components/swap/SelectAssetDialog';
 import { useSwapForm } from '../../context/swap-form';
 import { useAssets } from '../../hooks';
 
-// eslint-disable-next-line import/no-unresolved
-import type { SimpleTokenInfo } from '@yoroi/swap/lib/typescript/translators/reactjs/state/state';
-
 type Props = {|
   onClose(): void,
-  onTokenInfoChanged: SimpleTokenInfo => void;
+  onTokenInfoChanged: * => void;
 |};
 
 export default function SelectSellTokenFromList({ onClose, onTokenInfoChanged }: Props): Node {
