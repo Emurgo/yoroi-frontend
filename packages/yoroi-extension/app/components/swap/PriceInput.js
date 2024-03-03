@@ -15,14 +15,20 @@ export default function PriceInput({ label }: Props): Node {
   const { orderData } = useSwap();
   const { sellTokenInfo, buyTokenInfo } = useSwapForm();
 
+  const isMarketOrder = orderData.type === 'market';
+
   const prices = orderData.selectedPoolCalculation?.prices;
-  const formattedPrice = Quantities.format(
-    prices?.market ?? Quantities.zero,
+  const pricePlaceholder = isMarketOrder ? '---' : '0';
+  const formattedPrice = prices?.market ? Quantities.format(
+    prices?.market,
     orderData.tokens.priceDenomination,
     PRICE_PRECISION
-  );
+  ) : pricePlaceholder;
 
-  const readonly = orderData.type === 'market';
+  // console.log('>>>> formattedPrice: ', formattedPrice);
+
+  const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
+  const isReadonly = !isValidTickers || orderData.type === 'market';
 
   return (
     <Box
@@ -36,7 +42,7 @@ export default function PriceInput({ label }: Props): Node {
         gridTemplateColumns: '1fr auto',
         justifyContent: 'start',
         position: 'relative',
-        bgcolor: readonly ? 'grayscale.50' : 'common.white',
+        bgcolor: isReadonly ? 'grayscale.50' : 'common.white',
         columnGap: '6px',
         rowGap: '8px',
       }}
@@ -66,9 +72,9 @@ export default function PriceInput({ label }: Props): Node {
         variant="body1"
         color="#000"
         placeholder="0"
-        bgcolor={readonly ? 'grayscale.50' : 'common.white'}
-        readOnly={readonly}
-        value={sellTokenInfo?.ticker && buyTokenInfo?.ticker ? formattedPrice : '0'}
+        bgcolor={isReadonly ? 'grayscale.50' : 'common.white'}
+        readOnly={isReadonly}
+        value={isValidTickers ? formattedPrice : '---'}
       />
       <Box sx={{ justifySelf: 'end' }}>
         <Box height="100%" width="max-content" display="flex" alignItems="center">
