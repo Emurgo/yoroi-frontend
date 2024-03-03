@@ -115,6 +115,7 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
         <Box sx={{ flexGrow: '1', overflowY: 'auto' }}>
           {step === 0 && (
             <SwapForm
+              swapStore={props.stores.substores.ada.swapStore}
               slippageValue={slippageValue}
               onSetNewSlippage={onSetNewSlippage}
               onLimitSwap={() => handleOpenedDialog('limitOrder')}

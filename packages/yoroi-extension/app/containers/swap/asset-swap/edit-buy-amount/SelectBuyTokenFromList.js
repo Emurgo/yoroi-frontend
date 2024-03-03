@@ -5,11 +5,15 @@ import SelectAssetDialog from '../../../../components/swap/SelectAssetDialog';
 import { useSwapForm } from '../../context/swap-form';
 import { useAssets } from '../../hooks';
 
+// eslint-disable-next-line import/no-unresolved
+import type { SimpleTokenInfo } from '@yoroi/swap/lib/typescript/translators/reactjs/state/state';
+
 type Props = {|
   onClose(): void,
+  onTokenInfoChanged: SimpleTokenInfo => void;
 |};
 
-export default function SelectBuyTokenFromList({ onClose }: Props): Node {
+export default function SelectBuyTokenFromList({ onClose, onTokenInfoChanged }: Props): Node {
   const {
     sellQuantity: { isTouched: isSellTouched },
     buyQuantity: { isTouched: isBuyTouched },
@@ -36,7 +40,7 @@ export default function SelectBuyTokenFromList({ onClose }: Props): Node {
       .filter(Boolean);
   }, [onlyVerifiedTokens, walletAssets, sellTokenInfo]);
 
-  const { buyTokenInfoChanged, orderData, resetQuantities } = useSwap();
+  const { orderData, resetQuantities } = useSwap();
 
   const handleAssetSelected = token => {
     const { id, decimals } = token;
@@ -50,7 +54,7 @@ export default function SelectBuyTokenFromList({ onClose }: Props): Node {
     }
 
     if (shouldUpdateToken) {
-      buyTokenInfoChanged({ decimals: decimals ?? 0, id });
+      onTokenInfoChanged({ decimals: decimals ?? 0, id });
       buyTouched(token);
     }
 

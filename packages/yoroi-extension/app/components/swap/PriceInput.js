@@ -5,14 +5,18 @@ import { Quantities } from '../../utils/quantities';
 import { useSwap } from '@yoroi/swap';
 import { PRICE_PRECISION } from './common';
 import { useSwapForm } from '../../containers/swap/context/swap-form';
+import { useState } from 'react';
+import SwapStore from '../../stores/ada/SwapStore';
+import { runInAction } from 'mobx';
 
 type Props = {|
   label: string,
+  swapStore: SwapStore,
 |};
 
 const NO_PRICE_VALUE_PLACEHOLDER = '---';
 
-export default function PriceInput({ label }: Props): Node {
+export default function PriceInput({ label, swapStore }: Props): Node {
   const {
     orderData,
     limitPriceChanged,
@@ -26,17 +30,24 @@ export default function PriceInput({ label }: Props): Node {
   const pricePlaceholder = isMarketOrder ? NO_PRICE_VALUE_PLACEHOLDER : '0';
 
   const marketPrice = orderData.selectedPoolCalculation?.prices.market;
-  const limitPrice = orderData.limitPrice ?? marketPrice;
-  const selectedPrice = isMarketOrder ? marketPrice : limitPrice;
-
-  const formattedPrice = selectedPrice ? Quantities.format(
-    selectedPrice,
+  const formattedPrice = marketPrice ? Quantities.format(
+    marketPrice,
     orderData.tokens.priceDenomination,
     PRICE_PRECISION
   ) : pricePlaceholder;
 
+  if (swapStore.limitOrderDisplayValue === '' && marketPrice != null) {
+    runInAction(() => {
+      swapStore.setLimitOrderDisplayValue(formattedPrice);
+    })
+  }
+  const displayValue = isMarketOrder ? formattedPrice : swapStore.limitOrderDisplayValue;
+  console.log('>>> ', displayValue);
+
   const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
   const isReadonly = !isValidTickers || isMarketOrder;
+
+  const [, forceUpdate] = useState();
 
   return (
     <Box
@@ -82,13 +93,22 @@ export default function PriceInput({ label }: Props): Node {
         placeholder="0"
         bgcolor={isReadonly ? 'grayscale.50' : 'common.white'}
         readOnly={isReadonly}
-        value={isValidTickers ? formattedPrice : NO_PRICE_VALUE_PLACEHOLDER}
+        value={isValidTickers ? displayValue : NO_PRICE_VALUE_PLACEHOLDER}
         onChange={({ target: { value } }) => {
-          try {
-            if (/\d+[,.]\d*/.test(value)) {
+          if (/^\d+\.?\d*$/.test(value)) {
+            runInAction(() => {
+              swapStore.setLimitOrderDisplayValue(value);
+            })
+            if (value.endsWith('.')) {
+              /*
+               * FOR SOME REASON HAVE TO FORCE RENDER WHEN NEW VAL NEDS WITH DOT
+               * <TODO:FIGURE> why setting string ending with dot does not trigger observable
+               */
+              forceUpdate({});
+            } else {
               limitPriceChanged(value);
             }
-          } catch { /*ignore*/ }
+          }
         }}
       />
       <Box sx={{ justifySelf: 'end' }}>

@@ -5,11 +5,15 @@ import SelectAssetDialog from '../../../../components/swap/SelectAssetDialog';
 import { useSwapForm } from '../../context/swap-form';
 import { useAssets } from '../../hooks';
 
+// eslint-disable-next-line import/no-unresolved
+import type { SimpleTokenInfo } from '@yoroi/swap/lib/typescript/translators/reactjs/state/state';
+
 type Props = {|
   onClose(): void,
+  onTokenInfoChanged: SimpleTokenInfo => void;
 |};
 
-export default function SelectSellTokenFromList({ onClose }: Props): Node {
+export default function SelectSellTokenFromList({ onClose, onTokenInfoChanged }: Props): Node {
   const { onlyVerifiedTokens } = useSwapTokensOnlyVerified();
   const assets = useAssets();
   const walletVerifiedAssets = useMemo(() => {
@@ -22,7 +26,7 @@ export default function SelectSellTokenFromList({ onClose }: Props): Node {
       .filter(Boolean);
   }, [onlyVerifiedTokens, assets]);
 
-  const { sellTokenInfoChanged, orderData, resetQuantities } = useSwap();
+  const { orderData, resetQuantities } = useSwap();
   const {
     buyQuantity: { isTouched: isBuyTouched },
     sellQuantity: { isTouched: isSellTouched },
@@ -46,7 +50,7 @@ export default function SelectSellTokenFromList({ onClose }: Props): Node {
 
     if (shouldUpdateToken) {
       sellTouched(token);
-      sellTokenInfoChanged({ id, decimals: decimals ?? 0 });
+      onTokenInfoChanged({ id, decimals: decimals ?? 0 });
     }
 
     onClose();

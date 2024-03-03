@@ -22,14 +22,17 @@ import SelectBuyTokenFromList from './edit-buy-amount/SelectBuyTokenFromList';
 import SelectSellTokenFromList from './edit-sell-amount/SelectSellTokenFromList';
 import EditSwapPool from './edit-pool/EditPool';
 import SelectSwapPoolFromList from './edit-pool/SelectPoolFromList';
+import SwapStore from '../../../stores/ada/SwapStore';
+import { runInAction } from 'mobx';
 
 type Props = {|
   onLimitSwap: void => void,
   slippageValue: string,
   onSetNewSlippage: number => void,
+  swapStore: SwapStore,
 |};
 
-export default function SwapForm({ onLimitSwap, slippageValue, onSetNewSlippage }: Props): React$Node {
+export default function SwapForm({ onLimitSwap, slippageValue, onSetNewSlippage, swapStore }: Props): React$Node {
   const [openedDialog, setOpenedDialog] = useState('');
   const {
     // sellQuantity: { isTouched: isSellTouched },
@@ -46,6 +49,8 @@ export default function SwapForm({ onLimitSwap, slippageValue, onSetNewSlippage 
     // unsignedTxChanged,
     poolPairsChanged,
     orderTypeChanged,
+    sellTokenInfoChanged,
+    buyTokenInfoChanged,
   } = useSwap();
 
   useSwapPoolsByPair(
@@ -113,7 +118,7 @@ export default function SwapForm({ onLimitSwap, slippageValue, onSetNewSlippage 
 
         {/* Price between assets */}
         <Box mt="16px">
-          <PriceInput label="Market price" />
+          <PriceInput label="Market price" swapStore={swapStore} />
         </Box>
 
         {/* Slippage settings */}
@@ -146,8 +151,24 @@ export default function SwapForm({ onLimitSwap, slippageValue, onSetNewSlippage 
       </Box>
 
       {/* Dialogs */}
-      {openedDialog === 'from' && <SelectSellTokenFromList onClose={() => setOpenedDialog('')} />}
-      {openedDialog === 'to' && <SelectBuyTokenFromList onClose={() => setOpenedDialog('')} />}
+      {openedDialog === 'from' && (
+        <SelectSellTokenFromList
+          onClose={() => setOpenedDialog('')}
+          onTokenInfoChanged={val => {
+            swapStore.resetLimitOrderDisplayValue();
+            sellTokenInfoChanged(val);
+          }}
+        />
+      )}
+      {openedDialog === 'to' && (
+        <SelectBuyTokenFromList
+          onClose={() => setOpenedDialog('')}
+          onTokenInfoChanged={val => {
+            swapStore.resetLimitOrderDisplayValue();
+            buyTokenInfoChanged(val);
+          }}
+        />
+      )}
       {openedDialog === 'slippage' && (
         <SlippageDialog
           slippageValue={slippageValue}
