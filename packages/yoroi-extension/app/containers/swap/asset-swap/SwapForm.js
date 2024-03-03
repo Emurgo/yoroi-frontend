@@ -31,7 +31,6 @@ type Props = {|
 
 export default function SwapForm({ onLimitSwap, slippageValue, onSetNewSlippage }: Props): React$Node {
   const [openedDialog, setOpenedDialog] = useState('');
-  const [isLimitSelected, setIsLimitSelected] = useState(false);
   const {
     // sellQuantity: { isTouched: isSellTouched },
     // buyQuantity: { isTouched: isBuyTouched },
@@ -46,6 +45,7 @@ export default function SwapForm({ onLimitSwap, slippageValue, onSetNewSlippage 
     orderData,
     // unsignedTxChanged,
     poolPairsChanged,
+    orderTypeChanged,
   } = useSwap();
 
   useSwapPoolsByPair(
@@ -69,15 +69,21 @@ export default function SwapForm({ onLimitSwap, slippageValue, onSetNewSlippage 
     resetSwapForm();
   };
 
+  const orderTypeTabs = [
+    { type: 'market', label: 'Market' },
+    { type: 'limit', label: 'Limit' },
+  ];
+
   return (
     <>
       <Box width="100%" mx="auto" maxWidth="506px" display="flex" flexDirection="column" gap="16px">
         <Box display="flex" alignItems="center" justifyContent="space-between" mb="16px">
           <Tabs
-            tabs={[
-              { label: 'Market', isActive: !isLimitSelected, onClick: () => setIsLimitSelected(false) },
-              { label: 'Limit', isActive: isLimitSelected, onClick: () => setIsLimitSelected(true) },
-            ]}
+            tabs={orderTypeTabs.map(({ type, label }) => ({
+              label,
+              isActive: orderData.type === type,
+              onClick: () => orderTypeChanged(type)
+            }))}
           />
           <Box sx={{ cursor: 'pointer' }}>
             <RefreshIcon />
