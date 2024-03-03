@@ -2,7 +2,6 @@
 import type { Node } from 'react';
 import { Box, Typography } from '@mui/material';
 import { Quantities } from '../../utils/quantities';
-// import { BigNumber } from 'bignumber.js';
 import { useSwap } from '@yoroi/swap';
 import { PRICE_PRECISION } from './common';
 import { useSwapForm } from '../../containers/swap/context/swap-form';
@@ -11,24 +10,33 @@ type Props = {|
   label: string,
 |};
 
+const NO_PRICE_VALUE_PLACEHOLDER = '---';
+
 export default function PriceInput({ label }: Props): Node {
-  const { orderData } = useSwap();
-  const { sellTokenInfo, buyTokenInfo } = useSwapForm();
+  const {
+    orderData,
+    limitPriceChanged,
+  } = useSwap();
+  const {
+    sellTokenInfo,
+    buyTokenInfo,
+  } = useSwapForm();
 
   const isMarketOrder = orderData.type === 'market';
+  const pricePlaceholder = isMarketOrder ? NO_PRICE_VALUE_PLACEHOLDER : '0';
 
-  const prices = orderData.selectedPoolCalculation?.prices;
-  const pricePlaceholder = isMarketOrder ? '---' : '0';
-  const formattedPrice = prices?.market ? Quantities.format(
-    prices?.market,
+  const marketPrice = orderData.selectedPoolCalculation?.prices.market;
+  const limitPrice = orderData.limitPrice ?? marketPrice;
+  const selectedPrice = isMarketOrder ? marketPrice : limitPrice;
+
+  const formattedPrice = selectedPrice ? Quantities.format(
+    selectedPrice,
     orderData.tokens.priceDenomination,
     PRICE_PRECISION
   ) : pricePlaceholder;
 
-  // console.log('>>>> formattedPrice: ', formattedPrice);
-
   const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
-  const isReadonly = !isValidTickers || orderData.type === 'market';
+  const isReadonly = !isValidTickers || isMarketOrder;
 
   return (
     <Box
@@ -74,7 +82,14 @@ export default function PriceInput({ label }: Props): Node {
         placeholder="0"
         bgcolor={isReadonly ? 'grayscale.50' : 'common.white'}
         readOnly={isReadonly}
-        value={isValidTickers ? formattedPrice : '---'}
+        value={isValidTickers ? formattedPrice : NO_PRICE_VALUE_PLACEHOLDER}
+        onChange={({ target: { value } }) => {
+          try {
+            if (/\d+[,.]\d*/.test(value)) {
+              limitPriceChanged(value);
+            }
+          } catch { /*ignore*/ }
+        }}
       />
       <Box sx={{ justifySelf: 'end' }}>
         <Box height="100%" width="max-content" display="flex" alignItems="center">
