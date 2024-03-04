@@ -20,15 +20,31 @@ export default function EditSwapPool({ handleEditPool }: Props): React$Node {
   const { orderData } = useSwap();
 
   const { selectedPoolCalculation: calculation, amounts, bestPoolCalculation, type } = orderData;
-  console.log('🚀 ~ EditSwapPool ~ amounts:', amounts);
+  const { sellTokenInfo, buyTokenInfo } = useSwapForm();
 
-  const {
-    buyQuantity: { isTouched: isBuyTouched },
-    sellQuantity: { isTouched: isSellTouched },
-    sellTokenInfo,
-  } = useSwapForm();
+  const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
+  if (!isValidTickers) {
+    return null;
+  }
 
-  if (!isBuyTouched || !isSellTouched || calculation === undefined) return null;
+  if (calculation === undefined) {
+    return (
+      <Box>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            mb: '16px',
+          }}
+        >
+          <Typography component="div" variant="subtitle2" color="darkred">
+            No viable pool found!
+          </Typography>
+        </Box>
+      </Box>
+    );
+  }
 
   const { cost, pool } = calculation;
 

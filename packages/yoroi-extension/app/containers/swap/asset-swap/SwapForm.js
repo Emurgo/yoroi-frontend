@@ -147,6 +147,7 @@ export default function SwapForm({ onLimitSwap, slippageValue, onSetNewSlippage,
 
         {/* Available pools */}
         <EditSwapPool handleEditPool={() => setOpenedDialog('pool')} />
+
       </Box>
 
       {/* Dialogs */}
