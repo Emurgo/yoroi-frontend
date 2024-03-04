@@ -5,9 +5,9 @@ import { Quantities } from '../../utils/quantities';
 import { useSwap } from '@yoroi/swap';
 import { PRICE_PRECISION } from './common';
 import { useSwapForm } from '../../containers/swap/context/swap-form';
-import { useState } from 'react';
 import SwapStore from '../../stores/ada/SwapStore';
 import { runInAction } from 'mobx';
+import { observer } from 'mobx-react';
 
 type Props = {|
   label: string,
@@ -16,7 +16,7 @@ type Props = {|
 
 const NO_PRICE_VALUE_PLACEHOLDER = '---';
 
-export default function PriceInput({ label, swapStore }: Props): Node {
+function PriceInput({ label, swapStore }: Props): Node {
   const {
     orderData,
     limitPriceChanged,
@@ -42,12 +42,8 @@ export default function PriceInput({ label, swapStore }: Props): Node {
     })
   }
   const displayValue = isMarketOrder ? formattedPrice : swapStore.limitOrderDisplayValue;
-  console.log('>>> ', displayValue);
-
   const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
   const isReadonly = !isValidTickers || isMarketOrder;
-
-  const [, forceUpdate] = useState();
 
   return (
     <Box
@@ -99,13 +95,7 @@ export default function PriceInput({ label, swapStore }: Props): Node {
             runInAction(() => {
               swapStore.setLimitOrderDisplayValue(value);
             })
-            if (value.endsWith('.')) {
-              /*
-               * FOR SOME REASON HAVE TO FORCE RENDER WHEN NEW VAL NEDS WITH DOT
-               * <TODO:FIGURE> why setting string ending with dot does not trigger observable
-               */
-              forceUpdate({});
-            } else {
+            if (!value.endsWith('.')) {
               limitPriceChanged(value);
             }
           }
@@ -121,3 +111,5 @@ export default function PriceInput({ label, swapStore }: Props): Node {
     </Box>
   );
 }
+
+export default observer(PriceInput);

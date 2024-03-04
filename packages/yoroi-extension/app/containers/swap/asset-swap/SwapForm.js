@@ -23,7 +23,6 @@ import SelectSellTokenFromList from './edit-sell-amount/SelectSellTokenFromList'
 import EditSwapPool from './edit-pool/EditPool';
 import SelectSwapPoolFromList from './edit-pool/SelectPoolFromList';
 import SwapStore from '../../../stores/ada/SwapStore';
-import { runInAction } from 'mobx';
 
 type Props = {|
   onLimitSwap: void => void,

@@ -10,7 +10,6 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
   @observable limitOrderDisplayValue: string = '';
 
   @action setLimitOrderDisplayValue: string => void = (val: string) => {
-    console.log('[setLimitOrderDisplayValue]', val);
     this.limitOrderDisplayValue = val;
   }
 
