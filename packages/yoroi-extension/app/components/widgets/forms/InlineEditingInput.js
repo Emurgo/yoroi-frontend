@@ -42,6 +42,7 @@ type Props = {|
   +validationErrorMessage: string,
   +successfullyUpdated: boolean,
   +classicTheme: boolean,
+  id: string,
 |};
 
 type State = {|
@@ -129,7 +130,7 @@ class InlineEditingInput extends Component<Props & InjectedLayoutProps, State> {
   };
 
   renderCancelButton(): Node {
-    const { isActive, isRevampLayout } = this.props;
+    const { isActive, isRevampLayout, id } = this.props;
     const { intl } = this.context;
     const { validator } = this;
     const inputField = validator.$('inputField');
@@ -149,6 +150,7 @@ class InlineEditingInput extends Component<Props & InjectedLayoutProps, State> {
             right: '13px',
             transform: 'translateY(-80%)',
           }}
+          id={id + '-cancelChanges-button'}
         >
           {intl.formatMessage(messages.cancel)}
         </Button>
@@ -182,6 +184,7 @@ class InlineEditingInput extends Component<Props & InjectedLayoutProps, State> {
       isActive,
       inputFieldValue,
       successfullyUpdated,
+      id,
     } = this.props;
     const { intl } = this.context;
     const inputField = validator.$('inputField');
@@ -216,6 +219,7 @@ class InlineEditingInput extends Component<Props & InjectedLayoutProps, State> {
           inputRef={input => {
             this.inputField = input;
           }}
+          id={id + '-editValue-input'}
         />
 
         {this.renderCancelButton()}

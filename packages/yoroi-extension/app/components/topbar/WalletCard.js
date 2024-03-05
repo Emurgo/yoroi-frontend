@@ -45,6 +45,7 @@ type Props = {|
   +idx: number,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?string,
+  id: string,
 |};
 
 type State = {| +isActionsShow: boolean |};
@@ -108,6 +109,7 @@ export default class WalletCard extends Component<Props, State> {
       idx,
       unitOfAccountSetting,
       getCurrentPrice,
+      id,
     } = this.props;
     const { isActionsShow } = this.state;
 
@@ -121,6 +123,8 @@ export default class WalletCard extends Component<Props, State> {
       .join(' - ');
     const totalAmount = this.getTotalAmount();
     const { tokenTypes, nfts } = this.countTokenTypes();
+    const buttonId = `${id}-selectWallet_${idx}-button`;
+    const walletNameId = `${id}:walletCard_${idx}-walletName-text`
 
     return (
       <Draggable draggableId={walletId.toString()} index={idx}>
@@ -144,9 +148,10 @@ export default class WalletCard extends Component<Props, State> {
               tabIndex="0"
               onClick={this.props.onSelect}
               onKeyDown={this.props.onSelect}
+              id={buttonId}
             >
               <div className={styles.header}>
-                <h5 className={styles.name}>{this.props.settingsCache.conceptualWalletName}</h5>
+                <h5 className={styles.name} id={walletNameId}>{this.props.settingsCache.conceptualWalletName}</h5>
                 {' ·  '}
                 <div className={styles.type}>{typeText}</div>
               </div>
