@@ -21,13 +21,11 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
   const {
     slippage,
     slippageChanged,
-    orderData,
+    orderData: {
+      slippage: defaultSlippage,
+      selectedPoolCalculation,
+    },
   } = useSwap();
-
-  const {
-    slippage: defaultSlippage,
-    selectedPoolCalculation,
-  } = orderData;
 
   const [slippageValue, setSlippageValue] = useState(String(defaultSlippage));
 

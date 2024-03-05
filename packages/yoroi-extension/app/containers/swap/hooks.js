@@ -8,6 +8,7 @@ import {
 } from '../../stores/stateless/tokenHelpers';
 import { splitAmount, truncateToken } from '../../utils/formatters';
 import useSwapPage from './context/swap-page/useSwapPage';
+import { useSwap, useSwapPoolsByPair } from '@yoroi/swap';
 
 export function useTokenInfo({ tokenId }: {| tokenId: string |}): any {
   const { spendableBalance, tokenInfo } = useSwapPage();
@@ -60,15 +61,14 @@ export function useAssets(): Array<any> {
   return assetsList;
 }
 
-//   {
-//     "id": "984394dcc0b08ea12d72b8833292e3c3197d7a8ac89aad61d2f5aa9e.45415254485f746f6b656e",
-//     "group": "984394dcc0b08ea12d72b8833292e3c3197d7a8ac89aad61d2f5aa9e",
-//     "fingerprint": "asset1lr7d44kvy8q8dqnat5macsj6matcvk046hdyeh",
-//     "name": "EARTH_token",
-//     "decimals": 6,
-//     "description": "$EARTH token for use within the Unbounded.Earth metaverse",
-//     "image": "https://tokens.muesliswap.com/static/img/tokens/984394dcc0b08ea12d72b8833292e3c3197d7a8ac89aad61d2f5aa9e.45415254485f746f6b656e.png",
-//     "kind": "ft",
-//     "ticker": "EARTH",
-//     "metadatas": {}
-// }
+export async function useAsyncPools(tokenA: string, tokenB: string): Promise<void> {
+  const { poolPairsChanged } = useSwap();
+  useSwapPoolsByPair(
+    { tokenA, tokenB },
+    {
+      onSuccess: pools => {
+        poolPairsChanged(pools);
+      },
+    }
+  );
+}

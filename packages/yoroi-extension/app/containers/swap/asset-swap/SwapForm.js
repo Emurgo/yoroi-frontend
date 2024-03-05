@@ -8,13 +8,7 @@ import { ReactComponent as RefreshIcon } from '../../../assets/images/revamp/ico
 import PriceInput from '../../../components/swap/PriceInput';
 import SlippageDialog from '../../../components/swap/SlippageDialog';
 import Tabs from '../../../components/common/tabs/Tabs';
-import {
-  // makeLimitOrder,
-  // makePossibleMarketOrder,
-  useSwap,
-  // useSwapCreateOrder,
-  useSwapPoolsByPair,
-} from '@yoroi/swap';
+import { useSwap, } from '@yoroi/swap';
 import { useSwapForm } from '../context/swap-form';
 import EditSellAmount from './edit-sell-amount/EditSellAmount';
 import EditBuyAmount from './edit-buy-amount/EditBuyAmount';
@@ -23,6 +17,7 @@ import SelectSellTokenFromList from './edit-sell-amount/SelectSellTokenFromList'
 import EditSwapPool from './edit-pool/EditPool';
 import SelectSwapPoolFromList from './edit-pool/SelectPoolFromList';
 import SwapStore from '../../../stores/ada/SwapStore';
+import { useAsyncPools } from '../hooks';
 
 type Props = {|
   onLimitSwap: void => void,
@@ -44,26 +39,16 @@ export default function SwapForm({ onLimitSwap, slippageValue, onSetNewSlippage,
   } = useSwapForm();
 
   const {
-    orderData,
+    orderData: { amounts: { sell, buy }, type: orderType },
     // unsignedTxChanged,
-    poolPairsChanged,
     orderTypeChanged,
     sellTokenInfoChanged,
     buyTokenInfoChanged,
   } = useSwap();
 
-  useSwapPoolsByPair(
-    {
-      tokenA: orderData.amounts.sell.tokenId,
-      tokenB: orderData.amounts.buy.tokenId,
-    },
-    {
-      enabled: true,
-      onSuccess: pools => {
-        poolPairsChanged(pools);
-      },
-    }
-  );
+  useAsyncPools(sell.tokenId, buy.tokenId)
+    .then(() => null)
+    .catch(() => null);
 
   const handleSwitchSelectedAssets = () => {
     switchTokens();
@@ -85,7 +70,7 @@ export default function SwapForm({ onLimitSwap, slippageValue, onSetNewSlippage,
           <Tabs
             tabs={orderTypeTabs.map(({ type, label }) => ({
               label,
-              isActive: orderData.type === type,
+              isActive: orderType === type,
               onClick: () => orderTypeChanged(type)
             }))}
           />
@@ -147,7 +132,6 @@ export default function SwapForm({ onLimitSwap, slippageValue, onSetNewSlippage,
 
         {/* Available pools */}
         <EditSwapPool handleEditPool={() => setOpenedDialog('pool')} />
-
       </Box>
 
       {/* Dialogs */}
@@ -176,7 +160,9 @@ export default function SwapForm({ onLimitSwap, slippageValue, onSetNewSlippage,
           onClose={() => setOpenedDialog('')}
         />
       )}
-      {openedDialog === 'pool' && <SelectSwapPoolFromList onClose={() => setOpenedDialog('')} />}
+      {openedDialog === 'pool' && (
+        <SelectSwapPoolFromList onClose={() => setOpenedDialog('')} />
+      )}
     </>
   );
 }
