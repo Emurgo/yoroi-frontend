@@ -279,6 +279,7 @@ export default class WalletListDialog extends Component<Props, State> {
     }
     // either unit of account is not enabled, or fails to convert to fiat
     const amount = this.sumWallets(cardanoWallets).sum;
+    const totalAmountId = `changeWalletDialog:total`;
     return (
       <AmountDisplay
         shouldHideBalance={shouldHideBalance}
@@ -288,6 +289,7 @@ export default class WalletListDialog extends Component<Props, State> {
         showAmount
         unitOfAccountSetting={unitOfAccountSetting}
         getCurrentPrice={getCurrentPrice}
+        id={totalAmountId}
       />
     );
   }
