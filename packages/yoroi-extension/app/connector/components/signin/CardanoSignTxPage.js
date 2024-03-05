@@ -425,6 +425,7 @@ class SignTxPage extends Component<Props, State> {
             border="1px solid var(--yoroi-palette-gray-100)"
             borderRadius="6px"
             id="signMessageBox-payload"
+            sx={{ overflow: 'auto' }}
           >
             <pre>{this.renderPayload(signData.payload)}</pre>
           </Box>
