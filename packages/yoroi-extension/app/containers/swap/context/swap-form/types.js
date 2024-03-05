@@ -74,7 +74,6 @@ export type SwapFormContext = {|
   ...SwapFormActions,
   sellInputRef: any | null,
   buyInputRef: any | null,
-  limitInputRef: any | null,
   onChangeSellQuantity: (text: string) => void,
   onChangeBuyQuantity: (text: string) => void,
   onChangeLimitPrice: (text: string) => void,

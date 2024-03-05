@@ -25,7 +25,6 @@ const initialSwapFormContext: SwapFormContext = {
   canSwapChanged: missingInit,
   sellInputRef: undefined,
   buyInputRef: undefined,
-  limitInputRef: undefined,
   onChangeSellQuantity: missingInit,
   onChangeBuyQuantity: missingInit,
   onChangeLimitPrice: missingInit,

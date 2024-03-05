@@ -27,7 +27,7 @@ export default function EditSwapPool({ handleEditPool }: Props): React$Node {
     return null;
   }
 
-  if (calculation === undefined) {
+  if (calculation == null) {
     return (
       <Box>
         <Box

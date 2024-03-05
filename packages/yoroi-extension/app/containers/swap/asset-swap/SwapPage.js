@@ -18,7 +18,17 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
   const [step, setStep] = useState(0);
   const [openedDialog, setOpenedDialog] = useState('');
 
-  const { slippage, slippageChanged, orderData: { slippage: defaultSlippage } } = useSwap();
+  const {
+    slippage,
+    slippageChanged,
+    orderData,
+  } = useSwap();
+
+  const {
+    slippage: defaultSlippage,
+    selectedPoolCalculation,
+  } = orderData;
+
   const [slippageValue, setSlippageValue] = useState(String(defaultSlippage));
 
   useEffect(() => {
@@ -97,17 +107,8 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
   //   refetch();
   // }, [refetch]);
 
-  // <TODO:CHECK_LINT>
-  // eslint-disable-next-line no-unused-vars
   const [isSuccessful, setIsSuccessful] = useState(false);
-
   const handleNextStep = () => setStep(s => s + 1);
-
-  // <TODO:CHECK_LINT>
-  // eslint-disable-next-line no-unused-vars
-  const handlePrevStep = () => setStep(s => s - 1);
-
-  const handleOpenedDialog = dialog => setOpenedDialog(dialog);
 
   return (
     <SwapFormProvider>
@@ -118,7 +119,7 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
               swapStore={props.stores.substores.ada.swapStore}
               slippageValue={slippageValue}
               onSetNewSlippage={onSetNewSlippage}
-              onLimitSwap={() => handleOpenedDialog('limitOrder')}
+              onLimitSwap={() => setOpenedDialog('limitOrder')}
             />
           )}
           {/* TODO: provide proper pool prop */}
@@ -146,6 +147,7 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
               onClick={handleNextStep}
               sx={{ minWidth: '128px', minHeight: '48px' }}
               variant="primary"
+              disabled={selectedPoolCalculation == null}
             >
               {step === 0 ? 'Swap' : 'Confirm'}
             </Button>
@@ -158,8 +160,8 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
           limitPrice={9}
           marketPrice={4}
           exchangePair="ADA/USDA"
-          onConfirm={() => handleOpenedDialog('')}
-          onClose={() => handleOpenedDialog('')}
+          onConfirm={() => setOpenedDialog('')}
+          onClose={() => setOpenedDialog('')}
         />
       )}
     </SwapFormProvider>

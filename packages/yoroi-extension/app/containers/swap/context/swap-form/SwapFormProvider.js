@@ -1,9 +1,9 @@
 //@flow
 import type { Node } from 'react';
-import type { SwapFormState, SwapFormAction } from './types';
-import type { AssetAmount } from '../../../../components/swap/types';
-import { SwapFormActionTypeValues } from './types';
 import { useCallback, useEffect, useReducer, useRef } from 'react';
+import type { SwapFormAction, SwapFormState } from './types';
+import { SwapFormActionTypeValues } from './types';
+import type { AssetAmount } from '../../../../components/swap/types';
 import { useSwap } from '@yoroi/swap';
 // import { Quantities } from '../../../../utils/quantities';
 import Context from './context';
@@ -13,7 +13,7 @@ import { Quantities } from '../../../../utils/quantities';
 
 export const defaultSwapFormState: SwapFormState = Object.freeze({
   sellQuantity: {
-    isTouched: true,
+    isTouched: false,
     disabled: false,
     error: null,
     displayValue: '',
@@ -27,27 +27,27 @@ export const defaultSwapFormState: SwapFormState = Object.freeze({
   sellTokenInfo: {
     tokenId: '',
   },
-  buyTokenInfo: {},
+  buyTokenInfo: {
+    tokenId: '',
+  },
   selectedPool: { isTouched: false },
   limitPrice: { displayValue: '' },
   canSwap: false,
 });
 
 type Props = {|
-  initialSwapFormProvider?: SwapFormState,
   children: any,
 |};
 
 const numberLocale = { decimalSeparator: ',' };
 
-export default function SwapFormProvider({ initialSwapFormProvider, children }: Props): Node {
+export default function SwapFormProvider({ children }: Props): Node {
   const {
     orderData,
     resetState,
     buyQuantityChanged,
     sellQuantityChanged,
     switchTokens,
-    // limitPriceChanged,
     resetQuantities,
   } = useSwap();
 
@@ -57,7 +57,6 @@ export default function SwapFormProvider({ initialSwapFormProvider, children }: 
   // TODO: fix the types for TextInput
   const buyInputRef = useRef/*<TextInput | null>*/(null);
   const sellInputRef = useRef/*<TextInput | null>*/(null);
-  // const limitInputRef = useRef<TextInput | null>(null)
 
   const swapFormReducer = (state: SwapFormState, action: SwapFormAction) => {
     const draft = { ...state };
@@ -121,7 +120,6 @@ export default function SwapFormProvider({ initialSwapFormProvider, children }: 
 
   const [swapFormState, dispatch] = useReducer(swapFormReducer, {
     ...defaultSwapFormState,
-    ...initialSwapFormProvider,
   });
 
   const actions = {
@@ -165,6 +163,9 @@ export default function SwapFormProvider({ initialSwapFormProvider, children }: 
 
   const onChangeSellQuantity = useCallback(
     (text: string) => {
+      if (swapFormState.sellTokenInfo.tokenId === '') {
+        return;
+      }
       const [input, quantity] = Quantities.parseFromText(
         text,
         swapFormState.sellTokenInfo.decimals ?? 0,
@@ -180,6 +181,9 @@ export default function SwapFormProvider({ initialSwapFormProvider, children }: 
 
   const onChangeBuyQuantity = useCallback(
     (text: string) => {
+      if (swapFormState.buyTokenInfo.tokenId === '') {
+        return;
+      }
       const [input, quantity] = Quantities.parseFromText(
         text,
         swapFormState.buyTokenInfo.decimals ?? 0,
