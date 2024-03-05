@@ -30,7 +30,6 @@ function CheckboxLabel({
   id,
   ...checkboxProps
 }: Props): Node {
-  console.log('CheckboxLabel ID', id)
   return (
     <FormControlLabel
       control={
