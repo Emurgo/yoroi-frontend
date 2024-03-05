@@ -86,7 +86,7 @@ export default class AmountDisplay extends Component<Props> {
     return (
       <>
         {showAmount === true && (
-          <div className={styles.amount} id={id + '-walletBalance-text'}>
+          <div className={styles.amount} id={id + '-availableBalance-text'}>
             {balanceDisplay}&nbsp;{truncateToken(getTokenName(tokenInfo))}
           </div>
         )}

@@ -124,10 +124,10 @@ export default class WalletCard extends Component<Props, State> {
     const totalAmount = this.getTotalAmount();
     const { tokenTypes, nfts } = this.countTokenTypes();
     const buttonId = `${id}-selectWallet_${idx}-button`;
-    const walletNameId = `${id}:walletCard_${idx}-walletName-text`
-    const walletBalanceId = `${id}:walletCard_${idx}`
-    const walletTokensAmountId = `${id}:walletCard_${idx}-walletTokensAmount-text`
-    const walletNFTsAmountId = `${id}:walletCard_${idx}-walletNFTsAmount-text`
+    const walletNameId = `${id}:walletCard_${idx}-walletName-text`;
+    const walletBalanceId = `${id}:walletCard_${idx}`;
+    const walletTokensAmountId = `${id}:walletCard_${idx}-walletTokensAmount-text`;
+    const walletNFTsAmountId = `${id}:walletCard_${idx}-walletNFTsAmount-text`;
 
     return (
       <Draggable draggableId={walletId.toString()} index={idx}>
