@@ -4,6 +4,8 @@ import { ReactComponent as DefaultToken } from '../../assets/images/revamp/token
 import { ReactComponent as MinswapImage } from '../../assets/images/revamp/dex/minswap.inline.svg';
 import { ReactComponent as SundaeImage } from '../../assets/images/revamp/dex/sundae.inline.svg';
 import { ReactComponent as MuesliImage } from '../../assets/images/revamp/dex/muesli.inline.svg';
+import { ReactComponent as SpecImage } from '../../assets/images/revamp/dex/spec.inline.svg';
+import { ReactComponent as VyfiImage } from '../../assets/images/revamp/dex/vyfi.inline.svg';
 
 const poolIcons = {
   muesliswap: <MuesliImage />,
@@ -14,8 +16,8 @@ const poolIcons = {
   minswap: <MinswapImage />,
   sundaeswap: <SundaeImage />,
   //   wingriders: Icon.WingRiders,
-  //   vyfi: Icon.VyfiSwap,
-  //   spectrum: Icon.SpectrumSwap,
+  vyfi: <VyfiImage />,
+  spectrum: <SpecImage />,
 };
 
 type Props = {|

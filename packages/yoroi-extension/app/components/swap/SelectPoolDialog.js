@@ -5,13 +5,16 @@ import Table from '../common/table/Table';
 import { getMarketPrice } from '@yoroi/swap';
 import { Quantities } from '../../utils/quantities';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
+import SwapPoolIcon from './SwapPoolIcon';
+import BigNumber from 'bignumber.js';
+import type { Swap } from '@yoroi/types';
 
 const tableColumns = ['DEX name', 'Price', 'TVL', 'DEX fee', 'Liquidity provider fee'];
 const templateColumns = 'minmax(auto, 208px) 120px 200px 90px 160px';
 const PRECISION = 10;
 
 type Props = {|
-  poolList: Array<any>,
+  poolList: Array<Swap.Pool>,
   sellTokenId: string,
   sellTokenInfo: ?RemoteTokenInfo,
   buyTokenInfo: ?RemoteTokenInfo,
@@ -44,13 +47,27 @@ export default function SelectPoolDialog({
     <Dialog title="Select dex" onClose={onClose} withCloseButton closeOnOverlayClick>
       <Table gridTemplateColumns={templateColumns} columnNames={tableColumns}>
         {poolList.map(pool => {
-          const { provider, fee, deposit, poolId } = pool;
+          const { provider, fee, batcherFee, poolId } = pool;
+          const tvl = new BigNumber(pool.tokenA.quantity)
+            .dividedBy(pool.ptPriceTokenA)
+            .multipliedBy(2)
+            .toString(10);
+          const formattedTvl = Quantities.format(
+            tvl,
+            6,
+            0,
+          );
           const marketPrice = getMarketPrice(pool, sellTokenId);
           const formattedMarketPrice = isTokenInfoPresent ? Quantities.format(
             marketPrice ?? Quantities.zero,
             denomination,
             PRECISION,
           ) : '-';
+          const formattedPoolFee = Quantities.format(
+            batcherFee.quantity,
+            6,
+            6,
+          );
           return (
             <Box
               key={poolId}
@@ -71,7 +88,7 @@ export default function SelectPoolDialog({
             >
               <Box sx={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <Box width="32px" height="32px">
-                  todo:image
+                  <SwapPoolIcon provider={provider} />
                 </Box>
                 <Typography component="span" variant="body1" fontWeight={500}>
                   {provider}
@@ -84,17 +101,17 @@ export default function SelectPoolDialog({
               </Box>
               <Box textAlign="right">
                 <Typography component="span" variant="body1">
-                  todo:liquidity
+                  {formattedTvl} ADA
+                </Typography>
+              </Box>
+              <Box textAlign="right">
+                <Typography component="span" variant="body1">
+                  {formattedPoolFee} ADA
                 </Typography>
               </Box>
               <Box textAlign="right">
                 <Typography component="span" variant="body1">
                   {fee}%
-                </Typography>
-              </Box>
-              <Box textAlign="right">
-                <Typography component="span" variant="body1">
-                  {deposit.quantity/1_000_000} ADA
                 </Typography>
               </Box>
             </Box>

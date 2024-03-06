@@ -25,6 +25,7 @@ type Props = {|
   slippageValue: string,
   onSetNewSlippage: number => void,
   swapStore: SwapStore,
+  defaultTokenInfo: RemoteTokenInfo,
   tokenInfoLookup: string => Promise<RemoteTokenInfo>,
 |};
 

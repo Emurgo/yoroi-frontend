@@ -59,6 +59,8 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
   // state data
   const wallet = props.stores.wallets.selectedOrFail;
   const network = wallet.getParent().getNetworkInfo();
+  const defaultTokenInfo = props.stores.tokenInfoStore
+    .getDefaultTokenInfoSummary(network.NetworkId);
   const tokenInfoLookup = (tokenId: string): Promise<RemoteTokenInfo> =>
     props.stores.tokenInfoStore.getLocalOrRemoteMetadata(network, tokenId);
 
