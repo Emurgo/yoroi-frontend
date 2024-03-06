@@ -10,17 +10,6 @@ import { splitAmount, truncateToken } from '../../utils/formatters';
 import useSwapPage from './context/swap-page/useSwapPage';
 import { useSwap, useSwapPoolsByPair } from '@yoroi/swap';
 
-export function useTokenInfo({ tokenId }: {| tokenId: string |}): any {
-  const { spendableBalance, tokenInfo } = useSwapPage();
-  const getTokenInfo = genLookupOrFail(tokenInfo);
-
-  const assetEntry = [spendableBalance.getDefaultEntry()]
-    .concat(...spendableBalance.nonDefaultEntries())
-    .filter(entry => entry.indentifier === tokenId)[0];
-
-  return getTokenInfo(assetEntry);
-}
-
 export function useAssets(): Array<any> {
   const { spendableBalance, tokenInfo } = useSwapPage();
   const getTokenInfo = genLookupOrFail(tokenInfo);

@@ -18,15 +18,23 @@ import EditSwapPool from './edit-pool/EditPool';
 import SelectSwapPoolFromList from './edit-pool/SelectPoolFromList';
 import SwapStore from '../../../stores/ada/SwapStore';
 import { useAsyncPools } from '../hooks';
+import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 
 type Props = {|
   onLimitSwap: void => void,
   slippageValue: string,
   onSetNewSlippage: number => void,
   swapStore: SwapStore,
+  tokenInfoLookup: string => Promise<RemoteTokenInfo>,
 |};
 
-export default function SwapForm({ onLimitSwap, slippageValue, onSetNewSlippage, swapStore }: Props): React$Node {
+export default function SwapForm({
+  onLimitSwap,
+  slippageValue,
+  onSetNewSlippage,
+  swapStore,
+  tokenInfoLookup,
+}: Props): React$Node {
   const [openedDialog, setOpenedDialog] = useState('');
   const {
     // sellQuantity: { isTouched: isSellTouched },
@@ -49,14 +57,6 @@ export default function SwapForm({ onLimitSwap, slippageValue, onSetNewSlippage,
   useAsyncPools(sell.tokenId, buy.tokenId)
     .then(() => null)
     .catch(() => null);
-
-  const handleSwitchSelectedAssets = () => {
-    switchTokens();
-  };
-
-  const handleResetForm = () => {
-    resetSwapForm();
-  };
 
   const orderTypeTabs = [
     { type: 'market', label: 'Market' },
@@ -86,12 +86,12 @@ export default function SwapForm({ onLimitSwap, slippageValue, onSetNewSlippage,
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Box
             sx={{ cursor: 'pointer', color: 'primary.500' }}
-            onClick={handleSwitchSelectedAssets}
+            onClick={() => switchTokens()}
           >
             <SwitchIcon />
           </Box>
           <Box>
-            <Button onClick={handleResetForm} variant="tertiary" color="primary">
+            <Button onClick={() => resetSwapForm()} variant="tertiary" color="primary">
               Clear
             </Button>
           </Box>
@@ -161,7 +161,10 @@ export default function SwapForm({ onLimitSwap, slippageValue, onSetNewSlippage,
         />
       )}
       {openedDialog === 'pool' && (
-        <SelectSwapPoolFromList onClose={() => setOpenedDialog('')} />
+        <SelectSwapPoolFromList
+          tokenInfoLookup={tokenInfoLookup}
+          onClose={() => setOpenedDialog('')}
+        />
       )}
     </>
   );

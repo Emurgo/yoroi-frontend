@@ -55,7 +55,7 @@ export default function EditSwapPool({ handleEditPool }: Props): React$Node {
     sumQty.push(amounts.sell.quantity);
   }
 
-  // TODO: do not hardcode pt ticker
+  // <TODO:SWAP_FIX> unhardcode ada ticker
   const totalFees = Quantities.format(Quantities.sum(sumQty), 6);
   const sellTokenTotal = sellTokenIsPtToken
     ? `${totalFees} ADA`

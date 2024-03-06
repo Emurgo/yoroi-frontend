@@ -112,4 +112,4 @@ function PriceInput({ label, swapStore }: Props): Node {
   );
 }
 
-export default observer(PriceInput);
+export default (observer(PriceInput): React$ComponentType<Props>);

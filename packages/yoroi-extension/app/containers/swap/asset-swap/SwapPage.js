@@ -13,6 +13,7 @@ import { SwapFormProvider } from '../context/swap-form';
 import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
 import { useSwap } from '@yoroi/swap';
 import { runInAction } from 'mobx';
+import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 
 export default function SwapPage(props: StoresAndActionsProps): Node {
   const [step, setStep] = useState(0);
@@ -56,7 +57,10 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
   }
 
   // state data
-  const wallet = props.stores.wallets.selected;
+  const wallet = props.stores.wallets.selectedOrFail;
+  const network = wallet.getParent().getNetworkInfo();
+  const tokenInfoLookup = (tokenId: string): Promise<RemoteTokenInfo> =>
+    props.stores.tokenInfoStore.getLocalOrRemoteMetadata(network, tokenId);
 
   // const wallet = useSelectedWallet();
   // const {
@@ -118,6 +122,7 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
               slippageValue={slippageValue}
               onSetNewSlippage={onSetNewSlippage}
               onLimitSwap={() => setOpenedDialog('limitOrder')}
+              tokenInfoLookup={tokenInfoLookup}
             />
           )}
           {/* TODO: provide proper pool prop */}
