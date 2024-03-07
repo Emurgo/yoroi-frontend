@@ -218,7 +218,11 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
           />
         </div>
 
-        {error ? <div className={styles.error}>{intl.formatMessage(error, error.values)}</div> : null}
+        {error ? (
+          <div className={styles.error} id="changePasswordDialog-errorMessage-text">
+            {intl.formatMessage(error, error.values)}
+          </div>
+        ) : null}
       </Dialog>
     );
   }
