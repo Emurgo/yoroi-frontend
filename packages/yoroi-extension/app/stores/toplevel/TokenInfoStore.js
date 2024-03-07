@@ -149,7 +149,7 @@ export default class TokenInfoStore<
     );
   }
 
-  getDefaultTokenInfoSummary: number => ?RemoteTokenInfo = (
+  getDefaultTokenInfoSummary: number => RemoteTokenInfo = (
     networkId: number
   ) => {
     return createTokenRowSummary(this.getDefaultTokenInfo(networkId));

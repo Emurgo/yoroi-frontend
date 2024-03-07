@@ -4,7 +4,7 @@ import { useSwap, useSwapTokensOnlyVerified } from '@yoroi/swap';
 import SelectAssetDialog from '../../../../components/swap/SelectAssetDialog';
 import { useSwapForm } from '../../context/swap-form';
 import { useAssets } from '../../hooks';
-import { assetNameFromIdentifier } from '../../../../stores/stateless/tokenHelpers';
+import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
 
 type Props = {|
   onClose(): void,
@@ -30,11 +30,10 @@ export default function SelectBuyTokenFromList({ onClose, onTokenInfoChanged, de
     const pt = walletAssets.find(a => a.id === '');
     const nonPtAssets = onlyVerifiedTokens.map(ovt => {
       if (ovt.id === '') return null;
-      const name = assetNameFromIdentifier(ovt.id);
       const vft = walletAssets.find(a => a.fingerprint === ovt.fingerprint);
-      return { ...ovt, ...(vft ?? {}), name };
+      return { ...ovt, ...(vft ?? {}) };
     }).filter(Boolean);
-    return (isSellingPt ? [] : [pt]).concat(nonPtAssets);
+    return [...(isSellingPt ? [] : [pt]), ...nonPtAssets];
   }, [onlyVerifiedTokens, walletAssets, sellTokenInfo]);
 
   const { orderData, resetQuantities } = useSwap();

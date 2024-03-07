@@ -5,6 +5,7 @@ import { useSwap } from '@yoroi/swap';
 import { useSwapForm } from '../../context/swap-form';
 import { Quantities } from '../../../../utils/quantities';
 import { useSwapFeeDisplay } from '../../hooks';
+import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
 
 type Props = {|
   +defaultTokenInfo: RemoteTokenInfo,

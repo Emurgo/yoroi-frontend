@@ -22,13 +22,13 @@ export default function SelectSwapPoolFromList({ onClose, defaultTokenInfo, toke
       .then(setSellTokenInfo)
       .catch(e => {
         console.error(`Failed to fetch SELL token info`, e);
-        setSellTokenInfo({});
+        setSellTokenInfo(({}: any));
       });
     tokenInfoLookup(buy.tokenId)
       .then(setBuyTokenInfo)
       .catch(e => {
         console.error(`Failed to fetch BUY token info`, e);
-        setBuyTokenInfo({});
+        setBuyTokenInfo(({}: any));
       });
   }, []);
 

@@ -7,14 +7,13 @@ import { Quantities } from '../../utils/quantities';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
 import SwapPoolIcon from './SwapPoolIcon';
 import BigNumber from 'bignumber.js';
-import type { Swap } from '@yoroi/types';
 
 const tableColumns = ['DEX name', 'Price', 'TVL', 'DEX fee', 'Liquidity provider fee'];
 const templateColumns = 'minmax(auto, 208px) 120px 200px 90px 160px';
 const PRECISION = 10;
 
 type Props = {|
-  poolList: Array<Swap.Pool>,
+  poolList: Array<*>,
   sellTokenId: string,
   sellTokenInfo: ?RemoteTokenInfo,
   buyTokenInfo: ?RemoteTokenInfo,

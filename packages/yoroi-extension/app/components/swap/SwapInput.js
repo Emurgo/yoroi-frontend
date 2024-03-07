@@ -7,6 +7,7 @@ import { ReactComponent as ChevronDownIcon } from '../../assets/images/revamp/ic
 import adaTokenImage from '../../containers/swap/mockAssets/ada.inline.svg';
 import defaultTokenImage from '../../assets/images/revamp/token-default.inline.svg';
 import { urlResolveForIpfsAndCorsproxy } from '../../coreUtils';
+import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
 
 type Props = {|
   label: string,

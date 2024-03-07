@@ -72,8 +72,10 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
   // <TODO:DEDUPLICATE> extract this and fix all places where it's duplicated
   const getFormattedPairingValue = (lovelaces: string): string => {
     const { currency } = props.stores.profile.unitOfAccount;
+    if (currency == null || defaultTokenInfo.ticker == null)
+      return '-';
     const price = props.stores.coinPriceStore.getCurrentPrice(defaultTokenInfo.ticker, currency);
-    const shiftedAmount = new BigNumber(lovelaces).shiftedBy(-defaultTokenInfo.decimals);
+    const shiftedAmount = new BigNumber(lovelaces).shiftedBy(-(defaultTokenInfo.decimals ?? 0));
     const val = price ? calculateAndFormatValue(shiftedAmount, price) : '-';
     return `${val} ${currency}`;
   }

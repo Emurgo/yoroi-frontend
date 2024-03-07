@@ -3,6 +3,7 @@ import type { Node } from 'react';
 import { useSwap } from '@yoroi/swap';
 import { useSwapForm } from '../../context/swap-form';
 import SwapInput from '../../../../components/swap/SwapInput';
+import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
 
 type Props = {|
   defaultTokenInfo: RemoteTokenInfo,

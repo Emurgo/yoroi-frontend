@@ -7,6 +7,7 @@ import useSwapPage from './context/swap-page/useSwapPage';
 import { useSwap, useSwapPoolsByPair } from '@yoroi/swap';
 import { Quantities } from '../../utils/quantities';
 import { useSwapForm } from './context/swap-form';
+import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
 
 export function useAssets(): Array<any> {
   const { spendableBalance, tokenInfo } = useSwapPage();
@@ -60,20 +61,26 @@ export async function useAsyncPools(tokenA: string, tokenB: string): Promise<voi
   );
 }
 
-export function useSwapFeeDisplay(defaultTokenInfo: RemoteTokenInfo): {
-  ptAmount: string,
-  nonPtAmount: ?string,
-  formattedPtAmount: string,
-  formattedNonPtAmount: ?string,
+export function useSwapFeeDisplay(defaultTokenInfo: RemoteTokenInfo): {|
   formattedFee: string,
-} {
+  ptAmount: string,
+  formattedPtAmount: string,
+  nonPtAmount: ?string,
+  formattedNonPtAmount: ?string,
+|} {
   const { orderData } = useSwap();
   const { selectedPoolCalculation, amounts } = orderData ?? {};
   const { cost } = selectedPoolCalculation ?? {};
   const { sellTokenInfo } = useSwapForm();
 
   if (cost == null) {
-    return { formattedFee: '', formattedTotal: '' };
+    return {
+      formattedFee: '',
+      ptAmount: '',
+      formattedPtAmount: '',
+      nonPtAmount: null,
+      formattedNonPtAmount: null
+    };
   }
 
   const sellTokenIsPtToken = amounts.sell.tokenId === '';

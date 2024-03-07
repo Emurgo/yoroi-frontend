@@ -4,6 +4,7 @@ import { useSwap, useSwapTokensOnlyVerified } from '@yoroi/swap';
 import SelectAssetDialog from '../../../../components/swap/SelectAssetDialog';
 import { useSwapForm } from '../../context/swap-form';
 import { useAssets } from '../../hooks';
+import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
 
 type Props = {|
   onClose(): void,

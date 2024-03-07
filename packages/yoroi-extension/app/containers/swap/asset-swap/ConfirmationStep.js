@@ -9,6 +9,7 @@ import { useSwap } from '@yoroi/swap';
 import SwapPoolIcon from '../../../components/swap/SwapPoolIcon';
 import SwapPoolFullInfo from './edit-pool/PoolFullInfo';
 import { useSwapFeeDisplay } from '../hooks';
+import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 
 type Props = {|
   slippageValue: string,

@@ -13,6 +13,7 @@ import defaultTokenImage from '../../assets/images/revamp/asset-default.inline.s
 import Dialog from '../widgets/Dialog';
 import Table from '../common/table/Table';
 import { urlResolveForIpfsAndCorsproxy } from '../../coreUtils';
+import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
 
 const fromTemplateColumns = '1fr minmax(auto, 136px)';
 const toTemplateColumns = '1fr minmax(auto, 152px) minmax(auto, 136px)';
@@ -21,7 +22,7 @@ const toColumns = ['Asset', 'Volume, 24h', 'Price %, 24h'];
 
 type Props = {|
   assets: Array<AssetAmount>,
-  type: string,
+  type: 'from' | 'to',
   onAssetSelected: any => void,
   onClose: void => void,
   defaultTokenInfo: RemoteTokenInfo,
@@ -151,7 +152,17 @@ export const AssetAndAmountRow = ({
   onAssetSelected = null,
   defaultTokenInfo,
   displayAmount = null
-}) => {
+}: {|
+  type: 'from' | 'to',
+  asset: AssetAmount,
+  usdPrice?: number,
+  adaPrice?: number,
+  volume24h?: number,
+  priceChange100?: string,
+  onAssetSelected?: AssetAmount => void,
+  defaultTokenInfo: RemoteTokenInfo,
+  displayAmount?: ?string,
+|}): React$Node => {
 
   const isFrom = type === 'from';
 
@@ -187,7 +198,7 @@ export const AssetAndAmountRow = ({
           cursor: 'pointer'
         } : {}),
       }}
-      {...(isClickable ? { onClick: () => onAssetSelected(asset) } : {})}
+      {...(isClickable ? { onClick: () => onAssetSelected?.(asset) } : {})}
     >
       <Box sx={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
         <Box
