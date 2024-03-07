@@ -24,7 +24,7 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
   const { selectedPoolCalculation: calculation, bestPoolCalculation, type } = orderData;
   const { sellTokenInfo, buyTokenInfo } = useSwapForm();
 
-  const { formattedTotal } = useSwapFeeDisplay(defaultTokenInfo);
+  const { formattedPtAmount, formattedNonPtAmount } = useSwapFeeDisplay(defaultTokenInfo);
 
   const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
   if (!isValidTickers) {
@@ -52,6 +52,8 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
 
   const { pool } = calculation;
 
+  const formattedTotal = formattedNonPtAmount == null ? formattedPtAmount
+    : `${formattedNonPtAmount} + ${formattedPtAmount}`;
   const titleTotalFeesFormatted = `Total: ${formattedTotal}`;
 
   const isLimitOrder = type === 'limit';

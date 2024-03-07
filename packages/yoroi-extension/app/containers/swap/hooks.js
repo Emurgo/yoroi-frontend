@@ -61,7 +61,10 @@ export async function useAsyncPools(tokenA: string, tokenB: string): Promise<voi
 }
 
 export function useSwapFeeDisplay(defaultTokenInfo: RemoteTokenInfo): {
-  formattedTotal: string,
+  ptAmount: string,
+  nonPtAmount: ?string,
+  formattedPtAmount: string,
+  formattedNonPtAmount: ?string,
   formattedFee: string,
 } {
   const { orderData } = useSwap();
@@ -90,15 +93,24 @@ export function useSwapFeeDisplay(defaultTokenInfo: RemoteTokenInfo): {
 
   if (sellTokenIsPtToken) {
     // put together the sell and the fees
-    const formattedPtTotal = Quantities.format(
-      Quantities.sum([sellAmount, totalFeesPtToken]),
-      ptDecimals,
-      ptDecimals,
-    );
-    const formattedTotal = `${formattedPtTotal} ${ptTicker}`;
-    return { formattedTotal, formattedFee };
+    const ptAmount = Quantities.sum([sellAmount, totalFeesPtToken]);
+    const formattedPtTotal = Quantities.format(ptAmount, ptDecimals, ptDecimals);
+    const formattedPtAmount = `${formattedPtTotal} ${ptTicker}`;
+    return {
+      ptAmount,
+      formattedPtAmount,
+      formattedFee,
+      nonPtAmount: null,
+      formattedNonPtAmount: null,
+    };
   }
+
   const formattedSell = Quantities.format(sellAmount, sellDecimals, sellDecimals) + ` ${sellTicker}`;
-  const formattedTotal = `${formattedSell} + ${formattedFee}`;
-  return { formattedTotal, formattedFee };
+  return {
+    ptAmount: totalFeesPtToken,
+    formattedPtAmount: formattedFee,
+    nonPtAmount: sellAmount,
+    formattedNonPtAmount: formattedSell,
+    formattedFee,
+  };
 }

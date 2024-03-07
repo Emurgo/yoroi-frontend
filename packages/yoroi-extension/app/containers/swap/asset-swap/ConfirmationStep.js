@@ -8,13 +8,15 @@ import { AssetAndAmountRow } from '../../../components/swap/SelectAssetDialog';
 import { useSwap } from '@yoroi/swap';
 import SwapPoolIcon from '../../../components/swap/SwapPoolIcon';
 import SwapPoolFullInfo from './edit-pool/PoolFullInfo';
+import { useSwapFeeDisplay } from '../hooks';
 
 type Props = {|
   slippageValue: string,
   defaultTokenInfo: RemoteTokenInfo,
+  getFormattedPairingValue: (amount: string) => string,
 |};
 
-export default function SwapConfirmationStep({ slippageValue, defaultTokenInfo }: Props): React$Node {
+export default function SwapConfirmationStep({ slippageValue, defaultTokenInfo, getFormattedPairingValue }: Props): React$Node {
 
   const {
     orderData: {
@@ -23,6 +25,7 @@ export default function SwapConfirmationStep({ slippageValue, defaultTokenInfo }
     },
   } = useSwap();
   const { sellTokenInfo, buyTokenInfo, sellQuantity, buyQuantity } = useSwapForm();
+  const { ptAmount, formattedPtAmount, formattedNonPtAmount } = useSwapFeeDisplay(defaultTokenInfo);
 
   const isAutoPool = pool?.poolId === bestPool?.poolId;
 
@@ -86,14 +89,24 @@ export default function SwapConfirmationStep({ slippageValue, defaultTokenInfo }
         <Box p="16px" bgcolor="#244ABF" borderRadius="8px" color="common.white">
           <Box display="flex" justifyContent="space-between">
             <Box>Total</Box>
-            <Typography component="div" fontSize="20px" fontWeight="500">
-              11 ADA
-            </Typography>
+            <Box>
+              <Typography component="div" fontSize="20px" fontWeight="500">
+                {formattedNonPtAmount ?? formattedPtAmount}
+              </Typography>
+            </Box>
           </Box>
-          <Box display="flex" justifyContent="space-between">
-            <Box />
+          {formattedNonPtAmount && (
+            <Box display="flex" justifyContent="right">
+              <Box>
+                <Typography component="div" fontSize="20px" fontWeight="500">
+                  {formattedPtAmount}
+                </Typography>
+              </Box>
+            </Box>
+          )}
+          <Box display="flex" justifyContent="right">
             <Typography component="div" variant="body1">
-              4.32 USD
+              {getFormattedPairingValue(ptAmount)}
             </Typography>
           </Box>
         </Box>
