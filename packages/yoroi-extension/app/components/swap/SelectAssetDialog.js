@@ -53,7 +53,7 @@ export default function SelectAssetDialog({
   const filteredAssets =
     assets.filter(
       a =>
-        Boolean(a) &&
+        a != null &&
         (a.name.toLowerCase().includes(searchTerm) ||
           a.ticker.toLowerCase().includes(searchTerm) ||
           a.id.toLowerCase().includes(searchTerm) ||

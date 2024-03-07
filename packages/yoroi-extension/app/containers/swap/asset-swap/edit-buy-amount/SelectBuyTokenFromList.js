@@ -4,6 +4,7 @@ import { useSwap, useSwapTokensOnlyVerified } from '@yoroi/swap';
 import SelectAssetDialog from '../../../../components/swap/SelectAssetDialog';
 import { useSwapForm } from '../../context/swap-form';
 import { useAssets } from '../../hooks';
+import { assetNameFromIdentifier } from '../../../../stores/stateless/tokenHelpers';
 
 type Props = {|
   onClose(): void,
@@ -25,17 +26,15 @@ export default function SelectBuyTokenFromList({ onClose, onTokenInfoChanged, de
   const walletAssets = useAssets();
 
   const walletVerifiedAssets = useMemo(() => {
-    const isSellingPt = sellTokenInfo.id === '' && sellTokenInfo.decimals === 6;
+    const isSellingPt = sellTokenInfo.id === '';
     const pt = walletAssets.find(a => a.id === '');
-    return [isSellingPt ? undefined : pt]
-      .concat(
-        onlyVerifiedTokens.map(ovt => {
-          const vft = walletAssets.find(a => a.fingerprint === ovt.fingerprint);
-          if (vft) return { ...ovt, ...vft };
-          return ovt;
-        })
-      )
-      .filter(Boolean);
+    const nonPtAssets = onlyVerifiedTokens.map(ovt => {
+      if (ovt.id === '') return null;
+      const name = assetNameFromIdentifier(ovt.id);
+      const vft = walletAssets.find(a => a.fingerprint === ovt.fingerprint);
+      return { ...ovt, ...(vft ?? {}), name };
+    }).filter(Boolean);
+    return (isSellingPt ? [] : [pt]).concat(nonPtAssets);
   }, [onlyVerifiedTokens, walletAssets, sellTokenInfo]);
 
   const { orderData, resetQuantities } = useSwap();

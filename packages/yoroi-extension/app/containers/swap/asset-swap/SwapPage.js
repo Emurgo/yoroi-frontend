@@ -11,7 +11,6 @@ import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
 import { useSwap } from '@yoroi/swap';
 import { runInAction } from 'mobx';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
-import { maybe } from '../../../coreUtils';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import BigNumber from 'bignumber.js';
 
@@ -71,10 +70,10 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
     props.stores.tokenInfoStore.getLocalOrRemoteMetadata(network, tokenId);
 
   // <TODO:DEDUPLICATE> extract this and fix all places where it's duplicated
-  const getFormattedPairingValue = (amount: string): string => {
+  const getFormattedPairingValue = (lovelaces: string): string => {
     const { currency } = props.stores.profile.unitOfAccount;
     const price = props.stores.coinPriceStore.getCurrentPrice(defaultTokenInfo.ticker, currency);
-    const shiftedAmount = new BigNumber(amount).shiftedBy(-defaultTokenInfo.decimals);
+    const shiftedAmount = new BigNumber(lovelaces).shiftedBy(-defaultTokenInfo.decimals);
     const val = price ? calculateAndFormatValue(shiftedAmount, price) : '-';
     return `${val} ${currency}`;
   }
