@@ -6,6 +6,7 @@ import { ReactComponent as SundaeImage } from '../../assets/images/revamp/dex/su
 import { ReactComponent as MuesliImage } from '../../assets/images/revamp/dex/muesli.inline.svg';
 import { ReactComponent as SpecImage } from '../../assets/images/revamp/dex/spec.inline.svg';
 import { ReactComponent as VyfiImage } from '../../assets/images/revamp/dex/vyfi.inline.svg';
+import { ReactComponent as WingridersImage } from '../../assets/images/revamp/dex/wingriders.inline.svg';
 
 const poolIcons = {
   muesliswap: <MuesliImage />,
@@ -15,7 +16,7 @@ const poolIcons = {
   muesliswap_v4: <MuesliImage />,
   minswap: <MinswapImage />,
   sundaeswap: <SundaeImage />,
-  //   wingriders: Icon.WingRiders,
+  wingriders: <WingridersImage />,
   vyfi: <VyfiImage />,
   spectrum: <SpecImage />,
 };

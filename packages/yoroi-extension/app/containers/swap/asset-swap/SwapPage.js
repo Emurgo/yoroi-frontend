@@ -124,6 +124,7 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
               slippageValue={slippageValue}
               onSetNewSlippage={onSetNewSlippage}
               onLimitSwap={() => setOpenedDialog('limitOrder')}
+              defaultTokenInfo={defaultTokenInfo}
               tokenInfoLookup={tokenInfoLookup}
             />
           )}

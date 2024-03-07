@@ -6,10 +6,11 @@ import { useEffect, useState } from 'react';
 
 type Props = {|
   +onClose: void => void,
+  defaultTokenInfo: RemoteTokenInfo,
   tokenInfoLookup: string => Promise<RemoteTokenInfo>,
 |}
 
-export default function SelectSwapPoolFromList({ onClose, tokenInfoLookup }: Props): React$Node {
+export default function SelectSwapPoolFromList({ onClose, defaultTokenInfo, tokenInfoLookup }: Props): React$Node {
 
   const { orderData: { pools, selectedPoolId, amounts: { sell, buy } }, selectedPoolChanged } = useSwap();
 
@@ -36,6 +37,7 @@ export default function SelectSwapPoolFromList({ onClose, tokenInfoLookup }: Pro
     sellTokenId={sell.tokenId}
     sellTokenInfo={sellTokenInfo}
     buyTokenInfo={buyTokenInfo}
+    defaultTokenInfo={defaultTokenInfo}
     poolList={pools}
     currentPool={selectedPoolId}
     onClose={onClose}

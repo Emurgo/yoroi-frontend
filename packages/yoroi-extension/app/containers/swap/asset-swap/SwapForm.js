@@ -34,6 +34,7 @@ export default function SwapForm({
   slippageValue,
   onSetNewSlippage,
   swapStore,
+  defaultTokenInfo,
   tokenInfoLookup,
 }: Props): React$Node {
   const [openedDialog, setOpenedDialog] = useState('');
@@ -163,6 +164,7 @@ export default function SwapForm({
       )}
       {openedDialog === 'pool' && (
         <SelectSwapPoolFromList
+          defaultTokenInfo={defaultTokenInfo}
           tokenInfoLookup={tokenInfoLookup}
           onClose={() => setOpenedDialog('')}
         />

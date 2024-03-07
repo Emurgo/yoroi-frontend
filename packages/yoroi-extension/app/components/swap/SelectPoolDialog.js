@@ -18,6 +18,7 @@ type Props = {|
   sellTokenId: string,
   sellTokenInfo: ?RemoteTokenInfo,
   buyTokenInfo: ?RemoteTokenInfo,
+  defaultTokenInfo: RemoteTokenInfo,
   currentPool: string,
   onPoolSelected: (poolId: string) => void,
   onClose: void => void,
@@ -27,6 +28,7 @@ export default function SelectPoolDialog({
   currentPool,
   sellTokenId,
   sellTokenInfo,
+  defaultTokenInfo,
   buyTokenInfo,
   poolList = [],
   onPoolSelected,
@@ -38,7 +40,8 @@ export default function SelectPoolDialog({
     onClose();
   };
 
-  // <TODO:SWAP_FIX> unhardcode ada ticker
+  const ptDecimals = defaultTokenInfo.decimals ?? 0;
+  const ptTicker = defaultTokenInfo.ticker;
 
   const isTokenInfoPresent = sellTokenInfo != null && buyTokenInfo != null;
   const denomination = (sellTokenInfo?.decimals ?? 0) - (buyTokenInfo?.decimals ?? 0);
@@ -52,22 +55,15 @@ export default function SelectPoolDialog({
             .dividedBy(pool.ptPriceTokenA)
             .multipliedBy(2)
             .toString(10);
-          const formattedTvl = Quantities.format(
-            tvl,
-            6,
-            0,
-          );
+          const formattedTvl = Quantities.format(tvl, ptDecimals, 0);
           const marketPrice = getMarketPrice(pool, sellTokenId);
           const formattedMarketPrice = isTokenInfoPresent ? Quantities.format(
             marketPrice ?? Quantities.zero,
             denomination,
             PRECISION,
           ) : '-';
-          const formattedPoolFee = Quantities.format(
-            batcherFee.quantity,
-            6,
-            6,
-          );
+          const formattedPoolFee = Quantities
+            .format(batcherFee.quantity, ptDecimals, ptDecimals);
           return (
             <Box
               key={poolId}
@@ -101,12 +97,12 @@ export default function SelectPoolDialog({
               </Box>
               <Box textAlign="right">
                 <Typography component="span" variant="body1">
-                  {formattedTvl} ADA
+                  {formattedTvl} {ptTicker}
                 </Typography>
               </Box>
               <Box textAlign="right">
                 <Typography component="span" variant="body1">
-                  {formattedPoolFee} ADA
+                  {formattedPoolFee} {ptTicker}
                 </Typography>
               </Box>
               <Box textAlign="right">
