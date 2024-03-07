@@ -128,8 +128,11 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
               tokenInfoLookup={tokenInfoLookup}
             />
           )}
-          {/* TODO: provide proper pool prop */}
-          {step === 1 && <SwapConfirmationStep poolInfo={{}} />}
+          {step === 1 && (
+            <SwapConfirmationStep
+              defaultTokenInfo={defaultTokenInfo}
+            />
+          )}
           {step === 2 && (
             <TxSubmittedStep
               isSuccessful={isSuccessful}

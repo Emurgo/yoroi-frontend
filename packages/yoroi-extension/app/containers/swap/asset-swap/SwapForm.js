@@ -82,7 +82,10 @@ export default function SwapForm({
         </Box>
 
         {/* From Field */}
-        <EditSellAmount onAssetSelect={() => setOpenedDialog('from')} />
+        <EditSellAmount
+          defaultTokenInfo={defaultTokenInfo}
+          onAssetSelect={() => setOpenedDialog('from')}
+        />
 
         {/* Clear and switch */}
         <Box display="flex" alignItems="center" justifyContent="space-between">
@@ -100,7 +103,10 @@ export default function SwapForm({
         </Box>
 
         {/* To Field */}
-        <EditBuyAmount onAssetSelect={() => setOpenedDialog('to')} />
+        <EditBuyAmount
+          defaultTokenInfo={defaultTokenInfo}
+          onAssetSelect={() => setOpenedDialog('to')}
+        />
 
         {/* Price between assets */}
         <Box mt="16px">

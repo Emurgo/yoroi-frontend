@@ -4,12 +4,14 @@ import type { AssetAmount } from './types';
 import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { ReactComponent as ChevronDownIcon } from '../../assets/images/revamp/icons/chevron-down.inline.svg';
-import assetDefault from '../../assets/images/revamp/token-default.inline.svg';
+import adaTokenImage from '../../containers/swap/mockAssets/ada.inline.svg';
+import defaultTokenImage from '../../assets/images/revamp/token-default.inline.svg';
 import { urlResolveForIpfsAndCorsproxy } from '../../coreUtils';
 
 type Props = {|
   label: string,
   tokenInfo: AssetAmount | Object,
+  defaultTokenInfo: RemoteTokenInfo,
   onAssetSelect: function,
   handleAmountChange: function,
   showMax?: boolean,
@@ -27,8 +29,9 @@ export default function SwapInput({
   handleAmountChange,
   value,
   tokenInfo,
+  defaultTokenInfo,
 }: Props): Node {
-  const { amount: quantity = undefined, image, ...rest } = tokenInfo || {};
+  const { amount: quantity = undefined, image, ticker } = tokenInfo || {};
 
   const [isFocused, setIsFocused] = useState(false);
 
@@ -37,7 +40,8 @@ export default function SwapInput({
   };
 
   const isFocusedColor = isFocused ? 'grayscale.max' : 'grayscale.400';
-  const imgSrc = urlResolveForIpfsAndCorsproxy(image);
+  const imgSrc = ticker === defaultTokenInfo.ticker ? adaTokenImage
+    : (urlResolveForIpfsAndCorsproxy(image) ?? defaultTokenImage);
 
   return (
     <Box>
@@ -100,14 +104,14 @@ export default function SwapInput({
             >
               <img
                 width="100%"
-                src={imgSrc || assetDefault}
+                src={imgSrc}
                 alt=""
                 onError={e => {
-                  e.target.src = assetDefault;
+                  e.target.src = defaultTokenImage;
                 }}
               />
             </Box>
-            <Box width="max-content">{rest.ticker || 'Select asset'}</Box>
+            <Box width="max-content">{ticker || 'Select asset'}</Box>
             <Box display="inline-flex">
               <ChevronDownIcon />
             </Box>
@@ -132,7 +136,7 @@ export default function SwapInput({
         )}
         <Box sx={{ justifySelf: 'end', alignSelf: 'end' }}>
           <Typography component="div" variant="caption" color="grayscale.600">
-            Current balance: {quantity || 0} {rest.ticker}
+            Current balance: {quantity || 0} {ticker}
           </Typography>
         </Box>
       </Box>
