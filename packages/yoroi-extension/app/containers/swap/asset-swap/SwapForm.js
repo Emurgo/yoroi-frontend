@@ -150,6 +150,7 @@ export default function SwapForm({
             swapStore.resetLimitOrderDisplayValue();
             sellTokenInfoChanged(val);
           }}
+          defaultTokenInfo={defaultTokenInfo}
         />
       )}
       {openedDialog === 'to' && (
@@ -159,6 +160,7 @@ export default function SwapForm({
             swapStore.resetLimitOrderDisplayValue();
             buyTokenInfoChanged(val);
           }}
+          defaultTokenInfo={defaultTokenInfo}
         />
       )}
       {openedDialog === 'slippage' && (

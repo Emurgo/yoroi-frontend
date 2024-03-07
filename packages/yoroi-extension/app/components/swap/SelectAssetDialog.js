@@ -8,14 +8,14 @@ import { ReactComponent as WalletIcon } from '../../assets/images/revamp/icons/w
 import { ReactComponent as ArrowTopIcon } from '../../assets/images/revamp/icons/arrow-top.inline.svg';
 import { ReactComponent as ArrowBottomIcon } from '../../assets/images/revamp/icons/arrow-bottom.inline.svg';
 import { truncateAddressShort } from '../../utils/formatters';
-import assetDefault from '../../assets/images/revamp/asset-default.inline.svg';
+import adaTokenImage from '../../containers/swap/mockAssets/ada.inline.svg';
+import defaultTokenImage from '../../assets/images/revamp/asset-default.inline.svg';
 import Dialog from '../widgets/Dialog';
 import Table from '../common/table/Table';
 import { urlResolveForIpfsAndCorsproxy } from '../../coreUtils';
 
 const fromTemplateColumns = '1fr minmax(auto, 136px)';
 const toTemplateColumns = '1fr minmax(auto, 152px) minmax(auto, 136px)';
-// TODO: add Intl
 const fromColumns = ['Asset', 'Amount'];
 const toColumns = ['Asset', 'Volume, 24h', 'Price %, 24h'];
 
@@ -24,6 +24,7 @@ type Props = {|
   type: string,
   onAssetSelected: any => void,
   onClose: void => void,
+  defaultTokenInfo: RemoteTokenInfo,
 |};
 
 export default function SelectAssetDialog({
@@ -31,6 +32,7 @@ export default function SelectAssetDialog({
   type,
   onAssetSelected,
   onClose,
+  defaultTokenInfo,
 }: Props): React$Node {
   const [searchTerm, setSearchTerm] = useState('');
   // const [sortBy, setSortBy] = useState('');
@@ -104,12 +106,13 @@ export default function SelectAssetDialog({
           columnNames={type === 'from' ? fromColumns : toColumns}
           gridTemplateColumns={type === 'from' ? fromTemplateColumns : toTemplateColumns}
         >
-          {filteredAssets.map((a, index) => (
+          {filteredAssets.map((a) => (
             <AssetAndAmountRow
-              key={`${a.id}-${index}`}
+              key={a.id}
               asset={a}
               type={type}
               onAssetSelected={handleAssetSelected}
+              defaultTokenInfo={defaultTokenInfo}
             />
           ))}
         </Table>
@@ -146,25 +149,16 @@ const AssetAndAmountRow = ({
   volume24h = null,
   priceChange100 = '',
   onAssetSelected,
+  defaultTokenInfo,
 }) => {
   const { name = null, image = '', fingerprint: address, id, amount, ticker } = asset;
-  //   {
-  //     "id": "984394dcc0b08ea12d72b8833292e3c3197d7a8ac89aad61d2f5aa9e.45415254485f746f6b656e",
-  //     "group": "984394dcc0b08ea12d72b8833292e3c3197d7a8ac89aad61d2f5aa9e",
-  //     "fingerprint": "asset1lr7d44kvy8q8dqnat5macsj6matcvk046hdyeh",
-  //     "name": "EARTH_token",
-  //     "decimals": 6,
-  //     "description": "$EARTH token for use within the Unbounded.Earth metaverse",
-  //     "image": "https://tokens.muesliswap.com/static/img/tokens/984394dcc0b08ea12d72b8833292e3c3197d7a8ac89aad61d2f5aa9e.45415254485f746f6b656e.png",
-  //     "kind": "ft",
-  //     "ticker": "EARTH",
-  //     "metadatas": {}
-  // }
-  const imgSrc = urlResolveForIpfsAndCorsproxy(image);
   const isFrom = type === 'from';
   const priceNotChanged = Number(priceChange100.replace('-', '').replace('%', '')) === 0;
   const priceIncreased = priceChange100 && priceChange100.charAt(0) !== '-';
   const priceChange24h = priceChange100.replace('-', '') || '0%';
+
+  const imgSrc = ticker === defaultTokenInfo.ticker ? adaTokenImage
+    : (urlResolveForIpfsAndCorsproxy(image) ?? defaultTokenImage);
 
   const priceColor = (): string => {
     if (priceNotChanged) return 'grayscale.900';
@@ -202,7 +196,7 @@ const AssetAndAmountRow = ({
             src={imgSrc}
             alt={name}
             onError={e => {
-              e.target.src = assetDefault;
+              e.target.src = defaultTokenImage;
             }}
           />
         </Box>

@@ -7,10 +7,11 @@ import { useAssets } from '../../hooks';
 
 type Props = {|
   onClose(): void,
-  onTokenInfoChanged: * => void;
+  onTokenInfoChanged: * => void,
+  defaultTokenInfo: RemoteTokenInfo,
 |};
 
-export default function SelectBuyTokenFromList({ onClose, onTokenInfoChanged }: Props): Node {
+export default function SelectBuyTokenFromList({ onClose, onTokenInfoChanged, defaultTokenInfo }: Props): Node {
   const {
     sellQuantity: { isTouched: isSellTouched },
     buyQuantity: { isTouched: isBuyTouched },
@@ -64,6 +65,7 @@ export default function SelectBuyTokenFromList({ onClose, onTokenInfoChanged }: 
       type="to"
       onAssetSelected={handleAssetSelected}
       onClose={onClose}
+      defaultTokenInfo={defaultTokenInfo}
     />
   );
 }
