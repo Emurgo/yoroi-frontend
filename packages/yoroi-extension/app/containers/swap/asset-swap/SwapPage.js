@@ -25,8 +25,14 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
     orderData: {
       slippage: defaultSlippage,
       selectedPoolCalculation,
+      amounts: { sell, buy }
     },
   } = useSwap();
+
+  const isSwapEnabled =
+    selectedPoolCalculation != null
+    && sell.quantity !== '0'
+    && buy.quantity !== '0';
 
   const [slippageValue, setSlippageValue] = useState(String(defaultSlippage));
 
@@ -64,53 +70,6 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
   const tokenInfoLookup = (tokenId: string): Promise<RemoteTokenInfo> =>
     props.stores.tokenInfoStore.getLocalOrRemoteMetadata(network, tokenId);
 
-  // const wallet = useSelectedWallet();
-  // const {
-  //   aggregatorTokenId,
-  //   lpTokenHeldChanged,
-  //   frontendFeeTiers,
-  //   frontendFeeTiersChanged,
-  //   sellTokenInfoChanged,
-  //   primaryTokenInfoChanged,
-  // } = useSwap();
-  // // const lpTokenHeld = useBalance({ wallet, tokenId: aggregatorTokenId });
-
-  // // initialize sell with / and primary token
-  // useEffect(() => {
-  //   const ptInfo = {
-  //     decimals: wallet.primaryTokenInfo.decimals ?? 0,
-  //     id: wallet.primaryTokenInfo.id,
-  //   };
-  //   sellTokenInfoChanged(ptInfo);
-  //   primaryTokenInfoChanged(ptInfo);
-  // }, [
-  //   primaryTokenInfoChanged,
-  //   sellTokenInfoChanged,
-  //   wallet.primaryTokenInfo.decimals,
-  //   wallet.primaryTokenInfo.id,
-  // ]);
-
-  // // update the fee tiers
-  // useEffect(() => {
-  //   frontendFeeTiersChanged(frontendFeeTiers);
-  // }, [frontendFeeTiers, frontendFeeTiersChanged]);
-
-  // // update lp token balance
-  // useEffect(() => {
-  //   if (aggregatorTokenId == null) return;
-
-  //   lpTokenHeldChanged({
-  //     tokenId: aggregatorTokenId,
-  //     quantity: lpTokenHeld,
-  //   });
-  // }, [aggregatorTokenId, lpTokenHeld, lpTokenHeldChanged]);
-
-  // // pre load swap tokens
-  // const { refetch } = useSwapTokensOnlyVerified({ suspense: false, enabled: false });
-  // useEffect(() => {
-  //   refetch();
-  // }, [refetch]);
-
   const [isSuccessful, setIsSuccessful] = useState(false);
   const handleNextStep = () => setStep(s => s + 1);
 
@@ -130,6 +89,7 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
           )}
           {step === 1 && (
             <SwapConfirmationStep
+              slippageValue={slippageValue}
               defaultTokenInfo={defaultTokenInfo}
             />
           )}
@@ -156,7 +116,7 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
               onClick={handleNextStep}
               sx={{ minWidth: '128px', minHeight: '48px' }}
               variant="primary"
-              disabled={selectedPoolCalculation == null}
+              disabled={!isSwapEnabled}
             >
               {step === 0 ? 'Swap' : 'Confirm'}
             </Button>

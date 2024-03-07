@@ -141,18 +141,21 @@ export default function SelectAssetDialog({
   );
 }
 
-const AssetAndAmountRow = ({
+export const AssetAndAmountRow = ({
   type,
   asset,
   usdPrice = null,
   adaPrice = null,
   volume24h = null,
   priceChange100 = '',
-  onAssetSelected,
+  onAssetSelected = null,
   defaultTokenInfo,
+  displayAmount = null
 }) => {
-  const { name = null, image = '', fingerprint: address, id, amount, ticker } = asset;
+
   const isFrom = type === 'from';
+
+  const { name = null, image = '', fingerprint: address, id, amount: assetAmount, ticker } = asset;
   const priceNotChanged = Number(priceChange100.replace('-', '').replace('%', '')) === 0;
   const priceIncreased = priceChange100 && priceChange100.charAt(0) !== '-';
   const priceChange24h = priceChange100.replace('-', '') || '0%';
@@ -160,11 +163,15 @@ const AssetAndAmountRow = ({
   const imgSrc = ticker === defaultTokenInfo.ticker ? adaTokenImage
     : (urlResolveForIpfsAndCorsproxy(image) ?? defaultTokenImage);
 
+  const amount = displayAmount ?? assetAmount;
+
   const priceColor = (): string => {
     if (priceNotChanged) return 'grayscale.900';
     if (priceIncreased) return 'secondary.600';
     return 'magenta.500';
   };
+
+  const isClickable = onAssetSelected != null;
 
   return (
     <Box
@@ -172,13 +179,15 @@ const AssetAndAmountRow = ({
         display: 'grid',
         columnGap: '8px',
         p: '8px',
-        cursor: 'pointer',
         borderRadius: '8px',
         gridColumn: '1/-1',
         gridTemplateColumns: isFrom ? fromTemplateColumns : toTemplateColumns,
-        '&:hover': { bgcolor: 'grayscale.50' },
+        ...(isClickable ? {
+          '&:hover': { bgcolor: 'grayscale.50' },
+          cursor: 'pointer'
+        } : {}),
       }}
-      onClick={() => onAssetSelected(asset)}
+      {...(isClickable ? { onClick: () => onAssetSelected(asset) } : {})}
     >
       <Box sx={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
         <Box

@@ -1,14 +1,12 @@
 //@flow
 import { useMemo } from 'react';
 import adaLogo from './mockAssets/ada.inline.svg';
-import {
-  genLookupOrFail,
-  getTokenIdentifierIfExists,
-  getTokenName,
-} from '../../stores/stateless/tokenHelpers';
+import { genLookupOrFail, getTokenIdentifierIfExists, getTokenName, } from '../../stores/stateless/tokenHelpers';
 import { splitAmount, truncateToken } from '../../utils/formatters';
 import useSwapPage from './context/swap-page/useSwapPage';
 import { useSwap, useSwapPoolsByPair } from '@yoroi/swap';
+import { Quantities } from '../../utils/quantities';
+import { useSwapForm } from './context/swap-form';
 
 export function useAssets(): Array<any> {
   const { spendableBalance, tokenInfo } = useSwapPage();
@@ -60,4 +58,47 @@ export async function useAsyncPools(tokenA: string, tokenB: string): Promise<voi
       },
     }
   );
+}
+
+export function useSwapFeeDisplay(defaultTokenInfo: RemoteTokenInfo): {
+  formattedTotal: string,
+  formattedFee: string,
+} {
+  const { orderData } = useSwap();
+  const { selectedPoolCalculation, amounts } = orderData ?? {};
+  const { cost } = selectedPoolCalculation ?? {};
+  const { sellTokenInfo } = useSwapForm();
+
+  if (cost == null) {
+    return { formattedFee: '', formattedTotal: '' };
+  }
+
+  const sellTokenIsPtToken = amounts.sell.tokenId === '';
+
+  const ptDecimals = defaultTokenInfo.decimals ?? 0;
+  const ptTicker = defaultTokenInfo.ticker ?? '';
+  const sellDecimals = sellTokenInfo?.decimals ?? 0;
+  const sellTicker = sellTokenInfo?.ticker ?? '';
+
+  const sellAmount = amounts.sell.quantity;
+  const totalFeesPtToken = Quantities.sum([
+    cost.batcherFee.quantity,
+    cost.frontendFeeInfo.fee.quantity,
+  ]);
+
+  const formattedFee = Quantities.format(totalFeesPtToken, ptDecimals, ptDecimals) + ` ${ptTicker}`;
+
+  if (sellTokenIsPtToken) {
+    // put together the sell and the fees
+    const formattedPtTotal = Quantities.format(
+      Quantities.sum([sellAmount, totalFeesPtToken]),
+      ptDecimals,
+      ptDecimals,
+    );
+    const formattedTotal = `${formattedPtTotal} ${ptTicker}`;
+    return { formattedTotal, formattedFee };
+  }
+  const formattedSell = Quantities.format(sellAmount, sellDecimals, sellDecimals) + ` ${sellTicker}`;
+  const formattedTotal = `${formattedSell} + ${formattedFee}`;
+  return { formattedTotal, formattedFee };
 }

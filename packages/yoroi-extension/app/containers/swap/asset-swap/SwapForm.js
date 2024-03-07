@@ -139,7 +139,10 @@ export default function SwapForm({
         </Box>
 
         {/* Available pools */}
-        <EditSwapPool handleEditPool={() => setOpenedDialog('pool')} />
+        <EditSwapPool
+          handleEditPool={() => setOpenedDialog('pool')}
+          defaultTokenInfo={defaultTokenInfo}
+        />
       </Box>
 
       {/* Dialogs */}

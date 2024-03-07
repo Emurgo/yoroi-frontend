@@ -4,25 +4,27 @@ import { Box, Typography } from '@mui/material';
 import { ReactComponent as InfoIcon } from '../../../assets/images/revamp/icons/info.inline.svg';
 import TextField from '../../../components/common/TextField';
 import { useSwapForm } from '../context/swap-form';
-import adaTokenImage from '../mockAssets/ada.inline.svg';
-import defaultTokenImage from '../../../assets/images/revamp/token-default.inline.svg';
-import { urlResolveForIpfsAndCorsproxy } from '../../../coreUtils';
+import { AssetAndAmountRow } from '../../../components/swap/SelectAssetDialog';
+import { useSwap } from '@yoroi/swap';
+import SwapPoolIcon from '../../../components/swap/SwapPoolIcon';
+import SwapPoolFullInfo from './edit-pool/PoolFullInfo';
 
 type Props = {|
+  slippageValue: string,
   defaultTokenInfo: RemoteTokenInfo,
 |};
 
-export default function SwapConfirmationStep({ defaultTokenInfo }: Props): React$Node {
+export default function SwapConfirmationStep({ slippageValue, defaultTokenInfo }: Props): React$Node {
 
-  const { sellTokenInfo, buyTokenInfo } = useSwapForm();
+  const {
+    orderData: {
+      selectedPoolCalculation: { pool },
+      bestPoolCalculation: { pool: bestPool },
+    },
+  } = useSwap();
+  const { sellTokenInfo, buyTokenInfo, sellQuantity, buyQuantity } = useSwapForm();
 
-  function resolveImageForToken({ name, image } = {}): any {
-    if (name === defaultTokenInfo.name) return adaTokenImage;
-    return urlResolveForIpfsAndCorsproxy(image) ?? defaultTokenInfo;
-  }
-
-  console.log(11, sellTokenInfo);
-  console.log(22, buyTokenInfo);
+  const isAutoPool = pool?.poolId === bestPool?.poolId;
 
   return (
     <Box width="100%" mx="auto" maxWidth="506px" display="flex" flexDirection="column" gap="24px">
@@ -39,21 +41,12 @@ export default function SwapConfirmationStep({ defaultTokenInfo }: Props): React
             </Typography>
           </Box>
           <Box>
-            <Box
-              width="40px"
-              height="40px"
-              sx={{ overflowY: 'hidden', '& > svg': { width: '100%', height: '100%' } }}
-            >
-              <img
-                width="100%"
-                src={resolveImageForToken(sellTokenInfo)}
-                alt=""
-                onError={e => {
-                  e.target.src = defaultTokenImage;
-                }}
-              />
-            </Box>
-            <Box width="max-content">{sellTokenInfo?.ticker ?? ''}</Box>
+            <AssetAndAmountRow
+              asset={sellTokenInfo}
+              displayAmount={sellQuantity.displayValue}
+              type="from"
+              defaultTokenInfo={defaultTokenInfo}
+            />
           </Box>
         </Box>
         <Box>
@@ -64,41 +57,32 @@ export default function SwapConfirmationStep({ defaultTokenInfo }: Props): React
           </Box>
           <Box>
             <Box>
-              <Box
-                width="40px"
-                height="40px"
-                sx={{ overflowY: 'hidden', '& > svg': { width: '100%', height: '100%' } }}
-              >
-                <img
-                  width="100%"
-                  src={resolveImageForToken(buyTokenInfo)}
-                  alt=""
-                  onError={e => {
-                    e.target.src = defaultTokenImage;
-                  }}
-                />
-              </Box>
-              <Box width="max-content">{buyTokenInfo?.ticker ?? ''}</Box>
+              <AssetAndAmountRow
+                asset={buyTokenInfo}
+                displayAmount={buyQuantity.displayValue}
+                type="from"
+                defaultTokenInfo={defaultTokenInfo}
+              />
             </Box>
           </Box>
         </Box>
       </Box>
       <Box display="flex" gap="8px" flexDirection="column">
-        {/*<SummaryRow*/}
-        {/*  col1="Dex"*/}
-        {/*  col2={*/}
-        {/*    <Box display="flex" alignItems="center" gap="8px">*/}
-        {/*      <Box display="inline-flex">{poolInfo.image}</Box>*/}
-        {/*      <Typography component="div" variant="body1" color="primary.500" fontWeight={500}>*/}
-        {/*        {poolInfo.name} {poolInfo.isAuto ? '(Auto)' : null}*/}
-        {/*      </Typography>*/}
-        {/*    </Box>*/}
-        {/*  }*/}
-        {/*/>*/}
-        <SummaryRow col1="Slippage tolerance" col2="1%" withInfo />
-        <SummaryRow col1="Min ADA" col2="2 ADA" withInfo />
-        <SummaryRow col1="Minimum assets received" col2="2.99 USDA" withInfo />
-        <SummaryRow col1="Fees" col2="0 ADA" withInfo />
+        <SummaryRow
+          col1="Dex"
+          col2={
+            <Box display="flex" alignItems="center" gap="8px">
+              <Box display="inline-flex">
+                <SwapPoolIcon provider={pool?.provider} />
+              </Box>
+              <Typography component="div" variant="body1" color="primary.500" fontWeight={500}>
+                {pool?.provider} {isAutoPool ? '(Auto)' : null}
+              </Typography>
+            </Box>
+          }
+        />
+        <SummaryRow col1="Slippage tolerance" col2={`${slippageValue}%`} withInfo />
+        <SwapPoolFullInfo defaultTokenInfo={defaultTokenInfo} />
         <Box p="16px" bgcolor="#244ABF" borderRadius="8px" color="common.white">
           <Box display="flex" justifyContent="space-between">
             <Box>Total</Box>
