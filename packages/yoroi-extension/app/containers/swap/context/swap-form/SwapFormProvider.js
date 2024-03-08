@@ -175,49 +175,47 @@ export default function SwapFormProvider({ children }: Props): Node {
     handler({ quantity, input: text === '' ? '' : input });
   };
 
+  const sellUpdateHandler = ({ input, quantity }) => {
+    sellQuantityChanged(quantity);
+    actions.sellInputValueChanged(input);
+    const sellAvailableAmount = swapFormState.sellTokenInfo.amount ?? '0';
+    if (quantity !== '' && sellAvailableAmount !== '') {
+      const decimals = swapFormState.sellTokenInfo.decimals ?? 0;
+      const [, availableQuantity] = Quantities.parseFromText(sellAvailableAmount, decimals, numberLocale);
+      if (Quantities.isGreaterThan(quantity, availableQuantity)) {
+        actions.sellAmountErrorChanged('Not enough balance');
+      }
+    }
+  };
+
+  const buyUpdateHandler = ({ input, quantity }) => {
+    buyQuantityChanged(quantity);
+    actions.buyInputValueChanged(input);
+  };
+
   const onChangeSellQuantity = useCallback(
-    baseSwapFieldChangeHandler(
-      swapFormState.sellTokenInfo,
-      ({ input, quantity }) => {
-        sellQuantityChanged(quantity);
-        actions.sellInputValueChanged(input);
-        const sellAvailableAmount = swapFormState.sellTokenInfo.amount;
-        if (quantity !== '' && sellAvailableAmount !== '') {
-          const decimals = swapFormState.sellTokenInfo.decimals ?? 0;
-          const [, availableQuantity] = Quantities.parseFromText(sellAvailableAmount, decimals, numberLocale);
-          if (Quantities.isGreaterThan(quantity, availableQuantity)) {
-            actions.sellAmountErrorChanged('Not enough balance');
-          }
-        }
-      },
-    ),
+    baseSwapFieldChangeHandler(swapFormState.sellTokenInfo, sellUpdateHandler),
     [sellQuantityChanged, actions, clearErrors],
   );
 
   const onChangeBuyQuantity = useCallback(
-    baseSwapFieldChangeHandler(
-      swapFormState.buyTokenInfo,
-      ({ input, quantity }) => {
-        buyQuantityChanged(quantity);
-        actions.buyInputValueChanged(input);
-      },
-    ),
+    baseSwapFieldChangeHandler(swapFormState.buyTokenInfo, buyUpdateHandler),
     [buyQuantityChanged, actions, clearErrors],
   );
 
   const updateSellInput = useCallback(() => {
     if (swapFormState.sellQuantity.isTouched && !sellInputRef?.current?.isFocused()) {
-      actions.sellInputValueChanged(
-        Quantities.format(sellQuantity, swapFormState.sellTokenInfo.decimals ?? 0)
-      );
+      const decimals = swapFormState.sellTokenInfo.decimals ?? 0;
+      const formatted = Quantities.format(sellQuantity, decimals);
+      sellUpdateHandler({ input: formatted, quantity: sellQuantity });
     }
   }, [sellQuantity, swapFormState.sellTokenInfo.decimals, swapFormState.sellQuantity.isTouched]);
 
   const updateBuyInput = useCallback(() => {
     if (swapFormState.buyQuantity.isTouched && !buyInputRef?.current?.isFocused()) {
-      actions.buyInputValueChanged(
-        Quantities.format(buyQuantity, swapFormState.buyTokenInfo.decimals ?? 0)
-      );
+      const decimals = swapFormState.buyTokenInfo.decimals ?? 0;
+      const formatted = Quantities.format(buyQuantity, decimals);
+      buyUpdateHandler({ input: formatted, quantity: buyQuantity });
     }
   }, [swapFormState.buyTokenInfo.decimals, buyQuantity, swapFormState.buyQuantity.isTouched]);
 

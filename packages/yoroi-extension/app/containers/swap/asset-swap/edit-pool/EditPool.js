@@ -27,27 +27,8 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
   const { formattedPtAmount, formattedNonPtAmount } = useSwapFeeDisplay(defaultTokenInfo);
 
   const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
-  if (!isValidTickers) {
+  if (!isValidTickers || calculation == null) {
     return null;
-  }
-
-  if (calculation == null) {
-    return (
-      <Box>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            mb: '16px',
-          }}
-        >
-          <Typography component="div" variant="subtitle2" color="darkred">
-            No viable pool found!
-          </Typography>
-        </Box>
-      </Box>
-    );
   }
 
   const { pool } = calculation;

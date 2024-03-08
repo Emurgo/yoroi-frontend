@@ -13,25 +13,33 @@ type Props = {|
 export default function EditBuyAmount({ onAssetSelect, defaultTokenInfo }: Props): Node {
   const { orderData } = useSwap();
   const {
-    buyQuantity: { isTouched: isBuyTouched, displayValue: buyDisplayValue, error: buyError },
+    buyQuantity: { isTouched: isBuyTouched, displayValue: buyDisplayValue, error: fieldError },
+    sellTokenInfo = {},
     buyTokenInfo = {},
     onChangeBuyQuantity,
     buyInputRef,
   } = useSwapForm();
   const { tokenId } = orderData.amounts.buy;
 
+  const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
+  const isInvalidPair = isValidTickers && orderData.selectedPoolCalculation == null;
+  const error = isInvalidPair ? 'Selected pair is not available in any liquidity pool' : fieldError;
+
+  // Amount input is blocked in case invalid pair
+  const handleAmountChange = isInvalidPair ? () => {} : onChangeBuyQuantity;
+
   return (
     <SwapInput
       key={tokenId}
       label="Swap To"
-      handleAmountChange={onChangeBuyQuantity}
+      handleAmountChange={handleAmountChange}
       value={buyDisplayValue}
       tokenInfo={buyTokenInfo}
       defaultTokenInfo={defaultTokenInfo}
       onAssetSelect={onAssetSelect}
       touched={isBuyTouched}
       inputRef={buyInputRef}
-      error={buyError}
+      error={error}
     />
   );
 }
