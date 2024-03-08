@@ -39,7 +39,7 @@ type Props = {|
   children: any,
 |};
 
-const numberLocale = { decimalSeparator: ',' };
+const numberLocale = { decimalSeparator: '.' };
 
 export default function SwapFormProvider({ children }: Props): Node {
   const {
@@ -161,40 +161,48 @@ export default function SwapFormProvider({ children }: Props): Node {
     if (swapFormState.buyQuantity.error !== undefined) actions.buyAmountErrorChanged(null);
   }, [actions, swapFormState.buyQuantity.error, swapFormState.sellQuantity.error]);
 
-  const onChangeSellQuantity = useCallback(
-    (text: string) => {
-      if (swapFormState.sellTokenInfo.tokenId === '') {
-        return;
-      }
-      const [input, quantity] = Quantities.parseFromText(
-        text,
-        swapFormState.sellTokenInfo.decimals ?? 0,
-        numberLocale
-      );
-      sellQuantityChanged(quantity);
-      actions.sellInputValueChanged(text === '' ? '' : input);
+  const baseSwapFieldChangeHandler = (
+    tokenInfo: any,
+    handler: ({| input: string, quantity: string |}) => void,
+  ) => (text: string) => {
+    if (tokenInfo.tokenId === '') {
+      // empty input
+      return;
+    }
+    const decimals = tokenInfo.decimals ?? 0;
+    const [input, quantity] = Quantities.parseFromText(text, decimals, numberLocale);
+    clearErrors();
+    handler({ quantity, input: text === '' ? '' : input });
+  };
 
-      clearErrors();
-    },
-    [actions, clearErrors, sellQuantityChanged]
+  const onChangeSellQuantity = useCallback(
+    baseSwapFieldChangeHandler(
+      swapFormState.sellTokenInfo,
+      ({ input, quantity }) => {
+        sellQuantityChanged(quantity);
+        actions.sellInputValueChanged(input);
+        const sellAvailableAmount = swapFormState.sellTokenInfo.amount;
+        if (quantity !== '' && sellAvailableAmount !== '') {
+          const decimals = swapFormState.sellTokenInfo.decimals ?? 0;
+          const [, availableQuantity] = Quantities.parseFromText(sellAvailableAmount, decimals, numberLocale);
+          if (Quantities.isGreaterThan(quantity, availableQuantity)) {
+            actions.sellAmountErrorChanged('Not enough balance');
+          }
+        }
+      },
+    ),
+    [sellQuantityChanged, actions, clearErrors],
   );
 
   const onChangeBuyQuantity = useCallback(
-    (text: string) => {
-      if (swapFormState.buyTokenInfo.tokenId === '') {
-        return;
-      }
-      const [input, quantity] = Quantities.parseFromText(
-        text,
-        swapFormState.buyTokenInfo.decimals ?? 0,
-        numberLocale
-      );
-      buyQuantityChanged(quantity);
-      actions.buyInputValueChanged(text === '' ? '' : input);
-
-      clearErrors();
-    },
-    [buyQuantityChanged, actions, clearErrors]
+    baseSwapFieldChangeHandler(
+      swapFormState.buyTokenInfo,
+      ({ input, quantity }) => {
+        buyQuantityChanged(quantity);
+        actions.buyInputValueChanged(input);
+      },
+    ),
+    [buyQuantityChanged, actions, clearErrors],
   );
 
   const updateSellInput = useCallback(() => {
