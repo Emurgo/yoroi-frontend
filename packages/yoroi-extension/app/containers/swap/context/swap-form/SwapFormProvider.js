@@ -1,8 +1,8 @@
 //@flow
 import type { Node } from 'react';
-import { useCallback, useEffect, useReducer, useRef } from 'react';
+import { useCallback, useEffect, useReducer, useState } from 'react';
 import type { SwapFormAction, SwapFormState } from './types';
-import { SwapFormActionTypeValues } from './types';
+import { StateWrap, SwapFormActionTypeValues } from './types';
 import type { AssetAmount } from '../../../../components/swap/types';
 import { useSwap } from '@yoroi/swap';
 // import { Quantities } from '../../../../utils/quantities';
@@ -42,6 +42,7 @@ type Props = {|
 const numberLocale = { decimalSeparator: '.' };
 
 export default function SwapFormProvider({ children }: Props): Node {
+
   const {
     orderData,
     resetState,
@@ -53,10 +54,6 @@ export default function SwapFormProvider({ children }: Props): Node {
 
   const { quantity: buyQuantity } = orderData.amounts.buy;
   const { quantity: sellQuantity } = orderData.amounts.sell;
-
-  // TODO: fix the types for TextInput
-  const buyInputRef = useRef/*<TextInput | null>*/(null);
-  const sellInputRef = useRef/*<TextInput | null>*/(null);
 
   const swapFormReducer = (state: SwapFormState, action: SwapFormAction) => {
     const draft = { ...state };
@@ -139,6 +136,7 @@ export default function SwapFormProvider({ children }: Props): Node {
       dispatch({ type: SwapFormActionTypeValues.ClearSwapForm });
     },
     resetSwapForm: () => {
+      clearErrors();
       resetState();
       dispatch({ type: SwapFormActionTypeValues.ResetSwapForm });
     },
@@ -156,9 +154,14 @@ export default function SwapFormProvider({ children }: Props): Node {
       dispatch({ type: SwapFormActionTypeValues.SellAmountErrorChanged, error }),
   };
 
+  // on mount
+  useEffect(() => actions.resetSwapForm(), []);
+  // on unmount
+  useEffect(() => () => actions.resetSwapForm(), []);
+
   const clearErrors = useCallback(() => {
-    if (swapFormState.sellQuantity.error !== undefined) actions.sellAmountErrorChanged(null);
-    if (swapFormState.buyQuantity.error !== undefined) actions.buyAmountErrorChanged(null);
+    if (swapFormState.sellQuantity.error != null) actions.sellAmountErrorChanged(null);
+    if (swapFormState.buyQuantity.error != null) actions.buyAmountErrorChanged(null);
   }, [actions, swapFormState.buyQuantity.error, swapFormState.sellQuantity.error]);
 
   const baseSwapFieldChangeHandler = (
@@ -203,8 +206,11 @@ export default function SwapFormProvider({ children }: Props): Node {
     [buyQuantityChanged, actions, clearErrors],
   );
 
+  const sellFocusState = StateWrap<boolean>(useState(false));
+  const buyFocusState = StateWrap<boolean>(useState(false));
+
   const updateSellInput = useCallback(() => {
-    if (swapFormState.sellQuantity.isTouched && !sellInputRef?.current?.isFocused()) {
+    if (swapFormState.sellQuantity.isTouched && !sellFocusState.value) {
       const decimals = swapFormState.sellTokenInfo.decimals ?? 0;
       const formatted = Quantities.format(sellQuantity, decimals);
       sellUpdateHandler({ input: formatted, quantity: sellQuantity });
@@ -212,12 +218,12 @@ export default function SwapFormProvider({ children }: Props): Node {
   }, [sellQuantity, swapFormState.sellTokenInfo.decimals, swapFormState.sellQuantity.isTouched]);
 
   const updateBuyInput = useCallback(() => {
-    if (swapFormState.buyQuantity.isTouched && !buyInputRef?.current?.isFocused()) {
+    if (swapFormState.buyQuantity.isTouched && !buyFocusState.value) {
       const decimals = swapFormState.buyTokenInfo.decimals ?? 0;
       const formatted = Quantities.format(buyQuantity, decimals);
       buyUpdateHandler({ input: formatted, quantity: buyQuantity });
     }
-  }, [swapFormState.buyTokenInfo.decimals, buyQuantity, swapFormState.buyQuantity.isTouched]);
+  }, [buyQuantity, swapFormState.buyTokenInfo.decimals, swapFormState.buyQuantity.isTouched]);
 
   useEffect(() => {
     updateSellInput();
@@ -229,8 +235,8 @@ export default function SwapFormProvider({ children }: Props): Node {
 
   const allActions = {
     ...actions,
-    buyInputRef,
-    sellInputRef,
+    sellFocusState,
+    buyFocusState,
     onChangeSellQuantity,
     onChangeBuyQuantity,
   };

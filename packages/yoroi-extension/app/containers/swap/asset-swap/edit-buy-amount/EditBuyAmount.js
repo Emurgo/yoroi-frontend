@@ -17,7 +17,7 @@ export default function EditBuyAmount({ onAssetSelect, defaultTokenInfo }: Props
     sellTokenInfo = {},
     buyTokenInfo = {},
     onChangeBuyQuantity,
-    buyInputRef,
+    buyFocusState,
   } = useSwapForm();
   const { tokenId } = orderData.amounts.buy;
 
@@ -38,7 +38,7 @@ export default function EditBuyAmount({ onAssetSelect, defaultTokenInfo }: Props
       defaultTokenInfo={defaultTokenInfo}
       onAssetSelect={onAssetSelect}
       touched={isBuyTouched}
-      inputRef={buyInputRef}
+      focusState={buyFocusState}
       error={error}
     />
   );

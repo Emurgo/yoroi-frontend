@@ -16,7 +16,7 @@ export default function EditSellAmount({ onAssetSelect, defaultTokenInfo }: Prop
     sellQuantity: { isTouched: isSellTouched, displayValue: sellDisplayValue, error },
     sellTokenInfo = {},
     onChangeSellQuantity,
-    sellInputRef,
+    sellFocusState,
   } = useSwapForm();
   const { tokenId } = orderData.amounts.sell;
 
@@ -30,7 +30,7 @@ export default function EditSellAmount({ onAssetSelect, defaultTokenInfo }: Prop
       defaultTokenInfo={defaultTokenInfo}
       onAssetSelect={onAssetSelect}
       touched={isSellTouched}
-      inputRef={sellInputRef}
+      focusState={sellFocusState}
       error={error}
       showMax
     />

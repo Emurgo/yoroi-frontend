@@ -69,11 +69,17 @@ export type SwapFormActions = {|
   sellAmountErrorChanged: (error: string | null) => void,
 |};
 
+export type State<T> = {| value: T, update: ((T => T) | T) => void |}
+
+export function StateWrap<T>([value, update]: [S, ((S => S) | S) => void]): State<T> {
+  return { value, update };
+}
+
 export type SwapFormContext = {|
   ...SwapFormState,
   ...SwapFormActions,
-  sellInputRef: any | null,
-  buyInputRef: any | null,
+  sellFocusState: State<boolean>,
+  buyFocusState: State<boolean>,
   onChangeSellQuantity: (text: string) => void,
   onChangeBuyQuantity: (text: string) => void,
   onChangeLimitPrice: (text: string) => void,

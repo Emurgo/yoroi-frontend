@@ -8,6 +8,7 @@ import adaTokenImage from '../../containers/swap/mockAssets/ada.inline.svg';
 import defaultTokenImage from '../../assets/images/revamp/token-default.inline.svg';
 import { urlResolveForIpfsAndCorsproxy } from '../../coreUtils';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
+import type { State } from '../../containers/swap/context/swap-form/types';
 
 type Props = {|
   label: string,
@@ -18,7 +19,7 @@ type Props = {|
   showMax?: boolean,
   value?: string,
   touched?: boolean,
-  inputRef?: any | null,
+  focusState: State<boolean>,
   error: string | null,
 |};
 
@@ -31,16 +32,15 @@ export default function SwapInput({
   value,
   tokenInfo,
   defaultTokenInfo,
+  focusState,
 }: Props): Node {
   const { amount: quantity = undefined, image, ticker } = tokenInfo || {};
-
-  const [isFocused, setIsFocused] = useState(false);
 
   const handleChange = e => {
     handleAmountChange(e.target.value);
   };
 
-  const isFocusedColor = isFocused ? 'grayscale.max' : 'grayscale.400';
+  const isFocusedColor = focusState.value ? 'grayscale.max' : 'grayscale.400';
   const imgSrc = ticker === defaultTokenInfo.ticker ? adaTokenImage
     : (urlResolveForIpfsAndCorsproxy(image) ?? defaultTokenImage);
 
@@ -50,7 +50,7 @@ export default function SwapInput({
         component="fieldset"
         sx={{
           borderStyle: 'solid',
-          borderWidth: isFocused || error ? '2px' : '1px',
+          borderWidth: focusState.value || error ? '2px' : '1px',
           borderColor: error ? 'magenta.500' : isFocusedColor,
           borderRadius: '8px',
           p: '16px',
@@ -93,8 +93,8 @@ export default function SwapInput({
           placeholder="0"
           onChange={handleChange}
           value={value}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
+          onFocus={() => focusState.update(true)}
+          onBlur={() => focusState.update(false)}
         />
         <Box sx={{ justifySelf: 'end', cursor: 'pointer' }} onClick={onAssetSelect}>
           <Box height="100%" width="min-content" display="flex" gap="8px" alignItems="center">

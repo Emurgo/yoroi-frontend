@@ -67,7 +67,7 @@ export default function SwapForm({
 
   return (
     <>
-      <Box width="100%" mx="auto" maxWidth="506px" display="flex" flexDirection="column" gap="16px">
+      <Box width="100%" mx="auto" maxWidth="506px" display="flex" flexDirection="column" gap="8px">
         <Box display="flex" alignItems="center" justifyContent="space-between" mb="16px">
           <Tabs
             tabs={orderTypeTabs.map(({ type, label }) => ({
