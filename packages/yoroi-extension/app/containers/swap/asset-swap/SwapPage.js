@@ -13,10 +13,12 @@ import { runInAction } from 'mobx';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import BigNumber from 'bignumber.js';
+import SwapDisclaimerDialog from '../../../components/swap/SwapDisclaimerDialog';
+import { ROUTES } from '../../../routes-config';
 
 export default function SwapPage(props: StoresAndActionsProps): Node {
   const [step, setStep] = useState(0);
-  const [openedDialog, setOpenedDialog] = useState('');
+  const [openedDialog, setOpenedDialog] = useState('disclaimer');
 
   const {
     slippage,
@@ -33,9 +35,18 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
     && sell.quantity !== '0'
     && buy.quantity !== '0';
 
+  const [disclaimerStatus, setDisclaimerStatus] = useState<?boolean>(null);
   const [slippageValue, setSlippageValue] = useState(String(defaultSlippage));
 
+  const disclaimerFlag = props.stores.substores.ada.swapStore.swapDisclaimerAcceptanceFlag;
+
   useEffect(() => {
+    disclaimerFlag.get()
+      .then(setDisclaimerStatus)
+      .catch(e => {
+        console.error('Failed to load swap disclaimer status! Setting to false for safety', e);
+        setDisclaimerStatus(false);
+      });
     slippage.read()
       .then(storedSlippage => {
         if (storedSlippage > 0) {
@@ -52,6 +63,15 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
         console.error('Failed to load stored slippage', e);
       })
   }, []);
+
+  const onAcceptDisclaimer = () => {
+    disclaimerFlag.set(true)
+      .then(() => setDisclaimerStatus(true))
+      .catch(e => {
+        console.error('Failed to store swap acceptance status!', e);
+        setDisclaimerStatus(true);
+      })
+  }
 
   const onSetNewSlippage = (newSlippage: number): void => {
     runInAction(() => {
@@ -142,6 +162,15 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
           exchangePair="ADA/USDA"
           onConfirm={() => setOpenedDialog('')}
           onClose={() => setOpenedDialog('')}
+        />
+      )}
+
+      {disclaimerStatus === false && (
+        <SwapDisclaimerDialog
+          onDialogConfirm={onAcceptDisclaimer}
+          onDialogRefuse={() => {
+            props.actions.router.redirect.trigger({ route: ROUTES.WALLETS.ROOT });
+          }}
         />
       )}
     </SwapFormProvider>

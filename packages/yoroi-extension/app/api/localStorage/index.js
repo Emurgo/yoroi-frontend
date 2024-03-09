@@ -16,6 +16,7 @@ import {
 import type { ComplexityLevelType } from '../../types/complexityLevelType';
 import type { WhitelistEntry } from '../../../chrome/extension/connector/types';
 import type { CatalystRoundInfoResponse } from '../ada/lib/state-fetch/types'
+import { maybe } from '../../coreUtils';
 
 declare var chrome;
 declare var browser;
@@ -454,4 +455,34 @@ export function asyncLocalStorageWrapper(): {|
     setItem: setLocalItem,
     removeItem: removeLocalItem,
   }
+}
+
+export type StorageField<T> = {
+  get: () => Promise<T>;
+  set: T => Promise<void>;
+  remove: () => Promise<void>;
+  defaultValue: () => T,
+}
+
+export function createStorageField<T>(
+  key: string,
+  serializer: T => string,
+  deserializer: string => T,
+  defaultValue: T,
+): StorageField<T> {
+  return Object.freeze({
+    get: async () => maybe(await getLocalItem(key), deserializer) ?? defaultValue,
+    set: t => setLocalItem(key, serializer(t)),
+    remove: () => removeLocalItem(key),
+    defaultValue: () => defaultValue,
+  });
+}
+
+export function createStorageFlag(
+  key: string,
+  defaultValue: boolean,
+): StorageField<boolean> {
+  const serializer = String;
+  const deserializer = s => s === 'true';
+  return createStorageField<boolean>(key, serializer, deserializer, defaultValue);
 }
