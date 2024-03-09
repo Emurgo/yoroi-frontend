@@ -98,7 +98,7 @@ export default class AdaAddressesStore extends Store<StoresMap, ActionsMap> {
     if (selectedWallet == null) {
       return true;
     }
-    return selectedWallet.getParent().getNetworkInfo().NetworkId === networks.CardanoMainnet.NetworkId;
+    return selectedWallet.isMainnet();
   }
 
   getSupportedAddressDomainBannerState(): boolean {
