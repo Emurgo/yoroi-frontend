@@ -8,15 +8,18 @@ import { useSwapForm } from '../../containers/swap/context/swap-form';
 import SwapStore from '../../stores/ada/SwapStore';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react';
+import Percent from '../common/Percent';
+import type { PriceImpact } from './types';
 
 type Props = {|
   label: string,
   swapStore: SwapStore,
+  priceImpactState: ?PriceImpact,
 |};
 
 const NO_PRICE_VALUE_PLACEHOLDER = '---';
 
-function PriceInput({ label, swapStore }: Props): Node {
+function PriceInput({ label, swapStore, priceImpactState }: Props): Node {
   const {
     orderData,
     limitPriceChanged,
@@ -29,7 +32,11 @@ function PriceInput({ label, swapStore }: Props): Node {
   const isMarketOrder = orderData.type === 'market';
   const pricePlaceholder = isMarketOrder ? NO_PRICE_VALUE_PLACEHOLDER : '0';
 
-  const marketPrice = orderData.selectedPoolCalculation?.prices.market;
+  const {
+    market: marketPrice,
+    actualPrice,
+    priceImpact,
+  } = orderData.selectedPoolCalculation?.prices ?? {};
   const formattedPrice = marketPrice ? Quantities.format(
     marketPrice,
     orderData.tokens.priceDenomination,
@@ -46,68 +53,86 @@ function PriceInput({ label, swapStore }: Props): Node {
   const isReadonly = !isValidTickers || isMarketOrder;
 
   return (
-    <Box
-      component="fieldset"
-      sx={{
-        border: '1px solid',
-        borderColor: 'grayscale.400',
-        borderRadius: '8px',
-        p: '16px',
-        display: 'grid',
-        gridTemplateColumns: '1fr auto',
-        justifyContent: 'start',
-        position: 'relative',
-        bgcolor: isReadonly ? 'grayscale.50' : 'common.white',
-        columnGap: '6px',
-        rowGap: '8px',
-      }}
-    >
+    <Box>
       <Box
-        component="legend"
+        component="fieldset"
         sx={{
-          top: '-9px',
-          left: '16px',
-          position: 'absolute',
-          px: '4px',
-          bgcolor: 'common.white',
+          border: '1px solid',
+          borderColor: 'grayscale.400',
+          borderRadius: '8px',
+          p: '16px',
+          display: 'grid',
+          gridTemplateColumns: '1fr auto',
+          justifyContent: 'start',
+          position: 'relative',
+          bgcolor: isReadonly ? 'grayscale.50' : 'common.white',
+          columnGap: '6px',
+          rowGap: '8px',
         }}
       >
-        {label}
-      </Box>
+        <Box
+          component="legend"
+          sx={{
+            top: '-9px',
+            left: '16px',
+            position: 'absolute',
+            px: '4px',
+            bgcolor: 'common.white',
+          }}
+        >
+          {label}
+        </Box>
 
-      <Typography
-        sx={{
-          appearance: 'none',
-          border: '0',
-          outline: 'none',
-          '::placeholder': { color: 'grayscale.600' },
-        }}
-        component="input"
-        type="text"
-        variant="body1"
-        color="#000"
-        placeholder="0"
-        bgcolor={isReadonly ? 'grayscale.50' : 'common.white'}
-        readOnly={isReadonly}
-        value={isValidTickers ? displayValue : NO_PRICE_VALUE_PLACEHOLDER}
-        onChange={({ target: { value } }) => {
-          if (/^\d+\.?\d*$/.test(value)) {
-            runInAction(() => {
-              swapStore.setLimitOrderDisplayValue(value);
-            })
-            if (!value.endsWith('.')) {
-              limitPriceChanged(value);
+        <Typography
+          sx={{
+            appearance: 'none',
+            border: '0',
+            outline: 'none',
+            '::placeholder': { color: 'grayscale.600' },
+          }}
+          component="input"
+          type="text"
+          variant="body1"
+          color="#000"
+          placeholder="0"
+          bgcolor={isReadonly ? 'grayscale.50' : 'common.white'}
+          readOnly={isReadonly}
+          value={isValidTickers ? displayValue : NO_PRICE_VALUE_PLACEHOLDER}
+          onChange={({ target: { value } }) => {
+            if (/^\d+\.?\d*$/.test(value)) {
+              runInAction(() => {
+                swapStore.setLimitOrderDisplayValue(value);
+              })
+              if (!value.endsWith('.')) {
+                limitPriceChanged(value);
+              }
             }
-          }
-        }}
-      />
-      <Box sx={{ justifySelf: 'end' }}>
-        <Box height="100%" width="max-content" display="flex" alignItems="center">
-          <Box>{sellTokenInfo?.ticker || '-'}</Box>
-          <Box>/</Box>
-          <Box>{buyTokenInfo?.ticker || '-'}</Box>
+          }}
+        />
+        <Box sx={{ justifySelf: 'end' }}>
+          <Box height="100%" width="max-content" display="flex" alignItems="center">
+            <Box>{sellTokenInfo?.ticker || '-'}</Box>
+            <Box>/</Box>
+            <Box>{buyTokenInfo?.ticker || '-'}</Box>
+          </Box>
         </Box>
       </Box>
+      {priceImpactState && (
+        <Typography
+          component="div"
+          pt="4px"
+          variant="caption"
+          color={priceImpactState.isSevere ? 'magenta.500' : '#ED8600'}
+        >
+          Price impact = <Percent value={priceImpact} /> ({
+            Quantities.format(
+              actualPrice,
+              orderData.tokens.priceDenomination,
+              PRICE_PRECISION,
+            )
+          } {sellTokenInfo?.ticker}/{buyTokenInfo?.ticker})
+        </Typography>
+      )}
     </Box>
   );
 }

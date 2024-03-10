@@ -19,6 +19,7 @@ import SelectSwapPoolFromList from './edit-pool/SelectPoolFromList';
 import SwapStore from '../../../stores/ada/SwapStore';
 import { useAsyncPools } from '../hooks';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
+import type { PriceImpact } from '../../../components/swap/types';
 
 type Props = {|
   onLimitSwap: void => void,
@@ -26,7 +27,7 @@ type Props = {|
   onSetNewSlippage: number => void,
   swapStore: SwapStore,
   defaultTokenInfo: RemoteTokenInfo,
-  tokenInfoLookup: string => Promise<RemoteTokenInfo>,
+  priceImpactState: ?PriceImpact,
 |};
 
 export default function SwapForm({
@@ -35,15 +36,10 @@ export default function SwapForm({
   onSetNewSlippage,
   swapStore,
   defaultTokenInfo,
-  tokenInfoLookup,
+  priceImpactState,
 }: Props): React$Node {
   const [openedDialog, setOpenedDialog] = useState('');
   const {
-    // sellQuantity: { isTouched: isSellTouched },
-    // buyQuantity: { isTouched: isBuyTouched },
-    // sellAmountErrorChanged,
-    // poolDefaulted,
-    // canSwap,
     resetSwapForm,
     switchTokens,
   } = useSwapForm();
@@ -110,7 +106,11 @@ export default function SwapForm({
 
         {/* Price between assets */}
         <Box mt="16px">
-          <PriceInput label="Market price" swapStore={swapStore} />
+          <PriceInput
+            label="Market price"
+            swapStore={swapStore}
+            priceImpactState={priceImpactState}
+          />
         </Box>
 
         {/* Slippage settings */}
@@ -176,7 +176,6 @@ export default function SwapForm({
       {openedDialog === 'pool' && (
         <SelectSwapPoolFromList
           defaultTokenInfo={defaultTokenInfo}
-          tokenInfoLookup={tokenInfoLookup}
           onClose={() => setOpenedDialog('')}
         />
       )}

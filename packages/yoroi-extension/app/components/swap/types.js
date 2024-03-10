@@ -13,3 +13,7 @@ export type AssetAmount = {|
   amount: string,
   address: string,
 |};
+
+export type PriceImpact = {|
+  isSevere: boolean,
+|};

@@ -457,12 +457,12 @@ export function asyncLocalStorageWrapper(): {|
   }
 }
 
-export type StorageField<T> = {
+export type StorageField<T> = {|
   get: () => Promise<T>;
   set: T => Promise<void>;
   remove: () => Promise<void>;
   defaultValue: () => T,
-}
+|}
 
 export function createStorageField<T>(
   key: string,

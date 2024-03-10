@@ -15,8 +15,7 @@ const PRECISION = 10;
 type Props = {|
   poolList: Array<*>,
   sellTokenId: string,
-  sellTokenInfo: ?RemoteTokenInfo,
-  buyTokenInfo: ?RemoteTokenInfo,
+  denomination: number,
   defaultTokenInfo: RemoteTokenInfo,
   currentPool: string,
   onPoolSelected: (poolId: string) => void,
@@ -26,9 +25,8 @@ type Props = {|
 export default function SelectPoolDialog({
   currentPool,
   sellTokenId,
-  sellTokenInfo,
+  denomination,
   defaultTokenInfo,
-  buyTokenInfo,
   poolList = [],
   onPoolSelected,
   onClose,
@@ -42,9 +40,6 @@ export default function SelectPoolDialog({
   const ptDecimals = defaultTokenInfo.decimals ?? 0;
   const ptTicker = defaultTokenInfo.ticker;
 
-  const isTokenInfoPresent = sellTokenInfo != null && buyTokenInfo != null;
-  const denomination = (sellTokenInfo?.decimals ?? 0) - (buyTokenInfo?.decimals ?? 0);
-
   return (
     <Dialog title="Select dex" onClose={onClose} withCloseButton closeOnOverlayClick>
       <Table gridTemplateColumns={templateColumns} columnNames={tableColumns}>
@@ -56,7 +51,7 @@ export default function SelectPoolDialog({
             .toString(10);
           const formattedTvl = Quantities.format(tvl, ptDecimals, 0);
           const marketPrice = getMarketPrice(pool, sellTokenId);
-          const formattedMarketPrice = isTokenInfoPresent ? Quantities.format(
+          const formattedMarketPrice = denomination >= 0 ? Quantities.format(
             marketPrice ?? Quantities.zero,
             denomination,
             PRECISION,

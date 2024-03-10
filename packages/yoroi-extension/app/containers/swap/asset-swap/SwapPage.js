@@ -10,15 +10,19 @@ import { SwapFormProvider } from '../context/swap-form';
 import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
 import { useSwap } from '@yoroi/swap';
 import { runInAction } from 'mobx';
-import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import BigNumber from 'bignumber.js';
 import SwapDisclaimerDialog from '../../../components/swap/SwapDisclaimerDialog';
 import { ROUTES } from '../../../routes-config';
+import type { PriceImpact } from '../../../components/swap/types';
+import PriceImpactAlert from '../../../components/swap/PriceImpactAlert';
+
+export const PRICE_IMPACT_MODERATE_RISK = 1
+export const PRICE_IMPACT_HIGH_RISK = 10
 
 export default function SwapPage(props: StoresAndActionsProps): Node {
   const [step, setStep] = useState(0);
-  const [openedDialog, setOpenedDialog] = useState('disclaimer');
+  const [openedDialog, setOpenedDialog] = useState('');
 
   const {
     slippage,
@@ -29,6 +33,10 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
       amounts: { sell, buy }
     },
   } = useSwap();
+
+  const impact = Number(selectedPoolCalculation?.prices.priceImpact ?? 0);
+  const priceImpactState: ?PriceImpact = impact > PRICE_IMPACT_MODERATE_RISK
+    ? { isSevere: impact > PRICE_IMPACT_HIGH_RISK } : null;
 
   const isSwapEnabled =
     selectedPoolCalculation != null
@@ -86,8 +94,6 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
   const network = wallet.getParent().getNetworkInfo();
   const defaultTokenInfo = props.stores.tokenInfoStore
     .getDefaultTokenInfoSummary(network.NetworkId);
-  const tokenInfoLookup = (tokenId: string): Promise<RemoteTokenInfo> =>
-    props.stores.tokenInfoStore.getLocalOrRemoteMetadata(network, tokenId);
 
   // <TODO:DEDUPLICATE> extract this and fix all places where it's duplicated
   const getFormattedPairingValue = (lovelaces: string): string => {
@@ -101,7 +107,16 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
   }
 
   const [isSuccessful, setIsSuccessful] = useState(false);
-  const handleNextStep = () => setStep(s => s + 1);
+  const handleNextStep = () => {
+    if (step === 0 && priceImpactState?.isSevere) {
+      if (openedDialog === '') {
+        setOpenedDialog('priceImpactAlert');
+        return;
+      }
+      setOpenedDialog('');
+    }
+    setStep(s => s + 1);
+  };
 
   return (
     <SwapFormProvider>
@@ -114,7 +129,7 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
               onSetNewSlippage={onSetNewSlippage}
               onLimitSwap={() => setOpenedDialog('limitOrder')}
               defaultTokenInfo={defaultTokenInfo}
-              tokenInfoLookup={tokenInfoLookup}
+              priceImpactState={priceImpactState}
             />
           )}
           {step === 1 && (
@@ -162,6 +177,13 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
           exchangePair="ADA/USDA"
           onConfirm={() => setOpenedDialog('')}
           onClose={() => setOpenedDialog('')}
+        />
+      )}
+
+      {openedDialog === 'priceImpactAlert' && (
+        <PriceImpactAlert
+          onContinue={handleNextStep}
+          onCancel={() => setOpenedDialog('')}
         />
       )}
 
