@@ -8,9 +8,13 @@ import { useSwapForm } from '../../containers/swap/context/swap-form';
 import SwapStore from '../../stores/ada/SwapStore';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react';
-import Percent from '../common/Percent';
 import type { PriceImpact } from './types';
-import PriceImpactIcon from './PriceImpactIcon';
+import {
+  FormattedActualPrice,
+  PriceImpactColored,
+  PriceImpactPercent,
+  PriceImpactTitle
+} from './PriceImpact';
 
 type Props = {|
   label: string,
@@ -119,23 +123,16 @@ function PriceInput({ label, swapStore, priceImpactState }: Props): Node {
         </Box>
       </Box>
       {priceImpactState && (
-        <Box sx={{ display: 'flex', paddingTop: '4px' }}>
-          <PriceImpactIcon small isSevere={priceImpactState.isSevere} />
-          <Typography
-            component="div"
-            variant="caption"
-            color={priceImpactState.isSevere ? 'magenta.500' : '#ED8600'}
-
-          >
-            Price impact = <Percent value={priceImpact} /> ({
-              Quantities.format(
-                actualPrice,
-                orderData.tokens.priceDenomination,
-                PRICE_PRECISION,
-              )
-            } {sellTokenInfo?.ticker}/{buyTokenInfo?.ticker})
-          </Typography>
-        </Box>
+        <Typography
+          component="div"
+          variant="caption"
+          pt="4px"
+        >
+          <PriceImpactColored priceImpactState={priceImpactState} sx={{ display: 'flex' }}>
+            <PriceImpactTitle small isSevere={priceImpactState.isSevere} />
+            &nbsp;=&nbsp;<PriceImpactPercent />&nbsp;(<FormattedActualPrice />)
+          </PriceImpactColored>
+        </Typography>
       )}
     </Box>
   );

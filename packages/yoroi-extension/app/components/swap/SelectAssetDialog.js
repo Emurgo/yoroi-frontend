@@ -1,5 +1,5 @@
 // @flow
-import type { AssetAmount } from './types';
+import type { AssetAmount, PriceImpact } from './types';
 import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { ReactComponent as NoAssetsFound } from '../../assets/images/revamp/no-assets-found.inline.svg';
@@ -14,6 +14,7 @@ import Dialog from '../widgets/Dialog';
 import Table from '../common/table/Table';
 import { urlResolveForIpfsAndCorsproxy } from '../../coreUtils';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
+import { PriceImpactColored, PriceImpactIcon } from './PriceImpact';
 
 const fromTemplateColumns = '1fr minmax(auto, 136px)';
 const toTemplateColumns = '1fr minmax(auto, 152px) minmax(auto, 136px)';
@@ -151,7 +152,8 @@ export const AssetAndAmountRow = ({
   priceChange100 = '',
   onAssetSelected = null,
   defaultTokenInfo,
-  displayAmount = null
+  displayAmount = null,
+  priceImpactState = null,
 }: {|
   type: 'from' | 'to',
   asset: AssetAmount,
@@ -162,6 +164,7 @@ export const AssetAndAmountRow = ({
   onAssetSelected?: AssetAmount => void,
   defaultTokenInfo: RemoteTokenInfo,
   displayAmount?: ?string,
+  priceImpactState?: ?PriceImpact,
 |}): React$Node => {
 
   const isFrom = type === 'from';
@@ -286,8 +289,11 @@ export const AssetAndAmountRow = ({
           flexDirection="column"
           alignItems="flex-end"
         >
-          <Typography component="div" variant="body1" color="grayscale.900">
-            <span>{amount}</span>&nbsp;<span>{ticker}</span>
+          <Typography component="div" variant="body1" color="grayscale.900" display="flex">
+            {priceImpactState && <PriceImpactIcon isSevere={priceImpactState.isSevere} />}
+            <PriceImpactColored priceImpactState={priceImpactState}>
+              <span>{amount}</span>&nbsp;<span>{ticker}</span>
+            </PriceImpactColored>
           </Typography>
           {usdPrice && (
             <Typography component="div" variant="body2" color="grayscale.600">

@@ -10,7 +10,13 @@ import SwapPoolFullInfo from './edit-pool/PoolFullInfo';
 import { useSwapFeeDisplay } from '../hooks';
 import type { PriceImpact } from '../../../components/swap/types';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
-import PriceImpactIcon from '../../../components/swap/PriceImpactIcon';
+import {
+  FormattedActualPrice,
+  FormattedMarketPrice,
+  PriceImpactBanner,
+  PriceImpactColored, PriceImpactIcon,
+  PriceImpactPercent
+} from '../../../components/swap/PriceImpact';
 
 type Props = {|
   slippageValue: string,
@@ -73,61 +79,48 @@ export default function SwapConfirmationStep({
                 displayAmount={buyQuantity.displayValue}
                 type="from"
                 defaultTokenInfo={defaultTokenInfo}
+                priceImpactState={priceImpactState}
               />
             </Box>
           </Box>
         </Box>
       </Box>
-      {priceImpactState && (
-        <Box
-          component="div"
-          bgcolor={priceImpactState.isSevere ? 'magenta.100' : 'yellow.100'}
-          p='12px 17px 16px 16px'
-          borderRadius='8px'
-        >
-          <Box sx={{ display: 'flex', marginBottom: '8px' }}>
-            <PriceImpactIcon isSevere={priceImpactState.isSevere} />
-            <Typography
-              component="div"
-              fontWeight="500"
-              color={priceImpactState.isSevere ? 'magenta.500' : '#ED8600'}
-            >
-              Price impact
+
+      <PriceImpactBanner priceImpactState={priceImpactState} />
+
+      <Box display="flex" gap="8px" flexDirection="column">
+        <SummaryRow col1="Dex">
+          <Box display="flex" alignItems="center" gap="8px">
+            <Box display="inline-flex">
+              <SwapPoolIcon provider={pool?.provider} />
+            </Box>
+            <Typography component="div" variant="body1" color="primary.500" fontWeight={500}>
+              {pool?.provider} {isAutoPool ? '(Auto)' : null}
             </Typography>
           </Box>
-          {priceImpactState.isSevere ? (
-            <Typography component="div" variant="body1" color="grayscale.900">
-              <Typography component="span" fontWeight="500">
-                Price impact over 10%&nbsp;
-              </Typography>
-              may cause a significant loss of funds. Please bear this in mind and proceed with an extra caution.
-            </Typography>
-          ) : (
-            <Typography component="div" variant="body1" color="grayscale.900">
-              <Typography component="span" fontWeight="500">
-                Price impact over 1%&nbsp;
-              </Typography>
-              may cause a difference in the amount you actually receive. Consider this at your own risk.
-            </Typography>
-          )}
-        </Box>
-      )}
-      <Box display="flex" gap="8px" flexDirection="column">
-        <SummaryRow
-          col1="Dex"
-          col2={
-            <Box display="flex" alignItems="center" gap="8px">
-              <Box display="inline-flex">
-                <SwapPoolIcon provider={pool?.provider} />
-              </Box>
-              <Typography component="div" variant="body1" color="primary.500" fontWeight={500}>
-                {pool?.provider} {isAutoPool ? '(Auto)' : null}
-              </Typography>
-            </Box>
-          }
-        />
-        <SummaryRow col1="Slippage tolerance" col2={`${slippageValue}%`} withInfo />
+        </SummaryRow>
+        <SummaryRow col1="Slippage tolerance" withInfo>
+          {slippageValue}%
+        </SummaryRow>
         <SwapPoolFullInfo defaultTokenInfo={defaultTokenInfo} />
+        {priceImpactState && (
+          <>
+            <SummaryRow col1="Market price" withInfo>
+              <FormattedMarketPrice />
+            </SummaryRow>
+            <SummaryRow col1="Price impact" withInfo>
+              <PriceImpactColored priceImpactState={priceImpactState} sx={{ display: 'flex' }}>
+                <PriceImpactIcon isSevere={priceImpactState.isSevere} />
+                <PriceImpactPercent />
+              </PriceImpactColored>
+            </SummaryRow>
+            <SummaryRow col1="">
+              <PriceImpactColored priceImpactState={priceImpactState}>
+                (<FormattedActualPrice />)
+              </PriceImpactColored>
+            </SummaryRow>
+          </>
+        )}
         <Box p="16px" bgcolor="#244ABF" borderRadius="8px" color="common.white">
           <Box display="flex" justifyContent="space-between">
             <Box>Total</Box>
@@ -168,52 +161,7 @@ export default function SwapConfirmationStep({
   );
 }
 
-// type AssetRowProps = {|
-//   asset: AssetAmount,
-//   usdAmount?: string,
-// |};
-
-// const AssetRow = ({ asset, usdAmount = null }: AssetRowProps) => {
-//   const { image = null, name, address, amount, ticker } = asset;
-//   return (
-//     <Box
-//       sx={{
-//         display: 'flex',
-//         alignItems: 'center',
-//         gap: '12px',
-//         p: '8px',
-//       }}
-//     >
-//       <Box flexShrink="0" width="48px" height="48px">
-//         {image || <AssetDefault />}
-//       </Box>
-//       <Box flexGrow="1" width="100%">
-//         <Box>
-//           <Typography component="div" variant="body1">
-//             {name}
-//           </Typography>
-//         </Box>
-//         <Box>
-//           <Typography component="div" variant="body2" color="grayscale.600">
-//             {address}
-//           </Typography>
-//         </Box>
-//       </Box>
-//       <Box flexShrink="0" display="flex" flexDirection="column" alignItems="flex-end">
-//         <Typography component="div" variant="body1" color="grayscale.900">
-//           <span>{amount}</span>&nbsp;<span>{ticker}</span>
-//         </Typography>
-//         {usdAmount && (
-//           <Typography component="div" variant="body2" color="grayscale.600">
-//             {usdAmount} USD
-//           </Typography>
-//         )}
-//       </Box>
-//     </Box>
-//   );
-// };
-
-const SummaryRow = ({ col1, col2, withInfo = false }) => (
+const SummaryRow = ({ col1, children, withInfo = false }) => (
   <Box display="flex" alignItems="center" justifyContent="space-between">
     <Box display="flex" alignItems="center">
       <Typography component="div" variant="body1" color="grayscale.500">
@@ -227,7 +175,7 @@ const SummaryRow = ({ col1, col2, withInfo = false }) => (
     </Box>
     <Box>
       <Typography component="div" variant="body1">
-        {col2}
+        {children}
       </Typography>
     </Box>
   </Box>

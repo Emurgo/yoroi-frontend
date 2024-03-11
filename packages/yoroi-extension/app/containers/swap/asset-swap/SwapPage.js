@@ -15,7 +15,7 @@ import BigNumber from 'bignumber.js';
 import SwapDisclaimerDialog from '../../../components/swap/SwapDisclaimerDialog';
 import { ROUTES } from '../../../routes-config';
 import type { PriceImpact } from '../../../components/swap/types';
-import PriceImpactAlert from '../../../components/swap/PriceImpactAlert';
+import { PriceImpactAlert } from '../../../components/swap/PriceImpact';
 
 export const PRICE_IMPACT_MODERATE_RISK = 1
 export const PRICE_IMPACT_HIGH_RISK = 10
