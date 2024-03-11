@@ -135,6 +135,7 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
           {step === 1 && (
             <SwapConfirmationStep
               slippageValue={slippageValue}
+              priceImpactState={priceImpactState}
               defaultTokenInfo={defaultTokenInfo}
               getFormattedPairingValue={getFormattedPairingValue}
             />

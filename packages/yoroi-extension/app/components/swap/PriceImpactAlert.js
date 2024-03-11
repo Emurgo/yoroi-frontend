@@ -17,7 +17,7 @@ export default function PriceImpactAlert({
     <Dialog title="Warning" onClose={onCancel} withCloseButton closeOnOverlayClick>
       <Box display="flex" maxWidth="648px" mt="-24px" flexDirection="column" gap="24px">
         <Typography component="div" variant="body1" color="grayscale.900">
-          <Typography component="span" fontWeight="bold">
+          <Typography component="span" fontWeight="500">
             Price impact over 10%&nbsp;
           </Typography>
           may cause a significant loss of funds. Please bear this in mind and proceed with an extra caution.

@@ -10,6 +10,7 @@ import { runInAction } from 'mobx';
 import { observer } from 'mobx-react';
 import Percent from '../common/Percent';
 import type { PriceImpact } from './types';
+import PriceImpactIcon from './PriceImpactIcon';
 
 type Props = {|
   label: string,
@@ -118,20 +119,23 @@ function PriceInput({ label, swapStore, priceImpactState }: Props): Node {
         </Box>
       </Box>
       {priceImpactState && (
-        <Typography
-          component="div"
-          pt="4px"
-          variant="caption"
-          color={priceImpactState.isSevere ? 'magenta.500' : '#ED8600'}
-        >
-          Price impact = <Percent value={priceImpact} /> ({
-            Quantities.format(
-              actualPrice,
-              orderData.tokens.priceDenomination,
-              PRICE_PRECISION,
-            )
-          } {sellTokenInfo?.ticker}/{buyTokenInfo?.ticker})
-        </Typography>
+        <Box sx={{ display: 'flex', paddingTop: '4px' }}>
+          <PriceImpactIcon small isSevere={priceImpactState.isSevere} />
+          <Typography
+            component="div"
+            variant="caption"
+            color={priceImpactState.isSevere ? 'magenta.500' : '#ED8600'}
+
+          >
+            Price impact = <Percent value={priceImpact} /> ({
+              Quantities.format(
+                actualPrice,
+                orderData.tokens.priceDenomination,
+                PRICE_PRECISION,
+              )
+            } {sellTokenInfo?.ticker}/{buyTokenInfo?.ticker})
+          </Typography>
+        </Box>
       )}
     </Box>
   );

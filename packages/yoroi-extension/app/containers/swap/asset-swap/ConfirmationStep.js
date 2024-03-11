@@ -1,5 +1,4 @@
 //@flow
-// import type { AssetAmount } from '../../../components/swap/types';
 import { Box, Typography } from '@mui/material';
 import { ReactComponent as InfoIcon } from '../../../assets/images/revamp/icons/info.inline.svg';
 import TextField from '../../../components/common/TextField';
@@ -9,15 +8,23 @@ import { useSwap } from '@yoroi/swap';
 import SwapPoolIcon from '../../../components/swap/SwapPoolIcon';
 import SwapPoolFullInfo from './edit-pool/PoolFullInfo';
 import { useSwapFeeDisplay } from '../hooks';
+import type { PriceImpact } from '../../../components/swap/types';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
+import PriceImpactIcon from '../../../components/swap/PriceImpactIcon';
 
 type Props = {|
   slippageValue: string,
+  priceImpactState: ?PriceImpact,
   defaultTokenInfo: RemoteTokenInfo,
   getFormattedPairingValue: (amount: string) => string,
 |};
 
-export default function SwapConfirmationStep({ slippageValue, defaultTokenInfo, getFormattedPairingValue }: Props): React$Node {
+export default function SwapConfirmationStep({
+  slippageValue,
+  priceImpactState,
+  defaultTokenInfo,
+  getFormattedPairingValue,
+}: Props): React$Node {
 
   const {
     orderData: {
@@ -71,6 +78,40 @@ export default function SwapConfirmationStep({ slippageValue, defaultTokenInfo, 
           </Box>
         </Box>
       </Box>
+      {priceImpactState && (
+        <Box
+          component="div"
+          bgcolor={priceImpactState.isSevere ? 'magenta.100' : 'yellow.100'}
+          p='12px 17px 16px 16px'
+          borderRadius='8px'
+        >
+          <Box sx={{ display: 'flex', marginBottom: '8px' }}>
+            <PriceImpactIcon isSevere={priceImpactState.isSevere} />
+            <Typography
+              component="div"
+              fontWeight="500"
+              color={priceImpactState.isSevere ? 'magenta.500' : '#ED8600'}
+            >
+              Price impact
+            </Typography>
+          </Box>
+          {priceImpactState.isSevere ? (
+            <Typography component="div" variant="body1" color="grayscale.900">
+              <Typography component="span" fontWeight="500">
+                Price impact over 10%&nbsp;
+              </Typography>
+              may cause a significant loss of funds. Please bear this in mind and proceed with an extra caution.
+            </Typography>
+          ) : (
+            <Typography component="div" variant="body1" color="grayscale.900">
+              <Typography component="span" fontWeight="500">
+                Price impact over 1%&nbsp;
+              </Typography>
+              may cause a difference in the amount you actually receive. Consider this at your own risk.
+            </Typography>
+          )}
+        </Box>
+      )}
       <Box display="flex" gap="8px" flexDirection="column">
         <SummaryRow
           col1="Dex"
