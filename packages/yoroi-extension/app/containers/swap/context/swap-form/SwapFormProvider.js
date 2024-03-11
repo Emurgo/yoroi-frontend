@@ -179,7 +179,9 @@ export default function SwapFormProvider({ children }: Props): Node {
   };
 
   const sellUpdateHandler = ({ input, quantity }) => {
-    sellQuantityChanged(quantity);
+    if (quantity !== sellQuantity) {
+      sellQuantityChanged(quantity);
+    }
     actions.sellInputValueChanged(input);
     const sellAvailableAmount = swapFormState.sellTokenInfo.amount ?? '0';
     if (quantity !== '' && sellAvailableAmount !== '') {
@@ -192,7 +194,9 @@ export default function SwapFormProvider({ children }: Props): Node {
   };
 
   const buyUpdateHandler = ({ input, quantity }) => {
-    buyQuantityChanged(quantity);
+    if (quantity !== buyQuantity) {
+      buyQuantityChanged(quantity);
+    }
     actions.buyInputValueChanged(input);
   };
 
@@ -225,13 +229,8 @@ export default function SwapFormProvider({ children }: Props): Node {
     }
   }, [buyQuantity, swapFormState.buyTokenInfo.decimals, swapFormState.buyQuantity.isTouched]);
 
-  useEffect(() => {
-    updateSellInput();
-  }, [sellQuantity, updateSellInput]);
-
-  useEffect(() => {
-    updateBuyInput();
-  }, [buyQuantity, updateBuyInput]);
+  useEffect(updateSellInput, [updateSellInput]);
+  useEffect(updateBuyInput, [updateBuyInput]);
 
   const allActions = {
     ...actions,
