@@ -1,7 +1,6 @@
 // @flow
 import type { Node } from 'react';
 import type { AssetAmount } from './types';
-import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { ReactComponent as ChevronDownIcon } from '../../assets/images/revamp/icons/chevron-down.inline.svg';
 import adaTokenImage from '../../containers/swap/mockAssets/ada.inline.svg';

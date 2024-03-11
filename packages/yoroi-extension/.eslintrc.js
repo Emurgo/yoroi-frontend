@@ -66,6 +66,7 @@ module.exports = {
     'react/state-in-constructor': ['warn', 'never'],
     'react/jsx-props-no-spreading': 0,
     'react/jsx-curly-newline': 0,
+    'react/jsx-tag-spacing': 0,
     'class-methods-use-this': 0,
     'no-continue': 0,
     'no-duplicate-imports': 0,
