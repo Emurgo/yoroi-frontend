@@ -116,3 +116,11 @@ export function noop(..._: any[]): void {
 export function fail<T>(...params: any[]): T {
   throw new Error(...params);
 }
+
+/**
+ * Returns the passed argument with no changes and just force-casts it to defined type
+ */
+export function forceNonNull<T>(t: ?T): T {
+  // $FlowIgnore
+  return t;
+}

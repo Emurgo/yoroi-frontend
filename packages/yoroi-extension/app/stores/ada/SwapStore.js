@@ -6,7 +6,6 @@ import type { StoresMap } from '../index';
 import { action, observable } from 'mobx';
 import type { StorageField } from '../../api/localStorage';
 import { createStorageFlag } from '../../api/localStorage';
-import { BalanceAmount } from '@yoroi/types/lib/balance/token';
 
 export default class SwapStore extends Store<StoresMap, ActionsMap> {
 
@@ -23,11 +22,11 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
     this.limitOrderDisplayValue = '';
   }
 
-  createUnsignedSwapTx: ({
-    buy: BalanceAmount,
-    sell: BalanceAmount,
+  createUnsignedSwapTx: ({|
+    buy: {| tokenId: string, quantity: string |},
+    sell: {| tokenId: string, quantity: string |},
     poolProvider: string,
-  }) => void = ({ buy, sell, poolProvider }) => {
+  |}) => void = ({ buy, sell, poolProvider }) => {
     const metadata = [
       {
         label: '674',

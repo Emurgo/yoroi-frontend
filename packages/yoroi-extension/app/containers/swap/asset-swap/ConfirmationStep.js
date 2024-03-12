@@ -19,15 +19,14 @@ import {
   PriceImpactPercent
 } from '../../../components/swap/PriceImpact';
 import type { State } from '../context/swap-form/types';
-import { SwapCreateOrderResponse } from '@yoroi/types/lib/swap/order';
 import { useEffect } from 'react';
 
 type Props = {|
   slippageValue: string,
-  walletAddress: string,
+  walletAddress: ?string,
   priceImpactState: ?PriceImpact,
   userPasswordState: State<string>,
-  orderDataState: State<SwapCreateOrderResponse>,
+  orderDataState: State<any>,
   defaultTokenInfo: RemoteTokenInfo,
   getFormattedPairingValue: (amount: string) => string,
 |};
@@ -54,7 +53,7 @@ export default function SwapConfirmationStep({
   const isAutoPool = pool?.poolId === bestPool?.poolId;
 
   const { createOrderData } = useSwapCreateOrder({
-    onSuccess: (data: SwapCreateOrderResponse) => {
+    onSuccess: (data) => {
       orderDataState.update(data);
     },
     onError: error => {
@@ -63,6 +62,10 @@ export default function SwapConfirmationStep({
     }
   });
   useEffect(() => {
+    if (walletAddress == null) {
+      alert('Wallet address is not available');
+      return;
+    }
     createOrderData((isMarketOrder ? makePossibleMarketOrder : makeLimitOrder)(
       orderData.amounts.sell,
       orderData.amounts.buy,

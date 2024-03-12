@@ -20,7 +20,6 @@ import { StateWrap } from '../context/swap-form/types';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import FullscreenLayout from '../../../components/layout/FullscreenLayout';
 import { addressHexToBech32 } from '../../../api/ada/lib/cardanoCrypto/utils';
-import { SwapCreateOrderResponse } from '@yoroi/types/lib/swap/order';
 
 export const PRICE_IMPACT_MODERATE_RISK = 1;
 export const PRICE_IMPACT_HIGH_RISK = 10;
@@ -51,7 +50,7 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
   const [selectedWalletAddress, setSelectedWalletAddress] = useState<?string>(null);
   const [slippageValue, setSlippageValue] = useState(String(defaultSlippage));
   const userPasswordState = StateWrap(useState<string>(''));
-  const remoteOrderDataState = StateWrap(useState<?SwapCreateOrderResponse>(null));
+  const remoteOrderDataState = StateWrap(useState<?any>(null));
 
   const swapFormCanContinue =
     selectedPoolCalculation != null
