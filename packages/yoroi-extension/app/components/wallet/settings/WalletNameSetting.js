@@ -91,6 +91,7 @@ class WalletNameSetting extends Component<Props & InjectedLayoutProps> {
             validationErrorMessage={intl.formatMessage(globalMessages.invalidWalletName)}
             successfullyUpdated={!isSubmitting && lastUpdatedField === 'name' && !isInvalid}
             classicTheme={classicTheme}
+            id="settings:wallet:walletName"
           />
           {error && <div className={styles.error}>{intl.formatMessage(error, error.values)}</div>}
         </Box>
