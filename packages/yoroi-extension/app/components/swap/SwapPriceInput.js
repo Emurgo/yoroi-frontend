@@ -17,14 +17,13 @@ import {
 } from './PriceImpact';
 
 type Props = {|
-  label: string,
   swapStore: SwapStore,
   priceImpactState: ?PriceImpact,
 |};
 
-const NO_PRICE_VALUE_PLACEHOLDER = '---';
+const NO_PRICE_VALUE_PLACEHOLDER = ' ';
 
-function PriceInput({ label, swapStore, priceImpactState }: Props): Node {
+function SwapPriceInput({ swapStore, priceImpactState }: Props): Node {
   const {
     orderData,
     limitPriceChanged,
@@ -79,9 +78,10 @@ function PriceInput({ label, swapStore, priceImpactState }: Props): Node {
             position: 'absolute',
             px: '4px',
             bgcolor: 'common.white',
+            borderRadius: '10px',
           }}
         >
-          {label}
+          {isMarketOrder ? 'Market ' : 'Limit '} price
         </Box>
 
         <Typography
@@ -134,4 +134,4 @@ function PriceInput({ label, swapStore, priceImpactState }: Props): Node {
   );
 }
 
-export default (observer(PriceInput): React$ComponentType<Props>);
+export default (observer(SwapPriceInput): React$ComponentType<Props>);

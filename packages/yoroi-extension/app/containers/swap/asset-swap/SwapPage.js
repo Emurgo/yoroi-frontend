@@ -5,7 +5,7 @@ import { Box, Button } from '@mui/material';
 import SwapForm from './SwapForm';
 import SwapConfirmationStep from './ConfirmationStep';
 import TxSubmittedStep from './TxSubmittedStep';
-import LimitOrderDialog from '../../../components/swap/LimitOrderDialog';
+import LimitOrderWarningDialog from '../../../components/swap/LimitOrderWarningDialog';
 import { SwapFormProvider } from '../context/swap-form';
 import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
 import { useSwap } from '@yoroi/swap';
@@ -17,8 +17,9 @@ import { ROUTES } from '../../../routes-config';
 import type { PriceImpact } from '../../../components/swap/types';
 import { PriceImpactAlert } from '../../../components/swap/PriceImpact';
 
-export const PRICE_IMPACT_MODERATE_RISK = 1
-export const PRICE_IMPACT_HIGH_RISK = 10
+export const PRICE_IMPACT_MODERATE_RISK = 1;
+export const PRICE_IMPACT_HIGH_RISK = 10;
+export const LIMIT_PRICE_WARNING_THRESHOLD = 0.1;
 
 export default function SwapPage(props: StoresAndActionsProps): Node {
   const [step, setStep] = useState(0);
@@ -28,13 +29,16 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
     slippage,
     slippageChanged,
     orderData: {
+      type: orderType,
       slippage: defaultSlippage,
       selectedPoolCalculation,
-      amounts: { sell, buy }
+      amounts: { sell, buy },
+      limitPrice: orderLimitPrice,
     },
   } = useSwap();
 
-  const impact = Number(selectedPoolCalculation?.prices.priceImpact ?? 0);
+  const isMarketOrder = orderType === 'market';
+  const impact = isMarketOrder ? Number(selectedPoolCalculation?.prices.priceImpact ?? 0) : 0;
   const priceImpactState: ?PriceImpact = impact > PRICE_IMPACT_MODERATE_RISK
     ? { isSevere: impact > PRICE_IMPACT_HIGH_RISK } : null;
 
@@ -108,12 +112,27 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
 
   const [isSuccessful, setIsSuccessful] = useState(false);
   const handleNextStep = () => {
-    if (step === 0 && priceImpactState?.isSevere) {
-      if (openedDialog === '') {
-        setOpenedDialog('priceImpactAlert');
-        return;
+    if (step === 0) {
+      if (isMarketOrder) {
+        if (priceImpactState?.isSevere) {
+          if (openedDialog === '') {
+            setOpenedDialog('priceImpactAlert');
+            return;
+          }
+          setOpenedDialog('');
+        }
+      } else {
+        // limit order
+        const marketPrice = new BigNumber(selectedPoolCalculation.prices.market);
+        const limitPrice = new BigNumber(orderLimitPrice);
+        if (limitPrice.isGreaterThan(marketPrice.times(1 + LIMIT_PRICE_WARNING_THRESHOLD))) {
+          if (openedDialog === '') {
+            setOpenedDialog('limitOrderWarning');
+            return;
+          }
+          setOpenedDialog('');
+        }
       }
-      setOpenedDialog('');
     }
     setStep(s => s + 1);
   };
@@ -171,13 +190,10 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
         )}
       </Box>
 
-      {openedDialog === 'limitOrder' && (
-        <LimitOrderDialog
-          limitPrice={9}
-          marketPrice={4}
-          exchangePair="ADA/USDA"
-          onConfirm={() => setOpenedDialog('')}
-          onClose={() => setOpenedDialog('')}
+      {openedDialog === 'limitOrderWarning' && (
+        <LimitOrderWarningDialog
+          onContinue={handleNextStep}
+          onCancel={() => setOpenedDialog('')}
         />
       )}
 

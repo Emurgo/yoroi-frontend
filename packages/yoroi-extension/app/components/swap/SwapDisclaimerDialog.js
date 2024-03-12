@@ -16,7 +16,7 @@ export default function SwapDisclaimerDialog({
 }: Props): Node {
   const [isCheckboxMarked, setCheckboxMarked] = useState(false);
   return (
-    <Dialog title="Swap Disclaimer" withCloseButton onClose={onDialogRefuse}>
+    <Dialog title="Swap Disclaimer" onClose={onDialogRefuse}>
       <Box display="flex" maxWidth="648px" mt="-24px" flexDirection="column" gap="24px">
         <Box>
           <Typography component="div" variant="body1" color="grayscale.900" align="justify">

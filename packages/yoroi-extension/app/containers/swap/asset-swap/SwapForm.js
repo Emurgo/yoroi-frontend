@@ -5,7 +5,7 @@ import { ReactComponent as SwitchIcon } from '../../../assets/images/revamp/icon
 import { ReactComponent as InfoIcon } from '../../../assets/images/revamp/icons/info.inline.svg';
 import { ReactComponent as EditIcon } from '../../../assets/images/revamp/icons/edit.inline.svg';
 import { ReactComponent as RefreshIcon } from '../../../assets/images/revamp/icons/refresh.inline.svg';
-import PriceInput from '../../../components/swap/PriceInput';
+import SwapPriceInput from '../../../components/swap/SwapPriceInput';
 import SlippageDialog from '../../../components/swap/SlippageDialog';
 import Tabs from '../../../components/common/tabs/Tabs';
 import { useSwap, } from '@yoroi/swap';
@@ -106,8 +106,7 @@ export default function SwapForm({
 
         {/* Price between assets */}
         <Box mt="16px">
-          <PriceInput
-            label="Market price"
+          <SwapPriceInput
             swapStore={swapStore}
             priceImpactState={priceImpactState}
           />
