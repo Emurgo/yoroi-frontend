@@ -273,10 +273,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
 
     const nonce = timeToSlot({ time: new Date() }).slot;
 
-    const allAddresses = await this.api.ada.getAllAddressesForDisplay({
-      publicDeriver,
-      type: CoreAddressTypes.CARDANO_BASE,
-    });
+    const firstAddress = await this.stores.addresses.getFirstExternalAddress(publicDeriver);
 
     let votingRegTxPromise;
 
@@ -322,8 +319,8 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
             votingPublicKey,
             stakingKeyPath: stakingKeyResp.addressing.path,
             stakingKey: Buffer.from(stakingKey.as_bytes()).toString('hex'),
-            paymentKeyPath: allAddresses[0].addressing.path,
-            paymentAddress: allAddresses[0].address,
+            paymentKeyPath: firstAddress.addressing.path,
+            paymentAddress: firstAddress.address,
             nonce,
           },
         }).promise;
@@ -335,8 +332,8 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
             votingPublicKey,
             stakingKeyPath: stakingKeyResp.addressing.path,
             stakingKey: Buffer.from(stakingKey.as_bytes()).toString('hex'),
-            paymentKeyPath: allAddresses[0].addressing.path,
-            paymentAddress: allAddresses[0].address,
+            paymentKeyPath: firstAddress.addressing.path,
+            paymentAddress: firstAddress.address,
             nonce,
           },
         }).promise;
@@ -368,7 +365,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
       const trxMeta = generateRegistration({
         stakePrivateKey: stakingKey,
         catalystPrivateKey,
-        receiverAddress: allAddresses[0].address,
+        receiverAddress: firstAddress.address,
         slotNumber: nonce,
       });
 

@@ -80,6 +80,7 @@ import type { ForeignUtxoFetcher } from '../../app/connector/stores/ConnectorSto
 import { find721metadata } from '../../app/utils/nftMetadata';
 import { hexToBytes } from '../../app/coreUtils';
 import { mergeWitnessSets } from './connector/utils';
+import { addressHexToBech32 } from '../../app/api/ada/lib/cardanoCrypto/utils';
 
 /*::
 declare var chrome;
@@ -1039,11 +1040,7 @@ async function handleInjectorMessage(message, sender) {
   }
   async function addressesToBech(addressesHex: string[]): Promise<string[]> {
     await RustModule.load();
-    return addressesHex.map(a =>
-                            RustModule.WalletV4.Address.from_bytes(
-                              Buffer.from(a, 'hex'),
-                            ).to_bech32()
-                           );
+    return addressesHex.map(addressHexToBech32);
   }
   const connectParameters = () => ({
     protocol: message.protocol,

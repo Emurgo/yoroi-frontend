@@ -31,6 +31,9 @@ import { allAddressSubgroups } from '../stateless/addressStores';
 import type { IAddressTypeUiSubset, IAddressTypeStore } from '../stateless/addressStores';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import type { AddressDetails } from '../../api/ada';
+import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
+import { ChainDerivations } from '../../config/numbersConfig';
 
 export default class AddressesStore extends Store<StoresMap, ActionsMap> {
 
@@ -238,5 +241,13 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
 
   @action _resetFilter: void => void = () => {
     this.addressFilter = AddressFilter.None;
+  }
+
+  getFirstExternalAddress: (PublicDeriver<>) => Promise<AddressDetails> = async (publicDeriver) => {
+    return (await this.api.ada.getChainAddressesForDisplay({
+      publicDeriver,
+      type: CoreAddressTypes.CARDANO_BASE,
+      chainsRequest: { chainId: ChainDerivations.EXTERNAL },
+    }))[0];
   }
 }

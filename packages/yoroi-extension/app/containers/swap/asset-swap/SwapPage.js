@@ -1,7 +1,7 @@
 // @flow
 import type { Node } from 'react';
 import { useEffect, useState, } from 'react';
-import { Box, Button } from '@mui/material';
+import { Box, Button, Stack } from '@mui/material';
 import SwapForm from './SwapForm';
 import SwapConfirmationStep from './ConfirmationStep';
 import TxSubmittedStep from './TxSubmittedStep';
@@ -16,6 +16,11 @@ import SwapDisclaimerDialog from '../../../components/swap/SwapDisclaimerDialog'
 import { ROUTES } from '../../../routes-config';
 import type { PriceImpact } from '../../../components/swap/types';
 import { PriceImpactAlert } from '../../../components/swap/PriceImpact';
+import { StateWrap } from '../context/swap-form/types';
+import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
+import FullscreenLayout from '../../../components/layout/FullscreenLayout';
+import { addressHexToBech32 } from '../../../api/ada/lib/cardanoCrypto/utils';
+import { SwapCreateOrderResponse } from '@yoroi/types/lib/swap/order';
 
 export const PRICE_IMPACT_MODERATE_RISK = 1;
 export const PRICE_IMPACT_HIGH_RISK = 10;
@@ -42,14 +47,29 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
   const priceImpactState: ?PriceImpact = impact > PRICE_IMPACT_MODERATE_RISK
     ? { isSevere: impact > PRICE_IMPACT_HIGH_RISK } : null;
 
-  const isSwapEnabled =
+  const [disclaimerStatus, setDisclaimerStatus] = useState<?boolean>(null);
+  const [selectedWalletAddress, setSelectedWalletAddress] = useState<?string>(null);
+  const [slippageValue, setSlippageValue] = useState(String(defaultSlippage));
+  const userPasswordState = StateWrap(useState<string>(''));
+  const remoteOrderDataState = StateWrap(useState<?SwapCreateOrderResponse>(null));
+
+  const swapFormCanContinue =
     selectedPoolCalculation != null
     && sell.quantity !== '0'
     && buy.quantity !== '0';
 
-  const [disclaimerStatus, setDisclaimerStatus] = useState<?boolean>(null);
-  const [slippageValue, setSlippageValue] = useState(String(defaultSlippage));
+  const confirmationCanContinue =
+    userPasswordState.value !== ''
+    && remoteOrderDataState.value != null;
 
+  const isButtonLoader =
+    step === 1 && remoteOrderDataState.value == null;
+
+  const isSwapEnabled =
+    (step === 0 && swapFormCanContinue)
+    || (step === 1 && confirmationCanContinue);
+
+  const wallet = props.stores.wallets.selectedOrFail;
   const disclaimerFlag = props.stores.substores.ada.swapStore.swapDisclaimerAcceptanceFlag;
 
   useEffect(() => {
@@ -73,7 +93,12 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
       })
       .catch(e => {
         console.error('Failed to load stored slippage', e);
-      })
+      });
+    props.stores.addresses.getFirstExternalAddress(wallet)
+      .then(a => setSelectedWalletAddress(addressHexToBech32(a.address)))
+      .catch(e => {
+        console.error('Failed to load wallet address', e);
+      });
   }, []);
 
   const onAcceptDisclaimer = () => {
@@ -94,7 +119,6 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
   }
 
   // state data
-  const wallet = props.stores.wallets.selectedOrFail;
   const network = wallet.getParent().getNetworkInfo();
   const defaultTokenInfo = props.stores.tokenInfoStore
     .getDefaultTokenInfoSummary(network.NetworkId);
@@ -133,6 +157,8 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
           setOpenedDialog('');
         }
       }
+    } else if (step === 1) {
+      // submitting tx
     }
     setStep(s => s + 1);
   };
@@ -154,12 +180,22 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
           {step === 1 && (
             <SwapConfirmationStep
               slippageValue={slippageValue}
+              walletAddress={selectedWalletAddress}
               priceImpactState={priceImpactState}
+              orderDataState={remoteOrderDataState}
+              userPasswordState={userPasswordState}
               defaultTokenInfo={defaultTokenInfo}
               getFormattedPairingValue={getFormattedPairingValue}
             />
           )}
           {step === 2 && (
+            <FullscreenLayout bottomPadding={0}>
+              <Stack alignItems="center" justifyContent="center" height="50vh">
+                <LoadingSpinner />
+              </Stack>
+            </FullscreenLayout>
+          )}
+          {step === 3 && (
             <TxSubmittedStep
               isSuccessful={isSuccessful}
               onTryAgain={() => {
@@ -177,14 +213,19 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
             display="flex"
             alignItems="center"
             justifyContent="center"
+            borderTop="1px solid"
+            borderColor="grayscale.200"
           >
             <Button
               onClick={handleNextStep}
               sx={{ minWidth: '128px', minHeight: '48px' }}
               variant="primary"
-              disabled={!isSwapEnabled}
+              disabled={!isSwapEnabled || isButtonLoader}
             >
-              {step === 0 ? 'Swap' : 'Confirm'}
+              {isButtonLoader
+                ? (<LoadingSpinner />)
+                : (step === 0 ? 'Swap' : 'Confirm')
+              }
             </Button>
           </Box>
         )}

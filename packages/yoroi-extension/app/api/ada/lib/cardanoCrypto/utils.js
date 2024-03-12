@@ -43,3 +43,8 @@ export async function isWalletExist(
       return deriver;
   }
 }
+
+export function addressHexToBech32(hex: string): string {
+  return RustModule.WasmScope(Module =>
+    Module.WalletV4.Address.from_hex(hex).to_bech32());
+}

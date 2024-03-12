@@ -156,15 +156,17 @@ import { derivePrivateByAddressing, derivePublicByAddressing } from './lib/carda
 
 // ADA specific Request / Response params
 
+export type AddressDetails = {|
+  ...Address, ...Value, ...Addressing, ...UsedStatus, ...AddressType,
+|};
+
 // getAllAddressesForDisplay
 
 export type GetAllAddressesForDisplayRequest = {|
   publicDeriver: IPublicDeriver<>,
   type: CoreAddressT,
 |};
-export type GetAllAddressesForDisplayResponse = Array<{|
-  ...Address, ...Value, ...Addressing, ...UsedStatus, ...AddressType,
-|}>;
+export type GetAllAddressesForDisplayResponse = Array<AddressDetails>;
 export type GetAllAddressesForDisplayFunc = (
   request: GetAllAddressesForDisplayRequest
 ) => Promise<GetAllAddressesForDisplayResponse>;
@@ -176,9 +178,7 @@ export type GetChainAddressesForDisplayRequest = {|
   chainsRequest: IHasUtxoChainsRequest,
   type: CoreAddressT,
 |};
-export type GetChainAddressesForDisplayResponse = Array<{|
-  ...Address, ...AddressType, ...Value, ...Addressing, ...UsedStatus
-|}>;
+export type GetChainAddressesForDisplayResponse = Array<AddressDetails>;
 export type GetChainAddressesForDisplayFunc = (
   request: GetChainAddressesForDisplayRequest
 ) => Promise<GetChainAddressesForDisplayResponse>;

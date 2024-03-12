@@ -4,7 +4,7 @@ import { ReactComponent as InfoIcon } from '../../../assets/images/revamp/icons/
 import TextField from '../../../components/common/TextField';
 import { useSwapForm } from '../context/swap-form';
 import { AssetAndAmountRow } from '../../../components/swap/SelectAssetDialog';
-import { useSwap } from '@yoroi/swap';
+import { makeLimitOrder, makePossibleMarketOrder, useSwap, useSwapCreateOrder } from '@yoroi/swap';
 import SwapPoolIcon from '../../../components/swap/SwapPoolIcon';
 import SwapPoolFullInfo from './edit-pool/PoolFullInfo';
 import { useSwapFeeDisplay } from '../hooks';
@@ -14,34 +14,63 @@ import {
   FormattedActualPrice,
   FormattedMarketPrice,
   PriceImpactBanner,
-  PriceImpactColored, PriceImpactIcon,
+  PriceImpactColored,
+  PriceImpactIcon,
   PriceImpactPercent
 } from '../../../components/swap/PriceImpact';
+import type { State } from '../context/swap-form/types';
+import { SwapCreateOrderResponse } from '@yoroi/types/lib/swap/order';
+import { useEffect } from 'react';
 
 type Props = {|
   slippageValue: string,
+  walletAddress: string,
   priceImpactState: ?PriceImpact,
+  userPasswordState: State<string>,
+  orderDataState: State<SwapCreateOrderResponse>,
   defaultTokenInfo: RemoteTokenInfo,
   getFormattedPairingValue: (amount: string) => string,
 |};
 
 export default function SwapConfirmationStep({
   slippageValue,
+  walletAddress,
   priceImpactState,
+  userPasswordState,
+  orderDataState,
   defaultTokenInfo,
   getFormattedPairingValue,
 }: Props): React$Node {
 
+  const { orderData } = useSwap();
   const {
-    orderData: {
-      selectedPoolCalculation: { pool },
-      bestPoolCalculation: { pool: bestPool },
-    },
-  } = useSwap();
+    selectedPoolCalculation: { pool },
+    bestPoolCalculation: { pool: bestPool },
+  } = orderData;
   const { sellTokenInfo, buyTokenInfo, sellQuantity, buyQuantity } = useSwapForm();
   const { ptAmount, formattedPtAmount, formattedNonPtAmount } = useSwapFeeDisplay(defaultTokenInfo);
 
+  const isMarketOrder = orderData.type === 'market';
   const isAutoPool = pool?.poolId === bestPool?.poolId;
+
+  const { createOrderData } = useSwapCreateOrder({
+    onSuccess: (data: SwapCreateOrderResponse) => {
+      orderDataState.update(data);
+    },
+    onError: error => {
+      console.error('useSwapCreateOrder fail', error);
+      alert('Failed to receive remote data for the order');
+    }
+  });
+  useEffect(() => {
+    createOrderData((isMarketOrder ? makePossibleMarketOrder : makeLimitOrder)(
+      orderData.amounts.sell,
+      orderData.amounts.buy,
+      orderData.selectedPoolCalculation?.pool,
+      orderData.slippage,
+      walletAddress,
+    ));
+  }, []);
 
   return (
     <Box width="100%" mx="auto" maxWidth="506px" display="flex" flexDirection="column" gap="24px">
@@ -149,12 +178,10 @@ export default function SwapConfirmationStep({
       <Box>
         <TextField
           className="walletPassword"
-          value=""
+          value={userPasswordState.value}
           label="Password"
           type="password"
-          // {...walletPasswordField.bind()}
-          // done={walletPasswordField.isValid}
-          // error={walletPasswordField.error}
+          onChange={e => userPasswordState.update(e.target.value)}
         />
       </Box>
     </Box>

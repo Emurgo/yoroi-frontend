@@ -6,6 +6,7 @@ import type { StoresMap } from '../index';
 import { action, observable } from 'mobx';
 import type { StorageField } from '../../api/localStorage';
 import { createStorageFlag } from '../../api/localStorage';
+import { BalanceAmount } from '@yoroi/types/lib/balance/token';
 
 export default class SwapStore extends Store<StoresMap, ActionsMap> {
 
@@ -21,4 +22,37 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
   @action resetLimitOrderDisplayValue: void => void = () => {
     this.limitOrderDisplayValue = '';
   }
+
+  createUnsignedSwapTx: ({
+    buy: BalanceAmount,
+    sell: BalanceAmount,
+    poolProvider: string,
+  }) => void = ({ buy, sell, poolProvider }) => {
+    const metadata = [
+      {
+        label: '674',
+        data: {
+          msg: splitStringInto64CharArray(
+            JSON.stringify({
+              provider: poolProvider,
+              sellTokenId: sell.tokenId,
+              sellQuantity: sell.quantity,
+              buyTokenId: buy.tokenId,
+              buyQuantity: buy.quantity,
+            }),
+          ),
+        },
+      },
+    ];
+  }
+}
+
+export const splitStringInto64CharArray = (inputString: string): string[] => {
+  const maxLength = 64
+  const resultArray: string[] = []
+  for (let i = 0; i < inputString.length; i += maxLength) {
+    const substring = inputString.slice(i, i + maxLength)
+    resultArray.push(substring)
+  }
+  return resultArray
 }
