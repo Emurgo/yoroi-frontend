@@ -22,7 +22,6 @@ import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import type { PriceImpact } from '../../../components/swap/types';
 
 type Props = {|
-  onLimitSwap: void => void,
   slippageValue: string,
   onSetNewSlippage: number => void,
   swapStore: SwapStore,
@@ -31,7 +30,6 @@ type Props = {|
 |};
 
 export default function SwapForm({
-  onLimitSwap,
   slippageValue,
   onSetNewSlippage,
   swapStore,

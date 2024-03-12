@@ -171,7 +171,6 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
               swapStore={props.stores.substores.ada.swapStore}
               slippageValue={slippageValue}
               onSetNewSlippage={onSetNewSlippage}
-              onLimitSwap={() => setOpenedDialog('limitOrder')}
               defaultTokenInfo={defaultTokenInfo}
               priceImpactState={priceImpactState}
             />
@@ -221,9 +220,9 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
               variant="primary"
               disabled={!isSwapEnabled || isButtonLoader}
             >
-              {isButtonLoader
-                ? (<LoadingSpinner />)
-                : (step === 0 ? 'Swap' : 'Confirm')
+              {
+                (isButtonLoader && <LoadingSpinner />)
+                ?? (step === 0 ? 'Swap' : 'Confirm')
               }
             </Button>
           </Box>

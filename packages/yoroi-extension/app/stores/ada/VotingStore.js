@@ -47,7 +47,6 @@ import {
   loadCatalystRoundInfo,
   saveCatalystRoundInfo,
 } from '../../api/localStorage';
-import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 import { derivePublicByAddressing } from '../../api/ada/lib/cardanoCrypto/deriveByAddressing';
 
 export const ProgressStep = Object.freeze({
