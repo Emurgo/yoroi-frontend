@@ -1,5 +1,5 @@
 //@flow
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import adaLogo from './mockAssets/ada.inline.svg';
 import { genLookupOrFail, getTokenIdentifierIfExists, getTokenName, } from '../../stores/stateless/tokenHelpers';
 import { splitAmount, truncateToken } from '../../utils/formatters';
@@ -8,6 +8,7 @@ import { useSwap, useSwapPoolsByPair } from '@yoroi/swap';
 import { Quantities } from '../../utils/quantities';
 import { useSwapForm } from './context/swap-form';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
+import { runInAction } from 'mobx';
 
 export function useAssets(): Array<any> {
   const { spendableBalance, tokenInfo } = useSwapPage();
@@ -51,11 +52,19 @@ export function useAssets(): Array<any> {
 
 export async function useAsyncPools(tokenA: string, tokenB: string): Promise<void> {
   const { poolPairsChanged } = useSwap();
+  const [prevUsedPair, setPrevUsedPair] = useState<?string>(null);
+  const pair = `${tokenA}:${tokenB}`;
+  const isSamePair = prevUsedPair === pair;
   useSwapPoolsByPair(
     { tokenA, tokenB },
     {
       onSuccess: pools => {
-        poolPairsChanged(pools);
+        if (!isSamePair) {
+          runInAction(() => {
+            setPrevUsedPair(pair);
+            poolPairsChanged(pools);
+          })
+        }
       },
     }
   );
