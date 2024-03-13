@@ -219,12 +219,15 @@ export default class BuySellDialog extends Component<Props, State> {
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
-                <div>
-                  <div>
-                    <img style={{ borderRadius: '4px', verticalAlign: 'bottom' }} src={adaPng} alt="" />
-                    {' '}ADA
+                <div style={{ position: 'relative' /* so that the balance line can align on the right side */ }}>
+                  <div style={{ marginBottom: '8px', color: '#000' }}>
+                    <img
+                      style={{ marginRight: '8px', borderRadius: '4px', verticalAlign: 'bottom' }}
+                      src={adaPng}
+                      alt=""
+                    />ADA
                   </div>
-                  <Box sx={{ position: 'absolute', right: '1em', fontSize: '12px' }}>
+                  <Box sx={{ position: 'absolute', right: '0px', fontSize: '12px' }}>
                     {intl.formatMessage(messages.currentBalance, { amount: props.currentBalanceAda })}
                   </Box>
                 </div>
