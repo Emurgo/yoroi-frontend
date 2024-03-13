@@ -25,6 +25,8 @@ export const PRICE_IMPACT_MODERATE_RISK = 1;
 export const PRICE_IMPACT_HIGH_RISK = 10;
 export const LIMIT_PRICE_WARNING_THRESHOLD = 0.1;
 
+const SWAP_AGGREGATOR = 'muesliswap';
+
 export default function SwapPage(props: StoresAndActionsProps): Node {
   const [step, setStep] = useState(0);
   const [openedDialog, setOpenedDialog] = useState('');
@@ -39,6 +41,7 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
       amounts: { sell, buy },
       limitPrice: orderLimitPrice,
     },
+    frontendFeeTiersChanged,
   } = useSwap();
 
   const isMarketOrder = orderType === 'market';
@@ -69,6 +72,10 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
     || (step === 1 && confirmationCanContinue);
 
   const wallet = props.stores.wallets.selectedOrFail;
+  const network = wallet.getParent().getNetworkInfo();
+  const defaultTokenInfo = props.stores.tokenInfoStore
+    .getDefaultTokenInfoSummary(network.NetworkId);
+
   const disclaimerFlag = props.stores.substores.ada.swapStore.swapDisclaimerAcceptanceFlag;
 
   useEffect(() => {
@@ -98,6 +105,14 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
       .catch(e => {
         console.error('Failed to load wallet address', e);
       });
+    props.stores.substores.ada.stateFetchStore.fetcher.getSwapFeeTiers({ network })
+      .then(feeTiers => {
+        const aggregatorFeeTiers = feeTiers?.[SWAP_AGGREGATOR] ?? [];
+        frontendFeeTiersChanged(aggregatorFeeTiers);
+      })
+      .catch(err => {
+        console.error(`unexpected erorr: failed to get swap fee tiers: ${err}`);
+      });
   }, []);
 
   const onAcceptDisclaimer = () => {
@@ -116,11 +131,6 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
       setSlippageValue(String(newSlippage));
     });
   }
-
-  // state data
-  const network = wallet.getParent().getNetworkInfo();
-  const defaultTokenInfo = props.stores.tokenInfoStore
-    .getDefaultTokenInfoSummary(network.NetworkId);
 
   // <TODO:DEDUPLICATE> extract this and fix all places where it's duplicated
   const getFormattedPairingValue = (lovelaces: string): string => {
@@ -158,6 +168,19 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
       }
     } else if (step === 1) {
       // submitting tx
+      if (selectedPoolCalculation == null) {
+        throw new Error('Incorrect state. Pool calculations are not available to prepare the transaction')
+      }
+      const remoteOrderData = remoteOrderDataState.value;
+      if (remoteOrderData == null) {
+        throw new Error('Incorrect state. Remote order data is not available to prepare the transaction')
+      }
+      const { pool: { provider: poolProvider, deposit, batcherFee }, cost } = selectedPoolCalculation;
+      const { contractAddress, datum } = remoteOrderData;
+      const feFees = cost.frontendFeeInfo.fee;
+      const ptFees = { deposit: deposit.quantity, batcher: batcherFee.quantity };
+      const swapTxReq = { wallet, contractAddress, datum, sell, buy, feFees, ptFees, poolProvider };
+      props.stores.substores.ada.swapStore.createUnsignedSwapTx(swapTxReq);
     }
     setStep(s => s + 1);
   };
@@ -222,7 +245,7 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
             >
               {
                 (isButtonLoader && <LoadingSpinner />)
-                ?? (step === 0 ? 'Swap' : 'Confirm')
+                || (step === 0 ? 'Swap' : 'Confirm')
               }
             </Button>
           </Box>
