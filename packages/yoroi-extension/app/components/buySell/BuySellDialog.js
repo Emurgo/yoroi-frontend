@@ -20,7 +20,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import BigNumber from 'bignumber.js';
 import adaPng from '../../assets/images/ada.png';
 import banxaPng from '../../assets/images/banxa.png';
-import { ReactComponent as InfoIcon } from '../../assets/images/info-icon.inline.svg';
+import { ReactComponent as InfoIcon } from '../../assets/images/info-icon-revamp.inline.svg';
 import { banxaModuleMaker } from '@yoroi/banxa'
 
 declare var chrome;
@@ -135,6 +135,7 @@ const Disclaimer = styled(Box)({
     fontWeight: 500,
     '& svg': {
       verticalAlign: 'text-bottom',
+      marginRight: '8px',
     },
   },
   borderRadius: 'var(--corner-radius-8, 8px)',
