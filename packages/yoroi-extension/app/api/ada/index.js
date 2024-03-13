@@ -4,12 +4,7 @@ import type { lf$Database } from 'lovefield';
 import { fullErrStr, Logger, stringifyData, stringifyError } from '../../utils/logging';
 import CardanoByronTransaction from '../../domain/CardanoByronTransaction';
 import CardanoShelleyTransaction from '../../domain/CardanoShelleyTransaction';
-import {
-  ChainDerivations,
-  CoinTypes,
-  HARD_DERIVATION_START,
-  WalletTypePurpose,
-} from '../../config/numbersConfig';
+import { ChainDerivations, CoinTypes, HARD_DERIVATION_START, WalletTypePurpose, } from '../../config/numbersConfig';
 import { createHardwareCip1852Wallet, createStandardCip1852Wallet, } from './lib/storage/bridge/walletBuilder/shelley';
 import type { ReferenceTx } from './lib/storage/bridge/updateTransactions';
 import {
@@ -66,6 +61,7 @@ import type {
   RemoveAllTransactionsResponse,
 } from '../common/index';
 import { builtSendTokenList, hasSendAllDefault } from '../common/index';
+import type { TxOutput } from './transactions/shelley/transactions';
 import {
   newAdaUnsignedTx as shelleyNewAdaUnsignedTx,
   newAdaUnsignedTxForConnector as shelleyNewAdaUnsignedTxForConnector,
@@ -153,6 +149,7 @@ import type { PersistedSubmittedTransaction } from '../localStorage';
 import type { ForeignUtxoFetcher } from '../../connector/stores/ConnectorStore';
 import type WalletTransaction from '../../domain/WalletTransaction';
 import { derivePrivateByAddressing, derivePublicByAddressing } from './lib/cardanoCrypto/deriveByAddressing';
+import { genTimeToSlot } from './lib/storage/bridge/timeUtils';
 
 // ADA specific Request / Response params
 
@@ -371,6 +368,11 @@ export type CreateVotingRegTxRequest = {|
   ledgerNanoWallet: LedgerNanoCatalystRegistrationTxSignData,
 |};
 
+export type CreateSimpleTxRequest = {|
+  publicDeriver: IPublicDeriver<ConceptualWallet> & IGetAllUtxos & IHasUtxoChains,
+  entries: Array<TxOutput>,
+  metadata: RustModule.WalletV4.AuxiliaryData,
+|};
 
 export type CreateDelegationTxResponse = {|
   signTxRequest: HaskellShelleyTxSignRequest,
@@ -1594,6 +1596,76 @@ export default class AdaApi {
       if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
+  }
+
+  async createSimpleTx(
+    request: CreateSimpleTxRequest,
+  ): Promise<HaskellShelleyTxSignRequest> {
+    Logger.debug(`${nameof(AdaApi)}::${nameof(this.createSimpleTx)} called`);
+
+    try {
+      const fullConfig = getCardanoHaskellBaseConfig(request.publicDeriver.getParent().getNetworkInfo());
+      const config = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
+
+      const protocolParams = {
+        keyDeposit: config.KeyDeposit,
+        linearFeeCoefficient: config.LinearFee.coefficient,
+        linearFeeConstant: config.LinearFee.constant,
+        coinsPerUtxoWord: config.CoinsPerUtxoWord,
+        poolDeposit: config.PoolDeposit,
+        networkId: request.publicDeriver.getParent().networkInfo.NetworkId,
+      };
+
+      const allUtxo = await request.publicDeriver.getAllUtxos();
+      const addressedUtxo = asAddressedUtxo(allUtxo);
+      const changeAddr = await getReceiveAddress(request.publicDeriver);
+      if (changeAddr == null) {
+        throw new Error(`${nameof(this.createSimpleTx)} no internal addresses left. Should never happen`);
+      }
+      const timeToSlot = await genTimeToSlot(fullConfig);
+      const absSlotNumber = new BigNumber(
+        timeToSlot({ time: new Date()}).slot
+      );
+
+      const unsignedTx = await shelleyNewAdaUnsignedTx(
+        request.entries,
+        {
+          address: changeAddr.addr.Hash,
+          addressing: changeAddr.addressing,
+        },
+        addressedUtxo,
+        absSlotNumber,
+        protocolParams,
+        [],
+        [],
+        false,
+        request.metadata,
+      );
+
+      return new HaskellShelleyTxSignRequest({
+        senderUtxos: unsignedTx.senderUtxos,
+        unsignedTx: unsignedTx.txBuilder,
+        changeAddr: unsignedTx.changeAddr,
+        metadata: request.metadata,
+        networkSettingSnapshot: {
+          ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
+          KeyDeposit: new BigNumber(config.KeyDeposit),
+          PoolDeposit: new BigNumber(config.PoolDeposit),
+          NetworkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+        },
+        neededStakingKeyHashes: {
+          neededHashes: new Set(),
+          wits: new Set(),
+        },
+        trezorTCatalystRegistrationTxSignData: undefined,
+        ledgerNanoCatalystRegistrationTxSignData: undefined,
+      });
+    } catch (error) {
+      Logger.error(`${nameof(AdaApi)}::${nameof(this.createSimpleTx)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
+      throw new GenericApiError();
+    }
+
   }
 
   async createVotingRegTx(
