@@ -1,20 +1,36 @@
 // @flow
 
 import type {
-  AddressUtxoRequest, AddressUtxoResponse,
-  HistoryRequest, HistoryResponse,
-  RewardHistoryRequest, RewardHistoryResponse,
-  AccountStateRequest, AccountStateResponse,
-  SignedRequest, SignedResponse,
-  PoolInfoRequest, PoolInfoResponse,
-  CatalystRoundInfoRequest, CatalystRoundInfoResponse,
-  BestBlockRequest, BestBlockResponse,
-  TokenInfoRequest, TokenInfoResponse,
-  MultiAssetRequest, MultiAssetMintMetadataResponse,
-  GetUtxoDataRequest, GetUtxoDataResponse,
-  GetLatestBlockBySlotReq, GetLatestBlockBySlotRes,
-  GetRecentTransactionHashesRequest, GetRecentTransactionHashesResponse,
-  GetTransactionsByHashesRequest, GetTransactionsByHashesResponse, MultiAssetSupplyResponse,
+  AddressUtxoRequest,
+  AddressUtxoResponse,
+  HistoryRequest,
+  HistoryResponse,
+  RewardHistoryRequest,
+  RewardHistoryResponse,
+  AccountStateRequest,
+  AccountStateResponse,
+  SignedRequest,
+  SignedResponse,
+  PoolInfoRequest,
+  PoolInfoResponse,
+  CatalystRoundInfoRequest,
+  CatalystRoundInfoResponse,
+  BestBlockRequest,
+  BestBlockResponse,
+  TokenInfoRequest,
+  TokenInfoResponse,
+  MultiAssetRequest,
+  MultiAssetMintMetadataResponse,
+  GetUtxoDataRequest,
+  GetUtxoDataResponse,
+  GetLatestBlockBySlotReq,
+  GetLatestBlockBySlotRes,
+  GetRecentTransactionHashesRequest,
+  GetRecentTransactionHashesResponse,
+  GetTransactionsByHashesRequest,
+  GetTransactionsByHashesResponse,
+  MultiAssetSupplyResponse,
+  GetSwapFeeTiersFunc,
 } from './types';
 import type {
   FilterUsedRequest, FilterUsedResponse,
@@ -41,5 +57,6 @@ export interface IFetcher {
     : GetRecentTransactionHashesRequest => Promise<GetRecentTransactionHashesResponse>;
   getTransactionsByHashes
     : GetTransactionsByHashesRequest => Promise<GetTransactionsByHashesResponse>;
-
+  getSwapFeeTiers
+    : GetSwapFeeTiersFunc;
 }

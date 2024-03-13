@@ -40,6 +40,7 @@ import type {
   GetTransactionsByHashesResponse,
   GetTransactionsByHashesFunc,
   MultiAssetSupplyResponse,
+  GetSwapFeeTiersFunc,
 } from './types';
 import type {
   FilterFunc, FilterUsedRequest, FilterUsedResponse,
@@ -188,6 +189,11 @@ export class BatchedFetcher implements IFetcher {
   getLatestBlockBySlot: GetLatestBlockBySlotFunc = async (body) => (
     // Todo: Implement batching as the max slots per request is 50
     this.baseFetcher.getLatestBlockBySlot(body)
+  )
+
+  getSwapFeeTiers: GetSwapFeeTiersFunc = async (body) => (
+    // No batching for fee tiers
+    this.baseFetcher.getSwapFeeTiers(body)
   )
 }
 

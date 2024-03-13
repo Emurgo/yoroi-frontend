@@ -29,7 +29,11 @@ import type {
   GetRecentTransactionHashesRequest,
   GetRecentTransactionHashesResponse,
   GetTransactionsByHashesRequest,
-  GetTransactionsByHashesResponse, MultiAssetSupplyResponse,
+  GetTransactionsByHashesResponse,
+  MultiAssetSupplyResponse,
+  GetSwapFeeTiersFunc,
+  GetSwapFeeTiersRequest,
+  GetSwapFeeTiersResponse,
 } from './types';
 import type { FilterUsedRequest, FilterUsedResponse, } from '../../../common/lib/state-fetch/currencySpecificTypes';
 
@@ -557,4 +561,20 @@ export class RemoteFetcher implements IFetcher {
         }
       });
   }
+
+  getSwapFeeTiers: GetSwapFeeTiersFunc = async (body: GetSwapFeeTiersRequest): GetSwapFeeTiersResponse => {
+    const { BackendService } = body.network.Backend;
+    if (BackendService == null) throw new Error(`${nameof(this.getSwapFeeTiers)} missing backend url`);
+    return await axios(
+      `${BackendService}/api/v2.1/swap/feesInfo`,
+      {
+        method: 'get',
+      }
+    ).then(response => response.data)
+      .catch((error) => {
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getCatalystRoundInfo)} error: ` + stringifyError(error));
+        throw new GetCatalystRoundInfoApiError();
+      });
+  }
+
 }

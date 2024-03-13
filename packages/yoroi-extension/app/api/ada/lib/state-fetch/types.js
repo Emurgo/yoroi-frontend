@@ -577,3 +577,11 @@ export type GetTransactionsByHashesResponse = Array<RemoteTransaction>;
 export type GetTransactionsByHashesFunc = (
   body: GetTransactionsByHashesRequest
 ) => Promise<GetTransactionsByHashesResponse>;
+
+export type GetSwapFeeTiersRequest = BackendNetworkInfo;
+
+export type GetSwapFeeTiersResponse = { [string]: any };
+
+export type GetSwapFeeTiersFunc = (
+  body: GetSwapFeeTiersRequest
+) => Promise<GetSwapFeeTiersResponse>;
