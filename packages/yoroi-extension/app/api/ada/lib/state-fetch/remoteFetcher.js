@@ -562,7 +562,7 @@ export class RemoteFetcher implements IFetcher {
       });
   }
 
-  getSwapFeeTiers: GetSwapFeeTiersFunc = async (body: GetSwapFeeTiersRequest): GetSwapFeeTiersResponse => {
+  getSwapFeeTiers: GetSwapFeeTiersFunc = async (body: GetSwapFeeTiersRequest): Promise<GetSwapFeeTiersResponse> => {
     const { BackendService } = body.network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.getSwapFeeTiers)} missing backend url`);
     return await axios(
