@@ -257,6 +257,7 @@ const ModalContent = styled(Box)(({ theme }) => ({
   paddingRight: theme.name === 'classic' ? '30px' : '24px',
   paddingTop: theme.name === 'classic' ? '0px' : '24px',
   paddingBottom: theme.name === 'classic' || theme.name === 'modern' ? '0px' : '24px',
+  flexGrow: 1,
 }));
 
 const ModalFooter = styled(Box)(({ theme, contentHasScroll }) => ({
