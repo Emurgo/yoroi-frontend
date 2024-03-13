@@ -56,10 +56,11 @@ import { derivePrivateByAddressing } from '../../lib/cardanoCrypto/deriveByAddre
  */
 const defaultTtlOffset = 7200;
 
-type TxOutput = {|
+export type TxOutput = {|
   ...Address,
   amount: MultiToken,
   dataHash?: string,
+  data?: string,
 |};
 
 type TxMint = {|
@@ -586,6 +587,8 @@ export async function newAdaUnsignedTxFromUtxo(
     );
 
     return {
+      data: output.data,
+      dataHash: output.dataHash,
       receiver: output.address,
       value: new LibValue(
         new Amount(defaultTokenAmount),
