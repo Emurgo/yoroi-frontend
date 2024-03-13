@@ -206,7 +206,8 @@ export default class BuySellDialog extends Component<Props, State> {
     const { intl } = this.context;
     const { state, props } = this;
 
-    let helperText = undefined;
+    // set a place holder so that when it becomes an error message, the height doesn't change
+    let helperText = ' ';
     if (state.error === 'lessThanBuyMinimum') {
       helperText = intl.formatMessage(messages.lessThanBuyMinimum, { amount: MINIMUM_BUY_ADA.toString() });
     }
