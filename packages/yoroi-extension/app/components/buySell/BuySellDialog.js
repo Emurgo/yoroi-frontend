@@ -310,6 +310,7 @@ export default class BuySellDialog extends Component<Props, State> {
           }
         ]}
         styleOverride={{ width: '648px', height: '688px' }}
+        styleFlags={{ contentNoTopPadding: true }}
       >
         <Tabs
           value={state.tabBuy ? 0 : 1}

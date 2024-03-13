@@ -23,6 +23,10 @@ export type ActionType = {|
   +size?: ?string,
 |};
 
+export type StyleFlag = {|
+  +contentNoTopPadding?: boolean,
+|};
+
 export type Props = {|
   +title?: string | Node,
   +children?: Node,
@@ -37,6 +41,7 @@ export type Props = {|
   +closeOnOverlayClick?: boolean,
   +isRevampLayout?: boolean,
   id?: string,
+  +styleFlags?: StyleFlag,
 |};
 
 type InjectedProps = {| isRevampLayout: boolean |};
@@ -55,6 +60,7 @@ function Dialog(props: Props & InjectedProps): Node {
     scrollableContentClass,
     isRevampLayout,
     id,
+    styleFlags,
   } = props;
 
   const [contentHasScroll, setContentHasScroll] = useState(false);
@@ -127,6 +133,7 @@ function Dialog(props: Props & InjectedProps): Node {
         ) : null}
         {children != null ? (
           <ModalContent
+            pt={styleFlags?.contentNoTopPadding ? '0px !important' : undefined}
             pb={contentHasScroll || !hasActions ? '24px' : '0px !important'}
             className="ModalContent"
           >
