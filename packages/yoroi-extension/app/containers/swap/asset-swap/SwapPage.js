@@ -109,6 +109,7 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
       .then(feeTiers => {
         const aggregatorFeeTiers = feeTiers?.[SWAP_AGGREGATOR] ?? [];
         frontendFeeTiersChanged(aggregatorFeeTiers);
+        return null;
       })
       .catch(err => {
         console.error(`unexpected erorr: failed to get swap fee tiers: ${err}`);
