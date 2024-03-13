@@ -291,7 +291,7 @@ export default class BuySellDialog extends Component<Props, State> {
 
     return (
       <Dialog
-        title={intl.formatMessage(messages.dialogTitle)}
+        title={intl.formatMessage(globalMessages.buyAda)}
         closeOnOverlayClick={false}
         onClose={props.onCancel}
         closeButton={<DialogCloseButton />}
