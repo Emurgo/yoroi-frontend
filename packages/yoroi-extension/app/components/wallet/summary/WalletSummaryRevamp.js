@@ -185,7 +185,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
       );
 
     return (
-      <Box id="walletSummary_box" sx={{ bgcolor: 'common.white' }}>
+      <Box id="wallet:transactions-walletSummary-box" sx={{ bgcolor: 'common.white' }}>
         <Box
           sx={{
             marginBottom: '16px',
@@ -214,6 +214,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
               onClick={openExportTxToFileDialog}
               onKeyPress={openExportTxToFileDialog}
               startIcon={<ExportTxToFileSvg />}
+              id="wallet:transactions:walletSummary-openExportWindow-button"
             >
               {intl.formatMessage(globalMessages.exportButtonLabel)}
             </Button>
