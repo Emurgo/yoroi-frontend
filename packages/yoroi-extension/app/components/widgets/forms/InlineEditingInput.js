@@ -178,7 +178,7 @@ class InlineEditingInput extends Component<Props & InjectedLayoutProps, State> {
           value={inputField.value}
           onChange={inputField.onChange}
           onKeyDown={event => this.handleInputKeyDown(event)}
-          error={inputField.value.length === 0 ? inputField.error : ''}
+          error={inputField.value.length === 0 || inputField.value.length > 40 ? inputField.error : ''}
           inputRef={input => {
             this.inputField = input;
           }}
