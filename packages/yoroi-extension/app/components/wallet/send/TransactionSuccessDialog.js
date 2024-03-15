@@ -9,15 +9,12 @@ import Dialog from '../../widgets/Dialog';
 import { Stack, Typography } from '@mui/material';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import { ReactComponent as SuccessImg } from '../../../assets/images/transfer-success.inline.svg';
+import globalMessages from '../../../i18n/global-messages';
 
 const messages = defineMessages({
   title: {
     id: 'wallet.transaction.success.title',
     defaultMessage: '!!!Transaction submitted',
-  },
-  buttonLabel: {
-    id: 'wallet.transaction.success.button.label',
-    defaultMessage: '!!!Go To Transactions',
   },
   explanation: {
     id: 'wallet.transaction.success.explanation',
@@ -44,7 +41,7 @@ export default class TransactionSuccessDialog extends Component<Props> {
         title={intl.formatMessage(messages.title)}
         actions={[
           {
-            label: intl.formatMessage(messages.buttonLabel),
+            label: intl.formatMessage(globalMessages.goToTransactions),
             onClick: this.props.onClose,
             primary: true,
           },
