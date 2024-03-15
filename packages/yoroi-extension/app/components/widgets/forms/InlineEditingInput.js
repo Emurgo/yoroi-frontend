@@ -103,6 +103,7 @@ class InlineEditingInput extends Component<Props & InjectedLayoutProps, State> {
     if (event.which === 13) {
       // ENTER key
       this.onBlur();
+
     }
     if (event.which === 27) {
       // ESCAPE key
@@ -118,6 +119,7 @@ class InlineEditingInput extends Component<Props & InjectedLayoutProps, State> {
   onBlur: () => void = () => {
     if (this.state.isActive) {
       this.submit();
+      this.inputField.blur();
     }
   };
 
@@ -126,6 +128,7 @@ class InlineEditingInput extends Component<Props & InjectedLayoutProps, State> {
     inputField.value = this.props.inputFieldValue;
     this.setState({ isActive: false });
     this.props.onCancelEditing();
+    this.inputField.blur();
   };
 
   componentDidUpdate(): void {
@@ -143,7 +146,6 @@ class InlineEditingInput extends Component<Props & InjectedLayoutProps, State> {
       className,
       inputFieldLabel,
       isActive,
-      inputFieldValue,
       successfullyUpdated,
       id,
     } = this.props;
@@ -173,7 +175,7 @@ class InlineEditingInput extends Component<Props & InjectedLayoutProps, State> {
           type="text"
           {...inputField.bind()}
           label={inputFieldLabel}
-          value={isActive ? inputField.value : inputFieldValue}
+          value={inputField.value}
           onChange={inputField.onChange}
           onKeyDown={event => this.handleInputKeyDown(event)}
           error={isActive ? inputField.error : ''}
