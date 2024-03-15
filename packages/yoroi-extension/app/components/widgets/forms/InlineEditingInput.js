@@ -103,7 +103,6 @@ class InlineEditingInput extends Component<Props & InjectedLayoutProps, State> {
     if (event.which === 13) {
       // ENTER key
       this.onBlur();
-
     }
     if (event.which === 27) {
       // ESCAPE key
@@ -142,13 +141,7 @@ class InlineEditingInput extends Component<Props & InjectedLayoutProps, State> {
 
   render(): Node {
     const { validator } = this;
-    const {
-      className,
-      inputFieldLabel,
-      isActive,
-      successfullyUpdated,
-      id,
-    } = this.props;
+    const { className, inputFieldLabel, isActive, successfullyUpdated, id } = this.props;
     const { intl } = this.context;
     const inputField = validator.$('inputField');
     const componentStyles = classnames([
@@ -178,7 +171,7 @@ class InlineEditingInput extends Component<Props & InjectedLayoutProps, State> {
           value={inputField.value}
           onChange={inputField.onChange}
           onKeyDown={event => this.handleInputKeyDown(event)}
-          error={inputField.value.length === 0 || inputField.value.length > 40 ? inputField.error : ''}
+          error={inputField.value.length === 0 ? inputField.error : ''}
           inputRef={input => {
             this.inputField = input;
           }}
