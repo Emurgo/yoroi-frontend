@@ -21,7 +21,7 @@ const buildAndCopyInjector: (string, string) => void = (destDir, buildType) => {
 
   let injectScript: string;
   try {
-    const data = fs.readFileSync(`${__dirname}/../chrome/extension/inject.js`);
+    const data = fs.readFileSync(`${__dirname}/../chrome/content-scripts/inject.js`);
     injectScript = Buffer.from(data).toString('utf-8');
   } catch (e) {
     console.error('Failed to read the connector inject script!', e);
@@ -35,7 +35,7 @@ const buildAndCopyInjector: (string, string) => void = (destDir, buildType) => {
     throw e;
   }
   for (const script of injectedScripts) {
-    shell.cp(`${__dirname}/../chrome/extension/${script}`, destDir);
+    shell.cp(`${__dirname}/../chrome/content-scripts/${script}`, destDir);
   }
 };
 
