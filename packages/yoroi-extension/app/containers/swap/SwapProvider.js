@@ -53,6 +53,7 @@ function SwapProvider({ children, publicDeriver }: Props): Node {
   const swapApi = useMemo(
     () =>
       swapApiMaker({
+        // Preprod does not work atm so always mainnet
         isMainnet: true,
         stakingKey,
         primaryTokenId: defaultToken.defaultIdentifier,

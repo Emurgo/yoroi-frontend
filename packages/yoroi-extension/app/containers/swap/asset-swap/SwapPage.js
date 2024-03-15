@@ -20,6 +20,7 @@ import { StateWrap } from '../context/swap-form/types';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import FullscreenLayout from '../../../components/layout/FullscreenLayout';
 import { addressHexToBech32 } from '../../../api/ada/lib/cardanoCrypto/utils';
+import { HaskellShelleyTxSignRequest } from '../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 
 export const PRICE_IMPACT_MODERATE_RISK = 1;
 export const PRICE_IMPACT_HIGH_RISK = 10;
@@ -52,8 +53,8 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
   const [disclaimerStatus, setDisclaimerStatus] = useState<?boolean>(null);
   const [selectedWalletAddress, setSelectedWalletAddress] = useState<?string>(null);
   const [slippageValue, setSlippageValue] = useState(String(defaultSlippage));
+  const [signRequest, setSignRequest] = useState<?HaskellShelleyTxSignRequest>(null);
   const userPasswordState = StateWrap(useState<string>(''));
-  const remoteOrderDataState = StateWrap(useState<?any>(null));
 
   const swapFormCanContinue =
     selectedPoolCalculation != null
@@ -62,10 +63,10 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
 
   const confirmationCanContinue =
     userPasswordState.value !== ''
-    && remoteOrderDataState.value != null;
+    && signRequest != null;
 
   const isButtonLoader =
-    step === 1 && remoteOrderDataState.value == null;
+    step === 1 && signRequest == null;
 
   const isSwapEnabled =
     (step === 0 && swapFormCanContinue)
@@ -167,24 +168,36 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
           setOpenedDialog('');
         }
       }
+      setSignRequest(null);
     } else if (step === 1) {
       // submitting tx
-      if (selectedPoolCalculation == null) {
-        throw new Error('Incorrect state. Pool calculations are not available to prepare the transaction')
+      if (signRequest == null) {
+        throw new Error('Incorrect state! Order transaction is not prepared properly');
       }
-      const remoteOrderData = remoteOrderDataState.value;
-      if (remoteOrderData == null) {
-        throw new Error('Incorrect state. Remote order data is not available to prepare the transaction')
-      }
-      const { pool: { provider: poolProvider, deposit, batcherFee }, cost } = selectedPoolCalculation;
-      const { contractAddress, datum } = remoteOrderData;
-      const feFees = cost.frontendFeeInfo.fee;
-      const ptFees = { deposit: deposit.quantity, batcher: batcherFee.quantity };
-      const swapTxReq = { wallet, contractAddress, datum, sell, buy, feFees, ptFees, poolProvider };
-      props.stores.substores.ada.swapStore.createUnsignedSwapTx(swapTxReq);
+      const unsignedTx = signRequest.unsignedTx.build_tx();
+      console.log('SWAP TX: ', unsignedTx.to_hex());
     }
     setStep(s => s + 1);
   };
+
+  const onRemoteOrderDataResolved: any => Promise<void> = async ({ contractAddress, datum }) => {
+    // creating tx
+    if (selectedPoolCalculation == null) {
+      throw new Error('Incorrect state. Pool calculations are not available to prepare the transaction')
+    }
+    if (contractAddress == null || datum == null) {
+      throw new Error(`Incorrect remote order resolve! ${JSON.stringify({ contractAddress, datum })}`);
+    }
+    const { pool: { provider: poolProvider, deposit, batcherFee }, cost } = selectedPoolCalculation;
+    const feFees = cost.frontendFeeInfo.fee;
+    const ptFees = { deposit: deposit.quantity, batcher: batcherFee.quantity };
+    const swapTxReq = { wallet, contractAddress, datum, sell, buy, feFees, ptFees, poolProvider };
+    const signRequest: HaskellShelleyTxSignRequest =
+      await props.stores.substores.ada.swapStore.createUnsignedSwapTx(swapTxReq);
+    runInAction(() => {
+      setSignRequest(signRequest);
+    });
+  }
 
   return (
     <SwapFormProvider>
@@ -204,7 +217,7 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
               slippageValue={slippageValue}
               walletAddress={selectedWalletAddress}
               priceImpactState={priceImpactState}
-              orderDataState={remoteOrderDataState}
+              onRemoteOrderDataResolved={onRemoteOrderDataResolved}
               userPasswordState={userPasswordState}
               defaultTokenInfo={defaultTokenInfo}
               getFormattedPairingValue={getFormattedPairingValue}

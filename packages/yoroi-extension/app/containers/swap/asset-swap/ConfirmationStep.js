@@ -26,7 +26,7 @@ type Props = {|
   walletAddress: ?string,
   priceImpactState: ?PriceImpact,
   userPasswordState: State<string>,
-  orderDataState: State<any>,
+  onRemoteOrderDataResolved: any => Promise<void>,
   defaultTokenInfo: RemoteTokenInfo,
   getFormattedPairingValue: (amount: string) => string,
 |};
@@ -36,7 +36,7 @@ export default function SwapConfirmationStep({
   walletAddress,
   priceImpactState,
   userPasswordState,
-  orderDataState,
+  onRemoteOrderDataResolved,
   defaultTokenInfo,
   getFormattedPairingValue,
 }: Props): React$Node {
@@ -54,7 +54,11 @@ export default function SwapConfirmationStep({
 
   const { createOrderData } = useSwapCreateOrder({
     onSuccess: (data) => {
-      orderDataState.update(data);
+      onRemoteOrderDataResolved(data)
+        .catch(e => {
+          console.error('Failed to handle remote order resolution', e);
+          alert('Failed to prepare order transaction');
+        });
     },
     onError: error => {
       console.error('useSwapCreateOrder fail', error);

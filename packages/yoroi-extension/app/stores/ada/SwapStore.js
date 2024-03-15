@@ -43,7 +43,7 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
     feFees: {| tokenId: string, quantity: string |},
     ptFees: {| deposit: string, batcher: string |},
     poolProvider: string,
-  |}) => Promise<void> = async ({
+  |}) => Promise<HaskellShelleyTxSignRequest> = ({
     wallet,
     contractAddress,
     datum,
@@ -85,17 +85,11 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
         amount: createSwapFeFeeAmount({ wallet, feFees }),
       });
     }
-    try {
-      const signRequest: HaskellShelleyTxSignRequest = await this.api.ada.createSimpleTx({
-        publicDeriver: withHasUtxoChains,
-        entries,
-        metadata,
-      });
-      const tx = signRequest.unsignedTx.build_tx();
-      console.log('>>> SWAP TX: ', tx.to_hex());
-    } catch (e) {
-      console.error('Failed tp produce swap transaction', e);
-    }
+    return this.api.ada.createSimpleTx({
+      publicDeriver: withHasUtxoChains,
+      entries,
+      metadata,
+    });
   }
 }
 
@@ -125,28 +119,10 @@ function createSwapOrderAmount({
   ptFees: {| deposit: string, batcher: string |},
 |}): MultiToken {
   const orderAmount: MultiToken = wallet.getParent().getDefaultMultiToken();
-  const networkId = orderAmount.getDefaults().defaultNetworkId;
-  const defaultIdentifier = orderAmount.getDefaults().defaultIdentifier;
-  if (sell.tokenId === defaultIdentifier) {
-    // combine sell with fees
-    orderAmount.add({
-      networkId,
-      identifier: defaultIdentifier,
-      amount: new BigNumber(Quantities.sum([sell.quantity, ptFees.deposit, ptFees.batcher])),
-    });
-  } else {
-    //separate sell and fees
-    orderAmount.add({
-      networkId,
-      identifier: sell.tokenId,
-      amount: new BigNumber(sell.quantity),
-    }).add({
-      networkId,
-      identifier: defaultIdentifier,
-      amount: new BigNumber(Quantities.sum([ptFees.deposit, ptFees.batcher]))
-    });
-  }
-  return orderAmount;
+  // entries will add together automatically in case they are both default token
+  return orderAmount
+    .add(orderAmount.createEntry(sell.tokenId, new BigNumber(sell.quantity)))
+    .add(orderAmount.createDefaultEntry(new BigNumber(Quantities.sum([ptFees.deposit, ptFees.batcher]))));
 }
 
 function splitStringInto64CharArray(inputString: string): string[] {
