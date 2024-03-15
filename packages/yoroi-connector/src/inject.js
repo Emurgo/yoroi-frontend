@@ -245,7 +245,7 @@ window.addEventListener('message', function (event) {
     event.source === window &&
     (
       event.origin === 'http://localhost:8000' ||
-      event.origin === 'https://jp.emurgo.io'
+      event.origin === 'https://ramp-redirect.yoroiwallet.com'
     ) &&
     event.data?.type === 'banxa callback'
   ) {
