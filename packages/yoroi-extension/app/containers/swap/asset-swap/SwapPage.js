@@ -1,7 +1,7 @@
 // @flow
 import type { Node } from 'react';
 import { useEffect, useState, } from 'react';
-import { Box, Button, Stack } from '@mui/material';
+import { Box, Button, Stack, Typography } from '@mui/material';
 import SwapForm from './SwapForm';
 import SwapConfirmationStep from './ConfirmationStep';
 import TxSubmittedStep from './TxSubmittedStep';
@@ -18,9 +18,9 @@ import type { PriceImpact } from '../../../components/swap/types';
 import { PriceImpactAlert } from '../../../components/swap/PriceImpact';
 import { StateWrap } from '../context/swap-form/types';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
-import FullscreenLayout from '../../../components/layout/FullscreenLayout';
 import { addressHexToBech32 } from '../../../api/ada/lib/cardanoCrypto/utils';
 import { HaskellShelleyTxSignRequest } from '../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
+import LoadingOverlay from '../../../components/swap/LoadingOverlay';
 
 export const PRICE_IMPACT_MODERATE_RISK = 1;
 export const PRICE_IMPACT_HIGH_RISK = 10;
@@ -55,6 +55,7 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
   const [slippageValue, setSlippageValue] = useState(String(defaultSlippage));
   const [signRequest, setSignRequest] = useState<?HaskellShelleyTxSignRequest>(null);
   const userPasswordState = StateWrap(useState<string>(''));
+  const txSubmitErrorState = StateWrap(useState<?Error>(null));
 
   const swapFormCanContinue =
     selectedPoolCalculation != null
@@ -113,7 +114,7 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
         return null;
       })
       .catch(err => {
-        console.error(`unexpected erorr: failed to get swap fee tiers: ${err}`);
+        console.error(`unexpected error: failed to get swap fee tiers: ${err}`);
       });
   }, []);
 
@@ -171,11 +172,36 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
       setSignRequest(null);
     } else if (step === 1) {
       // submitting tx
-      if (signRequest == null) {
-        throw new Error('Incorrect state! Order transaction is not prepared properly');
+      if (openedDialog === '') {
+        if (signRequest == null) {
+          throw new Error('Incorrect state! Order transaction is not prepared properly');
+        }
+        const password = userPasswordState.value;
+        if (password === '') {
+          throw new Error('Incorrect state! User password is required');
+        }
+        props.stores.substores.ada.wallets.adaSendAndRefresh({
+          broadcastRequest: {
+            normal: {
+              publicDeriver: wallet,
+              password,
+              signRequest,
+            },
+          },
+          refreshWallet: () => props.stores.wallets.refreshWalletFromRemote(wallet),
+        })
+          .then(handleNextStep)
+          .catch(e => {
+            console.error('Failed to submit swap tx', e);
+            runInAction(() => {
+              txSubmitErrorState.update(e);
+              setOpenedDialog('');
+            });
+          });
+        setOpenedDialog('loadingOverlay');
+        return;
       }
-      const unsignedTx = signRequest.unsignedTx.build_tx();
-      console.log('SWAP TX: ', unsignedTx.to_hex());
+      setOpenedDialog('');
     }
     setStep(s => s + 1);
   };
@@ -197,7 +223,7 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
     runInAction(() => {
       setSignRequest(signRequest);
     });
-  }
+  };
 
   return (
     <SwapFormProvider>
@@ -219,18 +245,12 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
               priceImpactState={priceImpactState}
               onRemoteOrderDataResolved={onRemoteOrderDataResolved}
               userPasswordState={userPasswordState}
+              txSubmitErrorState={txSubmitErrorState}
               defaultTokenInfo={defaultTokenInfo}
               getFormattedPairingValue={getFormattedPairingValue}
             />
           )}
           {step === 2 && (
-            <FullscreenLayout bottomPadding={0}>
-              <Stack alignItems="center" justifyContent="center" height="50vh">
-                <LoadingSpinner />
-              </Stack>
-            </FullscreenLayout>
-          )}
-          {step === 3 && (
             <TxSubmittedStep
               isSuccessful={isSuccessful}
               onTryAgain={() => {
@@ -265,6 +285,10 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
           </Box>
         )}
       </Box>
+
+      {openedDialog === 'loadingOverlay' && (
+        <LoadingOverlay />
+      )}
 
       {openedDialog === 'limitOrderWarning' && (
         <LimitOrderWarningDialog

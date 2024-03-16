@@ -20,12 +20,15 @@ import {
 } from '../../../components/swap/PriceImpact';
 import type { State } from '../context/swap-form/types';
 import { useEffect } from 'react';
+import { stringifyError } from '../../../utils/logging';
+import { IncorrectWalletPasswordError } from '../../../api/common/errors';
 
 type Props = {|
   slippageValue: string,
   walletAddress: ?string,
   priceImpactState: ?PriceImpact,
   userPasswordState: State<string>,
+  txSubmitErrorState: State<?Error>,
   onRemoteOrderDataResolved: any => Promise<void>,
   defaultTokenInfo: RemoteTokenInfo,
   getFormattedPairingValue: (amount: string) => string,
@@ -36,6 +39,7 @@ export default function SwapConfirmationStep({
   walletAddress,
   priceImpactState,
   userPasswordState,
+  txSubmitErrorState,
   onRemoteOrderDataResolved,
   defaultTokenInfo,
   getFormattedPairingValue,
@@ -51,6 +55,16 @@ export default function SwapConfirmationStep({
 
   const isMarketOrder = orderData.type === 'market';
   const isAutoPool = pool?.poolId === bestPool?.poolId;
+
+  const txSubmitErr = txSubmitErrorState.value;
+  if (txSubmitErr != null) {
+    if (txSubmitErr instanceof IncorrectWalletPasswordError) {
+      alert('Incorrect password');
+    } else {
+      alert('Failed to submit swap transaction: ' + stringifyError(txSubmitErr));
+    }
+    txSubmitErrorState.update(null);
+  }
 
   const { createOrderData } = useSwapCreateOrder({
     onSuccess: (data) => {
