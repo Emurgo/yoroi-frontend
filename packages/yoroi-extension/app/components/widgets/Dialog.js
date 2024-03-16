@@ -208,7 +208,7 @@ export const CloseButton = ({
   </Box>
 );
 
-export const ModalContainer = styled(Box)(({ theme, contentHasScroll, empty = false }) => {
+export const ModalContainer: any => Node = styled(Box)(({ theme, contentHasScroll, empty = false }) => {
   const normalMinWidth = theme.name === 'classic' || theme.name === 'modern'
     ? 'var(--yoroi-comp-dialog-min-width-md)'
     : '648px';

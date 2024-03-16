@@ -6,16 +6,16 @@ import classnames from 'classnames';
 import styles from './LoadingSpinner.scss';
 
 type Props = {|
-  small?: true,
-  large?: true,
+  small?: boolean,
+  large?: boolean,
   light?: boolean,
 |};
 
 @observer
 export default class LoadingSpinner extends Component<Props> {
-  static defaultProps: {|light: boolean, large: boolean, small: void|} = {
-    small: undefined,
-    large: undefined,
+  static defaultProps: {|light: boolean, large: boolean, small: boolean|} = {
+    small: false,
+    large: false,
     light: false,
   };
 
