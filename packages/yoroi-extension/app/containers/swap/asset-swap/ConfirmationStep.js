@@ -56,13 +56,8 @@ export default function SwapConfirmationStep({
   const isMarketOrder = orderData.type === 'market';
   const isAutoPool = pool?.poolId === bestPool?.poolId;
 
-  const txSubmitErr = txSubmitErrorState.value;
-  if (txSubmitErr != null) {
-    if (txSubmitErr instanceof IncorrectWalletPasswordError) {
-      alert('Incorrect password');
-    } else {
-      alert('Failed to submit swap transaction: ' + stringifyError(txSubmitErr));
-    }
+  if (txSubmitErrorState.value instanceof IncorrectWalletPasswordError) {
+    alert('Incorrect password');
     txSubmitErrorState.update(null);
   }
 

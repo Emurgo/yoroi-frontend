@@ -21,6 +21,7 @@ import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import { addressHexToBech32 } from '../../../api/ada/lib/cardanoCrypto/utils';
 import { HaskellShelleyTxSignRequest } from '../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import LoadingOverlay from '../../../components/swap/LoadingOverlay';
+import { IncorrectWalletPasswordError } from '../../../api/common/errors';
 
 export const PRICE_IMPACT_MODERATE_RISK = 1;
 export const PRICE_IMPACT_HIGH_RISK = 10;
@@ -146,7 +147,6 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
     return `${val} ${currency}`;
   }
 
-  const [isSuccessful, setIsSuccessful] = useState(false);
   const handleNextStep = () => {
     if (step === 0) {
       if (isMarketOrder) {
@@ -192,10 +192,16 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
         })
           .then(handleNextStep)
           .catch(e => {
-            console.error('Failed to submit swap tx', e);
+            const isPasswordError = e instanceof IncorrectWalletPasswordError;
+            if (!isPasswordError) {
+              console.error('Failed to submit swap tx', e);
+            }
             runInAction(() => {
               txSubmitErrorState.update(e);
               setOpenedDialog('');
+              if (!isPasswordError) {
+                setStep(s => s + 1);
+              }
             });
           });
         setOpenedDialog('loadingOverlay');
@@ -252,10 +258,9 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
           )}
           {step === 2 && (
             <TxSubmittedStep
-              isSuccessful={isSuccessful}
+              txSubmitErrorState={txSubmitErrorState}
               onTryAgain={() => {
                 setStep(0);
-                setIsSuccessful(true);
               }}
             />
           )}
