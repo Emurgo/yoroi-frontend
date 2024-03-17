@@ -1270,7 +1270,11 @@ async function handleInjectorMessage(message, sender) {
                   isCBOR,
                 );
               } catch (e) {
-                rpcResponse({ err: e.message });
+                if (e instanceof NotEnoughMoneyToSendError) {
+                  rpcResponse({ ok: null });
+                } else {
+                  rpcResponse({ err: e.message });
+                }
                 return;
               }
               rpcResponse({ ok: utxos });
