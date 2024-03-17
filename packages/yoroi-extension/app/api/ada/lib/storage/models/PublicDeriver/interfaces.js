@@ -61,7 +61,7 @@ import {
 } from '../../../../../../config/numbersConfig';
 import type {
   TreeInsert,
-} from '../../database/walletTypes/common/utils';
+} from '../../database/walletTypes/common/utils.types';
 import type { Bip44ChainInsert } from '../../database/walletTypes/common/tables';
 import { MultiToken } from '../../../../../common/lib/MultiToken';
 import type {

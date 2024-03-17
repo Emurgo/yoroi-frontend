@@ -6,7 +6,7 @@ import type {
   HistoricalCoinPriceRequest, HistoricalCoinPriceResponse,
 } from './types';
 
-import type { IFetcher } from './IFetcher';
+import type { IFetcher } from './IFetcher.types';
 
 import axios from 'axios';
 import {

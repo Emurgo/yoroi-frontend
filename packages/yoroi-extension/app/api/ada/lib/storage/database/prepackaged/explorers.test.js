@@ -1,5 +1,5 @@
 // @flow
-import '../../../test-config';
+import '../../../test-config.forTests';
 import { prepackagedExplorers } from './explorers';
 
 test('Only one backup per network', async () => {

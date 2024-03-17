@@ -10,7 +10,7 @@ import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 
 import type {
   InsertRequest,
-} from '../../lib/storage/database/walletTypes/common/utils';
+} from '../../lib/storage/database/walletTypes/common/utils.types';
 import type { AddByHashFunc, } from '../../../common/lib/storage/bridge/hashMapper';
 import { CoreAddressTypes } from '../../lib/storage/database/primitives/enums';
 

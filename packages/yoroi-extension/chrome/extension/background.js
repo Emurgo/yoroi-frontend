@@ -54,7 +54,7 @@ import {
   updateTransactions as cardanoUpdateTransactions
 } from '../../app/api/ada/lib/storage/bridge/updateTransactions';
 import { environment } from '../../app/environment';
-import type { IFetcher as CardanoIFetcher } from '../../app/api/ada/lib/state-fetch/IFetcher';
+import type { IFetcher as CardanoIFetcher } from '../../app/api/ada/lib/state-fetch/IFetcher.types';
 import { RemoteFetcher as CardanoRemoteFetcher } from '../../app/api/ada/lib/state-fetch/remoteFetcher';
 import { BatchedFetcher as CardanoBatchedFetcher } from '../../app/api/ada/lib/state-fetch/batchedFetcher';
 import LocalStorageApi, {

@@ -19,7 +19,7 @@ import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 
 import type {
   TreeInsert, InsertRequest,
-} from '../../lib/storage/database/walletTypes/common/utils';
+} from '../../lib/storage/database/walletTypes/common/utils.types';
 import type { AddByHashFunc, } from '../../../common/lib/storage/bridge/hashMapper';
 import type { NetworkRow, CanonicalAddressInsert } from '../../lib/storage/database/primitives/tables';
 import { CoreAddressTypes } from '../../lib/storage/database/primitives/enums';

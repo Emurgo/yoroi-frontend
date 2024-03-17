@@ -15,7 +15,7 @@ import {
 
 import type {
   TreeInsert,
-} from '../../database/walletTypes/common/utils';
+} from '../../database/walletTypes/common/utils.types';
 import type { Bip44ChainInsert } from '../../database/walletTypes/common/tables';
 import type { NetworkRow } from '../../database/primitives/tables';
 import type { HWFeatures, } from '../../database/walletTypes/core/tables';
