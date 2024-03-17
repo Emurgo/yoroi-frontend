@@ -14,7 +14,7 @@ import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { AddressFilterKind, StandardAddress } from '../../types/AddressFilterTypes';
 import { addressFilter, AddressFilter, } from '../../types/AddressFilterTypes';
 import environment from '../../environment';
-import type { Notification } from '../../types/notificationType';
+import type { Notification } from '../../types/notification.types';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { truncateAddressShort, splitAmount, truncateToken } from '../../utils/formatters';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';

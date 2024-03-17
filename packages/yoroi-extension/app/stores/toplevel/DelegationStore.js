@@ -6,11 +6,6 @@ import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/t
 import { PublicDeriver, } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import Store from '../base/Store';
-import type {
-  GetDelegatedBalanceFunc,
-  RewardHistoryFunc,
-  GetDelegatedBalanceResponse,
-} from '../../api/common/lib/storage/bridge/delegationUtils';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import LocalizableError from '../../i18n/LocalizableError';
 import { PoolMissingApiError, } from '../../api/common/errors';
@@ -20,6 +15,11 @@ import type { StoresMap } from '../index';
 import type { PoolInfo } from '@emurgo/yoroi-lib';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { maybe } from '../../coreUtils';
+import type {
+  GetDelegatedBalanceFunc,
+  GetDelegatedBalanceResponse,
+  RewardHistoryFunc
+} from '../../api/ada/lib/storage/bridge/delegationUtils';
 
 export type DelegationRequests = {|
   publicDeriver: PublicDeriver<>,

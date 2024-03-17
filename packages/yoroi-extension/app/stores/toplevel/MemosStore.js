@@ -21,7 +21,7 @@ import type {
   DownloadExternalTxMemoFunc, FetchFilenameExternalTxMemoFunc,
   FetchFilenameExternalTxMemoResponse, FetchFolderExternalTxMemoFunc,
   CreateFolderExternalTxMemoFunc
-} from '../../api/externalStorage/providers/IProvider';
+} from '../../api/externalStorage/providers/IProvider.types';
 import type { SelectedExternalStorageProvider } from '../../domain/ExternalStorage';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { ActionsMap } from '../../actions/index';

@@ -5,7 +5,7 @@
 
 import type {
   AssuranceMode, AssuranceLevel, AssuranceModeOption,
-} from '../types/transactionAssuranceTypes';
+} from '../types/transactionAssurance.types';
 
 export const assuranceModeOptions: {|
   NORMAL: AssuranceModeOption,
