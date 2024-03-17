@@ -674,6 +674,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     ? intl.formatMessage(memoMessages.memoLabel)
                     : intl.formatMessage(messages.memoFieldLabelInactive)
                 }
+                id="wallet:send:enterAddressStep-enterMemo-input"
               />
               <Typography component="div"
                 variant="caption1"
@@ -876,6 +877,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 onClick={() => this.props.openDialog(AddTokenDialog)}
                 disabled={this.props.shouldSendAll}
                 startIcon={<PlusIcon />}
+                id='wallet:send:addAssetsStep-addTokens-button'
               >
                 {intl.formatMessage(globalMessages.addToken)}
               </Button>
@@ -885,6 +887,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 onClick={() => this.props.openDialog(AddNFTDialog)}
                 disabled={this.props.shouldSendAll}
                 startIcon={<PlusIcon />}
+                id='wallet:send:addAssetsStep-addNFTs-button'
               >
                 {intl.formatMessage(globalMessages.addNft)}
               </Button>
@@ -954,6 +957,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             size="medium"
             onClick={() => this.onUpdateStep(SEND_FORM_STEP.AMOUNT)}
             disabled={invalidMemo || !receiverField.isValid}
+            id="wallet:send:enterAddressStep-nextToAddAssets-button"
           >
             {intl.formatMessage(globalMessages.nextButtonLabel)}
           </ActionButton>
@@ -966,6 +970,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               variant="secondary"
               size="medium"
               onClick={() => this.onUpdateStep(SEND_FORM_STEP.RECEIVER)}
+              id="wallet:send:addAssetsStep-backToEnterAddress-button"
             >
               {intl.formatMessage(globalMessages.backButtonLabel)}
             </ActionButton>
@@ -983,6 +988,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 invalidMemo ||
                 maxSendableAmount.isExecuting
               }
+              id="wallet:send:addAssetsStep-nextToConfirmTransaction-button"
             >
               {intl.formatMessage(globalMessages.nextButtonLabel)}
             </ActionButton>
