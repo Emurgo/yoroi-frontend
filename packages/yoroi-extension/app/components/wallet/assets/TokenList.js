@@ -30,7 +30,7 @@ import {
 import { Box, styled } from '@mui/system';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../routes-config';
-import CopyToClipboardText from '../../widgets/CopyToClipboardLabel';
+import CopyToClipboardLabel from '../../widgets/CopyToClipboardLabel';
 import { ListEmpty } from './ListEmpty';
 import BigNumber from 'bignumber.js';
 
@@ -313,9 +313,9 @@ function TokenItemRow({ avatar, name, id, amount, isTotalAmount }: TokenItemRowP
       secondColumn={
         <Typography component="div" variant="body1" color="grayscale.900">
           <Box sx={{ '> button': { px: '5px', py: '3px', borderRadius: '8px', ml: '-5px' } }}>
-            <CopyToClipboardText text={id}>
+            <CopyToClipboardLabel text={id}>
               {below1200px ? truncateAddressShort(id) : id}
-            </CopyToClipboardText>
+            </CopyToClipboardLabel>
           </Box>
         </Typography>
       }

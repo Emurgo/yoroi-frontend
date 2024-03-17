@@ -36,11 +36,12 @@ export type Props = {|
   +onClose?: ?(void) => PossiblyAsync<void>,
   +closeOnOverlayClick?: boolean,
   +isRevampLayout?: boolean,
+  id?: string,
 |};
 
 type InjectedProps = {| isRevampLayout: boolean |};
 
-function DialogFn(props: Props & InjectedProps): Node {
+function Dialog(props: Props & InjectedProps): Node {
   const {
     title,
     children,
@@ -53,6 +54,7 @@ function DialogFn(props: Props & InjectedProps): Node {
     backButton,
     scrollableContentClass,
     isRevampLayout,
+    id,
   } = props;
 
   const [contentHasScroll, setContentHasScroll] = useState(false);
@@ -106,7 +108,8 @@ function DialogFn(props: Props & InjectedProps): Node {
         justifyContent: 'center',
         alignItems: 'center',
       }}
-      id="dialogWindow"
+      // $FlowIgnore
+      id={id + '-dialogWindow-modalWindow'}
     >
       <ModalContainer
         display="flex"
@@ -117,7 +120,8 @@ function DialogFn(props: Props & InjectedProps): Node {
         contentHasScroll={contentHasScroll}
       >
         {title != null && title !== '' ? (
-          <Typography as="h1" variant="body1" className="dialog__title" id="dialogTitle">
+          // $FlowIgnore
+          <Typography as="h1" variant="body1" className="dialog__title" id={id + '-dialogTitle-text'}>
             {title}
           </Typography>
         ) : null}
@@ -137,10 +141,11 @@ function DialogFn(props: Props & InjectedProps): Node {
                 action.className != null ? action.className : null,
                 action.primary === true ? 'primary' : 'secondary',
               ]);
-              const buttonLabel = action.label.toLowerCase().replace(/ /gi, '') + '-'
+              const buttonLabel = action.label.toLowerCase().replace(/ /gi, '')
               return (
                 <LoadingButton
-                  id={action.id ?? 'dialog-' + buttonLabel + 'button'}
+                // $FlowIgnore
+                  id={action.id ?? id + '-' + buttonLabel + '-button'}
                   key={i}
                   {...getBtnVariant(action.danger, action.primary, isRevampLayout)}
                   className={buttonClasses}
@@ -167,7 +172,7 @@ function DialogFn(props: Props & InjectedProps): Node {
   );
 }
 
-DialogFn.defaultProps = {
+Dialog.defaultProps = {
   title: undefined,
   children: undefined,
   actions: undefined,
@@ -178,6 +183,7 @@ DialogFn.defaultProps = {
   styleOverride: undefined,
   onClose: undefined,
   closeOnOverlayClick: false,
+  id: 'dialog',
 };
 
 export const CloseButton = ({
@@ -299,4 +305,4 @@ function getBtnVariant(
   return { variant: 'secondary' };
 }
 
-export default (withLayout(observer(DialogFn)): ComponentType<Props>);
+export default (withLayout(observer(Dialog)): ComponentType<Props>);

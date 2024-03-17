@@ -71,6 +71,7 @@ export default class IncludePublicKeyDialog extends Component<Props> {
             this.props.actions.dialogs.closeActiveDialog.trigger();
           }
         }}
+        id="includePublicKeyDialog"
       >
         <div><FormattedHTMLMessage {...dialogMessages.includeKeyExplanationLine1} /></div>
         <div><FormattedHTMLMessage {...globalMessages.publicKeyExplanation} /></div>

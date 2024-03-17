@@ -103,6 +103,7 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
         secondaryButton={{
           onClick: this.props.actions.dialogs.closeActiveDialog.trigger,
         }}
+        id="removeWalletDialog"
       >
         <p>{intl.formatMessage(messages.removeExplanation)}</p>
         <p>{intl.formatMessage(dialogMessages.warning2)}</p>
@@ -124,6 +125,7 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
         secondaryButton={{
           onClick: this.props.actions.dialogs.closeActiveDialog.trigger,
         }}
+        id="removeWalletDialog"
       >
         <p>{intl.formatMessage(messages.removeExplanation)}</p>
         <p>{intl.formatMessage(dialogMessages.warning2)}</p>
