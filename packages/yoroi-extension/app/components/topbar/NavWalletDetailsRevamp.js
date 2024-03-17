@@ -91,6 +91,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
     const totalAmount = this.getTotalAmount();
     const showEyeIconSafe = showEyeIcon != null && showEyeIcon;
     const [accountPlateId, iconComponent] = plate ? constructPlate(plate, 0, styles.icon) : [];
+    const amountDisplayId = `topBar:selectedWallet`;
 
     return (
       <Box
@@ -132,6 +133,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
                     showFiat
                     unitOfAccountSetting={unitOfAccountSetting}
                     getCurrentPrice={getCurrentPrice}
+                    id={amountDisplayId}
                   />
                 </Box>
               </div>

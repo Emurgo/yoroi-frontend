@@ -68,6 +68,7 @@ export default class ResyncWalletDialogContainer extends Component<Props> {
         secondaryButton={{
           onClick: this.props.actions.dialogs.closeActiveDialog.trigger,
         }}
+        id="resyncWalletDialog"
       >
         <p>{intl.formatMessage(messages.resyncExplanation)}</p>
         <p>{intl.formatMessage(dialogMessages.warning)}</p>

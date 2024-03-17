@@ -336,7 +336,7 @@ class ConnectPage extends Component<Props & InjectedProps> {
                   </div>
 
                   <ul className={styles.list}>
-                    {publicDerivers.map(wallet => (
+                    {publicDerivers.map((wallet, idx) => (
                       <li
                         key={wallet.publicDeriver.getPublicDeriverId()}
                         className={styles.listItem}
@@ -361,6 +361,7 @@ class ConnectPage extends Component<Props & InjectedProps> {
                                   getCurrentPrice={this.props.getCurrentPrice}
                                   showFiat
                                   showAmount
+                                  id={'dAppConnector:connect:walletList:walletCard_' + idx}
                                 />
                               </Box>
                             }
