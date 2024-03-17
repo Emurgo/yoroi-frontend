@@ -41,8 +41,6 @@ export const isValidRepeatPassword: (string, string) => boolean = (
   repeatPassword
 ) => walletPassword === repeatPassword;
 
-export const isNotEmptyString: string => boolean = (value) => value !== '';
-
 export const isValidMemo: string => boolean = (memo) => (
   memo !== ''
   && memo.length <= MAX_MEMO_SIZE
@@ -60,30 +58,6 @@ export const isWithinSupply: (string, BigNumber) => boolean = (value, totalSuppl
   const isValid = numericValue.gte(minValue) && numericValue.lte(totalSupply);
   return isValid;
 };
-
-/**
- * Calculate the max number of digits we should allow
- * in an input box before the decimal separator
- * ex: 123.45 would be allowed with max digits of 3
- */
-export function calcMaxBeforeDot(
-  numberOfDecimals: number
-): number {
-  // some WASM bindings are backed by signed 64-bit numbers
-  const max64 = new BigNumber(2).pow(63).minus(1);
-
-  return max64
-    // recall: when converting to a WASM object,
-    // the decimal is included in the unit
-    // ex: 123.45 -> 12345
-    // so we need to make sure we're below 2^63 - 1 including the # of decimals
-    .div(new BigNumber(10).pow(numberOfDecimals))
-    .toFixed(0) // cut off any decimals from division
-    // remove 1 because 2^63 - 1 is not exactly divisible by 10
-    // ex: if the limit was 2^7 - 1 (127)
-    // we would need to disallow 3-digit numbers to make sure 999 can't be inputted
-    .length - 1;
-}
 
 export async function validateAmount(
   amount: BigNumber,
