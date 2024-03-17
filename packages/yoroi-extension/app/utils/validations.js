@@ -35,7 +35,6 @@ export const isValidWalletPassword: string => boolean = (walletPassword) => (
   walletPassword.length >= 10
 );
 
-// eslint-disable-next-line max-len
 export const isValidRepeatPassword: (string, string) => boolean = (
   walletPassword,
   repeatPassword

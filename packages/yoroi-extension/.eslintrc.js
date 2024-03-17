@@ -86,7 +86,7 @@ module.exports = {
     'arrow-body-style': 0,
     'key-spacing': 1,
     'no-empty-function': 1,
-    'max-len': ['warn', { code: 120 }],
+    'max-len': 0,
     'no-useless-escape': 1,
     'prefer-const': 1,
     'object-curly-spacing': 1,
