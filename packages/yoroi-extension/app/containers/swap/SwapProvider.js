@@ -59,7 +59,7 @@ function SwapProvider({ children, publicDeriver }: Props): Node {
         primaryTokenId: defaultToken.defaultIdentifier,
         supportedProviders,
       }),
-    []
+    [stakingKey]
   );
 
   const swapManager = useMemo(() => swapManagerMaker({ swapApi, swapStorage }), [

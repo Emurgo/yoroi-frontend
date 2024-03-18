@@ -43,6 +43,7 @@ export function genCSP(request: {|
 
   // Swap
   connectSrc.push('https://aggregator.muesliswap.com/');
+  connectSrc.push('https://onchain2.muesliswap.com/');
 
   // unsafe-inline is unfortunately required by style-loader (even in production builds)
   const evalStyle = "'unsafe-inline'";

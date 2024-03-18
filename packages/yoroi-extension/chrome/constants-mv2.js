@@ -64,6 +64,7 @@ export function genCSP(request: {|
 
   // Swap
   connectSrc.push('https://aggregator.muesliswap.com/');
+  connectSrc.push('https://onchain2.muesliswap.com/');
 
   // wasm-eval is needed to compile WebAssembly in the browser
   // note: wasm-eval is not standardized but empirically works in Firefox & Chrome https://github.com/w3c/webappsec-csp/pull/293
