@@ -65,10 +65,16 @@ export default class RewardGraphClean extends Component<Props> {
               .filter(value => value !== null && value.length > 0)
               .map(([key, value], idx) => (
                 <Stack direction="row" mb="2px">
-                  <Typography component="div" width={idx === 2 ? '100px' : 'content'} mr="3px" variant="caption1">
+                  <Typography
+                    component="div"
+                    width={idx === 2 ? '100px' : 'content'}
+                    mr="3px"
+                    variant="caption1"
+                  >
                     {key}:
                   </Typography>
-                  <Typography component="div"
+                  <Typography
+                    component="div"
                     sx={{
                       wordWrap: 'break-word',
                       maxWidth: '300px',
@@ -127,7 +133,7 @@ export default class RewardGraphClean extends Component<Props> {
             label={{
               value: yAxisLabel,
               position: 'insideLeft',
-              offset: -5,
+              offset: 15,
               dy: 50,
               angle: -90,
               fill: '#6B7384',
