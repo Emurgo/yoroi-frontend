@@ -89,7 +89,7 @@ class InlineEditingInput extends Component<Props & InjectedLayoutProps, State> {
       onSuccess: async form => {
         const { inputField } = form.values();
         if (inputField !== this.props.inputFieldValue) {
-          await this.props.onSubmit(inputField);
+          await this.props.onSubmit(inputField.trim());
           this.props.onStopEditing();
         } else {
           this.props.onCancelEditing();
@@ -168,7 +168,7 @@ class InlineEditingInput extends Component<Props & InjectedLayoutProps, State> {
           type="text"
           {...inputField.bind()}
           label={inputFieldLabel}
-          value={inputField.value}
+          value={inputField.value.trimStart()}
           onChange={inputField.onChange}
           onKeyDown={event => this.handleInputKeyDown(event)}
           error={inputField.value.length === 0 || inputField.value.length > 40 ? inputField.error : ''}
