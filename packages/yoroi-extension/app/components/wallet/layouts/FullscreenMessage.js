@@ -48,7 +48,7 @@ class FullscreenMessage extends Component<Props & InjectedLayoutProps> {
               },
             }}
           >
-            {image && <Box mb="16px">{image}</Box>}
+            {image && <Box mb="32px">{image}</Box>}
             <Typography component="div" variant="h5" mb="8px" fontWeight={500}>
               {title}
             </Typography>
