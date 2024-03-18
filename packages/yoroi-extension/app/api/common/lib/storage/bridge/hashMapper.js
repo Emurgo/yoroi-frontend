@@ -19,7 +19,7 @@ import {
   addressToKind,
 } from '../../../../ada/lib/storage/bridge/utils';
 import { getAllTables } from '../../../../ada/lib/storage/database/utils';
-import type { InsertRequest } from '../../../../ada/lib/storage/database/walletTypes/common/utils';
+import type { InsertRequest } from '../../../../ada/lib/storage/database/walletTypes/common/utils.types';
 
 export type AddByHashRequest = {|
   ...InsertRequest,

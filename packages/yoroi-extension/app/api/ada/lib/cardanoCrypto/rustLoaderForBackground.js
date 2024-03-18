@@ -1,5 +1,9 @@
 // @flow
 
+/********************************
+ LOADED IN `webpack/*Config.js`!
+********************************/
+
 // Somehow the dyanmic imports in `rustLoader.js` do not work in the background
 // service worker. This module replaces `rustLoader.js` in the background service
 // worker with the help of webpack NormalModuleReplacementPlugin.

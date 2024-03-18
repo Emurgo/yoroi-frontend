@@ -11,7 +11,7 @@ import {
   CanonicalAddressSchema, AddressMappingSchema, AddressSchema, EncryptionMetaSchema,
 } from '../../../primitives/tables';
 import type { CanonicalAddressInsert, } from '../../../primitives/tables';
-import type { TreeInsert, InsertRequest, } from '../../common/utils';
+import type { TreeInsert, InsertRequest, } from '../../common/utils.types';
 import type { Schema } from '../../../utils';
 
 export const Bip44DerivationLevels = Object.freeze({

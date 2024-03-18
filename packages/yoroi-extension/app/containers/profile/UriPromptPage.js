@@ -11,7 +11,7 @@ import TopBarLayout from '../../components/layout/TopBarLayout';
 import UriPromptForm from '../../components/profile/uri-prompt/UriPromptForm';
 import UriAccept from '../../components/profile/uri-prompt/UriAccept';
 
-import type { StoresAndActionsProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';

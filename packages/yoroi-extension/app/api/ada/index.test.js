@@ -1,5 +1,5 @@
 // @flow
-import './lib/test-config';
+import './lib/test-config.forTests';
 import { schema } from 'lovefield';
 import type { lf$Database } from 'lovefield';
 import AdaApi from './index';
@@ -10,11 +10,6 @@ import {
   silenceLogsForTesting,
 } from '../../utils/logging';
 
-import type {
-  FilterUsedRequest,
-  FilterUsedResponse,
-} from '../common/lib/state-fetch/currencySpecificTypes';
-
 import {
   loadLovefieldDB,
 } from './lib/storage/database/index';
@@ -24,6 +19,7 @@ import {
   networks,
 } from './lib/storage/database/prepackaged/networks';
 import BigNumber from 'bignumber.js';
+import type { FilterUsedRequest, FilterUsedResponse } from './lib/state-fetch/types';
 
 let db: lf$Database;
 

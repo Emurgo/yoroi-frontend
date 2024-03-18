@@ -47,7 +47,7 @@ import {
   GetToken,
   GetAddress,
 } from './read';
-import type { InsertRequest } from '../../walletTypes/common/utils';
+import type { InsertRequest } from '../../walletTypes/common/utils.types';
 
 export class ModifyKey {
   static ownTables: {|

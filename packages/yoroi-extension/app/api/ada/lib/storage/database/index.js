@@ -29,7 +29,7 @@ import { populateMemoTransactionsDb } from './memos/tables';
 import { populatePricesDb } from './prices/tables';
 import { populateExplorerDb } from './explorers/tables';
 import { populateUtxoDb } from './utxo/tables';
-import { KeyKind } from '../../../../common/lib/crypto/keys/types';
+import { KeyKind } from '../../cardanoCrypto/keys/types';
 import { networks, defaultAssets } from './prepackaged/networks';
 import { prepackagedExplorers } from './prepackaged/explorers';
 import environment from '../../../../../environment';
