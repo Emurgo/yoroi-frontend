@@ -127,7 +127,7 @@ export default class RewardGraphClean extends Component<Props> {
             label={{
               value: yAxisLabel,
               position: 'insideLeft',
-              offset: 25,
+              offset: 15,
               dy: 50,
               angle: -90,
               fill: '#6B7384',
