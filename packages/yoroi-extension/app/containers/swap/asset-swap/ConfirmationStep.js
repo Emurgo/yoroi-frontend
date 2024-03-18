@@ -56,10 +56,7 @@ export default function SwapConfirmationStep({
   const isMarketOrder = orderData.type === 'market';
   const isAutoPool = pool?.poolId === bestPool?.poolId;
 
-  if (txSubmitErrorState.value instanceof IncorrectWalletPasswordError) {
-    alert('Incorrect password');
-    txSubmitErrorState.update(null);
-  }
+  const isIncorrectPassword = txSubmitErrorState.value instanceof IncorrectWalletPasswordError;
 
   const { createOrderData } = useSwapCreateOrder({
     onSuccess: (data) => {
@@ -198,6 +195,7 @@ export default function SwapConfirmationStep({
           label="Password"
           type="password"
           onChange={e => userPasswordState.update(e.target.value)}
+          error={isIncorrectPassword && 'Incorrect password!'}
         />
       </Box>
     </Box>
