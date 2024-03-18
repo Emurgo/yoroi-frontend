@@ -5,12 +5,8 @@ import chacha from 'chacha';
 import cryptoRandomString from 'crypto-random-string';
 
 const PBKDF_ITERATIONS = 12983;
-const SALT_SIZE = 16;
 const KEY_SIZE = 32;
 const DIGEST = 'sha512';
-const NONCE_SIZE = 12;
-const TAG_SIZE = 16;
-const PROTO_SIZE = 1;
 const PROTO_VERSION = Buffer.from('01', 'hex');
 
 /*
