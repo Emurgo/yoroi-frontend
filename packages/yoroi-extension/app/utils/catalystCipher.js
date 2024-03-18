@@ -49,31 +49,3 @@ export async function encryptWithPassword(
   const cipherText = Buffer.concat([PROTO_VERSION, salt, nonce, head, final, tag]);
   return cipherText.toString('hex');
 }
-
-export async function decryptWithPassword(
-  passwordBuf: Uint8Array,
-  ciphertextHex: string
-): Promise<string> {
-  const ciphertext = Buffer.from(ciphertextHex, 'hex');
-
-  const salt = ciphertext.slice(PROTO_SIZE, SALT_SIZE + PROTO_SIZE);
-  const nonce = ciphertext.slice(SALT_SIZE + PROTO_SIZE, SALT_SIZE + NONCE_SIZE + PROTO_SIZE);
-  const cipherdata = ciphertext.slice(SALT_SIZE + NONCE_SIZE + PROTO_SIZE, -TAG_SIZE);
-  const tag = ciphertext.slice(SALT_SIZE + PROTO_SIZE + NONCE_SIZE + cipherdata.length);
-
-  const aad = Buffer.from('', 'hex');
-
-  if (ciphertext.length <= SALT_SIZE + NONCE_SIZE + TAG_SIZE) {
-    throw new Error('not enough data to decrypt');
-  }
-
-  const key = await promisifyPbkdf2(passwordBuf, salt);
-
-  const decipher = chacha.createDecipher(key, nonce);
-  decipher.setAAD(aad);
-  decipher.setAuthTag(tag);
-
-  let decrypted = decipher.update(cipherdata, 'ignored', 'hex');
-  decrypted += decipher.final('hex');
-  return decrypted;
-}
