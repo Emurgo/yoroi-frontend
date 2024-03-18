@@ -30,11 +30,10 @@ import type {
   GetTransactionsByHashesRequest,
   GetTransactionsByHashesResponse,
   MultiAssetSupplyResponse,
+  FilterUsedRequest,
+  FilterUsedResponse,
   GetSwapFeeTiersFunc,
 } from './types';
-import type {
-  FilterUsedRequest, FilterUsedResponse,
-} from '../../../common/lib/state-fetch/currencySpecificTypes';
 
 export interface IFetcher {
   getUTXOsForAddresses(body: AddressUtxoRequest): Promise<AddressUtxoResponse>;

@@ -31,13 +31,14 @@ import type {
   GetTransactionsByHashesRequest,
   GetTransactionsByHashesResponse,
   MultiAssetSupplyResponse,
+  FilterUsedRequest,
+  FilterUsedResponse,
   GetSwapFeeTiersFunc,
   GetSwapFeeTiersRequest,
   GetSwapFeeTiersResponse,
 } from './types';
-import type { FilterUsedRequest, FilterUsedResponse, } from '../../../common/lib/state-fetch/currencySpecificTypes';
 
-import type { IFetcher } from './IFetcher';
+import type { IFetcher } from './IFetcher.types';
 
 import axios from 'axios';
 import { Logger, stringifyError } from '../../../../utils/logging';

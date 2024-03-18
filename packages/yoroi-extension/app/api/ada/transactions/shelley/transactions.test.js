@@ -1,5 +1,5 @@
 // @flow
-import '../../lib/test-config';
+import '../../lib/test-config.forTests';
 
 import { schema } from 'lovefield';
 import BigNumber from 'bignumber.js';

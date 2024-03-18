@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { ROUTES } from '../../routes-config';
-import type { StoresAndActionsProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import URILandingDialogContainer from './URILandingDialogContainer';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { isValidReceiveAddress } from '../../api/ada/lib/storage/bridge/utils';

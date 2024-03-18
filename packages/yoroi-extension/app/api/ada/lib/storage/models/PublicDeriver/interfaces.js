@@ -53,15 +53,12 @@ import {
 } from '../../database/walletTypes/common/api/write';
 import { GetDerivationSpecific } from '../../database/walletTypes/common/api/read';
 import { ModifyKey, ModifyAddress, } from '../../database/primitives/api/write';
-import type {
-  FilterFunc,
-} from '../../../../../common/lib/state-fetch/currencySpecificTypes';
 import {
   ChainDerivations,
 } from '../../../../../../config/numbersConfig';
 import type {
   TreeInsert,
-} from '../../database/walletTypes/common/utils';
+} from '../../database/walletTypes/common/utils.types';
 import type { Bip44ChainInsert } from '../../database/walletTypes/common/tables';
 import { MultiToken } from '../../../../../common/lib/MultiToken';
 import type {
@@ -70,6 +67,7 @@ import type {
 } from '../../database/utxo/api/read';
 import { UtxoService } from '@emurgo/yoroi-lib/dist/utxo';
 import { UtxoStorageApi, } from '../utils';
+import type { FilterFunc } from '../../../state-fetch/types';
 
 
 export type Address = {|

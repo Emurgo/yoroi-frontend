@@ -3,14 +3,19 @@
 import { RustModule } from './rustLoader';
 import type { GenerateAddressFunc } from '../../../common/lib/restoration/bip44AddressScan';
 import {
-  HARD_DERIVATION_START,
-  CoinTypes,
-  WalletTypePurpose,
   ChainDerivations,
+  CoinTypes,
+  HARD_DERIVATION_START,
   STAKING_KEY_INDEX,
+  WalletTypePurpose,
 } from '../../../../config/numbersConfig';
+import type { WalletChecksum } from '@emurgo/cip4-js';
 import { walletChecksum } from '@emurgo/cip4-js';
-import type { PlateResponse } from '../../../common/lib/crypto/plate';
+
+export type PlateResponse = {|
+  addresses: Array<string>,
+  plate: WalletChecksum
+|};
 
 export const generateShelleyPlate = (
   rootPk: RustModule.WalletV4.Bip32PrivateKey,

@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import React, { Component, Suspense } from 'react';
 import { observer } from 'mobx-react';
 import { Box } from '@mui/material';

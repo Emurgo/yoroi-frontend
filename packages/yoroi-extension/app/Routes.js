@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import type { StoresMap } from './stores/index';
 import type { ActionsMap } from './actions/index';
-import type { StoresAndActionsProps } from './types/injectedPropsType';
+import type { StoresAndActionsProps } from './types/injectedProps.types';
 import type { ConfigType } from '../config/config-types';
 import { Route, Redirect, Switch } from 'react-router-dom';
 import { ROUTES } from './routes-config';

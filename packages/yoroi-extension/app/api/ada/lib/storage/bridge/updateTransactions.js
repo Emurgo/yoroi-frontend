@@ -140,15 +140,12 @@ import type {
   MultiAssetMintMetadataResponse,
   MultiAssetSupplyResponse,
   TxSummary,
-  HistoryFunc,
+  HistoryFunc, FilterFunc,
 } from '../../state-fetch/types';
 import {
   ShelleyCertificateTypes,
   RemoteTransactionTypes,
 } from '../../state-fetch/types';
-import type {
-  FilterFunc,
-} from '../../../../common/lib/state-fetch/currencySpecificTypes';
 import { addressToKind, } from './utils';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 import { Bech32Prefix } from '../../../../../config/stringConfig';

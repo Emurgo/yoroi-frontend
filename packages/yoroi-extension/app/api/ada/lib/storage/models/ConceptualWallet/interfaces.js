@@ -13,7 +13,7 @@ import type {
 } from '../../database/walletTypes/common/api/write';
 import type {
   TreeInsert,
-} from '../../database/walletTypes/common/utils';
+} from '../../database/walletTypes/common/utils.types';
 import type { AddPublicDeriverResponse } from '../../database/walletTypes/core/api/write';
 import { ModifyKey, } from '../../database/primitives/api/write';
 import {

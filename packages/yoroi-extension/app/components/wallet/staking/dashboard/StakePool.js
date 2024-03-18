@@ -8,7 +8,7 @@ import { toSvg } from 'jdenticon';
 import { Button } from '@mui/material';
 
 import CardShadow from './CardShadow';
-import type { Notification } from '../../../../types/notificationType';
+import type { Notification } from '../../../../types/notification.types';
 import CopyableAddress from '../../../widgets/CopyableAddress';
 import RawHash from '../../../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../../../containers/widgets/ExplorableHashContainer';

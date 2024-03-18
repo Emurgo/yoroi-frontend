@@ -70,7 +70,7 @@ import {
 } from './transactions/shelley/transactions';
 import { generateAdaMnemonic, generateWalletRootKey, } from './lib/cardanoCrypto/cryptoWallet';
 import { v4PublicToV2, } from './lib/cardanoCrypto/utils';
-import { isValidBip39Mnemonic, } from '../common/lib/crypto/wallet';
+import { isValidBip39Mnemonic, } from './lib/cardanoCrypto/wallet';
 import type { CardanoSignTransaction } from 'trezor-connect-flow';
 import { createTrezorSignTxPayload, } from './transactions/shelley/trezorTx';
 import { createLedgerSignTxPayload, } from './transactions/shelley/ledgerTx';
@@ -101,7 +101,7 @@ import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 import type {
   AccountStateFunc,
   AddressUtxoFunc,
-  BestBlockFunc,
+  BestBlockFunc, FilterFunc,
   GetRecentTransactionHashesFunc,
   GetTransactionsByHashesFunc,
   HistoryFunc,
@@ -113,7 +113,6 @@ import type {
   SignedResponse,
   TokenInfoFunc,
 } from './lib/state-fetch/types';
-import type { FilterFunc, } from '../common/lib/state-fetch/currencySpecificTypes';
 import { getChainAddressesForDisplay, } from './lib/storage/models/utils';
 import { getAllAddressesForDisplay, rawGetAddressRowsForWallet, } from './lib/storage/bridge/traitUtils';
 import {

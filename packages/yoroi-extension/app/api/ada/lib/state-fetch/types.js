@@ -2,6 +2,7 @@
 
 import typeof { MIRPot } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 import type { BackendNetworkInfo } from '../../../common/lib/state-fetch/types';
+import type { NetworkRow } from '../storage/database/primitives/tables';
 
 // getUTXOsForAddresses
 
@@ -577,6 +578,13 @@ export type GetTransactionsByHashesResponse = Array<RemoteTransaction>;
 export type GetTransactionsByHashesFunc = (
   body: GetTransactionsByHashesRequest
 ) => Promise<GetTransactionsByHashesResponse>;
+
+export type FilterUsedRequest = {|
+  network: $ReadOnly<NetworkRow>,
+  addresses: Array<string>,
+|};
+export type FilterUsedResponse = Array<string>;
+export type FilterFunc = (body: FilterUsedRequest) => Promise<FilterUsedResponse>;
 
 export type GetSwapFeeTiersRequest = BackendNetworkInfo;
 

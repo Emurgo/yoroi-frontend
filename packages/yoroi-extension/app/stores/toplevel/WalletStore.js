@@ -8,7 +8,7 @@ import { ROUTES } from '../../routes-config';
 import environment from '../../environment';
 import config from '../../config';
 import globalMessages from '../../i18n/global-messages';
-import type { Notification } from '../../types/notificationType';
+import type { Notification } from '../../types/notification.types';
 import type { GetWalletsFunc } from '../../api/common/index';
 import { getWallets } from '../../api/common/index';
 import type { CreateWalletResponse, RestoreWalletResponse } from '../../api/common/types';

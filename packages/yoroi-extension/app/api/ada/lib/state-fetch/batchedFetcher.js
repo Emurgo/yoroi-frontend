@@ -40,14 +40,14 @@ import type {
   GetTransactionsByHashesResponse,
   GetTransactionsByHashesFunc,
   MultiAssetSupplyResponse,
+  FilterUsedRequest,
+  FilterUsedResponse,
+  FilterFunc,
   GetSwapFeeTiersFunc,
 } from './types';
-import type {
-  FilterFunc, FilterUsedRequest, FilterUsedResponse,
-} from '../../../common/lib/state-fetch/currencySpecificTypes';
 import LocalizableError from '../../../../i18n/LocalizableError';
 
-import type { IFetcher } from './IFetcher';
+import type { IFetcher } from './IFetcher.types';
 
 import { chunk } from 'lodash';
 import {

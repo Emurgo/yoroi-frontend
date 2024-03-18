@@ -9,7 +9,6 @@ import type {
   GenerateAddressFunc,
 } from '../../../common/lib/restoration/bip44AddressScan';
 import type { ConfigType } from '../../../../../config/config-types';
-import type { FilterFunc } from '../../../common/lib/state-fetch/currencySpecificTypes';
 
 import {
   ChainDerivations, BIP44_SCAN_SIZE,
@@ -19,13 +18,14 @@ import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 
 import type {
   TreeInsert, InsertRequest,
-} from '../../lib/storage/database/walletTypes/common/utils';
+} from '../../lib/storage/database/walletTypes/common/utils.types';
 import type { AddByHashFunc, } from '../../../common/lib/storage/bridge/hashMapper';
 import type { NetworkRow, CanonicalAddressInsert } from '../../lib/storage/database/primitives/tables';
 import { CoreAddressTypes } from '../../lib/storage/database/primitives/enums';
 import type { Bip44ChainInsert } from '../../lib/storage/database/walletTypes/common/tables';
 import { getCardanoHaskellBaseConfig } from '../../lib/storage/database/prepackaged/networks';
 import { Bech32Prefix } from '../../../../config/stringConfig';
+import type { FilterFunc } from '../../lib/state-fetch/types';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
