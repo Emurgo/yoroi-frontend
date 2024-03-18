@@ -150,6 +150,10 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
         sx={{
           color: 'grayscale.900',
           lineHeight: '27.5px',
+          fontSize: '14px',
+          '&.MuiButton-sizeMedium': {
+            padding: '13px 16px',
+          },
         }}
         startIcon={<BackArrow />}
       >
