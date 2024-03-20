@@ -7,6 +7,8 @@ import Table from '../../../components/common/table/Table';
 import CancelSwapOrderDialog from '../../../components/swap/CancelOrderDialog';
 import AssetPair from '../../../components/common/assets/AssetPair';
 import Tabs from '../../../components/common/tabs/Tabs';
+import { useRichOpenOrders } from '../hooks';
+import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 
 const orderColumns = [
   'Pair (From / To)',
@@ -18,9 +20,18 @@ const orderColumns = [
   'Transaction ID',
 ];
 
-export default function SwapOrdersPage(): Node {
+export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
+
   const [showCompletedOrders, setShowCompletedOrders] = useState(false);
   const [cancelOrder, setCancelOrder] = useState(null);
+
+  const wallet = props.stores.wallets.selectedOrFail;
+  const network = wallet.getParent().getNetworkInfo();
+  const defaultTokenInfo = props.stores.tokenInfoStore
+    .getDefaultTokenInfoSummary(network.NetworkId);
+
+  const openOrders = useRichOpenOrders();
+  console.log('1 >>> ', openOrders);
 
   const handleCancelOrder = order => {
     console.log('🚀 > order:', order);
@@ -53,10 +64,22 @@ export default function SwapOrdersPage(): Node {
           columnGap="0px"
         >
           {showCompletedOrders
-            ? mockCompletedOrders.map(order => <OrderRow isCompleted key={order.txId} {...order} />)
-            : mockOpenOrders.map(order => (
-              <OrderRow key={order.txId} handleCancel={() => setCancelOrder(order)} {...order} />
-              ))}
+            ? mockCompletedOrders.map(order => (
+              <OrderRow
+                key={order.txId}
+                isCompleted
+                order={order}
+                defaultTokenInfo={defaultTokenInfo}
+              />
+            ))
+            : openOrders.map(order => (
+              <OrderRow
+                key={order.utxo}
+                handleCancel={() => setCancelOrder(order)}
+                order={order}
+                defaultTokenInfo={defaultTokenInfo}
+              />
+            ))}
         </Table>
       </Box>
       {cancelOrder && (
@@ -70,9 +93,14 @@ export default function SwapOrdersPage(): Node {
   );
 }
 
-const OrderRow = ({ isCompleted = false, handleCancel, ...order }) => (
+const OrderRow = ({ isCompleted = false, handleCancel, order, defaultTokenInfo }) => (
   <>
-    <AssetPair sx={{ py: '20px' }} from={order.from} to={order.to} />
+    <AssetPair
+      sx={{ py: '20px' }}
+      from={order.from.token}
+      to={order.to.token}
+      defaultTokenInfo={defaultTokenInfo}
+    />
     <Box textAlign="right">{order.price}</Box>
     <Box textAlign="right">{order.amount}</Box>
     <Box textAlign="right">
@@ -83,10 +111,10 @@ const OrderRow = ({ isCompleted = false, handleCancel, ...order }) => (
     </Box>
     <Box display="flex" pl="32px" justifyContent="flex-start" alignItems="center" gap="8px">
       <Box width="32px" height="32px">
-        {order.dex.image}
+        {order.dex?.image ?? '-'}
       </Box>
       <Box fontWeight={500} color="primary.500">
-        {order.dex.name}
+        {order.dex?.name ?? '-'}
       </Box>
     </Box>
     <Box textAlign="left">{order.datetime}</Box>

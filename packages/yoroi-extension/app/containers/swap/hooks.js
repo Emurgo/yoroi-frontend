@@ -4,7 +4,7 @@ import adaLogo from './mockAssets/ada.inline.svg';
 import { genLookupOrFail, getTokenIdentifierIfExists, getTokenName, } from '../../stores/stateless/tokenHelpers';
 import { splitAmount, truncateToken } from '../../utils/formatters';
 import useSwapPage from './context/swap-page/useSwapPage';
-import { useSwap, useSwapPoolsByPair } from '@yoroi/swap';
+import { useSwap, useSwapOrdersByStatusOpen, useSwapPoolsByPair, useSwapTokensOnlyVerified } from '@yoroi/swap';
 import { Quantities } from '../../utils/quantities';
 import { useSwapForm } from './context/swap-form';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
@@ -129,4 +129,23 @@ export function useSwapFeeDisplay(defaultTokenInfo: RemoteTokenInfo): {|
     formattedNonPtAmount: formattedSell,
     formattedFee,
   };
+}
+
+export function useRichOpenOrders() {
+  const openOrders = useSwapOrdersByStatusOpen();
+  const { onlyVerifiedTokens } = useSwapTokensOnlyVerified();
+  const tokensMap = onlyVerifiedTokens.reduce((map, t) => ({ ...map, [t.id]: t }), {});
+  return openOrders.map(o => {
+    const fromToken = tokensMap[o.from.tokenId];
+    const toToken = tokensMap[o.to.tokenId];
+    onlyVerifiedTokens.fi
+    return {
+      utxo: o.utxo,
+      from: { quantity: o.from.quantity, token: fromToken },
+      to: { quantity: o.to.quantity, token: toToken },
+      batcherFee: o.batcherFee,
+      deposit: o.deposit,
+      provider: o.provider,
+    };
+  })
 }
