@@ -42,9 +42,9 @@ export default class BaseLoadingStore<TStores, TActions> extends Store<TStores, 
     this.__blockingLoadingRequests.push([new Request(() => promise), name]);
   }
 
-  load(env: 'connector' | 'extension'): void {
+  async load(env: 'connector' | 'extension'): Promise<void> {
     const rustLoadingParams = (env === 'extension') ? ['dontLoadMessagesSigning'] : [];
-    Promise
+    await Promise
       .all([
         // $FlowIgnore[invalid-tuple-arity]
         this.loadRustRequest.execute(rustLoadingParams),
