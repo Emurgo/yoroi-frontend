@@ -144,6 +144,7 @@ class CardanoUtxoDetails extends Component<Props> {
         id="addressRow"
       >
         <CopyableAddress
+          id={'utxoDetails_' + request.addressIndex}
           hash={addressHash}
           elementId={notificationElementId}
           onCopyAddress={() =>
