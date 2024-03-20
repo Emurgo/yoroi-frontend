@@ -5,7 +5,7 @@ import moment from 'moment/moment';
 import Store from './Store';
 import Request from '../lib/LocalizedRequest';
 import environment from '../../environment';
-import { THEMES } from '../../styles/utils';
+import { getCSSCustomPropObject, THEMES } from '../../styles/utils';
 import type { Theme } from '../../styles/utils';
 import { LANGUAGES } from '../../i18n/translations';
 import type { LanguageType } from '../../i18n/translations';
@@ -423,7 +423,6 @@ export default class BaseProfileStore
   };
 
   _exportTheme: void => Promise<void> = async () => {
-    const { getCSSCustomPropObject } = require(`../../styles/utils`);
     const cssCustomPropObject = getCSSCustomPropObject();
     await this.unsetCustomThemeRequest.execute();
     await this.setCustomThemeRequest.execute({

@@ -1,5 +1,4 @@
 // @flow
-export type AssuranceModeOption = 'CWANormal' | 'CWAStrict';
 export type AssuranceMode = {|
     /** <95% assurance */
     low: number,
