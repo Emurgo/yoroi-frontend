@@ -184,6 +184,7 @@ export default class WalletReceiveRevamp extends Component<Props> {
             >
               {/* Address Id */}
               <CopyableAddress
+                id='walletReceiveRevamp'
                 hash={address.address}
                 elementId={notificationElementId}
                 onCopyAddress={() => onCopyAddressTooltip(address.address, notificationElementId)}

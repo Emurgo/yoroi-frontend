@@ -89,6 +89,7 @@ export default class StandardHeader extends Component<Props> {
         <div className={styles.instructions}>
           <div className={styles.hashLabel}>{intl.formatMessage(messages.walletAddressLabel)}</div>
           <CopyableAddress
+            id='standartHeader'
             darkVariant
             hash={walletAddress}
             elementId={mainAddressNotificationId}

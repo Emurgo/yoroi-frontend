@@ -117,6 +117,7 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
         </span>
         <div className="verificationAddress">
           <CopyableAddress
+            id='verifyAddressDialog'
             hash={this.props.addressInfo.address}
             elementId={notificationId}
             onCopyAddress={() => this.props.onCopyAddressTooltip(notificationId)}

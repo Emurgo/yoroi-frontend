@@ -132,6 +132,7 @@ export default class StandardHeaderRevamp extends Component<Props> {
           <Box width="100%">
             <Box mb="8px">
               <CopyableAddress
+                id='standartHeaderRevamp'
                 darkVariant
                 sx={{
                   justifyContent: 'flex-start',

@@ -92,6 +92,7 @@ export default class URIDisplayDialog extends Component<Props> {
           </div>
           <div className={styles.uriDisplay}>
             <CopyableAddress
+              id='uriDisplayDialog'
               hash={uri}
               elementId={uriNotificationId}
               onCopyAddress={() => onCopyAddressTooltip(uriNotificationId)}

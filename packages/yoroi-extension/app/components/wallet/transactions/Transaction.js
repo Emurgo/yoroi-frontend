@@ -612,6 +612,7 @@ export default class Transaction extends Component<Props, State> {
         className={styles.addressItem}
       >
         <CopyableAddress
+          id='transaction'
           hash={this.props.addressToDisplayString(request.address.address)}
           elementId={notificationElementId}
           onCopyAddress={() =>

@@ -168,6 +168,7 @@ class WalletSummaryPage extends Component<AllProps> {
               addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())
             }
             complexityLevel={this.props.stores.profile.selectedComplexityLevel}
+            id='wallet:transaction-transactionsList-box'
           />
         );
       } else {

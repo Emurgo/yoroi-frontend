@@ -228,6 +228,7 @@ export default class WalletReceive extends Component<Props> {
             <div key={`gen-${address.address}`} className={addressClasses}>
               {/* Address Id */}
               <CopyableAddress
+                id='walletReceive'
                 hash={address.address}
                 elementId={notificationElementId}
                 onCopyAddress={
