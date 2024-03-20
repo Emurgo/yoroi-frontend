@@ -78,10 +78,3 @@ export async function closeOtherInstances(
 ) {
   await setLocalItem(tabKeyId, thisWindowId);
 }
-
-export const handlersSettingUrl: string = 'chrome://settings/handlers';
-
-/** To open special URLs like chrome://settings you need to use the Chrome API */
-export function openSandboxedTab(url: string) {
-  chrome.tabs.create({ url });
-}

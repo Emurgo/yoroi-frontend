@@ -1,6 +1,5 @@
 // @flow
 import BigNumber from 'bignumber.js';
-import { asQuantity } from './asQuantity';
 
 type NumbersLocale = {|
   prefix?: string,
@@ -12,6 +11,14 @@ type NumbersLocale = {|
   fractionGroupSeparator?: string,
   suffix?: string,
 |};
+
+const asQuantity = (value: BigNumber | number | string): string => {
+  const bn = new BigNumber(value);
+  if (bn.isNaN() || !bn.isFinite()) {
+    throw new Error('Invalid quantity');
+  }
+  return bn.toString(10);
+};
 
 export const Quantities = {
   sum: (quantities: Array<number | string>): string => {

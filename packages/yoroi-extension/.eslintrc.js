@@ -87,7 +87,7 @@ module.exports = {
     'arrow-body-style': 0,
     'key-spacing': 1,
     'no-empty-function': 1,
-    'max-len': ['warn', { code: 120 }],
+    'max-len': 0,
     'no-useless-escape': 1,
     'prefer-const': 1,
     'object-curly-spacing': 1,
@@ -112,6 +112,7 @@ module.exports = {
       2,
       { object: 'TrezorConnect', message: 'Use TrezorWrapper instead to minimize Trezor iframe lifespan', },
     ],
+    'import/no-unused-modules': [1, { unusedExports: true }],
   },
   plugins: [
     'import',
