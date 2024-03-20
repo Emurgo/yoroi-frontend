@@ -4,17 +4,20 @@ import { ReactComponent as InfoIcon } from '../../assets/images/revamp/icons/inf
 import Dialog from '../widgets/Dialog';
 import AssetPair from '../common/assets/AssetPair';
 import TextField from '../common/TextField';
+import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
 
 type Props = {|
   order: any,
   onCancelOrder: void => void,
   onClose: void => void,
+  defaultTokenInfo: RemoteTokenInfo,
 |};
 
 export default function CancelSwapOrderDialog({
   order,
   onCancelOrder,
   onClose,
+  defaultTokenInfo,
 }: Props): React$Node {
   const handleCancelOrder = () => {
     onCancelOrder();
@@ -26,7 +29,7 @@ export default function CancelSwapOrderDialog({
         <Box>
           <Typography component="div" variant="body1">Are you sure you want to cancel this order?</Typography>
         </Box>
-        <AssetPair from={order.from} to={order.to} />
+        <AssetPair from={order.from} to={order.to} defaultTokenInfo={defaultTokenInfo} />
         <Box display="flex" flexDirection="column" gap="8px">
           <SummaryRow col1="Asset price" col2="5 MILK" />
           <SummaryRow col1="Asset amount" col2="10 LVLC" />

@@ -7,7 +7,7 @@ import SwapConfirmationStep from './ConfirmationStep';
 import TxSubmittedStep from './TxSubmittedStep';
 import LimitOrderWarningDialog from '../../../components/swap/LimitOrderWarningDialog';
 import { SwapFormProvider } from '../context/swap-form';
-import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import { useSwap } from '@yoroi/swap';
 import { runInAction } from 'mobx';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';

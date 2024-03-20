@@ -14,6 +14,7 @@ import ExplorableHashContainer from '../../widgets/ExplorableHashContainer';
 import { truncateAddressShort } from '../../../utils/formatters';
 import { Quantities } from '../../../utils/quantities';
 import { PRICE_PRECISION } from '../../../components/swap/common';
+import { fail } from '../../../coreUtils';
 
 const orderColumns = [
   'Pair (From / To)',
@@ -75,7 +76,6 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
             ? mockCompletedOrders.map(order => (
               <OrderRow
                 key={order.txId}
-                isCompleted
                 order={order}
                 defaultTokenInfo={defaultTokenInfo}
                 selectedExplorer={selectedExplorer}
@@ -97,13 +97,14 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
           order={cancelOrder}
           onCancelOrder={() => handleCancelOrder(cancelOrder)}
           onClose={() => setCancelOrder(null)}
+          defaultTokenInfo={defaultTokenInfo}
         />
       )}
     </>
   );
 }
 
-const OrderRow = ({ isCompleted = false, handleCancel, order, defaultTokenInfo, selectedExplorer }) => {
+const OrderRow = ({ handleCancel = null, order, defaultTokenInfo, selectedExplorer }) => {
   const txId = order.utxo.split('#')[0];
   const price = Quantities.quotient(order.from.quantity, order.to.quantity);
   const priceDenomination = order.from.token.decimals - order.to.token.decimals;
@@ -141,7 +142,7 @@ const OrderRow = ({ isCompleted = false, handleCancel, order, defaultTokenInfo, 
         >
           <span>{truncateAddressShort(txId)}</span>
         </ExplorableHashContainer>
-        {!isCompleted && (
+        {handleCancel == null ? null : (
           <Box>
             <Button onClick={handleCancel} variant="tertiary" color="grayscale">
               Cancel

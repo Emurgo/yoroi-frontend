@@ -131,7 +131,7 @@ export function useSwapFeeDisplay(defaultTokenInfo: RemoteTokenInfo): {|
   };
 }
 
-export function useRichOpenOrders() {
+export function useRichOpenOrders(): Array<any> {
   const openOrders = useSwapOrdersByStatusOpen();
   const { onlyVerifiedTokens } = useSwapTokensOnlyVerified();
   const tokensMap = onlyVerifiedTokens.reduce((map, t) => ({ ...map, [t.id]: t }), {});

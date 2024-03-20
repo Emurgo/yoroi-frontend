@@ -4,21 +4,21 @@ import type { AssetAmount } from '../../swap/types';
 import adaTokenImage from '../../../containers/swap/mockAssets/ada.inline.svg';
 import { urlResolveForIpfsAndCorsproxy } from '../../../coreUtils';
 import defaultTokenImage from '../../../assets/images/revamp/token-default.inline.svg';
+import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 
 type Props = {|
   from: AssetAmount,
   to: AssetAmount,
   sx?: any,
+  defaultTokenInfo: RemoteTokenInfo,
 |};
 
 function tokenImgSrc(token, defaultTokenInfo): string {
-  const src = token.ticker === defaultTokenInfo.ticker ? adaTokenImage
+  return token.ticker === defaultTokenInfo.ticker ? adaTokenImage
     : (urlResolveForIpfsAndCorsproxy(token.image) ?? defaultTokenImage);
-  console.log('>>> ', token.ticker, token.image, src);
-  return src;
 }
 
-function tokenImg(token, defaultTokenInfo): Node {
+function tokenImg(token, defaultTokenInfo): React$Node {
   return (
     <Box
       width="24px"
