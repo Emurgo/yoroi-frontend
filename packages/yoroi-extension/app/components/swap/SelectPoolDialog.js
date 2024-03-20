@@ -5,7 +5,7 @@ import Table from '../common/table/Table';
 import { getMarketPrice } from '@yoroi/swap';
 import { Quantities } from '../../utils/quantities';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
-import SwapPoolIcon from './SwapPoolIcon';
+import { SwapPoolIcon } from './SwapPoolComponents';
 import BigNumber from 'bignumber.js';
 
 const tableColumns = ['DEX name', 'Price', 'TVL', 'DEX fee', 'Liquidity provider fee'];

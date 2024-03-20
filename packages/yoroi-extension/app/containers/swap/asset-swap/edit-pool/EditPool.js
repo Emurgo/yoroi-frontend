@@ -5,7 +5,7 @@ import { ReactComponent as EditIcon } from '../../../../assets/images/revamp/ico
 import { ReactComponent as ChevronDownIcon } from '../../../../assets/images/revamp/icons/chevron-down.inline.svg';
 import { useSwap } from '@yoroi/swap';
 import { capitalize } from 'lodash';
-import SwapPoolIcon from '../../../../components/swap/SwapPoolIcon';
+import { SwapPoolIcon } from '../../../../components/swap/SwapPoolComponents';
 import SwapPoolFullInfo from './PoolFullInfo';
 import { useSwapForm } from '../../context/swap-form';
 import { maybe } from '../../../../coreUtils';

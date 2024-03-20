@@ -5,7 +5,7 @@ import TextField from '../../../components/common/TextField';
 import { useSwapForm } from '../context/swap-form';
 import { AssetAndAmountRow } from '../../../components/swap/SelectAssetDialog';
 import { makeLimitOrder, makePossibleMarketOrder, useSwap, useSwapCreateOrder } from '@yoroi/swap';
-import SwapPoolIcon from '../../../components/swap/SwapPoolIcon';
+import { SwapPoolLabel } from '../../../components/swap/SwapPoolComponents';
 import SwapPoolFullInfo from './edit-pool/PoolFullInfo';
 import { useSwapFeeDisplay } from '../hooks';
 import type { PriceImpact } from '../../../components/swap/types';
@@ -132,14 +132,7 @@ export default function SwapConfirmationStep({
 
       <Box display="flex" gap="8px" flexDirection="column">
         <SummaryRow col1="Dex">
-          <Box display="flex" alignItems="center" gap="8px">
-            <Box display="inline-flex">
-              <SwapPoolIcon provider={pool?.provider} />
-            </Box>
-            <Typography component="div" variant="body1" color="primary.500" fontWeight={500}>
-              {pool?.provider} {isAutoPool ? '(Auto)' : null}
-            </Typography>
-          </Box>
+          <SwapPoolLabel provider={pool?.provider} isAutoPool={isAutoPool} />
         </SummaryRow>
         <SummaryRow col1="Slippage tolerance" withInfo>
           {slippageValue}%

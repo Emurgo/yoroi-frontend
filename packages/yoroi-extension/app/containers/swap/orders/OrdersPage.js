@@ -2,13 +2,18 @@
 import type { Node } from 'react';
 import { useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
-import { mockOpenOrders, mockCompletedOrders } from './mockData';
+import { mockCompletedOrders } from './mockData';
 import Table from '../../../components/common/table/Table';
 import CancelSwapOrderDialog from '../../../components/swap/CancelOrderDialog';
 import AssetPair from '../../../components/common/assets/AssetPair';
 import Tabs from '../../../components/common/tabs/Tabs';
 import { useRichOpenOrders } from '../hooks';
 import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
+import { SwapPoolLabel } from '../../../components/swap/SwapPoolComponents';
+import ExplorableHashContainer from '../../widgets/ExplorableHashContainer';
+import { truncateAddressShort } from '../../../utils/formatters';
+import { Quantities } from '../../../utils/quantities';
+import { PRICE_PRECISION } from '../../../components/swap/common';
 
 const orderColumns = [
   'Pair (From / To)',
@@ -29,6 +34,9 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
   const network = wallet.getParent().getNetworkInfo();
   const defaultTokenInfo = props.stores.tokenInfoStore
     .getDefaultTokenInfoSummary(network.NetworkId);
+
+  const selectedExplorer = props.stores.explorers.selectedExplorer.get(network.NetworkId)
+    ?? fail('No explorer for wallet network');
 
   const openOrders = useRichOpenOrders();
   console.log('1 >>> ', openOrders);
@@ -70,6 +78,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
                 isCompleted
                 order={order}
                 defaultTokenInfo={defaultTokenInfo}
+                selectedExplorer={selectedExplorer}
               />
             ))
             : openOrders.map(order => (
@@ -78,6 +87,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
                 handleCancel={() => setCancelOrder(order)}
                 order={order}
                 defaultTokenInfo={defaultTokenInfo}
+                selectedExplorer={selectedExplorer}
               />
             ))}
         </Table>
@@ -93,43 +103,55 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
   );
 }
 
-const OrderRow = ({ isCompleted = false, handleCancel, order, defaultTokenInfo }) => (
-  <>
-    <AssetPair
-      sx={{ py: '20px' }}
-      from={order.from.token}
-      to={order.to.token}
-      defaultTokenInfo={defaultTokenInfo}
-    />
-    <Box textAlign="right">{order.price}</Box>
-    <Box textAlign="right">{order.amount}</Box>
-    <Box textAlign="right">
-      <Box>
-        {order.total} {order.to.ticker}
-      </Box>
-      <Box>{order.totalAda} ADA</Box>
-    </Box>
-    <Box display="flex" pl="32px" justifyContent="flex-start" alignItems="center" gap="8px">
-      <Box width="32px" height="32px">
-        {order.dex?.image ?? '-'}
-      </Box>
-      <Box fontWeight={500} color="primary.500">
-        {order.dex?.name ?? '-'}
-      </Box>
-    </Box>
-    <Box textAlign="left">{order.datetime}</Box>
-    <Box display="flex" justifyContent="space-between" alignItems="center" gap="12px">
-      <Box color="primary.500">{order.txId}</Box>
-      {!isCompleted && (
+const OrderRow = ({ isCompleted = false, handleCancel, order, defaultTokenInfo, selectedExplorer }) => {
+  const txId = order.utxo.split('#')[0];
+  const price = Quantities.quotient(order.from.quantity, order.to.quantity);
+  const priceDenomination = order.from.token.decimals - order.to.token.decimals;
+  const formattedPrice = Quantities.format(price, priceDenomination, PRICE_PRECISION);
+  const formattedToQuantity = Quantities.format(
+    order.to.quantity,
+    order.to.token.decimals,
+    order.to.token.decimals,
+  );
+  return (
+    <>
+      <AssetPair
+        sx={{ py: '20px' }}
+        from={order.from.token}
+        to={order.to.token}
+        defaultTokenInfo={defaultTokenInfo}
+      />
+      <Box textAlign="right">{formattedPrice}</Box>
+      <Box textAlign="right">{formattedToQuantity}</Box>
+      <Box textAlign="right">
         <Box>
-          <Button onClick={handleCancel} variant="tertiary" color="grayscale">
-            Cancel
-          </Button>
+          {order.total} {order.to.ticker}
         </Box>
-      )}
-    </Box>
-  </>
-);
+        <Box>{order.totalAda} ADA</Box>
+      </Box>
+      <Box display="flex" pl="32px" justifyContent="flex-start" alignItems="center" gap="8px">
+        <SwapPoolLabel provider={order.provider}/>
+      </Box>
+      <Box textAlign="left">{order.datetime}</Box>
+      <Box display="flex" justifyContent="space-between" alignItems="center" gap="12px">
+        <ExplorableHashContainer
+          selectedExplorer={selectedExplorer}
+          linkType="transaction"
+          hash={txId}
+        >
+          <span>{truncateAddressShort(txId)}</span>
+        </ExplorableHashContainer>
+        {!isCompleted && (
+          <Box>
+            <Button onClick={handleCancel} variant="tertiary" color="grayscale">
+              Cancel
+            </Button>
+          </Box>
+        )}
+      </Box>
+    </>
+  );
+};
 
 // <TODO:CHECK_LINT>
 // eslint-disable-next-line no-unused-vars
