@@ -12,7 +12,6 @@ import config from '../../../config';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { withLayout } from '../../../styles/context/layout';
 import type { InjectedLayoutProps } from '../../../styles/context/layout';
-import { Button } from '@mui/material';
 
 const messages = defineMessages({
   change: {
@@ -104,6 +103,7 @@ class InlineEditingInput extends Component<Props & InjectedLayoutProps, State> {
     if (event.which === 13) {
       // ENTER key
       this.onBlur();
+
     }
     if (event.which === 27) {
       // ESCAPE key
@@ -119,6 +119,7 @@ class InlineEditingInput extends Component<Props & InjectedLayoutProps, State> {
   onBlur: () => void = () => {
     if (this.state.isActive) {
       this.submit();
+      this.inputField.blur();
     }
   };
 
@@ -127,45 +128,8 @@ class InlineEditingInput extends Component<Props & InjectedLayoutProps, State> {
     inputField.value = this.props.inputFieldValue;
     this.setState({ isActive: false });
     this.props.onCancelEditing();
+    this.inputField.blur();
   };
-
-  renderCancelButton(): Node {
-    const { isActive, isRevampLayout, id } = this.props;
-    const { intl } = this.context;
-    const { validator } = this;
-    const inputField = validator.$('inputField');
-
-    if (!isActive) return null;
-
-    if (isRevampLayout)
-      return (
-        <Button
-          type="button"
-          onMouseDown={this.onCancel}
-          size="small"
-          sx={{
-            color: 'grayscale.900',
-            position: 'absolute',
-            top: '50%',
-            right: '13px',
-            transform: 'translateY(-80%)',
-          }}
-          id={id + '-cancelChanges-button'}
-        >
-          {intl.formatMessage(messages.cancel)}
-        </Button>
-      );
-
-    return (
-      <button
-        type="button"
-        className={classnames([styles.button, inputField.error ? styles.error : ''])}
-        onMouseDown={this.onCancel}
-      >
-        {intl.formatMessage(messages.cancel)}
-      </button>
-    );
-  }
 
   componentDidUpdate(): void {
     if (this.props.isActive && this.inputField) {
@@ -182,7 +146,6 @@ class InlineEditingInput extends Component<Props & InjectedLayoutProps, State> {
       className,
       inputFieldLabel,
       isActive,
-      inputFieldValue,
       successfullyUpdated,
       id,
     } = this.props;
@@ -212,17 +175,18 @@ class InlineEditingInput extends Component<Props & InjectedLayoutProps, State> {
           type="text"
           {...inputField.bind()}
           label={inputFieldLabel}
-          value={isActive ? inputField.value : inputFieldValue}
+          value={inputField.value}
           onChange={inputField.onChange}
           onKeyDown={event => this.handleInputKeyDown(event)}
-          error={isActive ? inputField.error : ''}
+          error={inputField.value.length === 0 || inputField.value.length > 40 ? inputField.error : ''}
           inputRef={input => {
             this.inputField = input;
           }}
           id={id + '-editValue-input'}
+          onFocus={event => {
+            event.target.select();
+          }}
         />
-
-        {this.renderCancelButton()}
 
         {successfullyUpdated && (
           <div className={styles.savingResultLabel}>
