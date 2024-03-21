@@ -550,7 +550,10 @@ export default class TransactionRevamp extends Component<Props, State> {
     const txIdFullInfoBasePart = `${txIdBasePart}:txFullInfo`
 
     return (
-      <Box className={styles.component}>
+      <Box
+        className={styles.component}
+        id={this.props.id + '-transaction_' + this.props.txIndex + '-box'}
+      >
         {/* ==== Clickable Header -> toggles details ==== */}
         <Box
           sx={{ padding: '20px 0', cursor: 'pointer' }}
