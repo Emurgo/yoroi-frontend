@@ -14,7 +14,7 @@ import ExplorableHashContainer from '../../widgets/ExplorableHashContainer';
 import { truncateAddressShort } from '../../../utils/formatters';
 import { Quantities } from '../../../utils/quantities';
 import { PRICE_PRECISION } from '../../../components/swap/common';
-import { fail } from '../../../coreUtils';
+import { fail, maybe } from '../../../coreUtils';
 
 const orderColumns = [
   'Pair (From / To)',
@@ -104,6 +104,26 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
   );
 }
 
+function createFormattedAttachedValues({ order, defaultTokenInfo }): Array<{ formattedValue: string, ticker: string }> {
+  const attachedValueMap = order.valueAttached.reduce((map, v) =>
+    ({ ...map, [v.token]: Quantities.sum([map[v.token] ?? '0', v.amount]) }), {});
+  const decimalsAda = defaultTokenInfo.decimals;
+  const formattedAttachedValues = [{
+    formattedValue: Quantities.format(attachedValueMap['.'] ?? '0', decimalsAda, decimalsAda),
+    ticker: defaultTokenInfo.ticker,
+  }];
+  [order.from, order.to].forEach(t => {
+    maybe(attachedValueMap[t.id], v => {
+      const formattedValue = Quantities.format(v, t.decimals, t.decimals);
+      formattedAttachedValues.push({
+        formattedValue,
+        ticker: t.ticker,
+      });
+    })
+  })
+  return formattedAttachedValues;
+}
+
 const OrderRow = ({ handleCancel = null, order, defaultTokenInfo, selectedExplorer }) => {
   const txId = order.utxo.split('#')[0];
   const price = Quantities.quotient(order.from.quantity, order.to.quantity);
@@ -114,6 +134,10 @@ const OrderRow = ({ handleCancel = null, order, defaultTokenInfo, selectedExplor
     order.to.token.decimals,
     order.to.token.decimals,
   );
+
+  const formattedAttachedValues =
+    createFormattedAttachedValues({ order, defaultTokenInfo });
+
   return (
     <>
       <AssetPair
@@ -128,12 +152,16 @@ const OrderRow = ({ handleCancel = null, order, defaultTokenInfo, selectedExplor
         <Box>
           {order.total} {order.to.ticker}
         </Box>
-        <Box>{order.totalAda} ADA</Box>
+        <Box>{formattedAttachedValues.map(v => (
+          <Box>
+            {v.formattedValue} {v.ticker}
+          </Box>
+        ))}</Box>
       </Box>
       <Box display="flex" pl="32px" justifyContent="flex-start" alignItems="center" gap="8px">
         <SwapPoolLabel provider={order.provider}/>
       </Box>
-      <Box textAlign="left">{order.datetime}</Box>
+      <Box textAlign="left">-</Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" gap="12px">
         <ExplorableHashContainer
           selectedExplorer={selectedExplorer}
@@ -153,13 +181,3 @@ const OrderRow = ({ handleCancel = null, order, defaultTokenInfo, selectedExplor
     </>
   );
 };
-
-// <TODO:CHECK_LINT>
-// eslint-disable-next-line no-unused-vars
-const TabButton = ({ label, isActive, onClick }): React$Node => (
-  <Box onClick={onClick} p="8px" borderRadius="8px" bgcolor={isActive ? 'grayscale.200' : ''}>
-    <Typography component="div" variant="body1" fontWeight={500}>
-      {label}
-    </Typography>
-  </Box>
-);

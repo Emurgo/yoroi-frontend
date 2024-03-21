@@ -144,6 +144,7 @@ export function useRichOpenOrders(): Array<any> {
       from: { quantity: o.from.quantity, token: fromToken },
       to: { quantity: o.to.quantity, token: toToken },
       batcherFee: o.batcherFee,
+      valueAttached: o.valueAttached,
       deposit: o.deposit,
       provider: o.provider,
     };
