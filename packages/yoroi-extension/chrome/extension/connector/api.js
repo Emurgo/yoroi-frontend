@@ -283,7 +283,7 @@ export const MAX_COLLATERAL: BigNumber = new BigNumber('5000000');
 // only consider UTXO value <= (${requiredAmount} + 1 ADA)
 const MAX_PER_UTXO_SURPLUS = new BigNumber('2000000');
 // Max allowed collateral inputs in a tx by protocol
-export const MAX_COLLATERAL_COUNT: number = 3;
+const MAX_COLLATERAL_COUNT: number = 3;
 
 type GetCollateralUtxosRespose = {|
   utxosToUse: Array<RemoteUnspentOutput>,
@@ -353,7 +353,7 @@ export async function connectorGetCollateralUtxos(
   };
 }
 
-export type FullAddressPayloadWithBase58 = {|
+type FullAddressPayloadWithBase58 = {|
   fullAddress: FullAddressPayload,
   base58: Address,
 |};
@@ -518,15 +518,6 @@ export async function connectorGetChangeAddress(wallet: PublicDeriver<>): Promis
     throw new Error('could not get change address - this should never happen');
   }
   return change.addr.Hash
-}
-
-export type BoxLike = {
-  value: number | string,
-  assets: Array<{|
-    tokenId: string, // hex
-    amount: number | string,
-  |}>,
-  ...
 }
 
 export function getScriptRequiredSigningKeys(

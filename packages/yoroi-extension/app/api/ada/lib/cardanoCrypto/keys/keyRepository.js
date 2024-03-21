@@ -13,7 +13,7 @@ import type {
 import {
   KeyKind,
 } from './types';
-import { RustModule } from '../../../../ada/lib/cardanoCrypto/rustLoader';
+import { RustModule } from '../rustLoader';
 import type { BIP32Interface } from 'bip32';
 import { fromBase58, fromPublicKey } from 'bip32';
 import { decode, encode } from 'bs58check';

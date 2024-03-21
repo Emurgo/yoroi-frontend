@@ -3,14 +3,14 @@
 import type { Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { TransactionDirectionType } from '../../../api/ada/transactions/types';
-import type { AssuranceLevel } from '../../../types/transactionAssuranceTypes';
+import type { AssuranceLevel } from '../../../types/transactionAssurance.types';
 import type { TxStatusCodesType } from '../../../api/ada/lib/storage/database/primitives/enums';
 import type {
   CertificateRow,
   TokenRow,
 } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos/tables';
-import type { Notification } from '../../../types/notificationType';
+import type { Notification } from '../../../types/notification.types';
 import type { TxDataOutput, TxDataInput } from '../../../api/common/types';
 import type { TokenLookupKey, TokenEntry } from '../../../api/common/lib/MultiToken';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';

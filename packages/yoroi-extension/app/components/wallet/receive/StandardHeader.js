@@ -12,7 +12,7 @@ import QrCodeWrapper from '../../widgets/QrCodeWrapper';
 import RawHash from '../../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
-import type { Notification } from '../../../types/notificationType';
+import type { Notification } from '../../../types/notification.types';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { truncateAddress } from '../../../utils/formatters';
 

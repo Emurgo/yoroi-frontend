@@ -1,7 +1,7 @@
 // @flow
 import type { ComponentType, Node } from 'react';
 import { Component } from 'react';
-import type { StoresAndActionsProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import type { StandardAddress } from '../../types/AddressFilterTypes';
 import {
   AddressFilter,

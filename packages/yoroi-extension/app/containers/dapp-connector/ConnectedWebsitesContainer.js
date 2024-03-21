@@ -4,7 +4,7 @@ import { Component, lazy, Suspense } from 'react';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
-import type { StoresAndActionsProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import BannerContainer from '../banners/BannerContainer';
 import { withLayout } from '../../styles/context/layout';

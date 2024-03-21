@@ -4,7 +4,7 @@ import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType'
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import type { UnconfirmedAmount } from '../../../types/unconfirmedAmountType';
+import type { UnconfirmedAmount } from '../../../types/unconfirmedAmount.types';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletSummary.scss';
 import { Component } from 'react';

@@ -25,7 +25,7 @@ import type {
   IGetLastSyncInfoResponse,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
-import type { UnconfirmedAmount } from '../../types/unconfirmedAmountType';
+import type { UnconfirmedAmount } from '../../types/unconfirmedAmount.types';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
 import { Logger, stringifyError } from '../../utils/logging';

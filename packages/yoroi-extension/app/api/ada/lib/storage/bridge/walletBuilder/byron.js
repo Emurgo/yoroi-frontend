@@ -14,7 +14,7 @@ import {
 
 import type {
   TreeInsert,
-} from '../../database/walletTypes/common/utils';
+} from '../../database/walletTypes/common/utils.types';
 import type { Bip44ChainInsert } from '../../database/walletTypes/common/tables';
 import type { KeyInsert, NetworkRow } from '../../database/primitives/tables';
 import type { HWFeatures, } from '../../database/walletTypes/core/tables';
@@ -38,7 +38,7 @@ import type {
 import type { AddByHashFunc } from '../../../../../common/lib/storage/bridge/hashMapper';
 import { rawGenAddByHash } from '../../../../../common/lib/storage/bridge/hashMapper';
 import { addByronAddress } from '../../../../restoration/byron/scan';
-import { KeyKind } from '../../../../../common/lib/crypto/keys/types';
+import { KeyKind } from '../../../cardanoCrypto/keys/types';
 
 // TODO: maybe move this inside walletBuilder somehow so it's all done in the same transaction
 /**

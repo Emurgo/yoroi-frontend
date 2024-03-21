@@ -1,13 +1,18 @@
 // @flow
-import React from 'react';
 import type { Node } from 'react';
+import React from 'react';
 import { MuiThemes, THEMES } from '../utils';
 import { ThemeProvider } from '@mui/material/styles';
-import { getDesignTokens } from '../themes/revamp-theme';
+import { revampBaseTheme as revampBaseThemeLight } from '../themes/revamp/light-theme-mui';
+import { revampBaseTheme as revampBaseThemeDark } from '../themes/revamp/dark-theme-mui';
 
 export type Modes = 'light' | 'dark';
 
 const ColorModeContext = React.createContext();
+
+function getDesignTokens(mode: string): Object {
+  return mode === 'light' ? revampBaseThemeLight : revampBaseThemeDark;
+}
 
 function ColorModeProvider({ children, currentTheme }: any): Node {
   const [mode, setMode] = React.useState<Modes>('light');

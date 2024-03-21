@@ -9,7 +9,7 @@ import WalletRestoreDialog from '../../../components/wallet/WalletRestoreDialog'
 import WalletRestoreVerifyDialog from '../../../components/wallet/WalletRestoreVerifyDialog';
 import TransferSummaryPage from '../../../components/transfer/TransferSummaryPage';
 import LegacyExplanation from '../../../components/wallet/restore/LegacyExplanation';
-import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import globalMessages from '../../../i18n/global-messages';
 import { CheckAddressesInUseApiError, NoInputsError } from '../../../api/common/errors';
 import type { RestoreModeType, } from '../../../actions/common/wallet-restore-actions';

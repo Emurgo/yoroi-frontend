@@ -18,10 +18,6 @@ import {
 import {
   getDelegatedBalance,
 } from '../../api/ada/lib/storage/bridge/delegationUtils';
-import type {
-  GetDelegatedBalanceFunc,
-  RewardHistoryFunc
-} from '../../api/common/lib/storage/bridge/delegationUtils';
 import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { MangledAmountFunc } from '../stateless/mangledAddresses';
@@ -33,6 +29,7 @@ import { PoolInfoApi } from '@emurgo/yoroi-lib';
 import { entriesIntoMap } from '../../coreUtils';
 import type { PoolInfo } from '@emurgo/yoroi-lib';
 import type { PoolInfoResponse, RemotePool } from '../../api/ada/lib/state-fetch/types';
+import type { GetDelegatedBalanceFunc, RewardHistoryFunc } from '../../api/ada/lib/storage/bridge/delegationUtils';
 
 export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
 

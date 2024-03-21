@@ -2,7 +2,7 @@
 import { action, observable, runInAction } from 'mobx';
 import type { Node } from 'react';
 import { find, } from 'lodash';
-import type { AssuranceMode, } from '../../types/transactionAssuranceTypes';
+import type { AssuranceMode, } from '../../types/transactionAssurance.types';
 import { PublicDeriver, } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { ConceptualWallet, } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import Store from '../base/Store';

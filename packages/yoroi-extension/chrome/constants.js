@@ -1,4 +1,5 @@
 // @flow
+/* eslint-disable  import/no-unused-modules */
 
 export function genCSP(request: {|
   isDev: boolean,

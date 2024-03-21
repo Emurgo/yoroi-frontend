@@ -1,6 +1,6 @@
 // @flow
 import { Action } from './lib/Action';
-import type { Notification } from '../types/notificationType';
+import type { Notification } from '../types/notification.types';
 
 // ======= NOTIFICATIONS ACTIONS =======
 

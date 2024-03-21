@@ -9,7 +9,7 @@ import { ReactComponent as IconCopy } from '../../assets/images/copy.inline.svg'
 import { ReactComponent as IconCopied } from '../../assets/images/copied.inline.svg';
 import styles from './CopyableAddress.scss';
 import { Box, Tooltip, Typography } from '@mui/material';
-import type { Notification } from '../../types/notificationType';
+import type { Notification } from '../../types/notification.types';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 export const copyableMessages: Object = defineMessages({

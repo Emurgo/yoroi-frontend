@@ -40,7 +40,6 @@ jobs:
         run: |
           npm i --legacy-peer-deps 
           npm i --legacy-peer-deps --prefix packages/yoroi-extension 
-          npm i --legacy-peer-deps --prefix packages/yoroi-connector 
 
       - name: Build
         if: steps.check.outputs.changed == 'true'

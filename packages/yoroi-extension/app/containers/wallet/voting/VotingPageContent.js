@@ -4,7 +4,7 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { FormattedHTMLMessage, defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import Voting from '../../../components/wallet/voting/Voting';
 import VotingRegistrationDialogContainer from '../dialogs/voting/VotingRegistrationDialogContainer';
 import { handleExternalLinkClick } from '../../../utils/routing';
