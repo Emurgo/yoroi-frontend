@@ -29,12 +29,26 @@ export default function CancelSwapOrderDialog({
         <Box>
           <Typography component="div" variant="body1">Are you sure you want to cancel this order?</Typography>
         </Box>
-        <AssetPair from={order.from} to={order.to} defaultTokenInfo={defaultTokenInfo} />
+        <AssetPair
+          from={order.fromToken}
+          to={order.toToken}
+          defaultTokenInfo={defaultTokenInfo}
+        />
         <Box display="flex" flexDirection="column" gap="8px">
-          <SummaryRow col1="Asset price" col2="5 MILK" />
-          <SummaryRow col1="Asset amount" col2="10 LVLC" />
-          <SummaryRow col1="Total returned" col2="50 MILK + 5 ADA" withInfo />
-          <SummaryRow col1="Cancellation fee" col2="0.17 ADA" />
+          <SummaryRow col1="Asset price">
+            {order.price} {order.fromToken.ticker}
+          </SummaryRow>
+          <SummaryRow col1="Asset amount">
+            {order.amount} {order.toToken.ticker}
+          </SummaryRow>
+          <SummaryRow col1="Total returned" withInfo>
+            {order.totalValues.map(v => (
+              <Box>{v.formattedValue} {v.ticker}</Box>
+            ))}
+          </SummaryRow>
+          <SummaryRow col1="Cancellation fee">
+            -
+          </SummaryRow>
         </Box>
         <Box>
           <TextField
@@ -42,8 +56,6 @@ export default function CancelSwapOrderDialog({
             value=""
             label="Password"
             type="password"
-            // {...walletPasswordField.bind()}
-            // done={walletPasswordField.isValid}
             // error={walletPasswordField.error}
           />
         </Box>
@@ -60,7 +72,7 @@ export default function CancelSwapOrderDialog({
   );
 }
 
-const SummaryRow = ({ col1, col2, withInfo = false }) => (
+const SummaryRow = ({ col1, children, withInfo = false }) => (
   <Box display="flex" alignItems="center" justifyContent="space-between">
     <Box display="flex" alignItems="center">
       <Typography component="div" variant="body1" color="grayscale.500">
@@ -73,7 +85,7 @@ const SummaryRow = ({ col1, col2, withInfo = false }) => (
       ) : null}
     </Box>
     <Box>
-      <Typography component="div" variant="body1">{col2}</Typography>
+      <Typography component="div" variant="body1">{children}</Typography>
     </Box>
   </Box>
 );

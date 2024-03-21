@@ -15,6 +15,7 @@ import { truncateAddressShort } from '../../../utils/formatters';
 import { Quantities } from '../../../utils/quantities';
 import { PRICE_PRECISION } from '../../../components/swap/common';
 import { fail, maybe } from '../../../coreUtils';
+import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 
 const orderColumns = [
   'Pair (From / To)',
@@ -25,6 +26,59 @@ const orderColumns = [
   'Time created',
   'Transaction ID',
 ];
+
+function createFormattedAttachedValues({ order, defaultTokenInfo }): Array<{ formattedValue: string, ticker: string }> {
+  const attachedValueMap = order.valueAttached.reduce((map, v) =>
+    ({ ...map, [v.token]: Quantities.sum([map[v.token] ?? '0', v.amount]) }), {});
+  const decimalsAda = defaultTokenInfo.decimals;
+  const formattedAttachedValues = [{
+    formattedValue: Quantities.format(attachedValueMap['.'] ?? '0', decimalsAda, decimalsAda),
+    ticker: defaultTokenInfo.ticker,
+  }];
+  [order.from, order.to].forEach(t => {
+    maybe(attachedValueMap[t.id], v => {
+      const formattedValue = Quantities.format(v, t.decimals, t.decimals);
+      formattedAttachedValues.push({
+        formattedValue,
+        ticker: t.ticker,
+      });
+    })
+  })
+  return formattedAttachedValues;
+}
+
+function mapOrder(order: any, defaultTokenInfo: RemoteTokenInfo): {|
+  utxo: string,
+  txId: string,
+  price: string,
+  amount: string,
+  totalValues: Array<{ formattedValue: string, ticker: string }>,
+  provider: string,
+  fromToken: any,
+  toToken: any,
+|} {
+  const txId = order.utxo.split('#')[0];
+  const price = Quantities.quotient(order.from.quantity, order.to.quantity);
+  const priceDenomination = order.from.token.decimals - order.to.token.decimals;
+  const formattedPrice = Quantities.format(price, priceDenomination, PRICE_PRECISION);
+  const formattedToQuantity = Quantities.format(
+    order.to.quantity,
+    order.to.token.decimals,
+    order.to.token.decimals,
+  );
+  const formattedAttachedValues =
+    createFormattedAttachedValues({ order, defaultTokenInfo });
+  return {
+    utxo: order.utxo,
+    txId,
+    price: formattedPrice,
+    amount: formattedToQuantity,
+    totalValues: formattedAttachedValues,
+    provider: order.provider,
+    fromToken: order.from.token,
+    toToken: order.to.token,
+  }
+}
 
 export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
 
@@ -39,7 +93,8 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
   const selectedExplorer = props.stores.explorers.selectedExplorer.get(network.NetworkId)
     ?? fail('No explorer for wallet network');
 
-  const openOrders = useRichOpenOrders();
+  const openOrders = useRichOpenOrders()
+    .map(o => mapOrder(o, defaultTokenInfo));
   console.log('1 >>> ', openOrders);
 
   const handleCancelOrder = order => {
@@ -104,59 +159,23 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
   );
 }
 
-function createFormattedAttachedValues({ order, defaultTokenInfo }): Array<{ formattedValue: string, ticker: string }> {
-  const attachedValueMap = order.valueAttached.reduce((map, v) =>
-    ({ ...map, [v.token]: Quantities.sum([map[v.token] ?? '0', v.amount]) }), {});
-  const decimalsAda = defaultTokenInfo.decimals;
-  const formattedAttachedValues = [{
-    formattedValue: Quantities.format(attachedValueMap['.'] ?? '0', decimalsAda, decimalsAda),
-    ticker: defaultTokenInfo.ticker,
-  }];
-  [order.from, order.to].forEach(t => {
-    maybe(attachedValueMap[t.id], v => {
-      const formattedValue = Quantities.format(v, t.decimals, t.decimals);
-      formattedAttachedValues.push({
-        formattedValue,
-        ticker: t.ticker,
-      });
-    })
-  })
-  return formattedAttachedValues;
-}
-
 const OrderRow = ({ handleCancel = null, order, defaultTokenInfo, selectedExplorer }) => {
-  const txId = order.utxo.split('#')[0];
-  const price = Quantities.quotient(order.from.quantity, order.to.quantity);
-  const priceDenomination = order.from.token.decimals - order.to.token.decimals;
-  const formattedPrice = Quantities.format(price, priceDenomination, PRICE_PRECISION);
-  const formattedToQuantity = Quantities.format(
-    order.to.quantity,
-    order.to.token.decimals,
-    order.to.token.decimals,
-  );
-
-  const formattedAttachedValues =
-    createFormattedAttachedValues({ order, defaultTokenInfo });
-
   return (
     <>
       <AssetPair
         sx={{ py: '20px' }}
-        from={order.from.token}
-        to={order.to.token}
+        from={order.fromToken}
+        to={order.toToken}
         defaultTokenInfo={defaultTokenInfo}
       />
-      <Box textAlign="right">{formattedPrice}</Box>
-      <Box textAlign="right">{formattedToQuantity}</Box>
+      <Box textAlign="right">{order.price}</Box>
+      <Box textAlign="right">{order.amount}</Box>
       <Box textAlign="right">
-        <Box>
-          {order.total} {order.to.ticker}
-        </Box>
-        <Box>{formattedAttachedValues.map(v => (
+        {order.totalValues.map(v => (
           <Box>
             {v.formattedValue} {v.ticker}
           </Box>
-        ))}</Box>
+        ))}
       </Box>
       <Box display="flex" pl="32px" justifyContent="flex-start" alignItems="center" gap="8px">
         <SwapPoolLabel provider={order.provider}/>
@@ -166,9 +185,9 @@ const OrderRow = ({ handleCancel = null, order, defaultTokenInfo, selectedExplor
         <ExplorableHashContainer
           selectedExplorer={selectedExplorer}
           linkType="transaction"
-          hash={txId}
+          hash={order.txId}
         >
-          <span>{truncateAddressShort(txId)}</span>
+          <span>{truncateAddressShort(order.txId)}</span>
         </ExplorableHashContainer>
         {handleCancel == null ? null : (
           <Box>
