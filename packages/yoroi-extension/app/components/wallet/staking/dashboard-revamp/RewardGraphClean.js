@@ -93,7 +93,7 @@ export default class RewardGraphClean extends Component<Props> {
         <BarChart
           data={data.slice(-10)}
           height={200}
-          margin={{ top: 0, right: 0, left: 30, bottom: 0 }}
+          margin={{ top: 0, right: 0, left: 56, bottom: 0 }}
         >
           <XAxis
             tick={{
