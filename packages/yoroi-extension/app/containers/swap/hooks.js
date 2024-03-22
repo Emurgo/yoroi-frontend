@@ -138,7 +138,6 @@ export function useRichOpenOrders(): Array<any> {
   return openOrders.map(o => {
     const fromToken = tokensMap[o.from.tokenId];
     const toToken = tokensMap[o.to.tokenId];
-    onlyVerifiedTokens.fi
     return {
       utxo: o.utxo,
       from: { quantity: o.from.quantity, token: fromToken },

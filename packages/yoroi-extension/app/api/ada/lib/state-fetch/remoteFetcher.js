@@ -56,7 +56,6 @@ import {
   SendTransactionApiError,
   GetUtxoDataError,
 } from '../../../common/errors';
-import { RustModule } from '../cardanoCrypto/rustLoader';
 
 import type { ConfigType } from '../../../../../config/config-types';
 import { bech32, } from 'bech32';

@@ -1,7 +1,7 @@
 // @flow
 import type { Node } from 'react';
 import { useEffect, useState, } from 'react';
-import { Box, Button, Stack, Typography } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import SwapForm from './SwapForm';
 import SwapConfirmationStep from './ConfirmationStep';
 import TxSubmittedStep from './TxSubmittedStep';

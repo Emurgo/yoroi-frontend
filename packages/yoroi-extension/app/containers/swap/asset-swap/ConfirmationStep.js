@@ -20,7 +20,6 @@ import {
 } from '../../../components/swap/PriceImpact';
 import type { State } from '../context/swap-form/types';
 import { useEffect } from 'react';
-import { stringifyError } from '../../../utils/logging';
 import { IncorrectWalletPasswordError } from '../../../api/common/errors';
 
 type Props = {|

@@ -1,12 +1,7 @@
 // @flow
 import type { Node } from 'react';
-import { useState } from 'react';
-import { alpha, Box, Button, Modal, Typography } from '@mui/material';
-import Dialog, { ModalContainer } from '../widgets/Dialog';
-import CheckboxLabel from '../common/CheckboxLabel';
-import { map } from 'lodash';
-import classnames from 'classnames';
-import { LoadingButton } from '@mui/lab';
+import { alpha, Modal } from '@mui/material';
+import { ModalContainer } from '../widgets/Dialog';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 
 type Props = {|

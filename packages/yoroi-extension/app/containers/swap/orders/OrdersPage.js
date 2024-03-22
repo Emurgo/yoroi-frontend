@@ -1,7 +1,7 @@
 // @flow
 import type { Node } from 'react';
 import { useState } from 'react';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import { mockCompletedOrders } from './mockData';
 import Table from '../../../components/common/table/Table';
 import CancelSwapOrderDialog from '../../../components/swap/CancelOrderDialog';
@@ -19,7 +19,6 @@ import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import { useSwap } from '@yoroi/swap';
 import { addressBech32ToHex } from '../../../api/ada/lib/cardanoCrypto/utils';
 import { StateWrap } from '../context/swap-form/types';
-import { runInAction } from 'mobx';
 import type { State } from '../context/swap-form/types';
 
 const orderColumns = [
