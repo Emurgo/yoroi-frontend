@@ -14,8 +14,13 @@ import ExplorableHashContainer from '../../widgets/ExplorableHashContainer';
 import { truncateAddressShort } from '../../../utils/formatters';
 import { Quantities } from '../../../utils/quantities';
 import { PRICE_PRECISION } from '../../../components/swap/common';
-import { fail, maybe } from '../../../coreUtils';
+import { fail, forceNonNull, maybe } from '../../../coreUtils';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
+import { useSwap } from '@yoroi/swap';
+import { addressBech32ToHex } from '../../../api/ada/lib/cardanoCrypto/utils';
+import { StateWrap } from '../context/swap-form/types';
+import { runInAction } from 'mobx';
+import type { State } from '../context/swap-form/types';
 
 const orderColumns = [
   'Pair (From / To)',
@@ -27,20 +32,23 @@ const orderColumns = [
   'Transaction ID',
 ];
 
-function createFormattedAttachedValues({ order, defaultTokenInfo }): Array<{ formattedValue: string, ticker: string }> {
+function createFormattedAttachedValues({
+  order,
+  defaultTokenInfo,
+}): Array<{| formattedValue: string, ticker: string |}> {
   const attachedValueMap = order.valueAttached.reduce((map, v) =>
     ({ ...map, [v.token]: Quantities.sum([map[v.token] ?? '0', v.amount]) }), {});
-  const decimalsAda = defaultTokenInfo.decimals;
+  const decimalsAda = forceNonNull(defaultTokenInfo.decimals);
   const formattedAttachedValues = [{
     formattedValue: Quantities.format(attachedValueMap['.'] ?? '0', decimalsAda, decimalsAda),
-    ticker: defaultTokenInfo.ticker,
+    ticker: defaultTokenInfo.ticker ?? '-',
   }];
   [order.from, order.to].forEach(t => {
     maybe(attachedValueMap[t.id], v => {
       const formattedValue = Quantities.format(v, t.decimals, t.decimals);
       formattedAttachedValues.push({
         formattedValue,
-        ticker: t.ticker,
+        ticker: t.ticker ?? '-',
       });
     })
   })
@@ -49,10 +57,11 @@ function createFormattedAttachedValues({ order, defaultTokenInfo }): Array<{ for
 
 function mapOrder(order: any, defaultTokenInfo: RemoteTokenInfo): {|
   utxo: string,
+  sender: string,
   txId: string,
   price: string,
   amount: string,
-  totalValues: Array<{ formattedValue: string, ticker: string }>,
+  totalValues: Array<{| formattedValue: string, ticker: string |}>,
   provider: string,
   fromToken: any,
   toToken: any,
@@ -70,6 +79,7 @@ function mapOrder(order: any, defaultTokenInfo: RemoteTokenInfo): {|
     createFormattedAttachedValues({ order, defaultTokenInfo });
   return {
     utxo: order.utxo,
+    sender: order.sender,
     txId,
     price: formattedPrice,
     amount: formattedToQuantity,
@@ -82,8 +92,10 @@ function mapOrder(order: any, defaultTokenInfo: RemoteTokenInfo): {|
 
 export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
 
-  const [showCompletedOrders, setShowCompletedOrders] = useState(false);
-  const [cancelOrder, setCancelOrder] = useState(null);
+  const { order: { cancel: swapCancelOrder } } = useSwap();
+
+  const [showCompletedOrders, setShowCompletedOrders] = useState<boolean>(false);
+  const cancellationState: State<?{| order: any, tx: ?string |}> = StateWrap(useState(null));
 
   const wallet = props.stores.wallets.selectedOrFail;
   const network = wallet.getParent().getNetworkInfo();
@@ -95,9 +107,30 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
 
   const openOrders = useRichOpenOrders()
     .map(o => mapOrder(o, defaultTokenInfo));
-  console.log('1 >>> ', openOrders);
 
-  const handleCancelOrder = order => {
+  const handleCancelRequest = order => {
+    (async () => {
+      const utxoHex = await props.stores.substores.ada.swapStore
+        .getUtxoHexForCancelCollateral({ wallet });
+      const cancelTxCbor = await swapCancelOrder({
+        address: addressBech32ToHex(order.sender),
+        utxos: {
+          order: order.utxo,
+          collateral: utxoHex,
+        },
+      });
+      cancellationState.update(s => {
+        // State might have been reset to null in the meantime
+        if (s == null) return null;
+        // State might have been recreated for another order in the meantime
+        if (s.order.utxo !== order.utxo) return s;
+        return { order: s.order, tx: cancelTxCbor };
+      });
+    })();
+    cancellationState.update({ order, tx: null });
+  }
+
+  const handleCancelConfirm = order => {
     console.log('🚀 > order:', order);
   };
 
@@ -139,7 +172,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
             : openOrders.map(order => (
               <OrderRow
                 key={order.utxo}
-                handleCancel={() => setCancelOrder(order)}
+                handleCancel={() => handleCancelRequest(order)}
                 order={order}
                 defaultTokenInfo={defaultTokenInfo}
                 selectedExplorer={selectedExplorer}
@@ -147,11 +180,13 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
             ))}
         </Table>
       </Box>
-      {cancelOrder && (
+      {cancellationState.value && (
         <CancelSwapOrderDialog
-          order={cancelOrder}
-          onCancelOrder={() => handleCancelOrder(cancelOrder)}
-          onClose={() => setCancelOrder(null)}
+          cancellationState={cancellationState}
+          onCancelOrder={handleCancelConfirm}
+          onDialogClose={() => {
+            cancellationState.update(null);
+          }}
           defaultTokenInfo={defaultTokenInfo}
         />
       )}

@@ -14,7 +14,8 @@ import { MultiToken } from '../../api/common/lib/MultiToken';
 import { Quantities } from '../../utils/quantities';
 import BigNumber from 'bignumber.js';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import { fail } from '../../coreUtils';
+import { cast, fail } from '../../coreUtils';
+import { asAddressedUtxo, cardanoUtxoHexFromRemoteFormat } from '../../api/ada/transactions/utils';
 
 const FRONTEND_FEE_ADDRESS_MAINNET = 'addr1q9ry6jfdgm0lcrtfpgwrgxg7qfahv80jlghhrthy6w8hmyjuw9ngccy937pm7yw0jjnxasm7hzxjrf8rzkqcj26788lqws5fke';
 const FRONTEND_FEE_ADDRESS_PREPROD = 'addr_test1qrgpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqzp57km';
@@ -32,6 +33,18 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
 
   @action resetLimitOrderDisplayValue: void => void = () => {
     this.limitOrderDisplayValue = '';
+  }
+
+  getUtxoHexForCancelCollateral: ({| wallet: PublicDeriver<> |}) => Promise<string> = async ({ wallet }) => {
+    const withUtxos = asGetAllUtxos(wallet)
+      ?? fail(`${nameof(this.createUnsignedSwapTx)} missing utxo functionality`);
+    const allUtxos = await withUtxos.getAllUtxos();
+    if (allUtxos.length === 0) {
+      fail('No utxo available at all in the wallet!');
+    }
+    const utxo = allUtxos[0];
+    const [addressedUtxo] = asAddressedUtxo([utxo]);
+    return cardanoUtxoHexFromRemoteFormat(cast(addressedUtxo));
   }
 
   createUnsignedSwapTx: ({|

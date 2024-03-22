@@ -1,41 +1,23 @@
 // @flow
 import { groupBy, keyBy, mapValues } from 'lodash';
 import BigNumber from 'bignumber.js';
-import type {
-  UserAnnotation,
-  CardanoAddressedUtxo,
-} from './types';
-import type {
-  RemoteUnspentOutput,
-} from '../lib/state-fetch/types';
-import {
-  transactionTypes,
-} from './types';
+import type { CardanoAddressedUtxo, UserAnnotation, } from './types';
+import { transactionTypes, } from './types';
+import type { RemoteAsset, RemoteUnspentOutput, } from '../lib/state-fetch/types';
 import type {
   UtxoTransactionInputRow,
   UtxoTransactionOutputRow,
 } from '../lib/storage/database/transactionModels/utxo/tables';
-import type {
-  DbTransaction,
-  DbBlock,
-  DbTokenInfo,
-  TokenRow,
-} from '../lib/storage/database/primitives/tables';
+import type { DbBlock, DbTokenInfo, DbTransaction, TokenRow, } from '../lib/storage/database/primitives/tables';
 import type {
   AccountingTransactionInputRow,
   AccountingTransactionOutputRow,
 } from '../lib/storage/database/transactionModels/account/tables';
 import type { TransactionExportRow } from '../../export';
-import type {
-  IGetAllUtxosResponse,
-} from '../lib/storage/models/PublicDeriver/interfaces';
+import type { IGetAllUtxosResponse, } from '../lib/storage/models/PublicDeriver/interfaces';
 import { formatBigNumberToFloatString } from '../../../utils/formatters';
-import {
-  MultiToken,
-} from '../../common/lib/MultiToken';
-import type {
-  DefaultTokenEntry,
-} from '../../common/lib/MultiToken';
+import type { DefaultTokenEntry, } from '../../common/lib/MultiToken';
+import { MultiToken, } from '../../common/lib/MultiToken';
 import { RustModule } from '../lib/cardanoCrypto/rustLoader';
 import { PRIMARY_ASSET_CONSTANTS } from '../lib/storage/database/primitives/enums';
 
@@ -445,4 +427,47 @@ export function iterateWasmKeyValue<K, V>(iterable: ?{| get: K => V |}, keys: ?K
     }
   }
   return res;
+}
+
+export function cardanoUtxoHexFromRemoteFormat(u: RemoteUnspentOutput): string {
+  return RustModule.WasmScope(Module => {
+    const W4 = Module.WalletV4;
+    const input = W4.TransactionInput.new(
+      W4.TransactionHash.from_hex(u.tx_hash),
+      u.tx_index,
+    );
+    const value = W4.Value.new(W4.BigNum.from_str(u.amount));
+    if ((u.assets || []).length > 0) {
+      value.set_multiasset(assetToRustMultiasset(u.assets));
+    }
+    const output = W4.TransactionOutput.new(
+      W4.Address.from_bytes(Buffer.from(u.receiver, 'hex')),
+      value,
+    );
+    return W4.TransactionUnspentOutput.new(input, output).to_hex();
+  });
+}
+
+export function assetToRustMultiasset(
+  remoteAssets: $ReadOnlyArray<$ReadOnly<RemoteAsset>>
+): RustModule.WalletV4.MultiAsset {
+  const groupedAssets = remoteAssets.reduce((res, a) => {
+    (res[a.policyId] = (res[a.policyId] || [])).push(a);
+    return res;
+  }, {})
+  const W4 = RustModule.WalletV4;
+  const multiasset = W4.MultiAsset.new();
+  for (const policyHex of Object.keys(groupedAssets)) {
+    const assetGroup = groupedAssets[policyHex];
+    const policyId = W4.ScriptHash.from_bytes(Buffer.from(policyHex, 'hex'));
+    const assets = RustModule.WalletV4.Assets.new();
+    for (const asset of assetGroup) {
+      assets.insert(
+        W4.AssetName.new(Buffer.from(asset.name, 'hex')),
+        W4.BigNum.from_str(asset.amount),
+      );
+    }
+    multiasset.insert(policyId, assets);
+  }
+  return multiasset;
 }

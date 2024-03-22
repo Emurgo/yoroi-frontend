@@ -124,3 +124,11 @@ export function forceNonNull<T>(t: ?T): T {
   // $FlowIgnore
   return t;
 }
+
+/**
+ * Returns the passed argument with no changes and just force-casts it to defined type
+ */
+export function cast<T>(t: any): T {
+  // $FlowIgnore
+  return t;
+}

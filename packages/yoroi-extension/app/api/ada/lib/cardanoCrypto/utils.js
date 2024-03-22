@@ -48,3 +48,8 @@ export function addressHexToBech32(hex: string): string {
   return RustModule.WasmScope(Module =>
     Module.WalletV4.Address.from_hex(hex).to_bech32());
 }
+
+export function addressBech32ToHex(bech32: string): string {
+  return RustModule.WasmScope(Module =>
+    Module.WalletV4.Address.from_bech32(bech32).to_hex());
+}

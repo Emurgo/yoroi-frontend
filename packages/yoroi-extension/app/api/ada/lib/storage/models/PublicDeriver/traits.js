@@ -136,6 +136,7 @@ import type {
   Utxo,
 } from '@emurgo/yoroi-lib/dist/utxo/models';
 import { derivePublicByAddressing } from '../../../cardanoCrypto/deriveByAddressing';
+import { addressBech32ToHex } from '../../../cardanoCrypto/utils';
 
 interface Empty {}
 type HasPrivateDeriverDependencies = IPublicDeriver<ConceptualWallet & IHasPrivateDeriver>;
@@ -256,9 +257,7 @@ const GetAllUtxosMixin = (
     const addressedUtxos = utxosInStorage.map(utxo => {
       let addressHash;
       try {
-        addressHash = Buffer.from(
-          RustModule.WalletV4.Address.from_bech32(utxo.receiver).to_bytes()
-        ).toString('hex')
+        addressHash = addressBech32ToHex(utxo.receiver);
       } catch {
         addressHash = utxo.receiver;
       }

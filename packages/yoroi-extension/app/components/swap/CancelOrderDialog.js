@@ -5,26 +5,28 @@ import Dialog from '../widgets/Dialog';
 import AssetPair from '../common/assets/AssetPair';
 import TextField from '../common/TextField';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
+import LoadingSpinner from '../widgets/LoadingSpinner';
+import type { State } from '../../containers/swap/context/swap-form/types';
 
 type Props = {|
-  order: any,
-  onCancelOrder: void => void,
-  onClose: void => void,
+  cancellationState: State<?{| order: any, tx: ?string |}>,
+  onCancelOrder: any => void,
+  onDialogClose: void => void,
   defaultTokenInfo: RemoteTokenInfo,
 |};
 
 export default function CancelSwapOrderDialog({
-  order,
+  cancellationState,
   onCancelOrder,
-  onClose,
+  onDialogClose,
   defaultTokenInfo,
 }: Props): React$Node {
-  const handleCancelOrder = () => {
-    onCancelOrder();
-    onClose();
-  };
+  const order = cancellationState.value?.order;
+  if (order == null) {
+    return null;
+  }
   return (
-    <Dialog title="Cancel order" onClose={onClose} withCloseButton closeOnOverlayClick>
+    <Dialog title="Cancel order" onClose={onDialogClose} withCloseButton closeOnOverlayClick>
       <Box display="flex" mt="8px" mb="24px" flexDirection="column" gap="16px">
         <Box>
           <Typography component="div" variant="body1">Are you sure you want to cancel this order?</Typography>
@@ -61,11 +63,18 @@ export default function CancelSwapOrderDialog({
         </Box>
       </Box>
       <Box display="flex" gap="24px" mt="24px">
-        <Button fullWidth variant="secondary" onClick={onClose}>
+        <Button fullWidth variant="secondary" onClick={onDialogClose}>
           Back
         </Button>
-        <Button fullWidth variant="destructive" onClick={handleCancelOrder}>
-          Cancel order
+        <Button
+          fullWidth
+          variant="destructive"
+          onClick={() => onCancelOrder(order)}
+          disabled={cancellationState.value?.tx == null}
+        >
+          {cancellationState.value?.tx == null ? (
+            <LoadingSpinner small light />
+          ) : 'Cancel order'}
         </Button>
       </Box>
     </Dialog>

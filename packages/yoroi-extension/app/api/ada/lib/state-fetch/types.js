@@ -89,30 +89,25 @@ export const RemoteTransactionTypes: RemoteTransactionTypeT = Object.freeze({
   byron: 'byron',
   shelley: 'shelley',
 });
+export type RemoteAsset = {
+  +amount: string,
+  +assetId: string,
+  +policyId: string,
+  +name: string,
+  ...
+};
 export type RemoteTransactionInput = {|
   +id: string,
   +index: number, // index of output we're consuming
   +txHash: string, // tx that created output we're consuming
   +address: string,
   +amount: string,
-  +assets: $ReadOnlyArray<$ReadOnly<{
-    +amount: string,
-    +assetId: string,
-    +policyId: string,
-    +name: string,
-    ...
-  }>>,
+  +assets: $ReadOnlyArray<$ReadOnly<RemoteAsset>>,
 |};
 export type RemoteTransactionOutput = {|
   +address: string,
   +amount: string,
-  +assets: $ReadOnlyArray<$ReadOnly<{
-    +amount: string,
-    +assetId: string,
-    +policyId: string,
-    +name: string,
-    ...
-  }>>,
+  +assets: $ReadOnlyArray<$ReadOnly<RemoteAsset>>,
 |};
 
 /**
@@ -150,13 +145,7 @@ export type RemoteUnspentOutput = {|
   +tx_index: number,
   +receiver: string,
   +amount: string,
-  +assets: $ReadOnlyArray<$ReadOnly<{
-    +amount: string,
-    +assetId: string,
-    +policyId: string,
-    +name: string,
-    ...
-  }>>,
+  +assets: $ReadOnlyArray<$ReadOnly<RemoteAsset>>,
   // +block_num: number,
 |};
 

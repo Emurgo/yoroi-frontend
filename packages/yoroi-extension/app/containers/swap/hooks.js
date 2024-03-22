@@ -147,6 +147,7 @@ export function useRichOpenOrders(): Array<any> {
       valueAttached: o.valueAttached,
       deposit: o.deposit,
       provider: o.provider,
+      sender: o.sender,
     };
   })
 }
