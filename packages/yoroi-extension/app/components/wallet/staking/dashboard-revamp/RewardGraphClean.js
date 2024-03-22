@@ -93,7 +93,7 @@ export default class RewardGraphClean extends Component<Props> {
         <BarChart
           data={data.slice(-10)}
           height={200}
-          margin={{ top: 0, right: 0, left: 30, bottom: 0 }}
+          margin={{ top: 0, right: 0, left: 56, bottom: 0 }}
         >
           <XAxis
             tick={{
@@ -127,7 +127,7 @@ export default class RewardGraphClean extends Component<Props> {
             label={{
               value: yAxisLabel,
               position: 'insideLeft',
-              offset: 25,
+              offset: -5,
               dy: 50,
               angle: -90,
               fill: '#6B7384',
