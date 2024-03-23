@@ -224,10 +224,10 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
     const feFees = cost.frontendFeeInfo.fee;
     const ptFees = { deposit: deposit.quantity, batcher: batcherFee.quantity };
     const swapTxReq = { wallet, contractAddress, datum, sell, buy, feFees, ptFees, poolProvider };
-    const signRequest: HaskellShelleyTxSignRequest =
+    const txSignRequest: HaskellShelleyTxSignRequest =
       await props.stores.substores.ada.swapStore.createUnsignedSwapTx(swapTxReq);
     runInAction(() => {
-      setSignRequest(signRequest);
+      setSignRequest(txSignRequest);
     });
   };
 

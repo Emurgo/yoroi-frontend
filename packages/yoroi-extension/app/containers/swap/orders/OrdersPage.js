@@ -18,8 +18,6 @@ import { fail, forceNonNull, maybe } from '../../../coreUtils';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import { useSwap } from '@yoroi/swap';
 import { addressBech32ToHex } from '../../../api/ada/lib/cardanoCrypto/utils';
-import { StateWrap } from '../context/swap-form/types';
-import type { State } from '../context/swap-form/types';
 
 const orderColumns = [
   'Pair (From / To)',
@@ -94,7 +92,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
   const { order: { cancel: swapCancelOrder } } = useSwap();
 
   const [showCompletedOrders, setShowCompletedOrders] = useState<boolean>(false);
-  const cancellationState: State<?{| order: any, tx: ?string |}> = StateWrap(useState(null));
+  const [cancellationState, setCancellationState] = useState<?{| order: any, tx: ?string |}>(null);
 
   const wallet = props.stores.wallets.selectedOrFail;
   const network = wallet.getParent().getNetworkInfo();
@@ -108,25 +106,30 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
     .map(o => mapOrder(o, defaultTokenInfo));
 
   const handleCancelRequest = order => {
-    (async () => {
-      const utxoHex = await props.stores.substores.ada.swapStore
-        .getUtxoHexForCancelCollateral({ wallet });
-      const cancelTxCbor = await swapCancelOrder({
-        address: addressBech32ToHex(order.sender),
-        utxos: {
-          order: order.utxo,
-          collateral: utxoHex,
-        },
+    props.stores.substores.ada.swapStore.getUtxoHexForCancelCollateral({ wallet })
+      .then(utxoHex => {
+        return swapCancelOrder({
+          address: addressBech32ToHex(order.sender),
+          utxos: {
+            order: order.utxo,
+            collateral: utxoHex,
+          },
+        })
+      })
+      .then(cancelTxCbor => {
+        setCancellationState(s => {
+          // State might have been reset to null in the meantime
+          if (s == null) return null;
+          // State might have been recreated for another order in the meantime
+          if (s.order.utxo !== order.utxo) return s;
+          return { order: s.order, tx: cancelTxCbor };
+        });
+        return null;
+      })
+      .catch(e => {
+        console.error('Failed to prepare cancellation transaction', e);
       });
-      cancellationState.update(s => {
-        // State might have been reset to null in the meantime
-        if (s == null) return null;
-        // State might have been recreated for another order in the meantime
-        if (s.order.utxo !== order.utxo) return s;
-        return { order: s.order, tx: cancelTxCbor };
-      });
-    })();
-    cancellationState.update({ order, tx: null });
+    setCancellationState({ order, tx: null });
   }
 
   const handleCancelConfirm = order => {
@@ -179,13 +182,12 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
             ))}
         </Table>
       </Box>
-      {cancellationState.value && (
+      {cancellationState && (
         <CancelSwapOrderDialog
-          cancellationState={cancellationState}
+          order={cancellationState.order}
+          isLoading={cancellationState.tx == null}
           onCancelOrder={handleCancelConfirm}
-          onDialogClose={() => {
-            cancellationState.update(null);
-          }}
+          onDialogClose={() => setCancellationState(null)}
           defaultTokenInfo={defaultTokenInfo}
         />
       )}

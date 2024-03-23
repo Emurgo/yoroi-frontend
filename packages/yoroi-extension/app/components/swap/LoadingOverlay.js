@@ -7,9 +7,11 @@ import LoadingSpinner from '../widgets/LoadingSpinner';
 type Props = {|
 |};
 
-export default function LoadingOverlay({}: Props): Node {
+export default function LoadingOverlay(_: Props): Node {
   return (
-    <Modal open onClose={() => {}}
+    <Modal
+      open
+      onClose={() => {}}
       sx={{
         bgcolor: alpha('#121F4D', 0.7),
         display: 'flex',
