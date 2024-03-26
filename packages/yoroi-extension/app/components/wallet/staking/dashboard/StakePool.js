@@ -168,6 +168,7 @@ export default class StakePool extends Component<Props> {
             <h3 className={styles.userTitle}>{poolName}</h3>
             <div className={styles.subTitle}>
               <CopyableAddress
+                id='stakePool'
                 hash={hash}
                 elementId={poolIdNotificationId}
                 onCopyAddress={() => this.props.onCopyAddressTooltip(hash, poolIdNotificationId)}

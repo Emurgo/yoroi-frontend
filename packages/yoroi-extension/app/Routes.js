@@ -177,7 +177,6 @@ export const LazyLoadPromises: Array<() => any> = [
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 
-/* eslint-disable max-len */
 export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
   <Suspense fallback={null}>
     <Switch>

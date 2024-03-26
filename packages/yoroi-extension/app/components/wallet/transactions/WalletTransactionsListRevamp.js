@@ -52,6 +52,7 @@ type Props = {|
   +addressToDisplayString: string => string,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +complexityLevel: ?ComplexityLevelType,
+  id: string,
 |};
 
 @observer
@@ -144,6 +145,8 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
       </div>
     ) : null;
 
+    const baseIdPart = 'wallet:transactions:transactionsList'
+
     return (
       <Box
         sx={{
@@ -151,8 +154,9 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
           padding: '20px 0',
           overflow: 'auto',
         }}
+        id={this.props.id}
       >
-        {transactionsGroups.map(group => (
+        {transactionsGroups.map((group, index) => (
           <Box
             sx={{
               marginBottom: '30px',
@@ -161,8 +165,14 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
               },
             }}
             key={`${this.getTransactionKey(group.transactions)}`}
+            id={baseIdPart + '-transactionsGroup_' + index + '-box'}
           >
-            <Typography component="div" variant="body2" color="grayscale.600">
+            <Typography
+              component="div"
+              variant="body2"
+              color="grayscale.600"
+              id={baseIdPart + ':transactionsGroup_' + index + '-date-text'}
+            >
               {this.localizedDate(group.date)}
             </Typography>
             <Box>
@@ -194,6 +204,8 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
                   onCopyAddressTooltip={onCopyAddressTooltip}
                   addressToDisplayString={this.props.addressToDisplayString}
                   complexityLevel={this.props.complexityLevel}
+                  id={baseIdPart + ':transactionsGroup_' + index}
+                  txIndex={transactionIndex}
                 />
               ))}
             </Box>

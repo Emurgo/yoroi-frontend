@@ -93,6 +93,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
           const notificationElementId = `${address}-${index}`;
           return (
             <CopyableAddress
+              id={'walletRestoreVerifyDialog_' + index}
               hash={address}
               elementId={notificationElementId}
               onCopyAddress={() => onCopyAddressTooltip(address, notificationElementId)}

@@ -32,6 +32,7 @@ type Props = {|
   |},
   setStartDate(Date | null): void,
   setEndDate(Date | null): void,
+  initialId: string,
 |};
 
 @observer
@@ -42,7 +43,7 @@ export default class ExportTransactionDialog extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { date, setStartDate, setEndDate } = this.props;
+    const { date, setStartDate, setEndDate, initialId } = this.props;
 
     const dates = [
       {
@@ -51,6 +52,7 @@ export default class ExportTransactionDialog extends Component<Props> {
         value: date.startDate,
         setDateHandler: setStartDate,
         minDate: undefined,
+        componentId: `${initialId}-startDate-datePicker`,
       },
       {
         id: 2,
@@ -58,12 +60,13 @@ export default class ExportTransactionDialog extends Component<Props> {
         value: date.endDate,
         setDateHandler: setEndDate,
         minDate: date.startDate !== null ? date.startDate : undefined,
+        componentId: `${initialId}-endDate-datePicker`,
       },
     ];
 
     return (
       <LocalizationProvider dateAdapter={AdapterMoment}>
-        {dates.map(({ id, label, value, setDateHandler, minDate }) => (
+        {dates.map(({ id, label, value, setDateHandler, minDate, componentId }) => (
           <DatePicker
             key={id}
             label={intl.formatMessage(label)}
@@ -76,6 +79,7 @@ export default class ExportTransactionDialog extends Component<Props> {
                 helperText: 'MM/DD/YYYY',
               },
             }}
+            className={componentId}
             renderInput={params => {
               return <TextField {...params} sx={{ mb: '24px' }} />;
             }}
