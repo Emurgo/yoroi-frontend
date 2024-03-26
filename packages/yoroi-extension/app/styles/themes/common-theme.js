@@ -18,6 +18,7 @@ export const commonTheme: Object = createTheme({
       '100': '#59B1F4',
     },
     gray: {
+       min: '#ffffff',
       '50': '#F0F3F5',
       '100': '#EAEDF2',
       '200': '#DCE0E9',
@@ -28,6 +29,7 @@ export const commonTheme: Object = createTheme({
       '700': '#4A5065',
       '800': '#383E54',
       '900': '#242838',
+       max: '#000000',
     },
     background: {
       overlay: '#060d23cc', // dialogs,
