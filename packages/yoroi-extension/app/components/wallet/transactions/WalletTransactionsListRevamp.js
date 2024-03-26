@@ -218,6 +218,7 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
             disabled={isLoadingTransactions}
             onClick={onLoadMore}
             sx={{ margin: '30px auto', width: '400px', display: 'block' }}
+            id={baseIdPart + '-showMoreTxs-button'}
           >
             {intl.formatMessage(messages.showMoreTransactionsButtonLabel)}
           </Button>
