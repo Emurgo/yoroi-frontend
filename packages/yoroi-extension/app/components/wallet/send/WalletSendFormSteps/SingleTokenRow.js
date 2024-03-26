@@ -1,5 +1,5 @@
 // @flow
-import { Component, } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
 import styles from './SingleTokenRow.scss';
 import { ReactComponent as NoAssetLogo } from '../../../../assets/images/assets-page/asset-no.inline.svg';
@@ -80,7 +80,6 @@ export default class SingleTokenRow extends Component<Props,State> {
     const displayAmount = token.amount
       ? splitAmount(new BigNumber(token.amount), numberOfDecimals).join('')
       : '0';
-    console.log('STATETETATEA',this.state.isInputFocused)
 
     return (
       <div className={styles.component}>
