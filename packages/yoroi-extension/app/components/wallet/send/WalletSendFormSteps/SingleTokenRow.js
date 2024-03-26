@@ -29,16 +29,29 @@ type Props = {|
   +isValidAmount: ($ReadOnly<TokenRow>) => boolean,
 |};
 
+type State = {|
+  isInputFocused: boolean,
+|};
+
 const messages = defineMessages({
   notEnoughMoneyToSendError: {
     id: 'api.errors.NotEnoughMoneyToSendError',
-    defaultMessage: '!!!Not enough funds to make this transaction.',
+    defaultMessage: '!!!Not enough balance',
   },
 });
-export default class SingleTokenRow extends Component<Props> {
+export default class SingleTokenRow extends Component<Props,State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
+
+
+  constructor(props: Props) {
+    super(props);
+    // eslint-disable-next-line react/state-in-constructor
+    this.state = {
+      isInputFocused: false,
+    };
+  }
 
   getNumDecimals(): number {
     return this.props.token.info.Metadata.numberOfDecimals;
@@ -95,7 +108,10 @@ export default class SingleTokenRow extends Component<Props> {
           <Box
             border="2px solid"
             borderColor="grayscale.400"
-            className={classnames([styles.amountWrapper, !isValid && styles.amountError])}
+            className={
+              classnames([styles.amountWrapper,
+                !isValid && styles.amountError,this.state.isInputFocused && styles.inputFocused])
+            }
           >
             <div className={styles.amountTokenName}>
               <div className={styles.logo}>
@@ -117,6 +133,12 @@ export default class SingleTokenRow extends Component<Props> {
                 decimalPlaces={this.getNumDecimals()}
                 amountFieldRevamp
                 placeholder={displayAmount}
+                onFocus={() => {
+                  this.setState({ isInputFocused: true })
+                }}
+                onBlur={() => {
+                  this.setState({ isInputFocused: false })
+                }}
               />
             </div>
             <button

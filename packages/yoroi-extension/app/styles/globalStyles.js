@@ -132,6 +132,8 @@ export function getMainYoroiPalette(theme: Object): { [string]: string | number 
     '--yoroi-palette-gray-900': (theme.palette.grey ? theme.palette.grey : theme.palette.grayscale)[
       '900'
     ],
+    '--yoroi-palette-gray-max': theme.palette.common.black,
+    '--yoroi-palette-gray-min': theme.palette.common.white,
     '--yoroi-palette-background-overlay': theme.palette.background.overlay,
 
     '--yoroi-palette-tx-status-pending-background': theme.palette.txStatus?.pending.background,
