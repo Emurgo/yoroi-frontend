@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { observable, runInAction } from 'mobx';
 import { intlShape } from 'react-intl';
 
-import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import DelegationSendForm from '../../../components/wallet/send/DelegationSendForm';
 import LocalizableError from '../../../i18n/LocalizableError';

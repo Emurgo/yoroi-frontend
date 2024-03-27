@@ -32,7 +32,7 @@ import type {
   TreeInsertStart, TreeInsert,
   TreeResultStart, TreeResult,
   InsertPath,
-} from '../utils';
+} from '../utils.types';
 
 export class AddDerivationTree {
   static ownTables: {||} = Object.freeze({});

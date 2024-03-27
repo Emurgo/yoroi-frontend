@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import type { Notification } from '../../../types/notificationType';
+import type { Notification } from '../../../types/notification.types';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
@@ -132,6 +132,7 @@ export default class StandardHeaderRevamp extends Component<Props> {
           <Box width="100%">
             <Box mb="8px">
               <CopyableAddress
+                id='standartHeaderRevamp'
                 darkVariant
                 sx={{
                   justifyContent: 'flex-start',

@@ -1,6 +1,6 @@
 // @flow
 
-import '../../lib/test-config';
+import '../../lib/test-config.forTests';
 import BigNumber from 'bignumber.js';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import {

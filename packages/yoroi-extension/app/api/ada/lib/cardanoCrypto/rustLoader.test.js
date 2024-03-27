@@ -1,5 +1,5 @@
 // @flow
-import '../test-config';
+import '../test-config.forTests';
 import { RustModule } from './rustLoader';
 import { bytesToHex } from '../../../../coreUtils';
 

@@ -33,7 +33,7 @@ import type { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/she
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
 import { isLedgerNanoWallet, isTrezorTWallet, } from '../../api/ada/lib/storage/models/ConceptualWallet';
 import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import type { IFetcher } from '../../api/ada/lib/state-fetch/IFetcher';
+import type { IFetcher } from '../../api/ada/lib/state-fetch/IFetcher.types';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import BigNumber from 'bignumber.js';
 import { action, computed, observable, runInAction, toJS } from 'mobx';

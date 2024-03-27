@@ -7,7 +7,7 @@ import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
 import { defineMessages, intlShape } from 'react-intl';
 import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
-import type { StoresAndActionsProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';

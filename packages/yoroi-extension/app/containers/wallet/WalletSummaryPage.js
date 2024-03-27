@@ -6,13 +6,13 @@ import { observable, runInAction } from 'mobx';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { FormattedHTMLMessage, intlShape } from 'react-intl';
 import { ROUTES } from '../../routes-config';
-import type { Notification } from '../../types/notificationType';
+import type { Notification } from '../../types/notification.types';
 import NotificationMessage from '../../components/widgets/NotificationMessage';
 import Dialog from '../../components/widgets/Dialog';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import globalMessages from '../../i18n/global-messages';
 import { ReactComponent as successIcon } from '../../assets/images/success-small.inline.svg';
-import type { StoresAndActionsProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import WalletTransactionsList from '../../components/wallet/transactions/WalletTransactionsList';
 import WalletTransactionsListRevamp from '../../components/wallet/transactions/WalletTransactionsListRevamp';
 import WalletSummary from '../../components/wallet/summary/WalletSummary';
@@ -168,6 +168,7 @@ class WalletSummaryPage extends Component<AllProps> {
               addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())
             }
             complexityLevel={this.props.stores.profile.selectedComplexityLevel}
+            id='wallet:transaction-transactionsList-box'
           />
         );
       } else {

@@ -13,7 +13,7 @@ import NavBarBack from '../../components/topbar/NavBarBack';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { ROUTES } from '../../routes-config';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { StoresAndActionsProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { allCategories, allSubcategoriesRevamp } from '../../stores/stateless/topbarCategories';
 import { withLayout } from '../../styles/context/layout';

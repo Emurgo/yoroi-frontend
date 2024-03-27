@@ -7,7 +7,7 @@ import { defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import globalMessages from '../i18n/global-messages';
 
-export type Label = {|
+type Label = {|
   +label: string,
 |}
 
@@ -28,7 +28,7 @@ export const AddressSubgroup = Object.freeze({
   external: 'external',
   mangled: 'mangled',
 });
-export type AddressSubgroupKind = $Values<typeof AddressSubgroup>;
+type AddressSubgroupKind = $Values<typeof AddressSubgroup>;
 export const addressSubgroupName: $ObjMap<typeof AddressSubgroup, ToMessage> = Object.freeze({
   all: globalMessages.allLabel,
   ...defineMessages({
@@ -72,7 +72,7 @@ const commonDescriptions = defineMessages({
     defaultMessage: '!!!Addresses containing only a spending key and no staking key',
   },
 });
-export type AddressGroupKind = $Values<typeof AddressGroupTypes>;
+type AddressGroupKind = $Values<typeof AddressGroupTypes>;
 export const addressGroupsTooltip: $ObjMap<typeof AddressGroupTypes, ToMessage> = Object.freeze({
   group: commonDescriptions.group,
   base: commonDescriptions.group,

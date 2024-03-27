@@ -29,7 +29,7 @@ export function urlResolveForIpfsAndCorsproxy<T: ?string>(url: T): T {
   // $FlowIgnore
   return maybe(url, (u: string): string => u.startsWith('ipfs://')
     ? u.replace('ipfs://', 'https://ipfs.io/ipfs/')
-    : `https://corsproxy.io/${u}`);
+    : `https://corsproxy.io/?${u}`);
 }
 
 /**

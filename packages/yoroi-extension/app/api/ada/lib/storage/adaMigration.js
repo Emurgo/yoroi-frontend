@@ -25,7 +25,7 @@ import { asGetAllUtxos, asHasLevels, } from './models/PublicDeriver/traits';
 import { ConceptualWallet, isLedgerNanoWallet, } from './models/ConceptualWallet/index';
 import { loadWalletsFromStorage } from './models/load';
 import environment from '../../../../environment';
-import { KeyKind } from '../../../common/lib/crypto/keys/types';
+import { KeyKind } from '../cardanoCrypto/keys/types';
 import { getLocalItem, removeLocalItem, } from '../../../localStorage/primitives';
 import { isCardanoHaskell, networks } from './database/prepackaged/networks';
 import { getAllSchemaTables, raii, } from './database/utils';

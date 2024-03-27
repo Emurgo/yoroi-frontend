@@ -7,7 +7,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { connectorMessages } from '../../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import CopyableAddress from '../../../../components/widgets/CopyableAddress';
-import type { Notification } from '../../../../types/notificationType';
+import type { Notification } from '../../../../types/notification.types';
 import { splitAmount, truncateAddressShort, truncateToken } from '../../../../utils/formatters';
 import type { TokenLookupKey, TokenEntry } from '../../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
@@ -144,6 +144,7 @@ class CardanoUtxoDetails extends Component<Props> {
         id="addressRow"
       >
         <CopyableAddress
+          id={'utxoDetails_' + request.addressIndex}
           hash={addressHash}
           elementId={notificationElementId}
           onCopyAddress={() =>
