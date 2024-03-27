@@ -11,7 +11,7 @@ export type AssetAmount = {|
   kind: string,
   ticker: string,
   amount: string,
-  address: string,
+  address?: string,
 |};
 
 export type PriceImpact = {|

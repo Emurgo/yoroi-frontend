@@ -19,6 +19,7 @@ import { asAddressedUtxo, cardanoUtxoHexFromRemoteFormat } from '../../api/ada/t
 import { genLookupOrFail, getTokenIdentifierIfExists, getTokenName } from '../stateless/tokenHelpers';
 import { splitAmount, truncateToken } from '../../utils/formatters';
 import adaLogo from '../../containers/swap/mockAssets/ada.inline.svg';
+import type { AssetAmount } from '../../components/swap/types';
 
 const FRONTEND_FEE_ADDRESS_MAINNET = 'addr1q9ry6jfdgm0lcrtfpgwrgxg7qfahv80jlghhrthy6w8hmyjuw9ngccy937pm7yw0jjnxasm7hzxjrf8rzkqcj26788lqws5fke';
 const FRONTEND_FEE_ADDRESS_PREPROD = 'addr_test1qrgpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqzp57km';
@@ -38,7 +39,7 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
     this.limitOrderDisplayValue = '';
   }
 
-  @computed get assets(): Array<> {
+  @computed get assets(): Array<AssetAmount> {
     const spendableBalance = this.stores.transactions?.balance;
     if (spendableBalance == null) return [];
     const getTokenInfo = genLookupOrFail(this.stores.tokenInfoStore?.tokenInfo);
@@ -58,16 +59,12 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
           id,
           group: token.info?.Metadata.policyId,
           fingerprint: getTokenIdentifierIfExists(token.info) ?? '',
-          name: id == null
-            ? token.info?.Metadata.ticker
-            : truncateToken(getTokenName(token.info)),
+          name: truncateToken(getTokenName(token.info)),
           decimals: token.info?.Metadata.numberOfDecimals,
           ticker: token.info?.Metadata.ticker ?? truncateToken(getTokenName(token.info)),
           kind: token.info?.IsNFT ? 'nft' : 'ft',
           amount: [beforeDecimal, afterDecimal].join(''),
-          amountForSorting: shiftedAmount,
           description: '',
-          metadatas: token.info?.Metadata,
           image: id ? '' : adaLogo,
         };
       });
