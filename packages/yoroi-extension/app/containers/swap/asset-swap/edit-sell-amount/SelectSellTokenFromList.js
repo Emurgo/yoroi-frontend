@@ -17,13 +17,10 @@ export default function SelectSellTokenFromList({ store, onClose, onTokenInfoCha
   const { onlyVerifiedTokens } = useSwapTokensOnlyVerified();
   const assets = store.assets;
   const walletVerifiedAssets = useMemo(() => {
-    return assets
-      .map(a => {
-        const vft = onlyVerifiedTokens.find(ovt => ovt.fingerprint === a.fingerprint);
-        if (a.id === '' || vft) return { ...a, ...vft };
-        return undefined;
-      })
-      .filter(Boolean);
+    return assets.map(a => {
+      const vft = onlyVerifiedTokens.find(ovt => ovt.fingerprint === a.fingerprint);
+      return a.id === '' || vft ? { ...a, ...vft } : undefined;
+    }).filter(Boolean);
   }, [onlyVerifiedTokens, assets]);
 
   const { orderData, resetQuantities } = useSwap();

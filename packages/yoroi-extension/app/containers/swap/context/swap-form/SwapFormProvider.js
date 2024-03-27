@@ -5,9 +5,9 @@ import type { SwapFormAction, SwapFormState } from './types';
 import { StateWrap, SwapFormActionTypeValues } from './types';
 import type { AssetAmount } from '../../../../components/swap/types';
 import { useSwap } from '@yoroi/swap';
-// import { Quantities } from '../../../../utils/quantities';
 import Context from './context';
 import { Quantities } from '../../../../utils/quantities';
+import SwapStore from '../../../../stores/ada/SwapStore';
 
 // const PRECISION = 14;
 
@@ -36,18 +36,20 @@ export const defaultSwapFormState: SwapFormState = Object.freeze({
 });
 
 type Props = {|
+  swapStore: SwapStore,
   children: any,
 |};
 
 const numberLocale = { decimalSeparator: '.' };
 
-export default function SwapFormProvider({ children }: Props): Node {
+export default function SwapFormProvider({ swapStore, children }: Props): Node {
 
   const {
     orderData,
     resetState,
     buyQuantityChanged,
     sellQuantityChanged,
+    sellTokenInfoChanged,
     switchTokens,
     resetQuantities,
   } = useSwap();
@@ -155,7 +157,20 @@ export default function SwapFormProvider({ children }: Props): Node {
   };
 
   // on mount
-  useEffect(() => actions.resetSwapForm(), []);
+  useEffect(() => {
+    // RESET
+    actions.resetSwapForm();
+    // SELECT DEFAULT SELL
+    const assets = swapStore.assets;
+    const defaultAsset = assets[0];
+    if (defaultAsset != null) {
+      actions.sellTouched({ ...defaultAsset });
+      sellTokenInfoChanged({
+        id: defaultAsset.id,
+        decimals: defaultAsset.decimals,
+      });
+    }
+  }, []);
   // on unmount
   useEffect(() => () => actions.resetSwapForm(), []);
 

@@ -234,7 +234,7 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
   };
 
   return (
-    <SwapFormProvider>
+    <SwapFormProvider swapStore={props.stores.substores.ada.swapStore}>
       <Box display="flex" flexDirection="column" height="100%">
         <Box sx={{ flexGrow: '1', overflowY: 'auto' }}>
           {step === 0 && (
