@@ -3,16 +3,17 @@ import { useMemo, type Node } from 'react';
 import { useSwap, useSwapTokensOnlyVerified } from '@yoroi/swap';
 import SelectAssetDialog from '../../../../components/swap/SelectAssetDialog';
 import { useSwapForm } from '../../context/swap-form';
-import { useAssets } from '../../hooks';
 import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
+import SwapStore from '../../../../stores/ada/SwapStore';
 
 type Props = {|
+  store: SwapStore,
   onClose(): void,
   onTokenInfoChanged: * => void,
   defaultTokenInfo: RemoteTokenInfo,
 |};
 
-export default function SelectBuyTokenFromList({ onClose, onTokenInfoChanged, defaultTokenInfo }: Props): Node {
+export default function SelectBuyTokenFromList({ store, onClose, onTokenInfoChanged, defaultTokenInfo }: Props): Node {
   const {
     sellQuantity: { isTouched: isSellTouched },
     buyQuantity: { isTouched: isBuyTouched },
@@ -23,7 +24,7 @@ export default function SelectBuyTokenFromList({ onClose, onTokenInfoChanged, de
   } = useSwapForm();
 
   const { onlyVerifiedTokens } = useSwapTokensOnlyVerified();
-  const walletAssets = useAssets();
+  const walletAssets = store.assets;
 
   const walletVerifiedAssets = useMemo(() => {
     const isSellingPt = sellTokenInfo.id === '';

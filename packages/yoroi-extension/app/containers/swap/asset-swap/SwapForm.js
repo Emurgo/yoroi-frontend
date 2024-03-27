@@ -1,5 +1,5 @@
 // @flow
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import { ReactComponent as SwitchIcon } from '../../../assets/images/revamp/icons/switch.inline.svg';
 import { ReactComponent as InfoIcon } from '../../../assets/images/revamp/icons/info.inline.svg';
@@ -40,6 +40,7 @@ export default function SwapForm({
   const {
     resetSwapForm,
     switchTokens,
+    sellTouched,
   } = useSwapForm();
 
   const {
@@ -49,6 +50,18 @@ export default function SwapForm({
     sellTokenInfoChanged,
     buyTokenInfoChanged,
   } = useSwap();
+
+  // useEffect(() => {
+  //   console.log('on assets > effect > recalc');
+  //   const defaultAsset = assets.find(a => a.id === '');
+  //   if (defaultAsset != null) {
+  //     sellTouched(defaultAsset);
+  //     sellTokenInfoChanged({
+  //       id: defaultAsset.id,
+  //       decimals: defaultAsset.decimals,
+  //     });
+  //   }
+  // }, []);
 
   useAsyncPools(sell.tokenId, buy.tokenId)
     .then(() => null)
@@ -145,6 +158,7 @@ export default function SwapForm({
       {/* Dialogs */}
       {openedDialog === 'from' && (
         <SelectSellTokenFromList
+          store={swapStore}
           onClose={() => setOpenedDialog('')}
           onTokenInfoChanged={val => {
             swapStore.resetLimitOrderDisplayValue();
@@ -155,6 +169,7 @@ export default function SwapForm({
       )}
       {openedDialog === 'to' && (
         <SelectBuyTokenFromList
+          store={swapStore}
           onClose={() => setOpenedDialog('')}
           onTokenInfoChanged={val => {
             swapStore.resetLimitOrderDisplayValue();

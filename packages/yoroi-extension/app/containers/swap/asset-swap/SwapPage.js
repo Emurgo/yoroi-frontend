@@ -212,7 +212,9 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
     setStep(s => s + 1);
   };
 
-  const onRemoteOrderDataResolved: any => Promise<void> = async ({ contractAddress, datum }) => {
+  const onRemoteOrderDataResolved: any => Promise<void> = async (x) => {
+    console.log('> onRemoteOrderDataResolved', x);
+    const { contractAddress, datum } = x;
     // creating tx
     if (selectedPoolCalculation == null) {
       throw new Error('Incorrect state. Pool calculations are not available to prepare the transaction')
