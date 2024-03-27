@@ -8,7 +8,7 @@ import styles from './LoadingSpinner.scss';
 type Props = {|
   small?: true,
   light?: boolean,
-  id: string,
+  id?: string,
 |};
 
 @observer
@@ -31,6 +31,6 @@ export default class LoadingSpinner extends Component<Props> {
         ? styles.smallSize
         : styles.standardSize,
     ]);
-    return <div className={componentClasses} id={this.props.id + '-loadingSpinner-component'} ref={(div) => { this.root = div; }} />;
+    return <div className={componentClasses} id={this.props.id && this.props.id + '-loadingSpinner-component'} ref={(div) => { this.root = div; }} />;
   }
 }
