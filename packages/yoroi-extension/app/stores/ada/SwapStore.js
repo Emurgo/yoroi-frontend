@@ -85,7 +85,7 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
   createUnsignedSwapTx: ({|
     wallet: PublicDeriver<>,
     contractAddress: string,
-    datum: string,
+    datumHash: string,
     buy: {| tokenId: string, quantity: string |},
     sell: {| tokenId: string, quantity: string |},
     feFees: {| tokenId: string, quantity: string |},
@@ -94,7 +94,7 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
   |}) => Promise<HaskellShelleyTxSignRequest> = ({
     wallet,
     contractAddress,
-    datum,
+    datumHash,
     buy,
     sell,
     feFees,
@@ -125,7 +125,7 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
     entries.push({
       address: contractAddress,
       amount: createSwapOrderAmount({ wallet, sell, ptFees }),
-      data: datum,
+      dataHash: datumHash,
     });
     if (!Quantities.isZero(feFees.quantity)) {
       entries.push({
