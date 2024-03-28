@@ -43,7 +43,6 @@ type Props = {|
 const numberLocale = { decimalSeparator: '.' };
 
 export default function SwapFormProvider({ swapStore, children }: Props): Node {
-
   const {
     orderData,
     resetState,
@@ -181,7 +180,7 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
 
   const baseSwapFieldChangeHandler = (
     tokenInfo: any,
-    handler: ({| input: string, quantity: string |}) => void,
+    handler: ({| input: string, quantity: string |}) => void
   ) => (text: string) => {
     if (tokenInfo.tokenId === '') {
       // empty input
@@ -201,7 +200,11 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
     const sellAvailableAmount = swapFormState.sellTokenInfo.amount ?? '0';
     if (quantity !== '' && sellAvailableAmount !== '') {
       const decimals = swapFormState.sellTokenInfo.decimals ?? 0;
-      const [, availableQuantity] = Quantities.parseFromText(sellAvailableAmount, decimals, numberLocale);
+      const [, availableQuantity] = Quantities.parseFromText(
+        sellAvailableAmount,
+        decimals,
+        numberLocale
+      );
       if (Quantities.isGreaterThan(quantity, availableQuantity)) {
         actions.sellAmountErrorChanged('Not enough balance');
       }
@@ -217,12 +220,12 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
 
   const onChangeSellQuantity = useCallback(
     baseSwapFieldChangeHandler(swapFormState.sellTokenInfo, sellUpdateHandler),
-    [sellQuantityChanged, actions, clearErrors],
+    [sellQuantityChanged, actions, clearErrors]
   );
 
   const onChangeBuyQuantity = useCallback(
     baseSwapFieldChangeHandler(swapFormState.buyTokenInfo, buyUpdateHandler),
-    [buyQuantityChanged, actions, clearErrors],
+    [buyQuantityChanged, actions, clearErrors]
   );
 
   const sellFocusState = StateWrap<boolean>(useState(false));

@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import { useEffect, useState, } from 'react';
 import { Box, Button } from '@mui/material';
-import SwapForm from './SwapForm';
+import {CreateSwapOrder} from './CreateSwapOrder';
 import SwapConfirmationStep from './ConfirmationStep';
 import TxSubmittedStep from './TxSubmittedStep';
 import LimitOrderWarningDialog from '../../../components/swap/LimitOrderWarningDialog';
@@ -236,7 +236,7 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
       <Box display="flex" flexDirection="column" height="100%">
         <Box sx={{ flexGrow: '1', overflowY: 'auto' }}>
           {step === 0 && (
-            <SwapForm
+            <CreateSwapOrder
               swapStore={props.stores.substores.ada.swapStore}
               slippageValue={slippageValue}
               onSetNewSlippage={onSetNewSlippage}
@@ -276,6 +276,17 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
             borderTop="1px solid"
             borderColor="grayscale.200"
           >
+            <Button
+              onClick={handleNextStep}
+              sx={{ minWidth: '128px', minHeight: '48px' }}
+              variant="primary"
+              disabled={!isSwapEnabled || isButtonLoader}
+            >
+              {
+                (isButtonLoader && <LoadingSpinner />)
+                || (step === 0 ? 'Swap' : 'Confirm')
+              }
+            </Button>
             <Button
               onClick={handleNextStep}
               sx={{ minWidth: '128px', minHeight: '48px' }}
