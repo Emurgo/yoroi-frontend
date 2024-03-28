@@ -167,11 +167,12 @@ export type IGetAllUtxoAddressesFunc = (
   body: IGetAllUtxoAddressesRequest
 ) => Promise<IGetAllUtxoAddressesResponse>;
 export type IGetAllUtxosRequest = void;
-export type IGetAllUtxosResponse = Array<{|
+export type QueriedUtxo = {|
   output: $ReadOnly<GetAllUtxosOutput>;
   ...Addressing,
   ...Address,
-|}>;
+|};
+export type IGetAllUtxosResponse = Array<QueriedUtxo>;
 export type IGetAllUtxosFunc = (
   body: IGetAllUtxosRequest
 ) => Promise<IGetAllUtxosResponse>;

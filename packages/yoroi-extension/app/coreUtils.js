@@ -64,10 +64,18 @@ export function listValues<T>(obj: { [any]: T }): T[] {
 /**
  * Returns a sorted copy
  */
-export function sorted<T>(arr: T[]): T[] {
+export function sorted<T>(arr: T[], f?: (a: T, b: T) => number): T[] {
   const res = [...arr];
-  res.sort();
+  res.sort(f);
   return res;
+}
+
+export function first<T>(arr: T[]): ?T {
+  return arr[0];
+}
+
+export function last<T>(arr: T[]): ?T {
+  return arr[arr.length - 1];
 }
 
 /**
