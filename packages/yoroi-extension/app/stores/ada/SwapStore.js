@@ -27,6 +27,7 @@ import {
 import { splitAmount, truncateToken } from '../../utils/formatters';
 import adaLogo from '../../containers/swap/mockAssets/ada.inline.svg';
 import type { AssetAmount } from '../../components/swap/types';
+import type { QueriedUtxo } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 const FRONTEND_FEE_ADDRESS_MAINNET =
   'addr1q9ry6jfdgm0lcrtfpgwrgxg7qfahv80jlghhrthy6w8hmyjuw9ngccy937pm7yw0jjnxasm7hzxjrf8rzkqcj26788lqws5fke';
@@ -88,14 +89,9 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
   getUtxoHexForCancelCollateral: ({| wallet: PublicDeriver<> |}) => Promise<string> = async ({
     wallet,
   }) => {
-    const withUtxos =
-      asGetAllUtxos(wallet) ??
-      fail(`${nameof(this.createUnsignedSwapTx)} missing utxo functionality`);
-    const allUtxos = await withUtxos.getAllUtxos();
-    if (allUtxos.length === 0) {
-      fail('No utxo available at all in the wallet!');
-    }
-    const utxo = allUtxos[0];
+    const utxo: QueriedUtxo = await this.stores.substores.ada.wallets.pickCollateralUtxo({
+      wallet,
+    });
     const [addressedUtxo] = asAddressedUtxo([utxo]);
     return cardanoUtxoHexFromRemoteFormat(cast(addressedUtxo));
   };
