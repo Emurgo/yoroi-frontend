@@ -90,7 +90,6 @@ export type SendMoneyRequest = Request<DeferredCall<{| txId: string |}>>;
  * dealing with wallets / accounts.
  */
 export default class WalletStore extends Store<StoresMap, ActionsMap> {
-  WALLET_REFRESH_INTERVAL: number = environment.getWalletRefreshInterval();
   ON_VISIBLE_DEBOUNCE_WAIT: number = 1000;
 
   @observable initialSyncingWalletIds: Array<number> = [];
@@ -152,11 +151,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     const { wallets } = this.actions;
     wallets.unselectWallet.listen(this._unsetActiveWallet);
     wallets.setActiveWallet.listen(this._setActiveWallet);
-    setInterval(this._pollRefresh, this.WALLET_REFRESH_INTERVAL);
-    document.addEventListener(
-      'visibilitychange',
-      debounce(_e => this._pollRefresh(), this.ON_VISIBLE_DEBOUNCE_WAIT)
-    );
   }
 
   @action
@@ -188,9 +182,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       this.actions.dialogs.closeActiveDialog.trigger();
       this.initialSyncingWalletIds.push(newWallet.publicDerivers[0].getPublicDeriverId());
       this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
-      for (const publicDeriver of newWithCachedData) {
-        this._startParallelRefreshForWallet(publicDeriver);
-      }
     });
   };
 
@@ -227,26 +218,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     return groupWallets(this.publicDerivers);
   }
 
-  refreshWalletFromRemote: (PublicDeriver<>) => Promise<void> = async publicDeriver => {
-    try {
-      await this.stores.transactions.refreshTransactionData({
-        publicDeriver,
-        isLocalRequest: false,
-      });
-      await this.stores.addresses.refreshAddressesFromDb(publicDeriver);
-    } catch (error) {
-      Logger.error(
-        `${nameof(WalletStore)}::${nameof(this.refreshWalletFromRemote)} ` + stringifyError(error)
-      );
-      throw error;
-    } finally {
-      runInAction(() => {
-        // $FlowFixMe[prop-missing] this is an mobx obervable.array so there is a remove method
-        this.initialSyncingWalletIds.remove(publicDeriver.getPublicDeriverId());
-      });
-    }
-  };
-
   refreshWalletFromLocalOnLaunch: (PublicDeriver<>) => Promise<void> = async publicDeriver => {
     try {
       await this.stores.transactions.refreshTransactionData({
@@ -279,7 +250,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       this.publicDerivers.push(withCache);
       this.initialSyncingWalletIds.push(publicDeriver.getPublicDeriverId());
     });
-    this._startParallelRefreshForWallet(withCache);
   };
 
   /** Make all API calls required to setup/update wallet */
@@ -321,21 +291,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     setTimeout(async () => {
       await Promise.all(newWithCachedData
         .map(w => this.refreshWalletFromLocalOnLaunch(w)));
-      // This should correctly handle both states of `paralletSync`, both
-      // initially and when it changes.
-      // The initial case is straightforward.
-      // When change happens, i.e. when the action fires, the value of `parallelSync`
-      // has already been changed, so the new invocation of `_startRefreshAllWallets`
-      // should choose the correct mode. And the currently running polling loops
-      // (`_refreshAllWalletsSerial` for serial syncing,
-      // or `_startParallelRefreshForWallet` for parallel syncing)  should terminate
-      // when they see the `parallelSync` value change.
-      // There is no need to handle muliple simultaneous refreshing of one
-      // wallet because the TransactionStore ensures it couldn't happen.
-      this._startRefreshAllWallets();
-      this.actions.serverConnection.parallelSyncStateChange.listen(() => {
-        this._startRefreshAllWallets();
-      });
     }, 50); // let the UI render first so that the loading process is perceived faster
   };
 
@@ -361,8 +316,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     this.selected = wallet;
     // Cache select wallet
     this.api.localStorage.setSelectedWalletId(wallet.getPublicDeriverId());
-    // do not await on purpose since the UI will handle adding loaders while refresh is happening
-    this.refreshWalletFromRemote(wallet);
   };
 
   getLastSelectedWallet: void => ?PublicDeriver<> = () => {
@@ -382,56 +335,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     const isRootRoute = matchRoute(ROUTES.WALLETS.ROOT, currentRoute) !== false;
     return isRootRoute;
   }
-
-  _pollRefresh: void => Promise<void> = async () => {
-    // Do not update if screen not active
-    // TODO: use visibilityState instead
-    // Also no need to update if we are in parallel sync mode
-    if (!document.hidden && !this.stores.serverConnectionStore.parallelSync) {
-      const selected = this.selected;
-      if (selected) {
-        // note: don't need to await since UI will handle this
-        this.refreshWalletFromRemote(selected);
-      }
-    }
-  };
-
-  _startRefreshAllWallets: void => Promise<void> = async () => {
-    if (this.stores.serverConnectionStore.parallelSync) {
-      for (const publicDeriver of this.publicDerivers) {
-        this._startParallelRefreshForWallet(publicDeriver);
-      }
-    } else {
-      this._refreshAllWalletsSerial();
-    }
-  };
-  _refreshAllWalletsSerial: void => Promise<void> = async () => {
-    for (const publicDeriver of this.publicDerivers) {
-      if (this.stores.serverConnectionStore.parallelSync) {
-        return;
-      }
-      if (this.selected !== publicDeriver) {
-        try {
-          await this.refreshWalletFromRemote(publicDeriver);
-        } catch {
-          // ignore error
-        }
-      }
-    }
-    setTimeout(this._refreshAllWalletsSerial, this.WALLET_REFRESH_INTERVAL);
-  };
-  _startParallelRefreshForWallet: (PublicDeriver<>) => Promise<void> = async publicDeriver => {
-    if (!this.stores.serverConnectionStore.parallelSync) {
-      return;
-    }
-
-    await this.refreshWalletFromRemote(publicDeriver);
-
-    setTimeout(
-      this._startParallelRefreshForWallet.bind(this, publicDeriver),
-      this.WALLET_REFRESH_INTERVAL
-    );
-  };
 
   // =================== NOTIFICATION ==================== //
   showLedgerWalletIntegratedNotification: void => void = (): void => {

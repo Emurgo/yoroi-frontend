@@ -223,6 +223,11 @@ export type GetUtxosRequest = {|
   select: string[],
 |}
 
+export type GetDb = {|
+  type: 'get-db',
+  tabId: number,
+|};
+
 export type TxSignWindowRetrieveData = {|
   type: 'tx_sign_window_retrieve_data',
 |}

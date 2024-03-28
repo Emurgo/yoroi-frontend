@@ -14,6 +14,7 @@ import type {
   GetConnectedSitesData,
   GetConnectionProtocolData,
   GetUtxosRequest,
+  GetDb,
   PendingSignData,
   RemoveWalletFromWhitelistData,
   SigningMessage,
@@ -63,10 +64,6 @@ import LocalStorageApi, {
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { Logger, stringifyError } from '../../app/utils/logging';
 import type { lf$Database, } from 'lovefield';
-import { schema } from 'lovefield';
-import { copyDbToMemory, loadLovefieldDB, } from '../../app/api/ada/lib/storage/database/index';
-import { migrateNoRefresh } from '../../app/api/common/migration';
-import { Mutex, } from 'async-mutex';
 import {
   getCardanoHaskellBaseConfig,
   isCardanoHaskell
@@ -80,6 +77,7 @@ import type { ForeignUtxoFetcher } from '../../app/connector/stores/ConnectorSto
 import { find721metadata } from '../../app/utils/nftMetadata';
 import { hexToBytes } from '../../app/coreUtils';
 import { mergeWitnessSets } from './connector/utils';
+import { getDbCopy, syncWallet } from './state';
 
 /*::
 declare var chrome;
@@ -262,56 +260,14 @@ const popupProps: {|width: number, height: number, focused: boolean, type: strin
   type: 'popup',
 };
 
-/**
-* need to make sure JS tasks run in an order where no two of them have different DB instances
-* Otherwise, caching logic may make things go wrong
-* TODO: this doesn't help if the Yoroi Extension or a Web Worker makes a query during this execution
-*/
-const dbAccessMutex = new Mutex();
-
-/**
- * Performs wallet version migration if needed
- * Then calls the continuation with storage objects
- * Note: the DB returns is an IN-MEMORY COPY of the real DB
- * This is to avoid DB modifications corrupting the state of the Yoroi Extension
- * If the Yoroi Extension is running at the same time
- */
 async function withDb<T>(
   continuation: (lf$Database, LocalStorageApi) => Promise<T>
 ): Promise<T> {
-  return await dbAccessMutex.runExclusive(async () => {
-    // note: lovefield internally caches queries an optimization
-    // this doesn't work for us because the DB can change under our feet through the Yoroi Extension
-    // so instead, we create the DB, use it, then close the connection
-    const db = await loadLovefieldDB(schema.DataStoreType.INDEXED_DB);
-    let inMemoryDb: void | lf$Database = undefined;
-    try {
-      // process migration here before anything involving storage is cached
-      // as dApp can't easily recover from refreshing a page to wipe cache after storage migration
-      const localStorageApi = new LocalStorageApi();
-      // note: it's safe that this call modifies the DB that is shared with the main extension
-      // since if a migration actually needs to be processed,
-      // it means the extension hasn't been launched since the Yoroi version updated
-      // which means it's not running at the same time as the connector
-      await migrateNoRefresh({
-        localStorageApi,
-        persistentDb: db,
-        currVersion: environment.getVersion(),
-      })
-
-      // note: we can't close the persistent DB connection here after copying it
-      // since lovefield closes some shared workers causing the in-memory connection to fail as well
-      inMemoryDb = await copyDbToMemory(db);
-
-      return await continuation(inMemoryDb, localStorageApi);
-    } catch (e) {
-      Logger.error(`DB continuation call failed due to internal error: ${e}\n${e.stack}`);
-      throw e;
-    } finally {
-      inMemoryDb?.close();
-      db.close();
-    }
-  });
+  const localStorageApi = new LocalStorageApi();
+  const db = await getDbCopy();
+  return await continuation(db, localStorageApi);
+  // note: calling close() "is not mandatory nor recommended":
+  // https://github.com/google/lovefield/blob/master/docs/spec/03_life_of_db.md
 }
 
 async function createFetcher(
@@ -338,53 +294,6 @@ async function getCardanoStateFetcher(
   localStorageApi: LocalStorageApi,
 ): Promise<CardanoIFetcher> {
   return new CardanoBatchedFetcher(await createFetcher(CardanoRemoteFetcher, localStorageApi));
-}
-
-// This is a temporary workaround to DB duplicate key constraint violations
-// that is happening when multiple DBs are loaded at the same time, or possibly
-// this one being loaded while Yoroi's main App is doing DB operations.
-// Promise<void>
-let syncing: ?boolean = null;
-async function syncWallet(
-  wallet: PublicDeriver<>,
-  localStorageApi: LocalStorageApi,
-): Promise<void> {
-  const isCardano = isCardanoHaskell(wallet.getParent().getNetworkInfo());
-  try {
-    const lastSync = await wallet.getLastSyncInfo();
-    // don't sync more than every 30 seconds
-    const now = Date.now();
-    if (lastSync.Time == null || now - lastSync.Time.getTime() > 30*1000) {
-      if (syncing == null) {
-        syncing = true;
-        await RustModule.load();
-        Logger.debug('sync started');
-        if (isCardano) {
-          const stateFetcher: CardanoIFetcher =
-            await getCardanoStateFetcher(localStorageApi);
-          await cardanoUpdateTransactions(
-            wallet.getDb(),
-            wallet,
-            stateFetcher.checkAddressesInUse,
-            stateFetcher.getTransactionsHistoryForAddresses,
-            stateFetcher.getRecentTransactionHashes,
-            stateFetcher.getTransactionsByHashes,
-            stateFetcher.getBestBlock,
-            stateFetcher.getTokenInfo,
-            stateFetcher.getMultiAssetMintMetadata,
-            stateFetcher.getMultiAssetSupply,
-          )
-        } else {
-          throw new Error('non-cardano wallet. Should not happen');
-        }
-        Logger.debug('sync ended');
-      }
-    }
-  } catch (e) {
-    Logger.error(`Syncing failed: ${e}`);
-  } finally {
-    syncing = null;
-  }
 }
 
 async function withSelectedSiteConnection<T>(
@@ -421,7 +330,7 @@ async function withSelectedWallet<T>(
       return Promise.reject(new Error(`Public deriver index not found: ${String(publicDeriverId)}`));
     }
     if (shouldSyncWallet) {
-      await syncWallet(selectedWallet, localStorageApi);
+      await syncWallet(selectedWallet);
     }
 
     // we need to make sure this runs within the withDb call
@@ -460,6 +369,7 @@ const YOROI_MESSAGES = Object.freeze({
   GET_CONNECTED_SITES: 'get_connected_sites',
   GET_PROTOCOL: 'get_protocol',
   GET_UTXOS_ADDRESSES: 'get_utxos/addresses',
+  GET_DB: 'get-db',
 });
 
 const isYoroiMessage = ({ type }) => Object.values(YOROI_MESSAGES).includes(type);
@@ -476,6 +386,7 @@ const yoroiMessageHandler = async (
     | GetConnectedSitesData
     | GetConnectionProtocolData
     | GetUtxosRequest
+    | GetDb
   ),
   sender,
   sendResponse
@@ -854,6 +765,10 @@ const yoroiMessageHandler = async (
     } catch (error) {
       Logger.error(`Get utxos faild for tabId = ${request.tabId}`);
     }
+  } else if (request.type === YOROI_MESSAGES.GET_DB) {
+    const db = await getDbCopy();
+    const data = await db.export();
+    sendResponse(JSON.stringify(data));
   }
 };
 

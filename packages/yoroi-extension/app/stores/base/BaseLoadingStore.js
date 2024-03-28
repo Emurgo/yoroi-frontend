@@ -11,8 +11,9 @@ import type { MigrationRequest } from '../../api/common/migration';
 import { migrateAndRefresh } from '../../api/common/migration';
 import { Logger, stringifyError } from '../../utils/logging';
 import { closeOtherInstances } from '../../utils/tabManager';
-import { importOldDb, loadLovefieldDB, } from '../../api/ada/lib/storage/database/index';
+import { importOldDb } from '../../api/ada/lib/storage/database/index';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import { getDb } from '../../api/thunk';
 
 /** Load dependencies before launching the app */
 export default class BaseLoadingStore<TStores, TActions> extends Store<TStores, TActions> {
@@ -23,14 +24,9 @@ export default class BaseLoadingStore<TStores, TActions> extends Store<TStores, 
   @observable loadRustRequest: Request<void => Promise<void>>
     = new Request<void => Promise<void>>(RustModule.load.bind(RustModule));
 
-  @observable migrationRequest: Request<MigrationRequest => Promise<void>>
-    = new Request<MigrationRequest => Promise<void>>(migrateAndRefresh);
-
   // note: never get anything but result except for the .error inside this file
   @observable loadPersistentDbRequest: Request<void => Promise<lf$Database>>
-    = new Request<void => Promise<lf$Database>>(
-      () => loadLovefieldDB(schema.DataStoreType.INDEXED_DB)
-    );
+    = new Request<void => Promise<lf$Database>>(getDb);
 
   __blockingLoadingRequests: Array<[Request<() => Promise<void>>, string]> = [];
 
@@ -62,12 +58,6 @@ export default class BaseLoadingStore<TStores, TActions> extends Store<TStores, 
              DB was not loaded. Should never happen`
           );
         }
-        Logger.debug(`[yoroi] check migrations`);
-        await this.migrationRequest.execute({
-          localStorageApi: this.api.localStorage,
-          persistentDb,
-          currVersion: environment.getVersion(),
-        }).promise;
         Logger.debug(`[yoroi][preLoadingScreenEnd]`);
         await this.preLoadingScreenEnd.bind(this)();
         runInAction(() => {
