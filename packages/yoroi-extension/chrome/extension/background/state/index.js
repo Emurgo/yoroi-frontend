@@ -1,11 +1,11 @@
 // @flow
 import { schema } from 'lovefield';
-import { copyDbToMemory, loadLovefieldDB, } from '../../../app/api/ada/lib/storage/database/index';
-import { migrateNoRefresh } from '../../../app/api/common/migration';
-import LocalStorageApi from '../../../app/api/localStorage/index';
-import { environment } from '../../../app/environment';
+import { copyDbToMemory, loadLovefieldDB, } from '../../../../app/api/ada/lib/storage/database/index';
+import { migrateNoRefresh } from '../../../../app/api/common/migration';
+import LocalStorageApi from '../../../../app/api/localStorage/index';
+import { environment } from '../../../../app/environment';
 import type { lf$Database, } from 'lovefield';
-import type { PublicDeriver, } from '../../../app/api/ada/lib/storage/models/PublicDeriver/index';
+import type { PublicDeriver, } from '../../../../app/api/ada/lib/storage/models/PublicDeriver/index';
 
 async function migrate(): Promise<void> {
   const localStorageApi = new LocalStorageApi();
@@ -19,14 +19,14 @@ async function migrate(): Promise<void> {
 
 const migratePromise = migrate();
 
-async function getDb(): Promise<lf$Database> {
+async function _getDb(): Promise<lf$Database> {
   await migratePromise;
   return await loadLovefieldDB(schema.DataStoreType.INDEXED_DB);
 }
 
 // Get the db handle. The client should only read from the db.
-export async function getDbCopy(): Promise<lf$Database> {
-  const db = await getDb();
+export async function getDb(): Promise<lf$Database> {
+  const db = await _getDb();
 
   // To be extra safe, we return an in-memory copy of the DB to the caller.
   // So if the caller mistakenly update the database,

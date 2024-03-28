@@ -500,6 +500,9 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   isInitialSyncing: (PublicDeriver<>) => boolean = (publicDeriver) => {
     return this.initialSyncingWalletIds.includes(publicDeriver.getPublicDeriverId());
   }
+
+  //fixme
+  async refreshWalletFromRemote(_: any): Promise<void> {}
 }
 
 export const WalletCreationNotifications: {| [key: string]: Notification |} = {

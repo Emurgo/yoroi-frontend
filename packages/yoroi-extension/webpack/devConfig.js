@@ -99,7 +99,7 @@ const backgroundServiceWorkerConfig = (
   devtool: 'source-map',
   entry: {
     background: [
-      path.join(__dirname, '../chrome/extension/background')
+      path.join(__dirname, '../chrome/extension/background/index')
     ],
   },
   devServer: {
