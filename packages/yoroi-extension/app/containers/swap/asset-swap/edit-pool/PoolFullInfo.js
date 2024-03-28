@@ -4,48 +4,58 @@ import { ReactComponent as InfoIcon } from '../../../../assets/images/revamp/ico
 import { useSwap } from '@yoroi/swap';
 import { useSwapForm } from '../../context/swap-form';
 import { Quantities } from '../../../../utils/quantities';
+import { useSwapFeeDisplay } from '../../hooks';
+import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
 
 type Props = {|
-  +totalFees: string,
+  +defaultTokenInfo: RemoteTokenInfo,
 |}
 
-export default function SwapPoolFullInfo({ totalFees }: Props): React$Node {
+export default function SwapPoolFullInfo({ defaultTokenInfo }: Props): React$Node {
   const { orderData } = useSwap();
   const { buyTokenInfo } = useSwapForm();
+  const { formattedFee } = useSwapFeeDisplay(defaultTokenInfo);
+
   const buyToken = orderData.tokens?.buyInfo;
-  const selectedPool = orderData.selectedPoolCalculation;
+  const calculation = orderData.selectedPoolCalculation;
 
-  if (!selectedPool) return null;
+  if (!calculation) return null;
 
-  const { cost } = selectedPool;
+  const { cost } = calculation;
 
-  const minReceived = `${Quantities.format(
-    selectedPool.buyAmountWithSlippage.quantity,
-    buyToken.decimals
-  )} ${buyTokenInfo?.ticker ?? ''}`;
+  const ptDecimals = defaultTokenInfo.decimals ?? 0;
+  const ptTicker = defaultTokenInfo.ticker ?? '';
+  const buyTicker = buyTokenInfo?.ticker ?? '';
 
-  // TODO: do not hadcode pt decimals and ticker
-  const deposit = `${Quantities.format(cost.deposit.quantity, 6)} ADA`;
+  const minReceived = Quantities.format(
+    calculation.buyAmountWithSlippage.quantity,
+    buyToken.decimals,
+  );
+
+  const deposit = Quantities.format(
+    cost.deposit.quantity,
+    ptDecimals,
+  );
 
   return (
     <Box sx={{ display: 'flex', flexFlow: 'column', gap: '8px', mt: '8px' }}>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
-          Min ADA{' '}
+          Min ADA
           <Box component="span" color="grayscale.900">
             <InfoIcon />
           </Box>
         </Box>
-        <Box>{deposit}</Box>
+        <Box>{deposit} {ptTicker}</Box>
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
-          Fees{' '}
+          Fees
           <Box component="span" color="grayscale.900">
             <InfoIcon />
           </Box>
         </Box>
-        <Box>{totalFees} ADA</Box>
+        <Box>{formattedFee}</Box>
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
@@ -54,7 +64,7 @@ export default function SwapPoolFullInfo({ totalFees }: Props): React$Node {
             <InfoIcon />
           </Box>
         </Box>
-        <Box>{minReceived}</Box>
+        <Box>{minReceived} {buyTicker}</Box>
       </Box>
     </Box>
   );

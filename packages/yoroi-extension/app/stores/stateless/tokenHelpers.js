@@ -8,6 +8,7 @@ import type { TokenRow, TokenMetadata } from '../../api/ada/lib/storage/database
 import { isHexadecimal } from 'validator';
 import AssetFingerprint from '@emurgo/cip14-js';
 import { AssetNameUtils } from '@emurgo/yoroi-lib/dist/internals/utils/assets';
+import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
 
 export function getTokenName(
   tokenRow: $ReadOnly<{
@@ -83,6 +84,16 @@ export function getTokenIdentifierIfExists(
   }
 
   return tokenRow.Identifier;
+}
+
+export function createTokenRowSummary(tokenRow: $ReadOnly<TokenRow>): RemoteTokenInfo {
+  const { numberOfDecimals, ticker } = tokenRow.Metadata;
+  const { name } = getTokenStrictName(tokenRow);
+  return {
+    ticker: ticker ?? undefined,
+    name: name ?? undefined,
+    decimals: numberOfDecimals ?? undefined,
+  };
 }
 
 export function genLookupOrFail(

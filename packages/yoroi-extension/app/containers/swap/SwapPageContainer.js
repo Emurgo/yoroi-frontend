@@ -8,7 +8,6 @@ import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import { buildRoute } from '../../utils/routing';
 import { withLayout } from '../../styles/context/layout';
-import { SwapPageProvider } from './context/swap-page';
 import globalMessages from '../../i18n/global-messages';
 import SwapMenu from '../../components/swap/SwapMenu';
 import BannerContainer from '../banners/BannerContainer';
@@ -75,7 +74,7 @@ class SwapPageContainer extends Component<AllProps> {
         showInContainer
         showAsCard
       >
-        <SwapPageProvider initialSwapPageState={{ stores }}>{children}</SwapPageProvider>
+        {children}
       </TopBarLayout>
     );
   }

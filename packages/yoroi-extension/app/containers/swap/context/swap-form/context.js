@@ -2,6 +2,7 @@
 import type { SwapFormContext } from './types';
 import { createContext } from 'react';
 import { defaultSwapFormState } from './SwapFormProvider';
+import { ConstantState } from './types';
 
 function missingInit() {
   console.error('[SwapFormContext] missing initialization');
@@ -23,9 +24,8 @@ const initialSwapFormContext: SwapFormContext = {
   buyAmountErrorChanged: missingInit,
   sellAmountErrorChanged: missingInit,
   canSwapChanged: missingInit,
-  sellInputRef: undefined,
-  buyInputRef: undefined,
-  limitInputRef: undefined,
+  sellFocusState: ConstantState(false),
+  buyFocusState: ConstantState(false),
   onChangeSellQuantity: missingInit,
   onChangeBuyQuantity: missingInit,
   onChangeLimitPrice: missingInit,

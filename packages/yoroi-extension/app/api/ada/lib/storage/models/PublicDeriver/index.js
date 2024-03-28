@@ -42,6 +42,7 @@ import { addTraitsForBip44Child, addTraitsForCip1852Child } from './traits';
 import { UtxoService } from '@emurgo/yoroi-lib/dist/utxo';
 import { UtxoStorageApi, } from '../utils';
 import UtxoApi from '../../../state-fetch/utxoApi';
+import { networks } from '../../database/prepackaged/networks';
 
 /** Snapshot of a PublicDeriver in the database */
 export class PublicDeriver<+Parent: ConceptualWallet = ConceptualWallet>
@@ -88,6 +89,11 @@ implements IPublicDeriver<Parent>, IRename, IGetLastSyncInfo {
 
   getParent(): Parent {
     return this.parent;
+  }
+
+  isMainnet(): boolean {
+    return this.getParent().getNetworkInfo().NetworkId
+      === networks.CardanoMainnet.NetworkId;
   }
 
   getPathToPublic(): Array<number> {

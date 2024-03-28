@@ -39,7 +39,11 @@ import type {
   GetTransactionsByHashesRequest,
   GetTransactionsByHashesResponse,
   GetTransactionsByHashesFunc,
-  MultiAssetSupplyResponse, FilterUsedRequest, FilterUsedResponse, FilterFunc,
+  MultiAssetSupplyResponse,
+  FilterUsedRequest,
+  FilterUsedResponse,
+  FilterFunc,
+  GetSwapFeeTiersFunc,
 } from './types';
 import LocalizableError from '../../../../i18n/LocalizableError';
 
@@ -185,6 +189,11 @@ export class BatchedFetcher implements IFetcher {
   getLatestBlockBySlot: GetLatestBlockBySlotFunc = async (body) => (
     // Todo: Implement batching as the max slots per request is 50
     this.baseFetcher.getLatestBlockBySlot(body)
+  )
+
+  getSwapFeeTiers: GetSwapFeeTiersFunc = async (body) => (
+    // No batching for fee tiers
+    this.baseFetcher.getSwapFeeTiers(body)
   )
 }
 

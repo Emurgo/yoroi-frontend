@@ -32,6 +32,7 @@ import type {
   MultiAssetSupplyResponse,
   FilterUsedRequest,
   FilterUsedResponse,
+  GetSwapFeeTiersFunc,
 } from './types';
 
 export interface IFetcher {
@@ -55,5 +56,6 @@ export interface IFetcher {
     : GetRecentTransactionHashesRequest => Promise<GetRecentTransactionHashesResponse>;
   getTransactionsByHashes
     : GetTransactionsByHashesRequest => Promise<GetTransactionsByHashesResponse>;
-
+  getSwapFeeTiers
+    : GetSwapFeeTiersFunc;
 }
