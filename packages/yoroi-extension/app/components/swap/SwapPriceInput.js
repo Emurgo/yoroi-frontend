@@ -29,9 +29,6 @@ function SwapPriceInput({ swapStore, priceImpactState }: Props): Node {
 
   const isMarketOrder = orderData.type === 'market';
   const pricePlaceholder = isMarketOrder ? NO_PRICE_VALUE_PLACEHOLDER : '0';
-
-  console.log('ORDER DATATATATATTATA PROICESS', orderData.selectedPoolCalculation?.prices);
-
   const marketPrice = orderData.selectedPoolCalculation?.prices.market;
   const formattedPrice = marketPrice
     ? Quantities.format(marketPrice, orderData.tokens.priceDenomination, PRICE_PRECISION)
