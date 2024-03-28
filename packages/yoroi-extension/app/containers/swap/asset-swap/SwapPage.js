@@ -1,8 +1,8 @@
 // @flow
 import type { Node } from 'react';
-import { useEffect, useState, } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Button } from '@mui/material';
-import {CreateSwapOrder} from './CreateSwapOrder';
+import { CreateSwapOrder } from './CreateSwapOrder';
 import SwapConfirmationStep from './ConfirmationStep';
 import TxSubmittedStep from './TxSubmittedStep';
 import LimitOrderWarningDialog from '../../../components/swap/LimitOrderWarningDialog';
@@ -48,8 +48,9 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
 
   const isMarketOrder = orderType === 'market';
   const impact = isMarketOrder ? Number(selectedPoolCalculation?.prices.priceImpact ?? 0) : 0;
-  const priceImpactState: ?PriceImpact = impact > PRICE_IMPACT_MODERATE_RISK
-    ? { isSevere: impact > PRICE_IMPACT_HIGH_RISK } : null;
+  // console.log('PRICE IMPACT SWAP PAGEEE', selectedPoolCalculation?.prices);
+  const priceImpactState: ?PriceImpact =
+    impact > PRICE_IMPACT_MODERATE_RISK ? { isSevere: impact > PRICE_IMPACT_HIGH_RISK } : null;
 
   const [disclaimerStatus, setDisclaimerStatus] = useState<?boolean>(null);
   const [selectedWalletAddress, setSelectedWalletAddress] = useState<?string>(null);
@@ -59,36 +60,33 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
   const txSubmitErrorState = StateWrap(useState<?Error>(null));
 
   const swapFormCanContinue =
-    selectedPoolCalculation != null
-    && sell.quantity !== '0'
-    && buy.quantity !== '0';
+    selectedPoolCalculation != null && sell.quantity !== '0' && buy.quantity !== '0';
 
-  const confirmationCanContinue =
-    userPasswordState.value !== ''
-    && signRequest != null;
+  const confirmationCanContinue = userPasswordState.value !== '' && signRequest != null;
 
-  const isButtonLoader =
-    step === 1 && signRequest == null;
+  const isButtonLoader = step === 1 && signRequest == null;
 
   const isSwapEnabled =
-    (step === 0 && swapFormCanContinue)
-    || (step === 1 && confirmationCanContinue);
+    (step === 0 && swapFormCanContinue) || (step === 1 && confirmationCanContinue);
 
   const wallet = props.stores.wallets.selectedOrFail;
   const network = wallet.getParent().getNetworkInfo();
-  const defaultTokenInfo = props.stores.tokenInfoStore
-    .getDefaultTokenInfoSummary(network.NetworkId);
+  const defaultTokenInfo = props.stores.tokenInfoStore.getDefaultTokenInfoSummary(
+    network.NetworkId
+  );
 
   const disclaimerFlag = props.stores.substores.ada.swapStore.swapDisclaimerAcceptanceFlag;
 
   useEffect(() => {
-    disclaimerFlag.get()
+    disclaimerFlag
+      .get()
       .then(setDisclaimerStatus)
       .catch(e => {
         console.error('Failed to load swap disclaimer status! Setting to false for safety', e);
         setDisclaimerStatus(false);
       });
-    slippage.read()
+    slippage
+      .read()
       .then(storedSlippage => {
         if (storedSlippage > 0) {
           runInAction(() => {
@@ -96,19 +94,21 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
             if (storedSlippage !== defaultSlippage) {
               slippageChanged(storedSlippage);
             }
-          })
+          });
         }
         return null;
       })
       .catch(e => {
         console.error('Failed to load stored slippage', e);
       });
-    props.stores.addresses.getFirstExternalAddress(wallet)
+    props.stores.addresses
+      .getFirstExternalAddress(wallet)
       .then(a => setSelectedWalletAddress(addressHexToBech32(a.address)))
       .catch(e => {
         console.error('Failed to load wallet address', e);
       });
-    props.stores.substores.ada.stateFetchStore.fetcher.getSwapFeeTiers({ network })
+    props.stores.substores.ada.stateFetchStore.fetcher
+      .getSwapFeeTiers({ network })
       .then(feeTiers => {
         const aggregatorFeeTiers = feeTiers?.[SWAP_AGGREGATOR] ?? [];
         frontendFeeTiersChanged(aggregatorFeeTiers);
@@ -120,13 +120,14 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
   }, []);
 
   const onAcceptDisclaimer = () => {
-    disclaimerFlag.set(true)
+    disclaimerFlag
+      .set(true)
       .then(() => setDisclaimerStatus(true))
       .catch(e => {
         console.error('Failed to store swap acceptance status!', e);
         setDisclaimerStatus(true);
-      })
-  }
+      });
+  };
 
   const onSetNewSlippage = (newSlippage: number): void => {
     runInAction(() => {
@@ -134,18 +135,17 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
       slippageChanged(newSlippage);
       setSlippageValue(String(newSlippage));
     });
-  }
+  };
 
   // <TODO:DEDUPLICATE> extract this and fix all places where it's duplicated
   const getFormattedPairingValue = (lovelaces: string): string => {
     const { currency } = props.stores.profile.unitOfAccount;
-    if (currency == null || defaultTokenInfo.ticker == null)
-      return '-';
+    if (currency == null || defaultTokenInfo.ticker == null) return '-';
     const price = props.stores.coinPriceStore.getCurrentPrice(defaultTokenInfo.ticker, currency);
     const shiftedAmount = new BigNumber(lovelaces).shiftedBy(-(defaultTokenInfo.decimals ?? 0));
     const val = price ? calculateAndFormatValue(shiftedAmount, price) : '-';
     return `${val} ${currency}`;
-  }
+  };
 
   const handleNextStep = () => {
     if (step === 0) {
@@ -180,16 +180,17 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
         if (password === '') {
           throw new Error('Incorrect state! User password is required');
         }
-        props.stores.substores.ada.wallets.adaSendAndRefresh({
-          broadcastRequest: {
-            normal: {
-              publicDeriver: wallet,
-              password,
-              signRequest,
+        props.stores.substores.ada.wallets
+          .adaSendAndRefresh({
+            broadcastRequest: {
+              normal: {
+                publicDeriver: wallet,
+                password,
+                signRequest,
+              },
             },
-          },
-          refreshWallet: () => props.stores.wallets.refreshWalletFromRemote(wallet),
-        })
+            refreshWallet: () => props.stores.wallets.refreshWalletFromRemote(wallet),
+          })
           .then(handleNextStep)
           .catch(e => {
             const isPasswordError = e instanceof IncorrectWalletPasswordError;
@@ -212,20 +213,40 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
     setStep(s => s + 1);
   };
 
-  const onRemoteOrderDataResolved: any => Promise<void> = async ({ contractAddress, datumHash }) => {
+  const onRemoteOrderDataResolved: any => Promise<void> = async ({
+    contractAddress,
+    datumHash,
+  }) => {
     // creating tx
     if (selectedPoolCalculation == null) {
-      throw new Error('Incorrect state. Pool calculations are not available to prepare the transaction')
+      throw new Error(
+        'Incorrect state. Pool calculations are not available to prepare the transaction'
+      );
     }
     if (contractAddress == null || datumHash == null) {
-      throw new Error(`Incorrect remote order resolve! ${JSON.stringify({ contractAddress, datumHash })}`);
+      throw new Error(
+        `Incorrect remote order resolve! ${JSON.stringify({ contractAddress, datumHash })}`
+      );
     }
-    const { pool: { provider: poolProvider, deposit, batcherFee }, cost } = selectedPoolCalculation;
+    const {
+      pool: { provider: poolProvider, deposit, batcherFee },
+      cost,
+    } = selectedPoolCalculation;
     const feFees = cost.frontendFeeInfo.fee;
     const ptFees = { deposit: deposit.quantity, batcher: batcherFee.quantity };
-    const swapTxReq = { wallet, contractAddress, datumHash, sell, buy, feFees, ptFees, poolProvider };
-    const txSignRequest: HaskellShelleyTxSignRequest =
-      await props.stores.substores.ada.swapStore.createUnsignedSwapTx(swapTxReq);
+    const swapTxReq = {
+      wallet,
+      contractAddress,
+      datumHash,
+      sell,
+      buy,
+      feFees,
+      ptFees,
+      poolProvider,
+    };
+    const txSignRequest: HaskellShelleyTxSignRequest = await props.stores.substores.ada.swapStore.createUnsignedSwapTx(
+      swapTxReq
+    );
     runInAction(() => {
       setSignRequest(txSignRequest);
     });
@@ -277,15 +298,12 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
             borderColor="grayscale.200"
           >
             <Button
-              onClick={handleNextStep}
+              onClick={() => setStep(s => s - 1)}
               sx={{ minWidth: '128px', minHeight: '48px' }}
               variant="primary"
               disabled={!isSwapEnabled || isButtonLoader}
             >
-              {
-                (isButtonLoader && <LoadingSpinner />)
-                || (step === 0 ? 'Swap' : 'Confirm')
-              }
+              Back
             </Button>
             <Button
               onClick={handleNextStep}
@@ -293,31 +311,20 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
               variant="primary"
               disabled={!isSwapEnabled || isButtonLoader}
             >
-              {
-                (isButtonLoader && <LoadingSpinner />)
-                || (step === 0 ? 'Swap' : 'Confirm')
-              }
+              {(isButtonLoader && <LoadingSpinner />) || (step === 0 ? 'Swap' : 'Confirm')}
             </Button>
           </Box>
         )}
       </Box>
 
-      {openedDialog === 'loadingOverlay' && (
-        <LoadingOverlay />
-      )}
+      {openedDialog === 'loadingOverlay' && <LoadingOverlay />}
 
       {openedDialog === 'limitOrderWarning' && (
-        <LimitOrderWarningDialog
-          onContinue={handleNextStep}
-          onCancel={() => setOpenedDialog('')}
-        />
+        <LimitOrderWarningDialog onContinue={handleNextStep} onCancel={() => setOpenedDialog('')} />
       )}
 
       {openedDialog === 'priceImpactAlert' && (
-        <PriceImpactAlert
-          onContinue={handleNextStep}
-          onCancel={() => setOpenedDialog('')}
-        />
+        <PriceImpactAlert onContinue={handleNextStep} onCancel={() => setOpenedDialog('')} />
       )}
 
       {disclaimerStatus === false && (

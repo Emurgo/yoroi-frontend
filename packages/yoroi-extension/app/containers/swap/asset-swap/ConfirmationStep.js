@@ -16,7 +16,7 @@ import {
   PriceImpactBanner,
   PriceImpactColored,
   PriceImpactIcon,
-  PriceImpactPercent
+  PriceImpactPercent,
 } from '../../../components/swap/PriceImpact';
 import type { State } from '../context/swap-form/types';
 import { useEffect } from 'react';
@@ -43,6 +43,7 @@ export default function SwapConfirmationStep({
   defaultTokenInfo,
   getFormattedPairingValue,
 }: Props): React$Node {
+  console.log('priceImpactState', priceImpactState);
 
   const { orderData } = useSwap();
   const {
@@ -58,30 +59,31 @@ export default function SwapConfirmationStep({
   const isIncorrectPassword = txSubmitErrorState.value instanceof IncorrectWalletPasswordError;
 
   const { createOrderData } = useSwapCreateOrder({
-    onSuccess: (data) => {
-      onRemoteOrderDataResolved(data)
-        .catch(e => {
-          console.error('Failed to handle remote order resolution', e);
-          alert('Failed to prepare order transaction');
-        });
+    onSuccess: data => {
+      onRemoteOrderDataResolved(data).catch(e => {
+        console.error('Failed to handle remote order resolution', e);
+        alert('Failed to prepare order transaction');
+      });
     },
     onError: error => {
       console.error('useSwapCreateOrder fail', error);
       alert('Failed to receive remote data for the order');
-    }
+    },
   });
   useEffect(() => {
     if (walletAddress == null) {
       alert('Wallet address is not available');
       return;
     }
-    createOrderData((isMarketOrder ? makePossibleMarketOrder : makeLimitOrder)(
-      orderData.amounts.sell,
-      orderData.amounts.buy,
-      orderData.selectedPoolCalculation?.pool,
-      orderData.slippage,
-      walletAddress,
-    ));
+    createOrderData(
+      (isMarketOrder ? makePossibleMarketOrder : makeLimitOrder)(
+        orderData.amounts.sell,
+        orderData.amounts.buy,
+        orderData.selectedPoolCalculation?.pool,
+        orderData.slippage,
+        walletAddress
+      )
+    );
   }, []);
 
   return (

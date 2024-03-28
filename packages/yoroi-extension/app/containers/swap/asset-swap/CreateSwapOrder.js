@@ -1,9 +1,6 @@
 // @flow
 import { useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
-import { ReactComponent as SwitchIcon } from '../../../assets/images/revamp/icons/switch.inline.svg';
-import { ReactComponent as InfoIcon } from '../../../assets/images/revamp/icons/info.inline.svg';
-import { ReactComponent as EditIcon } from '../../../assets/images/revamp/icons/edit.inline.svg';
 import SwapPriceInput from '../../../components/swap/SwapPriceInput';
 import SlippageDialog from '../../../components/swap/SlippageDialog';
 import Tabs from '../../../components/common/tabs/Tabs';
@@ -22,6 +19,7 @@ import type { PriceImpact } from '../../../components/swap/types';
 
 import { TopActions } from './actions/TopActions';
 import { MiddleActions } from './actions/MiddleActions';
+import { EditSlippage } from './actions/EditSlippage';
 
 type Props = {|
   slippageValue: string,
@@ -83,34 +81,13 @@ export const CreateSwapOrder = ({
         />
 
         {/* Price between assets */}
-        <Box mt="16px">
-          <SwapPriceInput swapStore={swapStore} priceImpactState={priceImpactState} />
-        </Box>
+        <SwapPriceInput swapStore={swapStore} priceImpactState={priceImpactState} />
 
         {/* Slippage settings */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Box display="flex" gap="8px" alignItems="center">
-            <Typography component="div" variant="body1" color="grayscale.500">
-              Slippage tolerance
-            </Typography>
-            <InfoIcon />
-          </Box>
-          <Box
-            onClick={() => setOpenedDialog('slippage')}
-            sx={{ cursor: 'pointer', display: 'flex', gap: '4px', alignItems: 'center' }}
-          >
-            <Typography component="div" variant="body1" color="grayscale.max">
-              {slippageValue}%
-            </Typography>
-            <EditIcon />
-          </Box>
-        </Box>
+        <EditSlippage
+          setOpenedDialog={() => setOpenedDialog('slippage')}
+          slippageValue={slippageValue}
+        />
 
         {/* Available pools */}
         <EditSwapPool

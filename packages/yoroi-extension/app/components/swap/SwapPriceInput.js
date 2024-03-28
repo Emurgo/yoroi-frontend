@@ -13,7 +13,7 @@ import {
   FormattedActualPrice,
   PriceImpactColored,
   PriceImpactPercent,
-  PriceImpactTitle
+  PriceImpactTitle,
 } from './PriceImpact';
 
 type Props = {|
@@ -24,36 +24,30 @@ type Props = {|
 const NO_PRICE_VALUE_PLACEHOLDER = ' ';
 
 function SwapPriceInput({ swapStore, priceImpactState }: Props): Node {
-  const {
-    orderData,
-    limitPriceChanged,
-  } = useSwap();
-  const {
-    sellTokenInfo,
-    buyTokenInfo,
-  } = useSwapForm();
+  const { orderData, limitPriceChanged } = useSwap();
+  const { sellTokenInfo, buyTokenInfo } = useSwapForm();
 
   const isMarketOrder = orderData.type === 'market';
   const pricePlaceholder = isMarketOrder ? NO_PRICE_VALUE_PLACEHOLDER : '0';
 
+  console.log('ORDER DATATATATATTATA PROICESS', orderData.selectedPoolCalculation?.prices);
+
   const marketPrice = orderData.selectedPoolCalculation?.prices.market;
-  const formattedPrice = marketPrice ? Quantities.format(
-    marketPrice,
-    orderData.tokens.priceDenomination,
-    PRICE_PRECISION
-  ) : pricePlaceholder;
+  const formattedPrice = marketPrice
+    ? Quantities.format(marketPrice, orderData.tokens.priceDenomination, PRICE_PRECISION)
+    : pricePlaceholder;
 
   if (swapStore.limitOrderDisplayValue === '' && marketPrice != null) {
     runInAction(() => {
       swapStore.setLimitOrderDisplayValue(formattedPrice);
-    })
+    });
   }
   const displayValue = isMarketOrder ? formattedPrice : swapStore.limitOrderDisplayValue;
   const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
   const isReadonly = !isValidTickers || isMarketOrder;
 
   return (
-    <Box>
+    <Box mt="16px">
       <Box
         component="fieldset"
         sx={{
@@ -103,7 +97,7 @@ function SwapPriceInput({ swapStore, priceImpactState }: Props): Node {
             if (/^\d+\.?\d*$/.test(value)) {
               runInAction(() => {
                 swapStore.setLimitOrderDisplayValue(value);
-              })
+              });
               if (!value.endsWith('.')) {
                 limitPriceChanged(value);
               }
@@ -119,14 +113,13 @@ function SwapPriceInput({ swapStore, priceImpactState }: Props): Node {
         </Box>
       </Box>
       {priceImpactState && (
-        <Typography
-          component="div"
-          variant="caption"
-          pt="4px"
-        >
+        <Typography component="div" variant="caption" pt="4px">
           <PriceImpactColored priceImpactState={priceImpactState} sx={{ display: 'flex' }}>
             <PriceImpactTitle small isSevere={priceImpactState.isSevere} />
-            &nbsp;=&nbsp;<PriceImpactPercent />&nbsp;(<FormattedActualPrice />)
+            &nbsp;=&nbsp;
+            <PriceImpactPercent />
+            &nbsp;(
+            <FormattedActualPrice />)
           </PriceImpactColored>
         </Typography>
       )}
