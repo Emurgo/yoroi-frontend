@@ -18,6 +18,8 @@ import { fail, forceNonNull, maybe } from '../../../coreUtils';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import { useSwap } from '@yoroi/swap';
 import { addressBech32ToHex } from '../../../api/ada/lib/cardanoCrypto/utils';
+import BigNumber from 'bignumber.js';
+import { getTransactionFeeFromCbor } from '../../../api/ada/transactions/utils';
 
 const orderColumns = [
   'Pair (From / To)',
@@ -29,21 +31,32 @@ const orderColumns = [
   'Transaction ID',
 ];
 
+type FormattedAttachedValue = {|
+  value: string,
+  formattedValue: string,
+  ticker: string,
+  defaultToken?: true,
+|};
+
 function createFormattedAttachedValues({
   order,
   defaultTokenInfo,
-}): Array<{| formattedValue: string, ticker: string |}> {
+}): Array<FormattedAttachedValue> {
   const attachedValueMap = order.valueAttached.reduce((map, v) =>
     ({ ...map, [v.token]: Quantities.sum([map[v.token] ?? '0', v.amount]) }), {});
   const decimalsAda = forceNonNull(defaultTokenInfo.decimals);
+  const defaultTokenValue = attachedValueMap['.'] ?? '0';
   const formattedAttachedValues = [{
-    formattedValue: Quantities.format(attachedValueMap['.'] ?? '0', decimalsAda, decimalsAda),
+    value: defaultTokenValue,
+    formattedValue: Quantities.format(defaultTokenValue, decimalsAda, decimalsAda),
     ticker: defaultTokenInfo.ticker ?? '-',
+    defaultToken: true,
   }];
   [order.from, order.to].forEach(t => {
     maybe(attachedValueMap[t.id], v => {
       const formattedValue = Quantities.format(v, t.decimals, t.decimals);
       formattedAttachedValues.push({
+        value: v,
         formattedValue,
         ticker: t.ticker ?? '-',
       });
@@ -58,7 +71,7 @@ function mapOrder(order: any, defaultTokenInfo: RemoteTokenInfo): {|
   txId: string,
   price: string,
   amount: string,
-  totalValues: Array<{| formattedValue: string, ticker: string |}>,
+  totalValues: Array<FormattedAttachedValue>,
   provider: string,
   fromToken: any,
   toToken: any,
@@ -92,7 +105,10 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
   const { order: { cancel: swapCancelOrder } } = useSwap();
 
   const [showCompletedOrders, setShowCompletedOrders] = useState<boolean>(false);
-  const [cancellationState, setCancellationState] = useState<?{| order: any, tx: ?string |}>(null);
+  const [cancellationState, setCancellationState] = useState<?{|
+    order: any,
+    tx: ?{| cbor: string, fee: BigNumber |},
+  |}>(null);
 
   const wallet = props.stores.wallets.selectedOrFail;
   const network = wallet.getParent().getNetworkInfo();
@@ -122,7 +138,13 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
           if (s == null) return null;
           // State might have been recreated for another order in the meantime
           if (s.order.utxo !== order.utxo) return s;
-          return { order: s.order, tx: cancelTxCbor };
+          return {
+            order: s.order,
+            tx: {
+              cbor: cancelTxCbor,
+              fee: getTransactionFeeFromCbor(cancelTxCbor),
+            },
+          };
         });
         return null;
       })
@@ -132,8 +154,13 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
     setCancellationState({ order, tx: null });
   }
 
-  const handleCancelConfirm = order => {
-    console.log('🚀 > order:', order);
+  const handleCancelConfirm = (cancelledOrder: any, password: string) => {
+    const { order, tx } = cancellationState ?? {};
+    if (order === cancelledOrder) {
+      console.log('🚀 > order:', order, password, tx?.cbor);
+    } else {
+      console.log('Cancellation state order mismatch. Ignoring.');
+    }
   };
 
   return (
@@ -185,7 +212,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
       {cancellationState && (
         <CancelSwapOrderDialog
           order={cancellationState.order}
-          isLoading={cancellationState.tx == null}
+          transactionFee={cancellationState.tx?.fee}
           onCancelOrder={handleCancelConfirm}
           onDialogClose={() => setCancellationState(null)}
           defaultTokenInfo={defaultTokenInfo}

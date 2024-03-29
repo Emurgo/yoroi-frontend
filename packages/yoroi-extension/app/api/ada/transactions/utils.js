@@ -471,3 +471,18 @@ export function assetToRustMultiasset(
   }
   return multiasset;
 }
+
+/**
+ * Shallow-parses the passed transaction CBOR HEX and returns the BigNumber of the fee lovelaces
+ */
+export function getTransactionFeeFromCbor(txHex: string): BigNumber {
+  try {
+    return RustModule.WasmScope(Module => {
+      const feeStr = Module.WalletV4.FixedTransaction.from_hex(txHex).body().fee().to_str();
+      return new BigNumber(feeStr);
+    });
+  } catch (e) {
+    console.error('Failed to decode transaction fee from cbor', e);
+    throw e;
+  }
+}

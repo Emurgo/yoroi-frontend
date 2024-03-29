@@ -2382,6 +2382,7 @@ async function networkTxToDbTx(
       BlockSeed,
     );
 
+    // <TODO:PENDING_REMOVAL> Byron
     if (networkTx.type == null || networkTx.type === RemoteTransactionTypes.byron) {
       byronTxs.push({
         block,
