@@ -6,22 +6,35 @@ import AssetPair from '../common/assets/AssetPair';
 import TextField from '../common/TextField';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
 import LoadingSpinner from '../widgets/LoadingSpinner';
+import { useState } from 'react';
+import BigNumber from 'bignumber.js';
+import { Quantities } from '../../utils/quantities';
 
 type Props = {|
   order: any,
-  isLoading: boolean,
-  onCancelOrder: any => void,
+  transactionFee: ?BigNumber,
+  onCancelOrder: (order: any, password: string) => void,
   onDialogClose: void => void,
   defaultTokenInfo: RemoteTokenInfo,
 |};
 
 export default function CancelSwapOrderDialog({
   order,
-  isLoading,
+  transactionFee,
   onCancelOrder,
   onDialogClose,
   defaultTokenInfo,
 }: Props): React$Node {
+  const [password, setPassword] = useState('');
+  const isLoading = transactionFee == null;
+  const ptDecimals = defaultTokenInfo.decimals ?? 0;
+  const calcDefaultTokenReturnValue: string => ?string = baseValue => {
+    // TODO: add frontend fee
+    return transactionFee ? Quantities.format(
+      Quantities.sum([baseValue, `-${transactionFee.toString()}`]),
+      ptDecimals,
+    ) : null;
+  }
   return (
     <Dialog title="Cancel order" onClose={onDialogClose} withCloseButton closeOnOverlayClick>
       <Box display="flex" mt="8px" mb="24px" flexDirection="column" gap="16px">
@@ -41,21 +54,33 @@ export default function CancelSwapOrderDialog({
             {order.amount} {order.toToken.ticker}
           </SummaryRow>
           <SummaryRow col1="Total returned" withInfo>
-            {order.totalValues.map(v => (
-              <Box>{v.formattedValue} {v.ticker}</Box>
-            ))}
+            {order.totalValues.map(v => {
+              const val = v.defaultToken
+                ? calcDefaultTokenReturnValue(v.value)
+                : v.formattedValue;
+              return (
+                <Box>{val ? `${val} ${v.ticker}` : (<LoadingSpinner small />)}</Box>
+              );
+            })}
           </SummaryRow>
           <SummaryRow col1="Cancellation fee">
-            -
+            {transactionFee ? (
+              Quantities.format(
+                transactionFee.toString(),
+                ptDecimals,
+              )
+            ) : (
+              <LoadingSpinner small />
+            )}
           </SummaryRow>
         </Box>
         <Box>
           <TextField
             className="walletPassword"
-            value=""
+            value={password}
             label="Password"
             type="password"
-            // error={walletPasswordField.error}
+            onChange={e => setPassword(e.target.value)}
           />
         </Box>
       </Box>
@@ -66,8 +91,8 @@ export default function CancelSwapOrderDialog({
         <Button
           fullWidth
           variant="destructive"
-          onClick={() => onCancelOrder(order)}
-          disabled={isLoading}
+          onClick={() => onCancelOrder(order, password)}
+          disabled={isLoading || password.length === 0}
         >
           {isLoading ? (
             <LoadingSpinner small light />
