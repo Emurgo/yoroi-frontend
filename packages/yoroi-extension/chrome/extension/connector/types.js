@@ -225,9 +225,10 @@ export type GetUtxosRequest = {|
 
 export type GetDb = {|
   type: 'get-db',
-  tabId: number,
 |};
-
+export type SubscribeWalletStateChanges = {|
+  type: 'subscribe-wallet-state-changes',
+|};
 export type TxSignWindowRetrieveData = {|
   type: 'tx_sign_window_retrieve_data',
 |}

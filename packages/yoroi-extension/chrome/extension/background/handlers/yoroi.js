@@ -14,6 +14,7 @@ import type {
   GetConnectionProtocolData,
   GetUtxosRequest,
   GetDb,
+  SubscribeWalletStateChanges,
   PendingSignData,
   RemoveWalletFromWhitelistData,
   SigningMessage,
@@ -92,6 +93,7 @@ import {
   STORAGE_KEY_CONNECTION_PROTOCOL,
 } from './content';
 import type { ConnectedSite } from './content';
+import { subscribeWalletStateChanges } from '../state';
 
 const YOROI_MESSAGES = Object.freeze({
   CONNECT_RESPONSE: 'connect_response',
@@ -105,6 +107,7 @@ const YOROI_MESSAGES = Object.freeze({
   GET_PROTOCOL: 'get_protocol',
   GET_UTXOS_ADDRESSES: 'get_utxos/addresses',
   GET_DB: 'get-db',
+  SUBSCRIBE_WALLET_STATE_CHANGES: 'subscribe-wallet-state-changes',
 });
 
 // messages from other parts of Yoroi (i.e. the UI for the connector)
@@ -120,6 +123,7 @@ export async function yoroiMessageHandler(
     | GetConnectionProtocolData
     | GetUtxosRequest
     | GetDb
+    | SubscribeWalletStateChanges
   ),
   sender: any,
   sendResponse: Function,
@@ -502,6 +506,11 @@ export async function yoroiMessageHandler(
     const db = await getDb();
     const data = await db.export();
     sendResponse(JSON.stringify(data));
+  } else if (request.type === YOROI_MESSAGES.SUBSCRIBE_WALLET_STATE_CHANGES) {
+    const data = await subscribeWalletStateChanges(sender.tab.id);
+    sendResponse(JSON.stringify(data));
+  } else {
+    console.error(`unknown message ${JSON.stringify(request)} from ${sender.tab.id}`)
   }
 }
 

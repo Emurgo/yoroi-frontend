@@ -6,22 +6,42 @@ import LocalStorageApi from '../../../../app/api/localStorage/index';
 import { environment } from '../../../../app/environment';
 import type { lf$Database, } from 'lovefield';
 import type { PublicDeriver, } from '../../../../app/api/ada/lib/storage/models/PublicDeriver/index';
+import { connectorGetUtxosCardano } from '../../connector/api';
+import { getWallets } from '../../../../app/api/common/index';
+import { RustModule } from '../../../../app/api/ada/lib/cardanoCrypto/rustLoader';
+import { getCardanoStateFetcher } from '../utils';
+import AdaApi from '../../../../app/api/ada';
+import type { WalletState } from '../types';
 
-async function migrate(): Promise<void> {
-  const localStorageApi = new LocalStorageApi();
-  const db = await loadLovefieldDB(schema.DataStoreType.INDEXED_DB);
-  await migrateNoRefresh({
-    localStorageApi,
-    persistentDb: db,
-    currVersion: environment.getVersion(),
-  })
+/*::
+declare var chrome;
+*/
+
+let dbCache = null;
+let migratePromiseCache = null;
+
+export async function init(): Promise<void> {
+  // eagerly cache
+  await _getDb();
 }
 
-const migratePromise = migrate();
-
 async function _getDb(): Promise<lf$Database> {
-  await migratePromise;
-  return await loadLovefieldDB(schema.DataStoreType.INDEXED_DB);
+  const localStorageApi = new LocalStorageApi();
+
+  if (!dbCache) {
+    dbCache = await loadLovefieldDB(schema.DataStoreType.INDEXED_DB);
+  }
+  
+  if (!migratePromiseCache) {
+    migratePromiseCache =  migrateNoRefresh({
+      localStorageApi,
+      persistentDb: dbCache,
+      currVersion: environment.getVersion(),
+    });
+  }
+  await migratePromiseCache;
+
+  return dbCache;
 }
 
 // Get the db handle. The client should only read from the db.
@@ -34,43 +54,87 @@ export async function getDb(): Promise<lf$Database> {
   return await copyDbToMemory(db);
 }
 
+type WalletId = number;
+type SyncState = {|
+  promise: Promise<void>,
+|};
+const syncState: Map<WalletId, SyncState> = new Map();
+
 export async function syncWallet(wallet: PublicDeriver<>): Promise<void> {
-  /*
-  const isCardano = isCardanoHaskell(wallet.getParent().getNetworkInfo());
-  try {
-    const lastSync = await wallet.getLastSyncInfo();
-    // don't sync more than every 30 seconds
-    const now = Date.now();
-    if (lastSync.Time == null || now - lastSync.Time.getTime() > 30*1000) {
-      if (syncing == null) {
-        syncing = true;
-        await RustModule.load();
-        Logger.debug('sync started');
-        if (isCardano) {
-          const stateFetcher: CardanoIFetcher =
-            await getCardanoStateFetcher(localStorageApi);
-          await cardanoUpdateTransactions(
-            wallet.getDb(),
-            wallet,
-            stateFetcher.checkAddressesInUse,
-            stateFetcher.getTransactionsHistoryForAddresses,
-            stateFetcher.getRecentTransactionHashes,
-            stateFetcher.getTransactionsByHashes,
-            stateFetcher.getBestBlock,
-            stateFetcher.getTokenInfo,
-            stateFetcher.getMultiAssetMintMetadata,
-            stateFetcher.getMultiAssetSupply,
-          )
-        } else {
-          throw new Error('non-cardano wallet. Should not happen');
-        }
-        Logger.debug('sync ended');
-      }
-    }
-  } catch (e) {
-    Logger.error(`Syncing failed: ${e}`);
-  } finally {
-    syncing = null;
+  const walletId = wallet.getPublicDeriverId();
+  const state = syncState.get(walletId);
+  if (state && state.promise) {
+    return state.promise;
   }
-  */
+  const promise = _syncWallet(wallet);
+  syncState.set(walletId, { promise });
+  await promise;
+  syncState.delete(walletId);
+  notifyWalletState([wallet]);
 }
+
+async function getWalletState(wallet: PublicDeriver<>): Promise<WalletState> {
+  return {
+    publicDeriverId: wallet.getPublicDeriverId(),
+    utxos: await connectorGetUtxosCardano(
+      wallet,
+      null,
+      null,
+      RustModule.WalletV4.BigNum.from_str('0'), // we know this isn't used
+    ),
+    transactions: [],
+  };
+}
+
+async function notifyWalletState(wallets: Array<PublicDeriver<>>): Promise<void> {
+  const state = await Promise.all(wallets.map(getWalletState));
+  const json = JSON.stringify(state);
+  for (const tabId of subscribedTabIds) {
+    chrome.tabs.sendMessage(tabId, json);
+  }    
+}
+
+async function _syncWallet(wallet: PublicDeriver<>): Promise<void> {
+  try {
+    await RustModule.load();
+    console.debug('sync started');
+    const localStorageApi = new LocalStorageApi();
+    const stateFetcher = await getCardanoStateFetcher(localStorageApi);
+    const adaApi = new AdaApi();
+    adaApi.refreshTransactions({
+      // skip
+      // number
+      publicDeriver: wallet,
+      isLocalRequest: false,
+      beforeTx: undefined,
+      afterTx: undefined,
+      getRecentTransactionHashes: stateFetcher.getRecentTransactionHashes,
+      getTransactionsByHashes: stateFetcher.getTransactionsByHashes,
+      checkAddressesInUse: stateFetcher.checkAddressesInUse,
+      getBestBlock: stateFetcher.getBestBlock,
+      getTokenInfo: stateFetcher.getTokenInfo,
+      getMultiAssetMetadata: stateFetcher.getMultiAssetMintMetadata,
+      getMultiAssetSupply: stateFetcher.getMultiAssetSupply,
+      getTransactionHistory: stateFetcher.getTransactionsHistoryForAddresses,
+    });
+    console.debug('sync ended');
+  } catch (e) {
+    console.error(`Syncing failed: ${e}`);
+  }
+}
+
+const subscribedTabIds: Array<number> = [];
+
+export async function subscribeWalletStateChanges(tabId: number): Promise<Array<WalletState>> {
+  subscribedTabIds.push(tabId);
+  const wallets = await getWallets({ db: await _getDb()});
+  const state = await Promise.all(wallets.map(wallet => getWalletState(wallet)));
+  return state;
+}
+
+chrome.tabs.onRemoved.addListener((tabId: number, _info) => {
+  const index = subscribedTabIds.indexOf(tabId);
+  if (index >= 0) {
+    subscribedTabIds.splice(index, 1);
+  }
+});

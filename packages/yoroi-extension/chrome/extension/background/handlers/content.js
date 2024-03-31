@@ -77,6 +77,7 @@ import { find721metadata } from '../../../../app/utils/nftMetadata';
 import { hexToBytes } from '../../../../app/coreUtils';
 import { mergeWitnessSets } from '../../connector/utils';
 import { getDb, syncWallet } from '../state';
+import { getCardanoStateFetcher } from '../utils';
 
 /*::
 declare var chrome;
@@ -255,32 +256,6 @@ export async function withDb<T>(
   return await continuation(db, localStorageApi);
   // note: calling close() "is not mandatory nor recommended":
   // https://github.com/google/lovefield/blob/master/docs/spec/03_life_of_db.md
-}
-
-async function createFetcher(
-  fetcherType: Function,
-  localStorageApi: LocalStorageApi,
-): * {
-  const locale = await localStorageApi.getUserLocale() ?? 'en-US';
-  return new fetcherType(
-    () => environment.getVersion(),
-    () => locale,
-    () => {
-      if (environment.userAgentInfo.isFirefox()) {
-        return 'firefox';
-      }
-      if (environment.userAgentInfo.isChrome()) {
-        return 'chrome';
-      }
-      return '-';
-    },
-  )
-}
-
-async function getCardanoStateFetcher(
-  localStorageApi: LocalStorageApi,
-): Promise<CardanoIFetcher> {
-  return new CardanoBatchedFetcher(await createFetcher(CardanoRemoteFetcher, localStorageApi));
 }
 
 async function withSelectedSiteConnection<T>(

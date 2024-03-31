@@ -2,6 +2,7 @@
 import debounce from 'lodash/debounce';
 import { handleInjectorMessage } from './handlers/content';
 import { isYoroiMessage, yoroiMessageHandler } from './handlers/yoroi';
+import { init } from './state';
 
 /*::
 declare var chrome;
@@ -20,14 +21,16 @@ if (chrome.action) {
 }
 
 
-chrome.runtime.onMessage.addListener(
-  (message, sender, sendResponse) => {
-    if (isYoroiMessage(message)) {
-      // Returning `true` is required by Firefox, see:
-      // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage
-      yoroiMessageHandler(message, sender, sendResponse);
-      return true;
-    }
-    return handleInjectorMessage(message, sender);
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  //fixme: verify sender.id === extension id
+  console.debug(`get message ${JSON.stringify(message)} from ${sender.tab.id}`);
+  if (isYoroiMessage(message)) {
+    // Returning `true` is required by Firefox, see:
+    // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage
+    yoroiMessageHandler(message, sender, sendResponse);
+    return true;
   }
-);
+  return handleInjectorMessage(message, sender);
+});
+
+init().catch(console.error);

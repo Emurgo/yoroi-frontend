@@ -3,6 +3,11 @@
 import { schema } from 'lovefield';
 import { loadLovefieldDBFromDump } from './ada/lib/storage/database';
 import type { lf$Database, } from 'lovefield';
+import type { WalletState } from '../../chrome/extension/background/types';
+
+/*::
+declare var chrome;
+*/
 
 function callBackground<T, R>(message: T): Promise<R> {
   return new Promise((resolve, reject) => {
@@ -28,4 +33,12 @@ export async function getDb(): Promise<lf$Database> {
     return value;
   });
   return await loadLovefieldDBFromDump(schema.DataStoreType.MEMORY, data);
+}
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  //fixme: verify sender.id/origin
+});
+
+export async function subscribeWalletStateChanges(): Promise<Array<WalletState>> {
+  return await callBackground({ type: 'subscribe-wallet-state-changes' });
 }
