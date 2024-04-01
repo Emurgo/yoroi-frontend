@@ -40,7 +40,6 @@ export default function SwapForm({
   const {
     resetSwapForm,
     switchTokens,
-    sellTouched,
   } = useSwapForm();
 
   const {
