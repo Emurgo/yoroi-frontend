@@ -18,7 +18,6 @@ import { fail, forceNonNull, maybe } from '../../../coreUtils';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import { useSwap } from '@yoroi/swap';
 import { addressBech32ToHex } from '../../../api/ada/lib/cardanoCrypto/utils';
-import BigNumber from 'bignumber.js';
 import { getTransactionFeeFromCbor, getTransactionTotalOutputFromCbor } from '../../../api/ada/transactions/utils';
 
 const orderColumns = [

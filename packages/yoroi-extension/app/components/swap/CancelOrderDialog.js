@@ -7,8 +7,6 @@ import TextField from '../common/TextField';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 import { useState } from 'react';
-import BigNumber from 'bignumber.js';
-import { Quantities } from '../../utils/quantities';
 import type { FormattedTokenValue } from '../../containers/swap/orders/OrdersPage';
 
 type Props = {|

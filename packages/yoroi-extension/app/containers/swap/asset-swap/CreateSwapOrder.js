@@ -37,7 +37,7 @@ export const CreateSwapOrder = ({
   priceImpactState,
 }: Props): React$Node => {
   const [openedDialog, setOpenedDialog] = useState('');
-  const { resetSwapForm, switchTokens, sellTouched } = useSwapForm();
+  const { resetSwapForm, switchTokens } = useSwapForm();
 
   const {
     orderData: {
