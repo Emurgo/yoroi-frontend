@@ -239,6 +239,10 @@ export class MultiToken {
     return new Map(this.values.map(value => [value.identifier, value.amount]));
   };
 
+  entries: void => Array<TokenEntry> = () => {
+    return [...this.values];
+  }
+
   isEqualTo: MultiToken => boolean = tokens => {
     const remainingTokens = this.asMap();
 

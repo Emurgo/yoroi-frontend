@@ -9,10 +9,14 @@ import LoadingSpinner from '../widgets/LoadingSpinner';
 import { useState } from 'react';
 import BigNumber from 'bignumber.js';
 import { Quantities } from '../../utils/quantities';
+import type { FormattedTokenValue } from '../../containers/swap/orders/OrdersPage';
 
 type Props = {|
   order: any,
-  transactionFee: ?BigNumber,
+  transactionParams: ?{|
+    formattedFee: string,
+    returnValues: Array<FormattedTokenValue>,
+  |},
   onCancelOrder: (order: any, password: string) => void,
   onDialogClose: void => void,
   defaultTokenInfo: RemoteTokenInfo,
@@ -20,21 +24,13 @@ type Props = {|
 
 export default function CancelSwapOrderDialog({
   order,
-  transactionFee,
+  transactionParams,
   onCancelOrder,
   onDialogClose,
   defaultTokenInfo,
 }: Props): React$Node {
   const [password, setPassword] = useState('');
-  const isLoading = transactionFee == null;
-  const ptDecimals = defaultTokenInfo.decimals ?? 0;
-  const calcDefaultTokenReturnValue: string => ?string = baseValue => {
-    // TODO: add frontend fee
-    return transactionFee ? Quantities.format(
-      Quantities.sum([baseValue, `-${transactionFee.toString()}`]),
-      ptDecimals,
-    ) : null;
-  }
+  const isLoading = transactionParams == null;
   return (
     <Dialog title="Cancel order" onClose={onDialogClose} withCloseButton closeOnOverlayClick>
       <Box display="flex" mt="8px" mb="24px" flexDirection="column" gap="16px">
@@ -42,36 +38,24 @@ export default function CancelSwapOrderDialog({
           <Typography component="div" variant="body1">Are you sure you want to cancel this order?</Typography>
         </Box>
         <AssetPair
-          from={order.fromToken}
-          to={order.toToken}
+          from={order.from.token}
+          to={order.to.token}
           defaultTokenInfo={defaultTokenInfo}
         />
         <Box display="flex" flexDirection="column" gap="8px">
           <SummaryRow col1="Asset price">
-            {order.price} {order.fromToken.ticker}
+            {order.price} {order.from.token.ticker}
           </SummaryRow>
           <SummaryRow col1="Asset amount">
-            {order.amount} {order.toToken.ticker}
+            {order.amount} {order.to.token.ticker}
           </SummaryRow>
           <SummaryRow col1="Total returned" withInfo>
-            {order.totalValues.map(v => {
-              const val = v.defaultToken
-                ? calcDefaultTokenReturnValue(v.value)
-                : v.formattedValue;
-              return (
-                <Box>{val ? `${val} ${v.ticker}` : (<LoadingSpinner small />)}</Box>
-              );
-            })}
+            {transactionParams ? transactionParams.returnValues.map(v => (
+              <Box>{v.formattedValue} {v.ticker}</Box>
+            )) : (<LoadingSpinner small />)}
           </SummaryRow>
           <SummaryRow col1="Cancellation fee">
-            {transactionFee ? (
-              Quantities.format(
-                transactionFee.toString(),
-                ptDecimals,
-              )
-            ) : (
-              <LoadingSpinner small />
-            )}
+            {transactionParams ? transactionParams.formattedFee : (<LoadingSpinner small />)}
           </SummaryRow>
         </Box>
         <Box>

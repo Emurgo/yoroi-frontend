@@ -486,3 +486,20 @@ export function getTransactionFeeFromCbor(txHex: string): BigNumber {
     throw e;
   }
 }
+
+export function getTransactionTotalOutputFromCbor(txHex: string, defaults: DefaultTokenEntry): MultiToken {
+  try {
+    return RustModule.WasmScope(Module => {
+      const outputs = Module.WalletV4.FixedTransaction.from_hex(txHex).body().outputs();
+      const sum = new MultiToken([], defaults);
+      for (let i = 0; i < outputs.len(); i++) {
+        const output = outputs.get(i);
+        sum.joinAddMutable(multiTokenFromCardanoValue(output.amount(), defaults));
+      }
+      return sum;
+    });
+  } catch (e) {
+    console.error('Failed to decode transaction total output from cbor', e);
+    throw e;
+  }
+}

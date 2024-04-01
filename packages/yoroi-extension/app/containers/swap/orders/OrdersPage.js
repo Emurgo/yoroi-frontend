@@ -19,7 +19,7 @@ import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import { useSwap } from '@yoroi/swap';
 import { addressBech32ToHex } from '../../../api/ada/lib/cardanoCrypto/utils';
 import BigNumber from 'bignumber.js';
-import { getTransactionFeeFromCbor } from '../../../api/ada/transactions/utils';
+import { getTransactionFeeFromCbor, getTransactionTotalOutputFromCbor } from '../../../api/ada/transactions/utils';
 
 const orderColumns = [
   'Pair (From / To)',
@@ -31,38 +31,44 @@ const orderColumns = [
   'Transaction ID',
 ];
 
-type FormattedAttachedValue = {|
+export type FormattedTokenValue = {|
   value: string,
   formattedValue: string,
   ticker: string,
-  defaultToken?: true,
 |};
 
-function createFormattedAttachedValues({
+function createFormattedTokenValues({
+  entries,
   order,
   defaultTokenInfo,
-}): Array<FormattedAttachedValue> {
-  const attachedValueMap = order.valueAttached.reduce((map, v) =>
-    ({ ...map, [v.token]: Quantities.sum([map[v.token] ?? '0', v.amount]) }), {});
-  const decimalsAda = forceNonNull(defaultTokenInfo.decimals);
-  const defaultTokenValue = attachedValueMap['.'] ?? '0';
-  const formattedAttachedValues = [{
+}: {|
+  entries: Array<{| id: string, amount: string |}>,
+  order: any,
+  defaultTokenInfo: RemoteTokenInfo,
+|}): Array<FormattedTokenValue> {
+  const tokenAmountMap = entries.reduce((map, v) =>
+    ({ ...map, [v.id]: Quantities.sum([map[v.id] ?? '0', v.amount]) }), {});
+  const ptDecimals = forceNonNull(defaultTokenInfo.decimals);
+  // $FlowIgnore[prop-missing]
+  const defaultTokenValue = tokenAmountMap[''] ?? tokenAmountMap['.'] ?? '0';
+  const formattedTokenValues = [{
     value: defaultTokenValue,
-    formattedValue: Quantities.format(defaultTokenValue, decimalsAda, decimalsAda),
+    formattedValue: Quantities.format(defaultTokenValue, ptDecimals, ptDecimals),
     ticker: defaultTokenInfo.ticker ?? '-',
-    defaultToken: true,
   }];
-  [order.from, order.to].forEach(t => {
-    maybe(attachedValueMap[t.id], v => {
-      const formattedValue = Quantities.format(v, t.decimals, t.decimals);
-      formattedAttachedValues.push({
-        value: v,
-        formattedValue,
-        ticker: t.ticker ?? '-',
+  [order.from.token, order.to.token].forEach(t => {
+    if (t.id !== '' && t.id !== '.') {
+      maybe(tokenAmountMap[t.id], v => {
+        const formattedValue = Quantities.format(v, t.decimals, t.decimals);
+        formattedTokenValues.push({
+          value: v,
+          formattedValue,
+          ticker: t.ticker ?? '-',
+        });
       });
-    })
-  })
-  return formattedAttachedValues;
+    }
+  });
+  return formattedTokenValues;
 }
 
 function mapOrder(order: any, defaultTokenInfo: RemoteTokenInfo): {|
@@ -71,10 +77,10 @@ function mapOrder(order: any, defaultTokenInfo: RemoteTokenInfo): {|
   txId: string,
   price: string,
   amount: string,
-  totalValues: Array<FormattedAttachedValue>,
+  totalValues: Array<FormattedTokenValue>,
   provider: string,
-  fromToken: any,
-  toToken: any,
+  from: any,
+  to: any,
 |} {
   const txId = order.utxo.split('#')[0];
   const price = Quantities.quotient(order.from.quantity, order.to.quantity);
@@ -85,8 +91,11 @@ function mapOrder(order: any, defaultTokenInfo: RemoteTokenInfo): {|
     order.to.token.decimals,
     order.to.token.decimals,
   );
-  const formattedAttachedValues =
-    createFormattedAttachedValues({ order, defaultTokenInfo });
+  const formattedAttachedValues = createFormattedTokenValues({
+    entries: order.valueAttached.map(({ token: id, amount }) => ({ id, amount })),
+    order,
+    defaultTokenInfo,
+  });
   return {
     utxo: order.utxo,
     sender: order.sender,
@@ -95,8 +104,8 @@ function mapOrder(order: any, defaultTokenInfo: RemoteTokenInfo): {|
     amount: formattedToQuantity,
     totalValues: formattedAttachedValues,
     provider: order.provider,
-    fromToken: order.from.token,
-    toToken: order.to.token,
+    from: order.from,
+    to: order.to,
   }
 }
 
@@ -107,7 +116,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
   const [showCompletedOrders, setShowCompletedOrders] = useState<boolean>(false);
   const [cancellationState, setCancellationState] = useState<?{|
     order: any,
-    tx: ?{| cbor: string, fee: BigNumber |},
+    tx: ?{| cbor: string, formattedFee: string, formattedReturn: Array<FormattedTokenValue> |},
   |}>(null);
 
   const wallet = props.stores.wallets.selectedOrFail;
@@ -133,6 +142,12 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
         })
       })
       .then(cancelTxCbor => {
+        const mt = getTransactionTotalOutputFromCbor(cancelTxCbor, wallet.getParent().getDefaultToken());
+        const formattedCancelValues = createFormattedTokenValues({
+          entries: mt.entries().map(e => ({ id: e.identifier, amount: e.amount.toString() })),
+          order,
+          defaultTokenInfo,
+        });
         setCancellationState(s => {
           // State might have been reset to null in the meantime
           if (s == null) return null;
@@ -142,7 +157,12 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
             order: s.order,
             tx: {
               cbor: cancelTxCbor,
-              fee: getTransactionFeeFromCbor(cancelTxCbor),
+              formattedFee: Quantities.format(
+                getTransactionFeeFromCbor(cancelTxCbor).toString(),
+                forceNonNull(defaultTokenInfo.decimals),
+                forceNonNull(defaultTokenInfo.decimals),
+              ),
+              formattedReturn: formattedCancelValues,
             },
           };
         });
@@ -212,7 +232,10 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
       {cancellationState && (
         <CancelSwapOrderDialog
           order={cancellationState.order}
-          transactionFee={cancellationState.tx?.fee}
+          transactionParams={maybe(cancellationState.tx, tx => ({
+            formattedFee: tx.formattedFee,
+            returnValues: tx.formattedReturn,
+          }))}
           onCancelOrder={handleCancelConfirm}
           onDialogClose={() => setCancellationState(null)}
           defaultTokenInfo={defaultTokenInfo}
@@ -227,8 +250,8 @@ const OrderRow = ({ handleCancel = null, order, defaultTokenInfo, selectedExplor
     <>
       <AssetPair
         sx={{ py: '20px' }}
-        from={order.fromToken}
-        to={order.toToken}
+        from={order.from.token}
+        to={order.to.token}
         defaultTokenInfo={defaultTokenInfo}
       />
       <Box textAlign="right">{order.price}</Box>
