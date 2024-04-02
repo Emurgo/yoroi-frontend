@@ -147,7 +147,7 @@ function TopBarLayout({
             margin: 0,
             display: 'flex',
             flexDirection: 'column',
-            height: 'calc(100vh - 92px)',
+            height: 'calc(100vh - 25px)',
           }}
         >
           {content}
