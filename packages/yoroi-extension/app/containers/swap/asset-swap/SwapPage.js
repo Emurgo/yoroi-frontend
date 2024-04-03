@@ -215,6 +215,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
 
   const onRemoteOrderDataResolved: any => Promise<void> = async ({
     contractAddress,
+    datum,
     datumHash,
   }) => {
     // creating tx
@@ -223,9 +224,9 @@ function SwapPage(props: StoresAndActionsProps): Node {
         'Incorrect state. Pool calculations are not available to prepare the transaction'
       );
     }
-    if (contractAddress == null || datumHash == null) {
+    if (contractAddress == null || datum == null || datumHash == null) {
       throw new Error(
-        `Incorrect remote order resolve! ${JSON.stringify({ contractAddress, datumHash })}`
+        `Incorrect remote order resolve! ${JSON.stringify({ contractAddress, datum, datumHash })}`
       );
     }
     const {
@@ -237,6 +238,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
     const swapTxReq = {
       wallet,
       contractAddress,
+      datum,
       datumHash,
       sell,
       buy,

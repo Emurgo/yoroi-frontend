@@ -580,6 +580,10 @@ export async function newAdaUnsignedTxFromUtxo(
 
   const txBuilder = await TxBuilder.new(defaultNetworkConfig, utxoSet);
 
+  // When both hash and datum are present - datum is added as extra witness
+  const extraWitnessDatumsPresent =
+    outputs.some(o => o.data != null && o.dataHash != null);
+
   const sendRequest = await SendRequest.from(outputs.map(output => {
     const defaultTokenAmount = output.amount.getDefaultEntry().amount.toString();
     const nondefaultTokens = output.amount.values.filter(
@@ -662,6 +666,10 @@ export async function newAdaUnsignedTxFromUtxo(
         start: changeAdaAddr.addressing.startLevel,
       }
     );
+
+  if (extraWitnessDatumsPresent) {
+    await txBuilder.calcScriptDataHash('default');
+  }
 
   await txBuilder.addChangeAndFee(changeAddress);
 
@@ -1049,8 +1057,11 @@ export function signTransaction(
 
   let txBody;
   let txHash;
+  let txWitSet;
   if (unsignedTx instanceof RustModule.WalletV4.TransactionBuilder) {
-    txBody = unsignedTx.build();
+    const tx = unsignedTx.build_tx();
+    txBody = tx.body();
+    txWitSet = tx.witness_set();
     txHash = RustModule.WalletV4.hash_transaction(txBody);
   } else if (unsignedTx instanceof RustModule.WalletV4.TransactionBody) {
     txBody = unsignedTx;
@@ -1068,8 +1079,9 @@ export function signTransaction(
     throw new Error('unexpected tx body type');
   }
 
-  const vkeyWits = RustModule.WalletV4.Vkeywitnesses.new();
-  const bootstrapWits = RustModule.WalletV4.BootstrapWitnesses.new();
+  const witnessSet = txWitSet ?? RustModule.WalletV4.TransactionWitnessSet.new();
+  const vkeyWits = witnessSet.vkeys() ?? RustModule.WalletV4.Vkeywitnesses.new();
+  const bootstrapWits = witnessSet.bootstraps() ?? RustModule.WalletV4.BootstrapWitnesses.new();
 
   addWitnesses(
     txHash,
@@ -1093,7 +1105,6 @@ export function signTransaction(
     );
   }
 
-  const witnessSet = RustModule.WalletV4.TransactionWitnessSet.new();
   if (bootstrapWits.len() > 0) witnessSet.set_bootstraps(bootstrapWits);
   if (vkeyWits.len() > 0) witnessSet.set_vkeys(vkeyWits);
 
