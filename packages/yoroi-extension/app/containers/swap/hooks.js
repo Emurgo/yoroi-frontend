@@ -65,7 +65,7 @@ export function useSwapFeeDisplay(defaultTokenInfo: RemoteTokenInfo): {|
 
   if (sellTokenIsPtToken) {
     // put together the sell and the fees
-    const ptAmount = Quantities.sum([sellAmount, totalFeesPtToken]);
+    const ptAmount = Quantities.sum([sellAmount, totalFeesPtToken, cost.deposit.quantity]);
     const formattedPtTotal = Quantities.format(ptAmount, ptDecimals, ptDecimals);
     const formattedPtAmount = `${formattedPtTotal} ${ptTicker}`;
     return {
