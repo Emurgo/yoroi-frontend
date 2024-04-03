@@ -340,4 +340,4 @@ function SwapPage(props: StoresAndActionsProps): Node {
   );
 }
 
-export default (observer(SwapPage): React$ComponentType<Props>);
+export default (observer(SwapPage): React$ComponentType<StoresAndActionsProps>);

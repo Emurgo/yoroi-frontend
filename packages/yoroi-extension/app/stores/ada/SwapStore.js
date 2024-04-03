@@ -50,7 +50,7 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
     this.limitOrderDisplayValue = '';
   };
 
-  @action setOrderStepValue: string => void = (val: number) => {
+  @action setOrderStepValue: number => void = (val: number) => {
     this.orderStep = val;
   };
 
