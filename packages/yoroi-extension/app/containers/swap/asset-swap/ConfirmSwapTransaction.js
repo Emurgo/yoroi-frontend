@@ -21,6 +21,7 @@ import {
 import type { State } from '../context/swap-form/types';
 import { useEffect } from 'react';
 import { IncorrectWalletPasswordError } from '../../../api/common/errors';
+import { InfoTooltip } from '../../../components/widgets/InfoTooltip';
 
 type Props = {|
   slippageValue: string,
@@ -33,7 +34,7 @@ type Props = {|
   getFormattedPairingValue: (amount: string) => string,
 |};
 
-export default function SwapConfirmationStep({
+export default function ConfirmSwapTransaction({
   slippageValue,
   walletAddress,
   priceImpactState,
@@ -135,27 +136,31 @@ export default function SwapConfirmationStep({
         <SummaryRow col1="Dex">
           <SwapPoolLabel provider={pool?.provider} isAutoPool={isAutoPool} />
         </SummaryRow>
-        <SummaryRow col1="Slippage tolerance" withInfo>
-          {slippageValue}%
-        </SummaryRow>
+        <SummaryRow col1="Slippage tolerance">{slippageValue}%</SummaryRow>
         <SwapPoolFullInfo defaultTokenInfo={defaultTokenInfo} />
+        <SummaryRow
+          col1="Market price"
+          withInfo
+          infoText="Market price is the best price available on the market among several DEXes that lets you buy or sell an asset instantly"
+        >
+          <FormattedMarketPrice />
+        </SummaryRow>
+        <SummaryRow
+          col1="Price impact"
+          withInfo
+          infoText="Limit price in a DEX is a specific pre-set price at which you can trade an asset. Unlike market orders, which execute immediately at the current market price, limit orders are set to execute only when the market reaches the trader's specified price."
+        >
+          <PriceImpactColored priceImpactState={priceImpactState} sx={{ display: 'flex' }}>
+            {priceImpactState && <PriceImpactIcon isSevere={priceImpactState.isSevere} />}
+            <PriceImpactPercent />
+          </PriceImpactColored>
+        </SummaryRow>
         {priceImpactState && (
-          <>
-            <SummaryRow col1="Market price" withInfo>
-              <FormattedMarketPrice />
-            </SummaryRow>
-            <SummaryRow col1="Price impact" withInfo>
-              <PriceImpactColored priceImpactState={priceImpactState} sx={{ display: 'flex' }}>
-                <PriceImpactIcon isSevere={priceImpactState.isSevere} />
-                <PriceImpactPercent />
-              </PriceImpactColored>
-            </SummaryRow>
-            <SummaryRow col1="">
-              <PriceImpactColored priceImpactState={priceImpactState}>
-                (<FormattedActualPrice />)
-              </PriceImpactColored>
-            </SummaryRow>
-          </>
+          <SummaryRow col1="">
+            <PriceImpactColored priceImpactState={priceImpactState}>
+              (<FormattedActualPrice />)
+            </PriceImpactColored>
+          </SummaryRow>
         )}
         <Box p="16px" bgcolor="#244ABF" borderRadius="8px" color="common.white">
           <Box display="flex" justifyContent="space-between">
@@ -196,7 +201,7 @@ export default function SwapConfirmationStep({
   );
 }
 
-const SummaryRow = ({ col1, children, withInfo = false }) => (
+const SummaryRow = ({ col1, children, withInfo = false, infoText = '' }) => (
   <Box display="flex" alignItems="center" justifyContent="space-between">
     <Box display="flex" alignItems="center">
       <Typography component="div" variant="body1" color="grayscale.500">
@@ -204,7 +209,7 @@ const SummaryRow = ({ col1, children, withInfo = false }) => (
       </Typography>
       {withInfo ? (
         <Box ml="8px">
-          <InfoIcon />
+          <InfoTooltip width={500} content={<Typography color="inherit">{infoText}</Typography>} />
         </Box>
       ) : null}
     </Box>

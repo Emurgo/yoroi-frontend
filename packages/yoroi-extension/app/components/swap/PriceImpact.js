@@ -12,9 +12,7 @@ import { PRICE_PRECISION } from './common';
 import { useSwapForm } from '../../containers/swap/context/swap-form';
 
 function colorsBySeverity(isSevere: boolean) {
-  return isSevere
-    ? { fg: '#FF1351', bg: '#FFF1F5' }
-    : { fg: '#ED8600', bg: '#FDF7E2' };
+  return isSevere ? { fg: '#FF1351', bg: '#FFF1F5' } : { fg: '#ED8600', bg: '#FDF7E2' };
 }
 
 export function PriceImpactColored({
@@ -26,17 +24,15 @@ export function PriceImpactColored({
   children: Node,
   sx?: any,
 |}): Node {
-  const colorProps = priceImpactState ? { color: colorsBySeverity(priceImpactState.isSevere).fg } : {};
-  return (
-    <span style={{ ...colorProps, ...(sx??{}) }}>
-      {children}
-    </span>
-  )
+  const colorProps = priceImpactState
+    ? { color: colorsBySeverity(priceImpactState.isSevere).fg }
+    : {};
+  return <span style={{ ...colorProps, ...(sx ?? {}) }}>{children}</span>;
 }
 
 export function PriceImpactIcon({
   isSevere,
-  small
+  small,
 }: {|
   isSevere: boolean,
   small?: boolean,
@@ -44,36 +40,33 @@ export function PriceImpactIcon({
   const sz = `${small ? 16 : 24}px`;
   const marginTop = `${small ? -2 : 0}px`;
   const marginRight = `6px`;
-  const svgProp = small ? {
-    style: { transform: 'scale(0.666666666)' },
-  } : {};
+  const svgProp = small
+    ? {
+        style: { transform: 'scale(0.666666666)' },
+      }
+    : {};
   return (
     <Box
       sx={{
         width: sz,
         height: sz,
         marginTop,
-        marginRight
+        marginRight,
       }}
     >
-      {isSevere
-        ? <ErrorTriangleIcon {...svgProp} />
-        : <ExclamationCircleIcon {...svgProp} />}
+      {isSevere ? <ErrorTriangleIcon {...svgProp} /> : <ExclamationCircleIcon {...svgProp} />}
     </Box>
   );
 }
 
-function PriceImpactWarningText({
-  isSevere,
-}: {|
-  isSevere: boolean,
-|}): Node {
+function PriceImpactWarningText({ isSevere }: {| isSevere: boolean |}): Node {
   return isSevere ? (
     <Typography component="div" variant="body1" color="grayscale.900">
       <Typography component="span" fontWeight="500">
         Price impact over 10%&nbsp;
       </Typography>
-      may cause a significant loss of funds. Please bear this in mind and proceed with an extra caution.
+      may cause a significant loss of funds. Please bear this in mind and proceed with an extra
+      caution.
     </Typography>
   ) : (
     <Typography component="div" variant="body1" color="grayscale.900">
@@ -95,43 +88,45 @@ export function PriceImpactTitle({
   sx?: any,
 |}): Node {
   return (
-    <Box sx={{ display: 'flex', ...(sx??{}) }}>
+    <Box sx={{ display: 'flex', ...(sx ?? {}) }}>
       <PriceImpactIcon small={small} isSevere={isSevere} />
       <Typography
         component="div"
         color={colorsBySeverity(isSevere).fg}
-        {...(small ? {
-          variant: 'caption',
-        }: {
-          fontWeight: '500',
-        })}
+        {...(small
+          ? {
+              variant: 'caption',
+            }
+          : {
+              fontWeight: '500',
+            })}
       >
         Price impact
       </Typography>
     </Box>
-  )
+  );
 }
 
 export function PriceImpactPercent(): Node {
-  const { orderData  } = useSwap();
+  const { orderData } = useSwap();
   const priceImpact = orderData.selectedPoolCalculation?.prices.priceImpact ?? '0';
+  console.log('priceImpact', priceImpact);
+  if (priceImpact <= 1) {
+    return <Typography sx={{ color: 'secondary.600' }}>&lt;1%</Typography>;
+  }
   return <Percent value={priceImpact} />;
 }
 
-export function FormattedPrice({
-  price,
-}: {|
-  price: string,
-|}): Node {
+export function FormattedPrice({ price }: {| price: string |}): Node {
   const { orderData } = useSwap();
-  const { sellTokenInfo, buyTokenInfo} = useSwapForm();
+  const { sellTokenInfo, buyTokenInfo } = useSwapForm();
   const denomination = orderData.tokens.priceDenomination;
   return (
     <>
       {Quantities.format(price, denomination, PRICE_PRECISION)}
       &nbsp;{sellTokenInfo?.ticker}/{buyTokenInfo?.ticker}
     </>
-  )
+  );
 }
 
 export function FormattedMarketPrice(): Node {
@@ -159,11 +154,11 @@ export function PriceImpactBanner({
     <Box
       component="div"
       bgcolor={colorsBySeverity(isSevere).bg}
-      p='12px 17px 16px 16px'
-      borderRadius='8px'
+      p="12px 17px 16px 16px"
+      borderRadius="8px"
     >
-      <PriceImpactTitle isSevere={isSevere} sx={{ marginBottom: '8px' }}/>
-      <PriceImpactWarningText isSevere={isSevere}/>
+      <PriceImpactTitle isSevere={isSevere} sx={{ marginBottom: '8px' }} />
+      <PriceImpactWarningText isSevere={isSevere} />
     </Box>
   );
 }
@@ -184,7 +179,12 @@ export function PriceImpactAlert({
         <Button fullWidth variant="secondary" onClick={onCancel}>
           Cancel
         </Button>
-        <Button fullWidth variant="primary" onClick={onContinue} sx={{ backgroundColor: 'magenta.500' }}>
+        <Button
+          fullWidth
+          variant="primary"
+          onClick={onContinue}
+          sx={{ backgroundColor: 'magenta.500' }}
+        >
           Continue
         </Button>
       </Box>

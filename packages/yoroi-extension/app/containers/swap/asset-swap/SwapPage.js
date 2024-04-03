@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import { useEffect, useState } from 'react';
 import { Box, Button } from '@mui/material';
 import { CreateSwapOrder } from './CreateSwapOrder';
-import SwapConfirmationStep from './ConfirmationStep';
+import ConfirmSwapTransaction from './ConfirmSwapTransaction';
 import TxSubmittedStep from './TxSubmittedStep';
 import LimitOrderWarningDialog from '../../../components/swap/LimitOrderWarningDialog';
 import { SwapFormProvider } from '../context/swap-form';
@@ -266,7 +266,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
             />
           )}
           {orderStep === 1 && (
-            <SwapConfirmationStep
+            <ConfirmSwapTransaction
               slippageValue={slippageValue}
               walletAddress={selectedWalletAddress}
               priceImpactState={priceImpactState}

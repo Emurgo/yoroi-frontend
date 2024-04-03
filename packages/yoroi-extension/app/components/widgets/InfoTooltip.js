@@ -20,7 +20,7 @@ const STooltip = styled(({ className, width, ...props }: any) => (
 
 type Props = {|
   +content: string | React$Node,
-  width: number,
+  width?: number,
 |};
 
 export const InfoTooltip = ({ content, width }: Props): React$Node => {

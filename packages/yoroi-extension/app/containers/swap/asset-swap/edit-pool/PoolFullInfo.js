@@ -14,9 +14,10 @@ import { InfoTooltip } from '../../../../components/widgets/InfoTooltip';
 
 type Props = {|
   +defaultTokenInfo: RemoteTokenInfo,
+  withInfo?: boolean,
 |};
 
-export default function SwapPoolFullInfo({ defaultTokenInfo }: Props): React$Node {
+export default function SwapPoolFullInfo({ defaultTokenInfo, withInfo }: Props): React$Node {
   const { orderData } = useSwap();
   const { buyTokenInfo } = useSwapForm();
   const { formattedFee } = useSwapFeeDisplay(defaultTokenInfo);
@@ -41,18 +42,20 @@ export default function SwapPoolFullInfo({ defaultTokenInfo }: Props): React$Nod
   const liqFeeQuantity = Quantities.format(cost.liquidityFee.quantity, ptDecimals ?? 0);
 
   return (
-    <Box sx={{ display: 'flex', flexFlow: 'column', gap: '8px', mt: '8px' }}>
+    <Box sx={{ display: 'flex', flexFlow: 'column', gap: '16px', mt: '8px', mb: '8px' }}>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
           Min ADA
-          <InfoTooltip
-            width={245}
-            content={
-              <Typography color="inherit">
-                A small ADA deposit that will be returned when your order is processed or canceled
-              </Typography>
-            }
-          />
+          {withInfo && (
+            <InfoTooltip
+              width={245}
+              content={
+                <Typography color="inherit">
+                  A small ADA deposit that will be returned when your order is processed or canceled
+                </Typography>
+              }
+            />
+          )}
         </Box>
         <Box>
           {deposit} {ptTicker}
@@ -61,30 +64,34 @@ export default function SwapPoolFullInfo({ defaultTokenInfo }: Props): React$Nod
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
           Fees
-          <InfoTooltip
-            width={245}
-            content={
-              <React.Fragment>
-                <Typography color="inherit">Fees included:</Typography>
-                <Typography color="inherit">• DEX fee</Typography>
-                <Typography color="inherit">• Frontend fee</Typography>
-              </React.Fragment>
-            }
-          />
+          {withInfo && (
+            <InfoTooltip
+              width={245}
+              content={
+                <React.Fragment>
+                  <Typography color="inherit">Fees included:</Typography>
+                  <Typography color="inherit">• DEX fee</Typography>
+                  <Typography color="inherit">• Frontend fee</Typography>
+                </React.Fragment>
+              }
+            />
+          )}
         </Box>
         <Box>{formattedFee}</Box>
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
           Minimum assets received
-          <InfoTooltip
-            width={245}
-            content={
-              <Typography color="inherit">
-                The minimum amount you are guaranteed to receive in case of price slippage
-              </Typography>
-            }
-          />
+          {withInfo && (
+            <InfoTooltip
+              width={245}
+              content={
+                <Typography color="inherit">
+                  The minimum amount you are guaranteed to receive in case of price slippage
+                </Typography>
+              }
+            />
+          )}
         </Box>
         <Box>
           {minReceived} {buyTicker}
@@ -93,15 +100,18 @@ export default function SwapPoolFullInfo({ defaultTokenInfo }: Props): React$Nod
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
           Liquidity provider fee
-          <InfoTooltip
-            width={360}
-            content={
-              <Typography color="inherit">
-                A fixed 0.3% operational fee paid to liquidity providers as a reward for supplying
-                tokens, enabling traders to buy and sell assets on the decentralized Cardano network
-              </Typography>
-            }
-          />
+          {withInfo && (
+            <InfoTooltip
+              width={360}
+              content={
+                <Typography color="inherit">
+                  A fixed 0.3% operational fee paid to liquidity providers as a reward for supplying
+                  tokens, enabling traders to buy and sell assets on the decentralized Cardano
+                  network
+                </Typography>
+              }
+            />
+          )}
         </Box>
         <Box>
           {liqFeeQuantity} {buyTicker}
