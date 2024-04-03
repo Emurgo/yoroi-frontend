@@ -117,8 +117,4 @@ export default class LoadingStore extends BaseLoadingStore<StoresMap, ActionsMap
   getTabIdKey(): string {
     return TabIdKeys.Primary;
   }
-
-  getDatabase(): ?lf$Database {
-    return this.loadPersistentDbRequest.result;
-  }
 }

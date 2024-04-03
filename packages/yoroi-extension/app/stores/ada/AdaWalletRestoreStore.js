@@ -10,6 +10,7 @@ import type {
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import { createWallet } from '../../api/thunk';
 
 export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> {
   setup(): void {
@@ -62,26 +63,9 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
     }
     const { phrase } = this.stores.walletRestore.recoveryResult;
     const { walletName, walletPassword } = this.stores.walletRestore.walletRestoreMeta;
-    const persistentDb = this.stores.loading.getDatabase();
-    if (persistentDb == null) {
-      throw new Error(`${nameof(this._restoreToDb)} db not loaded. Should never happen`);
-    }
-    const { selectedNetwork } = this.stores.profile;
-    if (selectedNetwork == null)
-      throw new Error(`${nameof(this._restoreToDb)} no network selected`);
 
     const accountIndex = this.stores.walletRestore.selectedAccount;
-    await this.stores.wallets.restoreRequest.execute(async () => {
-      const wallet = await this.api.ada.restoreWallet({
-        db: persistentDb,
-        recoveryPhrase: phrase,
-        walletName,
-        walletPassword,
-        network: selectedNetwork,
-        accountIndex,
-      });
-      return wallet;
-    }).promise;
+    await this._restoreWallet({ walletName, walletPassword, recoveryPhrase: phrase });
   };
 
   _restoreWallet: ({|
@@ -89,26 +73,19 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
     walletPassword: string,
     recoveryPhrase: string,
   |}) => Promise<void> = async ({ walletName, walletPassword, recoveryPhrase }) => {
-    const persistentDb = this.stores.loading.getDatabase();
-    if (persistentDb == null) {
-      throw new Error(`${nameof(this._restoreToDb)} db not loaded. Should never happen`);
-    }
     const { selectedNetwork } = this.stores.profile;
     if (selectedNetwork == null)
       throw new Error(`${nameof(this._restoreToDb)} no network selected`);
 
     const accountIndex = this.stores.walletRestore.selectedAccount;
-    await this.stores.wallets.restoreRequest.execute(async () => {
-      const wallet = await this.api.ada.restoreWallet({
-        db: persistentDb,
-        recoveryPhrase,
-        walletName,
-        walletPassword,
-        network: selectedNetwork,
-        accountIndex,
-      });
-      return wallet;
-    }).promise;
+
+    await createWallet({
+      recoveryPhrase,
+      walletName,
+      walletPassword,
+      networkId: selectedNetwork.NetworkId,
+      accountIndex,
+    });
   };
 
   teardown(): void {

@@ -42,3 +42,18 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 export async function subscribeWalletStateChanges(): Promise<Array<WalletState>> {
   return await callBackground({ type: 'subscribe-wallet-state-changes' });
 }
+
+export type CreateWalletRequest = {|
+  networkId: number,
+  recoveryPhrase: string,
+  walletName: string,
+  walletPassword: string,
+  accountIndex: number,
+|};
+
+export async function createWallet(request: CreateWalletRequest): Promise<void> {
+  return await callBackground({
+    type: 'create-wallet',
+    request,
+  });
+}

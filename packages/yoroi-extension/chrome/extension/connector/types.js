@@ -6,6 +6,7 @@ import { MultiToken } from '../../../app/api/common/lib/MultiToken';
 import type CardanoTxRequest from '../../../app/api/ada';
 import type { RemoteUnspentOutput } from '../../../app/api/ada/lib/state-fetch/types';
 import type { IGetAllUtxosResponse } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { CreateWalletRequest } from '../../../app/api/thunk';
 
 // ----- Types used in the dApp <-> Yoroi connection bridge ----- //
 
@@ -228,6 +229,10 @@ export type GetDb = {|
 |};
 export type SubscribeWalletStateChanges = {|
   type: 'subscribe-wallet-state-changes',
+|};
+export type CreateWallet = {|
+  type: 'create-wallet',
+  request: CreateWalletRequest,
 |};
 export type TxSignWindowRetrieveData = {|
   type: 'tx_sign_window_retrieve_data',

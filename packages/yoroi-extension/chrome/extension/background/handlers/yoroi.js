@@ -13,14 +13,12 @@ import type {
   GetConnectedSitesData,
   GetConnectionProtocolData,
   GetUtxosRequest,
-  GetDb,
-  SubscribeWalletStateChanges,
-  PendingSignData,
   RemoveWalletFromWhitelistData,
   SigningMessage,
   TxSignWindowRetrieveData,
-  WalletAuthEntry,
-  WhitelistEntry,
+  GetDb,
+  SubscribeWalletStateChanges,
+  CreateWallet,
 } from '../../connector/types';
 import {
   APIErrorCodes,
@@ -66,7 +64,8 @@ import { Logger, stringifyError } from '../../../../app/utils/logging';
 import type { lf$Database, } from 'lovefield';
 import {
   getCardanoHaskellBaseConfig,
-  isCardanoHaskell
+  isCardanoHaskell,
+  networks,
 } from '../../../../app/api/ada/lib/storage/database/prepackaged/networks';
 import { authSignHexPayload } from '../../../../app/connector/api';
 import type { RemoteUnspentOutput } from '../../../../app/api/ada/lib/state-fetch/types';
@@ -94,6 +93,7 @@ import {
 } from './content';
 import type { ConnectedSite } from './content';
 import { subscribeWalletStateChanges } from '../state';
+import { createWallet } from '../../../../app/api/ada';
 
 const YOROI_MESSAGES = Object.freeze({
   CONNECT_RESPONSE: 'connect_response',
@@ -108,6 +108,7 @@ const YOROI_MESSAGES = Object.freeze({
   GET_UTXOS_ADDRESSES: 'get_utxos/addresses',
   GET_DB: 'get-db',
   SUBSCRIBE_WALLET_STATE_CHANGES: 'subscribe-wallet-state-changes',
+  CREATE_WALLET: 'create-wallet',
 });
 
 // messages from other parts of Yoroi (i.e. the UI for the connector)
@@ -124,6 +125,7 @@ export async function yoroiMessageHandler(
     | GetUtxosRequest
     | GetDb
     | SubscribeWalletStateChanges
+    | CreateWallet
   ),
   sender: any,
   sendResponse: Function,
@@ -509,6 +511,28 @@ export async function yoroiMessageHandler(
   } else if (request.type === YOROI_MESSAGES.SUBSCRIBE_WALLET_STATE_CHANGES) {
     const data = await subscribeWalletStateChanges(sender.tab.id);
     sendResponse(JSON.stringify(data));
+  } else if (request.type === YOROI_MESSAGES.CREATE_WALLET) {
+    try {
+      const db = await getDb();
+      const networkKey = Object.keys(networks).find(k => networks[k].NetworkId === request.request.networkId);
+      if (!networkKey) {
+        throw new Error('network not found');
+      }
+      const network = networks[networkKey];
+
+      await createWallet({
+        db,
+        network,
+        recoveryPhrase: request.request.recoveryPhrase,
+        walletName: request.request.walletName,
+        walletPassword: request.request.walletPassword,
+        accountIndex: request.request.accountIndex,
+      });
+    } catch(error) {
+      sendResponse({ error: error.message });
+      return;
+    }
+    sendResponse({ error: null });
   } else {
     console.error(`unknown message ${JSON.stringify(request)} from ${sender.tab.id}`)
   }
