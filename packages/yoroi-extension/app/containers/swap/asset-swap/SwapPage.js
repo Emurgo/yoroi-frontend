@@ -212,18 +212,18 @@ export default function SwapPage(props: StoresAndActionsProps): Node {
     setStep(s => s + 1);
   };
 
-  const onRemoteOrderDataResolved: any => Promise<void> = async ({ contractAddress, datumHash }) => {
+  const onRemoteOrderDataResolved: any => Promise<void> = async ({ contractAddress, datum, datumHash }) => {
     // creating tx
     if (selectedPoolCalculation == null) {
       throw new Error('Incorrect state. Pool calculations are not available to prepare the transaction')
     }
-    if (contractAddress == null || datumHash == null) {
-      throw new Error(`Incorrect remote order resolve! ${JSON.stringify({ contractAddress, datumHash })}`);
+    if (contractAddress == null || datum == null || datumHash == null) {
+      throw new Error(`Incorrect remote order resolve! ${JSON.stringify({ contractAddress, datum, datumHash })}`);
     }
     const { pool: { provider: poolProvider, deposit, batcherFee }, cost } = selectedPoolCalculation;
     const feFees = cost.frontendFeeInfo.fee;
     const ptFees = { deposit: deposit.quantity, batcher: batcherFee.quantity };
-    const swapTxReq = { wallet, contractAddress, datumHash, sell, buy, feFees, ptFees, poolProvider };
+    const swapTxReq = { wallet, contractAddress, datum, datumHash, sell, buy, feFees, ptFees, poolProvider };
     const txSignRequest: HaskellShelleyTxSignRequest =
       await props.stores.substores.ada.swapStore.createUnsignedSwapTx(swapTxReq);
     runInAction(() => {

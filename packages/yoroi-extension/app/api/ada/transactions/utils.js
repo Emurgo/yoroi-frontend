@@ -487,6 +487,9 @@ export function getTransactionFeeFromCbor(txHex: string): BigNumber {
   }
 }
 
+/**
+ * Shallow-parses the passed transaction CBOR HEX, adds together all outputs, and returns as multi-token
+ */
 export function getTransactionTotalOutputFromCbor(txHex: string, defaults: DefaultTokenEntry): MultiToken {
   try {
     return RustModule.WasmScope(Module => {
