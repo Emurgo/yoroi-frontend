@@ -12,13 +12,15 @@ import { maybe } from '../../../../coreUtils';
 import { useSwapFeeDisplay } from '../../hooks';
 import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
 
+
 type Props = {|
   +defaultTokenInfo: RemoteTokenInfo,
   +handleEditPool: void => void,
-|}
+|};
 
 export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props): React$Node {
   const [showFullInfo, setShowFullInfo] = useState(true);
+  const [openedDialog, setOpenedDialog] = useState('');
   const { orderData } = useSwap();
 
   const { selectedPoolCalculation: calculation, bestPoolCalculation, type } = orderData;
@@ -33,8 +35,10 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
 
   const { pool } = calculation;
 
-  const formattedTotal = formattedNonPtAmount == null ? formattedPtAmount
-    : `${formattedNonPtAmount} + ${formattedPtAmount}`;
+  const formattedTotal =
+    formattedNonPtAmount == null
+      ? formattedPtAmount
+      : `${formattedNonPtAmount} + ${formattedPtAmount}`;
   const titleTotalFeesFormatted = `Total: ${formattedTotal}`;
 
   const isLimitOrder = type === 'limit';
@@ -62,8 +66,8 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
           <Box display="flex" gap="8px" alignItems="center">
             <SwapPoolIcon provider={pool.provider} />
             <Typography component="div" variant="body1" color="grayscale.max">
-              {maybe(pool.provider, p => `${capitalize(p)} ${isAutoPool ? '(Auto)' : ''}`)
-                ?? 'No pool found'}
+              {maybe(pool.provider, p => `${capitalize(p)} ${isAutoPool ? '(Auto)' : ''}`) ??
+                'No pool found'}
             </Typography>
             {isLimitOrder && (
               <Box sx={{ cursor: 'pointer' }} onClick={isLimitOrder ? handleEditPool : undefined}>

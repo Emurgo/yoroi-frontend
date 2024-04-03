@@ -27,6 +27,7 @@ export default function EditBuyAmount({ onAssetSelect, defaultTokenInfo }: Props
 
   // Amount input is blocked in case invalid pair
   const handleAmountChange = isInvalidPair ? () => {} : onChangeBuyQuantity;
+  console.log('BUYTokenInfo tokenId', buyTokenInfo);
 
   return (
     <SwapInput
