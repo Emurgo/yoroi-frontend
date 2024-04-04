@@ -110,7 +110,7 @@ export function PriceImpactTitle({
 export function PriceImpactPercent(): Node {
   const { orderData } = useSwap();
   const priceImpact = orderData.selectedPoolCalculation?.prices.priceImpact ?? '0';
-  console.log('priceImpact', priceImpact);
+
   if (priceImpact <= 1) {
     return <Typography sx={{ color: 'secondary.600' }}>&lt;1%</Typography>;
   }

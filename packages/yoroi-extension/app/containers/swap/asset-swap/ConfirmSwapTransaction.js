@@ -44,8 +44,6 @@ export default function ConfirmSwapTransaction({
   defaultTokenInfo,
   getFormattedPairingValue,
 }: Props): React$Node {
-  console.log('priceImpactState', priceImpactState);
-
   const { orderData } = useSwap();
   const {
     selectedPoolCalculation: { pool },
@@ -133,7 +131,7 @@ export default function ConfirmSwapTransaction({
       <PriceImpactBanner priceImpactState={priceImpactState} />
 
       <Box display="flex" gap="8px" flexDirection="column">
-        <SummaryRow col1="Dex">
+        <SummaryRow col1="DEX">
           <SwapPoolLabel provider={pool?.provider} isAutoPool={isAutoPool} />
         </SummaryRow>
         <SummaryRow col1="Slippage tolerance">{slippageValue}%</SummaryRow>
