@@ -50,9 +50,7 @@ import {
   MAX_COLLATERAL,
   connectorGetDRepKey, connectorGetStakeKey,
 } from './connector/api';
-import {
-  updateTransactions as cardanoUpdateTransactions
-} from '../../app/api/ada/lib/storage/bridge/updateTransactions';
+import { updateUtxos } from '../../app/api/ada/lib/storage/bridge/updateTransactions';
 import { environment } from '../../app/environment';
 import type { IFetcher as CardanoIFetcher } from '../../app/api/ada/lib/state-fetch/IFetcher';
 import { RemoteFetcher as CardanoRemoteFetcher } from '../../app/api/ada/lib/state-fetch/remoteFetcher';
@@ -362,14 +360,10 @@ async function syncWallet(
         if (isCardano) {
           const stateFetcher: CardanoIFetcher =
             await getCardanoStateFetcher(localStorageApi);
-          await cardanoUpdateTransactions(
+          await updateUtxos(
             wallet.getDb(),
             wallet,
             stateFetcher.checkAddressesInUse,
-            stateFetcher.getTransactionsHistoryForAddresses,
-            stateFetcher.getRecentTransactionHashes,
-            stateFetcher.getTransactionsByHashes,
-            stateFetcher.getBestBlock,
             stateFetcher.getTokenInfo,
             stateFetcher.getMultiAssetMintMetadata,
             stateFetcher.getMultiAssetSupply,
