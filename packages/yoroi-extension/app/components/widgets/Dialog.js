@@ -69,7 +69,7 @@ function Dialog(props: Props & InjectedProps): Node {
 
       if (el.clientHeight < el.scrollHeight) {
         setContentHasScroll(true);
-        el.style.marginRight = '-24px';
+        // el.style.marginRight = '-24px';
       } else {
         setContentHasScroll(false);
         el.style.marginRight = '0';
@@ -121,15 +121,17 @@ function Dialog(props: Props & InjectedProps): Node {
       >
         {title != null && title !== '' ? (
           // $FlowIgnore
-          <Typography as="h1" variant="body1" className="dialog__title" id={id + '-dialogTitle-text'}>
+          <Typography
+            as="h1"
+            variant="body1"
+            className="dialog__title"
+            id={String(id) + '-dialogTitle-text'}
+          >
             {title}
           </Typography>
         ) : null}
         {children != null ? (
-          <ModalContent
-            pb={contentHasScroll || !hasActions ? '24px' : '0px !important'}
-            className="ModalContent"
-          >
+          <ModalContent pb={contentHasScroll || !hasActions ? '24px' : '0px !important'}>
             {children}
           </ModalContent>
         ) : null}
@@ -141,10 +143,10 @@ function Dialog(props: Props & InjectedProps): Node {
                 action.className != null ? action.className : null,
                 action.primary === true ? 'primary' : 'secondary',
               ]);
-              const buttonLabel = action.label.toLowerCase().replace(/ /gi, '')
+              const buttonLabel = action.label.toLowerCase().replace(/ /gi, '');
               return (
                 <LoadingButton
-                // $FlowIgnore
+                  // $FlowIgnore
                   id={action.id ?? id + '-' + buttonLabel + '-button'}
                   key={i}
                   {...getBtnVariant(action.danger, action.primary, isRevampLayout)}
@@ -214,43 +216,46 @@ export const CloseButton = ({
   </Box>
 );
 
-export const ModalContainer: any => Node = styled(Box)(({ theme, contentHasScroll, empty = false }) => {
-  const normalMinWidth = theme.name === 'classic' || theme.name === 'modern'
-    ? 'var(--yoroi-comp-dialog-min-width-md)'
-    : '648px';
-  return ({
-    position: 'relative',
-    minWidth: empty ? '0px' : normalMinWidth,
-    borderRadius: theme.name === 'classic' ? 0 : 8,
-    paddingTop: theme.name === 'classic' ? '25px' : '0px',
-    paddingBottom: theme.name === 'classic' || theme.name === 'modern' ? '30px' : '0px',
-    maxWidth: theme.name === 'classic' ? '785px' : '824px',
-    backgroundColor: empty ? undefined : 'var(--yoroi-comp-dialog-background)',
-    color: 'var(--yoroi-comp-dialog-text)',
-    maxHeight: '95vh',
+export const ModalContainer: any => Node = styled(Box)(
+  ({ theme, contentHasScroll, empty = false }) => {
+    const normalMinWidth =
+      theme.name === 'classic' || theme.name === 'modern'
+        ? 'var(--yoroi-comp-dialog-min-width-md)'
+        : '648px';
+    return {
+      position: 'relative',
+      minWidth: empty ? '0px' : normalMinWidth,
+      borderRadius: theme.name === 'classic' ? 0 : 8,
+      paddingTop: theme.name === 'classic' ? '25px' : '0px',
+      paddingBottom: theme.name === 'classic' || theme.name === 'modern' ? '30px' : '0px',
+      maxWidth: theme.name === 'classic' ? '785px' : '824px',
+      backgroundColor: empty ? undefined : 'var(--yoroi-comp-dialog-background)',
+      color: 'var(--yoroi-comp-dialog-text)',
+      maxHeight: '95vh',
 
-    '& .dialog__title': {
-      flex: 1,
-      marginBottom: theme.name === 'classic' ? '22px' : '0px',
-      padding: theme.name === 'classic' ? '0' : '24px',
-      fontWeight: 500,
-      textAlign: 'center',
-      textTransform: 'uppercase',
-      letterSpacing: 0,
-      display: 'block',
-      borderBottom:
-        theme.name === 'classic' || theme.name === 'modern'
-          ? ''
-          : contentHasScroll
+      '& .dialog__title': {
+        flex: 1,
+        marginBottom: theme.name === 'classic' ? '22px' : '0px',
+        padding: theme.name === 'classic' ? '0' : '24px',
+        fontWeight: 500,
+        textAlign: 'center',
+        textTransform: 'uppercase',
+        letterSpacing: 0,
+        display: 'block',
+        borderBottom:
+          theme.name === 'classic' || theme.name === 'modern'
+            ? ''
+            : contentHasScroll
             ? '1px solid'
             : '',
-      borderBottomColor:
-        theme.name === 'classic' || theme.name === 'modern'
-          ? theme.palette.gray['200']
-          : theme.palette.grayscale['200'],
-    },
-  });
-});
+        borderBottomColor:
+          theme.name === 'classic' || theme.name === 'modern'
+            ? theme.palette.gray['200']
+            : theme.palette.grayscale['200'],
+      },
+    };
+  }
+);
 
 const ModalContent = styled(Box)(({ theme }) => ({
   overflowX: 'hidden',

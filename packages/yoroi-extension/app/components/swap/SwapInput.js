@@ -45,8 +45,6 @@ export default function SwapInput({
       ? adaTokenImage
       : urlResolveForIpfsAndCorsproxy(image) ?? defaultTokenImage;
 
-  console.log('focusState', focusState);
-
   return (
     <Box>
       <Box

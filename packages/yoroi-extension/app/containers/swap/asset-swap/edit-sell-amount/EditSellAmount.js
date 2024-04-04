@@ -20,7 +20,7 @@ export default function EditSellAmount({ onAssetSelect, defaultTokenInfo }: Prop
     sellFocusState,
   } = useSwapForm();
   const { tokenId } = orderData.amounts.sell;
-  console.log('sellTokenInfo tokenId', sellTokenInfo);
+
   return (
     <Box>
       <SwapInput

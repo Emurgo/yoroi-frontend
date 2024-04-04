@@ -73,6 +73,7 @@ class SwapPageContainer extends Component<AllProps> {
         }
         showInContainer
         showAsCard
+        withPadding={false}
       >
         {children}
       </TopBarLayout>

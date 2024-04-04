@@ -12,7 +12,6 @@ import { maybe } from '../../../../coreUtils';
 import { useSwapFeeDisplay } from '../../hooks';
 import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
 
-
 type Props = {|
   +defaultTokenInfo: RemoteTokenInfo,
   +handleEditPool: void => void,
@@ -27,8 +26,8 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
   const { sellTokenInfo, buyTokenInfo } = useSwapForm();
 
   const { formattedPtAmount, formattedNonPtAmount } = useSwapFeeDisplay(defaultTokenInfo);
-
   const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
+
   if (!isValidTickers || calculation == null) {
     return null;
   }
@@ -106,7 +105,7 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
             </Box>
           </Box>
         </Box>
-        {showFullInfo && <SwapPoolFullInfo defaultTokenInfo={defaultTokenInfo} />}
+        {showFullInfo && <SwapPoolFullInfo defaultTokenInfo={defaultTokenInfo} withInfo />}
       </Box>
     </Box>
   );

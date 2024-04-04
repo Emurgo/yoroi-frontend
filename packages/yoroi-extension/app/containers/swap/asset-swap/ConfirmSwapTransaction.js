@@ -137,7 +137,7 @@ export default function ConfirmSwapTransaction({
           <SwapPoolLabel provider={pool?.provider} isAutoPool={isAutoPool} />
         </SummaryRow>
         <SummaryRow col1="Slippage tolerance">{slippageValue}%</SummaryRow>
-        <SwapPoolFullInfo defaultTokenInfo={defaultTokenInfo} />
+        <SwapPoolFullInfo defaultTokenInfo={defaultTokenInfo} showMinAda />
         <SummaryRow
           col1="Market price"
           withInfo

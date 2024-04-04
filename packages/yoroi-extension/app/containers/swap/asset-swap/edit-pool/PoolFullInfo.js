@@ -15,9 +15,14 @@ import { InfoTooltip } from '../../../../components/widgets/InfoTooltip';
 type Props = {|
   +defaultTokenInfo: RemoteTokenInfo,
   withInfo?: boolean,
+  showMinAda?: boolean,
 |};
 
-export default function SwapPoolFullInfo({ defaultTokenInfo, withInfo }: Props): React$Node {
+export default function SwapPoolFullInfo({
+  defaultTokenInfo,
+  withInfo,
+  showMinAda,
+}: Props): React$Node {
   const { orderData } = useSwap();
   const { buyTokenInfo } = useSwapForm();
   const { formattedFee } = useSwapFeeDisplay(defaultTokenInfo);
@@ -43,24 +48,27 @@ export default function SwapPoolFullInfo({ defaultTokenInfo, withInfo }: Props):
 
   return (
     <Box sx={{ display: 'flex', flexFlow: 'column', gap: '16px', mt: '8px', mb: '8px' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
-          Min ADA
-          {withInfo && (
-            <InfoTooltip
-              width={245}
-              content={
-                <Typography color="inherit">
-                  A small ADA deposit that will be returned when your order is processed or canceled
-                </Typography>
-              }
-            />
-          )}
+      {showMinAda && (
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
+            Min ADA
+            {withInfo && (
+              <InfoTooltip
+                width={245}
+                content={
+                  <Typography color="inherit">
+                    A small ADA deposit that will be returned when your order is processed or
+                    canceled
+                  </Typography>
+                }
+              />
+            )}
+          </Box>
+          <Box>
+            {deposit} {ptTicker}
+          </Box>
         </Box>
-        <Box>
-          {deposit} {ptTicker}
-        </Box>
-      </Box>
+      )}
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
           Fees

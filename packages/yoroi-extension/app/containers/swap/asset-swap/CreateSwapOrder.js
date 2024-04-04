@@ -61,7 +61,15 @@ export const CreateSwapOrder = ({
 
   return (
     <>
-      <Box width="100%" mx="auto" maxWidth="506px" display="flex" flexDirection="column" gap="8px">
+      <Box
+        width="100%"
+        mx="auto"
+        maxWidth="506px"
+        display="flex"
+        flexDirection="column"
+        gap="8px"
+        pb="20px"
+      >
         {/* Order type and refresh */}
         <TopActions orderTypeTabs={orderTypeTabs} orderType={orderType} />
 

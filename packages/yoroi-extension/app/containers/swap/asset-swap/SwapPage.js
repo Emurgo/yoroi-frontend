@@ -255,7 +255,11 @@ function SwapPage(props: StoresAndActionsProps): Node {
   return (
     <SwapFormProvider swapStore={props.stores.substores.ada.swapStore}>
       <Box display="flex" flexDirection="column" height="100%">
-        <Box sx={{ flexGrow: '1', overflowY: 'auto' }}>
+        <Box
+          sx={{ flexGrow: '1', overflowY: 'auto', p: '24px' }}
+          borderBottom="1px solid"
+          borderColor="grayscale.200"
+        >
           {orderStep === 0 && (
             <CreateSwapOrder
               swapStore={props.stores.substores.ada.swapStore}
@@ -294,8 +298,6 @@ function SwapPage(props: StoresAndActionsProps): Node {
             display="flex"
             alignItems="center"
             justifyContent="center"
-            borderTop="1px solid"
-            borderColor="grayscale.200"
           >
             {orderStep === 1 && (
               <Button
