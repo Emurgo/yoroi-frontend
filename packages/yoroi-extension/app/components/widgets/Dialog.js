@@ -234,7 +234,6 @@ export const ModalContainer: any => Node = styled(Box)(
       maxHeight: '95vh',
 
       '& .dialog__title': {
-        flex: 1,
         marginBottom: theme.name === 'classic' ? '22px' : '0px',
         padding: theme.name === 'classic' ? '0' : '24px',
         fontWeight: 500,

@@ -201,7 +201,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
   return (
     <>
       <Box>
-        <Box sx={{ mb: '24px' }}>
+        <Box sx={{ my: '24px' }}>
           <Tabs
             tabs={[
               {

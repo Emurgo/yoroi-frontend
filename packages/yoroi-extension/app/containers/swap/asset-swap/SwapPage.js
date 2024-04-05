@@ -147,71 +147,93 @@ function SwapPage(props: StoresAndActionsProps): Node {
     return `${val} ${currency}`;
   };
 
-  const handleNextStep = () => {
-    if (orderStep === 0) {
-      if (isMarketOrder) {
-        if (priceImpactState?.isSevere) {
-          if (openedDialog === '') {
-            setOpenedDialog('priceImpactAlert');
-            return;
-          }
-          setOpenedDialog('');
-        }
-      } else {
-        // limit order
-        const marketPrice = new BigNumber(selectedPoolCalculation.prices.market);
-        const limitPrice = new BigNumber(orderLimitPrice);
-        if (limitPrice.isGreaterThan(marketPrice.times(1 + LIMIT_PRICE_WARNING_THRESHOLD))) {
-          if (openedDialog === '') {
-            setOpenedDialog('limitOrderWarning');
-            return;
-          }
-          setOpenedDialog('');
-        }
+  async function processOrderStep() {
+    try {
+      if (orderStep === 0) {
+        handleInitialStep();
+      } else if (orderStep === 1) {
+        await handleSubmitTransaction();
       }
-      setSignRequest(null);
-    } else if (orderStep === 1) {
-      // submitting tx
-      if (openedDialog === '') {
-        if (signRequest == null) {
-          throw new Error('Incorrect state! Order transaction is not prepared properly');
-        }
-        const password = userPasswordState.value;
-        if (password === '') {
-          throw new Error('Incorrect state! User password is required');
-        }
-        props.stores.substores.ada.wallets
-          .adaSendAndRefresh({
-            broadcastRequest: {
-              normal: {
-                publicDeriver: wallet,
-                password,
-                signRequest,
-              },
-            },
-            refreshWallet: () => props.stores.wallets.refreshWalletFromRemote(wallet),
-          })
-          .then(handleNextStep)
-          .catch(e => {
-            const isPasswordError = e instanceof IncorrectWalletPasswordError;
-            if (!isPasswordError) {
-              console.error('Failed to submit swap tx', e);
-            }
-            runInAction(() => {
-              txSubmitErrorState.update(e);
-              setOpenedDialog('');
-              if (!isPasswordError) {
-                setOrderStepValue(1);
-              }
-            });
-          });
-        setOpenedDialog('loadingOverlay');
-        return;
-      }
+    } catch (error) {
+      console.error('Error handling next step', error);
+      // Handle error appropriately
+    }
+  }
+
+  function handleInitialStep() {
+    if (openedDialog !== '') return;
+
+    if (isMarketOrder) {
+      handleMarketOrder();
+    } else {
+      handleLimitOrder();
+    }
+    setSignRequest(null);
+  }
+
+  function handleMarketOrder() {
+    if (priceImpactState?.isSevere) {
+      setOpenedDialog('priceImpactAlert');
+      return;
+    }
+  }
+
+  function handleLimitOrder() {
+    const marketPrice = new BigNumber(selectedPoolCalculation.prices.market);
+    const limitPrice = new BigNumber(orderLimitPrice);
+    if (limitPrice.isGreaterThan(marketPrice.times(1 + LIMIT_PRICE_WARNING_THRESHOLD))) {
+      setOpenedDialog('limitOrderWarning');
+    }
+  }
+
+  async function handleSubmitTransaction() {
+    if (openedDialog !== '' || signRequest == null) return;
+
+    validateSignRequestAndUserPassword();
+    setOpenedDialog('loadingOverlay');
+    const password = userPasswordState.value;
+
+    try {
+      await props.stores.substores.ada.wallets.adaSendAndRefresh({
+        broadcastRequest: {
+          normal: {
+            publicDeriver: wallet,
+            password,
+            signRequest,
+          },
+        },
+        refreshWallet: () => props.stores.wallets.refreshWalletFromRemote(wallet),
+      });
+      processOrderStep();
+    } catch (e) {
+      handleTransactionError(e);
+    } finally {
       setOpenedDialog('');
     }
-    setOrderStepValue(1);
-  };
+  }
+
+  function validateSignRequestAndUserPassword() {
+    if (signRequest == null) {
+      throw new Error('Incorrect state! Order transaction is not prepared properly');
+    }
+    const password = userPasswordState.value;
+    if (password === '') {
+      throw new Error('Incorrect state! User password is required');
+    }
+  }
+
+  function handleTransactionError(e) {
+    const isPasswordError = e instanceof IncorrectWalletPasswordError;
+    runInAction(() => {
+      txSubmitErrorState.update(e);
+      if (!isPasswordError) {
+        setOrderStepValue(1);
+      }
+    });
+    if (!isPasswordError) {
+      console.error('Failed to submit swap tx', e);
+    }
+  }
 
   const onRemoteOrderDataResolved: any => Promise<void> = async ({
     contractAddress,
@@ -311,7 +333,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
               </Button>
             )}
             <Button
-              onClick={handleNextStep}
+              onClick={processOrderStep}
               sx={{ minWidth: '128px', minHeight: '48px' }}
               variant="primary"
               disabled={!isSwapEnabled || isButtonLoader}
@@ -325,11 +347,23 @@ function SwapPage(props: StoresAndActionsProps): Node {
       {openedDialog === 'loadingOverlay' && <LoadingOverlay />}
 
       {openedDialog === 'limitOrderWarning' && (
-        <LimitOrderWarningDialog onContinue={handleNextStep} onCancel={() => setOpenedDialog('')} />
+        <LimitOrderWarningDialog
+          onContinue={() => {
+            setOrderStepValue(1);
+            setOpenedDialog('');
+          }}
+          onCancel={() => setOpenedDialog('')}
+        />
       )}
 
       {openedDialog === 'priceImpactAlert' && (
-        <PriceImpactAlert onContinue={handleNextStep} onCancel={() => setOpenedDialog('')} />
+        <PriceImpactAlert
+          onContinue={() => {
+            setOrderStepValue(1);
+            setOpenedDialog('');
+          }}
+          onCancel={() => setOpenedDialog('')}
+        />
       )}
 
       {disclaimerStatus === false && (
