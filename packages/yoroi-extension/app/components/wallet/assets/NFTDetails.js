@@ -150,6 +150,10 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
         sx={{
           color: 'grayscale.900',
           lineHeight: '27.5px',
+          fontSize: '14px',
+          '&.MuiButton-sizeMedium': {
+            padding: '13px 16px',
+          },
         }}
         startIcon={<BackArrow />}
       >
@@ -160,8 +164,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
         columns={10}
         sx={{
           margin: '0 auto',
-          minHeight: '520px',
-          mb: '21px',
+          minHeight: '400px',
           backgroundColor: 'common.white',
           borderRadius: '8px',
         }}
@@ -191,7 +194,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
           item
           xs={6}
           sx={{
-            paddingTop: '24px',
+            paddingTop: '16px',
             paddingBottom: '22px',
           }}
         >
@@ -343,7 +346,6 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
               sx={{
                 boxShadow: 'none',
                 bgcolor: 'transparent',
-                height: '100%',
                 overflow: 'auto',
               }}
               value={tabs[1].id}
