@@ -336,7 +336,8 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
             {intl.formatMessage(globalMessages.stakePoolHash)}
           </Typography>
           <Box>
-            <Typography component="div"
+            <Typography
+              component="div"
               variant="body1"
               sx={{ '& > div > p': { p: '2px 3px' }, px: '2px', ml: '-3px', mt: '-2px' }}
             >
