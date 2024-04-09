@@ -9,6 +9,8 @@ import type {
 import typeof * as WasmV4 from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 import typeof * as WasmMessageSigning from '@emurgo/cardano-message-signing-browser/cardano_message_signing';
 import typeof * as CrossCsl from '@emurgo/cross-csl-browser';
+import { coinsPerWord_to_coinsPerByte } from '../../transactions/utils';
+import BigNumber from 'bignumber.js';
 
 // TODO: unmagic the constants
 const MAX_VALUE_BYTES = 5000;
@@ -230,6 +232,19 @@ class Module {
     return scopedResult.result;
   }
 
+  ScopeMonad<T>(callback: Module => T): WasmMonad<T> {
+    const WS = this.WasmScope.bind(this);
+    function InternalMonad<T>(mapper: Module => T): WasmMonad<T> {
+      return {
+        // $FlowIgnore[escaped-generic]
+        wasmMap: f => InternalMonad(Module => f(mapper(Module), Module)),
+        // $FlowIgnore[escaped-generic]
+        unwrap: f => WS(Module => f(mapper(Module), Module)),
+      }
+    }
+    return InternalMonad(callback);
+  }
+
   // Need to expose through a getter to get Flow to detect the type correctly
   get WalletV2(): WasmV2 {
     return this._wasmv2;
@@ -288,12 +303,20 @@ class Module {
       maxTxBytes,
     } = params;
     const w4 = this.WalletV4;
+
+    // <TODO:PENDING_REMOVAL> LEGACY
+    const cointPerUtxoByte = w4.BigNum.from_str(
+      coinsPerWord_to_coinsPerByte(
+        new BigNumber(coinsPerUtxoWord.to_str()),
+      ).toString(),
+    );
+
     return w4.TransactionBuilder.new(
       w4.TransactionBuilderConfigBuilder.new()
         .fee_algo(linearFee)
         .pool_deposit(poolDeposit)
         .key_deposit(keyDeposit)
-        .coins_per_utxo_word(coinsPerUtxoWord)
+        .coins_per_utxo_byte(cointPerUtxoByte)
         .max_value_size(maxValueBytes ?? MAX_VALUE_BYTES)
         .max_tx_size(maxTxBytes ?? MAX_TX_BYTES)
         .ex_unit_prices(w4.ExUnitPrices.new(
@@ -315,6 +338,11 @@ class Module {
     return this._messageSigning;
   }
 }
+
+export type WasmMonad<T> = {|
+  wasmMap<R>(f: (T, Module) => R): WasmMonad<R>;
+  unwrap<R>(f: (T, Module) => R): R;
+|}
 
 // Need this otherwise Wallet's flow type isn't properly exported
 export const RustModule: Module = new Module();

@@ -116,7 +116,7 @@ import type {
 import { getChainAddressesForDisplay, } from './lib/storage/models/utils';
 import { getAllAddressesForDisplay, rawGetAddressRowsForWallet, } from './lib/storage/bridge/traitUtils';
 import {
-  asAddressedUtxo,
+  asAddressedUtxo, cardanoMinAdaRequiredFromAssets_coinsPerWord,
   cardanoValueFromMultiToken,
   convertAdaTransactionsToExportRows,
   multiTokenFromCardanoValue,
@@ -1236,18 +1236,12 @@ export default class AdaApi {
           throw new Error(`Value is required for a valid tx output, got: ${JSON.stringify(target)}`);
         }
       } else {
-        RustModule.WasmScope(Scope => {
-          // ensureRequiredMinimalValue is true
-          const minAmount = Scope.WalletV4.min_ada_required(
-            cardanoValueFromMultiToken(amount),
-            dataHash != null,
-            RustModule.WalletV4.BigNum.from_str(protocolParams.coinsPerUtxoWord),
-          );
 
-          if ((new BigNumber(minAmount.to_str())).gt(new BigNumber(target.value ?? '0'))) {
-            amount = makeMultiToken(minAmount.to_str());
-          };
-        });
+        const minAmount =
+          cardanoMinAdaRequiredFromAssets_coinsPerWord(amount, new BigNumber(protocolParams.coinsPerUtxoWord));
+        if (minAmount.gt(target.value ?? '0')) {
+          amount = makeMultiToken(minAmount.toString());
+        }
       }
       outputs.push({
         address: target.address,

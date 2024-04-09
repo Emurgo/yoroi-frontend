@@ -42,7 +42,11 @@ import { MultiToken } from '../../api/common/lib/MultiToken';
 import { genLookupOrFail, getTokenName } from '../stateless/tokenHelpers';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import { asAddressedUtxo, cardanoValueFromRemoteFormat } from '../../api/ada/transactions/utils';
+import {
+  asAddressedUtxo,
+  cardanoMinAdaRequiredFromRemoteFormat_coinsPerWord,
+  cardanoValueFromRemoteFormat
+} from '../../api/ada/transactions/utils';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { PRIMARY_ASSET_CONSTANTS } from '../../api/ada/lib/storage/database/primitives/enums';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
@@ -87,12 +91,12 @@ type SubmittedTransactionEntry = {|
   usedUtxos: Array<{| txHash: string, index: number |}>,
 |};
 
-function getCoinsPerUtxoWord(network: $ReadOnly<NetworkRow>): RustModule.WalletV4.BigNum {
+function getCoinsPerUtxoWord(network: $ReadOnly<NetworkRow>): BigNumber {
   const config = getCardanoHaskellBaseConfig(network).reduce(
     (acc, next) => Object.assign(acc, next),
     {}
   );
-  return RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord);
+  return new BigNumber(config.CoinsPerUtxoWord);
 }
 
 function newMultiToken(
@@ -418,9 +422,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const networkInfo = deriverParent.getNetworkInfo();
     const defaultToken = deriverParent.getDefaultToken();
     const isCardano = isCardanoHaskell(networkInfo);
-    const coinsPerUtxoWord = isCardano
-      ? getCoinsPerUtxoWord(networkInfo)
-      : RustModule.WalletV4.BigNum.zero();
+    const coinsPerUtxoWord = getCoinsPerUtxoWord(networkInfo);
 
     // <TODO:PLUTUS_SUPPORT>
     const utxoHasDataHash = false;
@@ -445,30 +447,27 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
             const WalletV4 = RustModule.WalletV4;
             const utxos = await canGetUtxos.getAllUtxos();
             const addressedUtxos = asAddressedUtxo(utxos).filter(u => u.assets.length > 0);
-            const deposits: Array<RustModule.WalletV4.BigNum> = addressedUtxos.map(
+            const deposits: Array<BigNumber> = addressedUtxos.map(
               (u: CardanoAddressedUtxo) => {
                 try {
-                  return WalletV4.min_ada_required(
-                    // $FlowFixMe[prop-missing]
-                    cardanoValueFromRemoteFormat(u),
-                    utxoHasDataHash,
-                    coinsPerUtxoWord
-                  );
+                  // <TODO:COINS_PER_BYTE>
+                  // $FlowIgnore[prop-missing]
+                  return cardanoMinAdaRequiredFromRemoteFormat_coinsPerWord(u, coinsPerUtxoWord);
                 } catch (e) {
                   // eslint-disable-next-line no-console
                   console.error(
                     `Failed to calculate min-required ADA for utxo: ${JSON.stringify(u)}`,
                     e
                   );
-                  return WalletV4.BigNum.zero();
+                  return new BigNumber(0);
                 }
               }
             );
-            const sumDeposit = deposits.reduce((a, b) => a.checked_add(b), WalletV4.BigNum.zero());
+            const sumDeposit = deposits.reduce((a, b) => a.plus(b), new BigNumber(0));
             return newMultiToken(defaultToken, [
               {
                 identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
-                amount: new BigNumber(sumDeposit.to_str()),
+                amount: sumDeposit,
                 networkId: networkInfo.NetworkId,
               },
             ]);

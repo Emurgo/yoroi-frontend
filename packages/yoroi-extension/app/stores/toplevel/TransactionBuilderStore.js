@@ -25,7 +25,11 @@ import {
 } from '../../api/common/lib/MultiToken';
 import type { TokenRow, } from '../../api/ada/lib/storage/database/primitives/tables';
 import { getDefaultEntryToken } from './TokenInfoStore';
-import {  cardanoValueFromMultiToken } from '../../api/ada/transactions/utils';
+import {
+  cardanoMinAdaRequiredFromAssets_coinsPerWord,
+  cardanoMinAdaRequiredFromRemoteFormat_coinsPerWord,
+  cardanoValueFromMultiToken
+} from '../../api/ada/transactions/utils';
 import { getReceiveAddress } from '../stateless/addressStores';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
@@ -298,13 +302,11 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       getDefaultEntryToken(defaultToken)
     );
 
-    const minAmount = RustModule.WalletV4.min_ada_required(
-      cardanoValueFromMultiToken(fakeMultitoken),
-      false,
-      RustModule.WalletV4.BigNum.from_str(squashedConfig.CoinsPerUtxoWord)
+    const minAmount = cardanoMinAdaRequiredFromAssets_coinsPerWord(
+      fakeMultitoken,
+      new BigNumber(squashedConfig.CoinsPerUtxoWord),
     );
-
-    return minAmount.to_str();
+    return minAmount.toString();
   }
 
   /**

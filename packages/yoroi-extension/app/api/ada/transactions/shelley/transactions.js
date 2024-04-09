@@ -25,7 +25,7 @@ import { getCardanoSpendingKeyHash, normalizeToAddress } from '../../lib/storage
 import { MultiToken, } from '../../../common/lib/MultiToken';
 import { PRIMARY_ASSET_CONSTANTS } from '../../lib/storage/database/primitives/enums';
 import { cardanoValueFromMultiToken, cardanoValueFromRemoteFormat, multiTokenFromCardanoValue, asAddressedUtxo, multiTokenFromRemote } from '../utils';
-import { hexToBytes, logErr } from '../../../../coreUtils';
+import { hexToBytes, logErr, fail } from '../../../../coreUtils';
 import { getCardanoHaskellBaseConfig } from '../../lib/storage/database/prepackaged/networks';
 import { IPublicDeriver, IGetAllUtxos, IHasUtxoChains } from '../../lib/storage/models/PublicDeriver/interfaces';
 import { ConceptualWallet } from '../../lib/storage/models/ConceptualWallet/index';
@@ -235,8 +235,8 @@ function addUtxoInput(
   if (witness == null) {
     logErr(
       () => {
-        txBuilder.add_input(
-          wasmAddr,
+        txBuilder.add_key_input(
+          getCardanoSpendingKeyHash(wasmAddr) ?? fail(`Not a key-input address: ${input.receiver}`),
           txInput,
           wasmAmount
         );

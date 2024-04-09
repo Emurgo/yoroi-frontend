@@ -20,6 +20,9 @@ import type { DefaultTokenEntry, } from '../../common/lib/MultiToken';
 import { MultiToken, } from '../../common/lib/MultiToken';
 import { RustModule } from '../lib/cardanoCrypto/rustLoader';
 import { PRIMARY_ASSET_CONSTANTS } from '../lib/storage/database/primitives/enums';
+import type { WasmMonad } from '../lib/cardanoCrypto/rustLoader';
+
+const RANDOM_BASE_ADDRESS = 'addr_test1qzz6hulv54gzf2suy2u5gkvmt6ysasfdlvvegy3fmf969y7r3y3kdut55a40jff00qmg74686vz44v6k363md06qkq0qy0adz0';
 
 export function cardanoAssetToIdentifier(
   policyId: RustModule.WalletV4.ScriptHash,
@@ -88,22 +91,23 @@ export function parseTokenList(
 
 export function cardanoValueFromMultiToken(
   tokens: MultiToken,
+  Module: typeof RustModule = RustModule,
 ): RustModule.WalletV4.Value {
-  const value = RustModule.WalletV4.Value.new(
-    RustModule.WalletV4.BigNum.from_str(tokens.getDefaultEntry().amount.toString())
+  const value = Module.WalletV4.Value.new(
+    Module.WalletV4.BigNum.from_str(tokens.getDefaultEntry().amount.toString())
   );
   // recall: primary asset counts towards size
   if (tokens.size() === 1) return value;
 
-  const assets = RustModule.WalletV4.MultiAsset.new();
+  const assets = Module.WalletV4.MultiAsset.new();
   for (const entry of tokens.nonDefaultEntries()) {
     const { policyId, name } = identifierToCardanoAsset(entry.identifier);
 
-    const policyContent = assets.get(policyId) ?? RustModule.WalletV4.Assets.new();
+    const policyContent = assets.get(policyId) ?? Module.WalletV4.Assets.new();
 
     policyContent.insert(
       name,
-      RustModule.WalletV4.BigNum.from_str(entry.amount.toString())
+      Module.WalletV4.BigNum.from_str(entry.amount.toString())
     );
     // recall: we always have to insert since WASM returns copies of objects
     assets.insert(policyId, policyContent);
@@ -429,8 +433,10 @@ export function iterateWasmKeyValue<K, V>(iterable: ?{| get: K => V |}, keys: ?K
   return res;
 }
 
-export function cardanoUtxoHexFromRemoteFormat(u: RemoteUnspentOutput): string {
-  return RustModule.WasmScope(Module => {
+function cardanoUtxoMonadFromRemoteFormat(
+  u: RemoteUnspentOutput,
+): WasmMonad<RustModule.WalletV4.TransactionUnspentOutput> {
+  return RustModule.ScopeMonad(Module => {
     const W4 = Module.WalletV4;
     const input = W4.TransactionInput.new(
       W4.TransactionHash.from_hex(u.tx_hash),
@@ -441,10 +447,68 @@ export function cardanoUtxoHexFromRemoteFormat(u: RemoteUnspentOutput): string {
       value.set_multiasset(assetToRustMultiasset(u.assets));
     }
     const output = W4.TransactionOutput.new(
-      W4.Address.from_bytes(Buffer.from(u.receiver, 'hex')),
+      W4.Address.from_hex(u.receiver),
       value,
     );
-    return W4.TransactionUnspentOutput.new(input, output).to_hex();
+    return W4.TransactionUnspentOutput.new(input, output);
+  });
+}
+
+export function cardanoUtxoHexFromRemoteFormat(u: RemoteUnspentOutput): string {
+  return cardanoUtxoMonadFromRemoteFormat(u)
+    .unwrap(output => output.to_hex());
+}
+
+function cardanoMinAdaRequiredFromOutput(
+  output: RustModule.WalletV4.TransactionOutput,
+  coinsPerByte: BigNumber,
+  Module: typeof RustModule,
+): BigNumber {
+  const wasmCoinsPerByte = Module.WalletV4.BigNum.from_str(coinsPerByte.toString());
+  const dataCost = Module.WalletV4.DataCost.new_coins_per_byte(wasmCoinsPerByte);
+  const minAdaRequired = Module.WalletV4.min_ada_for_output(output, dataCost).to_str();
+  return new BigNumber(minAdaRequired);
+}
+
+/**
+ * <TODO:PENDING_REMOVAL> LEGACY
+ * @deprecated
+ */
+export function coinsPerWord_to_coinsPerByte(coinsPerWord: BigNumber): BigNumber {
+  return coinsPerWord.div(8).integerValue(BigNumber.ROUND_FLOOR);
+}
+
+/**
+ * @deprecated
+ */
+export function cardanoMinAdaRequiredFromRemoteFormat_coinsPerWord(u: RemoteUnspentOutput, coinsPerWord: BigNumber): BigNumber {
+  return cardanoMinAdaRequiredFromRemoteFormat(u, coinsPerWord_to_coinsPerByte(coinsPerWord));
+}
+
+export function cardanoMinAdaRequiredFromRemoteFormat(u: RemoteUnspentOutput, coinsPerByte: BigNumber): BigNumber {
+  return cardanoUtxoMonadFromRemoteFormat(u)
+    .unwrap<BigNumber>((wasmUtxo, Module) => {
+      const wasmCoinsPerByte = Module.WalletV4.BigNum.from_str(coinsPerByte.toString());
+      const dataCost = Module.WalletV4.DataCost.new_coins_per_byte(wasmCoinsPerByte);
+      const minAdaRequired = Module.WalletV4.min_ada_for_output(wasmUtxo.output(), dataCost).to_str();
+      return new BigNumber(minAdaRequired);
+    });
+}
+
+/**
+ * @deprecated
+ */
+export function cardanoMinAdaRequiredFromAssets_coinsPerWord(tokens: MultiToken, coinsPerWord: BigNumber): BigNumber {
+  return cardanoMinAdaRequiredFromAssets(tokens, coinsPerWord_to_coinsPerByte(coinsPerWord));
+}
+
+export function cardanoMinAdaRequiredFromAssets(tokens: MultiToken, coinsPerByte: BigNumber): BigNumber {
+  return RustModule.WasmScope(Module => {
+    const output = Module.WalletV4.TransactionOutput.new(
+      Module.WalletV4.Address.from_bech32(RANDOM_BASE_ADDRESS),
+      cardanoValueFromMultiToken(tokens, Module),
+    );
+    return cardanoMinAdaRequiredFromOutput(output, coinsPerByte, Module);
   });
 }
 
