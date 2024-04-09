@@ -25,6 +25,7 @@ import SubMenu from '../../components/topbar/SubMenu';
 import WalletSyncingOverlay from '../../components/wallet/syncingOverlay/WalletSyncingOverlay';
 import WalletLoadingAnimation from '../../components/wallet/WalletLoadingAnimation';
 import { RevampAnnouncementDialog } from './dialogs/RevampAnnouncementDialog';
+import { PoolTransitionDialog } from './dialogs/pool-transition/PoolTransitionDialog';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -55,6 +56,11 @@ class Wallet extends Component<AllProps> {
       });
     }
 
+    // check current pool id -> open poll transition dialog if needed
+    if (true) {
+      this.props.actions.dialogs.open.trigger({ dialog: PoolTransitionDialog });
+    }
+
     if (!this.props.stores.profile.isRevampAnnounced)
       this.props.actions.dialogs.open.trigger({ dialog: RevampAnnouncementDialog });
   }
@@ -73,7 +79,7 @@ class Wallet extends Component<AllProps> {
     if (publicDeriver == null) return;
 
     const spendableBalance = this.props.stores.transactions.balance;
-    const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
+    const walletHasAssets = !!spendableBalance?.nonDefaultEntries().length;
 
     const activeCategory = categories.find(category =>
       this.props.stores.app.currentRoute.startsWith(category.route)
@@ -84,8 +90,8 @@ class Wallet extends Component<AllProps> {
     // or no category is selected yet (wallet selected for the first time)
     const visibilityContext = { selected: publicDeriver, walletHasAssets };
     if (
-      !activeCategory?.isVisible(visibilityContext)
-      && activeCategory?.isHiddenButAllowed !== true
+      !activeCategory?.isVisible(visibilityContext) &&
+      activeCategory?.isHiddenButAllowed !== true
     ) {
       const firstValidCategory = categories.find(c => c.isVisible(visibilityContext));
       if (firstValidCategory == null) {
@@ -127,7 +133,7 @@ class Wallet extends Component<AllProps> {
 
     const isFirstSync = stores.wallets.firstSyncWalletId === selectedWallet.getPublicDeriverId();
     const spendableBalance = this.props.stores.transactions.balance;
-    const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
+    const walletHasAssets = !!spendableBalance?.nonDefaultEntries().length;
 
     const visibilityContext = { selected: selectedWallet, walletHasAssets };
 
@@ -211,6 +217,7 @@ class Wallet extends Component<AllProps> {
         {warning}
         {this.props.children}
         {this.getDialogs()}
+        {this.getPoolTransitionDialog()}
       </TopBarLayout>
     ) : (
       <TopBarLayout sidebar={sidebarContainer}>
@@ -227,6 +234,20 @@ class Wallet extends Component<AllProps> {
       return undefined;
     }
     return warnings[warnings.length - 1]();
+  };
+
+  getPoolTransitionDialog: void => Node = () => {
+    const isOpen = this.props.stores.uiDialogs.isOpen;
+    if (isOpen(PoolTransitionDialog)) {
+      return (
+        <PoolTransitionDialog
+          onClose={() => {
+            this.props.actions.dialogs.closeActiveDialog.trigger();
+          }}
+        />
+      );
+    }
+    return null;
   };
 
   getDialogs: void => Node = () => {
