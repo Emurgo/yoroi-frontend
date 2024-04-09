@@ -45,9 +45,7 @@ import type { StoresMap } from '../index';
 import {
   asAddressedUtxo,
   cardanoMinAdaRequiredFromRemoteFormat_coinsPerWord,
-  cardanoValueFromRemoteFormat
 } from '../../api/ada/transactions/utils';
-import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { PRIMARY_ASSET_CONSTANTS } from '../../api/ada/lib/storage/database/primitives/enums';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
@@ -424,9 +422,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const isCardano = isCardanoHaskell(networkInfo);
     const coinsPerUtxoWord = getCoinsPerUtxoWord(networkInfo);
 
-    // <TODO:PLUTUS_SUPPORT>
-    const utxoHasDataHash = false;
-
     await (async () => {
       const canGetBalance = asGetBalance(publicDeriver);
       if (canGetBalance == null) {
@@ -444,7 +439,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
             if (!isCardano || canGetUtxos == null) {
               return newMultiToken(defaultToken);
             }
-            const WalletV4 = RustModule.WalletV4;
             const utxos = await canGetUtxos.getAllUtxos();
             const addressedUtxos = asAddressedUtxo(utxos).filter(u => u.assets.length > 0);
             const deposits: Array<BigNumber> = addressedUtxos.map(

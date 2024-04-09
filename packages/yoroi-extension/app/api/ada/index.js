@@ -117,7 +117,6 @@ import { getChainAddressesForDisplay, } from './lib/storage/models/utils';
 import { getAllAddressesForDisplay, rawGetAddressRowsForWallet, } from './lib/storage/bridge/traitUtils';
 import {
   asAddressedUtxo, cardanoMinAdaRequiredFromAssets_coinsPerWord,
-  cardanoValueFromMultiToken,
   convertAdaTransactionsToExportRows,
   multiTokenFromCardanoValue,
   multiTokenFromRemote,

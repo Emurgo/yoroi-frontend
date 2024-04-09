@@ -26,7 +26,7 @@ test('Wasm Scope Monad Simple Address Convert', async () => {
   const addressFixedDirectly = bytesToHex(RustModule.WalletV4.Address.from_bech32(addr).to_bytes());
   const addressFixedInScope = RustModule
     .ScopeMonad(Module => Module.WalletV4.Address.from_bech32(addr))
-    .wasmMap(addr => addr.to_bytes())
+    .wasmMap(a => a.to_bytes())
     .unwrap(bytes => bytesToHex(bytes));
   expect(addressFixedInScope).toEqual(addressFixedDirectly);
 });

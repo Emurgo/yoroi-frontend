@@ -234,15 +234,15 @@ class Module {
 
   ScopeMonad<T>(callback: Module => T): WasmMonad<T> {
     const WS = this.WasmScope.bind(this);
-    function InternalMonad<T>(mapper: Module => T): WasmMonad<T> {
+    function InternalMonad<K>(mapper: Module => K): WasmMonad<K> {
       return {
         // $FlowIgnore[escaped-generic]
-        wasmMap: f => InternalMonad(Module => f(mapper(Module), Module)),
+        wasmMap: f => InternalMonad(M => f(mapper(M), M)),
         // $FlowIgnore[escaped-generic]
-        unwrap: f => WS(Module => f(mapper(Module), Module)),
+        unwrap: f => WS(M => f(mapper(M), M)),
       }
     }
-    return InternalMonad(callback);
+    return InternalMonad<T>(callback);
   }
 
   // Need to expose through a getter to get Flow to detect the type correctly
