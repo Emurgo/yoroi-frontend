@@ -169,7 +169,7 @@ export default class StandardHeaderRevamp extends Component<Props> {
             </Typography>
 
             {generateAddressForm}
-            {error && <div className={styles.error}>{intl.formatMessage(error)}</div>}
+            {error && <div className={styles.error} id={locationId + '-addressError-text'}>{intl.formatMessage(error)}</div>}
           </Box>
         </Box>
       </Box>
