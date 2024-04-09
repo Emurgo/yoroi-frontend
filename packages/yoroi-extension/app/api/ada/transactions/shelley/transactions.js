@@ -235,8 +235,8 @@ function addUtxoInput(
   if (witness == null) {
     logErr(
       () => {
-        txBuilder.add_key_input(
-          getCardanoSpendingKeyHash(wasmAddr) ?? fail(`Not a key-input address: ${input.receiver}`),
+        txBuilder.add_regular_input(
+          wasmAddr,
           txInput,
           wasmAmount
         );

@@ -1,6 +1,5 @@
 // @flow
 
-import axios from 'axios';
 import { action, reaction, runInAction } from 'mobx';
 import BigNumber from 'bignumber.js';
 import Store from '../base/Store';
@@ -174,7 +173,7 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
       poolIds: poolsToQuery,
     });
     const remotePoolInfoPromises: Array<Promise<[string, PoolInfo | null]>> =
-      poolsToQuery.map(id => new PoolInfoApi(axios).getPool(id).then(res => [id, res]));
+      poolsToQuery.map(id => new PoolInfoApi().getPool(id).then(res => [id, res]));
     const [poolInfoResp, remotePoolInfoResps]: [PoolInfoResponse, Array<[string, PoolInfo | null]>] =
       await Promise.all([poolInfoPromise, Promise.all(remotePoolInfoPromises)]);
     const remoteInfoMap = entriesIntoMap<string, PoolInfo | null>(remotePoolInfoResps);
