@@ -1,33 +1,95 @@
 // @flow
 import React from 'react';
-import { Card, CardContent, Typography, Icon, Grid, Alert, styled, Paper } from '@mui/material';
+import {
+  Card,
+  CardContent,
+  Typography,
+  Icon,
+  Grid,
+  Alert,
+  styled,
+  Paper,
+  Box,
+  Stack,
+} from '@mui/material';
+import { formatTimeSpan } from './helpers';
+
+import { ReactComponent as WarningSvg } from '../../../../assets/images/alert.inline.svg';
 
 type Props = {|
   label: string,
-  poolName: string,
-  roa: string,
-  fee: string,
-  deadline: string,
+  poolName?: string,
+  roa?: string,
+  fee?: string,
+  deadlineMilliseconds?: number,
+  suggestedPool?: boolean,
 |};
 
-export const StakePoolCard = ({ label, poolName, roa, fee, deadline }: Props): React$Node => {
+export const StakePoolCard = ({
+  label,
+  poolName,
+  roa,
+  fee,
+  deadlineMilliseconds,
+  suggestedPool = false,
+}: Props): React$Node => {
   return (
-    <CustomCard>
-      <CardContent>
-        <Typography variant="subtitle1">{poolName}</Typography>
-        <Typography variant="body2">Estimated ROA {roa}</Typography>
-        <Typography variant="body2">Fee {fee}</Typography>
-        {deadline && <Alert severity="warning">{deadline}</Alert>}
-      </CardContent>
+    <CustomCard suggestedPool={suggestedPool}>
+      <Typography variant="body1" fontWeight={500} mb={2}>
+        {label}
+      </Typography>
+      <Typography variant="body1" fontWeight={400}>
+        {poolName}
+      </Typography>
+      <Stack direction="column" gap={1} my={2}>
+        <Stack direction="row" justifyContent="space-between">
+          <Typography variant="body1" color="grayscale.600">
+            Estimated ROA
+          </Typography>
+          <Typography variant="body1" color="grayscale.600">
+            {roa}%
+          </Typography>
+        </Stack>
+        <Stack direction="row" justifyContent="space-between">
+          <Typography variant="body1" color="grayscale.600">
+            Fee
+          </Typography>
+          <Typography variant="body1" color="grayscale.600">
+            {fee}%
+          </Typography>
+        </Stack>
+      </Stack>
+      <Stack direction="row">
+        {!suggestedPool && (
+          <Box mr="4px">
+            <WarningSvg />
+          </Box>
+        )}
+        <Typography color={suggestedPool ? 'grayscale.max' : 'magenta.500'} component="span">
+          <Typography variant="body2" component="span">
+            {suggestedPool
+              ? 'This pool continues to generate staking rewards'
+              : 'This pool will stop generating staking rewards in'}
+          </Typography>
+          {!suggestedPool && (
+            <Typography variant="body2" fontWeight="500" component="span" pl={0.4}>
+              {deadlineMilliseconds
+                ? formatTimeSpan(deadlineMilliseconds)
+                : 'This pool is NOT generating staking rewards anymore'}
+            </Typography>
+          )}
+        </Typography>
+      </Stack>
     </CustomCard>
   );
 };
 
-const CustomCard = styled(Card)(({ theme }) => ({
-  // Add your custom styles here
-  margin: theme.spacing(2),
+const CustomCard = styled(Box)(({ theme, suggestedPool }) => ({
+  background: suggestedPool ? 'linear-gradient(312deg, #C6F7ED 0%, #E4E8F7 70.58%)' : 'transparent',
   padding: theme.spacing(2),
-  boxShadow: '0 3px 5px 2px rgba(0, 0, 0, .3)',
+  width: '294px',
+  borderWidth: 1,
   borderRadius: 8,
-  maxWidth: '284px',
+  border: `1px solid ${theme.palette.grayscale['200']}`,
+  boxShadow: 'none',
 }));

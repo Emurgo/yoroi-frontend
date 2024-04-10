@@ -30,7 +30,11 @@ import { generateGraphData } from '../../../utils/graph';
 import RewardHistoryDialog from '../../../components/wallet/staking/dashboard-revamp/RewardHistoryDialog';
 import DelegatedStakePoolCard from '../../../components/wallet/staking/dashboard-revamp/DelegatedStakePoolCard';
 import WithdrawRewardsDialog from './WithdrawRewardsDialog';
-import { formatLovelacesHumanReadableShort, roundOneDecimal, roundTwoDecimal } from '../../../utils/formatters';
+import {
+  formatLovelacesHumanReadableShort,
+  roundOneDecimal,
+  roundTwoDecimal,
+} from '../../../utils/formatters';
 import { compose, maybe } from '../../../coreUtils';
 
 // populated by ConfigWebpackPlugin
@@ -104,7 +108,8 @@ class StakingPageContent extends Component<AllProps> {
 
     const networkInfo = publicDeriver.getParent().getNetworkInfo();
     const poolMeta = delegationStore.getLocalPoolInfo(networkInfo, currentPool);
-    const { stake, roa, saturation, pic } = delegationStore.getLocalRemotePoolInfo(networkInfo, currentPool) ?? {};
+    const { stake, roa, saturation, pic } =
+      delegationStore.getLocalRemotePoolInfo(networkInfo, currentPool) ?? {};
     if (poolMeta == null) {
       // server hasn't returned information about the stake pool yet
       return null;
@@ -117,12 +122,18 @@ class StakingPageContent extends Component<AllProps> {
       avatar: pic,
       roa: maybe(roa, compose(Number, roundTwoDecimal)),
       poolSize: maybe(stake, formatLovelacesHumanReadableShort),
-      share: maybe(saturation, s => roundOneDecimal(Number(s)*100)),
+      share: maybe(saturation, s => roundOneDecimal(Number(s) * 100)),
       websiteUrl: poolMeta.info?.homepage,
       ticker: poolMeta.info?.ticker,
     };
+
+    // fake current pool id to trigger the transition UI
+    const poolTransition = delegationStore.getPoolTransition(
+      'd248ded3c18e0e80d07a46f00a2d808075b989ccb1a0e40a76e5cee1'
+    );
     return (
       <DelegatedStakePoolCard
+        poolTransition={poolTransition}
         delegatedPool={delegatedPool}
         undelegate={async () => this.createWithdrawalTx(true)} // shouldDeregister=true
       />
@@ -216,8 +227,8 @@ class StakingPageContent extends Component<AllProps> {
 
     const errorIfPresent = maybe(delegationRequests.error, error => ({ error }));
 
-    const showRewardAmount = errorIfPresent == null
-      && stores.delegation.isExecutedDelegatedBalance(publicDeriver);
+    const showRewardAmount =
+      errorIfPresent == null && stores.delegation.isExecutedDelegatedBalance(publicDeriver);
 
     const isStakeRegistered = stores.delegation.isStakeRegistered(publicDeriver);
     const currentlyDelegating = stores.delegation.isCurrentlyDelegating(publicDeriver);
@@ -260,7 +271,8 @@ class StakingPageContent extends Component<AllProps> {
               graphData={generateGraphData({
                 publicDeriver,
                 delegationRequests,
-                currentEpoch: stores.substores.ada.time.getCurrentTimeRequests(publicDeriver).currentEpoch,
+                currentEpoch: stores.substores.ada.time.getCurrentTimeRequests(publicDeriver)
+                  .currentEpoch,
                 shouldHideBalance: stores.profile.shouldHideBalance,
                 getLocalPoolInfo: stores.delegation.getLocalPoolInfo,
                 tokenInfo: stores.tokenInfoStore.tokenInfo,
@@ -321,11 +333,7 @@ class StakingPageContent extends Component<AllProps> {
           />
         ) : null}
         {uiDialogs.isOpen(UnmangleTxDialogContainer) ? (
-          <UnmangleTxDialogContainer
-            actions={actions}
-            stores={stores}
-            onClose={this.onClose}
-          />
+          <UnmangleTxDialogContainer actions={actions} stores={stores} onClose={this.onClose} />
         ) : null}
         {uiDialogs.isOpen(WithdrawalTxDialogContainer) ? (
           <WithdrawalTxDialogContainer
@@ -357,7 +365,8 @@ class StakingPageContent extends Component<AllProps> {
             graphData={generateGraphData({
               delegationRequests,
               publicDeriver,
-              currentEpoch: stores.substores.ada.time.getCurrentTimeRequests(publicDeriver).currentEpoch,
+              currentEpoch: stores.substores.ada.time.getCurrentTimeRequests(publicDeriver)
+                .currentEpoch,
               shouldHideBalance: stores.profile.shouldHideBalance,
               getLocalPoolInfo: stores.delegation.getLocalPoolInfo,
               tokenInfo: stores.tokenInfoStore.tokenInfo,

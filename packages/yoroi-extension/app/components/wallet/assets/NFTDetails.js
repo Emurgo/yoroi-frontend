@@ -230,8 +230,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                 >
                   <IconButton
                     aria-label="Previous"
-                    sx={{ transform: 'rotate(180deg)', width: '32px' }}
-                  >
+                    sx={{ transform: 'rotate(180deg)', width: '32px' }}§
                     <Chevron />
                   </IconButton>
                 </Link>

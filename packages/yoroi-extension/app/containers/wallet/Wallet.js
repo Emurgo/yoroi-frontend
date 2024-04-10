@@ -48,6 +48,7 @@ class Wallet extends Component<AllProps> {
   };
 
   componentDidMount() {
+    this.checkPoolTransition();
     // reroute to the default path for the wallet
     const newRoute = this.checkRoute();
     if (newRoute != null) {
@@ -56,9 +57,9 @@ class Wallet extends Component<AllProps> {
       });
     }
 
-    // check current pool id -> open poll transition dialog if needed
-    if (true) {
-      this.props.actions.dialogs.open.trigger({ dialog: PoolTransitionDialog });
+    const publicDeriver = this.props.stores.wallets.selected;
+    if (publicDeriver == null) {
+      throw new Error(`${nameof(Wallet)} no public deriver. Should never happen`);
     }
 
     if (!this.props.stores.profile.isRevampAnnounced)
@@ -98,6 +99,27 @@ class Wallet extends Component<AllProps> {
         throw new Error(`Selected wallet has no valid category`);
       }
       return firstValidCategory.route;
+    }
+  }
+
+  async checkPoolTransition(): Promise<void> {
+    const publicDeriver = this.props.stores.wallets.selected;
+    const { uiDialogs } = this.props.stores;
+
+    if (publicDeriver == null) return;
+    const isStakeRegistered = this.props.stores.delegation.isStakeRegistered(publicDeriver);
+    const currentlyDelegating = this.props.stores.delegation.isCurrentlyDelegating(publicDeriver);
+    // mock Id to trigger the poll transition flow
+    const currentPoolId = 'd248ded3c18e0e80d07a46f00a2d808075b989ccb1a0e40a76e5cee1';
+    const currentPool = this.props.stores.delegation.getDelegatedPoolId(publicDeriver);
+
+    // handle pool transition only if the wallet has delagation and is currently delegating to emurgo
+    const poolTransition = await this.props.stores.delegation.getPoolTransition(currentPoolId);
+    if (isStakeRegistered && currentlyDelegating && poolTransition) {
+      this.props.actions.dialogs.open.trigger({
+        dialog: PoolTransitionDialog,
+        params: { poolTransition },
+      });
     }
   }
 
@@ -237,12 +259,15 @@ class Wallet extends Component<AllProps> {
 
   getPoolTransitionDialog: void => Node = () => {
     const isOpen = this.props.stores.uiDialogs.isOpen;
+    const paramPoolTransition = this.props.stores.uiDialogs.getParam<any>('poolTransition') ?? '';
+
     if (isOpen(PoolTransitionDialog)) {
       return (
         <PoolTransitionDialog
           onClose={() => {
             this.props.actions.dialogs.closeActiveDialog.trigger();
           }}
+          poolTransition={paramPoolTransition}
         />
       );
     }

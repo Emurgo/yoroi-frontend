@@ -46,6 +46,7 @@ const theme = {
     MuiChip: ModernChip,
     MuiTooltip: ModernTooltip,
   },
+  spacing: [0, 2, 3, 5, 8],
   palette: {
     /* `main` is added since MUI required it but we don't use it at all */
     primary: {
