@@ -25,15 +25,15 @@ import { getCardanoSpendingKeyHash, normalizeToAddress } from '../../lib/storage
 import { MultiToken, } from '../../../common/lib/MultiToken';
 import { PRIMARY_ASSET_CONSTANTS } from '../../lib/storage/database/primitives/enums';
 import { cardanoValueFromMultiToken, cardanoValueFromRemoteFormat, multiTokenFromCardanoValue, asAddressedUtxo, multiTokenFromRemote } from '../utils';
-import { hexToBytes, logErr, fail } from '../../../../coreUtils';
+import { hexToBytes, logErr } from '../../../../coreUtils';
 import { getCardanoHaskellBaseConfig } from '../../lib/storage/database/prepackaged/networks';
 import { IPublicDeriver, IGetAllUtxos, IHasUtxoChains } from '../../lib/storage/models/PublicDeriver/interfaces';
 import { ConceptualWallet } from '../../lib/storage/models/ConceptualWallet/index';
 import { builtSendTokenList } from '../../../common';
 import type { TokenRow } from '../../lib/storage/database/primitives/tables';
-import { setRuntime, } from '@emurgo/yoroi-eutxo-txs';
-import { TxBuilder, SendRequest } from '@emurgo/yoroi-eutxo-txs/dist/tx-builder';
-import { WalletType } from '@emurgo/yoroi-eutxo-txs/dist/kernel';
+import { setRuntime, } from '@emurgo/yoroi-eutxo-txs/dist/src';
+import { TxBuilder, SendRequest } from '@emurgo/yoroi-eutxo-txs/dist/src/tx-builder';
+import { WalletType } from '@emurgo/yoroi-eutxo-txs/dist/src/kernel';
 import {
   UTxOSet,
   Address as LibAddress,
@@ -41,12 +41,12 @@ import {
   Amount,
   NativeAssets,
   WalletAddress,
-} from '@emurgo/yoroi-eutxo-txs/dist/classes';
+} from '@emurgo/yoroi-eutxo-txs/dist/src/classes';
 import {
   NotEnoughMoneyToSendError as LibNotEnoughMoneyToSendError,
   NoOutputError,
   OverflowError,
-} from'@emurgo/yoroi-eutxo-txs/dist/errors';
+} from'@emurgo/yoroi-eutxo-txs/dist/src/errors';
 import blake2b from 'blake2b';
 import { derivePrivateByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
 

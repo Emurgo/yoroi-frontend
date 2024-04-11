@@ -65,10 +65,10 @@ import { GetToken } from '../../../app/api/ada/lib/storage/database/primitives/a
 import { getAllSchemaTables, raii, } from '../../../app/api/ada/lib/storage/database/utils';
 import type { TokenRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
 import fetchAdapter from '@vespaiach/axios-fetch-adapter';
-import { Amount, NativeAssets, UTxOSet, Value as LibValue, } from '@emurgo/yoroi-eutxo-txs/dist/classes';
-import { coinSelectionClassificationStrategy } from '@emurgo/yoroi-eutxo-txs/dist/tx-builder';
-import { setRuntime, } from '@emurgo/yoroi-eutxo-txs';
-import { NotEnoughMoneyToSendError as LibNotEnoughMoneyToSendError } from '@emurgo/yoroi-eutxo-txs/dist/errors';
+import { Amount, NativeAssets, UTxOSet, Value as LibValue, } from '@emurgo/yoroi-eutxo-txs/dist/src/classes';
+import { coinSelectionClassificationStrategy } from '@emurgo/yoroi-eutxo-txs/dist/src/tx-builder';
+import { setRuntime, } from '@emurgo/yoroi-eutxo-txs/dist/src';
+import { NotEnoughMoneyToSendError as LibNotEnoughMoneyToSendError } from '@emurgo/yoroi-eutxo-txs/dist/src/errors';
 import {
   ChainDerivations,
   DREP_KEY_INDEX,
