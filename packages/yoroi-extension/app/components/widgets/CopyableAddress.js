@@ -71,7 +71,7 @@ export default class CopyableAddress extends Component<Props> {
         }
         placement={this.props.placementTooltip}
       >
-        <span className={styles.copyIconBig}>
+        <span className={styles.copyIconBig} id={id + '-copyAddress-button'}>
           <Icon />
         </span>
       </Tooltip>
@@ -83,7 +83,7 @@ export default class CopyableAddress extends Component<Props> {
         className={classnames([styles.component, darkVariant === true && styles.componentDark])}
         id={id + '-copyableAddress-box'}
       >
-        <span>{this.props.children}</span>
+        <span id={id + '-address-text'}>{this.props.children}</span>
         <CopyToClipboard
           text={hash}
           onCopy={onCopyAddress == null ? undefined : (_text, _result) => onCopyAddress()}

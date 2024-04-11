@@ -9,14 +9,16 @@ type Props = {|
   small?: boolean,
   large?: boolean,
   light?: boolean,
+  id?: string,
 |};
 
 @observer
 export default class LoadingSpinner extends Component<Props> {
-  static defaultProps: {|light: boolean, large: boolean, small: boolean|} = {
+  static defaultProps: {|light: boolean, large: boolean, small: boolean, id: string|} = {
     small: false,
     large: false,
     light: false,
+    id: 'somewhere',
   };
 
   root: ?HTMLElement;
@@ -36,6 +38,6 @@ export default class LoadingSpinner extends Component<Props> {
       kindClass,
       sizeClass,
     ]);
-    return <div className={componentClasses} ref={(div) => { this.root = div; }} />;
+    return <div className={componentClasses} id={this.props.id && this.props.id + '-loadingSpinner-component'} ref={(div) => { this.root = div; }} />;
   }
 }
