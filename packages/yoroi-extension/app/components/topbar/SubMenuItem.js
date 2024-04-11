@@ -13,6 +13,7 @@ type Props = {|
   +onClick: void => void,
   +className: string,
   +disabled?: boolean,
+  locationId: string,
 |};
 
 type InjectedProps = {| +isRevampLayout: boolean |};
@@ -24,7 +25,7 @@ class SubMenuItem extends Component<Props & InjectedProps> {
   };
 
   render(): Node {
-    const { label, active, disabled, onClick, className, isRevampLayout } = this.props;
+    const { label, active, disabled, onClick, className, isRevampLayout, locationId } = this.props;
     let state = styles.enabled;
     if (disabled === true) {
       state = styles.disabled;
@@ -42,7 +43,7 @@ class SubMenuItem extends Component<Props & InjectedProps> {
         className={componentClasses}
         disabled={disabled}
         onClick={onClick}
-        id={'subMenuItem_' + subMenuItemId}
+        id={locationId + '-' + subMenuItemId + 'SubTab-button'}
       >
         {label}
       </Box>
