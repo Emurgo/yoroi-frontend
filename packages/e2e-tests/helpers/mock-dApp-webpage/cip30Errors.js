@@ -5,20 +5,20 @@ export const ApiErrorCode = Object.freeze({
   InternalError: -2,
   Refused: -3,
   AccountChange: -4,
-})
+});
 
 export const DataSignErrorCode = Object.freeze({
   ProofGeneration: 1,
   AddressNotPK: 2,
   UserDeclined: 3,
-})
+});
 
 export const TxSendErrorCode = Object.freeze({
   Refused: 1,
   Failure: 2,
-})
+});
 
 export const TxSignErrorCode = Object.freeze({
   ProofGeneration: 1,
   UserDeclined: 2,
-})
+});

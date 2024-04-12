@@ -1,6 +1,6 @@
 import {TargetBrowser} from '../helpers/constants.js'
 import BasePage from './basepage.js'
-import {getTargetBrowser} from '../utils.js'
+import {getTargetBrowser} from '../utils/utils.js'
 import {defaultWaitTimeout, oneSecond, quarterSecond, twoSeconds} from '../helpers/timeConstants.js'
 
 class InitialStepsPage extends BasePage {

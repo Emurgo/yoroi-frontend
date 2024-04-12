@@ -1,82 +1,83 @@
-import path from 'path'
-import {fileURLToPath} from 'url'
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-const __englishCharacters = 'qwertyuiopasdfghjklzxcvbnm'
-const __digits = '1234567890'
-const __getRandomItem = (arr) => {
-  const randomIndex = Math.floor(Math.random() * arr.length)
-  const item = arr[randomIndex]
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const __englishCharacters = 'qwertyuiopasdfghjklzxcvbnm';
+const __digits = '1234567890';
+const __getRandomItem = arr => {
+  const randomIndex = Math.floor(Math.random() * arr.length);
+  const item = arr[randomIndex];
 
-  return item
-}
+  return item;
+};
 const __flipCoin = () => {
-  const trueFalseArr = [true, false]
-  const randomIndex = Math.floor(Math.random() * trueFalseArr.length)
-  return trueFalseArr[randomIndex]
-}
-const __getRandomChar = (isCapital) => {
-  let randomChar = ''
+  const trueFalseArr = [true, false];
+  const randomIndex = Math.floor(Math.random() * trueFalseArr.length);
+  return trueFalseArr[randomIndex];
+};
+const __getRandomChar = isCapital => {
+  let randomChar = '';
   if (isCapital) {
     randomChar = __flipCoin()
       ? __getRandomItem(__englishCharacters + __digits).toUpperCase()
-      : __getRandomItem(__englishCharacters + __digits)
+      : __getRandomItem(__englishCharacters + __digits);
   } else {
-    randomChar = __getRandomItem(__englishCharacters + __digits)
+    randomChar = __getRandomItem(__englishCharacters + __digits);
   }
-  return randomChar
-}
+  return randomChar;
+};
 const __genString = (stringLength, startPart = '', withCapitals = false) => {
-  const numOfLettersToAdd = stringLength - startPart.length
-  let tempString = `${startPart}`
+  const numOfLettersToAdd = stringLength - startPart.length;
+  let tempString = `${startPart}`;
   for (let index = 0; index < numOfLettersToAdd; index++) {
-    const randomCharacter = __getRandomChar(withCapitals)
-    tempString = tempString + randomCharacter
+    const randomCharacter = __getRandomChar(withCapitals);
+    tempString = tempString + randomCharacter;
   }
-  return tempString
-}
+  return tempString;
+};
 
 export const getTestString = (basePart, stringLength, withCapitals) => {
   if (!stringLength) {
-    return basePart
+    return basePart;
   }
   if (stringLength <= basePart.length) {
-    return __genString(stringLength, '', withCapitals)
+    return __genString(stringLength, '', withCapitals);
   }
-  return __genString(stringLength, basePart, withCapitals)
-}
+  return __genString(stringLength, basePart, withCapitals);
+};
 
-export const chromeExtIdUrl = `chrome-extension://bdlknlffjjmjckcldekkbejaogpkjphg`
-export const firefoxExtensionId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
-export const firefoxExtIdUrl = `moz-extension://${firefoxExtensionId}`
-export const firefoxUuidMapping = `{"{530f7c6c-6077-4703-8f71-cb368c663e35}":"${firefoxExtensionId}"}`
+export const chromeExtIdUrl = `chrome-extension://bdlknlffjjmjckcldekkbejaogpkjphg`;
+export const firefoxExtensionId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+export const firefoxExtIdUrl = `moz-extension://${firefoxExtensionId}`;
+export const firefoxUuidMapping = `{"{530f7c6c-6077-4703-8f71-cb368c663e35}":"${firefoxExtensionId}"}`;
 export const firefoxBin =
   process.env.FIREFOX_BIN != null
     ? process.env.FIREFOX_BIN
-    : '/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox-bin'
+    : '/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox-bin';
 export const TargetBrowser = Object.freeze({
   Chrome: 'chrome',
   Brave: 'brave',
   FF: 'firefox',
-})
+});
 export const WalletWordsSize = Object.freeze({
   Shelley: 15,
   Daedalus: 24,
-})
-export const adaInLovelaces = 1000000
+});
+export const adaInLovelaces = 1000000;
 
-export const testRunDir = (browserName) => path.resolve(__dirname, '..', `testRunsData_${browserName}`)
+export const testRunDir = browserName =>
+  path.resolve(__dirname, '..', `testRunsData_${browserName}`);
 
 export const getTestWalletName = (walletNameLength = 0, withCapitals = false) => {
-  let basePart = 'test'
-  return getTestString(basePart, walletNameLength, withCapitals)
-}
+  let basePart = 'test';
+  return getTestString(basePart, walletNameLength, withCapitals);
+};
 
 export const getPassword = (walletNameLength = 0, withCapitals = false) => {
-  let basePart = 'qwerty1234'
-  return getTestString(basePart, walletNameLength, withCapitals)
-}
+  let basePart = 'qwerty1234';
+  return getTestString(basePart, walletNameLength, withCapitals);
+};
 export const yoroiObject = Object.freeze({
   name: 'yoroi',
   apiVersion: '0.3.0',
@@ -109,8 +110,8 @@ export const yoroiObject = Object.freeze({
     '0iIzFBNDRCNyIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM0NzYwRkYiLz4KPC9saW5lYXJHcmFkaWVudD4KPGNsaX' +
     'BQYXRoIGlkPSJjbGlwMF8xMTg0Xzg0MjQwIj4KPHJlY3Qgd2lkdGg9IjcyIiBoZWlnaHQ9IjYyLjUyNjMiIGZpbGw9IndoaXRlIi' +
     '8+CjwvY2xpcFBhdGg+CjwvZGVmcz4KPC9zdmc+Cg==',
-})
+});
 
 export const Colors = Object.freeze({
   errorRed: 'rgb(255, 19, 81)',
-})
+});
