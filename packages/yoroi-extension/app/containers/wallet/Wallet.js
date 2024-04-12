@@ -149,6 +149,7 @@ class Wallet extends Component<AllProps> {
           }))}
         onItemClick={route => actions.router.goToRoute.trigger({ route })}
         isActiveItem={route => this.props.stores.app.currentRoute.startsWith(route)}
+        locationId='wallet'
       />
     );
 

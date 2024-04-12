@@ -17,6 +17,7 @@ type Props = {|
   +isActiveItem: string => boolean,
   +onItemClick: string => void,
   +options: Array<SubMenuOption>,
+  locationId: string,
 |};
 type InjectedProps = {|
   +isRevampLayout: boolean,
@@ -25,12 +26,12 @@ type AllProps = {| ...Props, ...InjectedProps |};
 @observer
 class SubMenu extends Component<AllProps> {
   render(): Node {
-    const { onItemClick, isActiveItem, options } = this.props;
+    const { onItemClick, isActiveItem, options, locationId } = this.props;
 
     const isRevamp = this.props.isRevampLayout;
     return (
-      <div className={styles.componentWrapper} id="subMenu">
-        <div className={isRevamp ? styles.componentRevamp : styles.component} id="settingsMenuLayout">
+      <div className={styles.componentWrapper}>
+        <div className={isRevamp ? styles.componentRevamp : styles.component}>
           {options
             .filter(o => !o.hidden)
             .map(({ label, route, className }) => (
@@ -40,6 +41,7 @@ class SubMenu extends Component<AllProps> {
                 onClick={() => onItemClick(route)}
                 active={isActiveItem(route)}
                 className={className}
+                locationId={locationId}
               />
             ))}
         </div>
