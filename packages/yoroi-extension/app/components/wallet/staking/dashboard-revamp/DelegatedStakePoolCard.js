@@ -11,12 +11,13 @@ import type { PoolData } from '../../../../containers/wallet/staking/SeizaFetche
 import { getAvatarFromPoolId } from '../utils';
 import { Alert } from '@mui/material';
 import { Stack } from '@mui/material';
+import type { PoolTransition } from '../../../../stores/toplevel/DelegationStore';
 
 type Props = {|
   delegatedPool: PoolData,
   +undelegate: void | (void => Promise<void>),
-  poolTransition?: any,
-  delegateToSpecificPool: any,
+  poolTransition?: PoolTransition,
+  delegateToSpecificPool: (id: string) => void,
 |};
 
 type Intl = {|
@@ -38,7 +39,7 @@ function DelegatedStakePoolCard({
       return (
         <UpdatePoolButton
           variant="danger"
-          onClick={() => delegateToSpecificPool(poolTransition.suggestedPool.id)}
+          onClick={() => delegateToSpecificPool(poolTransition.suggestedPool?.id ?? '')}
         >
           UPDATE POOL
         </UpdatePoolButton>

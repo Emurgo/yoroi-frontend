@@ -15,51 +15,58 @@ import {
 import { styled } from '@mui/material/styles';
 
 import DialogCloseButton from '../../../../components/widgets/DialogCloseButton';
+import type { PoolTransition } from '../../../../stores/toplevel/DelegationStore';
 import type { Node } from 'react';
 import { StakePoolCard } from './StakePoolCard';
 import { Stack } from '@mui/material';
+import { messages } from './dialog-messages';
+import { intlShape } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {|
   onClose: () => void,
-  poolTransition?: any,
+  poolTransition?: PoolTransition | null,
   onUpdatePool: () => void,
+  intl: $npm$ReactIntl$IntlFormat,
 |};
 
 export const PoolTransitionDialog = ({
   onClose,
   poolTransition,
   onUpdatePool,
+  intl,
 }: Props): React$Node => {
   const { currentPool, suggestedPool } = poolTransition || {};
 
   return (
     <Dialog
       onClose={onClose}
-      title="UPGRADE YOUR STAKE POOL"
+      title={intl.formatMessage(messages.upgradeStakePool)}
       styleOverride={{ width: '648px', padding: 0 }}
       closeButton={<DialogCloseButton onClose={onClose} />}
     >
       <Typography variant="body1" mb={2}>
-        The current stake pool you're using will soon close. Migrate to the new EMURGO pool to
-        sustain reward generation.
+        {intl.formatMessage(messages.currentStakePool)}
       </Typography>
       <Stack direction="row" spacing={2} alignItems="center">
         <StakePoolCard
-          label="Current Pool"
+          label={intl.formatMessage(messages.currentPool)}
           poolName={currentPool?.name}
           roa={currentPool?.roa}
           fee={currentPool?.share}
           deadlineMilliseconds={poolTransition?.deadlineMilliseconds}
+          intl={intl}
         />
         <Typography variant="body1" fontWeight="500">
           →
         </Typography>
         <StakePoolCard
-          label="New Pool"
+          label={intl.formatMessage(messages.newPool)}
           poolName={suggestedPool?.name}
           roa={suggestedPool?.roa}
           fee={suggestedPool?.share}
           suggestedPool
+          intl={intl}
         />
       </Stack>
       <Grid
@@ -70,10 +77,10 @@ export const PoolTransitionDialog = ({
         style={{ marginTop: 20, gap: 24 }}
       >
         <CustomButton variant="text" onClick={onClose}>
-          SKIP AND STOP RECEIVING REWARDS
+          {intl.formatMessage(messages.skipAndStop)}
         </CustomButton>
         <CustomButton variant="contained" color="primary" width="100%" onClick={onUpdatePool}>
-          UPDATE NOW AND KEEP EARNING
+          {intl.formatMessage(messages.updateNow)}
         </CustomButton>
       </Grid>
     </Dialog>

@@ -67,9 +67,10 @@ class StakingPageContent extends Component<AllProps> {
     }
     if (this.props.stores.delegation.poolTransitionConfig) {
       const currentPool = this.props.stores.delegation.getDelegatedPoolId(publicDeriver);
-
       const poolTransitionInfo = this.props.stores.delegation.getPoolTransition(currentPool);
-      this.delegateToSpecificPool(currentPool);
+      if (poolTransitionInfo) {
+        this.delegateToSpecificPool(currentPool);
+      }
     }
 
     const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
@@ -152,7 +153,9 @@ class StakingPageContent extends Component<AllProps> {
         poolTransition={poolTransition}
         delegatedPool={delegatedPool}
         undelegate={async () => this.createWithdrawalTx(true)} // shouldDeregister=true
-        delegateToSpecificPool={this.delegateToSpecificPool}
+        delegateToSpecificPool={async (poolId): any => {
+          await this.delegateToSpecificPool(poolId);
+        }}
       />
     );
   };

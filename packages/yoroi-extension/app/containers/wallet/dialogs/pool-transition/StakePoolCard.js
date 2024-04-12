@@ -16,6 +16,8 @@ import { formatTimeSpan } from './helpers';
 
 import { ReactComponent as WarningSvg } from '../../../../assets/images/alert.inline.svg';
 import { ReactComponent as EmurgoSvg } from '../../../../assets/images/emurgo-logo-small.svg';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { messages } from './dialog-messages';
 
 type Props = {|
   label: string,
@@ -24,6 +26,7 @@ type Props = {|
   fee?: string,
   deadlineMilliseconds?: number,
   suggestedPool?: boolean,
+  intl: $npm$ReactIntl$IntlFormat,
 |};
 
 export const StakePoolCard = ({
@@ -33,6 +36,7 @@ export const StakePoolCard = ({
   fee,
   deadlineMilliseconds,
   suggestedPool = false,
+  intl,
 }: Props): React$Node => {
   return (
     <CustomCard suggestedPool={suggestedPool}>
@@ -48,7 +52,7 @@ export const StakePoolCard = ({
       <Stack direction="column" gap={1} my={2}>
         <Stack direction="row" justifyContent="space-between">
           <Typography variant="body1" color="grayscale.600">
-            Estimated ROA
+            {intl.formatMessage(messages.estimatedROA)}
           </Typography>
           <Typography variant="body1" color="grayscale.600">
             {roa}%
@@ -56,7 +60,7 @@ export const StakePoolCard = ({
         </Stack>
         <Stack direction="row" justifyContent="space-between">
           <Typography variant="body1" color="grayscale.600">
-            Fee
+            {intl.formatMessage(messages.fee)}
           </Typography>
           <Typography variant="body1" color="grayscale.600">
             {fee}%
@@ -72,14 +76,14 @@ export const StakePoolCard = ({
         <Typography color={suggestedPool ? 'grayscale.max' : 'magenta.500'} component="span">
           <Typography variant="body2" component="span">
             {suggestedPool
-              ? 'This pool continues to generate staking rewards'
-              : 'This pool will stop generating staking rewards in'}
+              ? intl.formatMessage(messages.poolContinues)
+              : intl.formatMessage(messages.poolStop)}
           </Typography>
           {!suggestedPool && (
             <Typography variant="body2" fontWeight="500" component="span" pl={0.4}>
               {deadlineMilliseconds
                 ? formatTimeSpan(deadlineMilliseconds)
-                : 'This pool is NOT generating staking rewards anymore'}
+                : intl.formatMessage(messages.poolNotGenerating)}
             </Typography>
           )}
         </Typography>

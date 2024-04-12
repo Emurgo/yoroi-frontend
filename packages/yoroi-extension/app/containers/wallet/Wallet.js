@@ -132,7 +132,6 @@ class Wallet extends Component<AllProps> {
     }
 
     const poolTransition = stores.delegation.checkPoolTransition(publicDeriver);
-    console.log('poolTransition', poolTransition);
     const isFirstSync = stores.wallets.firstSyncWalletId === selectedWallet.getPublicDeriverId();
     const spendableBalance = this.props.stores.transactions.balance;
     const walletHasAssets = !!spendableBalance?.nonDefaultEntries().length;
@@ -220,6 +219,7 @@ class Wallet extends Component<AllProps> {
         {this.getDialogs()}
         {this.props.stores.delegation.poolTransitionConfig.show === 'open' && (
           <PoolTransitionDialog
+            intl={intl}
             onClose={() => {
               this.props.stores.delegation.setPoolTransitionConfig({ show: 'idle' });
             }}
