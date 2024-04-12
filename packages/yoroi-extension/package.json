@@ -128,7 +128,6 @@
     "react-refresh": "0.9.0",
     "rimraf": "3.0.2",
     "sass-loader": "11.0.1",
-    "selenium-webdriver": "4.0.0-alpha.7",
     "shelljs": "0.8.4",
     "style-loader": "2.0.0",
     "unused-webpack-plugin": "2.4.0",
