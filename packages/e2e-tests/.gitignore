@@ -1,0 +1,5 @@
+node_modules/
+ExtBuilds/
+testRunsData_*/
+.DS_Store
+mochawesome-report/
