@@ -24,7 +24,10 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../routes-config';
 import { getNetworkUrl, tokenMessages } from './TokenDetails';
-import type { CardanoAssetMintMetadata, NetworkRow, } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type {
+  CardanoAssetMintMetadata,
+  NetworkRow,
+} from '../../../api/ada/lib/storage/database/primitives/tables';
 import { NftImage } from './NFTsList';
 import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { truncateAddress, truncateAddressShort } from '../../../utils/formatters';
@@ -181,12 +184,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
             }}
             onClick={() => nftImage !== null && setOpenAndTrack()}
           >
-            <NftImage
-              imageUrl={nftImage}
-              name={nftInfo.name || '-'}
-              width="100%"
-              height="auto"
-            />
+            <NftImage imageUrl={nftImage} name={nftInfo.name || '-'} width="100%" height="auto" />
           </ImageItem>
         </Grid>
 
@@ -231,6 +229,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                   <IconButton
                     aria-label="Previous"
                     sx={{ transform: 'rotate(180deg)', width: '32px' }}
+                  >
                     <Chevron />
                   </IconButton>
                 </Link>
@@ -426,8 +425,12 @@ const ImageItem = styled(Box)({
 function LabelWithValue({ label, value }: {| label: string | Node, value: string | Node |}): Node {
   return (
     <Box>
-      <Typography component="div" color="var(--yoroi-palette-gray-600)">{label}</Typography>
-      <Typography component="div" color="var(--yoroi-palette-gray-900)">{value}</Typography>
+      <Typography component="div" color="var(--yoroi-palette-gray-600)">
+        {label}
+      </Typography>
+      <Typography component="div" color="var(--yoroi-palette-gray-900)">
+        {value}
+      </Typography>
     </Box>
   );
 }
