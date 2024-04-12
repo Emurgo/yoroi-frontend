@@ -10,7 +10,7 @@ import { getPassword } from '../helpers/constants.js';
 import { expect } from 'chai';
 import { getTestLogger } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
-import driversPoolsManager from '../driversPool.js';
+import driversPoolsManager from '../utils/driversPool.js';
 
 // The test case is based on the issue https://emurgo.atlassian.net/browse/YOEXT-811
 describe('Restoring 15-wallet, clear input and restore other 15-wallet', function () {

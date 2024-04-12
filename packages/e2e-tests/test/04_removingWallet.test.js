@@ -9,7 +9,7 @@ import { restoreWallet } from '../helpers/restoreWalletHelper.js';
 import SettingsTab from '../pages/wallet/settingsTab/settingsTab.page.js';
 import WalletSubTab from '../pages/wallet/settingsTab/walletSubTab.page.js';
 import AddNewWallet from '../pages/addNewWallet.page.js';
-import driversPoolsManager from '../driversPool.js';
+import driversPoolsManager from '../utils/driversPool.js';
 
 describe('Removing a wallet, one wallet is added', function () {
   this.timeout(2 * oneMinute);

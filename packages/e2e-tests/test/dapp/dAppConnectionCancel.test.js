@@ -10,7 +10,7 @@ import { getMockServer, mockDAppUrl } from '../../helpers/mock-dApp-webpage/mock
 import { MockDAppWebpage } from '../../helpers/mock-dApp-webpage/mockedDApp.js';
 import DAppConnectWallet from '../../pages/dapp/dAppConnectWallet.page.js';
 import { ApiErrorCode } from '../../helpers/mock-dApp-webpage/cip30Errors.js';
-import driversPoolsManager from '../../driversPool.js';
+import driversPoolsManager from '../../utils/driversPool.js';
 
 describe('dApp, cancel connection', function () {
   this.timeout(2 * oneMinute);

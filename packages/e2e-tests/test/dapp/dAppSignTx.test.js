@@ -12,7 +12,7 @@ import { connectNonAuth } from '../../helpers/mock-dApp-webpage/dAppHelper.js';
 import { adaInLovelaces, getPassword } from '../../helpers/constants.js';
 import DAppSignTx from '../../pages/dapp/dAppSignTx.page.js';
 import { TxSignErrorCode } from '../../helpers/mock-dApp-webpage/cip30Errors.js';
-import driversPoolsManager from '../../driversPool.js';
+import driversPoolsManager from '../../utils/driversPool.js';
 
 describe('dApp, signTx, intrawallet Tx', function () {
   this.timeout(2 * oneMinute);

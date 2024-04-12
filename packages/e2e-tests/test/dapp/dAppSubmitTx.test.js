@@ -13,7 +13,7 @@ import { adaInLovelaces, getPassword } from '../../helpers/constants.js';
 import DAppSignTx from '../../pages/dapp/dAppSignTx.page.js';
 import { signTxWithCSL } from '../../helpers/mock-dApp-webpage/dAppTxHelper.js';
 import { ApiErrorCode, TxSendErrorCode } from '../../helpers/mock-dApp-webpage/cip30Errors.js';
-import driversPoolsManager from '../../driversPool.js';
+import driversPoolsManager from '../../utils/driversPool.js';
 
 describe('dApp, submitTx', function () {
   this.timeout(2 * oneMinute);

@@ -13,7 +13,7 @@ import {
 } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
 import { restoreWallet } from '../helpers/restoreWalletHelper.js';
-import driversPoolsManager from '../driversPool.js';
+import driversPoolsManager from '../utils/driversPool.js';
 import { compareExportedTxsAndDisplayedTxs } from '../helpers/customChecks.js';
 
 describe('Export transactions', function () {

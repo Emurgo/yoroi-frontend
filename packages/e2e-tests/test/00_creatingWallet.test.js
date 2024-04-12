@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import BasePage from '../pages/basepage.js';
-import driversPoolsManager from '../driversPool.js';
+import driversPoolsManager from '../utils/driversPool.js';
 import { getPassword, getTestWalletName } from '../helpers/constants.js';
 import AddNewWallet from '../pages/addNewWallet.page.js';
 import CreateWalletStepOne from '../pages/newWalletPages/createWalletSteps/createWalletStepOne.page.js';

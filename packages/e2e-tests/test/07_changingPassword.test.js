@@ -12,7 +12,7 @@ import { getPassword } from '../helpers/constants.js';
 import WalletTab from '../pages/wallet/walletTab/walletTab.page.js';
 import SendSubTab from '../pages/wallet/walletTab/sendSubTab.page.js';
 import { PASSWORDS_DONT_MATCH, PASSWORD_TOO_SHORT, WRONG_PASSWORD } from '../helpers/messages.js';
-import driversPoolsManager from '../driversPool.js';
+import driversPoolsManager from '../utils/driversPool.js';
 
 describe('Changing wallet password', function () {
   this.timeout(2 * oneMinute);

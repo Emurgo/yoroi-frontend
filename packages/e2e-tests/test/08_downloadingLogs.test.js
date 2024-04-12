@@ -13,7 +13,7 @@ import { oneMinute } from '../helpers/timeConstants.js';
 import { restoreWallet } from '../helpers/restoreWalletHelper.js';
 import SettingsTab from '../pages/wallet/settingsTab/settingsTab.page.js';
 import SupportSubTab from '../pages/wallet/settingsTab/supportSubTab.page.js';
-import driversPoolsManager from '../driversPool.js';
+import driversPoolsManager from '../utils/driversPool.js';
 
 describe('Downloading logs for support', function () {
   this.timeout(2 * oneMinute);

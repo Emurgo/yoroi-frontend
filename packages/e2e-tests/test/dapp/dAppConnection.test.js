@@ -10,7 +10,7 @@ import { getMockServer, mockDAppUrl } from '../../helpers/mock-dApp-webpage/mock
 import { MockDAppWebpage } from '../../helpers/mock-dApp-webpage/mockedDApp.js';
 import { connectNonAuth } from '../../helpers/mock-dApp-webpage/dAppHelper.js';
 import ConnectorTab from '../../pages/wallet/connectorTab/connectorTab.page.js';
-import driversPoolsManager from '../../driversPool.js';
+import driversPoolsManager from '../../utils/driversPool.js';
 
 describe('dApp, connection in extension', function () {
   this.timeout(2 * oneMinute);

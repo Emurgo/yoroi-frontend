@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import BasePage from '../pages/basepage.js';
-import driversPoolsManager from '../driversPool.js';
+import driversPoolsManager from '../utils/driversPool.js';
 import TransactionsSubTab from '../pages/wallet/walletTab/walletTransactions.page.js';
 import { customAfterEach } from '../utils/customHooks.js';
 import { getTestLogger } from '../utils/utils.js';

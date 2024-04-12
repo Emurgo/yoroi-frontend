@@ -10,7 +10,7 @@ import { getPassword } from '../helpers/constants.js';
 import { expect } from 'chai';
 import { getTestLogger } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
-import driversPoolsManager from '../driversPool.js';
+import driversPoolsManager from '../utils/driversPool.js';
 
 describe('Restoring 15-wallet', function () {
   this.timeout(2 * oneMinute);

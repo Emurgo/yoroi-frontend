@@ -12,7 +12,7 @@ import { connectNonAuth } from '../../helpers/mock-dApp-webpage/dAppHelper.js';
 import DAppSignData from '../../pages/dapp/dAppSignData.page.js';
 import { getPassword } from '../../helpers/constants.js';
 import { DataSignErrorCode } from '../../helpers/mock-dApp-webpage/cip30Errors.js';
-import driversPoolsManager from '../../driversPool.js';
+import driversPoolsManager from '../../utils/driversPool.js';
 
 describe('dApp, CIP-95, signData', function () {
   this.timeout(2 * oneMinute);

@@ -6,7 +6,7 @@ import { expect } from 'chai';
 import { cleanDownloads, getTestLogger, getListOfDownloadedFiles } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
 import { restoreWallet } from '../helpers/restoreWalletHelper.js';
-import driversPoolsManager from '../driversPool.js';
+import driversPoolsManager from '../utils/driversPool.js';
 import { Colors } from '../helpers/constants.js';
 
 describe('Export transactions, negative cases', function () {

@@ -10,7 +10,7 @@ import { getMockServer, mockDAppUrl } from '../../helpers/mock-dApp-webpage/mock
 import { MockDAppWebpage } from '../../helpers/mock-dApp-webpage/mockedDApp.js';
 import { connectNonAuth } from '../../helpers/mock-dApp-webpage/dAppHelper.js';
 import { adaInLovelaces } from '../../helpers/constants.js';
-import driversPoolsManager from '../../driversPool.js';
+import driversPoolsManager from '../../utils/driversPool.js';
 
 describe('dApp, getCollateral, no popup, positive', function () {
   this.timeout(2 * oneMinute);

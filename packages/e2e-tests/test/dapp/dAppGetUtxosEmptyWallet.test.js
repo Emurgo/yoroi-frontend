@@ -9,7 +9,7 @@ import { MockDAppWebpage } from '../../helpers/mock-dApp-webpage/mockedDApp.js';
 import { connectNonAuth } from '../../helpers/mock-dApp-webpage/dAppHelper.js';
 import { getTestWalletName } from '../../helpers/constants.js';
 import { createWallet } from '../../helpers/restoreWalletHelper.js';
-import driversPoolsManager from '../../driversPool.js';
+import driversPoolsManager from '../../utils/driversPool.js';
 
 describe('dApp, getUtxos, empty wallet, not auth', function () {
   const testWalletName = getTestWalletName();

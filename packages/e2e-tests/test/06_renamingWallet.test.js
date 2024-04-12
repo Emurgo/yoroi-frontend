@@ -8,7 +8,7 @@ import { restoreWallet } from '../helpers/restoreWalletHelper.js';
 import SettingsTab from '../pages/wallet/settingsTab/settingsTab.page.js';
 import WalletSubTab from '../pages/wallet/settingsTab/walletSubTab.page.js';
 import TransactionsSubTab from '../pages/wallet/walletTab/walletTransactions.page.js';
-import driversPoolsManager from '../driversPool.js';
+import driversPoolsManager from '../utils/driversPool.js';
 
 describe('Renaming the wallet', function () {
   this.timeout(2 * oneMinute);

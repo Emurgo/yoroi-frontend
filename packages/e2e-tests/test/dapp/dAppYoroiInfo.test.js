@@ -9,7 +9,7 @@ import { MockDAppWebpage } from '../../helpers/mock-dApp-webpage/mockedDApp.js';
 import { yoroiObject } from '../../helpers/constants.js';
 import { oneMinute } from '../../helpers/timeConstants.js';
 import { restoreWallet } from '../../helpers/restoreWalletHelper.js';
-import driversPoolsManager from '../../driversPool.js';
+import driversPoolsManager from '../../utils/driversPool.js';
 
 describe('dApp, Yoroi object in Cardano', function () {
   this.timeout(2 * oneMinute);

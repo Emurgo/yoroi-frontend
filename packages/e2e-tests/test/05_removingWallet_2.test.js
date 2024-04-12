@@ -10,7 +10,7 @@ import WalletSubTab from '../pages/wallet/settingsTab/walletSubTab.page.js';
 import WalletCommonBase from '../pages/walletCommonBase.page.js';
 import AddNewWallet from '../pages/addNewWallet.page.js';
 import TransactionsSubTab from '../pages/wallet/walletTab/walletTransactions.page.js';
-import driversPoolsManager from '../driversPool.js';
+import driversPoolsManager from '../utils/driversPool.js';
 
 describe('Removing the first wallet, two wallets is added', function () {
   this.timeout(2 * oneMinute);

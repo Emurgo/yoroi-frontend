@@ -10,7 +10,7 @@ import { MockDAppWebpage } from '../../helpers/mock-dApp-webpage/mockedDApp.js';
 import { connectNonAuth } from '../../helpers/mock-dApp-webpage/dAppHelper.js';
 import { adaInLovelaces, getTestWalletName } from '../../helpers/constants.js';
 import { ApiErrorCode } from '../../helpers/mock-dApp-webpage/cip30Errors.js';
-import driversPoolsManager from '../../driversPool.js';
+import driversPoolsManager from '../../utils/driversPool.js';
 
 describe('dApp, getCollateral, error, empty wallet, not auth', function () {
   const testWalletName = getTestWalletName();
