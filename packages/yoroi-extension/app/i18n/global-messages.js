@@ -957,6 +957,10 @@ const globalMessages: * = defineMessages({
     defaultMessage:
       '!!!I agree with <span id="tosLink">Terms of Service Agreement</span> and <span id="privacyLink">Privacy Notice</span>',
   },
+  poolNotGenerating: {
+    id: 'wallet.transitionDialog.poolNotGenerating',
+    defaultMessage: '!!!This pool is NOT generating staking rewards anymore',
+  },
 });
 export default globalMessages;
 

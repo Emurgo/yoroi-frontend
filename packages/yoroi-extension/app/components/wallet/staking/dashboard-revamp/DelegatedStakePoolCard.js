@@ -155,7 +155,7 @@ function DelegatedStakePoolCard({
       </Wrapper>
       {poolTransition?.deadlineMilliseconds && (
         <Alert sx={{ width: '100%', justifyContent: 'center' }} severity="error">
-          This pool is NOT generating staking rewards anymore
+          {intl.formatMessage(globalMessages.poolNotGenerating)}
         </Alert>
       )}
     </Card>
