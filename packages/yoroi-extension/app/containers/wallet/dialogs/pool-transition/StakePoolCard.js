@@ -15,6 +15,7 @@ import {
 import { formatTimeSpan } from './helpers';
 
 import { ReactComponent as WarningSvg } from '../../../../assets/images/alert.inline.svg';
+import { ReactComponent as EmurgoSvg } from '../../../../assets/images/emurgo-logo-small.svg';
 
 type Props = {|
   label: string,
@@ -38,9 +39,12 @@ export const StakePoolCard = ({
       <Typography variant="body1" fontWeight={500} mb={2}>
         {label}
       </Typography>
-      <Typography variant="body1" fontWeight={400}>
-        {poolName}
-      </Typography>
+      <Stack direction="row" gap={1}>
+        <EmurgoSvg />
+        <Typography variant="body1" fontWeight={400}>
+          {poolName}
+        </Typography>
+      </Stack>
       <Stack direction="column" gap={1} my={2}>
         <Stack direction="row" justifyContent="space-between">
           <Typography variant="body1" color="grayscale.600">

@@ -22,9 +22,14 @@ import { Stack } from '@mui/material';
 type Props = {|
   onClose: () => void,
   poolTransition?: any,
+  onUpdatePool: () => void,
 |};
 
-export const PoolTransitionDialog = ({ onClose, poolTransition }: Props): React$Node => {
+export const PoolTransitionDialog = ({
+  onClose,
+  poolTransition,
+  onUpdatePool,
+}: Props): React$Node => {
   const { currentPool, suggestedPool } = poolTransition || {};
 
   return (
@@ -64,8 +69,10 @@ export const PoolTransitionDialog = ({ onClose, poolTransition }: Props): React$
         direction="column"
         style={{ marginTop: 20, gap: 24 }}
       >
-        <CustomButton variant="text">SKIP AND STOP RECEIVING REWARDS</CustomButton>
-        <CustomButton variant="contained" color="primary" width="100%">
+        <CustomButton variant="text" onClick={onClose}>
+          SKIP AND STOP RECEIVING REWARDS
+        </CustomButton>
+        <CustomButton variant="contained" color="primary" width="100%" onClick={onUpdatePool}>
           UPDATE NOW AND KEEP EARNING
         </CustomButton>
       </Grid>

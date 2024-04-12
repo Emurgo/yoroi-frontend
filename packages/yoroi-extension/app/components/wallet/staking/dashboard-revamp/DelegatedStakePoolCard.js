@@ -16,6 +16,7 @@ type Props = {|
   delegatedPool: PoolData,
   +undelegate: void | (void => Promise<void>),
   poolTransition?: any,
+  delegateToSpecificPool: any,
 |};
 
 type Intl = {|
@@ -27,14 +28,21 @@ function DelegatedStakePoolCard({
   undelegate,
   intl,
   poolTransition,
+  delegateToSpecificPool,
 }: Props & Intl): Node {
   const { id, name, ticker, poolSize, share, avatar, roa, socialLinks, websiteUrl } =
     delegatedPool || {};
   const avatarGenerated = getAvatarFromPoolId(id);
-
   const renderDelegationBtn = () => {
     if (poolTransition?.deadlineMilliseconds) {
-      return <UpdatePoolButton variant="danger">UPDATE POOL</UpdatePoolButton>;
+      return (
+        <UpdatePoolButton
+          variant="danger"
+          onClick={() => delegateToSpecificPool(poolTransition.suggestedPool.id)}
+        >
+          UPDATE POOL
+        </UpdatePoolButton>
+      );
     }
 
     return (

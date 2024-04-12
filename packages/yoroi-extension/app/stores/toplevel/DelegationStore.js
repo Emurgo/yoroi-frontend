@@ -14,6 +14,7 @@ import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import type { PoolInfo } from '@emurgo/yoroi-lib';
 import { MultiToken } from '../../api/common/lib/MultiToken';
+import { PoolTransitionDialog } from '../../containers/wallet/dialogs/pool-transition/PoolTransitionDialog';
 import { maybe } from '../../coreUtils';
 import type {
   GetDelegatedBalanceFunc,
@@ -61,8 +62,19 @@ export type PoolTransition = {|
   deadlineMilliseconds: number,
 |};
 
+type PoolTransitionModal = {| show: 'open' | 'closed' | 'idle', shouldUpdatePool: boolean |};
+
 export default class DelegationStore extends Store<StoresMap, ActionsMap> {
   @observable delegationRequests: Array<DelegationRequests> = [];
+  @observable poolTransitionConfig: PoolTransitionModal = {
+    show: 'closed',
+    shouldUpdatePool: false,
+  };
+
+  @action setPoolTransitionConfig: any => void = (config: PoolTransitionModal) => {
+    this.poolTransitionConfig.show = config.show;
+    this.poolTransitionConfig.shouldUpdatePool = config.shouldUpdatePool;
+  };
 
   @observable poolInfoQuery: LocalizedRequest<
     (Array<string>) => Promise<void>
@@ -195,9 +207,15 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
   };
 
   getPoolTransition: (currentPoolId: string) => PoolTransition | null = currentPoolId => {
-    if (currentPoolId === 'd248ded3c18e0e80d07a46f00a2d808075b989ccb1a0e40a76e5cee1') {
+    // This is the satke pool that activates the flow
+    // Stake pool checksum and name
+    // Fair Pool #01
+    // Stake pool id
+    // 6b51a5aae5b4b5f07f38acf12816b4f8a558ee2840d0dba69040aeb2
+
+    if (currentPoolId === '6b51a5aae5b4b5f07f38acf12816b4f8a558ee2840d0dba69040aeb2') {
       return {
-        currentPool: { name: 'emurgo old', roa: '0', share: '3.5' },
+        currentPool: { name: '[FAIR] Fair Pool #01', roa: '0', share: '3.02' },
         suggestedPool: {
           id: 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207',
           name: 'emurgo new',
@@ -209,6 +227,25 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     } else {
       return null;
     }
+  };
+
+  checkPoolTransition: (PublicDeriver<>) => PoolTransition | null = publicDeriver => {
+    const isStakeRegistered = this.stores.delegation.isStakeRegistered(publicDeriver);
+    const currentlyDelegating = this.stores.delegation.isCurrentlyDelegating(publicDeriver);
+    // mock Id to trigger the poll transition flow
+    const currentPool = this.getDelegatedPoolId(publicDeriver);
+
+    // handle pool transition only if the wallet has delagation and is currently delegating to emurgo
+    const poolTransition = currentPool ? this.getPoolTransition(currentPool) : null;
+    if (
+      isStakeRegistered &&
+      currentlyDelegating &&
+      poolTransition &&
+      this.poolTransitionConfig.show === 'closed'
+    ) {
+      this.setPoolTransitionConfig({ show: 'open' });
+    }
+    return poolTransition;
   };
 
   @action.bound

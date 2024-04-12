@@ -87,7 +87,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
       const balance = this.props.stores.transactions.getBalance(publicDeriver);
       const isStakeRegistered = this.props.stores.delegation.isStakeRegistered(publicDeriver);
       const isWalletWithNoFunds = balance != null && balance.getDefaultEntry().amount.isZero();
-      const poolList = (delegatedPoolId != null && isStakeRegistered) ? [delegatedPoolId] : [];
+      const poolList = delegatedPoolId != null && isStakeRegistered ? [delegatedPoolId] : [];
 
       const classicCardanoStakingPage = (
         <div id="classicCardanoStakingPage">
@@ -98,7 +98,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
             bias={stakingListBias}
             totalAda={totalAda}
             poolList={poolList}
-            stakepoolSelectedAction={async (poolId) => {
+            stakepoolSelectedAction={async poolId => {
               await this._updatePool(poolId);
               await this._next();
             }}

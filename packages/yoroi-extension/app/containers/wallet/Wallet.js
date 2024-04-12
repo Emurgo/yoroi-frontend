@@ -48,18 +48,12 @@ class Wallet extends Component<AllProps> {
   };
 
   componentDidMount() {
-    this.checkPoolTransition();
     // reroute to the default path for the wallet
     const newRoute = this.checkRoute();
     if (newRoute != null) {
       this.props.actions.router.redirect.trigger({
         route: newRoute,
       });
-    }
-
-    const publicDeriver = this.props.stores.wallets.selected;
-    if (publicDeriver == null) {
-      throw new Error(`${nameof(Wallet)} no public deriver. Should never happen`);
     }
 
     if (!this.props.stores.profile.isRevampAnnounced)
@@ -102,27 +96,6 @@ class Wallet extends Component<AllProps> {
     }
   }
 
-  async checkPoolTransition(): Promise<void> {
-    const publicDeriver = this.props.stores.wallets.selected;
-    const { uiDialogs } = this.props.stores;
-
-    if (publicDeriver == null) return;
-    const isStakeRegistered = this.props.stores.delegation.isStakeRegistered(publicDeriver);
-    const currentlyDelegating = this.props.stores.delegation.isCurrentlyDelegating(publicDeriver);
-    // mock Id to trigger the poll transition flow
-    const currentPoolId = 'd248ded3c18e0e80d07a46f00a2d808075b989ccb1a0e40a76e5cee1';
-    const currentPool = this.props.stores.delegation.getDelegatedPoolId(publicDeriver);
-
-    // handle pool transition only if the wallet has delagation and is currently delegating to emurgo
-    const poolTransition = await this.props.stores.delegation.getPoolTransition(currentPoolId);
-    if (isStakeRegistered && currentlyDelegating && poolTransition) {
-      this.props.actions.dialogs.open.trigger({
-        dialog: PoolTransitionDialog,
-        params: { poolTransition },
-      });
-    }
-  }
-
   navigateToMyWallets: string => void = destination => {
     this.props.actions.router.goToRoute.trigger({ route: destination });
   };
@@ -153,6 +126,13 @@ class Wallet extends Component<AllProps> {
     const warning = this.getWarning(selectedWallet);
     if (selectedWallet == null) throw new Error(`${nameof(Wallet)} no public deriver`);
 
+    const publicDeriver = this.props.stores.wallets.selected;
+    if (publicDeriver == null) {
+      throw new Error(`${nameof(Wallet)} no public deriver. Should never happen`);
+    }
+
+    const poolTransition = stores.delegation.checkPoolTransition(publicDeriver);
+    console.log('poolTransition', poolTransition);
     const isFirstSync = stores.wallets.firstSyncWalletId === selectedWallet.getPublicDeriverId();
     const spendableBalance = this.props.stores.transactions.balance;
     const walletHasAssets = !!spendableBalance?.nonDefaultEntries().length;
@@ -238,7 +218,23 @@ class Wallet extends Component<AllProps> {
         {warning}
         {this.props.children}
         {this.getDialogs()}
-        {this.getPoolTransitionDialog()}
+        {this.props.stores.delegation.poolTransitionConfig.show === 'open' && (
+          <PoolTransitionDialog
+            onClose={() => {
+              this.props.stores.delegation.setPoolTransitionConfig({ show: 'idle' });
+            }}
+            poolTransition={poolTransition}
+            onUpdatePool={() => {
+              this.props.stores.delegation.setPoolTransitionConfig({
+                show: 'idle',
+                shouldUpdatePool: true,
+              });
+              this.props.actions.router.goToRoute.trigger({
+                route: ROUTES.STAKING,
+              });
+            }}
+          />
+        )}
       </TopBarLayout>
     ) : (
       <TopBarLayout sidebar={sidebarContainer}>
@@ -257,25 +253,9 @@ class Wallet extends Component<AllProps> {
     return warnings[warnings.length - 1]();
   };
 
-  getPoolTransitionDialog: void => Node = () => {
-    const isOpen = this.props.stores.uiDialogs.isOpen;
-    const paramPoolTransition = this.props.stores.uiDialogs.getParam<any>('poolTransition') ?? '';
-
-    if (isOpen(PoolTransitionDialog)) {
-      return (
-        <PoolTransitionDialog
-          onClose={() => {
-            this.props.actions.dialogs.closeActiveDialog.trigger();
-          }}
-          poolTransition={paramPoolTransition}
-        />
-      );
-    }
-    return null;
-  };
-
   getDialogs: void => Node = () => {
     const isOpen = this.props.stores.uiDialogs.isOpen;
+
     if (isOpen(RevampAnnouncementDialog))
       return (
         <RevampAnnouncementDialog
@@ -285,6 +265,7 @@ class Wallet extends Component<AllProps> {
           }}
         />
       );
+
     return null;
   };
 }

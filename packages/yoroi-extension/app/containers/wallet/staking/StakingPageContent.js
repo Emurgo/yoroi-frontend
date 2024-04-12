@@ -65,6 +65,13 @@ class StakingPageContent extends Component<AllProps> {
     if (publicDeriver == null) {
       throw new Error(`${nameof(StakingPageContent)} no public deriver. Should never happen`);
     }
+    if (this.props.stores.delegation.poolTransitionConfig) {
+      const currentPool = this.props.stores.delegation.getDelegatedPoolId(publicDeriver);
+
+      const poolTransitionInfo = this.props.stores.delegation.getPoolTransition(currentPool);
+      this.delegateToSpecificPool(currentPool);
+    }
+
     const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
     await timeCalcRequests.requests.toAbsoluteSlot.execute().promise;
     await timeCalcRequests.requests.toRealTime.execute().promise;
@@ -101,6 +108,16 @@ class StakingPageContent extends Component<AllProps> {
     });
   };
 
+  delegateToSpecificPool: (?string) => Promise<void> = async poolId => {
+    console.log('DELEGATE To POOL ID: ', poolId);
+    this.props.stores.delegation.poolInfoQuery.reset();
+    if (poolId == null) {
+      await this.props.actions.ada.delegationTransaction.setPools.trigger([]);
+      return;
+    }
+    await this.props.actions.ada.delegationTransaction.setPools.trigger([poolId]);
+  };
+
   getStakePoolMeta: (PublicDeriver<>) => Node = publicDeriver => {
     const delegationStore = this.props.stores.delegation;
     const currentPool = delegationStore.getDelegatedPoolId(publicDeriver);
@@ -128,14 +145,14 @@ class StakingPageContent extends Component<AllProps> {
     };
 
     // fake current pool id to trigger the transition UI
-    const poolTransition = delegationStore.getPoolTransition(
-      'd248ded3c18e0e80d07a46f00a2d808075b989ccb1a0e40a76e5cee1'
-    );
+    const poolTransition = delegationStore.getPoolTransition(currentPool);
+
     return (
       <DelegatedStakePoolCard
         poolTransition={poolTransition}
         delegatedPool={delegatedPool}
         undelegate={async () => this.createWithdrawalTx(true)} // shouldDeregister=true
+        delegateToSpecificPool={this.delegateToSpecificPool}
       />
     );
   };
