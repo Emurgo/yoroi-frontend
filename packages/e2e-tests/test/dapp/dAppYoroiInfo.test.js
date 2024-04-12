@@ -1,8 +1,8 @@
 import BasePage from '../../pages/basepage.js';
-import { customAfterEach } from '../../customHooks.js';
+import { customAfterEach } from '../../utils/customHooks.js';
 import { expect } from 'chai';
-import { testWallet1 } from '../../testWallets.js';
-import { getTestLogger } from '../../utils.js';
+import { testWallet1 } from '../../utils/testWallets.js';
+import { getTestLogger } from '../../utils/utils.js';
 import { getMockServer, mockDAppUrl } from '../../helpers/mock-dApp-webpage/mockServer.js';
 import { WindowManager, mockDAppName } from '../../helpers/windowManager.js';
 import { MockDAppWebpage } from '../../helpers/mock-dApp-webpage/mockedDApp.js';

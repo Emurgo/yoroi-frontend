@@ -8,8 +8,8 @@ import CreateWalletStepTwo from '../pages/newWalletPages/createWalletSteps/creat
 import CreateWalletStepThree from '../pages/newWalletPages/createWalletSteps/createWalletStepThree.page.js';
 import WalletDetails from '../pages/newWalletPages/walletDetails.page.js';
 import TransactionsSubTab from '../pages/wallet/walletTab/walletTransactions.page.js';
-import { customAfterEach } from '../customHooks.js';
-import { getTestLogger } from '../utils.js';
+import { customAfterEach } from '../utils/customHooks.js';
+import { getTestLogger } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
 
 describe('Creating wallet', function () {

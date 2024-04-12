@@ -5,10 +5,10 @@
   "type": "module",
   "main": "index.js",
   "config": {
-    "hooksPath": "./e2e-tests/hooks.mjs",
-    "testPathGeneral": "./e2e-tests/test/*.test.js",
-    "testPathHW": "./e2e-tests/test/hw/*.test.js",
-    "testPathDApp": "./e2e-tests/test/dapp/*.test.js"
+    "hooksPath": "./utils/hooks.mjs",
+    "testPathGeneral": "./test/*.test.js",
+    "testPathHW": "./test/hw/*.test.js",
+    "testPathDApp": "./test/dapp/*.test.js"
   },
   "scripts": {
     "test:clean:logs": "find . -type d -name \"testRunsData_*\" -exec rm -r {} +",

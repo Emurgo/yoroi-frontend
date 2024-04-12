@@ -1,9 +1,9 @@
 import { expect } from 'chai';
 import InitialStepsPage from '../pages/initialSteps.page.js';
 import BasePage from '../pages/basepage.js';
-import { getDriver } from '../driverBootstrap.js';
-import { customAfterEach } from '../customHooks.js';
-import { getTestLogger } from '../utils.js';
+import { getDriver } from '../utils/driverBootstrap.js';
+import { customAfterEach } from '../utils/customHooks.js';
+import { getTestLogger } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
 
 describe("Can't proceed without accepting the ToS", function () {

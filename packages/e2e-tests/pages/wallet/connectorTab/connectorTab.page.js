@@ -1,4 +1,4 @@
-import { getByLocator } from '../../../utils.js';
+import { getByLocator } from '../../../utils/utils.js';
 import WalletCommonBase from '../../walletCommonBase.page.js';
 import { defaultWaitTimeout, oneSecond } from '../../../helpers/timeConstants.js';
 

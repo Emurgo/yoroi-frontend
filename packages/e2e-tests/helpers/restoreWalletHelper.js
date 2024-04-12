@@ -8,7 +8,7 @@ import { expect } from 'chai';
 import CreateWalletStepOne from '../pages/newWalletPages/createWalletSteps/createWalletStepOne.page.js';
 import CreateWalletStepTwo from '../pages/newWalletPages/createWalletSteps/createWalletStepTwo.page.js';
 import CreateWalletStepThree from '../pages/newWalletPages/createWalletSteps/createWalletStepThree.page.js';
-import { walletNameShortener } from '../utils.js';
+import { walletNameShortener } from '../utils/utils.js';
 
 export const restoreWallet = async (webdriver, logger, testWallet, shouldBeModalWindow = true) => {
   const addNewWalletPage = new AddNewWallet(webdriver, logger);

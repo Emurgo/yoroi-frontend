@@ -1,7 +1,7 @@
 import { expect } from 'chai';
-import { getDriver } from '../../driverBootstrap.js';
-import { customAfterEach } from '../../customHooks.js';
-import { getTestLogger } from '../../utils.js';
+import { getDriver } from '../../utils/driverBootstrap.js';
+import { customAfterEach } from '../../utils/customHooks.js';
+import { getTestLogger } from '../../utils/utils.js';
 import { TrezorEmulatorController } from '../../helpers/trezorEmulatorController.js';
 import { runAndPrepareTrezor } from '../../helpers/trezorHelper.js';
 import {
@@ -9,7 +9,7 @@ import {
   extensionTabName,
   trezorConnectTabName,
 } from '../../helpers/windowManager.js';
-import { testWalletTrezor } from '../../testWallets.js';
+import { testWalletTrezor } from '../../utils/testWallets.js';
 import BasePage from '../../pages/basepage.js';
 import InitialStepsPage from '../../pages/initialSteps.page.js';
 import AddNewWallet from '../../pages/addNewWallet.page.js';

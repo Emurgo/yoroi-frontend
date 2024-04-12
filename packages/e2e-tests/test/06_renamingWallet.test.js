@@ -1,8 +1,8 @@
 import BasePage from '../pages/basepage.js';
-import { customAfterEach } from '../customHooks.js';
-import { testWallet1 } from '../testWallets.js';
+import { customAfterEach } from '../utils/customHooks.js';
+import { testWallet1 } from '../utils/testWallets.js';
 import { expect } from 'chai';
-import { getTestLogger, walletNameShortener } from '../utils.js';
+import { getTestLogger, walletNameShortener } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
 import { restoreWallet } from '../helpers/restoreWalletHelper.js';
 import SettingsTab from '../pages/wallet/settingsTab/settingsTab.page.js';

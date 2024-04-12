@@ -1,9 +1,9 @@
 import BasePage from '../pages/basepage.js';
-import { customAfterEach } from '../customHooks.js';
+import { customAfterEach } from '../utils/customHooks.js';
 import TransactionsSubTab from '../pages/wallet/walletTab/walletTransactions.page.js';
-import { testWallet1 } from '../testWallets.js';
+import { testWallet1 } from '../utils/testWallets.js';
 import { expect } from 'chai';
-import { getTestLogger } from '../utils.js';
+import { getTestLogger } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
 import { restoreWallet } from '../helpers/restoreWalletHelper.js';
 import SettingsTab from '../pages/wallet/settingsTab/settingsTab.page.js';

@@ -1,7 +1,7 @@
 import BasePage from '../../pages/basepage.js';
-import { customAfterEach } from '../../customHooks.js';
+import { customAfterEach } from '../../utils/customHooks.js';
 import { expect } from 'chai';
-import { getTestLogger } from '../../utils.js';
+import { getTestLogger } from '../../utils/utils.js';
 import { oneMinute } from '../../helpers/timeConstants.js';
 import { createWallet } from '../../helpers/restoreWalletHelper.js';
 import { WindowManager, mockDAppName } from '../../helpers/windowManager.js';

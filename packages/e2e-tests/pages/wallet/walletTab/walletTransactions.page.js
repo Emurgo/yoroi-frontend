@@ -6,7 +6,7 @@ import {
 } from '../../../helpers/timeConstants.js';
 import BasePage from '../../basepage.js';
 import WalletTab from './walletTab.page.js';
-import { convertPrettyDateToNormal, convertPrettyTimeToNormal } from '../../../utils.js';
+import { convertPrettyDateToNormal, convertPrettyTimeToNormal } from '../../../utils/utils.js';
 
 class ExportTransactionsModal extends BasePage {
   // locators

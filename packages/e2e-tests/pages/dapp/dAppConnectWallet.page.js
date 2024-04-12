@@ -1,5 +1,5 @@
 import DAppBase from './dAppBase.page.js';
-import { getByLocator } from '../../utils.js';
+import { getByLocator } from '../../utils/utils.js';
 
 class DAppConnectWallet extends DAppBase {
   // locators

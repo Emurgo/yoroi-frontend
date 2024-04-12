@@ -1,4 +1,4 @@
-import { getByLocator } from '../../utils.js';
+import { getByLocator } from '../../utils/utils.js';
 import DAppSignBase from './dAppSignBase.page.js';
 
 class DAppSignTx extends DAppSignBase {

@@ -1,14 +1,14 @@
 import BasePage from '../pages/basepage.js';
-import { customAfterEach } from '../customHooks.js';
+import { customAfterEach } from '../utils/customHooks.js';
 import AddNewWallet from '../pages/addNewWallet.page.js';
 import RestoreWalletStepOne from '../pages/newWalletPages/restoreWalletSteps/restoreWalletStepOne.page.js';
 import RestoreWalletStepTwo from '../pages/newWalletPages/restoreWalletSteps/restoreWalletStepTwo.page.js';
 import WalletDetails from '../pages/newWalletPages/walletDetails.page.js';
 import TransactionsSubTab from '../pages/wallet/walletTab/walletTransactions.page.js';
-import { testWallet1, testWallet2 } from '../testWallets.js';
+import { testWallet1, testWallet2 } from '../utils/testWallets.js';
 import { getPassword } from '../helpers/constants.js';
 import { expect } from 'chai';
-import { getTestLogger } from '../utils.js';
+import { getTestLogger } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
 import driversPoolsManager from '../driversPool.js';
 

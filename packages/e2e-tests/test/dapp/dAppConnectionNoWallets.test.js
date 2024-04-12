@@ -1,10 +1,10 @@
 import BasePage from '../../pages/basepage.js';
-import { getDriver } from '../../driverBootstrap.js';
-import { customAfterEach } from '../../customHooks.js';
+import { getDriver } from '../../utils/driverBootstrap.js';
+import { customAfterEach } from '../../utils/customHooks.js';
 import InitialStepsPage from '../../pages/initialSteps.page.js';
-import { testWallet1 } from '../../testWallets.js';
+import { testWallet1 } from '../../utils/testWallets.js';
 import { expect } from 'chai';
-import { getTestLogger } from '../../utils.js';
+import { getTestLogger } from '../../utils/utils.js';
 import { oneMinute } from '../../helpers/timeConstants.js';
 import { restoreWallet } from '../../helpers/restoreWalletHelper.js';
 import {
