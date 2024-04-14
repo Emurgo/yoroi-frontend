@@ -2,9 +2,8 @@ import { until, Key, logging } from 'selenium-webdriver';
 import path from 'path';
 import * as fs from 'node:fs';
 import { promisify } from 'util';
-import { createTestRunDataDir, getByLocator, getTargetBrowser } from '../utils/utils.js';
+import { createTestRunDataDir, getByLocator, isFirefox, isChrome } from '../utils/utils.js';
 import { getExtensionUrl } from '../utils/driverBootstrap.js';
-import { TargetBrowser } from '../helpers/constants.js';
 import {
   defaultRepeatPeriod,
   defaultWaitTimeout,
@@ -182,7 +181,7 @@ class BasePage {
     const testRundDataDir = createTestRunDataDir(testSuiteName);
     const cleanName = logFileName.replace(/ /gi, '_');
     const logsPaths = path.resolve(testRundDataDir, `console_${cleanName}-log.json`);
-    if (getTargetBrowser() === TargetBrowser.Chrome) {
+    if (isChrome()) {
       const logEntries = await this.driver
         .manage()
         .logs()
@@ -291,7 +290,7 @@ class BasePage {
   }
   // tableNames are [ 'UtxoAtSafePointTable', 'UtxoDiffToBestBlock', 'UtxoTransactionInput', 'UtxoTransactionOutput']
   async getInfoFromIndexedDB(tableName) {
-    if (getTargetBrowser() === 'firefox') {
+    if (isFirefox()) {
       return await this.getInfoFromIndexedDBFF(tableName);
     }
     return await this.getInfoFromIndexedDBChrome(tableName);

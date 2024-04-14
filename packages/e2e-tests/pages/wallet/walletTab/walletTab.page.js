@@ -1,4 +1,5 @@
 import WalletCommonBase from '../../walletCommonBase.page.js';
+import { isFirefox } from '../../../utils/utils.js';
 
 class WalletTab extends WalletCommonBase {
   //locators
@@ -29,6 +30,9 @@ class WalletTab extends WalletCommonBase {
   async goToReceiveSubMenu() {
     this.logger.info(`WalletTab::goToReceiveSubMenu is called`);
     await this.click(this.receiveSubmenuItemLocator);
+    if (isFirefox()) {
+      await this.sleep(500);
+    }
   }
 }
 

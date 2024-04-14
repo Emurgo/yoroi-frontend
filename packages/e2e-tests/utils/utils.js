@@ -1,5 +1,6 @@
 import { By } from 'selenium-webdriver';
 import { testRunDir } from '../helpers/constants.js';
+import { TargetBrowser } from '../helpers/constants.js';
 import * as fs from 'node:fs';
 import path from 'path';
 import pkg from 'simple-node-logger';
@@ -37,6 +38,10 @@ export function getMethod(locatorMethod) {
 export const getByLocator = locator => getMethod(locator.method)(locator.locator);
 
 export const getTargetBrowser = () => process.env.TARGETBROWSER;
+
+export const isFirefox = () => getTargetBrowser() === TargetBrowser.FF;
+export const isChrome = () => getTargetBrowser() === TargetBrowser.Chrome;
+export const isBrave = () => getTargetBrowser() === TargetBrowser.Brave;
 
 export const createTestRunDataDir = testSuiteName => {
   const clearedTestSuiteName = testSuiteName.replace(/[ |,]/gi, '_');

@@ -228,7 +228,6 @@ class ReceiveSubTab extends WalletTab {
       const addrInfo = await this.getAddressInfo(rowIndex);
       balance = balance + addrInfo.balance;
     }
-    console.log('balance', balance);
     return balance;
   }
 }

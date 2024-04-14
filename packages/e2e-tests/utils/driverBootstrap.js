@@ -10,7 +10,7 @@ import {
   firefoxUuidMapping,
   TargetBrowser,
 } from '../helpers/constants.js';
-import { getDownloadsDir, getTargetBrowser } from './utils.js';
+import { getDownloadsDir, getTargetBrowser, isBrave, isChrome, isFirefox } from './utils.js';
 
 const prefs = new logging.Preferences();
 prefs.setLevel(logging.Type.BROWSER, logging.Level.ALL);
@@ -22,7 +22,7 @@ const __extensionDir = path.resolve(__projectRoot, 'yoroi-extension');
 
 export const getExtensionUrl = () => {
   const targetBrowser = getTargetBrowser();
-  if (targetBrowser === 'chrome' || targetBrowser === 'brave') {
+  if (isChrome() || isBrave()) {
     /**
      * Extension id is deterministically calculated based on pubKey used to generate the crx file
      * so we can just hardcode this value if we keep e2etest-key.pem file
@@ -126,7 +126,7 @@ export const getBuilder = () => {
 export const getDriver = () => {
   const driver = getBuilder().build();
   driver.manage().setTimeouts({ implicit: 10000 });
-  if (getTargetBrowser() === TargetBrowser.FF) {
+  if (isFirefox()) {
     driver.manage().window().maximize();
   }
   return driver;

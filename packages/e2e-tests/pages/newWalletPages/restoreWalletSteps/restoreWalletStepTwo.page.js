@@ -1,5 +1,6 @@
 import AddWalletBase from '../addWalletBase.page.js';
 import { Key } from 'selenium-webdriver';
+import { twoSeconds, quarterSecond } from '../../../helpers/timeConstants.js';
 
 class RestoreWalletStepTwo extends AddWalletBase {
   // locators
@@ -114,9 +115,14 @@ class RestoreWalletStepTwo extends AddWalletBase {
   };
   recoveryPhraseIsVerified = async () => {
     this.logger.info(`RestoreWalletStepTwo::recoveryPhraseIsVerified is called`);
-    const isDisplayed = await (
-      await this.findElement(this.recoveryPhraseVerifiedTextLocator)
-    ).isDisplayed();
+    const isDisplayed = await this.customWaiter(
+      async () => {
+        const allElements = await this.findElements(this.recoveryPhraseVerifiedTextLocator);
+        return allElements.length === 1;
+      },
+      twoSeconds,
+      quarterSecond
+    );
     return isDisplayed;
   };
   duplicatedWalletDialogIsDisplayed = async () => {

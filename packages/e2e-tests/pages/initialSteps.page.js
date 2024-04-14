@@ -97,7 +97,7 @@ class InitialStepsPage extends BasePage {
     await this.driver.manage().setTimeouts({ implicit: oneSecond });
     await this.acceptToSPP();
     await this.skipAnalytics();
-    if (getTargetBrowser() === TargetBrowser.Chrome) {
+    if (this.isChrome()) {
       await this.skipCardanoPaymentUrls();
     }
     await this.driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
