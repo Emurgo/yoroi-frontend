@@ -1,6 +1,5 @@
-import { TargetBrowser } from '../helpers/constants.js';
 import BasePage from './basepage.js';
-import { getTargetBrowser } from '../utils/utils.js';
+import { isChrome } from '../utils/utils.js';
 import {
   defaultWaitTimeout,
   oneSecond,
@@ -97,7 +96,7 @@ class InitialStepsPage extends BasePage {
     await this.driver.manage().setTimeouts({ implicit: oneSecond });
     await this.acceptToSPP();
     await this.skipAnalytics();
-    if (this.isChrome()) {
+    if (isChrome()) {
       await this.skipCardanoPaymentUrls();
     }
     await this.driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
