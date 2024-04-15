@@ -77,4 +77,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: testRunsData_E2E_tests_${{ matrix.browser }}
-          path: ./packages/e2e-tests/testRunsData_${{ matrix.browser }}
+          path: |
+            ./packages/e2e-tests/mochawesome-report
+            ./packages/e2e-tests/testRunsData_${{ matrix.browser }}
