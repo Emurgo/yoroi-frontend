@@ -9,12 +9,12 @@ import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import ThemeSettingsBlock from '../../../components/settings/categories/general-setting/ThemeSettingsBlock';
 import AboutYoroiSettingsBlock from '../../../components/settings/categories/general-setting/AboutYoroiSettingsBlock';
 import UnitOfAccountSettings from '../../../components/settings/categories/general-setting/UnitOfAccountSettings';
-import { THEMES } from '../../../styles/utils';
 import { ReactComponent as AdaCurrency } from '../../../assets/images/currencies/ADA.inline.svg';
 import { unitOfAccountDisabledValue } from '../../../types/unitOfAccountType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Box, Typography } from '@mui/material';
 import { settingsMenuMessages } from '../../../components/settings/menu/SettingsMenu';
+import { THEMES } from '../../../styles/themes';
 
 const currencyLabels = defineMessages({
   USD: {
