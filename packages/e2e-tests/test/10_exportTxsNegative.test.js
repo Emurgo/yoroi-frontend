@@ -24,7 +24,7 @@ describe('Export transactions, negative cases', function () {
   it('Restore a 15-word wallet', async function () {
     await restoreWallet(webdriver, logger, testWallet1);
   });
-  describe('Case: both dates are "00/00/0000"', function () {
+  describe('Both dates are 00/00/0000', function () {
     it('Open the export modal window', async function () {
       const transactionsPage = new TransactionsSubTab(webdriver, logger);
       const exportDialog = await transactionsPage.openExportModalWindow();
@@ -32,7 +32,7 @@ describe('Export transactions, negative cases', function () {
       expect(exportDialogIsDisplayed, 'Something wrong with Export Transaction Dialog').to.be.true;
     });
 
-    it('Set the date "00.00.0000 in both export fields"', async function () {
+    it('Set the date 00.00.0000 in both export fields', async function () {
       const exportDialog = new TransactionsSubTab(webdriver, logger).getExportDialog();
       // mm/dd/yyyy
       await exportDialog.setStartDate('00000000');
@@ -52,7 +52,7 @@ describe('Export transactions, negative cases', function () {
       expect(endInputColor, 'End date input is not higlighted').to.equal(Colors.errorRed);
     });
   });
-  describe('Case: the end date is earlier then the start date', function () {
+  describe('The end date is earlier then the start date', function () {
     it('Refresh page', async function () {
       const transactionsPage = new TransactionsSubTab(webdriver, logger);
       await transactionsPage.refreshPage();
@@ -86,7 +86,7 @@ describe('Export transactions, negative cases', function () {
     });
   });
   // 27 September 2017 (09272017) - cardano network initial release
-  describe("Case: both fields has the same date in the past, Cardano didn' exist", function () {
+  describe('Both fields has the same date in the past, Cardano did not exist', function () {
     it('Refresh page', async function () {
       const transactionsPage = new TransactionsSubTab(webdriver, logger);
       await transactionsPage.refreshPage();

@@ -31,7 +31,7 @@ for (const testDatum of testData) {
       done();
     });
 
-    it(`Restore a 15-word test wallet "${testDatum.testWallet.name}"`, async function () {
+    it(`Restore a 15-word test wallet ${testDatum.testWallet.name}`, async function () {
       await restoreWallet(webdriver, logger, testDatum.testWallet);
     });
 

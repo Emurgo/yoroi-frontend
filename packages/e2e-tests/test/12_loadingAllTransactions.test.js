@@ -21,7 +21,7 @@ describe('Loading all txs', function () {
     done();
   });
 
-  it(`Restore a 15-word test wallet "${testWallet.name}"`, async function () {
+  it(`Restore a 15-word test wallet ${testWallet.name}`, async function () {
     await restoreWallet(webdriver, logger, testWallet);
   });
 
