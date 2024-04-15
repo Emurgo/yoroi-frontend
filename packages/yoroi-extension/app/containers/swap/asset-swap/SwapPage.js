@@ -49,7 +49,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
 
   const isMarketOrder = orderType === 'market';
   const impact = isMarketOrder ? Number(selectedPoolCalculation?.prices.priceImpact ?? 0) : 0;
-  const priceImpactState: ?PriceImpact =
+  const priceImpactState: PriceImpact | null =
     impact > PRICE_IMPACT_MODERATE_RISK ? { isSevere: impact > PRICE_IMPACT_HIGH_RISK } : null;
 
   const [disclaimerStatus, setDisclaimerStatus] = useState<?boolean>(null);
@@ -168,6 +168,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
     } else {
       handleLimitOrder();
     }
+    setOrderStepValue(1);
     setSignRequest(null);
   }
 

@@ -135,7 +135,7 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
     } = this.props;
     const transactionsGroups = this.groupTransactionsByDay(transactions);
 
-    const baseIdPart = 'wallet:transactions:transactionsList'
+    const baseIdPart = 'wallet:transactions:transactionsList';
 
     const loadingSpinner = isLoadingTransactions ? (
       <div className={styles.loading}>
@@ -147,8 +147,6 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
         />
       </div>
     ) : null;
-
-    const baseIdPart = 'wallet:transactions:transactionsList'
 
     return (
       <Box
