@@ -147,7 +147,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
     return `${val} ${currency}`;
   };
 
-  async function processOrderStep() {
+  async function processSwapOrder() {
     try {
       if (orderStep === 0) {
         handleInitialStep();
@@ -205,7 +205,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
         },
         refreshWallet: () => props.stores.wallets.refreshWalletFromRemote(wallet),
       });
-      processOrderStep();
+      setOrderStepValue(2);
     } catch (e) {
       handleTransactionError(e);
     } finally {
@@ -334,7 +334,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
               </Button>
             )}
             <Button
-              onClick={processOrderStep}
+              onClick={processSwapOrder}
               sx={{ minWidth: '128px', minHeight: '48px' }}
               variant="primary"
               disabled={!isSwapEnabled || isButtonLoader}
