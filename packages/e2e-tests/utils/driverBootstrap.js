@@ -21,7 +21,6 @@ const __projectRoot = path.resolve(__dirname, '../..');
 const __extensionDir = path.resolve(__projectRoot, 'yoroi-extension');
 
 export const getExtensionUrl = () => {
-  const targetBrowser = getTargetBrowser();
   if (isChrome() || isBrave()) {
     /**
      * Extension id is deterministically calculated based on pubKey used to generate the crx file
@@ -46,7 +45,8 @@ const getBraveBuilder = () => {
           '--disable-gpu', // Disables GPU hardware acceleration. If software renderer is not in place, then the GPU process won't launch
           '--disable-dev-shm-usage', // The /dev/shm partition is too small in certain VM environments, causing Chrome to fail or crash
           '--disable-setuid-sandbox', // Disable the setuid sandbox (Linux only)
-          '--start-maximized' // Starts the browser maximized, regardless of any previous settings
+          '--start-maximized', // Starts the browser maximized, regardless of any previous settings
+          '--headless=new', // Runs the browser in the headless mode
         )
         .addExtensions(path.resolve(__extensionDir, 'Yoroi-test.crx'))
     );
@@ -65,7 +65,8 @@ const getChromeBuilder = () => {
           '--disable-gpu',
           '--disable-dev-shm-usage',
           '--disable-setuid-sandbox',
-          '--start-maximized'
+          '--start-maximized',
+          '--headless=new', // Runs the browser in the headless mode
         )
         .setUserPreferences({ 'download.default_directory': downloadsDir })
     );
@@ -80,6 +81,7 @@ const getFirefoxBuilder = () => {
      */
     .setBinary(firefoxBin)
     .addExtensions(path.resolve(__extensionDir, 'Yoroi.xpi'))
+    .addArguments('--headless') // Runs the browser in the headless mode
     /**
      * Firefox disallows unsigned extensions by default. We solve this through a config change
      * The proper way to do this is to use the "temporary addon" feature of Firefox
