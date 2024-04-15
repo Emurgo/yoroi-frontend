@@ -312,6 +312,9 @@ function SwapPage(props: StoresAndActionsProps): Node {
               onTryAgain={() => {
                 setOrderStepValue(0);
               }}
+              onSuccess={() => {
+                props.actions.router.goToRoute.trigger({ route: ROUTES.SWAP.ORDERS });
+              }}
             />
           )}
         </Box>

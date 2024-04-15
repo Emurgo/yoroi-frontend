@@ -7,11 +7,13 @@ import type { State } from '../context/swap-form/types';
 type Props = {|
   txSubmitErrorState: State<?Error>,
   onTryAgain: void => void,
+  onSuccess: void => void,
 |};
 
 export default function TxSubmittedStep({
   txSubmitErrorState,
   onTryAgain,
+  onSuccess,
 }: Props): React$Node {
   const isSuccessful = txSubmitErrorState.value == null;
   return (
@@ -36,7 +38,7 @@ export default function TxSubmittedStep({
         </Typography>
       </Box>
       <Box>
-        <Button onClick={onTryAgain} variant="primary">
+        <Button onClick={isSuccessful ? onSuccess : onTryAgain} variant="primary">
           {isSuccessful ? 'Go to orders' : 'Try again'}
         </Button>
       </Box>
