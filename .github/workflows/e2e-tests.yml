@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: distutils hack
-        run: pip3 install setuptools
+        run: brew install python-setuptools
 
       - name: Forcefully update the Chrome browser
         if: matrix.browser=='chrome'
