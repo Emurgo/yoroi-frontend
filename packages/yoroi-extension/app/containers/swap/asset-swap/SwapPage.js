@@ -313,6 +313,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
               }}
               onSuccess={() => {
                 props.actions.router.goToRoute.trigger({ route: ROUTES.SWAP.ORDERS });
+                setOrderStepValue(0);
               }}
             />
           )}

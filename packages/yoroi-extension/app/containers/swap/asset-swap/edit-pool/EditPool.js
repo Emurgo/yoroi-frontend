@@ -94,11 +94,19 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
           onClick={handleShowFullInfo}
         >
           {pool.provider && (
-            <Typography component="div" variant="body1" color="grayscale.max">
+            <Typography component="div" variant="body1" color="grayscale.max" mb="8px">
               {titleTotalFeesFormatted}
             </Typography>
           )}
-          <Box sx={{ cursor: 'pointer', display: 'flex', gap: '4px', alignItems: 'center' }}>
+          <Box
+            sx={{
+              cursor: 'pointer',
+              display: 'flex',
+              gap: '4px',
+              alignItems: 'center',
+              marginBottom: '8px',
+            }}
+          >
             <Box sx={{ transform: showFullInfo ? 'rotate(180deg)' : 'rotate(0deg)' }}>
               <ChevronDownIcon />
             </Box>

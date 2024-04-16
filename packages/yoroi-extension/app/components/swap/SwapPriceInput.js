@@ -109,7 +109,7 @@ function SwapPriceInput({ swapStore, priceImpactState }: Props): Node {
           </Box>
         </Box>
       </Box>
-      {priceImpactState && (
+      {priceImpactState && isValidTickers && (
         <Typography component="div" variant="caption" pt="4px">
           <PriceImpactColored priceImpactState={priceImpactState} sx={{ display: 'flex' }}>
             <PriceImpactTitle small isSevere={priceImpactState.isSevere} />

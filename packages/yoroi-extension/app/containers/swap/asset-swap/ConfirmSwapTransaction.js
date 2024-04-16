@@ -129,7 +129,7 @@ export default function ConfirmSwapTransaction({
 
       <PriceImpactBanner priceImpactState={priceImpactState} />
 
-      <Box display="flex" gap="8px" flexDirection="column">
+      <Box display="flex" flexDirection="column" gap="8px">
         <SummaryRow col1="DEX">
           <SwapPoolLabel provider={pool?.provider} isAutoPool={isAutoPool} />
         </SummaryRow>
@@ -159,29 +159,29 @@ export default function ConfirmSwapTransaction({
             </PriceImpactColored>
           </SummaryRow>
         )}
-        <Box p="16px" bgcolor="#244ABF" borderRadius="8px" color="common.white">
-          <Box display="flex" justifyContent="space-between">
-            <Box>Total</Box>
+      </Box>
+      <Box p="16px" bgcolor="#244ABF" borderRadius="8px" color="common.white">
+        <Box display="flex" justifyContent="space-between">
+          <Box>Total</Box>
+          <Box>
+            <Typography component="div" fontSize="20px" fontWeight="500">
+              {formattedNonPtAmount ?? formattedPtAmount}
+            </Typography>
+          </Box>
+        </Box>
+        {formattedNonPtAmount && (
+          <Box display="flex" justifyContent="right">
             <Box>
               <Typography component="div" fontSize="20px" fontWeight="500">
-                {formattedNonPtAmount ?? formattedPtAmount}
+                {formattedPtAmount}
               </Typography>
             </Box>
           </Box>
-          {formattedNonPtAmount && (
-            <Box display="flex" justifyContent="right">
-              <Box>
-                <Typography component="div" fontSize="20px" fontWeight="500">
-                  {formattedPtAmount}
-                </Typography>
-              </Box>
-            </Box>
-          )}
-          <Box display="flex" justifyContent="right">
-            <Typography component="div" variant="body1">
-              {getFormattedPairingValue(ptAmount)}
-            </Typography>
-          </Box>
+        )}
+        <Box display="flex" justifyContent="right">
+          <Typography component="div" variant="body1">
+            {getFormattedPairingValue(ptAmount)}
+          </Typography>
         </Box>
       </Box>
       <Box>

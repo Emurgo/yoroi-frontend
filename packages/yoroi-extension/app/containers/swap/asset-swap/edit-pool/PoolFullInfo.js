@@ -44,11 +44,11 @@ export default function SwapPoolFullInfo({
   const liqFeeQuantity = Quantities.format(cost.liquidityFee.quantity, ptDecimals ?? 0);
 
   return (
-    <Box sx={{ display: 'flex', flexFlow: 'column', gap: '8px', mt: '8px', mb: '8px' }}>
+    <Box sx={{ display: 'flex', flexFlow: 'column', gap: '8px' }}>
       {showMinAda && (
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
-            Min ADA
+            <Typography>Min ADA</Typography>
             {withInfo && (
               <InfoTooltip
                 content={
@@ -67,7 +67,7 @@ export default function SwapPoolFullInfo({
       )}
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
-          Fees
+          <Typography>Fees</Typography>
           {withInfo && (
             <InfoTooltip
               content={
@@ -84,7 +84,7 @@ export default function SwapPoolFullInfo({
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
-          Minimum assets received
+          <Typography>Minimum assets received</Typography>
           {withInfo && (
             <InfoTooltip
               content={
@@ -101,7 +101,7 @@ export default function SwapPoolFullInfo({
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
-          Liquidity provider fee
+          <Typography>Liquidity provider fee</Typography>
           {withInfo && (
             <InfoTooltip
               content={
