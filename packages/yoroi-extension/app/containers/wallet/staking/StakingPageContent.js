@@ -135,9 +135,6 @@ class StakingPageContent extends Component<AllProps> {
       websiteUrl: poolMeta.info?.homepage,
       ticker: poolMeta.info?.ticker,
     };
-    console.log('delegatedPooldelegatedPool', delegatedPool);
-
-    // fake current pool id to trigger the transition UI
     const poolTransition = delegationStore.getPoolTransition(currentPool);
 
     return (
