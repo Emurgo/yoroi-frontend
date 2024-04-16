@@ -3,7 +3,7 @@ import React from 'react';
 import { Typography, styled, Box, Stack } from '@mui/material';
 import { formatTimeSpan } from './helpers';
 
-import { ReactComponent as WarningSvg } from '../../../../assets/images/alert.inline.svg';
+import { ReactComponent as WarningSvg } from '../../../../assets/images/revamp/icons/alert.inline.svg';
 import { ReactComponent as EmurgoSvg } from '../../../../assets/images/emurgo-logo-small.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { messages } from './dialog-messages';
