@@ -65,11 +65,12 @@ class StakingPageContent extends Component<AllProps> {
     if (publicDeriver == null) {
       throw new Error(`${nameof(StakingPageContent)} no public deriver. Should never happen`);
     }
-    if (this.props.stores.delegation.poolTransitionConfig) {
+    if (this.props.stores.delegation.poolTransitionConfig.shouldUpdatePool) {
       const currentPool = this.props.stores.delegation.getDelegatedPoolId(publicDeriver);
       const poolTransitionInfo = this.props.stores.delegation.getPoolTransition(currentPool);
       if (poolTransitionInfo) {
-        this.delegateToSpecificPool(currentPool);
+        this.props.stores.delegation.delegateToSpecificPool(currentPool);
+        this.props.stores.delegation.createDelegationTransaction();
       }
     }
 
@@ -109,16 +110,6 @@ class StakingPageContent extends Component<AllProps> {
     });
   };
 
-  delegateToSpecificPool: (?string) => Promise<void> = async poolId => {
-    console.log('DELEGATE To POOL ID: ', poolId);
-    this.props.stores.delegation.poolInfoQuery.reset();
-    if (poolId == null) {
-      await this.props.actions.ada.delegationTransaction.setPools.trigger([]);
-      return;
-    }
-    await this.props.actions.ada.delegationTransaction.setPools.trigger([poolId]);
-  };
-
   getStakePoolMeta: (PublicDeriver<>) => Node = publicDeriver => {
     const delegationStore = this.props.stores.delegation;
     const currentPool = delegationStore.getDelegatedPoolId(publicDeriver);
@@ -144,6 +135,7 @@ class StakingPageContent extends Component<AllProps> {
       websiteUrl: poolMeta.info?.homepage,
       ticker: poolMeta.info?.ticker,
     };
+    console.log('delegatedPooldelegatedPool', delegatedPool);
 
     // fake current pool id to trigger the transition UI
     const poolTransition = delegationStore.getPoolTransition(currentPool);
@@ -154,7 +146,8 @@ class StakingPageContent extends Component<AllProps> {
         delegatedPool={delegatedPool}
         undelegate={async () => this.createWithdrawalTx(true)} // shouldDeregister=true
         delegateToSpecificPool={async (poolId): any => {
-          await this.delegateToSpecificPool(poolId);
+          this.props.stores.delegation.delegateToSpecificPool(poolId);
+          this.props.stores.delegation.createDelegationTransaction();
         }}
       />
     );

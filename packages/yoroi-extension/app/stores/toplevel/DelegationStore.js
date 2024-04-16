@@ -81,11 +81,11 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
   > = new LocalizedRequest<(Array<string>) => Promise<void>>(async poolIds => {
     const { selectedNetwork } = this.stores.profile;
     if (selectedNetwork == null) throw new Error(`${nameof(DelegationStore)} no network selected`);
+    await this.stores.substores.ada.delegation.updatePoolInfo({
+      network: selectedNetwork,
+      allPoolIds: poolIds,
+    });
     if (this.stores.substores.ada.delegation) {
-      await this.stores.substores.ada.delegation.updatePoolInfo({
-        network: selectedNetwork,
-        allPoolIds: poolIds,
-      });
       // make sure all the pools were found or throw an error
       for (const poolId of poolIds) {
         if (this.getLocalPoolInfo(selectedNetwork, poolId) == null) {
@@ -246,6 +246,30 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
       this.setPoolTransitionConfig({ show: 'open' });
     }
     return poolTransition;
+  };
+
+  delegateToSpecificPool: (?string) => Promise<void> = async poolId => {
+    this.stores.delegation.poolInfoQuery.reset();
+    if (poolId == null) {
+      await this.actions.ada.delegationTransaction.setPools.trigger([]);
+      return;
+    }
+    await this.actions.ada.delegationTransaction.setPools.trigger([poolId]);
+  };
+
+  createDelegationTransaction: void => Promise<void> = async () => {
+    const selectedWallet = this.stores.wallets.selected;
+    if (selectedWallet == null) {
+      return;
+    }
+    const { delegationTransaction } = this.stores.substores.ada;
+    if (delegationTransaction.selectedPools.length === 0) {
+      return;
+    }
+    await this.actions.ada.delegationTransaction.createTransaction.trigger({
+      poolRequest: delegationTransaction.selectedPools[0],
+      publicDeriver: selectedWallet,
+    });
   };
 
   @action.bound
