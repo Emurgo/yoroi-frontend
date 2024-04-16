@@ -49,9 +49,9 @@ describe('dApp, getUtxos, nested tests', function () {
       await customBeforeNestedDAppTest(this, windowManager);
     });
 
-    it('Request "getUtxos" for 1 ADA', async function () {
+    it('Request getUtxos for 1 ADA', async function () {
       const getUtxosResponse = await mockedDApp.getUTXOs(String(1 * adaInLovelaces));
-      expect(getUtxosResponse.success, 'The request "getUtxos" failed').to.be.true;
+      expect(getUtxosResponse.success, 'The request getUtxos failed').to.be.true;
       expect(getUtxosResponse.retValue).to.be.an('array').that.is.not.empty;
       for (const utxo of getUtxosResponse.retValue) {
         const adaAmount = parseFloat(utxo.amount) / adaInLovelaces;
@@ -65,9 +65,9 @@ describe('dApp, getUtxos, nested tests', function () {
       await customBeforeNestedDAppTest(this, windowManager);
     });
 
-    it('Request "getUtxos" for 6 ADA', async function () {
+    it('Request getUtxos for 6 ADA', async function () {
       const getUtxosResponse = await mockedDApp.getUTXOs(String(6 * adaInLovelaces), false);
-      expect(getUtxosResponse.success, 'The request "getUtxos" failed').to.be.true;
+      expect(getUtxosResponse.success, 'The request getUtxos failed').to.be.true;
       expect(getUtxosResponse.retValue).to.equal(null);
     });
   });
@@ -77,9 +77,9 @@ describe('dApp, getUtxos, nested tests', function () {
       await customBeforeNestedDAppTest(this, windowManager);
     });
 
-    it('Request "getUtxos" with undefined amount', async function () {
+    it('Request getUtxos with undefined amount', async function () {
       const getUtxosResponse = await mockedDApp.getUTXOs();
-      expect(getUtxosResponse.success, 'The request "getUtxos" failed').to.be.true;
+      expect(getUtxosResponse.success, 'The request getUtxos failed').to.be.true;
       expect(getUtxosResponse.retValue).to.be.an('array').that.is.not.empty;
       const sumUtxosAmount = getUtxosResponse.retValue.reduce(
         (accumulator, utxo) => accumulator + parseFloat(utxo.amount),

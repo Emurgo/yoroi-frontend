@@ -49,9 +49,9 @@ describe('dApp, getUtxos, empty wallet, not auth', function () {
     await connectNonAuth(webdriver, logger, windowManager, mockedDApp, newTestWallet);
   });
 
-  it('Request "getUtxos"', async function () {
+  it('Request getUtxos', async function () {
     const getUtxosResponse = await mockedDApp.getUTXOs();
-    expect(getUtxosResponse.success, 'The request "getUtxos" failed').to.be.true;
+    expect(getUtxosResponse.success, 'The request getUtxos failed').to.be.true;
     expect(getUtxosResponse.retValue).to.be.an('array').that.is.empty;
   });
 

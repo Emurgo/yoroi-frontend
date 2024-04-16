@@ -52,7 +52,7 @@ describe('dApp, getCollateral, no popup, positive', function () {
 
     it('Getting collateral for 1 ADA', async function () {
       const collateralResponse = await mockedDApp.getCollateral(String(1 * adaInLovelaces));
-      expect(collateralResponse.success, 'The request "getCollateral" failed').to.be.true;
+      expect(collateralResponse.success, 'The request getCollateral failed').to.be.true;
       expect(collateralResponse.retValue).to.be.an('array').that.is.not.empty;
       expect(collateralResponse.retValue.length).to.be.equal(1);
       const receivedAmount = parseFloat(collateralResponse.retValue[0].amount) / adaInLovelaces;
@@ -67,7 +67,7 @@ describe('dApp, getCollateral, no popup, positive', function () {
 
     it('Getting collateral for 3 ADA', async function () {
       const collateralResponse = await mockedDApp.getCollateral(String(3 * adaInLovelaces));
-      expect(collateralResponse.success, 'The request "getCollateral" failed').to.be.true;
+      expect(collateralResponse.success, 'The request getCollateral failed').to.be.true;
       expect(collateralResponse.retValue).to.be.an('array').that.is.not.empty;
       expect(collateralResponse.retValue.length).to.be.equal(3);
       const sumUtxosAmount = collateralResponse.retValue.reduce(
@@ -85,7 +85,7 @@ describe('dApp, getCollateral, no popup, positive', function () {
 
     it('Getting collateral for 5 ADA', async function () {
       const collateralResponse = await mockedDApp.getCollateral(String(5 * adaInLovelaces));
-      expect(collateralResponse.success, 'The request "getCollateral" failed').to.be.true;
+      expect(collateralResponse.success, 'The request getCollateral failed').to.be.true;
       expect(collateralResponse.retValue).to.be.an('array').that.is.not.empty;
       const sumUtxosAmount = collateralResponse.retValue.reduce(
         (accumulator, utxo) => accumulator + parseFloat(utxo.amount) / adaInLovelaces,
@@ -102,7 +102,7 @@ describe('dApp, getCollateral, no popup, positive', function () {
 
     it('Getting collateral for undefined amount', async function () {
       const collateralResponse = await mockedDApp.getCollateral();
-      expect(collateralResponse.success, 'The request "getCollateral" failed').to.be.true;
+      expect(collateralResponse.success, 'The request getCollateral failed').to.be.true;
       expect(collateralResponse.retValue).to.be.an('array').that.is.not.empty;
       const sumUtxosAmount = collateralResponse.retValue.reduce(
         (accumulator, utxo) => accumulator + parseFloat(utxo.amount) / adaInLovelaces,

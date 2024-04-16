@@ -53,7 +53,7 @@ describe('dApp, general functions, without pop-up', function () {
       const balanceResponse = await mockedDApp.getBalance();
       // it is necessary to do, because the wallet balance is returned in lovelaces
       // and as the String type
-      expect(balanceResponse.success, 'The request "getBalance" failed').to.be.true;
+      expect(balanceResponse.success, 'The request getBalance failed').to.be.true;
       const expectedBalance = String(testWallet1.balance * adaInLovelaces);
       expect(balanceResponse.retValue).to.equal(expectedBalance, `Wrong balance`);
     });
@@ -64,9 +64,9 @@ describe('dApp, general functions, without pop-up', function () {
       await customBeforeNestedDAppTest(this, windowManager);
     });
 
-    it('Request "getChangeAddress"', async function () {
+    it('Request getChangeAddress', async function () {
       const changeAddressResponse = await mockedDApp.getChangeAddress();
-      expect(changeAddressResponse.success, 'The request "getChangeAddress" failed').to.be.true;
+      expect(changeAddressResponse.success, 'The request getChangeAddress failed').to.be.true;
       expect(changeAddressResponse.retValue).to.be.an('string').that.is.not.empty;
     });
   });
@@ -76,9 +76,9 @@ describe('dApp, general functions, without pop-up', function () {
       await customBeforeNestedDAppTest(this, windowManager);
     });
 
-    it('Requet "getExtensions"', async function () {
+    it('Requet getExtensions', async function () {
       const extensionsResponse = await mockedDApp.getExtensions();
-      expect(extensionsResponse.success, 'The request "getExtensions" failed').to.be.true;
+      expect(extensionsResponse.success, 'The request getExtensions failed').to.be.true;
       expect(extensionsResponse.retValue).to.be.an('array').that.is.not.empty;
       expect(extensionsResponse.retValue.length).to.equal(1);
       expect(extensionsResponse.retValue[0].cip).to.equal(95);
@@ -90,9 +90,9 @@ describe('dApp, general functions, without pop-up', function () {
       await customBeforeNestedDAppTest(this, windowManager);
     });
 
-    it('Request "getNetworkId"', async function () {
+    it('Request getNetworkId', async function () {
       const networkIdResponse = await mockedDApp.getNetworkId();
-      expect(networkIdResponse.success, 'The request "getNetworkId" failed').to.be.true;
+      expect(networkIdResponse.success, 'The request getNetworkId failed').to.be.true;
       expect(networkIdResponse.retValue).to.be.an('number');
       expect(networkIdResponse.retValue).to.be.at.most(1);
     });
@@ -103,9 +103,9 @@ describe('dApp, general functions, without pop-up', function () {
       await customBeforeNestedDAppTest(this, windowManager);
     });
 
-    it('Request "getRewardAddresses"', async function () {
+    it('Request getRewardAddresses', async function () {
       const rewardAddressesResponse = await mockedDApp.getRewardAddresses();
-      expect(rewardAddressesResponse.success, 'The request "getRewardAddresses" failed').to.be.true;
+      expect(rewardAddressesResponse.success, 'The request getRewardAddresses failed').to.be.true;
       expect(rewardAddressesResponse.retValue).to.be.an('array').that.is.not.empty;
     });
   });
@@ -115,10 +115,10 @@ describe('dApp, general functions, without pop-up', function () {
       await customBeforeNestedDAppTest(this, windowManager);
     });
 
-    it('Request "getUnusedAddresses"', async function () {
+    it('Request getUnusedAddresses', async function () {
       await mockedDApp.requestUnusedAddresses();
       const unusedAddressesResponse = await mockedDApp.getAddresses();
-      expect(unusedAddressesResponse.success, 'The request "getUnusedAddresses" failed').to.be.true;
+      expect(unusedAddressesResponse.success, 'The request getUnusedAddresses failed').to.be.true;
       expect(unusedAddressesResponse.retValue).to.be.an('array').that.is.not.empty;
     });
   });
@@ -128,10 +128,10 @@ describe('dApp, general functions, without pop-up', function () {
       await customBeforeNestedDAppTest(this, windowManager);
     });
 
-    it('Request "getUsedAddresses"', async function () {
+    it('Request getUsedAddresses', async function () {
       await mockedDApp.requestUsedAddresses();
       const usedAddressesResponse = await mockedDApp.getAddresses();
-      expect(usedAddressesResponse.success, 'The request "getUsedAddresses" failed').to.be.true;
+      expect(usedAddressesResponse.success, 'The request getUsedAddresses failed').to.be.true;
       expect(usedAddressesResponse.retValue).to.be.an('array').that.is.not.empty;
     });
   });
@@ -141,12 +141,12 @@ describe('dApp, general functions, without pop-up', function () {
       await customBeforeNestedDAppTest(this, windowManager);
     });
 
-    it('Request "getUsedAddresses" with too big page parameter', async function () {
+    it('Request getUsedAddresses with too big page parameter', async function () {
       const page = 10;
       const limit = 5;
       await mockedDApp.requestUsedAddresses(page, limit);
       const usedAddressesResponse = await mockedDApp.getAddresses();
-      expect(usedAddressesResponse.success, 'The request "getUsedAddresses" passed').to.be.false;
+      expect(usedAddressesResponse.success, 'The request getUsedAddresses passed').to.be.false;
       const responseErrMsg = usedAddressesResponse.errMsg;
       expect(responseErrMsg.maxSize).to.be.at.least(1);
     });
@@ -157,9 +157,9 @@ describe('dApp, general functions, without pop-up', function () {
       await customBeforeNestedDAppTest(this, windowManager);
     });
 
-    it('Request "getPubDRepKey"', async function () {
+    it('Request getPubDRepKey', async function () {
       const extensionsResponse = await mockedDApp.getPubDRepKey();
-      expect(extensionsResponse.success, 'The request "getExtensions" failed').to.be.true;
+      expect(extensionsResponse.success, 'The request getExtensions failed').to.be.true;
       expect(extensionsResponse.retValue).to.be.an('string').that.is.not.empty;
     });
   });
@@ -169,9 +169,9 @@ describe('dApp, general functions, without pop-up', function () {
       await customBeforeNestedDAppTest(this, windowManager);
     });
 
-    it('Request "getRegisteredPubStakeKeys"', async function () {
+    it('Request getRegisteredPubStakeKeys', async function () {
       const extensionsResponse = await mockedDApp.getRegisteredPubStakeKeys();
-      expect(extensionsResponse.success, 'The request "getRegisteredPubStakeKeys" failed').to.be
+      expect(extensionsResponse.success, 'The request getRegisteredPubStakeKeys failed').to.be
         .true;
       // update it when the SanchoNet is released
       expect(extensionsResponse.retValue).to.be.an('array');
@@ -183,9 +183,9 @@ describe('dApp, general functions, without pop-up', function () {
       await customBeforeNestedDAppTest(this, windowManager);
     });
 
-    it('Request "getUnregisteredPubStakeKeys"', async function () {
+    it('Request getUnregisteredPubStakeKeys', async function () {
       const extensionsResponse = await mockedDApp.getUnregisteredPubStakeKeys();
-      expect(extensionsResponse.success, 'The request "getUnregisteredPubStakeKeys" failed').to.be
+      expect(extensionsResponse.success, 'The request getUnregisteredPubStakeKeys failed').to.be
         .true;
       // update it when the SanchoNet is released
       expect(extensionsResponse.retValue).to.be.an('array').that.is.not.empty;
