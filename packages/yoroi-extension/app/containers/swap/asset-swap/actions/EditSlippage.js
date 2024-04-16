@@ -22,7 +22,6 @@ export const EditSlippage = ({ setOpenedDialog, slippageValue }: EditSlippagePro
           Slippage tolerance
         </Typography>
         <InfoTooltip
-          width={450}
           content={
             <Typography color="inherit">
               Slippage tolerance is set as a percentage of the total swap value. Your transactions

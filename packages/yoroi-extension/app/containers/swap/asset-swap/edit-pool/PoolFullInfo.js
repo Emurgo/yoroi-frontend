@@ -44,14 +44,13 @@ export default function SwapPoolFullInfo({
   const liqFeeQuantity = Quantities.format(cost.liquidityFee.quantity, ptDecimals ?? 0);
 
   return (
-    <Box sx={{ display: 'flex', flexFlow: 'column', gap: '16px', mt: '8px', mb: '8px' }}>
+    <Box sx={{ display: 'flex', flexFlow: 'column', gap: '8px', mt: '8px', mb: '8px' }}>
       {showMinAda && (
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
             Min ADA
             {withInfo && (
               <InfoTooltip
-                width={245}
                 content={
                   <Typography color="inherit">
                     A small ADA deposit that will be returned when your order is processed or
@@ -71,7 +70,6 @@ export default function SwapPoolFullInfo({
           Fees
           {withInfo && (
             <InfoTooltip
-              width={245}
               content={
                 <React.Fragment>
                   <Typography color="inherit">Fees included:</Typography>
@@ -89,7 +87,6 @@ export default function SwapPoolFullInfo({
           Minimum assets received
           {withInfo && (
             <InfoTooltip
-              width={245}
               content={
                 <Typography color="inherit">
                   The minimum amount you are guaranteed to receive in case of price slippage
@@ -107,7 +104,6 @@ export default function SwapPoolFullInfo({
           Liquidity provider fee
           {withInfo && (
             <InfoTooltip
-              width={360}
               content={
                 <Typography color="inherit">
                   A fixed 0.3% operational fee paid to liquidity providers as a reward for supplying
