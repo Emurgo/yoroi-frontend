@@ -31,7 +31,7 @@ jobs:
         run: |
           brew update
           brew tap homebrew/cask-versions && brew install --cask firefox-developer-edition
-          echo "FIREFOX_BIN=/Applications/Firefox\ Developer\ Edition.app/Contents/MacOS/firefox-bin" >> $GITHUB_ENV
+          echo "FIREFOX_BIN=/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox-bin" >> $GITHUB_ENV
 
       - name: Read .nvmrc
         id: nvm
@@ -73,7 +73,10 @@ jobs:
           SECOND_STATIC_TEST_WALLET: ${{ secrets.SECOND_STATIC_TEST_WALLET }}
           SECOND_SMOKE_TEST_WALLET: ${{ secrets.SECOND_SMOKE_TEST_WALLET }}
           SECOND_SMOKE_TEST_WALLET_FF: ${{ secrets.SECOND_SMOKE_TEST_WALLET_FF }}
-        run: npm run test:${{ matrix.browser }}
+        run: |
+          echo "--------->"
+          echo $FIREFOX_BIN
+          npm run test:${{ matrix.browser }}
 
       - name: Archive tests screenshots and logs
         if: ${{ failure() }}
