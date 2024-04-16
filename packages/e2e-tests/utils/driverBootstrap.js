@@ -66,7 +66,7 @@ const getChromeBuilder = () => {
           '--disable-dev-shm-usage',
           '--disable-setuid-sandbox',
           '--start-maximized',
-          '--headless=new', // Runs the browser in the headless mode
+          // '--headless=new', // Runs the browser in the headless mode
         )
         .setUserPreferences({ 'download.default_directory': downloadsDir })
     );
@@ -81,7 +81,7 @@ const getFirefoxBuilder = () => {
      */
     .setBinary(firefoxBin)
     .addExtensions(path.resolve(__extensionDir, 'Yoroi.xpi'))
-    .addArguments('--headless') // Runs the browser in the headless mode
+    // .addArguments('--headless') // Runs the browser in the headless mode
     /**
      * Firefox disallows unsigned extensions by default. We solve this through a config change
      * The proper way to do this is to use the "temporary addon" feature of Firefox
