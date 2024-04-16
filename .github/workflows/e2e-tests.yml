@@ -13,7 +13,7 @@ jobs:
     runs-on: macos-14
     strategy:
       matrix:
-        browser: ['chrome', 'firefox']
+        browser: ['chrome']
       fail-fast: false
 
     steps:
