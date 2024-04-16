@@ -6,7 +6,6 @@ import { CreateSwapOrder } from './CreateSwapOrder';
 import ConfirmSwapTransaction from './ConfirmSwapTransaction';
 import TxSubmittedStep from './TxSubmittedStep';
 import LimitOrderWarningDialog from '../../../components/swap/LimitOrderWarningDialog';
-import { SwapFormProvider } from '../context/swap-form';
 import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import { useSwap } from '@yoroi/swap';
 import { runInAction } from 'mobx';
@@ -23,6 +22,7 @@ import { HaskellShelleyTxSignRequest } from '../../../api/ada/transactions/shell
 import LoadingOverlay from '../../../components/swap/LoadingOverlay';
 import { IncorrectWalletPasswordError } from '../../../api/common/errors';
 import { observer } from 'mobx-react';
+import useSwapForm from '../context/swap-form/useSwapForm';
 
 export const PRICE_IMPACT_MODERATE_RISK = 1;
 export const PRICE_IMPACT_HIGH_RISK = 10;
@@ -45,7 +45,9 @@ function SwapPage(props: StoresAndActionsProps): Node {
       limitPrice: orderLimitPrice,
     },
     frontendFeeTiersChanged,
+    orderData,
   } = useSwap();
+  const { sellTokenInfo, buyTokenInfo } = useSwapForm();
 
   const isMarketOrder = orderType === 'market';
   const impact = isMarketOrder ? Number(selectedPoolCalculation?.prices.priceImpact ?? 0) : 0;
@@ -58,9 +60,13 @@ function SwapPage(props: StoresAndActionsProps): Node {
   const [signRequest, setSignRequest] = useState<?HaskellShelleyTxSignRequest>(null);
   const userPasswordState = StateWrap(useState<string>(''));
   const txSubmitErrorState = StateWrap(useState<?Error>(null));
+  const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
 
   const swapFormCanContinue =
-    selectedPoolCalculation != null && sell.quantity !== '0' && buy.quantity !== '0';
+    selectedPoolCalculation != null &&
+    sell.quantity !== '0' &&
+    buy.quantity !== '0' &&
+    isValidTickers;
 
   const confirmationCanContinue = userPasswordState.value !== '' && signRequest != null;
 
@@ -277,7 +283,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
   };
 
   return (
-    <SwapFormProvider swapStore={props.stores.substores.ada.swapStore}>
+    <>
       <Box display="flex" flexDirection="column" height="100%">
         <Box
           sx={{ flexGrow: '1', overflowY: 'auto', p: '24px' }}
@@ -378,7 +384,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
           }}
         />
       )}
-    </SwapFormProvider>
+    </>
   );
 }
 

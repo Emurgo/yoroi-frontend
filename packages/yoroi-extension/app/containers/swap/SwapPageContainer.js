@@ -15,6 +15,7 @@ import TopBarLayout from '../../components/layout/TopBarLayout';
 import SidebarContainer from '../SidebarContainer';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
+import { SwapFormProvider } from './context/swap-form';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -75,7 +76,9 @@ class SwapPageContainer extends Component<AllProps> {
         showAsCard
         withPadding={false}
       >
-        {children}
+        <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>
+          {children}
+        </SwapFormProvider>
       </TopBarLayout>
     );
   }
