@@ -222,7 +222,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
           columnNames={orderColumns}
           columnAlignment={['left', '', '', '', 'left', 'left', 'left']}
           columnLeftPaddings={['', '', '', '', '32px']}
-          gridTemplateColumns="186px 160px 176px 160px 186px 260px auto"
+          gridTemplateColumns="176px 150px 166px 150px 176px 240px auto"
           columnGap="0px"
         >
           {showCompletedOrders
