@@ -10,7 +10,7 @@ on:
 jobs:
   E2E_tests:
     if: github.event.review  && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check') || contains(github.event.review.body, '/regression-check'))
-    runs-on: macos-13
+    runs-on: macos-14
     strategy:
       matrix:
         browser: ['chrome', 'firefox']
