@@ -1,17 +1,6 @@
 // @flow
 import React from 'react';
-import {
-  Card,
-  CardContent,
-  Typography,
-  Icon,
-  Grid,
-  Alert,
-  styled,
-  Paper,
-  Box,
-  Stack,
-} from '@mui/material';
+import { Typography, styled, Box, Stack } from '@mui/material';
 import { formatTimeSpan } from './helpers';
 
 import { ReactComponent as WarningSvg } from '../../../../assets/images/alert.inline.svg';
