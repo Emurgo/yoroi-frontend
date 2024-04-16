@@ -75,13 +75,12 @@ const getChromeBuilder = () => {
 const getFirefoxBuilder = () => {
   const downloadsDir = getDownloadsDir();
   const options = new firefox.Options()
+    // .addArguments('--headless') // Runs the browser in the headless mode
     /**
      * For Firefox it is needed to use "Firefox for Developers" to load the unsigned extensions
      * Set the FIREFOX_BIN env variable to the "Firefox for Developers" executable
      */
     .setBinary(firefoxBin)
-    .addExtensions(path.resolve(__extensionDir, 'Yoroi.xpi'))
-    // .addArguments('--headless') // Runs the browser in the headless mode
     /**
      * Firefox disallows unsigned extensions by default. We solve this through a config change
      * The proper way to do this is to use the "temporary addon" feature of Firefox
@@ -98,7 +97,8 @@ const getFirefoxBuilder = () => {
       'browser.helperApps.neverAsk.saveToDisk',
       'application/csv, text/csv, application/pdfss, text/csv, application/excel'
     )
-    .setPreference('browser.download.manager.showAlertOnComplete', false);
+    .setPreference('browser.download.manager.showAlertOnComplete', false)
+    .addExtensions(path.resolve(__extensionDir, 'Yoroi.xpi'));
 
   return new Builder()
     .withCapabilities({
