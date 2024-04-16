@@ -31,7 +31,7 @@ jobs:
         run: |
           brew update
           brew tap homebrew/cask-versions && brew install --cask firefox-developer-edition
-          echo "FIREFOX_BIN=/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox-bin" >> $GITHUB_ENV
+          echo "FIREFOX_BIN=/Applications/Firefox\ Developer\ Edition.app/Contents/MacOS/firefox-bin" >> $GITHUB_ENV
 
       - name: Read .nvmrc
         id: nvm
