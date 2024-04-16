@@ -1,12 +1,11 @@
 // @flow
 
-import React from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
 import { styled } from '@mui/material/styles';
 import { ReactComponent as Info } from '../../assets/images/revamp/icons/info.inline.svg';
 
-const STooltip = styled(({ className, width, ...props }: any) => (
+const STooltip = styled(({ className, ...props }: any) => (
   <Tooltip {...props} classes={{ popper: className }} />
 ))(({ theme, width }) => ({
   [`& .${tooltipClasses.tooltip}`]: {

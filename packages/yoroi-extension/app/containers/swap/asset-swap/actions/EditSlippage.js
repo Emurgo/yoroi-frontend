@@ -1,7 +1,5 @@
 // @flow
-import React from 'react';
 import { Box, Typography } from '@mui/material';
-import { ReactComponent as InfoIcon } from '../../../../assets/images/revamp/icons/info.inline.svg';
 import { ReactComponent as EditIcon } from '../../../../assets/images/revamp/icons/edit.inline.svg';
 import { InfoTooltip } from '../../../../components/widgets/InfoTooltip';
 

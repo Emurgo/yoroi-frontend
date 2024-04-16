@@ -1,6 +1,5 @@
 //@flow
 import { Box, Typography } from '@mui/material';
-import { ReactComponent as InfoIcon } from '../../../assets/images/revamp/icons/info.inline.svg';
 import TextField from '../../../components/common/TextField';
 import { useSwapForm } from '../context/swap-form';
 import { AssetAndAmountRow } from '../../../components/swap/SelectAssetDialog';

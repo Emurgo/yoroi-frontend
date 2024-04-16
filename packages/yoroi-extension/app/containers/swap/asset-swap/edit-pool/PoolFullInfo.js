@@ -2,14 +2,11 @@
 
 import React from 'react';
 import { Box, Typography } from '@mui/material';
-import { ReactComponent as InformationIcon } from '../../../../assets/images/revamp/icons/info.inline.svg';
 import { useSwap } from '@yoroi/swap';
 import { useSwapForm } from '../../context/swap-form';
 import { Quantities } from '../../../../utils/quantities';
 import { useSwapFeeDisplay } from '../../hooks';
 import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
-import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
-import { styled } from '@mui/material/styles';
 import { InfoTooltip } from '../../../../components/widgets/InfoTooltip';
 
 type Props = {|

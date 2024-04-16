@@ -175,7 +175,6 @@ function SwapPage(props: StoresAndActionsProps): Node {
   function handleMarketOrder() {
     if (priceImpactState?.isSevere) {
       setOpenedDialog('priceImpactAlert');
-      return;
     }
   }
 

@@ -1,9 +1,8 @@
 // @flow
 import { useState } from 'react';
-import { Box, Button, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import SwapPriceInput from '../../../components/swap/SwapPriceInput';
 import SlippageDialog from '../../../components/swap/SlippageDialog';
-import Tabs from '../../../components/common/tabs/Tabs';
 import { useSwap } from '@yoroi/swap';
 import { useSwapForm } from '../context/swap-form';
 import EditSellAmount from './edit-sell-amount/EditSellAmount';
@@ -37,7 +36,6 @@ export const CreateSwapOrder = ({
   priceImpactState,
 }: Props): React$Node => {
   const [openedDialog, setOpenedDialog] = useState('');
-  const { resetSwapForm, switchTokens } = useSwapForm();
 
   const {
     orderData: {
@@ -45,7 +43,6 @@ export const CreateSwapOrder = ({
       type: orderType,
     },
     // unsignedTxChanged,
-    orderTypeChanged,
     sellTokenInfoChanged,
     buyTokenInfoChanged,
   } = useSwap();

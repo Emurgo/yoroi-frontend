@@ -19,7 +19,6 @@ type Props = {|
 
 export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props): React$Node {
   const [showFullInfo, setShowFullInfo] = useState(true);
-  const [openedDialog, setOpenedDialog] = useState('');
   const { orderData } = useSwap();
 
   const { selectedPoolCalculation: calculation, bestPoolCalculation, type } = orderData;
