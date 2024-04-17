@@ -186,7 +186,10 @@ export default function SwapConfirmationStep({
           value={userPasswordState.value}
           label="Password"
           type="password"
-          onChange={e => userPasswordState.update(e.target.value)}
+          onChange={e => {
+            txSubmitErrorState.update(null);
+            userPasswordState.update(e.target.value);
+          }}
           error={isIncorrectPassword && 'Incorrect password!'}
         />
       </Box>

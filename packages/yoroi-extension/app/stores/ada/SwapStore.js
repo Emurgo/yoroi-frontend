@@ -15,7 +15,7 @@ import { Quantities } from '../../utils/quantities';
 import BigNumber from 'bignumber.js';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import { cast, fail } from '../../coreUtils';
-import { asAddressedUtxo, cardanoUtxoHexFromRemoteFormat } from '../../api/ada/transactions/utils';
+import { asAddressedUtxo, cardanoUtxoHexFromRemoteFormat, signTransactionHex } from '../../api/ada/transactions/utils';
 import { genLookupOrFail, getTokenIdentifierIfExists, getTokenName } from '../stateless/tokenHelpers';
 import { splitAmount, truncateToken } from '../../utils/formatters';
 import adaLogo from '../../containers/swap/mockAssets/ada.inline.svg';
@@ -135,6 +135,22 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
       entries,
       metadata,
     });
+  }
+
+  executeCancelTransaction: ({|
+    wallet: PublicDeriver<>,
+    transactionHex: string,
+    password: string,
+  |}) => Promise<void> = async ({
+    wallet,
+    transactionHex,
+    password,
+  }) => {
+    console.log('🚀 > CANCEL:', transactionHex);
+    const signedTransactionHex =
+      await signTransactionHex(wallet, password, transactionHex);
+    console.log('🚀 > CANCEL SIGNED TX', signedTransactionHex);
+    // TODO: submit
   }
 }
 
