@@ -69,7 +69,7 @@ class StakingPageContent extends Component<AllProps> {
       const currentPool = this.props.stores.delegation.getDelegatedPoolId(publicDeriver);
       const poolTransitionInfo = this.props.stores.delegation.getPoolTransition(currentPool);
       if (poolTransitionInfo) {
-        this.props.stores.delegation.delegateToSpecificPool(currentPool);
+        this.props.stores.delegation.delegateToSpecificPool(poolTransitionInfo.suggestedPool.id);
         this.props.stores.delegation.createDelegationTransaction();
       }
     }
