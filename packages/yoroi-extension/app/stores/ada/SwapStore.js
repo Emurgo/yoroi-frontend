@@ -44,7 +44,6 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
     const spendableBalance = this.stores.transactions?.balance;
     if (spendableBalance == null) return [];
     const getTokenInfo = genLookupOrFail(this.stores.tokenInfoStore?.tokenInfo);
-    console.log('SwapStore > assets recalc');
     return [spendableBalance.getDefaultEntry(), ...spendableBalance.nonDefaultEntries()]
       .map(entry => ({
         entry,
