@@ -27,6 +27,7 @@ type Props = {|
   onClose: () => void,
   poolTransition?: PoolTransition | null,
   onUpdatePool: () => void,
+  currentPoolId?: string,
   intl: $npm$ReactIntl$IntlFormat,
 |};
 
@@ -34,6 +35,7 @@ export const PoolTransitionDialog = ({
   onClose,
   poolTransition,
   onUpdatePool,
+  currentPoolId,
   intl,
 }: Props): React$Node => {
   const { currentPool, suggestedPool } = poolTransition || {};
@@ -55,6 +57,7 @@ export const PoolTransitionDialog = ({
           roa={currentPool?.roa}
           fee={currentPool?.share}
           deadlineMilliseconds={poolTransition?.deadlineMilliseconds}
+          poolHash={currentPoolId}
           intl={intl}
         />
         <Typography variant="body1" fontWeight="500">
@@ -65,6 +68,7 @@ export const PoolTransitionDialog = ({
           poolName={suggestedPool?.name}
           roa={suggestedPool?.roa}
           fee={suggestedPool?.share}
+          poolHash={suggestedPool?.id}
           suggestedPool
           intl={intl}
         />

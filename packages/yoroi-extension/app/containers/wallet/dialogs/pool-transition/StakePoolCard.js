@@ -7,6 +7,7 @@ import { ReactComponent as WarningSvg } from '../../../../assets/images/revamp/i
 import { ReactComponent as EmurgoSvg } from '../../../../assets/images/emurgo-logo-small.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { messages } from './dialog-messages';
+import { toSvg } from 'jdenticon';
 
 type Props = {|
   label: string,
@@ -15,6 +16,7 @@ type Props = {|
   fee?: string,
   deadlineMilliseconds?: number,
   suggestedPool?: boolean,
+  poolHash?: string,
   intl: $npm$ReactIntl$IntlFormat,
 |};
 
@@ -26,14 +28,21 @@ export const StakePoolCard = ({
   deadlineMilliseconds,
   suggestedPool = false,
   intl,
+  poolHash,
 }: Props): React$Node => {
+  const avatarSource = toSvg(poolHash, 36, { padding: 0 });
+  const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
   return (
     <CustomCard suggestedPool={suggestedPool}>
       <Typography variant="body1" fontWeight={500} mb={2}>
         {label}
       </Typography>
       <Stack direction="row" gap={1}>
-        <EmurgoSvg />
+        <Box
+          sx={{ width: '24px', height: '24px', borderRadius: '50%', display: 'inline-block' }}
+          component="img"
+          src={avatarGenerated}
+        />
         <Typography variant="body1" fontWeight={400}>
           {poolName}
         </Typography>

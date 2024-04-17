@@ -14,7 +14,6 @@ import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import type { PoolInfo } from '@emurgo/yoroi-lib';
 import { MultiToken } from '../../api/common/lib/MultiToken';
-import { PoolTransitionDialog } from '../../containers/wallet/dialogs/pool-transition/PoolTransitionDialog';
 import { maybe } from '../../coreUtils';
 import type {
   GetDelegatedBalanceFunc,

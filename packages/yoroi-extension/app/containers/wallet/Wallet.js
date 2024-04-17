@@ -130,7 +130,7 @@ class Wallet extends Component<AllProps> {
     if (publicDeriver == null) {
       throw new Error(`${nameof(Wallet)} no public deriver. Should never happen`);
     }
-
+    const currentPool = this.props.stores.delegation.getDelegatedPoolId(publicDeriver);
     const poolTransition = stores.delegation.checkPoolTransition(publicDeriver);
     const isFirstSync = stores.wallets.firstSyncWalletId === selectedWallet.getPublicDeriverId();
     const spendableBalance = this.props.stores.transactions.balance;
@@ -149,7 +149,7 @@ class Wallet extends Component<AllProps> {
           }))}
         onItemClick={route => actions.router.goToRoute.trigger({ route })}
         isActiveItem={route => this.props.stores.app.currentRoute.startsWith(route)}
-        locationId='wallet'
+        locationId="wallet"
       />
     );
 
@@ -225,6 +225,7 @@ class Wallet extends Component<AllProps> {
               this.props.stores.delegation.setPoolTransitionConfig({ show: 'idle' });
             }}
             poolTransition={poolTransition}
+            currentPoolId={currentPool ?? ''}
             onUpdatePool={() => {
               this.props.stores.delegation.setPoolTransitionConfig({
                 show: 'idle',
