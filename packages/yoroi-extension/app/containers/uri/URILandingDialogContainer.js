@@ -17,7 +17,7 @@ type Props = {|
   ...StoresAndActionsProps,
   +onClose: void => void,
   +onConfirm: void => void,
-  +firstSelectedWallet: null | PublicDeriver<>,
+  +hasFirstSelectedWallet: boolean,
 |};
 
 @observer
@@ -43,7 +43,7 @@ export default class URILandingDialogContainer extends Component<Props> {
   }
 
   render(): Node {
-    if (!this.props.stores.loading.uriParams || this.props.firstSelectedWallet == null) {
+    if (!this.props.stores.loading.uriParams || !this.props.hasFirstSelectedWallet) {
       return (
         <URIInvalidDialog
           onClose={this.onCancel}

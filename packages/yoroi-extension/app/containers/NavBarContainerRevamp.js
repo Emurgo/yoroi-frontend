@@ -2,14 +2,11 @@
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { Node } from 'react';
 import type { StoresAndActionsProps } from '../types/injectedProps.types';
-import type { ConceptualWalletSettingsCache } from '../stores/toplevel/WalletSettingsStore';
 import { Component } from 'react';
 import { intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
 import { ROUTES } from '../routes-config';
 import { ConceptualWallet } from '../api/ada/lib/storage/models/ConceptualWallet/index';
-import { asGetPublicKey } from '../api/ada/lib/storage/models/PublicDeriver/traits';
-import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
 import { genLookupOrFail, getTokenName } from '../stores/stateless/tokenHelpers';
 import { networks } from '../api/ada/lib/storage/database/prepackaged/networks';
 import { addressToDisplayString } from '../api/ada/lib/storage/bridge/utils';
@@ -42,13 +39,13 @@ export default class NavBarContainerRevamp extends Component<Props> {
     await this.props.actions.profile.updateHideBalance.trigger();
   };
 
-  onSelectWallet: (PublicDeriver<>) => void = newWallet => {
+  onSelectWallet: (number) => void = newWalletId => {
     const { delegation, app } = this.props.stores;
-    const isRewardWallet = delegation.isRewardWallet(newWallet);
+    const isRewardWallet = delegation.isRewardWallet(newWalletId);
     const isStakingPage = app.currentRoute === ROUTES.STAKING;
 
     const route = !isRewardWallet && isStakingPage ? ROUTES.WALLETS.ROOT : app.currentRoute;
-    this.props.actions.router.goToRoute.trigger({ route, publicDeriver: newWallet });
+    this.props.actions.router.goToRoute.trigger({ route, publicDeriverId: newWalletId });
   };
 
   openDialogWrapper: any => void = dialog => {
@@ -59,36 +56,28 @@ export default class NavBarContainerRevamp extends Component<Props> {
   render(): Node {
     const { stores } = this.props;
     const { profile } = stores;
-    const walletsStore = stores.wallets;
+    const { selected } = stores.wallets;
 
     const DropdownHead = () => {
-      const publicDeriver = walletsStore.selected;
-      if (publicDeriver == null) return null;
-      const parent = publicDeriver.getParent();
-      const settingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(
-        parent
-      );
+      if (!selected) {
+        return null;
+      }
+      const { plate }= selected;
 
-      const withPubKey = asGetPublicKey(publicDeriver);
-      const plate =
-        withPubKey == null
-          ? null
-          : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
-
-      const balance: ?MultiToken = this.props.stores.transactions.getBalance(publicDeriver);
-      const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(publicDeriver);
+      const balance: ?MultiToken = this.props.stores.transactions.getBalance(selected.publicDeriverId);
+      const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(selected.publicDeriverId);
 
       return (
         <NavWalletDetailsRevamp
           plate={plate}
-          wallet={settingsCache}
+          name={selected.name}
           onUpdateHideBalance={this.updateHideBalance}
           shouldHideBalance={profile.shouldHideBalance}
           rewards={rewards}
           walletAmount={balance}
           getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
           defaultToken={this.props.stores.tokenInfoStore.getDefaultTokenInfo(
-            publicDeriver.getParent().getNetworkInfo().NetworkId
+            selected.publicDeriverId,
           )}
           unitOfAccountSetting={profile.unitOfAccount}
           getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
@@ -106,7 +95,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
         <NavBarRevamp
           title={this.props.title}
           menu={this.props.menu}
-          walletDetails={walletsStore.selected !== null ? <DropdownHead /> : null}
+          walletDetails={selected !== null ? <DropdownHead /> : null}
           buyButton={
             <BuySellAdaButton
               onBuySellClick={() =>
@@ -120,36 +109,26 @@ export default class NavBarContainerRevamp extends Component<Props> {
   }
 
   getDialog: void => Node = () => {
-    const publicDeriver = this.props.stores.wallets.selected;
-    const wallets = this.props.stores.wallets.publicDerivers;
+    const { selected, wallets } = this.props.stores.wallets;
     let balance;
-    if (publicDeriver) {
-      balance = this.props.stores.transactions.getBalance(publicDeriver);
+    if (selected) {
+      balance = this.props.stores.transactions.getBalance(selected);
     }
 
     const cardanoWallets = [];
 
     wallets.forEach(wallet => {
-      const walletAmount = this.props.stores.transactions.getBalance(wallet);
+      const amount = this.props.stores.transactions.getBalance(wallet);
       const rewards = this.props.stores.delegation.getRewardBalanceOrZero(wallet);
-      const parent = wallet.getParent();
-      const settingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(parent);
-
-      const withPubKey = asGetPublicKey(wallet);
-      const plate =
-        withPubKey == null
-          ? null
-          : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
+      const plate = wallet.plate;
 
       const walletMap = {
-        walletId: wallet.getPublicDeriverId(),
+        walletId: wallet.publicDeriverId,
         rewards,
-        walletAmount,
-        getTokenInfo: genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo),
+        amount,
         plate,
-        wallet,
-        settingsCache,
-        shouldHideBalance: this.props.stores.profile.shouldHideBalance,
+        type: wallet.type,
+        name: wallet.name,
       };
 
       cardanoWallets.push(walletMap);
@@ -160,7 +139,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
         <WalletListDialog
           cardanoWallets={cardanoWallets}
           onSelect={this.onSelectWallet}
-          selectedWallet={this.props.stores.wallets.selected}
+          selectedWalletId={selected?.publicDeriverId}
           close={this.props.actions.dialogs.closeActiveDialog.trigger}
           shouldHideBalance={this.props.stores.profile.shouldHideBalance}
           onUpdateHideBalance={this.updateHideBalance}
@@ -181,51 +160,22 @@ export default class NavBarContainerRevamp extends Component<Props> {
       return (
         <BuySellDialog
           onCancel={this.props.actions.dialogs.closeActiveDialog.trigger}
-          genWalletList={async () => {
-            return await this.generateUnusedAddressesPerWallet(wallets);
-          }}
+          walletList={wallets.map(wallet => {
+            const defaultToken = this.props.stores.tokenInfoStore.getDefaultTokenInfo(
+              wallet.networkId,
+            );
+            const currencyName = getTokenName(defaultToken);
+
+            return {
+              walletName: wallet.name,
+              currencyName,
+              anAddressFormatted: wallet.receiveAddress,
+            };
+          })}
         />
       );
     }
     return null;
   };
 
-  generateUnusedAddressesPerWallet: (Array<PublicDeriver<>>) => Promise<Array<any>> = async (
-    wallets: Array<PublicDeriver<>>
-  ) => {
-    const infoWallets = wallets.map(async (wallet: PublicDeriver<>) => {
-      const parent: ConceptualWallet = wallet.getParent();
-      const settingsCache: ConceptualWalletSettingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(
-        parent
-      );
-
-      const defaultToken = this.props.stores.tokenInfoStore.getDefaultTokenInfo(
-        wallet.getParent().getNetworkInfo().NetworkId
-      );
-      const currencyName = getTokenName(defaultToken);
-
-      if (defaultToken.NetworkId !== networks.CardanoMainnet.NetworkId) {
-        return null;
-      }
-
-      const receiveAddress = await getReceiveAddress(wallet);
-      if (receiveAddress == null) return null;
-      const anAddressFormatted = addressToDisplayString(
-        receiveAddress.addr.Hash,
-        parent.getNetworkInfo()
-      );
-
-      return {
-        walletName: settingsCache.conceptualWalletName,
-        currencyName,
-        anAddressFormatted,
-      };
-    });
-
-    return (await Promise.all(infoWallets)).reduce((acc, next) => {
-      if (next == null) return acc;
-      acc.push(next);
-      return acc;
-    }, []);
-  };
 }

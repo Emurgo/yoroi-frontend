@@ -19,6 +19,7 @@ import { isWalletExist } from '../../api/ada/lib/cardanoCrypto/utils';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import AdaApi from '../../api/ada';
 import type { PlateResponse } from '../../api/ada/lib/cardanoCrypto/plate';
+import type { WalletState } from '../../../chrome/extension/background/types';
 
 const messages = defineMessages({
   walletRestoreVerifyAccountIdLabel: {
@@ -68,7 +69,7 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
     plates: Array<PlateWithMeta>,
   |};
 
-  @observable duplicatedWallet: null | void | PublicDeriver<>;
+  @observable duplicatedWallet: null | void | WalletState;
 
   setup(): void {
     super.setup();

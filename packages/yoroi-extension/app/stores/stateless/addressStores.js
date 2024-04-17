@@ -385,7 +385,7 @@ export function genAddressingLookup(
  * a given address belongs to the wallet with some extra information about the store
  */
 export function genAddressLookup(
-  publicDeriver: PublicDeriver<>,
+  publicDeriverId: number,
   intl: $npm$ReactIntl$IntlFormat,
   goToRoute: void | (string => void),
   addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
@@ -397,7 +397,7 @@ export function genAddressLookup(
     address: $ReadOnly<StandardAddress>,
   |}
 )) {
-  const addressStoreLookup = genAddressStoreLookup(publicDeriver, addressSubgroupMap);
+  const addressStoreLookup = genAddressStoreLookup(publicDeriverId, addressSubgroupMap);
   return (address) => {
     const lookupResult = addressStoreLookup(address);
     if (lookupResult == null) return undefined;

@@ -87,13 +87,13 @@ export default class TransferSendPage extends Component<Props> {
       if (isTrezorTWallet(selected.getParent())) {
         await this.props.actions.ada.trezorSend.sendUsingTrezor.trigger({
           params: { signRequest },
-          publicDeriver: selected,
+          publicDeriverId: selected.publicDeriverId,
         });
       }
       if (isLedgerNanoWallet(selected.getParent())) {
         await this.props.actions.ada.ledgerSend.sendUsingLedgerWallet.trigger({
           params: { signRequest },
-          publicDeriver: selected,
+          publicDeriverId: selected.publicDeriverId,
         });
       }
       if (this.props.stores.wallets.sendMoneyRequest.error == null) {
@@ -106,7 +106,7 @@ export default class TransferSendPage extends Component<Props> {
           await this.props.actions.wallets.sendMoney.trigger({
             signRequest,
             password: walletPassword,
-            publicDeriver: selected,
+            publicDeriverId: selected.publicDeriverId,
           });
           if (this.props.stores.wallets.sendMoneyRequest.error == null) {
             this.props.onSubmit.trigger();

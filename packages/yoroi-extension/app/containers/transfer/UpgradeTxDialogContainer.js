@@ -12,7 +12,6 @@ import type {
   TransferTx,
 } from '../../types/TransferTypes';
 import { genAddressLookup, genAddressingLookup, allAddressSubgroups } from '../../stores/stateless/addressStores';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import Dialog from '../../components/widgets/Dialog';
 import LegacyTransferLayout from '../../components/transfer/LegacyTransferLayout';
@@ -52,7 +51,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
       key: RustModule.WalletV4.Bip32PublicKey,
       ...Addressing,
     |},
-    publicDeriver: PublicDeriver<>,
+    publicDeriverId: number,
     addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
     expectedSerial: string | void,
   |} => Promise<void> = async (request) => {
@@ -166,7 +165,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
         getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
         onSubmit={{
           trigger: async () => await this.submit({
-            publicDeriver: selected,
+            publicDeriverId: selected.publicDeriverId,
             addressingMap: genAddressingLookup(
               selected,
               this.props.stores.addresses.addressSubgroupMap

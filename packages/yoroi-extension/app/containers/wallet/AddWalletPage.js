@@ -237,7 +237,7 @@ class AddWalletPage extends Component<AllProps> {
           onCreate={() => goToRoute.trigger({ route: ROUTES.WALLETS.CREATE_NEW_WALLET })}
           onRestore={() => goToRoute.trigger({ route: ROUTES.WALLETS.RESTORE_WALLET })}
           goToCurrentWallet={() => goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS })}
-          hasAnyWallets={hasAnyWallets}
+          hasAnyWallets={hasAnyWallets === true}
         />
         {activeDialog}
       </>

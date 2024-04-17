@@ -14,7 +14,6 @@ import { MultiToken } from '../../api/common/lib/MultiToken';
 import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { WalletChecksum } from '@emurgo/cip4-js';
-import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import WalletAccountIcon from './WalletAccountIcon';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import AmountDisplay from '../common/AmountDisplay';
@@ -33,10 +32,7 @@ type Props = {|
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +defaultToken: $ReadOnly<TokenRow>,
   +plate: null | WalletChecksum,
-  +wallet: {|
-    conceptualWallet: ConceptualWallet,
-    conceptualWalletName: string,
-  |},
+  +name: string,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?string,
   +openWalletInfoDialog: () => void,
@@ -115,7 +111,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
             <div className={styles.content}>
               <div className={styles.walletInfo}>
                 <Typography component="div" variant="body2" fontWeight={500} sx={{ color: 'grayscale.900' }}>
-                  {truncateLongName(this.props.wallet.conceptualWalletName)}
+                  {truncateLongName(this.props.name)}
                 </Typography>
                 <Typography component="div" variant="caption1" sx={{ color: 'grayscale.600' }}>
                   {accountPlateId}

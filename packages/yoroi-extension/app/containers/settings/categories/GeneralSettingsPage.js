@@ -122,14 +122,11 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
           currentTheme={currentTheme}
           onSubmit={(theme: string) => {
             if (theme === THEMES.YOROI_REVAMP) {
-              const { wallets } = this.props.stores;
-              const publicDeriver = wallets.selected;
-              const publicDerivers = wallets.publicDerivers;
-
-              if (publicDeriver == null && publicDerivers.length !== 0) {
-                const lastSelectedWallet = wallets.getLastSelectedWallet();
+              const { wallets, selected } = this.props.stores.wallets;
+              if (selected == null && wallets.length !== 0) {
+                const lastSelectedWallet = this.props.stores.wallets.getLastSelectedWallet();
                 this.props.actions.wallets.setActiveWallet.trigger({
-                  wallet: lastSelectedWallet ?? publicDerivers[0],
+                  publicDeriverId: (lastSelectedWallet ?? wallets[0]).publicDeriverId,
                 });
               }
             }

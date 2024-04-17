@@ -46,7 +46,7 @@ export type WalletInfo = {|
 
 type Props = {|
   +onCancel: void => void,
-  +genWalletList: () => Promise<Array<WalletInfo>>,
+  +walletList: Array<WalletInfo>,
 |};
 
 const WIDGET_URL =
@@ -71,9 +71,8 @@ export default class BuySellDialog extends Component<Props, State> {
   async componentDidMount() {
     const { intl } = this.context;
 
-    const resp = await this.props.genWalletList();
     const wallets = [
-      ...resp,
+      ...this.props.walletList,
       {
         walletName: intl.formatMessage(messages.dialogManual),
         currencyName: '',

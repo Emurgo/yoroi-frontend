@@ -5,10 +5,10 @@ import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
 import type { GenerateWalletRecoveryPhraseFunc } from '../../api/ada/index';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { HARD_DERIVATION_START } from '../../config/numbersConfig';
+import { createWallet } from '../../api/thunk';
 
 export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
   // REQUESTS
@@ -32,20 +32,20 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
     broadcastRequest:
       | {|
           normal: {|
-            publicDeriver: PublicDeriver<>,
+            publicDeriverId: number,
             signRequest: HaskellShelleyTxSignRequest,
             password: string,
           |},
         |}
       | {|
           trezor: {|
-            publicDeriver: PublicDeriver<>,
+            publicDeriverId: number,
             signRequest: HaskellShelleyTxSignRequest,
           |},
         |}
       | {|
           ledger: {|
-            publicDeriver: PublicDeriver<>,
+            publicDeriverId: number,
             signRequest: HaskellShelleyTxSignRequest,
           |},
         |},
@@ -55,13 +55,13 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
       if (request.broadcastRequest.ledger) {
         return await this.stores.substores.ada.ledgerSend.signAndBroadcastFromWallet({
           params: { signRequest: request.broadcastRequest.ledger.signRequest },
-          publicDeriver: request.broadcastRequest.ledger.publicDeriver,
+          publicDeriverId: request.broadcastRequest.ledger.publicDeriverId,
         });
       }
       if (request.broadcastRequest.trezor) {
         return await this.stores.substores.ada.trezorSend.signAndBroadcast({
           params: { signRequest: request.broadcastRequest.trezor.signRequest },
-          publicDeriver: request.broadcastRequest.trezor.publicDeriver,
+          publicDeriverId: request.broadcastRequest.trezor.publicDeriverId,
         });
       }
       if (request.broadcastRequest.normal) {
@@ -73,16 +73,16 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
         `${nameof(AdaWalletsStore)}::${nameof(this.adaSendAndRefresh)} unhandled wallet type`
       );
     };
-    const publicDeriver = (() => {
-      if (request.broadcastRequest.ledger) return request.broadcastRequest.ledger.publicDeriver;
-      if (request.broadcastRequest.trezor) return request.broadcastRequest.trezor.publicDeriver;
-      if (request.broadcastRequest.normal) return request.broadcastRequest.normal.publicDeriver;
+    const publicDeriverId = (() => {
+      if (request.broadcastRequest.ledger) return request.broadcastRequest.ledger.publicDeriverId;
+      if (request.broadcastRequest.trezor) return request.broadcastRequest.trezor.publicDeriverId;
+      if (request.broadcastRequest.normal) return request.broadcastRequest.normal.publicDeriverId;
       throw new Error(
         `${nameof(AdaWalletsStore)}::${nameof(this.adaSendAndRefresh)} unhandled wallet type`
       );
     })();
     await this.stores.wallets.sendAndRefresh({
-      publicDeriver,
+      publicDeriverId,
       broadcastRequest,
       refreshWallet: request.refreshWallet,
     });
@@ -117,23 +117,11 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
 
   /** Create the wallet and go to wallet summary screen */
   _createInDb: void => Promise<void> = async () => {
-    const persistentDb = this.stores.loading.getDatabase();
-    if (persistentDb == null) {
-      throw new Error(`${nameof(this._createInDb)} db not loaded. Should never happen`);
-    }
-    const { selectedNetwork } = this.stores.profile;
-    if (selectedNetwork == null) throw new Error(`${nameof(this._createInDb)} no network selected`);
-    await this.stores.wallets.createWalletRequest.execute(async () => {
-      const wallet = await this.api.ada.createWallet({
-        db: persistentDb,
-        walletName: this.stores.walletBackup.name,
-        walletPassword: this.stores.walletBackup.password,
-        recoveryPhrase: this.stores.walletBackup.recoveryPhrase.join(' '),
-        network: selectedNetwork,
-        accountIndex: this.stores.walletBackup.selectedAccount,
-      });
-      return wallet;
-    }).promise;
+    await this._createWallet({
+      recoveryPhrase: this.stores.walletBackup.recoveryPhrase,
+      walletPassword: this.stores.walletBackup.password,
+      walletName: this.stores.walletBackup.name,
+    });
   };
 
   _createWallet: {|
@@ -141,22 +129,14 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
     walletPassword: string,
     walletName: string,
   |} => Promise<void> = async (request) => {
-    const persistentDb = this.stores.loading.getDatabase();
-    if (persistentDb == null) {
-      throw new Error(`${nameof(this._createInDb)} db not loaded. Should never happen`);
-    }
     const { selectedNetwork } = this.stores.profile;
     if (selectedNetwork == null) throw new Error(`${nameof(this._createInDb)} no network selected`);
-    await this.stores.wallets.createWalletRequest.execute(async () => {
-      const wallet = await this.api.ada.createWallet({
-        db: persistentDb,
-        walletName: request.walletName,
-        walletPassword: request.walletPassword,
-        recoveryPhrase: request.recoveryPhrase.join(' '),
-        network: selectedNetwork,
-        accountIndex: 0 + HARD_DERIVATION_START,
-      });
-      return wallet;
-    }).promise;
+    await createWallet({
+      walletName: request.walletName,
+      walletPassword: request.walletPassword,
+      recoveryPhrase: request.recoveryPhrase.join(' '),
+      networkId: selectedNetwork.NetworkId,
+      accountIndex: 0 + HARD_DERIVATION_START,
+    });
   };
 }

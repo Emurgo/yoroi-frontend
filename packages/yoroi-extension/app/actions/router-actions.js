@@ -1,6 +1,5 @@
 // @flow
 import { Action } from './lib/Action';
-import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver/index';
 
 // ======= ROUTER ACTIONS =======
 
@@ -8,7 +7,7 @@ export default class RouterActions {
   goToRoute: Action<{|
     route: string,
     params?: ?Object,
-    publicDeriver?: null | PublicDeriver<>,
+    publicDeriverId?: null | number,
   |}> = new Action();
   redirect: Action<{|
     route: string,

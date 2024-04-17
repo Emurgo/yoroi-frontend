@@ -65,7 +65,7 @@ import type { lf$Database, } from 'lovefield';
 import {
   getCardanoHaskellBaseConfig,
   isCardanoHaskell,
-  networks,
+  getNetworkById,
 } from '../../../../app/api/ada/lib/storage/database/prepackaged/networks';
 import { authSignHexPayload } from '../../../../app/connector/api';
 import type { RemoteUnspentOutput } from '../../../../app/api/ada/lib/state-fetch/types';
@@ -109,6 +109,7 @@ const YOROI_MESSAGES = Object.freeze({
   GET_DB: 'get-db',
   SUBSCRIBE_WALLET_STATE_CHANGES: 'subscribe-wallet-state-changes',
   CREATE_WALLET: 'create-wallet',
+  CREAET_HARDWARE_WALLET: 'create-hardware-wallet',
 });
 
 // messages from other parts of Yoroi (i.e. the UI for the connector)
@@ -514,11 +515,7 @@ export async function yoroiMessageHandler(
   } else if (request.type === YOROI_MESSAGES.CREATE_WALLET) {
     try {
       const db = await getDb();
-      const networkKey = Object.keys(networks).find(k => networks[k].NetworkId === request.request.networkId);
-      if (!networkKey) {
-        throw new Error('network not found');
-      }
-      const network = networks[networkKey];
+      const network = getNetworkById(request.request.networkId);
 
       await createWallet({
         db,
@@ -533,6 +530,8 @@ export async function yoroiMessageHandler(
       return;
     }
     sendResponse({ error: null });
+  } else if (request.type === YOROI_MESSAGES.CREATE_HARDWARE_WALLET) {
+    //fixme
   } else {
     console.error(`unknown message ${JSON.stringify(request)} from ${sender.tab.id}`)
   }

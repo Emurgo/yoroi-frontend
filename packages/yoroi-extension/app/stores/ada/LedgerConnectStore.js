@@ -33,6 +33,8 @@ import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import type { GetExtendedPublicKeyResponse, } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import { createHardwareWallet } from '../../api/thunk';
+import type { WalletState } from '../../../chrome/extension/background/types';
 
 export default class LedgerConnectStore
   extends Store<StoresMap, ActionsMap>
@@ -53,16 +55,10 @@ export default class LedgerConnectStore
   get isActionProcessing(): boolean {
     return this.progressInfo.stepState === StepState.PROCESS;
   }
-  // =================== VIEW RELATED =================== //
-
-  // =================== API RELATED =================== //
-  createHWRequest: LocalizedRequest<CreateHardwareWalletFunc>
-    = new LocalizedRequest<CreateHardwareWalletFunc>(this.api.ada.createHardwareWallet);
 
   /** While ledger wallet creation is taking place, we need to block users from starting a
     * ledger wallet creation on a separate wallet and explain to them why the action is blocked */
   @observable isCreateHWActive: boolean = false;
-  // =================== API RELATED =================== //
 
   setup(): void {
     super.setup();
@@ -349,16 +345,13 @@ export default class LedgerConnectStore
     try {
       Logger.debug(`${nameof(LedgerConnectStore)}::${nameof(this._saveHW)}:: called`);
       this._setIsCreateHWActive(true);
-      this.createHWRequest.reset();
 
       const reqParams = this._prepareCreateHWReqParams(
         walletName,
       );
-      this.createHWRequest.execute(reqParams);
-      if (!this.createHWRequest.promise) throw new Error('should never happen');
-      const newWallet = await this.createHWRequest.promise;
+      const newWallet = await createHardwareWallet(reqParams);
 
-      await this._onSaveSuccess(newWallet.publicDeriver);
+      await this._onSaveSuccess(newWallet);
     } catch (error) {
       Logger.error(`${nameof(LedgerConnectStore)}::${nameof(this._saveHW)}::error ${stringifyError(error)}`);
 
@@ -381,7 +374,6 @@ export default class LedgerConnectStore
       }
       this._goToSaveError();
     } finally {
-      this.createHWRequest.reset();
       this._setIsCreateHWActive(false);
     }
   };
@@ -396,17 +388,12 @@ export default class LedgerConnectStore
     }
     const { publicMasterKey, hwFeatures } = this.hwDeviceInfo;
 
-    const persistentDb = this.stores.loading.getDatabase();
-    if (persistentDb == null) {
-      throw new Error(`${nameof(this._prepareCreateHWReqParams)} db not loaded. Should never happen`);
-    }
     const { selectedNetwork } = this.stores.profile;
     if (selectedNetwork == null) throw new Error(`${nameof(this._prepareCreateHWReqParams)} no network selected`);
 
     const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
 
     return {
-      db: persistentDb,
       addressing: {
         path: this.getPath(),
         startLevel: Bip44DerivationLevels.PURPOSE.level,
@@ -423,17 +410,15 @@ export default class LedgerConnectStore
     return [WalletTypePurpose.CIP1852, CoinTypes.CARDANO, this.derivationIndex];
   }
 
-  async _onSaveSuccess(publicDeriver: PublicDeriver<>): Promise<void> {
+  async _onSaveSuccess(wallet: WalletState): Promise<void> {
     // close the active dialog
     Logger.debug(`${nameof(LedgerConnectStore)}::${nameof(this._onSaveSuccess)} success`);
     if (this.stores.substores.ada.yoroiTransfer.transferRequest.result == null) {
       this.actions.dialogs.closeActiveDialog.trigger();
     }
 
-    await this.stores.wallets.addHwWallet(publicDeriver);
-    this.actions.wallets.setActiveWallet.trigger({
-      wallet: publicDeriver
-    });
+    await this.stores.wallets.addHwWallet(wallet);
+    this.actions.wallets.setActiveWallet.trigger({ wallet });
     if (this.stores.substores.ada.yoroiTransfer.transferRequest.result == null) {
       this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
 

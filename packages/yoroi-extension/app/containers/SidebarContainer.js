@@ -40,7 +40,7 @@ class SidebarContainer extends Component<AllProps> {
         isActiveCategory={category => stores.app.currentRoute.startsWith(category.route)}
         categories={allCategories.filter(category =>
           category.isVisible({
-            hasAnyWallets: stores.wallets.hasAnyWallets,
+            hasAnyWallets: stores.wallets.hasAnyWallets === true,
             selected: stores.wallets.selected,
             currentRoute: stores.app.currentRoute,
           })
@@ -55,7 +55,7 @@ class SidebarContainer extends Component<AllProps> {
         onLogoClick={() => {
           actions.router.goToRoute.trigger({
             route: ROUTES.WALLETS.TRANSACTIONS,
-            publicDeriver: stores.wallets.selected,
+            publicDeriverId: stores.wallets.selected?.publicDeriverId,
           });
         }}
         onCategoryClicked={category => {
@@ -66,11 +66,11 @@ class SidebarContainer extends Component<AllProps> {
         isActiveCategory={category => stores.app.currentRoute.startsWith(category.route)}
         categories={allCategoriesRevamp.filter(category =>
           category.isVisible({
-            hasAnyWallets: this.props.stores.wallets.hasAnyWallets,
+            hasAnyWallets: this.props.stores.wallets.hasAnyWallets === true,
             selected: this.props.stores.wallets.selected,
             currentRoute: this.props.stores.app.currentRoute,
-            isRewardWallet: (publicDeriver: PublicDeriver<>) =>
-              stores.delegation.isRewardWallet(publicDeriver),
+            isRewardWallet: (publicDeriverId: number) =>
+              stores.delegation.isRewardWallet(publicDeriverId),
           })
         )}
       />

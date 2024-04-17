@@ -1,6 +1,5 @@
 // @flow
 import { AsyncAction, Action } from '../lib/Action';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { Moment } from 'moment';
 
 // ======= TRANSACTIONS ACTIONS =======
@@ -11,9 +10,9 @@ export type TransactionRowsToExportRequest = {|
 |};
 
 export default class TransactionsActions {
-  loadMoreTransactions: AsyncAction<PublicDeriver<>> = new AsyncAction();
+  loadMoreTransactions: AsyncAction<{| publicDeriverId: number |}> = new AsyncAction();
   exportTransactionsToFile: AsyncAction<{|
-    publicDeriver: PublicDeriver<>,
+  publicDeriverId: number,
     exportRequest: TransactionRowsToExportRequest,
   |}> = new AsyncAction();
   closeExportTransactionDialog: Action<void> = new Action();

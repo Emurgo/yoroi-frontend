@@ -7,7 +7,6 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { messages } from '../../../components/wallet/settings/RemoveWallet';
-import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 
 import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 
@@ -17,7 +16,7 @@ import { withLayout } from '../../../styles/context/layout';
 
 type Props = {|
   ...StoresAndActionsProps,
-  publicDeriver: void | PublicDeriver<>,
+  publicDeriverId: number,
 |};
 type InjectedLayoutProps = {|
   +renderLayoutComponent: LayoutComponentMap => Node,
@@ -57,25 +56,21 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
 
   removeWalletRevamp: void => Promise<void> = async () => {
     const settingsActions = this.props.actions.walletSettings;
-    const selectedWalletId = this.props.publicDeriver?.getPublicDeriverId();
+    const selectedWalletId = this.props.publicDeriverId;
     const walletsNavigation = this.props.stores.profile.walletsNavigation;
 
-    if (this.props.publicDeriver) {
-      const newWalletsNavigation = {
-        ...walletsNavigation,
-        // $FlowFixMe[invalid-computed-prop]
-        'cardano': walletsNavigation.cardano.filter(
-          walletId => walletId !== selectedWalletId
-        ),
-      };
-      await this.props.actions.profile.updateSortedWalletList.trigger(newWalletsNavigation);
-    }
+    const newWalletsNavigation = {
+      ...walletsNavigation,
+      // $FlowFixMe[invalid-computed-prop]
+      'cardano': walletsNavigation.cardano.filter(
+        walletId => walletId !== selectedWalletId
+      ),
+    };
+    await this.props.actions.profile.updateSortedWalletList.trigger(newWalletsNavigation);
 
-    if (this.props.publicDeriver != null) {
-      settingsActions.removeWallet.trigger({
-        publicDeriver: this.props.publicDeriver,
-      });
-    }
+    settingsActions.removeWallet.trigger({
+      publicDeriverId: this.props.publicDeriverId,
+    });
   };
 
   render(): Node {
@@ -94,11 +89,11 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
         onCancel={this.props.actions.dialogs.closeActiveDialog.trigger}
         primaryButton={{
           label: intl.formatMessage(globalMessages.remove),
-          onClick: () =>
-            this.props.publicDeriver &&
+          onClick: () => {
             settingsActions.removeWallet.trigger({
-              publicDeriver: this.props.publicDeriver,
-            }),
+              publicDeriverId: this.props.publicDeriverId,
+            });
+          },
         }}
         secondaryButton={{
           onClick: this.props.actions.dialogs.closeActiveDialog.trigger,

@@ -24,8 +24,6 @@ import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitive
 import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
 import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import WalletAlreadyExistDialog from '../../../components/wallet/WalletAlreadyExistDialog';
-import { asGetPublicKey } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
-import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
 import NavPlate from '../../../components/topbar/NavPlate';
 import WalletDetails from '../../../components/wallet/my-wallets/WalletDetails';
 import { ROUTES } from '../../../routes-config';
@@ -85,9 +83,9 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
     await this.props.actions.profile.updateHideBalance.trigger();
   };
 
-  openToTransactions: (PublicDeriver<>) => void = publicDeriver => {
+  openToTransactions: (number) => void = publicDeriverId => {
     this.props.actions.wallets.setActiveWallet.trigger({
-      wallet: publicDeriver,
+      publicDeriverId,
     });
     this.props.actions.router.goToRoute.trigger({
       route: ROUTES.WALLETS.TRANSACTIONS,
@@ -131,24 +129,22 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         );
       }
       case RestoreSteps.WALLET_EXIST: {
-        const publicDeriver = walletRestore.duplicatedWallet;
-        if (!publicDeriver) {
+        const duplicatedWallet = walletRestore.duplicatedWallet;
+        if (!duplicatedWallet) {
           throw new Error(`${nameof(WalletRestoreDialogContainer)} no duplicated wallet`);
         }
-        const parent = publicDeriver.getParent();
-        const settingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(
-          parent
-        );
-        const withPubKey = asGetPublicKey(publicDeriver);
-        const plate = withPubKey == null
-          ? null
-          : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
-        const balance: ?MultiToken = this.props.stores.transactions.getBalance(publicDeriver);
-        const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(publicDeriver);
+        const balance = this.props.stores.transactions.getBalance(duplicatedWallet.publicDeriverId);
+        const rewards = this.props.stores.delegation.getRewardBalanceOrZero(duplicatedWallet.publicDeriverId);
 
         return (
           <WalletAlreadyExistDialog
-            walletPlate={<NavPlate plate={plate} wallet={settingsCache} />}
+            walletPlate={
+              <NavPlate
+                plate={duplicatedWallet.plate}
+                walletType={duplicatedWallet.type}
+                name={duplicateWallet.name}
+              />
+            }
             walletSumDetails={
               <WalletDetails
                 walletAmount={balance}
@@ -160,7 +156,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
               />
             }
             openWallet={() => {
-              this.openToTransactions(publicDeriver);
+              this.openToTransactions(duplicatedWallet.publicDeriverId);
             }}
             onCancel={walletRestoreActions.back.trigger}
           />

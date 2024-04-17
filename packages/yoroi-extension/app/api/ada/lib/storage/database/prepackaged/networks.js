@@ -259,3 +259,11 @@ export const defaultAssets: Array<
     }
     throw new Error(`Missing default asset for network type ${JSON.stringify(network)}`);
   });
+
+export function getNetworkById(id: number): $ReadOnly<NetworkRow> {
+  const networkKey = Object.keys(networks).find(k => networks[k].NetworkId === id);
+  if (!networkKey) {
+    throw new Error('network not found');
+  }
+  return networks[networkKey];
+}

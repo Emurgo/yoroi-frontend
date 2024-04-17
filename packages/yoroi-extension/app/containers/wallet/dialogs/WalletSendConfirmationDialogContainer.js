@@ -62,7 +62,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
         staleTx={this.props.staleTx}
         selectedExplorer={stores.explorers.selectedExplorer
           .get(
-            publicDeriver.getParent().getNetworkInfo().NetworkId
+            publicDeriver.networkId
           ) ?? (() => { throw new Error('No explorer for wallet network'); })()
         }
         getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
@@ -76,7 +76,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
           await sendMoney.trigger({
             signRequest,
             password,
-            publicDeriver,
+            publicDeriver.publicDeriverId,
             onSuccess: openTransactionSuccessDialog,
           });
         }}

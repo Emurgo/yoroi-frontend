@@ -18,8 +18,8 @@ import { ReactComponent as DragIcon } from '../../assets/images/add-wallet/walle
 import { Draggable } from 'react-beautiful-dnd';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import AmountDisplay from '../common/AmountDisplay';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import { maybe } from '../../coreUtils';
+import type { WalletType } from '../../../chrome/extension/background/types';
 
 const messages = defineMessages({
   tokenTypes: {
@@ -30,18 +30,15 @@ const messages = defineMessages({
 
 type Props = {|
   +plate: null | WalletChecksum,
-  +settingsCache: {|
-    conceptualWallet: ConceptualWallet,
-    conceptualWalletName: string,
-  |},
-  +wallet: PublicDeriver<>,
+  +type: WalletType,
+  +name: string,
   +rewards: null | void | MultiToken,
   +shouldHideBalance: boolean,
   +walletAmount: null | MultiToken,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +isCurrentWallet?: boolean,
   +onSelect: void => void,
-  +walletId: string,
+  +walletId: number,
   +idx: number,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?string,
@@ -83,11 +80,11 @@ export default class WalletCard extends Component<Props, State> {
     isActionsShow: false,
   };
 
-  getType: ConceptualWallet => $Exact<$npm$ReactIntl$MessageDescriptor> = wallet => {
-    if (isLedgerNanoWallet(wallet)) {
+  getType: WalletType => $Exact<$npm$ReactIntl$MessageDescriptor> = type => {
+    if (type === 'ledger') {
       return globalMessages.ledgerWallet;
     }
-    if (isTrezorTWallet(wallet)) {
+    if (type === 'trezor') {
       return globalMessages.trezorWallet;
     }
     return globalMessages.standardWallet;
@@ -117,7 +114,7 @@ export default class WalletCard extends Component<Props, State> {
       ? constructPlate(this.props.plate, 0, styles.icon)
       : [];
 
-    const typeText = [this.getType(this.props.settingsCache.conceptualWallet)]
+    const typeText = [this.getType(this.props.type)]
       .filter(text => text != null)
       .map(text => intl.formatMessage(text))
       .join(' - ');
@@ -154,7 +151,7 @@ export default class WalletCard extends Component<Props, State> {
               id={buttonId}
             >
               <div className={styles.header}>
-                <h5 className={styles.name} id={walletNameId}>{this.props.settingsCache.conceptualWalletName}</h5>
+                <h5 className={styles.name} id={walletNameId}>{this.props.name}</h5>
                 {' ·  '}
                 <div className={styles.type}>{typeText}</div>
               </div>

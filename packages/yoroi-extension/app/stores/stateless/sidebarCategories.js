@@ -96,7 +96,7 @@ type isVisibleFunc = ({|
   isRewardWallet: isRewardWalletFunc,
 |}) => boolean;
 
-type isRewardWalletFunc = (PublicDeriver<>) => boolean;
+type isRewardWalletFunc = (publicDeriverId: number) => boolean;
 
 export type SidebarCategoryRevamp = {|
   +className: string,

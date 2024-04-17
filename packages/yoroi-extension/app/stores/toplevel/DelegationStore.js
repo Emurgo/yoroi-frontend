@@ -115,8 +115,8 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
   }
 
   // <TODO:PENDING_REMOVAL> legacy after removing bip44
-  isRewardWallet: PublicDeriver<> => boolean = (publicDeriver) => {
-    return this.getDelegationRequests(publicDeriver) != null;
+  isRewardWallet: number => boolean = (publicDeriverId) => {
+    return this.getDelegationRequests(publicDeriverId) != null;
   }
 
   canUnmangleSomeUtxo: PublicDeriver<> => boolean = (publicDeriver) => {

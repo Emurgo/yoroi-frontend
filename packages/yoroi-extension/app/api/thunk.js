@@ -57,3 +57,11 @@ export async function createWallet(request: CreateWalletRequest): Promise<void> 
     request,
   });
 }
+
+export type CreateHardwareWalletRequest = any;
+export async function createHardwareWallet(request: CreateHardwareWalletRequest): Promise<WalletState> {
+  return await callBackground({
+    type: 'create-hardware-wallet',
+    request,
+  });
+}
