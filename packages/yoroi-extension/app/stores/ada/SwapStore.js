@@ -17,7 +17,7 @@ import { MultiToken } from '../../api/common/lib/MultiToken';
 import { Quantities } from '../../utils/quantities';
 import BigNumber from 'bignumber.js';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import { cast, fail, hexToBytes } from '../../coreUtils';
+import { cast, fail, hexToBytes, noop } from '../../coreUtils';
 import { asAddressedUtxo, cardanoUtxoHexFromRemoteFormat, signTransactionHex } from '../../api/ada/transactions/utils';
 import { genLookupOrFail, getTokenIdentifierIfExists, getTokenName } from '../stateless/tokenHelpers';
 import { splitAmount, truncateToken } from '../../utils/formatters';
@@ -164,17 +164,15 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
     transactionHex,
     password,
   }) => {
-    console.log('🚀 > CANCEL:', transactionHex);
     const signedTransactionHex =
       await signTransactionHex(wallet, password, transactionHex);
-    console.log('🚀 > CANCEL SIGNED TX', signedTransactionHex);
     const resp = await this.stores.substores.ada.stateFetchStore.fetcher.sendTx({
       id: transactionHexToHash(signedTransactionHex),
       encodedTx: hexToBytes(signedTransactionHex),
       network: wallet.getParent().getNetworkInfo(),
     });
-    console.log('🚀 > CANCEL TX SUBMIT', resp);
-    await this.stores.wallets.refreshWalletFromRemote(wallet);
+    // Refresh call is non-blocking on purpose
+    noop(this.stores.wallets.refreshWalletFromRemote(wallet));
   };
 }
 
