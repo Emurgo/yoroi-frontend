@@ -9,6 +9,7 @@ import LoadingSpinner from '../widgets/LoadingSpinner';
 import { useState } from 'react';
 import type { FormattedTokenValue } from '../../containers/swap/orders/OrdersPage';
 import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
+import { stringifyError } from '../../utils/logging';
 
 type Props = {|
   order: any,
@@ -90,6 +91,7 @@ export default function CancelSwapOrderDialog({
                 return;
               }
               console.error('Failed to process order cancel! ', e);
+              alert('Failed to process order cancel! ' + stringifyError(e));
             }
           }}
           disabled={isLoading || password.length === 0}

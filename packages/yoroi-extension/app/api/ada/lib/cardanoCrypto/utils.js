@@ -60,6 +60,11 @@ export function transactionHexToWitnessSet(txHex: string): string {
     bytesToHex(Module.WalletV4.FixedTransaction.from_hex(txHex).raw_witness_set()));
 }
 
+export function transactionHexToHash(txHex: string): string {
+  return RustModule.WasmScope(Module =>
+    Module.WalletV4.hash_transaction(Module.WalletV4.FixedTransaction.from_hex(txHex).body()).to_hex());
+}
+
 export function transactionHexReplaceWitnessSet(txHex: string, witnessSetHex: string): string {
   return RustModule.WasmScope(Module => {
     const fixedTransaction = Module.WalletV4.FixedTransaction.from_hex(txHex);

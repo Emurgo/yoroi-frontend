@@ -193,6 +193,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
       password,
       transactionHex: tx.cbor,
     });
+    setCancellationState(null);
   };
 
   return (
