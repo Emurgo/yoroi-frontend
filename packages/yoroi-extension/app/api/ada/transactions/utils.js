@@ -18,9 +18,13 @@ import type { IGetAllUtxosResponse, } from '../lib/storage/models/PublicDeriver/
 import { formatBigNumberToFloatString } from '../../../utils/formatters';
 import type { DefaultTokenEntry, } from '../../common/lib/MultiToken';
 import { MultiToken, } from '../../common/lib/MultiToken';
+import type { WasmMonad } from '../lib/cardanoCrypto/rustLoader';
 import { RustModule } from '../lib/cardanoCrypto/rustLoader';
 import { PRIMARY_ASSET_CONSTANTS } from '../lib/storage/database/primitives/enums';
-import type { WasmMonad } from '../lib/cardanoCrypto/rustLoader';
+import { PublicDeriver } from '../lib/storage/models/PublicDeriver';
+import { connectorSignCardanoTx } from '../../../../chrome/extension/connector/api';
+import { mergeWitnessSets } from '../../../../chrome/extension/connector/utils';
+import { transactionHexReplaceWitnessSet, transactionHexToWitnessSet } from '../lib/cardanoCrypto/utils';
 
 const RANDOM_BASE_ADDRESS = 'addr_test1qzz6hulv54gzf2suy2u5gkvmt6ysasfdlvvegy3fmf969y7r3y3kdut55a40jff00qmg74686vz44v6k363md06qkq0qy0adz0';
 
@@ -569,4 +573,19 @@ export function getTransactionTotalOutputFromCbor(txHex: string, defaults: Defau
     console.error('Failed to decode transaction total output from cbor', e);
     throw e;
   }
+}
+
+export async function signTransactionHex(wallet: PublicDeriver<>, password: string, transactionHex: string): Promise<string> {
+  // <TODO:REFACTOR> This signing function must be moved from the connector to the main api
+  const signedWitnessSetHex = await connectorSignCardanoTx(
+    wallet,
+    password,
+    { tx: transactionHex, tabId: -1, partialSign: false },
+  );
+  // <TODO:REFACTOR> This signing function must be moved from the connector to the main api
+  const mergedWitnessSetHex = mergeWitnessSets(
+    transactionHexToWitnessSet(transactionHex),
+    signedWitnessSetHex,
+  );
+  return transactionHexReplaceWitnessSet(transactionHex, mergedWitnessSetHex);
 }

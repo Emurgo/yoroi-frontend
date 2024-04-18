@@ -127,6 +127,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
   const [cancellationState, setCancellationState] = useState<?{|
     order: any,
     tx: ?{| cbor: string, formattedFee: string, formattedReturn: Array<FormattedTokenValue> |},
+    isSubmitting?: boolean,
   |}>(null);
 
   const wallet = props.stores.wallets.selectedOrFail;
@@ -189,13 +190,26 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
     setCancellationState({ order, tx: null });
   };
 
-  const handleCancelConfirm = (cancelledOrder: any, password: string) => {
-    const { order, tx } = cancellationState ?? {};
-    if (order === cancelledOrder) {
-      console.log('🚀 > order:', order, password, tx?.cbor);
-    } else {
-      console.log('Cancellation state order mismatch. Ignoring.');
+  const handleCancelConfirm = async (cancelledOrder: any, password: string) => {
+    const { order, tx, isSubmitting } = cancellationState ?? {};
+    if (isSubmitting) {
+      console.log('Cancellation is already submitting. Ignoring.');
     }
+    if (order !== cancelledOrder) {
+      console.log('Cancellation state order mismatch. Ignoring.');
+      return;
+    }
+    if (tx == null) {
+      console.log('Cancellation transaction is not available. Ignoring.');
+      return;
+    }
+    setCancellationState({ order, tx, isSubmitting: true });
+    await props.stores.substores.ada.swapStore.executeCancelTransaction({
+      wallet,
+      password,
+      transactionHex: tx.cbor,
+    });
+    setCancellationState(null);
   };
 
   return (
@@ -248,6 +262,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
       {cancellationState && (
         <CancelSwapOrderDialog
           order={cancellationState.order}
+          isSubmitting={Boolean(cancellationState.isSubmitting)}
           transactionParams={maybe(cancellationState.tx, tx => ({
             formattedFee: tx.formattedFee,
             returnValues: tx.formattedReturn,

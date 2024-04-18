@@ -17,17 +17,14 @@ import { MultiToken } from '../../api/common/lib/MultiToken';
 import { Quantities } from '../../utils/quantities';
 import BigNumber from 'bignumber.js';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import { cast, fail } from '../../coreUtils';
-import { asAddressedUtxo, cardanoUtxoHexFromRemoteFormat } from '../../api/ada/transactions/utils';
-import {
-  genLookupOrFail,
-  getTokenIdentifierIfExists,
-  getTokenName,
-} from '../stateless/tokenHelpers';
+import { cast, fail, hexToBytes } from '../../coreUtils';
+import { asAddressedUtxo, cardanoUtxoHexFromRemoteFormat, signTransactionHex } from '../../api/ada/transactions/utils';
+import { genLookupOrFail, getTokenIdentifierIfExists, getTokenName } from '../stateless/tokenHelpers';
 import { splitAmount, truncateToken } from '../../utils/formatters';
 import adaLogo from '../../containers/swap/mockAssets/ada.inline.svg';
 import type { AssetAmount } from '../../components/swap/types';
 import type { QueriedUtxo } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import { transactionHexToHash } from '../../api/ada/lib/cardanoCrypto/utils';
 
 const FRONTEND_FEE_ADDRESS_MAINNET =
   'addr1q9ry6jfdgm0lcrtfpgwrgxg7qfahv80jlghhrthy6w8hmyjuw9ngccy937pm7yw0jjnxasm7hzxjrf8rzkqcj26788lqws5fke';
@@ -59,7 +56,6 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
     const spendableBalance = this.stores.transactions?.balance;
     if (spendableBalance == null) return [];
     const getTokenInfo = genLookupOrFail(this.stores.tokenInfoStore?.tokenInfo);
-    console.log('SwapStore > assets recalc');
     return [spendableBalance.getDefaultEntry(), ...spendableBalance.nonDefaultEntries()]
       .map(entry => ({
         entry,
@@ -157,6 +153,28 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
       entries,
       metadata,
     });
+  };
+
+  executeCancelTransaction: ({|
+    wallet: PublicDeriver<>,
+    transactionHex: string,
+    password: string,
+  |}) => Promise<void> = async ({
+    wallet,
+    transactionHex,
+    password,
+  }) => {
+    console.log('🚀 > CANCEL:', transactionHex);
+    const signedTransactionHex =
+      await signTransactionHex(wallet, password, transactionHex);
+    console.log('🚀 > CANCEL SIGNED TX', signedTransactionHex);
+    const resp = await this.stores.substores.ada.stateFetchStore.fetcher.sendTx({
+      id: transactionHexToHash(signedTransactionHex),
+      encodedTx: hexToBytes(signedTransactionHex),
+      network: wallet.getParent().getNetworkInfo(),
+    });
+    console.log('🚀 > CANCEL TX SUBMIT', resp);
+    await this.stores.wallets.refreshWalletFromRemote(wallet);
   };
 }
 

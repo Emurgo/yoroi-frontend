@@ -8,32 +8,9 @@ import { useSwap } from '@yoroi/swap';
 import Context from './context';
 import { Quantities } from '../../../../utils/quantities';
 import SwapStore from '../../../../stores/ada/SwapStore';
+import { defaultSwapFormState } from './DefaultSwapFormState';
 
 // const PRECISION = 14;
-
-export const defaultSwapFormState: SwapFormState = Object.freeze({
-  sellQuantity: {
-    isTouched: false,
-    disabled: false,
-    error: null,
-    displayValue: '',
-  },
-  buyQuantity: {
-    isTouched: false,
-    disabled: false,
-    error: null,
-    displayValue: '',
-  },
-  sellTokenInfo: {
-    tokenId: '',
-  },
-  buyTokenInfo: {
-    tokenId: '',
-  },
-  selectedPool: { isTouched: false },
-  limitPrice: { displayValue: '' },
-  canSwap: false,
-});
 
 type Props = {|
   swapStore: SwapStore,

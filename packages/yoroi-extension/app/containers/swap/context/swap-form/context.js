@@ -1,8 +1,8 @@
 //@flow
 import type { SwapFormContext } from './types';
 import { createContext } from 'react';
-import { defaultSwapFormState } from './SwapFormProvider';
 import { ConstantState } from './types';
+import { defaultSwapFormState } from './DefaultSwapFormState';
 
 function missingInit() {
   console.error('[SwapFormContext] missing initialization');

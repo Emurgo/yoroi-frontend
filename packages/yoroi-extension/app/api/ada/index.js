@@ -310,11 +310,6 @@ export type CreateUnsignedTxForConnectorRequest = {|
   submittedTxs: Array<PersistedSubmittedTransaction>,
   utxos: Array<CardanoAddressedUtxo>,
 |};
-export type CreateUnsignedTxResponse = HaskellShelleyTxSignRequest;
-export type CreateVotingRegTxResponse = HaskellShelleyTxSignRequest;
-export type CreateUnsignedTxFunc = (
-  request: CreateUnsignedTxRequest
-) => Promise<CreateUnsignedTxResponse>;
 
 // createUnsignedTxForUtxos
 
@@ -383,7 +378,7 @@ export type CreateDelegationTxFunc = (
 
 export type CreateVotingRegTxFunc = (
   request: CreateVotingRegTxRequest
-) => Promise<CreateVotingRegTxResponse>;
+) => Promise<HaskellShelleyTxSignRequest>;
 
 // createWithdrawalTx
 
@@ -457,7 +452,7 @@ export type TransferToCip1852Request = {|
   defaultToken: $ReadOnly<TokenRow>,
 |};
 export type TransferToCip1852Response = {|
-  signRequest: CreateUnsignedTxResponse,
+  signRequest: HaskellShelleyTxSignRequest,
   publicKey: {|
     key: RustModule.WalletV4.Bip32PublicKey,
     ...Addressing,
@@ -979,7 +974,7 @@ export default class AdaApi {
 
   async createUnsignedTx(
     request: CreateUnsignedTxRequest
-  ): Promise<CreateUnsignedTxResponse> {
+  ): Promise<HaskellShelleyTxSignRequest> {
     const utxos = await request.publicDeriver.getAllUtxos();
     const filteredUtxos = utxos.filter(utxo => request.filter(utxo));
 
@@ -1014,7 +1009,7 @@ export default class AdaApi {
   async createUnsignedTxForConnector(
     request: CreateUnsignedTxForConnectorRequest,
     foreignUtxoFetcher: ?ForeignUtxoFetcher,
-  ): Promise<CreateUnsignedTxResponse> {
+  ): Promise<HaskellShelleyTxSignRequest> {
     const {
       includeInputs,
       includeOutputs,
@@ -1662,7 +1657,7 @@ export default class AdaApi {
 
   async createVotingRegTx(
     request: CreateVotingRegTxRequest
-  ): Promise<CreateVotingRegTxResponse> {
+  ): Promise<HaskellShelleyTxSignRequest> {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.createVotingRegTx)} called`);
 
     try {

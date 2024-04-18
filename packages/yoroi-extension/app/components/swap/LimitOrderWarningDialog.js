@@ -17,7 +17,6 @@ export default function LimitOrderWarningDialog({
 }: Props): Node {
   const { orderData } = useSwap();
   const limitPrice = orderData.selectedPoolCalculation?.order.limitPrice ?? '0';
-  console.log('>>> ', limitPrice);
   return (
     <Dialog title="Limit price" onClose={onCancel} withCloseButton closeOnOverlayClick>
       <Box display="flex" maxWidth="648px" mt="8px" mb="24px" flexDirection="column" gap="24px">

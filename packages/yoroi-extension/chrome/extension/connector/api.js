@@ -731,7 +731,6 @@ async function __connectorSignCardanoTx(
     ...getCertificatesRequiredSignKeys(txBody),
   ]);
 
-  console.log('totalAdditionalRequiredSignKeys', [...totalAdditionalRequiredSignKeys]);
   const additionalSignaturesRequired = totalAdditionalRequiredSignKeys.size > 0;
 
   const queryAllBaseAddresses = (): Promise<Array<FullAddressPayload>> => {
@@ -785,10 +784,8 @@ async function __connectorSignCardanoTx(
         requiredPaymentCred,
         parsedStakingCred,
       ).to_address();
-      console.log('requiredAddress', requiredAddress.to_bech32());
       requiredTxSignAddresses.add(bytesToHex(requiredAddress.to_bytes()));
     }
-    console.log('requiredTxSignAddresses', [...requiredTxSignAddresses]);
     for (const baseAddress of allBaseAddresses) {
       const { address, addressing } = baseAddress;
       if (requiredTxSignAddresses.delete(address)) {
@@ -813,7 +810,6 @@ async function __connectorSignCardanoTx(
       ).to_address().to_hex();
       otherRequiredSigners.push({ address, ...addressing });
     }
-    console.log('otherRequiredSigners', [...otherRequiredSigners]);
   }
 
   const submittedTxs = await loadSubmittedTransactions() || [];
