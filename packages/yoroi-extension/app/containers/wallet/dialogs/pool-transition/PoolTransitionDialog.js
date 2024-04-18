@@ -22,6 +22,7 @@ import { Stack } from '@mui/material';
 import { messages } from './dialog-messages';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import Separator from '../../../../components/common/separator/Separator';
 
 type Props = {|
   onClose: () => void,
@@ -78,12 +79,19 @@ export const PoolTransitionDialog = ({
         justifyContent="space-between"
         alignItems="center"
         direction="column"
-        style={{ marginTop: 20, gap: 24 }}
+        style={{ marginTop: 20 }}
       >
-        <CustomButton variant="text" onClick={onClose}>
+        <CustomButton variant="text" onClick={onClose} sx={{ color: '#242838' }}>
           {intl.formatMessage(messages.skipAndStop)}
         </CustomButton>
-        <CustomButton variant="contained" color="primary" width="100%" onClick={onUpdatePool}>
+        <Separator />
+        <CustomButton
+          variant="contained"
+          color="primary"
+          width="100%"
+          onClick={onUpdatePool}
+          sx={{ marginTop: '24px' }}
+        >
           {intl.formatMessage(messages.updateNow)}
         </CustomButton>
       </Grid>
@@ -91,6 +99,7 @@ export const PoolTransitionDialog = ({
   );
 };
 
-const CustomButton = styled(Button)(({ theme }) => ({
+const CustomButton = styled(Button)(({ theme, color }) => ({
   width: '100%',
+  fontSize: '14px',
 }));

@@ -43,7 +43,7 @@ export const StakePoolCard = ({
           component="img"
           src={avatarGenerated}
         />
-        <Typography variant="body1" fontWeight={400}>
+        <Typography variant="body1" fontWeight={400} color="primary.600">
           {poolName}
         </Typography>
       </Stack>
@@ -52,7 +52,7 @@ export const StakePoolCard = ({
           <Typography variant="body1" color="grayscale.600">
             {intl.formatMessage(messages.estimatedROA)}
           </Typography>
-          <Typography variant="body1" color="grayscale.600">
+          <Typography variant="body1" color="grayscale.max" fontWeight={suggestedPool ? 500 : 400}>
             {roa}%
           </Typography>
         </Stack>
@@ -60,7 +60,7 @@ export const StakePoolCard = ({
           <Typography variant="body1" color="grayscale.600">
             {intl.formatMessage(messages.fee)}
           </Typography>
-          <Typography variant="body1" color="grayscale.600">
+          <Typography variant="body1" color="grayscale.max" fontWeight={suggestedPool ? 500 : 400}>
             {fee}%
           </Typography>
         </Stack>
