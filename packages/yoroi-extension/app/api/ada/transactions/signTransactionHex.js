@@ -1,3 +1,4 @@
+// @flow
 import { PublicDeriver } from '../lib/storage/models/PublicDeriver';
 import { connectorSignCardanoTx } from '../../../../chrome/extension/connector/api';
 import { transactionHexReplaceWitnessSet, transactionHexToWitnessSet } from '../lib/cardanoCrypto/utils';
