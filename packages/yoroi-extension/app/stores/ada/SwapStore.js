@@ -149,7 +149,7 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
   }) => {
     const signedTransactionHex =
       await signTransactionHex(wallet, password, transactionHex);
-    const resp = await this.stores.substores.ada.stateFetchStore.fetcher.sendTx({
+    await this.stores.substores.ada.stateFetchStore.fetcher.sendTx({
       id: transactionHexToHash(signedTransactionHex),
       encodedTx: hexToBytes(signedTransactionHex),
       network: wallet.getParent().getNetworkInfo(),
