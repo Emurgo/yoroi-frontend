@@ -75,12 +75,12 @@ import {
   asAddressedUtxo as asAddressedUtxoCardano,
   assetToRustMultiasset,
   cardanoUtxoHexFromRemoteFormat,
+  mergeWitnessSets,
 } from '../../app/api/ada/transactions/utils';
 import type { ForeignUtxoFetcher } from '../../app/connector/stores/ConnectorStore';
 import ConnectorStore from '../../app/connector/stores/ConnectorStore';
 import { find721metadata } from '../../app/utils/nftMetadata';
 import { hexToBytes } from '../../app/coreUtils';
-import { mergeWitnessSets } from './connector/utils';
 import { addressHexToBech32 } from '../../app/api/ada/lib/cardanoCrypto/utils';
 
 /*::
