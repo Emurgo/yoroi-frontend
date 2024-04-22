@@ -283,7 +283,7 @@ class Module {
     const coinsPerUtxoByte = w4.BigNum.from_str(
       new BigNumber(coinsPerUtxoWord.to_str())
         .div(8)
-        .integerValue(BigNumber1.ROUND_FLOOR)
+        .integerValue(BigNumber.ROUND_FLOOR)
         .toString(),
     );
 
