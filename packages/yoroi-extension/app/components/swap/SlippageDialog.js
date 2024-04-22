@@ -31,7 +31,7 @@ export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValu
   };
 
   const handleSlippageChange = e => {
-    let val = e.target.value.replace(/[^\d.-]+/g, '');
+    let val = e.target.value.replace(/[^\d.]+/g, '');
     const number = Number(val);
     if (number > 100) val = '100';
     else if (number < 0) val = '0';
@@ -132,7 +132,12 @@ export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValu
           </Typography>
         </Box>
         <Box>
-          <Button fullWidth onClick={handleSlippageApply} variant="primary">
+          <Button
+            disabled={selectedSlippage.trim().length === 0}
+            fullWidth
+            onClick={handleSlippageApply}
+            variant="primary"
+          >
             Apply
           </Button>
         </Box>
