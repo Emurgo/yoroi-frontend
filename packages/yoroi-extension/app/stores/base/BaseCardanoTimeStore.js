@@ -2,9 +2,6 @@
 
 import { action, observable, runInAction, } from 'mobx';
 import { find } from 'lodash';
-import {
-  PublicDeriver,
-} from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import Store from './Store';
 import type {
@@ -23,7 +20,7 @@ export type TimeCalcRequests = {|
   // although time is network-specific
   // time settings can change over duration of blockchain
   // so it depends how much the blockchain has synced for a given wallet
-  publicDeriver: PublicDeriver<>,
+  publicDeriverId: number,
   requests: {|
     toAbsoluteSlot: CachedRequest<void => Promise<ToAbsoluteSlotNumberFunc>>;
     toRelativeSlotNumber: CachedRequest<void => Promise<ToRelativeSlotNumberFunc>>;
@@ -39,7 +36,7 @@ export type CurrentTimeRequests = {|
   // although time is network-specific
   // time settings can change over duration of blockchain
   // so it depends how much the blockchain has synced for a given wallet
-  publicDeriver: PublicDeriver<>,
+  publicDeriverId: number,
   currentEpoch: number,
   currentSlot: number,
   msIntoSlot: number,
@@ -62,19 +59,19 @@ export default class BaseCardanoTimeStore extends Store<StoresMap, ActionsMap> {
 
   @observable currentTimeRequests: Array<CurrentTimeRequests> = [];
 
-  getTimeCalcRequests: PublicDeriver<> => TimeCalcRequests = (
-    publicDeriver
+  getTimeCalcRequests: number => TimeCalcRequests = (
+    publicDeriverId
   ) => {
-    const foundRequest = find(this.timeCalcRequests, { publicDeriver });
+    const foundRequest = find(this.timeCalcRequests, { publicDeriverId });
     if (foundRequest) return foundRequest;
 
     throw new Error(`${nameof(BaseCardanoTimeStore)}::${nameof(this.getTimeCalcRequests)} missing for public deriver`);
   }
 
-  getCurrentTimeRequests: PublicDeriver<> => CurrentTimeRequests = (
-    publicDeriver
+  getCurrentTimeRequests: number => CurrentTimeRequests = (
+    publicDeriverId
   ) => {
-    const foundRequest = find(this.currentTimeRequests, { publicDeriver });
+    const foundRequest = find(this.currentTimeRequests, { publicDeriverId });
     if (foundRequest) return foundRequest;
 
     throw new Error(`${nameof(BaseCardanoTimeStore)}::${nameof(this.getCurrentTimeRequests)} missing for public deriver`);

@@ -1,6 +1,7 @@
 // @flow
 import type { WalletChecksum } from '@emurgo/cip4-js';
-import type { BaseSingleAddressPath } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces'
+import type { BaseSingleAddressPath } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { Addressing } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 export type WalletType = 'trezor' | 'ledger' | 'mnemonic';
 
@@ -35,4 +36,7 @@ export type WalletState = {|
               this.props.stores.wallets.getSigningKeyCache(withSigning).signingKeyUpdateDate
 */
   signingKeyUpdateDate: string,
+//AdaDelegationTransactionStore.js
+  stakingAddressing: Addressing,
+  stakingAddress: string,
 |};

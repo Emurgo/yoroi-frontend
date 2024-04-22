@@ -1,9 +1,6 @@
 // @flow
 
 import { action, computed, } from 'mobx';
-import {
-  PublicDeriver,
-} from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import BaseCardanoTimeStore from '../base/BaseCardanoTimeStore';
 import {
@@ -25,7 +22,10 @@ import type {
   ToRealTimeFunc,
 } from '../../api/common/lib/storage/bridge/timeUtils';
 import type { CurrentTimeRequests } from '../base/BaseCardanoTimeStore';
-import { isCardanoHaskell, getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import {
+  getCardanoHaskellBaseConfig,
+  getNetworkById,
+} from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 /**
  * Different wallets can be on different networks and therefore have different measures of time
@@ -45,52 +45,54 @@ export default class AdaTimeStore extends BaseCardanoTimeStore {
     if (this._intervalId) clearInterval(this._intervalId);
   }
 
-  @action addObservedTime: PublicDeriver<> => void = (
-    publicDeriver
+  @action addObservedTime: (number, number) => void = (
+    publicDeriverId, networkId
   ) => {
+    const networkInfo = getNetworkById(networkId);
+
     this.timeCalcRequests.push({
-      publicDeriver,
+      publicDeriverId,
       requests: {
         toAbsoluteSlot: new CachedRequest<void => Promise<ToAbsoluteSlotNumberFunc>>(
           () => genToAbsoluteSlotNumber(
-            getCardanoHaskellBaseConfig(publicDeriver.getParent().getNetworkInfo())
+            getCardanoHaskellBaseConfig(networkInfo)
           )
         ),
         toRelativeSlotNumber: new CachedRequest<void => Promise<ToRelativeSlotNumberFunc>>(
           () => genToRelativeSlotNumber(
-            getCardanoHaskellBaseConfig(publicDeriver.getParent().getNetworkInfo())
+            getCardanoHaskellBaseConfig(networkInfo)
           )
         ),
         timeToSlot: new CachedRequest<void => Promise<TimeToAbsoluteSlotFunc>>(
           () => genTimeToSlot(
-            getCardanoHaskellBaseConfig(publicDeriver.getParent().getNetworkInfo())
+            getCardanoHaskellBaseConfig(networkInfo)
           )
         ),
         currentEpochLength: new CachedRequest<void => Promise<CurrentEpochLengthFunc>>(
           () => genCurrentEpochLength(
-            getCardanoHaskellBaseConfig(publicDeriver.getParent().getNetworkInfo())
+            getCardanoHaskellBaseConfig(networkInfo)
           )
         ),
         currentSlotLength: new CachedRequest<void => Promise<CurrentSlotLengthFunc>>(
           () => genCurrentSlotLength(
-            getCardanoHaskellBaseConfig(publicDeriver.getParent().getNetworkInfo())
+            getCardanoHaskellBaseConfig(networkInfo)
           )
         ),
         timeSinceGenesis: new CachedRequest<void => Promise<TimeSinceGenesisFunc>>(
           () => genTimeSinceGenesis(
-            getCardanoHaskellBaseConfig(publicDeriver.getParent().getNetworkInfo())
+            getCardanoHaskellBaseConfig(networkInfo)
           )
         ),
         toRealTime: new CachedRequest<void => Promise<ToRealTimeFunc>>(
           () => genToRealTime(
-            getCardanoHaskellBaseConfig(publicDeriver.getParent().getNetworkInfo())
+            getCardanoHaskellBaseConfig(networkInfo)
           )
         ),
       },
     });
 
     this.currentTimeRequests.push({
-      publicDeriver,
+      publicDeriverId,
       // initial values that can be updated later
       currentEpoch: 0,
       currentSlot: 0,
@@ -101,8 +103,7 @@ export default class AdaTimeStore extends BaseCardanoTimeStore {
   @computed get currentTime(): ?CurrentTimeRequests {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return undefined;
-    if (!isCardanoHaskell(publicDeriver.getParent().getNetworkInfo())) return undefined;
 
-    return this.getCurrentTimeRequests(publicDeriver);
+    return this.getCurrentTimeRequests(publicDeriver.publicDeriverId);
   }
 }

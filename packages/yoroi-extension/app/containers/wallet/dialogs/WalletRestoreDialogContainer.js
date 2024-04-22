@@ -142,7 +142,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
               <NavPlate
                 plate={duplicatedWallet.plate}
                 walletType={duplicatedWallet.type}
-                name={duplicateWallet.name}
+                name={duplicatedWallet.name}
               />
             }
             walletSumDetails={

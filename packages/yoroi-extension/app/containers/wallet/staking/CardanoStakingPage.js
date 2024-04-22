@@ -215,7 +215,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
     }
     await this.props.actions.ada.delegationTransaction.createTransaction.trigger({
       poolRequest: delegationTransaction.selectedPools[0],
-      publicDeriver: selectedWallet,
+      wallet: selectedWallet,
     });
   };
 
@@ -418,7 +418,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
           onSubmit={async ({ password }) => {
             await this.props.actions.ada.delegationTransaction.signTransaction.trigger({
               password,
-              publicDeriver: selectedWallet,
+              wallet: selectedWallet,
               dialog: DelegationSuccessDialog,
             });
           }}

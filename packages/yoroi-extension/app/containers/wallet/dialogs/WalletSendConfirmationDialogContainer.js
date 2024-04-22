@@ -76,7 +76,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
           await sendMoney.trigger({
             signRequest,
             password,
-            publicDeriver.publicDeriverId,
+            publicDeriverId: publicDeriver.publicDeriverId,
             onSuccess: openTransactionSuccessDialog,
           });
         }}

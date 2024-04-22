@@ -13,7 +13,6 @@ import LocalizedRequest from '../lib/LocalizedRequest';
 import { ROUTES } from '../../routes-config';
 
 import type { CreateHardwareWalletFunc, CreateHardwareWalletRequest, } from '../../api/ada';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 
 import { convertToLocalizableError } from '../../domain/LedgerLocalizedError';
 
