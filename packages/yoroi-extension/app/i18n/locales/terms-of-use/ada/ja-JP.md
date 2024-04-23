@@ -98,12 +98,12 @@ By using the translated versions of our Software you acknowledge and accept the 
  
 If you have any questions or concerns regarding the accuracy or reliability of the translated content, please contact us for clarification.
 
-## 12. Delegation and Staking
+## 12. 委任とステーキング
 
 12.1 **Rewards.** The amount of Rewards a User may earn from delegation depends on various factors including, but not limited to, user participation, stakepool profit margins and the volume of ada being delegated. It is possible that delegation generates no Reward for a User due to the above-mentioned factors. Rewards are earned as of the start of the 3rd epoch on the Cardano blockchain.
 
-12.2 **Delegation.** Users may delegate their stake to one of the various stake pools of the Company or to a third party stake pool. User will have the sole right to determine the volume to be delegated to a stake pool and may increase or decrease its level of participation at any time. Any information Company shares regarding stakepools, including performance metrics and Rewards, will be for indicative purposes only and may not be accurate. Users may only delegate their stake to a stake pool if their ada is in an updated Daedalus or an updated Yoroi wallet at the time of the setup process. User does not acquire any automatic right to Rewards as a result of delegating its stake.
+12.2 **委任** ユーザーは、そのステークを当社の複数のステークプールの一つまたは第三者のステークプールに委任することができます。ユーザーは、ステークプールへ委任する量を決定する単独の権利を持ち、随時その参加レベルを上昇・下降させることができます。当社が共有するパフォーマンスメトリクスおよび報酬を含むステークプールに関するあらゆる情報は参考目的であり、正確ではありません。ユーザーは、設定プロセスの時点で更新済みのDaedalusまたは更新済みのYoroiウォレットにADAを保有している場合にのみ自身のステークをステークプールに委任することができます。ユーザーは、そのステークを委任する結果として報酬を得るいかなる権利も自動的に得られるものではありません。
 
-12.3 **Company Stake-Pools.** The Company will operate various stake pools which will be visible in Yoroi. The cost and network and server requirements to reliably operate such stake pools shall be determined by the Company in its sole discretion. Company will communicate the percentage amount of Reward to be shared with Users through the User’s Yoroi wallet. Rewards will accrue at the end of each epoch and will automatically appear in the User’s Yoroi wallet.
+12.3 **当社のステークプール** 当社は、複数のステークプールを運営し、当該ステークプールはヨロイで可視化されます。かかるステークプールを確実に運営するためのコストならびにネットワークおよびサーバー要件は、当社の単独の裁量で決定されるものとします。当社は、ユーザーと共有する報酬額の割合をユーザーのヨロイウォレット経由で通知します。報酬は、各エポックの終了時に発生し、ユーザーのヨロイウォレットに自動的に表示されます。
 
-12.4 **Redeeming Rewards.** User shall be responsible for payment of all applicable taxes, if any, to which the Rewards might be subject and any and all other taxes which may apply to User once Rewards are redeemed.
+12.4 ** 報酬の引き出し** ユーザーは、報酬に課される可能性のあるすべての税金（該当する場合）、および報酬の引き出し後にユーザーに課される可能性のあるその他すべての税金の支払いに責任を負うものとします。
