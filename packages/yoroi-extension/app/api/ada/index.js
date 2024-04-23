@@ -973,7 +973,7 @@ export default class AdaApi {
         `${nameof(AdaApi)}::${nameof(this.createUnsignedTxForUtxos)} error: ` + stringifyError(error)
       );
       if (error instanceof LocalizableError) throw error;
-      throw error;
+      throw new GenericApiError();
     }
   }
 
