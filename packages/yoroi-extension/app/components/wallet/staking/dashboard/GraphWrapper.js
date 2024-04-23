@@ -134,18 +134,18 @@ export const Graph: {|
     if (active && payload != null) {
       return (
         <div className={styles.tooltip}>
-          <p>
+          <div>
             <span className={styles.tooltipLabel}>{epochTitle}:</span>&nbsp;
             <span className={styles.tooltipValue}>{label}</span>
-          </p>
-          <p>
+          </div>
+          <div>
             <span className={styles.tooltipLabel}>{primaryBarLabel}:</span>&nbsp;
             <span className={styles.tooltipValue}>{payload[0].value}</span>
-          </p>
-          <p>
+          </div>
+          <div>
             <span className={styles.tooltipLabel}>{stakepoolNameTitle}:</span>&nbsp;
             <span className={styles.tooltipValue}>{payload[0].payload.poolName}</span>
-          </p>
+          </div>
         </div>
       );
     }

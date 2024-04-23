@@ -1,24 +1,26 @@
 // @flow
-import { Component } from 'react';
 import type { Node } from 'react';
-import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
-import { ReactComponent as ExportTxToFileSvg } from '../../../assets/images/transaction/export.inline.svg';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
+import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { UnconfirmedAmount } from '../../../types/unconfirmedAmountType';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletSummary.scss';
-import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+import { Component } from 'react';
+import { observer } from 'mobx-react';
+import { defineMessages, intlShape } from 'react-intl';
 import { formatValue } from '../../../utils/unit-of-account';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { splitAmount, truncateToken } from '../../../utils/formatters';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { hiddenAmount } from '../../../utils/strings';
-import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';
-import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import { Button, Typography } from '@mui/material';
-import { Box, styled } from '@mui/system';
+import { Button, Typography, Grid, Stack } from '@mui/material';
+import { Box } from '@mui/system';
 import BigNumber from 'bignumber.js';
+import { ReactComponent as ExportTxToFileSvg } from '../../../assets/images/transaction/export.inline.svg';
+import LoadingSpinner from '../../widgets/LoadingSpinner';
+import FullscreenLayout from '../../layout/FullscreenLayout';
 
 const messages = defineMessages({
   pendingOutgoingConfirmationLabel: {
@@ -39,6 +41,8 @@ type Props = {|
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +getHistoricalPrice: (from: string, to: string, timestamp: number) => ?string,
+  +shouldShowEmptyBanner: boolean,
+  +emptyBannerComponent: Node,
 |};
 
 @observer
@@ -164,98 +168,116 @@ export default class WalletSummaryRevamp extends Component<Props> {
       pendingAmount,
       isLoadingTransactions,
       openExportTxToFileDialog,
+      shouldShowEmptyBanner,
+      emptyBannerComponent,
     } = this.props;
     const { intl } = this.context;
 
-    const content = (
-      <Box
-        id="walletSummary_box"
-        sx={{
-          background: 'var(--yoroi-palette-common-white)',
-          boxShadow:
-            '0 4px 6px 0 #dee2ea, 0 1px 2px 0 rgb(222 226 234 / 82%), 0 2px 4px 0 rgb(222 226 234 / 74%)',
-        }}
-      >
-        {!isLoadingTransactions && (
-          <>
-            <Box
-              sx={{
-                padding: '24px 30px',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
-              <Button
-                variant="ternary"
-                sx={{
-                  textTransform: 'uppercase',
-                  fontWeight: 'bold',
-                  borderWidth: 2,
-                  width: 'unset',
-                }}
-                onClick={openExportTxToFileDialog}
-                onKeyPress={openExportTxToFileDialog}
-                disabled={isLoadingTransactions}
-                startIcon={<ExportTxToFileSvg />}
-              >
-                {intl.formatMessage({ id: 'wallet.transaction.export.exportIcon.tooltip' })}
-              </Button>
-            </Box>
-            {/* {(pendingAmount.incoming.length > 0 || pendingAmount.outgoing.length > 0) && ( */}
-            <Box sx={{ padding: '16px 30px' }}>
-              <Typography variant="body1">
-                {this.renderPendingAmount(
-                  pendingAmount.incoming,
-                  intl.formatMessage(messages.pendingIncomingConfirmationLabel)
-                )}
-              </Typography>
-              <Typography variant="body1">
-                {this.renderPendingAmount(
-                  pendingAmount.outgoing,
-                  intl.formatMessage(messages.pendingOutgoingConfirmationLabel)
-                )}
-              </Typography>
-            </Box>
-            {/* )} */}
-          </>
-        )}
+    const hasPendingAmount = pendingAmount.incoming.length || pendingAmount.outgoing.length;
+
+    if (isLoadingTransactions)
+      return (
+        <FullscreenLayout bottomPadding={0}>
+          <Stack alignItems="center" justifyContent="center" height="50vh">
+            <LoadingSpinner />
+          </Stack>
+        </FullscreenLayout>
+      );
+
+    return (
+      <Box id="walletSummary_box" sx={{ bgcolor: 'common.white' }}>
         <Box
           sx={{
+            marginBottom: '16px',
             display: 'flex',
-            padding: '20px 30px 10px',
-            paddingRight: '68px',
-            width: '100%',
             justifyContent: 'space-between',
+            alignItems: 'center',
           }}
         >
-          <Label variant="body2" sx={columnTXStyles.transactionType}>
-            {intl.formatMessage({ id: 'wallet.summary.page.type' })}
-          </Label>
-          <Label variant="body2" sx={columnTXStyles.status}>
-            {intl.formatMessage({ id: 'wallet.summary.page.status' })}
-          </Label>
-          <Label variant="body2" sx={columnTXStyles.fee}>
-            {intl.formatMessage(globalMessages.feeLabel)}
-          </Label>
-          <Label variant="body2" sx={columnTXStyles.amount}>
-            {intl.formatMessage(globalMessages.amountLabel)}
-          </Label>
+          <Typography
+            variant="h2"
+            as="p"
+            fontSize="18px"
+            sx={{ fontWeight: 500, color: 'common.black' }}
+          >
+            {intl.formatMessage({ id: 'wallet.navigation.transactions' })}
+          </Typography>
+          {!isLoadingTransactions && (
+            <Button
+              variant="tertiary"
+              color="primary"
+              sx={{
+                textTransform: 'uppercase',
+                margin: '2px',
+                lineHeight: '21px',
+              }}
+              onClick={openExportTxToFileDialog}
+              onKeyPress={openExportTxToFileDialog}
+              startIcon={<ExportTxToFileSvg />}
+            >
+              {intl.formatMessage(globalMessages.exportButtonLabel)}
+            </Button>
+          )}
         </Box>
+        <Box sx={{ pb: hasPendingAmount ? '16px' : 0 }}>
+          <Typography component="div" variant="body1">
+            {this.renderPendingAmount(
+              pendingAmount.incoming,
+              intl.formatMessage(messages.pendingIncomingConfirmationLabel)
+            )}
+          </Typography>
+          <Typography component="div" variant="body1">
+            {this.renderPendingAmount(
+              pendingAmount.outgoing,
+              intl.formatMessage(messages.pendingOutgoingConfirmationLabel)
+            )}
+          </Typography>
+        </Box>
+        {shouldShowEmptyBanner && <Box>{emptyBannerComponent}</Box>}
+        {!shouldShowEmptyBanner && !isLoadingTransactions && (
+          <Grid
+            container
+            sx={{
+              width: '100%',
+              padding: '12px 0',
+              borderBottom: '1px solid',
+              borderBottomColor: 'grayscale.200',
+            }}
+          >
+            <Grid item xs={4}>
+              <Typography component="div" variant="body2">
+                {intl.formatMessage({ id: 'wallet.summary.page.type' })}
+              </Typography>
+            </Grid>
+            <Grid item xs={2} sx={{ textAlign: 'left' }}>
+              <Typography component="div" variant="body2">
+                {intl.formatMessage({ id: 'wallet.summary.page.status' })}
+              </Typography>
+            </Grid>
+            <Grid item xs={2} sx={{ textAlign: 'right' }}>
+              <Typography component="div" variant="body2">{intl.formatMessage(globalMessages.feeLabel)}</Typography>
+            </Grid>
+            <Grid item xs={4} sx={{ textAlign: 'right', pr: '30px' }}>
+              <Typography component="div" variant="body2">
+                {intl.formatMessage(globalMessages.amountLabel)}
+              </Typography>
+            </Grid>
+          </Grid>
+        )}
       </Box>
     );
-
-    return content;
   }
 }
 
-const Label = styled(Typography)({
-  color: 'var(--yoroi-palette-gray-600)',
-});
-
 export const columnTXStyles = {
-  transactionType: { flex: '1 1 30%', maxWidth: '30%', textAlign: 'left' },
-  status: { flex: '1 1 16%', maxWidth: '16%', textAlign: 'left' },
-  fee: { flex: '1 1 16%', maxWidth: '16%', textAlign: 'right' },
-  amount: { flex: '1 1 25%', maxWidth: '25%', textAlign: 'right' },
+  transactionType: { flex: '1 1 30%', maxWidth: '30%', textAlign: 'left', color: 'grayscale.600' },
+  status: { flex: '1 1 16%', maxWidth: '16%', textAlign: 'left', color: 'grayscale.600' },
+  fee: { flex: '1 1 16%', maxWidth: '16%', textAlign: 'right', color: 'grayscale.600' },
+  amount: {
+    flex: '1 1 25%',
+    maxWidth: '25%',
+    paddingRight: '24px',
+    textAlign: 'right',
+    color: 'grayscale.600',
+  },
 };

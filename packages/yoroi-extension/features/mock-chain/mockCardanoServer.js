@@ -4,8 +4,6 @@ import { create, bodyParser, defaults } from 'json-server';
 import type {
   AddressUtxoRequest,
   AddressUtxoResponse,
-  UtxoSumRequest,
-  UtxoSumResponse,
   HistoryRequest,
   HistoryResponse,
   AccountStateRequest,
@@ -183,21 +181,6 @@ export function getMockServer(settings: {
     );
 
     server.post(
-      '/api/txs/utxoSumForAddresses',
-      async (
-        req: { body: UtxoSumRequest, ... },
-        res: { send(arg: UtxoSumResponse): any, ... }
-      ): Promise<void> => {
-        const methodLogger = localLogger.getMethodLogger('POST', '/api/txs/utxoSumForAddresses');
-        chai.assert.isTrue(_validateAddressesReq(req.body, localLogger));
-        methodLogger.logRequest(JSON.stringify(req.body));
-        const utxoSumForAddresses = await mockImporter.utxoSumForAddresses(req.body);
-        methodLogger.logResponseSuccess(JSON.stringify(utxoSumForAddresses));
-        res.send(utxoSumForAddresses);
-      }
-    );
-
-    server.post(
       '/api/v2/txs/history',
       async (
         req: { body: HistoryRequest, ... },
@@ -244,7 +227,8 @@ export function getMockServer(settings: {
             `Wrong transaction payload. Expected ${expectedTxBase64[0]} and found ${req.body.signedTx}`
           );
           // throw new Error(
-          //   `Wrong transaction payload. Expected ${expectedTxBase64[0]} and found ${req.body.signedTx}`
+          //   `Wrong transaction payload.
+          //    Expected ${expectedTxBase64[0]} and found ${req.body.signedTx}`
           // );
         }
         methodLogger.logRequest(JSON.stringify(req.body));

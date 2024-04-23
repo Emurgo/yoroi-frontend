@@ -3,9 +3,8 @@ import { Component } from 'react';
 import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
-import { Button } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
-import styles from './SupportSettings.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { withLayout } from '../../../styles/context/layout';
 
@@ -61,7 +60,6 @@ class SupportSettings extends Component<Props & InjectedProps> {
 
     const faqLink = (
       <a
-        className={styles.link}
         href={intl.formatMessage(globalMessages.faqLinkUrl)}
         onClick={event => onExternalLinkClick(event)}
       >
@@ -71,7 +69,6 @@ class SupportSettings extends Component<Props & InjectedProps> {
 
     const supportRequestLink = (
       <a
-        className={styles.link}
         href="https://emurgohelpdesk.zendesk.com/hc/en-us/requests/new?ticket_form_id=360013330335"
         onClick={event => onExternalLinkClick(event)}
       >
@@ -80,45 +77,79 @@ class SupportSettings extends Component<Props & InjectedProps> {
     );
 
     const downloadLogsLink = (
-      <span
-        role="button"
-        tabIndex={0}
-        onKeyPress={() => null}
-        className={styles.link}
-        onClick={onDownloadLogs}
-      >
+      <span role="button" tabIndex={0} onKeyPress={() => null} onClick={onDownloadLogs}>
         {intl.formatMessage(globalMessages.downloadLogsLink)}
       </span>
     );
 
-    return (
-      <div className={styles.component}>
-        <h1>{intl.formatMessage(messages.faqTitle)}</h1>
-
-        <p>
-          <FormattedMessage {...messages.faqContent} values={{ faqLink }} />
-        </p>
-
-        <h1>{intl.formatMessage(messages.reportProblemTitle)}</h1>
-
-        <p>
+    const sections = [
+      {
+        title: messages.faqTitle,
+        text: <FormattedMessage {...messages.faqContent} values={{ faqLink }} />,
+      },
+      {
+        title: messages.reportProblemTitle,
+        text: (
           <FormattedMessage {...messages.reportProblemContent} values={{ supportRequestLink }} />
-        </p>
+        ),
+      },
+      {
+        title: messages.logsTitle,
+        text: <FormattedMessage {...globalMessages.logsContent} values={{ downloadLogsLink }} />,
+      },
+    ];
 
-        <h1>{intl.formatMessage(messages.logsTitle)}</h1>
+    return (
+      <Box>
+        {isRevampLayout && (
+          <Typography component="h5" variant="h5" mb="24px" color="common.black" fontWeight={500}>
+            {intl.formatMessage(globalMessages.support)}
+          </Typography>
+        )}
 
-        <p>
-          <FormattedMessage {...globalMessages.logsContent} values={{ downloadLogsLink }} />
-        </p>
-
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: isRevampLayout ? '40px' : '20px',
+          }}
+        >
+          {sections.map(({ title, text }) => {
+            return (
+              <Box key={title.id}>
+                <Typography component="div"
+                  variant={isRevampLayout ? 'body1' : 'h5'}
+                  color={isRevampLayout ? 'grayscale.900' : 'var(--yoroi-support-settings-text)'}
+                  fontWeight={500}
+                  mb="8px"
+                >
+                  {intl.formatMessage(title)}
+                </Typography>
+                <Typography component="div"
+                  sx={{
+                    '& a': {
+                      color: isRevampLayout ? 'primary.500' : 'var(--yoroi-support-settings-text)',
+                      textDecoration: isRevampLayout ? 'none' : 'underline',
+                    },
+                  }}
+                  color={isRevampLayout ? 'common.black' : 'var(--yoroi-support-settings-text)'}
+                  variant={isRevampLayout ? 'body1' : 'body2'}
+                >
+                  {text}
+                </Typography>
+              </Box>
+            );
+          })}
+        </Box>
         <Button
           variant={isRevampLayout ? 'contained' : 'primary'}
+          size={isRevampLayout ? 'flat' : 'medium'}
           onClick={onDownloadLogs}
-          sx={{ marginTop: '20px' }}
+          sx={{ marginTop: isRevampLayout ? '40px' : '20px' }}
         >
           {intl.formatMessage(globalMessages.downloadLogsButtonLabel)}
         </Button>
-      </div>
+      </Box>
     );
   }
 }

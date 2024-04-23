@@ -1,6 +1,6 @@
 // @flow
 import { Component } from 'react';
-import type { Node, ComponentType } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import classnames from 'classnames';
@@ -15,8 +15,6 @@ import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { Notification } from '../../../types/notificationType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { truncateAddress } from '../../../utils/formatters';
-import { withLayout } from '../../../styles/context/layout';
-import type { InjectedLayoutProps } from '../../../styles/context/layout';
 
 const messages = defineMessages({
   walletAddressLabel: {
@@ -47,7 +45,7 @@ type Props = {|
 |};
 
 @observer
-class StandardHeader extends Component<Props & InjectedLayoutProps> {
+export default class StandardHeader extends Component<Props> {
   static defaultProps: {| error: void |} = {
     error: undefined,
   };
@@ -68,14 +66,13 @@ class StandardHeader extends Component<Props & InjectedLayoutProps> {
       isWalletAddressUsed,
       onCopyAddressTooltip,
       notification,
-      isRevampLayout,
     } = this.props;
     const { intl } = this.context;
     const mainAddressNotificationId = 'mainAddress-copyNotification';
 
     const generateAddressForm = (
       <LoadingButton
-        variant={isRevampLayout ? 'contained' : 'primary'}
+        variant="primary"
         loading={isSubmitting}
         className="generateAddressButton"
         onClick={this.submit}
@@ -116,9 +113,9 @@ class StandardHeader extends Component<Props & InjectedLayoutProps> {
           </div>
           {generateAddressForm}
           {error ? (
-            <p className={styles.error}>{intl.formatMessage(error)}</p>
+            <div className={styles.error}>{intl.formatMessage(error)}</div>
           ) : (
-            <p className={styles.error}>&nbsp;</p>
+            <div className={styles.error}>&nbsp;</div>
           )}
         </div>
         <div className={styles.qrCode}>
@@ -130,5 +127,3 @@ class StandardHeader extends Component<Props & InjectedLayoutProps> {
     return walletHeader;
   }
 }
-
-export default (withLayout(StandardHeader): ComponentType<Props>);

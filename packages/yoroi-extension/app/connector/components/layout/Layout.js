@@ -1,7 +1,7 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import { ReactComponent as YoroiLogo } from '../../assets/images/yoroi_logo.inline.svg';
+import { ReactComponent as YoroiLogo } from '../../assets/images/yoroi-logo.inline.svg';
 import styles from './Layout.scss';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
@@ -31,7 +31,7 @@ export default class Layout extends Component<Props> {
 
     return (
       <div className={styles.layout}>
-        <TestnetWarningBanner isTestnet={environment.isTest()} isErgo={false} />
+        <TestnetWarningBanner isTestnet={environment.isTest()} />
         <div className={styles.header}>
           <div className={styles.menu}>
             <YoroiLogo />

@@ -3,38 +3,38 @@
 /* eslint react/jsx-one-expression-per-line: 0 */ // the &nbsp; in the html breaks this
 
 import type { Node } from 'react';
-import { Component } from 'react';
-import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
-import Dialog from '../../../widgets/Dialog';
-import DialogCloseButton from '../../../widgets/DialogCloseButton';
-import styles from './AddTokenDialog.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { MultiToken } from '../../../../api/common/lib/MultiToken';
-import { ReactComponent as SearchIcon } from '../../../../assets/images/assets-page/search.inline.svg';
-import { ReactComponent as ArrowsListFromBottom } from '../../../../assets/images/assets-page/arrows-list-from-bottom.inline.svg';
-import { ReactComponent as ArrowsListFromTop } from '../../../../assets/images/assets-page/arrows-list-from-top.inline.svg';
-import { ReactComponent as InfoIcon } from '../../../../assets/images/assets-page/info.inline.svg';
-import { ReactComponent as ArrowsList } from '../../../../assets/images/assets-page/arrows-list.inline.svg';
-import { ReactComponent as NoItemsFoundImg } from '../../../../assets/images/assets-page/no-tokens.inline.svg';
-import SingleTokenRow from './SingleTokenRow';
-import { Button } from '@mui/material';
 import type { TokenLookupKey } from '../../../../api/common/lib/MultiToken';
 import type {
   TokenRow,
   NetworkRow,
 } from '../../../../api/ada/lib/storage/database/primitives/tables';
-import BigNumber from 'bignumber.js';
 import type { FormattedTokenDisplay } from '../../../../utils/wallet';
+import { Component } from 'react';
+import { observer } from 'mobx-react';
+import { defineMessages, intlShape } from 'react-intl';
+import { MultiToken } from '../../../../api/common/lib/MultiToken';
+import { Typography } from '@mui/material';
 import { isCardanoHaskell } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 import { compareNumbers, compareStrings } from '../../assets/AssetsList';
 import { getTokens } from '../../../../utils/wallet';
+import { Box } from '@mui/system';
+import { formattedAmountToNaturalUnits } from '../../../../utils/formatters';
+import { ReactComponent as SearchIcon } from '../../../../assets/images/assets-page/search.inline.svg';
+import { ReactComponent as ArrowsListFromBottom } from '../../../../assets/images/assets-page/arrows-list-from-bottom.inline.svg';
+import { ReactComponent as ArrowsListFromTop } from '../../../../assets/images/assets-page/arrows-list-from-top.inline.svg';
+import { ReactComponent as InfoIcon } from '../../../../assets/images/revamp/fingerprint-info.inline.svg';
+import { ReactComponent as ArrowsList } from '../../../../assets/images/assets-page/arrows-list.inline.svg';
+import { ReactComponent as NoItemsFoundImg } from '../../../../assets/images/assets-page/no-tokens.inline.svg';
+import { ampli } from '../../../../../ampli/index';
+import Dialog from '../../../widgets/Dialog';
+import styles from './AddTokenDialog.scss';
+import SingleTokenRow from './SingleTokenRow';
+import BigNumber from 'bignumber.js';
 import MinAda from './MinAda';
 import globalMessages from '../../../../i18n/global-messages';
 import MaxAssetsError from '../MaxAssetsError';
-import { Box } from '@mui/system';
 import OutlinedInput from '@mui/material/OutlinedInput';
-import { formattedAmountToNaturalUnits } from '../../../../utils/formatters';
 
 type Props = {|
   +onClose: void => void,
@@ -44,6 +44,7 @@ type Props = {|
   +selectedNetwork: $ReadOnly<NetworkRow>,
   +onAddToken: ({|
     token: void | $ReadOnly<TokenRow>,
+    shouldSendAll?: boolean,
     shouldReset?: boolean,
   |}) => void,
   +onRemoveTokens: (Array<$ReadOnly<TokenRow>>) => void,
@@ -81,11 +82,11 @@ const SORTING_COLUMNS = {
 export const messages: Object = defineMessages({
   nTokens: {
     id: 'wallet.send.form.dialog.nToken',
-    defaultMessage: '!!!Tokens ({number})',
+    defaultMessage: '!!!Token ({number})',
   },
   nameAndTicker: {
     id: 'wallet.assets.nameAndTicker',
-    defaultMessage: '!!!Name and ticker',
+    defaultMessage: '!!!Ticker and name',
   },
   quantity: {
     id: 'wallet.assets.quantity',
@@ -189,7 +190,26 @@ export default class AddTokenDialog extends Component<Props, State> {
 
   onAddAll: void => void = () => {
     const toRemove = [];
+    let changed = false;
+    const tokens = this.props.plannedTxInfoMap
+      .filter(({ token }) => !token.IsDefault)
+      .map(({ token, amount }) => ({ tokenId: token.TokenId, amount }));
     for (const { token, amount, included } of this.state.selectedTokens) {
+      const tokenIndex = tokens.findIndex(({ tokenId }) => tokenId === token.TokenId);
+      if (tokenIndex !== -1) {
+        if (included && amount != null) {
+          if (amount.toString() !== tokens[tokenIndex].amount) {
+            tokens[tokenIndex].amount = amount.toString();
+            changed = true;
+          }
+        } else {
+          tokens.splice(tokenIndex, 1);
+          changed = true;
+        }
+      } else if (included && amount != null) {
+        tokens.push({ tokenId: token.TokenId, amount: amount.toString() });
+        changed = true;
+      }
       if (!included) {
         toRemove.push(token);
         continue;
@@ -205,6 +225,11 @@ export default class AddTokenDialog extends Component<Props, State> {
     }
     this.props.onRemoveTokens(toRemove);
     this.props.onClose();
+    if (changed) {
+      ampli.sendSelectAssetUpdated({
+        asset_count: tokens.length,
+      });
+    }
   };
 
   getMaxAmount: ($ReadOnly<TokenRow>) => BigNumber = tokenInfo => {
@@ -307,6 +332,8 @@ export default class AddTokenDialog extends Component<Props, State> {
     const shouldAddMore = shouldAddMoreTokens(
       selectedTokens.map(({ token, included }) => ({ token, included }))
     );
+    const hasSelectedTokensIncluded = selectedTokens.filter(t => t.included);
+
     return (
       <Dialog
         title={
@@ -314,39 +341,59 @@ export default class AddTokenDialog extends Component<Props, State> {
             ? intl.formatMessage(globalMessages.tokens)
             : intl.formatMessage(messages.nTokens, { number: fullTokensList.length })
         }
+        actions={[
+          {
+            disabled:
+              fullTokensList.length === 0 ||
+              hasSelectedTokensIncluded.length === 0 ||
+              !this.isValidAmounts() ||
+              !shouldAddMore,
+            onClick: this.onAddAll,
+            primary: true,
+            label: intl.formatMessage(globalMessages.confirm),
+          },
+        ]}
         closeOnOverlayClick={false}
         className={styles.dialog}
         onClose={onClose}
-        closeButton={<DialogCloseButton />}
+        withCloseButton
+        scrollableContentClass="CurrentTokensList"
       >
-        <div className={styles.component}>
-          <Box sx={{ position: 'relative', width: '100%' }}>
-            <Box
-              sx={{ position: 'absolute', top: '55%', left: '10px', transform: 'translateY(-50%)' }}
-            >
-              {' '}
-              <SearchIcon />{' '}
+        <Box className={styles.component}>
+          <Box sx={{ width: '100%' }}>
+            <Box sx={{ position: 'relative' }}>
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: '55%',
+                  left: '10px',
+                  transform: 'translateY(-50%)',
+                }}
+              >
+                {' '}
+                <SearchIcon />{' '}
+              </Box>
+              <OutlinedInput
+                onChange={this.search}
+                sx={{
+                  padding: '0px 0px 0px 30px',
+                  height: '40px',
+                  width: '100%',
+                  fontSize: '14px',
+                  lineHeight: '22px',
+                }}
+                placeholder={intl.formatMessage(messages.search)}
+              />
             </Box>
-            <OutlinedInput
-              onChange={this.search}
-              sx={{
-                padding: '0px 0px 0px 30px',
-                height: '40px',
-                width: '100%',
-                fontSize: '14px',
-                lineHeight: '22px',
-              }}
-              placeholder={intl.formatMessage(messages.search)}
-            />
           </Box>
           {isCardanoHaskell(this.props.selectedNetwork) && (
-            <div className={styles.minAda}>
+            <Box textAlign="center" mt="24px">
               <MinAda
                 minAda={calculateMinAda(
                   selectedTokens.map(({ token, included }) => ({ token, included }))
                 )}
               />
-            </div>
+            </Box>
           )}
           {!shouldAddMore && (
             <Box sx={{ marginTop: '10px' }}>
@@ -363,66 +410,61 @@ export default class AddTokenDialog extends Component<Props, State> {
               </h1>
             </div>
           ) : (
-            <div className={styles.columnsContainer}>
-              <ul className={styles.columns}>
-                <li className={styles.name}>
+            <Box>
+              <Box
+                component="ul"
+                borderBottom="1px solid"
+                borderBottomColor="grayscale.200"
+                className={styles.columns}
+              >
+                <li>
                   <button type="button" onClick={() => this.sortTokens(SORTING_COLUMNS.LABEL)}>
-                    <p className={styles.headerText}>
+                    <Typography component="div" variant="body2" color="grayscale.600">
                       {intl.formatMessage(messages.nameAndTicker)}
-                    </p>
+                    </Typography>
                     {this.displayColumnLogo(SORTING_COLUMNS.LABEL)}
                   </button>
                 </li>
-                <li className={styles.identifier}>
-                  <p className={styles.headerText}>{intl.formatMessage(messages.identifier)}</p>
-                  <InfoIcon />
+                <li>
+                  <Typography component="div" variant="body2" color="grayscale.600">
+                    {intl.formatMessage(messages.identifier)}
+                  </Typography>
+                  <Box sx={{ '& > svg': { width: '24px', height: '24px' } }}>
+                    <InfoIcon />
+                  </Box>
                 </li>
                 <li className={styles.quantity}>
                   <button type="button" onClick={() => this.sortTokens(SORTING_COLUMNS.AMOUNT)}>
-                    <p className={styles.headerText}>{intl.formatMessage(messages.quantity)}</p>
+                    <Typography component="div" variant="body2" color="grayscale.600">
+                      {intl.formatMessage(messages.quantity)}
+                    </Typography>
                     {this.displayColumnLogo(SORTING_COLUMNS.AMOUNT)}
                   </button>
                 </li>
-              </ul>
-
-              {currentTokensList.map(token => (
-                <SingleTokenRow
-                  key={token.id}
-                  token={token}
-                  updateAmount={this.updateAmount}
-                  getTokenAmount={this.getCurrentAmount}
-                  onAddToken={this.onSelect}
-                  onRemoveToken={this.onRemoveToken}
-                  isTokenIncluded={this.isTokenIncluded}
-                  isValidAmount={this.isValidAmount}
-                />
-              ))}
-            </div>
+              </Box>
+              <Box
+                height="320px"
+                overflow="auto"
+                pr={currentTokensList.length > 4 ? '4px' : '24px'}
+                pt="10px"
+                className="CurrentTokensList"
+              >
+                {currentTokensList.map(token => (
+                  <SingleTokenRow
+                    key={token.id}
+                    token={token}
+                    updateAmount={this.updateAmount}
+                    getTokenAmount={this.getCurrentAmount}
+                    onAddToken={this.onSelect}
+                    onRemoveToken={this.onRemoveToken}
+                    isTokenIncluded={this.isTokenIncluded}
+                    isValidAmount={this.isValidAmount}
+                  />
+                ))}
+              </Box>
+            </Box>
           )}
-        </div>
-        {fullTokensList.length !== 0 && (
-          <Button
-            sx={{
-              width: '100%',
-              color: 'secondary.300',
-              borderTopLeftRadius: '0px',
-              borderTopRightRadius: '0px',
-              borderColor: 'gray.200',
-              ':hover': {
-                bgcolor: 'transparent',
-                borderColor: 'gray.300',
-              },
-              '&.MuiButton-sizeMedium': {
-                height: '81px',
-              },
-            }}
-            disabled={selectedTokens.length === 0 || !this.isValidAmounts() || !shouldAddMore}
-            onClick={this.onAddAll}
-            variant="ternary"
-          >
-            {intl.formatMessage(globalMessages.confirm)}
-          </Button>
-        )}
+        </Box>
       </Dialog>
     );
   }

@@ -164,7 +164,6 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props, Sta
 
             return (
               <Stack
-                item
                 // use the form name key to know when we reset
                 key={form.name + '-word-' + idx}
               >
@@ -182,7 +181,7 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props, Sta
                   }}
                   variant="body1"
                 >
-                  <Typography variant="body1" color="primary.400" width="24px">
+                  <Typography component="div" variant="body1" color="primary.400" width="24px">
                     {idx + 1}.
                   </Typography>
 
@@ -228,13 +227,14 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props, Sta
                   '&:hover': { border: 0 },
                   '&.Mui-disabled': { border: 0 },
                 }}
+                id="clearAllButton"
               >
                 {intl.formatMessage(messages.clearAll)}
               </Button>
             </Fade>
 
             <Fade in={!isValidPhrase && allWordsEntered}>
-              <Typography variant="body2" color="#FF1351">
+              <Typography component="div" variant="body2" color="#FF1351" id="mnemonicErrorText">
                 {mnemonicError}
               </Typography>
             </Fade>
@@ -244,7 +244,7 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props, Sta
         <Fade in={isValidPhrase}>
           <Stack gap="10px" direction="row" mt="12px" alignItems="center">
             <VerifiedIcon />
-            <Typography variant="body1" fontWeight={500} id="validPhraseMessage">
+            <Typography component="div" variant="body1" fontWeight={500} id="validPhraseMessage">
               {intl.formatMessage(messages.verified)}
             </Typography>
           </Stack>

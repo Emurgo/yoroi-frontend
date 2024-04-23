@@ -78,13 +78,13 @@ export default class EpochProgress extends Component<Props> {
         </div>
         <div className={styles.stats}>
           <div>
-            <p className={classnames(styles.label, styles.dashed)}>
+            <div className={classnames(styles.label, styles.dashed)}>
               {intl.formatMessage(globalMessages.epochLabel)}:
-            </p>
-            <p className={styles.value}>{currentEpoch}</p>
+            </div>
+            <div className={styles.value}>{currentEpoch}</div>
           </div>
           <div className={styles.row}>
-            <p className={styles.label}>{intl.formatMessage(messages.endTitle)}:</p>
+            <div className={styles.label}>{intl.formatMessage(messages.endTitle)}:</div>
             <div className={styles.value}>
               <div className={styles.timer}><Timer time={endTime} /></div>
               {this.props.showTooltip === true && (

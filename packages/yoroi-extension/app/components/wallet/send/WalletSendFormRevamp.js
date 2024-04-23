@@ -2,8 +2,8 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { reaction } from 'mobx';
-import { Button, Typography, TextField as MemoTextField, Box } from '@mui/material';
+import { action, reaction } from 'mobx';
+import { Button, Typography, TextField as MemoTextField, Box, styled } from '@mui/material';
 import TextField from '../../common/TextField';
 import { defineMessages, intlShape } from 'react-intl';
 import { isValidMemoOptional } from '../../../utils/validations';
@@ -22,11 +22,13 @@ import type { TokenRow, NetworkRow } from '../../../api/ada/lib/storage/database
 import {
   formattedAmountToBigNumber,
   formattedAmountToNaturalUnits,
+  truncateAddressShort,
   truncateToken,
 } from '../../../utils/formatters';
 import config from '../../../config';
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import {
   getTokenName,
   genFormatTokenAmount,
@@ -39,7 +41,6 @@ import BigNumber from 'bignumber.js';
 import classnames from 'classnames';
 import SendFormHeader from './SendFormHeader';
 import { SEND_FORM_STEP } from '../../../types/WalletSendTypes';
-import { isErgo } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { ReactComponent as PlusIcon } from '../../../assets/images/plus.inline.svg';
 import AddNFTDialog from './WalletSendFormSteps/AddNFTDialog';
 import AddTokenDialog from './WalletSendFormSteps/AddTokenDialog';
@@ -50,6 +51,17 @@ import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType'
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import { CannotSendBelowMinimumValueError } from '../../../api/common/errors';
 import { getImageFromTokenMetadata } from '../../../utils/nftMetadata';
+import WalletSendPreviewStepContainer from './WalletSendFormSteps/WalletSendPreviewStepContainer';
+import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
+import { ampli } from '../../../../ampli/index';
+import type { DomainResolverFunc, DomainResolverResponse } from '../../../stores/ada/AdaAddressesStore';
+import { isResolvableDomain } from '@yoroi/resolver';
+import SupportedAddressDomainsBanner from '../../../containers/wallet/SupportedAddressDomainsBanner';
+import TrezorSendActions from '../../../actions/ada/trezor-send-actions';
+import LedgerSendActions from '../../../actions/ada/ledger-send-actions';
+import type { SendMoneyRequest } from '../../../stores/toplevel/WalletStore';
+import type { MaxSendableAmountRequest } from '../../../stores/toplevel/TransactionBuilderStore';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -59,6 +71,38 @@ const messages = defineMessages({
   receiverHint: {
     id: 'wallet.send.form.receiver.hint',
     defaultMessage: '!!!Wallet Address',
+  },
+  receiverFieldLabelDefault: {
+    id: 'wallet.send.form.receiver.label.inactive',
+    defaultMessage: '!!!Receiver address',
+  },
+  receiverFieldLabelResolverSupported: {
+    id: 'wallet.send.form.receiver.label.resolverSupported',
+    defaultMessage: '!!!Receiver address, ADA Handle, or domains',
+  },
+  receiverFieldLabelUnresolvedAddress: {
+    id: 'wallet.send.form.receiver.label.unresolvedAddress',
+    defaultMessage: '!!!Receiver address, ADA Handle or domain you entered doesn\'t exist. Please double-check it and try again',
+  },
+  receiverFieldLabelForbiddenAccess: {
+    id: 'wallet.send.form.receiver.label.forbiddenAccess',
+    defaultMessage: '!!!access forbidden, you might need a VPN',
+  },
+  receiverFieldLabelUnexpectedError: {
+    id: 'wallet.send.form.receiver.label.unexpectedError',
+    defaultMessage: '!!!unexpected error',
+  },
+  receiverFieldLabelInvalidAddress: {
+    id: 'wallet.send.form.receiver.label.invalidAddress',
+    defaultMessage: '!!!Please enter a valid receiver address, ADA Handle or domain',
+  },
+  receiverFieldLabelResolvedAddress: {
+    id: 'wallet.send.form.receiver.label.resolvedAddress',
+    defaultMessage: '!!!Related address',
+  },
+  memoFieldLabelInactive: {
+    id: 'wallet.send.form.memo.label.inactive',
+    defaultMessage: '!!!Enter memo',
   },
   dropdownAmountLabel: {
     id: 'wallet.send.form.sendAll.dropdownAmountLabel',
@@ -85,8 +129,8 @@ const messages = defineMessages({
     defaultMessage: '!!!Calculating the fee, please wait.',
   },
   memoInvalidOptional: {
-    id: 'wallet.transaction.memo.optional.invalid',
-    defaultMessage: '!!!Memo cannot be more than {maxMemo} characters.',
+    id: 'wallet.revamp.transaction.memo.optional.invalid',
+    defaultMessage: '!!!Memo name is too long',
   },
   willSendAll: {
     id: 'wallet.send.form.willSendAll',
@@ -110,16 +154,24 @@ const messages = defineMessages({
   },
   minimumRequiredADA: {
     id: 'wallet.send.form.amount.minimumRequiredADA',
-    defaultMessage: '!!!The minimum required is {number} ADA',
+    defaultMessage: '!!!Minimum required is {number} ADA',
   },
 });
 
+// <TODO:REORGANISE> too many props
 type Props = {|
+  +resolveDomainAddress: ?DomainResolverFunc,
+  +supportedAddressDomainBannerState: {|
+    isDisplayed: boolean,
+    onClose: () => void,
+  |},
   +selectedNetwork: $ReadOnly<NetworkRow>,
+  +selectedWallet: PublicDeriver<>,
+  +selectedExplorer: Map<number, SelectedExplorer>,
   +hasAnyPending: boolean,
   +onSubmit: void => void,
   +totalInput: ?MultiToken,
-  +classicTheme: boolean,
+  +isClassicTheme: boolean,
   +updateReceiver: (void | string) => void,
   +updateAmount: (?BigNumber) => void,
   +updateMemo: (void | string) => void,
@@ -131,18 +183,19 @@ type Props = {|
   +error: ?LocalizableError,
   +uriParams: ?UriParams,
   +resetUriParams: void => void,
+  +memo: void | string,
   +showMemo: boolean,
   +onAddMemo: void => void,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +defaultToken: $ReadOnly<TokenRow>, // need since no guarantee input in non-null
   +onAddToken: ({|
     token?: $ReadOnly<TokenRow>,
+    shouldSendAll?: boolean,
     shouldReset?: boolean,
   |}) => void,
   +onRemoveTokens: (Array<$ReadOnly<TokenRow>>) => void,
   +spendableBalance: ?MultiToken,
   +selectedToken: void | $ReadOnly<TokenRow>,
-  +previewStep: () => Node,
   +openDialog: any => void,
   +plannedTxInfoMap: Array<{|
     token: $ReadOnly<TokenRow>,
@@ -155,31 +208,54 @@ type Props = {|
   +closeDialog: void => void,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?string,
-  +maxSendableAmount: {|
-    error: ?LocalizableError,
-    isExecuting: boolean,
-    result: ?BigNumber,
-  |},
+  +maxSendableAmount: MaxSendableAmountRequest,
   +calculateMaxAmount: void => Promise<void>,
+  +signRequest: null | ISignRequest<any>,
+  +staleTx: boolean,
+  +openTransactionSuccessDialog: void => void,
+  +sendMoneyRequest: SendMoneyRequest,
+  +sendMoney: (params: {|
+    password: string,
+    publicDeriver: PublicDeriver<>,
+    signRequest: ISignRequest<any>,
+    onSuccess?: void => void,
+  |}) => Promise<void>,
+  +ledgerSendError: null | LocalizableError,
+  +trezorSendError: null | LocalizableError,
+  +ledgerSend: LedgerSendActions,
+  +trezorSend: TrezorSendActions,
 |};
 
 type State = {|
-  showMemoWarning: boolean,
-  invalidMemo: boolean,
   currentStep: number,
+  invalidMemo: boolean,
+  isMemoFieldActive: boolean,
+  domainResolverResult: ?{|
+    nameServer: string,
+    handle: string,
+    address: string,
+  |},
+  domainResolverMessage: ?string,
+  domainResolverIsLoading: boolean,
 |};
 
 @observer
-export default class WalletSendForm extends Component<Props, State> {
+export default class WalletSendFormRevamp extends Component<Props, State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   state: State = {
-    showMemoWarning: false,
     invalidMemo: false,
     currentStep: SEND_FORM_STEP.RECEIVER,
+    isMemoFieldActive: false,
+    domainResolverResult: null,
+    domainResolverMessage: null,
+    domainResolverIsLoading: false,
   };
+  maxStep: number = SEND_FORM_STEP.RECEIVER;
+
+  bodyRef: any | null = null;
 
   amountFieldReactionDisposer: null | (() => mixed) = null;
 
@@ -245,21 +321,74 @@ export default class WalletSendForm extends Component<Props, State> {
     }
   }
 
+  @action async resolveDomainAddress(handle: string): Promise<{|
+    isDomainResolvable: boolean,
+    domainResolverMessage: ?string,
+    resolvedAddress: ?string,
+  |}> {
+    let isDomainResolvable = false;
+    let domainResolverMessage = null;
+    let resolvedAddress = null;
+    const { resolveDomainAddress } = this.props;
+    if (resolveDomainAddress != null) {
+      isDomainResolvable = isResolvableDomain(handle);
+      let domainResolverResult = null;
+      if (isDomainResolvable) {
+        this.setState({ domainResolverIsLoading: true });
+        const res: ?DomainResolverResponse = await resolveDomainAddress(handle);
+        if (res == null) {
+          domainResolverMessage = this.context.intl
+            .formatMessage(messages.receiverFieldLabelUnresolvedAddress);
+        } else if (res.address != null) {
+          resolvedAddress = res.address;
+          domainResolverResult = {
+            handle,
+            address: res.address,
+            nameServer: res.nameServer,
+          };
+        } else if (res.error === 'forbidden') {
+          domainResolverMessage = `${res.nameServer}: ${
+            this.context.intl.formatMessage(messages.receiverFieldLabelForbiddenAccess)
+          }`;
+        } else {
+          domainResolverMessage = `${res.nameServer}: ${
+            this.context.intl.formatMessage(messages.receiverFieldLabelUnexpectedError)
+          }`;
+        }
+      }
+      this.setState({
+        domainResolverResult,
+        domainResolverMessage,
+        domainResolverIsLoading: false
+      });
+    }
+    return {
+      isDomainResolvable,
+      domainResolverMessage,
+      resolvedAddress,
+    }
+  }
+
   // FORM VALIDATION
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
       fields: {
         receiver: {
-          label: this.context.intl.formatMessage(messages.receiverLabel),
-          placeholder: this.props.classicTheme
+          label: this.context.intl.formatMessage(messages.receiverFieldLabelDefault),
+          placeholder: this.props.isClassicTheme
             ? this.context.intl.formatMessage(messages.receiverHint)
             : '',
           value: this.props.uriParams ? this.props.uriParams.address : '',
           validators: [
-            ({ field }) => {
-              const receiverValue = field.value;
+            async ({ field }) => {
+              let receiverValue = field.value;
               if (receiverValue === '') {
                 this.props.updateReceiver();
+                this.setState({
+                  domainResolverResult: null,
+                  domainResolverMessage: null,
+                  domainResolverIsLoading: false
+                });
                 return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
               }
               const updateReceiver = (isValid: boolean) => {
@@ -272,19 +401,37 @@ export default class WalletSendForm extends Component<Props, State> {
                 }
               };
 
+              // DOMAIN RESOLVER
+              const {
+                isDomainResolvable,
+                domainResolverMessage,
+                resolvedAddress,
+              } = await this.resolveDomainAddress(receiverValue);
+              if (resolvedAddress != null) {
+                receiverValue = resolvedAddress;
+              }
+              ////////////////////
+
               const isValid = isValidReceiveAddress(receiverValue, this.props.selectedNetwork);
               if (isValid === true) {
                 updateReceiver(true);
                 return [isValid];
               }
-              updateReceiver(isValid[0]);
-              return [isValid[0], this.context.intl.formatMessage(isValid[1])];
+              const [result, errorMessage, errorType] = isValid;
+              updateReceiver(result);
+              const fieldError = isDomainResolvable
+                ? domainResolverMessage
+                : this.context.intl.formatMessage(errorType === 1
+                  ? messages.receiverFieldLabelInvalidAddress
+                  : errorMessage
+                );
+              return [isValid[0], fieldError];
             },
           ],
         },
         amount: {
           label: this.context.intl.formatMessage(globalMessages.amountLabel),
-          placeholder: this.props.classicTheme ? `0.${'0'.repeat(this.getNumDecimals())}` : '',
+          placeholder: this.props.isClassicTheme ? `0.${'0'.repeat(this.getNumDecimals())}` : '',
           value: (() => {
             const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
             return this.props.uriParams
@@ -325,7 +472,7 @@ export default class WalletSendForm extends Component<Props, State> {
         showErrorsOnInit: this.props.uriParams,
         validateOnBlur: false,
         validateOnChange: true,
-        validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
+        validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT_LONGER,
       },
       plugins: {
         vjf: vjf(),
@@ -340,6 +487,10 @@ export default class WalletSendForm extends Component<Props, State> {
     });
     return info.Metadata.numberOfDecimals;
   }
+
+  setMemoFieldStatus: boolean => void = isMemoFieldActive => {
+    this.setState({ isMemoFieldActive });
+  };
 
   getTokensAndNFTs: MultiToken => [
     FormattedTokenDisplay[],
@@ -363,7 +514,7 @@ export default class WalletSendForm extends Component<Props, State> {
 
         return {
           label: truncateToken(
-            getTokenStrictName(token) ?? getTokenIdentifierIfExists(token) ?? '-'
+            getTokenStrictName(token).name ?? getTokenIdentifierIfExists(token) ?? '-'
           ),
           amount: formattedAmount,
           info: token,
@@ -374,12 +525,14 @@ export default class WalletSendForm extends Component<Props, State> {
     const nfts = plannedTxInfoMap
       .filter(({ token }) => token.IsNFT === true)
       .map(({ token }) => {
-        const policyId = token.Identifier.split('.')[0];
-        const fullName = getTokenStrictName(token);
+        const split = token.Identifier.split('.');
+        const policyId = split[0];
+        const hexName = split[1] ?? '';
+        const fullName = getTokenStrictName(token).name;
         const name = truncateToken(fullName ?? '-');
         return {
           name,
-          image: getImageFromTokenMetadata(policyId, fullName, token.Metadata),
+          image: getImageFromTokenMetadata(policyId, hexName, token.Metadata),
           info: token,
         };
       });
@@ -409,7 +562,7 @@ export default class WalletSendForm extends Component<Props, State> {
   renderCurrentStep(step: number): Node {
     const { form } = this;
     const { intl } = this.context;
-    const { showMemoWarning, invalidMemo } = this.state;
+    const { invalidMemo } = this.state;
     const {
       shouldSendAll,
       isCalculatingFee,
@@ -417,6 +570,7 @@ export default class WalletSendForm extends Component<Props, State> {
       isDefaultIncluded,
       maxSendableAmount,
       spendableBalance,
+      memo,
     } = this.props;
 
     const amountField = form.$('amount');
@@ -459,75 +613,155 @@ export default class WalletSendForm extends Component<Props, State> {
       networkId: this.props.defaultToken.NetworkId,
     });
 
+    const showFiat =
+      this.props.unitOfAccountSetting.enabled && this.props.unitOfAccountSetting.currency;
+
+    const domainResolverResult = this.state.domainResolverResult;
+    const domainResolverSupported = this.props.resolveDomainAddress != null;
     switch (step) {
       case SEND_FORM_STEP.RECEIVER:
         return (
           <div className={styles.receiverStep}>
-            <div className={styles.receiverInput}>
+            {(domainResolverSupported && this.props.supportedAddressDomainBannerState.isDisplayed) ? (
+              <Box pb="10px">
+                <SupportedAddressDomainsBanner
+                  onClose={this.props.supportedAddressDomainBannerState.onClose}
+                />
+              </Box>
+            ) : null}
+            <Box sx={{ position: 'relative' }}>
               <TextField
+                greenCheck={domainResolverResult != null}
+                isLoading={this.state.domainResolverIsLoading}
                 className="send_form_receiver"
                 {...receiverField.bind()}
                 error={receiverField.error}
-                done={receiverField.isValid}
+                helperText={domainResolverResult?.nameServer ?? this.state.domainResolverMessage}
+                label={
+                  domainResolverSupported
+                    ? intl.formatMessage(messages.receiverFieldLabelResolverSupported)
+                    : intl.formatMessage(messages.receiverFieldLabelDefault)
+                }
               />
-            </div>
-            <MemoTextField
-              label={intl.formatMessage(memoMessages.addMemo)}
-              onChange={e => this.onUpdateMemo(e.target.value)}
-              onFocus={() => this.setState({ showMemoWarning: true })}
-              onBlur={() => this.setState({ showMemoWarning: false })}
-              helperText={
-                invalidMemo
-                  ? intl.formatMessage(messages.memoInvalidOptional, { maxMemo: MAX_MEMO_SIZE })
-                  : showMemoWarning && intl.formatMessage(memoMessages.memoWarning)
-              }
-              error={invalidMemo}
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              size="large"
-              onClick={() => this.onUpdateStep(SEND_FORM_STEP.AMOUNT)}
-              disabled={invalidMemo || !receiverField.isValid}
-              sx={{
-                display: 'block',
-                margin: '125px 0px 0px 0px',
-                width: '173px',
-              }}
-            >
-              {intl.formatMessage(globalMessages.nextButtonLabel)}
-            </Button>
+              {domainResolverResult != null ? (
+                <Typography component="div"
+                  variant="caption1"
+                  color={invalidMemo ? 'magenta.500' : 'grayscale.600'}
+                  sx={{ position: 'absolute', bottom: '10px', right: '0' }}
+                >
+                  {intl.formatMessage(messages.receiverFieldLabelResolvedAddress)}:&nbsp;
+                  {truncateAddressShort(domainResolverResult.address)}
+                </Typography>
+              ) : null}
+            </Box>
+            <Box sx={{ position: 'relative', mt: '8px' }}>
+              <MemoTextField
+                onChange={e => this.onUpdateMemo(e.target.value)}
+                helperText={
+                  invalidMemo
+                    ? intl.formatMessage(messages.memoInvalidOptional, { maxMemo: MAX_MEMO_SIZE })
+                    : intl.formatMessage(memoMessages.memoWarning)
+                }
+                error={invalidMemo}
+                onFocus={() => {
+                  this.setMemoFieldStatus(true);
+                }}
+                onBlur={() => {
+                  if (!memo || memo.length === 0) this.setMemoFieldStatus(false);
+                }}
+                label={
+                  this.state.isMemoFieldActive
+                    ? intl.formatMessage(memoMessages.memoLabel)
+                    : intl.formatMessage(messages.memoFieldLabelInactive)
+                }
+              />
+              <Typography component="div"
+                variant="caption1"
+                color={invalidMemo ? 'magenta.500' : 'grayscale.600'}
+                sx={{ position: 'absolute', bottom: '5px', right: '0' }}
+              >
+                {memo ? memo.length : 0}/{MAX_MEMO_SIZE}
+              </Typography>
+            </Box>
           </div>
         );
       case SEND_FORM_STEP.AMOUNT:
         return (
-          <div className={styles.amountStep}>
+          <Box className={styles.amountStep}>
             {isCalculatingFee && (
-              <p className={styles.calculatingFee}>{intl.formatMessage(messages.calculatingFee)}</p>
+              <Typography component="div"
+                variant="caption1"
+                sx={{
+                  position: 'absolute',
+                  color: 'grey.600',
+                  left: '50%',
+                  top: '-14px',
+                  transform: 'translateX(-50%)',
+                }}
+              >
+                {intl.formatMessage(messages.calculatingFee)}
+              </Typography>
             )}
 
-            {!isDefaultIncluded && <p className={styles.sendError}>{transactionFeeError}</p>}
-            <div
-              className={classnames([
-                styles.amountInput,
-                amountInputError && isDefaultIncluded && styles.amountInputError,
-                shouldSendAll && styles.disabled,
-              ])}
+            {!isDefaultIncluded && (
+              <Typography component="div"
+                variant="caption1"
+                sx={{
+                  position: 'absolute',
+                  color: 'magenta.500',
+                  left: '50%',
+                  top: '-14px',
+                  transform: 'translateX(-50%)',
+                }}
+              >
+                {transactionFeeError}
+              </Typography>
+            )}
+            <Box
+              sx={{
+                position: 'relative',
+                padding: '16px 0px',
+                borderRadius: '8px',
+                ...(amountInputError && isDefaultIncluded
+                  ? {
+                      borderWidth: '2px',
+                      borderStyle: 'solid',
+                      borderColor: 'magenta.500',
+                    }
+                  : {
+                      borderWidth: '1px',
+                      borderStyle: 'solid',
+                      borderColor: 'grey.400',
+                    }),
+              }}
             >
-              <Typography
+              <Typography component="div"
                 sx={{
                   position: 'absolute',
                   top: '-8px',
                   left: '6px',
-                  backgroundColor: 'var(--yoroi-palette-common-white)',
+                  backgroundColor: 'common.white',
                   paddingX: '4px',
-                  color: shouldSendAll && 'var(--yoroi-comp-input-text-disabled)',
+                  color: shouldSendAll && 'grayscale.200',
                 }}
                 variant="caption2"
               >
                 {intl.formatMessage(globalMessages.amountLabel)}
               </Typography>
-              <div className={styles.amountInputGrid}>
+              <Box
+                sx={{
+                  margin: '0px 16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  '& input': {
+                    padding: '0px',
+                    '&:disabled': {
+                      cursor: 'not-allowed',
+                    },
+                  },
+                }}
+              >
                 <AmountInputRevamp
                   {...amountFieldProps}
                   value={
@@ -540,6 +774,7 @@ export default class WalletSendForm extends Component<Props, State> {
                   decimalPlaces={this.getNumDecimals()}
                   disabled={shouldSendAll}
                   error={amountInputError}
+                  helperText=""
                   currency={truncateToken(getTokenName(this.props.defaultToken))}
                   fees={formatValue(transactionFee.getDefaultEntry())}
                   total={formatValue(totalAmount.getDefaultEntry())}
@@ -554,23 +789,28 @@ export default class WalletSendForm extends Component<Props, State> {
                     if (!amountField.value) this.props.onRemoveTokens([defaultTokenInfo]);
                   }}
                   amountFieldRevamp
-                  placeholder="0.0"
+                  placeholder="0"
                 />
-                <p className={styles.defaultCoin}>
-                  {isErgo(this.props.selectedNetwork) ? 'ERG' : 'ADA'}
-                </p>
-                {!isErgo(this.props.selectedNetwork) && (
-                  <Button
-                    variant="ternary"
-                    sx={{
-                      width: '51px',
+
+                <Typography component="div" variant="button2" color="grey.600" fontWeight={500} mr="12px">
+                  ADA
+                </Typography>
+
+                <Button
+                  variant="tertiary"
+                  color="secondary"
+                  size="small"
+                  sx={{
+                      '&.MuiButton-sizeSmall': {
+                        lineHeight: '17px',
+                      },
                     }}
-                    disabled={maxSendableAmount.isExecuting}
-                    className={classnames([
+                  disabled={maxSendableAmount.isExecuting}
+                  className={classnames([
                       styles.maxBtn,
                       maxSendableAmount.isExecuting && styles.maxButtonSpinning,
                     ])}
-                    onClick={() => {
+                  onClick={() => {
                       const hasTokens =
                         spendableBalance && spendableBalance.nonDefaultEntries().length !== 0;
                       if (hasTokens || !spendableBalance) {
@@ -588,95 +828,230 @@ export default class WalletSendForm extends Component<Props, State> {
                         this.props.updateSendAllStatus(true);
                       }
                     }}
-                  >
-                    {intl.formatMessage(messages.max)}
-                  </Button>
-                )}
-              </div>
-              {this.props.unitOfAccountSetting.enabled &&
-                this.props.unitOfAccountSetting.currency && (
-                  <div className={styles.fiat}>
-                    {this.renderUnitOfAccountAmount(amountFieldProps.value)}
-                  </div>
-                )}
-              {isDefaultIncluded && <p className={styles.amountError}>{amountInputError}</p>}
-            </div>
+                >
+                  {intl.formatMessage(messages.max)}
+                </Button>
+              </Box>
+              {showFiat && (
+                <Box
+                  sx={{
+                    margin: '16px 16px 0px 16px',
+                    pt: '16px',
+                    color: 'grayscale.600',
+                    fontSize: '16px',
+                    letterSpacing: 0,
+                    borderTop: '1px solid var(--yoroi-comp-input-text-disabled)',
+                  }}
+                >
+                  {this.renderUnitOfAccountAmount(amountFieldProps.value)}
+                </Box>
+              )}
+              {isDefaultIncluded && (
+                <Typography component="div"
+                  sx={{
+                    position: 'absolute',
+                    bottom: '-25px',
+                    left: '17px',
+                    color: 'magenta.500',
+                    fontSize: '12px',
+                  }}
+                >
+                  {amountInputError}
+                </Typography>
+              )}
+            </Box>
 
-            <IncludedTokens
-              tokens={tokens}
-              nfts={nfts}
-              onRemoveTokens={this.props.onRemoveTokens}
-              shouldSendAll={shouldSendAll}
-            />
-
-            <div className={styles.addButtonsWrapper}>
+            <Box
+              sx={{
+                mt: '42px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+              }}
+            >
               <Button
-                variant="ternary"
-                sx={{
-                  marginRight: '16px',
-                }}
+                variant="tertiary"
+                color="primary"
+                sx={{ marginRight: '16px' }}
                 onClick={() => this.props.openDialog(AddTokenDialog)}
                 disabled={this.props.shouldSendAll}
                 startIcon={<PlusIcon />}
               >
-                {intl.formatMessage(globalMessages.token)}
+                {intl.formatMessage(globalMessages.addToken)}
               </Button>
               <Button
-                variant="ternary"
+                variant="tertiary"
+                color="primary"
                 onClick={() => this.props.openDialog(AddNFTDialog)}
                 disabled={this.props.shouldSendAll}
                 startIcon={<PlusIcon />}
               >
-                {intl.formatMessage(globalMessages.nfts)}
-              </Button>
-            </div>
-
-            <Box sx={{ marginTop: '60px' }}>
-              <Button
-                variant="contained"
-                color="primary"
-                size="large"
-                onClick={() => {
-                  this.props.onSubmit();
-                  this.onUpdateStep(SEND_FORM_STEP.PREVIEW);
-                }}
-                disabled={
-                  !this.props.fee ||
-                  this.props.hasAnyPending ||
-                  invalidMemo ||
-                  maxSendableAmount.isExecuting
-                }
-                sx={{ width: '173px' }}
-              >
-                {intl.formatMessage(globalMessages.nextButtonLabel)}
+                {intl.formatMessage(globalMessages.addNft)}
               </Button>
             </Box>
-          </div>
+
+            <IncludedTokens
+              tokens={tokens}
+              nfts={nfts}
+              onRemoveTokens={tokensRemove => {
+                const assetCount = totalAmount.nonDefaultEntries().length - 1;
+                this.props.onRemoveTokens(tokensRemove);
+                ampli.sendSelectAssetUpdated({
+                  asset_count: assetCount,
+                });
+              }}
+              shouldSendAll={shouldSendAll}
+            />
+          </Box>
         );
       case SEND_FORM_STEP.PREVIEW:
-        return this.props.previewStep();
+        return (
+          <WalletSendPreviewStepContainer
+            signRequest={this.props.signRequest}
+            staleTx={this.props.staleTx}
+            isDefaultIncluded={this.props.isDefaultIncluded}
+            unitOfAccountSetting={this.props.unitOfAccountSetting}
+            openTransactionSuccessDialog={this.props.openTransactionSuccessDialog}
+            minAda={this.props.minAda}
+            plannedTxInfoMap={this.props.plannedTxInfoMap}
+            onUpdateStep={this.onUpdateStep.bind(this)}
+            sendMoneyRequest={this.props.sendMoneyRequest}
+            sendMoney={this.props.sendMoney}
+            getTokenInfo={this.props.getTokenInfo}
+            getCurrentPrice={this.props.getCurrentPrice}
+            isClassicTheme={this.props.isClassicTheme}
+            ledgerSendError={this.props.ledgerSendError}
+            trezorSendError={this.props.ledgerSendError}
+            ledgerSend={this.props.ledgerSend}
+            trezorSend={this.props.trezorSend}
+            selectedExplorer={this.props.selectedExplorer}
+            selectedWallet={this.props.selectedWallet}
+            receiverHandle={domainResolverResult ? {
+              nameServer: domainResolverResult.nameServer,
+              handle: domainResolverResult.handle,
+            } : null}
+          />
+        );
       default:
         throw Error(`${step} is not a valid step`);
     }
   }
 
+  renderCurrentFooter(step: number): Node {
+    const { form } = this;
+    const { intl } = this.context;
+    const { invalidMemo } = this.state;
+    const { maxSendableAmount } = this.props;
+
+    const receiverField = form.$('receiver');
+
+    switch (step) {
+      case SEND_FORM_STEP.RECEIVER:
+        return (
+          <ActionButton
+            key="receiver-next"
+            variant="primary"
+            size="medium"
+            onClick={() => this.onUpdateStep(SEND_FORM_STEP.AMOUNT)}
+            disabled={invalidMemo || !receiverField.isValid}
+          >
+            {intl.formatMessage(globalMessages.nextButtonLabel)}
+          </ActionButton>
+        );
+      case SEND_FORM_STEP.AMOUNT:
+        return (
+          <>
+            <ActionButton
+              key="amount-back"
+              variant="secondary"
+              size="medium"
+              onClick={() => this.onUpdateStep(SEND_FORM_STEP.RECEIVER)}
+            >
+              {intl.formatMessage(globalMessages.backButtonLabel)}
+            </ActionButton>
+            <ActionButton
+              key="amount-next"
+              variant="primary"
+              size="medium"
+              onClick={() => {
+                this.props.onSubmit();
+                this.onUpdateStep(SEND_FORM_STEP.PREVIEW);
+              }}
+              disabled={
+                !this.props.fee ||
+                this.props.hasAnyPending ||
+                invalidMemo ||
+                maxSendableAmount.isExecuting
+              }
+            >
+              {intl.formatMessage(globalMessages.nextButtonLabel)}
+            </ActionButton>
+          </>
+        );
+      default:
+        return null;
+    }
+  }
+
   render(): Node {
     const { currentStep } = this.state;
+    const { bodyRef } = this;
     return (
       <>
         <div className={styles.component}>
-          <div className={styles.wrapper}>
+          <Box className={styles.wrapper} sx={{ bgcolor: 'common.white', height: '100%' }}>
             <SendFormHeader step={currentStep} onUpdateStep={this.onUpdateStep.bind(this)} />
-            <div className={styles.formBody}>{this.renderCurrentStep(currentStep)}</div>
-          </div>
+            <Box
+              ref={ref => {
+                this.bodyRef = ref;
+              }}
+              className={styles.formBody}
+            >
+              {this.renderCurrentStep(currentStep)}
+            </Box>
+            {currentStep !== SEND_FORM_STEP.PREVIEW && (
+              <Box
+                borderTop={
+                  bodyRef && bodyRef.scrollHeight > bodyRef.clientHeight ? '1px solid' : '0'
+                }
+                borderColor="grayscale.200"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                gap="24px"
+                p="24px"
+                mx="-24px"
+                mt="30px"
+              >
+                {this.renderCurrentFooter(currentStep)}
+              </Box>
+            )}
+          </Box>
         </div>
       </>
     );
   }
 
-  onUpdateStep(step: number) {
+  onUpdateStep(step: number): void {
     if (step > 3) throw new Error('Invalid Step number.');
     this.setState({ currentStep: step });
+    if (step > this.maxStep) {
+      this.maxStep = step;
+      if (step === SEND_FORM_STEP.AMOUNT) {
+        ampli.sendSelectAssetPageViewed();
+      } else if (step === SEND_FORM_STEP.PREVIEW) {
+        const { totalInput } = this.props;
+        if (totalInput == null) {
+          throw new Error('expect totalInput');
+        }
+        ampli.sendSelectAssetSelected({
+          asset_count: totalInput.nonDefaultEntries().length,
+        });
+        ampli.sendSummaryPageViewed({
+          asset_count: totalInput.nonDefaultEntries().length,
+        });
+      }
+    }
   }
 
   onUpdateMemo(memo: string) {
@@ -717,3 +1092,10 @@ export default class WalletSendForm extends Component<Props, State> {
     return `${convertedAmount} ${currency}`;
   }
 }
+
+const ActionButton: any = styled(Button)(() => ({
+  minWidth: '128px',
+  '&.MuiButton-sizeMedium': {
+    padding: '13px 24px',
+  },
+}));

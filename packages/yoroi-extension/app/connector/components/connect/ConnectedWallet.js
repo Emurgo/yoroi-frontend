@@ -49,10 +49,17 @@ export default class WalletCard extends Component<Props> {
         <div className={styles.wrapper}>
           <div className={styles.avatar}>{iconComponent}</div>
           <div className={styles.nameWrapper}>
-            <Typography color="#242838" fontWeight="500" variant="b1" fontSize={16}>
+            <Typography
+              component="div"
+              color="#242838"
+              fontWeight="500"
+              variant="b1"
+              fontSize={16}
+              id="connectedWalletName"
+            >
               {this.props.publicDeriver.name}
             </Typography>
-            <div className={styles.checksum}>{checksum}</div>
+            <div className={styles.checksum} id="connectedWalletPlate">{checksum}</div>
           </div>
           {walletBalance != null && <Box sx={{ ml: 'auto' }}>{walletBalance}</Box>}
         </div>

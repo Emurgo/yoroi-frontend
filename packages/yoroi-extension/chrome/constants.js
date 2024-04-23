@@ -29,6 +29,17 @@ export function genCSP(request: {|
 
   // Analytics
   connectSrc.push('https://analytics.emurgo-rnd.com/');
+  connectSrc.push('https://api2.amplitude.com');
+  connectSrc.push('https://api.muesliswap.com');
+
+  // Resolver
+  connectSrc.push('https://api.handle.me/');
+  connectSrc.push('https://api.unstoppabledomains.com/');
+
+  // Pool info
+  connectSrc.push('https://a.cexplorer.io/');
+  imgSrc.push('https://img.cexplorer.io/');
+  imgSrc.push('https://corsproxy.io/');
 
   // unsafe-inline is unfortunately required by style-loader (even in production builds)
   const evalStyle = "'unsafe-inline'";
@@ -45,6 +56,5 @@ export function genCSP(request: {|
 
 export const injectedScripts = [
   'cardanoApiInject.js',
-  'ergoApiInject.js',
   'initialInject.js',
 ];

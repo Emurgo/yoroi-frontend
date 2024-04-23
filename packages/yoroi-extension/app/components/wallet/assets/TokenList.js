@@ -2,14 +2,13 @@
 import { useState, useEffect } from 'react';
 import type { ComponentType, Node } from 'react';
 import { observer } from 'mobx-react';
-import { injectIntl } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { ReactComponent as NoAssetLogo } from '../../../assets/images/assets-page/asset-no.inline.svg';
+import { ReactComponent as DefaultAssetLogo } from '../../../assets/images/assets-page/default-asset-logo.inline.svg';
 import { ReactComponent as ArrowsListFromBottom } from '../../../assets/images/assets-page/arrows-list-from-bottom.inline.svg';
 import { ReactComponent as ArrowsListFromTop } from '../../../assets/images/assets-page/arrows-list-from-top.inline.svg';
 import { ReactComponent as ArrowsList } from '../../../assets/images/assets-page/arrows-list.inline.svg';
 import { ReactComponent as Search } from '../../../assets/images/assets-page/search.inline.svg';
-import { ReactComponent as Info } from '../../../assets/images/assets-page/info.inline.svg';
 import { truncateAddressShort } from '../../../utils/formatters';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
@@ -18,7 +17,6 @@ import globalMessages from '../../../i18n/global-messages';
 import { hiddenAmount } from '../../../utils/strings';
 import { assetsMessage, compareNumbers, compareStrings } from './AssetsList';
 import {
-  Avatar,
   ButtonBase,
   Input,
   InputAdornment,
@@ -27,6 +25,7 @@ import {
   ListItemText,
   Stack,
   Typography,
+  useMediaQuery,
 } from '@mui/material';
 import { Box, styled } from '@mui/system';
 import { Link } from 'react-router-dom';
@@ -51,20 +50,30 @@ export type Asset = {|
   amount: string,
   amountForSorting?: BigNumber,
 |};
+
 type Props = {|
   +assetsList: Asset[],
   +assetDeposit: ?null | MultiToken,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +shouldHideBalance: boolean,
 |};
+
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
+
 type State = {|
   assetsList: Asset[],
   sortingDirection: null | 'UP' | 'DOWN',
   sortingColumn: string,
 |};
+
+const messages: Object = defineMessages({
+  search: {
+    id: 'wallet.revamp.assets.search',
+    defaultMessage: '!!!Search by asset name or ID',
+  },
+});
 
 function TokenList({ assetsList: list, shouldHideBalance, intl }: Props & Intl): Node {
   const [state, setState] = useState<State>({
@@ -77,7 +86,9 @@ function TokenList({ assetsList: list, shouldHideBalance, intl }: Props & Intl):
   useEffect(() => {
     const regExp = new RegExp(keyword, 'gi');
     const assetsListCopy = [...list];
-    const filteredAssetsList = assetsListCopy.filter(a => a.name.match(regExp));
+    const filteredAssetsList = assetsListCopy.filter(a =>
+      [a.name, a.id].some(field => field.match(regExp))
+    );
     setState(prev => ({ ...prev, assetsList: filteredAssetsList }));
   }, [keyword, list]);
 
@@ -125,23 +136,39 @@ function TokenList({ assetsList: list, shouldHideBalance, intl }: Props & Intl):
   const { assetsList } = state;
 
   return (
-    <Stack sx={{ minHeight: '500px' }}>
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        borderBottom="1px solid var(--yoroi-palette-gray-200)"
-        padding="16px 24px"
-      >
-        <Typography variant="h5" color="var(--yoroi-palette-gray-900)">
-          {intl.formatMessage(globalMessages.tokens)} ({list.length})
+    <Stack sx={{ minHeight: '500px' }} id="tokens-list">
+      <Box display="flex" justifyContent="space-between" alignItems="center" paddingBottom="8px">
+        <Typography component="div"
+          variant="h5"
+          color="var(--yoroi-palette-common-black)"
+          fontWeight={500}
+          fontSize="18px"
+        >
+          {intl.formatMessage(assetsMessage.assets, {
+            number: list.length,
+          })}
         </Typography>
         <SearchInput
           disableUnderline
           onChange={e => setKeyword(e.target.value)}
-          placeholder={intl.formatMessage(assetsMessage.search)}
+          placeholder={intl.formatMessage(messages.search)}
+          sx={{
+            bgcolor: 'common.white',
+            border: '1px solid',
+            borderColor: 'grayscale.400',
+            'input::placeholder': {
+              color: 'grayscale.600',
+            },
+          }}
           startAdornment={
-            <InputAdornment position="start">
+            <InputAdornment
+              sx={{
+                '> svg > use': {
+                  fill: 'grayscale.600',
+                },
+              }}
+              position="start"
+            >
               <Search />
             </InputAdornment>
           }
@@ -155,38 +182,47 @@ function TokenList({ assetsList: list, shouldHideBalance, intl }: Props & Intl):
       ) : (
         <>
           <List>
-            <ListItemLayout
-              firstColumn={
-                <ButtonBase disableRipple onClick={() => sortAssets(SORTING_COLUMNS.NAME)}>
-                  <Typography variant="body2" color="var(--yoroi-palette-gray-400)" mr="4px">
-                    {intl.formatMessage(assetsMessage.nameAndTicker)}
-                  </Typography>
-                  {displayColumnLogo(SORTING_COLUMNS.NAME)}
-                </ButtonBase>
-              }
-              secondColumn={
-                <Stack direction="row" alignItems="center" spacing="4px">
-                  <Typography variant="body2" color="var(--yoroi-palette-gray-400)">
-                    {intl.formatMessage(globalMessages.fingerprint)}
-                  </Typography>
-                  <Info />
-                </Stack>
-              }
-              thirdColumn={
-                <ButtonBase disableRipple onClick={() => sortAssets(SORTING_COLUMNS.AMOUNT)}>
-                  <Typography variant="body2" color="var(--yoroi-palette-gray-400)" mr="4px">
-                    {intl.formatMessage(assetsMessage.quantity)}
-                  </Typography>
-                  {displayColumnLogo(SORTING_COLUMNS.AMOUNT)}
-                </ButtonBase>
-              }
-            />
+            <Box sx={{ borderBottom: '1px solid', borderColor: 'grayscale.200', mt: '-8px' }}>
+              <ListItemLayout
+                firstColumn={
+                  <ButtonBase disableRipple onClick={() => sortAssets(SORTING_COLUMNS.NAME)}>
+                    <Typography component="div" variant="body2" color="grayscale.600" mr="4px">
+                      {intl.formatMessage(assetsMessage.nameAndTicker)}
+                    </Typography>
+                    {displayColumnLogo(SORTING_COLUMNS.NAME)}
+                  </ButtonBase>
+                }
+                secondColumn={
+                  <Stack direction="row" alignItems="center" spacing="4px">
+                    <Typography component="div" variant="body2" color="grayscale.600">
+                      {intl.formatMessage(globalMessages.fingerprint)}
+                    </Typography>
+                  </Stack>
+                }
+                thirdColumn={
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'flex-end',
+                    }}
+                  >
+                    <ButtonBase disableRipple onClick={() => sortAssets(SORTING_COLUMNS.AMOUNT)}>
+                      <Typography component="div" variant="body2" color="grayscale.600" mr="4px">
+                        {intl.formatMessage(assetsMessage.quantity)}
+                      </Typography>
+                      {displayColumnLogo(SORTING_COLUMNS.AMOUNT)}
+                    </ButtonBase>
+                  </Box>
+                }
+              />
+            </Box>
 
             {assetsList.map(token => (
               <TokenItemRow
                 key={token.id}
-                avatar={<NoAssetLogo />}
-                name={token.name}
+                avatar={<DefaultAssetLogo />}
+                name={token.name || '-'}
                 id={token.id}
                 amount={shouldHideBalance ? hiddenAmount : token.amount}
               />
@@ -226,7 +262,7 @@ function ListItemLayout({ firstColumn, secondColumn, thirdColumn }) {
     },
   ];
   return (
-    <ListItem sx={{ px: '32px' }}>
+    <ListItem sx={{ px: '0' }}>
       {layoutColumns.map(col => (
         <ListItemText
           key={col.id}
@@ -249,13 +285,14 @@ type TokenItemRowProps = {|
   isTotalAmount?: boolean,
 |};
 function TokenItemRow({ avatar, name, id, amount, isTotalAmount }: TokenItemRowProps): Node {
+  const below1200px = useMediaQuery('(max-width: 1200px)');
   return (
     <ListItemLayout
       firstColumn={
         <Box display="flex" alignItems="center">
-          <Avatar variant="round" sx={{ background: 'white', marginRight: '16px' }}>
+          <Box sx={{ mr: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {avatar}
-          </Avatar>
+          </Box>
           <Typography
             as={isTotalAmount !== false ? 'span' : Link}
             variant="body1"
@@ -267,18 +304,26 @@ function TokenItemRow({ avatar, name, id, amount, isTotalAmount }: TokenItemRowP
               width: '70%',
             }}
             color="primary.600"
-            to={id !== '-' && ROUTES.ASSETS.DETAILS.replace(':tokenId', id)}
+            to={id === '-' ? '#' :  ROUTES.ASSETS.DETAILS.replace(':tokenId', id)}
           >
             {name}
           </Typography>
         </Box>
       }
       secondColumn={
-        <Typography variant="body1" color="var(--yoroi-palette-gray-900)">
-          <CopyToClipboardText text={id}>{truncateAddressShort(id)}</CopyToClipboardText>
+        <Typography component="div" variant="body1" color="grayscale.900">
+          <Box sx={{ '> button': { px: '5px', py: '3px', borderRadius: '8px', ml: '-5px' } }}>
+            <CopyToClipboardText text={id}>
+              {below1200px ? truncateAddressShort(id) : id}
+            </CopyToClipboardText>
+          </Box>
         </Typography>
       }
-      thirdColumn={<Typography fontWeight="500">{amount}</Typography>}
+      thirdColumn={
+        <Typography component="div" fontWeight="500" textAlign="right">
+          {amount}
+        </Typography>
+      }
     />
   );
 }

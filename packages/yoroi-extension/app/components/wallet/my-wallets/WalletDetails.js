@@ -18,12 +18,7 @@ import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/
 type Props = {|
   +onUpdateHideBalance: void => Promise<void>,
   +shouldHideBalance: boolean,
-  /**
-   * undefined => wallet is not a reward wallet
-   * null => still calculating
-   * value => done calculating
-   */
-  +rewards?: null | void | MultiToken,
+  +rewards: ?MultiToken,
   +walletAmount: null | MultiToken,
   +infoText?: string,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
@@ -32,9 +27,8 @@ type Props = {|
 
 @observer
 export default class WalletDetails extends Component<Props> {
-  static defaultProps: {| infoText: void, rewards: null |} = {
+  static defaultProps: {| infoText: void |} = {
     infoText: undefined,
-    rewards: null,
   };
 
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {

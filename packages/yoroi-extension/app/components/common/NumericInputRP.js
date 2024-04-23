@@ -13,7 +13,6 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import TextField from './TextField';
 import { Box } from '@mui/system';
 import { Typography } from '@mui/material';
-import styles from './AmountInput.scss';
 
 type NumericInputValue = null | number | string | BigNumber;
 
@@ -483,27 +482,27 @@ class AmountInput extends Component<AmountInputProps> {
         <NumericInputRP {...this.props} />
         {/* Do not show fee in case of some error is showing */}
         {error == null || error === '' ? (
-          <Typography
+          <Typography component="div"
             sx={{
               position: 'absolute',
               bottom: '86px',
               right: '10px',
               fontWeight: 400,
               fontSize: '0.75rem',
-              color: 'var(--yoroi-comp-input-text)',
+              color: 'grayscale.900',
             }}
           >
             {intl.formatMessage(messages.feesLabel, { amount: fees })}
           </Typography>
         ) : null}
 
-        <Typography
+        <Typography component="div"
           variant="body3"
           sx={{
             position: 'absolute',
             bottom: '45px',
             right: error != null && error !== '' ? '45px' : '10px',
-            color: 'var(--yoroi-comp-input-text)',
+            color: 'grayscale.900',
             textTransform: 'uppercase',
           }}
         >
@@ -529,9 +528,25 @@ class AmountInputRevamp extends Component<AmountInputProps> {
     const { intl } = this.context;
 
     return (
-      <div className={styles.component}>
+      <Box
+        sx={{
+          width: '100%',
+          '& > div': {
+            padding: '0px',
+            margin: '0px',
+          },
+          '& input': {
+            border: 'none',
+            outline: 'none',
+            width: '100%',
+            fontSize: '24px',
+            lineHeight: '32px',
+          },
+          '& input::placeholder': { color: 'grayscale.600' },
+        }}
+      >
         <NumericInputRP {...this.props} />
-      </div>
+      </Box>
     );
   }
 }

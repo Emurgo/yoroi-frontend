@@ -10,6 +10,7 @@ import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { ComplexityLevels } from '../../types/complexityLevelType';
 import type { WalletsNavigation } from '../../api/localStorage'
+import { ampli } from '../../../ampli/index';
 
 export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap> {
   @observable __selectedNetwork: void | $ReadOnly<NetworkRow> = undefined;
@@ -22,7 +23,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
 
   /** Linear list of steps that need to be completed before app start */
   @observable
-  SETUP_STEPS: Array<{| isDone: void => boolean, action: void => Promise<void> |}> = [
+  SETUP_STEPS: Array<{| isDone: void => boolean | Promise<boolean>, action: void => Promise<void> |}> = [
     {
       isDone: () => this.isCurrentLocaleSet,
       action: async () => {
@@ -31,12 +32,24 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
           return;
         }
         this.actions.router.goToRoute.trigger({ route });
+        ampli.createWalletLanguagePageViewed();
       },
     },
     {
       isDone: () => this.areTermsOfUseAccepted,
       action: async () => {
         const route = ROUTES.PROFILE.TERMS_OF_USE;
+        if (this.stores.app.currentRoute === route) {
+          return;
+        }
+        this.actions.router.goToRoute.trigger({ route });
+        ampli.createWalletTermsPageViewed();
+      },
+    },
+    {
+      isDone: () => this.isAnalyticsOpted,
+      action: async () => {
+        const route = ROUTES.PROFILE.OPT_FOR_ANALYTICS;
         if (this.stores.app.currentRoute === route) {
           return;
         }
@@ -93,6 +106,15 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
             wallets.publicDerivers.length !== 0 ? wallets.publicDerivers[0] : null;
           if (firstWallet == null) {
             this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
+            return;
+          }
+          const isRevamp = this.stores.profile.isRevampTheme;
+          if (isRevamp) {
+            const lastSelectedWallet = this.stores.wallets.getLastSelectedWallet();
+            this.actions.router.goToRoute.trigger({
+              route: ROUTES.WALLETS.ROOT,
+              publicDeriver: lastSelectedWallet ?? firstWallet,
+            });
           } else if (wallets.publicDerivers.length === 1) {
             // if user only has 1 wallet, just go to it directly as a shortcut
             this.actions.router.goToRoute.trigger({
@@ -114,10 +136,6 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
       },
     },
   ];
-
-  @observable setTermsOfUseAcceptanceRequest: Request<(void) => Promise<void>> = new Request<
-    (void) => Promise<void>
-  >(this.api.localStorage.setTermsOfUseAcceptance);
 
   @observable getUriSchemeAcceptanceRequest: Request<(void) => Promise<boolean>> = new Request<
     (void) => Promise<boolean>
@@ -156,7 +174,6 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
       this._checkSetupSteps,
     ]);
     this.actions.profile.updateSortedWalletList.listen(this._updateSortedWalletList);
-    this._getTermsOfUseAcceptance(); // eagerly cache
     this._getUriSchemeAcceptance(); // eagerly cache
     this._getSortedWalletList()
   }
@@ -187,13 +204,6 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
   @computed get paperWalletsIntro(): string {
     return getPaperWalletIntro(this.currentLocale, ProfileStore.getDefaultLocale());
   }
-
-    // ========== Terms of Use ========== //
-
-  _acceptTermsOfUse: void => Promise<void> = async () => {
-    await this.setTermsOfUseAcceptanceRequest.execute();
-    await this.getTermsOfUseAcceptanceRequest.execute(); // eagerly cache
-  };
 
   // ========== URI Scheme acceptance ========== //
 
@@ -254,7 +264,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
     if (result == null) {
       result = this.getWalletsNavigationRequest.execute().result;
     }
-    return result ?? { ergo: [], cardano: [] };
+    return result ?? { cardano: [] };
   }
   _getSortedWalletList: void => Promise<void> = async () => {
     await this.getWalletsNavigationRequest.execute();

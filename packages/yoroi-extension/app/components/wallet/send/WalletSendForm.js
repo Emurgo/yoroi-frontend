@@ -55,7 +55,11 @@ const messages = defineMessages({
   },
   dropdownAmountLabel: {
     id: 'wallet.send.form.sendAll.dropdownAmountLabel',
-    defaultMessage: '!!!Send all {coinName}',
+    defaultMessage: '!!!Send all {currency}',
+  },
+  dropdownSendNFTLabel: {
+    id: 'wallet.send.form.sendAll.dropdownSendNFTLabel',
+    defaultMessage: '!!!Send {currency}',
   },
   allTokens: {
     id: 'wallet.send.form.sendAll.allTokens',
@@ -114,6 +118,7 @@ type Props = {|
   +defaultToken: $ReadOnly<TokenRow>, // need since no guarantee input in non-null
   +onAddToken: ({|
     token: void | $ReadOnly<TokenRow>,
+    shouldSendAll?: boolean,
     shouldReset?: boolean,
   |}) => void,
   +spendableBalance: ?MultiToken,
@@ -392,7 +397,7 @@ export default class WalletSendForm extends Component<Props> {
             value: token.info.TokenId,
             info: token.info,
             label: truncateToken(
-              getTokenStrictName(token.info) ?? getTokenIdentifierIfExists(token.info) ?? '-'
+              getTokenStrictName(token.info).name ?? getTokenIdentifierIfExists(token.info) ?? '-'
             ),
             id: getTokenIdentifierIfExists(token.info) ?? '-',
             amount,
@@ -417,9 +422,13 @@ export default class WalletSendForm extends Component<Props> {
         ...tokenOptions
           .filter(t => t.value === tokenId)
           .map(token => {
-            let label = intl.formatMessage(messages.dropdownAmountLabel, {
-              currency: truncateToken(token.label),
-            });
+            let label = intl.formatMessage(
+              token.info.IsNFT ? messages.dropdownSendNFTLabel : messages.dropdownAmountLabel,
+              {
+                currency: truncateToken(token.label),
+              }
+            );
+
             const defaultTokenName = truncateToken(getTokenName(this.props.defaultToken));
             if (token.label === defaultTokenName) {
               label += intl.formatMessage(messages.allTokens);
@@ -438,6 +447,7 @@ export default class WalletSendForm extends Component<Props> {
         [styles.show]: this.props.shouldSendAll && this.form.$('selectedToken').value === tokenId,
       },
     ]);
+
     return (
       <div className={styles.component}>
         {hasAnyPending && pendingTxWarningComponent}
@@ -449,20 +459,23 @@ export default class WalletSendForm extends Component<Props> {
               labelId="token-assets-select"
               {...form.$('selectedToken').bind()}
               onChange={value => {
+                const token = tokenOptions.find(t => t.info.TokenId === value);
+                if (!token) return;
+
                 this.props.onAddToken({
-                  token: tokenOptions.find(token => token.info.TokenId === value)?.info,
+                  token: token?.info,
+                  shouldSendAll: token.info.IsNFT === true,
                   shouldReset: true,
                 });
 
-                // clear send all when changing currencies
-                if (this.props.shouldSendAll) {
-                  this.props.updateSendAllStatus(false);
+                if (token.info.IsNFT) {
+                  this.form.$('amount').value = token.amount;
+                  this.form.$('selectedAmount').value = token.value;
+                } else {
+                  this.form.$('amount').clear();
+                  this.form.$('selectedAmount').value = CUSTOM_AMOUNT;
+                  this.props.updateAmount();
                 }
-                // clear amount field when switching currencies
-                this.form.$('amount').clear();
-                // reset the amout dropdown to coustom amount
-                this.form.$('selectedAmount').value = CUSTOM_AMOUNT;
-                this.props.updateAmount();
               }}
               value={
                 this.props.selectedToken?.TokenId ??
@@ -483,10 +496,10 @@ export default class WalletSendForm extends Component<Props> {
                 disabled
               >
                 <Box width="100%" display="flex">
-                  <Typography variant="body2" flex="1">
+                  <Typography component="div" variant="body2" flex="1">
                     {intl.formatMessage(globalMessages.name)}
                   </Typography>
-                  <Typography variant="body2" flex="1">
+                  <Typography component="div" variant="body2" flex="1">
                     {intl.formatMessage(globalMessages.amount)}
                   </Typography>
                 </Box>
@@ -537,8 +550,9 @@ export default class WalletSendForm extends Component<Props> {
           <Select
             {...form.$('selectedAmount').bind()}
             labelId="amount-options-select"
+            disabled={this.props.selectedToken?.IsNFT}
             renderValue={value => (
-              <Typography sx={{ textTransform: 'uppercase' }}>
+              <Typography component="div" sx={{ textTransform: 'uppercase' }}>
                 {sendAmountOptions.find(item => item.value === value)?.label ?? '-'}
               </Typography>
             )}
@@ -578,9 +592,9 @@ export default class WalletSendForm extends Component<Props> {
           <div className={tokenListClasses}>
             <h1>{intl.formatMessage(messages.willSendAll)}</h1>
             {tokenOptions.map(token => (
-              <p key={token.id}>
+              <div key={token.id}>
                 {token.amount} {token.label}
-              </p>
+              </div>
             ))}
           </div>
 

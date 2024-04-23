@@ -73,12 +73,12 @@ export default class YoroiThemesPage extends Component<Props, State> {
                   if (typeof entry[1] === 'object') {
                     return (
                       <div className={styles.row} key={entry[0]}>
-                        <p className={styles.rowKey}>{entry[0]}</p>
+                        <div className={styles.rowKey}>{entry[0]}</div>
                         <ul className={styles.subRow}>
                           {Object.entries(Object(entry[1])).map(row => (
                             <li className={styles.subRowItem} key={row[0]}>
-                              <p className={styles.key}>{JSON.stringify(row[0])}</p>
-                              <p className={styles.value}>{JSON.stringify(row[1])}</p>
+                              <div className={styles.key}>{JSON.stringify(row[0])}</div>
+                              <div className={styles.value}>{JSON.stringify(row[1])}</div>
                             </li>
                           ))}
                         </ul>

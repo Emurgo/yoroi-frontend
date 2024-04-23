@@ -1,6 +1,6 @@
 // @flow
 
-/* eslint react/jsx-one-expression-per-line: 0 */  // the &nbsp; in the html breaks this
+/* eslint react/jsx-one-expression-per-line: 0 */ // the &nbsp; in the html breaks this
 
 import type { Node } from 'react';
 import BigNumber from 'bignumber.js';
@@ -23,30 +23,30 @@ import { AmountInput } from '../../common/NumericInputRP';
 import { ProgressInfo } from '../../../stores/ada/VotingStore';
 import ProgressStepBlock from './ProgressStepBlock';
 import WarningBox from '../../widgets/WarningBox';
-import { getTokenName, genFormatTokenAmount, } from '../../../stores/stateless/tokenHelpers';
-import type {
-  TokenLookupKey,
-} from '../../../api/common/lib/MultiToken';
-import type { TokenRow, } from '../../../api/ada/lib/storage/database/primitives/tables';
+import { getTokenName, genFormatTokenAmount } from '../../../stores/stateless/tokenHelpers';
+import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
+import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { truncateToken } from '../../../utils/formatters';
 
-import {
-  MultiToken,
-} from '../../../api/common/lib/MultiToken';
+import { MultiToken } from '../../../api/common/lib/MultiToken';
 import type { WalletType, StepsList } from './types';
+import Stepper from '../../common/stepper/Stepper';
 
 const messages = defineMessages({
   line1: {
     id: 'wallet.voting.dialog.step.trx.line1',
-    defaultMessage: '!!!Confirm your spending password to register in the blockchain the certificate previously generated for voting.',
+    defaultMessage:
+      '!!!Confirm your password to register in the blockchain the certificate previously generated for voting.',
   },
   txConfirmationTrezorTLine1: {
     id: 'wallet.voting.dialog.step.trx.trezor.info.line.1',
-    defaultMessage: '!!!After connecting your Trezor device to your computer, press the Register button.',
+    defaultMessage:
+      '!!!After connecting your Trezor device to your computer, press the Register button.',
   },
   txConfirmationLedgerNanoLine1: {
     id: 'wallet.voting.dialog.step.trx.ledger.info.line.1',
-    defaultMessage: '!!!After connecting your Ledger device to your computer’s USB port, press the Register button.',
+    defaultMessage:
+      '!!!After connecting your Ledger device to your computer’s USB port, press the Register button.',
   },
 });
 
@@ -61,19 +61,18 @@ type Props = {|
   +onSubmit: ({| password?: string |}) => PossiblyAsync<void>,
   +classicTheme: boolean,
   +error: ?LocalizableError,
-  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
+  +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +walletType: WalletType,
+  +isRevamp: boolean,
 |};
 
 @observer
 export default class VotingRegTxDialog extends Component<Props> {
-
   @observable spendingPasswordForm: void | ReactToolboxMobxForm;
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
-
 
   @action
   setSpendingPasswordForm(form: ReactToolboxMobxForm) {
@@ -86,11 +85,11 @@ export default class VotingRegTxDialog extends Component<Props> {
       return;
     }
     this.spendingPasswordForm.submit({
-      onSuccess: async (form) => {
+      onSuccess: async form => {
         const { walletPassword } = form.values();
         await this.props.onSubmit({ password: walletPassword });
       },
-      onError: () => {}
+      onError: () => {},
     });
   }
 
@@ -121,8 +120,14 @@ export default class VotingRegTxDialog extends Component<Props> {
     return (
       <div className={styles.infoBlock}>
         <ul>
-          <li key="1"><span>{intl.formatMessage(infoLine1)}</span><br /></li>
-          <li key="2"><span>{intl.formatMessage(infoLine2)}</span><br /></li>
+          <li key="1">
+            <span>{intl.formatMessage(infoLine1)}</span>
+            <br />
+          </li>
+          <li key="2">
+            <span>{intl.formatMessage(infoLine2)}</span>
+            <br />
+          </li>
         </ul>
       </div>
     );
@@ -131,20 +136,20 @@ export default class VotingRegTxDialog extends Component<Props> {
   render(): Node {
     const { intl } = this.context;
 
-    const spendingPasswordForm = (this.props.walletType === 'mnemonic')
-      ? (
+    const spendingPasswordForm =
+      this.props.walletType === 'mnemonic' ? (
         <SpendingPasswordInput
-          setForm={(form) => this.setSpendingPasswordForm(form)}
+          setForm={form => this.setSpendingPasswordForm(form)}
           classicTheme={this.props.classicTheme}
           isSubmitting={this.props.isSubmitting}
         />
-      )
-      : undefined; // hardware wallet
+      ) : undefined; // hardware wallet
 
     const staleTxWarning = (
       <div className={styles.warningBox}>
         <WarningBox>
-          {intl.formatMessage(globalMessages.staleTxnWarningLine1)}<br />
+          {intl.formatMessage(globalMessages.staleTxnWarningLine1)}
+          <br />
           {intl.formatMessage(globalMessages.staleTxnWarningLine2)}
         </WarningBox>
       </div>
@@ -179,11 +184,22 @@ export default class VotingRegTxDialog extends Component<Props> {
         closeButton={<DialogCloseButton />}
         backButton={<DialogBackButton onBack={this.props.goBack} />}
       >
-        <ProgressStepBlock
-          stepsList={this.props.stepsList}
-          progressInfo={this.props.progressInfo}
-          classicTheme={this.props.classicTheme}
-        />
+        {this.props.isRevamp ? (
+          <Stepper
+            currentStep={String(this.props.progressInfo.currentStep)}
+            steps={this.props.stepsList.map(step => ({
+              message: step.message,
+              stepId: String(step.step),
+            }))}
+            setCurrentStep={() => {}}
+          />
+        ) : (
+          <ProgressStepBlock
+            stepsList={this.props.stepsList}
+            progressInfo={this.props.progressInfo}
+            classicTheme={this.props.classicTheme}
+          />
+        )}
         {this.props.staleTx && staleTxWarning}
 
         {this.renderInfoBlock()}
@@ -204,15 +220,11 @@ export default class VotingRegTxDialog extends Component<Props> {
           />
         </div>
         {spendingPasswordForm}
-        {this.props.error
-          ? (
-            <p className={styles.error}>
-              {intl.formatMessage(this.props.error, this.props.error.values)}
-            </p>
-          )
-          : null
-        }
-
+        {this.props.error ? (
+          <div className={styles.error}>
+            {intl.formatMessage(this.props.error, this.props.error.values)}
+          </div>
+        ) : null}
       </Dialog>
     );
   }

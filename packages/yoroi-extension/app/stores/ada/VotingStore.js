@@ -20,7 +20,6 @@ import {
 import {
   isCardanoHaskell,
   getCardanoHaskellBaseConfig,
-  isErgo,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { genTimeToSlot } from '../../api/ada/lib/storage/bridge/timeUtils';
 import { generatePrivateKeyForCatalyst } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
@@ -42,15 +41,14 @@ import cryptoRandomString from 'crypto-random-string';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { generateRegistration } from '../../api/ada/lib/cardanoCrypto/catalyst';
-import { derivePublicByAddressing } from '../../api/ada/lib/cardanoCrypto/utils'
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet'
 import type { CatalystRoundInfoResponse } from '../../api/ada/lib/state-fetch/types'
-import { trackCatalystRegistration } from '../../api/analytics';
 import {
   loadCatalystRoundInfo,
   saveCatalystRoundInfo,
 } from '../../api/localStorage';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
+import { derivePublicByAddressing } from '../../api/ada/lib/cardanoCrypto/deriveByAddressing';
 
 export const ProgressStep = Object.freeze({
   GENERATE: 0,
@@ -140,7 +138,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
       this.loadingCatalystRoundInfo = true
     })
     const publicDeriver = this.stores.wallets.selected;
-    if (!publicDeriver || isErgo(publicDeriver.getParent().getNetworkInfo())) {
+    if (!publicDeriver) {
       runInAction(() => {
         this.loadingCatalystRoundInfo = false
       })
@@ -360,7 +358,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
         throw new Error(`${nameof(this._createTransaction)} missing staking key functionality`);
       }
       if (spendingPassword === null) {
-        throw new Error(`${nameof(this._createTransaction)} expect a spending password`);
+        throw new Error(`${nameof(this._createTransaction)} expect a password`);
       }
       const stakingKey = await genOwnStakingKey({
         publicDeriver: withStakingKey,
@@ -409,7 +407,9 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
         },
         refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
       });
-    } else if (isTrezorTWallet(request.publicDeriver.getParent())) {
+      return;
+    }
+    if (isTrezorTWallet(request.publicDeriver.getParent())) {
       await this.stores.substores.ada.wallets.adaSendAndRefresh({
         broadcastRequest: {
           trezor: {
@@ -419,23 +419,23 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
         },
         refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
       });
-    } else {
-      // normal password-based wallet
-      if (request.password == null) {
-        throw new Error(`${nameof(this._signTransaction)} missing password for non-hardware signing`);
-      }
-      await this.stores.substores.ada.wallets.adaSendAndRefresh({
-        broadcastRequest: {
-          normal: {
-            publicDeriver: request.publicDeriver,
-            password: request.password,
-            signRequest: result,
-          },
-        },
-        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
-      });
+      return;
     }
-    trackCatalystRegistration();
+
+    // normal password-based wallet
+    if (request.password == null) {
+      throw new Error(`${nameof(this._signTransaction)} missing password for non-hardware signing`);
+    }
+    await this.stores.substores.ada.wallets.adaSendAndRefresh({
+      broadcastRequest: {
+        normal: {
+          publicDeriver: request.publicDeriver,
+          password: request.password,
+          signRequest: result,
+        },
+      },
+      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
+    });
   };
 
   @action _generateCatalystKey: void => Promise<void> = async () => {

@@ -29,8 +29,9 @@ type Props = {|
   +unitOfAccount: TokenEntry => void | {| currency: string, amount: string |},
   +shouldHideBalance: boolean,
   +graphData: GraphData,
-  +epochLength: ?number,
+  +withdrawRewards: void | (void => Promise<void>),
 |};
+
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
@@ -38,7 +39,7 @@ type Intl = {|
 const messages = defineMessages({
   summary: {
     id: 'wallet.staking.summary',
-    defaultMessage: '!!!Summary',
+    defaultMessage: '!!!Rewards Summary',
   },
   dialogSummaryDescription: {
     id: 'wallet.staking.dialogSummaryDescription',
@@ -51,12 +52,12 @@ function SummaryCard({
   totalRewards,
   totalDelegated,
   getTokenInfo,
-  onOverviewClick: _onOverviewClick,  // todo: remove?
+  onOverviewClick: _onOverviewClick, // todo: remove?
+  withdrawRewards,
   shouldHideBalance,
   onOpenRewardList,
   unitOfAccount,
   graphData,
-  epochLength,
   intl,
 }: Props & Intl): Node {
   const formatTokenEntry: TokenEntry => Node = tokenEntry => {
@@ -109,36 +110,51 @@ function SummaryCard({
   };
 
   return (
-    <Card>
+    <Card sx={{ border: '1px solid', borderColor: 'grayscale.200', bgcolor: 'background.card' }}>
       <Box
         sx={{
           padding: '15px 24px',
-          borderBottom: '1px solid var(--yoroi-palette-gray-200)',
+          borderBottom: '1px solid',
+          borderColor: 'grayscale.200',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
         }}
       >
-        <Typography variant="h5" color="var(--yoroi-palette-gray-900)">
+        <Typography component="div" variant="h5" color="common.black" fontWeight={500}>
           {intl.formatMessage(messages.summary)}
         </Typography>
+        <Button
+          variant="primary"
+          sx={{
+            '&.MuiButton-sizeMedium': {
+              height: 'unset',
+              p: '9px 20px',
+            },
+          }}
+          onClick={withdrawRewards}
+          disabled={!withdrawRewards}
+        >
+          {intl.formatMessage(globalMessages.withdrawLabel)}
+        </Button>
       </Box>
       <Box sx={{ display: 'flex' }}>
-        <InfoRow>
-          <WrapperIcon bgcolor="#EEF1FA">
-            <StakingIcon />
-          </WrapperIcon>
+        <InfoRow sx={{ borderColor: 'grayscale.200' }}>
+          <StakingIcon />
           <InfoDetails>
-            <Typography
-              variant="body2"
-              color="var(--yoroi-palette-gray-600)"
+            <Typography component="div"
+              variant="caption1"
+              color="grayscale.600"
               sx={{ textTransform: 'uppercase' }}
             >
               {intl.formatMessage(globalMessages.totalRewardsLabel)}
             </Typography>
           </InfoDetails>
           <InfoDetails>
-            <Typography variant="h1" fontWeight="400" color="var(--yoroi-palette-gray-900)">
+            <Typography component="div" variant="h2" color="common.black" fontWeight={500}>
               {renderAmount(totalRewards)}
             </Typography>
-            <Typography variant="body1" color="var(--yoroi-palette-gray-900)">
+            <Typography component="div" variant="body1" color="grayscale.600" fontWeight={500}>
               {renderAmountWithUnitOfAccount(totalRewards)}
             </Typography>
           </InfoDetails>
@@ -146,16 +162,21 @@ function SummaryCard({
               {intl.formatMessage(globalMessages.overview)}
             </OverviewButton> */}
         </InfoRow>
-        <InfoRow>
-          <WrapperIcon bgcolor="#F3FAFF">
-            <TotalDelegatedIcon />
-          </WrapperIcon>
+        <InfoRow sx={{ borderColor: 'grayscale.200' }}>
+          <TotalDelegatedIcon />
           <InfoDetails>
-            <Typography variant="body1" color="var(--yoroi-palette-gray-600)" marginBottom="4px">
+            <Typography component="div"
+              variant="caption1"
+              color="grayscale.600"
+              marginBottom="4px"
+              sx={{ textTransform: 'uppercase' }}
+            >
               {intl.formatMessage(globalMessages.totalDelegated)}
             </Typography>
+          </InfoDetails>
+          <InfoDetails>
             {totalDelegated ? (
-              <Typography variant="h1" fontWeight="400" color="var(--yoroi-palette-gray-900)">
+              <Typography component="div" variant="h2" fontWeight="500" color="common.black">
                 {renderAmount(totalDelegated)}
               </Typography>
             ) : (
@@ -163,24 +184,19 @@ function SummaryCard({
                 <LoadingSpinner small />
               </div>
             )}
-            <Typography variant="body1" color="var(--yoroi-palette-gray-900)">
+            <Typography component="div" variant="body1" color="grayscale.600" fontWeight={500}>
               {renderAmountWithUnitOfAccount(totalDelegated)}
             </Typography>
           </InfoDetails>
         </InfoRow>
       </Box>
-      <RewardHistoryGraph
-        onOpenRewardList={onOpenRewardList}
-        graphData={graphData}
-        epochLength={epochLength}
-      />
+      <RewardHistoryGraph onOpenRewardList={onOpenRewardList} graphData={graphData} />
     </Card>
   );
 }
 export default (injectIntl(observer(SummaryCard)): ComponentType<Props>);
 
 const Card = styled(Box)({
-  backgroundColor: 'var(--yoroi-palette-common-white)',
   borderRadius: '8px',
   flex: '1 1 48.5%',
   maxWidth: '48.5%',
@@ -191,7 +207,6 @@ const InfoRow = styled(Box)({
   margin: '0',
   display: 'flex',
   flexFlow: 'column',
-  borderColor: 'var(--yoroi-palette-gray-200)',
   borderStyle: 'solid',
   borderBottomWidth: '1px',
   gap: 8,
@@ -199,15 +214,7 @@ const InfoRow = styled(Box)({
     borderLeftWidth: '1px',
   },
 });
-const WrapperIcon = styled(Box)({
-  borderRadius: '50px',
-  width: '40px',
-  height: '40px',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  marginRight: '24px',
-});
+
 const InfoDetails = styled(Box)({});
 
 // todo: remove?

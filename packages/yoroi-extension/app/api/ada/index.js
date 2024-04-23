@@ -15,6 +15,7 @@ import {
 import type { Network, } from '../../../config/config-types';
 import { createHardwareWallet, createStandardBip44Wallet, } from './lib/storage/bridge/walletBuilder/byron';
 import { createHardwareCip1852Wallet, createStandardCip1852Wallet, } from './lib/storage/bridge/walletBuilder/shelley';
+import type { ReferenceTx } from './lib/storage/bridge/updateTransactions';
 import {
   getAllTransactions,
   getForeignAddresses,
@@ -41,11 +42,7 @@ import { CoreAddressTypes, TxStatusCodes, } from './lib/storage/database/primiti
 import type { NetworkRow, TokenRow, } from './lib/storage/database/primitives/tables';
 import { TransactionType } from './lib/storage/database/primitives/tables';
 import { PublicDeriver, } from './lib/storage/models/PublicDeriver/index';
-import {
-  asDisplayCutoff,
-  asHasLevels,
-  asGetAllUtxos,
-} from './lib/storage/models/PublicDeriver/traits';
+import { asDisplayCutoff, asGetAllUtxos, asHasLevels, } from './lib/storage/models/PublicDeriver/traits';
 import { ConceptualWallet } from './lib/storage/models/ConceptualWallet/index';
 import type { IHasLevels } from './lib/storage/models/ConceptualWallet/interfaces';
 import type {
@@ -82,7 +79,7 @@ import {
   signTransaction as shelleySignTransaction,
 } from './transactions/shelley/transactions';
 import { generateAdaMnemonic, generateWalletRootKey, } from './lib/cardanoCrypto/cryptoWallet';
-import { derivePrivateByAddressing, derivePublicByAddressing, v4PublicToV2, } from './lib/cardanoCrypto/utils';
+import { v4PublicToV2, } from './lib/cardanoCrypto/utils';
 import { isValidBip39Mnemonic, } from '../common/lib/crypto/wallet';
 import { generateByronPlate } from './lib/cardanoCrypto/plate';
 import {
@@ -111,13 +108,11 @@ import type {
   CardanoUtxoScriptWitness,
   V4UnsignedTxAddressedUtxoResponse,
 } from './transactions/types';
-import {
-  HaskellShelleyTxSignRequest,
-} from './transactions/shelley/HaskellShelleyTxSignRequest';
 import type {
   LedgerNanoCatalystRegistrationTxSignData,
   TrezorTCatalystRegistrationTxSignData,
 } from './transactions/shelley/HaskellShelleyTxSignRequest';
+import { HaskellShelleyTxSignRequest, } from './transactions/shelley/HaskellShelleyTxSignRequest';
 import type { SignTransactionRequest } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 
@@ -125,14 +120,16 @@ import type {
   AccountStateFunc,
   AddressUtxoFunc,
   BestBlockFunc,
+  GetRecentTransactionHashesFunc,
+  GetTransactionsByHashesFunc,
+  HistoryFunc,
   MultiAssetMintMetadataFunc,
+  MultiAssetSupplyFunc,
+  RemoteUnspentOutput,
   SendFunc,
   SignedRequest,
   SignedResponse,
   TokenInfoFunc,
-  RemoteUnspentOutput,
-  GetRecentTransactionHashesFunc,
-  GetTransactionsByHashesFunc,
 } from './lib/state-fetch/types';
 import type { FilterFunc, } from '../common/lib/state-fetch/currencySpecificTypes';
 import { getChainAddressesForDisplay, } from './lib/storage/models/utils';
@@ -172,6 +169,7 @@ import { bytesToHex, hexToBytes, hexToUtf } from '../../coreUtils';
 import type { PersistedSubmittedTransaction } from '../localStorage';
 import type { ForeignUtxoFetcher } from '../../connector/stores/ConnectorStore';
 import type WalletTransaction from '../../domain/WalletTransaction';
+import { derivePrivateByAddressing, derivePublicByAddressing } from './lib/cardanoCrypto/deriveByAddressing';
 
 // ADA specific Request / Response params
 
@@ -239,9 +237,11 @@ export type AdaGetTransactionsRequest = {|
   getBestBlock: BestBlockFunc,
   getTokenInfo: TokenInfoFunc,
   getMultiAssetMetadata: MultiAssetMintMetadataFunc,
-  afterTxs?: ?Array<WalletTransaction>,
+  getMultiAssetSupply: MultiAssetSupplyFunc,
+  afterTx?: ?WalletTransaction,
   getRecentTransactionHashes: GetRecentTransactionHashesFunc,
   getTransactionsByHashes: GetTransactionsByHashesFunc,
+  getTransactionHistory: HistoryFunc,
 |};
 
 // notices
@@ -668,10 +668,9 @@ export default class AdaApi {
 
   /*
     3 scenarios when this function is invoked:
-    1. To load locally the initial txs: isLocalRequest === true, afterTxs == null;
-    2. To fetch the newest transactions from network: isLocalRequest === false, afterTxs == null,
-    3. To fetch transactions after some transactions from network:
-         isLocalRequest = false, afterTxs != null
+    1. To load locally the initial txs: isLocalRequest === true, afterTx == null, beforeTx == null;
+    2. To fetch the newest transactions from network: isLocalRequest === false, afterTx != null,
+    3. To fetch older transactions: isLocalRequest = false, beforeTx != null
    */
   async refreshTransactions(
     request: {|
@@ -690,37 +689,37 @@ export default class AdaApi {
           limit: FETCH_TXS_BATCH_SIZE,
         });
       } else {
-        if (!request.afterTxs) {
+        if (!request.beforeTx) {
           await updateUtxos(
             request.publicDeriver.getDb(),
             request.publicDeriver,
             request.checkAddressesInUse,
             request.getTokenInfo,
             request.getMultiAssetMetadata,
+            request.getMultiAssetSupply,
           );
         }
 
-        let after;
-        if (request.afterTxs && request.afterTxs.length > 0) {
-          const lastTx = request.afterTxs[request.afterTxs.length - 1];
-          if (lastTx.block) {
-            after = {
-              blockHash: lastTx.block.Hash,
-              txHash: lastTx.txid,
-            };
-          }
-        }
+        const resolveReference: ?WalletTransaction => ?ReferenceTx = ref => {
+          return ref?.block ? {
+            blockHash: ref.block.Hash,
+            txHash: ref.txid,
+          } : undefined;
+        };
 
         fetchedTxs = await updateTransactions(
           request.publicDeriver.getDb(),
           request.publicDeriver,
           request.checkAddressesInUse,
+          request.getTransactionHistory,
           request.getRecentTransactionHashes,
           request.getTransactionsByHashes,
           request.getBestBlock,
           request.getTokenInfo,
           request.getMultiAssetMetadata,
-          after,
+          request.getMultiAssetSupply,
+          resolveReference(request.afterTx),
+          resolveReference(request.beforeTx),
         );
       }
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.refreshTransactions)} success: ` + stringifyData(fetchedTxs));
@@ -1548,7 +1547,7 @@ export default class AdaApi {
       );
 
       const allUtxosForKey = filterAddressesByStakingKey<ElementOf<IGetAllUtxosResponse>>(
-        RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.hash()),
+        RustModule.WalletV4.Credential.from_keyhash(stakingKey.hash()),
         allUtxo,
         false,
       );
@@ -1578,7 +1577,7 @@ export default class AdaApi {
 
       const stakeCredentialHex = RustModule.WasmScope(Scope => {
         return Buffer.from(
-            Scope.WalletV4.StakeCredential
+            Scope.WalletV4.Credential
               .from_keyhash(stakingKey.hash())
               .to_bytes()
           ).toString('hex')
@@ -2166,8 +2165,8 @@ export default class AdaApi {
       const chainNetworkId = Number.parseInt(config.ChainNetworkId, 10);
       const receiveAddress = RustModule.WalletV4.BaseAddress.new(
         chainNetworkId,
-        RustModule.WalletV4.StakeCredential.from_keyhash(firstInternalPayment),
-        RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey),
+        RustModule.WalletV4.Credential.from_keyhash(firstInternalPayment),
+        RustModule.WalletV4.Credential.from_keyhash(stakingKey),
       );
 
       const addresses = [
@@ -2399,6 +2398,9 @@ export default class AdaApi {
     for (const input of signRequest.inputs()) {
       amount.joinSubtractMutable(input.value);
     }
+    for (const withdrawal of signRequest.withdrawals()) {
+      amount.joinSubtractMutable(withdrawal.amount);
+    }
     let isIntraWallet = true;
     for (const output of signRequest.outputs()) {
       if (ownAddresses.has(output.address)) {
@@ -2571,7 +2573,7 @@ function getDifferenceAfterTx(
 ): MultiToken {
 
   const accountKeyString = RustModule.WasmScope(Scope => {
-    const stakeCredential = Scope.WalletV4.StakeCredential.from_keyhash(stakingKey.hash());
+    const stakeCredential = Scope.WalletV4.Credential.from_keyhash(stakingKey.hash());
     return Buffer.from(stakeCredential.to_bytes()).toString('hex')
   })
 

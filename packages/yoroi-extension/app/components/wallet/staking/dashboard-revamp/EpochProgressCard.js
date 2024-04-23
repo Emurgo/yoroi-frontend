@@ -7,8 +7,8 @@ type Props = {|
   +percentage: number,
   +days: string,
   +currentEpoch: number,
-  +startEpochDate: string,
-  +endEpochDate: string,
+  +startEpochDate: string | Date,
+  +endEpochDate: string | Date,
 |};
 
 export function EpochProgressCard({
@@ -41,7 +41,7 @@ type TitleProps = {|
 const Title = ({ label, value }: TitleProps): Node => {
   return (
     <Box>
-      <Typography fontWeight="500" color="primary.600">
+      <Typography component="div" fontWeight="500" color="primary.600">
         {label}: {value}
       </Typography>
     </Box>
@@ -50,20 +50,20 @@ const Title = ({ label, value }: TitleProps): Node => {
 
 type InfoColumnProps = {|
   +label: string,
-  +value: string | number,
+  +value: string | number | Date,
 |};
 const LabelWithValue = ({ label, value }: InfoColumnProps): Node => {
   return (
     <Box>
-      <Typography
+      <Typography component="div"
         style={{ textTransform: 'uppercase' }}
         variant="caption"
         mb="4px"
-        color="var(--yoroi-palette-gray-600)"
+        color="grayscale.600"
       >
         {label}
       </Typography>
-      <Typography color="var(--yoroi-palette-gray-900)">{value}</Typography>
+      <Typography component="div" color="grayscale.900">{value}</Typography>
     </Box>
   );
 };
@@ -87,9 +87,7 @@ const Graph = ({ value, days }): Node => {
         size={120}
         thickness={7}
         variant="determinate"
-        sx={{
-          color: 'var(--yoroi-palette-gray-50)',
-        }}
+        sx={{ color: 'grayscale.50' }}
         value={100}
       />
       <Box
@@ -101,10 +99,10 @@ const Graph = ({ value, days }): Node => {
           textAlign: 'center',
         }}
       >
-        <Typography variant="h4" color="var(--yoroi-palette-gray-900)">
+        <Typography component="div" variant="h4" color="grayscale.900">
           {value}%
         </Typography>
-        <Typography variant="caption1" fontSize="12px" color="var(--yoroi-palette-gray-600)">
+        <Typography component="div" variant="caption1" fontSize="12px" color="grayscale.600">
           {days} days
         </Typography>
       </Box>

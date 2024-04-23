@@ -28,7 +28,7 @@ function StakePoolAlert({ message }: {| message: string |}): Node {
   return (
     <StyledBox>
       <InfoIconSVG />
-      <Typography variant="body2" color="var(--yoroi-palette-gray-600)" marginLeft="8px">
+      <Typography component="div" variant="body2" color="var(--yoroi-palette-gray-600)" marginLeft="8px">
         {message}
       </Typography>
       <IconButton>

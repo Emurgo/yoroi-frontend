@@ -1,31 +1,31 @@
 // @flow
 /* eslint react/jsx-one-expression-per-line: 0 */ // the &nbsp; in the html breaks this
-import { Component } from 'react';
 import type { Node } from 'react';
-import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
-import Dialog from '../../../widgets/Dialog';
-import DialogCloseButton from '../../../widgets/DialogCloseButton';
-import styles from './AddNFTDialog.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { MultiToken } from '../../../../api/common/lib/MultiToken';
-import { ReactComponent as SearchIcon } from '../../../../assets/images/assets-page/search.inline.svg';
-import { ReactComponent as NoItemsFoundImg } from '../../../../assets/images/assets-page/no-nfts.inline.svg';
-import { getNFTs } from '../../../../utils/wallet';
 import type { FormattedNFTDisplay } from '../../../../utils/wallet';
-import BigNumber from 'bignumber.js';
 import type { TokenLookupKey } from '../../../../api/common/lib/MultiToken';
 import type {
   TokenRow,
   NetworkRow,
 } from '../../../../api/ada/lib/storage/database/primitives/tables';
-import { Button, OutlinedInput, Typography } from '@mui/material';
+import { Component } from 'react';
+import { observer } from 'mobx-react';
+import { defineMessages, intlShape } from 'react-intl';
+import { MultiToken } from '../../../../api/common/lib/MultiToken';
+import { ReactComponent as SearchIcon } from '../../../../assets/images/assets-page/search.inline.svg';
+import { ReactComponent as NoItemsFoundImg } from '../../../../assets/images/assets-page/no-nfts.inline.svg';
+import { getNFTs } from '../../../../utils/wallet';
+import { OutlinedInput, Typography } from '@mui/material';
 import { isCardanoHaskell } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
+import { Box } from '@mui/system';
+import { ampli } from '../../../../../ampli/index';
 import MinAda from './MinAda';
+import Dialog from '../../../widgets/Dialog';
+import styles from './AddNFTDialog.scss';
+import BigNumber from 'bignumber.js';
 import NFTImage from './NFTImage';
 import globalMessages from '../../../../i18n/global-messages';
 import MaxAssetsError from '../MaxAssetsError';
-import { Box } from '@mui/system';
 
 type Props = {|
   +onClose: void => void,
@@ -35,6 +35,7 @@ type Props = {|
   +updateAmount: (?BigNumber) => void,
   +onAddToken: ({|
     token: void | $ReadOnly<TokenRow>,
+    shouldSendAll?: boolean,
     shouldReset?: boolean,
   |}) => void,
   +selectedNetwork: $ReadOnly<NetworkRow>,
@@ -148,7 +149,21 @@ export default class AddNFTDialog extends Component<Props, State> {
   onAddAll: void => void = () => {
     const amount = new BigNumber('1');
     const toRemove = [];
+    let changed = false;
+    const tokens = this.props.plannedTxInfoMap
+      .filter(({ token }) => !token.IsDefault)
+      .map(({ token }) => ({ tokenId: token.TokenId }));
     for (const { token, included } of this.state.selectedTokens) {
+      const tokenIndex = tokens.findIndex(({ tokenId }) => tokenId === token.TokenId);
+      if (tokenIndex !== -1) {
+        if (!included) {
+          tokens.splice(tokenIndex, 1);
+          changed = true;
+        }
+      } else if (included) {
+        tokens.push({ tokenId: token.TokenId });
+        changed = true;
+      }
       if (!included) {
         toRemove.push(token);
         continue;
@@ -161,6 +176,11 @@ export default class AddNFTDialog extends Component<Props, State> {
     }
     this.props.onRemoveTokens(toRemove);
     this.props.onClose();
+    if (changed) {
+      ampli.sendSelectAssetUpdated({
+        asset_count: tokens.length,
+      });
+    }
   };
 
   render(): Node {
@@ -168,17 +188,27 @@ export default class AddNFTDialog extends Component<Props, State> {
     const { onClose, calculateMinAda, shouldAddMoreTokens } = this.props;
     const { currentNftsList, fullNftsList, selectedTokens } = this.state;
     const shouldAddMore = shouldAddMoreTokens(selectedTokens);
+    const hasSelectedTokensIncluded = selectedTokens.filter(t => t.included);
+
     return (
       <Dialog
-        title={
-          fullNftsList.length === 0
-            ? intl.formatMessage(globalMessages.nfts)
-            : intl.formatMessage(messages.nNft, { number: fullNftsList.length })
-        }
+        title={intl.formatMessage(messages.nNft, { number: fullNftsList.length })}
         closeOnOverlayClick={false}
         className={styles.dialog}
         onClose={onClose}
-        closeButton={<DialogCloseButton />}
+        withCloseButton
+        scrollableContentClass={styles.nftsGrid}
+        actions={[
+          {
+            disabled:
+              hasSelectedTokensIncluded.length === 0 ||
+              !shouldAddMore ||
+              currentNftsList.length === 0,
+            onClick: this.onAddAll,
+            primary: true,
+            label: intl.formatMessage(globalMessages.confirm),
+          },
+        ]}
       >
         <div className={styles.component}>
           <Box sx={{ position: 'relative', width: '100%' }}>
@@ -234,11 +264,11 @@ export default class AddNFTDialog extends Component<Props, State> {
                       sx={{
                         padding: '16px',
                         cursor: 'pointer',
-                        width: '180px',
+                        width: '184px',
                         minHeight: '237px',
                         overflow: 'hidden',
                         border: '2px solid',
-                        borderColor: isIncluded ? 'primary.600' : 'gray.50',
+                        borderColor: isIncluded ? 'primary.600' : 'grayscale.100',
                         borderRadius: '8px',
                         transition: 'border-color 300ms ease',
                         display: 'flex',
@@ -253,13 +283,13 @@ export default class AddNFTDialog extends Component<Props, State> {
                         width="141px"
                         height="141px"
                       />
-                      <Typography
+                      <Typography component="div"
                         variant="body1"
                         color="gray.900"
                         width="140px"
                         sx={{
                           wordWrap: 'break-word',
-                          textAlign: 'center',
+                          textAlign: 'left',
                           mt: '16px',
                         }}
                       >
@@ -272,29 +302,6 @@ export default class AddNFTDialog extends Component<Props, State> {
             </>
           )}
         </div>
-        {fullNftsList.length !== 0 && (
-          <Button
-            sx={{
-              width: '100%',
-              color: 'secondary.300',
-              borderTopLeftRadius: '0px',
-              borderTopRightRadius: '0px',
-              borderColor: 'gray.200',
-              ':hover': {
-                bgcolor: 'transparent',
-                borderColor: 'gray.300',
-              },
-              '&.MuiButton-sizeMedium': {
-                height: '81px',
-              },
-            }}
-            disabled={selectedTokens.length === 0 || !shouldAddMore}
-            onClick={this.onAddAll}
-            variant="ternary"
-          >
-            {intl.formatMessage(globalMessages.confirm)}
-          </Button>
-        )}
       </Dialog>
     );
   }

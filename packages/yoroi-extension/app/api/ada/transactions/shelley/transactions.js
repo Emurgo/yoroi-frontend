@@ -18,7 +18,6 @@ import {
 } from '../../../common/errors';
 
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
-import { derivePrivateByAddressing } from '../../lib/cardanoCrypto/utils';
 
 import { Bip44DerivationLevels, } from '../../lib/storage/database/walletTypes/bip44/api/utils';
 import type { Address, Addressing, } from '../../lib/storage/models/PublicDeriver/interfaces';
@@ -49,6 +48,7 @@ import {
   OverflowError,
 } from'@emurgo/yoroi-eutxo-txs/dist/errors';
 import blake2b from 'blake2b';
+import { derivePrivateByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
 
 /**
  * based off what the cardano-wallet team found worked empirically
@@ -553,7 +553,7 @@ export async function newAdaUnsignedTxFromUtxo(
   auxiliaryData: RustModule.WalletV4.AuxiliaryData | void,
 ): Promise<V4UnsignedTxUtxoResponse> {
   await RustModule.load();
-  setRuntime(RustModule.CrossCsl.init());
+  setRuntime(RustModule.CrossCsl.init);
 
   const defaultNetworkConfig = {
     linearFee: {
@@ -563,6 +563,12 @@ export async function newAdaUnsignedTxFromUtxo(
     coinsPerUtxoWord: protocolParams.coinsPerUtxoWord,
     poolDeposit: protocolParams.poolDeposit,
     keyDeposit: protocolParams.keyDeposit,
+    maxValueSize: 5000,
+    maxTxSize: 16384,
+    memPriceFrom: 577,
+    memPriceTo: 1000,
+    stepPriceFrom: 721,
+    stepPriceTo: 10000000,
   };
 
   const utxoSet = new UTxOSet(
@@ -823,7 +829,7 @@ async function newAdaUnsignedTxFromUtxoForConnector(
   |},
 ): Promise<V4UnsignedTxUtxoResponse> {
   await RustModule.load();
-  setRuntime(RustModule.CrossCsl.init());
+  setRuntime(RustModule.CrossCsl.init);
 
   const defaultNetworkConfig = {
     linearFee: {
@@ -833,6 +839,12 @@ async function newAdaUnsignedTxFromUtxoForConnector(
     coinsPerUtxoWord: protocolParams.coinsPerUtxoWord,
     poolDeposit: protocolParams.poolDeposit,
     keyDeposit: protocolParams.keyDeposit,
+    maxValueSize: 5000,
+    maxTxSize: 16384,
+    memPriceFrom: 577,
+    memPriceTo: 1000,
+    stepPriceFrom: 721,
+    stepPriceTo: 10000000,
   };
 
   const utxoSet = new UTxOSet(
@@ -843,7 +855,7 @@ async function newAdaUnsignedTxFromUtxoForConnector(
 
   const txBuilder = await TxBuilder.new(defaultNetworkConfig, utxoSet);
 
-  txBuilder.addRequiredInputs(
+  await txBuilder.addRequiredInputs(
     await Promise.all(
       mustIncludeUtxos.map(async ([utxo, witness]) => {
         let taggedWitness;
@@ -872,25 +884,30 @@ async function newAdaUnsignedTxFromUtxoForConnector(
   // must set TTL before specifying change address, otherwise the TX builder
   // miscalculate the tx fee by several bytes fewer
   if (ttl != null) {
-    txBuilder.setTtl(ttl);
+    await txBuilder.setTtl(ttl);
   } else {
-    txBuilder.setTtl(absSlotNumber.plus(defaultTtlOffset).toNumber());
+    await txBuilder.setTtl(absSlotNumber.plus(defaultTtlOffset).toNumber());
   }
 
   if (validityStart != null) {
-    txBuilder.setValidityStartInterval(validityStart);
+    await txBuilder.setValidityStartInterval(validityStart);
   }
   if (requiredSigners != null) {
-    txBuilder.addRequiredSigners(requiredSigners);
+    await txBuilder.addRequiredSigners(requiredSigners);
   }
-  if (auxiliaryData.metadata) {
-    txBuilder.withMetadata(auxiliaryData.metadata);
+  const metadata = auxiliaryData.metadata ?? {};
+  if (Object.keys(metadata).length > 0) {
+    const record = {};
+    for (const tag of Object.keys(metadata)) {
+      record[parseInt(tag, 10)] = metadata[tag];
+    }
+    await txBuilder.withMetadata(record);
   }
   if (auxiliaryData.nativeScripts) {
-    txBuilder.addNativeScripts(auxiliaryData.nativeScripts);
+    await txBuilder.addNativeScripts(auxiliaryData.nativeScripts);
   }
 
-  txBuilder.addMint(mint);
+  await txBuilder.addMint(mint);
 
   const sendRequest = await SendRequest.from(outputs.map(output => {
     const defaultTokenAmount = output.amount.getDefaultEntry().amount.toString();

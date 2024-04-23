@@ -10,19 +10,14 @@ import type {
 import type { PlateResponse } from '../../api/common/lib/crypto/plate';
 import { unscramblePaperAdaMnemonic } from '../../api/ada/lib/cardanoCrypto/paperWallet';
 import { generateShelleyPlate } from '../../api/ada/lib/cardanoCrypto/plate';
-import { generateErgoPlate } from '../../api/ergo/lib/crypto/plate';
 import { HARD_DERIVATION_START } from '../../config/numbersConfig';
-import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import {
   generateWalletRootKey as generateAdaWalletRootKey,
   generateLedgerWalletRootKey,
 } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
-import { generateWalletRootKey as generateErgoWalletRootKey } from '../../api/ergo/lib/crypto/wallet';
-import { getApiForNetwork } from '../../api/common/utils';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import {
   isCardanoHaskell,
-  isErgo,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
@@ -206,8 +201,7 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
   |}) => boolean = request => {
     const { selectedNetwork } = this.stores.profile;
     if (selectedNetwork == null) throw new Error(`${nameof(this.isValidMnemonic)} no API selected`);
-    const api = getApiForNetwork(selectedNetwork);
-    return this.stores.substores[api].walletRestore.isValidMnemonic(request);
+    return this.stores.substores.ada.walletRestore.isValidMnemonic(request);
   };
 }
 
@@ -246,23 +240,5 @@ export function generatePlates(
       addressMessage: messages.walletRestoreVerifyShelleyAddressesLabel,
     });
   }
-
-  if (isErgo(network)) {
-    const rootKey = generateErgoWalletRootKey(recoveryPhrase);
-    const plate = generateErgoPlate(
-      rootKey,
-      accountIndex - HARD_DERIVATION_START,
-      addressCount,
-      ((Number.parseInt(network.BaseConfig[0].ChainNetworkId, 10): any): $Values<
-        typeof RustModule.SigmaRust.NetworkPrefix
-      >)
-    );
-    plates.push({
-      ...plate,
-      checksumTitle: messages.walletRestoreVerifyAccountIdLabel,
-      addressMessage: messages.walletRestoreVerifyAddressesLabel,
-    });
-  }
-
   return plates;
 }

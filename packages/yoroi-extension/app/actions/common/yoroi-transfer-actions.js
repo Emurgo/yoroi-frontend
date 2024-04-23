@@ -10,11 +10,6 @@ export default class YoroiTransferActions {
   startTransferFunds: Action<{|
     source: RestoreModeType,
   |}> = new Action();
-  startHardwareMnemonic: Action<void> = new Action();
-  setPrivateKey: Action<string> = new Action();
-  setupTransferFundsWithMnemonic: Action<{|
-    recoveryPhrase: string,
-  |}> = new Action();
   setupTransferFundsWithPaperMnemonic: Action<{|
     recoveryPhrase: string,
     paperPassword: string,

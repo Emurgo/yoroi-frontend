@@ -26,10 +26,6 @@ const messages = defineMessages({
     id: 'wallet.currency.pick.testnetDescription',
     defaultMessage: '!!!Testnet are alternative chain to be used for testing. This allows application developers or testers to experiment, without having to use real coins.',
   },
-  ergoDescription: {
-    id: 'wallet.currency.pick.ergo',
-    defaultMessage: '!!!Ergo builds advanced cryptographic features and radically new DeFi functionality on the rock-solid foundations laid by a decade of blockchain theory and development',
-  },
 });
 
 type Props = {|
@@ -37,6 +33,7 @@ type Props = {|
   +onCardano: void => void,
   +onCardanoPreprodTestnet: void => void,
   +onCardanoPreviewTestnet: void => void,
+  +onCardanoSanchoTestnet: void => void,
   +onExternalLinkClick: MouseEvent => void,
 |};
 
@@ -102,6 +99,26 @@ export default class PickCurrencyOptionDialog extends Component<Props> {
                   type="cardanoTestnet"
                   title="Cardano Preview Testnet"
                   onSubmit={this.props.onCardanoPreviewTestnet}
+                  learnMoreText={
+                    <>
+                      {intl.formatMessage(messages.testnetDescription)}<br />
+                      <a
+                        href="https://testnets.cardano.org/"
+                        onClick={event => this.props.onExternalLinkClick(event)}
+                      >
+                        {intl.formatMessage(globalMessages.learnMore)}
+                      </a>
+                    </>}
+                />
+              </>
+            }
+            {(!environment.isProduction() || environment.isNightly() || environment.isTest()) &&
+              <>
+                <OptionBlock
+                  parentName="PickCurrencyOptionDialog"
+                  type="cardanoTestnet"
+                  title="Cardano Sancho Testnet"
+                  onSubmit={this.props.onCardanoSanchoTestnet}
                   learnMoreText={
                     <>
                       {intl.formatMessage(messages.testnetDescription)}<br />

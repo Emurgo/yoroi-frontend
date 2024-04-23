@@ -12,33 +12,6 @@ export type AddressUtxoRequest = {|
 export type AddressUtxoResponse = Array<RemoteUnspentOutput>;
 export type AddressUtxoFunc = (body: AddressUtxoRequest) => Promise<AddressUtxoResponse>;
 
-// getTxsBodiesForUTXOs
-
-export type TxBodiesRequest = {|
-  ...BackendNetworkInfo,
-  txsHashes: Array<string>,
-|};
-export type TxBodiesResponse = { [key: string]:string, ... };
-export type TxBodiesFunc = (body: TxBodiesRequest) => Promise<TxBodiesResponse>;
-
-// getUTXOsSumsForAddresses
-
-export type UtxoSumRequest = {|
-  ...BackendNetworkInfo,
-  addresses: Array<string>,
-|};
-export type UtxoSumResponse = {|
-  +sum: ?string,
-  +assets: $ReadOnlyArray<$ReadOnly<{
-    +amount: string,
-    +assetId: string,
-    +policyId: string,
-    +name: string,
-    ...
-  }>>,
-|};
-export type UtxoSumFunc = (body: UtxoSumRequest) => Promise<UtxoSumResponse>;
-
 // getTransactionsHistoryForAddresses
 
 export type HistoryRequest = {|
@@ -287,6 +260,8 @@ export type RemoteAccountState = {|
   remainingAmount: string, // current remaining awards
   rewards: string, // all the rewards every added
   withdrawals: string, // all the withdrawals that have ever happened
+  delegation: string | null, // hex pool ID the stake key currently delegates to
+  stakeRegistered: boolean,
 |};
 export type AccountStateResponse = {|
   [key: string]: null | RemoteAccountState,
@@ -372,21 +347,28 @@ export type CatalystRoundInfoFunc = (body: CatalystRoundInfoRequest)
 
 // Multi Asset Mint Metadata
 
-export type MultiAssetMintMetadataFunc = (body: MultiAssetMintMetadataRequest)
+export type MultiAssetMintMetadataFunc = (body: MultiAssetRequest)
   => Promise<MultiAssetMintMetadataResponse>;
 
-export type MultiAssetMintMetadataRequest = {|
+export type MultiAssetSupplyFunc = (body: MultiAssetRequest)
+  => Promise<MultiAssetSupplyResponse>;
+
+export type MultiAssetRequest = {|
   ...BackendNetworkInfo,
-  assets: MultiAssetMintMetadataRequestAsset[]
+  assets: MultiAssetRequestAsset[]
 |};
 
-export type MultiAssetMintMetadataRequestAsset = {|
+export type MultiAssetRequestAsset = {|
   nameHex: string,
   policy: string
 |}
 
 export type MultiAssetMintMetadataResponse = {|
   ...{[key: string]: MultiAssetMintMetadataResponseAsset[]}
+|}
+
+export type MultiAssetSupplyResponse = {|
+  ...{[key: string]: string}
 |}
 
 export type MultiAssetMintMetadataResponseAsset = {|
@@ -447,14 +429,15 @@ export type GetRecentTransactionHashesRequest = {|
   |},
 |};
 
+export type TxSummary = {|
+  txHash: string,
+  blockHash: string,
+  txBlockIndex: number,
+  epoch: number,
+  slot: number,
+|};
 export type GetRecentTransactionHashesResponse = {|
-  [address: string]: Array<{|
-    txHash: string,
-    blockHash: string,
-    txBlockIndex: number,
-    epoch: number,
-    slot: number,
-  |}>
+  [address: string]: Array<TxSummary>
 |};
 
 export type GetRecentTransactionHashesFunc = (

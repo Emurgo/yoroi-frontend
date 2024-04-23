@@ -32,7 +32,7 @@ function RecoveryPhrase(props: Props & Intl): Node {
   const { recoveryPhrase, intl, shouldShowRecoveryPhrase, toggleRecoveryPhrase } = props;
 
   return (
-    <Box width="100%" mt="8px">
+    <Box width="100%" mt="8px" id="recoveryPhraseBox">
       <Grid container gap="8px">
         {recoveryPhrase &&
           recoveryPhrase.map((word, idx) => (
@@ -51,8 +51,9 @@ function RecoveryPhrase(props: Props & Intl): Node {
                 filter: shouldShowRecoveryPhrase ? 'unset' : 'blur(4px)',
                 cursor: shouldShowRecoveryPhrase ? 'auto' : 'not-allowed',
               }}
+              id={'recoveryPhraseWord' + idx}
             >
-              <Typography
+              <Typography component="div"
                 sx={{
                   width: '124px',
                   whiteSpace: 'nowrap',
@@ -82,9 +83,10 @@ function RecoveryPhrase(props: Props & Intl): Node {
           padding: '6px',
         }}
         onClick={toggleRecoveryPhrase}
+        id="toggleRecoveryPhraseButton"
       >
         {shouldShowRecoveryPhrase ? <ClosedEyeIcon /> : <OpenedEyeIcon />}
-        <Typography variant="body2" fontWeight="500">
+        <Typography component="div" variant="body2" fontWeight="500">
           {intl.formatMessage(
             shouldShowRecoveryPhrase
               ? messages.hideRecoveryPhraseBtn

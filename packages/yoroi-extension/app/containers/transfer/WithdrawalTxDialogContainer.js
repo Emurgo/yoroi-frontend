@@ -2,12 +2,8 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { computed, } from 'mobx';
-import type { InjectedOrGenerated } from '../../types/injectedPropsType';
-import LocalizableError from '../../i18n/LocalizableError';
-import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
+import type { StoresAndActionsProps } from '../../types/injectedPropsType';
 import TransferSendPage from './TransferSendPage';
-import type { GeneratedData as TransferSendData } from './TransferSendPage';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import globalMessages from '../../i18n/global-messages';
 import { intlShape, } from 'react-intl';
@@ -15,14 +11,10 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import {
   MultiToken,
 } from '../../api/common/lib/MultiToken';
-import type { NetworkRow, TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { getDefaultEntryToken } from '../../stores/toplevel/TokenInfoStore';
-import { trackWithdrawal } from '../../api/analytics';
-
-export type GeneratedData = typeof WithdrawalTxDialogContainer.prototype.generated;
 
 type Props = {|
-  ...InjectedOrGenerated<GeneratedData>,
+  ...StoresAndActionsProps,
   +onClose: void => void,
 |};
 
@@ -34,33 +26,34 @@ export default class WithdrawalTxDialogContainer extends Component<Props> {
   };
 
   render(): Node {
+    const { actions, stores } = this.props;
     const { intl } = this.context;
-    const {
-      createWithdrawalTx,
-      shouldDeregister,
-    } = this.generated.stores.substores.ada.delegationTransaction;
 
-    if (this.generated.stores.profile.selectedNetwork == null) {
+    if (this.props.stores.profile.selectedNetwork == null) {
       throw new Error(`${nameof(WithdrawalTxDialogContainer)} no selected network`);
     }
-    const defaultToken = this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
-      this.generated.stores.profile.selectedNetwork.NetworkId
+    const defaultToken = this.props.stores.tokenInfoStore.getDefaultTokenInfo(
+      this.props.stores.profile.selectedNetwork.NetworkId
     );
 
+    const { createWithdrawalTx } = this.props.stores.substores.ada.delegationTransaction;
     return (
       <TransferSendPage
-        {...this.generated.TransferSendProps}
+        actions={actions}
+        stores={stores}
         onClose={{
           trigger: this.props.onClose,
           label: intl.formatMessage(globalMessages.cancel),
         }}
         onSubmit={{
-          trigger: () => {
-            trackWithdrawal(shouldDeregister);
-          },
+          trigger: () => {}, // nothing extra to do
           label: intl.formatMessage(globalMessages.confirm),
         }}
-        transactionRequest={createWithdrawalTx}
+        transactionRequest={{
+          error: createWithdrawalTx.error,
+          result: createWithdrawalTx.result,
+          reset: createWithdrawalTx.reset,
+        }}
         toTransferTx={tentativeTx => {
           if (!(tentativeTx instanceof HaskellShelleyTxSignRequest)) {
             throw new Error(`${nameof(WithdrawalTxDialogContainer)} incorrect tx type`);
@@ -85,61 +78,5 @@ export default class WithdrawalTxDialogContainer extends Component<Props> {
         }}
       />
     );
-  }
-
-  @computed get generated(): {|
-    TransferSendProps: InjectedOrGenerated<TransferSendData>,
-    actions: {||},
-    stores: {|
-      tokenInfoStore: {|
-        getDefaultTokenInfo: number => $ReadOnly<TokenRow>,
-      |},
-      profile: {| selectedNetwork: void | $ReadOnly<NetworkRow> |},
-      substores: {|
-        ada: {|
-          delegationTransaction: {|
-            createWithdrawalTx: {|
-              reset: void => void,
-              error: ?LocalizableError,
-              result: ?ISignRequest<any>
-            |},
-            shouldDeregister: boolean,
-          |},
-        |},
-      |},
-    |}
-    |} {
-    if (this.props.generated !== undefined) {
-      return this.props.generated;
-    }
-    if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(WithdrawalTxDialogContainer)} no way to generated props`);
-    }
-    const { stores, actions } = this.props;
-    return Object.freeze({
-      TransferSendProps: ({ actions, stores, }: InjectedOrGenerated<TransferSendData>),
-      actions: Object.freeze({
-      }),
-      stores: {
-        profile: {
-          selectedNetwork: stores.profile.selectedNetwork,
-        },
-        tokenInfoStore: {
-          getDefaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfo,
-        },
-        substores: {
-          ada: {
-            delegationTransaction: {
-              createWithdrawalTx: {
-                error: stores.substores.ada.delegationTransaction.createWithdrawalTx.error,
-                result: stores.substores.ada.delegationTransaction.createWithdrawalTx.result,
-                reset: stores.substores.ada.delegationTransaction.createWithdrawalTx.reset,
-              },
-              shouldDeregister: stores.substores.ada.delegationTransaction.shouldDeregister,
-            },
-          },
-        },
-      },
-    });
   }
 }

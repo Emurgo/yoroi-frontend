@@ -76,7 +76,7 @@ type Props = {|
   +numberOfMnemonics: number,
   +error?: ?LocalizableError,
   +validWords: Array<string>,
-  // <TODO:PENDING_REMOVAL>
+  // <TODO:PENDING_REMOVAL> paper
   +isPaper?: boolean,
   +isVerificationMode?: boolean,
   +showPaperPassword?: boolean,
@@ -270,7 +270,7 @@ export default class WalletRestoreDialog extends Component<Props> {
       error,
       onCancel,
       onBack,
-      // <TODO:PENDING_REMOVAL>
+      // <TODO:PENDING_REMOVAL> paper
       isPaper,
       isVerificationMode,
       showPaperPassword,
@@ -433,9 +433,9 @@ export default class WalletRestoreDialog extends Component<Props> {
         )}
 
         {error && (
-          <p className={styles.error}>
+          <div className={styles.error}>
             {intl.formatMessage(error, error.values)}
-          </p>
+          </div>
         )}
 
       </Dialog>

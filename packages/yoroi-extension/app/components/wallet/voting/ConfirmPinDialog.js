@@ -18,11 +18,14 @@ import PinInput from '../../widgets/forms/PinInput';
 
 import styles from './ConfirmPinDialog.scss';
 import type { StepsList } from './types';
+import { Typography } from '@mui/material';
+import Stepper from '../../common/stepper/Stepper';
 
 const messages = defineMessages({
   line1: {
     id: 'wallet.voting.dialog.step.confirm.line1',
-    defaultMessage: '!!!Please enter the PIN as you will need it <strong>every time</strong> you want to access the Catalyst Voting app.',
+    defaultMessage:
+      '!!!Please enter the PIN as you will need it <strong>every time</strong> you want to access the Catalyst Voting app.',
   },
 });
 
@@ -36,13 +39,13 @@ type Props = {|
   +classicTheme: boolean,
   +pinValidation: string => boolean,
   +isProcessing: boolean,
+  +isRevamp: boolean,
 |};
 
 @observer
 export default class ConfirmPinDialog extends Component<Props> {
-
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+    intl: intlShape.isRequired,
   };
   @observable pinForm: void | ReactToolboxMobxForm;
 
@@ -63,13 +66,15 @@ export default class ConfirmPinDialog extends Component<Props> {
       isProcessing,
     } = this.props;
 
-    const dailogActions = [{
-      label: intl.formatMessage(globalMessages.stepConfirm),
-      primary: true,
-      onClick: this._submitForm,
-      isSubmitting: isProcessing,
-      disabled: isProcessing,
-    }];
+    const dailogActions = [
+      {
+        label: intl.formatMessage(globalMessages.stepConfirm),
+        primary: true,
+        onClick: this._submitForm,
+        isSubmitting: isProcessing,
+        disabled: isProcessing,
+      },
+    ];
 
     return (
       <Dialog
@@ -81,14 +86,35 @@ export default class ConfirmPinDialog extends Component<Props> {
         backButton={<DialogBackButton onBack={goBack} />}
         onClose={cancel}
       >
-        <ProgressStepBlock
-          stepsList={stepsList}
-          progressInfo={progressInfo}
-          classicTheme={classicTheme}
-        />
-        <div className={classnames([styles.lineText, styles.firstItem])}>
-          <FormattedHTMLMessage {...messages.line1} />
-        </div>
+        {this.props.isRevamp ? (
+          <>
+            <Stepper
+              currentStep={String(progressInfo.currentStep)}
+              steps={stepsList.map(step => ({ message: step.message, stepId: String(step.step) }))}
+              setCurrentStep={() => goBack()}
+            />
+            <Typography component="div"
+              textAlign="center"
+              pt="24px"
+              pb="40px"
+              variant="body1"
+              color="grayscale.900"
+            >
+              <FormattedHTMLMessage {...messages.line1} />
+            </Typography>
+          </>
+        ) : (
+          <>
+            <ProgressStepBlock
+              stepsList={stepsList}
+              progressInfo={progressInfo}
+              classicTheme={classicTheme}
+            />
+            <div className={classnames([styles.lineText, styles.firstItem])}>
+              <FormattedHTMLMessage {...messages.line1} />
+            </div>
+          </>
+        )}
         <div className={styles.pinInputContainer}>
           <PinInput
             setForm={form => this.setPinForm(form)}
@@ -101,7 +127,8 @@ export default class ConfirmPinDialog extends Component<Props> {
             allowEmptyInput={false}
           />
         </div>
-      </Dialog>);
+      </Dialog>
+    );
   }
 
   _submitForm: void => Promise<void> = async () => {

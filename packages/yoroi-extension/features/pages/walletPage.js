@@ -3,6 +3,7 @@
 
 import type { LocatorObject } from '../support/webdriver';
 import { By } from 'selenium-webdriver';
+import { selectWalletButton } from './mainWindowPage';
 
 export const summaryTab: LocatorObject = { locator: 'summary', method: 'css' };
 export const sendTab: LocatorObject = { locator: '.send', method: 'css' };
@@ -12,7 +13,10 @@ export const votingTab: LocatorObject = { locator: '.voting', method: 'css' };
 export const delegationByIdTab: LocatorObject = { locator: '.cardanoStake', method: 'css' };
 
 export const walletPlate: LocatorObject = { locator: '.NavPlate_plate', method: 'css' };
-export const walletNameText: LocatorObject = { locator: '.NavPlate_name', method: 'css' };
+export const walletNameText: LocatorObject = {
+  locator: '.NavWalletDetailsRevamp_name',
+  method: 'css',
+};
 export const activeNavTab: LocatorObject = { locator: '.WalletNavButton_active', method: 'css' };
 export const dashboardTab: LocatorObject = { locator: '.stakeDashboard ', method: 'css' };
 export const transactionsTab: LocatorObject = {
@@ -33,16 +37,18 @@ export const navDetailsWalletDropdown: LocatorObject = {
   method: 'css',
 };
 
-export const navDetailsWalletDropdownRow: LocatorObject = {
-  locator: '//button[contains(@class, "NavDropdownRow_head")]',
-  method: 'xpath'
+export const walletCardComponent: LocatorObject = {
+  locator: '.WalletCard_main',
+  method: 'css',
 };
 
 export const switchToWallet = async (customWorld: Object, seekWalletName: string) => {
-  await customWorld.click(navDetailsWalletDropdown);
-  const wallets = await customWorld.findElements(navDetailsWalletDropdownRow);
+  await customWorld.waitForElement(selectWalletButton);
+  await customWorld.click(selectWalletButton);
+
+  const wallets = await customWorld.findElements(walletCardComponent);
   for (const wallet of wallets) {
-    const nameElem = await wallet.findElement(By.css('.NavPlate_name'));
+    const nameElem = await wallet.findElement(By.css('.WalletCard_name'));
     const foundName = await nameElem.getText();
     if (foundName === seekWalletName) {
       await wallet.click();
@@ -50,7 +56,7 @@ export const switchToWallet = async (customWorld: Object, seekWalletName: string
     }
   }
   throw new Error(`No wallet found with name ${seekWalletName}`);
-}
+};
 
 export const navDetailsBuyButton: LocatorObject = {
   locator: '.NavDropdownContent_buyButton',

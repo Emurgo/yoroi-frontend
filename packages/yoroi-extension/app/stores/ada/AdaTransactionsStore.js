@@ -24,11 +24,13 @@ export default class AdaTransactionsStore extends Store<StoresMap, ActionsMap> {
     const txs: GetTransactionsResponse = await this.api.ada.refreshTransactions({
       ...request,
       getRecentTransactionHashes: stateFetcher.getRecentTransactionHashes,
-      getTransactionsByHashes: stateFetcher.getTransactionsByHashes, 
+      getTransactionsByHashes: stateFetcher.getTransactionsByHashes,
       checkAddressesInUse: stateFetcher.checkAddressesInUse,
       getBestBlock: stateFetcher.getBestBlock,
       getTokenInfo: stateFetcher.getTokenInfo,
-      getMultiAssetMetadata: stateFetcher.getMultiAssetMintMetadata
+      getMultiAssetMetadata: stateFetcher.getMultiAssetMintMetadata,
+      getMultiAssetSupply: stateFetcher.getMultiAssetSupply,
+      getTransactionHistory: stateFetcher.getTransactionsHistoryForAddresses,
     });
 
     return txs;

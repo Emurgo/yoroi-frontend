@@ -17,7 +17,7 @@ type Props = {|
   +showFiat?: boolean,
   +shouldHideBalance: boolean,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
-  +amount: null | MultiToken,
+  +amount: ?MultiToken,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?string,
 |};
@@ -45,7 +45,11 @@ export default class AmountDisplay extends Component<Props> {
 
     if (shouldHideBalance) {
       balanceDisplay = <span>{hiddenAmount}</span>;
-      fiatDisplay = <span>{hiddenAmount}</span>;
+      fiatDisplay = (
+        <span>
+          {hiddenAmount} {currency}
+        </span>
+      );
     } else {
       const shiftedAmount = defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
@@ -61,7 +65,7 @@ export default class AmountDisplay extends Component<Props> {
         </>
       );
 
-      if (unitOfAccountSetting.enabled && Boolean(showFiat)) {
+      if (unitOfAccountSetting.enabled) {
         const ticker = tokenInfo.Metadata.ticker;
         if (ticker == null) {
           throw new Error('unexpected main token type');
@@ -81,14 +85,14 @@ export default class AmountDisplay extends Component<Props> {
     return (
       <>
         {showAmount === true && (
-          <p className={styles.amount}>
+          <div className={styles.amount}>
             {balanceDisplay}&nbsp;{truncateToken(getTokenName(tokenInfo))}
-          </p>
+          </div>
         )}
-        {showFiat === true && unitOfAccountSetting.enabled && (
-          <p className={styles.fiat}>
-            {fiatDisplay} {currency}
-          </p>
+        {showFiat === true && (
+          <div className={styles.fiat}>
+            {fiatDisplay || '-'} {currency || 'USD'}
+          </div>
         )}
       </>
     );
@@ -113,8 +117,8 @@ export function FiatDisplay(props: {|
   }
 
   return (
-    <p className={styles.fiat}>
+    <div className={styles.fiat}>
       {formatValue(props.amount)} {props.currency}
-    </p>
+    </div>
   );
 }

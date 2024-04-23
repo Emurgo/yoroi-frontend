@@ -75,7 +75,7 @@ export default class WalletAlreadyExistDialog extends Component<Props> {
           <div> {walletPlate}</div>
           <div>{walletSumDetails}</div>
         </div>
-        <p className={styles.explanation}>{intl.formatMessage(messages.explanation)}</p>
+        <div className={styles.explanation}>{intl.formatMessage(messages.explanation)}</div>
       </Dialog>
     );
   }

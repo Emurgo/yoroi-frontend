@@ -136,6 +136,11 @@ import type {
   MultiAssetMintMetadataFunc,
   GetRecentTransactionHashesFunc,
   GetTransactionsByHashesFunc,
+  MultiAssetSupplyFunc,
+  MultiAssetMintMetadataResponse,
+  MultiAssetSupplyResponse,
+  TxSummary,
+  HistoryFunc,
 } from '../../state-fetch/types';
 import {
   ShelleyCertificateTypes,
@@ -154,7 +159,7 @@ import type {
   DefaultTokenEntry,
 } from '../../../../common/lib/MultiToken';
 import { UtxoStorageApi } from '../models/utils';
-import { bytesToHex, hexToBytes } from '../../../../../coreUtils';
+import { bytesToHex, createFilterUniqueBy, hexToBytes } from '../../../../../coreUtils';
 
 type TxData = {|
   addressLookupMap: Map<number, string>,
@@ -164,15 +169,6 @@ type TxData = {|
     ...UserAnnotation,
   |}>,
 |};
-
-type TokensMintMetadata = {|
-...{[key: string]: TokenMintMetadata[]}
-|}
-
-type TokenMintMetadata = {|
-key: string,
-metadata: any
-|}
 
 async function rawGetAllTxIds(
   db: lf$Database,
@@ -918,6 +914,7 @@ export async function updateUtxos(
   checkAddressesInUse: FilterFunc,
   getTokenInfo: TokenInfoFunc,
   getMultiAssetMintMetadata: MultiAssetMintMetadataFunc,
+  getMultiAssetSupply: MultiAssetSupplyFunc,
 ): Promise<void> {
   const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
   const derivationTables = withLevels == null
@@ -1023,13 +1020,14 @@ export async function updateUtxos(
         tokenIds,
         getTokenInfo,
         getMultiAssetMintMetadata,
+        getMultiAssetSupply,
         publicDeriver.getParent().getNetworkInfo(),
       )
     )
   );
 }
 
-type After = {|
+export type ReferenceTx = {|
   blockHash: string,
   txHash: ?string,
 |};
@@ -1038,12 +1036,15 @@ export async function updateTransactions(
   db: lf$Database,
   publicDeriver: IPublicDeriver<ConceptualWallet>,
   checkAddressesInUse: FilterFunc,
+  getTransactionHistory: HistoryFunc,
   getRecentTransactionHashes: GetRecentTransactionHashesFunc,
   getTransactionsByHashes: GetTransactionsByHashesFunc,
   getBestBlock: BestBlockFunc,
   getTokenInfo: TokenInfoFunc,
   getMultiAssetMetadata: MultiAssetMintMetadataFunc,
-  after?: ?After,
+  getMultiAssetSupply: MultiAssetSupplyFunc,
+  after?: ?ReferenceTx,
+  before?: ?ReferenceTx,
 ): Promise<TxData> {
   const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
   const derivationTables = withLevels == null
@@ -1110,13 +1111,16 @@ export async function updateTransactions(
           remainingDeps,
           publicDeriver,
           lastSyncInfo,
+          getTransactionHistory,
           getRecentTransactionHashes,
           getTransactionsByHashes,
           getBestBlock,
           derivationTables,
           getTokenInfo,
           getMultiAssetMetadata,
+          getMultiAssetSupply,
           after,
+          before,
         );
       }
     );
@@ -1376,13 +1380,16 @@ async function rawUpdateTransactions(
   |},
   publicDeriver: IPublicDeriver<>,
   lastSyncInfo: $ReadOnly<LastSyncInfoRow>,
+  getTransactionHistory: HistoryFunc,
   getRecentTransactionHashes: GetRecentTransactionHashesFunc,
   getTransactionsByHashes: GetTransactionsByHashesFunc,
   getBestBlock: BestBlockFunc,
   derivationTables: Map<number, string>,
   getTokenInfo: TokenInfoFunc,
   getMultiAssetMetadata: MultiAssetMintMetadataFunc,
-  after: ?After,
+  getMultiAssetSupply: MultiAssetSupplyFunc,
+  after: ?ReferenceTx,
+  before: ?ReferenceTx,
 ): Promise<TxData> {
   const network = publicDeriver.getParent().getNetworkInfo();
   // TODO: consider passing this function in as an argument instead of generating it here
@@ -1390,24 +1397,23 @@ async function rawUpdateTransactions(
     getCardanoHaskellBaseConfig(network)
   );
 
-  let untilBlock;
+  if (before != null && after != null) {
+    throw new Error('Only one of `before` or `after` should be used for a resync');
+  }
 
-  if (after) {
-    untilBlock = after.blockHash;
-  } else {
-    const bestBlock = await getBestBlock({
-      network,
-    });
-    untilBlock = bestBlock.hash;
+  const bestBlock = await getBestBlock({ network });
+  const untilBlock = before == null ? bestBlock.hash : before.blockHash;
+  const shouldUpdateLastSync = before == null;
 
+
+  if (shouldUpdateLastSync) {
     // update last sync
     const slotInRemote = (bestBlock.epoch == null || bestBlock.slot == null)
-          ? null
-          : toAbsoluteSlotNumber({
-            epoch: bestBlock.epoch,
-            slot: bestBlock.slot,
-          });
-
+      ? null
+      : toAbsoluteSlotNumber({
+        epoch: bestBlock.epoch,
+        slot: bestBlock.slot,
+      });
     await deps.ModifyLastSyncInfo.overrideLastSyncInfo(
       db, dbTx,
       {
@@ -1423,10 +1429,9 @@ async function rawUpdateTransactions(
   let txHashes;
 
   if (untilBlock != null) {
+
     // address syncing has been done by scanUtxos so no need to do it here again
-
-    //  get new txs from fetcher
-
+    // get new txs from fetcher
     // important: get addresses for our wallet AFTER scanning for new addresses
     const { txIds, addresses } = await rawGetAllTxIds(
       db, dbTx,
@@ -1442,57 +1447,44 @@ async function rawUpdateTransactions(
       derivationTables,
     );
 
-    const recentTxHashesResult = await getRecentTransactionHashes({
-      network,
-      addresses: toRequestAddresses(addresses),
-      before: {
-        blockHash: untilBlock,
-        txHash: after?.txHash,
-      },
-    });
-
-    // should use Object.values(recentTxHashesResult) but flow couldn't infer the type
-    txHashes = Object.keys(recentTxHashesResult).map(addr => recentTxHashesResult[addr])
-      .flatMap(txs => txs.map(tx => tx.txHash));
-
-    const allExistingTxHashes = new Set(
-      (await rawGetTransactions(
-        db, dbTx,
-        {
-          GetPathWithSpecific: deps.GetPathWithSpecific,
-          GetAddress: deps.GetAddress,
-          CardanoByronAssociateTxWithIOs: deps.CardanoByronAssociateTxWithIOs,
-          CardanoShelleyAssociateTxWithIOs: deps.CardanoShelleyAssociateTxWithIOs,
-          AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
-          AssociateTxWithAccountingIOs: deps.AssociateTxWithAccountingIOs,
-          GetTxAndBlock: deps.GetTxAndBlock,
-          GetDerivationSpecific: deps.GetDerivationSpecific,
-          GetCertificates: deps.GetCertificates,
-        },
-        {
-          publicDeriver,
-          getTxAndBlock: async (hashes) => await deps.GetTxAndBlock.byTime(
-            db, dbTx,
-            {
-              txIds: hashes,
-            }
-          )
-        },
-        derivationTables,
-      )).txs
-        // pending txs needs to be updated, so exclude them from existing
-        .filter(tx => tx.block != null)
-        .map(tx => tx.transaction.Hash)
-    );
-
-    const missingTxHashSet = new Set(txHashes.filter(hash => !allExistingTxHashes.has(hash)));
-
-    const txsFromNetwork = await getTransactionsByHashes(
-      {
+    let txsFromNetwork;
+    if (after != null) {
+      /*
+       * HEAD
+       */
+      txsFromNetwork = await getTransactionHistory({
         network,
-        txHashes: [...missingTxHashSet],
-      }
-    );
+        addresses: toRequestAddresses(addresses),
+        after: {
+          block: after.blockHash,
+          tx: after.txHash || undefined,
+        },
+        untilBlock,
+      });
+      txHashes = txsFromNetwork.map(tx => tx.hash);
+    } else {
+      /*
+       * TAIL
+       */
+      const recentTxHashesResult = await getRecentTransactionHashes({
+        network,
+        addresses: toRequestAddresses(addresses),
+        before: {
+          blockHash: untilBlock,
+          txHash: before?.txHash,
+        },
+      });
+      const summaries: Array<TxSummary> =
+        // $FlowFixMe[incompatible-cast]
+        (Object.values(recentTxHashesResult).flat(): Array<TxSummary>)
+          .filter(createFilterUniqueBy(x => x.txHash));
+      summaries.sort((a: TxSummary, b: TxSummary) => {
+        // DESC ordering (b < a)
+        return b.epoch - a.epoch || b.slot - a.slot;
+      });
+      txHashes = summaries.slice(0,20).map(x => x.txHash);
+      txsFromNetwork = await getTransactionsByHashes({ network, txHashes });
+    }
 
     const ourIds = new Set(
       Object.keys(addresses)
@@ -1536,7 +1528,8 @@ async function rawUpdateTransactions(
         toAbsoluteSlotNumber,
         derivationTables,
         getTokenInfo,
-        getMultiAssetMetadata
+        getMultiAssetMetadata,
+        getMultiAssetSupply,
       }
     );
   } else {
@@ -1617,6 +1610,7 @@ async function updateTransactionBatch(
     defaultToken: DefaultTokenEntry,
     getTokenInfo: TokenInfoFunc,
     getMultiAssetMetadata: MultiAssetMintMetadataFunc,
+    getMultiAssetSupply: MultiAssetSupplyFunc,
   |}
 ): Promise<Array<{|
   ...(CardanoByronTxIO | CardanoShelleyTxIO),
@@ -1734,7 +1728,8 @@ async function updateTransactionBatch(
     tokenIds,
     request.getTokenInfo,
     request.getMultiAssetMetadata,
-    request.network
+    request.getMultiAssetSupply,
+    request.network,
   );
 
   // 3) Add new transactions
@@ -2125,33 +2120,36 @@ function genShelleyIOGen(
   };
 }
 
-export async function getTokenMintMetadata(
+export async function getTokenMintMetadataAndSupply(
   tokenIds: string[],
   getMultiAssetMetadata: MultiAssetMintMetadataFunc,
-  network: $ReadOnly<NetworkRow>)
-: Promise<$ReadOnly<TokensMintMetadata>> {
-  if (!tokenIds || tokenIds.length === 0) return {};
-
-  const nativeAssets = tokenIds
+  getMultiAssetSupply: MultiAssetSupplyFunc,
+  network: $ReadOnly<NetworkRow>
+) : Promise<[
+  $ReadOnly<MultiAssetMintMetadataResponse>,
+  $ReadOnly<MultiAssetSupplyResponse>,
+]> {
+  const assets = (tokenIds||[])
     .filter(t => t.indexOf('.') !== -1)
     .map(t => {
       const parts = t.split('.');
-      const assetName = parts[1];
       const policyId = parts[0];
+      const assetNameHex = parts[1];
       return {
-        nameHex: assetName,
-        policy: policyId
+        nameHex: assetNameHex,
+        policy: policyId,
       };
     });
 
-  if (!nativeAssets || nativeAssets.length === 0) return {};
+  if (assets.length === 0)
+    return [{}, {}];
 
-  const tokensMintMetadata = await getMultiAssetMetadata({
-    network,
-    assets: nativeAssets
-  });
+  const [tokensMintMetadata, tokensSupply] = await Promise.all([
+    getMultiAssetMetadata({ network, assets }),
+    getMultiAssetSupply({ network, assets }),
+  ]);
 
-  return tokensMintMetadata;
+  return [tokensMintMetadata, tokensSupply];
 };
 
 const TOKEN_INFO_CACHE_TIME = 1 * 60 * 60 * 1000;
@@ -2166,6 +2164,7 @@ export async function genCardanoAssetMap(
   tokenIds: Array<string>,
   getTokenInfo: TokenInfoFunc,
   getMultiAssetMetadata: MultiAssetMintMetadataFunc,
+  getMultiAssetSupply: MultiAssetSupplyFunc,
   network: $ReadOnly<NetworkRow>,
 ): Promise<Map<string, $ReadOnly<TokenRow>>> {
   const existingDbRows = (await deps.GetToken.fromIdentifier(
@@ -2197,16 +2196,27 @@ export async function genCardanoAssetMap(
 
   const updatingTokenIds = tokenIds.filter(token => !noNeedForUpdateTokens.has(token));
 
-  let tokenInfoResponse;
+  const tokenInfoPromise = getTokenInfo({
+    network,
+    tokenIds: updatingTokenIds.map(id => id.split('.').join(''))
+  });
+
+  const tokenMintMetadataAndSupplyPromise = getTokenMintMetadataAndSupply(
+    tokenIds,
+    getMultiAssetMetadata,
+    getMultiAssetSupply,
+    network,
+  );
+
+  let tokenInfoResponse = {};
+  let metadata = {};
+  let supply = {};
   try {
-    tokenInfoResponse = await getTokenInfo({
-      network,
-      tokenIds: updatingTokenIds.map(id => id.split('.').join(''))
-    });
-  } catch {
-    tokenInfoResponse = {};
+    [tokenInfoResponse, [metadata, supply]] =
+      await Promise.all([tokenInfoPromise, tokenMintMetadataAndSupplyPromise]);
+  } catch(e) {
+    console.error('Failed to query token info, metadata, or supply', e);
   }
-  const metadata = await getTokenMintMetadata(tokenIds, getMultiAssetMetadata, network);
 
   const databaseInsert = updatingTokenIds
     .map(tokenId => {
@@ -2247,18 +2257,16 @@ export async function genCardanoAssetMap(
       const assetName = Buffer.from(parts.name.name()).toString('hex');
       const policyId = Buffer.from(parts.policyId.to_bytes()).toString('hex');
 
-      const assetNameInMetadata = Buffer.from(assetName, 'hex').toString();
-      const identifierInMetadata = `${policyId}.${assetNameInMetadata}`;
-
-      const tokenMetadata = metadata[identifierInMetadata];
+      const tokenMetadata = metadata[tokenId];
+      const tokenSupplyStr = supply[tokenId];
 
       let isNft = false;
 
       let assetMintMetadata: CardanoAssetMintMetadata[] = [];
       if (tokenMetadata) {
-        if (tokenMetadata.filter(m => m.key === '721').length > 0) {
-          isNft = true;
-        }
+        const hasMediaMetadata = tokenMetadata.filter(m => m.key === '721').length > 0;
+        const hasOnlyOneUnit = tokenSupplyStr === '1';
+        isNft = hasMediaMetadata && hasOnlyOneUnit;
 
         assetMintMetadata = tokenMetadata.map(m => {
           const metaObj: CardanoAssetMintMetadata = {};
@@ -2601,7 +2609,7 @@ async function certificateToDb(
     // and in most cases, people generate these addresses through the CLI anyway
     {
       const rewardAddressHex = RustModule.WasmScope(Module => {
-        const stakeCredential = Module.WalletV4.StakeCredential
+        const stakeCredential = Module.WalletV4.Credential
           .from_bytes(hexToBytes(stakeCredentialHex));
         return bytesToHex(
           Module.WalletV4.RewardAddress
@@ -2617,7 +2625,7 @@ async function certificateToDb(
     }
     {
       const enterpriseAddressHex = RustModule.WasmScope(Module => {
-        const stakeCredential = Module.WalletV4.StakeCredential
+        const stakeCredential = Module.WalletV4.Credential
           .from_bytes(hexToBytes(stakeCredentialHex));
         return Buffer.from(
           Module.WalletV4.EnterpriseAddress
@@ -2711,7 +2719,7 @@ async function certificateToDb(
             bytesToHex(rewardAddress.to_address().to_bytes()),
             bytesToHex(Module.WalletV4.StakeDelegation
               .new(stakeCredentials, poolKeyHash).to_bytes()),
-            bytesToHex(Module.WalletV4.StakeCredential
+            bytesToHex(Module.WalletV4.Credential
               .from_keyhash(poolKeyHash).to_bytes()),
           ]
         });
@@ -2766,22 +2774,9 @@ async function certificateToDb(
           const owners = Module.WalletV4.Ed25519KeyHashes.new();
           for (let j = 0; j < cert.poolParams.poolOwners.length; j++) {
             const owner = cert.poolParams.poolOwners[j];
-            // The owners property of the pool parameter is a set of stake key hashes
-            // of the owners. But the values returned from the backend are a set of
-            // stake addresses which are "a single header byte identifying their type
-            // and the network, followed by 28 bytes of payload identifying either a
-            // stake key hash or a script hash" (CIP19). So we convert the stake
-            // address to a key hash (equivalent to removing the header byte).
-            const ownerKey = Module.WalletV4.RewardAddress.from_address(
-              Module.WalletV4.Address.from_bytes(
-                Buffer.from(owner, 'hex')
-              )
-            )?.payment_cred().to_keyhash();
-            if (!ownerKey) {
-              throw new Error(`${nameof(certificateToDb)} expect the pool owner to be a key hash`);
-            }
+            const ownerKey = Module.WalletV4.Ed25519KeyHash.from_hex(owner);
             owners.add(ownerKey);
-            const ownerStakeCredentialHex = bytesToHex(Module.WalletV4.StakeCredential
+            const ownerStakeCredentialHex = bytesToHex(Module.WalletV4.Credential
               .from_keyhash(ownerKey).to_bytes());
             ownerStakeCredentialHexes.push(ownerStakeCredentialHex);
           }
@@ -2820,7 +2815,7 @@ async function certificateToDb(
           );
 
           return [
-            bytesToHex(Module.WalletV4.StakeCredential
+            bytesToHex(Module.WalletV4.Credential
               .from_keyhash(operatorKey).to_bytes()),
             bytesToHex(certificate.to_bytes()),
           ];
@@ -2877,7 +2872,7 @@ async function certificateToDb(
           const poolKeyHash = Module.WalletV4.Ed25519KeyHash
             .from_bytes(hexToBytes(cert.poolKeyHash));
           return [
-            bytesToHex(Module.WalletV4.StakeCredential
+            bytesToHex(Module.WalletV4.Credential
               .from_keyhash(poolKeyHash).to_bytes()),
             bytesToHex(Module.WalletV4.PoolRetirement
               .new(poolKeyHash, cert.epoch).to_bytes()),

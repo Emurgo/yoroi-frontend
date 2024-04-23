@@ -7,6 +7,7 @@ import type {
 import type { TokenRow, TokenMetadata } from '../../api/ada/lib/storage/database/primitives/tables';
 import { isHexadecimal } from 'validator';
 import AssetFingerprint from '@emurgo/cip14-js';
+import { AssetNameUtils } from '@emurgo/yoroi-lib/dist/internals/utils/assets';
 
 export function getTokenName(
   tokenRow: $ReadOnly<{
@@ -17,33 +18,28 @@ export function getTokenName(
     ...,
   }>,
 ): string {
-  const strictName = getTokenStrictName(tokenRow);
+  const strictName = getTokenStrictName(tokenRow).name;
   if (strictName != null) return strictName;
   const identifier = getTokenIdentifierIfExists(tokenRow);
   if (identifier != null) return identifier;
   return '-';
 }
 
-const ASCII_ASSET_NAME_BLACKLIST =
-  new Set<void | string>(['ADA']);
-
-function hexToValidAsciiOrNothing(hexString: string): void | string {
-  const bytes = [...Buffer.from(hexString, 'hex')];
-  const isAscii = bytes.every(b => b >= 32 && b < 127);
-  return isAscii ? String.fromCharCode(...bytes) : undefined;
-}
-
-function decodeAssetNameIfASCII(assetName: ?string): void | string {
-  if (assetName == null || assetName.length === 0 || !isHexadecimal(assetName)) {
-    return undefined;
+function resolveNameProperties(name: ?string): {| name: string, cip67Tag: ?string |} {
+  if (name == null || name.length === 0 || !isHexadecimal(name)) {
+    return { name: '', cip67Tag: null };
   }
-  const asciiName = hexToValidAsciiOrNothing(assetName);
-  return ASCII_ASSET_NAME_BLACKLIST.has(asciiName) ? undefined : asciiName;
+  const { asciiName, hexName, cip67Tag } =
+    AssetNameUtils.resolveProperties(name);
+  return {
+    name: asciiName ?? hexName,
+    cip67Tag: cip67Tag?.toString(10),
+  }
 }
 
 export function assetNameFromIdentifier(identifier: string): string {
   const [, name ] = identifier.split('.');
-  return decodeAssetNameIfASCII(name) || name;
+  return resolveNameProperties(name).name;
 }
 
 export function getTokenStrictName(
@@ -52,17 +48,19 @@ export function getTokenStrictName(
     Metadata: TokenMetadata,
     ...,
   }>,
-): void | string {
+): {| name: ?string, cip67Tag: ?string |} {
   if (tokenRow.Metadata.ticker != null) {
-    return tokenRow.Metadata.ticker;
+    return { name: tokenRow.Metadata.ticker, cip67Tag: null };
   }
   if (tokenRow.Metadata.longName != null) {
-    return tokenRow.Metadata.longName;
+    return { name: tokenRow.Metadata.longName, cip67Tag: null };
   }
   if (tokenRow.Metadata.type === 'Cardano') {
-    return decodeAssetNameIfASCII(tokenRow.Metadata.assetName);
+    const assetName = tokenRow.Metadata.assetName;
+    const { name, cip67Tag } = resolveNameProperties(assetName);
+    return { name, cip67Tag };
   }
-  return undefined;
+  return { name: null, cip67Tag: null };
 }
 
 export function getTokenIdentifierIfExists(

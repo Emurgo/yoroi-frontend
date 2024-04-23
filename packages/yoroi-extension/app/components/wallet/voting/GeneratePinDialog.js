@@ -1,28 +1,26 @@
 // @flow
 import type { Node } from 'react';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { StepsList } from './types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import classnames from 'classnames';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
-
+import { ProgressInfo } from '../../../stores/ada/VotingStore';
+import { Box, Typography } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
-
 import Dialog from '../../widgets/Dialog';
+import Stepper from '../../common/stepper/Stepper';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import DialogBackButton from '../../widgets/DialogBackButton';
-
+import classnames from 'classnames';
 import ProgressStepBlock from './ProgressStepBlock';
-
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { ProgressInfo } from '../../../stores/ada/VotingStore';
-
 import styles from './GeneratePinDialog.scss';
-import type { StepsList } from './types';
 
 const messages = defineMessages({
   line1: {
     id: 'wallet.voting.dialog.step.pin.line1',
-    defaultMessage: '!!!Please write down this PIN as you will need it <strong>every time</strong> you want to access the Catalyst Voting app.',
+    defaultMessage:
+      '!!!Please write down this PIN as you will need it <strong>every time</strong> you want to access the Catalyst Voting app.',
   },
   actionButton: {
     id: 'wallet.voting.dialog.step.pin.actionButton',
@@ -38,6 +36,7 @@ type Props = {|
   +onBack: void => void,
   +classicTheme: boolean,
   +pin: Array<number>,
+  +isRevamp: boolean,
 |};
 
 @observer
@@ -48,7 +47,7 @@ export default class GeneratePinDialog extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { stepsList, progressInfo, next, cancel, classicTheme, pin } = this.props;
+    const { stepsList, progressInfo, next, cancel, classicTheme, pin, isRevamp } = this.props;
 
     const dialogActions = [
       {
@@ -62,7 +61,29 @@ export default class GeneratePinDialog extends Component<Props> {
       <div className={classnames([styles.pinContainer, styles.lastItem])}>
         {pin.map((value, index) => {
           // eslint-disable-next-line react/no-array-index-key
-          return <div key={index} className={styles.pin}><span>{value}</span></div>;
+          return isRevamp ? (
+            <Box
+              key={index}
+              sx={{
+                width: '56px',
+                height: '56px',
+                border: '1px solid',
+                borderColor: 'grayscale.400',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Typography component="div" variant="body1" color="grayscale.600">
+                {value}
+              </Typography>
+            </Box>
+          ) : (
+            <div key={index} className={styles.pin}>
+              <span>{value}</span>
+            </div>
+          );
         })}
       </div>
     );
@@ -77,15 +98,36 @@ export default class GeneratePinDialog extends Component<Props> {
         backButton={<DialogBackButton onBack={this.props.onBack} />}
         onClose={cancel}
       >
-        <ProgressStepBlock
-          stepsList={stepsList}
-          progressInfo={progressInfo}
-          classicTheme={classicTheme}
-        />
+        {this.props.isRevamp ? (
+          <>
+            <Stepper
+              currentStep={String(progressInfo.currentStep)}
+              steps={stepsList.map(step => ({ message: step.message, stepId: String(step.step) }))}
+              setCurrentStep={() => {}}
+            />
+            <Typography component="div"
+              textAlign="center"
+              pt="24px"
+              pb="40px"
+              variant="body1"
+              color="grayscale.900"
+            >
+              <FormattedHTMLMessage {...messages.line1} />
+            </Typography>
+          </>
+        ) : (
+          <>
+            <ProgressStepBlock
+              stepsList={stepsList}
+              progressInfo={progressInfo}
+              classicTheme={classicTheme}
+            />
 
-        <div className={classnames([styles.lineText, styles.firstItem, styles.importantText])}>
-          <FormattedHTMLMessage {...messages.line1} />
-        </div>
+            <div className={classnames([styles.lineText, styles.firstItem, styles.importantText])}>
+              <FormattedHTMLMessage {...messages.line1} />
+            </div>
+          </>
+        )}
         {pinCards}
       </Dialog>
     );

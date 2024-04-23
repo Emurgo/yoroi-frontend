@@ -24,17 +24,17 @@ function StepController(props: Props): Node {
       py="24px"
       gap="24px"
     >
-      {actions.map(({ type, label, disabled, onClick }) => {
+      {actions.map(({ type, label, disabled, onClick }, idx) => {
         const isPrimary = type === 'primary';
         return (
           <Button
-            variant={isPrimary ? 'contained' : 'outlined'}
-            color="primary"
+            key={idx}
+            variant={isPrimary ? 'primary' : 'secondary'}
             disableRipple={false}
             onClick={onClick}
             disabled={disabled}
             style={{ width: '144px', height: '48px' }}
-            id={type+'Button'}
+            id={type + 'Button'}
           >
             {label}
           </Button>

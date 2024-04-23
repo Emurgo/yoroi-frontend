@@ -1,71 +1,48 @@
 // @flow
 import type { Node, ComponentType } from 'react';
+import type { StoresAndActionsProps } from '../../types/injectedPropsType';
+import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { LayoutComponentMap } from '../../styles/context/layout';
 import { Component, lazy } from 'react';
 import { observer } from 'mobx-react';
-import { computed } from 'mobx';
 import { intlShape } from 'react-intl';
-
 import { ROUTES } from '../../routes-config';
-import type { InjectedOrGenerated } from '../../types/injectedPropsType';
+import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { withLayout } from '../../styles/context/layout';
+import { Box } from '@mui/material';
 import globalMessages from '../../i18n/global-messages';
-
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import BannerContainer from '../banners/BannerContainer';
-import type { GeneratedData as BannerContainerData } from '../banners/BannerContainer';
 import WalletAdd from '../../components/wallet/WalletAdd';
-
 import WalletCreateDialogContainer from './dialogs/WalletCreateDialogContainer';
-import type { GeneratedData as WalletCreateDialogContainerData } from './dialogs/WalletCreateDialogContainer';
 import WalletCreateDialog from '../../components/wallet/WalletCreateDialog';
 import WalletBackupDialogContainer from './dialogs/WalletBackupDialogContainer';
-import type { GeneratedData as WalletBackupDialogContainerData } from './dialogs/WalletBackupDialogContainer';
 import WalletBackupDialog from '../../components/wallet/WalletBackupDialog';
-
 import PickCurrencyDialogContainer from './dialogs/PickCurrencyDialogContainer';
-
 import WalletRestoreOptionDialogContainer from './dialogs/WalletRestoreOptionDialogContainer';
 import WalletRestoreDialogContainer from './dialogs/WalletRestoreDialogContainer';
-import type { GeneratedData as WalletRestoreDialogContainerData } from './dialogs/WalletRestoreDialogContainer';
 import WalletRestoreOptionDialog from '../../components/wallet/add/option-dialog/WalletRestoreOptionDialog';
-
 import WalletConnectHWOptionDialogContainer from './dialogs/WalletConnectHWOptionDialogContainer';
 import WalletConnectHWOptionDialog from '../../components/wallet/add/option-dialog/WalletConnectHWOptionDialog';
 import WalletTrezorConnectDialogContainer from './dialogs/WalletTrezorConnectDialogContainer';
-import type { GeneratedData as WalletTrezorConnectDialogContainerData } from './dialogs/WalletTrezorConnectDialogContainer';
 import WalletLedgerConnectDialogContainer from './dialogs/WalletLedgerConnectDialogContainer';
-import type { GeneratedData as WalletLedgerConnectDialogContainerData } from './dialogs/WalletLedgerConnectDialogContainer';
-
 import WalletPaperDialog from '../../components/wallet/WalletPaperDialog';
 import WalletPaperDialogContainer from './dialogs/WalletPaperDialogContainer';
-import type { GeneratedData as WalletPaperDialogContainerData } from './dialogs/WalletPaperDialogContainer';
 import CreatePaperWalletDialogContainer from './dialogs/CreatePaperWalletDialogContainer';
-import type { GeneratedData as CreatePaperWalletDialogContainerData } from './dialogs/CreatePaperWalletDialogContainer';
 import UserPasswordDialog from '../../components/wallet/add/paper-wallets/UserPasswordDialog';
-
 import SidebarContainer from '../SidebarContainer';
-import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import NavBar from '../../components/topbar/NavBar';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
-
-import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import { withLayout } from '../../styles/context/layout';
-import type { LayoutComponentMap } from '../../styles/context/layout';
 import AddWalletPageRevamp from './AddWalletPageRevamp';
 
 export const AddAnotherWalletPromise: void => Promise<any> = () =>
   import('../../components/wallet/add/AddAnotherWallet');
 const AddAnotherWallet = lazy(AddAnotherWalletPromise);
 
-export type GeneratedData = typeof AddWalletPage.prototype.generated;
-
-type Props = InjectedOrGenerated<GeneratedData>;
-type InjectedProps = {| +renderLayoutComponent: LayoutComponentMap => Node |};
-type AllProps = {| ...Props, ...InjectedProps |};
+type Props = StoresAndActionsProps;
+type InjectedLayoutProps = {| +renderLayoutComponent: LayoutComponentMap => Node |};
+type AllProps = {| ...Props, ...InjectedLayoutProps |};
 
 @observer
 class AddWalletPage extends Component<AllProps> {
@@ -74,10 +51,10 @@ class AddWalletPage extends Component<AllProps> {
   };
 
   onClose: void => void = () => {
-    if (!this.generated.stores.wallets.hasAnyWallets) {
-      this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
+    if (!this.props.stores.wallets.hasAnyWallets) {
+      this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
     }
-    this.generated.actions.dialogs.closeActiveDialog.trigger();
+    this.props.actions.dialogs.closeActiveDialog.trigger();
   };
 
   openDialogWrapper: any => void = dialog => {
@@ -85,47 +62,40 @@ class AddWalletPage extends Component<AllProps> {
     // this is because on close, asynchronous unmount actions get triggered
     // so there is no safe time at which we can un-select the API
     // so instead, the API gets reset before we start any dialog flow
-    this.generated.actions.profile.setSelectedNetwork.trigger(undefined);
+    this.props.actions.profile.setSelectedNetwork.trigger(undefined);
 
-    this.generated.actions.dialogs.open.trigger({ dialog });
+    this.props.actions.dialogs.open.trigger({ dialog });
   };
 
   componentDidMount() {
-    this.generated.actions.wallets.unselectWallet.trigger();
+    const { isRevampTheme } = this.props.stores.profile;
+    if (!isRevampTheme) this.props.actions.wallets.unselectWallet.trigger();
   }
 
   render(): Node {
-    const { selectedNetwork } = this.generated.stores.profile;
-    const { actions, stores } = this.generated;
+    const { selectedNetwork } = this.props.stores.profile;
+    const { actions, stores } = this.props;
     const { uiDialogs } = stores;
 
     const openTrezorConnectDialog = (type: string) => {
       if (selectedNetwork === undefined) {
         throw new Error(`${nameof(AddWalletPage)} no API selected`);
       }
-      const api = getApiForNetwork(selectedNetwork);
       actions.dialogs.push.trigger({
         dialog: WalletTrezorConnectDialogContainer,
         params: { restoreType: { type, extra: 'trezor' } },
       });
-      if (api !== ApiOptions.ada) {
-        throw new Error(`${nameof(AddWalletPage)} not ADA API type`);
-      }
-      this.generated.actions[ApiOptions.ada].trezorConnect.init.trigger();
+      this.props.actions.ada.trezorConnect.init.trigger();
     };
     const openLedgerConnectDialog = (type: string) => {
       if (selectedNetwork === undefined) {
         throw new Error(`${nameof(AddWalletPage)} no API selected`);
       }
-      const api = getApiForNetwork(selectedNetwork);
       actions.dialogs.push.trigger({
         dialog: WalletLedgerConnectDialogContainer,
         params: { restoreType: { type, extra: 'ledger' } },
       });
-      if (api !== ApiOptions.ada) {
-        throw new Error(`${nameof(AddWalletPage)} not ADA API type`);
-      }
-      this.generated.actions[ApiOptions.ada].ledgerConnect.init.trigger();
+      this.props.actions.ada.ledgerConnect.init.trigger();
     };
 
     let activeDialog = null;
@@ -140,33 +110,40 @@ class AddWalletPage extends Component<AllProps> {
           onCardanoPreviewTestnet={() =>
             actions.profile.setSelectedNetwork.trigger(networks.CardanoPreviewTestnet)
           }
+          onCardanoSanchoTestnet={() =>
+            actions.profile.setSelectedNetwork.trigger(networks.CardanoSanchoTestnet)
+          }
         />
       );
     } else if (uiDialogs.isOpen(WalletCreateDialog)) {
       activeDialog = (
         <WalletCreateDialogContainer
-          {...this.generated.WalletCreateDialogContainerProps}
+          actions={actions}
+          stores={stores}
           onClose={this.onClose}
         />
       );
     } else if (uiDialogs.isOpen(WalletPaperDialog)) {
-      // <TODO:PENDING_REMOVAL>
+      // <TODO:PENDING_REMOVAL> paper
       activeDialog = (
         <WalletPaperDialogContainer
-          {...this.generated.WalletPaperDialogContainerProps}
+          actions={actions}
+          stores={stores}
           onClose={this.onClose}
         />
       );
     } else if (uiDialogs.isOpen(UserPasswordDialog)) {
       activeDialog = (
         <CreatePaperWalletDialogContainer
-          {...this.generated.CreatePaperWalletDialogContainerProps}
+          actions={actions}
+          stores={stores}
         />
       );
     } else if (uiDialogs.isOpen(WalletBackupDialog)) {
       activeDialog = (
         <WalletBackupDialogContainer
-          {...this.generated.WalletBackupDialogContainerProps}
+          actions={actions}
+          stores={stores}
           onClose={this.onClose}
         />
       );
@@ -189,16 +166,6 @@ class AddWalletPage extends Component<AllProps> {
               params: { restoreType: { type: 'cip1852', extra: undefined, length: 24 } },
             });
           }}
-          onPaperRestore={
-            // <TODO:PENDING_REMOVAL>
-            getApiForNetwork(selectedNetwork) !== ApiOptions.ada 
-              ? undefined
-              : () =>
-                  actions.dialogs.push.trigger({
-                    dialog: WalletRestoreDialogContainer,
-                    params: { restoreType: { type: 'bip44', extra: 'paper', length: 21 } },
-                  })
-          }
         />
       );
     } else if (uiDialogs.isOpen(WalletRestoreDialogContainer)) {
@@ -207,7 +174,8 @@ class AddWalletPage extends Component<AllProps> {
         throw new Error(`${nameof(AddWalletPage)} no mode for restoration selected`);
       activeDialog = (
         <WalletRestoreDialogContainer
-          {...this.generated.WalletRestoreDialogContainerProps}
+          actions={actions}
+          stores={stores}
           onClose={this.onClose}
           onBack={() => actions.dialogs.pop.trigger()}
           mode={mode}
@@ -227,7 +195,8 @@ class AddWalletPage extends Component<AllProps> {
         throw new Error(`${nameof(AddWalletPage)} no mode for restoration selected`);
       activeDialog = (
         <WalletTrezorConnectDialogContainer
-          {...this.generated.WalletTrezorConnectDialogContainerProps}
+          actions={actions}
+          stores={stores}
           mode={mode}
           onClose={this.onClose}
           onBack={() => actions.dialogs.pop.trigger()}
@@ -239,7 +208,8 @@ class AddWalletPage extends Component<AllProps> {
         throw new Error(`${nameof(AddWalletPage)} no mode for restoration selected`);
       activeDialog = (
         <WalletLedgerConnectDialogContainer
-          {...this.generated.WalletLedgerConnectDialogContainerProps}
+          actions={actions}
+          stores={stores}
           mode={mode}
           onClose={this.onClose}
           onBack={() => actions.dialogs.pop.trigger()}
@@ -249,8 +219,8 @@ class AddWalletPage extends Component<AllProps> {
 
     let addWalletPageClassic = (
       <TopBarLayout
-        banner={<BannerContainer {...this.generated.BannerContainerProps} />}
-        sidebar={<SidebarContainer {...this.generated.SidebarContainerProps} />}
+        banner={<BannerContainer actions={actions} stores={stores} />}
+        sidebar={<SidebarContainer actions={actions} stores={stores} />}
         navbar={
           <NavBar
             title={
@@ -269,11 +239,11 @@ class AddWalletPage extends Component<AllProps> {
       </TopBarLayout>
     );
 
-    const { hasAnyWallets } = this.generated.stores.wallets;
+    const { hasAnyWallets } = this.props.stores.wallets;
     if (!hasAnyWallets) {
       addWalletPageClassic = (
         <TopBarLayout
-          banner={<BannerContainer {...this.generated.BannerContainerProps} />}
+          banner={<BannerContainer actions={actions} stores={stores} />}
           asModern
         >
           <WalletAdd
@@ -281,19 +251,15 @@ class AddWalletPage extends Component<AllProps> {
             onCreate={() => this.openDialogWrapper(WalletCreateDialog)}
             onRestore={() => this.openDialogWrapper(WalletRestoreOptionDialog)}
             onSettings={this._goToSettingsRoot}
-            onDaedalusTransfer={this._goToDaedalusTransferRoot}
           />
           {activeDialog}
         </TopBarLayout>
       );
     }
 
-    const goToRoute = this.generated.actions.router.goToRoute;
-    const addWalletPageRevamp = (
-      <TopBarLayout
-        banner={<BannerContainer {...this.generated.BannerContainerProps} />}
-        sidebar={<SidebarContainer {...this.generated.SidebarContainerProps} />}
-      >
+    const goToRoute = this.props.actions.router.goToRoute;
+    const addWalletPageComponent = (
+      <>
         <AddWalletPageRevamp
           onHardwareConnect={() => this.openDialogWrapper(WalletConnectHWOptionDialog)}
           onCreate={() => goToRoute.trigger({ route: ROUTES.WALLETS.CREATE_NEW_WALLET })}
@@ -302,6 +268,19 @@ class AddWalletPage extends Component<AllProps> {
           hasAnyWallets={hasAnyWallets}
         />
         {activeDialog}
+      </>
+    );
+
+    const addWalletPageRevamp = !hasAnyWallets ? (
+      <Box py="48px" height="100vh" sx={{ overflowY: 'auto' }}>
+        {addWalletPageComponent}
+      </Box>
+    ) : (
+      <TopBarLayout
+        banner={<BannerContainer actions={actions} stores={stores} />}
+        sidebar={<SidebarContainer actions={actions} stores={stores} />}
+      >
+        {addWalletPageComponent}
       </TopBarLayout>
     );
 
@@ -312,179 +291,9 @@ class AddWalletPage extends Component<AllProps> {
   }
 
   _goToSettingsRoot: () => void = () => {
-    this.generated.actions.router.goToRoute.trigger({
+    this.props.actions.router.goToRoute.trigger({
       route: ROUTES.SETTINGS.ROOT,
     });
   };
-
-  _goToDaedalusTransferRoot: () => void = () => {
-    this.generated.actions.router.goToRoute.trigger({
-      route: ROUTES.TRANSFER.DAEDALUS,
-    });
-  };
-
-  @computed get generated(): {|
-    BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
-    CreatePaperWalletDialogContainerProps: InjectedOrGenerated<CreatePaperWalletDialogContainerData>,
-    SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
-    WalletBackupDialogContainerProps: InjectedOrGenerated<WalletBackupDialogContainerData>,
-    WalletCreateDialogContainerProps: InjectedOrGenerated<WalletCreateDialogContainerData>,
-    WalletLedgerConnectDialogContainerProps: InjectedOrGenerated<WalletLedgerConnectDialogContainerData>,
-    WalletPaperDialogContainerProps: InjectedOrGenerated<WalletPaperDialogContainerData>,
-    WalletRestoreDialogContainerProps: InjectedOrGenerated<WalletRestoreDialogContainerData>,
-    WalletTrezorConnectDialogContainerProps: InjectedOrGenerated<WalletTrezorConnectDialogContainerData>,
-    actions: {|
-      ada: {|
-        ledgerConnect: {|
-          init: {| trigger: (params: void) => void |},
-        |},
-        trezorConnect: {|
-          init: {| trigger: (params: void) => void |},
-        |},
-      |},
-      dialogs: {|
-        closeActiveDialog: {|
-          trigger: (params: void) => void,
-        |},
-        open: {|
-          trigger: (params: {|
-            dialog: any,
-            params?: any,
-          |}) => void,
-        |},
-        push: {|
-          trigger: (params: {|
-            dialog: any,
-            params?: any,
-          |}) => void,
-        |},
-        pop: {|
-          trigger: void => void,
-        |},
-      |},
-      profile: {|
-        setSelectedNetwork: {|
-          trigger: (params: void | $ReadOnly<NetworkRow>) => void,
-        |},
-      |},
-      router: {|
-        goToRoute: {|
-          trigger: (params: {|
-            publicDeriver?: null | PublicDeriver<>,
-            params?: ?any,
-            route: string,
-          |}) => void,
-        |},
-      |},
-      wallets: {|
-        unselectWallet: {| trigger: (params: void) => void |},
-      |},
-    |},
-    stores: {|
-      profile: {| selectedNetwork: void | $ReadOnly<NetworkRow> |},
-      uiDialogs: {|
-        hasOpen: boolean,
-        getParam: <T>(number | string) => void | T,
-        isOpen: any => boolean,
-      |},
-      wallets: {| hasAnyWallets: boolean |},
-    |},
-  |} {
-    if (this.props.generated !== undefined) {
-      return this.props.generated;
-    }
-    if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(AddWalletPage)} no way to generated props`);
-    }
-    const { stores, actions } = this.props;
-    return Object.freeze({
-      stores: {
-        profile: {
-          selectedNetwork: stores.profile.selectedNetwork,
-        },
-        uiDialogs: {
-          hasOpen: stores.uiDialogs.hasOpen,
-          isOpen: stores.uiDialogs.isOpen,
-          getParam: stores.uiDialogs.getParam,
-        },
-        wallets: {
-          hasAnyWallets: stores.wallets.hasAnyWallets,
-        },
-      },
-      actions: {
-        router: {
-          goToRoute: {
-            trigger: actions.router.goToRoute.trigger,
-          },
-        },
-        dialogs: {
-          closeActiveDialog: {
-            trigger: actions.dialogs.closeActiveDialog.trigger,
-          },
-          open: {
-            trigger: actions.dialogs.open.trigger,
-          },
-          push: {
-            trigger: actions.dialogs.push.trigger,
-          },
-          pop: {
-            trigger: actions.dialogs.pop.trigger,
-          },
-        },
-        profile: {
-          setSelectedNetwork: {
-            trigger: actions.profile.setSelectedNetwork.trigger,
-          },
-        },
-        wallets: {
-          unselectWallet: {
-            trigger: actions.wallets.unselectWallet.trigger,
-          },
-        },
-        ada: {
-          trezorConnect: {
-            init: {
-              trigger: actions.ada.trezorConnect.init.trigger,
-            },
-          },
-          ledgerConnect: {
-            init: {
-              trigger: actions.ada.ledgerConnect.init.trigger,
-            },
-          },
-        },
-      },
-      SidebarContainerProps: ({ actions, stores }: InjectedOrGenerated<SidebarContainerData>),
-      WalletCreateDialogContainerProps: ({
-        actions,
-        stores,
-      }: InjectedOrGenerated<WalletCreateDialogContainerData>),
-      WalletPaperDialogContainerProps: ({
-        actions,
-        stores,
-      }: InjectedOrGenerated<WalletPaperDialogContainerData>),
-      CreatePaperWalletDialogContainerProps: ({
-        stores,
-        actions,
-      }: InjectedOrGenerated<CreatePaperWalletDialogContainerData>),
-      WalletBackupDialogContainerProps: ({
-        actions,
-        stores,
-      }: InjectedOrGenerated<WalletBackupDialogContainerData>),
-      WalletRestoreDialogContainerProps: ({
-        actions,
-        stores,
-      }: InjectedOrGenerated<WalletRestoreDialogContainerData>),
-      WalletTrezorConnectDialogContainerProps: ({
-        actions,
-        stores,
-      }: InjectedOrGenerated<WalletTrezorConnectDialogContainerData>),
-      WalletLedgerConnectDialogContainerProps: ({
-        actions,
-        stores,
-      }: InjectedOrGenerated<WalletLedgerConnectDialogContainerData>),
-      BannerContainerProps: ({ actions, stores }: InjectedOrGenerated<BannerContainerData>),
-    });
-  }
 }
 export default (withLayout(AddWalletPage): ComponentType<Props>);

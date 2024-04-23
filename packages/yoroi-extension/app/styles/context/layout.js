@@ -24,6 +24,7 @@ const LayoutProvider = (props: Object): Node => {
     <LayoutContext.Provider
       value={{
         selectedLayout: localLayout,
+        currentTheme: layout,
         isRevampLayout: localLayout === 'REVAMP',
         renderLayoutComponent: (layoutMap: LayoutComponentMap = {}) => {
           const selectedComponent = layoutMap[localLayout];

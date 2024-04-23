@@ -27,10 +27,23 @@
   }
 }
 
-:global(.YoroiModern), :global(.YoroiRevamp)  {
+:global(.YoroiModern),
+:global(.YoroiRevamp) {
   .dialog {
     :global(.Dialog_actions) {
       margin-top: 10px;
+    }
+  }
+}
+
+:global(.YoroiRevamp) {
+  .dialog {
+    p {
+      font-size: 16px;
+    }
+
+    .checkbox {
+      padding-bottom: 0px;
     }
   }
 }

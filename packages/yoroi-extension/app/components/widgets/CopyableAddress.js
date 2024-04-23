@@ -8,7 +8,7 @@ import CopyToClipboard from 'react-copy-to-clipboard';
 import { ReactComponent as IconCopy } from '../../assets/images/copy.inline.svg';
 import { ReactComponent as IconCopied } from '../../assets/images/copied.inline.svg';
 import styles from './CopyableAddress.scss';
-import { Tooltip, Typography } from '@mui/material';
+import { Box, Tooltip, Typography } from '@mui/material';
 import type { Notification } from '../../types/notificationType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
@@ -31,6 +31,7 @@ type Props = {|
   +placementTooltip?: string,
   +notification: ?Notification,
   +darkVariant?: boolean,
+  +sx?: Object,
 |};
 
 @observer
@@ -43,23 +44,25 @@ export default class CopyableAddress extends Component<Props> {
     darkVariant: boolean,
     elementId: void,
     onCopyAddress: void,
+    sx: Object,
     placementTooltip: string,
   |} = {
     onCopyAddress: undefined,
     placementTooltip: 'bottom',
     elementId: undefined,
+    sx: {},
     darkVariant: false,
   };
 
   render(): Node {
-    const { hash, elementId, onCopyAddress, notification, darkVariant } = this.props;
+    const { hash, elementId, sx, onCopyAddress, notification, darkVariant } = this.props;
     const { intl } = this.context;
 
     const Icon = notification && notification.id === elementId ? IconCopied : IconCopy;
     const tooltipComponent = (
       <Tooltip
         title={
-          <Typography variant="body3">
+          <Typography component="div" variant="body3">
             {notification && notification.id === elementId
               ? intl.formatMessage(notification.message)
               : intl.formatMessage(copyableMessages.copyTooltipMessage)}
@@ -74,7 +77,11 @@ export default class CopyableAddress extends Component<Props> {
     );
 
     return (
-      <div className={classnames([styles.component, darkVariant === true && styles.componentDark])}>
+      <Box
+        sx={sx}
+        className={classnames([styles.component, darkVariant === true && styles.componentDark])}
+        id="copyableAddress"
+      >
         <span>{this.props.children}</span>
         <CopyToClipboard
           text={hash}
@@ -82,7 +89,7 @@ export default class CopyableAddress extends Component<Props> {
         >
           {tooltipComponent}
         </CopyToClipboard>
-      </div>
+      </Box>
     );
   }
 }

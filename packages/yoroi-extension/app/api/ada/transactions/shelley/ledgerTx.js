@@ -39,8 +39,8 @@ import {
 import {
   ChainDerivations,
 } from '../../../../config/numbersConfig';
-import { derivePublicByAddressing } from '../../lib/cardanoCrypto/utils';
 import cbor from 'cbor';
+import { derivePublicByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
 
 // ==================== LEDGER ==================== //
 /** Generate a payload for Ledger SignTx */
@@ -342,7 +342,7 @@ function formatLedgerCertificates(
   addressingMap: string => (void | { +path: Array<number>, ... }),
 ): Array<Certificate> {
   const getPath = (
-    stakeCredential: RustModule.WalletV4.StakeCredential
+    stakeCredential: RustModule.WalletV4.Credential
   ): Array<number> => {
     const rewardAddr = RustModule.WalletV4.RewardAddress.new(
       networkId,
@@ -849,11 +849,11 @@ export function toLedgerSignRequest(
       const hash = Module.WalletV4.Ed25519KeyHash.from_hex(hashHex);
       const enterpriseAddress = Module.WalletV4.EnterpriseAddress.new(
         networkId,
-        Module.WalletV4.StakeCredential.from_keyhash(hash),
+        Module.WalletV4.Credential.from_keyhash(hash),
       ).to_address().to_hex();
       const stakeAddress = Module.WalletV4.RewardAddress.new(
         networkId,
-        Module.WalletV4.StakeCredential.from_keyhash(hash),
+        Module.WalletV4.Credential.from_keyhash(hash),
       ).to_address().to_hex();
       return ownUtxoAddressMap[enterpriseAddress] ||
         ownStakeAddressMap[stakeAddress];

@@ -37,7 +37,7 @@ type Props = {|
 |};
 
 @observer
-// <TODO:PENDING_REMOVAL>
+// <TODO:PENDING_REMOVAL> paper
 export default class PaperWalletDialog extends Component<Props> {
   static defaultProps: {|error: void|} = {
     error: undefined
@@ -122,7 +122,7 @@ export default class PaperWalletDialog extends Component<Props> {
           ))}
         </Select>
 
-        {error && <p className={styles.error}>{intl.formatMessage(error, error.values)}</p>}
+        {error && <div className={styles.error}>{intl.formatMessage(error, error.values)}</div>}
       </Dialog>
     );
   }

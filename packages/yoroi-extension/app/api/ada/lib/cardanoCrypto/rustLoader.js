@@ -8,8 +8,8 @@ import type {
   TransactionBuilder
 } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 import typeof * as WasmV4 from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
-import typeof * as SigmaRust from 'ergo-lib-wasm-browser';
 import typeof * as WasmMessageSigning from '@emurgo/cardano-message-signing-browser/cardano_message_signing';
+import typeof * as CrossCsl from '@emurgo/cross-csl-browser';
 
 // TODO: unmagic the constants
 const MAX_VALUE_BYTES = 5000;
@@ -18,7 +18,7 @@ const MAX_TX_BYTES = 16384;
 type RustModuleLoadFlags = 'dontLoadMessagesSigning';
 
 function isWasmPointer(o: ?any): boolean {
-  return o != null && (typeof o.ptr === 'number') && (typeof o.free === 'function');
+  return o != null && (typeof o.__wbg_ptr === 'number') && (typeof o.free === 'function');
 }
 
 /*
@@ -70,7 +70,7 @@ function createWasmScope(): {|
    * This way ANY wasm pointer produced within the callback will be automatically destroyed,
    * but only as long as it's created using the injected proxied module reference.
    */
-  const scope: Array<{ ptr: number, free: () => void, ... }> = [];
+  const scope: Array<{ __wbg_ptr: number, free: () => void, ... }> = [];
   function recursiveProxy<E>(originalObject: E): E {
     if (!isProxiable(originalObject)) {
       return originalObject;
@@ -136,13 +136,13 @@ function createWasmScope(): {|
     free: () => {
       scope.forEach(x => {
         // Checking just to avoid a null-pointer crash
-        if (x.ptr !== 0) {
+        if (x.__wbg_ptr !== 0) {
           x.free()
         }
       });
     },
     size: () => scope.length,
-    isFree: () => scope.every(x => x.ptr === 0),
+    isFree: () => scope.every(x => x.__wbg_ptr === 0),
   }
 }
 
@@ -150,9 +150,8 @@ class Module {
   _wasmv2: WasmV2;
   _wasmv3: WasmV3;
   _wasmv4: WasmV4;
-  _ergo: SigmaRust;
   _messageSigning: WasmMessageSigning;
-  _crossCsl: any;
+  _crossCsl: CrossCsl;
 
   async load(flags: Array<RustModuleLoadFlags> = []): Promise<void> {
     if (
@@ -166,7 +165,6 @@ class Module {
     // this is used only by the now defunct jormungandr wallet
     this._wasmv3 = ((null: any): WasmV3);
     this._wasmv4 = await import('@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib');
-    this._ergo = await import('ergo-lib-wasm-browser');
     if (flags.includes('dontLoadMessagesSigning')) {
       this._messageSigning = ((null: any): WasmMessageSigning);
     } else {
@@ -249,7 +247,7 @@ class Module {
   get WalletV4(): WasmV4 {
     return this._wasmv4;
   }
-  get CrossCsl(): any {
+  get CrossCsl(): CrossCsl {
     return this._crossCsl;
   }
   WalletV4TxBuilderFromConfig(config: {
@@ -321,10 +319,7 @@ class Module {
         .build()
     );
   }
-  // Need to expose through a getter to get Flow to detect the type correctly
-  get SigmaRust(): SigmaRust {
-    return this._ergo;
-  }
+
   get MessageSigning(): WasmMessageSigning {
     return this._messageSigning;
   }

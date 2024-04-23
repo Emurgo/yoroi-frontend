@@ -6,6 +6,7 @@ import { intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import styles from './SideBarCategoryRevamp.scss';
+import { Typography } from '@mui/material';
 
 type Props = {|
   +icon: string,
@@ -43,7 +44,11 @@ export default class SideBarCategoryRevamp extends Component<Props> {
         <span className={styles.icon}>
           <SvgElem />
         </span>
-        {label ? <span className={styles.label}>{intl.formatMessage(label)}</span> : null}
+        {label ? (
+          <Typography component="div" variant="caption2" className={styles.label}>
+            {intl.formatMessage(label)}
+          </Typography>
+        ) : null}
       </button>
     ) : (
       <a
@@ -57,7 +62,7 @@ export default class SideBarCategoryRevamp extends Component<Props> {
         <span className={styles.icon}>
           <SvgElem />
         </span>
-        {label ? <span>{intl.formatMessage(label)}</span> : null}
+        {label ? <Typography component="div" variant="caption2">{intl.formatMessage(label)}</Typography> : null}
       </a>
     );
   }

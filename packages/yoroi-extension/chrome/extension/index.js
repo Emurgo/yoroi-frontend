@@ -15,7 +15,8 @@ import { addCloseListener, TabIdKeys } from '../../app/utils/tabManager';
 import { Logger } from '../../app/utils/logging';
 import { LazyLoadPromises } from '../../app/Routes';
 import environment from '../../app/environment';
-import { trackStartup } from '../../app/api/analytics';
+import { ampli } from '../../ampli/index';
+import { ROUTES } from '../../app/routes-config';
 
 // run MobX in strict mode
 configure({ enforceActions: 'always' });
@@ -26,12 +27,12 @@ BigNumber.DEBUG = true;
 
 // Entry point into our application
 const initializeYoroi: void => Promise<void> = async () => {
+
   const api = await setupApi();
   const router = new RouterStore();
   const hashHistory = createHashHistory();
   const history = syncHistoryWithStore(hashHistory, router);
-  const stores = createStores(api, actions, router);
-  await trackStartup(stores);
+  const stores = await createStores(api, actions, router);
 
   Logger.debug(`[yoroi] stores created`);
 
@@ -40,9 +41,9 @@ const initializeYoroi: void => Promise<void> = async () => {
     actions,
     translations,
     stores,
-    reset: action(() => {
+    reset: action(async () => {
       Action.resetAllActions();
-      createStores(api, actions, router);
+      await createStores(api, actions, router);
     })
   };
 
@@ -66,6 +67,35 @@ const initializeYoroi: void => Promise<void> = async () => {
     <App stores={stores} actions={actions} history={history} />,
     root
   );
+
+  history.listen(({ pathname }) => {
+    if (pathname === ROUTES.ASSETS.ROOT) {
+      ampli.assetsPageViewed();
+    } else if (pathname === ROUTES.TRANSFER) {
+      ampli.claimAdaPageViewed();
+    } else if (pathname === ROUTES.PROFILE.LANGUAGE_SELECTION) {
+      ampli.createWalletLanguagePageViewed();
+    } else if (pathname === ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES) {
+      ampli.connectorPageViewed();
+    } else if (pathname === ROUTES.WALLETS.ADD) {
+      ampli.createWalletSelectMethodPageViewed();
+    } else if (pathname === ROUTES.WALLETS.RECEIVE.ROOT) {
+      ampli.receivePageViewed();
+    } else if (pathname === ROUTES.SETTINGS.ROOT) {
+      ampli.settingsPageViewed();
+    } else if (
+      pathname === ROUTES.REVAMP.CATALYST_VOTING ||
+        pathname === ROUTES.WALLETS.CATALYST_VOTING
+    ) {
+      ampli.votingPageViewed();
+    } else if (pathname === ROUTES.WALLETS.TRANSACTIONS) {
+      ampli.transactionsPageViewed();
+    } else if (pathname === ROUTES.STAKING) {
+      ampli.stakingCenterPageViewed();
+    } else if (pathname === ROUTES.WALLETS.ROOT) {
+      ampli.walletPageViewed();
+    }
+  });
 };
 
 addCloseListener(TabIdKeys.Primary);

@@ -61,7 +61,6 @@ import type { StoresMap } from '../index';
 import type {
   GetExtendedPublicKeyResponse,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import { trackWalletCreation } from '../../api/analytics';
 
 export default class LedgerConnectStore
   extends Store<StoresMap, ActionsMap>
@@ -116,7 +115,9 @@ export default class LedgerConnectStore
 
   @action _cancel: void => void = () => {
     this.teardown();
-    this.ledgerConnect && this.ledgerConnect.dispose();
+    if (this.ledgerConnect) {
+      this.ledgerConnect.dispose();
+    }
     this.ledgerConnect = undefined;
   };
 
@@ -190,7 +191,9 @@ export default class LedgerConnectStore
 
       return this._normalizeHWResponse(extendedPublicKeyResp);
     } finally {
-      this.ledgerConnect && this.ledgerConnect.dispose();
+      if (this.ledgerConnect != null) {
+        this.ledgerConnect.dispose();
+      };
       this.ledgerConnect = undefined;
     }
   }
@@ -222,7 +225,9 @@ export default class LedgerConnectStore
         }
       )).map(this._normalizeHWResponse);
     } finally {
-      this.ledgerConnect && this.ledgerConnect.dispose();
+      if (this.ledgerConnect != null) {
+        this.ledgerConnect.dispose();
+      }
       this.ledgerConnect = undefined;
     }
   }
@@ -366,7 +371,6 @@ export default class LedgerConnectStore
     await this._saveHW(
       walletName,
     );
-    trackWalletCreation('hardware');
   };
 
   /** creates new wallet and loads it */

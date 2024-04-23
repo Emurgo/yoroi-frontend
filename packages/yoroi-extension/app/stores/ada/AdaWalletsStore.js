@@ -6,11 +6,8 @@ import Request from '../lib/LocalizedRequest';
 import type { GenerateWalletRecoveryPhraseFunc } from '../../api/ada/index';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import { buildCheckAndCall } from '../lib/check';
-import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import { trackWalletCreation } from '../../api/analytics';
 import { HARD_DERIVATION_START } from '../../config/numbersConfig';
 
 export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
@@ -24,13 +21,9 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
   setup(): void {
     super.setup();
     const { ada, walletBackup } = this.actions;
-    const { asyncCheck } = buildCheckAndCall(ApiOptions.ada, () => {
-      if (this.stores.profile.selectedNetwork == null) return undefined;
-      return getApiForNetwork(this.stores.profile.selectedNetwork);
-    });
-    walletBackup.finishWalletBackup.listen(asyncCheck(this._createInDb));
+    walletBackup.finishWalletBackup.listen(this._createInDb);
     ada.wallets.startWalletCreation.listen(this._startWalletCreation);
-    ada.wallets.createWallet.listen(asyncCheck(this._createWallet))
+    ada.wallets.createWallet.listen(this._createWallet)
   }
 
   // =================== SEND MONEY ==================== //
@@ -142,8 +135,6 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
       });
       return wallet;
     }).promise;
-
-    trackWalletCreation('created');
   };
 
   _createWallet: {|
@@ -169,7 +160,5 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
       });
       return wallet;
     }).promise;
-
-    trackWalletCreation('created');
   };
 }

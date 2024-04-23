@@ -1,0 +1,25 @@
+// @flow
+import type { Node } from 'react';
+import { Component } from 'react';
+import { observer } from 'mobx-react';
+import { intlShape  } from 'react-intl';
+import OptForAnalyticsForm from '../../../components/profile/terms-of-use/OptForAnalyticsForm';
+import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+
+@observer
+export default class AnalyticsSettingsPage extends Component<StoresAndActionsProps> {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+    intl: intlShape.isRequired,
+  };
+
+  render(): Node {
+    return (
+      <OptForAnalyticsForm
+        onOpt={this.props.actions.profile.optForAnalytics.trigger}
+        variant="settings"
+        isOptedIn={this.props.stores.profile.analyticsOption}
+      />
+    );
+  }
+}

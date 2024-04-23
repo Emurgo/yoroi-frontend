@@ -5,7 +5,7 @@ import { intlShape } from 'react-intl';
 import moment from 'moment';
 import { observer } from 'mobx-react';
 
-import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
 import StakingDashboard from '../../../components/wallet/staking/dashboard/StakingDashboard';
 import UserSummary from '../../../components/wallet/staking/dashboard/UserSummary';
 import StakePool from '../../../components/wallet/staking/dashboard/StakePool';
@@ -16,51 +16,30 @@ import { digestForHash } from '../../../api/ada/lib/storage/database/primitives/
 import { handleExternalLinkClick } from '../../../utils/routing';
 import LocalizableError from '../../../i18n/LocalizableError';
 import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer';
-import type { GeneratedData as UnmangleTxDialogContainerData } from '../../transfer/UnmangleTxDialogContainer';
 import config from '../../../config';
 import type { PoolTuples } from '../../../api/common/lib/storage/bridge/delegationUtils';
-import type { PoolMeta, DelegationRequests } from '../../../stores/toplevel/DelegationStore';
-import type { AdaDelegationRequests } from '../../../stores/ada/AdaDelegationStore';
-import EpochProgressContainer from './EpochProgressContainer';
+import type {  DelegationRequests } from '../../../stores/toplevel/DelegationStore';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type {
   ToRealTimeFunc,
   ToAbsoluteSlotNumberFunc,
   CurrentEpochLengthFunc,
   TimeSinceGenesisFunc,
 } from '../../../api/common/lib/storage/bridge/timeUtils';
-import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
-import type {
-  CurrentTimeRequests,
-  TimeCalcRequests,
-} from '../../../stores/base/BaseCardanoTimeStore';
-import type { Notification } from '../../../types/notificationType';
 
 import globalMessages from '../../../i18n/global-messages';
-import { computed, observable, runInAction } from 'mobx';
-import { ApiOptions, getApiForNetwork, } from '../../../api/common/utils';
-import type { NetworkRow, TokenRow, } from '../../../api/ada/lib/storage/database/primitives/tables';
+import { observable, runInAction } from 'mobx';
 import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import DeregisterDialogContainer from '../../transfer/DeregisterDialogContainer';
-import type { GeneratedData as DeregisterDialogContainerData } from '../../transfer/DeregisterDialogContainer';
-import type { GeneratedData as WithdrawalTxDialogContainerData } from '../../transfer/WithdrawalTxDialogContainer';
 import WithdrawalTxDialogContainer from '../../transfer/WithdrawalTxDialogContainer';
-import {
-  MultiToken,
-} from '../../../api/common/lib/MultiToken';
-import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
+import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { getTokenName, genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../../utils/formatters';
 import { generateGraphData } from '../../../utils/graph';
 
-export type GeneratedData = typeof StakingDashboardPage.prototype.generated;
-
-type Props = InjectedOrGenerated<GeneratedData>;
-
 @observer
-export default class StakingDashboardPage extends Component<Props> {
+export default class StakingDashboardPage extends Component<StoresAndActionsProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -68,8 +47,8 @@ export default class StakingDashboardPage extends Component<Props> {
   @observable notificationElementId: string = '';
 
   async componentDidMount() {
-    const timeStore = this.generated.stores.time;
-    const publicDeriver = this.generated.stores.wallets.selected;
+    const timeStore = this.props.stores.substores.ada.time;
+    const publicDeriver = this.props.stores.wallets.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(StakingDashboardPage)} no public deriver. Should never happen`);
     }
@@ -82,15 +61,15 @@ export default class StakingDashboardPage extends Component<Props> {
   }
 
   componentWillUnmount() {
-    this.generated.actions.ada.delegationTransaction.reset.trigger({ justTransaction: false });
+    this.props.actions.ada.delegationTransaction.reset.trigger({ justTransaction: false });
   }
 
   render(): Node {
-    const publicDeriver = this.generated.stores.wallets.selected;
+    const publicDeriver = this.props.stores.wallets.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(StakingDashboardPage)} no public deriver. Should never happen`);
     }
-    const delegationStore = this.generated.stores.delegation;
+    const delegationStore = this.props.stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
@@ -104,22 +83,15 @@ export default class StakingDashboardPage extends Component<Props> {
     const dashboard = (
       <StakingDashboard
         pageInfo={
-          !delegationRequests.getCurrentDelegation.wasExecuted ||
-          delegationRequests.getCurrentDelegation.isExecuting
+          stakePools.pools == null
             ? undefined
             : {
-                currentPage: this.generated.stores.delegation.selectedPage,
-                numPages: Array.from(
-                  new Set(
-                    delegationRequests.getCurrentDelegation.result?.currEpoch?.pools.map(
-                      tuple => tuple[0]
-                    )
-                  ) ?? []
-                ).length,
-                goToPage: page => this.generated.actions.delegation.setSelectedPage.trigger(page),
+                currentPage: this.props.stores.delegation.selectedPage,
+                numPages: stakePools.pools.length,
+                goToPage: page => this.props.actions.delegation.setSelectedPage.trigger(page),
               }
         }
-        hasAnyPending={this.generated.stores.transactions.hasAnyPending}
+        hasAnyPending={this.props.stores.transactions.hasAnyPending}
         stakePools={stakePools}
         userSummary={this._generateUserSummary({
           delegationRequests,
@@ -130,19 +102,21 @@ export default class StakingDashboardPage extends Component<Props> {
         graphData={generateGraphData({
           delegationRequests,
           publicDeriver,
-          currentEpoch:
-            this.generated.stores.time.getCurrentTimeRequests(publicDeriver).currentEpoch,
-          shouldHideBalance: this.generated.stores.profile.shouldHideBalance,
-          getLocalPoolInfo: this.generated.stores.delegation.getLocalPoolInfo,
-          tokenInfo: this.generated.stores.tokenInfoStore.tokenInfo,
+          currentEpoch: this.props.stores.substores.ada.time.getCurrentTimeRequests(publicDeriver)
+            .currentEpoch,
+          shouldHideBalance: this.props.stores.profile.shouldHideBalance,
+          getLocalPoolInfo: this.props.stores.delegation.getLocalPoolInfo,
+          tokenInfo: this.props.stores.tokenInfoStore.tokenInfo,
         })}
-        delegationHistory={delegationRequests.getCurrentDelegation.result?.fullHistory}
+        isUnregistered={!this._isRegistered(publicDeriver)}
         epochLength={this.getEpochLengthInDays(publicDeriver)}
-        ticker={truncateToken(getTokenName(
-          this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
-            publicDeriver.getParent().getNetworkInfo().NetworkId
+        ticker={truncateToken(
+          getTokenName(
+            this.props.stores.tokenInfoStore.getDefaultTokenInfo(
+              publicDeriver.getParent().getNetworkInfo().NetworkId
+            )
           )
-        ))}
+        )}
       />
     );
 
@@ -155,7 +129,7 @@ export default class StakingDashboardPage extends Component<Props> {
   }
 
   getEpochLengthInDays: (PublicDeriver<>) => ?number = publicDeriver => {
-    const timeStore = this.generated.stores.time;
+    const timeStore = this.props.stores.substores.ada.time;
     const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
     const getEpochLength = timeCalcRequests.requests.currentEpochLength.result;
     if (getEpochLength == null) return null;
@@ -174,7 +148,7 @@ export default class StakingDashboardPage extends Component<Props> {
     rewardPopup: Node,
     showWarning: boolean,
   |} = publicDeriver => {
-    const timeStore = this.generated.stores.time;
+    const timeStore = this.props.stores.substores.ada.time;
     const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
     const currTimeRequests = timeStore.getCurrentTimeRequests(publicDeriver);
     const toAbsoluteSlot = timeCalcRequests.requests.toAbsoluteSlot.result;
@@ -185,7 +159,7 @@ export default class StakingDashboardPage extends Component<Props> {
     if (timeSinceGenesis == null) return undefined;
     const getEpochLength = timeCalcRequests.requests.currentEpochLength.result;
     if (getEpochLength == null) return undefined;
-    const delegationStore = this.generated.stores.delegation;
+    const delegationStore = this.props.stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
@@ -265,7 +239,7 @@ export default class StakingDashboardPage extends Component<Props> {
           upcomingRewards.unshift(
             this.generateUpcomingRewardInfo({
               epoch: currTimeRequests.currentEpoch + i + 1,
-              pools: currEpochCert.pools,
+              pools: isRegistered ? currEpochCert.pools : [],
               toAbsoluteSlot,
               toRealTime,
               timeSinceGenesis,
@@ -278,7 +252,7 @@ export default class StakingDashboardPage extends Component<Props> {
           upcomingRewards.unshift(
             this.generateUpcomingRewardInfo({
               epoch: currTimeRequests.currentEpoch + 2,
-              pools: result.prevEpoch.pools,
+              pools: isRegistered ? result.prevEpoch.pools : [],
               toAbsoluteSlot,
               toRealTime,
               timeSinceGenesis,
@@ -291,7 +265,7 @@ export default class StakingDashboardPage extends Component<Props> {
           upcomingRewards.unshift(
             this.generateUpcomingRewardInfo({
               epoch: currTimeRequests.currentEpoch + 1,
-              pools: result.prevPrevEpoch.pools,
+              pools: isRegistered ? result.prevPrevEpoch.pools : [],
               toAbsoluteSlot,
               toRealTime,
               timeSinceGenesis,
@@ -305,7 +279,7 @@ export default class StakingDashboardPage extends Component<Props> {
           upcomingRewards.unshift(
             this.generateUpcomingRewardInfo({
               epoch: currTimeRequests.currentEpoch,
-              pools: result.prevPrevPrevEpoch.pools,
+              pools: isRegistered ? result.prevPrevPrevEpoch.pools : [],
               toAbsoluteSlot,
               toRealTime,
               timeSinceGenesis,
@@ -316,7 +290,7 @@ export default class StakingDashboardPage extends Component<Props> {
           );
         }
 
-        const poolExplorerLink = this.generated.stores.explorers.selectedExplorer
+        const poolExplorerLink = this.props.stores.explorers.selectedExplorer
           .get(publicDeriver.getParent().getNetworkInfo().NetworkId)
           ?.getOrDefault('pool');
 
@@ -381,7 +355,7 @@ export default class StakingDashboardPage extends Component<Props> {
     const endEpochMoment = moment(endEpochTime);
 
     const miniPoolInfo = request.pools.map(pool => {
-      const meta = this.generated.stores.delegation.getLocalPoolInfo(
+      const meta = this.props.stores.delegation.getLocalPoolInfo(
         request.publicDeriver.getParent().getNetworkInfo(),
         pool[0]
       );
@@ -405,7 +379,7 @@ export default class StakingDashboardPage extends Component<Props> {
   };
 
   getErrorInFetch: (PublicDeriver<>) => void | {| error: LocalizableError |} = publicDeriver => {
-    const delegationStore = this.generated.stores.delegation;
+    const delegationStore = this.props.stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
@@ -413,44 +387,38 @@ export default class StakingDashboardPage extends Component<Props> {
     if (delegationRequests.error != null) {
       return { error: delegationRequests.error };
     }
-    if (delegationRequests.getCurrentDelegation.result != null) {
-      const currentDelegation = delegationRequests.getCurrentDelegation.result;
-      const currEpochInfo = currentDelegation.currEpoch;
-      if (currEpochInfo == null) {
-        return undefined;
-      }
-    }
     return undefined;
   };
 
   getStakePools: (PublicDeriver<>) => {| pools: null | Array<Node | void> |} = publicDeriver => {
-    const delegationStore = this.generated.stores.delegation;
+    const delegationStore = this.props.stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
     }
     if (
-      !delegationRequests.getCurrentDelegation.wasExecuted ||
-      delegationRequests.getCurrentDelegation.isExecuting ||
-      delegationRequests.getCurrentDelegation.result == null
+      !delegationRequests.getDelegatedBalance.wasExecuted ||
+      delegationRequests.getDelegatedBalance.isExecuting ||
+      delegationRequests.getDelegatedBalance.result == null
     ) {
       return { pools: null };
     }
-    if (delegationRequests.getCurrentDelegation.result.currEpoch == null) {
+    if (delegationRequests.getDelegatedBalance.result.delegation == null) {
       return { pools: [] };
     }
-    const currentPools = delegationRequests.getCurrentDelegation.result.currEpoch.pools;
-
+    const currentPools = [
+      [delegationRequests.getDelegatedBalance.result.delegation, 1]
+    ];
     const tooltipNotification = {
       duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
       message: globalMessages.copyTooltipMessage,
     };
 
-    const { uiNotifications } = this.generated.stores;
+    const { uiNotifications } = this.props.stores;
     const { intl } = this.context;
     return {
       pools: currentPools.map(pool => {
-        const meta = this.generated.stores.delegation.getLocalPoolInfo(
+        const meta = this.props.stores.delegation.getLocalPoolInfo(
           publicDeriver.getParent().getNetworkInfo(),
           pool[0]
         );
@@ -488,7 +456,7 @@ export default class StakingDashboardPage extends Component<Props> {
             key={digestForHash(JSON.stringify(meta), 0)}
             data={stakePoolMeta}
             selectedExplorer={
-              this.generated.stores.explorers.selectedExplorer.get(
+              this.props.stores.explorers.selectedExplorer.get(
                 publicDeriver.getParent().getNetworkInfo().NetworkId
               ) ??
               (() => {
@@ -497,13 +465,13 @@ export default class StakingDashboardPage extends Component<Props> {
             }
             hash={pool[0]}
             moreInfo={moreInfo}
-            classicTheme={this.generated.stores.profile.isClassicTheme}
+            classicTheme={this.props.stores.profile.isClassicTheme}
             onCopyAddressTooltip={(address, elementId) => {
               if (!uiNotifications.isOpen(elementId)) {
                 runInAction(() => {
                   this.notificationElementId = elementId;
                 });
-                this.generated.actions.notifications.open.trigger({
+                this.props.actions.notifications.open.trigger({
                   id: elementId,
                   duration: tooltipNotification.duration,
                   message: tooltipNotification.message,
@@ -523,12 +491,13 @@ export default class StakingDashboardPage extends Component<Props> {
   };
 
   getDialog: (PublicDeriver<>) => Node = publicDeriver => {
-    const uiDialogs = this.generated.stores.uiDialogs;
+    const { actions, stores } = this.props;
+    const uiDialogs = this.props.stores.uiDialogs;
 
     if (uiDialogs.isOpen(LessThanExpectedDialog)) {
       return (
         <LessThanExpectedDialog
-          close={() => this.generated.actions.dialogs.closeActiveDialog.trigger()}
+          close={() => this.props.actions.dialogs.closeActiveDialog.trigger()}
         />
       );
     }
@@ -536,8 +505,9 @@ export default class StakingDashboardPage extends Component<Props> {
     if (uiDialogs.isOpen(UnmangleTxDialogContainer)) {
       return (
         <UnmangleTxDialogContainer
-          {...this.generated.UnmangleTxDialogContainerProps}
-          onClose={() => this.generated.actions.dialogs.closeActiveDialog.trigger()}
+          actions={actions}
+          stores={stores}
+          onClose={() => this.props.actions.dialogs.closeActiveDialog.trigger()}
         />
       );
     }
@@ -545,14 +515,15 @@ export default class StakingDashboardPage extends Component<Props> {
     if (uiDialogs.isOpen(DeregisterDialogContainer)) {
       return (
         <DeregisterDialogContainer
-          {...this.generated.DeregisterDialogContainerProps}
+          actions={actions}
+          stores={stores}
           alwaysShowDeregister
           onNext={() => {
             // note: purposely don't await since the next dialog will properly render the spinner
-            this.generated.actions.ada.delegationTransaction.createWithdrawalTxForWallet.trigger({
+            this.props.actions.ada.delegationTransaction.createWithdrawalTxForWallet.trigger({
               publicDeriver,
             });
-            this.generated.actions.dialogs.open.trigger({ dialog: WithdrawalTxDialogContainer });
+            this.props.actions.dialogs.open.trigger({ dialog: WithdrawalTxDialogContainer });
           }}
         />
       );
@@ -560,12 +531,13 @@ export default class StakingDashboardPage extends Component<Props> {
     if (uiDialogs.isOpen(WithdrawalTxDialogContainer)) {
       return (
         <WithdrawalTxDialogContainer
-          {...this.generated.WithdrawalTxDialogContainerProps}
+          actions={actions}
+          stores={stores}
           onClose={() => {
-            this.generated.actions.ada.delegationTransaction.reset.trigger({
+            this.props.actions.ada.delegationTransaction.reset.trigger({
               justTransaction: false,
             });
-            this.generated.actions.dialogs.closeActiveDialog.trigger();
+            this.props.actions.dialogs.closeActiveDialog.trigger();
           }}
         />
       );
@@ -580,7 +552,6 @@ export default class StakingDashboardPage extends Component<Props> {
     errorIfPresent: void | {| error: LocalizableError |},
   |}) => Node = request => {
     const showRewardAmount =
-      request.delegationRequests.getCurrentDelegation.wasExecuted &&
       request.delegationRequests.getDelegatedBalance.wasExecuted &&
       request.errorIfPresent == null;
 
@@ -588,7 +559,7 @@ export default class StakingDashboardPage extends Component<Props> {
 
     const defaultToken = request.publicDeriver.getParent().getDefaultToken();
 
-    const balance = this.generated.stores.transactions.balance;
+    const balance = this.props.stores.transactions.balance;
 
     const rewardBalance =
       request.delegationRequests.getDelegatedBalance.result == null
@@ -596,7 +567,7 @@ export default class StakingDashboardPage extends Component<Props> {
         : request.delegationRequests.getDelegatedBalance.result.accountPart;
 
     const currentlyDelegating =
-      (request.delegationRequests.getCurrentDelegation.result?.currEpoch?.pools ?? []).length > 0;
+      request.delegationRequests.getDelegatedBalance.result?.delegation != null;
 
     return (
       <UserSummary
@@ -604,36 +575,30 @@ export default class StakingDashboardPage extends Component<Props> {
         cannotUnmangleSum={
           unmangledAmountsRequest?.cannotUnmangle ?? new MultiToken([], defaultToken)
         }
-        defaultTokenInfo={
-          this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
-            request.publicDeriver.getParent().getNetworkInfo().NetworkId
-          )
-        }
-        getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+        defaultTokenInfo={this.props.stores.tokenInfoStore.getDefaultTokenInfo(
+          request.publicDeriver.getParent().getNetworkInfo().NetworkId
+        )}
+        getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
         onUnmangle={() =>
-          this.generated.actions.dialogs.open.trigger({
+          this.props.actions.dialogs.open.trigger({
             dialog: UnmangleTxDialogContainer,
           })
         }
-        totalSum={
-          balance == null
-            ? undefined
-            : balance.joinAddCopy(rewardBalance)
-        }
+        totalSum={balance == null ? undefined : balance.joinAddCopy(rewardBalance)}
         totalRewards={
           !showRewardAmount || request.delegationRequests.getDelegatedBalance.result == null
             ? undefined
             : request.delegationRequests.getDelegatedBalance.result.accountPart
         }
         openLearnMore={() =>
-          this.generated.actions.dialogs.open.trigger({
+          this.props.actions.dialogs.open.trigger({
             dialog: LessThanExpectedDialog,
           })
         }
         withdrawRewards={
           this._isRegistered(request.publicDeriver) === true
             ? () => {
-                this.generated.actions.dialogs.open.trigger({ dialog: DeregisterDialogContainer });
+                this.props.actions.dialogs.open.trigger({ dialog: DeregisterDialogContainer });
               }
             : undefined
         }
@@ -641,18 +606,18 @@ export default class StakingDashboardPage extends Component<Props> {
           // temporarily disabled
           return undefined;
           /*
-          const tokenRow = this.generated.stores.tokenInfoStore.tokenInfo
+          const tokenRow = this.props.stores.tokenInfoStore.tokenInfo
             .get(entry.networkId.toString())
             ?.get(entry.identifier);
           if (tokenRow == null) return undefined;
 
-          if (!this.generated.stores.profile.unitOfAccount.enabled) return undefined;
-          const currency = this.generated.stores.profile.unitOfAccount.currency;
+          if (!this.props.stores.profile.unitOfAccount.enabled) return undefined;
+          const currency = this.props.stores.profile.unitOfAccount.currency;
 
           const shiftedAmount = entry.amount
             .shiftedBy(-tokenRow.Metadata.numberOfDecimals);
 
-          const coinPrice = this.generated.stores.coinPriceStore.getCurrentPrice(
+          const coinPrice = this.props.stores.coinPriceStore.getCurrentPrice(
             getTokenName(tokenRow),
             currency
           );
@@ -663,11 +628,12 @@ export default class StakingDashboardPage extends Component<Props> {
           };
           */
         }}
-        shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
+        shouldHideBalance={this.props.stores.profile.shouldHideBalance}
         isDelegated={
           showRewardAmount &&
           request.delegationRequests.getDelegatedBalance.result !== null &&
-          currentlyDelegating
+          currentlyDelegating &&
+          this._isRegistered(request.publicDeriver) === true
         }
       />
     );
@@ -677,218 +643,17 @@ export default class StakingDashboardPage extends Component<Props> {
     if (!isCardanoHaskell(publicDeriver.getParent().getNetworkInfo())) {
       return undefined;
     }
-    const adaDelegationRequests = this.generated.stores.substores.ada.
-      delegation.getDelegationRequests(
+    const delegationRequests = this.props.stores.delegation.getDelegationRequests(
       publicDeriver
     );
-    if (adaDelegationRequests == null) return undefined;
-    return adaDelegationRequests.getRegistrationHistory.result?.current;
+    if (delegationRequests == null) return undefined;
+    if (
+      !delegationRequests.getDelegatedBalance.wasExecuted ||
+      delegationRequests.getDelegatedBalance.isExecuting ||
+      delegationRequests.getDelegatedBalance.result == null
+    ) {
+      return undefined;
+    }
+    return delegationRequests.getDelegatedBalance.result.stakeRegistered;
   };
-
-  @computed get generated(): {|
-    UnmangleTxDialogContainerProps: InjectedOrGenerated<UnmangleTxDialogContainerData>,
-    DeregisterDialogContainerProps: InjectedOrGenerated<DeregisterDialogContainerData>,
-    WithdrawalTxDialogContainerProps: InjectedOrGenerated<WithdrawalTxDialogContainerData>,
-    actions: {|
-      ada: {|
-        delegationTransaction: {|
-          reset: {| trigger: (params: {| justTransaction: boolean |}) => void |},
-          createWithdrawalTxForWallet: {|
-            trigger: (params: {| publicDeriver: PublicDeriver<> |}) => Promise<void>,
-          |},
-        |},
-      |},
-      delegation: {|
-        setSelectedPage: {|
-          trigger: (params: number) => void,
-        |},
-      |},
-      dialogs: {|
-        closeActiveDialog: {|
-          trigger: (params: void) => void,
-        |},
-        open: {|
-          trigger: (params: {|
-            dialog: any,
-            params?: any,
-          |}) => void,
-        |},
-      |},
-      notifications: {|
-        open: {| trigger: (params: Notification) => void |},
-      |},
-    |},
-    stores: {|
-      coinPriceStore: {|
-        getCurrentPrice: (from: string, to: string) => ?string,
-      |},
-      explorers: {|
-        selectedExplorer: Map<number, SelectedExplorer>,
-      |},
-      profile: {|
-        isClassicTheme: boolean,
-        shouldHideBalance: boolean,
-        unitOfAccount: UnitOfAccountSettingType,
-      |},
-      delegation: {|
-        selectedPage: number,
-        getLocalPoolInfo: ($ReadOnly<NetworkRow>, string) => void | PoolMeta,
-        getDelegationRequests: (PublicDeriver<>) => void | DelegationRequests,
-      |},
-      time: {|
-        getCurrentTimeRequests: (PublicDeriver<>) => CurrentTimeRequests,
-        getTimeCalcRequests: (PublicDeriver<>) => TimeCalcRequests,
-      |},
-      tokenInfoStore: {|
-        tokenInfo: TokenInfoMap,
-        getDefaultTokenInfo: number => $ReadOnly<TokenRow>,
-      |},
-      substores: {|
-        ada: {|
-          delegation: {|
-            getDelegationRequests: (PublicDeriver<>) => void | AdaDelegationRequests,
-          |},
-        |},
-      |},
-      transactions: {|
-        balance: ?MultiToken,
-        hasAnyPending: boolean,
-      |},
-      uiDialogs: {|
-        getParam: <T>(number | string) => T,
-        isOpen: any => boolean,
-      |},
-      uiNotifications: {|
-        getTooltipActiveNotification: string => ?Notification,
-        isOpen: string => boolean,
-      |},
-      wallets: {|
-        sendMoneyRequest: {|
-          error: ?LocalizableError,
-          isExecuting: boolean,
-        |},
-        selected: null | PublicDeriver<>,
-      |},
-    |},
-  |} {
-    if (this.props.generated !== undefined) {
-      return this.props.generated;
-    }
-    if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(StakingDashboardPage)} no way to generated props`);
-    }
-    const { stores, actions } = this.props;
-
-    const selected = stores.wallets.selected;
-    if (selected == null) {
-      throw new Error(`${nameof(EpochProgressContainer)} no wallet selected`);
-    }
-    const api = getApiForNetwork(selected.getParent().getNetworkInfo());
-    const time = (() => {
-      if (api === ApiOptions.ada) {
-        return {
-          getTimeCalcRequests: stores.substores.ada.time.getTimeCalcRequests,
-          getCurrentTimeRequests: stores.substores.ada.time.getCurrentTimeRequests,
-        };
-      }
-
-      return {
-        getTimeCalcRequests: (undefined: any),
-        getCurrentTimeRequests: () => { throw new Error(`${nameof(StakingDashboardPage)} api not supported`) },
-      };
-    })();
-    return Object.freeze({
-      stores: {
-        explorers: {
-          selectedExplorer: stores.explorers.selectedExplorer,
-        },
-        profile: {
-          isClassicTheme: stores.profile.isClassicTheme,
-          shouldHideBalance: stores.profile.shouldHideBalance,
-          unitOfAccount: stores.profile.unitOfAccount,
-        },
-        wallets: {
-          selected: stores.wallets.selected,
-          sendMoneyRequest: {
-            error: stores.wallets.sendMoneyRequest.error,
-            isExecuting: stores.wallets.sendMoneyRequest.isExecuting,
-          },
-        },
-        coinPriceStore: {
-          getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
-        },
-        tokenInfoStore: {
-          tokenInfo: stores.tokenInfoStore.tokenInfo,
-          getDefaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfo,
-        },
-        uiDialogs: {
-          isOpen: stores.uiDialogs.isOpen,
-          getParam: stores.uiDialogs.getParam,
-        },
-        uiNotifications: {
-          isOpen: stores.uiNotifications.isOpen,
-          getTooltipActiveNotification: stores.uiNotifications.getTooltipActiveNotification,
-        },
-        transactions: {
-          hasAnyPending: stores.transactions.hasAnyPending,
-          balance: stores.transactions.balance,
-        },
-        delegation: {
-          selectedPage: stores.delegation.selectedPage,
-          getLocalPoolInfo: stores.delegation.getLocalPoolInfo,
-          getDelegationRequests: stores.delegation.getDelegationRequests,
-        },
-        time,
-        substores: {
-          ada: {
-            delegation: {
-              getDelegationRequests: stores.substores.ada.delegation.getDelegationRequests,
-            },
-          },
-        },
-      },
-      actions: {
-        dialogs: {
-          closeActiveDialog: {
-            trigger: actions.dialogs.closeActiveDialog.trigger,
-          },
-          open: {
-            trigger: actions.dialogs.open.trigger,
-          },
-        },
-        notifications: {
-          open: {
-            trigger: actions.notifications.open.trigger,
-          },
-        },
-        delegation: {
-          setSelectedPage: {
-            trigger: actions.delegation.setSelectedPage.trigger,
-          },
-        },
-        ada: {
-          delegationTransaction: {
-            reset: {
-              trigger: actions.ada.delegationTransaction.reset.trigger,
-            },
-            createWithdrawalTxForWallet: {
-              trigger: actions.ada.delegationTransaction.createWithdrawalTxForWallet.trigger,
-            },
-          },
-        },
-      },
-      UnmangleTxDialogContainerProps: ({
-        stores,
-        actions,
-      }: InjectedOrGenerated<UnmangleTxDialogContainerData>),
-      WithdrawalTxDialogContainerProps: ({
-        stores,
-        actions,
-      }: InjectedOrGenerated<WithdrawalTxDialogContainerData>),
-      DeregisterDialogContainerProps: ({
-        stores,
-        actions,
-      }: InjectedOrGenerated<DeregisterDialogContainerData>),
-    });
-  }
 }

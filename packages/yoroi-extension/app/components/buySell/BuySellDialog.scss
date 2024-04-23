@@ -4,6 +4,7 @@
   padding-left: 40px;
   padding-right: 40px;
   max-height: 600px;
+  max-width: 600px;
 
   .description {
     color: var(--yoroi-palette-gray-900);
@@ -20,17 +21,16 @@
   flex-direction: column;
   letter-spacing: 0;
   line-height: 22px;
+  max-width: 600px;
 }
 
 .row {
   display: flex;
-  flex-direction: row;
-  height: 60px;
-  align-items: flex-start;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: space-between;
 
   .left {
-    flex: 7;
-
     .nameAndCurrency {
       color: var(--yoroi-palette-gray-900);
       font-size: 16px;
@@ -44,15 +44,6 @@
       line-height: 22px;
     }
   }
-  .right {
-    flex: 1;
-    width: 40px;
-    height: 40px;
-  }
-}
-
-.row:first-child {
-  margin-top: 40px;
 }
 
 .verifyIcon {

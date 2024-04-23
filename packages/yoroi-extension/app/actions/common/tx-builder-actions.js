@@ -14,6 +14,7 @@ export default class TxBuilderActions {
   updateMemo: Action<void | string> = new Action();
   addToken: Action<{|
     token?: $ReadOnly<TokenRow>,
+    shouldSendAll?: boolean,
     shouldReset?: boolean,
   |}> = new Action();
   calculateMaxAmount: AsyncAction<void> = new AsyncAction();

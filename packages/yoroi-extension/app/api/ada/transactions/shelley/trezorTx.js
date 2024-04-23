@@ -37,9 +37,9 @@ import {
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { range } from 'lodash';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
-import { derivePublicByAddressing } from '../../lib/cardanoCrypto/utils';
 import blake2b from 'blake2b';
 import cbor from 'cbor';
+import { derivePublicByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
 
 // ==================== TREZOR ==================== //
 /** Generate a payload for Trezor SignTx */
@@ -119,15 +119,15 @@ export async function createTrezorSignTxPayload(
     request = {
       ...request,
       auxiliaryData: {
-        governanceRegistrationParameters: {
+        cVoteRegistrationParameters: {
           delegations: [
             {
-              votingPublicKey: votingPublicKey.replace(/^0x/, ''),
+              votePublicKey: votingPublicKey.replace(/^0x/, ''),
               weight: 1,
             }
           ],
           stakingPath: stakingKeyPath,
-          rewardAddressParameters: {
+          paymentAddressParameters: {
             addressType: CardanoAddressType.BASE,
             path: paymentKeyPath,
             stakingPath: stakingKeyPath,
@@ -688,11 +688,11 @@ export function toTrezorSignRequest(
       const hash = requiredSigners.get(i);
       const enterpriseAddress = RustModule.WalletV4.EnterpriseAddress.new(
         networkId,
-        RustModule.WalletV4.StakeCredential.from_keyhash(hash),
+        RustModule.WalletV4.Credential.from_keyhash(hash),
       ).to_address().to_hex();
       const stakeAddress = RustModule.WalletV4.RewardAddress.new(
         networkId,
-        RustModule.WalletV4.StakeCredential.from_keyhash(hash),
+        RustModule.WalletV4.Credential.from_keyhash(hash),
       ).to_address().to_hex();
       const ownAddressPath = ownUtxoAddressMap[enterpriseAddress] ||
         ownStakeAddressMap[stakeAddress];
@@ -713,7 +713,7 @@ export function toTrezorSignRequest(
   const certificates = txBody.certs();
   if (certificates) {
     const getPath = (
-      stakeCredential: RustModule.WalletV4.StakeCredential
+      stakeCredential: RustModule.WalletV4.Credential
     ): Array<number> => {
       const rewardAddr = RustModule.WalletV4.RewardAddress.new(
         networkId,

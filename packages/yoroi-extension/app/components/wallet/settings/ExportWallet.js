@@ -3,9 +3,8 @@ import { Component } from 'react';
 import type { Node, ComponentType } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
-import styles from './ExportWallet.scss';
 import { observer } from 'mobx-react';
-import { Button } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { withLayout } from '../../../styles/context/layout';
 
@@ -37,19 +36,45 @@ class ExportWallet extends Component<Props & InjectedProps> {
     const { isRevampLayout, openDialog } = this.props;
 
     return (
-      <div className={styles.component}>
-        <h2>{intl.formatMessage(messages.titleLabel)}</h2>
-        <p>{intl.formatMessage(messages.exportExplanation)}</p>
+      <Box
+        sx={{
+          pb: '20px',
+          mt: isRevampLayout ? '20px' : '32px',
+          pt: !isRevampLayout && '30px',
+          borderTop: !isRevampLayout && '1px solid',
+          borderColor: !isRevampLayout && 'var(--yoroi-palette-gray-200)',
+        }}
+      >
+        <Typography component="div"
+          variant={isRevampLayout ? 'body1' : 'h5'}
+          fontWeight={500}
+          mb={isRevampLayout ? '16px' : '12px'}
+          color="grayscale.900"
+        >
+          {intl.formatMessage(messages.titleLabel)}
+        </Typography>
+
+        <Typography component="div"
+          variant={isRevampLayout ? 'body1' : 'body2'}
+          color="common.black"
+          mb={isRevampLayout ? '16px' : '12px'}
+        >
+          {intl.formatMessage(messages.exportExplanation)}
+        </Typography>
 
         <Button
           variant={isRevampLayout ? 'contained' : 'primary'}
+          size={isRevampLayout ? 'flat' : 'medium'}
           className="exportWallet"
           onClick={openDialog}
-          sx={{ marginTop: '20px', width: '400px' }}
+          sx={{
+            marginTop: !isRevampLayout && '20px',
+            width: isRevampLayout ? 'fit-content' : '400px',
+          }}
         >
           {`${this.context.intl.formatMessage(globalMessages.exportButtonLabel)}`}
         </Button>
-      </div>
+      </Box>
     );
   }
 }

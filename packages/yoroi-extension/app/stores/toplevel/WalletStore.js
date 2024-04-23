@@ -29,7 +29,6 @@ import { assuranceModes } from '../../config/transactionAssuranceConfig';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { createDebugWalletDialog } from '../../containers/wallet/dialogs/DebugWalletDialogContainer';
 import { createProblematicWalletDialog } from '../../containers/wallet/dialogs/ProblematicWalletDialogContainer';
-import { getApiForNetwork } from '../../api/common/utils';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { getCurrentWalletFromLS, updateSyncedWallets } from '../../utils/localStorage';
@@ -85,6 +84,8 @@ export type PublicKeyCache = {|
   publicKey: string,
 |};
 
+export type SendMoneyRequest = Request<DeferredCall<{| txId: string |}>>;
+
 /**
  * The base wallet store that contains the shared logic
  * dealing with wallets / accounts.
@@ -122,7 +123,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   });
   @observable isImportActive: boolean = false;
 
-  @observable sendMoneyRequest: Request<DeferredCall<{| txId: string |}>> = new Request<
+  @observable sendMoneyRequest: SendMoneyRequest = new Request<
     DeferredCall<{| txId: string |}>
   >(request => request());
 
@@ -326,9 +327,8 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       this.publicDerivers.push(...newWithCachedData);
     });
     setTimeout(async () => {
-      for (const publicDeriver of newWithCachedData) {
-        await this.refreshWalletFromLocalOnLaunch(publicDeriver);
-      }
+      await Promise.all(newWithCachedData
+        .map(w => this.refreshWalletFromLocalOnLaunch(w)));
       // This should correctly handle both states of `paralletSync`, both
       // initially and when it changes.
       // The initial case is straightforward.
@@ -351,22 +351,20 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     publicDeriver: PublicDeriver<>,
     lastSyncInfo: IGetLastSyncInfoResponse,
   |}) => void = request => {
-    const apiType = getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo());
-
-    const stores = this.stores.substores[apiType];
+    const adaSubstores = this.stores.substores.ada;
     this.stores.addresses.addObservedWallet(request.publicDeriver);
     this.stores.transactions.addObservedWallet(request);
-    stores.time.addObservedTime(request.publicDeriver);
+    adaSubstores.time.addObservedTime(request.publicDeriver);
     if (asGetStakingKey(request.publicDeriver) != null) {
-      if (!stores.delegation) {
+      if (!adaSubstores.delegation) {
         throw new Error(
           `${nameof(
             this.registerObserversForNewWallet
           )} wallet has staking key but currency doesn't support delegation`
         );
       }
-      stores.delegation.addObservedWallet(request.publicDeriver);
-      stores.delegation.refreshDelegation(request.publicDeriver);
+      adaSubstores.delegation.addObservedWallet(request.publicDeriver);
+      adaSubstores.delegation.refreshDelegation(request.publicDeriver);
     }
   };
 
@@ -552,7 +550,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
             action(() => {
               existingWarnings.dialogs.pop();
             }),
-            { stores: this.stores, actions: this.actions }
           )
         );
       }
@@ -563,7 +560,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
             action(() => {
               existingWarnings.dialogs.pop();
             }),
-            { stores: this.stores, actions: this.actions }
           )
         );
       }

@@ -51,6 +51,14 @@ const AccordionSummary = styled((props /* AccordionSummaryProps */) => (
   <MuiAccordionSummary expandIcon={<ExpandMoreIcon />} {...props} />
 ))(() => ({
   padding: 0,
+  alignItems: 'flex-start',
+  '.MuiAccordionSummary-expandIconWrapper': {
+    width: '24px',
+    height: '24px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   '.MuiAccordionSummary-content': {
     margin: 0,
   },
@@ -85,24 +93,23 @@ export const RewardHistoryItem = ({
   poolAvatar,
   historyList,
 }: RewardHistoryItemProps): Node => {
-  const avatarGenerated = getAvatarFromPoolId(poolId);
+  const avatarGenerated = getAvatarFromPoolId(poolId || poolName);
 
   return (
     <Accordion>
-      <AccordionSummary aria-controls={poolId + '-content'} id={poolId + '-header'}>
+      <AccordionSummary aria-controls={poolId + '-content'} id={poolId || poolName + '-header'}>
         <Box>
           <Box display="block">
-            <Typography color="var(--yoroi-palette-gray-600)">Stake Pool</Typography>
+            <Typography component="div" color="grayscale.600">Stake Pool</Typography>
           </Box>
           <Box display="flex">
             <AvatarWrapper>
-              {poolAvatar != null ? (
-                <AvatarImg src={poolAvatar} alt="stake pool logo" />
-              ) : (
-                <AvatarImg src={avatarGenerated} alt="stake pool logo" />
-              )}
+              <AvatarImg
+                src={poolAvatar != null ? poolAvatar : avatarGenerated}
+                alt="stake pool logo"
+              />
             </AvatarWrapper>
-            <Typography>{poolName}</Typography>
+            <Typography component="div">{poolName}</Typography>
           </Box>
         </Box>
       </AccordionSummary>
@@ -112,14 +119,14 @@ export const RewardHistoryItem = ({
             // eslint-disable-next-line react/no-array-index-key
             <Box key={idx} display="flex" justifyContent="space-between" alignItems="center">
               <Box>
-                <Typography mb="2px" color="var(--yoroi-palette-gray-900)">
+                <Typography component="div" mb="2px" color="var(--yoroi-palette-gray-900)">
                   {type}
                 </Typography>
-                <Typography variant="body2" color="var(--yoroi-palette-gray-600)">
+                <Typography component="div" variant="body2" color="var(--yoroi-palette-gray-600)">
                   {date}
                 </Typography>
               </Box>
-              <Typography fontWeight={500} variant="body2">
+              <Typography component="div" fontWeight={500} variant="body2">
                 + {balance}
               </Typography>
             </Box>

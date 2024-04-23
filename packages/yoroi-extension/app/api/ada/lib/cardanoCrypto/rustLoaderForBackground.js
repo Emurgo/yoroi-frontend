@@ -8,8 +8,8 @@
 import type { BigNum, LinearFee, TransactionBuilder } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 
 import * as WasmV4 from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
-import * as SigmaRust from 'ergo-lib-wasm-browser';
 import * as WasmMessageSigning from '@emurgo/cardano-message-signing-browser/cardano_message_signing';
+import * as CrossCslBrowser from '@emurgo/cross-csl-browser';
 
 // TODO: unmagic the constants
 const MAX_VALUE_BYTES = 5000;
@@ -215,12 +215,12 @@ class Module {
     return WasmV4;
   }
 
-  get SigmaRust(): typeof SigmaRust {
-    return SigmaRust;
-  }
-
   get MessageSigning(): typeof WasmMessageSigning {
     return WasmMessageSigning;
+  }
+
+  get CrossCsl(): typeof CrossCslBrowser {
+    return CrossCslBrowser;
   }
 
   WalletV4TxBuilderFromConfig(config: {

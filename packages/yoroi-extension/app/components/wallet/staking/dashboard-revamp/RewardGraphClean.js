@@ -55,7 +55,7 @@ export default class RewardGraphClean extends Component<Props> {
           <Box
             sx={{
               padding: '8px 12px 8px 8px',
-              backgroundColor: 'gray.900',
+              bgcolor: theme => theme.palette.grayscale[900],
               color: 'common.white',
               lineHeight: '14px',
               borderRadius: '4px',
@@ -65,10 +65,10 @@ export default class RewardGraphClean extends Component<Props> {
               .filter(value => value !== null && value.length > 0)
               .map(([key, value], idx) => (
                 <Stack direction="row" mb="2px">
-                  <Typography width={idx === 2 ? '100px' : 'content'} mr="3px" variant="caption1">
+                  <Typography component="div" width={idx === 2 ? '100px' : 'content'} mr="3px" variant="caption1">
                     {key}:
                   </Typography>
-                  <Typography
+                  <Typography component="div"
                     sx={{
                       wordWrap: 'break-word',
                       maxWidth: '300px',
@@ -106,8 +106,9 @@ export default class RewardGraphClean extends Component<Props> {
             label={{
               value: xAxisLabel,
               position: 'insideBottom',
-              fontSize: graphVars.fontSize,
+              fontSize: '12px',
               fill: '#6B7384',
+              offset: 10,
             }}
             padding={{ left: 24, right: 24 }}
             stroke="#DCE0E9"
@@ -126,11 +127,13 @@ export default class RewardGraphClean extends Component<Props> {
             label={{
               value: yAxisLabel,
               position: 'insideLeft',
-              offset: -20,
+              offset: 25,
               dy: 50,
               angle: -90,
               fill: '#6B7384',
               textAnchor: 'middle',
+              fontSize: '12px',
+              fontWeight: 400,
             }}
           />
 

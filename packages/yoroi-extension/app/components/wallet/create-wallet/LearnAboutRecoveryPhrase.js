@@ -47,7 +47,7 @@ function _LearnAboutRecoveryPhrase(props: Props & Intl): Node {
   return (
     <Stack alignItems="center" justifyContent="center">
       <Stack direction="column" alignItems="center" justifyContent="center" maxWidth="648px">
-        <Typography mb="16px" variant="body1">
+        <Typography component="div" mb="16px" variant="body1">
           <FormattedHTMLMessage {...messages.description} />
           <Box
             component="span"
@@ -138,9 +138,9 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
   const tips = [text.firstTip, text.secondTip, text.thirdTip, text.fourthTip, text.fifthTip];
 
   return (
-    <Stack alignItems="center" justifyContent="center">
+    <Stack alignItems="center" justifyContent="center" id="learnAboutRecoveryPhraseComponent">
       <Stack maxWidth="648px">
-        <Typography mb="16px" variant="body1">
+        <Typography component="div" mb="16px" variant="body1">
           <FormattedHTMLMessage {...text.shortDescription} />
         </Typography>
 
@@ -161,7 +161,7 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
           >
             {tips.map(tip => (
               <Box component="li" key={tip.id}>
-                <Typography variant="body1" color="primary.600" mb="4px">
+                <Typography component="div" variant="body1" color="primary.600" mb="4px">
                   <FormattedHTMLMessage {...tip} />
                 </Typography>
               </Box>

@@ -1,6 +1,6 @@
 // @flow
 import { Component } from 'react';
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import environmnent from '../../../environment';
@@ -8,8 +8,11 @@ import { ROUTES } from '../../../routes-config';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import SubMenu from '../../topbar/SubMenu';
+import { withLayout } from '../../../styles/context/layout';
+import type { InjectedLayoutProps } from '../../../styles/context/layout';
+import type { SubMenuOption } from '../../topbar/SubMenu';
 
-const messages = defineMessages({
+export const settingsMenuMessages: Object = defineMessages({
   general: {
     id: 'settings.menu.general.link.label',
     defaultMessage: '!!!General',
@@ -26,6 +29,10 @@ const messages = defineMessages({
     id: 'settings.menu.externalStorage.link.label',
     defaultMessage: '!!!External Storage',
   },
+  analytics: {
+    id: 'settings.menu.analytics.link.label',
+    defaultMessage: '!!!Analytics',
+  },
 });
 
 type Props = {|
@@ -33,23 +40,23 @@ type Props = {|
   +onItemClick: string => void,
 |};
 @observer
-export default class SettingsMenu extends Component<Props> {
+class SettingsMenu extends Component<Props & InjectedLayoutProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   render(): Node {
     const { intl } = this.context;
-    const { onItemClick, isActiveItem } = this.props;
-
-    const settingOptions: Array<Object> = [
+    const { onItemClick, isActiveItem, isRevampLayout } = this.props;
+    const isProduction = environmnent.isProduction();
+    const settingOptions: Array<SubMenuOption> = [
       {
-        label: intl.formatMessage(messages.general),
+        label: intl.formatMessage(settingsMenuMessages.general),
         route: ROUTES.SETTINGS.GENERAL,
         className: 'general',
       },
       {
-        label: intl.formatMessage(messages.blockchain),
+        label: intl.formatMessage(settingsMenuMessages.blockchain),
         route: ROUTES.SETTINGS.BLOCKCHAIN,
         className: 'blockchain',
       },
@@ -58,13 +65,16 @@ export default class SettingsMenu extends Component<Props> {
         route: ROUTES.SETTINGS.WALLET,
         className: 'wallet',
       },
-      !environmnent.isProduction() && {
-        label: intl.formatMessage(messages.externalStorage),
+      {
+        label: intl.formatMessage(settingsMenuMessages.externalStorage),
         route: ROUTES.SETTINGS.EXTERNAL_STORAGE,
         className: 'externalStorage',
+        hidden: isProduction,
       },
       {
-        label: intl.formatMessage(globalMessages.termsOfUse),
+        label: intl.formatMessage(
+          isRevampLayout ? globalMessages.termsOfService : globalMessages.termsOfUse
+        ),
         route: ROUTES.SETTINGS.TERMS_OF_USE,
         className: 'termsOfUse',
       },
@@ -74,9 +84,15 @@ export default class SettingsMenu extends Component<Props> {
         className: 'support',
       },
       {
-        label: intl.formatMessage(messages.levelOfComplexity),
+        label: intl.formatMessage(settingsMenuMessages.levelOfComplexity),
         route: ROUTES.SETTINGS.LEVEL_OF_COMPLEXITY,
         className: 'levelOfComplexity',
+      },
+      {
+        label: intl.formatMessage(settingsMenuMessages.analytics),
+        route: ROUTES.SETTINGS.ANALYTICS,
+        className: 'analytics',
+        hidden: !isRevampLayout,
       },
     ];
 
@@ -85,3 +101,5 @@ export default class SettingsMenu extends Component<Props> {
     );
   }
 }
+
+export default (withLayout(SettingsMenu): ComponentType<Props>);

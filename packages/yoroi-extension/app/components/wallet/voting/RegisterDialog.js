@@ -1,27 +1,28 @@
 // @flow
 import type { Node } from 'react';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { StepsList } from './types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { observable, action } from 'mobx';
-import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { ProgressInfo } from '../../../stores/ada/VotingStore';
+import classnames from 'classnames';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import globalMessages from '../../../i18n/global-messages';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import SpendingPasswordInput from '../../widgets/forms/SpendingPasswordInput';
 import ProgressStepBlock from './ProgressStepBlock';
-
-import { ProgressInfo } from '../../../stores/ada/VotingStore';
-
 import styles from './RegisterDialog.scss';
-import type { StepsList } from './types';
+import { Typography } from '@mui/material';
+import Stepper from '../../common/stepper/Stepper';
 
 const messages = defineMessages({
   line1: {
     id: 'wallet.voting.dialog.step.register.line1',
-    defaultMessage: '!!!Enter your spending password to be able to generate the required certificate for voting.',
+    defaultMessage:
+      '!!!Enter your password to be able to generate the required certificate for voting.',
   },
 });
 
@@ -32,13 +33,13 @@ type Props = {|
   +cancel: void => void,
   +classicTheme: boolean,
   +isProcessing: boolean,
+  +isRevamp: boolean,
 |};
 
 @observer
 export default class RegisterDialog extends Component<Props> {
-
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+    intl: intlShape.isRequired,
   };
   @observable spendingPasswordForm: void | ReactToolboxMobxForm;
 
@@ -48,21 +49,17 @@ export default class RegisterDialog extends Component<Props> {
   }
   render(): Node {
     const { intl } = this.context;
-    const {
-      stepsList,
-      progressInfo,
-      cancel,
-      classicTheme,
-      isProcessing,
-    } = this.props;
+    const { stepsList, progressInfo, cancel, classicTheme, isProcessing } = this.props;
 
-    const dailogActions = [{
-      label: intl.formatMessage(globalMessages.nextButtonLabel),
-      primary: true,
-      onClick: this._submitForm,
-      isSubmitting: isProcessing,
-      disabled: isProcessing,
-    }];
+    const dailogActions = [
+      {
+        label: intl.formatMessage(globalMessages.nextButtonLabel),
+        primary: true,
+        onClick: this._submitForm,
+        isSubmitting: isProcessing,
+        disabled: isProcessing,
+      },
+    ];
 
     return (
       <Dialog
@@ -73,22 +70,44 @@ export default class RegisterDialog extends Component<Props> {
         closeButton={<DialogCloseButton />}
         onClose={cancel}
       >
-        <ProgressStepBlock
-          stepsList={stepsList}
-          progressInfo={progressInfo}
-          classicTheme={classicTheme}
-        />
-        <div className={classnames([styles.lineText, styles.firstItem])}>
-          {intl.formatMessage(messages.line1)}
-        </div>
+        {this.props.isRevamp ? (
+          <>
+            <Stepper
+              currentStep={String(progressInfo.currentStep)}
+              steps={stepsList.map(step => ({ message: step.message, stepId: String(step.step) }))}
+              setCurrentStep={() => {}}
+            />
+            <Typography component="div"
+              textAlign="center"
+              pt="24px"
+              pb="40px"
+              variant="body1"
+              color="grayscale.900"
+            >
+              {intl.formatMessage(messages.line1)}
+            </Typography>
+          </>
+        ) : (
+          <>
+            <ProgressStepBlock
+              stepsList={stepsList}
+              progressInfo={progressInfo}
+              classicTheme={classicTheme}
+            />
+            <div className={classnames([styles.lineText, styles.firstItem])}>
+              {intl.formatMessage(messages.line1)}
+            </div>
+          </>
+        )}
         <div className={styles.spendingPassword}>
           <SpendingPasswordInput
-            setForm={(form) => this.setSpendingPasswordForm(form)}
+            setForm={form => this.setSpendingPasswordForm(form)}
             classicTheme={this.props.classicTheme}
             isSubmitting={isProcessing}
           />
         </div>
-      </Dialog>);
+      </Dialog>
+    );
   }
 
   _submitForm: void => Promise<void> = async () => {

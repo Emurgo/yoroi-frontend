@@ -26,7 +26,7 @@ import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 
-const SOURCE_CURRENCIES = ['ADA', 'ERG'];
+const SOURCE_CURRENCIES = ['ADA'];
 
 interface LoadingStore {
   getDatabase(): ?lf$Database
@@ -183,11 +183,9 @@ export default class BaseCoinPriceStore
             response.pubKeyDataSignature
           );
         }
+
         if (!this.pubKeyData) {
           throw new Error('missing pubKeyData - should never happen');
-        }
-        if (!verifyTicker(response.ticker, this.pubKeyData)) {
-          throw new Error('Invalid ticker signature: ' + JSON.stringify(response.ticker));
         }
 
         // if we got here before the timeout expired, clear the timeout
