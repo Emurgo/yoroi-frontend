@@ -68,6 +68,24 @@ export class MultiToken {
     return this.values.find(value => value.identifier === identifier)?.amount;
   };
 
+  /**
+   * Creates a token entry with the network of the default token
+   */
+  createEntry: (string, BigNumber) => TokenEntry = (identifier, amount) => {
+    return {
+      networkId: this.getDefaults().defaultNetworkId,
+      identifier,
+      amount,
+    };
+  }
+
+  /**
+   * Creates a token entry with the network and the identifier of the default token
+   */
+  createDefaultEntry: (BigNumber) => TokenEntry = (amount) => {
+    return this.createEntry(this.getDefaults().defaultIdentifier, amount);
+  }
+
   add: TokenEntry => MultiToken = entry => {
     this._checkNetworkId(entry.networkId);
     const existingEntry = this.values.find(value => value.identifier === entry.identifier);
@@ -220,6 +238,10 @@ export class MultiToken {
   asMap: void => Map<string, BigNumber> = () => {
     return new Map(this.values.map(value => [value.identifier, value.amount]));
   };
+
+  entries: void => Array<TokenEntry> = () => {
+    return [...this.values];
+  }
 
   isEqualTo: MultiToken => boolean = tokens => {
     const remainingTokens = this.asMap();

@@ -1,17 +1,89 @@
 //@flow
-// import type { AssetAmount } from '../../../components/swap/types';
 import { Box, Typography } from '@mui/material';
 import { ReactComponent as InfoIcon } from '../../../assets/images/revamp/icons/info.inline.svg';
-// import { ReactComponent as AssetDefault } from '../../../assets/images/revamp/asset-default.inline.svg';
-// import AdaTokenImage from '../mockAssets/ada.inline.svg';
-// import UsdaTokenImage from '../mockAssets/usda.inline.svg';
 import TextField from '../../../components/common/TextField';
+import { useSwapForm } from '../context/swap-form';
+import { AssetAndAmountRow } from '../../../components/swap/SelectAssetDialog';
+import { makeLimitOrder, makePossibleMarketOrder, useSwap, useSwapCreateOrder } from '@yoroi/swap';
+import { SwapPoolLabel } from '../../../components/swap/SwapPoolComponents';
+import SwapPoolFullInfo from './edit-pool/PoolFullInfo';
+import { useSwapFeeDisplay } from '../hooks';
+import type { PriceImpact } from '../../../components/swap/types';
+import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
+import {
+  FormattedActualPrice,
+  FormattedMarketPrice,
+  PriceImpactBanner,
+  PriceImpactColored,
+  PriceImpactIcon,
+  PriceImpactPercent
+} from '../../../components/swap/PriceImpact';
+import type { State } from '../context/swap-form/types';
+import { useEffect } from 'react';
+import { IncorrectWalletPasswordError } from '../../../api/common/errors';
 
 type Props = {|
-  poolInfo: any,
+  slippageValue: string,
+  walletAddress: ?string,
+  priceImpactState: ?PriceImpact,
+  userPasswordState: State<string>,
+  txSubmitErrorState: State<?Error>,
+  onRemoteOrderDataResolved: any => Promise<void>,
+  defaultTokenInfo: RemoteTokenInfo,
+  getFormattedPairingValue: (amount: string) => string,
 |};
 
-export default function SwapConfirmationStep({ poolInfo = {} }: Props): React$Node {
+export default function SwapConfirmationStep({
+  slippageValue,
+  walletAddress,
+  priceImpactState,
+  userPasswordState,
+  txSubmitErrorState,
+  onRemoteOrderDataResolved,
+  defaultTokenInfo,
+  getFormattedPairingValue,
+}: Props): React$Node {
+
+  const { orderData } = useSwap();
+  const {
+    selectedPoolCalculation: { pool },
+    bestPoolCalculation: { pool: bestPool },
+  } = orderData;
+  const { sellTokenInfo, buyTokenInfo, sellQuantity, buyQuantity } = useSwapForm();
+  const { ptAmount, formattedPtAmount, formattedNonPtAmount } = useSwapFeeDisplay(defaultTokenInfo);
+
+  const isMarketOrder = orderData.type === 'market';
+  const isAutoPool = pool?.poolId === bestPool?.poolId;
+
+  const isIncorrectPassword = txSubmitErrorState.value instanceof IncorrectWalletPasswordError;
+
+  const { createOrderData } = useSwapCreateOrder({
+    onSuccess: (data) => {
+      onRemoteOrderDataResolved(data)
+        .catch(e => {
+          console.error('Failed to handle remote order resolution', e);
+          alert('Failed to prepare order transaction');
+        });
+    },
+    onError: error => {
+      console.error('useSwapCreateOrder fail', error);
+      alert('Failed to receive remote data for the order');
+    }
+  });
+  useEffect(() => {
+    if (walletAddress == null) {
+      alert('Wallet address is not available');
+      return;
+    }
+    createOrderData((isMarketOrder ? makePossibleMarketOrder : makeLimitOrder)(
+      orderData.amounts.sell,
+      orderData.amounts.buy,
+      orderData.selectedPoolCalculation?.pool,
+      orderData.slippage,
+      walletAddress,
+    ));
+  }, []);
+
   return (
     <Box width="100%" mx="auto" maxWidth="506px" display="flex" flexDirection="column" gap="24px">
       <Box textAlign="center">
@@ -27,17 +99,12 @@ export default function SwapConfirmationStep({ poolInfo = {} }: Props): React$No
             </Typography>
           </Box>
           <Box>
-            {/* <AssetRow
-              asset={{
-                image: AdaTokenImage,
-                name: 'ADA',
-                ticker: 'ADA',
-                address: 'Cardano',
-                amount: '9',
-                walletAmount: 0,
-                decimals: 6,
-              }}
-            /> */}
+            <AssetAndAmountRow
+              asset={sellTokenInfo}
+              displayAmount={sellQuantity.displayValue}
+              type="from"
+              defaultTokenInfo={defaultTokenInfo}
+            />
           </Box>
         </Box>
         <Box>
@@ -47,47 +114,68 @@ export default function SwapConfirmationStep({ poolInfo = {} }: Props): React$No
             </Typography>
           </Box>
           <Box>
-            {/* <AssetRow
-              asset={{
-                image: UsdaTokenImage,
-                name: '[USDA] Anzens',
-                ticker: 'USDA',
-                address: 'asse1maasdafsfs3245s2asddadsadfww6hv343',
-                amount: '9',
-                walletAmount: 0,
-                decimals: 6,
-              }}
-            /> */}
+            <Box>
+              <AssetAndAmountRow
+                asset={buyTokenInfo}
+                displayAmount={buyQuantity.displayValue}
+                type="from"
+                defaultTokenInfo={defaultTokenInfo}
+                priceImpactState={priceImpactState}
+              />
+            </Box>
           </Box>
         </Box>
       </Box>
+
+      <PriceImpactBanner priceImpactState={priceImpactState} />
+
       <Box display="flex" gap="8px" flexDirection="column">
-        <SummaryRow
-          col1="Dex"
-          col2={
-            <Box display="flex" alignItems="center" gap="8px">
-              <Box display="inline-flex">{poolInfo.image}</Box>
-              <Typography component="div" variant="body1" color="primary.500" fontWeight={500}>
-                {poolInfo.name} {poolInfo.isAuto ? '(Auto)' : null}
-              </Typography>
-            </Box>
-          }
-        />
-        <SummaryRow col1="Slippage tolerance" col2="1%" withInfo />
-        <SummaryRow col1="Min ADA" col2="2 ADA" withInfo />
-        <SummaryRow col1="Minimum assets received" col2="2.99 USDA" withInfo />
-        <SummaryRow col1="Fees" col2="0 ADA" withInfo />
+        <SummaryRow col1="Dex">
+          <SwapPoolLabel provider={pool?.provider} isAutoPool={isAutoPool} />
+        </SummaryRow>
+        <SummaryRow col1="Slippage tolerance" withInfo>
+          {slippageValue}%
+        </SummaryRow>
+        <SwapPoolFullInfo defaultTokenInfo={defaultTokenInfo} />
+        {priceImpactState && (
+          <>
+            <SummaryRow col1="Market price" withInfo>
+              <FormattedMarketPrice />
+            </SummaryRow>
+            <SummaryRow col1="Price impact" withInfo>
+              <PriceImpactColored priceImpactState={priceImpactState} sx={{ display: 'flex' }}>
+                <PriceImpactIcon isSevere={priceImpactState.isSevere} />
+                <PriceImpactPercent />
+              </PriceImpactColored>
+            </SummaryRow>
+            <SummaryRow col1="">
+              <PriceImpactColored priceImpactState={priceImpactState}>
+                (<FormattedActualPrice />)
+              </PriceImpactColored>
+            </SummaryRow>
+          </>
+        )}
         <Box p="16px" bgcolor="#244ABF" borderRadius="8px" color="common.white">
           <Box display="flex" justifyContent="space-between">
             <Box>Total</Box>
-            <Typography component="div" fontSize="20px" fontWeight="500">
-              11 ADA
-            </Typography>
+            <Box>
+              <Typography component="div" fontSize="20px" fontWeight="500">
+                {formattedNonPtAmount ?? formattedPtAmount}
+              </Typography>
+            </Box>
           </Box>
-          <Box display="flex" justifyContent="space-between">
-            <Box />
+          {formattedNonPtAmount && (
+            <Box display="flex" justifyContent="right">
+              <Box>
+                <Typography component="div" fontSize="20px" fontWeight="500">
+                  {formattedPtAmount}
+                </Typography>
+              </Box>
+            </Box>
+          )}
+          <Box display="flex" justifyContent="right">
             <Typography component="div" variant="body1">
-              4.32 USD
+              {getFormattedPairingValue(ptAmount)}
             </Typography>
           </Box>
         </Box>
@@ -95,64 +183,21 @@ export default function SwapConfirmationStep({ poolInfo = {} }: Props): React$No
       <Box>
         <TextField
           className="walletPassword"
-          value=""
+          value={userPasswordState.value}
           label="Password"
           type="password"
-          // {...walletPasswordField.bind()}
-          // done={walletPasswordField.isValid}
-          // error={walletPasswordField.error}
+          onChange={e => {
+            txSubmitErrorState.update(null);
+            userPasswordState.update(e.target.value);
+          }}
+          error={isIncorrectPassword && 'Incorrect password!'}
         />
       </Box>
     </Box>
   );
 }
 
-// type AssetRowProps = {|
-//   asset: AssetAmount,
-//   usdAmount?: string,
-// |};
-
-// const AssetRow = ({ asset, usdAmount = null }: AssetRowProps) => {
-//   const { image = null, name, address, amount, ticker } = asset;
-//   return (
-//     <Box
-//       sx={{
-//         display: 'flex',
-//         alignItems: 'center',
-//         gap: '12px',
-//         p: '8px',
-//       }}
-//     >
-//       <Box flexShrink="0" width="48px" height="48px">
-//         {image || <AssetDefault />}
-//       </Box>
-//       <Box flexGrow="1" width="100%">
-//         <Box>
-//           <Typography component="div" variant="body1">
-//             {name}
-//           </Typography>
-//         </Box>
-//         <Box>
-//           <Typography component="div" variant="body2" color="grayscale.600">
-//             {address}
-//           </Typography>
-//         </Box>
-//       </Box>
-//       <Box flexShrink="0" display="flex" flexDirection="column" alignItems="flex-end">
-//         <Typography component="div" variant="body1" color="grayscale.900">
-//           <span>{amount}</span>&nbsp;<span>{ticker}</span>
-//         </Typography>
-//         {usdAmount && (
-//           <Typography component="div" variant="body2" color="grayscale.600">
-//             {usdAmount} USD
-//           </Typography>
-//         )}
-//       </Box>
-//     </Box>
-//   );
-// };
-
-const SummaryRow = ({ col1, col2, withInfo = false }) => (
+const SummaryRow = ({ col1, children, withInfo = false }) => (
   <Box display="flex" alignItems="center" justifyContent="space-between">
     <Box display="flex" alignItems="center">
       <Typography component="div" variant="body1" color="grayscale.500">
@@ -166,7 +211,7 @@ const SummaryRow = ({ col1, col2, withInfo = false }) => (
     </Box>
     <Box>
       <Typography component="div" variant="body1">
-        {col2}
+        {children}
       </Typography>
     </Box>
   </Box>

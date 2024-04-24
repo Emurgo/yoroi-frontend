@@ -1,43 +1,28 @@
 // @flow
 import { groupBy, keyBy, mapValues } from 'lodash';
 import BigNumber from 'bignumber.js';
-import type {
-  UserAnnotation,
-  CardanoAddressedUtxo,
-} from './types';
-import type {
-  RemoteUnspentOutput,
-} from '../lib/state-fetch/types';
-import {
-  transactionTypes,
-} from './types';
+import type { CardanoAddressedUtxo, UserAnnotation, } from './types';
+import { transactionTypes, } from './types';
+import type { RemoteAsset, RemoteUnspentOutput, } from '../lib/state-fetch/types';
 import type {
   UtxoTransactionInputRow,
   UtxoTransactionOutputRow,
 } from '../lib/storage/database/transactionModels/utxo/tables';
-import type {
-  DbTransaction,
-  DbBlock,
-  DbTokenInfo,
-  TokenRow,
-} from '../lib/storage/database/primitives/tables';
+import type { DbBlock, DbTokenInfo, DbTransaction, TokenRow, } from '../lib/storage/database/primitives/tables';
 import type {
   AccountingTransactionInputRow,
   AccountingTransactionOutputRow,
 } from '../lib/storage/database/transactionModels/account/tables';
 import type { TransactionExportRow } from '../../export';
-import type {
-  IGetAllUtxosResponse,
-} from '../lib/storage/models/PublicDeriver/interfaces';
+import type { IGetAllUtxosResponse, } from '../lib/storage/models/PublicDeriver/interfaces';
 import { formatBigNumberToFloatString } from '../../../utils/formatters';
-import {
-  MultiToken,
-} from '../../common/lib/MultiToken';
-import type {
-  DefaultTokenEntry,
-} from '../../common/lib/MultiToken';
+import type { DefaultTokenEntry, } from '../../common/lib/MultiToken';
+import { MultiToken, } from '../../common/lib/MultiToken';
+import type { WasmMonad } from '../lib/cardanoCrypto/rustLoader';
 import { RustModule } from '../lib/cardanoCrypto/rustLoader';
 import { PRIMARY_ASSET_CONSTANTS } from '../lib/storage/database/primitives/enums';
+
+const RANDOM_BASE_ADDRESS = 'addr_test1qzz6hulv54gzf2suy2u5gkvmt6ysasfdlvvegy3fmf969y7r3y3kdut55a40jff00qmg74686vz44v6k363md06qkq0qy0adz0';
 
 export function cardanoAssetToIdentifier(
   policyId: RustModule.WalletV4.ScriptHash,
@@ -106,22 +91,23 @@ export function parseTokenList(
 
 export function cardanoValueFromMultiToken(
   tokens: MultiToken,
+  Module: typeof RustModule = RustModule,
 ): RustModule.WalletV4.Value {
-  const value = RustModule.WalletV4.Value.new(
-    RustModule.WalletV4.BigNum.from_str(tokens.getDefaultEntry().amount.toString())
+  const value = Module.WalletV4.Value.new(
+    Module.WalletV4.BigNum.from_str(tokens.getDefaultEntry().amount.toString())
   );
   // recall: primary asset counts towards size
   if (tokens.size() === 1) return value;
 
-  const assets = RustModule.WalletV4.MultiAsset.new();
+  const assets = Module.WalletV4.MultiAsset.new();
   for (const entry of tokens.nonDefaultEntries()) {
     const { policyId, name } = identifierToCardanoAsset(entry.identifier);
 
-    const policyContent = assets.get(policyId) ?? RustModule.WalletV4.Assets.new();
+    const policyContent = assets.get(policyId) ?? Module.WalletV4.Assets.new();
 
     policyContent.insert(
       name,
-      RustModule.WalletV4.BigNum.from_str(entry.amount.toString())
+      Module.WalletV4.BigNum.from_str(entry.amount.toString())
     );
     // recall: we always have to insert since WASM returns copies of objects
     assets.insert(policyId, policyContent);
@@ -445,4 +431,236 @@ export function iterateWasmKeyValue<K, V>(iterable: ?{| get: K => V |}, keys: ?K
     }
   }
   return res;
+}
+
+function cardanoUtxoMonadFromRemoteFormat(
+  u: RemoteUnspentOutput,
+): WasmMonad<RustModule.WalletV4.TransactionUnspentOutput> {
+  return RustModule.ScopeMonad(Module => {
+    const W4 = Module.WalletV4;
+    const input = W4.TransactionInput.new(
+      W4.TransactionHash.from_hex(u.tx_hash),
+      u.tx_index,
+    );
+    const value = W4.Value.new(W4.BigNum.from_str(u.amount));
+    if ((u.assets || []).length > 0) {
+      value.set_multiasset(assetToRustMultiasset(u.assets));
+    }
+    const output = W4.TransactionOutput.new(
+      W4.Address.from_hex(u.receiver),
+      value,
+    );
+    return W4.TransactionUnspentOutput.new(input, output);
+  });
+}
+
+export function cardanoUtxoHexFromRemoteFormat(u: RemoteUnspentOutput): string {
+  return cardanoUtxoMonadFromRemoteFormat(u)
+    .unwrap(output => output.to_hex());
+}
+
+function cardanoMinAdaRequiredFromOutput(
+  output: RustModule.WalletV4.TransactionOutput,
+  coinsPerByte: BigNumber,
+  Module: typeof RustModule,
+): BigNumber {
+  const wasmCoinsPerByte = Module.WalletV4.BigNum.from_str(coinsPerByte.toString());
+  const dataCost = Module.WalletV4.DataCost.new_coins_per_byte(wasmCoinsPerByte);
+  const minAdaRequired = Module.WalletV4.min_ada_for_output(output, dataCost).to_str();
+  return new BigNumber(minAdaRequired);
+}
+
+/**
+ * <TODO:PENDING_REMOVAL> LEGACY
+ * @deprecated
+ */
+export function coinsPerWord_to_coinsPerByte(coinsPerWord: BigNumber): BigNumber {
+  return coinsPerWord.div(8).integerValue(BigNumber.ROUND_FLOOR);
+}
+
+/**
+ * @deprecated
+ */
+export function cardanoMinAdaRequiredFromRemoteFormat_coinsPerWord(u: RemoteUnspentOutput, coinsPerWord: BigNumber): BigNumber {
+  return cardanoMinAdaRequiredFromRemoteFormat(u, coinsPerWord_to_coinsPerByte(coinsPerWord));
+}
+
+export function cardanoMinAdaRequiredFromRemoteFormat(u: RemoteUnspentOutput, coinsPerByte: BigNumber): BigNumber {
+  return cardanoUtxoMonadFromRemoteFormat(u)
+    .unwrap<BigNumber>((wasmUtxo, Module) => {
+      const wasmCoinsPerByte = Module.WalletV4.BigNum.from_str(coinsPerByte.toString());
+      const dataCost = Module.WalletV4.DataCost.new_coins_per_byte(wasmCoinsPerByte);
+      const minAdaRequired = Module.WalletV4.min_ada_for_output(wasmUtxo.output(), dataCost).to_str();
+      return new BigNumber(minAdaRequired);
+    });
+}
+
+/**
+ * @deprecated
+ */
+export function cardanoMinAdaRequiredFromAssets_coinsPerWord(tokens: MultiToken, coinsPerWord: BigNumber): BigNumber {
+  return cardanoMinAdaRequiredFromAssets(tokens, coinsPerWord_to_coinsPerByte(coinsPerWord));
+}
+
+export function cardanoMinAdaRequiredFromAssets(tokens: MultiToken, coinsPerByte: BigNumber): BigNumber {
+  return RustModule.WasmScope(Module => {
+    const output = Module.WalletV4.TransactionOutput.new(
+      Module.WalletV4.Address.from_bech32(RANDOM_BASE_ADDRESS),
+      cardanoValueFromMultiToken(tokens, Module),
+    );
+    return cardanoMinAdaRequiredFromOutput(output, coinsPerByte, Module);
+  });
+}
+
+export function assetToRustMultiasset(
+  remoteAssets: $ReadOnlyArray<$ReadOnly<RemoteAsset>>
+): RustModule.WalletV4.MultiAsset {
+  const groupedAssets = remoteAssets.reduce((res, a) => {
+    (res[a.policyId] = (res[a.policyId] || [])).push(a);
+    return res;
+  }, {})
+  const W4 = RustModule.WalletV4;
+  const multiasset = W4.MultiAsset.new();
+  for (const policyHex of Object.keys(groupedAssets)) {
+    const assetGroup = groupedAssets[policyHex];
+    const policyId = W4.ScriptHash.from_bytes(Buffer.from(policyHex, 'hex'));
+    const assets = RustModule.WalletV4.Assets.new();
+    for (const asset of assetGroup) {
+      assets.insert(
+        W4.AssetName.new(Buffer.from(asset.name, 'hex')),
+        W4.BigNum.from_str(asset.amount),
+      );
+    }
+    multiasset.insert(policyId, assets);
+  }
+  return multiasset;
+}
+
+/**
+ * Shallow-parses the passed transaction CBOR HEX and returns the BigNumber of the fee lovelaces
+ */
+export function getTransactionFeeFromCbor(txHex: string): BigNumber {
+  try {
+    return RustModule.WasmScope(Module => {
+      const feeStr = Module.WalletV4.FixedTransaction.from_hex(txHex).body().fee().to_str();
+      return new BigNumber(feeStr);
+    });
+  } catch (e) {
+    console.error('Failed to decode transaction fee from cbor', e);
+    throw e;
+  }
+}
+
+/**
+ * Shallow-parses the passed transaction CBOR HEX, adds together all outputs, and returns as multi-token
+ */
+export function getTransactionTotalOutputFromCbor(txHex: string, defaults: DefaultTokenEntry): MultiToken {
+  try {
+    return RustModule.WasmScope(Module => {
+      const outputs = Module.WalletV4.FixedTransaction.from_hex(txHex).body().outputs();
+      const sum = new MultiToken([], defaults);
+      for (let i = 0; i < outputs.len(); i++) {
+        const output = outputs.get(i);
+        sum.joinAddMutable(multiTokenFromCardanoValue(output.amount(), defaults));
+      }
+      return sum;
+    });
+  } catch (e) {
+    console.error('Failed to decode transaction total output from cbor', e);
+    throw e;
+  }
+}
+
+/**
+ * @param witnessSetHex1 - a serialised witness set as a HEX string
+ * @param witnessSetHex2 - a serialised witness set as a HEX string
+ * @return the resulting new witness set as a HEX string
+ */
+export function mergeWitnessSets(
+  witnessSetHex1: string,
+  witnessSetHex2: string,
+): string {
+  return RustModule.WasmScope(Scope => {
+    const wset1 = Scope.WalletV4.TransactionWitnessSet.from_hex(witnessSetHex1);
+    const wset2 = Scope.WalletV4.TransactionWitnessSet.from_hex(witnessSetHex2);
+    const wsetResult = Scope.WalletV4.TransactionWitnessSet.new();
+    let vkeys = wset1.vkeys();
+    const newVkeys = wset2.vkeys();
+    if (vkeys && newVkeys) {
+      for (let i = 0; i < newVkeys.len(); i++) {
+        vkeys.add(newVkeys.get(i));
+      }
+    } else if (newVkeys) {
+      vkeys = newVkeys;
+    }
+    if (vkeys) {
+      wsetResult.set_vkeys(vkeys);
+    }
+
+    let nativeScripts = wset1.native_scripts();
+    const newNativeScripts = wset2.native_scripts();
+    if (nativeScripts && newNativeScripts) {
+      for (let i = 0; i < newNativeScripts.len(); i++) {
+        nativeScripts.add(newNativeScripts.get(i));
+      }
+    } else if (newNativeScripts) {
+      nativeScripts = newNativeScripts;
+    }
+    if (nativeScripts) {
+      wsetResult.set_native_scripts(nativeScripts);
+    }
+
+    let bootstraps = wset1.bootstraps();
+    const newBootstraps = wset2.bootstraps();
+    if (bootstraps && newBootstraps) {
+      for (let i = 0; i < newBootstraps.len(); i++) {
+        bootstraps.add(newBootstraps.get(i));
+      }
+    } else if (newBootstraps) {
+      bootstraps = newBootstraps;
+    }
+    if (bootstraps) {
+      wsetResult.set_bootstraps(bootstraps);
+    }
+
+    let plutusScripts = wset1.plutus_scripts();
+    const newPlutusScripts = wset2.plutus_scripts();
+    if (plutusScripts && newPlutusScripts) {
+      for (let i = 0; i < newPlutusScripts.len(); i++) {
+        plutusScripts.add(newPlutusScripts.get(i));
+      }
+    } else if (newPlutusScripts) {
+      plutusScripts = newPlutusScripts;
+    }
+    if (plutusScripts) {
+      wsetResult.set_plutus_scripts(plutusScripts);
+    }
+
+    let plutusData = wset1.plutus_data();
+    const newPlutusData = wset2.plutus_data();
+    if (plutusData && newPlutusData) {
+      for (let i = 0; i < newPlutusData.len(); i++) {
+        plutusData.add(newPlutusData.get(i));
+      }
+    } else if (newPlutusData) {
+      plutusData = newPlutusData;
+    }
+    if (plutusData) {
+      wsetResult.set_plutus_data(plutusData);
+    }
+
+    let redeemers = wset1.redeemers();
+    const newRedeemers = wset2.redeemers();
+    if (redeemers && newRedeemers) {
+      for (let i = 0; i < newRedeemers.len(); i++) {
+        redeemers.add(newRedeemers.get(i));
+      }
+    } else if (newRedeemers) {
+      redeemers = newRedeemers;
+    }
+    if (redeemers) {
+      wsetResult.set_redeemers(redeemers);
+    }
+    return wsetResult.to_hex();
+  });
 }

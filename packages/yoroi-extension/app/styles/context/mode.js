@@ -1,10 +1,10 @@
 // @flow
 import type { Node } from 'react';
 import React from 'react';
-import { MuiThemes, THEMES } from '../utils';
 import { ThemeProvider } from '@mui/material/styles';
 import { revampBaseTheme as revampBaseThemeLight } from '../themes/revamp/light-theme-mui';
 import { revampBaseTheme as revampBaseThemeDark } from '../themes/revamp/dark-theme-mui';
+import { MuiThemes, THEMES } from '../themes';
 
 export type Modes = 'light' | 'dark';
 

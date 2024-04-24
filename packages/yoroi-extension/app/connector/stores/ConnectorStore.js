@@ -92,6 +92,7 @@ import {
 import { wrapWithFrame } from '../../stores/lib/TrezorWrapper';
 import { ampli } from '../../../ampli/index';
 import { noop } from '../../coreUtils';
+import { addressBech32ToHex } from '../../api/ada/lib/cardanoCrypto/utils';
 
 export function connectorCall<T, R>(message: T): Promise<R> {
   return new Promise((resolve, reject) => {
@@ -688,9 +689,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         }
         const value = multiTokenFromRemote(foreignUtxo.output, defaultToken.NetworkId);
         foreignInputDetails.push({
-          address: Buffer.from(
-            RustModule.WalletV4.Address.from_bech32(foreignUtxo.output.address).to_bytes()
-          ).toString('hex'),
+          address: addressBech32ToHex(foreignUtxo.output.address),
           value,
         });
       }

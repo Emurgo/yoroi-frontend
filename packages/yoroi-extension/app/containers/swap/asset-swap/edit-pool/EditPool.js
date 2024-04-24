@@ -5,51 +5,37 @@ import { ReactComponent as EditIcon } from '../../../../assets/images/revamp/ico
 import { ReactComponent as ChevronDownIcon } from '../../../../assets/images/revamp/icons/chevron-down.inline.svg';
 import { useSwap } from '@yoroi/swap';
 import { capitalize } from 'lodash';
-import SwapPoolIcon from '../../../../components/swap/SwapPoolIcon';
+import { SwapPoolIcon } from '../../../../components/swap/SwapPoolComponents';
 import SwapPoolFullInfo from './PoolFullInfo';
 import { useSwapForm } from '../../context/swap-form';
-import { Quantities } from '../../../../utils/quantities';
 import { maybe } from '../../../../coreUtils';
+import { useSwapFeeDisplay } from '../../hooks';
+import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
 
 type Props = {|
+  +defaultTokenInfo: RemoteTokenInfo,
   +handleEditPool: void => void,
 |}
 
-export default function EditSwapPool({ handleEditPool }: Props): React$Node {
-  const [showFullInfo, setShowFullInfo] = useState(false);
+export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props): React$Node {
+  const [showFullInfo, setShowFullInfo] = useState(true);
   const { orderData } = useSwap();
 
-  const { selectedPoolCalculation: calculation, amounts, bestPoolCalculation, type } = orderData;
-  console.log('🚀 ~ EditSwapPool ~ amounts:', amounts);
+  const { selectedPoolCalculation: calculation, bestPoolCalculation, type } = orderData;
+  const { sellTokenInfo, buyTokenInfo } = useSwapForm();
 
-  const {
-    buyQuantity: { isTouched: isBuyTouched },
-    sellQuantity: { isTouched: isSellTouched },
-    sellTokenInfo,
-  } = useSwapForm();
+  const { formattedPtAmount, formattedNonPtAmount } = useSwapFeeDisplay(defaultTokenInfo);
 
-  if (!isBuyTouched || !isSellTouched || calculation === undefined) return null;
-
-  const { cost, pool } = calculation;
-
-  const sellTokenIsPtToken = amounts.sell.tokenId === '';
-  const sumQty = [cost.batcherFee.quantity, cost.frontendFeeInfo.fee.quantity];
-
-  if (sellTokenIsPtToken) {
-    sumQty.push(amounts.sell.quantity);
+  const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
+  if (!isValidTickers || calculation == null) {
+    return null;
   }
 
-  // TODO: do not hardcode pt ticker
-  const totalFees = Quantities.format(Quantities.sum(sumQty), 6);
-  const sellTokenTotal = sellTokenIsPtToken
-    ? `${totalFees} ADA`
-    : `${Quantities.format(amounts.sell.quantity, sellTokenInfo?.decimals ?? 0)} ${
-        sellTokenInfo?.ticker ?? ''
-      }`;
+  const { pool } = calculation;
 
-  const titleTotalFeesFormatted = `Total: ${
-    !sellTokenIsPtToken ? `${sellTokenTotal} + ${totalFees} ADA` : sellTokenTotal
-  }`;
+  const formattedTotal = formattedNonPtAmount == null ? formattedPtAmount
+    : `${formattedNonPtAmount} + ${formattedPtAmount}`;
+  const titleTotalFeesFormatted = `Total: ${formattedTotal}`;
 
   const isLimitOrder = type === 'limit';
   const bestPool = bestPoolCalculation?.pool || {};
@@ -116,7 +102,7 @@ export default function EditSwapPool({ handleEditPool }: Props): React$Node {
             </Box>
           </Box>
         </Box>
-        {showFullInfo && <SwapPoolFullInfo totalFees={totalFees} />}
+        {showFullInfo && <SwapPoolFullInfo defaultTokenInfo={defaultTokenInfo} />}
       </Box>
     </Box>
   );

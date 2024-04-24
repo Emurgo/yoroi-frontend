@@ -3,22 +3,22 @@
 import { action, observable, runInAction } from 'mobx';
 import Store from '../base/Store';
 
-import type {
-  RestoreModeType,
-  WalletRestoreMeta,
-} from '../../actions/common/wallet-restore-actions';
+import type { RestoreModeType, WalletRestoreMeta, } from '../../actions/common/wallet-restore-actions';
+import type { PlateResponse } from '../../api/ada/lib/cardanoCrypto/plate';
 import { generateShelleyPlate } from '../../api/ada/lib/cardanoCrypto/plate';
-import { HARD_DERIVATION_START } from '../../config/numbersConfig';
-import { generateWalletRootKey as generateAdaWalletRootKey, } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
+import { CoinTypes, HARD_DERIVATION_START, WalletTypePurpose } from '../../config/numbersConfig';
+import {
+  generateWalletRootKey as cardanoGenerateWalletRootKey,
+  generateWalletRootKey as generateAdaWalletRootKey,
+} from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import { defineMessages } from 'react-intl';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import { isWalletExist } from '../../api/ada/lib/cardanoCrypto/utils';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import AdaApi from '../../api/ada';
-import type { PlateResponse } from '../../api/ada/lib/cardanoCrypto/plate';
+import { asGetPublicKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 
 const messages = defineMessages({
   walletRestoreVerifyAccountIdLabel: {
@@ -54,6 +54,37 @@ export type PlateWithMeta = {|
   checksumTitle: $Exact<$npm$ReactIntl$MessageDescriptor>,
   addressMessage: $Exact<$npm$ReactIntl$MessageDescriptor>,
 |};
+
+export async function isWalletExist(
+  publicDerivers: Array<PublicDeriver<>>,
+  recoveryPhrase: string,
+  accountIndex: number,
+  selectedNetwork: $ReadOnly<NetworkRow>
+): Promise<PublicDeriver<> | void> {
+  const rootPk = cardanoGenerateWalletRootKey(recoveryPhrase);
+  const accountPublicKey = rootPk
+    .derive(WalletTypePurpose.CIP1852)
+    .derive(CoinTypes.CARDANO)
+    .derive(accountIndex)
+    .to_public();
+  const publicKey = Buffer.from(accountPublicKey.as_bytes()).toString('hex');
+
+  for (const deriver of publicDerivers) {
+    const withPubKey = asGetPublicKey(deriver);
+    if (withPubKey == null) return;
+    const existedPublicKey = await withPubKey.getPublicKey();
+    const walletNetwork = deriver.getParent().getNetworkInfo();
+    /**
+     * We will still allow to restore the wallet on a different networks even they are
+     * sharing the same recovery phrase but we are treating them differently
+     */
+    if (
+      publicKey === existedPublicKey.Hash &&
+      walletNetwork.NetworkId === selectedNetwork.NetworkId
+    )
+      return deriver;
+  }
+}
 
 export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> {
   @observable selectedAccount: number = 0 + HARD_DERIVATION_START;

@@ -64,6 +64,13 @@
 
   function cardano_request_read_access(cardanoAccessRequest) {
     const { requestIdentification, onlySilent } = (cardanoAccessRequest || {});
+    if (requestIdentification) {
+      // <TODO:PENDING_REMOVAL> experimental
+      console.warn(`
+        WARNING!! YOROI-EXPERIMENTAL feature "requestIdentification" is about to be removed.
+        Migrate to some other API for authentication immediately.
+      `);
+    }
     return new Promise(function(resolve, reject) {
       window.postMessage({
         type: "connector_connect_request/cardano",
