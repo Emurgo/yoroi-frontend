@@ -134,6 +134,9 @@ const SwapPage = React.lazy(SwapPagePromise);
 const SwapOrdersPagePromise = () => import('./containers/swap/orders/OrdersPage');
 const SwapOrdersPage = React.lazy(SwapOrdersPagePromise);
 
+const ExchangeEndPagePromise = () => import('./containers/ExchangeEndPage');
+const ExchangeEndPage = React.lazy(ExchangeEndPagePromise);
+
 export const LazyLoadPromises: Array<() => any> = [
   AddAnotherWalletPromise,
   StakingPageContentPromise,
@@ -175,6 +178,7 @@ export const LazyLoadPromises: Array<() => any> = [
   SwapOrdersPagePromise,
   OptForAnalyticsPagePromise,
   AnalyticsSettingsPagePromise,
+  ExchangeEndPagePromise,
 ];
 
 // populated by ConfigWebpackPlugin
@@ -308,6 +312,11 @@ export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
         exact
         path={ROUTES.REVAMP.CATALYST_VOTING}
         component={props => <VotingPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.EXCHANGE_END}
+        component={props => <ExchangeEndPage {...props} stores={stores} actions={actions} />}
       />
       <Redirect to={ROUTES.MY_WALLETS} />
     </Switch>
