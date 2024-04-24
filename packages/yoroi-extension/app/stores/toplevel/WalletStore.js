@@ -8,7 +8,7 @@ import { ROUTES } from '../../routes-config';
 import environment from '../../environment';
 import config from '../../config';
 import globalMessages from '../../i18n/global-messages';
-import type { Notification } from '../../types/notificationType';
+import type { Notification } from '../../types/notification.types';
 import type { GetWalletsFunc } from '../../api/common/index';
 import { getWallets } from '../../api/common/index';
 import type { CreateWalletResponse, RestoreWalletResponse } from '../../api/common/types';
@@ -200,6 +200,13 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   @computed get hasActiveWallet(): boolean {
     return this.selected != null;
+  }
+
+  @computed get selectedOrFail(): PublicDeriver<> {
+    if (this.selected == null) {
+      throw new Error('A selected wallet is required!');
+    }
+    return this.selected;
   }
 
   @computed get activeWalletPlate(): ?WalletChecksum {

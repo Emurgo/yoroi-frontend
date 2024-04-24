@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import type { StoresMap } from './stores/index';
 import type { ActionsMap } from './actions/index';
-import type { StoresAndActionsProps } from './types/injectedPropsType';
+import type { StoresAndActionsProps } from './types/injectedProps.types';
 import type { ConfigType } from '../config/config-types';
 import { Route, Redirect, Switch } from 'react-router-dom';
 import { ROUTES } from './routes-config';
@@ -29,6 +29,9 @@ import SwapPageContainer from './containers/swap/SwapPageContainer';
 import AssetsWrapper from './containers/wallet/AssetsWrapper';
 import NFTsWrapper from './containers/wallet/NFTsWrapper';
 import SwapProvider from './containers/swap/SwapProvider';
+import { Stack } from '@mui/material';
+import LoadingSpinner from './components/widgets/LoadingSpinner';
+import FullscreenLayout from './components/layout/FullscreenLayout';
 
 // PAGES
 const LanguageSelectionPagePromise = () => import('./containers/profile/LanguageSelectionPage');
@@ -181,7 +184,6 @@ export const LazyLoadPromises: Array<() => any> = [
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 
-/* eslint-disable max-len */
 export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
   <Suspense fallback={null}>
     <Switch>
@@ -474,11 +476,18 @@ const NFTsSubPages = (stores, actions) => (
 
 export function wrapSwap(swapProps: StoresAndActionsProps, children: Node): Node {
   const queryClient = new QueryClient();
+  const loader = (
+    <FullscreenLayout bottomPadding={0}>
+      <Stack alignItems="center" justifyContent="center" height="50vh">
+        <LoadingSpinner />
+      </Stack>
+    </FullscreenLayout>
+  );
   return (
     <QueryClientProvider client={queryClient}>
       <SwapProvider publicDeriver={swapProps.stores.wallets.selected}>
         <SwapPageContainer {...swapProps}>
-          <Suspense fallback={null}>{children}</Suspense>
+          <Suspense fallback={loader}>{children}</Suspense>
         </SwapPageContainer>
       </SwapProvider>
     </QueryClientProvider>

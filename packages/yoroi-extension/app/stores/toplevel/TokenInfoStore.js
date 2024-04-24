@@ -24,7 +24,9 @@ import { ModifyToken } from '../../api/ada/lib/storage/database/primitives/api/w
 import { genCardanoAssetMap } from '../../api/ada/lib/storage/bridge/updateTransactions';
 import type WalletsActions from '../../actions/wallet-actions';
 import type TransactionsStore from './TransactionsStore';
-import type { IFetcher as IFetcherCardano } from '../../api/ada/lib/state-fetch/IFetcher';
+import type { IFetcher as IFetcherCardano } from '../../api/ada/lib/state-fetch/IFetcher.types';
+import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
+import { createTokenRowSummary } from '../stateless/tokenHelpers';
 
 export type TokenInfoMap = Map<
   string, // network ID. String because mobx requires string for observable maps
@@ -62,7 +64,27 @@ export default class TokenInfoStore<
     this.tokenInfo = new Map();
   }
 
-  fetchMissingTokenInfo: (number, Array<string>) => Promise<void> = async (
+  async fetchRemoteMetadata(network: $ReadOnly<NetworkRow>, tokenId: string): Promise<?RemoteTokenInfo> {
+    const identifier = tokenId.replace('.', '');
+    return (await this.stores.substores.ada.stateFetchStore.fetcher
+      .getTokenInfo({ network, tokenIds: [identifier] }))[identifier];
+  }
+
+  async getLocalOrRemoteMetadata(network: $ReadOnly<NetworkRow>, tokenId: string): Promise<RemoteTokenInfo> {
+    const localTokeninfo: ?$ReadOnly<TokenRow> =
+      this.tokenInfo.get(String(network.NetworkId))?.get(tokenId);
+    if (localTokeninfo != null) {
+      return createTokenRowSummary(localTokeninfo);
+    }
+    const remoteTokeninfo: ?RemoteTokenInfo =
+      await this.fetchRemoteMetadata(network, tokenId);
+    if (remoteTokeninfo != null) {
+      return remoteTokeninfo;
+    }
+    return { name: undefined, ticker: undefined, decimals: undefined };
+  }
+
+  fetchMissingTokenInfo: (networkId: number, tokenIds: Array<string>) => Promise<void> = async (
     networkId,
     tokenIds
   ) => {
@@ -125,6 +147,12 @@ export default class TokenInfoStore<
       networkId,
       this.tokenInfo
     );
+  }
+
+  getDefaultTokenInfoSummary: number => RemoteTokenInfo = (
+    networkId: number
+  ) => {
+    return createTokenRowSummary(this.getDefaultTokenInfo(networkId));
   }
 
   _updateTokenInfo: $ReadOnlyArray<$ReadOnly<TokenRow>> => void = (tokens) => {

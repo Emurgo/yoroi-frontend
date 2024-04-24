@@ -29,7 +29,7 @@ export function urlResolveForIpfsAndCorsproxy<T: ?string>(url: T): T {
   // $FlowIgnore
   return maybe(url, (u: string): string => u.startsWith('ipfs://')
     ? u.replace('ipfs://', 'https://ipfs.io/ipfs/')
-    : `https://corsproxy.io/${u}`);
+    : `https://corsproxy.io/?${u}`);
 }
 
 /**
@@ -64,10 +64,18 @@ export function listValues<T>(obj: { [any]: T }): T[] {
 /**
  * Returns a sorted copy
  */
-export function sorted<T>(arr: T[]): T[] {
+export function sorted<T>(arr: T[], f?: (a: T, b: T) => number): T[] {
   const res = [...arr];
-  res.sort();
+  res.sort(f);
   return res;
+}
+
+export function first<T>(arr: T[]): ?T {
+  return arr[0];
+}
+
+export function last<T>(arr: T[]): ?T {
+  return arr[arr.length - 1];
 }
 
 /**
@@ -115,4 +123,20 @@ export function noop(..._: any[]): void {
  */
 export function fail<T>(...params: any[]): T {
   throw new Error(...params);
+}
+
+/**
+ * Returns the passed argument with no changes and just force-casts it to defined type
+ */
+export function forceNonNull<T>(t: ?T): T {
+  // $FlowIgnore
+  return t;
+}
+
+/**
+ * Returns the passed argument with no changes and just force-casts it to defined type
+ */
+export function cast<T>(t: any): T {
+  // $FlowIgnore
+  return t;
 }

@@ -4,7 +4,7 @@ import { Component } from 'react';
 import ConnectPage from '../components/connect/ConnectPage';
 import { observer } from 'mobx-react';
 import { autorun } from 'mobx';
-import type { ConnectorStoresAndActionsProps } from '../../types/injectedPropsType';
+import type { ConnectorStoresAndActionsProps } from '../../types/injectedProps.types';
 import type { ConnectResponseData } from '../../../chrome/extension/connector/types';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { LoadingWalletStates } from '../types';

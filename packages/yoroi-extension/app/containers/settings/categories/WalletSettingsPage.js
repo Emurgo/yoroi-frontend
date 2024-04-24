@@ -11,7 +11,7 @@ import ExportWallet from '../../../components/wallet/settings/ExportWallet';
 import RemoveWalletDialogContainer from './RemoveWalletDialogContainer';
 import ExportWalletDialogContainer from './ExportWalletDialogContainer';
 import ResyncWalletDialogContainer from './ResyncWalletDialogContainer';
-import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import { isValidWalletName } from '../../../utils/validations';
 import ChangeWalletPasswordDialogContainer from '../../wallet/dialogs/ChangeWalletPasswordDialogContainer';
 import { asGetSigningKey } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';

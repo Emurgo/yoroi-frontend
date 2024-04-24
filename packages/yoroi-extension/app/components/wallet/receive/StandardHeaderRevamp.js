@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import type { Notification } from '../../../types/notificationType';
+import type { Notification } from '../../../types/notification.types';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
@@ -68,6 +68,7 @@ export default class StandardHeaderRevamp extends Component<Props> {
     } = this.props;
     const { intl } = this.context;
     const mainAddressNotificationId = 'mainAddress-copyNotification';
+    const locationId = 'wallet:receive:infoPanel:header'
 
     const generateAddressForm = (
       <LoadingButton
@@ -82,6 +83,7 @@ export default class StandardHeaderRevamp extends Component<Props> {
             height: 'unset',
           },
         }}
+        id={locationId + '-generateNewAddress-button'}
       >
         {intl.formatMessage(messages.generateNewAddressButtonLabel)}
       </LoadingButton>
@@ -125,13 +127,14 @@ export default class StandardHeaderRevamp extends Component<Props> {
                   },
                 }}
               >
-                <QrCodeWrapper fgColor="#000" value={walletAddress} size={153} />
+                <QrCodeWrapper fgColor="#000" value={walletAddress} size={153} id={locationId + '-addressQrCode-image'} />
               </Box>
             </Box>
           </Box>
           <Box width="100%">
             <Box mb="8px">
               <CopyableAddress
+                id={locationId}
                 darkVariant
                 sx={{
                   justifyContent: 'flex-start',
@@ -166,7 +169,7 @@ export default class StandardHeaderRevamp extends Component<Props> {
             </Typography>
 
             {generateAddressForm}
-            {error && <div className={styles.error}>{intl.formatMessage(error)}</div>}
+            {error && <div className={styles.error} id={locationId + '-addressError-text'}>{intl.formatMessage(error)}</div>}
           </Box>
         </Box>
       </Box>

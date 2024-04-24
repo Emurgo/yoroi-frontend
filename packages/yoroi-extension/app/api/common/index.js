@@ -46,7 +46,7 @@ import type { CoreAddressT, } from '../ada/lib/storage/database/primitives/enums
 import { getAllTokenInfo } from './lib/tokens/utils';
 import { MultiToken } from './lib/MultiToken';
 import type { DefaultTokenEntry } from './lib/MultiToken';
-import type { UnconfirmedAmount } from '../../types/unconfirmedAmountType';
+import type { UnconfirmedAmount } from '../../types/unconfirmedAmount.types';
 
 // getTokenInfo
 

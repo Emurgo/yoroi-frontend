@@ -117,6 +117,7 @@ class ExportTransactionDialog extends Component<Props & InjectedLayoutProps, Sta
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={cancel}
+        id="exportTransactionsDialog"
       >
         <Box width={isRevampLayout ? '600px' : '100%'}>
           {infoBlock}
@@ -128,6 +129,7 @@ class ExportTransactionDialog extends Component<Props & InjectedLayoutProps, Sta
             setEndDate={date => {
               this.setState({ endDate: date });
             }}
+            initialId="exportTransactionsDialog"
           />
 
           {isRevampLayout ? (
@@ -140,6 +142,7 @@ class ExportTransactionDialog extends Component<Props & InjectedLayoutProps, Sta
               }}
               control={<Checkbox checked={shouldIncludeTxIds} onChange={toggleIncludeTxIds} />}
               label={intl.formatMessage(messages.includeTxIds)}
+              id="exportTransactionsDialog-includeTxIds-checkbox"
             />
           ) : (
             <CheckboxLabel

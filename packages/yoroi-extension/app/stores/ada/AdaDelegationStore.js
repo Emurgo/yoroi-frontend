@@ -1,6 +1,5 @@
 // @flow
 
-import axios from 'axios';
 import { action, reaction, runInAction } from 'mobx';
 import BigNumber from 'bignumber.js';
 import Store from '../base/Store';
@@ -18,10 +17,6 @@ import {
 import {
   getDelegatedBalance,
 } from '../../api/ada/lib/storage/bridge/delegationUtils';
-import type {
-  GetDelegatedBalanceFunc,
-  RewardHistoryFunc
-} from '../../api/common/lib/storage/bridge/delegationUtils';
 import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { MangledAmountFunc } from '../stateless/mangledAddresses';
@@ -33,6 +28,7 @@ import { PoolInfoApi } from '@emurgo/yoroi-lib';
 import { entriesIntoMap } from '../../coreUtils';
 import type { PoolInfo } from '@emurgo/yoroi-lib';
 import type { PoolInfoResponse, RemotePool } from '../../api/ada/lib/state-fetch/types';
+import type { GetDelegatedBalanceFunc, RewardHistoryFunc } from '../../api/ada/lib/storage/bridge/delegationUtils';
 
 export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
 
@@ -177,7 +173,7 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
       poolIds: poolsToQuery,
     });
     const remotePoolInfoPromises: Array<Promise<[string, PoolInfo | null]>> =
-      poolsToQuery.map(id => new PoolInfoApi(axios).getPool(id).then(res => [id, res]));
+      poolsToQuery.map(id => new PoolInfoApi().getPool(id).then(res => [id, res]));
     const [poolInfoResp, remotePoolInfoResps]: [PoolInfoResponse, Array<[string, PoolInfo | null]>] =
       await Promise.all([poolInfoPromise, Promise.all(remotePoolInfoPromises)]);
     const remoteInfoMap = entriesIntoMap<string, PoolInfo | null>(remotePoolInfoResps);

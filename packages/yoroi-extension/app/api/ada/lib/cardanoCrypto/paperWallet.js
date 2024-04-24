@@ -9,7 +9,7 @@ import { Logger, stringifyError } from '../../../../utils/logging';
 import { RustModule } from './rustLoader';
 import {
   isValidBip39Mnemonic
-} from '../../../common/lib/crypto/wallet';
+} from './wallet';
 import config from '../../../../config';
 
 // <TODO:PENDING_REMOVAL> paper

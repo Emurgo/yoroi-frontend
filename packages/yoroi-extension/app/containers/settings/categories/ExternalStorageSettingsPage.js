@@ -4,7 +4,7 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { handleExternalClick } from '../../../utils/routing';
 import ExternalStorageSettings from '../../../components/settings/categories/ExternalStorageSettings';
-import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 
 @observer
 export default class ExternalStorageSettingsPage extends Component<StoresAndActionsProps> {

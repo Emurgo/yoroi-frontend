@@ -8,7 +8,7 @@ import { toSvg } from 'jdenticon';
 import { Button } from '@mui/material';
 
 import CardShadow from './CardShadow';
-import type { Notification } from '../../../../types/notificationType';
+import type { Notification } from '../../../../types/notification.types';
 import CopyableAddress from '../../../widgets/CopyableAddress';
 import RawHash from '../../../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../../../containers/widgets/ExplorableHashContainer';
@@ -168,6 +168,7 @@ export default class StakePool extends Component<Props> {
             <h3 className={styles.userTitle}>{poolName}</h3>
             <div className={styles.subTitle}>
               <CopyableAddress
+                id='stakePool'
                 hash={hash}
                 elementId={poolIdNotificationId}
                 onCopyAddress={() => this.props.onCopyAddressTooltip(hash, poolIdNotificationId)}

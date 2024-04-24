@@ -2,16 +2,20 @@
 import { Box, Button, Typography } from '@mui/material';
 import { ReactComponent as TxSuccessfulImage } from '../../../assets/images/revamp/tx-successful.inline.svg';
 import { ReactComponent as TxFailureImage } from '../../../assets/images/revamp/tx-failure.inline.svg';
+import type { State } from '../context/swap-form/types';
 
 type Props = {|
-  isSuccessful: boolean,
+  txSubmitErrorState: State<?Error>,
   onTryAgain: void => void,
+  onSuccess: void => void,
 |};
 
 export default function TxSubmittedStep({
-  isSuccessful,
+  txSubmitErrorState,
   onTryAgain,
+  onSuccess,
 }: Props): React$Node {
+  const isSuccessful = txSubmitErrorState.value == null;
   return (
     <Box
       display="flex"
@@ -34,7 +38,7 @@ export default function TxSubmittedStep({
         </Typography>
       </Box>
       <Box>
-        <Button onClick={onTryAgain} variant="primary">
+        <Button onClick={isSuccessful ? onSuccess : onTryAgain} variant="primary">
           {isSuccessful ? 'Go to orders' : 'Try again'}
         </Button>
       </Box>

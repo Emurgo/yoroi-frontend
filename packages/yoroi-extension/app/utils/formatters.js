@@ -27,15 +27,6 @@ export const truncateLongName: string => string = (walletName) => {
     : walletName;
 };
 
-/**
- * Just removes all Lovelaces, without decimal place (does not round off)
- * e.g 3657.9345 => 3657
- * @param {*} amount
- */
-export const formattedAmountWithoutLovelace = (amount: BigNumber): string => (
-  amount.decimalPlaces(0, 3).toString() // 3 = ROUND_FLOOR
-);
-
 /** removes commas */
 export const formattedAmountToBigNumber = (amount: string): BigNumber => {
   const cleanedAmount = amount.replace(/,/g, '');
@@ -65,11 +56,6 @@ export const formattedAmountToNaturalUnits: (
   const cleanedAmount = amount.replace('.', '').replace(/,/g, '').replace(/^0+/, '');
   return cleanedAmount === '' ? '0' : cleanedAmount;
 };
-
-/** removes all trailing zeros */
-export const formattedAmountWithoutTrailingZeros = (amount: string): string => (
-  amount.replace(/0+$/, '').replace(/\.$/, '')
-);
 
 function truncateFormatter(addr: string, cutoff: number): string {
   const shortener = '...';

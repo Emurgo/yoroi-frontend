@@ -5,8 +5,7 @@ import moment from 'moment/moment';
 import Store from './Store';
 import Request from '../lib/LocalizedRequest';
 import environment from '../../environment';
-import { THEMES } from '../../styles/utils';
-import type { Theme } from '../../styles/utils';
+import { getCSSCustomPropObject} from '../../styles/utils';
 import { LANGUAGES } from '../../i18n/translations';
 import type { LanguageType } from '../../i18n/translations';
 import type { SetCustomUserThemeRequest } from '../../api/localStorage/index';
@@ -19,6 +18,8 @@ import { CURRENT_TOS_VERSION } from '../../i18n/locales/terms-of-use/ada/index';
 import { ampli } from '../../../ampli/index';
 import type { LoadOptionsWithEnvironment } from '../../../ampli/index';
 import { noop } from '../../coreUtils';
+import type { Theme } from '../../styles/themes';
+import { THEMES } from '../../styles/themes';
 
 interface CoinPriceStore {
   refreshCurrentUnit: Request<(void) => Promise<void>>;
@@ -423,7 +424,6 @@ export default class BaseProfileStore
   };
 
   _exportTheme: void => Promise<void> = async () => {
-    const { getCSSCustomPropObject } = require(`../../styles/utils`);
     const cssCustomPropObject = getCSSCustomPropObject();
     await this.unsetCustomThemeRequest.execute();
     await this.setCustomThemeRequest.execute({

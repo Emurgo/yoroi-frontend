@@ -1,5 +1,5 @@
 // @flow
-import '../ada/lib/test-config'; // TODO: https://github.com/Emurgo/yoroi-frontend/issues/250
+import '../ada/lib/test-config.forTests'; // TODO: https://github.com/Emurgo/yoroi-frontend/issues/250
 import type { CsvData } from './index';
 import ExportApi, { COIN_TRACKING_HEADERS } from './index';
 

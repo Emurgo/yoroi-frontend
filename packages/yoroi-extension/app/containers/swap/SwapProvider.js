@@ -1,7 +1,7 @@
 // @flow
 import type { Node } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
-import { useMemo, useState, useEffect } from 'react';
 import {
   supportedProviders,
   swapApiMaker,
@@ -11,6 +11,7 @@ import {
 } from '@yoroi/swap';
 import { asGetStakingKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { unwrapStakingKey } from '../../api/ada/lib/storage/bridge/utils';
+import { asyncLocalStorageWrapper } from '../../api/localStorage';
 
 type Props = {|
   children?: Node,
@@ -32,8 +33,10 @@ function SwapProvider({ children, publicDeriver }: Props): Node {
     withStakingKey
       .getStakingKey()
       .then(stakingKeyResp => {
-        const stakignAddr = stakingKeyResp.addr.Hash;
-        const skey = Buffer.from(unwrapStakingKey(stakignAddr).to_bytes()).toString('hex');
+        const skey = unwrapStakingKey(stakingKeyResp.addr.Hash).to_keyhash()?.to_hex();
+        if (skey == null) {
+          throw new Error('Cannot get staking key from the wallet!');
+        }
         setStakingKey(skey);
         return null;
       })
@@ -43,28 +46,20 @@ function SwapProvider({ children, publicDeriver }: Props): Node {
   }, []);
 
   const swapStorage = useMemo(
-    () =>
-      swapStorageMaker({
-        // todo: storage api should be moved into its own file.
-        storage: {
-          getItem: (key: string) => Promise.resolve(localStorage.getItem(key)),
-          setItem: (key: string, value: string) =>
-            Promise.resolve(localStorage.setItem(key, value)),
-          removeItem: (key: string) => Promise.resolve(localStorage.removeItem(key)),
-        },
-      }),
+    () => swapStorageMaker({ storage: asyncLocalStorageWrapper() }),
     []
   );
 
   const swapApi = useMemo(
     () =>
       swapApiMaker({
+        // Preprod does not work atm so always mainnet
         isMainnet: true,
         stakingKey,
         primaryTokenId: defaultToken.defaultIdentifier,
         supportedProviders,
       }),
-    []
+    [stakingKey]
   );
 
   const swapManager = useMemo(() => swapManagerMaker({ swapApi, swapStorage }), [
