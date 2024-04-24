@@ -1,6 +1,5 @@
 // @flow
 
-import React from 'react';
 import { Box, Typography } from '@mui/material';
 import { useSwap } from '@yoroi/swap';
 import { useSwapForm } from '../../context/swap-form';
@@ -71,11 +70,11 @@ export default function SwapPoolFullInfo({
           {withInfo && (
             <InfoTooltip
               content={
-                <React.Fragment>
+                <>
                   <Typography color="inherit">Fees included:</Typography>
                   <Typography color="inherit">• DEX fee</Typography>
                   <Typography color="inherit">• Frontend fee</Typography>
-                </React.Fragment>
+                </>
               }
             />
           )}

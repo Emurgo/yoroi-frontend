@@ -4,7 +4,6 @@ import { Box } from '@mui/material';
 import SwapPriceInput from '../../../components/swap/SwapPriceInput';
 import SlippageDialog from '../../../components/swap/SlippageDialog';
 import { useSwap } from '@yoroi/swap';
-import { useSwapForm } from '../context/swap-form';
 import EditSellAmount from './edit-sell-amount/EditSellAmount';
 import EditBuyAmount from './edit-buy-amount/EditBuyAmount';
 import SelectBuyTokenFromList from './edit-buy-amount/SelectBuyTokenFromList';

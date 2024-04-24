@@ -45,7 +45,6 @@ function SwapPage(props: StoresAndActionsProps): Node {
       limitPrice: orderLimitPrice,
     },
     frontendFeeTiersChanged,
-    orderData,
   } = useSwap();
   const { sellTokenInfo, buyTokenInfo } = useSwapForm();
 
@@ -188,6 +187,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
         return;
       }
     } else {
+      // eslint-disable-next-line no-lonely-if
       if (checkLimitOrderThresholdWarning()) {
         return;
       }
