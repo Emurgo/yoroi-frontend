@@ -2,7 +2,6 @@
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { Node } from 'react';
 import type { StoresAndActionsProps } from '../types/injectedProps.types';
-import type { ConceptualWalletSettingsCache } from '../stores/toplevel/WalletSettingsStore';
 import { Component } from 'react';
 import { intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
