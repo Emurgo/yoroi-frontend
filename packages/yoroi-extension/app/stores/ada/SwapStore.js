@@ -7,7 +7,10 @@ import { action, computed, observable } from 'mobx';
 import type { StorageField } from '../../api/localStorage';
 import { createStorageFlag } from '../../api/localStorage';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
-import { asGetAllUtxos, asHasUtxoChains } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import {
+  asGetAllUtxos,
+  asHasUtxoChains,
+} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { createMetadata } from '../../api/ada/lib/storage/bridge/metadataUtils';
 import type { TxOutput } from '../../api/ada/transactions/shelley/transactions';
 import { MultiToken } from '../../api/common/lib/MultiToken';
@@ -24,23 +27,31 @@ import type { QueriedUtxo } from '../../api/ada/lib/storage/models/PublicDeriver
 import { transactionHexToHash } from '../../api/ada/lib/cardanoCrypto/utils';
 import { signTransactionHex } from '../../api/ada/transactions/signTransactionHex';
 
-const FRONTEND_FEE_ADDRESS_MAINNET = 'addr1q9ry6jfdgm0lcrtfpgwrgxg7qfahv80jlghhrthy6w8hmyjuw9ngccy937pm7yw0jjnxasm7hzxjrf8rzkqcj26788lqws5fke';
-const FRONTEND_FEE_ADDRESS_PREPROD = 'addr_test1qrgpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqzp57km';
+const FRONTEND_FEE_ADDRESS_MAINNET =
+  'addr1q9ry6jfdgm0lcrtfpgwrgxg7qfahv80jlghhrthy6w8hmyjuw9ngccy937pm7yw0jjnxasm7hzxjrf8rzkqcj26788lqws5fke';
+const FRONTEND_FEE_ADDRESS_PREPROD =
+  'addr_test1qrgpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqzp57km';
 
 export default class SwapStore extends Store<StoresMap, ActionsMap> {
-
   @observable limitOrderDisplayValue: string = '';
+  @observable orderStep: number = 0;
 
-  swapDisclaimerAcceptanceFlag: StorageField<boolean> =
-    createStorageFlag('SwapStore.swapDisclaimerAcceptanceFlag', false);
+  swapDisclaimerAcceptanceFlag: StorageField<boolean> = createStorageFlag(
+    'SwapStore.swapDisclaimerAcceptanceFlag',
+    false
+  );
 
   @action setLimitOrderDisplayValue: string => void = (val: string) => {
     this.limitOrderDisplayValue = val;
-  }
+  };
 
   @action resetLimitOrderDisplayValue: void => void = () => {
     this.limitOrderDisplayValue = '';
-  }
+  };
+
+  @action setOrderStepValue: number => void = (val: number) => {
+    this.orderStep = val;
+  };
 
   @computed get assets(): Array<AssetAmount> {
     const spendableBalance = this.stores.transactions?.balance;
@@ -72,11 +83,15 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
       });
   }
 
-  getUtxoHexForCancelCollateral: ({| wallet: PublicDeriver<> |}) => Promise<string> = async ({ wallet }) => {
-    const utxo: QueriedUtxo = await this.stores.substores.ada.wallets.pickCollateralUtxo({ wallet });
+  getUtxoHexForCancelCollateral: ({| wallet: PublicDeriver<> |}) => Promise<string> = async ({
+    wallet,
+  }) => {
+    const utxo: QueriedUtxo = await this.stores.substores.ada.wallets.pickCollateralUtxo({
+      wallet,
+    });
     const [addressedUtxo] = asAddressedUtxo([utxo]);
     return cardanoUtxoHexFromRemoteFormat(cast(addressedUtxo));
-  }
+  };
 
   createUnsignedSwapTx: ({|
     wallet: PublicDeriver<>,
@@ -110,15 +125,17 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
               sellQuantity: sell.quantity,
               buyTokenId: buy.tokenId,
               buyQuantity: buy.quantity,
-            }),
+            })
           ),
         },
       },
     ]);
-    const withUtxos = asGetAllUtxos(wallet)
-      ?? fail(`${nameof(this.createUnsignedSwapTx)} missing utxo functionality`);
-    const withHasUtxoChains = asHasUtxoChains(withUtxos)
-      ?? fail(`${nameof(this.createUnsignedSwapTx)} missing chains functionality`);
+    const withUtxos =
+      asGetAllUtxos(wallet) ??
+      fail(`${nameof(this.createUnsignedSwapTx)} missing utxo functionality`);
+    const withHasUtxoChains =
+      asHasUtxoChains(withUtxos) ??
+      fail(`${nameof(this.createUnsignedSwapTx)} missing chains functionality`);
     const entries: Array<TxOutput> = [];
     entries.push({
       address: contractAddress,
@@ -137,7 +154,7 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
       entries,
       metadata,
     });
-  }
+  };
 
   executeCancelTransaction: ({|
     wallet: PublicDeriver<>,
@@ -157,7 +174,7 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
     });
     // Refresh call is non-blocking on purpose
     noop(this.stores.wallets.refreshWalletFromRemote(wallet));
-  }
+  };
 }
 
 function createSwapFeFeeAmount({
@@ -172,7 +189,7 @@ function createSwapFeFeeAmount({
     networkId: feFeeAmount.getDefaults().defaultNetworkId,
     identifier: feFees.tokenId,
     amount: new BigNumber(feFees.quantity),
-  })
+  });
   return feFeeAmount;
 }
 
@@ -189,15 +206,19 @@ function createSwapOrderAmount({
   // entries will add together automatically in case they are both default token
   return orderAmount
     .add(orderAmount.createEntry(sell.tokenId, new BigNumber(sell.quantity)))
-    .add(orderAmount.createDefaultEntry(new BigNumber(Quantities.sum([ptFees.deposit, ptFees.batcher]))));
+    .add(
+      orderAmount.createDefaultEntry(
+        new BigNumber(Quantities.sum([ptFees.deposit, ptFees.batcher]))
+      )
+    );
 }
 
 function splitStringInto64CharArray(inputString: string): string[] {
-  const maxLength = 64
-  const resultArray: string[] = []
+  const maxLength = 64;
+  const resultArray: string[] = [];
   for (let i = 0; i < inputString.length; i += maxLength) {
-    const substring = inputString.slice(i, i + maxLength)
-    resultArray.push(substring)
+    const substring = inputString.slice(i, i + maxLength);
+    resultArray.push(substring);
   }
-  return resultArray
+  return resultArray;
 }

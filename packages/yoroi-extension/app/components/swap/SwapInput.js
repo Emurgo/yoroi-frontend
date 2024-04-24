@@ -40,16 +40,19 @@ export default function SwapInput({
   };
 
   const isFocusedColor = focusState.value ? 'grayscale.max' : 'grayscale.400';
-  const imgSrc = ticker === defaultTokenInfo.ticker ? adaTokenImage
-    : (urlResolveForIpfsAndCorsproxy(image) ?? defaultTokenImage);
+  const imgSrc =
+    ticker === defaultTokenInfo.ticker
+      ? adaTokenImage
+      : urlResolveForIpfsAndCorsproxy(image) ?? defaultTokenImage;
 
   return (
     <Box>
       <Box
+        onClick={tokenInfo.name?.length > 0 ? undefined : onAssetSelect}
         component="fieldset"
         sx={{
           borderStyle: 'solid',
-          borderWidth: focusState.value || error ? '2px' : '1px',
+          borderWidth: tokenInfo.id?.length > 0 || error ? '2px' : '1px',
           borderColor: error ? 'magenta.500' : isFocusedColor,
           borderRadius: '8px',
           p: '16px',

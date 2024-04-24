@@ -31,9 +31,9 @@ class SubMenuItem extends Component<Props & InjectedProps> {
       state = styles.disabled;
     }
     const componentClasses = classNames([styles.component, state, className]);
-    let subMenuItemId = ''
-    if (typeof label === 'string'){
-      subMenuItemId = label.toLowerCase().replace(/[ \/]/gi, '')
+    let subMenuItemId = '';
+    if (typeof label === 'string') {
+      subMenuItemId = label.toLowerCase().replace(/[ \/]/gi, '');
     }
 
     return (

@@ -15,7 +15,7 @@ import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types'
 type Props = {|
   +defaultTokenInfo: RemoteTokenInfo,
   +handleEditPool: void => void,
-|}
+|};
 
 export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props): React$Node {
   const [showFullInfo, setShowFullInfo] = useState(true);
@@ -25,16 +25,18 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
   const { sellTokenInfo, buyTokenInfo } = useSwapForm();
 
   const { formattedPtAmount, formattedNonPtAmount } = useSwapFeeDisplay(defaultTokenInfo);
-
   const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
+
   if (!isValidTickers || calculation == null) {
     return null;
   }
 
   const { pool } = calculation;
 
-  const formattedTotal = formattedNonPtAmount == null ? formattedPtAmount
-    : `${formattedNonPtAmount} + ${formattedPtAmount}`;
+  const formattedTotal =
+    formattedNonPtAmount == null
+      ? formattedPtAmount
+      : `${formattedNonPtAmount} + ${formattedPtAmount}`;
   const titleTotalFeesFormatted = `Total: ${formattedTotal}`;
 
   const isLimitOrder = type === 'limit';
@@ -62,8 +64,8 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
           <Box display="flex" gap="8px" alignItems="center">
             <SwapPoolIcon provider={pool.provider} />
             <Typography component="div" variant="body1" color="grayscale.max">
-              {maybe(pool.provider, p => `${capitalize(p)} ${isAutoPool ? '(Auto)' : ''}`)
-                ?? 'No pool found'}
+              {maybe(pool.provider, p => `${capitalize(p)} ${isAutoPool ? '(Auto)' : ''}`) ??
+                'No pool found'}
             </Typography>
             {isLimitOrder && (
               <Box sx={{ cursor: 'pointer' }} onClick={isLimitOrder ? handleEditPool : undefined}>
@@ -92,17 +94,25 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
           onClick={handleShowFullInfo}
         >
           {pool.provider && (
-            <Typography component="div" variant="body1" color="grayscale.max">
+            <Typography component="div" variant="body1" color="grayscale.max" mb="8px">
               {titleTotalFeesFormatted}
             </Typography>
           )}
-          <Box sx={{ cursor: 'pointer', display: 'flex', gap: '4px', alignItems: 'center' }}>
+          <Box
+            sx={{
+              cursor: 'pointer',
+              display: 'flex',
+              gap: '4px',
+              alignItems: 'center',
+              marginBottom: '8px',
+            }}
+          >
             <Box sx={{ transform: showFullInfo ? 'rotate(180deg)' : 'rotate(0deg)' }}>
               <ChevronDownIcon />
             </Box>
           </Box>
         </Box>
-        {showFullInfo && <SwapPoolFullInfo defaultTokenInfo={defaultTokenInfo} />}
+        {showFullInfo && <SwapPoolFullInfo defaultTokenInfo={defaultTokenInfo} withInfo />}
       </Box>
     </Box>
   );

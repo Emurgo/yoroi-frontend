@@ -1,15 +1,9 @@
 // @flow
 import { useState } from 'react';
-import { Box, Button, Typography } from '@mui/material';
-import { ReactComponent as SwitchIcon } from '../../../assets/images/revamp/icons/switch.inline.svg';
-import { ReactComponent as InfoIcon } from '../../../assets/images/revamp/icons/info.inline.svg';
-import { ReactComponent as EditIcon } from '../../../assets/images/revamp/icons/edit.inline.svg';
-import { ReactComponent as RefreshIcon } from '../../../assets/images/revamp/icons/refresh.inline.svg';
+import { Box } from '@mui/material';
 import SwapPriceInput from '../../../components/swap/SwapPriceInput';
 import SlippageDialog from '../../../components/swap/SlippageDialog';
-import Tabs from '../../../components/common/tabs/Tabs';
-import { useSwap, } from '@yoroi/swap';
-import { useSwapForm } from '../context/swap-form';
+import { useSwap } from '@yoroi/swap';
 import EditSellAmount from './edit-sell-amount/EditSellAmount';
 import EditBuyAmount from './edit-buy-amount/EditBuyAmount';
 import SelectBuyTokenFromList from './edit-buy-amount/SelectBuyTokenFromList';
@@ -21,6 +15,10 @@ import { useAsyncPools } from '../hooks';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import type { PriceImpact } from '../../../components/swap/types';
 
+import { TopActions } from './actions/TopActions';
+import { MiddleActions } from './actions/MiddleActions';
+import { EditSlippage } from './actions/EditSlippage';
+
 type Props = {|
   slippageValue: string,
   onSetNewSlippage: number => void,
@@ -29,23 +27,21 @@ type Props = {|
   priceImpactState: ?PriceImpact,
 |};
 
-export default function SwapForm({
+export const CreateSwapOrder = ({
   slippageValue,
   onSetNewSlippage,
   swapStore,
   defaultTokenInfo,
   priceImpactState,
-}: Props): React$Node {
+}: Props): React$Node => {
   const [openedDialog, setOpenedDialog] = useState('');
-  const {
-    resetSwapForm,
-    switchTokens,
-  } = useSwapForm();
 
   const {
-    orderData: { amounts: { sell, buy }, type: orderType },
+    orderData: {
+      amounts: { sell, buy },
+      type: orderType,
+    },
     // unsignedTxChanged,
-    orderTypeChanged,
     sellTokenInfoChanged,
     buyTokenInfoChanged,
   } = useSwap();
@@ -61,19 +57,17 @@ export default function SwapForm({
 
   return (
     <>
-      <Box width="100%" mx="auto" maxWidth="506px" display="flex" flexDirection="column" gap="8px">
-        <Box display="flex" alignItems="center" justifyContent="space-between" mb="16px">
-          <Tabs
-            tabs={orderTypeTabs.map(({ type, label }) => ({
-              label,
-              isActive: orderType === type,
-              onClick: () => orderTypeChanged(type)
-            }))}
-          />
-          <Box sx={{ cursor: 'pointer' }}>
-            <RefreshIcon />
-          </Box>
-        </Box>
+      <Box
+        width="100%"
+        mx="auto"
+        maxWidth="506px"
+        display="flex"
+        flexDirection="column"
+        gap="8px"
+        pb="20px"
+      >
+        {/* Order type and refresh */}
+        <TopActions orderTypeTabs={orderTypeTabs} orderType={orderType} />
 
         {/* From Field */}
         <EditSellAmount
@@ -82,19 +76,7 @@ export default function SwapForm({
         />
 
         {/* Clear and switch */}
-        <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Box
-            sx={{ cursor: 'pointer', color: 'primary.500' }}
-            onClick={() => switchTokens()}
-          >
-            <SwitchIcon />
-          </Box>
-          <Box>
-            <Button onClick={() => resetSwapForm()} variant="tertiary" color="primary">
-              Clear
-            </Button>
-          </Box>
-        </Box>
+        <MiddleActions />
 
         {/* To Field */}
         <EditBuyAmount
@@ -103,37 +85,13 @@ export default function SwapForm({
         />
 
         {/* Price between assets */}
-        <Box mt="16px">
-          <SwapPriceInput
-            swapStore={swapStore}
-            priceImpactState={priceImpactState}
-          />
-        </Box>
+        <SwapPriceInput swapStore={swapStore} priceImpactState={priceImpactState} />
 
         {/* Slippage settings */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Box display="flex" gap="8px" alignItems="center">
-            <Typography component="div" variant="body1" color="grayscale.500">
-              Slippage tolerance
-            </Typography>
-            <InfoIcon />
-          </Box>
-          <Box
-            onClick={() => setOpenedDialog('slippage')}
-            sx={{ cursor: 'pointer', display: 'flex', gap: '4px', alignItems: 'center' }}
-          >
-            <Typography component="div" variant="body1" color="grayscale.max">
-              {slippageValue}%
-            </Typography>
-            <EditIcon />
-          </Box>
-        </Box>
+        <EditSlippage
+          setOpenedDialog={() => setOpenedDialog('slippage')}
+          slippageValue={slippageValue}
+        />
 
         {/* Available pools */}
         <EditSwapPool
@@ -180,4 +138,4 @@ export default function SwapForm({
       )}
     </>
   );
-}
+};

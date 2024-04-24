@@ -19,7 +19,7 @@ import { PriceImpactColored, PriceImpactIcon } from './PriceImpact';
 const fromTemplateColumns = '1fr minmax(auto, 136px)';
 const toTemplateColumns = '1fr minmax(auto, 152px) minmax(auto, 136px)';
 const fromColumns = ['Asset', 'Amount'];
-const toColumns = ['Asset', 'Volume, 24h', 'Price %, 24h'];
+const toColumns = [''];
 
 type Props = {|
   assets: Array<AssetAmount>,
@@ -63,7 +63,14 @@ export default function SelectAssetDialog({
     ) || [];
 
   return (
-    <Dialog title={`Swap ${type}`} onClose={onClose} withCloseButton closeOnOverlayClick>
+    <Dialog
+      title={`Swap ${type}`}
+      onClose={onClose}
+      withCloseButton
+      closeOnOverlayClick
+      styleOverride={{ maxWidth: '612px', minHeight: '600px' }}
+      scrollableContentClass="scrollable-content"
+    >
       <Box mb="8px" position="relative">
         <Box
           sx={{
@@ -102,13 +109,14 @@ export default function SelectAssetDialog({
           {filteredAssets.length} assets {searchTerm ? 'found' : 'available'}
         </Typography>
       </Box>
+
       {filteredAssets.length !== 0 && (
         <Table
           rowGap="0px"
           columnNames={type === 'from' ? fromColumns : toColumns}
           gridTemplateColumns={type === 'from' ? fromTemplateColumns : toTemplateColumns}
         >
-          {filteredAssets.map((a) => (
+          {filteredAssets.map(a => (
             <AssetAndAmountRow
               key={a.id}
               asset={a}
@@ -166,7 +174,6 @@ export const AssetAndAmountRow = ({
   displayAmount?: ?string,
   priceImpactState?: ?PriceImpact,
 |}): React$Node => {
-
   const isFrom = type === 'from';
 
   const { name = null, image = '', fingerprint: address, id, amount: assetAmount, ticker } = asset;
@@ -174,8 +181,10 @@ export const AssetAndAmountRow = ({
   const priceIncreased = priceChange100 && priceChange100.charAt(0) !== '-';
   const priceChange24h = priceChange100.replace('-', '') || '0%';
 
-  const imgSrc = ticker === defaultTokenInfo.ticker ? adaTokenImage
-    : (urlResolveForIpfsAndCorsproxy(image) ?? defaultTokenImage);
+  const imgSrc =
+    ticker === defaultTokenInfo.ticker
+      ? adaTokenImage
+      : urlResolveForIpfsAndCorsproxy(image) ?? defaultTokenImage;
 
   const amount = displayAmount ?? assetAmount;
 
@@ -196,10 +205,12 @@ export const AssetAndAmountRow = ({
         borderRadius: '8px',
         gridColumn: '1/-1',
         gridTemplateColumns: isFrom ? fromTemplateColumns : toTemplateColumns,
-        ...(isClickable ? {
-          '&:hover': { bgcolor: 'grayscale.50' },
-          cursor: 'pointer'
-        } : {}),
+        ...(isClickable
+          ? {
+              '&:hover': { bgcolor: 'grayscale.50' },
+              cursor: 'pointer',
+            }
+          : {}),
       }}
       {...(isClickable ? { onClick: () => onAssetSelected?.(asset) } : {})}
     >
