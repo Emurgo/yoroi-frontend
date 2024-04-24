@@ -2,19 +2,21 @@
 
 /********************************
  LOADED IN `webpack/*Config.js`!
-********************************/
+ ********************************/
 
 // Somehow the dyanmic imports in `rustLoader.js` do not work in the background
 // service worker. This module replaces `rustLoader.js` in the background service
 // worker with the help of webpack NormalModuleReplacementPlugin.
 // Note this won't work even here:
 // import * as WasmV2 from 'cardano-wallet-browser';
-import type { BigNum, LinearFee, TransactionBuilder } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
-
+import type {
+  BigNum,
+  LinearFee,
+  TransactionBuilder
+} from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 import * as WasmV4 from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 import * as WasmMessageSigning from '@emurgo/cardano-message-signing-browser/cardano_message_signing';
 import * as CrossCslBrowser from '@emurgo/cross-csl-browser';
-import { coinsPerWord_to_coinsPerByte } from '../../transactions/utils';
 import BigNumber from 'bignumber.js';
 
 // TODO: unmagic the constants
@@ -278,10 +280,11 @@ class Module {
     const w4 = this.WalletV4;
 
     // <TODO:PENDING_REMOVAL> LEGACY
-    const cointPerUtxoByte = w4.BigNum.from_str(
-      coinsPerWord_to_coinsPerByte(
-        new BigNumber(coinsPerUtxoWord.to_str()),
-      ).toString(),
+    const coinsPerUtxoByte = w4.BigNum.from_str(
+      new BigNumber(coinsPerUtxoWord.to_str())
+        .div(8)
+        .integerValue(BigNumber.ROUND_FLOOR)
+        .toString(),
     );
 
     return w4.TransactionBuilder.new(
@@ -289,7 +292,7 @@ class Module {
         .fee_algo(linearFee)
         .pool_deposit(poolDeposit)
         .key_deposit(keyDeposit)
-        .coins_per_utxo_byte(cointPerUtxoByte)
+        .coins_per_utxo_byte(coinsPerUtxoByte)
         .max_value_size(maxValueBytes ?? MAX_VALUE_BYTES)
         .max_tx_size(maxTxBytes ?? MAX_TX_BYTES)
         .ex_unit_prices(w4.ExUnitPrices.new(
