@@ -62,6 +62,11 @@ function SwapPage(props: StoresAndActionsProps): Node {
   const txSubmitErrorState = StateWrap(useState<?Error>(null));
   const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
 
+  useEffect(() => () => {
+    // UNMOUNT
+    setOrderStepValue(0);
+  }, []);
+
   const swapFormCanContinue =
     selectedPoolCalculation != null &&
     sell.quantity !== '0' &&
@@ -166,29 +171,44 @@ function SwapPage(props: StoresAndActionsProps): Node {
     }
   }
 
+  function processBackToStart() {
+    runInAction(() => {
+      setOrderStepValue(0);
+      userPasswordState.update('');
+      txSubmitErrorState.update(null);
+      setSignRequest(null);
+    });
+  }
+
   function handleInitialStep() {
     if (openedDialog !== '') return;
 
     if (isMarketOrder) {
-      handleMarketOrder();
+      if (checkPriceImpactWarning()) {
+        return;
+      }
     } else {
-      handleLimitOrder();
+      if (checkLimitOrderThresholdWarning()) {
+        return;
+      }
     }
     setOrderStepValue(1);
     setSignRequest(null);
   }
 
-  function handleMarketOrder() {
+  function checkPriceImpactWarning() {
     if (priceImpactState?.isSevere) {
       setOpenedDialog('priceImpactAlert');
+      return true;
     }
   }
 
-  function handleLimitOrder() {
+  function checkLimitOrderThresholdWarning() {
     const marketPrice = new BigNumber(selectedPoolCalculation.prices.market);
     const limitPrice = new BigNumber(orderLimitPrice);
     if (limitPrice.isGreaterThan(marketPrice.times(1 + LIMIT_PRICE_WARNING_THRESHOLD))) {
       setOpenedDialog('limitOrderWarning');
+      return true;
     }
   }
 
@@ -314,12 +334,9 @@ function SwapPage(props: StoresAndActionsProps): Node {
           {orderStep === 2 && (
             <TxSubmittedStep
               txSubmitErrorState={txSubmitErrorState}
-              onTryAgain={() => {
-                setOrderStepValue(0);
-              }}
+              onTryAgain={processBackToStart}
               onSuccess={() => {
                 props.actions.router.goToRoute.trigger({ route: ROUTES.SWAP.ORDERS });
-                setOrderStepValue(0);
               }}
             />
           )}
@@ -335,7 +352,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
           >
             {orderStep === 1 && (
               <Button
-                onClick={() => setOrderStepValue(0)}
+                onClick={processBackToStart}
                 sx={{ minWidth: '128px', minHeight: '48px' }}
                 variant="primary"
               >
