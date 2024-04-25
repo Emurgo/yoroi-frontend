@@ -9,20 +9,19 @@ import {
   getTokenStrictName,
 } from '../../stores/stateless/tokenHelpers';
 import { splitAmount, truncateToken } from '../../utils/formatters';
-import type { Match } from 'react-router-dom';
-import { withRouter } from 'react-router-dom';
 import { Box } from '@mui/system';
 import TokenDetails from '../../components/wallet/assets/TokenDetails';
 import { getDescriptionFromTokenMetadata } from '../../utils/nftMetadata';
+import { withParams } from '../hooks';
 
 type Props = {|
   ...StoresAndActionsProps,
 |};
-type MatchProps = {|
-  match: Match,
+type ParamsProps = {|
+  params: any,
 |};
 
-type AllProps = {| ...Props, ...MatchProps |};
+type AllProps = {| ...Props, ...ParamsProps |};
 
 @observer
 class TokenDetailsPageRevamp extends Component<AllProps> {
@@ -64,7 +63,7 @@ class TokenDetailsPageRevamp extends Component<AllProps> {
               };
             });
 
-    const { tokenId } = this.props.match.params;
+    const { tokenId } = this.props.params;
     const tokenInfo = assetsList.find(token => token.id === tokenId);
     return (
       <Box
@@ -78,4 +77,4 @@ class TokenDetailsPageRevamp extends Component<AllProps> {
     );
   }
 }
-export default (withRouter(TokenDetailsPageRevamp): ComponentType<Props>);
+export default (withParams(TokenDetailsPageRevamp): ComponentType<Props>);

@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import { Route, Switch } from 'react-router-dom';
+import { Route, Routes as Switch } from 'react-router-dom';
 import type { StoresMap } from './stores/index';
 import type { ActionsMap } from './actions/index';
 import { ROUTES } from './routes-config';

@@ -21,9 +21,9 @@ import LoadingSpinner from './components/widgets/LoadingSpinner';
 
 import {
   HashRouter,
-  Switch,
+  Routes as Switch,
   Route,
-  Redirect,
+  Navigate as Redirect,
 } from 'react-router-dom';
 
 import { translations } from './i18n/translations';

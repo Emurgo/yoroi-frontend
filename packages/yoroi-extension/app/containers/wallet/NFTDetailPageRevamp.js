@@ -9,8 +9,6 @@ import {
   getTokenStrictName,
 } from '../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../utils/formatters';
-import type { Match, Location } from 'react-router-dom';
-import { withRouter } from 'react-router-dom';
 import { Box } from '@mui/system';
 import NFTDetails from '../../components/wallet/assets/NFTDetails';
 import {
@@ -18,12 +16,14 @@ import {
   getDescriptionFromTokenMetadata,
   getImageFromTokenMetadata,
 } from '../../utils/nftMetadata';
+import { withLocation, withParams } from '../hooks';
+import type { Location } from '../hooks';
 
 type Props = {|
   ...StoresAndActionsProps,
 |};
 type MatchProps = {|
-  match: Match,
+  params: any,
   location: Location,
 |};
 
@@ -77,7 +77,7 @@ class NFTDetailPageRevamp extends Component<AllProps> {
               };
             });
 
-    const { nftId } = this.props.match.params;
+    const { nftId } = this.props.params;
     const currentNftIdx = nftsList.findIndex(nft => nft.id === nftId);
     const nftsCount = nftsList.length;
     const nftInfo = nftsList[currentNftIdx];
@@ -104,4 +104,4 @@ class NFTDetailPageRevamp extends Component<AllProps> {
     );
   }
 }
-export default (withRouter(NFTDetailPageRevamp): ComponentType<Props>);
+export default (withLocation(withParams(NFTDetailPageRevamp)): ComponentType<Props>);

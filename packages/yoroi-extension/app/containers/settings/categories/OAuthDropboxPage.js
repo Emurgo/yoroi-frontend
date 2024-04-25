@@ -1,7 +1,7 @@
 // @flow
 import type { Node } from 'react';
 import { Component } from 'react';
-import { Redirect } from 'react-router-dom';
+import { Navigate as Redirect } from 'react-router-dom';
 import { observer } from 'mobx-react';
 import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import { ExternalStorageList } from '../../../domain/ExternalStorage';

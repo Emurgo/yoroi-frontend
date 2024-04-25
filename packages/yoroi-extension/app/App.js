@@ -3,7 +3,6 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { Router } from 'react-router-dom';
-import type { RouterHistory } from 'react-router-dom';
 import { addLocaleData, IntlProvider } from 'react-intl';
 import { observable, autorun, runInAction } from 'mobx';
 import { Routes } from './Routes';
@@ -28,7 +27,7 @@ addLocaleData(locales);
 type Props = {|
   +stores: StoresMap,
   +actions: ActionsMap,
-  +history: RouterHistory,
+  +history: any,
 |};
 type State = {|
   crashed: boolean,

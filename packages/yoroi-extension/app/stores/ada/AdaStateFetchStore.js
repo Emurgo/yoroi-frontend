@@ -1,5 +1,5 @@
 // @flow
-import { observable } from 'mobx';
+import { override } from 'mobx';
 import BaseStateFetchStore from '../base/BaseStateFetchStore';
 import type { RequiredStores } from '../base/BaseStateFetchStore';
 
@@ -17,7 +17,7 @@ export default class AdaStateFetchStore<
   IFetcher
 > {
 
-  @observable fetcher: IFetcher;
+  @override fetcher: IFetcher;
 
   setup(): void {
     super.setup();

@@ -37,7 +37,7 @@ export default class ServerConnectionStore extends Store<StoresMap, ActionsMap> 
     const checkServerStatusFunc = stateFetcher.checkServerStatus;
     try {
       const response: ServerStatusResponse = await checkServerStatusFunc();
-      runInAction('refresh server status', () => {
+      const refreshServerStatus = () => {
         this.serverStatus = response.isServerOk === true
           ? ServerStatusErrors.Healthy
           : ServerStatusErrors.Server;
@@ -48,11 +48,13 @@ export default class ServerConnectionStore extends Store<StoresMap, ActionsMap> 
           this.actions.serverConnection.parallelSyncStateChange.trigger();
         }
         this.serverTime = new Date(response.serverTime);
-      });
+      }
+      runInAction(refreshServerStatus);
     } catch (err) {
-      runInAction('refresh server status', () => {
+      const refreshServerStatusErr = () => {
         this.serverStatus = ServerStatusErrors.Network;
-      });
+      };
+      runInAction(refreshServerStatusErr);
     }
   }
 }

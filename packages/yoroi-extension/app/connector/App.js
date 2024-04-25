@@ -27,7 +27,6 @@ import type { ActionsMap } from './actions';
 import ThemeManager from '../ThemeManager';
 import CrashPage from '../containers/CrashPage';
 import { Logger } from '../utils/logging';
-import type { RouterHistory } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import { globalStyles } from '../styles/globalStyles';
 import { CssBaseline } from '@mui/material';
@@ -56,7 +55,7 @@ addLocaleData([
 type Props = {|
   +stores: StoresMap,
   +actions: ActionsMap,
-  +history: RouterHistory,
+  +history: any,
 |};
 type State = {|
   crashed: boolean,

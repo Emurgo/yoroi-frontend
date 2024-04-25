@@ -67,10 +67,12 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
       const result = await this._baseCreateAddress(publicDeriver);
       if (result != null) {
         await this.refreshAddressesFromDb(publicDeriver);
-        runInAction('reset error', () => { this.error = null; });
+        const resetError = () => { this.error = null; };
+        runInAction(resetError);
       }
     } catch (error) {
-      runInAction('set error', () => { this.error = localizedError(error); });
+      const setError = () => { this.error = localizedError(error); };
+      runInAction(setError);
     }
   };
   _baseCreateAddress: PublicDeriver<> => Promise<?CreateAddressResponse> = async (

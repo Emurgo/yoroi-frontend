@@ -13,10 +13,10 @@ export default class BaseStateFetchStore
   <
     TStores: RequiredStores,
     TActions,
-    IFetcher
+    TFetcher
   > extends Store<TStores, TActions> {
 
-  @observable fetcher: IFetcher;
+  @observable fetcher: TFetcher;
 
   setup(): void {
     super.setup();

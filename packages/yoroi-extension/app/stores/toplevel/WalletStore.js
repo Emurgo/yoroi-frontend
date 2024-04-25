@@ -325,14 +325,15 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     for (const publicDeriver of newWithCachedData) {
       this._queueWarningIfNeeded(publicDeriver);
     }
-    runInAction('refresh active wallet', () => {
+    const refreshActiveWallet = () => {
       if (this.selected == null && newWithCachedData.length === 1) {
         this.actions.wallets.setActiveWallet.trigger({
           wallet: newWithCachedData[0],
         });
       }
       this.publicDerivers.push(...newWithCachedData);
-    });
+    };
+    runInAction(refreshActiveWallet);
     setTimeout(async () => {
       await Promise.all(newWithCachedData
         .map(w => this.refreshWalletFromLocalOnLaunch(w)));
