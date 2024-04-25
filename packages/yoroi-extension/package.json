@@ -214,7 +214,6 @@
     "react-router-dom": "5.2.0",
     "recharts": "1.8.5",
     "ringbufferjs": "2.0.0",
-    "route-parser": "0.0.5",
     "semver": "7.6.0",
     "stream-browserify": "3.0.0",
     "tinycolor2": "1.4.2",

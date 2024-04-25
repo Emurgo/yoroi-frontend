@@ -392,12 +392,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   // =================== PRIVATE API ==================== //
 
-  @computed get _canRedirectToWallet(): boolean {
-    const currentRoute = this.stores.app.currentRoute;
-    const isRootRoute = matchRoute(ROUTES.WALLETS.ROOT, currentRoute) !== false;
-    return isRootRoute;
-  }
-
   _pollRefresh: void => Promise<void> = async () => {
     // Do not update if screen not active
     // TODO: use visibilityState instead

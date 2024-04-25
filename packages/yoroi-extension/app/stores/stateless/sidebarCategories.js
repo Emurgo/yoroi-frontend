@@ -45,8 +45,7 @@ export const MY_WALLETS: SidebarCategory = registerCategory({
   label: globalMessages.sidebarWallets,
   isVisible: request =>
     request.hasAnyWallets &&
-    request.selected == null &&
-    matchRoute(ROUTES.WALLETS.ADD, request.currentRoute) === false,
+    request.selected == null,
 });
 
 export const WALLETS_ROOT: SidebarCategory = registerCategory({
