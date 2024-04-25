@@ -2,11 +2,7 @@
 
 export const matchRoute = (
   pattern: string, path: string
-): boolean => {
-  const result = path.toLowerCase().startsWith(pattern.toLowerCase());
-  console.log('>>> matchRoute: ', pattern, path, result)
-  return result;
-};
+): boolean => path.toLowerCase().startsWith(pattern.toLowerCase());
 
 /**
  * Build a route from a pattern like `/wallets/:id` to `/wallets/123`
