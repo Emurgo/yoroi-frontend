@@ -16,16 +16,20 @@ export default function EditSellAmount({ onAssetSelect, defaultTokenInfo }: Prop
   const {
     sellQuantity: { isTouched: isSellTouched, displayValue: sellDisplayValue, error },
     sellTokenInfo = {},
+    buyTokenInfo = {},
     onChangeSellQuantity,
     sellFocusState,
   } = useSwapForm();
   const { tokenId } = orderData.amounts.sell;
+
+  const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
 
   return (
     <Box>
       <SwapInput
         key={tokenId}
         label="Swap From"
+        disabled={!isValidTickers}
         handleAmountChange={onChangeSellQuantity}
         value={sellDisplayValue}
         tokenInfo={sellTokenInfo}

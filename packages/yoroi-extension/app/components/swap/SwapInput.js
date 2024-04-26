@@ -17,7 +17,7 @@ type Props = {|
   handleAmountChange: function,
   showMax?: boolean,
   value?: string,
-  touched?: boolean,
+  disabled?: boolean,
   focusState: State<boolean>,
   error: string | null,
 |};
@@ -25,6 +25,7 @@ type Props = {|
 export default function SwapInput({
   label,
   showMax = false,
+  disabled = false,
   onAssetSelect,
   error = '',
   handleAmountChange,
@@ -93,8 +94,8 @@ export default function SwapInput({
           variant="body1"
           color="grayscale.max"
           placeholder="0"
-          onChange={handleChange}
-          value={value}
+          onChange={disabled ? () => {} : handleChange}
+          value={disabled ? '' : value}
           onFocus={() => focusState.update(true)}
           onBlur={() => focusState.update(false)}
         />
