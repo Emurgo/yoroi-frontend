@@ -52,7 +52,7 @@ export default function CancelSwapOrderDialog({
           <SummaryRow col1="Asset amount">
             {order.amount} {order.to.token.ticker}
           </SummaryRow>
-          <SummaryRow col1="Total returned" info='The amount you receive back after the order is cancelled'>
+          <SummaryRow col1="Total returned" info='The amount returned to your wallet after cancelling the order'>
             {transactionParams ? transactionParams.returnValues.map(v => (
               <Box>{v.formattedValue} {v.ticker}</Box>
             )) : (<LoadingSpinner small />)}
