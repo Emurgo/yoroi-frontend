@@ -49,14 +49,7 @@ export default function SwapPoolFullInfo({
           <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
             <Typography>Min ADA</Typography>
             {withInfo && (
-              <InfoTooltip
-                content={
-                  <Typography color="inherit">
-                    A small ADA deposit that will be returned when your order is processed or
-                    canceled
-                  </Typography>
-                }
-              />
+              <InfoTooltip content={'A small ADA deposit that will be returned when your order is processed or canceled'} />
             )}
           </Box>
           <Box>
@@ -85,13 +78,7 @@ export default function SwapPoolFullInfo({
         <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
           <Typography>Minimum assets received</Typography>
           {withInfo && (
-            <InfoTooltip
-              content={
-                <Typography color="inherit">
-                  The minimum amount you are guaranteed to receive in case of price slippage
-                </Typography>
-              }
-            />
+            <InfoTooltip content={'The minimum amount you are guaranteed to receive in case of price slippage'} />
           )}
         </Box>
         <Box>
@@ -102,15 +89,7 @@ export default function SwapPoolFullInfo({
         <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
           <Typography>Liquidity provider fee</Typography>
           {withInfo && (
-            <InfoTooltip
-              content={
-                <Typography color="inherit">
-                  A fixed 0.3% operational fee paid to liquidity providers as a reward for supplying
-                  tokens, enabling traders to buy and sell assets on the decentralized Cardano
-                  network
-                </Typography>
-              }
-            />
+            <InfoTooltip content={'A fixed 0.3% operational fee paid to liquidity providers as a reward for supplying tokens, enabling traders to buy and sell assets on the decentralized Cardano network'} />
           )}
         </Box>
         <Box>
