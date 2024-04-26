@@ -50,11 +50,6 @@ export const CreateSwapOrder = ({
     .then(() => null)
     .catch(() => null);
 
-  const orderTypeTabs = [
-    { type: 'market', label: 'Market' },
-    { type: 'limit', label: 'Limit' },
-  ];
-
   return (
     <>
       <Box
@@ -67,7 +62,7 @@ export const CreateSwapOrder = ({
         pb="20px"
       >
         {/* Order type and refresh */}
-        <TopActions orderTypeTabs={orderTypeTabs} orderType={orderType} />
+        <TopActions orderType={orderType} />
 
         {/* From Field */}
         <EditSellAmount
@@ -76,7 +71,7 @@ export const CreateSwapOrder = ({
         />
 
         {/* Clear and switch */}
-        <MiddleActions />
+        <MiddleActions swapStore={swapStore} />
 
         {/* To Field */}
         <EditBuyAmount
@@ -85,7 +80,10 @@ export const CreateSwapOrder = ({
         />
 
         {/* Price between assets */}
-        <SwapPriceInput swapStore={swapStore} priceImpactState={priceImpactState} />
+        <SwapPriceInput
+          swapStore={swapStore}
+          priceImpactState={priceImpactState}
+        />
 
         {/* Slippage settings */}
         <EditSlippage

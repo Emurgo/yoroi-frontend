@@ -6,45 +6,37 @@ import { ReactComponent as RefreshIcon } from '../../../../assets/images/revamp/
 import { useSwap, useSwapPoolsByPair } from '@yoroi/swap';
 import { useSwapForm } from '../../context/swap-form';
 
-type OrderTypeTab = {|
-  type: string,
-  label: string,
-|};
-
 type TopActionsProps = {|
-  orderTypeTabs: OrderTypeTab[],
   orderType: string,
 |};
 
-export const TopActions = ({ orderTypeTabs, orderType }: TopActionsProps): React$Node => {
-  const { orderTypeChanged, orderData, poolPairsChanged } = useSwap();
-  const { buyQuantity, sellQuantity } = useSwapForm();
-  const isDisabled = buyQuantity.isTouched && sellQuantity.isTouched;
+export const TopActions = ({ orderType }: TopActionsProps): React$Node => {
 
-  const { refetch } = useSwapPoolsByPair(
-    {
-      tokenA: orderData.amounts.sell.tokenId,
-      tokenB: orderData.amounts.buy.tokenId,
-    },
-    {
-      enabled: false,
-      onSuccess: pools => {
-        poolPairsChanged(pools);
-      },
-    }
-  );
+  const { orderTypeChanged } = useSwap();
+  const {
+    sellTokenInfo = {},
+    buyTokenInfo = {},
+  } = useSwapForm();
+
+  const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
+  const isDisabled = !isValidTickers;
+
+  const orderTypeTabs = [
+    { type: 'market', label: 'Market' },
+    { type: 'limit', label: 'Limit' },
+  ];
 
   const [rotationDegrees, setRotationDegrees] = useState(0);
 
   const handleRefresh = () => {
     document.activeElement?.blur();
-    setRotationDegrees(prevDegrees => prevDegrees + 180);
-    refetch();
+    setRotationDegrees(prevDegrees => prevDegrees + 360);
+    console.log('swap refresh');
   };
 
   const refreshIconStyles = {
     transform: `rotate(${rotationDegrees}deg)`,
-    transition: 'transform 1s ease',
+    transition: 'transform 2s ease',
   };
 
   return (
@@ -57,12 +49,12 @@ export const TopActions = ({ orderTypeTabs, orderType }: TopActionsProps): React
         }))}
       />
       <Box
-        sx={{ cursor: 'pointer', '& path': { fill: !isDisabled && '#A0A4A8' } }}
-        onClick={handleRefresh}
+        sx={{ cursor: 'pointer', '& path': { fill: isDisabled && '#A0A4A8' } }}
+        onClick={isDisabled ? () => {} : handleRefresh}
       >
         <RefreshIcon
           style={{
-            ...(isDisabled && refreshIconStyles),
+            ...(!isDisabled && refreshIconStyles),
           }}
         />
       </Box>
