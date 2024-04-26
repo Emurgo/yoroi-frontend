@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Box } from '@mui/material';
 import Tabs from '../../../../components/common/tabs/Tabs';
 import { ReactComponent as RefreshIcon } from '../../../../assets/images/revamp/icons/refresh.inline.svg';
-import { useSwap, useSwapPoolsByPair } from '@yoroi/swap';
+import { useSwap } from '@yoroi/swap';
 import { useSwapForm } from '../../context/swap-form';
 
 type TopActionsProps = {|

@@ -13,10 +13,13 @@ export const MiddleActions = ({ swapStore }: Props): React$Node => {
 
   return (
     <Box display="flex" alignItems="center" justifyContent="space-between">
-      <Box sx={{ cursor: 'pointer', color: 'primary.500' }} onClick={() => {
-        swapStore.resetLimitOrderDisplayValue();
-        return switchTokens();
-      }}>
+      <Box
+        sx={{ cursor: 'pointer', color: 'primary.500' }}
+        onClick={() => {
+          swapStore.resetLimitOrderDisplayValue();
+          return switchTokens();
+        }}
+      >
         <SwitchIcon />
       </Box>
       <Box>
