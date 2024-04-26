@@ -34,7 +34,7 @@ export default function SelectBuyTokenFromList({ store, onClose, onTokenInfoChan
       if (ovt.id === '') return null;
       const vft = walletAssets.find(a => a.fingerprint === ovt.fingerprint);
       return { ...ovt, ...(vft ?? {}) };
-    }).filter(Boolean).sort(comparatorByGetter(a => a.name));
+    }).filter(Boolean).sort(comparatorByGetter(a => a.name?.toLowerCase()));
     return [...(isSellingPt ? [] : [pt]), ...nonPtAssets];
   }, [onlyVerifiedTokens, walletAssets, sellTokenInfo]);
 

@@ -21,7 +21,7 @@ export default function SelectSellTokenFromList({ store, onClose, onTokenInfoCha
     return assets.map(a => {
       const vft = onlyVerifiedTokens.find(ovt => ovt.fingerprint === a.fingerprint);
       return a.id === '' || vft ? { ...a, ...vft } : undefined;
-    }).filter(Boolean).sort(comparatorByGetter(a => a.name));
+    }).filter(Boolean).sort(comparatorByGetter(a => a.name?.toLowerCase()));
   }, [onlyVerifiedTokens, assets]);
 
   const { orderData, resetQuantities } = useSwap();
