@@ -1,6 +1,6 @@
 // @flow
 
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
 import { styled } from '@mui/material/styles';
 import { ReactComponent as Info } from '../../assets/images/revamp/icons/info.inline.svg';
@@ -20,13 +20,17 @@ const STooltip = styled(({ className, ...props }: any) => (
 type Props = {|
   +content: string | React$Node,
   width?: number,
+  children?: React$Node,
 |};
 
-export const InfoTooltip = ({ content, width }: Props): React$Node => {
+export const InfoTooltip = ({ content, width, children }: Props): React$Node => {
+  const contentNode = typeof content === 'string' ? (
+    <Typography color="inherit">{content}</Typography>
+  ) : content;
   return (
-    <STooltip title={content} placement="top" arrow width={width}>
+    <STooltip title={contentNode} placement="top" arrow width={width}>
       <Box component="span" color="grayscale.900">
-        <Info />
+        {children ?? (<Info />)}
       </Box>
     </STooltip>
   );
