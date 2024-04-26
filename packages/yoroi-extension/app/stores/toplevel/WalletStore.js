@@ -3,7 +3,6 @@ import { action, computed, observable, runInAction } from 'mobx';
 import { debounce, find } from 'lodash';
 import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
-import { matchRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 import environment from '../../environment';
 import config from '../../config';
