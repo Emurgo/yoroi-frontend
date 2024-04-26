@@ -114,6 +114,7 @@ module.exports = {
     ],
     'import/no-unused-modules': [1, { unusedExports: true }],
     'camelcase': 0,
+    'react/jsx-curly-brace-presence': 0,
   },
   plugins: [
     'import',
