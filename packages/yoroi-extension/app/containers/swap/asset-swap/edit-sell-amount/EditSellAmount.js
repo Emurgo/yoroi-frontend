@@ -14,7 +14,7 @@ type Props = {|
 export default function EditSellAmount({ onAssetSelect, defaultTokenInfo }: Props): Node {
   const { orderData } = useSwap();
   const {
-    sellQuantity: { isTouched: isSellTouched, displayValue: sellDisplayValue, error },
+    sellQuantity: { displayValue: sellDisplayValue, error },
     sellTokenInfo = {},
     buyTokenInfo = {},
     onChangeSellQuantity,
@@ -35,7 +35,6 @@ export default function EditSellAmount({ onAssetSelect, defaultTokenInfo }: Prop
         tokenInfo={sellTokenInfo}
         defaultTokenInfo={defaultTokenInfo}
         onAssetSelect={onAssetSelect}
-        touched={isSellTouched}
         focusState={sellFocusState}
         error={error}
         showMax
