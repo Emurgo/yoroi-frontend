@@ -5,6 +5,7 @@ import SelectAssetDialog from '../../../../components/swap/SelectAssetDialog';
 import { useSwapForm } from '../../context/swap-form';
 import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
 import SwapStore from '../../../../stores/ada/SwapStore';
+import { comparatorByGetter } from '../../../../coreUtils';
 
 type Props = {|
   store: SwapStore,
@@ -33,7 +34,7 @@ export default function SelectBuyTokenFromList({ store, onClose, onTokenInfoChan
       if (ovt.id === '') return null;
       const vft = walletAssets.find(a => a.fingerprint === ovt.fingerprint);
       return { ...ovt, ...(vft ?? {}) };
-    }).filter(Boolean);
+    }).filter(Boolean).sort(comparatorByGetter(a => a.name));
     return [...(isSellingPt ? [] : [pt]), ...nonPtAssets];
   }, [onlyVerifiedTokens, walletAssets, sellTokenInfo]);
 
