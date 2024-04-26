@@ -57,8 +57,9 @@ export function createFilterUniqueBy<T>(getter: T => any = x => x): T => boolean
 export function comparatorByGetter<T>(getter: T => any): (T, T) => number {
   return (a: T, b: T) => {
     const [aV, bV] = [getter(a), getter(b)];
-    if (aV === bV) return 0;
-    return aV < bV ? -1 : 1;
+    if (aV < bV) return -1;
+    if (aV > bV) return 1;
+    return 0;
   }
 }
 
