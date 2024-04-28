@@ -67,6 +67,9 @@ export const lightTheme = {
       'blue-green-banner': 'linear-gradient(269.97deg, #E4E8F7 0%, #C6F7ED 100%)',
       green: 'linear-gradient(180deg, #93F5E1 0%, #C6F7ED 100%)',
       blue: 'linear-gradient(30.09deg, #244ABF 0%, #4760FF 176.73%)',
+      'bg-gradient-1': 'linear-gradient(312.19deg, #C6F7ED 0%, #E4E8F7 100%)',
+      'bg-gradient-2': 'linear-gradient(180deg, #93F5E1 0%, #C6F7ED 100%)',
+      'bg-gradient-3': 'linear-gradient(30.09deg, #244ABF 0%, #4760FF 176.73%)',
     },
     background: {
       card: '#fff',

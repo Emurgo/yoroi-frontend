@@ -1,8 +1,9 @@
 // @flow
-import { Component } from 'react';
 import type { Node, ComponentType } from 'react';
-import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { ComplexityLevelType } from '../../../types/complexityLevelType';
+import { Component } from 'react';
+import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
 import styles from './ComplexityLevelForm.scss';
 import classnames from 'classnames';
 import { ReactComponent as BeginnerLevel } from '../../../assets/images/complexity-level/beginner-level.inline.svg';
@@ -10,7 +11,6 @@ import { ReactComponent as AdvancedLevel } from '../../../assets/images/complexi
 import LocalizableError from '../../../i18n/LocalizableError';
 import { LoadingButton } from '@mui/lab';
 import { ComplexityLevels } from '../../../types/complexityLevelType';
-import type { ComplexityLevelType } from '../../../types/complexityLevelType';
 import { withLayout } from '../../../styles/context/layout';
 import { Box, Typography } from '@mui/material';
 import { settingsMenuMessages } from '../../settings/menu/SettingsMenu';
@@ -92,7 +92,8 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
     return (
       <Box className={styles.component}>
         {isRevampLayout && (
-          <Typography component="div"
+          <Typography
+            component="div"
             textAlign="center"
             color="grayscale.900"
             mb="16px"
@@ -103,23 +104,25 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
           </Typography>
         )}
 
-        <Typography component="div"
+        <Typography
+          component="div"
           textAlign="center"
           variant="body1"
-          color={isRevampLayout ? 'grayscale.800' : 'var(--yoroi-palette-gray-600)'}
+          color={isRevampLayout ? 'grayscale.800' : 'gray.600'}
         >
           {intl.formatMessage(messages.subtitle)}
         </Typography>
 
         {complexityLevel && (
-          <Typography component="div"
+          <Typography
+            component="div"
             variant="body1"
             my="1rem"
             mx="auto"
             sx={{
               textAlign: 'center',
               '& strong': {
-                color: isRevampLayout ? 'primary.500' : 'var(--yoroi-comp-button-secondary-text)',
+                color: isRevampLayout ? 'primary.500' : 'secondary.300',
                 fontWeight: 500,
                 textTransform: 'uppercase',
               },
@@ -167,7 +170,7 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
                     border: 'solid 1px transparent',
                     background: theme =>
                       isSelected
-                        ? theme.palette.gradients.green
+                        ? theme.palette.gradients['bg-gradient-2']
                         : 'linear-gradient( 0deg, var(--yoroi-palette-common-white), var(--yoroi-palette-common-white)), linear-gradient(180deg, #e4e8f7 0%, #c6f7f7 100%)',
                     backgroundClip: 'content-box, border-box',
                     backgroundOrigin: 'border-box',
@@ -201,7 +204,9 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
                       <Typography component="div" mb="4px" variant="h3" fontWeight={500}>
                         {level.name}
                       </Typography>
-                      <Typography component="div" variant="body2">{level.description}</Typography>
+                      <Typography component="div" variant="body2">
+                        {level.description}
+                      </Typography>
                     </Box>
                   </Box>
                 </Box>
@@ -211,11 +216,14 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
         ) : (
           <div className={styles.cardsWrapper}>
             {levels.map(level => (
-              <div className={styles.card} key={level.key}>
-                <div className={classnames([styles.cardImage, styles[level.key]])}>
+              <Box className={styles.card} sx={{ bgcolor: 'gratscale.min' }} key={level.key}>
+                <Box
+                  sx={{ bgcolor: 'grayscale.100' }}
+                  className={classnames([styles.cardImage, styles[level.key]])}
+                >
                   {level.image}
-                </div>
-                <div className={styles.cardContent}>
+                </Box>
+                <Box sx={{ bgcolor: 'grayscale.900' }} className={styles.cardContent}>
                   <div>
                     <h3>{level.name}</h3>
                     <div>{level.description}</div>
@@ -228,8 +236,8 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
                   >
                     {intl.formatMessage(messages.labelChoose)}
                   </LoadingButton>
-                </div>
-              </div>
+                </Box>
+              </Box>
             ))}
           </div>
         )}
