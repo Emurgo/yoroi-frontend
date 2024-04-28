@@ -13,7 +13,6 @@ import EnterRecoveryPhraseStep from './steps/phrase/EnterRecoveryPhraseStep';
 import AddWalletDetailsStep from '../create-wallet/AddWalletDetailsStep';
 import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { asGetPublicKey } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
-import { isWalletExist } from '../../../api/ada/lib/cardanoCrypto/utils';
 import { markDialogAsShown } from '../dialogs/utils';
 import { ROUTES } from '../../../routes-config';
 import SelectNetworkStep from '../create-wallet/SelectNetworkStep';
@@ -22,6 +21,7 @@ import { useRestoreWallet } from './hooks';
 import { ampli } from '../../../../ampli/index';
 import { runInAction } from 'mobx';
 import type { RestoreModeType } from '../../../actions/common/wallet-restore-actions';
+import { isWalletExist } from '../../../stores/toplevel/WalletRestoreStore';
 
 const messages: * = defineMessages({
   title: {

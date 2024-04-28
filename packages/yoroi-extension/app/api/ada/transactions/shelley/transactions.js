@@ -31,12 +31,21 @@ import { IPublicDeriver, IGetAllUtxos, IHasUtxoChains } from '../../lib/storage/
 import { ConceptualWallet } from '../../lib/storage/models/ConceptualWallet/index';
 import { builtSendTokenList } from '../../../common';
 import type { TokenRow } from '../../lib/storage/database/primitives/tables';
+import { setRuntime, WalletType } from '@emurgo/yoroi-eutxo-txs/dist/kernel'
 import {
-  txBuilder as LibTxBuilder,
-  kernel as LibKernel,
-  classes as LibClasses,
-  errors as LibErrors,
-} from '@emurgo/yoroi-eutxo-txs';
+  UTxOSet as LibUtxoSet,
+  Value as LibValue,
+  Amount as LibAmount,
+  Address as LibAddress,
+  WalletAddress as LibWalletAddress,
+  NativeAssets as LibNativeAssets,
+} from '@emurgo/yoroi-eutxo-txs/dist/classes'
+import {
+  NotEnoughMoneyToSendError as LibNotEnoughMoneyToSendError,
+  OverflowError as LibOverflowError,
+  NoOutputError as LibNoOutputError,
+} from '@emurgo/yoroi-eutxo-txs/dist/errors'
+import { TxBuilder, SendRequest } from '@emurgo/yoroi-eutxo-txs/dist/tx-builder'
 import blake2b from 'blake2b';
 import { derivePrivateByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
 
@@ -544,7 +553,7 @@ export async function newAdaUnsignedTxFromUtxo(
   auxiliaryData: RustModule.WalletV4.AuxiliaryData | void,
 ): Promise<V4UnsignedTxUtxoResponse> {
   await RustModule.load();
-  LibKernel.setRuntime(RustModule.CrossCsl.init);
+  setRuntime(RustModule.CrossCsl.init);
 
   const defaultNetworkConfig = {
     linearFee: {
@@ -562,19 +571,19 @@ export async function newAdaUnsignedTxFromUtxo(
     stepPriceTo: 10000000,
   };
 
-  const utxoSet = new LibClasses.UTxOSet(
+  const utxoSet = new LibUtxoSet(
     await Promise.all(
       utxos.map(toLibUTxO)
     )
   );
 
-  const txBuilder = await LibTxBuilder.TxBuilder.new(defaultNetworkConfig, utxoSet);
+  const txBuilder = await TxBuilder.new(defaultNetworkConfig, utxoSet);
 
   // When both hash and datum are present - datum is added as extra witness
   const extraWitnessDatumsPresent =
     outputs.some(o => o.data != null && o.dataHash != null);
 
-  const sendRequest = await LibTxBuilder.SendRequest.from(outputs.map(output => {
+  const sendRequest = await SendRequest.from(outputs.map(output => {
     const defaultTokenAmount = output.amount.getDefaultEntry().amount.toString();
     const nondefaultTokens = output.amount.values.filter(
       ({ identifier }) => identifier !== outputs[0].amount.defaults.defaultIdentifier
@@ -584,9 +593,9 @@ export async function newAdaUnsignedTxFromUtxo(
       data: output.data,
       dataHash: output.dataHash,
       receiver: output.address,
-      value: new LibClasses.Value(
-        new LibClasses.Amount(defaultTokenAmount),
-        LibClasses.NativeAssets.from(
+      value: new LibValue(
+        new LibAmount(defaultTokenAmount),
+        LibNativeAssets.from(
           nondefaultTokens.map(t => {
             const [policyId, assetName] = t.identifier.split('.');
             return {
@@ -594,7 +603,7 @@ export async function newAdaUnsignedTxFromUtxo(
                 policy: Buffer.from(policyId, 'hex'),
                 name: Buffer.from(assetName, 'hex'),
               },
-              amount: new LibClasses.Amount(t.amount.toString()),
+              amount: new LibAmount(t.amount.toString()),
             };
           })
         ),
@@ -605,10 +614,10 @@ export async function newAdaUnsignedTxFromUtxo(
   try {
     await txBuilder.withSendRequest(sendRequest);
   } catch (error) {
-    if (error instanceof LibErrors.NotEnoughMoneyToSendError) {
+    if (error instanceof LibNotEnoughMoneyToSendError) {
       throw new NotEnoughMoneyToSendError();
     }
-    if (error instanceof LibErrors.OverflowError) {
+    if (error instanceof LibOverflowError) {
       throw new AssetOverflowError();
     }
     if (String(error).includes('less than the minimum UTXO value')) {
@@ -648,9 +657,9 @@ export async function newAdaUnsignedTxFromUtxo(
   txBuilder.setTtl(absSlotNumber.plus(defaultTtlOffset).toNumber());
 
   const changeAddress = changeAdaAddr &&
-    await LibClasses.WalletAddress.from(
+    await LibWalletAddress.from(
       changeAdaAddr.address,
-      LibKernel.WalletType.Shelley,
+      WalletType.Shelley,
       {
         path: changeAdaAddr.addressing.path,
         start: changeAdaAddr.addressing.startLevel,
@@ -667,7 +676,7 @@ export async function newAdaUnsignedTxFromUtxo(
   try {
     unsignedTx = await txBuilder.build();
   } catch (error) {
-    if (error instanceof LibErrors.NoOutputError) {
+    if (error instanceof LibNoOutputError) {
       throw new NoOutputsError();
     }
     throw error;
@@ -830,7 +839,7 @@ async function newAdaUnsignedTxFromUtxoForConnector(
   |},
 ): Promise<V4UnsignedTxUtxoResponse> {
   await RustModule.load();
-  LibKernel.setRuntime(RustModule.CrossCsl.init);
+  setRuntime(RustModule.CrossCsl.init);
 
   const defaultNetworkConfig = {
     linearFee: {
@@ -848,13 +857,13 @@ async function newAdaUnsignedTxFromUtxoForConnector(
     stepPriceTo: 10000000,
   };
 
-  const utxoSet = new LibClasses.UTxOSet(
+  const utxoSet = new LibUtxoSet(
     await Promise.all(
       coinSelectUtxos.map(toLibUTxO)
     )
   );
 
-  const txBuilder = await LibTxBuilder.TxBuilder.new(defaultNetworkConfig, utxoSet);
+  const txBuilder = await TxBuilder.new(defaultNetworkConfig, utxoSet);
 
   await txBuilder.addRequiredInputs(
     await Promise.all(
@@ -910,7 +919,7 @@ async function newAdaUnsignedTxFromUtxoForConnector(
 
   await txBuilder.addMint(mint);
 
-  const sendRequest = await LibTxBuilder.SendRequest.from(outputs.map(output => {
+  const sendRequest = await SendRequest.from(outputs.map(output => {
     const defaultTokenAmount = output.amount.getDefaultEntry().amount.toString();
     const nondefaultTokens = output.amount.values.filter(
       ({ identifier }) => identifier !== outputs[0].amount.defaults.defaultIdentifier
@@ -918,9 +927,9 @@ async function newAdaUnsignedTxFromUtxoForConnector(
 
     return {
       receiver: output.address,
-      value: new LibClasses.Value(
-        new LibClasses.Amount(defaultTokenAmount),
-        LibClasses.NativeAssets.from(
+      value: new LibValue(
+        new LibAmount(defaultTokenAmount),
+        LibNativeAssets.from(
           nondefaultTokens.map(t => {
             const [policyId, assetName] = t.identifier.split('.');
             return {
@@ -928,7 +937,7 @@ async function newAdaUnsignedTxFromUtxoForConnector(
                 policy: Buffer.from(policyId, 'hex'),
                 name: Buffer.from(assetName, 'hex'),
               },
-              amount: new LibClasses.Amount(t.amount.toString()),
+              amount: new LibAmount(t.amount.toString()),
             };
           })
         ),
@@ -939,7 +948,7 @@ async function newAdaUnsignedTxFromUtxoForConnector(
   try {
     await txBuilder.withSendRequest(sendRequest);
   } catch (error) {
-    if (error instanceof LibErrors.NotEnoughMoneyToSendError) {
+    if (error instanceof LibNotEnoughMoneyToSendError) {
       throw new NotEnoughMoneyToSendError();
     }
     if (String(error).includes('less than the minimum UTXO value')) {
@@ -953,9 +962,9 @@ async function newAdaUnsignedTxFromUtxoForConnector(
   );
 
   const changeAddress = changeAdaAddr &&
-    await LibClasses.WalletAddress.from(
+    await LibWalletAddress.from(
       changeAdaAddr.address,
-      LibKernel.WalletType.Shelley,
+      WalletType.Shelley,
       {
         path: changeAdaAddr.addressing.path,
         start: changeAdaAddr.addressing.startLevel,
@@ -1239,19 +1248,19 @@ function libValueToMultiToken(
 
 export async function toLibUTxO(utxo: RemoteUnspentOutput): any {
   return {
-    address: await LibClasses.Address.from(utxo.receiver),
+    address: await LibAddress.from(utxo.receiver),
     tx: utxo.tx_hash,
     index: utxo.tx_index,
-    value: new LibClasses.Value(
-      new LibClasses.Amount(utxo.amount),
-      LibClasses.NativeAssets.from(
+    value: new LibValue(
+      new LibAmount(utxo.amount),
+      LibNativeAssets.from(
         utxo.assets.map(asset => (
           {
             asset: {
               policy: Buffer.from(asset.policyId, 'hex'),
               name: Buffer.from(asset.name, 'hex'),
             },
-            amount: new LibClasses.Amount(asset.amount),
+            amount: new LibAmount(asset.amount),
           }
         ))
       )

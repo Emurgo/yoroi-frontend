@@ -1,6 +1,6 @@
 {
   "name": "yoroi",
-  "version": "5.1.400",
+  "version": "5.1.412",
   "description": "Cardano ADA wallet",
   "scripts": {
     "dev-mv2": "rimraf dev/ && NODE_OPTIONS=--openssl-legacy-provider babel-node scripts-mv2/build --type=debug --env 'mainnet'",
@@ -150,7 +150,7 @@
     "@emurgo/cip14-js": "2.0.0",
     "@emurgo/cip4-js": "1.0.5",
     "@emurgo/cross-csl-browser": "4.4.0",
-    "@emurgo/yoroi-eutxo-txs": "0.0.2-alpha.7",
+    "@emurgo/yoroi-eutxo-txs": "0.0.2-alpha.8",
     "@emurgo/yoroi-lib": "0.15.3",
     "@ledgerhq/hw-transport-u2f": "5.36.0-deprecated",
     "@ledgerhq/hw-transport-webauthn": "5.36.0-deprecated",
@@ -161,9 +161,10 @@
     "@mui/x-date-pickers": "^5.0.8",
     "@svgr/webpack": "5.5.0",
     "@vespaiach/axios-fetch-adapter": "^0.3.0",
+    "@yoroi/banxa": "1.5.0",
+    "@yoroi/resolver": "2.0.2",
     "@yoroi/swap": "1.5.2",
     "@yoroi/types": "1.5.0",
-    "@yoroi/resolver": "2.0.2",
     "assert": "2.1.0",
     "async-mutex": "^0.3.1",
     "axios": "0.21.1",

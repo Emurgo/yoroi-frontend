@@ -21,10 +21,6 @@ import { MultiToken, } from '../../common/lib/MultiToken';
 import type { WasmMonad } from '../lib/cardanoCrypto/rustLoader';
 import { RustModule } from '../lib/cardanoCrypto/rustLoader';
 import { PRIMARY_ASSET_CONSTANTS } from '../lib/storage/database/primitives/enums';
-import { PublicDeriver } from '../lib/storage/models/PublicDeriver';
-import { connectorSignCardanoTx } from '../../../../chrome/extension/connector/api';
-import { mergeWitnessSets } from '../../../../chrome/extension/connector/utils';
-import { transactionHexReplaceWitnessSet, transactionHexToWitnessSet } from '../lib/cardanoCrypto/utils';
 
 const RANDOM_BASE_ADDRESS = 'addr_test1qzz6hulv54gzf2suy2u5gkvmt6ysasfdlvvegy3fmf969y7r3y3kdut55a40jff00qmg74686vz44v6k363md06qkq0qy0adz0';
 
@@ -575,17 +571,96 @@ export function getTransactionTotalOutputFromCbor(txHex: string, defaults: Defau
   }
 }
 
-export async function signTransactionHex(wallet: PublicDeriver<>, password: string, transactionHex: string): Promise<string> {
-  // <TODO:REFACTOR> This signing function must be moved from the connector to the main api
-  const signedWitnessSetHex = await connectorSignCardanoTx(
-    wallet,
-    password,
-    { tx: transactionHex, tabId: -1, partialSign: false },
-  );
-  // <TODO:REFACTOR> This signing function must be moved from the connector to the main api
-  const mergedWitnessSetHex = mergeWitnessSets(
-    transactionHexToWitnessSet(transactionHex),
-    signedWitnessSetHex,
-  );
-  return transactionHexReplaceWitnessSet(transactionHex, mergedWitnessSetHex);
+/**
+ * @param witnessSetHex1 - a serialised witness set as a HEX string
+ * @param witnessSetHex2 - a serialised witness set as a HEX string
+ * @return the resulting new witness set as a HEX string
+ */
+export function mergeWitnessSets(
+  witnessSetHex1: string,
+  witnessSetHex2: string,
+): string {
+  return RustModule.WasmScope(Scope => {
+    const wset1 = Scope.WalletV4.TransactionWitnessSet.from_hex(witnessSetHex1);
+    const wset2 = Scope.WalletV4.TransactionWitnessSet.from_hex(witnessSetHex2);
+    const wsetResult = Scope.WalletV4.TransactionWitnessSet.new();
+    let vkeys = wset1.vkeys();
+    const newVkeys = wset2.vkeys();
+    if (vkeys && newVkeys) {
+      for (let i = 0; i < newVkeys.len(); i++) {
+        vkeys.add(newVkeys.get(i));
+      }
+    } else if (newVkeys) {
+      vkeys = newVkeys;
+    }
+    if (vkeys) {
+      wsetResult.set_vkeys(vkeys);
+    }
+
+    let nativeScripts = wset1.native_scripts();
+    const newNativeScripts = wset2.native_scripts();
+    if (nativeScripts && newNativeScripts) {
+      for (let i = 0; i < newNativeScripts.len(); i++) {
+        nativeScripts.add(newNativeScripts.get(i));
+      }
+    } else if (newNativeScripts) {
+      nativeScripts = newNativeScripts;
+    }
+    if (nativeScripts) {
+      wsetResult.set_native_scripts(nativeScripts);
+    }
+
+    let bootstraps = wset1.bootstraps();
+    const newBootstraps = wset2.bootstraps();
+    if (bootstraps && newBootstraps) {
+      for (let i = 0; i < newBootstraps.len(); i++) {
+        bootstraps.add(newBootstraps.get(i));
+      }
+    } else if (newBootstraps) {
+      bootstraps = newBootstraps;
+    }
+    if (bootstraps) {
+      wsetResult.set_bootstraps(bootstraps);
+    }
+
+    let plutusScripts = wset1.plutus_scripts();
+    const newPlutusScripts = wset2.plutus_scripts();
+    if (plutusScripts && newPlutusScripts) {
+      for (let i = 0; i < newPlutusScripts.len(); i++) {
+        plutusScripts.add(newPlutusScripts.get(i));
+      }
+    } else if (newPlutusScripts) {
+      plutusScripts = newPlutusScripts;
+    }
+    if (plutusScripts) {
+      wsetResult.set_plutus_scripts(plutusScripts);
+    }
+
+    let plutusData = wset1.plutus_data();
+    const newPlutusData = wset2.plutus_data();
+    if (plutusData && newPlutusData) {
+      for (let i = 0; i < newPlutusData.len(); i++) {
+        plutusData.add(newPlutusData.get(i));
+      }
+    } else if (newPlutusData) {
+      plutusData = newPlutusData;
+    }
+    if (plutusData) {
+      wsetResult.set_plutus_data(plutusData);
+    }
+
+    let redeemers = wset1.redeemers();
+    const newRedeemers = wset2.redeemers();
+    if (redeemers && newRedeemers) {
+      for (let i = 0; i < newRedeemers.len(); i++) {
+        redeemers.add(newRedeemers.get(i));
+      }
+    } else if (newRedeemers) {
+      redeemers = newRedeemers;
+    }
+    if (redeemers) {
+      wsetResult.set_redeemers(redeemers);
+    }
+    return wsetResult.to_hex();
+  });
 }

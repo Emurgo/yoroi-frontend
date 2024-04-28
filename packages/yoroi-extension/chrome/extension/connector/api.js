@@ -66,11 +66,14 @@ import { getAllSchemaTables, raii, } from '../../../app/api/ada/lib/storage/data
 import type { TokenRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
 import fetchAdapter from '@vespaiach/axios-fetch-adapter';
 import {
-  classes as LibClasses,
-  txBuilder as LibTxBuilder,
-  kernel as LibKernel,
-  errors as LibErrors,
-} from '@emurgo/yoroi-eutxo-txs';
+  UTxOSet as LibUtxoSet,
+  Value as LibValue,
+  Amount as LibAmount,
+  NativeAssets as LibNativeAssets,
+} from '@emurgo/yoroi-eutxo-txs/dist/classes'
+import { coinSelectionClassificationStrategy } from '@emurgo/yoroi-eutxo-txs/dist/tx-builder'
+import { setRuntime } from '@emurgo/yoroi-eutxo-txs/dist/kernel'
+import { NotEnoughMoneyToSendError as LibNotEnoughMoneyToSendError } from '@emurgo/yoroi-eutxo-txs/dist/errors'
 import {
   ChainDerivations,
   DREP_KEY_INDEX,
@@ -158,18 +161,18 @@ export async function connectorGetAssets(
 }
 
 // $FlowFixMe
-function stringToLibValue(s: string): LibClasses.Value {
+function stringToLibValue(s: string): LibValue {
   if (/^\d+$/.test(s)) {
     // The string is an int number
-    return new LibClasses.Value(
-      new LibClasses.Amount(s),
-      LibClasses.NativeAssets.from([]),
+    return new LibValue(
+      new LibAmount(s),
+      LibNativeAssets.from([]),
     );
   }
   try {
     return RustModule.WasmScope(Module => {
       // $FlowFixMe
-      function multiAssetToLibAssets(masset: ?RustModule.WalletV4.MultiAsset): LibClasses.NativeAssets {
+      function multiAssetToLibAssets(masset: ?RustModule.WalletV4.MultiAsset): LibNativeAssets {
         const mappedAssets = [];
         if (masset != null) {
           const policies = masset.keys();
@@ -187,18 +190,18 @@ function stringToLibValue(s: string): LibClasses.Value {
                       policy: policy.to_bytes(),
                       name: name.to_bytes(),
                     },
-                    amount: new LibClasses.Amount(amount.to_str()),
+                    amount: new LibAmount(amount.to_str()),
                   })
                 }
               }
             }
           }
         }
-        return LibClasses.NativeAssets.from(mappedAssets);
+        return LibNativeAssets.from(mappedAssets);
       }
       const value = Module.WalletV4.Value.from_bytes(hexToBytes(s));
-      return new LibClasses.Value(
-        new LibClasses.Amount(value.coin().to_str()),
+      return new LibValue(
+        new LibAmount(value.coin().to_str()),
         multiAssetToLibAssets(value.multiasset()),
       )
     });
@@ -241,9 +244,9 @@ export async function connectorGetUtxosCardano(
     return Promise.resolve(paginateResults(formattedUtxos, paginate));
   }
 
-  LibKernel.setRuntime(RustModule.CrossCsl.init);
+  setRuntime(RustModule.CrossCsl.init);
 
-  const utxoSet = new LibClasses.UTxOSet(
+  const utxoSet = new LibUtxoSet(
     await Promise.all(
       formattedUtxos.map(toLibUTxO)
     )
@@ -251,13 +254,13 @@ export async function connectorGetUtxosCardano(
   const value = stringToLibValue(valueStr);
   let selectedUtxos;
   try {
-    selectedUtxos = (await LibTxBuilder.coinSelectionClassificationStrategy(
+    selectedUtxos = (await coinSelectionClassificationStrategy(
       utxoSet,
       [value],
       coinsPerUtxoWord.to_str(),
     )).selectedUtxos;
   } catch (error) {
-    if (error instanceof LibErrors.NotEnoughMoneyToSendError) {
+    if (error instanceof LibNotEnoughMoneyToSendError) {
       throw new NotEnoughMoneyToSendError();
     }
     if (String(error).includes('less than the minimum UTXO value')) {

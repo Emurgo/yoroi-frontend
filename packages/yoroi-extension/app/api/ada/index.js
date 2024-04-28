@@ -310,6 +310,11 @@ export type CreateUnsignedTxForConnectorRequest = {|
   submittedTxs: Array<PersistedSubmittedTransaction>,
   utxos: Array<CardanoAddressedUtxo>,
 |};
+export type CreateUnsignedTxResponse = HaskellShelleyTxSignRequest;
+export type CreateVotingRegTxResponse = HaskellShelleyTxSignRequest;
+export type CreateUnsignedTxFunc = (
+  request: CreateUnsignedTxRequest
+) => Promise<CreateUnsignedTxResponse>;
 
 // createUnsignedTxForUtxos
 
@@ -378,7 +383,7 @@ export type CreateDelegationTxFunc = (
 
 export type CreateVotingRegTxFunc = (
   request: CreateVotingRegTxRequest
-) => Promise<HaskellShelleyTxSignRequest>;
+) => Promise<CreateVotingRegTxResponse>;
 
 // createWithdrawalTx
 
@@ -452,7 +457,7 @@ export type TransferToCip1852Request = {|
   defaultToken: $ReadOnly<TokenRow>,
 |};
 export type TransferToCip1852Response = {|
-  signRequest: HaskellShelleyTxSignRequest,
+  signRequest: CreateUnsignedTxResponse,
   publicKey: {|
     key: RustModule.WalletV4.Bip32PublicKey,
     ...Addressing,
@@ -968,13 +973,13 @@ export default class AdaApi {
         `${nameof(AdaApi)}::${nameof(this.createUnsignedTxForUtxos)} error: ` + stringifyError(error)
       );
       if (error instanceof LocalizableError) throw error;
-      throw error;
+      throw new GenericApiError();
     }
   }
 
   async createUnsignedTx(
     request: CreateUnsignedTxRequest
-  ): Promise<HaskellShelleyTxSignRequest> {
+  ): Promise<CreateUnsignedTxResponse> {
     const utxos = await request.publicDeriver.getAllUtxos();
     const filteredUtxos = utxos.filter(utxo => request.filter(utxo));
 
@@ -1009,7 +1014,7 @@ export default class AdaApi {
   async createUnsignedTxForConnector(
     request: CreateUnsignedTxForConnectorRequest,
     foreignUtxoFetcher: ?ForeignUtxoFetcher,
-  ): Promise<HaskellShelleyTxSignRequest> {
+  ): Promise<CreateUnsignedTxResponse> {
     const {
       includeInputs,
       includeOutputs,
@@ -1657,7 +1662,7 @@ export default class AdaApi {
 
   async createVotingRegTx(
     request: CreateVotingRegTxRequest
-  ): Promise<HaskellShelleyTxSignRequest> {
+  ): Promise<CreateVotingRegTxResponse> {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.createVotingRegTx)} called`);
 
     try {
