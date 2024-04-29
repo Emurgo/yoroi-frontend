@@ -140,7 +140,7 @@ export default function SwapInput({
         )}
         <Box sx={{ justifySelf: 'end', alignSelf: 'end' }}>
           <Typography component="div" variant="caption" color="grayscale.600">
-            Current balance: {quantity || 0} {ticker}
+            Balance: {quantity || 0} {ticker}
           </Typography>
         </Box>
       </Box>
