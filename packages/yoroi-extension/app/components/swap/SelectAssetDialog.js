@@ -58,7 +58,7 @@ export default function SelectAssetDialog({
       onClose={onClose}
       withCloseButton
       closeOnOverlayClick
-      styleOverride={{ maxWidth: '612px', minHeight: '600px' }}
+      styleOverride={{ minWidth: '612px', maxWidth: '612px', minHeight: '600px' }}
       scrollableContentClass="scrollable-content"
     >
       <Box mb="8px" position="relative">
