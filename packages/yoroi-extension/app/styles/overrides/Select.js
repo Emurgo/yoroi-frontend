@@ -1,20 +1,9 @@
 // @flow
-const ClassicSelect = {
-  styleOverrides: {
-    icon: {
-      color: 'var(--yoroi-comp-menu-icon)',
-      right: '15px',
-    },
-  },
-  defaultProps: {
-    notched: false,
-  },
-};
 
-const ModernSelect = {
+const Select = {
   styleOverrides: {
     icon: {
-      color: 'var(--yoroi-comp-menu-icon)',
+      color: 'grayscale.600',
       right: '15px',
     },
   },
@@ -23,4 +12,4 @@ const ModernSelect = {
   },
 };
 
-export { ClassicSelect, ModernSelect };
+export { Select };

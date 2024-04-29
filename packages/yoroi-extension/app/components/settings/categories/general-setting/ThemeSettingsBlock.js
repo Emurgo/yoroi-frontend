@@ -79,7 +79,7 @@ type Props = {|
   +onExternalLinkClick: MouseEvent => void,
 |};
 
-const NEW_THEME = THEMES.YOROI_REVAMP;
+const NEW_THEME = THEMES.YOROI_BASE;
 const OLD_THEME = `${THEMES.YOROI_MODERN}-${THEMES.YOROI_CLASSIC}`;
 @observer
 export default class ThemeSettingsBlock extends Component<Props> {
@@ -90,7 +90,7 @@ export default class ThemeSettingsBlock extends Component<Props> {
   render(): Node {
     const { currentTheme, onSubmit, onExternalLinkClick } = this.props;
     const { intl } = this.context;
-    const isRevampLayout = currentTheme === THEMES.YOROI_REVAMP;
+    const isRevampLayout = currentTheme === THEMES.YOROI_BASE;
 
     const blogLink = (
       <Typography
@@ -162,12 +162,12 @@ export default class ThemeSettingsBlock extends Component<Props> {
             />
           </RadioGroup>
         </Box>
-        {false && currentTheme === THEMES.YOROI_REVAMP && environment.isDev() && (
+        {false && currentTheme === THEMES.YOROI_BASE && environment.isDev() && (
           <Box sx={{ mt: '20px' }}>
             <ThemeToggler />
           </Box>
         )}
-        {currentTheme !== THEMES.YOROI_REVAMP && (
+        {currentTheme !== THEMES.YOROI_BASE && (
           <Box>
             <Box sx={{ marginTop: '20px' }}>
               <Typography component="div"

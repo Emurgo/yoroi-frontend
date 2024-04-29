@@ -356,8 +356,8 @@ export default class BaseProfileStore
     if (result != null) {
       if (!this.didUserMigratedToRevampTheme) {
         this.setUserRevampMigrationStatusRequest.execute(true);
-        this._updateTheme({ theme: THEMES.YOROI_REVAMP });
-        return THEMES.YOROI_REVAMP;
+        this._updateTheme({ theme: THEMES.YOROI_BASE });
+        return THEMES.YOROI_BASE;
       }
 
       // verify content is an actual theme
@@ -367,11 +367,11 @@ export default class BaseProfileStore
       }
     }
 
-    return THEMES.YOROI_REVAMP;
+    return THEMES.YOROI_BASE;
   }
 
   @computed get isRevampTheme(): boolean {
-    return this.currentTheme === THEMES.YOROI_REVAMP;
+    return this.currentTheme === THEMES.YOROI_BASE;
   }
 
   @computed get isModernTheme(): boolean {

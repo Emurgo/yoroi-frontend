@@ -1,89 +1,43 @@
 // @flow
-const ClassicOutlinedInput = {
+
+const OutlinedInput = {
   styleOverrides: {
-    root: {
+    root: ({ theme }: any): any => ({
       paddingRight: '16px',
+      '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: theme.palette.grayscale[900] },
       '& .MuiOutlinedInput-notchedOutline': {
-        borderColor: 'var(--yoroi-comp-input-border)',
-        borderRadius: 0,
-        backgroundColor: 'var(--yoroi-comp-input-background)',
-        letterSpacing: 'initial',
-      },
-      '&:hover .MuiOutlinedInput-notchedOutline': {
-        borderColor: 'var(--yoroi-comp-input-border-focus)',
-      },
-      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-        borderColor: 'var(--yoroi-comp-input-border-focus)',
-      },
-      '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
-        borderColor: 'var(--yoroi-comp-input-border-disabled)',
-        backgroundColor: 'var(--yoroi-comp-input-background-disabled)',
-        color: 'var(--yoroi-comp-input-text-disabled)',
-      },
-      '&.Mui-error .MuiOutlinedInput-notchedOutline': {
-        borderColor: 'var(--yoroi-comp-input-error)',
-      },
-      '& .MuiOutlinedInput-input': {
-        height: '1.2em',
-        '&.Mui-disabled': {
-          color: 'var(--yoroi-comp-input-text-disabled)',
-          WebkitTextFillColor: 'var(--yoroi-comp-input-text-disabled)',
-        },
-      },
-      '& svg': {
-        color: 'var(--yoroi-comp-input-border)',
-      },
-      '&.Mui-focused svg': {
-        color: 'var(--yoroi-comp-input-helper-text)',
-      },
-      '&.Mui-disabled svg': {
-        color: 'var(--yoroi-comp-input-border-disabled)',
-      },
-    },
-  },
-};
-const ModernOutlinedInput = {
-  styleOverrides: {
-    root: {
-      paddingRight: '16px',
-      height: '56px',
-      '&:hover .MuiOutlinedInput-notchedOutline': {
-        borderColor: 'var(--yoroi-comp-input-border-focus)',
-      },
-      '& .MuiOutlinedInput-notchedOutline': {
-        borderColor: 'var(--yoroi-comp-input-border)',
+        borderColor: theme.palette.grayscale[400],
         borderRadius: 8,
-        backgroundColor: 'var(--yoroi-comp-input-background)',
+        backgroundColor: 'transparent',
         letterSpacing: 'initial',
       },
       '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-        borderColor: 'var(--yoroi-comp-input-border-focus)',
-        border: '2px solid',
+        borderColor: theme.palette.grayscale[900],
+        borderWidth: '2px',
+      },
+      '&.Mui-focused.Mui-error .MuiOutlinedInput-notchedOutline': {
+        borderColor: theme.palette.magenta[500],
+        borderWidth: '2px',
       },
       '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
-        borderColor: 'var(--yoroi-comp-input-border-disabled)',
-        backgroundColor: 'var(--yoroi-comp-input-background-disabled)',
-        color: 'var(--yoroi-comp-input-text-disabled)',
+        borderColor: theme.palette.grayscale[200],
+        backgroundColor: 'transparent',
+        color: theme.palette.grayscale[200],
       },
       '&.Mui-error .MuiOutlinedInput-notchedOutline': {
-        borderColor: 'var(--yoroi-comp-input-error)',
+        borderColor: theme.palette.magenta[500],
+        borderWidth: '2px',
       },
       '& .MuiOutlinedInput-input': {
         '&.Mui-disabled': {
-          color: 'var(--yoroi-comp-input-text-disabled)',
-          WebkitTextFillColor: 'var(--yoroi-comp-input-text-disabled)',
+          color: theme.palette.grayscale[200],
+          WebkitTextFillColor: theme.palette.grayscale[200],
         },
       },
-      '& svg': {
-        color: 'var(--yoroi-comp-input-border)',
-      },
-      '&.Mui-focused svg': {
-        color: 'var(--yoroi-comp-input-helper-text)',
-      },
-      '&.Mui-disabled svg': {
-        color: 'var(--yoroi-comp-input-border-disabled)',
-      },
-    },
+      '& svg': { color: theme.palette.grayscale[400] },
+      '&.Mui-focused svg': { color: theme.palette.grayscale[600] },
+      '&.Mui-disabled svg': { color: theme.palette.grayscale[200] },
+    }),
   },
 };
-export { ClassicOutlinedInput, ModernOutlinedInput };
+export { OutlinedInput };

@@ -28,7 +28,7 @@ function ColorModeProvider({ children, currentTheme }: any): Node {
 
   // Update the theme only if the mode changes
   const theme = React.useMemo(() => {
-    if (currentTheme === THEMES.YOROI_REVAMP) return getDesignTokens(mode);
+    if (currentTheme === THEMES.YOROI_BASE) return getDesignTokens(mode);
     return MuiThemes[currentTheme];
   }, [mode, currentTheme]);
 
