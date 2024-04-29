@@ -1,5 +1,5 @@
 // @flow
-import { lightTheme } from '../../themes/light-theme-base';
+import { lightThemeBase } from '../../themes/light-theme-base';
 
 const ClassicCheckbox = {
   styleOverrides: {
@@ -44,8 +44,8 @@ const RevampCheckbox: any = {
         color: 'primary.500',
       },
       '&.Mui-disabled': {
-        color: lightTheme.palette.grayscale[400],
-        backgroundColor: lightTheme.palette.grayscale[400],
+        color: lightThemeBase.palette.grayscale[400],
+        backgroundColor: lightThemeBase.palette.grayscale[400],
       },
     },
   },

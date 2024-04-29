@@ -1,26 +1,26 @@
 // @flow
-import { Component } from 'react';
 import type { Node } from 'react';
-import { observer } from 'mobx-react';
-import { Router } from 'react-router-dom';
 import type { RouterHistory } from 'react-router-dom';
-import { addLocaleData, IntlProvider } from 'react-intl';
-import { observable, autorun, runInAction } from 'mobx';
-import { Routes } from './Routes';
-import { locales, translations } from './i18n/translations';
 import type { StoresMap } from './stores';
 import type { ActionsMap } from './actions';
+import { Component } from 'react';
+import { observer } from 'mobx-react';
+import { Router } from 'react-router-dom';
+import { addLocaleData, IntlProvider } from 'react-intl';
+import { observable, autorun, runInAction } from 'mobx';
+import { CssBaseline } from '@mui/material';
+import { Routes } from './Routes';
+import { locales, translations } from './i18n/translations';
+import { Logger } from './utils/logging';
+import { LayoutProvider } from './styles/context/layout';
+import { ColorModeProvider } from './styles/context/mode';
+import { globalStyles } from './styles/globalStyles';
+import { changeToplevelTheme, MuiThemes } from './styles/themes';
 import ThemeManager from './ThemeManager';
 import environment from './environment';
 import MaintenancePage from './containers/MaintenancePage';
 import CrashPage from './containers/CrashPage';
-import { Logger } from './utils/logging';
-import { LayoutProvider } from './styles/context/layout';
-import { ColorModeProvider } from './styles/context/mode';
-import { CssBaseline } from '@mui/material';
-import { globalStyles } from './styles/globalStyles';
 import Support from './components/widgets/Support';
-import { changeToplevelTheme, MuiThemes } from './styles/themes';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData(locales);

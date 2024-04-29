@@ -1,7 +1,7 @@
 // @flow
 
-import { lightTheme } from '../themes/light-theme-base';
-import { darkTheme } from '../themes/dark-theme-base';
+import { lightThemeBase } from '../themes/light-theme-base';
+import { darkThemeBase } from '../themes/dark-theme-base';
 
 const ButtonCommonProps: Object = {
   styleOverrides: {
@@ -42,15 +42,15 @@ export const LightButton: any = {
     },
     {
       props: { variant: 'tertiary', color: 'primary' },
-      style: getTertiaryStyles('primary', lightTheme),
+      style: getTertiaryStyles('primary', lightThemeBase),
     },
     {
       props: { variant: 'tertiary', color: 'secondary' },
-      style: getTertiaryStyles('grayscale', lightTheme),
+      style: getTertiaryStyles('grayscale', lightThemeBase),
     },
     {
       props: { variant: 'destructive' },
-      style: getContainedStyles('magenta', lightTheme),
+      style: getContainedStyles('magenta', lightThemeBase),
     },
     {
       props: { variant: 'segmented' },
@@ -66,9 +66,9 @@ export const LightButton: any = {
           color: 'grayscale.50',
         },
         '&.active': {
-          backgroundColor: lightTheme.palette.grayscale[200],
+          backgroundColor: lightThemeBase.palette.grayscale[200],
           ':hover': {
-            backgroundColor: lightTheme.palette.grayscale[50],
+            backgroundColor: lightThemeBase.palette.grayscale[50],
           },
         },
       },
@@ -82,23 +82,23 @@ export const DarkButton: any = {
   variants: [
     {
       props: { variant: 'primary' },
-      style: getContainedStyles('primary', darkTheme),
+      style: getContainedStyles('primary', darkThemeBase),
     },
     {
       props: { variant: 'secondary' },
-      style: getOutlinedStyles('primary', darkTheme),
+      style: getOutlinedStyles('primary', darkThemeBase),
     },
     {
       props: { variant: 'tertiary', color: 'primary' },
-      style: getTertiaryStyles('primary', darkTheme),
+      style: getTertiaryStyles('primary', darkThemeBase),
     },
     {
       props: { variant: 'tertiary', color: 'secondary' },
-      style: getTertiaryStyles('grayscale', darkTheme),
+      style: getTertiaryStyles('grayscale', darkThemeBase),
     },
     {
       props: { variant: 'destructive' },
-      style: getContainedStyles('magenta', darkTheme),
+      style: getContainedStyles('magenta', darkThemeBase),
     },
   ],
 };

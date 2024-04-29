@@ -1,5 +1,5 @@
 // @flow
-import { revampBaseTheme } from '../../themes/light-theme-mui';
+import { baseLightTheme } from '../../themes/light-theme-mui';
 
 const ClassicButton: any = {
   styleOverrides: {
@@ -251,23 +251,23 @@ const ModernButton: any = {
 
 function makeContainedBtnStyles(color: 'primary' | 'secondary'): Object {
   return {
-    backgroundColor: revampBaseTheme.palette[color].main,
-    color: revampBaseTheme.palette.common.white,
+    backgroundColor: baseLightTheme.palette[color].main,
+    color: baseLightTheme.palette.common.white,
     ':hover': {
-      backgroundColor: revampBaseTheme.palette[color][600],
+      backgroundColor: baseLightTheme.palette[color][600],
     },
     ':active': {
-      backgroundColor: revampBaseTheme.palette[color][700],
+      backgroundColor: baseLightTheme.palette[color][700],
     },
     ':focus': {
-      backgroundColor: revampBaseTheme.palette[color][500],
+      backgroundColor: baseLightTheme.palette[color][500],
     },
     '&.Mui-disabled': {
-      color: revampBaseTheme.palette.common.white,
-      backgroundColor: revampBaseTheme.palette[color][200],
+      color: baseLightTheme.palette.common.white,
+      backgroundColor: baseLightTheme.palette[color][200],
     },
     '& .MuiLoadingButton-loadingIndicator': {
-      color: revampBaseTheme.palette.common.white,
+      color: baseLightTheme.palette.common.white,
     },
   };
 }
@@ -275,27 +275,27 @@ function makeContainedBtnStyles(color: 'primary' | 'secondary'): Object {
 function makeOutlinedBtnStyles(color: 'primary' | 'secondary'): Object {
   return {
     backgroundColor: 'transparent',
-    color: revampBaseTheme.palette[color][500],
+    color: baseLightTheme.palette[color][500],
     border: '2px solid',
-    borderColor: revampBaseTheme.palette[color][500],
+    borderColor: baseLightTheme.palette[color][500],
     ':hover': {
       border: '2px solid',
-      color: revampBaseTheme.palette[color][600],
-      borderColor: revampBaseTheme.palette[color][600],
+      color: baseLightTheme.palette[color][600],
+      borderColor: baseLightTheme.palette[color][600],
     },
     ':active': {
-      borderColor: revampBaseTheme.palette[color][700],
+      borderColor: baseLightTheme.palette[color][700],
     },
     ':focus': {
-      borderColor: revampBaseTheme.palette[color][500],
+      borderColor: baseLightTheme.palette[color][500],
     },
     '&.Mui-disabled': {
       border: '2px solid',
-      borderColor: revampBaseTheme.palette[color][200],
-      color: revampBaseTheme.palette[color][200],
+      borderColor: baseLightTheme.palette[color][200],
+      color: baseLightTheme.palette[color][200],
     },
     '& .MuiLoadingButton-loadingIndicator': {
-      color: revampBaseTheme.palette[color][600],
+      color: baseLightTheme.palette[color][600],
     },
   };
 }
@@ -354,72 +354,72 @@ const RevampButton: any = {
         padding: '8px',
         fontSize: '0.875rem',
         backgroundColor: 'transparent',
-        color: revampBaseTheme.palette.grayscale[600],
+        color: baseLightTheme.palette.grayscale[600],
         border: '1px solid',
-        borderColor: revampBaseTheme.palette.grayscale[400],
+        borderColor: baseLightTheme.palette.grayscale[400],
         ':hover': {
-          borderColor: revampBaseTheme.palette.grayscale[500],
+          borderColor: baseLightTheme.palette.grayscale[500],
         },
         '&.Mui-active': {
-          backgroundColor: revampBaseTheme.palette.grayscale[50],
+          backgroundColor: baseLightTheme.palette.grayscale[50],
         },
         '&.Mui-disabled': {
           border: '1px solid',
           opacity: 0.4,
-          borderColor: revampBaseTheme.palette.grayscale[400],
-          color: revampBaseTheme.palette.grayscale[600],
+          borderColor: baseLightTheme.palette.grayscale[400],
+          color: baseLightTheme.palette.grayscale[600],
         },
         '& .MuiLoadingButton-loadingIndicator': {
-          color: revampBaseTheme.palette.grayscale[600],
+          color: baseLightTheme.palette.grayscale[600],
         },
       },
     },
     {
       props: { variant: 'contained', color: 'error' },
       style: {
-        backgroundColor: revampBaseTheme.palette.magenta[300],
-        color: revampBaseTheme.palette.common.white,
+        backgroundColor: baseLightTheme.palette.magenta[300],
+        color: baseLightTheme.palette.common.white,
         border: 0,
         ':hover': {
-          backgroundColor: revampBaseTheme.palette.magenta[100],
+          backgroundColor: baseLightTheme.palette.magenta[100],
         },
         '&.Mui-active': {
-          backgroundColor: revampBaseTheme.palette.magenta[300],
+          backgroundColor: baseLightTheme.palette.magenta[300],
         },
         '&.Mui-disabled': {
-          backgroundColor: revampBaseTheme.palette.magenta[300],
-          color: revampBaseTheme.palette.common.white,
+          backgroundColor: baseLightTheme.palette.magenta[300],
+          color: baseLightTheme.palette.common.white,
           opacity: 0.4,
         },
         '& .MuiLoadingButton-loadingIndicator': {
-          color: revampBaseTheme.palette.magenta[300],
+          color: baseLightTheme.palette.magenta[300],
         },
       },
     },
     {
       props: { variant: 'outlined', color: 'error' },
       style: {
-        backgroundColor: revampBaseTheme.palette.common.white,
-        color: revampBaseTheme.palette.magenta[500],
+        backgroundColor: baseLightTheme.palette.common.white,
+        color: baseLightTheme.palette.magenta[500],
         border: '2px solid',
-        borderColor: revampBaseTheme.palette.magenta[500],
+        borderColor: baseLightTheme.palette.magenta[500],
         ':hover': {
           border: '2px solid',
-          color: revampBaseTheme.palette.magenta[400],
-          borderColor: revampBaseTheme.palette.magenta[400],
+          color: baseLightTheme.palette.magenta[400],
+          borderColor: baseLightTheme.palette.magenta[400],
         },
         ':active': {
-          borderColor: revampBaseTheme.palette.magenta[400],
+          borderColor: baseLightTheme.palette.magenta[400],
         },
         ':focus': {
-          borderColor: revampBaseTheme.palette.magenta[400],
+          borderColor: baseLightTheme.palette.magenta[400],
         },
         '&.Mui-disabled': {
           border: '2px solid',
           opacity: 0.4,
         },
         '& .MuiLoadingButton-loadingIndicator': {
-          color: revampBaseTheme.palette.magenta[500],
+          color: baseLightTheme.palette.magenta[500],
         },
       },
     },
