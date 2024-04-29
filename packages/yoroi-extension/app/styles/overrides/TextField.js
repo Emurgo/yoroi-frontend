@@ -21,19 +21,19 @@ const TextField = {
       '.MuiFormHelperText-root': {
         fontSize: '0.75rem',
         '&.Mui-error': {
-          color: theme.palette.magenta[500],
+          color: theme.palette.system.magenta[500],
         },
       },
       '.MuiOutlinedInput-input.Mui-disabled': {
-        color: asImportant(theme.palette.common.black),
-        WebkitTextFillColor: asImportant(theme.palette.common.black),
+        color: asImportant(theme.palette.static.black),
+        WebkitTextFillColor: asImportant(theme.palette.static.black),
       },
       '.MuiOutlinedInput-root.Mui-disabled': {
         backgroundColor: theme.palette.grayscale[50],
       },
       '.MuiInputLabel-root.Mui-disabled': {
-        color: theme.palette.common.black,
-        backgroundColor: theme.palette.common.white,
+        color: theme.palette.static.black,
+        backgroundColor: theme.palette.static.white,
       },
       '& .MuiInputLabel-root': {
         color: theme.palette.grayscale[600],

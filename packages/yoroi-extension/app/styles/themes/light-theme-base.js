@@ -1,18 +1,6 @@
 // @flow
 import { alpha } from '@mui/material/styles';
 
-const cyan = { '500': '#59B1F4', '100': '#E8F4FF' };
-const yellow = { '500': '#ECBA09', '100': '#FDF7E2' };
-const orange = { '500': '#ED8600', '100': '#FFF2E2' };
-const magenta = {
-  main: '#FF1351',
-  '700': '#CF053A',
-  '600': '#E80742',
-  '500': '#FF1351',
-  '300': '#FBCBD7',
-  '100': '#FFF1F5',
-};
-
 const grayscale = {
   main: '#8A92A3',
   max: '#000000',
@@ -56,6 +44,19 @@ const secondary = {
 };
 
 const staticColors = { white: '#FFFFFF', black: '#000000' };
+
+const cyan = { '500': '#59B1F4', '100': '#E8F4FF' };
+const yellow = { '500': '#ECBA09', '100': '#FDF7E2' };
+const orange = { '500': '#ED8600', '100': '#FFF2E2' };
+const magenta = {
+  main: '#FF1351',
+  '700': '#CF053A',
+  '600': '#E80742',
+  '500': '#FF1351',
+  '300': '#FBCBD7',
+  '100': '#FFF1F5',
+};
+
 const system = { magenta, cyan, yellow, orange };
 
 export const lightThemeBase = {
@@ -69,18 +70,18 @@ export const lightThemeBase = {
     static: staticColors,
     system,
     gradients: {
-      'bg-gradient-1': 'linear-gradient(312.19deg, #C6F7ED 0%, #E4E8F7 100%)',
-      'bg-gradient-2': 'linear-gradient(180deg, #93F5E1 0%, #C6F7ED 100%)',
-      'bg-gradient-3': 'linear-gradient(30.09deg, #244ABF 0%, #4760FF 176.73%)',
+      bg_gradient_1: 'linear-gradient(312.19deg, #C6F7ED 0%, #E4E8F7 100%)',
+      bg_gradient_2: 'linear-gradient(180deg, #93F5E1 0%, #C6F7ED 100%)',
+      bg_gradient_3: 'linear-gradient(30.09deg, #244ABF 0%, #4760FF 176.73%)',
     },
-    background: { 'bg-color-low': grayscale.min, 'bg-color-medium': grayscale['100'] },
-    text: {
+    background: { bg_color_low: grayscale.min, bg_color_medium: grayscale['100'] },
+    uitext: {
       primary: {
         high: primary['600'],
         normal: primary['500'],
         low: primary['300'],
       },
-      'on-primary': staticColors.white,
+      on_primary: staticColors.white,
       gray: {
         max: grayscale.max,
         normal: grayscale['900'],
@@ -112,9 +113,9 @@ export const lightThemeBase = {
       },
     },
     special: {
-      overlay: alpha(staticColors.black, 70),
-      'bg-sidebar-item': alpha(staticColors.black, 16),
-      'el-sidebar-item': alpha(staticColors.white, 48),
+      overlay: alpha(staticColors.black, 0.7),
+      bg_sidebar_item: alpha(staticColors.black, 0.16),
+      el_sidebar_item: alpha(staticColors.white, 0.48),
     },
   },
   shape: {

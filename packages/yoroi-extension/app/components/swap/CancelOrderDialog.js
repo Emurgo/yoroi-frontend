@@ -1,6 +1,6 @@
 //@flow
 import { Box, Button, Typography } from '@mui/material';
-import Dialog from '../widgets/Dialog';
+import Dialog from '../widgets/Dialog/Dialog';
 import AssetPair from '../common/assets/AssetPair';
 import TextField from '../common/TextField';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';

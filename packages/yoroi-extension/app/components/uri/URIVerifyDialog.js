@@ -5,9 +5,9 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 
-import Dialog from '../widgets/Dialog';
-import DialogCloseButton from '../widgets/DialogCloseButton';
-import DialogBackButton from '../widgets/DialogBackButton';
+import Dialog from '../widgets/Dialog/Dialog';
+import DialogCloseButton from '../widgets/Dialog/DialogCloseButton';
+import DialogBackButton from '../widgets/Dialog/DialogBackButton';
 import type { UriParams } from '../../utils/URIHandling';
 import globalMessages from '../../i18n/global-messages';
 import { truncateAddress, truncateToken } from '../../utils/formatters';

@@ -6,8 +6,8 @@ import classnames from 'classnames';
 import { intlShape } from 'react-intl';
 import type { MessageDescriptor, $npm$ReactIntl$IntlFormat } from 'react-intl';
 
-import Dialog from '../../widgets/Dialog';
-import DialogCloseButton from '../../widgets/DialogCloseButton';
+import Dialog from '../../widgets/Dialog/Dialog';
+import DialogCloseButton from '../../widgets/Dialog/DialogCloseButton';
 import ErrorBlock from '../../widgets/ErrorBlock';
 import WarningBox from '../../widgets/WarningBox';
 

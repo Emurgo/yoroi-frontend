@@ -8,7 +8,7 @@ import { FormattedHTMLMessage, intlShape } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import type { Notification } from '../../types/notification.types';
 import NotificationMessage from '../../components/widgets/NotificationMessage';
-import Dialog from '../../components/widgets/Dialog';
+import Dialog from '../../components/widgets/Dialog/Dialog';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import globalMessages from '../../i18n/global-messages';
 import { ReactComponent as successIcon } from '../../assets/images/success-small.inline.svg';

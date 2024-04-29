@@ -16,7 +16,7 @@ const OutlinedInput = {
         borderWidth: '2px',
       },
       '&.Mui-focused.Mui-error .MuiOutlinedInput-notchedOutline': {
-        borderColor: theme.palette.magenta[500],
+        borderColor: theme.palette.system.magenta[500],
         borderWidth: '2px',
       },
       '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
@@ -25,7 +25,7 @@ const OutlinedInput = {
         color: theme.palette.grayscale[200],
       },
       '&.Mui-error .MuiOutlinedInput-notchedOutline': {
-        borderColor: theme.palette.magenta[500],
+        borderColor: theme.palette.system.magenta[500],
         borderWidth: '2px',
       },
       '& .MuiOutlinedInput-input': {

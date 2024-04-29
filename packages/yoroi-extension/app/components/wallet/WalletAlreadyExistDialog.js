@@ -6,8 +6,8 @@ import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import styles from './WalletAlreadyExistDialog.scss';
-import DialogBackButton from '../widgets/DialogBackButton';
-import Dialog from '../widgets/Dialog';
+import DialogBackButton from '../widgets/Dialog/DialogBackButton';
+import Dialog from '../widgets/Dialog/Dialog';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({

@@ -68,7 +68,7 @@ export default class StandardHeaderRevamp extends Component<Props> {
     } = this.props;
     const { intl } = this.context;
     const mainAddressNotificationId = 'mainAddress-copyNotification';
-    const locationId = 'wallet:receive:infoPanel:header'
+    const locationId = 'wallet:receive:infoPanel:header';
 
     const generateAddressForm = (
       <LoadingButton
@@ -110,7 +110,7 @@ export default class StandardHeaderRevamp extends Component<Props> {
               borderRadius="16px"
               height="min-content"
               sx={{
-                background: theme => theme.palette.gradients['blue-green-bg'],
+                background: theme => theme.palette.gradients.bg_gradient_1,
               }}
             >
               <Box
@@ -127,7 +127,12 @@ export default class StandardHeaderRevamp extends Component<Props> {
                   },
                 }}
               >
-                <QrCodeWrapper fgColor="#000" value={walletAddress} size={153} id={locationId + '-addressQrCode-image'} />
+                <QrCodeWrapper
+                  fgColor="#000"
+                  value={walletAddress}
+                  size={153}
+                  id={locationId + '-addressQrCode-image'}
+                />
               </Box>
             </Box>
           </Box>
@@ -164,12 +169,22 @@ export default class StandardHeaderRevamp extends Component<Props> {
               </CopyableAddress>
             </Box>
 
-            <Typography component="div" mb="24px" variant="body2" lineHeight="22px" color="grayscale.600">
+            <Typography
+              component="div"
+              mb="24px"
+              variant="body2"
+              lineHeight="22px"
+              color="grayscale.600"
+            >
               <FormattedHTMLMessage {...messages.walletReceiveInstructions} />
             </Typography>
 
             {generateAddressForm}
-            {error && <div className={styles.error} id={locationId + '-addressError-text'}>{intl.formatMessage(error)}</div>}
+            {error && (
+              <div className={styles.error} id={locationId + '-addressError-text'}>
+                {intl.formatMessage(error)}
+              </div>
+            )}
           </Box>
         </Box>
       </Box>

@@ -1,6 +1,6 @@
 // @flow
 import { Box, Typography } from '@mui/material';
-import Dialog from '../widgets/Dialog';
+import Dialog from '../widgets/Dialog/Dialog';
 import Table from '../common/table/Table';
 import { getMarketPrice } from '@yoroi/swap';
 import { Quantities } from '../../utils/quantities';

@@ -42,7 +42,7 @@ import URIGenerateDialog from '../../components/uri/URIGenerateDialog';
 import URIDisplayDialog from '../../components/uri/URIDisplayDialog';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
-import Dialog from '../../components/widgets/Dialog';
+import Dialog from '../../components/widgets/Dialog/Dialog';
 import globalMessages from '../../i18n/global-messages';
 import WalletReceiveRevamp from '../../components/wallet/WalletReceiveRevamp';
 import UnmangleTxDialogContainer from '../transfer/UnmangleTxDialogContainer';

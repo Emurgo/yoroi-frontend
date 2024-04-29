@@ -4,7 +4,7 @@
 const Tooltip = {
   styleOverrides: {
     tooltip: ({ theme }: any): any => ({
-      color: theme.palette.common.white,
+      color: theme.palette.static.white,
       backgroundColor: theme.palette.grayscale[900],
       borderRadius: 8,
       fontSize: '0.75rem',

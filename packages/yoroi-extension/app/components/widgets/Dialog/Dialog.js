@@ -7,9 +7,10 @@ import { map } from 'lodash';
 import { IconButton, Modal, Typography, alpha } from '@mui/material';
 import { Box, styled } from '@mui/system';
 import { LoadingButton } from '@mui/lab';
-import { withLayout } from '../../styles/context/layout';
+import { withLayout } from '../../../styles/context/layout';
 import { observer } from 'mobx-react';
 import { ReactComponent as CrossIcon } from '../../assets/images/revamp/icons/cross.inline.svg';
+import LegacyDialog from './legacy/Dialog';
 
 export type ActionType = {|
   +label: string,
@@ -48,6 +49,7 @@ type InjectedProps = {| isRevampLayout: boolean |};
 
 function Dialog(props: Props & InjectedProps): Node {
   const {
+    isRevampLayout,
     title,
     children,
     actions,
@@ -58,10 +60,11 @@ function Dialog(props: Props & InjectedProps): Node {
     withCloseButton,
     backButton,
     scrollableContentClass,
-    isRevampLayout,
     id,
     styleFlags,
   } = props;
+
+  if (!isRevampLayout) return <LegacyDialog props={props} />;
 
   const [contentHasScroll, setContentHasScroll] = useState(false);
 
@@ -107,9 +110,7 @@ function Dialog(props: Props & InjectedProps): Node {
             }
       }
       sx={{
-        bgcolor: isRevampLayout
-          ? alpha('#121F4D', 0.7) // primary.900 70%
-          : 'var(--yoroi-comp-dialog-overlay-background-color)',
+        bgcolor: 'special.overlay',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -159,7 +160,7 @@ function Dialog(props: Props & InjectedProps): Node {
                   // $FlowIgnore
                   id={action.id ?? id + '-' + buttonLabel + '-button'}
                   key={i}
-                  {...getBtnVariant(action.danger, action.primary, isRevampLayout)}
+                  {...getBtnVariant(action.danger, action.primary)}
                   className={buttonClasses}
                   loading={action.isSubmitting}
                   onClick={action.onClick}
@@ -228,69 +229,54 @@ export const CloseButton = ({
 
 export const ModalContainer: any => Node = styled(Box)(
   ({ theme, contentHasScroll, empty = false }) => {
-    const normalMinWidth =
-      theme.name === 'classic' || theme.name === 'modern'
-        ? 'var(--yoroi-comp-dialog-min-width-md)'
-        : '648px';
+    const normalMinWidth = '648px';
     return {
       position: 'relative',
       minWidth: empty ? '0px' : normalMinWidth,
-      borderRadius: theme.name === 'classic' ? 0 : 8,
-      paddingTop: theme.name === 'classic' ? '25px' : '0px',
-      paddingBottom: theme.name === 'classic' || theme.name === 'modern' ? '30px' : '0px',
-      maxWidth: theme.name === 'classic' ? '785px' : '824px',
-      backgroundColor: empty ? undefined : 'var(--yoroi-comp-dialog-background)',
-      color: 'var(--yoroi-comp-dialog-text)',
+      borderRadius: 8,
+      paddingTop: '0px',
+      paddingBottom: '0px',
+      maxWidth: '824px',
+      bgcolor: empty ? undefined : 'static.white',
+      color: 'uitext.gray.normal',
       maxHeight: '95vh',
 
       '& .dialog__title': {
-        marginBottom: theme.name === 'classic' ? '22px' : '0px',
-        padding: theme.name === 'classic' ? '0' : '24px',
+        marginBottom: '0px',
+        padding: '24px',
         fontWeight: 500,
         textAlign: 'center',
         textTransform: 'uppercase',
         letterSpacing: 0,
         display: 'block',
-        borderBottom:
-          theme.name === 'classic' || theme.name === 'modern'
-            ? ''
-            : contentHasScroll
-            ? '1px solid'
-            : '',
-        borderBottomColor:
-          theme.name === 'classic' || theme.name === 'modern'
-            ? theme.palette.gray['200']
-            : theme.palette.grayscale['200'],
+        borderBottom: contentHasScroll ? '1px solid' : '',
+        borderBottomColor: theme.palette.grayscale['200'],
       },
     };
   }
 );
 
-const ModalContent = styled(Box)(({ theme }) => ({
+const ModalContent = styled(Box)(() => ({
   overflowX: 'hidden',
   overflowY: 'overlay',
   maxHeight: '70vh',
-  paddingLeft: theme.name === 'classic' ? '30px' : '24px',
-  paddingRight: theme.name === 'classic' ? '30px' : '24px',
-  paddingTop: theme.name === 'classic' ? '0px' : '24px',
-  paddingBottom: theme.name === 'classic' || theme.name === 'modern' ? '0px' : '24px',
+  paddingLeft: '24px',
+  paddingRight: '24px',
+  paddingTop: '24px',
+  paddingBottom: '24px',
   flexGrow: 1,
 }));
 
 const ModalFooter = styled(Box)(({ theme, contentHasScroll }) => ({
   display: 'flex',
   gap: '24px',
-  paddingLeft: theme.name === 'classic' ? '30px' : '24px',
-  paddingRight: theme.name === 'classic' ? '30px' : '24px',
-  paddingTop: theme.name === 'classic' || theme.name === 'modern' ? '0' : '24px',
-  paddingBottom: theme.name === 'classic' || theme.name === 'modern' ? '0' : '24px',
-  marginTop: theme.name === 'classic' ? '20px' : '0px',
-  borderTop:
-    theme.name === 'classic' || theme.name === 'modern' ? '' : contentHasScroll ? '1px solid' : '',
-  borderTopColor:
-    theme.name === 'classic' || theme.name === 'modern'
-      ? theme.palette.gray['200']
-      : theme.palette.grayscale['200'],
+  paddingLeft: '24px',
+  paddingRight: '24px',
+  paddingTop: '24px',
+  paddingBottom: '24px',
+  marginTop: '0px',
+  borderTop: contentHasScroll ? '1px solid' : '',
+  borderTopColor: theme.palette.grayscale['200'],
   '& button': {
     width: '50%',
     '&:only-child': { width: '100%' },
@@ -302,22 +288,14 @@ function getBtnVariant(
   primary?: boolean,
   isRevampLayout?: boolean
 ): {|
-  variant: 'contained' | 'outlined' | 'danger' | 'primary' | 'secondary',
+  variant: 'contained' | 'danger' | 'primary' | 'secondary',
   color?: 'primary' | 'secondary' | 'error',
 |} {
-  if (danger && isRevampLayout) return { variant: 'contained', color: 'error' };
+  if (danger) return { variant: 'contained', color: 'error' };
 
-  if (isRevampLayout && primary) {
-    return { variant: 'primary' };
-  }
+  if (primary) return { variant: 'primary' };
 
-  if (isRevampLayout && !primary) {
-    return { variant: 'secondary' };
-  }
-
-  if (danger === true) return { variant: 'danger' };
-  if (primary === true) return { variant: 'primary' };
-  return { variant: 'secondary' };
+  if (!primary) return { variant: 'secondary' };
 }
 
 export default (withLayout(observer(Dialog)): ComponentType<Props>);

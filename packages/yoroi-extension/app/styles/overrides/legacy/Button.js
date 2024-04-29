@@ -252,7 +252,7 @@ const ModernButton: any = {
 function makeContainedBtnStyles(color: 'primary' | 'secondary'): Object {
   return {
     backgroundColor: baseLightTheme.palette[color].main,
-    color: baseLightTheme.palette.common.white,
+    color: baseLightTheme.palette.static.white,
     ':hover': {
       backgroundColor: baseLightTheme.palette[color][600],
     },
@@ -263,11 +263,11 @@ function makeContainedBtnStyles(color: 'primary' | 'secondary'): Object {
       backgroundColor: baseLightTheme.palette[color][500],
     },
     '&.Mui-disabled': {
-      color: baseLightTheme.palette.common.white,
+      color: baseLightTheme.palette.static.white,
       backgroundColor: baseLightTheme.palette[color][200],
     },
     '& .MuiLoadingButton-loadingIndicator': {
-      color: baseLightTheme.palette.common.white,
+      color: baseLightTheme.palette.static.white,
     },
   };
 }
@@ -377,49 +377,49 @@ const RevampButton: any = {
     {
       props: { variant: 'contained', color: 'error' },
       style: {
-        backgroundColor: baseLightTheme.palette.magenta[300],
-        color: baseLightTheme.palette.common.white,
+        backgroundColor: baseLightTheme.palette.system.magenta[300],
+        color: baseLightTheme.palette.static.white,
         border: 0,
         ':hover': {
-          backgroundColor: baseLightTheme.palette.magenta[100],
+          backgroundColor: baseLightTheme.palette.system.magenta[100],
         },
         '&.Mui-active': {
-          backgroundColor: baseLightTheme.palette.magenta[300],
+          backgroundColor: baseLightTheme.palette.system.magenta[300],
         },
         '&.Mui-disabled': {
-          backgroundColor: baseLightTheme.palette.magenta[300],
-          color: baseLightTheme.palette.common.white,
+          backgroundColor: baseLightTheme.palette.system.magenta[300],
+          color: baseLightTheme.palette.static.white,
           opacity: 0.4,
         },
         '& .MuiLoadingButton-loadingIndicator': {
-          color: baseLightTheme.palette.magenta[300],
+          color: baseLightTheme.palette.system.magenta[300],
         },
       },
     },
     {
       props: { variant: 'outlined', color: 'error' },
       style: {
-        backgroundColor: baseLightTheme.palette.common.white,
-        color: baseLightTheme.palette.magenta[500],
+        backgroundColor: baseLightTheme.palette.static.white,
+        color: baseLightTheme.palette.system.magenta[500],
         border: '2px solid',
-        borderColor: baseLightTheme.palette.magenta[500],
+        borderColor: baseLightTheme.palette.system.magenta[500],
         ':hover': {
           border: '2px solid',
-          color: baseLightTheme.palette.magenta[400],
-          borderColor: baseLightTheme.palette.magenta[400],
+          color: baseLightTheme.palette.system.magenta[400],
+          borderColor: baseLightTheme.palette.system.magenta[400],
         },
         ':active': {
-          borderColor: baseLightTheme.palette.magenta[400],
+          borderColor: baseLightTheme.palette.system.magenta[400],
         },
         ':focus': {
-          borderColor: baseLightTheme.palette.magenta[400],
+          borderColor: baseLightTheme.palette.system.magenta[400],
         },
         '&.Mui-disabled': {
           border: '2px solid',
           opacity: 0.4,
         },
         '& .MuiLoadingButton-loadingIndicator': {
-          color: baseLightTheme.palette.magenta[500],
+          color: baseLightTheme.palette.system.magenta[500],
         },
       },
     },

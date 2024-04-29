@@ -1,7 +1,7 @@
 // @flow
 import type { Node } from 'react';
 import { Box, Button, Typography } from '@mui/material';
-import Dialog from '../widgets/Dialog';
+import Dialog from '../widgets/Dialog/Dialog';
 import { ReactComponent as ErrorTriangleIcon } from '../../assets/images/revamp/error.triangle.svg';
 import { ReactComponent as ExclamationCircleIcon } from '../../assets/images/revamp/exclamation.circle.svg';
 import type { PriceImpact } from './types';

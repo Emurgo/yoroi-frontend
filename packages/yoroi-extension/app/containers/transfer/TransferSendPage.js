@@ -10,7 +10,7 @@ import LegacyTransferLayout from '../../components/transfer/LegacyTransferLayout
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import YoroiTransferErrorPage from './YoroiTransferErrorPage';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
-import Dialog from '../../components/widgets/Dialog';
+import Dialog from '../../components/widgets/Dialog/Dialog';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import SpendingPasswordInput from '../../components/widgets/forms/SpendingPasswordInput';
 import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils';

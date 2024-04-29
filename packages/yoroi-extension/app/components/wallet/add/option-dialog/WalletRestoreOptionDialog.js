@@ -4,8 +4,8 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 
-import Dialog from '../../../widgets/Dialog';
-import DialogCloseButton from '../../../widgets/DialogCloseButton';
+import Dialog from '../../../widgets/Dialog/Dialog';
+import DialogCloseButton from '../../../widgets/Dialog/DialogCloseButton';
 import OptionBlock from '../../../widgets/options/OptionBlock';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from '../../../widgets/options/OptionListWrapperStyle.scss';

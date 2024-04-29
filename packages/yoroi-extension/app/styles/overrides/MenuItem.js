@@ -4,7 +4,7 @@ const MenuItem = {
   styleOverrides: {
     root: {
       padding: '14px 20px',
-      bgcolor: 'common.white',
+      bgcolor: 'static.white',
       height: 45,
       color: 'grayscale.900',
       '&:hover': { background: 'grayscale.50' },

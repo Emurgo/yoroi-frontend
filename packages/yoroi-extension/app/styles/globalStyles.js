@@ -68,6 +68,8 @@ export const formatPalette = (palette: any, theme: any): FormatedPalette => {
 };
 
 export function getMainYoroiPalette(theme: Object): { [string]: string | number } {
+  if (theme.name === 'light-theme' || theme.name === 'dark-theme') return {};
+
   return {
     /*
       CSS variables follow the same name as mui using kebab case syntax

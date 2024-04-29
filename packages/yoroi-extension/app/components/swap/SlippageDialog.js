@@ -1,7 +1,7 @@
 // @flow
 import { useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
-import Dialog from '../widgets/Dialog';
+import Dialog from '../widgets/Dialog/Dialog';
 // <TODO:CHECK_LINT>
 // eslint-disable-next-line no-unused-vars
 import { ReactComponent as AssetDefault } from '../../assets/images/revamp/asset-default.inline.svg';

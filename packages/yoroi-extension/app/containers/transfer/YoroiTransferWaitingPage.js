@@ -6,7 +6,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import type { TransferStatusT } from '../../types/TransferTypes';
 import { TransferStatus } from '../../types/TransferTypes';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import Dialog from '../../components/widgets/Dialog';
+import Dialog from '../../components/widgets/Dialog/Dialog';
 
 import AnnotatedLoader from '../../components/transfer/AnnotatedLoader';
 

@@ -9,9 +9,9 @@ import Autocomplete from '../common/Autocomplete';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
-import DialogCloseButton from '../widgets/DialogCloseButton';
-import DialogTextBlock from '../widgets/DialogTextBlock';
-import Dialog from '../widgets/Dialog';
+import DialogCloseButton from '../widgets/Dialog/DialogCloseButton';
+import DialogTextBlock from '../widgets/Dialog/DialogTextBlock';
+import Dialog from '../widgets/Dialog/Dialog';
 import {
   isValidWalletName,
   isValidWalletPassword,
@@ -21,7 +21,7 @@ import globalMessages from '../../i18n/global-messages';
 import LocalizableError from '../../i18n/LocalizableError';
 import styles from './WalletRestoreDialog.scss';
 import config from '../../config';
-import DialogBackButton from '../widgets/DialogBackButton';
+import DialogBackButton from '../widgets/Dialog/DialogBackButton';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({

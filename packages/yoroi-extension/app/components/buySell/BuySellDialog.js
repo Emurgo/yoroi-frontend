@@ -5,8 +5,8 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
-import Dialog from '../widgets/Dialog';
-import DialogCloseButton from '../widgets/DialogCloseButton';
+import Dialog from '../widgets/Dialog/Dialog';
+import DialogCloseButton from '../widgets/Dialog/DialogCloseButton';
 
 import VerticalFlexContainer from '../layout/VerticalFlexContainer';
 import LoadingSpinner from '../widgets/LoadingSpinner';
@@ -21,7 +21,7 @@ import BigNumber from 'bignumber.js';
 import adaPng from '../../assets/images/ada.png';
 import banxaPng from '../../assets/images/banxa.png';
 import { ReactComponent as InfoIcon } from '../../assets/images/info-icon-revamp.inline.svg';
-import { banxaModuleMaker } from '@yoroi/banxa'
+import { banxaModuleMaker } from '@yoroi/banxa';
 
 declare var chrome;
 
@@ -52,7 +52,8 @@ const messages = defineMessages({
   },
   disclaimerText: {
     id: 'buysell.dialog.disclaimerText',
-    defaultMessage: '!!!Yoroi uses Banxa to provide direct Fiat-ADA exchange. By clicking “Proceed,” you also acknowledge that you will be redirected to our partner’s website, where you may be asked to accept their terms and conditions. Banxa may have buy and sell limitations depending on your location and your financial institution.'
+    defaultMessage:
+      '!!!Yoroi uses Banxa to provide direct Fiat-ADA exchange. By clicking “Proceed,” you also acknowledge that you will be redirected to our partner’s website, where you may be asked to accept their terms and conditions. Banxa may have buy and sell limitations depending on your location and your financial institution.',
   },
   proceed: {
     id: 'buysell.dialog.proceed',
@@ -75,7 +76,8 @@ type State = {|
 |};
 
 const MINIMUM_BUY_ADA = new BigNumber('100');
-const BANXA_CALLBACK_URL = 'https://ramp-redirect.yoroiwallet.com/yoroi-extension-banxa-callback.html';
+const BANXA_CALLBACK_URL =
+  'https://ramp-redirect.yoroiwallet.com/yoroi-extension-banxa-callback.html';
 
 const TabItem = styled(Tab)({
   position: 'relative',
@@ -139,8 +141,10 @@ const Disclaimer = styled(Box)({
     },
   },
   borderRadius: 'var(--corner-radius-8, 8px)',
-  background: 'var(--gradient-light-green-blue, linear-gradient(270deg, #E4E8F7 0%, #C6F7ED 99.98%))',
-  padding: 'var(--spacing-12, 12px) var(--spacing-16, 16px) var(--spacing-16, 16px) var(--spacing-16, 16px)'
+  background:
+    'var(--gradient-light-green-blue, linear-gradient(270deg, #E4E8F7 0%, #C6F7ED 99.98%))',
+  padding:
+    'var(--spacing-12, 12px) var(--spacing-16, 16px) var(--spacing-16, 16px) var(--spacing-16, 16px)',
 });
 
 @observer
@@ -172,8 +176,8 @@ export default class BuySellDialog extends Component<Props, State> {
       });
 
       const self = this;
-      chrome.tabs.create({ url: url.href }, (exchangePageTab) => {
-        chrome.tabs.onRemoved.addListener((tabId) => {
+      chrome.tabs.create({ url: url.href }, exchangePageTab => {
+        chrome.tabs.onRemoved.addListener(tabId => {
           if (tabId === exchangePageTab.id) {
             self.setState({ isSubmitting: false });
           }
@@ -187,9 +191,9 @@ export default class BuySellDialog extends Component<Props, State> {
         });
       });
     }
-  }
+  };
 
-  onChangeBuyAmount: (SyntheticInputEvent<HTMLInputElement>) => void = (event) => {
+  onChangeBuyAmount: (SyntheticInputEvent<HTMLInputElement>) => void = event => {
     const { value } = event.target;
 
     if (!value.match(/^\d*$/)) {
@@ -198,9 +202,9 @@ export default class BuySellDialog extends Component<Props, State> {
 
     this.setState({
       buyAmountAda: value,
-      error: (value !== '' && MINIMUM_BUY_ADA.gt(value)) ? 'lessThanBuyMinimum' : null,
+      error: value !== '' && MINIMUM_BUY_ADA.gt(value) ? 'lessThanBuyMinimum' : null,
     });
-  }
+  };
 
   renderBuy(): Node {
     const { intl } = this.context;
@@ -209,7 +213,9 @@ export default class BuySellDialog extends Component<Props, State> {
     // set a place holder so that when it becomes an error message, the height doesn't change
     let helperText = ' ';
     if (state.error === 'lessThanBuyMinimum') {
-      helperText = intl.formatMessage(messages.lessThanBuyMinimum, { amount: MINIMUM_BUY_ADA.toString() });
+      helperText = intl.formatMessage(messages.lessThanBuyMinimum, {
+        amount: MINIMUM_BUY_ADA.toString(),
+      });
     }
 
     return (
@@ -219,16 +225,23 @@ export default class BuySellDialog extends Component<Props, State> {
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
-                <div style={{ position: 'relative' /* so that the balance line can align on the right side */ }}>
+                <div
+                  style={{
+                    position: 'relative' /* so that the balance line can align on the right side */,
+                  }}
+                >
                   <div style={{ marginBottom: '8px', color: '#000' }}>
                     <img
                       style={{ marginRight: '8px', borderRadius: '4px', verticalAlign: 'bottom' }}
                       src={adaPng}
                       alt=""
-                    />ADA
+                    />
+                    ADA
                   </div>
                   <Box sx={{ position: 'absolute', right: '0px', fontSize: '12px' }}>
-                    {intl.formatMessage(messages.currentBalance, { amount: props.currentBalanceAda })}
+                    {intl.formatMessage(messages.currentBalance, {
+                      amount: props.currentBalanceAda,
+                    })}
                   </Box>
                 </div>
               </InputAdornment>
@@ -245,9 +258,7 @@ export default class BuySellDialog extends Component<Props, State> {
         />
 
         <ProviderRow>
-          <ProviderLabel>
-            {intl.formatMessage(globalMessages.provider)}
-          </ProviderLabel>
+          <ProviderLabel>{intl.formatMessage(globalMessages.provider)}</ProviderLabel>
           <ProviderInfo>
             <img style={{ verticalAlign: 'bottom' }} src={banxaPng} alt="" />
             Banxa
@@ -255,17 +266,14 @@ export default class BuySellDialog extends Component<Props, State> {
         </ProviderRow>
 
         <ProviderRow>
-          <ProviderLabel>
-            {intl.formatMessage(messages.providerFee)}
-          </ProviderLabel>
-          <ProviderInfo>
-            2%
-          </ProviderInfo>
+          <ProviderLabel>{intl.formatMessage(messages.providerFee)}</ProviderLabel>
+          <ProviderInfo>2%</ProviderInfo>
         </ProviderRow>
 
         <Disclaimer>
           <header>
-            <InfoIcon />{intl.formatMessage(messages.disclaimer)}
+            <InfoIcon />
+            {intl.formatMessage(messages.disclaimer)}
           </header>
           {intl.formatMessage(messages.disclaimerText)}
         </Disclaimer>
@@ -307,7 +315,7 @@ export default class BuySellDialog extends Component<Props, State> {
             disabled: state.buyAmountAda === '' || state.error !== null,
             onClick: this.onSubmit,
             isSubmitting: state.isSubmitting,
-          }
+          },
         ]}
         styleOverride={{ width: '648px', height: '688px' }}
         styleFlags={{ contentNoTopPadding: true }}

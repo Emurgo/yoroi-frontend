@@ -146,7 +146,7 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
 
         <Stack
           sx={{
-            background: theme => theme.palette.background.gradients.primary,
+            background: theme => theme.palette.gradients.bg_gradient_1,
             borderRadius: theme => theme.shape.borderRadius + 'px',
             padding: '16px',
             paddingLeft: '40px',

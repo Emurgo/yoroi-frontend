@@ -6,8 +6,8 @@ import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import globalMessages from '../../../../i18n/global-messages';
-import Dialog from '../../../widgets/Dialog';
-import DialogCloseButton from '../../../widgets/DialogCloseButton';
+import Dialog from '../../../widgets/Dialog/Dialog';
+import DialogCloseButton from '../../../widgets/Dialog/DialogCloseButton';
 import OptionBlock from '../../../widgets/options/OptionBlock';
 
 import styles from '../../../widgets/options/OptionListWrapperStyle.scss';

@@ -4,7 +4,7 @@ import { Component } from 'react';
 import { intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
 import globalMessages from '../../../i18n/global-messages';
-import Dialog from '../../widgets/Dialog';
+import Dialog from '../../widgets/Dialog/Dialog';
 import AnnotatedLoader from '../../transfer/AnnotatedLoader';
 
 import type { Node } from 'react';

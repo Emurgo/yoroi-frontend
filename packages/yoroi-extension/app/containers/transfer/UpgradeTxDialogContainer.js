@@ -14,7 +14,7 @@ import type {
 import { genAddressLookup, genAddressingLookup, allAddressSubgroups } from '../../stores/stateless/addressStores';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
-import Dialog from '../../components/widgets/Dialog';
+import Dialog from '../../components/widgets/Dialog/Dialog';
 import LegacyTransferLayout from '../../components/transfer/LegacyTransferLayout';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';

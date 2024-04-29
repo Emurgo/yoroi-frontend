@@ -8,9 +8,9 @@ import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 import LocalizableError from '../../../../i18n/LocalizableError';
 
-import Dialog from '../../../widgets/Dialog';
-import DialogCloseButton from '../../../widgets/DialogCloseButton';
-import DialogBackButton from '../../../widgets/DialogBackButton';
+import Dialog from '../../../widgets/Dialog/Dialog';
+import DialogCloseButton from '../../../widgets/Dialog/DialogCloseButton';
+import DialogBackButton from '../../../widgets/Dialog/DialogBackButton';
 
 import ProgressStepBlock from '../common/ProgressStepBlock';
 import HelpLinkBlock from './HelpLinkBlock';

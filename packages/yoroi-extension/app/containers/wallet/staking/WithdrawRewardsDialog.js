@@ -6,7 +6,7 @@ import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, intlShape } from 'react-intl';
 import { Box, Typography } from '@mui/material';
-import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
+import DialogCloseButton from '../../../components/widgets/Dialog/DialogCloseButton';
 import { action, observable } from 'mobx';
 import { observer } from 'mobx-react';
 import globalMessages from '../../../i18n/global-messages';
@@ -28,7 +28,7 @@ import YoroiTransferErrorPage from '../../transfer/YoroiTransferErrorPage';
 import ExplorableHashContainer from '../../widgets/ExplorableHashContainer';
 import RawHash from '../../../components/widgets/hashWrappers/RawHash';
 import Warning from '../../../components/common/Warning';
-import Dialog from '../../../components/widgets/Dialog';
+import Dialog from '../../../components/widgets/Dialog/Dialog';
 
 const messages = defineMessages({
   dialogTitle: {

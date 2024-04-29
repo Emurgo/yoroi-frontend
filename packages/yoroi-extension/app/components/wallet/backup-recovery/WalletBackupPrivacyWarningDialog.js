@@ -5,8 +5,8 @@ import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import CheckboxLabel from '../../common/CheckboxLabel'
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
-import Dialog from '../../widgets/Dialog';
-import DialogCloseButton from '../../widgets/DialogCloseButton';
+import Dialog from '../../widgets/Dialog/Dialog';
+import DialogCloseButton from '../../widgets/Dialog/DialogCloseButton';
 import WalletRecoveryInstructions from './WalletRecoveryInstructions';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletBackupPrivacyWarningDialog.scss';

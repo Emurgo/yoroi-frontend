@@ -7,7 +7,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import DialogCloseButton from '../widgets/DialogCloseButton';
+import DialogCloseButton from '../widgets/Dialog/DialogCloseButton';
 import NumericInputRP from '../common/NumericInputRP';
 import globalMessages from '../../i18n/global-messages';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
@@ -23,7 +23,7 @@ import BigNumber from 'bignumber.js';
 
 import styles from './URIGenerateDialog.scss';
 // import ThemedDialog from '../widgets/ThemedDialog';
-import Dialog from '../widgets/Dialog';
+import Dialog from '../widgets/Dialog/Dialog';
 
 const messages = defineMessages({
   uriGenerateDialogTitle: {

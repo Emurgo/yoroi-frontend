@@ -6,8 +6,8 @@ import { observer } from 'mobx-react';
 import { Button } from '@mui/material';
 import { defineMessages, intlShape } from 'react-intl';
 
-import Dialog from '../widgets/Dialog';
-import DialogCloseButton from '../widgets/DialogCloseButton';
+import Dialog from '../widgets/Dialog/Dialog';
+import DialogCloseButton from '../widgets/Dialog/DialogCloseButton';
 import { ReactComponent as PerformTxImg }  from '../../assets/images/uri/perform-tx-uri.inline.svg';
 
 import styles from './URILandingDialog.scss';

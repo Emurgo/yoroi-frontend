@@ -1,7 +1,7 @@
 // @flow
 import type { Node } from 'react';
 import { alpha, Modal } from '@mui/material';
-import { ModalContainer } from '../widgets/Dialog';
+import { ModalContainer } from '../widgets/Dialog/Dialog';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 
 type Props = {|

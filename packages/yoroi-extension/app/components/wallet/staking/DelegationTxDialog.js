@@ -11,8 +11,8 @@ import classnames from 'classnames';
 import { AmountInput } from '../../common/NumericInputRP';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
-import Dialog from '../../widgets/Dialog';
-import DialogCloseButton from '../../widgets/DialogCloseButton';
+import Dialog from '../../widgets/Dialog/Dialog';
+import DialogCloseButton from '../../widgets/Dialog/DialogCloseButton';
 import globalMessages from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './DelegationTxDialog.scss';
@@ -281,7 +281,7 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
         {this.props.staleTx && staleTxWarning}
         <Box
           sx={{
-            background: theme => theme.palette.gradients['blue-green-banner'],
+            background: theme => theme.palette.gradients.bg_gradient_1,
             mb: '24px',
             p: '12px 16px 8px 16px',
             borderRadius: '8px',
@@ -336,7 +336,8 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
             {intl.formatMessage(globalMessages.stakePoolHash)}
           </Typography>
           <Box>
-            <Typography component="div"
+            <Typography
+              component="div"
               variant="body1"
               sx={{ '& > div > p': { p: '2px 3px' }, px: '2px', ml: '-3px', mt: '-2px' }}
             >

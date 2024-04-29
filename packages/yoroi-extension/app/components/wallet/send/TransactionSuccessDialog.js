@@ -5,9 +5,9 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import Dialog from '../../widgets/Dialog';
+import Dialog from '../../widgets/Dialog/Dialog';
 import { Stack, Typography } from '@mui/material';
-import DialogCloseButton from '../../widgets/DialogCloseButton';
+import DialogCloseButton from '../../widgets/Dialog/DialogCloseButton';
 import { ReactComponent as SuccessImg } from '../../../assets/images/transfer-success.inline.svg';
 import globalMessages from '../../../i18n/global-messages';
 

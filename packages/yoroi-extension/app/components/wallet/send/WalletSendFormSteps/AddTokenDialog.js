@@ -26,7 +26,7 @@ import { ReactComponent as ArrowsListFromTop } from '../../../../assets/images/a
 import { ReactComponent as ArrowsList } from '../../../../assets/images/assets-page/arrows-list.inline.svg';
 import { ReactComponent as NoItemsFoundImg } from '../../../../assets/images/assets-page/no-tokens.inline.svg';
 import { ampli } from '../../../../../ampli/index';
-import Dialog from '../../../widgets/Dialog';
+import Dialog from '../../../widgets/Dialog/Dialog';
 import styles from './AddTokenDialog.scss';
 import SingleTokenRow from './SingleTokenRow';
 import BigNumber from 'bignumber.js';

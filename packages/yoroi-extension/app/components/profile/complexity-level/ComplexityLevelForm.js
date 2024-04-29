@@ -170,7 +170,7 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
                     border: 'solid 1px transparent',
                     background: theme =>
                       isSelected
-                        ? theme.palette.gradients['bg-gradient-2']
+                        ? theme.palette.gradients.bg_gradient_2
                         : 'linear-gradient( 0deg, var(--yoroi-palette-common-white), var(--yoroi-palette-common-white)), linear-gradient(180deg, #e4e8f7 0%, #c6f7f7 100%)',
                     backgroundClip: 'content-box, border-box',
                     backgroundOrigin: 'border-box',
@@ -186,7 +186,7 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
                       right: '0px',
                       left: '0px',
                       bottom: '0px',
-                      background: theme => theme.palette.gradients['blue-green-bg'],
+                      background: theme => theme.palette.gradients.bg_gradient_1,
                       borderRadius: '8px',
                       zIndex: -1,
                       opacity: 0,

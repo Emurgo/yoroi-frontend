@@ -3,11 +3,11 @@
 import { observer } from 'mobx-react';
 import { Component } from 'react';
 import type { Node } from 'react';
-import DialogCloseButton from '../widgets/DialogCloseButton';
+import DialogCloseButton from '../widgets/Dialog/DialogCloseButton';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 import { Box, Typography } from '@mui/material';
 import { ReactComponent as SuccessImg } from '../../assets/images/transfer-success.inline.svg';
-import Dialog from '../widgets/Dialog';
+import Dialog from '../widgets/Dialog/Dialog';
 
 type Props = {|
   +title: string,

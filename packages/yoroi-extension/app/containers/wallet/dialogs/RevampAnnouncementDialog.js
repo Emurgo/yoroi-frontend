@@ -2,11 +2,11 @@
 
 import { Component } from 'react';
 import type { Node } from 'react';
-import Dialog from '../../../components/widgets/Dialog';
+import Dialog from '../../../components/widgets/Dialog/Dialog';
 import { defineMessages, intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
 import { ReactComponent as NewThemeIllustration } from '../../../assets/images/new-theme-illustration.inline.svg';
-import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
+import DialogCloseButton from '../../../components/widgets/Dialog/DialogCloseButton';
 import styles from './RevampAnnouncementDialog.scss';
 import { Box, Stack, Typography } from '@mui/material';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';

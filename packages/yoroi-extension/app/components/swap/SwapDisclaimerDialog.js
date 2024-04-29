@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import { useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
-import Dialog from '../widgets/Dialog';
+import Dialog from '../widgets/Dialog/Dialog';
 import CheckboxLabel from '../common/CheckboxLabel';
 
 type Props = {|

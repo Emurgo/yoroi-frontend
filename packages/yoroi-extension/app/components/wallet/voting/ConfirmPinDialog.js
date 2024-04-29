@@ -9,9 +9,9 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import globalMessages from '../../../i18n/global-messages';
 
-import Dialog from '../../widgets/Dialog';
-import DialogCloseButton from '../../widgets/DialogCloseButton';
-import DialogBackButton from '../../widgets/DialogBackButton';
+import Dialog from '../../widgets/Dialog/Dialog';
+import DialogCloseButton from '../../widgets/Dialog/DialogCloseButton';
+import DialogBackButton from '../../widgets/Dialog/DialogBackButton';
 import ProgressStepBlock from './ProgressStepBlock';
 import { ProgressInfo } from '../../../stores/ada/VotingStore';
 import PinInput from '../../widgets/forms/PinInput';

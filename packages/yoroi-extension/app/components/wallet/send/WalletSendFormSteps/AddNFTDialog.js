@@ -20,7 +20,7 @@ import { isCardanoHaskell } from '../../../../api/ada/lib/storage/database/prepa
 import { Box } from '@mui/system';
 import { ampli } from '../../../../../ampli/index';
 import MinAda from './MinAda';
-import Dialog from '../../../widgets/Dialog';
+import Dialog from '../../../widgets/Dialog/Dialog';
 import styles from './AddNFTDialog.scss';
 import BigNumber from 'bignumber.js';
 import NFTImage from './NFTImage';

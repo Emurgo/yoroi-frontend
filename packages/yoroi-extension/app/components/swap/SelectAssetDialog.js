@@ -10,7 +10,7 @@ import { ReactComponent as ArrowBottomIcon } from '../../assets/images/revamp/ic
 import { truncateAddressShort } from '../../utils/formatters';
 import adaTokenImage from '../../containers/swap/mockAssets/ada.inline.svg';
 import defaultTokenImage from '../../assets/images/revamp/asset-default.inline.svg';
-import Dialog from '../widgets/Dialog';
+import Dialog from '../widgets/Dialog/Dialog';
 import Table from '../common/table/Table';
 import { urlResolveForIpfsAndCorsproxy } from '../../coreUtils';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';

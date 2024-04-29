@@ -49,7 +49,7 @@ const cyan = { '500': '#59B1F4', '100': '#112333' };
 const yellow = { '500': '#ECBA09', '100': '#31290E' };
 const orange = { '500': '#FAB357', '100': '#291802' };
 const magenta = {
-  main: '#FF1351',
+  main: '#FF7196',
   '700': '#9B1F40',
   '600': '#CF335B',
   '500': '#FF7196',
@@ -70,20 +70,20 @@ export const darkThemeBase = {
     static: staticColors,
     system,
     gradients: {
-      'bg-gradient-1':
+      bg_gradient_1:
         'linear-gradient(195.39deg, rgba(26, 227, 187, 0.26) 0.57%, rgba(75, 109, 222, 0.1) 41.65%, rgba(75, 109, 222, 0.16) 100%)',
-      'bg-gradient-2':
+      bg_gradient_2:
         'linear-gradient(205.51deg, rgba(11, 153, 125, 0.49) -10.43%, rgba(8, 194, 157, 0.08) 100%)',
-      'bg-gradient-3': 'linear-gradient(30.09deg, #244ABF 0%, #4760FF 176.73%)',
+      bg_gradient_3: 'linear-gradient(30.09deg, #244ABF 0%, #4760FF 176.73%)',
     },
-    background: { 'bg-color-low': grayscale.min, 'bg-color-medium': grayscale['100'] },
-    text: {
+    background: { bg_color_low: grayscale.min, bg_color_medium: grayscale['100'] },
+    uitext: {
       primary: {
         high: primary['700'],
         normal: primary['600'],
         low: primary['300'],
       },
-      'on-primary': staticColors.white,
+      on_primary: staticColors.white,
       gray: {
         max: grayscale.max,
         normal: grayscale['900'],
@@ -115,9 +115,9 @@ export const darkThemeBase = {
       },
     },
     special: {
-      overlay: alpha(grayscale['100'], 80),
-      'bg-sidebar-item': alpha(staticColors.black, 16),
-      'el-sidebar-item': alpha(staticColors.white, 48),
+      overlay: alpha(grayscale['100'], 0.8),
+      bg_sidebar_item: alpha(staticColors.black, 0.16),
+      el_sidebar_item: alpha(staticColors.white, 0.48),
     },
   },
   shape: {

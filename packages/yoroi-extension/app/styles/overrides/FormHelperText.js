@@ -6,7 +6,7 @@ const FormHelperText = {
       color: theme.palette.grayscale[600],
       fontSize: '0.75rem',
       '&.Mui-disabled': { color: theme.palette.grayscale[200] },
-      '&.Mui-error': { color: theme.palette.magenta[500] },
+      '&.Mui-error': { color: theme.palette.system.magenta[500] },
     }),
   },
   defaultProps: { variant: 'outlined' },

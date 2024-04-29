@@ -4,8 +4,8 @@ import type { Node } from 'react';
 import { defineMessages, intlShape, FormattedMessage, FormattedHTMLMessage } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
-import Dialog from '../../widgets/Dialog';
-import DialogCloseButton from '../../widgets/DialogCloseButton';
+import Dialog from '../../widgets/Dialog/Dialog';
+import DialogCloseButton from '../../widgets/Dialog/DialogCloseButton';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import styles from './BaseWarningDialog.scss';
