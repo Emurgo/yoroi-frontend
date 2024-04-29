@@ -35,16 +35,24 @@ export const CreateSwapOrder = ({
   priceImpactState,
 }: Props): React$Node => {
   const [openedDialog, setOpenedDialog] = useState('');
+  const [prevSelectedPoolId, setPrevSelectedPoolId] = useState<?string>(undefined);
 
   const {
     orderData: {
       amounts: { sell, buy },
       type: orderType,
+      selectedPoolCalculation,
     },
     // unsignedTxChanged,
     sellTokenInfoChanged,
     buyTokenInfoChanged,
   } = useSwap();
+
+  const selectedPoolId = selectedPoolCalculation?.pool.poolId;
+  if (selectedPoolId !== prevSelectedPoolId) {
+    setPrevSelectedPoolId(selectedPoolId);
+    swapStore.resetLimitOrderDisplayValue();
+  }
 
   useAsyncPools(sell.tokenId, buy.tokenId)
     .then(() => null)
