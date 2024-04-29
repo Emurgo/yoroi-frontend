@@ -48,10 +48,12 @@ export const CreateSwapOrder = ({
     buyTokenInfoChanged,
   } = useSwap();
 
-  const selectedPoolId = selectedPoolCalculation?.pool.poolId;
-  if (selectedPoolId !== prevSelectedPoolId) {
-    setPrevSelectedPoolId(selectedPoolId);
-    swapStore.resetLimitOrderDisplayValue();
+  if (orderType === 'market') {
+    const selectedPoolId = selectedPoolCalculation?.pool.poolId;
+    if (selectedPoolId !== prevSelectedPoolId) {
+      setPrevSelectedPoolId(selectedPoolId);
+      swapStore.resetLimitOrderDisplayValue();
+    }
   }
 
   useAsyncPools(sell.tokenId, buy.tokenId)
