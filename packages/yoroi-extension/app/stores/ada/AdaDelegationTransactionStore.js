@@ -94,7 +94,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     wallet: WalletState,
     poolRequest: string | void,
   |}) => Promise<void> = async request => {
-    const fullConfig = getCardanoHaskellBaseConfig(getNetworkById(wallet.networkId));
+    const fullConfig = getCardanoHaskellBaseConfig(getNetworkById(request.wallet.networkId));
     const timeToSlot = await genTimeToSlot(fullConfig);
     const absSlotNumber = new BigNumber(
       timeToSlot({
@@ -107,7 +107,11 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
       wallet: request.wallet,
       poolRequest: request.poolRequest,
       registrationStatus: this.stores.delegation.isStakeRegistered(request.wallet.publicDeriverId) === true,
-      valueInAccount: this.stores.delegation.getRewardBalanceOrZero(request.wallet.publicDeriverId),
+      valueInAccount: this.stores.delegation.getRewardBalanceOrZero(
+        request.wallet.publicDeriverId,
+        request.wallet.networkId,
+        request.wallet.defaultTokenId
+      ),
       absSlotNumber,
     }).promise;
     if (delegationTxPromise == null) {
@@ -142,8 +146,8 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
         absSlotNumber,
         withdrawals: [
           {
-            addressing: wallet.stakingKeyPath,
-            rewardAddress: wallet.stakingAddress,
+            addressing: request.wallet.stakingAddressing.addressing,
+            rewardAddress: request.wallet.stakingAddress,
             shouldDeregister: this.shouldDeregister,
           },
         ],
@@ -163,24 +167,32 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     if (result == null) {
       throw new Error(`${nameof(this._signTransaction)} no tx to broadcast`);
     }
-    if (walletType === 'ledger') {
+    if (request.wallet.type === 'ledger') {
       await this.stores.substores.ada.wallets.adaSendAndRefresh({
         broadcastRequest: {
           ledger: {
             signRequest: result.signTxRequest,
             publicDeriverId: request.wallet.publicDeriverId,
+            stakingAddressing: request.wallet.stakingAddressing,
+            networkId: request.wallet.networkId,
+            publicKey: request.wallet.publicKey,
+            pathToPublic: request.wallet.pathToPublic,
           },
         },
         refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
       });
       return;
     }
-    if (walletType === 'trezor') {
+    if (request.wallet.type === 'trezor') {
       await this.stores.substores.ada.wallets.adaSendAndRefresh({
         broadcastRequest: {
           trezor: {
             signRequest: result.signTxRequest,
             publicDeriverId: request.wallet.publicDeriverId,
+            stakingAddressing: request.wallet.stakingAddressing,
+            publicKey: request.wallet.publicKey,
+            pathToPublic: request.wallet.pathToPublic,
+            networkId: request.wallet.networkId,
           },
         },
         refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),

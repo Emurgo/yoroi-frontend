@@ -23,6 +23,7 @@ import { getTokenName, genLookupOrFail } from '../../../stores/stateless/tokenHe
 import { truncateToken } from '../../../utils/formatters';
 import { generateGraphData } from '../../../utils/graph';
 import { maybe } from '../../../coreUtils';
+import type { WalletState } from '../../../../chrome/extension/background/types';
 
 @observer
 export default class StakingDashboardPage extends Component<StoresAndActionsProps> {
@@ -84,13 +85,15 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
         hasAnyPending={this.props.stores.transactions.hasAnyPending}
         stakePools={stakePools}
         userSummary={this._generateUserSummary({
-          publicDeriver.publicDeriverId,
-          publicDeriver.networkId,
+          publicDeriverId: publicDeriver.publicDeriverId,
+          networkId: publicDeriver.networkId,
+          defaultTokenId: publicDeriver.defaultTokenId,
           showRewardAmount,
         })}
         graphData={generateGraphData({
           delegationRequests,
-          publicDeriver.publicDeriverId,
+          networkId: publicDeriver.networkId,
+          defaultTokenId: publicDeriver.defaultTokenId,
           currentEpoch: this.props.stores.substores.ada.time.getCurrentTimeRequests(
             publicDeriver.publicDeriverId
           ).currentEpoch,
@@ -289,15 +292,24 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
   _generateUserSummary: ({|
     publicDeriverId: number,
     networkId: number,
+    defaultTokenId: string,
     showRewardAmount: boolean,
   |}) => Node = request => {
 
-    const { publicDeriverId, networkId, showRewardAmount } = request;
+    const { publicDeriverId, networkId, defaultTokenId, showRewardAmount } = request;
     const { stores } = this.props;
 
     const balance = this.props.stores.transactions.balance;
-    const mangledAmounts = stores.delegation.getMangledAmountsOrZero(publicDeriverId);
-    const rewardBalance = this.props.stores.delegation.getRewardBalanceOrZero(publicDeriverId);
+    const mangledAmounts = stores.delegation.getMangledAmountsOrZero(
+      publicDeriverId,
+      networkId,
+      defaultTokenId
+    );
+    const rewardBalance = this.props.stores.delegation.getRewardBalanceOrZero(
+      publicDeriverId,
+      networkId,
+      defaultTokenId
+    );
 
     const stakeRegistered =
       this.props.stores.delegation.isStakeRegistered(publicDeriverId) === true;

@@ -10,15 +10,9 @@ import {
 } from '../../utils/logging';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import {
-  PublicDeriver,
-} from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import {
-  asGetStakingKey,
-} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import {
   getDelegatedBalance,
 } from '../../api/ada/lib/storage/bridge/delegationUtils';
-import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { MangledAmountFunc } from '../stateless/mangledAddresses';
 import { getUnmangleAmounts } from '../stateless/mangledAddresses';
@@ -30,16 +24,17 @@ import { entriesIntoMap } from '../../coreUtils';
 import type { PoolInfo } from '@emurgo/yoroi-lib';
 import type { PoolInfoResponse, RemotePool } from '../../api/ada/lib/state-fetch/types';
 import type { GetDelegatedBalanceFunc, RewardHistoryFunc } from '../../api/ada/lib/storage/bridge/delegationUtils';
+import type { WalletState } from '../../../chrome/extension/background/types';
 
 export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
 
   _recalculateDelegationInfoDisposer: Array<void => void> = [];
 
-  @action addObservedWallet: PublicDeriver<> => void = (
-    publicDeriver
+  @action addObservedWallet: (number, number, string) => void = (
+    publicDeriverId, networkId, defaultTokenId,
   ) => {
     this.stores.delegation.delegationRequests.push({
-      publicDeriver,
+      publicDeriverId,
       mangledAmounts: new CachedRequest<MangledAmountFunc>(getUnmangleAmounts),
       getDelegatedBalance: new CachedRequest<GetDelegatedBalanceFunc>(getDelegatedBalance),
       rewardHistory: new CachedRequest<RewardHistoryFunc>(async (address) => {
@@ -47,11 +42,14 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
         // by the time this constructor is called
         const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
         const historyResult = await stateFetcher.getRewardHistory({
-          network: publicDeriver.getParent().getNetworkInfo(),
+          network: getNetworkById(networkId),
           addresses: [address],
         });
 
-        const defaultToken = publicDeriver.getParent().getDefaultToken();
+        const defaultToken = {
+          defaultNetworkId: networkId,
+          defaultIdentifier: defaultTokenId,
+        };
         const addressRewards = historyResult[address]
           ?.sort((a,b) => a.epoch - b.epoch)
           .map(info => (
@@ -79,41 +77,33 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
     this._startWatch();
   }
 
-  refreshDelegation: PublicDeriver<> => Promise<void> = async (
-    publicDeriver
-  ) => {
-    const delegationRequest = this.stores.delegation.getDelegationRequests(publicDeriver);
+  refreshDelegation: (WalletState) => Promise<void> = async (wallet) => {
+    const delegationRequest = this.stores.delegation.getDelegationRequests(wallet.publicDeriverId);
     if (delegationRequest == null) return;
 
     try {
-      await delegationRequest.mangledAmounts.execute({
-        publicDeriver,
-      }).promise;
+      await delegationRequest.mangledAmounts.execute({ wallet }).promise;
 
       runInAction(() => {
         delegationRequest.error = undefined;
       });
 
-      const defaultToken = publicDeriver.getParent().getDefaultToken();
-
-      const withStakingKey = asGetStakingKey(publicDeriver);
-      if (withStakingKey == null) {
-        throw new Error(`${nameof(this.refreshDelegation)} missing staking key functionality`);
-      }
-
-      const stakingKeyResp = await withStakingKey.getStakingKey();
+      const defaultToken = {
+        defaultNetworkId: wallet.networkId,
+        defaultIdentifier: wallet.defaultTokenId,
+      };
 
       const accountStateCalcs = (async () => {
         try {
           const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
           const accountStateResp = await stateFetcher.getAccountState({
-            network: publicDeriver.getParent().getNetworkInfo(),
-            addresses: [stakingKeyResp.addr.Hash],
+            network: getNetworkById(wallet.publicDeriverId),
+            addresses: [wallet.stakingAddress],
           });
-          const stateForStakingKey = accountStateResp[stakingKeyResp.addr.Hash];
+          const stateForStakingKey = accountStateResp[wallet.stakingAddress];
           const delegatedPoolId = stateForStakingKey?.delegation;
           const delegatedBalance = delegationRequest.getDelegatedBalance.execute({
-            publicDeriver: withStakingKey,
+            wallet,
             rewardBalance: new MultiToken(
               [{
                 amount: new BigNumber(stateForStakingKey?.remainingAmount ?? 0),
@@ -122,7 +112,7 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
               }],
               defaultToken
             ),
-            stakingAddress: stakingKeyResp.addr.Hash,
+            stakingAddress: wallet.stakingAddress,
             delegation: delegatedPoolId ?? null,
             allRewards: stateForStakingKey?.rewards ?? null,
             stakeRegistered: stateForStakingKey?.stakeRegistered,
@@ -131,7 +121,7 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
 
           const updatePool = delegatedPoolId != null ?
             this.updatePoolInfo({
-              network: publicDeriver.getParent().getNetworkInfo(),
+              network: getNetworkById(wallet.networkId),
               allPoolIds: [delegatedPoolId],
             }) : Promise.resolve();
 
@@ -147,7 +137,7 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
       })();
 
       const rewardHistory = delegationRequest.rewardHistory.execute(
-        stakingKeyResp.addr.Hash
+        wallet.stakingAddress
       ).promise;
 
       await Promise.all([
@@ -211,12 +201,7 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
       }
       const selected = this.stores.wallets.selected;
       if (selected == null) return;
-      if (!isCardanoHaskell(selected.getParent().getNetworkInfo())) {
-        return;
-      }
-      if (asGetStakingKey(selected) != null) {
-        await this.refreshDelegation(selected);
-      }
+      await this.refreshDelegation(selected);
     };
     this._recalculateDelegationInfoDisposer.push(reaction(
       () => [

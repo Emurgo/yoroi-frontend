@@ -4,6 +4,7 @@ import { schema } from 'lovefield';
 import { loadLovefieldDBFromDump } from './ada/lib/storage/database';
 import type { lf$Database, } from 'lovefield';
 import type { WalletState } from '../../chrome/extension/background/types';
+import { HaskellShelleyTxSignRequest } from './ada/transactions/shelley/HaskellShelleyTxSignRequest';
 
 /*::
 declare var chrome;
@@ -63,5 +64,74 @@ export async function createHardwareWallet(request: CreateHardwareWalletRequest)
   return await callBackground({
     type: 'create-hardware-wallet',
     request,
+  });
+}
+
+/*
+export async function getBalance(publicDeriverId: number): Promise<MultiToken> {
+  return await callBackground({
+    type: 'get-balance',
+    request: { publicDeriverId },
+  });
+}
+*/
+
+// todo: notify all tabs
+// WalletSettingsStore.js
+export async function removeWalletFromDb(request: {| publicDeriverId: number |}): Promise<void> {
+  await callBackground({
+    type: 'remove-wallet',
+    request,
+  });
+}
+
+type ChangeSigningKeyPasswordType = {|
+  publicDeriverId: number,
+  oldPassword: string,
+  newPassword: string,
+|};
+export async function changeSigningKeyPassword(request: ChangeSigningKeyPasswordType): Promise<void> {
+  await callBackground({
+    type: 'change-signing-password',
+    request,
+  });
+}
+
+export async function renamePublicDeriver(request: {| publicDeriverId: number, newName: string |}): Promise<void> {
+  await callBackground({
+    type: 'rename-public-deriver',
+    request,
+  });
+}
+
+export async function renameConceptualWallet(
+  request: {| conceptualWalletId: number, newName: string |}
+): Promise<void> {
+  await callBackground({
+    type: 'rename-conceputal-wallet',
+    request,
+  });
+}
+
+// AdaMnemonicSendStore.signAndBroadcast
+export async function signAndBroadcast(
+  request: {|
+    signRequest: HaskellShelleyTxSignRequest,
+    password: string,
+    publicDeriverId: number,
+  |}
+): Promise<{| txId: string |}> {
+  return await callBackground({
+    type: 'sign-and-broadcast',
+    request,
+  });
+}
+
+export async function getPrivateStakingKey(
+  request: {| publicDeriverId: number, password: string |}
+): Promise<string> {
+  return await callBackground({
+    type: 'get-private-staking-key',
+    request
   });
 }

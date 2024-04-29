@@ -21,13 +21,12 @@ import { HWConnectStoreTypes, HWDeviceInfo, ProgressInfo, ProgressStep } from '.
 import { StepState } from '../../components/widgets/ProgressSteps';
 
 import { Logger, stringifyError } from '../../utils/logging';
-
-import type { CreateHardwareWalletFunc, CreateHardwareWalletRequest, } from '../../api/ada';
 import { CoinTypes, HARD_DERIVATION_START, WalletTypePurpose, } from '../../config/numbersConfig';
 import { Bip44DerivationLevels, } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { createHardwareWallet } from '../../api/thunk';
+import type { CreateHardwareWalletRequest } from '../../api/thunk';
 import type { WalletState } from '../../../chrome/extension/background/types';
 
 type TrezorConnectionResponse = {|
@@ -324,7 +323,6 @@ export default class TrezorConnectStore
       }
       this._goToSaveError();
     } finally {
-      this.createHWRequest.reset();
       this._setIsCreateHWActive(false);
     }
   };
@@ -372,11 +370,11 @@ export default class TrezorConnectStore
     this.actions.dialogs.closeActiveDialog.trigger();
 
     await this.stores.wallets.addHwWallet(wallet);
-    this.actions.wallets.setActiveWallet.trigger({ wallet });
+    this.actions.wallets.setActiveWallet.trigger({ publicDeriverId: wallet.publicDeriverId });
     this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
 
     // show success notification
-    wallets.showTrezorTWalletIntegratedNotification();
+    this.stores.wallets.showTrezorTWalletIntegratedNotification();
 
     this.teardown();
     Logger.info('SUCCESS: Trezor Connected Wallet created and loaded');

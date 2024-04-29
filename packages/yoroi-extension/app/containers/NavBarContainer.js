@@ -55,7 +55,11 @@ export default class NavBarContainer extends Component<Props> {
 
     const walletComponents = wallets.map(wallet => {
       const balance: ?MultiToken = this.props.stores.transactions.getBalance(wallet.publicDeriverId);
-      const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(wallet.publicDeriverId);
+      const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(
+        wallet.publicDeriverId,
+        wallet.networkId,
+        wallet.defaultTokenId,
+      );
       const lastSyncInfo = this.props.stores.transactions.lastSyncInfo;
 
       return (
@@ -101,8 +105,12 @@ export default class NavBarContainer extends Component<Props> {
           return <NoWalletsDropdown />;
         }
 
-        const balance: ?MultiToken = this.props.stores.transactions.getBalance(publicDeriver);
-        const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(publicDeriver);
+        const balance: ?MultiToken = this.props.stores.transactions.getBalance(publicDeriver.publicDeriverId);
+        const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(
+          publicDeriver.publicDeriverId,
+          publicDeriver.networkId,
+          publicDeriver.defaultTokenId
+        );
 
         return (
           <NavWalletDetails

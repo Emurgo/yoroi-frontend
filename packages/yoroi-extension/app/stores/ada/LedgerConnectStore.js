@@ -11,9 +11,6 @@ import Config from '../../config';
 import Store from '../base/Store';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import { ROUTES } from '../../routes-config';
-
-import type { CreateHardwareWalletFunc, CreateHardwareWalletRequest, } from '../../api/ada';
-
 import { convertToLocalizableError } from '../../domain/LedgerLocalizedError';
 
 // This is actually just an interface
@@ -33,6 +30,7 @@ import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import type { GetExtendedPublicKeyResponse, } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { createHardwareWallet } from '../../api/thunk';
+import type { CreateHardwareWalletRequest } from '../../api/thunk';
 import type { WalletState } from '../../../chrome/extension/background/types';
 
 export default class LedgerConnectStore
@@ -417,7 +415,7 @@ export default class LedgerConnectStore
     }
 
     await this.stores.wallets.addHwWallet(wallet);
-    this.actions.wallets.setActiveWallet.trigger({ wallet });
+    this.actions.wallets.setActiveWallet.trigger({ publicDeriverId: wallet.publicDeriverId });
     if (this.stores.substores.ada.yoroiTransfer.transferRequest.result == null) {
       this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
 

@@ -146,7 +146,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
     if (currentPool == null) return null;
 
     const network = getNetworkById(publicDeriver.networkId);
-    const meta = this.props.stores.delegation.getLocalPoolInfo(network, String(currentPool));
+    const meta = this.props.stores.delegation.getLocalPoolInfo(publicDeriver.networkId, String(currentPool));
     if (meta == null) {
       // server hasn't returned information about the stake pool yet
       return null;

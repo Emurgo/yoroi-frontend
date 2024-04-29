@@ -9,6 +9,7 @@ import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { HARD_DERIVATION_START } from '../../config/numbersConfig';
 import { createWallet } from '../../api/thunk';
+import type { Addressing } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
   // REQUESTS
@@ -41,12 +42,20 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
           trezor: {|
             publicDeriverId: number,
             signRequest: HaskellShelleyTxSignRequest,
+            publicKey: string,
+            pathToPublic: Array<number>,
+            stakingAddressing: Addressing,
+            networkId: number,
           |},
         |}
       | {|
           ledger: {|
             publicDeriverId: number,
             signRequest: HaskellShelleyTxSignRequest,
+            stakingAddressing: Addressing,
+            publicKey: string,
+            pathToPublic: Array<number>,
+            networkId: number,
           |},
         |},
     refreshWallet: () => Promise<void>,
@@ -56,12 +65,19 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
         return await this.stores.substores.ada.ledgerSend.signAndBroadcastFromWallet({
           params: { signRequest: request.broadcastRequest.ledger.signRequest },
           publicDeriverId: request.broadcastRequest.ledger.publicDeriverId,
+          publicKey: request.broadcastRequest.ledger.publicKey,
+          pathToPublic: request.broadcastRequest.ledger.pathToPublic,
+          networkId: request.broadcastRequest.ledger.networkId,
         });
       }
       if (request.broadcastRequest.trezor) {
         return await this.stores.substores.ada.trezorSend.signAndBroadcast({
           params: { signRequest: request.broadcastRequest.trezor.signRequest },
           publicDeriverId: request.broadcastRequest.trezor.publicDeriverId,
+          publicKey: request.broadcastRequest.trezor.publicKey,
+          pathToPublic: request.broadcastRequest.trezor.pathToPublic,
+          stakingAddressing: request.broadcastRequest.trezor.stakingAddressing,
+          networkId: request.broadcastRequest.trezor.networkId,
         });
       }
       if (request.broadcastRequest.normal) {

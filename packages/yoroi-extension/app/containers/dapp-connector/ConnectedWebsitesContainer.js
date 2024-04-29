@@ -12,9 +12,6 @@ import type { LayoutComponentMap } from '../../styles/context/layout';
 import SidebarContainer from '../SidebarContainer';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import FullscreenLayout from '../../components/layout/FullscreenLayout';
-import type { ConceptualWalletSettingsCache } from '../../stores/toplevel/WalletSettingsStore';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
-import { asGetPublicKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import environment from '../../environment';
 import { ROUTES } from '../../routes-config';
 import type { WalletChecksum } from '@emurgo/cip4-js';
@@ -59,13 +56,6 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
     });
   };
 
-  getWalletInfo(
-    publicDeriverId: number
-  ): {| balance: null | MultiToken |} {
-    const balance = this.props.stores.transactions.getBalance(publicDeriverId);
-    return { balance };
-  }
-
   render(): Node {
     const { actions, stores } = this.props;
     const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
@@ -93,7 +83,6 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
               activeSites={this.props.stores.connector.activeSites.sites}
               getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
               shouldHideBalance={this.props.stores.profile.shouldHideBalance}
-              getWalletInfo={this.getWalletInfo.bind(this)}
             />
           </Suspense>
         </FullscreenLayout>

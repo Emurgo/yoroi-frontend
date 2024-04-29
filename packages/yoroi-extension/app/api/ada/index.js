@@ -138,7 +138,10 @@ import type {
   RestoreWalletResponse,
   SendTokenList,
 } from '../common/types';
-import { getCardanoHaskellBaseConfig, } from './lib/storage/database/prepackaged/networks';
+import {
+  getCardanoHaskellBaseConfig,
+  getNetworkById,
+} from './lib/storage/database/prepackaged/networks';
 import { toSenderUtxos, } from './transactions/transfer/utils';
 import type { DefaultTokenEntry } from '../common/lib/MultiToken';
 import { MultiToken } from '../common/lib/MultiToken';
@@ -152,6 +155,7 @@ import type { PersistedSubmittedTransaction } from '../localStorage';
 import type { ForeignUtxoFetcher } from '../../connector/stores/ConnectorStore';
 import type WalletTransaction from '../../domain/WalletTransaction';
 import { derivePrivateByAddressing, derivePublicByAddressing } from './lib/cardanoCrypto/deriveByAddressing';
+import type { WalletState } from '../../../chrome/extension/background/types';
 
 // ADA specific Request / Response params
 
@@ -342,10 +346,7 @@ export type CreateUnsignedTxForUtxosFunc = (
 // createDelegationTx
 
 export type CreateDelegationTxRequest = {|
-  publicDeriver: (
-    IPublicDeriver<ConceptualWallet & IHasLevels> &
-    IGetPublic & IGetAllUtxos & IHasUtxoChains & IGetStakingKey
-  ),
+ wallet: WalletState,
   absSlotNumber: BigNumber,
   registrationStatus: boolean,
   poolRequest: void | string,
@@ -353,7 +354,7 @@ export type CreateDelegationTxRequest = {|
 |};
 
 type CreateVotingRegTxRequestCommon = {|
-  publicDeriver: IPublicDeriver<ConceptualWallet> & IGetAllUtxos & IHasUtxoChains,
+  wallet: WalletState,
   absSlotNumber: BigNumber,
 |};
 
@@ -387,7 +388,7 @@ export type CreateVotingRegTxFunc = (
 // createWithdrawalTx
 
 export type CreateWithdrawalTxRequest = {|
-  publicDeriver: IPublicDeriver<ConceptualWallet> & IGetAllUtxos & IHasUtxoChains,
+  wallet: WalletState,
   absSlotNumber: BigNumber,
   getAccountState: AccountStateFunc,
   withdrawals: Array<{|
@@ -1314,8 +1315,8 @@ export default class AdaApi {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.createDelegationTx)} called`);
 
     try {
-      const { publicDeriver } = request;
-      const networkInfo = publicDeriver.getParent().getNetworkInfo();
+      const { wallet } = request;
+      const networkInfo = getNetworkById(wallet.networkId);
       const config = getCardanoHaskellBaseConfig(networkInfo)
         .reduce((acc, next) => Object.assign(acc, next), {});
 
@@ -1328,19 +1329,14 @@ export default class AdaApi {
         networkId: networkInfo.NetworkId,
       };
 
-      const publicKeyDbRow = await publicDeriver.getPublicKey();
-      if (publicKeyDbRow.IsEncrypted) {
-        throw new Error(`${nameof(AdaApi)}::${nameof(this.createDelegationTx)} public key is encrypted`);
-      }
       const publicKey = RustModule.WalletV4.Bip32PublicKey.from_bytes(
-        Buffer.from(publicKeyDbRow.Hash, 'hex')
+        Buffer.from(wallet.publicKey, 'hex')
       );
 
-      const stakingKeyDbRow = await publicDeriver.getStakingKey();
       const stakingKey = derivePublicByAddressing({
-        addressing: stakingKeyDbRow.addressing,
+        addressing: wallet.stakingAddressing.addressing,
         startingFrom: {
-          level: publicDeriver.getParent().getPublicDeriverLevel(),
+          level: wallet.publicDeriverLevel,
           key: publicKey,
         },
       }).to_raw_key();
@@ -1351,12 +1347,10 @@ export default class AdaApi {
         request.poolRequest
       );
 
-      const allUtxo = await publicDeriver.getAllUtxos();
+      const allUtxo = wallet.utxos;
       const addressedUtxo = asAddressedUtxo(allUtxo);
-      const changeAddr = await getReceiveAddress(publicDeriver);
-      if (changeAddr == null) {
-        throw new Error(`${nameof(this.createDelegationTx)} no internal addresses left. Should never happen`);
-      }
+      const changeAddr = await wallet.receiveAddress;
+
       const unsignedTx = await shelleyNewAdaUnsignedTx(
         [],
         {
@@ -1377,23 +1371,28 @@ export default class AdaApi {
         false,
       );
 
+      const defaultToken = {
+        defaultNetworkId: wallet.networkId,
+        defaultIdentifier: wallet.defaultTokenId,
+      };
+
       const utxoSum = allUtxosForKey.reduce(
-      (sum, utxo) => sum.joinAddMutable(new MultiToken(
-        utxo.output.tokens.map(token => ({
-          identifier: token.Token.Identifier,
-          amount: new BigNumber(token.TokenList.Amount),
-          networkId: token.Token.NetworkId,
-        })),
-        publicDeriver.getParent().getDefaultToken()
-      )),
-        publicDeriver.getParent().getDefaultMultiToken()
-    );
+        (sum, utxo) => sum.joinAddMutable(new MultiToken(
+          utxo.output.tokens.map(token => ({
+            identifier: token.Token.Identifier,
+            amount: new BigNumber(token.TokenList.Amount),
+            networkId: token.Token.NetworkId,
+          })),
+          defaultToken,
+        )),
+        new MultiToken([], defaultToken),
+      );
 
       const differenceAfterTx = getDifferenceAfterTx(
         unsignedTx,
         allUtxo,
         stakingKey,
-        publicDeriver.getParent().getDefaultToken(),
+        defaultToken,
       );
 
       const totalAmountToDelegate = utxoSum
@@ -1440,8 +1439,9 @@ export default class AdaApi {
   ): Promise<CreateWithdrawalTxResponse> {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} called`);
     try {
+      const network = getNetworkById(request.wallet.networkId);
       const config = getCardanoHaskellBaseConfig(
-        request.publicDeriver.getParent().getNetworkInfo()
+        network,
       ).reduce((acc, next) => Object.assign(acc, next), {});
 
       const protocolParams = {
@@ -1450,16 +1450,13 @@ export default class AdaApi {
         linearFeeConstant: config.LinearFee.constant,
         coinsPerUtxoWord: config.CoinsPerUtxoWord,
         poolDeposit: config.PoolDeposit,
-        networkId: request.publicDeriver.getParent().networkInfo.NetworkId,
+        networkId: request.wallet.networkId,
       };
 
-      const utxos = await request.publicDeriver.getAllUtxos();
+      const utxos = request.wallet.utxos;
       const addressedUtxo = asAddressedUtxo(utxos);
 
-      const changeAddr = await getReceiveAddress(request.publicDeriver);
-      if (changeAddr == null) {
-        throw new Error(`${nameof(this.createWithdrawalTx)} no internal addresses left. Should never happen`);
-      }
+      const changeAddr = request.wallet.receiveAddress;
 
       const certificates = [];
       const neededKeys = {
@@ -1489,7 +1486,7 @@ export default class AdaApi {
         }
       }
       const accountStates = await request.getAccountState({
-        network: request.publicDeriver.getParent().getNetworkInfo(),
+        network,
         addresses: request.withdrawals.map(withdrawal => withdrawal.rewardAddress)
       });
       const finalWithdrawals = Object.keys(accountStates).reduce(
@@ -1581,7 +1578,7 @@ export default class AdaApi {
           ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
           KeyDeposit: new BigNumber(config.KeyDeposit),
           PoolDeposit: new BigNumber(config.PoolDeposit),
-          NetworkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+          NetworkId: request.wallet.networkId,
         },
         neededStakingKeyHashes: neededKeys,
       });
@@ -1602,7 +1599,7 @@ export default class AdaApi {
 
     try {
       const config = getCardanoHaskellBaseConfig(
-        request.publicDeriver.getParent().getNetworkInfo()
+        getNetworkById(request.wallet.networkId)
       ).reduce((acc, next) => Object.assign(acc, next), {});
 
       const protocolParams = {
@@ -1611,12 +1608,12 @@ export default class AdaApi {
         linearFeeConstant: config.LinearFee.constant,
         coinsPerUtxoWord: config.CoinsPerUtxoWord,
         poolDeposit: config.PoolDeposit,
-        networkId: request.publicDeriver.getParent().networkInfo.NetworkId,
+        networkId: request.wallet.networkId,
       };
 
-      const allUtxo = await request.publicDeriver.getAllUtxos();
+      const allUtxo = await request.wallet.utxos;
       const addressedUtxo = asAddressedUtxo(allUtxo);
-      const changeAddr = await getReceiveAddress(request.publicDeriver);
+      const changeAddr = request.wallet.receiveAddress;
       if (changeAddr == null) {
         throw new Error(`${nameof(this.createVotingRegTx)} no internal addresses left. Should never happen`);
       }
@@ -1663,7 +1660,7 @@ export default class AdaApi {
           ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
           KeyDeposit: new BigNumber(config.KeyDeposit),
           PoolDeposit: new BigNumber(config.PoolDeposit),
-          NetworkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+          NetworkId: request.wallet.networkId,
         },
         neededStakingKeyHashes: {
           neededHashes: new Set(),

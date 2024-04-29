@@ -3,7 +3,6 @@
 import { action, observable, } from 'mobx';
 import { find } from 'lodash';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import { PublicDeriver, } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import Store from '../base/Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
@@ -22,7 +21,7 @@ import type {
 } from '../../api/ada/lib/storage/bridge/delegationUtils';
 
 export type DelegationRequests = {|
-  publicDeriver: PublicDeriver<>,
+  publicDeriverId: number,
   getDelegatedBalance: CachedRequest<GetDelegatedBalanceFunc>,
   rewardHistory: CachedRequest<RewardHistoryFunc>,
   mangledAmounts: CachedRequest<MangledAmountFunc>,
@@ -103,14 +102,14 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     this.selectedPage = 0;
   }
 
-  getDelegationRequests: PublicDeriver<> => void | DelegationRequests = (
-    publicDeriver
+  getDelegationRequests: number => void | DelegationRequests = (
+    publicDeriverId
   ) => {
-    return find(this.delegationRequests, { publicDeriver });
+    return find(this.delegationRequests, { publicDeriverId });
   }
 
-  _getDelegatedBalanceResult: PublicDeriver<> => ?GetDelegatedBalanceResponse = (publicDeriver) => {
-    const delegationRequest = this.getDelegationRequests(publicDeriver);
+  _getDelegatedBalanceResult: number => ?GetDelegatedBalanceResponse = (publicDeriverId) => {
+    const delegationRequest = this.getDelegationRequests(publicDeriverId);
     return delegationRequest?.getDelegatedBalance.result || null;
   }
 
@@ -119,66 +118,88 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     return this.getDelegationRequests(publicDeriverId) != null;
   }
 
-  canUnmangleSomeUtxo: PublicDeriver<> => boolean = (publicDeriver) => {
-    const canUnmangleAmount: ?MultiToken = this.getDelegationRequests(publicDeriver)
+  canUnmangleSomeUtxo: number => boolean = (publicDeriverId) => {
+    const canUnmangleAmount: ?MultiToken = this.getDelegationRequests(publicDeriverId)
       ?.mangledAmounts.result?.canUnmangle;
     return maybe(canUnmangleAmount, t => t.getDefault().gt(0)) ?? false;
   }
 
-  getMangledAmountsOrZero: PublicDeriver<> => MangledAmountsResponse = (publicDeriver) => {
-    const resp: ?MangledAmountsResponse = this.getDelegationRequests(publicDeriver)?.mangledAmounts.result;
+  getMangledAmountsOrZero: (number, number, string) => MangledAmountsResponse = (
+    publicDeriverId,
+    networkId,
+    defaultTokenId,
+  ) => {
+    const defaultMultiToken = new MultikToken(
+      [],
+      {
+        defaultNetworkId: networkId,
+        defaultIdentifier: defaultTokenId,
+      }
+    );
+    const resp: ?MangledAmountsResponse = this.getDelegationRequests(publicDeriverId)?.mangledAmounts.result;
     return {
-      canUnmangle: resp?.canUnmangle ?? publicDeriver.getParent().getDefaultMultiToken(),
-      cannotUnmangle: resp?.cannotUnmangle ?? publicDeriver.getParent().getDefaultMultiToken(),
+      canUnmangle: resp?.canUnmangle ?? defaultMultiToken,
+      cannotUnmangle: resp?.cannotUnmangle ?? defaultMultiToken,
     };
   }
 
-  hasRewardHistory: PublicDeriver<> => boolean = (publicDeriver) => {
-    return this.getDelegationRequests(publicDeriver)?.rewardHistory.result != null;
+  hasRewardHistory: number => boolean = (publicDeriverId) => {
+    return this.getDelegationRequests(publicDeriverId)?.rewardHistory.result != null;
   }
 
-  isExecutedDelegatedBalance: PublicDeriver<> => boolean = (publicDeriver) => {
-    return this.getDelegationRequests(publicDeriver)?.getDelegatedBalance.wasExecuted === true;
+  isExecutedDelegatedBalance: number => boolean = (publicDeriverId) => {
+    return this.getDelegationRequests(publicDeriverId)?.getDelegatedBalance.wasExecuted === true;
   }
 
-  getRewardBalanceOrZero: PublicDeriver<> => MultiToken = (publicDeriver) => {
-    if (this.stores.transactions.hasProcessedWithdrawals(publicDeriver)) {
+  getRewardBalanceOrZero: (number, number, string) => MultiToken = (
+    publicDeriverId,
+    networkId,
+    defaultTokenId,
+  ) => {
+    const defaultMultiToken = new MultikToken(
+      [],
+      {
+        defaultNetworkId: networkId,
+        defaultIdentifier: defaultTokenId,
+      }
+    );
+
+    if (this.stores.transactions.hasProcessedWithdrawals(publicDeriverId)) {
       // In case we have a processed withdrawal for the wallet
       // We cancel out any still present reward, in case it has not synced yet
-      return publicDeriver.getParent().getDefaultMultiToken();
+      return defaultMultiToken;
     }
-    return this._getDelegatedBalanceResult(publicDeriver)?.accountPart
-      ?? publicDeriver.getParent().getDefaultMultiToken();
+    return this._getDelegatedBalanceResult(publicDeriver)?.accountPart ?? fefaultMultiToken;
   }
 
-  getDelegatedUtxoBalance: PublicDeriver<> => ?MultiToken = (publicDeriver) => {
-    return this._getDelegatedBalanceResult(publicDeriver)?.utxoPart ?? null;
+  getDelegatedUtxoBalance: number => ?MultiToken = (publicDeriverId) => {
+    return this._getDelegatedBalanceResult(publicDeriverId)?.utxoPart ?? null;
   }
 
-  getDelegatedPoolId: PublicDeriver<> => ?string = (publicDeriver) => {
-    return this._getDelegatedBalanceResult(publicDeriver)?.delegation ?? null;
+  getDelegatedPoolId: number => ?string = (publicDeriverId) => {
+    return this._getDelegatedBalanceResult(publicDeriverId)?.delegation ?? null;
   }
 
-  isCurrentlyDelegating: PublicDeriver<> => boolean = (publicDeriver) => {
-    return this.getDelegatedPoolId(publicDeriver) != null;
+  isCurrentlyDelegating: number => boolean = (publicDeriverId) => {
+    return this.getDelegatedPoolId(publicDeriverId) != null;
   }
 
-  isStakeRegistered: PublicDeriver<> => ?boolean = (publicDeriver) => {
-    return this._getDelegatedBalanceResult(publicDeriver)?.stakeRegistered ?? null;
+  isStakeRegistered: number => ?boolean = (publicDeriverId) => {
+    return this._getDelegatedBalanceResult(publicDeriverId)?.stakeRegistered ?? null;
   }
 
   getLocalPoolInfo: (
-    $ReadOnly<NetworkRow>,
+    number,
     string,
-  ) => void | PoolMeta = (network, poolId) => {
-    return find(this.poolInfo, { networkId: network.NetworkId, poolId })?.poolInfo;
+  ) => void | PoolMeta = (networkId, poolId) => {
+    return find(this.poolInfo, { networkId, poolId })?.poolInfo;
   }
 
   getLocalRemotePoolInfo: (
-    $ReadOnly<NetworkRow>,
+    number,
     string,
-  ) => void | PoolInfo = (network, poolId) => {
-    return find(this.poolInfo, { networkId: network.NetworkId, poolId })?.poolRemoteInfo ?? undefined;
+  ) => void | PoolInfo = (networkId, poolId) => {
+    return find(this.poolInfo, { networkId, poolId })?.poolRemoteInfo ?? undefined;
   }
 
   @action.bound

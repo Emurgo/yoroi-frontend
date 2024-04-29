@@ -4,16 +4,10 @@ import BigNumber from 'bignumber.js';
 import {
   isCardanoHaskell,
   getCardanoHaskellBaseConfig,
+  getNetworkById,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { genFilterSmallUtxo } from '../../api/ada/transactions/shelley/transactions';
-import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import {
-  asGetAllUtxos, asGetStakingKey,
-} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import {
-  PublicDeriver,
-} from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { BASE_MANGLED } from './addressStores';
 import {
   unwrapStakingKey as CardanoUnwrapStakingKey,
@@ -25,9 +19,10 @@ import {
 import {
   MultiToken,
 } from '../../api/common/lib/MultiToken';
+import type { WalletState } from '../../../chrome/extension/background/types';
 
 export type MangledAmountsRequest = {|
-  publicDeriver: PublicDeriver<>,
+  wallet: WalletState,
 |};
 export type MangledAmountsResponse = {|
   canUnmangle: MultiToken,
@@ -42,28 +37,27 @@ export async function getUnmangleAmounts(
   const canUnmangle: Array<MultiToken> = [];
   const cannotUnmangle: Array<MultiToken> = [];
 
-  const defaultToken = request.publicDeriver.getParent().getDefaultToken();
+  const defaultToken = {
+    defaultNetworkId: request.wallet.networkId,
+    defaultIdentifier: request.wallet.defaultTokenId,
+  };
 
-  const withUtxos = asGetAllUtxos(request.publicDeriver);
-  if (withUtxos == null) {
+  if (request.wallet.utxos == null) {
     return {
       canUnmangle: new MultiToken([], defaultToken),
       cannotUnmangle: new MultiToken([], defaultToken),
     };
   }
-  const utxos = await withUtxos.getAllUtxos();
+  const utxos = request.wallet.utxos;
 
-  const withStakingKey = asGetStakingKey(request.publicDeriver);
-  if (withStakingKey == null) {
+  if (request.wallet.stakingAddress == null) {
     return {
       canUnmangle: new MultiToken([], defaultToken),
       cannotUnmangle: new MultiToken([], defaultToken),
     };
   }
 
-  const stakingKeyResp = await withStakingKey.getStakingKey();
-
-  const network = request.publicDeriver.getParent().getNetworkInfo();
+  const network = getNetworkById(request.wallet.networkId);
   if (isCardanoHaskell(network)) {
     const config = getCardanoHaskellBaseConfig(
       network
@@ -78,7 +72,7 @@ export async function getUnmangleAmounts(
       },
     });
 
-    const stakingKey = CardanoUnwrapStakingKey(stakingKeyResp.addr.Hash);
+    const stakingKey = CardanoUnwrapStakingKey(request.wallet.stakingAddress);
 
     for (const utxo of utxos) {
       // filter out addresses that contain your staking key
@@ -123,13 +117,14 @@ export async function getUnmangleAmounts(
 
 export function getMangledFilter(
   getAddresses: Class<any> => Set<string>,
-  publicDeriver: PublicDeriver<>,
+  networkId: number,
 ): (ElementOf<IGetAllUtxosResponse> => boolean) {
-  if (isCardanoHaskell(publicDeriver.getParent().getNetworkInfo())) {
+  const network = getNetworkById(networkId);
+  if (isCardanoHaskell(network)) {
     const relevantAddresses = getAddresses(BASE_MANGLED.class);
 
     const config = getCardanoHaskellBaseConfig(
-      publicDeriver.getParent().getNetworkInfo()
+      network,
     ).reduce((acc, next) => Object.assign(acc, next), {});
 
     const filter = genFilterSmallUtxo({
@@ -152,5 +147,5 @@ export function getMangledFilter(
     };
   }
 
-  throw new Error(`${nameof(getMangledFilter)} no unmangle support for network ${publicDeriver.getParent().getNetworkInfo().NetworkId}`);
+  throw new Error(`${nameof(getMangledFilter)} no unmangle support for network ${networkId}`);
 }

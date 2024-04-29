@@ -6,7 +6,6 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, intlShape } from 'react-intl';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { MultiToken, TokenLookupKey } from '../../../api/common/lib/MultiToken';
-import type { ConceptualWalletSettingsCache } from '../../../stores/toplevel/WalletSettingsStore';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { observer } from 'mobx-react';
 import { ReactComponent as NoDappsFoundImg } from '../../../assets/images/dapp-connector/no-dapps-connected.inline.svg';
@@ -27,7 +26,6 @@ type Props = {|
   +onRemoveWallet: ({| url: ?string, protocol: ?string |}) => void,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +shouldHideBalance: boolean,
-  +getWalletInfo: (number) => WalletInfo,
 |};
 
 type InjectedProps = {| isRevampLayout: boolean |};
@@ -103,8 +101,6 @@ class ConnectedWebsitesPage extends Component<AllProps> {
 
         if (wallet == null) return null;
 
-        const { balance } = this.props.getWalletInfo(wallet.publicDeriverId);
-
         return [
           <WalletRowRevamp
             key={url}
@@ -112,7 +108,7 @@ class ConnectedWebsitesPage extends Component<AllProps> {
             protocol={protocol}
             websiteIcon={image}
             onRemoveWallet={this.props.onRemoveWallet}
-            balance={balance}
+            balance={wallet.balance}
             plate={wallet.plate}
             shouldHideBalance={this.props.shouldHideBalance}
             getTokenInfo={this.props.getTokenInfo}
@@ -193,7 +189,7 @@ class ConnectedWebsitesPage extends Component<AllProps> {
         if (wallet == null) {
           return null;
         }
-        const { balance } = this.props.getWalletInfo(wallet.publicDeriverId);
+
         return (
           <WalletRow
             key={url}
@@ -202,7 +198,7 @@ class ConnectedWebsitesPage extends Component<AllProps> {
             websiteIcon={image}
             isActiveSite={this.props.activeSites.includes(url)}
             onRemoveWallet={this.props.onRemoveWallet}
-            balance={balance}
+            balance={wallet.balance}
             plate={wallet.plate}
             shouldHideBalance={this.props.shouldHideBalance}
             getTokenInfo={this.props.getTokenInfo}

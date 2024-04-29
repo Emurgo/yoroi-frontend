@@ -2,45 +2,32 @@
 import { action, observable, runInAction } from 'mobx';
 import type { Node } from 'react';
 import { find, } from 'lodash';
-import type { AssuranceMode, } from '../../types/transactionAssurance.types';
-import { PublicDeriver, } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import { ConceptualWallet, } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import Store from '../base/Store';
 import type { ChangeModelPasswordFunc, RemoveAllTransactionsFunc, RenameModelFunc } from '../../api/common';
 import Request from '../lib/LocalizedRequest';
-import { asGetSigningKey, asHasLevels, } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type { IConceptualWallet, } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import type { IPublicDeriver, } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import { removePublicDeriver } from '../../api/ada/lib/storage/bridge/walletBuilder/remove';
-import { groupForWallet, } from './WalletStore';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-
-export type PublicDeriverSettingsCache = {|
-  publicDeriver: PublicDeriver<>,
-  // todo: maybe should be a Request instead of just the result data
-  assuranceMode: AssuranceMode,
-  publicDeriverName: string,
-|};
-
-export type ConceptualWalletSettingsCache = {|
-  conceptualWallet: ConceptualWallet,
-  // todo: maybe should be a Request instead of just the result data
-  conceptualWalletName: string,
-|};
+import {
+  removeWalletFromDb,
+  changeSigningKeyPassword,
+  renamePublicDeriver,
+  renameConceptualWallet,
+} from '../../api/thunk';
 
 export type WarningList = {|
-  publicDeriver: PublicDeriver<>,
+  publicDeriverId: number,
   dialogs: Array<void => Node>,
 |};
 
 export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
 
-  @observable renameModelRequest: Request<RenameModelFunc>
-    = new Request<RenameModelFunc>(this.api.common.renameModel);
+  @observable renameModelRequest: Request<(() => Promise<void>) => Promise<void>>
+    = new Request(async (func) => { await func(); });
 
-  @observable changeSigningKeyRequest: Request<ChangeModelPasswordFunc>
-    = new Request<ChangeModelPasswordFunc>(this.api.common.changeModelPassword);
+  @observable changeSigningKeyRequest: Request<(() => Promise<void>) => Promise<void>>
+    = new Request(async (func) => { await func(); });
 
   @observable clearHistory: Request<RemoveAllTransactionsFunc>
     = new Request<RemoveAllTransactionsFunc>(async (req) => {
@@ -66,37 +53,17 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
       return promise;
     });
 
-  @observable removeWalletRequest: Request<typeof _removeWalletFromDb>
-    = new Request<typeof _removeWalletFromDb>(_removeWalletFromDb);
+  @observable removeWalletRequest: Request<typeof removeWalletFromDb>
+    = new Request<typeof removeWalletFromDb>(removeWalletFromDb);
 
   @observable walletFieldBeingEdited: string | null = null;
   @observable lastUpdatedWalletField: string | null = null;
 
-  @observable publicDeriverSettingsCache: Array<PublicDeriverSettingsCache> = [];
-  getPublicDeriverSettingsCache: PublicDeriver<> => PublicDeriverSettingsCache = (
-    publicDeriver
-  ) => {
-    const foundRequest = find(this.publicDeriverSettingsCache, { publicDeriver });
-    if (foundRequest) return foundRequest;
-
-    throw new Error(`${nameof(WalletSettingsStore)}::${nameof(this.getPublicDeriverSettingsCache)} no settings in cache`);
-  }
-
-  @observable conceptualWalletSettingsCache: Array<ConceptualWalletSettingsCache> = [];
-  getConceptualWalletSettingsCache: ConceptualWallet => ConceptualWalletSettingsCache = (
-    conceptualWallet
-  ) => {
-    const foundRequest = find(this.conceptualWalletSettingsCache, { conceptualWallet });
-    if (foundRequest) return foundRequest;
-
-    throw new Error(`${nameof(WalletSettingsStore)}::${nameof(this.conceptualWalletSettingsCache)} no settings in cache`);
-  }
-
   @observable walletWarnings: Array<WarningList> = [];
-  getWalletWarnings: PublicDeriver<> => WarningList = (
-    publicDeriver
+  getWalletWarnings: number => WarningList = (
+    publicDeriverId
   ) => {
-    const foundRequest = find(this.walletWarnings, { publicDeriver });
+    const foundRequest = find(this.walletWarnings, { publicDeriverId });
     if (foundRequest) return foundRequest;
 
     throw new Error(`${nameof(WalletSettingsStore)}::${nameof(this.getWalletWarnings)} no warning list found`);
@@ -134,87 +101,57 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
   };
 
   @action _changeSigningPassword: {|
-    publicDeriver: PublicDeriver<>,
+    publicDeriverId: number,
     oldPassword: string,
     newPassword: string
   |} => Promise<void> = async (request) => {
-    const withSigningKey = asGetSigningKey(request.publicDeriver);
-    if (withSigningKey == null) {
-      throw new Error(`${nameof(this._changeSigningPassword)} missing signing functionality`);
-    }
     const newUpdateDate = new Date(Date.now());
-    await this.changeSigningKeyRequest.execute({
-      func: withSigningKey.changeSigningKeyPassword,
-      request: {
-        currentTime: newUpdateDate,
-        oldPassword: request.oldPassword,
-        newPassword: request.newPassword,
-      },
+    await this.changeSigningKeyRequest.execute(async () => {
+      await changeSigningKeyPassword(request);
     });
     runInAction(() => {
-      this.stores.wallets.getSigningKeyCache(withSigningKey).signingKeyUpdateDate = newUpdateDate;
+      this.stores.wallets.getSigningKeyCache(publicDeriverId).signingKeyUpdateDate = newUpdateDate;
     });
     this.actions.dialogs.closeActiveDialog.trigger();
     this.changeSigningKeyRequest.reset();
   };
 
   @action _renamePublicDeriver: {|
-    publicDeriver: PublicDeriver<>,
+    publicDeriverId: number,
     newName: string
   |} => Promise<void> = async (request) => {
     // update the meta-parameters in the internal wallet representation
-    await this.renameModelRequest.execute({
-      func: request.publicDeriver.rename,
-      request: {
-        newName: request.newName,
-      },
-    }).promise;
-
-    const settingsCache = this.getPublicDeriverSettingsCache(request.publicDeriver);
-    runInAction(() => {
-      settingsCache.publicDeriverName = request.newName;
+    await this.renameModelRequest.execute(async () => {
+      await renamePublicDeriver(request);
     });
+    //fixme: update memory directly?
   };
 
   @action _renameConceptualWallet: {|
-    publicDeriver: PublicDeriver<>,
+    conceptualWalletId: number,
     newName: string
   |} => Promise<void> = async (request) => {
-    const conceptualWallet = request.publicDeriver.getParent();
     // update the meta-parameters in the internal wallet representation
-    await this.renameModelRequest.execute({
-      func: conceptualWallet.rename,
-      request: {
-        newName: request.newName,
-      },
-    }).promise;
-
-    const parent = request.publicDeriver.getParent();
-    const settingsCache = this.getConceptualWalletSettingsCache(parent);
-    runInAction(() => {
-      settingsCache.conceptualWalletName = request.newName;
+    await this.renameModelRequest.execute(async () => {
+      await renameConceptualWallet(request);
     });
+    //fixme: update memory directly?
   };
 
   @action _resyncHistory: {|
-    publicDeriver: PublicDeriver<>,
+    publicDeriverId: number,
   |} => Promise<void> = async (request) => {
     this.clearHistory.reset();
-    const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
-    if (withLevels == null) {
-      throw new Error(`${nameof(this._resyncHistory)} missing levels`);
-    }
     try {
       await this.clearHistory.execute({
-        publicDeriver: withLevels,
-        publicDeriverId: request.publicDeriver.publicDeriverId,
+        publicDeriverId: request.publicDeriverId,
         refreshWallet: () => {
           this.stores.transactions.clearCache(request.publicDeriver);
           // currently in the map the promise for this wallet is this resyncing process,
           // we need to remove it before calling refreshing otherwise it's a deadlock
           runInAction(() => {
             this.stores.transactions.ongoingRefreshing.delete(
-              request.publicDeriver.publicDeriverId,
+              request.publicDeriverId,
             );
           });
           // refresh
@@ -227,7 +164,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
       // is not affected
       runInAction(() => {
         this.stores.transactions.ongoingRefreshing.delete(
-          request.publicDeriver.publicDeriverId,
+          request.publicDeriverId,
         );
       });
     }
@@ -236,18 +173,10 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
   };
 
   @action _removeWallet: {|
-    publicDeriver: PublicDeriver<>,
+    publicDeriverId: number,
   |} => Promise<void> = async (request) => {
     this.removeWalletRequest.reset();
     this.actions.wallets.unselectWallet.trigger(); // deselect before deleting
-
-    const group = groupForWallet(
-      this.stores.wallets.grouped,
-      request.publicDeriver
-    );
-    if (group == null) {
-      throw new Error(`${nameof(this._removeWallet)} wallet doesn't belong to group`);
-    }
 
     // Remove this wallet from wallet sort list
     const walletsNavigation = this.stores.profile.walletsNavigation
@@ -255,7 +184,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
       ...walletsNavigation,
       // $FlowFixMe[invalid-computed-prop]
       'cardano': walletsNavigation.cardano.filter(
-        walletId => walletId !== request.publicDeriver.publicDeriverId)
+        walletId => walletId !== request.publicDeriverId)
     }
     await this.actions.profile.updateSortedWalletList.trigger(newWalletsNavigation);
 
@@ -263,7 +192,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     await this.actions.connector.getConnectorWhitelist.trigger();
     const connectorWhitelist = this.stores.connector.currentConnectorWhitelist;
     const connectedDapps = connectorWhitelist.filter(
-      dapp => dapp.publicDeriverId === request.publicDeriver.publicDeriverId
+      dapp => dapp.publicDeriverId === request.publicDeriverId
     );
 
     for (const dapp of connectedDapps) {
@@ -274,10 +203,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     }
 
     await this.removeWalletRequest.execute({
-      publicDeriver: request.publicDeriver,
-      conceptualWallet: group.publicDerivers.length === 1
-        ? group.conceptualWallet
-        : undefined
+      publicDeriverId: request.publicDeriverId,
     }).promise;
     // note: it's possible some other function was waiting for a DB lock
     //       and so it may fail if it runs now since underlying data was deleted
@@ -289,14 +215,4 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     //       but the chance is low and we need to release the DB lock to commit the deletion
     window.location.reload();
   };
-}
-
-async function _removeWalletFromDb(request: {|
-  publicDeriver: IPublicDeriver<>,
-  conceptualWallet: void | IConceptualWallet,
-|}): Promise<void> {
-  await removePublicDeriver({
-    publicDeriver: request.publicDeriver,
-    conceptualWallet: request.conceptualWallet,
-  });
 }

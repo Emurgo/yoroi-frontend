@@ -7,19 +7,10 @@ import { Logger } from '../../utils/logging';
 import { encryptWithPassword } from '../../utils/catalystCipher';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import type { CreateVotingRegTxFunc } from '../../api/ada';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import {
-  asGetAllUtxos,
-  asHasUtxoChains,
-  asGetSigningKey,
-  asGetAllAccounting,
-  asGetStakingKey,
-  asGetPublicKey,
-  asHasLevels,
-} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import {
   isCardanoHaskell,
   getCardanoHaskellBaseConfig,
+  getNetworkById,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { genTimeToSlot } from '../../api/ada/lib/storage/bridge/timeUtils';
 import { generatePrivateKeyForCatalyst } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
@@ -49,6 +40,8 @@ import {
 } from '../../api/localStorage';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 import { derivePublicByAddressing } from '../../api/ada/lib/cardanoCrypto/deriveByAddressing';
+import type { WalletState } from '../../../chrome/extension/background/types';
+import { getPrivateStakingKey } from '../../api/thunk';
 
 export const ProgressStep = Object.freeze({
   GENERATE: 0,
@@ -144,7 +137,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
       })
       return;
     }
-    const network = publicDeriver.getParent().getNetworkInfo()
+    const network = getNetworkById(publicDeriver.networkId);
     const res = await this.stores.substores.ada.stateFetchStore.fetcher
                 .getCatalystRoundInfo({ network })
     runInAction(() => {
@@ -236,27 +229,8 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
     if (!publicDeriver) {
       return;
     }
-
-    const withUtxos = asGetAllUtxos(publicDeriver);
-    if (withUtxos == null) {
-      throw new Error(`${nameof(this._createTransaction)} missing utxo functionality`);
-    }
-
-    const network = withUtxos.getParent().getNetworkInfo();
-    if (!isCardanoHaskell(network)) {
-      throw new Error(
-        `${nameof(VotingStore)}::${nameof(this._createTransaction)} network not supported`
-      );
-    }
-
-    const withHasUtxoChains = asHasUtxoChains(withUtxos);
-    if (withHasUtxoChains == null) {
-      throw new Error(`${nameof(this._createTransaction)} missing chains functionality`);
-    }
-
-    const fullConfig = getCardanoHaskellBaseConfig(
-      publicDeriver.getParent().getNetworkInfo()
-    );
+    const network = getNetworkById(publicDeriver.networkId);
+    const fullConfig = getCardanoHaskellBaseConfig(network);
 
     const timeToSlot = await genTimeToSlot(fullConfig);
     const absSlotNumber = new BigNumber(
@@ -273,67 +247,46 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
 
     const nonce = timeToSlot({ time: new Date() }).slot;
 
-    const allAddresses = await this.api.ada.getAllAddressesForDisplay({
-      publicDeriver,
-      type: CoreAddressTypes.CARDANO_BASE,
-    });
+    const allAddresses = publicDeriver.allAddresses;
 
     let votingRegTxPromise;
 
-    if (
-      publicDeriver.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET
-    ) {
+    if (publicDeriver.type !== 'mnemonic') {
       const votingPublicKey = `0x${Buffer.from(catalystPrivateKey.to_public().as_bytes()).toString('hex')}`;
 
-      const withStakingKey = asGetStakingKey(publicDeriver);
-      if (!withStakingKey) {
-        throw new Error(`${nameof(this._createTransaction)} can't get staking key`);
-      }
-      const stakingKeyResp = await withStakingKey.getStakingKey();
-
-      const withPublicKey = asGetPublicKey(publicDeriver);
-      if (!withPublicKey) {
-        throw new Error(`${nameof(this._createTransaction)} can't get public key`);
-      }
-      const publicKeyResp = await withPublicKey.getPublicKey();
       const publicKey = RustModule.WalletV4.Bip32PublicKey.from_bytes(
-        Buffer.from(publicKeyResp.Hash, 'hex')
+        Buffer.from(publicDeriver.publicKey, 'hex')
       );
 
-      const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
-      if (!withLevels) {
-        throw new Error(`${nameof(this._createTransaction)} can't get level`);
-      }
-
       const stakingKey = derivePublicByAddressing({
-        addressing: stakingKeyResp.addressing,
+        addressing: publicDeriver.stakingAddressing,
         startingFrom: {
-          level: withLevels.getParent().getPublicDeriverLevel(),
-          key: publicKey,
+          level: publicDeriver.publicDeriverLevel,
+          key: publicDeriver.publicKey,
         },
       }).to_raw_key();
 
 
-      if (isTrezorTWallet(publicDeriver.getParent())) {
+      if (publicDeriver.type === 'trezor') {
         votingRegTxPromise = this.createVotingRegTx.execute({
-          publicDeriver: withHasUtxoChains,
+          wallet: publicDeriver,
           absSlotNumber,
           trezorTWallet: {
             votingPublicKey,
-            stakingKeyPath: stakingKeyResp.addressing.path,
+            stakingKeyPath: publicDeriver.stakingAddressing.path,
             stakingKey: Buffer.from(stakingKey.as_bytes()).toString('hex'),
             paymentKeyPath: allAddresses[0].addressing.path,
             paymentAddress: allAddresses[0].address,
             nonce,
           },
         }).promise;
-      } else if (isLedgerNanoWallet(publicDeriver.getParent())) {
+      } else if (publicDeriver.type === 'ledger') {
         votingRegTxPromise = this.createVotingRegTx.execute({
-          publicDeriver: withHasUtxoChains,
+          wallet: publicDeriver,
           absSlotNumber,
           ledgerNanoWallet: {
             votingPublicKey,
-            stakingKeyPath: stakingKeyResp.addressing.path,
+            stakingKeyPath: publicDeriver.stakingAddressing.path,
             stakingKey: Buffer.from(stakingKey.as_bytes()).toString('hex'),
             paymentKeyPath: allAddresses[0].addressing.path,
             paymentAddress: allAddresses[0].address,
@@ -344,41 +297,28 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
         throw new Error(`${nameof(this._createTransaction)} unexpected hardware wallet type`);
       }
 
-    } else if (
-      publicDeriver.getParent().getWalletType() === WalletTypeOption.WEB_WALLET
-    ) {
-      const withSigning = asGetSigningKey(publicDeriver);
-      if (withSigning == null) {
-        throw new Error(
-          `${nameof(this._createTransaction)} public deriver missing signing functionality.`
-        );
-      }
-      const withStakingKey = asGetAllAccounting(withSigning);
-      if (withStakingKey == null) {
-        throw new Error(`${nameof(this._createTransaction)} missing staking key functionality`);
-      }
+    } else {
       if (spendingPassword === null) {
         throw new Error(`${nameof(this._createTransaction)} expect a password`);
       }
-      const stakingKey = await genOwnStakingKey({
-        publicDeriver: withStakingKey,
+      // todo: optimize this away, use one round-trip
+      const stakingKey = await getPrivateStakingKey({
+        publicDeriverId: publicDeriver.publicDeriverId,
         password: spendingPassword,
       });
 
       const trxMeta = generateRegistration({
-        stakePrivateKey: stakingKey,
+        stakePrivateKey: RustModule.WalletV4.PrivateKey.from_hex(stakingKey),
         catalystPrivateKey,
         receiverAddress: allAddresses[0].address,
         slotNumber: nonce,
       });
 
       votingRegTxPromise = this.createVotingRegTx.execute({
-        publicDeriver: withHasUtxoChains,
+        wallet: publicDeriver,
         absSlotNumber,
         normalWallet: { metadata: trxMeta },
       }).promise;
-    } else {
-      throw new Error(`${nameof(this._createTransaction)} unexpected wallet type`);
     }
 
     if (votingRegTxPromise == null) {
@@ -391,33 +331,41 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
   @action
   _signTransaction: ({|
     password?: string,
-    publicDeriver: PublicDeriver<>,
+    wallet: WalletState,
   |}) => Promise<void> = async request => {
     const result = this.createVotingRegTx.result;
     if (result == null) {
       throw new Error(`${nameof(this._signTransaction)} no tx to broadcast`);
     }
-    if (isLedgerNanoWallet(request.publicDeriver.getParent())) {
+    if (request.wallet.type === 'ledger') {
       await this.stores.substores.ada.wallets.adaSendAndRefresh({
         broadcastRequest: {
           ledger: {
             signRequest: result,
-            publicDeriver: request.publicDeriver,
+            publicDeriverId: request.wallet.publicDeriverId,
+            stakingAddressing: request.wallet.stakingAddressing,
+            publicKey: request.wallet.publicKey,
+            pathToPublic: request.wallet.pathToPublic,
+            networkId: request.wallet.networkId,
           },
         },
-        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
+        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
       });
       return;
     }
-    if (isTrezorTWallet(request.publicDeriver.getParent())) {
+    if (request.wallet.type === 'trezor') {
       await this.stores.substores.ada.wallets.adaSendAndRefresh({
         broadcastRequest: {
           trezor: {
             signRequest: result,
-            publicDeriver: request.publicDeriver,
+            publicDeriverId: request.wallet.publicDeriverId,
+            publicKey: request.wallet.publicKey,
+            pathToPublic: request.wallet.pathToPublic,
+            stakingAddressing: request.wallet.stakingAddressing,
+            networkId: request.wallet.networkId,
           },
         },
-        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
+        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
       });
       return;
     }
@@ -429,7 +377,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
     await this.stores.substores.ada.wallets.adaSendAndRefresh({
       broadcastRequest: {
         normal: {
-          publicDeriver: request.publicDeriver,
+          publicDeriverId: request.wallet.publicDeriverId,
           password: request.password,
           signRequest: result,
         },

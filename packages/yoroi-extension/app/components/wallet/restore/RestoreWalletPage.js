@@ -186,9 +186,9 @@ function RestoreWalletPage(props: Props & Intl): Node {
             );
             return isValid;
           }}
-          openDuplicatedWallet={lastDuplicatedWallet => {
+          openDuplicatedWallet={lastDuplicatedWalletId => {
             resetRestoreWalletData();
-            walletsActions.setActiveWallet.trigger({ wallet: lastDuplicatedWallet });
+            walletsActions.setActiveWallet.trigger({ publicDeriverId: lastDuplicatedWalletId });
             handleGoToRoute({ route: ROUTES.WALLETS.TRANSACTIONS });
           }}
           onSubmit={async enteredRecoveryPhrase => {
@@ -207,7 +207,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
               recoveryPhrase: enteredRecoveryPhrase,
             });
 
-            return existingWallet;
+            return existingWallet?.publicDeriverId;
           }}
         />
       ),

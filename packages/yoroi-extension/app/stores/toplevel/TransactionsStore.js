@@ -13,10 +13,8 @@ import type {
   GetTransactionsResponse,
   RefreshPendingTransactionsFunc,
 } from '../../api/common/index';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
   asGetAllUtxos,
-  asGetBalance,
   asGetPublicKey,
   asHasLevels,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
@@ -54,9 +52,10 @@ import { toRequestAddresses } from '../../api/ada/lib/storage/bridge/updateTrans
 import type { TransactionExportRow } from '../../api/export';
 import type { HistoryRequest } from '../../api/ada/lib/state-fetch/types';
 import appConfig from '../../config';
+import { getBalance } from '../../api/thunk';
 
 export type TxHistoryState = {|
-  publicDeriver: PublicDeriver<>,
+  publicDeriverId: number,
   lastSyncInfo: IGetLastSyncInfoResponse,
   txs: Array<WalletTransaction>,
   hasMoreToLoad: boolean,
@@ -173,9 +172,9 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   @computed get recent(): Array<WalletTransaction> {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return [];
-    const { txs } = this.getTxHistoryState(publicDeriver);
+    const { txs } = this.getTxHistoryState(publicDeriver.publicDeriverId);
     return  [
-      ...this.getSubmittedTransactions(publicDeriver),
+      ...this.getSubmittedTransactions(publicDeriver.publicDeriverId),
       ...txs,
     ];
   }
@@ -187,20 +186,21 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   @computed get hasAnyPending(): boolean {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return false;
-    const result = this.getTxHistoryState(publicDeriver).requests.pendingRequest.result;
+    const result = this.getTxHistoryState(publicDeriver.publicDeriverId).requests.pendingRequest.result;
     return result ? result.length > 0 : false;
   }
 
   @computed get hasMoreToLoad(): boolean {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return false;
-    return this.getTxHistoryState(publicDeriver).hasMoreToLoad;
+    return this.getTxHistoryState(publicDeriver.publicDeriverId).hasMoreToLoad;
   }
 
   // This method ensures that at any time, there is only one refreshing process
   // for each wallet.
+  /*
   refreshTransactionData: ({|
-    publicDeriver: PublicDeriver<>,
+    publicDeriverId: number,
     isLocalRequest: boolean,
   |}) => Promise<void> = async (request) => {
     const { publicDeriverId } = request.publicDeriver;
@@ -219,6 +219,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       });
     }
   };
+  */
 
   @computed get balance(): MultiToken | null {
     const publicDeriver = this.stores.wallets.selected;
@@ -335,166 +336,155 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   }
 
   /** Refresh transaction history and update wallet balance */
-  @action _refreshTransactionData: {|
-    publicDeriver: PublicDeriver<>,
-    isLocalRequest: boolean,
-  |} => Promise<void> = async (request) => {
-    const publicDeriver = asHasLevels<
-      ConceptualWallet,
-      IGetLastSyncInfo
-    >(request.publicDeriver);
+  // @action _refreshTransactionData: {|
+  //   publicDeriverId: PublicDeriver<>,
+  //   isLocalRequest: boolean,
+  // |} => Promise<void> = async (request) => {
+  //   const { publicDeriverId } = request;
 
-    if (publicDeriver == null) {
-      return;
-    }
+  //   const txHistoryState = this.getTxHistoryState(request.publicDeriverId);
+  //   const isEmptyHistory = txHistoryState.txs.length === 0;
 
-    const txHistoryState = this.getTxHistoryState(request.publicDeriver);
-    const isEmptyHistory = txHistoryState.txs.length === 0;
+  //   const {
+  //     headRequest,
+  //     getBalanceRequest,
+  //     getAssetDepositRequest
+  //   } = txHistoryState.requests;
 
-    const {
-      headRequest,
-      getBalanceRequest,
-      getAssetDepositRequest
-    } = txHistoryState.requests;
+  //   let result;
+  //   if (isEmptyHistory) {
+  //     /*
+  //      * TAIL REQUEST IS USED WHEN FIRST SYNC OR EMPTY WALLET
+  //      */
+  //     result = await this._internalTailRequestForTxs({
+  //       publicDeriverId,
+  //       isLocalRequest: request.isLocalRequest,
+  //     });
+  //   } else {
+  //     /*
+  //      * HEAD REQUEST IS USED WITH `AFTER` REFERENCE
+  //      * WHEN NON-EMPTY WALLET
+  //      */
+  //     headRequest.invalidate({ immediately: false });
+  //     headRequest.execute({
+  //       publicDeriverId,
+  //       // HEAD request is never local by logic
+  //       isLocalRequest: false,
+  //       afterTx: txHistoryState.txs[0],
+  //     });
+  //     if (headRequest.promise == null) {
+  //       throw new Error('unexpected nullish headRequest.promise');
+  //     }
+  //     result = await headRequest.promise;
+  //     {
+  //       /**
+  //        * Adding received txs to the start of the existing history
+  //        */
+  //       const { txs } = this.getTxHistoryState(publicDeriverId);
+  //       runInAction(() => {
+  //         for (let i = 0; i < result.length; i++) {
+  //           const tx = result[i];
+  //           if (tx.txid === txs[0]?.txid) {
+  //             // In case received tx matches with the existing one - stop
+  //             break;
+  //           }
+  //           txs.splice(i, 0, tx);
+  //         }
+  //       });
+  //     }
+  //   }
 
-    let result;
-    if (isEmptyHistory) {
-      /*
-       * TAIL REQUEST IS USED WHEN FIRST SYNC OR EMPTY WALLET
-       */
-      result = await this._internalTailRequestForTxs({
-        publicDeriver: request.publicDeriver,
-        isLocalRequest: request.isLocalRequest,
-      });
-    } else {
-      /*
-       * HEAD REQUEST IS USED WITH `AFTER` REFERENCE
-       * WHEN NON-EMPTY WALLET
-       */
-      headRequest.invalidate({ immediately: false });
-      headRequest.execute({
-        publicDeriver,
-        // HEAD request is never local by logic
-        isLocalRequest: false,
-        afterTx: txHistoryState.txs[0],
-      });
-      if (headRequest.promise == null) {
-        throw new Error('unexpected nullish headRequest.promise');
-      }
-      result = await headRequest.promise;
-      {
-        /**
-         * Adding received txs to the start of the existing history
-         */
-        const { txs } = this.getTxHistoryState(request.publicDeriver);
-        runInAction(() => {
-          for (let i = 0; i < result.length; i++) {
-            const tx = result[i];
-            if (tx.txid === txs[0]?.txid) {
-              // In case received tx matches with the existing one - stop
-              break;
-            }
-            txs.splice(i, 0, tx);
-          }
-        });
-      }
-    }
+  //   // update last sync (note: changes even if no new transaction is found)
+  //   {
+  //     const lastUpdateDate = await this.api.common.getTxLastUpdatedDate({
+  //       getLastSyncInfo: publicDeriver.getLastSyncInfo
+  //     });
+  //     runInAction(() => {
+  //       this.getTxHistoryState(request.publicDeriver).lastSyncInfo = lastUpdateDate;
+  //     });
+  //   }
 
-    // update last sync (note: changes even if no new transaction is found)
-    {
-      const lastUpdateDate = await this.api.common.getTxLastUpdatedDate({
-        getLastSyncInfo: publicDeriver.getLastSyncInfo
-      });
-      runInAction(() => {
-        this.getTxHistoryState(request.publicDeriver).lastSyncInfo = lastUpdateDate;
-      });
-    }
+  //   // note: possible existing memos were modified on a difference instance, etc.
+  //   await this.actions.memos.syncTxMemos.trigger(request.publicDeriver);
 
-    // note: possible existing memos were modified on a difference instance, etc.
-    await this.actions.memos.syncTxMemos.trigger(request.publicDeriver);
+  //   // update balance
+  //   const deriverParent = request.publicDeriver.getParent();
+  //   const networkInfo = deriverParent.getNetworkInfo();
+  //   const defaultToken = deriverParent.getDefaultToken();
+  //   const isCardano = isCardanoHaskell(networkInfo);
+  //   const coinsPerUtxoWord = isCardano
+  //     ? getCoinsPerUtxoWord(networkInfo)
+  //     : RustModule.WalletV4.BigNum.zero();
 
-    // update balance
-    const deriverParent = request.publicDeriver.getParent();
-    const networkInfo = deriverParent.getNetworkInfo();
-    const defaultToken = deriverParent.getDefaultToken();
-    const isCardano = isCardanoHaskell(networkInfo);
-    const coinsPerUtxoWord = isCardano
-      ? getCoinsPerUtxoWord(networkInfo)
-      : RustModule.WalletV4.BigNum.zero();
+  //   // <TODO:PLUTUS_SUPPORT>
+  //   const utxoHasDataHash = false;
 
-    // <TODO:PLUTUS_SUPPORT>
-    const utxoHasDataHash = false;
+  //   await (async () => {
+  //     getBalanceRequest.invalidate({ immediately: false });
+  //     getAssetDepositRequest.invalidate({ immediately: false });
+  //     getBalanceRequest.execute({
+  //       getBalance,
+  //     });
+  //     getAssetDepositRequest.execute({
+  //       getBalance: async (): Promise<MultiToken> => {
+  //         try {
+  //           const canGetUtxos = asGetAllUtxos(publicDeriver);
+  //           if (!isCardano || canGetUtxos == null) {
+  //             return newMultiToken(defaultToken);
+  //           }
+  //           const WalletV4 = RustModule.WalletV4;
+  //           const utxos = await canGetUtxos.getAllUtxos();
+  //           const addressedUtxos = asAddressedUtxo(utxos).filter(u => u.assets.length > 0);
+  //           const deposits: Array<RustModule.WalletV4.BigNum> = addressedUtxos.map(
+  //             (u: CardanoAddressedUtxo) => {
+  //               try {
+  //                 return WalletV4.min_ada_required(
+  //                   // $FlowFixMe[prop-missing]
+  //                   cardanoValueFromRemoteFormat(u),
+  //                   utxoHasDataHash,
+  //                   coinsPerUtxoWord
+  //                 );
+  //               } catch (e) {
+  //                 // eslint-disable-next-line no-console
+  //                 console.error(
+  //                   `Failed to calculate min-required ADA for utxo: ${JSON.stringify(u)}`,
+  //                   e
+  //                 );
+  //                 return WalletV4.BigNum.zero();
+  //               }
+  //             }
+  //           );
+  //           const sumDeposit = deposits.reduce((a, b) => a.checked_add(b), WalletV4.BigNum.zero());
+  //           return newMultiToken(defaultToken, [
+  //             {
+  //               identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+  //               amount: new BigNumber(sumDeposit.to_str()),
+  //               networkId: networkInfo.NetworkId,
+  //             },
+  //           ]);
+  //         } catch (e) {
+  //           // eslint-disable-next-line no-console
+  //           console.error('Failed to request asset deposit recalc', e);
+  //         }
+  //         return newMultiToken(defaultToken);
+  //       },
+  //     });
+  //     const refreshDelegationPromise =
+  //       this.stores.substores.ada.delegation.refreshDelegation(request.publicDeriver);
+  //     if (!getBalanceRequest.promise || !getAssetDepositRequest.promise)
+  //       throw new Error('should never happen');
+  //     await Promise.all([
+  //       getBalanceRequest.promise,
+  //       getAssetDepositRequest.promise,
+  //       refreshDelegationPromise,
+  //     ]);
+  //   })();
 
-    await (async () => {
-      const canGetBalance = asGetBalance(publicDeriver);
-      if (canGetBalance == null) {
-        return;
-      }
-      getBalanceRequest.invalidate({ immediately: false });
-      getAssetDepositRequest.invalidate({ immediately: false });
-      getBalanceRequest.execute({
-        getBalance: canGetBalance.getBalance,
-      });
-      getAssetDepositRequest.execute({
-        getBalance: async (): Promise<MultiToken> => {
-          try {
-            const canGetUtxos = asGetAllUtxos(publicDeriver);
-            if (!isCardano || canGetUtxos == null) {
-              return newMultiToken(defaultToken);
-            }
-            const WalletV4 = RustModule.WalletV4;
-            const utxos = await canGetUtxos.getAllUtxos();
-            const addressedUtxos = asAddressedUtxo(utxos).filter(u => u.assets.length > 0);
-            const deposits: Array<RustModule.WalletV4.BigNum> = addressedUtxos.map(
-              (u: CardanoAddressedUtxo) => {
-                try {
-                  return WalletV4.min_ada_required(
-                    // $FlowFixMe[prop-missing]
-                    cardanoValueFromRemoteFormat(u),
-                    utxoHasDataHash,
-                    coinsPerUtxoWord
-                  );
-                } catch (e) {
-                  // eslint-disable-next-line no-console
-                  console.error(
-                    `Failed to calculate min-required ADA for utxo: ${JSON.stringify(u)}`,
-                    e
-                  );
-                  return WalletV4.BigNum.zero();
-                }
-              }
-            );
-            const sumDeposit = deposits.reduce((a, b) => a.checked_add(b), WalletV4.BigNum.zero());
-            return newMultiToken(defaultToken, [
-              {
-                identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
-                amount: new BigNumber(sumDeposit.to_str()),
-                networkId: networkInfo.NetworkId,
-              },
-            ]);
-          } catch (e) {
-            // eslint-disable-next-line no-console
-            console.error('Failed to request asset deposit recalc', e);
-          }
-          return newMultiToken(defaultToken);
-        },
-      });
-      const refreshDelegationPromise =
-        this.stores.substores.ada.delegation.refreshDelegation(request.publicDeriver);
-      if (!getBalanceRequest.promise || !getAssetDepositRequest.promise)
-        throw new Error('should never happen');
-      await Promise.all([
-        getBalanceRequest.promise,
-        getAssetDepositRequest.promise,
-        refreshDelegationPromise,
-      ]);
-    })();
-
-    await this._afterLoadingNewTxs(
-      result,
-      request.publicDeriver,
-    );
-  }
+  //   await this._afterLoadingNewTxs(
+  //     result,
+  //     request.publicDeriver,
+  //   );
+  // }
 
   _internalTailRequestForTxs: ({|
     publicDeriver: PublicDeriver<> & IGetLastSyncInfo,

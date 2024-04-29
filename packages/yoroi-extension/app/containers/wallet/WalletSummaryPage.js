@@ -114,9 +114,6 @@ class WalletSummaryPage extends Component<AllProps> {
       const WalletTransactionsListComp = mapWalletTransactionLayout[this.props.selectedLayout];
 
       if (isLoading || hasAny) {
-        const {
-          assuranceMode,
-        } = this.props.stores.walletSettings.getPublicDeriverSettingsCache(selected.publicDeriverId);
         walletTransactions = (
           <WalletTransactionsListComp
             transactions={recent}
@@ -135,7 +132,7 @@ class WalletSummaryPage extends Component<AllProps> {
             onLoadMore={() => actions.transactions.loadMoreTransactions.trigger({
               publicDeriverId: selected.publicDeriverId
             })}
-            assuranceMode={assuranceMode}
+            assuranceMode={selected.assuranceMode}
             shouldHideBalance={profile.shouldHideBalance}
             onAddMemo={transaction =>
               this.showMemoDialog({

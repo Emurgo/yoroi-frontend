@@ -65,7 +65,11 @@ export default class NavBarContainerRevamp extends Component<Props> {
       const { plate }= selected;
 
       const balance: ?MultiToken = this.props.stores.transactions.getBalance(selected.publicDeriverId);
-      const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(selected.publicDeriverId);
+      const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(
+        selected.publicDeriverId,
+        selected.networkId,
+        selected.defaultTokenId
+      );
 
       return (
         <NavWalletDetailsRevamp
@@ -118,15 +122,17 @@ export default class NavBarContainerRevamp extends Component<Props> {
     const cardanoWallets = [];
 
     wallets.forEach(wallet => {
-      const amount = this.props.stores.transactions.getBalance(wallet);
-      const rewards = this.props.stores.delegation.getRewardBalanceOrZero(wallet);
-      const plate = wallet.plate;
+      const rewards = this.props.stores.delegation.getRewardBalanceOrZero(
+        wallet.publicDeriverId,
+        wallet.networkId,
+        wallet.defaultTokenId
+      );
 
       const walletMap = {
         walletId: wallet.publicDeriverId,
         rewards,
-        amount,
-        plate,
+        amount: wallet.balance,
+        plate: wallet.plate,
         type: wallet.type,
         name: wallet.name,
       };

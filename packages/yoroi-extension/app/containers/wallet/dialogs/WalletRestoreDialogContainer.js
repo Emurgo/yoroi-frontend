@@ -134,7 +134,11 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           throw new Error(`${nameof(WalletRestoreDialogContainer)} no duplicated wallet`);
         }
         const balance = this.props.stores.transactions.getBalance(duplicatedWallet.publicDeriverId);
-        const rewards = this.props.stores.delegation.getRewardBalanceOrZero(duplicatedWallet.publicDeriverId);
+        const rewards = this.props.stores.delegation.getRewardBalanceOrZero(
+          duplicatedWallet.publicDeriverId,
+          duplicatedWallet.networkId,
+          duplicatedWallet.defaultTokenId,
+        );
 
         return (
           <WalletAlreadyExistDialog

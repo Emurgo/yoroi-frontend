@@ -16,7 +16,6 @@ import { defineMessages } from 'react-intl';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { isWalletExist } from '../../api/ada/lib/cardanoCrypto/utils';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import AdaApi from '../../api/ada';
 import type { PlateResponse } from '../../api/ada/lib/cardanoCrypto/plate';
 import type { WalletState } from '../../../chrome/extension/background/types';
@@ -114,7 +113,7 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
     });
 
     // Check for wallet duplication.
-    const wallets = this.stores.wallets.publicDerivers;
+    const wallets = this.stores.wallets.wallets;
     const accountIndex = this.stores.walletRestore.selectedAccount;
     const duplicatedWallet = await isWalletExist(
       wallets,

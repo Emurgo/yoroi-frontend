@@ -2,7 +2,6 @@
 import type { Node, ComponentType } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { StoresAndActionsProps } from '../../types/injectedProps.types';
-import type { ConceptualWalletSettingsCache } from '../../stores/toplevel/WalletSettingsStore';
 import type { WalletInfo } from '../../components/buySell/BuySellDialog';
 import type { LayoutComponentMap } from '../../styles/context/layout';
 import { Component } from 'react';
@@ -198,7 +197,11 @@ class MyWalletsPage extends Component<AllProps> {
     })();
 
     const balance: ?MultiToken = this.props.stores.transactions.getBalance(wallet.publicDeriverId);
-    const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(wallet.publicDeriverId);
+    const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(
+      wallet.publicDeriverId,
+      wallet.networkId,
+      wallet.defaultTokenId,
+    );
 
     const plate = wallet.plate;
 

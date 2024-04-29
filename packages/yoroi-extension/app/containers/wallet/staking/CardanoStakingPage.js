@@ -12,7 +12,6 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import Dialog from '../../../components/widgets/Dialog';
 import { EPOCH_REWARD_DENOMINATOR } from '../../../config/numbersConfig';
 import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
-import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import globalMessages from '../../../i18n/global-messages';
 import { ReactComponent as InvalidURIImg } from '../../../assets/images/uri/invalid-uri.inline.svg';
 import ErrorBlock from '../../../components/widgets/ErrorBlock';
@@ -33,7 +32,7 @@ import { withLayout } from '../../../styles/context/layout';
 import type { LayoutComponentMap } from '../../../styles/context/layout';
 import { Box } from '@mui/system';
 import type { PoolData } from './SeizaFetcher';
-import { isTestnet } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import { isTestnet, getNetworkById } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -84,7 +83,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
       if (publicDeriver == null) {
         throw new Error(`${nameof(CardanoStakingPage)} no public deriver. Should never happen`);
       }
-      const balance = this.props.stores.transactions.getBalance(publicDeriver);
+      const balance = publicDeriver.balance;
       const isStakeRegistered = this.props.stores.delegation.isStakeRegistered(publicDeriver);
       const isWalletWithNoFunds = balance != null && balance.getDefaultEntry().amount.isZero();
       const poolList = (delegatedPoolId != null && isStakeRegistered) ? [delegatedPoolId] : [];
@@ -120,11 +119,11 @@ class CardanoStakingPage extends Component<AllProps, State> {
               ticker={truncateToken(
                 getTokenName(
                   this.props.stores.tokenInfoStore.getDefaultTokenInfo(
-                    publicDeriver.getParent().getNetworkInfo().NetworkId
+                    publicDeriver.networkId
                   )
                 )
               )}
-              isTestnet={isTestnet(publicDeriver.getParent().getNetworkInfo())}
+              isTestnet={isTestnet(getNetworkById(publicDeriver.networkId))}
             />
           ) : null}
 
@@ -179,12 +178,16 @@ class CardanoStakingPage extends Component<AllProps, State> {
       throw new Error(`${nameof(CardanoStakingPage)} no public deriver. Should never happen`);
     }
 
-    const delegationStore = this.props.stores.delegation;
-    const balance = this.props.stores.transactions.getBalance(publicDeriver);
+    const { balance } = publicDeriver;
     if (balance == null) {
       return null;
     }
-    const rewardBalance = delegationStore.getRewardBalanceOrZero(publicDeriver);
+    const delegationStore = this.props.stores.delegation;
+    const rewardBalance = delegationStore.getRewardBalanceOrZero(
+      publicDeriver.publicDeriverId,
+      publicDeriver.networkId,
+      publicDeriver.defaultTokenId
+    );
     const tokenInfo = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)(
       rewardBalance.getDefaultEntry()
     );
@@ -285,12 +288,12 @@ class CardanoStakingPage extends Component<AllProps, State> {
     );
   };
 
-  _getPoolInfo: (PublicDeriver<>) => void | PoolMeta = publicDeriver => {
+  _getPoolInfo: (number) => void | PoolMeta = networkId => {
     const { delegationTransaction } = this.props.stores.substores.ada;
     return delegationTransaction.selectedPools.length === 0
       ? undefined
       : this.props.stores.delegation.getLocalPoolInfo(
-          publicDeriver.getParent().getNetworkInfo(),
+          networkId,
           delegationTransaction.selectedPools[0]
         );
   };
@@ -361,7 +364,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
       !this.props.stores.wallets.sendMoneyRequest.wasExecuted ||
       this.props.stores.wallets.sendMoneyRequest.error != null;
 
-    const selectedPoolInfo = this._getPoolInfo(selectedWallet);
+    const selectedPoolInfo = this._getPoolInfo(selectedWallet.networkId);
     if (this.props.stores.delegation.poolInfoQuery.error != null) {
       return undefined;
     }
