@@ -20,7 +20,7 @@ import { InfoTooltip } from '../widgets/InfoTooltip';
 const fromTemplateColumns = '1fr minmax(auto, 136px)';
 const toTemplateColumns = '1fr minmax(auto, 152px) minmax(auto, 136px)';
 const fromColumns = ['Asset', 'Amount'];
-const toColumns = [''];
+const toColumns = [];
 
 type Props = {|
   assets: Array<AssetAmount>,
