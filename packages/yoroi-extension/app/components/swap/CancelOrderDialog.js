@@ -1,6 +1,5 @@
 //@flow
 import { Box, Button, Typography } from '@mui/material';
-import { ReactComponent as InfoIcon } from '../../assets/images/revamp/icons/info.inline.svg';
 import Dialog from '../widgets/Dialog';
 import AssetPair from '../common/assets/AssetPair';
 import TextField from '../common/TextField';
@@ -10,6 +9,7 @@ import { useState } from 'react';
 import type { FormattedTokenValue } from '../../containers/swap/orders/OrdersPage';
 import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import { stringifyError } from '../../utils/logging';
+import { InfoTooltip } from '../widgets/InfoTooltip';
 
 type Props = {|
   order: any,
@@ -52,7 +52,7 @@ export default function CancelSwapOrderDialog({
           <SummaryRow col1="Asset amount">
             {order.amount} {order.to.token.ticker}
           </SummaryRow>
-          <SummaryRow col1="Total returned" withInfo>
+          <SummaryRow col1="Total returned" info='The amount returned to your wallet after cancelling the order'>
             {transactionParams ? transactionParams.returnValues.map(v => (
               <Box>{v.formattedValue} {v.ticker}</Box>
             )) : (<LoadingSpinner small />)}
@@ -105,15 +105,15 @@ export default function CancelSwapOrderDialog({
   );
 }
 
-const SummaryRow = ({ col1, children, withInfo = false }) => (
+const SummaryRow = ({ col1, children, info = '' }) => (
   <Box display="flex" alignItems="center" justifyContent="space-between">
     <Box display="flex" alignItems="center">
       <Typography component="div" variant="body1" color="grayscale.500">
         {col1}
       </Typography>
-      {withInfo ? (
+      {info ? (
         <Box ml="8px">
-          <InfoIcon />
+          <InfoTooltip content={info} />
         </Box>
       ) : null}
     </Box>

@@ -15,6 +15,7 @@ import Table from '../common/table/Table';
 import { urlResolveForIpfsAndCorsproxy } from '../../coreUtils';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
 import { PriceImpactColored, PriceImpactIcon } from './PriceImpact';
+import { InfoTooltip } from '../widgets/InfoTooltip';
 
 const fromTemplateColumns = '1fr minmax(auto, 136px)';
 const toTemplateColumns = '1fr minmax(auto, 152px) minmax(auto, 136px)';
@@ -36,31 +37,20 @@ export default function SelectAssetDialog({
   onClose,
   defaultTokenInfo,
 }: Props): React$Node {
-  const [searchTerm, setSearchTerm] = useState('');
-  // const [sortBy, setSortBy] = useState('');
-
-  // const handleSortBy = sort => {
-  //   setSortBy(sort);
-  // };
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   const handleAssetSelected = asset => {
     onAssetSelected(asset);
     onClose();
   };
 
-  const handleSearch = e => {
-    setSearchTerm(e.target.value);
-  };
-
   const filteredAssets =
-    assets.filter(
-      a =>
-        a != null &&
-        (a.name.toLowerCase().includes(searchTerm) ||
-          a.ticker.toLowerCase().includes(searchTerm) ||
-          a.id.toLowerCase().includes(searchTerm) ||
-          a.fingerprint.toLowerCase().includes(searchTerm))
-    ) || [];
+    assets.filter(a => {
+      if (a == null) return false;
+      if (!searchTerm) return true;
+      return `${a.name};[${a.ticker}];${a.id};${a.fingerprint}`
+        .toLowerCase().includes(searchTerm.toLowerCase())
+    }) || [];
 
   return (
     <Dialog
@@ -101,7 +91,9 @@ export default function SelectAssetDialog({
               borderColor: 'grayscale.max',
             },
           }}
-          onChange={handleSearch}
+          onChange={e => {
+            setSearchTerm(e.target.value?.trim() ?? '');
+          }}
         />
       </Box>
       <Box>
@@ -116,15 +108,17 @@ export default function SelectAssetDialog({
           columnNames={type === 'from' ? fromColumns : toColumns}
           gridTemplateColumns={type === 'from' ? fromTemplateColumns : toTemplateColumns}
         >
-          {filteredAssets.map(a => (
-            <AssetAndAmountRow
-              key={a.id}
-              asset={a}
-              type={type}
-              onAssetSelected={handleAssetSelected}
-              defaultTokenInfo={defaultTokenInfo}
-            />
-          ))}
+          {filteredAssets.map(a => {
+            return (
+              <AssetAndAmountRow
+                key={a.id}
+                asset={a}
+                type={type}
+                onAssetSelected={handleAssetSelected}
+                defaultTokenInfo={defaultTokenInfo}
+              />
+            );
+          })}
         </Table>
       )}
       {filteredAssets.length === 0 && (
@@ -239,10 +233,12 @@ export const AssetAndAmountRow = ({
             <Typography component="div" fontWeight={500} variant="body1">
               {(name !== address || name !== id) && name !== ticker && `[${ticker}]`} {name}
             </Typography>
-            {!isFrom && Number(amount) > 0 && (
-              <Box component="span" color="secondary.600">
-                <WalletIcon />
-              </Box>
+            {!isFrom && amount != null && (
+              <InfoTooltip content={'This asset is already in my portfolio'}>
+                <Box component="span" color="secondary.600">
+                  <WalletIcon />
+                </Box>
+              </InfoTooltip>
             )}
           </Box>
           <Box>

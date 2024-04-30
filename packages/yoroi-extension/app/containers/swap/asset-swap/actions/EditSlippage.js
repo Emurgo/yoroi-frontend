@@ -21,14 +21,7 @@ export const EditSlippage = ({ setOpenedDialog, slippageValue }: EditSlippagePro
         <Typography component="div" variant="body1" color="grayscale.500">
           Slippage tolerance
         </Typography>
-        <InfoTooltip
-          content={
-            <Typography color="inherit">
-              Slippage tolerance is set as a percentage of the total swap value. Your transactions
-              will not be executed if the price moves by more than this amount{' '}
-            </Typography>
-          }
-        />
+        <InfoTooltip content={'Slippage tolerance is set as a percentage of the total swap value. Your transactions will not be executed if the price moves by more than this amount'} />
       </Box>
       <Box
         onClick={setOpenedDialog}
