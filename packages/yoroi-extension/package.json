@@ -218,7 +218,7 @@
     "tinycolor2": "1.4.2",
     "trezor-connect-flow": "Emurgo/trezor-connect-flow#92d6d8c8faef25c0ea1d481aa1ecb4ba77ce539c",
     "ua-parser-js": "1.0.37",
-    "util": "0.12.5",
+    "util": "0.12.5"
   },
   "engineStrict": true,
   "engine": {
