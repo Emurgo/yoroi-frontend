@@ -20,7 +20,7 @@ export const messages = defineMessages({
   },
   currentPool: {
     id: 'wallet.transitionDialog.currentPool',
-    defaultMessage: '!!! Curers Pool',
+    defaultMessage: '!!! Current Pool',
   },
   newPool: {
     id: 'wallet.transitionDialog.newPool',

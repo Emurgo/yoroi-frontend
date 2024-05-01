@@ -131,6 +131,7 @@ class Wallet extends Component<AllProps> {
       throw new Error(`${nameof(Wallet)} no public deriver. Should never happen`);
     }
     const currentPool = this.props.stores.delegation.getDelegatedPoolId(publicDeriver);
+    console.log('this.props.actions.dialogs.open', this.props.actions.dialogs);
     const poolTransition = stores.delegation.checkPoolTransition(publicDeriver);
     const isFirstSync = stores.wallets.firstSyncWalletId === selectedWallet.getPublicDeriverId();
     const spendableBalance = this.props.stores.transactions.balance;
@@ -217,26 +218,8 @@ class Wallet extends Component<AllProps> {
       >
         {warning}
         {this.props.children}
-        {this.getDialogs()}
-        {this.props.stores.delegation.poolTransitionConfig.show === 'open' && (
-          <PoolTransitionDialog
-            intl={intl}
-            onClose={() => {
-              this.props.stores.delegation.setPoolTransitionConfig({ show: 'idle' });
-            }}
-            poolTransition={poolTransition}
-            currentPoolId={currentPool ?? ''}
-            onUpdatePool={() => {
-              this.props.stores.delegation.setPoolTransitionConfig({
-                show: 'idle',
-                shouldUpdatePool: true,
-              });
-              this.props.actions.router.goToRoute.trigger({
-                route: ROUTES.STAKING,
-              });
-            }}
-          />
-        )}
+        {this.getDialogs(intl, poolTransition, currentPool)}
+        {}
       </TopBarLayout>
     ) : (
       <TopBarLayout sidebar={sidebarContainer}>
@@ -255,10 +238,32 @@ class Wallet extends Component<AllProps> {
     return warnings[warnings.length - 1]();
   };
 
-  getDialogs: void => Node = () => {
+  getDialogs: (any, any, any) => Node = (intl, poolTransition, currentPool) => {
     const isOpen = this.props.stores.uiDialogs.isOpen;
+    const isRevampDialogOpen = isOpen(RevampAnnouncementDialog);
 
-    if (isOpen(RevampAnnouncementDialog))
+    if (this.props.stores.delegation.poolTransitionConfig.show === 'open' && !isRevampDialogOpen)
+      return (
+        <PoolTransitionDialog
+          intl={intl}
+          onClose={() => {
+            this.props.stores.delegation.setPoolTransitionConfig({ show: 'idle' });
+          }}
+          poolTransition={poolTransition}
+          currentPoolId={currentPool ?? ''}
+          onUpdatePool={() => {
+            this.props.stores.delegation.setPoolTransitionConfig({
+              show: 'idle',
+              shouldUpdatePool: true,
+            });
+            this.props.actions.router.goToRoute.trigger({
+              route: ROUTES.STAKING,
+            });
+          }}
+        />
+      );
+
+    if (isRevampDialogOpen)
       return (
         <RevampAnnouncementDialog
           onClose={() => {
