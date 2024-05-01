@@ -524,6 +524,10 @@ const globalMessages: * = defineMessages({
     id: 'global.uriExplanation.revamp',
     defaultMessage: '!!!Allow URLs to easily share invoices with friends and businesses',
   },
+  updatePool: {
+    id: 'global.updatePool',
+    defaultMessage: '!!!  UPDATE POOL',
+  },
   copyTooltipMessage: {
     id: 'global.copyTooltipMessage',
     defaultMessage: '!!!Copied',

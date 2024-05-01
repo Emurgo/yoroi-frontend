@@ -41,7 +41,7 @@ function DelegatedStakePoolCard({
           variant="danger"
           onClick={() => delegateToSpecificPool(poolTransition.suggestedPool?.id ?? '')}
         >
-          UPDATE POOL
+          {intl.formatMessage(globalMessages.updatePool)}
         </UpdatePoolButton>
       );
     }
@@ -154,9 +154,11 @@ function DelegatedStakePoolCard({
         )}
       </Wrapper>
       {poolTransition?.deadlineMilliseconds && (
-        <Alert sx={{ width: '100%', justifyContent: 'center' }} severity="error">
-          {intl.formatMessage(globalMessages.poolNotGenerating)}
-        </Alert>
+        <SAlert severity="error">
+          <Typography variant="body2" mt="1px" color="grayscale.900">
+            {intl.formatMessage(globalMessages.poolNotGenerating)}
+          </Typography>
+        </SAlert>
       )}
     </Card>
   );
@@ -168,6 +170,21 @@ const Card = styled(Box)({
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'flex-end',
+});
+
+const SAlert = styled(Alert)({
+  width: '100%',
+  justifyContent: 'center',
+  backgroundColor: 'magenta.100',
+  borderTopLeftRadius: '0px',
+  borderTopRightRadius: '0px',
+  height: '40px',
+  padding: 0,
+  '& .MuiAlert-icon': {
+    color: 'magenta.500',
+    fontSize: '26px',
+    margin: '0',
+  },
 });
 
 const Wrapper: any = styled(Box)({
@@ -193,14 +210,14 @@ const UndelegateButton: any = styled(Button)({
   width: 'unset',
   marginLeft: 'auto',
 });
-const UpdatePoolButton: any = styled(Button)({
+const UpdatePoolButton: any = styled(Button)(({ theme }) => ({
   minWidth: 'auto',
   width: 'unset',
   marginLeft: 'auto',
-  background: 'red',
+  background: theme.palette.magenta['500'],
   color: 'white',
   '&:hover': {
-    backgroundColor: 'red',
+    backgroundColor: theme.palette.magenta['500'],
     color: 'white',
   },
-});
+}));
