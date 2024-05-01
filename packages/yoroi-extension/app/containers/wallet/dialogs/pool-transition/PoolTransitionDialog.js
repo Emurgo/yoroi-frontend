@@ -46,13 +46,14 @@ export const PoolTransitionDialog = ({
     <Dialog
       onClose={onClose}
       title={intl.formatMessage(messages.upgradeStakePool)}
-      styleOverride={{ width: '648px', padding: 0 }}
+      styleOverride={{ width: '648px', height: '552px', padding: 0 }}
+      styleContentOverride={{ padding: 0 }}
       closeOnOverlayClick
     >
-      <Typography variant="body1" mb={2}>
+      <Typography variant="body1" mb={2} mx="24px">
         {intl.formatMessage(messages.currentStakePool)}
       </Typography>
-      <Stack direction="row" spacing={2} alignItems="center">
+      <Stack direction="row" spacing={2} alignItems="center" px="24px">
         <StakePoolCard
           label={intl.formatMessage(messages.currentPool)}
           poolName={currentPool?.name}
@@ -78,9 +79,8 @@ export const PoolTransitionDialog = ({
       <Grid
         container
         justifyContent="space-between"
-        alignItems="center"
         direction="column"
-        style={{ marginTop: 20 }}
+        style={{ marginTop: 30, marginBottom: 24 }}
       >
         <CustomButton variant="text" onClick={onClose} sx={{ color: '#242838' }}>
           {intl.formatMessage(messages.skipAndStop)}
@@ -105,4 +105,7 @@ export const PoolTransitionDialog = ({
 const CustomButton = styled(Button)(({ theme, color }) => ({
   width: '100%',
   fontSize: '14px',
+  marginLeft: '24px',
+  marginRight: '24px',
+  maxWidth: '600px',
 }));

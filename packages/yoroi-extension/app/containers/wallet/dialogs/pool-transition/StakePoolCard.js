@@ -93,7 +93,7 @@ export const StakePoolCard = ({
 const CustomCard = styled(Box)(({ theme, suggestedPool }) => ({
   background: suggestedPool ? 'linear-gradient(312deg, #C6F7ED 0%, #E4E8F7 70.58%)' : 'transparent',
   padding: theme.spacing(2),
-  width: '294px',
+  width: '284px',
   borderWidth: 1,
   borderRadius: 8,
   border: `1px solid ${theme.palette.grayscale['200']}`,
