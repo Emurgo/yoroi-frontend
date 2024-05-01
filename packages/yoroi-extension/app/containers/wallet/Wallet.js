@@ -56,11 +56,6 @@ class Wallet extends Component<AllProps> {
       });
     }
 
-    // check current pool id -> open poll transition dialog if needed
-    if (true) {
-      this.props.actions.dialogs.open.trigger({ dialog: PoolTransitionDialog });
-    }
-
     if (!this.props.stores.profile.isRevampAnnounced)
       this.props.actions.dialogs.open.trigger({ dialog: RevampAnnouncementDialog });
   }
@@ -258,20 +253,6 @@ class Wallet extends Component<AllProps> {
       return undefined;
     }
     return warnings[warnings.length - 1]();
-  };
-
-  getPoolTransitionDialog: void => Node = () => {
-    const isOpen = this.props.stores.uiDialogs.isOpen;
-    if (isOpen(PoolTransitionDialog)) {
-      return (
-        <PoolTransitionDialog
-          onClose={() => {
-            this.props.actions.dialogs.closeActiveDialog.trigger();
-          }}
-        />
-      );
-    }
-    return null;
   };
 
   getDialogs: void => Node = () => {

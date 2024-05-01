@@ -23,6 +23,7 @@ import { messages } from './dialog-messages';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import Separator from '../../../../components/common/separator/Separator';
+import { ReactComponent as ArrowRightSvg } from '../../../../assets/images/revamp/icons/arrow-right.inline.svg';
 
 type Props = {|
   onClose: () => void,
@@ -46,7 +47,7 @@ export const PoolTransitionDialog = ({
       onClose={onClose}
       title={intl.formatMessage(messages.upgradeStakePool)}
       styleOverride={{ width: '648px', padding: 0 }}
-      closeButton={<DialogCloseButton onClose={onClose} />}
+      closeOnOverlayClick
     >
       <Typography variant="body1" mb={2}>
         {intl.formatMessage(messages.currentStakePool)}
@@ -61,9 +62,9 @@ export const PoolTransitionDialog = ({
           poolHash={currentPoolId}
           intl={intl}
         />
-        <Typography variant="body1" fontWeight="500">
-          →
-        </Typography>
+
+        <ArrowRightSvg />
+
         <StakePoolCard
           label={intl.formatMessage(messages.newPool)}
           poolName={suggestedPool?.name}
