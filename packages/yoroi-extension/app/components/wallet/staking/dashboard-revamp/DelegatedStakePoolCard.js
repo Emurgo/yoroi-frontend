@@ -155,7 +155,7 @@ function DelegatedStakePoolCard({
       </Wrapper>
       {poolTransition?.deadlineMilliseconds && (
         <SAlert severity="error">
-          <Typography variant="body2" mt="1px" color="grayscale.900">
+          <Typography variant="body2" mt="1px" ml="4px" color="grayscale.900">
             {intl.formatMessage(globalMessages.poolNotGenerating)}
           </Typography>
         </SAlert>
@@ -216,6 +216,10 @@ const UpdatePoolButton: any = styled(Button)(({ theme }) => ({
   marginLeft: 'auto',
   background: theme.palette.magenta['500'],
   color: 'white',
+  height: '40px',
+  width: '140px',
+  padding: '0px !important',
+  fontSize: '14px',
   '&:hover': {
     backgroundColor: theme.palette.magenta['500'],
     color: 'white',
