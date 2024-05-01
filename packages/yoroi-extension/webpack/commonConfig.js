@@ -193,6 +193,7 @@ const optimization = {
 const resolve = () /*: * */ => ({
   extensions: ['*', '.js', '.wasm'],
   fallback: {
+    vm: false,
     fs: false,
     path: require.resolve('path-browserify'),
     stream: require.resolve('stream-browserify'),

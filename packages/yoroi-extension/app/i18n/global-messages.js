@@ -927,6 +927,14 @@ const globalMessages: * = defineMessages({
     id: 'button.buyAda',
     defaultMessage: '!!!Buy ADA',
   },
+  sellAda: {
+    id: 'button.sellAda',
+    defaultMessage: '!!!Sell ADA',
+  },
+  buySellAda: {
+    id: 'button.buySellAda',
+    defaultMessage: '!!!Buy/Sell ADA',
+  },
   txConfirmationLedgerNanoLine2: {
     id: 'wallet.send.ledger.confirmationDialog.info.line.2',
     defaultMessage:
@@ -960,6 +968,14 @@ const globalMessages: * = defineMessages({
   poolNotGenerating: {
     id: 'wallet.transitionDialog.poolNotGenerating',
     defaultMessage: '!!!This pool is NOT generating staking rewards anymore',
+  },
+  goToTransactions: {
+    id: 'wallet.transaction.success.button.label',
+    defaultMessage: '!!!Go To Transactions',
+  },
+  provider: {
+    id: 'buysell.dialog.provider',
+    defaultMessage: '!!!Provider',
   },
 });
 export default globalMessages;

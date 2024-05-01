@@ -3,29 +3,22 @@ import type { Node } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import { ReactComponent as InfoIcon } from '../../assets/images/revamp/icons/info.inline.svg';
 import Dialog from '../widgets/Dialog';
+import { FormattedMarketPrice, FormattedPrice } from './PriceImpact';
+import { useSwap } from '@yoroi/swap';
 
 type Props = {|
-  limitPrice: number,
-  marketPrice: number,
-  exchangePair: string,
-  onConfirm(): void,
-  onClose(): void,
+  onContinue: () => void,
+  onCancel: () => void,
 |};
 
-export default function LimitOrderDialog({
-  limitPrice,
-  marketPrice,
-  exchangePair,
-  onConfirm,
-  onClose,
+export default function LimitOrderWarningDialog({
+  onContinue,
+  onCancel,
 }: Props): Node {
-  const handleConfirm = () => {
-    onConfirm();
-    onClose();
-  };
-
+  const { orderData } = useSwap();
+  const limitPrice = orderData.selectedPoolCalculation?.order.limitPrice ?? '0';
   return (
-    <Dialog title="Limit price" onClose={onClose} withCloseButton closeOnOverlayClick>
+    <Dialog title="Limit price" onClose={onCancel} withCloseButton closeOnOverlayClick>
       <Box display="flex" maxWidth="648px" mt="8px" mb="24px" flexDirection="column" gap="24px">
         <Box>
           <Typography component="div" variant="body1" color="grayscale.900">
@@ -34,15 +27,19 @@ export default function LimitOrderDialog({
           </Typography>
         </Box>
         <Box display="flex" flexDirection="column" gap="16px">
-          <SummaryRow col1="Your limit price" col2={`${limitPrice} ${exchangePair}`} />
-          <SummaryRow col1="Market price" col2={`${marketPrice} ${exchangePair}`} />
+          <SummaryRow col1="Your limit price">
+            <FormattedPrice price={limitPrice ?? '0'} />
+          </SummaryRow>
+          <SummaryRow col1="Market price">
+            <FormattedMarketPrice />
+          </SummaryRow>
         </Box>
       </Box>
       <Box maxWidth="648px" display="flex" gap="24px" pt="24px">
-        <Button fullWidth variant="secondary" onClick={onClose}>
+        <Button fullWidth variant="secondary" onClick={onCancel}>
           Back
         </Button>
-        <Button fullWidth variant="primary" onClick={handleConfirm}>
+        <Button fullWidth variant="primary" onClick={onContinue}>
           Swap
         </Button>
       </Box>
@@ -52,11 +49,11 @@ export default function LimitOrderDialog({
 
 type SummaryRowProps = {|
   col1: Node,
-  col2: Node,
+  children: Node,
   withInfo?: boolean,
 |};
 
-const SummaryRow = ({ col1, col2, withInfo = false }: SummaryRowProps): Node => (
+const SummaryRow = ({ col1, children, withInfo = false }: SummaryRowProps): Node => (
   <Box display="flex" alignItems="center" justifyContent="space-between">
     <Box display="flex" alignItems="center">
       <Typography component="div" variant="body1" color="grayscale.500">
@@ -69,7 +66,7 @@ const SummaryRow = ({ col1, col2, withInfo = false }: SummaryRowProps): Node => 
       ) : null}
     </Box>
     <Box>
-      <Typography component="div" variant="body1">{col2}</Typography>
+      <Typography component="div" variant="body1">{children}</Typography>
     </Box>
   </Box>
 );

@@ -23,6 +23,10 @@ export type ActionType = {|
   +size?: ?string,
 |};
 
+export type StyleFlag = {|
+  +contentNoTopPadding?: boolean,
+|};
+
 export type Props = {|
   +title?: string | Node,
   +children?: Node,
@@ -37,6 +41,7 @@ export type Props = {|
   +closeOnOverlayClick?: boolean,
   +isRevampLayout?: boolean,
   id?: string,
+  +styleFlags?: StyleFlag,
 |};
 
 type InjectedProps = {| isRevampLayout: boolean |};
@@ -55,6 +60,7 @@ function Dialog(props: Props & InjectedProps): Node {
     scrollableContentClass,
     isRevampLayout,
     id,
+    styleFlags,
   } = props;
 
   const [contentHasScroll, setContentHasScroll] = useState(false);
@@ -69,6 +75,7 @@ function Dialog(props: Props & InjectedProps): Node {
 
       if (el.clientHeight < el.scrollHeight) {
         setContentHasScroll(true);
+        // el.style.marginRight = '-24px';
       } else {
         setContentHasScroll(false);
         el.style.marginRight = '0';
@@ -130,7 +137,11 @@ function Dialog(props: Props & InjectedProps): Node {
           </Typography>
         ) : null}
         {children != null ? (
-          <ModalContent pb={contentHasScroll || !hasActions ? '24px' : '0px !important'}>
+          <ModalContent
+            pt={styleFlags?.contentNoTopPadding ? '0px !important' : undefined}
+            pb={contentHasScroll || !hasActions ? '24px' : '0px !important'}
+            className="ModalContent"
+          >
             {children}
           </ModalContent>
         ) : null}
@@ -263,6 +274,7 @@ const ModalContent = styled(Box)(({ theme }) => ({
   paddingRight: theme.name === 'classic' ? '30px' : '24px',
   paddingTop: theme.name === 'classic' ? '0px' : '24px',
   paddingBottom: theme.name === 'classic' || theme.name === 'modern' ? '0px' : '24px',
+  flexGrow: 1,
 }));
 
 const ModalFooter = styled(Box)(({ theme, contentHasScroll }) => ({

@@ -202,6 +202,13 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     return this.selected != null;
   }
 
+  @computed get selectedOrFail(): PublicDeriver<> {
+    if (this.selected == null) {
+      throw new Error('A selected wallet is required!');
+    }
+    return this.selected;
+  }
+
   @computed get activeWalletPlate(): ?WalletChecksum {
     const selectedPublicDeriverId = this.selected?.publicDeriverId;
     if (selectedPublicDeriverId != null) {

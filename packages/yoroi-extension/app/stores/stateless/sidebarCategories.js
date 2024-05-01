@@ -135,7 +135,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.SWAP.ROOT,
     icon: swapIcon,
     label: globalMessages.sidebarSwap,
-    isVisible: () => environment.isDev(),
+    isVisible: ({ selected }) => (environment.isDev() || environment.isNightly()) && !!selected?.isMainnet(),
   },
   {
     className: 'assets',

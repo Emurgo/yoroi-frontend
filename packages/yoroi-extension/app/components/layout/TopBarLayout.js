@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import styles from './TopBarLayout.scss';
 import { withLayout } from '../../styles/context/layout';
 import { Box } from '@mui/system';
-import { THEMES } from '../../styles/utils';
+import { THEMES } from '../../styles/themes';
 
 type Props = {|
   +banner?: Node,

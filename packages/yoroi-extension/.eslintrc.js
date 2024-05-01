@@ -66,6 +66,7 @@ module.exports = {
     'react/state-in-constructor': ['warn', 'never'],
     'react/jsx-props-no-spreading': 0,
     'react/jsx-curly-newline': 0,
+    'react/jsx-tag-spacing': 0,
     'class-methods-use-this': 0,
     'no-continue': 0,
     'no-duplicate-imports': 0,
@@ -112,6 +113,8 @@ module.exports = {
       { object: 'TrezorConnect', message: 'Use TrezorWrapper instead to minimize Trezor iframe lifespan', },
     ],
     'import/no-unused-modules': [1, { unusedExports: true }],
+    'camelcase': 0,
+    'react/jsx-curly-brace-presence': 0,
   },
   plugins: [
     'import',

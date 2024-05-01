@@ -87,10 +87,20 @@
       },
       
       auth: () => {
+        // <TODO:PENDING_REMOVAL> experimental
+        console.warn(`
+          WARNING!! YOROI-EXPERIMENTAL function "auth" is about to be removed.
+          Migrate to some other API for authentication immediately.
+        `);
         return CardanoAPI._auth;
       },
       
       createTx: (req) => {
+        // <TODO:PENDING_REMOVAL> experimental
+        console.warn(`
+          WARNING!! YOROI-EXPERIMENTAL function "createTx" is about to be removed.
+          Migrate to some other API for transaction building immediately.
+        `);
         return CardanoAPI._cardano_rpc_call("create_tx/cardano", [req]);
       },
 

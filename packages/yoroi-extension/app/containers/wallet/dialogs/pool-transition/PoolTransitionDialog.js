@@ -84,7 +84,9 @@ export const PoolTransitionDialog = ({
         <CustomButton variant="text" onClick={onClose} sx={{ color: '#242838' }}>
           {intl.formatMessage(messages.skipAndStop)}
         </CustomButton>
+
         <Separator />
+
         <CustomButton
           variant="contained"
           color="primary"
