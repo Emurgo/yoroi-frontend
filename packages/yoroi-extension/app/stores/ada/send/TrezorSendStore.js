@@ -26,6 +26,8 @@ import type {
 } from '../../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { generateRegistrationMetadata } from '../../../api/ada/lib/cardanoCrypto/catalyst';
 import { derivePublicByAddressing } from '../../../api/ada/lib/cardanoCrypto/deriveByAddressing';
+import type { Addressing } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackaged/networks.js';
 
 /** Note: Handles Trezor Signing */
 export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
@@ -54,6 +56,10 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
     params: SendUsingTrezorParams,
     publicDeriverId: number,
     onSuccess?: void => void,
+    stakingAddressing: Addressing,
+    publicKey: string,
+    pathToPublic: Array<number>,
+    networkId: number,
   |} => Promise<void> = async (request) => {
     try {
       if (this.isActionProcessing) {
@@ -73,6 +79,10 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
           trezor: {
             signRequest,
             publicDeriverId: request.publicDeriverId,
+            stakingAddressing: request.stakingAddressing,
+            publicKey: request.publicKey,
+            pathToPublic: request.pathToPublic,
+            networkId: request.networkId,
           },
         },
         refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriverId),
@@ -137,7 +147,7 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
       };
 
       const stakingKey = derivePublicByAddressing({
-        addressing: stakingAddressing.addressing,
+        addressing: request.stakingAddressing.addressing,
         startingFrom: {
           level: publicKeyInfo.addressing.startLevel + publicKeyInfo.addressing.path.length - 1,
           key: publicKeyInfo.key,
@@ -210,11 +220,6 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
         },
         sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
       });
-      await this.stores.substores.ada.transactions.recordSubmittedTransaction(
-        request.publicDeriverId,
-        request.params.signRequest,
-        txId,
-      );
       return { txId };
     } catch (error) {
       Logger.error(`${nameof(TrezorSendStore)}::${nameof(this.signAndBroadcast)} error: ` + stringifyError(error));

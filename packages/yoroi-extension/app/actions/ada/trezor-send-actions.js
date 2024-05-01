@@ -15,5 +15,9 @@ export default class TrezorSendActions {
     params: SendUsingTrezorParams,
     publicDeriverId: number,
     onSuccess?: void => void,
+    stakingAddressing: request.stakingAddressing,
+    publicKey: request.publicKey,
+    pathToPublic: request.pathToPublic,
+    networkId: request.networkId,
   |}> = new AsyncAction();
 }

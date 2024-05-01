@@ -27,6 +27,8 @@ export type WalletState = {|
   networkId: number,
   name: string,
   type: WalletType,
+  // request.publicDeriver.getParent().hardwareInfo?.DeviceId
+  hardwareWalletDeviceId: ?string,
   // cache
   plate: WalletChecksum,
   publicKey: string,

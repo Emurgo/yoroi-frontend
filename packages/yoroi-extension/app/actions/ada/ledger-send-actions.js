@@ -20,6 +20,10 @@ export default class LedgerSendActions {
     params: SendUsingLedgerParams,
     publicDeriverId: number,
     onSuccess?: void => void,
+    stakingAddressing: Addressing,
+    publicKey: string,
+    pathToPublic: Array<number>,
+    networkId: number,
   |}> = new AsyncAction();
   sendUsingLedgerKey: AsyncAction<{|
     signRequest: HaskellShelleyTxSignRequest,
@@ -30,5 +34,6 @@ export default class LedgerSendActions {
     publicDeriverId: number,
     addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
     expectedSerial: string | void,
+    networkId: number,
   |}> = new AsyncAction();
 }

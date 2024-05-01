@@ -128,7 +128,7 @@ export const CARDANO_DELEGATION: TopbarCategory = registerCategory({
   icon: undefined,
   label: messages.delegationById,
   isVisible: request => {
-    const networkId = request.selected.getParent().getNetworkInfo().NetworkId;
+    const { networkId } = request;
     return (
       (environment.isTest() ||
         networkId === networks.CardanoTestnet.NetworkId ||

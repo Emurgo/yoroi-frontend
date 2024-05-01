@@ -45,6 +45,7 @@ import {
   generateRegistrationMetadata,
   generateCip15RegistrationMetadata,
 } from '../../../api/ada/lib/cardanoCrypto/catalyst';
+import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackaged/networks.js';
 
 /** Note: Handles Ledger Signing */
 export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
@@ -94,6 +95,10 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
     params: SendUsingLedgerParams,
     publicDeriverId: number,
     onSuccess?: void => void,
+    stakingAddressing: Addressing,
+    publicKey: string,
+    pathToPublic: Array<number>,
+    networkId: number,
   |} => Promise<void> = async (request) => {
     try {
       if (this.isActionProcessing) {
@@ -113,6 +118,10 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
           ledger: {
             signRequest,
             publicDeriverId: request.publicDeriverId,
+            stakingAddressing: request.stakingAddressing,
+            publicKey: request.publicKey,
+            pathToPublic: request.pathToPublic,
+            networkId: request.networkId,
           },
         },
         refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriverId),
@@ -143,6 +152,7 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
     publicKey: string,
     pathToPublic: Array<number>,
     networkId: number,
+    hardwareWalletDeviceId: ?string,
   |} => Promise<{| txId: string |}> = async (request) => {
     try {
       Logger.debug(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcast)} called: ` + stringifyData(request.params));
@@ -157,16 +167,17 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
         },
       };
 
-      const expectedSerial = request.publicDeriver.getParent().hardwareInfo?.DeviceId || '';
+      const expectedSerial = request.hardwareWalletDeviceId || '';
       return this.signAndBroadcast({
         ...request.params,
         publicKey: publicKeyInfo,
-        publicDeriver: request.publicDeriver,
+        publicDeriverId: request.publicDeriverId,
         addressingMap: genAddressingLookup(
-          request.publicDeriver,
+          request.publicDeriverId,
           this.stores.addresses.addressSubgroupMap
         ),
         expectedSerial,
+        networkId: request.networkId,
       });
     } catch (error) {
       Logger.error(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcast)} error: ` + stringifyError(error));
@@ -202,7 +213,7 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
         cip36 = getVersionResponse.compatibility.supportsCIP36Vote === true;
       }
 
-      const network = getNetworkById(networkId);
+      const network = getNetworkById(request.networkId);
 
       const { ledgerSignTxPayload } = await this.api.ada.createLedgerSignTxData({
         signRequest: request.signRequest,
@@ -298,12 +309,6 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
       });
 
       Logger.info('SUCCESS: ADA sent using Ledger SignTx');
-
-      await this.stores.substores.ada.transactions.recordSubmittedTransaction(
-        request.publicDeriverId,
-        request.signRequest,
-        txId,
-      );
 
       return {
         txId,

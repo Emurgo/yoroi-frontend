@@ -3,7 +3,6 @@ import type { MessageDescriptor } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import globalMessages, { connectorMessages } from '../../i18n/global-messages';
 import { matchRoute } from '../../utils/routing';
-import { asGetStakingKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { ReactComponent as walletsIcon } from '../../assets/images/sidebar/my_wallets.inline.svg';
 import { ReactComponent as transferIcon } from '../../assets/images/sidebar/transfer_wallets.inline.svg';
 import { ReactComponent as settingsIcon } from '../../assets/images/sidebar/wallet-settings-2-ic.inline.svg';
@@ -16,7 +15,6 @@ import { ReactComponent as nftsIcon } from '../../assets/images/sidebar/revamp/n
 import { ReactComponent as votingIcon } from '../../assets/images/sidebar/revamp/voting.inline.svg';
 import { ReactComponent as swapIcon } from '../../assets/images/sidebar/revamp/swap.inline.svg';
 import { ReactComponent as settingIcon } from '../../assets/images/sidebar/revamp/setting.inline.svg';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import environment from '../../environment';
 
@@ -27,7 +25,7 @@ export type SidebarCategory = {|
   +label?: MessageDescriptor,
   +isVisible: ({|
     hasAnyWallets: boolean,
-    selected: null | PublicDeriver<>,
+    selected: null | number,
     currentRoute: string,
   |}) => boolean,
 |};
@@ -91,7 +89,7 @@ export const CONNECTED_WEBSITES: SidebarCategory = registerCategory({
 
 type isVisibleFunc = ({|
   hasAnyWallets: boolean,
-  selected: null | PublicDeriver<>,
+  selected: null | number,
   currentRoute: string,
   isRewardWallet: isRewardWalletFunc,
 |}) => boolean;
@@ -157,7 +155,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     icon: votingIcon,
     label: globalMessages.sidebarVoting,
     // $FlowFixMe[prop-missing]
-    isVisible: request => asGetStakingKey(request.selected) != null,
+    isVisible: request => request.selected != null,
   },
   {
     className: 'connected-websites',

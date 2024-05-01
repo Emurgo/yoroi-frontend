@@ -114,6 +114,7 @@ export async function renameConceptualWallet(
 }
 
 // AdaMnemonicSendStore.signAndBroadcast
+// AdaTransactionsStore.recordSubmittedTransaction
 export async function signAndBroadcast(
   request: {|
     signRequest: HaskellShelleyTxSignRequest,

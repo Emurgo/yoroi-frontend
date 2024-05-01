@@ -156,7 +156,7 @@ class WalletSummaryPage extends Component<AllProps> {
             getHistoricalPrice={this.props.stores.coinPriceStore.getHistoricalPrice}
             getTokenInfo={genLookupOrNull(this.props.stores.tokenInfoStore.tokenInfo)}
             addressLookup={genAddressLookup(
-              selected.publicDeriverId,
+              selected,
               intl,
               route => this.props.actions.router.goToRoute.trigger({ route }),
               this.props.stores.addresses.addressSubgroupMap

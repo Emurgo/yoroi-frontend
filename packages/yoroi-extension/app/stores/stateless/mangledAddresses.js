@@ -8,6 +8,7 @@ import {
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { genFilterSmallUtxo } from '../../api/ada/transactions/shelley/transactions';
+import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { BASE_MANGLED } from './addressStores';
 import {
   unwrapStakingKey as CardanoUnwrapStakingKey,
