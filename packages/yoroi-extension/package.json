@@ -221,8 +221,7 @@
     "trezor-connect-flow": "Emurgo/trezor-connect-flow#92d6d8c8faef25c0ea1d481aa1ecb4ba77ce539c",
     "ua-parser-js": "0.7.24",
     "unorm": "1.6.0",
-    "util": "0.12.5",
-    "validator": "13.5.2"
+    "util": "0.12.5"
   },
   "engineStrict": true,
   "engine": {
