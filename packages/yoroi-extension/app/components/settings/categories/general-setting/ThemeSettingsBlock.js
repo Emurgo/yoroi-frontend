@@ -121,7 +121,7 @@ export default class ThemeSettingsBlock extends Component<Props> {
           variant={isRevampLayout ? 'body1' : 'h5'}
           fontWeight={500}
           mb={isRevampLayout ? '0px' : '12px'}
-          color="grayscale.900"
+          color="ds.gray_c900"
         >
           {intl.formatMessage(messages.version)}
         </Typography>
@@ -143,7 +143,7 @@ export default class ThemeSettingsBlock extends Component<Props> {
               control={
                 <Radio
                   sx={{
-                    color: 'primary.500',
+                    color: 'ds.primary_c500',
                   }}
                   size="small"
                 />
@@ -153,7 +153,7 @@ export default class ThemeSettingsBlock extends Component<Props> {
             />
             <FormControlLabel
               value={OLD_THEME}
-              control={<Radio sx={{ color: 'primary.500' }} size="small" />}
+              control={<Radio sx={{ color: 'ds.primary_c500' }} size="small" />}
               label={intl.formatMessage(messages.currentVersion)}
               id="switchToOldVersionButton"
               sx={{

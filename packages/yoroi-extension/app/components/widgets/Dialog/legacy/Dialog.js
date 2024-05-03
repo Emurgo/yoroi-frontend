@@ -9,7 +9,7 @@ import { Box, styled } from '@mui/system';
 import { LoadingButton } from '@mui/lab';
 import { withLayout } from '../../../../styles/context/layout';
 import { observer } from 'mobx-react';
-import { ReactComponent as CrossIcon } from '../../../assets/images/revamp/icons/cross.inline.svg';
+import { ReactComponent as CrossIcon } from '../../../../assets/images/revamp/icons/cross.inline.svg';
 
 export type ActionType = {|
   +label: string,
@@ -152,7 +152,7 @@ function LegacyDialog(props: Props): Node {
   );
 }
 
-Dialog.defaultProps = {
+LegacyDialog.defaultProps = {
   title: undefined,
   children: undefined,
   actions: undefined,

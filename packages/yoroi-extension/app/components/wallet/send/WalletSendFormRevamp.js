@@ -646,7 +646,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               {domainResolverResult != null ? (
                 <Typography component="div"
                   variant="caption1"
-                  color={invalidMemo ? 'magenta.500' : 'grayscale.600'}
+                  color={invalidMemo ? 'magenta.500' : 'ds.gray_c600'}
                   sx={{ position: 'absolute', bottom: '10px', right: '0' }}
                 >
                   {intl.formatMessage(messages.receiverFieldLabelResolvedAddress)}:&nbsp;
@@ -678,7 +678,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               />
               <Typography component="div"
                 variant="caption1"
-                color={invalidMemo ? 'magenta.500' : 'grayscale.600'}
+                color={invalidMemo ? 'magenta.500' : 'ds.gray_c600'}
                 sx={{ position: 'absolute', bottom: '5px', right: '0' }}
               >
                 {memo ? memo.length : 0}/{MAX_MEMO_SIZE}
@@ -741,9 +741,9 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   position: 'absolute',
                   top: '-8px',
                   left: '6px',
-                  backgroundColor: 'common.white',
+                  backgroundColor: 'ds.white_static',
                   paddingX: '4px',
-                  color: shouldSendAll && 'grayscale.200',
+                  color: shouldSendAll && 'ds.gray_c200',
                 }}
                 variant="caption2"
               >
@@ -838,7 +838,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   sx={{
                     margin: '16px 16px 0px 16px',
                     pt: '16px',
-                    color: 'grayscale.600',
+                    color: 'ds.gray_c600',
                     fontSize: '16px',
                     letterSpacing: 0,
                     borderTop: '1px solid var(--yoroi-comp-input-text-disabled)',
@@ -1005,7 +1005,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     return (
       <>
         <div className={styles.component}>
-          <Box className={styles.wrapper} sx={{ bgcolor: 'common.white', height: '100%' }}>
+          <Box className={styles.wrapper} sx={{ bgcolor: 'ds.gray_cmin', height: '100%' }}>
             <SendFormHeader step={currentStep} onUpdateStep={this.onUpdateStep.bind(this)} />
             <Box
               ref={ref => {
@@ -1020,7 +1020,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 borderTop={
                   bodyRef && bodyRef.scrollHeight > bodyRef.clientHeight ? '1px solid' : '0'
                 }
-                borderColor="grayscale.200"
+                borderColor="ds.gray_c200"
                 display="flex"
                 alignItems="center"
                 justifyContent="center"

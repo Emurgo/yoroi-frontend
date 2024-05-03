@@ -60,19 +60,19 @@ export default class ExplorableHash extends Component<Props> {
               borderRadius: '2px',
               color: 'transparent',
               '&:hover': {
-                color: 'primary.600',
+                color: 'ds.primary_c600',
               },
               '&:active': {
-                color: 'primary.700',
+                color: 'ds.primary_c700',
               },
               '&:focus': {
-                color: 'primary.600',
+                color: 'ds.primary_c600',
                 outlineWidth: '2px',
                 outlineStyle: 'solid',
                 outlineColor: theme => theme.palette.yellow[500],
               },
               '&:disabled': {
-                color: 'primary.300',
+                color: 'ds.primary_c300',
               },
             }}
           >

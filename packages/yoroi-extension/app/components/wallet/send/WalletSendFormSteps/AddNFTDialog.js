@@ -268,7 +268,7 @@ export default class AddNFTDialog extends Component<Props, State> {
                         minHeight: '237px',
                         overflow: 'hidden',
                         border: '2px solid',
-                        borderColor: isIncluded ? 'primary.600' : 'grayscale.100',
+                        borderColor: isIncluded ? 'ds.primary_c600' : 'ds.gray_c100',
                         borderRadius: '8px',
                         transition: 'border-color 300ms ease',
                         display: 'flex',

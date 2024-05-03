@@ -82,7 +82,7 @@ export default class RegisterDialog extends Component<Props> {
               pt="24px"
               pb="40px"
               variant="body1"
-              color="grayscale.900"
+              color="ds.gray_c900"
             >
               {intl.formatMessage(messages.line1)}
             </Typography>

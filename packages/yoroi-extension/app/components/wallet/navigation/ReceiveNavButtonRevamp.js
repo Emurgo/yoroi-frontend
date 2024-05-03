@@ -42,14 +42,14 @@ export default class ReceiveNavButtonRevamp extends Component<Props> {
     return (
       <Box
         onClick={this.props.onClick}
-        color={isTopLvl && isActive ? 'primary.600' : 'grayscale.600'}
+        color={isTopLvl && isActive ? 'ds.primary_c600' : 'ds.gray_c600'}
         id={locationId + '-' + simplifiedLabel + 'MenuItem-button'}
       >
         <Box display="flex" alignItems="center" gap="6px">
           <Typography component="div" variant="body1" fontWeight={this.props.isActive ? 500 : 400}>
             {this.props.label}
           </Typography>
-          <Box component="span" color="grayscale.600" sx={{ '& path': { fill: 'currentcolor' } }}>
+          <Box component="span" color="ds.gray_c600" sx={{ '& path': { fill: 'currentcolor' } }}>
             {this.props.tooltip}
           </Box>
         </Box>

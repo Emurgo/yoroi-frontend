@@ -37,7 +37,7 @@ export default class CreateWalletPageContainer extends Component<StoresAndAction
       <TopBarLayout
         banner={<BannerContainer actions={actions} stores={stores} />}
         sidebar={<SidebarContainer actions={actions} stores={stores} />}
-        bgcolor="common.white"
+        bgcolor="ds.gray_cmin"
       >
         {createWalletPageComponent}
       </TopBarLayout>

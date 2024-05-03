@@ -41,7 +41,7 @@ type TitleProps = {|
 const Title = ({ label, value }: TitleProps): Node => {
   return (
     <Box>
-      <Typography component="div" fontWeight="500" color="primary.600">
+      <Typography component="div" fontWeight="500" color="ds.primary_c600">
         {label}: {value}
       </Typography>
     </Box>
@@ -59,11 +59,11 @@ const LabelWithValue = ({ label, value }: InfoColumnProps): Node => {
         style={{ textTransform: 'uppercase' }}
         variant="caption"
         mb="4px"
-        color="grayscale.600"
+        color="ds.gray_c600"
       >
         {label}
       </Typography>
-      <Typography component="div" color="grayscale.900">{value}</Typography>
+      <Typography component="div" color="ds.gray_c900">{value}</Typography>
     </Box>
   );
 };
@@ -77,7 +77,7 @@ const Graph = ({ value, days }): Node => {
         variant="determinate"
         value={value}
         sx={{
-          color: 'primary.600',
+          color: 'ds.primary_c600',
           animationDuration: '550ms',
           position: 'absolute',
           zIndex: 1,
@@ -87,7 +87,7 @@ const Graph = ({ value, days }): Node => {
         size={120}
         thickness={7}
         variant="determinate"
-        sx={{ color: 'grayscale.50' }}
+        sx={{ color: 'ds.gray_c50' }}
         value={100}
       />
       <Box
@@ -99,10 +99,10 @@ const Graph = ({ value, days }): Node => {
           textAlign: 'center',
         }}
       >
-        <Typography component="div" variant="h4" color="grayscale.900">
+        <Typography component="div" variant="h4" color="ds.gray_c900">
           {value}%
         </Typography>
-        <Typography component="div" variant="caption1" fontSize="12px" color="grayscale.600">
+        <Typography component="div" variant="caption1" fontSize="12px" color="ds.gray_c600">
           {days} days
         </Typography>
       </Box>

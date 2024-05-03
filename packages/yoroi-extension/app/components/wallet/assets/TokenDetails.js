@@ -81,13 +81,13 @@ function TokenDetails({ tokenInfo, network, intl }: Props & Intl): Node {
 
   return (
     <Box>
-      <Box backgroundColor="common.white">
+      <Box backgroundColor="ds.white_static">
         <Typography
           as={Link}
           replace
           to={ROUTES.ASSETS.ROOT}
           variant="h5"
-          color="grayscale.900"
+          color="ds.gray_c900"
           fontWeight={500}
           fontSize="18px"
           sx={{
@@ -123,15 +123,15 @@ function TokenDetails({ tokenInfo, network, intl }: Props & Intl): Node {
         }}
       >
         <Box display="flex" alignItems="center" py="20px">
-          <Typography component="div" variant="h2" fontWeight={500} color="common.black">
+          <Typography component="div" variant="h2" fontWeight={500} color="ds.black_static">
             {tokenInfo.name}
           </Typography>
         </Box>
         <Box>
-          <Typography component="div" variant="body1" color="grayscale.600">
+          <Typography component="div" variant="body1" color="ds.gray_c600">
             {intl.formatMessage(assetsMessage.quantity)}
           </Typography>
-          <Typography component="div" variant="body1" color="grayscale.900" mt="6px">
+          <Typography component="div" variant="body1" color="ds.gray_c900" mt="6px">
             {tokenInfo.amount}
           </Typography>
         </Box>
@@ -191,10 +191,10 @@ function TokenDetails({ tokenInfo, network, intl }: Props & Intl): Node {
         />
 
         <Box>
-          <Typography component="div" variant="body1" color="grayscale.600">
+          <Typography component="div" variant="body1" color="ds.gray_c600">
             {intl.formatMessage(tokenMessages.detailsOn)}
           </Typography>
-          <Typography component="div" variant="body1" color="grayscale.900" mt="6px">
+          <Typography component="div" variant="body1" color="ds.gray_c900" mt="6px">
             <LinkMui
               target="_blank"
               href={
@@ -220,8 +220,8 @@ export default (injectIntl(TokenDetails): ComponentType<Props>);
 function LabelWithValue({ label, value }: {| label: string | Node, value: string | Node |}): Node {
   return (
     <Box>
-      <Typography component="div" color="grayscale.600">{label}</Typography>
-      <Typography component="div" color="grayscale.900">{value}</Typography>
+      <Typography component="div" color="ds.gray_c600">{label}</Typography>
+      <Typography component="div" color="ds.gray_c900">{value}</Typography>
     </Box>
   );
 }

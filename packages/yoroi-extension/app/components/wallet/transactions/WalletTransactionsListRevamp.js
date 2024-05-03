@@ -151,7 +151,7 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
     return (
       <Box
         sx={{
-          bgcolor: 'common.white',
+          bgcolor: 'ds.gray_cmin',
           padding: '20px 0',
           overflow: 'auto',
         }}
@@ -171,7 +171,7 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
             <Typography
               component="div"
               variant="body2"
-              color="grayscale.600"
+              color="ds.gray_c600"
               id={baseIdPart + ':transactionsGroup_' + index + '-date-text'}
             >
               {this.localizedDate(group.date)}

@@ -95,7 +95,7 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
           <Typography
             component="div"
             textAlign="center"
-            color="grayscale.900"
+            color="ds.gray_c900"
             mb="16px"
             variant="h3"
             fontWeight={500}
@@ -108,7 +108,7 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
           component="div"
           textAlign="center"
           variant="body1"
-          color={isRevampLayout ? 'grayscale.800' : 'gray.600'}
+          color={isRevampLayout ? 'ds.gray_c800' : 'gray.600'}
         >
           {intl.formatMessage(messages.subtitle)}
         </Typography>
@@ -122,7 +122,7 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
             sx={{
               textAlign: 'center',
               '& strong': {
-                color: isRevampLayout ? 'primary.500' : 'secondary.300',
+                color: isRevampLayout ? 'ds.primary_c500' : 'ds.secondary_c300',
                 fontWeight: 500,
                 textTransform: 'uppercase',
               },
@@ -216,14 +216,14 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
         ) : (
           <div className={styles.cardsWrapper}>
             {levels.map(level => (
-              <Box className={styles.card} sx={{ bgcolor: 'gratscale.min' }} key={level.key}>
+              <Box className={styles.card} sx={{ bgcolor: 'ds.gray_cmin' }} key={level.key}>
                 <Box
-                  sx={{ bgcolor: 'grayscale.100' }}
+                  sx={{ bgcolor: 'ds.gray_c100' }}
                   className={classnames([styles.cardImage, styles[level.key]])}
                 >
                   {level.image}
                 </Box>
-                <Box sx={{ bgcolor: 'grayscale.900' }} className={styles.cardContent}>
+                <Box sx={{ bgcolor: 'ds.gray_c900' }} className={styles.cardContent}>
                   <div>
                     <h3>{level.name}</h3>
                     <div>{level.description}</div>

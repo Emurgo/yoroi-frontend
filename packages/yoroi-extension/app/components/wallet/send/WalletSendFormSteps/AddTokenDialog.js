@@ -413,25 +413,25 @@ export default class AddTokenDialog extends Component<Props, State> {
               <Box
                 component="ul"
                 borderBottom="1px solid"
-                borderBottomColor="grayscale.200"
+                borderBottomColor="ds.gray_c200"
                 className={styles.columns}
               >
                 <li>
                   <button type="button" onClick={() => this.sortTokens(SORTING_COLUMNS.LABEL)}>
-                    <Typography component="div" variant="body2" color="grayscale.600">
+                    <Typography component="div" variant="body2" color="ds.gray_c600">
                       {intl.formatMessage(messages.nameAndTicker)}
                     </Typography>
                     {this.displayColumnLogo(SORTING_COLUMNS.LABEL)}
                   </button>
                 </li>
                 <li>
-                  <Typography component="div" variant="body2" color="grayscale.600">
+                  <Typography component="div" variant="body2" color="ds.gray_c600">
                     {intl.formatMessage(messages.identifier)}
                   </Typography>
                 </li>
                 <li className={styles.quantity}>
                   <button type="button" onClick={() => this.sortTokens(SORTING_COLUMNS.AMOUNT)}>
-                    <Typography component="div" variant="body2" color="grayscale.600">
+                    <Typography component="div" variant="body2" color="ds.gray_c600">
                       {intl.formatMessage(messages.quantity)}
                     </Typography>
                     {this.displayColumnLogo(SORTING_COLUMNS.AMOUNT)}

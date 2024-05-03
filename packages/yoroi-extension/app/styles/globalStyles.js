@@ -82,8 +82,8 @@ export function getMainYoroiPalette(theme: Object): { [string]: string | number 
        to keep consistency and allow users to override few options from BASE if they want to
     */
     /* === BASE === */
-    '--yoroi-palette-common-white': theme.palette.common.white,
-    '--yoroi-palette-common-black': theme.palette.common.black,
+    '--yoroi-palette-common-white': theme.palette.ds.white_static,
+    '--yoroi-palette-common-black': theme.palette.ds.black_static,
 
     '--yoroi-palette-primary-50': theme.palette.primary['50'],
     '--yoroi-palette-primary-100': theme.palette.primary['100'],
@@ -134,8 +134,8 @@ export function getMainYoroiPalette(theme: Object): { [string]: string | number 
     '--yoroi-palette-gray-900': (theme.palette.grey ? theme.palette.grey : theme.palette.grayscale)[
       '900'
     ],
-    '--yoroi-palette-gray-max': theme.palette.common.black,
-    '--yoroi-palette-gray-min': theme.palette.common.white,
+    '--yoroi-palette-gray-max': theme.palette.ds.black_static,
+    '--yoroi-palette-gray-min': theme.palette.ds.white_static,
     '--yoroi-palette-background-overlay': theme.palette.background.overlay,
 
     '--yoroi-palette-tx-status-pending-background': theme.palette.txStatus?.pending.background,

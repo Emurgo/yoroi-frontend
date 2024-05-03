@@ -1,5 +1,5 @@
-@import '../../themes/mixins/loading-spinner';
-@import '../../themes/mixins/error-message';
+@import '../../../themes/mixins/loading-spinner';
+@import '../../../themes/mixins/error-message';
 
 .dialog {
   font-weight: 300;
@@ -49,5 +49,5 @@
 }
 
 .isSubmitting {
-  @include loading-spinner('../../assets/images/spinner-light.svg');
+  @include loading-spinner('../../../assets/images/spinner-light.svg');
 }

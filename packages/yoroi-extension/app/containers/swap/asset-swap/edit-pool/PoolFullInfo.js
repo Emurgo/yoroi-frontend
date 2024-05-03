@@ -46,7 +46,7 @@ export default function SwapPoolFullInfo({
     <Box sx={{ display: 'flex', flexFlow: 'column', gap: '8px' }}>
       {showMinAda && (
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
+          <Box color="ds.gray_c500" display="flex" alignItems="center" gap="8px">
             <Typography>Min ADA</Typography>
             {withInfo && (
               <InfoTooltip content={'A small ADA deposit that will be returned when your order is processed or canceled'} />
@@ -58,7 +58,7 @@ export default function SwapPoolFullInfo({
         </Box>
       )}
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
+        <Box color="ds.gray_c500" display="flex" alignItems="center" gap="8px">
           <Typography>Fees</Typography>
           {withInfo && (
             <InfoTooltip
@@ -75,7 +75,7 @@ export default function SwapPoolFullInfo({
         <Box>{formattedFee}</Box>
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
+        <Box color="ds.gray_c500" display="flex" alignItems="center" gap="8px">
           <Typography>Minimum assets received</Typography>
           {withInfo && (
             <InfoTooltip content={'The minimum amount you are guaranteed to receive in case of price slippage'} />
@@ -86,7 +86,7 @@ export default function SwapPoolFullInfo({
         </Box>
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
+        <Box color="ds.gray_c500" display="flex" alignItems="center" gap="8px">
           <Typography>Liquidity provider fee</Typography>
           {withInfo && (
             <InfoTooltip content={'A fixed 0.3% operational fee paid to liquidity providers as a reward for supplying tokens, enabling traders to buy and sell assets on the decentralized Cardano network'} />

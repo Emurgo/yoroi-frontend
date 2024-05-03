@@ -76,14 +76,14 @@ export default class URIDisplayDialog extends Component<Props> {
             }}
           >
             <Box mb="8px" display="flex" alignItems="center" justifyContent="flex-start" gap="8px">
-              <Box component="span" color="grayscale.max">
+              <Box component="span" color="ds.gray_cmax">
                 <InfoIcon />
               </Box>
               <Typography component="div" variant="body1" fontWeight={500}>
                 {intl.formatMessage(globalMessages.important)}
               </Typography>
             </Box>
-            <Typography component="div" variant="body1" color="grayscale.max">
+            <Typography component="div" variant="body1" color="ds.gray_cmax">
               {intl.formatMessage(messages.usabilityWarning)}
             </Typography>
           </Box>

@@ -69,7 +69,7 @@ export default function SelectAssetDialog({
             top: '50%',
             transform: 'translateY(-50%)',
             display: 'inline-flex',
-            color: 'grayscale.600',
+            color: 'ds.gray_c600',
           }}
         >
           <SearchIcon />
@@ -80,7 +80,7 @@ export default function SelectAssetDialog({
           placeholder="Search"
           sx={{
             border: '1px solid',
-            borderColor: 'grayscale.400',
+            borderColor: 'ds.gray_c400',
             borderRadius: '8px',
             padding: '8px',
             paddingLeft: '34px',
@@ -88,7 +88,7 @@ export default function SelectAssetDialog({
             width: '100%',
             '&:focus': {
               borderWidth: '2px',
-              borderColor: 'grayscale.max',
+              borderColor: 'ds.gray_cmax',
             },
           }}
           onChange={e => {
@@ -97,7 +97,7 @@ export default function SelectAssetDialog({
         />
       </Box>
       <Box>
-        <Typography component="div" variant="body2" color="grayscale.700">
+        <Typography component="div" variant="body2" color="ds.gray_c700">
           {filteredAssets.length} assets {searchTerm ? 'found' : 'available'}
         </Typography>
       </Box>
@@ -183,8 +183,8 @@ export const AssetAndAmountRow = ({
   const amount = displayAmount ?? assetAmount;
 
   const priceColor = (): string => {
-    if (priceNotChanged) return 'grayscale.900';
-    if (priceIncreased) return 'secondary.600';
+    if (priceNotChanged) return 'ds.gray_c900';
+    if (priceIncreased) return 'ds.secondary_c600';
     return 'magenta.500';
   };
 
@@ -201,7 +201,7 @@ export const AssetAndAmountRow = ({
         gridTemplateColumns: isFrom ? fromTemplateColumns : toTemplateColumns,
         ...(isClickable
           ? {
-              '&:hover': { bgcolor: 'grayscale.50' },
+              '&:hover': { bgcolor: 'ds.gray_c50' },
               cursor: 'pointer',
             }
           : {}),
@@ -235,14 +235,14 @@ export const AssetAndAmountRow = ({
             </Typography>
             {!isFrom && amount != null && (
               <InfoTooltip content={'This asset is already in my portfolio'}>
-                <Box component="span" color="secondary.600">
+                <Box component="span" color="ds.secondary_c600">
                   <WalletIcon />
                 </Box>
               </InfoTooltip>
             )}
           </Box>
           <Box>
-            <Typography component="div" variant="body2" color="grayscale.600">
+            <Typography component="div" variant="body2" color="ds.gray_c600">
               {truncateAddressShort(address || id, 17) || 'Cardano'}
             </Typography>
           </Box>
@@ -259,11 +259,11 @@ export const AssetAndAmountRow = ({
               flexDirection="column"
               alignItems="flex-end"
             >
-              <Typography component="div" variant="body1" color="grayscale.900">
+              <Typography component="div" variant="body1" color="ds.gray_c900">
                 <span>{volume24h}</span>&nbsp;<span>{ticker}</span>
               </Typography>
               {adaPrice && volume24h && (
-                <Typography component="div" variant="body2" color="grayscale.600">
+                <Typography component="div" variant="body2" color="ds.gray_c600">
                   {(volume24h * adaPrice).toFixed(2)} ADA
                 </Typography>
               )}
@@ -296,14 +296,14 @@ export const AssetAndAmountRow = ({
           flexDirection="column"
           alignItems="flex-end"
         >
-          <Typography component="div" variant="body1" color="grayscale.900" display="flex">
+          <Typography component="div" variant="body1" color="ds.gray_c900" display="flex">
             {priceImpactState && <PriceImpactIcon isSevere={priceImpactState.isSevere} />}
             <PriceImpactColored priceImpactState={priceImpactState}>
               <span>{amount}</span>&nbsp;<span>{ticker}</span>
             </PriceImpactColored>
           </Typography>
           {usdPrice && (
-            <Typography component="div" variant="body2" color="grayscale.600">
+            <Typography component="div" variant="body2" color="ds.gray_c600">
               {(Number(amount) * usdPrice).toFixed(2)} USD
             </Typography>
           )}

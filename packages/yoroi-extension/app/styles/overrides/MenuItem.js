@@ -4,18 +4,18 @@ const MenuItem = {
   styleOverrides: {
     root: {
       padding: '14px 20px',
-      bgcolor: 'static.white',
+      bgcolor: 'ds.gray_cmin',
       height: 45,
-      color: 'grayscale.900',
-      '&:hover': { background: 'grayscale.50' },
+      color: 'ds.gray_c900',
+      '&:hover': { background: 'ds.gray_c50' },
       '&.Mui-selected': {
-        background: 'grayscale.50',
+        background: 'ds.gray_c50',
         position: 'relative',
-        '&:hover': { backgroundColor: 'grayscale.50' },
+        '&:hover': { backgroundColor: 'ds.gray_c50' },
         '&::after': {
           content: '""',
           position: 'absolute',
-          borderColor: 'secondary.300',
+          borderColor: 'ds.secondary_c300',
           borderStyle: 'solid',
           borderWidth: '0 2px 2px 0',
           height: '9px',

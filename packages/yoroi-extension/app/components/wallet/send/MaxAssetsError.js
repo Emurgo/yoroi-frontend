@@ -32,7 +32,7 @@ export default class MaxAssetsError extends Component<Props> {
         <Typography component="div" fontWeight={500} variant="body1" color="magenta.500" marginBottom="8px">
           {intl.formatMessage(globalMessages.errorLabel)}
         </Typography>
-        <Typography component="div" variant="body1" color="grayscale.900">
+        <Typography component="div" variant="body1" color="ds.gray_c900">
           <FormattedHTMLMessage
             {...messages.maxNumberAllowed}
             values={{ number: this.props.maxAssetsAllowed }}

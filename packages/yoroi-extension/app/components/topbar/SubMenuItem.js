@@ -54,11 +54,11 @@ class SubMenuItem extends Component<Props & InjectedProps> {
 function getStyles(active: boolean, isRevampLayout: boolean): Object {
   if (isRevampLayout && active)
     return {
-      borderBottomColor: 'primary.600',
-      color: 'primary.600',
+      borderBottomColor: 'ds.primary_c600',
+      color: 'ds.primary_c600',
       ':hover': {
-        borderBottomColor: 'primary.600',
-        color: 'primary.600',
+        borderBottomColor: 'ds.primary_c600',
+        color: 'ds.primary_c600',
       },
       fontWeight: 500,
       marginRight: '24px',

@@ -81,9 +81,9 @@ export default class SidebarRevamp extends Component<Props> {
           target="_blank"
           rel="noreferrer"
           sx={{
-            color: 'grayscale.50',
-            bgcolor: 'primary.700',
-            '&:hover': { bgcolor: 'primary.800' },
+            color: 'ds.gray_c50',
+            bgcolor: 'ds.primary_c700',
+            '&:hover': { bgcolor: 'ds.primary_c800' },
           }}
         >
           {intl.formatMessage(globalMessages.sidebarFaq)}

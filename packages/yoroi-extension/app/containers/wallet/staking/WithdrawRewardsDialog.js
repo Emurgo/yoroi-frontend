@@ -259,7 +259,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
             </Box>
           )}
           <Box mb="16px" px="5px">
-            <Typography component="div" variant="body1" color="grayscale.600">
+            <Typography component="div" variant="body1" color="ds.gray_c600">
               {intl.formatMessage(globalMessages.stakePoolChecksumAndName)}
             </Typography>
             <Box
@@ -282,13 +282,13 @@ export default class WithdrawRewardsDialog extends Component<Props> {
                   src={avatarGenerated}
                 />
               </Box>
-              <Typography component="div" variant="body1" color="grayscale.900">
+              <Typography component="div" variant="body1" color="ds.gray_c900">
                 {name}
               </Typography>
             </Box>
           </Box>
           <Box>
-            <Typography component="div" variant="body1" color="grayscale.600" px="4px">
+            <Typography component="div" variant="body1" color="ds.gray_c600" px="4px">
               {intl.formatMessage(globalMessages.stakePoolHash)}
             </Typography>
             <Typography component="div" variant="body1" sx={{ '& > div > p': { p: '2px 3px' }, px: '2px' }}>
@@ -309,7 +309,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
             </Typography>
           </Box>
           <Box>
-            <Typography component="div" variant="body1" color="grayscale.600" px="5px">
+            <Typography component="div" variant="body1" color="ds.gray_c600" px="5px">
               {intl.formatMessage(messages.withdrawalAddress)}
             </Typography>
             <Typography component="div" variant="body1" sx={{ '& > div > p': { p: '2px 3px' }, px: '2px' }}>
@@ -337,29 +337,29 @@ export default class WithdrawRewardsDialog extends Component<Props> {
             mt="28px"
             mx="5px"
             borderTop="1px solid"
-            borderColor="grayscale.200"
+            borderColor="ds.gray_c200"
           >
             <Box minWidth="180px">
-              <Typography component="div" variant="body1" color="grayscale.600" mb="4px">
+              <Typography component="div" variant="body1" color="ds.gray_c600" mb="4px">
                 {intl.formatMessage(messages.accumulatedRewards)}
               </Typography>
-              <Typography component="div" variant="body1" color="grayscale.900">
+              <Typography component="div" variant="body1" color="ds.gray_c900">
                 {formatValue(recoveredBalance.getDefaultEntry())} {ticker}
               </Typography>
             </Box>
             <Box minWidth="180px">
-              <Typography component="div" variant="body1" color="grayscale.600" mb="4px">
+              <Typography component="div" variant="body1" color="ds.gray_c600" mb="4px">
                 {intl.formatMessage(globalMessages.feeLabel)}
               </Typography>
-              <Typography component="div" variant="body1" color="grayscale.900">
+              <Typography component="div" variant="body1" color="ds.gray_c900">
                 {formatValue(txFee.getDefaultEntry())} {ticker}
               </Typography>
             </Box>
             <Box minWidth="180px">
-              <Typography component="div" variant="body1" color="grayscale.600" mb="4px">
+              <Typography component="div" variant="body1" color="ds.gray_c600" mb="4px">
                 {intl.formatMessage(globalMessages.finalBalanceLabel)}
               </Typography>
-              <Typography component="div" variant="body1" color="grayscale.900">
+              <Typography component="div" variant="body1" color="ds.gray_c900">
                 {formatValue(finalRewards.getDefaultEntry())} {ticker}
               </Typography>
             </Box>

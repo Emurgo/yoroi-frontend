@@ -21,7 +21,7 @@ export default function LimitOrderWarningDialog({
     <Dialog title="Limit price" onClose={onCancel} withCloseButton closeOnOverlayClick>
       <Box display="flex" maxWidth="648px" mt="8px" mb="24px" flexDirection="column" gap="24px">
         <Box>
-          <Typography component="div" variant="body1" color="grayscale.900">
+          <Typography component="div" variant="body1" color="ds.gray_c900">
             Are you sure you want to proceed this order with the limit price that is 10% or more
             higher than the market price?
           </Typography>
@@ -56,7 +56,7 @@ type SummaryRowProps = {|
 const SummaryRow = ({ col1, children, withInfo = false }: SummaryRowProps): Node => (
   <Box display="flex" alignItems="center" justifyContent="space-between">
     <Box display="flex" alignItems="center">
-      <Typography component="div" variant="body1" color="grayscale.500">
+      <Typography component="div" variant="body1" color="ds.gray_c500">
         {col1}
       </Typography>
       {withInfo ? (

@@ -8,7 +8,7 @@ export const MiddleActions = (): React$Node => {
 
   return (
     <Box display="flex" alignItems="center" justifyContent="space-between">
-      <Box sx={{ cursor: 'pointer', color: 'primary.500' }} onClick={() => switchTokens()}>
+      <Box sx={{ cursor: 'pointer', color: 'ds.primary_c500' }} onClick={() => switchTokens()}>
         <SwitchIcon />
       </Box>
       <Box>

@@ -21,7 +21,7 @@ class NavBarTitle extends Component<Props & InjectedProps> {
 
     const navbarTitleClassic = <div className={styles.title}>{title}</div>;
     const navbarTitleRevamp = (
-      <Box id="navBarTitle" className={styles.titleRevamp} sx={{ color: 'grayscale.800' }}>
+      <Box id="navBarTitle" className={styles.titleRevamp} sx={{ color: 'ds.gray_c800' }}>
         {title}
       </Box>
     );

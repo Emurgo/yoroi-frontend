@@ -176,7 +176,7 @@ export default class ReceiveNavigationRevamp extends Component<Props> {
             pt: '14px',
             overflowY: 'auto',
             border: '1px solid',
-            borderColor: 'grayscale.200',
+            borderColor: 'ds.gray_c200',
             borderRadius: '8px',
             borderBottomLeftRadius: 0,
             borderBottomRightRadius: 0,
@@ -188,7 +188,7 @@ export default class ReceiveNavigationRevamp extends Component<Props> {
         <Box
           sx={{
             border: '1px solid',
-            borderColor: 'grayscale.200',
+            borderColor: 'ds.gray_c200',
             borderRadius: '8px',
             borderTop: 0,
             borderTopLeftRadius: 0,

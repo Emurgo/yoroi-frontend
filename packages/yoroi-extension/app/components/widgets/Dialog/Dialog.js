@@ -9,7 +9,7 @@ import { Box, styled } from '@mui/system';
 import { LoadingButton } from '@mui/lab';
 import { withLayout } from '../../../styles/context/layout';
 import { observer } from 'mobx-react';
-import { ReactComponent as CrossIcon } from '../../assets/images/revamp/icons/cross.inline.svg';
+import { ReactComponent as CrossIcon } from '../../../assets/images/revamp/icons/cross.inline.svg';
 import LegacyDialog from './legacy/Dialog';
 
 export type ActionType = {|
@@ -125,6 +125,9 @@ function Dialog(props: Props & InjectedProps): Node {
         style={props.styleOverride}
         boxShadow="0px 13px 20px -1px #00000026"
         contentHasScroll={contentHasScroll}
+        sx={{
+          bgcolor: 'ds.gray_cmin',
+        }}
       >
         {title != null && title !== '' ? (
           // $FlowIgnore
@@ -215,6 +218,7 @@ export const CloseButton = ({
       right: '16px',
       top: '16px',
       cursor: 'pointer',
+      color: 'ds.gray_cmax',
       ...(sx ?? {}),
     }}
     onClick={onClose}
@@ -237,7 +241,7 @@ export const ModalContainer: any => Node = styled(Box)(
       paddingTop: '0px',
       paddingBottom: '0px',
       maxWidth: '824px',
-      bgcolor: empty ? undefined : 'static.white',
+      bgcolor: empty ? undefined : theme.palette.static.white,
       color: 'uitext.gray.normal',
       maxHeight: '95vh',
 

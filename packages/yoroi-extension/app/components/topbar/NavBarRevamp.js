@@ -34,16 +34,16 @@ class NavBarRevamp extends Component<Props> {
     return (
       <Box
         sx={{
-          backgroundColor: 'common.white',
+          backgroundColor: 'ds.gray_cmin',
           borderBottom: '1px solid',
-          borderBottomColor: 'grayscale.200',
+          borderBottomColor: 'ds.gray_c200',
         }}
       >
         <Box sx={{ position: 'relative', zIndex: 100, margin: 'auto' }}>
           <Box
             as="header"
             sx={{
-              color: 'grayscale.800',
+              color: 'ds.gray_c800',
               display: 'flex',
               alignItems: 'center',
               height: 'inherit',

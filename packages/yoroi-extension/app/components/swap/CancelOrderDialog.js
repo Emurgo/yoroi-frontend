@@ -108,7 +108,7 @@ export default function CancelSwapOrderDialog({
 const SummaryRow = ({ col1, children, info = '' }) => (
   <Box display="flex" alignItems="center" justifyContent="space-between">
     <Box display="flex" alignItems="center">
-      <Typography component="div" variant="body1" color="grayscale.500">
+      <Typography component="div" variant="body1" color="ds.gray_c500">
         {col1}
       </Typography>
       {info ? (

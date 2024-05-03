@@ -34,8 +34,8 @@ const TabButton = ({ label, isActive, onClick, disabled }: TabProps): Node => (
     onClick={disabled ? undefined : onClick}
     p="8px"
     borderRadius="8px"
-    bgcolor={isActive ? 'grayscale.200' : ''}
-    sx={{ cursor: disabled ? 'not-allowed' : 'pointer', color: disabled ? 'grayscale.400' : '' }}
+    bgcolor={isActive ? 'ds.gray_c200' : ''}
+    sx={{ cursor: disabled ? 'not-allowed' : 'pointer', color: disabled ? 'ds.gray_c400' : '' }}
   >
     <Typography component="div" variant="body1" fontWeight={500}>
       {label}

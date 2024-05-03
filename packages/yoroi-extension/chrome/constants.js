@@ -26,7 +26,7 @@ export function genCSP(request: {|
 
   frameSrc.push('https://connect.trezor.io/');
   frameSrc.push('https://emurgo.github.io/');
-  frameSrc.push('https://www.youtube.com/')
+  frameSrc.push('https://www.youtube.com/');
 
   // Analytics
   connectSrc.push('https://analytics.emurgo-rnd.com/');
@@ -45,6 +45,7 @@ export function genCSP(request: {|
   // Swap
   connectSrc.push('https://aggregator.muesliswap.com/');
   connectSrc.push('https://onchain2.muesliswap.com/');
+  connectSrc.push('ws://0.0.0.0:8080/');
 
   // unsafe-inline is unfortunately required by style-loader (even in production builds)
   const evalStyle = "'unsafe-inline'";
@@ -59,7 +60,4 @@ export function genCSP(request: {|
   ].join(' ');
 }
 
-export const injectedScripts = [
-  'cardanoApiInject.js',
-  'initialInject.js',
-];
+export const injectedScripts = ['cardanoApiInject.js', 'initialInject.js'];

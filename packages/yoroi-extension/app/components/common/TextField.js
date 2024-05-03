@@ -93,7 +93,7 @@ function TextField({
       InputProps={{
         ...((Boolean(revamp) ? { disableUnderline: true } : {}): any),
         ...((theme.name === 'classic' ? { notched: false } : {}): any),
-        sx: value.length  === 0 ? { color: 'grayscale.900 !important' } : null,
+        sx: value.length  === 0 ? { color: 'ds.gray_c900 !important' } : null,
         endAdornment: isLoading ? (
           <InputAdornment position="end" sx={{ marginTop: '-26px' }}>
             <LoadingSpinner small />

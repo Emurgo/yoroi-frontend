@@ -3,16 +3,13 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: var(--yoroi-palette-background-banner-warning);
   .warningIcon {
     margin-right: 9px;
   }
   .text {
     text-transform: uppercase;
     height: 20px;
-    color: var(--yoroi-palette-common-white);
     font-size: 13px;
-    font-weight: bold;
     font-weight: 400;
     letter-spacing: 1px;
     line-height: 20px;

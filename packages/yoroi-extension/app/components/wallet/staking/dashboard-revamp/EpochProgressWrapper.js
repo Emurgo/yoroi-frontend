@@ -30,7 +30,7 @@ function EpochProgressWrapper({ epochProgress, intl }: Props & Intl): Node {
     <Card
       sx={{
         border: '1px solid',
-        borderColor: 'grayscale.200',
+        borderColor: 'ds.gray_c200',
         bgcolor: 'background.card',
       }}
     >
@@ -38,10 +38,10 @@ function EpochProgressWrapper({ epochProgress, intl }: Props & Intl): Node {
         sx={{
           padding: '15px 24px',
           borderBottom: '1px solid',
-          borderColor: 'grayscale.200',
+          borderColor: 'ds.gray_c200',
         }}
       >
-        <Typography component="div" variant="h5" color="common.black" fontWeight={500}>
+        <Typography component="div" variant="h5" color="ds.black_static" fontWeight={500}>
           {intl.formatMessage(globalMessages.epochProgress)}
         </Typography>
       </Box>

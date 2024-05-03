@@ -64,7 +64,7 @@ function TopBarLayout({
             boxShadow: !isRevamp && showAsCard === true && '0 2px 12px 0 rgba(0, 0, 0, 0.06)',
             borderRadius: !isRevamp && showAsCard === true && '8px',
             ...(showInContainer === true && {
-              bgcolor: 'common.white',
+              bgcolor: 'ds.gray_cmin',
               width: '100%',
               overflow: 'hidden',
               display: 'flex',
@@ -78,7 +78,7 @@ function TopBarLayout({
           {isRevamp ? (
             <Box
               sx={{
-                bgcolor: bgcolor || 'common.white',
+                bgcolor: bgcolor || 'ds.gray_cmin',
                 height: '100%',
                 width: '100%',
                 maxWidth: '1872px',
@@ -99,7 +99,7 @@ function TopBarLayout({
                     padding:
                       typeof withPadding === 'undefined' || withPadding === true ? '24px' : '0px',
                     pb: 0,
-                    bgcolor: bgcolor || 'common.white',
+                    bgcolor: bgcolor || 'ds.gray_cmin',
                   }}
                 >
                   {children}
@@ -124,7 +124,7 @@ function TopBarLayout({
       const boxProperties = {
         height: '100%',
         minHeight: '200px',
-        backgroundColor: isRevamp ? 'common.white' : 'var(--yoroi-palette-gray-50)',
+        backgroundColor: isRevamp ? 'ds.gray_cmin' : 'var(--yoroi-palette-gray-50)',
         maxWidth: '1295px',
         paddingLeft: '40px',
         paddingRight: '40px',
@@ -164,7 +164,7 @@ function TopBarLayout({
   return (
     <Box
       sx={{
-        backgroundColor: 'common.white',
+        backgroundColor: 'ds.gray_cmin',
         boxShadow: isModern ? '0 0 70px 0 rgba(0, 0, 0, 0.75)' : 'none',
         display: 'flex',
         flexDirection: 'column',
@@ -192,7 +192,7 @@ function TopBarLayout({
             display: 'flex',
             flexDirection: 'column',
             position: 'relative',
-            backgroundColor: isRevamp ? 'common.white' : 'var(--yoroi-palette-gray-50)',
+            backgroundColor: isRevamp ? 'ds.gray_cmin' : 'var(--yoroi-palette-gray-50)',
           }}
         >
           {banner}

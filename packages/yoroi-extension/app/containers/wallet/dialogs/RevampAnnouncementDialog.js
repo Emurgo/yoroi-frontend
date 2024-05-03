@@ -96,7 +96,7 @@ export class RevampAnnouncementDialog extends Component<Props> {
 
           <NewThemeIllustration />
           <Stack gap="16px">
-            <Typography component="div" color="grayscale.900" variant="body1" fontWeight={500}>
+            <Typography component="div" color="ds.gray_c900" variant="body1" fontWeight={500}>
               {intl.formatMessage(messages.updatesSectionTitle)}
             </Typography>
 
@@ -111,12 +111,12 @@ export class RevampAnnouncementDialog extends Component<Props> {
                 component="ul"
                 sx={{
                   listStyle: 'inside',
-                  color: 'grayscale.900',
+                  color: 'ds.gray_c900',
                   width: '100%',
                 }}
               >
                 {[messages.update1, messages.update2, messages.update3].map(message => (
-                  <Typography component="li" variant="body1" color="grayscale.900">
+                  <Typography component="li" variant="body1" color="ds.gray_c900">
                     {intl.formatMessage(message)}
                   </Typography>
                 ))}
@@ -125,12 +125,12 @@ export class RevampAnnouncementDialog extends Component<Props> {
                 component="ul"
                 sx={{
                   listStyle: 'inside',
-                  color: 'grayscale.900',
+                  color: 'ds.gray_c900',
                   width: '100%',
                 }}
               >
                 {[messages.update4, messages.update5, messages.update6].map(message => (
-                  <Typography component="li" variant="body1" color="grayscale.900">
+                  <Typography component="li" variant="body1" color="ds.gray_c900">
                     {intl.formatMessage(message)}
                   </Typography>
                 ))}

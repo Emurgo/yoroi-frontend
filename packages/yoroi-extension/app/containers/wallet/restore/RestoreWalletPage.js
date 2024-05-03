@@ -35,7 +35,7 @@ export default class RestoreWalletPage extends Component<StoresAndActionsProps> 
       <TopBarLayout
         banner={<BannerContainer actions={actions} stores={stores} />}
         sidebar={<SidebarContainer actions={actions} stores={stores} />}
-        bgcolor="common.white"
+        bgcolor="ds.gray_cmin"
       >
         {restoreWalletPageComponent}
       </TopBarLayout>

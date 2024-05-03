@@ -150,7 +150,7 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
             borderRadius: theme => theme.shape.borderRadius + 'px',
             padding: '16px',
             paddingLeft: '40px',
-            color: 'primary.600',
+            color: 'ds.primary_c600',
           }}
         >
           <Box
@@ -161,7 +161,7 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
           >
             {tips.map(tip => (
               <Box component="li" key={tip.id}>
-                <Typography component="div" variant="body1" color="primary.600" mb="4px">
+                <Typography component="div" variant="body1" color="ds.primary_c600" mb="4px">
                   <FormattedHTMLMessage {...tip} />
                 </Typography>
               </Box>

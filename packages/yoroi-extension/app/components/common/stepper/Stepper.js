@@ -34,8 +34,8 @@ function Stepper(props: Props & Intl): Node {
         let stepColor = 'grey.400';
         let cursor = 'pointer';
 
-        if (isCurrentStep) stepColor = 'primary.600';
-        else if (isPrevStep) stepColor = 'primary.300';
+        if (isCurrentStep) stepColor = 'ds.primary_c600';
+        else if (isPrevStep) stepColor = 'ds.primary_c300';
         if (isFutureStep) cursor = 'not-allowed';
 
         return (
@@ -61,11 +61,11 @@ function Stepper(props: Props & Intl): Node {
                       borderStyle: 'solid',
                     }
                   : {}),
-                bgcolor: isCurrentStep ? 'primary.500' : 'unset',
+                bgcolor: isCurrentStep ? 'ds.primary_c500' : 'unset',
                 borderRadius: '50%',
                 transition: 'color 300ms ease',
                 cursor,
-                borderColor: isCurrentStep ? 'primary.500' : stepColor,
+                borderColor: isCurrentStep ? 'ds.primary_c500' : stepColor,
               }}
             >
               {isPrevStep ? (
@@ -74,7 +74,7 @@ function Stepper(props: Props & Intl): Node {
                 <Typography component="div"
                   variant="body2"
                   fontWeight={500}
-                  color={isCurrentStep ? 'common.white' : stepColor}
+                  color={isCurrentStep ? 'ds.white_static' : stepColor}
                   lineHeight="27px"
                 >
                   {idx + 1}

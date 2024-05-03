@@ -148,7 +148,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
         LinkComponent={Link}
         to={ROUTES.NFTS.ROOT}
         sx={{
-          color: 'grayscale.900',
+          color: 'ds.gray_c900',
           lineHeight: '27.5px',
           fontSize: '14px',
           '&.MuiButton-sizeMedium': {
@@ -165,7 +165,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
         sx={{
           margin: '0 auto',
           minHeight: '400px',
-          backgroundColor: 'common.white',
+          backgroundColor: 'ds.white_static',
           borderRadius: '8px',
         }}
       >
@@ -213,7 +213,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                   variant="h2"
                   fontWeight={500}
                   sx={{ width: below1400 ? '200px' : '400px' }}
-                  color="common.black"
+                  color="ds.black_static"
                 >
                   {nftInfo.name}
                 </TruncatedText>
@@ -358,7 +358,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                     ml: '-8px',
                     mb: '24px',
                     fontSize: '14px',
-                    color: 'grayscale.900',
+                    color: 'ds.gray_c900',
                   }}
                   endIcon={isCopied ? <IconCopied /> : <IconCopy />}
                 >

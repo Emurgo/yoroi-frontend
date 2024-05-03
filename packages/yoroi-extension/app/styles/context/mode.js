@@ -15,7 +15,7 @@ function getDesignTokens(mode: string): Object {
 }
 
 function ColorModeProvider({ children, currentTheme }: any): Node {
-  const [mode, setMode] = React.useState<Modes>('light');
+  const [mode, setMode] = React.useState<Modes>('dark');
   const colorMode = React.useMemo(
     () => ({
       // The dark mode switch would invoke this method

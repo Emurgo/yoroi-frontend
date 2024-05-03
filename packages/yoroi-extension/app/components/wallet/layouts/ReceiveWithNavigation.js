@@ -60,7 +60,7 @@ function ReceiveWithNavigation({
         display: 'flex',
         overflow: 'hidden',
         height: '100%',
-        bgcolor: 'common.white',
+        bgcolor: 'ds.gray_cmin',
         borderRadius: '8px',
         width: '100%',
       }}

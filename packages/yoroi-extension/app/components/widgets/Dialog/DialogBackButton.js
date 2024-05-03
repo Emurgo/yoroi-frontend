@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { ReactComponent as BackArrow }  from '../../assets/images/back-arrow-ic.inline.svg';
+import { ReactComponent as BackArrow } from '../../../assets/images/back-arrow-ic.inline.svg';
 import { IconButton } from '@mui/material';
 
 type Props = {|

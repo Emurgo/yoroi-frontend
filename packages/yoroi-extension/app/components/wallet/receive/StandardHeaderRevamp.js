@@ -121,14 +121,14 @@ export default class StandardHeaderRevamp extends Component<Props> {
                   '& canvas': {
                     border: '16px solid',
                     borderRadius: '8px',
-                    borderColor: 'common.white',
+                    borderColor: 'ds.gray_cmin',
                     boxSizing: 'content-box',
-                    bgcolor: 'common.white',
+                    bgcolor: 'ds.gray_cmin',
                   },
                 }}
               >
                 <QrCodeWrapper
-                  fgColor="#000"
+                  fgColor="#fff"
                   value={walletAddress}
                   size={153}
                   id={locationId + '-addressQrCode-image'}
@@ -161,7 +161,7 @@ export default class StandardHeaderRevamp extends Component<Props> {
                   linkType="address"
                 >
                   <RawHash light={isWalletAddressUsed}>
-                    <Typography component="div" variant="body1" color="grayscale.max">
+                    <Typography component="div" variant="body1" color="ds.gray_cmax">
                       {walletAddress}
                     </Typography>
                   </RawHash>
@@ -174,7 +174,7 @@ export default class StandardHeaderRevamp extends Component<Props> {
               mb="24px"
               variant="body2"
               lineHeight="22px"
-              color="grayscale.600"
+              color="ds.gray_c600"
             >
               <FormattedHTMLMessage {...messages.walletReceiveInstructions} />
             </Typography>

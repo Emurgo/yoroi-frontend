@@ -62,7 +62,7 @@ function RecoveryPhrase(props: Props & Intl): Node {
                   px: '10px',
                 }}
                 variant="body1"
-                color="primary.600"
+                color="ds.primary_c600"
               >
                 {idx + 1}. {word}
               </Typography>

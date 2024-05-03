@@ -98,13 +98,13 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
         sx={{
           display: 'flex',
           flexDirection: 'row',
-          color: 'grayscale.900',
+          color: 'ds.gray_c900',
           border: '1px solid',
-          borderColor: 'grayscale.300',
+          borderColor: 'ds.gray_c300',
           borderRadius: 1,
           height: '48px',
           ':hover': {
-            borderColor: 'primary.600',
+            borderColor: 'ds.primary_c600',
           },
           transition: 'border-color 300ms ease',
         }}
@@ -114,16 +114,21 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
             <div className={classnames([styles.plate])}>{iconComponent}</div>
             <div className={styles.content}>
               <div className={styles.walletInfo}>
-                <Typography component="div" variant="body2" fontWeight={500} sx={{ color: 'grayscale.900' }}>
+                <Typography
+                  component="div"
+                  variant="body2"
+                  fontWeight={500}
+                  sx={{ color: 'ds.gray_c900' }}
+                >
                   {truncateLongName(this.props.wallet.conceptualWalletName)}
                 </Typography>
-                <Typography component="div" variant="caption1" sx={{ color: 'grayscale.600' }}>
+                <Typography component="div" variant="caption1" sx={{ color: 'ds.gray_c600' }}>
                   {accountPlateId}
                 </Typography>
               </div>
               <div className={styles.balance}>
                 <Box
-                  sx={{ color: 'grayscale.max', height: '100%' }}
+                  sx={{ color: 'ds.gray_cmax', height: '100%' }}
                   className={classnames([totalAmount ? styles.amount : styles.spinnerWrapper])}
                 >
                   <AmountDisplay
@@ -143,7 +148,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
             disabled={totalAmount === null && !showEyeIconSafe}
             onClick={onUpdateHideBalance}
             sx={{
-              bgcolor: 'primary.600',
+              bgcolor: 'ds.primary_c600',
               width: '46px',
               height: '46px',
               borderTopRightRadius: '6px',
@@ -151,10 +156,10 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
               borderTopLeftRadius: '0px',
               borderBottomLeftRadius: '0px',
               ':hover': {
-                bgcolor: 'primary.600',
+                bgcolor: 'ds.primary_c600',
               },
               ':disabled': {
-                bgcolor: 'primary.200',
+                bgcolor: 'ds.primary_c200',
               },
             }}
             color="primary"
@@ -167,7 +172,6 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
   }
 
   getTotalAmount: void => ?MultiToken = () => {
-    return maybe(this.props.walletAmount,
-      w => this.props.rewards.joinAddCopy(w))
+    return maybe(this.props.walletAmount, w => this.props.rewards.joinAddCopy(w));
   };
 }

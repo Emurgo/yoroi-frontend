@@ -9,7 +9,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import { messages } from '../../../components/wallet/settings/ResyncBlock';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import globalMessages from '../../../i18n/global-messages';
-import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
+import DangerousActionDialog from '../../../components/widgets/Dialog/DangerousActionDialog';
 
 type Props = {|
   ...StoresAndActionsProps,

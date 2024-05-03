@@ -68,14 +68,14 @@ export default class GeneratePinDialog extends Component<Props> {
                 width: '56px',
                 height: '56px',
                 border: '1px solid',
-                borderColor: 'grayscale.400',
+                borderColor: 'ds.gray_c400',
                 borderRadius: '8px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
-              <Typography component="div" variant="body1" color="grayscale.600">
+              <Typography component="div" variant="body1" color="ds.gray_c600">
                 {value}
               </Typography>
             </Box>
@@ -110,7 +110,7 @@ export default class GeneratePinDialog extends Component<Props> {
               pt="24px"
               pb="40px"
               variant="body1"
-              color="grayscale.900"
+              color="ds.gray_c900"
             >
               <FormattedHTMLMessage {...messages.line1} />
             </Typography>

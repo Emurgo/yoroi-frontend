@@ -44,7 +44,7 @@ export default function Table({
           pb="5px" // 5px + 8px of gap = 13px
           pr={columnRightPaddings[i] ? columnRightPaddings[i] : '8px'}
           pl={columnLeftPaddings[i] ? columnLeftPaddings[i] : '0px'}
-          color="grayscale.600"
+          color="ds.gray_c600"
         >
           {name}
         </Typography>

@@ -57,7 +57,7 @@ class SuccessPage extends Component<Props & InjectedLayoutProps> {
             <div className={styles.successImg} />
             <Typography component="div"
               variant="body1"
-              color={isRevampLayout ? 'primary' : 'secondary.300'}
+              color={isRevampLayout ? 'primary' : 'ds.secondary_c300'}
               textAlign="center"
               mt="16px"
               fontWeight={500}

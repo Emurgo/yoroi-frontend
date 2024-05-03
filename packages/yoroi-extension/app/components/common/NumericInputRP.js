@@ -489,7 +489,7 @@ class AmountInput extends Component<AmountInputProps> {
               right: '10px',
               fontWeight: 400,
               fontSize: '0.75rem',
-              color: 'grayscale.900',
+              color: 'ds.gray_c900',
             }}
           >
             {intl.formatMessage(messages.feesLabel, { amount: fees })}
@@ -502,7 +502,7 @@ class AmountInput extends Component<AmountInputProps> {
             position: 'absolute',
             bottom: '45px',
             right: error != null && error !== '' ? '45px' : '10px',
-            color: 'grayscale.900',
+            color: 'ds.gray_c900',
             textTransform: 'uppercase',
           }}
         >
@@ -542,7 +542,7 @@ class AmountInputRevamp extends Component<AmountInputProps> {
             fontSize: '24px',
             lineHeight: '32px',
           },
-          '& input::placeholder': { color: 'grayscale.600' },
+          '& input::placeholder': { color: 'ds.gray_c600' },
         }}
       >
         <NumericInputRP {...this.props} />

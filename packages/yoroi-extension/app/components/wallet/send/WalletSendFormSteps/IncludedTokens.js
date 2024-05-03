@@ -46,7 +46,7 @@ export default class IncludedTokens extends Component<Props> {
             sx={{
               border: '2px solid',
               borderRadius: '8px',
-              borderColor: 'grayscale.100',
+              borderColor: 'ds.gray_c100',
               display: 'flex',
               alignItems: 'center',
               padding: '11px 16px',
@@ -84,7 +84,7 @@ export default class IncludedTokens extends Component<Props> {
                     textOverflow="ellipsis"
                     justifySelf="flex-start"
                     variant="body1"
-                    color="grayscale.max"
+                    color="ds.gray_cmax"
                   >
                     {item.name}
                   </Typography>
@@ -107,7 +107,7 @@ export default class IncludedTokens extends Component<Props> {
                   <NoAssetLogo />
                   <Typography component="div"
                     variant="body1"
-                    color="grayscale.max"
+                    color="ds.gray_cmax"
                     whiteSpace="nowrap"
                     overflow="hidden"
                     textOverflow="ellipsis"
@@ -116,7 +116,7 @@ export default class IncludedTokens extends Component<Props> {
                   </Typography>
                 </Box>
                 <Box ml="auto" flexShrink={0}>
-                  <Typography component="div" variant="body1" color="grayscale.max">
+                  <Typography component="div" variant="body1" color="ds.gray_cmax">
                     {displayAmount}
                   </Typography>
                 </Box>
@@ -134,7 +134,7 @@ export default class IncludedTokens extends Component<Props> {
           >
             {!this.props.shouldSendAll && (
               <Box
-                sx={{ bgcolor: 'grayscale.50', width: '32px', height: '32px', borderRadius: '50%' }}
+                sx={{ bgcolor: 'ds.gray_c50', width: '32px', height: '32px', borderRadius: '50%' }}
                 component="button"
                 type="button"
                 onClick={() => this.props.onRemoveTokens([item.info])}

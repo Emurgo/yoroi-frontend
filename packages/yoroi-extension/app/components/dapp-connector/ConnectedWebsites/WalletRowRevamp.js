@@ -119,9 +119,9 @@ export default class WalletRowRevamp extends Component<Props, State> {
           position: 'relative',
           borderRadius: '8px',
           border: '1px solid',
-          borderColor: 'common.white',
+          borderColor: 'ds.white_static',
           '&:hover': {
-            borderColor: 'grayscale.400',
+            borderColor: 'ds.gray_c400',
           },
         }}
         id={id}
@@ -131,7 +131,7 @@ export default class WalletRowRevamp extends Component<Props, State> {
             {plateIcon}
           </Box>
           <div>
-            <Typography component="div" variant="caption1" color="grayscale.900" id="connectedWalletNameLabel">
+            <Typography component="div" variant="caption1" color="ds.gray_c900" id="connectedWalletNameLabel">
               {settingsCache.conceptualWalletName}
             </Typography>
             <Typography component="div" variant="body2" fontWeight={500} id="connectedWalletBalanceLabel">
@@ -148,7 +148,7 @@ export default class WalletRowRevamp extends Component<Props, State> {
           </Box>
           <Typography component="div"
             variant="body1"
-            color="grayscale.900"
+            color="ds.gray_c900"
             sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
             id="dAppUrlLabel"
           >

@@ -1,13 +1,11 @@
 // @flow
 import type { Node } from 'react';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-
 import Dialog from '../widgets/Dialog/Dialog';
 import DialogCloseButton from '../widgets/Dialog/DialogCloseButton';
-
 import VerticalFlexContainer from '../layout/VerticalFlexContainer';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 import globalMessages from '../../i18n/global-messages';
@@ -104,28 +102,28 @@ const ProviderRow = styled(Box)({
   marginBottom: '16px',
 });
 
-const ProviderLabel = styled(Box)({
-  color: 'var(--grayscale-contrast-600, #6B7384)',
+const ProviderLabel = styled(Box)(({ theme }) => ({
+  color: theme.palette.ds.gray_c600,
   fontFeatureSettings: `'clig' off, 'liga' off`,
   fontFamily: 'Rubik',
   fontSize: '16px',
   fontStyle: 'normal',
   fontWeight: 400,
   lineHeight: '24px',
-});
+}));
 
-const ProviderInfo = styled(Box)({
-  color: 'var(--grayscale-contrast-max, #000)',
+const ProviderInfo = styled(Box)(({ theme }) => ({
+  color: theme.palette.ds.gray_cmax,
   fontFeatureSettings: `'clig' off, 'liga' off`,
   fontFamily: 'Rubik',
   fontSize: '16px',
   fontStyle: 'normal',
   fontWeight: 500,
   lineHeight: '24px',
-});
+}));
 
-const Disclaimer = styled(Box)({
-  color: 'var(--grayscale-contrast-900, #242838)',
+const Disclaimer = styled(Box)(({ theme }) => ({
+  color: theme.palette.ds.gray_c900,
   fontFeatureSettings: `'clig' off, 'liga' off`,
   fontFamily: 'Rubik',
   fontSize: '16px',
@@ -141,11 +139,10 @@ const Disclaimer = styled(Box)({
     },
   },
   borderRadius: 'var(--corner-radius-8, 8px)',
-  background:
-    'var(--gradient-light-green-blue, linear-gradient(270deg, #E4E8F7 0%, #C6F7ED 99.98%))',
+  background: theme.palette.ds.bg_gradient_1,
   padding:
     'var(--spacing-12, 12px) var(--spacing-16, 16px) var(--spacing-16, 16px) var(--spacing-16, 16px)',
-});
+}));
 
 @observer
 export default class BuySellDialog extends Component<Props, State> {
@@ -230,14 +227,14 @@ export default class BuySellDialog extends Component<Props, State> {
                     position: 'relative' /* so that the balance line can align on the right side */,
                   }}
                 >
-                  <div style={{ marginBottom: '8px', color: '#000' }}>
+                  <Box sx={{ color: 'ds.gray_cmax' }} style={{ marginBottom: '8px' }}>
                     <img
                       style={{ marginRight: '8px', borderRadius: '4px', verticalAlign: 'bottom' }}
                       src={adaPng}
                       alt=""
                     />
                     ADA
-                  </div>
+                  </Box>
                   <Box sx={{ position: 'absolute', right: '0px', fontSize: '12px' }}>
                     {intl.formatMessage(messages.currentBalance, {
                       amount: props.currentBalanceAda,

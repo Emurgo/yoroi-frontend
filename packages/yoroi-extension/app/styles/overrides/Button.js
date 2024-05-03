@@ -5,6 +5,8 @@ import { darkThemeBase } from '../themes/dark-theme-base';
 
 const { palette: darkThemePalette } = darkThemeBase;
 const { palette: lightThemePalette } = lightThemeBase;
+const ltDs = lightThemePalette.ds;
+const dtDs = darkThemePalette.ds;
 
 const ButtonCommonProps: Object = {
   styleOverrides: {
@@ -37,41 +39,41 @@ export const LightButton: any = {
   variants: [
     {
       props: { variant: 'primary' },
-      style: getContainedStyles('primary', lightThemePalette),
+      style: getContainedStyles('primary', ltDs),
     },
     {
       props: { variant: 'secondary' },
-      style: getOutlinedStyles('primary', lightThemePalette),
+      style: getOutlinedStyles('primary', ltDs),
     },
     {
       props: { variant: 'tertiary', color: 'primary' },
-      style: getTertiaryStyles('primary', lightThemePalette),
+      style: getTertiaryStyles('primary', ltDs),
     },
     {
       props: { variant: 'tertiary', color: 'secondary' },
-      style: getTertiaryStyles('grayscale', lightThemePalette),
+      style: getTertiaryStyles('grayscale', ltDs),
     },
     {
       props: { variant: 'destructive' },
       style: {
-        backgroundColor: lightThemePalette.system.magenta[500],
-        color: lightThemePalette.static.white,
-        ':hover': { backgroundColor: lightThemePalette.system.magenta[600] },
-        ':active': { backgroundColor: lightThemePalette.system.magenta[700] },
+        backgroundColor: ltDs.sys_magenta_c500,
+        color: ltDs.white_static,
+        ':hover': { backgroundColor: ltDs.sys_magenta_c600 },
+        ':active': { backgroundColor: ltDs.sys_magenta_c700 },
         ':focus': {
-          backgroundColor: lightThemePalette.system.magenta[500],
+          backgroundColor: ltDs.sys_magenta_c500,
           outline: '2px solid',
-          outlineColor: lightThemePalette.system.yellow[500],
+          outlineColor: ltDs.sys_yellow_c500,
         },
         '&.Mui-disabled': {
-          color: lightThemePalette.static.white,
-          backgroundColor: lightThemePalette.system.magenta[300],
+          color: ltDs.white_static,
+          backgroundColor: ltDs.sys_magenta_c300,
           cursor: 'not-allowed',
           pointerEvents: 'unset',
         },
-        '& .MuiLoadingButton-loadingIndicator': { color: lightThemePalette.static.white },
-        '& .MuiButton-startIcon svg': { fill: lightThemePalette.static.white },
-        '& .MuiButton-startIcon svg path': { fill: lightThemePalette.static.white },
+        '& .MuiLoadingButton-loadingIndicator': { color: ltDs.white_static },
+        '& .MuiButton-startIcon svg': { fill: ltDs.white_static },
+        '& .MuiButton-startIcon svg path': { fill: ltDs.white_static },
       },
     },
     {
@@ -82,15 +84,15 @@ export const LightButton: any = {
         width: '40px',
         height: '40px',
         padding: '8px',
-        color: 'grayscale.200',
+        color: 'ds.gray_c200',
         '&.MuiButton-sizeMedium': { padding: '8px', height: '40px' },
         ':hover': {
-          color: 'grayscale.50',
+          color: 'ds.gray_c50',
         },
         '&.active': {
-          backgroundColor: lightThemePalette.grayscale[200],
+          backgroundColor: ltDs.gray_c200,
           ':hover': {
-            backgroundColor: lightThemePalette.grayscale[50],
+            backgroundColor: ltDs.gray_c50,
           },
         },
       },
@@ -104,41 +106,41 @@ export const DarkButton: any = {
   variants: [
     {
       props: { variant: 'primary' },
-      style: getContainedStyles('primary', darkThemePalette),
+      style: getContainedStyles('primary', dtDs),
     },
     {
       props: { variant: 'secondary' },
-      style: getOutlinedStyles('primary', darkThemePalette),
+      style: getOutlinedStyles('primary', dtDs),
     },
     {
       props: { variant: 'tertiary', color: 'primary' },
-      style: getTertiaryStyles('primary', darkThemePalette),
+      style: getTertiaryStyles('primary', dtDs),
     },
     {
       props: { variant: 'tertiary', color: 'secondary' },
-      style: getTertiaryStyles('grayscale', darkThemePalette),
+      style: getTertiaryStyles('grayscale', dtDs),
     },
     {
       props: { variant: 'destructive' },
       style: {
-        backgroundColor: darkThemePalette.system.magenta[500],
-        color: darkThemePalette.static.white,
-        ':hover': { backgroundColor: darkThemePalette.system.magenta[600] },
-        ':active': { backgroundColor: darkThemePalette.system.magenta[700] },
+        backgroundColor: dtDs.sys_magenta_c500,
+        color: dtDs.white_static,
+        ':hover': { backgroundColor: dtDs.sys_magenta_c600 },
+        ':active': { backgroundColor: dtDs.sys_magenta_c700 },
         ':focus': {
-          backgroundColor: darkThemePalette.system.magenta[500],
+          backgroundColor: dtDs.sys_magenta_c500,
           outline: '2px solid',
-          outlineColor: darkThemePalette.system.yellow[500],
+          outlineColor: dtDs.sys_yellow_c500,
         },
         '&.Mui-disabled': {
-          color: darkThemePalette.static.white,
-          backgroundColor: darkThemePalette.system.magenta[300],
+          color: dtDs.white_static,
+          backgroundColor: dtDs.sys_magenta_c300,
           cursor: 'not-allowed',
           pointerEvents: 'unset',
         },
-        '& .MuiLoadingButton-loadingIndicator': { color: darkThemePalette.static.white },
-        '& .MuiButton-startIcon svg': { fill: darkThemePalette.static.white },
-        '& .MuiButton-startIcon svg path': { fill: darkThemePalette.static.white },
+        '& .MuiLoadingButton-loadingIndicator': { color: dtDs.white_static },
+        '& .MuiButton-startIcon svg': { fill: dtDs.white_static },
+        '& .MuiButton-startIcon svg path': { fill: dtDs.white_static },
       },
     },
   ],
@@ -146,82 +148,82 @@ export const DarkButton: any = {
 
 function getContainedStyles(variant: 'primary' | 'secondary', themePalette: Object): Object {
   return {
-    backgroundColor: themePalette[variant][500],
-    color: themePalette.static.white,
-    ':hover': { backgroundColor: themePalette[variant][600] },
-    ':active': { backgroundColor: themePalette[variant][700] },
+    backgroundColor: themePalette[`${variant}_c500`],
+    color: themePalette.white_static,
+    ':hover': { backgroundColor: themePalette[`${variant}_c600`] },
+    ':active': { backgroundColor: themePalette[`${variant}_c700`] },
     ':focus': {
-      backgroundColor: themePalette[variant][500],
+      backgroundColor: themePalette[`${variant}_c500`],
       outline: '2px solid',
-      outlineColor: themePalette.system.yellow[500],
+      outlineColor: themePalette.sys_yellow_c500,
     },
     '&.Mui-disabled': {
-      color: themePalette.static.white,
-      backgroundColor: themePalette[variant][300],
+      color: themePalette.white_static,
+      backgroundColor: themePalette[`${variant}_c300`],
       cursor: 'not-allowed',
       pointerEvents: 'unset',
     },
-    '& .MuiLoadingButton-loadingIndicator': { color: themePalette.static.white },
-    '& .MuiButton-startIcon svg': { fill: themePalette.static.white },
-    '& .MuiButton-startIcon svg path': { fill: themePalette.static.white },
+    '& .MuiLoadingButton-loadingIndicator': { color: themePalette.white_static },
+    '& .MuiButton-startIcon svg': { fill: themePalette.white_static },
+    '& .MuiButton-startIcon svg path': { fill: themePalette.white_static },
   };
 }
 
 function getOutlinedStyles(variant: 'primary' | 'secondary', themePalette: Object): Object {
   return {
     backgroundColor: 'transparent',
-    color: themePalette[variant][500],
+    color: themePalette[`${variant}_c500`],
     border: '2px solid',
-    borderColor: themePalette[variant][500],
+    borderColor: themePalette[`${variant}_c500`],
     ':hover': {
       border: '2px solid',
-      color: themePalette[variant][600],
-      borderColor: themePalette[variant][600],
+      color: themePalette[`${variant}_c600`],
+      borderColor: themePalette[`${variant}_c600`],
     },
-    ':active': { borderColor: themePalette[variant][700] },
+    ':active': { borderColor: themePalette[`${variant}_c700`] },
     ':focus': {
-      borderColor: themePalette[variant][500],
+      borderColor: themePalette[`${variant}_c500`],
       outline: '2px solid',
-      outlineColor: themePalette.system.yellow[500],
+      outlineColor: themePalette.sys_yellow_c500,
     },
     '&.Mui-disabled': {
       border: '2px solid',
-      borderColor: themePalette[variant][200],
-      color: themePalette[variant][200],
+      borderColor: themePalette[`${variant}_c200`],
+      color: themePalette[`${variant}_c200`],
       cursor: 'not-allowed',
       pointerEvents: 'unset',
     },
-    '& .MuiLoadingButton-loadingIndicator': { color: themePalette[variant][600] },
-    '& .MuiButton-startIcon svg': { fill: themePalette[variant][500] },
-    '& .MuiButton-startIcon svg path': { fill: themePalette[variant][500] },
+    '& .MuiLoadingButton-loadingIndicator': { color: themePalette[`${variant}_c600`] },
+    '& .MuiButton-startIcon svg': { fill: themePalette[`${variant}_c500`] },
+    '& .MuiButton-startIcon svg path': { fill: themePalette[`${variant}_c500`] },
   };
 }
 
 function getTertiaryStyles(variant: 'primary' | 'grayscale', themePalette: Object): Object {
   return {
     backgroundColor: 'transparent',
-    color: themePalette[variant][500],
+    color: themePalette[`${variant}_c500`],
     ':hover': {
-      backgroundColor: themePalette.grayscale[50],
-      color: themePalette[variant][600],
+      backgroundColor: themePalette.gray_c50,
+      color: themePalette[`${variant}_c600`],
     },
     ':active': {
-      backgroundColor: themePalette.grayscale[100],
-      color: themePalette[variant][700],
+      backgroundColor: themePalette.gray_c100,
+      color: themePalette[`${variant}_c700`],
     },
     ':focus': {
       outline: '2px solid',
-      outlineColor: themePalette.system.yellow[500],
+      outlineColor: themePalette.sys_yellow_c500,
     },
     '&.Mui-disabled': {
       border: '2px solid',
-      borderColor: themePalette[variant][200],
-      color: themePalette[variant][200],
+      borderColor: themePalette[`${variant}_c200`],
+      color: themePalette[`${variant}_c200`],
       cursor: 'not-allowed',
       pointerEvents: 'unset',
     },
-    '& .MuiLoadingButton-loadingIndicator': { color: themePalette[variant][600] },
-    '& .MuiButton-startIcon svg': { fill: themePalette[variant][500] },
-    '& .MuiButton-startIcon svg path': { fill: themePalette[variant][500] },
+    '& .MuiLoadingButton-loadingIndicator': { color: themePalette[`${variant}_c600`] },
+    '& .MuiButton-startIcon svg': { fill: themePalette[`${variant}_c500`] },
+    '& .MuiButton-startIcon svg path': { fill: themePalette[`${variant}_c500`] },
   };
 }

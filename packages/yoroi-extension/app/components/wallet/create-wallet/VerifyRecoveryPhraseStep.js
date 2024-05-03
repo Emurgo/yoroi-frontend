@@ -147,9 +147,9 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                       height: '40px',
                     }}
                     variant="body1"
-                    color="primary.600"
+                    color="ds.primary_c600"
                   >
-                    <Typography component="div" variant="body1" color="primary.400" width="20px">
+                    <Typography component="div" variant="body1" color="ds.primary_c400" width="20px">
                       {idx + 1}.
                     </Typography>
                     {word !== null &&
@@ -200,7 +200,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                     zIndex: 10,
                   }}
                   variant="body1"
-                  color={isAdded ? 'primary.400' : 'primary.600'}
+                  color={isAdded ? 'ds.primary_c400' : 'ds.primary_c600'}
                 >
                   {word}
                 </Typography>

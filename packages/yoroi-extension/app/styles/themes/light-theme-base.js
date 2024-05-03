@@ -1,5 +1,6 @@
 // @flow
 import { alpha } from '@mui/material/styles';
+import { light } from './themed-palettes/light';
 
 const grayscale = {
   main: '#8A92A3',
@@ -64,6 +65,9 @@ export const lightThemeBase = {
   palette: {
     mode: 'light',
     /* `main` is added since MUI required it but we don't use it at all */
+    ds: {
+      ...light,
+    },
     primary,
     secondary,
     grayscale,
@@ -74,7 +78,7 @@ export const lightThemeBase = {
       bg_gradient_2: 'linear-gradient(180deg, #93F5E1 0%, #C6F7ED 100%)',
       bg_gradient_3: 'linear-gradient(30.09deg, #244ABF 0%, #4760FF 176.73%)',
     },
-    background: { bg_color_low: grayscale.min, bg_color_medium: grayscale['100'] },
+    background: { bg_color_low: light.gray_cmin, bg_color_medium: grayscale['100'] },
     uitext: {
       primary: {
         high: primary['600'],
@@ -83,7 +87,7 @@ export const lightThemeBase = {
       },
       on_primary: staticColors.white,
       gray: {
-        max: grayscale.max,
+        max: light.gray_cmax,
         normal: grayscale['900'],
         medium: grayscale['600'],
         low: grayscale['400'],
@@ -100,7 +104,7 @@ export const lightThemeBase = {
         low: primary['300'],
       },
       gray: {
-        high: grayscale.max,
+        high: light.gray_cmax,
         normal: grayscale['900'],
         medium: grayscale['600'],
         low: grayscale['400'],

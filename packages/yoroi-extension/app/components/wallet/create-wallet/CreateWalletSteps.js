@@ -76,8 +76,8 @@ function CreateWalletSteps(props: Props & Intl): Node {
           let stepColor = 'grey.400';
           let cursor = 'pointer';
 
-          if (isCurrentStep) stepColor = 'primary.600';
-          else if (isPrevStep) stepColor = 'primary.300';
+          if (isCurrentStep) stepColor = 'ds.primary_c600';
+          else if (isPrevStep) stepColor = 'ds.primary_c300';
           if (isFutureStep) cursor = 'not-allowed';
 
           return (

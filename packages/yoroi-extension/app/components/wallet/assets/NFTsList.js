@@ -102,7 +102,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
       sx={{
         height: 'content',
         width: '100%',
-        bgcolor: 'common.white',
+        bgcolor: 'ds.gray_cmin',
         borderRadius: '8px',
         p: '24px',
       }}
@@ -114,7 +114,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
         marginBottom="30px"
         paddingBottom="16px"
       >
-        <Typography component="div" variant="h5" color="common.black" fontWeight={500} fontSize="18px">
+        <Typography component="div" variant="h5" color="ds.black_static" fontWeight={500} fontSize="18px">
           {list.length === 0
             ? intl.formatMessage(globalMessages.sidebarNfts)
             : intl.formatMessage(messages.nftsCount, { number: list.length })}
@@ -164,7 +164,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
           spacing={2}
         >
           <NotFound />
-          <Typography component="div" variant="h5" fontWeight={500} color="common.black">
+          <Typography component="div" variant="h5" fontWeight={500} color="ds.black_static">
             {intl.formatMessage(!list.length ? messages.noNFTsAdded : messages.noResultsFound)}
           </Typography>
         </Stack>
@@ -283,7 +283,7 @@ function NftCardImage({ ipfsUrl, name }: {| ipfsUrl: string | null, name: string
         <Typography component="div"
           mt="16px"
           sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-          color="grayscale.900"
+          color="ds.gray_c900"
         >
           {name}
         </Typography>

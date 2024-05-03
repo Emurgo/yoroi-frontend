@@ -45,13 +45,13 @@ function WalletEmptyBanner({ onBuySellClick, intl }: Props & Intl): Node {
           <CoverBg />
         </Box>
         <Box>
-          <Typography component="div" variant="h3" color="common.black" fontWeight={500} mb="8px">
+          <Typography component="div" variant="h3" color="ds.black_static" fontWeight={500} mb="8px">
             {intl.formatMessage(messages.welcomeMessage)}
           </Typography>
           <Typography
             component="div"
             variant="body1"
-            color="common.black"
+            color="ds.black_static"
             maxWidth="500px"
             mb="40px"
           >

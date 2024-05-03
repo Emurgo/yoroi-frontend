@@ -78,7 +78,7 @@ class ConnectedWebsitesPage extends Component<AllProps> {
             <Typography component="div" variant="h5" fontWeight={500} mb="8px">
               {intl.formatMessage(messages.noWebsitesConnected)}
             </Typography>
-            <Typography component="div" variant="body1" color="grayscale.600">
+            <Typography component="div" variant="body1" color="ds.gray_c600">
               {intl.formatMessage(connectorMessages.messageReadOnly)}
             </Typography>
           </Box>
@@ -144,8 +144,8 @@ class ConnectedWebsitesPage extends Component<AllProps> {
             py: '12px',
             alignItems: 'center',
             borderBottom: '1px solid',
-            borderBottomColor: 'grayscale.200',
-            color: 'grayscale.600',
+            borderBottomColor: 'ds.gray_c200',
+            color: 'ds.gray_c600',
           }}
         >
           <Box width="100%">

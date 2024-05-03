@@ -18,24 +18,17 @@ const baseDevConfig = (
   resolve: commonConfig.resolve(),
   devtool: 'source-map',
   entry: {
-    yoroi: [
-      customPath,
-      path.join(__dirname, '../chrome/extension/index')
-    ],
-    connector: [
-      customPath,
-      path.join(__dirname, '../chrome/extension/connector/index')
-    ],
-    ledger: [
-      customPath,
-      path.join(__dirname, '../ledger/index')
-    ],
+    yoroi: [customPath, path.join(__dirname, '../chrome/extension/index')],
+    connector: [customPath, path.join(__dirname, '../chrome/extension/connector/index')],
+    ledger: [customPath, path.join(__dirname, '../ledger/index')],
   },
   devServer: {
+    hot: true,
+    liveReload: true,
     devMiddleware: {
       publicPath: `js`,
       stats: {
-        colors: true
+        colors: true,
       },
       headers: { 'Access-Control-Allow-Origin': '*' },
       writeToDisk: true,
@@ -48,13 +41,9 @@ const baseDevConfig = (
   },
   plugins: [
     ...commonConfig.plugins('dev', networkName),
-    new webpack.DefinePlugin(commonConfig.definePlugin(
-      networkName,
-      false,
-      isNightly,
-      Boolean(isLight)
-    )),
-    new webpack.HotModuleReplacementPlugin(),
+    new webpack.DefinePlugin(
+      commonConfig.definePlugin(networkName, false, isNightly, Boolean(isLight))
+    ),
     new webpack.IgnorePlugin({
       resourceRegExp: /[^/]+\/[\S]+.prod$/,
     }),
@@ -80,11 +69,11 @@ const baseDevConfig = (
       },
       {
         test: /\.(eot|otf|ttf|woff|woff2|gif|png)$/,
-        include: [ path.resolve(__dirname, '../app') ],
+        include: [path.resolve(__dirname, '../app')],
         loader: 'file-loader',
       },
-    ]
-  }
+    ],
+  },
 });
 
 const backgroundServiceWorkerConfig = (
@@ -98,11 +87,10 @@ const backgroundServiceWorkerConfig = (
   // could not use the eval option because Chrome manifest v3 prohibits eval()
   devtool: 'source-map',
   entry: {
-    background: [
-      path.join(__dirname, '../chrome/extension/background')
-    ],
+    background: [path.join(__dirname, '../chrome/extension/background')],
   },
   devServer: {
+    port: 8081,
     devMiddleware: {
       writeToDisk: true,
     },
@@ -121,24 +109,18 @@ const backgroundServiceWorkerConfig = (
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
     }),
-    new webpack.DefinePlugin(commonConfig.definePlugin(
-      networkName,
-      false,
-      isNightly,
-      Boolean(isLight)
-    )),
+    new webpack.DefinePlugin(
+      commonConfig.definePlugin(networkName, false, isNightly, Boolean(isLight))
+    ),
     new webpack.IgnorePlugin({
       resourceRegExp: /[^/]+\/[\S]+.prod$/,
     }),
     new webpack.optimize.LimitChunkCountPlugin({
       maxChunks: 1,
     }),
-    new webpack.NormalModuleReplacementPlugin(
-      /rustLoader/,
-      (resource) => {
-        resource.request = resource.request.replace('rustLoader', 'rustLoaderForBackground')
-      }
-    ),
+    new webpack.NormalModuleReplacementPlugin(/rustLoader/, resource => {
+      resource.request = resource.request.replace('rustLoader', 'rustLoaderForBackground');
+    }),
   ],
   module: {
     rules: [
@@ -161,11 +143,11 @@ const backgroundServiceWorkerConfig = (
       },
       {
         test: /\.(eot|otf|ttf|woff|woff2|gif|png)$/,
-        include: [ path.resolve(__dirname, '../app') ],
+        include: [path.resolve(__dirname, '../app')],
         loader: 'file-loader',
       },
-    ]
-  }
+    ],
+  },
 });
 
 module.exports = { baseDevConfig, backgroundServiceWorkerConfig };

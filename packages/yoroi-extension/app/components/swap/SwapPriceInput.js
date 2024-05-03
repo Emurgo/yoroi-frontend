@@ -49,14 +49,14 @@ function SwapPriceInput({ swapStore, priceImpactState }: Props): Node {
         component="fieldset"
         sx={{
           border: '1px solid',
-          borderColor: 'grayscale.400',
+          borderColor: 'ds.gray_c400',
           borderRadius: '8px',
           p: '16px',
           display: 'grid',
           gridTemplateColumns: '1fr auto',
           justifyContent: 'start',
           position: 'relative',
-          bgcolor: isReadonly ? 'grayscale.50' : 'common.white',
+          bgcolor: isReadonly ? 'ds.gray_c50' : 'ds.gray_cmin',
           columnGap: '6px',
           rowGap: '8px',
         }}
@@ -68,7 +68,7 @@ function SwapPriceInput({ swapStore, priceImpactState }: Props): Node {
             left: '16px',
             position: 'absolute',
             px: '4px',
-            bgcolor: 'common.white',
+            bgcolor: 'ds.gray_cmin',
             borderRadius: '10px',
           }}
         >
@@ -80,14 +80,14 @@ function SwapPriceInput({ swapStore, priceImpactState }: Props): Node {
             appearance: 'none',
             border: '0',
             outline: 'none',
-            '::placeholder': { color: 'grayscale.600' },
+            '::placeholder': { color: 'ds.gray_c600' },
           }}
           component="input"
           type="text"
           variant="body1"
           color="#000"
           placeholder="0"
-          bgcolor={isReadonly ? 'grayscale.50' : 'common.white'}
+          bgcolor={isReadonly ? 'ds.gray_c50' : 'ds.white_static'}
           readOnly={isReadonly}
           value={isValidTickers ? displayValue : NO_PRICE_VALUE_PLACEHOLDER}
           onChange={({ target: { value } }) => {

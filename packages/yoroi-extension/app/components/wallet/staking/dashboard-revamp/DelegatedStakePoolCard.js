@@ -25,18 +25,18 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
   const avatarGenerated = getAvatarFromPoolId(id);
 
   return (
-    <Card sx={{ border: '1px solid', borderColor: 'grayscale.200', bgcolor: 'background.card' }}>
+    <Card sx={{ border: '1px solid', borderColor: 'ds.gray_c200', bgcolor: 'background.card' }}>
       <Box
         sx={{
           padding: '16px 9px 16px 24px',
           borderBottom: '1px solid',
-          borderBottomColor: 'grayscale.200',
+          borderBottomColor: 'ds.gray_c200',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
         }}
       >
-        <Typography component="div" variant="h5" color="common.black" fontWeight={500}>
+        <Typography component="div" variant="h5" color="ds.black_static" fontWeight={500}>
           {intl.formatMessage(globalMessages.stakePoolDelegated)}
         </Typography>
         <UndelegateButton
@@ -63,11 +63,11 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
           )}
         </AvatarWrapper>
         <Box marginLeft="16px" sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-          <Typography component="div" color="grayscale.max" variant="body1" fontWeight="medium" mb="3px">
+          <Typography component="div" color="ds.gray_cmax" variant="body1" fontWeight="medium" mb="3px">
             {ticker !== undefined ? `[${ticker}]` : ''} {name}
           </Typography>
           <SocialMediaStakePool
-            color="grayscale.500"
+            color="ds.gray_c500"
             websiteUrl={websiteUrl}
             socialLinks={socialLinks}
           />
@@ -78,12 +78,12 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
           <Box sx={{ display: 'flex', flexFlow: 'column' }}>
             <Typography component="div"
               variant="caption1"
-              color="grayscale.500"
+              color="ds.gray_c500"
               sx={{ textTransform: 'uppercase' }}
             >
               {intl.formatMessage(globalMessages.roa30d)}
             </Typography>
-            <Typography as="span" fontWeight={500} color="grayscale.max" variant="h2">
+            <Typography as="span" fontWeight={500} color="ds.gray_cmax" variant="h2">
               {roa} %
             </Typography>
           </Box>
@@ -92,12 +92,12 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
           <Box sx={{ display: 'flex', flexFlow: 'column' }}>
             <Typography component="div"
               variant="caption1"
-              color="grayscale.500"
+              color="ds.gray_c500"
               sx={{ textTransform: 'uppercase' }}
             >
               {intl.formatMessage(globalMessages.poolSize)}
             </Typography>
-            <Typography as="span" fontWeight={500} color="grayscale.max" variant="h2">
+            <Typography as="span" fontWeight={500} color="ds.gray_cmax" variant="h2">
               {poolSize}
             </Typography>
           </Box>
@@ -106,12 +106,12 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Int
           <Box sx={{ display: 'flex', flexFlow: 'column' }}>
             <Typography component="div"
               variant="caption1"
-              color="grayscale.500"
+              color="ds.gray_c500"
               sx={{ textTransform: 'uppercase' }}
             >
               {intl.formatMessage(globalMessages.poolSaturation)}
             </Typography>
-            <Typography as="span" fontWeight={500} color="grayscale.max" variant="h2">
+            <Typography as="span" fontWeight={500} color="ds.gray_cmax" variant="h2">
               {share} %
             </Typography>
           </Box>

@@ -202,7 +202,7 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
 
           {isRevampLayout && (
             <>
-              <Typography component="div" variant="caption1" display="inline-block" color="grayscale.700" mt="4px">
+              <Typography component="div" variant="caption1" display="inline-block" color="ds.gray_c700" mt="4px">
                 <FormattedHTMLMessage {...messages.noteRevamp} />
               </Typography>
               <Typography component="div"

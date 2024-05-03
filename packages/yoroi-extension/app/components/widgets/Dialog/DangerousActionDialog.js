@@ -1,18 +1,18 @@
 // @flow
 import type { Node, ComponentType } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { InjectedLayoutProps } from '../../styles/context/layout';
+import type { InjectedLayoutProps } from '../../../styles/context/layout';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
-import { withLayout } from '../../styles/context/layout';
+import { withLayout } from '../../../styles/context/layout';
 import { Box, FormControlLabel, Checkbox as MuiCheckbox } from '@mui/material';
 import classnames from 'classnames';
 import DialogCloseButton from './DialogCloseButton';
 import Dialog from './Dialog';
-import globalMessages from '../../i18n/global-messages';
-import LocalizableError from '../../i18n/LocalizableError';
-import CheckboxLabel from '../common/CheckboxLabel';
+import globalMessages from '../../../i18n/global-messages';
+import LocalizableError from '../../../i18n/LocalizableError';
+import CheckboxLabel from '../../common/CheckboxLabel';
 import styles from './DangerousActionDialog.scss';
 
 type Props = {|

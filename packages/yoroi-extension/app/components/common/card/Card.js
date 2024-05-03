@@ -21,7 +21,7 @@ export default function Card(props: Props): Node {
       </Box>
       <Typography component="div"
         variant="h3"
-        color="grayscale.max"
+        color="ds.gray_cmax"
         fontWeight={500}
         textAlign="center"
         padding="0px 40px"
@@ -30,7 +30,7 @@ export default function Card(props: Props): Node {
       >
         {label}
       </Typography>
-      <Typography component="div" variant="body2" color="grayscale.900" mb="16px">
+      <Typography component="div" variant="body2" color="ds.gray_c900" mb="16px">
         {description}
       </Typography>
       {props.children}

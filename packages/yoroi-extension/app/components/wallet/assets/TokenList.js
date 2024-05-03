@@ -153,18 +153,18 @@ function TokenList({ assetsList: list, shouldHideBalance, intl }: Props & Intl):
           onChange={e => setKeyword(e.target.value)}
           placeholder={intl.formatMessage(messages.search)}
           sx={{
-            bgcolor: 'common.white',
+            bgcolor: 'ds.gray_cmin',
             border: '1px solid',
-            borderColor: 'grayscale.400',
+            borderColor: 'ds.gray_c400',
             'input::placeholder': {
-              color: 'grayscale.600',
+              color: 'ds.gray_c600',
             },
           }}
           startAdornment={
             <InputAdornment
               sx={{
                 '> svg > use': {
-                  fill: 'grayscale.600',
+                  fill: 'ds.gray_c600',
                 },
               }}
               position="start"
@@ -182,11 +182,11 @@ function TokenList({ assetsList: list, shouldHideBalance, intl }: Props & Intl):
       ) : (
         <>
           <List>
-            <Box sx={{ borderBottom: '1px solid', borderColor: 'grayscale.200', mt: '-8px' }}>
+            <Box sx={{ borderBottom: '1px solid', borderColor: 'ds.gray_c200', mt: '-8px' }}>
               <ListItemLayout
                 firstColumn={
                   <ButtonBase disableRipple onClick={() => sortAssets(SORTING_COLUMNS.NAME)}>
-                    <Typography component="div" variant="body2" color="grayscale.600" mr="4px">
+                    <Typography component="div" variant="body2" color="ds.gray_c600" mr="4px">
                       {intl.formatMessage(assetsMessage.nameAndTicker)}
                     </Typography>
                     {displayColumnLogo(SORTING_COLUMNS.NAME)}
@@ -194,7 +194,7 @@ function TokenList({ assetsList: list, shouldHideBalance, intl }: Props & Intl):
                 }
                 secondColumn={
                   <Stack direction="row" alignItems="center" spacing="4px">
-                    <Typography component="div" variant="body2" color="grayscale.600">
+                    <Typography component="div" variant="body2" color="ds.gray_c600">
                       {intl.formatMessage(globalMessages.fingerprint)}
                     </Typography>
                   </Stack>
@@ -208,7 +208,7 @@ function TokenList({ assetsList: list, shouldHideBalance, intl }: Props & Intl):
                     }}
                   >
                     <ButtonBase disableRipple onClick={() => sortAssets(SORTING_COLUMNS.AMOUNT)}>
-                      <Typography component="div" variant="body2" color="grayscale.600" mr="4px">
+                      <Typography component="div" variant="body2" color="ds.gray_c600" mr="4px">
                         {intl.formatMessage(assetsMessage.quantity)}
                       </Typography>
                       {displayColumnLogo(SORTING_COLUMNS.AMOUNT)}
@@ -303,7 +303,7 @@ function TokenItemRow({ avatar, name, id, amount, isTotalAmount }: TokenItemRowP
               textOverflow: 'ellipsis',
               width: '70%',
             }}
-            color="primary.600"
+            color="ds.primary_c600"
             to={id === '-' ? '#' :  ROUTES.ASSETS.DETAILS.replace(':tokenId', id)}
           >
             {name}
@@ -311,7 +311,7 @@ function TokenItemRow({ avatar, name, id, amount, isTotalAmount }: TokenItemRowP
         </Box>
       }
       secondColumn={
-        <Typography component="div" variant="body1" color="grayscale.900">
+        <Typography component="div" variant="body1" color="ds.gray_c900">
           <Box sx={{ '> button': { px: '5px', py: '3px', borderRadius: '8px', ml: '-5px' } }}>
             <CopyToClipboardLabel text={id}>
               {below1200px ? truncateAddressShort(id) : id}

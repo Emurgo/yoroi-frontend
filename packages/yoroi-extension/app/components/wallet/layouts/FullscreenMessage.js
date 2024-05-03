@@ -44,7 +44,7 @@ class FullscreenMessage extends Component<Props & InjectedLayoutProps> {
             textAlign="center"
             sx={{
               '& a': {
-                color: 'primary.500',
+                color: 'ds.primary_c500',
               },
             }}
           >
@@ -52,7 +52,7 @@ class FullscreenMessage extends Component<Props & InjectedLayoutProps> {
             <Typography component="div" variant="h5" mb="8px" fontWeight={500}>
               {title}
             </Typography>
-            <Typography component="div" variant="body1" color="grayscale.600" maxWidth="480px">
+            <Typography component="div" variant="body1" color="ds.gray_c600" maxWidth="480px">
               {subtitle}
             </Typography>
           </Stack>

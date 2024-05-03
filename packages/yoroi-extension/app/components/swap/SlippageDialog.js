@@ -45,12 +45,12 @@ export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValu
     <Dialog title="Slippage tolerance" onClose={onClose} withCloseButton closeOnOverlayClick>
       <Box maxWidth="564px">
         <Box>
-          <Typography component="div" variant="body1" color="grayscale.800">
+          <Typography component="div" variant="body1" color="ds.gray_c800">
             Default Slippage Tolerance
           </Typography>
         </Box>
         <Box py="8px">
-          <Typography component="div" variant="body2" color="grayscale.700">
+          <Typography component="div" variant="body2" color="ds.gray_c700">
             Slippage tolerance is set as a percentage of the total swap value. Your transactions
             will not be executed if the price moves by more than this amount.
           </Typography>
@@ -80,14 +80,14 @@ export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValu
             component="fieldset"
             sx={{
               border: '1px solid',
-              borderColor: 'grayscale.400',
+              borderColor: 'ds.gray_c400',
               borderRadius: '8px',
               p: '16px',
               display: 'grid',
               gridTemplateColumns: '1fr auto',
               justifyContent: 'start',
               position: 'relative',
-              bgcolor: readonly ? 'grayscale.50' : 'common.white',
+              bgcolor: readonly ? 'ds.gray_c50' : 'ds.gray_cmin',
               columnGap: '6px',
               rowGap: '8px',
             }}
@@ -99,7 +99,7 @@ export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValu
                 left: '16px',
                 position: 'absolute',
                 px: '4px',
-                bgcolor: 'common.white',
+                bgcolor: 'ds.gray_cmin',
               }}
             >
               Slippage tolerance
@@ -110,7 +110,7 @@ export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValu
                 appearance: 'none',
                 border: '0',
                 outline: 'none',
-                '::placeholder': { color: 'grayscale.600' },
+                '::placeholder': { color: 'ds.gray_c600' },
               }}
               component="input"
               type="text"
@@ -118,14 +118,14 @@ export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValu
               color="#000"
               placeholder="0"
               onChange={handleSlippageChange}
-              bgcolor={readonly ? 'grayscale.50' : 'common.white'}
+              bgcolor={readonly ? 'ds.gray_c50' : 'ds.gray_cmin'}
               readOnly={readonly}
               value={selectedSlippage}
             />
           </Box>
         </Box>
         <Box my="24px" p="16px" pt="12px" bgcolor="yellow.100" borderRadius="8px">
-          <Typography component="div" variant="body1" color="grayscale.max">
+          <Typography component="div" variant="body1" color="ds.gray_cmax">
             When the slippage tolerance is set really high, it allows the transaction to still
             complete despite large price swings. This can open the door to front-running and
             sandwich attacks.

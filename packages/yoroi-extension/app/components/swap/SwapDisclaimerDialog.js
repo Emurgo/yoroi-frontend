@@ -19,7 +19,7 @@ export default function SwapDisclaimerDialog({
     <Dialog title="Swap Disclaimer" onClose={onDialogRefuse}>
       <Box display="flex" maxWidth="648px" mt="-24px" flexDirection="column" gap="24px">
         <Box>
-          <Typography component="div" variant="body1" color="grayscale.900" align="justify">
+          <Typography component="div" variant="body1" color="ds.gray_c900" align="justify">
             Please be aware that by proceeding to use the SWAP functionality within Yoroi,
             you acknowledge and understand that any actions taken are solely your responsibility.
             <br /><br />

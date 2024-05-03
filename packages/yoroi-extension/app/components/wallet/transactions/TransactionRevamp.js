@@ -254,7 +254,7 @@ export default class TransactionRevamp extends Component<Props, State> {
               <span>{hiddenAmount}</span>
               {ticker}
             </Typography>
-            <Typography variant="body2" color="grayscale.600" textAlign="right">
+            <Typography variant="body2" color="ds.gray_c600" textAlign="right">
               {hiddenAmount}&nbsp;{currency}
             </Typography>
           </>
@@ -289,10 +289,10 @@ export default class TransactionRevamp extends Component<Props, State> {
             justifyContent: 'center',
           }}
         >
-          <Typography variant="body1" fontWeight={500} color="grayscale.900">
+          <Typography variant="body1" fontWeight={500} color="ds.gray_c900">
             {this.renderAmountDisplay({ entry: request.entry })} {this.getTicker(request.entry)}
           </Typography>
-          <Typography variant="body2" color="grayscale.600" textAlign="right">
+          <Typography variant="body2" color="ds.gray_c600" textAlign="right">
             {fiatDisplay}&nbsp;{currency}
           </Typography>
         </Box>
@@ -300,7 +300,7 @@ export default class TransactionRevamp extends Component<Props, State> {
     }
 
     return (
-      <Typography variant="body1" fontWeight={500} color="grayscale.900">
+      <Typography variant="body1" fontWeight={500} color="ds.gray_c900">
         {this.renderAmountDisplay({ entry: request.entry })} {this.getTicker(request.entry)}
       </Typography>
     );
@@ -356,12 +356,12 @@ export default class TransactionRevamp extends Component<Props, State> {
       }
       return (
         <>
-          <Typography variant="body1" fontWeight={500} color="grayscale.900">
+          <Typography variant="body1" fontWeight={500} color="ds.gray_c900">
             {beforeDecimalRewards}
             <span className={styles.afterDecimal}>{afterDecimalRewards}</span>{' '}
             {this.getTicker(defaultEntry)}
           </Typography>
-          <Typography variant="body2" color="grayscale.600" textAlign="right">
+          <Typography variant="body2" color="ds.gray_c600" textAlign="right">
             {fiatDisplay}&nbsp;{currency}
           </Typography>
         </>
@@ -369,7 +369,7 @@ export default class TransactionRevamp extends Component<Props, State> {
     }
 
     return (
-      <Typography variant="body1" fontWeight={500} color="grayscale.900">
+      <Typography variant="body1" fontWeight={500} color="ds.gray_c900">
         {[beforeDecimalRewards, afterDecimalRewards].join('')} {this.getTicker(defaultEntry)}
       </Typography>
     );
@@ -447,7 +447,7 @@ export default class TransactionRevamp extends Component<Props, State> {
       const fingerprint = this.getFingerprint(entry);
       return (
         <div className={styles.fee}>
-          <Typography color="grayscale.600" variant="caption1">
+          <Typography color="ds.gray_c600" variant="caption1">
             {this.renderAmountDisplay({
               entry: {
                 ...entry,
@@ -462,7 +462,7 @@ export default class TransactionRevamp extends Component<Props, State> {
               light
               linkType="token"
             >
-              <Typography variant="caption1" color="grayscale.600">
+              <Typography variant="caption1" color="ds.gray_c600">
                 {this.getTicker(entry)}
               </Typography>
             </ExplorableHashContainer>
@@ -502,7 +502,7 @@ export default class TransactionRevamp extends Component<Props, State> {
           >
             <Typography
               variant="caption1"
-              color="grayscale.600"
+              color="ds.gray_c600"
               id={request.addressRowId + '-truncatedAddress-text'}
             >
               {truncateAddressShort(this.props.addressToDisplayString(request.address.address))}
@@ -510,7 +510,7 @@ export default class TransactionRevamp extends Component<Props, State> {
           </ExplorableHashContainer>
         </CopyableAddress>
         <Box textAlign="center">{this.generateAddressButton(request.address.address)}</Box>
-        <Typography textAlign="center" component="span" variant="caption1" color="grayscale.600">
+        <Typography textAlign="center" component="span" variant="caption1" color="ds.gray_c600">
           {renderAmount(request.address.value.getDefaultEntry())}
         </Typography>
         {request.address.value.nonDefaultEntries().map(entry => (
@@ -546,8 +546,8 @@ export default class TransactionRevamp extends Component<Props, State> {
     const status = this.getStatusString(intl, state, assuranceLevel, isValidTransaction);
     const txType = this.getTxType(intl, this.getTicker(data.amount.getDefaultEntry()), data);
 
-    const txIdBasePart = `${this.props.id}:transaction_${this.props.txIndex}`
-    const txIdFullInfoBasePart = `${txIdBasePart}:txFullInfo`
+    const txIdBasePart = `${this.props.id}:transaction_${this.props.txIndex}`;
+    const txIdFullInfoBasePart = `${txIdBasePart}:txFullInfo`;
 
     return (
       <Box
@@ -577,10 +577,18 @@ export default class TransactionRevamp extends Component<Props, State> {
             >
               <TypeIcon type={txType.icon} />
               <Box>
-                <Typography variant="body1" color="grayscale.900" id={txIdBasePart + '-txType-text'}>
+                <Typography
+                  variant="body1"
+                  color="ds.gray_c900"
+                  id={txIdBasePart + '-txType-text'}
+                >
                   {txType.msg}
                 </Typography>
-                <Typography variant="caption1" color="grayscale.600" id={txIdBasePart + '-txTime-text'}>
+                <Typography
+                  variant="caption1"
+                  color="ds.gray_c600"
+                  id={txIdBasePart + '-txTime-text'}
+                >
                   {moment(data.date).format('hh:mm A')}
                 </Typography>
               </Box>
@@ -590,7 +598,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                 <Typography
                   variant="body1"
                   sx={{
-                    color: isPendingTransaction ? 'grayscale.400' : 'grayscale.900',
+                    color: isPendingTransaction ? 'ds.gray_c400' : 'ds.gray_c900',
                     textTransform: 'capitalize',
                   }}
                   id={txIdBasePart + '-txStatus-text'}
@@ -604,8 +612,8 @@ export default class TransactionRevamp extends Component<Props, State> {
                     color: isFailedTransaction
                       ? 'var(--yoroi-palette-error-100)'
                       : isPendingTransaction
-                      ? 'grayscale.400'
-                      : 'grayscale.900',
+                      ? 'ds.gray_c400'
+                      : 'ds.gray_c900',
                     textTransform: 'capitalize',
                   }}
                   id={txIdBasePart + '-txStatus-text'}
@@ -626,7 +634,7 @@ export default class TransactionRevamp extends Component<Props, State> {
               <Typography
                 component="div"
                 variant="body1"
-                color="grayscale.900"
+                color="ds.gray_c900"
                 id={txIdBasePart + '-txFee-text'}
               >
                 {this.renderFeeDisplay({
@@ -646,14 +654,12 @@ export default class TransactionRevamp extends Component<Props, State> {
                 gap: '8px',
               }}
             >
-              <Box
-                textAlign="right"
-              >
+              <Box textAlign="right">
                 <Typography
                   component="div"
                   variant="body1"
                   fontWeight="500"
-                  color="grayscale.900"
+                  color="ds.gray_c900"
                   textAlign="left"
                   id={txIdBasePart + '-txAmount-text'}
                 >
@@ -695,9 +701,9 @@ export default class TransactionRevamp extends Component<Props, State> {
           className={contentStyles}
           sx={{
             overflowX: 'overlay',
-            bgcolor: 'common.white',
+            bgcolor: 'ds.gray_cmin',
             border: isExpanded ? '1px solid' : 'none',
-            borderColor: 'grayscale.200',
+            borderColor: 'ds.gray_c200',
             borderRadius: '8px',
             mt: '8px',
           }}
@@ -714,14 +720,14 @@ export default class TransactionRevamp extends Component<Props, State> {
                 </div>
               </div>
             )}
-            <Box sx={{ overflowX: 'overlay', bgcolor: 'common.white' }}>
+            <Box sx={{ overflowX: 'overlay', bgcolor: 'ds.gray_cmin' }}>
               <div className={styles.addressContent}>
                 <div>
                   <Box
                     sx={{
                       px: '24px',
                       display: 'grid',
-                      color: 'grayscale.max',
+                      color: 'ds.gray_cmax',
                       gap: '15px',
                       gridTemplateColumns: 'minmax(232px, 1fr) 105px 1fr',
                       justifyContent: 'space-between',
@@ -744,7 +750,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                       {intl.formatMessage(globalMessages.amountLabel)}
                     </Typography>
                   </Box>
-                  <Box className={styles.addressList} sx={{ color: 'grayscale.600' }}>
+                  <Box className={styles.addressList} sx={{ color: 'ds.gray_c600' }}>
                     {data.addresses.from.map((address, addressIndex) => {
                       const addressRowId = `${txIdFullInfoBasePart}:fromAddresses:address_${addressIndex}`;
                       return this.renderRow({
@@ -758,12 +764,12 @@ export default class TransactionRevamp extends Component<Props, State> {
                     })}
                   </Box>
                 </div>
-                <Box sx={{ borderLeft: '1px solid', borderColor: 'grayscale.200' }}>
+                <Box sx={{ borderLeft: '1px solid', borderColor: 'ds.gray_c200' }}>
                   <Box
                     sx={{
                       px: '24px',
                       display: 'grid',
-                      color: 'grayscale.max',
+                      color: 'ds.gray_cmax',
                       gap: '15px',
                       gridTemplateColumns: 'minmax(232px, 1fr) 105px 1fr',
                       justifyContent: 'space-between',
@@ -810,7 +816,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                       <Typography variant="caption1" fontWeight={500}>
                         {intl.formatMessage(messages.assuranceLevel)}
                       </Typography>
-                      <Typography variant="caption1" color="grayscale.600">
+                      <Typography variant="caption1" color="ds.gray_c600">
                         <span className={styles.assuranceLevel}>{status}</span>.{' '}
                         <span
                           className="confirmationCount"
@@ -835,7 +841,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                     >
                       <Typography
                         variant="caption1"
-                        color="grayscale.600"
+                        color="ds.gray_c600"
                         className={classnames('txid' /* for tests */)}
                         id={txIdFullInfoBasePart + '-transactionId-text'}
                       >
@@ -916,8 +922,8 @@ export default class TransactionRevamp extends Component<Props, State> {
       <Box
         type="button"
         sx={{
-          bgcolor: 'primary.100',
-          color: 'primary.600',
+          bgcolor: 'ds.primary_c100',
+          color: 'ds.primary_c600',
           textTransform: 'capitalize',
           cursor: 'pointer',
           borderRadius: '20px',
@@ -1038,7 +1044,7 @@ export default class TransactionRevamp extends Component<Props, State> {
             ? intl.formatMessage(messages.certificatesLabel)
             : intl.formatMessage(messages.certificateLabel)}
         </Typography>
-        <Typography variant="caption1" color="grayscale.600">
+        <Typography variant="caption1" color="ds.gray_c600">
           {node}
         </Typography>
       </Box>
@@ -1049,7 +1055,7 @@ export default class TransactionRevamp extends Component<Props, State> {
         return null;
       }
       const certBlock = data.certificates.reduce((acc, curr, idx) => {
-        const certComponentId=`${txIdFullInfoBasePart}-txCertificate_${idx}-text`
+        const certComponentId = `${txIdFullInfoBasePart}-txCertificate_${idx}-text`;
         const newElem = (
           // eslint-disable-next-line react/no-array-index-key
           <span key={idx} id={certComponentId}>

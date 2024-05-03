@@ -3,7 +3,7 @@
 const TabPanel = {
   styleOverrides: {
     root: {
-      bgcolor: 'static.white',
+      bgcolor: 'ds.gray_cmin',
       borderBottomLeftRadius: 8,
       borderBottomRightRadius: 8,
       boxShadow: 'inset 0 2px 12px 0 hsl(0 0% 0% / 6%)',

@@ -70,10 +70,10 @@ export default function SelectPoolDialog({
                 borderRadius: '8px',
                 cursor: 'pointer',
                 alignItems: 'center',
-                borderColor: currentPool === poolId ? 'primary.600' : 'transparent',
+                borderColor: currentPool === poolId ? 'ds.primary_c600' : 'transparent',
                 gridTemplateColumns: templateColumns,
                 columnGap: '8px',
-                '&:hover': { bgcolor: 'grayscale.50' },
+                '&:hover': { bgcolor: 'ds.gray_c50' },
               }}
             >
               <Box sx={{ display: 'flex', alignItems: 'center', gap: '12px' }}>

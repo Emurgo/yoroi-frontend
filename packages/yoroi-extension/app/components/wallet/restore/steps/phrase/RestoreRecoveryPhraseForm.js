@@ -181,7 +181,7 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
                   }}
                   variant="body1"
                 >
-                  <Typography component="div" variant="body1" color="primary.400" width="24px">
+                  <Typography component="div" variant="body1" color="ds.primary_c400" width="24px">
                     {idx + 1}.
                   </Typography>
 

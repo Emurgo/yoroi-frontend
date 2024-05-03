@@ -1,12 +1,12 @@
 // @flow
 import type { ComponentType, Node } from 'react';
-import type { InjectedLayoutProps } from '../../../../../styles/context/layout';
+import type { InjectedLayoutProps } from '../../../styles/context/layout';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { ReactComponent as CloseCross } from '../../../../assets/images/cross-dark.inline.svg';
-import { ReactComponent as CloseCrossRevamp } from '../../../../assets/images/cross-dark-revamp.inline.svg';
+import { ReactComponent as CloseCross } from '../../../assets/images/cross-dark.inline.svg';
+import { ReactComponent as CloseCrossRevamp } from '../../../assets/images/cross-dark-revamp.inline.svg';
 import { IconButton } from '@mui/material';
-import { withLayout } from '../../../../../styles/context/layout';
+import { withLayout } from '../../../styles/context/layout';
 
 type Props = {|
   +onClose?: void => PossiblyAsync<void>,
@@ -27,7 +27,7 @@ class DialogCloseButton extends Component<Props & InjectedLayoutProps> {
     const Svg = icon != null && icon !== '' ? icon : defaultIcon;
 
     return (
-      <IconButton onClick={onClose} sx={{ position: 'relative' }}>
+      <IconButton onClick={onClose} sx={{ position: 'relative', color: 'ds.gray_cmax' }}>
         <Svg />
       </IconButton>
     );

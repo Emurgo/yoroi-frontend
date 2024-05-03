@@ -289,7 +289,7 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px', mb: '8px' }}>
             <InfoIcon />
-            <Typography component="div" variant="body1" fontWeight={500} color="grayscale.900">
+            <Typography component="div" variant="body1" fontWeight={500} color="ds.gray_c900">
               {intl.formatMessage(messages.delegationTips)}
             </Typography>
           </Box>
@@ -305,7 +305,7 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
                 const message = intl.formatMessage(msg);
                 return (
                   <Box component="li" key={message}>
-                    <Typography component="div" variant="body1" color="grayscale.900">
+                    <Typography component="div" variant="body1" color="ds.gray_c900">
                       {message}
                     </Typography>
                   </Box>
@@ -315,7 +315,7 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
           </Box>
         </Box>
         <Box mb="16px">
-          <Typography component="div" variant="body1" color="grayscale.600" mb="4px">
+          <Typography component="div" variant="body1" color="ds.gray_c600" mb="4px">
             {intl.formatMessage(globalMessages.stakePoolChecksumAndName)}
           </Typography>
           <Box sx={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
@@ -326,13 +326,13 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
                 src={avatarGenerated}
               />
             </Box>
-            <Typography component="div" variant="body1" color="grayscale.900">
+            <Typography component="div" variant="body1" color="ds.gray_c900">
               {this.props.poolName ?? intl.formatMessage(globalMessages.unknownPoolLabel)}
             </Typography>
           </Box>
         </Box>
         <Box mb="24px">
-          <Typography component="div" variant="body1" color="grayscale.600">
+          <Typography component="div" variant="body1" color="ds.gray_c600">
             {intl.formatMessage(globalMessages.stakePoolHash)}
           </Typography>
           <Box>
@@ -363,7 +363,7 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
           sx={{
             py: '24px',
             borderTop: '1px solid',
-            borderColor: 'grayscale.200',
+            borderColor: 'ds.gray_c200',
             display: 'flex',
             alignItems: 'center',
             gap: '16px',
@@ -371,7 +371,7 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
         >
           <Box>
             <Box display="flex" gap="6px" alignItems="center">
-              <Typography component="div" color="grayscale.600" variant="body1">
+              <Typography component="div" color="ds.gray_c600" variant="body1">
                 {intl.formatMessage(messages.amountToDelegate)}
               </Typography>
               <Tooltip
@@ -387,13 +387,13 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
                 </Box>
               </Tooltip>
             </Box>
-            <Typography component="div" color="grayscale.900">
+            <Typography component="div" color="ds.gray_c900">
               {delegatingValue.toString()} {tokenTicker}
             </Typography>
           </Box>
           <Box>
             <Box display="flex" gap="6px" alignItems="center">
-              <Typography component="div" color="grayscale.600" variant="body1">
+              <Typography component="div" color="ds.gray_c600" variant="body1">
                 {intl.formatMessage(messages.epochRewardLabel)}
               </Typography>
               <Tooltip
@@ -408,7 +408,7 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
                 </Box>
               </Tooltip>
             </Box>
-            <Typography component="div" color="grayscale.900">
+            <Typography component="div" color="ds.gray_c900">
               {this.props.approximateReward.amount
                 .shiftedBy(-this.props.approximateReward.token.Metadata.numberOfDecimals)
                 .toFormat(this.props.approximateReward.token.Metadata.numberOfDecimals)}
@@ -417,10 +417,10 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
             </Typography>
           </Box>
           <Box>
-            <Typography component="div" color="grayscale.600" variant="body1">
+            <Typography component="div" color="ds.gray_c600" variant="body1">
               {intl.formatMessage(globalMessages.feeLabel)}
             </Typography>
-            <Typography component="div" color="grayscale.900">
+            <Typography component="div" color="ds.gray_c900">
               {formatValue(this.props.transactionFee.getDefaultEntry())} {tokenTicker}
             </Typography>
           </Box>

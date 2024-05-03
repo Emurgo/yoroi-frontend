@@ -224,7 +224,7 @@ class LanguageSelectionForm extends Component<Props & InjectedLayoutProps, State
               <Box
                 sx={{
                   '& span > span': {
-                    color: 'primary.600',
+                    color: 'ds.primary_c600',
                   },
                 }}
               >
@@ -321,7 +321,7 @@ class LanguageSelectionForm extends Component<Props & InjectedLayoutProps, State
         </Box>
         <Button
           sx={{
-            color: 'grayscale.900',
+            color: 'ds.gray_c900',
             position: 'absolute',
             top: '24px',
             left: '24px',

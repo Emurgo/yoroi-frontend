@@ -308,7 +308,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
         <Box
           sx={{ flexGrow: '1', overflowY: 'auto', p: '24px' }}
           borderBottom="1px solid"
-          borderColor="grayscale.200"
+          borderColor="ds.gray_c200"
         >
           {orderStep === 0 && (
             <CreateSwapOrder

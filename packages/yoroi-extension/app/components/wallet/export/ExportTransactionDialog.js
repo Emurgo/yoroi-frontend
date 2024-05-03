@@ -86,7 +86,7 @@ class ExportTransactionDialog extends Component<Props & InjectedLayoutProps, Sta
           opacity: 0.7,
           textAlign: 'left',
           paddingTop: '10px',
-          color: 'grayscale.900',
+          color: 'ds.gray_c900',
           mb: '24px',
         }}
       >

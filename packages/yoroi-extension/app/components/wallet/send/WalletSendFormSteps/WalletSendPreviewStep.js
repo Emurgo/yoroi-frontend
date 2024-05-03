@@ -429,7 +429,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
             {receiverHandle ? (
               <div style={{ marginBottom: '20px' }}>
                 <Box mb="8px">
-                  <Typography component="div" variant="body1" color="grayscale.600">
+                  <Typography component="div" variant="body1" color="ds.gray_c600">
                     {intl.formatMessage(messages.receiverHandleLabel)}
                   </Typography>
                 </Box>
@@ -437,7 +437,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
                   <Typography component="div"
                     variant="body1"
                     sx={{
-                      color: 'grayscale.900',
+                      color: 'ds.gray_c900',
                       overflowWrap: 'break-word',
                     }}
                   >
@@ -448,7 +448,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
             ) : null}
             <div>
               <Box mb="8px">
-                <Typography component="div" variant="body1" color="grayscale.600">
+                <Typography component="div" variant="body1" color="ds.gray_c600">
                   {intl.formatMessage(messages.receiverLabel)}
                 </Typography>
               </Box>
@@ -456,7 +456,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
                 <Typography component="div"
                   variant="body1"
                   sx={{
-                    color: 'grayscale.900',
+                    color: 'ds.gray_c900',
                     overflowWrap: 'break-word',
                   }}
                   id="wallet:send:confrimTransactionStep-receiverAddress-text"
@@ -468,7 +468,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
 
             <Box
               className={styles.totalAmountWrapper}
-              sx={{ bgcolor: 'primary.600', color: 'grayscale.min' }}
+              sx={{ bgcolor: 'ds.primary_c600', color: 'ds.gray_cmin' }}
             >
               <div className={styles.totalAmountLabel}>
                 {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
@@ -509,7 +509,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
             <div className={styles.wrapper}>
               {this.props.transactionSize != null ? (
                 <div className={styles.addressToLabelWrapper}>
-                  <Box className={styles.addressToLabel} sx={{ color: 'grayscale.600' }}>
+                  <Box className={styles.addressToLabel} sx={{ color: 'ds.gray_c600' }}>
                     {intl.formatMessage(globalMessages.walletSendConfirmationTxSizeLabel)}
                   </Box>
                   <span className={styles.txSize}>{this.props.transactionSize}</span>

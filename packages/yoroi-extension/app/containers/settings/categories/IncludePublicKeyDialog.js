@@ -9,7 +9,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 
-import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
+import DangerousActionDialog from '../../../components/widgets/Dialog/DangerousActionDialog';
 
 type Props = {|
   ...StoresAndActionsProps,

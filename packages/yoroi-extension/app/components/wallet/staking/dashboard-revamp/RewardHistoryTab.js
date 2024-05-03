@@ -100,7 +100,7 @@ export const RewardHistoryItem = ({
       <AccordionSummary aria-controls={poolId + '-content'} id={poolId || poolName + '-header'}>
         <Box>
           <Box display="block">
-            <Typography component="div" color="grayscale.600">Stake Pool</Typography>
+            <Typography component="div" color="ds.gray_c600">Stake Pool</Typography>
           </Box>
           <Box display="flex">
             <AvatarWrapper>

@@ -118,7 +118,7 @@ export default class WalletReceiveRevamp extends Component<Props> {
     const { intl } = this.context;
 
     const header = (
-      <Typography component="h2" variant="body2" color="grayscale.500" textAlign="right">
+      <Typography component="h2" variant="body2" color="ds.gray_c500" textAlign="right">
         {intl.formatMessage(messages.outputAmountUTXO)}
       </Typography>
     );
@@ -126,7 +126,7 @@ export default class WalletReceiveRevamp extends Component<Props> {
       <Typography
         component="div"
         variant="body1"
-        color="grayscale.900"
+        color="ds.gray_c900"
         textAlign="right"
         id={this.locationId + ':addressRow_' + rowIndex + '-adaAmount-text'}
       >
@@ -157,19 +157,19 @@ export default class WalletReceiveRevamp extends Component<Props> {
           py="13px"
           px="24px"
           borderBottom="1px solid"
-          borderBottomColor="grayscale.200"
+          borderBottomColor="ds.gray_c200"
           className={styles.generatedAddressesGrid}
         >
-          <Typography color="grayscale.600" component="h2" variant="body2">
+          <Typography color="ds.gray_c600" component="h2" variant="body2">
             {intl.formatMessage(messages.generatedAddressesSectionTitle)}
           </Typography>
           {valueBlock.header}
           {onGeneratePaymentURI != null && (
-            <Typography color="grayscale.600" component="h2" variant="body2" textAlign="right">
+            <Typography color="ds.gray_c600" component="h2" variant="body2" textAlign="right">
               {intl.formatMessage(messages.generateURLLabel)}
             </Typography>
           )}
-          <Typography color="grayscale.600" component="h2" variant="body2" textAlign="right">
+          <Typography color="ds.gray_c600" component="h2" variant="body2" textAlign="right">
             {intl.formatMessage(messages.verifyAddressLabel)}
           </Typography>
         </Box>
@@ -209,7 +209,7 @@ export default class WalletReceiveRevamp extends Component<Props> {
                   }
                 >
                   <RawHash light={address.isUsed === true}>
-                    <Typography component="div" variant="body1" color="grayscale.900">
+                    <Typography component="div" variant="body1" color="ds.gray_c900">
                       {truncateAddressShort(address.address, 16)}
                     </Typography>
                   </RawHash>

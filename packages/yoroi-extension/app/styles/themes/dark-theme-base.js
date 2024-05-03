@@ -1,5 +1,6 @@
 // @flow
 import { alpha } from '@mui/material/styles';
+import { dark } from './themed-palettes/dark';
 
 const primary = {
   main: '#4B6DDE',
@@ -64,6 +65,9 @@ export const darkThemeBase = {
   palette: {
     mode: 'dark',
     /* `main` is added since MUI required it but we don't use it at all */
+    ds: {
+      ...dark,
+    },
     primary,
     secondary,
     grayscale,
@@ -76,7 +80,7 @@ export const darkThemeBase = {
         'linear-gradient(205.51deg, rgba(11, 153, 125, 0.49) -10.43%, rgba(8, 194, 157, 0.08) 100%)',
       bg_gradient_3: 'linear-gradient(30.09deg, #244ABF 0%, #4760FF 176.73%)',
     },
-    background: { bg_color_low: grayscale.min, bg_color_medium: grayscale['100'] },
+    background: { bg_color_low: dark.gray_cmin, bg_color_medium: grayscale['100'] },
     uitext: {
       primary: {
         high: primary['700'],
@@ -85,7 +89,7 @@ export const darkThemeBase = {
       },
       on_primary: staticColors.white,
       gray: {
-        max: grayscale.max,
+        max: dark.gray_cmax,
         normal: grayscale['900'],
         medium: grayscale['600'],
         low: grayscale['400'],
@@ -102,7 +106,7 @@ export const darkThemeBase = {
         low: primary['300'],
       },
       gray: {
-        high: grayscale.max,
+        high: dark.gray_cmax,
         normal: grayscale['900'],
         medium: grayscale['600'],
         low: grayscale['400'],

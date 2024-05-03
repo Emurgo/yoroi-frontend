@@ -13,7 +13,7 @@ type Props = {|
 export default class CodeBlock extends Component<Props> {
   render(): Node {
     return (
-      <Box sx={{bgcolor: "grayscale.100"}} className={styles.component}>
+      <Box sx={{bgcolor: "ds.gray_c100"}} className={styles.component}>
         <code>{this.props.code}</code>
       </Box>
     );

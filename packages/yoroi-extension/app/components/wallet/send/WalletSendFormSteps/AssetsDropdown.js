@@ -99,7 +99,7 @@ export default class AssetsDropdown extends Component<Props, State> {
               onClick={() => this.toggleDropdown('tokens')}
               className={styles.header}
             >
-              <Typography component="div" fontWeight={500} variant="body1" color="grayscale.700">
+              <Typography component="div" fontWeight={500} variant="body1" color="ds.gray_c700">
                 {intl.formatMessage(globalMessages.tokens)} ({tokens.length})
               </Typography>
               <div className={styles.headerRight}>
@@ -123,7 +123,7 @@ export default class AssetsDropdown extends Component<Props, State> {
               onClick={() => this.toggleDropdown('nfts')}
               className={styles.header}
             >
-              <Typography component="div" fontWeight={500} variant="body1" color="grayscale.700">
+              <Typography component="div" fontWeight={500} variant="body1" color="ds.gray_c700">
                 {intl.formatMessage(globalMessages.nfts)} ({nfts.length})
               </Typography>
               <div className={styles.headerRight}>

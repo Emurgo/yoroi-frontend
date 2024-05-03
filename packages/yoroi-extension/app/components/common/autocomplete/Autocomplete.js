@@ -206,7 +206,7 @@ function Autocomplete({
         {isOpen && (
           <>
             {filteredList.length === 0 ? (
-              <Box sx={{ padding: '16px', bgcolor: 'var(--yoroi-palette-common-white)' }}>
+              <Box sx={{ padding: '16px', bgcolor: 'ds.gray_cmin' }}>
                 {noResultsMessage}
               </Box>
             ) : (
@@ -269,7 +269,7 @@ const ULList = styled(Box)({
 const InputWrapper = styled(Box)(
   ({ theme, error, isVerified }) => `
   width: 100%;
-  background-color: ${theme.palette.common.white};
+  background-color: ${theme.palette.ds.white_static};
   height: 40px;
   align-content: baseline;
   display: inline-flex;

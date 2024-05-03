@@ -93,13 +93,13 @@ export default class SingleTokenRow extends Component<Props,State> {
               <div className={styles.logo}>
                 <NoAssetLogo />
               </div>
-              <Typography component="div" variant="body1" color="primary.600" className={styles.label}>
+              <Typography component="div" variant="body1" color="ds.primary_c600" className={styles.label}>
                 {token.label.startsWith('asset')
                   ? truncateAddressShort(token.label, 14)
                   : token.label}
               </Typography>
             </div>
-            <Typography component="div" variant="body1" color="grayscale.900">
+            <Typography component="div" variant="body1" color="ds.gray_c900">
               {truncateAddressShort(token.id, 14)}
             </Typography>
             <div className={styles.amount}>{displayAmount}</div>
@@ -107,7 +107,7 @@ export default class SingleTokenRow extends Component<Props,State> {
         ) : (
           <Box
             border="2px solid"
-            borderColor="grayscale.400"
+            borderColor="ds.gray_c400"
             className={
               classnames([styles.amountWrapper,
                 !isValid && styles.amountError,this.state.isInputFocused && styles.inputFocused])
@@ -117,12 +117,12 @@ export default class SingleTokenRow extends Component<Props,State> {
               <div className={styles.logo}>
                 <NoAssetLogo />
               </div>
-              <Typography component="div" variant="body1" color="primary.600" className={styles.label}>
+              <Typography component="div" variant="body1" color="ds.primary_c600" className={styles.label}>
                 {token.label}
               </Typography>
             </div>
             <div>
-              <Typography component="div" variant="body1" color="grayscale.900">
+              <Typography component="div" variant="body1" color="ds.gray_c900">
                 {truncateAddressShort(token.id, 14)}
               </Typography>
             </div>

@@ -1,19 +1,18 @@
 // @flow
 import type { ComponentType, Node } from 'react';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
+import type { LayoutComponentMap } from '../../../styles/context/layout';
 import { Component } from 'react';
 import { action, observable } from 'mobx';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, intlShape } from 'react-intl';
-import globalMessages from '../../../i18n/global-messages';
 import { messages } from '../../../components/wallet/settings/RemoveWallet';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
-
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
-
-import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
-import type { LayoutComponentMap } from '../../../styles/context/layout';
 import { withLayout } from '../../../styles/context/layout';
+import globalMessages from '../../../i18n/global-messages';
+
+import DangerousActionDialog from '../../../components/widgets/Dialog/DangerousActionDialog';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -64,9 +63,7 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
       const newWalletsNavigation = {
         ...walletsNavigation,
         // $FlowFixMe[invalid-computed-prop]
-        'cardano': walletsNavigation.cardano.filter(
-          walletId => walletId !== selectedWalletId
-        ),
+        cardano: walletsNavigation.cardano.filter(walletId => walletId !== selectedWalletId),
       };
       await this.props.actions.profile.updateSortedWalletList.trigger(newWalletsNavigation);
     }

@@ -185,7 +185,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
       );
 
     return (
-      <Box id="wallet:transactions-walletSummary-box" sx={{ bgcolor: 'common.white' }}>
+      <Box id="wallet:transactions-walletSummary-box" sx={{ bgcolor: 'ds.gray_cmin' }}>
         <Box
           sx={{
             marginBottom: '16px',
@@ -198,7 +198,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
             variant="h2"
             as="p"
             fontSize="18px"
-            sx={{ fontWeight: 500, color: 'common.black' }}
+            sx={{ fontWeight: 500, color: 'ds.gray_cmax' }}
           >
             {intl.formatMessage({ id: 'wallet.navigation.transactions' })}
           </Typography>
@@ -242,7 +242,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
               width: '100%',
               padding: '12px 0',
               borderBottom: '1px solid',
-              borderBottomColor: 'grayscale.200',
+              borderBottomColor: 'ds.gray_c200',
             }}
           >
             <Grid item xs={4}>
@@ -271,14 +271,14 @@ export default class WalletSummaryRevamp extends Component<Props> {
 }
 
 export const columnTXStyles = {
-  transactionType: { flex: '1 1 30%', maxWidth: '30%', textAlign: 'left', color: 'grayscale.600' },
-  status: { flex: '1 1 16%', maxWidth: '16%', textAlign: 'left', color: 'grayscale.600' },
-  fee: { flex: '1 1 16%', maxWidth: '16%', textAlign: 'right', color: 'grayscale.600' },
+  transactionType: { flex: '1 1 30%', maxWidth: '30%', textAlign: 'left', color: 'ds.gray_c600' },
+  status: { flex: '1 1 16%', maxWidth: '16%', textAlign: 'left', color: 'ds.gray_c600' },
+  fee: { flex: '1 1 16%', maxWidth: '16%', textAlign: 'right', color: 'ds.gray_c600' },
   amount: {
     flex: '1 1 25%',
     maxWidth: '25%',
     paddingRight: '24px',
     textAlign: 'right',
-    color: 'grayscale.600',
+    color: 'ds.gray_c600',
   },
 };

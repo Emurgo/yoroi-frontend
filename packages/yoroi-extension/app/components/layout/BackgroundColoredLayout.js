@@ -15,7 +15,7 @@ function BackgroundColoredLayout({ children, isRevamp = false }: Props): Node {
         overflow: 'auto',
         height: '100%',
         padding: isRevamp ? 0 : '30px',
-        backgroundColor: isRevamp ? 'common.white' : 'var(--yoroi-palette-gray-50)',
+        backgroundColor: isRevamp ? 'ds.white_static' : 'var(--yoroi-palette-gray-50)',
       }}
     >
       {children}

@@ -11,7 +11,10 @@ import { MultiToken } from '../../api/common/lib/MultiToken';
 import classnames from 'classnames';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import { isLedgerNanoWallet, isTrezorTWallet, } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import {
+  isLedgerNanoWallet,
+  isTrezorTWallet,
+} from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import globalMessages from '../../i18n/global-messages';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { ReactComponent as DragIcon } from '../../assets/images/add-wallet/wallet-list/drag.inline.svg';
@@ -140,6 +143,9 @@ export default class WalletCard extends Component<Props, State> {
               this.props.isCurrentWallet === true && styles.currentCardWrapper,
               snapshot.isDragging === true && styles.isDragging
             )}
+            sx={{
+              bgcolor: 'ds.gray_cmin',
+            }}
             onMouseEnter={this.showActions}
             onMouseLeave={this.hideActions}
             {...provided.draggableProps}
@@ -154,7 +160,9 @@ export default class WalletCard extends Component<Props, State> {
               id={buttonId}
             >
               <div className={styles.header}>
-                <h5 className={styles.name} id={walletNameId}>{this.props.settingsCache.conceptualWalletName}</h5>
+                <h5 className={styles.name} id={walletNameId}>
+                  {this.props.settingsCache.conceptualWalletName}
+                </h5>
                 {' ·  '}
                 <div className={styles.type}>{typeText}</div>
               </div>
@@ -175,10 +183,15 @@ export default class WalletCard extends Component<Props, State> {
                 <div className={styles.extraInfo}>
                   <div className={styles.label}>
                     {intl.formatMessage(messages.tokenTypes)}{' '}
-                    <span className={styles.value} id={walletTokensAmountId}>{tokenTypes}</span>
+                    <span className={styles.value} id={walletTokensAmountId}>
+                      {tokenTypes}
+                    </span>
                   </div>
                   <div className={styles.label}>
-                    NFTs <span className={styles.value} id={walletNFTsAmountId}>{nfts}</span>
+                    NFTs{' '}
+                    <span className={styles.value} id={walletNFTsAmountId}>
+                      {nfts}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -200,32 +213,36 @@ export default class WalletCard extends Component<Props, State> {
   }
 
   getTotalAmount: void => ?MultiToken = () => {
-    return maybe(this.props.walletAmount,
-      w => this.props.rewards?.joinAddCopy(w) ?? w)
+    return maybe(this.props.walletAmount, w => this.props.rewards?.joinAddCopy(w) ?? w);
   };
 
-  countTokenTypes: void => {|tokenTypes: number, nfts: number|} = () => {
-    if (this.props.walletAmount
-      && this.props.walletAmount.values
-      && Array.isArray(this.props.walletAmount.values)) {
-      const count = this.props.walletAmount.values.reduce((prev, curr) => {
-        const tokenInfo = this.props.getTokenInfo(curr);
-        if (tokenInfo.Identifier !== '' && !tokenInfo.IsDefault) {
-          if (tokenInfo.IsNFT === true) {
-            prev.nfts++;
-          } else {
-            prev.tokenTypes++;
+  countTokenTypes: void => {| tokenTypes: number, nfts: number |} = () => {
+    if (
+      this.props.walletAmount &&
+      this.props.walletAmount.values &&
+      Array.isArray(this.props.walletAmount.values)
+    ) {
+      const count = this.props.walletAmount.values.reduce(
+        (prev, curr) => {
+          const tokenInfo = this.props.getTokenInfo(curr);
+          if (tokenInfo.Identifier !== '' && !tokenInfo.IsDefault) {
+            if (tokenInfo.IsNFT === true) {
+              prev.nfts++;
+            } else {
+              prev.tokenTypes++;
+            }
           }
-        }
-        return prev;
-      }, { tokenTypes: 0, nfts: 0 });
+          return prev;
+        },
+        { tokenTypes: 0, nfts: 0 }
+      );
 
       return count;
     }
 
     return {
       tokenTypes: 0,
-      nfts: 0
+      nfts: 0,
     };
   };
 }

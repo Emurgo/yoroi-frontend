@@ -39,9 +39,9 @@ const RevampCheckbox: any = {
       padding: 0,
       marginRight: '18px',
       borderRadius: '2px',
-      color: 'primary.500',
+      color: 'ds.primary_c500',
       '&.Mui-checked': {
-        color: 'primary.500',
+        color: 'ds.primary_c500',
       },
       '&.Mui-disabled': {
         color: lightThemeBase.palette.grayscale[400],

@@ -59,14 +59,14 @@ function SupportedAddressDomainsBanner({ onClose, intl }: Props & Intl): Node {
         <Box>
           <Typography
             component="div"
-            color="common.black"
+            color="ds.black_static"
             fontWeight={500}
             fontSize="16px"
             mb="8px"
           >
             {intl.formatMessage(messages.title)}
           </Typography>
-          <Typography component="div" color="common.black" fontWeight={400} fontSize="16px">
+          <Typography component="div" color="ds.black_static" fontWeight={400} fontSize="16px">
             {intl.formatMessage(messages.message)}
           </Typography>
           <Typography component="div" fontWeight={500} paddingLeft="10px">

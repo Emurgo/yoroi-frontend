@@ -49,14 +49,14 @@ class ExportWallet extends Component<Props & InjectedProps> {
           variant={isRevampLayout ? 'body1' : 'h5'}
           fontWeight={500}
           mb={isRevampLayout ? '16px' : '12px'}
-          color="grayscale.900"
+          color="ds.gray_c900"
         >
           {intl.formatMessage(messages.titleLabel)}
         </Typography>
 
         <Typography component="div"
           variant={isRevampLayout ? 'body1' : 'body2'}
-          color="common.black"
+          color="ds.black_static"
           mb={isRevampLayout ? '16px' : '12px'}
         >
           {intl.formatMessage(messages.exportExplanation)}

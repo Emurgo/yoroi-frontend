@@ -29,7 +29,7 @@ export default class MinAda extends Component<Props> {
     const { minAda } = this.props;
 
     return (
-      <Typography component="div" color="grayscale.900" variant="body1">
+      <Typography component="div" color="ds.gray_c900" variant="body1">
         {intl.formatMessage(messages.minAda, { minAda })}
       </Typography>
     );

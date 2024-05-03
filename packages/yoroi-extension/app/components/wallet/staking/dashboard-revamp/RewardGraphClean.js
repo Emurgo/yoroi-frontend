@@ -56,7 +56,7 @@ export default class RewardGraphClean extends Component<Props> {
             sx={{
               padding: '8px 12px 8px 8px',
               bgcolor: theme => theme.palette.grayscale[900],
-              color: 'common.white',
+              color: 'ds.white_static',
               lineHeight: '14px',
               borderRadius: '4px',
             }}

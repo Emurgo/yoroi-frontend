@@ -161,7 +161,7 @@ class AboutYoroiSettingsBlock extends Component<Props & InjectedLayoutProps> {
           variant={isRevampLayout ? 'body1' : 'h5'}
           fontWeight={500}
           mb={isRevampLayout ? '16px' : '12px'}
-          color="grayscale.900"
+          color="ds.gray_c900"
         >
           {intl.formatMessage(messages.aboutYoroiLabel)}
         </Typography>
@@ -232,7 +232,7 @@ class AboutYoroiSettingsBlock extends Component<Props & InjectedLayoutProps> {
           mt: '40px',
         }}
       >
-        <Typography component="h2" variant="body1" fontWeight={500} mb="16px" color="grayscale.900">
+        <Typography component="h2" variant="body1" fontWeight={500} mb="16px" color="ds.gray_c900">
           {intl.formatMessage(messages.aboutYoroiLabel)}
         </Typography>
 
@@ -296,7 +296,7 @@ function LabelWithValue({
 |}): Node {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-      <Typography component="div" variant="body1" fontWeight={500} color="grayscale.max">
+      <Typography component="div" variant="body1" fontWeight={500} color="ds.gray_cmax">
         {label}
       </Typography>
       <Typography component="div"
@@ -308,7 +308,7 @@ function LabelWithValue({
             }
           : {})}
         variant="body1"
-        color="grayscale.max"
+        color="ds.gray_cmax"
         sx={{ textDecoration: 'none' }}
       >
         {value}

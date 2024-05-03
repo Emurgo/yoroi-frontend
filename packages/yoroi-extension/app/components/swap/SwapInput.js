@@ -39,7 +39,7 @@ export default function SwapInput({
     handleAmountChange(e.target.value);
   };
 
-  const isFocusedColor = focusState.value ? 'grayscale.max' : 'grayscale.400';
+  const isFocusedColor = focusState.value ? 'ds.gray_cmax' : 'ds.gray_c400';
   const imgSrc =
     ticker === defaultTokenInfo.ticker
       ? adaTokenImage
@@ -62,7 +62,7 @@ export default function SwapInput({
           gridTemplateRows: '1fr 1fr',
           justifyContent: 'start',
           position: 'relative',
-          bgcolor: 'common.white',
+          bgcolor: 'ds.gray_cmin',
           columnGap: '6px',
           rowGap: '8px',
         }}
@@ -74,7 +74,7 @@ export default function SwapInput({
             left: '16px',
             position: 'absolute',
             px: '4px',
-            bgcolor: 'common.white',
+            bgcolor: 'ds.gray_cmin',
             color: error ? 'magenta.500' : 'black',
           }}
         >
@@ -86,12 +86,12 @@ export default function SwapInput({
             appearance: 'none',
             border: '0',
             outline: 'none',
-            '::placeholder': { color: 'grayscale.600' },
+            '::placeholder': { color: 'ds.gray_c600' },
           }}
           component="input"
           type="text"
           variant="body1"
-          color="grayscale.max"
+          color="ds.gray_cmax"
           placeholder="0"
           onChange={handleChange}
           value={value}
@@ -126,7 +126,7 @@ export default function SwapInput({
               component="button"
               variant="caption"
               fontWeight={500}
-              sx={{ p: '4px 8px', bgcolor: 'grayscale.50', borderRadius: '8px' }}
+              sx={{ p: '4px 8px', bgcolor: 'ds.gray_c50', borderRadius: '8px' }}
               onClick={() => {
                 handleAmountChange(quantity);
               }}
@@ -138,7 +138,7 @@ export default function SwapInput({
           <Box minHeight="31px" />
         )}
         <Box sx={{ justifySelf: 'end', alignSelf: 'end' }}>
-          <Typography component="div" variant="caption" color="grayscale.600">
+          <Typography component="div" variant="caption" color="ds.gray_c600">
             Current balance: {quantity || 0} {ticker}
           </Typography>
         </Box>

@@ -61,7 +61,7 @@ export function PriceImpactIcon({
 
 function PriceImpactWarningText({ isSevere }: {| isSevere: boolean |}): Node {
   return isSevere ? (
-    <Typography component="div" variant="body1" color="grayscale.900">
+    <Typography component="div" variant="body1" color="ds.gray_c900">
       <Typography component="span" fontWeight="500">
         Price impact over 10%&nbsp;
       </Typography>
@@ -69,7 +69,7 @@ function PriceImpactWarningText({ isSevere }: {| isSevere: boolean |}): Node {
       caution.
     </Typography>
   ) : (
-    <Typography component="div" variant="body1" color="grayscale.900">
+    <Typography component="div" variant="body1" color="ds.gray_c900">
       <Typography component="span" fontWeight="500">
         Price impact over 1%&nbsp;
       </Typography>
@@ -112,7 +112,7 @@ export function PriceImpactPercent(): Node {
   const priceImpact = orderData.selectedPoolCalculation?.prices.priceImpact ?? '0';
 
   if (priceImpact <= 1) {
-    return <Typography sx={{ color: 'secondary.600' }}>&lt;1%</Typography>;
+    return <Typography sx={{ color: 'ds.secondary_c600' }}>&lt;1%</Typography>;
   }
   return <Percent value={priceImpact} />;
 }

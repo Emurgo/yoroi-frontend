@@ -29,7 +29,7 @@ export const InfoTooltip = ({ content, width, children }: Props): React$Node => 
   ) : content;
   return (
     <STooltip title={contentNode} placement="top" arrow width={width}>
-      <Box component="span" color="grayscale.900">
+      <Box component="span" color="ds.gray_c900">
         {children ?? (<Info />)}
       </Box>
     </STooltip>

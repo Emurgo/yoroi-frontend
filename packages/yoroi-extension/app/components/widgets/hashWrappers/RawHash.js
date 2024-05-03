@@ -35,18 +35,18 @@ export default class RawHash extends Component<Props> {
       <Box
         component="span"
         sx={{
-          color: 'primary.500',
+          color: 'ds.primary_c500',
           '&:hover': {
-            color: 'primary.600',
+            color: 'ds.primary_c600',
           },
           '&:active': {
-            color: 'primary.700',
+            color: 'ds.primary_c700',
           },
           '&:focus': {
-            color: 'primary.600',
+            color: 'ds.primary_c600',
           },
           '&:disabled': {
-            color: 'primary.300',
+            color: 'ds.primary_c300',
           },
         }}
       >

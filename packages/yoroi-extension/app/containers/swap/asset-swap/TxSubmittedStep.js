@@ -31,7 +31,7 @@ export default function TxSubmittedStep({
         <Typography component="div" variant="h3" fontWeight={500} mb="4px">
           Transaction {isSuccessful ? 'submitted' : 'failed'}
         </Typography>
-        <Typography component="div" variant="body1" color="grayscale.600">
+        <Typography component="div" variant="body1" color="ds.gray_c600">
           {isSuccessful
             ? 'Your transactions will be displayed both in the list of transaction and Open swap orders'
             : 'Your transaction has not been processed properly due to technical issues'}
