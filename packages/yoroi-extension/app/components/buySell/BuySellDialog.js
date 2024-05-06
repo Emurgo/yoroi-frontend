@@ -8,8 +8,6 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 
-import VerticalFlexContainer from '../layout/VerticalFlexContainer';
-import LoadingSpinner from '../widgets/LoadingSpinner';
 import globalMessages from '../../i18n/global-messages';
 import { Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -237,6 +235,9 @@ export default class BuySellDialog extends Component<Props, State> {
               paddingBottom: '1lh',
             },
           }}
+          sx={{
+            paddingBottom: 0,
+          }}
           value={state.buyAmountAda}
           onChange={this.onChangeBuyAmount}
           error={state.error !== null}
@@ -280,19 +281,6 @@ export default class BuySellDialog extends Component<Props, State> {
   render(): Node {
     const { intl } = this.context;
     const { state, props } = this;
-
-    if (false) {
-      return (
-        <Dialog
-          title={intl.formatMessage(globalMessages.processingLabel)}
-          closeOnOverlayClick={false}
-        >
-          <VerticalFlexContainer>
-            <LoadingSpinner />
-          </VerticalFlexContainer>
-        </Dialog>
-      );
-    }
 
     return (
       <Dialog
