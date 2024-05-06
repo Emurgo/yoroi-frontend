@@ -298,7 +298,7 @@ export default class BuySellDialog extends Component<Props, State> {
             isSubmitting: state.isSubmitting,
           }
         ]}
-        styleOverride={{ width: '648px', height: '688px' }}
+        styleOverride={{ width: '648px', height: '638px' }}
         styleFlags={{ contentNoTopPadding: true }}
       >
         <Tabs
