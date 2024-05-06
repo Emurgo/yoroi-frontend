@@ -23,7 +23,7 @@ import type { FilterUsedRequest, FilterUsedResponse } from './lib/state-fetch/ty
 
 let db: lf$Database;
 
-describe.skip('app/api/ada/index', () => {
+describe('app/api/ada/index', () => {
   beforeAll(async () => {
     await RustModule.load();
     db = await loadLovefieldDB(schema.DataStoreType.MEMORY);
