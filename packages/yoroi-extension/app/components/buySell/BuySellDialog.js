@@ -128,7 +128,7 @@ const Disclaimer = styled(Box)({
   fontStyle: 'normal',
   fontWeight: 400,
   lineHeight: '24px',
-  marginBottom: '80px',
+  marginBottom: '140px',
   '& header': {
     fontWeight: 500,
     '& svg': {
@@ -137,7 +137,7 @@ const Disclaimer = styled(Box)({
     },
   },
   borderRadius: 'var(--corner-radius-8, 8px)',
-  background: 'var(--gradient-light-green-blue, linear-gradient(270deg, #E4E8F7 0%, #C6F7ED 99.98%))',
+  background: 'var(--gradient-light-green-blue, linear-gradient(340deg, #C6F7ED 10%, #E4E8F7 60%))',
   padding: 'var(--spacing-12, 12px) var(--spacing-16, 16px) var(--spacing-16, 16px) var(--spacing-16, 16px)'
 });
 
@@ -298,7 +298,7 @@ export default class BuySellDialog extends Component<Props, State> {
             isSubmitting: state.isSubmitting,
           }
         ]}
-        styleOverride={{ width: '648px', height: '638px' }}
+        styleOverride={{ width: '648px' }}
         styleFlags={{ contentNoTopPadding: true }}
       >
         <Tabs
