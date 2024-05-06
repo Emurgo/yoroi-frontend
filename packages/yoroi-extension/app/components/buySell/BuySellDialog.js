@@ -266,7 +266,8 @@ export default class BuySellDialog extends Component<Props, State> {
 
         <Disclaimer>
           <header>
-            <InfoIcon />{intl.formatMessage(messages.disclaimer)}
+            <InfoIcon style={{ verticalAlign: 'middle' }} />
+            <span style={{ verticalAlign: 'middle' }}>{intl.formatMessage(messages.disclaimer)}</span>
           </header>
           {intl.formatMessage(messages.disclaimerText)}
         </Disclaimer>
