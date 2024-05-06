@@ -1,4 +1,4 @@
-name: Lint branch name and add jira task 
+name: Link JIRA
 
 on:
   push:
@@ -8,11 +8,12 @@ on:
       types: [opened, synchronize, reopened]
 
 jobs:
-  # A script to ensure that the PR branch name is named following the new naming
-  # conventions `<tag>/<jira-ticket>/<short-summary>` and to make a comment with
-  # the Jira ticket associated with the open PR
-  # Script: https://github.com/AhmedIbrahim336/jira-ticket
   jira: 
     runs-on: ubuntu-latest
-    steps: 
-      - run: curl ${{ secrets.JIRA_TICKET_API }}${{ github.event.number }}
+    name: Auto jira link
+    steps:
+      - name: Comment PR
+        uses: sbimochan/jira-link-commenter@v2.4
+        with:
+          jira-project-url: ${{ secrets.JIRA_URL }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
