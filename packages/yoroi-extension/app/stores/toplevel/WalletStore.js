@@ -3,7 +3,6 @@ import { action, computed, observable, runInAction } from 'mobx';
 import { debounce, find } from 'lodash';
 import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
-import { matchRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 import environment from '../../environment';
 import config from '../../config';
@@ -391,12 +390,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   };
 
   // =================== PRIVATE API ==================== //
-
-  @computed get _canRedirectToWallet(): boolean {
-    const currentRoute = this.stores.app.currentRoute;
-    const isRootRoute = matchRoute(ROUTES.WALLETS.ROOT, currentRoute) !== false;
-    return isRootRoute;
-  }
 
   _pollRefresh: void => Promise<void> = async () => {
     // Do not update if screen not active
