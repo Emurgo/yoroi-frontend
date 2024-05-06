@@ -20,7 +20,7 @@ import { InfoTooltip } from '../widgets/InfoTooltip';
 const fromTemplateColumns = '1fr minmax(auto, 136px)';
 const toTemplateColumns = '1fr minmax(auto, 152px) minmax(auto, 136px)';
 const fromColumns = ['Asset', 'Amount'];
-const toColumns = [''];
+const toColumns = [];
 
 type Props = {|
   assets: Array<AssetAmount>,
@@ -58,7 +58,7 @@ export default function SelectAssetDialog({
       onClose={onClose}
       withCloseButton
       closeOnOverlayClick
-      styleOverride={{ maxWidth: '612px', minHeight: '600px' }}
+      styleOverride={{ minWidth: '612px', maxWidth: '612px', minHeight: '600px' }}
       scrollableContentClass="scrollable-content"
     >
       <Box mb="8px" position="relative">

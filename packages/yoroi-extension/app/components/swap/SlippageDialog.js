@@ -2,11 +2,6 @@
 import { useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import Dialog from '../widgets/Dialog';
-// <TODO:CHECK_LINT>
-// eslint-disable-next-line no-unused-vars
-import { ReactComponent as AssetDefault } from '../../assets/images/revamp/asset-default.inline.svg';
-// eslint-disable-next-line no-unused-vars
-import { ReactComponent as NoAssetsFound } from '../../assets/images/revamp/no-assets-found.inline.svg';
 import Tabs from '../common/tabs/Tabs';
 
 const defaultSlippages = ['0', '0.1', '0.5', '1', '2', '3', '5', '10'];
@@ -32,6 +27,9 @@ export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValu
 
   const handleSlippageChange = e => {
     let val = e.target.value.replace(/[^\d.]+/g, '');
+    const [int, dec] = val.split('.');
+    // only two decimal places
+    if (dec?.length > 2) val = val.substr(0, int.length + 3);
     const number = Number(val);
     if (number > 100) val = '100';
     else if (number < 0) val = '0';
