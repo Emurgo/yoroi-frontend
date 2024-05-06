@@ -289,6 +289,7 @@ export default class BuySellDialog extends Component<Props, State> {
         closeOnOverlayClick={false}
         onClose={props.onCancel}
         closeButton={<DialogCloseButton />}
+        forceBottomDivider
         actions={[
           {
             label: intl.formatMessage(messages.proceed),
