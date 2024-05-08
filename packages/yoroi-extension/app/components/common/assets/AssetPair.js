@@ -1,7 +1,7 @@
 //@flow
 import { Box } from '@mui/material';
 import type { AssetAmount } from '../../swap/types';
-import adaTokenImage from '../../../containers/swap/mockAssets/ada.inline.svg';
+import adaTokenImage from '../../../assets/images/ada.inline.svg';
 import { urlResolveForIpfsAndCorsproxy } from '../../../coreUtils';
 import defaultTokenImage from '../../../assets/images/revamp/token-default.inline.svg';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
