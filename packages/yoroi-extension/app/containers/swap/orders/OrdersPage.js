@@ -2,7 +2,6 @@
 import type { Node } from 'react';
 import { useState } from 'react';
 import { Box, Button } from '@mui/material';
-import { mockCompletedOrders } from './mockData';
 import Table from '../../../components/common/table/Table';
 import CancelSwapOrderDialog from '../../../components/swap/CancelOrderDialog';
 import AssetPair from '../../../components/common/assets/AssetPair';
@@ -14,7 +13,7 @@ import ExplorableHashContainer from '../../widgets/ExplorableHashContainer';
 import { truncateAddressShort } from '../../../utils/formatters';
 import { Quantities } from '../../../utils/quantities';
 import { PRICE_PRECISION } from '../../../components/swap/common';
-import { fail, forceNonNull, mapFilterNonNull, maybe } from '../../../coreUtils';
+import { fail, forceNonNull, maybe } from '../../../coreUtils';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import { useSwap } from '@yoroi/swap';
 import { addressBech32ToHex } from '../../../api/ada/lib/cardanoCrypto/utils';
@@ -24,7 +23,13 @@ import {
 } from '../../../api/ada/transactions/utils';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 
-const orderColumns = [
+const orderColumns: Array<{|
+  name: string,
+  align?: string,
+  width?: string,
+  leftPadding?: string,
+  openOrdersOnly?: boolean,
+|}> = [
   {
     name: 'Pair (From / To)',
     align: 'left',
@@ -273,11 +278,11 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
     setCancellationState(null);
   };
 
-  const columnKeys = orderColumns.map(({ name }) => name);
-  const columnNames = orderColumns.map(({ name, openOrdersOnly }) => showCompletedOrders && openOrdersOnly ? '' : name);
-  const columnAlignment = orderColumns.map(({ align }) => align ?? '');
-  const columnLeftPaddings = orderColumns.map(({ leftPadding }) => leftPadding ?? '');
-  const gridTemplateColumns = orderColumns.map(({ width }) => width ?? 'auto').join(' ');
+  const columnKeys = orderColumns.map(c => c.name);
+  const columnNames = orderColumns.map(c => showCompletedOrders && c.openOrdersOnly ? '' : c.name);
+  const columnAlignment = orderColumns.map(c => c.align ?? '');
+  const columnLeftPaddings = orderColumns.map(c => c.leftPadding ?? '');
+  const gridTemplateColumns = orderColumns.map(c => c.width ?? 'auto').join(' ');
 
   return (
     <>
