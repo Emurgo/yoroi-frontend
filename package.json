@@ -8,12 +8,7 @@
     "translations:purge": "lerna run translations:purge -- stream",
     "archive:src": "func() { git rev-parse HEAD > COMMIT && git rev-parse --abbrev-ref HEAD > BRANCH && git archive --format zip --add-file COMMIT --add-file BRANCH -o $1 HEAD && rm COMMIT BRANCH; }; func"
   },
-  "husky": {
-    "hooks": {
-      "pre-push": ". check-all.sh",
-      "post-checkout": "npm run translations:purge"
-    }
-  },
+
   "devDependencies": {
     "concurrently": "^7.0.0",
     "husky": "4.3.8",

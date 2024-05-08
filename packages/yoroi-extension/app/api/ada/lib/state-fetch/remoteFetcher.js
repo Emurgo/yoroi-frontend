@@ -29,7 +29,13 @@ import type {
   GetRecentTransactionHashesRequest,
   GetRecentTransactionHashesResponse,
   GetTransactionsByHashesRequest,
-  GetTransactionsByHashesResponse, MultiAssetSupplyResponse, FilterUsedRequest, FilterUsedResponse,
+  GetTransactionsByHashesResponse,
+  MultiAssetSupplyResponse,
+  FilterUsedRequest,
+  FilterUsedResponse,
+  GetSwapFeeTiersFunc,
+  GetSwapFeeTiersRequest,
+  GetSwapFeeTiersResponse,
 } from './types';
 
 import type { IFetcher } from './IFetcher.types';
@@ -50,11 +56,10 @@ import {
   SendTransactionApiError,
   GetUtxoDataError,
 } from '../../../common/errors';
-import { RustModule } from '../cardanoCrypto/rustLoader';
 
 import type { ConfigType } from '../../../../../config/config-types';
 import { bech32, } from 'bech32';
-import { bytesToHex } from '../../../../coreUtils';
+import { addressBech32ToHex } from '../cardanoCrypto/utils';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -102,9 +107,7 @@ export class RemoteFetcher implements IFetcher {
       });
     return result.map(utxo => {
       if (utxo.receiver.startsWith('addr')) {
-        const fixedAddr = RustModule.WasmScope(Module => bytesToHex(
-          Module.WalletV4.Address.from_bech32(utxo.receiver).to_bytes()
-        ));
+        const fixedAddr = addressBech32ToHex(utxo.receiver);
         return {
           ...utxo,
           receiver: fixedAddr,
@@ -556,4 +559,20 @@ export class RemoteFetcher implements IFetcher {
         }
       });
   }
+
+  getSwapFeeTiers: GetSwapFeeTiersFunc = async (body: GetSwapFeeTiersRequest): Promise<GetSwapFeeTiersResponse> => {
+    const { BackendService } = body.network.Backend;
+    if (BackendService == null) throw new Error(`${nameof(this.getSwapFeeTiers)} missing backend url`);
+    return await axios(
+      `${BackendService}/api/v2.1/swap/feesInfo`,
+      {
+        method: 'get',
+      }
+    ).then(response => response.data)
+      .catch((error) => {
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getCatalystRoundInfo)} error: ` + stringifyError(error));
+        throw new GetCatalystRoundInfoApiError();
+      });
+  }
+
 }

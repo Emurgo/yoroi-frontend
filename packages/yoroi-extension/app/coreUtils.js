@@ -52,6 +52,18 @@ export function createFilterUniqueBy<T>(getter: T => any = x => x): T => boolean
 }
 
 /**
+ * Creates a comparator function that applies the provided `getter` to all values and compares the getter results
+ */
+export function comparatorByGetter<T>(getter: T => any): (T, T) => number {
+  return (a: T, b: T) => {
+    const [aV, bV] = [getter(a), getter(b)];
+    if (aV < bV) return -1;
+    if (aV > bV) return 1;
+    return 0;
+  }
+}
+
+/**
  * Calls `Object.values` and performs force type-casting.
  *
  * @param obj - any object
@@ -64,10 +76,18 @@ export function listValues<T>(obj: { [any]: T }): T[] {
 /**
  * Returns a sorted copy
  */
-export function sorted<T>(arr: T[]): T[] {
+export function sorted<T>(arr: T[], f?: (a: T, b: T) => number): T[] {
   const res = [...arr];
-  res.sort();
+  res.sort(f);
   return res;
+}
+
+export function first<T>(arr: T[]): ?T {
+  return arr[0];
+}
+
+export function last<T>(arr: T[]): ?T {
+  return arr[arr.length - 1];
 }
 
 /**
@@ -115,4 +135,20 @@ export function noop(..._: any[]): void {
  */
 export function fail<T>(...params: any[]): T {
   throw new Error(...params);
+}
+
+/**
+ * Returns the passed argument with no changes and just force-casts it to defined type
+ */
+export function forceNonNull<T>(t: ?T): T {
+  // $FlowIgnore
+  return t;
+}
+
+/**
+ * Returns the passed argument with no changes and just force-casts it to defined type
+ */
+export function cast<T>(t: any): T {
+  // $FlowIgnore
+  return t;
 }

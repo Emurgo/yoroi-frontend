@@ -35,7 +35,8 @@ export default function Table({
       }}
     >
       {columnNames.map((name, i) => (
-        <Typography component="div"
+        <Typography
+          component="div"
           variant="body2"
           key={name}
           textAlign={columnAlignment[i] ? columnAlignment[i] : 'right'}
@@ -48,7 +49,10 @@ export default function Table({
           {name}
         </Typography>
       ))}
-      <Separator sx={{ gridColumn: '1/-1', mb: '8px' }} />
+      {columnNames.length > 0 && <Separator sx={{
+        gridColumn: '1/-1',
+        mb: '8px'
+      }}/>}
       {children}
     </Box>
   );

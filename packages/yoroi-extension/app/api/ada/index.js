@@ -4,12 +4,7 @@ import type { lf$Database } from 'lovefield';
 import { fullErrStr, Logger, stringifyData, stringifyError } from '../../utils/logging';
 import CardanoByronTransaction from '../../domain/CardanoByronTransaction';
 import CardanoShelleyTransaction from '../../domain/CardanoShelleyTransaction';
-import {
-  ChainDerivations,
-  CoinTypes,
-  HARD_DERIVATION_START,
-  WalletTypePurpose,
-} from '../../config/numbersConfig';
+import { ChainDerivations, CoinTypes, HARD_DERIVATION_START, WalletTypePurpose, } from '../../config/numbersConfig';
 import { createHardwareCip1852Wallet, createStandardCip1852Wallet, } from './lib/storage/bridge/walletBuilder/shelley';
 import type { ReferenceTx } from './lib/storage/bridge/updateTransactions';
 import {
@@ -66,6 +61,7 @@ import type {
   RemoveAllTransactionsResponse,
 } from '../common/index';
 import { builtSendTokenList, hasSendAllDefault } from '../common/index';
+import type { TxOutput } from './transactions/shelley/transactions';
 import {
   newAdaUnsignedTx as shelleyNewAdaUnsignedTx,
   newAdaUnsignedTxForConnector as shelleyNewAdaUnsignedTxForConnector,
@@ -120,8 +116,7 @@ import type {
 import { getChainAddressesForDisplay, } from './lib/storage/models/utils';
 import { getAllAddressesForDisplay, rawGetAddressRowsForWallet, } from './lib/storage/bridge/traitUtils';
 import {
-  asAddressedUtxo,
-  cardanoValueFromMultiToken,
+  asAddressedUtxo, cardanoMinAdaRequiredFromAssets_coinsPerWord,
   convertAdaTransactionsToExportRows,
   multiTokenFromCardanoValue,
   multiTokenFromRemote,
@@ -152,8 +147,13 @@ import type { PersistedSubmittedTransaction } from '../localStorage';
 import type { ForeignUtxoFetcher } from '../../connector/stores/ConnectorStore';
 import type WalletTransaction from '../../domain/WalletTransaction';
 import { derivePrivateByAddressing, derivePublicByAddressing } from './lib/cardanoCrypto/deriveByAddressing';
+import { genTimeToSlot } from './lib/storage/bridge/timeUtils';
 
 // ADA specific Request / Response params
+
+export type AddressDetails = {|
+  ...Address, ...Value, ...Addressing, ...UsedStatus, ...AddressType,
+|};
 
 // getAllAddressesForDisplay
 
@@ -161,9 +161,7 @@ export type GetAllAddressesForDisplayRequest = {|
   publicDeriver: IPublicDeriver<>,
   type: CoreAddressT,
 |};
-export type GetAllAddressesForDisplayResponse = Array<{|
-  ...Address, ...Value, ...Addressing, ...UsedStatus, ...AddressType,
-|}>;
+export type GetAllAddressesForDisplayResponse = Array<AddressDetails>;
 export type GetAllAddressesForDisplayFunc = (
   request: GetAllAddressesForDisplayRequest
 ) => Promise<GetAllAddressesForDisplayResponse>;
@@ -175,9 +173,7 @@ export type GetChainAddressesForDisplayRequest = {|
   chainsRequest: IHasUtxoChainsRequest,
   type: CoreAddressT,
 |};
-export type GetChainAddressesForDisplayResponse = Array<{|
-  ...Address, ...AddressType, ...Value, ...Addressing, ...UsedStatus
-|}>;
+export type GetChainAddressesForDisplayResponse = Array<AddressDetails>;
 export type GetChainAddressesForDisplayFunc = (
   request: GetChainAddressesForDisplayRequest
 ) => Promise<GetChainAddressesForDisplayResponse>;
@@ -370,6 +366,11 @@ export type CreateVotingRegTxRequest = {|
   ledgerNanoWallet: LedgerNanoCatalystRegistrationTxSignData,
 |};
 
+export type CreateSimpleTxRequest = {|
+  publicDeriver: IPublicDeriver<ConceptualWallet> & IGetAllUtxos & IHasUtxoChains,
+  entries: Array<TxOutput>,
+  metadata: RustModule.WalletV4.AuxiliaryData,
+|};
 
 export type CreateDelegationTxResponse = {|
   signTxRequest: HaskellShelleyTxSignRequest,
@@ -855,7 +856,7 @@ export default class AdaApi {
   async createUnsignedTxForUtxos(
     request: CreateUnsignedTxForUtxosRequest
   ): Promise<CreateUnsignedTxForUtxosResponse> {
-    Logger.debug(`${nameof(AdaApi)}::${nameof(this.createUnsignedTxForUtxos)} called`);
+    Logger.debug('AdaApi.createUnsignedTxForUtxos called');
     try {
       const config = getCardanoHaskellBaseConfig(
         request.network
@@ -867,7 +868,7 @@ export default class AdaApi {
 
       if (hasSendAllDefault(request.tokens)) {
         if (request.receivers.length !== 1) {
-          throw new Error(`${nameof(this.createUnsignedTxForUtxos)} wrong output size for sendAll`);
+          throw new Error('AdaApi.createUnsignedTxForUtxos wrong output size for sendAll');
         }
         const receiver = request.receivers[0];
         unsignedTxResponse = shelleySendAllUnsignedTx(
@@ -901,7 +902,7 @@ export default class AdaApi {
           ([]: Array<{| ...Address, ...Addressing |}>)
         );
         if (changeAddresses.length !== 1) {
-          throw new Error(`${nameof(this.createUnsignedTxForUtxos)} needs exactly one change address`);
+          throw new Error('AdaApi.createUnsignedTxForUtxos needs exactly one change address');
         }
         const changeAddr = changeAddresses[0];
         const otherAddresses: Array<{| ...Address, |}> = request.receivers.reduce(
@@ -915,7 +916,7 @@ export default class AdaApi {
           ([]: Array<{| ...Address, |}>)
         );
         if (otherAddresses.length > 1) {
-          throw new Error(`${nameof(this.createUnsignedTxForUtxos)} can't send to more than one address`);
+          throw new Error('AdaApi.createUnsignedTxForUtxos can\'t send to more than one address');
         }
         unsignedTxResponse = await shelleyNewAdaUnsignedTx(
           otherAddresses.length === 1
@@ -949,7 +950,7 @@ export default class AdaApi {
         );
       }
       Logger.debug(
-        `${nameof(AdaApi)}::${nameof(this.createUnsignedTxForUtxos)} success: ` + stringifyData(unsignedTxResponse)
+        'AdaApi.createUnsignedTxForUtxos success: ' + stringifyData(unsignedTxResponse)
       );
       return new HaskellShelleyTxSignRequest({
         senderUtxos: unsignedTxResponse.senderUtxos,
@@ -969,7 +970,7 @@ export default class AdaApi {
       });
     } catch (error) {
       Logger.error(
-        `${nameof(AdaApi)}::${nameof(this.createUnsignedTxForUtxos)} error: ` + stringifyError(error)
+        'AdaApi.createUnsignedTxForUtxos error: ' + stringifyError(error)
       );
       if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
@@ -1234,18 +1235,12 @@ export default class AdaApi {
           throw new Error(`Value is required for a valid tx output, got: ${JSON.stringify(target)}`);
         }
       } else {
-        RustModule.WasmScope(Scope => {
-          // ensureRequiredMinimalValue is true
-          const minAmount = Scope.WalletV4.min_ada_required(
-            cardanoValueFromMultiToken(amount),
-            dataHash != null,
-            RustModule.WalletV4.BigNum.from_str(protocolParams.coinsPerUtxoWord),
-          );
 
-          if ((new BigNumber(minAmount.to_str())).gt(new BigNumber(target.value ?? '0'))) {
-            amount = makeMultiToken(minAmount.to_str());
-          };
-        });
+        const minAmount =
+          cardanoMinAdaRequiredFromAssets_coinsPerWord(amount, new BigNumber(protocolParams.coinsPerUtxoWord));
+        if (minAmount.gt(target.value ?? '0')) {
+          amount = makeMultiToken(minAmount.toString());
+        }
       }
       outputs.push({
         address: target.address,
@@ -1595,6 +1590,76 @@ export default class AdaApi {
     }
   }
 
+  async createSimpleTx(
+    request: CreateSimpleTxRequest,
+  ): Promise<HaskellShelleyTxSignRequest> {
+    Logger.debug(`${nameof(AdaApi)}::${nameof(this.createSimpleTx)} called`);
+
+    try {
+      const fullConfig = getCardanoHaskellBaseConfig(request.publicDeriver.getParent().getNetworkInfo());
+      const config = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
+
+      const protocolParams = {
+        keyDeposit: config.KeyDeposit,
+        linearFeeCoefficient: config.LinearFee.coefficient,
+        linearFeeConstant: config.LinearFee.constant,
+        coinsPerUtxoWord: config.CoinsPerUtxoWord,
+        poolDeposit: config.PoolDeposit,
+        networkId: request.publicDeriver.getParent().networkInfo.NetworkId,
+      };
+
+      const allUtxo = await request.publicDeriver.getAllUtxos();
+      const addressedUtxo = asAddressedUtxo(allUtxo);
+      const changeAddr = await getReceiveAddress(request.publicDeriver);
+      if (changeAddr == null) {
+        throw new Error(`${nameof(this.createSimpleTx)} no internal addresses left. Should never happen`);
+      }
+      const timeToSlot = await genTimeToSlot(fullConfig);
+      const absSlotNumber = new BigNumber(
+        timeToSlot({ time: new Date()}).slot
+      );
+
+      const unsignedTx = await shelleyNewAdaUnsignedTx(
+        request.entries,
+        {
+          address: changeAddr.addr.Hash,
+          addressing: changeAddr.addressing,
+        },
+        addressedUtxo,
+        absSlotNumber,
+        protocolParams,
+        [],
+        [],
+        false,
+        request.metadata,
+      );
+
+      return new HaskellShelleyTxSignRequest({
+        senderUtxos: unsignedTx.senderUtxos,
+        unsignedTx: unsignedTx.txBuilder,
+        changeAddr: unsignedTx.changeAddr,
+        metadata: request.metadata,
+        networkSettingSnapshot: {
+          ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
+          KeyDeposit: new BigNumber(config.KeyDeposit),
+          PoolDeposit: new BigNumber(config.PoolDeposit),
+          NetworkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+        },
+        neededStakingKeyHashes: {
+          neededHashes: new Set(),
+          wits: new Set(),
+        },
+        trezorTCatalystRegistrationTxSignData: undefined,
+        ledgerNanoCatalystRegistrationTxSignData: undefined,
+      });
+    } catch (error) {
+      Logger.error(`${nameof(AdaApi)}::${nameof(this.createSimpleTx)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
+      throw new GenericApiError();
+    }
+
+  }
+
   async createVotingRegTx(
     request: CreateVotingRegTxRequest
   ): Promise<CreateVotingRegTxResponse> {
@@ -1731,11 +1796,11 @@ export default class AdaApi {
   async restoreWallet(
     request: RestoreWalletRequest
   ): Promise<RestoreWalletResponse> {
-    Logger.debug(`${nameof(AdaApi)}::${nameof(this.restoreWallet)} called`);
+    Logger.debug('AdaApi.restoreWallet called');
     const { recoveryPhrase, walletName, walletPassword, } = request;
 
     if (request.accountIndex < HARD_DERIVATION_START) {
-      throw new Error(`${nameof(this.restoreWallet)} needs hardened index`);
+      throw new Error('AdaApi.restoreWallet needs hardened index');
     }
     try {
       // Note: we only restore for 0th account
@@ -1760,12 +1825,12 @@ export default class AdaApi {
           cip1852Wallet,
         ));
       }
-      Logger.debug(`${nameof(AdaApi)}::${nameof(this.restoreWallet)} success`);
+      Logger.debug('AdaApi.restoreWallet success');
       return {
         publicDerivers: newPubDerivers,
       };
     } catch (error) {
-      Logger.error(`${nameof(AdaApi)}::${nameof(this.restoreWallet)} error: ` + stringifyError(error));
+      Logger.error('AdaApi.restoreWallet error: ' + stringifyError(error));
       // TODO: handle case where wallet already exists (this if case is never hit)
       if (error.message != null && error.message.includes('Wallet with that mnemonics already exists')) {
         throw new WalletAlreadyRestoredError();
@@ -1784,7 +1849,7 @@ export default class AdaApi {
   async restoreWalletForTransfer(
     request: RestoreWalletForTransferRequest
   ): Promise<RestoreWalletForTransferResponse> {
-    Logger.debug(`${nameof(AdaApi)}::${nameof(this.restoreWalletForTransfer)} called`);
+    Logger.debug('AdaApi.restoreWalletForTransfer called');
     const { checkAddressesInUse } = request;
 
     const config = getCardanoHaskellBaseConfig(
@@ -1845,7 +1910,7 @@ export default class AdaApi {
           keyDerivationId: i
         });
         const family = reverseAddressLookup.get(i);
-        if (family == null) throw new Error(`${nameof(this.restoreWalletForTransfer)} should never happen`);
+        if (family == null) throw new Error('AdaApi.restoreWalletForTransfer: should never happen');
         const result = family.map(address => ({
           address,
           addressing: {
@@ -1856,13 +1921,13 @@ export default class AdaApi {
         addressResult.push(...result);
       }
 
-      Logger.debug(`${nameof(this.restoreWalletForTransfer)} success`);
+      Logger.debug('AdaApi.restoreWalletForTransfer success');
 
       return {
         addresses: addressResult,
       };
     } catch (error) {
-      Logger.error(`${nameof(this.restoreWalletForTransfer)} error: ` + stringifyError(error));
+      Logger.error('AdaApi.restoreWalletForTransfer error: ' + stringifyError(error));
       // TODO: backend will return something different here, if multiple wallets
       // are restored from the key and if there are duplicate wallets we will get
       // some kind of error and present the user with message that some wallets

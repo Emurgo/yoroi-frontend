@@ -76,4 +76,5 @@ export const ROUTES = {
     ROOT: '/swap',
     ORDERS: '/swap/orders',
   },
+  EXCHANGE_END: '/exchange-end',
 };

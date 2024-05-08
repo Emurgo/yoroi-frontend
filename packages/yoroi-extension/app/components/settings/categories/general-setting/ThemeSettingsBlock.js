@@ -5,14 +5,14 @@ import { observer } from 'mobx-react';
 import { FormControlLabel, Radio, RadioGroup, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { defineMessages, intlShape, FormattedMessage, FormattedHTMLMessage } from 'react-intl';
-import { THEMES } from '../../../../styles/utils';
-import type { Theme } from '../../../../styles/utils';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 import { ReactComponent as YoroiModernTheme } from '../../../../assets/images/yoroi-modern-theme.inline.svg';
 import { ReactComponent as YoroiClassicTheme } from '../../../../assets/images/yoroi-classic-theme.inline.svg';
 import ThemeToggler from '../../themeToggler';
 import environment from '../../../../environment';
+import type { Theme } from '../../../../styles/themes';
+import { THEMES } from '../../../../styles/themes';
 
 const messages = defineMessages({
   themeLabel: {
