@@ -8,7 +8,7 @@ import { ReactComponent as WalletIcon } from '../../assets/images/revamp/icons/w
 import { ReactComponent as ArrowTopIcon } from '../../assets/images/revamp/icons/arrow-top.inline.svg';
 import { ReactComponent as ArrowBottomIcon } from '../../assets/images/revamp/icons/arrow-bottom.inline.svg';
 import { truncateAddressShort } from '../../utils/formatters';
-import adaTokenImage from '../../containers/swap/mockAssets/ada.inline.svg';
+import adaTokenImage from '../../assets/images/ada.inline.svg';
 import defaultTokenImage from '../../assets/images/revamp/asset-default.inline.svg';
 import Dialog from '../widgets/Dialog';
 import Table from '../common/table/Table';

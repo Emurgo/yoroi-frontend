@@ -1,6 +1,12 @@
 //@flow
 import { useState } from 'react';
-import { useSwap, useSwapOrdersByStatusOpen, useSwapPoolsByPair, useSwapTokensOnlyVerified } from '@yoroi/swap';
+import {
+  useSwap,
+  useSwapOrdersByStatusCompleted,
+  useSwapOrdersByStatusOpen,
+  useSwapPoolsByPair,
+  useSwapTokensOnlyVerified
+} from '@yoroi/swap';
 import { Quantities } from '../../utils/quantities';
 import { useSwapForm } from './context/swap-form';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
@@ -103,6 +109,21 @@ export function useRichOpenOrders(): Array<any> {
       deposit: o.deposit,
       provider: o.provider,
       sender: o.sender,
+    };
+  })
+}
+
+export function useRichCompletedOrders(): Array<any> {
+  const completedOrders = useSwapOrdersByStatusCompleted();
+  const { onlyVerifiedTokens } = useSwapTokensOnlyVerified();
+  const tokensMap = onlyVerifiedTokens.reduce((map, t) => ({ ...map, [t.id]: t }), {});
+  return completedOrders.map(o => {
+    const fromToken = tokensMap[o.from.tokenId];
+    const toToken = tokensMap[o.to.tokenId];
+    return {
+      txHash: o.txHash,
+      from: { quantity: o.from.quantity, token: fromToken },
+      to: { quantity: o.to.quantity, token: toToken },
     };
   })
 }
