@@ -6,6 +6,7 @@ import classNames from 'classnames';
 import styles from './SubMenuItem.scss';
 import { Box } from '@mui/material';
 import { withLayout } from '../../styles/context/layout';
+import { Typography } from '@mui/material';
 
 type Props = {|
   +label: string,
@@ -45,7 +46,9 @@ class SubMenuItem extends Component<Props & InjectedProps> {
         onClick={onClick}
         id={locationId + '-' + subMenuItemId + 'SubTab-button'}
       >
-        {label}
+        <Typography variant="body1" fontWeight="500">
+          {label}
+        </Typography>
       </Box>
     );
   }
