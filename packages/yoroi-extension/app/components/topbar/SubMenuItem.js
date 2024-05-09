@@ -4,9 +4,8 @@ import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import styles from './SubMenuItem.scss';
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { withLayout } from '../../styles/context/layout';
-import { Typography } from '@mui/material';
 
 type Props = {|
   +label: string,
