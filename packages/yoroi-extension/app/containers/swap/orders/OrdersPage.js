@@ -17,19 +17,28 @@ import { fail, forceNonNull, maybe } from '../../../coreUtils';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import { useSwap } from '@yoroi/swap';
 import { addressBech32ToHex } from '../../../api/ada/lib/cardanoCrypto/utils';
-import {
-  getTransactionFeeFromCbor,
-  getTransactionTotalOutputFromCbor,
-} from '../../../api/ada/transactions/utils';
+import { getTransactionFeeFromCbor, getTransactionTotalOutputFromCbor, } from '../../../api/ada/transactions/utils';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 
-const orderColumns: Array<{|
-  name: string,
-  align?: string,
-  width?: string,
-  leftPadding?: string,
+type ColumnContext = {|
+  completedOrders: boolean,
+|};
+
+type ColumnValueOrGetter = string | ColumnContext => string;
+
+type Column = {|
+  name: ColumnValueOrGetter,
+  align?: ColumnValueOrGetter,
+  width?: ColumnValueOrGetter,
+  leftPadding?: ColumnValueOrGetter,
   openOrdersOnly?: boolean,
-|}> = [
+|};
+
+function resolveValueOrGetter(v: ColumnValueOrGetter, ctx: ColumnContext): string {
+  return typeof v === 'function' ? v(ctx) : v;
+}
+
+const orderColumns: Array<Column> = [
   {
     name: 'Pair (From / To)',
     align: 'left',
@@ -56,7 +65,7 @@ const orderColumns: Array<{|
     openOrdersOnly: true,
   },
   {
-    name: 'Time created',
+    name: ({ completedOrders }) => completedOrders ? 'Time executed' : 'Time created',
     align: 'left',
     width: '240px',
   },
@@ -187,6 +196,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
   const [showCompletedOrders, setShowCompletedOrders] = useState<boolean>(false);
   const [cancellationState, setCancellationState] = useState<?{|
     order: any,
+    collateralReorgRequired?: boolean,
     tx: ?{| cbor: string, formattedFee: string, formattedReturn: Array<FormattedTokenValue> |},
     isSubmitting?: boolean,
   |}>(null);
@@ -204,56 +214,75 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
   const openOrders = useRichOpenOrders().map(o => mapOpenOrder(o, defaultTokenInfo));
   const completedOrders = useRichCompletedOrders().map(o => mapCompletedOrder(o, defaultTokenInfo));
 
-  const handleCancelRequest = order => {
+  const handleCancelRequest = async order => {
+    setCancellationState({ order, tx: null });
+    try {
+      const utxoHex = await props.stores.substores.ada.swapStore
+        .getUtxoHexForCancelCollateral({ wallet });
+      if (utxoHex == null) {
+        setCancellationState({
+          order,
+          collateralReorgRequired: true,
+          tx: null,
+        });
+        // terminate when no collateral is available
+        return;
+      }
+      return handleCreateCancelTransaction(order, utxoHex);
+    } catch (e) {
+      console.error('Failed to prepare a collateral utxo for cancel', e);
+      throw e;
+    }
+  };
+  
+  const handleCreateCancelTransaction = async (order, utxoHex) => {
     const sender = order.sender;
     if (sender == null) {
       throw new Error('Cannot cancel a completed order (sender == null)');
     }
-    props.stores.substores.ada.swapStore
-      .getUtxoHexForCancelCollateral({ wallet })
-      .then(utxoHex => {
-        return swapCancelOrder({
-          address: addressBech32ToHex(sender),
-          utxos: {
-            order: order.utxo,
-            collateral: utxoHex,
-          },
-        });
-      })
-      .then(cancelTxCbor => {
-        const mt = getTransactionTotalOutputFromCbor(
-          cancelTxCbor,
-          wallet.getParent().getDefaultToken()
-        );
-        const formattedCancelValues = createFormattedTokenValues({
-          entries: mt.entries().map(e => ({ id: e.identifier, amount: e.amount.toString() })),
-          order,
-          defaultTokenInfo,
-        });
-        setCancellationState(s => {
-          // State might have been reset to null in the meantime
-          if (s == null) return null;
-          // State might have been recreated for another order in the meantime
-          if (s.order.utxo !== order.utxo) return s;
-          return {
-            order: s.order,
-            tx: {
-              cbor: cancelTxCbor,
-              formattedFee: Quantities.format(
-                getTransactionFeeFromCbor(cancelTxCbor).toString(),
-                forceNonNull(defaultTokenInfo.decimals),
-                forceNonNull(defaultTokenInfo.decimals)
-              ),
-              formattedReturn: formattedCancelValues,
-            },
-          };
-        });
-        return null;
-      })
-      .catch(e => {
-        console.error('Failed to prepare cancellation transaction', e);
+    try {
+      const cancelTxCbor = await swapCancelOrder({
+        address: addressBech32ToHex(sender),
+        utxos: {
+          order: order.utxo,
+          collateral: utxoHex,
+        },
       });
-    setCancellationState({ order, tx: null });
+      const totalCancelOutput = getTransactionTotalOutputFromCbor(
+        cancelTxCbor,
+        wallet.getParent().getDefaultToken()
+      );
+      const formattedCancelValues = createFormattedTokenValues({
+        entries: totalCancelOutput.entries().map(e => ({
+          id: e.identifier,
+          amount: e.amount.toString()
+        })),
+        order,
+        defaultTokenInfo,
+      });
+      const formattedFeeValue = Quantities.format(
+        getTransactionFeeFromCbor(cancelTxCbor).toString(),
+        forceNonNull(defaultTokenInfo.decimals),
+        forceNonNull(defaultTokenInfo.decimals)
+      );
+      setCancellationState(s => {
+        // State might have been reset to null in the meantime
+        if (s == null) return null;
+        // State might have been recreated for another order in the meantime
+        if (s.order.utxo !== order.utxo) return s;
+        return {
+          order: s.order,
+          tx: {
+            cbor: cancelTxCbor,
+            formattedFee: formattedFeeValue,
+            formattedReturn: formattedCancelValues,
+          },
+        };
+      });
+    } catch (e) {
+      console.error('Failed to prepare a cancellation transaction', e);
+      throw e;
+    }
   };
 
   const handleCancelConfirm = async (cancelledOrder: any, password: string) => {
@@ -278,11 +307,12 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
     setCancellationState(null);
   };
 
-  const columnKeys = orderColumns.map(c => c.name);
-  const columnNames = orderColumns.map(c => showCompletedOrders && c.openOrdersOnly ? '' : c.name);
-  const columnAlignment = orderColumns.map(c => c.align ?? '');
-  const columnLeftPaddings = orderColumns.map(c => c.leftPadding ?? '');
-  const gridTemplateColumns = orderColumns.map(c => c.width ?? 'auto').join(' ');
+  const columnContext = { completedOrders: showCompletedOrders };
+  const columnKeys = orderColumns.map(c => resolveValueOrGetter(c.name, columnContext));
+  const columnNames = orderColumns.map(c => showCompletedOrders && c.openOrdersOnly ? '' : resolveValueOrGetter(c.name, columnContext));
+  const columnAlignment = orderColumns.map(c => resolveValueOrGetter(c.align ?? '', columnContext));
+  const columnLeftPaddings = orderColumns.map(c => resolveValueOrGetter(c.leftPadding ?? '', columnContext));
+  const gridTemplateColumns = orderColumns.map(c => resolveValueOrGetter(c.width ?? 'auto', columnContext)).join(' ');
 
   return (
     <>
@@ -334,6 +364,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
       {cancellationState && (
         <CancelSwapOrderDialog
           order={cancellationState.order}
+          reorgRequired={cancellationState.collateralReorgRequired ?? false}
           isSubmitting={Boolean(cancellationState.isSubmitting)}
           transactionParams={maybe(cancellationState.tx, tx => ({
             formattedFee: tx.formattedFee,
@@ -357,7 +388,7 @@ const OrderRow = ({
   order: MappedOrder,
   defaultTokenInfo: RemoteTokenInfo,
   selectedExplorer: SelectedExplorer,
-  handleCancel?: () => void,
+  handleCancel?: () => Promise<void>,
 |}) => {
   return (
     <>

@@ -13,6 +13,7 @@ import { InfoTooltip } from '../widgets/InfoTooltip';
 
 type Props = {|
   order: any,
+  reorgRequired: boolean,
   isSubmitting: boolean,
   transactionParams: ?{|
     formattedFee: string,
@@ -25,6 +26,7 @@ type Props = {|
 
 export default function CancelSwapOrderDialog({
   order,
+  reorgRequired,
   isSubmitting,
   transactionParams,
   onCancelOrder,
