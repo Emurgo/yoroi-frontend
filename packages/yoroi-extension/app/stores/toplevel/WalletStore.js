@@ -3,12 +3,11 @@ import { action, computed, observable, runInAction } from 'mobx';
 import { debounce, find } from 'lodash';
 import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
-import { matchRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 import environment from '../../environment';
 import config from '../../config';
 import globalMessages from '../../i18n/global-messages';
-import type { Notification } from '../../types/notificationType';
+import type { Notification } from '../../types/notification.types';
 import type { GetWalletsFunc } from '../../api/common/index';
 import { getWallets } from '../../api/common/index';
 import type { CreateWalletResponse, RestoreWalletResponse } from '../../api/common/types';
@@ -202,6 +201,13 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     return this.selected != null;
   }
 
+  @computed get selectedOrFail(): PublicDeriver<> {
+    if (this.selected == null) {
+      throw new Error('A selected wallet is required!');
+    }
+    return this.selected;
+  }
+
   @computed get activeWalletPlate(): ?WalletChecksum {
     const selectedPublicDeriverId = this.selected?.publicDeriverId;
     if (selectedPublicDeriverId != null) {
@@ -376,12 +382,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   };
 
   // =================== PRIVATE API ==================== //
-
-  @computed get _canRedirectToWallet(): boolean {
-    const currentRoute = this.stores.app.currentRoute;
-    const isRootRoute = matchRoute(ROUTES.WALLETS.ROOT, currentRoute) !== false;
-    return isRootRoute;
-  }
 
   _pollRefresh: void => Promise<void> = async () => {
     // Do not update if screen not active

@@ -2,7 +2,7 @@
 /* eslint-disable no-nested-ternary */
 import type { Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { Notification } from '../../../types/notificationType';
+import type { Notification } from '../../../types/notification.types';
 import type {
   DefaultTokenEntry,
   TokenLookupKey,

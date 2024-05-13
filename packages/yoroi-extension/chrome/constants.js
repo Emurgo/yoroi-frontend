@@ -1,4 +1,5 @@
 // @flow
+/* eslint-disable  import/no-unused-modules */
 
 export function genCSP(request: {|
   isDev: boolean,
@@ -40,6 +41,10 @@ export function genCSP(request: {|
   connectSrc.push('https://a.cexplorer.io/');
   imgSrc.push('https://img.cexplorer.io/');
   imgSrc.push('https://corsproxy.io/');
+
+  // Swap
+  connectSrc.push('https://aggregator.muesliswap.com/');
+  connectSrc.push('https://onchain2.muesliswap.com/');
 
   // unsafe-inline is unfortunately required by style-loader (even in production builds)
   const evalStyle = "'unsafe-inline'";

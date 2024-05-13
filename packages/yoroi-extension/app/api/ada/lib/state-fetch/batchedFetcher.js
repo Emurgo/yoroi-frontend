@@ -40,13 +40,14 @@ import type {
   GetTransactionsByHashesResponse,
   GetTransactionsByHashesFunc,
   MultiAssetSupplyResponse,
+  FilterUsedRequest,
+  FilterUsedResponse,
+  FilterFunc,
+  GetSwapFeeTiersFunc,
 } from './types';
-import type {
-  FilterFunc, FilterUsedRequest, FilterUsedResponse,
-} from '../../../common/lib/state-fetch/currencySpecificTypes';
 import LocalizableError from '../../../../i18n/LocalizableError';
 
-import type { IFetcher } from './IFetcher';
+import type { IFetcher } from './IFetcher.types';
 
 import { chunk } from 'lodash';
 import {
@@ -188,6 +189,11 @@ export class BatchedFetcher implements IFetcher {
   getLatestBlockBySlot: GetLatestBlockBySlotFunc = async (body) => (
     // Todo: Implement batching as the max slots per request is 50
     this.baseFetcher.getLatestBlockBySlot(body)
+  )
+
+  getSwapFeeTiers: GetSwapFeeTiersFunc = async (body) => (
+    // No batching for fee tiers
+    this.baseFetcher.getSwapFeeTiers(body)
   )
 }
 

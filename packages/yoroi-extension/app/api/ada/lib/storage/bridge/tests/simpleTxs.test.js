@@ -4,18 +4,18 @@ import BigNumber from 'bignumber.js';
 import {
   schema,
 } from 'lovefield';
-import '../../../test-config';
+import '../../../test-config.forTests';
 import type { RemoteTransaction } from '../../../state-fetch/types';
 import {
   setup,
-} from './common';
+} from './common.forTests';
 import {
   ABANDON_SHARE,
   TX_TEST_MNEMONIC_1,
   mockDate,
   filterDbSnapshot,
   compareObject,
-} from '../../../../../jestUtils';
+} from '../../../../../jestUtils.forTests';
 import {
   genCheckAddressesInUse,
   genGetBestBlock,
@@ -25,7 +25,7 @@ import {
   MockUtxoApi,
   genGetRecentTransactionHashes,
   genGetTransactionsByHashes, genGetMultiAssetSupply, genGetTransactionsHistoryForAddresses,
-} from '../../../state-fetch/mockNetwork';
+} from '../../../state-fetch/mockNetwork.forTests';
 import {
   HARD_DERIVATION_START,
   WalletTypePurpose,

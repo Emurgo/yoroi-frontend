@@ -43,7 +43,7 @@ import {
   derivePublicDeriver,
 } from '../../models/ConceptualWallet/traits';
 import type { AddDerivationRequest } from '../../database/primitives/api/write';
-import type { TreeInsertStart } from '../../database/walletTypes/common/utils';
+import type { TreeInsertStart } from '../../database/walletTypes/common/utils.types';
 
 /**
  * We need to statically ensure that

@@ -1,4 +1,5 @@
 // @flow
+/* eslint-disable  import/no-unused-modules */
 
 import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
 

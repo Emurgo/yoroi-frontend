@@ -1,6 +1,6 @@
 // @flow
 
-import '../test-config';
+import '../test-config.forTests';
 import { schema } from 'lovefield';
 import {
   generateWalletRootKey,

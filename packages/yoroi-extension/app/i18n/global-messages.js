@@ -927,6 +927,14 @@ const globalMessages: * = defineMessages({
     id: 'button.buyAda',
     defaultMessage: '!!!Buy ADA',
   },
+  sellAda: {
+    id: 'button.sellAda',
+    defaultMessage: '!!!Sell ADA',
+  },
+  buySellAda: {
+    id: 'button.buySellAda',
+    defaultMessage: '!!!Buy/Sell ADA',
+  },
   txConfirmationLedgerNanoLine2: {
     id: 'wallet.send.ledger.confirmationDialog.info.line.2',
     defaultMessage:
@@ -956,6 +964,14 @@ const globalMessages: * = defineMessages({
     id: 'profile.languageSelect.tosAgreement',
     defaultMessage:
       '!!!I agree with <span id="tosLink">Terms of Service Agreement</span> and <span id="privacyLink">Privacy Notice</span>',
+  },
+  goToTransactions: {
+    id: 'wallet.transaction.success.button.label',
+    defaultMessage: '!!!Go To Transactions',
+  },
+  provider: {
+    id: 'buysell.dialog.provider',
+    defaultMessage: '!!!Provider',
   },
 });
 export default globalMessages;

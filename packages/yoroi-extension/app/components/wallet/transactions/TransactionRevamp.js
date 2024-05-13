@@ -3,14 +3,14 @@
 import type { Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { TransactionDirectionType } from '../../../api/ada/transactions/types';
-import type { AssuranceLevel } from '../../../types/transactionAssuranceTypes';
+import type { AssuranceLevel } from '../../../types/transactionAssurance.types';
 import type { TxStatusCodesType } from '../../../api/ada/lib/storage/database/primitives/enums';
 import type {
   CertificateRow,
   TokenRow,
 } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos/tables';
-import type { Notification } from '../../../types/notificationType';
+import type { Notification } from '../../../types/notification.types';
 import type { TxDataOutput, TxDataInput } from '../../../api/common/types';
 import type { TokenLookupKey, TokenEntry } from '../../../api/common/lib/MultiToken';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
@@ -84,6 +84,8 @@ type Props = {|
   +addressToDisplayString: string => string,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +complexityLevel: ?ComplexityLevelType,
+  id: string,
+  txIndex: number,
 |};
 
 type State = {|
@@ -436,6 +438,7 @@ export default class TransactionRevamp extends Component<Props, State> {
     address: TxDataOutput | TxDataInput,
     addressIndex: number,
     transform?: BigNumber => BigNumber,
+    addressRowId: string,
   |}) => Node = request => {
     const notificationElementId = `${request.kind}-address-${request.addressIndex}-${request.data.txid}-copyNotification`;
     const divKey = identifier =>
@@ -489,6 +492,7 @@ export default class TransactionRevamp extends Component<Props, State> {
           }
           notification={this.props.notification}
           placementTooltip="bottom-start"
+          id={request.addressRowId}
         >
           <ExplorableHashContainer
             selectedExplorer={this.props.selectedExplorer}
@@ -496,7 +500,11 @@ export default class TransactionRevamp extends Component<Props, State> {
             light
             linkType="address"
           >
-            <Typography variant="caption1" color="grayscale.600">
+            <Typography
+              variant="caption1"
+              color="grayscale.600"
+              id={request.addressRowId + '-truncatedAddress-text'}
+            >
               {truncateAddressShort(this.props.addressToDisplayString(request.address.address))}
             </Typography>
           </ExplorableHashContainer>
@@ -538,8 +546,14 @@ export default class TransactionRevamp extends Component<Props, State> {
     const status = this.getStatusString(intl, state, assuranceLevel, isValidTransaction);
     const txType = this.getTxType(intl, this.getTicker(data.amount.getDefaultEntry()), data);
 
+    const txIdBasePart = `${this.props.id}:transaction_${this.props.txIndex}`
+    const txIdFullInfoBasePart = `${txIdBasePart}:txFullInfo`
+
     return (
-      <Box className={styles.component}>
+      <Box
+        className={styles.component}
+        id={this.props.id + '-transaction_' + this.props.txIndex + '-box'}
+      >
         {/* ==== Clickable Header -> toggles details ==== */}
         <Box
           sx={{ padding: '20px 0', cursor: 'pointer' }}
@@ -563,15 +577,15 @@ export default class TransactionRevamp extends Component<Props, State> {
             >
               <TypeIcon type={txType.icon} />
               <Box>
-                <Typography variant="body1" color="grayscale.900">
+                <Typography variant="body1" color="grayscale.900" id={txIdBasePart + '-txType-text'}>
                   {txType.msg}
                 </Typography>
-                <Typography variant="caption1" color="grayscale.600">
+                <Typography variant="caption1" color="grayscale.600" id={txIdBasePart + '-txTime-text'}>
                   {moment(data.date).format('hh:mm A')}
                 </Typography>
               </Box>
             </Grid>
-            <Grid item xs={2} sx={{ textAlign: 'left' }} id="txStatus">
+            <Grid item xs={2} sx={{ textAlign: 'left' }}>
               {state === TxStatusCodes.IN_BLOCK ? (
                 <Typography
                   variant="body1"
@@ -579,6 +593,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                     color: isPendingTransaction ? 'grayscale.400' : 'grayscale.900',
                     textTransform: 'capitalize',
                   }}
+                  id={txIdBasePart + '-txStatus-text'}
                 >
                   {status}
                 </Typography>
@@ -593,6 +608,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                       : 'grayscale.900',
                     textTransform: 'capitalize',
                   }}
+                  id={txIdBasePart + '-txStatus-text'}
                 >
                   {status}
                 </Typography>
@@ -607,7 +623,12 @@ export default class TransactionRevamp extends Component<Props, State> {
                 justifyContent: 'flex-end',
               }}
             >
-              <Typography component="div" variant="body1" color="grayscale.900" id="txFee">
+              <Typography
+                component="div"
+                variant="body1"
+                color="grayscale.900"
+                id={txIdBasePart + '-txFee-text'}
+              >
                 {this.renderFeeDisplay({
                   amount: data.fee,
                   type: data.type,
@@ -633,15 +654,15 @@ export default class TransactionRevamp extends Component<Props, State> {
                   variant="body1"
                   fontWeight="500"
                   color="grayscale.900"
-                  id="transactionAmount"
                   textAlign="left"
+                  id={txIdBasePart + '-txAmount-text'}
                 >
                   {this.renderAmountWithUnitOfAccount({
                     entry: data.amount.getDefaultEntry(),
                     timestamp: data.date.valueOf(),
                   })}
                 </Typography>
-                <Typography component="div">
+                <Typography component="div" id={txIdBasePart + '-txAmountAssets-text'}>
                   {this.renderAssets({ assets: data.amount.nonDefaultEntries() })}
                 </Typography>
               </Box>
@@ -709,7 +730,12 @@ export default class TransactionRevamp extends Component<Props, State> {
                   >
                     <Typography variant="caption1">
                       {intl.formatMessage(globalMessages.fromAddresses)}:{' '}
-                      <span style={{ fontWeight: 500 }}>{data.addresses.from.length}</span>
+                      <span
+                        style={{ fontWeight: 500 }}
+                        id={txIdFullInfoBasePart + ':fromAddresses-addressesAmount-text'}
+                      >
+                        {data.addresses.from.length}
+                      </span>
                     </Typography>
                     <Typography variant="caption1" textAlign="center">
                       {intl.formatMessage(messages.addressType)}
@@ -720,12 +746,14 @@ export default class TransactionRevamp extends Component<Props, State> {
                   </Box>
                   <Box className={styles.addressList} sx={{ color: 'grayscale.600' }}>
                     {data.addresses.from.map((address, addressIndex) => {
+                      const addressRowId = `${txIdFullInfoBasePart}:fromAddresses:address_${addressIndex}`;
                       return this.renderRow({
                         kind: 'in',
                         data,
                         address,
                         addressIndex,
                         transform: amount => amount.abs().negated(), // ensure it shows as negative
+                        addressRowId,
                       });
                     })}
                   </Box>
@@ -744,7 +772,12 @@ export default class TransactionRevamp extends Component<Props, State> {
                   >
                     <Typography variant="caption1">
                       {intl.formatMessage(globalMessages.toAddresses)}:{' '}
-                      <span style={{ fontWeight: 500 }}>{data.addresses.to.length}</span>
+                      <span
+                        style={{ fontWeight: 500 }}
+                        id={txIdFullInfoBasePart + ':toAddresses-addressesAmount-text'}
+                      >
+                        {data.addresses.to.length}
+                      </span>
                     </Typography>
                     <Typography variant="caption1" textAlign="center">
                       {intl.formatMessage(messages.addressType)}
@@ -755,18 +788,20 @@ export default class TransactionRevamp extends Component<Props, State> {
                   </Box>
                   <div className={styles.addressList}>
                     {data.addresses.to.map((address, addressIndex) => {
+                      const addressRowId = `${txIdFullInfoBasePart}:toAddresses:address_${addressIndex}`;
                       return this.renderRow({
                         kind: 'out',
                         data,
                         address,
                         addressIndex,
+                        addressRowId,
                       });
                     })}
                   </div>
                 </Box>
               </div>
-              {this.getWithdrawals(data)}
-              {this.getCertificate(data)}
+              {this.getWithdrawals(data, txIdFullInfoBasePart)}
+              {this.getCertificate(data, txIdFullInfoBasePart)}
 
               <Box display="flex" p="24px">
                 <Box flexShrink={0}>
@@ -777,7 +812,10 @@ export default class TransactionRevamp extends Component<Props, State> {
                       </Typography>
                       <Typography variant="caption1" color="grayscale.600">
                         <span className={styles.assuranceLevel}>{status}</span>.{' '}
-                        <span className="confirmationCount">
+                        <span
+                          className="confirmationCount"
+                          id={txIdFullInfoBasePart + '-numberOfConfirmations-text'}
+                        >
                           {this.props.numberOfConfirmations}
                         </span>{' '}
                         {intl.formatMessage(messages.confirmations)}.
@@ -799,6 +837,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                         variant="caption1"
                         color="grayscale.600"
                         className={classnames('txid' /* for tests */)}
+                        id={txIdFullInfoBasePart + '-transactionId-text'}
                       >
                         {data.txid}
                       </Typography>
@@ -820,6 +859,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                             styles.editButton,
                             'editMemoButton' // for tests
                           )}
+                          id={txIdFullInfoBasePart + '-editMemo-button'}
                         >
                           <div className={styles.editMemoIcon}>
                             <EditSvg />
@@ -831,6 +871,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                           styles.rowData,
                           'memoContent' // for tests
                         )}
+                        id={txIdFullInfoBasePart + '-memoContent-text'}
                       >
                         {this.props.memo?.Content}
                       </span>
@@ -844,6 +885,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                         onClick={onAddMemo.bind(this, data)}
                         className="addMemoButton" // for tests
                         startIcon={<AddMemoSvg />}
+                        id={txIdFullInfoBasePart + '-addMemo-button'}
                       >
                         <Typography variant="button2" fontWeight={500}>
                           {intl.formatMessage(memoMessages.addMemo)}
@@ -935,7 +977,7 @@ export default class TransactionRevamp extends Component<Props, State> {
     });
   };
 
-  getWithdrawals: WalletTransaction => ?Node = data => {
+  getWithdrawals: (WalletTransaction, string) => ?Node = (data, txIdFullInfoBasePart) => {
     const { intl } = this.context;
     if (!(data instanceof CardanoShelleyTransaction)) {
       return null;
@@ -969,12 +1011,14 @@ export default class TransactionRevamp extends Component<Props, State> {
           </Box>
           <div className={styles.addressList}>
             {data.withdrawals.map((address, addressIndex) => {
+              const addressRowId = `${txIdFullInfoBasePart}:withdrawalAddresses:address_${addressIndex}`;
               return this.renderRow({
                 kind: 'withdrawal',
                 data,
                 address,
                 addressIndex,
                 transform: amount => amount.abs().negated(),
+                addressRowId,
               });
             })}
           </div>
@@ -984,7 +1028,7 @@ export default class TransactionRevamp extends Component<Props, State> {
     );
   };
 
-  getCertificate: WalletTransaction => ?Node = data => {
+  getCertificate: (WalletTransaction, string) => ?Node = (data, txIdFullInfoBasePart) => {
     const { intl } = this.context;
 
     const wrapCertificateText = (node, manyCerts) => (
@@ -1005,9 +1049,10 @@ export default class TransactionRevamp extends Component<Props, State> {
         return null;
       }
       const certBlock = data.certificates.reduce((acc, curr, idx) => {
+        const certComponentId=`${txIdFullInfoBasePart}-txCertificate_${idx}-text`
         const newElem = (
           // eslint-disable-next-line react/no-array-index-key
-          <span key={idx}>
+          <span key={idx} id={certComponentId}>
             {acc.length !== 0 ? <br /> : undefined}
             {this.shelleyCertificateToText(curr.certificate)}
           </span>

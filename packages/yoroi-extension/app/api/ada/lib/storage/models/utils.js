@@ -46,7 +46,7 @@ import {
 } from '../database/walletTypes/bip44/api/write';
 import type {
   TreeInsert
-} from '../database/walletTypes/common/utils';
+} from '../database/walletTypes/common/utils.types';
 import {
   GetAddress,
   GetPathWithSpecific,

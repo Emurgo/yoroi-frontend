@@ -5,12 +5,36 @@ import { RustModule } from '../../cardanoCrypto/rustLoader';
 import { asGetAllUtxos, } from '../models/PublicDeriver/traits';
 import { PublicDeriver, } from '../models/PublicDeriver/index';
 import { normalizeToAddress, unwrapStakingKey, } from './utils';
-import type {
-  GetDelegatedBalanceRequest,
-  GetDelegatedBalanceResponse,
-} from '../../../../common/lib/storage/bridge/delegationUtils';
-import type { IGetAllUtxosResponse, } from '../models/PublicDeriver/interfaces';
+import type { IGetAllUtxosResponse, IGetStakingKey, } from '../models/PublicDeriver/interfaces';
 import { MultiToken, } from '../../../../common/lib/MultiToken';
+
+export type GetDelegatedBalanceRequest = {|
+  publicDeriver: PublicDeriver<> & IGetStakingKey,
+  rewardBalance: MultiToken,
+  stakingAddress: string,
+  delegation: string | null,
+  allRewards: string | null,
+  stakeRegistered: ?boolean,
+|};
+export type GetDelegatedBalanceResponse = {|
+  utxoPart: MultiToken,
+  accountPart: MultiToken,
+  delegation: string | null,
+  allRewards: string | null,
+  stakeRegistered: ?boolean,
+|};
+export type GetDelegatedBalanceFunc = (
+  request: GetDelegatedBalanceRequest
+) => Promise<GetDelegatedBalanceResponse>;
+export type RewardHistoryRequest = string;
+export type RewardHistoryResponse = Array<[
+  number, // epoch
+  MultiToken, // amount
+  string, // poolHash
+]>;
+export type RewardHistoryFunc = (
+  request: RewardHistoryRequest
+) => Promise<RewardHistoryResponse>;
 
 export async function getDelegatedBalance(
   request: GetDelegatedBalanceRequest,

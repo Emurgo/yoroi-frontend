@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import { intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
 
-import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import StakingDashboard from '../../../components/wallet/staking/dashboard/StakingDashboard';
 import UserSummary from '../../../components/wallet/staking/dashboard/UserSummary';
 import StakePool from '../../../components/wallet/staking/dashboard/StakePool';

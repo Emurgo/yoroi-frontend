@@ -46,7 +46,12 @@ export default class SwapMenu extends Component<Props> {
     ];
 
     return (
-      <SubMenu options={settingOptions} onItemClick={onItemClick} isActiveItem={isActiveItem} />
+      <SubMenu
+        options={settingOptions}
+        onItemClick={onItemClick}
+        isActiveItem={isActiveItem}
+        locationId='swap'
+      />
     );
   }
 }

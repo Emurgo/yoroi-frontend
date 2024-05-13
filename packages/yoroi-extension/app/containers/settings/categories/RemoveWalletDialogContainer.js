@@ -9,7 +9,7 @@ import globalMessages from '../../../i18n/global-messages';
 import { messages } from '../../../components/wallet/settings/RemoveWallet';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 
-import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 
 import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
 import type { LayoutComponentMap } from '../../../styles/context/layout';

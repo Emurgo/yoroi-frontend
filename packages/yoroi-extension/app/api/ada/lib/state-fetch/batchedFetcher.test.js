@@ -1,6 +1,6 @@
 // @flow
 
-import '../test-config';
+import '../test-config.forTests';
 import { RustModule } from '../cardanoCrypto/rustLoader';
 
 import {
@@ -8,7 +8,7 @@ import {
 } from './batchedFetcher';
 import {
   genGetTransactionsHistoryForAddresses,
-} from './mockNetwork';
+} from './mockNetwork.forTests';
 import {
   generateWalletRootKey,
 } from '../cardanoCrypto/cryptoWallet';

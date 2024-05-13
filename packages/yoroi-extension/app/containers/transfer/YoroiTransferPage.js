@@ -4,7 +4,7 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, } from 'react-intl';
 import validWords from 'bip39/src/wordlists/english.json';
-import type { StoresAndActionsProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import YoroiPaperWalletFormPage from './YoroiPaperWalletFormPage';
 import YoroiPlatePage from './YoroiPlatePage';

@@ -124,12 +124,12 @@ function initializeSubstore<T: {...}>(
 
 /** Set up and return the stores for this app -> also used to reset all stores to defaults */
 export default (action(
-  (
+  async (
     api: Api,
     actions: ActionsMap,
     // $FlowFixMe[value-as-type]
     router: RouterStore
-  ): StoresMap => {
+  ): Promise<StoresMap> => {
     /** Note: `stores` sets all values to null to start
      * However this is incompatible with the `StoresMap` types
      * We don't make `StoresMap` fields optional as it would bloat the code with null checks
@@ -164,7 +164,7 @@ export default (action(
     initializeSubstore<AdaStoresMap>(loadedStores.substores.ada);
 
     // Perform load after all setup is done to ensure migration can modify store state
-    loadedStores.loading.load('extension');
+    await loadedStores.loading.load('extension');
 
     return loadedStores;
   }

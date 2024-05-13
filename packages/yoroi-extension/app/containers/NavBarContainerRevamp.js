@@ -1,17 +1,14 @@
 // @flow
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { Node } from 'react';
-import type { StoresAndActionsProps } from '../types/injectedPropsType';
-import type { ConceptualWalletSettingsCache } from '../stores/toplevel/WalletSettingsStore';
+import type { StoresAndActionsProps } from '../types/injectedProps.types';
 import { Component } from 'react';
 import { intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
 import { ROUTES } from '../routes-config';
-import { ConceptualWallet } from '../api/ada/lib/storage/models/ConceptualWallet/index';
 import { asGetPublicKey } from '../api/ada/lib/storage/models/PublicDeriver/traits';
 import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
-import { genLookupOrFail, getTokenName } from '../stores/stateless/tokenHelpers';
-import { networks } from '../api/ada/lib/storage/database/prepackaged/networks';
+import { genLookupOrFail } from '../stores/stateless/tokenHelpers';
 import { addressToDisplayString } from '../api/ada/lib/storage/bridge/utils';
 import { getReceiveAddress } from '../stores/stateless/addressStores';
 import BuySellDialog from '../components/buySell/BuySellDialog';
@@ -49,11 +46,6 @@ export default class NavBarContainerRevamp extends Component<Props> {
 
     const route = !isRewardWallet && isStakingPage ? ROUTES.WALLETS.ROOT : app.currentRoute;
     this.props.actions.router.goToRoute.trigger({ route, publicDeriver: newWallet });
-  };
-
-  openDialogWrapper: any => void = dialog => {
-    this.props.actions.router.goToRoute.trigger({ route: ROUTES.MY_WALLETS });
-    this.props.actions.dialogs.open.trigger({ dialog });
   };
 
   render(): Node {
@@ -121,41 +113,41 @@ export default class NavBarContainerRevamp extends Component<Props> {
 
   getDialog: void => Node = () => {
     const publicDeriver = this.props.stores.wallets.selected;
-    const wallets = this.props.stores.wallets.publicDerivers;
     let balance;
     if (publicDeriver) {
       balance = this.props.stores.transactions.getBalance(publicDeriver);
     }
-
-    const cardanoWallets = [];
-
-    wallets.forEach(wallet => {
-      const walletAmount = this.props.stores.transactions.getBalance(wallet);
-      const rewards = this.props.stores.delegation.getRewardBalanceOrZero(wallet);
-      const parent = wallet.getParent();
-      const settingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(parent);
-
-      const withPubKey = asGetPublicKey(wallet);
-      const plate =
-        withPubKey == null
-          ? null
-          : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
-
-      const walletMap = {
-        walletId: wallet.getPublicDeriverId(),
-        rewards,
-        walletAmount,
-        getTokenInfo: genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo),
-        plate,
-        wallet,
-        settingsCache,
-        shouldHideBalance: this.props.stores.profile.shouldHideBalance,
-      };
-
-      cardanoWallets.push(walletMap);
-    });
+    const getTokenInfo = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo);
 
     if (this.props.stores.uiDialogs.isOpen(WalletListDialog)) {
+      const cardanoWallets = [];
+
+      this.props.stores.wallets.publicDerivers.forEach(wallet => {
+        const walletAmount = this.props.stores.transactions.getBalance(wallet);
+        const rewards = this.props.stores.delegation.getRewardBalanceOrZero(wallet);
+        const parent = wallet.getParent();
+        const settingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(parent);
+
+        const withPubKey = asGetPublicKey(wallet);
+        const plate =
+              withPubKey == null
+              ? null
+              : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
+
+        const walletMap = {
+          walletId: wallet.getPublicDeriverId(),
+          rewards,
+          walletAmount,
+          getTokenInfo: genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo),
+          plate,
+          wallet,
+          settingsCache,
+          shouldHideBalance: this.props.stores.profile.shouldHideBalance,
+        };
+
+        cardanoWallets.push(walletMap);
+      });
+
       return (
         <WalletListDialog
           cardanoWallets={cardanoWallets}
@@ -164,7 +156,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
           close={this.props.actions.dialogs.closeActiveDialog.trigger}
           shouldHideBalance={this.props.stores.profile.shouldHideBalance}
           onUpdateHideBalance={this.updateHideBalance}
-          getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
+          getTokenInfo={getTokenInfo}
           walletAmount={balance}
           onAddWallet={() => {
             this.props.actions.dialogs.closeActiveDialog.trigger();
@@ -177,55 +169,37 @@ export default class NavBarContainerRevamp extends Component<Props> {
         />
       );
     }
+
     if (this.props.stores.uiDialogs.isOpen(BuySellDialog)) {
+      if (!publicDeriver || !balance) {
+        return null;
+      }
+      const getReceiveAdaAddress = async () => {
+        const receiveAddress = await getReceiveAddress(publicDeriver);
+        if (receiveAddress == null) return null;
+        return addressToDisplayString(
+          receiveAddress.addr.Hash,
+          publicDeriver.getParent().getNetworkInfo()
+        );
+      };
+
+      const tokenInfo = getTokenInfo(balance.getDefaultEntry());
+      const { numberOfDecimals } = tokenInfo.Metadata;
+
       return (
         <BuySellDialog
           onCancel={this.props.actions.dialogs.closeActiveDialog.trigger}
-          genWalletList={async () => {
-            return await this.generateUnusedAddressesPerWallet(wallets);
-          }}
+          onExchangeCallback={
+            () => this.props.actions.router.goToRoute.trigger({ route: ROUTES.EXCHANGE_END })
+          }
+          currentBalanceAda={
+            balance.getDefault().shiftedBy(-numberOfDecimals).toFormat(numberOfDecimals)
+          }
+          receiveAdaAddressPromise={getReceiveAdaAddress()}
         />
       );
     }
+
     return null;
-  };
-
-  generateUnusedAddressesPerWallet: (Array<PublicDeriver<>>) => Promise<Array<any>> = async (
-    wallets: Array<PublicDeriver<>>
-  ) => {
-    const infoWallets = wallets.map(async (wallet: PublicDeriver<>) => {
-      const parent: ConceptualWallet = wallet.getParent();
-      const settingsCache: ConceptualWalletSettingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(
-        parent
-      );
-
-      const defaultToken = this.props.stores.tokenInfoStore.getDefaultTokenInfo(
-        wallet.getParent().getNetworkInfo().NetworkId
-      );
-      const currencyName = getTokenName(defaultToken);
-
-      if (defaultToken.NetworkId !== networks.CardanoMainnet.NetworkId) {
-        return null;
-      }
-
-      const receiveAddress = await getReceiveAddress(wallet);
-      if (receiveAddress == null) return null;
-      const anAddressFormatted = addressToDisplayString(
-        receiveAddress.addr.Hash,
-        parent.getNetworkInfo()
-      );
-
-      return {
-        walletName: settingsCache.conceptualWalletName,
-        currencyName,
-        anAddressFormatted,
-      };
-    });
-
-    return (await Promise.all(infoWallets)).reduce((acc, next) => {
-      if (next == null) return acc;
-      acc.push(next);
-      return acc;
-    }, []);
   };
 }

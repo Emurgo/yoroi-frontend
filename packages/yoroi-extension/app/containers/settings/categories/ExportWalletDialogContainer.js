@@ -11,7 +11,7 @@ import {
   asGetPublicKey,
 } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
 
-import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 
 type Props = {|
   ...StoresAndActionsProps,

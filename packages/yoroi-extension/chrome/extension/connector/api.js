@@ -65,10 +65,15 @@ import { GetToken } from '../../../app/api/ada/lib/storage/database/primitives/a
 import { getAllSchemaTables, raii, } from '../../../app/api/ada/lib/storage/database/utils';
 import type { TokenRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
 import fetchAdapter from '@vespaiach/axios-fetch-adapter';
-import { Amount, NativeAssets, UTxOSet, Value as LibValue, } from '@emurgo/yoroi-eutxo-txs/dist/classes';
-import { coinSelectionClassificationStrategy } from '@emurgo/yoroi-eutxo-txs/dist/tx-builder';
-import { setRuntime, } from '@emurgo/yoroi-eutxo-txs';
-import { NotEnoughMoneyToSendError as LibNotEnoughMoneyToSendError } from '@emurgo/yoroi-eutxo-txs/dist/errors';
+import {
+  UTxOSet as LibUtxoSet,
+  Value as LibValue,
+  Amount as LibAmount,
+  NativeAssets as LibNativeAssets,
+} from '@emurgo/yoroi-eutxo-txs/dist/classes'
+import { coinSelectionClassificationStrategy } from '@emurgo/yoroi-eutxo-txs/dist/tx-builder'
+import { setRuntime } from '@emurgo/yoroi-eutxo-txs/dist/kernel'
+import { NotEnoughMoneyToSendError as LibNotEnoughMoneyToSendError } from '@emurgo/yoroi-eutxo-txs/dist/errors'
 import {
   ChainDerivations,
   DREP_KEY_INDEX,
@@ -160,14 +165,14 @@ function stringToLibValue(s: string): LibValue {
   if (/^\d+$/.test(s)) {
     // The string is an int number
     return new LibValue(
-      new Amount(s),
-      NativeAssets.from([]),
+      new LibAmount(s),
+      LibNativeAssets.from([]),
     );
   }
   try {
     return RustModule.WasmScope(Module => {
       // $FlowFixMe
-      function multiAssetToLibAssets(masset: ?RustModule.WalletV4.MultiAsset): NativeAssets {
+      function multiAssetToLibAssets(masset: ?RustModule.WalletV4.MultiAsset): LibNativeAssets {
         const mappedAssets = [];
         if (masset != null) {
           const policies = masset.keys();
@@ -185,18 +190,18 @@ function stringToLibValue(s: string): LibValue {
                       policy: policy.to_bytes(),
                       name: name.to_bytes(),
                     },
-                    amount: new Amount(amount.to_str()),
+                    amount: new LibAmount(amount.to_str()),
                   })
                 }
               }
             }
           }
         }
-        return NativeAssets.from(mappedAssets);
+        return LibNativeAssets.from(mappedAssets);
       }
       const value = Module.WalletV4.Value.from_bytes(hexToBytes(s));
       return new LibValue(
-        new Amount(value.coin().to_str()),
+        new LibAmount(value.coin().to_str()),
         multiAssetToLibAssets(value.multiasset()),
       )
     });
@@ -241,7 +246,7 @@ export async function connectorGetUtxosCardano(
 
   setRuntime(RustModule.CrossCsl.init);
 
-  const utxoSet = new UTxOSet(
+  const utxoSet = new LibUtxoSet(
     await Promise.all(
       formattedUtxos.map(toLibUTxO)
     )
@@ -283,7 +288,7 @@ export const MAX_COLLATERAL: BigNumber = new BigNumber('5000000');
 // only consider UTXO value <= (${requiredAmount} + 1 ADA)
 const MAX_PER_UTXO_SURPLUS = new BigNumber('2000000');
 // Max allowed collateral inputs in a tx by protocol
-export const MAX_COLLATERAL_COUNT: number = 3;
+const MAX_COLLATERAL_COUNT: number = 3;
 
 type GetCollateralUtxosRespose = {|
   utxosToUse: Array<RemoteUnspentOutput>,
@@ -353,7 +358,7 @@ export async function connectorGetCollateralUtxos(
   };
 }
 
-export type FullAddressPayloadWithBase58 = {|
+type FullAddressPayloadWithBase58 = {|
   fullAddress: FullAddressPayload,
   base58: Address,
 |};
@@ -518,15 +523,6 @@ export async function connectorGetChangeAddress(wallet: PublicDeriver<>): Promis
     throw new Error('could not get change address - this should never happen');
   }
   return change.addr.Hash
-}
-
-export type BoxLike = {
-  value: number | string,
-  assets: Array<{|
-    tokenId: string, // hex
-    amount: number | string,
-  |}>,
-  ...
 }
 
 export function getScriptRequiredSigningKeys(
@@ -738,7 +734,6 @@ async function __connectorSignCardanoTx(
     ...getCertificatesRequiredSignKeys(txBody),
   ]);
 
-  console.log('totalAdditionalRequiredSignKeys', [...totalAdditionalRequiredSignKeys]);
   const additionalSignaturesRequired = totalAdditionalRequiredSignKeys.size > 0;
 
   const queryAllBaseAddresses = (): Promise<Array<FullAddressPayload>> => {
@@ -792,10 +787,8 @@ async function __connectorSignCardanoTx(
         requiredPaymentCred,
         parsedStakingCred,
       ).to_address();
-      console.log('requiredAddress', requiredAddress.to_bech32());
       requiredTxSignAddresses.add(bytesToHex(requiredAddress.to_bytes()));
     }
-    console.log('requiredTxSignAddresses', [...requiredTxSignAddresses]);
     for (const baseAddress of allBaseAddresses) {
       const { address, addressing } = baseAddress;
       if (requiredTxSignAddresses.delete(address)) {
@@ -820,7 +813,6 @@ async function __connectorSignCardanoTx(
       ).to_address().to_hex();
       otherRequiredSigners.push({ address, ...addressing });
     }
-    console.log('otherRequiredSigners', [...otherRequiredSigners]);
   }
 
   const submittedTxs = await loadSubmittedTransactions() || [];

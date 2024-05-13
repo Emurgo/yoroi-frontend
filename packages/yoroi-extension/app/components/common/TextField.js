@@ -88,11 +88,12 @@ function TextField({
         'shrink' and 'notched' prop status so we pass an empty object
       */
       InputLabelProps={
-        theme.name === 'classic' ? { shrink: true, ...InputLabelProps } : { ...InputLabelProps }
-      }
+          theme.name === 'classic' ? { shrink: true, ...InputLabelProps } : { ...InputLabelProps }
+        }
       InputProps={{
         ...((Boolean(revamp) ? { disableUnderline: true } : {}): any),
         ...((theme.name === 'classic' ? { notched: false } : {}): any),
+        sx: value.length  === 0 ? { color: 'grayscale.900 !important' } : null,
         endAdornment: isLoading ? (
           <InputAdornment position="end" sx={{ marginTop: '-26px' }}>
             <LoadingSpinner small />

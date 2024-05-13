@@ -1,6 +1,6 @@
 // @flow
 import type { Node, ComponentType } from 'react';
-import type { StoresAndActionsProps } from '../../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../../types/injectedProps.types';
 import type { WalletType } from '../../../../components/wallet/voting/types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';

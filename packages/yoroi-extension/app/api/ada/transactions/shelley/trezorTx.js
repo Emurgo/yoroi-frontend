@@ -3,7 +3,7 @@ import type {
   CardanoAddressedUtxo,
 } from '../types';
 import { verifyFromDerivationRoot }  from '../../lib/storage/models/utils';
-import { toDerivationPathString } from '../../../common/lib/crypto/keys/path';
+import { toDerivationPathString } from '../../lib/cardanoCrypto/keys/path';
 import type {
   CardanoSignTransaction,
   CardanoInput,

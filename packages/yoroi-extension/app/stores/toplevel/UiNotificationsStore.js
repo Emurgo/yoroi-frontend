@@ -1,7 +1,7 @@
 // @flow
 import { observable, action, computed } from 'mobx';
 import Store from '../base/Store';
-import type { Notification } from '../../types/notificationType';
+import type { Notification } from '../../types/notification.types';
 import NotificationsActions from '../../actions/notifications-actions';
 
 /** Manage a list on ongoing notifications and closes them when they expire */

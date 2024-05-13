@@ -3,7 +3,7 @@
 import {
   schema,
 } from 'lovefield';
-import '../../test-config';
+import '../../test-config.forTests';
 import { loadLovefieldDB } from '../database/index';
 import {
   HARD_DERIVATION_START,

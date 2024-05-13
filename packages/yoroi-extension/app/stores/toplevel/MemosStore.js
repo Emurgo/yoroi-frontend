@@ -21,7 +21,7 @@ import type {
   DownloadExternalTxMemoFunc, FetchFilenameExternalTxMemoFunc,
   FetchFilenameExternalTxMemoResponse, FetchFolderExternalTxMemoFunc,
   CreateFolderExternalTxMemoFunc
-} from '../../api/externalStorage/providers/IProvider';
+} from '../../api/externalStorage/providers/IProvider.types';
 import type { SelectedExternalStorageProvider } from '../../domain/ExternalStorage';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { ActionsMap } from '../../actions/index';
@@ -40,12 +40,10 @@ export default class MemosStore extends Store<StoresMap, ActionsMap> {
 
   @observable getExternalStorageProviderRequest:
     Request<void => Promise<?SelectedExternalStorageProvider>>
-    // eslint-disable-next-line max-len
     = new Request<void => Promise<?SelectedExternalStorageProvider>>(this.api.localStorage.getExternalStorage);
 
   @observable
   setExternalStorageProviderRequest: Request<SelectedExternalStorageProvider => Promise<void>>
-    // eslint-disable-next-line max-len
     = new Request<SelectedExternalStorageProvider => Promise<void>>(this.api.localStorage.setExternalStorage);
 
   @observable
@@ -54,7 +52,6 @@ export default class MemosStore extends Store<StoresMap, ActionsMap> {
 
   @observable
   setSelectedProviderRequest: Request<SelectedExternalStorageProvider => Promise<void>>
-    // eslint-disable-next-line max-len
     = new Request<SelectedExternalStorageProvider => Promise<void>>(this.api.externalStorage.setSelectedProvider);
 
   @observable uploadExternalTxMemoRequest: Request<UploadExternalTxMemoFunc>

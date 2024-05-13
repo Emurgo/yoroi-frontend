@@ -15,13 +15,6 @@ import type { IGetAllUtxosResponse } from '../../../app/api/ada/lib/storage/mode
 
 export type Address = string;
 
-export function asAddress(input: any): Address {
-  if (typeof input === 'string') {
-    return input;
-  }
-  throw ConnectorError.invalidRequest(`invalid Address: ${JSON.stringify(input)}`);
-}
-
 export type Paginate = {|
   page: number,
   limit: number,
@@ -41,18 +34,6 @@ export type PaginateError = {|
     maxSize: number,
 |};
 
-export type TokenAmount = {|
-  tokenId: TokenId,
-  amount: Value,
-|};
-
-export function asTokenAmount(input: any): TokenAmount {
-  return {
-    tokenId: asTokenId(input?.tokenId),
-    amount: asValue(input?.amount)
-  };
-}
-
 export type TokenId = string;
 
 export function asTokenId(input: any): TokenId {
@@ -67,15 +48,6 @@ export type CardanoTx = {|
   partialSign: boolean,
   tabId: number,
 |};
-
-export type TxId = string;
-
-export function asTxId(input: any): TxId {
-  if (typeof input === 'string') {
-    return input;
-  }
-  throw new Error(`invalid TxId, must be string: ${JSON.stringify(input)}`);
-}
 
 export type Value = string;
 
@@ -274,7 +246,7 @@ export type GetConnectionProtocolData = {|
 // Errors: Yoroi-only
 
 // if thrown within an API call, these will be returned instead of converted into an internal error
-type AllErrors = TxSendError | TxSignError | APIError | DataSignError | PaginateError;
+export type AllErrors = TxSendError | TxSignError | APIError | DataSignError | PaginateError;
 
 export class ConnectorError extends Error {
   e: AllErrors

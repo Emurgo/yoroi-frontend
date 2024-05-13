@@ -1,0 +1,1 @@
+npm run eslint-loud --prefix packages/yoroi-extension

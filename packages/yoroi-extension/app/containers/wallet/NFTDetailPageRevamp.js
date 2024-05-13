@@ -1,7 +1,7 @@
 // @flow
 import { observer } from 'mobx-react';
 import { Component } from 'react';
-import type { StoresAndActionsProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import type { ComponentType, Node } from 'react';
 import {
   genLookupOrFail,
@@ -92,7 +92,7 @@ class NFTDetailPageRevamp extends Component<AllProps> {
     const tab = urlPrams.get('tab');
 
     return (
-      <Box sx={{ width: '100%', pb: '50vh' }}>
+      <Box sx={{ width: '100%' }}>
         <NFTDetails
           nftInfo={nftInfo}
           network={network}

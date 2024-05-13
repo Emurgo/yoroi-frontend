@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import type { ConnectorStoresAndActionsProps } from '../../types/injectedPropsType';
+import type { ConnectorStoresAndActionsProps } from '../../types/injectedProps.types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { observable, runInAction } from 'mobx';

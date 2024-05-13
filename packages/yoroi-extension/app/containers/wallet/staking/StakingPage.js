@@ -1,7 +1,7 @@
 // @flow
 import { Component, Suspense, lazy } from 'react';
 import type { Node } from 'react';
-import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import type { ConfigType } from '../../../../config/config-types';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';

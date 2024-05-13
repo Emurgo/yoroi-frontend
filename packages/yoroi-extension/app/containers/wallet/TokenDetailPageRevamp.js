@@ -1,7 +1,7 @@
 // @flow
 import { observer } from 'mobx-react';
 import { Component } from 'react';
-import type {  StoresAndActionsProps } from '../../types/injectedPropsType';
+import type {  StoresAndActionsProps } from '../../types/injectedProps.types';
 import type { ComponentType, Node } from 'react';
 import {
   genLookupOrFail,

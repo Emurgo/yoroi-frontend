@@ -8,7 +8,7 @@ import type {
   CoreAddressT,
 } from './enums';
 import typeof { CertificateKind } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
-import type { KeyKindType } from '../../../../../common/lib/crypto/keys/types';
+import type { KeyKindType } from '../../../cardanoCrypto/keys/types';
 import type { CoinTypesT } from '../../../../../../config/numbersConfig';
 
 export type CommonBaseConfig = {|

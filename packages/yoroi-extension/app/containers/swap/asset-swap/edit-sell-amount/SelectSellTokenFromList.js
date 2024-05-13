@@ -3,26 +3,28 @@ import { useMemo, type Node } from 'react';
 import { useSwap, useSwapTokensOnlyVerified } from '@yoroi/swap';
 import SelectAssetDialog from '../../../../components/swap/SelectAssetDialog';
 import { useSwapForm } from '../../context/swap-form';
-import { useAssets } from '../../hooks';
+import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
+import SwapStore from '../../../../stores/ada/SwapStore';
+import { comparatorByGetter } from '../../../../coreUtils';
 
 type Props = {|
+  store: SwapStore,
   onClose(): void,
+  onTokenInfoChanged: * => void,
+  defaultTokenInfo: RemoteTokenInfo,
 |};
 
-export default function SelectSellTokenFromList({ onClose }: Props): Node {
+export default function SelectSellTokenFromList({ store, onClose, onTokenInfoChanged, defaultTokenInfo }: Props): Node {
   const { onlyVerifiedTokens } = useSwapTokensOnlyVerified();
-  const assets = useAssets();
+  const assets = store.assets;
   const walletVerifiedAssets = useMemo(() => {
-    return assets
-      .map(a => {
-        const vft = onlyVerifiedTokens.find(ovt => ovt.fingerprint === a.fingerprint);
-        if (a.id === '' || vft) return { ...a, ...vft };
-        return undefined;
-      })
-      .filter(Boolean);
+    return assets.map(a => {
+      const vft = onlyVerifiedTokens.find(ovt => ovt.fingerprint === a.fingerprint);
+      return a.id === '' || vft ? { ...a, ...vft } : undefined;
+    }).filter(Boolean).sort(comparatorByGetter(a => a.name?.toLowerCase()));
   }, [onlyVerifiedTokens, assets]);
 
-  const { sellTokenInfoChanged, orderData, resetQuantities } = useSwap();
+  const { orderData, resetQuantities } = useSwap();
   const {
     buyQuantity: { isTouched: isBuyTouched },
     sellQuantity: { isTouched: isSellTouched },
@@ -46,7 +48,7 @@ export default function SelectSellTokenFromList({ onClose }: Props): Node {
 
     if (shouldUpdateToken) {
       sellTouched(token);
-      sellTokenInfoChanged({ id, decimals: decimals ?? 0 });
+      onTokenInfoChanged({ id, decimals: decimals ?? 0 });
     }
 
     onClose();
@@ -58,6 +60,7 @@ export default function SelectSellTokenFromList({ onClose }: Props): Node {
       type="from"
       onAssetSelected={handleAssetSelected}
       onClose={onClose}
+      defaultTokenInfo={defaultTokenInfo}
     />
   );
 }

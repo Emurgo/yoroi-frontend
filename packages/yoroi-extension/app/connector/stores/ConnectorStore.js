@@ -33,7 +33,7 @@ import type { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/she
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
 import { isLedgerNanoWallet, isTrezorTWallet, } from '../../api/ada/lib/storage/models/ConceptualWallet';
 import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import type { IFetcher } from '../../api/ada/lib/state-fetch/IFetcher';
+import type { IFetcher } from '../../api/ada/lib/state-fetch/IFetcher.types';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import BigNumber from 'bignumber.js';
 import { action, computed, observable, runInAction, toJS } from 'mobx';
@@ -92,6 +92,7 @@ import {
 import { wrapWithFrame } from '../../stores/lib/TrezorWrapper';
 import { ampli } from '../../../ampli/index';
 import { noop } from '../../coreUtils';
+import { addressBech32ToHex } from '../../api/ada/lib/cardanoCrypto/utils';
 
 export function connectorCall<T, R>(message: T): Promise<R> {
   return new Promise((resolve, reject) => {
@@ -688,9 +689,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         }
         const value = multiTokenFromRemote(foreignUtxo.output, defaultToken.NetworkId);
         foreignInputDetails.push({
-          address: Buffer.from(
-            RustModule.WalletV4.Address.from_bech32(foreignUtxo.output.address).to_bytes()
-          ).toString('hex'),
+          address: addressBech32ToHex(foreignUtxo.output.address),
           value,
         });
       }

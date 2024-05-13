@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { action, observable } from 'mobx';
 import { intlShape, } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
-import type { StoresAndActionsProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import LegacyTransferLayout from '../../components/transfer/LegacyTransferLayout';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import YoroiTransferErrorPage from './YoroiTransferErrorPage';

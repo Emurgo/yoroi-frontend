@@ -3,7 +3,7 @@ import moment from 'moment';
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import type { StoresAndActionsProps } from '../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../types/injectedProps.types';
 import { intlShape } from 'react-intl';
 import NavBar from '../components/topbar/NavBar';
 import NavPlate from '../components/topbar/NavPlate';

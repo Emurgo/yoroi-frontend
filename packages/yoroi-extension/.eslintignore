@@ -1,3 +1,11 @@
-node_modules
-/chrome/content-scripts
+ampli
+build
+chrome/content-scripts
+config
+dev
+docs
+flow
 flow-typed
+ledger
+node_modules
+translations

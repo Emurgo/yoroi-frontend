@@ -1,7 +1,7 @@
 // @flow
 import type { ComponentType, Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import type { LayoutComponentMap } from '../../../styles/context/layout';
 import type { ConfigType } from '../../../../config/config-types';
 import type { TokenEntry } from '../../../api/common/lib/MultiToken';
