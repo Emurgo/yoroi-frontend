@@ -21,7 +21,7 @@ import { cast, fail, hexToBytes, noop } from '../../coreUtils';
 import { asAddressedUtxo, cardanoUtxoHexFromRemoteFormat} from '../../api/ada/transactions/utils';
 import { genLookupOrFail, getTokenIdentifierIfExists, getTokenName } from '../stateless/tokenHelpers';
 import { splitAmount, truncateToken } from '../../utils/formatters';
-import adaLogo from '../../containers/swap/mockAssets/ada.inline.svg';
+import adaLogo from '../../assets/images/ada.inline.svg';
 import type { AssetAmount } from '../../components/swap/types';
 import type { QueriedUtxo } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { transactionHexToHash } from '../../api/ada/lib/cardanoCrypto/utils';
