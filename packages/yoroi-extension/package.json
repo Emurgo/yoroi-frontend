@@ -164,6 +164,7 @@
     "@yoroi/exchange": "2.0.1",
     "@yoroi/resolver": "2.0.2",
     "@yoroi/swap": "1.5.2",
+    "@yoroi/types": "1.5.4",
     "assert": "2.1.0",
     "async-mutex": "0.5.0",
     "axios": "0.21.1",
