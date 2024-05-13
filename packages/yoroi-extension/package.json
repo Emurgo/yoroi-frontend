@@ -220,6 +220,9 @@
     "ua-parser-js": "1.0.37",
     "util": "0.12.5"
   },
+  "overrides": {
+    "@babel/helpers": "7.16.0"    
+  },
   "engineStrict": true,
   "engine": {
     "node": "~18.18.2",
