@@ -30,9 +30,9 @@ function SwapPriceInput({ swapStore, priceImpactState }: Props): Node {
   const isMarketOrder = orderData.type === 'market';
   const pricePlaceholder = isMarketOrder ? NO_PRICE_VALUE_PLACEHOLDER : '0';
   const marketPrice = orderData.selectedPoolCalculation?.prices.market;
-  const formattedPrice = marketPrice
-    ? Quantities.format(marketPrice, orderData.tokens.priceDenomination, PRICE_PRECISION)
-    : pricePlaceholder;
+
+  const format = s => Quantities.format(s, orderData.tokens.priceDenomination, PRICE_PRECISION) + (s.endsWith('.') ? '.' : '');
+  const formattedPrice = marketPrice ? format(marketPrice) : pricePlaceholder;
 
   if (swapStore.limitOrderDisplayValue === '' && marketPrice != null) {
     runInAction(() => {
@@ -90,10 +90,12 @@ function SwapPriceInput({ swapStore, priceImpactState }: Props): Node {
           bgcolor={isReadonly ? 'grayscale.50' : 'common.white'}
           readOnly={isReadonly}
           value={isValidTickers ? displayValue : NO_PRICE_VALUE_PLACEHOLDER}
-          onChange={({ target: { value } }) => {
+          onChange={({ target: { value: val } }) => {
+            let value = val.replace(/[^\d.]+/g, '');
+            if (!value) value = '0';
             if (/^\d+\.?\d*$/.test(value)) {
               runInAction(() => {
-                swapStore.setLimitOrderDisplayValue(value);
+                swapStore.setLimitOrderDisplayValue(format(value));
               });
               if (!value.endsWith('.')) {
                 limitPriceChanged(value);

@@ -152,15 +152,13 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
         to={ROUTES.NFTS.ROOT}
         sx={{
           color: 'grayscale.900',
-          lineHeight: '27.5px',
-          fontSize: '14px',
           '&.MuiButton-sizeMedium': {
             padding: '13px 16px',
           },
         }}
         startIcon={<BackArrow />}
       >
-        {intl.formatMessage(messages.back)}
+        <Typography fontWeight="500">{intl.formatMessage(messages.back)}</Typography>
       </Button>
       <Grid
         container
@@ -274,7 +272,11 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                       textTransform: 'none',
                       fontWeight: 500,
                     }}
-                    label={intl.formatMessage(label)}
+                    label={
+                      <Typography variant="body1" fontWeight="500" pb="6px">
+                        {intl.formatMessage(label)}
+                      </Typography>
+                    }
                     value={id}
                     disableRipple
                   />

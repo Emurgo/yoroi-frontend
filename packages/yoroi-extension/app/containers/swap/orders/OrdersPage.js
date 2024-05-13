@@ -2,12 +2,11 @@
 import type { Node } from 'react';
 import { useState } from 'react';
 import { Box, Button } from '@mui/material';
-import { mockCompletedOrders } from './mockData';
 import Table from '../../../components/common/table/Table';
 import CancelSwapOrderDialog from '../../../components/swap/CancelOrderDialog';
 import AssetPair from '../../../components/common/assets/AssetPair';
 import Tabs from '../../../components/common/tabs/Tabs';
-import { useRichOpenOrders } from '../hooks';
+import { useRichCompletedOrders, useRichOpenOrders } from '../hooks';
 import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import { SwapPoolLabel } from '../../../components/swap/SwapPoolComponents';
 import ExplorableHashContainer from '../../widgets/ExplorableHashContainer';
@@ -22,15 +21,50 @@ import {
   getTransactionFeeFromCbor,
   getTransactionTotalOutputFromCbor,
 } from '../../../api/ada/transactions/utils';
+import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 
-const orderColumns = [
-  'Pair (From / To)',
-  'Asset price',
-  'Asset amount',
-  'Total',
-  'DEX',
-  'Time created',
-  'Transaction ID',
+const orderColumns: Array<{|
+  name: string,
+  align?: string,
+  width?: string,
+  leftPadding?: string,
+  openOrdersOnly?: boolean,
+|}> = [
+  {
+    name: 'Pair (From / To)',
+    align: 'left',
+    width: '176px',
+  },
+  {
+    name: 'Asset price',
+    width: '150px',
+  },
+  {
+    name: 'Asset amount',
+    width: '166px'
+  },
+  {
+    name: 'Total',
+    width: '150px',
+    openOrdersOnly: true,
+  },
+  {
+    name: 'DEX',
+    align: 'left',
+    leftPadding: '32px',
+    width: '176px',
+    openOrdersOnly: true,
+  },
+  {
+    name: 'Time created',
+    align: 'left',
+    width: '240px',
+  },
+  {
+    name: 'Transaction ID',
+    align: 'left',
+    width: 'auto',
+  },
 ];
 
 export type FormattedTokenValue = {|
@@ -77,21 +111,16 @@ function createFormattedTokenValues({
   return formattedTokenValues;
 }
 
-function mapOrder(
+function mapOrderAssets(
   order: any,
   defaultTokenInfo: RemoteTokenInfo
 ): {|
-  utxo: string,
-  sender: string,
-  txId: string,
   price: string,
   amount: string,
-  totalValues: Array<FormattedTokenValue>,
-  provider: string,
+  totalValues: ?Array<FormattedTokenValue>,
   from: any,
   to: any,
 |} {
-  const txId = order.utxo.split('#')[0];
   const price = Quantities.quotient(order.from.quantity, order.to.quantity);
   const priceDenomination = order.from.token.decimals - order.to.token.decimals;
   const formattedPrice = Quantities.format(price, priceDenomination, PRICE_PRECISION);
@@ -100,21 +129,53 @@ function mapOrder(
     order.to.token.decimals,
     order.to.token.decimals
   );
-  const formattedAttachedValues = createFormattedTokenValues({
-    entries: order.valueAttached.map(({ token: id, amount }) => ({ id, amount })),
+  const formattedAttachedValues = maybe(order.valueAttached, val => createFormattedTokenValues({
+    entries: val.map(({ token: id, amount }) => ({ id, amount })),
     order,
     defaultTokenInfo,
-  });
+  }));
   return {
-    utxo: order.utxo,
-    sender: order.sender,
-    txId,
     price: formattedPrice,
     amount: formattedToQuantity,
     totalValues: formattedAttachedValues,
-    provider: order.provider,
     from: order.from,
     to: order.to,
+  };
+}
+
+type MappedOrder = {|
+  txId: string,
+  utxo?: string,
+  sender?: string,
+  provider?: string,
+  price: string,
+  amount: string,
+  totalValues: ?Array<FormattedTokenValue>,
+  from: any,
+  to: any,
+|};
+
+function mapOpenOrder(
+  order: any,
+  defaultTokenInfo: RemoteTokenInfo
+): MappedOrder {
+  const txId = order.utxo.split('#')[0];
+  return {
+    txId,
+    utxo: order.utxo,
+    sender: order.sender,
+    provider: order.provider,
+    ...mapOrderAssets(order, defaultTokenInfo),
+  };
+}
+
+function mapCompletedOrder(
+  order: any,
+  defaultTokenInfo: RemoteTokenInfo
+): MappedOrder {
+  return {
+    txId: order.txHash,
+    ...mapOrderAssets(order, defaultTokenInfo),
   };
 }
 
@@ -140,14 +201,19 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
     props.stores.explorers.selectedExplorer.get(network.NetworkId) ??
     fail('No explorer for wallet network');
 
-  const openOrders = useRichOpenOrders().map(o => mapOrder(o, defaultTokenInfo));
+  const openOrders = useRichOpenOrders().map(o => mapOpenOrder(o, defaultTokenInfo));
+  const completedOrders = useRichCompletedOrders().map(o => mapCompletedOrder(o, defaultTokenInfo));
 
   const handleCancelRequest = order => {
+    const sender = order.sender;
+    if (sender == null) {
+      throw new Error('Cannot cancel a completed order (sender == null)');
+    }
     props.stores.substores.ada.swapStore
       .getUtxoHexForCancelCollateral({ wallet })
       .then(utxoHex => {
         return swapCancelOrder({
-          address: addressBech32ToHex(order.sender),
+          address: addressBech32ToHex(sender),
           utxos: {
             order: order.utxo,
             collateral: utxoHex,
@@ -212,6 +278,12 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
     setCancellationState(null);
   };
 
+  const columnKeys = orderColumns.map(c => c.name);
+  const columnNames = orderColumns.map(c => showCompletedOrders && c.openOrdersOnly ? '' : c.name);
+  const columnAlignment = orderColumns.map(c => c.align ?? '');
+  const columnLeftPaddings = orderColumns.map(c => c.leftPadding ?? '');
+  const gridTemplateColumns = orderColumns.map(c => c.width ?? 'auto').join(' ');
+
   return (
     <>
       <Box sx={{ mx: '24px' }}>
@@ -225,22 +297,22 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
               },
               {
                 label: 'Completed orders',
-                isActive: false,
+                isActive: showCompletedOrders,
                 onClick: () => setShowCompletedOrders(true),
-                disabled: true,
               },
             ]}
           />
         </Box>
         <Table
-          columnNames={orderColumns}
-          columnAlignment={['left', '', '', '', 'left', 'left', 'left']}
-          columnLeftPaddings={['', '', '', '', '32px']}
-          gridTemplateColumns="176px 150px 166px 150px 176px 240px auto"
+          columnKeys={columnKeys}
+          columnNames={columnNames}
+          columnAlignment={columnAlignment}
+          columnLeftPaddings={columnLeftPaddings}
+          gridTemplateColumns={gridTemplateColumns}
           columnGap="0px"
         >
           {showCompletedOrders
-            ? mockCompletedOrders.map(order => (
+            ? completedOrders.map(order => (
                 <OrderRow
                   key={order.txId}
                   order={order}
@@ -251,10 +323,10 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
             : openOrders.map(order => (
                 <OrderRow
                   key={order.utxo}
-                  handleCancel={() => handleCancelRequest(order)}
                   order={order}
                   defaultTokenInfo={defaultTokenInfo}
                   selectedExplorer={selectedExplorer}
+                  handleCancel={() => handleCancelRequest(order)}
                 />
               ))}
         </Table>
@@ -276,7 +348,17 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
   );
 }
 
-const OrderRow = ({ handleCancel = null, order, defaultTokenInfo, selectedExplorer }) => {
+const OrderRow = ({
+  order,
+  defaultTokenInfo,
+  selectedExplorer,
+  handleCancel,
+}: {|
+  order: MappedOrder,
+  defaultTokenInfo: RemoteTokenInfo,
+  selectedExplorer: SelectedExplorer,
+  handleCancel?: () => void,
+|}) => {
   return (
     <>
       <AssetPair
@@ -288,14 +370,16 @@ const OrderRow = ({ handleCancel = null, order, defaultTokenInfo, selectedExplor
       <Box textAlign="right">{order.price}</Box>
       <Box textAlign="right">{order.amount}</Box>
       <Box textAlign="right">
-        {order.totalValues.map(v => (
+        {(order.totalValues??[]).map(v => (
           <Box>
             {v.formattedValue} {v.ticker}
           </Box>
         ))}
       </Box>
       <Box display="flex" pl="32px" justifyContent="flex-start" alignItems="center" gap="8px">
-        <SwapPoolLabel provider={order.provider} />
+        {maybe(order.provider, provider => (
+          <SwapPoolLabel provider={provider}/>
+        ))}
       </Box>
       <Box textAlign="left">-</Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" gap="12px">
@@ -306,13 +390,13 @@ const OrderRow = ({ handleCancel = null, order, defaultTokenInfo, selectedExplor
         >
           <span>{truncateAddressShort(order.txId)}</span>
         </ExplorableHashContainer>
-        {handleCancel == null ? null : (
+        {maybe(handleCancel, f => (
           <Box>
-            <Button onClick={handleCancel} variant="tertiary" color="grayscale">
+            <Button onClick={f} variant="tertiary" color="grayscale">
               Cancel
             </Button>
           </Box>
-        )}
+        ))}
       </Box>
     </>
   );

@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import type { AssetAmount } from './types';
 import { Box, Typography } from '@mui/material';
 import { ReactComponent as ChevronDownIcon } from '../../assets/images/revamp/icons/chevron-down.inline.svg';
-import adaTokenImage from '../../containers/swap/mockAssets/ada.inline.svg';
+import adaTokenImage from '../../assets/images/ada.inline.svg';
 import defaultTokenImage from '../../assets/images/revamp/token-default.inline.svg';
 import { urlResolveForIpfsAndCorsproxy } from '../../coreUtils';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
@@ -17,7 +17,7 @@ type Props = {|
   handleAmountChange: function,
   showMax?: boolean,
   value?: string,
-  touched?: boolean,
+  disabled?: boolean,
   focusState: State<boolean>,
   error: string | null,
 |};
@@ -25,6 +25,7 @@ type Props = {|
 export default function SwapInput({
   label,
   showMax = false,
+  disabled = false,
   onAssetSelect,
   error = '',
   handleAmountChange,
@@ -93,8 +94,8 @@ export default function SwapInput({
           variant="body1"
           color="grayscale.max"
           placeholder="0"
-          onChange={handleChange}
-          value={value}
+          onChange={disabled ? () => {} : handleChange}
+          value={disabled ? '' : value}
           onFocus={() => focusState.update(true)}
           onBlur={() => focusState.update(false)}
         />

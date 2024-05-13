@@ -13,7 +13,7 @@ type Props = {|
 export default function EditBuyAmount({ onAssetSelect, defaultTokenInfo }: Props): Node {
   const { orderData } = useSwap();
   const {
-    buyQuantity: { isTouched: isBuyTouched, displayValue: buyDisplayValue, error: fieldError },
+    buyQuantity: { displayValue: buyDisplayValue, error: fieldError },
     sellTokenInfo = {},
     buyTokenInfo = {},
     onChangeBuyQuantity,
@@ -32,12 +32,12 @@ export default function EditBuyAmount({ onAssetSelect, defaultTokenInfo }: Props
     <SwapInput
       key={tokenId}
       label="Swap To"
+      disabled={!isValidTickers}
       handleAmountChange={handleAmountChange}
       value={buyDisplayValue}
       tokenInfo={buyTokenInfo}
       defaultTokenInfo={defaultTokenInfo}
       onAssetSelect={onAssetSelect}
-      touched={isBuyTouched}
       focusState={buyFocusState}
       error={error}
     />

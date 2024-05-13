@@ -43,6 +43,7 @@ export type Props = {|
   +isRevampLayout?: boolean,
   id?: string,
   +styleFlags?: StyleFlag,
+  +forceBottomDivider?: boolean,
 |};
 
 type InjectedProps = {| isRevampLayout: boolean |};
@@ -62,6 +63,7 @@ function Dialog(props: Props & InjectedProps): Node {
     isRevampLayout,
     id,
     styleFlags,
+    forceBottomDivider,
   } = props;
 
   const [contentHasScroll, setContentHasScroll] = useState(false);
@@ -148,7 +150,7 @@ function Dialog(props: Props & InjectedProps): Node {
           </ModalContent>
         ) : null}
         {hasActions && (
-          <ModalFooter contentHasScroll={contentHasScroll}>
+          <ModalFooter hasDivider={forceBottomDivider || contentHasScroll}>
             {map(actions, (action, i: number) => {
               const buttonClasses = classnames([
                 // Keep classnames for testing
@@ -279,7 +281,7 @@ const ModalContent = styled(Box)(({ theme }) => ({
   flexGrow: 1,
 }));
 
-const ModalFooter = styled(Box)(({ theme, contentHasScroll }) => ({
+const ModalFooter = styled(Box)(({ theme, hasDivider }) => ({
   display: 'flex',
   gap: '24px',
   paddingLeft: theme.name === 'classic' ? '30px' : '24px',
@@ -288,7 +290,7 @@ const ModalFooter = styled(Box)(({ theme, contentHasScroll }) => ({
   paddingBottom: theme.name === 'classic' || theme.name === 'modern' ? '0' : '24px',
   marginTop: theme.name === 'classic' ? '20px' : '0px',
   borderTop:
-    theme.name === 'classic' || theme.name === 'modern' ? '' : contentHasScroll ? '1px solid' : '',
+    theme.name === 'classic' || theme.name === 'modern' ? '' : hasDivider ? '1px solid' : '',
   borderTopColor:
     theme.name === 'classic' || theme.name === 'modern'
       ? theme.palette.gray['200']

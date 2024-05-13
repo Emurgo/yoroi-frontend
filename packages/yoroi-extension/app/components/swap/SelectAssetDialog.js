@@ -8,7 +8,7 @@ import { ReactComponent as WalletIcon } from '../../assets/images/revamp/icons/w
 import { ReactComponent as ArrowTopIcon } from '../../assets/images/revamp/icons/arrow-top.inline.svg';
 import { ReactComponent as ArrowBottomIcon } from '../../assets/images/revamp/icons/arrow-bottom.inline.svg';
 import { truncateAddressShort } from '../../utils/formatters';
-import adaTokenImage from '../../containers/swap/mockAssets/ada.inline.svg';
+import adaTokenImage from '../../assets/images/ada.inline.svg';
 import defaultTokenImage from '../../assets/images/revamp/asset-default.inline.svg';
 import Dialog from '../widgets/Dialog';
 import Table from '../common/table/Table';
@@ -20,7 +20,7 @@ import { InfoTooltip } from '../widgets/InfoTooltip';
 const fromTemplateColumns = '1fr minmax(auto, 136px)';
 const toTemplateColumns = '1fr minmax(auto, 152px) minmax(auto, 136px)';
 const fromColumns = ['Asset', 'Amount'];
-const toColumns = [''];
+const toColumns = [];
 
 type Props = {|
   assets: Array<AssetAmount>,
@@ -58,7 +58,7 @@ export default function SelectAssetDialog({
       onClose={onClose}
       withCloseButton
       closeOnOverlayClick
-      styleOverride={{ maxWidth: '612px', minHeight: '600px' }}
+      styleOverride={{ minWidth: '612px', maxWidth: '612px', minHeight: '600px' }}
       scrollableContentClass="scrollable-content"
     >
       <Box mb="8px" position="relative">
