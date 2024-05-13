@@ -125,8 +125,8 @@ class Wallet extends Component<AllProps> {
     const warning = this.getWarning(selectedWallet);
     if (selectedWallet == null) throw new Error(`${nameof(Wallet)} no public deriver`);
 
-    const isFirstSync = stores.wallets.firstSyncWalletId === selectedWallet.getPublicDeriverId();
-    const spendableBalance = this.props.stores.transactions.balance;
+    const isInitialSyncing = stores.wallets.isInitialSyncing(selectedWallet);
+    const spendableBalance = stores.transactions.balance;
     const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
 
     const visibilityContext = { selected: selectedWallet, walletHasAssets };
@@ -183,7 +183,7 @@ class Wallet extends Component<AllProps> {
             }))}
         >
           {this.props.children}
-          {isFirstSync && (
+          {isInitialSyncing && (
             <WalletSyncingOverlay
               classicTheme={this.props.stores.profile.isClassicTheme}
               onClose={() => this.navigateToMyWallets(ROUTES.MY_WALLETS)}
@@ -193,7 +193,7 @@ class Wallet extends Component<AllProps> {
       </TopBarLayout>
     );
 
-    const walletRevamp = !isFirstSync ? (
+    const walletRevamp = (
       <TopBarLayout
         banner={<BannerContainer actions={actions} stores={stores} />}
         sidebar={sidebarContainer}
@@ -202,19 +202,21 @@ class Wallet extends Component<AllProps> {
             actions={actions}
             stores={stores}
             title={<NavBarTitle title={intl.formatMessage(globalMessages.walletLabel)} />}
-            menu={menu}
+            menu={isInitialSyncing ? null : menu}
           />
         }
         showInContainer
         showAsCard
       >
         {warning}
-        {this.props.children}
-        {this.getDialogs()}
-      </TopBarLayout>
-    ) : (
-      <TopBarLayout sidebar={sidebarContainer}>
-        <WalletLoadingAnimation />
+        {isInitialSyncing ? (
+          <WalletLoadingAnimation />
+        ): (
+          <>
+            {this.props.children}
+            {this.getDialogs()}
+          </>
+        )}
       </TopBarLayout>
     );
 
