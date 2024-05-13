@@ -307,12 +307,12 @@ export default class BuySellDialog extends Component<Props, State> {
         />
 
         <ProviderRow>
-          <div class="provider-logo">
+          <div className="provider-logo">
             <img src={providerLogo} alt="" />
           </div>
-          <div class="provider-name-fee">
-            <div class="provider-name">{providerName}</div>
-            <div class="provider-fee">2% fee</div>
+          <div className="provider-name-fee">
+            <div className="provider-name">{providerName}</div>
+            <div className="provider-fee">2% fee</div>
           </div>
         </ProviderRow>
 
