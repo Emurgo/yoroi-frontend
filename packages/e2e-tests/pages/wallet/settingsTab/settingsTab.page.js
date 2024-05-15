@@ -19,12 +19,12 @@ class SettingsTab extends WalletCommonBase {
   };
   // TOS subtab
   tosSubmenuItemLocator = {
-    locator: 'settings-termsofserviceagreementSubTab-button',
+    locator: 'settings-termsofuseSubTab-button',
     method: 'id',
   };
   // Support/Logs subtab
   supportSubmenuItemLocator = {
-    locator: 'settings-supportlogsSubTab-button',
+    locator: 'settings-supportSubTab-button',
     method: 'id',
   };
   // Level of Complexity subtab
@@ -66,6 +66,16 @@ class SettingsTab extends WalletCommonBase {
   async goToAnalyticsSubMenu() {
     this.logger.info(`SettingsTab::goToAnalyticsSubMenu is called`);
     await this.click(this.analyticsSubmenuItemLocator);
+  }
+  /**
+   * Returns text from the General tab from Settings
+   * @returns {Promise<string>}
+   */
+  async getGeneralSubTabText() {
+    this.logger.info(`SettingsTab::getGeneralSubTabText is called`);
+    const result = await this.getText(this.generalSubmenuItemLocator);
+    this.logger.info(`SettingsTab::getGeneralSubTabText::result ${result}`);
+    return result;
   }
 }
 
