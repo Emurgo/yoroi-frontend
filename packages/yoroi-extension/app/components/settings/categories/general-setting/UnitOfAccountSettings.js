@@ -92,7 +92,11 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
     const optionRenderer = option => {
       const SvgElem = option.svg;
       return (
-        <MenuItem key={option.value} value={option.value} sx={{ height: '80px' }}>
+        <MenuItem
+          key={option.value}
+          value={option.value}
+          sx={{ height: '80px' }}
+          id={'selectFiat-' + option.value + '-menuItem'}>
           <Box sx={{ display: 'flex' }}>
             <Box>
               <SvgElem className={styles.flag} width="38px" height="38px" />
