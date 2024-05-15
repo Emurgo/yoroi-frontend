@@ -24,6 +24,11 @@ class BasePage {
     method: 'id',
   };
 
+  linkLocator = {
+    locator: './a',
+    method: 'xpath',
+  };
+
   async goToUrl(theURL) {
     this.logger.info('BasePage::goToUrl is called');
     await this.driver.get(theURL);
@@ -90,7 +95,7 @@ class BasePage {
     return await this.driver.findElement(getByLocator(locator)).getCssValue(cssStyleProperty);
   }
   async getCssValueElement(webElement, cssStyleProperty) {
-    this.logger.info(`BasePage::getCssValueElement is called.Property: ${cssStyleProperty}`);
+    this.logger.info(`BasePage::getCssValueElement is called. Property: ${cssStyleProperty}`);
     return await webElement.getCssValue(cssStyleProperty);
   }
   async getAttribute(locator, property) {
@@ -102,6 +107,13 @@ class BasePage {
   async getAttributeElement(webElement, property) {
     this.logger.info(`BasePage::getAttributeElement is called. Property: ${property}`);
     return await webElement.getAttribute(property);
+  }
+  async getLinkFromComponent(locator) {
+    this.logger.info(`BasePage::getLinkFromComponent is called. Locator: ${JSON.stringify(locator)}`);
+    const webElem = await this.driver.findElement(getByLocator(locator));
+    const linkElem = await webElem.findElement(getByLocator(this.linkLocator));
+    const linkText = await this.getAttributeElement(linkElem, 'href');
+    return linkText;
   }
   async executeLocalStorageScript(script) {
     this.logger.info(
