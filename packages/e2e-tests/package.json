@@ -49,6 +49,7 @@
     "simple-node-logger": "^21.8.12"
   },
   "dependencies": {
+    "axios": "^1.6.8",
     "balanced-match": "^1.0.2",
     "brace-expansion": "^1.1.11",
     "concat-map": "^0.0.1",
