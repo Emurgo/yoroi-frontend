@@ -50,7 +50,7 @@ describe('Changing fiat currencies', function () {
 
       it('Check the selected currency is applied', async function () {
         const generalSubTab = new GeneralSubTab(webdriver, logger);
-        await generalSubTab.goToWalletSubMenu();
+        await generalSubTab.goToWalletTab();
         const walletInfo = await generalSubTab.getSelectedWalletInfo();
         if (testDatum === 'ADA') {
           expect(walletInfo.fiatBalance, 'Fiat balance is different').to.equal(0);
