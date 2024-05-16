@@ -27,7 +27,7 @@ import { ReactComponent as ArrowRightSvg } from '../../../../assets/images/revam
 
 type Props = {|
   onClose: () => void,
-  poolTransition?: PoolTransition | null,
+  poolTransition: ?PoolTransition,
   onUpdatePool: () => void,
   currentPoolId?: string,
   intl: $npm$ReactIntl$IntlFormat,
@@ -40,7 +40,6 @@ export const PoolTransitionDialog = ({
   currentPoolId,
   intl,
 }: Props): React$Node => {
-  console.log('poolTransition', poolTransition);
   const { currentPool, suggestedPool } = poolTransition || {};
 
   return (
@@ -57,10 +56,10 @@ export const PoolTransitionDialog = ({
       <Stack direction="row" spacing={2} alignItems="center" px="24px">
         <StakePoolCard
           label={intl.formatMessage(messages.currentPool)}
-          poolName={currentPool?.name}
+          poolName={`[${currentPool?.ticker ?? ''}] ${currentPool?.name ?? ''}`}
           roa={currentPool?.roa}
-          fee={currentPool?.share}
-          deadlineMilliseconds={poolTransition?.deadlineMilliseconds}
+          fee={currentPool?.taxRatio}
+          deadlineMilliseconds={poolTransition?.deadlineMilliseconds || 0}
           poolHash={currentPoolId}
           intl={intl}
         />
@@ -69,10 +68,10 @@ export const PoolTransitionDialog = ({
 
         <StakePoolCard
           label={intl.formatMessage(messages.newPool)}
-          poolName={suggestedPool?.name}
+          poolName={`[${suggestedPool?.ticker ?? ''}] ${suggestedPool?.name ?? ''}`}
           roa={suggestedPool?.roa}
-          fee={suggestedPool?.share}
-          poolHash={suggestedPool?.id}
+          fee={suggestedPool?.taxRatio}
+          poolHash={suggestedPool?.hash}
           suggestedPool
           intl={intl}
         />

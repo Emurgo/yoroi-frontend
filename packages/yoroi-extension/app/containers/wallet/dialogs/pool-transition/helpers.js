@@ -1,16 +1,18 @@
-const MS_IN_SEC = 1000,
-  SEC_IN_DAY = 86400,
-  SEC_IN_HOUR = 3600,
-  SEC_IN_MIN = 60;
+const ms_in_sec = 1000,
+  sec_in_day = 86400,
+  sec_in_hour = 3600,
+  sec_in_min = 60;
 export const formatTimeSpan = (ms: number) => {
-  let seconds = Math.round(Math.abs(ms) / MS_IN_SEC);
-  const days = Math.floor(seconds / SEC_IN_DAY);
-  seconds = Math.floor(seconds % SEC_IN_DAY);
-  const hours = Math.floor(seconds / SEC_IN_HOUR);
-  seconds = Math.floor(seconds % SEC_IN_HOUR);
-  const minutes = Math.floor(seconds / SEC_IN_MIN);
+  if (ms < 0) return '';
+
+  let seconds = Math.round(Math.abs(ms) / ms_in_sec);
+  const days = Math.floor(seconds / sec_in_day);
+  seconds = Math.floor(seconds % sec_in_day);
+  const hours = Math.floor(seconds / sec_in_hour);
+  seconds = Math.floor(seconds % sec_in_hour);
+  const minutes = Math.floor(seconds / sec_in_min);
   const [dd, hh, mm] = [days, hours, minutes].map(item =>
     item < 10 ? '0' + item : item.toString()
   );
-  return `${dd}d:${hh}h:${mm}m`;
+  return `${dd}d : ${hh}h : ${mm}m`;
 };

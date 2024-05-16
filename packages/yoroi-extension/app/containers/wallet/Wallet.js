@@ -131,15 +131,6 @@ class Wallet extends Component<AllProps> {
       throw new Error(`${nameof(Wallet)} no public deriver. Should never happen`);
     }
     const currentPool = this.props.stores.delegation.getDelegatedPoolId(publicDeriver);
-    const poolTransition = stores.delegation.checkPoolTransition(publicDeriver);
-
-    const test = async (): any => {
-      const n = await stores.delegation.checkPoolTransition(publicDeriver);
-      console.log('nnn', n);
-      return n;
-    };
-
-    console.log('Component poolTransition', test());
 
     const spendableBalance = this.props.stores.transactions.balance;
     const walletHasAssets = !!spendableBalance?.nonDefaultEntries().length;
@@ -230,7 +221,7 @@ class Wallet extends Component<AllProps> {
         ) : (
           <>
             {this.props.children}
-            {this.getDialogs(intl, PublicDeriver, currentPool)}
+            {this.getDialogs(intl, currentPool)}
           </>
         )}
       </TopBarLayout>
@@ -247,20 +238,23 @@ class Wallet extends Component<AllProps> {
     return warnings[warnings.length - 1]();
   };
 
-  getDialogs: (any, any, any) => Node = (intl, publicDeriver, currentPool) => {
+  getDialogs: (any, any, any) => Node = (intl, currentPool) => {
     const isOpen = this.props.stores.uiDialogs.isOpen;
     const isRevampDialogOpen = isOpen(RevampAnnouncementDialog);
+    const poolTransitionInfo = this.props.stores.delegation.poolTransitionRequestInfo;
 
-    if (this.props.stores.delegation.poolTransitionConfig.show === 'open' && !isRevampDialogOpen)
+    if (
+      this.props.stores.delegation.poolTransitionConfig.show === 'open' &&
+      !isRevampDialogOpen &&
+      poolTransitionInfo?.shouldShowTransitionFunnel
+    )
       return (
         <PoolTransitionDialog
           intl={intl}
           onClose={() => {
             this.props.stores.delegation.setPoolTransitionConfig({ show: 'idle' });
           }}
-          poolTransition={async () => {
-            return await this.props.stores.delegation.checkPoolTransition(publicDeriver);
-          }}
+          poolTransition={poolTransitionInfo}
           currentPoolId={currentPool ?? ''}
           onUpdatePool={() => {
             this.props.stores.delegation.setPoolTransitionConfig({

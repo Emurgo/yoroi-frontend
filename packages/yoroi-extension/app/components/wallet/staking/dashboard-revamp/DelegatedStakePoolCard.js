@@ -35,11 +35,11 @@ function DelegatedStakePoolCard({
     delegatedPool || {};
   const avatarGenerated = getAvatarFromPoolId(id);
   const renderDelegationBtn = () => {
-    if (poolTransition?.deadlineMilliseconds) {
+    if (poolTransition?.shouldShowTransitionFunnel) {
       return (
         <UpdatePoolButton
           variant="danger"
-          onClick={() => delegateToSpecificPool(poolTransition.suggestedPool?.id ?? '')}
+          onClick={() => delegateToSpecificPool(poolTransition.suggestedPool?.hash ?? '')}
         >
           {intl.formatMessage(globalMessages.updatePool)}
         </UpdatePoolButton>
@@ -153,7 +153,7 @@ function DelegatedStakePoolCard({
           </Box>
         )}
       </Wrapper>
-      {poolTransition?.deadlineMilliseconds && (
+      {poolTransition?.shouldShowTransitionFunnel && (
         <SAlert severity="error">
           <Typography variant="body2" mt="1px" ml="4px" color="grayscale.900">
             {intl.formatMessage(globalMessages.poolNotGenerating)}

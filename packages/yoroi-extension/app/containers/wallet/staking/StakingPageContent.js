@@ -66,10 +66,9 @@ class StakingPageContent extends Component<AllProps> {
       throw new Error(`${nameof(StakingPageContent)} no public deriver. Should never happen`);
     }
     if (this.props.stores.delegation.poolTransitionConfig.shouldUpdatePool) {
-      const currentPool = this.props.stores.delegation.getDelegatedPoolId(publicDeriver);
-      const poolTransitionInfo = this.props.stores.delegation.getPoolTransition(currentPool);
+      const poolTransitionInfo = this.props.stores.delegation.poolTransitionRequestInfo;
       if (poolTransitionInfo) {
-        this.props.stores.delegation.delegateToSpecificPool(poolTransitionInfo.suggestedPool.id);
+        this.props.stores.delegation.delegateToSpecificPool(poolTransitionInfo.suggestedPool.hash);
         this.props.stores.delegation.createDelegationTransaction();
       }
     }
@@ -135,11 +134,10 @@ class StakingPageContent extends Component<AllProps> {
       websiteUrl: poolMeta.info?.homepage,
       ticker: poolMeta.info?.ticker,
     };
-    const poolTransition = delegationStore.getPoolTransition(currentPool);
 
     return (
       <DelegatedStakePoolCard
-        poolTransition={poolTransition}
+        poolTransition={delegationStore.poolTransitionRequestInfo}
         delegatedPool={delegatedPool}
         undelegate={async () => this.createWithdrawalTx(true)} // shouldDeregister=true
         delegateToSpecificPool={async (poolId): any => {
