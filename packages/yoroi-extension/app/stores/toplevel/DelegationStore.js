@@ -263,7 +263,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
 
       const transitionResult = await Promise.resolve(remotePooTransitionlInfoPromises);
 
-      const responseTest = {
+      const response = {
         currentPool: transitionResult?.current,
         suggestedPool: transitionResult?.suggested,
         deadlineMilliseconds: transitionResult?.deadlineMilliseconds,
@@ -280,7 +280,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
       }
 
       runInAction(() => {
-        this.poolTransitionRequestInfo = { ...responseTest };
+        this.poolTransitionRequestInfo = { ...response };
       });
     } catch (error) {
       console.warn(error);
