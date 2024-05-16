@@ -13,6 +13,7 @@ import type { MangledAmountFunc, MangledAmountsResponse } from '../stateless/man
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import type { PoolInfo } from '@emurgo/yoroi-lib';
+import { PoolInfoApi } from '@emurgo/yoroi-lib';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { maybe } from '../../coreUtils';
 import type {
@@ -20,6 +21,9 @@ import type {
   GetDelegatedBalanceResponse,
   RewardHistoryFunc,
 } from '../../api/ada/lib/storage/bridge/delegationUtils';
+
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import { environment } from '../../environment';
 
 export type DelegationRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -205,37 +209,82 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     );
   };
 
-  getPoolTransition: (currentPoolId: string) => PoolTransition | null = currentPoolId => {
-    // This is the satke pool that activates the flow
-    // Stake pool checksum and name
-    // Fair Pool #01
-    // Stake pool id
-    // 6b51a5aae5b4b5f07f38acf12816b4f8a558ee2840d0dba69040aeb2
+  getPoolTransition: (currentPoolId: string) => Promise<any> = async currentPoolId => {
+    //   exports.EMURGO_POOLS = {
+    //     old: {
+    //         emurgo: [
+    //             'pool14u30jkg45xwd27kmznz43hxy596lvrrpj0wz8w9a9k97kmt4p2d',
+    //             'pool1qs6h0y7czzt605kptmrv6cr85kxd6tajr2hs0etvxphv7tr7nqu',
+    //             'pool1cd987kw92e3nmjywcfwfws79a09rwp0p0xj5mdtr39qukxgp9uf',
+    //             'pool1c55n72ag3tz8g7rntzuu9a86u7eugsy008xl3xsje8kwgvz2vdz',
+    //             'pool13mas2wthxs28zftxskcsd8t87jk2w9ntc0u5uflt45sh7lcvs8h',
+    //             'pool1pmm654jfx088td54ekkkd0j28x6r5gnjdhnutzggursrxjnpk2y' // Pool [EMUR8] Emurgo #8
+    //         ],
+    //         yoroi: [
+    //             'pool1mut4phum9hegtl8m2r68gpjh5x8w8t6zwf75zrphhp3qwwrrpgt' // Pool [YOROI] Yoroi
+    //         ]
+    //     },
+    //     new: {
+    //         emurgo: [
+    //             'pool1m0drnjxsvnlesq0rwmur2rh6lenuql57jfzd6cf6aegj2cv7ugy',
+    //             'pool1xkwnlr34tjrnkz6u4c0p36cju3xuls4dyynsdkf6cv22ksuhz6q' // Pool [EMURB] Emurgo B
+    //         ],
+    //         yoroi: [
+    //             'pool192pfftt48zc4x5aellvpufk6l6zxllpldw0rx82vrhqrqfhhqs2',
+    //             'pool1kx0jm9ycs3t99tnwafw6w72jkdlzhj5ltxe2nrzkd9x2u5x343h' // Pool [YORO2] Yoroi pool 2
+    //         ]
+    //     }
+    // };
 
-    if (currentPoolId === '6b51a5aae5b4b5f07f38acf12816b4f8a558ee2840d0dba69040aeb2') {
-      return {
-        currentPool: { name: '[FAIR] Fair Pool #01', roa: '0', share: '3.02' },
-        suggestedPool: {
-          id: 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207',
-          name: 'emurgo new',
-          roa: '5.1',
-          share: '3.2',
-        },
-        deadlineMilliseconds: 2999777000,
-      };
-    } else {
-      return null;
-    }
+    const remotePooTransitionlInfoPromises = new PoolInfoApi()
+      .getTransition(
+        'pool14u30jkg45xwd27kmznz43hxy596lvrrpj0wz8w9a9k97kmt4p2d',
+        RustModule.CrossCsl.init
+      )
+      .then(res => res);
+
+    console.log('remotePooTransitionlInfoPromises', remotePooTransitionlInfoPromises);
+
+    const result = await Promise.resolve(remotePooTransitionlInfoPromises);
+    console.log('@@@@@@@@@ Store result', result);
+
+    const responseTest = {
+      currentPool: result?.current,
+      suggestedPool: result?.suggested,
+      deadlineMilliseconds: result?.deadlineMilliseconds,
+      shouldShowTransitionFunnel: environment.isDev(),
+    };
+    console.log('112121212121 @@@@@@@@@ Store poolTransitonInfo', responseTest);
+
+    // runInAction(() => {});
+
+    return responseTest;
+
+    // if (currentPoolId === '6b51a5aae5b4b5f07f38acf12816b4f8a558ee2840d0dba69040aeb2') {
+    //   return {
+    //     currentPool: { name: '[FAIR] Fair Pool #01', roa: '0', share: '3.02' },
+    //     suggestedPool: {
+    //       id: 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207',
+    //       name: 'emurgo new',
+    //       roa: '5.1',
+    //       share: '3.2',
+    //     },
+    //     deadlineMilliseconds: 2999777000,
+    //   };
+    // } else {
+    //   return null;
+    // }
   };
 
-  checkPoolTransition: (PublicDeriver<>) => PoolTransition | null = publicDeriver => {
+  checkPoolTransition: (PublicDeriver<>) => Promise<any> = async publicDeriver => {
     const isStakeRegistered = this.stores.delegation.isStakeRegistered(publicDeriver);
     const currentlyDelegating = this.stores.delegation.isCurrentlyDelegating(publicDeriver);
     // mock Id to trigger the poll transition flow
     const currentPool = this.getDelegatedPoolId(publicDeriver);
 
     // handle pool transition only if the wallet has delagation and is currently delegating to emurgo
-    const poolTransition = currentPool ? this.getPoolTransition(currentPool) : null;
+    const poolTransition = currentPool ? await this.getPoolTransition(currentPool) : null;
+
     if (
       isStakeRegistered &&
       currentlyDelegating &&
@@ -244,6 +293,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     ) {
       this.setPoolTransitionConfig({ show: 'open' });
     }
+    console.log('checkPoolTransition', poolTransition);
     return poolTransition;
   };
 

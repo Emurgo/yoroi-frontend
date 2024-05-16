@@ -40,6 +40,7 @@ export const PoolTransitionDialog = ({
   currentPoolId,
   intl,
 }: Props): React$Node => {
+  console.log('poolTransition', poolTransition);
   const { currentPool, suggestedPool } = poolTransition || {};
 
   return (
