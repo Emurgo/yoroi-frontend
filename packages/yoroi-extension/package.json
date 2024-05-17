@@ -90,7 +90,7 @@
     "cardano-wallet": "1.2.2",
     "chai": "4.3.0",
     "chai-as-promised": "7.1.1",
-    "chromedriver": "113.0.0",
+    "chromedriver": "125.0.0",
     "config": "1.31.0",
     "config-webpack": "1.0.4",
     "copy-webpack-plugin": "6.0.0",
