@@ -1,4 +1,5 @@
 //@flow
+import { dark } from './themed-palettes/dark';
 
 const cyan = { '400': '#59B1F4', '100': '#F2F9FF' };
 const yellow = { '500': '#ECBA09', '100': '#FDF7E2' };
@@ -16,6 +17,9 @@ export const darkTheme = {
   palette: {
     mode: 'dark',
     /* `main` is added since MUI required it but we don't use it at all */
+    ds: {
+      ...dark,
+    },
     primary: {
       main: '#17D1AA',
       '900': '#17453C',
