@@ -77,4 +77,9 @@ export const ROUTES = {
     ORDERS: '/swap/orders',
   },
   EXCHANGE_END: '/exchange-end',
+
+  // NEW UI ROUTES
+  Gouvernance: {
+    ROOT: '/gouvernance',
+  },
 };

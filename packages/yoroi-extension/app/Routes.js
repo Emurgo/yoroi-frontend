@@ -33,6 +33,9 @@ import { Stack } from '@mui/material';
 import LoadingSpinner from './components/widgets/LoadingSpinner';
 import FullscreenLayout from './components/layout/FullscreenLayout';
 
+// New UI pages
+import GouvernancePage from './UI/pages/Gouvernance/GouvernancePage';
+
 // PAGES
 const LanguageSelectionPagePromise = () => import('./containers/profile/LanguageSelectionPage');
 const LanguageSelectionPage = React.lazy(LanguageSelectionPagePromise);
@@ -284,7 +287,6 @@ export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
           wrapSettings({ ...props, stores, actions }, SettingsSubpages(stores, actions))
         }
       />
-
       <Route
         path={ROUTES.SWAP.ROOT}
         component={props => wrapSwap({ ...props, stores, actions }, SwapSubpages(stores, actions))}
@@ -317,6 +319,14 @@ export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
         exact
         path={ROUTES.EXCHANGE_END}
         component={props => <ExchangeEndPage {...props} stores={stores} actions={actions} />}
+      />
+
+      {/* NEW UI Routes */}
+      <Route
+        path={ROUTES.Gouvernance.ROOT}
+        component={props =>
+          wrapGouvernance({ ...props, stores, actions }, GouvernanceSubpages(stores, actions))
+        }
       />
       <Redirect to={ROUTES.MY_WALLETS} />
     </Switch>
@@ -474,6 +484,17 @@ const NFTsSubPages = (stores, actions) => (
   </Switch>
 );
 
+const GouvernanceSubpages = (stores, actions) => (
+  <Switch>
+    <Route
+      exact
+      path={ROUTES.Gouvernance.ROOT}
+      component={props => <GouvernancePage {...props} stores={stores} actions={actions} />}
+    />
+    <Redirect to={ROUTES.Gouvernance.ROOT} />
+  </Switch>
+);
+
 export function wrapSwap(swapProps: StoresAndActionsProps, children: Node): Node {
   const queryClient = new QueryClient();
   const loader = (
@@ -494,10 +515,7 @@ export function wrapSwap(swapProps: StoresAndActionsProps, children: Node): Node
   );
 }
 
-export function wrapSettings(
-  settingsProps: StoresAndActionsProps,
-  children: Node
-): Node {
+export function wrapSettings(settingsProps: StoresAndActionsProps, children: Node): Node {
   return (
     <Settings {...settingsProps}>
       <Suspense fallback={null}>{children}</Suspense>
@@ -531,4 +549,13 @@ export function wrapWallet(walletProps: StoresAndActionsProps, children: Node): 
 
 export function wrapReceive(receiveProps: StoresAndActionsProps, children: Node): Node {
   return <Receive {...receiveProps}>{children}</Receive>;
+}
+
+// NEW UI - TODO: to be refactred
+export function wrapGouvernance(gouvernanceProps: StoresAndActionsProps, children: Node): Node {
+  return (
+    <Settings {...gouvernanceProps}>
+      <Suspense fallback={null}>{children}</Suspense>
+    </Settings>
+  );
 }
