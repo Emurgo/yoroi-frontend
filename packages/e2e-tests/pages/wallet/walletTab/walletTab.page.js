@@ -5,7 +5,7 @@ class WalletTab extends WalletCommonBase {
   //locators
   // Transaction subtab
   transactionsSubmenuItemLocator = {
-    locator: 'wallet-transactionsSubTab-button',
+    locator: 'wallet-summarySubTab-button',
     method: 'id',
   };
   // Send subtab

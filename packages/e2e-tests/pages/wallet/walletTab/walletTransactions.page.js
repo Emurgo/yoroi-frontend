@@ -147,63 +147,6 @@ export class TransactionsSubTab extends WalletTab {
       method: 'id',
     };
   };
-  async __getTxsGroups() {
-    const locatorForAllGroups = {
-      locator: '//div[starts-with(@id, "wallet:transactions:transactionsList-transactionsGroup_")]',
-      method: 'xpath',
-    };
-    const result = [];
-    const allGroups = await this.findElements(locatorForAllGroups);
-    for (let groupIndex = 0; groupIndex < allGroups.length; groupIndex++) {
-      const groupDatePrettified = await this.getText(
-        this.walletTransactionsGroupDateTextLocator(groupIndex)
-      );
-      const groupDate = convertPrettyDateToNormal(groupDatePrettified);
-      result.push({
-        groupDate,
-        groupIndex,
-      });
-    }
-    return result;
-  }
-  /**
-   * The method collect all txs info inside a group
-   * @param {({groupDate: string, groupIndex: number})} groupObject An group object which contains such properties as groupDate and groupIndex
-   * @returns {Promise<Array<{txType: string, txTime: string, txDateTime: string, txStatus: string, txFee: number, txAmount: number, txHashId: string}>>}
-   */
-  async __getAllTxsInGroup(groupObject) {
-    const { groupDate, groupIndex } = groupObject;
-    const result = [];
-    const allTxs = await this.findElements(this.txsInGroupLocator(groupIndex));
-    for (let txIndex = 0; txIndex < allTxs.length; txIndex++) {
-      const txType = await this.getText(this.txTypeTextLocator(groupIndex, txIndex));
-      const txTimePrettified = await this.getText(this.txTimeTextLocator(groupIndex, txIndex));
-      const txTime = convertPrettyTimeToNormal(txTimePrettified);
-      const txDateTime = `${groupDate} ${txTime}`;
-      const txStatus = await this.getText(this.txStatusTextLocator(groupIndex, txIndex));
-      const txFeeString = await this.getText(this.txFeeTextLocator(groupIndex, txIndex));
-      let txFee = 0;
-      if (txFeeString !== '-') {
-        txFee = parseFloat(txFeeString.split(' ')[0]);
-      }
-      const txAmountString = await this.getText(this.txAmountTextLocator(groupIndex, txIndex));
-      const txAmount = parseFloat(txAmountString.split(' ')[0]);
-      await this.click(this.txRowLocator(groupIndex, txIndex));
-      const txHashId = await this.getText(this.txHashIdTextLocator(groupIndex, txIndex));
-      await this.click(this.txRowLocator(groupIndex, txIndex));
-      const txInfo = {
-        txType,
-        txTime,
-        txDateTime,
-        txStatus,
-        txFee,
-        txAmount,
-        txHashId,
-      };
-      result.push(txInfo);
-    }
-    return result;
-  }
   txsInGroupLocator = groupIndex => {
     return {
       locator: `//div[starts-with(@id, "wallet:transactions:transactionsList:transactionsGroup_${groupIndex}-transaction_")]`,
@@ -270,6 +213,18 @@ export class TransactionsSubTab extends WalletTab {
       method: 'id',
     };
   };
+  txFromAddressTextLocator = (groupIndex, txIndex, fromAddressIndex) => {
+    return {
+      locator: `wallet:transactions:transactionsList:transactionsGroup_${groupIndex}:transaction_${txIndex}:txFullInfo:fromAddresses:address_${fromAddressIndex}-address-text`,
+      method: 'id',
+    };
+  };
+  txToAddressTextLocator = (groupIndex, txIndex, toAddressIndex) => {
+    return {
+      locator: `wallet:transactions:transactionsList:transactionsGroup_${groupIndex}:transaction_${txIndex}:txFullInfo:toAddresses:address_${toAddressIndex}-address-text`,
+      method: 'id',
+    };
+  };
   txAddMemoButtonLocator = (groupIndex, txIndex) => {
     return {
       locator: `wallet:transactions:transactionsList:transactionsGroup_${groupIndex}:transaction_${txIndex}:txFullInfo-addMemo-button`,
@@ -333,6 +288,91 @@ export class TransactionsSubTab extends WalletTab {
     ).isDisplayed();
     const displayedTxs = await this.findElements(this.transactionRowLocator);
     return emptyBannerIsDisplayed && displayedTxs.length == 0;
+  }
+  async __getTxsGroups() {
+    const locatorForAllGroups = {
+      locator: '//div[starts-with(@id, "wallet:transactions:transactionsList-transactionsGroup_")]',
+      method: 'xpath',
+    };
+    const result = [];
+    const allGroups = await this.findElements(locatorForAllGroups);
+    for (let groupIndex = 0; groupIndex < allGroups.length; groupIndex++) {
+      const groupDatePrettified = await this.getText(
+        this.walletTransactionsGroupDateTextLocator(groupIndex)
+      );
+      const groupDate = convertPrettyDateToNormal(groupDatePrettified);
+      result.push({
+        groupDate,
+        groupIndex,
+      });
+    }
+    return result;
+  }
+  /**
+   * The method collect all txs info inside a group
+   * @param {({groupDate: string, groupIndex: number})} groupObject An group object which contains such properties as groupDate and groupIndex
+   * @returns {Promise<Array<{txType: string, txTime: string, txDateTime: string, txStatus: string, txFee: number, txAmount: number, txHashId: string}>>}
+   */
+  async __getAllTxsInGroup(groupObject) {
+    const { groupDate, groupIndex } = groupObject;
+    const result = [];
+    const allTxs = await this.findElements(this.txsInGroupLocator(groupIndex));
+    for (let txIndex = 0; txIndex < allTxs.length; txIndex++) {
+      const txType = await this.getText(this.txTypeTextLocator(groupIndex, txIndex));
+      const txTimePrettified = await this.getText(this.txTimeTextLocator(groupIndex, txIndex));
+      const txTime = convertPrettyTimeToNormal(txTimePrettified);
+      const txDateTime = `${groupDate} ${txTime}`;
+      const txStatus = await this.getText(this.txStatusTextLocator(groupIndex, txIndex));
+      const txFeeString = await this.getText(this.txFeeTextLocator(groupIndex, txIndex));
+      let txFee = 0;
+      if (txFeeString !== '-') {
+        txFee = parseFloat(txFeeString.split(' ')[0]);
+      }
+      const txAmountString = await this.getText(this.txAmountTextLocator(groupIndex, txIndex));
+      const txAmount = parseFloat(txAmountString.split(' ')[0]);
+      await this.click(this.txRowLocator(groupIndex, txIndex));
+      const txHashId = await this.getText(this.txHashIdTextLocator(groupIndex, txIndex));
+      await this.click(this.txRowLocator(groupIndex, txIndex));
+      const txInfo = {
+        txType,
+        txTime,
+        txDateTime,
+        txStatus,
+        txFee,
+        txAmount,
+        txHashId,
+      };
+      result.push(txInfo);
+    }
+    return result;
+  }
+  /**
+   * Getting amount of addresses in the "from" section
+   * @param {number} groupIndex Group index, starting from 0 (zero). Zero is the latest one
+   * @param {number} txIndex Tx index, starting from 0 (zero), Zero is the top one
+   * @returns {Promise<number>} Amount of addresses in the "from" section
+   */
+  async __getAmountOfFromAddresses(groupIndex, txIndex) {
+    const fromAddrsLocator = {
+      locator: `//div[starts-with(@id, "wallet:transactions:transactionsList:transactionsGroup_${groupIndex}:transaction_${txIndex}:txFullInfo:fromAddresses:address_")]`,
+      method: 'xpath',
+    };
+    const result = await this.findElements(fromAddrsLocator);
+    return result.length;
+  }
+  /**
+   * Getting amount of addresses in the "to" section
+   * @param {number} groupIndex Group index, starting from 0 (zero). Zero is the latest one
+   * @param {number} txIndex Tx index, starting from 0 (zero), Zero is the top one
+   * @returns {Promise<number>} Amount of addresses in the "to" section
+   */
+  async __getAmountOfToAddresses(groupIndex, txIndex) {
+    const toAddrsLocator = {
+      locator: `//div[starts-with(@id, "wallet:transactions:transactionsList:transactionsGroup_${groupIndex}:transaction_${txIndex}:txFullInfo:toAddresses:address_")]`,
+      method: 'xpath',
+    };
+    const result = await this.findElements(toAddrsLocator);
+    return result.length;
   }
   async getLastTx() {
     this.logger.info(`TransactionsSubTab::getLastTx is called`);
@@ -429,6 +469,53 @@ export class TransactionsSubTab extends WalletTab {
         }
       }
     }
+  }
+  async __getAddrsLinks(groupIndex, txIndex, addrsAmount, getLocatorFunc) {
+    const links = [];
+
+    for (let addrIndex = 0; addrIndex < addrsAmount; addrIndex++) {
+      const addrLocator = getLocatorFunc(groupIndex, txIndex, addrIndex);
+      const addrLink = await this.getLinkFromComponent(addrLocator);
+      links.push(addrLink);
+    }
+
+    return links;
+  }
+  /**
+   * Getting all links as strings from a selected tx
+   * @param {number} groupIndex 
+   * @param {number} txIndex 
+   * @returns {Promise<{fromAddrsLinks: string[], toAddrsLinks: string[], txLink: string[]}>}
+   */
+  async getTxURLs(groupIndex, txIndex) {
+    const txRowLocator = this.txRowLocator(groupIndex, txIndex);
+    await this.click(txRowLocator);
+    // from addresses
+    const amountFromAddrs = await this.__getAmountOfFromAddresses(groupIndex, txIndex);
+    const fromAddrsLinks = await this.__getAddrsLinks(
+      groupIndex,
+      txIndex,
+      amountFromAddrs,
+      this.txFromAddressTextLocator
+    );
+    // to addresses
+    const amountToAddrs = await this.__getAmountOfToAddresses(groupIndex, txIndex);
+    const toAddrsLinks = await this.__getAddrsLinks(
+      groupIndex,
+      txIndex,
+      amountToAddrs,
+      this.txToAddressTextLocator
+    );
+    // txHash link
+    const txHashIdTextLocator = this.txHashIdTextLocator(groupIndex, txIndex);
+    const txLinkElement = await this.getWebElementAbove(txHashIdTextLocator, 2);
+    const txLink = [await this.getAttributeElement(txLinkElement, 'href')];
+
+    return {
+      fromAddrsLinks,
+      toAddrsLinks,
+      txLink,
+    };
   }
 }
 

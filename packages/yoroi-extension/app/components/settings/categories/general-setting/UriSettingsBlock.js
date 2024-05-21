@@ -67,6 +67,7 @@ class UriSettingsBlock extends Component<Props & InjectedProps> {
               p: isRevampLayout && '13px 24px',
             },
           }}
+          id="settings:blockchain-allowPaymentURL-button"
         >
           {intl.formatMessage(globalMessages.allowLabel)}
         </Button>
