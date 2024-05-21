@@ -2,8 +2,8 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { FormattedHTMLMessage, defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { defineMessages, intlShape } from 'react-intl';
 import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
 import Voting from '../../../components/wallet/voting/Voting';
 import VotingRegistrationDialogContainer from '../dialogs/voting/VotingRegistrationDialogContainer';
@@ -11,15 +11,12 @@ import { handleExternalLinkClick } from '../../../utils/routing';
 import { WalletTypeOption } from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import VerticallyCenteredLayout from '../../../components/layout/VerticallyCenteredLayout';
-import { CATALYST_MIN_AMOUNT, CATALYST_DISPLAYED_MIN_AMOUNT } from '../../../config/numbersConfig';
+import { CATALYST_DISPLAYED_MIN_AMOUNT, CATALYST_MIN_AMOUNT } from '../../../config/numbersConfig';
 import InsufficientFundsPage from './InsufficientFundsPage';
-import { getTokenName, genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
+import { genLookupOrFail, getTokenName } from '../../../stores/stateless/tokenHelpers';
 import environment from '../../../environment';
 import RegistrationOver from './RegistrationOver';
-import {
-  isLedgerNanoWallet,
-  isTrezorTWallet,
-} from '../../../api/ada/lib/storage/models/ConceptualWallet/index';
+import { isLedgerNanoWallet, isTrezorTWallet, } from '../../../api/ada/lib/storage/models/ConceptualWallet/index';
 
 const messages: * = defineMessages({
   mainTitle: {
@@ -145,87 +142,6 @@ class VotingPageContent extends Component<StoresAndActionsProps> {
           />
         );
       }
-
-      const { currentFund, nextFund } = catalystRoundInfo;
-      const nextFundRegistrationSubtitle = intl.formatMessage(messages.nextFundRegistration, {
-        roundNumber: nextFund?.id,
-        registrationStart: nextFund?.registrationStart,
-      });
-
-      if (currentFund) {
-        const isLate = new Date() >= new Date(Date.parse(currentFund.registrationEnd));
-        const isEarly = new Date() <= new Date(Date.parse(currentFund.registrationStart));
-        const isBeforeVoting = new Date() <= new Date(Date.parse(currentFund.votingStart));
-        const isAfterVoting = new Date() >= new Date(Date.parse(currentFund.votingEnd));
-        const isBetweenVoting = !isBeforeVoting && !isAfterVoting;
-
-        if (isEarly) {
-          return (
-            <RegistrationOver
-              title={intl.formatMessage(messages.earlyForRegistrationTitle)}
-              subtitle={intl.formatMessage(messages.earlyForRegistrationSubTitle, {
-                roundNumber: currentFund.id,
-                registrationStart: currentFund.registrationStart,
-              })}
-            />
-          );
-        }
-
-        // registeration is ended -> check for voting start and end dates
-        if (isLate) {
-          if (isBeforeVoting) {
-            return (
-              <RegistrationOver
-                title={intl.formatMessage(messages.mainTitle)}
-                subtitle={intl.formatMessage(messages.beforeVotingSubtitle, {
-                  votingStart: currentFund.votingStart,
-                })}
-              />
-            );
-          }
-
-          if (isBetweenVoting) {
-            return (
-              <RegistrationOver
-                title={intl.formatMessage(messages.mainTitle)}
-                subtitle={intl.formatMessage(messages.betweenVotingSubtitle, {
-                  votingEnd: currentFund.votingEnd,
-                })}
-              />
-            );
-          }
-
-          if (isAfterVoting) {
-            /* if we after the voting date (= between funds) and no next funds
-            will dispaly "round is over" */
-            const subtitle = nextFund ? (
-              nextFundRegistrationSubtitle
-            ) : (
-              <FormattedHTMLMessage
-                {...messages.mainSubtitle}
-                values={{
-                  roundNumber: currentFund.id,
-                }}
-              />
-            );
-
-            return (
-              <RegistrationOver
-                title={intl.formatMessage(messages.mainTitle)}
-                subtitle={subtitle}
-              />
-            );
-          }
-        }
-      } else if (nextFund) {
-        // No current funds -> check for next funds
-        return (
-          <RegistrationOver
-            title={intl.formatMessage(messages.mainTitle)}
-            subtitle={nextFundRegistrationSubtitle}
-          />
-        );
-      }
     }
 
     // disable the minimum on E2E tests
@@ -258,6 +174,15 @@ class VotingPageContent extends Component<StoresAndActionsProps> {
     } else {
       throw new Error(`${nameof(VotingPageContent)} unexpected wallet type`);
     }
+
+    // <TODO:display fund info to user>
+    // const { currentFund, nextFund } = catalystRoundInfo;
+    // const isCurrentFund = currentFund != null;
+    // const isNextFund = nextFund != null;
+    // const now = Date.now();
+    // const isBeforeVoting = isCurrentFund && Date.parse(currentFund.votingStart) >= now;
+    // const isAfterVoting = isCurrentFund && Date.parse(currentFund.votingEnd) <= now;
+    // const isBetweenVoting = !isBeforeVoting && !isAfterVoting;
 
     if (uiDialogs.isOpen(VotingRegistrationDialogContainer)) {
       activeDialog = (

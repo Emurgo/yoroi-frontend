@@ -123,7 +123,7 @@ class Voting extends Component<Props & InjectedProps, State> {
 
   renderRevampLayout() {
     const { intl } = this.context;
-    const { walletType, name: fundName } = this.props;
+    const { walletType } = this.props;
     const { showDisclamer } = this.state;
     const pendingTxWarningComponent = this.props.hasAnyPending ? (
       <div className={styles.warningBox}>
@@ -136,7 +136,7 @@ class Voting extends Component<Props & InjectedProps, State> {
 
         <Box sx={{ maxWidth: '612px', mx: 'auto' }} className={styles.voting}>
           <Typography component="div" variant="h3" fontWeight={500}>
-            {intl.formatMessage(messages.lineTitle, { fundName })}
+            {intl.formatMessage(messages.lineTitle, { fundName: 'Catalyst' })}
           </Typography>
 
           <Typography component="div" variant="body1" color="grayscale.800" mt="16px" mb="24px">
