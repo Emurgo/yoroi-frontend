@@ -2,43 +2,41 @@
 import { useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import Dialog from '../widgets/Dialog';
-// <TODO:CHECK_LINT>
-// eslint-disable-next-line no-unused-vars
-import { ReactComponent as AssetDefault } from '../../assets/images/revamp/asset-default.inline.svg';
-// eslint-disable-next-line no-unused-vars
-import { ReactComponent as NoAssetsFound } from '../../assets/images/revamp/no-assets-found.inline.svg';
 import Tabs from '../common/tabs/Tabs';
-import { useSwap } from '@yoroi/swap';
 
 const defaultSlippages = ['0', '0.1', '0.5', '1', '2', '3', '5', '10'];
 
 type Props = {|
+  onSetNewSlippage: number => void,
   onClose: void => void,
+  slippageValue: string,
 |};
 
-export default function SlippageDialog({ onClose }: Props): React$Node {
-  const {
-    slippageChanged,
-    orderData: { slippage: currentSlippage },
-  } = useSwap();
-  const [selectedSlippage, setSelectedSlippage] = useState(currentSlippage || '1');
-  const [manualSlippage, setManualSlippage] = useState(currentSlippage);
-  const [isManual, setIsManual] = useState(!defaultSlippages.includes(currentSlippage));
+export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValue }: Props): React$Node {
+  const [selectedSlippage, setSelectedSlippage] = useState(slippageValue);
+  const [isManualSlippage, setIsManualSlippage] = useState(!defaultSlippages.includes(slippageValue));
 
   const handleSlippageApply = () => {
-    slippageChanged(isManual ? manualSlippage : selectedSlippage);
-    onClose();
+    try {
+      onSetNewSlippage(parseFloat(selectedSlippage));
+      onClose();
+    } catch (e) {
+      console.error(`Failed to apply new slippage: "${selectedSlippage}"`, e);
+    }
   };
 
   const handleSlippageChange = e => {
-    let val = e.target.value.replace(/[^\d.-]+/g, '');
+    let val = e.target.value.replace(/[^\d.]+/g, '');
+    const [int, dec] = val.split('.');
+    // only two decimal places
+    if (dec?.length > 2) val = val.substr(0, int.length + 3);
     const number = Number(val);
     if (number > 100) val = '100';
     else if (number < 0) val = '0';
-    setManualSlippage(val);
+    setSelectedSlippage(val);
   };
 
-  const readonly = defaultSlippages.includes(selectedSlippage);
+  const readonly = !isManualSlippage;
 
   // <TODO:CHECK_INTL>
   return (
@@ -60,18 +58,17 @@ export default function SlippageDialog({ onClose }: Props): React$Node {
             tabs={defaultSlippages
               .map(val => ({
                 label: `${val}%`,
-                isActive: val === selectedSlippage && !isManual,
+                isActive: !isManualSlippage && val === selectedSlippage,
                 onClick: () => {
-                  setIsManual(false);
+                  setIsManualSlippage(false);
                   setSelectedSlippage(val);
                 },
               }))
               .concat({
                 label: 'Manual',
-                isActive: isManual,
+                isActive: isManualSlippage,
                 onClick: () => {
-                  setIsManual(true);
-                  setSelectedSlippage('');
+                  setIsManualSlippage(true);
                 },
               })}
           />
@@ -121,7 +118,7 @@ export default function SlippageDialog({ onClose }: Props): React$Node {
               onChange={handleSlippageChange}
               bgcolor={readonly ? 'grayscale.50' : 'common.white'}
               readOnly={readonly}
-              value={isManual ? manualSlippage : selectedSlippage}
+              value={selectedSlippage}
             />
           </Box>
         </Box>
@@ -133,7 +130,12 @@ export default function SlippageDialog({ onClose }: Props): React$Node {
           </Typography>
         </Box>
         <Box>
-          <Button fullWidth onClick={handleSlippageApply} variant="primary">
+          <Button
+            disabled={selectedSlippage.trim().length === 0}
+            fullWidth
+            onClick={handleSlippageApply}
+            variant="primary"
+          >
             Apply
           </Button>
         </Box>

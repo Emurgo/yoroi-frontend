@@ -33,31 +33,30 @@ import {
 import {
   connectorCreateCardanoTx,
   connectorGenerateReorgTx,
+  connectorGetAssets,
   connectorGetBalance,
   connectorGetCardanoRewardAddresses,
   connectorGetChangeAddress,
   connectorGetCollateralUtxos,
+  connectorGetDRepKey,
+  connectorGetStakeKey,
   connectorGetUnusedAddresses,
   connectorGetUsedAddresses,
   connectorGetUtxosCardano,
   connectorRecordSubmittedCardanoTransaction,
   connectorSendTxCardano,
   connectorSignCardanoTx,
-  getAddressing,
   connectorSignData,
-  connectorGetAssets,
+  getAddressing,
   getTokenMetadataFromIds,
   MAX_COLLATERAL,
-  connectorGetDRepKey, connectorGetStakeKey,
 } from './connector/api';
 import { updateUtxos } from '../../app/api/ada/lib/storage/bridge/updateTransactions';
 import { environment } from '../../app/environment';
 import type { IFetcher as CardanoIFetcher } from '../../app/api/ada/lib/state-fetch/IFetcher.types';
 import { RemoteFetcher as CardanoRemoteFetcher } from '../../app/api/ada/lib/state-fetch/remoteFetcher';
 import { BatchedFetcher as CardanoBatchedFetcher } from '../../app/api/ada/lib/state-fetch/batchedFetcher';
-import LocalStorageApi, {
-  loadSubmittedTransactions,
-} from '../../app/api/localStorage/index';
+import LocalStorageApi, { loadSubmittedTransactions, } from '../../app/api/localStorage/index';
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { Logger, stringifyError } from '../../app/utils/logging';
 import type { lf$Database, } from 'lovefield';
@@ -72,12 +71,17 @@ import {
 import { authSignHexPayload } from '../../app/connector/api';
 import type { RemoteUnspentOutput } from '../../app/api/ada/lib/state-fetch/types';
 import { NotEnoughMoneyToSendError, } from '../../app/api/common/errors';
-import { asAddressedUtxo as asAddressedUtxoCardano, } from '../../app/api/ada/transactions/utils';
-import ConnectorStore from '../../app/connector/stores/ConnectorStore';
+import {
+  asAddressedUtxo as asAddressedUtxoCardano,
+  assetToRustMultiasset,
+  cardanoUtxoHexFromRemoteFormat,
+  mergeWitnessSets,
+} from '../../app/api/ada/transactions/utils';
 import type { ForeignUtxoFetcher } from '../../app/connector/stores/ConnectorStore';
+import ConnectorStore from '../../app/connector/stores/ConnectorStore';
 import { find721metadata } from '../../app/utils/nftMetadata';
 import { hexToBytes } from '../../app/coreUtils';
-import { mergeWitnessSets } from './connector/utils';
+import { addressHexToBech32 } from '../../app/api/ada/lib/cardanoCrypto/utils';
 
 /*::
 declare var chrome;
@@ -1033,11 +1037,7 @@ async function handleInjectorMessage(message, sender) {
   }
   async function addressesToBech(addressesHex: string[]): Promise<string[]> {
     await RustModule.load();
-    return addressesHex.map(a =>
-                            RustModule.WalletV4.Address.from_bytes(
-                              Buffer.from(a, 'hex'),
-                            ).to_bech32()
-                           );
+    return addressesHex.map(addressHexToBech32);
   }
   const connectParameters = () => ({
     protocol: message.protocol,
@@ -1763,28 +1763,6 @@ async function handleInjectorMessage(message, sender) {
 }
 
 
-function assetToRustMultiasset(jsonAssets): RustModule.WalletV4.MultiAsset {
-  const groupedAssets = jsonAssets.reduce((res, a) => {
-    (res[a.policyId] = (res[a.policyId]||[])).push(a);
-    return res;
-  }, {})
-  const W4 = RustModule.WalletV4;
-  const multiasset = W4.MultiAsset.new();
-  for (const policyHex of Object.keys(groupedAssets)) {
-    const assetGroup = groupedAssets[policyHex];
-    const policyId = W4.ScriptHash.from_bytes(Buffer.from(policyHex, 'hex'));
-    const assets = RustModule.WalletV4.Assets.new();
-    for (const asset of assetGroup) {
-      assets.insert(
-        W4.AssetName.new(Buffer.from(asset.name, 'hex')),
-        W4.BigNum.from_str(asset.amount),
-      );
-    }
-    multiasset.insert(policyId, assets);
-  }
-  return multiasset;
-}
-
 async function transformCardanoUtxos(
   utxos: Array<RemoteUnspentOutput>,
   isCBOR: boolean,
@@ -1793,25 +1771,7 @@ async function transformCardanoUtxos(
   await RustModule.load();
   const W4 = RustModule.WalletV4;
   if (isCBOR) {
-    return cardanoUtxos.map(u => {
-      const input = W4.TransactionInput.new(
-        W4.TransactionHash.from_bytes(
-          Buffer.from(u.tx_hash, 'hex')
-        ),
-        u.tx_index,
-      );
-      const value = W4.Value.new(W4.BigNum.from_str(u.amount));
-      if ((u.assets || []).length > 0) {
-        value.set_multiasset(assetToRustMultiasset(u.assets));
-      }
-      const output = W4.TransactionOutput.new(
-        W4.Address.from_bytes(Buffer.from(u.receiver, 'hex')),
-        value,
-      );
-      return Buffer.from(
-        W4.TransactionUnspentOutput.new(input, output).to_bytes(),
-      ).toString('hex');
-    })
+    return cardanoUtxos.map(cardanoUtxoHexFromRemoteFormat)
   }
 
   return cardanoUtxos.map(u => {
