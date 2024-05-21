@@ -720,6 +720,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             )}
             <Box
               sx={{
+                height: '129px',
                 position: 'relative',
                 padding: '16px 0px',
                 borderRadius: '8px',
@@ -736,7 +737,8 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     }),
               }}
             >
-              <Typography component="div"
+              <Typography
+                component="div"
                 sx={{
                   position: 'absolute',
                   top: '-8px',
@@ -744,6 +746,10 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   backgroundColor: 'common.white',
                   paddingX: '4px',
                   color: shouldSendAll && 'grayscale.200',
+                  fontWeight: 400,
+                  fontSize: '12px',
+                  lineHeight: '16px',
+                  letterSpacing: '0.2px',
                 }}
                 variant="caption2"
               >
@@ -751,6 +757,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               </Typography>
               <Box
                 sx={{
+                  height: '32px',
                   margin: '0px 16px',
                   display: 'flex',
                   alignItems: 'center',

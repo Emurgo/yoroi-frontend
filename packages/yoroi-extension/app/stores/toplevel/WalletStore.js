@@ -3,7 +3,6 @@ import { action, computed, observable, runInAction } from 'mobx';
 import { debounce, find } from 'lodash';
 import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
-import { matchRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 import environment from '../../environment';
 import config from '../../config';
@@ -31,7 +30,6 @@ import { createDebugWalletDialog } from '../../containers/wallet/dialogs/DebugWa
 import { createProblematicWalletDialog } from '../../containers/wallet/dialogs/ProblematicWalletDialogContainer';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import { getCurrentWalletFromLS, updateSyncedWallets } from '../../utils/localStorage';
 import { getWalletChecksum } from '../../api/export/utils';
 
 type GroupedWallets = {|
@@ -94,7 +92,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   WALLET_REFRESH_INTERVAL: number = environment.getWalletRefreshInterval();
   ON_VISIBLE_DEBOUNCE_WAIT: number = 1000;
 
-  @observable firstSyncWalletId: ?number;
+  @observable initialSyncingWalletIds: Array<number> = [];
   @observable publicDerivers: Array<PublicDeriver<>>;
   @observable selected: null | PublicDeriver<>;
   @observable getInitialWallets: Request<GetWalletsFunc> = new Request<GetWalletsFunc>(getWallets);
@@ -187,6 +185,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
         wallet: newWithCachedData[0],
       });
       this.actions.dialogs.closeActiveDialog.trigger();
+      this.initialSyncingWalletIds.push(newWallet.publicDerivers[0].getPublicDeriverId());
       this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
       for (const publicDeriver of newWithCachedData) {
         this._startParallelRefreshForWallet(publicDeriver);
@@ -200,6 +199,13 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   @computed get hasActiveWallet(): boolean {
     return this.selected != null;
+  }
+
+  @computed get selectedOrFail(): PublicDeriver<> {
+    if (this.selected == null) {
+      throw new Error('A selected wallet is required!');
+    }
+    return this.selected;
   }
 
   @computed get activeWalletPlate(): ?WalletChecksum {
@@ -229,30 +235,21 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   refreshWalletFromRemote: (PublicDeriver<>) => Promise<void> = async publicDeriver => {
     try {
-      const wallet = await getCurrentWalletFromLS(publicDeriver);
-      if (!wallet || !wallet.isSynced) {
-        runInAction(() => {
-          this.firstSyncWalletId = publicDeriver.getPublicDeriverId();
-        });
-      }
-
       await this.stores.transactions.refreshTransactionData({
         publicDeriver,
         isLocalRequest: false,
       });
       await this.stores.addresses.refreshAddressesFromDb(publicDeriver);
-      await updateSyncedWallets(publicDeriver);
-
-      if (typeof this.firstSyncWalletId === 'number') {
-        runInAction(() => {
-          this.firstSyncWalletId = null;
-        });
-      }
     } catch (error) {
       Logger.error(
         `${nameof(WalletStore)}::${nameof(this.refreshWalletFromRemote)} ` + stringifyError(error)
       );
       throw error;
+    } finally {
+      runInAction(() => {
+        // $FlowFixMe[prop-missing] this is an mobx obervable.array so there is a remove method
+        this.initialSyncingWalletIds.remove(publicDeriver.getPublicDeriverId());
+      });
     }
   };
 
@@ -286,6 +283,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     this._queueWarningIfNeeded(withCache);
     runInAction(() => {
       this.publicDerivers.push(withCache);
+      this.initialSyncingWalletIds.push(publicDeriver.getPublicDeriverId());
     });
     this._startParallelRefreshForWallet(withCache);
   };
@@ -384,12 +382,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   };
 
   // =================== PRIVATE API ==================== //
-
-  @computed get _canRedirectToWallet(): boolean {
-    const currentRoute = this.stores.app.currentRoute;
-    const isRootRoute = matchRoute(ROUTES.WALLETS.ROOT, currentRoute) !== false;
-    return isRootRoute;
-  }
 
   _pollRefresh: void => Promise<void> = async () => {
     // Do not update if screen not active
@@ -601,6 +593,10 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     if (tx == null) throw new Error(`Should never happen`);
     return tx;
   };
+
+  isInitialSyncing: (PublicDeriver<>) => boolean = (publicDeriver) => {
+    return this.initialSyncingWalletIds.includes(publicDeriver.getPublicDeriverId());
+  }
 }
 
 export const WalletCreationNotifications: {| [key: string]: Notification |} = {

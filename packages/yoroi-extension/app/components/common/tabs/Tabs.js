@@ -6,6 +6,7 @@ type TabProps = {|
   label: string,
   isActive: boolean,
   onClick(): void,
+  disabled?: boolean,
 |};
 
 type Props = {|
@@ -16,7 +17,6 @@ export default function Tabs({ tabs = [] }: Props): Node {
   return (
     <Box
       sx={{
-        cursor: 'pointer',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -29,8 +29,14 @@ export default function Tabs({ tabs = [] }: Props): Node {
   );
 }
 
-const TabButton = ({ label, isActive, onClick }: TabProps): Node => (
-  <Box onClick={onClick} p="8px" borderRadius="8px" bgcolor={isActive ? 'grayscale.200' : ''}>
+const TabButton = ({ label, isActive, onClick, disabled }: TabProps): Node => (
+  <Box
+    onClick={disabled ? undefined : onClick}
+    p="8px"
+    borderRadius="8px"
+    bgcolor={isActive ? 'grayscale.200' : ''}
+    sx={{ cursor: disabled ? 'not-allowed' : 'pointer', color: disabled ? 'grayscale.400' : '' }}
+  >
     <Typography component="div" variant="body1" fontWeight={500}>
       {label}
     </Typography>
