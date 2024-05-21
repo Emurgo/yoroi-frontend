@@ -11,9 +11,6 @@ import driversPoolsManager from '../utils/driversPool.js';
 import GeneralSubTab from '../pages/wallet/settingsTab/generalSubTab.page.js';
 import axios from 'axios';
 
-const reqResponse = await axios.get('https://iohk-mainnet.yoroiwallet.com/api/price/ADA/current');
-const prices = reqResponse.data.ticker.prices;
-
 describe('Changing fiat currencies', function () {
   this.timeout(2 * oneMinute);
   let webdriver = null;
@@ -56,6 +53,8 @@ describe('Changing fiat currencies', function () {
           expect(walletInfo.fiatBalance, 'Fiat balance is different').to.equal(0);
         } else {
           expect(walletInfo.fiatCurrency, 'Fiat currency is different').to.equal(testDatum);
+          const reqResponse = await axios.get('https://iohk-mainnet.yoroiwallet.com/api/price/ADA/current');
+          const prices = reqResponse.data.ticker.prices;
           const expectedFiatValue = roundUpCurrency(
             prices[testDatum] * walletInfo.balance,
             testDatum
