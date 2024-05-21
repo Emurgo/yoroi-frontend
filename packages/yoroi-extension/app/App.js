@@ -10,7 +10,6 @@ import { Routes } from './Routes';
 import { locales, translations } from './i18n/translations';
 import type { StoresMap } from './stores';
 import type { ActionsMap } from './actions';
-import { changeToplevelTheme, MuiThemes } from './styles/utils';
 import ThemeManager from './ThemeManager';
 import environment from './environment';
 import MaintenancePage from './containers/MaintenancePage';
@@ -21,6 +20,7 @@ import { ColorModeProvider } from './styles/context/mode';
 import { CssBaseline } from '@mui/material';
 import { globalStyles } from './styles/globalStyles';
 import Support from './components/widgets/Support';
+import { changeToplevelTheme, MuiThemes } from './styles/themes';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData(locales);

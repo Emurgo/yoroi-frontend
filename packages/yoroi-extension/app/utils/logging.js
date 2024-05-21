@@ -1,5 +1,4 @@
 // @flow
-import RingBuffer from 'ringbufferjs';
 import moment from 'moment';
 import FileSaver from 'file-saver';
 import { inspect } from 'util';
@@ -13,7 +12,14 @@ const logger = console;
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 const { logsBufferSize, logsFileSuffix } = CONFIG.app;
-const logs = new RingBuffer(logsBufferSize);
+const errors = [];
+
+function pushError(s: string): void {
+  errors.push(s);
+  if (errors.length > logsBufferSize) {
+    errors.shift();
+  }
+}
 
 export const Logger = {
 
@@ -29,7 +35,7 @@ export const Logger = {
     // fix format so it shows up properly in Chrome console
     const fixedString = data.replace(/\\n/g, '\n');
     logger.error(fixedString);
-    logs.enq(`[${moment().format()}] ${fixedString}\n`);
+    pushError(`[${moment().format()}] ${fixedString}\n`);
   },
 
   warn: (data : string) => {
@@ -47,7 +53,7 @@ export const silenceLogsForTesting = () => {
 
 export const downloadLogs = (publicKey?: string) => {
   const header = generateLogHeader(publicKey);
-  let errorLogs = logs.peekN(logs.size());
+  let errorLogs = [...errors];
   if (errorLogs.length === 0) {
     errorLogs = [`[${moment().format()}] No errors logged.`];
   }

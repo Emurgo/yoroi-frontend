@@ -121,7 +121,7 @@ export const SEIZA_STAKE_SIMULATOR: TopbarCategory = registerCategory({
   label: messages.delegationList,
   isVisible: request =>
     asGetStakingKey(request.selected) != null &&
-    request.selected.getParent().getNetworkInfo().NetworkId === networks.CardanoMainnet.NetworkId,
+    request.selected.isMainnet(),
 });
 
 export const CARDANO_DELEGATION: TopbarCategory = registerCategory({

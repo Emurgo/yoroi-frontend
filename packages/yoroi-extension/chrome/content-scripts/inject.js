@@ -239,3 +239,16 @@ async function convertImgToBase64(origin, urls) {
     return reader.result;
 }
 
+// relay Banxa callback to the extension tab
+window.addEventListener('message', function (event) {
+  if (
+    event.source === window &&
+    (
+      event.origin === 'http://localhost:8000' ||
+      event.origin === 'https://ramp-redirect.yoroiwallet.com'
+    ) &&
+    event.data?.type === 'banxa callback'
+  ) {
+    chrome.runtime.sendMessage(event.data);
+  }
+});
