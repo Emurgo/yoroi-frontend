@@ -47,6 +47,7 @@ class NavBarRevamp extends Component<Props> {
               display: 'flex',
               alignItems: 'center',
               height: 'inherit',
+
             }}
           >
             <Box
@@ -56,7 +57,8 @@ class NavBarRevamp extends Component<Props> {
                 width: '100%',
                 justifyContent: 'space-between',
                 margin: '20px 24px',
-                marginBottom: menu != null ? '71px' : '',
+                marginBottom: menu != null ? '52px' : '',
+
               }}
             >
               <Box flex="0 0 auto">{title}</Box>

@@ -1,10 +1,8 @@
 // @flow
 
-import RouteParser from 'route-parser';
-
 export const matchRoute = (
   pattern: string, path: string
-): false | { [param: string]: string, ... } => new RouteParser(pattern).match(path);
+): boolean => path.toLowerCase().startsWith(pattern.toLowerCase());
 
 /**
  * Build a route from a pattern like `/wallets/:id` to `/wallets/123`

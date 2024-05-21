@@ -46,7 +46,6 @@ class DangerousActionDialog extends Component<Props & InjectedLayoutProps> {
   render(): Node {
     const { intl } = this.context;
     const { isSubmitting, error, renderLayoutComponent, id } = this.props;
-    console.log('DangerousActionDialog ID', id)
 
     const dialogClasses = classnames(['removeWalletDialog', styles.dialog]);
 
