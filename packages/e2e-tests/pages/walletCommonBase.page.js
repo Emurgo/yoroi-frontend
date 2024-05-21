@@ -46,6 +46,10 @@ class WalletCommonBase extends BasePage {
     locator: 'topBar:selectedWallet-availableBalance-text',
     method: 'id',
   };
+  walletFiatBalanceTextLocator = {
+    locator: 'topBar:selectedWallet-availableFiatBalance-text',
+    method: 'id',
+  };
   // change wallet modal window
   changeWalletDialogLocator = {
     locator: 'changeWalletDialog-dialogWindow-modalWindow',
@@ -112,16 +116,25 @@ class WalletCommonBase extends BasePage {
   // functions
   async getSelectedWalletInfo() {
     this.logger.info(`WalletCommonBase::getSelectedWalletInfo is called`);
+
     await this.waitForElement(this.walletNameAndPlateNumberTextLocator);
     const rawNameAndPlateText = await this.getText(this.walletNameAndPlateNumberTextLocator);
+    const [walletName, walletPlate] = rawNameAndPlateText.split('\n');
+
     await this.waitForElement(this.walletBalanceTextLocator);
     const rawBalanceText = await this.getText(this.walletBalanceTextLocator);
-    const [walletName, walletPlate] = rawNameAndPlateText.split('\n');
     const adaBalance = Number(rawBalanceText.split(' ')[0]);
+
+    const rawFiatBalanceText = await this.getText(this.walletFiatBalanceTextLocator);
+    const [fiatBalanceStr, fiatCurrency] = rawFiatBalanceText.split(' ');
+    const fiatBalance = fiatBalanceStr === '-' ? 0 : Number(fiatBalanceStr);
+
     const walletInfo = {
       name: walletName,
       plate: walletPlate,
       balance: adaBalance,
+      fiatBalance,
+      fiatCurrency,
     };
     this.logger.info(
       `WalletCommonBase::getSelectedWalletInfo::walletInfo is ${JSON.stringify(walletInfo)}`

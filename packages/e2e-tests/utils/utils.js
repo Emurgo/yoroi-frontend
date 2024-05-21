@@ -235,3 +235,12 @@ export const convertPrettyTimeToNormal = prettyTime => {
   }
   return `${hours}:${minutes}:00`;
 };
+
+export const roundUpCurrency = (value, fiatCurrency) => {
+  const cryptoFiats = ['ETH', 'BTC'];
+  if (cryptoFiats.includes(fiatCurrency)) {
+    return Number(parseFloat(value).toFixed(6));
+  } else {
+    return Number(parseFloat(value).toFixed(2));
+  }
+};
