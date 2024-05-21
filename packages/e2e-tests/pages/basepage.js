@@ -109,11 +109,34 @@ class BasePage {
     return await webElement.getAttribute(property);
   }
   async getLinkFromComponent(locator) {
-    this.logger.info(`BasePage::getLinkFromComponent is called. Locator: ${JSON.stringify(locator)}`);
+    this.logger.info(
+      `BasePage::getLinkFromComponent is called. Locator: ${JSON.stringify(locator)}`
+    );
     const webElem = await this.driver.findElement(getByLocator(locator));
     const linkElem = await webElem.findElement(getByLocator(this.linkLocator));
     const linkText = await this.getAttributeElement(linkElem, 'href');
     return linkText;
+  }
+  async getWebElementAbove(locator, numberAbove) {
+    this.logger.info(
+      `BasePage::getWebElementAbove is called. Locator: ${JSON.stringify(locator)}, NumberAbove: ${JSON.stringify(numberAbove)}`
+    );
+    const webElement = await this.findElement(locator);
+    return await this.getWebElementAboveElement(webElement, numberAbove);
+  }
+  async getWebElementAboveElement(webElement, numberAbove) {
+    this.logger.info(
+      `BasePage::getWebElementAboveElement is called. NumberAbove: ${JSON.stringify(numberAbove)}`
+    );
+    const parentLocator = '.' + '/..'.repeat(numberAbove);
+    const elLocator = {
+      locator: parentLocator,
+      method: 'xpath',
+    };
+    const parentElement = await webElement.findElement(getByLocator(elLocator));
+    const text = await parentElement.getText();
+
+    return parentElement;
   }
   async executeLocalStorageScript(script) {
     this.logger.info(
