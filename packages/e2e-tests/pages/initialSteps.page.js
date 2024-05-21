@@ -18,8 +18,8 @@ class InitialStepsPage extends BasePage {
     method: 'css',
   };
   tosContinueButtonLocator = {
-    locator: '.MuiButton-primary',
-    method: 'css',
+    locator: 'initialPage-continue-button',
+    method: 'id',
   };
   analyticsSkipButtonLocator = {
     locator: '//div[@class="OptForAnalyticsForm_skip"]/button',
@@ -41,7 +41,13 @@ class InitialStepsPage extends BasePage {
     locator: '.MuiButton-secondary',
     method: 'css',
   };
-  // functions
+  getLanguageMenuItem = countryCode => {
+    return {
+      locator: `selectLanguage-${countryCode}-menuItem`,
+      method: 'id',
+    };
+  };
+  // methods
   async _continueButtonIsEnabled() {
     const buttonIsEnabled = await this.customWaiter(
       async () => {
@@ -54,6 +60,22 @@ class InitialStepsPage extends BasePage {
 
     return buttonIsEnabled;
   }
+  async openLanguageSelection() {
+    this.logger.info(`InitialStepsPage::openLanguageSelection is called`);
+    await this.waitForElement(this.languagesDropDownLocator);
+    await this.click(this.languagesDropDownLocator);
+  }
+  async pickLanguage(countryCode) {
+    this.logger.info(`InitialStepsPage::pickLanguage is called. Country code: "${countryCode}"`);
+    const langLocator = this.getLanguageMenuItem(countryCode);
+    await this.scrollIntoView(langLocator);
+    await this.click(langLocator);
+  }
+  async selectLanguage(countryCode) {
+    this.logger.info(`InitialStepsPage::selectLanguage is called. Country code: "${countryCode}"`);
+    await this.openLanguageSelection();
+    await this.pickLanguage(countryCode);
+  }
   async acceptToSPP() {
     this.logger.info(`InitialStepsPage::acceptToSPP is called`);
     await this.waitForElement(this.languagesDropDownLocator);
@@ -64,12 +86,20 @@ class InitialStepsPage extends BasePage {
   }
   async cantProceedWithoutToS() {
     this.logger.info(`InitialStepsPage::cantProceedWithoutToS is called`);
+    await this.takeScreenshot('DEBUG', 'debug');
+    await this.takeSnapshot('DEBUG', 'debug');
     await this.waitForElement(this.languagesDropDownLocator);
     await this.waitForElement(this.agreeCheckboxLocator);
     await this.click(this.agreeCheckboxLocator);
     await this.waitEnable(this.tosContinueButtonLocator);
     await this.click(this.agreeCheckboxLocator);
     return !(await this._continueButtonIsEnabled());
+  }
+  async getContinueButtonText() {
+    this.logger.info(`InitialStepsPage::getContinueButtonText is called`);
+    const btnText = await this.getText(this.tosContinueButtonLocator);
+    this.logger.info(`InitialStepsPage::getContinueButtonText::btnText is "${btnText}"`);
+    return btnText;
   }
   async acceptAnalytics() {
     this.logger.info(`InitialStepsPage::acceptAnalytics is called`);

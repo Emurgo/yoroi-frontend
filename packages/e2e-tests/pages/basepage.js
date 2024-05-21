@@ -255,6 +255,22 @@ class BasePage {
     await this.driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
     return false;
   }
+  async customWaitIsPresented(
+    locator,
+    timeout = defaultWaitTimeout,
+    repeatPeriod = defaultRepeatPeriod
+  ) {
+    this.logger.info(`BasePage::customWaitIsPresented is called.`);
+    const result = await this.customWaiter(
+      async () => {
+        const elemsPresented = await this.findElements(locator);
+        return elemsPresented === 1;
+      },
+      timeout,
+      repeatPeriod
+    );
+    return result;
+  }
   async sleep(milliseconds) {
     this.logger.info(`BasePage::sleep is called. Value: ${milliseconds}`);
     await this.driver.sleep(milliseconds);
