@@ -17,7 +17,7 @@ type Props = {|
   delegatedPool: PoolData,
   +undelegate: void | (void => Promise<void>),
   poolTransition?: PoolTransition,
-  delegateToSpecificPool: (id: string) => void,
+  delegateToSpecificPool: (id: ?string) => void,
 |};
 
 type Intl = {|

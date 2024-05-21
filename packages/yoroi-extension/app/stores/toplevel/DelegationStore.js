@@ -257,11 +257,11 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     const currentPool = this.getDelegatedPoolId(publicDeriver);
 
     try {
-      const remotePooTransitionlInfoPromises = new PoolInfoApi()
+      const remotePoolTransitionInfoPromises = new PoolInfoApi()
         .getTransition(String(currentPool), RustModule.CrossCsl.init)
         .then(res => res);
 
-      const transitionResult = await Promise.resolve(remotePooTransitionlInfoPromises);
+      const transitionResult = await Promise.resolve(remotePoolTransitionInfoPromises);
 
       const response = {
         currentPool: transitionResult?.current,
