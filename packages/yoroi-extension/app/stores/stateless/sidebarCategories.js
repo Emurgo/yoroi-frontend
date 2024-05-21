@@ -10,7 +10,7 @@ import { ReactComponent as goBackIcon } from '../../assets/images/top-bar/back-a
 import { ReactComponent as dappConnectorIcon } from '../../assets/images/dapp-connector/dapp-connector.inline.svg';
 import { ReactComponent as walletIcon } from '../../assets/images/sidebar/revamp/wallet.inline.svg';
 import { ReactComponent as stakingIcon } from '../../assets/images/sidebar/revamp/staking.inline.svg';
-import { ReactComponent as assetsIcon } from '../../assets/images/sidebar/revamp/assets.inline.svg';
+import { ReactComponent as portfolioIcon } from '../../assets/images/sidebar/revamp/portfolio.inline.svg';
 import { ReactComponent as nftsIcon } from '../../assets/images/sidebar/revamp/nfts.inline.svg';
 import { ReactComponent as votingIcon } from '../../assets/images/sidebar/revamp/voting.inline.svg';
 import { ReactComponent as swapIcon } from '../../assets/images/sidebar/revamp/swap.inline.svg';
@@ -42,9 +42,7 @@ export const MY_WALLETS: SidebarCategory = registerCategory({
   route: ROUTES.MY_WALLETS,
   icon: walletsIcon,
   label: globalMessages.sidebarWallets,
-  isVisible: request =>
-    request.hasAnyWallets &&
-    request.selected == null,
+  isVisible: request => request.hasAnyWallets && request.selected == null,
 });
 
 export const WALLETS_ROOT: SidebarCategory = registerCategory({
@@ -133,13 +131,14 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.SWAP.ROOT,
     icon: swapIcon,
     label: globalMessages.sidebarSwap,
-    isVisible: ({ selected }) => (environment.isDev() || environment.isNightly()) && !!selected?.isMainnet(),
+    isVisible: ({ selected }) =>
+      (environment.isDev() || environment.isNightly()) && !!selected?.isMainnet(),
   },
   {
-    className: 'assets',
-    route: ROUTES.ASSETS.ROOT,
-    icon: assetsIcon,
-    label: globalMessages.sidebarAssets,
+    className: 'portfolio',
+    route: ROUTES.PORTFOLIO.ROOT,
+    icon: portfolioIcon,
+    label: globalMessages.sidebarPortfolio,
     isVisible: _request => _request.selected !== null,
   },
   {

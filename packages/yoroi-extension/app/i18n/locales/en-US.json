@@ -326,7 +326,7 @@
   "settings.unitOfAccount.note": "<strong>Note:</strong> coin price is approximate and may not match the price of any given trading platform. Any transactions based on these price approximates are done at your own risk.",
   "settings.unitOfAccount.revamp.label": "Select currency",
   "settings.unitOfAccount.title": "Fiat pairing",
-  "sidebar.assets": "Assets",
+  "sidebar.portfolio": "Portfolio",
   "sidebar.faq": "Faq",
   "sidebar.feedback": "Feedback",
   "sidebar.newUpdates": "New updates",
@@ -1008,5 +1008,9 @@
   "yoroiTransfer.waiting.checkingAddresses.generatingTx": "Generating transfer transaction",
   "yoroiTransfer.waiting.progressInfo.checkingAddresses": "Checking addresses funds",
   "yoroiTransfer.waiting.progressInfo.restoringAddresses": "Fetching addresses",
-  "yoroiTransfer.waiting.title.label": "Wallet is being restored"
+  "yoroiTransfer.waiting.title.label": "Wallet is being restored",
+  "portfolio.main.header.text": "Tokens",
+  "portfolio.detail.header.text": "Token details",
+  "portfolio.menu.wallet.link.label": "Wallet",
+  "portfolio.menu.dapps.link.label": "Dapps"
 }

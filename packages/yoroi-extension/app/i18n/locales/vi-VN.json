@@ -326,7 +326,7 @@
   "settings.unitOfAccount.note": "<strong>Lưu ý:</strong> giá Coin là gần đúng và có thể không khớp với giá của bất kỳ nền tảng giao dịch cụ thể nào. Bất kỳ giao dịch nào dựa trên các ước tính giá này đều được thực hiện với rủi ro của riêng bạn.",
   "settings.unitOfAccount.revamp.label": "Select currency",
   "settings.unitOfAccount.title": "Fiat pairing",
-  "sidebar.assets": "Tài sản",
+  "sidebar.portfolio": "Danh mục",
   "sidebar.faq": "Câu hỏi thường gặp",
   "sidebar.feedback": "Phản hồi",
   "sidebar.newUpdates": "Cập nhật mới",

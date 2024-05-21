@@ -18,7 +18,6 @@ export const ROUTES = {
     RESTORE_WALLET: '/wallets/restore',
     TRANSACTIONS: '/wallets/transactions',
     SEND: '/wallets/send',
-    ASSETS: '/wallets/assets',
     RECEIVE: {
       ROOT: '/wallets/receive',
       ADDRESS_LIST: '/wallets/receive/:group/:name',
@@ -77,4 +76,9 @@ export const ROUTES = {
     ORDERS: '/swap/orders',
   },
   EXCHANGE_END: '/exchange-end',
+  PORTFOLIO: {
+    ROOT: '/portfolio',
+    DAPPS: '/portfolio/dapps',
+    DETAILS: '/portfolio/details/:tokenId',
+  },
 };

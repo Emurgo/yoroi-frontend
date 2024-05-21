@@ -26,7 +26,7 @@ import LoadingPage from './containers/LoadingPage';
 import Wallet from './containers/wallet/Wallet';
 import Settings from './containers/settings/Settings';
 import SwapPageContainer from './containers/swap/SwapPageContainer';
-import AssetsWrapper from './containers/wallet/AssetsWrapper';
+import PortfolioWrapper from './containers/portfolio/PortfolioWrapper';
 import NFTsWrapper from './containers/wallet/NFTsWrapper';
 import SwapProvider from './containers/swap/SwapProvider';
 import { Stack } from '@mui/material';
@@ -137,6 +137,14 @@ const SwapOrdersPage = React.lazy(SwapOrdersPagePromise);
 const ExchangeEndPagePromise = () => import('./containers/ExchangeEndPage');
 const ExchangeEndPage = React.lazy(ExchangeEndPagePromise);
 
+// PORTFOLIO
+const PortfolioPagePromise = () => import('./containers/portfolio/PortfolioPage');
+const PortfolioPage = React.lazy(PortfolioPagePromise);
+const PortfolioDappsPagePromise = () => import('./containers/portfolio/PortfolioDappsPage');
+const PortfolioDappsPage = React.lazy(PortfolioDappsPagePromise);
+const PortfolioDetailPagePromise = () => import('./containers/portfolio/PortfolioDetailPage');
+const PortfolioDetailPage = React.lazy(PortfolioDetailPagePromise);
+
 export const LazyLoadPromises: Array<() => any> = [
   AddAnotherWalletPromise,
   StakingPageContentPromise,
@@ -233,9 +241,9 @@ export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
         component={props => <StakingPage {...props} stores={stores} actions={actions} />}
       />
       <Route
-        path={ROUTES.ASSETS.ROOT}
+        path={ROUTES.PORTFOLIO.ROOT}
         component={props =>
-          wrapAssets({ ...props, stores, actions }, AssetsSubpages(stores, actions))
+          wrapPortfolio({ ...props, stores, actions }, PortfolioSubpages(stores, actions))
         }
       />
       <Route
@@ -334,10 +342,6 @@ const WalletsSubpages = (stores, actions) => (
       exact
       path={ROUTES.WALLETS.SEND}
       component={props => <WalletSendPage {...props} stores={stores} actions={actions} />}
-    />
-    <Route
-      path={ROUTES.WALLETS.ASSETS}
-      component={props => <WalletAssetsPage {...props} stores={stores} actions={actions} />}
     />
     <Route
       path={ROUTES.WALLETS.RECEIVE.ROOT}
@@ -444,17 +448,18 @@ const SettingsSubpages = (stores, actions) => (
   </Switch>
 );
 
-const AssetsSubpages = (stores, actions) => (
+const PortfolioSubpages = (stores, actions) => (
   <Switch>
+    <Route exact path={ROUTES.PORTFOLIO.ROOT} component={props => <PortfolioPage {...props} />} />
     <Route
       exact
-      path={ROUTES.ASSETS.ROOT}
-      component={props => <TokensPageRevamp {...props} stores={stores} actions={actions} />}
+      path={ROUTES.PORTFOLIO.DAPPS}
+      component={props => <PortfolioDappsPage {...props} />}
     />
     <Route
       exact
-      path={ROUTES.ASSETS.DETAILS}
-      component={props => <TokensDetailPageRevamp {...props} stores={stores} actions={actions} />}
+      path={ROUTES.PORTFOLIO.DETAILS}
+      component={props => <PortfolioDetailPage {...props} />}
     />
   </Switch>
 );
@@ -494,10 +499,7 @@ export function wrapSwap(swapProps: StoresAndActionsProps, children: Node): Node
   );
 }
 
-export function wrapSettings(
-  settingsProps: StoresAndActionsProps,
-  children: Node
-): Node {
+export function wrapSettings(settingsProps: StoresAndActionsProps, children: Node): Node {
   return (
     <Settings {...settingsProps}>
       <Suspense fallback={null}>{children}</Suspense>
@@ -505,11 +507,11 @@ export function wrapSettings(
   );
 }
 
-export function wrapAssets(assetsProps: StoresAndActionsProps, children: Node): Node {
+export function wrapPortfolio(portfolioProps: StoresAndActionsProps, children: Node): Node {
   return (
-    <AssetsWrapper {...assetsProps}>
+    <PortfolioWrapper {...portfolioProps}>
       <Suspense fallback={null}>{children}</Suspense>
-    </AssetsWrapper>
+    </PortfolioWrapper>
   );
 }
 
