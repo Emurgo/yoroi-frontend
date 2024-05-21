@@ -8,10 +8,9 @@ import { oneMinute } from '../helpers/timeConstants.js';
 import { restoreWallet } from '../helpers/restoreWalletHelper.js';
 import SettingsTab from '../pages/wallet/settingsTab/settingsTab.page.js';
 import driversPoolsManager from '../utils/driversPool.js';
-import GeneralSubTab from '../pages/wallet/settingsTab/generalSubTab.page.js';
-import axios from 'axios';
+import BlockchainSubTab from '../pages/wallet/settingsTab/blockchainSubTab.page.js';
 
-describe('Changing fiat currencies', function () {
+describe('Changing explorer', function () {
   this.timeout(2 * oneMinute);
   let webdriver = null;
   let logger = null;
@@ -22,7 +21,28 @@ describe('Changing fiat currencies', function () {
     done();
   });
 
-  const testData = ['BRL', 'ETH', 'BTC', 'KRW', 'CNY', 'EUR', 'JPY', 'USD', 'ADA'];
+  const testData = [
+    {
+      explorerName: 'CardanoScan',
+      reExplorerURL: /^https\:\/\/cardanoscan\.io/,
+    },
+    {
+      explorerName: 'AdaStat',
+      reExplorerURL: /^https\:\/\/adastat\.net/,
+    },
+    {
+      explorerName: 'CardanoExplorer',
+      reExplorerURL: /^https\:\/\/explorer\.cardano\.org/,
+    },
+    {
+      explorerName: 'Cexplorer',
+      reExplorerURL: /^https\:\/\/cexplorer\.io/,
+    },
+    {
+      explorerName: 'Blockchair',
+      reExplorerURL: /^https\:\/\/blockchair\.com/,
+    },
+  ];
 
   it('Restore a 15-word wallet', async function () {
     await restoreWallet(webdriver, logger, testWallet1);
@@ -32,34 +52,29 @@ describe('Changing fiat currencies', function () {
   });
 
   for (const testDatum of testData) {
-    describe(`Changing fiat currency to ${testDatum}`, function () {
-      it('Open General settings', async function () {
+    describe(`Changing Cardano explorer to ${testDatum.explorerName}`, function () {
+      it('Open Blockchain settings', async function () {
         const transactionsPage = new TransactionsSubTab(webdriver, logger);
         await transactionsPage.goToSettingsTab();
         const settingsPage = new SettingsTab(webdriver, logger);
-        await settingsPage.goToGeneralSubMenu();
+        await settingsPage.goToBlockchainSubMenu();
       });
 
-      it('Select currency', async function () {
-        const generalSubTab = new GeneralSubTab(webdriver, logger);
-        await generalSubTab.selectFiat(testDatum);
+      it('Select explorer', async function () {
+        const blockchainSubTab = new BlockchainSubTab(webdriver, logger);
+        await blockchainSubTab.selectExplorer(testDatum.explorerName);
       });
 
-      it('Check the selected currency is applied', async function () {
-        const generalSubTab = new GeneralSubTab(webdriver, logger);
-        await generalSubTab.goToWalletTab();
-        const walletInfo = await generalSubTab.getSelectedWalletInfo();
-        if (testDatum === 'ADA') {
-          expect(walletInfo.fiatBalance, 'Fiat balance is different').to.equal(0);
-        } else {
-          expect(walletInfo.fiatCurrency, 'Fiat currency is different').to.equal(testDatum);
-          const reqResponse = await axios.get('https://iohk-mainnet.yoroiwallet.com/api/price/ADA/current');
-          const prices = reqResponse.data.ticker.prices;
-          const expectedFiatValue = roundUpCurrency(
-            prices[testDatum] * walletInfo.balance,
-            testDatum
-          );
-          expect(walletInfo.fiatBalance, 'Fiat balance is different').to.equal(expectedFiatValue);
+      it('Check the selected explorer is applied', async function () {
+        const blockchainSubTab = new BlockchainSubTab(webdriver, logger);
+        await blockchainSubTab.goToWalletTab();
+        const transactionsPage = new TransactionsSubTab(webdriver, logger);
+        const allTxLinks = await transactionsPage.getTxURLs(0, 0);
+        for (const key in allTxLinks) {
+          const links = allTxLinks[key];
+          for (const link of links) {
+            expect(link, 'Wrong link').to.match(testDatum.reExplorerURL);
+          }
         }
       });
     });
