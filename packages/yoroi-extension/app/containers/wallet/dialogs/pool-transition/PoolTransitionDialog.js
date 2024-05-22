@@ -1,26 +1,18 @@
 // @flow
-import React from 'react';
 import Dialog from '../../../../components/widgets/Dialog';
 import {
-  DialogContent,
-  DialogActions,
   Typography,
   Button,
-  Card,
-  CardContent,
   Grid,
-  Alert,
-  Modal,
+
+
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
-import DialogCloseButton from '../../../../components/widgets/DialogCloseButton';
 import type { PoolTransition } from '../../../../stores/toplevel/DelegationStore';
-import type { Node } from 'react';
 import { StakePoolCard } from './StakePoolCard';
 import { Stack } from '@mui/material';
 import { messages } from './dialog-messages';
-import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import Separator from '../../../../components/common/separator/Separator';
 import { ReactComponent as ArrowRightSvg } from '../../../../assets/images/revamp/icons/arrow-right.inline.svg';

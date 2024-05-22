@@ -1,6 +1,6 @@
 // @flow
 
-import { action, observable } from 'mobx';
+import { action, observable, runInAction } from 'mobx';
 import { find } from 'lodash';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
@@ -24,9 +24,6 @@ import type {
 
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { environment } from '../../environment';
-import { runInAction } from 'mobx';
-import { addressBech32ToHex } from '../../api/ada/lib/cardanoCrypto/utils';
-import { bech32 } from 'bech32';
 
 export type DelegationRequests = {|
   publicDeriver: PublicDeriver<>,

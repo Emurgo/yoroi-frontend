@@ -1,7 +1,7 @@
 // @flow
 import type { ComponentType, Node } from 'react';
 import { Box, styled } from '@mui/system';
-import { Button, Typography } from '@mui/material';
+import { Alert, Button, Stack, Typography } from '@mui/material';
 import { injectIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
@@ -9,8 +9,6 @@ import globalMessages from '../../../../i18n/global-messages';
 import { SocialMediaStakePool } from './StakePool/StakePool';
 import type { PoolData } from '../../../../containers/wallet/staking/SeizaFetcher';
 import { getAvatarFromPoolId } from '../utils';
-import { Alert } from '@mui/material';
-import { Stack } from '@mui/material';
 import type { PoolTransition } from '../../../../stores/toplevel/DelegationStore';
 
 type Props = {|
@@ -80,7 +78,7 @@ function DelegatedStakePoolCard({
           alignItems: 'center',
           justifyContent: 'space-between',
         }}
-      ></Box>
+      />
       <Wrapper sx={{ paddingBottom: 0 }}>
         <AvatarWrapper>
           {avatar != null ? (
@@ -212,12 +210,12 @@ const UndelegateButton: any = styled(Button)({
 });
 const UpdatePoolButton: any = styled(Button)(({ theme }) => ({
   minWidth: 'auto',
-  width: 'unset',
+  // width: 'unset',
+  width: '140px',
   marginLeft: 'auto',
   background: theme.palette.magenta['500'],
   color: 'white',
   height: '40px',
-  width: '140px',
   padding: '0px !important',
   fontSize: '14px',
   '&:hover': {

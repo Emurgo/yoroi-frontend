@@ -1,6 +1,7 @@
-import { defineMessages, injectIntl } from 'react-intl';
+// @flow
+import { defineMessages } from 'react-intl';
 
-export const messages = defineMessages({
+export const messages: * = defineMessages({
   currentStakePool: {
     id: 'wallet.transitionDialog.currentStakePool',
     defaultMessage:
