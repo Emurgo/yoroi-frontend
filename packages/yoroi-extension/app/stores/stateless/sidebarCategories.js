@@ -42,9 +42,7 @@ export const MY_WALLETS: SidebarCategory = registerCategory({
   route: ROUTES.MY_WALLETS,
   icon: walletsIcon,
   label: globalMessages.sidebarWallets,
-  isVisible: request =>
-    request.hasAnyWallets &&
-    request.selected == null,
+  isVisible: request => request.hasAnyWallets && request.selected == null,
 });
 
 export const WALLETS_ROOT: SidebarCategory = registerCategory({
@@ -133,7 +131,8 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.SWAP.ROOT,
     icon: swapIcon,
     label: globalMessages.sidebarSwap,
-    isVisible: ({ selected }) => (environment.isDev() || environment.isNightly()) && !!selected?.isMainnet(),
+    isVisible: ({ selected }) =>
+      (environment.isDev() || environment.isNightly()) && !!selected?.isMainnet(),
   },
   {
     className: 'assets',
@@ -174,6 +173,13 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
   {
     className: 'settings',
     route: '/settings',
+    icon: settingIcon,
+    label: globalMessages.sidebarSettings,
+    isVisible: _request => true,
+  },
+  {
+    className: 'settings',
+    route: '/gouvernance',
     icon: settingIcon,
     label: globalMessages.sidebarSettings,
     isVisible: _request => true,

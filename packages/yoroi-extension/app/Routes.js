@@ -35,6 +35,7 @@ import FullscreenLayout from './components/layout/FullscreenLayout';
 
 // New UI pages
 import GouvernancePage from './UI/pages/Gouvernance/GouvernancePage';
+import GouvernanceDelegationFormPage from './UI/pages/Gouvernance/GouvernanceDelegationFormPage';
 
 // PAGES
 const LanguageSelectionPagePromise = () => import('./containers/profile/LanguageSelectionPage');
@@ -490,6 +491,13 @@ const GouvernanceSubpages = (stores, actions) => (
       exact
       path={ROUTES.Gouvernance.ROOT}
       component={props => <GouvernancePage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.Gouvernance.DELEGATE}
+      component={props => (
+        <GouvernanceDelegationFormPage {...props} stores={stores} actions={actions} />
+      )}
     />
     <Redirect to={ROUTES.Gouvernance.ROOT} />
   </Switch>

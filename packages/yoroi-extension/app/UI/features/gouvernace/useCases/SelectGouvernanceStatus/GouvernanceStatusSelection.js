@@ -75,10 +75,11 @@ const GovernanceCard = ({ title, description, icon, selected, onClick }: Props) 
 
 export const GouvernanceStatusSelection = (): Node => {
   const [selectedCard, setSelectedCard] = useState(null);
-  const { gouvernanceStatus } = useGouvernance();
+  const { gouvernanceStatus, dRepId } = useGouvernance();
   const { openModal } = useModal();
 
-  console.log('Test gouvernanceStatus', gouvernanceStatus);
+  console.log('gouvernanceStatus', gouvernanceStatus);
+  console.log('dRepId', dRepId);
 
   const pageTitle = gouvernanceStatus === 'none' ? 'Governance Status' : 'Governance status';
   const statusRawText = mapStatus[gouvernanceStatus];
@@ -89,12 +90,8 @@ export const GouvernanceStatusSelection = (): Node => {
 
   const hasDRep = gouvernanceStatus === 'drep';
 
-  const confirmDRep = drep => {
-    console.log('TEST', drep);
-  };
-
   const onChoosDRepClick = () => {
-    openModal('UploadModal', { title: 'avatar', confirmDRep });
+    openModal('ChooseDRepModal', { title: 'Choose your Drep' });
   };
   const handleCardClick = card => {
     setSelectedCard(card);

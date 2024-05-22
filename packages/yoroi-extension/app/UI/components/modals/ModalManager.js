@@ -1,5 +1,5 @@
 import { useModal } from '../../context/ModalContext';
-import UploadModal from './ChooseDRepModal';
+import { ChooseDRepModal } from '../../features/gouvernace/common/ChooseDRepModal';
 
 const ModalLookup = {
   ChooseDRepModal: ChooseDRepModal,

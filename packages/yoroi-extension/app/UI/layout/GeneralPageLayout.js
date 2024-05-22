@@ -11,6 +11,8 @@ import { Box, Typography } from '@mui/material';
 import { withLayout } from '../../styles/context/layout';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { ModalProvider } from '../context/ModalContext';
+import ModalManager from '../components/modals/ModalManager';
+import { GouvernanceContextProvider } from '../features/gouvernace/module/GouvernanceContextProvider';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -33,16 +35,24 @@ class GeneralPageLayout extends Component<LayoutProps> {
     const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
 
     return (
-      // TODO ModalProvider to be moved into APP after finish refactoring and bring everything in UI
-      <ModalProvider>
-        <TopBarLayout
-          banner={<BannerContainer actions={actions} stores={stores} />}
-          sidebar={sidebarContainer}
-          navbar={navbar}
-        >
-          {children}
-        </TopBarLayout>
-      </ModalProvider>
+      <GouvernanceContextProvider
+        initialState={{
+          gouvernanceStatus: 'none',
+        }}
+      >
+        // TODO ModalProvider to be moved into APP after finish refactoring and bring everything in
+        UI
+        <ModalProvider>
+          <ModalManager />
+          <TopBarLayout
+            banner={<BannerContainer actions={actions} stores={stores} />}
+            sidebar={sidebarContainer}
+            navbar={navbar}
+          >
+            {children}
+          </TopBarLayout>
+        </ModalProvider>
+      </GouvernanceContextProvider>
     );
   }
 }

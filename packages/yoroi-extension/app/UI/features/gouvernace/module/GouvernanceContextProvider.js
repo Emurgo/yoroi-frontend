@@ -29,14 +29,17 @@ export const GouvernanceContextProvider = ({
     ...initialState,
   });
 
-  const actions =
-    React.useRef <
-    GouvernanceActions >
-    {
-      gouvernanceStatusChanged: (status: any) => {
-        dispatch({ type: GouvernanceActionType.GouvernanceStatusChanged, gouvernanceStatus });
-      },
-    }.current;
+  const actions = React.useRef({
+    gouvernanceStatusChanged: (status: any) => {
+      dispatch({
+        type: GouvernanceActionType.GouvernanceStatusChanged,
+        gouvernanceStatus: status,
+      });
+    },
+    dRepIdChanged: (id: string) => {
+      dispatch({ type: GouvernanceActionType.DRepIdChanged, dRepId: id });
+    },
+  }).current;
 
   const context = React.useMemo(
     () => ({
