@@ -82,4 +82,9 @@ export const ROUTES = {
   Gouvernance: {
     ROOT: '/gouvernance',
   },
+  PORTFOLIO: {
+    ROOT: '/portfolio',
+    DAPPS: '/portfolio/dapps',
+    DETAILS: '/portfolio/details/:tokenId',
+  },
 };

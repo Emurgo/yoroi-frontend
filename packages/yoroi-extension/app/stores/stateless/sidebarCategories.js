@@ -136,10 +136,10 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     isVisible: ({ selected }) => (environment.isDev() || environment.isNightly()) && !!selected?.isMainnet(),
   },
   {
-    className: 'assets',
-    route: ROUTES.ASSETS.ROOT,
+    className: 'portfolio',
+    route: ROUTES.PORTFOLIO.ROOT,
     icon: assetsIcon,
-    label: globalMessages.sidebarAssets,
+    label: globalMessages.sidebarPortfolio,
     isVisible: _request => _request.selected !== null,
   },
   {

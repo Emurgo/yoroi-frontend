@@ -688,9 +688,9 @@ const globalMessages: * = defineMessages({
     id: 'sidebar.staking',
     defaultMessage: '!!!Staking',
   },
-  sidebarAssets: {
-    id: 'sidebar.assets',
-    defaultMessage: '!!!Assets',
+  sidebarPortfolio: {
+    id: 'sidebar.portfolio',
+    defaultMessage: '!!!Portfolio',
   },
   sidebarNfts: {
     id: 'sidebar.nfts',
@@ -972,6 +972,14 @@ const globalMessages: * = defineMessages({
   provider: {
     id: 'buysell.dialog.provider',
     defaultMessage: '!!!Provider',
+  },
+  portfolioHeaderText: {
+    id: 'portfolio.main.header.text',
+    defaultMessage: '!!!Tokens',
+  },
+  portfolioDetailHeaderText: {
+    id: 'portfolio.detail.header.text',
+    defaultMessage: '!!!Token details',
   },
 });
 export default globalMessages;

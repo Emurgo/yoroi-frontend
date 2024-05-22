@@ -35,6 +35,7 @@ import FullscreenLayout from './components/layout/FullscreenLayout';
 
 // New UI pages
 import GouvernancePage from './UI/pages/Gouvernance/GouvernancePage';
+import PortfolioWrapper from './UI/features/portfolio/PortfolioWrapper';
 
 // PAGES
 const LanguageSelectionPagePromise = () => import('./containers/profile/LanguageSelectionPage');
@@ -140,6 +141,14 @@ const SwapOrdersPage = React.lazy(SwapOrdersPagePromise);
 const ExchangeEndPagePromise = () => import('./containers/ExchangeEndPage');
 const ExchangeEndPage = React.lazy(ExchangeEndPagePromise);
 
+// PORTFOLIO
+const PortfolioPagePromise = () => import('./UI/pages/portfolio/PortfolioPage');
+const PortfolioPage = React.lazy(PortfolioPagePromise);
+const PortfolioDappsPagePromise = () => import('./UI/pages/portfolio/PortfolioDappsPage');
+const PortfolioDappsPage = React.lazy(PortfolioDappsPagePromise);
+const PortfolioDetailPagePromise = () => import('./UI/pages/portfolio/PortfolioDetailPage');
+const PortfolioDetailPage = React.lazy(PortfolioDetailPagePromise);
+
 export const LazyLoadPromises: Array<() => any> = [
   AddAnotherWalletPromise,
   StakingPageContentPromise,
@@ -236,9 +245,9 @@ export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
         component={props => <StakingPage {...props} stores={stores} actions={actions} />}
       />
       <Route
-        path={ROUTES.ASSETS.ROOT}
+        path={ROUTES.PORTFOLIO.ROOT}
         component={props =>
-          wrapAssets({ ...props, stores, actions }, AssetsSubpages(stores, actions))
+          wrapPortfolio({ ...props, stores, actions }, PortfolioSubpages(stores, actions))
         }
       />
       <Route
@@ -454,17 +463,18 @@ const SettingsSubpages = (stores, actions) => (
   </Switch>
 );
 
-const AssetsSubpages = (stores, actions) => (
+const PortfolioSubpages = (stores, actions) => (
   <Switch>
+    <Route exact path={ROUTES.PORTFOLIO.ROOT} component={props => <PortfolioPage {...props} />} />
     <Route
       exact
-      path={ROUTES.ASSETS.ROOT}
-      component={props => <TokensPageRevamp {...props} stores={stores} actions={actions} />}
+      path={ROUTES.PORTFOLIO.DAPPS}
+      component={props => <PortfolioDappsPage {...props} />}
     />
     <Route
       exact
-      path={ROUTES.ASSETS.DETAILS}
-      component={props => <TokensDetailPageRevamp {...props} stores={stores} actions={actions} />}
+      path={ROUTES.PORTFOLIO.DETAILS}
+      component={props => <PortfolioDetailPage {...props} />}
     />
   </Switch>
 );
@@ -523,11 +533,11 @@ export function wrapSettings(settingsProps: StoresAndActionsProps, children: Nod
   );
 }
 
-export function wrapAssets(assetsProps: StoresAndActionsProps, children: Node): Node {
+export function wrapPortfolio(portfolioProps: StoresAndActionsProps, children: Node): Node {
   return (
-    <AssetsWrapper {...assetsProps}>
+    <PortfolioWrapper {...portfolioProps}>
       <Suspense fallback={null}>{children}</Suspense>
-    </AssetsWrapper>
+    </PortfolioWrapper>
   );
 }
 
