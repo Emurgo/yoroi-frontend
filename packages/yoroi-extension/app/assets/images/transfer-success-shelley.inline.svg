@@ -5,16 +5,16 @@
     <desc>Created with Sketch.</desc>
     <defs>
         <linearGradient x1="57.8286372%" y1="0%" x2="42.1713628%" y2="100%" id="linearGradient-1">
-            <stop stop-color="#F14D78" offset="0%"></stop>
-            <stop stop-color="#1A44B7" offset="100%"></stop>
+            <stop stopColor="#F14D78" offset="0%"></stop>
+            <stop stopColor="#1A44B7" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="76.6761718%" y1="0%" x2="23.3238282%" y2="100%" id="linearGradient-2">
-            <stop stop-color="#F14D78" offset="0%"></stop>
-            <stop stop-color="#1A44B7" offset="100%"></stop>
+            <stop stopColor="#F14D78" offset="0%"></stop>
+            <stop stopColor="#1A44B7" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="86.9008994%" y1="0%" x2="13.0991006%" y2="100%" id="linearGradient-3">
-            <stop stop-color="#F14D78" offset="0%"></stop>
-            <stop stop-color="#1A44B7" offset="100%"></stop>
+            <stop stopColor="#F14D78" offset="0%"></stop>
+            <stop stopColor="#1A44B7" offset="100%"></stop>
         </linearGradient>
     </defs>
     <g id="Trunsfer-success.inline" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">

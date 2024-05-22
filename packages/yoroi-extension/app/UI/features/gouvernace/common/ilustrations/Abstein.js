@@ -112,12 +112,12 @@ export const Abstein = () => {
           y2="186.972"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint1_linear_1598_4400"
@@ -127,12 +127,12 @@ export const Abstein = () => {
           y2="226.98"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint2_linear_1598_4400"
@@ -142,15 +142,15 @@ export const Abstein = () => {
           y2="180.271"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#1D45BA" />
-          <stop offset="0.4204" stop-color="#1D47BA" />
-          <stop offset="0.5718" stop-color="#1D4EB9" />
-          <stop offset="0.6797" stop-color="#1C59B8" />
-          <stop offset="0.767" stop-color="#1B6AB6" />
-          <stop offset="0.8417" stop-color="#1A80B3" />
-          <stop offset="0.9079" stop-color="#199CB0" />
-          <stop offset="0.9663" stop-color="#18BBAD" />
-          <stop offset="1" stop-color="#17D1AA" />
+          <stop stopColor="#1D45BA" />
+          <stop offset="0.4204" stopColor="#1D47BA" />
+          <stop offset="0.5718" stopColor="#1D4EB9" />
+          <stop offset="0.6797" stopColor="#1C59B8" />
+          <stop offset="0.767" stopColor="#1B6AB6" />
+          <stop offset="0.8417" stopColor="#1A80B3" />
+          <stop offset="0.9079" stopColor="#199CB0" />
+          <stop offset="0.9663" stopColor="#18BBAD" />
+          <stop offset="1" stopColor="#17D1AA" />
         </linearGradient>
         <linearGradient
           id="paint3_linear_1598_4400"
@@ -160,15 +160,15 @@ export const Abstein = () => {
           y2="29.1708"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#1D45BA" />
-          <stop offset="0.4204" stop-color="#1D47BA" />
-          <stop offset="0.5718" stop-color="#1D4EB9" />
-          <stop offset="0.6797" stop-color="#1C59B8" />
-          <stop offset="0.767" stop-color="#1B6AB6" />
-          <stop offset="0.8417" stop-color="#1A80B3" />
-          <stop offset="0.9079" stop-color="#199CB0" />
-          <stop offset="0.9663" stop-color="#18BBAD" />
-          <stop offset="1" stop-color="#17D1AA" />
+          <stop stopColor="#1D45BA" />
+          <stop offset="0.4204" stopColor="#1D47BA" />
+          <stop offset="0.5718" stopColor="#1D4EB9" />
+          <stop offset="0.6797" stopColor="#1C59B8" />
+          <stop offset="0.767" stopColor="#1B6AB6" />
+          <stop offset="0.8417" stopColor="#1A80B3" />
+          <stop offset="0.9079" stopColor="#199CB0" />
+          <stop offset="0.9663" stopColor="#18BBAD" />
+          <stop offset="1" stopColor="#17D1AA" />
         </linearGradient>
         <linearGradient
           id="paint4_linear_1598_4400"
@@ -178,15 +178,15 @@ export const Abstein = () => {
           y2="91.6786"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#1D45BA" />
-          <stop offset="0.4204" stop-color="#1D47BA" />
-          <stop offset="0.5718" stop-color="#1D4EB9" />
-          <stop offset="0.6797" stop-color="#1C59B8" />
-          <stop offset="0.767" stop-color="#1B6AB6" />
-          <stop offset="0.8417" stop-color="#1A80B3" />
-          <stop offset="0.9079" stop-color="#199CB0" />
-          <stop offset="0.9663" stop-color="#18BBAD" />
-          <stop offset="1" stop-color="#17D1AA" />
+          <stop stopColor="#1D45BA" />
+          <stop offset="0.4204" stopColor="#1D47BA" />
+          <stop offset="0.5718" stopColor="#1D4EB9" />
+          <stop offset="0.6797" stopColor="#1C59B8" />
+          <stop offset="0.767" stopColor="#1B6AB6" />
+          <stop offset="0.8417" stopColor="#1A80B3" />
+          <stop offset="0.9079" stopColor="#199CB0" />
+          <stop offset="0.9663" stopColor="#18BBAD" />
+          <stop offset="1" stopColor="#17D1AA" />
         </linearGradient>
         <linearGradient
           id="paint5_linear_1598_4400"
@@ -196,15 +196,15 @@ export const Abstein = () => {
           y2="29.6355"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#1D45BA" />
-          <stop offset="0.4204" stop-color="#1D47BA" />
-          <stop offset="0.5718" stop-color="#1D4EB9" />
-          <stop offset="0.6797" stop-color="#1C59B8" />
-          <stop offset="0.767" stop-color="#1B6AB6" />
-          <stop offset="0.8417" stop-color="#1A80B3" />
-          <stop offset="0.9079" stop-color="#199CB0" />
-          <stop offset="0.9663" stop-color="#18BBAD" />
-          <stop offset="1" stop-color="#17D1AA" />
+          <stop stopColor="#1D45BA" />
+          <stop offset="0.4204" stopColor="#1D47BA" />
+          <stop offset="0.5718" stopColor="#1D4EB9" />
+          <stop offset="0.6797" stopColor="#1C59B8" />
+          <stop offset="0.767" stopColor="#1B6AB6" />
+          <stop offset="0.8417" stopColor="#1A80B3" />
+          <stop offset="0.9079" stopColor="#199CB0" />
+          <stop offset="0.9663" stopColor="#18BBAD" />
+          <stop offset="1" stopColor="#17D1AA" />
         </linearGradient>
         <linearGradient
           id="paint6_linear_1598_4400"
@@ -214,12 +214,12 @@ export const Abstein = () => {
           y2="183.776"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint7_linear_1598_4400"
@@ -229,12 +229,12 @@ export const Abstein = () => {
           y2="213.557"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint8_linear_1598_4400"
@@ -244,12 +244,12 @@ export const Abstein = () => {
           y2="215.301"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint9_linear_1598_4400"
@@ -259,12 +259,12 @@ export const Abstein = () => {
           y2="234.931"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint10_linear_1598_4400"
@@ -274,15 +274,15 @@ export const Abstein = () => {
           y2="102.414"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#1D45BA" />
-          <stop offset="0.4204" stop-color="#1D47BA" />
-          <stop offset="0.5718" stop-color="#1D4EB9" />
-          <stop offset="0.6797" stop-color="#1C59B8" />
-          <stop offset="0.767" stop-color="#1B6AB6" />
-          <stop offset="0.8417" stop-color="#1A80B3" />
-          <stop offset="0.9079" stop-color="#199CB0" />
-          <stop offset="0.9663" stop-color="#18BBAD" />
-          <stop offset="1" stop-color="#17D1AA" />
+          <stop stopColor="#1D45BA" />
+          <stop offset="0.4204" stopColor="#1D47BA" />
+          <stop offset="0.5718" stopColor="#1D4EB9" />
+          <stop offset="0.6797" stopColor="#1C59B8" />
+          <stop offset="0.767" stopColor="#1B6AB6" />
+          <stop offset="0.8417" stopColor="#1A80B3" />
+          <stop offset="0.9079" stopColor="#199CB0" />
+          <stop offset="0.9663" stopColor="#18BBAD" />
+          <stop offset="1" stopColor="#17D1AA" />
         </linearGradient>
         <linearGradient
           id="paint11_linear_1598_4400"
@@ -292,15 +292,15 @@ export const Abstein = () => {
           y2="102.414"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#1D45BA" />
-          <stop offset="0.4204" stop-color="#1D47BA" />
-          <stop offset="0.5718" stop-color="#1D4EB9" />
-          <stop offset="0.6797" stop-color="#1C59B8" />
-          <stop offset="0.767" stop-color="#1B6AB6" />
-          <stop offset="0.8417" stop-color="#1A80B3" />
-          <stop offset="0.9079" stop-color="#199CB0" />
-          <stop offset="0.9663" stop-color="#18BBAD" />
-          <stop offset="1" stop-color="#17D1AA" />
+          <stop stopColor="#1D45BA" />
+          <stop offset="0.4204" stopColor="#1D47BA" />
+          <stop offset="0.5718" stopColor="#1D4EB9" />
+          <stop offset="0.6797" stopColor="#1C59B8" />
+          <stop offset="0.767" stopColor="#1B6AB6" />
+          <stop offset="0.8417" stopColor="#1A80B3" />
+          <stop offset="0.9079" stopColor="#199CB0" />
+          <stop offset="0.9663" stopColor="#18BBAD" />
+          <stop offset="1" stopColor="#17D1AA" />
         </linearGradient>
         <linearGradient
           id="paint12_linear_1598_4400"
@@ -310,15 +310,15 @@ export const Abstein = () => {
           y2="102.414"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#1D45BA" />
-          <stop offset="0.4204" stop-color="#1D47BA" />
-          <stop offset="0.5718" stop-color="#1D4EB9" />
-          <stop offset="0.6797" stop-color="#1C59B8" />
-          <stop offset="0.767" stop-color="#1B6AB6" />
-          <stop offset="0.8417" stop-color="#1A80B3" />
-          <stop offset="0.9079" stop-color="#199CB0" />
-          <stop offset="0.9663" stop-color="#18BBAD" />
-          <stop offset="1" stop-color="#17D1AA" />
+          <stop stopColor="#1D45BA" />
+          <stop offset="0.4204" stopColor="#1D47BA" />
+          <stop offset="0.5718" stopColor="#1D4EB9" />
+          <stop offset="0.6797" stopColor="#1C59B8" />
+          <stop offset="0.767" stopColor="#1B6AB6" />
+          <stop offset="0.8417" stopColor="#1A80B3" />
+          <stop offset="0.9079" stopColor="#199CB0" />
+          <stop offset="0.9663" stopColor="#18BBAD" />
+          <stop offset="1" stopColor="#17D1AA" />
         </linearGradient>
         <linearGradient
           id="paint13_linear_1598_4400"
@@ -328,15 +328,15 @@ export const Abstein = () => {
           y2="102.414"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#1D45BA" />
-          <stop offset="0.4204" stop-color="#1D47BA" />
-          <stop offset="0.5718" stop-color="#1D4EB9" />
-          <stop offset="0.6797" stop-color="#1C59B8" />
-          <stop offset="0.767" stop-color="#1B6AB6" />
-          <stop offset="0.8417" stop-color="#1A80B3" />
-          <stop offset="0.9079" stop-color="#199CB0" />
-          <stop offset="0.9663" stop-color="#18BBAD" />
-          <stop offset="1" stop-color="#17D1AA" />
+          <stop stopColor="#1D45BA" />
+          <stop offset="0.4204" stopColor="#1D47BA" />
+          <stop offset="0.5718" stopColor="#1D4EB9" />
+          <stop offset="0.6797" stopColor="#1C59B8" />
+          <stop offset="0.767" stopColor="#1B6AB6" />
+          <stop offset="0.8417" stopColor="#1A80B3" />
+          <stop offset="0.9079" stopColor="#199CB0" />
+          <stop offset="0.9663" stopColor="#18BBAD" />
+          <stop offset="1" stopColor="#17D1AA" />
         </linearGradient>
         <linearGradient
           id="paint14_linear_1598_4400"
@@ -346,15 +346,15 @@ export const Abstein = () => {
           y2="102.414"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#1D45BA" />
-          <stop offset="0.4204" stop-color="#1D47BA" />
-          <stop offset="0.5718" stop-color="#1D4EB9" />
-          <stop offset="0.6797" stop-color="#1C59B8" />
-          <stop offset="0.767" stop-color="#1B6AB6" />
-          <stop offset="0.8417" stop-color="#1A80B3" />
-          <stop offset="0.9079" stop-color="#199CB0" />
-          <stop offset="0.9663" stop-color="#18BBAD" />
-          <stop offset="1" stop-color="#17D1AA" />
+          <stop stopColor="#1D45BA" />
+          <stop offset="0.4204" stopColor="#1D47BA" />
+          <stop offset="0.5718" stopColor="#1D4EB9" />
+          <stop offset="0.6797" stopColor="#1C59B8" />
+          <stop offset="0.767" stopColor="#1B6AB6" />
+          <stop offset="0.8417" stopColor="#1A80B3" />
+          <stop offset="0.9079" stopColor="#199CB0" />
+          <stop offset="0.9663" stopColor="#18BBAD" />
+          <stop offset="1" stopColor="#17D1AA" />
         </linearGradient>
         <linearGradient
           id="paint15_linear_1598_4400"
@@ -364,15 +364,15 @@ export const Abstein = () => {
           y2="102.414"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#1D45BA" />
-          <stop offset="0.4204" stop-color="#1D47BA" />
-          <stop offset="0.5718" stop-color="#1D4EB9" />
-          <stop offset="0.6797" stop-color="#1C59B8" />
-          <stop offset="0.767" stop-color="#1B6AB6" />
-          <stop offset="0.8417" stop-color="#1A80B3" />
-          <stop offset="0.9079" stop-color="#199CB0" />
-          <stop offset="0.9663" stop-color="#18BBAD" />
-          <stop offset="1" stop-color="#17D1AA" />
+          <stop stopColor="#1D45BA" />
+          <stop offset="0.4204" stopColor="#1D47BA" />
+          <stop offset="0.5718" stopColor="#1D4EB9" />
+          <stop offset="0.6797" stopColor="#1C59B8" />
+          <stop offset="0.767" stopColor="#1B6AB6" />
+          <stop offset="0.8417" stopColor="#1A80B3" />
+          <stop offset="0.9079" stopColor="#199CB0" />
+          <stop offset="0.9663" stopColor="#18BBAD" />
+          <stop offset="1" stopColor="#17D1AA" />
         </linearGradient>
         <linearGradient
           id="paint16_linear_1598_4400"
@@ -382,15 +382,15 @@ export const Abstein = () => {
           y2="102.414"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#1D45BA" />
-          <stop offset="0.4204" stop-color="#1D47BA" />
-          <stop offset="0.5718" stop-color="#1D4EB9" />
-          <stop offset="0.6797" stop-color="#1C59B8" />
-          <stop offset="0.767" stop-color="#1B6AB6" />
-          <stop offset="0.8417" stop-color="#1A80B3" />
-          <stop offset="0.9079" stop-color="#199CB0" />
-          <stop offset="0.9663" stop-color="#18BBAD" />
-          <stop offset="1" stop-color="#17D1AA" />
+          <stop stopColor="#1D45BA" />
+          <stop offset="0.4204" stopColor="#1D47BA" />
+          <stop offset="0.5718" stopColor="#1D4EB9" />
+          <stop offset="0.6797" stopColor="#1C59B8" />
+          <stop offset="0.767" stopColor="#1B6AB6" />
+          <stop offset="0.8417" stopColor="#1A80B3" />
+          <stop offset="0.9079" stopColor="#199CB0" />
+          <stop offset="0.9663" stopColor="#18BBAD" />
+          <stop offset="1" stopColor="#17D1AA" />
         </linearGradient>
         <linearGradient
           id="paint17_linear_1598_4400"
@@ -400,15 +400,15 @@ export const Abstein = () => {
           y2="102.414"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#1D45BA" />
-          <stop offset="0.4204" stop-color="#1D47BA" />
-          <stop offset="0.5718" stop-color="#1D4EB9" />
-          <stop offset="0.6797" stop-color="#1C59B8" />
-          <stop offset="0.767" stop-color="#1B6AB6" />
-          <stop offset="0.8417" stop-color="#1A80B3" />
-          <stop offset="0.9079" stop-color="#199CB0" />
-          <stop offset="0.9663" stop-color="#18BBAD" />
-          <stop offset="1" stop-color="#17D1AA" />
+          <stop stopColor="#1D45BA" />
+          <stop offset="0.4204" stopColor="#1D47BA" />
+          <stop offset="0.5718" stopColor="#1D4EB9" />
+          <stop offset="0.6797" stopColor="#1C59B8" />
+          <stop offset="0.767" stopColor="#1B6AB6" />
+          <stop offset="0.8417" stopColor="#1A80B3" />
+          <stop offset="0.9079" stopColor="#199CB0" />
+          <stop offset="0.9663" stopColor="#18BBAD" />
+          <stop offset="1" stopColor="#17D1AA" />
         </linearGradient>
         <linearGradient
           id="paint18_linear_1598_4400"
@@ -418,12 +418,12 @@ export const Abstein = () => {
           y2="188.328"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint19_linear_1598_4400"
@@ -433,12 +433,12 @@ export const Abstein = () => {
           y2="188.328"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
       </defs>
     </svg>

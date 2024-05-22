@@ -7,8 +7,8 @@
         <rect id="path-1" x="0" y="0" width="480" height="230" rx="8"></rect>
         <rect id="path-3" x="0" y="0" width="308" height="49.5625"></rect>
         <linearGradient x1="-6.10616698%" y1="-0.151651253%" x2="114.164042%" y2="90.9334744%" id="linearGradient-5">
-            <stop stop-color="#17D1AA" offset="0%"></stop>
-            <stop stop-color="#3154CA" offset="100%"></stop>
+            <stop stopColor="#17D1AA" offset="0%"></stop>
+            <stop stopColor="#3154CA" offset="100%"></stop>
         </linearGradient>
         <polygon id="path-6" points="0.21913125 0.0341860465 129.6295 0.0341860465 129.6295 105 0.21913125 105"></polygon>
         <polygon id="path-8" points="0 0.23558481 48.384805 0.23558481 48.384805 62.8632304 0 62.8632304"></polygon>

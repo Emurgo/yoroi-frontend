@@ -10,6 +10,7 @@ import SidebarContainer from '../../containers/SidebarContainer';
 import { Box, Typography } from '@mui/material';
 import { withLayout } from '../../styles/context/layout';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { ModalProvider } from '../context/ModalContext';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -32,13 +33,16 @@ class GeneralPageLayout extends Component<LayoutProps> {
     const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
 
     return (
-      <TopBarLayout
-        banner={<BannerContainer actions={actions} stores={stores} />}
-        sidebar={sidebarContainer}
-        navbar={navbar}
-      >
-        {children}
-      </TopBarLayout>
+      // TODO ModalProvider to be moved into APP after finish refactoring and bring everything in UI
+      <ModalProvider>
+        <TopBarLayout
+          banner={<BannerContainer actions={actions} stores={stores} />}
+          sidebar={sidebarContainer}
+          navbar={navbar}
+        >
+          {children}
+        </TopBarLayout>
+      </ModalProvider>
     );
   }
 }

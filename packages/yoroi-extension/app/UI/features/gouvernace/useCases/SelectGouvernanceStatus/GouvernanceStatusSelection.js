@@ -14,6 +14,7 @@ import { NoConfidance } from '../../common/ilustrations/NoConfidance';
 import { Stack } from '@mui/material';
 import { Button } from '@mui/material';
 import Link from '@mui/material/Link';
+import { useModal } from '../../../../context/ModalContext';
 
 type Props = {|
   title: string,
@@ -75,6 +76,7 @@ const GovernanceCard = ({ title, description, icon, selected, onClick }: Props) 
 export const GouvernanceStatusSelection = (): Node => {
   const [selectedCard, setSelectedCard] = useState(null);
   const { gouvernanceStatus } = useGouvernance();
+  const { openModal } = useModal();
 
   console.log('Test gouvernanceStatus', gouvernanceStatus);
 
@@ -87,6 +89,13 @@ export const GouvernanceStatusSelection = (): Node => {
 
   const hasDRep = gouvernanceStatus === 'drep';
 
+  const confirmDRep = drep => {
+    console.log('TEST', drep);
+  };
+
+  const onChoosDRepClick = () => {
+    openModal('UploadModal', { title: 'avatar', confirmDRep });
+  };
   const handleCardClick = card => {
     setSelectedCard(card);
   };
@@ -105,17 +114,17 @@ export const GouvernanceStatusSelection = (): Node => {
           description="You are designating someone else to cast your vote on your behalf for all proposals now and in the future."
           icon={<DRepIlustration />}
           selected={selectedCard === 'drep'}
-          onClick={() => handleCardClick('drep')}
+          onClick={() => onChoosDRepClick()}
         />
         <GovernanceCard
-          title="No Vote"
+          title="Abstain"
           description="You are choosing not to cast a vote on all proposals now and in the future."
           icon={<Abstein />}
           selected={selectedCard === 'no-vote'}
           onClick={() => handleCardClick('no-vote')}
         />
         <GovernanceCard
-          title="Lack of Trust"
+          title="No Confidence"
           description="You are expressing a lack of trust for all proposals now and in the future."
           icon={<NoConfidance />}
           selected={selectedCard === 'lack-of-trust'}

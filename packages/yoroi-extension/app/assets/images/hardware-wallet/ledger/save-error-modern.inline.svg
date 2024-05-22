@@ -7,18 +7,18 @@
         <rect id="path-1" x="0" y="0" width="480" height="230" rx="8"></rect>
         <rect id="path-3" x="0" y="0" width="302" height="48.6273585"></rect>
         <linearGradient x1="-6.10616698%" y1="-0.151651253%" x2="114.164042%" y2="90.9334744%" id="linearGradient-5">
-            <stop stop-color="#17D1AA" offset="0%"></stop>
-            <stop stop-color="#3154CA" offset="100%"></stop>
+            <stop stopColor="#17D1AA" offset="0%"></stop>
+            <stop stopColor="#3154CA" offset="100%"></stop>
         </linearGradient>
         <polygon id="path-6" points="0.214074375 0.0335410268 126.63805 0.0335410268 126.63805 103.018868 0.214074375 103.018868"></polygon>
         <linearGradient x1="120.762473%" y1="95.6915912%" x2="-14.6812098%" y2="-5.07031544%" id="linearGradient-8">
-            <stop stop-color="#17D1AA" offset="0%"></stop>
-            <stop stop-color="#229DB7" offset="58.3425681%"></stop>
-            <stop stop-color="#3154CA" offset="100%"></stop>
+            <stop stopColor="#17D1AA" offset="0%"></stop>
+            <stop stopColor="#229DB7" offset="58.3425681%"></stop>
+            <stop stopColor="#3154CA" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="56.6978106%" y1="100%" x2="73.1751067%" y2="-11.2783395%" id="linearGradient-9">
-            <stop stop-color="#17D1AA" offset="0%"></stop>
-            <stop stop-color="#3154CA" offset="100%"></stop>
+            <stop stopColor="#17D1AA" offset="0%"></stop>
+            <stop stopColor="#3154CA" offset="100%"></stop>
         </linearGradient>
     </defs>
     <g id="save-error.inline" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">

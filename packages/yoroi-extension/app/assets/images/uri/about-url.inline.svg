@@ -5,67 +5,67 @@
     <desc>Created with Sketch.</desc>
     <defs>
         <linearGradient x1="-9.07742215%" y1="46.4545323%" x2="126.688495%" y2="54.5434405%" id="linearGradient-1">
-            <stop stop-color="#17D1AA" offset="0%"></stop>
-            <stop stop-color="#1CB9B0" offset="22.74%"></stop>
-            <stop stop-color="#297DC0" offset="70.39%"></stop>
-            <stop stop-color="#3154CB" offset="100%"></stop>
+            <stop stopColor="#17D1AA" offset="0%"></stop>
+            <stop stopColor="#1CB9B0" offset="22.74%"></stop>
+            <stop stopColor="#297DC0" offset="70.39%"></stop>
+            <stop stopColor="#3154CB" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="0.00851266809%" y1="49.9960344%" x2="99.978254%" y2="49.9960344%" id="linearGradient-2">
-            <stop stop-color="#17D1AA" offset="0%"></stop>
-            <stop stop-color="#1AC2AE" offset="6.594372%"></stop>
-            <stop stop-color="#229BB8" offset="26.51%"></stop>
-            <stop stop-color="#297CC0" offset="46.16%"></stop>
-            <stop stop-color="#2D66C6" offset="65.25%"></stop>
-            <stop stop-color="#3059CA" offset="83.49%"></stop>
-            <stop stop-color="#3154CB" offset="100%"></stop>
+            <stop stopColor="#17D1AA" offset="0%"></stop>
+            <stop stopColor="#1AC2AE" offset="6.594372%"></stop>
+            <stop stopColor="#229BB8" offset="26.51%"></stop>
+            <stop stopColor="#297CC0" offset="46.16%"></stop>
+            <stop stopColor="#2D66C6" offset="65.25%"></stop>
+            <stop stopColor="#3059CA" offset="83.49%"></stop>
+            <stop stopColor="#3154CB" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="0.00851266809%" y1="49.8853092%" x2="99.978254%" y2="49.8853092%" id="linearGradient-3">
-            <stop stop-color="#17D1AA" offset="0%"></stop>
-            <stop stop-color="#1AC2AE" offset="6.594372%"></stop>
-            <stop stop-color="#229BB8" offset="26.51%"></stop>
-            <stop stop-color="#297CC0" offset="46.16%"></stop>
-            <stop stop-color="#2D66C6" offset="65.25%"></stop>
-            <stop stop-color="#3059CA" offset="83.49%"></stop>
-            <stop stop-color="#3154CB" offset="100%"></stop>
+            <stop stopColor="#17D1AA" offset="0%"></stop>
+            <stop stopColor="#1AC2AE" offset="6.594372%"></stop>
+            <stop stopColor="#229BB8" offset="26.51%"></stop>
+            <stop stopColor="#297CC0" offset="46.16%"></stop>
+            <stop stopColor="#2D66C6" offset="65.25%"></stop>
+            <stop stopColor="#3059CA" offset="83.49%"></stop>
+            <stop stopColor="#3154CB" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="18.343486%" y1="43.0039432%" x2="180.164623%" y2="68.4053628%" id="linearGradient-4">
-            <stop stop-color="#17D1AA" offset="0%"></stop>
-            <stop stop-color="#1CB9B0" offset="22.74%"></stop>
-            <stop stop-color="#297DC0" offset="70.39%"></stop>
-            <stop stop-color="#3154CB" offset="100%"></stop>
+            <stop stopColor="#17D1AA" offset="0%"></stop>
+            <stop stopColor="#1CB9B0" offset="22.74%"></stop>
+            <stop stopColor="#297DC0" offset="70.39%"></stop>
+            <stop stopColor="#3154CB" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="-70.3333213%" y1="46.5434783%" x2="42.7397334%" y2="50.1209194%" id="linearGradient-5">
-            <stop stop-color="#17D1AA" offset="0%"></stop>
-            <stop stop-color="#1CB9B0" offset="22.74%"></stop>
-            <stop stop-color="#297DC0" offset="70.39%"></stop>
-            <stop stop-color="#3154CB" offset="100%"></stop>
+            <stop stopColor="#17D1AA" offset="0%"></stop>
+            <stop stopColor="#1CB9B0" offset="22.74%"></stop>
+            <stop stopColor="#297DC0" offset="70.39%"></stop>
+            <stop stopColor="#3154CB" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="0.0288027762%" y1="50.0177019%" x2="99.9779641%" y2="50.0177019%" id="linearGradient-6">
-            <stop stop-color="#17D1AA" offset="0%"></stop>
-            <stop stop-color="#1CB9B0" offset="22.74%"></stop>
-            <stop stop-color="#297DC0" offset="70.39%"></stop>
-            <stop stop-color="#3154CB" offset="100%"></stop>
+            <stop stopColor="#17D1AA" offset="0%"></stop>
+            <stop stopColor="#1CB9B0" offset="22.74%"></stop>
+            <stop stopColor="#297DC0" offset="70.39%"></stop>
+            <stop stopColor="#3154CB" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="0.00184478372%" y1="49.9969306%" x2="100.030725%" y2="49.9969306%" id="linearGradient-7">
-            <stop stop-color="#17D1AA" offset="0%"></stop>
-            <stop stop-color="#1AC2AE" offset="6.594372%"></stop>
-            <stop stop-color="#229BB8" offset="26.51%"></stop>
-            <stop stop-color="#297CC0" offset="46.16%"></stop>
-            <stop stop-color="#2D66C6" offset="65.25%"></stop>
-            <stop stop-color="#3059CA" offset="83.49%"></stop>
-            <stop stop-color="#3154CB" offset="100%"></stop>
+            <stop stopColor="#17D1AA" offset="0%"></stop>
+            <stop stopColor="#1AC2AE" offset="6.594372%"></stop>
+            <stop stopColor="#229BB8" offset="26.51%"></stop>
+            <stop stopColor="#297CC0" offset="46.16%"></stop>
+            <stop stopColor="#2D66C6" offset="65.25%"></stop>
+            <stop stopColor="#3059CA" offset="83.49%"></stop>
+            <stop stopColor="#3154CB" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="0.0282763407%" y1="19.0814015%" x2="99.9123218%" y2="80.9396623%" id="linearGradient-8">
-            <stop stop-color="#17D1AA" offset="0%"></stop>
-            <stop stop-color="#1CB9B0" offset="22.74%"></stop>
-            <stop stop-color="#297DC0" offset="70.39%"></stop>
-            <stop stop-color="#3154CB" offset="100%"></stop>
+            <stop stopColor="#17D1AA" offset="0%"></stop>
+            <stop stopColor="#1CB9B0" offset="22.74%"></stop>
+            <stop stopColor="#297DC0" offset="70.39%"></stop>
+            <stop stopColor="#3154CB" offset="100%"></stop>
         </linearGradient>
         <linearGradient x1="0.231247072%" y1="19.1454416%" x2="99.8821553%" y2="80.9274382%" id="linearGradient-9">
-            <stop stop-color="#17D1AA" offset="0%"></stop>
-            <stop stop-color="#1CB9B0" offset="22.74%"></stop>
-            <stop stop-color="#297DC0" offset="70.39%"></stop>
-            <stop stop-color="#3154CB" offset="100%"></stop>
+            <stop stopColor="#17D1AA" offset="0%"></stop>
+            <stop stopColor="#1CB9B0" offset="22.74%"></stop>
+            <stop stopColor="#297DC0" offset="70.39%"></stop>
+            <stop stopColor="#3154CB" offset="100%"></stop>
         </linearGradient>
     </defs>
     <g id="Design-1.7.1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
