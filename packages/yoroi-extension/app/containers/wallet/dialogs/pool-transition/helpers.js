@@ -1,8 +1,8 @@
 // @flow
-const ms_in_sec = 1000,
-  sec_in_day = 86400,
-  sec_in_hour = 3600,
-  sec_in_min = 60;
+const ms_in_sec = 1000;
+const sec_in_day = 86400;
+const sec_in_hour = 3600;
+const sec_in_min = 60;
 export const formatTimeSpan: number => string = (ms: number) => {
   if (ms < 0) return '';
 

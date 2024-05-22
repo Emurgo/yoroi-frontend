@@ -50,20 +50,6 @@ export type PoolMeta = {|
   |}>,
 |};
 
-type Pool = {|
-  id: string,
-  hash: string,
-  ticker: string,
-  name: string,
-  pic: ?string,
-  stake: string,
-  share: string,
-  roa: string,
-  saturation: string,
-  taxFix: string,
-  taxRatio: string,
-|};
-
 export type PoolTransition = {|
   currentPool: ?PoolInfo,
   deadlineMilliseconds: ?number,

@@ -4,14 +4,12 @@ import {
   Typography,
   Button,
   Grid,
-
-
+  Stack,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 import type { PoolTransition } from '../../../../stores/toplevel/DelegationStore';
 import { StakePoolCard } from './StakePoolCard';
-import { Stack } from '@mui/material';
 import { messages } from './dialog-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import Separator from '../../../../components/common/separator/Separator';
@@ -94,6 +92,7 @@ export const PoolTransitionDialog = ({
   );
 };
 
+// noinspection JSUnusedLocalSymbols
 const CustomButton = styled(Button)(({ theme, color }) => ({
   width: '100%',
   fontSize: '14px',
