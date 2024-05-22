@@ -78,9 +78,6 @@ export const GouvernanceStatusSelection = (): Node => {
   const { gouvernanceStatus, dRepId } = useGouvernance();
   const { openModal } = useModal();
 
-  console.log('gouvernanceStatus', gouvernanceStatus);
-  console.log('dRepId', dRepId);
-
   const pageTitle = gouvernanceStatus === 'none' ? 'Governance Status' : 'Governance status';
   const statusRawText = mapStatus[gouvernanceStatus];
   const pageSubtitle =
@@ -97,6 +94,31 @@ export const GouvernanceStatusSelection = (): Node => {
     setSelectedCard(card);
   };
 
+  const optionsList = [
+    {
+      title: 'Delegate to a Drep',
+      description:
+        'You are designating someone else to cast your vote on your behalf for all proposals now and in the future.',
+      icon: <DRepIlustration />,
+      selected: selectedCard === 'drep',
+      onClick: onChoosDRepClick,
+    },
+    {
+      title: 'Abstain',
+      description: 'You are choosing not to cast a vote on all proposals now and in the future.',
+      icon: <Abstein />,
+      selected: selectedCard === 'no-vote',
+      onClick: () => handleCardClick('no-vote'),
+    },
+    {
+      title: 'No Confidence',
+      description: 'You are expressing a lack of trust for all proposals now and in the future.',
+      icon: <NoConfidance />,
+      selected: selectedCard === 'lack-of-trust',
+      onClick: () => handleCardClick('lack-of-trust'),
+    },
+  ];
+
   return (
     <Container>
       <Typography variant="h3" fontWeight="500" mb={2} gutterBottom>
@@ -106,27 +128,18 @@ export const GouvernanceStatusSelection = (): Node => {
         {pageSubtitle}
       </Typography>
       <Box display="flex" justifyContent="center" gap="24px">
-        <GovernanceCard
-          title="Delegating to a DRep"
-          description="You are designating someone else to cast your vote on your behalf for all proposals now and in the future."
-          icon={<DRepIlustration />}
-          selected={selectedCard === 'drep'}
-          onClick={() => onChoosDRepClick()}
-        />
-        <GovernanceCard
-          title="Abstain"
-          description="You are choosing not to cast a vote on all proposals now and in the future."
-          icon={<Abstein />}
-          selected={selectedCard === 'no-vote'}
-          onClick={() => handleCardClick('no-vote')}
-        />
-        <GovernanceCard
-          title="No Confidence"
-          description="You are expressing a lack of trust for all proposals now and in the future."
-          icon={<NoConfidance />}
-          selected={selectedCard === 'lack-of-trust'}
-          onClick={() => handleCardClick('lack-of-trust')}
-        />
+        {optionsList.map((option, index) => {
+          return (
+            <GovernanceCard
+              key={index}
+              title={option.title}
+              description={option.description}
+              icon={option.icon}
+              selected={option.selected}
+              onClick={option.onClick}
+            />
+          );
+        })}
       </Box>
       {gouvernanceStatus === 'none' && (
         <Stack gap="17px" mt="42px">
