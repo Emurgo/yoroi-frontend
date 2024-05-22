@@ -24,7 +24,7 @@ const GouvernancePage = ({ stores, actions, children }: Props): any => {
           title={<NavBarTitle title={'Governance'} />}
         />
       }
-      menu={menu} // ADD a menu if needed (see example in SwapPageContainer)
+      // menu={menu} // ADD a menu if needed (see example in SwapPageContainer)
     >
       <GouvernanceContextProvider
         initialState={{

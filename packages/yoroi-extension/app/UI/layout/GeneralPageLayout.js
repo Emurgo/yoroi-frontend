@@ -10,8 +10,6 @@ import SidebarContainer from '../../containers/SidebarContainer';
 import { Box, Typography } from '@mui/material';
 import { withLayout } from '../../styles/context/layout';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import NavBarContainerRevamp from '../../containers/NavBarContainerRevamp';
-import NavBarTitle from '../../components/topbar/NavBarTitle';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -36,13 +34,7 @@ class GeneralPageLayout extends Component<LayoutProps> {
       <TopBarLayout
         banner={<BannerContainer actions={actions} stores={stores} />}
         sidebar={sidebarContainer}
-        navbar={
-          <NavBarContainerRevamp
-            actions={actions}
-            stores={stores}
-            title={<NavBarTitle title={'Governance'} />}
-          />
-        }
+        navbar={navbar}
       >
         {children}
       </TopBarLayout>
