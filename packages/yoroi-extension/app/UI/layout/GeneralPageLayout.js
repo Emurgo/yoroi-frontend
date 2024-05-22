@@ -14,6 +14,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 type Props = {|
   ...StoresAndActionsProps,
   +children?: Node,
+  navbar?: Node,
 |};
 
 type LayoutProps = {|

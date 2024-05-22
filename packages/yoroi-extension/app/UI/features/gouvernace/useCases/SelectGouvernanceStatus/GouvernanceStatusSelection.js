@@ -12,6 +12,8 @@ import { DRepIlustration } from '../../common/ilustrations/DRepIlustration';
 import { Abstein } from '../../common/ilustrations/Abstein';
 import { NoConfidance } from '../../common/ilustrations/NoConfidance';
 import { Stack } from '@mui/material';
+import { Button } from '@mui/material';
+import Link from '@mui/material/Link';
 
 type Props = {|
   title: string,
@@ -26,7 +28,7 @@ const Container = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   alignItems: 'center',
   textAlign: 'center',
-  paddingBottom: '24px',
+  paddingTop: '24px',
 }));
 
 const Description = styled(Typography)(({ theme }) => ({
@@ -35,12 +37,16 @@ const Description = styled(Typography)(({ theme }) => ({
 }));
 
 const StyledCard = styled(Stack)(({ theme, selected }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
   width: '294px',
-  borderRadius: '16px',
+  borderRadius: '8px',
   backgroundImage: theme.palette.ds?.bg_gradient_1,
   backgroundOrigin: 'border-box',
   boxShadow: 'inset 0 100vw white',
   border: '2px solid transparent',
+  cursor: 'pointer',
 }));
 
 const IconContainer = styled(Box)(({ theme }) => ({
@@ -73,11 +79,13 @@ export const GouvernanceStatusSelection = (): Node => {
   console.log('Test gouvernanceStatus', gouvernanceStatus);
 
   const pageTitle = gouvernanceStatus === 'none' ? 'Governance Status' : 'Governance status';
-  const status = mapStatus[gouvernanceStatus];
+  const statusRawText = mapStatus[gouvernanceStatus];
   const pageSubtitle =
     gouvernanceStatus === 'none'
       ? 'Review the selections carefully to assign yourself a Governance Status'
-      : `You have selected ${status} as your governance status. You can change it at any time by clicking in the card bellow`;
+      : `You have selected ${statusRawText} as your governance status. You can change it at any time by clicking in the card bellow`;
+
+  const hasDRep = gouvernanceStatus === 'drep';
 
   const handleCardClick = card => {
     setSelectedCard(card);
@@ -114,10 +122,26 @@ export const GouvernanceStatusSelection = (): Node => {
           onClick={() => handleCardClick('lack-of-trust')}
         />
       </Box>
-      {selectedCard && (
-        <Typography variant="body2" align="center" color="textSecondary" gutterBottom>
-          Drep ID: drep1c93a2zvs3aw8e4naez0ynpmc48jbc7yaa3n2k8ljhwfdt70yscts
-        </Typography>
+      {gouvernanceStatus === 'none' && (
+        <Stack gap="17px" mt="42px">
+          <Link href="#" variant="body1">
+            Want to became a Drep?
+          </Link>
+          <Link href="#" variant="body1">
+            Learn more About Governance
+          </Link>
+        </Stack>
+      )}
+
+      {hasDRep && (
+        <Stack gap="17px" mt="42px">
+          <Typography variant="body2" align="center" color="textSecondary" gutterBottom>
+            Drep ID: drep1c93a2zvs3aw8e4naez0ynpmc48jbc7yaa3n2k8ljhwfdt70yscts
+          </Typography>
+          <Link href="#" variant="body1">
+            Learn more About Governance
+          </Link>
+        </Stack>
       )}
     </Container>
   );
