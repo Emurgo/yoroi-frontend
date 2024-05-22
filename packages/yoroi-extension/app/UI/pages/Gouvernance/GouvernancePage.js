@@ -1,7 +1,10 @@
 // @flow
 import GeneralPageLayout from '../../layout/GeneralPageLayout';
-import { Box } from '@mui/material';
-import { Typography } from '@mui/material';
+import { GouvernanceStatusSelection } from '../../features/gouvernace/useCases/SelectGouvernanceStatus/GouvernanceStatusSelection';
+import { GouvernanceContextProvider } from '../../features/gouvernace/module/GouvernanceContextProvider';
+import NavBarContainerRevamp from '../../../containers/NavBarContainerRevamp';
+import NavBar from '../../../components/topbar/NavBar';
+import NavBarTitle from '../../../components/topbar/NavBarTitle';
 
 type Props = {|
   stores: any,
@@ -11,10 +14,25 @@ type Props = {|
 
 const GouvernancePage = ({ stores, actions, children }: Props): any => {
   return (
-    <GeneralPageLayout stores={stores} actions={actions}>
-      <Box>
-        <Typography>Gouvernace page content</Typography>
-      </Box>
+    <GeneralPageLayout
+      stores={stores}
+      actions={actions}
+      navbar={
+        <NavBarContainerRevamp
+          actions={actions}
+          stores={stores}
+          title={<NavBarTitle title={'Governance'} />}
+        />
+      }
+      menu={menu} // ADD a menu if needed (see example in SwapPageContainer)
+    >
+      <GouvernanceContextProvider
+        initialState={{
+          gouvernanceStatus: 'none',
+        }}
+      >
+        <GouvernanceStatusSelection />
+      </GouvernanceContextProvider>
     </GeneralPageLayout>
   );
 };

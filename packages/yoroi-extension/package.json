@@ -187,6 +187,7 @@
     "dropbox": "4.0.30",
     "es6-error": "4.1.1",
     "file-saver": "2.0.5",
+    "immer": "^10.1.1",
     "jdenticon": "3.2.0",
     "lodash": "4.17.21",
     "lottie-react": "2.4.0",
@@ -221,7 +222,7 @@
     "util": "0.12.5"
   },
   "overrides": {
-    "@babel/helpers": "7.16.0"    
+    "@babel/helpers": "7.16.0"
   },
   "engineStrict": true,
   "engine": {

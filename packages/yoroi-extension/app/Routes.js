@@ -553,9 +553,5 @@ export function wrapReceive(receiveProps: StoresAndActionsProps, children: Node)
 
 // NEW UI - TODO: to be refactred
 export function wrapGouvernance(gouvernanceProps: StoresAndActionsProps, children: Node): Node {
-  return (
-    <Settings {...gouvernanceProps}>
-      <Suspense fallback={null}>{children}</Suspense>
-    </Settings>
-  );
+  return <Suspense fallback={null}>{children}</Suspense>;
 }
