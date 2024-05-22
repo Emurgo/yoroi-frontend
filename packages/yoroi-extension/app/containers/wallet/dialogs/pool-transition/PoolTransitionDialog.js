@@ -92,8 +92,7 @@ export const PoolTransitionDialog = ({
   );
 };
 
-// noinspection JSUnusedLocalSymbols
-const CustomButton = styled(Button)(({ theme, color }) => ({
+const CustomButton = styled(Button)(({ _theme, _color }) => ({
   width: '100%',
   fontSize: '14px',
   marginLeft: '24px',
