@@ -9,6 +9,8 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import { CustomModal } from '../../../components/modals/CustomModal';
 import { useGouvernance } from '../module/GouvernanceContextProvider';
+import { useHistory } from 'react-router-dom';
+import { ROUTES } from '../../../../routes-config';
 
 type ChooseDRepModallProps = {|
   onClose: () => void,
@@ -21,10 +23,12 @@ type ChooseDRepModallProps = {|
 export const ChooseDRepModal = ({ onClose, title }: ChooseDRepModallProps): Node => {
   const [drepId, setDrepId] = React.useState('');
   const { dRepIdChanged, gouvernanceStatusChanged } = useGouvernance();
+  const history = useHistory();
 
   const confirmDRep = () => {
     // TODO add spcecific validation if needed
     dRepIdChanged(drepId);
+    history.push('/gouvernance/delagation');
   };
 
   return (

@@ -499,7 +499,6 @@ const GouvernanceSubpages = (stores, actions) => (
         <GouvernanceDelegationFormPage {...props} stores={stores} actions={actions} />
       )}
     />
-    <Redirect to={ROUTES.Gouvernance.ROOT} />
   </Switch>
 );
 

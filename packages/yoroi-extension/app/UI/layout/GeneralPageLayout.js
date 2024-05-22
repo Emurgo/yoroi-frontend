@@ -40,8 +40,7 @@ class GeneralPageLayout extends Component<LayoutProps> {
           gouvernanceStatus: 'none',
         }}
       >
-        // TODO ModalProvider to be moved into APP after finish refactoring and bring everything in
-        UI
+        {/* TODO ModalProvider to be moved into APP after finish refactoring and bring everything in UI */}
         <ModalProvider>
           <ModalManager />
           <TopBarLayout
