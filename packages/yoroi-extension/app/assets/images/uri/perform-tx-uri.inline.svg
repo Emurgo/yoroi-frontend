@@ -20,7 +20,7 @@
             <stop stopColor="#3154CA" offset="100%"></stop>
         </linearGradient>
     </defs>
-    <g id="-perform-tx-url.inline" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+    <g id="-perform-tx-url.inline" stroke="none" stroke-width="1" fill="none" fillRule="evenodd">
         <g id="Group-36" transform="translate(11.000000, 12.000000)">
             <g id="Group-9" opacity="0.20186942" stroke="#1D45BA" stroke-width="0.5">
                 <path d="M82.9424108,134.323949 L243.972492,41.6727883" id="Stroke-1"></path>

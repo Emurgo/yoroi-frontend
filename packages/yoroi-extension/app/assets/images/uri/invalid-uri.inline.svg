@@ -10,7 +10,7 @@
             <stop stopColor="#17D1AA" offset="100%"></stop>
         </linearGradient>
     </defs>
-    <g id="invalid-url.inline" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+    <g id="invalid-url.inline" stroke="none" stroke-width="1" fill="none" fillRule="evenodd">
         <g id="Group-20" transform="translate(12.000000, 12.000000)">
             <g id="Group-9" opacity="0.200000003" transform="translate(0.000000, 1.041286)" stroke="#1D45BA" stroke-width="0.5">
                 <path d="M82.2014345,132.68901 L241.793716,41.1655631" id="Stroke-1"></path>

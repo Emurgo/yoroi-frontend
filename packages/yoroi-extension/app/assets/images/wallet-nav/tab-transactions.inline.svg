@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <title>icon / transactions@1x</title>
-    <g id="icon-/-transactions" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+    <g id="icon-/-transactions" stroke="none" stroke-width="1" fill="none" fillRule="evenodd" stroke-linecap="round" stroke-linejoin="round">
         <g id="icon" transform="translate(2.000000, 2.000000)" stroke="currentcolor" stroke-width="1.5">
             <path d="M17.0124,16.7342 C15.2934,18.5262 12.8744,19.6412 10.1954,19.6412 C4.9784,19.6412 0.7504,15.4122 0.7504,10.1952 C0.7504,4.9792 4.9784,0.7502 10.1954,0.7502 C15.4124,0.7502 19.6414,4.9792 19.6414,10.1952" id="Stroke-1"></path>
             <line x1="6.3264" y1="9.0823" x2="13.9714" y2="9.0823" id="Stroke-3"></line>

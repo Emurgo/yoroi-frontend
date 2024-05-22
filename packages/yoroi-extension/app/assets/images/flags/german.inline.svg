@@ -6,7 +6,7 @@
     <defs>
         <circle id="path-1" cx="8" cy="8" r="8"></circle>
     </defs>
-    <g id="germany" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+    <g id="germany" stroke="none" stroke-width="1" fill="none" fillRule="evenodd">
         <g id="ru-copy-2" transform="translate(1.000000, 1.000000)">
             <g id="Group">
                 <mask id="mask-2" fill="white">
