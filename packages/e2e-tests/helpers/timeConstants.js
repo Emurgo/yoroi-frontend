@@ -1,0 +1,12 @@
+export const quarterSecond = 250;
+export const halfSecond = 500;
+export const oneSecond = 1000;
+export const defaultRepeatPeriod = oneSecond;
+export const twoSeconds = 2 * oneSecond;
+export const threeSeconds = 3 * oneSecond;
+export const fiveSeconds = 5 * oneSecond;
+export const defaultWaitTimeout = 10 * oneSecond;
+export const quarterMinute = 15 * oneSecond;
+export const halfMinute = 30 * oneSecond;
+export const oneMinute = 60 * oneSecond;
+export const fiveMinute = 5 * oneMinute;
