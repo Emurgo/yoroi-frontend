@@ -37,6 +37,7 @@ export type Props = {|
   +className?: string,
   +scrollableContentClass?: string,
   +styleOverride?: { ... },
+  +styleContentOverride?: { ... },
   +onClose?: ?(void) => PossiblyAsync<void>,
   +closeOnOverlayClick?: boolean,
   +isRevampLayout?: boolean,
@@ -143,6 +144,7 @@ function Dialog(props: Props & InjectedProps): Node {
             pt={styleFlags?.contentNoTopPadding ? '0px !important' : undefined}
             pb={contentHasScroll || !hasActions ? '24px' : '0px !important'}
             className="ModalContent"
+            style={props.styleContentOverride}
           >
             {children}
           </ModalContent>
