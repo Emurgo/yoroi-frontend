@@ -5,8 +5,7 @@ import moment from 'moment/moment';
 import Store from './Store';
 import Request from '../lib/LocalizedRequest';
 import environment from '../../environment';
-import { THEMES } from '../../styles/utils';
-import type { Theme } from '../../styles/utils';
+import { getCSSCustomPropObject} from '../../styles/utils';
 import { LANGUAGES } from '../../i18n/translations';
 import type { LanguageType } from '../../i18n/translations';
 import type { SetCustomUserThemeRequest } from '../../api/localStorage/index';
@@ -18,13 +17,16 @@ import BaseProfileActions from '../../actions/base/base-profile-actions';
 import { CURRENT_TOS_VERSION } from '../../i18n/locales/terms-of-use/ada/index';
 import { ampli } from '../../../ampli/index';
 import type { LoadOptionsWithEnvironment } from '../../../ampli/index';
+import { noop } from '../../coreUtils';
+import type { Theme } from '../../styles/themes';
+import { THEMES } from '../../styles/themes';
 
 interface CoinPriceStore {
   refreshCurrentUnit: Request<(void) => Promise<void>>;
 }
 
 interface LoadingStore {
-  +registerBlockingLoadingRequest: (promise: Promise<void>) => void
+  +registerBlockingLoadingRequest: (promise: Promise<void>, name: string) => void
 }
 
 export default class BaseProfileStore
@@ -193,43 +195,49 @@ export default class BaseProfileStore
       this._updateMomentJsLocaleAfterLocaleChange,
     ]);
     this._getSelectComplexityLevel(); // eagerly cache
-    this.currentTheme; // eagerly cache (note: don't remove -- getter is stateful)
-    this.isRevampAnnounced;
-    this.didUserMigratedToRevampTheme;
+    noop(this.currentTheme); // eagerly cache (note: don't remove -- getter is stateful)
+    noop(this.isRevampAnnounced);
+    noop(this.didUserMigratedToRevampTheme);
     this.stores.loading.registerBlockingLoadingRequest(
-      this._loadAcceptedTosVersion()
+      this._loadAcceptedTosVersion(),
+      'load-tos-version',
     );
     this.stores.loading.registerBlockingLoadingRequest(
-      (async () => {
-        const option = await this.getIsAnalyticsAllowed.execute()
-        const AMPLI_FLUSH_INTERVAL_MS = 5000;
-        await ampli.load(({
-          environment: environment.isProduction() ? 'production' : 'development',
-          client: {
-            configuration: {
-              optOut: !option,
-              flushIntervalMillis: AMPLI_FLUSH_INTERVAL_MS,
-              trackingOptions: {
-                ipAddress: false,
-              },
-              defaultTracking: false,
-            },
-          },
-        }: LoadOptionsWithEnvironment)).promise;
+      this._loadWhetherAnalyticsAllowed(),
+      'load-analytics-flag',
+    );
+  }
 
-        if (environment.isDev()) {
-          ampli.client.add({
-            name: 'info-plugin',
-            type: 'enrichment',
-            setup: () => Promise.resolve(),
-            execute: async (event) => {
-              console.info('[metrics]', event.event_type, event.event_properties)
-              return Promise.resolve(event)
-            },
-          });
-        }
-      })()
-    );
+  _loadWhetherAnalyticsAllowed: () => Promise<void> = async () => {
+    const isAnalyticsAllowed = await this.getIsAnalyticsAllowed.execute();
+    const AMPLI_FLUSH_INTERVAL_MS = 5000;
+    if (ampli.load == null || typeof ampli.load !== 'function') {
+      throw new Error(`ampli.load is not available or not a function (${typeof ampli.load})`)
+    }
+    await ampli.load(({
+      environment: environment.isProduction() ? 'production' : 'development',
+      client: {
+        configuration: {
+          optOut: !isAnalyticsAllowed,
+          flushIntervalMillis: AMPLI_FLUSH_INTERVAL_MS,
+          trackingOptions: {
+            ipAddress: false,
+          },
+          defaultTracking: false,
+        },
+      },
+    }: LoadOptionsWithEnvironment)).promise;
+    if (environment.isDev()) {
+      ampli.client.add({
+        name: 'info-plugin',
+        type: 'enrichment',
+        setup: () => Promise.resolve(),
+        execute: async (event) => {
+          console.info('[metrics]', event.event_type, event.event_properties)
+          return Promise.resolve(event)
+        },
+      });
+    }
   }
 
   teardown(): void {
@@ -416,7 +424,6 @@ export default class BaseProfileStore
   };
 
   _exportTheme: void => Promise<void> = async () => {
-    const { getCSSCustomPropObject } = require(`../../styles/utils`);
     const cssCustomPropObject = getCSSCustomPropObject();
     await this.unsetCustomThemeRequest.execute();
     await this.setCustomThemeRequest.execute({
@@ -562,10 +569,10 @@ export default class BaseProfileStore
     return this.getUnitOfAccountRequest.wasExecuted && this.getUnitOfAccountRequest.result !== null;
   }
 
-  _onOptForAnalytics: (boolean) => void = (option) => {
-    this.getIsAnalyticsAllowed.patch(_ => option);
-    this.api.localStorage.saveIsAnalysticsAllowed(option);
-    ampli.client.setOptOut(!option);
+  _onOptForAnalytics: (boolean) => void = (isAnalyticsAllowed) => {
+    this.getIsAnalyticsAllowed.patch(_ => isAnalyticsAllowed);
+    this.api.localStorage.saveIsAnalysticsAllowed(isAnalyticsAllowed);
+    ampli.client.setOptOut(!isAnalyticsAllowed);
   }
 
   @computed get isAnalyticsOpted(): boolean {

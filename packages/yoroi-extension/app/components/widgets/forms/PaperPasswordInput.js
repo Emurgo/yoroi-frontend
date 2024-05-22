@@ -18,6 +18,7 @@ type Props = {|
 |};
 
 @observer
+// <TODO:PENDING_REMOVAL> paper
 export default class PaperPasswordInput extends Component<Props> {
 
   static defaultProps: {|initValues: void|} = {

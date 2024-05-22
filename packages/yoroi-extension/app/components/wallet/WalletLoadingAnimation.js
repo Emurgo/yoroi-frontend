@@ -39,7 +39,7 @@ function WalletLoadingAnimation(props: Props & Intl): Node {
       >
         {View}
       </Box>
-      <Typography
+      <Typography component="div"
         variant="h1"
         mt="25px"
         color="primary.600"

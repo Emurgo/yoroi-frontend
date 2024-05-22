@@ -1,35 +1,24 @@
 // @flow
 
-import { observable, action, runInAction } from 'mobx';
+import { action, observable, runInAction } from 'mobx';
 import Store from '../base/Store';
 
-import type {
-  PaperWalletRestoreMeta,
-  RestoreModeType,
-} from '../../actions/common/wallet-restore-actions';
-import type { PlateResponse } from '../../api/common/lib/crypto/plate';
-import { unscramblePaperAdaMnemonic } from '../../api/ada/lib/cardanoCrypto/paperWallet';
+import type { RestoreModeType, WalletRestoreMeta, } from '../../actions/common/wallet-restore-actions';
+import type { PlateResponse } from '../../api/ada/lib/cardanoCrypto/plate';
 import { generateShelleyPlate } from '../../api/ada/lib/cardanoCrypto/plate';
-import { generateErgoPlate } from '../../api/ergo/lib/crypto/plate';
-import { HARD_DERIVATION_START } from '../../config/numbersConfig';
-import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import { CoinTypes, HARD_DERIVATION_START, WalletTypePurpose } from '../../config/numbersConfig';
 import {
+  generateWalletRootKey as cardanoGenerateWalletRootKey,
   generateWalletRootKey as generateAdaWalletRootKey,
-  generateLedgerWalletRootKey,
 } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
-import { generateWalletRootKey as generateErgoWalletRootKey } from '../../api/ergo/lib/crypto/wallet';
-import { getApiForNetwork } from '../../api/common/utils';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import {
-  isCardanoHaskell,
-  isErgo,
-} from '../../api/ada/lib/storage/database/prepackaged/networks';
-import { defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
+import { defineMessages } from 'react-intl';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import { isWalletExist } from '../../api/ada/lib/cardanoCrypto/utils';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
+import AdaApi from '../../api/ada';
+import { asGetPublicKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 
 const messages = defineMessages({
   walletRestoreVerifyAccountIdLabel: {
@@ -51,7 +40,6 @@ const messages = defineMessages({
 });
 
 export const NUMBER_OF_VERIFIED_ADDRESSES = 1;
-export const NUMBER_OF_VERIFIED_ADDRESSES_PAPER = 5;
 
 export const RestoreSteps = Object.freeze({
   START: 0,
@@ -67,15 +55,44 @@ export type PlateWithMeta = {|
   addressMessage: $Exact<$npm$ReactIntl$MessageDescriptor>,
 |};
 
+export async function isWalletExist(
+  publicDerivers: Array<PublicDeriver<>>,
+  recoveryPhrase: string,
+  accountIndex: number,
+  selectedNetwork: $ReadOnly<NetworkRow>
+): Promise<PublicDeriver<> | void> {
+  const rootPk = cardanoGenerateWalletRootKey(recoveryPhrase);
+  const accountPublicKey = rootPk
+    .derive(WalletTypePurpose.CIP1852)
+    .derive(CoinTypes.CARDANO)
+    .derive(accountIndex)
+    .to_public();
+  const publicKey = Buffer.from(accountPublicKey.as_bytes()).toString('hex');
+
+  for (const deriver of publicDerivers) {
+    const withPubKey = asGetPublicKey(deriver);
+    if (withPubKey == null) return;
+    const existedPublicKey = await withPubKey.getPublicKey();
+    const walletNetwork = deriver.getParent().getNetworkInfo();
+    /**
+     * We will still allow to restore the wallet on a different networks even they are
+     * sharing the same recovery phrase but we are treating them differently
+     */
+    if (
+      publicKey === existedPublicKey.Hash &&
+      walletNetwork.NetworkId === selectedNetwork.NetworkId
+    )
+      return deriver;
+  }
+}
+
 export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> {
   @observable selectedAccount: number = 0 + HARD_DERIVATION_START;
 
   @observable step: RestoreStepsType;
 
   // only to handle the back button
-  @observable walletRestoreMeta: void | PaperWalletRestoreMeta;
-
-  @observable mode: void | RestoreModeType;
+  @observable walletRestoreMeta: void | WalletRestoreMeta;
 
   @observable recoveryResult: void | {|
     phrase: string,
@@ -90,11 +107,6 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
     const actions = this.actions.walletRestore;
     actions.submitFields.listen(this._processRestoreMeta);
     actions.verifyMnemonic.listen(this._verifyMnemonic);
-    actions.setMode.listen(mode =>
-      runInAction(() => {
-        this.mode = mode;
-      })
-    );
     actions.reset.listen(this.reset);
     actions.back.listen(this._back);
   }
@@ -109,44 +121,18 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
   };
 
   @action
-  _processRestoreMeta: PaperWalletRestoreMeta => Promise<void> = async restoreMeta => {
+  _processRestoreMeta: WalletRestoreMeta => Promise<void> = async restoreMeta => {
     this.walletRestoreMeta = restoreMeta;
 
-    let resolvedRecoveryPhrase = restoreMeta.recoveryPhrase;
-
-    if (this.mode === undefined) {
-      throw new Error(`${nameof(this._processRestoreMeta)} ${nameof(this.mode)} unset`);
-    }
-    const mode = this.mode;
-    if (!mode.length) {
-      throw new Error(
-        `${nameof(AdaWalletRestoreStore)}::${nameof(this._processRestoreMeta)} missing length`
-      );
-    }
-    const wordCount = mode.length;
-    if (mode.extra === 'paper') {
-      const [newPhrase] = unscramblePaperAdaMnemonic(
-        restoreMeta.recoveryPhrase,
-        wordCount,
-        restoreMeta.paperPassword
-      );
-      if (newPhrase == null) {
-        throw new Error(`
-          ${nameof(
-            this._processRestoreMeta
-          )} Failed to restore a paper wallet! Invalid recovery phrase!
-        `);
-      }
-      resolvedRecoveryPhrase = newPhrase;
-    }
+    const resolvedRecoveryPhrase = restoreMeta.recoveryPhrase;
 
     const { selectedNetwork } = this.stores.profile;
     if (selectedNetwork == null)
       throw new Error(`${nameof(this._processRestoreMeta)} no network selected`);
+
     const plates = generatePlates(
       resolvedRecoveryPhrase,
       this.selectedAccount,
-      mode,
       selectedNetwork
     );
 
@@ -162,7 +148,6 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
     const accountIndex = this.stores.walletRestore.selectedAccount;
     const duplicatedWallet = await isWalletExist(
       wallets,
-      mode.type,
       resolvedRecoveryPhrase,
       accountIndex,
       selectedNetwork
@@ -193,7 +178,6 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
 
   @action.bound
   reset(): void {
-    this.mode = undefined;
     this.step = RestoreSteps.START;
     this.walletRestoreMeta = undefined;
     this.recoveryResult = undefined;
@@ -204,65 +188,28 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
     mnemonic: string,
     mode: RestoreModeType,
   |}) => boolean = request => {
-    const { selectedNetwork } = this.stores.profile;
-    if (selectedNetwork == null) throw new Error(`${nameof(this.isValidMnemonic)} no API selected`);
-    const api = getApiForNetwork(selectedNetwork);
-    return this.stores.substores[api].walletRestore.isValidMnemonic(request);
+    return AdaApi.isValidMnemonic({
+      mnemonic: request.mnemonic,
+      // $FlowIgnore[prop-missing]
+      numberOfWords: request.mode.length ?? 0,
+    });
   };
 }
 
 export function generatePlates(
   recoveryPhrase: string,
   accountIndex: number,
-  mode: RestoreModeType,
   network: $ReadOnly<NetworkRow>
 ): Array<PlateWithMeta> {
-  if (mode == null) throw new Error(`${nameof(generatePlates)} restore mode unset`);
-  const addressCount =
-    mode.extra === 'paper' ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER : NUMBER_OF_VERIFIED_ADDRESSES;
-
-  const plates = [];
-
-  const getCardanoKey = () => {
-    return mode.extra === 'ledger'
-      ? generateLedgerWalletRootKey(recoveryPhrase)
-      : generateAdaWalletRootKey(recoveryPhrase);
-  };
-
-  const shouldShowShelleyPlate = (() => {
-    return isCardanoHaskell(network) && mode.type === 'cip1852';
-  })();
-
-  if (shouldShowShelleyPlate) {
-    const shelleyPlate = generateShelleyPlate(
-      getCardanoKey(),
-      accountIndex - HARD_DERIVATION_START,
-      addressCount,
-      Number.parseInt(network.BaseConfig[0].ChainNetworkId, 10)
-    );
-    plates.push({
-      ...shelleyPlate,
-      checksumTitle: messages.walletRestoreVerifyShelleyAccountIdLabel,
-      addressMessage: messages.walletRestoreVerifyShelleyAddressesLabel,
-    });
-  }
-
-  if (isErgo(network)) {
-    const rootKey = generateErgoWalletRootKey(recoveryPhrase);
-    const plate = generateErgoPlate(
-      rootKey,
-      accountIndex - HARD_DERIVATION_START,
-      addressCount,
-      ((Number.parseInt(network.BaseConfig[0].ChainNetworkId, 10): any): $Values<
-        typeof RustModule.SigmaRust.NetworkPrefix
-      >)
-    );
-    plates.push({
-      ...plate,
-      checksumTitle: messages.walletRestoreVerifyAccountIdLabel,
-      addressMessage: messages.walletRestoreVerifyAddressesLabel,
-    });
-  }
-
-  return plates;
+  const shelleyPlate = generateShelleyPlate(
+    generateAdaWalletRootKey(recoveryPhrase),
+    accountIndex - HARD_DERIVATION_START,
+    NUMBER_OF_VERIFIED_ADDRESSES,
+    Number.parseInt(network.BaseConfig[0].ChainNetworkId, 10)
+  );
+  return [{
+    ...shelleyPlate,
+    checksumTitle: messages.walletRestoreVerifyShelleyAccountIdLabel,
+    addressMessage: messages.walletRestoreVerifyShelleyAddressesLabel,
+  }];
 }

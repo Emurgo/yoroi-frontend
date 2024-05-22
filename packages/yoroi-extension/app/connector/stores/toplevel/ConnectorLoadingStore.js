@@ -35,7 +35,7 @@ export default class ConnectorLoadingStore extends BaseLoadingStore<StoresMap, A
   }
 
   getTabIdKey(): string {
-    return TabIdKeys.ErgoConnector;
+    return TabIdKeys.YoroiConnector;
   }
 
   getDatabase(): ?lf$Database {

@@ -40,16 +40,16 @@ export default class MangledHeader extends Component<Props> {
         <WarningHeader
           message={(
             <>
-              <p>
+              <div>
                 {intl.formatMessage(
                   messages.warning1,
                   { ticker: this.props.ticker }
                 )}
-              </p><br />
-              <p>
+              </div><br />
+              <div>
                 {intl.formatMessage(addressSubgroupName.mangled)}&nbsp;
                 <FormattedHTMLMessage {...globalMessages.auditAddressWarning} />
-              </p>
+              </div>
             </>
           )}
         >

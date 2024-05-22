@@ -1,13 +1,11 @@
 // @flow
 import type { Node, ComponentType } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { InjectedOrGenerated } from '../../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../../types/injectedProps.types';
 import type { StepsList } from '../../../../components/wallet/voting/types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { computed } from 'mobx';
 import { intlShape } from 'react-intl';
-import { ProgressInfo } from '../../../../stores/ada/VotingStore';
 import { withLayout } from '../../../../styles/context/layout';
 import globalMessages from '../../../../i18n/global-messages';
 import DialogCloseButton from '../../../../components/widgets/DialogCloseButton';
@@ -16,10 +14,8 @@ import LocalizableError from '../../../../i18n/LocalizableError';
 import ErrorBlock from '../../../../components/widgets/ErrorBlock';
 import RegisterDialog from '../../../../components/wallet/voting/RegisterDialog';
 
-export type GeneratedData = typeof RegisterDialogContainer.prototype.generated;
-
 type Props = {|
-  ...InjectedOrGenerated<GeneratedData>,
+  ...StoresAndActionsProps,
   +stepsList: StepsList,
   +submit: void => PossiblyAsync<void>,
   +cancel: void => void,
@@ -28,11 +24,11 @@ type Props = {|
   +classicTheme: boolean,
 |};
 
-type InjectedProps = {|
+type InjectedLayoutProps = {|
   +isRevampLayout: boolean,
 |};
 
-type AllProps = {| ...Props, ...InjectedProps |};
+type AllProps = {| ...Props, ...InjectedLayoutProps |};
 
 @observer
 class RegisterDialogContainer extends Component<AllProps> {
@@ -42,7 +38,7 @@ class RegisterDialogContainer extends Component<AllProps> {
 
   render(): Node {
     const { submit, cancel, onError, classicTheme, stepsList } = this.props;
-    const votingStore = this.generated.stores.substores.ada.votingStore;
+    const votingStore = this.props.stores.substores.ada.votingStore;
 
     if (votingStore.createVotingRegTx.error != null) {
       return this._errorDialog(votingStore.createVotingRegTx.error);
@@ -56,7 +52,7 @@ class RegisterDialogContainer extends Component<AllProps> {
         progressInfo={votingStore.progressInfo}
         submit={async (walletPassword: string) => {
           try {
-            await this.generated.actions.ada.votingTransaction.createTransaction.trigger(
+            await this.props.actions.ada.voting.createTransaction.trigger(
               walletPassword
             );
             await submit();
@@ -95,66 +91,6 @@ class RegisterDialogContainer extends Component<AllProps> {
       </Dialog>
     );
   };
-
-  @computed get generated(): {|
-    actions: {|
-      ada: {|
-        votingTransaction: {|
-          createTransaction: {|
-            trigger: (params: string) => Promise<void>,
-          |},
-        |},
-      |},
-    |},
-    stores: {|
-      substores: {|
-        ada: {|
-          votingStore: {|
-            isActionProcessing: boolean,
-            progressInfo: ProgressInfo,
-            error: ?LocalizableError,
-            createVotingRegTx: {|
-              error: ?LocalizableError,
-            |},
-          |},
-        |},
-      |},
-    |},
-  |} {
-    if (this.props.generated !== undefined) {
-      return this.props.generated;
-    }
-    if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(RegisterDialogContainer)} no way to generated props`);
-    }
-
-    const { stores, actions } = this.props;
-    return Object.freeze({
-      actions: {
-        ada: {
-          votingTransaction: {
-            createTransaction: {
-              trigger: actions.ada.voting.createTransaction.trigger,
-            },
-          },
-        },
-      },
-      stores: {
-        substores: {
-          ada: {
-            votingStore: {
-              isActionProcessing: stores.substores.ada.votingStore.isActionProcessing,
-              progressInfo: stores.substores.ada.votingStore.progressInfo,
-              error: stores.substores.ada.votingStore.error,
-              createVotingRegTx: {
-                error: stores.substores.ada.votingStore.createVotingRegTx.error,
-              },
-            },
-          },
-        },
-      },
-    });
-  }
 }
 
 export default (withLayout(RegisterDialogContainer): ComponentType<Props>);

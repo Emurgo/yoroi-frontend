@@ -64,15 +64,15 @@ export default class Crashed extends Component<Props> {
     );
 
     return (
-      <p>
-        <Typography sx={{ textAlign: 'justify', mb: '15px' }}>
+      <div>
+        <Typography component="div" sx={{ textAlign: 'justify', mb: '15px' }}>
           <FormattedMessage {...globalMessages.forMoreHelp} values={{ supportRequestLink }} />
         </Typography>
 
-        <Typography variant="subtitle2" sx={{ textAlign: 'justify' }}>
+        <Typography component="div" variant="subtitle2" sx={{ textAlign: 'justify' }}>
           <FormattedMessage {...globalMessages.logsContent} values={{ downloadLogsLink }} />
         </Typography>
-      </p>
+      </div>
     );
   };
 }

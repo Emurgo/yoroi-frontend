@@ -2,19 +2,12 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { computed } from 'mobx';
-import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import WalletSendConfirmationDialog from '../../../components/wallet/send/WalletSendConfirmationDialog';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
-import LocalizableError from '../../../i18n/LocalizableError';
-import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
-import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
 import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
-import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
 import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
-
-export type GeneratedData = typeof WalletSendConfirmationDialogContainer.prototype.generated;
 
 // TODO: unmagic the constants
 const MAX_VALUE_BYTES = 5000;
@@ -26,7 +19,7 @@ type DialogProps = {|
   +unitOfAccountSetting: UnitOfAccountSettingType,
 |};
 type Props = {|
-  ...InjectedOrGenerated<GeneratedData>,
+  ...StoresAndActionsProps,
   ...DialogProps,
   +openTransactionSuccessDialog: () => void,
 |};
@@ -35,7 +28,7 @@ type Props = {|
 export default class WalletSendConfirmationDialogContainer extends Component<Props> {
 
   componentWillUnmount() {
-    this.generated.stores.wallets.sendMoneyRequest.reset();
+    this.props.stores.wallets.sendMoneyRequest.reset();
   }
 
   render(): Node {
@@ -44,11 +37,12 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
       unitOfAccountSetting,
       openTransactionSuccessDialog,
     } = this.props;
-    const { stores, actions } = this.generated;
+    const { stores, actions } = this.props;
     const publicDeriver = stores.wallets.selected;
     const { profile } = stores;
 
-    if (publicDeriver == null) throw new Error(`Active wallet required for ${nameof(WalletSendConfirmationDialogContainer)}`);
+    if (publicDeriver == null)
+      throw new Error(`Active wallet required for ${nameof(WalletSendConfirmationDialogContainer)}`);
 
     const { sendMoney } = actions.wallets;
     const { sendMoneyRequest } = stores.wallets;
@@ -71,8 +65,8 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
             publicDeriver.getParent().getNetworkInfo().NetworkId
           ) ?? (() => { throw new Error('No explorer for wallet network'); })()
         }
-        getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
-        getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
+        getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
+        getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
         amount={totalInput.joinSubtractCopy(fee)}
         receivers={receivers}
         totalAmount={totalInput}
@@ -99,100 +93,5 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
         }
       />
     );
-  }
-
-  @computed get generated(): {|
-    actions: {|
-      wallets: {|
-        sendMoney: {|
-          trigger: (params: {|
-            password: string,
-            publicDeriver: PublicDeriver<>,
-            signRequest: ISignRequest<any>,
-            onSuccess?: void => void,
-          |}) => Promise<void>
-        |},
-      |},
-      dialogs: {|
-        closeActiveDialog: {|
-          trigger: (params: void) => void
-        |}
-      |},
-      ada: any // not used here
-    |},
-    stores: {|
-      coinPriceStore: {|
-        getCurrentPrice: (
-          from: string,
-          to: string
-        ) => ?string,
-      |},
-      explorers: {|
-        selectedExplorer: Map<number, SelectedExplorer>,
-      |},
-      tokenInfoStore: {|
-        tokenInfo: TokenInfoMap,
-      |},
-      profile: {|
-        isClassicTheme: boolean,
-      |},
-      wallets: {|
-        sendMoneyRequest: {|
-          error: ?LocalizableError,
-          isExecuting: boolean,
-          reset: () => void
-        |},
-        selected: null | PublicDeriver<>
-      |},
-      ledgerSend: any, // not used here
-      trezorSend: any, // not used here
-    |}
-    |} {
-    if (this.props.generated !== undefined) {
-      return this.props.generated;
-    }
-    if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(WalletSendConfirmationDialogContainer)} no way to generated props`);
-    }
-    const { stores, actions } = this.props;
-    return Object.freeze({
-      stores: {
-        explorers: {
-          selectedExplorer: stores.explorers.selectedExplorer,
-        },
-        profile: {
-          isClassicTheme: stores.profile.isClassicTheme,
-        },
-        tokenInfoStore: {
-          tokenInfo: stores.tokenInfoStore.tokenInfo,
-        },
-        coinPriceStore: {
-          getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
-        },
-        wallets: {
-          selected: stores.wallets.selected,
-          sendMoneyRequest: {
-            isExecuting: stores.wallets.sendMoneyRequest.isExecuting,
-            reset: stores.wallets.sendMoneyRequest.reset,
-            error: stores.wallets.sendMoneyRequest.error,
-          },
-        },
-        ledgerSend: null,
-        trezorSend: null,
-      },
-      actions: {
-        dialogs: {
-          closeActiveDialog: {
-            trigger: actions.dialogs.closeActiveDialog.trigger,
-          },
-        },
-        wallets: {
-          sendMoney: {
-            trigger: actions.wallets.sendMoney.trigger,
-          },
-        },
-        ada: null,
-      },
-    });
   }
 }

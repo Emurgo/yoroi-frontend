@@ -15,7 +15,7 @@ import DialogTextBlock from '../widgets/DialogTextBlock';
 import LocalizableError from '../../i18n/LocalizableError';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
-import type { Notification } from '../../types/notificationType';
+import type { Notification } from '../../types/notification.types';
 import CenteredLayout from '../layout/CenteredLayout';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -93,6 +93,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
           const notificationElementId = `${address}-${index}`;
           return (
             <CopyableAddress
+              id={'walletRestoreVerifyDialog_' + index}
               hash={address}
               elementId={notificationElementId}
               onCopyAddress={() => onCopyAddressTooltip(address, notificationElementId)}
@@ -214,7 +215,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
 
         <div className={styles.postCopyMargin} />
 
-        {error && <p className={styles.error}>{intl.formatMessage(error, error.values)}</p>}
+        {error && <div className={styles.error}>{intl.formatMessage(error, error.values)}</div>}
       </Dialog>
     );
   }

@@ -1,10 +1,10 @@
 // @flow
+/* eslint-disable  import/no-unused-modules */
 
 import buildManifest from './manifest.template';
 import {
   Ports,
   portToPermission,
-  portToSocketPermission,
 } from '../scripts/connections';
 import {
   genCSP,
@@ -19,9 +19,6 @@ export default (isDebug: boolean, shouldInjectConnector: boolean): * => buildMan
     additional: {
       'connect-src': [
         portToPermission(Ports.DevBackendServer),
-        portToSocketPermission(Ports.DevBackendServer),
-        portToPermission(Ports.ErgoMockServer),
-        portToSocketPermission(Ports.ErgoMockServer),
       ],
     },
   }),

@@ -27,11 +27,12 @@ BigNumber.DEBUG = true;
 
 // Entry point into our application
 const initializeYoroi: void => Promise<void> = async () => {
+
   const api = await setupApi();
   const router = new RouterStore();
   const hashHistory = createHashHistory();
   const history = syncHistoryWithStore(hashHistory, router);
-  const stores = createStores(api, actions, router);
+  const stores = await createStores(api, actions, router);
 
   Logger.debug(`[yoroi] stores created`);
 
@@ -40,9 +41,9 @@ const initializeYoroi: void => Promise<void> = async () => {
     actions,
     translations,
     stores,
-    reset: action(() => {
+    reset: action(async () => {
       Action.resetAllActions();
-      createStores(api, actions, router);
+      await createStores(api, actions, router);
     })
   };
 
@@ -91,6 +92,8 @@ const initializeYoroi: void => Promise<void> = async () => {
       ampli.transactionsPageViewed();
     } else if (pathname === ROUTES.STAKING) {
       ampli.stakingCenterPageViewed();
+    } else if (pathname === ROUTES.WALLETS.ROOT) {
+      ampli.walletPageViewed();
     }
   });
 };

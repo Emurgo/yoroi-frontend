@@ -10,7 +10,6 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { withLayout } from '../../../styles/context/layout';
 import type { InjectedLayoutProps } from '../../../styles/context/layout';
 import { ReactComponent as YoroiRevampLogo } from '../../../assets/images/yoroi-logo-revamp-blue.inline.svg';
-// eslint-disable-next-line max-len
 import { ReactComponent as YoroiRevampNightlyLogo } from '../../../assets/images/yoroi-logo-revamp-nightly-blue.inline.svg';
 import { Box, Typography } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
@@ -64,10 +63,10 @@ class IntroBanner extends Component<Props & InjectedLayoutProps> {
         </Box>
 
         <Box textAlign="center">
-          <Typography variant="h1" fontWeight={500} color="primary.600" mb="8px">
+          <Typography component="div" variant="h1" fontWeight={500} color="primary.600" mb="8px">
             {intl.formatMessage(globalMessages.yoroi)}
           </Typography>
-          <Typography variant="body1" fontWeight={500} color="primary.600">
+          <Typography component="div" variant="body1" fontWeight={500} color="primary.600">
             {intl.formatMessage(globalMessages.yoroiIntro)}
           </Typography>
         </Box>

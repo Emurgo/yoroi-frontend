@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import { Component, } from 'react';
+import { Component } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
@@ -162,9 +162,9 @@ export default class URIVerifyDialog extends Component<Props> {
             </div>
           )}
         </div>
-        <p className={styles.textBlock}>
+        <div className={styles.textBlock}>
           {intl.formatMessage(messages.uriVerifyDialogText)}
-        </p>
+        </div>
       </Dialog>
     );
   }

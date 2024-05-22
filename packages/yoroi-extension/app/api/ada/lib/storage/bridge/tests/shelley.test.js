@@ -4,17 +4,17 @@ import BigNumber from 'bignumber.js';
 import {
   schema,
 } from 'lovefield';
-import '../../../test-config';
+import '../../../test-config.forTests';
 import type { RemoteTransaction } from '../../../state-fetch/types';
 import {
   setup,
-} from './common';
+} from './common.forTests';
 import {
   ABANDON_SHARE,
   TX_TEST_MNEMONIC_1,
   mockDate,
   filterDbSnapshot,
-} from '../../../../../jestUtils';
+} from '../../../../../jestUtils.forTests';
 import {
   genCheckAddressesInUse,
   genGetBestBlock,
@@ -23,8 +23,8 @@ import {
   genGetMultiAssetMetadata,
   MockUtxoApi,
   genGetRecentTransactionHashes,
-  genGetTransactionsByHashes, genGetMultiAssetSupply,
-} from '../../../state-fetch/mockNetwork';
+  genGetTransactionsByHashes, genGetMultiAssetSupply, genGetTransactionsHistoryForAddresses,
+} from '../../../state-fetch/mockNetwork.forTests';
 import {
   HARD_DERIVATION_START,
   WalletTypePurpose,
@@ -227,6 +227,7 @@ async function syncingSimpleTransaction(
   const getTokenInfo = genGetTokenInfo();
   const getMultiAssetMetadata = genGetMultiAssetMetadata();
   const getMultiAssetSupply = genGetMultiAssetSupply();
+  const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(txHistory, network);
   const getRecentTransactionHashes = genGetRecentTransactionHashes(txHistory);
   const getTransactionsByHashes = genGetTransactionsByHashes(txHistory);
 
@@ -256,6 +257,7 @@ async function syncingSimpleTransaction(
       db,
       basePubDeriver,
       checkAddressesInUse,
+      getTransactionsHistoryForAddresses,
       getRecentTransactionHashes,
       getTransactionsByHashes,
       getBestBlock,
@@ -362,6 +364,7 @@ async function syncingSimpleTransaction(
       db,
       basePubDeriver,
       checkAddressesInUse,
+      getTransactionsHistoryForAddresses,
       getRecentTransactionHashes,
       getTransactionsByHashes,
       getBestBlock,

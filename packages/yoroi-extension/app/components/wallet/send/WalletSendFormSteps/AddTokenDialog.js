@@ -23,7 +23,6 @@ import { formattedAmountToNaturalUnits } from '../../../../utils/formatters';
 import { ReactComponent as SearchIcon } from '../../../../assets/images/assets-page/search.inline.svg';
 import { ReactComponent as ArrowsListFromBottom } from '../../../../assets/images/assets-page/arrows-list-from-bottom.inline.svg';
 import { ReactComponent as ArrowsListFromTop } from '../../../../assets/images/assets-page/arrows-list-from-top.inline.svg';
-import { ReactComponent as InfoIcon } from '../../../../assets/images/revamp/fingerprint-info.inline.svg';
 import { ReactComponent as ArrowsList } from '../../../../assets/images/assets-page/arrows-list.inline.svg';
 import { ReactComponent as NoItemsFoundImg } from '../../../../assets/images/assets-page/no-tokens.inline.svg';
 import { ampli } from '../../../../../ampli/index';
@@ -419,23 +418,20 @@ export default class AddTokenDialog extends Component<Props, State> {
               >
                 <li>
                   <button type="button" onClick={() => this.sortTokens(SORTING_COLUMNS.LABEL)}>
-                    <Typography variant="body2" color="grayscale.600">
+                    <Typography component="div" variant="body2" color="grayscale.600">
                       {intl.formatMessage(messages.nameAndTicker)}
                     </Typography>
                     {this.displayColumnLogo(SORTING_COLUMNS.LABEL)}
                   </button>
                 </li>
                 <li>
-                  <Typography variant="body2" color="grayscale.600">
+                  <Typography component="div" variant="body2" color="grayscale.600">
                     {intl.formatMessage(messages.identifier)}
                   </Typography>
-                  <Box sx={{ '& > svg': { width: '24px', height: '24px' } }}>
-                    <InfoIcon />
-                  </Box>
                 </li>
                 <li className={styles.quantity}>
                   <button type="button" onClick={() => this.sortTokens(SORTING_COLUMNS.AMOUNT)}>
-                    <Typography variant="body2" color="grayscale.600">
+                    <Typography component="div" variant="body2" color="grayscale.600">
                       {intl.formatMessage(messages.quantity)}
                     </Typography>
                     {this.displayColumnLogo(SORTING_COLUMNS.AMOUNT)}

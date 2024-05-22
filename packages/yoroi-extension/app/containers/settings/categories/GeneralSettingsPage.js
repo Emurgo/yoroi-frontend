@@ -2,25 +2,19 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { computed } from 'mobx';
 import { defineMessages, intlShape } from 'react-intl';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import GeneralSettings from '../../../components/settings/categories/general-setting/GeneralSettings';
-import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import ThemeSettingsBlock from '../../../components/settings/categories/general-setting/ThemeSettingsBlock';
 import AboutYoroiSettingsBlock from '../../../components/settings/categories/general-setting/AboutYoroiSettingsBlock';
 import UnitOfAccountSettings from '../../../components/settings/categories/general-setting/UnitOfAccountSettings';
-import LocalizableError from '../../../i18n/LocalizableError';
-import type { LanguageType } from '../../../i18n/translations';
-import { THEMES } from '../../../styles/utils';
-import type { Theme } from '../../../styles/utils';
-import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
 import { ReactComponent as AdaCurrency } from '../../../assets/images/currencies/ADA.inline.svg';
 import { unitOfAccountDisabledValue } from '../../../types/unitOfAccountType';
-import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Box, Typography } from '@mui/material';
 import { settingsMenuMessages } from '../../../components/settings/menu/SettingsMenu';
+import { THEMES } from '../../../styles/themes';
 
 const currencyLabels = defineMessages({
   USD: {
@@ -57,10 +51,8 @@ const currencyLabels = defineMessages({
   },
 });
 
-type GeneratedData = typeof GeneralSettingsPage.prototype.generated;
-
 @observer
-export default class GeneralSettingsPage extends Component<InjectedOrGenerated<GeneratedData>> {
+export default class GeneralSettingsPage extends Component<StoresAndActionsProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -68,13 +60,13 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
   onSelectUnitOfAccount: string => Promise<void> = async value => {
     const unitOfAccount =
       value === 'ADA' ? unitOfAccountDisabledValue : { enabled: true, currency: value };
-    await this.generated.actions.profile.updateUnitOfAccount.trigger(unitOfAccount);
+    await this.props.actions.profile.updateUnitOfAccount.trigger(unitOfAccount);
   };
 
   render(): Node {
     const { intl } = this.context;
-    const profileStore = this.generated.stores.profile;
-    const coinPriceStore = this.generated.stores.coinPriceStore;
+    const profileStore = this.props.stores.profile;
+    const coinPriceStore = this.props.stores.coinPriceStore;
 
     const isSubmittingLocale = profileStore.setProfileLocaleRequest.isExecuting;
     const isSubmittingUnitOfAccount =
@@ -107,12 +99,12 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
     return (
       <Box sx={{ pb: profileStore.isRevampTheme ? '50px' : '0px' }}>
         {profileStore.isRevampTheme && (
-          <Typography variant="h5" fontWeight={500} mb="24px">
+          <Typography component="div" variant="h5" fontWeight={500} mb="24px">
             {intl.formatMessage(settingsMenuMessages.general)}
           </Typography>
         )}
         <GeneralSettings
-          onSelectLanguage={this.generated.actions.profile.updateLocale.trigger}
+          onSelectLanguage={this.props.actions.profile.updateLocale.trigger}
           isSubmitting={isSubmittingLocale}
           languages={profileStore.LANGUAGE_OPTIONS}
           currentLocale={profileStore.currentLocale}
@@ -130,148 +122,23 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
           currentTheme={currentTheme}
           onSubmit={(theme: string) => {
             if (theme === THEMES.YOROI_REVAMP) {
-              const { wallets } = this.generated.stores;
+              const { wallets } = this.props.stores;
               const publicDeriver = wallets.selected;
               const publicDerivers = wallets.publicDerivers;
 
               if (publicDeriver == null && publicDerivers.length !== 0) {
                 const lastSelectedWallet = wallets.getLastSelectedWallet();
-                this.generated.actions.wallets.setActiveWallet.trigger({
+                this.props.actions.wallets.setActiveWallet.trigger({
                   wallet: lastSelectedWallet ?? publicDerivers[0],
                 });
               }
             }
-            this.generated.actions.profile.updateTheme.trigger({ theme });
+            this.props.actions.profile.updateTheme.trigger({ theme });
           }}
           onExternalLinkClick={handleExternalLinkClick}
         />
-        <AboutYoroiSettingsBlock wallet={this.generated.stores.wallets.selected} />
+        <AboutYoroiSettingsBlock wallet={this.props.stores.wallets.selected} />
       </Box>
     );
-  }
-
-  @computed get generated(): {|
-    actions: {|
-      profile: {|
-        updateLocale: {|
-          trigger: (params: {|
-            locale: string,
-          |}) => Promise<void>,
-        |},
-        updateTheme: {|
-          trigger: (params: {|
-            theme: string,
-          |}) => Promise<void>,
-        |},
-        updateUnitOfAccount: {|
-          trigger: (params: UnitOfAccountSettingType) => Promise<void>,
-        |},
-      |},
-      router: {|
-        goToRoute: {|
-          trigger: (params: {|
-            publicDeriver?: null | PublicDeriver<>,
-            params?: ?any,
-            route: string,
-          |}) => void,
-        |},
-      |},
-      wallets: {|
-        setActiveWallet: {|
-          trigger: (params: {|
-            wallet: PublicDeriver<>,
-          |}) => void,
-        |},
-      |},
-    |},
-    stores: {|
-      app: {| currentRoute: string |},
-      profile: {|
-        LANGUAGE_OPTIONS: Array<LanguageType>,
-        currentLocale: string,
-        currentTheme: Theme,
-        isRevampTheme: boolean,
-        setProfileLocaleRequest: {|
-          error: ?LocalizableError,
-          isExecuting: boolean,
-        |},
-        UNIT_OF_ACCOUNT_OPTIONS: Array<{|
-          svg: string,
-          symbol: string,
-        |}>,
-        setUnitOfAccountRequest: {|
-          error: ?LocalizableError,
-          isExecuting: boolean,
-        |},
-        unitOfAccount: UnitOfAccountSettingType,
-      |},
-      wallets: {|
-        selected: null | PublicDeriver<>,
-        publicDerivers: Array<PublicDeriver<>>,
-        getLastSelectedWallet: void => ?PublicDeriver<>,
-      |},
-      coinPriceStore: {|
-        getCurrentPrice: (from: string, to: string) => ?string,
-        lastUpdateTimestamp: null | number,
-        refreshCurrentUnit: {| isExecuting: boolean |},
-      |},
-    |},
-  |} {
-    if (this.props.generated !== undefined) {
-      return this.props.generated;
-    }
-    if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(GeneralSettingsPage)} no way to generated props`);
-    }
-    const { stores, actions } = this.props;
-    const profileStore = stores.profile;
-    return Object.freeze({
-      stores: {
-        app: {
-          currentRoute: stores.app.currentRoute,
-        },
-        profile: {
-          setProfileLocaleRequest: {
-            isExecuting: profileStore.setProfileLocaleRequest.isExecuting,
-            error: profileStore.setProfileLocaleRequest.error,
-          },
-          LANGUAGE_OPTIONS: profileStore.LANGUAGE_OPTIONS,
-          currentLocale: profileStore.currentLocale,
-          currentTheme: profileStore.currentTheme,
-          isRevampTheme: profileStore.isRevampTheme,
-          UNIT_OF_ACCOUNT_OPTIONS: profileStore.UNIT_OF_ACCOUNT_OPTIONS,
-          unitOfAccount: profileStore.unitOfAccount,
-          setUnitOfAccountRequest: {
-            error: profileStore.setUnitOfAccountRequest.error,
-            isExecuting: profileStore.setUnitOfAccountRequest.isExecuting,
-          },
-        },
-        wallets: {
-          selected: stores.wallets.selected,
-          publicDerivers: stores.wallets.publicDerivers,
-          getLastSelectedWallet: stores.wallets.getLastSelectedWallet,
-        },
-        coinPriceStore: {
-          getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
-          lastUpdateTimestamp: stores.coinPriceStore.lastUpdateTimestamp,
-          refreshCurrentUnit: {
-            isExecuting: stores.coinPriceStore.refreshCurrentUnit.isExecuting,
-          },
-        },
-      },
-      actions: {
-        wallets: {
-          setActiveWallet: { trigger: actions.wallets.setActiveWallet.trigger },
-        },
-        profile: {
-          updateLocale: { trigger: actions.profile.updateLocale.trigger },
-          updateTheme: { trigger: actions.profile.updateTheme.trigger },
-          updateUnitOfAccount: { trigger: actions.profile.updateUnitOfAccount.trigger },
-        },
-        router: {
-          goToRoute: { trigger: actions.router.goToRoute.trigger },
-        },
-      },
-    });
   }
 }

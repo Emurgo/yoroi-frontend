@@ -34,7 +34,7 @@ function WalletPlate(props: Props): Node {
       mb="30px"
     >
       {plateImagePart}
-      <Typography variant="body1" id="walletPlateText">{plate.TextPart}</Typography>
+      <Typography component="div" variant="body1" id="walletPlateText">{plate.TextPart}</Typography>
       <Box
         component="button"
         sx={{

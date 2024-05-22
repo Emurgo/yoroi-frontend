@@ -38,7 +38,7 @@ export default class LoadingStore extends BaseLoadingStore<StoresMap, ActionsMap
   }
 
   @computed get fromUriScheme(): boolean {
-    return matchRoute(ROUTES.SEND_FROM_URI.ROOT, this._originRoute.route) !== false;
+    return matchRoute(ROUTES.SEND_FROM_URI.ROOT, this._originRoute.route);
   }
 
   @computed get uriParams(): ?UriParams {
@@ -96,9 +96,9 @@ export default class LoadingStore extends BaseLoadingStore<StoresMap, ActionsMap
   }
 
   _redirectRegex: RegExp = pathToRegexp(ROUTES.OAUTH_FROM_EXTERNAL.DROPBOX);
+
   postLoadingScreenEnd(): void {
     super.postLoadingScreenEnd();
-
     if (this._redirectRegex.test(this.stores.app.currentRoute)) {
       this._shouldRedirect = true;
       this._redirectUri = this.stores.app.currentRoute;

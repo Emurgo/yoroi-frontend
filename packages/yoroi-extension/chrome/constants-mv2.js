@@ -1,9 +1,9 @@
 // @flow
+/* eslint-disable  import/no-unused-modules */
 
 import {
   Ports,
   portToPermission,
-  portToSocketPermission,
 } from '../scripts-mv2/connections';
 
 export function genCSP(request: {|
@@ -36,7 +36,6 @@ export function genCSP(request: {|
     connectSrc.push(portToPermission(Ports.WebpackDev));
     connectSrc.push(portToPermission(Ports.DevBackendServe));
     connectSrc.push(portToPermission(Ports.ReactDevTools));
-    connectSrc.push(portToSocketPermission(Ports.WebpackDev));
 
     imgSrc.push(portToPermission(Ports.WebpackDev));
   }
@@ -47,16 +46,26 @@ export function genCSP(request: {|
   // connectSrc.push('https://content.dropboxapi.com');
 
   frameSrc.push('https://connect.trezor.io/');
+  frameSrc.push('https://emurgo.github.io/yoroi-extension-ledger-bridge');
   frameSrc.push('https://emurgo.github.io/');
-
-  // Zendesk setup
-  scriptSrc.push('https://*.zdassets.com/')
-  connectSrc.push('https://*.zdassets.com/')
-  connectSrc.push('https://emurgohelpdesk.zendesk.com/')
 
   // Analytics
   connectSrc.push('https://analytics.emurgo-rnd.com/');
   connectSrc.push('https://api2.amplitude.com/');
+  connectSrc.push('https://api.muesliswap.com');
+
+  // Resolver
+  connectSrc.push('https://api.handle.me/');
+  connectSrc.push('https://api.unstoppabledomains.com/');
+
+  // Pool info
+  connectSrc.push('https://a.cexplorer.io/');
+  imgSrc.push('https://img.cexplorer.io/');
+  imgSrc.push('https://corsproxy.io/');
+
+  // Swap
+  connectSrc.push('https://aggregator.muesliswap.com/');
+  connectSrc.push('https://onchain2.muesliswap.com/');
 
   // wasm-eval is needed to compile WebAssembly in the browser
   // note: wasm-eval is not standardized but empirically works in Firefox & Chrome https://github.com/w3c/webappsec-csp/pull/293

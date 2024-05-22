@@ -84,7 +84,7 @@ class ExternalStorageSettings extends Component<Props & InjectedProps> {
     return (
       <div className={styles.component}>
         <h1>{this.context.intl.formatMessage(messages.sectionTitle)}</h1>
-        <p>{this.context.intl.formatMessage(messages.sectionIntro)}</p>
+        <div>{this.context.intl.formatMessage(messages.sectionIntro)}</div>
         {providersButtons}
       </div>
     );

@@ -10,6 +10,7 @@ import type { GetBalanceFunc } from '../../api/common/types';
 import type {
   ExportTransactionsFunc,
   GetTransactionsFunc,
+  GetTransactionsResponse,
   RefreshPendingTransactionsFunc,
 } from '../../api/common/index';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
@@ -24,8 +25,7 @@ import type {
   IGetLastSyncInfoResponse,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
-import { getApiForNetwork, } from '../../api/common/utils';
-import type { UnconfirmedAmount } from '../../types/unconfirmedAmountType';
+import type { UnconfirmedAmount } from '../../types/unconfirmedAmount.types';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
 import { Logger, stringifyError } from '../../utils/logging';
@@ -35,7 +35,6 @@ import * as timeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
 import {
   getCardanoHaskellBaseConfig,
   isCardanoHaskell,
-  isErgo,
   networks,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { DefaultTokenEntry, TokenEntry } from '../../api/common/lib/MultiToken';
@@ -43,23 +42,20 @@ import { MultiToken } from '../../api/common/lib/MultiToken';
 import { genLookupOrFail, getTokenName } from '../stateless/tokenHelpers';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import { asAddressedUtxo, cardanoValueFromRemoteFormat } from '../../api/ada/transactions/utils';
-import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import {
+  asAddressedUtxo,
+  cardanoMinAdaRequiredFromRemoteFormat_coinsPerWord,
+} from '../../api/ada/transactions/utils';
 import { PRIMARY_ASSET_CONSTANTS } from '../../api/ada/lib/storage/database/primitives/enums';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
 import moment from 'moment';
-import {
-  loadSubmittedTransactions,
-  persistSubmittedTransactions,
-} from '../../api/localStorage';
-import LegacyTransactionsStore from './LegacyTransactionsStore';
-import type { Api } from '../../api/index';
+import { loadSubmittedTransactions, persistSubmittedTransactions, } from '../../api/localStorage';
 import { getAllAddressesForWallet } from '../../api/ada/lib/storage/bridge/traitUtils';
 import { toRequestAddresses } from '../../api/ada/lib/storage/bridge/updateTransactions'
 import type { TransactionExportRow } from '../../api/export';
 import type { HistoryRequest } from '../../api/ada/lib/state-fetch/types';
-
+import appConfig from '../../config';
 
 export type TxHistoryState = {|
   publicDeriver: PublicDeriver<>,
@@ -93,12 +89,12 @@ type SubmittedTransactionEntry = {|
   usedUtxos: Array<{| txHash: string, index: number |}>,
 |};
 
-function getCoinsPerUtxoWord(network: $ReadOnly<NetworkRow>): RustModule.WalletV4.BigNum {
+function getCoinsPerUtxoWord(network: $ReadOnly<NetworkRow>): BigNumber {
   const config = getCardanoHaskellBaseConfig(network).reduce(
     (acc, next) => Object.assign(acc, next),
     {}
   );
-  return RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord);
+  return new BigNumber(config.CoinsPerUtxoWord);
 }
 
 function newMultiToken(
@@ -117,6 +113,15 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
   @observable _submittedTransactions: Array<SubmittedTransactionEntry> = [];
 
+  /*
+   * This transient state only used to store a flag that a reward withdrawal has been processed for some wallet.
+   * Needed to cancel out the utxo balance being synced before the reward balance which was causing a higher
+   * total balance to be displayed for few seconds.
+   *
+   * NOT PERSISTED
+   */
+  @observable _processedWithdrawals: Array<number> = [];
+
   getTransactionRowsToExportRequest: LocalizedRequest<
     ((void) => Promise<void>) => Promise<void>
   > = new LocalizedRequest<((void) => Promise<void>) => Promise<void>>(func => func());
@@ -128,13 +133,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   @observable shouldIncludeTxIds: boolean = false;
 
   ongoingRefreshing: Map<number, Promise<void>> = observable.map({});
-
-  ergoTransactionsStore: LegacyTransactionsStore;
-
-  constructor(stores: StoresMap, api: Api, actions: ActionsMap) {
-    super(stores, api, actions);
-    this.ergoTransactionsStore = new LegacyTransactionsStore(stores, api, actions);
-  }
 
   setup(): void {
     super.setup();
@@ -151,17 +149,8 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     });
   }
 
-  isErgoWalletSelected: () => boolean = () => {
-    const { selected } = this.stores.wallets;
-    return selected != null && isErgo(selected.getParent().getNetworkInfo());
-  }
-
   /** Calculate information about transactions that are still realistically reversible */
   @computed get unconfirmedAmount(): UnconfirmedAmount {
-    if (this.isErgoWalletSelected()) {
-      return this.ergoTransactionsStore.unconfirmedAmount;
-    }
-
     const defaultUnconfirmedAmount = {
       incoming: [],
       outgoing: [],
@@ -170,7 +159,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   }
 
   @action toggleIncludeTxIds: void => void = () => {
-    this.ergoTransactionsStore.toggleIncludeTxIds();
     this.shouldIncludeTxIds = !this.shouldIncludeTxIds
   }
 
@@ -181,19 +169,12 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
         `${nameof(TransactionsStore)}::${nameof(this.lastSyncInfo)} no wallet selected`
       );
     }
-    if (isErgo(selected.getParent().getNetworkInfo())) {
-      return this.ergoTransactionsStore.lastSyncInfo;
-    }
     return this.getTxHistoryState(selected).lastSyncInfo;
   }
 
   @computed get recent(): Array<WalletTransaction> {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return [];
-
-    if (this.isErgoWalletSelected()) {
-      return this.ergoTransactionsStore.recent;
-    }
     const { txs } = this.getTxHistoryState(publicDeriver);
     return  [
       ...this.getSubmittedTransactions(publicDeriver),
@@ -202,18 +183,10 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   }
 
   @computed get hasAny(): boolean {
-    if (this.isErgoWalletSelected()) {
-      return this.ergoTransactionsStore.hasAny;
-    }
-
     return this.recent.length > 0;
   }
 
   @computed get hasAnyPending(): boolean {
-    if (this.isErgoWalletSelected()) {
-      return this.ergoTransactionsStore.hasAnyPending;
-    }
-
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return false;
     const result = this.getTxHistoryState(publicDeriver).requests.pendingRequest.result;
@@ -221,10 +194,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   }
 
   @computed get hasMoreToLoad(): boolean {
-    if (this.isErgoWalletSelected()) {
-      return this.ergoTransactionsStore.hasMore;
-    }
-
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return false;
     return this.getTxHistoryState(publicDeriver).hasMoreToLoad;
@@ -236,13 +205,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     publicDeriver: PublicDeriver<>,
     isLocalRequest: boolean,
   |}) => Promise<void> = async (request) => {
-    if (isErgo(request.publicDeriver.getParent().getNetworkInfo())) {
-      return this.ergoTransactionsStore.refreshTransactionData({
-        publicDeriver: request.publicDeriver,
-        localRequest: request.isLocalRequest,
-      });
-    }
-
     const { publicDeriverId } = request.publicDeriver;
     if (this.ongoingRefreshing.has(publicDeriverId)) {
       return this.ongoingRefreshing.get(publicDeriverId);
@@ -261,21 +223,12 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   };
 
   @computed get balance(): MultiToken | null {
-    if (this.isErgoWalletSelected()) {
-      return this.ergoTransactionsStore.balance;
-    }
-
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return null;
     return this.getTxHistoryState(publicDeriver).requests.getBalanceRequest.result || null;
   }
 
   @computed get isLoadingMore(): boolean {
-    if (this.isErgoWalletSelected()) {
-      const { recentTransactionsRequest } = this.ergoTransactionsStore;
-      return !recentTransactionsRequest.wasExecuted || recentTransactionsRequest.isExecuting;
-    }
-
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) {
       throw new Error(`${nameof(TransactionsStore)}::${nameof(this.isLoadingMore)} no wallet selected`);
@@ -286,87 +239,45 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   }
 
   @computed get isLoading(): boolean {
-    if (this.isErgoWalletSelected()) {
-      const { recentTransactionsRequest } = this.ergoTransactionsStore;
-      return !recentTransactionsRequest.wasExecuted;
-    }
-
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) {
       throw new Error(`${nameof(TransactionsStore)}::${nameof(this.isLoading)} no wallet selected`);
     }
-    const { headRequest } = this.getTxHistoryState(publicDeriver).requests;
+    const { headRequest, tailRequest } = this.getTxHistoryState(publicDeriver).requests;
 
-    return !headRequest.wasExecuted;
+    return !headRequest.wasExecuted && !tailRequest.wasExecuted;
   }
 
   @computed get assetDeposit(): MultiToken | null {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return null;
-
-    if (this.isErgoWalletSelected()) {
-      const { requests } = this.ergoTransactionsStore.getTxRequests(publicDeriver);
-      return requests.getAssetDepositRequest.result || null;
-    }
-
     return this.getTxHistoryState(publicDeriver).requests.getAssetDepositRequest.result || null;
   }
 
   isWalletRefreshing:  PublicDeriver<> => boolean = (publicDeriver) => {
-    if (isErgo(publicDeriver.getParent().getNetworkInfo())) {
-      return this.ergoTransactionsStore.isWalletRefreshing(publicDeriver);
-    }
     return this.ongoingRefreshing.has(publicDeriver.publicDeriverId)
   }
 
 
   isWalletLoading:  PublicDeriver<> => boolean = (publicDeriver) => {
-    if (isErgo(publicDeriver.getParent().getNetworkInfo())) {
-      const { requests } = this.ergoTransactionsStore.getTxRequests(publicDeriver);
-      return requests.recentRequest.wasExecuted;
-    }
-
     return !this.getTxHistoryState(publicDeriver).requests.headRequest.wasExecuted;
   }
 
   @action
   clearCache: PublicDeriver<> => void = (publicDeriver) => {
-    if (isErgo(publicDeriver.getParent().getNetworkInfo())) {
-      const { requests } = this.ergoTransactionsStore.getTxRequests(publicDeriver);
-      for (const txRequest of Object.keys(requests)) {
-        requests[txRequest].reset();
-      }
-
-      return;
-    }
-
     const txs = this.getTxHistoryState(publicDeriver).txs;
     txs.splice(0, txs.length);
   }
 
   getBalance: PublicDeriver<> => MultiToken | null = (publicDeriver) => {
-    if (isErgo(publicDeriver.getParent().getNetworkInfo())) {
-      const { requests } = this.ergoTransactionsStore.getTxRequests(publicDeriver);
-      return requests.getBalanceRequest.result || null;
-    }
-
     return this.getTxHistoryState(publicDeriver).requests.getBalanceRequest.result || null;
   }
 
   getAssetDeposit: PublicDeriver<> => MultiToken | null = (publicDeriver) => {
-    if (isErgo(publicDeriver.getParent().getNetworkInfo())) {
-      const { requests } = this.ergoTransactionsStore.getTxRequests(publicDeriver);
-      return requests.getAssetDepositRequest.result || null;
-    }
-
     return this.getTxHistoryState(publicDeriver).requests.getAssetDepositRequest.result || null;
   }
 
   getLastSyncInfo: PublicDeriver<> => IGetLastSyncInfoResponse = (publicDeriver) => {
-    if (isErgo(publicDeriver.getParent().getNetworkInfo())) {
-      return this.ergoTransactionsStore.getTxRequests(publicDeriver).lastSyncInfo;
-    }
-
     return this.getTxHistoryState(publicDeriver).lastSyncInfo;
   }
 
@@ -374,12 +285,17 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   _afterLoadingNewTxs: (
     Array<WalletTransaction>,
     PublicDeriver<>,
-  ) => Promise<void> = async (result, publicDeriver) => {
+  ) => Promise<void> = async (result: Array<WalletTransaction>, publicDeriver: PublicDeriver<>) => {
     const timestamps: Set<number> = new Set();
     const remoteTransactionIds: Set<string> = new Set();
-    for (const { txid, date } of result) {
+    const withdrawalIds = new Set<string>();
+    for (const tx of result) {
+      const { txid, date } = tx;
       timestamps.add(date.valueOf());
       remoteTransactionIds.add(txid);
+      if (tx instanceof CardanoShelleyTransaction && tx.withdrawals.length > 0) {
+        withdrawalIds.add(txid);
+      }
     }
     const defaultTokenInfo = this.stores.tokenInfoStore.getDefaultTokenInfo(
       publicDeriver.getParent().getNetworkInfo().NetworkId,
@@ -395,9 +311,16 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     });
 
     let submittedTransactionsChanged = false;
+    let addedProcessedWithdrawal = false;
     runInAction(() => {
       for (let i = 0; i < this._submittedTransactions.length; ) {
-        if (remoteTransactionIds.has(this._submittedTransactions[i].transaction.txid)) {
+        const txId = this._submittedTransactions[i].transaction.txid;
+        if (remoteTransactionIds.has(txId)) {
+          if (withdrawalIds.has(txId) && !addedProcessedWithdrawal) {
+            // Set local processed withdrawals only if there was a pending local transaction
+            this._processedWithdrawals.push(publicDeriver.publicDeriverId);
+            addedProcessedWithdrawal = true;
+          }
           this._submittedTransactions.splice(i, 1);
           submittedTransactionsChanged = true;
         } else {
@@ -427,31 +350,57 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       return;
     }
 
+    const txHistoryState = this.getTxHistoryState(request.publicDeriver);
+    const isEmptyHistory = txHistoryState.txs.length === 0;
+
     const {
       headRequest,
       getBalanceRequest,
       getAssetDepositRequest
-    } = this.getTxHistoryState(request.publicDeriver).requests;
+    } = txHistoryState.requests;
 
-    headRequest.invalidate({ immediately: false });
-    headRequest.execute({
-      publicDeriver,
-      isLocalRequest: request.isLocalRequest
-    });
-    if (headRequest.promise == null) {
-      throw new Error('unexpected nullish headRequest.promise');
-    }
-    const result = await headRequest.promise;
-    const { txs } = this.getTxHistoryState(request.publicDeriver);
-    runInAction(() => {
-      for (let i = 0; i < result.length; i++) {
-        const tx = result[i];
-        if (tx.txid === txs[0]?.txid) {
-          break;
-        }
-        txs.splice(i, 0, tx);
+    let result;
+    if (isEmptyHistory) {
+      /*
+       * TAIL REQUEST IS USED WHEN FIRST SYNC OR EMPTY WALLET
+       */
+      result = await this._internalTailRequestForTxs({
+        publicDeriver: request.publicDeriver,
+        isLocalRequest: request.isLocalRequest,
+      });
+    } else {
+      /*
+       * HEAD REQUEST IS USED WITH `AFTER` REFERENCE
+       * WHEN NON-EMPTY WALLET
+       */
+      headRequest.invalidate({ immediately: false });
+      headRequest.execute({
+        publicDeriver,
+        // HEAD request is never local by logic
+        isLocalRequest: false,
+        afterTx: txHistoryState.txs[0],
+      });
+      if (headRequest.promise == null) {
+        throw new Error('unexpected nullish headRequest.promise');
       }
-    });
+      result = await headRequest.promise;
+      {
+        /**
+         * Adding received txs to the start of the existing history
+         */
+        const { txs } = this.getTxHistoryState(request.publicDeriver);
+        runInAction(() => {
+          for (let i = 0; i < result.length; i++) {
+            const tx = result[i];
+            if (tx.txid === txs[0]?.txid) {
+              // In case received tx matches with the existing one - stop
+              break;
+            }
+            txs.splice(i, 0, tx);
+          }
+        });
+      }
+    }
 
     // update last sync (note: changes even if no new transaction is found)
     {
@@ -471,12 +420,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const networkInfo = deriverParent.getNetworkInfo();
     const defaultToken = deriverParent.getDefaultToken();
     const isCardano = isCardanoHaskell(networkInfo);
-    const coinsPerUtxoWord = isCardano
-      ? getCoinsPerUtxoWord(networkInfo)
-      : RustModule.WalletV4.BigNum.zero();
-
-    // <TODO:PLUTUS_SUPPORT>
-    const utxoHasDataHash = false;
+    const coinsPerUtxoWord = getCoinsPerUtxoWord(networkInfo);
 
     await (async () => {
       const canGetBalance = asGetBalance(publicDeriver);
@@ -495,33 +439,29 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
             if (!isCardano || canGetUtxos == null) {
               return newMultiToken(defaultToken);
             }
-            const WalletV4 = RustModule.WalletV4;
             const utxos = await canGetUtxos.getAllUtxos();
             const addressedUtxos = asAddressedUtxo(utxos).filter(u => u.assets.length > 0);
-            const deposits: Array<RustModule.WalletV4.BigNum> = addressedUtxos.map(
+            const deposits: Array<BigNumber> = addressedUtxos.map(
               (u: CardanoAddressedUtxo) => {
                 try {
-                  return WalletV4.min_ada_required(
-                    // $FlowFixMe[prop-missing]
-                    cardanoValueFromRemoteFormat(u),
-                    utxoHasDataHash,
-                    coinsPerUtxoWord
-                  );
+                  // <TODO:COINS_PER_BYTE>
+                  // $FlowIgnore[prop-missing]
+                  return cardanoMinAdaRequiredFromRemoteFormat_coinsPerWord(u, coinsPerUtxoWord);
                 } catch (e) {
                   // eslint-disable-next-line no-console
                   console.error(
                     `Failed to calculate min-required ADA for utxo: ${JSON.stringify(u)}`,
                     e
                   );
-                  return WalletV4.BigNum.zero();
+                  return new BigNumber(0);
                 }
               }
             );
-            const sumDeposit = deposits.reduce((a, b) => a.checked_add(b), WalletV4.BigNum.zero());
+            const sumDeposit = deposits.reduce((a, b) => a.plus(b), new BigNumber(0));
             return newMultiToken(defaultToken, [
               {
                 identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
-                amount: new BigNumber(sumDeposit.to_str()),
+                amount: sumDeposit,
                 networkId: networkInfo.NetworkId,
               },
             ]);
@@ -532,9 +472,15 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
           return newMultiToken(defaultToken);
         },
       });
+      const refreshDelegationPromise =
+        this.stores.substores.ada.delegation.refreshDelegation(request.publicDeriver);
       if (!getBalanceRequest.promise || !getAssetDepositRequest.promise)
         throw new Error('should never happen');
-      await Promise.all([getBalanceRequest.promise, getAssetDepositRequest.promise]);
+      await Promise.all([
+        getBalanceRequest.promise,
+        getAssetDepositRequest.promise,
+        refreshDelegationPromise,
+      ]);
     })();
 
     await this._afterLoadingNewTxs(
@@ -543,16 +489,13 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     );
   }
 
-  @action _loadMore: (
-    PublicDeriver<> & IGetLastSyncInfo,
-  ) => Promise<void> = async (
+  _internalTailRequestForTxs: ({|
     publicDeriver: PublicDeriver<> & IGetLastSyncInfo,
-  ) => {
-    if (isErgo(publicDeriver.getParent().getNetworkInfo())) {
-      this.ergoTransactionsStore._increaseSearchLimit(publicDeriver);
-      return;
-    }
-
+    isLocalRequest?: boolean,
+  |}) => Promise<GetTransactionsResponse> = async ({
+    publicDeriver,
+    isLocalRequest = false,
+  }) => {
     const withLevels = asHasLevels<ConceptualWallet, IGetLastSyncInfo>(publicDeriver);
     if (withLevels == null) {
       throw new Error(`${nameof(this._loadMore)} no levels`);
@@ -560,23 +503,30 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const state = this.getTxHistoryState(publicDeriver);
     const { tailRequest } = state.requests;
 
+    const beforeTx = state.txs[state.txs.length-1];
+
     tailRequest.invalidate({ immediately: false });
     tailRequest.execute({
       publicDeriver: withLevels,
-      isLocalRequest: false,
-      afterTxs: state.txs,
+      isLocalRequest,
+      beforeTx,
     });
-    if (!tailRequest.promise) throw new Error('should never happen');
+    if (!tailRequest.promise) throw new Error('unexpected nullish tailRequest.promise');
     const result = await tailRequest.promise;
     runInAction(() => {
       state.txs.splice(state.txs.length, 0, ...result);
-      state.hasMoreToLoad = result.length > 0;
+      state.hasMoreToLoad = result.length >= appConfig.wallets.MAX_RECENT_TXS_PER_LOAD;
     });
+    return result;
+  }
 
-    await this._afterLoadingNewTxs(
-      result,
-      publicDeriver,
-    );
+  @action _loadMore: (
+    PublicDeriver<> & IGetLastSyncInfo,
+  ) => Promise<void> = async (
+    publicDeriver: PublicDeriver<> & IGetLastSyncInfo,
+  ) => {
+    const result = await this._internalTailRequestForTxs({ publicDeriver });
+    await this._afterLoadingNewTxs(result, publicDeriver);
   }
 
   /** Add a new public deriver to track and refresh the data */
@@ -586,13 +536,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   |}) => void = (
     request
   ) => {
-    if (isErgo(request.publicDeriver.getParent().getNetworkInfo())) {
-      this.ergoTransactionsStore.addObservedWallet(request);
-      return;
-    }
-
-    const apiType = getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo());
-
     const foundRequest = find(
       this.txHistoryStates,
       { publicDeriver: request.publicDeriver }
@@ -607,17 +550,16 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       txs: [],
       hasMoreToLoad: true, // assuming yes until actually loaded and found otherwise
       requests: {
-        // note: this captures the right API for the wallet
         headRequest: new CachedRequest<GetTransactionsFunc>(
-          this.stores.substores[apiType].transactions.refreshTransactions
+          this.stores.substores.ada.transactions.refreshTransactions
         ),
         tailRequest: new CachedRequest<GetTransactionsFunc>(
-          this.stores.substores[apiType].transactions.refreshTransactions
+          this.stores.substores.ada.transactions.refreshTransactions
         ),
         getBalanceRequest: new CachedRequest<GetBalanceFunc>(this.api.common.getBalance),
         getAssetDepositRequest: new CachedRequest<GetBalanceFunc>(this.api.common.getAssetDeposit),
         pendingRequest: new CachedRequest<RefreshPendingTransactionsFunc>(
-          this.stores.substores[apiType].transactions.refreshPendingTransactions
+          this.stores.substores.ada.transactions.refreshPendingTransactions
         ),
       },
     });
@@ -639,11 +581,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     publicDeriver: PublicDeriver<>,
     exportRequest: TransactionRowsToExportRequest,
   |}) => Promise<void> = async (request) => {
-    if (isErgo(request.publicDeriver.getParent().getNetworkInfo())) {
-      await this.ergoTransactionsStore._exportTransactionsToFile(request);
-      return;
-    }
-
     try {
       this._setExporting(true);
 
@@ -937,6 +874,20 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       .map(tx => tx.transaction);
   };
 
+  hasProcessedWithdrawals: (PublicDeriver<>) => boolean = (publicDeriver) => {
+    return this._processedWithdrawals.includes(publicDeriver.publicDeriverId);
+  }
+
+  clearProcessedWithdrawals: (PublicDeriver<>) => void = (publicDeriver) => {
+    for (let i = 0; i < this._processedWithdrawals.length; ) {
+      if (this._processedWithdrawals[i] === publicDeriver.publicDeriverId) {
+        this._processedWithdrawals.splice(i, 1);
+      } else {
+        i++;
+      }
+    }
+  }
+
   @action
   clearSubmittedTransactions: (PublicDeriver<>) => void = publicDeriver => {
     for (let i = 0; i < this._submittedTransactions.length; ) {
@@ -1008,10 +959,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
                 })),
                 isValid: transaction.isValid,
               });
-            });
-          } else if (isErgo(network)) {
-            runInAction(() => {
-              tx = new WalletTransaction(txCtorData);
             });
           } else {
             return;

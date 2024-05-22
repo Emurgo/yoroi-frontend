@@ -10,10 +10,7 @@ import ConnectorStore from './ConnectorStore';
 import ConnectorLoadingStore from './toplevel/ConnectorLoadingStore';
 import type { ActionsMap } from '../actions';
 import type { AdaStoresMap } from './ada/index';
-import type { ErgoStoresMap } from './ergo/index';
 import setupAdaStores from './ada/index';
-import setupErgoStores from './ergo/index';
-import { ApiOptions } from '../../api/common/utils';
 import StateFetchStore from '../../stores/toplevel/StateFetchStore';
 import ExplorerStore from './toplevel/ExplorerStore';
 
@@ -42,7 +39,6 @@ export type StoresMap = {|
   tokenInfoStore: TokenInfoStore<StoresMap, ActionsMap>,
   substores: {|
     ada: AdaStoresMap,
-    ergo: ErgoStoresMap,
   |},
 |};
 
@@ -94,12 +90,10 @@ export default (action(
      * But we only want to actually initialize it if it is the currency in use */
     stores.substores = {
       ada: setupAdaStores((stores: any), api, actions),
-      ergo: setupErgoStores((stores: any), api, actions),
     };
 
     const loadedStores: StoresMap = (stores: any);
-    initializeSubstore<ErgoStoresMap>(loadedStores.substores[ApiOptions.ergo]);
-    initializeSubstore<AdaStoresMap>(loadedStores.substores[ApiOptions.ada]);
+    initializeSubstore<AdaStoresMap>(loadedStores.substores.ada);
 
     // Perform load after all setup is done to ensure migration can modify store state
     loadedStores.loading.load('connector');

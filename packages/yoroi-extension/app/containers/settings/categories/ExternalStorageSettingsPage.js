@@ -2,18 +2,12 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { computed } from 'mobx';
 import { handleExternalClick } from '../../../utils/routing';
 import ExternalStorageSettings from '../../../components/settings/categories/ExternalStorageSettings';
-import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
-import type { ProvidersType } from '../../../api/externalStorage/index';
-import type { SelectedExternalStorageProvider } from '../../../domain/ExternalStorage';
-
-type GeneratedData = typeof ExternalStorageSettingsPage.prototype.generated;
+import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 
 @observer
-export default class ExternalStorageSettingsPage
-  extends Component<InjectedOrGenerated<GeneratedData>> {
+export default class ExternalStorageSettingsPage extends Component<StoresAndActionsProps> {
 
   onConnect: string => void = (authorizeUrl) => {
     // Open authorize url
@@ -21,14 +15,14 @@ export default class ExternalStorageSettingsPage
   };
 
   onDisconnect: void => Promise<void> = async () => {
-    await this.generated.actions.memos.unsetExternalStorageProvider.trigger();
+    await this.props.actions.memos.unsetExternalStorageProvider.trigger();
   };
 
   render(): Node {
     const {
       providers,
       selectedProvider
-    } = this.generated.stores.memos;
+    } = this.props.stores.memos;
 
     return (
       <ExternalStorageSettings
@@ -38,44 +32,5 @@ export default class ExternalStorageSettingsPage
         selectedExternalStorage={selectedProvider}
       />
     );
-  }
-
-  @computed get generated(): {|
-    actions: {|
-      memos: {|
-        unsetExternalStorageProvider: {|
-          trigger: (params: void) => Promise<void>
-        |}
-      |}
-    |},
-    stores: {|
-      memos: {|
-        providers: { [key: string]: ProvidersType, ... },
-        selectedProvider: ?SelectedExternalStorageProvider
-      |}
-    |}
-    |} {
-    if (this.props.generated !== undefined) {
-      return this.props.generated;
-    }
-    if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(ExternalStorageSettingsPage)} no way to generated props`);
-    }
-    const { stores, actions } = this.props;
-    return Object.freeze({
-      stores: {
-        memos: {
-          providers: stores.memos.providers,
-          selectedProvider: stores.memos.selectedProvider,
-        },
-      },
-      actions: {
-        memos: {
-          unsetExternalStorageProvider: {
-            trigger: actions.memos.unsetExternalStorageProvider.trigger
-          },
-        },
-      },
-    });
   }
 }

@@ -9,7 +9,6 @@ import type {
   GenerateAddressFunc,
 } from './bip44AddressScan';
 import type { ConfigType } from '../../../../../config/config-types';
-import type { FilterFunc } from '../state-fetch/currencySpecificTypes';
 
 import {
   ChainDerivations, BIP44_SCAN_SIZE,
@@ -17,15 +16,18 @@ import {
 
 import type {
   TreeInsert, InsertRequest,
-} from '../../../ada/lib/storage/database/walletTypes/common/utils';
+} from '../../../ada/lib/storage/database/walletTypes/common/utils.types';
 import type { AddByHashFunc, } from '../storage/bridge/hashMapper';
 import type { NetworkRow, CanonicalAddressInsert } from '../../../ada/lib/storage/database/primitives/tables';
 import type { CoreAddressT } from '../../../ada/lib/storage/database/primitives/enums';
 import type { Bip44ChainInsert } from '../../../ada/lib/storage/database/walletTypes/common/tables';
+import type { FilterFunc } from '../../../ada/lib/state-fetch/types';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 const addressRequestSize = CONFIG.app.addressRequestSize;
+
+// <TODO:PENDING_REMOVAL> bip44
 
 export async function addAddrForType(
   addByHash: AddByHashFunc,
@@ -80,6 +82,7 @@ export async function scanBip44Chain(request: {|
     });
 }
 
+// <TODO:PENDING_REMOVAL> bip44
 export async function scanBip44Account(request: {|
   generateInternalAddresses: GenerateAddressFunc,
   generateExternalAddresses: GenerateAddressFunc,

@@ -4,7 +4,7 @@ import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType'
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import type { UnconfirmedAmount } from '../../../types/unconfirmedAmountType';
+import type { UnconfirmedAmount } from '../../../types/unconfirmedAmount.types';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletSummary.scss';
 import { Component } from 'react';
@@ -185,7 +185,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
       );
 
     return (
-      <Box id="walletSummary_box" sx={{ bgcolor: 'common.white' }}>
+      <Box id="wallet:transactions-walletSummary-box" sx={{ bgcolor: 'common.white' }}>
         <Box
           sx={{
             marginBottom: '16px',
@@ -214,19 +214,20 @@ export default class WalletSummaryRevamp extends Component<Props> {
               onClick={openExportTxToFileDialog}
               onKeyPress={openExportTxToFileDialog}
               startIcon={<ExportTxToFileSvg />}
+              id="wallet:transactions:walletSummary-openExportWindow-button"
             >
               {intl.formatMessage(globalMessages.exportButtonLabel)}
             </Button>
           )}
         </Box>
         <Box sx={{ pb: hasPendingAmount ? '16px' : 0 }}>
-          <Typography variant="body1">
+          <Typography component="div" variant="body1">
             {this.renderPendingAmount(
               pendingAmount.incoming,
               intl.formatMessage(messages.pendingIncomingConfirmationLabel)
             )}
           </Typography>
-          <Typography variant="body1">
+          <Typography component="div" variant="body1">
             {this.renderPendingAmount(
               pendingAmount.outgoing,
               intl.formatMessage(messages.pendingOutgoingConfirmationLabel)
@@ -245,20 +246,20 @@ export default class WalletSummaryRevamp extends Component<Props> {
             }}
           >
             <Grid item xs={4}>
-              <Typography variant="body2">
+              <Typography component="div" variant="body2">
                 {intl.formatMessage({ id: 'wallet.summary.page.type' })}
               </Typography>
             </Grid>
             <Grid item xs={2} sx={{ textAlign: 'left' }}>
-              <Typography variant="body2">
+              <Typography component="div" variant="body2">
                 {intl.formatMessage({ id: 'wallet.summary.page.status' })}
               </Typography>
             </Grid>
             <Grid item xs={2} sx={{ textAlign: 'right' }}>
-              <Typography variant="body2">{intl.formatMessage(globalMessages.feeLabel)}</Typography>
+              <Typography component="div" variant="body2">{intl.formatMessage(globalMessages.feeLabel)}</Typography>
             </Grid>
             <Grid item xs={4} sx={{ textAlign: 'right', pr: '30px' }}>
-              <Typography variant="body2">
+              <Typography component="div" variant="body2">
                 {intl.formatMessage(globalMessages.amountLabel)}
               </Typography>
             </Grid>

@@ -183,6 +183,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
         onClose={onCancel}
         className={dialogClasses}
         closeButton={<DialogCloseButton onClose={onCancel} />}
+        id="changePasswordDialog"
       >
         <div className={styles.walletPassword}>
           <TextField
@@ -217,7 +218,11 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
           />
         </div>
 
-        {error ? <p className={styles.error}>{intl.formatMessage(error, error.values)}</p> : null}
+        {error ? (
+          <div className={styles.error} id="changePasswordDialog-errorMessage-text">
+            {intl.formatMessage(error, error.values)}
+          </div>
+        ) : null}
       </Dialog>
     );
   }

@@ -20,8 +20,6 @@ You can:
 
 - ask us to send you a small amount of funds / share with you a wallet with a small amount of funds to test with (again, these are real assets on the network so we cannot easily share any non-trivial amount). Although even this only gives you limited access because we cannot send you all possible combinations, nor can we physically send you "hardware wallets".
 
-- View the whole UI (mockups) without (can experience all user flows without requiring any real assets) [here](https://yoroi-extension-storybook.netlify.com/)
-
 We cannot:
 
 - generate any "god-mode" or unlimited fund account for you to test with

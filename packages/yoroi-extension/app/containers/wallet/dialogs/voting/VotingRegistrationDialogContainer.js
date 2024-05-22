@@ -1,16 +1,13 @@
 // @flow
 import type { Node, ComponentType } from 'react';
-import type { InjectedOrGenerated } from '../../../../types/injectedPropsType';
-import type { GeneratedData as TransactionDialogData } from './TransactionDialogContainer';
-import type { GeneratedData as RegisterDialogData } from './RegisterDialogContainer';
+import type { StoresAndActionsProps } from '../../../../types/injectedProps.types';
 import type { WalletType } from '../../../../components/wallet/voting/types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { computed } from 'mobx';
 import { Logger } from '../../../../utils/logging';
 import { handleExternalLinkClick } from '../../../../utils/routing';
 import { withLayout } from '../../../../styles/context/layout';
-import { ProgressStep, ProgressInfo } from '../../../../stores/ada/VotingStore';
+import { ProgressStep } from '../../../../stores/ada/VotingStore';
 import GeneratePinDialog from '../../../../components/wallet/voting/GeneratePinDialog';
 import ConfirmPinDialog from '../../../../components/wallet/voting/ConfirmPinDialog';
 import QrCodeDialog from '../../../../components/wallet/voting/QrCodeDialog';
@@ -19,40 +16,40 @@ import RegisterDialogContainer from './RegisterDialogContainer';
 import globalMessages from '../../../../i18n/global-messages';
 import CreateTxExecutingDialog from '../../../../components/wallet/voting/CreateTxExecutingDialog';
 
-export type GeneratedData = typeof VotingRegistrationDialogContainer.prototype.generated;
 type Props = {|
-  ...InjectedOrGenerated<GeneratedData>,
+  ...StoresAndActionsProps,
   +onClose: void => void,
   +walletType: WalletType,
 |};
-type InjectedProps = {|
+type InjectedLayoutProps = {|
   +isRevampLayout: boolean,
 |};
 
-type AllProps = {| ...Props, ...InjectedProps |};
+type AllProps = {| ...Props, ...InjectedLayoutProps |};
 
 @observer
 class VotingRegistrationDialogContainer extends Component<AllProps> {
   cancel: () => void = () => {
     this.props.onClose();
-    this.generated.actions.ada.votingActions.cancel.trigger();
+    this.props.actions.ada.voting.cancel.trigger();
   };
 
   componentDidMount() {
-    this.generated.actions.generateCatalystKey.trigger();
+    this.props.actions.ada.voting.generateCatalystKey.trigger();
   }
   async componentWillUnmount() {
-    this.generated.actions.ada.votingActions.cancel.trigger();
+    this.props.actions.ada.voting.cancel.trigger();
   }
 
   render(): null | Node {
-    const votingStore = this.generated.stores.substores.ada.votingStore;
+    const { actions, stores } = this.props;
+    const votingStore = this.props.stores.substores.ada.votingStore;
     if (votingStore.createVotingRegTx.isExecuting) {
       return <CreateTxExecutingDialog />;
     }
 
-    const { profile } = this.generated.stores;
-    const votingActions = this.generated.actions.ada.votingActions;
+    const { profile } = this.props.stores;
+    const votingActions = this.props.actions.ada.voting;
     const walletType = this.props.walletType;
     const stepsList = [
       { step: ProgressStep.GENERATE, message: globalMessages.stepPin },
@@ -103,7 +100,8 @@ class VotingRegistrationDialogContainer extends Component<AllProps> {
       case ProgressStep.REGISTER:
         component = (
           <RegisterDialogContainer
-            {...this.generated.RegisterDialogProps}
+            actions={actions}
+            stores={stores}
             stepsList={stepsList}
             submit={votingActions.submitRegister.trigger}
             goBack={votingActions.goBackToRegister.trigger}
@@ -116,7 +114,8 @@ class VotingRegistrationDialogContainer extends Component<AllProps> {
       case ProgressStep.TRANSACTION:
         component = (
           <TransactionDialogContainer
-            {...this.generated.TransactionDialogProps}
+            actions={actions}
+            stores={stores}
             stepsList={stepsList}
             classicTheme={profile.isClassicTheme}
             cancel={this.cancel}
@@ -150,137 +149,6 @@ class VotingRegistrationDialogContainer extends Component<AllProps> {
     }
 
     return component;
-  }
-
-  @computed get generated(): {|
-    actions: {|
-      generateCatalystKey: {| trigger: (params: void) => Promise<void> |},
-      ada: {|
-        votingActions: {|
-          cancel: {| trigger: (params: void) => void |},
-          submitGenerate: {| trigger: (params: void) => void |},
-          goBackToGenerate: {|
-            trigger: (params: void) => void,
-          |},
-          submitConfirm: {|
-            trigger: (params: void) => void,
-          |},
-          submitConfirmError: {|
-            trigger: (params: void) => void,
-          |},
-          submitRegister: {|
-            trigger: (params: void) => void,
-          |},
-          submitRegisterError: {|
-            trigger: (params: Error) => void,
-          |},
-          goBackToRegister: {|
-            trigger: (params: void) => void,
-          |},
-          submitTransaction: {|
-            trigger: (params: void) => void,
-          |},
-          submitTransactionError: {|
-            trigger: (params: Error) => void,
-          |},
-          finishQRCode: {|
-            trigger: (params: void) => void,
-          |},
-        |},
-      |},
-    |},
-    stores: {|
-      profile: {|
-        isClassicTheme: boolean,
-      |},
-      substores: {|
-        ada: {|
-          votingStore: {|
-            pin: Array<number>,
-            progressInfo: ProgressInfo,
-            encryptedKey: string | null,
-            isActionProcessing: boolean,
-            createVotingRegTx: {|
-              isExecuting: boolean,
-            |},
-          |},
-        |},
-      |},
-    |},
-    TransactionDialogProps: InjectedOrGenerated<TransactionDialogData>,
-    RegisterDialogProps: InjectedOrGenerated<RegisterDialogData>,
-  |} {
-    if (this.props.generated !== undefined) {
-      return this.props.generated;
-    }
-    if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(VotingRegistrationDialogContainer)} no way to generated props`);
-    }
-    const { stores, actions } = this.props;
-    return Object.freeze({
-      stores: {
-        profile: {
-          isClassicTheme: stores.profile.isClassicTheme,
-        },
-        substores: {
-          ada: {
-            votingStore: {
-              progressInfo: stores.substores.ada.votingStore.progressInfo,
-              pin: stores.substores.ada.votingStore.pin,
-              encryptedKey: stores.substores.ada.votingStore.encryptedKey,
-              isActionProcessing: stores.substores.ada.votingStore.isActionProcessing,
-              createVotingRegTx: {
-                isExecuting: stores.substores.ada.votingStore.createVotingRegTx.isExecuting,
-              },
-            },
-          },
-        },
-      },
-      actions: {
-        ada: {
-          votingActions: {
-            submitGenerate: {
-              trigger: actions.ada.voting.submitGenerate.trigger,
-            },
-            goBackToGenerate: {
-              trigger: actions.ada.voting.goBackToGenerate.trigger,
-            },
-            submitConfirm: {
-              trigger: () => {
-                actions.ada.voting.submitConfirm.trigger();
-              },
-            },
-            submitConfirmError: {
-              trigger: actions.ada.voting.submitConfirmError.trigger,
-            },
-            submitRegister: {
-              trigger: actions.ada.voting.submitRegister.trigger,
-            },
-            submitRegisterError: {
-              trigger: actions.ada.voting.submitRegisterError.trigger,
-            },
-            goBackToRegister: {
-              trigger: actions.ada.voting.goBackToRegister.trigger,
-            },
-            submitTransaction: {
-              trigger: actions.ada.voting.submitTransaction.trigger,
-            },
-            submitTransactionError: {
-              trigger: actions.ada.voting.submitTransactionError.trigger,
-            },
-            finishQRCode: {
-              trigger: actions.ada.voting.finishQRCode.trigger,
-            },
-            cancel: {
-              trigger: actions.ada.voting.cancel.trigger,
-            },
-          },
-        },
-        generateCatalystKey: { trigger: actions.ada.voting.generateCatalystKey.trigger },
-      },
-      TransactionDialogProps: ({ actions, stores }: InjectedOrGenerated<TransactionDialogData>),
-      RegisterDialogProps: ({ actions, stores }: InjectedOrGenerated<RegisterDialogData>),
-    });
   }
 }
 

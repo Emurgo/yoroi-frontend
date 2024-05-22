@@ -71,7 +71,7 @@ function Stepper(props: Props & Intl): Node {
               {isPrevStep ? (
                 <StepMarkIcon />
               ) : (
-                <Typography
+                <Typography component="div"
                   variant="body2"
                   fontWeight={500}
                   color={isCurrentStep ? 'common.white' : stepColor}
@@ -81,7 +81,7 @@ function Stepper(props: Props & Intl): Node {
                 </Typography>
               )}
             </Box>
-            <Typography sx={{ cursor }} variant="body1" color={stepColor} fontWeight={500}>
+            <Typography component="div" sx={{ cursor }} variant="body1" color={stepColor} fontWeight={500}>
               {intl.formatMessage(message)}
             </Typography>
           </Stack>

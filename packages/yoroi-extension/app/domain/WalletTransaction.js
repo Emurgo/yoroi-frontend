@@ -1,5 +1,5 @@
 // @flow
-import type { AssuranceMode, AssuranceLevel } from '../types/transactionAssuranceTypes';
+import type { AssuranceMode, AssuranceLevel } from '../types/transactionAssurance.types';
 import type { TransactionDirectionType } from '../api/ada/transactions/types';
 import type { BlockRow, DbTokenInfo } from '../api/ada/lib/storage/database/primitives/tables';
 import type { TxStatusCodesType } from '../api/ada/lib/storage/database/primitives/enums';

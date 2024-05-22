@@ -221,9 +221,9 @@ export default class VotingRegTxDialog extends Component<Props> {
         </div>
         {spendingPasswordForm}
         {this.props.error ? (
-          <p className={styles.error}>
+          <div className={styles.error}>
             {intl.formatMessage(this.props.error, this.props.error.values)}
-          </p>
+          </div>
         ) : null}
       </Dialog>
     );

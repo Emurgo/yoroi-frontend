@@ -33,13 +33,13 @@ export default class RewardHeader extends Component<Props> {
       <WarningHeader
         message={(
           <>
-            <p>{intl.formatMessage(messages.rewardAddressLine1)}</p><br />
-            <p>
+            <div>{intl.formatMessage(messages.rewardAddressLine1)}</div><br />
+            <div>
               {intl.formatMessage(
                 messages.rewardAddressLine2,
                 { ticker: this.props.ticker }
               )}
-            </p>
+            </div>
             <br />
           </>
         )}

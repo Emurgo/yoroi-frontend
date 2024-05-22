@@ -35,7 +35,7 @@ const plugins = (folder /*: string */, _networkName /*: string */) /*: * */ => {
     new HtmlWebpackPlugin({
       filename: path.join(__dirname, `../${folder}/main_window_connector.html`),
       template: path.join(__dirname, '../chrome/views/connector/main_window.html'),
-      chunks: ['ergo'],
+      chunks: ['connector'],
       alwaysWriteToDisk: true,
       title: 'Yoroi Dapp Connector',
     }),
@@ -193,12 +193,15 @@ const optimization = {
 const resolve = () /*: * */ => ({
   extensions: ['*', '.js', '.wasm'],
   fallback: {
+    vm: false,
     fs: false,
     path: require.resolve('path-browserify'),
     stream: require.resolve('stream-browserify'),
     zlib: require.resolve('browserify-zlib'),
     crypto: require.resolve('crypto-browserify'),
     buffer: require.resolve('buffer'),
+    assert: require.resolve('assert/'),
+    util: require.resolve('util/'),
   },
   alias: { process: 'process/browser', }
 });

@@ -19,7 +19,7 @@ export default function Card(props: Props): Node {
       <Box>
         <img src={imageSrc} alt={label} />
       </Box>
-      <Typography
+      <Typography component="div"
         variant="h3"
         color="grayscale.max"
         fontWeight={500}
@@ -30,7 +30,7 @@ export default function Card(props: Props): Node {
       >
         {label}
       </Typography>
-      <Typography variant="body2" color="grayscale.900" mb="16px">
+      <Typography component="div" variant="body2" color="grayscale.900" mb="16px">
         {description}
       </Typography>
       {props.children}

@@ -1,9 +1,10 @@
 // @flow
 // Handles Connect to Ledger Hardware Wallet dialog
 
-import { observable, action, runInAction } from 'mobx';
+import { action, observable } from 'mobx';
 import BigNumber from 'bignumber.js';
 import type { ExtendedPublicKeyResp } from '../../utils/hwConnectHandler';
+import { LedgerConnect } from '../../utils/hwConnectHandler';
 
 import Config from '../../config';
 
@@ -11,56 +12,27 @@ import Store from '../base/Store';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import { ROUTES } from '../../routes-config';
 
-import type {
-  CreateHardwareWalletRequest,
-  CreateHardwareWalletFunc,
-} from '../../api/ada';
+import type { CreateHardwareWalletFunc, CreateHardwareWalletRequest, } from '../../api/ada';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 
-import {
-  convertToLocalizableError
-} from '../../domain/LedgerLocalizedError';
+import { convertToLocalizableError } from '../../domain/LedgerLocalizedError';
 
 // This is actually just an interface
-import {
-  HWConnectStoreTypes,
-  ProgressStep,
-  ProgressInfo,
-  HWDeviceInfo
-} from '../../types/HWConnectStoreTypes';
+import { HWConnectStoreTypes, HWDeviceInfo, ProgressInfo, ProgressStep } from '../../types/HWConnectStoreTypes';
 import { StepState } from '../../components/widgets/ProgressSteps';
-
-import { LedgerConnect } from '../../utils/hwConnectHandler';
 
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
 import { CheckAddressesInUseApiError } from '../../api/common/errors';
 
-import {
-  Logger,
-  stringifyData,
-  stringifyError
-} from '../../utils/logging';
-import {
-  CoinTypes,
-  HARD_DERIVATION_START,
-  WalletTypePurpose,
-} from '../../config/numbersConfig';
-import {
-  Bip44DerivationLevels,
-} from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
-import type {
-  RestoreModeType,
-} from '../../actions/common/wallet-restore-actions';
+import { Logger, stringifyData, stringifyError } from '../../utils/logging';
+import { CoinTypes, HARD_DERIVATION_START, WalletTypePurpose, } from '../../config/numbersConfig';
+import { Bip44DerivationLevels, } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import {
-  genTimeToSlot,
-} from '../../api/ada/lib/storage/bridge/timeUtils';
+import { genTimeToSlot, } from '../../api/ada/lib/storage/bridge/timeUtils';
 import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import type {
-  GetExtendedPublicKeyResponse,
-} from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import type { GetExtendedPublicKeyResponse, } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 export default class LedgerConnectStore
   extends Store<StoresMap, ActionsMap>
@@ -69,7 +41,6 @@ export default class LedgerConnectStore
   // =================== VIEW RELATED =================== //
   @observable progressInfo: ProgressInfo;
   @observable derivationIndex: number = HARD_DERIVATION_START + 0; // assume single account
-  @observable mode: void | RestoreModeType;
   error: ?LocalizableError;
   hwDeviceInfo: ?HWDeviceInfo;
   ledgerConnect: ?LedgerConnect;
@@ -104,7 +75,6 @@ export default class LedgerConnectStore
     ledgerConnectAction.submitConnect.listen(this._submitConnect);
     ledgerConnectAction.submitSave.listen(this._submitSave);
     ledgerConnectAction.finishTransfer.listen(this._finishTransfer);
-    ledgerConnectAction.setMode.listen((mode) => runInAction(() => { this.mode = mode; }));
   }
 
   /** setup() is called when stores are being created
@@ -115,7 +85,9 @@ export default class LedgerConnectStore
 
   @action _cancel: void => void = () => {
     this.teardown();
-    this.ledgerConnect && this.ledgerConnect.dispose();
+    if (this.ledgerConnect) {
+      this.ledgerConnect.dispose();
+    }
     this.ledgerConnect = undefined;
   };
 
@@ -125,7 +97,6 @@ export default class LedgerConnectStore
   }
 
   @action _reset: void => void = () => {
-    this.mode = undefined;
     this.progressInfo = {
       currentStep: ProgressStep.CHECK,
       stepState: StepState.LOAD,
@@ -189,7 +160,9 @@ export default class LedgerConnectStore
 
       return this._normalizeHWResponse(extendedPublicKeyResp);
     } finally {
-      this.ledgerConnect && this.ledgerConnect.dispose();
+      if (this.ledgerConnect != null) {
+        this.ledgerConnect.dispose();
+      };
       this.ledgerConnect = undefined;
     }
   }
@@ -221,7 +194,9 @@ export default class LedgerConnectStore
         }
       )).map(this._normalizeHWResponse);
     } finally {
-      this.ledgerConnect && this.ledgerConnect.dispose();
+      if (this.ledgerConnect != null) {
+        this.ledgerConnect.dispose();
+      }
       this.ledgerConnect = undefined;
     }
   }
@@ -445,17 +420,7 @@ export default class LedgerConnectStore
   };
 
   getPath: void => Array<number> = () => {
-    const suffix = [CoinTypes.CARDANO, this.derivationIndex];
-    if (this.mode == null) {
-      throw new Error(`${nameof(LedgerConnectStore)}::${nameof(this._prepareCreateHWReqParams)} missing mode`);
-    }
-    if (this.mode.type === 'bip44') {
-      return [WalletTypePurpose.BIP44, ...suffix];
-    }
-    if (this.mode.type === 'cip1852') {
-      return [WalletTypePurpose.CIP1852, ...suffix];
-    }
-    throw new Error(`${nameof(LedgerConnectStore)}::${nameof(this._prepareCreateHWReqParams)} unknown purpose`);
+    return [WalletTypePurpose.CIP1852, CoinTypes.CARDANO, this.derivationIndex];
   }
 
   async _onSaveSuccess(publicDeriver: PublicDeriver<>): Promise<void> {

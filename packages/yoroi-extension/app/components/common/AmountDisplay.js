@@ -17,9 +17,10 @@ type Props = {|
   +showFiat?: boolean,
   +shouldHideBalance: boolean,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
-  +amount: null | MultiToken,
+  +amount: ?MultiToken,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?string,
+  id: string,
 |};
 
 @observer
@@ -30,7 +31,7 @@ export default class AmountDisplay extends Component<Props> {
   };
 
   render(): Node {
-    const { amount, shouldHideBalance, showFiat, showAmount, unitOfAccountSetting } = this.props;
+    const { amount, shouldHideBalance, showFiat, showAmount, unitOfAccountSetting, id } = this.props;
     if (amount == null) {
       return <div className={styles.isLoading} />;
     }
@@ -85,14 +86,14 @@ export default class AmountDisplay extends Component<Props> {
     return (
       <>
         {showAmount === true && (
-          <p className={styles.amount}>
+          <div className={styles.amount} id={id + '-availableBalance-text'}>
             {balanceDisplay}&nbsp;{truncateToken(getTokenName(tokenInfo))}
-          </p>
+          </div>
         )}
         {showFiat === true && (
-          <p className={styles.fiat}>
+          <div className={styles.fiat} id={id + '-availableFiatBalance-text'}>
             {fiatDisplay || '-'} {currency || 'USD'}
-          </p>
+          </div>
         )}
       </>
     );
@@ -117,8 +118,8 @@ export function FiatDisplay(props: {|
   }
 
   return (
-    <p className={styles.fiat}>
+    <div className={styles.fiat}>
       {formatValue(props.amount)} {props.currency}
-    </p>
+    </div>
   );
 }

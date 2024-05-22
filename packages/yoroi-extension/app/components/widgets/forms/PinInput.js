@@ -91,7 +91,7 @@ export default class PinInput extends Component<Props> {
     const pinField = form.$(this.props.fieldName);
 
     return (
-      <Box sx={{ width: '100%'}}>
+      <Box sx={{ width: '100%' }}>
         {this.props.disclaimer}
         <TextField
           className={this.props.fieldName}

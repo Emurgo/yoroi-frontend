@@ -1,10 +1,8 @@
 // @flow
 
-import RouteParser from 'route-parser';
-
 export const matchRoute = (
   pattern: string, path: string
-): false | { [param: string]: string, ... } => new RouteParser(pattern).match(path);
+): boolean => path.toLowerCase().startsWith(pattern.toLowerCase());
 
 /**
  * Build a route from a pattern like `/wallets/:id` to `/wallets/123`
@@ -31,7 +29,7 @@ export const buildRoute = (pattern: string, params: ParamsT): string => {
   const reTokens = /<(.*?)>/g;
   const reSlashTokens = /_!slash!_/g;
 
-  let routePath = pattern;
+  let routePath = pattern || '';
   const tokens = {};
 
   if (params) {
@@ -114,10 +112,3 @@ export const handleExternalLinkClick = (event: MouseEvent) => {
 export const handleExternalClick: string => void = (link) => {
   window.open(link);
 };
-
-type RecursiveTree = string | { [key: string]: RecursiveTree, ... };
-/** visit all the possible root paths of our application */
-export function visitPaths(value: RecursiveTree): Array<string> {
-  if (typeof value !== 'object') return [value];
-  return Object.keys(value).map(key => value[key]).flatMap(nextValue => visitPaths(nextValue));
-}

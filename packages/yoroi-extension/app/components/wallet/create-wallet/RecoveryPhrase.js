@@ -53,7 +53,7 @@ function RecoveryPhrase(props: Props & Intl): Node {
               }}
               id={'recoveryPhraseWord' + idx}
             >
-              <Typography
+              <Typography component="div"
                 sx={{
                   width: '124px',
                   whiteSpace: 'nowrap',
@@ -86,7 +86,7 @@ function RecoveryPhrase(props: Props & Intl): Node {
         id="toggleRecoveryPhraseButton"
       >
         {shouldShowRecoveryPhrase ? <ClosedEyeIcon /> : <OpenedEyeIcon />}
-        <Typography variant="body2" fontWeight="500">
+        <Typography component="div" variant="body2" fontWeight="500">
           {intl.formatMessage(
             shouldShowRecoveryPhrase
               ? messages.hideRecoveryPhraseBtn

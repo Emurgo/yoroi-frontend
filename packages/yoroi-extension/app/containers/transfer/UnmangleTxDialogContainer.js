@@ -2,21 +2,14 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { computed, } from 'mobx';
-import type { InjectedOrGenerated } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import {
   asHasUtxoChains,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { getAddressPayload } from '../../api/ada/lib/storage/bridge/utils';
 import type { ConfigType } from '../../../config/config-types';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import LocalizableError from '../../i18n/LocalizableError';
-import type { SetupSelfTxRequest } from '../../stores/toplevel/TransactionBuilderStore';
-import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
 import { getMangledFilter, } from '../../stores/stateless/mangledAddresses';
-import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 import TransferSendPage from './TransferSendPage';
-import type { GeneratedData as TransferSendData } from './TransferSendPage';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape, } from 'react-intl';
@@ -24,10 +17,8 @@ import { intlShape, } from 'react-intl';
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 
-export type GeneratedData = typeof UnmangleTxDialogContainer.prototype.generated;
-
 type Props = {|
-  ...InjectedOrGenerated<GeneratedData>,
+  ...StoresAndActionsProps,
   +onClose: void => void,
 |};
 
@@ -39,7 +30,7 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
   };
 
   componentDidMount() {
-    const selected = this.generated.stores.wallets.selected;
+    const selected = this.props.stores.wallets.selected;
     if (selected == null) {
       throw new Error(`${nameof(UnmangleTxDialogContainer)} no wallet selected`);
     }
@@ -49,7 +40,7 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
     }
 
     const getAddresses = (clazz) => {
-      const entries = this.generated.stores.addresses.addressSubgroupMap.get(clazz)?.all ?? [];
+      const entries = this.props.stores.addresses.addressSubgroupMap.get(clazz)?.all ?? [];
       const payloadList = entries.map(
         info => getAddressPayload(info.address, selected.getParent().getNetworkInfo())
       );
@@ -62,7 +53,7 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
       selected,
     );
     // note: don't await
-    this.generated.actions.txBuilderActions.initialize.trigger({
+    this.props.actions.txBuilderActions.initialize.trigger({
       publicDeriver: withChains,
       /**
        * We filter to only UTXOs of mangled addresses
@@ -73,11 +64,13 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
   }
 
   render(): Node {
+    const { actions, stores } = this.props;
     const { intl } = this.context;
-    const txBuilder = this.generated.stores.transactionBuilderStore;
+    const txBuilder = this.props.stores.transactionBuilderStore;
     return (
       <TransferSendPage
-        {...this.generated.TransferSendProps}
+        actions={actions}
+        stores={stores}
         onClose={{
           trigger: this.props.onClose,
           label: intl.formatMessage(globalMessages.cancel),
@@ -89,7 +82,7 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
         transactionRequest={{
           error: txBuilder.setupSelfTx.error,
           result: txBuilder.tentativeTx,
-          reset: this.generated.actions.txBuilderActions.reset.trigger,
+          reset: this.props.actions.txBuilderActions.reset.trigger,
         }}
         toTransferTx={tentativeTx => ({
           recoveredBalance: tentativeTx.totalInput(),
@@ -101,64 +94,5 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
         })}
       />
     );
-  }
-
-  @computed get generated(): {|
-    TransferSendProps: InjectedOrGenerated<TransferSendData>,
-    actions: {|
-      txBuilderActions: {|
-        reset: {| trigger: (params: void) => void |},
-        initialize: {| trigger: (params: SetupSelfTxRequest) => Promise<void> |},
-      |},
-    |},
-    stores: {|
-      addresses: {|
-        addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
-      |},
-      transactionBuilderStore: {|
-        setupSelfTx: {|
-          error: ?LocalizableError,
-        |},
-        tentativeTx: null | ISignRequest<any>,
-      |},
-      wallets: {|
-        selected: null | PublicDeriver<>,
-      |}
-    |}
-    |} {
-    if (this.props.generated !== undefined) {
-      return this.props.generated;
-    }
-    if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(UnmangleTxDialogContainer)} no way to generated props`);
-    }
-    const { stores, actions } = this.props;
-    return Object.freeze({
-      TransferSendProps: ({ actions, stores, }: InjectedOrGenerated<TransferSendData>),
-      stores: {
-        wallets: {
-          selected: stores.wallets.selected,
-        },
-        addresses: {
-          addressSubgroupMap: stores.addresses.addressSubgroupMap,
-        },
-        transactionBuilderStore: {
-          tentativeTx: stores.transactionBuilderStore.tentativeTx,
-          setupSelfTx: {
-            error: stores.transactionBuilderStore.setupSelfTx.error,
-          },
-        },
-      },
-      actions: {
-        txBuilderActions: {
-          initialize: {
-            trigger: actions.txBuilderActions.initialize.trigger,
-          },
-          reset: {
-            trigger: actions.txBuilderActions.reset.trigger
-          },
-        },
-      },
-    });
   }
 }

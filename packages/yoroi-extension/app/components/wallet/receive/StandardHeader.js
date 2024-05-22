@@ -12,7 +12,7 @@ import QrCodeWrapper from '../../widgets/QrCodeWrapper';
 import RawHash from '../../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
-import type { Notification } from '../../../types/notificationType';
+import type { Notification } from '../../../types/notification.types';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { truncateAddress } from '../../../utils/formatters';
 
@@ -89,6 +89,7 @@ export default class StandardHeader extends Component<Props> {
         <div className={styles.instructions}>
           <div className={styles.hashLabel}>{intl.formatMessage(messages.walletAddressLabel)}</div>
           <CopyableAddress
+            id='standartHeader'
             darkVariant
             hash={walletAddress}
             elementId={mainAddressNotificationId}
@@ -113,9 +114,9 @@ export default class StandardHeader extends Component<Props> {
           </div>
           {generateAddressForm}
           {error ? (
-            <p className={styles.error}>{intl.formatMessage(error)}</p>
+            <div className={styles.error}>{intl.formatMessage(error)}</div>
           ) : (
-            <p className={styles.error}>&nbsp;</p>
+            <div className={styles.error}>&nbsp;</div>
           )}
         </div>
         <div className={styles.qrCode}>

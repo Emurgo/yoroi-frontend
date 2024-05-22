@@ -10,6 +10,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import SubMenu from '../../topbar/SubMenu';
 import { withLayout } from '../../../styles/context/layout';
 import type { InjectedLayoutProps } from '../../../styles/context/layout';
+import type { SubMenuOption } from '../../topbar/SubMenu';
 
 export const settingsMenuMessages: Object = defineMessages({
   general: {
@@ -47,8 +48,8 @@ class SettingsMenu extends Component<Props & InjectedLayoutProps> {
   render(): Node {
     const { intl } = this.context;
     const { onItemClick, isActiveItem, isRevampLayout } = this.props;
-
-    const settingOptions: Array<Object> = [
+    const isProduction = environmnent.isProduction();
+    const settingOptions: Array<SubMenuOption> = [
       {
         label: intl.formatMessage(settingsMenuMessages.general),
         route: ROUTES.SETTINGS.GENERAL,
@@ -64,10 +65,11 @@ class SettingsMenu extends Component<Props & InjectedLayoutProps> {
         route: ROUTES.SETTINGS.WALLET,
         className: 'wallet',
       },
-      !environmnent.isProduction() && {
+      {
         label: intl.formatMessage(settingsMenuMessages.externalStorage),
         route: ROUTES.SETTINGS.EXTERNAL_STORAGE,
         className: 'externalStorage',
+        hidden: isProduction,
       },
       {
         label: intl.formatMessage(
@@ -90,11 +92,17 @@ class SettingsMenu extends Component<Props & InjectedLayoutProps> {
         label: intl.formatMessage(settingsMenuMessages.analytics),
         route: ROUTES.SETTINGS.ANALYTICS,
         className: 'analytics',
+        hidden: !isRevampLayout,
       },
     ];
 
     return (
-      <SubMenu options={settingOptions} onItemClick={onItemClick} isActiveItem={isActiveItem} />
+      <SubMenu
+        options={settingOptions}
+        onItemClick={onItemClick}
+        isActiveItem={isActiveItem}
+        locationId='settings'
+      />
     );
   }
 }

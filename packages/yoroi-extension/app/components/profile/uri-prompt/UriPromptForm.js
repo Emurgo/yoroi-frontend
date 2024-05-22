@@ -45,7 +45,7 @@ export default class UriPromptForm extends Component<Props> {
 
           <div className={styles.explanation}>
             <h1>{intl.formatMessage(messages.uriHeading)}</h1>
-            <p>{intl.formatMessage(messages.uriExplanation)}</p>
+            <div>{intl.formatMessage(messages.uriExplanation)}</div>
           </div>
 
           <div className={styles.buttonsWrapper}>

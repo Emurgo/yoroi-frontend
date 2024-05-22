@@ -1,13 +1,8 @@
 // @flow
 
-import BigNumber from 'bignumber.js';
 import type {
   AddressUtxoRequest,
   AddressUtxoResponse,
-  TxBodiesRequest,
-  TxBodiesResponse,
-  UtxoSumRequest,
-  UtxoSumResponse,
   HistoryRequest,
   HistoryResponse,
   RewardHistoryFunc,
@@ -31,8 +26,6 @@ import type {
   BestBlockResponse,
   AddressUtxoFunc,
   HistoryFunc,
-  TxBodiesFunc,
-  UtxoSumFunc,
   RemoteTransaction,
   MultiAssetRequest,
   MultiAssetMintMetadataResponse,
@@ -47,20 +40,19 @@ import type {
   GetTransactionsByHashesResponse,
   GetTransactionsByHashesFunc,
   MultiAssetSupplyResponse,
+  FilterUsedRequest,
+  FilterUsedResponse,
+  FilterFunc,
+  GetSwapFeeTiersFunc,
 } from './types';
-import type {
-  FilterFunc, FilterUsedRequest, FilterUsedResponse,
-} from '../../../common/lib/state-fetch/currencySpecificTypes';
 import LocalizableError from '../../../../i18n/LocalizableError';
 
-import type { IFetcher } from './IFetcher';
+import type { IFetcher } from './IFetcher.types';
 
 import { chunk } from 'lodash';
 import {
   CheckAddressesInUseApiError,
   GetAllUTXOsForAddressesError,
-  GetTxsBodiesForUTXOsError,
-  GetUtxosSumsForAddressesApiError,
   GetTxHistoryForAddressesApiError,
   GetRewardHistoryApiError,
   GetAccountStateApiError,
@@ -95,14 +87,6 @@ export class BatchedFetcher implements IFetcher {
 
   getUTXOsForAddresses: AddressUtxoRequest => Promise<AddressUtxoResponse> = (body) => (
     batchUTXOsForAddresses(this.baseFetcher.getUTXOsForAddresses)(body)
-  )
-
-  getTxsBodiesForUTXOs: TxBodiesRequest => Promise<TxBodiesResponse> = (body) => (
-    batchTxsBodiesForInputs(this.baseFetcher.getTxsBodiesForUTXOs)(body)
-  )
-
-  getUTXOsSumsForAddresses: UtxoSumRequest => Promise<UtxoSumResponse> = (body) => (
-    batchGetUTXOsSumsForAddresses(this.baseFetcher.getUTXOsSumsForAddresses)(body)
   )
 
   getTransactionsHistoryForAddresses: HistoryRequest => Promise<HistoryResponse> = (body) => (
@@ -206,6 +190,11 @@ export class BatchedFetcher implements IFetcher {
     // Todo: Implement batching as the max slots per request is 50
     this.baseFetcher.getLatestBlockBySlot(body)
   )
+
+  getSwapFeeTiers: GetSwapFeeTiersFunc = async (body) => (
+    // No batching for fee tiers
+    this.baseFetcher.getSwapFeeTiers(body)
+  )
 }
 
 /** Sum up the UTXO for a list of addresses by batching backend requests */
@@ -234,94 +223,6 @@ function batchUTXOsForAddresses(
       Logger.error(`batchedFetcher:::${nameof(batchUTXOsForAddresses)} error: ` + stringifyError(error));
       if (error instanceof LocalizableError) throw error;
       throw new GetAllUTXOsForAddressesError();
-    }
-  };
-}
-
-/** List of Body hashes for a list of utxos by batching backend requests */
-function batchTxsBodiesForInputs(
-  getTxsBodiesForUTXOs: TxBodiesFunc,
-): TxBodiesFunc {
-  return async function (body: TxBodiesRequest): Promise<TxBodiesResponse> {
-    try {
-      // split up all txs into chunks of equal size
-      const groupsOfTxsHashes = chunk(body.txsHashes, CONFIG.app.txsBodiesRequestSize);
-
-      // convert chunks into list of Promises that call the backend-service
-      const promises = groupsOfTxsHashes
-        .map(groupOfTxsHashes => getTxsBodiesForUTXOs({
-          network: body.network,
-          txsHashes: groupOfTxsHashes,
-        }));
-
-      // Sum up all the utxo
-      return Promise.all(promises)
-        .then(groupsOfTxBodies => {
-          const bodies = groupsOfTxBodies
-            .reduce((acc, groupOfTxBodies) => Object.assign(acc, groupOfTxBodies), {});
-          if (body.txsHashes.length !== Object.keys(bodies).length) {
-            throw new GetTxsBodiesForUTXOsError();
-          }
-          return bodies;
-        });
-    } catch (error) {
-      Logger.error(`batchedFetcher::${nameof(batchTxsBodiesForInputs)} error: ` + stringifyError(error));
-      if (error instanceof LocalizableError) throw error;
-      throw new GetTxsBodiesForUTXOsError();
-    }
-  };
-}
-
-export function batchGetUTXOsSumsForAddresses(
-  getUTXOsSumsForAddresses: UtxoSumFunc,
-): UtxoSumFunc {
-  return async function (body: UtxoSumRequest): Promise<UtxoSumResponse> {
-    try {
-      // batch all addresses into chunks for API
-      const groupsOfAddresses = chunk(body.addresses, addressesLimit);
-      const promises =
-        groupsOfAddresses.map(groupOfAddresses => getUTXOsSumsForAddresses({
-          network: body.network,
-          addresses: groupOfAddresses,
-        }));
-      const partialAmounts: Array<UtxoSumResponse> = await Promise.all(promises);
-
-      // sum all chunks together
-      let sum: BigNumber = new BigNumber(0);
-      const assetMap = new Map<string, ReadonlyElementOf<$PropertyType<UtxoSumResponse, 'assets'>>>();
-      for (const partial of partialAmounts) {
-        sum = sum.plus(
-          partial.sum != null && partial.sum !== '' // undefined if no addresses in the batch has any balance
-              ? new BigNumber(partial.sum)
-              : new BigNumber(0)
-        );
-        for (const asset of partial.assets) {
-          const currentVal = assetMap.get(asset.assetId)?.amount ?? '0';
-          assetMap.set(
-            asset.assetId,
-            {
-              ...asset,
-              amount: new BigNumber(currentVal).plus(asset.amount).toString(),
-            },
-          );
-        }
-      }
-      if (sum.isZero()) {
-        return {
-          sum: null,
-          assets: [],
-        };
-      }
-      return {
-        sum: sum.toString(),
-        assets: Array.from(assetMap.entries()).map(entry => ({
-          ...entry[1]
-        })),
-      };
-    } catch (error) {
-      Logger.error(`batchedFetcher::${nameof(batchGetUTXOsSumsForAddresses)} error: ` + stringifyError(error));
-      if (error instanceof LocalizableError) throw error;
-      throw new GetUtxosSumsForAddressesApiError();
     }
   };
 }

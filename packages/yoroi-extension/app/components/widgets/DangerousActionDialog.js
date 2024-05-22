@@ -34,6 +34,7 @@ type Props = {|
     onClick: void => void,
     primary?: boolean,
   |},
+  id: string,
 |};
 
 @observer
@@ -44,7 +45,7 @@ class DangerousActionDialog extends Component<Props & InjectedLayoutProps> {
 
   render(): Node {
     const { intl } = this.context;
-    const { isSubmitting, error, renderLayoutComponent } = this.props;
+    const { isSubmitting, error, renderLayoutComponent, id } = this.props;
 
     const dialogClasses = classnames(['removeWalletDialog', styles.dialog]);
 
@@ -79,6 +80,7 @@ class DangerousActionDialog extends Component<Props & InjectedLayoutProps> {
             label={this.props.checkboxAcknowledge}
             onChange={this.props.toggleCheck}
             checked={this.props.isSubmitting || this.props.isChecked}
+            id={id + '-acknowledgeAction'}
           />
         </div>
 
@@ -99,6 +101,7 @@ class DangerousActionDialog extends Component<Props & InjectedLayoutProps> {
                 sx={{ marginRight: '8px', width: '16px', height: '16px' }}
               />
             }
+            id={id + '-acknowledgeAction-checkbox'}
             sx={{ marginLeft: '-0px' }}
           />
         </Box>
@@ -119,6 +122,7 @@ class DangerousActionDialog extends Component<Props & InjectedLayoutProps> {
         onClose={this.props.onCancel}
         className={dialogClasses}
         closeButton={<DialogCloseButton onClose={this.props.onCancel} />}
+        id={id}
       >
         {content}
       </Dialog>

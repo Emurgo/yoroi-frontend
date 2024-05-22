@@ -220,9 +220,9 @@ class ConnectPage extends Component<Props & InjectedProps> {
             <NoWalletImage />
           </div>
           <div>
-            <p className={styles.noWalletsText}>
+            <div className={styles.noWalletsText}>
               {intl.formatMessage(messages.noWalletsFound, { network })}
-            </p>
+            </div>
             <button className={styles.createWallet} onClick={this.onCreateWallet} type="button">
               {intl.formatMessage(messages.createWallet)}
             </button>
@@ -279,7 +279,7 @@ class ConnectPage extends Component<Props & InjectedProps> {
         {hasWallets ? (
           <>
             <ProgressBar step={isAppAuth ? 2 : 1} max={2} />
-            <Typography
+            <Typography component="div"
               variant="h4"
               color="gray.900"
               marginTop="32px"
@@ -300,7 +300,7 @@ class ConnectPage extends Component<Props & InjectedProps> {
                 )}
               </div>
               <Box marginTop="16px">
-                <Typography variant="body-1" fontWeight="400" color="gray.900">
+                <Typography component="div" variant="body-1" fontWeight="400" color="gray.900">
                   {intl.formatMessage(messages.subtitle)}{' '}
                   <Typography as="span" variant="body-1" fontWeight="500">
                     {url}
@@ -323,7 +323,7 @@ class ConnectPage extends Component<Props & InjectedProps> {
               ) : hasWallets ? (
                 <div className={styles.walletsContainer}>
                   <div className={styles.titleWallet}>
-                    <Typography variant="body-1" lineHeight="24px" color="gray.900">
+                    <Typography component="div" variant="body-1" lineHeight="24px" color="gray.900">
                       {intl.formatMessage(messages.yourWallets)}
                     </Typography>
                     <button
@@ -336,7 +336,7 @@ class ConnectPage extends Component<Props & InjectedProps> {
                   </div>
 
                   <ul className={styles.list}>
-                    {publicDerivers.map(wallet => (
+                    {publicDerivers.map((wallet, idx) => (
                       <li
                         key={wallet.publicDeriver.getPublicDeriverId()}
                         className={styles.listItem}
@@ -361,6 +361,7 @@ class ConnectPage extends Component<Props & InjectedProps> {
                                   getCurrentPrice={this.props.getCurrentPrice}
                                   showFiat
                                   showAmount
+                                  id={'dAppConnector:connect:walletList:walletCard_' + idx}
                                 />
                               </Box>
                             }
@@ -376,10 +377,10 @@ class ConnectPage extends Component<Props & InjectedProps> {
         </Box>
         {hasWallets && !isAppAuth ? (
           <div className={styles.bottom}>
-            <p className={styles.infoText}>{intl.formatMessage(messages.connectInfo)}</p>
-            <p className={styles.infoText}>
+            <div className={styles.infoText}>{intl.formatMessage(messages.connectInfo)}</div>
+            <div className={styles.infoText}>
               {intl.formatMessage(connectorMessages.messageReadOnly)}
-            </p>
+            </div>
           </div>
         ) : null}
       </div>

@@ -14,7 +14,7 @@ type CreateAuthEntryParams = {|
   password: string,
 |};
 
-export const createAuthEntry: CreateAuthEntryParams => Promise<?WalletAuthEntry> 
+export const createAuthEntry: CreateAuthEntryParams => Promise<?WalletAuthEntry>
   = async (params) => {
     return RustModule.WasmScope(Scope => _createAuthEntry(Scope, params));
   };

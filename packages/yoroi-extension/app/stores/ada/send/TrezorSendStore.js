@@ -17,8 +17,6 @@ import {
 import LocalizableError from '../../../i18n/LocalizableError';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import { ROUTES } from '../../../routes-config';
-import { buildCheckAndCall } from '../../lib/check';
-import { getApiForNetwork, ApiOptions } from '../../../api/common/utils';
 import { HaskellShelleyTxSignRequest } from '../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type { ActionsMap } from '../../../actions/index';
 import type { StoresMap } from '../../index';
@@ -48,18 +46,9 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
   setup(): void {
     super.setup();
     const trezorSendAction = this.actions.ada.trezorSend;
-
-    const { syncCheck, asyncCheck } = buildCheckAndCall(
-      ApiOptions.ada,
-      () => {
-        if (this.stores.profile.selectedNetwork == null) return undefined;
-        return getApiForNetwork(this.stores.profile.selectedNetwork);
-      }
-    );
-
-    trezorSendAction.sendUsingTrezor.listen(asyncCheck(this._sendWrapper));
-    trezorSendAction.cancel.listen(syncCheck(this._cancel));
-    trezorSendAction.reset.listen(syncCheck(this._reset));
+    trezorSendAction.sendUsingTrezor.listen(this._sendWrapper);
+    trezorSendAction.cancel.listen(this._cancel);
+    trezorSendAction.reset.listen(this._reset);
   }
 
   _reset: void => void = () => {

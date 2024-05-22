@@ -1,20 +1,12 @@
 // @flow
 import type { Node } from 'react';
 import { Component } from 'react';
-import { computed } from 'mobx';
 import { observer } from 'mobx-react';
 import WalletBackupDialog from '../../../components/wallet/WalletBackupDialog';
-import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
-import type {
-  RecoveryPhraseSortedArray,
-  RecoveryPhraseWordArray,
-  WalletBackupSteps,
-} from '../../../stores/toplevel/WalletBackupStore';
-
-export type GeneratedData = typeof WalletBackupDialogContainer.prototype.generated;
+import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 
 type Props = {|
-  ...InjectedOrGenerated<GeneratedData>,
+  ...StoresAndActionsProps,
   +onClose: void => void,
 |};
 
@@ -23,11 +15,11 @@ export default class WalletBackupDialogContainer extends Component<Props> {
 
   onCancelBackup: (() => void) = () => {
     this.props.onClose();
-    this.generated.actions.walletBackup.cancelWalletBackup.trigger();
+    this.props.actions.walletBackup.cancelWalletBackup.trigger();
   }
 
   render(): Node {
-    const { actions, stores } = this.generated;
+    const { actions, stores } = this.props;
     const {
       recoveryPhraseWords,
       enteredPhrase,
@@ -89,142 +81,5 @@ export default class WalletBackupDialogContainer extends Component<Props> {
         classicTheme={stores.profile.isClassicTheme}
       />
     );
-  }
-
-  @computed get generated(): {|
-    actions: {|
-      walletBackup: {|
-        togglePrivacyNoticeForWalletBackup: {|
-          trigger: (params: void) => void
-        |},
-        acceptWalletBackupTermDevice: {|
-          trigger: (params: void) => void
-        |},
-        acceptWalletBackupTermRecovery: {|
-          trigger: (params: void) => void
-        |},
-        addWordToWalletBackupVerification: {|
-          trigger: (params: {|
-            index: number,
-            word: string
-          |}) => void
-        |},
-        cancelWalletBackup: {|
-          trigger: (params: void) => void
-        |},
-        clearEnteredRecoveryPhrase: {|
-          trigger: (params: void) => void
-        |},
-        continueToPrivacyWarning: {|
-          trigger: (params: void) => void
-        |},
-        continueToRecoveryPhraseForWalletBackup: {|
-          trigger: (params: void) => void
-        |},
-        finishWalletBackup: {|
-          trigger: (params: void) => Promise<void>
-        |},
-        removeOneMnemonicWord: {|
-          trigger: (params: void) => void
-        |},
-        restartWalletBackup: {|
-          trigger: (params: void) => void
-        |},
-        startWalletBackup: {|
-          trigger: (params: void) => void
-        |}
-      |}
-    |},
-    stores: {|
-      profile: {| isClassicTheme: boolean |},
-      walletBackup: {|
-        countdownRemaining: number,
-        currentStep: WalletBackupSteps,
-        enteredPhrase: Array<{|
-          index: number,
-          word: string
-        |}>,
-        isPrivacyNoticeAccepted: boolean,
-        isRecoveryPhraseValid: boolean,
-        isTermDeviceAccepted: boolean,
-        isTermRecoveryAccepted: boolean,
-        recoveryPhraseSorted: RecoveryPhraseSortedArray,
-        recoveryPhraseWords: RecoveryPhraseWordArray
-      |},
-      wallets: {|
-        createWalletRequest: {| isExecuting: boolean |}
-      |}
-    |}
-    |} {
-    if (this.props.generated !== undefined) {
-      return this.props.generated;
-    }
-    if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(WalletBackupDialogContainer)} no way to generated props`);
-    }
-    const { stores, actions, } = this.props;
-    return Object.freeze({
-      stores: {
-        profile: {
-          isClassicTheme: stores.profile.isClassicTheme,
-        },
-        walletBackup: {
-          recoveryPhraseWords: stores.walletBackup.recoveryPhraseWords,
-          enteredPhrase: stores.walletBackup.enteredPhrase,
-          isRecoveryPhraseValid: stores.walletBackup.isRecoveryPhraseValid,
-          countdownRemaining: stores.walletBackup.countdownRemaining,
-          recoveryPhraseSorted: stores.walletBackup.recoveryPhraseSorted,
-          isTermDeviceAccepted: stores.walletBackup.isTermDeviceAccepted,
-          isTermRecoveryAccepted: stores.walletBackup.isTermRecoveryAccepted,
-          isPrivacyNoticeAccepted: stores.walletBackup.isPrivacyNoticeAccepted,
-          currentStep: stores.walletBackup.currentStep,
-        },
-        wallets: {
-          createWalletRequest: {
-            isExecuting: stores.wallets.createWalletRequest.isExecuting,
-          },
-        },
-      },
-      actions: {
-        walletBackup: {
-          cancelWalletBackup: {
-            trigger: actions.walletBackup.cancelWalletBackup.trigger,
-          },
-          startWalletBackup: {
-            trigger: actions.walletBackup.startWalletBackup.trigger,
-          },
-          addWordToWalletBackupVerification: {
-            trigger: actions.walletBackup.addWordToWalletBackupVerification.trigger,
-          },
-          clearEnteredRecoveryPhrase: {
-            trigger: actions.walletBackup.clearEnteredRecoveryPhrase.trigger,
-          },
-          acceptWalletBackupTermDevice: {
-            trigger: actions.walletBackup.acceptWalletBackupTermDevice.trigger,
-          },
-          acceptWalletBackupTermRecovery: {
-            trigger: actions.walletBackup.acceptWalletBackupTermRecovery.trigger,
-          },
-          restartWalletBackup: {
-            trigger: actions.walletBackup.restartWalletBackup.trigger,
-          },
-          finishWalletBackup: {
-            trigger: actions.walletBackup.finishWalletBackup.trigger,
-          },
-          removeOneMnemonicWord: {
-            trigger: actions.walletBackup.removeOneMnemonicWord.trigger,
-          },
-          continueToPrivacyWarning: {
-            trigger: actions.walletBackup.continueToPrivacyWarning.trigger,
-          },
-          togglePrivacyNoticeForWalletBackup: {
-            trigger: actions.walletBackup.togglePrivacyNoticeForWalletBackup.trigger,
-          },
-          continueToRecoveryPhraseForWalletBackup: {
-            trigger: actions.walletBackup.continueToRecoveryPhraseForWalletBackup.trigger,
-          },
-        },
-      },
-    });
   }
 }

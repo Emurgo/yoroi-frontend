@@ -20,7 +20,6 @@ import {
   asHasLevels,
 } from '../../models/PublicDeriver/traits';
 import { rawRemoveAllTransactions as cardanoRawRemoveAllTransactions } from '../updateTransactions';
-import { rawRemoveAllTransactions as ergoRawRemoveAllTransactions } from '../../../../../ergo/lib/storage/bridge/updateTransactions';
 import {
   GetAddress,
   GetPathWithSpecific,
@@ -33,11 +32,10 @@ import { AssociateTxWithAccountingIOs, } from '../../database/transactionModels/
 import {
   CardanoByronAssociateTxWithIOs,
   CardanoShelleyAssociateTxWithIOs,
-  ErgoAssociateTxWithIOs,
 } from '../../database/transactionModels/multipart/api/read';
 import { GetDerivationSpecific, } from '../../database/walletTypes/common/api/read';
 import { rawGetAddressRowsForWallet } from '../traitUtils';
-import { isCardanoHaskell, isErgo } from '../../database/prepackaged/networks';
+import { isCardanoHaskell } from '../../database/prepackaged/networks';
 import {
   ModifyUtxoAtSafePoint,
   ModifyUtxoDiffToBestBlock,
@@ -54,7 +52,6 @@ export async function removePublicDeriver(request: {|
     GetPathWithSpecific,
     GetAddress,
     CardanoByronAssociateTxWithIOs,
-    ErgoAssociateTxWithIOs,
     CardanoShelleyAssociateTxWithIOs,
     AssociateTxWithAccountingIOs,
     AssociateTxWithUtxoIOs,
@@ -103,26 +100,6 @@ export async function removePublicDeriver(request: {|
               GetTransaction: deps.GetTransaction,
               FreeBlocks: deps.FreeBlocks,
               GetCertificates: deps.GetCertificates,
-              ModifyTokenList: deps.ModifyTokenList,
-            },
-            withLevels.getParent().getDerivationTables(),
-            {
-              publicDeriver: withLevels,
-            }
-          );
-        } else if (isErgo(network)) {
-          await ergoRawRemoveAllTransactions(
-            db, dbTx,
-            {
-              GetPathWithSpecific: deps.GetPathWithSpecific,
-              GetAddress: deps.GetAddress,
-              ErgoAssociateTxWithIOs: deps.ErgoAssociateTxWithIOs,
-              AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
-              GetDerivationSpecific: deps.GetDerivationSpecific,
-              DeleteAllTransactions: deps.DeleteAllTransactions,
-              ModifyAddress: deps.ModifyAddress,
-              GetTransaction: deps.GetTransaction,
-              FreeBlocks: deps.FreeBlocks,
               ModifyTokenList: deps.ModifyTokenList,
             },
             withLevels.getParent().getDerivationTables(),

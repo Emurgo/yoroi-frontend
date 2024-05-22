@@ -5,26 +5,21 @@ import ProfileStore from './toplevel/ProfileStore';
 import WalletBackupStore from './toplevel/WalletBackupStore';
 import UiDialogsStore from './toplevel/UiDialogsStore';
 import UiNotificationsStore from './toplevel/UiNotificationsStore';
-import NoticeBoardStore from './toplevel/NoticeBoardStore';
 import LoadingStore from './toplevel/LoadingStore';
 import MemosStore from './toplevel/MemosStore';
 import WalletStore from './toplevel/WalletStore';
 import WalletSettingsStore from './toplevel/WalletSettingsStore';
 import TransactionsStore from './toplevel/TransactionsStore';
 import AddressesStore from './toplevel/AddressesStore';
-import TimeStore from './toplevel/TimeStore';
 import WalletRestoreStore from './toplevel/WalletRestoreStore';
 import YoroiTransferStore from './toplevel/YoroiTransferStore';
 import TransactionBuilderStore from './toplevel/TransactionBuilderStore';
 import DelegationStore from './toplevel/DelegationStore';
 import setupAdaStores from './ada/index';
-import setupErgoStores from './ergo/index';
 import type { AdaStoresMap } from './ada/index';
-import type { ErgoStoresMap } from './ergo/index';
 import { RouterStore } from 'mobx-react-router';
 import type { ActionsMap } from '../actions/index';
 import type { Api } from '../api/index';
-import { ApiOptions } from '../api/common/utils';
 import StateFetchStore from './toplevel/StateFetchStore';
 import CoinPriceStore from './toplevel/CoinPriceStore';
 import TokenInfoStore from './toplevel/TokenInfoStore';
@@ -43,11 +38,9 @@ const storeClasses = Object.freeze({
   walletBackup: WalletBackupStore,
   uiDialogs: UiDialogsStore,
   uiNotifications: UiNotificationsStore,
-  noticeBoard: NoticeBoardStore,
   loading: LoadingStore,
   wallets: WalletStore,
   addresses: AddressesStore,
-  time: TimeStore,
   transactions: TransactionsStore,
   walletRestore: WalletRestoreStore,
   walletSettings: WalletSettingsStore,
@@ -70,11 +63,9 @@ export type StoresMap = {|
   walletBackup: WalletBackupStore,
   uiDialogs: UiDialogsStore<{||}, ActionsMap>,
   uiNotifications: UiNotificationsStore<{||}, ActionsMap>,
-  noticeBoard: NoticeBoardStore,
   loading: LoadingStore,
   wallets: WalletStore,
   addresses: AddressesStore,
-  time: TimeStore,
   transactions: TransactionsStore,
   walletRestore: WalletRestoreStore,
   walletSettings: WalletSettingsStore,
@@ -85,7 +76,6 @@ export type StoresMap = {|
   connector: ConnectorStore,
   substores: {|
     ada: AdaStoresMap,
-    ergo: ErgoStoresMap,
   |},
   // $FlowFixMe[value-as-type]
   router: RouterStore,
@@ -107,11 +97,9 @@ const stores: StoresMap = (observable({
   walletBackup: null,
   uiDialogs: null,
   uiNotifications: null,
-  noticeBoard: null,
   loading: null,
   wallets: null,
   addresses: null,
-  time: null,
   transactions: null,
   walletRestore: null,
   walletSettings: null,
@@ -136,12 +124,12 @@ function initializeSubstore<T: {...}>(
 
 /** Set up and return the stores for this app -> also used to reset all stores to defaults */
 export default (action(
-  (
+  async (
     api: Api,
     actions: ActionsMap,
     // $FlowFixMe[value-as-type]
     router: RouterStore
-  ): StoresMap => {
+  ): Promise<StoresMap> => {
     /** Note: `stores` sets all values to null to start
      * However this is incompatible with the `StoresMap` types
      * We don't make `StoresMap` fields optional as it would bloat the code with null checks
@@ -170,15 +158,13 @@ export default (action(
      * But we only want to actually initialize it if it is the currency in use */
     stores.substores = {
       ada: setupAdaStores((stores: any), api, actions),
-      ergo: setupErgoStores((stores: any), api, actions),
     };
 
     const loadedStores: StoresMap = (stores: any);
-    initializeSubstore<ErgoStoresMap>(loadedStores.substores[ApiOptions.ergo]);
-    initializeSubstore<AdaStoresMap>(loadedStores.substores[ApiOptions.ada]);
+    initializeSubstore<AdaStoresMap>(loadedStores.substores.ada);
 
     // Perform load after all setup is done to ensure migration can modify store state
-    loadedStores.loading.load('extension');
+    await loadedStores.loading.load('extension');
 
     return loadedStores;
   }

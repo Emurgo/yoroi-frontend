@@ -81,26 +81,6 @@ export function generateWalletRootKey(
   return rootKey;
 }
 
-/** Generate a Daedalus /wallet/ to create transactions. Do not save this. Regenerate every time. */
-export function getCryptoDaedalusWalletFromMnemonics(
-  mnemonic: string,
-): RustModule.WalletV2.DaedalusWallet {
-  const entropy = RustModule.WalletV2.Entropy.from_english_mnemonics(mnemonic);
-  const wallet = RustModule.WalletV2.DaedalusWallet.recover(entropy);
-  return wallet;
-}
-
-/** Generate a Daedalus /wallet/ to create transactions. Do not save this. Regenerate every time.
- * Note: key encoded as hex-string
- */
-export function getCryptoDaedalusWalletFromMasterKey(
-  masterKeyHex: string,
-): RustModule.WalletV2.DaedalusWallet {
-  const privateKey = RustModule.WalletV2.PrivateKey.from_hex(masterKeyHex);
-  const wallet = RustModule.WalletV2.DaedalusWallet.new(privateKey);
-  return wallet;
-}
-
 /**
  * Generate catalyst private key for QR code
  */

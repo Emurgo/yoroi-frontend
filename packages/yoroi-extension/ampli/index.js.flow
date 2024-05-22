@@ -336,36 +336,9 @@ export type SwapCancelationSubmittedProperties = {|
   from_asset: any[],
 
   /**
-   * The type of order selected on a given transaction
-   *
-   * | Rule | Value |
-   * |---|---|
-   * | Enum Values | limit, market |
-   */
-  order_type: "limit" | "market",
-
-  /**
    * The name of liquidity pool used for this swap transaction
    */
   pool_source: string,
-
-  /**
-   * The default slippage tolerance is 1%, but users are free to change the slippage.
-   *
-   * | Rule | Value |
-   * |---|---|
-   * | Type | number |
-   */
-  slippage_tolerance: number,
-
-  /**
-   * The amount of fees charged on the transaction. The value is in ADA.
-   *
-   * | Rule | Value |
-   * |---|---|
-   * | Type | number |
-   */
-  swap_fees: number,
 
   /**
    * The amount of asset that the user is swapping to
@@ -395,9 +368,9 @@ export type SwapConfirmedPageViewedProperties = {|
    *
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | Open Orders, Complete, Complete Orders |
+   * | Enum Values | Open Orders, Completed Orders |
    */
-  swap_tab: "Open Orders" | "Complete" | "Complete Orders",
+  swap_tab: "Open Orders" | "Completed Orders",
 |};
 export type SwapInitiatedProperties = {|
   /**
@@ -760,9 +733,6 @@ declare export class DappPopupSignTransactionPageViewed mixins BaseEvent {
 declare export class DappPopupSignTransactionSubmitted mixins BaseEvent {
   event_type: string;
 }
-declare export class MenuPageViewed mixins BaseEvent {
-  event_type: string;
-}
 declare export class NftGalleryDetailsImageViewed mixins BaseEvent {
   event_type: string;
 }
@@ -852,9 +822,6 @@ declare export class SettingsPageViewed mixins BaseEvent {
 declare export class StakingCenterPageViewed mixins BaseEvent {
   event_type: string;
 }
-declare export class StakingPageViewed mixins BaseEvent {
-  event_type: string;
-}
 declare export class SwapAssetFromChanged mixins BaseEvent {
   event_properties: SwapAssetFromChangedProperties;
   event_type: string;
@@ -904,6 +871,9 @@ declare export class TransactionsPageViewed mixins BaseEvent {
 declare export class VotingPageViewed mixins BaseEvent {
   event_type: string;
 }
+declare export class WalletPageViewed mixins BaseEvent {
+  event_type: string;
+}
 export type PromiseResult<T> = {|
   promise: Promise<T | void>,
 |};
@@ -947,9 +917,7 @@ declare export class Ampli {
    * This event tracks when a user views the All Wallets page on Menu. Note: only available on Yoroi Mobile.
    * @param options Amplitude event options.
    */
-  allWalletsPageViewed(
-    options?: EventOptions
-  ): PromiseResult<any>;
+  allWalletsPageViewed(options?: EventOptions): PromiseResult<any>;
 
   /**
    * Assets Page Viewed
@@ -959,9 +927,7 @@ declare export class Ampli {
    * This event tracks when a user views the Assets page. Note: only available on Yoroi Extension.
    * @param options Amplitude event options.
    */
-  assetsPageViewed(
-    options?: EventOptions
-  ): PromiseResult<any>;
+  assetsPageViewed(options?: EventOptions): PromiseResult<any>;
 
   /**
    * Claim ADA Page Viewed
@@ -973,9 +939,7 @@ declare export class Ampli {
    * Description: This event tracks when a user views the page to claim ADA tokens. It provides insights into the number of users who are interested in claiming ADA tokens and can be used to analyze user engagement and conversion rates on the claim page
    * @param options Amplitude event options.
    */
-  claimAdaPageViewed(
-    options?: EventOptions
-  ): PromiseResult<any>;
+  claimAdaPageViewed(options?: EventOptions): PromiseResult<any>;
 
   /**
    * Connector Page Viewed
@@ -985,9 +949,7 @@ declare export class Ampli {
    * This event tracks when a user views the dApp Connector page.
    * @param options Amplitude event options.
    */
-  connectorPageViewed(
-    options?: EventOptions
-  ): PromiseResult<any>;
+  connectorPageViewed(options?: EventOptions): PromiseResult<any>;
 
   /**
    * Create Wallet Details Step Viewed
@@ -997,9 +959,7 @@ declare export class Ampli {
    * This event tracks when a user views the details \*\*step 4\*\* while creating a wallet. User will introduce: \* Wallet Name \* Password \* Repeat Password
    * @param options Amplitude event options.
    */
-  createWalletDetailsStepViewed(
-    options?: EventOptions
-  ): PromiseResult<any>;
+  createWalletDetailsStepViewed(options?: EventOptions): PromiseResult<any>;
 
   /**
    * Create Wallet Details Submitted
@@ -1009,9 +969,7 @@ declare export class Ampli {
    * This event captures the submission of the wallet creation on the last step of the flow (\*\*step 4\*\*).
    * @param options Amplitude event options.
    */
-  createWalletDetailsSubmitted(
-    options?: EventOptions
-  ): PromiseResult<any>;
+  createWalletDetailsSubmitted(options?: EventOptions): PromiseResult<any>;
 
   /**
    * Create Wallet Language Page Viewed
@@ -1021,9 +979,7 @@ declare export class Ampli {
    * This event tracks when a user views the page for selecting the language during the wallet creation process on the first time he launch Yoroi.
    * @param options Amplitude event options.
    */
-  createWalletLanguagePageViewed(
-    options?: EventOptions
-  ): PromiseResult<any>;
+  createWalletLanguagePageViewed(options?: EventOptions): PromiseResult<any>;
 
   /**
    * Create Wallet Learn Phrase Step Viewed
@@ -1033,9 +989,7 @@ declare export class Ampli {
    * This event tracks when a user view the \*\*first step\*\* of learn about recovery prhase
    * @param options Amplitude event options.
    */
-  createWalletLearnPhraseStepViewed(
-    options?: EventOptions
-  ): PromiseResult<any>;
+  createWalletLearnPhraseStepViewed(options?: EventOptions): PromiseResult<any>;
 
   /**
    * Create Wallet Save Phrase Step Viewed
@@ -1045,9 +999,7 @@ declare export class Ampli {
    * This event tracks when a user views the \*\*second step\*\* to save their wallet recovery phrase during the wallet creation process
    * @param options Amplitude event options.
    */
-  createWalletSavePhraseStepViewed(
-    options?: EventOptions
-  ): PromiseResult<any>;
+  createWalletSavePhraseStepViewed(options?: EventOptions): PromiseResult<any>;
 
   /**
    * Create Wallet Select Method Page Viewed
@@ -1075,9 +1027,7 @@ declare export class Ampli {
    * This event tracks when a user views the terms of service agreement page on the creation wallet flow
    * @param options Amplitude event options.
    */
-  createWalletTermsPageViewed(
-    options?: EventOptions
-  ): PromiseResult<any>;
+  createWalletTermsPageViewed(options?: EventOptions): PromiseResult<any>;
 
   /**
    * Create Wallet Verify Phrase Step Viewed
@@ -1113,9 +1063,7 @@ declare export class Ampli {
    * This event tracks when a user views the "Add Collateral" page in the Dapp Connector Popup
    * @param options Amplitude event options.
    */
-  dappPopupAddCollateralPageViewed(
-    options?: EventOptions
-  ): PromiseResult<any>;
+  dappPopupAddCollateralPageViewed(options?: EventOptions): PromiseResult<any>;
 
   /**
    * Dapp Popup Connect Wallet Page Viewed
@@ -1163,19 +1111,7 @@ declare export class Ampli {
    * This event tracks the click "confirm" button on submission of a sign transaction request within the Dapp Connector Popup This event tracks the submission of a sign transaction request within the Dapp Popup feature
    * @param options Amplitude event options.
    */
-  dappPopupSignTransactionSubmitted(
-    options?: EventOptions
-  ): PromiseResult<any>;
-
-  /**
-   * Menu Page Viewed
-   *
-   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Menu%20Page%20Viewed)
-   *
-   * This event is triggered when a user views the menu page within the application
-   * @param options Amplitude event options.
-   */
-  menuPageViewed(options?: EventOptions): PromiseResult<any>;
+  dappPopupSignTransactionSubmitted(options?: EventOptions): PromiseResult<any>;
 
   /**
    * NFT Gallery Details Image Viewed
@@ -1185,9 +1121,7 @@ declare export class Ampli {
    * This event tracks when a user views the NFT image at full screen
    * @param options Amplitude event options.
    */
-  nftGalleryDetailsImageViewed(
-    options?: EventOptions
-  ): PromiseResult<any>;
+  nftGalleryDetailsImageViewed(options?: EventOptions): PromiseResult<any>;
 
   /**
    * NFT Gallery Details Navigation
@@ -1211,9 +1145,7 @@ declare export class Ampli {
    * This event tracks when a user views the details page of an NFT item.
    * @param options Amplitude event options.
    */
-  nftGalleryDetailsPageViewed(
-    options?: EventOptions
-  ): PromiseResult<any>;
+  nftGalleryDetailsPageViewed(options?: EventOptions): PromiseResult<any>;
 
   /**
    * NFT Gallery Details Tab
@@ -1279,9 +1211,7 @@ declare export class Ampli {
    * This event tracks when a user views the Receive page of the Wallet menu.
    * @param options Amplitude event options.
    */
-  receivePageViewed(
-    options?: EventOptions
-  ): PromiseResult<any>;
+  receivePageViewed(options?: EventOptions): PromiseResult<any>;
 
   /**
    * Restore Wallet Details Step Viewed
@@ -1291,9 +1221,7 @@ declare export class Ampli {
    * Event has no description in tracking plan.
    * @param options Amplitude event options.
    */
-  restoreWalletDetailsStepViewed(
-    options?: EventOptions
-  ): PromiseResult<any>;
+  restoreWalletDetailsStepViewed(options?: EventOptions): PromiseResult<any>;
 
   /**
    * Restore Wallet Details Submitted
@@ -1303,16 +1231,14 @@ declare export class Ampli {
    * Event has no description in tracking plan.
    * @param options Amplitude event options.
    */
-  restoreWalletDetailsSubmitted(
-    options?: EventOptions
-  ): PromiseResult<any>;
+  restoreWalletDetailsSubmitted(options?: EventOptions): PromiseResult<any>;
 
   /**
    * Restore Wallet Enter Phrase Step Status
    *
    * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Restore%20Wallet%20Enter%20Phrase%20Step%20Status)
    *
-   * Event has no description in tracking plan.
+   * This events tracks the validation of the recovery phrase is verified, once the user insert the latest word. The output can be positive or negative and we do save that in he property: recovery*prhase*status
    * @param properties The event's properties (e.g. recovery_prhase_status)
    * @param options Amplitude event options.
    */
@@ -1347,9 +1273,7 @@ declare export class Ampli {
    * * 24-word recovery phrase
    * @param options Amplitude event options.
    */
-  restoreWalletTypeStepViewed(
-    options?: EventOptions
-  ): PromiseResult<any>;
+  restoreWalletTypeStepViewed(options?: EventOptions): PromiseResult<any>;
 
   /**
    * Send Initiated
@@ -1369,9 +1293,7 @@ declare export class Ampli {
    * This event tracks when a user views the "Amount" page in the send flow.
    * @param options Amplitude event options.
    */
-  sendSelectAssetPageViewed(
-    options?: EventOptions
-  ): PromiseResult<any>;
+  sendSelectAssetPageViewed(options?: EventOptions): PromiseResult<any>;
 
   /**
    * Send Select Asset Selected
@@ -1440,9 +1362,7 @@ declare export class Ampli {
    * This event tracks when a user views the settings page within the application.
    * @param options Amplitude event options.
    */
-  settingsPageViewed(
-    options?: EventOptions
-  ): PromiseResult<any>;
+  settingsPageViewed(options?: EventOptions): PromiseResult<any>;
 
   /**
    * Staking Center Page Viewed
@@ -1452,21 +1372,7 @@ declare export class Ampli {
    * This event tracks when a user views the Staking Center page on Staking menu.
    * @param options Amplitude event options.
    */
-  stakingCenterPageViewed(
-    options?: EventOptions
-  ): PromiseResult<any>;
-
-  /**
-   * Staking Page Viewed
-   *
-   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Staking%20Page%20Viewed)
-   *
-   * This event tracks when a user views the Staking page.
-   * @param options Amplitude event options.
-   */
-  stakingPageViewed(
-    options?: EventOptions
-  ): PromiseResult<any>;
+  stakingCenterPageViewed(options?: EventOptions): PromiseResult<any>;
 
   /**
    * Swap Asset From Changed
@@ -1590,9 +1496,7 @@ declare export class Ampli {
    * Owner: Sergio SF
    * @param options Amplitude event options.
    */
-  swapPoolChanged(
-    options?: EventOptions
-  ): PromiseResult<any>;
+  swapPoolChanged(options?: EventOptions): PromiseResult<any>;
 
   /**
    * Swap Slippage Changed
@@ -1618,9 +1522,7 @@ declare export class Ampli {
    * This event tracks when a user views the transactions page within the wallet.
    * @param options Amplitude event options.
    */
-  transactionsPageViewed(
-    options?: EventOptions
-  ): PromiseResult<any>;
+  transactionsPageViewed(options?: EventOptions): PromiseResult<any>;
 
   /**
    * Voting Page Viewed
@@ -1630,9 +1532,17 @@ declare export class Ampli {
    * This event tracks when a user views the Voting page.
    * @param options Amplitude event options.
    */
-  votingPageViewed(
-    options?: EventOptions
-  ): PromiseResult<any>;
+  votingPageViewed(options?: EventOptions): PromiseResult<any>;
+
+  /**
+   * Wallet Page Viewed
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Wallet%20Page%20Viewed)
+   *
+   * ThThis event tracks when a user views the wallet page. Wallet page is the deffault page when the user logs in to the app (Once the initial setup is done)
+   * @param options Amplitude event options.
+   */
+  walletPageViewed(options?: EventOptions): PromiseResult<any>;
 }
 declare export var ampli: Ampli;
 declare type BrowserOptions = any;

@@ -25,7 +25,7 @@ module.exports = {
     'comma-dangle': 'off',
     'generator-star-spacing': 'off',
     'import/no-unresolved': ['error', {
-      ignore: ['js-chain-libs', 'cardano-wallet-browser', 'ergo-lib-wasm-browser']
+      ignore: ['cardano-wallet-browser']
     }],
     'import/no-extraneous-dependencies': 'off',
     'import/no-dynamic-require': 'off',
@@ -66,6 +66,7 @@ module.exports = {
     'react/state-in-constructor': ['warn', 'never'],
     'react/jsx-props-no-spreading': 0,
     'react/jsx-curly-newline': 0,
+    'react/jsx-tag-spacing': 0,
     'class-methods-use-this': 0,
     'no-continue': 0,
     'no-duplicate-imports': 0,
@@ -86,7 +87,7 @@ module.exports = {
     'arrow-body-style': 0,
     'key-spacing': 1,
     'no-empty-function': 1,
-    'max-len': ['warn', { code: 120 }],
+    'max-len': 0,
     'no-useless-escape': 1,
     'prefer-const': 1,
     'object-curly-spacing': 1,
@@ -99,17 +100,21 @@ module.exports = {
     'flowtype/require-valid-file-annotation': [2, 'always'],
     'global-require': 'off',
     'no-await-in-loop': 0,
-    'no-unused-expressions': 0,
+    'no-unused-expressions': 2,
     'no-lone-blocks': 0,
     'max-classes-per-file': 0,
     'no-floating-promise/no-floating-promise': 2,
     'flowtype/no-primitive-constructor-types': 2,
     'flowtype/no-dupe-keys': 2,
     'no-extra-boolean-cast': 0,
+    'react/jsx-first-prop-new-line': 0,
     'no-restricted-properties': [
       2,
       { object: 'TrezorConnect', message: 'Use TrezorWrapper instead to minimize Trezor iframe lifespan', },
     ],
+    'import/no-unused-modules': [1, { unusedExports: true }],
+    'camelcase': 0,
+    'react/jsx-curly-brace-presence': 0,
   },
   plugins: [
     'import',

@@ -92,7 +92,11 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
     const optionRenderer = option => {
       const SvgElem = option.svg;
       return (
-        <MenuItem key={option.value} value={option.value} sx={{ height: '80px' }}>
+        <MenuItem
+          key={option.value}
+          value={option.value}
+          sx={{ height: '80px' }}
+          id={'selectFiat-' + option.value + '-menuItem'}>
           <Box sx={{ display: 'flex' }}>
             <Box>
               <SvgElem className={styles.flag} width="38px" height="38px" />
@@ -104,11 +108,11 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
               </div>
               {/* $FlowFixMe[prop-missing] */}
               {option.native !== null ? (
-                <Typography variant="body2" className={styles.optionSmallNative}>
+                <Typography component="div" variant="body2" className={styles.optionSmallNative}>
                   native
                 </Typography>
               ) : (
-                <Typography variant="body2" color="var(--yoroi-widgets-hash-light)">
+                <Typography component="div" variant="body2" color="var(--yoroi-widgets-hash-light)">
                   1 ADA =&nbsp;
                   {/* $FlowFixMe[prop-missing] */}
                   {option.price !== null ? option.price : '-'} {option.value}
@@ -157,11 +161,11 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
 
         {!isRevampLayout && (
           <>
-            <Typography className="text">
+            <Typography component="div" className="text">
               <FormattedHTMLMessage {...messages.note} />
             </Typography>
 
-            <Typography className="text">
+            <Typography component="div" className="text">
               <FormattedHTMLMessage {...messages.lastUpdated} values={{ lastUpdated }} />
             </Typography>
           </>
@@ -188,7 +192,7 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
               },
             }}
             renderValue={value => (
-              <Typography
+              <Typography component="div"
                 variant={isRevampLayout ? 'body1' : 'body2'}
                 fontWeight={isRevampLayout ? '400' : '300'}
               >
@@ -202,10 +206,10 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
 
           {isRevampLayout && (
             <>
-              <Typography variant="caption1" display="inline-block" color="grayscale.700" mt="4px">
+              <Typography component="div" variant="caption1" display="inline-block" color="grayscale.700" mt="4px">
                 <FormattedHTMLMessage {...messages.noteRevamp} />
               </Typography>
-              <Typography
+              <Typography component="div"
                 variant="body1"
                 fontWeight={500}
                 sx={{

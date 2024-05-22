@@ -1,27 +1,25 @@
 // @flow
-import { Component } from 'react';
 import type { Node } from 'react';
+import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape, defineMessages } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor } from 'react-intl';
+import { defineMessages, intlShape } from 'react-intl';
 import styles from './WalletCard.scss';
 import WalletAccountIcon from './WalletAccountIcon';
+import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import classnames from 'classnames';
 import type { WalletChecksum } from '@emurgo/cip4-js';
-import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import { isLedgerNanoWallet, isTrezorTWallet, } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import globalMessages from '../../i18n/global-messages';
-import {
-  isLedgerNanoWallet,
-  isTrezorTWallet,
-} from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import { ReactComponent as DragIcon }  from '../../assets/images/add-wallet/wallet-list/drag.inline.svg';
+import { ReactComponent as DragIcon } from '../../assets/images/add-wallet/wallet-list/drag.inline.svg';
 import { Draggable } from 'react-beautiful-dnd';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import AmountDisplay from '../common/AmountDisplay';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
+import { maybe } from '../../coreUtils';
 
 const messages = defineMessages({
   tokenTypes: {
@@ -47,6 +45,7 @@ type Props = {|
   +idx: number,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?string,
+  id: string,
 |};
 
 type State = {| +isActionsShow: boolean |};
@@ -110,6 +109,7 @@ export default class WalletCard extends Component<Props, State> {
       idx,
       unitOfAccountSetting,
       getCurrentPrice,
+      id,
     } = this.props;
     const { isActionsShow } = this.state;
 
@@ -123,6 +123,11 @@ export default class WalletCard extends Component<Props, State> {
       .join(' - ');
     const totalAmount = this.getTotalAmount();
     const { tokenTypes, nfts } = this.countTokenTypes();
+    const buttonId = `${id}-selectWallet_${idx}-button`;
+    const walletNameId = `${id}:walletCard_${idx}-walletName-text`;
+    const walletBalanceId = `${id}:walletCard_${idx}`;
+    const walletTokensAmountId = `${id}:walletCard_${idx}-walletTokensAmount-text`;
+    const walletNFTsAmountId = `${id}:walletCard_${idx}-walletNFTsAmount-text`;
 
     return (
       <Draggable draggableId={walletId.toString()} index={idx}>
@@ -146,9 +151,10 @@ export default class WalletCard extends Component<Props, State> {
               tabIndex="0"
               onClick={this.props.onSelect}
               onKeyDown={this.props.onSelect}
+              id={buttonId}
             >
               <div className={styles.header}>
-                <h5 className={styles.name}>{this.props.settingsCache.conceptualWalletName}</h5>
+                <h5 className={styles.name} id={walletNameId}>{this.props.settingsCache.conceptualWalletName}</h5>
                 {' ·  '}
                 <div className={styles.type}>{typeText}</div>
               </div>
@@ -163,16 +169,17 @@ export default class WalletCard extends Component<Props, State> {
                     showAmount
                     unitOfAccountSetting={unitOfAccountSetting}
                     getCurrentPrice={getCurrentPrice}
+                    id={walletBalanceId}
                   />
                 </div>
                 <div className={styles.extraInfo}>
-                  <p className={styles.label}>
+                  <div className={styles.label}>
                     {intl.formatMessage(messages.tokenTypes)}{' '}
-                    <span className={styles.value}>{tokenTypes}</span>
-                  </p>
-                  <p className={styles.label}>
-                    NFTs <span className={styles.value}>{nfts}</span>
-                  </p>
+                    <span className={styles.value} id={walletTokensAmountId}>{tokenTypes}</span>
+                  </div>
+                  <div className={styles.label}>
+                    NFTs <span className={styles.value} id={walletNFTsAmountId}>{nfts}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -192,14 +199,9 @@ export default class WalletCard extends Component<Props, State> {
     );
   }
 
-  getTotalAmount: void => null | MultiToken = () => {
-    if (this.props.rewards === undefined) {
-      return this.props.walletAmount;
-    }
-    if (this.props.rewards === null || this.props.walletAmount === null) {
-      return null;
-    }
-    return this.props.rewards.joinAddCopy(this.props.walletAmount);
+  getTotalAmount: void => ?MultiToken = () => {
+    return maybe(this.props.walletAmount,
+      w => this.props.rewards?.joinAddCopy(w) ?? w)
   };
 
   countTokenTypes: void => {|tokenTypes: number, nfts: number|} = () => {

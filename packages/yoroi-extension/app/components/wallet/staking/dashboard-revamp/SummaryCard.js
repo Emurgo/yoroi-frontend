@@ -19,13 +19,14 @@ import { getTokenName } from '../../../../stores/stateless/tokenHelpers';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import type { GraphData } from '../dashboard/StakingDashboard';
 import RewardHistoryGraph from './RewardHistoryGraph';
+import { maybe } from '../../../../coreUtils';
 
 type Props = {|
   +onOverviewClick: Function,
   +onOpenRewardList: Function,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
-  +totalRewards: void | MultiToken,
-  +totalDelegated: void | MultiToken,
+  +totalRewards: ?MultiToken,
+  +totalDelegated: ?MultiToken,
   +unitOfAccount: TokenEntry => void | {| currency: string, amount: string |},
   +shouldHideBalance: boolean,
   +graphData: GraphData,
@@ -83,30 +84,14 @@ function SummaryCard({
     );
   };
 
-  const renderAmount: (void | MultiToken) => Node = token => {
-    if (token == null) {
-      return null;
-    }
-
-    return formatTokenEntry(token.getDefaultEntry());
+  const renderAmount: (?MultiToken) => ?Node = token => {
+    return maybe(token, t => formatTokenEntry(t.getDefaultEntry()));
   };
 
-  const renderAmountWithUnitOfAccount: (void | MultiToken) => Node = token => {
-    if (token == null) {
-      return null;
-    }
-
-    const unitOfAccountCalculated = unitOfAccount(token.getDefaultEntry());
-
-    if (!unitOfAccountCalculated) {
-      return null;
-    }
-
-    if (shouldHideBalance) {
-      return `${hiddenAmount}  ${unitOfAccountCalculated.currency}`;
-    }
-
-    return `${unitOfAccountCalculated.amount} ${unitOfAccountCalculated.currency}`;
+  const renderAmountWithUnitOfAccount: (?MultiToken) => ?Node = token => {
+    const unitOfAccountCalculated = maybe(token, t => unitOfAccount(t.getDefaultEntry()));
+    return maybe(unitOfAccountCalculated,
+      u => `${shouldHideBalance ? hiddenAmount : u.amount} ${u.currency}`);
   };
 
   return (
@@ -121,7 +106,7 @@ function SummaryCard({
           alignItems: 'center',
         }}
       >
-        <Typography variant="h5" color="common.black" fontWeight={500}>
+        <Typography component="div" variant="h5" color="common.black" fontWeight={500}>
           {intl.formatMessage(messages.summary)}
         </Typography>
         <Button
@@ -142,7 +127,7 @@ function SummaryCard({
         <InfoRow sx={{ borderColor: 'grayscale.200' }}>
           <StakingIcon />
           <InfoDetails>
-            <Typography
+            <Typography component="div"
               variant="caption1"
               color="grayscale.600"
               sx={{ textTransform: 'uppercase' }}
@@ -151,10 +136,10 @@ function SummaryCard({
             </Typography>
           </InfoDetails>
           <InfoDetails>
-            <Typography variant="h2" color="common.black" fontWeight={500}>
+            <Typography component="div" variant="h2" color="common.black" fontWeight={500}>
               {renderAmount(totalRewards)}
             </Typography>
-            <Typography variant="body1" color="grayscale.600" fontWeight={500}>
+            <Typography component="div" variant="body1" color="grayscale.600" fontWeight={500}>
               {renderAmountWithUnitOfAccount(totalRewards)}
             </Typography>
           </InfoDetails>
@@ -165,7 +150,7 @@ function SummaryCard({
         <InfoRow sx={{ borderColor: 'grayscale.200' }}>
           <TotalDelegatedIcon />
           <InfoDetails>
-            <Typography
+            <Typography component="div"
               variant="caption1"
               color="grayscale.600"
               marginBottom="4px"
@@ -176,7 +161,7 @@ function SummaryCard({
           </InfoDetails>
           <InfoDetails>
             {totalDelegated ? (
-              <Typography variant="h2" fontWeight="500" color="common.black">
+              <Typography component="div" variant="h2" fontWeight="500" color="common.black">
                 {renderAmount(totalDelegated)}
               </Typography>
             ) : (
@@ -184,7 +169,7 @@ function SummaryCard({
                 <LoadingSpinner small />
               </div>
             )}
-            <Typography variant="body1" color="grayscale.600" fontWeight={500}>
+            <Typography component="div" variant="body1" color="grayscale.600" fontWeight={500}>
               {renderAmountWithUnitOfAccount(totalDelegated)}
             </Typography>
           </InfoDetails>

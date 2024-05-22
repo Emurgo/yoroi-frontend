@@ -8,14 +8,14 @@ import moment from 'moment';
 import styles from './WalletTransactionsList.scss';
 import WalletTransaction from '../../../domain/WalletTransaction';
 import LoadingSpinner from '../../widgets/LoadingSpinner';
-import type { AssuranceMode } from '../../../types/transactionAssuranceTypes';
+import type { AssuranceMode } from '../../../types/transactionAssurance.types';
 import { Logger } from '../../../utils/logging';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import globalMessages from '../../../i18n/global-messages';
 import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos/tables';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { Notification } from '../../../types/notificationType';
+import type { Notification } from '../../../types/notification.types';
 import { genAddressLookup } from '../../../stores/stateless/addressStores';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
@@ -52,6 +52,7 @@ type Props = {|
   +addressToDisplayString: string => string,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +complexityLevel: ?ComplexityLevelType,
+  id: string,
 |};
 
 @observer
@@ -134,12 +135,15 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
     } = this.props;
     const transactionsGroups = this.groupTransactionsByDay(transactions);
 
+    const baseIdPart = 'wallet:transactions:transactionsList';
+
     const loadingSpinner = isLoadingTransactions ? (
       <div className={styles.loading}>
         <LoadingSpinner
           ref={component => {
             this.loadingSpinner = component;
           }}
+          id={baseIdPart}
         />
       </div>
     ) : null;
@@ -151,8 +155,9 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
           padding: '20px 0',
           overflow: 'auto',
         }}
+        id={this.props.id}
       >
-        {transactionsGroups.map(group => (
+        {transactionsGroups.map((group, index) => (
           <Box
             sx={{
               marginBottom: '30px',
@@ -161,8 +166,14 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
               },
             }}
             key={`${this.getTransactionKey(group.transactions)}`}
+            id={baseIdPart + '-transactionsGroup_' + index + '-box'}
           >
-            <Typography variant="body2" color="grayscale.600">
+            <Typography
+              component="div"
+              variant="body2"
+              color="grayscale.600"
+              id={baseIdPart + ':transactionsGroup_' + index + '-date-text'}
+            >
               {this.localizedDate(group.date)}
             </Typography>
             <Box>
@@ -194,6 +205,8 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
                   onCopyAddressTooltip={onCopyAddressTooltip}
                   addressToDisplayString={this.props.addressToDisplayString}
                   complexityLevel={this.props.complexityLevel}
+                  id={baseIdPart + ':transactionsGroup_' + index}
+                  txIndex={transactionIndex}
                 />
               ))}
             </Box>
@@ -206,6 +219,7 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
             disabled={isLoadingTransactions}
             onClick={onLoadMore}
             sx={{ margin: '30px auto', width: '400px', display: 'block' }}
+            id={baseIdPart + '-showMoreTxs-button'}
           >
             {intl.formatMessage(messages.showMoreTransactionsButtonLabel)}
           </Button>

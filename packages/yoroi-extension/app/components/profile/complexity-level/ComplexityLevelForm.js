@@ -92,7 +92,7 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
     return (
       <Box className={styles.component}>
         {isRevampLayout && (
-          <Typography
+          <Typography component="div"
             textAlign="center"
             color="grayscale.900"
             mb="16px"
@@ -103,7 +103,7 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
           </Typography>
         )}
 
-        <Typography
+        <Typography component="div"
           textAlign="center"
           variant="body1"
           color={isRevampLayout ? 'grayscale.800' : 'var(--yoroi-palette-gray-600)'}
@@ -112,7 +112,7 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
         </Typography>
 
         {complexityLevel && (
-          <Typography
+          <Typography component="div"
             variant="body1"
             my="1rem"
             mx="auto"
@@ -198,10 +198,10 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
                   <Box sx={{ p: '15px' }}>
                     <Box sx={{ mb: '16px' }}>{level.image}</Box>
                     <Box mb="10px">
-                      <Typography mb="4px" variant="h3" fontWeight={500}>
+                      <Typography component="div" mb="4px" variant="h3" fontWeight={500}>
                         {level.name}
                       </Typography>
-                      <Typography variant="body2">{level.description}</Typography>
+                      <Typography component="div" variant="body2">{level.description}</Typography>
                     </Box>
                   </Box>
                 </Box>
@@ -218,7 +218,7 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
                 <div className={styles.cardContent}>
                   <div>
                     <h3>{level.name}</h3>
-                    <p>{level.description}</p>
+                    <div>{level.description}</div>
                   </div>
                   <LoadingButton
                     variant={isRevampLayout ? 'contained' : 'primary'}

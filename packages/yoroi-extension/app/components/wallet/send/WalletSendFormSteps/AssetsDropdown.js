@@ -55,9 +55,9 @@ export default class AssetsDropdown extends Component<Props, State> {
         <div className={styles.token}>
           <div className={styles.label}>
             <DefaultAssetIcon />
-            <p>{token.label}</p>
+            <div>{token.label}</div>
           </div>
-          <p className={styles.amount}>{displayAmount}</p>
+          <div className={styles.amount}>{displayAmount}</div>
         </div>
       );
     });
@@ -80,7 +80,7 @@ export default class AssetsDropdown extends Component<Props, State> {
           >
             <NftImage imageUrl={nft.image} name={nft.name} width="41px" height="44px" />
           </Box>
-          <p className={styles.name}>{nft.name}</p>
+          <div className={styles.name}>{nft.name}</div>
         </div>
       );
     });
@@ -99,7 +99,7 @@ export default class AssetsDropdown extends Component<Props, State> {
               onClick={() => this.toggleDropdown('tokens')}
               className={styles.header}
             >
-              <Typography fontWeight={500} variant="body1" color="grayscale.700">
+              <Typography component="div" fontWeight={500} variant="body1" color="grayscale.700">
                 {intl.formatMessage(globalMessages.tokens)} ({tokens.length})
               </Typography>
               <div className={styles.headerRight}>
@@ -123,7 +123,7 @@ export default class AssetsDropdown extends Component<Props, State> {
               onClick={() => this.toggleDropdown('nfts')}
               className={styles.header}
             >
-              <Typography fontWeight={500} variant="body1" color="grayscale.700">
+              <Typography component="div" fontWeight={500} variant="body1" color="grayscale.700">
                 {intl.formatMessage(globalMessages.nfts)} ({nfts.length})
               </Typography>
               <div className={styles.headerRight}>

@@ -27,15 +27,6 @@ export const truncateLongName: string => string = (walletName) => {
     : walletName;
 };
 
-/**
- * Just removes all Lovelaces, without decimal place (does not round off)
- * e.g 3657.9345 => 3657
- * @param {*} amount
- */
-export const formattedAmountWithoutLovelace = (amount: BigNumber): string => (
-  amount.decimalPlaces(0, 3).toString() // 3 = ROUND_FLOOR
-);
-
 /** removes commas */
 export const formattedAmountToBigNumber = (amount: string): BigNumber => {
   const cleanedAmount = amount.replace(/,/g, '');
@@ -65,11 +56,6 @@ export const formattedAmountToNaturalUnits: (
   const cleanedAmount = amount.replace('.', '').replace(/,/g, '').replace(/^0+/, '');
   return cleanedAmount === '' ? '0' : cleanedAmount;
 };
-
-/** removes all trailing zeros */
-export const formattedAmountWithoutTrailingZeros = (amount: string): string => (
-  amount.replace(/0+$/, '').replace(/\.$/, '')
-);
 
 function truncateFormatter(addr: string, cutoff: number): string {
   const shortener = '...';
@@ -107,4 +93,30 @@ export function truncateAddressShort(addr: string, by: ?number): string {
  */
 export function formatBigNumberToFloatString(x: BigNumber): string {
   return x.isInteger() ? x.toFixed(1) : x.toString();
+}
+
+export function formatLovelacesHumanReadableShort(num: string): string {
+  const fNum = Number(num) / 1000000; // divided in 1,000,000 to convert from Lovelace to ADA
+  if (fNum >= 1e3) {
+    const units = ['k', 'M', 'B', 'T'];
+    // Divide to get SI Unit engineering style numbers (1e3,1e6,1e9, etc)
+    const unit = Math.floor((fNum.toFixed(0).length - 1) / 3) * 3;
+    // Calculate the remainder
+    const formattedNum = ((fNum / Number(`1e${unit}`))).toFixed(2);
+    const unitname = units[Math.floor(unit / 3) - 1];
+    return `${formattedNum}${unitname}`;
+  }
+  return fNum.toLocaleString();
+}
+
+export function roundOneDecimal(num: number): string {
+  const fNum = Number(num);
+  const number = Math.round(fNum * 10) / 10;
+  if(number === 0) return number.toFixed(1)
+  return number.toString()
+}
+
+export function roundTwoDecimal(num: number): string {
+  const fNum = Number(num);
+  return (Math.round(fNum * 100) / 100).toFixed(2);
 }

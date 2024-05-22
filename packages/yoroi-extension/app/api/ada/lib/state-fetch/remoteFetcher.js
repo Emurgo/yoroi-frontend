@@ -19,10 +19,6 @@ import type {
   SignedResponse,
   TokenInfoRequest,
   TokenInfoResponse,
-  TxBodiesRequest,
-  TxBodiesResponse,
-  UtxoSumRequest,
-  UtxoSumResponse,
   CatalystRoundInfoRequest,
   CatalystRoundInfoResponse,
   MultiAssetRequest,
@@ -33,11 +29,16 @@ import type {
   GetRecentTransactionHashesRequest,
   GetRecentTransactionHashesResponse,
   GetTransactionsByHashesRequest,
-  GetTransactionsByHashesResponse, MultiAssetSupplyResponse,
+  GetTransactionsByHashesResponse,
+  MultiAssetSupplyResponse,
+  FilterUsedRequest,
+  FilterUsedResponse,
+  GetSwapFeeTiersFunc,
+  GetSwapFeeTiersRequest,
+  GetSwapFeeTiersResponse,
 } from './types';
-import type { FilterUsedRequest, FilterUsedResponse, } from '../../../common/lib/state-fetch/currencySpecificTypes';
 
-import type { IFetcher } from './IFetcher';
+import type { IFetcher } from './IFetcher.types';
 
 import axios from 'axios';
 import { Logger, stringifyError } from '../../../../utils/logging';
@@ -49,19 +50,16 @@ import {
   GetCatalystRoundInfoApiError,
   GetRewardHistoryApiError,
   GetTxHistoryForAddressesApiError,
-  GetTxsBodiesForUTXOsApiError,
   GetUtxosForAddressesApiError,
-  GetUtxosSumsForAddressesApiError,
   InvalidWitnessError,
   RollbackApiError,
   SendTransactionApiError,
   GetUtxoDataError,
 } from '../../../common/errors';
-import { RustModule } from '../cardanoCrypto/rustLoader';
 
 import type { ConfigType } from '../../../../../config/config-types';
 import { bech32, } from 'bech32';
-import { bytesToHex } from '../../../../coreUtils';
+import { addressBech32ToHex } from '../cardanoCrypto/utils';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -109,9 +107,7 @@ export class RemoteFetcher implements IFetcher {
       });
     return result.map(utxo => {
       if (utxo.receiver.startsWith('addr')) {
-        const fixedAddr = RustModule.WasmScope(Module => bytesToHex(
-          Module.WalletV4.Address.from_bech32(utxo.receiver).to_bytes()
-        ));
+        const fixedAddr = addressBech32ToHex(utxo.receiver);
         return {
           ...utxo,
           receiver: fixedAddr,
@@ -119,60 +115,6 @@ export class RemoteFetcher implements IFetcher {
       }
       return utxo;
     });
-  }
-
-  getTxsBodiesForUTXOs: TxBodiesRequest => Promise<TxBodiesResponse> = (body) => {
-    const { BackendService } = body.network.Backend;
-    if (BackendService == null) throw new Error(`${nameof(this.getTxsBodiesForUTXOs)} missing backend url`);
-    return axios(
-      `${BackendService}/api/txs/txBodies`,
-      {
-        method: 'post',
-        timeout: 2 * CONFIG.app.walletRefreshInterval,
-        data: {
-          txsHashes: body.txsHashes
-        },
-        headers: {
-          'yoroi-version': this.getLastLaunchVersion(),
-          'yoroi-locale': this.getCurrentLocale()
-        }
-      }
-    ).then(response => response.data)
-      .catch((error) => {
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getTxsBodiesForUTXOs)} error: ` + stringifyError(error));
-        throw new GetTxsBodiesForUTXOsApiError();
-      });
-  }
-
-  getUTXOsSumsForAddresses: UtxoSumRequest => Promise<UtxoSumResponse> = (body) => {
-    const { BackendService } = body.network.Backend;
-    if (BackendService == null) throw new Error(`${nameof(this.getUTXOsSumsForAddresses)} missing backend url`);
-    return axios(
-      `${BackendService}/api/txs/utxoSumForAddresses`,
-      {
-        method: 'post',
-        timeout: 2 * CONFIG.app.walletRefreshInterval,
-        data: {
-          addresses: body.addresses
-        },
-        headers: {
-          'yoroi-version': this.getLastLaunchVersion(),
-          'yoroi-locale': this.getCurrentLocale()
-        }
-      }
-    ).then(response => {
-      const result: UtxoSumResponse = response.data;
-      if (result.assets == null) {
-        // replace non-existent w/ empty array to handle Allegra -> Mary transition
-        // $FlowExpectedError[cannot-write]
-        result.assets = [];
-      }
-      return result;
-    })
-      .catch((error) => {
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getUTXOsSumsForAddresses)} error: ` + stringifyError(error));
-        throw new GetUtxosSumsForAddressesApiError();
-      });
   }
 
   getTransactionsHistoryForAddresses: HistoryRequest => Promise<HistoryResponse> = (body) => {
@@ -617,4 +559,20 @@ export class RemoteFetcher implements IFetcher {
         }
       });
   }
+
+  getSwapFeeTiers: GetSwapFeeTiersFunc = async (body: GetSwapFeeTiersRequest): Promise<GetSwapFeeTiersResponse> => {
+    const { BackendService } = body.network.Backend;
+    if (BackendService == null) throw new Error(`${nameof(this.getSwapFeeTiers)} missing backend url`);
+    return await axios(
+      `${BackendService}/api/v2.1/swap/feesInfo`,
+      {
+        method: 'get',
+      }
+    ).then(response => response.data)
+      .catch((error) => {
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getCatalystRoundInfo)} error: ` + stringifyError(error));
+        throw new GetCatalystRoundInfoApiError();
+      });
+  }
+
 }

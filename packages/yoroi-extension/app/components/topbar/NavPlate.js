@@ -128,12 +128,12 @@ export default class NavPlate extends Component<Props> {
     return (
       <Tooltip
         title={
-          <Typography variant="body3">
+          <Typography component="div" variant="body3">
             {walletName}
           </Typography>
         }
       >
-        <Typography variant="p" fontWeight="500" fontSize="1.125rem" pr="4px">
+        <Typography component="div" variant="p" fontWeight="500" fontSize="1.125rem" pr="4px">
           {truncatedName}
         </Typography>
       </Tooltip>

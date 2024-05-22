@@ -7,7 +7,7 @@ import { defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import globalMessages from '../i18n/global-messages';
 
-export type Label = {|
+type Label = {|
   +label: string,
 |}
 
@@ -28,7 +28,7 @@ export const AddressSubgroup = Object.freeze({
   external: 'external',
   mangled: 'mangled',
 });
-export type AddressSubgroupKind = $Values<typeof AddressSubgroup>;
+type AddressSubgroupKind = $Values<typeof AddressSubgroup>;
 export const addressSubgroupName: $ObjMap<typeof AddressSubgroup, ToMessage> = Object.freeze({
   all: globalMessages.allLabel,
   ...defineMessages({
@@ -60,7 +60,6 @@ export const AddressGroupTypes = Object.freeze({
   byron: 'byron',
   addressBook: 'addressBook',
   group: 'group',
-  p2pk: 'p2pk',
 });
 
 const commonDescriptions = defineMessages({
@@ -73,7 +72,7 @@ const commonDescriptions = defineMessages({
     defaultMessage: '!!!Addresses containing only a spending key and no staking key',
   },
 });
-export type AddressGroupKind = $Values<typeof AddressGroupTypes>;
+type AddressGroupKind = $Values<typeof AddressGroupTypes>;
 export const addressGroupsTooltip: $ObjMap<typeof AddressGroupTypes, ToMessage> = Object.freeze({
   group: commonDescriptions.group,
   base: commonDescriptions.group,
@@ -90,10 +89,6 @@ export const addressGroupsTooltip: $ObjMap<typeof AddressGroupTypes, ToMessage> 
     addressBook: {
       id: 'wallet.address.category.addressBook',
       defaultMessage: '!!!Addresses that do not belong to you, but are relevant to your wallet',
-    },
-    p2pk: {
-      id: 'wallet.address.category.p2pk',
-      defaultMessage: '!!!Addresses generated directly from a public key',
     },
   })
 });
@@ -115,10 +110,6 @@ export const addressGroupName: $ObjMap<typeof AddressGroupTypes, ToMessage> = Ob
     group: {
       id: 'wallet.receive.navigation.groupLabel',
       defaultMessage: '!!!Group'
-    },
-    p2pk: {
-      id: 'wallet.receive.navigation.p2pkLabel',
-      defaultMessage: '!!!P2PK'
     },
     addressBook: {
       id: 'wallet.receive.navigation.AddressBook',

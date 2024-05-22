@@ -30,7 +30,7 @@ import {
 import { Box, styled } from '@mui/system';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../routes-config';
-import CopyToClipboardText from '../../widgets/CopyToClipboardLabel';
+import CopyToClipboardLabel from '../../widgets/CopyToClipboardLabel';
 import { ListEmpty } from './ListEmpty';
 import BigNumber from 'bignumber.js';
 
@@ -138,7 +138,7 @@ function TokenList({ assetsList: list, shouldHideBalance, intl }: Props & Intl):
   return (
     <Stack sx={{ minHeight: '500px' }} id="tokens-list">
       <Box display="flex" justifyContent="space-between" alignItems="center" paddingBottom="8px">
-        <Typography
+        <Typography component="div"
           variant="h5"
           color="var(--yoroi-palette-common-black)"
           fontWeight={500}
@@ -186,7 +186,7 @@ function TokenList({ assetsList: list, shouldHideBalance, intl }: Props & Intl):
               <ListItemLayout
                 firstColumn={
                   <ButtonBase disableRipple onClick={() => sortAssets(SORTING_COLUMNS.NAME)}>
-                    <Typography variant="body2" color="grayscale.600" mr="4px">
+                    <Typography component="div" variant="body2" color="grayscale.600" mr="4px">
                       {intl.formatMessage(assetsMessage.nameAndTicker)}
                     </Typography>
                     {displayColumnLogo(SORTING_COLUMNS.NAME)}
@@ -194,7 +194,7 @@ function TokenList({ assetsList: list, shouldHideBalance, intl }: Props & Intl):
                 }
                 secondColumn={
                   <Stack direction="row" alignItems="center" spacing="4px">
-                    <Typography variant="body2" color="grayscale.600">
+                    <Typography component="div" variant="body2" color="grayscale.600">
                       {intl.formatMessage(globalMessages.fingerprint)}
                     </Typography>
                   </Stack>
@@ -208,7 +208,7 @@ function TokenList({ assetsList: list, shouldHideBalance, intl }: Props & Intl):
                     }}
                   >
                     <ButtonBase disableRipple onClick={() => sortAssets(SORTING_COLUMNS.AMOUNT)}>
-                      <Typography variant="body2" color="grayscale.600" mr="4px">
+                      <Typography component="div" variant="body2" color="grayscale.600" mr="4px">
                         {intl.formatMessage(assetsMessage.quantity)}
                       </Typography>
                       {displayColumnLogo(SORTING_COLUMNS.AMOUNT)}
@@ -304,23 +304,23 @@ function TokenItemRow({ avatar, name, id, amount, isTotalAmount }: TokenItemRowP
               width: '70%',
             }}
             color="primary.600"
-            to={id !== '-' && ROUTES.ASSETS.DETAILS.replace(':tokenId', id)}
+            to={id === '-' ? '#' :  ROUTES.ASSETS.DETAILS.replace(':tokenId', id)}
           >
             {name}
           </Typography>
         </Box>
       }
       secondColumn={
-        <Typography variant="body1" color="grayscale.900">
+        <Typography component="div" variant="body1" color="grayscale.900">
           <Box sx={{ '> button': { px: '5px', py: '3px', borderRadius: '8px', ml: '-5px' } }}>
-            <CopyToClipboardText text={id}>
+            <CopyToClipboardLabel text={id}>
               {below1200px ? truncateAddressShort(id) : id}
-            </CopyToClipboardText>
+            </CopyToClipboardLabel>
           </Box>
         </Typography>
       }
       thirdColumn={
-        <Typography fontWeight="500" textAlign="right">
+        <Typography component="div" fontWeight="500" textAlign="right">
           {amount}
         </Typography>
       }

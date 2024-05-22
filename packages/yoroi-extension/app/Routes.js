@@ -1,28 +1,19 @@
 // @flow
-import React, { Suspense } from 'react';
 import type { Node } from 'react';
-import { Route, Redirect, Switch } from 'react-router-dom';
-import { ROUTES } from './routes-config';
 import type { StoresMap } from './stores/index';
 import type { ActionsMap } from './actions/index';
-import type { InjectedOrGenerated } from './types/injectedPropsType';
-import type { GeneratedData as SettingsData } from './containers/settings/Settings';
-import type { GeneratedData as WalletData } from './containers/wallet/Wallet';
-import type { GeneratedData as ReceiveData } from './containers/wallet/Receive';
+import type { StoresAndActionsProps } from './types/injectedProps.types';
 import type { ConfigType } from '../config/config-types';
-import type { GeneratedData as AssetsData } from './containers/wallet/AssetsWrapper';
-import LoadingPage from './containers/LoadingPage';
+import { Route, Redirect, Switch } from 'react-router-dom';
+import { ROUTES } from './routes-config';
+import React, { Suspense } from 'react';
 import StakingPage, { StakingPageContentPromise } from './containers/wallet/staking/StakingPage';
-import Wallet from './containers/wallet/Wallet';
-import Settings from './containers/settings/Settings';
 import Transfer, { WalletTransferPagePromise } from './containers/transfer/Transfer';
 import VotingPage, { VotingPageContentPromise } from './containers/wallet/voting/VotingPage';
 import ConnectedWebsitesPage, {
   ConnectedWebsitesPagePromise,
 } from './containers/dapp-connector/ConnectedWebsitesContainer';
 import AddWalletPage, { AddAnotherWalletPromise } from './containers/wallet/AddWalletPage';
-import AssetsWrapper from './containers/wallet/AssetsWrapper';
-import NFTsWrapper from './containers/wallet/NFTsWrapper';
 // Todo: Add lazy loading
 import RestoreWalletPage, {
   RestoreWalletPagePromise,
@@ -30,6 +21,17 @@ import RestoreWalletPage, {
 import CreateWalletPage, {
   CreateWalletPagePromise,
 } from './containers/wallet/CreateWalletPageContainer';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import LoadingPage from './containers/LoadingPage';
+import Wallet from './containers/wallet/Wallet';
+import Settings from './containers/settings/Settings';
+import SwapPageContainer from './containers/swap/SwapPageContainer';
+import AssetsWrapper from './containers/wallet/AssetsWrapper';
+import NFTsWrapper from './containers/wallet/NFTsWrapper';
+import SwapProvider from './containers/swap/SwapProvider';
+import { Stack } from '@mui/material';
+import LoadingSpinner from './components/widgets/LoadingSpinner';
+import FullscreenLayout from './components/layout/FullscreenLayout';
 
 // PAGES
 const LanguageSelectionPagePromise = () => import('./containers/profile/LanguageSelectionPage');
@@ -94,9 +96,6 @@ const StakingDashboardPage = React.lazy(StakingDashboardPagePromise);
 const CardanoStakingPagePromise = () => import('./containers/wallet/staking/CardanoStakingPage');
 const CardanoStakingPage = React.lazy(CardanoStakingPagePromise);
 
-const NoticeBoardPagePromise = () => import('./containers/notice-board/NoticeBoardPage');
-const NoticeBoardPage = React.lazy(NoticeBoardPagePromise);
-
 const ComplexityLevelSettingsPagePromise = () =>
   import('./containers/settings/categories/ComplexityLevelSettingsPage');
 const ComplexityLevelSettingsPage = React.lazy(ComplexityLevelSettingsPagePromise);
@@ -129,6 +128,15 @@ const YoroiPalettePage = React.lazy(YoroiPalettePagePromise);
 const YoroiThemesPagePromise = () => import('./containers/experimental/yoroiThemes');
 const YoroiThemesPage = React.lazy(YoroiThemesPagePromise);
 
+// SWAP
+const SwapPagePromise = () => import('./containers/swap/asset-swap/SwapPage');
+const SwapPage = React.lazy(SwapPagePromise);
+const SwapOrdersPagePromise = () => import('./containers/swap/orders/OrdersPage');
+const SwapOrdersPage = React.lazy(SwapOrdersPagePromise);
+
+const ExchangeEndPagePromise = () => import('./containers/ExchangeEndPage');
+const ExchangeEndPage = React.lazy(ExchangeEndPagePromise);
+
 export const LazyLoadPromises: Array<() => any> = [
   AddAnotherWalletPromise,
   StakingPageContentPromise,
@@ -154,7 +162,6 @@ export const LazyLoadPromises: Array<() => any> = [
   ReceivePromise,
   StakingDashboardPagePromise,
   CardanoStakingPagePromise,
-  NoticeBoardPagePromise,
   VotingPageContentPromise,
   ComplexityLevelSettingsPagePromise,
   ComplexityLevelPagePromise,
@@ -167,14 +174,16 @@ export const LazyLoadPromises: Array<() => any> = [
   ConnectedWebsitesPagePromise,
   YoroiPalettePagePromise,
   YoroiThemesPagePromise,
+  SwapPagePromise,
+  SwapOrdersPagePromise,
   OptForAnalyticsPagePromise,
   AnalyticsSettingsPagePromise,
+  ExchangeEndPagePromise,
 ];
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 
-/* eslint-disable max-len */
 export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
   <Suspense fallback={null}>
     <Switch>
@@ -275,6 +284,11 @@ export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
           wrapSettings({ ...props, stores, actions }, SettingsSubpages(stores, actions))
         }
       />
+
+      <Route
+        path={ROUTES.SWAP.ROOT}
+        component={props => wrapSwap({ ...props, stores, actions }, SwapSubpages(stores, actions))}
+      />
       <Route
         path={ROUTES.TRANSFER.ROOT}
         component={props => <Transfer {...props} stores={stores} actions={actions} />}
@@ -291,11 +305,6 @@ export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
       />
       <Route
         exact
-        path={ROUTES.NOTICE_BOARD.ROOT}
-        component={props => <NoticeBoardPage {...props} stores={stores} actions={actions} />}
-      />
-      <Route
-        exact
         path={ROUTES.SWITCH}
         component={props => <WalletSwitch {...props} stores={stores} actions={actions} />}
       />
@@ -303,6 +312,11 @@ export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
         exact
         path={ROUTES.REVAMP.CATALYST_VOTING}
         component={props => <VotingPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.EXCHANGE_END}
+        component={props => <ExchangeEndPage {...props} stores={stores} actions={actions} />}
       />
       <Redirect to={ROUTES.MY_WALLETS} />
     </Switch>
@@ -364,6 +378,22 @@ const WalletsSubpages = (stores, actions) => (
   </Switch>
 );
 
+const SwapSubpages = (stores, actions) => (
+  <Switch>
+    <Route
+      exact
+      path={ROUTES.SWAP.ROOT}
+      component={props => <SwapPage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.SWAP.ORDERS}
+      component={props => <SwapOrdersPage {...props} stores={stores} actions={actions} />}
+    />
+    <Redirect to={ROUTES.SWAP.ROOT} />
+  </Switch>
+);
+
 const SettingsSubpages = (stores, actions) => (
   <Switch>
     <Route
@@ -408,9 +438,7 @@ const SettingsSubpages = (stores, actions) => (
     <Route
       exact
       path={ROUTES.SETTINGS.ANALYTICS}
-      component={props => (
-        <AnalyticsSettingsPage {...props} stores={stores} actions={actions} />
-      )}
+      component={props => <AnalyticsSettingsPage {...props} stores={stores} actions={actions} />}
     />
     <Redirect to={ROUTES.SETTINGS.GENERAL} />
   </Switch>
@@ -446,8 +474,28 @@ const NFTsSubPages = (stores, actions) => (
   </Switch>
 );
 
+export function wrapSwap(swapProps: StoresAndActionsProps, children: Node): Node {
+  const queryClient = new QueryClient();
+  const loader = (
+    <FullscreenLayout bottomPadding={0}>
+      <Stack alignItems="center" justifyContent="center" height="50vh">
+        <LoadingSpinner />
+      </Stack>
+    </FullscreenLayout>
+  );
+  return (
+    <QueryClientProvider client={queryClient}>
+      <SwapProvider publicDeriver={swapProps.stores.wallets.selected}>
+        <SwapPageContainer {...swapProps}>
+          <Suspense fallback={loader}>{children}</Suspense>
+        </SwapPageContainer>
+      </SwapProvider>
+    </QueryClientProvider>
+  );
+}
+
 export function wrapSettings(
-  settingsProps: InjectedOrGenerated<SettingsData>,
+  settingsProps: StoresAndActionsProps,
   children: Node
 ): Node {
   return (
@@ -457,7 +505,7 @@ export function wrapSettings(
   );
 }
 
-export function wrapAssets(assetsProps: InjectedOrGenerated<AssetsData>, children: Node): Node {
+export function wrapAssets(assetsProps: StoresAndActionsProps, children: Node): Node {
   return (
     <AssetsWrapper {...assetsProps}>
       <Suspense fallback={null}>{children}</Suspense>
@@ -465,7 +513,7 @@ export function wrapAssets(assetsProps: InjectedOrGenerated<AssetsData>, childre
   );
 }
 
-export function wrapNFTs(assetsProps: InjectedOrGenerated<AssetsData>, children: Node): Node {
+export function wrapNFTs(assetsProps: StoresAndActionsProps, children: Node): Node {
   return (
     <NFTsWrapper {...assetsProps}>
       <Suspense fallback={null}>{children}</Suspense>
@@ -473,7 +521,7 @@ export function wrapNFTs(assetsProps: InjectedOrGenerated<AssetsData>, children:
   );
 }
 
-export function wrapWallet(walletProps: InjectedOrGenerated<WalletData>, children: Node): Node {
+export function wrapWallet(walletProps: StoresAndActionsProps, children: Node): Node {
   return (
     <Wallet {...walletProps}>
       <Suspense fallback={null}>{children}</Suspense>
@@ -481,6 +529,6 @@ export function wrapWallet(walletProps: InjectedOrGenerated<WalletData>, childre
   );
 }
 
-export function wrapReceive(receiveProps: InjectedOrGenerated<ReceiveData>, children: Node): Node {
+export function wrapReceive(receiveProps: StoresAndActionsProps, children: Node): Node {
   return <Receive {...receiveProps}>{children}</Receive>;
 }

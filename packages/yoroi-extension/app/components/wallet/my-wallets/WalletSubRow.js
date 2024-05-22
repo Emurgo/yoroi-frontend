@@ -35,7 +35,7 @@ export default class WalletSubRow extends Component<Props> {
       <div className={styles.content}>
         <div className={styles.contentHead}>
           <div className={styles.plateSection}>
-            <p className={styles.walletNumber}>{walletNumber}</p>
+            <div className={styles.walletNumber}>{walletNumber}</div>
             <WalletPlate
               walletName={walletInfo.conceptualWalletName}
               plate={walletInfo.plate}

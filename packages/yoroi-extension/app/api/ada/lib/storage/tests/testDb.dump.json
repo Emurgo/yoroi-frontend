@@ -8,7 +8,6 @@
         "NetworkName": "Cardano Mainnet",
         "Backend": {
           "BackendService": "https://iohk-mainnet.yoroiwallet.com",
-          "WebSocket": "wss://iohk-mainnet.yoroiwallet.com:443",
           "TokenInfoService": "https://cdn.yoroiwallet.com"
         },
         "BaseConfig": [
@@ -39,28 +38,10 @@
         "Fork": 0
       },
       {
-        "NetworkId": 200,
-        "NetworkName": "Ergo Mainnet",
-        "Backend": {
-          "BackendService": "https://ergo-backend.yoroiwallet.com"
-        },
-        "BaseConfig": [
-          {
-            "StartAt": 0,
-            "ChainNetworkId": "0",
-            "MinimumBoxValue": "100000",
-            "FeeAddress": "031005040004000e36100204a00b08cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798ea02d192a39a8cc7a701730073011001020402d19683030193a38cc7b2a57300000193c2b2a57301007473027303830108cdeeac93b1a573046eebdc83"
-          }
-        ],
-        "CoinType": 2147484077,
-        "Fork": 0
-      },
-      {
         "NetworkId": 300,
         "NetworkName": "Cardano Testnet",
         "Backend": {
           "BackendService": "https://testnet-backend.yoroiwallet.com",
-          "WebSocket": "wss://testnet-backend.yoroiwallet.com:443",
           "TokenInfoService": "https://stage-cdn.yoroiwallet.com"
         },
         "BaseConfig": [
@@ -74,41 +55,6 @@
           },
           {
             "StartAt": 74,
-            "SlotsPerEpoch": 432000,
-            "SlotDuration": 1,
-            "PerEpochPercentageReward": 69344,
-            "LinearFee": {
-              "coefficient": "44",
-              "constant": "155381"
-            },
-            "CoinsPerUtxoWord": "34482",
-            "MinimumUtxoVal": "1000000",
-            "PoolDeposit": "500000000",
-            "KeyDeposit": "2000000"
-          }
-        ],
-        "CoinType": 2147485463,
-        "Fork": 0
-      },
-      {
-        "NetworkId": 400,
-        "NetworkName": "Alonzo Testnet",
-        "Backend": {
-          "BackendService": "https://alonzo-backend.yoroiwallet.com",
-          "WebSocket": "wss://alonzo-backend.yoroiwallet.com:443",
-          "TokenInfoService": "https://stage-cdn.yoroiwallet.com"
-        },
-        "BaseConfig": [
-          {
-            "StartAt": 0,
-            "ChainNetworkId": "0",
-            "ByronNetworkId": 1097911063,
-            "GenesisDate": "1563999616000",
-            "SlotsPerEpoch": 21600,
-            "SlotDuration": 20
-          },
-          {
-            "StartAt": 0,
             "SlotsPerEpoch": 432000,
             "SlotDuration": 1,
             "PerEpochPercentageReward": 69344,
@@ -1646,23 +1592,6 @@
       },
       {
         "Digest": 6.262633522161549e-167,
-        "NetworkId": 200,
-        "Identifier": "",
-        "IsDefault": true,
-        "IsNFT": false,
-        "Metadata": {
-          "type": "Ergo",
-          "height": 0,
-          "boxId": "",
-          "ticker": "ERG",
-          "longName": null,
-          "numberOfDecimals": 9,
-          "description": null
-        },
-        "TokenId": 3
-      },
-      {
-        "Digest": 6.262633522161549e-167,
         "NetworkId": 300,
         "Identifier": "",
         "IsDefault": true,
@@ -2064,16 +1993,6 @@
           "transaction": "https://itnexplorer.cardano.org/en/transaction/"
         },
         "Name": "CardanoExplorer"
-      },
-      {
-        "ExplorerId": 300,
-        "NetworkId": 200,
-        "IsBackup": true,
-        "Endpoints": {
-          "address": "https://explorer.ergoplatform.com/en/addresses/",
-          "transaction": "https://explorer.ergoplatform.com/en/transactions/"
-        },
-        "Name": "ErgoPlatform"
       },
       {
         "ExplorerId": 500,

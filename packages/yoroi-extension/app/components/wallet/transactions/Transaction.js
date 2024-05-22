@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { TransactionDirectionType } from '../../../api/ada/transactions/types';
-import type { AssuranceLevel } from '../../../types/transactionAssuranceTypes';
+import type { AssuranceLevel } from '../../../types/transactionAssurance.types';
 import type { TxDataOutput, TxDataInput } from '../../../api/common/types';
 import type { TxStatusCodesType } from '../../../api/ada/lib/storage/database/primitives/enums';
 import type {
@@ -11,7 +11,7 @@ import type {
   TokenRow,
 } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos/tables';
-import type { Notification } from '../../../types/notificationType';
+import type { Notification } from '../../../types/notification.types';
 import type { TokenLookupKey, TokenEntry } from '../../../api/common/lib/MultiToken';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import type { ComplexityLevelType } from '../../../types/complexityLevelType';
@@ -160,6 +160,46 @@ export const shelleyCertificateKinds: Object = {
     StakeDelegation: {
       id: 'wallet.transaction.certificate.StakeDelegation',
       defaultMessage: '!!!Stake delegation',
+    },
+    VoteDelegation: {
+      id: 'wallet.transaction.certificate.VoteDelegation',
+      defaultMessage: '!!!Vote delegation',
+    },
+    StakeAndVoteDelegation: {
+      id: 'wallet.transaction.certificate.StakeAndVoteDelegation',
+      defaultMessage: '!!!Staking and voting delegation',
+    },
+    StakeRegistrationAndDelegation: {
+      id: 'wallet.transaction.certificate.StakeRegistrationAndDelegation',
+      defaultMessage: '!!!Stake credential registration and staking delegation',
+    },
+    VoteRegistrationAndDelegation: {
+      id: 'wallet.transaction.certificate.VoteRegistrationAndDelegation',
+      defaultMessage: '!!!Stake credential registration and voting delegation',
+    },
+    StakeVoteRegistrationAndDelegation: {
+      id: 'wallet.transaction.certificate.StakeVoteRegistrationAndDelegation',
+      defaultMessage: '!!!Stake credential registration and staking and voting delegation',
+    },
+    CommitteeHotAuth: {
+      id: 'wallet.transaction.certificate.CommitteeHotAuth',
+      defaultMessage: '!!!Constitutional committee authorization',
+    },
+    CommitteeColdResign: {
+      id: 'wallet.transaction.certificate.CommitteeColdResign',
+      defaultMessage: '!!!Constitional committee resignment',
+    },
+    DrepRegistration: {
+      id: 'wallet.transaction.certificate.DrepRegistration',
+      defaultMessage: '!!!DRep credential registration',
+    },
+    DrepDeregistration: {
+      id: 'wallet.transaction.certificate.DrepDeregistration',
+      defaultMessage: '!!!DRep credential retirement',
+    },
+    DrepUpdate: {
+      id: 'wallet.transaction.certificate.DrepUpdate',
+      defaultMessage: '!!!DRep metadata update',
     },
   }),
 };
@@ -572,6 +612,7 @@ export default class Transaction extends Component<Props, State> {
         className={styles.addressItem}
       >
         <CopyableAddress
+          id='transaction'
           hash={this.props.addressToDisplayString(request.address.address)}
           elementId={notificationElementId}
           onCopyAddress={() =>

@@ -1,4 +1,5 @@
 // @flow
+/* eslint-disable  import/no-unused-modules */
 
 import buildManifest from './manifest-mv2.template';
 import {

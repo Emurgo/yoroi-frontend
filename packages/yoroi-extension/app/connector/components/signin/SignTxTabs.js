@@ -50,7 +50,7 @@ function SignTxTabs({
 
   return (
     <Background>
-      <Typography color="#242838" variant="h4" align="center" my="32px">
+      <Typography component="div" color="#242838" variant="h4" align="center" my="32px">
         {intl.formatMessage(connectorMessages[isDataSignin ? 'signData' : 'signTransaction'])}
       </Typography>
       <TabContext value={value}>
@@ -79,7 +79,7 @@ function SignTxTabs({
                     key={id}
                     disableRipple
                     label={
-                      <Typography variant="body1" fontWeight={500}>
+                      <Typography component="div" variant="body1" fontWeight={500}>
                         {label}
                       </Typography>
                     }

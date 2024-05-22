@@ -1,27 +1,26 @@
 // @flow
-import { observable, action, computed, runInAction } from 'mobx';
+import { action, computed, observable, runInAction } from 'mobx';
 import { debounce, find } from 'lodash';
 import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
-import { matchRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 import environment from '../../environment';
 import config from '../../config';
 import globalMessages from '../../i18n/global-messages';
-import type { Notification } from '../../types/notificationType';
+import type { Notification } from '../../types/notification.types';
 import type { GetWalletsFunc } from '../../api/common/index';
-import type { CreateWalletResponse, RestoreWalletResponse } from '../../api/common/types';
 import { getWallets } from '../../api/common/index';
+import type { CreateWalletResponse, RestoreWalletResponse } from '../../api/common/types';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
-  asGetSigningKey,
   asGetPublicKey,
+  asGetSigningKey,
   asGetStakingKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   IGetLastSyncInfoResponse,
-  IGetSigningKey,
   IGetPublic,
+  IGetSigningKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { Logger, stringifyError } from '../../utils/logging';
@@ -29,10 +28,8 @@ import { assuranceModes } from '../../config/transactionAssuranceConfig';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { createDebugWalletDialog } from '../../containers/wallet/dialogs/DebugWalletDialogContainer';
 import { createProblematicWalletDialog } from '../../containers/wallet/dialogs/ProblematicWalletDialogContainer';
-import { getApiForNetwork } from '../../api/common/utils';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import { getCurrentWalletFromLS, updateSyncedWallets } from '../../utils/localStorage';
 import { getWalletChecksum } from '../../api/export/utils';
 
 type GroupedWallets = {|
@@ -85,6 +82,8 @@ export type PublicKeyCache = {|
   publicKey: string,
 |};
 
+export type SendMoneyRequest = Request<DeferredCall<{| txId: string |}>>;
+
 /**
  * The base wallet store that contains the shared logic
  * dealing with wallets / accounts.
@@ -93,7 +92,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   WALLET_REFRESH_INTERVAL: number = environment.getWalletRefreshInterval();
   ON_VISIBLE_DEBOUNCE_WAIT: number = 1000;
 
-  @observable firstSyncWalletId: ?number;
+  @observable initialSyncingWalletIds: Array<number> = [];
   @observable publicDerivers: Array<PublicDeriver<>>;
   @observable selected: null | PublicDeriver<>;
   @observable getInitialWallets: Request<GetWalletsFunc> = new Request<GetWalletsFunc>(getWallets);
@@ -122,7 +121,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   });
   @observable isImportActive: boolean = false;
 
-  @observable sendMoneyRequest: Request<DeferredCall<{| txId: string |}>> = new Request<
+  @observable sendMoneyRequest: SendMoneyRequest = new Request<
     DeferredCall<{| txId: string |}>
   >(request => request());
 
@@ -186,6 +185,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
         wallet: newWithCachedData[0],
       });
       this.actions.dialogs.closeActiveDialog.trigger();
+      this.initialSyncingWalletIds.push(newWallet.publicDerivers[0].getPublicDeriverId());
       this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
       for (const publicDeriver of newWithCachedData) {
         this._startParallelRefreshForWallet(publicDeriver);
@@ -199,6 +199,13 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   @computed get hasActiveWallet(): boolean {
     return this.selected != null;
+  }
+
+  @computed get selectedOrFail(): PublicDeriver<> {
+    if (this.selected == null) {
+      throw new Error('A selected wallet is required!');
+    }
+    return this.selected;
   }
 
   @computed get activeWalletPlate(): ?WalletChecksum {
@@ -228,30 +235,21 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   refreshWalletFromRemote: (PublicDeriver<>) => Promise<void> = async publicDeriver => {
     try {
-      const wallet = await getCurrentWalletFromLS(publicDeriver);
-      if (!wallet || !wallet.isSynced) {
-        runInAction(() => {
-          this.firstSyncWalletId = publicDeriver.getPublicDeriverId();
-        });
-      }
-
       await this.stores.transactions.refreshTransactionData({
         publicDeriver,
         isLocalRequest: false,
       });
       await this.stores.addresses.refreshAddressesFromDb(publicDeriver);
-      await updateSyncedWallets(publicDeriver);
-
-      if (typeof this.firstSyncWalletId === 'number') {
-        runInAction(() => {
-          this.firstSyncWalletId = null;
-        });
-      }
     } catch (error) {
       Logger.error(
         `${nameof(WalletStore)}::${nameof(this.refreshWalletFromRemote)} ` + stringifyError(error)
       );
       throw error;
+    } finally {
+      runInAction(() => {
+        // $FlowFixMe[prop-missing] this is an mobx obervable.array so there is a remove method
+        this.initialSyncingWalletIds.remove(publicDeriver.getPublicDeriverId());
+      });
     }
   };
 
@@ -285,6 +283,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     this._queueWarningIfNeeded(withCache);
     runInAction(() => {
       this.publicDerivers.push(withCache);
+      this.initialSyncingWalletIds.push(publicDeriver.getPublicDeriverId());
     });
     this._startParallelRefreshForWallet(withCache);
   };
@@ -326,9 +325,8 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       this.publicDerivers.push(...newWithCachedData);
     });
     setTimeout(async () => {
-      for (const publicDeriver of newWithCachedData) {
-        await this.refreshWalletFromLocalOnLaunch(publicDeriver);
-      }
+      await Promise.all(newWithCachedData
+        .map(w => this.refreshWalletFromLocalOnLaunch(w)));
       // This should correctly handle both states of `paralletSync`, both
       // initially and when it changes.
       // The initial case is straightforward.
@@ -351,22 +349,14 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     publicDeriver: PublicDeriver<>,
     lastSyncInfo: IGetLastSyncInfoResponse,
   |}) => void = request => {
-    const apiType = getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo());
-
-    const stores = this.stores.substores[apiType];
-    this.stores.addresses.addObservedWallet(request.publicDeriver);
-    this.stores.transactions.addObservedWallet(request);
-    stores.time.addObservedTime(request.publicDeriver);
+    const { addresses, transactions, substores } = this.stores;
+    addresses.addObservedWallet(request.publicDeriver);
+    transactions.addObservedWallet(request);
+    const { time, delegation } = substores.ada;
+    time.addObservedTime(request.publicDeriver);
     if (asGetStakingKey(request.publicDeriver) != null) {
-      if (!stores.delegation) {
-        throw new Error(
-          `${nameof(
-            this.registerObserversForNewWallet
-          )} wallet has staking key but currency doesn't support delegation`
-        );
-      }
-      stores.delegation.addObservedWallet(request.publicDeriver);
-      stores.delegation.refreshDelegation(request.publicDeriver);
+      delegation.addObservedWallet(request.publicDeriver);
+      delegation.refreshDelegation(request.publicDeriver);
     }
   };
 
@@ -392,12 +382,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   };
 
   // =================== PRIVATE API ==================== //
-
-  @computed get _canRedirectToWallet(): boolean {
-    const currentRoute = this.stores.app.currentRoute;
-    const isRootRoute = matchRoute(ROUTES.WALLETS.ROOT, currentRoute) !== false;
-    return isRootRoute;
-  }
 
   _pollRefresh: void => Promise<void> = async () => {
     // Do not update if screen not active
@@ -552,7 +536,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
             action(() => {
               existingWarnings.dialogs.pop();
             }),
-            { stores: this.stores, actions: this.actions }
           )
         );
       }
@@ -563,7 +546,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
             action(() => {
               existingWarnings.dialogs.pop();
             }),
-            { stores: this.stores, actions: this.actions }
           )
         );
       }
@@ -611,6 +593,10 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     if (tx == null) throw new Error(`Should never happen`);
     return tx;
   };
+
+  isInitialSyncing: (PublicDeriver<>) => boolean = (publicDeriver) => {
+    return this.initialSyncingWalletIds.includes(publicDeriver.getPublicDeriverId());
+  }
 }
 
 export const WalletCreationNotifications: {| [key: string]: Notification |} = {

@@ -29,16 +29,29 @@ type Props = {|
   +isValidAmount: ($ReadOnly<TokenRow>) => boolean,
 |};
 
+type State = {|
+  isInputFocused: boolean,
+|};
+
 const messages = defineMessages({
   notEnoughMoneyToSendError: {
     id: 'api.errors.NotEnoughMoneyToSendError',
-    defaultMessage: '!!!Not enough funds to make this transaction.',
+    defaultMessage: '!!!Not enough balance',
   },
 });
-export default class SingleTokenRow extends Component<Props> {
+export default class SingleTokenRow extends Component<Props,State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
+
+
+  constructor(props: Props) {
+    super(props);
+    // eslint-disable-next-line react/state-in-constructor
+    this.state = {
+      isInputFocused: false,
+    };
+  }
 
   getNumDecimals(): number {
     return this.props.token.info.Metadata.numberOfDecimals;
@@ -80,33 +93,36 @@ export default class SingleTokenRow extends Component<Props> {
               <div className={styles.logo}>
                 <NoAssetLogo />
               </div>
-              <Typography variant="body1" color="primary.600" className={styles.label}>
+              <Typography component="div" variant="body1" color="primary.600" className={styles.label}>
                 {token.label.startsWith('asset')
                   ? truncateAddressShort(token.label, 14)
                   : token.label}
               </Typography>
             </div>
-            <Typography variant="body1" color="grayscale.900">
+            <Typography component="div" variant="body1" color="grayscale.900">
               {truncateAddressShort(token.id, 14)}
             </Typography>
-            <p className={styles.amount}>{displayAmount}</p>
+            <div className={styles.amount}>{displayAmount}</div>
           </button>
         ) : (
           <Box
             border="2px solid"
             borderColor="grayscale.400"
-            className={classnames([styles.amountWrapper, !isValid && styles.amountError])}
+            className={
+              classnames([styles.amountWrapper,
+                !isValid && styles.amountError,this.state.isInputFocused && styles.inputFocused])
+            }
           >
             <div className={styles.amountTokenName}>
               <div className={styles.logo}>
                 <NoAssetLogo />
               </div>
-              <Typography variant="body1" color="primary.600" className={styles.label}>
+              <Typography component="div" variant="body1" color="primary.600" className={styles.label}>
                 {token.label}
               </Typography>
             </div>
             <div>
-              <Typography variant="body1" color="grayscale.900">
+              <Typography component="div" variant="body1" color="grayscale.900">
                 {truncateAddressShort(token.id, 14)}
               </Typography>
             </div>
@@ -117,6 +133,12 @@ export default class SingleTokenRow extends Component<Props> {
                 decimalPlaces={this.getNumDecimals()}
                 amountFieldRevamp
                 placeholder={displayAmount}
+                onFocus={() => {
+                  this.setState({ isInputFocused: true })
+                }}
+                onBlur={() => {
+                  this.setState({ isInputFocused: false })
+                }}
               />
             </div>
             <button
@@ -127,9 +149,9 @@ export default class SingleTokenRow extends Component<Props> {
               {' '}
               <CloseIcon />{' '}
             </button>
-            <p className={styles.error}>
+            <div className={styles.error}>
               {!isValid && intl.formatMessage(messages.notEnoughMoneyToSendError)}
-            </p>
+            </div>
           </Box>
         )}
       </div>

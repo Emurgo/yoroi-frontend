@@ -482,7 +482,7 @@ class AmountInput extends Component<AmountInputProps> {
         <NumericInputRP {...this.props} />
         {/* Do not show fee in case of some error is showing */}
         {error == null || error === '' ? (
-          <Typography
+          <Typography component="div"
             sx={{
               position: 'absolute',
               bottom: '86px',
@@ -496,7 +496,7 @@ class AmountInput extends Component<AmountInputProps> {
           </Typography>
         ) : null}
 
-        <Typography
+        <Typography component="div"
           variant="body3"
           sx={{
             position: 'absolute',

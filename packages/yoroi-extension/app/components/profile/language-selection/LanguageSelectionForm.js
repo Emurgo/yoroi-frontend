@@ -132,7 +132,7 @@ class LanguageSelectionForm extends Component<Props & InjectedLayoutProps, State
             ))}
           </Select>
 
-          {error && <p className={styles.error}>{intl.formatMessage(error, error.values)}</p>}
+          {error && <div className={styles.error}>{intl.formatMessage(error, error.values)}</div>}
 
           <FormControlLabel
             onClick={this.onClickTosLabel}
@@ -169,13 +169,13 @@ class LanguageSelectionForm extends Component<Props & InjectedLayoutProps, State
           {!tier1Languages.includes(currentLocale) && (
             <div className={styles.info}>
               <h1>{intl.formatMessage(globalMessages.languageSelectLabelInfo)}</h1>
-              <p>
+              <div>
                 {intl.formatMessage(globalMessages.languageSelectInfo)}{' '}
                 {listOfTranslators(
                   intl.formatMessage(globalMessages.translationContributors),
                   intl.formatMessage(globalMessages.translationAcknowledgment)
                 )}
-              </p>
+              </div>
             </div>
           )}
         </div>
@@ -185,7 +185,7 @@ class LanguageSelectionForm extends Component<Props & InjectedLayoutProps, State
     const revampLayout = (
       <Box sx={{ maxWidth: '530px', mx: 'auto', mt: '48px' }}>
         <div className={styles.centeredBox}>
-          <Typography variant="h5" fontWeight={500} mb="24px" textAlign="center">
+          <Typography component="div" variant="h5" fontWeight={500} mb="24px" textAlign="center">
             {this.context.intl.formatMessage(globalMessages.languageSelectLabelShort)}
           </Typography>
           <Select
@@ -210,13 +210,13 @@ class LanguageSelectionForm extends Component<Props & InjectedLayoutProps, State
             shrink={false}
           >
             {languageOptions.map(option => (
-              <MenuItem key={option.value} value={option.value}>
+              <MenuItem key={option.value} value={option.value} id={'selectLanguage-' + option.value + '-menuItem'}>
                 <FlagLabel svg={option.svg} label={option.label} />
               </MenuItem>
             ))}
           </Select>
 
-          {error && <p className={styles.error}>{intl.formatMessage(error, error.values)}</p>}
+          {error && <div className={styles.error}>{intl.formatMessage(error, error.values)}</div>}
 
           <FormControlLabel
             onClick={this.onClickTosLabel}
@@ -237,6 +237,7 @@ class LanguageSelectionForm extends Component<Props & InjectedLayoutProps, State
                 onChange={event => {
                   tosAgreement.value = event.target.checked;
                 }}
+                id='initialPage-tosAgreement-checkbox'
               />
             }
             sx={{
@@ -265,6 +266,7 @@ class LanguageSelectionForm extends Component<Props & InjectedLayoutProps, State
                   padding: '13px 24px',
                 },
               }}
+              id='initialPage-continue-button'
             >
               {intl.formatMessage(globalMessages.continue)}
             </LoadingButton>
@@ -273,13 +275,13 @@ class LanguageSelectionForm extends Component<Props & InjectedLayoutProps, State
           {!tier1Languages.includes(currentLocale) && (
             <div className={styles.info}>
               <h1>{intl.formatMessage(globalMessages.languageSelectLabelInfo)}</h1>
-              <p>
+              <div>
                 {intl.formatMessage(globalMessages.languageSelectInfo)}{' '}
                 {listOfTranslators(
                   intl.formatMessage(globalMessages.translationContributors),
                   intl.formatMessage(globalMessages.translationAcknowledgment)
                 )}
-              </p>
+              </div>
             </div>
           )}
         </div>

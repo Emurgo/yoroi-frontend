@@ -24,11 +24,14 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../routes-config';
 import { getNetworkUrl, tokenMessages } from './TokenDetails';
-import type { CardanoAssetMintMetadata, NetworkRow, } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type {
+  CardanoAssetMintMetadata,
+  NetworkRow,
+} from '../../../api/ada/lib/storage/database/primitives/tables';
 import { NftImage } from './NFTsList';
 import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { truncateAddress, truncateAddressShort } from '../../../utils/formatters';
-import { urlResolveIpfs } from '../../../coreUtils';
+import { urlResolveForIpfsAndCorsproxy } from '../../../coreUtils';
 import { ampli } from '../../../../ampli/index';
 import { CopyAddress, TruncatedText } from './TruncatedText';
 
@@ -98,7 +101,7 @@ const tabs = [
 ];
 
 function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props & Intl): Node {
-  const nftImage = urlResolveIpfs(nftInfo?.image);
+  const nftImage = nftInfo?.image;
   const networkUrl = getNetworkUrl(network);
   const [activeTab, setActiveTab] = useState(tab !== null ? tab : tabs[0].id); // Overview tab
   const setActiveTabAndTrack = function (tabId: string) {
@@ -149,19 +152,20 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
         to={ROUTES.NFTS.ROOT}
         sx={{
           color: 'grayscale.900',
-          lineHeight: '27.5px',
+          '&.MuiButton-sizeMedium': {
+            padding: '13px 16px',
+          },
         }}
         startIcon={<BackArrow />}
       >
-        {intl.formatMessage(messages.back)}
+        <Typography fontWeight="500">{intl.formatMessage(messages.back)}</Typography>
       </Button>
       <Grid
         container
         columns={10}
         sx={{
           margin: '0 auto',
-          minHeight: '520px',
-          mb: '21px',
+          minHeight: '400px',
           backgroundColor: 'common.white',
           borderRadius: '8px',
         }}
@@ -178,12 +182,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
             }}
             onClick={() => nftImage !== null && setOpenAndTrack()}
           >
-            <NftImage
-              imageUrl={nftImage}
-              name={nftInfo.name || '-'}
-              width="100%"
-              height="auto"
-            />
+            <NftImage imageUrl={nftImage} name={nftInfo.name || '-'} width="100%" height="auto" />
           </ImageItem>
         </Grid>
 
@@ -191,7 +190,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
           item
           xs={6}
           sx={{
-            paddingTop: '24px',
+            paddingTop: '16px',
             paddingBottom: '22px',
           }}
         >
@@ -273,7 +272,11 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                       textTransform: 'none',
                       fontWeight: 500,
                     }}
-                    label={intl.formatMessage(label)}
+                    label={
+                      <Typography variant="body1" fontWeight="500" pb="6px">
+                        {intl.formatMessage(label)}
+                      </Typography>
+                    }
                     value={id}
                     disableRipple
                   />
@@ -343,7 +346,6 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
               sx={{
                 boxShadow: 'none',
                 bgcolor: 'transparent',
-                height: '100%',
                 overflow: 'auto',
               }}
               value={tabs[1].id}
@@ -392,7 +394,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
         >
           <img
             style={{ objectFit: 'cover', maxWidth: '100%', maxHeight: '100%' }}
-            src={nftImage}
+            src={urlResolveForIpfsAndCorsproxy(nftImage)}
             alt={nftInfo.name}
             title={nftInfo.name}
             loading="lazy"
@@ -422,48 +424,15 @@ const ImageItem = styled(Box)({
   },
 });
 
-// Requrie predefined with
-// jone -> jo..
-const TruncatedText = styled(Typography)({
-  whiteSpace: 'nowrap',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-});
-
-export function CopyAddress({ text, children }: {| text: string, children: Node |}): Node {
-  const [isCopied, setCopy] = useState(false);
-
-  const onCopy = async () => {
-    setCopy(false);
-
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopy(true);
-    } catch (error) {
-      setCopy(false);
-    }
-
-    setTimeout(() => {
-      setCopy(false);
-    }, 2500); // 2.5 sec
-  };
-
-  return (
-    <Stack direction="row" alignItems="center">
-      <TruncatedText>{children}</TruncatedText>
-
-      <IconButton sx={{ ml: '4px' }} onClick={onCopy}>
-        {isCopied ? <IconCopied /> : <IconCopy />}
-      </IconButton>
-    </Stack>
-  );
-}
-
 function LabelWithValue({ label, value }: {| label: string | Node, value: string | Node |}): Node {
   return (
     <Box>
-      <Typography color="var(--yoroi-palette-gray-600)">{label}</Typography>
-      <Typography color="var(--yoroi-palette-gray-900)">{value}</Typography>
+      <Typography component="div" color="var(--yoroi-palette-gray-600)">
+        {label}
+      </Typography>
+      <Typography component="div" color="var(--yoroi-palette-gray-900)">
+        {value}
+      </Typography>
     </Box>
   );
 }

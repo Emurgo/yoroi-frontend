@@ -9,6 +9,7 @@ const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
 const shell = require('shelljs');
 const manifestEnvs = require('../chrome/manifestEnvs');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const UnusedWebpackPlugin = require('unused-webpack-plugin');
 
 /* eslint-disable no-console */
 
@@ -35,7 +36,7 @@ const plugins = (folder /*: string */, _networkName /*: string */) /*: * */ => {
     new HtmlWebpackPlugin({
       filename: path.join(__dirname, `../${folder}/main_window_connector.html`),
       template: path.join(__dirname, '../chrome/views/connector/main_window.html'),
-      chunks: ['ergo'],
+      chunks: ['connector'],
       alwaysWriteToDisk: true,
       title: 'Yoroi dApp Connector',
     }),
@@ -75,6 +76,25 @@ const plugins = (folder /*: string */, _networkName /*: string */) /*: * */ => {
           globOptions: { gitignore: true },
         },
       ],
+    }),
+    new UnusedWebpackPlugin({
+      // Source directories
+      directories: [path.join(__dirname, '../app')],
+      // Exclude patterns
+      exclude: [
+        '*.test.js',
+        '*.forTests.*',
+        '**/__mocks__/*',
+        '*.snap',
+        '*.dump.json',
+        '*.md',
+        '*.types.*',
+        'types.js',
+        'interfaces.js',
+        'rustLoaderForBackground.js',
+      ],
+      // Root directory (optional)
+      root: __dirname,
     }),
   ];
 };
@@ -199,6 +219,7 @@ const optimization = {
 const resolve = () /*: * */ => ({
   extensions: ['*', '.js', '.wasm'],
   fallback: {
+    vm: false,
     fs: false,
     path: require.resolve('path-browserify'),
     stream: require.resolve('stream-browserify'),

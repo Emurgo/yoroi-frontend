@@ -74,6 +74,7 @@ class RemoveWallet extends Component<Props & InjectedProps> {
             marginTop: !isRevampLayout && '20px',
             width: isRevampLayout ? 'fit-content' : '400px',
           }}
+          id="settings:wallet-removeWallet-button"
         >
           {`${this.context.intl.formatMessage(globalMessages.remove)} ${this.props.walletName}`}
         </Button>

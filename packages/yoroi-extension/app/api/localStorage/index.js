@@ -16,6 +16,7 @@ import {
 import type { ComplexityLevelType } from '../../types/complexityLevelType';
 import type { WhitelistEntry } from '../../../chrome/extension/connector/types';
 import type { CatalystRoundInfoResponse } from '../ada/lib/state-fetch/types'
+import { maybe } from '../../coreUtils';
 
 declare var chrome;
 declare var browser;
@@ -38,8 +39,9 @@ const storageKeys = {
   WALLETS_NAVIGATION: networkForLocalStorage + '-WALLETS-NAVIGATION',
   SUBMITTED_TRANSACTIONS: 'submittedTransactions',
   CATALYST_ROUND_INFO: networkForLocalStorage + '-CATALYST_ROUND_INFO',
+  FLAGS: networkForLocalStorage + '-FLAGS',
   // ========== CONNECTOR   ========== //
-  ERGO_CONNECTOR_WHITELIST: 'connector_whitelist',
+  DAPP_CONNECTOR_WHITELIST: 'connector_whitelist',
   SELECTED_WALLET: 'SELECTED_WALLET',
 
   IS_ANALYTICS_ALLOWED: networkForLocalStorage + '-IS_ANALYTICS_ALLOWED',
@@ -51,7 +53,6 @@ export type SetCustomUserThemeRequest = {|
 |};
 
 export type WalletsNavigation = {|
-  ergo: number[],
   cardano: number[],
 |}
 
@@ -231,7 +232,7 @@ export default class LocalStorageApi {
 
   // ========== CONNECTOR whitelist  ========== //
   getWhitelist: void => Promise<?Array<WhitelistEntry>> = async () => {
-    const result = await getLocalItem(storageKeys.ERGO_CONNECTOR_WHITELIST);
+    const result = await getLocalItem(storageKeys.DAPP_CONNECTOR_WHITELIST);
     if (result === undefined || result === null) return undefined;
     const filteredWhitelist = JSON.parse(result).filter(e => e.protocol != null);
     this.setWhitelist(filteredWhitelist);
@@ -240,7 +241,7 @@ export default class LocalStorageApi {
 
   setWhitelist: (Array<WhitelistEntry> | void) => Promise<void> = value =>
     setLocalItem(
-      storageKeys.ERGO_CONNECTOR_WHITELIST,
+      storageKeys.DAPP_CONNECTOR_WHITELIST,
       JSON.stringify(value ?? [])
     );
 
@@ -297,6 +298,15 @@ export default class LocalStorageApi {
     }
   }
 
+  // ========== FLAGS ========== //
+
+  getFlag: string => boolean = (flag) => {
+    return localStorage.getItem(`${storageKeys.FLAGS}/${flag}`) === 'true';
+  }
+
+  setFlag: (string, boolean) => void = (flag, state) => {
+    localStorage.setItem(`${storageKeys.FLAGS}/${flag}`, String(state));
+  }
 
   // ========== Sort wallets - Revamp ========== //
   getWalletsNavigation: void => Promise<?WalletsNavigation> = async () => {
@@ -306,7 +316,6 @@ export default class LocalStorageApi {
     // Added for backward compatibility
     if(Array.isArray(result)) return {
       cardano: [],
-      ergo: [],
     }
 
     return result
@@ -434,4 +443,46 @@ export async function loadCatalystRoundInfo(): Promise<?CatalystRoundInfoRespons
 
 export async function saveCatalystRoundInfo(data: CatalystRoundInfoResponse): Promise<void> {
   await setLocalItem(storageKeys.CATALYST_ROUND_INFO, JSON.stringify(data));
+}
+
+export function asyncLocalStorageWrapper(): {|
+  getItem(key: string): Promise<string | null>,
+  setItem(key: string, value: string): Promise<void>,
+  removeItem(key: string): Promise<void>,
+|} {
+  return {
+    getItem: key => getLocalItem(key).then(x => x ?? null),
+    setItem: setLocalItem,
+    removeItem: removeLocalItem,
+  }
+}
+
+export type StorageField<T> = {|
+  get: () => Promise<T>;
+  set: T => Promise<void>;
+  remove: () => Promise<void>;
+  defaultValue: () => T,
+|}
+
+export function createStorageField<T>(
+  key: string,
+  serializer: T => string,
+  deserializer: string => T,
+  defaultValue: T,
+): StorageField<T> {
+  return Object.freeze({
+    get: async () => maybe(await getLocalItem(key), deserializer) ?? defaultValue,
+    set: t => setLocalItem(key, serializer(t)),
+    remove: () => removeLocalItem(key),
+    defaultValue: () => defaultValue,
+  });
+}
+
+export function createStorageFlag(
+  key: string,
+  defaultValue: boolean,
+): StorageField<boolean> {
+  const serializer = String;
+  const deserializer = s => s === 'true';
+  return createStorageField<boolean>(key, serializer, deserializer, defaultValue);
 }

@@ -26,10 +26,6 @@ const messages = defineMessages({
     id: 'wallet.currency.pick.testnetDescription',
     defaultMessage: '!!!Testnet are alternative chain to be used for testing. This allows application developers or testers to experiment, without having to use real coins.',
   },
-  ergoDescription: {
-    id: 'wallet.currency.pick.ergo',
-    defaultMessage: '!!!Ergo builds advanced cryptographic features and radically new DeFi functionality on the rock-solid foundations laid by a decade of blockchain theory and development',
-  },
 });
 
 type Props = {|

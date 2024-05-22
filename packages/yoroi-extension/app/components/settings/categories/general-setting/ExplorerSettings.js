@@ -73,7 +73,7 @@ class ExplorerSettings extends Component<Props & InjectedLayoutProps> {
     return (
       <div className={componentClassNames}>
         {isRevampLayout && (
-          <Typography variant="body1" fontWeight={500} mb="16px">
+          <Typography component="div" variant="body1" fontWeight={500} mb="16px">
             {intl.formatMessage(messages.title)}
           </Typography>
         )}
@@ -87,12 +87,12 @@ class ExplorerSettings extends Component<Props & InjectedLayoutProps> {
             onChange={this.selectExplorer}
           >
             {options.map(option => (
-              <MenuItem key={option.value.ExplorerId} value={option.value}>
+              <MenuItem key={option.value.ExplorerId} value={option.value} id={'selectExplorer-' + option.value.Name + '-menuItem'}>
                 {option.label}
               </MenuItem>
             ))}
           </Select>
-          {error && <p className={styles.error}>{intl.formatMessage(error, error.values)}</p>}
+          {error && <div className={styles.error}>{intl.formatMessage(error, error.values)}</div>}
         </Box>
       </div>
     );

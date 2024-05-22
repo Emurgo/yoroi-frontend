@@ -27,6 +27,7 @@ import {
   Bip44TableMap,
 } from '../../database/walletTypes/bip44/api/utils';
 
+// <TODO:PENDING_REMOVAL> bip44
 /** Snapshot of a Bip44Wallet in the database */
 export class Bip44Wallet
   extends ConceptualWallet
@@ -79,6 +80,7 @@ export class Bip44Wallet
     return this.#privateDeriverKeyDerivationId;
   }
 
+  // <TODO:PENDING_REMOVAL> bip44
   static async createBip44Wallet(
     db: lf$Database,
     row: $ReadOnly<Bip44WrapperRow>,

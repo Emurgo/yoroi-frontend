@@ -110,7 +110,7 @@ function CreateWalletSteps(props: Props & Intl): Node {
                 {isPrevStep ? (
                   <StepMarkIcon />
                 ) : (
-                  <Typography
+                  <Typography component="div"
                     sx={{
                       textAlign: 'center',
                       display: 'flex',
@@ -125,7 +125,7 @@ function CreateWalletSteps(props: Props & Intl): Node {
                   </Typography>
                 )}
               </Box>
-              <Typography sx={{ cursor }} variant="body1" color={stepColor} fontWeight={500}>
+              <Typography component="div" sx={{ cursor }} variant="body1" color={stepColor} fontWeight={500}>
                 {intl.formatMessage(message)}
               </Typography>
             </Stack>

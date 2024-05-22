@@ -6,7 +6,7 @@ import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
 import { ReactComponent as ExportTxToFileSvg } from '../../../assets/images/transaction/export-tx-to-file.inline.svg';
 import BorderedBox from '../../widgets/BorderedBox';
-import type { UnconfirmedAmount } from '../../../types/unconfirmedAmountType';
+import type { UnconfirmedAmount } from '../../../types/unconfirmedAmount.types';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletSummary.scss';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';

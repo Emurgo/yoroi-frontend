@@ -4,7 +4,7 @@
 
 import type { Node, ComponentType } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { Notification } from '../../../types/notificationType';
+import type { Notification } from '../../../types/notification.types';
 import type { StandardAddress } from '../../../types/AddressFilterTypes';
 import type { Addressing } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { ComplexityLevelType } from '../../../types/complexityLevelType';
@@ -12,7 +12,7 @@ import type { InjectedLayoutProps } from '../../../styles/context/layout';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import { toDerivationPathString } from '../../../api/common/lib/crypto/keys/path';
+import { toDerivationPathString } from '../../../api/ada/lib/cardanoCrypto/keys/path';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { truncateAddress } from '../../../utils/formatters';
 import { CoreAddressTypes } from '../../../api/ada/lib/storage/database/primitives/enums';
@@ -117,6 +117,7 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
         </span>
         <div className="verificationAddress">
           <CopyableAddress
+            id='verifyAddressDialog'
             hash={this.props.addressInfo.address}
             elementId={notificationId}
             onCopyAddress={() => this.props.onCopyAddressTooltip(notificationId)}

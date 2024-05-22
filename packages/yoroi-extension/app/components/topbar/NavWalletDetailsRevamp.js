@@ -19,19 +19,15 @@ import WalletAccountIcon from './WalletAccountIcon';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import AmountDisplay from '../common/AmountDisplay';
 import { Box, IconButton, Typography } from '@mui/material';
+import { maybe } from '../../coreUtils';
 
 type Props = {|
   +onUpdateHideBalance: void => Promise<void>,
   +shouldHideBalance: boolean,
   +highlightTitle?: boolean,
   +showEyeIcon?: boolean,
-  /**
-   * undefined => wallet is not a reward wallet
-   * null => still calculating
-   * value => done calculating
-   */
-  +rewards: null | void | MultiToken,
-  +walletAmount: null | MultiToken,
+  +rewards: MultiToken,
+  +walletAmount: ?MultiToken,
   +infoText?: string,
   +showDetails?: boolean,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
@@ -95,6 +91,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
     const totalAmount = this.getTotalAmount();
     const showEyeIconSafe = showEyeIcon != null && showEyeIcon;
     const [accountPlateId, iconComponent] = plate ? constructPlate(plate, 0, styles.icon) : [];
+    const amountDisplayId = `topBar:selectedWallet`;
 
     return (
       <Box
@@ -117,10 +114,10 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
             <div className={classnames([styles.plate])}>{iconComponent}</div>
             <div className={styles.content}>
               <div className={styles.walletInfo}>
-                <Typography variant="body2" fontWeight={500} sx={{ color: 'grayscale.900' }}>
+                <Typography component="div" variant="body2" fontWeight={500} sx={{ color: 'grayscale.900' }}>
                   {truncateLongName(this.props.wallet.conceptualWalletName)}
                 </Typography>
-                <Typography variant="caption1" sx={{ color: 'grayscale.600' }}>
+                <Typography component="div" variant="caption1" sx={{ color: 'grayscale.600' }}>
                   {accountPlateId}
                 </Typography>
               </div>
@@ -136,6 +133,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
                     showFiat
                     unitOfAccountSetting={unitOfAccountSetting}
                     getCurrentPrice={getCurrentPrice}
+                    id={amountDisplayId}
                   />
                 </Box>
               </div>
@@ -168,13 +166,8 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
     );
   }
 
-  getTotalAmount: void => null | MultiToken = () => {
-    if (this.props.rewards === undefined) {
-      return this.props.walletAmount;
-    }
-    if (this.props.rewards === null || this.props.walletAmount === null) {
-      return null;
-    }
-    return this.props.rewards.joinAddCopy(this.props.walletAmount);
+  getTotalAmount: void => ?MultiToken = () => {
+    return maybe(this.props.walletAmount,
+      w => this.props.rewards.joinAddCopy(w))
   };
 }

@@ -3,9 +3,6 @@
 import { action } from 'mobx';
 import Store from '../base/Store';
 
-import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
-import { buildCheckAndCall } from '../lib/check';
-import { ApiOptions, getApiForNetwork } from '../../api/common/utils';
 import { ApiMethodNotYetImplementedError } from '../lib/Request';
 import type {
   Address,
@@ -19,14 +16,10 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
     super.setup();
     this.reset();
     const actions = this.actions.walletRestore;
-    const { syncCheck, asyncCheck } = buildCheckAndCall(ApiOptions.ada, () => {
-      if (this.stores.profile.selectedNetwork == null) return undefined;
-      return getApiForNetwork(this.stores.profile.selectedNetwork);
-    });
-    actions.transferFromLegacy.listen(asyncCheck(this._transferFromLegacy));
-    actions.startRestore.listen(asyncCheck(this._restoreToDb));
-    actions.restoreWallet.listen(asyncCheck(this._restoreWallet));
-    actions.reset.listen(syncCheck(this.reset));
+    actions.transferFromLegacy.listen(this._transferFromLegacy);
+    actions.startRestore.listen(this._restoreToDb);
+    actions.restoreWallet.listen(this._restoreWallet);
+    actions.reset.listen(this.reset);
   }
 
   _transferFromLegacy: void => Promise<void> = async () => {
@@ -77,12 +70,9 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
     if (selectedNetwork == null)
       throw new Error(`${nameof(this._restoreToDb)} no network selected`);
 
-    const { mode } = this.stores.walletRestore;
-    if (mode == null) throw new Error(`${nameof(this._restoreToDb)} Unknown restoration type`);
     const accountIndex = this.stores.walletRestore.selectedAccount;
     await this.stores.wallets.restoreRequest.execute(async () => {
       const wallet = await this.api.ada.restoreWallet({
-        mode: mode.type,
         db: persistentDb,
         recoveryPhrase: phrase,
         walletName,
@@ -107,12 +97,9 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
     if (selectedNetwork == null)
       throw new Error(`${nameof(this._restoreToDb)} no network selected`);
 
-    const { mode } = this.stores.walletRestore;
-    if (mode == null) throw new Error(`${nameof(this._restoreToDb)} Unknown restoration type`);
     const accountIndex = this.stores.walletRestore.selectedAccount;
     await this.stores.wallets.restoreRequest.execute(async () => {
       const wallet = await this.api.ada.restoreWallet({
-        mode: mode.type,
         db: persistentDb,
         recoveryPhrase,
         walletName,
@@ -133,25 +120,4 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
   reset(): void {
     this.stores.walletRestore.stores.yoroiTransfer.reset();
   }
-
-  // =================== VALIDITY CHECK ==================== //
-
-  isValidMnemonic: ({|
-    mnemonic: string,
-    mode: RestoreModeType,
-  |}) => boolean = request => {
-    const { mnemonic } = request;
-    if (request.mode.extra === 'paper') {
-      return this.api.ada.isValidPaperMnemonic({ mnemonic, numberOfWords: request.mode.length });
-    }
-    if (!request.mode.length) {
-      throw new Error(
-        `${nameof(AdaWalletRestoreStore)}::${nameof(this.isValidMnemonic)} missing length`
-      );
-    }
-    return this.api.ada.constructor.isValidMnemonic({
-      mnemonic,
-      numberOfWords: request.mode.length,
-    });
-  };
 }

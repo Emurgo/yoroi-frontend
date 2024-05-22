@@ -5,14 +5,14 @@ import { observer } from 'mobx-react';
 import { FormControlLabel, Radio, RadioGroup, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { defineMessages, intlShape, FormattedMessage, FormattedHTMLMessage } from 'react-intl';
-import { THEMES } from '../../../../styles/utils';
-import type { Theme } from '../../../../styles/utils';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 import { ReactComponent as YoroiModernTheme } from '../../../../assets/images/yoroi-modern-theme.inline.svg';
 import { ReactComponent as YoroiClassicTheme } from '../../../../assets/images/yoroi-classic-theme.inline.svg';
 import ThemeToggler from '../../themeToggler';
 import environment from '../../../../environment';
+import type { Theme } from '../../../../styles/themes';
+import { THEMES } from '../../../../styles/themes';
 
 const messages = defineMessages({
   themeLabel: {
@@ -117,7 +117,7 @@ export default class ThemeSettingsBlock extends Component<Props> {
           py: !isRevampLayout && '24px',
         }}
       >
-        <Typography
+        <Typography component="div"
           variant={isRevampLayout ? 'body1' : 'h5'}
           fontWeight={500}
           mb={isRevampLayout ? '0px' : '12px'}
@@ -170,7 +170,7 @@ export default class ThemeSettingsBlock extends Component<Props> {
         {currentTheme !== THEMES.YOROI_REVAMP && (
           <Box>
             <Box sx={{ marginTop: '20px' }}>
-              <Typography
+              <Typography component="div"
                 variant="h5"
                 sx={{
                   fontWeight: 500,
@@ -181,14 +181,14 @@ export default class ThemeSettingsBlock extends Component<Props> {
               >
                 {intl.formatMessage(messages.selectColorTheme)}
               </Typography>
-              <Typography
+              <Typography component="div"
                 variant="body2"
                 color="var(--yoroi-support-settings-text)"
                 sx={{ marginBottom: '2px' }}
               >
                 <FormattedHTMLMessage {...messages.themeNote} />
               </Typography>
-              <Typography variant="body2" color="var(--yoroi-support-settings-text)">
+              <Typography component="div" variant="body2" color="var(--yoroi-support-settings-text)">
                 <FormattedMessage {...messages.blog} values={{ blogLink }} />
               </Typography>
             </Box>

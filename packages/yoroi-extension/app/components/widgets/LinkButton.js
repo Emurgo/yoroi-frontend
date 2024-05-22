@@ -13,6 +13,7 @@ type Props = {|
   +svgClass?: string,
   +textClassName: string,
   +onExternalLinkClick: MouseEvent => void,
+  +componentId?: string,
 |};
 
 @observer
@@ -33,12 +34,13 @@ export default class LinkButton extends Component<Props> {
       message,
       svgClass,
       textClassName,
-      onExternalLinkClick
+      onExternalLinkClick,
+      componentId,
     } = this.props;
 
     const SvgElem = svg;
     return (
-      <div className={styles.component}>
+      <div className={styles.component} id={componentId || 'somewhere-someValue-linkButton'}>
         <a
           href={url}
           onClick={event => onExternalLinkClick(event)}

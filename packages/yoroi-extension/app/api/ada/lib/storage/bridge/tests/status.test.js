@@ -4,17 +4,17 @@ import BigNumber from 'bignumber.js';
 import {
   schema,
 } from 'lovefield';
-import '../../../test-config';
+import '../../../test-config.forTests';
 import type { RemoteTransaction, RemoteTxBlockMeta, } from '../../../state-fetch/types';
 import {
   setup,
-} from './common';
+} from './common.forTests';
 import {
   ABANDON_SHARE,
   TX_TEST_MNEMONIC_1,
   mockDate,
   filterDbSnapshot,
-} from '../../../../../jestUtils';
+} from '../../../../../jestUtils.forTests';
 import {
   genCheckAddressesInUse,
   genGetBestBlock,
@@ -23,8 +23,8 @@ import {
   genGetMultiAssetMetadata,
   MockUtxoApi,
   genGetRecentTransactionHashes,
-  genGetTransactionsByHashes, genGetMultiAssetSupply,
-} from '../../../state-fetch/mockNetwork';
+  genGetTransactionsByHashes, genGetMultiAssetSupply, genGetTransactionsHistoryForAddresses,
+} from '../../../state-fetch/mockNetwork.forTests';
 import { loadLovefieldDB } from '../../database/index';
 import {
   HARD_DERIVATION_START,
@@ -325,6 +325,7 @@ async function baseTest(
   const getTokenInfo = genGetTokenInfo();
   const getMultiAssetMetadata = genGetMultiAssetMetadata();
   const getMultiAssetSupply = genGetMultiAssetSupply();
+  const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(networkTransactions, network);
   const getRecentTransactionHashes = genGetRecentTransactionHashes(networkTransactions);
   const getTransactionsByHashes = genGetTransactionsByHashes(networkTransactions);
 
@@ -350,6 +351,7 @@ async function baseTest(
       db,
       basePubDeriver,
       checkAddressesInUse,
+      getTransactionsHistoryForAddresses,
       getRecentTransactionHashes,
       getTransactionsByHashes,
       getBestBlock,
@@ -407,6 +409,7 @@ async function baseTest(
       db,
       basePubDeriver,
       checkAddressesInUse,
+      getTransactionsHistoryForAddresses,
       getRecentTransactionHashes,
       getTransactionsByHashes,
       getBestBlock,
@@ -544,6 +547,7 @@ async function baseTest(
       db,
       basePubDeriver,
       checkAddressesInUse,
+      getTransactionsHistoryForAddresses,
       getRecentTransactionHashes,
       getTransactionsByHashes,
       getBestBlock,
@@ -736,6 +740,7 @@ async function baseTest(
       db,
       basePubDeriver,
       checkAddressesInUse,
+      getTransactionsHistoryForAddresses,
       getRecentTransactionHashes,
       getTransactionsByHashes,
       getBestBlock,
@@ -917,6 +922,7 @@ async function baseTest(
       db,
       basePubDeriver,
       checkAddressesInUse,
+      getTransactionsHistoryForAddresses,
       getRecentTransactionHashes,
       getTransactionsByHashes,
       getBestBlock,
@@ -1071,6 +1077,7 @@ async function pendingDropped(
   const getTokenInfo = genGetTokenInfo();
   const getMultiAssetMetadata = genGetMultiAssetMetadata();
   const getMultiAssetSupply = genGetMultiAssetSupply();
+  const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(networkTransactions, network);
   const getRecentTransactionHashes = genGetRecentTransactionHashes(networkTransactions);
   const getTransactionsByHashes = genGetTransactionsByHashes(networkTransactions);
 
@@ -1093,6 +1100,7 @@ async function pendingDropped(
     db,
     basePubDeriver,
     checkAddressesInUse,
+    getTransactionsHistoryForAddresses,
     getRecentTransactionHashes,
     getTransactionsByHashes,
     getBestBlock,
@@ -1117,6 +1125,7 @@ async function pendingDropped(
     db,
     basePubDeriver,
     checkAddressesInUse,
+    getTransactionsHistoryForAddresses,
     getRecentTransactionHashes,
     getTransactionsByHashes,
     getBestBlock,

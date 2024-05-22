@@ -70,15 +70,21 @@ class SpendingPasswordSetting extends Component<Props & InjectedLayoutProps> {
 
     const revampLayout = (
       <Box mt="13px">
-        <Typography variant="body1" fontWeight={500} color="grayscale.900" mb="16px">
+        <Typography component="div" variant="body1" fontWeight={500} color="grayscale.900" mb="16px">
           {intl.formatMessage(messages.title)}
         </Typography>
 
-        <Typography variant="body1" color="common.black" mb="16px">
+        <Typography component="div" variant="body1" color="common.black" mb="16px">
           {intl.formatMessage(messages.passwordDescription)}
         </Typography>
 
-        <Button onClick={this.props.openDialog} size="flat" variant="contained" color="primary">
+        <Button
+          onClick={this.props.openDialog}
+          size="flat"
+          variant="contained"
+          color="primary"
+          id="settings:wallet-changePassword-button"
+        >
           {intl.formatMessage(messages.changePassword)}
         </Button>
       </Box>

@@ -20,7 +20,6 @@ import {
 import {
   isCardanoHaskell,
   getCardanoHaskellBaseConfig,
-  isErgo,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { genTimeToSlot } from '../../api/ada/lib/storage/bridge/timeUtils';
 import { generatePrivateKeyForCatalyst } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
@@ -48,7 +47,6 @@ import {
   loadCatalystRoundInfo,
   saveCatalystRoundInfo,
 } from '../../api/localStorage';
-import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 import { derivePublicByAddressing } from '../../api/ada/lib/cardanoCrypto/deriveByAddressing';
 
 export const ProgressStep = Object.freeze({
@@ -139,7 +137,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
       this.loadingCatalystRoundInfo = true
     })
     const publicDeriver = this.stores.wallets.selected;
-    if (!publicDeriver || isErgo(publicDeriver.getParent().getNetworkInfo())) {
+    if (!publicDeriver) {
       runInAction(() => {
         this.loadingCatalystRoundInfo = false
       })
@@ -274,10 +272,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
 
     const nonce = timeToSlot({ time: new Date() }).slot;
 
-    const allAddresses = await this.api.ada.getAllAddressesForDisplay({
-      publicDeriver,
-      type: CoreAddressTypes.CARDANO_BASE,
-    });
+    const firstAddress = await this.stores.addresses.getFirstExternalAddress(publicDeriver);
 
     let votingRegTxPromise;
 
@@ -323,8 +318,8 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
             votingPublicKey,
             stakingKeyPath: stakingKeyResp.addressing.path,
             stakingKey: Buffer.from(stakingKey.as_bytes()).toString('hex'),
-            paymentKeyPath: allAddresses[0].addressing.path,
-            paymentAddress: allAddresses[0].address,
+            paymentKeyPath: firstAddress.addressing.path,
+            paymentAddress: firstAddress.address,
             nonce,
           },
         }).promise;
@@ -336,8 +331,8 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
             votingPublicKey,
             stakingKeyPath: stakingKeyResp.addressing.path,
             stakingKey: Buffer.from(stakingKey.as_bytes()).toString('hex'),
-            paymentKeyPath: allAddresses[0].addressing.path,
-            paymentAddress: allAddresses[0].address,
+            paymentKeyPath: firstAddress.addressing.path,
+            paymentAddress: firstAddress.address,
             nonce,
           },
         }).promise;
@@ -369,7 +364,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
       const trxMeta = generateRegistration({
         stakePrivateKey: stakingKey,
         catalystPrivateKey,
-        receiverAddress: allAddresses[0].address,
+        receiverAddress: firstAddress.address,
         slotNumber: nonce,
       });
 

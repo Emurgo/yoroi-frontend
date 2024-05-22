@@ -62,6 +62,7 @@ class SupportSettings extends Component<Props & InjectedProps> {
       <a
         href={intl.formatMessage(globalMessages.faqLinkUrl)}
         onClick={event => onExternalLinkClick(event)}
+        id="settings:support-faq-link"
       >
         {intl.formatMessage(messages.faqLink)}
       </a>
@@ -71,6 +72,7 @@ class SupportSettings extends Component<Props & InjectedProps> {
       <a
         href="https://emurgohelpdesk.zendesk.com/hc/en-us/requests/new?ticket_form_id=360013330335"
         onClick={event => onExternalLinkClick(event)}
+        id="settings:support-requestSupport-link"
       >
         {intl.formatMessage(messages.supportRequestLink)}
       </a>
@@ -117,7 +119,7 @@ class SupportSettings extends Component<Props & InjectedProps> {
           {sections.map(({ title, text }) => {
             return (
               <Box key={title.id}>
-                <Typography
+                <Typography component="div"
                   variant={isRevampLayout ? 'body1' : 'h5'}
                   color={isRevampLayout ? 'grayscale.900' : 'var(--yoroi-support-settings-text)'}
                   fontWeight={500}
@@ -125,7 +127,7 @@ class SupportSettings extends Component<Props & InjectedProps> {
                 >
                   {intl.formatMessage(title)}
                 </Typography>
-                <Typography
+                <Typography component="div"
                   sx={{
                     '& a': {
                       color: isRevampLayout ? 'primary.500' : 'var(--yoroi-support-settings-text)',
@@ -146,6 +148,7 @@ class SupportSettings extends Component<Props & InjectedProps> {
           size={isRevampLayout ? 'flat' : 'medium'}
           onClick={onDownloadLogs}
           sx={{ marginTop: isRevampLayout ? '40px' : '20px' }}
+          id="settings:support-downloadLogs-buttons"
         >
           {intl.formatMessage(globalMessages.downloadLogsButtonLabel)}
         </Button>

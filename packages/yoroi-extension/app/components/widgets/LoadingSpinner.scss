@@ -12,6 +12,13 @@
   background: url("../../assets/images/spinner-light.svg") no-repeat center;
 }
 
+.largeSize {
+  margin: auto auto;
+  width: 38px;
+  height: 38px;
+  background-size: 38px;
+}
+
 .standardSize {
   margin: auto auto;
   width: 30px;

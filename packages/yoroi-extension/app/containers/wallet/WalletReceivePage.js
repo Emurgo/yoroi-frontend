@@ -1,39 +1,29 @@
 // @flow
-import type { Node, ComponentType } from 'react';
-import type { InjectedOrGenerated } from '../../types/injectedPropsType';
-import type { AddressFilterKind, StandardAddress } from '../../types/AddressFilterTypes';
-import type { GeneratedData as UnmangleTxDialogContainerData } from '../transfer/UnmangleTxDialogContainer';
+import type { ComponentType, Node } from 'react';
+import { Component } from 'react';
+import type { StoresAndActionsProps } from '../../types/injectedProps.types';
+import type { StandardAddress } from '../../types/AddressFilterTypes';
+import {
+  AddressFilter,
+  addressGroupName,
+  AddressGroupTypes,
+  AddressSubgroup,
+  addressSubgroupName,
+} from '../../types/AddressFilterTypes';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { Notification } from '../../types/notificationType';
-import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+import { intlShape } from 'react-intl';
 import type {
   AddressSubgroupMeta,
-  IAddressTypeUiSubset,
   IAddressTypeStore,
+  IAddressTypeUiSubset,
 } from '../../stores/stateless/addressStores';
-import type { ComplexityLevelType } from '../../types/complexityLevelType';
-import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
-import { Component } from 'react';
+import { allAddressSubgroups, applyAddressFilter, routeForStore, } from '../../stores/stateless/addressStores';
 import { observer } from 'mobx-react';
-import { computed, observable, runInAction } from 'mobx';
-import { intlShape } from 'react-intl';
+import { observable, runInAction } from 'mobx';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
-import {
-  addressGroupName,
-  addressSubgroupName,
-  AddressFilter,
-  AddressSubgroup,
-  AddressGroupTypes,
-} from '../../types/AddressFilterTypes';
-import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import { validateAmount } from '../../utils/validations';
 import { Logger } from '../../utils/logging';
-import {
-  routeForStore,
-  allAddressSubgroups,
-  applyAddressFilter,
-} from '../../stores/stateless/addressStores';
 import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { handleExternalLinkClick } from '../../utils/routing';
 import { genLookupOrFail, getTokenName } from '../../stores/stateless/tokenHelpers';
@@ -55,18 +45,16 @@ import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import Dialog from '../../components/widgets/Dialog';
 import globalMessages from '../../i18n/global-messages';
 import WalletReceiveRevamp from '../../components/wallet/WalletReceiveRevamp';
-import LocalizableError from '../../i18n/LocalizableError';
 import UnmangleTxDialogContainer from '../transfer/UnmangleTxDialogContainer';
 import StandardHeaderRevamp from '../../components/wallet/receive/StandardHeaderRevamp';
-
-export type GeneratedData = typeof WalletReceivePage.prototype.generated;
+import { maybe } from '../../coreUtils';
 
 type Props = {|
-  ...InjectedOrGenerated<GeneratedData>,
+  ...StoresAndActionsProps,
 |};
 
-type InjectedProps = {| +isRevampLayout: boolean |};
-type AllProps = {| ...Props, ...InjectedProps |};
+type InjectedLayoutProps = {| +isRevampLayout: boolean |};
+type AllProps = {| ...Props, ...InjectedLayoutProps |};
 
 @observer
 class WalletReceivePage extends Component<AllProps> {
@@ -77,41 +65,39 @@ class WalletReceivePage extends Component<AllProps> {
   componentWillUnmount() {
     this.closeNotification();
     this.resetErrors();
-    this.generated.actions.addresses.resetFilter.trigger();
+    this.props.actions.addresses.resetFilter.trigger();
   }
 
   handleGenerateAddress: void => Promise<void> = async () => {
-    const publicDeriver = this.generated.stores.wallets.selected;
+    const publicDeriver = this.props.stores.wallets.selected;
     if (publicDeriver != null) {
-      this.generated.actions.dialogs.open.trigger({
+      this.props.actions.dialogs.open.trigger({
         dialog: LoadingSpinner,
       });
-      await this.generated.actions.addresses.createAddress.trigger(publicDeriver);
-      this.generated.actions.dialogs.closeActiveDialog.trigger();
+      await this.props.actions.addresses.createAddress.trigger(publicDeriver);
+      this.props.actions.dialogs.closeActiveDialog.trigger();
     }
   };
 
   resetErrors: void => void = () => {
-    this.generated.actions.addresses.resetErrors.trigger();
+    this.props.actions.addresses.resetErrors.trigger();
   };
 
   closeNotification: void => void = () => {
-    const publicDeriver = this.generated.stores.wallets.selected;
+    const publicDeriver = this.props.stores.wallets.selected;
     if (publicDeriver) {
       const notificationId = `${publicDeriver.getPublicDeriverId()}-copyNotification`;
-      this.generated.actions.notifications.closeActiveNotification.trigger({ id: notificationId });
+      this.props.actions.notifications.closeActiveNotification.trigger({ id: notificationId });
     }
   };
 
   render(): Node {
     const { intl } = this.context;
-    const actions = this.generated.actions;
-    const { uiNotifications, uiDialogs, profile } = this.generated.stores;
-    const { hwVerifyAddress } = this.generated.stores.substores.ada;
-    const publicDeriver = this.generated.stores.wallets.selected;
+    const { actions, stores } = this.props;
+    const { uiNotifications, uiDialogs, profile } = this.props.stores;
+    const { hwVerifyAddress } = this.props.stores.substores.ada;
+    const publicDeriver = this.props.stores.wallets.selected;
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(WalletReceivePage)}.`);
-
-    this.generated.stores.tokenInfoStore.tokenInfo.get;
 
     const addressTypeStore = this.getTypeStore(publicDeriver);
 
@@ -154,7 +140,7 @@ class WalletReceivePage extends Component<AllProps> {
     const notification = uiNotifications.getTooltipActiveNotification(this.notificationElementId);
 
     const selectedExplorerForNetwork =
-      this.generated.stores.explorers.selectedExplorer.get(
+      this.props.stores.explorers.selectedExplorer.get(
         publicDeriver.getParent().getNetworkInfo().NetworkId
       ) ??
       (() => {
@@ -162,7 +148,7 @@ class WalletReceivePage extends Component<AllProps> {
       })();
 
     const defaultToken = publicDeriver.getParent().getDefaultToken();
-    const defaultTokenInfo = genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)({
+    const defaultTokenInfo = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)({
       identifier: defaultToken.defaultIdentifier,
       networkId: defaultToken.defaultNetworkId,
     });
@@ -179,9 +165,9 @@ class WalletReceivePage extends Component<AllProps> {
             onGenerateAddress={this.handleGenerateAddress}
             onCopyAddressTooltip={onCopyAddressTooltip}
             notification={notification}
-            isSubmitting={this.generated.stores.addresses.createAddressRequest.isExecuting}
-            error={this.generated.stores.addresses.error}
-            isFilterActive={this.generated.stores.addresses.addressFilter !== AddressFilter.None}
+            isSubmitting={this.props.stores.addresses.createAddressRequest.isExecuting}
+            error={this.props.stores.addresses.error}
+            isFilterActive={this.props.stores.addresses.addressFilter !== AddressFilter.None}
           />
         );
       }
@@ -192,11 +178,15 @@ class WalletReceivePage extends Component<AllProps> {
         return <RewardHeader ticker={truncateToken(getTokenName(defaultTokenInfo))} />;
       }
       if (addressTypeStore.meta.name.subgroup === AddressSubgroup.mangled) {
+
+        const canUnmangle = maybe(stores.wallets.selected,
+          w => stores.delegation.canUnmangleSomeUtxo(w)) ?? false;
+
         return (
           <MangledHeader
-            hasMangledUtxo={this.generated.canUnmangle}
+            hasMangledUtxo={canUnmangle}
             onClick={() =>
-              this.generated.actions.dialogs.open.trigger({
+              this.props.actions.dialogs.open.trigger({
                 dialog: UnmangleTxDialogContainer,
               })
             }
@@ -216,9 +206,9 @@ class WalletReceivePage extends Component<AllProps> {
             onGenerateAddress={this.handleGenerateAddress}
             onCopyAddressTooltip={onCopyAddressTooltip}
             notification={notification}
-            isSubmitting={this.generated.stores.addresses.createAddressRequest.isExecuting}
-            error={this.generated.stores.addresses.error}
-            isFilterActive={this.generated.stores.addresses.addressFilter !== AddressFilter.None}
+            isSubmitting={this.props.stores.addresses.createAddressRequest.isExecuting}
+            error={this.props.stores.addresses.error}
+            isFilterActive={this.props.stores.addresses.addressFilter !== AddressFilter.None}
           />
         );
       }
@@ -238,18 +228,21 @@ class WalletReceivePage extends Component<AllProps> {
 
     const WalletReceiveComp = isRevampLayout ? WalletReceiveRevamp : WalletReceive;
 
+    const paramAddress = uiDialogs.getParam<string>('address') ?? '';
+    const paramAmount = uiDialogs.getParam<?string>('amount') ?? '0';
+
     return (
       <VerticalFlexContainer>
         <WalletReceiveComp
           hierarchy={{
             path: getSelectedHierarchyPath(),
-            filter: this.generated.stores.addresses.addressFilter,
+            filter: this.props.stores.addresses.addressFilter,
           }}
           header={header}
-          getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+          getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
           selectedExplorer={selectedExplorerForNetwork}
           walletAddresses={applyAddressFilter({
-            addressFilter: this.generated.stores.addresses.addressFilter,
+            addressFilter: this.props.stores.addresses.addressFilter,
             addresses: addressTypeStore.request.all,
           })
             .slice()
@@ -287,7 +280,7 @@ class WalletReceivePage extends Component<AllProps> {
         ) : null}
         {uiDialogs.isOpen(URIGenerateDialog) ? (
           <URIGenerateDialog
-            walletAddress={uiDialogs.getParam<string>('address')}
+            walletAddress={paramAddress}
             amount={(() => {
               const val = uiDialogs.getParam<?string>('amount');
               if (val == null) return null;
@@ -314,15 +307,10 @@ class WalletReceivePage extends Component<AllProps> {
 
         {uiDialogs.isOpen(URIDisplayDialog) ? (
           <URIDisplayDialog
-            address={uiDialogs.getParam<string>('address')}
-            amount={new BigNumber(uiDialogs.getParam<?string>('amount') ?? '0')}
+            address={paramAddress}
+            amount={new BigNumber(paramAmount)}
             onClose={actions.dialogs.closeActiveDialog.trigger}
-            onBack={() =>
-              this.openURIGenerateDialog(
-                uiDialogs.getParam<string>('address'),
-                uiDialogs.getParam<?string>('amount') ?? '0'
-              )
-            }
+            onBack={() => this.openURIGenerateDialog(paramAddress, paramAmount)}
             onCopyAddressTooltip={elementId => {
               if (!uiNotifications.isOpen(elementId)) {
                 runInAction(() => {
@@ -341,8 +329,9 @@ class WalletReceivePage extends Component<AllProps> {
 
         {uiDialogs.isOpen(UnmangleTxDialogContainer) && (
           <UnmangleTxDialogContainer
-            {...this.generated.UnmangleTxDialogContainerProps}
-            onClose={() => this.generated.actions.dialogs.closeActiveDialog.trigger()}
+            actions={actions}
+            stores={stores}
+            onClose={() => this.props.actions.dialogs.closeActiveDialog.trigger()}
           />
         )}
 
@@ -386,8 +375,8 @@ class WalletReceivePage extends Component<AllProps> {
       if (!addressStore.isRelated({ selected: publicDeriver })) {
         continue;
       }
-      if (this.generated.stores.app.currentRoute.startsWith(routeForStore(addressStore.name))) {
-        const request = this.generated.stores.addresses.addressSubgroupMap.get(addressStore.class);
+      if (this.props.stores.app.currentRoute.startsWith(routeForStore(addressStore.name))) {
+        const request = this.props.stores.addresses.addressSubgroupMap.get(addressStore.class);
         if (request == null) throw new Error('Should never happen');
         return {
           request,
@@ -399,12 +388,12 @@ class WalletReceivePage extends Component<AllProps> {
   };
 
   openVerifyAddressDialog: void => void = (): void => {
-    const { actions } = this.generated;
+    const { actions } = this.props;
     actions.dialogs.open.trigger({ dialog: VerifyAddressDialog });
   };
 
   openURIGenerateDialog: (address: string, amount?: string) => void = (address, amount) => {
-    const { actions } = this.generated;
+    const { actions } = this.props;
     actions.dialogs.open.trigger({
       dialog: URIGenerateDialog,
       params: { address, amount },
@@ -412,203 +401,12 @@ class WalletReceivePage extends Component<AllProps> {
   };
 
   generateURI: (string, BigNumber) => void = (address, amount) => {
-    const { actions } = this.generated;
+    const { actions } = this.props;
     actions.dialogs.open.trigger({
       dialog: URIDisplayDialog,
       params: { address, amount: amount.toString() },
     });
   };
-
-  @computed get generated(): {|
-    UnmangleTxDialogContainerProps: InjectedOrGenerated<UnmangleTxDialogContainerData>,
-    actions: {|
-      ada: {|
-        hwVerifyAddress: {|
-          closeAddressDetailDialog: {|
-            trigger: (params: void) => void,
-          |},
-          selectAddress: {|
-            trigger: (params: $ReadOnly<StandardAddress>) => Promise<void>,
-          |},
-          verifyAddress: {|
-            trigger: (params: PublicDeriver<>) => Promise<void>,
-          |},
-        |},
-      |},
-      addresses: {|
-        createAddress: {|
-          trigger: (params: PublicDeriver<>) => Promise<void>,
-        |},
-        resetErrors: {| trigger: (params: void) => void |},
-        resetFilter: {| trigger: (params: void) => void |},
-        setFilter: {|
-          trigger: (params: AddressFilterKind) => void,
-        |},
-      |},
-      dialogs: {|
-        closeActiveDialog: {|
-          trigger: (params: void) => void,
-        |},
-        open: {|
-          trigger: (params: {|
-            dialog: any,
-            params?: any,
-          |}) => void,
-        |},
-      |},
-      notifications: {|
-        closeActiveNotification: {|
-          trigger: (params: {| id: string |}) => void,
-        |},
-        open: {| trigger: (params: Notification) => void |},
-      |},
-    |},
-    canUnmangle: boolean,
-    stores: {|
-      app: {| currentRoute: string |},
-      addresses: {|
-        addressFilter: AddressFilterKind,
-        createAddressRequest: {| isExecuting: boolean |},
-        error: ?LocalizableError,
-        addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
-      |},
-      explorers: {|
-        selectedExplorer: Map<number, SelectedExplorer>,
-      |},
-      tokenInfoStore: {|
-        tokenInfo: TokenInfoMap,
-      |},
-      profile: {|
-        selectedComplexityLevel: ?ComplexityLevelType,
-        isClassicTheme: boolean,
-        shouldHideBalance: boolean,
-        unitOfAccount: UnitOfAccountSettingType,
-      |},
-      substores: {|
-        ada: {|
-          hwVerifyAddress: {|
-            error: ?LocalizableError,
-            isActionProcessing: boolean,
-            selectedAddress: ?$ReadOnly<StandardAddress>,
-          |},
-        |},
-      |},
-      uiDialogs: {|
-        getParam: <T>(number | string) => T,
-        isOpen: any => boolean,
-      |},
-      uiNotifications: {|
-        getTooltipActiveNotification: string => ?Notification,
-        isOpen: string => boolean,
-      |},
-      wallets: {| selected: null | PublicDeriver<> |},
-    |},
-  |} {
-    if (this.props.generated !== undefined) {
-      return this.props.generated;
-    }
-    if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(WalletReceivePage)} no way to generated props`);
-    }
-    const { stores, actions } = this.props;
-    const adaStore = stores.substores.ada;
-
-    const canUnmangle = (() => {
-      const selected = stores.wallets.selected;
-      if (selected == null) return false;
-      const requests = stores.delegation.getDelegationRequests(selected);
-      if (requests == null) return false;
-      const { result } = requests.mangledAmounts;
-      if (result == null) return false;
-      return result.canUnmangle.getDefault().gt(0);
-    })();
-
-    return Object.freeze({
-      canUnmangle,
-      stores: {
-        app: {
-          currentRoute: stores.app.currentRoute,
-        },
-        uiNotifications: {
-          isOpen: stores.uiNotifications.isOpen,
-          getTooltipActiveNotification: stores.uiNotifications.getTooltipActiveNotification,
-        },
-        uiDialogs: {
-          isOpen: stores.uiDialogs.isOpen,
-          getParam: stores.uiDialogs.getParam,
-        },
-        explorers: {
-          selectedExplorer: stores.explorers.selectedExplorer,
-        },
-        tokenInfoStore: {
-          tokenInfo: stores.tokenInfoStore.tokenInfo,
-        },
-        profile: {
-          isClassicTheme: stores.profile.isClassicTheme,
-          shouldHideBalance: stores.profile.shouldHideBalance,
-          unitOfAccount: stores.profile.unitOfAccount,
-          selectedComplexityLevel: stores.profile.selectedComplexityLevel,
-        },
-        wallets: {
-          selected: stores.wallets.selected,
-        },
-        addresses: {
-          addressFilter: stores.addresses.addressFilter,
-          addressSubgroupMap: stores.addresses.addressSubgroupMap,
-          createAddressRequest: {
-            isExecuting: stores.addresses.createAddressRequest.isExecuting,
-          },
-          error: stores.addresses.error,
-        },
-        substores: {
-          ada: {
-            hwVerifyAddress: {
-              selectedAddress: adaStore.hwVerifyAddress.selectedAddress,
-              isActionProcessing: adaStore.hwVerifyAddress.isActionProcessing,
-              error: adaStore.hwVerifyAddress.error,
-            },
-          },
-        },
-      },
-      actions: {
-        dialogs: {
-          open: { trigger: actions.dialogs.open.trigger },
-          closeActiveDialog: { trigger: actions.dialogs.closeActiveDialog.trigger },
-        },
-        notifications: {
-          closeActiveNotification: {
-            trigger: actions.notifications.closeActiveNotification.trigger,
-          },
-          open: {
-            trigger: actions.notifications.open.trigger,
-          },
-        },
-        addresses: {
-          setFilter: { trigger: actions.addresses.setFilter.trigger },
-          resetFilter: { trigger: actions.addresses.resetFilter.trigger },
-          resetErrors: {
-            trigger: actions.addresses.resetErrors.trigger,
-          },
-          createAddress: {
-            trigger: actions.addresses.createAddress.trigger,
-          },
-        },
-        ada: {
-          hwVerifyAddress: {
-            selectAddress: { trigger: actions.ada.hwVerifyAddress.selectAddress.trigger },
-            verifyAddress: { trigger: actions.ada.hwVerifyAddress.verifyAddress.trigger },
-            closeAddressDetailDialog: {
-              trigger: actions.ada.hwVerifyAddress.closeAddressDetailDialog.trigger,
-            },
-          },
-        },
-      },
-      UnmangleTxDialogContainerProps: ({
-        stores,
-        actions,
-      }: InjectedOrGenerated<UnmangleTxDialogContainerData>),
-    });
-  }
 }
 
 export default (withLayout(WalletReceivePage): ComponentType<Props>);

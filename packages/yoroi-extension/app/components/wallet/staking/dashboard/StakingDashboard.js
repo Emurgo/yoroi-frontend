@@ -67,7 +67,6 @@ type Props = {|
   +graphData: GraphData,
   +stakePools: {| error: LocalizableError |} | {| pools: null | Array<Node | void> |},
   +userSummary: Node,
-  +upcomingRewards: void | Node,
   +hasAnyPending: boolean,
   +pageInfo: void | {|
     +currentPage: number,
@@ -116,7 +115,6 @@ export default class StakingDashboard extends Component<Props> {
           <div className={styles.statsWrapper}>
             <div className={styles.summary}>
               <div className={styles.summaryItem}>{this.props.userSummary}</div>
-              <div className={styles.summaryItem}>{this.props.upcomingRewards}</div>
             </div>
           </div>
           <div className={styles.bodyWrapper}>
@@ -190,7 +188,7 @@ export default class StakingDashboard extends Component<Props> {
     ) {
       return (
         <div className={width}>
-          <Typography fontWeight="500" fontSize="18px" lineHeight="22px" marginBottom="16px">
+          <Typography component="div" fontWeight="500" fontSize="18px" lineHeight="22px" marginBottom="16px">
             {intl.formatMessage(messages.title)}
           </Typography>
           <Skeleton

@@ -7,14 +7,16 @@ export const EPOCH_REWARD_DENOMINATOR: BigNumber = new BigNumber(10).pow(8);
 
 export const HARD_DERIVATION_START: 2147483648 = 0x80000000;
 
+// <TODO:PENDING_REMOVAL> bip44
 export const WalletTypePurpose = Object.freeze({
   BIP44: 2147483692, // HARD_DERIVATION_START + 44;
   CIP1852: 2147485500, // HARD_DERIVATION_START + 1852;
 });
 export type WalletTypePurposeT = $Values<typeof WalletTypePurpose>;
+
+// <TODO:PENDING_REMOVAL> Legacy
 export const CoinTypes = Object.freeze({
   CARDANO: 2147485463, // HARD_DERIVATION_START + 1815;
-  ERGO: 2147484077, // HARD_DERIVATION_START + 429;
 });
 export type CoinTypesT = $Values<typeof CoinTypes>;
 
@@ -40,11 +42,6 @@ export const DREP_KEY_INDEX = 0;
  * TODO: value for Ouroboros Genesis
  */
 export const CARDANO_STABLE_SIZE = 2160;
-
-/**
- * no safe reorg size of PoW cryptocurrencies
- */
-export const ERGO_STABLE_SIZE = Number.MAX_SAFE_INTEGER / 2;
 
 // Catalyst fund 4 *technically* requires > 450 ADA to participate
 // However, the official min amount is 500 ADA

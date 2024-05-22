@@ -1,51 +1,35 @@
 // @flow
 
-import type {
-  AccountBalance,
-  Address,
-  CardanoTx,
-  Paginate,
-  TokenId,
-  Value,
-  Asset,
-} from './types';
+import type { AccountBalance, Address, Asset, CardanoTx, Paginate, TokenId, Value, } from './types';
 import { ConnectorError, TxSendErrorCodes } from './types';
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
-import type {
-  Addressing,
-  IPublicDeriver,
-} from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { Addressing, IPublicDeriver, } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { PublicDeriver, } from '../../../app/api/ada/lib/storage/models/PublicDeriver/index';
 import {
+  asGetAllAccounting,
   asGetAllUtxos,
   asGetBalance,
+  asGetPublicKey,
   asGetSigningKey,
   asHasLevels,
   asHasUtxoChains,
-  asGetAllAccounting,
-  asGetPublicKey, asGetStakingKey,
 } from '../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import { ConceptualWallet } from '../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
 import BigNumber from 'bignumber.js';
 
-import {
-  CannotSendBelowMinimumValueError,
-  NotEnoughMoneyToSendError,
-} from '../../../app/api/common/errors';
+import { CannotSendBelowMinimumValueError, NotEnoughMoneyToSendError, } from '../../../app/api/common/errors';
 
 import axios from 'axios';
 
-import {
-  CoreAddressTypes,
-  TxStatusCodes,
-} from '../../../app/api/ada/lib/storage/database/primitives/enums';
+import { CoreAddressTypes, TxStatusCodes, } from '../../../app/api/ada/lib/storage/database/primitives/enums';
 import type { FullAddressPayload } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 import {
-  getAllAddressesForDisplay,
   getAddressRowsForWallet,
+  getAllAddressesForDisplay,
 } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 import { getReceiveAddress } from '../../../app/stores/stateless/addressStores';
 
+import type { PersistedSubmittedTransaction } from '../../../app/api/localStorage';
 import LocalStorageApi, {
   loadSubmittedTransactions,
   persistSubmittedTransactions,
@@ -56,17 +40,15 @@ import {
   multiTokenFromCardanoValue,
 } from '../../../app/api/ada/transactions/utils';
 import type {
-  RemoteUnspentOutput,
   AccountStateRequest,
   AccountStateResponse,
+  RemoteUnspentOutput,
 } from '../../../app/api/ada/lib/state-fetch/types';
 import {
   signTransaction as shelleySignTransaction,
   toLibUTxO,
 } from '../../../app/api/ada/transactions/shelley/transactions';
-import {
-  getCardanoHaskellBaseConfig,
-} from '../../../app/api/ada/lib/storage/database/prepackaged/networks';
+import { getCardanoHaskellBaseConfig, } from '../../../app/api/ada/lib/storage/database/prepackaged/networks';
 import { genTimeToSlot } from '../../../app/api/ada/lib/storage/bridge/timeUtils';
 import type CardanoTxRequest from '../../../app/api/ada';
 import AdaApi from '../../../app/api/ada';
@@ -78,31 +60,25 @@ import type {
 } from '../../../app/api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type { CardanoAddressedUtxo, } from '../../../app/api/ada/transactions/types';
 import { cip8Sign } from '../../../app/connector/api';
-import type { PersistedSubmittedTransaction } from '../../../app/api/localStorage';
 import type { ForeignUtxoFetcher } from '../../../app/connector/stores/ConnectorStore';
 import { GetToken } from '../../../app/api/ada/lib/storage/database/primitives/api/read';
-import {
-  getAllSchemaTables,
-  raii,
-} from '../../../app/api/ada/lib/storage/database/utils';
+import { getAllSchemaTables, raii, } from '../../../app/api/ada/lib/storage/database/utils';
 import type { TokenRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
 import fetchAdapter from '@vespaiach/axios-fetch-adapter';
 import {
-  UTxOSet,
+  UTxOSet as LibUtxoSet,
   Value as LibValue,
-  Amount,
-  NativeAssets,
-} from '@emurgo/yoroi-eutxo-txs/dist/classes';
-import { coinSelectionClassificationStrategy } from '@emurgo/yoroi-eutxo-txs/dist/tx-builder';
-import { setRuntime, } from '@emurgo/yoroi-eutxo-txs';
-import {
-  NotEnoughMoneyToSendError as LibNotEnoughMoneyToSendError
-} from'@emurgo/yoroi-eutxo-txs/dist/errors';
+  Amount as LibAmount,
+  NativeAssets as LibNativeAssets,
+} from '@emurgo/yoroi-eutxo-txs/dist/classes'
+import { coinSelectionClassificationStrategy } from '@emurgo/yoroi-eutxo-txs/dist/tx-builder'
+import { setRuntime } from '@emurgo/yoroi-eutxo-txs/dist/kernel'
+import { NotEnoughMoneyToSendError as LibNotEnoughMoneyToSendError } from '@emurgo/yoroi-eutxo-txs/dist/errors'
 import {
   ChainDerivations,
-  STAKING_KEY_INDEX,
   DREP_KEY_INDEX,
   HARD_DERIVATION_START,
+  STAKING_KEY_INDEX,
   WalletTypePurpose
 } from '../../../app/config/numbersConfig';
 import { Bip44DerivationLevels, CoinType } from '@emurgo/yoroi-lib';
@@ -136,11 +112,8 @@ function bigNumberToValue(x: BigNumber): Value {
 export async function connectorGetBalance(
   wallet: PublicDeriver<>,
   tokenId: TokenId,
-  // <TODO:PENDING_REMOVAL>
-  // eslint-disable-next-line no-unused-vars
-  protocol: 'cardano' | 'ergo',
 ): Promise<AccountBalance | Value> {
-  if (tokenId === 'ERG' || tokenId === 'ADA' || tokenId === 'TADA') {
+  if (tokenId === 'ADA' || tokenId === 'TADA') {
     // can directly query for balance
     const canGetBalance = asGetBalance(wallet);
     if (canGetBalance != null) {
@@ -193,14 +166,14 @@ function stringToLibValue(s: string): LibValue {
   if (/^\d+$/.test(s)) {
     // The string is an int number
     return new LibValue(
-      new Amount(s),
-      NativeAssets.from([]),
+      new LibAmount(s),
+      LibNativeAssets.from([]),
     );
   }
   try {
     return RustModule.WasmScope(Module => {
       // $FlowFixMe
-      function multiAssetToLibAssets(masset: ?RustModule.WalletV4.MultiAsset): NativeAssets {
+      function multiAssetToLibAssets(masset: ?RustModule.WalletV4.MultiAsset): LibNativeAssets {
         const mappedAssets = [];
         if (masset != null) {
           const policies = masset.keys();
@@ -218,18 +191,18 @@ function stringToLibValue(s: string): LibValue {
                       policy: policy.to_bytes(),
                       name: name.to_bytes(),
                     },
-                    amount: new Amount(amount.to_str()),
+                    amount: new LibAmount(amount.to_str()),
                   })
                 }
               }
             }
           }
         }
-        return NativeAssets.from(mappedAssets);
+        return LibNativeAssets.from(mappedAssets);
       }
       const value = Module.WalletV4.Value.from_bytes(hexToBytes(s));
       return new LibValue(
-        new Amount(value.coin().to_str()),
+        new LibAmount(value.coin().to_str()),
         multiAssetToLibAssets(value.multiasset()),
       )
     });
@@ -272,9 +245,9 @@ export async function connectorGetUtxosCardano(
     return Promise.resolve(paginateResults(formattedUtxos, paginate));
   }
 
-  setRuntime(RustModule.CrossCsl.init());
+  setRuntime(RustModule.CrossCsl.init);
 
-  const utxoSet = new UTxOSet(
+  const utxoSet = new LibUtxoSet(
     await Promise.all(
       formattedUtxos.map(toLibUTxO)
     )
@@ -316,7 +289,7 @@ export const MAX_COLLATERAL: BigNumber = new BigNumber('5000000');
 // only consider UTXO value <= (${requiredAmount} + 1 ADA)
 const MAX_PER_UTXO_SURPLUS = new BigNumber('2000000');
 // Max allowed collateral inputs in a tx by protocol
-export const MAX_COLLATERAL_COUNT: number = 3;
+const MAX_COLLATERAL_COUNT: number = 3;
 
 type GetCollateralUtxosRespose = {|
   utxosToUse: Array<RemoteUnspentOutput>,
@@ -386,7 +359,7 @@ export async function connectorGetCollateralUtxos(
   };
 }
 
-export type FullAddressPayloadWithBase58 = {|
+type FullAddressPayloadWithBase58 = {|
   fullAddress: FullAddressPayload,
   base58: Address,
 |};
@@ -548,30 +521,10 @@ export async function connectorGetCardanoRewardAddresses(
 
 export async function connectorGetChangeAddress(wallet: PublicDeriver<>): Promise<Address> {
   const change = await getReceiveAddress(wallet);
-  if (change !== undefined) {
-    const hash = change.addr.Hash;
-    await RustModule.load();
-    // Note: SimgaRust only works for ergo
-    // RustModule.walletV2 works for cardano but doesn't not have from_bytes and to_base58 methods
-    const walletType = wallet.parent.defaultToken.Metadata.type
-
-    if(walletType === 'Cardano') {
-      return hash
-    }
-    return RustModule.SigmaRust.NetworkAddress
-        .from_bytes(Buffer.from(hash, 'hex'))
-        .to_base58();
+  if (change == null) {
+    throw new Error('could not get change address - this should never happen');
   }
-  throw new Error('could not get change address - this should never happen');
-}
-
-export type BoxLike = {
-  value: number | string,
-  assets: Array<{|
-    tokenId: string, // hex
-    amount: number | string,
-  |}>,
-  ...
+  return change.addr.Hash
 }
 
 export function getScriptRequiredSigningKeys(
@@ -608,6 +561,62 @@ function getTxRequiredSigningKeys(
   return set;
 }
 
+type CertToKeyhashFuncs<CertType> = [
+  RustModule.WalletV4.Certificate => CertType | void,
+  CertType => RustModule.WalletV4.Ed25519KeyHash | Array<RustModule.WalletV4.Ed25519KeyHash> | void,
+];
+
+const CERT_TO_KEYHASH_FUNCS = [
+  ([
+    cert => cert.as_stake_deregistration(),
+    cert => cert.stake_credential().to_keyhash(),
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.StakeDeregistration>),
+  ([
+    cert => cert.as_stake_delegation(),
+    cert => cert.stake_credential().to_keyhash(),
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.StakeDelegation>),
+  ([
+    cert => cert.as_vote_delegation(),
+    cert => cert.stake_credential().to_keyhash(),
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.VoteDelegation>),
+  ([
+    cert => cert.as_stake_and_vote_delegation(),
+    cert => cert.stake_credential().to_keyhash(),
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.StakeAndVoteDelegation>),
+  ([
+    cert => cert.as_stake_registration_and_delegation(),
+    cert => cert.stake_credential().to_keyhash(),
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.StakeRegistrationAndDelegation>),
+
+  ([
+    cert => cert.as_stake_vote_registration_and_delegation(),
+    cert => cert.stake_credential().to_keyhash(),
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.StakeVoteRegistrationAndDelegation>),
+  ([
+    cert => cert.as_drep_registration(),
+    cert => cert.voting_credential().to_keyhash(),
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.DrepRegistration>),
+  ([
+    cert => cert.as_drep_deregistration(),
+    cert => cert.voting_credential().to_keyhash(),
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.DrepDeregistration>),
+  ([
+    cert => cert.as_drep_update(),
+    cert => cert.voting_credential().to_keyhash(),
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.DrepUpdate>),
+  ([
+    cert => cert.as_pool_registration(),
+    cert => {
+      const result = [];
+      const hashes = cert.pool_params().pool_owners();
+      for (let j = 0; j < hashes.len(); j++) {
+        result.push(hashes.get(j));
+      }
+      return result;
+    },
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.PoolRegistration>),
+];
+
 function getCertificatesRequiredSignKeys(
   txBody: RustModule.WalletV4.TransactionBody,
 ): Set<string> {
@@ -620,85 +629,20 @@ function getCertificatesRequiredSignKeys(
       if (!cert) {
         throw new Error('unexpectedly missing certificate');
       }
-      const stakeDeregistration = cert.as_stake_deregistration();
-      if (stakeDeregistration) {
-        const keyHash = stakeDeregistration.stake_credential().to_keyhash();
-        if (keyHash) {
-          result.add(keyHash.to_hex());
+      for (const [convertFunc, getKeyhashFunc] of CERT_TO_KEYHASH_FUNCS) {
+        const typedCert = convertFunc(cert);
+        if (typedCert) {
+          // $FlowFixMe[incompatible-call]
+          const getKeyhashResult = getKeyhashFunc(typedCert);
+          if (Array.isArray(getKeyhashResult)) {
+            for (const keyHash of getKeyhashResult) {
+              result.add(keyHash.to_hex());
+            }
+          } else if (getKeyhashResult) {
+            result.add(getKeyhashResult.to_hex());
+          }
+          break;
         }
-        continue;
-      }
-      const stakeDelegation = cert.as_stake_delegation();
-      if (stakeDelegation) {
-        const keyHash = stakeDelegation.stake_credential().to_keyhash();
-        if (keyHash) {
-          result.add(keyHash.to_hex());
-        }
-        continue;
-      }
-      const voteDelegation = cert.as_vote_delegation();
-      if (voteDelegation) {
-        const keyHash = voteDelegation.stake_credential().to_keyhash();
-        if (keyHash) {
-          result.add(keyHash.to_hex());
-        }
-        continue;
-      }
-      const stakeVoteDelegation = cert.as_stake_and_vote_delegation();
-      if (stakeVoteDelegation) {
-        const keyHash = stakeVoteDelegation.stake_credential().to_keyhash();
-        if (keyHash) {
-          result.add(keyHash.to_hex());
-        }
-        continue;
-      }
-      const stakeRegDelegation = cert.as_stake_registration_and_delegation();
-      if (stakeRegDelegation) {
-        const keyHash = stakeRegDelegation.stake_credential().to_keyhash();
-        if (keyHash) {
-          result.add(keyHash.to_hex());
-        }
-        continue;
-      }
-      const voteRegDelegation = cert.as_vote_registration_and_delegation();
-      if (voteRegDelegation) {
-        const keyHash = voteRegDelegation.stake_credential().to_keyhash();
-        if (keyHash) {
-          result.add(keyHash.to_hex());
-        }
-        continue;
-      }
-      const stakeRegVoteDeletion = cert.as_stake_vote_registration_and_delegation();
-      if (stakeRegVoteDeletion) {
-        const keyHash = stakeRegVoteDeletion.stake_credential().to_keyhash();
-        if (keyHash) {
-          result.add(keyHash.to_hex());
-        }
-        continue;
-      }
-      const unregDrep = cert.as_drep_deregistration();
-      if (unregDrep) {
-        const keyHash = unregDrep.voting_credential().to_keyhash();
-        if (keyHash) {
-          result.add(keyHash.to_hex());
-        }
-        continue;
-      }
-      const updateDrep = cert.as_drep_update();
-      if (updateDrep) {
-        const keyHash = updateDrep.voting_credential().to_keyhash();
-        if (keyHash) {
-          result.add(keyHash.to_hex());
-        }
-        continue;
-      }
-      const poolRegCert = cert.as_pool_registration();
-      if (poolRegCert) {
-        const hashes = poolRegCert.pool_params().pool_owners();
-        for (let j = 0; j < hashes.len(); j++) {
-          result.add(hashes.get(j).to_hex());
-        }
-        continue;
       }
     }
   }
@@ -792,7 +736,6 @@ async function __connectorSignCardanoTx(
     ...getCertificatesRequiredSignKeys(txBody),
   ]);
 
-  console.log('totalAdditionalRequiredSignKeys', [...totalAdditionalRequiredSignKeys]);
   const additionalSignaturesRequired = totalAdditionalRequiredSignKeys.size > 0;
 
   const queryAllBaseAddresses = (): Promise<Array<FullAddressPayload>> => {
@@ -846,10 +789,8 @@ async function __connectorSignCardanoTx(
         requiredPaymentCred,
         parsedStakingCred,
       ).to_address();
-      console.log('requiredAddress', requiredAddress.to_bech32());
       requiredTxSignAddresses.add(bytesToHex(requiredAddress.to_bytes()));
     }
-    console.log('requiredTxSignAddresses', [...requiredTxSignAddresses]);
     for (const baseAddress of allBaseAddresses) {
       const { address, addressing } = baseAddress;
       if (requiredTxSignAddresses.delete(address)) {
@@ -874,7 +815,6 @@ async function __connectorSignCardanoTx(
       ).to_address().to_hex();
       otherRequiredSigners.push({ address, ...addressing });
     }
-    console.log('otherRequiredSigners', [...otherRequiredSigners]);
   }
 
   const submittedTxs = await loadSubmittedTransactions() || [];
@@ -1285,6 +1225,11 @@ export async function getAddressing(
   );
   if (rewardAddressing) {
     return rewardAddressing;
+  }
+
+  const [ dRepPubKey, dRepAddressing ] = await _getDRepKeyAndAddressing(publicDeriver);
+  if (dRepPubKey.hash().to_hex() === address) {
+    return dRepAddressing;
   }
 
   const withUtxos = asGetAllUtxos(publicDeriver);

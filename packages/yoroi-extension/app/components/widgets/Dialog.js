@@ -23,6 +23,10 @@ export type ActionType = {|
   +size?: ?string,
 |};
 
+export type StyleFlag = {|
+  +contentNoTopPadding?: boolean,
+|};
+
 export type Props = {|
   +title?: string | Node,
   +children?: Node,
@@ -33,14 +37,18 @@ export type Props = {|
   +className?: string,
   +scrollableContentClass?: string,
   +styleOverride?: { ... },
+  +styleContentOverride?: { ... },
   +onClose?: ?(void) => PossiblyAsync<void>,
   +closeOnOverlayClick?: boolean,
   +isRevampLayout?: boolean,
+  id?: string,
+  +styleFlags?: StyleFlag,
+  +forceBottomDivider?: boolean,
 |};
 
 type InjectedProps = {| isRevampLayout: boolean |};
 
-function DialogFn(props: Props & InjectedProps): Node {
+function Dialog(props: Props & InjectedProps): Node {
   const {
     title,
     children,
@@ -53,6 +61,9 @@ function DialogFn(props: Props & InjectedProps): Node {
     backButton,
     scrollableContentClass,
     isRevampLayout,
+    id,
+    styleFlags,
+    forceBottomDivider,
   } = props;
 
   const [contentHasScroll, setContentHasScroll] = useState(false);
@@ -67,7 +78,7 @@ function DialogFn(props: Props & InjectedProps): Node {
 
       if (el.clientHeight < el.scrollHeight) {
         setContentHasScroll(true);
-        el.style.marginRight = '-24px';
+        // el.style.marginRight = '-24px';
       } else {
         setContentHasScroll(false);
         el.style.marginRight = '0';
@@ -106,6 +117,8 @@ function DialogFn(props: Props & InjectedProps): Node {
         justifyContent: 'center',
         alignItems: 'center',
       }}
+      // $FlowIgnore
+      id={id + '-dialogWindow-modalWindow'}
     >
       <ModalContainer
         display="flex"
@@ -116,29 +129,39 @@ function DialogFn(props: Props & InjectedProps): Node {
         contentHasScroll={contentHasScroll}
       >
         {title != null && title !== '' ? (
-          <Typography as="h1" variant="body1" className="dialog__title">
+          // $FlowIgnore
+          <Typography
+            as="h1"
+            variant="body1"
+            className="dialog__title"
+            id={String(id) + '-dialogTitle-text'}
+          >
             {title}
           </Typography>
         ) : null}
         {children != null ? (
           <ModalContent
+            pt={styleFlags?.contentNoTopPadding ? '0px !important' : undefined}
             pb={contentHasScroll || !hasActions ? '24px' : '0px !important'}
             className="ModalContent"
+            style={props.styleContentOverride}
           >
             {children}
           </ModalContent>
         ) : null}
         {hasActions && (
-          <ModalFooter contentHasScroll={contentHasScroll}>
+          <ModalFooter hasDivider={forceBottomDivider || contentHasScroll}>
             {map(actions, (action, i: number) => {
               const buttonClasses = classnames([
                 // Keep classnames for testing
                 action.className != null ? action.className : null,
                 action.primary === true ? 'primary' : 'secondary',
               ]);
+              const buttonLabel = action.label.toLowerCase().replace(/ /gi, '');
               return (
                 <LoadingButton
-                  id={action.id ?? action.primary === true ? 'primaryButton' : 'secondaryButton'}
+                  // $FlowIgnore
+                  id={action.id ?? id + '-' + buttonLabel + '-button'}
                   key={i}
                   {...getBtnVariant(action.danger, action.primary, isRevampLayout)}
                   className={buttonClasses}
@@ -157,6 +180,7 @@ function DialogFn(props: Props & InjectedProps): Node {
           <CloseButton
             onClose={onClose}
             closeButton={closeButton ? React.cloneElement(closeButton, { onClose }) : null}
+            idLocatorPath={id}
           />
         ) : null}
         {!hasSubmitting && backButton}
@@ -165,7 +189,7 @@ function DialogFn(props: Props & InjectedProps): Node {
   );
 }
 
-DialogFn.defaultProps = {
+Dialog.defaultProps = {
   title: undefined,
   children: undefined,
   actions: undefined,
@@ -176,9 +200,20 @@ DialogFn.defaultProps = {
   styleOverride: undefined,
   onClose: undefined,
   closeOnOverlayClick: false,
+  id: 'dialog',
 };
 
-const CloseButton = ({ onClose, closeButton }) => (
+export const CloseButton = ({
+  onClose,
+  closeButton,
+  sx,
+  idLocatorPath='modalWindow',
+}: {|
+  onClose: ?(void) => PossiblyAsync<void>,
+  closeButton: React$Node,
+  sx?: any,
+  idLocatorPath?: string,
+|}): React$Node => (
   <Box
     sx={{
       position: 'absolute',
@@ -186,8 +221,10 @@ const CloseButton = ({ onClose, closeButton }) => (
       right: '16px',
       top: '16px',
       cursor: 'pointer',
+      ...(sx ?? {}),
     }}
     onClick={onClose}
+    id={idLocatorPath + '-closeModal-button'}
   >
     {closeButton || (
       <IconButton>
@@ -197,41 +234,45 @@ const CloseButton = ({ onClose, closeButton }) => (
   </Box>
 );
 
-const ModalContainer = styled(Box)(({ theme, contentHasScroll }) => ({
-  position: 'relative',
-  minWidth:
-    theme.name === 'classic' || theme.name === 'modern'
-      ? 'var(--yoroi-comp-dialog-min-width-md)'
-      : '648px',
-  borderRadius: theme.name === 'classic' ? 0 : 8,
-  paddingTop: theme.name === 'classic' ? '25px' : '0px',
-  paddingBottom: theme.name === 'classic' || theme.name === 'modern' ? '30px' : '0px',
-  maxWidth: theme.name === 'classic' ? '785px' : '824px',
-  backgroundColor: 'var(--yoroi-comp-dialog-background)',
-  color: 'var(--yoroi-comp-dialog-text)',
-  maxHeight: '95vh',
+export const ModalContainer: any => Node = styled(Box)(
+  ({ theme, contentHasScroll, empty = false }) => {
+    const normalMinWidth =
+      theme.name === 'classic' || theme.name === 'modern'
+        ? 'var(--yoroi-comp-dialog-min-width-md)'
+        : '648px';
+    return {
+      position: 'relative',
+      minWidth: empty ? '0px' : normalMinWidth,
+      borderRadius: theme.name === 'classic' ? 0 : 8,
+      paddingTop: theme.name === 'classic' ? '25px' : '0px',
+      paddingBottom: theme.name === 'classic' || theme.name === 'modern' ? '30px' : '0px',
+      maxWidth: theme.name === 'classic' ? '785px' : '824px',
+      backgroundColor: empty ? undefined : 'var(--yoroi-comp-dialog-background)',
+      color: 'var(--yoroi-comp-dialog-text)',
+      maxHeight: '95vh',
 
-  '& .dialog__title': {
-    flex: 1,
-    marginBottom: theme.name === 'classic' ? '22px' : '0px',
-    padding: theme.name === 'classic' ? '0' : '24px',
-    fontWeight: 500,
-    textAlign: 'center',
-    textTransform: 'uppercase',
-    letterSpacing: 0,
-    display: 'block',
-    borderBottom:
-      theme.name === 'classic' || theme.name === 'modern'
-        ? ''
-        : contentHasScroll
-        ? '1px solid'
-        : '',
-    borderBottomColor:
-      theme.name === 'classic' || theme.name === 'modern'
-        ? theme.palette.gray['200']
-        : theme.palette.grayscale['200'],
-  },
-}));
+      '& .dialog__title': {
+        marginBottom: theme.name === 'classic' ? '22px' : '0px',
+        padding: theme.name === 'classic' ? '0' : '24px',
+        fontWeight: 500,
+        textAlign: 'center',
+        textTransform: 'uppercase',
+        letterSpacing: 0,
+        display: 'block',
+        borderBottom:
+          theme.name === 'classic' || theme.name === 'modern'
+            ? ''
+            : contentHasScroll
+            ? '1px solid'
+            : '',
+        borderBottomColor:
+          theme.name === 'classic' || theme.name === 'modern'
+            ? theme.palette.gray['200']
+            : theme.palette.grayscale['200'],
+      },
+    };
+  }
+);
 
 const ModalContent = styled(Box)(({ theme }) => ({
   overflowX: 'hidden',
@@ -241,9 +282,10 @@ const ModalContent = styled(Box)(({ theme }) => ({
   paddingRight: theme.name === 'classic' ? '30px' : '24px',
   paddingTop: theme.name === 'classic' ? '0px' : '24px',
   paddingBottom: theme.name === 'classic' || theme.name === 'modern' ? '0px' : '24px',
+  flexGrow: 1,
 }));
 
-const ModalFooter = styled(Box)(({ theme, contentHasScroll }) => ({
+const ModalFooter = styled(Box)(({ theme, hasDivider }) => ({
   display: 'flex',
   gap: '24px',
   paddingLeft: theme.name === 'classic' ? '30px' : '24px',
@@ -252,7 +294,7 @@ const ModalFooter = styled(Box)(({ theme, contentHasScroll }) => ({
   paddingBottom: theme.name === 'classic' || theme.name === 'modern' ? '0' : '24px',
   marginTop: theme.name === 'classic' ? '20px' : '0px',
   borderTop:
-    theme.name === 'classic' || theme.name === 'modern' ? '' : contentHasScroll ? '1px solid' : '',
+    theme.name === 'classic' || theme.name === 'modern' ? '' : hasDivider ? '1px solid' : '',
   borderTopColor:
     theme.name === 'classic' || theme.name === 'modern'
       ? theme.palette.gray['200']
@@ -286,4 +328,4 @@ function getBtnVariant(
   return { variant: 'secondary' };
 }
 
-export default (withLayout(observer(DialogFn)): ComponentType<Props>);
+export default (withLayout(observer(Dialog)): ComponentType<Props>);

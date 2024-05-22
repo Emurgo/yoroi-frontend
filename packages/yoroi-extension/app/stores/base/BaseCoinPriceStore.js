@@ -20,13 +20,13 @@ import type { GetAllPricesFunc } from '../../api/common/lib/storage/bridge/price
 import { verifyTicker, verifyPubKeyDataReplacement } from '../../api/verify';
 import type { ConfigType } from '../../../config/config-types';
 import BaseProfileActions from '../../actions/base/base-profile-actions';
-import type { IFetcher } from '../../api/common/lib/state-fetch/IFetcher';
+import type { IFetcher } from '../../api/common/lib/state-fetch/IFetcher.types';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 
-const SOURCE_CURRENCIES = ['ADA', 'ERG'];
+const SOURCE_CURRENCIES = ['ADA'];
 
 interface LoadingStore {
   getDatabase(): ?lf$Database
@@ -186,10 +186,6 @@ export default class BaseCoinPriceStore
 
         if (!this.pubKeyData) {
           throw new Error('missing pubKeyData - should never happen');
-        }
-
-        if (response.ticker.from === 'ERG' && !verifyTicker(response.ticker, this.pubKeyData)) {
-          throw new Error('Invalid ticker signature: ' + JSON.stringify(response.ticker));
         }
 
         // if we got here before the timeout expired, clear the timeout

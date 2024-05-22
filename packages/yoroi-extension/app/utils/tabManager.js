@@ -27,7 +27,7 @@ declare var chrome;
  */
 export const TabIdKeys = Object.freeze({
   Primary: 'openTabId',
-  ErgoConnector: 'openTabId-ErgoConnector',
+  YoroiConnector: 'openTabId-YoroiConnector',
 });
 const thisWindowId = Date.now().toString();
 
@@ -77,11 +77,4 @@ export async function closeOtherInstances(
   tabKeyId: $Values<typeof TabIdKeys>,
 ) {
   await setLocalItem(tabKeyId, thisWindowId);
-}
-
-export const handlersSettingUrl: string = 'chrome://settings/handlers';
-
-/** To open special URLs like chrome://settings you need to use the Chrome API */
-export function openSandboxedTab(url: string) {
-  chrome.tabs.create({ url });
 }

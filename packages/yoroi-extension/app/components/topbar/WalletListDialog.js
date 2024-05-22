@@ -35,10 +35,6 @@ const messages = defineMessages({
     id: 'wallet.topbar.dialog.totalBalance',
     defaultMessage: '!!!Total Balance',
   },
-  ergo: {
-    id: 'wallet.topbar.dialog.ergo',
-    defaultMessage: '!!!Ergo, ERG',
-  },
   cardano: {
     id: 'wallet.topbar.dialog.cardano',
     defaultMessage: '!!!Cardano, ADA',
@@ -54,7 +50,6 @@ type Props = {|
   +onAddWallet: void => void,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?string,
-  +ergoWallets: Array<Object>,
   +cardanoWallets: Array<Object>,
   +walletsNavigation: WalletsNavigation,
   +updateSortedWalletList: WalletsNavigation => Promise<void>,
@@ -62,7 +57,6 @@ type Props = {|
   +selectedWallet: null | PublicDeriver<>,
 |};
 type State = {|
-  ergoWalletsIdx: number[],
   cardanoWalletsIdx: number[],
   selectedWallet: PublicDeriver<> | null,
 |};
@@ -97,7 +91,6 @@ export default class WalletListDialog extends Component<Props, State> {
     intl: intlShape.isRequired,
   };
   state: State = {
-    ergoWalletsIdx: [],
     cardanoWalletsIdx: [],
     selectedWallet: null,
   };
@@ -107,27 +100,21 @@ export default class WalletListDialog extends Component<Props, State> {
       this.props.walletsNavigation.cardano,
       this.props.cardanoWallets.map(wallet => wallet.walletId)
     );
-    const ergoWalletsId = getGeneratedWalletIds(
-      this.props.walletsNavigation.ergo,
-      this.props.ergoWallets.map(wallet => wallet.walletId)
-    );
 
     this.setState(
       {
-        ergoWalletsIdx: ergoWalletsId,
         cardanoWalletsIdx: cardanoWalletsId,
         selectedWallet: this.props.selectedWallet,
       },
       async () => {
         await this.props.updateSortedWalletList({
-          ergo: ergoWalletsId,
           cardano: cardanoWalletsId,
         });
       }
     );
   }
 
-  onDragEnd: (network: 'ergo' | 'cardano', result: Object) => any = async (network, result) => {
+  onDragEnd: (network: 'cardano', result: Object) => any = async (network, result) => {
     const { destination, source } = result;
     if (!destination || destination.index === source.index) {
       return;
@@ -136,18 +123,16 @@ export default class WalletListDialog extends Component<Props, State> {
     this.setState(
       prev => {
         const walletListIdx = reorder(
-          network === 'ergo' ? prev.ergoWalletsIdx : prev.cardanoWalletsIdx,
+          prev.cardanoWalletsIdx,
           result.source.index,
           result.destination.index
         );
         return {
-          ergoWalletsIdx: network === 'ergo' ? walletListIdx : prev.ergoWalletsIdx,
-          cardanoWalletsIdx: network === 'cardano' ? walletListIdx : prev.cardanoWalletsIdx,
+          cardanoWalletsIdx: walletListIdx,
         };
       },
       async function () {
         await this.props.updateSortedWalletList({
-          ergo: this.state.ergoWalletsIdx,
           cardano: this.state.cardanoWalletsIdx,
         });
       }
@@ -169,13 +154,12 @@ export default class WalletListDialog extends Component<Props, State> {
 
   render(): Node {
     const { intl } = this.context;
-    const { ergoWalletsIdx, cardanoWalletsIdx } = this.state;
+    const { cardanoWalletsIdx } = this.state;
 
     const {
       shouldHideBalance,
       onAddWallet,
       onUpdateHideBalance,
-      ergoWallets,
       cardanoWallets,
       unitOfAccountSetting,
       getCurrentPrice,
@@ -192,13 +176,13 @@ export default class WalletListDialog extends Component<Props, State> {
         onClose={this.props.close}
         actions={[
           {
-            id: 'addWalletButton',
+            id: 'changeWalletDialog-addWallet-button',
             onClick: onAddWallet,
             size: 'large',
             label: intl.formatMessage(messages.addWallet),
           },
           {
-            id: 'applyWalletButton',
+            id: 'changeWalletDialog-applyWallet-button',
             onClick: this.onSelect,
             size: 'large',
             disabled:
@@ -209,14 +193,15 @@ export default class WalletListDialog extends Component<Props, State> {
           },
         ]}
         scrollableContentClass="WalletList"
+        id="changeWalletDialog"
       >
         <Box>
           <div className={styles.header}>
             <div className={styles.totalInfo}>
               {walletsTotal !== undefined && (
                 <div className={styles.amount}>
-                  <p className={styles.label}>{intl.formatMessage(messages.totalBalance)}</p>
-                  <p className={styles.value}>{walletsTotal}</p>
+                  <div className={styles.label}>{intl.formatMessage(messages.totalBalance)}</div>
+                  <div className={styles.value}>{walletsTotal}</div>
                 </div>
               )}
               <button type="button" className={styles.toggleButton} onClick={onUpdateHideBalance}>
@@ -224,7 +209,11 @@ export default class WalletListDialog extends Component<Props, State> {
               </button>
             </div>
           </div>
-          <Box className="WalletList" sx={{ overflow: 'auto', overflowY: 'auto', height: '400px' }}>
+          <Box
+            className="WalletList"
+            sx={{ overflow: 'auto', overflowY: 'auto', height: '400px' }}
+            id="changeWalletDialog-walletList-box"
+          >
             {cardanoWalletsIdx.length > 0 && (
               <div className={styles.sectionHeader}>
                 <h1>{intl.formatMessage(messages.cardano)}</h1>
@@ -251,40 +240,7 @@ export default class WalletListDialog extends Component<Props, State> {
                               {...wallet}
                               unitOfAccountSetting={unitOfAccountSetting}
                               getCurrentPrice={getCurrentPrice}
-                            />
-                          );
-                        })
-                        .filter(Boolean)}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
-            {ergoWalletsIdx.length > 0 && (
-              <div className={styles.sectionHeader}>
-                <h1>{intl.formatMessage(messages.ergo)}</h1>
-              </div>
-            )}
-            <DragDropContext onDragEnd={result => this.onDragEnd('ergo', result)}>
-              <Droppable droppableId="ergo-list-droppable">
-                {provided => (
-                  <div className={styles.list} {...provided.droppableProps} ref={provided.innerRef}>
-                    {ergoWalletsIdx.length > 0 &&
-                      ergoWalletsIdx
-                        .map((walletId, idx) => {
-                          const wallet = ergoWallets.find(w => w.walletId === walletId);
-                          if (!wallet) {
-                            return null;
-                          }
-                          return (
-                            <WalletCard
-                              key={walletId}
-                              idx={idx}
-                              onSelect={() => this.setState({ selectedWallet: wallet.wallet })}
-                              isCurrentWallet={this.isCurrentWallet(wallet.wallet, 'local')}
-                              {...wallet}
-                              unitOfAccountSetting={unitOfAccountSetting}
-                              getCurrentPrice={getCurrentPrice}
+                              id="changeWalletDialog:walletsList"
                             />
                           );
                         })
@@ -304,15 +260,13 @@ export default class WalletListDialog extends Component<Props, State> {
     const {
       unitOfAccountSetting,
       cardanoWallets,
-      ergoWallets,
       shouldHideBalance,
       getCurrentPrice,
     } = this.props;
     if (unitOfAccountSetting.enabled) {
       const adaFiat = this.sumWallets(cardanoWallets).fiat;
-      const ergFiat = this.sumWallets(ergoWallets).fiat;
-      if (adaFiat != null && ergFiat != null) {
-        const totalFiat = adaFiat.plus(ergFiat);
+      if (adaFiat != null) {
+        const totalFiat = adaFiat;
         const { currency } = unitOfAccountSetting;
         return (
           <FiatDisplay
@@ -324,37 +278,20 @@ export default class WalletListDialog extends Component<Props, State> {
       }
     }
     // either unit of account is not enabled, or fails to convert to fiat
-    if (ergoWallets.length === 0) {
-      // only have Cardano wallets
-      const amount = this.sumWallets(cardanoWallets).sum;
-      return (
-        <AmountDisplay
-          shouldHideBalance={shouldHideBalance}
-          amount={amount}
-          getTokenInfo={this.props.getTokenInfo}
-          showFiat={false}
-          showAmount
-          unitOfAccountSetting={unitOfAccountSetting}
-          getCurrentPrice={getCurrentPrice}
-        />
-      );
-    }
-    if (cardanoWallets.length === 0) {
-      const amount = this.sumWallets(ergoWallets).sum;
-      return (
-        <AmountDisplay
-          shouldHideBalance={shouldHideBalance}
-          amount={amount}
-          getTokenInfo={this.props.getTokenInfo}
-          showFiat={false}
-          showAmount
-          unitOfAccountSetting={unitOfAccountSetting}
-          getCurrentPrice={getCurrentPrice}
-        />
-      );
-    }
-    // there are both ADAs and ERGs, don't show total
-    return undefined;
+    const amount = this.sumWallets(cardanoWallets).sum;
+    const totalAmountId = `changeWalletDialog:total`;
+    return (
+      <AmountDisplay
+        shouldHideBalance={shouldHideBalance}
+        amount={amount}
+        getTokenInfo={this.props.getTokenInfo}
+        showFiat={false}
+        showAmount
+        unitOfAccountSetting={unitOfAccountSetting}
+        getCurrentPrice={getCurrentPrice}
+        id={totalAmountId}
+      />
+    );
   }
 
   sumWallets(

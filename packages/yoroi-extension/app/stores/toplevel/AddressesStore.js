@@ -1,37 +1,27 @@
 // @flow
-import { observable, action, runInAction } from 'mobx';
+import { action, observable, runInAction } from 'mobx';
 import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
 import LocalizableError, { localizedError } from '../../i18n/LocalizableError';
-import type {
-  CreateAddressFunc,
-  CreateAddressResponse,
-} from '../../api/common';
-import {
-  PublicDeriver,
-} from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import {
-  asHasUtxoChains, asDisplayCutoff, asHasLevels,
-} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import type {
-  IHasUtxoChainsRequest,
-} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import {
-  Logger,
-} from '../../utils/logging';
-import { getApiForNetwork } from '../../api/common/utils';
-import type { AddressFilterKind, StandardAddress, AddressTypeName, } from '../../types/AddressFilterTypes';
+import type { CreateAddressFunc, CreateAddressResponse, } from '../../api/common';
+import { PublicDeriver, } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import { asDisplayCutoff, asHasLevels, asHasUtxoChains, } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import type { IHasUtxoChainsRequest, } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import { Logger, } from '../../utils/logging';
+import type { AddressFilterKind, AddressTypeName, StandardAddress, } from '../../types/AddressFilterTypes';
 import { AddressFilter, } from '../../types/AddressFilterTypes';
-import {
-  ConceptualWallet
-} from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import { AddressTypeStore } from '../base/AddressSubgroupStore';
 import type { CoreAddressT } from '../../api/ada/lib/storage/database/primitives/enums';
+import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
+import type { IAddressTypeStore, IAddressTypeUiSubset } from '../stateless/addressStores';
 import { allAddressSubgroups } from '../stateless/addressStores';
-import type { IAddressTypeUiSubset, IAddressTypeStore } from '../stateless/addressStores';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import type { AddressDetails } from '../../api/ada';
+import { ChainDerivations } from '../../config/numbersConfig';
+import { forceNonNull } from '../../coreUtils';
 
 export default class AddressesStore extends Store<StoresMap, ActionsMap> {
 
@@ -134,9 +124,7 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
     storeName: AddressTypeName,
     type: CoreAddressT,
   |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
-    const apiType = getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo());
-
-    const allAddresses = await this.api[apiType].getAllAddressesForDisplay({
+    const allAddresses = await this.api.ada.getAllAddressesForDisplay({
       publicDeriver: request.publicDeriver,
       type: request.type,
     });
@@ -162,9 +150,7 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
     if (withLevels == null) {
       throw new Error(`${nameof(this._wrapForeign)} missing levels`);
     }
-    const apiType = getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo());
-
-    const allAddresses = await this.api[apiType].getForeignAddresses({
+    const allAddresses = await this.api.ada.getForeignAddresses({
       publicDeriver: withLevels,
     });
 
@@ -188,8 +174,6 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
     type: CoreAddressT,
     chainsRequest: IHasUtxoChainsRequest,
   |}=> Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
-    const apiType = getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo());
-
     const withHasUtxoChains = asHasUtxoChains(
       request.publicDeriver
     );
@@ -197,7 +181,7 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
       Logger.error(`${nameof(this._wrapForChainAddresses)} incorrect public deriver`);
       return Promise.resolve([]);
     }
-    const addresses = await this.api[apiType].getChainAddressesForDisplay({
+    const addresses = await this.api.ada.getChainAddressesForDisplay({
       publicDeriver: withHasUtxoChains,
       chainsRequest: request.chainsRequest,
       type: request.type,
@@ -221,9 +205,7 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
     storeName: AddressTypeName,
     addresses: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
   |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
-    const apiType = getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo());
-
-    return await this.stores.substores[apiType].addresses.storewiseFilter(request);
+    return await this.stores.substores.ada.addresses.storewiseFilter(request);
   }
 
   _createAddressIfNeeded: {|
@@ -247,5 +229,13 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
 
   @action _resetFilter: void => void = () => {
     this.addressFilter = AddressFilter.None;
+  }
+
+  getFirstExternalAddress: (PublicDeriver<>) => Promise<AddressDetails> = async (publicDeriver) => {
+    return (await this.api.ada.getChainAddressesForDisplay({
+      publicDeriver: forceNonNull(asHasUtxoChains(publicDeriver)),
+      type: CoreAddressTypes.CARDANO_BASE,
+      chainsRequest: { chainId: ChainDerivations.EXTERNAL },
+    }))[0];
   }
 }

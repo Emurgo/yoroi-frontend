@@ -35,10 +35,6 @@ export default class UiDialogsStore<
 
   @observable dialogList: Array<DialogEntry> = [];
 
-  @observable secondsSinceActiveDialogIsOpen: number = 0;
-
-  _secondsTimerInterval: ?IntervalID = null;
-
   setup(): void {
     super.setup();
     this.actions.dialogs.open.listen(this._onOpen);
@@ -74,12 +70,6 @@ export default class UiDialogsStore<
     this.dialogList[this.dialogList.length - 1]?.dataForActiveDialog.get(key)
   );
 
-  countdownSinceDialogOpened: number => number = (
-    countDownTo: number
-  ): number => (
-    Math.max(countDownTo - this.secondsSinceActiveDialogIsOpen, 0)
-  );
-
   @action _onPush: {| dialog : any, params?: {...} |} => void = ({ dialog, params }) => {
     const prevEntry = this.dialogList[this.dialogList.length - 1];
 
@@ -91,9 +81,6 @@ export default class UiDialogsStore<
       paramsForActiveDialog: newMap,
       dataForActiveDialog: observable.map(),
     });
-    this.secondsSinceActiveDialogIsOpen = 0;
-    if (this._secondsTimerInterval) clearInterval(this._secondsTimerInterval);
-    this._secondsTimerInterval = setInterval(this._updateSeconds, 1000);
   };
   @action _onPop: void => void = () => {
     this.dialogList.pop();
@@ -110,10 +97,6 @@ export default class UiDialogsStore<
     this._reset();
   };
 
-  @action _updateSeconds: void => void = () => {
-    this.secondsSinceActiveDialogIsOpen += 1;
-  };
-
   @action _onUpdateDataForActiveDialog: {| [key: string]: any, |} => void = (data) => {
     if (this.dialogList.length === 0) return;
     // $FlowExpectedError[prop-missing] this is a mobx property -- not part of es6
@@ -122,7 +105,6 @@ export default class UiDialogsStore<
 
   @action _reset: void => void = () => {
     this.dialogList.splice(0); // remove all elements. Need this to trigger mobx reaction
-    this.secondsSinceActiveDialogIsOpen = 0;
   };
 
 }

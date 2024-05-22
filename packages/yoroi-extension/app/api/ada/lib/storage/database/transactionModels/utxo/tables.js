@@ -75,6 +75,7 @@ export const UtxoTransactionOutputSchema: {|
     OutputIndex: 'OutputIndex',
     TokenListId: 'TokenListId',
     IsUnspent: 'IsUnspent',
+    // <TODO:PENDING_REMOVAL> Ergo
     ErgoBoxId: 'ErgoBoxId',
     ErgoCreationHeight: 'ErgoCreationHeight',
     ErgoTree: 'ErgoTree',

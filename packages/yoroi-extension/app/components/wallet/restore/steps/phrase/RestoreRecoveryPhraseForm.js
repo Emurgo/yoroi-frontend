@@ -66,7 +66,7 @@ type State = {|
 |};
 
 @observer
-export default class RestoreRecoveryPhraseFormClass extends Component<Props, State> {
+export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
   static defaultProps: {| error: void, initialRecoveryPhrase: string |} = {
     error: undefined,
     initialRecoveryPhrase: '',
@@ -181,7 +181,7 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props, Sta
                   }}
                   variant="body1"
                 >
-                  <Typography variant="body1" color="primary.400" width="24px">
+                  <Typography component="div" variant="body1" color="primary.400" width="24px">
                     {idx + 1}.
                   </Typography>
 
@@ -234,7 +234,7 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props, Sta
             </Fade>
 
             <Fade in={!isValidPhrase && allWordsEntered}>
-              <Typography variant="body2" color="#FF1351" id="mnemonicErrorText">
+              <Typography component="div" variant="body2" color="#FF1351" id="mnemonicErrorText">
                 {mnemonicError}
               </Typography>
             </Fade>
@@ -244,7 +244,7 @@ export default class RestoreRecoveryPhraseFormClass extends Component<Props, Sta
         <Fade in={isValidPhrase}>
           <Stack gap="10px" direction="row" mt="12px" alignItems="center">
             <VerifiedIcon />
-            <Typography variant="body1" fontWeight={500} id="validPhraseMessage">
+            <Typography component="div" variant="body1" fontWeight={500} id="validPhraseMessage">
               {intl.formatMessage(messages.verified)}
             </Typography>
           </Stack>

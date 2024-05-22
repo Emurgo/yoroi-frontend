@@ -2,8 +2,8 @@
 import type {
   CardanoAddressedUtxo,
 } from '../types';
-import { verifyFromBip44Root }  from '../../lib/storage/models/utils';
-import { toDerivationPathString } from '../../../common/lib/crypto/keys/path';
+import { verifyFromDerivationRoot }  from '../../lib/storage/models/utils';
+import { toDerivationPathString } from '../../lib/cardanoCrypto/keys/path';
 import type {
   CardanoSignTransaction,
   CardanoInput,
@@ -119,15 +119,15 @@ export async function createTrezorSignTxPayload(
     request = {
       ...request,
       auxiliaryData: {
-        governanceRegistrationParameters: {
+        cVoteRegistrationParameters: {
           delegations: [
             {
-              votingPublicKey: votingPublicKey.replace(/^0x/, ''),
+              votePublicKey: votingPublicKey.replace(/^0x/, ''),
               weight: 1,
             }
           ],
           stakingPath: stakingKeyPath,
-          rewardAddressParameters: {
+          paymentAddressParameters: {
             addressType: CardanoAddressType.BASE,
             path: paymentKeyPath,
             stakingPath: stakingKeyPath,
@@ -220,7 +220,7 @@ function _transformToTrezorInputs(
   inputs: Array<CardanoAddressedUtxo>
 ): Array<CardanoInput> {
   for (const input of inputs) {
-    verifyFromBip44Root(input.addressing);
+    verifyFromDerivationRoot(input.addressing);
   }
   return inputs.map(input => ({
     prev_hash: input.tx_hash,
@@ -277,7 +277,7 @@ function _generateTrezorOutputs(
 
     const changeAddr = changeAddrs.find(change => jsAddr === change.address);
     if (changeAddr != null) {
-      verifyFromBip44Root(changeAddr.addressing);
+      verifyFromDerivationRoot(changeAddr.addressing);
       if (RustModule.WalletV4.BaseAddress.from_address(address)) {
         result.push({
           addressParameters: {
@@ -409,7 +409,7 @@ export function buildSignedTransaction(
   const seenBootstrapWit = new Set<string>();
 
   for (const utxo of senderUtxos) {
-    verifyFromBip44Root(utxo.addressing);
+    verifyFromDerivationRoot(utxo.addressing);
 
     const addressKey = derivePublicByAddressing({
       addressing: utxo.addressing,

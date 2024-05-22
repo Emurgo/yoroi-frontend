@@ -78,7 +78,7 @@ export default class IncludedTokens extends Component<Props> {
                   />
                 </Box>
                 <Box width="80%">
-                  <Typography
+                  <Typography component="div"
                     whiteSpace="nowrap"
                     overflow="hidden"
                     textOverflow="ellipsis"
@@ -105,7 +105,7 @@ export default class IncludedTokens extends Component<Props> {
                   }}
                 >
                   <NoAssetLogo />
-                  <Typography
+                  <Typography component="div"
                     variant="body1"
                     color="grayscale.max"
                     whiteSpace="nowrap"
@@ -116,7 +116,7 @@ export default class IncludedTokens extends Component<Props> {
                   </Typography>
                 </Box>
                 <Box ml="auto" flexShrink={0}>
-                  <Typography variant="body1" color="grayscale.max">
+                  <Typography component="div" variant="body1" color="grayscale.max">
                     {displayAmount}
                   </Typography>
                 </Box>
@@ -155,7 +155,7 @@ export default class IncludedTokens extends Component<Props> {
       <Box mt="24px">
         {tokens.length > 0 && (
           <Box mb={nfts.length > 0 ? '24px' : '0px'}>
-            <Typography
+            <Typography component="div"
               variant="caption1"
               color="grey.900"
               mb="8px"
@@ -169,7 +169,7 @@ export default class IncludedTokens extends Component<Props> {
 
         {nfts.length > 0 && (
           <Box>
-            <Typography
+            <Typography component="div"
               variant="caption1"
               color="grey.900"
               mb="8px"
@@ -181,7 +181,7 @@ export default class IncludedTokens extends Component<Props> {
           </Box>
         )}
       </Box>
-    
+
     );
   }
 }

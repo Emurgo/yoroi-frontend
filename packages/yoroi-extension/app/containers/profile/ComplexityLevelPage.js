@@ -7,16 +7,11 @@ import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
 import { defineMessages, intlShape } from 'react-intl';
 import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
-import type { InjectedOrGenerated } from '../../types/injectedPropsType';
-import { computed } from 'mobx';
+import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import ComplexityLevel from '../../components/profile/complexity-level/ComplexityLevelForm';
-import type { ComplexityLevelType } from '../../types/complexityLevelType';
-import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
-import LocalizableError from '../../i18n/LocalizableError';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { isTestnet } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 const messages = defineMessages({
@@ -26,18 +21,17 @@ const messages = defineMessages({
   },
 });
 
-type GeneratedData = typeof ComplexityLevelPage.prototype.generated;
 @observer
-export default class ComplexityLevelPage extends Component<InjectedOrGenerated<GeneratedData>> {
+export default class ComplexityLevelPage extends Component<StoresAndActionsProps> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
   render(): Node {
 
-    const { checkAdaServerStatus } = this.generated.stores.serverConnectionStore;
+    const { checkAdaServerStatus } = this.props.stores.serverConnectionStore;
 
-    const { selected } = this.generated.stores.wallets;
+    const { selected } = this.props.stores.wallets;
     const isWalletTestnet = selected == null
       ? false
       : isTestnet(selected.getParent().getNetworkInfo());
@@ -59,66 +53,12 @@ export default class ComplexityLevelPage extends Component<InjectedOrGenerated<G
         banner={displayedBanner}
       >
         <ComplexityLevel
-          complexityLevel={this.generated.stores.profile.selectedComplexityLevel}
-          onSubmit={this.generated.actions.profile.selectComplexityLevel.trigger}
-          isSubmitting={this.generated.stores.profile.setComplexityLevelRequest.isExecuting}
-          error={this.generated.stores.profile.setComplexityLevelRequest.error}
+          complexityLevel={this.props.stores.profile.selectedComplexityLevel}
+          onSubmit={this.props.actions.profile.selectComplexityLevel.trigger}
+          isSubmitting={this.props.stores.profile.setComplexityLevelRequest.isExecuting}
+          error={this.props.stores.profile.setComplexityLevelRequest.error}
         />
       </TopBarLayout>
     );
-  }
-
-
-  @computed get generated(): {|
-    actions: {|
-      profile: {|
-        selectComplexityLevel: {| trigger: (params: ComplexityLevelType) => Promise < void > |}
-      |}
-    |},
-    stores: {|
-      wallets: {| selected: null | PublicDeriver<> |},
-      profile: {|
-        selectedComplexityLevel: ?ComplexityLevelType,
-        setComplexityLevelRequest: {|
-          error: ?LocalizableError,
-          isExecuting: boolean
-        |}
-      |},
-      serverConnectionStore: {|
-        checkAdaServerStatus: ServerStatusErrorType
-      |}
-    |}
-    |} {
-    if (this.props.generated !== undefined) {
-      return this.props.generated;
-    }
-    if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(ComplexityLevelPage)} no way to generated props`);
-    }
-    const { stores, actions } = this.props;
-    const profileStore = stores.profile;
-
-    return Object.freeze({
-      stores: {
-        serverConnectionStore: {
-          checkAdaServerStatus: stores.serverConnectionStore.checkAdaServerStatus,
-        },
-        wallets: {
-          selected: stores.wallets.selected,
-        },
-        profile: {
-          setComplexityLevelRequest: {
-            error: profileStore.setComplexityLevelRequest.error,
-            isExecuting: profileStore.setComplexityLevelRequest.isExecuting,
-          },
-          selectedComplexityLevel: profileStore.selectedComplexityLevel
-        },
-      },
-      actions: {
-        profile: {
-          selectComplexityLevel: { trigger: actions.profile.selectComplexityLevel.trigger },
-        },
-      },
-    });
   }
 }

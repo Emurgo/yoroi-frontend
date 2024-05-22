@@ -12,6 +12,7 @@ import type {
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { getConnectedSites } from '../../connector/stores/ConnectorStore';
+import { noop } from '../../coreUtils';
 
 type GetWhitelistFunc = void => Promise<?Array<WhitelistEntry>>;
 type SetWhitelistFunc = {|
@@ -44,7 +45,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     this.actions.connector.removeWalletFromWhitelist.listen(this._removeWalletFromWhitelist);
     this.actions.connector.refreshActiveSites.listen(this._refreshActiveSites);
     this._getConnectorWhitelist();
-    this.currentConnectorWhitelist;
+    noop(this.currentConnectorWhitelist);
   }
 
   teardown(): void {

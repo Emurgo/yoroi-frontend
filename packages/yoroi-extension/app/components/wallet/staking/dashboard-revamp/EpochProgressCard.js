@@ -41,7 +41,7 @@ type TitleProps = {|
 const Title = ({ label, value }: TitleProps): Node => {
   return (
     <Box>
-      <Typography fontWeight="500" color="primary.600">
+      <Typography component="div" fontWeight="500" color="primary.600">
         {label}: {value}
       </Typography>
     </Box>
@@ -55,7 +55,7 @@ type InfoColumnProps = {|
 const LabelWithValue = ({ label, value }: InfoColumnProps): Node => {
   return (
     <Box>
-      <Typography
+      <Typography component="div"
         style={{ textTransform: 'uppercase' }}
         variant="caption"
         mb="4px"
@@ -63,7 +63,7 @@ const LabelWithValue = ({ label, value }: InfoColumnProps): Node => {
       >
         {label}
       </Typography>
-      <Typography color="grayscale.900">{value}</Typography>
+      <Typography component="div" color="grayscale.900">{value}</Typography>
     </Box>
   );
 };
@@ -99,10 +99,10 @@ const Graph = ({ value, days }): Node => {
           textAlign: 'center',
         }}
       >
-        <Typography variant="h4" color="grayscale.900">
+        <Typography component="div" variant="h4" color="grayscale.900">
           {value}%
         </Typography>
-        <Typography variant="caption1" fontSize="12px" color="grayscale.600">
+        <Typography component="div" variant="caption1" fontSize="12px" color="grayscale.600">
           {days} days
         </Typography>
       </Box>

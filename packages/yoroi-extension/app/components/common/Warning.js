@@ -21,7 +21,7 @@ export default function Warning({ children }: Props): Node {
     >
       <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px', mb: '8px' }}>
         <InfoWarningIcon />
-        <Typography
+        <Typography component="div"
           variant="body1"
           fontWeight={500}
           color={theme => theme.palette.yellow[500]}

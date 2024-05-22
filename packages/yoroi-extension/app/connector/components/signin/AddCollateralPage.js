@@ -24,7 +24,6 @@ import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashC
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { CardanoConnectorSignRequest, SignSubmissionErrorType } from '../../types';
 import { Box } from '@mui/system';
-import { signTxMessages } from './SignTxPage';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import { LoadingButton } from '@mui/lab';
 import { ReactComponent as AddCollateralIcon } from '../../../assets/images/dapp-connector/add-collateral.inline.svg';
@@ -53,12 +52,15 @@ const messages = defineMessages({
   },
   reorgMessage: {
     id: 'connector.signin.reorg.message',
-    defaultMessage:
-      '!!!To interact with {smartContractsLink} in Cardano you should add collateral, which means to make a 0 ADA transaction.{lineBreak}{lineBreak}It is a guarantee that prevent from failing smart contracts and scams. {learnMoreLink} about collateral.',
+    defaultMessage: '!!!To interact with {smartContractsLink} in Cardano you should add collateral, which means to make a 0 ADA transaction.{lineBreak}{lineBreak}It is a guarantee that prevent from failing smart contracts and scams. {learnMoreLink} about collateral.',
   },
   sendError: {
     id: 'connector.signin.error.sendError',
     defaultMessage: '!!!An error occured when sending the transaction.',
+  },
+  transactionFee: {
+    id: 'connector.signin.transactionFee',
+    defaultMessage: '!!!Transaction Fee',
   },
 });
 
@@ -256,7 +258,7 @@ class AddCollateralPage extends Component<Props, State> {
     return (
       <Box overflowWrap="break-word" display="flex" height="100%" flexDirection="column">
         <Box maxWidth={480} margin="0 auto" padding="32px" flex="1" flexGrow="1" overflow="auto">
-          <Typography
+          <Typography component="div"
             textAlign="center"
             color="gray.900"
             variant="h4"
@@ -270,7 +272,7 @@ class AddCollateralPage extends Component<Props, State> {
           <Box textAlign="center" my="32px">
             <AddCollateralIcon />
           </Box>
-          <Typography>
+          <Typography component="div">
             <FormattedMessage
               {...messages.reorgMessage}
               values={{
@@ -291,8 +293,8 @@ class AddCollateralPage extends Component<Props, State> {
               gap="16px"
             >
               <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Typography>{intl.formatMessage(globalMessages.amount)}</Typography>
-                <Typography id="addCollateralAmountTitle">
+                <Typography component="div">{intl.formatMessage(globalMessages.amount)}</Typography>
+                <Typography component="div" id="addCollateralAmountTitle">
                   {this.renderAmountDisplay({
                     entry: {
                       identifier: txData.fee.tokenId,
@@ -303,8 +305,8 @@ class AddCollateralPage extends Component<Props, State> {
                 </Typography>
               </Box>
               <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Typography>{intl.formatMessage(signTxMessages.transactionFee)}</Typography>
-                <Typography id="addCollateralFeeTitle">
+                <Typography component="div">{intl.formatMessage(messages.transactionFee)}</Typography>
+                <Typography component="div" id="addCollateralFeeTitle">
                   {this.renderAmountDisplay({
                     entry: {
                       identifier: txData.fee.tokenId,

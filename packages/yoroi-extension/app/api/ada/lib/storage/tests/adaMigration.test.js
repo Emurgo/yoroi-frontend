@@ -1,12 +1,12 @@
 // @flow
 
-import '../../test-config';
+import '../../test-config.forTests';
 import { schema, } from 'lovefield';
 import type { lf$Database } from 'lovefield';
 import { setLocalItem } from '../../../../localStorage/primitives';
-import oldStorageMemory from '../../../../../../features/yoroi_snapshots/historical-versions/1_9_0/software/localStorage.json';
-import oldStorageTrezor from '../../../../../../features/yoroi_snapshots/historical-versions/1_9_0/trezor/localStorage.json';
-import oldStorageLedger from '../../../../../../features/yoroi_snapshots/historical-versions/1_9_0/ledger/localStorage.json';
+import oldStorageMemory from './__yoroi_snapshots__/historical-version-1_9_0/software/localStorage.forTests.json'
+import oldStorageTrezor from './__yoroi_snapshots__/historical-version-1_9_0/trezor/localStorage.forTests.json';
+import oldStorageLedger from './__yoroi_snapshots__/historical-version-1_9_0/ledger/localStorage.forTests.json';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 import {
   dumpByVersion,
@@ -14,7 +14,7 @@ import {
   loadLovefieldDBFromDump
 } from '../database/index';
 import { storageV2Migration, populateNewUtxodata } from '../adaMigration';
-import { mockDate, filterDbSnapshot } from '../../../../jestUtils';
+import { mockDate, filterDbSnapshot } from '../../../../jestUtils.forTests';
 import utxoTestDbDump from './testDb.dump.json';
 
 beforeAll(async () => {

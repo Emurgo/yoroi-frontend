@@ -3,9 +3,15 @@ import type { Node, ComponentType } from 'react';
 import type { ConnectorIntl } from '../../../types';
 import type { SummaryAssetsData } from '../CardanoSignTxPage';
 import { Box, Typography } from '@mui/material';
-import { injectIntl } from 'react-intl';
-import { signTxMessages } from '../SignTxPage';
+import { defineMessages, injectIntl } from 'react-intl';
 import { connectorMessages } from '../../../../i18n/global-messages';
+
+const messages: Object = defineMessages({
+  summary: {
+    id: 'connector.signin.summary',
+    defaultMessage: '!!!Summary',
+  },
+});
 
 type Props = {|
   txAssetsData: SummaryAssetsData,
@@ -82,10 +88,10 @@ function CardanoSignTxSummary({
       sx={{ background: 'linear-gradient(30.09deg, #244ABF 0%, #4760FF 176.73%)' }}
     >
       <Box display="flex" justifyContent="space-between" alignItems="center" id="signTxMessagesSummaryBox">
-        <Typography variant="b1" fontWeight={500}>
-          {intl.formatMessage(signTxMessages.summary)}
+        <Typography component="div" variant="b1" fontWeight={500}>
+          {intl.formatMessage(messages.summary)}
         </Typography>
-        <Typography variant="h3" fontSize="24px" textAlign="right" id="signTxMessagesSummaryBox-total">
+        <Typography component="div" variant="h3" fontSize="24px" textAlign="right" id="signTxMessagesSummaryBox-total">
           {showOnlyTxFee ? total.fee : total.total} {total.ticker}
         </Typography>
       </Box>

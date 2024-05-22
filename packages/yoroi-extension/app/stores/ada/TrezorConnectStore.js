@@ -1,15 +1,10 @@
 // @flow
 // Handles Connect to Trezor Hardware Wallet dialog
 
-import { observable, action, runInAction } from 'mobx';
+import { action, observable } from 'mobx';
 
+import type { CardanoPublicKey, DeviceEvent, Success, UiEvent, Unsuccessful, } from 'trezor-connect-flow';
 import TrezorConnect from 'trezor-connect-flow';
-import type {
-  DeviceEvent,
-  UiEvent,
-  CardanoPublicKey,
-  Success, Unsuccessful,
-} from 'trezor-connect-flow';
 
 import Store from '../base/Store';
 import LocalizedRequest from '../lib/LocalizedRequest';
@@ -22,35 +17,15 @@ import { ROUTES } from '../../routes-config';
 import Config from '../../config';
 
 // This is actually just an interface
-import {
-  HWConnectStoreTypes,
-  ProgressStep,
-  ProgressInfo,
-  HWDeviceInfo
-} from '../../types/HWConnectStoreTypes';
+import { HWConnectStoreTypes, HWDeviceInfo, ProgressInfo, ProgressStep } from '../../types/HWConnectStoreTypes';
 import { StepState } from '../../components/widgets/ProgressSteps';
 
-import {
-  Logger,
-  stringifyError
-} from '../../utils/logging';
+import { Logger, stringifyError } from '../../utils/logging';
 
-import type {
-  CreateHardwareWalletRequest,
-  CreateHardwareWalletFunc,
-} from '../../api/ada';
+import type { CreateHardwareWalletFunc, CreateHardwareWalletRequest, } from '../../api/ada';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
-import {
-  CoinTypes,
-  HARD_DERIVATION_START,
-  WalletTypePurpose,
-} from '../../config/numbersConfig';
-import {
-  Bip44DerivationLevels,
-} from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
-import type {
-  RestoreModeType,
-} from '../../actions/common/wallet-restore-actions';
+import { CoinTypes, HARD_DERIVATION_START, WalletTypePurpose, } from '../../config/numbersConfig';
+import { Bip44DerivationLevels, } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 
@@ -68,7 +43,6 @@ export default class TrezorConnectStore
   /** the only observable which manages state change */
   @observable progressInfo: ProgressInfo;
   @observable derivationIndex: number = HARD_DERIVATION_START + 0; // assume single account
-  @observable mode: void | RestoreModeType;
 
   /** only in ERROR state it will hold LocalizableError object */
   error: ?LocalizableError;
@@ -115,7 +89,6 @@ export default class TrezorConnectStore
     trezorConnectAction.goBackToCheck.listen(this._goBackToCheck);
     trezorConnectAction.submitConnect.listen(this._submitConnect);
     trezorConnectAction.submitSave.listen(this._submitSave);
-    trezorConnectAction.setMode.listen((mode) => runInAction(() => { this.mode = mode; }));
 
     try {
       const trezorManifest = getTrezorManifest();
@@ -142,7 +115,6 @@ export default class TrezorConnectStore
   }
 
   @action _reset: void => void = () => {
-    this.mode = undefined;
     this.progressInfo = {
       currentStep: ProgressStep.CHECK,
       stepState: StepState.LOAD,
@@ -403,17 +375,7 @@ export default class TrezorConnectStore
   }
 
   getPath: void => Array<number> = () => {
-    const suffix = [CoinTypes.CARDANO, this.derivationIndex];
-    if (this.mode == null) {
-      throw new Error(`${nameof(TrezorConnectStore)}::${nameof(this._prepareCreateHWReqParams)} missing mode`);
-    }
-    if (this.mode.type === 'bip44') {
-      return [WalletTypePurpose.BIP44, ...suffix];
-    }
-    if (this.mode.type === 'cip1852') {
-      return [WalletTypePurpose.CIP1852, ...suffix];
-    }
-    throw new Error(`${nameof(TrezorConnectStore)}::${nameof(this._prepareCreateHWReqParams)} unknown purpose`);
+    return [WalletTypePurpose.CIP1852, CoinTypes.CARDANO, this.derivationIndex];
   }
 
   @action _goToSaveError: void => void = () => {

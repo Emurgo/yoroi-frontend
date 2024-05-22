@@ -3,16 +3,23 @@ import type { Node, ComponentType } from 'react';
 import type { ConnectorIntl, Cip95Info } from '../../../types';
 import type { SummaryAssetsData } from '../CardanoSignTxPage';
 import BigNumber from 'bignumber.js';
-import { injectIntl } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { useState } from 'react';
-import { signTxMessages } from '../SignTxPage';
 import CardanoSignTxSummary from './SignTxSummary';
 import { ReactComponent as ExpandArrow } from '../../../assets/images/arrow-expand.inline.svg';
 import { connectorMessages } from '../../../../i18n/global-messages';
 import ErrorBlock from '../../../../components/widgets/ErrorBlock';
 import LocalizableError from '../../../../i18n/LocalizableError';
+
+const messages: Object = defineMessages({
+  transactionFee: {
+    id: 'connector.signin.transactionFee',
+    defaultMessage: '!!!Transaction Fee',
+  },
+});
+
 
 type AssetDisplayValueProps = {|
   amount: BigNumber,
@@ -65,10 +72,10 @@ function CardanoSignTx({
       />
       <Panel id="signTxAdditionalInfoPanel">
         <Box display="flex" justifyContent="space-between" alignItems="flex-start" id="signTxAdditionalInfoPanelBox">
-          <Typography color="#4A5065" fontWeight={500}>
-            {intl.formatMessage(signTxMessages.transactionFee)}
+          <Typography component="div" color="#4A5065" fontWeight={500}>
+            {intl.formatMessage(messages.transactionFee)}
           </Typography>
-          <Typography textAlign="right" color="#242838" id="signTxAdditionalInfoPanelBox-fee">
+          <Typography component="div" textAlign="right" color="#242838" id="signTxAdditionalInfoPanelBox-fee">
             {total.fee} {total.ticker}
           </Typography>
         </Box>
@@ -128,7 +135,7 @@ const ExpandableAssetsPanel = ({
         sx={{ cursor: 'pointer' }}
         onClick={() => setIsExpanded(expanded => !expanded)}
       >
-        <Typography color="#4A5065" fontWeight={500}>
+        <Typography component="div" color="#4A5065" fontWeight={500}>
           {panelTitle}
         </Typography>
         {isExpandable && (
@@ -138,7 +145,8 @@ const ExpandableAssetsPanel = ({
         )}
       </Box>
 
-      {(hasNativeToken || assets.length !== 0) && (
+      {((total.amount.startsWith('-') && action === 'sent') || (
+        !total.amount.startsWith('-') && action === 'received')) && (
         <AsseetValueDisplay>
           {total.amount} {total.ticker}
         </AsseetValueDisplay>
@@ -175,7 +183,7 @@ const ExpandableAssetsPanel = ({
 
 const AsseetValueDisplay = ({ children }): Node => (
   <Box mt="16px" id="asseetValueDisplayBox">
-    <Typography textAlign="right" color="#242838">
+    <Typography component="div" textAlign="right" color="#242838">
       {children}
     </Typography>
   </Box>

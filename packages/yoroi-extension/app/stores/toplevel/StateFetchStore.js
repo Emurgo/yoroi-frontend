@@ -2,7 +2,7 @@
 import { observable, } from 'mobx';
 import Store from '../base/Store';
 
-import type { IFetcher } from '../../api/common/lib/state-fetch/IFetcher';
+import type { IFetcher } from '../../api/common/lib/state-fetch/IFetcher.types';
 import { RemoteFetcher } from '../../api/common/lib/state-fetch/remoteFetcher';
 import { BatchedFetcher } from '../../api/common/lib/state-fetch/batchedFetcher';
 import environment from '../../environment';

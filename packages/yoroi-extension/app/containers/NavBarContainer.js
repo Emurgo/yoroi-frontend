@@ -1,10 +1,9 @@
 // @flow
 import moment from 'moment';
-import { computed } from 'mobx';
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import type { InjectedOrGenerated } from '../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../types/injectedProps.types';
 import { intlShape } from 'react-intl';
 import NavBar from '../components/topbar/NavBar';
 import NavPlate from '../components/topbar/NavPlate';
@@ -13,29 +12,16 @@ import NoWalletsDropdown from '../components/topbar/NoWalletsDropdown';
 import NavDropdown from '../components/topbar/NavDropdown';
 import NavDropdownRow from '../components/topbar/NavDropdownRow';
 import { ROUTES } from '../routes-config';
-import { ConceptualWallet } from '../api/ada/lib/storage/models/ConceptualWallet/index';
 import { asGetPublicKey } from '../api/ada/lib/storage/models/PublicDeriver/traits';
 import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { DelegationRequests } from '../stores/toplevel/DelegationStore';
-import type { ConceptualWalletSettingsCache } from '../stores/toplevel/WalletSettingsStore';
-import type { PublicKeyCache } from '../stores/toplevel/WalletStore';
-import type {
-  IGetPublic,
-  IGetLastSyncInfoResponse,
-} from '../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import type { TokenRow } from '../api/ada/lib/storage/database/primitives/tables';
-import { MultiToken } from '../api/common/lib/MultiToken';
-import type { TokenInfoMap } from '../stores/toplevel/TokenInfoStore';
 import { genLookupOrFail } from '../stores/stateless/tokenHelpers';
 import BuySellDialog from '../components/buySell/BuySellDialog';
 import globalMessages from '../i18n/global-messages';
-import type { UnitOfAccountSettingType } from '../types/unitOfAccountType';
-
-export type GeneratedData = typeof NavBarContainer.prototype.generated;
+import { MultiToken } from '../api/common/lib/MultiToken';
 
 type Props = {|
-  ...InjectedOrGenerated<GeneratedData>,
+  ...StoresAndActionsProps,
   title: Node,
 |};
 
@@ -46,36 +32,37 @@ export default class NavBarContainer extends Component<Props> {
   };
 
   updateHideBalance: void => Promise<void> = async () => {
-    await this.generated.actions.profile.updateHideBalance.trigger();
+    await this.props.actions.profile.updateHideBalance.trigger();
   };
 
   switchToNewWallet: (PublicDeriver<>) => void = newWallet => {
-    this.generated.actions.router.goToRoute.trigger({
-      route: this.generated.stores.app.currentRoute,
+    this.props.actions.router.goToRoute.trigger({
+      route: this.props.stores.app.currentRoute,
       publicDeriver: newWallet,
     });
   };
 
   openDialogWrapper: any => void = dialog => {
-    this.generated.actions.router.goToRoute.trigger({ route: ROUTES.MY_WALLETS });
-    this.generated.actions.dialogs.open.trigger({ dialog });
+    this.props.actions.router.goToRoute.trigger({ route: ROUTES.MY_WALLETS });
+    this.props.actions.dialogs.open.trigger({ dialog });
   };
 
   render(): Node {
     const { intl } = this.context;
-    const { stores } = this.generated;
+    const { stores } = this.props;
     const { profile } = stores;
 
     const walletsStore = stores.wallets;
 
-    const wallets = this.generated.stores.wallets.publicDerivers;
+    const wallets = this.props.stores.wallets.publicDerivers;
 
     const walletComponents = wallets.map(wallet => {
-      const balance = this.generated.stores.transactions.balance;
-      const lastSyncInfo = this.generated.stores.transactions.lastSyncInfo;
+      const balance: ?MultiToken = this.props.stores.transactions.getBalance(wallet);
+      const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(wallet);
+      const lastSyncInfo = this.props.stores.transactions.lastSyncInfo;
 
       const parent = wallet.getParent();
-      const settingsCache = this.generated.stores.walletSettings.getConceptualWalletSettingsCache(
+      const settingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(
         parent
       );
 
@@ -83,28 +70,28 @@ export default class NavBarContainer extends Component<Props> {
       const plate =
         withPubKey == null
           ? null
-          : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
+          : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
 
       return (
         <NavDropdownRow
           key={wallet.getPublicDeriverId()}
           plateComponent={<NavPlate plate={plate} wallet={settingsCache} />}
           onSelect={() => this.switchToNewWallet(wallet)}
-          isCurrentWallet={wallet === this.generated.stores.wallets.selected}
+          isCurrentWallet={wallet === this.props.stores.wallets.selected}
           syncTime={lastSyncInfo?.Time ? moment(lastSyncInfo.Time).fromNow() : null}
           detailComponent={
             <NavWalletDetails
               walletAmount={balance}
+              rewards={rewards}
               onUpdateHideBalance={this.updateHideBalance}
               shouldHideBalance={profile.shouldHideBalance}
-              rewards={this.getRewardBalance(wallet)}
-              getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
-              defaultToken={this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
+              getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
+              defaultToken={this.props.stores.tokenInfoStore.getDefaultTokenInfo(
                 wallet.getParent().getNetworkInfo().NetworkId
               )}
               showEyeIcon={false}
               unitOfAccountSetting={profile.unitOfAccount}
-              getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
+              getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
               purpose='allWallets'
             />
           }
@@ -128,20 +115,21 @@ export default class NavBarContainer extends Component<Props> {
           return <NoWalletsDropdown />;
         }
 
-        const balance = this.generated.stores.transactions.balance;
+        const balance: ?MultiToken = this.props.stores.transactions.getBalance(publicDeriver);
+        const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(publicDeriver);
 
         return (
           <NavWalletDetails
             onUpdateHideBalance={this.updateHideBalance}
             shouldHideBalance={profile.shouldHideBalance}
-            rewards={this.getRewardBalance(publicDeriver)}
+            rewards={rewards}
             walletAmount={balance}
-            getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
-            defaultToken={this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
+            getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
+            defaultToken={this.props.stores.tokenInfoStore.getDefaultTokenInfo(
               publicDeriver.getParent().getNetworkInfo().NetworkId
             )}
             unitOfAccountSetting={profile.unitOfAccount}
-            getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
+            getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
             purpose='topBar'
           />
         );
@@ -152,7 +140,7 @@ export default class NavBarContainer extends Component<Props> {
           headerComponent={getDropdownHead()}
           contentComponents={dropdownContent}
           onAddWallet={() =>
-            this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
+            this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
           }
           openBuySellDialog={() => this.openDialogWrapper(BuySellDialog)}
         />
@@ -165,7 +153,7 @@ export default class NavBarContainer extends Component<Props> {
 
       const parent = publicDeriver.getParent();
 
-      const settingsCache = this.generated.stores.walletSettings.getConceptualWalletSettingsCache(
+      const settingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(
         parent
       );
 
@@ -173,7 +161,7 @@ export default class NavBarContainer extends Component<Props> {
       const plate =
         withPubKey == null
           ? null
-          : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
+          : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
 
       return <NavPlate plate={plate} wallet={settingsCache} />;
     };
@@ -181,140 +169,5 @@ export default class NavBarContainer extends Component<Props> {
     return (
       <NavBar title={this.props.title} walletPlate={getPlate()} walletDetails={dropdownComponent} />
     );
-  }
-
-  /**
-   * undefined => wallet is not a reward wallet
-   * null => still calculating
-   * value => done calculating
-   */
-  getRewardBalance: (PublicDeriver<>) => null | void | MultiToken = publicDeriver => {
-    const delegationRequest = this.generated.stores.delegation.getDelegationRequests(publicDeriver);
-    if (delegationRequest == null) return undefined;
-
-    const balanceResult = delegationRequest.getDelegatedBalance.result;
-    if (balanceResult == null) {
-      return null;
-    }
-    return balanceResult.accountPart;
-  };
-
-  @computed get generated(): {|
-    actions: {|
-      dialogs: {|
-        open: {|
-          trigger: (params: {|
-            dialog: any,
-            params?: any,
-          |}) => void,
-        |},
-      |},
-      profile: {|
-        updateHideBalance: {|
-          trigger: (params: void) => Promise<void>,
-        |},
-      |},
-      router: {|
-        goToRoute: {|
-          trigger: (params: {|
-            publicDeriver?: null | PublicDeriver<>,
-            params?: ?any,
-            route: string,
-          |}) => void,
-        |},
-      |},
-      wallets: {|
-        setActiveWallet: {|
-          trigger: (params: {|
-            wallet: PublicDeriver<>,
-          |}) => void,
-        |},
-      |},
-    |},
-    stores: {|
-      app: {| currentRoute: string |},
-      delegation: {|
-        getDelegationRequests: (PublicDeriver<>) => void | DelegationRequests,
-      |},
-      profile: {|
-        shouldHideBalance: boolean,
-        unitOfAccount: UnitOfAccountSettingType,
-      |},
-      tokenInfoStore: {|
-        tokenInfo: TokenInfoMap,
-        getDefaultTokenInfo: number => $ReadOnly<TokenRow>,
-      |},
-      transactions: {|
-        balance: MultiToken | null,
-        lastSyncInfo: ?IGetLastSyncInfoResponse,
-      |},
-      walletSettings: {|
-        getConceptualWalletSettingsCache: ConceptualWallet => ConceptualWalletSettingsCache,
-      |},
-      wallets: {|
-        getPublicKeyCache: IGetPublic => PublicKeyCache,
-        publicDerivers: Array<PublicDeriver<>>,
-        selected: null | PublicDeriver<>,
-      |},
-      coinPriceStore: {|
-        getCurrentPrice: (from: string, to: string) => ?string,
-      |},
-    |},
-  |} {
-    if (this.props.generated !== undefined) {
-      return this.props.generated;
-    }
-    if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(NavBarContainer)} no way to generated props`);
-    }
-    const { stores, actions } = this.props;
-    const { selected } = stores.wallets;
-    return Object.freeze({
-      stores: {
-        app: {
-          currentRoute: stores.app.currentRoute,
-        },
-        walletSettings: {
-          getConceptualWalletSettingsCache: stores.walletSettings.getConceptualWalletSettingsCache,
-        },
-        wallets: {
-          selected,
-          publicDerivers: stores.wallets.publicDerivers,
-          getPublicKeyCache: stores.wallets.getPublicKeyCache,
-        },
-        tokenInfoStore: {
-          tokenInfo: stores.tokenInfoStore.tokenInfo,
-          getDefaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfo,
-        },
-        profile: {
-          shouldHideBalance: stores.profile.shouldHideBalance,
-          unitOfAccount: stores.profile.unitOfAccount,
-        },
-        delegation: {
-          getDelegationRequests: stores.delegation.getDelegationRequests,
-        },
-        transactions: {
-          balance: stores.transactions.balance,
-          lastSyncInfo: selected == null ? null : stores.transactions.lastSyncInfo,
-        },
-        coinPriceStore: {
-          getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
-        },
-      },
-      actions: {
-        wallets: {
-          setActiveWallet: { trigger: actions.wallets.setActiveWallet.trigger },
-        },
-        profile: {
-          updateHideBalance: { trigger: actions.profile.updateHideBalance.trigger },
-        },
-        router: {
-          goToRoute: { trigger: actions.router.goToRoute.trigger },
-        },
-        dialogs: {
-          open: { trigger: actions.dialogs.open.trigger },
-        },
-      },
-    });
   }
 }

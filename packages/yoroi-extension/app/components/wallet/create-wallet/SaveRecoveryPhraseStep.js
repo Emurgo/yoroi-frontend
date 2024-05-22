@@ -7,7 +7,7 @@ import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Stack, Typography, Box } from '@mui/material';
 import StepController from './StepController';
 import { CREATE_WALLET_SETPS, isDialogShownBefore, TIPS_DIALOGS } from './steps';
-import HowToSaveRecoverPhraseTipsDialog from './HowToSaveRecoverPhraseTipsDialog';
+import HowToSaveRecoveryPhraseTipsDialog from './HowToSaveRecoveryPhraseTipsDialog';
 import RecoveryPhrase from './RecoveryPhrase';
 import { ReactComponent as InfoIcon } from '../../../assets/images/info-icon-primary.inline.svg';
 import globalMessages from '../../../i18n/global-messages';
@@ -34,22 +34,22 @@ function SaveRecoveryPhraseStep(props: Props & Intl): Node {
   const { setCurrentStep, recoveryPhrase, isDialogOpen, openDialog, closeDialog, intl } = props;
   const [shouldShowRecoveryPhrase, showRecoveryPhrase] = useState(false);
 
-  const isActiveDialog = isDialogOpen(HowToSaveRecoverPhraseTipsDialog);
+  const isActiveDialog = isDialogOpen(HowToSaveRecoveryPhraseTipsDialog);
   useEffect(() => {
     if (!isActiveDialog && !isDialogShownBefore(TIPS_DIALOGS.SAVE_RECOVERY_PHRASE))
-      openDialog(HowToSaveRecoverPhraseTipsDialog);
+      openDialog(HowToSaveRecoveryPhraseTipsDialog);
   }, []);
 
   return (
     <Stack alignItems="center" justifyContent="center">
       <Stack direction="column" alignItems="left" justifyContent="center" maxWidth="700px">
         <Stack mb="8px" flexDirection="row" alignItems="center" gap="6px">
-          <Typography>
+          <Typography component="div">
             <FormattedHTMLMessage {...messages.description} />
           </Typography>
           <Box
             sx={{ cursor: 'pointer' }}
-            onClick={() => openDialog(HowToSaveRecoverPhraseTipsDialog)}
+            onClick={() => openDialog(HowToSaveRecoveryPhraseTipsDialog)}
           >
             <InfoIcon />
           </Box>
@@ -81,7 +81,7 @@ function SaveRecoveryPhraseStep(props: Props & Intl): Node {
         />
       </Stack>
 
-      <HowToSaveRecoverPhraseTipsDialog
+      <HowToSaveRecoveryPhraseTipsDialog
         open={isActiveDialog}
         onClose={() => closeDialog(TIPS_DIALOGS.SAVE_RECOVERY_PHRASE)}
       />

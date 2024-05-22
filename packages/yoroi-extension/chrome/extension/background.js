@@ -25,7 +25,6 @@ import {
   APIErrorCodes,
   asPaginate,
   asTokenId,
-  asTx,
   asValue,
   ConnectorError,
   DataSignErrorCodes,
@@ -34,33 +33,30 @@ import {
 import {
   connectorCreateCardanoTx,
   connectorGenerateReorgTx,
+  connectorGetAssets,
   connectorGetBalance,
   connectorGetCardanoRewardAddresses,
   connectorGetChangeAddress,
   connectorGetCollateralUtxos,
+  connectorGetDRepKey,
+  connectorGetStakeKey,
   connectorGetUnusedAddresses,
   connectorGetUsedAddresses,
   connectorGetUtxosCardano,
   connectorRecordSubmittedCardanoTransaction,
   connectorSendTxCardano,
   connectorSignCardanoTx,
-  getAddressing,
   connectorSignData,
-  connectorGetAssets,
+  getAddressing,
   getTokenMetadataFromIds,
   MAX_COLLATERAL,
-  connectorGetDRepKey, connectorGetStakeKey,
 } from './connector/api';
-import {
-  updateTransactions as cardanoUpdateTransactions
-} from '../../app/api/ada/lib/storage/bridge/updateTransactions';
+import { updateUtxos } from '../../app/api/ada/lib/storage/bridge/updateTransactions';
 import { environment } from '../../app/environment';
-import type { IFetcher as CardanoIFetcher } from '../../app/api/ada/lib/state-fetch/IFetcher';
+import type { IFetcher as CardanoIFetcher } from '../../app/api/ada/lib/state-fetch/IFetcher.types';
 import { RemoteFetcher as CardanoRemoteFetcher } from '../../app/api/ada/lib/state-fetch/remoteFetcher';
 import { BatchedFetcher as CardanoBatchedFetcher } from '../../app/api/ada/lib/state-fetch/batchedFetcher';
-import LocalStorageApi, {
-  loadSubmittedTransactions,
-} from '../../app/api/localStorage/index';
+import LocalStorageApi, { loadSubmittedTransactions, } from '../../app/api/localStorage/index';
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { Logger, stringifyError } from '../../app/utils/logging';
 import type { lf$Database, } from 'lovefield';
@@ -75,12 +71,17 @@ import {
 import { authSignHexPayload } from '../../app/connector/api';
 import type { RemoteUnspentOutput } from '../../app/api/ada/lib/state-fetch/types';
 import { NotEnoughMoneyToSendError, } from '../../app/api/common/errors';
-import { asAddressedUtxo as asAddressedUtxoCardano, } from '../../app/api/ada/transactions/utils';
-import ConnectorStore from '../../app/connector/stores/ConnectorStore';
+import {
+  asAddressedUtxo as asAddressedUtxoCardano,
+  assetToRustMultiasset,
+  cardanoUtxoHexFromRemoteFormat,
+  mergeWitnessSets,
+} from '../../app/api/ada/transactions/utils';
 import type { ForeignUtxoFetcher } from '../../app/connector/stores/ConnectorStore';
+import ConnectorStore from '../../app/connector/stores/ConnectorStore';
 import { find721metadata } from '../../app/utils/nftMetadata';
 import { hexToBytes } from '../../app/coreUtils';
-import { mergeWitnessSets } from './connector/utils';
+import { addressHexToBech32 } from '../../app/api/ada/lib/cardanoCrypto/utils';
 
 /*::
 declare var chrome;
@@ -177,8 +178,8 @@ type PendingSign = {|
 
 type ConnectedSite = {|
   url: string,
-  // <TODO:PENDING_REMOVAL> Ergo protocol
-  protocol: 'cardano' | 'ergo',
+  // <TODO:PENDING_REMOVAL> Legacy
+  protocol: 'cardano',
   appAuthID?: string,
   status: ConnectedStatus,
   pendingSigns: {| [uid: string]: PendingSign |},
@@ -363,13 +364,10 @@ async function syncWallet(
         if (isCardano) {
           const stateFetcher: CardanoIFetcher =
             await getCardanoStateFetcher(localStorageApi);
-          await cardanoUpdateTransactions(
+          await updateUtxos(
             wallet.getDb(),
             wallet,
             stateFetcher.checkAddressesInUse,
-            stateFetcher.getRecentTransactionHashes,
-            stateFetcher.getTransactionsByHashes,
-            stateFetcher.getBestBlock,
             stateFetcher.getTokenInfo,
             stateFetcher.getMultiAssetMintMetadata,
             stateFetcher.getMultiAssetSupply,
@@ -913,8 +911,8 @@ async function confirmSign(
 async function findWhitelistedConnection(
   url: string,
   requestIdentification?: boolean,
-  // <TODO:PENDING_REMOVAL> Ergo protocol
-  protocol: 'cardano' | 'ergo',
+  // <TODO:PENDING_REMOVAL> Legacy
+  protocol: 'cardano',
   localStorageApi: LocalStorageApi,
 ): Promise<?WhitelistEntry> {
   const isAuthRequested = Boolean(requestIdentification);
@@ -938,11 +936,12 @@ async function confirmConnect(
     url: string,
     requestIdentification?: boolean,
     onlySilent?: boolean,
-    // <TODO:PENDING_REMOVAL> Ergo protocol
-    protocol: 'cardano' | 'ergo',
+    // <TODO:PENDING_REMOVAL> Protocol
+    protocol: 'cardano',
   |},
   localStorageApi: LocalStorageApi,
 ): Promise<void> {
+  // <TODO:PENDING_REMOVAL> Protocol
   const { url, requestIdentification, onlySilent, protocol } = connectParameters;
   const isAuthRequested = Boolean(requestIdentification);
   const appAuthID = isAuthRequested ? url : undefined;
@@ -1038,11 +1037,7 @@ async function handleInjectorMessage(message, sender) {
   }
   async function addressesToBech(addressesHex: string[]): Promise<string[]> {
     await RustModule.load();
-    return addressesHex.map(a =>
-                            RustModule.WalletV4.Address.from_bytes(
-                              Buffer.from(a, 'hex'),
-                            ).to_bech32()
-                           );
+    return addressesHex.map(addressHexToBech32);
   }
   const connectParameters = () => ({
     protocol: message.protocol,
@@ -1135,47 +1130,8 @@ async function handleInjectorMessage(message, sender) {
         handleError(e);
       }
       break;
-    case 'sign_tx_input':
-      try {
-        checkParamCount(2);
-        await withDb(async (db, localStorageApi) => {
-          await withSelectedWallet(
-            tabId,
-            async (_wallet, connection) => {
-              if (connection == null) {
-                Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
-                rpcResponse(undefined); // shouldn't happen
-                return
-              }
-              await RustModule.load();
-              const tx = asTx(message.params[0], RustModule.SigmaRust);
-              const txIndex = message.params[1];
-              if (typeof txIndex !== 'number') {
-                throw ConnectorError.invalidRequest(`invalid tx input: ${txIndex}`);
-              }
-              await confirmSign(
-                tabId,
-                {
-                  type: 'tx_input',
-                  tx,
-                  index: txIndex,
-                  uid: message.uid
-                },
-                connection,
-                { type: 'cardano-tx-input' },
-                message.protocol,
-                message.uid,
-              );
-            },
-            db,
-            localStorageApi,
-          )
-        });
-      } catch (e) {
-        handleError(e);
-      }
-      break;
     case 'sign_data':
+    case 'cip95_sign_data':
       try {
         const rawAddress = message.params[0];
         const payload = message.params[1];
@@ -1247,11 +1203,9 @@ async function handleInjectorMessage(message, sender) {
           await withSelectedWallet(
             tabId,
             async (wallet) => {
-              const connectionProtocol = await getFromStorage(STORAGE_KEY_CONNECTION_PROTOCOL) ||
-                    'cardano';
               await RustModule.load();
               const balance =
-                    await connectorGetBalance(wallet, tokenId, connectionProtocol);
+                    await connectorGetBalance(wallet, tokenId);
               if (isCBOR && tokenId === '*' && !(typeof balance === 'string')) {
                 const W4 = RustModule.WalletV4;
                 const value = W4.Value.new(
@@ -1310,7 +1264,11 @@ async function handleInjectorMessage(message, sender) {
                   isCBOR,
                 );
               } catch (e) {
-                rpcResponse({ err: e.message });
+                if (e instanceof NotEnoughMoneyToSendError) {
+                  rpcResponse({ ok: null });
+                } else {
+                  rpcResponse({ err: e.message });
+                }
                 return;
               }
               rpcResponse({ ok: utxos });
@@ -1430,6 +1388,7 @@ async function handleInjectorMessage(message, sender) {
       break;
     case `get_change_address`:
       try {
+        await RustModule.load();
         await withDb(async (db, localStorageApi) => {
           await withSelectedWallet(
             tabId,
@@ -1803,28 +1762,6 @@ async function handleInjectorMessage(message, sender) {
 }
 
 
-function assetToRustMultiasset(jsonAssets): RustModule.WalletV4.MultiAsset {
-  const groupedAssets = jsonAssets.reduce((res, a) => {
-    (res[a.policyId] = (res[a.policyId]||[])).push(a);
-    return res;
-  }, {})
-  const W4 = RustModule.WalletV4;
-  const multiasset = W4.MultiAsset.new();
-  for (const policyHex of Object.keys(groupedAssets)) {
-    const assetGroup = groupedAssets[policyHex];
-    const policyId = W4.ScriptHash.from_bytes(Buffer.from(policyHex, 'hex'));
-    const assets = RustModule.WalletV4.Assets.new();
-    for (const asset of assetGroup) {
-      assets.insert(
-        W4.AssetName.new(Buffer.from(asset.name, 'hex')),
-        W4.BigNum.from_str(asset.amount),
-      );
-    }
-    multiasset.insert(policyId, assets);
-  }
-  return multiasset;
-}
-
 async function transformCardanoUtxos(
   utxos: Array<RemoteUnspentOutput>,
   isCBOR: boolean,
@@ -1833,25 +1770,7 @@ async function transformCardanoUtxos(
   await RustModule.load();
   const W4 = RustModule.WalletV4;
   if (isCBOR) {
-    return cardanoUtxos.map(u => {
-      const input = W4.TransactionInput.new(
-        W4.TransactionHash.from_bytes(
-          Buffer.from(u.tx_hash, 'hex')
-        ),
-        u.tx_index,
-      );
-      const value = W4.Value.new(W4.BigNum.from_str(u.amount));
-      if ((u.assets || []).length > 0) {
-        value.set_multiasset(assetToRustMultiasset(u.assets));
-      }
-      const output = W4.TransactionOutput.new(
-        W4.Address.from_bytes(Buffer.from(u.receiver, 'hex')),
-        value,
-      );
-      return Buffer.from(
-        W4.TransactionUnspentOutput.new(input, output).to_bytes(),
-      ).toString('hex');
-    })
+    return cardanoUtxos.map(cardanoUtxoHexFromRemoteFormat)
   }
 
   return cardanoUtxos.map(u => {

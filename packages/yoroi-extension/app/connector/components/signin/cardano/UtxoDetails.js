@@ -7,7 +7,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { connectorMessages } from '../../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import CopyableAddress from '../../../../components/widgets/CopyableAddress';
-import type { Notification } from '../../../../types/notificationType';
+import type { Notification } from '../../../../types/notification.types';
 import { splitAmount, truncateAddressShort, truncateToken } from '../../../../utils/formatters';
 import type { TokenLookupKey, TokenEntry } from '../../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
@@ -144,6 +144,7 @@ class CardanoUtxoDetails extends Component<Props> {
         id="addressRow"
       >
         <CopyableAddress
+          id={'utxoDetails_' + request.addressIndex}
           hash={addressHash}
           elementId={notificationElementId}
           onCopyAddress={() =>
@@ -196,13 +197,13 @@ class CardanoUtxoDetails extends Component<Props> {
       <Box>
         <Box>
           <Box pb="10px">
-            <Typography variant="body1" fontWeight="500" color="#000">
+            <Typography component="div" variant="body1" fontWeight="500" color="#000">
               {intl.formatMessage(connectorMessages.fromAddresses, { qty: txData.inputs.length })}
             </Typography>
           </Box>
           <Panel>
             <Box>
-              <Typography variant="body1" fontWeight="500" color="#4A5065">
+              <Typography component="div" variant="body1" fontWeight="500" color="#4A5065">
                 {intl.formatMessage(connectorMessages.yourAddresses)}
               </Typography>
               <Box id="fromAddressesBox-yourInputs">
@@ -221,7 +222,7 @@ class CardanoUtxoDetails extends Component<Props> {
               <>
                 <Separator />
                 <Box>
-                  <Typography variant="body1" fontWeight="500" color="#4A5065">
+                  <Typography component="div" variant="body1" fontWeight="500" color="#4A5065">
                     {intl.formatMessage(connectorMessages.foreignAddresses)}
                   </Typography>
                   <Box id="fromAddressesBox-foreignInputs">
@@ -241,13 +242,13 @@ class CardanoUtxoDetails extends Component<Props> {
         </Box>
         <Box>
           <Box pb="10px">
-            <Typography variant="body1" fontWeight="500" color="#000">
+            <Typography component="div" variant="body1" fontWeight="500" color="#000">
               {intl.formatMessage(connectorMessages.toAddresses, { qty: txData.outputs.length })}
             </Typography>
           </Box>
           <Panel withMargin={false}>
             <Box>
-              <Typography variant="body1" fontWeight="500" color="#4A5065">
+              <Typography component="div" variant="body1" fontWeight="500" color="#4A5065">
                 {intl.formatMessage(connectorMessages.yourAddresses)}
               </Typography>
               <Box id="toAddressesBox-yourOutputs">
@@ -267,7 +268,7 @@ class CardanoUtxoDetails extends Component<Props> {
               <>
                 <Separator />
                 <Box id="toAddressesBox-foreignOutputs">
-                  <Typography variant="body1" fontWeight="500" color="#4A5065">
+                  <Typography component="div" variant="body1" fontWeight="500" color="#4A5065">
                     {intl.formatMessage(connectorMessages.foreignAddresses)}
                   </Typography>
                   <Box>

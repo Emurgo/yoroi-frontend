@@ -737,6 +737,7 @@ Object {
         "address": "https://adastat.net/addresses/",
         "pool": "https://adastat.net/pools/",
         "stakeAddress": "https://adastat.net/addresses/",
+        "token": "https://adastat.net/tokens/",
         "transaction": "https://adastat.net/transactions/",
       },
       "ExplorerId": 108,
@@ -756,14 +757,15 @@ Object {
     },
     Object {
       "Endpoints": Object {
-        "address": "https://adaex.org/",
-        "pool": "https://adapools.org/pool/",
-        "stakeAddress": "https://adaex.org/",
-        "transaction": "https://adaex.org/",
+        "address": "https://cexplorer.io/address/",
+        "pool": "https://cexplorer.io/pool/",
+        "stakeAddress": "https://cexplorer.io/stake/",
+        "token": "https://cexplorer.io/asset/",
+        "transaction": "https://cexplorer.io/tx/",
       },
       "ExplorerId": 100,
       "IsBackup": false,
-      "Name": "ADAex.org",
+      "Name": "Cexplorer",
       "NetworkId": 0,
     },
     Object {
@@ -835,36 +837,16 @@ Object {
     },
     Object {
       "Endpoints": Object {
-        "address": "https://preview.cardanoscan.io/address/",
-        "pool": "https://preview.cardanoscan.io/pool/",
-        "stakeAddress": "https://preview.cardanoscan.io/stakeKey/",
-        "token": "https://preview.cardanoscan.io/token/",
-        "transaction": "https://preview.cardanoscan.io/transaction/",
+        "address": "https://sancho.cexplorer.io/address/",
+        "pool": "https://sancho.cexplorer.io/pool/",
+        "stakeAddress": "https://sancho.cexplorer.io/stake/",
+        "token": "https://sancho.cexplorer.io/asset/",
+        "transaction": "https://sancho.cexplorer.io/tx/",
       },
       "ExplorerId": 650,
       "IsBackup": true,
-      "Name": "CardanoScan",
+      "Name": "Cexplorer",
       "NetworkId": 450,
-    },
-    Object {
-      "Endpoints": Object {
-        "address": "https://explorer.ergoplatform.com/en/addresses/",
-        "transaction": "https://explorer.ergoplatform.com/en/transactions/",
-      },
-      "ExplorerId": 300,
-      "IsBackup": true,
-      "Name": "ErgoPlatform",
-      "NetworkId": 200,
-    },
-    Object {
-      "Endpoints": Object {
-        "address": "https://explorer.alonzo-white.dev.cardano.org/en/address?address=",
-        "transaction": "https://explorer.alonzo-white.dev.cardano.org/en/transaction?id=",
-      },
-      "ExplorerId": 500,
-      "IsBackup": true,
-      "Name": "CardanoExplorer",
-      "NetworkId": 400,
     },
   ],
   "HwWalletMeta": Array [],
@@ -1257,7 +1239,6 @@ Object {
       "Backend": Object {
         "BackendService": "https://iohk-mainnet.yoroiwallet.com",
         "TokenInfoService": "https://cdn.yoroiwallet.com",
-        "WebSocket": "wss://iohk-mainnet.yoroiwallet.com:443",
       },
       "BaseConfig": Array [
         Object {
@@ -1290,26 +1271,8 @@ Object {
     },
     Object {
       "Backend": Object {
-        "BackendService": "https://ergo-backend.yoroiwallet.com",
-      },
-      "BaseConfig": Array [
-        Object {
-          "ChainNetworkId": "0",
-          "FeeAddress": "031005040004000e36100204a00b08cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798ea02d192a39a8cc7a701730073011001020402d19683030193a38cc7b2a57300000193c2b2a57301007473027303830108cdeeac93b1a573046eebdc83",
-          "MinimumBoxValue": "100000",
-          "StartAt": 0,
-        },
-      ],
-      "CoinType": 2147484077,
-      "Fork": 0,
-      "NetworkId": 200,
-      "NetworkName": "Ergo Mainnet",
-    },
-    Object {
-      "Backend": Object {
         "BackendService": "https://testnet-backend.yoroiwallet.com",
         "TokenInfoService": "https://stage-cdn.yoroiwallet.com",
-        "WebSocket": "wss://testnet-backend.yoroiwallet.com:443",
       },
       "BaseConfig": Array [
         Object {
@@ -1342,44 +1305,8 @@ Object {
     },
     Object {
       "Backend": Object {
-        "BackendService": "https://alonzo-backend.yoroiwallet.com",
-        "TokenInfoService": "https://stage-cdn.yoroiwallet.com",
-        "WebSocket": "wss://alonzo-backend.yoroiwallet.com:443",
-      },
-      "BaseConfig": Array [
-        Object {
-          "ByronNetworkId": 1097911063,
-          "ChainNetworkId": "0",
-          "GenesisDate": "1563999616000",
-          "SlotDuration": 20,
-          "SlotsPerEpoch": 21600,
-          "StartAt": 0,
-        },
-        Object {
-          "CoinsPerUtxoWord": "34482",
-          "KeyDeposit": "2000000",
-          "LinearFee": Object {
-            "coefficient": "44",
-            "constant": "155381",
-          },
-          "MinimumUtxoVal": "1000000",
-          "PerEpochPercentageReward": 69344,
-          "PoolDeposit": "500000000",
-          "SlotDuration": 1,
-          "SlotsPerEpoch": 432000,
-          "StartAt": 0,
-        },
-      ],
-      "CoinType": 2147485463,
-      "Fork": 0,
-      "NetworkId": 400,
-      "NetworkName": "Alonzo Testnet",
-    },
-    Object {
-      "Backend": Object {
         "BackendService": "https://preprod-backend.yoroiwallet.com",
         "TokenInfoService": "https://stage-cdn.yoroiwallet.com",
-        "WebSocket": "wss://preprod-backend.yoroiwallet.com:443",
       },
       "BaseConfig": Array [
         Object {
@@ -1414,7 +1341,6 @@ Object {
       "Backend": Object {
         "BackendService": "https://preview-backend.emurgornd.com",
         "TokenInfoService": "https://stage-cdn.yoroiwallet.com",
-        "WebSocket": "wss://preview-backend.emurgornd.com:443",
       },
       "BaseConfig": Array [
         Object {
@@ -1449,7 +1375,6 @@ Object {
       "Backend": Object {
         "BackendService": "https://sanchonet-backend.yoroiwallet.com",
         "TokenInfoService": "https://stage-cdn.yoroiwallet.com",
-        "WebSocket": "wss://sanchonet-backend.yoroiwallet.com:443",
       },
       "BaseConfig": Array [
         Object {
@@ -1536,15 +1461,14 @@ Object {
       "IsDefault": true,
       "IsNFT": false,
       "Metadata": Object {
-        "boxId": "",
-        "description": null,
-        "height": 0,
+        "assetName": "",
         "longName": null,
-        "numberOfDecimals": 9,
-        "ticker": "ERG",
-        "type": "Ergo",
+        "numberOfDecimals": 6,
+        "policyId": "",
+        "ticker": "TADA",
+        "type": "Cardano",
       },
-      "NetworkId": 200,
+      "NetworkId": 300,
       "TokenId": 2,
     },
     Object {
@@ -1560,7 +1484,7 @@ Object {
         "ticker": "TADA",
         "type": "Cardano",
       },
-      "NetworkId": 300,
+      "NetworkId": 250,
       "TokenId": 3,
     },
     Object {
@@ -1576,7 +1500,7 @@ Object {
         "ticker": "TADA",
         "type": "Cardano",
       },
-      "NetworkId": 400,
+      "NetworkId": 350,
       "TokenId": 4,
     },
     Object {
@@ -1592,40 +1516,8 @@ Object {
         "ticker": "TADA",
         "type": "Cardano",
       },
-      "NetworkId": 250,
-      "TokenId": 5,
-    },
-    Object {
-      "Digest": 6.262633522161549e-167,
-      "Identifier": "",
-      "IsDefault": true,
-      "IsNFT": false,
-      "Metadata": Object {
-        "assetName": "",
-        "longName": null,
-        "numberOfDecimals": 6,
-        "policyId": "",
-        "ticker": "TADA",
-        "type": "Cardano",
-      },
-      "NetworkId": 350,
-      "TokenId": 6,
-    },
-    Object {
-      "Digest": 6.262633522161549e-167,
-      "Identifier": "",
-      "IsDefault": true,
-      "IsNFT": false,
-      "Metadata": Object {
-        "assetName": "",
-        "longName": null,
-        "numberOfDecimals": 6,
-        "policyId": "",
-        "ticker": "TADA",
-        "type": "Cardano",
-      },
       "NetworkId": 450,
-      "TokenId": 7,
+      "TokenId": 5,
     },
   ],
   "TokenList": Array [],

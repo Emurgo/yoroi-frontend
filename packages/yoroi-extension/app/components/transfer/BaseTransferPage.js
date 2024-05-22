@@ -75,9 +75,9 @@ export default class BaseTransferPage extends Component<Props> {
             </div>
             {this.props.children}
             {this.props.error && (
-              <p className={styles.error}>
+              <div className={styles.error}>
                 {intl.formatMessage(this.props.error, this.props.error.values)}
-              </p>
+              </div>
             )}
           </div>
         </div>

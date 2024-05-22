@@ -32,7 +32,6 @@ export const ROUTES = {
     ROOT: '/settings',
     GENERAL: '/settings/general',
     BLOCKCHAIN: '/settings/blockchain',
-    PAPER_WALLET: '/settings/paper-wallet',
     WALLET: '/settings/wallet',
     EXTERNAL_STORAGE: '/settings/external-storage',
     TERMS_OF_USE: '/settings/terms-of-use',
@@ -42,7 +41,6 @@ export const ROUTES = {
   },
   TRANSFER: {
     ROOT: '/transfer',
-    YOROI: '/transfer/yoroi',
   },
   SEND_FROM_URI: {
     ROOT: '/send-from-uri',
@@ -50,9 +48,6 @@ export const ROUTES = {
   OAUTH_FROM_EXTERNAL: {
     DROPBOX: '/foo', // TODO: think about this. GET params don't work well with react-router I think
     // DROPBOX: '/access_token=:token&token_type=:token_type&uid=:uid&account_id=:account_id',
-  },
-  NOTICE_BOARD: {
-    ROOT: '/notice-board',
   },
   // revamp
   STAKING: '/staking',
@@ -62,19 +57,24 @@ export const ROUTES = {
   },
   NFTS: {
     ROOT: '/nfts',
-    DETAILS: '/nfts/:nftId'
+    DETAILS: '/nfts/:nftId',
   },
   DAPP_CONNECTOR: {
-    CONNECTED_WEBSITES: '/connector/connected-websites'
+    CONNECTED_WEBSITES: '/connector/connected-websites',
   },
   EXPERIMENTAL: {
     YOROI_PALETTE: '/experimental/yoroi-palette',
     YOROI_COMPONENTS: '/experimental/components',
-    THEMES: '/experimental/themes'
+    THEMES: '/experimental/themes',
   },
   // Revamp specific routes:
   REVAMP: {
     // `voting` is part of the sidebar
     CATALYST_VOTING: '/voting',
-  }
+  },
+  SWAP: {
+    ROOT: '/swap',
+    ORDERS: '/swap/orders',
+  },
+  EXCHANGE_END: '/exchange-end',
 };

@@ -27,6 +27,7 @@ type Props = {|
   +websiteIcon: string,
   +balance: MultiToken | null,
   +plate: WalletChecksum,
+  +id: string,
 |};
 
 type State = {|
@@ -96,6 +97,7 @@ export default class WalletRowRevamp extends Component<Props, State> {
       shouldHideBalance,
       settingsCache,
       websiteIcon,
+      id,
     } = this.props;
     const { showDeleteIcon } = this.state;
 
@@ -122,16 +124,17 @@ export default class WalletRowRevamp extends Component<Props, State> {
             borderColor: 'grayscale.400',
           },
         }}
+        id={id}
       >
         <Box width="100%" display="flex" alignItems="center" gap="8px">
           <Box width="40px" height="40px" overflow="hidden" borderRadius="50%">
             {plateIcon}
           </Box>
           <div>
-            <Typography variant="caption1" color="grayscale.900">
+            <Typography component="div" variant="caption1" color="grayscale.900" id="connectedWalletNameLabel">
               {settingsCache.conceptualWalletName}
             </Typography>
-            <Typography variant="body2" fontWeight={500}>
+            <Typography component="div" variant="body2" fontWeight={500} id="connectedWalletBalanceLabel">
               {this.renderAmountDisplay({
                 shouldHideBalance,
                 amount: balance,
@@ -143,17 +146,18 @@ export default class WalletRowRevamp extends Component<Props, State> {
           <Box width="32px" height="32px" borderRadius="50%" overflow="hidden">
             {websiteIcon ? <img width="100%" src={websiteIcon} alt={url} /> : <NoDappImage />}
           </Box>
-          <Typography
+          <Typography component="div"
             variant="body1"
             color="grayscale.900"
             sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+            id="dAppUrlLabel"
           >
             {url}
           </Typography>
         </Box>
         {showDeleteIcon && (
           <Box position="absolute" right="16px" top="16px">
-            <button onClick={() => onRemoveWallet({ url, protocol })} type="button">
+            <button onClick={() => onRemoveWallet({ url, protocol })} type="button" id="removeWalletButton">
               <DeleteIcon />
             </button>
           </Box>

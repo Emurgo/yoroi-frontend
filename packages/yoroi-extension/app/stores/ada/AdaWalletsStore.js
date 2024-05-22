@@ -6,11 +6,13 @@ import Request from '../lib/LocalizedRequest';
 import type { GenerateWalletRecoveryPhraseFunc } from '../../api/ada/index';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import { buildCheckAndCall } from '../lib/check';
-import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { HARD_DERIVATION_START } from '../../config/numbersConfig';
+import { asGetAllUtxos } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { fail, first, forceNonNull, sorted } from '../../coreUtils';
+import type { QueriedUtxo } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import BigNumber from 'bignumber.js';
 
 export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
   // REQUESTS
@@ -23,13 +25,9 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
   setup(): void {
     super.setup();
     const { ada, walletBackup } = this.actions;
-    const { asyncCheck } = buildCheckAndCall(ApiOptions.ada, () => {
-      if (this.stores.profile.selectedNetwork == null) return undefined;
-      return getApiForNetwork(this.stores.profile.selectedNetwork);
-    });
-    walletBackup.finishWalletBackup.listen(asyncCheck(this._createInDb));
+    walletBackup.finishWalletBackup.listen(this._createInDb);
     ada.wallets.startWalletCreation.listen(this._startWalletCreation);
-    ada.wallets.createWallet.listen(asyncCheck(this._createWallet))
+    ada.wallets.createWallet.listen(this._createWallet)
   }
 
   // =================== SEND MONEY ==================== //
@@ -131,7 +129,6 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
     if (selectedNetwork == null) throw new Error(`${nameof(this._createInDb)} no network selected`);
     await this.stores.wallets.createWalletRequest.execute(async () => {
       const wallet = await this.api.ada.createWallet({
-        mode: 'cip1852',
         db: persistentDb,
         walletName: this.stores.walletBackup.name,
         walletPassword: this.stores.walletBackup.password,
@@ -156,7 +153,6 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
     if (selectedNetwork == null) throw new Error(`${nameof(this._createInDb)} no network selected`);
     await this.stores.wallets.createWalletRequest.execute(async () => {
       const wallet = await this.api.ada.createWallet({
-        mode: 'cip1852',
         db: persistentDb,
         walletName: request.walletName,
         walletPassword: request.walletPassword,
@@ -167,4 +163,32 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
       return wallet;
     }).promise;
   };
+
+  pickCollateralUtxo: ({| wallet: PublicDeriver<> |}) => Promise<QueriedUtxo> = async ({ wallet }) => {
+    const withUtxos = asGetAllUtxos(wallet)
+      ?? fail(`${nameof(this.pickCollateralUtxo)} missing utxo functionality`);
+    const allUtxos: Array<QueriedUtxo> = await withUtxos.getAllUtxos();
+    if (allUtxos.length === 0) {
+      fail('Cannot pick a collateral utxo! No utxo available at all in the wallet!');
+    }
+    const utxoDefaultCoinAmount = (u: QueriedUtxo): BigNumber =>
+      new BigNumber(u.output.tokens.find(x => x.Token.Identifier === '')?.TokenList.Amount ?? 0);
+    const compareDefaultCoins = (a: QueriedUtxo, b: QueriedUtxo): number =>
+      utxoDefaultCoinAmount(a).comparedTo(utxoDefaultCoinAmount(b));
+    // can force non-null because of array length check above
+    return forceNonNull(first(sorted(allUtxos, (a, b) => {
+      const aIsPure = a.output.tokens.length === 1;
+      const bIsPure = b.output.tokens.length === 1;
+      if (aIsPure && bIsPure) {
+        // smallest pure wins
+        return compareDefaultCoins(a, b);
+      }
+      if (aIsPure || bIsPure) {
+        // pure wins
+        return aIsPure ? -1 : 1;
+      }
+      // largest dirty wins to try and make sure it can handle the change
+      return compareDefaultCoins(b, a);
+    })));
+  }
 }

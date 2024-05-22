@@ -44,12 +44,12 @@ function WalletChecksumTipsDialog(props: Props & Intl): Node {
 
   return (
     <InfoDialog open={open} onClose={onClose}>
-      <Typography textAlign="center" variant="body1" fontWeight="500" mb="16px">
+      <Typography component="div" textAlign="center" variant="body1" fontWeight="500" mb="16px">
         {intl.formatMessage(messages.title)}
       </Typography>
       <Box component="ul" sx={{ listStyle: 'outside', px: '24px' }}>
         <Box component="li">
-          <Typography variant="body1" color="grey.800">
+          <Typography component="div" variant="body1" color="grey.800">
             <FormattedMessage
               {...messages.firstTip}
               values={{
@@ -65,12 +65,12 @@ function WalletChecksumTipsDialog(props: Props & Intl): Node {
           </Typography>
         </Box>
         <Box component="li">
-          <Typography variant="body1" color="grey.800">
+          <Typography component="div" variant="body1" color="grey.800">
             <FormattedHTMLMessage {...messages.secondTip} values={{ plateText: plateTextPart }} />
           </Typography>
         </Box>
         <Box component="li">
-          <Typography variant="body1" color="grey.800">
+          <Typography component="div" variant="body1" color="grey.800">
             {intl.formatMessage(messages.thirdTip)}
           </Typography>
         </Box>

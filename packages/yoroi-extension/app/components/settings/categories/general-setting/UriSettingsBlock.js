@@ -40,11 +40,11 @@ class UriSettingsBlock extends Component<Props & InjectedProps> {
           borderColor: !isRevampLayout && 'var(--yoroi-palette-gray-200)',
         }}
       >
-        <Typography variant={isRevampLayout ? 'body1' : 'h5'} fontWeight={500} mb="12px">
+        <Typography component="div" variant={isRevampLayout ? 'body1' : 'h5'} fontWeight={500} mb="12px">
           {intl.formatMessage(globalMessages.uriSchemeLabel)}
         </Typography>
 
-        <Typography variant={isRevampLayout ? 'body1' : 'body2'} color="common.black">
+        <Typography component="div" variant={isRevampLayout ? 'body1' : 'body2'} color="common.black">
           {intl.formatMessage(
             isRevampLayout ? globalMessages.uriExplanationRevamp : globalMessages.uriExplanation
           )}
@@ -67,6 +67,7 @@ class UriSettingsBlock extends Component<Props & InjectedProps> {
               p: isRevampLayout && '13px 24px',
             },
           }}
+          id="settings:blockchain-allowPaymentURL-button"
         >
           {intl.formatMessage(globalMessages.allowLabel)}
         </Button>

@@ -45,7 +45,7 @@ class ExportWallet extends Component<Props & InjectedProps> {
           borderColor: !isRevampLayout && 'var(--yoroi-palette-gray-200)',
         }}
       >
-        <Typography
+        <Typography component="div"
           variant={isRevampLayout ? 'body1' : 'h5'}
           fontWeight={500}
           mb={isRevampLayout ? '16px' : '12px'}
@@ -54,7 +54,7 @@ class ExportWallet extends Component<Props & InjectedProps> {
           {intl.formatMessage(messages.titleLabel)}
         </Typography>
 
-        <Typography
+        <Typography component="div"
           variant={isRevampLayout ? 'body1' : 'body2'}
           color="common.black"
           mb={isRevampLayout ? '16px' : '12px'}
@@ -71,6 +71,7 @@ class ExportWallet extends Component<Props & InjectedProps> {
             marginTop: !isRevampLayout && '20px',
             width: isRevampLayout ? 'fit-content' : '400px',
           }}
+          id="settings:wallet-exportWallet-button"
         >
           {`${this.context.intl.formatMessage(globalMessages.exportButtonLabel)}`}
         </Button>

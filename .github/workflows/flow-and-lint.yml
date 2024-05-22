@@ -1,12 +1,15 @@
 name: Flow and lint
 
 on:
+  workflow_dispatch:
+  pull_request:
+    types: [ opened, ready_for_review ]
   pull_request_review:
     types: [ submitted ]
 
 jobs:
   flow-and-lint:
-    if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check') || contains(github.event.review.body, '/release-check'))
+    if: github.event_name == 'workflow_dispatch' || (github.event.pull_request && github.event.pull_request.draft == false) || (github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check') || contains(github.event.review.body, '/release-check')))
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

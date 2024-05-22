@@ -1,5 +1,5 @@
 // @flow
-import '../test-config';
+import '../test-config.forTests';
 import { RustModule } from './rustLoader';
 import { CatalystLabels, generateRegistration } from './catalyst';
 
@@ -16,10 +16,9 @@ test('Generate Catalyst registration tx', async () => {
       Buffer.from('4820f7ce221e177c8eae2b2ee5c1f1581a0d88ca5c14329d8f2389e77a465655c27662621bfb99cb9445bf8114cc2a630afd2dd53bc88c08c5f2aed8e9c7cb89', 'hex')
     );
 
-    // eslint-disable-next-line max-len
     // stake_test1uzhr5zn6akj2affzua8ylcm8t872spuf5cf6tzjrvnmwemcehgcjm (e0ae3a0a7aeda4aea522e74e4fe36759fca80789a613a58a4364f6ecef)
     const address = Scope.WalletV4.RewardAddress.new(
-      Scope.WalletV4.NetworkInfo.testnet().network_id(),
+      Scope.WalletV4.NetworkInfo.testnet_preprod().network_id(),
       Scope.WalletV4.Credential.from_keyhash(stakePrivateKey.to_public().hash()),
     );
 

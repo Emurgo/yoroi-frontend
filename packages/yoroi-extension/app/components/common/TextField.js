@@ -8,11 +8,13 @@ import { ReactComponent as DoneIcon } from '../../assets/images/forms/done.inlin
 import { ReactComponent as EyeIcon } from '../../assets/images/forms/password-eye-close.inline.svg';
 import { ReactComponent as CloseEyeIcon } from '../../assets/images/forms/password-eye.inline.svg';
 import { ReactComponent as QRLogo } from '../../assets/images/qr-code.inline.svg';
+import LoadingSpinner from '../widgets/LoadingSpinner';
 
 type Props = {|
   error?: boolean | string,
   helperText?: string,
   done?: boolean,
+  greenCheck?: boolean,
   type?: string,
   className?: string,
   value: any,
@@ -26,6 +28,7 @@ type Props = {|
   revamp?: boolean,
   placeholder?: string,
   QRHandler?: Function,
+  isLoading?: boolean,
 |};
 
 function TextField({
@@ -35,6 +38,7 @@ function TextField({
   error,
   helperText,
   done,
+  greenCheck,
   type,
   inputRef,
   className,
@@ -45,6 +49,7 @@ function TextField({
   revamp,
   QRHandler,
   placeholder,
+  isLoading,
   ...props
 }: Props): Node {
   const theme = useTheme();
@@ -72,63 +77,73 @@ function TextField({
       onChange={onChange}
       type={type !== 'password' ? type : showPassword ? 'text' : 'password'}
       variant={Boolean(revamp) ? 'standard' : 'outlined'}
+      sx={{
+        '& .MuiFormHelperText-root': {
+          marginTop: '4px',
+          letterSpacing: '0.2px',
+        },
+      }}
       /*
         In order to show placeholders for classic theme we dont' need to override
         'shrink' and 'notched' prop status so we pass an empty object
       */
       InputLabelProps={
-        theme.name === 'classic' ? { shrink: true, ...InputLabelProps } : { ...InputLabelProps }
-      }
+          theme.name === 'classic' ? { shrink: true, ...InputLabelProps } : { ...InputLabelProps }
+        }
       InputProps={{
         ...((Boolean(revamp) ? { disableUnderline: true } : {}): any),
         ...((theme.name === 'classic' ? { notched: false } : {}): any),
-        endAdornment:
-          type === 'password' ? (
-            <InputAdornment
-              position="end"
-              sx={{ minWidth: '52px', display: 'flex', justifyContent: 'flex-end' }}
+        sx: value.length  === 0 ? { color: 'grayscale.900 !important' } : null,
+        endAdornment: isLoading ? (
+          <InputAdornment position="end" sx={{ marginTop: '-26px' }}>
+            <LoadingSpinner small />
+          </InputAdornment>
+        ) : type === 'password' ? (
+          <InputAdornment
+            position="end"
+            sx={{ minWidth: '52px', display: 'flex', justifyContent: 'flex-end' }}
+          >
+            {Boolean(error) === true && !isRevampTheme ? (
+              <ErrorIcon />
+            ) : done === true && !isRevampTheme ? (
+              <DoneIcon />
+            ) : null}
+            <IconButton
+              aria-label="toggle password visibility"
+              onClick={handleClickShowPassword}
+              onMouseDown={handleMouseDownPassword}
+              edge="end"
+              sx={{
+                width: '40px',
+                height: '40px',
+              }}
             >
-              {Boolean(error) === true && !isRevampTheme ? (
-                <ErrorIcon />
-              ) : done === true && !isRevampTheme ? (
-                <DoneIcon />
-              ) : null}
-              <IconButton
-                aria-label="toggle password visibility"
-                onClick={handleClickShowPassword}
-                onMouseDown={handleMouseDownPassword}
-                edge="end"
-                sx={{
-                  width: '40px',
-                  height: '40px',
-                }}
-              >
-                {showPassword ? <CloseEyeIcon /> : <EyeIcon />}
-              </IconButton>
-            </InputAdornment>
-          ) : QRHandler ? (
-            <InputAdornment
-              position="end"
-              sx={{ minWidth: '52px', display: 'flex', justifyContent: 'flex-end' }}
-            >
-              {Boolean(error) === true && !isRevampTheme ? (
-                <ErrorIcon />
-              ) : done === true && !isRevampTheme ? (
-                <DoneIcon />
-              ) : null}
-              <IconButton aria-label="QR Code Scanner" onClick={QRHandler} edge="end">
-                <QRLogo />
-              </IconButton>
-            </InputAdornment>
-          ) : (
-            <InputAdornment position="end">
-              {Boolean(error) === true && !isRevampTheme ? (
-                <ErrorIcon />
-              ) : done === true && !isRevampTheme ? (
-                <DoneIcon />
-              ) : null}
-            </InputAdornment>
-          ),
+              {showPassword ? <CloseEyeIcon /> : <EyeIcon />}
+            </IconButton>
+          </InputAdornment>
+        ) : QRHandler ? (
+          <InputAdornment
+            position="end"
+            sx={{ minWidth: '52px', display: 'flex', justifyContent: 'flex-end' }}
+          >
+            {Boolean(error) === true && !isRevampTheme ? (
+              <ErrorIcon />
+            ) : done === true && !isRevampTheme ? (
+              <DoneIcon />
+            ) : null}
+            <IconButton aria-label="QR Code Scanner" onClick={QRHandler} edge="end">
+              <QRLogo />
+            </IconButton>
+          </InputAdornment>
+        ) : (
+          <InputAdornment position="end">
+            {Boolean(error) === true && !isRevampTheme ? (
+              <ErrorIcon />
+            ) : (done === true && !isRevampTheme) || greenCheck ? (
+              <DoneIcon />
+            ) : null}
+          </InputAdornment>
+        ),
         placeholder: placeholder != null ? placeholder : '',
       }}
       {...props}
@@ -138,6 +153,7 @@ function TextField({
 TextField.defaultProps = {
   label: '',
   done: false,
+  greenCheck: false,
   error: '',
   helperText: ' ',
   className: '',
@@ -151,6 +167,7 @@ TextField.defaultProps = {
   revamp: false,
   QRHandler: null,
   placeholder: undefined,
+  isLoading: false,
 };
 
 export default TextField;

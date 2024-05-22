@@ -26,9 +26,8 @@ import Config from '../../../../../../config';
 import type {
   NetworkRow, TokenRow,
 } from '../../database/primitives/tables';
-import type {
-  DefaultTokenEntry,
-} from '../../../../../common/lib/MultiToken';
+import type { DefaultTokenEntry } from '../../../../../common/lib/MultiToken';
+import { MultiToken } from '../../../../../common/lib/MultiToken';
 
 /** Snapshot of a ConceptualWallet in the database */
 export class ConceptualWallet implements IConceptualWallet, IRename {
@@ -67,6 +66,10 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
       defaultNetworkId: this.networkInfo.NetworkId,
       defaultIdentifier: this.defaultToken.Identifier,
     };
+  }
+
+  getDefaultMultiToken(): MultiToken {
+    return new MultiToken([], this.getDefaultToken());
   }
 
   getConceptualWalletId(): number {

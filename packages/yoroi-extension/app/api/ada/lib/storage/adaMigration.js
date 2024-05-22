@@ -4,48 +4,31 @@
 
 import type { lf$Database } from 'lovefield';
 import {
-  resetLegacy,
+  clearStorageV1,
+  getCurrentCryptoAccount,
   getLegacyAddressesList,
   legacyGetLastReceiveAddressIndex,
-  legacySaveLastReceiveAddressIndex,
   legacyGetLocalStorageWallet,
-  getCurrentCryptoAccount,
-  clearStorageV1,
+  legacySaveLastReceiveAddressIndex,
   legacyStorageKeys,
+  resetLegacy,
 } from './database/legacy';
 import LocalStorageApi from '../../../localStorage/index';
-import {
-  Logger,
-} from '../../../../utils/logging';
+import { Logger, } from '../../../../utils/logging';
 import satisfies from 'semver/functions/satisfies';
-import {
-  TabIdKeys,
-} from '../../../../utils/tabManager';
+import { TabIdKeys, } from '../../../../utils/tabManager';
 import { migrateFromStorageV1 } from './bridge/walletBuilder/byron';
 import { RustModule } from '../cardanoCrypto/rustLoader';
 import { removeAllTransactions } from './bridge/updateTransactions';
 import { removePublicDeriver } from './bridge/walletBuilder/remove';
-import {
-  asHasLevels,
-  asGetAllUtxos,
-} from './models/PublicDeriver/traits';
-import {
-  ConceptualWallet,
-  isLedgerNanoWallet,
-} from './models/ConceptualWallet/index';
+import { asGetAllUtxos, asHasLevels, } from './models/PublicDeriver/traits';
+import { ConceptualWallet, isLedgerNanoWallet, } from './models/ConceptualWallet/index';
 import { loadWalletsFromStorage } from './models/load';
 import environment from '../../../../environment';
-import { KeyKind } from '../../../common/lib/crypto/keys/types';
-import {
-  removeLocalItem, getLocalItem,
-} from '../../../localStorage/primitives';
-import {
-  isCardanoHaskell, isErgo, networks
-} from './database/prepackaged/networks';
-import {
-  getAllSchemaTables,
-  raii,
-} from './database/utils';
+import { KeyKind } from '../cardanoCrypto/keys/types';
+import { getLocalItem, removeLocalItem, } from '../../../localStorage/primitives';
+import { isCardanoHaskell, networks } from './database/prepackaged/networks';
+import { getAllSchemaTables, raii, } from './database/utils';
 import type { BlockRow } from './database/primitives/tables';
 import { GetBlock } from './database/primitives/api/read';
 import { ModifyUtxoAtSafePoint } from './database/utxo/api/write';
@@ -110,21 +93,11 @@ export async function migrateToLatest(
       const ledgerDeviceWasRemove = await removeLedgerDevices(persistentDb);
       return txHistoryWasReset || ledgerDeviceWasRemove;
     }],
-    ['<3.7.0', async () => {
-      return await removeErgoDevices(persistentDb);
-    }],
     ['<3.8.0', async () => {
       return await cardanoTxHistoryReset(persistentDb);
     }],
-    ['<3.9.6', async () => {
-      return await ergoTxHistoryReset(persistentDb);
-    }],
     ['<4.18', async () => {
       return await populateNewUtxodata(persistentDb);
-    }],
-    ['<4.23', async () => {
-      // Ergo sunset
-      return await removeErgoDevices(persistentDb);
     }],
   ];
 
@@ -224,6 +197,7 @@ async function bip44Migration(
  * This migrates to a new storage format to allow multiple wallets and different kinds of wallets
  * see v2 storage spec for more details
  */
+// <TODO:PENDING_REMOVAL> legacy migration
 export async function storageV2Migration(
   persistentDb: lf$Database,
 ): Promise<boolean> {
@@ -328,55 +302,6 @@ async function removeLedgerDevices(
   return removedAWallet;
 }
 
-async function removeErgoDevices(
-  persistentDb: lf$Database,
-): Promise<boolean> {
-  const wallets = await loadWalletsFromStorage(persistentDb);
-  if (wallets.length === 0) {
-    return false;
-  }
-
-  let removedAWallet = false;
-  for (const publicDeriver of wallets) {
-    if (!isErgo(publicDeriver.getParent().getNetworkInfo())) {
-      continue;
-    }
-    // recall: at this point, we only supported Ergo on nightly
-    await removePublicDeriver({
-      publicDeriver,
-      conceptualWallet: publicDeriver.getParent(),
-    });
-    removedAWallet = true;
-  }
-  return removedAWallet;
-}
-
-/**
- * clear the transaction history for all wallets
- * useful if there was a bug in transaction processing
- */
-export async function ergoTxHistoryReset(
-  persistentDb: lf$Database,
-): Promise<boolean> {
-  const wallets = await loadWalletsFromStorage(persistentDb);
-  if (wallets.length === 0) {
-    return false;
-  }
-
-  for (const publicDeriver of wallets) {
-    const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
-    if (!isErgo(publicDeriver.getParent().getNetworkInfo())) {
-      continue;
-    }
-    if (withLevels == null) {
-      throw new Error(`${nameof(ergoTxHistoryReset)} missing levels`);
-    }
-    await removeAllTransactions({ publicDeriver: withLevels });
-  }
-
-  return true;
-}
-
 export async function populateNewUtxodata(
   persistentDb: lf$Database,
 ): Promise<boolean> {
@@ -387,7 +312,7 @@ export async function populateNewUtxodata(
 
   for (const publicDeriver of wallets) {
     try {
-      if (isErgo(publicDeriver.getParent().getNetworkInfo())) {
+      if (!isCardanoHaskell(publicDeriver.getParent().getNetworkInfo())) {
         continue;
       }
 

@@ -1,5 +1,4 @@
 //@flow
-import { isArray } from 'util';
 
 import type {
   CardanoAssetMintMetadata,
@@ -20,10 +19,6 @@ export function find721metadata(
     return null;
   }
   const metadata = metadataWrapper['721'];
-  if (metadata.version && metadata.version !== '1.0') {
-    return null;
-  }
-
   const assetName = Array.from(Buffer.from(assetNameHex, 'hex')).map(
     c => String.fromCharCode(c)
   ).join('');
@@ -45,7 +40,7 @@ export function find721metadata(
   }
   if (
     typeof asset.image === 'string' || (
-      isArray(asset.image) &&  asset.image.every(i => typeof i === 'string')
+      Array.isArray(asset.image) &&  asset.image.every(i => typeof i === 'string')
     )
   ) {
     ret.image = asset.image;
@@ -55,19 +50,19 @@ export function find721metadata(
   }
   if (
     typeof asset.description === 'string' || (
-      isArray(asset.description) && asset.description.every(i => typeof i === 'string')
+      Array.isArray(asset.description) && asset.description.every(i => typeof i === 'string')
     )
   ) {
     ret.description = asset.description;
   }
   if (
-    isArray(asset.files) &&
-      asset.files.every(({name, mediaType, src }) => (
+    Array.isArray(asset.files) &&
+      asset.files.every(({ name, mediaType, src }) => (
         typeof name === 'string' &&
           typeof mediaType === 'string' &&
           (
             typeof src === 'string' ||
-              (isArray(src) && src.every(s => typeof s === 'string'))
+              (Array.isArray(src) && src.every(s => typeof s === 'string'))
           )
       ))
   ) {
@@ -101,7 +96,7 @@ export function getImageFromTokenMetadata(
     return nftMetadata.image;
   }
   if (
-    isArray(nftMetadata.image) &&
+    Array.isArray(nftMetadata.image) &&
       nftMetadata.image.every(s => typeof s === 'string')
   ) {
     return nftMetadata.image.join('');
@@ -156,8 +151,8 @@ export function getDescriptionFromTokenMetadata(
   if (typeof nftMetadata.description === 'string') {
     return nftMetadata.description;
   }
-  if (typeof nftMetadata.description?.[0] === 'string') {
-    return nftMetadata.description[0];
+  if (Array.isArray(nftMetadata.description)) {
+    return nftMetadata.description.join('');
   }
   return null;
 }

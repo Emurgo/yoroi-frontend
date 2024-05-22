@@ -1,5 +1,5 @@
 // @flow
-import { Component, } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
@@ -436,9 +436,9 @@ export default class TransferSummaryPage extends Component<Props> {
         <div className={styles.errorWrapper}>
           {
             error && !isSubmitting && (
-              <p className={styles.error}>
+              <div className={styles.error}>
                 {intl.formatMessage(error, error.values)}
-              </p>
+              </div>
             )
           }
         </div>

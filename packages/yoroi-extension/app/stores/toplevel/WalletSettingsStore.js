@@ -1,36 +1,20 @@
 // @flow
-import { observable, action, runInAction } from 'mobx';
+import { action, observable, runInAction } from 'mobx';
 import type { Node } from 'react';
 import { find, } from 'lodash';
-import type { AssuranceMode, } from '../../types/transactionAssuranceTypes';
-import {
-  PublicDeriver,
-} from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import {
-  ConceptualWallet,
-} from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import type { AssuranceMode, } from '../../types/transactionAssurance.types';
+import { PublicDeriver, } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import { ConceptualWallet, } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import Store from '../base/Store';
-import type { ChangeModelPasswordFunc, RenameModelFunc, RemoveAllTransactionsFunc } from '../../api/common';
-import { getApiForNetwork } from '../../api/common/utils';
+import type { ChangeModelPasswordFunc, RemoveAllTransactionsFunc, RenameModelFunc } from '../../api/common';
 import Request from '../lib/LocalizedRequest';
-import {
-  asGetSigningKey,
-  asHasLevels,
-} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import type {
-  IConceptualWallet,
-} from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
-import type {
-  IPublicDeriver,
-} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import { asGetSigningKey, asHasLevels, } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import type { IConceptualWallet, } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import type { IPublicDeriver, } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { removePublicDeriver } from '../../api/ada/lib/storage/bridge/walletBuilder/remove';
-import {
-  groupForWallet,
-} from './WalletStore';
+import { groupForWallet, } from './WalletStore';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import { removeWalletFromLS } from '../../utils/localStorage';
-import { isErgo } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export type PublicDeriverSettingsCache = {|
   publicDeriver: PublicDeriver<>,
@@ -50,10 +34,6 @@ export type WarningList = {|
   dialogs: Array<void => Node>,
 |};
 
-export const getWalletType: PublicDeriver<> => 'ergo' | 'cardano' = (publicDeriver) => {
-  return isErgo(publicDeriver.getParent().getNetworkInfo()) ? 'ergo': 'cardano'
-}
-
 export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
 
   @observable renameModelRequest: Request<RenameModelFunc>
@@ -64,7 +44,6 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
 
   @observable clearHistory: Request<RemoveAllTransactionsFunc>
     = new Request<RemoveAllTransactionsFunc>(async (req) => {
-      const apiType = getApiForNetwork(req.publicDeriver.getParent().getNetworkInfo());
       const ongoingRefreshing = this.stores.transactions.ongoingRefreshing.get(
         req.publicDeriverId
       );
@@ -76,7 +55,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
         }
       }
 
-      const promise = this.api[apiType].removeAllTransactions(req);
+      const promise = this.api.ada.removeAllTransactions(req);
 
       runInAction(() => {
         this.stores.transactions.ongoingRefreshing.set(
@@ -269,15 +248,13 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     if (group == null) {
       throw new Error(`${nameof(this._removeWallet)} wallet doesn't belong to group`);
     }
-    await removeWalletFromLS(request.publicDeriver)
 
     // Remove this wallet from wallet sort list
-    const walletType = getWalletType(request.publicDeriver)
     const walletsNavigation = this.stores.profile.walletsNavigation
     const newWalletsNavigation = {
       ...walletsNavigation,
       // $FlowFixMe[invalid-computed-prop]
-      [walletType]: walletsNavigation[walletType].filter(
+      'cardano': walletsNavigation.cardano.filter(
         walletId => walletId !== request.publicDeriver.publicDeriverId)
     }
     await this.actions.profile.updateSortedWalletList.trigger(newWalletsNavigation);

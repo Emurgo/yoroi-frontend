@@ -1,7 +1,7 @@
 // @flow
 import type { Node } from 'react';
 import type { AddressFilterKind, StandardAddress } from '../../types/AddressFilterTypes';
-import type { Notification } from '../../types/notificationType';
+import type { Notification } from '../../types/notification.types';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import type { TokenEntry, TokenLookupKey } from '../../api/common/lib/MultiToken';
@@ -82,6 +82,7 @@ export default class WalletReceiveRevamp extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
+  locationId: string = 'wallet:receive:infoPanel:footer'
 
   getAmount: TokenEntry => ?Node = tokenEntry => {
     if (this.props.shouldHideBalance) {
@@ -109,7 +110,7 @@ export default class WalletReceiveRevamp extends Component<Props> {
 
   getValueBlock: void => {|
     header: ?Node,
-    body: ($ReadOnly<StandardAddress>) => ?Node,
+    body: ($ReadOnly<StandardAddress>, number) => ?Node,
   |} = () => {
     if (this.props.addressBook) {
       return { header: undefined, body: () => undefined };
@@ -121,8 +122,14 @@ export default class WalletReceiveRevamp extends Component<Props> {
         {intl.formatMessage(messages.outputAmountUTXO)}
       </Typography>
     );
-    const body = address => (
-      <Typography variant="body1" color="grayscale.900" textAlign="right">
+    const body = (address, rowIndex: number) => (
+      <Typography
+        component="div"
+        variant="body1"
+        color="grayscale.900"
+        textAlign="right"
+        id={this.locationId + ':addressRow_' + rowIndex + '-adaAmount-text'}
+      >
         {address.values != null ? (
           <span>{this.getAmount(address.values.getDefaultEntry())}</span>
         ) : (
@@ -176,14 +183,17 @@ export default class WalletReceiveRevamp extends Component<Props> {
             address.isUsed === true ? styles.usedWalletAddress : null,
           ]);
           const notificationElementId = `address-${index}-copyNotification`;
+          const rowLocationId = `${this.locationId}:addressRow_${index}`;
           return (
             <Box
               key={`gen-${address.address}`}
               sx={{ p: '13px 24px !important' }}
               className={addressClasses}
+              id={this.locationId + '-addressRow_' + index + '-box'}
             >
               {/* Address Id */}
               <CopyableAddress
+                id={rowLocationId}
                 hash={address.address}
                 elementId={notificationElementId}
                 onCopyAddress={() => onCopyAddressTooltip(address.address, notificationElementId)}
@@ -199,14 +209,14 @@ export default class WalletReceiveRevamp extends Component<Props> {
                   }
                 >
                   <RawHash light={address.isUsed === true}>
-                    <Typography variant="body1" color="grayscale.900">
+                    <Typography component="div" variant="body1" color="grayscale.900">
                       {truncateAddressShort(address.address, 16)}
                     </Typography>
                   </RawHash>
                 </ExplorableHashContainer>
               </CopyableAddress>
               {/* Address balance block start */}
-              {valueBlock.body(address)}
+              {valueBlock.body(address, index)}
               {/* Generate payment URL for Address action */}
               {onGeneratePaymentURI != null && (
                 <Box
@@ -220,6 +230,7 @@ export default class WalletReceiveRevamp extends Component<Props> {
                     type="button"
                     onClick={onGeneratePaymentURI.bind(this, address.address)}
                     className={styles.btnGenerateURI}
+                    id={rowLocationId + '-generateUrl-button'}
                   >
                     <div className={styles.generateURLActionBlock}>
                       <span className={styles.generateURIIcon}>
@@ -237,7 +248,11 @@ export default class WalletReceiveRevamp extends Component<Props> {
                   justifyContent: 'flex-end',
                 }}
               >
-                <button type="button" onClick={onVerifyAddress.bind(this, address)}>
+                <button
+                  type="button"
+                  onClick={onVerifyAddress.bind(this, address)}
+                  id={rowLocationId + '-verifyAddress-button'}
+                >
                   <div>
                     <span className={styles.verifyIcon}>
                       <VerifyIcon />
@@ -256,10 +271,10 @@ export default class WalletReceiveRevamp extends Component<Props> {
       return (
         <div className={styles.component}>
           {this.props.header}
-          <div className={styles.notFound}>
+          <div className={styles.notFound} id={this.locationId + '-noAddresses-component'}>
             <NoTransactionModernSvg />
             <h1>{intl.formatMessage(messages.noResultsFoundLabel)}</h1>
-            <p>{intl.formatMessage(messages.notFoundAnyAddresses)}</p>
+            <div>{intl.formatMessage(messages.notFoundAnyAddresses)}</div>
           </div>
         </div>
       );

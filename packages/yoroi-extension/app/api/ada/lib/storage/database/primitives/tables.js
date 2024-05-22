@@ -7,9 +7,8 @@ import type {
   CertificateRelationType,
   CoreAddressT,
 } from './enums';
-import type { CertificateKindType } from '@emurgo/js-chain-libs/js_chain_libs';
 import typeof { CertificateKind } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
-import type { KeyKindType } from '../../../../../common/lib/crypto/keys/types';
+import type { KeyKindType } from '../../../cardanoCrypto/keys/types';
 import type { CoinTypesT } from '../../../../../../config/numbersConfig';
 
 export type CommonBaseConfig = {|
@@ -55,21 +54,10 @@ export type CardanoHaskellBaseConfig = [
   $ReadOnly<CardanoHaskellShelleyBaseConfig>
 ];
 
-export type ErgoGenesisBaseConfig = {|
-  ...CommonBaseConfig,
-  MinimumBoxValue: string,
-  FeeAddress: string,
-|};
-export type ErgoBaseConfig = [$ReadOnly<ErgoGenesisBaseConfig>];
-
 // unfortunate hack to get around the fact tuple spreading is broken in Flow
 export type CardanoHaskellConfig = $ReadOnly<InexactSubset<{|
   ...$ElementType<CardanoHaskellBaseConfig, 0>,
   ...$ElementType<CardanoHaskellBaseConfig, 1>,
-|}>>;
-
-export type ErgoConfig = $ReadOnly<InexactSubset<{|
-  ...$ElementType<ErgoBaseConfig, 0>,
 |}>>;
 
 export type NetworkInsert = {|
@@ -92,7 +80,7 @@ export type NetworkInsert = {|
    * Only updates to fields specified here.
    * For these updates, you need to query a full node for current parameters
    */
-  BaseConfig: CardanoHaskellBaseConfig | ErgoBaseConfig,
+  BaseConfig: CardanoHaskellBaseConfig,
   /**
    * Some currencies have totally different implementations that use the same coin type
    * To differentiate these, we need some identifier of the fork
@@ -261,7 +249,6 @@ export type DbBlock = {|
 export const TransactionType = Object.freeze({
   CardanoByron: 0,
   CardanoShelley: 1,
-  Ergo: 2_00,
 });
 
 export type TransactionInsertBase = {|
@@ -296,16 +283,9 @@ export type CardanoShelleyTransactionInsert = {|
   ...TransactionInsertBase,
 |};
 
-export type ErgoTransactionInsert = {|
-  Type: $PropertyType<typeof TransactionType, 'Ergo'>,
-  Extra: null,
-  ...TransactionInsertBase
-|};
-
 export type TransactionInsert =
   CardanoByronTransactionInsert |
-  CardanoShelleyTransactionInsert |
-  ErgoTransactionInsert;
+  CardanoShelleyTransactionInsert;
 
 export type TransactionRow = {|
   TransactionId: number,
@@ -339,7 +319,8 @@ export type CertificatePart = {|
 export type CertificateInsert = {|
   TransactionId: number,
   Ordinal: number, // transactions can contain multiple certificates in some blockchains
-  Kind: CertificateKindType | $Values<CertificateKind>,
+  Kind: $Values<CertificateKind>,
+  // <TODO:PENDING_REMOVAL> Needs redesign
   Payload: string,
 |};
 export type CertificateRow = {|
@@ -368,6 +349,7 @@ export type CertificateAddressRow = {|
   CertificateAddressId: number,
   ...CertificateAddressInsert,
 |};
+
 export const CertificateAddressSchema: {|
   +name: 'CertificateAddress',
   properties: $ObjMapi<CertificateAddressRow, ToSchemaProp>,
@@ -471,22 +453,8 @@ export type CommonMetadata = {|
   // Otherwise it is null or not present.
   lastUpdatedAt?: ?string,
 |};
+
 export type TokenMetadata = {|
-  +type: 'Ergo',
-  /**
-    * This field is just an optimization for rollbacks
-    * With this, we just need to check if the most recent metadata exists
-    * and if we need to rollback, rollback in descending order
-    * note: null -> not in the chain (possible rolled back)
-    * note: 0 for ERG
-  */
-  +height: number | null,
-  // empty string for ERG
-  +boxId: string,
-  // based on https://github.com/ergoplatform/eips/blob/master/eip-0004.md
-  ...CommonMetadata,
-  +description: null | string,
-|} | {|
   +type: 'Cardano',
   // empty string for ADA
   +policyId: string,
@@ -502,7 +470,6 @@ export type TokenInsert = {|
   IsDefault: boolean,
   Digest: number,
   /**
-   * For Ergo, this is the tokenId (box id of first input in tx)
    * for Cardano, this is policyId || assetName
    * Note: we don't use null for the primary token of the chain
    * As some blockchains have multiple primary tokens

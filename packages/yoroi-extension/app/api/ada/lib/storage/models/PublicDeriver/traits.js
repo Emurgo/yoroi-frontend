@@ -29,7 +29,7 @@ import type {
   IGetPublic, IGetPublicRequest, IGetPublicResponse,
   IGetUtxoBalance, IGetUtxoBalanceRequest, IGetUtxoBalanceResponse,
   IScanAccountRequest, IScanAccountResponse, IScanAccountUtxo,
-  IScanChainRequest, IScanChainResponse, IScanChainUtxo,
+  IScanChainUtxo,
   IGetBalance, IGetBalanceRequest, IGetBalanceResponse,
   IGetAllAccountingAddressesRequest, IGetAllAccountingAddressesResponse,
   IGetAllAccounting,
@@ -45,7 +45,7 @@ import type {
 } from '../ConceptualWallet/interfaces';
 
 import {
-  rawGetBip44AddressesByPath,
+  rawGetAddressesByDerivationPath,
   rawGetNextUnusedIndex,
   updateCutoffFromInsert,
   getBalanceForUtxos,
@@ -109,8 +109,7 @@ import type {
 import { ModifyKey, ModifyAddress, } from '../../database/primitives/api/write';
 
 import { v2genAddressBatchFunc, } from '../../../../restoration/byron/scan';
-import { ergoGenAddressBatchFunc, } from '../../../../../ergo/lib/restoration/scan';
-import { scanBip44Chain, scanBip44Account, } from '../../../../../common/lib/restoration/bip44';
+import { scanBip44Account, } from '../../../../../common/lib/restoration/bip44';
 import { scanShelleyCip1852Account } from '../../../../restoration/shelley/scan';
 
 import {
@@ -129,7 +128,6 @@ import { RustModule } from '../../../cardanoCrypto/rustLoader';
 import {
   isCardanoHaskell,
 } from '../../database/prepackaged/networks';
-import { BIP32PublicKey, deriveKey } from '../../../../../common/lib/crypto/keys/keyRepository';
 import {
   GetUtxoAtSafePoint,
   GetUtxoDiffToBestBlock,
@@ -138,6 +136,7 @@ import type {
   Utxo,
 } from '@emurgo/yoroi-lib/dist/utxo/models';
 import { derivePublicByAddressing } from '../../../cardanoCrypto/deriveByAddressing';
+import { addressBech32ToHex } from '../../../cardanoCrypto/utils';
 
 interface Empty {}
 type HasPrivateDeriverDependencies = IPublicDeriver<ConceptualWallet & IHasPrivateDeriver>;
@@ -222,109 +221,102 @@ const GetAllUtxosMixin = (
     _body,
     derivationTables,
   ) => {
-    // TODO: perhaps should use seperate types for Ergo and Cardano wallets instead
-    // of branching
-    if (isCardanoHaskell(this.getParent().getNetworkInfo())) {
-      const addresses = await this.rawGetAllUtxoAddresses(
-        tx,
-        {
-          GetAddress: deps.GetAddress,
-          GetPathWithSpecific: deps.GetPathWithSpecific,
-          GetDerivationSpecific: deps.GetDerivationSpecific,
-        },
-        undefined,
-        derivationTables,
-      );
+    const addresses = await this.rawGetAllUtxoAddresses(
+      tx,
+      {
+        GetAddress: deps.GetAddress,
+        GetPathWithSpecific: deps.GetPathWithSpecific,
+        GetDerivationSpecific: deps.GetDerivationSpecific,
+      },
+      undefined,
+      derivationTables,
+    );
+    const utxoStorageApi = this.getUtxoStorageApi();
+    utxoStorageApi.setDb(super.getDb());
+    utxoStorageApi.setDbTx(tx);
+    const utxosInStorage: Array<Utxo> = await this.getUtxoService().getAvailableUtxos();
+    const networkId = this.getParent().getNetworkInfo().NetworkId;
+    const tokenMap = new Map<string, $ReadOnly<TokenRow>>(
+      (await deps.GetToken.fromIdentifier(
+        super.getDb(), tx,
+        [
+          '',
+          ...utxosInStorage.flatMap(
+            ({ assets }) => assets.map(asset => asset.assetId)
+          )
+        ]
+      )).filter(token => token.NetworkId === networkId)
+        .map(token => [token.Identifier, token])
+    );
+    const addressingMap = new Map<string, {| ...Address, ...Addressing |}>(
+      addresses.flatMap(family => family.addrs.map(addr => [addr.Hash, {
+        addressing: family.addressing,
+        address: addr.Hash,
+      }]))
+    );
+    const addressedUtxos = utxosInStorage.map(utxo => {
+      let addressHash;
+      try {
+        addressHash = addressBech32ToHex(utxo.receiver);
+      } catch {
+        addressHash = utxo.receiver;
+      }
+      const addressingInfo = addressingMap.get(addressHash);
+      if (addressingInfo == null) {
+        throw new Error(`${nameof(GetAllUtxos)}::${nameof(this.rawGetAllUtxos)}: Addressing info not found. Should never happen`);
+      }
 
-      const utxoStorageApi = this.getUtxoStorageApi();
-      utxoStorageApi.setDb(super.getDb());
-      utxoStorageApi.setDbTx(tx);
-      const utxosInStorage: Array<Utxo> = await this.getUtxoService().getAvailableUtxos();
-
-      const networkId = this.getParent().getNetworkInfo().NetworkId;
-      const tokenMap = new Map<string, $ReadOnly<TokenRow>>(
-        (await deps.GetToken.fromIdentifier(
-          super.getDb(), tx,
-          [
-            '',
-            ...utxosInStorage.flatMap(
-              ({ assets }) => assets.map(asset => asset.assetId)
-            )
-          ]
-        )).filter(token => token.NetworkId === networkId)
-          .map(token => [ token.Identifier, token ])
-      );
-
-      const addressingMap = new Map<string, {| ...Address, ...Addressing |}>(
-        addresses.flatMap(family => family.addrs.map(addr => [addr.Hash, {
-          addressing: family.addressing,
-          address: addr.Hash,
-        }]))
-      );
-
-      const addressedUtxos = utxosInStorage.map(utxo => {
-        let addressHash;
-        try {
-          addressHash = Buffer.from(
-            RustModule.WalletV4.Address.from_bech32(utxo.receiver).to_bytes()
-          ).toString('hex')
-        } catch {
-          addressHash = utxo.receiver;
+      const tokens = ['', ...utxo.assets.map(asset => asset.assetId)].map((tokenId, i) => {
+        let amount;
+        if (i === 0) {
+          amount = utxo.amount;
+        } else {
+          amount = utxo.assets[i - 1].amount;
         }
-        const addressingInfo = addressingMap.get(addressHash);
-        if (addressingInfo == null) {
-          throw new Error(`${nameof(GetAllUtxos)}::${nameof(this.rawGetAllUtxos)}: Addressing info not found. Should never happen`);
-        }
-
-        const tokens = [ '', ...utxo.assets.map(asset => asset.assetId) ].map((tokenId, i) => {
-          let amount;
-          if (i === 0) {
-            amount = utxo.amount;
-          } else {
-            amount = utxo.assets[i-1].amount;
-          }
-          const token = tokenMap.get(tokenId) || {
-            // Note this is dummy placeholder value and only the `Identifier` value
-            // matters. The only scenario this is needed is when during `updateUtxos`,
-            // new UTXOs with unseen tokens are added and before it requests the token
-            // info.
-            TokenId: -1,
-            NetworkId: networkId,
-            IsDefault: false,
-            Digest: 0,
-            Identifier: tokenId,
-            Metadata: {
-              type: 'Cardano',
-              policyId: tokenId.split('.')[0],
-              assetName: tokenId.split('.')[1],
-              numberOfDecimals: 0,
-              ticker: null,
-              longName: null
-            },
-          };
-          return { Token: token, TokenList: { Amount: amount.toString() } };
-        });
-        return {
-          output: {
-            Transaction: { Hash: utxo.txHash },
-            UtxoTransactionOutput: {
-              OutputIndex: utxo.txIndex,
-              ErgoBoxId: null,
-              ErgoCreationHeight: null,
-              ErgoTree: null,
-              ErgoRegisters: null,
-            },
-            tokens,
+        const token = tokenMap.get(tokenId) || {
+          // Note this is dummy placeholder value and only the `Identifier` value
+          // matters. The only scenario this is needed is when during `updateUtxos`,
+          // new UTXOs with unseen tokens are added and before it requests the token
+          // info.
+          TokenId: -1,
+          NetworkId: networkId,
+          IsDefault: false,
+          Digest: 0,
+          Identifier: tokenId,
+          Metadata: {
+            type: 'Cardano',
+            policyId: tokenId.split('.')[0],
+            assetName: tokenId.split('.')[1],
+            numberOfDecimals: 0,
+            ticker: null,
+            longName: null
           },
-          addressing: addressingInfo.addressing,
-          address: addressingInfo.address,
+        };
+        return {
+          Token: token,
+          TokenList: { Amount: amount.toString() }
         };
       });
-      return addressedUtxos;
-    }
-    // Ergo:
-    return this.rawGetAllUtxosFromOldDb(tx, deps, _body, derivationTables);
+      return {
+        output: {
+          Transaction: { Hash: utxo.txHash },
+          UtxoTransactionOutput: {
+            OutputIndex: utxo.txIndex,
+            ErgoBoxId: null,
+            ErgoCreationHeight: null,
+            ErgoTree: null,
+            ErgoRegisters: null,
+          },
+          tokens,
+        },
+        addressing: addressingInfo.addressing,
+        address: addressingInfo.address,
+      };
+    });
+    return addressedUtxos;
   }
+
+  // <TODO:PENDING_REMOVAL> Legacy: used only in migration
   rawGetAllUtxosFromOldDb: (
     lf$Transaction,
     {|
@@ -455,7 +447,7 @@ const GetAllUtxosMixin = (
   ): Promise<IGetAllUtxoAddressesResponse> => {
     // TODO: some way to know if single chain is an account or not
     if (this.getParent().getPublicDeriverLevel() >= Bip44DerivationLevels.CHAIN.level) {
-      return rawGetBip44AddressesByPath(
+      return rawGetAddressesByDerivationPath(
         super.getDb(), tx,
         deps,
         {
@@ -469,7 +461,7 @@ const GetAllUtxosMixin = (
         derivationTables,
       );
     }
-    const externalAddresses = await rawGetBip44AddressesByPath(
+    const externalAddresses = await rawGetAddressesByDerivationPath(
       super.getDb(), tx,
       deps,
       {
@@ -482,7 +474,7 @@ const GetAllUtxosMixin = (
       },
       derivationTables,
     );
-    const internalAddresses = await rawGetBip44AddressesByPath(
+    const internalAddresses = await rawGetAddressesByDerivationPath(
       super.getDb(), tx,
       deps,
       {
@@ -571,7 +563,7 @@ const GetAllAccountingMixin = (
       // we only allow this on accounts instead of any level < ACCOUNT.level to simplify the code
       throw new Error(`${nameof(GetAllAccounting)}::${nameof(this.rawGetAllAccountingAddresses)} incorrect pubderiver level`);
     }
-    return rawGetBip44AddressesByPath(
+    return rawGetAddressesByDerivationPath(
       super.getDb(), tx,
       deps,
       {
@@ -1123,75 +1115,6 @@ export const CardanoBip44PickReceive: * = Mixin<
   IPickReceive
 >(CardanoBip44PickReceiveMixin);
 
-// =====================
-//   ErgoBip44Receive
-// =====================
-
-type ErgoBip44PickReceiveMixinDependencies = IPublicDeriver<>;
-const ErgoBip44PickReceiveMixin = (
-  superclass: Class<ErgoBip44PickReceiveMixinDependencies>,
-) => (class ErgoBip44PickReceive extends superclass implements IPickReceive {
-  rawPickReceive: (
-    lf$Transaction,
-    {|
-      GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetAddress: Class<GetAddress>,
-      GetDerivationSpecific: Class<GetDerivationSpecific>,
-    |},
-    IPickReceiveRequest,
-    Map<number, string>,
-  ) => Promise<IPickReceiveResponse> = async (
-    _tx,
-    _deps,
-    body,
-    _derivationTables,
-  ) => {
-    const legacyAddr = body.addrs
-      .filter(addr => addr.Type === CoreAddressTypes.ERGO_P2PK);
-    if (legacyAddr.length !== 1) throw new Error(`${nameof(ErgoBip44PickReceive)}::${nameof(this.rawPickReceive)} no legacy address found`);
-    return {
-      addr: legacyAddr[0],
-      row: body.row,
-      addressing: body.addressing,
-    };
-  }
-
-  pickReceive: IPickReceiveRequest => Promise<IPickReceiveResponse> = async (
-    body,
-  ) => {
-    const withLevels = asHasLevels<ConceptualWallet>(this);
-    const derivationTables = withLevels == null
-      ? new Map()
-      : withLevels.getParent().getDerivationTables();
-    const deps = Object.freeze({
-      GetPathWithSpecific,
-      GetAddress,
-      GetDerivationSpecific,
-    });
-    const depTables = Object
-      .keys(deps)
-      .map(key => deps[key])
-      .flatMap(table => getAllSchemaTables(super.getDb(), table));
-    return await raii<IPickReceiveResponse>(
-      super.getDb(),
-      [
-        ...depTables,
-        ...mapToTables(super.getDb(), derivationTables),
-      ],
-      async tx => this.rawPickReceive(
-        tx,
-        deps,
-        body,
-        derivationTables,
-      )
-    );
-  }
-});
-export const ErgoBip44PickReceive: * = Mixin<
-  ErgoBip44PickReceiveMixinDependencies,
-  IPickReceive
->(ErgoBip44PickReceiveMixin);
-
 // =======================
 //   Cip1852PickReceive
 // =======================
@@ -1328,7 +1251,7 @@ const HasUtxoChainsMixin = (
     if (this.getParent().getPublicDeriverLevel() !== Bip44DerivationLevels.ACCOUNT.level) {
       throw new Error(`${nameof(HasUtxoChains)}::${nameof(this.rawGetAddressesForChain)} incorrect pubderiver level`);
     }
-    return rawGetBip44AddressesByPath(
+    return rawGetAddressesByDerivationPath(
       super.getDb(), tx,
       deps,
       {
@@ -1886,144 +1809,6 @@ export function asScanShelleyAccountUtxoInstance<
   return undefined;
 }
 
-// =======================
-//   ScanErgoAccountUtxo
-// =======================
-
-type ScanErgoAccountUtxoDependencies = IPublicDeriver<>;
-const ScanErgoAccountUtxoMixin = (
-  superclass: Class<ScanErgoAccountUtxoDependencies>,
-) => (class ScanErgoAccountUtxo extends superclass implements IScanAccountUtxo {
-  rawScanAccount: (
-    lf$Transaction,
-    {|
-      GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetAddress: Class<GetAddress>,
-      GetDerivationSpecific: Class<GetDerivationSpecific>,
-    |},
-    IScanAccountRequest,
-    Map<number, string>,
-  ) => Promise<IScanAccountResponse> = async (
-    _tx,
-    _deps,
-    body,
-    _derivationTables,
-  ): Promise<IScanAccountResponse> => {
-    const key = BIP32PublicKey.fromBuffer(Buffer.from(body.accountPublicKey, 'hex'));
-
-    const network = this.getParent().getNetworkInfo();
-    const chainNetworkId = ((
-      Number.parseInt(network.BaseConfig[0].ChainNetworkId, 10): any
-    ): $Values<typeof RustModule.SigmaRust.NetworkPrefix>);
-
-    return await scanBip44Account({
-      generateInternalAddresses: ergoGenAddressBatchFunc(
-        deriveKey(key, ChainDerivations.INTERNAL).key,
-        chainNetworkId
-      ),
-      generateExternalAddresses: ergoGenAddressBatchFunc(
-        deriveKey(key, ChainDerivations.EXTERNAL).key,
-        chainNetworkId
-      ),
-      lastUsedInternal: body.lastUsedInternal,
-      lastUsedExternal: body.lastUsedExternal,
-      network: this.getParent().getNetworkInfo(),
-      checkAddressesInUse: body.checkAddressesInUse,
-      addByHash: rawGenAddByHash(
-        new Set([
-          ...body.internalAddresses,
-          ...body.externalAddresses,
-        ])
-      ),
-      type: CoreAddressTypes.ERGO_P2PK,
-    });
-  }
-});
-
-const ScanErgoAccountUtxo: * = Mixin<
-  ScanErgoAccountUtxoDependencies,
-  IScanAccountUtxo,
->(ScanErgoAccountUtxoMixin);
-const ScanErgoAccountUtxoInstance = (
-  (ScanErgoAccountUtxo: any): ReturnType<typeof ScanErgoAccountUtxoMixin>
-);
-export function asScanErgoAccountUtxoInstance<
-  T: IPublicDeriver<any>
->(
-  obj: T
-): void | (IScanAccountUtxo & ScanErgoAccountUtxoDependencies & T) {
-  if (obj instanceof ScanErgoAccountUtxoInstance) {
-    return obj;
-  }
-  return undefined;
-}
-
-// ======================
-//   ScanErgoChainUtxo
-// ======================
-
-type ScanErgoChainUtxoDependencies = IPublicDeriver<ConceptualWallet & IHasLevels>;
-const ScanErgoChainUtxoMixin = (
-  superclass: Class<ScanErgoChainUtxoDependencies>,
-) => (class ScanErgoChainUtxo extends superclass implements IScanChainUtxo {
-  rawScanChain: (
-    lf$Transaction,
-    {|
-      GetPathWithSpecific: Class<GetPathWithSpecific>,
-      GetAddress: Class<GetAddress>,
-      GetDerivationSpecific: Class<GetDerivationSpecific>,
-    |},
-    IScanChainRequest,
-    Map<number, string>,
-  ) => Promise<IScanChainResponse> = async (
-    _tx,
-    _deps,
-    body,
-    _derivationTables,
-  ): Promise<IScanChainResponse> => {
-    const key = BIP32PublicKey.fromBuffer(Buffer.from(body.chainPublicKey, 'hex'));
-
-    const network = this.getParent().getNetworkInfo();
-    const networkId = ((
-      Number.parseInt(network.BaseConfig[0].ChainNetworkId, 10): any
-    ): $Values<typeof RustModule.SigmaRust.NetworkPrefix>);
-
-    return await scanBip44Chain({
-      generateAddressFunc: ergoGenAddressBatchFunc(
-        key.key,
-        networkId
-      ),
-      lastUsedIndex: body.lastUsedIndex,
-      network: this.getParent().getNetworkInfo(),
-      checkAddressesInUse: body.checkAddressesInUse,
-      addByHash: rawGenAddByHash(
-        new Set([
-          ...body.addresses,
-        ])
-      ),
-      type: CoreAddressTypes.ERGO_P2PK,
-    });
-  }
-});
-
-const ScanErgoChainUtxo: * = Mixin<
-  ScanErgoChainUtxoDependencies,
-  IScanChainUtxo,
->(ScanErgoChainUtxoMixin);
-const ScanErgoChainUtxoInstance = (
-  (ScanErgoChainUtxo: any): ReturnType<typeof ScanErgoChainUtxoMixin>
-);
-export function asScanErgoChainUtxoInstance<
-  T: IPublicDeriver<any>
->(
-  obj: T
-): void | (IScanChainUtxo & ScanErgoChainUtxoDependencies & T) {
-  if (obj instanceof ScanErgoChainUtxoInstance) {
-    return obj;
-  }
-  return undefined;
-}
-
 // ===================
 //   ScanUtxoAccount
 // ===================
@@ -2239,7 +2024,7 @@ const ScanUtxoChainAddressesMixin = (
       null
     );
 
-    const addresses = await rawGetBip44AddressesByPath(
+    const addresses = await rawGetAddressesByDerivationPath(
       super.getDb(), tx,
       {
         GetAddress: deps.GetAddress,
@@ -2514,9 +2299,12 @@ const traitFuncLookup: {
 } = {
   /* eslint-disable quote-props */
   '2147485463': addTraitsForCardanoBip44,
-  '2147484077': addTraitsForErgoBip44,
   /* eslint-enable quote-props */
 };
+
+export function isSupportedBip44CoinType(coinType: string): boolean {
+  return traitFuncLookup[coinType] != null;
+}
 
 export async function addTraitsForCardanoBip44(
   request: AddBip44TraitsRequest
@@ -2588,84 +2376,6 @@ export async function addTraitsForCardanoBip44(
 
   return { finalClass: currClass, };
 }
-export async function addTraitsForErgoBip44(
-  request: AddBip44TraitsRequest
-): Promise<AddBip44TraitsResponse> {
-  let currClass = request.startClass;
-  /**
-   * WARNING: If you get a weird error about dependencies in this function
-   * There is a high chance it has to do with initialization order
-   * If a trait X is added after trait Y
-   * X must come before Y in this file (even if X doesn't depend on Y)
-   */
-  currClass = HasPrivateDeriver(currClass);
-  currClass = HasLevels(currClass);
-  currClass = HasSign(currClass);
-  currClass = (GetAllUtxos(currClass): Class<IGetAllUtxos & Bip44PublicDeriver>);
-
-  let publicKey;
-  {
-    const deps = Object.freeze({
-      GetKeyForPublicDeriver,
-    });
-    const depTables = Object
-      .keys(deps)
-      .map(key => deps[key])
-      .flatMap(table => getAllSchemaTables(request.db, table));
-    publicKey = await raii<null | $ReadOnly<KeyRow>>(
-      request.db,
-      depTables,
-      async tx => {
-        const derivationAndKey = await deps.GetKeyForPublicDeriver.get(
-          request.db, tx,
-          request.pubDeriver.PublicDeriverId,
-          true,
-          false,
-        );
-        if (derivationAndKey.publicKey === undefined) {
-          throw new StaleStateError(`${nameof(addTraitsForErgoBip44)} publicKey`);
-        }
-        return derivationAndKey.publicKey;
-      }
-    );
-  }
-
-  currClass = AddBip44FromPublic(currClass);
-  currClass = PickReceive(ErgoBip44PickReceive(currClass));
-
-  if (request.conceptualWallet.getPublicDeriverLevel() === Bip44DerivationLevels.CHAIN.level) {
-    currClass = DisplayCutoff(currClass);
-
-    if (publicKey !== null) {
-      currClass = GetPublicKey(currClass);
-      currClass = ScanErgoChainUtxo(currClass);
-      currClass = ScanUtxoChainAddresses(currClass);
-      currClass = ScanAddresses(currClass);
-    }
-  } else if (
-    request.conceptualWallet.getPublicDeriverLevel() === Bip44DerivationLevels.ACCOUNT.level
-  ) {
-    currClass = DisplayCutoff(currClass);
-
-    currClass = HasUtxoChains(currClass);
-    if (publicKey !== null) {
-      currClass = GetPublicKey(currClass);
-      currClass = ScanErgoAccountUtxo(currClass);
-      currClass = ScanUtxoAccountAddresses(currClass);
-      currClass = ScanAddresses(currClass);
-    }
-  } else if (publicKey !== null) {
-    currClass = GetPublicKey(currClass);
-  }
-
-  if (request.conceptualWallet.getSigningLevel() !== null) {
-    currClass = GetSigningKey(currClass);
-  }
-  currClass = GetUtxoBalance(currClass);
-  currClass = GetBalance(currClass);
-
-  return { finalClass: currClass, };
-}
 
 export async function addTraitsForBip44Child(
   request: AddBip44TraitsRequest
@@ -2673,7 +2383,11 @@ export async function addTraitsForBip44Child(
   ...AddBip44TraitsResponse,
   pathToPublic: Array<number>,
 |}> {
-  const traitFunc = traitFuncLookup[request.conceptualWallet.getNetworkInfo().CoinType.toString()];
+  const coinType = request.conceptualWallet.getNetworkInfo().CoinType.toString();
+  const traitFunc = traitFuncLookup[coinType];
+  if (traitFunc == null) {
+    throw new Error(`No trait function found for coin type: ${coinType}`);
+  }
   const { finalClass } = await traitFunc(request);
 
   let pathToPublic;

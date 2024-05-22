@@ -283,7 +283,7 @@ export default class AddNFTDialog extends Component<Props, State> {
                         width="141px"
                         height="141px"
                       />
-                      <Typography
+                      <Typography component="div"
                         variant="body1"
                         color="gray.900"
                         width="140px"
