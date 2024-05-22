@@ -181,7 +181,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     className: 'settings',
     route: '/gouvernance',
     icon: settingIcon,
-    label: globalMessages.sidebarSettings,
+    label: globalMessages.sidebarGouvernance,
     isVisible: _request => true,
   },
   // {

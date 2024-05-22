@@ -675,6 +675,10 @@ const globalMessages: * = defineMessages({
     id: 'sidebar.settings',
     defaultMessage: '!!!Settings',
   },
+  sidebarGouvernance: {
+    id: 'sidebar.gouvernance',
+    defaultMessage: '!!!Gouvernance',
+  },
   sidebarTransfer: {
     id: 'sidebar.transfer',
     defaultMessage: '!!!Claim or transfer wallet',
