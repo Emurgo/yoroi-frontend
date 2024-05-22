@@ -85,42 +85,51 @@ const messages = defineMessages({
   },
 });
 
+const basePageComponentPath = 'settings:general';
+
 const socialMediaLinks = [
   {
     url: 'https://twitter.com/YoroiWallet',
     svg: twitterSvg,
     message: messages.aboutYoroiTwitter,
+    componentId: `${basePageComponentPath}-twitterLink-linkButton`,
   },
   {
     svgClass: styles.yoroiLogo,
     url: 'https://yoroi-wallet.com',
     svg: yoroiSvg,
     message: messages.aboutYoroiWebsite,
+    componentId: `${basePageComponentPath}-yoroiWebsiteLink-linkButton`,
   },
   {
     url: 'https://www.facebook.com/Yoroi-wallet-399386000586822/',
     svg: facebookSvg,
     message: messages.aboutYoroiFacebook,
+    componentId: `${basePageComponentPath}-facebookLink-linkButton`,
   },
   {
     url: 'https://www.youtube.com/channel/UCgFQ0hHuPO1QDcyP6t9KZTQ',
     svg: youtubeSvg,
     message: messages.aboutYoroiYoutube,
+    componentId: `${basePageComponentPath}-youtubeLink-linkButton`,
   },
   {
     url: 'https://t.me/emurgo',
     svg: telegramSvg,
     message: messages.aboutEmurgoTelegram,
+    componentId: `${basePageComponentPath}-telegramLink-linkButton`,
   },
   {
     url: 'https://medium.com/@emurgo_io',
     svg: mediumSvg,
     message: messages.aboutYoroiMedium,
+    componentId: `${basePageComponentPath}-mediumLink-linkButton`,
   },
   {
     url: 'https://github.com/Emurgo/yoroi-frontend',
     svg: githubSvg,
     message: messages.aboutYoroiGithub,
+    componentId: `${basePageComponentPath}-githubLink-linkButton`,
   },
 ];
 
@@ -240,6 +249,7 @@ class AboutYoroiSettingsBlock extends Component<Props & InjectedLayoutProps> {
           <LabelWithValue
             label={intl.formatMessage(messages.networkLabel)}
             value={intl.formatMessage(messages[network])}
+            componentId={basePageComponentPath + '-networkInfo-text'}
           />
         )}
 
@@ -247,12 +257,14 @@ class AboutYoroiSettingsBlock extends Component<Props & InjectedLayoutProps> {
           label={intl.formatMessage(messages.versionLabel)}
           value={environment.getVersion()}
           url={baseGithubUrl + 'releases/'}
+          componentId={basePageComponentPath + '-versionInfo-text'}
         />
 
         <LabelWithValue
           label={intl.formatMessage(messages.commitLabel)}
           value={environment.commit}
           url={baseGithubUrl + 'commit/' + environment.commit}
+          componentId={basePageComponentPath + '-commitInfo-text'}
         />
 
         {!environment.isProduction() && (
@@ -260,6 +272,7 @@ class AboutYoroiSettingsBlock extends Component<Props & InjectedLayoutProps> {
             label={intl.formatMessage(messages.branchLabel)}
             value={environment.branch}
             url={baseGithubUrl + 'tree/' + environment.branch}
+            componentId={basePageComponentPath + '-branchInfo-text'}
           />
         )}
 
@@ -289,10 +302,12 @@ function LabelWithValue({
   label,
   value,
   url,
+  componentId,
 }: {|
   label: string,
   value: string,
   url?: string,
+  componentId?: string,
 |}): Node {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -310,6 +325,7 @@ function LabelWithValue({
         variant="body1"
         color="grayscale.max"
         sx={{ textDecoration: 'none' }}
+        id={componentId || 'somewhere-someValue-text'}
       >
         {value}
       </Typography>
