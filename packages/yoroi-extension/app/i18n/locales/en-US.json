@@ -1009,5 +1009,7 @@
   "yoroiTransfer.waiting.checkingAddresses.generatingTx": "Generating transfer transaction",
   "yoroiTransfer.waiting.progressInfo.checkingAddresses": "Checking addresses funds",
   "yoroiTransfer.waiting.progressInfo.restoringAddresses": "Fetching addresses",
-  "yoroiTransfer.waiting.title.label": "Wallet is being restored"
+  "yoroiTransfer.waiting.title.label": "Wallet is being restored",
+  "gouvernace.delegateToDRep":"Delegate to a DRep",
+  "gouvernace.designatingSomeoneElse":"You are designating someone else to cast your vote on your behalf for all proposals now and in the future."
 }
