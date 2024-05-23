@@ -36,6 +36,8 @@ import FullscreenLayout from './components/layout/FullscreenLayout';
 // New UI pages
 import GouvernancePage from './UI/pages/Gouvernance/GouvernancePage';
 import GouvernanceDelegationFormPage from './UI/pages/Gouvernance/GouvernanceDelegationFormPage';
+import GouvernanceTransactionSubmittedPage from './UI/pages/Gouvernance/GouvernanceTransactionSubmittedPage';
+import GouvernanceTransactionFailedPage from './UI/pages/Gouvernance/GouvernanceTransactionFailedPage';
 
 // PAGES
 const LanguageSelectionPagePromise = () => import('./containers/profile/LanguageSelectionPage');
@@ -497,6 +499,20 @@ const GouvernanceSubpages = (stores, actions) => (
       path={ROUTES.Gouvernance.DELEGATE}
       component={props => (
         <GouvernanceDelegationFormPage {...props} stores={stores} actions={actions} />
+      )}
+    />
+    <Route
+      exact
+      path={ROUTES.Gouvernance.SUBMITTED}
+      component={props => (
+        <GouvernanceTransactionSubmittedPage {...props} stores={stores} actions={actions} />
+      )}
+    />
+    <Route
+      exact
+      path={ROUTES.Gouvernance.FAIL}
+      component={props => (
+        <GouvernanceTransactionFailedPage {...props} stores={stores} actions={actions} />
       )}
     />
   </Switch>

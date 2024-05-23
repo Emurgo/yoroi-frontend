@@ -82,5 +82,7 @@ export const ROUTES = {
   Gouvernance: {
     ROOT: '/gouvernance',
     DELEGATE: '/gouvernance/delagation',
+    SUBMITTED: '/gouvernance/submitted',
+    FAIL: '/gouvernance/failed',
   },
 };
