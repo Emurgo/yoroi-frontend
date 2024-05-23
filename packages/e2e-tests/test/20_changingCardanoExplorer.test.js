@@ -3,7 +3,7 @@ import { customAfterEach } from '../utils/customHooks.js';
 import TransactionsSubTab from '../pages/wallet/walletTab/walletTransactions.page.js';
 import { testWallet1 } from '../utils/testWallets.js';
 import { expect } from 'chai';
-import { getTestLogger, roundUpCurrency } from '../utils/utils.js';
+import { getTestLogger } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
 import { restoreWallet } from '../helpers/restoreWalletHelper.js';
 import SettingsTab from '../pages/wallet/settingsTab/settingsTab.page.js';
@@ -24,23 +24,23 @@ describe('Changing explorer', function () {
   const testData = [
     {
       explorerName: 'CardanoScan',
-      reExplorerURL: /^https\:\/\/cardanoscan\.io/,
+      reExplorerURL: /^https:\/\/cardanoscan\.io/,
     },
     {
       explorerName: 'AdaStat',
-      reExplorerURL: /^https\:\/\/adastat\.net/,
+      reExplorerURL: /^https:\/\/adastat\.net/,
     },
     {
       explorerName: 'CardanoExplorer',
-      reExplorerURL: /^https\:\/\/explorer\.cardano\.org/,
+      reExplorerURL: /^https:\/\/explorer\.cardano\.org/,
     },
     {
       explorerName: 'Cexplorer',
-      reExplorerURL: /^https\:\/\/cexplorer\.io/,
+      reExplorerURL: /^https:\/\/cexplorer\.io/,
     },
     {
       explorerName: 'Blockchair',
-      reExplorerURL: /^https\:\/\/blockchair\.com/,
+      reExplorerURL: /^https:\/\/blockchair\.com/,
     },
   ];
 
