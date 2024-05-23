@@ -13,7 +13,6 @@ type Props = {|
 |};
 
 const GouvernanceLayout = ({ stores, actions, children }: Props): any => {
-  console.log('@@@@@@@@@@@@GouvernanceLayout');
   return (
     <GeneralPageLayout
       stores={stores}
