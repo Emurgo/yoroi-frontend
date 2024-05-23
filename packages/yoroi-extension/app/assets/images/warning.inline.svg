@@ -3,7 +3,7 @@
     <!-- Generator: Sketch 52.2 (67145) - http://www.bohemiancoding.com/sketch -->
     <title>warning.inline</title>
     <desc>Created with Sketch.</desc>
-    <g id="warning.inline" stroke="none" stroke-width="1" fill="none" fillRule="evenodd">
+    <g id="warning.inline" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <path d="M17.8717716,15.984375 C18.0142479,16.2708348 18.0379935,16.5052074 17.9430094,16.6875 C17.8242792,16.8958344 17.6580594,17 17.4443451,17 L2.55565488,17 C2.34194055,17 2.17572079,16.8958344 2.05699061,16.6875 C1.96200647,16.5052074 1.98575215,16.2708348 2.12822836,15.984375 L9.50133573,2.3515625 C9.62006591,2.11718633 9.78628567,2 10,2 C10.2137143,2 10.3799341,2.11718633 10.4986643,2.3515625 L17.8717716,15.984375 Z M11.139804,15.125 L11.139804,13.25 L8.86019596,13.25 L8.86019596,15.125 L11.139804,15.125 Z M11.139804,12 L11.139804,6.375 L8.86019596,6.375 L8.86019596,12 L11.139804,12 Z" id="ion-alert-circled---Ionicons" fill="#FFFFFF"></path>
     </g>
 </svg>

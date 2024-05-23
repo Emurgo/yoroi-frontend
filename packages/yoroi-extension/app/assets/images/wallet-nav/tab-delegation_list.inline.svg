@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <title>icon/delegation_list active</title>
-    <g id="icon/delegation_list-active" stroke="none" stroke-width="1" fill="none" fillRule="evenodd">
+    <g id="icon/delegation_list-active" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <rect id="Rectangle" opacity="0" x="0" y="0" width="24" height="24"></rect>
-        <g id="icon/dashboard-copy" transform="translate(3.000000, 5.000000)" fill="#17D1AA" fillRule="nonzero">
+        <g id="icon/dashboard-copy" transform="translate(3.000000, 5.000000)" fill="#17D1AA" fill-rule="nonzero">
             <path d="M17,12 C17.5522847,12 18,12.4477153 18,13 C18,13.5128358 17.6139598,13.9355072 17.1166211,13.9932723 L17,14 L5,14 C4.44771525,14 4,13.5522847 4,13 C4,12.4871642 4.38604019,12.0644928 4.88337887,12.0067277 L5,12 L17,12 Z M1,12 C1.55228475,12 2,12.4477153 2,13 C2,13.5522847 1.55228475,14 1,14 C0.44771525,14 0,13.5522847 0,13 C0,12.4477153 0.44771525,12 1,12 Z M17,6 C17.5522847,6 18,6.44771525 18,7 C18,7.51283584 17.6139598,7.93550716 17.1166211,7.99327227 L17,8 L5,8 C4.44771525,8 4,7.55228475 4,7 C4,6.48716416 4.38604019,6.06449284 4.88337887,6.00672773 L5,6 L17,6 Z M1,6 C1.55228475,6 2,6.44771525 2,7 C2,7.55228475 1.55228475,8 1,8 C0.44771525,8 0,7.55228475 0,7 C0,6.44771525 0.44771525,6 1,6 Z M17,0 C17.5522847,0 18,0.44771525 18,1 C18,1.51283584 17.6139598,1.93550716 17.1166211,1.99327227 L17,2 L5,2 C4.44771525,2 4,1.55228475 4,1 C4,0.487164161 4.38604019,0.0644928393 4.88337887,0.00672773133 L5,0 L17,0 Z M1,0 C1.55228475,0 2,0.44771525 2,1 C2,1.55228475 1.55228475,2 1,2 C0.44771525,2 0,1.55228475 0,1 C0,0.44771525 0.44771525,0 1,0 Z" id="Combined-Shape"></path>
         </g>
     </g>

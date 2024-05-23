@@ -6,16 +6,16 @@
     <defs>
         <path d="M0.174,14.191 C0.174,14.191 2.894,18.513 2.217,20.945 L2.217,20.945 C1.93,22.079 1.511,23.175 0.968,24.212 L0.968,24.212 C0.735,24.622 0.849,25.142 1.234,25.418 L1.234,25.418 C1.301,25.469 1.376,25.513 1.456,25.546 L1.456,25.546 L5.066,27.679 L9.433,20.113 L10.391,15.847 L9.386,16.637 C9.835,15.505 10.155,14.326 10.342,13.125 L10.342,13.125 C11.891,3.01 10.342,0.682 10.342,0.682 L10.342,0.682 L0.174,14.191 Z" id="path-1"></path>
         <linearGradient x1="0.00446094486%" y1="49.9986154%" x2="99.9973707%" y2="49.9986154%" id="linearGradient-3">
-            <stop stopColor="#3154CA" offset="0%"></stop>
-            <stop stopColor="#17D1AA" offset="100%"></stop>
+            <stop stop-color="#3154CA" offset="0%"></stop>
+            <stop stop-color="#17D1AA" offset="100%"></stop>
         </linearGradient>
         <path d="M51.377,0.195 C50.67,0.199 49.891,0.425 49.075,0.899 L49.075,0.899 L6.382,25.575 C3.16,27.435 0.569,32.401 0.583935198,36.667 L0.583935198,36.667 L0.702,71.008 C0.702,73.569 1.661,75.275 3.107,75.855 L3.107,75.855 L7.076,77.917 L10.192,73.263 L49.243,50.692 C52.463,48.832 55.055,43.866 55.04,39.6 L55.04,39.6 L54.926,6.492 L57.338,2.89 L53.87,0.921 C53.378,0.681 52.866,0.486 52.339,0.338 L52.339,0.338 C52.05,0.245 51.742,0.197 51.419,0.195 L51.419,0.195 L51.377,0.195 Z" id="path-4"></path>
         <linearGradient x1="-0.000323322094%" y1="49.9993715%" x2="99.999646%" y2="49.9993715%" id="linearGradient-6">
-            <stop stopColor="#3154CA" offset="0%"></stop>
-            <stop stopColor="#17D1AA" offset="100%"></stop>
+            <stop stop-color="#3154CA" offset="0%"></stop>
+            <stop stop-color="#17D1AA" offset="100%"></stop>
         </linearGradient>
     </defs>
-    <g id="1366x768" stroke="none" stroke-width="1" fill="none" fillRule="evenodd">
+    <g id="1366x768" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="disable-screen" transform="translate(-603.000000, -194.000000)">
             <g id="popup" transform="translate(413.000000, 90.000000)">
                 <g id="pic" transform="translate(190.000000, 103.000000)">

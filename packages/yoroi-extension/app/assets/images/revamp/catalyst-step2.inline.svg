@@ -15,26 +15,26 @@
 <ellipse cx="130.592" cy="61.8784" rx="5.53112" ry="3.5455" transform="rotate(-52.81 130.592 61.8784)" fill="#F3994B"/>
 <defs>
 <linearGradient id="paint0_linear_6939_217964" x1="85.0001" y1="129.609" x2="143.848" y2="129.609" gradientUnits="userSpaceOnUse">
-<stop stopColor="#17D0A9"/>
-<stop offset="0.43" stopColor="#2395B9"/>
-<stop offset="0.81" stopColor="#2D66C5"/>
-<stop offset="1" stopColor="#3154CA"/>
+<stop stop-color="#17D0A9"/>
+<stop offset="0.43" stop-color="#2395B9"/>
+<stop offset="0.81" stop-color="#2D66C5"/>
+<stop offset="1" stop-color="#3154CA"/>
 </linearGradient>
 <linearGradient id="paint1_linear_6939_217964" x1="73.7225" y1="95.1468" x2="131.059" y2="105.953" gradientUnits="userSpaceOnUse">
-<stop stopColor="#3154CA"/>
-<stop offset="0.02" stopColor="#3057C9"/>
-<stop offset="0.26" stopColor="#2782BE"/>
-<stop offset="0.38" stopColor="#2493B9"/>
-<stop offset="0.43" stopColor="#219FB6"/>
-<stop offset="0.54" stopColor="#1DB5B0"/>
-<stop offset="0.66" stopColor="#1AC4AC"/>
-<stop offset="0.8" stopColor="#18CDAA"/>
-<stop offset="1" stopColor="#17D0A9"/>
+<stop stop-color="#3154CA"/>
+<stop offset="0.02" stop-color="#3057C9"/>
+<stop offset="0.26" stop-color="#2782BE"/>
+<stop offset="0.38" stop-color="#2493B9"/>
+<stop offset="0.43" stop-color="#219FB6"/>
+<stop offset="0.54" stop-color="#1DB5B0"/>
+<stop offset="0.66" stop-color="#1AC4AC"/>
+<stop offset="0.8" stop-color="#18CDAA"/>
+<stop offset="1" stop-color="#17D0A9"/>
 </linearGradient>
 <linearGradient id="paint2_linear_6939_217964" x1="111.564" y1="17.0581" x2="106.809" y2="31.6396" gradientUnits="userSpaceOnUse">
-<stop stopColor="#17D0A9"/>
-<stop offset="0.35" stopColor="#1DB4B0"/>
-<stop offset="1" stopColor="#2783BD"/>
+<stop stop-color="#17D0A9"/>
+<stop offset="0.35" stop-color="#1DB4B0"/>
+<stop offset="1" stop-color="#2783BD"/>
 </linearGradient>
 </defs>
 </svg>
