@@ -1,6 +1,6 @@
 {
   "name": "yoroi",
-  "version": "5.1.421",
+  "version": "5.1.422",
   "description": "Cardano ADA wallet",
   "scripts": {
     "dev-mv2": "rimraf dev/ && NODE_OPTIONS=--openssl-legacy-provider babel-node scripts-mv2/build --type=debug --env 'mainnet'",
@@ -184,6 +184,7 @@
     "dropbox": "4.0.30",
     "es6-error": "4.1.1",
     "file-saver": "2.0.5",
+    "immer": "10.1.1",
     "jdenticon": "3.2.0",
     "lodash": "4.17.21",
     "lottie-react": "2.4.0",
