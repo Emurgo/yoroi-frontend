@@ -4,13 +4,12 @@ import * as React from 'react';
 import type { Node } from 'react';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import { CustomModal } from '../../../components/modals/CustomModal';
 import { useGouvernance } from '../module/GouvernanceContextProvider';
-import { useHistory } from 'react-router-dom';
-import { ROUTES } from '../../../../routes-config';
+import { useNavigateTo } from './useNavigateTo';
+import { TextInput } from '../../../components';
 
 type ChooseDRepModallProps = {|
   onClose: () => void,
@@ -22,14 +21,16 @@ type ChooseDRepModallProps = {|
 
 export const ChooseDRepModal = ({ onClose, title }: ChooseDRepModallProps): Node => {
   const [drepId, setDrepId] = React.useState('');
+  const navigateTo = useNavigateTo();
   const { dRepIdChanged, gouvernanceStatusChanged } = useGouvernance();
-  const history = useHistory();
 
   const confirmDRep = () => {
     // TODO add spcecific validation if needed
     dRepIdChanged(drepId);
-    history.push('/gouvernance/delagation');
+    navigateTo.delegationForm();
   };
+
+  const idInvalid = drepId.match(/\d+/g);
 
   return (
     <CustomModal
@@ -41,20 +42,21 @@ export const ChooseDRepModal = ({ onClose, title }: ChooseDRepModallProps): Node
           <Typography variant="body1" textAlign="center">
             Identify your preferred DRep and enter their ID below to delegate your vote
           </Typography>
-          <TextField
+          <TextInput
             id="setDrepId"
             label="DRep ID"
             variant="outlined"
             onChange={event => {
-              console.log('event.target.value', event.target.value);
               setDrepId(event.target.value);
             }}
             value={drepId}
+            error={!!idInvalid}
+            helperText={idInvalid ? 'Incorrect format' : ' '}
           />
         </Stack>
       }
       actions={
-        <Button onClick={confirmDRep} fullWidth variant="primary">
+        <Button onClick={confirmDRep} fullWidth variant="primary" disabled={idInvalid}>
           Confirm
         </Button>
       }

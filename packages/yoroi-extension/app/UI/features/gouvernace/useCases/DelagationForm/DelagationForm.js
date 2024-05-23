@@ -3,18 +3,11 @@ import * as React from 'react';
 import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
 import type { Node } from 'react';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputAdornment from '@mui/material/InputAdornment';
-import IconButton from '@mui/material/IconButton';
-import { Icon } from '../../../../components/icons/index';
-import { VisibilityOff } from '../../../../components/icons/VisibilityOff';
-import { VisibilityOn } from '../../../../components/icons/VisibilityOn';
-import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
 import { Button } from '@mui/material';
+import { useNavigateTo } from '../../common/useNavigateTo';
+import { PasswordInput } from '../../../../components';
 
 const Container = styled(Box)(({ theme }) => ({
   paddingTop: '32px',
@@ -50,6 +43,7 @@ const Actions = styled(Stack)(({ theme }) => ({
 export const DelagationForm = (): Node => {
   const [showPassword, setShowPassword] = React.useState(false);
   const [passwaord, setPassword] = React.useState('');
+  const navigateTo = useNavigateTo();
 
   const handleClickShowPassword = () => setShowPassword(show => !show);
 
@@ -94,36 +88,17 @@ export const DelagationForm = (): Node => {
             Transaction fee: 0.5 ADA
           </Typography>
         </TransactionDetails>
-
-        {/* // TODO to be extracted in a reusable component for all features */}
-        <FormControl variant="outlined">
-          <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
-          <OutlinedInput
-            fullWidth
-            id="outlined-adornment-password"
-            type={showPassword ? 'text' : 'password'}
-            variant="outlined"
-            onChange={event => setPassword(event.target.value)}
-            value={passwaord}
-            endAdornment={
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label="toggle password visibility"
-                  onClick={handleClickShowPassword}
-                  onMouseDown={handleMouseDownPassword}
-                  edge="end"
-                >
-                  {showPassword ? <Icon.VisibilityOff /> : <Icon.VisibilityOn />}
-                </IconButton>
-              </InputAdornment>
-            }
-            label="Password"
-            sx={{ color: 'black' }}
-          />
-        </FormControl>
+        <PasswordInput
+          label="Password"
+          id="outlined-adornment-password"
+          onChange={event => setPassword(event.target.value)}
+          value={passwaord}
+        />
       </Stack>
       <Actions direction="row" spacing="24px">
-        <Button variant="secondary">Back</Button>
+        <Button variant="secondary" onClick={() => navigateTo.selectStatus()}>
+          Back
+        </Button>
         <Button variant="primary" disabled={passwaord.length === 0}>
           Confirm
         </Button>
