@@ -74,7 +74,7 @@ const TokenDetails = ({ tokenInfo, subMenuOptions, mockHistory }) => {
           sx={{ color: theme.palette.ds.black_static, display: 'flex', gap: theme.spacing(2) }}
         >
           <BackIcon />
-          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+          <Typography variant="body2" fontWeight="500">
             Back to Portfolio
           </Typography>
         </Button>
@@ -88,7 +88,7 @@ const TokenDetails = ({ tokenInfo, subMenuOptions, mockHistory }) => {
       <TokenInfo direction="row" spacing={theme.spacing(4)}>
         <Card>
           <Box sx={{ padding: '20px' }}>
-            <Typography variant="body1" sx={{ fontWeight: 500, marginBottom: '15px' }}>
+            <Typography fontWeight="500" sx={{ marginBottom: '15px' }}>
               {isLoading ? (
                 <StyledSkeleton width="82px" height="16px" />
               ) : (
@@ -100,13 +100,13 @@ const TokenDetails = ({ tokenInfo, subMenuOptions, mockHistory }) => {
               <StyledSkeleton width="146px" height="24px" />
             ) : (
               <Stack direction="row" spacing={theme.spacing(0.5)}>
-                <Typography variant="h2" sx={{ fontWeight: 500 }}>
+                <Typography variant="h2" fontWeight="500">
                   200000,00
                 </Typography>
                 <Typography
                   variant="body2"
+                  fontWeight="500"
                   sx={{
-                    fontWeight: 500,
                     marginTop: '5px',
                   }}
                 >
@@ -118,9 +118,7 @@ const TokenDetails = ({ tokenInfo, subMenuOptions, mockHistory }) => {
             {isLoading ? (
               <StyledSkeleton width="129px" height="16px" sx={{ marginTop: '10px' }} />
             ) : (
-              <Typography variant="body1" sx={{ color: theme.palette.ds.text_gray_medium }}>
-                680,00 USD
-              </Typography>
+              <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>680,00 USD</Typography>
             )}
           </Box>
 
@@ -131,16 +129,14 @@ const TokenDetails = ({ tokenInfo, subMenuOptions, mockHistory }) => {
               {isLoading ? (
                 <StyledSkeleton width="131px" height="13px" />
               ) : (
-                <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                  Market price
-                </Typography>
+                <Typography fontWeight="500">Market price</Typography>
               )}
               <Stack direction="row" gap={2} alignItems="center">
                 {isLoading ? (
                   <StyledSkeleton width="64px" height="13px" />
                 ) : (
                   <Stack direction="row" alignItems="center">
-                    <Typography variant="h5" sx={{ fontWeight: 500 }}>
+                    <Typography variant="h5" fontWeight="500">
                       0,48
                     </Typography>
                     &nbsp;USD
@@ -230,7 +226,7 @@ const TokenDetails = ({ tokenInfo, subMenuOptions, mockHistory }) => {
                     {isLoading ? (
                       <StyledSkeleton width="53px" height="16px" />
                     ) : (
-                      <Typography variant="body1" sx={{ fontWeight: 500, marginBottom: '20px' }}>
+                      <Typography fontWeight="500" sx={{ marginBottom: '20px' }}>
                         {tokenInfo.overview.tokenName}
                       </Typography>
                     )}
@@ -240,9 +236,7 @@ const TokenDetails = ({ tokenInfo, subMenuOptions, mockHistory }) => {
                     {isLoading ? (
                       <StyledSkeleton width="53px" height="16px" />
                     ) : (
-                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                        Description
-                      </Typography>
+                      <Typography fontWeight="500">Description</Typography>
                     )}
                     {isLoading ? (
                       <>
@@ -251,7 +245,7 @@ const TokenDetails = ({ tokenInfo, subMenuOptions, mockHistory }) => {
                         <StyledSkeleton height="20px" width="127px" />
                       </>
                     ) : (
-                      <Typography variant="body1" sx={{ color: theme.palette.ds.text_gray_medium }}>
+                      <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
                         {tokenInfo.overview.description}
                       </Typography>
                     )}
@@ -261,9 +255,7 @@ const TokenDetails = ({ tokenInfo, subMenuOptions, mockHistory }) => {
                     {isLoading ? (
                       <StyledSkeleton width="53px" height="16px" />
                     ) : (
-                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                        Website
-                      </Typography>
+                      <Typography fontWeight="500">Website</Typography>
                     )}
                     {isLoading ? (
                       <StyledSkeleton width="127px" height="20px" />
@@ -278,9 +270,7 @@ const TokenDetails = ({ tokenInfo, subMenuOptions, mockHistory }) => {
                     {isLoading ? (
                       <StyledSkeleton width="84px" height="20px" />
                     ) : (
-                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                        Policy ID
-                      </Typography>
+                      <Typography fontWeight="500">Policy ID</Typography>
                     )}
 
                     <Stack direction="row" spacing={theme.spacing(2)} alignItems="self-start">
@@ -291,7 +281,6 @@ const TokenDetails = ({ tokenInfo, subMenuOptions, mockHistory }) => {
                         </Box>
                       ) : (
                         <Typography
-                          variant="body1"
                           sx={{ color: theme.palette.ds.text_gray_medium, wordBreak: 'break-word' }}
                         >
                           {tokenInfo.overview.policyId}
@@ -308,9 +297,7 @@ const TokenDetails = ({ tokenInfo, subMenuOptions, mockHistory }) => {
                     {isLoading ? (
                       <StyledSkeleton width="84px" height="20px" />
                     ) : (
-                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                        Fingerprint
-                      </Typography>
+                      <Typography fontWeight="500">Fingerprint</Typography>
                     )}
 
                     <Stack direction="row" spacing={2} alignItems="self-start">
@@ -321,7 +308,6 @@ const TokenDetails = ({ tokenInfo, subMenuOptions, mockHistory }) => {
                         </Box>
                       ) : (
                         <Typography
-                          variant="body1"
                           sx={{ color: theme.palette.ds.text_gray_medium, wordBreak: 'break-word' }}
                         >
                           {tokenInfo.overview.fingerprint}
@@ -338,9 +324,7 @@ const TokenDetails = ({ tokenInfo, subMenuOptions, mockHistory }) => {
                     {isLoading ? (
                       <StyledSkeleton width="53px" height="16px" />
                     ) : (
-                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                        Details on
-                      </Typography>
+                      <Typography fontWeight="500">Details on</Typography>
                     )}
                     <Stack direction="row" alignItems="center" spacing={theme.spacing(1)}>
                       {isLoading ? (
@@ -365,7 +349,7 @@ const TokenDetails = ({ tokenInfo, subMenuOptions, mockHistory }) => {
 
             {selectedTab === subMenuOptions[1].route ? (
               <TabContent>
-                <Typography variant="body1" sx={{ fontWeight: 500, marginBottom: '30px' }}>
+                <Typography fontWeight="500" sx={{ marginBottom: '30px' }}>
                   Market data
                 </Typography>
                 <Stack direction="column" spacing={2.3}>
@@ -376,10 +360,10 @@ const TokenDetails = ({ tokenInfo, subMenuOptions, mockHistory }) => {
                       justifyContent="space-between"
                       alignItems="center"
                     >
-                      <Typography variant="body1" sx={{ color: theme.palette.ds.text_gray_medium }}>
+                      <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
                         {item.label}
                       </Typography>
-                      <Typography variant="body1">{tokenInfo.performance[index].value}</Typography>
+                      <Typography>{tokenInfo.performance[index].value}</Typography>
                     </Stack>
                   ))}
                 </Stack>

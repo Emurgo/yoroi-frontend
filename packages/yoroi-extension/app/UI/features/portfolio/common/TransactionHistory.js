@@ -51,9 +51,7 @@ const TransactionHistory = ({ history }) => {
     <Container>
       <Card>
         <Box sx={{ padding: '20px' }}>
-          <Typography variant="body1" sx={{ fontWeight: 500 }}>
-            Transaction history
-          </Typography>
+          <Typography fontWeight="500">Transaction history</Typography>
           <Table
             sx={{
               marginTop: '25px',
@@ -63,24 +61,18 @@ const TransactionHistory = ({ history }) => {
             <TableHead>
               <TableRow>
                 <TableCell>
-                  <Typography variant="body1" sx={{ color: theme.palette.ds.text_gray_medium }}>
+                  <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
                     Transaction type
                   </Typography>
                 </TableCell>
                 <TableCell>
-                  <Typography variant="body1" sx={{ color: theme.palette.ds.text_gray_medium }}>
-                    Status
-                  </Typography>
+                  <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>Status</Typography>
                 </TableCell>
                 <TableCell align="center">
-                  <Typography variant="body1" sx={{ color: theme.palette.ds.text_gray_medium }}>
-                    Fee
-                  </Typography>
+                  <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>Fee</Typography>
                 </TableCell>
                 <TableCell align="right">
-                  <Typography variant="body1" sx={{ color: theme.palette.ds.text_gray_medium }}>
-                    Amount
-                  </Typography>
+                  <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>Amount</Typography>
                 </TableCell>
               </TableRow>
             </TableHead>
@@ -88,7 +80,6 @@ const TransactionHistory = ({ history }) => {
               {timestamps.map((timestamp, index) => (
                 <>
                   <Typography
-                    variant="body1"
                     sx={{
                       color: theme.palette.ds.text_gray_medium,
                       marginTop: index ? '10px' : '20px',
@@ -136,7 +127,7 @@ const TransactionHistory = ({ history }) => {
                             )}
                           </IconButton>
                           <Stack direction="column">
-                            <Typography variant="body1">{row.type}</Typography>
+                            <Typography>{row.type}</Typography>
                             <Typography
                               variant="caption1"
                               sx={{ color: theme.palette.ds.text_gray_medium }}
@@ -148,7 +139,6 @@ const TransactionHistory = ({ history }) => {
                       </TableCell>
                       <TableCell>
                         <Typography
-                          variant="body1"
                           sx={{
                             color:
                               row.status === 'Failed'
@@ -161,19 +151,14 @@ const TransactionHistory = ({ history }) => {
                       </TableCell>
                       <TableCell align="center">
                         <Stack direction="column">
-                          <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                            {row.fee ? row.fee.amount : '-'}
-                          </Typography>
-                          <Typography variant="body1">{row.fee ? row.fee.usd : '-'}</Typography>
+                          <Typography fontWeight="500">{row.fee ? row.fee.amount : '-'}</Typography>
+                          <Typography>{row.fee ? row.fee.usd : '-'}</Typography>
                         </Stack>
                       </TableCell>
                       <TableCell>
                         <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
                           <Stack direction="column">
-                            <Typography
-                              variant="body1"
-                              sx={{ textAlign: 'right', fontWeight: 500 }}
-                            >
+                            <Typography fontWeight="500" sx={{ textAlign: 'right' }}>
                               {row.type === 'Received' && '+'}
                               {row.amount.total}
                             </Typography>
@@ -182,15 +167,12 @@ const TransactionHistory = ({ history }) => {
                               {row.amount.usd}
                             </Typography>
                             {row.type === 'Received' && (
-                              <Typography
-                                variant="body1"
-                                sx={{ textAlign: 'right', fontWeight: 500 }}
-                              >
+                              <Typography fontWeight="500" sx={{ textAlign: 'right' }}>
                                 + {row.amount.asset} assets
                               </Typography>
                             )}
                             {row.type === 'Sent' && (
-                              <Typography variant="body1" weight="500" sx={{ textAlign: 'right' }}>
+                              <Typography weight="500" sx={{ textAlign: 'right' }}>
                                 {row.amount.asset}
                               </Typography>
                             )}

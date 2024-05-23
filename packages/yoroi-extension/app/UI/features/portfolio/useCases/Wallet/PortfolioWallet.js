@@ -47,16 +47,16 @@ const PortfolioWallet = ({ headCells, data }) => {
       <Stack direction="row" justifyContent="space-between">
         <Stack direction="column">
           <Stack direction="row" spacing={theme.spacing(0.5)}>
-            <Typography variant="h2" sx={{ fontWeight: 500 }}>
+            <Typography variant="h2" fontWeight="500">
               200000,00
             </Typography>
-            <Typography variant="body2" sx={{ fontWeight: 500, marginTop: '5px' }}>
+            <Typography variant="body2" fontWeight="500" sx={{ marginTop: '5px' }}>
               ADA
               <Typography
                 variant="body2"
+                fontWeight="500"
                 sx={{
                   display: 'inline',
-                  fontWeight: 500,
                   marginTop: '5px',
                   color: theme.palette.ds.gray_c400,
                 }}
@@ -67,9 +67,7 @@ const PortfolioWallet = ({ headCells, data }) => {
           </Stack>
 
           <Stack direction="row" justifyContent="space-between" alignItems="center">
-            <Typography variant="body1" sx={{ color: theme.palette.ds.text_gray_medium }}>
-              10000,00 USD
-            </Typography>
+            <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>10000,00 USD</Typography>
             <StyledTooltip
               title={
                 <>
@@ -116,7 +114,7 @@ const PortfolioWallet = ({ headCells, data }) => {
         <SearchInput
           disableUnderline
           onChange={e => setKeyword(e.target.value)}
-          placeholder={'111'}
+          placeholder={'Search by asset name or ID'}
           startAdornment={
             <InputAdornment
               sx={{
@@ -148,9 +146,7 @@ const PortfolioWallet = ({ headCells, data }) => {
                   spacing={theme.spacing(1)}
                   sx={{ float: align }}
                 >
-                  <Typography variant="body1" sx={{ color: theme.palette.ds.text_gray_medium }}>
-                    {label}
-                  </Typography>
+                  <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>{label}</Typography>
                   <SortIcon style={{ cursor: 'pointer' }} />
                 </Stack>
               </TableCell>
@@ -184,10 +180,8 @@ const PortfolioWallet = ({ headCells, data }) => {
                     }}
                   ></Box>
                   <Stack direction="column">
-                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                      {row.name}
-                    </Typography>
-                    <Typography variant="body1" sx={{ color: theme.palette.ds.text_gray_medium }}>
+                    <Typography fontWeight="500">{row.name}</Typography>
+                    <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
                       {row.id}
                     </Typography>
                   </Stack>
@@ -195,7 +189,7 @@ const PortfolioWallet = ({ headCells, data }) => {
               </TableCell>
 
               <TableCell>
-                <Typography variant="body1" sx={{ color: theme.palette.ds.text_gray_medium }}>
+                <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
                   {row.price}
                 </Typography>
               </TableCell>
@@ -291,7 +285,7 @@ const PortfolioWallet = ({ headCells, data }) => {
               </TableCell>
 
               <TableCell>
-                <Typography variant="body1" sx={{ color: theme.palette.ds.text_gray_medium }}>
+                <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
                   {row.portfolioPercents}&nbsp;%
                 </Typography>
               </TableCell>
@@ -299,11 +293,8 @@ const PortfolioWallet = ({ headCells, data }) => {
               <TableCell>
                 <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
                   <Stack direction="column">
-                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                      {row.totalAmount.amount}
-                    </Typography>
+                    <Typography fontWeight="500">{row.totalAmount.amount}</Typography>
                     <Typography
-                      variant="body1"
                       sx={{ color: theme.palette.ds.text_gray_medium, textAlign: 'right' }}
                     >
                       {row.totalAmount.usd}
