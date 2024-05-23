@@ -11,11 +11,11 @@ import {
   TableRow,
   styled,
 } from '@mui/material';
-import { Card } from '../../components';
-import { ReactComponent as ArrowIcon } from './images/transaction-history/arrow-icon.inline.svg';
-import { ReactComponent as ExpandArrow } from './images/transaction-history/expand-arrow.inline.svg';
-import { ReactComponent as ErrorIcon } from './images/transaction-history/error-icon.inline.svg';
-import { ReactComponent as WithdrawIcon } from './images/transaction-history/withdraw-icon.inline.svg';
+import { useTheme } from '@mui/material/styles';
+import { Card } from '../../../components';
+import { default as ArrowIcon } from '../../../components/icons/portfolio/transaction-history/Arrow';
+import { default as ExpandIcon } from '../../../components/icons/portfolio/transaction-history/Expand';
+import { default as ErrorIcon } from '../../../components/icons/portfolio/transaction-history/Error';
 
 const timestamps = ['Today', 'Yesterday', 'In the past'];
 const categorizeByDate = data => {
@@ -43,13 +43,15 @@ const categorizeByDate = data => {
   );
 };
 
-const TransactionHistory = ({ mockHistory }) => {
-  const categorizedData = useMemo(() => categorizeByDate(mockHistory), [mockHistory]);
+const TransactionHistory = ({ history }) => {
+  const theme = useTheme();
+
+  const categorizedData = useMemo(() => categorizeByDate(history), [history]);
   return (
     <Container>
       <Card>
         <Box sx={{ padding: '20px' }}>
-          <Typography variant="body-1-regular" sx={{ fontWeight: 500 }}>
+          <Typography variant="body1" sx={{ fontWeight: 500 }}>
             Transaction history
           </Typography>
           <Table
@@ -61,75 +63,83 @@ const TransactionHistory = ({ mockHistory }) => {
             <TableHead>
               <TableRow>
                 <TableCell>
-                  <Typography variant="body-1-regular">Transaction type</Typography>
+                  <Typography variant="body1" sx={{ color: theme.palette.ds.text_gray_medium }}>
+                    Transaction type
+                  </Typography>
                 </TableCell>
                 <TableCell>
-                  <Typography variant="body-1-regular">Status</Typography>
+                  <Typography variant="body1" sx={{ color: theme.palette.ds.text_gray_medium }}>
+                    Status
+                  </Typography>
                 </TableCell>
                 <TableCell align="center">
-                  <Typography variant="body-1-regular">Fee</Typography>
+                  <Typography variant="body1" sx={{ color: theme.palette.ds.text_gray_medium }}>
+                    Fee
+                  </Typography>
                 </TableCell>
                 <TableCell align="right">
-                  <Typography variant="body-1-regular">Amount</Typography>
+                  <Typography variant="body1" sx={{ color: theme.palette.ds.text_gray_medium }}>
+                    Amount
+                  </Typography>
                 </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {timestamps.map((timestamp, index) => (
                 <>
-                  <Typography variant="body-1-regular">{timestamp}</Typography>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      color: theme.palette.ds.text_gray_medium,
+                      marginTop: index ? '10px' : '20px',
+                    }}
+                  >
+                    {timestamp}
+                  </Typography>
                   {categorizedData[timestamp].map((row, index) => (
-                    <TableRow sx={{ '& td, & th': { border: 0 } }}>
+                    <TableRow key={index} sx={{ '& td, & th': { border: 0 } }}>
                       <TableCell key={index}>
-                        <Stack direction="row" alignItems="center" spacing={2}>
+                        <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
                           <IconButton
                             sx={{
                               width: '48px',
                               height: '48px',
                               backgroundColor:
                                 row.type === 'Sent'
-                                  ? 'rgba(228, 232, 247, 1)'
+                                  ? theme.palette.ds.sys_cyan_c100
                                   : row.type === 'Received'
-                                  ? 'rgba(228, 247, 243, 1)'
-                                  : 'rgba(255, 241, 245, 1)',
+                                  ? theme.palette.ds.secondary_c100
+                                  : theme.palette.ds.sys_magenta_c100,
                             }}
                           >
                             {row.type === 'Sent' && (
                               <ArrowIcon
-                                stroke="rgba(75, 109, 222, 1)"
+                                stroke={theme.palette.ds.sys_cyan_c500}
                                 width="24px"
                                 height="24px"
                               />
                             )}
                             {row.type === 'Received' && (
                               <ArrowIcon
-                                stroke="rgba(8, 194, 157, 1)"
+                                stroke={theme.palette.ds.secondary_c500}
                                 width="24px"
                                 height="24px"
                                 style={{ transform: 'rotate(180deg)' }}
                               />
                             )}
                             {row.type === 'Transaction error' && (
-                              <ErrorIcon stroke="rgba(255, 19, 81, 1)" width="24px" height="24px" />
+                              <ErrorIcon
+                                fill={theme.palette.ds.sys_magenta_c500}
+                                width="24px"
+                                height="24px"
+                              />
                             )}
                           </IconButton>
                           <Stack direction="column">
+                            <Typography variant="body1">{row.type}</Typography>
                             <Typography
-                              sx={{
-                                fontWeight: 400,
-                                fontSize: '1rem',
-                                color: 'rgba(36, 40, 56, 1)',
-                              }}
-                            >
-                              {row.type}
-                            </Typography>
-                            <Typography
-                              sx={{
-                                fontWeight: 400,
-                                fontSize: '0.75rem',
-                                letterSpacing: '0.2px',
-                                color: 'rgba(107, 115, 132, 1)',
-                              }}
+                              variant="caption1"
+                              sx={{ color: theme.palette.ds.text_gray_medium }}
                             >
                               {row.time}
                             </Typography>
@@ -138,10 +148,12 @@ const TransactionHistory = ({ mockHistory }) => {
                       </TableCell>
                       <TableCell>
                         <Typography
+                          variant="body1"
                           sx={{
-                            fontWeight: 400,
-                            fontSize: '1rem',
-                            color: row.status === 'Failed' ? 'red' : 'rgba(36, 40, 56, 1)',
+                            color:
+                              row.status === 'Failed'
+                                ? theme.palette.ds.sys_magenta_c500
+                                : theme.palette.ds.black_static,
                           }}
                         >
                           {row.status}
@@ -149,19 +161,17 @@ const TransactionHistory = ({ mockHistory }) => {
                       </TableCell>
                       <TableCell align="center">
                         <Stack direction="column">
-                          <Typography variant="body-1-regular" sx={{ fontWeight: 500 }}>
+                          <Typography variant="body1" sx={{ fontWeight: 500 }}>
                             {row.fee ? row.fee.amount : '-'}
                           </Typography>
-                          <Typography variant="body-1-regular">
-                            {row.fee ? row.fee.usd : '-'}
-                          </Typography>
+                          <Typography variant="body1">{row.fee ? row.fee.usd : '-'}</Typography>
                         </Stack>
                       </TableCell>
                       <TableCell>
-                        <Stack direction="row" spacing={1.5} sx={{ float: 'right' }}>
+                        <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
                           <Stack direction="column">
                             <Typography
-                              variant="body-1-regular"
+                              variant="body1"
                               sx={{ textAlign: 'right', fontWeight: 500 }}
                             >
                               {row.type === 'Received' && '+'}
@@ -173,23 +183,19 @@ const TransactionHistory = ({ mockHistory }) => {
                             </Typography>
                             {row.type === 'Received' && (
                               <Typography
-                                variant="body-1-regular"
+                                variant="body1"
                                 sx={{ textAlign: 'right', fontWeight: 500 }}
                               >
                                 + {row.amount.asset} assets
                               </Typography>
                             )}
                             {row.type === 'Sent' && (
-                              <Typography
-                                variant="body-1-regular"
-                                weight="500"
-                                sx={{ textAlign: 'right' }}
-                              >
+                              <Typography variant="body1" weight="500" sx={{ textAlign: 'right' }}>
                                 {row.amount.asset}
                               </Typography>
                             )}
                           </Stack>
-                          <ExpandArrow width="16px" height="16px" />
+                          <ExpandIcon width="16px" height="16px" />
                         </Stack>
                       </TableCell>
                     </TableRow>

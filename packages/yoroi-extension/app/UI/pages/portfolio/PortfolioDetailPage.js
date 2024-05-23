@@ -1,75 +1,16 @@
+// @flow
 import React from 'react';
-import TokenDetailsPage from '../../features/portfolio/TokenDetailsPage';
+import TokenDetails from '../../features/portfolio/useCases/TokenDetails/TokenDetails';
+import PortfolioPageLayout from '../../layout/PortfolioPageLayout';
+import mockData from './mockData';
 
-const subMenuOptions = [
-  {
-    label: 'Overview',
-    className: 'overview',
-    route: 'overview',
-  },
-  {
-    label: 'Performance',
-    className: 'performance',
-    route: 'performance',
-  },
-];
+type Props = {|
+  stores: any,
+  actions: any,
+  match: any,
+|};
 
-const mockHistory = [
-  {
-    type: 'Sent',
-    time: '11:30 PM',
-    date: '05/22/2024',
-    status: 'Low',
-    fee: {
-      amount: '0.17 ADA',
-      usd: '0.03 USD',
-    },
-    amount: {
-      total: '1,169,789.34432 ADA',
-      usd: '0.03 USD',
-      asset: '200 MILK',
-    },
-  },
-  {
-    type: 'Received',
-    time: '9:12 PM',
-    date: '05/22/2024',
-    status: 'Low',
-    amount: {
-      total: '1,169,789.34432 ADA',
-      usd: '312,323.33 USD',
-      asset: 2,
-    },
-  },
-  {
-    type: 'Transaction error',
-    time: '9:12 PM',
-    date: '05/21/2024',
-    status: 'Failed',
-    amount: {
-      total: '1,169,789.34432 ADA',
-      usd: '312,323.33 USD',
-      asset: 2,
-    },
-  },
-  {
-    type: 'Sent',
-    time: '4:20 PM',
-    date: '05/20/2024',
-    status: 'Low',
-    fee: {
-      amount: '0.17 ADA',
-      usd: '0.03 USD',
-    },
-    amount: {
-      total: '1,169,789.34432 ADA',
-      usd: '0.03 USD',
-      asset: '200 MILK',
-    },
-  },
-];
-
-const PortfolioDetailPage = ({ match }) => {
+const PortfolioDetailPage = ({ stores, actions, match }: Props) => {
   const tokenId = match.params.tokenId;
 
   const tokenInfo = {
@@ -99,11 +40,13 @@ const PortfolioDetailPage = ({ match }) => {
   };
 
   return (
-    <TokenDetailsPage
-      tokenInfo={tokenInfo}
-      subMenuOptions={subMenuOptions}
-      mockHistory={mockHistory}
-    />
+    <PortfolioPageLayout stores={stores} actions={actions}>
+      <TokenDetails
+        tokenInfo={tokenInfo}
+        subMenuOptions={mockData.PortfolioDetailPage.subMenuOptions}
+        mockHistory={mockData.PortfolioDetailPage.history}
+      />
+    </PortfolioPageLayout>
   );
 };
 

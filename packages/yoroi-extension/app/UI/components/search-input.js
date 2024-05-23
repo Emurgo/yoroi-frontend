@@ -5,10 +5,10 @@ export const SearchInput = styled(Input)(({ theme }) => ({
   width: '370px',
   height: '40px',
   padding: '10px 12px',
-  backgroundColor: theme.palette.grayscale['50'],
+  backgroundColor: theme.palette.ds.white_static,
   border: '1px solid',
-  borderColor: theme.palette.grayscale['400'],
+  borderColor: theme.palette.ds.gray_c300,
   'input::placeholder': {
-    color: theme.palette.grayscale['600'],
+    color: theme.palette.ds.text_gray_medium,
   },
 }));

@@ -1,7 +1,18 @@
+// @flow
 import React from 'react';
+import PortfolioPageLayout from '../../layout/PortfolioPageLayout';
 
-const PortfolioDappsPage = () => {
-  return <div>PortfolioDappsPage</div>;
+type Props = {|
+  stores: any,
+  actions: any,
+|};
+
+const PortfolioDappsPage = ({ stores, actions }: Props) => {
+  return (
+    <PortfolioPageLayout stores={stores} actions={actions}>
+      <div>PortfolioDappsPage</div>
+    </PortfolioPageLayout>
+  );
 };
 
 export default PortfolioDappsPage;

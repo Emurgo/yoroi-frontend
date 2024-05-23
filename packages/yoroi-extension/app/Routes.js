@@ -35,8 +35,10 @@ import FullscreenLayout from './components/layout/FullscreenLayout';
 
 // New UI pages
 import GouvernancePage from './UI/pages/Gouvernance/GouvernancePage';
-import PortfolioWrapper from './UI/features/portfolio/PortfolioWrapper';
 import GouvernanceDelegationFormPage from './UI/pages/Gouvernance/GouvernanceDelegationFormPage';
+import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
+import PortfolioDappsPage from './UI/pages/portfolio/PortfolioDappsPage';
+import PortfolioDetailPage from './UI/pages/portfolio/PortfolioDetailPage';
 
 // PAGES
 const LanguageSelectionPagePromise = () => import('./containers/profile/LanguageSelectionPage');
@@ -141,14 +143,6 @@ const SwapOrdersPage = React.lazy(SwapOrdersPagePromise);
 
 const ExchangeEndPagePromise = () => import('./containers/ExchangeEndPage');
 const ExchangeEndPage = React.lazy(ExchangeEndPagePromise);
-
-// PORTFOLIO
-const PortfolioPagePromise = () => import('./UI/pages/portfolio/PortfolioPage');
-const PortfolioPage = React.lazy(PortfolioPagePromise);
-const PortfolioDappsPagePromise = () => import('./UI/pages/portfolio/PortfolioDappsPage');
-const PortfolioDappsPage = React.lazy(PortfolioDappsPagePromise);
-const PortfolioDetailPagePromise = () => import('./UI/pages/portfolio/PortfolioDetailPage');
-const PortfolioDetailPage = React.lazy(PortfolioDetailPagePromise);
 
 export const LazyLoadPromises: Array<() => any> = [
   AddAnotherWalletPromise,
@@ -466,16 +460,20 @@ const SettingsSubpages = (stores, actions) => (
 
 const PortfolioSubpages = (stores, actions) => (
   <Switch>
-    <Route exact path={ROUTES.PORTFOLIO.ROOT} component={props => <PortfolioPage {...props} />} />
+    <Route
+      exact
+      path={ROUTES.PORTFOLIO.ROOT}
+      component={props => <PortfolioPage {...props} stores={stores} actions={actions} />}
+    />
     <Route
       exact
       path={ROUTES.PORTFOLIO.DAPPS}
-      component={props => <PortfolioDappsPage {...props} />}
+      component={props => <PortfolioDappsPage {...props} stores={stores} actions={actions} />}
     />
     <Route
       exact
       path={ROUTES.PORTFOLIO.DETAILS}
-      component={props => <PortfolioDetailPage {...props} />}
+      component={props => <PortfolioDetailPage {...props} stores={stores} actions={actions} />}
     />
   </Switch>
 );
@@ -540,14 +538,6 @@ export function wrapSettings(settingsProps: StoresAndActionsProps, children: Nod
   );
 }
 
-export function wrapPortfolio(portfolioProps: StoresAndActionsProps, children: Node): Node {
-  return (
-    <PortfolioWrapper {...portfolioProps}>
-      <Suspense fallback={null}>{children}</Suspense>
-    </PortfolioWrapper>
-  );
-}
-
 export function wrapNFTs(assetsProps: StoresAndActionsProps, children: Node): Node {
   return (
     <NFTsWrapper {...assetsProps}>
@@ -570,5 +560,8 @@ export function wrapReceive(receiveProps: StoresAndActionsProps, children: Node)
 
 // NEW UI - TODO: to be refactred
 export function wrapGouvernance(gouvernanceProps: StoresAndActionsProps, children: Node): Node {
+  return <Suspense fallback={null}>{children}</Suspense>;
+}
+export function wrapPortfolio(portfolioProps: StoresAndActionsProps, children: Node): Node {
   return <Suspense fallback={null}>{children}</Suspense>;
 }

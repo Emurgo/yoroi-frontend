@@ -1,23 +1,23 @@
 // @flow
-import { Component } from 'react';
+import { Component, cloneElement } from 'react';
 import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
-import globalMessages from '../../../i18n/global-messages';
-import SettingsLayout from '../../../components/settings/SettingsLayout';
-import { buildRoute } from '../../../utils/routing';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
+import globalMessages from '../../i18n/global-messages';
+import SettingsLayout from '../../components/settings/SettingsLayout';
+import { buildRoute } from '../../utils/routing';
+import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 
-import TopBarLayout from '../../../components/layout/TopBarLayout';
-import NavBarTitle from '../../../components/topbar/NavBarTitle';
+import TopBarLayout from '../../components/layout/TopBarLayout';
+import NavBarTitle from '../../components/topbar/NavBarTitle';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { withLayout, type LayoutComponentMap } from '../../../styles/context/layout';
-import PortfolioMenu from './PortfolioMenu';
-import NavBarContainer from '../../../containers/NavBarContainer';
-import BannerContainer from '../../../containers/banners/BannerContainer';
-import SidebarContainer from '../../../containers/SidebarContainer';
-import NavBarContainerRevamp from '../../../containers/NavBarContainerRevamp';
-import { ROUTES } from '../../../routes-config';
+import { withLayout, type LayoutComponentMap } from '../../styles/context/layout';
+import PortfolioMenu from '../features/portfolio/common/PortfolioMenu';
+import NavBarContainer from '../../containers/NavBarContainer';
+import BannerContainer from '../../containers/banners/BannerContainer';
+import SidebarContainer from '../../containers/SidebarContainer';
+import NavBarContainerRevamp from '../../containers/NavBarContainerRevamp';
+import { ROUTES } from '../../routes-config';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -29,7 +29,7 @@ type InjectedLayoutProps = {|
 
 type AllProps = {| ...Props, ...InjectedLayoutProps |};
 @observer
-class PortfolioWrapper extends Component<AllProps> {
+class PortfolioPageLayout extends Component<AllProps> {
   static defaultProps: {| children: void |} = {
     children: undefined,
   };
@@ -82,7 +82,7 @@ class PortfolioWrapper extends Component<AllProps> {
         showInContainer
         showAsCard
       >
-        <SettingsLayout menu={menu}>{children != null ? children : null}</SettingsLayout>
+        <SettingsLayout menu={menu}>{children}</SettingsLayout>
       </TopBarLayout>
     );
     const PortfolioLayoutRevamp = (
@@ -117,4 +117,4 @@ class PortfolioWrapper extends Component<AllProps> {
     });
   }
 }
-export default (withLayout(PortfolioWrapper): ComponentType<Props>);
+export default (withLayout(PortfolioPageLayout): ComponentType<Props>);

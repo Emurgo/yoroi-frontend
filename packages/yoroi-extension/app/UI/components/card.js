@@ -6,6 +6,6 @@ export const Card = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   border: '1px solid',
-  borderColor: theme.palette.grayscale['200'],
+  borderColor: theme.palette.ds.gray_c200,
   bgcolor: 'background.card',
 }));
