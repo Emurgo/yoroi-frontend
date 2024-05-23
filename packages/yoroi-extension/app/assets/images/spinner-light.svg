@@ -4,8 +4,8 @@
         fill="url(#paint0_linear_12921_42008)" />
     <defs>
         <linearGradient id="paint0_linear_12921_42008" x1="2.5" y1="9.5" x2="9.5" y2="1" gradientUnits="userSpaceOnUse">
-            <stop offset="0.0311324" stop-color="#3154CB" />
-            <stop offset="1" stop-color="#3154CB" stop-opacity="0.18" />
+            <stop offset="0.0311324" stopColor="#3154CB" />
+            <stop offset="1" stopColor="#3154CB" stop-opacity="0.18" />
         </linearGradient>
     </defs>
 </svg>

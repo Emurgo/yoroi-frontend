@@ -36,6 +36,7 @@ import FullscreenLayout from './components/layout/FullscreenLayout';
 // New UI pages
 import GouvernancePage from './UI/pages/Gouvernance/GouvernancePage';
 import PortfolioWrapper from './UI/features/portfolio/PortfolioWrapper';
+import GouvernanceDelegationFormPage from './UI/pages/Gouvernance/GouvernanceDelegationFormPage';
 
 // PAGES
 const LanguageSelectionPagePromise = () => import('./containers/profile/LanguageSelectionPage');
@@ -501,7 +502,13 @@ const GouvernanceSubpages = (stores, actions) => (
       path={ROUTES.Gouvernance.ROOT}
       component={props => <GouvernancePage {...props} stores={stores} actions={actions} />}
     />
-    <Redirect to={ROUTES.Gouvernance.ROOT} />
+    <Route
+      exact
+      path={ROUTES.Gouvernance.DELEGATE}
+      component={props => (
+        <GouvernanceDelegationFormPage {...props} stores={stores} actions={actions} />
+      )}
+    />
   </Switch>
 );
 
@@ -563,9 +570,5 @@ export function wrapReceive(receiveProps: StoresAndActionsProps, children: Node)
 
 // NEW UI - TODO: to be refactred
 export function wrapGouvernance(gouvernanceProps: StoresAndActionsProps, children: Node): Node {
-  return (
-    <Settings {...gouvernanceProps}>
-      <Suspense fallback={null}>{children}</Suspense>
-    </Settings>
-  );
+  return <Suspense fallback={null}>{children}</Suspense>;
 }

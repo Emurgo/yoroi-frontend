@@ -81,6 +81,7 @@ export const ROUTES = {
   // NEW UI ROUTES
   Gouvernance: {
     ROOT: '/gouvernance',
+    DELEGATE: '/gouvernance/delagation',
   },
   PORTFOLIO: {
     ROOT: '/portfolio',

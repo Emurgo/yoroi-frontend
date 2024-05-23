@@ -6,13 +6,13 @@
     <defs>
         <rect id="path-1" x="0" y="0" width="302.948097" height="50.5362663"></rect>
         <linearGradient x1="-6.10616698%" y1="-0.151651253%" x2="114.164042%" y2="90.9334744%" id="linearGradient-3">
-            <stop stop-color="#17D1AA" offset="0%"></stop>
-            <stop stop-color="#3154CA" offset="100%"></stop>
+            <stop stopColor="#17D1AA" offset="0%"></stop>
+            <stop stopColor="#3154CA" offset="100%"></stop>
         </linearGradient>
         <polygon id="path-4" points="0.21576 0.0348372093 127.6352 0.0348372093 127.6352 107 0.21576 107"></polygon>
         <polygon id="path-6" points="0 0.239265823 47.39736 0.239265823 47.39736 63.8454684 0 63.8454684"></polygon>
     </defs>
-    <g id="save-load.inline" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+    <g id="save-load.inline" stroke="none" stroke-width="1" fill="none" fillRule="evenodd">
         <rect id="bg-copy" fill="#244BC0" opacity="0.06" x="0" y="0" width="480" height="230" rx="8"></rect>
         <g id="Group-9-Copy-5" transform="translate(88.000000, 31.000000)">
             <g id="connect-error.inline-copy-3" transform="translate(0.000000, 93.000000)">

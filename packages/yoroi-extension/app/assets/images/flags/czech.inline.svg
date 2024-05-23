@@ -4,14 +4,14 @@
     <defs>
         <circle id="path-1" cx="8" cy="8" r="7.75757576"></circle>
     </defs>
-    <g id="✅-REWAMP-1.1-(iOS)" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+    <g id="✅-REWAMP-1.1-(iOS)" stroke="none" stroke-width="1" fill="none" fillRule="evenodd">
         <g id="czech" transform="translate(1.000000, 1.000000)">
             <circle id="Oval" stroke-opacity="0.302790987" stroke="#4A4A4A" stroke-width="0.5" cx="8" cy="8" r="8"></circle>
             <mask id="mask-2" fill="white">
                 <use xlink:href="#path-1"></use>
             </mask>
             <g id="path-1"></g>
-            <g id="czech-flag" mask="url(#mask-2)" fill-rule="nonzero">
+            <g id="czech-flag" mask="url(#mask-2)" fillRule="nonzero">
                 <g transform="translate(-3.878788, -0.969697)">
                     <rect id="Rectangle" fill="#D7141A" x="3.51861472" y="0" width="16.4848485" height="17.4545455"></rect>
                     <rect id="Rectangle" fill="#FFFFFF" x="3.51861472" y="0" width="16.4848485" height="8.72727273"></rect>
