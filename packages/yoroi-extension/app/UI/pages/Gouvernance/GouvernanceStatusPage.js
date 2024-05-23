@@ -8,7 +8,7 @@ type Props = {|
   children?: React$Node,
 |};
 
-const GouvernancePage = (props: Props): any => {
+const GouvernanceStatusPage = (props: Props): any => {
   return (
     <GouvernanceLayout {...props}>
       <GouvernanceStatusSelection />
@@ -16,4 +16,4 @@ const GouvernancePage = (props: Props): any => {
   );
 };
 
-export default GouvernancePage;
+export default GouvernanceStatusPage;

@@ -34,7 +34,7 @@ import LoadingSpinner from './components/widgets/LoadingSpinner';
 import FullscreenLayout from './components/layout/FullscreenLayout';
 
 // New UI pages
-import GouvernancePage from './UI/pages/Gouvernance/GouvernancePage';
+import GouvernanceStatusPage from './UI/pages/Gouvernance/GouvernanceStatusPage';
 import GouvernanceDelegationFormPage from './UI/pages/Gouvernance/GouvernanceDelegationFormPage';
 import GouvernanceTransactionSubmittedPage from './UI/pages/Gouvernance/GouvernanceTransactionSubmittedPage';
 import GouvernanceTransactionFailedPage from './UI/pages/Gouvernance/GouvernanceTransactionFailedPage';
@@ -492,7 +492,7 @@ const GouvernanceSubpages = (stores, actions) => (
     <Route
       exact
       path={ROUTES.Gouvernance.ROOT}
-      component={props => <GouvernancePage {...props} stores={stores} actions={actions} />}
+      component={props => <GouvernanceStatusPage {...props} stores={stores} actions={actions} />}
     />
     <Route
       exact
