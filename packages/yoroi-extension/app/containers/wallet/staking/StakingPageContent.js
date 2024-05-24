@@ -30,7 +30,11 @@ import { generateGraphData } from '../../../utils/graph';
 import RewardHistoryDialog from '../../../components/wallet/staking/dashboard-revamp/RewardHistoryDialog';
 import DelegatedStakePoolCard from '../../../components/wallet/staking/dashboard-revamp/DelegatedStakePoolCard';
 import WithdrawRewardsDialog from './WithdrawRewardsDialog';
-import { formatLovelacesHumanReadableShort, roundOneDecimal, roundTwoDecimal } from '../../../utils/formatters';
+import {
+  formatLovelacesHumanReadableShort,
+  roundOneDecimal,
+  roundTwoDecimal,
+} from '../../../utils/formatters';
 import { compose, maybe } from '../../../coreUtils';
 
 // populated by ConfigWebpackPlugin
@@ -61,6 +65,14 @@ class StakingPageContent extends Component<AllProps> {
     if (publicDeriver == null) {
       throw new Error(`${nameof(StakingPageContent)} no public deriver. Should never happen`);
     }
+    if (this.props.stores.delegation.poolTransitionConfig.shouldUpdatePool) {
+      const poolTransitionInfo = this.props.stores.delegation.poolTransitionRequestInfo;
+      if (poolTransitionInfo) {
+        this.props.stores.delegation.delegateToSpecificPool(poolTransitionInfo.suggestedPool.hash);
+        this.props.stores.delegation.createDelegationTransaction();
+      }
+    }
+
     const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
     await timeCalcRequests.requests.toAbsoluteSlot.execute().promise;
     await timeCalcRequests.requests.toRealTime.execute().promise;
@@ -104,7 +116,8 @@ class StakingPageContent extends Component<AllProps> {
 
     const networkInfo = publicDeriver.getParent().getNetworkInfo();
     const poolMeta = delegationStore.getLocalPoolInfo(networkInfo, currentPool);
-    const { stake, roa, saturation, pic } = delegationStore.getLocalRemotePoolInfo(networkInfo, currentPool) ?? {};
+    const { stake, roa, saturation, pic } =
+      delegationStore.getLocalRemotePoolInfo(networkInfo, currentPool) ?? {};
     if (poolMeta == null) {
       // server hasn't returned information about the stake pool yet
       return null;
@@ -117,14 +130,20 @@ class StakingPageContent extends Component<AllProps> {
       avatar: pic,
       roa: maybe(roa, compose(Number, roundTwoDecimal)),
       poolSize: maybe(stake, formatLovelacesHumanReadableShort),
-      share: maybe(saturation, s => roundOneDecimal(Number(s)*100)),
+      share: maybe(saturation, s => roundOneDecimal(Number(s) * 100)),
       websiteUrl: poolMeta.info?.homepage,
       ticker: poolMeta.info?.ticker,
     };
+
     return (
       <DelegatedStakePoolCard
+        poolTransition={delegationStore.poolTransitionRequestInfo}
         delegatedPool={delegatedPool}
         undelegate={async () => this.createWithdrawalTx(true)} // shouldDeregister=true
+        delegateToSpecificPool={async (poolId): any => {
+          this.props.stores.delegation.delegateToSpecificPool(poolId);
+          this.props.stores.delegation.createDelegationTransaction();
+        }}
       />
     );
   };
@@ -216,8 +235,8 @@ class StakingPageContent extends Component<AllProps> {
 
     const errorIfPresent = maybe(delegationRequests.error, error => ({ error }));
 
-    const showRewardAmount = errorIfPresent == null
-      && stores.delegation.isExecutedDelegatedBalance(publicDeriver);
+    const showRewardAmount =
+      errorIfPresent == null && stores.delegation.isExecutedDelegatedBalance(publicDeriver);
 
     const isStakeRegistered = stores.delegation.isStakeRegistered(publicDeriver);
     const currentlyDelegating = stores.delegation.isCurrentlyDelegating(publicDeriver);
@@ -260,7 +279,8 @@ class StakingPageContent extends Component<AllProps> {
               graphData={generateGraphData({
                 publicDeriver,
                 delegationRequests,
-                currentEpoch: stores.substores.ada.time.getCurrentTimeRequests(publicDeriver).currentEpoch,
+                currentEpoch: stores.substores.ada.time.getCurrentTimeRequests(publicDeriver)
+                  .currentEpoch,
                 shouldHideBalance: stores.profile.shouldHideBalance,
                 getLocalPoolInfo: stores.delegation.getLocalPoolInfo,
                 tokenInfo: stores.tokenInfoStore.tokenInfo,
@@ -321,11 +341,7 @@ class StakingPageContent extends Component<AllProps> {
           />
         ) : null}
         {uiDialogs.isOpen(UnmangleTxDialogContainer) ? (
-          <UnmangleTxDialogContainer
-            actions={actions}
-            stores={stores}
-            onClose={this.onClose}
-          />
+          <UnmangleTxDialogContainer actions={actions} stores={stores} onClose={this.onClose} />
         ) : null}
         {uiDialogs.isOpen(WithdrawalTxDialogContainer) ? (
           <WithdrawalTxDialogContainer
@@ -357,7 +373,8 @@ class StakingPageContent extends Component<AllProps> {
             graphData={generateGraphData({
               delegationRequests,
               publicDeriver,
-              currentEpoch: stores.substores.ada.time.getCurrentTimeRequests(publicDeriver).currentEpoch,
+              currentEpoch: stores.substores.ada.time.getCurrentTimeRequests(publicDeriver)
+                .currentEpoch,
               shouldHideBalance: stores.profile.shouldHideBalance,
               getLocalPoolInfo: stores.delegation.getLocalPoolInfo,
               tokenInfo: stores.tokenInfoStore.tokenInfo,

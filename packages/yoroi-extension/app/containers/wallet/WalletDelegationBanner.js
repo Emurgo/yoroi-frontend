@@ -105,7 +105,13 @@ function WalletDelegationBanner({
         <StakingIllustration height="300px" />
       </Box>
       <Box>
-        <Typography component="div" variant="h3" fontWeight={500} color="comon.black" marginBottom="4px">
+        <Typography
+          component="div"
+          variant="h3"
+          fontWeight={500}
+          color="comon.black"
+          marginBottom="4px"
+        >
           {intl.formatMessage(emptyDashboardMessages.title, { ticker })}
         </Typography>
         <Typography component="div" variant="body1" color="common.black">

@@ -15,7 +15,6 @@ import { removePublicDeriver } from '../../api/ada/lib/storage/bridge/walletBuil
 import { groupForWallet, } from './WalletStore';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import { removeWalletFromLS } from '../../utils/localStorage';
 
 export type PublicDeriverSettingsCache = {|
   publicDeriver: PublicDeriver<>,
@@ -249,7 +248,6 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     if (group == null) {
       throw new Error(`${nameof(this._removeWallet)} wallet doesn't belong to group`);
     }
-    await removeWalletFromLS(request.publicDeriver)
 
     // Remove this wallet from wallet sort list
     const walletsNavigation = this.stores.profile.walletsNavigation
