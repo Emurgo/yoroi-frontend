@@ -9,13 +9,13 @@ import {
   Typography,
   Stack,
   Box,
-  Chip,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { default as SortIcon } from '../../../../components/icons/portfolio/Sort';
-import ArrowIcon from '../../../../components/icons/portfolio/Arrow';
 import { useNavigateTo } from '../../common/useNavigateTo';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
+import StyledChip from '../../../../components/chip';
+import ArrowIcon from '../../../../components/icons/portfolio/Arrow';
 
 const StatsTable = ({ data }) => {
   const theme = useTheme();
@@ -106,7 +106,8 @@ const StatsTable = ({ data }) => {
             </TableCell>
 
             <TableCell>
-              <Chip
+              <StyledChip
+                active={row['24h'].active}
                 label={
                   <Stack direction="row" justifyContent="space-between" alignItems="center">
                     <ArrowIcon
@@ -123,20 +124,13 @@ const StatsTable = ({ data }) => {
                     <Typography>{row['24h'].percents}%</Typography>
                   </Stack>
                 }
-                sx={{
-                  cursor: 'pointer',
-                  backgroundColor: row['24h'].active
-                    ? theme.palette.ds.secondary_c100
-                    : theme.palette.ds.sys_magenta_c100,
-                  color: row['24h'].active
-                    ? theme.palette.ds.secondary_c800
-                    : theme.palette.ds.sys_magenta_c700,
-                }}
-              ></Chip>
+                sx={{ cursor: 'pointer' }}
+              />
             </TableCell>
 
             <TableCell>
-              <Chip
+              <StyledChip
+                active={row['1W'].active}
                 label={
                   <Stack direction="row" justifyContent="space-between" alignItems="center">
                     <ArrowIcon
@@ -153,20 +147,13 @@ const StatsTable = ({ data }) => {
                     <Typography>{row['1W'].percents}%</Typography>
                   </Stack>
                 }
-                sx={{
-                  cursor: 'pointer',
-                  backgroundColor: row['1W'].active
-                    ? theme.palette.ds.secondary_c100
-                    : theme.palette.ds.sys_magenta_c100,
-                  color: row['1W'].active
-                    ? theme.palette.ds.secondary_c800
-                    : theme.palette.ds.sys_magenta_c700,
-                }}
-              ></Chip>
+                sx={{ cursor: 'pointer' }}
+              />
             </TableCell>
 
             <TableCell>
-              <Chip
+              <StyledChip
+                active={row['1M'].active}
                 label={
                   <Stack direction="row" justifyContent="space-between" alignItems="center">
                     <ArrowIcon
@@ -183,16 +170,8 @@ const StatsTable = ({ data }) => {
                     <Typography>{row['1M'].percents}%</Typography>
                   </Stack>
                 }
-                sx={{
-                  cursor: 'pointer',
-                  backgroundColor: row['1M'].active
-                    ? theme.palette.ds.secondary_c100
-                    : theme.palette.ds.sys_magenta_c100,
-                  color: row['1M'].active
-                    ? theme.palette.ds.secondary_c800
-                    : theme.palette.ds.sys_magenta_c700,
-                }}
-              ></Chip>
+                sx={{ cursor: 'pointer' }}
+              />
             </TableCell>
 
             <TableCell>
@@ -204,7 +183,9 @@ const StatsTable = ({ data }) => {
             <TableCell>
               <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
                 <Stack direction="column">
-                  <Typography fontWeight="500">{row.totalAmount.amount} {row.name}</Typography>
+                  <Typography fontWeight="500">
+                    {row.totalAmount.amount} {row.name}
+                  </Typography>
                   <Typography sx={{ color: theme.palette.ds.text_gray_medium, textAlign: 'right' }}>
                     {row.totalAmount.usd} USD
                   </Typography>

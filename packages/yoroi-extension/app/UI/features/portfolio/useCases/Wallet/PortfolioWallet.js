@@ -1,13 +1,14 @@
-import { Typography, Stack, Chip, Box, Input, InputAdornment, styled } from '@mui/material';
+import { Typography, Stack, Box, Input, InputAdornment, styled } from '@mui/material';
 import { ReactComponent as Search } from '../../../../../assets/images/assets-page/search.inline.svg';
 import React, { useState } from 'react';
 import { StyledTooltip, SearchInput } from '../../../../components';
-import ArrowIcon from '../../../../components/icons/portfolio/Arrow';
 import { useTheme } from '@mui/material/styles';
 import { defineMessages } from 'react-intl';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import StatsTable from './StatsTable';
 import mockData from '../../../../pages/portfolio/mockData';
+import StyledChip from '../../../../components/chip';
+import ArrowIcon from '../../../../components/icons/portfolio/Arrow';
 
 const PortfolioWallet = ({ data }) => {
   const theme = useTheme();
@@ -30,7 +31,7 @@ const PortfolioWallet = ({ data }) => {
                 sx={{
                   display: 'inline',
                   marginTop: '5px',
-                  color: theme.palette.ds.gray_c400,
+                  color: theme.palette.ds.text_gray_low,
                 }}
               >
                 /USD
@@ -58,7 +59,8 @@ const PortfolioWallet = ({ data }) => {
                 spacing={theme.spacing(1)}
                 sx={{ marginLeft: '20px' }}
               >
-                <Chip
+                <StyledChip
+                  active={mockData.PortfolioPage.balance.percents.active}
                   label={
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
                       <ArrowIcon
@@ -77,31 +79,16 @@ const PortfolioWallet = ({ data }) => {
                       <Typography>{mockData.PortfolioPage.balance.percents.value}%</Typography>
                     </Stack>
                   }
-                  sx={{
-                    backgroundColor: mockData.PortfolioPage.balance.percents.active
-                      ? theme.palette.ds.secondary_c100
-                      : theme.palette.ds.sys_magenta_c100,
-                    color: mockData.PortfolioPage.balance.percents.active
-                      ? theme.palette.ds.secondary_c800
-                      : theme.palette.ds.sys_magenta_c700,
-                  }}
-                ></Chip>
-                <Chip
+                />
+                <StyledChip
+                  active={mockData.PortfolioPage.balance.amount.active}
                   label={
                     <Typography>
                       {mockData.PortfolioPage.balance.amount.active ? '+' : '-'}
                       {mockData.PortfolioPage.balance.amount.value} USD
                     </Typography>
                   }
-                  sx={{
-                    backgroundColor: mockData.PortfolioPage.balance.amount.active
-                      ? theme.palette.ds.secondary_c100
-                      : theme.palette.ds.sys_magenta_c100,
-                    color: mockData.PortfolioPage.balance.amount.active
-                      ? theme.palette.ds.secondary_c800
-                      : theme.palette.ds.sys_magenta_c700,
-                  }}
-                ></Chip>
+                />
               </Stack>
             </StyledTooltip>
           </Stack>

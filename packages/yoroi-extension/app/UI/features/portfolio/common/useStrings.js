@@ -131,6 +131,38 @@ export const messages = Object.freeze(
       id: 'portfolio.statsTable.headerText.totalAmount',
       defaultMessage: '!!!Total amount',
     },
+    transactionHistory: {
+      id: 'portfolio.transactionTable.title',
+      defaultMessage: '!!!Transaction history',
+    },
+    transactionType: {
+      id: 'portfolio.transactionTable.headerText.transactionType',
+      defaultMessage: '!!!Transaction type',
+    },
+    status: {
+      id: 'portfolio.transactionTable.headerText.status',
+      defaultMessage: '!!!Status',
+    },
+    fee: {
+      id: 'portfolio.transactionTable.headerText.fee',
+      defaultMessage: '!!!Fee',
+    },
+    amount: {
+      id: 'portfolio.transactionTable.headerText.amount',
+      defaultMessage: '!!!Amount',
+    },
+    today: {
+      id: 'portfolio.transactionTable.timestamp.today',
+      defaultMessage: '!!!Today',
+    },
+    yesterday: {
+      id: 'portfolio.transactionTable.timestamp.yesterday',
+      defaultMessage: '!!!Amount',
+    },
+    inthepast: {
+      id: 'portfolio.transactionTable.timestamp.inthepast',
+      defaultMessage: '!!!In the past',
+    },
   })
 );
 
@@ -168,5 +200,13 @@ export const getStrings = intl => {
     price: intl.formatMessage(messages.price),
     portfolio: intl.formatMessage(messages.portfolio),
     totalAmount: intl.formatMessage(messages.totalAmount),
+    transactionHistory: intl.formatMessage(messages.transactionHistory),
+    transactionType: intl.formatMessage(messages.transactionType),
+    status: intl.formatMessage(messages.status),
+    fee: intl.formatMessage(messages.fee),
+    amount: intl.formatMessage(messages.amount),
+    today: intl.formatMessage(messages.today),
+    yesterday: intl.formatMessage(messages.yesterday),
+    inthepast: intl.formatMessage(messages.inthepast),
   }).current;
 };

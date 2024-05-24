@@ -1046,6 +1046,14 @@
   "portfolio.statsTable.headerText.price": "Price",
   "portfolio.statsTable.headerText.portfolio": "Portfolio",
   "portfolio.statsTable.headerText.totalAmount": "Total amount",
+  "portfolio.transactionTable.title": "Transaction history",
+  "portfolio.transactionTable.headerText.transactionType": "Transaction type",
+  "portfolio.transactionTable.headerText.status": "Status",
+  "portfolio.transactionTable.headerText.fee": "Fee",
+  "portfolio.transactionTable.headerText.amount": "Amount",
+  "portfolio.transactionTable.timestamp.today": "Today",
+  "portfolio.transactionTable.timestamp.yesterday": "Yesterday",
+  "portfolio.transactionTable.timestamp.inthepast": "In the past",
   "gouvernace.delegateToDRep": "Delegate to a DRep",
   "gouvernace.designatingSomeoneElse": "You are designating someone else to cast your vote on your behalf for all proposals now and in the future."
 }

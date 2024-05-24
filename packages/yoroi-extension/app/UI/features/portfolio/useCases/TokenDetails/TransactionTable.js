@@ -16,42 +16,44 @@ import { Card } from '../../../../components';
 import { default as ArrowIcon } from '../../../../components/icons/portfolio/transaction-history/Arrow';
 import { default as ExpandIcon } from '../../../../components/icons/portfolio/transaction-history/Expand';
 import { default as ErrorIcon } from '../../../../components/icons/portfolio/transaction-history/Error';
-
-const timestamps = ['Today', 'Yesterday', 'In the past'];
-const categorizeByDate = data => {
-  const today = new Date();
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
-
-  return data.reduce(
-    (acc, item) => {
-      const itemDate = new Date(item.date);
-      if (itemDate.toDateString() === today.toDateString()) {
-        acc['Today'].push(item);
-      } else if (itemDate.toDateString() === yesterday.toDateString()) {
-        acc['Yesterday'].push(item);
-      } else {
-        acc['In the past'].push(item);
-      }
-      return acc;
-    },
-    {
-      Today: [],
-      Yesterday: [],
-      'In the past': [],
-    }
-  );
-};
+import { usePortfolio } from '../../module/PortfolioContextProvider';
 
 const TransactionTable = ({ history }) => {
   const theme = useTheme();
+  const { strings } = usePortfolio();
+
+  const timestamps = [strings.today, strings.yesterday, strings.inthepast];
+  const categorizeByDate = data => {
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    return data.reduce(
+      (acc, item) => {
+        const itemDate = new Date(item.date);
+        if (itemDate.toDateString() === today.toDateString()) {
+          acc[timestamps[0]].push(item);
+        } else if (itemDate.toDateString() === yesterday.toDateString()) {
+          acc[timestamps[1]].push(item);
+        } else {
+          acc[timestamps[2]].push(item);
+        }
+        return acc;
+      },
+      {
+        Today: [],
+        Yesterday: [],
+        'In the past': [],
+      }
+    );
+  };
 
   const categorizedData = useMemo(() => categorizeByDate(history), [history]);
   return (
     <Container>
       <Card>
         <Box sx={{ padding: '20px' }}>
-          <Typography fontWeight="500">Transaction history</Typography>
+          <Typography fontWeight="500">{strings.transactionHistory}</Typography>
           <Table
             sx={{
               marginTop: '25px',
@@ -62,17 +64,23 @@ const TransactionTable = ({ history }) => {
               <TableRow>
                 <TableCell>
                   <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
-                    Transaction type
+                    {strings.transactionType}
                   </Typography>
                 </TableCell>
                 <TableCell>
-                  <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>Status</Typography>
+                  <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
+                    {strings.status}
+                  </Typography>
                 </TableCell>
                 <TableCell align="center">
-                  <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>Fee</Typography>
+                  <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
+                    {strings.fee}
+                  </Typography>
                 </TableCell>
                 <TableCell align="right">
-                  <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>Amount</Typography>
+                  <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
+                    {strings.amount}
+                  </Typography>
                 </TableCell>
               </TableRow>
             </TableHead>
@@ -97,22 +105,30 @@ const TransactionTable = ({ history }) => {
                               height: '48px',
                               backgroundColor:
                                 row.type === 'Sent'
-                                  ? theme.palette.ds.sys_cyan_c100
+                                  ? theme.palette.ds.primary_c100
                                   : row.type === 'Received'
                                   ? theme.palette.ds.secondary_c100
                                   : theme.palette.ds.sys_magenta_c100,
+                              '&:hover': {
+                                backgroundColor:
+                                  row.type === 'Sent'
+                                    ? theme.palette.ds.primary_c100
+                                    : row.type === 'Received'
+                                    ? theme.palette.ds.secondary_c100
+                                    : theme.palette.ds.sys_magenta_c100,
+                              },
                             }}
                           >
                             {row.type === 'Sent' && (
                               <ArrowIcon
-                                stroke={theme.palette.ds.sys_cyan_c500}
+                                stroke={theme.palette.ds.text_primary_medium}
                                 width="24px"
                                 height="24px"
                               />
                             )}
                             {row.type === 'Received' && (
                               <ArrowIcon
-                                stroke={theme.palette.ds.secondary_c500}
+                                stroke={theme.palette.ds.text_success}
                                 width="24px"
                                 height="24px"
                                 style={{ transform: 'rotate(180deg)' }}
@@ -120,7 +136,7 @@ const TransactionTable = ({ history }) => {
                             )}
                             {row.type === 'Transaction error' && (
                               <ErrorIcon
-                                fill={theme.palette.ds.sys_magenta_c500}
+                                fill={theme.palette.ds.text_error}
                                 width="24px"
                                 height="24px"
                               />
@@ -142,7 +158,7 @@ const TransactionTable = ({ history }) => {
                           sx={{
                             color:
                               row.status === 'Failed'
-                                ? theme.palette.ds.sys_magenta_c500
+                                ? theme.palette.ds.text_error
                                 : theme.palette.ds.black_static,
                           }}
                         >
@@ -172,12 +188,12 @@ const TransactionTable = ({ history }) => {
                               </Typography>
                             )}
                             {row.type === 'Sent' && (
-                              <Typography weight="500" sx={{ textAlign: 'right' }}>
+                              <Typography fontWeight="500" sx={{ textAlign: 'right' }}>
                                 {row.amount.asset}
                               </Typography>
                             )}
                           </Stack>
-                          <ExpandIcon width="16px" height="16px" />
+                          <ExpandIcon width="16px" height="16px" style={{ cursor: 'pointer' }} />
                         </Stack>
                       </TableCell>
                     </TableRow>

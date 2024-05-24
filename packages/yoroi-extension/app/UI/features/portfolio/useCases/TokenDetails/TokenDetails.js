@@ -23,6 +23,8 @@ import { useTheme } from '@mui/material/styles';
 import mockData from '../../../../pages/portfolio/mockData';
 import { useNavigateTo } from '../../common/useNavigateTo';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
+import StyledChip from '../../../../components/chip';
+import ArrowIcon from '../../../../components/icons/portfolio/Arrow';
 
 const PerformanceItemType = {
   USD: 'usd',
@@ -172,7 +174,7 @@ const TokenDetails = ({ tokenInfo, mockHistory }) => {
                 ) : (
                   <Stack direction="row" alignItems="center">
                     <Typography variant="h5" fontWeight="500">
-                      0,48
+                      {tokenInfo.marketPrice.current}
                     </Typography>
                     &nbsp;USD
                   </Stack>
@@ -190,39 +192,47 @@ const TokenDetails = ({ tokenInfo, mockHistory }) => {
                     {isLoading ? (
                       <StyledSkeleton width="35px" height="16px" />
                     ) : (
-                      <Chip
+                      <StyledChip
+                        active={tokenInfo.marketPrice.percents.active}
                         label={
                           <Stack direction="row" justifyContent="space-between" alignItems="center">
-                            <Arrow
-                              fill={theme.palette.ds.secondary_c800}
-                              style={{ marginRight: '5px' }}
+                            <ArrowIcon
+                              fill={
+                                tokenInfo.marketPrice.percents.active
+                                  ? theme.palette.ds.secondary_c800
+                                  : theme.palette.ds.sys_magenta_c700
+                              }
+                              style={{
+                                marginRight: '5px',
+                                transform: tokenInfo.marketPrice.percents.active
+                                  ? ''
+                                  : 'rotate(180deg)',
+                              }}
                             />
-                            <Typography>0,03%</Typography>
+                            <Typography>{tokenInfo.marketPrice.percents.value}%</Typography>
                           </Stack>
                         }
-                        sx={{
-                          backgroundColor: theme.palette.ds.secondary_c100,
-                          color: theme.palette.ds.secondary_c800,
-                        }}
-                      ></Chip>
+                      />
                     )}
 
                     {isLoading ? (
                       <StyledSkeleton width="35px" height="16px" />
                     ) : (
-                      <Chip
-                        label={<Typography>+0,03 USD</Typography>}
-                        sx={{
-                          backgroundColor: theme.palette.ds.secondary_c100,
-                          color: theme.palette.ds.secondary_c800,
-                        }}
-                      ></Chip>
+                      <StyledChip
+                        active={tokenInfo.marketPrice.usd.active}
+                        label={
+                          <Typography>
+                            {tokenInfo.marketPrice.usd.active ? '+' : '-'}
+                            {tokenInfo.marketPrice.usd.value} USD
+                          </Typography>
+                        }
+                      />
                     )}
                   </Stack>
                 </StyledTooltip>
               </Stack>
             </Stack>
-            <TokenDetailChart isLoading={isLoading} />
+            <TokenDetailChart isLoading={isLoading} data={tokenInfo.marketPrice.chartData} />
           </Box>
         </Card>
 

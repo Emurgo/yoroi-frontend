@@ -5,7 +5,7 @@ export const SearchInput = styled(Input)(({ theme }) => ({
   width: '370px',
   height: '40px',
   padding: '10px 12px',
-  backgroundColor: theme.palette.ds.white_static,
+  backgroundColor: theme.palette.ds.text_primary_on,
   border: '1px solid',
   borderColor: theme.palette.ds.gray_c300,
   'input::placeholder': {

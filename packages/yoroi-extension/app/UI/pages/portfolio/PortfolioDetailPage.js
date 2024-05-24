@@ -14,6 +14,41 @@ const PortfolioDetailPage = ({ stores, actions, match }: Props) => {
   const tokenId = match.params.tokenId;
 
   const tokenInfo = {
+    marketPrice: {
+      current: '0,68',
+      percents: {
+        active: true,
+        value: '0,79',
+      },
+      usd: {
+        active: true,
+        value: '8,33',
+      },
+      chartData: [
+        { date: '05/24/2024 14:37', value: Math.random().toFixed(3) },
+        { date: '05/01/2024 14:37', value: Math.random().toFixed(3) },
+        { date: '05/02/2024 18:21', value: Math.random().toFixed(3) },
+        { date: '05/03/2024 22:37', value: Math.random().toFixed(3) },
+        { date: '05/24/2024 13:37', value: Math.random().toFixed(3) },
+        { date: '05/24/2024 10:27', value: Math.random().toFixed(3) },
+        { date: '05/24/2024 08:18', value: Math.random().toFixed(3) },
+        { date: '08/17/2023 14:37', value: Math.random().toFixed(3) },
+        { date: '09/24/2023 14:37', value: Math.random().toFixed(3) },
+        { date: '08/17/2022 14:37', value: Math.random().toFixed(3) },
+        { date: '09/24/2022 14:37', value: Math.random().toFixed(3) },
+        { date: '08/17/2021 14:37', value: Math.random().toFixed(3) },
+        { date: '09/24/2021 14:37', value: Math.random().toFixed(3) },
+        { date: '05/23/2024 18:37', value: Math.random().toFixed(3) },
+        { date: '05/23/2024 20:37', value: Math.random().toFixed(3) },
+        { date: '05/20/2024 12:22', value: Math.random().toFixed(3) },
+        { date: '04/24/2024 12:22', value: Math.random().toFixed(3) },
+        { date: '04/24/2024 12:22', value: Math.random().toFixed(3) },
+        { date: '03/24/2024 04:22', value: Math.random().toFixed(3) },
+        { date: '03/24/2024 09:22', value: Math.random().toFixed(3) },
+        { date: '02/24/2024 18:22', value: Math.random().toFixed(3) },
+        { date: '01/24/2024 23:22', value: Math.random().toFixed(3) },
+      ],
+    },
     overview: {
       tokenName: tokenId,
       description:
