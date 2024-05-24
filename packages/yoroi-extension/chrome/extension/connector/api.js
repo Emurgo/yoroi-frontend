@@ -1133,8 +1133,7 @@ export async function connectorRecordSubmittedCardanoTransaction(
   await persistSubmittedTransactions(submittedTxs);
 }
 
-const MIN_REORG_OUTPUT_AMOUNT  = '1000000';
-
+// <TODO:PENDING_REMOVAL> use the ada api function directly
 export async function connectorGenerateReorgTx(
   publicDeriver: PublicDeriver<>,
   usedUtxoIds: Array<string>,
@@ -1145,59 +1144,14 @@ export async function connectorGenerateReorgTx(
   unsignedTx: HaskellShelleyTxSignRequest,
   collateralOutputAddressSet: Set<string>,
 |}> {
-  const network = publicDeriver.getParent().getNetworkInfo();
-
-  const withUtxos = asGetAllUtxos(publicDeriver);
-  if (withUtxos == null) {
-    throw new Error(`missing utxo functionality`);
-  }
-
-  const withHasUtxoChains = asHasUtxoChains(withUtxos);
-  if (withHasUtxoChains == null) {
-    throw new Error(`missing chains functionality`);
-  }
-
-  const fullConfig = getCardanoHaskellBaseConfig(network);
-  const timeToSlot = await genTimeToSlot(fullConfig);
-  const absSlotNumber = new BigNumber(timeToSlot({
-    time: new Date(),
-  }).slot);
-  const unusedAddresses = await connectorGetUnusedAddresses(
-    publicDeriver
-  );
-  if (unusedAddresses.length === 0) {
-    throw new Error('unexpected: no unused addresses available');
-  }
-  const reorgOutputValue = BigNumber
-    .max(reorgTargetAmount, MIN_REORG_OUTPUT_AMOUNT)
-    .toString();
-  const includeTargets = [{
-    address: unusedAddresses[0],
-    isForeign: false,
-    value: reorgOutputValue,
-  }];
-  const collateralOutputAddressSet = new Set<string>([unusedAddresses[0]]);
-  const dontUseUtxoIds = new Set(usedUtxoIds);
   const adaApi = new AdaApi();
-  const unsignedTx = await adaApi.createUnsignedTxForConnector(
-    {
-      publicDeriver: withHasUtxoChains,
-      absSlotNumber,
-      cardanoTxRequest: {
-        includeTargets,
-      },
-      utxos: (await adaApi.addressedUtxosWithSubmittedTxs(
-        utxos,
-        publicDeriver,
-        submittedTxs,
-      )).filter(utxo => !dontUseUtxoIds.has(utxo.utxo_id)),
-      // we already factored in submitted transactions above, no need to handle it
-      // any more, so just use an empty array here
-      submittedTxs: [],
-    },
-    null,
+  return adaApi.createReorgTx(
+    publicDeriver,
+    usedUtxoIds,
+    reorgTargetAmount,
+    utxos,
+    submittedTxs,
   );
-  return { unsignedTx, collateralOutputAddressSet };
 }
 
 export async function getAddressing(
