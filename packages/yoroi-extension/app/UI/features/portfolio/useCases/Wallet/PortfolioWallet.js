@@ -15,12 +15,12 @@ import {
 } from '@mui/material';
 import { ReactComponent as Search } from '../../../../../assets/images/assets-page/search.inline.svg';
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
 import { StyledTooltip, SearchInput } from '../../../../components';
 import Arrow from '../../../../components/icons/portfolio/Arrow';
 import { default as SortIcon } from '../../../../components/icons/portfolio/Sort';
 import { useTheme } from '@mui/material/styles';
 import { defineMessages } from 'react-intl';
+import { useNavigateTo } from '../../common/useNavigateTo';
 
 // const messages = defineMessages({
 //   search: {
@@ -31,7 +31,7 @@ import { defineMessages } from 'react-intl';
 
 const PortfolioWallet = ({ headCells, data }) => {
   const theme = useTheme();
-  const history = useHistory();
+  const navigateTo = useNavigateTo();
   const [keyword, setKeyword] = useState('');
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('');
@@ -157,7 +157,7 @@ const PortfolioWallet = ({ headCells, data }) => {
           {data.map(row => (
             <TableRow
               key={row.id}
-              onClick={() => history.push(`/portfolio/details/${row.id}`)}
+              onClick={() => navigateTo.portfolioDetail(row.id)}
               sx={{
                 cursor: 'pointer',
                 transition: 'all 0.3s ease-in-out',

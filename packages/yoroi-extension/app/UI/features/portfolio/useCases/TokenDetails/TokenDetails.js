@@ -15,13 +15,13 @@ import { ReactComponent as BackIcon } from '../../../../../assets/images/assets-
 import { styled } from '@mui/material/styles';
 import { StyledTooltip, StyledSkeleton, CopyButton, Card } from '../../../../components';
 import { tableCellClasses } from '@mui/material/TableCell';
-import { useHistory } from 'react-router-dom';
 import TransactionHistory from '../../common/TransactionHistory';
 import TokenDetailChart from '../../common/TokenDetailChart';
 import SubMenu from '../../../../../components/topbar/SubMenu';
 import Arrow from '../../../../components/icons/portfolio/Arrow';
 import { useTheme } from '@mui/material/styles';
 import mockData from '../../../../pages/portfolio/mockData';
+import { useNavigateTo } from '../../common/useNavigateTo';
 
 const Header = styled(Box)({
   display: 'flex',
@@ -43,7 +43,7 @@ const TabContent = styled(Box)({
 
 const TokenDetails = ({ tokenInfo, subMenuOptions, mockHistory }) => {
   const theme = useTheme();
-  const history = useHistory();
+  const navigateTo = useNavigateTo();
   const [selectedTab, setSelectedTab] = useState(subMenuOptions[0].route);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -70,7 +70,7 @@ const TokenDetails = ({ tokenInfo, subMenuOptions, mockHistory }) => {
     <Box>
       <Header>
         <Button
-          onClick={() => history.push('/portfolio')}
+          onClick={() => navigateTo.portfolio()}
           sx={{ color: theme.palette.ds.black_static, display: 'flex', gap: theme.spacing(2) }}
         >
           <BackIcon />
