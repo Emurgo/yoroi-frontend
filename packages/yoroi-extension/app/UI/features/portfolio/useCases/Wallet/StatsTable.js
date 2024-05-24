@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   Table,
   TableBody,
@@ -21,24 +21,74 @@ const StatsTable = ({ data }) => {
   const theme = useTheme();
   const navigateTo = useNavigateTo();
   const { strings } = usePortfolio();
-  const [order, setOrder] = useState('asc');
-  const [orderBy, setOrderBy] = useState('');
 
   const headCells = [
-    { id: 'name', label: strings.name, align: 'left' },
-    { id: 'price', label: strings.price, align: 'left' },
-    { id: '24h', label: '24H', align: 'left' },
-    { id: '1w', label: '1W', align: 'left' },
-    { id: '1m', label: '1M', align: 'left' },
-    { id: 'portfolioPercents', label: `${strings.portfolio} %`, align: 'left' },
-    { id: 'totalAmount', label: strings.totalAmount, align: 'right' },
+    { id: 'name', label: strings.name, align: 'left', disabledSort: false, sortType: 'character' },
+    { id: 'price', label: strings.price, align: 'left', disabledSort: false, sortType: 'numeric' },
+    { id: '24h', label: '24H', align: 'left', disabledSort: false, sortType: 'numeric' },
+    { id: '1W', label: '1W', align: 'left', disabledSort: false, sortType: 'numeric' },
+    { id: '1M', label: '1M', align: 'left', disabledSort: true, sortType: 'numeric' },
+    {
+      id: 'portfolioPercents',
+      label: `${strings.portfolio} %`,
+      align: 'left',
+      disabledSort: false,
+      sortType: 'numeric',
+    },
+    {
+      id: 'totalAmount',
+      label: strings.totalAmount,
+      align: 'right',
+      disabledSort: false,
+      sortType: 'numeric',
+    },
   ];
+
+  const [{ order, orderBy }, setSortState] = useState({
+    order: 'asc',
+    orderBy: 'name',
+  });
 
   const handleRequestSort = property => {
     const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
+    setSortState({
+      order: isAsc ? 'desc' : 'asc',
+      orderBy: property,
+    });
   };
+
+  function descendingComparator(a, b, sortType) {
+    switch (sortType) {
+      case 'numeric':
+        if (parseFloat(b[orderBy]) < parseFloat(a[orderBy])) {
+          return -1;
+        } else {
+          return 1;
+        }
+      case 'character':
+        return String(a[orderBy]).localeCompare(b[orderBy]);
+      default:
+        if (b[orderBy] < a[orderBy]) {
+          return -1;
+        } else {
+          return 1;
+        }
+    }
+  }
+
+  const getSortedData = useCallback(
+    data => {
+      if (!orderBy || !order) return data;
+      const sortColumn = headCells.find(cell => cell.id === orderBy);
+      const sortType = sortColumn?.sortType ?? 'character';
+      return data.sort((a, b) => {
+        return order === 'desc'
+          ? descendingComparator(a, b, sortType)
+          : -descendingComparator(a, b, sortType);
+      });
+    },
+    [order, orderBy, headCells]
+  );
 
   return (
     <Table
@@ -49,23 +99,32 @@ const StatsTable = ({ data }) => {
     >
       <TableHead>
         <TableRow>
-          {headCells.map(({ label, align, id }) => (
-            <TableCell key={id} align={align} onClick={() => handleRequestSort(id)}>
+          {headCells.map(({ label, align, id, disabledSort }) => (
+            <TableCell
+              key={id}
+              align={align}
+              onClick={() => (disabledSort ? null : handleRequestSort(id))}
+            >
               <Stack
                 direction="row"
                 alignItems="center"
                 spacing={theme.spacing(1)}
-                sx={{ float: align }}
+                sx={{ float: align, cursor: disabledSort ? 'auto' : 'pointer' }}
               >
-                <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>{label}</Typography>
-                <SortIcon style={{ cursor: 'pointer' }} />
+                <Typography
+                  sx={{ color: theme.palette.ds.text_gray_medium }}
+                  sx={{ userSelect: 'none' }}
+                >
+                  {label}
+                </Typography>
+                {disabledSort ? null : <SortIcon />}
               </Stack>
             </TableCell>
           ))}
         </TableRow>
       </TableHead>
       <TableBody>
-        {data.map(row => (
+        {getSortedData(data).map(row => (
           <TableRow
             key={row.id}
             onClick={() => navigateTo.portfolioDetail(row.id)}
@@ -107,21 +166,21 @@ const StatsTable = ({ data }) => {
 
             <TableCell>
               <StyledChip
-                active={row['24h'].active}
+                active={row['24h'] > 0}
                 label={
                   <Stack direction="row" justifyContent="space-between" alignItems="center">
                     <ArrowIcon
                       fill={
-                        row['24h'].active
+                        row['24h'] > 0
                           ? theme.palette.ds.secondary_c800
                           : theme.palette.ds.sys_magenta_c700
                       }
                       style={{
                         marginRight: '5px',
-                        transform: row['24h'].active ? '' : 'rotate(180deg)',
+                        transform: row['24h'] > 0 ? '' : 'rotate(180deg)',
                       }}
                     />
-                    <Typography>{row['24h'].percents}%</Typography>
+                    <Typography>{row['24h'] > 0 ? row['24h'] : -1 * row['24h']}%</Typography>
                   </Stack>
                 }
                 sx={{ cursor: 'pointer' }}
@@ -130,21 +189,21 @@ const StatsTable = ({ data }) => {
 
             <TableCell>
               <StyledChip
-                active={row['1W'].active}
+                active={row['1W'] > 0}
                 label={
                   <Stack direction="row" justifyContent="space-between" alignItems="center">
                     <ArrowIcon
                       fill={
-                        row['1W'].active
+                        row['1W'] > 0
                           ? theme.palette.ds.secondary_c800
                           : theme.palette.ds.sys_magenta_c700
                       }
                       style={{
                         marginRight: '5px',
-                        transform: row['1W'].active ? '' : 'rotate(180deg)',
+                        transform: row['1W'] > 0 ? '' : 'rotate(180deg)',
                       }}
                     />
-                    <Typography>{row['1W'].percents}%</Typography>
+                    <Typography>{row['1W'] > 0 ? row['1W'] : -1 * row['1W']}%</Typography>
                   </Stack>
                 }
                 sx={{ cursor: 'pointer' }}
@@ -153,21 +212,21 @@ const StatsTable = ({ data }) => {
 
             <TableCell>
               <StyledChip
-                active={row['1M'].active}
+                active={row['1M'] > 0}
                 label={
                   <Stack direction="row" justifyContent="space-between" alignItems="center">
                     <ArrowIcon
                       fill={
-                        row['1M'].active
+                        row['1M'] > 0
                           ? theme.palette.ds.secondary_c800
                           : theme.palette.ds.sys_magenta_c700
                       }
                       style={{
                         marginRight: '5px',
-                        transform: row['1M'].active ? '' : 'rotate(180deg)',
+                        transform: row['1M'] > 0 ? '' : 'rotate(180deg)',
                       }}
                     />
-                    <Typography>{row['1M'].percents}%</Typography>
+                    <Typography>{row['1M'] > 0 ? row['1M'] : -1 * row['1M']}%</Typography>
                   </Stack>
                 }
                 sx={{ cursor: 'pointer' }}
@@ -176,7 +235,7 @@ const StatsTable = ({ data }) => {
 
             <TableCell>
               <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
-                {row.portfolioPercents}&nbsp;%
+                {row.portfolioPercents.toFixed(2)}&nbsp;%
               </Typography>
             </TableCell>
 
@@ -184,10 +243,10 @@ const StatsTable = ({ data }) => {
               <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
                 <Stack direction="column">
                   <Typography fontWeight="500">
-                    {row.totalAmount.amount} {row.name}
+                    {row.totalAmount} {row.name}
                   </Typography>
                   <Typography sx={{ color: theme.palette.ds.text_gray_medium, textAlign: 'right' }}>
-                    {row.totalAmount.usd} USD
+                    {row.totalAmountUsd} USD
                   </Typography>
                 </Stack>
               </Stack>

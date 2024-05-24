@@ -10,12 +10,9 @@ type Props = {|
 |};
 
 const PortfolioPage = ({ stores, actions }: Props) => {
-
   return (
     <PortfolioPageLayout stores={stores} actions={actions}>
-      <PortfolioWallet
-        data={mockData.PortfolioPage.data}
-      />
+      <PortfolioWallet data={mockData.tokenList} />
     </PortfolioPageLayout>
   );
 };
