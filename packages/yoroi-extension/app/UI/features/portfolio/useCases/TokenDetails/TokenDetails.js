@@ -15,13 +15,20 @@ import { ReactComponent as BackIcon } from '../../../../../assets/images/assets-
 import { styled } from '@mui/material/styles';
 import { StyledTooltip, StyledSkeleton, CopyButton, Card } from '../../../../components';
 import { tableCellClasses } from '@mui/material/TableCell';
-import TransactionHistory from '../../common/TransactionHistory';
-import TokenDetailChart from '../../common/TokenDetailChart';
+import TransactionTable from './TransactionTable';
+import TokenDetailChart from './TokenDetailChart';
 import SubMenu from '../../../../../components/topbar/SubMenu';
 import Arrow from '../../../../components/icons/portfolio/Arrow';
 import { useTheme } from '@mui/material/styles';
 import mockData from '../../../../pages/portfolio/mockData';
 import { useNavigateTo } from '../../common/useNavigateTo';
+import { usePortfolio } from '../../module/PortfolioContextProvider';
+
+const PerformanceItemType = {
+  USD: 'usd',
+  TOKEN: 'token',
+  RANK: 'rank',
+};
 
 const Header = styled(Box)({
   display: 'flex',
@@ -41,11 +48,39 @@ const TabContent = styled(Box)({
   flex: 1,
 });
 
-const TokenDetails = ({ tokenInfo, subMenuOptions, mockHistory }) => {
+const TokenDetails = ({ tokenInfo, mockHistory }) => {
   const theme = useTheme();
   const navigateTo = useNavigateTo();
-  const [selectedTab, setSelectedTab] = useState(subMenuOptions[0].route);
+  const { strings } = usePortfolio();
   const [isLoading, setIsLoading] = useState(false);
+
+  const subMenuOptions = [
+    {
+      label: strings.overview,
+      className: 'overview',
+      route: 'overview',
+    },
+    {
+      label: strings.performance,
+      className: 'performance',
+      route: 'performance',
+    },
+  ];
+
+  const performanceItemList = [
+    { id: 'tokenPriceChange', type: PerformanceItemType.USD, label: strings.tokenPriceChange },
+    { id: 'tokenPrice', type: PerformanceItemType.USD, label: strings.tokenPrice },
+    { id: 'marketCap', type: PerformanceItemType.USD, label: strings.marketCap },
+    { id: 'volumn', type: PerformanceItemType.USD, label: strings['24hVolumn'] },
+    { id: 'rank', type: PerformanceItemType.RANK, label: strings.rank },
+    { id: 'circulating', type: PerformanceItemType.TOKEN, label: strings.circulating },
+    { id: 'totalSupply', type: PerformanceItemType.TOKEN, label: strings.totalSupply },
+    { id: 'maxSupply', type: PerformanceItemType.TOKEN, label: strings.maxSupply },
+    { id: 'allTimeHigh', type: PerformanceItemType.USD, label: strings.allTimeHigh },
+    { id: 'allTimeLow', type: PerformanceItemType.USD, label: strings.allTimeLow },
+  ];
+
+  const [selectedTab, setSelectedTab] = useState(subMenuOptions[0].route);
 
   const isActiveItem: string => boolean = route => {
     if (route === selectedTab) {
@@ -75,13 +110,13 @@ const TokenDetails = ({ tokenInfo, subMenuOptions, mockHistory }) => {
         >
           <BackIcon />
           <Typography variant="body2" fontWeight="500">
-            Back to Portfolio
+            {strings.backToPortfolio}
           </Typography>
         </Button>
         <Stack direction="row" spacing={theme.spacing(2)}>
-          <StyledButton variant="contained">SWAP</StyledButton>
-          <StyledButton variant="secondary">SEND</StyledButton>
-          <StyledButton variant="secondary">RECEIVE</StyledButton>
+          <StyledButton variant="contained">{strings.swap}</StyledButton>
+          <StyledButton variant="secondary">{strings.send}</StyledButton>
+          <StyledButton variant="secondary">{strings.receive}</StyledButton>
         </Stack>
       </Header>
 
@@ -92,7 +127,7 @@ const TokenDetails = ({ tokenInfo, subMenuOptions, mockHistory }) => {
               {isLoading ? (
                 <StyledSkeleton width="82px" height="16px" />
               ) : (
-                `${tokenInfo.overview.tokenName} balance`
+                `${tokenInfo.overview.tokenName} ${strings.balance}`
               )}
             </Typography>
 
@@ -129,7 +164,7 @@ const TokenDetails = ({ tokenInfo, subMenuOptions, mockHistory }) => {
               {isLoading ? (
                 <StyledSkeleton width="131px" height="13px" />
               ) : (
-                <Typography fontWeight="500">Market price</Typography>
+                <Typography fontWeight="500">{strings.marketPrice}</Typography>
               )}
               <Stack direction="row" gap={2} alignItems="center">
                 {isLoading ? (
@@ -145,8 +180,8 @@ const TokenDetails = ({ tokenInfo, subMenuOptions, mockHistory }) => {
                 <StyledTooltip
                   title={
                     <>
-                      <Typography display={'block'}>Token price change</Typography>
-                      <Typography display={'block'}>in 24 hours</Typography>
+                      <Typography display={'block'}>{strings.tokenPriceChange}</Typography>
+                      <Typography display={'block'}>{strings.in24hours}</Typography>
                     </>
                   }
                   placement="top"
@@ -236,7 +271,7 @@ const TokenDetails = ({ tokenInfo, subMenuOptions, mockHistory }) => {
                     {isLoading ? (
                       <StyledSkeleton width="53px" height="16px" />
                     ) : (
-                      <Typography fontWeight="500">Description</Typography>
+                      <Typography fontWeight="500">{strings.description}</Typography>
                     )}
                     {isLoading ? (
                       <>
@@ -255,7 +290,7 @@ const TokenDetails = ({ tokenInfo, subMenuOptions, mockHistory }) => {
                     {isLoading ? (
                       <StyledSkeleton width="53px" height="16px" />
                     ) : (
-                      <Typography fontWeight="500">Website</Typography>
+                      <Typography fontWeight="500">{strings.website}</Typography>
                     )}
                     {isLoading ? (
                       <StyledSkeleton width="127px" height="20px" />
@@ -270,7 +305,7 @@ const TokenDetails = ({ tokenInfo, subMenuOptions, mockHistory }) => {
                     {isLoading ? (
                       <StyledSkeleton width="84px" height="20px" />
                     ) : (
-                      <Typography fontWeight="500">Policy ID</Typography>
+                      <Typography fontWeight="500">{strings.policyId}</Typography>
                     )}
 
                     <Stack direction="row" spacing={theme.spacing(2)} alignItems="self-start">
@@ -297,7 +332,7 @@ const TokenDetails = ({ tokenInfo, subMenuOptions, mockHistory }) => {
                     {isLoading ? (
                       <StyledSkeleton width="84px" height="20px" />
                     ) : (
-                      <Typography fontWeight="500">Fingerprint</Typography>
+                      <Typography fontWeight="500">{strings.fingerprint}</Typography>
                     )}
 
                     <Stack direction="row" spacing={2} alignItems="self-start">
@@ -324,7 +359,7 @@ const TokenDetails = ({ tokenInfo, subMenuOptions, mockHistory }) => {
                     {isLoading ? (
                       <StyledSkeleton width="53px" height="16px" />
                     ) : (
-                      <Typography fontWeight="500">Details on</Typography>
+                      <Typography fontWeight="500">{strings.detailsOn}</Typography>
                     )}
                     <Stack direction="row" alignItems="center" spacing={theme.spacing(1)}>
                       {isLoading ? (
@@ -353,7 +388,7 @@ const TokenDetails = ({ tokenInfo, subMenuOptions, mockHistory }) => {
                   Market data
                 </Typography>
                 <Stack direction="column" spacing={2.3}>
-                  {mockData.TokenDetails.performanceItemList.map((item, index) => (
+                  {performanceItemList.map((item, index) => (
                     <Stack
                       key={item.id}
                       direction="row"
@@ -363,7 +398,12 @@ const TokenDetails = ({ tokenInfo, subMenuOptions, mockHistory }) => {
                       <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
                         {item.label}
                       </Typography>
-                      <Typography>{tokenInfo.performance[index].value}</Typography>
+                      <Typography>
+                        {item.type === PerformanceItemType.RANK && '#'}
+                        {tokenInfo.performance[index].value}{' '}
+                        {item.type === PerformanceItemType.USD && 'USD'}
+                        {item.type === PerformanceItemType.TOKEN && tokenInfo.overview.tokenName}
+                      </Typography>
                     </Stack>
                   ))}
                 </Stack>
@@ -373,7 +413,7 @@ const TokenDetails = ({ tokenInfo, subMenuOptions, mockHistory }) => {
         </Card>
       </TokenInfo>
 
-      <TransactionHistory history={mockHistory} />
+      <TransactionTable history={mockHistory} />
     </Box>
   );
 };

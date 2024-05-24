@@ -1,164 +1,158 @@
 // ALL THE MOCK DATA FOR RENDERING UI
 
 const mockData = {
+  tokenList: [],
+
   PortfolioPage: {
-    headCells: [
-      { id: 'name', label: 'Name', align: 'left' },
-      { id: 'price', label: 'Price', align: 'left' },
-      { id: '24h', label: '24H', align: 'left' },
-      { id: '1w', label: '1W', align: 'left' },
-      { id: '1m', label: '1M', align: 'left' },
-      { id: 'portfolioPercents', label: 'Portfolio %', align: 'left' },
-      { id: 'totalAmount', label: 'Total amount', align: 'right' },
-    ],
+    balance: {
+      ada: '289869,04',
+      usd: '940,64',
+      percents: {
+        active: true,
+        value: '0,03',
+      },
+      amount: {
+        active: true,
+        value: '0,56',
+      },
+    },
     data: [
       {
         name: 'Token name',
         id: 'Policy ID',
-        price: '0,48 USD',
+        price: '0,48',
         portfolioPercents: '75,00',
         '24h': {
           active: true,
-          percents: '0,03%',
+          percents: '0,03',
         },
         '1W': {
           active: false,
-          percents: '0,07%',
+          percents: '0,07',
         },
         '1M': {
           active: true,
-          percents: '0,07%',
+          percents: '0,07',
         },
         totalAmount: {
-          amount: '1,019,243 ADA',
-          usd: '372,561 USD',
+          amount: '1,019,243',
+          usd: '372,561',
         },
       },
       {
         name: 'AGIX',
         id: 'Agix',
-        price: '0,08 USD',
+        price: '0,08',
         portfolioPercents: '5,00',
         '24h': {
           active: false,
-          percents: '0,03%',
+          percents: '0,03',
         },
         '1W': {
           active: false,
-          percents: '0,07%',
+          percents: '0,07',
         },
         '1M': {
           active: false,
-          percents: '0,07%',
+          percents: '0,07',
         },
         totalAmount: {
-          amount: '4990,00 AGIX',
-          usd: '400,00 USD',
+          amount: '4990,00',
+          usd: '400,00',
         },
       },
       {
         name: 'MILK',
         id: 'Milk',
-        price: '0,05 USD',
+        price: '0,05',
         portfolioPercents: '5,00',
         '24h': {
           active: true,
-          percents: '0,03%',
+          percents: '0,03',
         },
         '1W': {
           active: false,
-          percents: '0,07%',
+          percents: '0,07',
         },
         '1M': {
           active: true,
-          percents: '0,03%',
+          percents: '0,03',
         },
         totalAmount: {
-          amount: '1000,00 MILK',
-          usd: '372,561 USD',
+          amount: '1000,00',
+          usd: '372,561',
         },
       },
       {
         name: 'TKN',
         id: 'Tkn',
-        price: '0,08 USD',
+        price: '0,08',
         portfolioPercents: '5,00',
         '24h': {
           active: true,
-          percents: '0,03%',
+          percents: '0,03',
         },
         '1W': {
           active: true,
-          percents: '0,07%',
+          percents: '0,07',
         },
         '1M': {
           active: false,
-          percents: '0,07%',
+          percents: '0,07',
         },
         totalAmount: {
-          amount: '4990,00 AGIX',
-          usd: '400,00 USD',
+          amount: '4990,00',
+          usd: '400,00',
         },
       },
       {
         name: 'TKN',
         id: 'Tkn',
-        price: '0,08 USD',
+        price: '0,08',
         portfolioPercents: '5,00',
         '24h': {
           active: false,
-          percents: '0,03%',
+          percents: '0,03',
         },
         '1W': {
           active: true,
-          percents: '0,07%',
+          percents: '0,07',
         },
         '1M': {
           active: true,
-          percents: '0,07%',
+          percents: '0,07',
         },
         totalAmount: {
-          amount: '4990,00 AGIX',
-          usd: '400,00 USD',
+          amount: '4990,00',
+          usd: '400,00',
         },
       },
       {
         name: 'TKN',
         id: 'Tkn',
-        price: '0,08 USD',
+        price: '0,08',
         portfolioPercents: '5,00',
         '24h': {
           active: false,
-          percents: '0,03%',
+          percents: '0,03',
         },
         '1W': {
           active: false,
-          percents: '0,07%',
+          percents: '0,07',
         },
         '1M': {
           active: false,
-          percents: '0,07%',
+          percents: '0,07',
         },
         totalAmount: {
-          amount: '4990,00 AGIX',
-          usd: '400,00 USD',
+          amount: '4990,00',
+          usd: '400,00',
         },
       },
     ],
   },
+
   PortfolioDetailPage: {
-    subMenuOptions: [
-      {
-        label: 'Overview',
-        className: 'overview',
-        route: 'overview',
-      },
-      {
-        label: 'Performance',
-        className: 'performance',
-        route: 'performance',
-      },
-    ],
     history: [
       {
         type: 'Sent',
@@ -214,20 +208,7 @@ const mockData = {
       },
     ],
   },
-  TokenDetails: {
-    performanceItemList: [
-      { id: 'tokenPriceChange', label: 'Token price change' },
-      { id: 'tokenPrice', label: 'Token price' },
-      { id: 'marketCap', label: 'Market cap' },
-      { id: 'volumn', label: '24h volumn' },
-      { id: 'rank', label: 'Rank' },
-      { id: 'circulating', label: 'Circulating' },
-      { id: 'totalSupply', label: 'Total supply' },
-      { id: 'maxSupply', label: 'Max supply' },
-      { id: 'allTimeHigh', label: 'All time high' },
-      { id: 'allTimeLow', label: 'All time low' },
-    ],
-  },
+
   Chart: {
     data: [
       { name: 'Page A', value: 0.1 },

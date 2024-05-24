@@ -14,7 +14,6 @@ const PortfolioPage = ({ stores, actions }: Props) => {
   return (
     <PortfolioPageLayout stores={stores} actions={actions}>
       <PortfolioWallet
-        headCells={mockData.PortfolioPage.headCells}
         data={mockData.PortfolioPage.data}
       />
     </PortfolioPageLayout>

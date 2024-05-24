@@ -26,26 +26,22 @@ const PortfolioDetailPage = ({ stores, actions, match }: Props) => {
         'asset399q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj1234',
     },
     performance: [
-      { value: '0,277 USD' },
-      { value: '0,48 USD' },
-      { value: '557M USD' },
-      { value: '34M USD' },
-      { value: '#55' },
-      { value: '67,00 ADA' },
-      { value: '100,67 ADA' },
-      { value: '400,60 ADA' },
-      { value: '3,01 USD' },
-      { value: '0,00002 USD' },
+      { value: '0,277' },
+      { value: '0,48' },
+      { value: '557M' },
+      { value: '34M' },
+      { value: '55' },
+      { value: '67,00' },
+      { value: '100,67' },
+      { value: '400,60' },
+      { value: '3,01' },
+      { value: '0,00002' },
     ],
   };
 
   return (
     <PortfolioPageLayout stores={stores} actions={actions}>
-      <TokenDetails
-        tokenInfo={tokenInfo}
-        subMenuOptions={mockData.PortfolioDetailPage.subMenuOptions}
-        mockHistory={mockData.PortfolioDetailPage.history}
-      />
+      <TokenDetails tokenInfo={tokenInfo} mockHistory={mockData.PortfolioDetailPage.history} />
     </PortfolioPageLayout>
   );
 };

@@ -12,10 +12,10 @@ import {
   styled,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { Card } from '../../../components';
-import { default as ArrowIcon } from '../../../components/icons/portfolio/transaction-history/Arrow';
-import { default as ExpandIcon } from '../../../components/icons/portfolio/transaction-history/Expand';
-import { default as ErrorIcon } from '../../../components/icons/portfolio/transaction-history/Error';
+import { Card } from '../../../../components';
+import { default as ArrowIcon } from '../../../../components/icons/portfolio/transaction-history/Arrow';
+import { default as ExpandIcon } from '../../../../components/icons/portfolio/transaction-history/Expand';
+import { default as ErrorIcon } from '../../../../components/icons/portfolio/transaction-history/Error';
 
 const timestamps = ['Today', 'Yesterday', 'In the past'];
 const categorizeByDate = data => {
@@ -43,7 +43,7 @@ const categorizeByDate = data => {
   );
 };
 
-const TransactionHistory = ({ history }) => {
+const TransactionTable = ({ history }) => {
   const theme = useTheme();
 
   const categorizedData = useMemo(() => categorizeByDate(history), [history]);
@@ -197,4 +197,4 @@ const Container = styled(Box)({
   margin: '30px 0 100px',
 });
 
-export default TransactionHistory;
+export default TransactionTable;

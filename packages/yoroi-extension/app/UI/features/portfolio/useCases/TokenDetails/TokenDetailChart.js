@@ -11,7 +11,7 @@ import {
   Label,
 } from 'recharts';
 import { useTheme } from '@mui/material/styles';
-import mockData from '../../../pages/portfolio/mockData';
+import mockData from '../../../../pages/portfolio/mockData';
 
 const StyledButton = styled(Button)(({ theme }) => ({
   fontWeight: 500,

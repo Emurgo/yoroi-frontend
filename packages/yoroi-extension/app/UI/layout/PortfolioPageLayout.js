@@ -18,6 +18,7 @@ import BannerContainer from '../../containers/banners/BannerContainer';
 import SidebarContainer from '../../containers/SidebarContainer';
 import NavBarContainerRevamp from '../../containers/NavBarContainerRevamp';
 import { ROUTES } from '../../routes-config';
+import { PortfolioContextProvider } from '../features/portfolio/module/PortfolioContextProvider';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -61,55 +62,59 @@ class PortfolioPageLayout extends Component<AllProps> {
     );
 
     const PortfolioLayoutClassic = (
-      <TopBarLayout
-        banner={<BannerContainer actions={actions} stores={stores} />}
-        sidebar={sidebarContainer}
-        navbar={
-          <NavBarContainer
-            actions={actions}
-            stores={stores}
-            title={
-              <NavBarTitle
-                title={this.context.intl.formatMessage(
-                  isDetailPage
-                    ? globalMessages.portfolioDetailHeaderText
-                    : globalMessages.portfolioHeaderText
-                )}
-              />
-            }
-          />
-        }
-        showInContainer
-        showAsCard
-      >
-        <SettingsLayout menu={menu}>{children}</SettingsLayout>
-      </TopBarLayout>
+      <PortfolioContextProvider intl={this.context.intl}>
+        <TopBarLayout
+          banner={<BannerContainer actions={actions} stores={stores} />}
+          sidebar={sidebarContainer}
+          navbar={
+            <NavBarContainer
+              actions={actions}
+              stores={stores}
+              title={
+                <NavBarTitle
+                  title={this.context.intl.formatMessage(
+                    isDetailPage
+                      ? globalMessages.portfolioDetailHeaderText
+                      : globalMessages.portfolioHeaderText
+                  )}
+                />
+              }
+            />
+          }
+          showInContainer
+          showAsCard
+        >
+          <SettingsLayout menu={menu}>{children}</SettingsLayout>
+        </TopBarLayout>
+      </PortfolioContextProvider>
     );
     const PortfolioLayoutRevamp = (
-      <TopBarLayout
-        banner={<BannerContainer actions={actions} stores={stores} />}
-        sidebar={sidebarContainer}
-        navbar={
-          <NavBarContainerRevamp
-            actions={actions}
-            stores={stores}
-            title={
-              <NavBarTitle
-                title={this.context.intl.formatMessage(
-                  isDetailPage
-                    ? globalMessages.portfolioDetailHeaderText
-                    : globalMessages.portfolioHeaderText
-                )}
-              />
-            }
-            menu={menu}
-          />
-        }
-        showInContainer
-        showAsCard
-      >
-        {children}
-      </TopBarLayout>
+      <PortfolioContextProvider intl={this.context.intl}>
+        <TopBarLayout
+          banner={<BannerContainer actions={actions} stores={stores} />}
+          sidebar={sidebarContainer}
+          navbar={
+            <NavBarContainerRevamp
+              actions={actions}
+              stores={stores}
+              title={
+                <NavBarTitle
+                  title={this.context.intl.formatMessage(
+                    isDetailPage
+                      ? globalMessages.portfolioDetailHeaderText
+                      : globalMessages.portfolioHeaderText
+                  )}
+                />
+              }
+              menu={menu}
+            />
+          }
+          showInContainer
+          showAsCard
+        >
+          {children}
+        </TopBarLayout>
+      </PortfolioContextProvider>
     );
     return this.props.renderLayoutComponent({
       CLASSIC: PortfolioLayoutClassic,
