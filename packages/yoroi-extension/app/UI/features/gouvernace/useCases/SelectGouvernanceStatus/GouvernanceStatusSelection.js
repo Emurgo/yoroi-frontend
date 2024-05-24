@@ -75,7 +75,7 @@ const GovernanceCard = ({ title, description, icon, selected, onClick }: Props) 
 
 export const GouvernanceStatusSelection = (): Node => {
   const [selectedCard, setSelectedCard] = useState(null);
-  const { gouvernanceStatus, dRepId } = useGouvernance();
+  const { gouvernanceStatus, dRepId, strings } = useGouvernance();
   const { openModal } = useModal();
 
   const pageTitle = gouvernanceStatus === 'none' ? 'Governance Status' : 'Governance status';
@@ -96,9 +96,8 @@ export const GouvernanceStatusSelection = (): Node => {
 
   const optionsList = [
     {
-      title: 'Delegate to a Drep',
-      description:
-        'You are designating someone else to cast your vote on your behalf for all proposals now and in the future.',
+      title: strings.delegateToDRep,
+      description: strings.designatingSomeoneElse,
       icon: <DRepIlustration />,
       selected: selectedCard === 'drep',
       onClick: onChoosDRepClick,

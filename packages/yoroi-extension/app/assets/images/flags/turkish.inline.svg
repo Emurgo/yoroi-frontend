@@ -6,7 +6,7 @@
     <defs>
         <circle id="path-1" cx="8" cy="8" r="8"></circle>
     </defs>
-    <g id="Turkish" stroke="none" stroke-width="1" fill="none" fillRule="evenodd">
+    <g id="Turkish" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="turkey">
             <circle id="Oval" stroke-opacity="0.302790987" stroke="#4A4A4A" stroke-width="0.5" cx="9" cy="9" r="8.25"></circle>
             <g id="flag" transform="translate(1.000000, 1.000000)">
@@ -14,7 +14,7 @@
                     <use xlink:href="#path-1"></use>
                 </mask>
                 <g id="path-1"></g>
-                <g id="Flag_of_Turkey_(alternate)" mask="url(#mask-2)" fillRule="nonzero">
+                <g id="Flag_of_Turkey_(alternate)" mask="url(#mask-2)" fill-rule="nonzero">
                     <g transform="translate(-1.000000, -1.000000)">
                         <rect id="red-background" fill="#E30A17" x="0.195652174" y="0.869565217" width="17" height="17" rx="8.5"></rect>
                         <path d="M8.74076087,7.30014237 C8.09074302,6.5769094 7.06215569,6.32922902 6.15417137,6.67730029 C5.24618706,7.02537155 4.64673913,7.89715115 4.64673913,8.86956522 C4.64673913,9.84197929 5.24618706,10.7137589 6.15417137,11.0618301 C7.06215569,11.4099014 8.09074302,11.162221 8.74076087,10.4389881 C8.04226379,11.5427039 6.69839845,12.0519549 5.44386066,11.6883319 C4.18932288,11.3247088 3.32608696,10.1757378 3.32608696,8.86956522 C3.32608696,7.56339265 4.18932288,6.41442162 5.44386066,6.05079857 C6.69839845,5.68717552 8.04226379,6.19642655 8.74076087,7.30014237 Z M9.57372506,7.47399316 L10.200376,8.33650412 L11.2143184,8.00705425 L10.5876675,8.86956522 L11.2143184,9.73207619 L10.200376,9.40262631 L9.57372506,10.2651373 L9.57372506,9.19901509 L8.55978261,8.86956522 L9.57372506,8.54011534 L9.57372506,7.47399316 Z" id="Combined-Shape" fill="#FFFFFF"></path>

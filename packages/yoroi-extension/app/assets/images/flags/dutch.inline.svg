@@ -6,7 +6,7 @@
     <defs>
         <circle id="path-1" cx="8" cy="8" r="8"></circle>
     </defs>
-    <g id="dutch" stroke="none" stroke-width="1" fill="none" fillRule="evenodd">
+    <g id="dutch" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="russian">
             <circle id="Oval" stroke-opacity="0.302790987" stroke="#4A4A4A" stroke-width="0.5" cx="9" cy="9" r="8.25"></circle>
             <g id="if_210_Ensign_Flag_Nation_russia_2634398-Copy-Clipped" transform="translate(1.000000, 1.000000)">
@@ -17,9 +17,9 @@
                 <g id="if_210_Ensign_Flag_Nation_russia_2634398-Copy" mask="url(#mask-2)">
                     <g transform="translate(-7.000000, -1.000000)" id="Rectangle">
                         <g>
-                            <polygon id="Path" fill="#AF0B17" fillRule="nonzero" points="0 0 29 0 29 7 0 7"></polygon>
-                            <polygon id="Path" fill="#F4F4F4" fillRule="nonzero" points="0 7 29 7 29 14 0 14"></polygon>
-                            <polygon id="Path" fill="#324095" fillRule="nonzero" points="0 12 29 12 29 19 0 19"></polygon>
+                            <polygon id="Path" fill="#AF0B17" fill-rule="nonzero" points="0 0 29 0 29 7 0 7"></polygon>
+                            <polygon id="Path" fill="#F4F4F4" fill-rule="nonzero" points="0 7 29 7 29 14 0 14"></polygon>
+                            <polygon id="Path" fill="#324095" fill-rule="nonzero" points="0 12 29 12 29 19 0 19"></polygon>
                         </g>
                     </g>
                 </g>

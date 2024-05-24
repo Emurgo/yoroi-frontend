@@ -34,11 +34,13 @@ import LoadingSpinner from './components/widgets/LoadingSpinner';
 import FullscreenLayout from './components/layout/FullscreenLayout';
 
 // New UI pages
-import GouvernancePage from './UI/pages/Gouvernance/GouvernancePage';
+import GouvernanceStatusPage from './UI/pages/Gouvernance/GouvernanceStatusPage';
 import GouvernanceDelegationFormPage from './UI/pages/Gouvernance/GouvernanceDelegationFormPage';
 import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
 import PortfolioDappsPage from './UI/pages/portfolio/PortfolioDappsPage';
 import PortfolioDetailPage from './UI/pages/portfolio/PortfolioDetailPage';
+import GouvernanceTransactionSubmittedPage from './UI/pages/Gouvernance/GouvernanceTransactionSubmittedPage';
+import GouvernanceTransactionFailedPage from './UI/pages/Gouvernance/GouvernanceTransactionFailedPage';
 
 // PAGES
 const LanguageSelectionPagePromise = () => import('./containers/profile/LanguageSelectionPage');
@@ -498,13 +500,27 @@ const GouvernanceSubpages = (stores, actions) => (
     <Route
       exact
       path={ROUTES.Gouvernance.ROOT}
-      component={props => <GouvernancePage {...props} stores={stores} actions={actions} />}
+      component={props => <GouvernanceStatusPage {...props} stores={stores} actions={actions} />}
     />
     <Route
       exact
       path={ROUTES.Gouvernance.DELEGATE}
       component={props => (
         <GouvernanceDelegationFormPage {...props} stores={stores} actions={actions} />
+      )}
+    />
+    <Route
+      exact
+      path={ROUTES.Gouvernance.SUBMITTED}
+      component={props => (
+        <GouvernanceTransactionSubmittedPage {...props} stores={stores} actions={actions} />
+      )}
+    />
+    <Route
+      exact
+      path={ROUTES.Gouvernance.FAIL}
+      component={props => (
+        <GouvernanceTransactionFailedPage {...props} stores={stores} actions={actions} />
       )}
     />
   </Switch>

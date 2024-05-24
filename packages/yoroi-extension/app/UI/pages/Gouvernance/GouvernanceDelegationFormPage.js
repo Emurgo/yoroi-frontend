@@ -1,9 +1,6 @@
 // @flow
-import GeneralPageLayout from '../../layout/GeneralPageLayout';
 import { DelagationForm } from '../../features/gouvernace/useCases/DelagationForm/DelagationForm';
-import NavBarContainerRevamp from '../../../containers/NavBarContainerRevamp';
-import NavBar from '../../../components/topbar/NavBar';
-import NavBarTitle from '../../../components/topbar/NavBarTitle';
+import GouvernanceLayout from './layout';
 
 type Props = {|
   stores: any,
@@ -11,21 +8,11 @@ type Props = {|
   children?: React$Node,
 |};
 
-const GouvernanceDelegationFormPage = ({ stores, actions, children }: Props): any => {
+const GouvernanceDelegationFormPage = (props: Props): any => {
   return (
-    <GeneralPageLayout
-      stores={stores}
-      actions={actions}
-      navbar={
-        <NavBarContainerRevamp
-          actions={actions}
-          stores={stores}
-          title={<NavBarTitle title={'Governance'} />}
-        />
-      }
-    >
+    <GouvernanceLayout {...props}>
       <DelagationForm />
-    </GeneralPageLayout>
+    </GouvernanceLayout>
   );
 };
 

@@ -7,7 +7,7 @@
         <polygon id="path-1" points="0.39072 0.161066667 26.2067694 0.161066667 26.2067694 33.6 0.39072 33.6"></polygon>
         <polygon id="path-3" points="8e-05 0.495573333 21.8268504 0.495573333 21.8268504 4.26666667 8e-05 4.26666667"></polygon>
     </defs>
-    <g id="paper_wallet.inline" stroke="none" stroke-width="1" fill="none" fillRule="evenodd">
+    <g id="paper_wallet.inline" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="Group-25-Copy" transform="translate(6.000000, 18.000000)">
             <path d="M1.08995,43.7568167 L1.09005,43.7565167 L1.08995,43.7568167 Z" id="Fill-1" fill="#0F88A7"></path>
             <path d="M61.0958451,29.6150686 L11.8380072,29.6150686 C11.689885,29.6150686 11.5495742,29.6816138 11.4558374,29.7963397 L-8.66009148e-06,43.8148534 L71.9850613,43.8148534 L61.4908145,29.8126425 C61.3975973,29.6882839 61.2512591,29.6150686 61.0958451,29.6150686" id="Fill-2" fill="#665E5D"></path>

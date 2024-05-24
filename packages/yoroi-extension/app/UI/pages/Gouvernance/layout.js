@@ -4,6 +4,7 @@ import { GouvernanceStatusSelection } from '../../features/gouvernace/useCases/S
 import NavBarContainerRevamp from '../../../containers/NavBarContainerRevamp';
 import NavBar from '../../../components/topbar/NavBar';
 import NavBarTitle from '../../../components/topbar/NavBarTitle';
+import { TransactionSubmitted } from '../../components/TransactionSubmitted/TransactionSubmitted';
 
 type Props = {|
   stores: any,
@@ -11,7 +12,7 @@ type Props = {|
   children?: React$Node,
 |};
 
-const GouvernancePage = ({ stores, actions, children }: Props): any => {
+const GouvernanceLayout = ({ stores, actions, children }: Props): any => {
   return (
     <GeneralPageLayout
       stores={stores}
@@ -25,9 +26,9 @@ const GouvernancePage = ({ stores, actions, children }: Props): any => {
       }
       // menu={menu} // ADD a menu if needed (see example in SwapPageContainer)
     >
-      <GouvernanceStatusSelection />
+      {children}
     </GeneralPageLayout>
   );
 };
 
-export default GouvernancePage;
+export default GouvernanceLayout;

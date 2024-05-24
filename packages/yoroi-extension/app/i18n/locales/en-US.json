@@ -1013,5 +1013,7 @@
   "portfolio.main.header.text": "Tokens",
   "portfolio.detail.header.text": "Token details",
   "portfolio.menu.wallet.link.label": "Wallet",
-  "portfolio.menu.dapps.link.label": "Dapps"
+  "portfolio.menu.dapps.link.label": "Dapps",
+  "gouvernace.delegateToDRep":"Delegate to a DRep",
+  "gouvernace.designatingSomeoneElse":"You are designating someone else to cast your vote on your behalf for all proposals now and in the future."
 }

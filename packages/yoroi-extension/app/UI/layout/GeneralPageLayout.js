@@ -13,6 +13,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { ModalProvider } from '../context/ModalContext';
 import ModalManager from '../components/modals/ModalManager';
 import { GouvernanceContextProvider } from '../features/gouvernace/module/GouvernanceContextProvider';
+import globalMessages from '../../i18n/global-messages';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -28,18 +29,29 @@ type LayoutProps = {|
   intl: $npm$ReactIntl$IntlFormat,
 |};
 
+type InjectedLayoutProps = {|
+  +renderLayoutComponent: any => Node,
+|};
+
+type AllProps = {| ...Props, ...InjectedLayoutProps |};
+
 @observer
 class GeneralPageLayout extends Component<LayoutProps> {
+  static defaultProps: {| children: void |} = {
+    children: undefined,
+  };
+
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+    intl: intlShape.isRequired,
+  };
+
   render() {
-    const { children, actions, navbar, stores, intl } = this.props;
+    const { children, actions, navbar, stores } = this.props;
     const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
+    const { intl } = this.context;
 
     return (
-      <GouvernanceContextProvider
-        initialState={{
-          gouvernanceStatus: 'none',
-        }}
-      >
+      <GouvernanceContextProvider intl={this.context.intl}>
         {/* TODO ModalProvider to be moved into APP after finish refactoring and bring everything in UI */}
         <ModalProvider>
           <ModalManager />

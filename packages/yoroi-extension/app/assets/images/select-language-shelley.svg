@@ -48,8 +48,8 @@
 	<g id="_18">
 		
 			<linearGradient id="_Path__1_" gradientUnits="userSpaceOnUse" x1="874.6013" y1="130.7772" x2="963.0213" y2="115.1472" gradientTransform="matrix(1 0 0 -1 0 1023)">
-			<stop  offset="0" style="stopColor:#F14D78"/>
-			<stop  offset="1" style="stopColor:#1A44B7"/>
+			<stop  offset="0" style="stop-color:#F14D78"/>
+			<stop  offset="1" style="stop-color:#1A44B7"/>
 		</linearGradient>
 		<path id="_Path_" class="st2" d="M952,898.8L952,898.8v-5.6l-10.3-2.7l-22.9-13.2c-3.8-2.2-9.7-2.5-13-0.5l-23.5,13.5l-11,2.6v5.5
 			c0,0.1,0,0.2,0,0.4v0.1l0,0c0.1,1.4,1.2,2.9,3.2,4l30,17.3c3.9,2.2,9.7,2.5,13,0.5l32.2-18.6C951.1,901.6,952,900.3,952,898.8z"/>
@@ -57,8 +57,8 @@
 			c3.3-1.9,9.2-1.7,13,0.5l30,17.3C952.7,891.1,953.1,894.4,949.8,896.3z"/>
 		
 			<linearGradient id="_Path_3_1_" gradientUnits="userSpaceOnUse" x1="885.9179" y1="159.0578" x2="931.7379" y2="116.4578" gradientTransform="matrix(1 0 0 -1 0 1023)">
-			<stop  offset="0" style="stopColor:#F14D78"/>
-			<stop  offset="1" style="stopColor:#1A44B7"/>
+			<stop  offset="0" style="stop-color:#F14D78"/>
+			<stop  offset="1" style="stop-color:#1A44B7"/>
 		</linearGradient>
 		<path id="_Path_3" class="st4" d="M940,891.8c-4.6-1.3-12-2.8-16.6-0.1L921,893l-2.8-1.2c0-1.1-0.5-2.2-1.4-2.9l0,0l-5.5-5
 			l-0.4-0.4l-0.1-0.1l0,0c-0.4-0.3-0.7-0.5-1.1-0.8c-4.9-2.5-10.6-2.5-15.5,0c-4.3,2.5-4.3,6.5,0,9c0.4,0.2,0.8,0.4,1.3,0.6l0,0
@@ -67,8 +67,8 @@
 		<g id="_Group_">
 			
 				<linearGradient id="_Path_4_1_" gradientUnits="userSpaceOnUse" x1="890.8555" y1="134.6162" x2="941.8958" y2="134.6162" gradientTransform="matrix(1 0 0 -1 0 1023)">
-				<stop  offset="0" style="stopColor:#F14D78"/>
-				<stop  offset="1" style="stopColor:#1A44B7"/>
+				<stop  offset="0" style="stop-color:#F14D78"/>
+				<stop  offset="1" style="stop-color:#1A44B7"/>
 			</linearGradient>
 			<path id="_Path_4" class="st5" d="M894.1,885.6c4.9-2.5,10.6-2.5,15.5,0c0.4,0.2,0.8,0.5,1.1,0.8l0,0l0.1,0.1
 				c0.2,0.1,0.3,0.2,0.4,0.4l5.5,5l0,0c0.9,0.7,1.4,1.8,1.4,2.9l2.8,1.2l2.3-1.3c4.7-2.7,12.1-1.2,16.7,0.1c0.3,0.1,0.5,0.2,0.8,0.3
@@ -77,8 +77,8 @@
 				C891.8,887.3,892.8,886.3,894.1,885.6z"/>
 			
 				<linearGradient id="_Path_5_1_" gradientUnits="userSpaceOnUse" x1="907.06" y1="121.405" x2="912.01" y2="121.405" gradientTransform="matrix(1 0 0 -1 0 1023)">
-				<stop  offset="0" style="stopColor:#F14D78"/>
-				<stop  offset="1" style="stopColor:#1A44B7"/>
+				<stop  offset="0" style="stop-color:#F14D78"/>
+				<stop  offset="1" style="stop-color:#1A44B7"/>
 			</linearGradient>
 			<path id="_Path_5" class="st6" d="M909.7,902.5l2.3-1.3v-3c0,0-2.3,1.3-2.3,1.3l0,0c-2.6,1.5-3,3.5-2.4,5.5
 				C907.8,903.9,908.6,903,909.7,902.5z"/>
@@ -87,59 +87,59 @@
 	<g id="_15">
 		
 			<linearGradient id="_Path_6_1_" gradientUnits="userSpaceOnUse" x1="1370.86" y1="391.405" x2="1384.02" y2="391.405" gradientTransform="matrix(1 0 0 -1 0 1023)">
-			<stop  offset="0" style="stopColor:#F14D78"/>
-			<stop  offset="1" style="stopColor:#1A44B7"/>
+			<stop  offset="0" style="stop-color:#F14D78"/>
+			<stop  offset="1" style="stop-color:#1A44B7"/>
 		</linearGradient>
 		<polygon id="_Path_6" class="st7" points="1384,618.7 1384,624.7 1370.9,644.5 1370.9,638.5 		"/>
 		
 			<linearGradient id="_Path_7_1_" gradientUnits="userSpaceOnUse" x1="1352.0529" y1="398.7928" x2="1390.1927" y2="360.2628" gradientTransform="matrix(1 0 0 -1 0 1023)">
-			<stop  offset="0" style="stopColor:#F14D78"/>
-			<stop  offset="1" style="stopColor:#1A44B7"/>
+			<stop  offset="0" style="stop-color:#F14D78"/>
+			<stop  offset="1" style="stop-color:#1A44B7"/>
 		</linearGradient>
 		<polygon id="_Path_7" class="st8" points="1366.6,637.7 1366.6,643.7 1370.9,644.5 1370.9,638.5 		"/>
 		
 			<linearGradient id="_Path_8_1_" gradientUnits="userSpaceOnUse" x1="1344.0701" y1="390.9001" x2="1382.2101" y2="352.3701" gradientTransform="matrix(1 0 0 -1 0 1023)">
-			<stop  offset="0" style="stopColor:#F14D78"/>
-			<stop  offset="1" style="stopColor:#1A44B7"/>
+			<stop  offset="0" style="stop-color:#F14D78"/>
+			<stop  offset="1" style="stop-color:#1A44B7"/>
 		</linearGradient>
 		<polygon id="_Path_8" class="st9" points="1347.3,634.2 1347.3,640.2 1351.6,640.9 1351.6,634.9 		"/>
 		
 			<linearGradient id="_Path_9_1_" gradientUnits="userSpaceOnUse" x1="1351.58" y1="391.48" x2="1377.27" y2="391.48" gradientTransform="matrix(1 0 0 -1 0 1023)">
-			<stop  offset="0" style="stopColor:#F14D78"/>
-			<stop  offset="1" style="stopColor:#1A44B7"/>
+			<stop  offset="0" style="stop-color:#F14D78"/>
+			<stop  offset="1" style="stop-color:#1A44B7"/>
 		</linearGradient>
 		<polygon id="_Path_9" class="st10" points="1377.3,622.1 1371,631.3 1351.6,640.9 1351.6,634.9 		"/>
 		<path id="_Compound_Path_" class="st3" d="M1384,618.7l-13.2,19.7l-4.2-0.8l10.7-15.6l-25.7,12.8l-4.2-0.8L1380,618L1384,618.7z"
 			/>
 		
 			<linearGradient id="_Path_10_1_" gradientUnits="userSpaceOnUse" x1="1336.41" y1="376.115" x2="1362.25" y2="376.115" gradientTransform="matrix(1 0 0 -1 0 1023)">
-			<stop  offset="0" style="stopColor:#F14D78"/>
-			<stop  offset="1" style="stopColor:#1A44B7"/>
+			<stop  offset="0" style="stop-color:#F14D78"/>
+			<stop  offset="1" style="stop-color:#1A44B7"/>
 		</linearGradient>
 		<polygon id="_Path_10" class="st11" points="1336.4,636.7 1336.4,642.7 1362.2,657.1 1362.2,651.1 		"/>
 		
 			<linearGradient id="_Path_11_1_" gradientUnits="userSpaceOnUse" x1="1343.8007" y1="390.6306" x2="1381.9406" y2="352.1006" gradientTransform="matrix(1 0 0 -1 0 1023)">
-			<stop  offset="0" style="stopColor:#F14D78"/>
-			<stop  offset="1" style="stopColor:#1A44B7"/>
+			<stop  offset="0" style="stop-color:#F14D78"/>
+			<stop  offset="1" style="stop-color:#1A44B7"/>
 		</linearGradient>
 		<polygon id="_Path_11" class="st12" points="1365.7,648.4 1365.7,654.4 1362.2,657.1 1362.2,651.1 		"/>
 		<path id="_Compound_Path_2" class="st3" d="M1362.2,651.1l-25.8-14.4l3.4-2.7l25.9,14.4L1362.2,651.1z"/>
 		
 			<linearGradient id="_Path_12_1_" gradientUnits="userSpaceOnUse" x1="1323.2407" y1="349.3405" x2="1314.2307" y2="363.8205" gradientTransform="matrix(1 0 0 -1 0 1023)">
-			<stop  offset="0" style="stopColor:#F14D78"/>
-			<stop  offset="1" style="stopColor:#1A44B7"/>
+			<stop  offset="0" style="stop-color:#F14D78"/>
+			<stop  offset="1" style="stop-color:#1A44B7"/>
 		</linearGradient>
 		<polygon id="_Path_12" class="st13" points="1318.8,666.4 1318.8,672.4 1322.8,673.1 1322.8,667.1 		"/>
 		
 			<linearGradient id="_Path_13_1_" gradientUnits="userSpaceOnUse" x1="1322.79" y1="360.955" x2="1355.62" y2="360.955" gradientTransform="matrix(1 0 0 -1 0 1023)">
-			<stop  offset="0" style="stopColor:#F14D78"/>
-			<stop  offset="1" style="stopColor:#1A44B7"/>
+			<stop  offset="0" style="stop-color:#F14D78"/>
+			<stop  offset="1" style="stop-color:#1A44B7"/>
 		</linearGradient>
 		<polygon id="_Path_13" class="st14" points="1355.6,651 1355.6,657 1322.8,673.1 1322.8,667.1 		"/>
 		
 			<linearGradient id="_Path_14_1_" gradientUnits="userSpaceOnUse" x1="1325.59" y1="367.75" x2="1336.34" y2="367.75" gradientTransform="matrix(1 0 0 -1 0 1023)">
-			<stop  offset="0" style="stopColor:#F14D78"/>
-			<stop  offset="1" style="stopColor:#1A44B7"/>
+			<stop  offset="0" style="stop-color:#F14D78"/>
+			<stop  offset="1" style="stop-color:#1A44B7"/>
 		</linearGradient>
 		<polygon id="_Path_14" class="st15" points="1336.3,647.5 1336.3,653.5 1331.9,659.9 1325.6,663 		"/>
 		<path id="_Compound_Path_3" class="st3" d="M1322.8,667.1l-4-0.7l13.3-19.7l4.2,0.8l-10.7,15.5l25.8-12.8l4.2,0.8L1322.8,667.1z"
@@ -151,8 +151,8 @@
 			c0,0,7.6-6.9,7.5-14.3V708l7.9-4.6C1058.1,701.4,1059.8,698.9,1059.8,696.4z"/>
 		
 			<linearGradient id="_Path_16_1_" gradientUnits="userSpaceOnUse" x1="919.6899" y1="329.6954" x2="1059.845" y2="329.6954" gradientTransform="matrix(1 0 0 -1 0 1023)">
-			<stop  offset="0" style="stopColor:#F14D78"/>
-			<stop  offset="1" style="stopColor:#1A44B7"/>
+			<stop  offset="0" style="stop-color:#F14D78"/>
+			<stop  offset="1" style="stop-color:#1A44B7"/>
 		</linearGradient>
 		<path id="_Path_16" class="st17" d="M989.8,655.8l-65,37.9c-6.6,3.9-6.9,9.9-0.6,13.5l42.1,24c6.3,3.6,16.8,3.4,23.4-0.5
 			l31.7-18.5l17.9,10.2c0,0,14.4-13.1,3.4-22.7l12-7c6.6-3.9,6.9-9.9,0.6-13.5l-42.1-24C1006.9,651.7,996.5,652,989.8,655.8z"/>
@@ -164,8 +164,8 @@
 			c0,0-4.4-4-4.4-8.3v-6.2l-4.6-2.7C1010.6,403,1009.6,401.5,1009.5,400.1z"/>
 		
 			<linearGradient id="_Path_19_1_" gradientUnits="userSpaceOnUse" x1="1009.4643" y1="624.6575" x2="1090.6343" y2="624.6575" gradientTransform="matrix(1 0 0 -1 0 1023)">
-			<stop  offset="0" style="stopColor:#F14D78"/>
-			<stop  offset="1" style="stopColor:#1A44B7"/>
+			<stop  offset="0" style="stop-color:#F14D78"/>
+			<stop  offset="1" style="stop-color:#1A44B7"/>
 		</linearGradient>
 		<path id="_Path_19" class="st18" d="M1050.1,376.6l37.7,22c3.8,2.2,4,5.7,0.3,7.8l-24.4,13.9c-3.6,2.1-9.7,2-13.5-0.3l-18.3-10.7
 			l-10.4,5.9c0,0-8.3-7.6-2-13.1l-7-4.1c-3.8-2.2-4-5.7-0.3-7.8l24.4-13.9C1040.2,374.2,1046.2,374.4,1050.1,376.6z"/>
@@ -175,8 +175,8 @@
 		<g id="_Group_2">
 			
 				<linearGradient id="_Path_21_1_" gradientUnits="userSpaceOnUse" x1="1123.1788" y1="278.221" x2="1236.3988" y2="263.3911" gradientTransform="matrix(1 0 0 -1 0 1023)">
-				<stop  offset="0" style="stopColor:#F14D78"/>
-				<stop  offset="1" style="stopColor:#1A44B7"/>
+				<stop  offset="0" style="stop-color:#F14D78"/>
+				<stop  offset="1" style="stop-color:#1A44B7"/>
 			</linearGradient>
 			<path id="_Path_21" class="st19" d="M1217,752.4L1217,752.4v-4.9l-9.1-2.3l-20.1-11.6c-3.4-2-8.5-2.2-11.4-0.5l-20.6,11.9
 				l-9.6,2.3v4.8c0,0.1,0,0.2,0,0.3v0.1l0,0c0.1,1.2,1,2.5,2.8,3.5l26.4,15.2c3.4,2,8.5,2.2,11.5,0.5l28.3-16.3
@@ -186,15 +186,15 @@
 			<g id="_Group_3">
 				
 					<linearGradient id="_Path_23_1_" gradientUnits="userSpaceOnUse" x1="1199.0001" y1="266.6177" x2="1157.8901" y2="290.2077" gradientTransform="matrix(1 0 0 -1 0 1023)">
-					<stop  offset="0" style="stopColor:#F14D78"/>
-					<stop  offset="1" style="stopColor:#1A44B7"/>
+					<stop  offset="0" style="stop-color:#F14D78"/>
+					<stop  offset="1" style="stop-color:#1A44B7"/>
 				</linearGradient>
 				<path id="_Path_23" class="st20" d="M1182,746.6l-6.3-11.2c-2.9,0.5-5.6,1.5-8.2,2.9c-8,4.6-8,12.1,0,16.7s20.9,4.6,28.9,0
 					s8-12.1,0-16.7c-0.2-0.1-0.5-0.3-0.8-0.4L1182,746.6z"/>
 				
 					<linearGradient id="_Path_24_1_" gradientUnits="userSpaceOnUse" x1="1161.5668" y1="280.2" x2="1202.4039" y2="280.2" gradientTransform="matrix(1 0 0 -1 0 1023)">
-					<stop  offset="0" style="stopColor:#F14D78"/>
-					<stop  offset="1" style="stopColor:#1A44B7"/>
+					<stop  offset="0" style="stop-color:#F14D78"/>
+					<stop  offset="1" style="stop-color:#1A44B7"/>
 				</linearGradient>
 				<path id="_Path_24" class="st21" d="M1167.5,741.8c2.5-1.4,5.3-2.4,8.2-2.9l6.3,11.2l13.7-8.8c0.2,0.1,0.5,0.2,0.8,0.4
 					c3.2,1.9,5.1,4.2,5.7,6.6c0.9-3.6-1-7.4-5.7-10.1c-0.2-0.1-0.5-0.3-0.8-0.4l-13.7,8.7l-6.3-11.2c-2.9,0.5-5.6,1.5-8.2,2.9
@@ -204,8 +204,8 @@
 		<g id="_Group_4">
 			
 				<linearGradient id="_Compound_Path_4_1_" gradientUnits="userSpaceOnUse" x1="1204.6116" y1="294.8453" x2="1091.6616" y2="384.8253" gradientTransform="matrix(1 0 0 -1 0 1023)">
-				<stop  offset="0" style="stopColor:#F14D78"/>
-				<stop  offset="1" style="stopColor:#1A44B7"/>
+				<stop  offset="0" style="stop-color:#F14D78"/>
+				<stop  offset="1" style="stop-color:#1A44B7"/>
 			</linearGradient>
 			<path id="_Compound_Path_4" class="st22" d="M1182.2,731.1c-2.4,0-4.7-0.6-6.7-1.7l-26.4-15.2c-1.9-1.1-3.1-2.6-3.1-4.2
 				c0.1-1.4,0.9-2.7,2.2-3.3l28.3-16.3c3.1-1.8,8.4-1.6,12,0.5l26.4,15.2c1.9,1.1,3,2.6,3,4.2c-0.1,1.4-0.9,2.7-2.2,3.3l-28.3,16.3
@@ -214,8 +214,8 @@
 				C1186.1,690.7,1183.9,690.1,1181.7,690.1L1181.7,690.1z"/>
 		</g>
 		<linearGradient id="_Path_25_1_" gradientUnits="userSpaceOnUse" x1="1145.8193" y1="734.9908" x2="1216.7684" y2="734.9908">
-			<stop  offset="0" style="stopColor:#F14D78"/>
-			<stop  offset="1" style="stopColor:#1A44B7"/>
+			<stop  offset="0" style="stop-color:#F14D78"/>
+			<stop  offset="1" style="stop-color:#1A44B7"/>
 		</linearGradient>
 		<path id="_Path_25" class="st23" d="M1214.8,738l-28.3,16.3c-2.9,1.7-8.1,1.5-11.5-0.5l-26.4-15.2c-3.4-2-3.8-4.9-0.8-6.6
 			l28.3-16.3c2.9-1.7,8.1-1.5,11.4,0.5l26.5,15.2C1217.3,733.3,1217.7,736.2,1214.8,738z"/>
@@ -223,8 +223,8 @@
 	<g id="_12">
 		
 			<linearGradient id="_Compound_Path_5_3_" gradientUnits="userSpaceOnUse" x1="980.57" y1="455.8449" x2="933.88" y2="455.8449" gradientTransform="matrix(1 0 0 -1 0 1023)">
-			<stop  offset="0" style="stopColor:#F14D78"/>
-			<stop  offset="1" style="stopColor:#1A44B7"/>
+			<stop  offset="0" style="stop-color:#F14D78"/>
+			<stop  offset="1" style="stop-color:#1A44B7"/>
 		</linearGradient>
 		<path id="_Compound_Path_5" class="st24" d="M980.6,560.6l-27.9-9.9l-18.8,11v9.1l0,0c0.1,3.2,2.1,6.3,6.1,8.7
 			c8.7,5.4,23.5,5.6,33,0.5c4.9-2.6,7.5-6.2,7.6-9.8l0,0L980.6,560.6z M952.3,572.7l-6-6c0.7-0.7,1.5-1.3,2.4-1.7
@@ -238,8 +238,8 @@
 	<g id="_12_1_">
 		
 			<linearGradient id="_Compound_Path_5_4_" gradientUnits="userSpaceOnUse" x1="785.41" y1="254.1162" x2="759.38" y2="254.1162" gradientTransform="matrix(1 0 0 -1 0 1023)">
-			<stop  offset="0" style="stopColor:#F14D78"/>
-			<stop  offset="1" style="stopColor:#1A44B7"/>
+			<stop  offset="0" style="stop-color:#F14D78"/>
+			<stop  offset="1" style="stop-color:#1A44B7"/>
 		</linearGradient>
 		<path id="_Compound_Path_5_1_" class="st25" d="M785.4,765.2l-15.6-5.5l-10.5,6.1v5.1l0,0c0.1,1.8,1.2,3.5,3.4,4.9
 			c4.8,3,13.1,3.1,18.4,0.3c2.7-1.5,4.2-3.5,4.2-5.4l0,0L785.4,765.2z M769.7,772l-3.3-3.3c0.4-0.4,0.8-0.7,1.3-1
@@ -253,8 +253,8 @@
 	<g id="_12_2_">
 		
 			<linearGradient id="_Compound_Path_5_5_" gradientUnits="userSpaceOnUse" x1="1349.76" y1="478.682" x2="1323.73" y2="478.682" gradientTransform="matrix(1 0 0 -1 0 1023)">
-			<stop  offset="0" style="stopColor:#F14D78"/>
-			<stop  offset="1" style="stopColor:#1A44B7"/>
+			<stop  offset="0" style="stop-color:#F14D78"/>
+			<stop  offset="1" style="stop-color:#1A44B7"/>
 		</linearGradient>
 		<path id="_Compound_Path_5_2_" class="st26" d="M1349.8,540.6l-15.6-5.5l-10.5,6.1v5.1l0,0c0.1,1.8,1.2,3.5,3.4,4.9
 			c4.8,3,13.1,3.1,18.4,0.3c2.7-1.5,4.2-3.5,4.2-5.4l0,0L1349.8,540.6z M1334,547.4l-3.3-3.3c0.4-0.4,0.8-0.7,1.3-1
@@ -269,16 +269,16 @@
 		<g id="_Group_8">
 			
 				<linearGradient id="_Path_26_1_" gradientUnits="userSpaceOnUse" x1="1123.85" y1="436.03" x2="1154.1844" y2="436.03" gradientTransform="matrix(1 0 0 -1 0 1023)">
-				<stop  offset="0" style="stopColor:#F14D78"/>
-				<stop  offset="1" style="stopColor:#1A44B7"/>
+				<stop  offset="0" style="stop-color:#F14D78"/>
+				<stop  offset="1" style="stop-color:#1A44B7"/>
 			</linearGradient>
 			<path id="_Path_26" class="st27" d="M1152.3,584c4.3-28.5,0-35,0-35l-28.4,38c0,0,7.6,12.2,5.7,19c-0.8,3.2-2,6.3-3.5,9.2
 				c-0.7,1.2-0.3,2.6,0.7,3.4l0,0c0.2,0.1,0.4,0.3,0.6,0.4l10.1,6l12.2-21.3l2.7-12l-2.8,2.2C1150.8,590.7,1151.7,587.4,1152.3,584z
 				"/>
 			
 				<linearGradient id="_Path_27_1_" gradientUnits="userSpaceOnUse" x1="1077.4899" y1="515.1414" x2="1236.08" y2="515.1414" gradientTransform="matrix(1 0 0 -1 0 1023)">
-				<stop  offset="0" style="stopColor:#F14D78"/>
-				<stop  offset="1" style="stopColor:#1A44B7"/>
+				<stop  offset="0" style="stop-color:#F14D78"/>
+				<stop  offset="1" style="stop-color:#1A44B7"/>
 			</linearGradient>
 			<path id="_Path_27" class="st28" d="M1236.1,406.1l-9.7-5.5c-1.4-0.7-2.8-1.2-4.3-1.6l0,0c-2.6-0.8-5.8-0.4-9.1,1.6l-119.3,69.4
 				c-9,5.2-16.2,19.2-16.2,31.2l0.3,96.6c0,7.2,2.7,12,6.7,13.6l11.1,5.8l8.7-13.1l109.1-63.5c9-5.2,16.2-19.2,16.2-31.2l-0.3-93.1
@@ -290,23 +290,23 @@
 		</g>
 		
 			<linearGradient id="_Path_28_1_" gradientUnits="userSpaceOnUse" x1="1092.0198" y1="491.1176" x2="1237.6798" y2="476.7376" gradientTransform="matrix(1 0 0 -1 0 1023)">
-			<stop  offset="0" style="stopColor:#F14D78"/>
-			<stop  offset="1" style="stopColor:#1A44B7"/>
+			<stop  offset="0" style="stop-color:#F14D78"/>
+			<stop  offset="1" style="stop-color:#1A44B7"/>
 		</linearGradient>
 		<path id="_Path_28" class="st29" d="M1141.7,524c1.2,9.7-4.5,22.6-12.8,28.9s-15.9,3.4-17.1-6.3s4.5-22.6,12.8-28.9
 			S1140.5,514.3,1141.7,524z"/>
 		
 			<linearGradient id="_Path_29_1_" gradientUnits="userSpaceOnUse" x1="1094.5801" y1="517.0714" x2="1240.2401" y2="502.7014" gradientTransform="matrix(1 0 0 -1 0 1023)">
-			<stop  offset="0" style="stopColor:#F14D78"/>
-			<stop  offset="1" style="stopColor:#1A44B7"/>
+			<stop  offset="0" style="stop-color:#F14D78"/>
+			<stop  offset="1" style="stop-color:#1A44B7"/>
 		</linearGradient>
 		<path id="_Path_29" class="st30" d="M1181.7,501.8c1.2,9.7-4.5,22.6-12.8,28.9s-15.9,3.4-17.1-6.3s4.5-22.6,12.8-28.9
 			S1180.5,492.1,1181.7,501.8z"/>
 		<g id="_Group_9">
 			
 				<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="1097.1198" y1="542.8478" x2="1242.7898" y2="528.4678" gradientTransform="matrix(1 0 0 -1 0 1023)">
-				<stop  offset="0" style="stopColor:#F14D78"/>
-				<stop  offset="1" style="stopColor:#1A44B7"/>
+				<stop  offset="0" style="stop-color:#F14D78"/>
+				<stop  offset="1" style="stop-color:#1A44B7"/>
 			</linearGradient>
 			<path class="st31" d="M1220.6,479.6c1.2,9.7-4.5,22.6-12.8,28.9c-8.3,6.2-15.9,3.4-17.1-6.3s4.5-22.6,12.8-28.9
 				S1219.4,469.9,1220.6,479.6z"/>

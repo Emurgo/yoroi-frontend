@@ -11,6 +11,8 @@ import {
   GouvernanceActions,
 } from './state';
 
+import { getStrings } from '../common/useStrings';
+
 const initialGouvernanceProvider = {
   ...defaultGouvernanceState,
   ...defaultGouvernanceActions,
@@ -22,7 +24,10 @@ type GouvernanceProviderProps = any;
 export const GouvernanceContextProvider = ({
   children,
   // gouvernanceApi,
-  initialState,
+  initialState = {
+    gouvernanceStatus: 'none',
+  },
+  intl,
 }: GouvernanceProviderProps) => {
   const [state, dispatch] = React.useReducer(GouvernanceReducer, {
     ...defaultGouvernanceState,
@@ -46,6 +51,7 @@ export const GouvernanceContextProvider = ({
       ...state,
       // ...gouvernanceApi,
       ...actions,
+      strings: getStrings(intl),
     }),
     [state, actions]
   );

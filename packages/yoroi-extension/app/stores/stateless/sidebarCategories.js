@@ -178,7 +178,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     isVisible: _request => true,
   },
   {
-    className: 'settings',
+    className: 'gouvernance',
     route: '/gouvernance',
     icon: settingIcon,
     label: globalMessages.sidebarGouvernance,
