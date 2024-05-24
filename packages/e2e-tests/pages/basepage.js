@@ -134,7 +134,6 @@ class BasePage {
       method: 'xpath',
     };
     const parentElement = await webElement.findElement(getByLocator(elLocator));
-    const text = await parentElement.getText();
 
     return parentElement;
   }
