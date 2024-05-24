@@ -100,15 +100,12 @@ const StatsTable = ({ data }) => {
       <TableHead>
         <TableRow>
           {headCells.map(({ label, align, id, disabledSort }) => (
-            <TableCell
-              key={id}
-              align={align}
-              onClick={() => (disabledSort ? null : handleRequestSort(id))}
-            >
+            <TableCell key={id} align={align}>
               <Stack
                 direction="row"
                 alignItems="center"
                 spacing={theme.spacing(1)}
+                onClick={() => (disabledSort ? null : handleRequestSort(id))}
                 sx={{ float: align, cursor: disabledSort ? 'auto' : 'pointer' }}
               >
                 <Typography

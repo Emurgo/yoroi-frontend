@@ -129,7 +129,7 @@ const TokenDetails = ({ tokenInfo, mockHistory }) => {
               {isLoading ? (
                 <StyledSkeleton width="82px" height="16px" />
               ) : (
-                `${tokenInfo.overview.tokenName} ${strings.balance}`
+                `${tokenInfo.name} ${strings.balance}`
               )}
             </Typography>
 
@@ -138,7 +138,7 @@ const TokenDetails = ({ tokenInfo, mockHistory }) => {
             ) : (
               <Stack direction="row" spacing={theme.spacing(0.5)}>
                 <Typography variant="h2" fontWeight="500">
-                  200000,00
+                  {tokenInfo.totalAmount}
                 </Typography>
                 <Typography
                   variant="body2"
@@ -147,7 +147,7 @@ const TokenDetails = ({ tokenInfo, mockHistory }) => {
                     marginTop: '5px',
                   }}
                 >
-                  {tokenInfo.overview.tokenName}
+                  {tokenInfo.name}
                 </Typography>
               </Stack>
             )}
@@ -155,7 +155,9 @@ const TokenDetails = ({ tokenInfo, mockHistory }) => {
             {isLoading ? (
               <StyledSkeleton width="129px" height="16px" sx={{ marginTop: '10px' }} />
             ) : (
-              <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>680,00 USD</Typography>
+              <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
+                {tokenInfo.totalAmountUsd} USD
+              </Typography>
             )}
           </Box>
 
@@ -174,7 +176,7 @@ const TokenDetails = ({ tokenInfo, mockHistory }) => {
                 ) : (
                   <Stack direction="row" alignItems="center">
                     <Typography variant="h5" fontWeight="500">
-                      {tokenInfo.marketPrice.current}
+                      {tokenInfo.price}
                     </Typography>
                     &nbsp;USD
                   </Stack>
@@ -193,23 +195,21 @@ const TokenDetails = ({ tokenInfo, mockHistory }) => {
                       <StyledSkeleton width="35px" height="16px" />
                     ) : (
                       <StyledChip
-                        active={tokenInfo.marketPrice.percents.active}
+                        active={tokenInfo.price > 0}
                         label={
                           <Stack direction="row" justifyContent="space-between" alignItems="center">
                             <ArrowIcon
                               fill={
-                                tokenInfo.marketPrice.percents.active
+                                tokenInfo.price > 0
                                   ? theme.palette.ds.secondary_c800
                                   : theme.palette.ds.sys_magenta_c700
                               }
                               style={{
                                 marginRight: '5px',
-                                transform: tokenInfo.marketPrice.percents.active
-                                  ? ''
-                                  : 'rotate(180deg)',
+                                transform: tokenInfo.price > 0 ? '' : 'rotate(180deg)',
                               }}
                             />
-                            <Typography>{tokenInfo.marketPrice.percents.value}%</Typography>
+                            <Typography>{tokenInfo.price}%</Typography>
                           </Stack>
                         }
                       />
@@ -219,11 +219,11 @@ const TokenDetails = ({ tokenInfo, mockHistory }) => {
                       <StyledSkeleton width="35px" height="16px" />
                     ) : (
                       <StyledChip
-                        active={tokenInfo.marketPrice.usd.active}
+                        active={tokenInfo.totalAmountUsd > 0}
                         label={
                           <Typography>
-                            {tokenInfo.marketPrice.usd.active ? '+' : '-'}
-                            {tokenInfo.marketPrice.usd.value} USD
+                            {tokenInfo.totalAmountUsd > 0 ? '+' : '-'}
+                            {tokenInfo.totalAmountUsd} USD
                           </Typography>
                         }
                       />
@@ -232,7 +232,7 @@ const TokenDetails = ({ tokenInfo, mockHistory }) => {
                 </StyledTooltip>
               </Stack>
             </Stack>
-            <TokenDetailChart isLoading={isLoading} data={tokenInfo.marketPrice.chartData} />
+            <TokenDetailChart isLoading={isLoading} data={tokenInfo.chartData} />
           </Box>
         </Card>
 
