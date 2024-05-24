@@ -218,8 +218,13 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
     setCancellationState({ order, tx: null });
     try {
       const utxoHex = await props.stores.substores.ada.swapStore
-        .getUtxoHexForCancelCollateral({ wallet });
+        .getCollateralUtxoHexForCancel({ wallet });
       if (utxoHex == null) {
+        const { unsignedTxHex, collateralUtxoHex } = await props.stores.substores.ada.swapStore
+          .createCollateralReorgForCancel({ wallet });
+        console.log('>>> REORG NEEDED');
+        console.log('>>> unsignedTxHex', unsignedTxHex);
+        console.log('>>> collateralUtxoHex', collateralUtxoHex);
         setCancellationState({
           order,
           collateralReorgRequired: true,
