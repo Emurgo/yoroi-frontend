@@ -10,7 +10,7 @@ import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { HARD_DERIVATION_START } from '../../config/numbersConfig';
 import { asGetAllUtxos } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import { fail, first, forceNonNull, sorted } from '../../coreUtils';
+import { fail, first, sorted } from '../../coreUtils';
 import type { QueriedUtxo } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import BigNumber from 'bignumber.js';
 
@@ -164,7 +164,7 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
     }).promise;
   };
 
-  pickCollateralUtxo: ({| wallet: PublicDeriver<> |}) => Promise<QueriedUtxo> = async ({ wallet }) => {
+  pickCollateralUtxo: ({| wallet: PublicDeriver<> |}) => Promise<?QueriedUtxo> = async ({ wallet }) => {
     const withUtxos = asGetAllUtxos(wallet)
       ?? fail(`${nameof(this.pickCollateralUtxo)} missing utxo functionality`);
     const allUtxos: Array<QueriedUtxo> = await withUtxos.getAllUtxos();
@@ -175,20 +175,7 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
       new BigNumber(u.output.tokens.find(x => x.Token.Identifier === '')?.TokenList.Amount ?? 0);
     const compareDefaultCoins = (a: QueriedUtxo, b: QueriedUtxo): number =>
       utxoDefaultCoinAmount(a).comparedTo(utxoDefaultCoinAmount(b));
-    // can force non-null because of array length check above
-    return forceNonNull(first(sorted(allUtxos, (a, b) => {
-      const aIsPure = a.output.tokens.length === 1;
-      const bIsPure = b.output.tokens.length === 1;
-      if (aIsPure && bIsPure) {
-        // smallest pure wins
-        return compareDefaultCoins(a, b);
-      }
-      if (aIsPure || bIsPure) {
-        // pure wins
-        return aIsPure ? -1 : 1;
-      }
-      // largest dirty wins to try and make sure it can handle the change
-      return compareDefaultCoins(b, a);
-    })));
+    const pureUtxos = allUtxos.filter(u => u.output.tokens.length === 1);
+    return first(sorted(pureUtxos, compareDefaultCoins));
   }
 }

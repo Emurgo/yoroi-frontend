@@ -17,7 +17,7 @@ import { MultiToken } from '../../api/common/lib/MultiToken';
 import { Quantities } from '../../utils/quantities';
 import BigNumber from 'bignumber.js';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import { cast, fail, hexToBytes, noop } from '../../coreUtils';
+import { cast, fail, hexToBytes, maybe, noop } from '../../coreUtils';
 import {
   asAddressedUtxo as asAddressedUtxoCardano,
   asAddressedUtxo,
@@ -88,14 +88,15 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
       });
   }
 
-  getCollateralUtxoHexForCancel: ({| wallet: PublicDeriver<> |}) => Promise<string> = async ({
+  getCollateralUtxoHexForCancel: ({| wallet: PublicDeriver<> |}) => Promise<?string> = async ({
     wallet,
   }) => {
-    const utxo: QueriedUtxo = await this.stores.substores.ada.wallets.pickCollateralUtxo({
-      wallet,
-    });
-    const [addressedUtxo] = asAddressedUtxo([utxo]);
-    return cardanoUtxoHexFromRemoteFormat(cast(addressedUtxo));
+    const utxo: ?QueriedUtxo = await this.stores.substores.ada.wallets
+      .pickCollateralUtxo({ wallet });
+    return maybe(utxo, u => {
+      const [addressedUtxo] = asAddressedUtxo([u]);
+      return cardanoUtxoHexFromRemoteFormat(cast(addressedUtxo));
+    })
   };
 
   createCollateralReorgForCancel: ({| wallet: PublicDeriver<> |}) => Promise<{|
