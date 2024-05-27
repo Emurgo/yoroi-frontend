@@ -11,12 +11,12 @@ import {
   Box,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { default as SortIcon } from '../../../../components/icons/portfolio/Sort';
+import { default as SortIcon } from '../../common/assets/icons/Sort';
 import { useNavigateTo } from '../../common/useNavigateTo';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
-import StyledChip from '../../common/chip';
-import ArrowIcon from '../../../../components/icons/portfolio/Arrow';
+import ArrowIcon from '../../common/assets/icons/Arrow';
 import adaPng from '../../../../../assets/images/ada.png';
+import { Chip } from '../../common/chip';
 
 const StatsTable = ({ data }) => {
   const theme = useTheme();
@@ -173,7 +173,7 @@ const StatsTable = ({ data }) => {
             </TableCell>
 
             <TableCell>
-              <StyledChip
+              <Chip
                 active={row['24h'] > 0}
                 label={
                   <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -198,7 +198,7 @@ const StatsTable = ({ data }) => {
             </TableCell>
 
             <TableCell>
-              <StyledChip
+              <Chip
                 active={row['1W'] > 0}
                 label={
                   <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -223,7 +223,7 @@ const StatsTable = ({ data }) => {
             </TableCell>
 
             <TableCell>
-              <StyledChip
+              <Chip
                 active={row['1M'] > 0}
                 label={
                   <Stack direction="row" justifyContent="space-between" alignItems="center">

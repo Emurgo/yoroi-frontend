@@ -1,14 +1,14 @@
 import { Typography, Stack, Box, Input, InputAdornment, styled } from '@mui/material';
 import { ReactComponent as Search } from '../../../../../assets/images/assets-page/search.inline.svg';
 import React, { useState } from 'react';
-import { StyledTooltip, StyledInput } from '../../../../components';
+import { Tooltip, SearchInput } from '../../../../components';
 import { useTheme } from '@mui/material/styles';
 import { defineMessages } from 'react-intl';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import StatsTable from './StatsTable';
 import mockData from '../../../../pages/portfolio/mockData';
-import StyledChip from '../../common/chip';
-import ArrowIcon from '../../../../components/icons/portfolio/Arrow';
+import ArrowIcon from '../../common/assets/icons/Arrow';
+import {Chip} from '../../common/chip';
 
 const PortfolioWallet = ({ data }) => {
   const theme = useTheme();
@@ -43,7 +43,7 @@ const PortfolioWallet = ({ data }) => {
             <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
               {mockData.PortfolioPage.balance.usd} USD
             </Typography>
-            <StyledTooltip
+            <Tooltip
               title={
                 <>
                   <Typography display={'block'}>% {strings.balancePerformance}</Typography>
@@ -59,7 +59,7 @@ const PortfolioWallet = ({ data }) => {
                 spacing={theme.spacing(1)}
                 sx={{ marginLeft: theme.spacing(2) }}
               >
-                <StyledChip
+                <Chip
                   active={mockData.PortfolioPage.balance.percents.active}
                   label={
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -70,7 +70,7 @@ const PortfolioWallet = ({ data }) => {
                             : theme.palette.ds.sys_magenta_c700
                         }
                         style={{
-                          marginRight: '5px',
+                          marginRight: theme.spacing(0.5),
                           transform: mockData.PortfolioPage.balance.percents.active
                             ? ''
                             : 'rotate(180deg)',
@@ -82,7 +82,7 @@ const PortfolioWallet = ({ data }) => {
                     </Stack>
                   }
                 />
-                <StyledChip
+                <Chip
                   active={mockData.PortfolioPage.balance.amount.active}
                   label={
                     <Typography variant="caption1">
@@ -92,11 +92,11 @@ const PortfolioWallet = ({ data }) => {
                   }
                 />
               </Stack>
-            </StyledTooltip>
+            </Tooltip>
           </Stack>
         </Stack>
 
-        <StyledInput
+        <SearchInput
           disableUnderline
           onChange={e => setKeyword(e.target.value)}
           placeholder={strings.search}

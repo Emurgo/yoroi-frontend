@@ -25,7 +25,7 @@ export type PortfolioState = {|
 
 // Define default state
 export const defaultPortfolioState: PortfolioState = {
-  portfolioStatus: 'none',
+  portfolioStatus: 'drep',
 };
 
 // Define action handlers

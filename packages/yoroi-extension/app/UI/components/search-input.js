@@ -1,6 +1,6 @@
 import { Input, styled } from '@mui/material';
 
-const SearchInput = styled(Input)(({ theme }) => ({
+const StyledInput = styled(Input)(({ theme }) => ({
   borderRadius: `${theme.shape.borderRadius}px`,
   width: '320px',
   height: '40px',
@@ -13,6 +13,6 @@ const SearchInput = styled(Input)(({ theme }) => ({
   },
 }));
 
-export const StyledInput = props => {
-  return <SearchInput {...props} />;
+export const SearchInput = props => {
+  return <StyledInput {...props} />;
 };

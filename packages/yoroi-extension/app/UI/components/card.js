@@ -1,6 +1,6 @@
 import { Box, styled } from '@mui/material';
 
-export const Card = styled(Box)(({ theme }) => ({
+const StyledCard = styled(Box)(({ theme }) => ({
   borderRadius: '8px',
   flex: '1 1 100%',
   display: 'flex',
@@ -9,3 +9,7 @@ export const Card = styled(Box)(({ theme }) => ({
   borderColor: theme.palette.ds.gray_c200,
   bgcolor: 'background.card',
 }));
+
+export const Card = props => {
+  return <StyledCard {...props} />;
+};

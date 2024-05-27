@@ -1,6 +1,6 @@
 import React from 'react';
 import { Stack, Box, Typography, Link, Button } from '@mui/material';
-import { StyledSkeleton } from '../../../../components/skeleton';
+import { Skeleton } from '../../../../components/skeleton';
 import { CopyButton } from '../../../../components/copy-button';
 import { useTheme } from '@mui/material/styles';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
@@ -20,7 +20,7 @@ const TokenDetailOverview = ({ tokenInfo, isLoading }) => {
           sx={{ margin: '10px 0' }}
         >
           {isLoading ? (
-            <StyledSkeleton width="32px" height="32px" />
+            <Skeleton width="32px" height="32px" />
           ) : (
             <Box
               width="32px"
@@ -34,7 +34,7 @@ const TokenDetailOverview = ({ tokenInfo, isLoading }) => {
             ></Box>
           )}
           {isLoading ? (
-            <StyledSkeleton width="53px" height="16px" />
+            <Skeleton width="53px" height="16px" />
           ) : (
             <Typography fontWeight="500" sx={{ marginBottom: '20px' }}>
               {tokenInfo.name}
@@ -44,15 +44,15 @@ const TokenDetailOverview = ({ tokenInfo, isLoading }) => {
 
         <Stack direction="column" spacing={theme.spacing(0.5)}>
           {isLoading ? (
-            <StyledSkeleton width="53px" height="16px" />
+            <Skeleton width="53px" height="16px" />
           ) : (
             <Typography fontWeight="500">{strings.description}</Typography>
           )}
           {isLoading ? (
             <>
-              <StyledSkeleton height="20px" width="full" />
-              <StyledSkeleton height="20px" width="full" />
-              <StyledSkeleton height="20px" width="127px" />
+              <Skeleton height="20px" width="full" />
+              <Skeleton height="20px" width="full" />
+              <Skeleton height="20px" width="127px" />
             </>
           ) : (
             <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
@@ -63,12 +63,12 @@ const TokenDetailOverview = ({ tokenInfo, isLoading }) => {
 
         <Stack direction="column" spacing={theme.spacing(0.5)}>
           {isLoading ? (
-            <StyledSkeleton width="53px" height="16px" />
+            <Skeleton width="53px" height="16px" />
           ) : (
             <Typography fontWeight="500">{strings.website}</Typography>
           )}
           {isLoading ? (
-            <StyledSkeleton width="127px" height="20px" />
+            <Skeleton width="127px" height="20px" />
           ) : (
             <Link href={tokenInfo.overview.website} target="_blank">
               cardano.org
@@ -78,7 +78,7 @@ const TokenDetailOverview = ({ tokenInfo, isLoading }) => {
 
         <Stack direction="column" spacing={theme.spacing(0.5)}>
           {isLoading ? (
-            <StyledSkeleton width="84px" height="20px" />
+            <Skeleton width="84px" height="20px" />
           ) : (
             <Typography fontWeight="500">{strings.policyId}</Typography>
           )}
@@ -86,8 +86,8 @@ const TokenDetailOverview = ({ tokenInfo, isLoading }) => {
           <Stack direction="row" alignItems="flex-start" spacing={theme.spacing(2)}>
             {isLoading ? (
               <Box flex={1}>
-                <StyledSkeleton height="20px" width="full" />
-                <StyledSkeleton height="16px" width="53px" sx={{ marginTop: '5px' }} />
+                <Skeleton height="20px" width="full" />
+                <Skeleton height="16px" width="53px" sx={{ marginTop: '5px' }} />
               </Box>
             ) : (
               <Typography
@@ -102,7 +102,7 @@ const TokenDetailOverview = ({ tokenInfo, isLoading }) => {
 
         <Stack direction="column" spacing={theme.spacing(0.5)}>
           {isLoading ? (
-            <StyledSkeleton width="84px" height="20px" />
+            <Skeleton width="84px" height="20px" />
           ) : (
             <Typography fontWeight="500">{strings.fingerprint}</Typography>
           )}
@@ -110,8 +110,8 @@ const TokenDetailOverview = ({ tokenInfo, isLoading }) => {
           <Stack direction="row" alignItems="flex-start" spacing={theme.spacing(2)}>
             {isLoading ? (
               <Box flex={1}>
-                <StyledSkeleton height="20px" width="full" />
-                <StyledSkeleton height="16px" width="53px" sx={{ marginTop: '5px' }} />
+                <Skeleton height="20px" width="full" />
+                <Skeleton height="16px" width="53px" sx={{ marginTop: '5px' }} />
               </Box>
             ) : (
               <Typography
@@ -126,20 +126,20 @@ const TokenDetailOverview = ({ tokenInfo, isLoading }) => {
 
         <Stack direction="column" spacing={theme.spacing(0.5)}>
           {isLoading ? (
-            <StyledSkeleton width="53px" height="16px" />
+            <Skeleton width="53px" height="16px" />
           ) : (
             <Typography fontWeight="500">{strings.detailsOn}</Typography>
           )}
           <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
             {isLoading ? (
-              <StyledSkeleton width="127px" height="20px" />
+              <Skeleton width="127px" height="20px" />
             ) : (
               <Link href={tokenInfo.overview.detailOn} target="_blank">
                 Cardanoscan
               </Link>
             )}
             {isLoading ? (
-              <StyledSkeleton width="60px" height="20px" />
+              <Skeleton width="60px" height="20px" />
             ) : (
               <Link href={tokenInfo.overview.detailOn} target="_blank">
                 Adaex

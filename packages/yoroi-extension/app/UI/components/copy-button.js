@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { IconButton } from '@mui/material';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import CopyIcon from '../components/icons/portfolio/Copy';
-import CopiedIcon from '../components/icons/portfolio/Copied';
-import { StyledTooltip } from './tooltip';
+import CopyIcon from './icons/Copy';
+import CopiedIcon from './icons/Copied';
+import { Tooltip } from './tooltip';
 
 export const CopyButton = ({ textToCopy, disabled, ...props }) => {
   const [copied, setCopied] = useState(false);
@@ -17,11 +17,11 @@ export const CopyButton = ({ textToCopy, disabled, ...props }) => {
 
   return (
     <CopyToClipboard text={textToCopy} onCopy={handleCopy} {...props}>
-      <StyledTooltip title={copied ? 'Copied' : 'Copy to clipboard'} arrow placement="bottom-start">
+      <Tooltip title={copied ? 'Copied' : 'Copy to clipboard'} arrow placement="bottom-start">
         <IconButton disabled={disabled} sx={{ padding: 0 }}>
           {copied ? <CopiedIcon /> : <CopyIcon />}
         </IconButton>
-      </StyledTooltip>
+      </Tooltip>
     </CopyToClipboard>
   );
 };

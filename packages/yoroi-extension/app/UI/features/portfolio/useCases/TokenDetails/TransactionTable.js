@@ -13,9 +13,9 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { Card } from '../../../../components';
-import { default as ArrowIcon } from '../../../../components/icons/portfolio/transaction-history/Arrow';
-import { default as ExpandIcon } from '../../../../components/icons/portfolio/transaction-history/Expand';
-import { default as ErrorIcon } from '../../../../components/icons/portfolio/transaction-history/Error';
+import { default as ArrowIcon } from '../../common/assets/icons/transaction-history/Arrow';
+import { default as ExpandIcon } from '../../common/assets/icons/transaction-history/Expand';
+import { default as ErrorIcon } from '../../common/assets/icons/transaction-history/Error';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 
 const TransactionTable = ({ history }) => {

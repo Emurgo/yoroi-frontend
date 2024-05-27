@@ -1,11 +1,11 @@
-import { Skeleton } from '@mui/material';
+import { Skeleton as MuiSkeleton } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
-export const StyledSkeleton = props => {
+export const Skeleton = props => {
   const theme = useTheme();
 
   return (
-    <Skeleton
+    <MuiSkeleton
       variant="rectangular"
       animation={false}
       {...props}

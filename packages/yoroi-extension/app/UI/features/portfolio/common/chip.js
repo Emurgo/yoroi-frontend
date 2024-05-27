@@ -1,12 +1,12 @@
 import React from 'react';
-import { Chip, Stack, Typography } from '@mui/material';
+import { Chip as MuiChip, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
-const StyledChip = props => {
+export const Chip = props => {
   const theme = useTheme();
 
   return (
-    <Chip
+    <MuiChip
       label={props.label}
       {...props}
       sx={{
@@ -16,8 +16,6 @@ const StyledChip = props => {
         color: props.active ? theme.palette.ds.secondary_c800 : theme.palette.ds.sys_magenta_c700,
         ...props.sx,
       }}
-    ></Chip>
+    ></MuiChip>
   );
 };
-
-export default StyledChip;

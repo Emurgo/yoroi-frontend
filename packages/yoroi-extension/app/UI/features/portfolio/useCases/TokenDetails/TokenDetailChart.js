@@ -1,4 +1,4 @@
-import { Box, Button, Stack, styled, Typography } from '@mui/material';
+import { Box, Button, Stack, styled, Typography, Divider } from '@mui/material';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   LineChart,
@@ -6,11 +6,16 @@ import {
   CartesianGrid,
   XAxis,
   YAxis,
-  Tooltip,
   ResponsiveContainer,
   Label,
+  Tooltip as RechartTooltip,
 } from 'recharts';
 import { useTheme } from '@mui/material/styles';
+import { usePortfolio } from '../../module/PortfolioContextProvider';
+import ArrowIcon from '../../common/assets/icons/Arrow';
+import { Skeleton, Tooltip } from '../../../../components';
+import chartSkeletonPng from '../../common/assets/images/token-detail-chart-skeleton.png';
+import { Chip } from '../../common/chip';
 
 const StyledButton = styled(Button)(({ theme }) => ({
   fontWeight: 500,
@@ -20,36 +25,21 @@ const StyledButton = styled(Button)(({ theme }) => ({
   height: '30px',
 }));
 
-const StyledTooltip = styled(Box)(({ theme }) => ({
-  padding: '10px',
-  borderRadius: `${theme.shape.borderRadius}px`,
-  border: `1px solid ${theme.palette.ds.sys_cyan_c100}`,
-  backgroundColor: theme.palette.ds.primary_c200,
-  color: theme.palette.ds.primary_c700,
-}));
+const CustomActiveDot = props => {
+  const { cx, cy, payload, onMouseMove } = props;
 
-const CustomTooltip = ({ active, payload, coordinate }) => {
-  if (active && payload && payload.length) {
-    const { x, y } = coordinate;
-    const tooltipX = x + 10;
-    const tooltipY = y - 50;
+  const handleMouseMove = event => {
+    if (onMouseMove) {
+      onMouseMove(event, payload);
+    }
+  };
 
-    return (
-      <g>
-        <line x1={x} y1={y} x2={tooltipX} y2={tooltipY} stroke="black" strokeDasharray="3 3" />
-        <StyledTooltip>
-          <Typography>{`Time: ${payload[0].payload.time}`}</Typography>
-          <Typography>{`Price: ${payload[0].value} USD`}</Typography>
-        </StyledTooltip>
-      </g>
-    );
-  }
-
-  return null;
+  return <circle cx={cx} cy={cy} r={5} fill="red" stroke="none" onMouseMove={handleMouseMove} />;
 };
 
-const TokenDetailChart = ({ isLoading, data }) => {
+const TokenDetailChart = ({ isLoading, tokenInfo }) => {
   const theme = useTheme();
+  const { strings } = usePortfolio();
   const [buttonPeriodProps, setButtonPeriodProps] = useState([
     { label: '24H', active: true },
     { label: '1W', active: false },
@@ -120,27 +110,12 @@ const TokenDetailChart = ({ isLoading, data }) => {
     return categorizedData;
   };
 
-  const categorizedData = useMemo(() => categorizeByTime(data), [data]);
+  const filteredData = useMemo(() => categorizeByTime(tokenInfo.chartData), [tokenInfo.chartData]);
 
-  const SkeletonLabel = ({ x, y, width = 19, height = 13, borderRadius = 8, marginRight = 10 }) => {
-    return (
-      <rect
-        x={x - width / 2 - marginRight}
-        y={y - height / 2}
-        width={width}
-        height={height}
-        rx={borderRadius}
-        ry={borderRadius}
-        fill={theme.palette.ds.gray_c50}
-      />
-    );
-  };
   const CustomYAxisTick = props => {
     const { x, y, payload } = props;
 
-    return isLoading ? (
-      <SkeletonLabel x={x} y={y} />
-    ) : (
+    return (
       <text x={x} y={y} dy={4} textAnchor="end" fill={theme.palette.ds.black_static}>
         {payload.value}
       </text>
@@ -158,43 +133,127 @@ const TokenDetailChart = ({ isLoading, data }) => {
     setButtonPeriodProps(tmp);
   };
 
-  return (
-    <Box sx={{ userSelect: 'none', width: '100%', margin: '10px 0' }}>
-      <Box sx={{ margin: '20px 0' }}>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={categorizedData[buttonPeriodProps.find(item => item.active).label]}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} />
-            <YAxis
-              axisLine={false}
-              allowDecimals={true}
-              tickLine={false}
-              type={'number'}
-              tick={CustomYAxisTick}
-            ></YAxis>
-            {!isLoading && <Tooltip content={<CustomTooltip />} />}
-            <Line
-              type="monotone"
-              dataKey="value"
-              strokeWidth={2}
-              stroke={isLoading ? theme.palette.ds.gray_c50 : theme.palette.ds.text_primary_medium}
-              dot={false}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </Box>
+  const handleMouseMove = (event, payload) => {
+    console.log('Mouse Move:', payload);
+  };
 
-      <Stack direction="row" justifyContent="space-between">
-        {buttonPeriodProps.map(period => (
-          <StyledButton
-            key={period.label}
-            variant={period.active ? 'contained' : 'text'}
-            disabled={isLoading}
-            onClick={() => handleChoosePeriod(period.label)}
+  return (
+    <Box sx={{ padding: theme.spacing(3) }}>
+      <Stack direction="row" justifyContent="space-between" alignItems="center">
+        {isLoading ? (
+          <Skeleton width="131px" height="13px" />
+        ) : (
+          <Typography fontWeight="500" sx={{ color: theme.palette.ds.black_static }}>
+            {strings.marketPrice}
+          </Typography>
+        )}
+        <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
+          {isLoading ? (
+            <Skeleton width="64px" height="13px" />
+          ) : (
+            <Stack direction="row" alignItems="center">
+              <Typography fontWeight="500" sx={{ marginBottom: theme.spacing(0.1125) }}>
+                {tokenInfo.price}
+              </Typography>
+              <Typography variant="caption1">&nbsp;USD</Typography>
+            </Stack>
+          )}
+          <Tooltip
+            title={
+              <>
+                <Typography display={'block'}>{strings.tokenPriceChange}</Typography>
+                <Typography display={'block'}>{strings.in24hours}</Typography>
+              </>
+            }
+            placement="top"
           >
-            {period.label}
-          </StyledButton>
-        ))}
+            <Stack direction="row" alignItems="center" spacing={theme.spacing(0.5)}>
+              {isLoading ? (
+                <Skeleton width="35px" height="16px" />
+              ) : (
+                <Chip
+                  active={tokenInfo.price > 0}
+                  label={
+                    <Stack direction="row" justifyContent="space-between" alignItems="center">
+                      <ArrowIcon
+                        fill={
+                          tokenInfo.price > 0
+                            ? theme.palette.ds.secondary_c800
+                            : theme.palette.ds.sys_magenta_c700
+                        }
+                        style={{
+                          marginRight: theme.spacing(0.5),
+                          transform: tokenInfo.price > 0 ? '' : 'rotate(180deg)',
+                        }}
+                      />
+                      <Typography variant="caption1">{tokenInfo.price}%</Typography>
+                    </Stack>
+                  }
+                />
+              )}
+
+              {isLoading ? (
+                <Skeleton width="35px" height="16px" />
+              ) : (
+                <Chip
+                  active={tokenInfo.totalAmountUsd > 0}
+                  label={
+                    <Typography variant="caption1">
+                      {tokenInfo.totalAmountUsd > 0 ? '+' : '-'}
+                      {tokenInfo.totalAmountUsd} USD
+                    </Typography>
+                  }
+                />
+              )}
+            </Stack>
+          </Tooltip>
+        </Stack>
       </Stack>
+
+      <Box sx={{ userSelect: 'none', width: '100%', margin: '10px 0' }}>
+        <Box
+          component={isLoading ? 'img' : 'div'}
+          src={chartSkeletonPng}
+          sx={{ margin: '20px 0', width: '100%', height: '265px' }}
+        >
+          {isLoading ? null : (
+            <ResponsiveContainer width="100%" height={265}>
+              <LineChart data={filteredData[buttonPeriodProps.find(item => item.active).label]}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <YAxis
+                  axisLine={false}
+                  allowDecimals={true}
+                  tickLine={false}
+                  type={'number'}
+                  tick={CustomYAxisTick}
+                ></YAxis>
+                <Line
+                  dot={false}
+                  type="monotone"
+                  dataKey="value"
+                  strokeWidth={2}
+                  stroke={
+                    isLoading ? theme.palette.ds.gray_c50 : theme.palette.ds.text_primary_medium
+                  }
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
+        </Box>
+
+        <Stack direction="row" justifyContent="space-between">
+          {buttonPeriodProps.map(period => (
+            <StyledButton
+              key={period.label}
+              variant={period.active ? 'contained' : 'text'}
+              disabled={isLoading}
+              onClick={() => handleChoosePeriod(period.label)}
+            >
+              {period.label}
+            </StyledButton>
+          ))}
+        </Stack>
+      </Box>
     </Box>
   );
 };
