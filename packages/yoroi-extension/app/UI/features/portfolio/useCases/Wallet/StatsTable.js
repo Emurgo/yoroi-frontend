@@ -45,14 +45,23 @@ const StatsTable = ({ data }) => {
   ];
 
   const [{ order, orderBy }, setSortState] = useState({
-    order: 'asc',
-    orderBy: 'name',
+    order: null,
+    orderBy: null,
   });
 
   const handleRequestSort = property => {
-    const isAsc = orderBy === property && order === 'asc';
+    let direction = 'asc';
+    if (order === 'asc') {
+      if (property === orderBy) {
+        direction = 'desc';
+      }
+    } else if (order === 'desc') {
+      if (property === orderBy) {
+        direction = null;
+      }
+    }
     setSortState({
-      order: isAsc ? 'desc' : 'asc',
+      order: direction,
       orderBy: property,
     });
   };
@@ -114,7 +123,7 @@ const StatsTable = ({ data }) => {
                 >
                   {label}
                 </Typography>
-                {disabledSort ? null : <SortIcon />}
+                {disabledSort ? null : <SortIcon id={id} order={order} orderBy={orderBy} />}
               </Stack>
             </TableCell>
           ))}
