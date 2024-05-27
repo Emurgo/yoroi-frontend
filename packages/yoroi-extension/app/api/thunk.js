@@ -5,7 +5,8 @@ import { loadLovefieldDBFromDump } from './ada/lib/storage/database';
 import type { lf$Database, } from 'lovefield';
 import type { WalletState } from '../../chrome/extension/background/types';
 import { HaskellShelleyTxSignRequest } from './ada/transactions/shelley/HaskellShelleyTxSignRequest';
-
+import type { TokenRow } from './ada/lib/storage/database/primitives/tables';
+import type { TxMemoTableInsert, TxMemoTableRow, TxMemoLookupKey, } from './ada/lib/storage/bridge/memos';
 /*::
 declare var chrome;
 */
@@ -53,18 +54,12 @@ export type CreateWalletRequest = {|
 |};
 
 export async function createWallet(request: CreateWalletRequest): Promise<void> {
-  return await callBackground({
-    type: 'create-wallet',
-    request,
-  });
+  return await callBackground({ type: 'create-wallet', request, });
 }
 
 export type CreateHardwareWalletRequest = any;
 export async function createHardwareWallet(request: CreateHardwareWalletRequest): Promise<WalletState> {
-  return await callBackground({
-    type: 'create-hardware-wallet',
-    request,
-  });
+  return await callBackground({ type: 'create-hardware-wallet', request, });
 }
 
 /*
@@ -79,10 +74,7 @@ export async function getBalance(publicDeriverId: number): Promise<MultiToken> {
 // todo: notify all tabs
 // WalletSettingsStore.js
 export async function removeWalletFromDb(request: {| publicDeriverId: number |}): Promise<void> {
-  await callBackground({
-    type: 'remove-wallet',
-    request,
-  });
+  await callBackground({ type: 'remove-wallet', request, });
 }
 
 type ChangeSigningKeyPasswordType = {|
@@ -91,26 +83,17 @@ type ChangeSigningKeyPasswordType = {|
   newPassword: string,
 |};
 export async function changeSigningKeyPassword(request: ChangeSigningKeyPasswordType): Promise<void> {
-  await callBackground({
-    type: 'change-signing-password',
-    request,
-  });
+  await callBackground({ type: 'change-signing-password', request, });
 }
 
 export async function renamePublicDeriver(request: {| publicDeriverId: number, newName: string |}): Promise<void> {
-  await callBackground({
-    type: 'rename-public-deriver',
-    request,
-  });
+  await callBackground({ type: 'rename-public-deriver', request, });
 }
 
 export async function renameConceptualWallet(
   request: {| conceptualWalletId: number, newName: string |}
 ): Promise<void> {
-  await callBackground({
-    type: 'rename-conceputal-wallet',
-    request,
-  });
+  await callBackground({ type: 'rename-conceputal-wallet', request, });
 }
 
 // AdaMnemonicSendStore.signAndBroadcast
@@ -122,17 +105,41 @@ export async function signAndBroadcast(
     publicDeriverId: number,
   |}
 ): Promise<{| txId: string |}> {
-  return await callBackground({
-    type: 'sign-and-broadcast',
-    request,
-  });
+  return await callBackground({ type: 'sign-and-broadcast', request, });
 }
 
 export async function getPrivateStakingKey(
   request: {| publicDeriverId: number, password: string |}
 ): Promise<string> {
-  return await callBackground({
-    type: 'get-private-staking-key',
-    request
-  });
+  return await callBackground({ type: 'get-private-staking-key', request });
+}
+
+// TokenInfoStore.fetchMissingTokenInfo
+// [... assertMap.values()]
+export async function getCardanoAssets(
+  request: {| networkId: number, tokenIds: Array<string> |}
+): Promise<Array<$ReadOnly<TokenRow>>> {
+  return await callBackground({ type: 'get-cardano-asset-map', request, });
+}
+
+export async function upsertTxMemo(
+  request: {| publicDeriverId: number, memo: TxMemoTableInsert | TxMemoTableRow, |},
+): Promise<TxMemoTableRow> {
+  return await callBackground({ type: 'upsert-tx-memo', request, });
+}
+
+export async function deleteTxMemo(
+  request: {| publicDeriverId: number, key: TxMemoLookupKey, |},
+): Promise<void> {
+  await callBackground({ type: 'delete-tx-memo', request, });
+}
+
+export async function getAllTxMemos(): Promise<$ReadOnlyArray<$ReadOnly<TxMemoTableRow>>> {
+  await callBackground({ type: 'get-all-tx-memos' });
+}
+
+export async function removeAllTransactions(
+  request: {| publicDeriverId: number |},
+): Promise<void> {
+  await callBackground({ type: 'remove-all-transactions' });
 }

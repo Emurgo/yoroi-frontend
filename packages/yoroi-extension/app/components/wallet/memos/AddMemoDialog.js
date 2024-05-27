@@ -30,6 +30,7 @@ const messages = defineMessages({
 
 type Props = {|
   selectedWalletId: number,
+  plateTextPart: string,
   selectedTransaction: WalletTransaction,
   error: ?LocalizableError,
   onCancel: void => void,
@@ -87,6 +88,7 @@ export default class AddMemoDialog extends Component<Props, State> {
         const { memoContent } = form.values();
         const memoRequest = {
           publicDeriverId: this.props.selectedWalletId,
+          plateTextPart: this.props.plateTextPart,
           memo: {
             Content: memoContent.replace(/ +/g, ' '),
             TransactionHash: this.props.selectedTransaction.txid,

@@ -33,6 +33,7 @@ import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { getWalletChecksum } from '../../api/export/utils';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import type { WalletState } from '../../../chrome/extension/background/types';
 
 /* fixme
 type GroupedWallets = {|

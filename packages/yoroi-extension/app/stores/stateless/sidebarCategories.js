@@ -15,7 +15,6 @@ import { ReactComponent as nftsIcon } from '../../assets/images/sidebar/revamp/n
 import { ReactComponent as votingIcon } from '../../assets/images/sidebar/revamp/voting.inline.svg';
 import { ReactComponent as swapIcon } from '../../assets/images/sidebar/revamp/swap.inline.svg';
 import { ReactComponent as settingIcon } from '../../assets/images/sidebar/revamp/setting.inline.svg';
-import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import environment from '../../environment';
 
 export type SidebarCategory = {|
@@ -125,7 +124,6 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     label: globalMessages.sidebarStaking,
     isVisible: ({ selected, isRewardWallet }) =>
       !!selected &&
-      isCardanoHaskell(selected.getParent().getNetworkInfo()) &&
       isRewardWallet(selected),
   },
   {

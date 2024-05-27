@@ -93,7 +93,7 @@ import {
 } from './content';
 import type { ConnectedSite } from './content';
 import { subscribeWalletStateChanges } from '../state';
-import { createWallet } from '../../../../app/api/ada';
+import AdaApi from '../../../../app/api/ada';
 
 const YOROI_MESSAGES = Object.freeze({
   CONNECT_RESPONSE: 'connect_response',
@@ -517,7 +517,8 @@ export async function yoroiMessageHandler(
       const db = await getDb();
       const network = getNetworkById(request.request.networkId);
 
-      await createWallet({
+      const adaApi = new AdaApi();
+      await adaApi.createWallet({
         db,
         network,
         recoveryPhrase: request.request.recoveryPhrase,

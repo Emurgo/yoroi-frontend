@@ -44,7 +44,7 @@ export default class AppStore extends Store<StoresMap, ActionsMap> {
       if (options.publicDeriverId == null) {
         this.actions.wallets.unselectWallet.trigger();
       } else {
-        this.actions.wallets.setActiveWallet.trigger({ publicDeriverId });
+        this.actions.wallets.setActiveWallet.trigger({ publicDeriverId: options.publicDeriverId });
       }
       // we can't clear the browser history programmatically (requires root privilege)
       // so instead, we route the user to a page that blocks the back button

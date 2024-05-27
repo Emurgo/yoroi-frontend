@@ -7,12 +7,6 @@ import type {
   CreateAddressFunc,
   CreateAddressResponse,
 } from '../../api/common';
-import {
-  PublicDeriver,
-} from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import {
-  asHasUtxoChains, asDisplayCutoff, asHasLevels,
-} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   IHasUtxoChainsRequest,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
@@ -31,6 +25,7 @@ import { allAddressSubgroups } from '../stateless/addressStores';
 import type { IAddressTypeUiSubset, IAddressTypeStore } from '../stateless/addressStores';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export default class AddressesStore extends Store<StoresMap, ActionsMap> {
 
@@ -69,7 +64,7 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
     return this._addressSubgroupMap;
   }
 
-  _createAddress: PublicDeriver<> => Promise<void> = async (
+  _createAddress: WalletState => Promise<void> = async (
     publicDeriver
   ) => {
     try {
@@ -82,7 +77,7 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
       runInAction('set error', () => { this.error = localizedError(error); });
     }
   };
-  _baseCreateAddress: PublicDeriver<> => Promise<?CreateAddressResponse> = async (
+  _baseCreateAddress: WalletState => Promise<?CreateAddressResponse> = async (
     publicDeriver
   ) => {
     const withDisplayCutoff = asDisplayCutoff(publicDeriver);
@@ -100,27 +95,23 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
     this.error = null;
   };
 
-  addObservedWallet: PublicDeriver<> => void = (
+  addObservedWallet: WalletState => void = (
     publicDeriver
   ) => {
     allAddressSubgroups
-      .filter(store => store.isRelated({
-        selected: publicDeriver
-      }))
+      .filter(store => store.isRelated()
       .map(store => store.class)
       .forEach(
         storeClass => this._addressSubgroupMap.get(storeClass)?.addObservedWallet(publicDeriver)
       );
   }
 
-  refreshAddressesFromDb: PublicDeriver<> => Promise<void> = async (
+  refreshAddressesFromDb: WalletState => Promise<void> = async (
     publicDeriver
   ) => {
     await Promise.all(
       allAddressSubgroups
-        .filter(store => store.isRelated({
-          selected: publicDeriver
-        }))
+        .filter(store => store.isRelated()
         .map(store => store.class)
         .map(storeClass => (
           this._addressSubgroupMap.get(storeClass)?.refreshAddressesFromDb(publicDeriver)
@@ -129,15 +120,11 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
   }
 
   _wrapForAllAddresses: {|
-    publicDeriver: PublicDeriver<>,
+    publicDeriver: WalletState,
     storeName: AddressTypeName,
     type: CoreAddressT,
   |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
-    const allAddresses = await this.api.ada.getAllAddressesForDisplay({
-      publicDeriver: request.publicDeriver,
-      type: request.type,
-    });
-
+    const allAddresses = request.publicDeriver.allAddresses.get(request.type);
     return this.storewiseFilter({
       publicDeriver: request.publicDeriver,
       storeName: request.storeName,
@@ -145,23 +132,17 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
         ...addrInfo,
         address: addressToDisplayString(
           addrInfo.address,
-          request.publicDeriver.getParent().getNetworkInfo()
+          getNetworkById(request.publicDeriver.networkId),
         ),
       })),
     });
   }
 
   _wrapForeign: {|
-    publicDeriver: PublicDeriver<>,
+    publicDeriver: WalletState,
     storeName: AddressTypeName,
   |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
-    const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
-    if (withLevels == null) {
-      throw new Error(`${nameof(this._wrapForeign)} missing levels`);
-    }
-    const allAddresses = await this.api.ada.getForeignAddresses({
-      publicDeriver: withLevels,
-    });
+    const allAddresses = request.publicDeriver.foreginAddresses;
 
     return this.storewiseFilter({
       publicDeriver: request.publicDeriver,
@@ -170,7 +151,7 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
         type: addrInfo.type,
         address: addressToDisplayString(
           addrInfo.address,
-          request.publicDeriver.getParent().getNetworkInfo()
+          getNetworkId(request.publicDeriver.networkId),
         ),
         label: 'asdf',
       })),
@@ -183,18 +164,7 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
     type: CoreAddressT,
     chainsRequest: IHasUtxoChainsRequest,
   |}=> Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
-    const withHasUtxoChains = asHasUtxoChains(
-      request.publicDeriver
-    );
-    if (withHasUtxoChains == null) {
-      Logger.error(`${nameof(this._wrapForChainAddresses)} incorrect public deriver`);
-      return Promise.resolve([]);
-    }
-    const addresses = await this.api.ada.getChainAddressesForDisplay({
-      publicDeriver: withHasUtxoChains,
-      chainsRequest: request.chainsRequest,
-      type: request.type,
-    });
+    const addresses = request.publicDeriver.chainAddresses.get(request.chainsRequest).get(request.type);
 
     return this.storewiseFilter({
       publicDeriver: request.publicDeriver,
@@ -203,14 +173,14 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
         ...addrInfo,
         address: addressToDisplayString(
           addrInfo.address,
-          request.publicDeriver.getParent().getNetworkInfo()
+          getNetworkById(request.publicDeriver),
         ),
       })),
     });
   }
 
   storewiseFilter: {|
-    publicDeriver: PublicDeriver<>,
+    publicDeriver: WalletState,
     storeName: AddressTypeName,
     addresses: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
   |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
@@ -218,7 +188,7 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
   }
 
   _createAddressIfNeeded: {|
-    publicDeriver: PublicDeriver<>,
+    publicDeriver: WalletState,
     genAddresses: () => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>>,
   |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
     const addresses = await request.genAddresses();

@@ -15,6 +15,7 @@ export type TxMemoPreLookupKey = {|
    * But for wallets without a public key, it can be something else
    */
   publicDeriverId: number,
+  plateTextPart: string,
   txHash: string,
 |};
 export type TxMemoLookupKey = {|
@@ -28,6 +29,7 @@ export type TxMemoTablePreInsert = {|
    * But for wallets without a public key, it can be something else
    */
   publicDeriverId: number,
+  plateTextPart: string,
   memo: TxMemoTableInsertCommon,
 |}
 
@@ -38,6 +40,7 @@ export type TxMemoTableUpsert = {|
    * But for wallets without a public key, it can be something else
    */
   publicDeriverId: number,
+  plateTextPart: string,
   memo: TxMemoTableInsertCommon,
 |}
 

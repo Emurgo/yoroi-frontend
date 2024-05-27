@@ -54,6 +54,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
     publicDeriverId: number,
     addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
     expectedSerial: string | void,
+    networkId: number,
   |} => Promise<void> = async (request) => {
     await this.props.actions.ada.ledgerSend.sendUsingLedgerKey.trigger({
       ...request,
@@ -71,7 +72,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
 
     // only display the upgrade dialog once we've populated the address info for the wallet
     for (const addressStore of allAddressSubgroups) {
-      if (!addressStore.isRelated({ selected })) {
+      if (!addressStore.isRelated()) {
         continue;
       }
       const store = this.props.stores.addresses.addressSubgroupMap.get(addressStore.class);
@@ -172,6 +173,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
             ),
             ...tentativeTx,
             expectedSerial,
+            networkId: selected.networkId,
           }),
           label: intl.formatMessage(globalMessages.upgradeLabel),
         }}
@@ -185,7 +187,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
         getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
         unitOfAccountSetting={this.props.stores.profile.unitOfAccount}
         addressLookup={genAddressLookup(
-          selected,
+          selected.networkId,
           intl,
           undefined, // don't want to go to route from within a dialog
           this.props.stores.addresses.addressSubgroupMap,

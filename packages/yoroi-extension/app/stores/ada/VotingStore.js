@@ -247,7 +247,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
 
     const nonce = timeToSlot({ time: new Date() }).slot;
 
-    const allAddresses = publicDeriver.allAddresses;
+    const allAddresses = publicDeriver.allAddresses.get(CoreAddressTypes.CARDANO_BASE);
 
     let votingRegTxPromise;
 
@@ -347,6 +347,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
             publicKey: request.wallet.publicKey,
             pathToPublic: request.wallet.pathToPublic,
             networkId: request.wallet.networkId,
+            hardwareWalletDeviceId: request.wallet.hardwareWalletDeviceId,
           },
         },
         refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
@@ -363,6 +364,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
             pathToPublic: request.wallet.pathToPublic,
             stakingAddressing: request.wallet.stakingAddressing,
             networkId: request.wallet.networkId,
+            hardwareWalletDeviceId: request.wallet.hardwareWalletDeviceId,
           },
         },
         refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
@@ -382,7 +384,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
           signRequest: result,
         },
       },
-      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
+      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet),
     });
   };
 

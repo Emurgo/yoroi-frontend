@@ -83,12 +83,14 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
         params: { signRequest },
         publicDeriverId: selectedWallet.publicDeriverId,
         onSuccess: openTransactionSuccessDialog,
-      });
+        wallet: selectedWallet,
+     });
     } else if (selectedWallet.type === 'trezor') {
       await trezorSend.sendUsingTrezor.trigger({
         params: { signRequest },
         publicDeriverId: selectedWallet.publicDeriverId,
         onSuccess: openTransactionSuccessDialog,
+        wallet: selectedWallet,
       });
     } else {
       // walletType === 'mnemonic'

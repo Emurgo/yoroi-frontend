@@ -88,12 +88,20 @@ export default class TransferSendPage extends Component<Props> {
         await this.props.actions.ada.trezorSend.sendUsingTrezor.trigger({
           params: { signRequest },
           publicDeriverId: selected.publicDeriverId,
+          stakingAddressing: selected.stakingAddressing,
+          publicKey: selected.publicKey,
+          pathToPublic: selected.pathToPublic,
+          networkId: selected.networkId,
         });
       }
       if (isLedgerNanoWallet(selected.getParent())) {
         await this.props.actions.ada.ledgerSend.sendUsingLedgerWallet.trigger({
           params: { signRequest },
           publicDeriverId: selected.publicDeriverId,
+          stakingAddressing: selected.stakingAddressing,
+          publicKey: selected.publicKey,
+          pathToPublic: selected.pathToPublic,
+          networkId: selected.networkId,
         });
       }
       if (this.props.stores.wallets.sendMoneyRequest.error == null) {
@@ -192,7 +200,7 @@ export default class TransferSendPage extends Component<Props> {
         getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
         unitOfAccountSetting={this.props.stores.profile.unitOfAccount}
         addressLookup={genAddressLookup(
-          selected,
+          selected.networkId,
           intl,
           undefined, // don't want to go to route from within a dialog
           this.props.stores.addresses.addressSubgroupMap,

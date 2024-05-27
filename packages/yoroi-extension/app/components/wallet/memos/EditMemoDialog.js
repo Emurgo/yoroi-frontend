@@ -25,6 +25,7 @@ import { ReactComponent as CloseIcon }  from '../../../assets/images/forms/close
 
 type Props = {|
   selectedWalletId: number,
+  plateTextPart: string,
   existingMemo: $ReadOnly<TxMemoTableRow>,
   error: ?LocalizableError,
   onCancel: void => void,
@@ -85,6 +86,7 @@ export default class EditMemoDialog extends Component<Props, State> {
         const { memoContent } = form.values();
         const memoRequest = {
           publicDeriverId: this.props.selectedWalletId,
+          plateTextPart: this.props.plateTextPart,
           memo: {
             Content: memoContent.replace(/ +/g, ' '),
             TransactionHash: this.props.existingMemo.TransactionHash,

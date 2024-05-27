@@ -64,9 +64,9 @@ export default class NavBarContainer extends Component<Props> {
 
       return (
         <NavDropdownRow
-          key={wallet.getPublicDeriverId()}
+          key={wallet.publicDeriverId}
           plateComponent={<NavPlate plate={wallet.plate} walletType={wallet.type} name={wallet.name} />}
-          onSelect={() => this.switchToNewWallet(wallet)}
+          onSelect={() => this.switchToNewWallet(wallet.publicDeriverId)}
           isCurrentWallet={wallet === this.props.stores.wallets.selected}
           syncTime={lastSyncInfo?.Time ? moment(lastSyncInfo.Time).fromNow() : null}
           detailComponent={

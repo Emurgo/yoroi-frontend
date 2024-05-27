@@ -7,13 +7,11 @@ import Store from '../base/Store';
 import LocalizableError, { localizedError } from '../../i18n/LocalizableError';
 import type { TransferStatusT, TransferTx, } from '../../types/TransferTypes';
 import { TransferStatus, } from '../../types/TransferTypes';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { unscramblePaperAdaMnemonic, } from '../../api/ada/lib/cardanoCrypto/paperWallet';
 import config from '../../config';
 import { SendTransactionApiError } from '../../api/common/errors';
 import type { Address, Addressing } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import { getReceiveAddress } from '../stateless/addressStores';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 
@@ -84,12 +82,12 @@ export default class YoroiTransferStore extends Store<StoresMap, ActionsMap> {
   }
 
   nextInternalAddress: (
-    PublicDeriver<>
+    WalletState
   ) => (void => Promise<{| ...Address, ...InexactSubset<Addressing> |}>) = (
     publicDeriver
   ) => {
     return async () => {
-      const nextInternal = await getReceiveAddress(publicDeriver);
+      const nextInternal = publicDeriver.receiveAddress;
       if (nextInternal == null) {
         throw new Error(`${nameof(this.nextInternalAddress)} no internal addresses left. Should never happen`);
       }
@@ -216,7 +214,7 @@ export default class YoroiTransferStore extends Store<StoresMap, ActionsMap> {
 
     try {
       await this.stores.wallets.sendAndRefresh({
-        publicDeriver: undefined,
+        publicDeriverId: undefined,
         broadcastRequest: async () => {
           const transferTx = await getTransferTx();
           if (transferTx.id == null || transferTx.encodedTx == null) {

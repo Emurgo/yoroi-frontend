@@ -19,6 +19,7 @@ import type {
   GetDelegatedBalanceResponse,
   RewardHistoryFunc
 } from '../../api/ada/lib/storage/bridge/delegationUtils';
+import { MultiToken } from '../../api/common/lib/MultiToken';
 
 export type DelegationRequests = {|
   publicDeriverId: number,
@@ -60,7 +61,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
         });
         // make sure all the pools were found or throw an error
         for (const poolId of poolIds) {
-          if (this.getLocalPoolInfo(selectedNetwork, poolId) == null) {
+          if (this.getLocalPoolInfo(selectedNetwork.NetworkId, poolId) == null) {
             throw new PoolMissingApiError();
           }
         }
@@ -169,7 +170,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
       // We cancel out any still present reward, in case it has not synced yet
       return defaultMultiToken;
     }
-    return this._getDelegatedBalanceResult(publicDeriver)?.accountPart ?? fefaultMultiToken;
+    return this._getDelegatedBalanceResult(publicDeriverId)?.accountPart ?? defaultMultiToken;
   }
 
   getDelegatedUtxoBalance: number => ?MultiToken = (publicDeriverId) => {

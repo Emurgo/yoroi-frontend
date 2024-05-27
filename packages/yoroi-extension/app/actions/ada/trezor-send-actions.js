@@ -1,6 +1,7 @@
 // @flow
 import { AsyncAction, Action } from '../lib/Action';
 import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
+import type { Addressing } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 export type SendUsingTrezorParams = {|
   signRequest: ISignRequest<any>,
@@ -13,11 +14,15 @@ export default class TrezorSendActions {
   reset: Action<void> = new Action();
   sendUsingTrezor: AsyncAction<{|
     params: SendUsingTrezorParams,
-    publicDeriverId: number,
     onSuccess?: void => void,
-    stakingAddressing: request.stakingAddressing,
-    publicKey: request.publicKey,
-    pathToPublic: request.pathToPublic,
-    networkId: request.networkId,
+    wallet: {
+      publicDeriverId: number,
+      stakingAddressing: Addressing,
+      publicKey: string,
+      pathToPublic: Array<number>,
+      networkId: number,
+      hardwareWalletDeviceId: ?string,
+      ...
+    },
   |}> = new AsyncAction();
 }

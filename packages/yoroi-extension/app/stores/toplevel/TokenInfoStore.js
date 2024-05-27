@@ -21,10 +21,10 @@ import {
 } from '../../api/ada/lib/storage/database/utils';
 import { GetToken } from '../../api/ada/lib/storage/database/primitives/api/read';
 import { ModifyToken } from '../../api/ada/lib/storage/database/primitives/api/write';
-import { genCardanoAssetMap } from '../../api/ada/lib/storage/bridge/updateTransactions';
 import type WalletsActions from '../../actions/wallet-actions';
 import type TransactionsStore from './TransactionsStore';
 import type { IFetcher as IFetcherCardano } from '../../api/ada/lib/state-fetch/IFetcher.types';
+import { getCardanoAssets } from '../../api/thunk';
 
 export type TokenInfoMap = Map<
   string, // network ID. String because mobx requires string for observable maps
@@ -37,10 +37,6 @@ export type TokenInfoMap = Map<
 export default class TokenInfoStore<
   StoresMapType: {
     +transactions?: TransactionsStore,
-    +loading: {
-      +getDatabase: () => any,
-      ...
-    },
     +substores: {
       +ada: {
         +stateFetchStore: {
@@ -66,56 +62,12 @@ export default class TokenInfoStore<
     networkId,
     tokenIds
   ) => {
-    const db = this.stores.loading.getDatabase();
-    if (!db) {
-      return;
-    }
-    const network: ?NetworkRow = (Object.values(networks): Array<any>).find(
-      ({ NetworkId }) => NetworkId === networkId
-    );
-    if (!network) {
-      return;
-    }
-
-    let assetMap;
-    if (isCardanoHaskell(network)) {
-      const deps =  Object.freeze({
-        ModifyToken,
-        GetToken,
-      });
-      const depTables = Object
-            .keys(deps)
-            .map(key => deps[key])
-            .flatMap(table => getAllSchemaTables(db, table));
-
-      assetMap = await raii(
-        db,
-        depTables,
-        dbTx => (
-          genCardanoAssetMap(
-            db,
-            dbTx,
-            deps,
-            tokenIds,
-            this.stores.substores.ada.stateFetchStore.fetcher.getTokenInfo,
-            this.stores.substores.ada.stateFetchStore.fetcher.getMultiAssetMintMetadata,
-            this.stores.substores.ada.stateFetchStore.fetcher.getMultiAssetSupply,
-            network,
-          )
-        )
-      );
-    } else {
-      throw new Error('unexpected wallet type');
-    }
-    runInAction(() => { this._updateTokenInfo([...assetMap.values()]) });
+    const assets = await getCaranoAssets({ networkId, tokenIds });
+    runInAction(() => { this._updateTokenInfo(assets) });
   }
 
   refreshTokenInfo: void => Promise<void> = async () => {
-    const db = this.stores.loading.getDatabase();
-    if (db == null) throw new Error(`${nameof(TokenInfoStore)}::${nameof(this.refreshTokenInfo)} called before storage was initialized`);
-    const tokens = await this.api.common.getTokenInfo({ db });
-
-    runInAction(() => { this._updateTokenInfo(tokens) });
+    // no-op
   }
 
   getDefaultTokenInfo: number => $ReadOnly<TokenRow> = (

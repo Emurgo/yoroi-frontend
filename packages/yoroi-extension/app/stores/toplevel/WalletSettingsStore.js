@@ -14,6 +14,7 @@ import {
   changeSigningKeyPassword,
   renamePublicDeriver,
   renameConceptualWallet,
+  removeAllTransactions,
 } from '../../api/thunk';
 
 export type WarningList = {|
@@ -42,7 +43,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
         }
       }
 
-      const promise = this.api.ada.removeAllTransactions(req);
+      const promise = removeAllTransactions({ publicDeriverId: req.publicDeriverId });
 
       runInAction(() => {
         this.stores.transactions.ongoingRefreshing.set(
@@ -109,9 +110,6 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     await this.changeSigningKeyRequest.execute(async () => {
       await changeSigningKeyPassword(request);
     });
-    runInAction(() => {
-      this.stores.wallets.getSigningKeyCache(publicDeriverId).signingKeyUpdateDate = newUpdateDate;
-    });
     this.actions.dialogs.closeActiveDialog.trigger();
     this.changeSigningKeyRequest.reset();
   };
@@ -146,7 +144,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
       await this.clearHistory.execute({
         publicDeriverId: request.publicDeriverId,
         refreshWallet: () => {
-          this.stores.transactions.clearCache(request.publicDeriver);
+          this.stores.transactions.clearCache(request.publicDeriverId);
           // currently in the map the promise for this wallet is this resyncing process,
           // we need to remove it before calling refreshing otherwise it's a deadlock
           runInAction(() => {
@@ -155,7 +153,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
             );
           });
           // refresh
-          return this.stores.wallets.refreshWalletFromRemote(request.publicDeriver);
+          return this.stores.wallets.refreshWalletFromRemote(request.publicDeriverId);
         }
       }).promise;
     } finally {

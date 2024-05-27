@@ -10,7 +10,7 @@ export default class WalletSettingsActions {
     newName: string,
   |}> = new AsyncAction();
   renameConceptualWallet: AsyncAction<{|
-    publicDeriverId: number,
+    conceptualWalletId: number,
     newName: string,
   |}> = new AsyncAction();
   updateSigningPassword: AsyncAction<{|

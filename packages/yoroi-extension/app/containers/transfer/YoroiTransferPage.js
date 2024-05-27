@@ -171,7 +171,7 @@ export default class YoroiTransferPage extends Component<StoresAndActionsProps> 
             dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
             getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
             addressLookup={genAddressLookup(
-              publicDeriver,
+              publicDeriver.networkId,
               intl,
               undefined, // don't want to go to route from within a dialog
               this.props.stores.addresses.addressSubgroupMap,

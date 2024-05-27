@@ -46,6 +46,7 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
             pathToPublic: Array<number>,
             stakingAddressing: Addressing,
             networkId: number,
+            hardwareWalletDeviceId: string,
           |},
         |}
       | {|
@@ -56,6 +57,7 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
             publicKey: string,
             pathToPublic: Array<number>,
             networkId: number,
+            hardwareWalletDeviceId: string,
           |},
         |},
     refreshWallet: () => Promise<void>,
@@ -68,6 +70,7 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
           publicKey: request.broadcastRequest.ledger.publicKey,
           pathToPublic: request.broadcastRequest.ledger.pathToPublic,
           networkId: request.broadcastRequest.ledger.networkId,
+          hardwareWalletDeviceId: request.broadcastRequest.ledger.hardwareWalletDeviceId,
         });
       }
       if (request.broadcastRequest.trezor) {
@@ -78,6 +81,7 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
           pathToPublic: request.broadcastRequest.trezor.pathToPublic,
           stakingAddressing: request.broadcastRequest.trezor.stakingAddressing,
           networkId: request.broadcastRequest.trezor.networkId,
+          hardwareWalletDeviceId: request.broadcastRequest.trezor.hardwareWalletDeviceId,
         });
       }
       if (request.broadcastRequest.normal) {

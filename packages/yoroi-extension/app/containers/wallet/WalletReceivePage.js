@@ -372,7 +372,7 @@ class WalletReceivePage extends Component<AllProps> {
     +meta: AddressSubgroupMeta<IAddressTypeStore>,
   |} = publicDeriver => {
     for (const addressStore of allAddressSubgroups) {
-      if (!addressStore.isRelated({ selected: publicDeriver })) {
+      if (!addressStore.isRelated()) {
         continue;
       }
       if (this.props.stores.app.currentRoute.startsWith(routeForStore(addressStore.name))) {

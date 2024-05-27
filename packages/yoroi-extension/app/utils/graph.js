@@ -59,7 +59,7 @@ const generateRewardGraphData: ({|
 
   const getMiniPoolInfo = (poolHash: string) => {
     const meta = request.getLocalPoolInfo(
-      networkId,
+      request.networkId,
       poolHash
     );
     if (meta == null || meta.info == null || meta.info.ticker == null || meta.info.name == null) {

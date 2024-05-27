@@ -54,12 +54,15 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
 
   _sendWrapper: {|
     params: SendUsingTrezorParams,
-    publicDeriverId: number,
     onSuccess?: void => void,
-    stakingAddressing: Addressing,
-    publicKey: string,
-    pathToPublic: Array<number>,
-    networkId: number,
+    wallet: {
+      publicDeriverId: number,
+      stakingAddressing: Addressing,
+      publicKey: string,
+      pathToPublic: Array<number>,
+      networkId: number,
+      ...
+    },
   |} => Promise<void> = async (request) => {
     try {
       if (this.isActionProcessing) {
@@ -78,11 +81,12 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
         broadcastRequest: {
           trezor: {
             signRequest,
-            publicDeriverId: request.publicDeriverId,
-            stakingAddressing: request.stakingAddressing,
-            publicKey: request.publicKey,
-            pathToPublic: request.pathToPublic,
-            networkId: request.networkId,
+            publicDeriverId: request.wallet.publicDeriverId,
+            stakingAddressing: request.wallet.stakingAddressing,
+            publicKey: request.wallet.publicKey,
+            pathToPublic: request.wallet.pathToPublic,
+            networkId: request.wallet.networkId,
+            hardwareWalletDeviceId: request.wallet.hardwareWalletDeviceId,
           },
         },
         refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriverId),

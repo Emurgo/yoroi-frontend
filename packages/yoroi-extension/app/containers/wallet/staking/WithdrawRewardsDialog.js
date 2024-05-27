@@ -87,20 +87,28 @@ export default class WithdrawRewardsDialog extends Component<Props> {
     if (signRequest == null) return;
 
     if (this.spendingPasswordForm == null) {
-      if (isTrezorTWallet(selected.getParent())) {
+      if (selected.type === 'trezor') {
         await this.props.actions.ada.trezorSend.sendUsingTrezor.trigger({
           params: {
             signRequest,
           },
           publicDeriverId: selected.publicDeriverId,
+          stakingAddressing: selected.stakingAddressing,
+          publicKey: selected.publicKey,
+          pathToPublic: selected.pathToPublic,
+          networkId: selected.networkId,
         });
       }
-      if (isLedgerNanoWallet(selected.getParent())) {
+      if (selected.type === 'ledger') {
         await this.props.actions.ada.ledgerSend.sendUsingLedgerWallet.trigger({
           params: {
             signRequest,
           },
           publicDeriverId: selected.publicDeriverId,
+          stakingAddressing: selected.stakingAddressing,
+          publicKey: selected.publicKey,
+          pathToPublic: selected.pathToPublic,
+          networkId: selected.networkId,
         });
       }
     } else {

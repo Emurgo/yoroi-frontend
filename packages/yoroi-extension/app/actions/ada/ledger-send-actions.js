@@ -18,12 +18,16 @@ export default class LedgerSendActions {
   cancel: Action<void> = new Action();
   sendUsingLedgerWallet: AsyncAction<{|
     params: SendUsingLedgerParams,
-    publicDeriverId: number,
     onSuccess?: void => void,
-    stakingAddressing: Addressing,
-    publicKey: string,
-    pathToPublic: Array<number>,
-    networkId: number,
+    wallet: {
+      publicDeriverId: number,
+      stakingAddressing: Addressing,
+      publicKey: string,
+      pathToPublic: Array<number>,
+      networkId: number,
+      hardwareWalletDeviceId: ?string,
+      ...
+    },
   |}> = new AsyncAction();
   sendUsingLedgerKey: AsyncAction<{|
     signRequest: HaskellShelleyTxSignRequest,

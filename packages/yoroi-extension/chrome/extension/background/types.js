@@ -3,7 +3,8 @@ import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { BaseSingleAddressPath } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { Addressing } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { LastSyncInfoRow, } from '../../../app/api/ada/lib/storage/database/walletTypes/core/tables';
-
+import type { CoreAddressT } from '../../../app/api/ada/lib/storage/database/primitives/enums';
+import type { IHasUtxoChainsRequest } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces.js';
 export type WalletType = 'trezor' | 'ledger' | 'mnemonic';
 
 export type WalletState = {|
@@ -72,5 +73,7 @@ export type WalletState = {|
       type: CoreAddressTypes.CARDANO_BASE,
     });
 */
-  allAddresses: Array<any>,
+  allAddresses: Map<CoreAddressT, Array<any>>,
+  foreignAddresses: Array<any>,
+  chainAddresses: Map<IHasUtxoChainsRequest, Map<CoreAddressT, Array<any>>>,
 |};

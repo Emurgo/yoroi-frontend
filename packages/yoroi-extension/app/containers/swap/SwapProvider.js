@@ -1,6 +1,5 @@
 // @flow
 import type { Node } from 'react';
-import type { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import { useMemo, useState, useEffect } from 'react';
 import {
   supportedProviders,
@@ -9,12 +8,12 @@ import {
   SwapProvider as Provider,
   swapStorageMaker,
 } from '@yoroi/swap';
-import { asGetStakingKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { unwrapStakingKey } from '../../api/ada/lib/storage/bridge/utils';
+import type { WalletState } from '../../../chrome/extension/background/types';
 
 type Props = {|
   children?: Node,
-  publicDeriver: PublicDeriver<> | null,
+  publicDeriver: WalletState | null,
 |};
 
 function SwapProvider({ children, publicDeriver }: Props): Node {
@@ -24,22 +23,9 @@ function SwapProvider({ children, publicDeriver }: Props): Node {
   const defaultToken = publicDeriver.getParent().getDefaultToken();
 
   useEffect(() => {
-    const withStakingKey = asGetStakingKey(publicDeriver);
-    if (withStakingKey == null) {
-      throw new Error(`${nameof(SwapProvider)} missing staking key functionality`);
-    }
-
-    withStakingKey
-      .getStakingKey()
-      .then(stakingKeyResp => {
-        const stakignAddr = stakingKeyResp.addr.Hash;
-        const skey = Buffer.from(unwrapStakingKey(stakignAddr).to_bytes()).toString('hex');
-        setStakingKey(skey);
-        return null;
-      })
-      .catch(err => {
-        console.error(`unexpected erorr: failed to get wallet staking key: ${err}`);
-      });
+    const stakignAddr = publicDeriver.stakingAddress;
+    const skey = Buffer.from(unwrapStakingKey(stakignAddr).to_bytes()).toString('hex');
+    setStakingKey(skey);
   }, []);
 
   const swapStorage = useMemo(
