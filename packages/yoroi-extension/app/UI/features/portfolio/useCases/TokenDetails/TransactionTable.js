@@ -23,7 +23,7 @@ const TransactionTable = ({ history }) => {
   const { strings } = usePortfolio();
 
   const timestamps = [strings.today, strings.yesterday, strings.inthepast];
-  const categorizeByDate = data => {
+  const categorizeByTimestamp = data => {
     const today = new Date();
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
@@ -48,7 +48,7 @@ const TransactionTable = ({ history }) => {
     );
   };
 
-  const categorizedData = useMemo(() => categorizeByDate(history), [history]);
+  const categorizedData = useMemo(() => categorizeByTimestamp(history), [history]);
   return (
     <Container>
       <Card>

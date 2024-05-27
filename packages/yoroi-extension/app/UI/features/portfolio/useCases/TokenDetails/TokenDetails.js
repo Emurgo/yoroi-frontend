@@ -272,7 +272,7 @@ const TokenDetails = ({ tokenInfo, mockHistory }) => {
                       <StyledSkeleton width="53px" height="16px" />
                     ) : (
                       <Typography fontWeight="500" sx={{ marginBottom: '20px' }}>
-                        {tokenInfo.overview.tokenName}
+                        {tokenInfo.name}
                       </Typography>
                     )}
                   </Stack>

@@ -32,7 +32,7 @@ const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
     return (
       <StyledTooltip>
-        <Typography>{`Date: ${payload[0].payload.date}`}</Typography>
+        <Typography>{`Time: ${payload[0].payload.time}`}</Typography>
         <Typography>{`Price: ${payload[0].value} USD`}</Typography>
       </StyledTooltip>
     );
@@ -52,7 +52,7 @@ const TokenDetailChart = ({ isLoading, data }) => {
     { label: 'ALL', active: false },
   ]);
 
-  const categorizeByDate = data => {
+  const categorizeByTime = data => {
     const now = new Date();
 
     const todayStart = new Date(now);
@@ -74,21 +74,21 @@ const TokenDetailChart = ({ isLoading, data }) => {
 
     const categorizedData = data.reduce(
       (acc, item) => {
-        const itemDate = new Date(item.date);
+        const itemTime = new Date(item.time);
 
-        if (itemDate >= yesterdayStart && itemDate < todayStart) {
+        if (itemTime >= yesterdayStart && itemTime < todayStart) {
           acc['24H'].push(item);
         }
-        if (itemDate >= oneWeekAgo && itemDate < todayStart) {
+        if (itemTime >= oneWeekAgo && itemTime < todayStart) {
           acc['1W'].push(item);
         }
-        if (itemDate >= oneMonthAgo && itemDate < todayStart) {
+        if (itemTime >= oneMonthAgo && itemTime < todayStart) {
           acc['1M'].push(item);
         }
-        if (itemDate >= sixMonthsAgo && itemDate < todayStart) {
+        if (itemTime >= sixMonthsAgo && itemTime < todayStart) {
           acc['6M'].push(item);
         }
-        if (itemDate >= oneYearAgo && itemDate < todayStart) {
+        if (itemTime >= oneYearAgo && itemTime < todayStart) {
           acc['1Y'].push(item);
         }
 
@@ -113,7 +113,7 @@ const TokenDetailChart = ({ isLoading, data }) => {
     return categorizedData;
   };
 
-  const categorizedData = useMemo(() => categorizeByDate(data), [data]);
+  const categorizedData = useMemo(() => categorizeByTime(data), [data]);
 
   const SkeletonLabel = ({ x, y, width = 19, height = 13, borderRadius = 8, marginRight = 10 }) => {
     return (
@@ -150,10 +150,6 @@ const TokenDetailChart = ({ isLoading, data }) => {
     });
     setButtonPeriodProps(tmp);
   };
-
-  useEffect(() => {
-    console.log('categorized data', categorizedData);
-  }, [categorizedData]);
 
   return (
     <Box sx={{ userSelect: 'none', width: '100%', margin: '10px 0' }}>
