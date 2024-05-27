@@ -10,10 +10,10 @@ import SidebarContainer from '../../containers/SidebarContainer';
 import { Box, Typography } from '@mui/material';
 import { withLayout } from '../../styles/context/layout';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { ModalProvider } from '../context/ModalContext';
-import ModalManager from '../components/modals/ModalManager';
 import { GouvernanceContextProvider } from '../features/gouvernace/module/GouvernanceContextProvider';
 import globalMessages from '../../i18n/global-messages';
+import { ModalProvider } from '../components/modals/ModalContext';
+import { ModalManager } from '../components/modals/ModalManager';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -50,8 +50,19 @@ class GeneralPageLayout extends Component<LayoutProps> {
     const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
     const { intl } = this.context;
 
+    const selectedWallet = this.props.stores.wallets.selected;
+    if (!selectedWallet) {
+      return null;
+    }
+    const currentWalletId = selectedWallet.getPublicDeriverId();
+    const networkId = selectedWallet.getParent().getNetworkInfo().NetworkId;
+
     return (
-      <GouvernanceContextProvider intl={this.context.intl}>
+      <GouvernanceContextProvider
+        intl={this.context.intl}
+        walletId={currentWalletId}
+        networkId={networkId}
+      >
         {/* TODO ModalProvider to be moved into APP after finish refactoring and bring everything in UI */}
         <ModalProvider>
           <ModalManager />

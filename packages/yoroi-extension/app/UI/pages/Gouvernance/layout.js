@@ -5,6 +5,8 @@ import NavBarContainerRevamp from '../../../containers/NavBarContainerRevamp';
 import NavBar from '../../../components/topbar/NavBar';
 import NavBarTitle from '../../../components/topbar/NavBarTitle';
 import { TransactionSubmitted } from '../../components/TransactionSubmitted/TransactionSubmitted';
+import { GovernanceProvider } from '@yoroi/staking';
+import { useGovernance } from '../../features/gouvernace/module/GouvernanceContextProvider';
 
 type Props = {|
   stores: any,
@@ -13,6 +15,7 @@ type Props = {|
 |};
 
 const GouvernanceLayout = ({ stores, actions, children }: Props): any => {
+  const { gouvernanceManager } = useGovernance();
   return (
     <GeneralPageLayout
       stores={stores}
@@ -26,7 +29,7 @@ const GouvernanceLayout = ({ stores, actions, children }: Props): any => {
       }
       // menu={menu} // ADD a menu if needed (see example in SwapPageContainer)
     >
-      {children}
+      <GovernanceProvider manager={gouvernanceManager}>{children}</GovernanceProvider>
     </GeneralPageLayout>
   );
 };

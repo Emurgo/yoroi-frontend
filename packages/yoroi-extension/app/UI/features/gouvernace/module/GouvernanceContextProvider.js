@@ -12,6 +12,7 @@ import {
 } from './state';
 
 import { getStrings } from '../common/useStrings';
+import { useGovernanceManagerMaker } from '../common/useGovernanceManagerMaker';
 
 const initialGouvernanceProvider = {
   ...defaultGouvernanceState,
@@ -28,11 +29,18 @@ export const GouvernanceContextProvider = ({
     gouvernanceStatus: 'none',
   },
   intl,
+  walletId,
+  networkId,
 }: GouvernanceProviderProps) => {
   const [state, dispatch] = React.useReducer(GouvernanceReducer, {
     ...defaultGouvernanceState,
     ...initialState,
   });
+
+  console.log('CONTEXT walletId AND networkId', walletId, networkId);
+
+  const gouvernanceManager = useGovernanceManagerMaker(walletId, networkId);
+  console.log('CONTEXT gouvernanceManager', gouvernanceManager);
 
   const actions = React.useRef({
     gouvernanceStatusChanged: (status: any) => {
@@ -50,8 +58,11 @@ export const GouvernanceContextProvider = ({
     () => ({
       ...state,
       // ...gouvernanceApi,
+      // walletId,
+      // networkId,
       ...actions,
       strings: getStrings(intl),
+      gouvernanceManager,
     }),
     [state, actions]
   );
@@ -59,6 +70,6 @@ export const GouvernanceContextProvider = ({
   return <GouvernanceContext.Provider value={context}>{children}</GouvernanceContext.Provider>;
 };
 
-export const useGouvernance = () =>
+export const useGovernance = () =>
   React.useContext(GouvernanceContext) ??
-  invalid('useGouvernance: needs to be wrapped in a GouvernanceManagerProvider');
+  invalid('useGovernance: needs to be wrapped in a GouvernanceManagerProvider');
