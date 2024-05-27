@@ -47,7 +47,7 @@ export class SuccessPageRevamp extends Component<Props> {
           closeInfo ? <DialogCloseButton onClose={closeInfo.onClose} isRevampLayout /> : undefined
         }
       >
-        <Box maxWidth="600px" outline="10px solid green">
+        <Box maxWidth="600px">
           <Box
             sx={{
               display: 'flex',
@@ -58,7 +58,13 @@ export class SuccessPageRevamp extends Component<Props> {
           >
             <SuccessImg />
           </Box>
-          <Typography component="div" variant="body1" color="grayscale.900" textAlign="left" mt="4px">
+          <Typography
+            component="div"
+            variant="body1"
+            color="grayscale.900"
+            textAlign="left"
+            mt="4px"
+          >
             {text}
           </Typography>
           {this.props.closeInfo == null && <LoadingSpinner />}

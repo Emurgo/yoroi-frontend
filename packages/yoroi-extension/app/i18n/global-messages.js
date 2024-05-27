@@ -524,6 +524,10 @@ const globalMessages: * = defineMessages({
     id: 'global.uriExplanation.revamp',
     defaultMessage: '!!!Allow URLs to easily share invoices with friends and businesses',
   },
+  updatePool: {
+    id: 'global.updatePool',
+    defaultMessage: '!!!  UPDATE POOL',
+  },
   copyTooltipMessage: {
     id: 'global.copyTooltipMessage',
     defaultMessage: '!!!Copied',
@@ -968,6 +972,10 @@ const globalMessages: * = defineMessages({
     id: 'profile.languageSelect.tosAgreement',
     defaultMessage:
       '!!!I agree with <span id="tosLink">Terms of Service Agreement</span> and <span id="privacyLink">Privacy Notice</span>',
+  },
+  poolNotGenerating: {
+    id: 'wallet.transitionDialog.poolNotGenerating',
+    defaultMessage: '!!!This pool is NOT generating staking rewards anymore',
   },
   goToTransactions: {
     id: 'wallet.transaction.success.button.label',

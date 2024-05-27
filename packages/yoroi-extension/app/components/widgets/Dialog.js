@@ -37,6 +37,7 @@ export type Props = {|
   +className?: string,
   +scrollableContentClass?: string,
   +styleOverride?: { ... },
+  +styleContentOverride?: { ... },
   +onClose?: ?(void) => PossiblyAsync<void>,
   +closeOnOverlayClick?: boolean,
   +isRevampLayout?: boolean,
@@ -143,6 +144,7 @@ function Dialog(props: Props & InjectedProps): Node {
             pt={styleFlags?.contentNoTopPadding ? '0px !important' : undefined}
             pb={contentHasScroll || !hasActions ? '24px' : '0px !important'}
             className="ModalContent"
+            style={props.styleContentOverride}
           >
             {children}
           </ModalContent>
@@ -178,6 +180,7 @@ function Dialog(props: Props & InjectedProps): Node {
           <CloseButton
             onClose={onClose}
             closeButton={closeButton ? React.cloneElement(closeButton, { onClose }) : null}
+            idLocatorPath={id}
           />
         ) : null}
         {!hasSubmitting && backButton}
@@ -204,10 +207,12 @@ export const CloseButton = ({
   onClose,
   closeButton,
   sx,
+  idLocatorPath='modalWindow',
 }: {|
   onClose: ?(void) => PossiblyAsync<void>,
   closeButton: React$Node,
   sx?: any,
+  idLocatorPath?: string,
 |}): React$Node => (
   <Box
     sx={{
@@ -219,6 +224,7 @@ export const CloseButton = ({
       ...(sx ?? {}),
     }}
     onClick={onClose}
+    id={idLocatorPath + '-closeModal-button'}
   >
     {closeButton || (
       <IconButton>
