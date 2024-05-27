@@ -14,8 +14,9 @@ import { useTheme } from '@mui/material/styles';
 import { default as SortIcon } from '../../../../components/icons/portfolio/Sort';
 import { useNavigateTo } from '../../common/useNavigateTo';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
-import StyledChip from '../../../../components/chip';
+import StyledChip from '../../common/chip';
 import ArrowIcon from '../../../../components/icons/portfolio/Arrow';
+import adaPng from '../../../../../assets/images/ada.png';
 
 const StatsTable = ({ data }) => {
   const theme = useTheme();
@@ -116,8 +117,8 @@ const StatsTable = ({ data }) => {
                 sx={{ float: align, cursor: 'pointer' }}
               >
                 <Typography
-                  sx={{ color: theme.palette.ds.text_gray_medium }}
-                  sx={{ userSelect: 'none' }}
+                  variant="body2"
+                  sx={{ color: theme.palette.grayscale[600], userSelect: 'none' }}
                 >
                   {label}
                 </Typography>
@@ -138,7 +139,6 @@ const StatsTable = ({ data }) => {
               '& td, & th': { border: 0 },
               '&:hover': {
                 backgroundColor: theme.palette.ds.gray_c50,
-                boxShadow: `0px 2px 10px ${theme.palette.ds.gray_c200}`,
                 borderRadius: `${theme.shape.borderRadius}px`,
               },
             }}
@@ -152,10 +152,14 @@ const StatsTable = ({ data }) => {
                     borderRadius: `${theme.shape.borderRadius}px`,
                     backgroundColor: theme.palette.ds.gray_c700,
                   }}
+                  component="img"
+                  src={adaPng}
                 ></Box>
                 <Stack direction="column">
-                  <Typography fontWeight="500">{row.name}</Typography>
-                  <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
+                  <Typography fontWeight="500" sx={{ color: theme.palette.ds.text_gray_normal }}>
+                    {row.name}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium }}>
                     {row.id}
                   </Typography>
                 </Stack>
@@ -163,7 +167,7 @@ const StatsTable = ({ data }) => {
             </TableCell>
 
             <TableCell>
-              <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
+              <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium }}>
                 {row.price} USD
               </Typography>
             </TableCell>
@@ -184,7 +188,9 @@ const StatsTable = ({ data }) => {
                         transform: row['24h'] > 0 ? '' : 'rotate(180deg)',
                       }}
                     />
-                    <Typography>{row['24h'] > 0 ? row['24h'] : -1 * row['24h']}%</Typography>
+                    <Typography variant="caption1">
+                      {row['24h'] > 0 ? row['24h'] : -1 * row['24h']}%
+                    </Typography>
                   </Stack>
                 }
                 sx={{ cursor: 'pointer' }}
@@ -207,7 +213,9 @@ const StatsTable = ({ data }) => {
                         transform: row['1W'] > 0 ? '' : 'rotate(180deg)',
                       }}
                     />
-                    <Typography>{row['1W'] > 0 ? row['1W'] : -1 * row['1W']}%</Typography>
+                    <Typography variant="caption1">
+                      {row['1W'] > 0 ? row['1W'] : -1 * row['1W']}%
+                    </Typography>
                   </Stack>
                 }
                 sx={{ cursor: 'pointer' }}
@@ -230,7 +238,9 @@ const StatsTable = ({ data }) => {
                         transform: row['1M'] > 0 ? '' : 'rotate(180deg)',
                       }}
                     />
-                    <Typography>{row['1M'] > 0 ? row['1M'] : -1 * row['1M']}%</Typography>
+                    <Typography variant="caption1">
+                      {row['1M'] > 0 ? row['1M'] : -1 * row['1M']}%
+                    </Typography>
                   </Stack>
                 }
                 sx={{ cursor: 'pointer' }}
@@ -238,7 +248,7 @@ const StatsTable = ({ data }) => {
             </TableCell>
 
             <TableCell>
-              <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
+              <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium }}>
                 {row.portfolioPercents.toFixed(2)}&nbsp;%
               </Typography>
             </TableCell>
@@ -246,10 +256,13 @@ const StatsTable = ({ data }) => {
             <TableCell>
               <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
                 <Stack direction="column">
-                  <Typography fontWeight="500">
+                  <Typography fontWeight="500" sx={{ color: theme.palette.ds.text_gray_normal }}>
                     {row.totalAmount} {row.name}
                   </Typography>
-                  <Typography sx={{ color: theme.palette.ds.text_gray_medium, textAlign: 'right' }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ color: theme.palette.ds.text_gray_medium, textAlign: 'right' }}
+                  >
                     {row.totalAmountUsd} USD
                   </Typography>
                 </Stack>

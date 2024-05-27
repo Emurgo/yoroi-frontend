@@ -28,13 +28,20 @@ const StyledTooltip = styled(Box)(({ theme }) => ({
   color: theme.palette.ds.primary_c700,
 }));
 
-const CustomTooltip = ({ active, payload }) => {
+const CustomTooltip = ({ active, payload, coordinate }) => {
   if (active && payload && payload.length) {
+    const { x, y } = coordinate;
+    const tooltipX = x + 10;
+    const tooltipY = y - 50;
+
     return (
-      <StyledTooltip>
-        <Typography>{`Time: ${payload[0].payload.time}`}</Typography>
-        <Typography>{`Price: ${payload[0].value} USD`}</Typography>
-      </StyledTooltip>
+      <g>
+        <line x1={x} y1={y} x2={tooltipX} y2={tooltipY} stroke="black" strokeDasharray="3 3" />
+        <StyledTooltip>
+          <Typography>{`Time: ${payload[0].payload.time}`}</Typography>
+          <Typography>{`Price: ${payload[0].value} USD`}</Typography>
+        </StyledTooltip>
+      </g>
     );
   }
 

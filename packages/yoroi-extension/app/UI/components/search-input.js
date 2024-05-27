@@ -1,14 +1,18 @@
 import { Input, styled } from '@mui/material';
 
-export const SearchInput = styled(Input)(({ theme }) => ({
-  borderRadius: '8px',
-  width: '370px',
+const SearchInput = styled(Input)(({ theme }) => ({
+  borderRadius: `${theme.shape.borderRadius}px`,
+  width: '320px',
   height: '40px',
-  padding: '10px 12px',
-  backgroundColor: theme.palette.ds.text_primary_on,
+  padding: '8px 16px 8px 8px',
+  backgroundColor: 'transparent',
   border: '1px solid',
-  borderColor: theme.palette.ds.gray_c300,
+  borderColor: theme.palette.grayscale[400],
   'input::placeholder': {
-    color: theme.palette.ds.text_gray_medium,
+    color: theme.palette.grayscale[600],
   },
 }));
+
+export const StyledInput = props => {
+  return <SearchInput {...props} />;
+};

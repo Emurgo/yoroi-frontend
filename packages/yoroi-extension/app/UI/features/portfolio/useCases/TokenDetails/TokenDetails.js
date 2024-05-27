@@ -23,7 +23,7 @@ import { useTheme } from '@mui/material/styles';
 import mockData from '../../../../pages/portfolio/mockData';
 import { useNavigateTo } from '../../common/useNavigateTo';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
-import StyledChip from '../../../../components/chip';
+import StyledChip from '../../common/chip';
 import ArrowIcon from '../../../../components/icons/portfolio/Arrow';
 
 const PerformanceItemType = {

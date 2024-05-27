@@ -1,13 +1,13 @@
 import { Typography, Stack, Box, Input, InputAdornment, styled } from '@mui/material';
 import { ReactComponent as Search } from '../../../../../assets/images/assets-page/search.inline.svg';
 import React, { useState } from 'react';
-import { StyledTooltip, SearchInput } from '../../../../components';
+import { StyledTooltip, StyledInput } from '../../../../components';
 import { useTheme } from '@mui/material/styles';
 import { defineMessages } from 'react-intl';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import StatsTable from './StatsTable';
 import mockData from '../../../../pages/portfolio/mockData';
-import StyledChip from '../../../../components/chip';
+import StyledChip from '../../common/chip';
 import ArrowIcon from '../../../../components/icons/portfolio/Arrow';
 
 const PortfolioWallet = ({ data }) => {
@@ -57,7 +57,7 @@ const PortfolioWallet = ({ data }) => {
                 direction="row"
                 alignItems="center"
                 spacing={theme.spacing(1)}
-                sx={{ marginLeft: '20px' }}
+                sx={{ marginLeft: theme.spacing(2) }}
               >
                 <StyledChip
                   active={mockData.PortfolioPage.balance.percents.active}
@@ -76,14 +76,16 @@ const PortfolioWallet = ({ data }) => {
                             : 'rotate(180deg)',
                         }}
                       />
-                      <Typography>{mockData.PortfolioPage.balance.percents.value}%</Typography>
+                      <Typography variant="caption1">
+                        {mockData.PortfolioPage.balance.percents.value}%
+                      </Typography>
                     </Stack>
                   }
                 />
                 <StyledChip
                   active={mockData.PortfolioPage.balance.amount.active}
                   label={
-                    <Typography>
+                    <Typography variant="caption1">
                       {mockData.PortfolioPage.balance.amount.active ? '+' : '-'}
                       {mockData.PortfolioPage.balance.amount.value} USD
                     </Typography>
@@ -94,7 +96,7 @@ const PortfolioWallet = ({ data }) => {
           </Stack>
         </Stack>
 
-        <SearchInput
+        <StyledInput
           disableUnderline
           onChange={e => setKeyword(e.target.value)}
           placeholder={strings.search}
@@ -102,7 +104,7 @@ const PortfolioWallet = ({ data }) => {
             <InputAdornment
               sx={{
                 '> svg > use': {
-                  fill: 'ds.text_gray_medium',
+                  fill: '#242838',
                 },
               }}
               position="start"
