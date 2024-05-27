@@ -14,6 +14,8 @@ import { fail, first, sorted } from '../../coreUtils';
 import type { QueriedUtxo } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import BigNumber from 'bignumber.js';
 
+const MAX_PICKED_COLLATERAL_UTXO_ADA = 10_000_000; // 10 ADA
+
 export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
   // REQUESTS
 
@@ -175,7 +177,8 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
       new BigNumber(u.output.tokens.find(x => x.Token.Identifier === '')?.TokenList.Amount ?? 0);
     const compareDefaultCoins = (a: QueriedUtxo, b: QueriedUtxo): number =>
       utxoDefaultCoinAmount(a).comparedTo(utxoDefaultCoinAmount(b));
-    const pureUtxos = allUtxos.filter(u => u.output.tokens.length === 1);
-    return first(sorted(pureUtxos, compareDefaultCoins));
+    const smallPureUtxos = allUtxos
+      .filter(u => u.output.tokens.length === 1 && utxoDefaultCoinAmount(u).lte(MAX_PICKED_COLLATERAL_UTXO_ADA));
+    return first(sorted(smallPureUtxos, compareDefaultCoins));
   }
 }

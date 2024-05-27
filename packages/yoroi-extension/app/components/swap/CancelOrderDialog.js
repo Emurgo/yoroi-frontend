@@ -10,32 +10,66 @@ import type { FormattedTokenValue } from '../../containers/swap/orders/OrdersPag
 import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import { stringifyError } from '../../utils/logging';
 import { InfoTooltip } from '../widgets/InfoTooltip';
+import AddCollateralPage from '../../connector/components/signin/AddCollateralPage';
+import type { CardanoConnectorSignRequest, SignSubmissionErrorType } from '../../connector/types';
+import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
+import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import { SelectedExplorer } from '../../domain/SelectedExplorer';
+import type LocalizableError from '../../i18n/LocalizableError';
 
 type Props = {|
   order: any,
-  reorgRequired: boolean,
+  reorgTxData: ?CardanoConnectorSignRequest,
   isSubmitting: boolean,
   transactionParams: ?{|
     formattedFee: string,
     returnValues: Array<FormattedTokenValue>,
   |},
+  onReorgConfirm: (order: any, password: string) => Promise<void>,
   onCancelOrder: (order: any, password: string) => Promise<void>,
   onDialogClose: void => void,
   defaultTokenInfo: RemoteTokenInfo,
+  getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => ?$ReadOnly<TokenRow>,
+  selectedExplorer: SelectedExplorer,
+  submissionError: ?SignSubmissionErrorType,
+  walletType: 'ledger' | 'trezor' | 'web',
+  hwWalletError: ?LocalizableError,
 |};
 
 export default function CancelSwapOrderDialog({
   order,
-  reorgRequired,
+  reorgTxData,
   isSubmitting,
   transactionParams,
+  onReorgConfirm,
   onCancelOrder,
   onDialogClose,
   defaultTokenInfo,
+  getTokenInfo,
+  selectedExplorer,
+  submissionError,
+  walletType,
+  hwWalletError,
 }: Props): React$Node {
   const [password, setPassword] = useState('');
   const [isIncorrectPassword, setIncorrectPassword] = useState(false);
   const isLoading = transactionParams == null || isSubmitting;
+  if (reorgTxData != null) {
+    return (
+      <Dialog title="Cancel order" onClose={onDialogClose} withCloseButton closeOnOverlayClick>
+        <AddCollateralPage
+          txData={reorgTxData}
+          onCancel={onDialogClose}
+          onConfirm={s => onReorgConfirm(order, s)}
+          getTokenInfo={getTokenInfo}
+          selectedExplorer={selectedExplorer}
+          submissionError={submissionError}
+          walletType={walletType}
+          hwWalletError={hwWalletError}
+        />
+      </Dialog>
+    )
+  }
   return (
     <Dialog title="Cancel order" onClose={onDialogClose} withCloseButton closeOnOverlayClick>
       <Box display="flex" mt="8px" mb="24px" flexDirection="column" gap="16px">
@@ -74,6 +108,7 @@ export default function CancelSwapOrderDialog({
               setPassword(e.target.value);
             }}
             error={isIncorrectPassword && 'Incorrect password!'}
+            disabled={isLoading}
           />
         </Box>
       </Box>

@@ -17,11 +17,12 @@ import { MultiToken } from '../../api/common/lib/MultiToken';
 import { Quantities } from '../../utils/quantities';
 import BigNumber from 'bignumber.js';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import { cast, fail, hexToBytes, maybe, noop } from '../../coreUtils';
+import { cast, fail, hexToBytes, maybe } from '../../coreUtils';
 import {
   asAddressedUtxo as asAddressedUtxoCardano,
   asAddressedUtxo,
-  cardanoUtxoHexFromRemoteFormat
+  cardanoUtxoHexFromRemoteFormat,
+  getTransactionFeeFromCbor,
 } from '../../api/ada/transactions/utils';
 import { genLookupOrFail, getTokenIdentifierIfExists, getTokenName } from '../stateless/tokenHelpers';
 import { splitAmount, truncateToken } from '../../utils/formatters';
@@ -31,6 +32,7 @@ import type { QueriedUtxo } from '../../api/ada/lib/storage/models/PublicDeriver
 import { transactionHexToHash } from '../../api/ada/lib/cardanoCrypto/utils';
 import { signTransactionHex } from '../../api/ada/transactions/signTransactionHex';
 import type { RemoteUnspentOutput } from '../../api/ada/lib/state-fetch/types';
+import type { CardanoConnectorSignRequest } from '../../connector/types';
 
 const FRONTEND_FEE_ADDRESS_MAINNET =
   'addr1q9ry6jfdgm0lcrtfpgwrgxg7qfahv80jlghhrthy6w8hmyjuw9ngccy937pm7yw0jjnxasm7hzxjrf8rzkqcj26788lqws5fke';
@@ -101,6 +103,7 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
 
   createCollateralReorgForCancel: ({| wallet: PublicDeriver<> |}) => Promise<{|
     unsignedTxHex: string,
+    txData: CardanoConnectorSignRequest,
     collateralUtxoHex: string,
   |}> = async ({
     wallet,
@@ -131,7 +134,24 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
       assets: [],
     };
     const collateralUtxoHex = cardanoUtxoHexFromRemoteFormat(collateralUtxo);
-    return { unsignedTxHex, collateralUtxoHex };
+    const defaultToken = wallet.getParent().getDefaultToken();
+    return {
+      unsignedTxHex,
+      collateralUtxoHex,
+      txData: {
+        inputs: [],
+        foreignInputs: [],
+        outputs: [],
+        fee: {
+          tokenId: defaultToken.defaultIdentifier,
+          networkId: defaultToken.defaultNetworkId,
+          amount: getTransactionFeeFromCbor(unsignedTxHex).toString(),
+        },
+        amount: wallet.getParent().getDefaultMultiToken(),
+        total: wallet.getParent().getDefaultMultiToken(),
+        cip95Info: [],
+      },
+    };
   }
 
   createUnsignedSwapTx: ({|
@@ -197,14 +217,16 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
     });
   };
 
-  executeCancelTransaction: ({|
+  executeTransactionHex: ({|
     wallet: PublicDeriver<>,
     transactionHex: string,
     password: string,
+    blocking?: boolean,
   |}) => Promise<void> = async ({
     wallet,
     transactionHex,
     password,
+    blocking = false,
   }) => {
     const signedTransactionHex =
       await signTransactionHex(wallet, password, transactionHex);
@@ -213,8 +235,10 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
       encodedTx: hexToBytes(signedTransactionHex),
       network: wallet.getParent().getNetworkInfo(),
     });
-    // Refresh call is non-blocking on purpose
-    noop(this.stores.wallets.refreshWalletFromRemote(wallet));
+    const refreshPromise = this.stores.wallets.refreshWalletFromRemote(wallet);
+    if (blocking) {
+      await refreshPromise;
+    }
   };
 }
 

@@ -19,6 +19,8 @@ import { useSwap } from '@yoroi/swap';
 import { addressBech32ToHex } from '../../../api/ada/lib/cardanoCrypto/utils';
 import { getTransactionFeeFromCbor, getTransactionTotalOutputFromCbor, } from '../../../api/ada/transactions/utils';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
+import type { CardanoConnectorSignRequest } from '../../../connector/types';
+import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 
 type ColumnContext = {|
   completedOrders: boolean,
@@ -196,13 +198,14 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
   const [showCompletedOrders, setShowCompletedOrders] = useState<boolean>(false);
   const [cancellationState, setCancellationState] = useState<?{|
     order: any,
-    collateralReorgRequired?: boolean,
+    collateralReorgTx?: {| cbor: string, txData: CardanoConnectorSignRequest |},
     tx: ?{| cbor: string, formattedFee: string, formattedReturn: Array<FormattedTokenValue> |},
     isSubmitting?: boolean,
   |}>(null);
 
   const wallet = props.stores.wallets.selectedOrFail;
   const network = wallet.getParent().getNetworkInfo();
+  const walletVariant = wallet.getParent().getWalletVariant();
   const defaultTokenInfo = props.stores.tokenInfoStore.getDefaultTokenInfoSummary(
     network.NetworkId
   );
@@ -217,30 +220,25 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
   const handleCancelRequest = async order => {
     setCancellationState({ order, tx: null });
     try {
-      const utxoHex = await props.stores.substores.ada.swapStore
+      let utxoHex = await props.stores.substores.ada.swapStore
         .getCollateralUtxoHexForCancel({ wallet });
+      let collateralReorgTxHex: ?string = null;
+      let collateralReorgTxData: ?CardanoConnectorSignRequest = null;
       if (utxoHex == null) {
-        const { unsignedTxHex, collateralUtxoHex } = await props.stores.substores.ada.swapStore
+        const { unsignedTxHex, txData, collateralUtxoHex } = await props.stores.substores.ada.swapStore
           .createCollateralReorgForCancel({ wallet });
-        console.log('>>> REORG NEEDED');
-        console.log('>>> unsignedTxHex', unsignedTxHex);
-        console.log('>>> collateralUtxoHex', collateralUtxoHex);
-        setCancellationState({
-          order,
-          collateralReorgRequired: true,
-          tx: null,
-        });
-        // terminate when no collateral is available
-        return;
+        collateralReorgTxHex = unsignedTxHex;
+        collateralReorgTxData = txData;
+        utxoHex = collateralUtxoHex;
       }
-      return handleCreateCancelTransaction(order, utxoHex);
+      return handleCreateCancelTransaction(order, utxoHex, collateralReorgTxHex, collateralReorgTxData);
     } catch (e) {
       console.error('Failed to prepare a collateral utxo for cancel', e);
       throw e;
     }
   };
   
-  const handleCreateCancelTransaction = async (order, utxoHex) => {
+  const handleCreateCancelTransaction = async (order, utxoHex, collateralReorgTx, collateralReorgTxData) => {
     const sender = order.sender;
     if (sender == null) {
       throw new Error('Cannot cancel a completed order (sender == null)');
@@ -277,6 +275,9 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
         if (s.order.utxo !== order.utxo) return s;
         return {
           order: s.order,
+          collateralReorgTx: collateralReorgTx && collateralReorgTxData
+            ? { cbor: collateralReorgTx, txData: collateralReorgTxData }
+            : undefined,
           tx: {
             cbor: cancelTxCbor,
             formattedFee: formattedFeeValue,
@@ -288,6 +289,28 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
       console.error('Failed to prepare a cancellation transaction', e);
       throw e;
     }
+  };
+
+  const handleReorgConfirm = async (cancelledOrder: any, password: string) => {
+    const { order, collateralReorgTx, tx, isSubmitting } = cancellationState ?? {};
+    if (isSubmitting) {
+      console.log('Cancellation is already submitting. Ignoring.');
+    }
+    if (order !== cancelledOrder) {
+      console.log('Cancellation state order mismatch. Ignoring.');
+      return;
+    }
+    if (collateralReorgTx == null) {
+      console.log('Reorg transaction is not available. Ignoring.');
+      return;
+    }
+    setCancellationState({ order, collateralReorgTx, tx, isSubmitting: true });
+    await props.stores.substores.ada.swapStore.executeTransactionHex({
+      wallet,
+      password,
+      transactionHex: collateralReorgTx.cbor,
+    });
+    setCancellationState({ order, tx });
   };
 
   const handleCancelConfirm = async (cancelledOrder: any, password: string) => {
@@ -304,7 +327,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
       return;
     }
     setCancellationState({ order, tx, isSubmitting: true });
-    await props.stores.substores.ada.swapStore.executeCancelTransaction({
+    await props.stores.substores.ada.swapStore.executeTransactionHex({
       wallet,
       password,
       transactionHex: tx.cbor,
@@ -369,15 +392,21 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
       {cancellationState && (
         <CancelSwapOrderDialog
           order={cancellationState.order}
-          reorgRequired={cancellationState.collateralReorgRequired ?? false}
+          reorgTxData={cancellationState.collateralReorgTx?.txData}
           isSubmitting={Boolean(cancellationState.isSubmitting)}
           transactionParams={maybe(cancellationState.tx, tx => ({
             formattedFee: tx.formattedFee,
             returnValues: tx.formattedReturn,
           }))}
+          onReorgConfirm={handleReorgConfirm}
           onCancelOrder={handleCancelConfirm}
           onDialogClose={() => setCancellationState(null)}
           defaultTokenInfo={defaultTokenInfo}
+          getTokenInfo={genLookupOrFail(props.stores.tokenInfoStore.tokenInfo)}
+          selectedExplorer={selectedExplorer}
+          submissionError={null}
+          walletType={walletVariant}
+          hwWalletError={null}
         />
       )}
     </>
