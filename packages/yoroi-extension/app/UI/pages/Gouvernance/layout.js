@@ -16,17 +16,13 @@ type Props = {|
 
 const GouvernanceLayout = ({ stores, actions, children }: Props): any => {
   const { gouvernanceManager } = useGovernance();
+
+  console.log('gouvernanceManager', gouvernanceManager);
   return (
     <GeneralPageLayout
       stores={stores}
       actions={actions}
-      navbar={
-        <NavBarContainerRevamp
-          actions={actions}
-          stores={stores}
-          title={<NavBarTitle title={'Governance'} />}
-        />
-      }
+      navbar={<NavBarContainerRevamp actions={actions} stores={stores} title={<NavBarTitle title={'Governance'} />} />}
       // menu={menu} // ADD a menu if needed (see example in SwapPageContainer)
     >
       <GovernanceProvider manager={gouvernanceManager}>{children}</GovernanceProvider>

@@ -14,7 +14,7 @@ export const useGovernanceManagerMaker = (walletId: string, networkId: string): 
         networkId,
         api: governanceApiMaker({ networkId }),
         cardano: RustModule.CrossCsl.init,
-        storage: '',
+        storage: 'wallet/${walletId}/staking-governance/',
       }),
     [networkId, walletId]
   );

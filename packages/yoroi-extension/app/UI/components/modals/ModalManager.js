@@ -46,8 +46,6 @@ type CustomModalProps = {|
 export const ModalManager = (): Node => {
   const { height, width, closeModal, content, title, isOpen, isLoading } = useModal();
 
-  console.log('ModalManagerNew', { height, width, closeModal, content, title, isOpen, isLoading });
-
   return (
     <BootstrapDialog
       onClose={closeModal}

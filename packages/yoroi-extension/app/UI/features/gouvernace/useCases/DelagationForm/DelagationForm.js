@@ -8,6 +8,7 @@ import type { Node } from 'react';
 import { Button } from '@mui/material';
 import { useNavigateTo } from '../../common/useNavigateTo';
 import { PasswordInput } from '../../../../components';
+import { useGovernance } from '../../module/GouvernanceContextProvider';
 
 const Container = styled(Box)(({ theme }) => ({
   paddingTop: '32px',
@@ -44,12 +45,18 @@ export const DelagationForm = (): Node => {
   const [showPassword, setShowPassword] = React.useState(false);
   const [passwaord, setPassword] = React.useState('');
   const navigateTo = useNavigateTo();
+  const { gouvernanceStatusChanged } = useGovernance();
 
-  const handleClickShowPassword = () => setShowPassword(show => !show);
-
-  const handleMouseDownPassword = event => {
-    event.preventDefault();
+  const confirmDelegation = () => {
+    gouvernanceStatusChanged('delegate');
+    // TODO mock functionality
+    if (passwaord.includes('oo')) {
+      navigateTo.transactionFail();
+    } else {
+      navigateTo.transactionSubmited();
+    }
   };
+  const idPasswordInvalid = passwaord.match(/\d+/g);
 
   return (
     <Container>
@@ -58,8 +65,7 @@ export const DelagationForm = (): Node => {
           Delegate to a DRep
         </Typography>
         <Typography variant="body1" mb="24px">
-          You are designating someone else to cast your vote on your behalf for all proposals now
-          and in the future.
+          You are designating someone else to cast your vote on your behalf for all proposals now and in the future.
         </Typography>
         <TotalBox>
           <Typography variant="h4" color="ds.gray_cmin">
@@ -81,9 +87,7 @@ export const DelagationForm = (): Node => {
           <Typography variant="body1" fontWeight="500">
             Operations
           </Typography>
-          <Typography variant="body2">
-            Delegate voting to drep1e93a2zvs3aw8e4naez0ynpmc48jbc7yaa3n2k8ljhwfdt70yscts
-          </Typography>
+          <Typography variant="body2">Delegate voting to drep1e93a2zvs3aw8e4naez0ynpmc48jbc7yaa3n2k8ljhwfdt70yscts</Typography>
           <Typography variant="body1" fontWeight="500">
             Transaction fee: 0.5 ADA
           </Typography>
@@ -93,13 +97,15 @@ export const DelagationForm = (): Node => {
           id="outlined-adornment-password"
           onChange={event => setPassword(event.target.value)}
           value={passwaord}
+          error={!!idPasswordInvalid}
+          helperText={idPasswordInvalid ? 'Wrong password' : ' '}
         />
       </Stack>
       <Actions direction="row" spacing="24px">
         <Button variant="secondary" onClick={() => navigateTo.selectStatus()}>
           Back
         </Button>
-        <Button variant="primary" disabled={passwaord.length === 0}>
+        <Button variant="primary" disabled={passwaord.length === 0 || idPasswordInvalid} onClick={confirmDelegation}>
           Confirm
         </Button>
       </Actions>

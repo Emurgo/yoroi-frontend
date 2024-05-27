@@ -22,25 +22,15 @@ const GouvernanceContext = React.createContext(initialGouvernanceProvider);
 
 type GouvernanceProviderProps = any;
 
-export const GouvernanceContextProvider = ({
-  children,
-  // gouvernanceApi,
-  initialState = {
-    gouvernanceStatus: 'none',
-  },
-  intl,
-  walletId,
-  networkId,
-}: GouvernanceProviderProps) => {
+export const GouvernanceContextProvider = ({ children, intl, currentWallet, currentPoolInfo }: GouvernanceProviderProps) => {
   const [state, dispatch] = React.useReducer(GouvernanceReducer, {
     ...defaultGouvernanceState,
-    ...initialState,
+    gouvernanceStatus: 'none',
   });
-
-  console.log('CONTEXT walletId AND networkId', walletId, networkId);
-
+  console.log('[CONTEXT Current Wallet Info]', currentWallet);
+  const { walletId, networkId, currentPool } = currentWallet;
   const gouvernanceManager = useGovernanceManagerMaker(walletId, networkId);
-  console.log('CONTEXT gouvernanceManager', gouvernanceManager);
+  console.log('[CONTEXT gouvernanceManager]', gouvernanceManager);
 
   const actions = React.useRef({
     gouvernanceStatusChanged: (status: any) => {
@@ -54,22 +44,17 @@ export const GouvernanceContextProvider = ({
     },
   }).current;
 
-  const context = React.useMemo(
-    () => ({
-      ...state,
-      // ...gouvernanceApi,
-      // walletId,
-      // networkId,
-      ...actions,
-      strings: getStrings(intl),
-      gouvernanceManager,
-    }),
-    [state, actions]
-  );
+  const context = {
+    ...state,
+    // ...gouvernanceApi,
+    ...actions,
+    strings: getStrings(intl),
+    gouvernanceManager: gouvernanceManager,
+    stakePoolKeyHash: currentPool.hash ?? '',
+  };
 
   return <GouvernanceContext.Provider value={context}>{children}</GouvernanceContext.Provider>;
 };
 
 export const useGovernance = () =>
-  React.useContext(GouvernanceContext) ??
-  invalid('useGovernance: needs to be wrapped in a GouvernanceManagerProvider');
+  React.useContext(GouvernanceContext) ?? invalid('useGovernance: needs to be wrapped in a GouvernanceManagerProvider');

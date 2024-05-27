@@ -7,21 +7,17 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import { CustomModal } from '../../../components/modals/CustomModal';
-import { useGovernance } from '../module/GouvernanceContextProvider';
-import { useNavigateTo } from './useNavigateTo';
 import { TextInput } from '../../../components';
 import { parseDrepId, useIsValidDRepID } from '@yoroi/staking';
 import { isNonNullable } from '@yoroi/common';
 import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
 
 type ChooseDRepModallProps = {|
-  title: string,
+  onSubmit?: (drepId: string) => void,
 |};
 
-export const ChooseDRepModal = (): Node => {
+export const ChooseDRepModal = ({ onSubmit }: ChooseDRepModallProps): Node => {
   const [drepId, setDrepId] = React.useState('');
-  const navigateTo = useNavigateTo();
-  const { dRepIdChanged, gouvernanceStatusChanged } = useGovernance();
 
   // TODO hook endpoint not working well
   const { error, isFetched, isFetching } = useIsValidDRepID(drepId, {
@@ -31,9 +27,7 @@ export const ChooseDRepModal = (): Node => {
 
   const confirmDRep = () => {
     // TODO add spcecific validation if needed
-    dRepIdChanged(drepId);
-    navigateTo.delegationForm();
-
+    onSubmit?.(drepId);
     // TODO hook endpoint not working well
     // parseDrepId(drepId, RustModule.CrossCsl.init)
     //   .then(parsedId => {

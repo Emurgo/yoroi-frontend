@@ -12,35 +12,19 @@ type StyledInputProps = {|
   onChange: (event: any) => void,
   value?: string,
   error?: boolean,
-  helperText: string,
+  helperText?: string,
 |};
 
-export const TextInput = ({
-  id,
-  label,
-  variant,
-  onChange,
-  value,
-  error,
-  helperText,
-}: StyledInputProps): Node => {
+export const TextInput = ({ id, label, variant, onChange, value, error, helperText }: StyledInputProps): Node => {
   return (
-    <SInput
-      id={id}
-      label={label}
-      variant="outlined"
-      onChange={onChange}
-      value={value}
-      error={error}
-      helperText={helperText}
-    />
+    <SInput id={id} label={label} variant="outlined" onChange={onChange} value={value} error={error} helperText={helperText} />
   );
 };
 
 const SInput = styled(TextField)(({ theme, error }) => ({
   '& .MuiFormHelperText-root': {
     position: 'absolute',
-    bottom: -22,
+    bottom: -4,
     left: -10,
   },
   '& .MuiInputLabel-root': {

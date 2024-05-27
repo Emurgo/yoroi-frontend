@@ -16,7 +16,9 @@ import { Button } from '@mui/material';
 import Link from '@mui/material/Link';
 import { useModal } from '../../../../components/modals/ModalContext';
 import { ChooseDRepModal } from '../../common/ChooseDRepModal';
-import { GovernanceProvider } from '@yoroi/staking';
+import { GovernanceProvider, useStakingKeyState, useDelegationCertificate, useVotingCertificate } from '@yoroi/staking';
+import { useNavigateTo } from '../../common/useNavigateTo';
+
 type Props = {|
   title: string,
   description: string,
@@ -75,9 +77,32 @@ const GovernanceCard = ({ title, description, icon, selected, onClick }: Props) 
 );
 
 export const GouvernanceStatusSelection = (): Node => {
-  const [selectedCard, setSelectedCard] = useState(null);
-  const { gouvernanceStatus, dRepId, strings, gouvernanceManager } = useGovernance();
+  const [voteKind, setVotKind] = useState<'abstain' | 'no-confidence' | 'delegate' | null>(null);
+  const [pendingVote, setPendingVote] = React.useState(null);
+  const navigateTo = useNavigateTo();
+
   const { openModal } = useModal();
+  const {
+    gouvernanceStatus,
+    strings,
+    gouvernanceManager,
+    stakePoolKeyHash,
+    dRepIdChanged,
+    gouvernanceStatusChanged,
+  } = useGovernance();
+
+  // TODO not working well - need to sync with mobile about this
+  // const { data: stakingStatus } = useStakingKeyState(stakePoolKeyHash, { suspense: true });
+  // const action = stakingStatus ? mapStakingKeyStateToGovernanceAction(stakingStatus) : null
+
+  const { createCertificate: createDelegationCertificate, isLoading: isCreatingDelegationCertificate } = useDelegationCertificate(
+    {
+      useErrorBoundary: true,
+    }
+  );
+  const { createCertificate: createVotingCertificate, isLoading: isCreatingVotingCertificate } = useVotingCertificate({
+    useErrorBoundary: true,
+  });
 
   const pageTitle = gouvernanceStatus === 'none' ? 'Governance Status' : 'Governance status';
   const statusRawText = mapStatus[gouvernanceStatus];
@@ -88,19 +113,39 @@ export const GouvernanceStatusSelection = (): Node => {
 
   const hasDRep = gouvernanceStatus === 'drep';
 
-  const onChoosDRepClick = () => {
+  const openDRepIdModal = (onSubmit: (drepId: string) => void) => {
     openModal({
       title: 'Choose your Drep',
       content: (
         <GovernanceProvider manager={gouvernanceManager}>
-          <ChooseDRepModal />
+          <ChooseDRepModal onSubmit={onSubmit} />
         </GovernanceProvider>
       ),
       width: '648px',
     });
   };
+
+  const handleDelegate = () => {
+    openDRepIdModal(drepID => {
+      const vote = { kind: 'delegate', drepID };
+      setPendingVote(vote.kind);
+      dRepIdChanged(drepID);
+      gouvernanceStatusChanged(drepID);
+      navigateTo.delegationForm('delegate');
+      // createDelegationCertificate(
+      //   { drepID, stakePoolKeyHash },
+      //   {
+      //     onSuccess: async certificate => {
+      //       // const unsignedTx = await createGovernanceTxMutation TODO - should be implemented
+      //       navigateTo.delegationForm();
+      //     },
+      //   }
+      // );
+    });
+  };
+
   const handleCardClick = card => {
-    setSelectedCard(card);
+    // setSelectedCard(card);
   };
 
   const optionsList = [
@@ -108,21 +153,21 @@ export const GouvernanceStatusSelection = (): Node => {
       title: strings.delegateToDRep,
       description: strings.designatingSomeoneElse,
       icon: <DRepIlustration />,
-      selected: selectedCard === 'drep',
-      onClick: onChoosDRepClick,
+      selected: voteKind === 'delegate',
+      onClick: handleDelegate,
     },
     {
       title: 'Abstain',
       description: 'You are choosing not to cast a vote on all proposals now and in the future.',
       icon: <Abstein />,
-      selected: selectedCard === 'no-vote',
+      selected: voteKind === 'abstain',
       onClick: () => handleCardClick('no-vote'),
     },
     {
       title: 'No Confidence',
       description: 'You are expressing a lack of trust for all proposals now and in the future.',
       icon: <NoConfidance />,
-      selected: selectedCard === 'lack-of-trust',
+      selected: voteKind === 'no-confidencet',
       onClick: () => handleCardClick('lack-of-trust'),
     },
   ];
