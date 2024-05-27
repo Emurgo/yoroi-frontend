@@ -25,12 +25,8 @@ import { useNavigateTo } from '../../common/useNavigateTo';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import StyledChip from '../../common/chip';
 import ArrowIcon from '../../../../components/icons/portfolio/Arrow';
-
-const PerformanceItemType = {
-  USD: 'usd',
-  TOKEN: 'token',
-  RANK: 'rank',
-};
+import TokenDetailPerformance from './TokenDetailPerformance';
+import TokenDetailOverview from './TokenDetailOverview';
 
 const Header = styled(Box)({
   display: 'flex',
@@ -42,9 +38,11 @@ const TokenInfo = styled(Stack)({
   marginTop: '25px',
 });
 
-const StyledButton = styled(Button)({
+const StyledButton = styled(Button)(({ theme }) => ({
   maxHeight: '40px',
-});
+  width: '100%',
+  maxWidth: '140,25px',
+}));
 
 const TabContent = styled(Box)({
   flex: 1,
@@ -58,28 +56,15 @@ const TokenDetails = ({ tokenInfo, mockHistory }) => {
 
   const subMenuOptions = [
     {
-      label: strings.overview,
-      className: 'overview',
-      route: 'overview',
-    },
-    {
       label: strings.performance,
       className: 'performance',
       route: 'performance',
     },
-  ];
-
-  const performanceItemList = [
-    { id: 'tokenPriceChange', type: PerformanceItemType.USD, label: strings.tokenPriceChange },
-    { id: 'tokenPrice', type: PerformanceItemType.USD, label: strings.tokenPrice },
-    { id: 'marketCap', type: PerformanceItemType.USD, label: strings.marketCap },
-    { id: 'volumn', type: PerformanceItemType.USD, label: strings['24hVolumn'] },
-    { id: 'rank', type: PerformanceItemType.RANK, label: strings.rank },
-    { id: 'circulating', type: PerformanceItemType.TOKEN, label: strings.circulating },
-    { id: 'totalSupply', type: PerformanceItemType.TOKEN, label: strings.totalSupply },
-    { id: 'maxSupply', type: PerformanceItemType.TOKEN, label: strings.maxSupply },
-    { id: 'allTimeHigh', type: PerformanceItemType.USD, label: strings.allTimeHigh },
-    { id: 'allTimeLow', type: PerformanceItemType.USD, label: strings.allTimeLow },
+    {
+      label: strings.overview,
+      className: 'overview',
+      route: 'overview',
+    },
   ];
 
   const [selectedTab, setSelectedTab] = useState(subMenuOptions[0].route);
@@ -116,16 +101,25 @@ const TokenDetails = ({ tokenInfo, mockHistory }) => {
           </Typography>
         </Button>
         <Stack direction="row" spacing={theme.spacing(2)}>
-          <StyledButton variant="contained">{strings.swap}</StyledButton>
-          <StyledButton variant="secondary">{strings.send}</StyledButton>
-          <StyledButton variant="secondary">{strings.receive}</StyledButton>
+          <StyledButton variant="contained">
+            <Typography variant="button2">{strings.swap}</Typography>
+          </StyledButton>
+          <StyledButton variant="secondary">
+            <Typography variant="button2">{strings.send}</Typography>
+          </StyledButton>
+          <StyledButton variant="secondary">
+            <Typography variant="button2">{strings.receive}</Typography>
+          </StyledButton>
         </Stack>
       </Header>
 
       <TokenInfo direction="row" spacing={theme.spacing(4)}>
         <Card>
           <Box sx={{ padding: '20px' }}>
-            <Typography fontWeight="500" sx={{ marginBottom: '15px' }}>
+            <Typography
+              fontWeight="500"
+              sx={{ marginBottom: theme.spacing(2), color: theme.palette.ds.text_gray_normal }}
+            >
               {isLoading ? (
                 <StyledSkeleton width="82px" height="16px" />
               ) : (
@@ -237,186 +231,25 @@ const TokenDetails = ({ tokenInfo, mockHistory }) => {
         </Card>
 
         <Card>
-          <Box sx={{ marginTop: '20px' }}>
+          <Box sx={{ paddingTop: `${theme.spacing(2)}` }}>
             <SubMenu
               options={subMenuOptions}
               onItemClick={route => setSelectedTab(route)}
               isActiveItem={isActiveItem}
               locationId="token-details"
             />
-            <Divider sx={{ margin: '0 20px' }} />
+            <Divider sx={{ margin: `0 ${theme.spacing(2)}` }} />
           </Box>
-          <Box sx={{ padding: '30px 20px' }}>
+          <Box sx={{ padding: theme.spacing(3) }}>
             {selectedTab === subMenuOptions[0].route ? (
               <TabContent>
-                <Stack direction="column" spacing={theme.spacing(1.5)}>
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    spacing={theme.spacing(1)}
-                    sx={{ margin: '10px 0' }}
-                  >
-                    {isLoading ? (
-                      <StyledSkeleton width="32px" height="32px" />
-                    ) : (
-                      <Box
-                        width="32px"
-                        height="32px"
-                        sx={{
-                          backgroundColor: theme.palette.ds.gray_c300,
-                          borderRadius: `${theme.shape.borderRadius}px`,
-                        }}
-                      ></Box>
-                    )}
-                    {isLoading ? (
-                      <StyledSkeleton width="53px" height="16px" />
-                    ) : (
-                      <Typography fontWeight="500" sx={{ marginBottom: '20px' }}>
-                        {tokenInfo.name}
-                      </Typography>
-                    )}
-                  </Stack>
-
-                  <Stack direction="column" spacing={theme.spacing(1)}>
-                    {isLoading ? (
-                      <StyledSkeleton width="53px" height="16px" />
-                    ) : (
-                      <Typography fontWeight="500">{strings.description}</Typography>
-                    )}
-                    {isLoading ? (
-                      <>
-                        <StyledSkeleton height="20px" width="full" />
-                        <StyledSkeleton height="20px" width="full" />
-                        <StyledSkeleton height="20px" width="127px" />
-                      </>
-                    ) : (
-                      <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
-                        {tokenInfo.overview.description}
-                      </Typography>
-                    )}
-                  </Stack>
-
-                  <Stack direction="column" spacing={theme.spacing(1)}>
-                    {isLoading ? (
-                      <StyledSkeleton width="53px" height="16px" />
-                    ) : (
-                      <Typography fontWeight="500">{strings.website}</Typography>
-                    )}
-                    {isLoading ? (
-                      <StyledSkeleton width="127px" height="20px" />
-                    ) : (
-                      <Link href={tokenInfo.overview.website} target="_blank">
-                        cardano.org
-                      </Link>
-                    )}
-                  </Stack>
-
-                  <Stack direction="column" spacing={theme.spacing(1)}>
-                    {isLoading ? (
-                      <StyledSkeleton width="84px" height="20px" />
-                    ) : (
-                      <Typography fontWeight="500">{strings.policyId}</Typography>
-                    )}
-
-                    <Stack direction="row" spacing={theme.spacing(2)} alignItems="self-start">
-                      {isLoading ? (
-                        <Box flex={1}>
-                          <StyledSkeleton height="20px" width="full" />
-                          <StyledSkeleton height="16px" width="53px" sx={{ marginTop: '5px' }} />
-                        </Box>
-                      ) : (
-                        <Typography
-                          sx={{ color: theme.palette.ds.text_gray_medium, wordBreak: 'break-word' }}
-                        >
-                          {tokenInfo.overview.policyId}
-                        </Typography>
-                      )}
-                      <CopyButton
-                        disabled={isLoading}
-                        textToCopy={`${tokenInfo.overview.policyId}`}
-                      />
-                    </Stack>
-                  </Stack>
-
-                  <Stack direction="column" spacing={theme.spacing(1)}>
-                    {isLoading ? (
-                      <StyledSkeleton width="84px" height="20px" />
-                    ) : (
-                      <Typography fontWeight="500">{strings.fingerprint}</Typography>
-                    )}
-
-                    <Stack direction="row" spacing={2} alignItems="self-start">
-                      {isLoading ? (
-                        <Box flex={1}>
-                          <StyledSkeleton height="20px" width="full" />
-                          <StyledSkeleton height="16px" width="53px" sx={{ marginTop: '5px' }} />
-                        </Box>
-                      ) : (
-                        <Typography
-                          sx={{ color: theme.palette.ds.text_gray_medium, wordBreak: 'break-word' }}
-                        >
-                          {tokenInfo.overview.fingerprint}
-                        </Typography>
-                      )}
-                      <CopyButton
-                        disabled={isLoading}
-                        textToCopy={`${tokenInfo.overview.fingerprint}`}
-                      />
-                    </Stack>
-                  </Stack>
-
-                  <Stack direction="column" spacing={theme.spacing(1)}>
-                    {isLoading ? (
-                      <StyledSkeleton width="53px" height="16px" />
-                    ) : (
-                      <Typography fontWeight="500">{strings.detailsOn}</Typography>
-                    )}
-                    <Stack direction="row" alignItems="center" spacing={theme.spacing(1)}>
-                      {isLoading ? (
-                        <StyledSkeleton width="127px" height="20px" />
-                      ) : (
-                        <Link href={tokenInfo.overview.detailOn} target="_blank">
-                          Cardanoscan
-                        </Link>
-                      )}
-                      {isLoading ? (
-                        <StyledSkeleton height="20px" width="60px" />
-                      ) : (
-                        <Button variant="text" sx={{ maxHeight: '22px' }}>
-                          Adaex
-                        </Button>
-                      )}
-                    </Stack>
-                  </Stack>
-                </Stack>
+                <TokenDetailPerformance tokenInfo={tokenInfo} />
               </TabContent>
             ) : null}
 
             {selectedTab === subMenuOptions[1].route ? (
               <TabContent>
-                <Typography fontWeight="500" sx={{ marginBottom: '30px' }}>
-                  Market data
-                </Typography>
-                <Stack direction="column" spacing={2.3}>
-                  {performanceItemList.map((item, index) => (
-                    <Stack
-                      key={item.id}
-                      direction="row"
-                      justifyContent="space-between"
-                      alignItems="center"
-                    >
-                      <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
-                        {item.label}
-                      </Typography>
-                      <Typography>
-                        {item.type === PerformanceItemType.RANK && '#'}
-                        {tokenInfo.performance[index].value}{' '}
-                        {item.type === PerformanceItemType.USD && 'USD'}
-                        {item.type === PerformanceItemType.TOKEN && tokenInfo.overview.tokenName}
-                      </Typography>
-                    </Stack>
-                  ))}
-                </Stack>
+                <TokenDetailOverview tokenInfo={tokenInfo} isLoading={isLoading} />
               </TabContent>
             ) : null}
           </Box>
