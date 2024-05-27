@@ -23,23 +23,21 @@ const StatsTable = ({ data }) => {
   const { strings } = usePortfolio();
 
   const headCells = [
-    { id: 'name', label: strings.name, align: 'left', disabledSort: false, sortType: 'character' },
-    { id: 'price', label: strings.price, align: 'left', disabledSort: false, sortType: 'numeric' },
-    { id: '24h', label: '24H', align: 'left', disabledSort: false, sortType: 'numeric' },
-    { id: '1W', label: '1W', align: 'left', disabledSort: false, sortType: 'numeric' },
-    { id: '1M', label: '1M', align: 'left', disabledSort: true, sortType: 'numeric' },
+    { id: 'name', label: strings.name, align: 'left', sortType: 'character' },
+    { id: 'price', label: strings.price, align: 'left', sortType: 'numeric' },
+    { id: '24h', label: '24H', align: 'left', sortType: 'numeric' },
+    { id: '1W', label: '1W', align: 'left', sortType: 'numeric' },
+    { id: '1M', label: '1M', align: 'left', sortType: 'numeric' },
     {
       id: 'portfolioPercents',
       label: `${strings.portfolio} %`,
       align: 'left',
-      disabledSort: false,
       sortType: 'numeric',
     },
     {
       id: 'totalAmount',
       label: strings.totalAmount,
       align: 'right',
-      disabledSort: false,
       sortType: 'numeric',
     },
   ];
@@ -108,14 +106,14 @@ const StatsTable = ({ data }) => {
     >
       <TableHead>
         <TableRow>
-          {headCells.map(({ label, align, id, disabledSort }) => (
+          {headCells.map(({ label, align, id }) => (
             <TableCell key={id} align={align}>
               <Stack
                 direction="row"
                 alignItems="center"
                 spacing={theme.spacing(1)}
-                onClick={() => (disabledSort ? null : handleRequestSort(id))}
-                sx={{ float: align, cursor: disabledSort ? 'auto' : 'pointer' }}
+                onClick={() => handleRequestSort(id)}
+                sx={{ float: align, cursor: 'pointer' }}
               >
                 <Typography
                   sx={{ color: theme.palette.ds.text_gray_medium }}
@@ -123,7 +121,7 @@ const StatsTable = ({ data }) => {
                 >
                   {label}
                 </Typography>
-                {disabledSort ? null : <SortIcon id={id} order={order} orderBy={orderBy} />}
+                <SortIcon id={id} order={order} orderBy={orderBy} />
               </Stack>
             </TableCell>
           ))}
