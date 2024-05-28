@@ -35,7 +35,7 @@ import type {
   FilterUsedResponse,
   GetSwapFeeTiersFunc,
   GetSwapFeeTiersRequest,
-  GetSwapFeeTiersResponse,
+  GetSwapFeeTiersResponse, GetTransactionSlotsByHashesResponse,
 } from './types';
 
 import type { IFetcher } from './IFetcher.types';
@@ -263,6 +263,26 @@ export class RemoteFetcher implements IFetcher {
           };
         });
       });
+    }
+
+  getTransactionSlotsByHashes
+  : GetTransactionsByHashesRequest => Promise<GetTransactionSlotsByHashesResponse>
+    = (body) => {
+      const { network, txHashes } = body;
+      const { BackendService } = network.Backend;
+      if (BackendService == null) throw new Error(`${nameof(this.getTransactionsByHashes)} missing backend url`);
+      return axios(
+        `${BackendService}/api/v2.1/tx/status`,
+        {
+          method: 'post',
+          timeout: 2 * CONFIG.app.walletRefreshInterval,
+          data: { txHashes },
+          headers: {
+            'yoroi-version': this.getLastLaunchVersion(),
+            'yoroi-locale': this.getCurrentLocale()
+          }
+        }
+      ).then(response => response.data?.slot ?? {});
     }
 
   getRewardHistory: RewardHistoryRequest => Promise<RewardHistoryResponse> = (body) => {

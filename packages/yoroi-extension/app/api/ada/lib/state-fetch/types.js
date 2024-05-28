@@ -568,6 +568,12 @@ export type GetTransactionsByHashesFunc = (
   body: GetTransactionsByHashesRequest
 ) => Promise<GetTransactionsByHashesResponse>;
 
+export type GetTransactionSlotsByHashesResponse = { [string]: string };
+
+export type GetTransactionSlotsByHashesFunc = (
+  body: GetTransactionsByHashesRequest
+) => Promise<GetTransactionSlotsByHashesResponse>;
+
 export type FilterUsedRequest = {|
   network: $ReadOnly<NetworkRow>,
   addresses: Array<string>,
