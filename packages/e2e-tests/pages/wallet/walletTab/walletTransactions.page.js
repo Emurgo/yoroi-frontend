@@ -8,6 +8,7 @@ import BasePage from '../../basepage.js';
 import WalletTab from './walletTab.page.js';
 import ExportTransactionsModal from './transactionsModals/exportTransactionModal.page.js';
 import { convertPrettyDateToNormal, convertPrettyTimeToNormal } from '../../../utils/utils.js';
+import MemoWarningModal from './transactionsModals/memoWarningModal.page.js';
 
 export class TransactionsSubTab extends WalletTab {
   // locators
@@ -427,6 +428,16 @@ export class TransactionsSubTab extends WalletTab {
     );
     const addMemoBtnLocator = this.txAddMemoButtonLocator(groupIndex, txIndex);
     await this.click(addMemoBtnLocator);
+    return new MemoWarningModal(this.driver, this.logger);
+  }
+  async getMemoMessage(groupIndex, txIndex) {
+    this.logger.info(
+      `TransactionsSubTab::getMemoMessage is called. Group index: ${groupIndex}, tx index: ${txIndex}`
+    );
+    const addMemoMsgLocator = this.txMemoContentTextLocator(groupIndex, txIndex);
+    const result = await this.getText(addMemoMsgLocator);
+    this.logger.info(`TransactionsSubTab::getMemoMessage::result ${result}`);
+    return result;
   }
 }
 
