@@ -17,11 +17,64 @@ import { usePortfolio } from '../../module/PortfolioContextProvider';
 import ArrowIcon from '../../common/assets/icons/Arrow';
 import adaPng from '../../../../../assets/images/ada.png';
 import { Chip } from '../../common/components/Chip';
+import { Skeleton } from '../../../../components/Skeleton';
 
-const StatsTable = ({ data }) => {
+const TableRowSkeleton = ({ id, theme }) => (
+  <TableRow
+    key={id}
+    sx={{
+      '& td': { border: 0 },
+    }}
+  >
+    <TableCell>
+      <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
+        <Skeleton width="40px" height="40px" />
+        <Stack direction="column" spacing={theme.spacing(0.25)}>
+          <Skeleton width="55px" height="24px" />
+          <Skeleton width="55px" height="16px" />
+        </Stack>
+      </Stack>
+    </TableCell>
+
+    <TableCell>
+      <Skeleton width="126px" height="24px" />
+    </TableCell>
+
+    <TableCell>
+      <Skeleton width="62px" height="20px" />
+    </TableCell>
+
+    <TableCell>
+      <Skeleton width="62px" height="20px" />
+    </TableCell>
+
+    <TableCell>
+      <Skeleton width="62px" height="20px" />
+    </TableCell>
+
+    <TableCell>
+      <Skeleton width="146px" height="24px" />
+    </TableCell>
+
+    <TableCell>
+      <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
+        <Stack direction="column" spacing={theme.spacing(0.25)}>
+          <Skeleton width="146px" height="24px" />
+          <Skeleton width="146px" height="16px" />
+        </Stack>
+      </Stack>
+    </TableCell>
+  </TableRow>
+);
+
+const StatsTable = ({ data, isLoading }) => {
   const theme = useTheme();
   const navigateTo = useNavigateTo();
   const { strings } = usePortfolio();
+  const [{ order, orderBy }, setSortState] = useState({
+    order: null,
+    orderBy: null,
+  });
 
   const headCells = [
     { id: 'name', label: strings.name, align: 'left', sortType: 'character' },
@@ -43,11 +96,6 @@ const StatsTable = ({ data }) => {
     },
   ];
 
-  const [{ order, orderBy }, setSortState] = useState({
-    order: null,
-    orderBy: null,
-  });
-
   const handleRequestSort = property => {
     let direction = 'asc';
     if (order === 'asc') {
@@ -65,7 +113,7 @@ const StatsTable = ({ data }) => {
     });
   };
 
-  function descendingComparator(a, b, sortType) {
+  const descendingComparator = (a, b, sortType) => {
     switch (sortType) {
       case 'numeric':
         if (parseFloat(b[orderBy]) < parseFloat(a[orderBy])) {
@@ -82,7 +130,7 @@ const StatsTable = ({ data }) => {
           return 1;
         }
     }
-  }
+  };
 
   const getSortedData = useCallback(
     data => {
@@ -129,147 +177,157 @@ const StatsTable = ({ data }) => {
         </TableRow>
       </TableHead>
       <TableBody>
-        {getSortedData(data).map(row => (
-          <TableRow
-            key={row.id}
-            onClick={() => navigateTo.portfolioDetail(row.id)}
-            sx={{
-              cursor: 'pointer',
-              transition: 'all 0.3s ease-in-out',
-              '& td, & th': { border: 0 },
-              '&:hover': {
-                backgroundColor: theme.palette.ds.gray_c50,
-                borderRadius: `${theme.shape.borderRadius}px`,
-              },
-            }}
-          >
-            <TableCell>
-              <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
-                <Box
-                  width="40px"
-                  height="40px"
-                  sx={{
-                    borderRadius: `${theme.shape.borderRadius}px`,
-                    backgroundColor: theme.palette.ds.gray_c700,
-                  }}
-                  component="img"
-                  src={adaPng}
-                ></Box>
-                <Stack direction="column">
-                  <Typography fontWeight="500" sx={{ color: theme.palette.ds.text_gray_normal }}>
-                    {row.name}
-                  </Typography>
+        {isLoading
+          ? Array.from([1, 2, 3]).map((item, index) => (
+              <TableRowSkeleton id={index} theme={theme} />
+            ))
+          : getSortedData(data).map(row => (
+              <TableRow
+                key={row.id}
+                onClick={() => navigateTo.portfolioDetail(row.id)}
+                sx={{
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease-in-out',
+                  borderRadius: `${theme.shape.borderRadius}px`,
+                  '& td': { border: 0 },
+                  '&:hover': {
+                    backgroundColor: theme.palette.ds.gray_c50,
+                  },
+                }}
+              >
+                <TableCell>
+                  <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
+                    <Box
+                      width="40px"
+                      height="40px"
+                      sx={{
+                        borderRadius: `${theme.shape.borderRadius}px`,
+                        backgroundColor: theme.palette.ds.gray_c700,
+                      }}
+                      component="img"
+                      src={adaPng}
+                    ></Box>
+                    <Stack direction="column">
+                      <Typography
+                        fontWeight="500"
+                        sx={{ color: theme.palette.ds.text_gray_normal }}
+                      >
+                        {row.name}
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium }}>
+                        {row.id}
+                      </Typography>
+                    </Stack>
+                  </Stack>
+                </TableCell>
+
+                <TableCell>
                   <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium }}>
-                    {row.id}
+                    {row.price} USD
                   </Typography>
-                </Stack>
-              </Stack>
-            </TableCell>
+                </TableCell>
 
-            <TableCell>
-              <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium }}>
-                {row.price} USD
-              </Typography>
-            </TableCell>
+                <TableCell>
+                  <Chip
+                    active={row['24h'] > 0}
+                    label={
+                      <Stack direction="row" justifyContent="space-between" alignItems="center">
+                        <ArrowIcon
+                          fill={
+                            row['24h'] > 0
+                              ? theme.palette.ds.secondary_c800
+                              : theme.palette.ds.sys_magenta_c700
+                          }
+                          style={{
+                            marginRight: '5px',
+                            transform: row['24h'] > 0 ? '' : 'rotate(180deg)',
+                          }}
+                        />
+                        <Typography variant="caption1">
+                          {row['24h'] > 0 ? row['24h'] : -1 * row['24h']}%
+                        </Typography>
+                      </Stack>
+                    }
+                    sx={{ cursor: 'pointer' }}
+                  />
+                </TableCell>
 
-            <TableCell>
-              <Chip
-                active={row['24h'] > 0}
-                label={
-                  <Stack direction="row" justifyContent="space-between" alignItems="center">
-                    <ArrowIcon
-                      fill={
-                        row['24h'] > 0
-                          ? theme.palette.ds.secondary_c800
-                          : theme.palette.ds.sys_magenta_c700
-                      }
-                      style={{
-                        marginRight: '5px',
-                        transform: row['24h'] > 0 ? '' : 'rotate(180deg)',
-                      }}
-                    />
-                    <Typography variant="caption1">
-                      {row['24h'] > 0 ? row['24h'] : -1 * row['24h']}%
-                    </Typography>
-                  </Stack>
-                }
-                sx={{ cursor: 'pointer' }}
-              />
-            </TableCell>
+                <TableCell>
+                  <Chip
+                    active={row['1W'] > 0}
+                    label={
+                      <Stack direction="row" justifyContent="space-between" alignItems="center">
+                        <ArrowIcon
+                          fill={
+                            row['1W'] > 0
+                              ? theme.palette.ds.secondary_c800
+                              : theme.palette.ds.sys_magenta_c700
+                          }
+                          style={{
+                            marginRight: '5px',
+                            transform: row['1W'] > 0 ? '' : 'rotate(180deg)',
+                          }}
+                        />
+                        <Typography variant="caption1">
+                          {row['1W'] > 0 ? row['1W'] : -1 * row['1W']}%
+                        </Typography>
+                      </Stack>
+                    }
+                    sx={{ cursor: 'pointer' }}
+                  />
+                </TableCell>
 
-            <TableCell>
-              <Chip
-                active={row['1W'] > 0}
-                label={
-                  <Stack direction="row" justifyContent="space-between" alignItems="center">
-                    <ArrowIcon
-                      fill={
-                        row['1W'] > 0
-                          ? theme.palette.ds.secondary_c800
-                          : theme.palette.ds.sys_magenta_c700
-                      }
-                      style={{
-                        marginRight: '5px',
-                        transform: row['1W'] > 0 ? '' : 'rotate(180deg)',
-                      }}
-                    />
-                    <Typography variant="caption1">
-                      {row['1W'] > 0 ? row['1W'] : -1 * row['1W']}%
-                    </Typography>
-                  </Stack>
-                }
-                sx={{ cursor: 'pointer' }}
-              />
-            </TableCell>
+                <TableCell>
+                  <Chip
+                    active={row['1M'] > 0}
+                    label={
+                      <Stack direction="row" justifyContent="space-between" alignItems="center">
+                        <ArrowIcon
+                          fill={
+                            row['1M'] > 0
+                              ? theme.palette.ds.secondary_c800
+                              : theme.palette.ds.sys_magenta_c700
+                          }
+                          style={{
+                            marginRight: '5px',
+                            transform: row['1M'] > 0 ? '' : 'rotate(180deg)',
+                          }}
+                        />
+                        <Typography variant="caption1">
+                          {row['1M'] > 0 ? row['1M'] : -1 * row['1M']}%
+                        </Typography>
+                      </Stack>
+                    }
+                    sx={{ cursor: 'pointer' }}
+                  />
+                </TableCell>
 
-            <TableCell>
-              <Chip
-                active={row['1M'] > 0}
-                label={
-                  <Stack direction="row" justifyContent="space-between" alignItems="center">
-                    <ArrowIcon
-                      fill={
-                        row['1M'] > 0
-                          ? theme.palette.ds.secondary_c800
-                          : theme.palette.ds.sys_magenta_c700
-                      }
-                      style={{
-                        marginRight: '5px',
-                        transform: row['1M'] > 0 ? '' : 'rotate(180deg)',
-                      }}
-                    />
-                    <Typography variant="caption1">
-                      {row['1M'] > 0 ? row['1M'] : -1 * row['1M']}%
-                    </Typography>
-                  </Stack>
-                }
-                sx={{ cursor: 'pointer' }}
-              />
-            </TableCell>
-
-            <TableCell>
-              <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium }}>
-                {row.portfolioPercents.toFixed(2)}&nbsp;%
-              </Typography>
-            </TableCell>
-
-            <TableCell>
-              <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
-                <Stack direction="column">
-                  <Typography fontWeight="500" sx={{ color: theme.palette.ds.text_gray_normal }}>
-                    {row.totalAmount} {row.name}
+                <TableCell>
+                  <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium }}>
+                    {row.portfolioPercents.toFixed(2)}&nbsp;%
                   </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ color: theme.palette.ds.text_gray_medium, textAlign: 'right' }}
-                  >
-                    {row.totalAmountUsd} USD
-                  </Typography>
-                </Stack>
-              </Stack>
-            </TableCell>
-          </TableRow>
-        ))}
+                </TableCell>
+
+                <TableCell>
+                  <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
+                    <Stack direction="column">
+                      <Typography
+                        fontWeight="500"
+                        sx={{ color: theme.palette.ds.text_gray_normal }}
+                      >
+                        {row.totalAmount} {row.name}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{ color: theme.palette.ds.text_gray_medium, textAlign: 'right' }}
+                      >
+                        {row.totalAmountUsd} USD
+                      </Typography>
+                    </Stack>
+                  </Stack>
+                </TableCell>
+              </TableRow>
+            ))}
       </TableBody>
     </Table>
   );

@@ -1,6 +1,6 @@
 import { Typography, Stack, Box, Input, InputAdornment, styled } from '@mui/material';
 import { ReactComponent as Search } from '../../../../../assets/images/assets-page/search.inline.svg';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Tooltip, SearchInput } from '../../../../components';
 import { useTheme } from '@mui/material/styles';
 import { defineMessages } from 'react-intl';
@@ -9,20 +9,37 @@ import StatsTable from './StatsTable';
 import mockData from '../../../../pages/portfolio/mockData';
 import ArrowIcon from '../../common/assets/icons/Arrow';
 import { Chip } from '../../common/components/Chip';
+import { Skeleton } from '../../../../components/Skeleton';
 
 const PortfolioWallet = ({ data }) => {
   const theme = useTheme();
   const { strings } = usePortfolio();
   const [keyword, setKeyword] = useState('');
+  const [isLoading, setIsLoading] = useState();
+
+  useEffect(() => {
+    // FAKE FETCHING DATA TO SEE SKELETON
+    setIsLoading(true);
+
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <Box>
       <Stack direction="row" justifyContent="space-between">
         <Stack direction="column">
           <Stack direction="row" spacing={theme.spacing(0.5)}>
-            <Typography variant="h2" fontWeight="500">
-              {mockData.PortfolioPage.balance.ada}
-            </Typography>
+            {isLoading ? (
+              <Skeleton width="146px" height="24px" />
+            ) : (
+              <Typography variant="h2" fontWeight="500">
+                {mockData.PortfolioPage.balance.ada}
+              </Typography>
+            )}
             <Typography variant="body2" fontWeight="500" sx={{ marginTop: '5px' }}>
               ADA
               <Typography
@@ -40,59 +57,75 @@ const PortfolioWallet = ({ data }) => {
           </Stack>
 
           <Stack direction="row" justifyContent="space-between" alignItems="center">
-            <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
-              {mockData.PortfolioPage.balance.usd} USD
-            </Typography>
-            <Tooltip
-              title={
-                <>
-                  <Typography display={'block'}>% {strings.balancePerformance}</Typography>
-                  <Typography display={'block'}>+/- {strings.balanceChange}</Typography>
-                  <Typography display={'block'}>{strings.in24hours}</Typography>
-                </>
-              }
-              placement="right"
-            >
+            {isLoading ? (
+              <Skeleton width="129px" height="16px" />
+            ) : (
+              <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
+                {mockData.PortfolioPage.balance.usd} USD
+              </Typography>
+            )}
+            {isLoading ? (
               <Stack
                 direction="row"
                 alignItems="center"
                 spacing={theme.spacing(1)}
                 sx={{ marginLeft: theme.spacing(2) }}
               >
-                <Chip
-                  active={mockData.PortfolioPage.balance.percents.active}
-                  label={
-                    <Stack direction="row" justifyContent="space-between" alignItems="center">
-                      <ArrowIcon
-                        fill={
-                          mockData.PortfolioPage.balance.percents.active
-                            ? theme.palette.ds.secondary_c800
-                            : theme.palette.ds.sys_magenta_c700
-                        }
-                        style={{
-                          marginRight: theme.spacing(0.5),
-                          transform: mockData.PortfolioPage.balance.percents.active
-                            ? ''
-                            : 'rotate(180deg)',
-                        }}
-                      />
-                      <Typography variant="caption1">
-                        {mockData.PortfolioPage.balance.percents.value}%
-                      </Typography>
-                    </Stack>
-                  }
-                />
-                <Chip
-                  active={mockData.PortfolioPage.balance.amount.active}
-                  label={
-                    <Typography variant="caption1">
-                      {mockData.PortfolioPage.balance.amount.active ? '+' : '-'}
-                      {mockData.PortfolioPage.balance.amount.value} USD
-                    </Typography>
-                  }
-                />
+                <Skeleton width="47px" height="20px" />
+                <Skeleton width="65px" height="20px" />
               </Stack>
-            </Tooltip>
+            ) : (
+              <Tooltip
+                title={
+                  <>
+                    <Typography display={'block'}>% {strings.balancePerformance}</Typography>
+                    <Typography display={'block'}>+/- {strings.balanceChange}</Typography>
+                    <Typography display={'block'}>{strings.in24hours}</Typography>
+                  </>
+                }
+                placement="right"
+              >
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  spacing={theme.spacing(1)}
+                  sx={{ marginLeft: theme.spacing(2) }}
+                >
+                  <Chip
+                    active={mockData.PortfolioPage.balance.percents.active}
+                    label={
+                      <Stack direction="row" justifyContent="space-between" alignItems="center">
+                        <ArrowIcon
+                          fill={
+                            mockData.PortfolioPage.balance.percents.active
+                              ? theme.palette.ds.secondary_c800
+                              : theme.palette.ds.sys_magenta_c700
+                          }
+                          style={{
+                            marginRight: theme.spacing(0.5),
+                            transform: mockData.PortfolioPage.balance.percents.active
+                              ? ''
+                              : 'rotate(180deg)',
+                          }}
+                        />
+                        <Typography variant="caption1">
+                          {mockData.PortfolioPage.balance.percents.value}%
+                        </Typography>
+                      </Stack>
+                    }
+                  />
+                  <Chip
+                    active={mockData.PortfolioPage.balance.amount.active}
+                    label={
+                      <Typography variant="caption1">
+                        {mockData.PortfolioPage.balance.amount.active ? '+' : '-'}
+                        {mockData.PortfolioPage.balance.amount.value} USD
+                      </Typography>
+                    }
+                  />
+                </Stack>
+              </Tooltip>
+            )}
           </Stack>
         </Stack>
 
@@ -114,7 +147,7 @@ const PortfolioWallet = ({ data }) => {
           }
         />
       </Stack>
-      <StatsTable data={data} />
+      <StatsTable data={data} isLoading={isLoading} />
     </Box>
   );
 };

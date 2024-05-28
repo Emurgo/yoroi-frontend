@@ -11,6 +11,7 @@ import { withLayout } from '../../../../../styles/context/layout';
 import type { InjectedLayoutProps } from '../../styles/context/layout';
 import type { SubMenuOption } from '../topbar/SubMenu';
 import SubMenu from '../../../../../components/topbar/SubMenu';
+import mockData from '../../../../pages/portfolio/mockData';
 
 export const portfolioMenuMessages: Object = defineMessages({
   wallet: {
@@ -39,7 +40,7 @@ class PortfolioMenu extends Component<Props & InjectedLayoutProps> {
     const isProduction = environmnent.isProduction();
     const portfolioOptions: Array<SubMenuOption> = [
       {
-        label: `${intl.formatMessage(portfolioMenuMessages.wallet)} (6)`,
+        label: `${intl.formatMessage(portfolioMenuMessages.wallet)} (${mockData.tokenList.length})`,
         route: ROUTES.PORTFOLIO.ROOT,
         className: 'wallet',
       },

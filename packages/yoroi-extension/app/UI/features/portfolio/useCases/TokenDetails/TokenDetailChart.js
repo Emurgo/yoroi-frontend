@@ -27,7 +27,8 @@ const StyledButton = styled(Button)(({ theme }) => ({
 }));
 
 const TokenDetailChart = ({ isLoading, tokenInfo }) => {
-  const chartHeight = 250;
+  const isAda = tokenInfo.id === 'ada';
+  const chartHeight = isAda ? 156 : 241;
   const theme = useTheme();
   const { strings } = usePortfolio();
   const [buttonPeriodProps, setButtonPeriodProps] = useState([

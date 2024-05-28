@@ -7,6 +7,7 @@ import { usePortfolio } from '../../module/PortfolioContextProvider';
 import adaPng from '../../../../../assets/images/ada.png';
 
 const TokenDetailOverview = ({ tokenInfo, isLoading }) => {
+  const isAda = tokenInfo.id === 'ada';
   const theme = useTheme();
   const { strings } = usePortfolio();
 
@@ -76,53 +77,57 @@ const TokenDetailOverview = ({ tokenInfo, isLoading }) => {
           )}
         </Stack>
 
-        <Stack direction="column" spacing={theme.spacing(0.5)}>
-          {isLoading ? (
-            <Skeleton width="84px" height="20px" />
-          ) : (
-            <Typography fontWeight="500">{strings.policyId}</Typography>
-          )}
+        {isAda ? null : (
+          <>
+            <Stack direction="column" spacing={theme.spacing(0.5)}>
+              {isLoading ? (
+                <Skeleton width="84px" height="20px" />
+              ) : (
+                <Typography fontWeight="500">{strings.policyId}</Typography>
+              )}
 
-          <Stack direction="row" alignItems="flex-start" spacing={theme.spacing(2)}>
-            {isLoading ? (
-              <Box flex={1}>
-                <Skeleton height="20px" width="full" />
-                <Skeleton height="16px" width="53px" sx={{ marginTop: '5px' }} />
-              </Box>
-            ) : (
-              <Typography
-                sx={{ color: theme.palette.ds.text_gray_medium, wordBreak: 'break-word' }}
-              >
-                {tokenInfo.overview.policyId}
-              </Typography>
-            )}
-            <CopyButton disabled={isLoading} textToCopy={`${tokenInfo.overview.policyId}`} />
-          </Stack>
-        </Stack>
+              <Stack direction="row" alignItems="flex-start" spacing={theme.spacing(2)}>
+                {isLoading ? (
+                  <Box flex={1}>
+                    <Skeleton height="20px" width="full" />
+                    <Skeleton height="16px" width="53px" sx={{ marginTop: '5px' }} />
+                  </Box>
+                ) : (
+                  <Typography
+                    sx={{ color: theme.palette.ds.text_gray_medium, wordBreak: 'break-word' }}
+                  >
+                    {tokenInfo.overview.policyId}
+                  </Typography>
+                )}
+                <CopyButton disabled={isLoading} textToCopy={`${tokenInfo.overview.policyId}`} />
+              </Stack>
+            </Stack>
 
-        <Stack direction="column" spacing={theme.spacing(0.5)}>
-          {isLoading ? (
-            <Skeleton width="84px" height="20px" />
-          ) : (
-            <Typography fontWeight="500">{strings.fingerprint}</Typography>
-          )}
+            <Stack direction="column" spacing={theme.spacing(0.5)}>
+              {isLoading ? (
+                <Skeleton width="84px" height="20px" />
+              ) : (
+                <Typography fontWeight="500">{strings.fingerprint}</Typography>
+              )}
 
-          <Stack direction="row" alignItems="flex-start" spacing={theme.spacing(2)}>
-            {isLoading ? (
-              <Box flex={1}>
-                <Skeleton height="20px" width="full" />
-                <Skeleton height="16px" width="53px" sx={{ marginTop: '5px' }} />
-              </Box>
-            ) : (
-              <Typography
-                sx={{ color: theme.palette.ds.text_gray_medium, wordBreak: 'break-word' }}
-              >
-                {tokenInfo.overview.fingerprint}
-              </Typography>
-            )}
-            <CopyButton disabled={isLoading} textToCopy={`${tokenInfo.overview.fingerprint}`} />
-          </Stack>
-        </Stack>
+              <Stack direction="row" alignItems="flex-start" spacing={theme.spacing(2)}>
+                {isLoading ? (
+                  <Box flex={1}>
+                    <Skeleton height="20px" width="full" />
+                    <Skeleton height="16px" width="53px" sx={{ marginTop: '5px' }} />
+                  </Box>
+                ) : (
+                  <Typography
+                    sx={{ color: theme.palette.ds.text_gray_medium, wordBreak: 'break-word' }}
+                  >
+                    {tokenInfo.overview.fingerprint}
+                  </Typography>
+                )}
+                <CopyButton disabled={isLoading} textToCopy={`${tokenInfo.overview.fingerprint}`} />
+              </Stack>
+            </Stack>
+          </>
+        )}
 
         <Stack direction="column" spacing={theme.spacing(0.5)}>
           {isLoading ? (

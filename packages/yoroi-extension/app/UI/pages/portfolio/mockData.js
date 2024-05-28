@@ -172,8 +172,8 @@ const mockData = {
       ],
     },
     {
-      name: 'DOGE',
-      id: 'Doge',
+      name: 'ADA',
+      id: 'ada',
       price: 0.23,
       portfolioPercents: 68,
       '24h': -0.59,
@@ -186,10 +186,6 @@ const mockData = {
           "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
         website: 'https://www.cardano.org',
         detailOn: 'https://www.yoroiwallet.com',
-        policyId:
-          'asset155qynmnez65dr3tz5699wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzdv20el66l8j025e4g6k0kafjfv4ukawsly9ats',
-        fingerprint:
-          'asset399q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj1234',
       },
       performance: [
         { value: '0,277' },
