@@ -1,4 +1,4 @@
-import { Box, Button, Stack, styled, Typography, Divider } from '@mui/material';
+import { Box, Button, Stack, styled, Typography, Divider, SvgIcon } from '@mui/material';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   LineChart,
@@ -16,6 +16,7 @@ import ArrowIcon from '../../common/assets/icons/Arrow';
 import { Skeleton, Tooltip } from '../../../../components';
 import chartSkeletonPng from '../../common/assets/images/token-detail-chart-skeleton.png';
 import { Chip } from '../../common/chip';
+import moment from 'moment';
 
 const StyledButton = styled(Button)(({ theme }) => ({
   fontWeight: 500,
@@ -36,6 +37,10 @@ const TokenDetailChart = ({ isLoading, tokenInfo }) => {
     { label: '1Y', active: false },
     { label: 'ALL', active: false },
   ]);
+  const [detailInfo, setDetailInfo] = useState({
+    value: tokenInfo.chartData[0].value,
+    usd: tokenInfo.chartData[0].usd,
+  });
 
   const categorizeByTime = data => {
     const now = new Date();
@@ -110,6 +115,69 @@ const TokenDetailChart = ({ isLoading, tokenInfo }) => {
     );
   };
 
+  const CustomActiveDot = props => {
+    const { cx, cy, payload, value, index, length } = props;
+
+    const rectWidth = 93;
+    const rectHeight = 34;
+    const chartBottom = 250;
+    const rectMargin = 5;
+
+    let rectX = cx - rectWidth / 2;
+    if (index === 0) {
+      rectX = cx + rectMargin;
+    } else if (index === length - 1) {
+      rectX = cx - rectWidth - rectMargin;
+    } else {
+      rectX = cx - (index * rectWidth) / length;
+    }
+
+    const rectY = chartBottom - rectHeight - rectMargin;
+
+    return (
+      <svg>
+        <g>
+          <circle cx={cx} cy={cy} r={5} fill={theme.palette.ds.primary_c500} />
+
+          <line
+            x1={cx}
+            y1={cy}
+            x2={cx}
+            y2={rectY}
+            stroke={theme.palette.ds.primary_c500}
+            strokeDasharray="5,5"
+          />
+
+          <Box
+            component="rect"
+            x={rectX}
+            y={rectY}
+            width={rectWidth}
+            height={rectHeight}
+            fill={theme.palette.ds.primary_c500}
+            rx={5}
+            ry={5}
+          ></Box>
+          <Box
+            component="text"
+            x={rectX + rectWidth / 2}
+            y={rectY + rectHeight / 2}
+            textAnchor="middle"
+            fill={theme.palette.ds.primary_c200}
+            alignmentBaseline="middle"
+            sx={{
+              fontFamily: theme.typography.fontFamily,
+              fontSize: '0.75rem',
+              fontWeight: 400,
+            }}
+          >
+            {moment(payload.time).format('MM/DD/YY H:mm')}
+          </Box>
+        </g>
+      </svg>
+    );
+  };
+
   const handleChoosePeriod = label => {
     const tmp = buttonPeriodProps.map(item => {
       if (item.label === label) return { ...item, active: true };
@@ -121,61 +189,27 @@ const TokenDetailChart = ({ isLoading, tokenInfo }) => {
     setButtonPeriodProps(tmp);
   };
 
-  const CustomActiveDot = props => {
-    const { cx, cy, payload, value, index } = props;
+  const handleMouseMove = e => {
+    const value =
+      e.activePayload && e.activePayload.length > 0 ? e.activePayload[0].payload.value : null;
+    const usd =
+      e.activePayload && e.activePayload.length > 0 ? e.activePayload[0].payload.usd : null;
 
-    const rectWidth = 163;
-    const rectHeight = 20;
-    const rectYOffset = 50;
-    const chartBottom = 250;
-
-    // Calculate the position adjustment
-    let rectX = index * (rectWidth / filteredData.length);
-    if (index === 0) {
-      // If the active dot is the first dot, align the rectangle to the right
-      rectX = cx;
-    } else if (index === filteredData.length - 1) {
-      // If the active dot is the last dot, align the rectangle to the left
-      rectX = cx - rectWidth;
-    }
-
-    return (
-      <g>
-        <circle cx={cx} cy={cy} r={5} fill={theme.palette.ds.text_primary_medium} />
-
-        <line
-          x1={cx}
-          y1={cy}
-          x2={cx}
-          y2={chartBottom}
-          stroke={theme.palette.ds.text_primary_medium}
-          strokeDasharray="5,5"
-        />
-
-        <rect
-          x={rectX}
-          y={chartBottom + index * (rectWidth / filteredData.length)}
-          width={rectWidth}
-          height={rectHeight}
-          fill={theme.palette.ds.text_primary_medium}
-          rx={5}
-          ry={5}
-        />
-        <text
-          x={cx + (index / filteredData.length) * rectYOffset}
-          y={chartBottom + rectHeight / 2 + 5}
-          textAnchor="middle"
-          fill={theme.palette.ds.sys_magenta_c700}
-        >
-          {payload.time}
-        </text>
-      </g>
-    );
+    if (!value || !usd) return;
+    setDetailInfo({
+      value,
+      usd,
+    });
   };
 
   return (
     <Box sx={{ padding: theme.spacing(3) }}>
-      <Stack direction="row" justifyContent="space-between" alignItems="center">
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        sx={{ marginBottom: theme.spacing(4) }}
+      >
         {isLoading ? (
           <Skeleton width="131px" height="13px" />
         ) : (
@@ -189,7 +223,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo }) => {
           ) : (
             <Stack direction="row" alignItems="center">
               <Typography fontWeight="500" sx={{ marginBottom: theme.spacing(0.1125) }}>
-                {tokenInfo.price}
+                {detailInfo.value}
               </Typography>
               <Typography variant="caption1">&nbsp;USD</Typography>
             </Stack>
@@ -208,21 +242,21 @@ const TokenDetailChart = ({ isLoading, tokenInfo }) => {
                 <Skeleton width="35px" height="16px" />
               ) : (
                 <Chip
-                  active={tokenInfo.price > 0}
+                  active={detailInfo.value > 0}
                   label={
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
                       <ArrowIcon
                         fill={
-                          tokenInfo.price > 0
+                          detailInfo.value > 0
                             ? theme.palette.ds.secondary_c800
                             : theme.palette.ds.sys_magenta_c700
                         }
                         style={{
                           marginRight: theme.spacing(0.5),
-                          transform: tokenInfo.price > 0 ? '' : 'rotate(180deg)',
+                          transform: detailInfo.value > 0 ? '' : 'rotate(180deg)',
                         }}
                       />
-                      <Typography variant="caption1">{tokenInfo.price}%</Typography>
+                      <Typography variant="caption1">{detailInfo.value}%</Typography>
                     </Stack>
                   }
                 />
@@ -232,11 +266,11 @@ const TokenDetailChart = ({ isLoading, tokenInfo }) => {
                 <Skeleton width="35px" height="16px" />
               ) : (
                 <Chip
-                  active={tokenInfo.totalAmountUsd > 0}
+                  active={detailInfo.usd > 0}
                   label={
                     <Typography variant="caption1">
-                      {tokenInfo.totalAmountUsd > 0 ? '+' : '-'}
-                      {tokenInfo.totalAmountUsd} USD
+                      {detailInfo.usd > 0 ? '+' : '-'}
+                      {detailInfo.usd} USD
                     </Typography>
                   }
                 />
@@ -246,15 +280,18 @@ const TokenDetailChart = ({ isLoading, tokenInfo }) => {
         </Stack>
       </Stack>
 
-      <Box sx={{ userSelect: 'none', width: '100%', margin: '10px 0' }}>
+      <Box sx={{ userSelect: 'none', width: '100%' }}>
         <Box
           component={isLoading ? 'img' : 'div'}
           src={chartSkeletonPng}
-          sx={{ margin: '20px 0', width: '100%', height: '265px' }}
+          sx={{ margin: '20px 0', width: '100%', height: '250px' }}
         >
           {isLoading ? null : (
-            <ResponsiveContainer width="100%" height={265}>
-              <LineChart data={filteredData[buttonPeriodProps.find(item => item.active).label]}>
+            <ResponsiveContainer width="100%" height={250}>
+              <LineChart
+                data={filteredData[buttonPeriodProps.find(item => item.active).label]}
+                onMouseMove={handleMouseMove}
+              >
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <YAxis
                   axisLine={false}
@@ -265,7 +302,14 @@ const TokenDetailChart = ({ isLoading, tokenInfo }) => {
                 ></YAxis>
                 <RechartTooltip cursor={false} content={<></>} />
                 <Line
-                  activeDot={<CustomActiveDot />}
+                  activeDot={props => (
+                    <CustomActiveDot
+                      length={
+                        filteredData[buttonPeriodProps.find(item => item.active).label].length
+                      }
+                      {...props}
+                    />
+                  )}
                   dot={false}
                   type="monotone"
                   dataKey="value"
@@ -279,7 +323,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo }) => {
           )}
         </Box>
 
-        <Stack direction="row" justifyContent="space-between">
+        <Stack direction="row" justifyContent="space-between" sx={{ marginTop: theme.spacing(3) }}>
           {buttonPeriodProps.map(period => (
             <StyledButton
               key={period.label}

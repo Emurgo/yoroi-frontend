@@ -1,3 +1,12 @@
+// UTILS
+
+function getRandomDate(start, end) {
+  const date = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+  return date.toISOString();
+}
+const startDate = new Date(2023, 3, 4);
+const endDate = new Date(2024, 5, 28);
+
 // ALL THE MOCK DATA FOR RENDERING UI
 
 const mockData = {
@@ -35,31 +44,131 @@ const mockData = {
         { value: '0,00002' },
       ],
       chartData: [
-        { time: '05/26/2024 14:37', value: Math.random().toFixed(3) },
-        { time: '05/26/2024 18:37', value: Math.random().toFixed(3) },
-        { time: '05/26/2024 20:47', value: Math.random().toFixed(3) },
-        { time: '05/27/2024 09:12', value: Math.random().toFixed(3) },
-        { time: '05/01/2024 14:37', value: Math.random().toFixed(3) },
-        { time: '05/02/2024 18:21', value: Math.random().toFixed(3) },
-        { time: '05/03/2024 22:37', value: Math.random().toFixed(3) },
-        { time: '05/24/2024 13:37', value: Math.random().toFixed(3) },
-        { time: '05/24/2024 10:27', value: Math.random().toFixed(3) },
-        { time: '05/24/2024 08:18', value: Math.random().toFixed(3) },
-        { time: '08/17/2023 14:37', value: Math.random().toFixed(3) },
-        { time: '09/24/2023 14:37', value: Math.random().toFixed(3) },
-        { time: '08/17/2022 14:37', value: Math.random().toFixed(3) },
-        { time: '09/24/2022 14:37', value: Math.random().toFixed(3) },
-        { time: '08/17/2021 14:37', value: Math.random().toFixed(3) },
-        { time: '09/24/2021 14:37', value: Math.random().toFixed(3) },
-        { time: '05/23/2024 18:37', value: Math.random().toFixed(3) },
-        { time: '05/23/2024 20:37', value: Math.random().toFixed(3) },
-        { time: '05/20/2024 12:22', value: Math.random().toFixed(3) },
-        { time: '04/24/2024 12:22', value: Math.random().toFixed(3) },
-        { time: '04/24/2024 12:22', value: Math.random().toFixed(3) },
-        { time: '03/24/2024 04:22', value: Math.random().toFixed(3) },
-        { time: '03/24/2024 09:22', value: Math.random().toFixed(3) },
-        { time: '02/24/2024 18:22', value: Math.random().toFixed(3) },
-        { time: '01/24/2024 23:22', value: Math.random().toFixed(3) },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
       ],
     },
     {
@@ -95,28 +204,131 @@ const mockData = {
         { value: '0,00002' },
       ],
       chartData: [
-        { time: '05/24/2024 14:37', value: Math.random().toFixed(3) },
-        { time: '05/01/2024 14:37', value: Math.random().toFixed(3) },
-        { time: '05/02/2024 18:21', value: Math.random().toFixed(3) },
-        { time: '05/03/2024 22:37', value: Math.random().toFixed(3) },
-        { time: '05/24/2024 13:37', value: Math.random().toFixed(3) },
-        { time: '05/24/2024 10:27', value: Math.random().toFixed(3) },
-        { time: '05/24/2024 08:18', value: Math.random().toFixed(3) },
-        { time: '08/17/2023 14:37', value: Math.random().toFixed(3) },
-        { time: '09/24/2023 14:37', value: Math.random().toFixed(3) },
-        { time: '08/17/2022 14:37', value: Math.random().toFixed(3) },
-        { time: '09/24/2022 14:37', value: Math.random().toFixed(3) },
-        { time: '08/17/2021 14:37', value: Math.random().toFixed(3) },
-        { time: '09/24/2021 14:37', value: Math.random().toFixed(3) },
-        { time: '05/23/2024 18:37', value: Math.random().toFixed(3) },
-        { time: '05/23/2024 20:37', value: Math.random().toFixed(3) },
-        { time: '05/20/2024 12:22', value: Math.random().toFixed(3) },
-        { time: '04/24/2024 12:22', value: Math.random().toFixed(3) },
-        { time: '04/24/2024 12:22', value: Math.random().toFixed(3) },
-        { time: '03/24/2024 04:22', value: Math.random().toFixed(3) },
-        { time: '03/24/2024 09:22', value: Math.random().toFixed(3) },
-        { time: '02/24/2024 18:22', value: Math.random().toFixed(3) },
-        { time: '01/24/2024 23:22', value: Math.random().toFixed(3) },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
       ],
     },
     {
@@ -152,28 +364,131 @@ const mockData = {
         { value: '0,00002' },
       ],
       chartData: [
-        { time: '05/24/2024 14:37', value: Math.random().toFixed(3) },
-        { time: '05/01/2024 14:37', value: Math.random().toFixed(3) },
-        { time: '05/02/2024 18:21', value: Math.random().toFixed(3) },
-        { time: '05/03/2024 22:37', value: Math.random().toFixed(3) },
-        { time: '05/24/2024 13:37', value: Math.random().toFixed(3) },
-        { time: '05/24/2024 10:27', value: Math.random().toFixed(3) },
-        { time: '05/24/2024 08:18', value: Math.random().toFixed(3) },
-        { time: '08/17/2023 14:37', value: Math.random().toFixed(3) },
-        { time: '09/24/2023 14:37', value: Math.random().toFixed(3) },
-        { time: '08/17/2022 14:37', value: Math.random().toFixed(3) },
-        { time: '09/24/2022 14:37', value: Math.random().toFixed(3) },
-        { time: '08/17/2021 14:37', value: Math.random().toFixed(3) },
-        { time: '09/24/2021 14:37', value: Math.random().toFixed(3) },
-        { time: '05/23/2024 18:37', value: Math.random().toFixed(3) },
-        { time: '05/23/2024 20:37', value: Math.random().toFixed(3) },
-        { time: '05/20/2024 12:22', value: Math.random().toFixed(3) },
-        { time: '04/24/2024 12:22', value: Math.random().toFixed(3) },
-        { time: '04/24/2024 12:22', value: Math.random().toFixed(3) },
-        { time: '03/24/2024 04:22', value: Math.random().toFixed(3) },
-        { time: '03/24/2024 09:22', value: Math.random().toFixed(3) },
-        { time: '02/24/2024 18:22', value: Math.random().toFixed(3) },
-        { time: '01/24/2024 23:22', value: Math.random().toFixed(3) },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
+        {
+          time: getRandomDate(startDate, endDate),
+          value: Math.random().toFixed(3),
+          usd: Math.random().toFixed(3) * 1000,
+        },
       ],
     },
   ],
@@ -247,21 +562,6 @@ const mockData = {
           asset: '200 MILK',
         },
       },
-    ],
-  },
-
-  Chart: {
-    data: [
-      { name: 'Page A', value: 0.1 },
-      { name: 'Page B', value: 0.15 },
-      { name: 'Page C', value: 0.05 },
-      { name: 'Page D', value: 0.35 },
-      { name: 'Page E', value: 0.6 },
-      { name: 'Page F', value: 0.45 },
-      { name: 'Page G', value: 0.3 },
-      { name: 'Page H', value: 0.2 },
-      { name: 'Page I', value: 0.35 },
-      { name: 'Page J', value: 0.55 },
     ],
   },
 };
