@@ -7,15 +7,16 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import { useGouvernance } from '../../module/GouvernanceContextProvider';
+import { useGovernance } from '../../module/GouvernanceContextProvider';
 import { DRepIlustration } from '../../common/ilustrations/DRepIlustration';
 import { Abstein } from '../../common/ilustrations/Abstein';
 import { NoConfidance } from '../../common/ilustrations/NoConfidance';
 import { Stack } from '@mui/material';
 import { Button } from '@mui/material';
 import Link from '@mui/material/Link';
-import { useModal } from '../../../../context/ModalContext';
-
+import { useModal } from '../../../../components/modals/ModalContext';
+import { ChooseDRepModal } from '../../common/ChooseDRepModal';
+import { GovernanceProvider } from '@yoroi/staking';
 type Props = {|
   title: string,
   description: string,
@@ -75,7 +76,7 @@ const GovernanceCard = ({ title, description, icon, selected, onClick }: Props) 
 
 export const GouvernanceStatusSelection = (): Node => {
   const [selectedCard, setSelectedCard] = useState(null);
-  const { gouvernanceStatus, dRepId, strings } = useGouvernance();
+  const { gouvernanceStatus, dRepId, strings, gouvernanceManager } = useGovernance();
   const { openModal } = useModal();
 
   const pageTitle = gouvernanceStatus === 'none' ? 'Governance Status' : 'Governance status';
@@ -88,7 +89,15 @@ export const GouvernanceStatusSelection = (): Node => {
   const hasDRep = gouvernanceStatus === 'drep';
 
   const onChoosDRepClick = () => {
-    openModal('ChooseDRepModal', { title: 'Choose your Drep' });
+    openModal({
+      title: 'Choose your Drep',
+      content: (
+        <GovernanceProvider manager={gouvernanceManager}>
+          <ChooseDRepModal />
+        </GovernanceProvider>
+      ),
+      width: '648px',
+    });
   };
   const handleCardClick = card => {
     setSelectedCard(card);
