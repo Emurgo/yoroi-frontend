@@ -1,5 +1,6 @@
-// UTILS
+import { HistoryItemType } from '../../features/portfolio/useCases/TokenDetails/TransactionTable';
 
+// UTILS
 function getRandomDate(start, end) {
   const date = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
   return date.toISOString();
@@ -7,8 +8,7 @@ function getRandomDate(start, end) {
 const startDate = new Date('01-01-2023 8:30');
 const endDate = new Date('05-28-2024 11:40');
 
-// ALL THE MOCK DATA FOR RENDERING UI
-
+// ALL THE MOCK DATA FOR RENDERING UI NEW
 const mockData = {
   tokenList: [
     {
@@ -508,62 +508,70 @@ const mockData = {
     },
   },
 
-  PortfolioDetailPage: {
-    history: [
-      {
-        type: 'Sent',
-        time: '11:30 PM',
-        time: '05/23/2024',
-        status: 'Low',
-        fee: {
-          amount: '0.17 ADA',
-          usd: '0.03 USD',
-        },
-        amount: {
-          total: '1,169,789.34432 ADA',
-          usd: '0.03 USD',
-          asset: '200 MILK',
-        },
+  history: [
+    {
+      type: HistoryItemType.SENT,
+      time: '2024-05-28T06:28:00.000Z',
+      status: 'Low',
+      fee: {
+        amount: '0.17 ADA',
+        usd: '0.03 USD',
       },
-      {
-        type: 'Received',
-        time: '9:12 PM',
-        time: '05/23/2024',
-        status: 'Low',
-        amount: {
-          total: '1,169,789.34432 ADA',
-          usd: '312,323.33 USD',
-          asset: 2,
-        },
+      amount: {
+        total: '1,169,789.34432 ADA',
+        usd: '0.03 USD',
+        asset: '200 MILK',
       },
-      {
-        type: 'Transaction error',
-        time: '9:12 PM',
-        time: '05/22/2024',
-        status: 'Failed',
-        amount: {
-          total: '1,169,789.34432 ADA',
-          usd: '312,323.33 USD',
-          asset: 2,
-        },
+    },
+    {
+      type: HistoryItemType.RECEIVED,
+      time: '2024-05-27T08:25:00.000Z',
+      status: 'Low',
+      amount: {
+        total: '1,169,789.34432 ADA',
+        usd: '312,323.33 USD',
+        asset: 2,
       },
-      {
-        type: 'Sent',
-        time: '4:20 PM',
-        time: '05/20/2024',
-        status: 'Low',
-        fee: {
-          amount: '0.17 ADA',
-          usd: '0.03 USD',
-        },
-        amount: {
-          total: '1,169,789.34432 ADA',
-          usd: '0.03 USD',
-          asset: '200 MILK',
-        },
+    },
+    {
+      type: HistoryItemType.ERROR,
+      time: '2024-05-24T11:04:27.000Z',
+      status: 'Failed',
+      amount: {
+        total: '1,169,789.34432 ADA',
+        usd: '312,323.33 USD',
+        asset: 2,
       },
-    ],
-  },
+    },
+    {
+      type: HistoryItemType.WITHDRAW,
+      time: '2024-05-08T11:04:27.000Z',
+      status: 'Low',
+      fee: {
+        amount: '0.17 ADA',
+        usd: '0.03 USD',
+      },
+      amount: {
+        total: '1,169,789.34432 ADA',
+        usd: '0.03 USD',
+        asset: '200 MILK',
+      },
+    },
+    {
+      type: HistoryItemType.DELEGATE,
+      time: '2024-05-08T11:04:27.000Z',
+      status: 'Low',
+      fee: {
+        amount: '0.17 ADA',
+        usd: '0.03 USD',
+      },
+      amount: {
+        total: '1,169,789.34432 ADA',
+        usd: '0.03 USD',
+        asset: '200 MILK',
+      },
+    },
+  ],
 };
 
 export default mockData;

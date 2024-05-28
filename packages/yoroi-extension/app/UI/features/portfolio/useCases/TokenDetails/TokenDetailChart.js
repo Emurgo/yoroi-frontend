@@ -17,7 +17,6 @@ import { Skeleton, Tooltip } from '../../../../components';
 import chartSkeletonPng from '../../common/assets/images/token-detail-chart-skeleton.png';
 import { Chip } from '../../common/components/Chip';
 import moment from 'moment';
-import { default as _ } from 'lodash';
 
 const StyledButton = styled(Button)(({ theme }) => ({
   fontWeight: 500,

@@ -1053,7 +1053,15 @@
   "portfolio.transactionTable.headerText.amount": "Amount",
   "portfolio.transactionTable.timestamp.today": "Today",
   "portfolio.transactionTable.timestamp.yesterday": "Yesterday",
-  "portfolio.transactionTable.timestamp.inthepast": "In the past",
+  "portfolio.transactionTable.historyLabel.sent": "Sent",
+  "portfolio.transactionTable.historyLabel.received": "Received",
+  "portfolio.transactionTable.historyLabel.transactionError": "Transaction error",
+  "portfolio.transactionTable.historyLabel.rewardWithdraw": "Reward withdrawn",
+  "portfolio.transactionTable.historyLabel.stakeDelegate": "Stake delegated",
+  "portfolio.transactionTable.status.low": "Low",
+  "portfolio.transactionTable.status.high": "High",
+  "portfolio.transactionTable.status.failed": "Failed",
+  "portfolio.transactionTable.amount.assets": "assets",
   "gouvernace.delegateToDRep": "Delegate to a DRep",
   "gouvernace.designatingSomeoneElse": "You are designating someone else to cast your vote on your behalf for all proposals now and in the future."
 }

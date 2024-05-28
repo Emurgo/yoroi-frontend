@@ -159,9 +159,41 @@ export const messages = Object.freeze(
       id: 'portfolio.transactionTable.timestamp.yesterday',
       defaultMessage: '!!!Amount',
     },
-    inthepast: {
-      id: 'portfolio.transactionTable.timestamp.inthepast',
-      defaultMessage: '!!!In the past',
+    sent: {
+      id: 'portfolio.transactionTable.historyLabel.sent',
+      defaultMessage: '!!!Sent',
+    },
+    received: {
+      id: 'portfolio.transactionTable.historyLabel.received',
+      defaultMessage: '!!!Received',
+    },
+    transactionError: {
+      id: 'portfolio.transactionTable.historyLabel.transactionError',
+      defaultMessage: '!!!Transaction error',
+    },
+    rewardWithdraw: {
+      id: 'portfolio.transactionTable.historyLabel.rewardWithdraw',
+      defaultMessage: '!!!Reward withdrawn',
+    },
+    stakeDelegate: {
+      id: 'portfolio.transactionTable.historyLabel.stakeDelegate',
+      defaultMessage: '!!!Stake delegated',
+    },
+    low: {
+      id: 'portfolio.transactionTable.status.low',
+      defaultMessage: '!!!Low',
+    },
+    high: {
+      id: 'portfolio.transactionTable.status.high',
+      defaultMessage: '!!!High',
+    },
+    failed: {
+      id: 'portfolio.transactionTable.status.failed',
+      defaultMessage: '!!!Failed',
+    },
+    assets: {
+      id: 'portfolio.transactionTable.amount.assets',
+      defaultMessage: '!!!assets',
     },
   })
 );
@@ -207,6 +239,14 @@ export const getStrings = intl => {
     amount: intl.formatMessage(messages.amount),
     today: intl.formatMessage(messages.today),
     yesterday: intl.formatMessage(messages.yesterday),
-    inthepast: intl.formatMessage(messages.inthepast),
+    sent: intl.formatMessage(messages.sent),
+    received: intl.formatMessage(messages.received),
+    transactionError: intl.formatMessage(messages.transactionError),
+    rewardWithdraw: intl.formatMessage(messages.rewardWithdraw),
+    stakeDelegate: intl.formatMessage(messages.stakeDelegate),
+    low: intl.formatMessage(messages.low),
+    high: intl.formatMessage(messages.high),
+    failed: intl.formatMessage(messages.failed),
+    assets: intl.formatMessage(messages.assets),
   }).current;
 };

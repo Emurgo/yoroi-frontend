@@ -16,88 +16,148 @@ import { Card } from '../../../../components';
 import { default as ArrowIcon } from '../../common/assets/icons/transaction-history/Arrow';
 import { default as ExpandIcon } from '../../common/assets/icons/transaction-history/Expand';
 import { default as ErrorIcon } from '../../common/assets/icons/transaction-history/Error';
+import { default as WithdrawIcon } from '../../common/assets/icons/transaction-history/Withdraw';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
+import moment from 'moment';
+
+export const HistoryItemType = Object.freeze({
+  SENT: 1,
+  RECEIVED: 2,
+  ERROR: 3,
+  WITHDRAW: 4,
+  DELEGATE: 5,
+});
+
+const Container = styled(Box)(({ theme }) => ({
+  width: '100%',
+  margin: '30px 0 100px',
+}));
 
 const TransactionTable = ({ history }) => {
   const theme = useTheme();
   const { strings } = usePortfolio();
 
-  const timestamps = [strings.today, strings.yesterday, strings.inthepast];
-  const categorizeByTimestamp = data => {
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
+  const mapLabel = arr =>
+    arr.map(item => {
+      let labelTemp = '';
+      let statusTemp = '';
 
-    return data.reduce(
-      (acc, item) => {
-        const itemDate = new Date(item.date);
-        if (itemDate.toDateString() === today.toDateString()) {
-          acc[timestamps[0]].push(item);
-        } else if (itemDate.toDateString() === yesterday.toDateString()) {
-          acc[timestamps[1]].push(item);
-        } else {
-          acc[timestamps[2]].push(item);
-        }
-        return acc;
-      },
-      {
-        Today: [],
-        Yesterday: [],
-        'In the past': [],
+      switch (item.type) {
+        case HistoryItemType.SENT:
+          labelTemp = strings.sent;
+          break;
+        case HistoryItemType.RECEIVED:
+          labelTemp = strings.received;
+          break;
+        case HistoryItemType.ERROR:
+          labelTemp = strings.transactionError;
+          break;
+        case HistoryItemType.WITHDRAW:
+          labelTemp = strings.rewardWithdraw;
+          break;
+        case HistoryItemType.DELEGATE:
+          labelTemp = strings.stakeDelegate;
+          break;
+
+        default:
+          break;
       }
-    );
-  };
 
-  const categorizedData = useMemo(() => categorizeByTimestamp(history), [history]);
+      switch (item.status) {
+        case 'Low':
+          statusTemp = strings.low;
+          break;
+        case 'High':
+          statusTemp = strings.high;
+          break;
+        case 'Failed':
+          statusTemp = strings.failed;
+          break;
+        default:
+          break;
+      }
 
-  
+      return {
+        ...item,
+        label: labelTemp,
+        status: statusTemp,
+      };
+    });
+
+  const groupedData = useMemo(() => {
+    if (!history) return [];
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+
+    return _.chain(mapLabel(history))
+      .groupBy(t => {
+        const time = new Date(t.time);
+        time.setHours(0, 0, 0, 0); // set the time to 00:00:00 for grouping by day
+        return time.toISOString();
+      })
+      .map((data, title) => ({
+        title:
+          new Date(title).getDate() === today.getDate()
+            ? strings.today
+            : new Date(title).getDate() === yesterday.getDate()
+            ? strings.yesterday
+            : moment(title).format('MMMM DD, YYYY'),
+        data,
+      }))
+      .value();
+  }, [history]);
+
   return (
     <Container>
       <Card>
-        <Box sx={{ padding: '20px' }}>
-          <Typography fontWeight="500">{strings.transactionHistory}</Typography>
+        <Box sx={{ padding: theme.spacing(3) }}>
+          <Typography fontWeight="500" sx={{ color: theme.palette.ds.black_static }}>
+            {strings.transactionHistory}
+          </Typography>
           <Table
             sx={{
-              marginTop: '25px',
+              marginTop: theme.spacing(3),
             }}
             aria-label="transaction history table"
           >
             <TableHead>
               <TableRow>
                 <TableCell>
-                  <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
+                  <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium }}>
                     {strings.transactionType}
                   </Typography>
                 </TableCell>
                 <TableCell>
-                  <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
+                  <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium }}>
                     {strings.status}
                   </Typography>
                 </TableCell>
                 <TableCell align="center">
-                  <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
+                  <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium }}>
                     {strings.fee}
                   </Typography>
                 </TableCell>
                 <TableCell align="right">
-                  <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
+                  <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium }}>
                     {strings.amount}
                   </Typography>
                 </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {timestamps.map((timestamp, index) => (
+              {groupedData.map((item, index) => (
                 <>
                   <Typography
+                    variant="body2"
                     sx={{
                       color: theme.palette.ds.text_gray_medium,
-                      marginTop: index ? '10px' : '20px',
+                      marginTop: theme.spacing(3),
                     }}
                   >
-                    {timestamp}
+                    {item.title}
                   </Typography>
-                  {categorizedData[timestamp].map((row, index) => (
+                  {item.data.map((row, index) => (
                     <TableRow key={index} sx={{ '& td, & th': { border: 0 } }}>
                       <TableCell key={index}>
                         <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
@@ -106,29 +166,33 @@ const TransactionTable = ({ history }) => {
                               width: '48px',
                               height: '48px',
                               backgroundColor:
-                                row.type === 'Sent'
+                                row.type === HistoryItemType.SENT ||
+                                row.type === HistoryItemType.DELEGATE
                                   ? theme.palette.ds.primary_c100
-                                  : row.type === 'Received'
+                                  : row.type === HistoryItemType.RECEIVED ||
+                                    row.type === HistoryItemType.WITHDRAW
                                   ? theme.palette.ds.secondary_c100
                                   : theme.palette.ds.sys_magenta_c100,
                               '&:hover': {
                                 backgroundColor:
-                                  row.type === 'Sent'
+                                  row.type === HistoryItemType.SENT ||
+                                  row.type === HistoryItemType.DELEGATE
                                     ? theme.palette.ds.primary_c100
-                                    : row.type === 'Received'
+                                    : row.type === HistoryItemType.RECEIVED ||
+                                      row.type === HistoryItemType.WITHDRAW
                                     ? theme.palette.ds.secondary_c100
                                     : theme.palette.ds.sys_magenta_c100,
                               },
                             }}
                           >
-                            {row.type === 'Sent' && (
+                            {row.type === HistoryItemType.SENT && (
                               <ArrowIcon
                                 stroke={theme.palette.ds.text_primary_medium}
                                 width="24px"
                                 height="24px"
                               />
                             )}
-                            {row.type === 'Received' && (
+                            {row.type === HistoryItemType.RECEIVED && (
                               <ArrowIcon
                                 stroke={theme.palette.ds.text_success}
                                 width="24px"
@@ -136,21 +200,37 @@ const TransactionTable = ({ history }) => {
                                 style={{ transform: 'rotate(180deg)' }}
                               />
                             )}
-                            {row.type === 'Transaction error' && (
+                            {row.type === HistoryItemType.ERROR && (
                               <ErrorIcon
                                 fill={theme.palette.ds.text_error}
                                 width="24px"
                                 height="24px"
                               />
                             )}
+                            {row.type === HistoryItemType.WITHDRAW && (
+                              <WithdrawIcon
+                                fill={theme.palette.ds.text_success}
+                                width="24px"
+                                height="24px"
+                              />
+                            )}
+                            {row.type === HistoryItemType.DELEGATE && (
+                              <WithdrawIcon
+                                fill={theme.palette.ds.text_primary_medium}
+                                width="24px"
+                                height="24px"
+                              />
+                            )}
                           </IconButton>
                           <Stack direction="column">
-                            <Typography>{row.type}</Typography>
+                            <Typography sx={{ color: theme.palette.ds.text_gray_normal }}>
+                              {row.label}
+                            </Typography>
                             <Typography
                               variant="caption1"
                               sx={{ color: theme.palette.ds.text_gray_medium }}
                             >
-                              {row.time}
+                              {moment.utc(row.time).local().format('h:mm A')}
                             </Typography>
                           </Stack>
                         </Stack>
@@ -161,7 +241,7 @@ const TransactionTable = ({ history }) => {
                             color:
                               row.status === 'Failed'
                                 ? theme.palette.ds.text_error
-                                : theme.palette.ds.black_static,
+                                : theme.palette.ds.text_gray_normal,
                           }}
                         >
                           {row.status}
@@ -169,28 +249,52 @@ const TransactionTable = ({ history }) => {
                       </TableCell>
                       <TableCell align="center">
                         <Stack direction="column">
-                          <Typography fontWeight="500">{row.fee ? row.fee.amount : '-'}</Typography>
-                          <Typography>{row.fee ? row.fee.usd : '-'}</Typography>
+                          <Typography
+                            fontWeight="500"
+                            sx={{ color: theme.palette.ds.text_gray_normal }}
+                          >
+                            {row.fee ? row.fee.amount : '-'}
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            sx={{ color: theme.palette.ds.text_gray_medium }}
+                          >
+                            {row.fee ? row.fee.usd : '-'}
+                          </Typography>
                         </Stack>
                       </TableCell>
                       <TableCell>
                         <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
                           <Stack direction="column">
-                            <Typography fontWeight="500" sx={{ textAlign: 'right' }}>
-                              {row.type === 'Received' && '+'}
+                            <Typography
+                              fontWeight="500"
+                              sx={{ textAlign: 'right', color: theme.palette.ds.text_gray_normal }}
+                            >
+                              {row.type === HistoryItemType.RECEIVED && '+'}
                               {row.amount.total}
                             </Typography>
-                            <Typography sx={{ textAlign: 'right' }}>
-                              {row.type === 'Received' && '+'}
+                            <Typography
+                              variant="body2"
+                              sx={{ textAlign: 'right', color: theme.palette.ds.text_gray_medium }}
+                            >
+                              {row.type === HistoryItemType.RECEIVED && '+'}
                               {row.amount.usd}
                             </Typography>
-                            {row.type === 'Received' && (
-                              <Typography fontWeight="500" sx={{ textAlign: 'right' }}>
-                                + {row.amount.asset} assets
+                            {row.type === HistoryItemType.RECEIVED && (
+                              <Typography
+                                variant="body2"
+                                fontWeight="500"
+                                sx={{ textAlign: 'right' }}
+                              >
+                                + {row.amount.asset} {strings.assets}
                               </Typography>
                             )}
                             {row.type === 'Sent' && (
-                              <Typography fontWeight="500" sx={{ textAlign: 'right' }}>
+                              <Typography
+                                variant="body2"
+                                fontWeight="500"
+                                sx={{ textAlign: 'right' }}
+                              >
                                 {row.amount.asset}
                               </Typography>
                             )}
@@ -209,10 +313,5 @@ const TransactionTable = ({ history }) => {
     </Container>
   );
 };
-
-const Container = styled(Box)({
-  width: '100%',
-  margin: '30px 0 100px',
-});
 
 export default TransactionTable;

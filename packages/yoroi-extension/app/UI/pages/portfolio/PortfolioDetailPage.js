@@ -21,7 +21,7 @@ const PortfolioDetailPage = ({ stores, actions, match }: Props) => {
 
   return (
     <PortfolioPageLayout stores={stores} actions={actions}>
-      <TokenDetails tokenInfo={tokenInfo} mockHistory={mockData.PortfolioDetailPage.history} />
+      <TokenDetails tokenInfo={tokenInfo} mockHistory={mockData.history} />
     </PortfolioPageLayout>
   );
 };

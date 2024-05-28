@@ -9,7 +9,12 @@ export const Skeleton = props => {
       variant="rectangular"
       animation={false}
       {...props}
-      sx={{ borderRadius: `${theme.shape.borderRadius}px`, ...props.sx }}
+      sx={{
+        borderRadius: `${theme.shape.borderRadius}px`,
+        backgroundColor: theme.palette.ds.gray_c100,
+        opacity: 0.8,
+        ...props.sx,
+      }}
     />
   );
 };
