@@ -3,14 +3,14 @@ import { Component } from 'react';
 import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import environmnent from '../../../../environment';
-import { ROUTES } from '../../../../routes-config';
-import globalMessages from '../../../../i18n/global-messages';
+import environmnent from '../../../../../environment';
+import { ROUTES } from '../../../../../routes-config';
+import globalMessages from '../../../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { withLayout } from '../../../../styles/context/layout';
+import { withLayout } from '../../../../../styles/context/layout';
 import type { InjectedLayoutProps } from '../../styles/context/layout';
 import type { SubMenuOption } from '../topbar/SubMenu';
-import SubMenu from '../../../../components/topbar/SubMenu';
+import SubMenu from '../../../../../components/topbar/SubMenu';
 
 export const portfolioMenuMessages: Object = defineMessages({
   wallet: {

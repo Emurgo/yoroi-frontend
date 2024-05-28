@@ -1,7 +1,7 @@
 import React from 'react';
 import { Stack, Box, Typography, Link, Button } from '@mui/material';
-import { Skeleton } from '../../../../components/skeleton';
-import { CopyButton } from '../../../../components/copy-button';
+import { Skeleton } from '../../../../components/Skeleton';
+import { CopyButton } from '../../../../components/Button/CopyButton';
 import { useTheme } from '@mui/material/styles';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import adaPng from '../../../../../assets/images/ada.png';

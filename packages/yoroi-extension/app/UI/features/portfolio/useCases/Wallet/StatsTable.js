@@ -12,11 +12,11 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { default as SortIcon } from '../../common/assets/icons/Sort';
-import { useNavigateTo } from '../../common/useNavigateTo';
+import { useNavigateTo } from '../../common/hooks/useNavigateTo';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import ArrowIcon from '../../common/assets/icons/Arrow';
 import adaPng from '../../../../../assets/images/ada.png';
-import { Chip } from '../../common/chip';
+import { Chip } from '../../common/components/Chip';
 
 const StatsTable = ({ data }) => {
   const theme = useTheme();

@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
 import { IconButton } from '@mui/material';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import CopyIcon from './icons/Copy';
-import CopiedIcon from './icons/Copied';
-import { Tooltip } from './tooltip';
+import CopyIcon from '../icons/Copy';
+import CopiedIcon from '../icons/Copied';
+import { Tooltip } from '../Tooltip';
 
-export const CopyButton = ({ textToCopy, disabled, ...props }) => {
+interface Props {
+  textToCopy: string;
+  disabled: boolean;
+}
+
+export const CopyButton = ({ textToCopy, disabled, ...props }: Props) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {

@@ -1,6 +1,6 @@
 import { useHistory } from 'react-router-dom';
 import React, { useRef } from 'react';
-import { ROUTES } from '../../../../routes-config';
+import { ROUTES } from '../../../../../routes-config';
 
 export const useNavigateTo = () => {
   const history = useHistory();

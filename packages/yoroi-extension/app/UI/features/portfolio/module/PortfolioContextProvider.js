@@ -11,7 +11,7 @@ import {
   PortfolioActions,
 } from './state';
 
-import { getStrings } from '../common/useStrings';
+import { getStrings } from '../common/hooks/useStrings';
 
 const initialPortfolioProvider = {
   ...defaultPortfolioState,

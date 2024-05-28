@@ -49,6 +49,8 @@ const TransactionTable = ({ history }) => {
   };
 
   const categorizedData = useMemo(() => categorizeByTimestamp(history), [history]);
+
+  
   return (
     <Container>
       <Card>

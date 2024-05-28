@@ -8,7 +8,7 @@ import { usePortfolio } from '../../module/PortfolioContextProvider';
 import StatsTable from './StatsTable';
 import mockData from '../../../../pages/portfolio/mockData';
 import ArrowIcon from '../../common/assets/icons/Arrow';
-import {Chip} from '../../common/chip';
+import { Chip } from '../../common/components/Chip';
 
 const PortfolioWallet = ({ data }) => {
   const theme = useTheme();

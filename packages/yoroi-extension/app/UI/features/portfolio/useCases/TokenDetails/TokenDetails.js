@@ -20,7 +20,7 @@ import SubMenu from '../../../../../components/topbar/SubMenu';
 import Arrow from '../../common/assets/icons/Arrow';
 import { useTheme } from '@mui/material/styles';
 import mockData from '../../../../pages/portfolio/mockData';
-import { useNavigateTo } from '../../common/useNavigateTo';
+import { useNavigateTo } from '../../common/hooks/useNavigateTo';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import TokenDetailPerformance from './TokenDetailPerformance';
 import TokenDetailOverview from './TokenDetailOverview';

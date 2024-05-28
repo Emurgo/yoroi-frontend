@@ -15,7 +15,7 @@ import { usePortfolio } from '../../module/PortfolioContextProvider';
 import ArrowIcon from '../../common/assets/icons/Arrow';
 import { Skeleton, Tooltip } from '../../../../components';
 import chartSkeletonPng from '../../common/assets/images/token-detail-chart-skeleton.png';
-import { Chip } from '../../common/chip';
+import { Chip } from '../../common/components/Chip';
 import moment from 'moment';
 import { default as _ } from 'lodash';
 
