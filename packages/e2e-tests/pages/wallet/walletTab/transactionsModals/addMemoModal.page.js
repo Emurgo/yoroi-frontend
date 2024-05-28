@@ -53,6 +53,7 @@ class AddMemoDialog extends BasePage {
   // * enter memo
   async enterMemo(memoText) {
     this.logger.info(`AddMemoDialog::enterMemo is called. Memo text: ${memoText}`);
+    await this.click(this.addMemoDialogInputLocator);
     await this.input(this.addMemoDialogInputLocator, memoText);
   }
   // * get error message
@@ -64,7 +65,7 @@ class AddMemoDialog extends BasePage {
 
   // * press add
   async pressAdd() {
-    this.logger.info(`AddMemoDialog::getMemoErrorMsg is called.`);
+    this.logger.info(`AddMemoDialog::pressAdd is called.`);
     await this.click(this.addMemoDialogAddButtonLocator);
   }
 }
