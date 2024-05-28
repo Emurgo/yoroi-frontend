@@ -17,6 +17,7 @@ import { Skeleton, Tooltip } from '../../../../components';
 import chartSkeletonPng from '../../common/assets/images/token-detail-chart-skeleton.png';
 import { Chip } from '../../common/chip';
 import moment from 'moment';
+import { default as _ } from 'lodash';
 
 const StyledButton = styled(Button)(({ theme }) => ({
   fontWeight: 500,
@@ -27,6 +28,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
 }));
 
 const TokenDetailChart = ({ isLoading, tokenInfo }) => {
+  const chartHeight = 250;
   const theme = useTheme();
   const { strings } = usePortfolio();
   const [buttonPeriodProps, setButtonPeriodProps] = useState([
@@ -45,40 +47,39 @@ const TokenDetailChart = ({ isLoading, tokenInfo }) => {
   const categorizeByTime = data => {
     const now = new Date();
 
-    const todayStart = new Date(now);
+    const yesterday = new Date(now);
+    yesterday.setDate(now.getDate() - 1);
 
-    const yesterdayStart = new Date(todayStart);
-    yesterdayStart.setDate(todayStart.getDate() - 1);
+    const oneWeekAgo = new Date(now);
+    oneWeekAgo.setDate(now.getDate() - 7);
 
-    const oneWeekAgo = new Date(todayStart);
-    oneWeekAgo.setDate(todayStart.getDate() - 7);
+    const oneMonthAgo = new Date(now);
+    oneMonthAgo.setMonth(now.getMonth() - 1);
 
-    const oneMonthAgo = new Date(todayStart);
-    oneMonthAgo.setMonth(todayStart.getMonth() - 1);
+    const sixMonthsAgo = new Date(now);
+    sixMonthsAgo.setMonth(now.getMonth() - 6);
 
-    const sixMonthsAgo = new Date(todayStart);
-    sixMonthsAgo.setMonth(todayStart.getMonth() - 6);
+    const oneYearAgo = new Date(now);
+    oneYearAgo.setFullYear(now.getFullYear() - 1);
 
-    const oneYearAgo = new Date(todayStart);
-    oneYearAgo.setFullYear(todayStart.getFullYear() - 1);
-
-    const categorizedData = data.reduce(
+    const categorizedData = _.reduce(
+      data,
       (acc, item) => {
         const itemTime = new Date(item.time);
 
-        if (itemTime >= yesterdayStart && itemTime < todayStart) {
+        if (itemTime >= yesterday) {
           acc['24H'].push(item);
         }
-        if (itemTime >= oneWeekAgo && itemTime < todayStart) {
+        if (itemTime >= oneWeekAgo) {
           acc['1W'].push(item);
         }
-        if (itemTime >= oneMonthAgo && itemTime < todayStart) {
+        if (itemTime >= oneMonthAgo) {
           acc['1M'].push(item);
         }
-        if (itemTime >= sixMonthsAgo && itemTime < todayStart) {
+        if (itemTime >= sixMonthsAgo) {
           acc['6M'].push(item);
         }
-        if (itemTime >= oneYearAgo && itemTime < todayStart) {
+        if (itemTime >= oneYearAgo) {
           acc['1Y'].push(item);
         }
 
@@ -96,8 +97,8 @@ const TokenDetailChart = ({ isLoading, tokenInfo }) => {
       }
     );
 
-    Object.keys(categorizedData).forEach(key => {
-      categorizedData[key].sort((a, b) => new Date(a.date) - new Date(b.date));
+    _.forEach(categorizedData, (value, key) => {
+      categorizedData[key] = _.sortBy(value, ['time']);
     });
 
     return categorizedData;
@@ -116,23 +117,18 @@ const TokenDetailChart = ({ isLoading, tokenInfo }) => {
   };
 
   const CustomActiveDot = props => {
-    const { cx, cy, payload, value, index, length } = props;
-
-    const rectWidth = 93;
-    const rectHeight = 34;
-    const chartBottom = 250;
-    const rectMargin = 5;
+    const { cx, cy, payload, value, index, dataLength, chartBottom, rectWidth, rectHeight } = props;
 
     let rectX = cx - rectWidth / 2;
     if (index === 0) {
-      rectX = cx + rectMargin;
-    } else if (index === length - 1) {
-      rectX = cx - rectWidth - rectMargin;
+      rectX = cx;
+    } else if (index === dataLength - 1) {
+      rectX = cx - rectWidth;
     } else {
-      rectX = cx - (index * rectWidth) / length;
+      rectX = cx - (index * rectWidth) / dataLength;
     }
 
-    const rectY = chartBottom - rectHeight - rectMargin;
+    const rectY = chartBottom - rectHeight;
 
     return (
       <svg>
@@ -284,10 +280,10 @@ const TokenDetailChart = ({ isLoading, tokenInfo }) => {
         <Box
           component={isLoading ? 'img' : 'div'}
           src={chartSkeletonPng}
-          sx={{ margin: '20px 0', width: '100%', height: '250px' }}
+          sx={{ margin: '20px 0', width: '100%', height: `${chartHeight}px` }}
         >
           {isLoading ? null : (
-            <ResponsiveContainer width="100%" height={250}>
+            <ResponsiveContainer width="100%" height={chartHeight}>
               <LineChart
                 data={filteredData[buttonPeriodProps.find(item => item.active).label]}
                 onMouseMove={handleMouseMove}
@@ -304,7 +300,10 @@ const TokenDetailChart = ({ isLoading, tokenInfo }) => {
                 <Line
                   activeDot={props => (
                     <CustomActiveDot
-                      length={
+                      chartBottom={chartHeight}
+                      rectWidth={93}
+                      rectHeight={34}
+                      dataLength={
                         filteredData[buttonPeriodProps.find(item => item.active).label].length
                       }
                       {...props}

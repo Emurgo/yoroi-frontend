@@ -4,8 +4,8 @@ function getRandomDate(start, end) {
   const date = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
   return date.toISOString();
 }
-const startDate = new Date(2023, 3, 4);
-const endDate = new Date(2024, 5, 28);
+const startDate = new Date('01-01-2023 8:30');
+const endDate = new Date('05-28-2024 11:40');
 
 // ALL THE MOCK DATA FOR RENDERING UI
 
@@ -45,7 +45,7 @@ const mockData = {
       ],
       chartData: [
         {
-          time: getRandomDate(startDate, endDate),
+          time: '2024-05-28T04:43:27.000Z',
           value: Math.random().toFixed(3),
           usd: Math.random().toFixed(3) * 1000,
         },
