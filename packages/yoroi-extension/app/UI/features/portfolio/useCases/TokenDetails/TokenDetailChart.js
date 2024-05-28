@@ -25,18 +25,6 @@ const StyledButton = styled(Button)(({ theme }) => ({
   height: '30px',
 }));
 
-const CustomActiveDot = props => {
-  const { cx, cy, payload, onMouseMove } = props;
-
-  const handleMouseMove = event => {
-    if (onMouseMove) {
-      onMouseMove(event, payload);
-    }
-  };
-
-  return <circle cx={cx} cy={cy} r={5} fill="red" stroke="none" onMouseMove={handleMouseMove} />;
-};
-
 const TokenDetailChart = ({ isLoading, tokenInfo }) => {
   const theme = useTheme();
   const { strings } = usePortfolio();
@@ -133,8 +121,56 @@ const TokenDetailChart = ({ isLoading, tokenInfo }) => {
     setButtonPeriodProps(tmp);
   };
 
-  const handleMouseMove = (event, payload) => {
-    console.log('Mouse Move:', payload);
+  const CustomActiveDot = props => {
+    const { cx, cy, payload, value, index } = props;
+
+    const rectWidth = 163;
+    const rectHeight = 20;
+    const rectYOffset = 50;
+    const chartBottom = 250;
+
+    // Calculate the position adjustment
+    let rectX = index * (rectWidth / filteredData.length);
+    if (index === 0) {
+      // If the active dot is the first dot, align the rectangle to the right
+      rectX = cx;
+    } else if (index === filteredData.length - 1) {
+      // If the active dot is the last dot, align the rectangle to the left
+      rectX = cx - rectWidth;
+    }
+
+    return (
+      <g>
+        <circle cx={cx} cy={cy} r={5} fill={theme.palette.ds.text_primary_medium} />
+
+        <line
+          x1={cx}
+          y1={cy}
+          x2={cx}
+          y2={chartBottom}
+          stroke={theme.palette.ds.text_primary_medium}
+          strokeDasharray="5,5"
+        />
+
+        <rect
+          x={rectX}
+          y={chartBottom + index * (rectWidth / filteredData.length)}
+          width={rectWidth}
+          height={rectHeight}
+          fill={theme.palette.ds.text_primary_medium}
+          rx={5}
+          ry={5}
+        />
+        <text
+          x={cx + (index / filteredData.length) * rectYOffset}
+          y={chartBottom + rectHeight / 2 + 5}
+          textAnchor="middle"
+          fill={theme.palette.ds.sys_magenta_c700}
+        >
+          {payload.time}
+        </text>
+      </g>
+    );
   };
 
   return (
@@ -227,7 +263,9 @@ const TokenDetailChart = ({ isLoading, tokenInfo }) => {
                   type={'number'}
                   tick={CustomYAxisTick}
                 ></YAxis>
+                <RechartTooltip cursor={false} content={<></>} />
                 <Line
+                  activeDot={<CustomActiveDot />}
                   dot={false}
                   type="monotone"
                   dataKey="value"
