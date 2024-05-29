@@ -16,6 +16,7 @@ const PortfolioWallet = ({ data }) => {
   const { strings } = usePortfolio();
   const [keyword, setKeyword] = useState('');
   const [isLoading, setIsLoading] = useState();
+  const [tokenList, setTokenList] = useState(data);
 
   useEffect(() => {
     // FAKE FETCHING DATA TO SEE SKELETON
@@ -27,6 +28,27 @@ const PortfolioWallet = ({ data }) => {
 
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (!keyword) {
+      setTokenList(data);
+      return;
+    }
+
+    const lowercaseKeyword = keyword.toLowerCase();
+
+    const temp = tokenList.filter(item => {
+      return (
+        item.name.toLowerCase().includes(lowercaseKeyword) ||
+        item.id.toLowerCase().includes(lowercaseKeyword)
+      );
+    });
+    if (temp && temp.length > 0) {
+      setTokenList(temp);
+    } else {
+      setTokenList([]);
+    }
+  }, [keyword]);
 
   return (
     <Box>
@@ -147,7 +169,7 @@ const PortfolioWallet = ({ data }) => {
           }
         />
       </Stack>
-      <StatsTable data={data} isLoading={isLoading} />
+      <StatsTable data={tokenList} isLoading={isLoading} />
     </Box>
   );
 };

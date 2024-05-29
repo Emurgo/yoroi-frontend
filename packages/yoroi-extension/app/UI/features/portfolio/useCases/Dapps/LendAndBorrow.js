@@ -1,0 +1,23 @@
+import React from 'react';
+import { Box, Stack, Typography } from '@mui/material';
+import { useTheme } from '@mui/material';
+import illustrationPng from '../../common/assets/images/illustration.png';
+import { usePortfolio } from '../../module/PortfolioContextProvider';
+
+const LendAndBorrow = () => {
+  const theme = useTheme();
+  const { strings } = usePortfolio();
+
+  return (
+    <Stack width="full" justifyContent="center" alignItems="center" sx={{ flex: 1 }}>
+      <Stack direction="column" alignItems="center" spacing={theme.spacing(3)}>
+        <Box component="img" src={illustrationPng}></Box>
+        <Typography variant="h4" fontWeight="500" sx={{ color: theme.palette.ds.black_static }}>
+          {strings.soonAvailable}
+        </Typography>
+      </Stack>
+    </Stack>
+  );
+};
+
+export default LendAndBorrow;

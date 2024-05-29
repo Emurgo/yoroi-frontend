@@ -10,6 +10,7 @@ export const Chip = props => {
       label={props.label}
       {...props}
       sx={{
+        maxWidth: 'fit-content',
         backgroundColor: props.active
           ? theme.palette.ds.secondary_c100
           : theme.palette.ds.sys_magenta_c100,

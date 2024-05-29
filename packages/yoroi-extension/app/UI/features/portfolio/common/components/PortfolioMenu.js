@@ -40,12 +40,16 @@ class PortfolioMenu extends Component<Props & InjectedLayoutProps> {
     const isProduction = environmnent.isProduction();
     const portfolioOptions: Array<SubMenuOption> = [
       {
-        label: `${intl.formatMessage(portfolioMenuMessages.wallet)} (${mockData.tokenList.length})`,
+        label: `${intl.formatMessage(portfolioMenuMessages.wallet)} (${
+          mockData.wallet.tokenList.length
+        })`,
         route: ROUTES.PORTFOLIO.ROOT,
         className: 'wallet',
       },
       {
-        label: `${intl.formatMessage(portfolioMenuMessages.dapps)} (10)`,
+        label: `${intl.formatMessage(portfolioMenuMessages.dapps)} (${
+          mockData.dapps.liquidityList.length + mockData.dapps.orderList.length
+        })`,
         route: ROUTES.PORTFOLIO.DAPPS,
         className: 'dapps',
       },

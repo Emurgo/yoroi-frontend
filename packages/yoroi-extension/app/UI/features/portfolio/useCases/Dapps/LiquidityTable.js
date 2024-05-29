@@ -1,0 +1,319 @@
+import React, { useCallback, useState } from 'react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  TableSortLabel,
+  Typography,
+  Stack,
+  Box,
+} from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import { default as SortIcon } from '../../common/assets/icons/Sort';
+import { useNavigateTo } from '../../common/hooks/useNavigateTo';
+import { usePortfolio } from '../../module/PortfolioContextProvider';
+import ArrowIcon from '../../common/assets/icons/Arrow';
+import adaPng from '../../../../../assets/images/ada.png';
+import hoskyPng from '../../common/assets/images/hosky-token.png';
+import minswapPng from '../../common/assets/images/minswap-dex.png';
+import { Chip } from '../../common/components/Chip';
+import { Skeleton } from '../../../../components/Skeleton';
+
+const TableRowSkeleton = ({ id, theme }) => (
+  <TableRow
+    key={id}
+    sx={{
+      '& td': { border: 0 },
+    }}
+  >
+    <TableCell>
+      <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
+        <Skeleton width="40px" height="40px" />
+        <Stack direction="column" spacing={theme.spacing(0.25)}>
+          <Skeleton width="55px" height="24px" />
+          <Skeleton width="55px" height="16px" />
+        </Stack>
+      </Stack>
+    </TableCell>
+
+    <TableCell>
+      <Skeleton width="126px" height="24px" />
+    </TableCell>
+
+    <TableCell>
+      <Skeleton width="62px" height="20px" />
+    </TableCell>
+
+    <TableCell>
+      <Skeleton width="62px" height="20px" />
+    </TableCell>
+
+    <TableCell>
+      <Skeleton width="62px" height="20px" />
+    </TableCell>
+
+    <TableCell>
+      <Skeleton width="146px" height="24px" />
+    </TableCell>
+
+    <TableCell>
+      <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
+        <Stack direction="column" spacing={theme.spacing(0.25)}>
+          <Skeleton width="146px" height="24px" />
+          <Skeleton width="146px" height="16px" />
+        </Stack>
+      </Stack>
+    </TableCell>
+  </TableRow>
+);
+
+const LiquidityTable = ({ data, isLoading }) => {
+  const theme = useTheme();
+  const navigateTo = useNavigateTo();
+  const { strings } = usePortfolio();
+  const [{ order, orderBy }, setSortState] = useState({
+    order: null,
+    orderBy: null,
+  });
+
+  const headCells = [
+    { id: 'tokenPair', label: strings.tokenPair, align: 'left', sortType: 'character' },
+    { id: 'DEX', label: strings.dex, align: 'left', sortType: 'character' },
+    { id: 'tokenValue1', label: strings.firstTokenValue, align: 'left', sortType: 'numeric' },
+    { id: 'tokenValue2', label: strings.secondTokenValue, align: 'left', sortType: 'numeric' },
+    { id: 'PNL', label: strings.pnl, align: 'left', sortType: 'numeric' },
+    {
+      id: 'lpTokens',
+      label: strings.lpTokens,
+      align: 'left',
+      sortType: 'numeric',
+    },
+    {
+      id: 'totalValue',
+      label: strings.totalValue,
+      align: 'right',
+      sortType: 'numeric',
+    },
+  ];
+
+  const handleRequestSort = property => {
+    let direction = 'asc';
+    if (order === 'asc') {
+      if (property === orderBy) {
+        direction = 'desc';
+      }
+    } else if (order === 'desc') {
+      if (property === orderBy) {
+        direction = null;
+      }
+    }
+    setSortState({
+      order: direction,
+      orderBy: property,
+    });
+  };
+
+  const descendingComparator = (a, b, sortType) => {
+    switch (sortType) {
+      case 'numeric':
+        if (parseFloat(b[orderBy]) < parseFloat(a[orderBy])) {
+          return -1;
+        } else {
+          return 1;
+        }
+      case 'character':
+        return String(a[orderBy]).localeCompare(b[orderBy]);
+      default:
+        if (b[orderBy] < a[orderBy]) {
+          return -1;
+        } else {
+          return 1;
+        }
+    }
+  };
+
+  const getSortedData = useCallback(
+    data => {
+      if (!orderBy || !order) return data;
+      const sortColumn = headCells.find(cell => cell.id === orderBy);
+      const sortType = sortColumn?.sortType ?? 'character';
+      return data.sort((a, b) => {
+        return order === 'desc'
+          ? descendingComparator(a, b, sortType)
+          : -descendingComparator(a, b, sortType);
+      });
+    },
+    [order, orderBy, headCells]
+  );
+
+  return (
+    <Table
+      sx={{
+        marginTop: '25px',
+      }}
+      aria-label="stats table"
+    >
+      <TableHead>
+        <TableRow>
+          {headCells.map(({ label, align, id }) => (
+            <TableCell key={id} align={align}>
+              <Stack
+                direction="row"
+                alignItems="center"
+                spacing={theme.spacing(1)}
+                onClick={() => handleRequestSort(id)}
+                sx={{ float: align, cursor: 'pointer' }}
+              >
+                <Typography
+                  variant="body2"
+                  sx={{ color: theme.palette.grayscale[600], userSelect: 'none' }}
+                >
+                  {label}
+                </Typography>
+                <SortIcon id={id} order={order} orderBy={orderBy} />
+              </Stack>
+            </TableCell>
+          ))}
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {isLoading
+          ? Array.from([1, 2, 3]).map((item, index) => (
+              <TableRowSkeleton id={index} theme={theme} />
+            ))
+          : getSortedData(data).map(row => (
+              <TableRow
+                key={row.id}
+                sx={{
+                  transition: 'all 0.3s ease-in-out',
+                  '& td': { border: 0 },
+                }}
+              >
+                <TableCell>
+                  <Stack direction="row" alignItems="center" spacing={theme.spacing(1)}>
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      sx={{ position: 'relative', width: '46px' }}
+                    >
+                      <Box
+                        width="24px"
+                        height="24px"
+                        sx={{
+                          borderRadius: `${theme.shape.borderRadius}px`,
+                          backgroundColor: theme.palette.ds.gray_c700,
+                        }}
+                        component="img"
+                        src={adaPng}
+                      ></Box>
+                      <Box
+                        width="24px"
+                        height="24px"
+                        sx={{
+                          borderRadius: `${theme.shape.borderRadius}px`,
+                          backgroundColor: theme.palette.ds.gray_c700,
+                          position: 'absolute',
+                          top: 0,
+                          left: '22px',
+                        }}
+                        component="img"
+                        src={hoskyPng}
+                      ></Box>
+                    </Stack>
+                    <Typography fontWeight="500" sx={{ color: theme.palette.ds.text_gray_normal }}>
+                      {row.firstToken.name} - {row.secondToken.name}
+                    </Typography>
+                  </Stack>
+                </TableCell>
+
+                <TableCell>
+                  <Stack direction="row" alignItems="center" spacing={theme.spacing(1)}>
+                    <Box
+                      width="32px"
+                      height="32px"
+                      sx={{
+                        borderRadius: `${theme.shape.borderRadius}px`,
+                        backgroundColor: 'transparent',
+                      }}
+                      component="img"
+                      src={minswapPng}
+                    ></Box>
+                    <Typography
+                      fontWeight="500"
+                      sx={{ color: theme.palette.ds.text_primary_medium }}
+                    >
+                      {row.DEX}
+                    </Typography>
+                  </Stack>
+                </TableCell>
+
+                <TableCell>
+                  <Stack direction="column" spacing={theme.spacing(0.25)}>
+                    <Typography sx={{ color: theme.palette.ds.text_gray_normal }}>
+                      {row.firstToken.value} {row.firstToken.name}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium }}>
+                      {row.firstToken.usdValue} USD
+                    </Typography>
+                  </Stack>
+                </TableCell>
+
+                <TableCell>
+                  <Stack direction="column" spacing={theme.spacing(0.25)}>
+                    <Typography sx={{ color: theme.palette.ds.text_gray_normal }}>
+                      {row.secondToken.value} {row.secondToken.name}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium }}>
+                      {row.secondToken.usdValue} USD
+                    </Typography>
+                  </Stack>
+                </TableCell>
+
+                <TableCell>
+                  <Stack direction="column" spacing={theme.spacing(0.25)}>
+                    <Typography>
+                      {row.PNL.value} {row.firstToken.name}
+                    </Typography>
+                    <Chip
+                      active={row.PNL.usdValue > 0}
+                      label={
+                        <Typography variant="caption1">
+                          {row.PNL.usdValue > 0 ? '+' : '-'}
+                          {row.PNL.usdValue} USD
+                        </Typography>
+                      }
+                    />
+                  </Stack>
+                </TableCell>
+
+                <TableCell>
+                  <Typography sx={{ color: theme.palette.ds.text_gray_normal }}>
+                    {row.lpTokens}
+                  </Typography>
+                </TableCell>
+
+                <TableCell>
+                  <Stack direction="column" spacing={theme.spacing(0.25)}>
+                    <Typography
+                      sx={{ color: theme.palette.ds.text_gray_normal, textAlign: 'right' }}
+                    >
+                      {row.totalValue.value} {row.firstToken.name}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: theme.palette.ds.text_gray_medium, textAlign: 'right' }}
+                    >
+                      {row.totalValue.usdValue} USD
+                    </Typography>
+                  </Stack>
+                </TableCell>
+              </TableRow>
+            ))}
+      </TableBody>
+    </Table>
+  );
+};
+
+export default LiquidityTable;

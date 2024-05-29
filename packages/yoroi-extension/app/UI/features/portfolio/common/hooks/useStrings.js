@@ -3,6 +3,26 @@ import { defineMessages } from 'react-intl';
 
 export const messages = Object.freeze(
   defineMessages({
+    dapps: {
+      id: 'portfolio.tooltip.dapps',
+      defaultMessage: '!!!DApps',
+    },
+    soonAvailable: {
+      id: 'portfolio.common.soonAvailable',
+      defaultMessage: '!!!Soon available',
+    },
+    dex: {
+      id: 'portfolio.common.dex',
+      defaultMessage: '!!!DEX',
+    },
+    totalValue: {
+      id: 'portfolio.common.totalValue',
+      defaultMessage: '!!!Total value',
+    },
+    noResultsForThisSearch: {
+      id: 'portfolio.common.noResultsForThisSearch',
+      defaultMessage: '!!!No results for this search',
+    },
     search: {
       id: 'portfolio.main.search.text',
       defaultMessage: '!!!Search by asset name or ID',
@@ -38,6 +58,18 @@ export const messages = Object.freeze(
     receive: {
       id: 'portfolio.button.receive',
       defaultMessage: '!!!Receive',
+    },
+    liquidityPool: {
+      id: 'portfolio.button.liquidityPool',
+      defaultMessage: '!!!Liquidity pool',
+    },
+    openOrders: {
+      id: 'portfolio.button.openOrders',
+      defaultMessage: '!!!Open orders',
+    },
+    lendAndBorrow: {
+      id: 'portfolio.button.lendAndBorrow',
+      defaultMessage: '!!!Lend & Borrow',
     },
     balance: {
       id: 'portfolio.tokenInfo.balance',
@@ -116,19 +148,19 @@ export const messages = Object.freeze(
       defaultMessage: '!!!All time low',
     },
     name: {
-      id: 'portfolio.statsTable.headerText.name',
+      id: 'portfolio.statsTable.header.name',
       defaultMessage: '!!!Name',
     },
     price: {
-      id: 'portfolio.statsTable.headerText.price',
+      id: 'portfolio.statsTable.header.price',
       defaultMessage: '!!!Price',
     },
     portfolio: {
-      id: 'portfolio.statsTable.headerText.portfolio',
+      id: 'portfolio.statsTable.header.portfolio',
       defaultMessage: '!!!Portfolio',
     },
     totalAmount: {
-      id: 'portfolio.statsTable.headerText.totalAmount',
+      id: 'portfolio.statsTable.header.totalAmount',
       defaultMessage: '!!!Total amount',
     },
     transactionHistory: {
@@ -136,19 +168,19 @@ export const messages = Object.freeze(
       defaultMessage: '!!!Transaction history',
     },
     transactionType: {
-      id: 'portfolio.transactionTable.headerText.transactionType',
+      id: 'portfolio.transactionTable.header.transactionType',
       defaultMessage: '!!!Transaction type',
     },
     status: {
-      id: 'portfolio.transactionTable.headerText.status',
+      id: 'portfolio.transactionTable.header.status',
       defaultMessage: '!!!Status',
     },
     fee: {
-      id: 'portfolio.transactionTable.headerText.fee',
+      id: 'portfolio.transactionTable.header.fee',
       defaultMessage: '!!!Fee',
     },
     amount: {
-      id: 'portfolio.transactionTable.headerText.amount',
+      id: 'portfolio.transactionTable.header.amount',
       defaultMessage: '!!!Amount',
     },
     today: {
@@ -160,23 +192,23 @@ export const messages = Object.freeze(
       defaultMessage: '!!!Amount',
     },
     sent: {
-      id: 'portfolio.transactionTable.historyLabel.sent',
+      id: 'portfolio.transactionTable.label.sent',
       defaultMessage: '!!!Sent',
     },
     received: {
-      id: 'portfolio.transactionTable.historyLabel.received',
+      id: 'portfolio.transactionTable.label.received',
       defaultMessage: '!!!Received',
     },
     transactionError: {
-      id: 'portfolio.transactionTable.historyLabel.transactionError',
+      id: 'portfolio.transactionTable.label.transactionError',
       defaultMessage: '!!!Transaction error',
     },
     rewardWithdraw: {
-      id: 'portfolio.transactionTable.historyLabel.rewardWithdraw',
+      id: 'portfolio.transactionTable.label.rewardWithdraw',
       defaultMessage: '!!!Reward withdrawn',
     },
     stakeDelegate: {
-      id: 'portfolio.transactionTable.historyLabel.stakeDelegate',
+      id: 'portfolio.transactionTable.label.stakeDelegate',
       defaultMessage: '!!!Stake delegated',
     },
     low: {
@@ -195,11 +227,51 @@ export const messages = Object.freeze(
       id: 'portfolio.transactionTable.amount.assets',
       defaultMessage: '!!!assets',
     },
+    tokenPair: {
+      id: 'portfolio.liquidityTable.header.tokenPair',
+      defaultMessage: '!!!Token pair',
+    },
+
+    firstTokenValue: {
+      id: 'portfolio.liquidityTable.header.firstTokenValue',
+      defaultMessage: '!!!Token value 1',
+    },
+    secondTokenValue: {
+      id: 'portfolio.liquidityTable.header.secondTokenValue',
+      defaultMessage: '!!!Token value 2',
+    },
+    pnl: {
+      id: 'portfolio.liquidityTable.header.pnl',
+      defaultMessage: '!!!PNL',
+    },
+    lpTokens: {
+      id: 'portfolio.liquidityTable.header.lpTokens',
+      defaultMessage: '!!!LP tokens',
+    },
+    pair: {
+      id: 'portfolio.orderTable.header.pair',
+      defaultMessage: '!!!Pair (From / To)',
+    },
+    assetPrice: {
+      id: 'portfolio.orderTable.header.assetPrice',
+      defaultMessage: '!!!Asset price',
+    },
+    assetAmount: {
+      id: 'portfolio.orderTable.header.assetAmount',
+      defaultMessage: '!!!Asset amount',
+    },
+    transactionId: {
+      id: 'portfolio.orderTable.header.transactionId',
+      defaultMessage: '!!!Transaction ID',
+    },
   })
 );
 
 export const getStrings = intl => {
   return React.useRef({
+    dapps: intl.formatMessage(messages.dapps),
+    soonAvailable: intl.formatMessage(messages.soonAvailable),
+    noResultsForThisSearch: intl.formatMessage(messages.noResultsForThisSearch),
     search: intl.formatMessage(messages.search),
     balancePerformance: intl.formatMessage(messages.balancePerformance),
     balanceChange: intl.formatMessage(messages.balanceChange),
@@ -209,6 +281,9 @@ export const getStrings = intl => {
     swap: intl.formatMessage(messages.swap),
     send: intl.formatMessage(messages.send),
     receive: intl.formatMessage(messages.receive),
+    liquidityPool: intl.formatMessage(messages.liquidityPool),
+    openOrders: intl.formatMessage(messages.openOrders),
+    lendAndBorrow: intl.formatMessage(messages.lendAndBorrow),
     balance: intl.formatMessage(messages.balance),
     marketPrice: intl.formatMessage(messages.marketPrice),
     description: intl.formatMessage(messages.description),
@@ -248,5 +323,16 @@ export const getStrings = intl => {
     high: intl.formatMessage(messages.high),
     failed: intl.formatMessage(messages.failed),
     assets: intl.formatMessage(messages.assets),
+    tokenPair: intl.formatMessage(messages.tokenPair),
+    dex: intl.formatMessage(messages.dex),
+    firstTokenValue: intl.formatMessage(messages.firstTokenValue),
+    secondTokenValue: intl.formatMessage(messages.secondTokenValue),
+    pnl: intl.formatMessage(messages.pnl),
+    lpTokens: intl.formatMessage(messages.lpTokens),
+    totalValue: intl.formatMessage(messages.totalValue),
+    pair: intl.formatMessage(messages.pair),
+    assetPrice: intl.formatMessage(messages.assetPrice),
+    assetAmount: intl.formatMessage(messages.assetAmount),
+    transactionId: intl.formatMessage(messages.transactionId),
   }).current;
 };

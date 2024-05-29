@@ -14,7 +14,7 @@ const PortfolioDetailPage = ({ stores, actions, match }: Props) => {
   const tokenId = match.params.tokenId;
 
   const tokenInfo = React.useMemo(() => {
-    const tmp = mockData.tokenList.find(item => item.id === tokenId);
+    const tmp = mockData.wallet.tokenList.find(item => item.id === tokenId);
     if (tmp) return tmp;
     return {};
   }, [tokenId]);
