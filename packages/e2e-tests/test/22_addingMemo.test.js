@@ -51,7 +51,14 @@ describe('Adding a memo to a completed Tx', function () {
   it('Check added memo', async function () {
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
     const memoMessage = await transactionsPage.getMemoMessage(0, 0);
+    const txHashId = await transactionsPage.getTxHashID(0, 0);
     expect(memoMessage).to.equal(testMemoMessage);
+    const memosInDB = await transactionsPage.getInfoFromIndexedDB('TxMemo');
+    expect(memosInDB.length).to.equal(1);
+    const txMemoinDB = memosInDB[0].value
+    expect(txMemoinDB.Content).to.equal(testMemoMessage);
+    expect(txMemoinDB.TransactionHash).to.equal(txHashId);
+    expect(txMemoinDB.WalletId).to.equal(testWallet1.plate);
   });
   // reload the page
   it('Refresh page', async function () {
