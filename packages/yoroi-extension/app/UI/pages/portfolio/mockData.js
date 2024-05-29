@@ -489,8 +489,8 @@ const mockData = {
         ],
       },
       {
-        name: 'AGIX',
-        id: 'Agix',
+        name: 'DOGE',
+        id: 'Doge',
         price: 0.23,
         portfolioPercents: 75,
         '24h': -0.03,
@@ -649,8 +649,8 @@ const mockData = {
         ],
       },
       {
-        name: 'ADA',
-        id: 'ada',
+        name: 'Shiba',
+        id: 'shiba',
         price: 0.23,
         portfolioPercents: 68,
         '24h': -0.59,
@@ -805,8 +805,8 @@ const mockData = {
         ],
       },
       {
-        name: 'TKN',
-        id: 'Tkn',
+        name: 'TKN1',
+        id: 'Tkn1',
         price: 0.82,
         portfolioPercents: 34,
         '24h': -0.93,

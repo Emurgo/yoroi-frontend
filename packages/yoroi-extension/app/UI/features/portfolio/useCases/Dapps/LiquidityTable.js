@@ -163,12 +163,7 @@ const LiquidityTable = ({ data, isLoading }) => {
   );
 
   return (
-    <Table
-      sx={{
-        marginTop: '25px',
-      }}
-      aria-label="stats table"
-    >
+    <Table aria-label="liquidity table">
       <TableHead>
         <TableRow>
           {headCells.map(({ label, align, id }) => (

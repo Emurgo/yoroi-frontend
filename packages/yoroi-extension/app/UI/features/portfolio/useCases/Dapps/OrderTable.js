@@ -144,12 +144,7 @@ const OrderTable = ({ data, isLoading }) => {
   );
 
   return (
-    <Table
-      sx={{
-        marginTop: '25px',
-      }}
-      aria-label="stats table"
-    >
+    <Table aria-label="order table">
       <TableHead>
         <TableRow>
           {headCells.map(({ label, align, id, disabledSort }) => (

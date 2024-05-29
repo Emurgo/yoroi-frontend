@@ -16,7 +16,7 @@ const PortfolioWallet = ({ data }) => {
   const { strings } = usePortfolio();
   const [keyword, setKeyword] = useState('');
   const [isLoading, setIsLoading] = useState();
-  const [tokenList, setTokenList] = useState(data);
+  const [tokenList, setTokenList] = useState([]);
 
   useEffect(() => {
     // FAKE FETCHING DATA TO SEE SKELETON
@@ -51,7 +51,7 @@ const PortfolioWallet = ({ data }) => {
   }, [keyword]);
 
   return (
-    <Box>
+    <Stack direction="column" spacing={theme.spacing(3)}>
       <Stack direction="row" justifyContent="space-between">
         <Stack direction="column">
           <Stack direction="row" spacing={theme.spacing(0.5)}>
@@ -170,7 +170,7 @@ const PortfolioWallet = ({ data }) => {
         />
       </Stack>
       <StatsTable data={tokenList} isLoading={isLoading} />
-    </Box>
+    </Stack>
   );
 };
 

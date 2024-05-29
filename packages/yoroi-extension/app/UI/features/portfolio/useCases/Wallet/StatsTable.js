@@ -147,12 +147,7 @@ const StatsTable = ({ data, isLoading }) => {
   );
 
   return (
-    <Table
-      sx={{
-        marginTop: '25px',
-      }}
-      aria-label="stats table"
-    >
+    <Table aria-label="stats table">
       <TableHead>
         <TableRow>
           {headCells.map(({ label, align, id }) => (

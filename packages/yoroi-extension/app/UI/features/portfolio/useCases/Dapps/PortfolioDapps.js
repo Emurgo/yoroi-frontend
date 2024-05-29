@@ -32,8 +32,8 @@ const PortfolioDapps = ({ data }) => {
   const { strings } = usePortfolio();
   const [keyword, setKeyword] = useState('');
   const [isLoading, setIsLoading] = useState();
-  const [liquidityList, setLiquidlityList] = useState(data.liquidityList);
-  const [orderList, setOrderList] = useState(data.orderList);
+  const [liquidityList, setLiquidlityList] = useState([]);
+  const [orderList, setOrderList] = useState([]);
   const [buttonProps, setButtonProps] = useState([
     {
       id: TableTabs.LIQUIDITY,
