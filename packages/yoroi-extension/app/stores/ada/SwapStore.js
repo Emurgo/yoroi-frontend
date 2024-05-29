@@ -240,6 +240,19 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
       await refreshPromise;
     }
   };
+
+  fetchTransactionTimestamps: ({|
+    wallet: PublicDeriver<>,
+    txHashes: Array<string>,
+  |}) => Promise<void> = async ({
+    wallet,
+    txHashes,
+  }) => {
+    const network = wallet.getParent().getNetworkInfo();
+    const timestampMap = await this.stores.substores.ada.stateFetchStore.fetcher
+      .getTransactionSlotsByHashes({ network, txHashes });
+    console.log('>>> timestampMap: ', timestampMap);
+  }
 }
 
 function createSwapFeFeeAmount({

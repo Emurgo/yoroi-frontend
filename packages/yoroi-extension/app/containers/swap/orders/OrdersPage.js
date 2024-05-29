@@ -13,7 +13,7 @@ import ExplorableHashContainer from '../../widgets/ExplorableHashContainer';
 import { truncateAddressShort } from '../../../utils/formatters';
 import { Quantities } from '../../../utils/quantities';
 import { PRICE_PRECISION } from '../../../components/swap/common';
-import { fail, forceNonNull, maybe } from '../../../coreUtils';
+import { fail, forceNonNull, maybe, noop } from '../../../coreUtils';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import { useSwap } from '@yoroi/swap';
 import { addressBech32ToHex } from '../../../api/ada/lib/cardanoCrypto/utils';
@@ -216,6 +216,9 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
 
   const openOrders = useRichOpenOrders().map(o => mapOpenOrder(o, defaultTokenInfo));
   const completedOrders = useRichCompletedOrders().map(o => mapCompletedOrder(o, defaultTokenInfo));
+
+  const txHashes = [...openOrders, ...completedOrders].map(o => o.txId);
+  noop(props.stores.substores.ada.swapStore.fetchTransactionTimestamps({ wallet, txHashes }));
 
   const handleCancelRequest = async order => {
     setCancellationState({ order, tx: null });
