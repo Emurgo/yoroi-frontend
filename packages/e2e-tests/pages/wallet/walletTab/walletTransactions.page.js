@@ -198,6 +198,12 @@ export class TransactionsSubTab extends WalletTab {
     }
     return result;
   }
+  async getTxHashID(groupIndex, txIndex) {
+    this.logger.info(`TransactionsSubTab::getTxHashID is called. Group index: ${groupIndex}, tx index: ${txIndex}`);
+    const txHashId = await this.getText(this.txHashIdTextLocator(groupIndex, txIndex));
+    this.logger.info(`TransactionsSubTab::getTxHashID::txHashId ${txHashId}`);
+    return txHashId;
+  }
   /**
    * The method collect all txs info inside a group
    * @param {({groupDate: string, groupIndex: number})} groupObject An group object which contains such properties as groupDate and groupIndex
@@ -221,7 +227,7 @@ export class TransactionsSubTab extends WalletTab {
       const txAmountString = await this.getText(this.txAmountTextLocator(groupIndex, txIndex));
       const txAmount = parseFloat(txAmountString.split(' ')[0]);
       await this.click(this.txRowLocator(groupIndex, txIndex));
-      const txHashId = await this.getText(this.txHashIdTextLocator(groupIndex, txIndex));
+      const txHashId = await this.getTxHashID(groupIndex, txIndex);
       await this.click(this.txRowLocator(groupIndex, txIndex));
       const txInfo = {
         txType,
