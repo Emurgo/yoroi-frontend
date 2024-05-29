@@ -65,8 +65,8 @@ const TableRowSkeleton = ({ id, theme }) => (
 
     <TableCell>
       <Stack direction="column" spacing={theme.spacing(0.25)}>
-        <Skeleton width="146px" height="24px" />
-        <Skeleton width="146px" height="16px" />
+        <Skeleton width="65px" height="24px" />
+        <Skeleton width="65px" height="20px" />
       </Stack>
     </TableCell>
 
@@ -95,9 +95,9 @@ const LiquidityTable = ({ data, isLoading }) => {
   const headCells = [
     { id: 'tokenPair', label: strings.tokenPair, align: 'left', sortType: 'character' },
     { id: 'DEX', label: strings.dex, align: 'left', sortType: 'character' },
-    { id: 'tokenValue1', label: strings.firstTokenValue, align: 'left', sortType: 'numeric' },
-    { id: 'tokenValue2', label: strings.secondTokenValue, align: 'left', sortType: 'numeric' },
-    { id: 'PNL', label: strings.pnl, align: 'left', sortType: 'numeric' },
+    { id: 'firstTokenValue', label: strings.firstTokenValue, align: 'left', sortType: 'numeric' },
+    { id: 'secondTokenValue', label: strings.secondTokenValue, align: 'left', sortType: 'numeric' },
+    { id: 'PNLValue', label: strings.pnl, align: 'left', sortType: 'numeric' },
     {
       id: 'lpTokens',
       label: strings.lpTokens,
@@ -212,7 +212,6 @@ const LiquidityTable = ({ data, isLoading }) => {
                         height="24px"
                         sx={{
                           borderRadius: `${theme.shape.borderRadius}px`,
-                          backgroundColor: theme.palette.ds.gray_c700,
                         }}
                         component="img"
                         src={adaPng}
@@ -222,7 +221,6 @@ const LiquidityTable = ({ data, isLoading }) => {
                         height="24px"
                         sx={{
                           borderRadius: `${theme.shape.borderRadius}px`,
-                          backgroundColor: theme.palette.ds.gray_c700,
                           position: 'absolute',
                           top: 0,
                           left: '22px',
@@ -244,7 +242,6 @@ const LiquidityTable = ({ data, isLoading }) => {
                       height="32px"
                       sx={{
                         borderRadius: `${theme.shape.borderRadius}px`,
-                        backgroundColor: 'transparent',
                       }}
                       component="img"
                       src={minswapPng}
@@ -261,10 +258,10 @@ const LiquidityTable = ({ data, isLoading }) => {
                 <TableCell>
                   <Stack direction="column" spacing={theme.spacing(0.25)}>
                     <Typography sx={{ color: theme.palette.ds.text_gray_normal }}>
-                      {row.firstToken.value} {row.firstToken.name}
+                      {row.firstTokenValue} {row.firstToken.name}
                     </Typography>
                     <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium }}>
-                      {row.firstToken.usdValue} USD
+                      {row.firstTokenValueUsd} USD
                     </Typography>
                   </Stack>
                 </TableCell>
@@ -272,10 +269,10 @@ const LiquidityTable = ({ data, isLoading }) => {
                 <TableCell>
                   <Stack direction="column" spacing={theme.spacing(0.25)}>
                     <Typography sx={{ color: theme.palette.ds.text_gray_normal }}>
-                      {row.secondToken.value} {row.secondToken.name}
+                      {row.secondTokenValue} {row.secondToken.name}
                     </Typography>
                     <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium }}>
-                      {row.secondToken.usdValue} USD
+                      {row.secondTokenValueUsd} USD
                     </Typography>
                   </Stack>
                 </TableCell>
@@ -283,14 +280,14 @@ const LiquidityTable = ({ data, isLoading }) => {
                 <TableCell>
                   <Stack direction="column" spacing={theme.spacing(0.25)}>
                     <Typography>
-                      {row.PNL.value} {row.firstToken.name}
+                      {row.PNLValue} {row.firstToken.name}
                     </Typography>
                     <Chip
-                      active={row.PNL.usdValue > 0}
+                      active={row.PNLValueUsd > 0}
                       label={
                         <Typography variant="caption1">
-                          {row.PNL.usdValue > 0 ? '+' : '-'}
-                          {row.PNL.usdValue} USD
+                          {row.PNLValueUsd > 0 ? '+' : '-'}
+                          {row.PNLValueUsd} USD
                         </Typography>
                       }
                     />
@@ -308,13 +305,13 @@ const LiquidityTable = ({ data, isLoading }) => {
                     <Typography
                       sx={{ color: theme.palette.ds.text_gray_normal, textAlign: 'right' }}
                     >
-                      {row.totalValue.value} {row.firstToken.name}
+                      {row.totalValue} {row.firstToken.name}
                     </Typography>
                     <Typography
                       variant="body2"
                       sx={{ color: theme.palette.ds.text_gray_medium, textAlign: 'right' }}
                     >
-                      {row.totalValue.usdValue} USD
+                      {row.totalValueUsd} USD
                     </Typography>
                   </Stack>
                 </TableCell>

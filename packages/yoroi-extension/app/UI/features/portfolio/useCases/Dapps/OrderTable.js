@@ -188,7 +188,6 @@ const OrderTable = ({ data, isLoading }) => {
                       height="24px"
                       sx={{
                         borderRadius: `${theme.shape.borderRadius}px`,
-                        backgroundColor: theme.palette.ds.gray_c700,
                       }}
                       component="img"
                       src={adaPng}
@@ -204,7 +203,6 @@ const OrderTable = ({ data, isLoading }) => {
                       height="24px"
                       sx={{
                         borderRadius: `${theme.shape.borderRadius}px`,
-                        backgroundColor: theme.palette.ds.gray_c700,
                       }}
                       component="img"
                       src={hoskyPng}
@@ -222,7 +220,6 @@ const OrderTable = ({ data, isLoading }) => {
                       height="32px"
                       sx={{
                         borderRadius: `${theme.shape.borderRadius}px`,
-                        backgroundColor: 'transparent',
                       }}
                       component="img"
                       src={minswapPng}
@@ -250,7 +247,7 @@ const OrderTable = ({ data, isLoading }) => {
 
                 <TableCell>
                   <Typography sx={{ color: theme.palette.ds.text_primary_medium }}>
-                    {truncateAddressShort(row.transactionId)}
+                    {truncateAddressShort(row.transactionId, 10)}
                   </Typography>
                 </TableCell>
 

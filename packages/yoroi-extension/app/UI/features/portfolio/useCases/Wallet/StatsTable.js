@@ -161,7 +161,7 @@ const StatsTable = ({ data, isLoading }) => {
               >
                 <Typography
                   variant="body2"
-                  sx={{ color: theme.palette.grayscale[600], userSelect: 'none' }}
+                  sx={{ color: theme.palette.ds.text_gray_medium, userSelect: 'none' }}
                 >
                   {label}
                 </Typography>
@@ -197,7 +197,6 @@ const StatsTable = ({ data, isLoading }) => {
                       height="40px"
                       sx={{
                         borderRadius: `${theme.shape.borderRadius}px`,
-                        backgroundColor: theme.palette.ds.gray_c700,
                       }}
                       component="img"
                       src={adaPng}
