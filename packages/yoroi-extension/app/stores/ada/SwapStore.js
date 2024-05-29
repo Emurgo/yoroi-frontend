@@ -3,7 +3,7 @@
 import Store from '../base/Store';
 import type { ActionsMap } from '../../actions';
 import type { StoresMap } from '../index';
-import { action, computed, observable } from 'mobx';
+import { action, computed, observable, runInAction } from 'mobx';
 import type { StorageField } from '../../api/localStorage';
 import { createStorageFlag, loadSubmittedTransactions } from '../../api/localStorage';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
@@ -17,7 +17,7 @@ import { MultiToken } from '../../api/common/lib/MultiToken';
 import { Quantities } from '../../utils/quantities';
 import BigNumber from 'bignumber.js';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import { cast, fail, hexToBytes, maybe } from '../../coreUtils';
+import { cast, fail, hexToBytes, listEntries, maybe } from '../../coreUtils';
 import {
   asAddressedUtxo as asAddressedUtxoCardano,
   asAddressedUtxo,
@@ -33,6 +33,9 @@ import { transactionHexToHash } from '../../api/ada/lib/cardanoCrypto/utils';
 import { signTransactionHex } from '../../api/ada/transactions/signTransactionHex';
 import type { RemoteUnspentOutput } from '../../api/ada/lib/state-fetch/types';
 import type { CardanoConnectorSignRequest } from '../../connector/types';
+import {
+  createSlotToTimestampFunc,
+} from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 const FRONTEND_FEE_ADDRESS_MAINNET =
   'addr1q9ry6jfdgm0lcrtfpgwrgxg7qfahv80jlghhrthy6w8hmyjuw9ngccy937pm7yw0jjnxasm7hzxjrf8rzkqcj26788lqws5fke';
@@ -42,6 +45,7 @@ const FRONTEND_FEE_ADDRESS_PREPROD =
 export default class SwapStore extends Store<StoresMap, ActionsMap> {
   @observable limitOrderDisplayValue: string = '';
   @observable orderStep: number = 0;
+  @observable transactionTimestamps: { [string]: Date } = {};
 
   swapDisclaimerAcceptanceFlag: StorageField<boolean> = createStorageFlag(
     'SwapStore.swapDisclaimerAcceptanceFlag',
@@ -248,10 +252,20 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
     wallet,
     txHashes,
   }) => {
+    const existingSet = new Set(Object.keys(this.transactionTimestamps));
+    const filteredTxHashes = txHashes.filter(x => !existingSet.has(x.toLowerCase()));
+    if (filteredTxHashes.length === 0) {
+      return;
+    }
     const network = wallet.getParent().getNetworkInfo();
-    const timestampMap = await this.stores.substores.ada.stateFetchStore.fetcher
-      .getTransactionSlotsByHashes({ network, txHashes });
-    console.log('>>> timestampMap: ', timestampMap);
+    const globalSlotMap: { [string]: string } = await this.stores.substores.ada.stateFetchStore.fetcher
+      .getTransactionSlotsByHashes({ network, txHashes: filteredTxHashes });
+    const slotToTimestamp: string => Date = await createSlotToTimestampFunc(network);
+    runInAction(() => {
+      for (const [tx,slot] of listEntries(globalSlotMap)) {
+        this.transactionTimestamps[tx.toLowerCase()] = slotToTimestamp(slot);
+      }
+    });
   }
 }
 

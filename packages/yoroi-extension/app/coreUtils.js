@@ -67,10 +67,20 @@ export function comparatorByGetter<T>(getter: T => any): (T, T) => number {
  * Calls `Object.values` and performs force type-casting.
  *
  * @param obj - any object
- * @return {T[]} - the array of values force-casted as T
+ * @return {Array<T>} - the array of values force-casted as T
  */
-export function listValues<T>(obj: { [any]: T }): T[] {
+export function listValues<T>(obj: { [any]: T }): Array<T> {
   return ((Object.values(obj): any): T[]);
+}
+
+/**
+ * Calls `Object.entries` and performs force type-casting.
+ *
+ * @param obj - any object
+ * @return {Array<[K,V]>} - the array of tuples force-casted as [K,V]
+ */
+export function listEntries<K,V>(obj: { [K]: V }): Array<[K,V]> {
+  return ((Object.entries(obj): any): Array<[K,V]>);
 }
 
 /**

@@ -21,6 +21,7 @@ import { getTransactionFeeFromCbor, getTransactionTotalOutputFromCbor, } from '.
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { CardanoConnectorSignRequest } from '../../../connector/types';
 import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
+import moment from 'moment';
 
 type ColumnContext = {|
   completedOrders: boolean,
@@ -63,7 +64,7 @@ const orderColumns: Array<Column> = [
     name: 'DEX',
     align: 'left',
     leftPadding: '32px',
-    width: '176px',
+    width: '216px',
     openOrdersOnly: true,
   },
   {
@@ -219,6 +220,11 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
 
   const txHashes = [...openOrders, ...completedOrders].map(o => o.txId);
   noop(props.stores.substores.ada.swapStore.fetchTransactionTimestamps({ wallet, txHashes }));
+
+  const txHashToRenderedTimestamp: string => string = txHash => {
+    const date = props.stores.substores.ada.swapStore.transactionTimestamps[txHash];
+    return date == null ? '-' : moment(date).format('MMM D, YYYY h:mm A');
+  };
 
   const handleCancelRequest = async order => {
     setCancellationState({ order, tx: null });
@@ -379,6 +385,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
                   order={order}
                   defaultTokenInfo={defaultTokenInfo}
                   selectedExplorer={selectedExplorer}
+                  txHashToRenderedTimestamp={txHashToRenderedTimestamp}
                 />
               ))
             : openOrders.map(order => (
@@ -388,6 +395,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
                   defaultTokenInfo={defaultTokenInfo}
                   selectedExplorer={selectedExplorer}
                   handleCancel={() => handleCancelRequest(order)}
+                  txHashToRenderedTimestamp={txHashToRenderedTimestamp}
                 />
               ))}
         </Table>
@@ -421,11 +429,13 @@ const OrderRow = ({
   defaultTokenInfo,
   selectedExplorer,
   handleCancel,
+  txHashToRenderedTimestamp,
 }: {|
   order: MappedOrder,
   defaultTokenInfo: RemoteTokenInfo,
   selectedExplorer: SelectedExplorer,
   handleCancel?: () => Promise<void>,
+  txHashToRenderedTimestamp: string => string,
 |}) => {
   return (
     <>
@@ -449,7 +459,7 @@ const OrderRow = ({
           <SwapPoolLabel provider={provider}/>
         ))}
       </Box>
-      <Box textAlign="left">-</Box>
+      <Box textAlign="left">{txHashToRenderedTimestamp(order.txId)}</Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" gap="12px">
         <ExplorableHashContainer
           selectedExplorer={selectedExplorer}
