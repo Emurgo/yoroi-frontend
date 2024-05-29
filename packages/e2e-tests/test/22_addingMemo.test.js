@@ -26,6 +26,7 @@ describe('Adding a memo to a completed Tx', function () {
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
     const txPageIsDisplayed = await transactionsPage.isDisplayed();
     expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
+    await transactionsPage.getFullIndexedDBFromChrome();
   });
 
   // open the latests tx
@@ -55,7 +56,7 @@ describe('Adding a memo to a completed Tx', function () {
     expect(memoMessage).to.equal(testMemoMessage);
     const memosInDB = await transactionsPage.getInfoFromIndexedDB('TxMemo');
     expect(memosInDB.length).to.equal(1);
-    const txMemoinDB = memosInDB[0].value
+    const txMemoinDB = memosInDB[0].value;
     expect(txMemoinDB.Content).to.equal(testMemoMessage);
     expect(txMemoinDB.TransactionHash).to.equal(txHashId);
     expect(txMemoinDB.WalletId).to.equal(testWallet1.plate);
@@ -71,7 +72,7 @@ describe('Adding a memo to a completed Tx', function () {
     await transactionsPage.clickOnTxRow(0, 0);
     const memoMessage = await transactionsPage.getMemoMessage(0, 0);
     expect(memoMessage).to.equal(testMemoMessage);
-  })
+  });
 
   afterEach(function (done) {
     customAfterEach(this, webdriver, logger);
