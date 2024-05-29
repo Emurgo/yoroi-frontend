@@ -247,7 +247,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
 
     const nonce = timeToSlot({ time: new Date() }).slot;
 
-    const allAddresses = publicDeriver.allAddresses.get(CoreAddressTypes.CARDANO_BASE);
+    const firstExternalAddress = publicDeriver.externalAddressesByType[CoreAddressTypes.CARDANO_BASE][0];
 
     let votingRegTxPromise;
 
@@ -275,8 +275,8 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
             votingPublicKey,
             stakingKeyPath: publicDeriver.stakingAddressing.path,
             stakingKey: Buffer.from(stakingKey.as_bytes()).toString('hex'),
-            paymentKeyPath: allAddresses[0].addressing.path,
-            paymentAddress: allAddresses[0].address,
+            paymentKeyPath: firstExternalAddress.addressing.path,
+            paymentAddress: firstExternalAddress.address,
             nonce,
           },
         }).promise;
@@ -288,8 +288,8 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
             votingPublicKey,
             stakingKeyPath: publicDeriver.stakingAddressing.path,
             stakingKey: Buffer.from(stakingKey.as_bytes()).toString('hex'),
-            paymentKeyPath: allAddresses[0].addressing.path,
-            paymentAddress: allAddresses[0].address,
+            paymentKeyPath: firstExternalAddress.addressing.path,
+            paymentAddress: firstExternalAddress.address,
             nonce,
           },
         }).promise;
@@ -310,7 +310,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
       const trxMeta = generateRegistration({
         stakePrivateKey: RustModule.WalletV4.PrivateKey.from_hex(stakingKey),
         catalystPrivateKey,
-        receiverAddress: allAddresses[0].address,
+        receiverAddress: firstExternalAddress.address,
         slotNumber: nonce,
       });
 

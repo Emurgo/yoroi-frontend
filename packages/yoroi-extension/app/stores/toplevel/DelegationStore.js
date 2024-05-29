@@ -19,7 +19,6 @@ import type {
   GetDelegatedBalanceResponse,
   RewardHistoryFunc
 } from '../../api/ada/lib/storage/bridge/delegationUtils';
-import { MultiToken } from '../../api/common/lib/MultiToken';
 
 export type DelegationRequests = {|
   publicDeriverId: number,
@@ -130,7 +129,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     networkId,
     defaultTokenId,
   ) => {
-    const defaultMultiToken = new MultikToken(
+    const defaultMultiToken = new MultiToken(
       [],
       {
         defaultNetworkId: networkId,
@@ -157,7 +156,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     networkId,
     defaultTokenId,
   ) => {
-    const defaultMultiToken = new MultikToken(
+    const defaultMultiToken = new MultiToken(
       [],
       {
         defaultNetworkId: networkId,

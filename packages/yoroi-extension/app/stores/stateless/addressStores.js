@@ -62,7 +62,7 @@ export interface IAddressTypeStore {
   +all: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
   +wasExecuted: boolean,
   +addObservedWallet: WalletState => void,
-  +refreshAddressesFromDb: Wallet => Promise<void>,
+  +refreshAddressesFromDb: WalletState => Promise<void>,
 }
 export type AddressSubgroupMeta<+T: IAddressTypeStore> = {|
   +isRelated: () => boolean,

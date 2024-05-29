@@ -351,7 +351,6 @@ export default class TrezorConnectStore
       publicKey: publicMasterKey,
       hwFeatures,
       network: selectedNetwork,
-      checkAddressesInUse: stateFetcher.checkAddressesInUse,
     };
   }
 

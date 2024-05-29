@@ -320,7 +320,8 @@ export default class MemosStore extends Store<StoresMap, ActionsMap> {
         // delete local copy if file was deleted on external storage
         if (memo.deleted === true) {
           await this.deleteTxMemoRequest.execute({
-            publicDeriver: request.publicDeriver,
+            publicDeriver: request.publicDeriver.publicDeriverId,
+            plateTextPart: request.publicDeriver.plate.textPart,
             key: {
               walletId,
               txHash: memo.tx,
@@ -329,7 +330,8 @@ export default class MemosStore extends Store<StoresMap, ActionsMap> {
         } else if (localMemo.LastUpdated < memo.lastUpdated) {
           // only update if the file is newer
           await this._downloadAndSaveTxMemo({
-            publicDeriver: request.publicDeriver,
+            publicDeriver: request.publicDeriver.publicDeriverId,
+            plateTextPart: request.publicDeriver.plate.textPart,
             txHash: memo.tx
           });
         }
@@ -337,7 +339,8 @@ export default class MemosStore extends Store<StoresMap, ActionsMap> {
       } else {
         // save memo locally
         await this._downloadAndSaveTxMemo({
-          publicDeriver: request.publicDeriver,
+          publicDeriverId: request.publicDeriver.publicDeriverId,
+          plateTextPart: request.publicDeriver.plate.textPart,
           txHash: memo.tx
         });
       }

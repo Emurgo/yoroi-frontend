@@ -166,8 +166,6 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
         );
       });
     }
-
-    this.stores.transactions.clearSubmittedTransactions(request.publicDeriver);
   };
 
   @action _removeWallet: {|

@@ -5,75 +5,39 @@ import type { Addressing } from '../../../app/api/ada/lib/storage/models/PublicD
 import type { LastSyncInfoRow, } from '../../../app/api/ada/lib/storage/database/walletTypes/core/tables';
 import type { CoreAddressT } from '../../../app/api/ada/lib/storage/database/primitives/enums';
 import type { IHasUtxoChainsRequest } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces.js';
+import type { AssuranceMode } from '../../../app/types/transactionAssurance.types';
+import type { MultiToken } from '../../../app/api/common/lib/MultiToken';
+
 export type WalletType = 'trezor' | 'ledger' | 'mnemonic';
+
+// Note: this is actually mapping from CoreAddressT to Array<AddressType>, but the values of
+// CoreAddressT are integers 0 ~ 4 so we use an array here.
+type AddressesByType = Array<Array<FullAddressPayload>>;
 
 export type WalletState = {|
   publicDeriverId: number,
   conceptualWalletId: number,
-/*
-  const withUtxos = asGetAllUtxos(publicDeriver);
-  if (withUtxos == null) {
-    return publicDeriver.getParent().getDefaultMultiToken();
-  }
-  const basePubDeriver = withUtxos;
-
-  // TODO: need to also deal with pointer address summing
-  // can get most recent pointer from getCurrentDelegation result
-
-  const stakingKey = unwrapStakingKey(stakingAddress);
-  const allUtxo = await basePubDeriver.getAllUtxos();
-*/
   utxos: Array<any>, // fixme
   transactions: Array<any>,
   networkId: number,
   name: string,
   type: WalletType,
-  // request.publicDeriver.getParent().hardwareInfo?.DeviceId
   hardwareWalletDeviceId: ?string,
-  // cache
   plate: WalletChecksum,
   publicKey: string,
-/*
-  app/stores/stateless/addressStores.js getReceiveAddress
-      const anAddressFormatted = addressToDisplayString(
-        receiveAddress.addr.Hash,
-        parent.getNetworkInfo()
-      );
-*/
   receiveAddress: BaseSingleAddressPath,
-/*
-    const withPublicKey = asGetPublicKey(selected);
-    if (withPublicKey == null) {
-      return null;
-    }
-    withPublicKey.pathToPublic
-*/
   pathToPublic: Array<number>,
-/*
-              this.props.stores.wallets.getSigningKeyCache(withSigning).signingKeyUpdateDate
-*/
-  signingKeyUpdateDate: string,
-//AdaDelegationTransactionStore.js
+  signingKeyUpdateDate: ?string,
   stakingAddressing: Addressing,
   stakingAddress: string,
   stakingKey: string,
-  //publicDeriver.getParent().getPublicDeriverLevel(),
   publicDeriverLevel: number,
-  // ?? need?
   lastSyncInfo: $ReadOnly<LastSyncInfoRow>,
   balance: MultiToken,
   defaultTokenId: string,
-  // delegation store stuff
-
-  //import type { AssuranceMode, } from '../../types/transactionAssurance.types';
   assuranceMode: AssuranceMode,
-/*
-    const allAddresses = await this.api.ada.getAllAddressesForDisplay({
-      publicDeriver,
-      type: CoreAddressTypes.CARDANO_BASE,
-    });
-*/
-  allAddresses: Map<CoreAddressT, Array<any>>,
-  foreignAddresses: Array<any>,
-  chainAddresses: Map<IHasUtxoChainsRequest, Map<CoreAddressT, Array<any>>>,
+  allAddressesByType: AddressesByType,
+  foreignAddresses: Array<{| address: string, type: CoreAddressT |}>,
+  externalAddressesByType: AddressesByType,
+  internalAddressesByType: AddressesByType,
 |};

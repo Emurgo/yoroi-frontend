@@ -6,7 +6,12 @@ import { MultiToken } from '../../../app/api/common/lib/MultiToken';
 import type CardanoTxRequest from '../../../app/api/ada';
 import type { RemoteUnspentOutput } from '../../../app/api/ada/lib/state-fetch/types';
 import type { IGetAllUtxosResponse } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
-import type { CreateWalletRequest } from '../../../app/api/thunk';
+import type {
+  CreateWalletRequestType,
+  CreateHardwareRequestType
+  ChangeSigningKeyPasswordRequestType,
+  SignAndBroadcastRequestType,
+} from '../../../app/api/thunk';
 
 // ----- Types used in the dApp <-> Yoroi connection bridge ----- //
 
@@ -232,7 +237,57 @@ export type SubscribeWalletStateChanges = {|
 |};
 export type CreateWallet = {|
   type: 'create-wallet',
-  request: CreateWalletRequest,
+  request: CreateWalletRequestType,
+|};
+export type CreateHardwareWallet = {|
+  type: 'create-hardware-wallet',
+  request: CreateHardwareWalletRequestType,
+|};
+export type RemoveWallet = {|
+  type: 'remove-wallet',
+  request: {| publicDeriverId: number |}
+|};
+export type GetWallets = {|
+  type: 'get-wallets',
+|};
+export type ChangeSigningPassword = {|
+  type: 'change-signing-password',
+  request: ChangeSigningKeyPasswordRequestType,
+|};
+export type RenamePublicDeriver = {|
+  type: 'rename-public-deriver',
+  request: {| publicDeriverId: number, newName: string |}
+|};
+export type RenameConceptualWallet = {|
+  type: 'rename-conceptual-wallet',
+  request: {| conceptualWalletId: number, newName: string |}
+|};
+export type SignAndBroadcast = {|
+  type: 'sign-and-broadcast',
+  request: SignAndBroadcastRquestType,
+|};
+export type GetPrivateStakingKey = {|
+  type: 'get-private-staking-key',
+  request: {| publicDeriverId: number, password: string |}
+|};
+export type GetCardanoAssets = {|
+  type: 'get-cardano-assets',
+  request: {| networkId: number, tokenIds: Array<string> |}
+|};
+export type UpsertTxMemo = {|
+  type: 'upsert-tx-memo',
+  request: {| publicDeriverId: number, memo: TxMemoTableInsert | TxMemoTableRow |}
+|};
+export type DeleteTxMemo = {|
+  type: 'delete-tx-memo',
+  request: {| publicDeriverId: number, key: TxMemoLookupKey, |},
+|};
+export type GetAllTxMemos = {|
+  type: 'get-all-tx-memos';
+|};
+export type RemoveAllTransactions = {|
+  type: 'remove-all-transactions',
+  request: {| publicDeriverId: number |}
 |};
 export type TxSignWindowRetrieveData = {|
   type: 'tx_sign_window_retrieve_data',

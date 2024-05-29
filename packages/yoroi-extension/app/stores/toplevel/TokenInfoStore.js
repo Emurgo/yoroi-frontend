@@ -62,7 +62,7 @@ export default class TokenInfoStore<
     networkId,
     tokenIds
   ) => {
-    const assets = await getCaranoAssets({ networkId, tokenIds });
+    const assets = await getCardanoAssets({ networkId, tokenIds });
     runInAction(() => { this._updateTokenInfo(assets) });
   }
 

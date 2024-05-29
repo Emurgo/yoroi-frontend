@@ -9,8 +9,6 @@ import environment from '../../environment';
 import config from '../../config';
 import globalMessages from '../../i18n/global-messages';
 import type { Notification } from '../../types/notification.types';
-import type { GetWalletsFunc } from '../../api/common/index';
-import { getWallets } from '../../api/common/index';
 import type { CreateWalletResponse, RestoreWalletResponse } from '../../api/common/types';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
@@ -34,61 +32,11 @@ import type { StoresMap } from '../index';
 import { getWalletChecksum } from '../../api/export/utils';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { WalletState } from '../../../chrome/extension/background/types';
-
-/* fixme
-type GroupedWallets = {|
-  publicDerivers: Array<PublicDeriver<>>,
-  conceptualWallet: ConceptualWallet,
-|};
-
-function groupWallets(publicDerivers: Array<PublicDeriver<>>): Array<GroupedWallets> {
-  const pairingMap = new Map();
-  for (const publicDeriver of publicDerivers) {
-    // note: this may override previous entries but the result is the same
-    const parent = publicDeriver.getParent();
-    pairingMap.set(parent, {
-      conceptualWallet: parent,
-      publicDerivers: [],
-    });
-  }
-  // now fill them with public derivers
-  for (const publicDeriver of publicDerivers) {
-    const parentEntry = pairingMap.get(publicDeriver.getParent());
-    if (parentEntry == null) throw new Error('getPairing public deriver without parent');
-    parentEntry.publicDerivers.push(publicDeriver);
-  }
-  return Array.from(pairingMap.values());
-}
-
-export function groupForWallet(
-  grouped: Array<GroupedWallets>,
-  publicDeriver: PublicDeriver<>
-): void | GroupedWallets {
-  for (const conceptualGroup of grouped) {
-    for (const pubDeriver of conceptualGroup.publicDerivers) {
-      if (pubDeriver === publicDeriver) {
-        return conceptualGroup;
-      }
-    }
-  }
-  return undefined;
-}
-
-export type SigningKeyCache = {|
-  publicDeriver: IGetSigningKey,
-  // todo: maybe should be a Request instead of just the result data
-  signingKeyUpdateDate: null | Date,
-|};
-
-export type PublicKeyCache = {|
-  publicDeriver: IGetPublic,
-  plate: WalletChecksum,
-  publicKey: string,
-|};
-*/
+import { getWallets } from '../../api/thunk';
 
 export type SendMoneyRequest = Request<DeferredCall<{| txId: string |}>>;
 
+type GetWalletsFunc = () => Array<WalletState>;
 
 /**
  * The base wallet store that contains the shared logic
@@ -100,6 +48,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   @observable initialSyncingWalletIds: Array<number> = [];
   @observable wallets: Array<WalletState> = [];
   @observable selected: null | WalletState;
+  @observable getInitialWallets: Request<GetWalletsFunc> = new Request<GetWalletsFunc>(getWallets);
 
   @observable sendMoneyRequest: SendMoneyRequest = new Request<
     DeferredCall<{| txId: string |}>
@@ -127,27 +76,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     this.restoreRequest.reset();
     return restoredWallet;
   });
-  /*
-  @observable signingKeyCache: Array<SigningKeyCache> = [];
-  getSigningKeyCache: IGetSigningKey => SigningKeyCache = publicDeriver => {
-    const foundRequest = find(this.signingKeyCache, { publicDeriver });
-    if (foundRequest) return foundRequest;
-
-    throw new Error(
-      `${nameof(WalletStore)}::${nameof(this.getSigningKeyCache)} no signing key in cache`
-    );
-  };
-
-  @observable publicKeyCache: Array<PublicKeyCache> = [];
-  getPublicKeyCache: IGetPublic => PublicKeyCache = publicDeriver => {
-    const foundRequest = find(this.publicKeyCache, { publicDeriver });
-    if (foundRequest) return foundRequest;
-
-    throw new Error(
-      `${nameof(WalletStore)}::${nameof(this.getPublicKeyCache)} no public key in cache`
-    );
-  };
-  */
 
   setup(): void {
     super.setup();
@@ -158,32 +86,22 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   @action
   _baseAddNewWallet: RestoreWalletResponse => Promise<void> = async newWallet => {
-    // set the first created as the result
-    const newWithCachedData: Array<PublicDeriver<>> = [];
-    for (const newPublicDeriver of newWallet.publicDerivers) {
-      const withCache = await this.populateCacheForWallet(newPublicDeriver);
-      newWithCachedData.push(withCache);
-    }
-
     this.showWalletCreatedNotification();
 
-    for (const pubDeriver of newWithCachedData) {
-      const lastSyncInfo = await pubDeriver.getLastSyncInfo();
-      this.registerObserversForNewWallet({
-        publicDeriver: pubDeriver,
-        lastSyncInfo,
-      });
-    }
-    for (const publicDeriver of newWithCachedData) {
-      this._queueWarningIfNeeded(publicDeriver);
-    }
+    this.registerObserversForNewWallet({
+      publicDeriver: newWallet,
+      lastSyncInfo: newWallet.lastSyncInfo,
+    });
+
+    this._queueWarningIfNeeded(newWallet);
+
     runInAction(() => {
-      this.publicDerivers.push(...newWithCachedData);
+      this.wallets.push(newWallet);
       this._setActiveWallet({
-        wallet: newWithCachedData[0],
+        wallet: newWallet,
       });
       this.actions.dialogs.closeActiveDialog.trigger();
-      this.initialSyncingWalletIds.push(newWallet.publicDerivers[0].getPublicDeriverId());
+      this.initialSyncingWalletIds.push(newWallet.publicDeriverId);
       this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
     });
   };
@@ -208,106 +126,59 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     if (!this.hasLoadedWallets) return undefined;
     return this.wallets.length > 0;
   }
-/*
-  @computed get grouped(): Array<GroupedWallets> {
-    return groupWallets(this.publicDerivers);
-  }
 
-  refreshWalletFromLocalOnLaunch: (PublicDeriver<>) => Promise<void> = async publicDeriver => {
-    try {
-      await this.stores.transactions.refreshTransactionData({
-        publicDeriver,
-        isLocalRequest: true,
-      });
-      await this.stores.addresses.refreshAddressesFromDb(publicDeriver);
-    } catch (error) {
-      Logger.error(
-        `${nameof(WalletStore)}::${nameof(this.refreshWalletFromLocalOnLaunch)} ` +
-          stringifyError(error)
-      );
-      throw error;
-    }
-  };
-*/
   @action
   addHwWallet: (WalletState) => Promise<void> = async (wallet): Promise<void> => {
-    /* fixme
-    const lastSyncInfo = await publicDeriver.getLastSyncInfo();
-    const withCache = await this.populateCacheForWallet(publicDeriver);
-
     this.registerObserversForNewWallet({
-      publicDeriver: withCache,
-      lastSyncInfo,
+      publicDeriver: wallet,
+      lastSyncInfo: wallet.lastSyncInfo,
     });
-    this._queueWarningIfNeeded(withCache);
-    runInAction(() => {
-      this.publicDerivers.push(withCache);
-      this.initialSyncingWalletIds.push(publicDeriver.getPublicDeriverId());
-    });
-    */
+    this._queueWarningIfNeeded(wallet);
+
     runInAction(() => {
       this.wallets.push(wallet);
+      this.initialSyncingWalletIds.push(wallet.publicDeriverId);
     });
   };
 
   /** Make all API calls required to setup/update wallet */
-/*
   @action restoreWalletsFromStorage: void => Promise<void> = async () => {
-    const persistentDb = this.stores.loading.getDatabase();
-    if (persistentDb == null) {
-      throw new Error(
-        `${nameof(this.restoreWalletsFromStorage)} db not loaded. Should never happen`
-      );
-    }
-    const result = await this.getInitialWallets.execute({
-      db: persistentDb,
-    }).promise;
+    const result = await this.getInitialWallets.execute().promise;
     if (result == null || result.length === 0) return;
 
-    const newWithCachedData: Array<PublicDeriver<>> = [];
-    for (const newPublicDeriver of result) {
-      const withCache = await this.populateCacheForWallet(newPublicDeriver);
-      newWithCachedData.push(withCache);
-    }
-    for (const publicDeriver of newWithCachedData) {
-      const lastSyncInfo = await publicDeriver.getLastSyncInfo();
+    for (const publicDeriver of result) {
       this.registerObserversForNewWallet({
         publicDeriver,
-        lastSyncInfo,
+        lastSyncInfo: publicDeriver.lastSyncInfo,
       });
-    }
-    for (const publicDeriver of newWithCachedData) {
       this._queueWarningIfNeeded(publicDeriver);
     }
+
     runInAction('refresh active wallet', () => {
-      if (this.selected == null && newWithCachedData.length === 1) {
+      if (this.selected == null && result.length === 1) {
         this.actions.wallets.setActiveWallet.trigger({
-          wallet: newWithCachedData[0],
+          wallet: result[0],
         });
       }
-      this.publicDerivers.push(...newWithCachedData);
+      this.wallets.push(...result);
     });
-    setTimeout(async () => {
-      await Promise.all(newWithCachedData
-        .map(w => this.refreshWalletFromLocalOnLaunch(w)));
-    }, 50); // let the UI render first so that the loading process is perceived faster
   };
 
   @action registerObserversForNewWallet: ({|
-    publicDeriver: PublicDeriver<>,
+    publicDeriver: WalletState,
     lastSyncInfo: IGetLastSyncInfoResponse,
   |}) => void = request => {
     const { addresses, transactions, substores } = this.stores;
     addresses.addObservedWallet(request.publicDeriver);
     transactions.addObservedWallet(request);
     const { time, delegation } = substores.ada;
-    time.addObservedTime(request.publicDeriver);
+    time.addObservedTime(request.publicDeriver.publicDeriverId);
     if (asGetStakingKey(request.publicDeriver) != null) {
       delegation.addObservedWallet(request.publicDeriver);
       delegation.refreshDelegation(request.publicDeriver);
     }
   };
-*/
+
   // =================== ACTIVE WALLET ==================== //
 
   @action _setActiveWallet: ({| publicDeriverId: number |}) => void = ({ publicDeriverId }) => {
@@ -355,65 +226,8 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     this.actions.notifications.open.trigger(WalletCreationNotifications.WalletRestoredNotification);
   };
 
-/*
-  // TODO: maybe delete this function and turn it into another "addObservedWallet"
-  populateCacheForWallet: (PublicDeriver<>) => Promise<PublicDeriver<>> = async publicDeriver => {
-    // $FlowFixMe[incompatible-call]
-    const withPubKey = asGetPublicKey(publicDeriver);
-
-    if (withPubKey != null) {
-      const publicKey = await withPubKey.getPublicKey();
-      if (publicKey.IsEncrypted) {
-        throw new Error(`${nameof(this.populateCacheForWallet)} unexpected encrypted public key`);
-      }
-      const checksum = await getWalletChecksum(withPubKey);
-      if (checksum != null) {
-        runInAction(() => {
-          this.publicKeyCache.push({
-            publicDeriver: withPubKey,
-            plate: checksum,
-            publicKey: publicKey.Hash,
-          });
-        });
-      }
-    }
-
-    const publicDeriverInfo = await publicDeriver.getFullPublicDeriverInfo();
-    const conceptualWalletInfo = await publicDeriver.getParent().getFullConceptualWalletInfo();
-
-    {
-      const withSigningKey = asGetSigningKey(publicDeriver);
-      if (withSigningKey) {
-        const key = await withSigningKey.getSigningKey();
-        runInAction(() => {
-          this.signingKeyCache.push({
-            publicDeriver: withSigningKey,
-            signingKeyUpdateDate: key.row.PasswordLastUpdate,
-          });
-        });
-      }
-    }
-    runInAction(() => {
-      this.stores.walletSettings.publicDeriverSettingsCache.push({
-        publicDeriver,
-        assuranceMode: assuranceModes.NORMAL,
-        publicDeriverName: publicDeriverInfo.Name,
-      });
-      this.stores.walletSettings.conceptualWalletSettingsCache.push({
-        conceptualWallet: publicDeriver.getParent(),
-        conceptualWalletName: conceptualWalletInfo.Name,
-      });
-      this.stores.walletSettings.walletWarnings.push({
-        publicDeriver,
-        dialogs: [],
-      });
-    });
-
-    return publicDeriver;
-  };
-*/
   @action
-  _queueWarningIfNeeded: (PublicDeriver<>) => void = publicDeriver => {
+  _queueWarningIfNeeded: (WalletState) => void = publicDeriver => {
     if (environment.isTest()) return;
     if (!environment.isProduction()) return;
 
@@ -429,32 +243,30 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       'SKBE-5478',
       'SHHN-6941', // mobile debug restore
     ];
-    const withPubKey = asGetPublicKey(publicDeriver);
-    if (withPubKey != null) {
-      const { plate } = this.getPublicKeyCache(withPubKey);
-      const existingWarnings = this.stores.walletSettings.getWalletWarnings(publicDeriver);
-      // bring this back if we ever need it. Removing this code deletes the i18n strings.
-      // eslint-disable-next-line no-constant-condition
-      if (false) {
-        existingWarnings.dialogs.push(
-          createProblematicWalletDialog(
-            plate.TextPart,
-            action(() => {
-              existingWarnings.dialogs.pop();
-            }),
-          )
-        );
-      }
-      if (debugWalletChecksums.find(elem => elem === plate.TextPart) != null) {
-        existingWarnings.dialogs.push(
-          createDebugWalletDialog(
-            plate.TextPart,
-            action(() => {
-              existingWarnings.dialogs.pop();
-            }),
-          )
-        );
-      }
+
+    const { plate } = publicDeriver;
+    const existingWarnings = this.stores.walletSettings.getWalletWarnings(publicDeriver.publicDeriverId);
+    // bring this back if we ever need it. Removing this code deletes the i18n strings.
+    // eslint-disable-next-line no-constant-condition
+    if (false) {
+      existingWarnings.dialogs.push(
+        createProblematicWalletDialog(
+          plate.TextPart,
+          action(() => {
+            existingWarnings.dialogs.pop();
+          }),
+        )
+      );
+    }
+    if (debugWalletChecksums.find(elem => elem === plate.TextPart) != null) {
+      existingWarnings.dialogs.push(
+        createDebugWalletDialog(
+          plate.TextPart,
+          action(() => {
+            existingWarnings.dialogs.pop();
+          }),
+        )
+      );
     }
   };
 
@@ -473,6 +285,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
           try {
             await this.actions.memos.saveTxMemo.trigger({
               publicDeriverId: request.publicDeriverId,
+              plateTextPart: request.plate.textPart,
               memo: {
                 Content: memo,
                 TransactionHash: result.txId,

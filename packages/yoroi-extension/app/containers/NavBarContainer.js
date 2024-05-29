@@ -120,7 +120,7 @@ export default class NavBarContainer extends Component<Props> {
             walletAmount={balance}
             getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
             defaultToken={this.props.stores.tokenInfoStore.getDefaultTokenInfo(
-              publicDeriver.getParent().getNetworkInfo().NetworkId
+              publicDeriver.networkId
             )}
             unitOfAccountSetting={profile.unitOfAccount}
             getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}

@@ -398,7 +398,6 @@ export default class LedgerConnectStore
       walletName,
       publicKey: publicMasterKey,
       hwFeatures,
-      checkAddressesInUse: stateFetcher.checkAddressesInUse,
       network: selectedNetwork,
     };
   };

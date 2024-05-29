@@ -14,6 +14,7 @@ import type { Address, Addressing } from '../../api/ada/lib/storage/models/Publi
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import type { WalletState } from '../../../chrome/extension/background/types';
 
 export default class YoroiTransferStore extends Store<StoresMap, ActionsMap> {
 

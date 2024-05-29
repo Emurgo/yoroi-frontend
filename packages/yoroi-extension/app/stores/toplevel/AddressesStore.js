@@ -99,7 +99,7 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
     publicDeriver
   ) => {
     allAddressSubgroups
-      .filter(store => store.isRelated()
+      .filter(store => store.isRelated())
       .map(store => store.class)
       .forEach(
         storeClass => this._addressSubgroupMap.get(storeClass)?.addObservedWallet(publicDeriver)
@@ -124,7 +124,7 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
     storeName: AddressTypeName,
     type: CoreAddressT,
   |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
-    const allAddresses = request.publicDeriver.allAddresses.get(request.type);
+    const allAddresses = request.publicDeriver.allAddressesByType[request.type];
     return this.storewiseFilter({
       publicDeriver: request.publicDeriver,
       storeName: request.storeName,
@@ -142,7 +142,7 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
     publicDeriver: WalletState,
     storeName: AddressTypeName,
   |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
-    const allAddresses = request.publicDeriver.foreginAddresses;
+    const allAddresses = request.publicDeriver.foreignAddresses;
 
     return this.storewiseFilter({
       publicDeriver: request.publicDeriver,
@@ -151,7 +151,7 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
         type: addrInfo.type,
         address: addressToDisplayString(
           addrInfo.address,
-          getNetworkId(request.publicDeriver.networkId),
+          getNetworkById(request.publicDeriver.networkId),
         ),
         label: 'asdf',
       })),
@@ -164,7 +164,11 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
     type: CoreAddressT,
     chainsRequest: IHasUtxoChainsRequest,
   |}=> Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
-    const addresses = request.publicDeriver.chainAddresses.get(request.chainsRequest).get(request.type);
+    const addresses = (
+      request.chainsRequest === ChainDerivations.EXTERNAL ?
+        request.publicDeriver.externalAddressesByType :
+        request.publicDeriver.internalAddressesByType
+    )[request.type];
 
     return this.storewiseFilter({
       publicDeriver: request.publicDeriver,

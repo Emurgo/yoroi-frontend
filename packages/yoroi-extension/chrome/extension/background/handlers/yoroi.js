@@ -19,6 +19,19 @@ import type {
   GetDb,
   SubscribeWalletStateChanges,
   CreateWallet,
+  CreateHardwareWallet,
+  RemoveWallet,
+  GetWallets,
+  ChangeSigningPassword,
+  RenamePublicDeriver,
+  RenameConceptualWallet,
+  SignAndBroadcast,
+  GetPrivateStakingKey,
+  GetCardanoAssets,
+  UpsertTxMemo,
+  DeleteTxMemo,
+  GetAllTxMemos,
+  RemoveAllTransactions,
 } from '../../connector/types';
 import {
   APIErrorCodes,
@@ -93,7 +106,11 @@ import {
 } from './content';
 import type { ConnectedSite } from './content';
 import { subscribeWalletStateChanges } from '../state';
-import AdaApi from '../../../../app/api/ada';
+import AdaApi, { genOwnStakingKey } from '../../../../app/api/ada';
+import { loadWalletsFromStorage } from '../../../../app/api/ada/lib/storage/models/load';
+import { getWalletState } from './utils';
+import { getCardanoStateFetcher } from '../utils';
+import { removePublicDeriver } from '../../../../app/api/ada/lib/storage/bridge/walletBuilder/remove';
 
 const YOROI_MESSAGES = Object.freeze({
   CONNECT_RESPONSE: 'connect_response',
@@ -110,6 +127,18 @@ const YOROI_MESSAGES = Object.freeze({
   SUBSCRIBE_WALLET_STATE_CHANGES: 'subscribe-wallet-state-changes',
   CREATE_WALLET: 'create-wallet',
   CREAET_HARDWARE_WALLET: 'create-hardware-wallet',
+  REMOVE_WALLET: 'remove-wallet',
+  GET_WALLETS: 'get-wallets',
+  CHANGE_SIGNING_PASSWORD: 'change-signing-password',
+  RENAME_PUBLIC_DERIVER: 'rename-public-deriver',
+  RENAME_CONCEPTUAL_WALLET: 'rename-conceptual-wallet',
+  SIGN_AND_BROADCAST: 'sign-and-broadcast',
+  GET_PRIVATE_STAKING_KEY: 'get-private-staking-key',
+  GET_CARDANO_ASSETS: 'get-cardano-assets',
+  UPSERT_TX_MEMO: 'upsert-tx-memo',
+  DELETE_TX_MEMO: 'delete-tx-memo',
+  GET_ALL_TX_MEMOS: 'get-all-tx-memos',
+  REMOVE_ALL_TRANSACTIONS: 'remove-all-transactions',
 });
 
 // messages from other parts of Yoroi (i.e. the UI for the connector)
@@ -127,6 +156,19 @@ export async function yoroiMessageHandler(
     | GetDb
     | SubscribeWalletStateChanges
     | CreateWallet
+    |  CreateHardwareWallet
+    | RemoveWallet
+    | GetWallets
+    | ChangeSigningPassword
+    | RenamePublicDeriver
+    | RenameConceptualWallet
+    | SignAndBroadcast
+    | GetPrivateStakingKey
+    | GetCardanoAssets
+    | UpsertTxMemo
+    | DeleteTxMemo
+    | GetAllTxMemos
+    | RemoveAllTransactions
   ),
   sender: any,
   sendResponse: Function,
@@ -532,7 +574,143 @@ export async function yoroiMessageHandler(
     }
     sendResponse({ error: null });
   } else if (request.type === YOROI_MESSAGES.CREATE_HARDWARE_WALLET) {
-    //fixme
+    try {
+      const db = await getDb();
+      const network = getNetworkById(request.request.networkId);
+
+      const stateFetcher = await getCardanoStateFetcher(new LocalStorageApi());
+
+      const adaApi = new AdaApi();
+      await adaApi.createHardwareWallet({
+        db,
+        network,
+        walletName: request.request.walletName,
+        publicKey: request.request.publicKey,
+        hwFeatures: request.request.hwFeatures,
+        checkAddreessesInUse: stateFetcher.checkAddressesInUse,
+        addressing: request.request.addressing,
+      });
+    } catch(error) {
+      sendResponse({ error: error.message });
+      return;
+    }
+    sendResponse({ error: null });
+  } else if (request.type === YOROI_MESSAGES.REMOVE_WALLET) {
+    // fixme: notify all tabs
+    const publicDeriver = getPublicDeriverById(request.request.publicDeriverId);
+    if (publicDeriver) {
+      await removePublicDeriver({
+        publicDeriver,
+        conceptualWallet: publicDeriver.getParent(),
+      });
+    }
+    sendResponse(null);
+  } else if (request.type === YOROI_MESSAGES.GET_WALLETS) {
+    const db = await getDb();
+    const publicDerivers = await loadWalletsFromStorage(db);
+    const result = await Promise.all(publicDerivers.map(getWalletState));
+    sendResponse(result);
+  } else if (request.type === YOROI_MESSAGES.CHANGE_SIGNING_PASSWORD) {
+    const publicDeriver = getPublicDeriverById(request.request.publicDeriverId);
+    if (publicDeriver) {
+      const withSigningKey = asGetSigningKey(publicDeriver);
+      if (withSigningKey == null) {
+        throw new Error('unexpected missing asGetSigningKey result');
+      }
+      const newUpdateDate = new Date(Date.now());
+      await withSigningKey.changeSigningKeyPassword({
+        currentTime: newUpdateDate,
+        oldPassword: request.request.oldPassword,
+        newPassword: request.request.newPassword,
+      });
+      sendResponse(null);
+    }
+  } else if (request.type === YOROI_MESSAGES.RENAME_PUBLIC_DERIVER) {
+    const publicDeriver = getPublicDeriverById(request.request.publicDeriverId);
+    if (publicDeriver) {
+      await publicDeriver.rename({ newName: request.request.newName });
+    }
+    sendResponse(null);
+  } else if (request.type === YOROI_MESSAGES.RENAME_CONCEPTUAL_WALLET) {
+    const db = await getDb();
+    for (let publicDeriver of await loadWalletsFromStorage(db)) {
+      if (publicDeriver.getParent().getConceptualWalletId() === request.request.conceptualWalletId) {
+        await publicDeriver.getParent().rename({ newName: request.request.newName });
+      }
+    }
+    sendResponse(null);
+  } else if (request.type === YOROI_MESSAGES.SIGN_AND_BROADCAST) {
+    const publicDeriver = getPublicDeriverById(request.request.publicDeriverId);
+    if (!publicDeriver) {
+      sendResponse({ error: 'no public deriver' });
+      return;
+    }
+    try {
+      const withSigning = asGetSigningKey(publicDeriver);
+      if (withSigning == null) {
+        throw new Error('unexpected missing asGetSigningKey result');
+      }
+
+      const { neededStakingKeyHashes } = request.request.signRequest;
+      if (neededStakingKeyHashes.neededHashes.size - neededStakingKeyHashes.wits.size >= 2) {
+        throw new Error('Too many missing witnesses');
+      }
+      if (neededStakingKeyHashes.neededHashes.size !== neededStakingKeyHashes.wits.size) {
+        const withStakingKey = asGetAllAccounting(withSigning);
+        if (withStakingKey == null) {
+          throw new Error('unexpected missing asGetAllAcccounting result');
+        }
+        const stakingKey = await genOwnStakingKey({
+          publicDeriver: withStakingKey,
+          password: request.request.password,
+        });
+        if (request.request.signRequest.neededStakingKeyHashes.neededHashes.has(
+          Buffer.from(
+            RustModule.WalletV4.Credential.from_keyhash(
+              stakingKey.to_public().hash()
+            ).to_bytes()
+          ).toString('hex')
+        )) {
+          neededStakingKeyHashes.wits.add(
+            Buffer.from(RustModule.WalletV4.make_vkey_witness(
+              RustModule.WalletV4.hash_transaction(
+                request.request.signRequest.unsignedTx.build()
+              ),
+              stakingKey
+            ).to_bytes()).toString('hex')
+          );
+        } else {
+          throw new Error('missing witness but it was not ours');
+        }
+      }
+
+      const stateFetcher = await getCardanoStateFetcher(new LocalStorageApi());
+      const adaApi = new AdaApi();
+      const { txId } = await adaApi.signAndBroadcast({
+        publicDeriver: withSigning,
+        password: request.request.password,
+        signRequest: request.request.signRequest,
+        sendTx: stateFetcher.sendTx,
+      });
+
+      sendResponse({ txId });
+    } catch (error) {
+      sendResponse({ error: error.message });
+    }
+    
+    // AdaTransactionsStore.recordSubmittedTransaction
+
+  } else if (request.type === YOROI_MESSAGES.GET_PRIVATE_STAKING_KEY) {
+  } else if (request.type === YOROI_MESSAGES.GET_CARDANO_ASSETS) {
+// TokenInfoStore.fetchMissingTokenInfo
+// [... assertMap.values()]
+
+  } else if (request.type === YOROI_MESSAGES.UPSERT_TX_MEMO) {
+  } else if (request.type === YOROI_MESSAGES.DELETE_TX_MEMO) {
+  } else if (request.type === YOROI_MESSAGES.GET_ALL_TX_MEMOS) {
+  } else if (request.type === YOROI_MESSAGES.REMOVE_ALL_TRANSACTIONS) {
+     //this.stores.transactions.clearSubmittedTransactions(request.publicDeriver);
+
   } else {
     console.error(`unknown message ${JSON.stringify(request)} from ${sender.tab.id}`)
   }
@@ -540,4 +718,14 @@ export async function yoroiMessageHandler(
 
 export function isYoroiMessage({ type }: {| type: string |}): boolean {
   return Object.values(YOROI_MESSAGES).includes(type);
+}
+
+function getPublicDeriverById(publicDeriverId: number): ?PublicDeriver<> {
+  const db = await getDb();
+  for (let publicDeriver of await loadWalletsFromStorage(db)) {
+    if (publicDeriver.getPublicDeriverId() === publicDeriverId) {
+      return publicDeriver;
+    }
+  }
+  return null;
 }

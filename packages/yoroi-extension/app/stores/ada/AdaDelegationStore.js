@@ -30,8 +30,13 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
 
   _recalculateDelegationInfoDisposer: Array<void => void> = [];
 
-  @action addObservedWallet: (number, number, string) => void = (
-    publicDeriverId, networkId, defaultTokenId,
+  @action addObservedWallet: ({
+    publicDeriverId: number,
+    networkId: number,
+    defaultTokenId: string
+    ...
+  }) => void = (
+    { publicDeriverId, networkId, defaultTokenId }
   ) => {
     this.stores.delegation.delegationRequests.push({
       publicDeriverId,

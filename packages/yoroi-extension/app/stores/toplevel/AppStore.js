@@ -39,7 +39,7 @@ export default class AppStore extends Store<StoresMap, ActionsMap> {
     const currentRoute = this.stores.router.location.pathname;
     if (
       options.publicDeriverId !== undefined &&
-      options.publicDeriverId !== this.stores.wallets.selected.publicDeriverId
+      options.publicDeriverId !== this.stores.wallets.selected?.publicDeriverId
     ) {
       if (options.publicDeriverId == null) {
         this.actions.wallets.unselectWallet.trigger();
