@@ -30,13 +30,30 @@ const TableRowSkeleton = ({ id, theme }) => (
     }}
   >
     <TableCell>
-      <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
-        <Skeleton width="40px" height="40px" />
-        <Stack direction="column" spacing={theme.spacing(0.25)}>
-          <Skeleton width="55px" height="24px" />
-          <Skeleton width="55px" height="16px" />
-        </Stack>
+      <Stack direction="row" alignItems="center" spacing={theme.spacing(1)}>
+        <Skeleton width="24px" height="24px" />
+        <Skeleton width="55px" height="24px" />
+        <Typography fontWeight="500" sx={{ color: theme.palette.ds.text_gray_normal }}>
+          /
+        </Typography>
+        <Skeleton width="24px" height="24px" />
+        <Skeleton width="55px" height="24px" />
       </Stack>
+    </TableCell>
+
+    <TableCell>
+      <Stack direction="row" alignItems="center" spacing={theme.spacing(1)}>
+        <Skeleton width="32px" height="32px" />
+        <Skeleton width="126px" height="24px" />
+      </Stack>
+    </TableCell>
+
+    <TableCell>
+      <Skeleton width="55px" height="24px" />
+    </TableCell>
+
+    <TableCell>
+      <Skeleton width="55px" height="24px" />
     </TableCell>
 
     <TableCell>
@@ -44,27 +61,9 @@ const TableRowSkeleton = ({ id, theme }) => (
     </TableCell>
 
     <TableCell>
-      <Skeleton width="62px" height="20px" />
-    </TableCell>
-
-    <TableCell>
-      <Skeleton width="62px" height="20px" />
-    </TableCell>
-
-    <TableCell>
-      <Skeleton width="62px" height="20px" />
-    </TableCell>
-
-    <TableCell>
-      <Skeleton width="146px" height="24px" />
-    </TableCell>
-
-    <TableCell>
-      <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
-        <Stack direction="column" spacing={theme.spacing(0.25)}>
-          <Skeleton width="146px" height="24px" />
-          <Skeleton width="146px" height="16px" />
-        </Stack>
+      <Stack direction="column" spacing={theme.spacing(0.25)} sx={{ float: 'right' }}>
+        <Skeleton width="146px" height="24px" />
+        <Skeleton width="146px" height="16px" />
       </Stack>
     </TableCell>
   </TableRow>

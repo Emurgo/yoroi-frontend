@@ -29,29 +29,45 @@ const TableRowSkeleton = ({ id, theme }) => (
     }}
   >
     <TableCell>
-      <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
-        <Skeleton width="40px" height="40px" />
-        <Stack direction="column" spacing={theme.spacing(0.25)}>
-          <Skeleton width="55px" height="24px" />
-          <Skeleton width="55px" height="16px" />
+      <Stack direction="row" alignItems="center" spacing={theme.spacing(1)}>
+        <Stack direction="row" alignItems="center" sx={{ position: 'relative', width: '46px' }}>
+          <Skeleton width="24px" height="24px" />
+          <Skeleton
+            width="24px"
+            height="24px"
+            sx={{ position: 'absolute', top: 0, left: '22px' }}
+          />
         </Stack>
+        <Skeleton width="146px" height="24px" />
       </Stack>
     </TableCell>
 
     <TableCell>
-      <Skeleton width="126px" height="24px" />
+      <Stack direction="row" alignItems="center" spacing={theme.spacing(1)}>
+        <Skeleton width="32px" height="32px" />
+        <Skeleton width="126px" height="24px" />
+      </Stack>
     </TableCell>
 
     <TableCell>
-      <Skeleton width="62px" height="20px" />
+      <Stack direction="column" spacing={theme.spacing(0.25)}>
+        <Skeleton width="146px" height="24px" />
+        <Skeleton width="146px" height="16px" />
+      </Stack>
     </TableCell>
 
     <TableCell>
-      <Skeleton width="62px" height="20px" />
+      <Stack direction="column" spacing={theme.spacing(0.25)}>
+        <Skeleton width="146px" height="24px" />
+        <Skeleton width="146px" height="16px" />
+      </Stack>
     </TableCell>
 
     <TableCell>
-      <Skeleton width="62px" height="20px" />
+      <Stack direction="column" spacing={theme.spacing(0.25)}>
+        <Skeleton width="146px" height="24px" />
+        <Skeleton width="146px" height="16px" />
+      </Stack>
     </TableCell>
 
     <TableCell>
@@ -59,11 +75,9 @@ const TableRowSkeleton = ({ id, theme }) => (
     </TableCell>
 
     <TableCell>
-      <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
-        <Stack direction="column" spacing={theme.spacing(0.25)}>
-          <Skeleton width="146px" height="24px" />
-          <Skeleton width="146px" height="16px" />
-        </Stack>
+      <Stack direction="column" spacing={theme.spacing(0.25)} sx={{ float: 'right' }}>
+        <Skeleton width="146px" height="24px" />
+        <Skeleton width="146px" height="16px" />
       </Stack>
     </TableCell>
   </TableRow>
