@@ -21,6 +21,7 @@ import minswapPng from '../../common/assets/images/minswap-dex.png';
 import { Chip } from '../../common/components/Chip';
 import { Skeleton } from '../../../../components/Skeleton';
 import { truncateAddressShort } from '../../../../../utils/formatters';
+import { Link } from 'react-router-dom';
 
 const TableRowSkeleton = ({ id, theme }) => (
   <TableRow
@@ -246,9 +247,16 @@ const OrderTable = ({ data, isLoading }) => {
                 </TableCell>
 
                 <TableCell>
-                  <Typography sx={{ color: theme.palette.ds.text_primary_medium }}>
-                    {truncateAddressShort(row.transactionId, 10)}
-                  </Typography>
+                  <Link
+                    href={`https://cardanoscan.io/transaction/${row.transactionId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ textDecoration: 'none' }}
+                  >
+                    <Typography sx={{ color: theme.palette.ds.text_primary_medium }}>
+                      {truncateAddressShort(row.transactionId, 10)}
+                    </Typography>
+                  </Link>
                 </TableCell>
 
                 <TableCell>

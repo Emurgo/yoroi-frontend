@@ -27,7 +27,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
 }));
 
 const TokenDetailChart = ({ isLoading, tokenInfo }) => {
-  const isAda = tokenInfo.id === 'ada';
+  const isAda = tokenInfo.id.toLowerCase() === 'ada';
   const chartHeight = isAda ? 156 : 241;
   const theme = useTheme();
   const { strings } = usePortfolio();

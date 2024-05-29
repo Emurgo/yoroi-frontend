@@ -37,7 +37,7 @@ const PortfolioWallet = ({ data }) => {
 
     const lowercaseKeyword = keyword.toLowerCase();
 
-    const temp = tokenList.filter(item => {
+    const temp = data.filter(item => {
       return (
         item.name.toLowerCase().includes(lowercaseKeyword) ||
         item.id.toLowerCase().includes(lowercaseKeyword)
@@ -114,34 +114,36 @@ const PortfolioWallet = ({ data }) => {
                   sx={{ marginLeft: theme.spacing(2) }}
                 >
                   <Chip
-                    active={mockData.PortfolioPage.balance.percents.active}
+                    active={mockData.PortfolioPage.balance.percents > 0}
                     label={
                       <Stack direction="row" justifyContent="space-between" alignItems="center">
                         <ArrowIcon
                           fill={
-                            mockData.PortfolioPage.balance.percents.active
+                            mockData.PortfolioPage.balance.percents > 0
                               ? theme.palette.ds.secondary_c800
                               : theme.palette.ds.sys_magenta_c700
                           }
                           style={{
                             marginRight: theme.spacing(0.5),
-                            transform: mockData.PortfolioPage.balance.percents.active
-                              ? ''
-                              : 'rotate(180deg)',
+                            transform:
+                              mockData.PortfolioPage.balance.percents > 0 ? '' : 'rotate(180deg)',
                           }}
                         />
                         <Typography variant="caption1">
-                          {mockData.PortfolioPage.balance.percents.value}%
+                          {mockData.PortfolioPage.balance.percents > 0
+                            ? mockData.PortfolioPage.balance.percents
+                            : -1 * mockData.PortfolioPage.balance.percents}
+                          %
                         </Typography>
                       </Stack>
                     }
                   />
                   <Chip
-                    active={mockData.PortfolioPage.balance.amount.active}
+                    active={mockData.PortfolioPage.balance.amount > 0}
                     label={
                       <Typography variant="caption1">
-                        {mockData.PortfolioPage.balance.amount.active ? '+' : '-'}
-                        {mockData.PortfolioPage.balance.amount.value} USD
+                        {mockData.PortfolioPage.balance.amount > 0 ? '+' : ''}
+                        {mockData.PortfolioPage.balance.amount} USD
                       </Typography>
                     }
                   />

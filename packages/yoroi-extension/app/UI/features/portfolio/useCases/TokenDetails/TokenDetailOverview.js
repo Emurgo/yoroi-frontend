@@ -7,7 +7,7 @@ import { usePortfolio } from '../../module/PortfolioContextProvider';
 import adaPng from '../../../../../assets/images/ada.png';
 
 const TokenDetailOverview = ({ tokenInfo, isLoading }) => {
-  const isAda = tokenInfo.id === 'ada';
+  const isAda = tokenInfo.id.toLowerCase() === 'ada';
   const theme = useTheme();
   const { strings } = usePortfolio();
 
@@ -71,7 +71,7 @@ const TokenDetailOverview = ({ tokenInfo, isLoading }) => {
           {isLoading ? (
             <Skeleton width="127px" height="20px" />
           ) : (
-            <Link href={tokenInfo.overview.website} target="_blank">
+            <Link href={tokenInfo.overview.website} target="_blank" rel="noopener noreferrer">
               cardano.org
             </Link>
           )}
@@ -139,14 +139,14 @@ const TokenDetailOverview = ({ tokenInfo, isLoading }) => {
             {isLoading ? (
               <Skeleton width="127px" height="20px" />
             ) : (
-              <Link href={tokenInfo.overview.detailOn} target="_blank">
+              <Link href={tokenInfo.overview.detailOn} target="_blank" rel="noopener noreferrer">
                 Cardanoscan
               </Link>
             )}
             {isLoading ? (
               <Skeleton width="60px" height="20px" />
             ) : (
-              <Link href={tokenInfo.overview.detailOn} target="_blank">
+              <Link href={tokenInfo.overview.detailOn} target="_blank" rel="noopener noreferrer">
                 Adaex
               </Link>
             )}
