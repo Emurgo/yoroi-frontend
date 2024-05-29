@@ -35,7 +35,7 @@ import type {
   FilterUsedResponse,
   GetSwapFeeTiersFunc,
   GetSwapFeeTiersRequest,
-  GetSwapFeeTiersResponse, GetTransactionSlotsByHashesResponse,
+  GetSwapFeeTiersResponse, GetTransactionSlotsByHashesResponse, SignedBatchRequest,
 } from './types';
 
 import type { IFetcher } from './IFetcher.types';
@@ -60,6 +60,7 @@ import {
 import type { ConfigType } from '../../../../../config/config-types';
 import { bech32, } from 'bech32';
 import { addressBech32ToHex } from '../cardanoCrypto/utils';
+import { bytesToBase64, forceNonNull, last } from '../../../../coreUtils';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -327,8 +328,11 @@ export class RemoteFetcher implements IFetcher {
       });
   }
 
-  sendTx: SignedRequest => Promise<SignedResponse> = (body) => {
-    const signedTx64 = Buffer.from(body.encodedTx).toString('base64');
+  sendTx: (SignedRequest | SignedBatchRequest) => Promise<SignedResponse> = (body) => {
+    // $FlowIgnore[prop-missing]
+    const txs: Array<{| encodedTx: Uint8Array, id: string |}> = body.txs ?? [body];
+    if (txs.length === 0) throw new Error('At least one transaction is required for submit');
+    const signedTx64: Array<string> = txs.map(t => bytesToBase64(t.encodedTx));
     const { BackendService } = body.network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.sendTx)} missing backend url`);
     return axios(
@@ -345,7 +349,7 @@ export class RemoteFetcher implements IFetcher {
         }
       }
     ).then(() => ({
-      txId: body.id
+      txId: forceNonNull(last(txs)).id,
     }))
       .catch((error) => {
         const err = {

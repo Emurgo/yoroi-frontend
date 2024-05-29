@@ -45,12 +45,19 @@ export type BestBlockFunc = (body: BestBlockRequest) => Promise<BestBlockRespons
 // sendTx
 
 export type SignedRequestInternal = {|
-  signedTx: string,
+  signedTx: string | Array<string>,
 |};
 export type SignedRequest = {|
   ...BackendNetworkInfo,
   id: string,
   encodedTx: Uint8Array,
+|};
+export type SignedBatchRequest = {|
+  ...BackendNetworkInfo,
+  txs: Array<{|
+    id: string,
+    encodedTx: Uint8Array,
+  |}>
 |};
 export type SignedResponse = {| txId: string, |};
 export type SendFunc = (body: SignedRequest) => Promise<SignedResponse>;
