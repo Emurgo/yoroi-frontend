@@ -340,10 +340,14 @@ class BasePage {
   }
   // tableNames are [ 'UtxoAtSafePointTable', 'UtxoDiffToBestBlock', 'UtxoTransactionInput', 'UtxoTransactionOutput']
   async getInfoFromIndexedDB(tableName) {
+    this.logger.info(`Webdriver::getInfoFromIndexedDB Table name "${tableName}"`);
+    let result;
     if (isFirefox()) {
-      return await this.getInfoFromIndexedDBFF(tableName);
+      result = await this.getInfoFromIndexedDBFF(tableName);
     }
-    return await this.getInfoFromIndexedDBChrome(tableName);
+    result = await this.getInfoFromIndexedDBChrome(tableName);
+    this.logger.info(`Webdriver::getInfoFromIndexedDB::result ${JSON.stringify(result)}`);
+    return result;
   }
   async getInfoFromIndexedDBFF(tableName) {
     await this.driver.executeScript(
@@ -405,6 +409,94 @@ class BasePage {
     }
 
     return tableContent;
+  }
+
+  async getFullIndexedDBFromChrome() {
+    this.logger.info(`Webdriver::getFullIndexedDBFromChrome is called.`);
+    await this.driver.executeScript(() => {
+      window.allDBsPromise = window.indexedDB.databases();
+    });
+    const allDBs = await this.driver.executeAsyncScript((...args) => {
+      const callback = args[args.length - 1];
+      window.allDBsPromise.then(response => callback(response)).catch(err => callback(err));
+    });
+    const { name, version } = allDBs[0];
+
+    await this.driver.executeScript(
+      (dbName, dbVersion) => {
+        const request = window.indexedDB.open(dbName, dbVersion);
+        request.onsuccess = function (event) {
+          const db = event.target.result;
+          const allTables = db.objectStoreNames;
+          const fullDBData = {};
+          for (const table of allTables) {
+            const tableContentRequest = db
+              .transaction(table, 'readonly')
+              .objectStore(table)
+              .getAll();
+            tableContentRequest.onsuccess = function (event) {
+              const allInfo = event.target.result;
+              fullDBData[table] = allInfo;
+            };
+          }
+          window.fullDBData = fullDBData;
+        };
+      },
+      name,
+      version
+    );
+
+    let fullDBDataResult;
+    try {
+      fullDBDataResult = await this.driver.executeScript(() => window.fullDBData);
+    } catch (error) {
+      this.webDriverLogger.warn(error);
+      fullDBDataResult = {};
+    }
+    this.logger.info(
+      `Webdriver::getFullIndexedDBFromChrome::allTables. All data ${JSON.stringify(fullDBDataResult)}`
+    );
+
+    return fullDBDataResult;
+  }
+
+  async setInfoToIndexedDBChrome(tableName, value) {
+    this.logger.info(`Webdriver::setInfoToIndexedDBChrome is called for the table ${tableName}.`);
+    this.driver.executeScript(() => {
+      window.allDBsPromise = window.indexedDB.databases();
+    });
+
+    const allDBs = await this.driver.executeAsyncScript((...args) => {
+      const callback = args[args.length - 1];
+      window.allDBsPromise.then(response => callback(response)).catch(err => callback(err));
+    });
+    const { name, version } = allDBs[0];
+
+    for (const valueItem of value) {
+      await this.driver.executeScript(
+        (dbName, dbVersion, tableName, valueItem) => {
+          const request = window.indexedDB.open(dbName, dbVersion);
+          request.onsuccess = function (event) {
+            const db = event.target.result;
+            const tx = db.transaction(tableName, 'readwrite');
+            tx.oncomplete = function (event) {
+              console.log(
+                `-----> Transaction is completed. Data is added to the table "${tableName}"`
+              );
+            };
+            tx.onerror = function (event) {
+              console.log('-----> Error happend:', event.target.result);
+            };
+            const store = tx.objectStore(tableName);
+            const addRequest = store.put(valueItem);
+          };
+        },
+        name,
+        version,
+        tableName,
+        valueItem
+      );
+    }
   }
 }
 
