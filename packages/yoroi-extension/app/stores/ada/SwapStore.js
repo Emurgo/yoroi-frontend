@@ -7,17 +7,14 @@ import { action, computed, observable, runInAction } from 'mobx';
 import type { StorageField } from '../../api/localStorage';
 import { createStorageFlag, loadSubmittedTransactions } from '../../api/localStorage';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
-import {
-  asGetAllUtxos,
-  asHasUtxoChains,
-} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { asGetAllUtxos, asHasUtxoChains, } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { createMetadata } from '../../api/ada/lib/storage/bridge/metadataUtils';
 import type { TxOutput } from '../../api/ada/transactions/shelley/transactions';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { Quantities } from '../../utils/quantities';
 import BigNumber from 'bignumber.js';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import { cast, fail, hexToBytes, listEntries, maybe } from '../../coreUtils';
+import { cast, fail, hexToBytes, listEntries, maybe, noop } from '../../coreUtils';
 import {
   asAddressedUtxo as asAddressedUtxoCardano,
   asAddressedUtxo,
@@ -30,12 +27,10 @@ import adaLogo from '../../assets/images/ada.inline.svg';
 import type { AssetAmount } from '../../components/swap/types';
 import type { QueriedUtxo } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { transactionHexToHash } from '../../api/ada/lib/cardanoCrypto/utils';
-import { signTransactionHex } from '../../api/ada/transactions/signTransactionHex';
 import type { RemoteUnspentOutput } from '../../api/ada/lib/state-fetch/types';
 import type { CardanoConnectorSignRequest } from '../../connector/types';
-import {
-  createSlotToTimestampFunc,
-} from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { createSlotToTimestampFunc, } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import type { AddressDetails } from '../../api/ada';
 
 const FRONTEND_FEE_ADDRESS_MAINNET =
   'addr1q9ry6jfdgm0lcrtfpgwrgxg7qfahv80jlghhrthy6w8hmyjuw9ngccy937pm7yw0jjnxasm7hzxjrf8rzkqcj26788lqws5fke';
@@ -120,12 +115,14 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
     const addressedUtxos = asAddressedUtxoCardano(walletUtxos);
     const submittedTxs = await loadSubmittedTransactions() ?? [];
     const reorgTargetAmount = '2000000';
+    const firstExternalAddress: AddressDetails = await this.stores.addresses.getFirstExternalAddress(wallet);
     const { unsignedTx, collateralOutputAddressSet } = await this.api.ada.createReorgTx(
       wallet,
       [],
       reorgTargetAmount,
       addressedUtxos,
       submittedTxs,
+      firstExternalAddress.address,
     );
     const unsignedTxHex = unsignedTx.unsignedTx.build_tx().to_hex();
     const hash = transactionHexToHash(unsignedTxHex);
@@ -221,28 +218,22 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
     });
   };
 
-  executeTransactionHex: ({|
+  executeTransactionHexes: ({|
     wallet: PublicDeriver<>,
-    transactionHex: string,
-    password: string,
-    blocking?: boolean,
+    signedTransactionHexes: Array<string>,
   |}) => Promise<void> = async ({
     wallet,
-    transactionHex,
-    password,
-    blocking = false,
+    signedTransactionHexes,
   }) => {
-    const signedTransactionHex =
-      await signTransactionHex(wallet, password, transactionHex);
     await this.stores.substores.ada.stateFetchStore.fetcher.sendTx({
-      id: transactionHexToHash(signedTransactionHex),
-      encodedTx: hexToBytes(signedTransactionHex),
       network: wallet.getParent().getNetworkInfo(),
+      txs: signedTransactionHexes.map(txHex => ({
+        id: transactionHexToHash(txHex),
+        encodedTx: hexToBytes(txHex),
+      }))
     });
-    const refreshPromise = this.stores.wallets.refreshWalletFromRemote(wallet);
-    if (blocking) {
-      await refreshPromise;
-    }
+    // refresh call is non-blocking
+    noop(this.stores.wallets.refreshWalletFromRemote(wallet));
   };
 
   fetchTransactionTimestamps: ({|

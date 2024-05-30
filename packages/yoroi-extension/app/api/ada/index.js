@@ -153,7 +153,7 @@ import type { ForeignUtxoFetcher } from '../../connector/stores/ConnectorStore';
 import type WalletTransaction from '../../domain/WalletTransaction';
 import { derivePrivateByAddressing, derivePublicByAddressing } from './lib/cardanoCrypto/deriveByAddressing';
 import { genTimeToSlot } from './lib/storage/bridge/timeUtils';
-import { connectorGetUnusedAddresses } from '../../../chrome/extension/connector/api';
+import { connectorGetUsedAddresses } from '../../../chrome/extension/connector/api';
 
 // ADA specific Request / Response params
 
@@ -2327,6 +2327,7 @@ export default class AdaApi {
     reorgTargetAmount: string,
     utxos: Array<CardanoAddressedUtxo>,
     submittedTxs: Array<PersistedSubmittedTransaction>,
+    reorgTargetAddress?: string,
   ): Promise<{|
     unsignedTx: HaskellShelleyTxSignRequest,
     collateralOutputAddressSet: Set<string>,
@@ -2348,21 +2349,19 @@ export default class AdaApi {
     const absSlotNumber = new BigNumber(timeToSlot({
       time: new Date(),
     }).slot);
-    const unusedAddresses = await connectorGetUnusedAddresses(
-      publicDeriver
-    );
-    if (unusedAddresses.length === 0) {
-      throw new Error('unexpected: no unused addresses available');
+    const targetAddress = reorgTargetAddress ?? (await connectorGetUsedAddresses(publicDeriver))[0];
+    if (targetAddress == null) {
+      throw new Error('unexpected: no target address or used addresses available');
     }
     const reorgOutputValue = BigNumber
       .max(reorgTargetAmount, MIN_REORG_OUTPUT_AMOUNT)
       .toString();
     const includeTargets = [{
-      address: unusedAddresses[0],
+      address: targetAddress,
       isForeign: false,
       value: reorgOutputValue,
     }];
-    const collateralOutputAddressSet = new Set<string>([unusedAddresses[0]]);
+    const collateralOutputAddressSet = new Set<string>([targetAddress]);
     const dontUseUtxoIds = new Set(usedUtxoIds);
     const unsignedTx = await this.createUnsignedTxForConnector(
       {

@@ -22,6 +22,7 @@ import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { CardanoConnectorSignRequest } from '../../../connector/types';
 import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import moment from 'moment';
+import { signTransactionHex } from '../../../api/ada/transactions/signTransactionHex';
 
 type ColumnContext = {|
   completedOrders: boolean,
@@ -200,6 +201,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
   const [cancellationState, setCancellationState] = useState<?{|
     order: any,
     collateralReorgTx?: {| cbor: string, txData: CardanoConnectorSignRequest |},
+    signedCollateralReorgTx?: string,
     tx: ?{| cbor: string, formattedFee: string, formattedReturn: Array<FormattedTokenValue> |},
     isSubmitting?: boolean,
   |}>(null);
@@ -313,17 +315,12 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
       console.log('Reorg transaction is not available. Ignoring.');
       return;
     }
-    setCancellationState({ order, collateralReorgTx, tx, isSubmitting: true });
-    await props.stores.substores.ada.swapStore.executeTransactionHex({
-      wallet,
-      password,
-      transactionHex: collateralReorgTx.cbor,
-    });
-    setCancellationState({ order, tx });
+    const signedCollateralReorgTx = await signTransactionHex(wallet, password, collateralReorgTx.cbor);
+    setCancellationState({ order, signedCollateralReorgTx, tx });
   };
 
   const handleCancelConfirm = async (cancelledOrder: any, password: string) => {
-    const { order, tx, isSubmitting } = cancellationState ?? {};
+    const { order, signedCollateralReorgTx, tx, isSubmitting } = cancellationState ?? {};
     if (isSubmitting) {
       console.log('Cancellation is already submitting. Ignoring.');
     }
@@ -335,11 +332,14 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
       console.log('Cancellation transaction is not available. Ignoring.');
       return;
     }
-    setCancellationState({ order, tx, isSubmitting: true });
-    await props.stores.substores.ada.swapStore.executeTransactionHex({
+    setCancellationState({ order, signedCollateralReorgTx, tx, isSubmitting: true });
+    const signedCancelTx = await signTransactionHex(wallet, password, tx.cbor);
+    const signedTransactionHexes = signedCollateralReorgTx != null
+      ? [signedCollateralReorgTx, signedCancelTx]
+      : [signedCancelTx];
+    await props.stores.substores.ada.swapStore.executeTransactionHexes({
       wallet,
-      password,
-      transactionHex: tx.cbor,
+      signedTransactionHexes,
     });
     setCancellationState(null);
   };
