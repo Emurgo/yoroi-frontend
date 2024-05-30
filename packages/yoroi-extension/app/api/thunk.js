@@ -7,6 +7,10 @@ import type { WalletState } from '../../chrome/extension/background/types';
 import { HaskellShelleyTxSignRequest } from './ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type { TokenRow } from './ada/lib/storage/database/primitives/tables';
 import type { TxMemoTableInsert, TxMemoTableRow, TxMemoLookupKey, } from './ada/lib/storage/bridge/memos';
+import { RustModule } from './ada/lib/cardanoCrypto/rustLoader';
+import type { CardanoAddressedUtxo } from './ada/transactions/types';
+
+
 /*::
 declare var chrome;
 */
@@ -101,13 +105,35 @@ export async function renameConceptualWallet(
   await callBackground({ type: 'rename-conceputal-wallet', request, });
 }
 
-export type SignAndBroadcastRequestType = {|
+type UserSignAndBroadcastRequestType = {|
   signRequest: HaskellShelleyTxSignRequest,
   password: string,
   publicDeriverId: number,
 |};
-export async function signAndBroadcast(request: SignAndBroadcastRequestType): Promise<{| txId: string |}> {
-  return await callBackground({ type: 'sign-and-broadcast', request, });
+export type SignAndBroadcastRequestType = {
+  senderUtxos: Array<CardanoAddressedUtxo>,
+  unsignedTx: string,
+  metadata: string,
+  wits: Array<string>,
+  password: string,
+  txHash: string,
+};
+export async function signAndBroadcast(request: UserSignAndBroadcastRequestType): Promise<{| txId: string |}> {
+  const txBody = request.signRequest.unsignedTx.build();
+  const txHash = RustModule.WalletV4.hash_transaction(txBody);
+
+  const serializableRequest: SignAndBroadcastRequestType = {
+    senderUtxos: request.signRequest.senderUtxos,
+    unsignedTx: txBody.to_hex(),
+    metadata: request.signRequest.metadata?.to_hex(),
+    wits: [...request.signRequest.neededStakingKeyHashes.wits],
+    password: request.password,
+    publicDeriverId: request.publicDeriverId,
+    txHash: txHash.to_hex(),
+  };
+  txBody.free();
+  txHash.free();
+  return await callBackground({ type: 'sign-and-broadcast', serializableRequest, });
 }
 
 export async function getPrivateStakingKey(

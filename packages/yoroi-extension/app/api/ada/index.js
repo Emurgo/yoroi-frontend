@@ -204,7 +204,19 @@ export type AdaGetTransactionsRequest = {|
 
 export type SignAndBroadcastRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey,
-  signRequest: HaskellShelleyTxSignRequest,
+  signRequest: {
+    senderUtxos: Array<CardanoAddressedUtxo>,
+    +unsignedTx: RustModule.WalletV4.TransactionBuilder |
+      RustModule.WalletV4.TransactionBody |
+      Buffer |
+      Uint8Array,
+    metadata: void | RustModule.WalletV4.AuxiliaryData,
+    +neededStakingKeyHashes: {
+      wits: Set<string>, // Vkeywitness
+      ...
+    },
+    ...
+  },
   password: string,
   sendTx: SendFunc,
 |};

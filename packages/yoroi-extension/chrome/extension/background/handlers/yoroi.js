@@ -64,6 +64,8 @@ import {
 } from '../../connector/api';
 import {
   updateTransactions as cardanoUpdateTransactions
+  removeAllTransactions,
+  genCardanoAssetMap,
 } from '../../../../app/api/ada/lib/storage/bridge/updateTransactions';
 import { environment } from '../../../../app/environment';
 import type { IFetcher as CardanoIFetcher } from '../../../../app/api/ada/lib/state-fetch/IFetcher.types';
@@ -111,6 +113,14 @@ import { loadWalletsFromStorage } from '../../../../app/api/ada/lib/storage/mode
 import { getWalletState } from './utils';
 import { getCardanoStateFetcher } from '../utils';
 import { removePublicDeriver } from '../../../../app/api/ada/lib/storage/bridge/walletBuilder/remove';
+import { GetToken } from '../../../../app/api/ada/lib/storage/database/primitives/api/read';
+import { ModifyToken } from '../../../../app/api/ada/lib/storage/database/primitives/api/write';
+import {
+  getAllSchemaTables,
+  raii,
+} from '../../../../app/api/ada/lib/storage/database/utils';
+import { loadSubmittedTransactions, persistSubmittedTransactions, } from '../../../../app/api/localStorage';
+import { upsertTxMemo, deleteTxMemo, getAllTxMemo } from '../../../../app/api/ada/lib/storage/bridge/memos';
 
 const YOROI_MESSAGES = Object.freeze({
   CONNECT_RESPONSE: 'connect_response',
@@ -645,6 +655,8 @@ export async function yoroiMessageHandler(
       sendResponse({ error: 'no public deriver' });
       return;
     }
+    const { senderUtxos, unsignedTx, metadata, wits, txHash } = request.request;
+
     try {
       const withSigning = asGetSigningKey(publicDeriver);
       if (withSigning == null) {
@@ -673,9 +685,7 @@ export async function yoroiMessageHandler(
         )) {
           neededStakingKeyHashes.wits.add(
             Buffer.from(RustModule.WalletV4.make_vkey_witness(
-              RustModule.WalletV4.hash_transaction(
-                request.request.signRequest.unsignedTx.build()
-              ),
+              RustModule.WalletV4.hash_transaction.from_hex(txHash)
               stakingKey
             ).to_bytes()).toString('hex')
           );
@@ -684,12 +694,20 @@ export async function yoroiMessageHandler(
         }
       }
 
+      const signRequest = {
+        senderUtxos,
+        unsignedTx: Buffer.from(unsignedTx, 'hex'),
+        metadata: RustModule.WalletV4.AuxiliaryData.from_hex(metadata),
+        neededStakingKeyHashes: {
+          wits: new Set(wits),
+        },
+      };
       const stateFetcher = await getCardanoStateFetcher(new LocalStorageApi());
       const adaApi = new AdaApi();
       const { txId } = await adaApi.signAndBroadcast({
         publicDeriver: withSigning,
         password: request.request.password,
-        signRequest: request.request.signRequest,
+        signRequest,
         sendTx: stateFetcher.sendTx,
       });
 
@@ -697,20 +715,94 @@ export async function yoroiMessageHandler(
     } catch (error) {
       sendResponse({ error: error.message });
     }
-    
-    // AdaTransactionsStore.recordSubmittedTransaction
-
   } else if (request.type === YOROI_MESSAGES.GET_PRIVATE_STAKING_KEY) {
+    const publicDeriver = getPublicDeriverById(request.request.publicDeriverId);
+    if (!publicDeriver) {
+      sendResponse({ error: 'no public deriver' });
+      return;
+    }
+    const withSigning = asGetSigningKey(publicDeriver);
+    if (withSigning == null) {
+      throw new Error('unexpected missing asGetSigningKey result');
+    }
+    const withStakingKey = asGetAllAccounting(withSigning);
+    if (withStakingKey == null) {
+      throw new Error('unexpected missing asGetAllAcccounting result');
+    }
+    const stakingKey = await genOwnStakingKey({
+      publicDeriver: withStakingKey,
+      password: request.request.password,
+    });
+    sendResponse(stakingKey.to_hex());
   } else if (request.type === YOROI_MESSAGES.GET_CARDANO_ASSETS) {
-// TokenInfoStore.fetchMissingTokenInfo
-// [... assertMap.values()]
+    // fixme: cache
+    const db = await getDb();
+    const network = getNetworkById(request.request.networkId);
+    const deps =  Object.freeze({
+      ModifyToken,
+      GetToken,
+    });
+    const depTables = Object
+          .keys(deps)
+          .map(key => deps[key])
+          .flatMap(table => getAllSchemaTables(db, table));
 
+    const stateFetcher = await getCardanoStateFetcher(new LocalStorageApi());
+
+    const assetMap = await raii(
+      db,
+      depTables,
+      dbTx => (
+        genCardanoAssetMap(
+          db,
+          dbTx,
+          deps,
+          request.request.tokenIds,
+          stateFetcher.getTokenInfo,
+          stateFetcher.getMultiAssetMintMetadata,
+          stateFetcher.getMultiAssetSupply,
+          network,
+        )
+      )
+    );
+    sendResponse([... assertMap.values()]);
   } else if (request.type === YOROI_MESSAGES.UPSERT_TX_MEMO) {
+    const db = await getDb();
+    const response = await upsertTxMemo({ db, memo: request.request.memo });
+    sendResponse(response);
   } else if (request.type === YOROI_MESSAGES.DELETE_TX_MEMO) {
+    const db = await getDb();
+    await deleteTxMemo({ db, key: request.request.key });
+    sendResponse(null);
   } else if (request.type === YOROI_MESSAGES.GET_ALL_TX_MEMOS) {
+    const db = await getDb();
+    const memos = await getAllTxMemos({ db });
+    sendResponse(memos);
   } else if (request.type === YOROI_MESSAGES.REMOVE_ALL_TRANSACTIONS) {
-     //this.stores.transactions.clearSubmittedTransactions(request.publicDeriver);
+    const publicDeriver = getPublicDeriverById(request.request.publicDeriverId);
+    if (!publicDeriver) {
+      sendResponse({ error: 'no public dervier'});
+      return;
+    }
+    await removeAllTransactions({ publicDeriver });
 
+    for (let i = 0; i < this._submittedTransactions.length; ) {
+      if (this._submittedTransactions[i].publicDeriverId === publicDeriver.publicDeriverId) {
+        this._submittedTransactions.splice(i, 1);
+      } else {
+        i++;
+      }
+    }
+
+    const txs = await loadSubmittedTransactions();
+    if (!txs) {
+      return;
+    }
+    const filteredTxs = txs.filter(
+      ({ publicDeriverId }) => publicDeriverId !== request.request.publicDeriverId
+    );
+    await persistSubmittedTransactions(filteredTxs);
+    sendResponse(null);
   } else {
     console.error(`unknown message ${JSON.stringify(request)} from ${sender.tab.id}`)
   }
