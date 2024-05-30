@@ -524,14 +524,15 @@ class BasePage {
       await this.setInfoToIndexedDBChrome(dbKey, dbSnapshot[dbKey]);
     }
     // set info into the chrome local storage
-    const storageSnapshot = getSnapshotObjectFromJSON(`${templateName}.localStorage.json`);
-    for (const storageKey in storageSnapshot) {
+    const chromeStorageSnapshot = getSnapshotObjectFromJSON(`${templateName}.chromeLocalStorage.json`);
+    for (const storageKey in chromeStorageSnapshot) {
       await this.setInfoChromeLocalStorage(storageKey, storageSnapshot[storageKey]);
     }
     // set info into regular storage
-    await this.saveToLocalStorage('dialog__SAVE_RECOVERY_PHRASE', true);
-    await this.saveToLocalStorage('dialog__WALLET_NAME_AND_PASSWORD', true);
-    await this.saveToLocalStorage('dialog__WALLET_CHECKSUM', true);
+    const commonStorageSnaphot = getSnapshotObjectFromJSON(`${templateName}.localStorage.json`);
+    for (const commonStorageKey in commonStorageSnaphot) {
+      await this.saveToLocalStorage(commonStorageKey, commonStorageSnaphot[commonStorageKey]);
+    }
   }
 }
 

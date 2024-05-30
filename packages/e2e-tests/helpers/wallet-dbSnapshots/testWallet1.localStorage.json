@@ -1,4 +1,5 @@
 {
-  "IS_REVAMP_THEME_ANNOUNCED": "true",
-  "mainnet-ACCEPTED_TOS_VERSION": "2"
+  "dialog__SAVE_RECOVERY_PHRASE": true,
+  "dialog__WALLET_NAME_AND_PASSWORD": true,
+  "dialog__WALLET_CHECKSUM": true
 }
