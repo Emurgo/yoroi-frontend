@@ -9,6 +9,7 @@ import { restoreWallet } from '../helpers/restoreWalletHelper.js';
 import SettingsTab from '../pages/wallet/settingsTab/settingsTab.page.js';
 import driversPoolsManager from '../utils/driversPool.js';
 import GeneralSubTab from '../pages/wallet/settingsTab/generalSubTab.page.js';
+import AddNewWallet from '../pages/addNewWallet.page.js';
 import axios from 'axios';
 
 describe('Changing fiat currencies', function () {
@@ -24,9 +25,17 @@ describe('Changing fiat currencies', function () {
 
   const testData = ['BRL', 'ETH', 'BTC', 'KRW', 'CNY', 'EUR', 'JPY', 'USD', 'ADA'];
 
-  it('Restore a 15-word wallet', async function () {
-    await restoreWallet(webdriver, logger, testWallet1);
+  it('Prepare DB and storages', async function () {
+    const addWalletPage = new AddNewWallet(webdriver, logger);
+    const state = await addWalletPage.isDisplayed();
+    expect(state).to.be.true;
+    await addWalletPage.prepareDBAndStorage('testWallet1');
+    await addWalletPage.refreshPage();
+  });
+
+  it('Check transactions page', async function () {
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
+    await transactionsPage.waitPrepareWalletBannerIsClosed();
     const txPageIsDisplayed = await transactionsPage.isDisplayed();
     expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
   });

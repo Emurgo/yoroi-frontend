@@ -517,7 +517,7 @@ class BasePage {
     await this.driver.executeScript(`await chrome.storage.local.set({ "${key}": "${value}" })`);
   }
 
-  async prepareDBandStorage(templateName) {
+  async prepareDBAndStorage(templateName) {
     // import info into the indexedDB
     const dbSnapshot = getSnapshotObjectFromJSON(`${templateName}.indexedDB.json`);
     for (const dbKey in dbSnapshot) {
