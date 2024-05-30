@@ -24,6 +24,7 @@ import type {
 
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { environment } from '../../environment';
+import { getDrepDelegationState } from '../../UI/features/governace/api/useDrepDelegationState';
 
 export type DelegationRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -61,6 +62,7 @@ type PoolTransitionModal = {| show: 'open' | 'closed' | 'idle', shouldUpdatePool
 
 export default class DelegationStore extends Store<StoresMap, ActionsMap> {
   @observable delegationRequests: Array<DelegationRequests> = [];
+  @observable isParticipatingToGouvernance: boolean = false;
   @observable poolTransitionRequestInfo: ?PoolTransition = null;
   @observable poolTransitionConfig: PoolTransitionModal = {
     show: 'closed',
@@ -72,9 +74,9 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     this.poolTransitionConfig.shouldUpdatePool = config.shouldUpdatePool;
   };
 
-  @observable poolInfoQuery: LocalizedRequest<
+  @observable poolInfoQuery: LocalizedRequest<(Array<string>) => Promise<void>> = new LocalizedRequest<
     (Array<string>) => Promise<void>
-  > = new LocalizedRequest<(Array<string>) => Promise<void>>(async poolIds => {
+  >(async poolIds => {
     const { selectedNetwork } = this.stores.profile;
     if (selectedNetwork == null) throw new Error(`${nameof(DelegationStore)} no network selected`);
     await this.stores.substores.ada.delegation.updatePoolInfo({
@@ -110,6 +112,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     this.registerReactions([this._changeWallets]);
     delegation.setSelectedPage.listen(this._setSelectedPage);
     this.checkPoolTransition();
+    this.checkGouvernanceStatus();
   }
 
   @action
@@ -140,14 +143,12 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
   };
 
   canUnmangleSomeUtxo: (PublicDeriver<>) => boolean = publicDeriver => {
-    const canUnmangleAmount: ?MultiToken = this.getDelegationRequests(publicDeriver)?.mangledAmounts
-      .result?.canUnmangle;
+    const canUnmangleAmount: ?MultiToken = this.getDelegationRequests(publicDeriver)?.mangledAmounts.result?.canUnmangle;
     return maybe(canUnmangleAmount, t => t.getDefault().gt(0)) ?? false;
   };
 
   getMangledAmountsOrZero: (PublicDeriver<>) => MangledAmountsResponse = publicDeriver => {
-    const resp: ?MangledAmountsResponse = this.getDelegationRequests(publicDeriver)?.mangledAmounts
-      .result;
+    const resp: ?MangledAmountsResponse = this.getDelegationRequests(publicDeriver)?.mangledAmounts.result;
     return {
       canUnmangle: resp?.canUnmangle ?? publicDeriver.getParent().getDefaultMultiToken(),
       cannotUnmangle: resp?.cannotUnmangle ?? publicDeriver.getParent().getDefaultMultiToken(),
@@ -168,10 +169,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
       // We cancel out any still present reward, in case it has not synced yet
       return publicDeriver.getParent().getDefaultMultiToken();
     }
-    return (
-      this._getDelegatedBalanceResult(publicDeriver)?.accountPart ??
-      publicDeriver.getParent().getDefaultMultiToken()
-    );
+    return this._getDelegatedBalanceResult(publicDeriver)?.accountPart ?? publicDeriver.getParent().getDefaultMultiToken();
   };
 
   getDelegatedUtxoBalance: (PublicDeriver<>) => ?MultiToken = publicDeriver => {
@@ -194,13 +192,8 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     return find(this.poolInfo, { networkId: network.NetworkId, poolId })?.poolInfo;
   };
 
-  getLocalRemotePoolInfo: ($ReadOnly<NetworkRow>, string) => void | PoolInfo = (
-    network,
-    poolId
-  ) => {
-    return (
-      find(this.poolInfo, { networkId: network.NetworkId, poolId })?.poolRemoteInfo ?? undefined
-    );
+  getLocalRemotePoolInfo: ($ReadOnly<NetworkRow>, string) => void | PoolInfo = (network, poolId) => {
+    return find(this.poolInfo, { networkId: network.NetworkId, poolId })?.poolRemoteInfo ?? undefined;
   };
 
   //   exports.EMURGO_POOLS = {
@@ -231,7 +224,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
 
   checkPoolTransition: () => Promise<void> = async () => {
     const publicDeriver = this.stores.wallets.selected;
-    if (publicDeriver === null) {
+    if (publicDeriver == null) {
       return;
     }
 
@@ -240,28 +233,37 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     const currentPool = this.getDelegatedPoolId(publicDeriver);
 
     try {
-      const transitionResult = await maybe(currentPool, p =>
-        new PoolInfoApi().getTransition(p, RustModule.CrossCsl.init)
-      );
+      const transitionResult = await maybe(currentPool, p => new PoolInfoApi().getTransition(p, RustModule.CrossCsl.init));
 
       const response = {
         currentPool: transitionResult?.current,
         suggestedPool: transitionResult?.suggested,
         deadlineMilliseconds: transitionResult?.deadlineMilliseconds,
-        shouldShowTransitionFunnel: environment.isDev(),
+        shouldShowTransitionFunnel: environment.isDev() && transitionResult !== null,
       };
 
-      if (
-        isStakeRegistered &&
-        currentlyDelegating &&
-        transitionResult &&
-        this.poolTransitionConfig.show === 'closed'
-      ) {
+      if (isStakeRegistered && currentlyDelegating && transitionResult && this.poolTransitionConfig.show === 'closed') {
         this.setPoolTransitionConfig({ show: 'open' });
       }
 
       runInAction(() => {
         this.poolTransitionRequestInfo = { ...response };
+      });
+    } catch (error) {
+      console.warn(error);
+    }
+  };
+  checkGouvernanceStatus: () => Promise<void> = async () => {
+    const publicDeriver = this.stores.wallets.selected;
+    if (publicDeriver == null) {
+      return;
+    }
+    const walletId = publicDeriver?.getPublicDeriverId();
+    const gouvernanceResult = await getDrepDelegationState(String(walletId));
+
+    try {
+      runInAction(() => {
+        this.isParticipatingToGouvernance = gouvernanceResult.kind !== 'none' && gouvernanceResult.drepID !== null;
       });
     } catch (error) {
       console.warn(error);

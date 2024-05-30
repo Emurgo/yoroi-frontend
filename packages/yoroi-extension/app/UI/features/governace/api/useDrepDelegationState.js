@@ -7,7 +7,7 @@ type PoolTransition = {|
 |};
 
 // TODO mock impementation - add real endpoint
-const getDrepDelegationState = async (walletId: string): Promise<PoolTransition> => {
+export const getDrepDelegationState = async (walletId: string): Promise<PoolTransition> => {
   const storage = localStorage.getItem(`Governance - ${walletId}`);
 
   if (storage === null || storage === undefined) {

@@ -24,7 +24,7 @@ export const TextInput = ({ id, label, variant, onChange, value, error, helperTe
 const SInput = styled(TextField)(({ theme, error }) => ({
   '& .MuiFormHelperText-root': {
     position: 'absolute',
-    bottom: -4,
+    bottom: -2,
     left: -10,
   },
   '& .MuiInputLabel-root': {

@@ -31,8 +31,7 @@ const messages = defineMessages({
   },
   adaAmountNote: {
     id: 'wallet.dashboard.summary.adaAmountNote',
-    defaultMessage:
-      '!!!This balance includes rewards (withdrawal required to be able to send this full amount)',
+    defaultMessage: '!!!This balance includes rewards (withdrawal required to be able to send this full amount)',
   },
   mangledPopupDialogLine2: {
     id: 'wallet.dashboard.summary.mangled.line2',
@@ -97,12 +96,7 @@ export default class UserSummary extends Component<Props> {
                   {intl.formatMessage(globalMessages.totalTokenLabel, {
                     ticker: truncateToken(getTokenName(this.props.defaultTokenInfo)),
                   })}
-                  :
-                  {this.props.isDelegated && (
-                    <span className={styles.delegated}>
-                      {intl.formatMessage(messages.delegated)}
-                    </span>
-                  )}
+                  :{this.props.isDelegated && <span className={styles.delegated}>{intl.formatMessage(messages.delegated)}</span>}
                 </span>
               </h3>
               {this.renderAmount(this.props.totalSum)}
@@ -128,11 +122,7 @@ export default class UserSummary extends Component<Props> {
             <div>
               <h3 className={styles.label}>
                 <span>{intl.formatMessage(globalMessages.totalRewardsLabel)}:</span>
-                <button
-                  className={styles.infoIcon}
-                  type="button"
-                  onClick={this.props.openLearnMore}
-                >
+                <button className={styles.infoIcon} type="button" onClick={this.props.openLearnMore}>
                   <InfoIcon />
                 </button>
               </h3>
@@ -196,9 +186,7 @@ export default class UserSummary extends Component<Props> {
     if (!token) throw new Error('Token is not defined - Should never happend');
     const unitOfAccount = this.props.unitOfAccount(token.getDefaultEntry());
 
-    const entryNode = (
-      <div className={styles.value}>{this.formatTokenEntry(token.getDefaultEntry())}</div>
-    );
+    const entryNode = <div className={styles.value}>{this.formatTokenEntry(token.getDefaultEntry())}</div>;
     const unitOfAccountNode = unitOfAccount ? (
       <div className={styles.value}>
         {unitOfAccount.amount} {unitOfAccount.currency}
@@ -215,10 +203,7 @@ export default class UserSummary extends Component<Props> {
     );
   };
 
-  formatWithAmount: ($npm$ReactIntl$MessageDescriptor, TokenEntry) => Node = (
-    message,
-    tokenEntry
-  ) => {
+  formatWithAmount: ($npm$ReactIntl$MessageDescriptor, TokenEntry) => Node = (message, tokenEntry) => {
     const tokenInfo = this.props.getTokenInfo(tokenEntry);
     const amount = tokenEntry.amount
       .shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
