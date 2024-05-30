@@ -524,7 +524,9 @@ class BasePage {
       await this.setInfoToIndexedDBChrome(dbKey, dbSnapshot[dbKey]);
     }
     // set info into the chrome local storage
-    const chromeStorageSnapshot = getSnapshotObjectFromJSON(`${templateName}.chromeLocalStorage.json`);
+    const chromeStorageSnapshot = getSnapshotObjectFromJSON(
+      `${templateName}.chromeLocalStorage.json`
+    );
     for (const storageKey in chromeStorageSnapshot) {
       await this.setInfoChromeLocalStorage(storageKey, chromeStorageSnapshot[storageKey]);
     }
