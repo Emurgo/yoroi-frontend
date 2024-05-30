@@ -76,6 +76,7 @@ const OrderTable = ({ data, isLoading }) => {
     order: null,
     orderBy: null,
   });
+  const [list, setList] = useState([...data]);
 
   const headCells = [
     { id: 'pair', label: strings.pair, align: 'left', disabledSort: true },
@@ -129,11 +130,11 @@ const OrderTable = ({ data, isLoading }) => {
   };
 
   const getSortedData = useCallback(
-    data => {
+    arr => {
       if (!orderBy || !order) return data;
       const sortColumn = headCells.find(cell => cell.id === orderBy);
       const sortType = sortColumn?.sortType ?? 'character';
-      return data.sort((a, b) => {
+      return arr.sort((a, b) => {
         return order === 'desc'
           ? descendingComparator(a, b, sortType)
           : -descendingComparator(a, b, sortType);
@@ -172,7 +173,7 @@ const OrderTable = ({ data, isLoading }) => {
           ? Array.from([1, 2, 3]).map((item, index) => (
               <TableRowSkeleton id={index} theme={theme} />
             ))
-          : getSortedData(data).map(row => (
+          : getSortedData(list).map(row => (
               <TableRow
                 key={row.id}
                 sx={{
