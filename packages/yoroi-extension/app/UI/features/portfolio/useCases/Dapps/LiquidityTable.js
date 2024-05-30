@@ -166,14 +166,22 @@ const LiquidityTable = ({ data, isLoading }) => {
     <Table aria-label="liquidity table">
       <TableHead>
         <TableRow>
-          {headCells.map(({ label, align, id }) => (
-            <TableCell key={id} align={align}>
+          {headCells.map(({ label, align, id }, index) => (
+            <TableCell key={id} align={align} sx={{ padding: `12.5px ${theme.spacing(2)}` }}>
               <Stack
                 direction="row"
                 alignItems="center"
                 spacing={theme.spacing(1)}
-                onClick={() => handleRequestSort(id)}
-                sx={{ float: align, cursor: 'pointer' }}
+                onClick={() =>
+                  index === 0 || index === headCells.length - 1 ? handleRequestSort(id) : null
+                }
+                sx={{
+                  float: align,
+                  cursor: index === 0 || index === headCells.length - 1 ? 'pointer' : 'normal',
+                  justifyContent:
+                    index === 0 || index === headCells.length - 1 ? 'flex-start' : 'space-between',
+                  width: index === 0 || index === headCells.length - 1 ? 'fit-content' : '100%',
+                }}
               >
                 <Typography
                   variant="body2"
@@ -181,7 +189,15 @@ const LiquidityTable = ({ data, isLoading }) => {
                 >
                   {label}
                 </Typography>
-                <SortIcon id={id} order={order} orderBy={orderBy} />
+                <SortIcon
+                  id={id}
+                  order={order}
+                  orderBy={orderBy}
+                  style={{ cursor: 'pointer ' }}
+                  onClick={() =>
+                    index === 0 || index === headCells.length - 1 ? null : handleRequestSort(id)
+                  }
+                />
               </Stack>
             </TableCell>
           ))}

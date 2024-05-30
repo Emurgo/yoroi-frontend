@@ -79,9 +79,9 @@ const StatsTable = ({ data, isLoading }) => {
   const headCells = [
     { id: 'name', label: strings.name, align: 'left', sortType: 'character' },
     { id: 'price', label: strings.price, align: 'left', sortType: 'numeric' },
-    { id: '24h', label: '24H', align: 'left', sortType: 'numeric' },
-    { id: '1W', label: '1W', align: 'left', sortType: 'numeric' },
-    { id: '1M', label: '1M', align: 'left', sortType: 'numeric' },
+    { id: '24h', label: strings['24h'], align: 'left', sortType: 'numeric' },
+    { id: '1W', label: strings['1W'], align: 'left', sortType: 'numeric' },
+    { id: '1M', label: strings['1M'], align: 'left', sortType: 'numeric' },
     {
       id: 'portfolioPercents',
       label: `${strings.portfolio} %`,
@@ -151,7 +151,7 @@ const StatsTable = ({ data, isLoading }) => {
       <TableHead>
         <TableRow>
           {headCells.map(({ label, align, id }) => (
-            <TableCell key={id} align={align}>
+            <TableCell key={id} align={align} sx={{ padding: `12.5px ${theme.spacing(2)}` }}>
               <Stack
                 direction="row"
                 alignItems="center"

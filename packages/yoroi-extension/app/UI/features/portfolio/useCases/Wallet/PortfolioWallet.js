@@ -8,6 +8,7 @@ import { usePortfolio } from '../../module/PortfolioContextProvider';
 import StatsTable from './StatsTable';
 import mockData from '../../../../pages/portfolio/mockData';
 import ArrowIcon from '../../common/assets/icons/Arrow';
+import illustrationPng from '../../common/assets/images/illustration.png';
 import { Chip } from '../../common/components/Chip';
 import { Skeleton } from '../../../../components/Skeleton';
 
@@ -51,7 +52,7 @@ const PortfolioWallet = ({ data }) => {
   }, [keyword]);
 
   return (
-    <Stack direction="column" spacing={theme.spacing(3)}>
+    <Stack direction="column" spacing={theme.spacing(3)} sx={{ minHeight: 'calc(100vh - 220px)' }}>
       <Stack direction="row" justifyContent="space-between">
         <Stack direction="column">
           <Stack direction="row" spacing={theme.spacing(0.5)}>
@@ -59,7 +60,7 @@ const PortfolioWallet = ({ data }) => {
               <Skeleton width="146px" height="24px" />
             ) : (
               <Typography variant="h2" fontWeight="500">
-                {mockData.PortfolioPage.balance.ada}
+                {mockData.common.balance.ada}
               </Typography>
             )}
             <Typography variant="body2" fontWeight="500" sx={{ marginTop: '5px' }}>
@@ -83,7 +84,7 @@ const PortfolioWallet = ({ data }) => {
               <Skeleton width="129px" height="16px" />
             ) : (
               <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
-                {mockData.PortfolioPage.balance.usd} USD
+                {mockData.common.balance.usd} USD
               </Typography>
             )}
             {isLoading ? (
@@ -114,36 +115,36 @@ const PortfolioWallet = ({ data }) => {
                   sx={{ marginLeft: theme.spacing(2) }}
                 >
                   <Chip
-                    active={mockData.PortfolioPage.balance.percents > 0}
+                    active={mockData.common.balance.percents > 0}
                     label={
                       <Stack direction="row" justifyContent="space-between" alignItems="center">
                         <ArrowIcon
                           fill={
-                            mockData.PortfolioPage.balance.percents > 0
+                            mockData.common.balance.percents > 0
                               ? theme.palette.ds.secondary_c800
                               : theme.palette.ds.sys_magenta_c700
                           }
                           style={{
                             marginRight: theme.spacing(0.5),
                             transform:
-                              mockData.PortfolioPage.balance.percents > 0 ? '' : 'rotate(180deg)',
+                              mockData.common.balance.percents > 0 ? '' : 'rotate(180deg)',
                           }}
                         />
                         <Typography variant="caption1">
-                          {mockData.PortfolioPage.balance.percents > 0
-                            ? mockData.PortfolioPage.balance.percents
-                            : -1 * mockData.PortfolioPage.balance.percents}
+                          {mockData.common.balance.percents > 0
+                            ? mockData.common.balance.percents
+                            : -1 * mockData.common.balance.percents}
                           %
                         </Typography>
                       </Stack>
                     }
                   />
                   <Chip
-                    active={mockData.PortfolioPage.balance.amount > 0}
+                    active={mockData.common.balance.amount > 0}
                     label={
                       <Typography variant="caption1">
-                        {mockData.PortfolioPage.balance.amount > 0 ? '+' : ''}
-                        {mockData.PortfolioPage.balance.amount} USD
+                        {mockData.common.balance.amount > 0 ? '+' : ''}
+                        {mockData.common.balance.amount} USD
                       </Typography>
                     }
                   />
@@ -171,7 +172,18 @@ const PortfolioWallet = ({ data }) => {
           }
         />
       </Stack>
-      <StatsTable data={tokenList} isLoading={isLoading} />
+      {tokenList.length > 0 ? (
+        <StatsTable data={tokenList} isLoading={isLoading} />
+      ) : (
+        <Stack width="full" justifyContent="center" alignItems="center" sx={{ flex: 1 }}>
+          <Stack direction="column" alignItems="center" spacing={theme.spacing(3)}>
+            <Box component="img" src={illustrationPng}></Box>
+            <Typography variant="h4" fontWeight="500" sx={{ color: theme.palette.ds.black_static }}>
+              {strings.noResultsForThisSearch}
+            </Typography>
+          </Stack>
+        </Stack>
+      )}
     </Stack>
   );
 };

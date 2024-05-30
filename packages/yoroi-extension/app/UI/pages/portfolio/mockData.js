@@ -1,4 +1,7 @@
-import { HistoryItemType } from '../../features/portfolio/useCases/TokenDetails/TransactionTable';
+import {
+  HistoryItemStatus,
+  HistoryItemType,
+} from '../../features/portfolio/useCases/TokenDetails/TransactionTable';
 
 // UTILS
 const getRandomTime = (startDate, endDate) => {
@@ -16,6 +19,15 @@ const start1MonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDa
 
 // ALL THE MOCK DATA FOR RENDERING UI NEW
 const mockData = {
+  common: {
+    balance: {
+      ada: (100000 * Math.random()).toFixed(2),
+      usd: (1000 * Math.random()).toFixed(2),
+      percents: -Math.random().toFixed(2),
+      amount: -Math.random().toFixed(2),
+    },
+  },
+
   wallet: {
     tokenList: [
       {
@@ -1689,6 +1701,138 @@ const mockData = {
         secondTokenValue: (Math.random() * 10000).toFixed(2),
         secondTokenValueUsd: (Math.random() * 10).toFixed(2),
       },
+      {
+        id: Math.random(),
+        tokenPair: 'ADA/BRICKS',
+        DEX: 'Minswap',
+        firstToken: {
+          name: 'ADA',
+          id: 'ada',
+        },
+        secondToken: {
+          name: 'BRICKS',
+          id: 'bricks',
+        },
+        PNLValue: (Math.random() * 10).toFixed(2),
+        PNLValueUsd: (Math.random() * 10).toFixed(2),
+        lpTokens: (Math.random() * 1000000).toFixed(2),
+        totalValue: (Math.random() * 1000).toFixed(2),
+        totalValueUsd: (Math.random() * 100).toFixed(2),
+        firstTokenValue: (Math.random() * 100).toFixed(2),
+        firstTokenValueUsd: (Math.random() * 100).toFixed(2),
+        secondTokenValue: (Math.random() * 10000).toFixed(2),
+        secondTokenValueUsd: (Math.random() * 10).toFixed(2),
+      },
+      {
+        id: Math.random(),
+        tokenPair: 'ADA/POPPA',
+        DEX: 'Sundaeswap',
+        firstToken: {
+          name: 'ADA',
+          id: 'ada',
+        },
+        secondToken: {
+          name: 'POPPA',
+          id: 'poppa',
+        },
+        PNLValue: (Math.random() * 10).toFixed(2),
+        PNLValueUsd: (Math.random() * 10).toFixed(2),
+        lpTokens: (Math.random() * 1000000).toFixed(2),
+        totalValue: (Math.random() * 1000).toFixed(2),
+        totalValueUsd: (Math.random() * 100).toFixed(2),
+        firstTokenValue: (Math.random() * 100).toFixed(2),
+        firstTokenValueUsd: (Math.random() * 100).toFixed(2),
+        secondTokenValue: (Math.random() * 10000).toFixed(2),
+        secondTokenValueUsd: (Math.random() * 10).toFixed(2),
+      },
+      {
+        id: Math.random(),
+        tokenPair: 'CUBY/VALDO',
+        DEX: 'Sundaeswap',
+        firstToken: {
+          name: 'CUBY',
+          id: 'cuby',
+        },
+        secondToken: {
+          name: 'VALDO',
+          id: 'valdo',
+        },
+        PNLValue: (Math.random() * 10).toFixed(2),
+        PNLValueUsd: (Math.random() * 10).toFixed(2),
+        lpTokens: (Math.random() * 1000000).toFixed(2),
+        totalValue: (Math.random() * 1000).toFixed(2),
+        totalValueUsd: (Math.random() * 100).toFixed(2),
+        firstTokenValue: (Math.random() * 100).toFixed(2),
+        firstTokenValueUsd: (Math.random() * 100).toFixed(2),
+        secondTokenValue: (Math.random() * 10000).toFixed(2),
+        secondTokenValueUsd: (Math.random() * 10).toFixed(2),
+      },
+      {
+        id: Math.random(),
+        tokenPair: 'SNEK/USDTST',
+        DEX: 'Minswap',
+        firstToken: {
+          name: 'SNEK',
+          id: 'snek',
+        },
+        secondToken: {
+          name: 'USDTST',
+          id: 'usdtst',
+        },
+        PNLValue: (Math.random() * 10).toFixed(2),
+        PNLValueUsd: (Math.random() * 10).toFixed(2),
+        lpTokens: (Math.random() * 1000000).toFixed(2),
+        totalValue: (Math.random() * 1000).toFixed(2),
+        totalValueUsd: (Math.random() * 100).toFixed(2),
+        firstTokenValue: (Math.random() * 100).toFixed(2),
+        firstTokenValueUsd: (Math.random() * 100).toFixed(2),
+        secondTokenValue: (Math.random() * 10000).toFixed(2),
+        secondTokenValueUsd: (Math.random() * 10).toFixed(2),
+      },
+      {
+        id: Math.random(),
+        tokenPair: 'GERO/NMKR',
+        DEX: 'Minswap',
+        firstToken: {
+          name: 'GERO',
+          id: 'gero',
+        },
+        secondToken: {
+          name: 'NMKR',
+          id: 'nmkr',
+        },
+        PNLValue: (Math.random() * 10).toFixed(2),
+        PNLValueUsd: (Math.random() * 10).toFixed(2),
+        lpTokens: (Math.random() * 1000000).toFixed(2),
+        totalValue: (Math.random() * 1000).toFixed(2),
+        totalValueUsd: (Math.random() * 100).toFixed(2),
+        firstTokenValue: (Math.random() * 100).toFixed(2),
+        firstTokenValueUsd: (Math.random() * 100).toFixed(2),
+        secondTokenValue: (Math.random() * 10000).toFixed(2),
+        secondTokenValueUsd: (Math.random() * 10).toFixed(2),
+      },
+      {
+        id: Math.random(),
+        tokenPair: 'SMOKES/CPASS',
+        DEX: 'Minswap',
+        firstToken: {
+          name: 'SMOKES',
+          id: 'smokes',
+        },
+        secondToken: {
+          name: 'CPASS',
+          id: 'cpass',
+        },
+        PNLValue: (Math.random() * 10).toFixed(2),
+        PNLValueUsd: (Math.random() * 10).toFixed(2),
+        lpTokens: (Math.random() * 1000000).toFixed(2),
+        totalValue: (Math.random() * 1000).toFixed(2),
+        totalValueUsd: (Math.random() * 100).toFixed(2),
+        firstTokenValue: (Math.random() * 100).toFixed(2),
+        firstTokenValueUsd: (Math.random() * 100).toFixed(2),
+        secondTokenValue: (Math.random() * 10000).toFixed(2),
+        secondTokenValueUsd: (Math.random() * 10).toFixed(2),
+      },
     ],
     orderList: [
       {
@@ -1727,80 +1871,181 @@ const mockData = {
         totalValue: (Math.random() * 10).toFixed(2),
         totalValueUsd: (Math.random() * 10).toFixed(2),
       },
+      {
+        id: Math.random(),
+        pair: 'DICE/WTAB',
+        firstToken: {
+          name: 'DICE',
+          id: 'dice',
+        },
+        secondToken: {
+          name: 'WTAB',
+          id: 'wtab',
+        },
+        DEX: 'Minswap',
+        assetPrice: Math.round(Math.random() * 10),
+        assetAmount: Math.round(Math.random() * 10),
+        transactionId: '043a2bfbb1d66d9883a068059a4e35bb53b7bdc6f5637d7b934150c453ffb116',
+        totalValue: (Math.random() * 10).toFixed(2),
+        totalValueUsd: (Math.random() * 10).toFixed(2),
+      },
+      {
+        id: Math.random(),
+        pair: 'FREN/SMOKES',
+        firstToken: {
+          name: 'FREN',
+          id: 'fren',
+        },
+        secondToken: {
+          name: 'SMOKES',
+          id: 'smokes',
+        },
+        DEX: 'Sundaeswap',
+        assetPrice: Math.round(Math.random() * 10),
+        assetAmount: Math.round(Math.random() * 10),
+        transactionId: 'a0a863e8eb398c04caebdbd3a3e50733bcb6c06e118c36eadb7f7b53424668a5',
+        totalValue: (Math.random() * 10).toFixed(2),
+        totalValueUsd: (Math.random() * 10).toFixed(2),
+      },
+      {
+        id: Math.random(),
+        pair: 'CCCC/HOSKY',
+        firstToken: {
+          name: 'CCCC',
+          id: 'cccc',
+        },
+        secondToken: {
+          name: 'HOSKY',
+          id: 'hosky',
+        },
+        DEX: 'Minswap',
+        assetPrice: Math.round(Math.random() * 10),
+        assetAmount: Math.round(Math.random() * 10),
+        transactionId: '043a2bfbb1d66d9883a068059a4e35bb53b7bdc6f5637d7b934150c453ffb116',
+        totalValue: (Math.random() * 10).toFixed(2),
+        totalValueUsd: (Math.random() * 10).toFixed(2),
+      },
+      {
+        id: Math.random(),
+        pair: 'CCCC/DRIP',
+        firstToken: {
+          name: 'CCCC',
+          id: 'cccc',
+        },
+        secondToken: {
+          name: 'DRIP',
+          id: 'drip',
+        },
+        DEX: 'Sundaeswap',
+        assetPrice: Math.round(Math.random() * 10),
+        assetAmount: Math.round(Math.random() * 10),
+        transactionId: 'a0a863e8eb398c04caebdbd3a3e50733bcb6c06e118c36eadb7f7b53424668a5',
+        totalValue: (Math.random() * 10).toFixed(2),
+        totalValueUsd: (Math.random() * 10).toFixed(2),
+      },
+      {
+        id: Math.random(),
+        pair: 'ATH/CATSKY',
+        firstToken: {
+          name: 'ATH',
+          id: 'ath',
+        },
+        secondToken: {
+          name: 'CATSKY',
+          id: 'catsky',
+        },
+        DEX: 'Minswap',
+        assetPrice: Math.round(Math.random() * 10),
+        assetAmount: Math.round(Math.random() * 10),
+        transactionId: '043a2bfbb1d66d9883a068059a4e35bb53b7bdc6f5637d7b934150c453ffb116',
+        totalValue: (Math.random() * 10).toFixed(2),
+        totalValueUsd: (Math.random() * 10).toFixed(2),
+      },
+      {
+        id: Math.random(),
+        pair: 'ADA/USDC',
+        firstToken: {
+          name: 'ADA',
+          id: 'ada',
+        },
+        secondToken: {
+          name: 'USDC',
+          id: 'usdc',
+        },
+        DEX: 'Minswap',
+        assetPrice: Math.round(Math.random() * 10),
+        assetAmount: Math.round(Math.random() * 10),
+        transactionId: 'a0a863e8eb398c04caebdbd3a3e50733bcb6c06e118c36eadb7f7b53424668a5',
+        totalValue: (Math.random() * 10).toFixed(2),
+        totalValueUsd: (Math.random() * 10).toFixed(2),
+      },
+      {
+        id: Math.random(),
+        pair: 'AVAX/COPI',
+        firstToken: {
+          name: 'AVAX',
+          id: 'avax',
+        },
+        secondToken: {
+          name: 'COPI',
+          id: 'copi',
+        },
+        DEX: 'Sundaeswap',
+        assetPrice: Math.round(Math.random() * 10),
+        assetAmount: Math.round(Math.random() * 10),
+        transactionId: 'a0a863e8eb398c04caebdbd3a3e50733bcb6c06e118c36eadb7f7b53424668a5',
+        totalValue: (Math.random() * 10).toFixed(2),
+        totalValueUsd: (Math.random() * 10).toFixed(2),
+      },
     ],
   },
 
-  PortfolioPage: {
-    balance: {
-      ada: (100000 * Math.random()).toFixed(2),
-      usd: (1000 * Math.random()).toFixed(2),
-      percents: -Math.random().toFixed(2),
-      amount: -Math.random().toFixed(2),
-    },
-  },
-
-  history: [
+  transactionHistory: [
     {
       type: HistoryItemType.SENT,
-      time: '2024-05-28T06:28:00.000Z',
-      status: 'Low',
-      fee: {
-        amount: '0.17 ADA',
-        usd: '0.03 USD',
-      },
-      amount: {
-        total: '1,169,789.34432 ADA',
-        usd: '0.03 USD',
-        asset: '200 MILK',
-      },
+      status: HistoryItemStatus.LOW,
+      time: getRandomTime(start24HoursAgo, now),
+      feeValue: Math.random().toFixed(2),
+      feeValueUsd: Math.random().toFixed(2),
+      amountTotal: (1000000 * Math.random()).toFixed(5),
+      amountTotalUsd: (100000 * Math.random()).toFixed(2),
+      amountAsset: `${Math.round(100 * Math.random())} MILK`,
     },
     {
       type: HistoryItemType.RECEIVED,
-      time: '2024-05-27T08:25:00.000Z',
-      status: 'Low',
-      amount: {
-        total: '1,169,789.34432 ADA',
-        usd: '312,323.33 USD',
-        asset: 2,
-      },
+      status: HistoryItemStatus.LOW,
+      time: getRandomTime(start24HoursAgo, now),
+      amountTotal: (1000000 * Math.random()).toFixed(5),
+      amountTotalUsd: (100000 * Math.random()).toFixed(2),
+      amountAsset: Math.round(10 * Math.random()),
     },
     {
       type: HistoryItemType.ERROR,
-      time: '2024-05-24T11:04:27.000Z',
-      status: 'Failed',
-      amount: {
-        total: '1,169,789.34432 ADA',
-        usd: '312,323.33 USD',
-        asset: 2,
-      },
+      status: HistoryItemStatus.FAILED,
+      time: getRandomTime(start24HoursAgo, now),
+      amountTotal: (1000000 * Math.random()).toFixed(5),
+      amountTotalUsd: (100000 * Math.random()).toFixed(2),
+      amountAsset: Math.round(10 * Math.random()),
     },
     {
       type: HistoryItemType.WITHDRAW,
-      time: '2024-05-08T11:04:27.000Z',
-      status: 'Low',
-      fee: {
-        amount: '0.17 ADA',
-        usd: '0.03 USD',
-      },
-      amount: {
-        total: '1,169,789.34432 ADA',
-        usd: '0.03 USD',
-        asset: '200 MILK',
-      },
+      status: HistoryItemStatus.HIGH,
+      time: getRandomTime(start1WeekAgo, now),
+      feeValue: Math.random().toFixed(2),
+      feeValueUsd: Math.random().toFixed(2),
+      amountTotal: (1000000 * Math.random()).toFixed(5),
+      amountTotalUsd: (100000 * Math.random()).toFixed(2),
+      amountAsset: `${Math.round(100 * Math.random())} MILK`,
     },
     {
       type: HistoryItemType.DELEGATE,
-      time: '2024-05-08T11:04:27.000Z',
-      status: 'Low',
-      fee: {
-        amount: '0.17 ADA',
-        usd: '0.03 USD',
-      },
-      amount: {
-        total: '1,169,789.34432 ADA',
-        usd: '0.03 USD',
-        asset: '200 MILK',
-      },
+      status: HistoryItemStatus.HIGH,
+      time: getRandomTime(start24HoursAgo, now),
+      feeValue: Math.random().toFixed(2),
+      feeValueUsd: Math.random().toFixed(2),
+      amountTotal: (1000000 * Math.random()).toFixed(5),
+      amountTotalUsd: (100000 * Math.random()).toFixed(2),
+      amountAsset: `${Math.round(100 * Math.random())} MILK`,
     },
   ],
 };

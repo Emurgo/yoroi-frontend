@@ -45,7 +45,7 @@ const TabContent = styled(Box)({
   flex: 1,
 });
 
-const TokenDetails = ({ tokenInfo, mockHistory }) => {
+const TokenDetails = ({ tokenInfo, transactionHistory }) => {
   const theme = useTheme();
   const navigateTo = useNavigateTo();
   const { strings } = usePortfolio();
@@ -185,7 +185,7 @@ const TokenDetails = ({ tokenInfo, mockHistory }) => {
         </Card>
       </TokenInfo>
 
-      <TransactionTable history={mockHistory} />
+      <TransactionTable history={transactionHistory} />
     </Box>
   );
 };

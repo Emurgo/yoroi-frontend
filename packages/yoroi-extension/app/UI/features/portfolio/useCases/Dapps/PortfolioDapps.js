@@ -111,7 +111,7 @@ const PortfolioDapps = ({ data }) => {
                 <Skeleton width="146px" height="24px" />
               ) : (
                 <Typography variant="h2" fontWeight="500">
-                  {mockData.PortfolioPage.balance.ada}
+                  {mockData.common.balance.ada}
                 </Typography>
               )}
               <Typography variant="body2" fontWeight="500" sx={{ marginTop: '5px' }}>
@@ -135,7 +135,7 @@ const PortfolioDapps = ({ data }) => {
                 <Skeleton width="129px" height="16px" />
               ) : (
                 <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
-                  {mockData.PortfolioPage.balance.usd} USD
+                  {mockData.common.balance.usd} USD
                 </Typography>
               )}
               {isLoading ? (
@@ -168,36 +168,36 @@ const PortfolioDapps = ({ data }) => {
                     sx={{ marginLeft: theme.spacing(2) }}
                   >
                     <Chip
-                      active={mockData.PortfolioPage.balance.percents > 0}
+                      active={mockData.common.balance.percents > 0}
                       label={
                         <Stack direction="row" justifyContent="space-between" alignItems="center">
                           <ArrowIcon
                             fill={
-                              mockData.PortfolioPage.balance.percents > 0
+                              mockData.common.balance.percents > 0
                                 ? theme.palette.ds.secondary_c800
                                 : theme.palette.ds.sys_magenta_c700
                             }
                             style={{
                               marginRight: theme.spacing(0.5),
                               transform:
-                                mockData.PortfolioPage.balance.percents > 0 ? '' : 'rotate(180deg)',
+                                mockData.common.balance.percents > 0 ? '' : 'rotate(180deg)',
                             }}
                           />
                           <Typography variant="caption1">
-                            {mockData.PortfolioPage.balance.percents > 0
-                              ? mockData.PortfolioPage.balance.percents
-                              : -1 * mockData.PortfolioPage.balance.percents}
+                            {mockData.common.balance.percents > 0
+                              ? mockData.common.balance.percents
+                              : -1 * mockData.common.balance.percents}
                             %
                           </Typography>
                         </Stack>
                       }
                     />
                     <Chip
-                      active={mockData.PortfolioPage.balance.amount > 0}
+                      active={mockData.common.balance.amount > 0}
                       label={
                         <Typography variant="caption1">
-                          {mockData.PortfolioPage.balance.amount > 0 ? '+' : ''}
-                          {mockData.PortfolioPage.balance.amount} USD
+                          {mockData.common.balance.amount > 0 ? '+' : ''}
+                          {mockData.common.balance.amount} USD
                         </Typography>
                       }
                     />

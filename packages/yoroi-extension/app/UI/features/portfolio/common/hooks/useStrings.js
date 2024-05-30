@@ -155,6 +155,18 @@ export const messages = Object.freeze(
       id: 'portfolio.statsTable.header.price',
       defaultMessage: '!!!Price',
     },
+    '24h': {
+      id: 'portfolio.statsTable.header.24h',
+      defaultMessage: '!!!24h',
+    },
+    '1W': {
+      id: 'portfolio.statsTable.header.1w',
+      defaultMessage: '!!!1W',
+    },
+    '1M': {
+      id: 'portfolio.statsTable.header.1m',
+      defaultMessage: '!!!1M',
+    },
     portfolio: {
       id: 'portfolio.statsTable.header.portfolio',
       defaultMessage: '!!!Portfolio',
@@ -305,6 +317,9 @@ export const getStrings = intl => {
     allTimeLow: intl.formatMessage(messages.allTimeLow),
     name: intl.formatMessage(messages.name),
     price: intl.formatMessage(messages.price),
+    '24h': intl.formatMessage(messages['24h']),
+    '1W': intl.formatMessage(messages['1W']),
+    '1M': intl.formatMessage(messages['1M']),
     portfolio: intl.formatMessage(messages.portfolio),
     totalAmount: intl.formatMessage(messages.totalAmount),
     transactionHistory: intl.formatMessage(messages.transactionHistory),
