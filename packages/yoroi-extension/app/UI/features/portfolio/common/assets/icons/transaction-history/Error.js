@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Error = props => {
+export const ErrorIcon = props => {
   return (
     <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
       <path
@@ -16,5 +16,3 @@ const Error = props => {
     </svg>
   );
 };
-
-export default Error;

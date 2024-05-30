@@ -12,7 +12,7 @@ import {
 } from 'recharts';
 import { useTheme } from '@mui/material/styles';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
-import ArrowIcon from '../../common/assets/icons/Arrow';
+import { ArrowIcon } from '../../common/assets/icons';
 import { Skeleton, Tooltip } from '../../../../components';
 import chartSkeletonPng from '../../common/assets/images/token-detail-chart-skeleton.png';
 import { Chip } from '../../common/components/Chip';

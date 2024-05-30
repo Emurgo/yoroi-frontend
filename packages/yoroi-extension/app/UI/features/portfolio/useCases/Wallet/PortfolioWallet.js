@@ -7,7 +7,7 @@ import { defineMessages } from 'react-intl';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import StatsTable from './StatsTable';
 import mockData from '../../../../pages/portfolio/mockData';
-import ArrowIcon from '../../common/assets/icons/Arrow';
+import { ArrowIcon } from '../../common/assets/icons';
 import illustrationPng from '../../common/assets/images/illustration.png';
 import { Chip } from '../../common/components/Chip';
 import { Skeleton } from '../../../../components/Skeleton';
@@ -126,8 +126,7 @@ const PortfolioWallet = ({ data }) => {
                           }
                           style={{
                             marginRight: theme.spacing(0.5),
-                            transform:
-                              mockData.common.balance.percents > 0 ? '' : 'rotate(180deg)',
+                            transform: mockData.common.balance.percents > 0 ? '' : 'rotate(180deg)',
                           }}
                         />
                         <Typography variant="caption1">

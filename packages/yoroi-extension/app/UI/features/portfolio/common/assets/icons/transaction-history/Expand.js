@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Expand = props => {
+export const ExpandIcon = props => {
   return (
     <svg
       width="24"
@@ -19,5 +19,3 @@ const Expand = props => {
     </svg>
   );
 };
-
-export default Expand;

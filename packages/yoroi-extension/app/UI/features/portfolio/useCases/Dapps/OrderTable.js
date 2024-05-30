@@ -11,10 +11,9 @@ import {
   Box,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { default as SortIcon } from '../../common/assets/icons/Sort';
+import { ArrowIcon, SortIcon } from '../../common/assets/icons/';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
-import ArrowIcon from '../../common/assets/icons/Arrow';
 import adaPng from '../../../../../assets/images/ada.png';
 import hoskyPng from '../../common/assets/images/hosky-token.png';
 import minswapPng from '../../common/assets/images/minswap-dex.png';

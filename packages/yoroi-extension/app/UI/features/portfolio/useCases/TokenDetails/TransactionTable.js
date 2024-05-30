@@ -13,10 +13,12 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { Card } from '../../../../components';
-import ArrowIcon from '../../common/assets/icons/transaction-history/Arrow';
-import ExpandIcon from '../../common/assets/icons/transaction-history/Expand';
-import ErrorIcon from '../../common/assets/icons/transaction-history/Error';
-import WithdrawIcon from '../../common/assets/icons/transaction-history/Withdraw';
+import {
+  ArrowIcon,
+  ExpandIcon,
+  ErrorIcon,
+  WithdrawIcon,
+} from '../../common/assets/icons/transaction-history';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import moment from 'moment';
 

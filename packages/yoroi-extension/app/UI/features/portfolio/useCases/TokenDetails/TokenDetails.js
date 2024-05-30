@@ -17,7 +17,6 @@ import { tableCellClasses } from '@mui/material/TableCell';
 import TransactionTable from './TransactionTable';
 import TokenDetailChart from './TokenDetailChart';
 import SubMenu from '../../../../../components/topbar/SubMenu';
-import Arrow from '../../common/assets/icons/Arrow';
 import { useTheme } from '@mui/material/styles';
 import mockData from '../../../../pages/portfolio/mockData';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';

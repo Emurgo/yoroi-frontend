@@ -7,7 +7,7 @@ import { defineMessages } from 'react-intl';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import LiquidityTable from './LiquidityTable';
 import mockData from '../../../../pages/portfolio/mockData';
-import ArrowIcon from '../../common/assets/icons/Arrow';
+import { ArrowIcon } from '../../common/assets/icons';
 import illustrationPng from '../../common/assets/images/illustration.png';
 import { Chip } from '../../common/components/Chip';
 import { Skeleton } from '../../../../components/Skeleton';

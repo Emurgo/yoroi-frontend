@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Withdraw = props => {
+export const WithdrawIcon = props => {
   return (
     <svg
       width="10px"
@@ -26,5 +26,3 @@ const Withdraw = props => {
     </svg>
   );
 };
-
-export default Withdraw;

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Sort = props => {
+export const SortIcon = props => {
   return (
     <svg
       width="25"
@@ -21,5 +21,3 @@ const Sort = props => {
     </svg>
   );
 };
-
-export default Sort;
