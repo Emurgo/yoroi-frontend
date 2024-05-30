@@ -1024,5 +1024,18 @@
   "yoroiTransfer.waiting.progressInfo.restoringAddresses": "Fetching addresses",
   "yoroiTransfer.waiting.title.label": "Wallet is being restored",
   "gouvernace.delegateToDRep":"Delegate to a DRep",
-  "gouvernace.designatingSomeoneElse":"You are designating someone else to cast your vote on your behalf for all proposals now and in the future."
+  "gouvernace.delegateingToDRep":"Delegateing to a DRep",
+  "gouvernace.designatingSomeoneElse":"You are designating someone else to cast your vote on your behalf for all proposals now and in the future.",
+  "gouvernace.governanceStatus":"Governance status",
+  "gouvernace.governanceStatusInfo":"Governance status",
+  "gouvernace.abstain":"Abstain",
+  "gouvernace.abstainInfo":"You are choosing not to cast a vote on all proposals now and in the future.",
+  "gouvernace.noConfidence":"No Confidence",
+  "gouvernace.noConfidenceInfo":"You are expressing a lack of trust for all proposals now and in the future.",
+  "gouvernace.learnMore":"Learn more About Governance",
+  "gouvernace.becomeADrep":"Want to became a Drep?",
+  "gouvernace.drepId":"Drep ID:",
+  "gouvernace.participateDialog.title":"Withdraw warning",
+  "gouvernace.participateDialog.contentInfo":"To withdraw your rewards, you need to participate in the Cardano Governance. Your rewards will continue to accumulate, but you are only able to withdraw it once you join the Governance process.",
+  "gouvernace.participateDialog.buttonText":"Participate on governance"
 }

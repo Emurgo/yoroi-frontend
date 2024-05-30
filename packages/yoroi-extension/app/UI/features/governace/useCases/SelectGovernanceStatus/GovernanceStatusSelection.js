@@ -20,6 +20,7 @@ import { GovernanceProvider, useStakingKeyState, useDelegationCertificate, useVo
 import { useNavigateTo } from '../../common/useNavigateTo';
 import { useDrepDelegationState } from '../../api/useDrepDelegationState';
 import { VotingSkeletonCard } from '../../common/VotingSkeletonCard';
+import { BECOME_DREP_LINK, LEARN_MORE_LINK } from '../../common/constants';
 
 const Container = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -42,7 +43,7 @@ export const GovernanceStatusSelection = (): Node => {
 
   const { openModal } = useModal();
   const { governanceVote, governanceManager, stakePoolKeyHash, dRepIdChanged, governanceVoteChanged, walletId } = useGovernance();
-  const { data } = useDrepDelegationState(walletId);
+  const { data: governanceData } = useDrepDelegationState(walletId);
 
   const strings = useStrings();
 
@@ -57,7 +58,7 @@ export const GovernanceStatusSelection = (): Node => {
     useErrorBoundary: true,
   });
 
-  const pageTitle = governanceVote === 'none' ? 'Register in Governance' : 'Governance status';
+  const pageTitle = governanceVote === 'none' ? 'Register in Governance' : strings.governanceStatus;
   const statusRawText = mapStatus[governanceVote];
   const pageSubtitle =
     governanceVote === 'none'
@@ -129,10 +130,10 @@ export const GovernanceStatusSelection = (): Node => {
 
   const optionsList = [
     {
-      title: strings.delegateToDRep,
+      title: governanceData?.kind === 'delegate' ? strings.delegateingToDRep : strings.delegateToDRep,
       description: strings.designatingSomeoneElse,
       icon: <DRepIlustration />,
-      selected: data?.kind === 'delegate',
+      selected: governanceData?.kind === 'delegate',
       onClick: handleDelegate,
       pending: pendingVote,
     },
@@ -140,7 +141,7 @@ export const GovernanceStatusSelection = (): Node => {
       title: 'Abstain',
       description: 'You are choosing not to cast a vote on all proposals now and in the future.',
       icon: <Abstein />,
-      selected: data?.kind === 'abstain',
+      selected: governanceData?.kind === 'abstain',
       onClick: handleAbstain,
       pending: pendingVote,
     },
@@ -148,7 +149,7 @@ export const GovernanceStatusSelection = (): Node => {
       title: 'No Confidence',
       description: 'You are expressing a lack of trust for all proposals now and in the future.',
       icon: <NoConfidance />,
-      selected: data?.kind === 'no-confidence',
+      selected: governanceData?.kind === 'no-confidence',
       onClick: handleNoConfidence,
       pending: pendingVote,
     },
@@ -181,24 +182,19 @@ export const GovernanceStatusSelection = (): Node => {
             })
           : skeletonsCards.map(() => <VotingSkeletonCard />)}
       </Box>
-      {governanceVote.kind === 'none' && (
-        <Stack gap="17px" mt="42px">
-          <Link href="#" variant="body1">
-            Want to became a Drep?
-          </Link>
-          <Link href="#" variant="body1">
-            Learn more About Governance
-          </Link>
-        </Stack>
-      )}
 
       <Stack gap="17px" mt="42px">
-        {data?.drepID && (
+        {governanceData?.kind === 'delegate' && (
           <Typography variant="body2" align="center" color="textSecondary" gutterBottom>
-            Drep ID: drep1c93a2zvs3aw8e4naez0ynpmc48jbc7yaa3n2k8ljhwfdt70yscts
+            `Drep ID: ${governanceData?.drepID}`
           </Typography>
         )}
-        <Link href="#" variant="body1">
+        {governanceData?.kind === 'none' && (
+          <Link href={BECOME_DREP_LINK} target="_blank" rel="noopener" variant="body1">
+            Want to became a Drep?
+          </Link>
+        )}
+        <Link href={LEARN_MORE_LINK} target="_blank" rel="noopener" variant="body1">
           Learn more About Governance
         </Link>
       </Stack>

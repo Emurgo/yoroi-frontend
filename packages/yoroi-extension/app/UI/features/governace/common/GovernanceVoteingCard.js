@@ -40,6 +40,12 @@ const StyledCard = styled(Stack)(({ theme, selected, pending }) => ({
     opacity: selected ? 1 : 0.5,
     cursor: 'not-allowed',
   }),
+  '&:hover': {
+    backgroundImage: theme.palette.ds.bg_gradient_1,
+    backgroundOrigin: 'content-box',
+    boxShadow: 'none',
+    transition: 'all 250ms ease-in-out',
+  },
 }));
 
 const IconContainer = styled(Box)(({ theme }) => ({
