@@ -1,6 +1,6 @@
 // @flow
 import { TransactionFailed } from '../../components/TransactionFailed/TransactionFailed';
-import GouvernanceLayout from './layout';
+import GovernanceLayout from './layout';
 
 type Props = {|
   stores: any,
@@ -8,12 +8,12 @@ type Props = {|
   children?: React$Node,
 |};
 
-const GouvernanceTransactionFailedPage = (props: Props): any => {
+const GovernanceTransactionFailedPage = (props: Props): any => {
   return (
-    <GouvernanceLayout {...props}>
+    <GovernanceLayout {...props}>
       <TransactionFailed />
-    </GouvernanceLayout>
+    </GovernanceLayout>
   );
 };
 
-export default GouvernanceTransactionFailedPage;
+export default GovernanceTransactionFailedPage;

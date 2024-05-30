@@ -8,7 +8,8 @@ import type { Node } from 'react';
 import { Button } from '@mui/material';
 import { useNavigateTo } from '../../common/useNavigateTo';
 import { PasswordInput } from '../../../../components';
-import { useGovernance } from '../../module/GouvernanceContextProvider';
+import { useGovernance } from '../../module/GovernanceContextProvider';
+import { useCreateAndSendDrepDelegationTransaction } from '../../api/useCreateAndSendDrepDelegationTransaction';
 
 const Container = styled(Box)(({ theme }) => ({
   paddingTop: '32px',
@@ -45,15 +46,15 @@ export const DelagationForm = (): Node => {
   const [showPassword, setShowPassword] = React.useState(false);
   const [passwaord, setPassword] = React.useState('');
   const navigateTo = useNavigateTo();
-  const { gouvernanceStatusChanged } = useGovernance();
+  const { dRepId, governanceVote, walletId } = useGovernance();
 
   const confirmDelegation = () => {
-    gouvernanceStatusChanged('delegate');
     // TODO mock functionality
     if (passwaord.includes('oo')) {
       navigateTo.transactionFail();
     } else {
       navigateTo.transactionSubmited();
+      useCreateAndSendDrepDelegationTransaction({ walletId, governanceVote });
     }
   };
   const idPasswordInvalid = passwaord.match(/\d+/g);
@@ -87,10 +88,24 @@ export const DelagationForm = (): Node => {
           <Typography variant="body1" fontWeight="500">
             Operations
           </Typography>
-          <Typography variant="body2">Delegate voting to drep1e93a2zvs3aw8e4naez0ynpmc48jbc7yaa3n2k8ljhwfdt70yscts</Typography>
-          <Typography variant="body1" fontWeight="500">
-            Transaction fee: 0.5 ADA
-          </Typography>
+          {governanceVote.kind === 'delegate' && (
+            <>
+              <Typography variant="body2">{`Delegate voting to ${governanceVote.drepID}`}</Typography>
+              <Typography variant="body1" fontWeight="500">
+                Transaction fee: 0.5 ADA
+              </Typography>
+            </>
+          )}
+          {governanceVote.kind === 'abstain' && (
+            <>
+              <Typography variant="body2">Select abstain</Typography>
+            </>
+          )}
+          {governanceVote.kind === 'no-confidence' && (
+            <>
+              <Typography variant="body2">Select no confidence</Typography>
+            </>
+          )}
         </TransactionDetails>
         <PasswordInput
           label="Password"

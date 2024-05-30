@@ -10,11 +10,11 @@ import SidebarContainer from '../../containers/SidebarContainer';
 import { Box, Typography } from '@mui/material';
 import { withLayout } from '../../styles/context/layout';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { GouvernanceContextProvider } from '../features/gouvernace/module/GouvernanceContextProvider';
 import globalMessages from '../../i18n/global-messages';
 import { ModalProvider } from '../components/modals/ModalContext';
 import { ModalManager } from '../components/modals/ModalManager';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import { IntlProvider } from '../context/IntlProvider';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -102,14 +102,14 @@ class GeneralPageLayout extends Component<LayoutProps> {
     const currentWalletInfo = this.createCurrrentWalletInfo();
 
     return (
-      <GouvernanceContextProvider intl={this.context.intl} currentWallet={currentWalletInfo}>
+      <IntlProvider intl={intl}>
         <ModalProvider>
           <ModalManager />
           <TopBarLayout banner={<BannerContainer actions={actions} stores={stores} />} sidebar={sidebarContainer} navbar={navbar}>
             {children}
           </TopBarLayout>
         </ModalProvider>
-      </GouvernanceContextProvider>
+      </IntlProvider>
     );
   }
 }

@@ -11,6 +11,7 @@ import { TextInput } from '../../../components';
 import { parseDrepId, useIsValidDRepID } from '@yoroi/staking';
 import { isNonNullable } from '@yoroi/common';
 import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
+import { useGovernance } from '../module/GovernanceContextProvider';
 
 type ChooseDRepModallProps = {|
   onSubmit?: (drepId: string) => void,
@@ -18,31 +19,35 @@ type ChooseDRepModallProps = {|
 
 export const ChooseDRepModal = ({ onSubmit }: ChooseDRepModallProps): Node => {
   const [drepId, setDrepId] = React.useState('');
+  const [error, setError] = React.useState(false);
+
+  const { dRepIdChanged, governanceVoteChanged } = useGovernance();
 
   // TODO hook endpoint not working well
-  const { error, isFetched, isFetching } = useIsValidDRepID(drepId, {
-    retry: false,
-    enabled: drepId.length > 0,
-  });
+  // const { error, isFetched, isFetching } = useIsValidDRepID(drepId, {
+  //   retry: false,
+  //   enabled: drepId.length > 0,
+  // });
+
+  React.useEffect(() => {
+    setError(false);
+  }, [drepId]);
 
   const confirmDRep = () => {
-    // TODO add spcecific validation if needed
-    onSubmit?.(drepId);
-    // TODO hook endpoint not working well
-    // parseDrepId(drepId, RustModule.CrossCsl.init)
-    //   .then(parsedId => {
-    //     console.log('parsedId', parsedId);
-    //   })
-    //   .catch(err => {
-    //     console.log('err', err);
-    //   });
+    parseDrepId(drepId, RustModule.CrossCsl.init('any'))
+      .then(parsedId => {
+        onSubmit?.(drepId);
+      })
+      .catch(err => {
+        setError(true);
+      });
   };
 
   const idInvalid = drepId.match(/\d+/g);
 
   return (
     <Stack>
-      <Stack gap="24px" mb="48px">
+      <Stack gap="24px" mb="24px">
         <Typography variant="body1" textAlign="center">
           Identify your preferred DRep and enter their ID below to delegate your vote
         </Typography>
@@ -51,21 +56,18 @@ export const ChooseDRepModal = ({ onSubmit }: ChooseDRepModallProps): Node => {
           label="DRep ID"
           variant="outlined"
           onChange={event => {
+            dRepIdChanged(event.target.value);
+            governanceVoteChanged({ kind: 'delegate', drepID: event.target.value });
             setDrepId(event.target.value);
           }}
           value={drepId}
-          error={!!idInvalid}
-          helperText={idInvalid ? 'Incorrect format' : ' '}
+          error={error}
+          helperText={error ? 'Incorrect format' : ' '}
+          defaultValue="drep1wn0dklu87w8d9pkuyr7jalulgvl9w2he0hn0fne9k5a6y4d55mt"
         />
       </Stack>
 
-      <Button
-        onClick={confirmDRep}
-        fullWidth
-        variant="primary"
-        // disabled={isNonNullable(error) || drepId.length === 0 || !isFetched || isFetching}
-        disabled={drepId.length === 0 || idInvalid}
-      >
+      <Button onClick={confirmDRep} fullWidth variant="primary" disabled={error || drepId.length === 0}>
         Confirm
       </Button>
     </Stack>

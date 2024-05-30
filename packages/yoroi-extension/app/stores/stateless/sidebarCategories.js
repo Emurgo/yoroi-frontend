@@ -15,6 +15,7 @@ import { ReactComponent as nftsIcon } from '../../assets/images/sidebar/revamp/n
 import { ReactComponent as votingIcon } from '../../assets/images/sidebar/revamp/voting.inline.svg';
 import { ReactComponent as swapIcon } from '../../assets/images/sidebar/revamp/swap.inline.svg';
 import { ReactComponent as settingIcon } from '../../assets/images/sidebar/revamp/setting.inline.svg';
+import { ReactComponent as governanceIcon } from '../../assets/images/sidebar/revamp/governance.inline.svg';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import environment from '../../environment';
@@ -122,17 +123,14 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     icon: stakingIcon,
     label: globalMessages.sidebarStaking,
     isVisible: ({ selected, isRewardWallet }) =>
-      !!selected &&
-      isCardanoHaskell(selected.getParent().getNetworkInfo()) &&
-      isRewardWallet(selected),
+      !!selected && isCardanoHaskell(selected.getParent().getNetworkInfo()) && isRewardWallet(selected),
   },
   {
     className: 'swap',
     route: ROUTES.SWAP.ROOT,
     icon: swapIcon,
     label: globalMessages.sidebarSwap,
-    isVisible: ({ selected }) =>
-      (environment.isDev() || environment.isNightly()) && !!selected?.isMainnet(),
+    isVisible: ({ selected }) => (environment.isDev() || environment.isNightly()) && !!selected?.isMainnet(),
   },
   {
     className: 'assets',
@@ -171,17 +169,17 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
   //   isVisible: _request => true,
   // },
   {
+    className: 'governance',
+    route: '/governance',
+    icon: governanceIcon,
+    label: globalMessages.sidebarGovernance,
+    isVisible: _request => true,
+  },
+  {
     className: 'settings',
     route: '/settings',
     icon: settingIcon,
     label: globalMessages.sidebarSettings,
-    isVisible: _request => true,
-  },
-  {
-    className: 'gouvernance',
-    route: '/gouvernance',
-    icon: settingIcon,
-    label: globalMessages.sidebarGouvernance,
     isVisible: _request => true,
   },
   // {

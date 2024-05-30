@@ -338,8 +338,7 @@ const globalMessages: * = defineMessages({
   },
   hwConnectDialogAboutPrerequisite4: {
     id: 'wallet.connect.hw.dialog.step.about.prerequisite.4',
-    defaultMessage:
-      '!!!Your computer must remain connected to the Internet throughout the process.',
+    defaultMessage: '!!!Your computer must remain connected to the Internet throughout the process.',
   },
   hwConnectDialogAboutPrerequisiteHeader: {
     id: 'wallet.connect.hw.dialog.step.about.prerequisite.header',
@@ -371,8 +370,7 @@ const globalMessages: * = defineMessages({
   },
   trezorError101: {
     id: 'wallet.connect.trezor.error.101',
-    defaultMessage:
-      '!!!Failed to connect trezor.io. Please check your Internet connection and retry.',
+    defaultMessage: '!!!Failed to connect trezor.io. Please check your Internet connection and retry.',
   },
   hwError101: {
     id: 'wallet.hw.common.error.101',
@@ -517,8 +515,7 @@ const globalMessages: * = defineMessages({
   },
   uriExplanation: {
     id: 'global.uriExplanation',
-    defaultMessage:
-      '!!!These allow you to easily share invoices with friends and businesses by simply clicking a URL.',
+    defaultMessage: '!!!These allow you to easily share invoices with friends and businesses by simply clicking a URL.',
   },
   uriExplanationRevamp: {
     id: 'global.uriExplanation.revamp',
@@ -542,8 +539,7 @@ const globalMessages: * = defineMessages({
   },
   sendingIsDisabled: {
     id: 'wallet.send.form.sendingIsDisabled',
-    defaultMessage:
-      '!!!Unable to process. Please retry after the previous transaction has been completed.',
+    defaultMessage: '!!!Unable to process. Please retry after the previous transaction has been completed.',
   },
   passwordDisclaimer: {
     id: 'wallet.restore.dialog.passwordDisclaimer',
@@ -596,8 +592,7 @@ const globalMessages: * = defineMessages({
   },
   restoreByronEraWalletDescription: {
     id: 'wallet.add.optionDialog.walletEra.byronEra.description',
-    defaultMessage:
-      '!!!Wallets created before July 29th, 2020 are Byron-era wallets and cannot delegate.',
+    defaultMessage: '!!!Wallets created before July 29th, 2020 are Byron-era wallets and cannot delegate.',
   },
   sendButtonLabel: {
     id: 'wallet.send.confirmationDialog.submit',
@@ -679,9 +674,9 @@ const globalMessages: * = defineMessages({
     id: 'sidebar.settings',
     defaultMessage: '!!!Settings',
   },
-  sidebarGouvernance: {
-    id: 'sidebar.gouvernance',
-    defaultMessage: '!!!Gouvernance',
+  sidebarGovernance: {
+    id: 'sidebar.governance',
+    defaultMessage: '!!!Governance',
   },
   sidebarTransfer: {
     id: 'sidebar.transfer',
@@ -742,8 +737,7 @@ const globalMessages: * = defineMessages({
   },
   roaHelperMessage: {
     id: 'wallet.staking.banner.roaHelperMessage',
-    defaultMessage:
-      '!!!Estimated ROA (Return of ADA) based on staking result from the last 30 days',
+    defaultMessage: '!!!Estimated ROA (Return of ADA) based on staking result from the last 30 days',
   },
   stakePoolDelegated: {
     id: 'wallet.dashboard.upcomingRewards.stakePoolDelegated',
@@ -787,8 +781,7 @@ const globalMessages: * = defineMessages({
   },
   auditAddressWarning: {
     id: 'wallet.receive.page.internalWarning2',
-    defaultMessage:
-      '!!!addresses are shown here for personal auditing purposes and should <strong>never</strong> be used.',
+    defaultMessage: '!!!addresses are shown here for personal auditing purposes and should <strong>never</strong> be used.',
   },
   lastSyncMessage: {
     id: 'myWallets.wallets.lastSyncText',
@@ -816,8 +809,7 @@ const globalMessages: * = defineMessages({
   },
   pendingTxWarning: {
     id: 'wallet.staking.warning.pendingTx',
-    defaultMessage:
-      '!!!You cannot change your delegation preference while a transaction is pending',
+    defaultMessage: '!!!You cannot change your delegation preference while a transaction is pending',
   },
   stakePoolHash: {
     id: 'wallet.delegation.transaction.stakePoolHash',
@@ -945,8 +937,7 @@ const globalMessages: * = defineMessages({
   },
   txConfirmationLedgerNanoLine2: {
     id: 'wallet.send.ledger.confirmationDialog.info.line.2',
-    defaultMessage:
-      '!!!Make sure Cardano ADA app must remain open on the Ledger device throughout the process.',
+    defaultMessage: '!!!Make sure Cardano ADA app must remain open on the Ledger device throughout the process.',
   },
   txConfirmationTrezorTLine2: {
     id: 'wallet.send.trezor.confirmationDialog.info.line.2',
