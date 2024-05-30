@@ -142,7 +142,7 @@ class BasePage {
     this.logger.info(
       `BasePage::executeLocalStorageScript is called. Script: ${JSON.stringify(script)}`
     );
-    return await this.driver.executeScript(`return window.yoroi.api.localStorage.${script}`);
+    return await this.driver.executeScript(`return localStorage.${script}`);
   }
   async input(locator, value) {
     this.logger.info(
@@ -528,6 +528,10 @@ class BasePage {
     for (const storageKey in storageSnapshot) {
       await this.setInfoChromeLocalStorage(storageKey, storageSnapshot[storageKey]);
     }
+    // set info into regular storage
+    await this.saveToLocalStorage('dialog__SAVE_RECOVERY_PHRASE', true);
+    await this.saveToLocalStorage('dialog__WALLET_NAME_AND_PASSWORD', true);
+    await this.saveToLocalStorage('dialog__WALLET_CHECKSUM', true);
   }
 }
 
