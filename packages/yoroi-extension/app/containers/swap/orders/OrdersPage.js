@@ -225,7 +225,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
 
   const txHashToRenderedTimestamp: string => string = txHash => {
     const date = props.stores.substores.ada.swapStore.transactionTimestamps[txHash];
-    return date == null ? '-' : moment(date).format('MMM D, YYYY h:mm A');
+    return date == null ? '-' : moment(date).format('MMM D, YYYY H:mm');
   };
 
   const handleCancelRequest = async order => {
