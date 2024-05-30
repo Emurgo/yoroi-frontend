@@ -10,6 +10,7 @@ import {
   halfSecond,
   oneSecond,
 } from '../helpers/timeConstants.js';
+import { getSnapshotObjectFromJSON } from '../utils/utils.js';
 
 const writeFile = promisify(fs.writeFile);
 
@@ -412,7 +413,7 @@ class BasePage {
   }
 
   async getFullIndexedDBFromChrome() {
-    this.logger.info(`Webdriver::getFullIndexedDBFromChrome is called.`);
+    this.logger.info(`BasePage::getFullIndexedDBFromChrome is called.`);
     await this.driver.executeScript(() => {
       window.allDBsPromise = window.indexedDB.databases();
     });
@@ -461,7 +462,7 @@ class BasePage {
   }
 
   async setInfoToIndexedDBChrome(tableName, value) {
-    this.logger.info(`Webdriver::setInfoToIndexedDBChrome is called for the table ${tableName}.`);
+    this.logger.info(`BasePage::setInfoToIndexedDBChrome is called for the table ${tableName}.`);
     this.driver.executeScript(() => {
       window.allDBsPromise = window.indexedDB.databases();
     });
@@ -496,6 +497,36 @@ class BasePage {
         tableName,
         valueItem
       );
+    }
+  }
+
+  async getInfoChromeLocalStorage(key) {
+    this.logger.info(`BasePage::getInfoChromeLocalStorage is called. Key: "${key}"`);
+    this.driver.executeScript(
+      `await chrome.storage.local.get('${key}', function (result) {window.someKeyValue = result})`
+    );
+    const result = await this.driver.executeScript(() => window.someKeyValue);
+    this.logger.info(`BasePage::getInfoChromeLocalStorage::result ${JSON.stringify(result)}`);
+    return result;
+  }
+
+  async setInfoChromeLocalStorage(key, value) {
+    this.logger.info(
+      `BasePage::setInfoChromeLocalStorage is called. Key: "${key}", value: "${value}"`
+    );
+    await this.driver.executeScript(`await chrome.storage.local.set({ "${key}": "${value}" })`);
+  }
+
+  async prepareDBandStorage(templateName) {
+    // import info into the indexedDB
+    const dbSnapshot = getSnapshotObjectFromJSON(`${templateName}.indexedDB.json`);
+    for (const dbKey in dbSnapshot) {
+      await this.setInfoToIndexedDBChrome(dbKey, dbSnapshot[dbKey]);
+    }
+    // set info into the chrome local storage
+    const storageSnapshot = getSnapshotObjectFromJSON(`${templateName}.localStorage.json`);
+    for (const storageKey in storageSnapshot) {
+      await this.setInfoChromeLocalStorage(storageKey, storageSnapshot[storageKey]);
     }
   }
 }
