@@ -526,7 +526,7 @@ class BasePage {
     // set info into the chrome local storage
     const chromeStorageSnapshot = getSnapshotObjectFromJSON(`${templateName}.chromeLocalStorage.json`);
     for (const storageKey in chromeStorageSnapshot) {
-      await this.setInfoChromeLocalStorage(storageKey, storageSnapshot[storageKey]);
+      await this.setInfoChromeLocalStorage(storageKey, chromeStorageSnapshot[storageKey]);
     }
     // set info into regular storage
     const commonStorageSnaphot = getSnapshotObjectFromJSON(`${templateName}.localStorage.json`);
