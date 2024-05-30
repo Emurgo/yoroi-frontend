@@ -4,6 +4,7 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import CopyIcon from '../icons/Copy';
 import CopiedIcon from '../icons/Copied';
 import { Tooltip } from '../Tooltip';
+import { usePortfolio } from '../../features/portfolio/module/PortfolioContextProvider';
 
 interface Props {
   textToCopy: string;
@@ -12,6 +13,7 @@ interface Props {
 
 export const CopyButton = ({ textToCopy, disabled, ...props }: Props) => {
   const [copied, setCopied] = useState(false);
+  const { strings } = usePortfolio();
 
   const handleCopy = () => {
     setCopied(true);
@@ -22,7 +24,11 @@ export const CopyButton = ({ textToCopy, disabled, ...props }: Props) => {
 
   return (
     <CopyToClipboard text={textToCopy} onCopy={handleCopy} {...props}>
-      <Tooltip title={copied ? 'Copied' : 'Copy to clipboard'} arrow placement="bottom-start">
+      <Tooltip
+        title={copied ? strings.copied : strings.copyToClipboard}
+        arrow
+        placement="bottom-start"
+      >
         <IconButton disabled={disabled} sx={{ padding: 0 }}>
           {copied ? <CopiedIcon /> : <CopyIcon />}
         </IconButton>

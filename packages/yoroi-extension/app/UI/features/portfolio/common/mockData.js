@@ -1,7 +1,4 @@
-import {
-  HistoryItemStatus,
-  HistoryItemType,
-} from '../../features/portfolio/useCases/TokenDetails/TransactionTable';
+import { HistoryItemStatus, HistoryItemType } from '../useCases/TokenDetails/TransactionTable';
 
 // UTILS
 const getRandomTime = (startDate, endDate) => {
@@ -23,8 +20,8 @@ const mockData = {
     balance: {
       ada: (100000 * Math.random()).toFixed(2),
       usd: (1000 * Math.random()).toFixed(2),
-      percents: -Math.random().toFixed(2),
-      amount: -Math.random().toFixed(2),
+      percents: Math.random().toFixed(2),
+      amount: Math.random().toFixed(2),
     },
   },
 
@@ -197,7 +194,7 @@ const mockData = {
         portfolioPercents: Math.round(100 * Math.random()),
         '24h': -(10 * Math.random()).toFixed(2),
         '1W': (10 * Math.random()).toFixed(2),
-        '1M': (10 * Math.random()).toFixed(2),
+        '1M': -(10 * Math.random()).toFixed(2),
         totalAmount: Math.round(100000 * Math.random()),
         totalAmountUsd: Math.round(100000 * Math.random()),
         overview: {
@@ -355,8 +352,8 @@ const mockData = {
         id: 'Ada',
         price: (10 * Math.random()).toFixed(2),
         portfolioPercents: Math.round(100 * Math.random()),
-        '24h': -(10 * Math.random()).toFixed(2),
-        '1W': (10 * Math.random()).toFixed(2),
+        '24h': (10 * Math.random()).toFixed(2),
+        '1W': -(10 * Math.random()).toFixed(2),
         '1M': (10 * Math.random()).toFixed(2),
         totalAmount: Math.round(100000 * Math.random()),
         totalAmountUsd: Math.round(100000 * Math.random()),
@@ -516,7 +513,7 @@ const mockData = {
         price: (10 * Math.random()).toFixed(2),
         portfolioPercents: Math.round(100 * Math.random()),
         '24h': -(10 * Math.random()).toFixed(2),
-        '1W': (10 * Math.random()).toFixed(2),
+        '1W': -(10 * Math.random()).toFixed(2),
         '1M': (10 * Math.random()).toFixed(2),
         totalAmount: Math.round(100000 * Math.random()),
         totalAmountUsd: Math.round(100000 * Math.random()),
@@ -677,7 +674,7 @@ const mockData = {
         portfolioPercents: Math.round(100 * Math.random()),
         '24h': -(10 * Math.random()).toFixed(2),
         '1W': (10 * Math.random()).toFixed(2),
-        '1M': (10 * Math.random()).toFixed(2),
+        '1M': -(10 * Math.random()).toFixed(2),
         totalAmount: Math.round(100000 * Math.random()),
         totalAmountUsd: Math.round(100000 * Math.random()),
         overview: {
@@ -835,7 +832,7 @@ const mockData = {
         id: 'Tkn1',
         price: (10 * Math.random()).toFixed(2),
         portfolioPercents: Math.round(100 * Math.random()),
-        '24h': -(10 * Math.random()).toFixed(2),
+        '24h': (10 * Math.random()).toFixed(2),
         '1W': (10 * Math.random()).toFixed(2),
         '1M': (10 * Math.random()).toFixed(2),
         totalAmount: Math.round(100000 * Math.random()),
@@ -996,8 +993,8 @@ const mockData = {
         price: (10 * Math.random()).toFixed(2),
         portfolioPercents: Math.round(100 * Math.random()),
         '24h': -(10 * Math.random()).toFixed(2),
-        '1W': (10 * Math.random()).toFixed(2),
-        '1M': (10 * Math.random()).toFixed(2),
+        '1W': -(10 * Math.random()).toFixed(2),
+        '1M': -(10 * Math.random()).toFixed(2),
         totalAmount: Math.round(100000 * Math.random()),
         totalAmountUsd: Math.round(100000 * Math.random()),
         overview: {
@@ -1157,7 +1154,7 @@ const mockData = {
         portfolioPercents: Math.round(100 * Math.random()),
         '24h': -(10 * Math.random()).toFixed(2),
         '1W': (10 * Math.random()).toFixed(2),
-        '1M': (10 * Math.random()).toFixed(2),
+        '1M': -(10 * Math.random()).toFixed(2),
         totalAmount: Math.round(100000 * Math.random()),
         totalAmountUsd: Math.round(100000 * Math.random()),
         overview: {
@@ -1315,7 +1312,7 @@ const mockData = {
         id: 'Tkn6',
         price: (10 * Math.random()).toFixed(2),
         portfolioPercents: Math.round(100 * Math.random()),
-        '24h': -(10 * Math.random()).toFixed(2),
+        '24h': (10 * Math.random()).toFixed(2),
         '1W': (10 * Math.random()).toFixed(2),
         '1M': (10 * Math.random()).toFixed(2),
         totalAmount: Math.round(100000 * Math.random()),
@@ -1475,9 +1472,9 @@ const mockData = {
         id: 'Tkn8',
         price: (10 * Math.random()).toFixed(2),
         portfolioPercents: Math.round(100 * Math.random()),
-        '24h': -(10 * Math.random()).toFixed(2),
+        '24h': (10 * Math.random()).toFixed(2),
         '1W': (10 * Math.random()).toFixed(2),
-        '1M': (10 * Math.random()).toFixed(2),
+        '1M': -(10 * Math.random()).toFixed(2),
         totalAmount: Math.round(100000 * Math.random()),
         totalAmountUsd: Math.round(100000 * Math.random()),
         overview: {
@@ -1624,7 +1621,82 @@ const mockData = {
             usd: Math.random().toFixed(3) * 1000,
           },
           {
-            time: getRandomTime(startDate, endDate),
+            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
+            value: Math.random().toFixed(3),
+            usd: Math.random().toFixed(3) * 1000,
+          },
+          {
+            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
+            value: Math.random().toFixed(3),
+            usd: Math.random().toFixed(3) * 1000,
+          },
+          {
+            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
+            value: Math.random().toFixed(3),
+            usd: Math.random().toFixed(3) * 1000,
+          },
+          {
+            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
+            value: Math.random().toFixed(3),
+            usd: Math.random().toFixed(3) * 1000,
+          },
+          {
+            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
+            value: Math.random().toFixed(3),
+            usd: Math.random().toFixed(3) * 1000,
+          },
+          {
+            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
+            value: Math.random().toFixed(3),
+            usd: Math.random().toFixed(3) * 1000,
+          },
+          {
+            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
+            value: Math.random().toFixed(3),
+            usd: Math.random().toFixed(3) * 1000,
+          },
+          {
+            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
+            value: Math.random().toFixed(3),
+            usd: Math.random().toFixed(3) * 1000,
+          },
+          {
+            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
+            value: Math.random().toFixed(3),
+            usd: Math.random().toFixed(3) * 1000,
+          },
+          {
+            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
+            value: Math.random().toFixed(3),
+            usd: Math.random().toFixed(3) * 1000,
+          },
+          {
+            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
+            value: Math.random().toFixed(3),
+            usd: Math.random().toFixed(3) * 1000,
+          },
+          {
+            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
+            value: Math.random().toFixed(3),
+            usd: Math.random().toFixed(3) * 1000,
+          },
+          {
+            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
+            value: Math.random().toFixed(3),
+            usd: Math.random().toFixed(3) * 1000,
+          },
+          {
+            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
+            value: Math.random().toFixed(3),
+            usd: Math.random().toFixed(3) * 1000,
+          },
+          {
+            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
+            value: Math.random().toFixed(3),
+            usd: Math.random().toFixed(3) * 1000,
+          },
+          {
+            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
             value: Math.random().toFixed(3),
             usd: Math.random().toFixed(3) * 1000,
           },
@@ -1648,7 +1720,7 @@ const mockData = {
           id: 'lvlc',
         },
         PNLValue: (Math.random() * 10).toFixed(2),
-        PNLValueUsd: (Math.random() * 10).toFixed(2),
+        PNLValueUsd: -(Math.random() * 10).toFixed(2),
         lpTokens: (Math.random() * 1000000).toFixed(2),
         totalValue: (Math.random() * 1000).toFixed(2),
         totalValueUsd: (Math.random() * 100).toFixed(2),
@@ -1714,7 +1786,7 @@ const mockData = {
           id: 'bricks',
         },
         PNLValue: (Math.random() * 10).toFixed(2),
-        PNLValueUsd: (Math.random() * 10).toFixed(2),
+        PNLValueUsd: -(Math.random() * 10).toFixed(2),
         lpTokens: (Math.random() * 1000000).toFixed(2),
         totalValue: (Math.random() * 1000).toFixed(2),
         totalValueUsd: (Math.random() * 100).toFixed(2),
@@ -1736,7 +1808,7 @@ const mockData = {
           id: 'poppa',
         },
         PNLValue: (Math.random() * 10).toFixed(2),
-        PNLValueUsd: (Math.random() * 10).toFixed(2),
+        PNLValueUsd: -(Math.random() * 10).toFixed(2),
         lpTokens: (Math.random() * 1000000).toFixed(2),
         totalValue: (Math.random() * 1000).toFixed(2),
         totalValueUsd: (Math.random() * 100).toFixed(2),
@@ -1802,7 +1874,7 @@ const mockData = {
           id: 'nmkr',
         },
         PNLValue: (Math.random() * 10).toFixed(2),
-        PNLValueUsd: (Math.random() * 10).toFixed(2),
+        PNLValueUsd: -(Math.random() * 10).toFixed(2),
         lpTokens: (Math.random() * 1000000).toFixed(2),
         totalValue: (Math.random() * 1000).toFixed(2),
         totalValueUsd: (Math.random() * 100).toFixed(2),

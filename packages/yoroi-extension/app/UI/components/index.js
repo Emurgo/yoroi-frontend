@@ -1,5 +1,5 @@
 export * from './Card';
-export * from './Button/CopyButton';
+export * from './buttons/CopyButton';
 export * from './Input/SearchInput';
 export * from './Tooltip';
 export * from './Skeleton';

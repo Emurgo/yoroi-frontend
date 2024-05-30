@@ -2,7 +2,7 @@
 import React from 'react';
 import TokenDetails from '../../features/portfolio/useCases/TokenDetails/TokenDetails';
 import PortfolioPageLayout from '../../layout/PortfolioPageLayout';
-import mockData from './mockData';
+import mockData from '../../features/portfolio/common/mockData';
 
 type Props = {|
   stores: any,

@@ -7,6 +7,14 @@ export const messages = Object.freeze(
       id: 'portfolio.tooltip.dapps',
       defaultMessage: '!!!DApps',
     },
+    copyToClipboard: {
+      id: 'widgets.copyableaddress.addressCopyTooltipMessage',
+      defaultMessage: '!!!Copy to clipboard',
+    },
+    copied: {
+      id: 'widgets.copyableaddress.copied',
+      defaultMessage: '!!!Copied',
+    },
     soonAvailable: {
       id: 'portfolio.common.soonAvailable',
       defaultMessage: '!!!Soon available',
@@ -282,6 +290,8 @@ export const messages = Object.freeze(
 export const getStrings = intl => {
   return React.useRef({
     dapps: intl.formatMessage(messages.dapps),
+    copyToClipboard: intl.formatMessage(messages.copyToClipboard),
+    copied: intl.formatMessage(messages.copied),
     soonAvailable: intl.formatMessage(messages.soonAvailable),
     noResultsForThisSearch: intl.formatMessage(messages.noResultsForThisSearch),
     search: intl.formatMessage(messages.search),

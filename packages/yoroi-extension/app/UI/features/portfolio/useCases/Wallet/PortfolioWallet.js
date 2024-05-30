@@ -1,12 +1,11 @@
-import { Typography, Stack, Box, Input, InputAdornment, styled } from '@mui/material';
-import { ReactComponent as Search } from '../../../../../assets/images/assets-page/search.inline.svg';
+import { Typography, Stack, Box, Input, styled } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { Tooltip, SearchInput } from '../../../../components';
 import { useTheme } from '@mui/material/styles';
 import { defineMessages } from 'react-intl';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import StatsTable from './StatsTable';
-import mockData from '../../../../pages/portfolio/mockData';
+import mockData from '../../common/mockData';
 import { ArrowIcon } from '../../common/assets/icons';
 import illustrationPng from '../../common/assets/images/illustration.png';
 import { Chip } from '../../common/components/Chip';
@@ -142,7 +141,7 @@ const PortfolioWallet = ({ data }) => {
                     active={mockData.common.balance.amount > 0}
                     label={
                       <Typography variant="caption1">
-                        {mockData.common.balance.amount > 0 ? '+' : ''}
+                        {mockData.common.balance.amount > 0 && '+'}
                         {mockData.common.balance.amount} USD
                       </Typography>
                     }
@@ -153,23 +152,7 @@ const PortfolioWallet = ({ data }) => {
           </Stack>
         </Stack>
 
-        <SearchInput
-          disableUnderline
-          onChange={e => setKeyword(e.target.value)}
-          placeholder={strings.search}
-          startAdornment={
-            <InputAdornment
-              sx={{
-                '> svg > use': {
-                  fill: '#242838',
-                },
-              }}
-              position="start"
-            >
-              <Search />
-            </InputAdornment>
-          }
-        />
+        <SearchInput onChange={e => setKeyword(e.target.value)} placeholder={strings.search} />
       </Stack>
       {tokenList.length > 0 ? (
         <StatsTable data={tokenList} isLoading={isLoading} />

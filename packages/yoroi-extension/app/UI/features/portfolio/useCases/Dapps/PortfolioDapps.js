@@ -6,7 +6,7 @@ import { useTheme } from '@mui/material/styles';
 import { defineMessages } from 'react-intl';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import LiquidityTable from './LiquidityTable';
-import mockData from '../../../../pages/portfolio/mockData';
+import mockData from '../../common/mockData';
 import { ArrowIcon } from '../../common/assets/icons';
 import illustrationPng from '../../common/assets/images/illustration.png';
 import { Chip } from '../../common/components/Chip';
@@ -196,7 +196,7 @@ const PortfolioDapps = ({ data }) => {
                       active={mockData.common.balance.amount > 0}
                       label={
                         <Typography variant="caption1">
-                          {mockData.common.balance.amount > 0 ? '+' : ''}
+                          {mockData.common.balance.amount > 0 && '+'}
                           {mockData.common.balance.amount} USD
                         </Typography>
                       }
@@ -207,23 +207,7 @@ const PortfolioDapps = ({ data }) => {
             </Stack>
           </Stack>
 
-          <SearchInput
-            disableUnderline
-            onChange={e => setKeyword(e.target.value)}
-            placeholder={strings.search}
-            startAdornment={
-              <InputAdornment
-                sx={{
-                  '> svg > use': {
-                    fill: '#242838',
-                  },
-                }}
-                position="start"
-              >
-                <Search />
-              </InputAdornment>
-            }
-          />
+          <SearchInput onChange={e => setKeyword(e.target.value)} placeholder={strings.search} />
         </Stack>
 
         <Stack direction="row">

@@ -2,13 +2,7 @@ import React from 'react';
 
 export const WithdrawIcon = props => {
   return (
-    <svg
-      width="10px"
-      height="10px"
-      viewBox="0 0 20 20"
-      xmlns="http://www.w3.org/2000/svg"
-      {...props}
-    >
+    <svg width="24" height="24" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" {...props}>
       <path
         fill-rule="evenodd"
         clip-rule="evenodd"

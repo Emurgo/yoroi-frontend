@@ -211,28 +211,20 @@ const TransactionHistoryItem = ({ index, row, theme, strings }) => {
             }}
           >
             {row.type === HistoryItemType.SENT && (
-              <ArrowIcon stroke={theme.palette.ds.text_primary_medium} width="24px" height="24px" />
+              <ArrowIcon stroke={theme.palette.ds.text_primary_medium} />
             )}
             {row.type === HistoryItemType.RECEIVED && (
               <ArrowIcon
-                stroke={theme.palette.ds.text_success}
-                width="24px"
-                height="24px"
+                stroke={theme.palette.ds.el_secondary_medium}
                 style={{ transform: 'rotate(180deg)' }}
               />
             )}
-            {row.type === HistoryItemType.ERROR && (
-              <ErrorIcon fill={theme.palette.ds.text_error} width="24px" height="24px" />
-            )}
+            {row.type === HistoryItemType.ERROR && <ErrorIcon fill={theme.palette.ds.text_error} />}
             {row.type === HistoryItemType.WITHDRAW && (
-              <WithdrawIcon fill={theme.palette.ds.text_success} width="24px" height="24px" />
+              <WithdrawIcon fill={theme.palette.ds.el_secondary_medium} />
             )}
             {row.type === HistoryItemType.DELEGATE && (
-              <WithdrawIcon
-                fill={theme.palette.ds.text_primary_medium}
-                width="24px"
-                height="24px"
-              />
+              <WithdrawIcon fill={theme.palette.ds.text_primary_medium} />
             )}
           </IconButton>
           <Stack direction="column">

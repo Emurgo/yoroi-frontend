@@ -18,7 +18,7 @@ import TransactionTable from './TransactionTable';
 import TokenDetailChart from './TokenDetailChart';
 import SubMenu from '../../../../../components/topbar/SubMenu';
 import { useTheme } from '@mui/material/styles';
-import mockData from '../../../../pages/portfolio/mockData';
+import mockData from '../../common/mockData';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import TokenDetailPerformance from './TokenDetailPerformance';

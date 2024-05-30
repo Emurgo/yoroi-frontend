@@ -11,7 +11,7 @@ import { withLayout } from '../../../../../styles/context/layout';
 import type { InjectedLayoutProps } from '../../styles/context/layout';
 import type { SubMenuOption } from '../topbar/SubMenu';
 import SubMenu from '../../../../../components/topbar/SubMenu';
-import mockData from '../../../../pages/portfolio/mockData';
+import mockData from '../mockData';
 
 export const portfolioMenuMessages: Object = defineMessages({
   wallet: {

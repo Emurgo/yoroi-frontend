@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   Table,
   TableBody,
@@ -74,7 +74,7 @@ const StatsTable = ({ data, isLoading }) => {
     order: null,
     orderBy: null,
   });
-  const [list, setList] = useState([...data]);
+  const list = useMemo(() => [...data], [data]);
 
   const headCells = [
     { id: 'name', label: strings.name, align: 'left', sortType: 'character' },

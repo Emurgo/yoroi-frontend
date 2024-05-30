@@ -2,7 +2,7 @@
 import React from 'react';
 import PortfolioWallet from '../../features/portfolio/useCases/Wallet/PortfolioWallet';
 import PortfolioPageLayout from '../../layout/PortfolioPageLayout';
-import mockData from './mockData';
+import mockData from '../../features/portfolio/common/mockData';
 
 type Props = {|
   stores: any,

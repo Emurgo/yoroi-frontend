@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   Table,
   TableBody,
@@ -11,7 +11,7 @@ import {
   Box,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { ArrowIcon, SortIcon } from '../../common/assets/icons/';
+import { SortIcon } from '../../common/assets/icons/';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import adaPng from '../../../../../assets/images/ada.png';
@@ -76,7 +76,7 @@ const OrderTable = ({ data, isLoading }) => {
     order: null,
     orderBy: null,
   });
-  const [list, setList] = useState([...data]);
+  const list = useMemo(() => [...data], [data]);
 
   const headCells = [
     { id: 'pair', label: strings.pair, align: 'left', disabledSort: true },

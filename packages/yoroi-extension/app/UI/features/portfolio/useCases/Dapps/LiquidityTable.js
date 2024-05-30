@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   Table,
   TableBody,
@@ -11,7 +11,7 @@ import {
   Box,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { ArrowIcon, SortIcon } from '../../common/assets/icons/';
+import { SortIcon } from '../../common/assets/icons/';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import adaPng from '../../../../../assets/images/ada.png';
@@ -90,7 +90,7 @@ const LiquidityTable = ({ data, isLoading }) => {
     order: null,
     orderBy: null,
   });
-  const [list, setList] = useState([...data]);
+  const list = useMemo(() => [...data], [data]);
 
   const headCells = [
     { id: 'tokenPair', label: strings.tokenPair, align: 'left', sortType: 'character' },
@@ -302,7 +302,7 @@ const LiquidityTable = ({ data, isLoading }) => {
                       active={row.PNLValueUsd > 0}
                       label={
                         <Typography variant="caption1">
-                          {row.PNLValueUsd > 0 ? '+' : '-'}
+                          {row.PNLValueUsd > 0 && '+'}
                           {row.PNLValueUsd} USD
                         </Typography>
                       }
