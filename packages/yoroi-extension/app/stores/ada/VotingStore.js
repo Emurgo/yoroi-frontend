@@ -257,7 +257,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
       publicDeriver.getParent().getNetworkInfo()
     );
 
-    const timeToSlot = await genTimeToSlot(fullConfig);
+    const timeToSlot = genTimeToSlot(fullConfig);
     const absSlotNumber = new BigNumber(
       timeToSlot({
         // use server time for TTL if connected to server

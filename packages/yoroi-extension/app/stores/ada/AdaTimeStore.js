@@ -15,17 +15,14 @@ import {
   genTimeSinceGenesis,
   genToRealTime,
 } from '../../api/ada/lib/storage/bridge/timeUtils';
-import type {
-  ToAbsoluteSlotNumberFunc,
-  ToRelativeSlotNumberFunc,
-  TimeToAbsoluteSlotFunc,
-  CurrentEpochLengthFunc,
-  CurrentSlotLengthFunc,
-  TimeSinceGenesisFunc,
-  ToRealTimeFunc,
-} from '../../api/common/lib/storage/bridge/timeUtils';
 import type { CurrentTimeRequests } from '../base/BaseCardanoTimeStore';
 import { isCardanoHaskell, getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import type {
+  CurrentEpochLengthFunc,
+  CurrentSlotLengthFunc,
+  TimeSinceGenesisFunc, TimeToAbsoluteSlotFunc, ToAbsoluteSlotNumberFunc,
+  ToRealTimeFunc, ToRelativeSlotNumberFunc
+} from '../../api/ada/lib/storage/bridge/timeUtils';
 
 /**
  * Different wallets can be on different networks and therefore have different measures of time
@@ -52,39 +49,39 @@ export default class AdaTimeStore extends BaseCardanoTimeStore {
       publicDeriver,
       requests: {
         toAbsoluteSlot: new CachedRequest<void => Promise<ToAbsoluteSlotNumberFunc>>(
-          () => genToAbsoluteSlotNumber(
+          () => Promise.resolve(genToAbsoluteSlotNumber(
             getCardanoHaskellBaseConfig(publicDeriver.getParent().getNetworkInfo())
-          )
+          ))
         ),
         toRelativeSlotNumber: new CachedRequest<void => Promise<ToRelativeSlotNumberFunc>>(
-          () => genToRelativeSlotNumber(
+          () => Promise.resolve(genToRelativeSlotNumber(
             getCardanoHaskellBaseConfig(publicDeriver.getParent().getNetworkInfo())
-          )
+          ))
         ),
         timeToSlot: new CachedRequest<void => Promise<TimeToAbsoluteSlotFunc>>(
-          () => genTimeToSlot(
+          () => Promise.resolve(genTimeToSlot(
             getCardanoHaskellBaseConfig(publicDeriver.getParent().getNetworkInfo())
-          )
+          ))
         ),
         currentEpochLength: new CachedRequest<void => Promise<CurrentEpochLengthFunc>>(
-          () => genCurrentEpochLength(
+          () => Promise.resolve(genCurrentEpochLength(
             getCardanoHaskellBaseConfig(publicDeriver.getParent().getNetworkInfo())
-          )
+          ))
         ),
         currentSlotLength: new CachedRequest<void => Promise<CurrentSlotLengthFunc>>(
-          () => genCurrentSlotLength(
+          () => Promise.resolve(genCurrentSlotLength(
             getCardanoHaskellBaseConfig(publicDeriver.getParent().getNetworkInfo())
-          )
+          ))
         ),
         timeSinceGenesis: new CachedRequest<void => Promise<TimeSinceGenesisFunc>>(
-          () => genTimeSinceGenesis(
+          () => Promise.resolve(genTimeSinceGenesis(
             getCardanoHaskellBaseConfig(publicDeriver.getParent().getNetworkInfo())
-          )
+          ))
         ),
         toRealTime: new CachedRequest<void => Promise<ToRealTimeFunc>>(
-          () => genToRealTime(
+          () => Promise.resolve(genToRealTime(
             getCardanoHaskellBaseConfig(publicDeriver.getParent().getNetworkInfo())
-          )
+          ))
         ),
       },
     });

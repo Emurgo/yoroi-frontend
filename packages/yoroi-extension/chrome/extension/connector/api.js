@@ -889,7 +889,7 @@ export async function connectorCreateCardanoTx(
 
   const network = publicDeriver.getParent().getNetworkInfo();
   const fullConfig = getCardanoHaskellBaseConfig(network);
-  const timeToSlot = await genTimeToSlot(fullConfig);
+  const timeToSlot = genTimeToSlot(fullConfig);
   const absSlotNumber = new BigNumber(timeToSlot({
     time: new Date(),
   }).slot);

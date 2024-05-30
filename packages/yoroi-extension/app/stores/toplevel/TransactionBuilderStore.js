@@ -343,7 +343,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       }
 
       const fullConfig = getCardanoHaskellBaseConfig(network);
-      const timeToSlot = await genTimeToSlot(fullConfig);
+      const timeToSlot = genTimeToSlot(fullConfig);
       const absSlotNumber = new BigNumber(timeToSlot({
         // use server time for TTL if connected to server
         time: this.stores.serverConnectionStore.serverTime ?? new Date(),
@@ -380,7 +380,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     this.shouldSendMax = true;
     const network = publicDeriver.getParent().getNetworkInfo();
     const fullConfig = getCardanoHaskellBaseConfig(network);
-    const timeToSlot = await genTimeToSlot(fullConfig);
+    const timeToSlot = genTimeToSlot(fullConfig);
     const absSlotNumber = new BigNumber(timeToSlot({
       time: this.stores.serverConnectionStore.serverTime ?? new Date(),
     }).slot);

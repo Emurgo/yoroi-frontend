@@ -105,7 +105,7 @@ export default class AdaYoroiTransferStore extends Store<StoresMap, ActionsMap> 
     const config = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
 
     // note: no wallet selected so we call this directly
-    const timeToSlot = await genTimeToSlot(fullConfig);
+    const timeToSlot = genTimeToSlot(fullConfig);
 
     const transferTx = await yoroiTransferTxFromAddresses({
       addresses,

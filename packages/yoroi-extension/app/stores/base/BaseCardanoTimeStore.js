@@ -7,17 +7,14 @@ import {
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import Store from './Store';
-import type {
-  ToAbsoluteSlotNumberFunc,
-  ToRelativeSlotNumberFunc,
-  TimeToAbsoluteSlotFunc,
-  CurrentEpochLengthFunc,
-  CurrentSlotLengthFunc,
-  TimeSinceGenesisFunc,
-  ToRealTimeFunc,
-} from '../../api/common/lib/storage/bridge/timeUtils';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import type {
+  CurrentEpochLengthFunc,
+  CurrentSlotLengthFunc,
+  TimeSinceGenesisFunc, TimeToAbsoluteSlotFunc, ToAbsoluteSlotNumberFunc,
+  ToRealTimeFunc, ToRelativeSlotNumberFunc
+} from '../../api/ada/lib/storage/bridge/timeUtils';
 
 export type TimeCalcRequests = {|
   // although time is network-specific
