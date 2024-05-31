@@ -50,7 +50,7 @@ describe('Adding a memo to a completed Tx', function () {
     const memoWarningModal = await transactionsPage.clickAddMemo(0, 0);
     const warningIsDisplayed = await memoWarningModal.isDisplayed();
     expect(warningIsDisplayed).to.be.true;
-    const addMemoModal = await memoWarningModal.pressUnderstand();
+    const addMemoModal = await memoWarningModal.understandAdding();
     const addMemoModalIsDisplayed = await addMemoModal.isDisplayed();
     expect(addMemoModalIsDisplayed).to.be.true;
     await addMemoModal.enterMemo(testMemoMessage);
