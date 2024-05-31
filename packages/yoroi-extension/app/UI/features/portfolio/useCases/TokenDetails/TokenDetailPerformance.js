@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Stack, Typography, Link } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { usePortfolio } from '../../module/PortfolioContextProvider';
+import { useStrings } from '../../common/hooks/useStrings';
 
 const PerformanceItemType = {
   USD: 'usd',
@@ -11,7 +11,7 @@ const PerformanceItemType = {
 
 const TokenDetailPerformance = ({ tokenInfo }) => {
   const theme = useTheme();
-  const { strings } = usePortfolio();
+  const strings = useStrings();
 
   const performanceItemList = [
     { id: 'tokenPriceChange', type: PerformanceItemType.USD, label: strings.tokenPriceChange },

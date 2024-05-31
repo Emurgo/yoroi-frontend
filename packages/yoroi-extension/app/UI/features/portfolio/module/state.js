@@ -2,46 +2,43 @@
 import { invalid } from '@yoroi/common';
 import { produce } from 'immer';
 
-type status = 'drep' | 'confidence';
+type currency = 'USD' | 'ADA';
 
 // Define types
 export type PortfolioActions = {|
-  +portfolioStatusChanged: (status: status) => void,
+  +unitOfAccountChanged: (currency: currency) => void,
 |};
 
 export const PortfolioActionType = Object.freeze({
-  PortfolioStatusChanged: 'portfolioStatusChanged',
+  UnitOfAccountChanged: 'unitOfAccountChanged',
 });
 
 export type PortfolioAction = {|
-  type: typeof PortfolioActionType.PortfolioStatusChanged,
-  portfolioStatus: status,
+  type: typeof GouvernanceActionType.UnitOfAccountChanged,
+  unitOfAccount: currency,
 |};
 
 // Define state type
 export type PortfolioState = {|
-  portfolioStatus: status,
+  unitOfAccount: currency,
 |};
 
 // Define default state
 export const defaultPortfolioState: PortfolioState = {
-  portfolioStatus: 'drep',
+  unitOfAccount: 'USD',
 };
 
 // Define action handlers
 export const defaultPortfolioActions: PortfolioActions = {
-  portfolioStatusChanged: () => invalid('missing init portfolioStatusChanged'),
+  unitOfAccountChanged: () => invalid('missing init unitOfAccountChanged'),
 };
 
 // Reducer function
-export const PortfolioReducer = (
-  state: PortfolioState,
-  action: PortfolioAction
-): PortfolioState => {
+export const PortfolioReducer = (state: PortfolioState, action: PortfolioAction): PortfolioState => {
   return produce(state, draft => {
     switch (action.type) {
-      case PortfolioActionType.PortfolioStatusChanged:
-        draft.portfolioStatus = action.portfolioStatus;
+      case PortfolioActionType.UnitOfAccountChanged:
+        draft.unitOfAccount = action.unitOfAccount;
         break;
       default:
         return;

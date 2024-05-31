@@ -18,7 +18,7 @@ import BannerContainer from '../../containers/banners/BannerContainer';
 import SidebarContainer from '../../containers/SidebarContainer';
 import NavBarContainerRevamp from '../../containers/NavBarContainerRevamp';
 import { ROUTES } from '../../routes-config';
-import { PortfolioContextProvider } from '../features/portfolio/module/PortfolioContextProvider';
+import { IntlProvider } from '../context/IntlProvider';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -52,17 +52,15 @@ class PortfolioPageLayout extends Component<AllProps> {
     const isDetailPage = location.pathname.startsWith(`${ROUTES.PORTFOLIO.ROOT}/details`);
     const { actions, stores } = this.props;
     const { children } = this.props;
+    const { intl } = this.context;
     const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
 
     const menu = isDetailPage ? null : (
-      <PortfolioMenu
-        onItemClick={route => actions.router.goToRoute.trigger({ route })}
-        isActiveItem={this.isActivePage}
-      />
+      <PortfolioMenu onItemClick={route => actions.router.goToRoute.trigger({ route })} isActiveItem={this.isActivePage} />
     );
 
     const PortfolioLayoutClassic = (
-      <PortfolioContextProvider intl={this.context.intl}>
+      <IntlProvider intl={intl}>
         <TopBarLayout
           banner={<BannerContainer actions={actions} stores={stores} />}
           sidebar={sidebarContainer}
@@ -72,10 +70,8 @@ class PortfolioPageLayout extends Component<AllProps> {
               stores={stores}
               title={
                 <NavBarTitle
-                  title={this.context.intl.formatMessage(
-                    isDetailPage
-                      ? globalMessages.portfolioDetailHeaderText
-                      : globalMessages.portfolioHeaderText
+                  title={intl.formatMessage(
+                    isDetailPage ? globalMessages.portfolioDetailHeaderText : globalMessages.portfolioHeaderText
                   )}
                 />
               }
@@ -86,10 +82,10 @@ class PortfolioPageLayout extends Component<AllProps> {
         >
           <SettingsLayout menu={menu}>{children}</SettingsLayout>
         </TopBarLayout>
-      </PortfolioContextProvider>
+      </IntlProvider>
     );
     const PortfolioLayoutRevamp = (
-      <PortfolioContextProvider intl={this.context.intl}>
+      <IntlProvider intl={intl}>
         <TopBarLayout
           banner={<BannerContainer actions={actions} stores={stores} />}
           sidebar={sidebarContainer}
@@ -99,10 +95,8 @@ class PortfolioPageLayout extends Component<AllProps> {
               stores={stores}
               title={
                 <NavBarTitle
-                  title={this.context.intl.formatMessage(
-                    isDetailPage
-                      ? globalMessages.portfolioDetailHeaderText
-                      : globalMessages.portfolioHeaderText
+                  title={intl.formatMessage(
+                    isDetailPage ? globalMessages.portfolioDetailHeaderText : globalMessages.portfolioHeaderText
                   )}
                 />
               }
@@ -114,7 +108,7 @@ class PortfolioPageLayout extends Component<AllProps> {
         >
           {children}
         </TopBarLayout>
-      </PortfolioContextProvider>
+      </IntlProvider>
     );
     return this.props.renderLayoutComponent({
       CLASSIC: PortfolioLayoutClassic,

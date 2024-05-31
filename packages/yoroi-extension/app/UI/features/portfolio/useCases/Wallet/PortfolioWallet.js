@@ -10,13 +10,26 @@ import { ArrowIcon } from '../../common/assets/icons';
 import illustrationPng from '../../common/assets/images/illustration.png';
 import { Chip } from '../../common/components/Chip';
 import { Skeleton } from '../../../../components/Skeleton';
+import { useStrings } from '../../common/hooks/useStrings';
 
 const PortfolioWallet = ({ data }) => {
   const theme = useTheme();
-  const { strings } = usePortfolio();
+  const strings = useStrings();
+  const { unitOfAccount, changeUnitOfAccount } = usePortfolio();
   const [keyword, setKeyword] = useState('');
   const [isLoading, setIsLoading] = useState();
   const [tokenList, setTokenList] = useState([]);
+  const [isUsdMainUnit, setIsUsdMainUnit] = useState(unitOfAccount === 'USD');
+
+  const handleCurrencyChange = () => {
+    if (isUsdMainUnit) {
+      changeUnitOfAccount('ADA');
+      setIsUsdMainUnit(false);
+    } else {
+      changeUnitOfAccount('USD');
+      setIsUsdMainUnit(true);
+    }
+  };
 
   useEffect(() => {
     // FAKE FETCHING DATA TO SEE SKELETON
@@ -38,10 +51,7 @@ const PortfolioWallet = ({ data }) => {
     const lowercaseKeyword = keyword.toLowerCase();
 
     const temp = data.filter(item => {
-      return (
-        item.name.toLowerCase().includes(lowercaseKeyword) ||
-        item.id.toLowerCase().includes(lowercaseKeyword)
-      );
+      return item.name.toLowerCase().includes(lowercaseKeyword) || item.id.toLowerCase().includes(lowercaseKeyword);
     });
     if (temp && temp.length > 0) {
       setTokenList(temp);
@@ -59,21 +69,23 @@ const PortfolioWallet = ({ data }) => {
               <Skeleton width="146px" height="24px" />
             ) : (
               <Typography variant="h2" fontWeight="500">
-                {mockData.common.balance.ada}
+                {isUsdMainUnit ? mockData.common.walletBalance.ada : mockData.common.walletBalance.usd}
               </Typography>
             )}
             <Typography variant="body2" fontWeight="500" sx={{ marginTop: '5px' }}>
-              ADA
+              {isUsdMainUnit ? 'ADA' : 'USD'}
               <Typography
                 variant="body2"
                 fontWeight="500"
+                onClick={handleCurrencyChange}
                 sx={{
+                  cursor: 'pointer',
                   display: 'inline',
                   marginTop: '5px',
                   color: theme.palette.ds.text_gray_low,
                 }}
               >
-                /USD
+                {isUsdMainUnit ? '/USD' : '/ADA'}
               </Typography>
             </Typography>
           </Stack>
@@ -83,16 +95,11 @@ const PortfolioWallet = ({ data }) => {
               <Skeleton width="129px" height="16px" />
             ) : (
               <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
-                {mockData.common.balance.usd} USD
+                {isUsdMainUnit ? mockData.common.walletBalance.usd : mockData.common.walletBalance.ada} {isUsdMainUnit ? 'USD' : 'ADA'}
               </Typography>
             )}
             {isLoading ? (
-              <Stack
-                direction="row"
-                alignItems="center"
-                spacing={theme.spacing(1)}
-                sx={{ marginLeft: theme.spacing(2) }}
-              >
+              <Stack direction="row" alignItems="center" spacing={theme.spacing(1)} sx={{ marginLeft: theme.spacing(2) }}>
                 <Skeleton width="47px" height="20px" />
                 <Skeleton width="65px" height="20px" />
               </Stack>
@@ -107,42 +114,37 @@ const PortfolioWallet = ({ data }) => {
                 }
                 placement="right"
               >
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  spacing={theme.spacing(1)}
-                  sx={{ marginLeft: theme.spacing(2) }}
-                >
+                <Stack direction="row" alignItems="center" spacing={theme.spacing(1)} sx={{ marginLeft: theme.spacing(2) }}>
                   <Chip
-                    active={mockData.common.balance.percents > 0}
+                    active={mockData.common.walletBalance.percents > 0}
                     label={
                       <Stack direction="row" justifyContent="space-between" alignItems="center">
                         <ArrowIcon
                           fill={
-                            mockData.common.balance.percents > 0
+                            mockData.common.walletBalance.percents > 0
                               ? theme.palette.ds.secondary_c800
                               : theme.palette.ds.sys_magenta_c700
                           }
                           style={{
                             marginRight: theme.spacing(0.5),
-                            transform: mockData.common.balance.percents > 0 ? '' : 'rotate(180deg)',
+                            transform: mockData.common.walletBalance.percents > 0 ? '' : 'rotate(180deg)',
                           }}
                         />
                         <Typography variant="caption1">
-                          {mockData.common.balance.percents > 0
-                            ? mockData.common.balance.percents
-                            : -1 * mockData.common.balance.percents}
+                          {mockData.common.walletBalance.percents > 0
+                            ? mockData.common.walletBalance.percents
+                            : -1 * mockData.common.walletBalance.percents}
                           %
                         </Typography>
                       </Stack>
                     }
                   />
                   <Chip
-                    active={mockData.common.balance.amount > 0}
+                    active={mockData.common.walletBalance.amount > 0}
                     label={
                       <Typography variant="caption1">
-                        {mockData.common.balance.amount > 0 && '+'}
-                        {mockData.common.balance.amount} USD
+                        {mockData.common.walletBalance.amount > 0 && '+'}
+                        {mockData.common.walletBalance.amount} USD
                       </Typography>
                     }
                   />

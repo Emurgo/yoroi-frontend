@@ -1,15 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  TableSortLabel,
-  Typography,
-  Stack,
-  Box,
-} from '@mui/material';
+import { Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, Typography, Stack, Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { ArrowIcon, SortIcon } from '../../common/assets/icons/';
 import adaPng from '../../../../../assets/images/ada.png';
@@ -17,6 +7,7 @@ import { useNavigateTo } from '../../common/hooks/useNavigateTo';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { Chip } from '../../common/components/Chip';
 import { Skeleton } from '../../../../components/Skeleton';
+import { useStrings } from '../../common/hooks/useStrings';
 
 const TableRowSkeleton = ({ id, theme }) => (
   <TableRow
@@ -69,7 +60,8 @@ const TableRowSkeleton = ({ id, theme }) => (
 const StatsTable = ({ data, isLoading }) => {
   const theme = useTheme();
   const navigateTo = useNavigateTo();
-  const { strings } = usePortfolio();
+  const strings = useStrings();
+  const { unitOfAccount } = usePortfolio();
   const [{ order, orderBy }, setSortState] = useState({
     order: null,
     orderBy: null,
@@ -138,9 +130,7 @@ const StatsTable = ({ data, isLoading }) => {
       const sortColumn = headCells.find(cell => cell.id === orderBy);
       const sortType = sortColumn?.sortType ?? 'character';
       return arr.sort((a, b) => {
-        return order === 'desc'
-          ? descendingComparator(a, b, sortType)
-          : -descendingComparator(a, b, sortType);
+        return order === 'desc' ? descendingComparator(a, b, sortType) : -descendingComparator(a, b, sortType);
       });
     },
     [order, orderBy, headCells]
@@ -159,10 +149,7 @@ const StatsTable = ({ data, isLoading }) => {
                 onClick={() => handleRequestSort(id)}
                 sx={{ float: align, cursor: 'pointer' }}
               >
-                <Typography
-                  variant="body2"
-                  sx={{ color: theme.palette.ds.text_gray_medium, userSelect: 'none' }}
-                >
+                <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium, userSelect: 'none' }}>
                   {label}
                 </Typography>
                 <SortIcon id={id} order={order} orderBy={orderBy} />
@@ -173,9 +160,7 @@ const StatsTable = ({ data, isLoading }) => {
       </TableHead>
       <TableBody>
         {isLoading
-          ? Array.from([1, 2, 3]).map((item, index) => (
-              <TableRowSkeleton id={index} theme={theme} />
-            ))
+          ? Array.from({ length: 6 }).map((item, index) => <TableRowSkeleton id={index} theme={theme} />)
           : getSortedData(list).map(row => (
               <TableRow
                 key={row.id}
@@ -202,10 +187,7 @@ const StatsTable = ({ data, isLoading }) => {
                       src={adaPng}
                     ></Box>
                     <Stack direction="column">
-                      <Typography
-                        fontWeight="500"
-                        sx={{ color: theme.palette.ds.text_gray_normal }}
-                      >
+                      <Typography fontWeight="500" sx={{ color: theme.palette.ds.text_gray_normal }}>
                         {row.name}
                       </Typography>
                       <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium }}>
@@ -227,19 +209,13 @@ const StatsTable = ({ data, isLoading }) => {
                     label={
                       <Stack direction="row" justifyContent="space-between" alignItems="center">
                         <ArrowIcon
-                          fill={
-                            row['24h'] > 0
-                              ? theme.palette.ds.secondary_c800
-                              : theme.palette.ds.sys_magenta_c700
-                          }
+                          fill={row['24h'] > 0 ? theme.palette.ds.secondary_c800 : theme.palette.ds.sys_magenta_c700}
                           style={{
                             marginRight: '5px',
                             transform: row['24h'] > 0 ? '' : 'rotate(180deg)',
                           }}
                         />
-                        <Typography variant="caption1">
-                          {row['24h'] > 0 ? row['24h'] : -1 * row['24h']}%
-                        </Typography>
+                        <Typography variant="caption1">{row['24h'] > 0 ? row['24h'] : -1 * row['24h']}%</Typography>
                       </Stack>
                     }
                     sx={{ cursor: 'pointer' }}
@@ -252,19 +228,13 @@ const StatsTable = ({ data, isLoading }) => {
                     label={
                       <Stack direction="row" justifyContent="space-between" alignItems="center">
                         <ArrowIcon
-                          fill={
-                            row['1W'] > 0
-                              ? theme.palette.ds.secondary_c800
-                              : theme.palette.ds.sys_magenta_c700
-                          }
+                          fill={row['1W'] > 0 ? theme.palette.ds.secondary_c800 : theme.palette.ds.sys_magenta_c700}
                           style={{
                             marginRight: '5px',
                             transform: row['1W'] > 0 ? '' : 'rotate(180deg)',
                           }}
                         />
-                        <Typography variant="caption1">
-                          {row['1W'] > 0 ? row['1W'] : -1 * row['1W']}%
-                        </Typography>
+                        <Typography variant="caption1">{row['1W'] > 0 ? row['1W'] : -1 * row['1W']}%</Typography>
                       </Stack>
                     }
                     sx={{ cursor: 'pointer' }}
@@ -277,19 +247,13 @@ const StatsTable = ({ data, isLoading }) => {
                     label={
                       <Stack direction="row" justifyContent="space-between" alignItems="center">
                         <ArrowIcon
-                          fill={
-                            row['1M'] > 0
-                              ? theme.palette.ds.secondary_c800
-                              : theme.palette.ds.sys_magenta_c700
-                          }
+                          fill={row['1M'] > 0 ? theme.palette.ds.secondary_c800 : theme.palette.ds.sys_magenta_c700}
                           style={{
                             marginRight: '5px',
                             transform: row['1M'] > 0 ? '' : 'rotate(180deg)',
                           }}
                         />
-                        <Typography variant="caption1">
-                          {row['1M'] > 0 ? row['1M'] : -1 * row['1M']}%
-                        </Typography>
+                        <Typography variant="caption1">{row['1M'] > 0 ? row['1M'] : -1 * row['1M']}%</Typography>
                       </Stack>
                     }
                     sx={{ cursor: 'pointer' }}
@@ -305,18 +269,14 @@ const StatsTable = ({ data, isLoading }) => {
                 <TableCell>
                   <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
                     <Stack direction="column">
-                      <Typography
-                        fontWeight="500"
-                        sx={{ color: theme.palette.ds.text_gray_normal }}
-                      >
+                      <Typography fontWeight="500" sx={{ color: theme.palette.ds.text_gray_normal }}>
                         {row.totalAmount} {row.name}
                       </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{ color: theme.palette.ds.text_gray_medium, textAlign: 'right' }}
-                      >
-                        {row.totalAmountUsd} USD
-                      </Typography>
+                      {row.name === 'ADA' && unitOfAccount === 'ADA' ? null : (
+                        <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium, textAlign: 'right' }}>
+                          {row.totalAmountUsd} {unitOfAccount}
+                        </Typography>
+                      )}
                     </Stack>
                   </Stack>
                 </TableCell>

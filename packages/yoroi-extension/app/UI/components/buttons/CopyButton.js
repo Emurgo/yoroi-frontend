@@ -4,7 +4,7 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import CopyIcon from '../icons/Copy';
 import CopiedIcon from '../icons/Copied';
 import { Tooltip } from '../Tooltip';
-import { usePortfolio } from '../../features/portfolio/module/PortfolioContextProvider';
+import { useStrings } from '../../features/portfolio/common/hooks/useStrings';
 
 interface Props {
   textToCopy: string;
@@ -13,7 +13,7 @@ interface Props {
 
 export const CopyButton = ({ textToCopy, disabled, ...props }: Props) => {
   const [copied, setCopied] = useState(false);
-  const { strings } = usePortfolio();
+  const strings = useStrings();
 
   const handleCopy = () => {
     setCopied(true);

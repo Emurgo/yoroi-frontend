@@ -28,17 +28,16 @@ import LoadingSpinner from './components/widgets/LoadingSpinner';
 import FullscreenLayout from './components/layout/FullscreenLayout';
 
 // New UI pages
-import GouvernanceStatusPage from './UI/pages/Gouvernance/GouvernanceStatusPage';
-import GouvernanceDelegationFormPage from './UI/pages/Gouvernance/GouvernanceDelegationFormPage';
-import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
-import PortfolioDappsPage from './UI/pages/portfolio/PortfolioDappsPage';
-import PortfolioDetailPage from './UI/pages/portfolio/PortfolioDetailPage';
 import { GovernanceContextProvider } from './UI/features/governace/module/GovernanceContextProvider';
 import { createCurrrentWalletInfo } from './UI/features/governace/common/helpers';
 import GovernanceStatusPage from './UI/pages/Governance/GovernanceStatusPage';
 import GovernanceDelegationFormPage from './UI/pages/Governance/GovernanceDelegationFormPage';
 import GovernanceTransactionSubmittedPage from './UI/pages/Governance/GovernanceTransactionSubmittedPage';
 import GovernanceTransactionFailedPage from './UI/pages/Governance/GovernanceTransactionFailedPage';
+import { PortfolioContextProvider } from './UI/features/portfolio/module/PortfolioContextProvider';
+import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
+import PortfolioDappsPage from './UI/pages/portfolio/PortfolioDappsPage';
+import PortfolioDetailPage from './UI/pages/portfolio/PortfolioDetailPage';
 
 // PAGES
 const LanguageSelectionPagePromise = () => import('./containers/profile/LanguageSelectionPage');
@@ -306,9 +305,7 @@ export const Routes = (stores: StoresMap, actions: ActionsMap): Node => {
           />
           <Route
             path={ROUTES.PORTFOLIO.ROOT}
-            component={props =>
-              wrapPortfolio({ ...props, stores, actions }, PortfolioSubpages(stores, actions))
-            }
+            component={props => wrapPortfolio({ ...props, stores, actions }, PortfolioSubpages(stores, actions))}
           />
 
           <Redirect to={ROUTES.MY_WALLETS} />
@@ -530,5 +527,9 @@ export function wrapGovernance(governanceProps: StoresAndActionsProps, children:
   );
 }
 export function wrapPortfolio(portfolioProps: StoresAndActionsProps, children: Node): Node {
-  return <Suspense fallback={null}>{children}</Suspense>;
+  return (
+    <PortfolioContextProvider>
+      <Suspense fallback={null}>{children}</Suspense>
+    </PortfolioContextProvider>
+  );
 }

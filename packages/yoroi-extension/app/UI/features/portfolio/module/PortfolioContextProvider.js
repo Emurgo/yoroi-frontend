@@ -11,8 +11,6 @@ import {
   PortfolioActions,
 } from './state';
 
-import { getStrings } from '../common/hooks/useStrings';
-
 const initialPortfolioProvider = {
   ...defaultPortfolioState,
   ...defaultPortfolioActions,
@@ -24,9 +22,8 @@ type PortfolioProviderProps = any;
 export const PortfolioContextProvider = ({
   children,
   initialState = {
-    portfolioStatus: 'none',
+    unitOfAccount: 'USD',
   },
-  intl,
 }: PortfolioProviderProps) => {
   const [state, dispatch] = React.useReducer(PortfolioReducer, {
     ...defaultPortfolioState,
@@ -34,10 +31,10 @@ export const PortfolioContextProvider = ({
   });
 
   const actions = React.useRef({
-    portfolioStatusChanged: (status: any) => {
+    changeUnitOfAccount: (currency: string) => {
       dispatch({
-        type: PortfolioActionType.PortfolioStatusChanged,
-        portfolioStatus: status,
+        type: PortfolioActionType.UnitOfAccountChanged,
+        unitOfAccount: currency.toLowerCase() === 'ada' ? 'ADA' : 'USD',
       });
     },
   }).current;
@@ -46,7 +43,6 @@ export const PortfolioContextProvider = ({
     () => ({
       ...state,
       ...actions,
-      strings: getStrings(intl),
     }),
     [state, actions]
   );
@@ -55,5 +51,4 @@ export const PortfolioContextProvider = ({
 };
 
 export const usePortfolio = () =>
-  React.useContext(PortfolioContext) ??
-  invalid('usePortfolio: needs to be wrapped in a PortfolioManagerProvider');
+  React.useContext(PortfolioContext) ?? invalid('usePortfolio: needs to be wrapped in a PortfolioManagerProvider');

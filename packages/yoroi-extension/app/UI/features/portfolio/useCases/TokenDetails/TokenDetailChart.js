@@ -11,12 +11,12 @@ import {
   Tooltip as RechartTooltip,
 } from 'recharts';
 import { useTheme } from '@mui/material/styles';
-import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { ArrowIcon } from '../../common/assets/icons';
 import { Skeleton, Tooltip } from '../../../../components';
 import chartSkeletonPng from '../../common/assets/images/token-detail-chart-skeleton.png';
 import { Chip } from '../../common/components/Chip';
 import moment from 'moment';
+import { useStrings } from '../../common/hooks/useStrings';
 
 const StyledButton = styled(Button)(({ theme }) => ({
   fontWeight: 500,
@@ -30,7 +30,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo }) => {
   const isAda = tokenInfo.id.toLowerCase() === 'ada';
   const chartHeight = isAda ? 156 : 241;
   const theme = useTheme();
-  const { strings } = usePortfolio();
+  const strings = useStrings();
   const [buttonPeriodProps, setButtonPeriodProps] = useState([
     { label: '24H', active: true },
     { label: '1W', active: false },

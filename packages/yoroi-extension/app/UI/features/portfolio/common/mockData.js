@@ -17,7 +17,13 @@ const start1MonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDa
 // ALL THE MOCK DATA FOR RENDERING UI NEW
 const mockData = {
   common: {
-    balance: {
+    walletBalance: {
+      ada: (100000 * Math.random()).toFixed(2),
+      usd: (1000 * Math.random()).toFixed(2),
+      percents: Math.random().toFixed(2),
+      amount: Math.random().toFixed(2),
+    },
+    dappsBalance: {
       ada: (100000 * Math.random()).toFixed(2),
       usd: (1000 * Math.random()).toFixed(2),
       percents: Math.random().toFixed(2),
@@ -349,7 +355,7 @@ const mockData = {
       },
       {
         name: 'ADA',
-        id: 'Ada',
+        id: 'Cardano',
         price: (10 * Math.random()).toFixed(2),
         portfolioPercents: Math.round(100 * Math.random()),
         '24h': (10 * Math.random()).toFixed(2),

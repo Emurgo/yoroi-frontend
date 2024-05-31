@@ -18,9 +18,9 @@ import TransactionTable from './TransactionTable';
 import TokenDetailChart from './TokenDetailChart';
 import SubMenu from '../../../../../components/topbar/SubMenu';
 import { useTheme } from '@mui/material/styles';
-import mockData from '../../common/mockData';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
-import { usePortfolio } from '../../module/PortfolioContextProvider';
+import { useStrings } from '../../common/hooks/useStrings';
+import mockData from '../../common/mockData';
 import TokenDetailPerformance from './TokenDetailPerformance';
 import TokenDetailOverview from './TokenDetailOverview';
 
@@ -47,7 +47,7 @@ const TabContent = styled(Box)({
 const TokenDetails = ({ tokenInfo, transactionHistory }) => {
   const theme = useTheme();
   const navigateTo = useNavigateTo();
-  const { strings } = usePortfolio();
+  const strings = useStrings();
   const [isLoading, setIsLoading] = useState(false);
 
   const subMenuOptions = [
@@ -97,13 +97,13 @@ const TokenDetails = ({ tokenInfo, transactionHistory }) => {
           </Typography>
         </Button>
         <Stack direction="row" spacing={theme.spacing(2)}>
-          <StyledButton variant="contained">
+          <StyledButton variant="contained" onClick={() => navigateTo.swapPage()}>
             <Typography variant="button2">{strings.swap}</Typography>
           </StyledButton>
-          <StyledButton variant="secondary">
+          <StyledButton variant="secondary" onClick={() => navigateTo.sendPage()}>
             <Typography variant="button2">{strings.send}</Typography>
           </StyledButton>
-          <StyledButton variant="secondary">
+          <StyledButton variant="secondary" onClick={() => navigateTo.receivePage()}>
             <Typography variant="button2">{strings.receive}</Typography>
           </StyledButton>
         </Stack>

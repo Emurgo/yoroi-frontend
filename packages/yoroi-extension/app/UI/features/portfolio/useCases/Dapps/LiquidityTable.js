@@ -1,15 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  TableSortLabel,
-  Typography,
-  Stack,
-  Box,
-} from '@mui/material';
+import { Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, Typography, Stack, Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { SortIcon } from '../../common/assets/icons/';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
@@ -19,6 +9,7 @@ import hoskyPng from '../../common/assets/images/hosky-token.png';
 import minswapPng from '../../common/assets/images/minswap-dex.png';
 import { Chip } from '../../common/components/Chip';
 import { Skeleton } from '../../../../components/Skeleton';
+import { useStrings } from '../../common/hooks/useStrings';
 
 const TableRowSkeleton = ({ id, theme }) => (
   <TableRow
@@ -31,11 +22,7 @@ const TableRowSkeleton = ({ id, theme }) => (
       <Stack direction="row" alignItems="center" spacing={theme.spacing(1)}>
         <Stack direction="row" alignItems="center" sx={{ position: 'relative', width: '46px' }}>
           <Skeleton width="24px" height="24px" />
-          <Skeleton
-            width="24px"
-            height="24px"
-            sx={{ position: 'absolute', top: 0, left: '22px' }}
-          />
+          <Skeleton width="24px" height="24px" sx={{ position: 'absolute', top: 0, left: '22px' }} />
         </Stack>
         <Skeleton width="146px" height="24px" />
       </Stack>
@@ -85,7 +72,8 @@ const TableRowSkeleton = ({ id, theme }) => (
 const LiquidityTable = ({ data, isLoading }) => {
   const theme = useTheme();
   const navigateTo = useNavigateTo();
-  const { strings } = usePortfolio();
+  const strings = useStrings();
+  const { unitOfAccount } = usePortfolio();
   const [{ order, orderBy }, setSortState] = useState({
     order: null,
     orderBy: null,
@@ -154,9 +142,7 @@ const LiquidityTable = ({ data, isLoading }) => {
       const sortColumn = headCells.find(cell => cell.id === orderBy);
       const sortType = sortColumn?.sortType ?? 'character';
       return arr.sort((a, b) => {
-        return order === 'desc'
-          ? descendingComparator(a, b, sortType)
-          : -descendingComparator(a, b, sortType);
+        return order === 'desc' ? descendingComparator(a, b, sortType) : -descendingComparator(a, b, sortType);
       });
     },
     [order, orderBy, headCells]
@@ -172,21 +158,15 @@ const LiquidityTable = ({ data, isLoading }) => {
                 direction="row"
                 alignItems="center"
                 spacing={theme.spacing(1)}
-                onClick={() =>
-                  index === 0 || index === headCells.length - 1 ? handleRequestSort(id) : null
-                }
+                onClick={() => (index === 0 || index === headCells.length - 1 ? handleRequestSort(id) : null)}
                 sx={{
                   float: align,
                   cursor: index === 0 || index === headCells.length - 1 ? 'pointer' : 'normal',
-                  justifyContent:
-                    index === 0 || index === headCells.length - 1 ? 'flex-start' : 'space-between',
+                  justifyContent: index === 0 || index === headCells.length - 1 ? 'flex-start' : 'space-between',
                   width: index === 0 || index === headCells.length - 1 ? 'fit-content' : '100%',
                 }}
               >
-                <Typography
-                  variant="body2"
-                  sx={{ color: theme.palette.grayscale[600], userSelect: 'none' }}
-                >
+                <Typography variant="body2" sx={{ color: theme.palette.grayscale[600], userSelect: 'none' }}>
                   {label}
                 </Typography>
                 <SortIcon
@@ -194,9 +174,7 @@ const LiquidityTable = ({ data, isLoading }) => {
                   order={order}
                   orderBy={orderBy}
                   style={{ cursor: 'pointer ' }}
-                  onClick={() =>
-                    index === 0 || index === headCells.length - 1 ? null : handleRequestSort(id)
-                  }
+                  onClick={() => (index === 0 || index === headCells.length - 1 ? null : handleRequestSort(id))}
                 />
               </Stack>
             </TableCell>
@@ -205,9 +183,7 @@ const LiquidityTable = ({ data, isLoading }) => {
       </TableHead>
       <TableBody>
         {isLoading
-          ? Array.from([1, 2, 3]).map((item, index) => (
-              <TableRowSkeleton id={index} theme={theme} />
-            ))
+          ? Array.from({ length: 6 }).map((item, index) => <TableRowSkeleton id={index} theme={theme} />)
           : getSortedData(list).map(row => (
               <TableRow
                 key={row.id}
@@ -218,11 +194,7 @@ const LiquidityTable = ({ data, isLoading }) => {
               >
                 <TableCell>
                   <Stack direction="row" alignItems="center" spacing={theme.spacing(1)}>
-                    <Stack
-                      direction="row"
-                      alignItems="center"
-                      sx={{ position: 'relative', width: '46px' }}
-                    >
+                    <Stack direction="row" alignItems="center" sx={{ position: 'relative', width: '46px' }}>
                       <Box
                         width="24px"
                         height="24px"
@@ -262,10 +234,7 @@ const LiquidityTable = ({ data, isLoading }) => {
                       component="img"
                       src={minswapPng}
                     ></Box>
-                    <Typography
-                      fontWeight="500"
-                      sx={{ color: theme.palette.ds.text_primary_medium }}
-                    >
+                    <Typography fontWeight="500" sx={{ color: theme.palette.ds.text_primary_medium }}>
                       {row.DEX}
                     </Typography>
                   </Stack>
@@ -276,9 +245,11 @@ const LiquidityTable = ({ data, isLoading }) => {
                     <Typography sx={{ color: theme.palette.ds.text_gray_normal }}>
                       {row.firstTokenValue} {row.firstToken.name}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium }}>
-                      {row.firstTokenValueUsd} USD
-                    </Typography>
+                    {row.firstToken.name === 'ADA' && unitOfAccount === 'ADA' ? null : (
+                      <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium }}>
+                        {row.firstTokenValueUsd} {unitOfAccount}
+                      </Typography>
+                    )}
                   </Stack>
                 </TableCell>
 
@@ -287,9 +258,11 @@ const LiquidityTable = ({ data, isLoading }) => {
                     <Typography sx={{ color: theme.palette.ds.text_gray_normal }}>
                       {row.secondTokenValue} {row.secondToken.name}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium }}>
-                      {row.secondTokenValueUsd} USD
-                    </Typography>
+                    {row.secondToken.name === 'ADA' && unitOfAccount === 'ADA' ? null : (
+                      <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium }}>
+                        {row.secondTokenValueUsd} {unitOfAccount}
+                      </Typography>
+                    )}
                   </Stack>
                 </TableCell>
 
@@ -303,7 +276,7 @@ const LiquidityTable = ({ data, isLoading }) => {
                       label={
                         <Typography variant="caption1">
                           {row.PNLValueUsd > 0 && '+'}
-                          {row.PNLValueUsd} USD
+                          {row.PNLValueUsd} {unitOfAccount}
                         </Typography>
                       }
                     />
@@ -311,23 +284,16 @@ const LiquidityTable = ({ data, isLoading }) => {
                 </TableCell>
 
                 <TableCell>
-                  <Typography sx={{ color: theme.palette.ds.text_gray_normal }}>
-                    {row.lpTokens}
-                  </Typography>
+                  <Typography sx={{ color: theme.palette.ds.text_gray_normal }}>{row.lpTokens}</Typography>
                 </TableCell>
 
                 <TableCell>
                   <Stack direction="column" spacing={theme.spacing(0.25)}>
-                    <Typography
-                      sx={{ color: theme.palette.ds.text_gray_normal, textAlign: 'right' }}
-                    >
+                    <Typography sx={{ color: theme.palette.ds.text_gray_normal, textAlign: 'right' }}>
                       {row.totalValue} {row.firstToken.name}
                     </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{ color: theme.palette.ds.text_gray_medium, textAlign: 'right' }}
-                    >
-                      {row.totalValueUsd} USD
+                    <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium, textAlign: 'right' }}>
+                      {row.totalValueUsd} {unitOfAccount}
                     </Typography>
                   </Stack>
                 </TableCell>

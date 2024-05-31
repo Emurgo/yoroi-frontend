@@ -3,13 +3,13 @@ import { Stack, Box, Typography, Link, Button } from '@mui/material';
 import { Skeleton } from '../../../../components/Skeleton';
 import { CopyButton } from '../../../../components/buttons/CopyButton';
 import { useTheme } from '@mui/material/styles';
-import { usePortfolio } from '../../module/PortfolioContextProvider';
 import adaPng from '../../../../../assets/images/ada.png';
+import { useStrings } from '../../common/hooks/useStrings';
 
 const TokenDetailOverview = ({ tokenInfo, isLoading }) => {
   const isAda = tokenInfo.id.toLowerCase() === 'ada';
   const theme = useTheme();
-  const { strings } = usePortfolio();
+  const strings = useStrings();
 
   return (
     <Box>

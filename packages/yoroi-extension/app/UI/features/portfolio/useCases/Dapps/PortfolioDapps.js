@@ -13,6 +13,7 @@ import { Chip } from '../../common/components/Chip';
 import { Skeleton } from '../../../../components/Skeleton';
 import OrderTable from './OrderTable';
 import LendAndBorrow from './LendAndBorrow';
+import { useStrings } from '../../common/hooks/useStrings';
 
 const StyledButton = styled(Button)(({ theme }) => ({
   height: '40px',
@@ -29,7 +30,8 @@ const TableTabs = {
 
 const PortfolioDapps = ({ data }) => {
   const theme = useTheme();
-  const { strings } = usePortfolio();
+  const strings = useStrings();
+  const { unitOfAccount, changeUnitOfAccount } = usePortfolio();
   const [keyword, setKeyword] = useState('');
   const [isLoading, setIsLoading] = useState();
   const [liquidityList, setLiquidlityList] = useState([]);
@@ -43,6 +45,17 @@ const PortfolioDapps = ({ data }) => {
     { id: TableTabs.ORDER, label: `${strings.openOrders}`, active: false },
     { id: TableTabs.LENDBORROW, label: `${strings.lendAndBorrow}`, active: false },
   ]);
+  const [isUsdMainUnit, setIsUsdMainUnit] = useState(unitOfAccount === 'USD');
+
+  const handleCurrencyChange = () => {
+    if (isUsdMainUnit) {
+      changeUnitOfAccount('ADA');
+      setIsUsdMainUnit(false);
+    } else {
+      changeUnitOfAccount('USD');
+      setIsUsdMainUnit(true);
+    }
+  };
 
   useEffect(() => {
     // FAKE FETCHING DATA TO SEE SKELETON
@@ -99,11 +112,7 @@ const PortfolioDapps = ({ data }) => {
 
   return (
     <Box>
-      <Stack
-        direction="column"
-        spacing={theme.spacing(3)}
-        sx={{ minHeight: 'calc(100vh - 220px)' }}
-      >
+      <Stack direction="column" spacing={theme.spacing(3)} sx={{ minHeight: 'calc(100vh - 220px)' }}>
         <Stack direction="row" justifyContent="space-between">
           <Stack direction="column">
             <Stack direction="row" spacing={theme.spacing(0.5)}>
@@ -111,21 +120,23 @@ const PortfolioDapps = ({ data }) => {
                 <Skeleton width="146px" height="24px" />
               ) : (
                 <Typography variant="h2" fontWeight="500">
-                  {mockData.common.balance.ada}
+                  {isUsdMainUnit ? mockData.common.dappsBalance.ada : mockData.common.dappsBalance.usd}
                 </Typography>
               )}
               <Typography variant="body2" fontWeight="500" sx={{ marginTop: '5px' }}>
-                ADA
+                {isUsdMainUnit ? 'ADA' : 'USD'}
                 <Typography
                   variant="body2"
                   fontWeight="500"
+                  onClick={handleCurrencyChange}
                   sx={{
+                    cursor: 'pointer',
                     display: 'inline',
                     marginTop: '5px',
                     color: theme.palette.ds.text_gray_low,
                   }}
                 >
-                  /USD
+                  {isUsdMainUnit ? '/USD' : '/ADA'}
                 </Typography>
               </Typography>
             </Stack>
@@ -135,16 +146,12 @@ const PortfolioDapps = ({ data }) => {
                 <Skeleton width="129px" height="16px" />
               ) : (
                 <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
-                  {mockData.common.balance.usd} USD
+                  {isUsdMainUnit ? mockData.common.dappsBalance.usd : mockData.common.dappsBalance.ada}{' '}
+                  {isUsdMainUnit ? 'USD' : 'ADA'}
                 </Typography>
               )}
               {isLoading ? (
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  spacing={theme.spacing(1)}
-                  sx={{ marginLeft: theme.spacing(2) }}
-                >
+                <Stack direction="row" alignItems="center" spacing={theme.spacing(1)} sx={{ marginLeft: theme.spacing(2) }}>
                   <Skeleton width="47px" height="20px" />
                   <Skeleton width="65px" height="20px" />
                 </Stack>
@@ -161,43 +168,37 @@ const PortfolioDapps = ({ data }) => {
                   }
                   placement="right"
                 >
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    spacing={theme.spacing(1)}
-                    sx={{ marginLeft: theme.spacing(2) }}
-                  >
+                  <Stack direction="row" alignItems="center" spacing={theme.spacing(1)} sx={{ marginLeft: theme.spacing(2) }}>
                     <Chip
-                      active={mockData.common.balance.percents > 0}
+                      active={mockData.common.dappsBalance.percents > 0}
                       label={
                         <Stack direction="row" justifyContent="space-between" alignItems="center">
                           <ArrowIcon
                             fill={
-                              mockData.common.balance.percents > 0
+                              mockData.common.dappsBalance.percents > 0
                                 ? theme.palette.ds.secondary_c800
                                 : theme.palette.ds.sys_magenta_c700
                             }
                             style={{
                               marginRight: theme.spacing(0.5),
-                              transform:
-                                mockData.common.balance.percents > 0 ? '' : 'rotate(180deg)',
+                              transform: mockData.common.dappsBalance.percents > 0 ? '' : 'rotate(180deg)',
                             }}
                           />
                           <Typography variant="caption1">
-                            {mockData.common.balance.percents > 0
-                              ? mockData.common.balance.percents
-                              : -1 * mockData.common.balance.percents}
+                            {mockData.common.dappsBalance.percents > 0
+                              ? mockData.common.dappsBalance.percents
+                              : -1 * mockData.common.dappsBalance.percents}
                             %
                           </Typography>
                         </Stack>
                       }
                     />
                     <Chip
-                      active={mockData.common.balance.amount > 0}
+                      active={mockData.common.dappsBalance.amount > 0}
                       label={
                         <Typography variant="caption1">
-                          {mockData.common.balance.amount > 0 && '+'}
-                          {mockData.common.balance.amount} USD
+                          {mockData.common.dappsBalance.amount > 0 && '+'}
+                          {mockData.common.dappsBalance.amount} USD
                         </Typography>
                       }
                     />
@@ -239,11 +240,7 @@ const PortfolioDapps = ({ data }) => {
             <Stack width="full" justifyContent="center" alignItems="center" sx={{ flex: 1 }}>
               <Stack direction="column" alignItems="center" spacing={theme.spacing(3)}>
                 <Box component="img" src={illustrationPng}></Box>
-                <Typography
-                  variant="h4"
-                  fontWeight="500"
-                  sx={{ color: theme.palette.ds.black_static }}
-                >
+                <Typography variant="h4" fontWeight="500" sx={{ color: theme.palette.ds.black_static }}>
                   {strings.noResultsForThisSearch}
                 </Typography>
               </Stack>
@@ -257,11 +254,7 @@ const PortfolioDapps = ({ data }) => {
             <Stack width="full" justifyContent="center" alignItems="center" sx={{ flex: 1 }}>
               <Stack direction="column" alignItems="center" spacing={theme.spacing(3)}>
                 <Box component="img" src={illustrationPng}></Box>
-                <Typography
-                  variant="h4"
-                  fontWeight="500"
-                  sx={{ color: theme.palette.ds.black_static }}
-                >
+                <Typography variant="h4" fontWeight="500" sx={{ color: theme.palette.ds.black_static }}>
                   {strings.noResultsForThisSearch}
                 </Typography>
               </Stack>

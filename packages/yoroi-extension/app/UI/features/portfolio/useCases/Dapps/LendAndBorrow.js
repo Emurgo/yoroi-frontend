@@ -1,12 +1,12 @@
 import React from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material';
+import { useStrings } from '../../common/hooks/useStrings';
 import illustrationPng from '../../common/assets/images/illustration.png';
-import { usePortfolio } from '../../module/PortfolioContextProvider';
 
 const LendAndBorrow = () => {
   const theme = useTheme();
-  const { strings } = usePortfolio();
+ const strings = useStrings();
 
   return (
     <Stack width="full" justifyContent="center" alignItems="center" sx={{ flex: 1 }}>

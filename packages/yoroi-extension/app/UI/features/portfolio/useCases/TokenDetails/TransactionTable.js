@@ -19,8 +19,8 @@ import {
   ErrorIcon,
   WithdrawIcon,
 } from '../../common/assets/icons/transaction-history';
-import { usePortfolio } from '../../module/PortfolioContextProvider';
 import moment from 'moment';
+import { useStrings } from '../../common/hooks/useStrings';
 
 export const HistoryItemType = Object.freeze({
   SENT: 1,
@@ -43,7 +43,7 @@ const Container = styled(Box)(({ theme }) => ({
 
 const TransactionTable = ({ history }) => {
   const theme = useTheme();
-  const { strings } = usePortfolio();
+  const strings = useStrings();
 
   const mapStrings = arr =>
     arr.map(item => {

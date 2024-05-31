@@ -1,5 +1,6 @@
 import React from 'react';
 import { defineMessages } from 'react-intl';
+import { useIntl } from '../../../../context/IntlProvider';
 
 export const messages = Object.freeze(
   defineMessages({
@@ -287,7 +288,8 @@ export const messages = Object.freeze(
   })
 );
 
-export const getStrings = intl => {
+export const useStrings = () => {
+  const { intl } = useIntl();
   return React.useRef({
     dapps: intl.formatMessage(messages.dapps),
     copyToClipboard: intl.formatMessage(messages.copyToClipboard),
