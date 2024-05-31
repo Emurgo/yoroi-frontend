@@ -15,19 +15,19 @@ import { useStrings } from '../../common/hooks/useStrings';
 const PortfolioWallet = ({ data }) => {
   const theme = useTheme();
   const strings = useStrings();
-  const { unitOfAccount, changeUnitOfAccount } = usePortfolio();
+  const { unitOfAccount, changeUnitOfAccount, settingFiatPairUnit } = usePortfolio();
   const [keyword, setKeyword] = useState('');
   const [isLoading, setIsLoading] = useState();
   const [tokenList, setTokenList] = useState([]);
-  const [isUsdMainUnit, setIsUsdMainUnit] = useState(unitOfAccount === 'USD');
+  const [isAdaMainUnit, setIsAdaMainUnit] = useState(unitOfAccount === 'ADA');
 
   const handleCurrencyChange = () => {
-    if (isUsdMainUnit) {
-      changeUnitOfAccount('ADA');
-      setIsUsdMainUnit(false);
+    if (isAdaMainUnit) {
+      changeUnitOfAccount(settingFiatPairUnit.currency || 'USD');
+      setIsAdaMainUnit(false);
     } else {
-      changeUnitOfAccount('USD');
-      setIsUsdMainUnit(true);
+      changeUnitOfAccount('ADA');
+      setIsAdaMainUnit(true);
     }
   };
 
@@ -69,11 +69,11 @@ const PortfolioWallet = ({ data }) => {
               <Skeleton width="146px" height="24px" />
             ) : (
               <Typography variant="h2" fontWeight="500">
-                {isUsdMainUnit ? mockData.common.walletBalance.ada : mockData.common.walletBalance.usd}
+                {isAdaMainUnit ? mockData.common.walletBalance.ada : mockData.common.walletBalance.usd}
               </Typography>
             )}
             <Typography variant="body2" fontWeight="500" sx={{ marginTop: '5px' }}>
-              {isUsdMainUnit ? 'ADA' : 'USD'}
+              {isAdaMainUnit ? settingFiatPairUnit.currency || 'USD' : 'ADA'}
               <Typography
                 variant="body2"
                 fontWeight="500"
@@ -85,7 +85,7 @@ const PortfolioWallet = ({ data }) => {
                   color: theme.palette.ds.text_gray_low,
                 }}
               >
-                {isUsdMainUnit ? '/USD' : '/ADA'}
+                {isAdaMainUnit ? '/ADA' : `/${unitOfAccount}`}
               </Typography>
             </Typography>
           </Stack>
@@ -95,7 +95,8 @@ const PortfolioWallet = ({ data }) => {
               <Skeleton width="129px" height="16px" />
             ) : (
               <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
-                {isUsdMainUnit ? mockData.common.walletBalance.usd : mockData.common.walletBalance.ada} {isUsdMainUnit ? 'USD' : 'ADA'}
+                {isAdaMainUnit ? mockData.common.walletBalance.usd : mockData.common.walletBalance.ada}{' '}
+                {isAdaMainUnit ? 'ADA' : unitOfAccount}
               </Typography>
             )}
             {isLoading ? (

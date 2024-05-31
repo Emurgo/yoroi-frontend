@@ -13,6 +13,7 @@ import { useStrings } from '../../common/hooks/useStrings';
 import mockData from '../../common/mockData';
 import TokenDetailPerformance from './TokenDetailPerformance';
 import TokenDetailOverview from './TokenDetailOverview';
+import { usePortfolio } from '../../module/PortfolioContextProvider';
 
 const Header = styled(Box)({
   display: 'flex',
@@ -37,6 +38,7 @@ const TokenDetails = ({ tokenInfo, transactionHistory }) => {
   const theme = useTheme();
   const navigateTo = useNavigateTo();
   const strings = useStrings();
+  const { unitOfAccount } = usePortfolio();
   const [isLoading, setIsLoading] = useState(false);
   const isAda = tokenInfo.name.toLowerCase() === 'ada';
 
@@ -129,7 +131,9 @@ const TokenDetails = ({ tokenInfo, transactionHistory }) => {
               {isLoading ? (
                 <Skeleton width="129px" height="16px" />
               ) : (
-                <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>{tokenInfo.totalAmountUsd} USD</Typography>
+                <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
+                  {tokenInfo.totalAmountUsd} {unitOfAccount}
+                </Typography>
               )}
             </Stack>
           </Box>

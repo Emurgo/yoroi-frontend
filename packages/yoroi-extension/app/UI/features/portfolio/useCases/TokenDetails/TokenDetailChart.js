@@ -8,6 +8,7 @@ import chartSkeletonPng from '../../common/assets/images/token-detail-chart-skel
 import { Chip } from '../../common/components/Chip';
 import moment from 'moment';
 import { useStrings } from '../../common/hooks/useStrings';
+import { usePortfolio } from '../../module/PortfolioContextProvider';
 
 const StyledButton = styled(Button)(({ theme }) => ({
   fontWeight: 500,
@@ -21,6 +22,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
   const chartHeight = isAda ? 156 : 241;
   const theme = useTheme();
   const strings = useStrings();
+  const { unitOfAccount } = usePortfolio();
   const [buttonPeriodProps, setButtonPeriodProps] = useState([
     { label: '24H', active: true },
     { label: '1W', active: false },
@@ -197,7 +199,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
               <Typography fontWeight="500" sx={{ marginBottom: theme.spacing(0.1125) }}>
                 {detailInfo.value}
               </Typography>
-              <Typography variant="caption1">&nbsp;USD</Typography>
+              <Typography variant="caption1">&nbsp;{unitOfAccount}</Typography>
             </Stack>
           )}
           <Tooltip
@@ -238,7 +240,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
                   label={
                     <Typography variant="caption1">
                       {detailInfo.usd > 0 ? '+' : '-'}
-                      {detailInfo.usd} USD
+                      {detailInfo.usd} {unitOfAccount}
                     </Typography>
                   }
                 />

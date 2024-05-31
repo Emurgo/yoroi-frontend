@@ -31,7 +31,7 @@ const TableTabs = {
 const PortfolioDapps = ({ data }) => {
   const theme = useTheme();
   const strings = useStrings();
-  const { unitOfAccount, changeUnitOfAccount } = usePortfolio();
+  const { unitOfAccount, changeUnitOfAccount, settingFiatPairUnit } = usePortfolio();
   const [keyword, setKeyword] = useState('');
   const [isLoading, setIsLoading] = useState();
   const [liquidityList, setLiquidlityList] = useState([]);
@@ -45,15 +45,15 @@ const PortfolioDapps = ({ data }) => {
     { id: TableTabs.ORDER, label: `${strings.openOrders}`, active: false },
     { id: TableTabs.LENDBORROW, label: `${strings.lendAndBorrow}`, active: false },
   ]);
-  const [isUsdMainUnit, setIsUsdMainUnit] = useState(unitOfAccount === 'USD');
+  const [isAdaMainUnit, setIsAdaMainUnit] = useState(unitOfAccount === 'ADA');
 
   const handleCurrencyChange = () => {
-    if (isUsdMainUnit) {
-      changeUnitOfAccount('ADA');
-      setIsUsdMainUnit(false);
+    if (isAdaMainUnit) {
+      changeUnitOfAccount(settingFiatPairUnit.currency || 'USD');
+      setIsAdaMainUnit(false);
     } else {
-      changeUnitOfAccount('USD');
-      setIsUsdMainUnit(true);
+      changeUnitOfAccount('ADA');
+      setIsAdaMainUnit(true);
     }
   };
 
@@ -120,11 +120,11 @@ const PortfolioDapps = ({ data }) => {
                 <Skeleton width="146px" height="24px" />
               ) : (
                 <Typography variant="h2" fontWeight="500">
-                  {isUsdMainUnit ? mockData.common.dappsBalance.ada : mockData.common.dappsBalance.usd}
+                  {isAdaMainUnit ? mockData.common.dappsBalance.ada : mockData.common.dappsBalance.usd}
                 </Typography>
               )}
               <Typography variant="body2" fontWeight="500" sx={{ marginTop: '5px' }}>
-                {isUsdMainUnit ? 'ADA' : 'USD'}
+                {isAdaMainUnit ? settingFiatPairUnit.currency || 'USD' : 'ADA'}
                 <Typography
                   variant="body2"
                   fontWeight="500"
@@ -136,7 +136,7 @@ const PortfolioDapps = ({ data }) => {
                     color: theme.palette.ds.text_gray_low,
                   }}
                 >
-                  {isUsdMainUnit ? '/USD' : '/ADA'}
+                  {isAdaMainUnit ? '/ADA' : `/${unitOfAccount}`}
                 </Typography>
               </Typography>
             </Stack>
@@ -146,8 +146,8 @@ const PortfolioDapps = ({ data }) => {
                 <Skeleton width="129px" height="16px" />
               ) : (
                 <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
-                  {isUsdMainUnit ? mockData.common.dappsBalance.usd : mockData.common.dappsBalance.ada}{' '}
-                  {isUsdMainUnit ? 'USD' : 'ADA'}
+                  {isAdaMainUnit ? mockData.common.dappsBalance.usd : mockData.common.dappsBalance.ada}{' '}
+                  {isAdaMainUnit ? 'USD' : unitOfAccount}
                 </Typography>
               )}
               {isLoading ? (

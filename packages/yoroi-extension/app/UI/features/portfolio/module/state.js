@@ -2,7 +2,7 @@
 import { invalid } from '@yoroi/common';
 import { produce } from 'immer';
 
-type currency = 'USD' | 'ADA';
+type currency = 'ADA' | 'USD' | 'BRL' | 'ETH' | 'BTC' | 'KRW' | 'CNY' | 'EUR' | 'JPY';
 
 // Define types
 export type PortfolioActions = {|
@@ -24,9 +24,7 @@ export type PortfolioState = {|
 |};
 
 // Define default state
-export const defaultPortfolioState: PortfolioState = {
-  unitOfAccount: 'USD',
-};
+export const defaultPortfolioState: PortfolioState = {};
 
 // Define action handlers
 export const defaultPortfolioActions: PortfolioActions = {

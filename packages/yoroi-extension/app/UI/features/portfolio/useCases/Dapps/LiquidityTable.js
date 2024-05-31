@@ -292,9 +292,11 @@ const LiquidityTable = ({ data, isLoading }) => {
                     <Typography sx={{ color: theme.palette.ds.text_gray_normal, textAlign: 'right' }}>
                       {row.totalValue} {row.firstToken.name}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium, textAlign: 'right' }}>
-                      {row.totalValueUsd} {unitOfAccount}
-                    </Typography>
+                    {unitOfAccount === 'ADA' && row.firstToken.name === 'ADA' ? null : (
+                      <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium, textAlign: 'right' }}>
+                        {row.totalValueUsd} {unitOfAccount}
+                      </Typography>
+                    )}
                   </Stack>
                 </TableCell>
               </TableRow>

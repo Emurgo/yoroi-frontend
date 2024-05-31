@@ -21,8 +21,9 @@ type PortfolioProviderProps = any;
 
 export const PortfolioContextProvider = ({
   children,
+  settingFiatPairUnit,
   initialState = {
-    unitOfAccount: 'USD',
+    unitOfAccount: settingFiatPairUnit.enabled ? settingFiatPairUnit.currency : 'USD',
   },
 }: PortfolioProviderProps) => {
   const [state, dispatch] = React.useReducer(PortfolioReducer, {
@@ -34,7 +35,7 @@ export const PortfolioContextProvider = ({
     changeUnitOfAccount: (currency: string) => {
       dispatch({
         type: PortfolioActionType.UnitOfAccountChanged,
-        unitOfAccount: currency.toLowerCase() === 'ada' ? 'ADA' : 'USD',
+        unitOfAccount: currency,
       });
     },
   }).current;
@@ -43,6 +44,7 @@ export const PortfolioContextProvider = ({
     () => ({
       ...state,
       ...actions,
+      settingFiatPairUnit,
     }),
     [state, actions]
   );

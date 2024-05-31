@@ -1,26 +1,11 @@
 import React, { useMemo, useState } from 'react';
-import {
-  Box,
-  Stack,
-  Typography,
-  IconButton,
-  Table,
-  TableCell,
-  TableHead,
-  TableBody,
-  TableRow,
-  styled,
-} from '@mui/material';
+import { Box, Stack, Typography, IconButton, Table, TableCell, TableHead, TableBody, TableRow, styled } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { Card } from '../../../../components';
-import {
-  ArrowIcon,
-  ExpandIcon,
-  ErrorIcon,
-  WithdrawIcon,
-} from '../../common/assets/icons/transaction-history';
+import { ArrowIcon, ExpandIcon, ErrorIcon, WithdrawIcon } from '../../common/assets/icons/transaction-history';
 import moment from 'moment';
 import { useStrings } from '../../common/hooks/useStrings';
+import { usePortfolio } from '../../module/PortfolioContextProvider';
 
 export const HistoryItemType = Object.freeze({
   SENT: 1,
@@ -44,6 +29,7 @@ const Container = styled(Box)(({ theme }) => ({
 const TransactionTable = ({ history }) => {
   const theme = useTheme();
   const strings = useStrings();
+  const { unitOfAccount } = usePortfolio();
 
   const mapStrings = arr =>
     arr.map(item => {
@@ -171,6 +157,7 @@ const TransactionTable = ({ history }) => {
                       row={row}
                       theme={theme}
                       strings={strings}
+                      unitOfAccount={unitOfAccount}
                     />
                   ))}
                 </>
@@ -183,7 +170,7 @@ const TransactionTable = ({ history }) => {
   );
 };
 
-const TransactionHistoryItem = ({ index, row, theme, strings }) => {
+const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
@@ -210,22 +197,13 @@ const TransactionHistoryItem = ({ index, row, theme, strings }) => {
               },
             }}
           >
-            {row.type === HistoryItemType.SENT && (
-              <ArrowIcon stroke={theme.palette.ds.text_primary_medium} />
-            )}
+            {row.type === HistoryItemType.SENT && <ArrowIcon stroke={theme.palette.ds.text_primary_medium} />}
             {row.type === HistoryItemType.RECEIVED && (
-              <ArrowIcon
-                stroke={theme.palette.ds.el_secondary_medium}
-                style={{ transform: 'rotate(180deg)' }}
-              />
+              <ArrowIcon stroke={theme.palette.ds.el_secondary_medium} style={{ transform: 'rotate(180deg)' }} />
             )}
             {row.type === HistoryItemType.ERROR && <ErrorIcon fill={theme.palette.ds.text_error} />}
-            {row.type === HistoryItemType.WITHDRAW && (
-              <WithdrawIcon fill={theme.palette.ds.el_secondary_medium} />
-            )}
-            {row.type === HistoryItemType.DELEGATE && (
-              <WithdrawIcon fill={theme.palette.ds.text_primary_medium} />
-            )}
+            {row.type === HistoryItemType.WITHDRAW && <WithdrawIcon fill={theme.palette.ds.el_secondary_medium} />}
+            {row.type === HistoryItemType.DELEGATE && <WithdrawIcon fill={theme.palette.ds.text_primary_medium} />}
           </IconButton>
           <Stack direction="column">
             <Typography sx={{ color: theme.palette.ds.text_gray_normal }}>{row.label}</Typography>
@@ -238,10 +216,7 @@ const TransactionHistoryItem = ({ index, row, theme, strings }) => {
       <TableCell>
         <Typography
           sx={{
-            color:
-              row.status === HistoryItemStatus.FAILED
-                ? theme.palette.ds.text_error
-                : theme.palette.ds.text_gray_normal,
+            color: row.status === HistoryItemStatus.FAILED ? theme.palette.ds.text_error : theme.palette.ds.text_gray_normal,
           }}
         >
           {row.status}
@@ -252,18 +227,17 @@ const TransactionHistoryItem = ({ index, row, theme, strings }) => {
           <Typography fontWeight="500" sx={{ color: theme.palette.ds.text_gray_normal }}>
             {row.feeValue ? `${row.feeValue} ADA` : '-'}
           </Typography>
-          <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium }}>
-            {row.feeValueUsd ? `${row.feeValueUsd} USD` : '-'}
-          </Typography>
+          {unitOfAccount === 'ADA' ? null : (
+            <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium }}>
+              {row.feeValueUsd ? `${row.feeValueUsd} ${unitOfAccount}` : '-'}
+            </Typography>
+          )}
         </Stack>
       </TableCell>
       <TableCell>
         <Stack direction="row" spacing={theme.spacing(2)} sx={{ float: 'right' }}>
           <Stack direction="column">
-            <Typography
-              fontWeight="500"
-              sx={{ textAlign: 'right', color: theme.palette.ds.text_gray_normal }}
-            >
+            <Typography fontWeight="500" sx={{ textAlign: 'right', color: theme.palette.ds.text_gray_normal }}>
               {(row.type === HistoryItemType.RECEIVED ||
                 row.type === HistoryItemType.WITHDRAW ||
                 row.type === HistoryItemType.DELEGATE) &&
@@ -272,16 +246,15 @@ const TransactionHistoryItem = ({ index, row, theme, strings }) => {
             </Typography>
             {isExpanded ? (
               <Box sx={{ transition: 'all ease 0.3s' }}>
-                <Typography
-                  variant="body2"
-                  sx={{ textAlign: 'right', color: theme.palette.ds.text_gray_medium }}
-                >
-                  {(row.type === HistoryItemType.RECEIVED ||
-                    row.type === HistoryItemType.WITHDRAW ||
-                    row.type === HistoryItemType.DELEGATE) &&
-                    '+ '}
-                  {row.amountTotalUsd} USD
-                </Typography>
+                {unitOfAccount === 'ADA' ? null : (
+                  <Typography variant="body2" sx={{ textAlign: 'right', color: theme.palette.ds.text_gray_medium }}>
+                    {(row.type === HistoryItemType.RECEIVED ||
+                      row.type === HistoryItemType.WITHDRAW ||
+                      row.type === HistoryItemType.DELEGATE) &&
+                      '+ '}
+                    {row.amountTotalUsd} {unitOfAccount}
+                  </Typography>
+                )}
                 {row.type === HistoryItemType.RECEIVED && (
                   <Typography variant="body2" fontWeight="500" sx={{ textAlign: 'right' }}>
                     + {row.amountAsset} {strings.assets}
@@ -297,11 +270,31 @@ const TransactionHistoryItem = ({ index, row, theme, strings }) => {
           </Stack>
           <ExpandIcon
             style={{
-              cursor: 'pointer',
+              cursor:
+                unitOfAccount === 'ADA' &&
+                (row.type === HistoryItemType.ERROR ||
+                  row.type === HistoryItemType.WITHDRAW ||
+                  row.type === HistoryItemType.DELEGATE)
+                  ? 'normal'
+                  : 'pointer',
               transition: 'all ease 0.3s',
               transform: isExpanded ? 'rotate(0deg)' : 'rotate(90deg)',
+              opacity:
+                unitOfAccount === 'ADA' &&
+                (row.type === HistoryItemType.ERROR ||
+                  row.type === HistoryItemType.WITHDRAW ||
+                  row.type === HistoryItemType.DELEGATE)
+                  ? 0
+                  : 1,
             }}
-            onClick={() => setIsExpanded(!isExpanded)}
+            onClick={() =>
+              unitOfAccount === 'ADA' &&
+              (row.type === HistoryItemType.ERROR ||
+                row.type === HistoryItemType.WITHDRAW ||
+                row.type === HistoryItemType.DELEGATE)
+                ? null
+                : setIsExpanded(!isExpanded)
+            }
           />
         </Stack>
       </TableCell>
