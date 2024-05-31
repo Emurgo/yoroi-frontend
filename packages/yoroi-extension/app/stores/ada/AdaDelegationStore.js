@@ -3,20 +3,11 @@
 import { action, reaction, runInAction } from 'mobx';
 import BigNumber from 'bignumber.js';
 import Store from '../base/Store';
-import {
-  Logger,
-  stringifyError,
-} from '../../utils/logging';
+import { Logger, stringifyError } from '../../utils/logging';
 import CachedRequest from '../lib/LocalizedCachedRequest';
-import {
-  PublicDeriver,
-} from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import {
-  asGetStakingKey,
-} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import {
-  getDelegatedBalance,
-} from '../../api/ada/lib/storage/bridge/delegationUtils';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import { asGetStakingKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { getDelegatedBalance } from '../../api/ada/lib/storage/bridge/delegationUtils';
 import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { MangledAmountFunc } from '../stateless/mangledAddresses';
@@ -28,20 +19,20 @@ import { PoolInfoApi } from '@emurgo/yoroi-lib';
 import { entriesIntoMap } from '../../coreUtils';
 import type { PoolInfo } from '@emurgo/yoroi-lib';
 import type { PoolInfoResponse, RemotePool } from '../../api/ada/lib/state-fetch/types';
-import type { GetDelegatedBalanceFunc, RewardHistoryFunc } from '../../api/ada/lib/storage/bridge/delegationUtils';
+import type {
+  GetDelegatedBalanceFunc,
+  RewardHistoryFunc,
+} from '../../api/ada/lib/storage/bridge/delegationUtils';
 
 export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
+  _recalculateDelegationInfoDisposer: Array<(void) => void> = [];
 
-  _recalculateDelegationInfoDisposer: Array<void => void> = [];
-
-  @action addObservedWallet: PublicDeriver<> => void = (
-    publicDeriver
-  ) => {
+  @action addObservedWallet: (PublicDeriver<>) => void = publicDeriver => {
     this.stores.delegation.delegationRequests.push({
       publicDeriver,
       mangledAmounts: new CachedRequest<MangledAmountFunc>(getUnmangleAmounts),
       getDelegatedBalance: new CachedRequest<GetDelegatedBalanceFunc>(getDelegatedBalance),
-      rewardHistory: new CachedRequest<RewardHistoryFunc>(async (address) => {
+      rewardHistory: new CachedRequest<RewardHistoryFunc>(async address => {
         // we need to defer this call because the store may not be initialized yet
         // by the time this constructor is called
         const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
@@ -52,25 +43,29 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
 
         const defaultToken = publicDeriver.getParent().getDefaultToken();
         const addressRewards = historyResult[address]
-          ?.sort((a,b) => a.epoch - b.epoch)
-          .map(info => (
-            ([info.epoch, new MultiToken(
-              [{
-                amount: new BigNumber(info.reward),
-                identifier: defaultToken.defaultIdentifier,
-                networkId: defaultToken.defaultNetworkId,
-              }],
-              defaultToken
-            ),
-            info.poolHash]: [number, MultiToken, string])
-          ));
-        return addressRewards != null
-          ? addressRewards
-          : [];
+          ?.sort((a, b) => a.epoch - b.epoch)
+          .map(
+            info =>
+              ([
+                info.epoch,
+                new MultiToken(
+                  [
+                    {
+                      amount: new BigNumber(info.reward),
+                      identifier: defaultToken.defaultIdentifier,
+                      networkId: defaultToken.defaultNetworkId,
+                    },
+                  ],
+                  defaultToken
+                ),
+                info.poolHash,
+              ]: [number, MultiToken, string])
+          );
+        return addressRewards != null ? addressRewards : [];
       }),
       error: undefined,
     });
-  }
+  };
 
   setup(): void {
     super.setup();
@@ -78,9 +73,7 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
     this._startWatch();
   }
 
-  refreshDelegation: PublicDeriver<> => Promise<void> = async (
-    publicDeriver
-  ) => {
+  refreshDelegation: (PublicDeriver<>) => Promise<void> = async publicDeriver => {
     const delegationRequest = this.stores.delegation.getDelegationRequests(publicDeriver);
     if (delegationRequest == null) return;
 
@@ -114,11 +107,13 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
           const delegatedBalance = delegationRequest.getDelegatedBalance.execute({
             publicDeriver: withStakingKey,
             rewardBalance: new MultiToken(
-              [{
-                amount: new BigNumber(stateForStakingKey?.remainingAmount ?? 0),
-                networkId: defaultToken.defaultNetworkId,
-                identifier: defaultToken.defaultIdentifier,
-              }],
+              [
+                {
+                  amount: new BigNumber(stateForStakingKey?.remainingAmount ?? 0),
+                  networkId: defaultToken.defaultNetworkId,
+                  identifier: defaultToken.defaultIdentifier,
+                },
+              ],
               defaultToken
             ),
             stakingAddress: stakingKeyResp.addr.Hash,
@@ -128,16 +123,15 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
           }).promise;
           if (delegatedBalance == null) throw new Error('Should never happen');
 
-          const updatePool = delegatedPoolId != null ?
-            this.updatePoolInfo({
-              network: publicDeriver.getParent().getNetworkInfo(),
-              allPoolIds: [delegatedPoolId],
-            }) : Promise.resolve();
+          const updatePool =
+            delegatedPoolId != null
+              ? this.updatePoolInfo({
+                  network: publicDeriver.getParent().getNetworkInfo(),
+                  allPoolIds: [delegatedPoolId],
+                })
+              : Promise.resolve();
 
-          return await Promise.all([
-            updatePool,
-            delegatedBalance,
-          ]);
+          return await Promise.all([updatePool, delegatedBalance]);
         } catch (e) {
           runInAction(() => {
             delegationRequest.error = e;
@@ -145,41 +139,45 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
         }
       })();
 
-      const rewardHistory = delegationRequest.rewardHistory.execute(
-        stakingKeyResp.addr.Hash
-      ).promise;
+      const rewardHistory = delegationRequest.rewardHistory.execute(stakingKeyResp.addr.Hash)
+        .promise;
 
-      await Promise.all([
-        accountStateCalcs,
-        rewardHistory,
-      ]);
+      await Promise.all([accountStateCalcs, rewardHistory]);
     } catch (e) {
-      Logger.error(`${nameof(AdaDelegationStore)}::${nameof(this.refreshDelegation)} error: ` + stringifyError(e));
+      Logger.error(
+        `${nameof(AdaDelegationStore)}::${nameof(this.refreshDelegation)} error: ` +
+          stringifyError(e)
+      );
     }
-  }
+  };
 
-  updatePoolInfo: {|
+  updatePoolInfo: ({|
     network: $ReadOnly<NetworkRow>,
     allPoolIds: Array<string>,
-  |} => Promise<void> = async (request) => {
+  |}) => Promise<void> = async request => {
     // update pool information
-    const poolsCachedForNetwork = new Set<string>(this.stores.delegation.poolInfo
-      .filter(next => next.networkId === request.network.NetworkId)
-      .map(next => next.poolId));
+    const poolsCachedForNetwork = new Set<string>(
+      this.stores.delegation.poolInfo
+        .filter(next => next.networkId === request.network.NetworkId)
+        .map(next => next.poolId)
+    );
     const poolsToQuery = request.allPoolIds.filter(pool => !poolsCachedForNetwork.has(pool));
     const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
     const poolInfoPromise: Promise<PoolInfoResponse> = stateFetcher.getPoolInfo({
       network: request.network,
       poolIds: poolsToQuery,
     });
-    const remotePoolInfoPromises: Array<Promise<[string, PoolInfo | null]>> =
-      poolsToQuery.map(id => new PoolInfoApi().getPool(id).then(res => [id, res]));
-    const [poolInfoResp, remotePoolInfoResps]: [PoolInfoResponse, Array<[string, PoolInfo | null]>] =
-      await Promise.all([poolInfoPromise, Promise.all(remotePoolInfoPromises)]);
+    const remotePoolInfoPromises: Array<Promise<[string, PoolInfo | null]>> = poolsToQuery.map(id =>
+      new PoolInfoApi().getPool(id).then(res => [id, res])
+    );
+    const [poolInfoResp, remotePoolInfoResps]: [
+      PoolInfoResponse,
+      Array<[string, PoolInfo | null]>
+    ] = await Promise.all([poolInfoPromise, Promise.all(remotePoolInfoPromises)]);
     const remoteInfoMap = entriesIntoMap<string, PoolInfo | null>(remotePoolInfoResps);
     runInAction(() => {
       for (const poolId of Object.keys(poolInfoResp)) {
-        const poolInfo: (RemotePool | null) = poolInfoResp[poolId];
+        const poolInfo: RemotePool | null = poolInfoResp[poolId];
         const poolRemoteInfo = remoteInfoMap[poolId];
         if (poolInfo == null) continue;
         this.stores.delegation.poolInfo.push({
@@ -199,7 +197,7 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
         });
       }
     });
-  }
+  };
 
   @action.bound
   _startWatch: void => void = () => {
@@ -217,25 +215,24 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
         await this.refreshDelegation(selected);
       }
     };
-    this._recalculateDelegationInfoDisposer.push(reaction(
-      () => [
-        this.stores.wallets.selected,
-      ],
-      triggerRefresh,
-    ));
-    this._recalculateDelegationInfoDisposer.push(reaction(
-      () => [
-        // update if tx history changes
-        this.stores.transactions.recent,
-      ],
-      async () => {
-        for (const requests of this.stores.delegation.delegationRequests) {
-          requests.mangledAmounts.invalidate();
-          requests.getDelegatedBalance.invalidate();
+    this._recalculateDelegationInfoDisposer.push(
+      reaction(() => [this.stores.wallets.selected], triggerRefresh)
+    );
+    this._recalculateDelegationInfoDisposer.push(
+      reaction(
+        () => [
+          // update if tx history changes
+          this.stores.transactions.recent,
+        ],
+        async () => {
+          for (const requests of this.stores.delegation.delegationRequests) {
+            requests.mangledAmounts.invalidate();
+            requests.getDelegatedBalance.invalidate();
+          }
+          await triggerRefresh();
         }
-        await triggerRefresh();
-      },
-    ));
+      )
+    );
     this._recalculateDelegationInfoDisposer = reaction(
       () => [
         // if query failed due to server issue, need to re-query when it comes back online
@@ -250,9 +247,9 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
           requests.rewardHistory.invalidate();
         }
         await triggerRefresh();
-      },
+      }
     );
-  }
+  };
 
   @action.bound
   reset(): void {

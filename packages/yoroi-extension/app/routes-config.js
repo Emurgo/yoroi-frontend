@@ -79,11 +79,11 @@ export const ROUTES = {
   EXCHANGE_END: '/exchange-end',
 
   // NEW UI ROUTES
-  Gouvernance: {
-    ROOT: '/gouvernance',
-    DELEGATE: '/gouvernance/delagation',
-    SUBMITTED: '/gouvernance/submitted',
-    FAIL: '/gouvernance/failed',
+  Governance: {
+    ROOT: '/governance',
+    DELEGATE: '/governance/delagation',
+    SUBMITTED: '/governance/submitted',
+    FAIL: '/governance/failed',
   },
   PORTFOLIO: {
     ROOT: '/portfolio',

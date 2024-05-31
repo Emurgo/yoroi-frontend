@@ -226,6 +226,9 @@ const resolve = () /*: * */ => ({
     zlib: require.resolve('browserify-zlib'),
     crypto: require.resolve('crypto-browserify'),
     buffer: require.resolve('buffer'),
+    // need these so that @yoroi/common (a dependent of @yoroi/exchange) doesn't break Webpack
+    'react-native': false,
+    'react-native-mmkv': false,
   },
   alias: { process: 'process/browser', }
 });

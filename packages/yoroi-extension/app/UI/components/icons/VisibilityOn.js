@@ -4,14 +4,14 @@ export const VisibilityOn = () => {
   return (
     <svg width="22" height="14" viewBox="0 0 22 14" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M14 7C14 8.65685 12.6569 10 11 10C9.34315 10 8 8.65685 8 7C8 5.34315 9.34315 4 11 4C12.6569 4 14 5.34315 14 7ZM12 7C12 7.55228 11.5523 8 11 8C10.4477 8 10 7.55228 10 7C10 6.44772 10.4477 6 11 6C11.5523 6 12 6.44772 12 7Z"
         fill="black"
       />
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M1.05201 6.684C1.07301 6.617 3.36701 0 11 0C18.633 0 20.927 6.617 20.949 6.684L21.054 7L20.948 7.316C20.927 7.383 18.633 14 11 14C3.36701 14 1.07301 7.383 1.05101 7.316L0.946014 7L1.05201 6.684ZM3.07401 7C3.57601 8.154 5.64901 12 11 12C16.348 12 18.422 8.158 18.926 7C18.424 5.846 16.351 2 11 2C5.65201 2 3.57801 5.842 3.07401 7Z"
         fill="black"
       />

@@ -5,6 +5,7 @@ import type { Node } from 'react';
 import { styled } from '@mui/material/styles';
 
 import OutlinedInput from '@mui/material/OutlinedInput';
+import FormHelperText from '@mui/material/FormHelperText';
 import InputAdornment from '@mui/material/InputAdornment';
 import FormControl from '@mui/material/FormControl';
 import IconButton from '@mui/material/IconButton';
@@ -23,15 +24,7 @@ type StyledInputProps = {|
   helperText?: string,
 |};
 
-export const PasswordInput = ({
-  id,
-  label,
-  variant,
-  onChange,
-  value,
-  error,
-  helperText,
-}: StyledInputProps): Node => {
+export const PasswordInput = ({ id, label, variant, onChange, value, error, helperText }: StyledInputProps): Node => {
   const [showPassword, setShowPassword] = React.useState(false);
 
   const handleClickShowPassword = () => setShowPassword(show => !show);
@@ -41,8 +34,10 @@ export const PasswordInput = ({
   };
 
   return (
-    <FormControl variant="outlined">
-      <InputLabel htmlFor="outlined-adornment-password">{label}</InputLabel>
+    <SFormControl variant="outlined">
+      <InputLabel htmlFor="outlined-adornment-password" error={error}>
+        {label}
+      </InputLabel>
       <SOutlinedInput
         fullWidth
         id={id}
@@ -63,11 +58,32 @@ export const PasswordInput = ({
           </InputAdornment>
         }
         label={label}
+        error={error}
       />
-    </FormControl>
+      {error && (
+        <FormHelperText error id="labe-error">
+          {helperText}
+        </FormHelperText>
+      )}
+    </SFormControl>
   );
 };
 
 const SOutlinedInput = styled(OutlinedInput)(({ theme, error }) => ({
-  // additional styles here
+  '& .MuiFormHelperText-root': {
+    marginLeft: '0px',
+  },
+
+  '& .MuiFormLabel-root': {
+    color: error && theme.palette.ds.sys_magenta_c500,
+  },
+}));
+const SFormControl = styled(FormControl)(({ theme, error }) => ({
+  '& .MuiFormHelperText-root': {
+    marginLeft: '0px',
+  },
+
+  '& .MuiFormLabel-root': {
+    color: error && theme.palette.ds.sys_magenta_c500,
+  },
 }));
