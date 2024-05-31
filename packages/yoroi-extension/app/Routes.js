@@ -28,6 +28,11 @@ import LoadingSpinner from './components/widgets/LoadingSpinner';
 import FullscreenLayout from './components/layout/FullscreenLayout';
 
 // New UI pages
+import GouvernanceStatusPage from './UI/pages/Gouvernance/GouvernanceStatusPage';
+import GouvernanceDelegationFormPage from './UI/pages/Gouvernance/GouvernanceDelegationFormPage';
+import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
+import PortfolioDappsPage from './UI/pages/portfolio/PortfolioDappsPage';
+import PortfolioDetailPage from './UI/pages/portfolio/PortfolioDetailPage';
 import { GovernanceContextProvider } from './UI/features/governace/module/GovernanceContextProvider';
 import { createCurrrentWalletInfo } from './UI/features/governace/common/helpers';
 import GovernanceStatusPage from './UI/pages/Governance/GovernanceStatusPage';
@@ -527,9 +532,8 @@ export function wrapGovernance(governanceProps: StoresAndActionsProps, children:
   );
 }
 export function wrapPortfolio(portfolioProps: StoresAndActionsProps, children: Node): Node {
-  return (
+return (
     <PortfolioContextProvider>
       <Suspense fallback={null}>{children}</Suspense>
     </PortfolioContextProvider>
   );
-}
