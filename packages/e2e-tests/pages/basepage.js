@@ -11,6 +11,7 @@ import {
   oneSecond,
 } from '../helpers/timeConstants.js';
 import { getSnapshotObjectFromJSON } from '../utils/utils.js';
+import { dbSnapshotsDir } from '../helpers/constants.js';
 
 const writeFile = promisify(fs.writeFile);
 
@@ -455,10 +456,26 @@ class BasePage {
       fullDBDataResult = {};
     }
     this.logger.info(
-      `Webdriver::getFullIndexedDBFromChrome::allTables. All data ${JSON.stringify(fullDBDataResult)}`
+      `Webdriver::getFullIndexedDBFromChrome::allTables. DB is collected.`
     );
 
     return fullDBDataResult;
+  }
+
+  async saveFullIndexedDBChrome(fileName, overwrite = false) {
+    this.logger.info(`BasePage::saveFullIndexedDBChrome is called. File name: "${fileName}"`);
+    const fullDB = await this.getFullIndexedDBFromChrome();
+    const dbfileName = `${fileName}.indexedDB.json`;
+    const snapshotPath = path.resolve(dbSnapshotsDir, dbfileName);
+    const fileExists = fs.existsSync(snapshotPath);
+    if (!fileExists || (fileExists && overwrite)) {
+      this.logger.info(
+        `BasePage::saveFullIndexedDBChrome Writting data to the file "${snapshotPath}"`
+      );
+      writeFile(snapshotPath, JSON.stringify(fullDB, null, 2));
+    } else {
+      throw new Error(`The file "${dbfileName}" exists. Overwritting the file is not allowed.`);
+    }
   }
 
   async setInfoToIndexedDBChrome(tableName, value) {
@@ -517,21 +534,21 @@ class BasePage {
     await this.driver.executeScript(`await chrome.storage.local.set({ "${key}": "${value}" })`);
   }
 
-  async prepareDBAndStorage(templateName) {
+  async prepareDBAndStorage(templateName, useGeneralStorageInfo = true) {
     // import info into the indexedDB
     const dbSnapshot = getSnapshotObjectFromJSON(`${templateName}.indexedDB.json`);
     for (const dbKey in dbSnapshot) {
       await this.setInfoToIndexedDBChrome(dbKey, dbSnapshot[dbKey]);
     }
     // set info into the chrome local storage
-    const chromeStorageSnapshot = getSnapshotObjectFromJSON(
-      `${templateName}.chromeLocalStorage.json`
-    );
+    const chromeStorageFileName = `${useGeneralStorageInfo ? 'general' : templateName}.chromeLocalStorage.json`;
+    const chromeStorageSnapshot = getSnapshotObjectFromJSON(chromeStorageFileName);
     for (const storageKey in chromeStorageSnapshot) {
       await this.setInfoChromeLocalStorage(storageKey, chromeStorageSnapshot[storageKey]);
     }
     // set info into regular storage
-    const commonStorageSnaphot = getSnapshotObjectFromJSON(`${templateName}.localStorage.json`);
+    const commonStorageFileName = `${useGeneralStorageInfo ? 'general' : templateName}.localStorage.json`;
+    const commonStorageSnaphot = getSnapshotObjectFromJSON(commonStorageFileName);
     for (const commonStorageKey in commonStorageSnaphot) {
       await this.saveToLocalStorage(commonStorageKey, commonStorageSnaphot[commonStorageKey]);
     }
