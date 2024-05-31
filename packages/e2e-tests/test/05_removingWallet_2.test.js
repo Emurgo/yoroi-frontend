@@ -23,8 +23,19 @@ describe('Removing the first wallet, two wallets is added', function () {
     done();
   });
 
-  it('Restore the test wallet 1', async function () {
-    await restoreWallet(webdriver, logger, testWallet1);
+  it('Prepare DB and storages', async function () {
+    const addWalletPage = new AddNewWallet(webdriver, logger);
+    const state = await addWalletPage.isDisplayed();
+    expect(state).to.be.true;
+    await addWalletPage.prepareDBAndStorage('testWallet1');
+    await addWalletPage.refreshPage();
+  });
+
+  it('Check transactions page', async function () {
+    const transactionsPage = new TransactionsSubTab(webdriver, logger);
+    await transactionsPage.waitPrepareWalletBannerIsClosed();
+    const txPageIsDisplayed = await transactionsPage.isDisplayed();
+    expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
   });
 
   // restore the second wallet

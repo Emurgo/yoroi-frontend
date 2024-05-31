@@ -8,6 +8,7 @@ import { oneMinute } from '../helpers/timeConstants.js';
 import { restoreWallet } from '../helpers/restoreWalletHelper.js';
 import driversPoolsManager from '../utils/driversPool.js';
 import { getTestString } from '../helpers/constants.js';
+import AddNewWallet from '../pages/addNewWallet.page.js';
 
 describe('Adding a memo to a completed Tx', function () {
   this.timeout(2 * oneMinute);
@@ -21,9 +22,17 @@ describe('Adding a memo to a completed Tx', function () {
     done();
   });
 
-  it('Restore a 15-word wallet', async function () {
-    await restoreWallet(webdriver, logger, testWallet1);
+  it('Prepare DB and storages', async function () {
+    const addWalletPage = new AddNewWallet(webdriver, logger);
+    const state = await addWalletPage.isDisplayed();
+    expect(state).to.be.true;
+    await addWalletPage.prepareDBAndStorage('testWallet1');
+    await addWalletPage.refreshPage();
+  });
+
+  it('Check transactions page', async function () {
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
+    await transactionsPage.waitPrepareWalletBannerIsClosed();
     const txPageIsDisplayed = await transactionsPage.isDisplayed();
     expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
   });
@@ -55,7 +64,7 @@ describe('Adding a memo to a completed Tx', function () {
     expect(memoMessage).to.equal(testMemoMessage);
     const memosInDB = await transactionsPage.getInfoFromIndexedDB('TxMemo');
     expect(memosInDB.length).to.equal(1);
-    const txMemoinDB = memosInDB[0].value
+    const txMemoinDB = memosInDB[0].value;
     expect(txMemoinDB.Content).to.equal(testMemoMessage);
     expect(txMemoinDB.TransactionHash).to.equal(txHashId);
     expect(txMemoinDB.WalletId).to.equal(testWallet1.plate);
@@ -71,7 +80,7 @@ describe('Adding a memo to a completed Tx', function () {
     await transactionsPage.clickOnTxRow(0, 0);
     const memoMessage = await transactionsPage.getMemoMessage(0, 0);
     expect(memoMessage).to.equal(testMemoMessage);
-  })
+  });
 
   afterEach(function (done) {
     customAfterEach(this, webdriver, logger);
