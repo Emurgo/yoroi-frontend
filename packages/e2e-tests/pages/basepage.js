@@ -176,6 +176,14 @@ class BasePage {
       await input.sendKeys(Key.BACK_SPACE);
     }
   }
+  async clearInputAll(locator) {
+    this.logger.info(`BasePage::clearInputAll is called. Locator: ${JSON.stringify(locator)}`);
+    const input = await this.findElement(locator);
+    await input.sendKeys(Key.chord(Key.COMMAND, 'a'));
+    await this.sleep(200);
+    await input.sendKeys(Key.NULL);
+    await input.sendKeys(Key.BACK_SPACE);
+  }
   async getFromLocalStorage(key) {
     this.logger.info(`BasePage::getFromLocalStorage is called. Key: ${key}`);
     const result = await this.executeLocalStorageScript(`getItem("${key}")`);
@@ -455,9 +463,7 @@ class BasePage {
       this.webDriverLogger.warn(error);
       fullDBDataResult = {};
     }
-    this.logger.info(
-      `Webdriver::getFullIndexedDBFromChrome::allTables. DB is collected.`
-    );
+    this.logger.info(`Webdriver::getFullIndexedDBFromChrome::allTables. DB is collected.`);
 
     return fullDBDataResult;
   }
