@@ -160,6 +160,7 @@
     "@vespaiach/axios-fetch-adapter": "^0.3.0",
     "@yoroi/exchange": "2.0.1",
     "@yoroi/resolver": "2.0.2",
+    "@yoroi/staking": "^1.5.1",
     "@yoroi/swap": "1.5.2",
     "@yoroi/types": "1.5.4",
     "assert": "2.1.0",

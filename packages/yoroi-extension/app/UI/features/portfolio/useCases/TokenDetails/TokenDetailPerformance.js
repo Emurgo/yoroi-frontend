@@ -44,7 +44,7 @@ const TokenDetailPerformance = ({ tokenInfo }) => {
             <Typography sx={{ color: theme.palette.ds.black_static }}>
               {item.type === PerformanceItemType.RANK && '#'}
               {tokenInfo.performance[index].value} {item.type === PerformanceItemType.USD && 'USD'}
-              {item.type === PerformanceItemType.TOKEN && tokenInfo.overview.tokenName}
+              {item.type === PerformanceItemType.TOKEN && tokenInfo.name}
             </Typography>
           </Stack>
         ))}

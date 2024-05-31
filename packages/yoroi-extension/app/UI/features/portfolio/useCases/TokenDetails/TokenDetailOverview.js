@@ -6,8 +6,7 @@ import { useTheme } from '@mui/material/styles';
 import adaPng from '../../../../../assets/images/ada.png';
 import { useStrings } from '../../common/hooks/useStrings';
 
-const TokenDetailOverview = ({ tokenInfo, isLoading }) => {
-  const isAda = tokenInfo.id.toLowerCase() === 'ada';
+const TokenDetailOverview = ({ tokenInfo, isLoading, isAda }) => {
   const theme = useTheme();
   const strings = useStrings();
 

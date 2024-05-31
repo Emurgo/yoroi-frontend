@@ -1,15 +1,6 @@
 import { Box, Button, Stack, styled, Typography, Divider, SvgIcon } from '@mui/material';
 import React, { useEffect, useMemo, useState } from 'react';
-import {
-  LineChart,
-  Line,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-  ResponsiveContainer,
-  Label,
-  Tooltip as RechartTooltip,
-} from 'recharts';
+import { LineChart, Line, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Label, Tooltip as RechartTooltip } from 'recharts';
 import { useTheme } from '@mui/material/styles';
 import { ArrowIcon } from '../../common/assets/icons';
 import { Skeleton, Tooltip } from '../../../../components';
@@ -26,8 +17,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
   height: '30px',
 }));
 
-const TokenDetailChart = ({ isLoading, tokenInfo }) => {
-  const isAda = tokenInfo.id.toLowerCase() === 'ada';
+const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
   const chartHeight = isAda ? 156 : 241;
   const theme = useTheme();
   const strings = useStrings();
@@ -135,14 +125,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo }) => {
         <g>
           <circle cx={cx} cy={cy} r={5} fill={theme.palette.ds.primary_c500} />
 
-          <line
-            x1={cx}
-            y1={cy}
-            x2={cx}
-            y2={rectY}
-            stroke={theme.palette.ds.primary_c500}
-            strokeDasharray="5,5"
-          />
+          <line x1={cx} y1={cy} x2={cx} y2={rectY} stroke={theme.palette.ds.primary_c500} strokeDasharray="5,5" />
 
           <Box
             component="rect"
@@ -186,10 +169,8 @@ const TokenDetailChart = ({ isLoading, tokenInfo }) => {
   };
 
   const handleMouseMove = e => {
-    const value =
-      e.activePayload && e.activePayload.length > 0 ? e.activePayload[0].payload.value : null;
-    const usd =
-      e.activePayload && e.activePayload.length > 0 ? e.activePayload[0].payload.usd : null;
+    const value = e.activePayload && e.activePayload.length > 0 ? e.activePayload[0].payload.value : null;
+    const usd = e.activePayload && e.activePayload.length > 0 ? e.activePayload[0].payload.usd : null;
 
     if (!value || !usd) return;
     setDetailInfo({
@@ -200,12 +181,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo }) => {
 
   return (
     <Box sx={{ padding: theme.spacing(3) }}>
-      <Stack
-        direction="row"
-        justifyContent="space-between"
-        alignItems="center"
-        sx={{ marginBottom: theme.spacing(4) }}
-      >
+      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ marginBottom: theme.spacing(4) }}>
         {isLoading ? (
           <Skeleton width="131px" height="13px" />
         ) : (
@@ -242,11 +218,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo }) => {
                   label={
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
                       <ArrowIcon
-                        fill={
-                          detailInfo.value > 0
-                            ? theme.palette.ds.secondary_c800
-                            : theme.palette.ds.sys_magenta_c700
-                        }
+                        fill={detailInfo.value > 0 ? theme.palette.ds.secondary_c800 : theme.palette.ds.sys_magenta_c700}
                         style={{
                           marginRight: theme.spacing(0.5),
                           transform: detailInfo.value > 0 ? '' : 'rotate(180deg)',
@@ -284,18 +256,9 @@ const TokenDetailChart = ({ isLoading, tokenInfo }) => {
         >
           {isLoading ? null : (
             <ResponsiveContainer width="100%" height={chartHeight}>
-              <LineChart
-                data={filteredData[buttonPeriodProps.find(item => item.active).label]}
-                onMouseMove={handleMouseMove}
-              >
+              <LineChart data={filteredData[buttonPeriodProps.find(item => item.active).label]} onMouseMove={handleMouseMove}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <YAxis
-                  axisLine={false}
-                  allowDecimals={true}
-                  tickLine={false}
-                  type={'number'}
-                  tick={CustomYAxisTick}
-                ></YAxis>
+                <YAxis axisLine={false} allowDecimals={true} tickLine={false} type={'number'} tick={CustomYAxisTick}></YAxis>
                 <RechartTooltip cursor={false} content={<></>} />
                 <Line
                   activeDot={props => (
@@ -303,9 +266,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo }) => {
                       chartBottom={chartHeight}
                       rectWidth={93}
                       rectHeight={34}
-                      dataLength={
-                        filteredData[buttonPeriodProps.find(item => item.active).label].length
-                      }
+                      dataLength={filteredData[buttonPeriodProps.find(item => item.active).label].length}
                       {...props}
                     />
                   )}
@@ -313,9 +274,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo }) => {
                   type="monotone"
                   dataKey="value"
                   strokeWidth={2}
-                  stroke={
-                    isLoading ? theme.palette.ds.gray_c50 : theme.palette.ds.text_primary_medium
-                  }
+                  stroke={isLoading ? theme.palette.ds.gray_c50 : theme.palette.ds.text_primary_medium}
                 />
               </LineChart>
             </ResponsiveContainer>
