@@ -54,7 +54,7 @@ describe('Changing fiat currencies', function () {
         await generalSubTab.selectFiat(testDatum);
       });
 
-      it('Check the selected currency is applied', async function () {
+      it(`Check the selected currency ${testDatum} is applied`, async function () {
         const generalSubTab = new GeneralSubTab(webdriver, logger);
         await generalSubTab.goToWalletTab();
         const walletInfo = await generalSubTab.getSelectedWalletInfo();
