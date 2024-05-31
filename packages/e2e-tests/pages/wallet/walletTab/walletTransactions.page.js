@@ -436,6 +436,14 @@ export class TransactionsSubTab extends WalletTab {
     await this.click(addMemoBtnLocator);
     return new MemoWarningModal(this.driver, this.logger);
   }
+  async clickEditMemo(groupIndex, txIndex) {
+    this.logger.info(
+      `TransactionsSubTab::clickEditMemo is called. Group index: ${groupIndex}, tx index: ${txIndex}`
+    );
+    const editMemoBtnLocator = this.txEditMemoButtonLocator(groupIndex, txIndex);
+    await this.click(editMemoBtnLocator);
+    return new MemoWarningModal(this.driver, this.logger);
+  }
   async getMemoMessage(groupIndex, txIndex) {
     this.logger.info(
       `TransactionsSubTab::getMemoMessage is called. Group index: ${groupIndex}, tx index: ${txIndex}`
