@@ -12,6 +12,7 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import { Icon } from '../icons/index';
+import { useModal } from './ModalContext';
 
 const BootstrapDialog = styled(Dialog)(({ theme, width }) => ({
   '& .MuiDialogContent-root': {
@@ -26,7 +27,7 @@ const BootstrapDialog = styled(Dialog)(({ theme, width }) => ({
     margin: 0,
   },
   '& .MuiDialogActions-root': {
-    padding: '24px',
+    padding: '0px',
   },
 }));
 
@@ -40,20 +41,14 @@ type CustomModalProps = {|
   actions: Node,
 |};
 
-export const CustomModal = ({
-  onClose,
-  title,
-  confirmDRep,
-  dividers = false,
-  width = '648px',
-  content,
-  actions,
-}: CustomModalProps): Node => {
+export const CustomModal = (): Node => {
+  const { height, width, closeModal, content, title, isOpen, isLoading } = useModal();
+
   return (
     <BootstrapDialog
-      onClose={onClose}
+      onClose={closeModal}
       aria-labelledby={`${title}-dialog-title`}
-      open
+      open={isOpen}
       fullWidth
       width={width}
     >
@@ -64,7 +59,7 @@ export const CustomModal = ({
       </DialogTitle>
       <IconButton
         aria-label="close"
-        onClick={onClose}
+        onClick={closeModal}
         sx={{
           position: 'absolute',
           right: 18,
@@ -74,8 +69,7 @@ export const CustomModal = ({
       >
         <Icon.CloseIcon />
       </IconButton>
-      <DialogContent dividers={dividers}>{content}</DialogContent>
-      <DialogActions>{actions}</DialogActions>
+      <DialogContent>{content}</DialogContent>
     </BootstrapDialog>
   );
 };

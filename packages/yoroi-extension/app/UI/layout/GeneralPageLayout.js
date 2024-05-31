@@ -10,10 +10,11 @@ import SidebarContainer from '../../containers/SidebarContainer';
 import { Box, Typography } from '@mui/material';
 import { withLayout } from '../../styles/context/layout';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { ModalProvider } from '../context/ModalContext';
-import ModalManager from '../components/modals/ModalManager';
-import { GouvernanceContextProvider } from '../features/gouvernace/module/GouvernanceContextProvider';
 import globalMessages from '../../i18n/global-messages';
+import { ModalProvider } from '../components/modals/ModalContext';
+import { ModalManager } from '../components/modals/ModalManager';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import { IntlProvider } from '../context/IntlProvider';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -45,25 +46,70 @@ class GeneralPageLayout extends Component<LayoutProps> {
     intl: intlShape.isRequired,
   };
 
+  getStakePoolMeta: () => any = () => {
+    const publicDeriver = this.props.stores.wallets.selected;
+    const delegationStore = this.props.stores.delegation;
+    const currentPool = delegationStore.getDelegatedPoolId(publicDeriver);
+    if (currentPool == null) return null;
+    const networkInfo = publicDeriver.getParent().getNetworkInfo();
+    const poolMeta = delegationStore.getLocalPoolInfo(networkInfo, currentPool);
+    const poolInfo = delegationStore.getLocalRemotePoolInfo(networkInfo, currentPool) ?? {};
+    if (poolMeta == null) {
+      // server hasn't returned information about the stake pool yet
+      return null;
+    }
+    const { intl } = this.context;
+    const name = poolMeta.info?.name ?? intl.formatMessage(globalMessages.unknownPoolLabel);
+    const delegatedPool = {
+      id: String(currentPool),
+      name,
+      websiteUrl: poolMeta.info?.homepage,
+      ticker: poolMeta.info?.ticker,
+      ...poolInfo,
+    };
+
+    return {
+      ...delegatedPool,
+      ...poolMeta,
+    };
+  };
+
+  createCurrrentWalletInfo: () => any = () => {
+    const { wallets, delegation, substores } = this.props.stores;
+    const walletCurrentPoolInfo = this.getStakePoolMeta();
+
+    const selectedWallet = wallets.selected;
+    if (selectedWallet == null) {
+      throw new Error(`no selected Wallet. Should never happen`);
+    }
+
+    const currentWalletId = selectedWallet.getPublicDeriverId();
+    const networkInfo = selectedWallet.getParent().getNetworkInfo();
+    const networkId = networkInfo.NetworkId;
+
+    return {
+      currentPool: walletCurrentPoolInfo,
+      networkId,
+      walletId: currentWalletId,
+    };
+  };
+
   render() {
     const { children, actions, navbar, stores } = this.props;
     const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
     const { intl } = this.context;
 
+    const currentWalletInfo = this.createCurrrentWalletInfo();
+
     return (
-      <GouvernanceContextProvider intl={this.context.intl}>
-        {/* TODO ModalProvider to be moved into APP after finish refactoring and bring everything in UI */}
+      <IntlProvider intl={intl}>
         <ModalProvider>
           <ModalManager />
-          <TopBarLayout
-            banner={<BannerContainer actions={actions} stores={stores} />}
-            sidebar={sidebarContainer}
-            navbar={navbar}
-          >
+          <TopBarLayout banner={<BannerContainer actions={actions} stores={stores} />} sidebar={sidebarContainer} navbar={navbar}>
             {children}
           </TopBarLayout>
         </ModalProvider>
-      </GouvernanceContextProvider>
+      </IntlProvider>
     );
   }
 }

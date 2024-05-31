@@ -32,6 +32,8 @@ import DelegatedStakePoolCard from '../../../components/wallet/staking/dashboard
 import WithdrawRewardsDialog from './WithdrawRewardsDialog';
 import { formatLovelacesHumanReadableShort, roundOneDecimal, roundTwoDecimal } from '../../../utils/formatters';
 import { compose, maybe } from '../../../coreUtils';
+import { getDrepDelegationState } from '../../../UI/features/governace/api/useDrepDelegationState';
+import { GovernanceParticipateDialog } from '../dialogs/GovernanceParticipateDialog';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -61,6 +63,14 @@ class StakingPageContent extends Component<AllProps> {
     if (publicDeriver == null) {
       throw new Error(`${nameof(StakingPageContent)} no public deriver. Should never happen`);
     }
+    if (this.props.stores.delegation.poolTransitionConfig.shouldUpdatePool) {
+      const poolTransitionInfo = this.props.stores.delegation.poolTransitionRequestInfo;
+      if (poolTransitionInfo) {
+        this.props.stores.delegation.delegateToSpecificPool(poolTransitionInfo.suggestedPool.hash);
+        this.props.stores.delegation.createDelegationTransaction();
+      }
+    }
+
     const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
     await timeCalcRequests.requests.toAbsoluteSlot.execute().promise;
     await timeCalcRequests.requests.toRealTime.execute().promise;
@@ -117,14 +127,20 @@ class StakingPageContent extends Component<AllProps> {
       avatar: pic,
       roa: maybe(roa, compose(Number, roundTwoDecimal)),
       poolSize: maybe(stake, formatLovelacesHumanReadableShort),
-      share: maybe(saturation, s => roundOneDecimal(Number(s)*100)),
+      share: maybe(saturation, s => roundOneDecimal(Number(s) * 100)),
       websiteUrl: poolMeta.info?.homepage,
       ticker: poolMeta.info?.ticker,
     };
+
     return (
       <DelegatedStakePoolCard
+        poolTransition={delegationStore.poolTransitionRequestInfo}
         delegatedPool={delegatedPool}
         undelegate={async () => this.createWithdrawalTx(true)} // shouldDeregister=true
+        delegateToSpecificPool={async (poolId): any => {
+          this.props.stores.delegation.delegateToSpecificPool(poolId);
+          this.props.stores.delegation.createDelegationTransaction();
+        }}
       />
     );
   };
@@ -179,9 +195,7 @@ class StakingPageContent extends Component<AllProps> {
 
   toUnitOfAccount: TokenEntry => void | {| currency: string, amount: string |} = entry => {
     const { stores } = this.props;
-    const tokenRow = stores.tokenInfoStore.tokenInfo
-      .get(entry.networkId.toString())
-      ?.get(entry.identifier);
+    const tokenRow = stores.tokenInfoStore.tokenInfo.get(entry.networkId.toString())?.get(entry.identifier);
     if (tokenRow == null) return undefined;
 
     if (!stores.profile.unitOfAccount.enabled) return undefined;
@@ -205,33 +219,31 @@ class StakingPageContent extends Component<AllProps> {
     if (publicDeriver == null) {
       throw new Error(`${nameof(StakingPageContent)} no public deriver. Should never happen`);
     }
+
     const { actions, stores } = this.props;
     const { uiDialogs, delegation: delegationStore } = stores;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingPageContent)} opened for non-reward wallet`);
     }
+    stores.delegation.checkGouvernanceStatus();
     const balance = stores.transactions.getBalance(publicDeriver);
     const isWalletWithNoFunds = balance != null && balance.getDefaultEntry().amount.isZero();
 
     const errorIfPresent = maybe(delegationRequests.error, error => ({ error }));
 
-    const showRewardAmount = errorIfPresent == null
-      && stores.delegation.isExecutedDelegatedBalance(publicDeriver);
+    const showRewardAmount = errorIfPresent == null && stores.delegation.isExecutedDelegatedBalance(publicDeriver);
 
     const isStakeRegistered = stores.delegation.isStakeRegistered(publicDeriver);
     const currentlyDelegating = stores.delegation.isCurrentlyDelegating(publicDeriver);
     const delegatedUtxo = stores.delegation.getDelegatedUtxoBalance(publicDeriver);
     const delegatedRewards = stores.delegation.getRewardBalanceOrZero(publicDeriver);
+    const isParticipatingToGouvernance = stores.delegation.isParticipatingToGouvernance;
 
     return (
       <Box>
         {isWalletWithNoFunds ? (
-          <WalletEmptyBanner
-            onBuySellClick={() =>
-              this.props.actions.dialogs.open.trigger({ dialog: BuySellDialog })
-            }
-          />
+          <WalletEmptyBanner onBuySellClick={() => this.props.actions.dialogs.open.trigger({ dialog: BuySellDialog })} />
         ) : null}
 
         {isStakeRegistered ? (
@@ -243,7 +255,13 @@ class StakingPageContent extends Component<AllProps> {
                 })
               }
               withdrawRewards={
-                isStakeRegistered
+                isParticipatingToGouvernance === false
+                  ? async () => {
+                      this.props.actions.dialogs.open.trigger({
+                        dialog: GovernanceParticipateDialog,
+                      });
+                    }
+                  : isStakeRegistered
                   ? async () => this.createWithdrawalTx(false) // shouldDeregister=false
                   : undefined
               }
@@ -293,10 +311,16 @@ class StakingPageContent extends Component<AllProps> {
             shouldHideBalance={this.props.stores.profile.shouldHideBalance}
             unitOfAccount={this.toUnitOfAccount}
             withdrawRewards={
-              isStakeRegistered
+              isParticipatingToGouvernance === false
                 ? () => {
                     this.props.actions.dialogs.open.trigger({
-                      dialog: DeregisterDialogContainer,
+                      dialog: GovernanceParticipateDialog,
+                    });
+                  }
+                : isStakeRegistered
+                ? () => {
+                    this.props.actions.dialogs.open.trigger({
+                      dialog: GovernanceParticipateDialog,
                     });
                   }
                 : undefined
@@ -320,12 +344,11 @@ class StakingPageContent extends Component<AllProps> {
             }}
           />
         ) : null}
+        {uiDialogs.isOpen(GovernanceParticipateDialog) ? (
+          <GovernanceParticipateDialog actions={actions} onClose={this.onClose} intl={this.context.intl} />
+        ) : null}
         {uiDialogs.isOpen(UnmangleTxDialogContainer) ? (
-          <UnmangleTxDialogContainer
-            actions={actions}
-            stores={stores}
-            onClose={this.onClose}
-          />
+          <UnmangleTxDialogContainer actions={actions} stores={stores} onClose={this.onClose} />
         ) : null}
         {uiDialogs.isOpen(WithdrawalTxDialogContainer) ? (
           <WithdrawalTxDialogContainer

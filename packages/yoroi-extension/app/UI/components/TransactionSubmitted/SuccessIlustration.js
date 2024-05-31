@@ -29,12 +29,12 @@ export const SuccessIlustration = () => {
           y2="167.645"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint1_linear_1736_20356"
@@ -44,15 +44,15 @@ export const SuccessIlustration = () => {
           y2="47.2271"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#1D45BA" />
-          <stop offset="0.4204" stop-color="#1D47BA" />
-          <stop offset="0.5718" stop-color="#1D4EB9" />
-          <stop offset="0.6797" stop-color="#1C59B8" />
-          <stop offset="0.767" stop-color="#1B6AB6" />
-          <stop offset="0.8417" stop-color="#1A80B3" />
-          <stop offset="0.9079" stop-color="#199CB0" />
-          <stop offset="0.9663" stop-color="#18BBAD" />
-          <stop offset="1" stop-color="#17D1AA" />
+          <stop stopColor="#1D45BA" />
+          <stop offset="0.4204" stopColor="#1D47BA" />
+          <stop offset="0.5718" stopColor="#1D4EB9" />
+          <stop offset="0.6797" stopColor="#1C59B8" />
+          <stop offset="0.767" stopColor="#1B6AB6" />
+          <stop offset="0.8417" stopColor="#1A80B3" />
+          <stop offset="0.9079" stopColor="#199CB0" />
+          <stop offset="0.9663" stopColor="#18BBAD" />
+          <stop offset="1" stopColor="#17D1AA" />
         </linearGradient>
       </defs>
     </svg>

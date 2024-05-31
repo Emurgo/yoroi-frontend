@@ -91,7 +91,7 @@ export default class AmountDisplay extends Component<Props> {
           </div>
         )}
         {showFiat === true && (
-          <div className={styles.fiat}>
+          <div className={styles.fiat} id={id + '-availableFiatBalance-text'}>
             {fiatDisplay || '-'} {currency || 'USD'}
           </div>
         )}

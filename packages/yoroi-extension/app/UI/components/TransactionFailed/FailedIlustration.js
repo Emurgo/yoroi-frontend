@@ -2,13 +2,7 @@ import React from 'react';
 
 export const FailedIlustration = () => {
   return (
-    <svg
-      width="128"
-      height="168"
-      viewBox="0 0 128 168"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg width="128" height="168" viewBox="0 0 128 168" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
         d="M11.9771 1.51257L4.42664 5.61495L9.67844 13.1162L9.42909 82.0792C9.39792 90.9652 15.0393 101.31 22.0521 105.183L68.8736 131.072C69.093 132.979 69.3781 135.06 69.7414 137.328C70.1468 139.833 70.8446 142.287 71.8219 144.644L69.6323 143L71.7206 151.886L81.2268 167.644L89.0889 163.201C89.2616 163.133 89.4241 163.043 89.572 162.935C90.4096 162.36 90.658 161.278 90.1487 160.424C88.9682 158.264 88.0556 155.98 87.4292 153.619C86.5191 150.489 88.4333 145.854 90.0284 142.77L107.078 152.197L113.865 161.891L122.506 157.596C125.654 156.389 127.743 152.834 127.743 147.503L128 75.9701C128.031 67.084 122.39 56.7392 115.377 52.8664L22.4184 1.46814C19.7924 0.00934612 17.3458 -0.32388 15.312 0.298142C14.1641 0.606571 13.0479 1.01303 11.9771 1.51257Z"
         fill="url(#paint0_linear_1736_20259)"
@@ -39,12 +33,12 @@ export const FailedIlustration = () => {
           y2="167.645"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
       </defs>
     </svg>
