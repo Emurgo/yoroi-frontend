@@ -1,6 +1,7 @@
 // @flow
 
 import type { CardanoHaskellConfig } from '../database/primitives/tables';
+import { fail } from '../../../../../coreUtils';
 
 export type ToAbsoluteSlotNumberFunc = {| epoch: number, slot: number |} => number;
 
@@ -14,8 +15,8 @@ export function genToAbsoluteSlotNumber(
 
     // for pairs of config changes (x, x+1), get the time between these pairs
     for (let i = 0; i < config.length - 1; i++) {
-      const start = config[i].StartAt ?? (() => { throw new Error(`${nameof(genToAbsoluteSlotNumber)} missing start`); })();
-      const end = config[i + 1].StartAt ?? (() => { throw new Error(`${nameof(genToAbsoluteSlotNumber)} missing end`); })();
+      const start = config[i].StartAt ?? fail(`${nameof(genToAbsoluteSlotNumber)} missing start`);
+      const end = config[i + 1].StartAt ?? fail(`${nameof(genToAbsoluteSlotNumber)} missing end`);
 
       // queried time is before the next protocol parameter choice
       if (end > request.epoch) {
@@ -29,13 +30,10 @@ export function genToAbsoluteSlotNumber(
 
       SlotsPerEpoch = config[i + 1].SlotsPerEpoch ?? SlotsPerEpoch;
     }
-
     if (SlotsPerEpoch == null) throw new Error(`${nameof(genToAbsoluteSlotNumber)} missing params`);
-
     // find how many slots in the epochs since the last update
-    slotCount += SlotsPerEpoch * epochsLeft;
-
-    return slotCount + request.slot;
+    const slotsLeft = SlotsPerEpoch * epochsLeft;
+    return slotCount + slotsLeft + request.slot;
   };
 }
 
