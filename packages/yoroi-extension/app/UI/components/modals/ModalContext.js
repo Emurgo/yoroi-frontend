@@ -33,20 +33,13 @@ export const useModal = (): any => {
   return value;
 };
 
-export const ModalProvider = ({
-  children,
-  initialState,
-}: {|
-  children: Node,
-  initialState?: ModalState,
-|}): Node => {
+export const ModalProvider = ({ children, initialState }: {| children: Node, initialState?: ModalState |}): Node => {
   const [state, dispatch] = React.useReducer(modalReducer, { ...defaultState, ...initialState });
   const onCloseRef = React.useRef();
   const actions = React.useRef<ModalActions>({
     closeModal: () => {
       dispatch({ type: 'close' });
     },
-    // openModal: (title: string, content: Node, height?: string, onClose?: () => void) => {
     openModal: payload => {
       dispatch({
         type: 'open',

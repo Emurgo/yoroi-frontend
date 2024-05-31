@@ -5,7 +5,7 @@ import NavBarContainerRevamp from '../../../containers/NavBarContainerRevamp';
 import NavBar from '../../../components/topbar/NavBar';
 import NavBarTitle from '../../../components/topbar/NavBarTitle';
 import { TransactionSubmitted } from '../../components/TransactionSubmitted/TransactionSubmitted';
-import { GovernanceProvider } from '@yoroi/staking';
+import { GovernanceProvider as GovernanceExternalPackageProvider } from '@yoroi/staking';
 import { useGovernance } from '../../features/governace/module/GovernanceContextProvider';
 
 type Props = {|
@@ -23,7 +23,7 @@ const GovernanceLayout = ({ stores, actions, children }: Props): any => {
       actions={actions}
       navbar={<NavBarContainerRevamp actions={actions} stores={stores} title={<NavBarTitle title={'Governance'} />} />}
     >
-      <GovernanceProvider manager={governanceManager}>{children}</GovernanceProvider>
+      <GovernanceExternalPackageProvider manager={governanceManager}>{children}</GovernanceExternalPackageProvider>
     </GeneralPageLayout>
   );
 };
