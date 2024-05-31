@@ -1,6 +1,6 @@
 // @flow
 
-import { action, observable, runInAction, } from 'mobx';
+import { action, computed, observable, runInAction, } from 'mobx';
 import { find } from 'lodash';
 import {
   PublicDeriver,
@@ -14,6 +14,13 @@ import type {
   CurrentSlotLengthFunc,
   TimeSinceGenesisFunc, TimeToAbsoluteSlotFunc, ToAbsoluteSlotNumberFunc,
   ToRealTimeFunc, ToRelativeSlotNumberFunc
+} from '../../api/ada/lib/storage/bridge/timeUtils';
+import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import {
+  genCurrentEpochLength, genCurrentSlotLength, genTimeSinceGenesis,
+  genTimeToSlot,
+  genToAbsoluteSlotNumber, genToRealTime,
+  genToRelativeSlotNumber
 } from '../../api/ada/lib/storage/bridge/timeUtils';
 
 export type TimeCalcRequests = {|
@@ -58,6 +65,60 @@ export default class BaseCardanoTimeStore extends Store<StoresMap, ActionsMap> {
   @observable timeCalcRequests: Array<TimeCalcRequests> = [];
 
   @observable currentTimeRequests: Array<CurrentTimeRequests> = [];
+
+  _intervalId: void | IntervalID;
+
+  setup(): void {
+    super.setup();
+    // note: doesn't await but that's okay
+    this._intervalId = setInterval(this._updateTime, 1000);
+  }
+
+  teardown(): void {
+    super.teardown();
+    if (this._intervalId) clearInterval(this._intervalId);
+  }
+
+  @action addObservedTime: PublicDeriver<> => void = (
+    publicDeriver
+  ) => {
+    const baseConfig = getCardanoHaskellBaseConfig(publicDeriver.getParent().getNetworkInfo());
+    this.timeCalcRequests.push({
+      publicDeriver,
+      requests: {
+        toAbsoluteSlot: new CachedRequest<void => Promise<ToAbsoluteSlotNumberFunc>>(
+          () => Promise.resolve(genToAbsoluteSlotNumber(baseConfig))
+        ),
+        toRelativeSlotNumber: new CachedRequest<void => Promise<ToRelativeSlotNumberFunc>>(
+          () => Promise.resolve(genToRelativeSlotNumber(baseConfig))
+        ),
+        timeToSlot: new CachedRequest<void => Promise<TimeToAbsoluteSlotFunc>>(
+          () => Promise.resolve(genTimeToSlot(baseConfig))
+        ),
+        currentEpochLength: new CachedRequest<void => Promise<CurrentEpochLengthFunc>>(
+          () => Promise.resolve(genCurrentEpochLength(baseConfig))
+        ),
+        currentSlotLength: new CachedRequest<void => Promise<CurrentSlotLengthFunc>>(
+          () => Promise.resolve(genCurrentSlotLength(baseConfig))
+        ),
+        timeSinceGenesis: new CachedRequest<void => Promise<TimeSinceGenesisFunc>>(
+          () => Promise.resolve(genTimeSinceGenesis(baseConfig))
+        ),
+        toRealTime: new CachedRequest<void => Promise<ToRealTimeFunc>>(
+          () => Promise.resolve(genToRealTime(baseConfig))
+        ),
+      },
+    });
+
+    this.currentTimeRequests.push({
+      publicDeriver,
+      // initial values that can be updated later
+      currentEpoch: 0,
+      currentSlot: 0,
+      msIntoSlot: 0,
+    });
+  }
+
 
   getTimeCalcRequests: PublicDeriver<> => TimeCalcRequests = (
     publicDeriver
@@ -108,5 +169,11 @@ export default class BaseCardanoTimeStore extends Store<StoresMap, ActionsMap> {
       currTimeRequests.currentSlot = currentRelativeTime.slot;
       currTimeRequests.msIntoSlot = currentAbsoluteSlot.msIntoSlot;
     });
+  }
+
+  @computed get currentTime(): ?CurrentTimeRequests {
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) return undefined;
+    return this.getCurrentTimeRequests(publicDeriver);
   }
 }
