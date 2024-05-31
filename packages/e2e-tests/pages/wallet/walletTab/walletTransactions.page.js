@@ -199,7 +199,9 @@ export class TransactionsSubTab extends WalletTab {
     return result;
   }
   async getTxHashID(groupIndex, txIndex) {
-    this.logger.info(`TransactionsSubTab::getTxHashID is called. Group index: ${groupIndex}, tx index: ${txIndex}`);
+    this.logger.info(
+      `TransactionsSubTab::getTxHashID is called. Group index: ${groupIndex}, tx index: ${txIndex}`
+    );
     const txHashId = await this.getText(this.txHashIdTextLocator(groupIndex, txIndex));
     this.logger.info(`TransactionsSubTab::getTxHashID::txHashId ${txHashId}`);
     return txHashId;
