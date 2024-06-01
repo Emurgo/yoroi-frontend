@@ -65,6 +65,7 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
       async (request) => {
         await this.stores.wallets.sendAndRefresh({
           publicDeriverId: undefined,
+          plateTextPart: undefined,
           broadcastRequest: async () => await this.signAndBroadcast(request),
           refreshWallet: async () => {}
         })
@@ -94,13 +95,14 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
   _sendWrapper: {|
     params: SendUsingLedgerParams,
     onSuccess?: void => void,
-    wallet: {
+    +wallet: {
       publicDeriverId: number,
       stakingAddressing: Addressing,
       publicKey: string,
       pathToPublic: Array<number>,
       networkId: number,
       hardwareWalletDeviceId: ?string,
+      +plate: { TextPart: string, ... },
       ...
     },
   |} => Promise<void> = async (request) => {
@@ -121,15 +123,10 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
         broadcastRequest: {
           ledger: {
             signRequest,
-            publicDeriverId: request.wallet.publicDeriverId,
-            stakingAddressing: request.wallet.stakingAddressing,
-            publicKey: request.wallet.publicKey,
-            pathToPublic: request.wallet.pathToPublic,
-            networkId: request.wallet.networkId,
-            hardwareWalletDeviceId: request.wallet.hardwareWalletDeviceId,
+            wallet: request.wallet,
           },
         },
-        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriverId),
+        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
       });
 
       this.actions.dialogs.closeActiveDialog.trigger();
@@ -153,36 +150,39 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
     params: {|
       signRequest: HaskellShelleyTxSignRequest,
     |},
-    publicDeriverId: number,
-    publicKey: string,
-    pathToPublic: Array<number>,
-    networkId: number,
-    hardwareWalletDeviceId: ?string,
+    +wallet: {
+      publicDeriverId: number,
+      publicKey: string,
+      pathToPublic: Array<number>,
+      networkId: number,
+      hardwareWalletDeviceId: ?string,
+      ...
+    },
   |} => Promise<{| txId: string |}> = async (request) => {
     try {
       Logger.debug(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcast)} called: ` + stringifyData(request.params));
 
       const publicKeyInfo = {
         key: RustModule.WalletV4.Bip32PublicKey.from_bytes(
-          Buffer.from(request.publicKey, 'hex')
+          Buffer.from(request.wallet.publicKey, 'hex')
         ),
         addressing: {
           startLevel: 1,
-          path: request.pathToPublic,
+          path: request.wallet.pathToPublic,
         },
       };
 
-      const expectedSerial = request.hardwareWalletDeviceId || '';
+      const expectedSerial = request.wallet.hardwareWalletDeviceId || '';
       return this.signAndBroadcast({
         ...request.params,
         publicKey: publicKeyInfo,
-        publicDeriverId: request.publicDeriverId,
+        publicDeriverId: request.wallet.publicDeriverId,
         addressingMap: genAddressingLookup(
-          request.networkId,
+          request.wallet.networkId,
           this.stores.addresses.addressSubgroupMap
         ),
         expectedSerial,
-        networkId: request.networkId,
+        networkId: request.wallet.networkId,
       });
     } catch (error) {
       Logger.error(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcast)} error: ` + stringifyError(error));

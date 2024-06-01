@@ -52,7 +52,6 @@ import { toRequestAddresses } from '../../api/ada/lib/storage/bridge/updateTrans
 import type { TransactionExportRow } from '../../api/export';
 import type { HistoryRequest } from '../../api/ada/lib/state-fetch/types';
 import appConfig from '../../config';
-import { getBalance } from '../../api/thunk';
 
 export type TxHistoryState = {|
   publicDeriverId: number,

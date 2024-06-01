@@ -8,7 +8,7 @@ import { observer } from 'mobx-react';
 import { ROUTES } from '../routes-config';
 import { ConceptualWallet } from '../api/ada/lib/storage/models/ConceptualWallet/index';
 import { genLookupOrFail, getTokenName } from '../stores/stateless/tokenHelpers';
-import { networks } from '../api/ada/lib/storage/database/prepackaged/networks';
+import { networks, getNetworkById } from '../api/ada/lib/storage/database/prepackaged/networks';
 import { addressToDisplayString } from '../api/ada/lib/storage/bridge/utils';
 import { getReceiveAddress } from '../stores/stateless/addressStores';
 import BuySellDialog from '../components/buySell/BuySellDialog';
@@ -120,28 +120,28 @@ export default class NavBarContainerRevamp extends Component<Props> {
       balance = this.props.stores.transactions.getBalance(selected);
     }
 
-    const cardanoWallets = [];
-
-    wallets.forEach(wallet => {
-      const rewards = this.props.stores.delegation.getRewardBalanceOrZero(
-        wallet.publicDeriverId,
-        wallet.networkId,
-        wallet.defaultTokenId
-      );
-
-      const walletMap = {
-        walletId: wallet.publicDeriverId,
-        rewards,
-        amount: wallet.balance,
-        plate: wallet.plate,
-        type: wallet.type,
-        name: wallet.name,
-      };
-
-      cardanoWallets.push(walletMap);
-    });
-
     if (this.props.stores.uiDialogs.isOpen(WalletListDialog)) {
+      const cardanoWallets = [];
+
+      wallets.forEach(wallet => {
+        const rewards = this.props.stores.delegation.getRewardBalanceOrZero(
+          wallet.publicDeriverId,
+          wallet.networkId,
+          wallet.defaultTokenId
+        );
+
+        const walletMap = {
+          walletId: wallet.publicDeriverId,
+          rewards,
+          amount: wallet.balance,
+          plate: wallet.plate,
+          type: wallet.type,
+          name: wallet.name,
+        };
+
+        cardanoWallets.push(walletMap);
+      });
+
       return (
         <WalletListDialog
           cardanoWallets={cardanoWallets}
@@ -164,19 +164,27 @@ export default class NavBarContainerRevamp extends Component<Props> {
       );
     }
     if (this.props.stores.uiDialogs.isOpen(BuySellDialog)) {
+      if (!selected) {
+        return null;
+      }
+      const formattedAddress = addressToDisplayString(
+        selected.receiveAddress.addr.Hash,
+        getNetworkById(selected.networkId),
+      );
+
       return (
         <BuySellDialog
           onCancel={this.props.actions.dialogs.closeActiveDialog.trigger}
           walletList={wallets.map(wallet => {
             const defaultToken = this.props.stores.tokenInfoStore.getDefaultTokenInfo(
-              wallet.networkId,
+              selected.networkId,
             );
             const currencyName = getTokenName(defaultToken);
 
             return {
-              walletName: wallet.name,
+              walletName: selected.name,
               currencyName,
-              anAddressFormatted: wallet.receiveAddress,
+              anAddressFormatted: formattedAddress,
             };
           })}
         />

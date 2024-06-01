@@ -1,7 +1,11 @@
 // @flow
 import { getWallets } from '../../../../app/api/common/index';
 import { PublicDeriver, } from '../../../../app/api/ada/lib/storage/models/PublicDeriver/index';
-import { asGetAllUtxos, asHasUtxoChains } from '../../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
+import {
+  asGetAllUtxos,
+  asHasUtxoChains,
+  asDisplayCutoff,
+} from '../../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   CardanoTx,
   ConfirmedSignData,
@@ -32,6 +36,7 @@ import type {
   DeleteTxMemo,
   GetAllTxMemos,
   RemoveAllTransactions,
+  PopAddress,
 } from '../../connector/types';
 import {
   APIErrorCodes,
@@ -149,6 +154,7 @@ const YOROI_MESSAGES = Object.freeze({
   DELETE_TX_MEMO: 'delete-tx-memo',
   GET_ALL_TX_MEMOS: 'get-all-tx-memos',
   REMOVE_ALL_TRANSACTIONS: 'remove-all-transactions',
+  POP_ADDRESS: 'pop-address',
 });
 
 // messages from other parts of Yoroi (i.e. the UI for the connector)
@@ -179,6 +185,7 @@ export async function yoroiMessageHandler(
     | DeleteTxMemo
     | GetAllTxMemos
     | RemoveAllTransactions
+    | PopAddress
   ),
   sender: any,
   sendResponse: Function,
@@ -697,7 +704,7 @@ export async function yoroiMessageHandler(
       const signRequest = {
         senderUtxos,
         unsignedTx: Buffer.from(unsignedTx, 'hex'),
-        metadata: RustModule.WalletV4.AuxiliaryData.from_hex(metadata),
+        metadata: metadata ?? RustModule.WalletV4.AuxiliaryData.from_hex(metadata),
         neededStakingKeyHashes: {
           wits: new Set(wits),
         },
@@ -803,6 +810,18 @@ export async function yoroiMessageHandler(
     );
     await persistSubmittedTransactions(filteredTxs);
     sendResponse(null);
+  } else if (request.type === YOROI_MESSAGES.POP_ADDRESS) {
+    const publicDeriver = getPublicDeriverById(request.request.publicDeriverId);
+    if (!publicDeriver) {
+      sendResponse({ error: 'no public dervier'});
+      return;
+    }
+    const withDisplayCutoff = asDisplayCutoff(publicDeriver);
+    if (withDisplayCutoff == null) {
+      throw new Error('unexpected missing asDisplayCutoff result');
+    }
+    await withDisplayCutoff.popAddress();
+    sendResponse(null);
   } else {
     console.error(`unknown message ${JSON.stringify(request)} from ${sender.tab.id}`)
   }
@@ -819,5 +838,6 @@ function getPublicDeriverById(publicDeriverId: number): ?PublicDeriver<> {
       return publicDeriver;
     }
   }
+  // todo: refactor to throw an exception
   return null;
 }

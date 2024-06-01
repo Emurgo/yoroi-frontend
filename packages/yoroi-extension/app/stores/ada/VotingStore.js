@@ -173,7 +173,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
     }
     let nextStep;
     if (
-      selected.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET
+      selected.type !== 'mnemonic'
     ) {
       await this.actions.ada.voting.createTransaction.trigger(null);
       nextStep = ProgressStep.TRANSACTION;
@@ -259,10 +259,10 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
       );
 
       const stakingKey = derivePublicByAddressing({
-        addressing: publicDeriver.stakingAddressing,
+        addressing: publicDeriver.stakingAddressing.addressing,
         startingFrom: {
           level: publicDeriver.publicDeriverLevel,
-          key: publicDeriver.publicKey,
+          key: publicKey,
         },
       }).to_raw_key();
 
@@ -273,7 +273,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
           absSlotNumber,
           trezorTWallet: {
             votingPublicKey,
-            stakingKeyPath: publicDeriver.stakingAddressing.path,
+            stakingKeyPath: publicDeriver.stakingAddressing.addressing.path,
             stakingKey: Buffer.from(stakingKey.as_bytes()).toString('hex'),
             paymentKeyPath: firstExternalAddress.addressing.path,
             paymentAddress: firstExternalAddress.address,
@@ -286,7 +286,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
           absSlotNumber,
           ledgerNanoWallet: {
             votingPublicKey,
-            stakingKeyPath: publicDeriver.stakingAddressing.path,
+            stakingKeyPath: publicDeriver.stakingAddressing.addressing.path,
             stakingKey: Buffer.from(stakingKey.as_bytes()).toString('hex'),
             paymentKeyPath: firstExternalAddress.addressing.path,
             paymentAddress: firstExternalAddress.address,
@@ -306,7 +306,9 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
         publicDeriverId: publicDeriver.publicDeriverId,
         password: spendingPassword,
       });
-
+      if (!stakingKey) {
+        throw new Error('expect mnemonic wallet to have private staking key');
+      }
       const trxMeta = generateRegistration({
         stakePrivateKey: RustModule.WalletV4.PrivateKey.from_hex(stakingKey),
         catalystPrivateKey,
@@ -342,12 +344,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
         broadcastRequest: {
           ledger: {
             signRequest: result,
-            publicDeriverId: request.wallet.publicDeriverId,
-            stakingAddressing: request.wallet.stakingAddressing,
-            publicKey: request.wallet.publicKey,
-            pathToPublic: request.wallet.pathToPublic,
-            networkId: request.wallet.networkId,
-            hardwareWalletDeviceId: request.wallet.hardwareWalletDeviceId,
+            wallet: request.wallet,
           },
         },
         refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
@@ -359,12 +356,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
         broadcastRequest: {
           trezor: {
             signRequest: result,
-            publicDeriverId: request.wallet.publicDeriverId,
-            publicKey: request.wallet.publicKey,
-            pathToPublic: request.wallet.pathToPublic,
-            stakingAddressing: request.wallet.stakingAddressing,
-            networkId: request.wallet.networkId,
-            hardwareWalletDeviceId: request.wallet.hardwareWalletDeviceId,
+            wallet: request.wallet,
           },
         },
         refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
@@ -379,7 +371,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
     await this.stores.substores.ada.wallets.adaSendAndRefresh({
       broadcastRequest: {
         normal: {
-          publicDeriverId: request.wallet.publicDeriverId,
+          wallet: request.wallet,
           password: request.password,
           signRequest: result,
         },

@@ -21,12 +21,11 @@ export default class BlockchainSettingsPage extends Component<StoresAndActionsPr
   };
 
   render(): Node {
-    const walletsStore = this.props.stores.wallets;
     const profileStore = this.props.stores.profile;
-    if (walletsStore.selected == null) {
+    const { selected } = this.props.stores.wallets;
+    if (selected == null) {
       return <NoWalletMessage />;
     }
-    const networkInfo = walletsStore.selected.getParent().getNetworkInfo();
 
     const { stores } = this.props;
     const { intl } = this.context;
@@ -34,7 +33,7 @@ export default class BlockchainSettingsPage extends Component<StoresAndActionsPr
     const isSubmittingExplorer = stores.explorers.setSelectedExplorerRequest.isExecuting;
 
     const uriSettings =
-      isCardanoHaskell(networkInfo) && environment.userAgentInfo.canRegisterProtocol() ? (
+      selected.isCardanoHaskell && environment.userAgentInfo.canRegisterProtocol() ? (
         <UriSettingsBlock
           registerUriScheme={() => registerProtocols()}
           isFirefox={environment.userAgentInfo.isFirefox()}
@@ -52,13 +51,13 @@ export default class BlockchainSettingsPage extends Component<StoresAndActionsPr
           onSelectExplorer={this.props.actions.explorers.updateSelectedExplorer.trigger}
           isSubmitting={isSubmittingExplorer}
           explorers={
-            this.props.stores.explorers.allExplorers.get(networkInfo.NetworkId) ??
+            this.props.stores.explorers.allExplorers.get(selected.networkId) ??
             (() => {
               throw new Error('No explorer for wallet network');
             })()
           }
           selectedExplorer={
-            stores.explorers.selectedExplorer.get(networkInfo.NetworkId) ??
+            stores.explorers.selectedExplorer.get(selected.networkId) ??
             (() => {
               throw new Error('No explorer for wallet network');
             })()

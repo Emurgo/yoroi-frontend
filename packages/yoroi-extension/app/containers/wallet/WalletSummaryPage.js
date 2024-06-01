@@ -80,7 +80,7 @@ class WalletSummaryPage extends Component<AllProps> {
 
     const { exportTransactionsToFile, closeExportTransactionDialog } = actions.transactions;
 
-    const walletId = this.props.stores.memos.getIdForWallet(selected.publicDeriverId);
+    const walletId = selected.plate.TextPart;
 
     const { uiDialogs, profile, memos, uiNotifications } = this.props.stores;
 
@@ -250,6 +250,7 @@ class WalletSummaryPage extends Component<AllProps> {
               return actions.memos.saveTxMemo.trigger(values);
             }}
             classicTheme={profile.isClassicTheme}
+            plateTextPart={selected.plate.TextPart}
           />
         ) : null}
 
@@ -284,6 +285,7 @@ class WalletSummaryPage extends Component<AllProps> {
               return actions.memos.updateTxMemo.trigger(values);
             }}
             classicTheme={profile.isClassicTheme}
+            plateTextPart={selected.plate.TextPart}
           />
         ) : null}
 
@@ -302,6 +304,7 @@ class WalletSummaryPage extends Component<AllProps> {
             onDelete={txHash => {
               return actions.memos.deleteTxMemo.trigger({
                 publicDeriverId: selected.publicDeriverId,
+                plateTextPart: selected.plate.TextPart,
                 txHash,
               });
             }}
@@ -354,6 +357,7 @@ class WalletSummaryPage extends Component<AllProps> {
               return actions.memos.saveTxMemo.trigger(values);
             }}
             classicTheme={profile.isClassicTheme}
+            plateTextPart={selected.plate.TextPart}
           />
         ) : null}
 
@@ -388,6 +392,7 @@ class WalletSummaryPage extends Component<AllProps> {
               return actions.memos.updateTxMemo.trigger(values);
             }}
             classicTheme={profile.isClassicTheme}
+            plateTextPart={selected.plate.TextPart}
           />
         ) : null}
 
@@ -406,6 +411,7 @@ class WalletSummaryPage extends Component<AllProps> {
             onDelete={txHash => {
               return actions.memos.deleteTxMemo.trigger({
                 publicDeriverId: selected.publicDeriverId,
+                plateTextPart: selected.plate.TextPart,
                 txHash,
               });
             }}

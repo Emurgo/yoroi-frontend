@@ -24,6 +24,8 @@ import {
   isLedgerNanoWallet,
   isTrezorTWallet
 } from '../../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
+import { Bip44Wallet } from '../../../../app/api/ada/lib/storage/models/Bip44Wallet/wrapper';
+import { isTestnet, isCardanoHaskell} from '../../../../app/api/ada/lib/storage/database/prepackaged/networks';
 
 export async function getWalletState(publicDeriver: PublicDeriver<>): WalletState {
   const conceptualWalletInfo = await publicDeriver.getParent().getFullConceptualWalletInfo();
@@ -50,8 +52,6 @@ export async function getWalletState(publicDeriver: PublicDeriver<>): WalletStat
   const publicKey = await withPubKey.getPublicKey();
   const plate = await getWalletChecksum(withPubKey);
   
-//  const stakingKey = unwrapStakingKey(stakingAddress);
-
   const receiveAddress = await getReceiveAddress(publicDeriver);
   if (receiveAddress == null) {
     throw new Error('unexpected missing receive address');
@@ -113,6 +113,8 @@ export async function getWalletState(publicDeriver: PublicDeriver<>): WalletStat
   }
   const balance = await canGetBalance.getBalance();
 
+  const network = publicDeriver.getParent().getNetworkInfo();
+
   return {
     publicDeriverId: publicDeriver.getPublicDeriverId(),
     conceptualWalletId: publicDeriver.getParent().getConceptualWalletId(),
@@ -129,14 +131,16 @@ export async function getWalletState(publicDeriver: PublicDeriver<>): WalletStat
     signingKeyUpdateDate,
     stakingAddressing: stakingKeyDbRow.addressing,
     stakingAddress: stakingKeyDbRow.addr.Hash,
-    stakingKey: '', //fixme
     publicDeriverLevel: publicDeriver.getParent().getPublicDeriverLevel(),
     lastSyncInfo: await publicDeriver.getLastSyncInfo(),
-    balance: // fixme,
+    balance,
     defaultTokenId: publicDeriver.getParent().getDefaultMultiToken().defaultTokenId,
     assuranceMode: assuranceModes.NORMAL,
     firstExternalAddress,
     externalAddressesByType,
     internalAddressesByType,
+    isBip44Wallet: publicDeriver.getParent() instanceof Bip44Wallet,
+    isTestnet: isTestnet(network),
+    isCardanoHaskell: isCardanoHaskell(network),
   };
 }

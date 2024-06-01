@@ -55,6 +55,7 @@ import type {
   IPublicDeriver,
   UsedStatus,
   Value,
+  BaseSingleAddressPath,
 } from './lib/storage/models/PublicDeriver/interfaces';
 import type {
   BaseGetTransactionsRequest,
@@ -279,7 +280,13 @@ export type BroadcastLedgerSignedTxFunc = (
 // createUnsignedTx
 
 export type CreateUnsignedTxRequest = {|
-  publicDeriver: IPublicDeriver<ConceptualWallet> & IGetAllUtxos & IHasUtxoChains,
+  publicDeriver: {
+    networkId: number,
+    utxos: IGetAllUtxosResponse,
+    defaultTokenId: string,
+    receiveAddress: BaseSingleAddressPath,
+    ...
+  },
   absSlotNumber: BigNumber,
   receiver: string,
   filter: ElementOf<IGetAllUtxosResponse> => boolean,
@@ -668,26 +675,6 @@ export default class AdaApi {
     }
   }
 
-  async removeAllTransactions(
-    request: RemoveAllTransactionsRequest
-  ): Promise<RemoveAllTransactionsResponse> {
-    try {
-      // 1) clear existing history
-      await removeAllTransactions({ publicDeriver: request.publicDeriver });
-
-      // 2) trigger a history sync
-      try {
-        await request.refreshWallet();
-      } catch (_e) {
-        Logger.warn(`${nameof(this.removeAllTransactions)} failed to connect to remote to resync. Data was still cleared locally`);
-      }
-    } catch (error) {
-      Logger.error(`${nameof(AdaApi)}::${nameof(this.removeAllTransactions)} error: ` + stringifyError(error));
-      if (error instanceof LocalizableError) throw error;
-      throw new GenericApiError();
-    }
-  }
-
   async getForeignAddresses(
     request: GetForeignAddressesRequest
   ): Promise<GetForeignAddressesResponse> {
@@ -992,8 +979,7 @@ export default class AdaApi {
   async createUnsignedTx(
     request: CreateUnsignedTxRequest
   ): Promise<CreateUnsignedTxResponse> {
-    const utxos = await request.publicDeriver.getAllUtxos();
-    const filteredUtxos = utxos.filter(utxo => request.filter(utxo));
+    const filteredUtxos = request.publicDeriver.utxos.filter(utxo => request.filter(utxo));
 
     const addressedUtxo = asAddressedUtxo(filteredUtxos);
 
@@ -1003,10 +989,7 @@ export default class AdaApi {
 
     // note: we need to create a change address IFF we're not sending all of the default asset
     if (!hasSendAllDefault(request.tokens)) {
-      const internal = await getReceiveAddress(request.publicDeriver);
-      if (internal == null) {
-        throw new Error(`${nameof(this.createUnsignedTx)} no internal addresses left. Should never happen`);
-      }
+      const internal = request.publicDeriver.receiveAddress;
       receivers.push({
         address: internal.addr.Hash,
         addressing: internal.addressing,
@@ -1015,8 +998,11 @@ export default class AdaApi {
     return this.createUnsignedTxForUtxos({
       absSlotNumber: request.absSlotNumber,
       receivers,
-      network: request.publicDeriver.getParent().getNetworkInfo(),
-      defaultToken: request.publicDeriver.getParent().getDefaultToken(),
+      network: getNetworkById(request.publicDeriver.networkId),
+      defaultToken: {
+        defaultNetworkId: request.publicDeriver.networkId,
+        defaultIdentifier: request.publicDeriver.defaultTokenId
+      },
       utxos: addressedUtxo,
       tokens: request.tokens,
       metadata: request.metadata,

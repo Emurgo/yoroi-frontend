@@ -20,7 +20,6 @@ function SwapProvider({ children, publicDeriver }: Props): Node {
   if (!publicDeriver) throw new Error(`${nameof(SwapProvider)} requires a wallet to be selected`);
 
   const [stakingKey, setStakingKey] = useState(null);
-  const defaultToken = publicDeriver.getParent().getDefaultToken();
 
   useEffect(() => {
     const stakignAddr = publicDeriver.stakingAddress;
@@ -47,7 +46,7 @@ function SwapProvider({ children, publicDeriver }: Props): Node {
       swapApiMaker({
         isMainnet: true,
         stakingKey,
-        primaryTokenId: defaultToken.defaultIdentifier,
+        primaryTokenId: publicDeriver.defaultTokenId,
         supportedProviders,
       }),
     []

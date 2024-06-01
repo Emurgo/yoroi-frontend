@@ -44,7 +44,11 @@ type Props = {|
   +sendMoneyRequest: SendMoneyRequest,
   +sendMoney: (params: {|
     password: string,
-    publicDeriverId: number,
+    +wallet: {
+      publicDeriverId: number,
+      +plate: { TextPart: string, ... },
+      ...
+    },
     signRequest: ISignRequest<any>,
     onSuccess?: void => void,
   |}) => Promise<void>,
@@ -81,14 +85,12 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
     if (selectedWallet.type === 'ledger') {
       await ledgerSend.sendUsingLedgerWallet.trigger({
         params: { signRequest },
-        publicDeriverId: selectedWallet.publicDeriverId,
         onSuccess: openTransactionSuccessDialog,
         wallet: selectedWallet,
      });
     } else if (selectedWallet.type === 'trezor') {
       await trezorSend.sendUsingTrezor.trigger({
         params: { signRequest },
-        publicDeriverId: selectedWallet.publicDeriverId,
         onSuccess: openTransactionSuccessDialog,
         wallet: selectedWallet,
       });
@@ -97,7 +99,7 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
       await sendMoney({
         signRequest,
         password,
-        publicDeriverId: selectedWallet.publicDeriverId,
+        wallet: selectedWallet,
         onSuccess: openTransactionSuccessDialog,
       });
     }

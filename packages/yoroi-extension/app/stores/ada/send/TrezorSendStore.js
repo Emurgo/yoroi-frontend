@@ -55,12 +55,14 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
   _sendWrapper: {|
     params: SendUsingTrezorParams,
     onSuccess?: void => void,
-    wallet: {
+    +wallet: {
       publicDeriverId: number,
       stakingAddressing: Addressing,
       publicKey: string,
       pathToPublic: Array<number>,
       networkId: number,
+      hardwareWalletDeviceId: ?string,
+      +plate: { TextPart: string, ... },
       ...
     },
   |} => Promise<void> = async (request) => {
@@ -81,15 +83,10 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
         broadcastRequest: {
           trezor: {
             signRequest,
-            publicDeriverId: request.wallet.publicDeriverId,
-            stakingAddressing: request.wallet.stakingAddressing,
-            publicKey: request.wallet.publicKey,
-            pathToPublic: request.wallet.pathToPublic,
-            networkId: request.wallet.networkId,
-            hardwareWalletDeviceId: request.wallet.hardwareWalletDeviceId,
+            wallet: request.wallet,
           },
         },
-        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriverId),
+        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
       });
 
       this.actions.dialogs.closeActiveDialog.trigger();
@@ -113,14 +110,17 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
     params: {|
       signRequest: HaskellShelleyTxSignRequest,
     |},
-    publicDeriverId: number,
-    networkId: number,
-    publicKey: string,
-    pathToPublic: Array<number>,
-    stakingAddressing: Addressing,
+    +wallet: {
+      publicDeriverId: number,
+      networkId: number,
+      publicKey: string,
+      pathToPublic: Array<number>,
+      stakingAddressing: Addressing,
+      ...
+    },
   |} => Promise<{| txId: string |}> = async (request) => {
     try {
-      const network = getNetworkById(request.networkId);
+      const network = getNetworkById(request.wallet.networkId);
       const trezorSignTxDataResp = await this.api.ada.createTrezorSignTxData({
         ...request.params,
         network,
@@ -142,16 +142,16 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
 
       const publicKeyInfo = {
         key: RustModule.WalletV4.Bip32PublicKey.from_bytes(
-          Buffer.from(request.publicKey, 'hex')
+          Buffer.from(request.wallet.publicKey, 'hex')
         ),
         addressing: {
           startLevel: 1,
-          path: request.pathToPublic,
+          path: request.wallet.pathToPublic,
         },
       };
 
       const stakingKey = derivePublicByAddressing({
-        addressing: request.stakingAddressing.addressing,
+        addressing: request.wallet.stakingAddressing.addressing,
         startingFrom: {
           level: publicKeyInfo.addressing.startLevel + publicKeyInfo.addressing.path.length - 1,
           key: publicKeyInfo.key,

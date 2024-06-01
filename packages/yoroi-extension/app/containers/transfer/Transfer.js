@@ -74,7 +74,7 @@ class Transfer extends Component<AllProps> {
       return <NoWalletMessage />;
     }
     // temporary solution: will need to handle more cases later for different currencies
-    if (wallet.getParent().getNetworkInfo().CoinType !== CoinTypes.CARDANO) {
+    if (wallet.isCardanoHaskell) {
       return <UnsupportedWallet />;
     }
     return (

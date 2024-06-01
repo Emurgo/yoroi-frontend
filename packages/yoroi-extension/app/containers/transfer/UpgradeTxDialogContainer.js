@@ -23,6 +23,7 @@ import type {
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { getTokenName, genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../utils/formatters';
+import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -135,8 +136,11 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
     if (selected == null) {
       throw new Error(`${nameof(UpgradeTxDialogContainer)} no wallet selected`);
     }
-    const network = selected.getParent().getNetworkInfo();
-    const defaultToken = selected.getParent().getDefaultToken();
+    const network = getNetworkById(selected.networkId);
+    const defaultToken = {
+      defaultNetworkId: selected.networkId,
+      defaultIdentifier: selected.defaultTokenId,
+    };
     const defaultTokenInfo = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)({
       identifier: defaultToken.defaultIdentifier,
       networkId: defaultToken.defaultNetworkId,
@@ -153,7 +157,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
       </div>
     );
 
-    const expectedSerial = selected.getParent().hardwareInfo?.DeviceId || '';
+    const expectedSerial = selected.hardwareWalletDeviceId || '';
 
     return (
       <TransferSummaryPage
@@ -168,7 +172,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
           trigger: async () => await this.submit({
             publicDeriverId: selected.publicDeriverId,
             addressingMap: genAddressingLookup(
-              selected,
+              selected.networkId,
               this.props.stores.addresses.addressSubgroupMap
             ),
             ...tentativeTx,
@@ -193,7 +197,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
           this.props.stores.addresses.addressSubgroupMap,
         )}
         addressToDisplayString={
-          addr => addressToDisplayString(addr, selected.getParent().getNetworkInfo())
+          addr => addressToDisplayString(addr, network)
         }
       />
     );

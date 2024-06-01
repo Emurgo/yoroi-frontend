@@ -216,6 +216,7 @@ export default class YoroiTransferStore extends Store<StoresMap, ActionsMap> {
     try {
       await this.stores.wallets.sendAndRefresh({
         publicDeriverId: undefined,
+        plateTextPart: undefined,
         broadcastRequest: async () => {
           const transferTx = await getTransferTx();
           if (transferTx.id == null || transferTx.encodedTx == null) {

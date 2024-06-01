@@ -8,9 +8,6 @@ import type {
   TxMemoTableUpsert, TxMemoTablePreInsert, TxMemoPreLookupKey,
   UpsertTxMemoFunc, DeleteTxMemoFunc, GetAllTxMemoFunc
 } from '../../api/ada/lib/storage/bridge/memos';
-import {
-  upsertTxMemo, deleteTxMemo, getAllTxMemo
-} from '../../api/ada/lib/storage/bridge/memos';
 import type { TxMemoTableRow } from '../../api/ada/lib/storage/database/memos/tables';
 import type { ProvidersType } from '../../api/externalStorage/index';
 import type {
@@ -196,7 +193,7 @@ export default class MemosStore extends Store<StoresMap, ActionsMap> {
     const savedMemo = await upsertTxMemo({
       publicDeriverId: request.publicDeriverId,
       memo,
-    }).promise;
+    });
 
     runInAction(() => {
       this.txMemoMap.get(walletId)?.set(request.memo.TransactionHash, savedMemo);
@@ -213,10 +210,10 @@ export default class MemosStore extends Store<StoresMap, ActionsMap> {
     if (this.hasSetSelectedExternalStorageProvider) {
       await this.uploadAndOverwriteExternalTxMemoRequest.execute({ memo });
     }
-    const savedMemo = upsertTxMemo({
+    const savedMemo = await upsertTxMemo({
       publicDeriverId: request.publicDeriverId,
       memo,
-    }).promise;
+    });
     if (savedMemo == null) throw new Error('Should never happen');
     runInAction(() => {
       this.txMemoMap.get(walletId)?.set(request.memo.TransactionHash, savedMemo);
@@ -253,7 +250,7 @@ export default class MemosStore extends Store<StoresMap, ActionsMap> {
         txHash: request.txHash,
       }).promise;
       if (memo == null) throw new Error('Should never happen');
-      const memoRow = await saveTxMemo({
+      const memoRow = await upsertTxMemo({
         publicDeriverId: request.publicDeriverId,
         memo: {
           WalletId: walletId,
@@ -319,9 +316,8 @@ export default class MemosStore extends Store<StoresMap, ActionsMap> {
       if (localMemo != null) {
         // delete local copy if file was deleted on external storage
         if (memo.deleted === true) {
-          await this.deleteTxMemoRequest.execute({
-            publicDeriver: request.publicDeriver.publicDeriverId,
-            plateTextPart: request.publicDeriver.plate.textPart,
+          await deleteTxMemo({
+            publicDeriverId: request.publicDeriver.publicDeriverId,
             key: {
               walletId,
               txHash: memo.tx,
@@ -330,8 +326,8 @@ export default class MemosStore extends Store<StoresMap, ActionsMap> {
         } else if (localMemo.LastUpdated < memo.lastUpdated) {
           // only update if the file is newer
           await this._downloadAndSaveTxMemo({
-            publicDeriver: request.publicDeriver.publicDeriverId,
-            plateTextPart: request.publicDeriver.plate.textPart,
+            publicDeriverId: request.publicDeriver.publicDeriverId,
+            plateTextPart: request.publicDeriver.plate.TextPart,
             txHash: memo.tx
           });
         }
@@ -340,7 +336,7 @@ export default class MemosStore extends Store<StoresMap, ActionsMap> {
         // save memo locally
         await this._downloadAndSaveTxMemo({
           publicDeriverId: request.publicDeriver.publicDeriverId,
-          plateTextPart: request.publicDeriver.plate.textPart,
+          plateTextPart: request.publicDeriver.plate.TextPart,
           txHash: memo.tx
         });
       }

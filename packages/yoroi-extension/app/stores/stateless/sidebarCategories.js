@@ -24,7 +24,7 @@ export type SidebarCategory = {|
   +label?: MessageDescriptor,
   +isVisible: ({|
     hasAnyWallets: boolean,
-    selected: null | number,
+    selected: ?number,
     currentRoute: string,
   |}) => boolean,
 |};
@@ -88,7 +88,7 @@ export const CONNECTED_WEBSITES: SidebarCategory = registerCategory({
 
 type isVisibleFunc = ({|
   hasAnyWallets: boolean,
-  selected: null | number,
+  selected: ?number,
   currentRoute: string,
   isRewardWallet: isRewardWalletFunc,
 |}) => boolean;

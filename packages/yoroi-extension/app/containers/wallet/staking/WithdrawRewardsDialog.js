@@ -89,26 +89,14 @@ export default class WithdrawRewardsDialog extends Component<Props> {
     if (this.spendingPasswordForm == null) {
       if (selected.type === 'trezor') {
         await this.props.actions.ada.trezorSend.sendUsingTrezor.trigger({
-          params: {
-            signRequest,
-          },
-          publicDeriverId: selected.publicDeriverId,
-          stakingAddressing: selected.stakingAddressing,
-          publicKey: selected.publicKey,
-          pathToPublic: selected.pathToPublic,
-          networkId: selected.networkId,
+          params: { signRequest },
+          wallet: selected,
         });
       }
       if (selected.type === 'ledger') {
         await this.props.actions.ada.ledgerSend.sendUsingLedgerWallet.trigger({
-          params: {
-            signRequest,
-          },
-          publicDeriverId: selected.publicDeriverId,
-          stakingAddressing: selected.stakingAddressing,
-          publicKey: selected.publicKey,
-          pathToPublic: selected.pathToPublic,
-          networkId: selected.networkId,
+          params: { signRequest },
+          wallet: selected,
         });
       }
     } else {
@@ -118,7 +106,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
           await this.props.actions.wallets.sendMoney.trigger({
             signRequest,
             password: walletPassword,
-            publicDeriverId: selected.publicDeriverId,
+            wallet: selected,
           });
         },
         onError: () => {},

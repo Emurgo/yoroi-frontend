@@ -8,7 +8,7 @@ import type { RemoteUnspentOutput } from '../../../app/api/ada/lib/state-fetch/t
 import type { IGetAllUtxosResponse } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type {
   CreateWalletRequestType,
-  CreateHardwareRequestType
+  CreateHardwareRequestType,
   ChangeSigningKeyPasswordRequestType,
   SignAndBroadcastRequestType,
 } from '../../../app/api/thunk';
@@ -288,6 +288,10 @@ export type GetAllTxMemos = {|
 export type RemoveAllTransactions = {|
   type: 'remove-all-transactions',
   request: {| publicDeriverId: number |}
+|};
+export type PopAddress = {|
+  type: 'pop-address',
+  request: {| publicDeriverId: number |},
 |};
 export type TxSignWindowRetrieveData = {|
   type: 'tx_sign_window_retrieve_data',

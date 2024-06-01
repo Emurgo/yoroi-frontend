@@ -113,7 +113,7 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
 
     return (
       <>
-        {this.getDialog(publicDeriver.publicDeriverId)}
+        {this.getDialog(publicDeriver)}
         {dashboard}
       </>
     );

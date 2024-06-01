@@ -10,7 +10,11 @@ export default class WalletsActions {
   sendMoney: AsyncAction<{|
     signRequest: ISignRequest<any>,
     password: string,
-    publicDeriverId: number,
+    +wallet: {
+      publicDeriverId: number,
+      +plate: { TextPart: string, ... },
+      ...
+    },
     onSuccess?: void => void,
   |}> = new AsyncAction();
 }

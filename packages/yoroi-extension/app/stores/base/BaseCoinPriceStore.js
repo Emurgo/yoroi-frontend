@@ -28,9 +28,6 @@ declare var CONFIG: ConfigType;
 
 const SOURCE_CURRENCIES = ['ADA'];
 
-interface LoadingStore {
-  getDatabase(): ?lf$Database
-}
 interface StateFetchStore {
   fetcher: IFetcher
 }
@@ -38,7 +35,6 @@ interface StateFetchStore {
 export default class BaseCoinPriceStore
   <
     TStores: {
-      +loading: LoadingStore,
       +stateFetchStore: StateFetchStore,
       +profile: {
         get unitOfAccount(): UnitOfAccountSettingType,
@@ -83,6 +79,7 @@ export default class BaseCoinPriceStore
 
   @action
   loadFromStorage: void => Promise<void> = async () => {
+    /*
     // note: only need to care about persistent storage
     // since this is called only once when the app launches
     // so there should be no transient storage when the app loads anyway
@@ -99,6 +96,7 @@ export default class BaseCoinPriceStore
       }
     });
     this.loadPubKeyData();
+    */
   }
 
   @action

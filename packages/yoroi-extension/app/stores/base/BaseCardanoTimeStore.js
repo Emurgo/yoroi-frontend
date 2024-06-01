@@ -84,8 +84,8 @@ export default class BaseCardanoTimeStore extends Store<StoresMap, ActionsMap> {
     const selected = this.stores.wallets.selected;
     if (selected == null) return;
 
-    const timeCalcRequests = this.getTimeCalcRequests(selected);
-    const currTimeRequests = this.getCurrentTimeRequests(selected);
+    const timeCalcRequests = this.getTimeCalcRequests(selected.publicDeriverId);
+    const currTimeRequests = this.getCurrentTimeRequests(selected.publicDeriverId);
 
     const timeToSlot = await timeCalcRequests.requests.timeToSlot.execute().promise;
     if (!timeToSlot) throw new Error(`${nameof(this._updateTime)} should never happen`);

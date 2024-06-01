@@ -20,14 +20,14 @@ import {
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 
 import { Bip44DerivationLevels, } from '../../lib/storage/database/walletTypes/bip44/api/utils';
-import type { Address, Addressing, } from '../../lib/storage/models/PublicDeriver/interfaces';
+import type { Address, Addressing, IGetAllUtxosResponse, } from '../../lib/storage/models/PublicDeriver/interfaces';
 import { getCardanoSpendingKeyHash, normalizeToAddress } from '../../lib/storage/bridge/utils';
 import { MultiToken, } from '../../../common/lib/MultiToken';
 import { PRIMARY_ASSET_CONSTANTS } from '../../lib/storage/database/primitives/enums';
 import { cardanoValueFromMultiToken, cardanoValueFromRemoteFormat, multiTokenFromCardanoValue, asAddressedUtxo, multiTokenFromRemote } from '../utils';
 import { hexToBytes, logErr } from '../../../../coreUtils';
-import { getCardanoHaskellBaseConfig } from '../../lib/storage/database/prepackaged/networks';
-import { IPublicDeriver, IGetAllUtxos, IHasUtxoChains } from '../../lib/storage/models/PublicDeriver/interfaces';
+import { getCardanoHaskellBaseConfig, getNetworkById } from '../../lib/storage/database/prepackaged/networks';
+import { IPublicDeriver, IGetAllUtxos, IHasUtxoChains, } from '../../lib/storage/models/PublicDeriver/interfaces';
 import { ConceptualWallet } from '../../lib/storage/models/ConceptualWallet/index';
 import { builtSendTokenList } from '../../../common';
 import type { TokenRow } from '../../lib/storage/database/primitives/tables';
@@ -697,7 +697,12 @@ export async function newAdaUnsignedTxFromUtxo(
 
 export async function maxSendableADA(
   request: {|
-    publicDeriver: IPublicDeriver<ConceptualWallet> & IGetAllUtxos & IHasUtxoChains,
+    publicDeriver: {
+      networkId: number,
+      utxos: IGetAllUtxosResponse,
+      defaultTokenId: string,
+      ...
+    },
     absSlotNumber: BigNumber,
     receiver: string | null,
     tokens: Array<$ReadOnly<{|
@@ -708,7 +713,7 @@ export async function maxSendableADA(
   |}
 ): Promise<BigNumber> {
   try {
-    const network = request.publicDeriver.getParent().getNetworkInfo()
+    const network = getNetworkById(request.publicDeriver.networkId);
     const config = getCardanoHaskellBaseConfig(network)
       .reduce((acc, next) => Object.assign(acc, next), {});
 
@@ -723,8 +728,7 @@ export async function maxSendableADA(
       networkId: network.NetworkId,
     };
 
-    const utxos = await request.publicDeriver.getAllUtxos();
-    const addressedUtxo = asAddressedUtxo(utxos);
+    const addressedUtxo = asAddressedUtxo(request.publicDeriver.utxos);
     const totalBalance = addressedUtxo
       .map(utxo => new BigNumber(utxo.amount))
       .reduce(
@@ -747,7 +751,10 @@ export async function maxSendableADA(
     }
     const isAssetsSelected = request.tokens.length >= 2 // [ada, ...tokens]
     if (isAssetsSelected) {
-      const defaultToken = request.publicDeriver.getParent().getDefaultToken()
+      const defaultToken = {
+        defaultNetworkId: request.publicDeriver.networkId,
+        defaultIdentifier: request.publicDeriver.defaultTokenId,
+      };
       txBuilder.add_output(
         RustModule.WalletV4.TransactionOutput.new(
           wasmReceiver,

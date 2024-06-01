@@ -30,7 +30,7 @@ import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import type { GetExtendedPublicKeyResponse, } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { createHardwareWallet } from '../../api/thunk';
-import type { CreateHardwareWalletRequest } from '../../api/thunk';
+import type { CreateHardwareWalletRequestType } from '../../api/thunk';
 import type { WalletState } from '../../../chrome/extension/background/types';
 
 export default class LedgerConnectStore
@@ -375,7 +375,7 @@ export default class LedgerConnectStore
     }
   };
 
-  _prepareCreateHWReqParams: string => CreateHardwareWalletRequest = (
+  _prepareCreateHWReqParams: string => CreateHardwareWalletRequestType = (
     walletName,
   ) => {
     if (this.hwDeviceInfo == null

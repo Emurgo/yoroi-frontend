@@ -10,12 +10,6 @@ import config from '../../config';
 import globalMessages from '../../i18n/global-messages';
 import type { Notification } from '../../types/notification.types';
 import type { CreateWalletResponse, RestoreWalletResponse } from '../../api/common/types';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import {
-  asGetPublicKey,
-  asGetSigningKey,
-  asGetStakingKey,
-} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   IGetLastSyncInfoResponse,
   IGetPublic,
@@ -36,8 +30,6 @@ import { getWallets } from '../../api/thunk';
 
 export type SendMoneyRequest = Request<DeferredCall<{| txId: string |}>>;
 
-type GetWalletsFunc = () => Array<WalletState>;
-
 /**
  * The base wallet store that contains the shared logic
  * dealing with wallets / accounts.
@@ -48,15 +40,15 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   @observable initialSyncingWalletIds: Array<number> = [];
   @observable wallets: Array<WalletState> = [];
   @observable selected: null | WalletState;
-  @observable getInitialWallets: Request<GetWalletsFunc> = new Request<GetWalletsFunc>(getWallets);
+  @observable getInitialWallets: Request<typeof getWallets> = new Request(getWallets);
 
   @observable sendMoneyRequest: SendMoneyRequest = new Request<
     DeferredCall<{| txId: string |}>
   >(request => request());
 
-  @observable createWalletRequest: Request<DeferredCall<CreateWalletResponse>> = new Request<
-    DeferredCall<CreateWalletResponse>
-  >(async create => {
+  @observable createWalletRequest: Request<
+    (() => Promise<WalletState>) => Promise<WalletState>
+  > = new Request(async create => {
     const createdWallet = await create();
     if (!createdWallet)
       throw new Error(`${nameof(this.createWalletRequest)} failed to create wallet`);
@@ -65,9 +57,9 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     this.stores.walletBackup.teardown();
     return createdWallet;
   });
-  @observable restoreRequest: Request<DeferredCall<RestoreWalletResponse>> = new Request<
-    DeferredCall<RestoreWalletResponse>
-  >(async restore => {
+  @observable restoreRequest: Request<
+    (() => Promise<WalletState>) => Promise<WalletState>
+  > = new Request(async restore => {
     const restoredWallet = await restore();
     if (!restoredWallet)
       throw new Error(`${nameof(this.createWalletRequest)} failed to restore wallet`);
@@ -85,7 +77,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   }
 
   @action
-  _baseAddNewWallet: RestoreWalletResponse => Promise<void> = async newWallet => {
+  _baseAddNewWallet: WalletState => Promise<void> = async newWallet => {
     this.showWalletCreatedNotification();
 
     this.registerObserversForNewWallet({
@@ -98,7 +90,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     runInAction(() => {
       this.wallets.push(newWallet);
       this._setActiveWallet({
-        wallet: newWallet,
+        publicDeriverId: newWallet.publicDeriverId,
       });
       this.actions.dialogs.closeActiveDialog.trigger();
       this.initialSyncingWalletIds.push(newWallet.publicDeriverId);
@@ -157,7 +149,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     runInAction('refresh active wallet', () => {
       if (this.selected == null && result.length === 1) {
         this.actions.wallets.setActiveWallet.trigger({
-          wallet: result[0],
+          publicDeriverId: result[0].publicDeriverId,
         });
       }
       this.wallets.push(...result);
@@ -172,17 +164,21 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     addresses.addObservedWallet(request.publicDeriver);
     transactions.addObservedWallet(request);
     const { time, delegation } = substores.ada;
-    time.addObservedTime(request.publicDeriver.publicDeriverId);
-    if (asGetStakingKey(request.publicDeriver) != null) {
-      delegation.addObservedWallet(request.publicDeriver);
-      delegation.refreshDelegation(request.publicDeriver);
-    }
+    time.addObservedTime(
+      request.publicDeriver.publicDeriverId,
+      request.publicDeriver.networkId
+    );
+    delegation.addObservedWallet(request.publicDeriver);
+    delegation.refreshDelegation(request.publicDeriver);
   };
 
   // =================== ACTIVE WALLET ==================== //
 
   @action _setActiveWallet: ({| publicDeriverId: number |}) => void = ({ publicDeriverId }) => {
     const wallet = this.wallets.find(wallet => wallet.publicDeriverId === publicDeriverId);
+    if (!wallet) {
+      throw new Error('unexpected missing wallet id');
+    }
     this.actions.profile.setSelectedNetwork.trigger(
       getNetworkById(wallet.networkId)
     );
@@ -191,9 +187,9 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     this.api.localStorage.setSelectedWalletId(wallet.publicDeriverId);
   };
 
-  getLastSelectedWallet: void => ?PublicDeriver<> = () => {
+  getLastSelectedWallet: void => ?WalletState = () => {
     const walletId = this.api.localStorage.getSelectedWalletId();
-    return this.wallets.find(wallet => wallet.publicDeriverId);
+    return this.wallets.find(wallet => wallet.publicDeriverId === walletId);
   };
 
   @action _unsetActiveWallet: void => void = () => {
@@ -272,6 +268,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   sendAndRefresh: ({|
     publicDeriverId: void | number,
+    plateTextPart: void | string,
     broadcastRequest: void => Promise<{| txId: string |}>,
     refreshWallet: () => Promise<void>,
   |}) => Promise<{| txId: string |}> = async request => {
@@ -281,11 +278,11 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
       if (request.publicDeriverId != null) {
         const memo = this.stores.transactionBuilderStore.memo;
-        if (memo !== '' && memo !== undefined) {
+        if (memo !== '' && memo !== undefined && request.plateTextPart) {
           try {
             await this.actions.memos.saveTxMemo.trigger({
               publicDeriverId: request.publicDeriverId,
-              plateTextPart: request.plate.textPart,
+              plateTextPart: request.plateTextPart,
               memo: {
                 Content: memo,
                 TransactionHash: result.txId,
@@ -313,8 +310,8 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     return tx;
   };
 
-  isInitialSyncing: (PublicDeriver<>) => boolean = (publicDeriver) => {
-    return this.initialSyncingWalletIds.includes(publicDeriver.getPublicDeriverId());
+  isInitialSyncing: (number) => boolean = (publicDeriverId) => {
+    return this.initialSyncingWalletIds.includes(publicDeriverId);
   }
 
   //fixme

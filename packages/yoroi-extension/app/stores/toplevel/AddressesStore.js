@@ -25,7 +25,10 @@ import { allAddressSubgroups } from '../stateless/addressStores';
 import type { IAddressTypeUiSubset, IAddressTypeStore } from '../stateless/addressStores';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import { ChainDerivations } from '../../config/numbersConfig';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { popAddress } from '../../api/thunk';
+import type { WalletState } from '../../../chrome/extension/background/types';
 
 export default class AddressesStore extends Store<StoresMap, ActionsMap> {
 
@@ -39,8 +42,8 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
   addressBook: AddressTypeStore;
 
   // REQUESTS
-  @observable createAddressRequest: Request<CreateAddressFunc>
-    = new Request<CreateAddressFunc>(this.api.common.createAddress);
+  @observable createAddressRequest: Request<typeof popAddress>
+    = new Request<typeof popAddress>(popAddress);
 
   setup(): void {
     super.setup();
@@ -80,14 +83,7 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
   _baseCreateAddress: WalletState => Promise<?CreateAddressResponse> = async (
     publicDeriver
   ) => {
-    const withDisplayCutoff = asDisplayCutoff(publicDeriver);
-    if (withDisplayCutoff == null) {
-      Logger.error(`${nameof(this._createAddress)} incorrect public deriver`);
-      return;
-    }
-    const address = await this.createAddressRequest.execute({
-      popFunc: withDisplayCutoff.popAddress
-    }).promise;
+    const address = await this.createAddressRequest.execute(publicDeriver).promise;
     return address;
   };
 
@@ -111,7 +107,7 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
   ) => {
     await Promise.all(
       allAddressSubgroups
-        .filter(store => store.isRelated()
+        .filter(store => store.isRelated())
         .map(store => store.class)
         .map(storeClass => (
           this._addressSubgroupMap.get(storeClass)?.refreshAddressesFromDb(publicDeriver)
@@ -159,13 +155,13 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
   }
 
   _wrapForChainAddresses: {|
-    publicDeriver: PublicDeriver<>,
+    publicDeriver: WalletState,
     storeName: AddressTypeName,
     type: CoreAddressT,
     chainsRequest: IHasUtxoChainsRequest,
   |}=> Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
     const addresses = (
-      request.chainsRequest === ChainDerivations.EXTERNAL ?
+      request.chainsRequest.chainId === ChainDerivations.EXTERNAL ?
         request.publicDeriver.externalAddressesByType :
         request.publicDeriver.internalAddressesByType
     )[request.type];
@@ -177,7 +173,7 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
         ...addrInfo,
         address: addressToDisplayString(
           addrInfo.address,
-          getNetworkById(request.publicDeriver),
+          getNetworkById(request.publicDeriver.networkId),
         ),
       })),
     });

@@ -172,12 +172,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
         broadcastRequest: {
           ledger: {
             signRequest: result.signTxRequest,
-            publicDeriverId: request.wallet.publicDeriverId,
-            stakingAddressing: request.wallet.stakingAddressing,
-            networkId: request.wallet.networkId,
-            publicKey: request.wallet.publicKey,
-            pathToPublic: request.wallet.pathToPublic,
-            hardwareWalletDeviceId: request.wallet.hardwareWalletDeviceId,
+            wallet: request.wallet,
           },
         },
         refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
@@ -189,12 +184,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
         broadcastRequest: {
           trezor: {
             signRequest: result.signTxRequest,
-            publicDeriverId: request.wallet.publicDeriverId,
-            stakingAddressing: request.wallet.stakingAddressing,
-            publicKey: request.wallet.publicKey,
-            pathToPublic: request.wallet.pathToPublic,
-            networkId: request.wallet.networkId,
-            hardwareWalletDeviceId: request.wallet.hardwareWalletDeviceId,
+            wallet: request.wallet,
           },
         },
         refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
@@ -210,7 +200,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     await this.stores.substores.ada.wallets.adaSendAndRefresh({
       broadcastRequest: {
         normal: {
-          publicDeriverId: request.wallet.publicDeriverId,
+          wallet: request.wallet,
           password: request.password,
           signRequest: result.signTxRequest,
         },

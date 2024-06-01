@@ -216,7 +216,11 @@ type Props = {|
   +sendMoneyRequest: SendMoneyRequest,
   +sendMoney: (params: {|
     password: string,
-    publicDeriverId: number,
+    +wallet: {
+      publicDeriverId: number,
+      +plate: { TextPart: string, ... },
+      ...
+    },
     signRequest: ISignRequest<any>,
     onSuccess?: void => void,
   |}) => Promise<void>,

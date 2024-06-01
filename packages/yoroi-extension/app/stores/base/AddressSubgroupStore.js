@@ -9,9 +9,10 @@ import type { StandardAddress, } from '../../types/AddressFilterTypes';
 import { ChainDerivations } from '../../config/numbersConfig';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 import type { SubgroupCtorData, IAddressTypeStore } from '../stateless/addressStores';
+import type { WalletState } from '../../../chrome/extension/background/types';
 
 type SubRequestType = {|
-  publicDeriverId: number,
+  publicDeriver: WalletState,
 |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>>;
 
 export class AddressTypeStore {
@@ -49,12 +50,12 @@ export class AddressTypeStore {
   }
 
   /** Refresh addresses from database */
-  @action refreshAddressesFromDb: number => Promise<void> = async (
-    publicDeriverId,
+  @action refreshAddressesFromDb: WalletState => Promise<void> = async (
+    publicDeriver
   ) => {
-    const allRequest = this._getRequest(publicDeriverId);
+    const allRequest = this._getRequest(publicDeriver.publicDeriverId);
     allRequest.invalidate({ immediately: false });
-    await allRequest.execute({ publicDeriverId }).promise;
+    await allRequest.execute({ publicDeriver }).promise;
   };
 
   _flowCoerceResult: (
@@ -73,8 +74,8 @@ export class AddressTypeStore {
     return new CachedRequest<SubRequestType>(this.request);
   };
 
-  @action addObservedWallet: number => void = (
-    publicDeriverId
+  @action addObservedWallet: WalletState => void = (
+    { publicDeriverId }
   ) => {
     this.addressesRequests.push({
       publicDeriverId,
@@ -116,7 +117,7 @@ export class ByronExternalAddressesSubgroup extends AddressTypeStore implements 
       stores: data.stores,
       actions: data.actions,
       request: (request) => data.stores.addresses._createAddressIfNeeded({
-        publicDeriverId: request.publicDeriverId,
+        publicDeriver: request.publicDeriver,
         genAddresses: () => data.stores.addresses._wrapForChainAddresses({
           ...request,
           storeName: data.name,
@@ -149,7 +150,7 @@ export class BaseExternalAddressesSubgroup extends AddressTypeStore implements I
       stores: data.stores,
       actions: data.actions,
       request: (request) => data.stores.addresses._createAddressIfNeeded({
-        publicDeriverId: request.publicDeriverId,
+        publicDeriver: request.publicDeriver,
         genAddresses: () => data.stores.addresses._wrapForChainAddresses({
           ...request,
           storeName: data.name,
@@ -167,7 +168,7 @@ export class BaseInternalAddressesSubgroup extends AddressTypeStore implements I
       stores: data.stores,
       actions: data.actions,
       request: (request) => data.stores.addresses._createAddressIfNeeded({
-        publicDeriverId: request.publicDeriverId,
+        publicDeriver: request.publicDeriver,
         genAddresses: () => data.stores.addresses._wrapForChainAddresses({
           ...request,
           storeName: data.name,
@@ -185,7 +186,7 @@ export class BaseMangledAddressesSubgroup extends AddressTypeStore implements IA
       stores: data.stores,
       actions: data.actions,
       request: (request) => data.stores.addresses._wrapForAllAddresses({
-        publicDeriverId: request.publicDeriverId,
+        publicDeriver: request.publicDeriver,
         ...request,
         storeName: data.name,
         type: CoreAddressTypes.CARDANO_BASE,
@@ -201,7 +202,7 @@ export class EnterpriseExternalAddressesSubgroup
       stores: data.stores,
       actions: data.actions,
       request: (request) => data.stores.addresses._createAddressIfNeeded({
-        publicDeriverId: request.publicDeriverId,
+        publicDeriver: request.publicDeriver,
         genAddresses: () => data.stores.addresses._wrapForChainAddresses({
           ...request,
           storeName: data.name,
@@ -220,7 +221,7 @@ export class EnterpriseInternalAddressesSubgroup
       stores: data.stores,
       actions: data.actions,
       request: (request) => data.stores.addresses._createAddressIfNeeded({
-        publicDeriverId: request.publicDeriverId,
+        publicDeriver: request.publicDeriver,
         genAddresses: () => data.stores.addresses._wrapForChainAddresses({
           ...request,
           storeName: data.name,
@@ -238,7 +239,7 @@ export class RewardAddressesSubgroup extends AddressTypeStore implements IAddres
       stores: data.stores,
       actions: data.actions,
       request: (request) => data.stores.addresses._wrapForAllAddresses({
-        publicDeriverId: request.publicDeriverId,
+        publicDeriver: request.publicDeriver,
         ...request,
         storeName: data.name,
         type: CoreAddressTypes.CARDANO_REWARD,

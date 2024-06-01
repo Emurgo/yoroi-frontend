@@ -18,6 +18,7 @@ import {
   getDescriptionFromTokenMetadata,
   getImageFromTokenMetadata,
 } from '../../utils/nftMetadata';
+import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -38,7 +39,7 @@ class NFTDetailPageRevamp extends Component<AllProps> {
       throw new Error(`Active wallet requiTokenDetails for ${nameof(NFTDetailPageRevamp)}.`);
     const spendableBalance = this.props.stores.transactions.balance;
     const getTokenInfo = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo);
-    const network = publicDeriver.getParent().getNetworkInfo();
+    const network = getNetworkById(publicDeriver.networkId);
 
     const nftsList =
       spendableBalance == null

@@ -19,13 +19,14 @@ export default class LedgerSendActions {
   sendUsingLedgerWallet: AsyncAction<{|
     params: SendUsingLedgerParams,
     onSuccess?: void => void,
-    wallet: {
+    +wallet: {
       publicDeriverId: number,
       stakingAddressing: Addressing,
       publicKey: string,
       pathToPublic: Array<number>,
       networkId: number,
       hardwareWalletDeviceId: ?string,
+      +plate: { TextPart: string, ... },
       ...
     },
   |}> = new AsyncAction();

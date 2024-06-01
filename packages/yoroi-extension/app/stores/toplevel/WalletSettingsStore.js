@@ -3,7 +3,11 @@ import { action, observable, runInAction } from 'mobx';
 import type { Node } from 'react';
 import { find, } from 'lodash';
 import Store from '../base/Store';
-import type { ChangeModelPasswordFunc, RemoveAllTransactionsFunc, RenameModelFunc } from '../../api/common';
+import type {
+  ChangeModelPasswordFunc,
+  RemoveAllTransactionsFunc,
+  RenameModelFunc
+} from '../../api/common';
 import Request from '../lib/LocalizedRequest';
 import type { IConceptualWallet, } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import type { IPublicDeriver, } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
@@ -31,9 +35,9 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     = new Request(async (func) => { await func(); });
 
   @observable clearHistory: Request<RemoveAllTransactionsFunc>
-    = new Request<RemoveAllTransactionsFunc>(async (req) => {
+    = new Request(async (req) => {
       const ongoingRefreshing = this.stores.transactions.ongoingRefreshing.get(
-        req.publicDeriverId
+        req.publicDeriver.publicDeriverId
       );
       if (ongoingRefreshing) {
         try {
@@ -43,11 +47,11 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
         }
       }
 
-      const promise = removeAllTransactions({ publicDeriverId: req.publicDeriverId });
+      const promise = removeAllTransactions({ publicDeriverId: req.publicDeriver.publicDeriverId });
 
       runInAction(() => {
         this.stores.transactions.ongoingRefreshing.set(
-          req.publicDeriverId,
+          req.publicDeriver.publicDeriverId,
           promise,
         );
       });
@@ -142,7 +146,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     this.clearHistory.reset();
     try {
       await this.clearHistory.execute({
-        publicDeriverId: request.publicDeriverId,
+        publicDeriver: { publicDeriverId: request.publicDeriverId },
         refreshWallet: () => {
           this.stores.transactions.clearCache(request.publicDeriverId);
           // currently in the map the promise for this wallet is this resyncing process,

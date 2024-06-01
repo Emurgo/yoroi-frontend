@@ -74,17 +74,17 @@ class CardanoStakingPage extends Component<AllProps, State> {
     const selectedPlate = this.props.stores.wallets.activeWalletPlate;
     const stakingListBias = selectedPlate?.TextPart || 'bias';
 
-    const delegatedPoolId = this.props.stores.delegation.getDelegatedPoolId(selectedWallet);
+    const delegatedPoolId = this.props.stores.delegation.getDelegatedPoolId(
+      selectedWallet.publicDeriverId
+    );
     if (urlTemplate != null) {
       const totalAda = this._getTotalAda();
       const locale = this.props.stores.profile.currentLocale;
 
-      const publicDeriver = this.props.stores.wallets.selected;
-      if (publicDeriver == null) {
-        throw new Error(`${nameof(CardanoStakingPage)} no public deriver. Should never happen`);
-      }
-      const balance = publicDeriver.balance;
-      const isStakeRegistered = this.props.stores.delegation.isStakeRegistered(publicDeriver);
+      const balance = selectedWallet.balance;
+      const isStakeRegistered = this.props.stores.delegation.isStakeRegistered(
+        selectedWallet.publicDeriverId
+      );
       const isWalletWithNoFunds = balance != null && balance.getDefaultEntry().amount.isZero();
       const poolList = (delegatedPoolId != null && isStakeRegistered) ? [delegatedPoolId] : [];
 
@@ -119,11 +119,11 @@ class CardanoStakingPage extends Component<AllProps, State> {
               ticker={truncateToken(
                 getTokenName(
                   this.props.stores.tokenInfoStore.getDefaultTokenInfo(
-                    publicDeriver.networkId
+                    selectedWallet.networkId
                   )
                 )
               )}
-              isTestnet={isTestnet(getNetworkById(publicDeriver.networkId))}
+              isTestnet={isTestnet(getNetworkById(selectedWallet.networkId))}
             />
           ) : null}
 
@@ -227,7 +227,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
     const selectedWallet = this.props.stores.wallets.selected;
     if (selectedWallet == null) return null;
 
-    const selectedPoolInfo = this._getPoolInfo(selectedWallet);
+    const selectedPoolInfo = this._getPoolInfo(selectedWallet.publicDeriverId);
     if (selectedPoolInfo == null) return;
 
     const tooltipNotification = {
@@ -255,7 +255,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
         }}
         selectedExplorer={
           this.props.stores.explorers.selectedExplorer.get(
-            selectedWallet.getParent().getNetworkInfo().NetworkId
+            selectedWallet.networkId
           ) ??
           (() => {
             throw new Error('No explorer for wallet network');
@@ -336,7 +336,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
       return null;
     }
 
-    const networkInfo = selectedWallet.getParent().getNetworkInfo();
+    const networkInfo = getNetworkById(selectedWallet.networkId);
     const currentParams = networkInfo.BaseConfig.reduce(
       (acc, next) => Object.assign(acc, next),
       {}
@@ -414,9 +414,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
           )}
           getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
           isSubmitting={this.props.stores.wallets.sendMoneyRequest.isExecuting}
-          isHardware={
-            selectedWallet.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET
-          }
+          isHardware={selectedWallet.type !== 'mnemonic'}
           onCancel={this.cancel}
           onSubmit={async ({ password }) => {
             await this.props.actions.ada.delegationTransaction.signTransaction.trigger({
@@ -429,7 +427,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
           error={this.props.stores.wallets.sendMoneyRequest.error}
           selectedExplorer={
             this.props.stores.explorers.selectedExplorer.get(
-              selectedWallet.getParent().getNetworkInfo().NetworkId
+              selectedWallet.networkId
             ) ??
             (() => {
               throw new Error('No explorer for wallet network');

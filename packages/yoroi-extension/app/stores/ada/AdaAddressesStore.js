@@ -1,15 +1,8 @@
 // @flow
 
 import Store from '../base/Store';
-import {
-  PublicDeriver,
-} from '../../api/ada/lib/storage/models/PublicDeriver/index';
-
 import type { StandardAddress, AddressTypeName, } from '../../types/AddressFilterTypes';
 import { AddressGroupTypes, AddressSubgroup } from '../../types/AddressFilterTypes';
-import {
-  asGetStakingKey,
-} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import {
   unwrapStakingKey,
 } from '../../api/ada/lib/storage/bridge/utils';
@@ -24,22 +17,11 @@ import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export async function filterMangledAddresses(request: {|
-  publicDeriver: PublicDeriver<>,
+  +publicDeriver: { stakingAddress: string, ... },
   baseAddresses: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
   invertFilter: boolean,
 |}): Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> {
-  const withStakingKey = asGetStakingKey(request.publicDeriver);
-  if (withStakingKey == null) {
-    if (request.invertFilter) return [];
-    return request.baseAddresses.map(info => ({
-      ...info,
-      address: info.address
-    }));
-  }
-
-  const stakingKeyResp = await withStakingKey.getStakingKey();
-
-  const stakingKey = unwrapStakingKey(stakingKeyResp.addr.Hash);
+  const stakingKey = unwrapStakingKey(request.publicDeriver.stakingAddress);
 
   const filterResult = filterAddressesByStakingKey<StandardAddress>(
     stakingKey,
@@ -98,7 +80,7 @@ export default class AdaAddressesStore extends Store<StoresMap, ActionsMap> {
     if (selectedWallet == null) {
       return true;
     }
-    return selectedWallet.getParent().getNetworkInfo().NetworkId === networks.CardanoMainnet.NetworkId;
+    return selectedWallet.networkId === networks.CardanoMainnet.NetworkId;
   }
 
   getSupportedAddressDomainBannerState(): boolean {
@@ -159,7 +141,7 @@ export default class AdaAddressesStore extends Store<StoresMap, ActionsMap> {
   }
 
   storewiseFilter: {|
-    publicDeriver: PublicDeriver<>,
+    +publicDeriver: { stakingAddress: string, ... },
     storeName: AddressTypeName,
     addresses: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
   |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {

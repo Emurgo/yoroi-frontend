@@ -15,13 +15,14 @@ export default class TrezorSendActions {
   sendUsingTrezor: AsyncAction<{|
     params: SendUsingTrezorParams,
     onSuccess?: void => void,
-    wallet: {
+    +wallet: {
       publicDeriverId: number,
       stakingAddressing: Addressing,
       publicKey: string,
       pathToPublic: Array<number>,
       networkId: number,
       hardwareWalletDeviceId: ?string,
+      +plate: { TextPart: string, ... },
       ...
     },
   |}> = new AsyncAction();

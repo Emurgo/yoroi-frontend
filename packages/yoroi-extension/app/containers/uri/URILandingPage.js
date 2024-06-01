@@ -50,6 +50,6 @@ export default class URILandingPage extends Component<StoresAndActionsProps> {
       return false;
     });
 
-    return firstCardanoWallet !== undefined ? firstCardanoWallet : null;
+    return firstCardanoWallet !== undefined ? firstCardanoWallet.publicDeriverId : null;
   }
 }

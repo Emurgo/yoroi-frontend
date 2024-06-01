@@ -33,7 +33,7 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
   @action addObservedWallet: ({
     publicDeriverId: number,
     networkId: number,
-    defaultTokenId: string
+    defaultTokenId: string,
     ...
   }) => void = (
     { publicDeriverId, networkId, defaultTokenId }

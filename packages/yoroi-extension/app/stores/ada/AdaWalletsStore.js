@@ -33,78 +33,87 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
     broadcastRequest:
       | {|
           normal: {|
-            publicDeriverId: number,
+            +wallet: {
+              publicDeriverId: number,
+              +plate: { TextPart: string, ... },
+              ...
+            },
             signRequest: HaskellShelleyTxSignRequest,
             password: string,
           |},
         |}
       | {|
           trezor: {|
-            publicDeriverId: number,
             signRequest: HaskellShelleyTxSignRequest,
-            publicKey: string,
-            pathToPublic: Array<number>,
-            stakingAddressing: Addressing,
-            networkId: number,
-            hardwareWalletDeviceId: string,
+            +wallet: {
+              publicDeriverId: number,
+              +plate: { TextPart: string, ... },
+              publicKey: string,
+              pathToPublic: Array<number>,
+              stakingAddressing: Addressing,
+              networkId: number,
+              hardwareWalletDeviceId: ?string,
+              ...
+            },
           |},
         |}
       | {|
           ledger: {|
-            publicDeriverId: number,
             signRequest: HaskellShelleyTxSignRequest,
-            stakingAddressing: Addressing,
-            publicKey: string,
-            pathToPublic: Array<number>,
-            networkId: number,
-            hardwareWalletDeviceId: string,
+            +wallet: {
+              publicDeriverId: number,
+              +plate: { TextPart: string, ... },
+              stakingAddressing: Addressing,
+              publicKey: string,
+              pathToPublic: Array<number>,
+              networkId: number,
+              hardwareWalletDeviceId: ?string,
+              ...
+            }
           |},
         |},
     refreshWallet: () => Promise<void>,
   |}) => Promise<void> = async request => {
-    const broadcastRequest = async () => {
-      if (request.broadcastRequest.ledger) {
+    let broadcastRequest;
+    let publicDeriverId;
+    let plateTextPart;
+
+    if (request.broadcastRequest.ledger) {
+      broadcastRequest = async () => {
         return await this.stores.substores.ada.ledgerSend.signAndBroadcastFromWallet({
           params: { signRequest: request.broadcastRequest.ledger.signRequest },
-          publicDeriverId: request.broadcastRequest.ledger.publicDeriverId,
-          publicKey: request.broadcastRequest.ledger.publicKey,
-          pathToPublic: request.broadcastRequest.ledger.pathToPublic,
-          networkId: request.broadcastRequest.ledger.networkId,
-          hardwareWalletDeviceId: request.broadcastRequest.ledger.hardwareWalletDeviceId,
+          wallet: request.broadcastRequest.ledger.wallet,
         });
-      }
-      if (request.broadcastRequest.trezor) {
+      };
+      publicDeriverId = request.broadcastRequest.ledger.wallet.publicDeriverId;
+      plateTextPart = request.broadcastRequest.ledger.wallet.plate.TextPart;
+    } else if (request.broadcastRequest.trezor) {
+      broadcastRequest = async () => {
         return await this.stores.substores.ada.trezorSend.signAndBroadcast({
           params: { signRequest: request.broadcastRequest.trezor.signRequest },
-          publicDeriverId: request.broadcastRequest.trezor.publicDeriverId,
-          publicKey: request.broadcastRequest.trezor.publicKey,
-          pathToPublic: request.broadcastRequest.trezor.pathToPublic,
-          stakingAddressing: request.broadcastRequest.trezor.stakingAddressing,
-          networkId: request.broadcastRequest.trezor.networkId,
-          hardwareWalletDeviceId: request.broadcastRequest.trezor.hardwareWalletDeviceId,
+          wallet: request.broadcastRequest.trezor.wallet,
         });
-      }
-      if (request.broadcastRequest.normal) {
+      };
+      publicDeriverId = request.broadcastRequest.trezor.wallet.publicDeriverId;
+      plateTextPart = request.broadcastRequest.trezor.wallet.plate.TextPart;
+    } else if (request.broadcastRequest.normal) {
+      broadcastRequest = async () => {
         return await this.stores.substores.ada.mnemonicSend.signAndBroadcast(
           request.broadcastRequest.normal
         );
-      }
+      };
+      publicDeriverId = request.broadcastRequest.normal.wallet.publicDeriverId;
+      plateTextPart = request.broadcastRequest.normal.wallet.plate.TextPart;
+    } else {
       throw new Error(
         `${nameof(AdaWalletsStore)}::${nameof(this.adaSendAndRefresh)} unhandled wallet type`
       );
     };
-    const publicDeriverId = (() => {
-      if (request.broadcastRequest.ledger) return request.broadcastRequest.ledger.publicDeriverId;
-      if (request.broadcastRequest.trezor) return request.broadcastRequest.trezor.publicDeriverId;
-      if (request.broadcastRequest.normal) return request.broadcastRequest.normal.publicDeriverId;
-      throw new Error(
-        `${nameof(AdaWalletsStore)}::${nameof(this.adaSendAndRefresh)} unhandled wallet type`
-      );
-    })();
     await this.stores.wallets.sendAndRefresh({
       publicDeriverId,
       broadcastRequest,
       refreshWallet: request.refreshWallet,
+      plateTextPart,
     });
   };
 
@@ -151,12 +160,15 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
   |} => Promise<void> = async (request) => {
     const { selectedNetwork } = this.stores.profile;
     if (selectedNetwork == null) throw new Error(`${nameof(this._createInDb)} no network selected`);
-    await createWallet({
-      walletName: request.walletName,
-      walletPassword: request.walletPassword,
-      recoveryPhrase: request.recoveryPhrase.join(' '),
-      networkId: selectedNetwork.NetworkId,
-      accountIndex: 0 + HARD_DERIVATION_START,
-    });
+    await this.stores.wallets.createWalletRequest.execute(async () => {
+      const wallet = await createWallet({
+        walletName: request.walletName,
+        walletPassword: request.walletPassword,
+        recoveryPhrase: request.recoveryPhrase.join(' '),
+        networkId: selectedNetwork.NetworkId,
+        accountIndex: 0 + HARD_DERIVATION_START,
+      });
+      return wallet;
+    }).promise;
   };
 }

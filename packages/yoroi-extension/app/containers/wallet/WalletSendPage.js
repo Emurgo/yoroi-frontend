@@ -395,12 +395,8 @@ class WalletSendPage extends Component<AllProps> {
           onSubmit={
             () => ledgerSendAction.sendUsingLedgerWallet.trigger({
               params: { signRequest },
-              publicDeriverId: selected.publicDeriverId,
               onSuccess: this.openTransactionSuccessDialog,
-              stakingAddressing: selected.stakingAddressing,
-              publicKey: selected.publicKey,
-              pathToPublic: selected.pathToPublic,
-              networkId: selected.networkId,
+              wallet: selected,
             })
           }
           onCancel={ledgerSendAction.cancel.trigger}
@@ -434,12 +430,8 @@ class WalletSendPage extends Component<AllProps> {
           onSubmit={
             () => trezorSendAction.sendUsingTrezor.trigger({
               params: { signRequest },
-              publicDeriverId: selected.publicDeriverId,
               onSuccess: this.openTransactionSuccessDialog,
-              stakingAddressing: selected.stakingAddressing,
-              publicKey: selected.publicKey,
-              pathToPublic: selected.pathToPublic,
-              networkId: selected.networkId,
+              wallet: selected,
             })
           }
           onCancel={trezorSendAction.cancel.trigger}

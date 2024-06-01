@@ -26,7 +26,11 @@ export default class AdaMnemonicSendStore extends Store<StoresMap, ActionsMap> {
   _sendMoney:  {|
     signRequest: ISignRequest<any>,
     password: string,
-    publicDeriverId: number,
+    +wallet: {
+      publicDeriverId: number,
+      +plate: { TextPart: string, ... },
+      ...
+    },
     onSuccess?: void => void,
   |} => Promise<void> = async (request) => {
     if (!(request.signRequest instanceof HaskellShelleyTxSignRequest)) {
@@ -36,12 +40,12 @@ export default class AdaMnemonicSendStore extends Store<StoresMap, ActionsMap> {
     await this.stores.substores.ada.wallets.adaSendAndRefresh({
       broadcastRequest: {
         normal: {
-          publicDeriverId: request.publicDeriverId,
+          wallet: request.wallet,
           password: request.password,
           signRequest: request.signRequest,
         },
       },
-      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriverId),
+      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
     });
 
     this.actions.dialogs.closeActiveDialog.trigger();

@@ -20,13 +20,9 @@ import { SelectedExplorer, defaultToSelectedExplorer } from '../../domain/Select
 import { lf$Database } from 'lovefield';
 import ExplorerActions from '../../actions/common/explorer-actions';
 
-interface LoadingStore {
-  getDatabase(): ?lf$Database
-}
 export default class BaseExplorerStore
   <
     TStores: {
-      +loading: LoadingStore,
       ...,
     },
     TActions: { +explorers: ExplorerActions, ... },
@@ -48,6 +44,7 @@ export default class BaseExplorerStore
   // ========== Selected Explorer ========== //
 
   @computed get selectedExplorer(): Map<number, SelectedExplorer> {
+    /*
     const db = this.stores.loading.getDatabase();
     if (db == null) throw new Error(`${nameof(BaseExplorerStore)}::${nameof(this.selectedExplorer)} called before storage was initialized`);
     if (this.getSelectedExplorerRequest.result == null) {
@@ -56,27 +53,35 @@ export default class BaseExplorerStore
       return defaultToSelectedExplorer();
     }
     const { result } = this.getSelectedExplorerRequest;
+    */
     const convertedMap: Map<number, SelectedExplorer> = new Map();
+    /*
     for (const [networkId, v] of result.entries()) {
       convertedMap.set(networkId, new SelectedExplorer({ backup: v.backup, selected: v.selected }));
     }
+    */
     return convertedMap;
   }
 
   @computed get allExplorers(): GetAllExplorersResponse {
+    /*
     const db = this.stores.loading.getDatabase();
     if (db == null) throw new Error(`${nameof(BaseExplorerStore)}::${nameof(this.allExplorers)} called before storage was initialized`);
     if (this.getAllExplorerRequest.result == null) {
       // when still loading, just return the defaults
       this.getAllExplorerRequest.execute({ db });
+    */
       return prepackagedExplorers;
+    /*
     }
     return this.getAllExplorerRequest.result;
+    */
   }
 
   setSelectedExplorer: {|
     explorer: $ReadOnly<ExplorerRow>,
   |} => Promise<void> = async (request): Promise<void> => {
+    /*
     const db = this.stores.loading.getDatabase();
     if (db == null) throw new Error(`${nameof(BaseExplorerStore)}::${nameof(this.setSelectedExplorer)} called before storage was initialized`);
     await this.setSelectedExplorerRequest.execute({
@@ -84,5 +89,6 @@ export default class BaseExplorerStore
       ...request
     });
     await this.getSelectedExplorerRequest.execute({ db }); // eagerly cache
+    */
   };
 }

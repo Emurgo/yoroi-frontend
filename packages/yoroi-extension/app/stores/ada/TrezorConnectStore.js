@@ -26,7 +26,7 @@ import { Bip44DerivationLevels, } from '../../api/ada/lib/storage/database/walle
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { createHardwareWallet } from '../../api/thunk';
-import type { CreateHardwareWalletRequest } from '../../api/thunk';
+import type { CreateHardwareWalletRequestType } from '../../api/thunk';
 import type { WalletState } from '../../../chrome/extension/background/types';
 
 type TrezorConnectionResponse = {|
@@ -327,7 +327,7 @@ export default class TrezorConnectStore
     }
   };
 
-  _prepareCreateHWReqParams: string => CreateHardwareWalletRequest = (
+  _prepareCreateHWReqParams: string => CreateHardwareWalletRequestType = (
     walletName,
   ) => {
     if (this.hwDeviceInfo == null

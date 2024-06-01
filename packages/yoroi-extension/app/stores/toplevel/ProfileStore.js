@@ -103,7 +103,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
           this.actions.router.goToRoute.trigger({ route: ROUTES.SEND_FROM_URI.ROOT });
         } else {
           const firstWallet =
-            wallets.publicDerivers.length !== 0 ? wallets.publicDerivers[0] : null;
+            wallets.wallets.length !== 0 ? wallets.wallets[0] : null;
           if (firstWallet == null) {
             this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
             return;
@@ -113,13 +113,13 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
             const lastSelectedWallet = this.stores.wallets.getLastSelectedWallet();
             this.actions.router.goToRoute.trigger({
               route: ROUTES.WALLETS.ROOT,
-              publicDeriver: lastSelectedWallet ?? firstWallet,
+              publicDeriverId: lastSelectedWallet?.publicDeriverId ?? firstWallet.publicDeriverId,
             });
-          } else if (wallets.publicDerivers.length === 1) {
+          } else if (wallets.wallets.length === 1) {
             // if user only has 1 wallet, just go to it directly as a shortcut
             this.actions.router.goToRoute.trigger({
               route: ROUTES.WALLETS.ROOT,
-              publicDeriver: firstWallet,
+              publicDeriverId: firstWallet.publicDeriverId,
             });
           } else {
             this.actions.router.goToRoute.trigger({

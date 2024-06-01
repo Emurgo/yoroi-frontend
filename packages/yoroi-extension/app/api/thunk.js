@@ -5,11 +5,12 @@ import { loadLovefieldDBFromDump } from './ada/lib/storage/database';
 import type { lf$Database, } from 'lovefield';
 import type { WalletState } from '../../chrome/extension/background/types';
 import { HaskellShelleyTxSignRequest } from './ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import type { TokenRow } from './ada/lib/storage/database/primitives/tables';
-import type { TxMemoTableInsert, TxMemoTableRow, TxMemoLookupKey, } from './ada/lib/storage/bridge/memos';
+import type { NetworkRow, TokenRow } from './ada/lib/storage/database/primitives/tables';
+import type { TxMemoLookupKey, } from './ada/lib/storage/bridge/memos';
+import type { TxMemoTableInsert, TxMemoTableRow, } from './ada/lib/storage/database/memos/tables';
 import { RustModule } from './ada/lib/cardanoCrypto/rustLoader';
 import type { CardanoAddressedUtxo } from './ada/transactions/types';
-
+import type { HWFeatures, } from './ada/lib/storage/database/walletTypes/core/tables';
 
 /*::
 declare var chrome;
@@ -42,7 +43,7 @@ export async function getDb(): Promise<lf$Database> {
   return await loadLovefieldDBFromDump(schema.DataStoreType.MEMORY, data);
 }
 
-export async function getWallets(): Promise<WalletState> {
+export async function getWallets(): Promise<Array<WalletState>> {
   return await callBackground({ type: 'get-wallets' });
 }
 
@@ -110,14 +111,15 @@ type UserSignAndBroadcastRequestType = {|
   password: string,
   publicDeriverId: number,
 |};
-export type SignAndBroadcastRequestType = {
+export type SignAndBroadcastRequestType = {|
+  publicDeriverId: number,
   senderUtxos: Array<CardanoAddressedUtxo>,
   unsignedTx: string,
-  metadata: string,
+  metadata: ?string,
   wits: Array<string>,
   password: string,
   txHash: string,
-};
+|};
 export async function signAndBroadcast(request: UserSignAndBroadcastRequestType): Promise<{| txId: string |}> {
   const txBody = request.signRequest.unsignedTx.build();
   const txHash = RustModule.WalletV4.hash_transaction(txBody);
@@ -136,9 +138,10 @@ export async function signAndBroadcast(request: UserSignAndBroadcastRequestType)
   return await callBackground({ type: 'sign-and-broadcast', serializableRequest, });
 }
 
+// Only mnemonic wallet has private staking key.
 export async function getPrivateStakingKey(
   request: {| publicDeriverId: number, password: string |}
-): Promise<string> {
+): Promise<?string> {
   return await callBackground({ type: 'get-private-staking-key', request });
 }
 
@@ -160,10 +163,14 @@ export async function deleteTxMemo(
   await callBackground({ type: 'delete-tx-memo', request, });
 }
 
-export async function getAllTxMemos(): Promise<$ReadOnlyArray<$ReadOnly<TxMemoTableRow>>> {
-  await callBackground({ type: 'get-all-tx-memos' });
+export async function getAllTxMemos(): Promise<Array<TxMemoTableRow>>{
+  return await callBackground({ type: 'get-all-tx-memos' });
 }
 
 export async function removeAllTransactions(request: {| publicDeriverId: number |}): Promise<void> {
   await callBackground({ type: 'remove-all-transactions' });
+}
+
+export async function popAddress(request: { publicDeriverId: number, ... }): Promise<void> {
+  await callBackground({ type: 'pop-address', request });
 }

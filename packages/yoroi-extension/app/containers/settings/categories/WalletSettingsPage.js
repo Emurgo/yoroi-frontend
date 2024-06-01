@@ -47,6 +47,10 @@ export default class WalletSettingsPage extends Component<StoresAndActionsProps>
       );
     }
     const selectedWallet = walletsStore.selected;
+    let signingKeyUpdateDate = null;
+    if (selectedWallet.signingKeyUpdateDate) {
+      signingKeyUpdateDate = new Date(selectedWallet.signingKeyUpdateDate);
+    }
 
     return (
       <div id="walletSettingsPage">
@@ -65,7 +69,7 @@ export default class WalletSettingsPage extends Component<StoresAndActionsProps>
           onFieldValueChange={async (field, value) => {
             if (field === 'name') {
               await renameConceptualWallet.trigger({
-                publicDeriverId: selectedWallet.publicDeriverId,
+                conceptualWalletId: selectedWallet.conceptualWalletId,
                 newName: value,
               });
             }
@@ -77,14 +81,14 @@ export default class WalletSettingsPage extends Component<StoresAndActionsProps>
           nameValidator={name => isValidWalletName(name)}
           classicTheme={profile.isClassicTheme}
         />
-        {selectedWallet.type === 'mnemonics' && (
+        {selectedWallet.type === 'mnemonic' && (
           <SpendingPasswordSetting
             openDialog={() =>
               actions.dialogs.open.trigger({
                 dialog: ChangeWalletPasswordDialogContainer,
               })
             }
-            walletPasswordUpdateDate={selectedWallet.signingKeyUpdateDate}
+            walletPasswordUpdateDate={signingKeyUpdateDate}
             classicTheme={profile.isClassicTheme}
           />
         )}

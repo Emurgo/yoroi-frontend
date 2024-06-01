@@ -107,10 +107,6 @@ export interface HWConnectStoreTypes<ConnectionResponse> {
     walletName: string,
   ): Promise<void>;
 
-  _prepareCreateHWReqParams(
-    walletName: string,
-  ): CreateHardwareWalletRequest;
-
   _onSaveSuccess(wallet: WalletState): Promise<void>;
   // =================== SAVE =================== //
 

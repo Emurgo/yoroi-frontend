@@ -79,13 +79,16 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
 
     const accountIndex = this.stores.walletRestore.selectedAccount;
 
-    await createWallet({
-      recoveryPhrase,
-      walletName,
-      walletPassword,
-      networkId: selectedNetwork.NetworkId,
-      accountIndex,
-    });
+    await this.stores.wallets.restoreRequest.execute(async () => {
+      const wallet = await createWallet({
+        recoveryPhrase,
+        walletName,
+        walletPassword,
+        networkId: selectedNetwork.NetworkId,
+        accountIndex,
+      });
+      return wallet;
+    }).promise;
   };
 
   teardown(): void {
