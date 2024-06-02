@@ -5,6 +5,9 @@ import {
   asGetAllUtxos,
   asHasUtxoChains,
   asDisplayCutoff,
+  asGetSigningKey,
+  asGetAllAccounting,
+  asHasLevels,
 } from '../../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   CardanoTx,
@@ -68,7 +71,7 @@ import {
   connectorGetDRepKey, connectorGetStakeKey,
 } from '../../connector/api';
 import {
-  updateTransactions as cardanoUpdateTransactions
+  updateTransactions as cardanoUpdateTransactions,
   removeAllTransactions,
   genCardanoAssetMap,
 } from '../../../../app/api/ada/lib/storage/bridge/updateTransactions';
@@ -77,7 +80,7 @@ import type { IFetcher as CardanoIFetcher } from '../../../../app/api/ada/lib/st
 import { RemoteFetcher as CardanoRemoteFetcher } from '../../../../app/api/ada/lib/state-fetch/remoteFetcher';
 import { BatchedFetcher as CardanoBatchedFetcher } from '../../../../app/api/ada/lib/state-fetch/batchedFetcher';
 import LocalStorageApi, {
-  loadSubmittedTransactions,
+  loadSubmittedTransactions, persistSubmittedTransactions
 } from '../../../../app/api/localStorage/index';
 import { RustModule } from '../../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { Logger, stringifyError } from '../../../../app/utils/logging';
@@ -124,7 +127,6 @@ import {
   getAllSchemaTables,
   raii,
 } from '../../../../app/api/ada/lib/storage/database/utils';
-import { loadSubmittedTransactions, persistSubmittedTransactions, } from '../../../../app/api/localStorage';
 import { upsertTxMemo, deleteTxMemo, getAllTxMemo } from '../../../../app/api/ada/lib/storage/bridge/memos';
 
 const YOROI_MESSAGES = Object.freeze({
@@ -141,7 +143,7 @@ const YOROI_MESSAGES = Object.freeze({
   GET_DB: 'get-db',
   SUBSCRIBE_WALLET_STATE_CHANGES: 'subscribe-wallet-state-changes',
   CREATE_WALLET: 'create-wallet',
-  CREAET_HARDWARE_WALLET: 'create-hardware-wallet',
+  CREATE_HARDWARE_WALLET: 'create-hardware-wallet',
   REMOVE_WALLET: 'remove-wallet',
   GET_WALLETS: 'get-wallets',
   CHANGE_SIGNING_PASSWORD: 'change-signing-password',
@@ -593,18 +595,17 @@ export async function yoroiMessageHandler(
   } else if (request.type === YOROI_MESSAGES.CREATE_HARDWARE_WALLET) {
     try {
       const db = await getDb();
-      const network = getNetworkById(request.request.networkId);
 
       const stateFetcher = await getCardanoStateFetcher(new LocalStorageApi());
 
       const adaApi = new AdaApi();
       await adaApi.createHardwareWallet({
         db,
-        network,
+        network: request.request.network,
         walletName: request.request.walletName,
         publicKey: request.request.publicKey,
         hwFeatures: request.request.hwFeatures,
-        checkAddreessesInUse: stateFetcher.checkAddressesInUse,
+        checkAddressesInUse: stateFetcher.checkAddressesInUse,
         addressing: request.request.addressing,
       });
     } catch(error) {
@@ -614,7 +615,7 @@ export async function yoroiMessageHandler(
     sendResponse({ error: null });
   } else if (request.type === YOROI_MESSAGES.REMOVE_WALLET) {
     // fixme: notify all tabs
-    const publicDeriver = getPublicDeriverById(request.request.publicDeriverId);
+    const publicDeriver = await getPublicDeriverById(request.request.publicDeriverId);
     if (publicDeriver) {
       await removePublicDeriver({
         publicDeriver,
@@ -628,7 +629,7 @@ export async function yoroiMessageHandler(
     const result = await Promise.all(publicDerivers.map(getWalletState));
     sendResponse(result);
   } else if (request.type === YOROI_MESSAGES.CHANGE_SIGNING_PASSWORD) {
-    const publicDeriver = getPublicDeriverById(request.request.publicDeriverId);
+    const publicDeriver = await getPublicDeriverById(request.request.publicDeriverId);
     if (publicDeriver) {
       const withSigningKey = asGetSigningKey(publicDeriver);
       if (withSigningKey == null) {
@@ -643,7 +644,7 @@ export async function yoroiMessageHandler(
       sendResponse(null);
     }
   } else if (request.type === YOROI_MESSAGES.RENAME_PUBLIC_DERIVER) {
-    const publicDeriver = getPublicDeriverById(request.request.publicDeriverId);
+    const publicDeriver = await getPublicDeriverById(request.request.publicDeriverId);
     if (publicDeriver) {
       await publicDeriver.rename({ newName: request.request.newName });
     }
@@ -657,12 +658,12 @@ export async function yoroiMessageHandler(
     }
     sendResponse(null);
   } else if (request.type === YOROI_MESSAGES.SIGN_AND_BROADCAST) {
-    const publicDeriver = getPublicDeriverById(request.request.publicDeriverId);
+    const publicDeriver = await getPublicDeriverById(request.request.publicDeriverId);
     if (!publicDeriver) {
       sendResponse({ error: 'no public deriver' });
       return;
     }
-    const { senderUtxos, unsignedTx, metadata, wits, txHash } = request.request;
+    const { senderUtxos, unsignedTx, metadata, wits, neededHashes, txHash } = request.request;
 
     try {
       const withSigning = asGetSigningKey(publicDeriver);
@@ -670,11 +671,10 @@ export async function yoroiMessageHandler(
         throw new Error('unexpected missing asGetSigningKey result');
       }
 
-      const { neededStakingKeyHashes } = request.request.signRequest;
-      if (neededStakingKeyHashes.neededHashes.size - neededStakingKeyHashes.wits.size >= 2) {
+      if (neededHashes.length - wits.length >= 2) {
         throw new Error('Too many missing witnesses');
       }
-      if (neededStakingKeyHashes.neededHashes.size !== neededStakingKeyHashes.wits.size) {
+      if (neededHashes.length !== wits.length) {
         const withStakingKey = asGetAllAccounting(withSigning);
         if (withStakingKey == null) {
           throw new Error('unexpected missing asGetAllAcccounting result');
@@ -683,16 +683,16 @@ export async function yoroiMessageHandler(
           publicDeriver: withStakingKey,
           password: request.request.password,
         });
-        if (request.request.signRequest.neededStakingKeyHashes.neededHashes.has(
+        if (neededHashes.includes(
           Buffer.from(
             RustModule.WalletV4.Credential.from_keyhash(
               stakingKey.to_public().hash()
             ).to_bytes()
           ).toString('hex')
         )) {
-          neededStakingKeyHashes.wits.add(
+          wits.push(
             Buffer.from(RustModule.WalletV4.make_vkey_witness(
-              RustModule.WalletV4.hash_transaction.from_hex(txHash)
+              RustModule.WalletV4.TransactionHash.from_hex(txHash),
               stakingKey
             ).to_bytes()).toString('hex')
           );
@@ -704,7 +704,7 @@ export async function yoroiMessageHandler(
       const signRequest = {
         senderUtxos,
         unsignedTx: Buffer.from(unsignedTx, 'hex'),
-        metadata: metadata ?? RustModule.WalletV4.AuxiliaryData.from_hex(metadata),
+        metadata: metadata ? RustModule.WalletV4.AuxiliaryData.from_hex(metadata) : undefined,
         neededStakingKeyHashes: {
           wits: new Set(wits),
         },
@@ -723,7 +723,7 @@ export async function yoroiMessageHandler(
       sendResponse({ error: error.message });
     }
   } else if (request.type === YOROI_MESSAGES.GET_PRIVATE_STAKING_KEY) {
-    const publicDeriver = getPublicDeriverById(request.request.publicDeriverId);
+    const publicDeriver = await getPublicDeriverById(request.request.publicDeriverId);
     if (!publicDeriver) {
       sendResponse({ error: 'no public deriver' });
       return;
@@ -772,7 +772,7 @@ export async function yoroiMessageHandler(
         )
       )
     );
-    sendResponse([... assertMap.values()]);
+    sendResponse([... assetMap.values()]);
   } else if (request.type === YOROI_MESSAGES.UPSERT_TX_MEMO) {
     const db = await getDb();
     const response = await upsertTxMemo({ db, memo: request.request.memo });
@@ -783,15 +783,19 @@ export async function yoroiMessageHandler(
     sendResponse(null);
   } else if (request.type === YOROI_MESSAGES.GET_ALL_TX_MEMOS) {
     const db = await getDb();
-    const memos = await getAllTxMemos({ db });
+    const memos = await getAllTxMemo({ db });
     sendResponse(memos);
   } else if (request.type === YOROI_MESSAGES.REMOVE_ALL_TRANSACTIONS) {
-    const publicDeriver = getPublicDeriverById(request.request.publicDeriverId);
+    const publicDeriver: ?PublicDeriver<> = await getPublicDeriverById(request.request.publicDeriverId);
     if (!publicDeriver) {
       sendResponse({ error: 'no public dervier'});
       return;
     }
-    await removeAllTransactions({ publicDeriver });
+    const withLevels = asHasLevels(publicDeriver);
+    if (!withLevels) {
+      throw new Error('unexpected missing asHasLevels result');
+    }
+    await removeAllTransactions({ publicDeriver: withLevels });
 
     for (let i = 0; i < this._submittedTransactions.length; ) {
       if (this._submittedTransactions[i].publicDeriverId === publicDeriver.publicDeriverId) {
@@ -811,7 +815,7 @@ export async function yoroiMessageHandler(
     await persistSubmittedTransactions(filteredTxs);
     sendResponse(null);
   } else if (request.type === YOROI_MESSAGES.POP_ADDRESS) {
-    const publicDeriver = getPublicDeriverById(request.request.publicDeriverId);
+    const publicDeriver = await getPublicDeriverById(request.request.publicDeriverId);
     if (!publicDeriver) {
       sendResponse({ error: 'no public dervier'});
       return;
@@ -831,7 +835,7 @@ export function isYoroiMessage({ type }: {| type: string |}): boolean {
   return Object.values(YOROI_MESSAGES).includes(type);
 }
 
-function getPublicDeriverById(publicDeriverId: number): ?PublicDeriver<> {
+async function getPublicDeriverById(publicDeriverId: number): Promise<?PublicDeriver<>> {
   const db = await getDb();
   for (let publicDeriver of await loadWalletsFromStorage(db)) {
     if (publicDeriver.getPublicDeriverId() === publicDeriverId) {

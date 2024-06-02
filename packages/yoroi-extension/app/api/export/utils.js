@@ -26,9 +26,7 @@ export async function sendFileToUser(data: Blob, fileName: string): Promise<void
 
 export async function getWalletChecksum(
   publicDeriver: ReturnType<typeof asGetPublicKey>,
-): Promise<void | WalletChecksum> {
-  if (publicDeriver == null) return undefined;
-
+): Promise<WalletChecksum> {
   const hash = (await publicDeriver.getPublicKey()).Hash;
 
   const isLegacyWallet =

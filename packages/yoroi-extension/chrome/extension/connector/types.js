@@ -8,9 +8,11 @@ import type { RemoteUnspentOutput } from '../../../app/api/ada/lib/state-fetch/t
 import type { IGetAllUtxosResponse } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type {
   CreateWalletRequestType,
-  CreateHardwareRequestType,
+  CreateHardwareWalletRequestType,
   ChangeSigningKeyPasswordRequestType,
   SignAndBroadcastRequestType,
+  UpsertTxMemoRequestType,
+  DeleteTxMemoRequestType,
 } from '../../../app/api/thunk';
 
 // ----- Types used in the dApp <-> Yoroi connection bridge ----- //
@@ -264,7 +266,7 @@ export type RenameConceptualWallet = {|
 |};
 export type SignAndBroadcast = {|
   type: 'sign-and-broadcast',
-  request: SignAndBroadcastRquestType,
+  request: SignAndBroadcastRequestType,
 |};
 export type GetPrivateStakingKey = {|
   type: 'get-private-staking-key',
@@ -276,11 +278,11 @@ export type GetCardanoAssets = {|
 |};
 export type UpsertTxMemo = {|
   type: 'upsert-tx-memo',
-  request: {| publicDeriverId: number, memo: TxMemoTableInsert | TxMemoTableRow |}
+  request: UpsertTxMemoRequestType,
 |};
 export type DeleteTxMemo = {|
   type: 'delete-tx-memo',
-  request: {| publicDeriverId: number, key: TxMemoLookupKey, |},
+  request: DeleteTxMemoRequestType,
 |};
 export type GetAllTxMemos = {|
   type: 'get-all-tx-memos';

@@ -26,8 +26,9 @@ import {
 } from '../../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
 import { Bip44Wallet } from '../../../../app/api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import { isTestnet, isCardanoHaskell} from '../../../../app/api/ada/lib/storage/database/prepackaged/networks';
+import AdaApi from '../../../../app/api/ada';
 
-export async function getWalletState(publicDeriver: PublicDeriver<>): WalletState {
+export async function getWalletState(publicDeriver: PublicDeriver<>): Promise<WalletState> {
   const conceptualWalletInfo = await publicDeriver.getParent().getFullConceptualWalletInfo();
 
   const type = (() => {
@@ -57,14 +58,11 @@ export async function getWalletState(publicDeriver: PublicDeriver<>): WalletStat
     throw new Error('unexpected missing receive address');
   }
 
-  let signingKeyUpdateDate = null;
-  const withSigningKey = asGetSigningKey(publicDeriver);
-  if (withSigningKey) {
-    const key = await withSigningKey.getSigningKey();
-    signingKeyUpdateDate = key.row.PasswordLastUpdate;
-  }
+  let signingKeyUpdateDate =
+    (await asGetSigningKey(publicDeriver)?.getSigningKey())?.row.PasswordLastUpdate?.toISOString()
+    || null;
 
-  const withStakingKey = asGetStakingKey(request.publicDeriver);
+  const withStakingKey = asGetStakingKey(publicDeriver);
   if (withStakingKey == null) {
     throw new Error('unexpected missing asGetAllAccounting result');
   }
@@ -84,19 +82,21 @@ export async function getWalletState(publicDeriver: PublicDeriver<>): WalletStat
   const externalAddressesByType = [];
   const internalAddressesByType = [];
 
-  for (let type of CoreAddressTypes) {
-    allAddressByType[type] = await getAllAddressesForDisplay({
+  for (let typeName of Object.keys(CoreAddressTypes)) {
+    const type = CoreAddressTypes[typeName];
+
+    allAddressesByType[type] = await getAllAddressesForDisplay({
       publicDeriver,
       type
     });
     externalAddressesByType[type] = await getChainAddressesForDisplay({
       publicDeriver: withUtxoChains,
-      chainsRequest: ChainDerivations.EXTERNAL,
+      chainsRequest: { chainId: ChainDerivations.EXTERNAL },
       type
     });
     internalAddressesByType[type] = await getChainAddressesForDisplay({
       publicDeriver: withUtxoChains,
-      chainsRequest: ChainDerivations.INTERNAL,
+      chainsRequest: { chainId: ChainDerivations.INTERNAL },
       type
     });
   }
@@ -120,7 +120,7 @@ export async function getWalletState(publicDeriver: PublicDeriver<>): WalletStat
     conceptualWalletId: publicDeriver.getParent().getConceptualWalletId(),
     utxos,
     transactions: [], // fixme
-    networkId: publicDeriver.networkId,
+    networkId: network.NetworkId,
     name: conceptualWalletInfo.Name,
     type,
     hardwareWalletDeviceId: publicDeriver.getParent().hardwareInfo?.DeviceId,
@@ -129,14 +129,15 @@ export async function getWalletState(publicDeriver: PublicDeriver<>): WalletStat
     receiveAddress,
     pathToPublic: withPubKey.pathToPublic,
     signingKeyUpdateDate,
-    stakingAddressing: stakingKeyDbRow.addressing,
+    stakingAddressing: { addressing: stakingKeyDbRow.addressing },
     stakingAddress: stakingKeyDbRow.addr.Hash,
-    publicDeriverLevel: publicDeriver.getParent().getPublicDeriverLevel(),
+    publicDeriverLevel: withLevels.getParent().getPublicDeriverLevel(),
     lastSyncInfo: await publicDeriver.getLastSyncInfo(),
     balance,
-    defaultTokenId: publicDeriver.getParent().getDefaultMultiToken().defaultTokenId,
+    defaultTokenId: publicDeriver.getParent().getDefaultMultiToken().defaults.defaultIdentifier,
     assuranceMode: assuranceModes.NORMAL,
-    firstExternalAddress,
+    allAddressesByType,
+    foreignAddresses,
     externalAddressesByType,
     internalAddressesByType,
     isBip44Wallet: publicDeriver.getParent() instanceof Bip44Wallet,

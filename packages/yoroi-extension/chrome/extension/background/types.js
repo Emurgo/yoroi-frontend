@@ -7,6 +7,7 @@ import type { CoreAddressT } from '../../../app/api/ada/lib/storage/database/pri
 import type { IGetAllUtxosResponse } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { AssuranceMode } from '../../../app/types/transactionAssurance.types';
 import type { MultiToken } from '../../../app/api/common/lib/MultiToken';
+import type { FullAddressPayload } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 
 export type WalletType = 'trezor' | 'ledger' | 'mnemonic';
 

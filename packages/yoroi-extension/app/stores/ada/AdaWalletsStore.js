@@ -79,31 +79,36 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
     let plateTextPart;
 
     if (request.broadcastRequest.ledger) {
+      const { wallet, signRequest } = request.broadcastRequest.ledger;
       broadcastRequest = async () => {
         return await this.stores.substores.ada.ledgerSend.signAndBroadcastFromWallet({
-          params: { signRequest: request.broadcastRequest.ledger.signRequest },
-          wallet: request.broadcastRequest.ledger.wallet,
+          params: { signRequest },
+          wallet,
         });
       };
-      publicDeriverId = request.broadcastRequest.ledger.wallet.publicDeriverId;
-      plateTextPart = request.broadcastRequest.ledger.wallet.plate.TextPart;
+      publicDeriverId = wallet.publicDeriverId;
+      plateTextPart = wallet.plate.TextPart;
     } else if (request.broadcastRequest.trezor) {
+      const { wallet, signRequest } = request.broadcastRequest.trezor;
       broadcastRequest = async () => {
         return await this.stores.substores.ada.trezorSend.signAndBroadcast({
-          params: { signRequest: request.broadcastRequest.trezor.signRequest },
-          wallet: request.broadcastRequest.trezor.wallet,
+          params: { signRequest },
+          wallet: wallet,
         });
       };
       publicDeriverId = request.broadcastRequest.trezor.wallet.publicDeriverId;
       plateTextPart = request.broadcastRequest.trezor.wallet.plate.TextPart;
     } else if (request.broadcastRequest.normal) {
+      const { wallet, signRequest, password } = request.broadcastRequest.normal;
       broadcastRequest = async () => {
-        return await this.stores.substores.ada.mnemonicSend.signAndBroadcast(
-          request.broadcastRequest.normal
-        );
+        return await this.stores.substores.ada.mnemonicSend.signAndBroadcast({
+          signRequest,
+          password,
+          publicDeriverId: wallet.publicDeriverId,
+        });
       };
-      publicDeriverId = request.broadcastRequest.normal.wallet.publicDeriverId;
-      plateTextPart = request.broadcastRequest.normal.wallet.plate.TextPart;
+      publicDeriverId = wallet.publicDeriverId;
+      plateTextPart = wallet.plate.TextPart;
     } else {
       throw new Error(
         `${nameof(AdaWalletsStore)}::${nameof(this.adaSendAndRefresh)} unhandled wallet type`

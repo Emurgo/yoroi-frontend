@@ -85,7 +85,7 @@ export async function removeWalletFromDb(request: {| publicDeriverId: number |})
   await callBackground({ type: 'remove-wallet', request, });
 }
 
-type ChangeSigningKeyPasswordRequestType = {|
+export type ChangeSigningKeyPasswordRequestType = {|
   publicDeriverId: number,
   oldPassword: string,
   newPassword: string,
@@ -116,6 +116,7 @@ export type SignAndBroadcastRequestType = {|
   senderUtxos: Array<CardanoAddressedUtxo>,
   unsignedTx: string,
   metadata: ?string,
+  neededHashes: Array<string>,
   wits: Array<string>,
   password: string,
   txHash: string,
@@ -128,6 +129,7 @@ export async function signAndBroadcast(request: UserSignAndBroadcastRequestType)
     senderUtxos: request.signRequest.senderUtxos,
     unsignedTx: txBody.to_hex(),
     metadata: request.signRequest.metadata?.to_hex(),
+    neededHashes: [...request.signRequest.neededStakingKeyHashes.neededHashes],
     wits: [...request.signRequest.neededStakingKeyHashes.wits],
     password: request.password,
     publicDeriverId: request.publicDeriverId,
@@ -151,15 +153,16 @@ export async function getCardanoAssets(
   return await callBackground({ type: 'get-cardano-assets', request, });
 }
 
-export async function upsertTxMemo(
-  request: {| publicDeriverId: number, memo: TxMemoTableInsert | TxMemoTableRow, |},
-): Promise<TxMemoTableRow> {
+export type UpsertTxMemoRequestType = {|
+  publicDeriverId: number,
+  memo: TxMemoTableInsert | TxMemoTableRow,
+|};
+export async function upsertTxMemo(request: UpsertTxMemoRequestType): Promise<TxMemoTableRow> {
   return await callBackground({ type: 'upsert-tx-memo', request, });
 }
 
-export async function deleteTxMemo(
-  request: {| publicDeriverId: number, key: TxMemoLookupKey, |},
-): Promise<void> {
+export type DeleteTxMemoRequestType = {| publicDeriverId: number, key: TxMemoLookupKey, |};
+export async function deleteTxMemo(request: DeleteTxMemoRequestType): Promise<void> {
   await callBackground({ type: 'delete-tx-memo', request, });
 }
 

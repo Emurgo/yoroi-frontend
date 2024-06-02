@@ -12,6 +12,7 @@ import { RustModule } from '../../../../app/api/ada/lib/cardanoCrypto/rustLoader
 import { getCardanoStateFetcher } from '../utils';
 import AdaApi from '../../../../app/api/ada';
 import type { WalletState } from '../types';
+import { asHasLevels } from '../../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 
 /*::
 declare var chrome;
@@ -73,38 +74,31 @@ export async function syncWallet(wallet: PublicDeriver<>): Promise<void> {
   notifyWalletState([wallet]);
 }
 
-async function getWalletState(wallet: PublicDeriver<>): Promise<WalletState> {
-  return {
-    publicDeriverId: wallet.getPublicDeriverId(),
-    utxos: await connectorGetUtxosCardano(
-      wallet,
-      null,
-      null,
-      RustModule.WalletV4.BigNum.from_str('0'), // we know this isn't used
-    ),
-    transactions: [],
-  };
-}
-
 async function notifyWalletState(wallets: Array<PublicDeriver<>>): Promise<void> {
-  const state = await Promise.all(wallets.map(getWalletState));
+  const state = null; // fixme await Promise.all(wallets.map(getWalletState));
   const json = JSON.stringify(state);
   for (const tabId of subscribedTabIds) {
     chrome.tabs.sendMessage(tabId, json);
   }    
 }
 
-async function _syncWallet(wallet: PublicDeriver<>): Promise<void> {
+async function _syncWallet(publicDeriver: PublicDeriver<>): Promise<void> {
   try {
     await RustModule.load();
     console.debug('sync started');
     const localStorageApi = new LocalStorageApi();
     const stateFetcher = await getCardanoStateFetcher(localStorageApi);
+
+    const withLevels = asHasLevels(publicDeriver);
+    if (!withLevels) {
+      throw new Error('unexpected missing asHasLevels result');
+    }
+
     const adaApi = new AdaApi();
     adaApi.refreshTransactions({
       // skip
       // number
-      publicDeriver: wallet,
+      publicDeriver: withLevels,
       isLocalRequest: false,
       beforeTx: undefined,
       afterTx: undefined,
@@ -125,11 +119,9 @@ async function _syncWallet(wallet: PublicDeriver<>): Promise<void> {
 
 const subscribedTabIds: Array<number> = [];
 
-export async function subscribeWalletStateChanges(tabId: number): Promise<Array<WalletState>> {
+export async function subscribeWalletStateChanges(tabId: number): Promise<void> {
   subscribedTabIds.push(tabId);
-  const wallets = await getWallets({ db: await _getDb()});
-  const state = await Promise.all(wallets.map(wallet => getWalletState(wallet)));
-  return state;
+  //fixme
 }
 
 chrome.tabs.onRemoved.addListener((tabId: number, _info) => {
