@@ -58,16 +58,13 @@ export const GovernanceStatusSelection = (): Node => {
     useErrorBoundary: true,
   });
 
-  const pageTitle = governanceVote === 'none' ? 'Register in Governance' : strings.governanceStatus;
-  const statusRawText = mapStatus[governanceVote];
-  const pageSubtitle =
-    governanceVote === 'none'
-      ? 'Review the selections carefully to assign yourself a Governance Status'
-      : `You have selected ${statusRawText} as your governance status. You can change it at any time by clicking in the card bellow`;
+  const pageTitle = governanceVote === 'none' ? strings.registerGovernance : strings.governanceStatus;
+  const statusRawText = mapStatus[governanceVote?.kind];
+  const pageSubtitle = governanceVote === 'none' ? strings.reviewSelection : strings.statusSelected(statusRawText);
 
   const openDRepIdModal = (onSubmit: (drepID: string) => void) => {
     openModal({
-      title: 'Choose your Drep',
+      title: strings.chooseDrep,
       content: (
         <GovernanceProvider manager={governanceManager}>
           <ChooseDRepModal onSubmit={onSubmit} />
@@ -138,16 +135,16 @@ export const GovernanceStatusSelection = (): Node => {
       pending: pendingVote,
     },
     {
-      title: 'Abstain',
-      description: 'You are choosing not to cast a vote on all proposals now and in the future.',
+      title: strings.abstain,
+      description: strings.abstainInfo,
       icon: <Abstein />,
       selected: governanceData?.kind === 'abstain',
       onClick: handleAbstain,
       pending: pendingVote,
     },
     {
-      title: 'No Confidence',
-      description: 'You are expressing a lack of trust for all proposals now and in the future.',
+      title: strings.noConfidence,
+      description: strings.noConfidenceInfo,
       icon: <NoConfidance />,
       selected: governanceData?.kind === 'no-confidence',
       onClick: handleNoConfidence,
@@ -186,16 +183,16 @@ export const GovernanceStatusSelection = (): Node => {
       <Stack gap="17px" mt="42px">
         {governanceData?.kind === 'delegate' && (
           <Typography variant="body2" align="center" color="textSecondary" gutterBottom>
-            `Drep ID: ${governanceData?.drepID}`
+            `${strings.drepId} ${governanceData?.drepID}`
           </Typography>
         )}
         {governanceData?.kind === 'none' && (
           <Link href={BECOME_DREP_LINK} target="_blank" rel="noopener" variant="body1">
-            Want to became a Drep?
+            {strings.becomeADrep}
           </Link>
         )}
         <Link href={LEARN_MORE_LINK} target="_blank" rel="noopener" variant="body1">
-          Learn more About Governance
+          {strings.learnMore}
         </Link>
       </Stack>
     </Container>

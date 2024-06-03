@@ -10,6 +10,7 @@ import { useNavigateTo } from '../../common/useNavigateTo';
 import { PasswordInput } from '../../../../components';
 import { useGovernance } from '../../module/GovernanceContextProvider';
 import { useCreateAndSendDrepDelegationTransaction } from '../../api/useCreateAndSendDrepDelegationTransaction';
+import { useStrings } from '../../common/useStrings';
 
 const Container = styled(Box)(({ theme }) => ({
   paddingTop: '32px',
@@ -47,6 +48,7 @@ export const DelagationForm = (): Node => {
   const [passwaord, setPassword] = React.useState('');
   const navigateTo = useNavigateTo();
   const { dRepId, governanceVote, walletId } = useGovernance();
+  const strings = useStrings();
 
   const confirmDelegation = () => {
     // TODO mock functionality
@@ -63,14 +65,14 @@ export const DelagationForm = (): Node => {
     <Container>
       <Stack>
         <Typography variant="body2" color="ds.gray_c600" mb="4px">
-          Delegate to a DRep
+          {strings.delegateToDRep}
         </Typography>
         <Typography variant="body1" mb="24px">
-          You are designating someone else to cast your vote on your behalf for all proposals now and in the future.
+          {strings.designatedSomeone}
         </Typography>
         <TotalBox>
           <Typography variant="h4" color="ds.gray_cmin">
-            Total
+            {strings.total}
           </Typography>
           <Box textAlign="right">
             <Typography variant="h4" fontWeight="500" color="ds.gray_cmin">
@@ -82,11 +84,11 @@ export const DelagationForm = (): Node => {
           </Box>
         </TotalBox>
         <Typography variant="body2" color="ds.gray_c600" mb="24px">
-          Transaction Details
+          {strings.transactionDetails}
         </Typography>
         <TransactionDetails>
           <Typography variant="body1" fontWeight="500">
-            Operations
+            {strings.operations}
           </Typography>
           {governanceVote.kind === 'delegate' && (
             <>
@@ -98,30 +100,30 @@ export const DelagationForm = (): Node => {
           )}
           {governanceVote.kind === 'abstain' && (
             <>
-              <Typography variant="body2">Select abstain</Typography>
+              <Typography variant="body2">{strings.selectAbstein}</Typography>
             </>
           )}
           {governanceVote.kind === 'no-confidence' && (
             <>
-              <Typography variant="body2">Select no confidence</Typography>
+              <Typography variant="body2">{strings.selectNoConfidenc}</Typography>
             </>
           )}
         </TransactionDetails>
         <PasswordInput
-          label="Password"
+          label={strings.password}
           id="outlined-adornment-password"
           onChange={event => setPassword(event.target.value)}
           value={passwaord}
           error={!!idPasswordInvalid}
-          helperText={idPasswordInvalid ? 'Wrong password' : ' '}
+          helperText={idPasswordInvalid ? strings.wrongPassword : ' '}
         />
       </Stack>
       <Actions direction="row" spacing="24px">
         <Button variant="secondary" onClick={() => navigateTo.selectStatus()}>
-          Back
+          {strings.back}
         </Button>
         <Button variant="primary" disabled={passwaord.length === 0 || idPasswordInvalid} onClick={confirmDelegation}>
-          Confirm
+          {strings.confirm}
         </Button>
       </Actions>
     </Container>

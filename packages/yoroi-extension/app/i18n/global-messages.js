@@ -537,6 +537,26 @@ const globalMessages: * = defineMessages({
     id: 'wallet.transaction.memo.invalid',
     defaultMessage: '!!!Memo must be at least 1 and at most {maxMemo} characters.',
   },
+  transactionFailed: {
+    id: 'wallet.transaction.transactionFailed',
+    defaultMessage: '!!!Transaction failed',
+  },
+  transactionFailedInfo: {
+    id: 'wallet.transaction.transactionFailedInfo',
+    defaultMessage: '!!!Your transaction has not been processed properly due to technical issues',
+  },
+  tryAgain: {
+    id: 'wallet.transaction.tryAgain',
+    defaultMessage: '!!!Try Again',
+  },
+  transactionSubmitted: {
+    id: 'wallet.transaction.transactionSubmitted',
+    defaultMessage: '!!!Transaction submitted',
+  },
+  transactionSubmittedInfo: {
+    id: 'wallet.transaction.transactionSubmittedInfo',
+    defaultMessage: '!!!Check this transaction in the list of wallet transactions',
+  },
   sendingIsDisabled: {
     id: 'wallet.send.form.sendingIsDisabled',
     defaultMessage: '!!!Unable to process. Please retry after the previous transaction has been completed.',
