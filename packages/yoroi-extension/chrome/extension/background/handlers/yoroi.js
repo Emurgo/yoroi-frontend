@@ -40,6 +40,7 @@ import type {
   GetAllTxMemos,
   RemoveAllTransactions,
   PopAddress,
+  RefreshTransactions,
 } from '../../connector/types';
 import {
   APIErrorCodes,
@@ -128,6 +129,8 @@ import {
   raii,
 } from '../../../../app/api/ada/lib/storage/database/utils';
 import { upsertTxMemo, deleteTxMemo, getAllTxMemo } from '../../../../app/api/ada/lib/storage/bridge/memos';
+import type { AdaGetTransactionsRequest } from '../../../../app/api/ada';
+import type { BaseGetTransactionsRequest } from '../../../../app/api/common';
 
 const YOROI_MESSAGES = Object.freeze({
   CONNECT_RESPONSE: 'connect_response',
@@ -157,6 +160,7 @@ const YOROI_MESSAGES = Object.freeze({
   GET_ALL_TX_MEMOS: 'get-all-tx-memos',
   REMOVE_ALL_TRANSACTIONS: 'remove-all-transactions',
   POP_ADDRESS: 'pop-address',
+  REFRESH_TRANSACTIONS: 'refresh-transactions',
 });
 
 // messages from other parts of Yoroi (i.e. the UI for the connector)
@@ -188,6 +192,7 @@ export async function yoroiMessageHandler(
     | GetAllTxMemos
     | RemoveAllTransactions
     | PopAddress
+    | RefreshTransactions
   ),
   sender: any,
   sendResponse: Function,
@@ -826,6 +831,48 @@ export async function yoroiMessageHandler(
     }
     await withDisplayCutoff.popAddress();
     sendResponse(null);
+  } else if (request.type === YOROI_MESSAGES.REFRESH_TRANSACTIONS) {
+    const publicDeriver: ?PublicDeriver<> = await getPublicDeriverById(request.request.publicDeriverId);
+    if (!publicDeriver) {
+      sendResponse({ error: 'no public dervier'});
+      return;
+    }
+    const withLevels = asHasLevels(publicDeriver);
+    if (!withLevels) {
+      throw new Error('unexpected missing asHasLevels result');
+    }
+
+    const stateFetcher = await getCardanoStateFetcher(new LocalStorageApi());
+    const adaApi = new AdaApi();
+    const refreshTxRequest: {|
+      ...BaseGetTransactionsRequest,
+      ...AdaGetTransactionsRequest,
+    |} = {
+      publicDeriver: withLevels,
+      isLocalRequest: request.request.isLocalRequest,
+      getRecentTransactionHashes: stateFetcher.getRecentTransactionHashes,
+      getTransactionsByHashes: stateFetcher.getTransactionsByHashes,
+      checkAddressesInUse: stateFetcher.checkAddressesInUse,
+      getBestBlock: stateFetcher.getBestBlock,
+      getTokenInfo: stateFetcher.getTokenInfo,
+      getMultiAssetMetadata: stateFetcher.getMultiAssetMintMetadata,
+      getMultiAssetSupply: stateFetcher.getMultiAssetSupply,
+      getTransactionHistory: stateFetcher.getTransactionsHistoryForAddresses,
+    };
+    if (request.request.skip) {
+      refreshTxRequest.skip = request.request.skip;
+    }
+    if (request.request.limit) {
+      refreshTxRequest.limit = request.request.limit;
+    }
+    if (request.request.beforeTx) {
+      refreshTxRequest.beforeTx = request.request.beforeTx;
+    }
+    if (request.request.afterTx) {
+      refreshTxRequest.afterTx = request.request.afterTx;
+    }
+    const txs = await adaApi.refreshTransactions(refreshTxRequest);
+    sendResponse(txs);
   } else {
     console.error(`unknown message ${JSON.stringify(request)} from ${sender.tab.id}`)
   }

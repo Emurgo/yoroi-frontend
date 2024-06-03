@@ -162,7 +162,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   |}) => void = request => {
     const { addresses, transactions, substores } = this.stores;
     addresses.addObservedWallet(request.publicDeriver);
-    transactions.addObservedWallet(request);
+    transactions.addObservedWallet(request.publicDeriver);
     const { time, delegation } = substores.ada;
     time.addObservedTime(
       request.publicDeriver.publicDeriverId,

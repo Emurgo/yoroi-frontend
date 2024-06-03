@@ -13,6 +13,7 @@ import type {
   SignAndBroadcastRequestType,
   UpsertTxMemoRequestType,
   DeleteTxMemoRequestType,
+  RefreshTransactionsRequestType,
 } from '../../../app/api/thunk';
 
 // ----- Types used in the dApp <-> Yoroi connection bridge ----- //
@@ -294,6 +295,10 @@ export type RemoveAllTransactions = {|
 export type PopAddress = {|
   type: 'pop-address',
   request: {| publicDeriverId: number |},
+|};
+export type RefreshTransactions = {|
+  type: 'refresh-transactions',
+  request: RefreshTransactionsRequestType,
 |};
 export type TxSignWindowRetrieveData = {|
   type: 'tx_sign_window_retrieve_data',

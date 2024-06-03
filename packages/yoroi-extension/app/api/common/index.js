@@ -131,12 +131,21 @@ export type GetTransactionsRequestOptions = {|
   skip: number,
   limit: number,
 |};
+// a subset of WalletTransaction
+export type ReferenceTransaction = {
+  +block: ?$ReadOnly<{
+    Hash: string,
+    ...
+  }>,
+  txid: string,
+  ...
+};
 export type BaseGetTransactionsRequest = {|
   ...InexactSubset<GetTransactionsRequestOptions>,
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetLastSyncInfo,
   isLocalRequest: boolean,
-  beforeTx?: ?WalletTransaction,
-  afterTx?: ?WalletTransaction,
+  +beforeTx?: ?ReferenceTransaction,
+  +afterTx?: ?ReferenceTransaction,
 |};
 export type GetTransactionsResponse = Array<WalletTransaction>;
 

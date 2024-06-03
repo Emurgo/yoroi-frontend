@@ -54,10 +54,12 @@ export default class AdaTransactionsStore extends Store<StoresMap, ActionsMap> {
       signRequest,
       txId,
     );
+    /*
     this.stores.transactions.recordSubmittedTransaction(
       publicDeriver,
       transaction,
       usedUtxos,
     );
+    */
   }
 }

@@ -11,6 +11,8 @@ import type { TxMemoTableInsert, TxMemoTableRow, } from './ada/lib/storage/datab
 import { RustModule } from './ada/lib/cardanoCrypto/rustLoader';
 import type { CardanoAddressedUtxo } from './ada/transactions/types';
 import type { HWFeatures, } from './ada/lib/storage/database/walletTypes/core/tables';
+import WalletTransaction from '../domain/WalletTransaction';
+import type { ReferenceTransaction } from './common';
 
 /*::
 declare var chrome;
@@ -176,4 +178,19 @@ export async function removeAllTransactions(request: {| publicDeriverId: number 
 
 export async function popAddress(request: { publicDeriverId: number, ... }): Promise<void> {
   await callBackground({ type: 'pop-address', request });
+}
+
+export type RefreshTransactionsRequestType = {|
+  publicDeriverId: number,
+  isLocalRequest: boolean,
+  beforeTx?: ?ReferenceTransaction,
+  afterTx?: ?ReferenceTransaction,
+  skip?: number,
+  limit?: number,
+|};
+export async function refreshTransactions(
+  request: RefreshTransactionsRequestType
+): Promise<Array<WalletTransaction>> {
+  const txs = await callBackground({ type: 'refresh-transactions', request });
+  return txs.map(txData => new WalletTransaction(txData));
 }
