@@ -86,8 +86,6 @@ class InitialStepsPage extends BasePage {
   }
   async cantProceedWithoutToS() {
     this.logger.info(`InitialStepsPage::cantProceedWithoutToS is called`);
-    await this.takeScreenshot('DEBUG', 'debug');
-    await this.takeSnapshot('DEBUG', 'debug');
     await this.waitForElement(this.languagesDropDownLocator);
     await this.waitForElement(this.agreeCheckboxLocator);
     await this.click(this.agreeCheckboxLocator);

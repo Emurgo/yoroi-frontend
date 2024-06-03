@@ -9,6 +9,7 @@ import SettingsTab from '../pages/wallet/settingsTab/settingsTab.page.js';
 import WalletSubTab from '../pages/wallet/settingsTab/walletSubTab.page.js';
 import TransactionsSubTab from '../pages/wallet/walletTab/walletTransactions.page.js';
 import driversPoolsManager from '../utils/driversPool.js';
+import AddNewWallet from '../pages/addNewWallet.page.js';
 
 describe('Renaming the wallet', function () {
   this.timeout(2 * oneMinute);
@@ -22,14 +23,23 @@ describe('Renaming the wallet', function () {
     done();
   });
 
-  it('Restore the test wallet 1', async function () {
-    await restoreWallet(webdriver, logger, testWallet1);
+  it('Prepare DB and storages', async function () {
+    const addWalletPage = new AddNewWallet(webdriver, logger);
+    const state = await addWalletPage.isDisplayed();
+    expect(state).to.be.true;
+    await addWalletPage.prepareDBAndStorage('testWallet1');
+    await addWalletPage.refreshPage();
+  });
+
+  it('Check transactions page', async function () {
+    const transactionsPage = new TransactionsSubTab(webdriver, logger);
+    await transactionsPage.waitPrepareWalletBannerIsClosed();
+    const txPageIsDisplayed = await transactionsPage.isDisplayed();
+    expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
   });
 
   it('Go to Wallet subtub in Settings', async function () {
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
-    const txPageIsDisplayed = await transactionsPage.isDisplayed();
-    expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
     await transactionsPage.goToSettingsTab();
     const settingsPage = new SettingsTab(webdriver, logger);
     await settingsPage.goToWalletSubMenu();

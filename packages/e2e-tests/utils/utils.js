@@ -1,5 +1,5 @@
 import { By } from 'selenium-webdriver';
-import { testRunDir } from '../helpers/constants.js';
+import { dbSnapshotsDir, testRunDir } from '../helpers/constants.js';
 import { TargetBrowser } from '../helpers/constants.js';
 import * as fs from 'node:fs';
 import path from 'path';
@@ -244,3 +244,9 @@ export const roundUpCurrency = (value, fiatCurrency) => {
     return Number(parseFloat(value).toFixed(2));
   }
 };
+
+export const getSnapshotObjectFromJSON = (dbSnapshotName) => {
+  const dbSnapshotPath = path.resolve(dbSnapshotsDir, dbSnapshotName);
+  const fileContent = getFileContent(dbSnapshotPath);
+  return JSON.parse(fileContent);
+}

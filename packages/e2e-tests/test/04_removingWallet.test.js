@@ -22,14 +22,23 @@ describe('Removing a wallet, one wallet is added', function () {
     done();
   });
 
-  it('Restore a 15-word wallet', async function () {
-    await restoreWallet(webdriver, logger, testWallet1);
+  it('Prepare DB and storages', async function () {
+    const addWalletPage = new AddNewWallet(webdriver, logger);
+    const state = await addWalletPage.isDisplayed();
+    expect(state).to.be.true;
+    await addWalletPage.prepareDBAndStorage('testWallet1');
+    await addWalletPage.refreshPage();
+  });
+
+  it('Check transactions page', async function () {
+    const transactionsPage = new TransactionsSubTab(webdriver, logger);
+    await transactionsPage.waitPrepareWalletBannerIsClosed();
+    const txPageIsDisplayed = await transactionsPage.isDisplayed();
+    expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
   });
 
   it('Remove wallet', async function () {
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
-    const txPageIsDisplayed = await transactionsPage.isDisplayed();
-    expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
     await transactionsPage.goToSettingsTab();
     const settingsPage = new SettingsTab(webdriver, logger);
     await settingsPage.goToWalletSubMenu();

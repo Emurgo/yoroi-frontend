@@ -136,6 +136,7 @@ export default class EditMemoDialog extends Component<Props, State> {
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={onCancel}
+        id='editMemoDialog'
       >
         <TextField
           className={styles.memoContent}
@@ -145,7 +146,11 @@ export default class EditMemoDialog extends Component<Props, State> {
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton aria-label="delete memo" onClick={onClickDelete}>
+                <IconButton
+                  aria-label="delete memo"
+                  onClick={onClickDelete}
+                  id='editMemoDialog:input-deleteMemo-button'
+                >
                   <CloseIcon />
                 </IconButton>
               </InputAdornment>
