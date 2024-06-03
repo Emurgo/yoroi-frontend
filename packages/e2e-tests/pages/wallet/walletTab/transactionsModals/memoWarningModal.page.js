@@ -1,5 +1,6 @@
 import BasePage from '../../../basepage.js';
 import AddMemoDialog from './addMemoModal.page.js';
+import EditMemoDialog from './editMemoModal.page.js';
 
 class MemoWarningModal extends BasePage {
   // locators
@@ -50,11 +51,17 @@ class MemoWarningModal extends BasePage {
     this.logger.info(`MemoWarningModal::closeWarningDialog is called`);
     await this.click(this.memoWarningDialogCloseButtonLocator);
   }
-  // * confirm
-  async pressUnderstand() {
-    this.logger.info(`MemoWarningModal::pressUnderstand is called`);
+  // * confirm adding
+  async understandAdding() {
+    this.logger.info(`MemoWarningModal::understandAdding is called`);
     await this.click(this.undesrtandButtonLocator);
     return new AddMemoDialog(this.driver, this.logger);
+  }
+  // * confirm editing
+  async understandEditing() {
+    this.logger.info(`MemoWarningModal::understandEditing is called`);
+    await this.click(this.undesrtandButtonLocator);
+    return new EditMemoDialog(this.driver, this.logger);
   }
 }
 

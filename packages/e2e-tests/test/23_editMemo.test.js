@@ -10,11 +10,12 @@ import driversPoolsManager from '../utils/driversPool.js';
 import { getTestString } from '../helpers/constants.js';
 import AddNewWallet from '../pages/addNewWallet.page.js';
 
-describe('Adding a memo to a completed Tx', function () {
+describe('Editing a memo', function () {
   this.timeout(2 * oneMinute);
   let webdriver = null;
   let logger = null;
-  const testMemoMessage = getTestString('', 40, true);
+  const oldMemo = 'j1hKEo4Er4FDLFAtGBo07jIcXBSOqx9D16U0sUIl';
+  const newMemoMessage = getTestString('', 40, true);
 
   before(function (done) {
     webdriver = driversPoolsManager.getDriverFromPool();
@@ -26,7 +27,7 @@ describe('Adding a memo to a completed Tx', function () {
     const addWalletPage = new AddNewWallet(webdriver, logger);
     const state = await addWalletPage.isDisplayed();
     expect(state).to.be.true;
-    await addWalletPage.prepareDBAndStorage('testWallet1');
+    await addWalletPage.prepareDBAndStorage('testWallet1MemoAdded');
     await addWalletPage.refreshPage();
   });
 
@@ -37,35 +38,38 @@ describe('Adding a memo to a completed Tx', function () {
     expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
   });
 
-  // open the latests tx
   it('Expand tx', async function () {
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
     await transactionsPage.clickOnTxRow(0, 0);
   });
-  // click the memo button
-  // enter the memo
-  // confirm saving the memo
-  it('Add memo', async function () {
+
+  it('Edit memo', async function () {
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
-    const memoWarningModal = await transactionsPage.clickAddMemo(0, 0);
+    const memoMessage = await transactionsPage.getMemoMessage(0, 0);
+    expect(memoMessage).to.equal(oldMemo);
+
+    // click edit memo
+    const memoWarningModal = await transactionsPage.clickEditMemo(0, 0);
     const warningIsDisplayed = await memoWarningModal.isDisplayed();
     expect(warningIsDisplayed).to.be.true;
-    const addMemoModal = await memoWarningModal.understandAdding();
-    const addMemoModalIsDisplayed = await addMemoModal.isDisplayed();
-    expect(addMemoModalIsDisplayed).to.be.true;
-    await addMemoModal.enterMemo(testMemoMessage);
-    await addMemoModal.pressAdd();
+
+    const editMemoModal = await memoWarningModal.understandEditing();
+    const editMemoModalIsDisplayed = await editMemoModal.isDisplayed();
+    expect(editMemoModalIsDisplayed).to.be.true;
+
+    await editMemoModal.enterMemo(newMemoMessage);
+    await editMemoModal.pressSave();
   });
   // check the memo displayed message
-  it('Check added memo', async function () {
+  it('Check edited memo', async function () {
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
     const memoMessage = await transactionsPage.getMemoMessage(0, 0);
     const txHashId = await transactionsPage.getTxHashID(0, 0);
-    expect(memoMessage).to.equal(testMemoMessage);
+    expect(memoMessage).to.equal(newMemoMessage);
     const memosInDB = await transactionsPage.getInfoFromIndexedDB('TxMemo');
     expect(memosInDB.length).to.equal(1);
     const txMemoinDB = memosInDB[0].value;
-    expect(txMemoinDB.Content).to.equal(testMemoMessage);
+    expect(txMemoinDB.Content).to.equal(newMemoMessage);
     expect(txMemoinDB.TransactionHash).to.equal(txHashId);
     expect(txMemoinDB.WalletId).to.equal(testWallet1.plate);
   });
@@ -75,11 +79,11 @@ describe('Adding a memo to a completed Tx', function () {
     await transactionsPage.refreshPage();
   });
   // check the memo displayed message again
-  it('Check added memo again', async function () {
+  it('Check edited memo again', async function () {
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
     await transactionsPage.clickOnTxRow(0, 0);
     const memoMessage = await transactionsPage.getMemoMessage(0, 0);
-    expect(memoMessage).to.equal(testMemoMessage);
+    expect(memoMessage).to.equal(newMemoMessage);
   });
 
   afterEach(function (done) {

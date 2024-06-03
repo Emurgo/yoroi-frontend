@@ -150,7 +150,6 @@ class WalletCommonBase extends BasePage {
   }
   async waitPrepareWalletBannerIsClosed() {
     this.logger.info(`WalletCommonBase::waitPrepareWalletBannerIsClosed is called`);
-    // AmountDisplay_isLoading
     const state = await this.customWaiter(
       async () => {
         const elAmount = await this.findElements(this.prepareWalletBannerLocator);

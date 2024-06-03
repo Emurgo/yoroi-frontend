@@ -1,4 +1,5 @@
 import BasePage from '../../../basepage.js';
+import { twoSeconds, quarterSecond } from '../../../../helpers/timeConstants.js';
 
 class ExportTransactionsModal extends BasePage {
   // locators
