@@ -72,7 +72,7 @@ const StatsTable = ({ data, isLoading }) => {
   const headCells = [
     { id: 'name', label: strings.name, align: 'left', sortType: 'character' },
     { id: 'price', label: strings.price, align: 'left', sortType: 'numeric' },
-    { id: '24h', label: strings['24h'], align: 'left', sortType: 'numeric' },
+    { id: '24h', label: strings['24H'], align: 'left', sortType: 'numeric' },
     { id: '1W', label: strings['1W'], align: 'left', sortType: 'numeric' },
     { id: '1M', label: strings['1M'], align: 'left', sortType: 'numeric' },
     {

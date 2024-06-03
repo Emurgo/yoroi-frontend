@@ -20,6 +20,8 @@ const PortfolioWallet = ({ data }) => {
   const [tokenList, setTokenList] = useState([]);
   const [isAdaMainUnit, setIsAdaMainUnit] = useState(unitOfAccount === 'ADA');
 
+  console.log('token list ne', data);
+
   const handleCurrencyChange = () => {
     if (isAdaMainUnit) {
       changeUnitOfAccount(settingFiatPairUnit.currency || 'USD');

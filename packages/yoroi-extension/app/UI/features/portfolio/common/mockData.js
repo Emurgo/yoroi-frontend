@@ -4,25 +4,93 @@ import { HistoryItemStatus, HistoryItemType } from '../useCases/TokenDetails/Tra
 const startDate = new Date('01-01-2023 8:30');
 const endDate = new Date('05-28-2024 11:40');
 const now = new Date();
-const start24HoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-const start1WeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-const start1MonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
-const start6MonthAgo = new Date(now.getFullYear(), now.getMonth() - 6, now.getDate());
-const start1YearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+const start24HoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000).getTime();
+const start1WeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).getTime();
+const start1MonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate()).getTime();
+const start6MonthAgo = new Date(now.getFullYear(), now.getMonth() - 6, now.getDate()).getTime();
+const start1YearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate()).getTime();
 const getRandomTime = (startDate, endDate) => {
-  const date = new Date(startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime()));
+  const date = new Date(startDate + Math.random() * (endDate - startDate));
   return date.toISOString();
 };
 const getRandomNumber = (min, max, toFixed) => {
   return (Math.random() * (max - min) + min).toFixed(toFixed);
 };
-const createChartData = (quantity: number, fromTime: number) => {
-  const tmp = Array.from({ length: quantity }).map(item => ({
-    time: getRandomTime(fromTime, now),
-    value: getRandomNumber(-10, 10, 3),
-    usd: getRandomNumber(-1000, 1000, 3),
-  }));
+const createChartData = (timePeriod: '24H' | '1W' | '1M' | '6M' | '1Y') => {
+  const quantity = getQuantityBasedOnTimePeriod(timePeriod);
+  const fromTime = getFromTime(timePeriod, now);
+  const interval = getInterval(timePeriod);
+
+  const tmp = Array.from({ length: quantity }).map((_, index) => {
+    const randomNumber = getRandomNumber(-20, 20, 2);
+    const time = new Date(fromTime + index * interval);
+    const utcString = `${time.getUTCFullYear()}-${pad(time.getUTCMonth() + 1, 2)}-${pad(time.getUTCDate(), 2)}T${pad(
+      time.getUTCHours(),
+      2
+    )}:${pad(time.getUTCMinutes(), 2)}:${pad(time.getUTCSeconds(), 2)}Z`;
+
+    const frequency = 5;
+    const value = Math.sin((index * Math.PI * 2 * frequency) / quantity);
+
+    return {
+      time: utcString,
+      value: value.toFixed(2),
+      usd: (value * 100).toFixed(3),
+    };
+  });
   return tmp;
+};
+
+// HELPERS
+function pad(number: number, length: number) {
+  return String(number).padStart(length, '0');
+}
+const getQuantityBasedOnTimePeriod = (timePeriod: '24H' | '1W' | '1M' | '6M' | '1Y') => {
+  switch (timePeriod) {
+    case '24H':
+      return 96; // 4 data points per hour (every 15 minutes)
+    case '1W':
+      return 168; // Hourly data for a week
+    case '1M':
+      const daysInMonth = new Date(now).getDate(); // Get number of days in current month
+      return Math.floor((daysInMonth * 24) / 4); // Approximately 4 values per day
+    case '6M':
+      return 180; // Approximately 1 data point per day
+    case '1Y':
+      return 90; // Approximately 1 data point every 4 days
+    default:
+      throw new Error('Invalid time period');
+  }
+};
+const getFromTime = (timePeriod: '24H' | '1W' | '1M' | '6M' | '1Y', now: number) => {
+  switch (timePeriod) {
+    case '24H':
+      return start24HoursAgo;
+    case '1W':
+      return start1WeekAgo;
+    case '1M':
+      return start1MonthAgo;
+    case '6M':
+      return start6MonthAgo;
+    case '1Y':
+      return start1YearAgo;
+    default:
+      throw new Error('Invalid time period');
+  }
+};
+const getInterval = (timePeriod: '24H' | '1W' | '1M' | '6M' | '1Y') => {
+  switch (timePeriod) {
+    case '24H':
+      return 15 * 60 * 1000; // 15 minutes in milliseconds
+    case '1W':
+      return 60 * 60 * 1000; // 1 hour in milliseconds
+    case '1M':
+    case '6M':
+    case '1Y':
+      return (24 * 60 * 60 * 1000) / getQuantityBasedOnTimePeriod(timePeriod); // Interval based on quantity
+    default:
+      throw new Error('Invalid time period');
+  }
 };
 
 // ALL THE MOCK DATA FOR RENDERING UI NEW
@@ -75,13 +143,13 @@ const mockData = {
           { value: (10 * Math.random()).toFixed(2) },
           { value: (10 * Math.random()).toFixed(5) },
         ],
-        chartData: [
-          ...createChartData(96, start24HoursAgo),
-          ...createChartData(168, start1WeekAgo),
-          ...createChartData(120, start1MonthAgo),
-          ...createChartData(180, start6MonthAgo),
-          ...createChartData(90, start1YearAgo),
-        ],
+        chartData: {
+          start24HoursAgo: createChartData('24H'),
+          start1WeekAgo: createChartData('1W'),
+          start1MonthAgo: createChartData('1M'),
+          start6MonthAgo: createChartData('6M'),
+          start1YearAgo: createChartData('1Y'),
+        },
       },
       {
         name: 'DOGE',
@@ -114,13 +182,13 @@ const mockData = {
           { value: (10 * Math.random()).toFixed(2) },
           { value: (10 * Math.random()).toFixed(5) },
         ],
-        chartData: [
-          ...createChartData(96, start24HoursAgo),
-          ...createChartData(168, start1WeekAgo),
-          ...createChartData(120, start1MonthAgo),
-          ...createChartData(180, start6MonthAgo),
-          ...createChartData(90, start1YearAgo),
-        ],
+        chartData: {
+          start24HoursAgo: createChartData('24H'),
+          start1WeekAgo: createChartData('1W'),
+          start1MonthAgo: createChartData('1M'),
+          start6MonthAgo: createChartData('6M'),
+          start1YearAgo: createChartData('1Y'),
+        },
       },
       {
         name: 'ADA',
@@ -153,13 +221,13 @@ const mockData = {
           { value: (10 * Math.random()).toFixed(2) },
           { value: (10 * Math.random()).toFixed(5) },
         ],
-        chartData: [
-          ...createChartData(96, start24HoursAgo),
-          ...createChartData(168, start1WeekAgo),
-          ...createChartData(120, start1MonthAgo),
-          ...createChartData(180, start6MonthAgo),
-          ...createChartData(90, start1YearAgo),
-        ],
+        chartData: {
+          start24HoursAgo: createChartData('24H'),
+          start1WeekAgo: createChartData('1W'),
+          start1MonthAgo: createChartData('1M'),
+          start6MonthAgo: createChartData('6M'),
+          start1YearAgo: createChartData('1Y'),
+        },
       },
       {
         name: 'Shiba',
@@ -192,13 +260,13 @@ const mockData = {
           { value: (10 * Math.random()).toFixed(2) },
           { value: (10 * Math.random()).toFixed(5) },
         ],
-        chartData: [
-          ...createChartData(96, start24HoursAgo),
-          ...createChartData(168, start1WeekAgo),
-          ...createChartData(120, start1MonthAgo),
-          ...createChartData(180, start6MonthAgo),
-          ...createChartData(90, start1YearAgo),
-        ],
+        chartData: {
+          start24HoursAgo: createChartData('24H'),
+          start1WeekAgo: createChartData('1W'),
+          start1MonthAgo: createChartData('1M'),
+          start6MonthAgo: createChartData('6M'),
+          start1YearAgo: createChartData('1Y'),
+        },
       },
       {
         name: 'ALT',
@@ -231,13 +299,13 @@ const mockData = {
           { value: (10 * Math.random()).toFixed(2) },
           { value: (10 * Math.random()).toFixed(5) },
         ],
-        chartData: [
-          ...createChartData(96, start24HoursAgo),
-          ...createChartData(168, start1WeekAgo),
-          ...createChartData(120, start1MonthAgo),
-          ...createChartData(180, start6MonthAgo),
-          ...createChartData(90, start1YearAgo),
-        ],
+        chartData: {
+          start24HoursAgo: createChartData('24H'),
+          start1WeekAgo: createChartData('1W'),
+          start1MonthAgo: createChartData('1M'),
+          start6MonthAgo: createChartData('6M'),
+          start1YearAgo: createChartData('1Y'),
+        },
       },
       {
         name: 'TKN1',
@@ -270,13 +338,13 @@ const mockData = {
           { value: (10 * Math.random()).toFixed(2) },
           { value: (10 * Math.random()).toFixed(5) },
         ],
-        chartData: [
-          ...createChartData(96, start24HoursAgo),
-          ...createChartData(168, start1WeekAgo),
-          ...createChartData(120, start1MonthAgo),
-          ...createChartData(180, start6MonthAgo),
-          ...createChartData(90, start1YearAgo),
-        ],
+        chartData: {
+          start24HoursAgo: createChartData('24H'),
+          start1WeekAgo: createChartData('1W'),
+          start1MonthAgo: createChartData('1M'),
+          start6MonthAgo: createChartData('6M'),
+          start1YearAgo: createChartData('1Y'),
+        },
       },
       {
         name: 'TKN2',
@@ -309,13 +377,13 @@ const mockData = {
           { value: (10 * Math.random()).toFixed(2) },
           { value: (10 * Math.random()).toFixed(5) },
         ],
-        chartData: [
-          ...createChartData(96, start24HoursAgo),
-          ...createChartData(168, start1WeekAgo),
-          ...createChartData(120, start1MonthAgo),
-          ...createChartData(180, start6MonthAgo),
-          ...createChartData(90, start1YearAgo),
-        ],
+        chartData: {
+          start24HoursAgo: createChartData('24H'),
+          start1WeekAgo: createChartData('1W'),
+          start1MonthAgo: createChartData('1M'),
+          start6MonthAgo: createChartData('6M'),
+          start1YearAgo: createChartData('1Y'),
+        },
       },
       {
         name: 'TKN3',
@@ -348,13 +416,13 @@ const mockData = {
           { value: (10 * Math.random()).toFixed(2) },
           { value: (10 * Math.random()).toFixed(5) },
         ],
-        chartData: [
-          ...createChartData(96, start24HoursAgo),
-          ...createChartData(168, start1WeekAgo),
-          ...createChartData(120, start1MonthAgo),
-          ...createChartData(180, start6MonthAgo),
-          ...createChartData(90, start1YearAgo),
-        ],
+        chartData: {
+          start24HoursAgo: createChartData('24H'),
+          start1WeekAgo: createChartData('1W'),
+          start1MonthAgo: createChartData('1M'),
+          start6MonthAgo: createChartData('6M'),
+          start1YearAgo: createChartData('1Y'),
+        },
       },
       {
         name: 'TKN6',
@@ -387,13 +455,13 @@ const mockData = {
           { value: (10 * Math.random()).toFixed(2) },
           { value: (10 * Math.random()).toFixed(5) },
         ],
-        chartData: [
-          ...createChartData(96, start24HoursAgo),
-          ...createChartData(168, start1WeekAgo),
-          ...createChartData(120, start1MonthAgo),
-          ...createChartData(180, start6MonthAgo),
-          ...createChartData(90, start1YearAgo),
-        ],
+        chartData: {
+          start24HoursAgo: createChartData('24H'),
+          start1WeekAgo: createChartData('1W'),
+          start1MonthAgo: createChartData('1M'),
+          start6MonthAgo: createChartData('6M'),
+          start1YearAgo: createChartData('1Y'),
+        },
       },
       {
         name: 'TKN8',
@@ -426,13 +494,13 @@ const mockData = {
           { value: (10 * Math.random()).toFixed(2) },
           { value: (10 * Math.random()).toFixed(5) },
         ],
-        chartData: [
-          ...createChartData(96, start24HoursAgo),
-          ...createChartData(168, start1WeekAgo),
-          ...createChartData(120, start1MonthAgo),
-          ...createChartData(180, start6MonthAgo),
-          ...createChartData(90, start1YearAgo),
-        ],
+        chartData: {
+          start24HoursAgo: createChartData('24H'),
+          start1WeekAgo: createChartData('1W'),
+          start1MonthAgo: createChartData('1M'),
+          start6MonthAgo: createChartData('6M'),
+          start1YearAgo: createChartData('1Y'),
+        },
       },
     ],
   },

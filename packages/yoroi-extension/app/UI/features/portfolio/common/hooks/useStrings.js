@@ -164,17 +164,29 @@ export const messages = Object.freeze(
       id: 'portfolio.statsTable.header.price',
       defaultMessage: '!!!Price',
     },
-    '24h': {
-      id: 'portfolio.statsTable.header.24h',
-      defaultMessage: '!!!24h',
+    '24H': {
+      id: 'portfolio.chart.button.24H',
+      defaultMessage: '!!!24H',
     },
     '1W': {
-      id: 'portfolio.statsTable.header.1w',
+      id: 'portfolio.chart.button.1W',
       defaultMessage: '!!!1W',
     },
     '1M': {
-      id: 'portfolio.statsTable.header.1m',
+      id: 'portfolio.chart.button.1M',
       defaultMessage: '!!!1M',
+    },
+    '6M': {
+      id: 'portfolio.chart.button.6M',
+      defaultMessage: '!!!6M',
+    },
+    '1Y': {
+      id: 'portfolio.chart.button.1Y',
+      defaultMessage: '!!!1W',
+    },
+    ALL: {
+      id: 'portfolio.chart.button.ALL',
+      defaultMessage: '!!!ALL',
     },
     portfolio: {
       id: 'portfolio.statsTable.header.portfolio',
@@ -252,7 +264,6 @@ export const messages = Object.freeze(
       id: 'portfolio.liquidityTable.header.tokenPair',
       defaultMessage: '!!!Token pair',
     },
-
     firstTokenValue: {
       id: 'portfolio.liquidityTable.header.firstTokenValue',
       defaultMessage: '!!!Token value 1',
@@ -325,9 +336,12 @@ export const useStrings = () => {
     allTimeLow: intl.formatMessage(messages.allTimeLow),
     name: intl.formatMessage(messages.name),
     price: intl.formatMessage(messages.price),
-    '24h': intl.formatMessage(messages['24h']),
+    '24H': intl.formatMessage(messages['24H']),
     '1W': intl.formatMessage(messages['1W']),
     '1M': intl.formatMessage(messages['1M']),
+    '6M': intl.formatMessage(messages['6M']),
+    '1Y': intl.formatMessage(messages['1Y']),
+    ALL: intl.formatMessage(messages['ALL']),
     portfolio: intl.formatMessage(messages.portfolio),
     totalAmount: intl.formatMessage(messages.totalAmount),
     transactionHistory: intl.formatMessage(messages.transactionHistory),

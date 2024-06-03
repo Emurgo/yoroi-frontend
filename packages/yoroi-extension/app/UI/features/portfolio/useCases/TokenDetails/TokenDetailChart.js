@@ -10,20 +10,21 @@ import { useStrings } from '../../common/hooks/useStrings';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { Icon } from '../../../../components/icons';
 
-const StyledButton = styled(Button)(({ theme }) => ({
+const StyledButton = styled(Button)(({ theme, disabled, variant }) => ({
   fontWeight: 500,
   fontSize: '0.75rem',
   lineHeight: '1.125rem',
   height: '30px',
   padding: '6px !important',
   minWidth: '36px',
+  backgroundColor:
+    variant === 'contained' ? (disabled ? theme.palette.ds.gray_c100 : theme.palette.ds.el_primary_medium) : `transparent`,
 
-  '& .MuiButton-contained': {
-    backgroundColor: theme.palette.ds.el_primary_medium,
+  '&.MuiButton-contained': {
     color: theme.palette.ds.el_static_white,
   },
-  '& .MuiButton-secondary': {
-    color: theme.palette.ds.text_primary_medium,
+  '&.MuiButton-secondary': {
+    color: disabled ? theme.palette.ds.gray_c100 : theme.palette.ds.text_primary_medium,
   },
 }));
 
@@ -33,85 +34,23 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
   const strings = useStrings();
   const { unitOfAccount } = usePortfolio();
   const [buttonPeriodProps, setButtonPeriodProps] = useState([
-    { label: '24H', active: true },
-    { label: '1W', active: false },
-    { label: '1M', active: false },
-    { label: '6M', active: false },
-    { label: '1Y', active: false },
-    { label: 'ALL', active: false },
+    { id: 'start24HoursAgo', label: strings['24H'], active: true },
+    { id: 'start1WeekAgo', label: strings['1W'], active: false },
+    { id: 'start1MonthAgo', label: strings['1M'], active: false },
+    { id: 'start6MonthAgo', label: strings['6M'], active: false },
+    { id: 'start1YearAgo', label: strings['1Y'], active: false },
+    { id: 'ALL', label: strings['ALL'], active: false },
   ]);
   const [detailInfo, setDetailInfo] = useState({
-    value: tokenInfo.chartData[0].value,
-    usd: tokenInfo.chartData[0].usd,
+    value: tokenInfo.chartData[buttonPeriodProps[0].id][0].value,
+    usd: tokenInfo.chartData[buttonPeriodProps[0].id][0].usd,
   });
-
-  const categorizeByTime = data => {
-    const now = new Date();
-
-    const yesterday = new Date(now);
-    yesterday.setDate(now.getDate() - 1);
-
-    const oneWeekAgo = new Date(now);
-    oneWeekAgo.setDate(now.getDate() - 7);
-
-    const oneMonthAgo = new Date(now);
-    oneMonthAgo.setMonth(now.getMonth() - 1);
-
-    const sixMonthsAgo = new Date(now);
-    sixMonthsAgo.setMonth(now.getMonth() - 6);
-
-    const oneYearAgo = new Date(now);
-    oneYearAgo.setFullYear(now.getFullYear() - 1);
-
-    const categorizedData = _.reduce(
-      data,
-      (acc, item) => {
-        const itemTime = new Date(item.time);
-
-        if (itemTime >= yesterday) {
-          acc['24H'].push(item);
-        }
-        if (itemTime >= oneWeekAgo) {
-          acc['1W'].push(item);
-        }
-        if (itemTime >= oneMonthAgo) {
-          acc['1M'].push(item);
-        }
-        if (itemTime >= sixMonthsAgo) {
-          acc['6M'].push(item);
-        }
-        if (itemTime >= oneYearAgo) {
-          acc['1Y'].push(item);
-        }
-
-        acc['ALL'].push(item);
-
-        return acc;
-      },
-      {
-        '24H': [],
-        '1W': [],
-        '1M': [],
-        '6M': [],
-        '1Y': [],
-        ALL: [],
-      }
-    );
-
-    _.forEach(categorizedData, (value, key) => {
-      categorizedData[key] = _.sortBy(value, ['time']);
-    });
-
-    return categorizedData;
-  };
-
-  const filteredData = useMemo(() => categorizeByTime(tokenInfo.chartData), [tokenInfo.chartData]);
 
   const CustomYAxisTick = props => {
     const { x, y, payload } = props;
 
     return (
-      <text x={x} y={y} dy={4} textAnchor="end" fill={theme.palette.ds.black_static}>
+      <text x={x - 9} y={y} dy={4} textAnchor="end" fill={theme.palette.ds.black_static}>
         {payload.value}
       </text>
     );
@@ -190,6 +129,14 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
     });
   };
 
+  const minValue = tokenInfo.chartData[buttonPeriodProps.find(item => item.active).id].reduce(
+    (min, item) => Math.min(min, item.value),
+    Infinity
+  );
+  const maxValue = tokenInfo.chartData[buttonPeriodProps.find(item => item.active).id].reduce(
+    (max, item) => Math.max(max, item.value),
+    -Infinity
+  );
   return (
     <Box sx={{ padding: theme.spacing(3) }}>
       <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ marginBottom: theme.spacing(4) }}>
@@ -262,13 +209,24 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
         <Box
           component={isLoading ? 'img' : 'div'}
           src={chartSkeletonPng}
-          sx={{ margin: '20px 0', width: '100%', height: `${chartHeight}px` }}
+          sx={{
+            margin: `${theme.spacing(3)} 0 ${theme.spacing(3)} -${theme.spacing(1)}`,
+            width: '100%',
+            height: `${chartHeight}px`,
+          }}
         >
           {isLoading ? null : (
-            <ResponsiveContainer width="100%" height={chartHeight}>
-              <LineChart data={filteredData[buttonPeriodProps.find(item => item.active).label]} onMouseMove={handleMouseMove}>
+            <ResponsiveContainer width="100%" height={chartHeight} style={{ padding: 0 }}>
+              <LineChart data={tokenInfo.chartData[buttonPeriodProps.find(item => item.active).id]} onMouseMove={handleMouseMove}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <YAxis axisLine={false} allowDecimals={true} tickLine={false} type={'number'} tick={CustomYAxisTick}></YAxis>
+                <YAxis
+                  domain={[minValue, maxValue]}
+                  axisLine={false}
+                  allowDecimals={true}
+                  tickLine={false}
+                  type={'number'}
+                  tick={CustomYAxisTick}
+                ></YAxis>
                 <RechartTooltip cursor={false} content={<></>} />
                 <Line
                   activeDot={props => (
@@ -276,7 +234,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
                       chartBottom={chartHeight}
                       rectWidth={93}
                       rectHeight={34}
-                      dataLength={filteredData[buttonPeriodProps.find(item => item.active).label].length}
+                      dataLength={tokenInfo.chartData[buttonPeriodProps.find(item => item.active).id].length}
                       {...props}
                     />
                   )}
