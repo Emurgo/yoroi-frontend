@@ -17,16 +17,16 @@ type Props = {|
 
 const messages = defineMessages({
   title: {
-    id: 'gouvernace.participateDialog.title',
+    id: 'governance.participateDialog.title',
     defaultMessage: '!!!Withdraw warning',
   },
   contentInfo: {
-    id: 'gouvernace.participateDialog.contentInfo',
+    id: 'governance.participateDialog.contentInfo',
     defaultMessage:
       '!!!To withdraw your rewards, you need to participate in the Cardano Governance. Your rewards will continue to accumulate, but you are only able to withdraw it once you join the Governance process.',
   },
   buttonText: {
-    id: 'gouvernace.participateDialog.buttonText',
+    id: 'governance.participateDialog.buttonText',
     defaultMessage: '!!!Participate on governance',
   },
 });
