@@ -30,7 +30,6 @@ export const GovernanceContextProvider = ({ children, currentWallet }: Governanc
   const [state, dispatch] = React.useReducer(GovernanceReducer, {
     ...defaultGovernanceState,
   });
-  console.log('[CONTEXT Current Wallet]', currentWallet);
   const { walletId, networkId, currentPool } = currentWallet;
   const governanceManager = useGovernanceManagerMaker(walletId, networkId);
 
@@ -50,7 +49,7 @@ export const GovernanceContextProvider = ({ children, currentWallet }: Governanc
     ...state,
     ...actions,
     governanceManager: governanceManager,
-    stakePoolKeyHash: currentPool.hash ?? '',
+    stakePoolKeyHash: currentPool?.hash ?? '',
     walletId: currentWallet.walletId,
   };
 

@@ -4,6 +4,7 @@ import { governanceApiMaker, governanceManagerMaker, useStakingKeyState } from '
 import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
 
 export const useGovernanceManagerMaker = (walletId: string, networkId: string): any => {
+  console.log('networkId', networkId);
   // TODO - sancho testnet networkId id 450 - can't use it for now as the network is not working
   // TODO - add proper storage for manager
   return React.useMemo(
