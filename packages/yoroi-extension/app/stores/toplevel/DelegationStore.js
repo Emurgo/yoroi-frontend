@@ -62,7 +62,7 @@ type PoolTransitionModal = {| show: 'open' | 'closed' | 'idle', shouldUpdatePool
 
 export default class DelegationStore extends Store<StoresMap, ActionsMap> {
   @observable delegationRequests: Array<DelegationRequests> = [];
-  @observable isParticipatingToGouvernance: boolean = false;
+  @observable isParticipatingToGovernance: boolean = false;
   @observable poolTransitionRequestInfo: ?PoolTransition = null;
   @observable poolTransitionConfig: PoolTransitionModal = {
     show: 'closed',
@@ -112,7 +112,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     this.registerReactions([this._changeWallets]);
     delegation.setSelectedPage.listen(this._setSelectedPage);
     this.checkPoolTransition();
-    this.checkGouvernanceStatus();
+    this.checkGovernanceStatus();
   }
 
   @action
@@ -253,17 +253,17 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
       console.warn(error);
     }
   };
-  checkGouvernanceStatus: () => Promise<void> = async () => {
+  checkGovernanceStatus: () => Promise<void> = async () => {
     const publicDeriver = this.stores.wallets.selected;
     if (publicDeriver == null) {
       return;
     }
     const walletId = publicDeriver?.getPublicDeriverId();
-    const gouvernanceResult = await getDrepDelegationState(String(walletId));
+    const governanceResult = await getDrepDelegationState(String(walletId));
 
     try {
       runInAction(() => {
-        this.isParticipatingToGouvernance = gouvernanceResult.kind !== 'none' && gouvernanceResult.drepID !== null;
+        this.isParticipatingToGovernance = governanceResult.kind !== 'none' && governanceResult.drepID !== null;
       });
     } catch (error) {
       console.warn(error);
