@@ -2,20 +2,29 @@ import { Box, Button, Stack, styled, Typography, Divider, SvgIcon } from '@mui/m
 import React, { useEffect, useMemo, useState } from 'react';
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Label, Tooltip as RechartTooltip } from 'recharts';
 import { useTheme } from '@mui/material/styles';
-import { ArrowIcon } from '../../common/assets/icons';
 import { Skeleton, Tooltip } from '../../../../components';
 import chartSkeletonPng from '../../common/assets/images/token-detail-chart-skeleton.png';
 import { Chip } from '../../common/components/Chip';
 import moment from 'moment';
 import { useStrings } from '../../common/hooks/useStrings';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
+import { Icon } from '../../../../components/icons';
 
 const StyledButton = styled(Button)(({ theme }) => ({
   fontWeight: 500,
   fontSize: '0.75rem',
   lineHeight: '1.125rem',
-  width: '36px',
   height: '30px',
+  padding: '6px !important',
+  minWidth: '36px',
+
+  '& .MuiButton-contained': {
+    backgroundColor: theme.palette.ds.el_primary_medium,
+    color: theme.palette.ds.el_static_white,
+  },
+  '& .MuiButton-secondary': {
+    color: theme.palette.ds.text_primary_medium,
+  },
 }));
 
 const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
@@ -187,7 +196,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
         {isLoading ? (
           <Skeleton width="131px" height="13px" />
         ) : (
-          <Typography fontWeight="500" sx={{ color: theme.palette.ds.black_static }}>
+          <Typography fontWeight="500" sx={{ color: theme.palette.ds.gray_cmax }}>
             {strings.marketPrice}
           </Typography>
         )}
@@ -195,10 +204,8 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
           {isLoading ? (
             <Skeleton width="64px" height="13px" />
           ) : (
-            <Stack direction="row" alignItems="center">
-              <Typography fontWeight="500" sx={{ marginBottom: theme.spacing(0.1125) }}>
-                {detailInfo.usd}
-              </Typography>
+            <Stack direction="row" alignItems="center" sx={{ color: theme.palette.ds.gray_cmax }}>
+              <Typography fontWeight="500">{detailInfo.usd}</Typography>
               <Typography variant="caption1">&nbsp;{unitOfAccount}</Typography>
             </Stack>
           )}
@@ -219,13 +226,12 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
                   active={detailInfo.value > 0}
                   label={
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
-                      <ArrowIcon
-                        fill={detailInfo.value > 0 ? theme.palette.ds.secondary_c800 : theme.palette.ds.sys_magenta_c700}
-                        style={{
-                          marginRight: theme.spacing(0.5),
-                          transform: detailInfo.value > 0 ? '' : 'rotate(180deg)',
-                        }}
-                      />
+                      {detailInfo.value > 0 ? (
+                        <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
+                      ) : (
+                        <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
+                      )}
+
                       <Typography variant="caption1">
                         {detailInfo.value > 0 ? detailInfo.value : -1 * detailInfo.value}%
                       </Typography>
@@ -278,7 +284,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
                   type="monotone"
                   dataKey="value"
                   strokeWidth={2}
-                  stroke={isLoading ? theme.palette.ds.gray_c50 : theme.palette.ds.text_primary_medium}
+                  stroke={isLoading ? theme.palette.ds.gray_c50 : theme.palette.ds.primary_c600}
                 />
               </LineChart>
             </ResponsiveContainer>

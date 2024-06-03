@@ -1,13 +1,14 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, Typography, Stack, Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { ArrowIcon, SortIcon } from '../../common/assets/icons/';
-import adaPng from '../../../../../assets/images/ada.png';
+import tokenPng from '../../common/assets/images/token.png';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { Chip } from '../../common/components/Chip';
 import { Skeleton } from '../../../../components/Skeleton';
 import { useStrings } from '../../common/hooks/useStrings';
+import { Icon } from '../../../../components/icons/index';
+import illustrationPng from '../../common/assets/images/illustration.png';
 
 const TableRowSkeleton = ({ id, theme }) => (
   <TableRow
@@ -136,7 +137,7 @@ const StatsTable = ({ data, isLoading }) => {
     [order, orderBy, headCells]
   );
 
-  return (
+  return getSortedData(list).length > 0 ? (
     <Table aria-label="stats table">
       <TableHead>
         <TableRow>
@@ -149,10 +150,10 @@ const StatsTable = ({ data, isLoading }) => {
                 onClick={() => handleRequestSort(id)}
                 sx={{ float: align, cursor: 'pointer' }}
               >
-                <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium, userSelect: 'none' }}>
+                <Typography variant="body2" sx={{ color: theme.palette.ds.gray_c600, userSelect: 'none' }}>
                   {label}
                 </Typography>
-                <SortIcon id={id} order={order} orderBy={orderBy} />
+                <Icon.Sort id={id} order={order} orderBy={orderBy} />
               </Stack>
             </TableCell>
           ))}
@@ -184,7 +185,7 @@ const StatsTable = ({ data, isLoading }) => {
                         borderRadius: `${theme.shape.borderRadius}px`,
                       }}
                       component="img"
-                      src={adaPng}
+                      src={tokenPng}
                     ></Box>
                     <Stack direction="column">
                       <Typography fontWeight="500" sx={{ color: theme.palette.ds.text_gray_normal }}>
@@ -208,13 +209,12 @@ const StatsTable = ({ data, isLoading }) => {
                     active={row['24h'] > 0}
                     label={
                       <Stack direction="row" justifyContent="space-between" alignItems="center">
-                        <ArrowIcon
-                          fill={row['24h'] > 0 ? theme.palette.ds.secondary_c800 : theme.palette.ds.sys_magenta_c700}
-                          style={{
-                            marginRight: '5px',
-                            transform: row['24h'] > 0 ? '' : 'rotate(180deg)',
-                          }}
-                        />
+                        {row['24h'] > 0 ? (
+                          <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
+                        ) : (
+                          <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
+                        )}
+
                         <Typography variant="caption1">{row['24h'] > 0 ? row['24h'] : -1 * row['24h']}%</Typography>
                       </Stack>
                     }
@@ -227,13 +227,11 @@ const StatsTable = ({ data, isLoading }) => {
                     active={row['1W'] > 0}
                     label={
                       <Stack direction="row" justifyContent="space-between" alignItems="center">
-                        <ArrowIcon
-                          fill={row['1W'] > 0 ? theme.palette.ds.secondary_c800 : theme.palette.ds.sys_magenta_c700}
-                          style={{
-                            marginRight: '5px',
-                            transform: row['1W'] > 0 ? '' : 'rotate(180deg)',
-                          }}
-                        />
+                        {row['1W'] > 0 ? (
+                          <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
+                        ) : (
+                          <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
+                        )}
                         <Typography variant="caption1">{row['1W'] > 0 ? row['1W'] : -1 * row['1W']}%</Typography>
                       </Stack>
                     }
@@ -246,13 +244,11 @@ const StatsTable = ({ data, isLoading }) => {
                     active={row['1M'] > 0}
                     label={
                       <Stack direction="row" justifyContent="space-between" alignItems="center">
-                        <ArrowIcon
-                          fill={row['1M'] > 0 ? theme.palette.ds.secondary_c800 : theme.palette.ds.sys_magenta_c700}
-                          style={{
-                            marginRight: '5px',
-                            transform: row['1M'] > 0 ? '' : 'rotate(180deg)',
-                          }}
-                        />
+                        {row['1M'] > 0 ? (
+                          <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
+                        ) : (
+                          <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
+                        )}
                         <Typography variant="caption1">{row['1M'] > 0 ? row['1M'] : -1 * row['1M']}%</Typography>
                       </Stack>
                     }
@@ -284,6 +280,15 @@ const StatsTable = ({ data, isLoading }) => {
             ))}
       </TableBody>
     </Table>
+  ) : (
+    <Stack width="full" justifyContent="center" alignItems="center" sx={{ flex: 1 }}>
+      <Stack direction="column" alignItems="center" spacing={theme.spacing(3)}>
+        <Box component="img" src={illustrationPng}></Box>
+        <Typography variant="h4" fontWeight="500" sx={{ color: theme.palette.ds.black_static }}>
+          {strings.noResultsForThisSearch}
+        </Typography>
+      </Stack>
+    </Stack>
   );
 };
 

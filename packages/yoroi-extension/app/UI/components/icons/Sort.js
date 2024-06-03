@@ -1,15 +1,8 @@
 import React from 'react';
 
-export const SortIcon = props => {
+export const Sort = props => {
   return (
-    <svg
-      width="24"
-      height="24"
-      viewBox="0 0 25 25"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      {...props}
-    >
+    <svg width="24" height="24" viewBox="0 0 25 25" xmlns="http://www.w3.org/2000/svg" {...props}>
       <path
         d="M11.8445 19.2626C11.8998 19.3372 11.9677 19.397 12.0437 19.4379C12.1198 19.4788 12.2022 19.5 12.2856 19.5C12.369 19.5 12.4514 19.4788 12.5274 19.4379C12.6034 19.397 12.6713 19.3372 12.7266 19.2626L16.1352 14.6753C16.4741 14.2204 16.2037 13.5 15.6942 13.5H8.87701C8.36805 13.5 8.09763 14.2204 8.43595 14.676L11.8445 19.2626Z"
         fill={props.order === 'desc' && props.orderBy === props.id ? '#000000' : '#A7AFC0'}

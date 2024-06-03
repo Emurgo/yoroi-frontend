@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Copied = props => {
+export const Copied = props => {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" {...props}>
       <path
@@ -12,13 +12,11 @@ const Copied = props => {
         fill="black"
       />
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M8 6.00001C6.89543 6.00001 6 6.89544 6 8.00001V20C6 21.1046 6.89543 22 8 22H19C20.1046 22 21 21.1046 21 20V8.00001C21 6.89544 20.1046 6.00001 19 6.00001H8ZM19 8.00001H8V20H19V8.00001Z"
         fill="black"
       />
     </svg>
   );
 };
-
-export default Copied;

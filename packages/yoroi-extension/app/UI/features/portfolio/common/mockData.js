@@ -1,16 +1,29 @@
 import { HistoryItemStatus, HistoryItemType } from '../useCases/TokenDetails/TransactionTable';
 
 // UTILS
-const getRandomTime = (startDate, endDate) => {
-  const date = new Date(startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime()));
-  return date.toISOString();
-};
 const startDate = new Date('01-01-2023 8:30');
 const endDate = new Date('05-28-2024 11:40');
 const now = new Date();
 const start24HoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 const start1WeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 const start1MonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+const start6MonthAgo = new Date(now.getFullYear(), now.getMonth() - 6, now.getDate());
+const start1YearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+const getRandomTime = (startDate, endDate) => {
+  const date = new Date(startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime()));
+  return date.toISOString();
+};
+const getRandomNumber = (min, max, toFixed) => {
+  return (Math.random() * (max - min) + min).toFixed(toFixed);
+};
+const createChartData = (quantity: number, fromTime: number) => {
+  const tmp = Array.from({ length: quantity }).map(item => ({
+    time: getRandomTime(fromTime, now),
+    value: getRandomNumber(-10, 10, 3),
+    usd: getRandomNumber(-1000, 1000, 3),
+  }));
+  return tmp;
+};
 
 // ALL THE MOCK DATA FOR RENDERING UI NEW
 const mockData = {
@@ -63,131 +76,11 @@ const mockData = {
           { value: (10 * Math.random()).toFixed(5) },
         ],
         chartData: [
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1MonthAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1MonthAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1MonthAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
+          ...createChartData(96, start24HoursAgo),
+          ...createChartData(168, start1WeekAgo),
+          ...createChartData(120, start1MonthAgo),
+          ...createChartData(180, start6MonthAgo),
+          ...createChartData(90, start1YearAgo),
         ],
       },
       {
@@ -222,131 +115,11 @@ const mockData = {
           { value: (10 * Math.random()).toFixed(5) },
         ],
         chartData: [
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1MonthAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1MonthAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1MonthAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
+          ...createChartData(96, start24HoursAgo),
+          ...createChartData(168, start1WeekAgo),
+          ...createChartData(120, start1MonthAgo),
+          ...createChartData(180, start6MonthAgo),
+          ...createChartData(90, start1YearAgo),
         ],
       },
       {
@@ -381,131 +154,11 @@ const mockData = {
           { value: (10 * Math.random()).toFixed(5) },
         ],
         chartData: [
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1MonthAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1MonthAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1MonthAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
+          ...createChartData(96, start24HoursAgo),
+          ...createChartData(168, start1WeekAgo),
+          ...createChartData(120, start1MonthAgo),
+          ...createChartData(180, start6MonthAgo),
+          ...createChartData(90, start1YearAgo),
         ],
       },
       {
@@ -540,131 +193,11 @@ const mockData = {
           { value: (10 * Math.random()).toFixed(5) },
         ],
         chartData: [
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1MonthAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1MonthAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1MonthAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
+          ...createChartData(96, start24HoursAgo),
+          ...createChartData(168, start1WeekAgo),
+          ...createChartData(120, start1MonthAgo),
+          ...createChartData(180, start6MonthAgo),
+          ...createChartData(90, start1YearAgo),
         ],
       },
       {
@@ -699,131 +232,11 @@ const mockData = {
           { value: (10 * Math.random()).toFixed(5) },
         ],
         chartData: [
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1MonthAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1MonthAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1MonthAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
+          ...createChartData(96, start24HoursAgo),
+          ...createChartData(168, start1WeekAgo),
+          ...createChartData(120, start1MonthAgo),
+          ...createChartData(180, start6MonthAgo),
+          ...createChartData(90, start1YearAgo),
         ],
       },
       {
@@ -858,131 +271,11 @@ const mockData = {
           { value: (10 * Math.random()).toFixed(5) },
         ],
         chartData: [
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1MonthAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1MonthAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1MonthAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
+          ...createChartData(96, start24HoursAgo),
+          ...createChartData(168, start1WeekAgo),
+          ...createChartData(120, start1MonthAgo),
+          ...createChartData(180, start6MonthAgo),
+          ...createChartData(90, start1YearAgo),
         ],
       },
       {
@@ -1017,131 +310,11 @@ const mockData = {
           { value: (10 * Math.random()).toFixed(5) },
         ],
         chartData: [
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1MonthAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1MonthAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1MonthAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
+          ...createChartData(96, start24HoursAgo),
+          ...createChartData(168, start1WeekAgo),
+          ...createChartData(120, start1MonthAgo),
+          ...createChartData(180, start6MonthAgo),
+          ...createChartData(90, start1YearAgo),
         ],
       },
       {
@@ -1176,131 +349,11 @@ const mockData = {
           { value: (10 * Math.random()).toFixed(5) },
         ],
         chartData: [
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1MonthAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1MonthAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1MonthAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
+          ...createChartData(96, start24HoursAgo),
+          ...createChartData(168, start1WeekAgo),
+          ...createChartData(120, start1MonthAgo),
+          ...createChartData(180, start6MonthAgo),
+          ...createChartData(90, start1YearAgo),
         ],
       },
       {
@@ -1335,131 +388,11 @@ const mockData = {
           { value: (10 * Math.random()).toFixed(5) },
         ],
         chartData: [
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1MonthAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1MonthAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1MonthAgo, now),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: -Math.random().toFixed(3),
-            usd: -Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
+          ...createChartData(96, start24HoursAgo),
+          ...createChartData(168, start1WeekAgo),
+          ...createChartData(120, start1MonthAgo),
+          ...createChartData(180, start6MonthAgo),
+          ...createChartData(90, start1YearAgo),
         ],
       },
       {
@@ -1494,206 +427,11 @@ const mockData = {
           { value: (10 * Math.random()).toFixed(5) },
         ],
         chartData: [
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1MonthAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1MonthAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(start1MonthAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
-          {
-            time: getRandomTime(new Date('03-03-2020 8:30'), endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
-          },
+          ...createChartData(96, start24HoursAgo),
+          ...createChartData(168, start1WeekAgo),
+          ...createChartData(120, start1MonthAgo),
+          ...createChartData(180, start6MonthAgo),
+          ...createChartData(90, start1YearAgo),
         ],
       },
     ],

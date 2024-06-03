@@ -6,11 +6,10 @@ import { defineMessages } from 'react-intl';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import StatsTable from './StatsTable';
 import mockData from '../../common/mockData';
-import { ArrowIcon } from '../../common/assets/icons';
-import illustrationPng from '../../common/assets/images/illustration.png';
 import { Chip } from '../../common/components/Chip';
 import { Skeleton } from '../../../../components/Skeleton';
 import { useStrings } from '../../common/hooks/useStrings';
+import { Icon } from '../../../../components/icons/index';
 
 const PortfolioWallet = ({ data }) => {
   const theme = useTheme();
@@ -64,15 +63,15 @@ const PortfolioWallet = ({ data }) => {
     <Stack direction="column" spacing={theme.spacing(3)} sx={{ minHeight: 'calc(100vh - 220px)' }}>
       <Stack direction="row" justifyContent="space-between">
         <Stack direction="column">
-          <Stack direction="row" spacing={theme.spacing(0.5)}>
+          <Stack direction="row" spacing={theme.spacing(0.5)} alignItems="flex-end">
             {isLoading ? (
               <Skeleton width="146px" height="24px" />
             ) : (
-              <Typography variant="h2" fontWeight="500">
+              <Typography variant="h2" fontWeight="500" sx={{ color: theme.palette.ds.gray_cmax }}>
                 {isAdaMainUnit ? mockData.common.walletBalance.ada : mockData.common.walletBalance.usd}
               </Typography>
             )}
-            <Typography variant="body2" fontWeight="500" sx={{ marginTop: '5px' }}>
+            <Typography variant="body2" fontWeight="500" sx={{ color: theme.palette.ds.black_static }}>
               {isAdaMainUnit ? settingFiatPairUnit.currency || 'USD' : 'ADA'}
               <Typography
                 variant="body2"
@@ -94,7 +93,7 @@ const PortfolioWallet = ({ data }) => {
             {isLoading ? (
               <Skeleton width="129px" height="16px" />
             ) : (
-              <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
+              <Typography sx={{ color: theme.palette.ds.gray_c600 }}>
                 {isAdaMainUnit ? mockData.common.walletBalance.usd : mockData.common.walletBalance.ada}{' '}
                 {isAdaMainUnit ? 'ADA' : unitOfAccount}
               </Typography>
@@ -120,17 +119,12 @@ const PortfolioWallet = ({ data }) => {
                     active={mockData.common.walletBalance.percents > 0}
                     label={
                       <Stack direction="row" justifyContent="space-between" alignItems="center">
-                        <ArrowIcon
-                          fill={
-                            mockData.common.walletBalance.percents > 0
-                              ? theme.palette.ds.secondary_c800
-                              : theme.palette.ds.sys_magenta_c700
-                          }
-                          style={{
-                            marginRight: theme.spacing(0.5),
-                            transform: mockData.common.walletBalance.percents > 0 ? '' : 'rotate(180deg)',
-                          }}
-                        />
+                        {mockData.common.walletBalance.percents > 0 ? (
+                          <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
+                        ) : (
+                          <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
+                        )}
+
                         <Typography variant="caption1">
                           {mockData.common.walletBalance.percents > 0
                             ? mockData.common.walletBalance.percents
@@ -157,18 +151,7 @@ const PortfolioWallet = ({ data }) => {
 
         <SearchInput onChange={e => setKeyword(e.target.value)} placeholder={strings.search} />
       </Stack>
-      {tokenList.length > 0 ? (
-        <StatsTable data={tokenList} isLoading={isLoading} />
-      ) : (
-        <Stack width="full" justifyContent="center" alignItems="center" sx={{ flex: 1 }}>
-          <Stack direction="column" alignItems="center" spacing={theme.spacing(3)}>
-            <Box component="img" src={illustrationPng}></Box>
-            <Typography variant="h4" fontWeight="500" sx={{ color: theme.palette.ds.black_static }}>
-              {strings.noResultsForThisSearch}
-            </Typography>
-          </Stack>
-        </Stack>
-      )}
+      <StatsTable data={tokenList} isLoading={isLoading} />
     </Stack>
   );
 };

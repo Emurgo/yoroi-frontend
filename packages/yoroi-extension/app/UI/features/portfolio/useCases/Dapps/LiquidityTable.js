@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, Typography, Stack, Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { SortIcon } from '../../common/assets/icons/';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import adaPng from '../../../../../assets/images/ada.png';
@@ -11,6 +10,7 @@ import { Chip } from '../../common/components/Chip';
 import { Skeleton } from '../../../../components/Skeleton';
 import { useStrings } from '../../common/hooks/useStrings';
 import illustrationPng from '../../common/assets/images/illustration.png';
+import { Icon } from '../../../../components/icons/';
 
 const TableRowSkeleton = ({ id, theme }) => (
   <TableRow
@@ -162,7 +162,7 @@ const LiquidityTable = ({ data, isLoading }) => {
                 <Typography variant="body2" sx={{ color: theme.palette.grayscale[600], userSelect: 'none' }}>
                   {label}
                 </Typography>
-                <SortIcon
+                <Icon.Sort
                   id={id}
                   order={order}
                   orderBy={orderBy}
@@ -210,7 +210,7 @@ const LiquidityTable = ({ data, isLoading }) => {
                         src={hoskyPng}
                       ></Box>
                     </Stack>
-                    <Typography fontWeight="500" sx={{ color: theme.palette.ds.text_gray_normal }}>
+                    <Typography fontWeight="500" sx={{ color: theme.palette.ds.gray_c900 }}>
                       {row.firstToken.name} - {row.secondToken.name}
                     </Typography>
                   </Stack>
@@ -237,7 +237,7 @@ const LiquidityTable = ({ data, isLoading }) => {
                       component="img"
                       src={minswapPng}
                     ></Box>
-                    <Typography fontWeight="500" sx={{ color: theme.palette.ds.text_primary_medium }}>
+                    <Typography fontWeight="500" sx={{ color: theme.palette.ds.primary_c600 }}>
                       {row.DEX}
                     </Typography>
                   </Stack>
@@ -245,11 +245,11 @@ const LiquidityTable = ({ data, isLoading }) => {
 
                 <TableCell>
                   <Stack direction="column" spacing={theme.spacing(0.25)}>
-                    <Typography sx={{ color: theme.palette.ds.text_gray_normal }}>
+                    <Typography sx={{ color: theme.palette.ds.gray_c900 }}>
                       {row.firstTokenValue} {row.firstToken.name}
                     </Typography>
                     {row.firstToken.name === 'ADA' && unitOfAccount === 'ADA' ? null : (
-                      <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium }}>
+                      <Typography variant="body2" sx={{ color: theme.palette.ds.gray_c600 }}>
                         {row.firstTokenValueUsd} {unitOfAccount}
                       </Typography>
                     )}
@@ -258,11 +258,11 @@ const LiquidityTable = ({ data, isLoading }) => {
 
                 <TableCell>
                   <Stack direction="column" spacing={theme.spacing(0.25)}>
-                    <Typography sx={{ color: theme.palette.ds.text_gray_normal }}>
+                    <Typography sx={{ color: theme.palette.ds.gray_c900 }}>
                       {row.secondTokenValue} {row.secondToken.name}
                     </Typography>
                     {row.secondToken.name === 'ADA' && unitOfAccount === 'ADA' ? null : (
-                      <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium }}>
+                      <Typography variant="body2" sx={{ color: theme.palette.ds.gray_c600 }}>
                         {row.secondTokenValueUsd} {unitOfAccount}
                       </Typography>
                     )}
@@ -270,16 +270,16 @@ const LiquidityTable = ({ data, isLoading }) => {
                 </TableCell>
 
                 <TableCell>
-                  <Typography sx={{ color: theme.palette.ds.text_gray_normal }}>{row.lpTokens}</Typography>
+                  <Typography sx={{ color: theme.palette.ds.gray_c900 }}>{row.lpTokens}</Typography>
                 </TableCell>
 
                 <TableCell>
                   <Stack direction="column" spacing={theme.spacing(0.25)}>
-                    <Typography sx={{ color: theme.palette.ds.text_gray_normal, textAlign: 'right' }}>
+                    <Typography sx={{ color: theme.palette.ds.gray_c900, textAlign: 'right' }}>
                       {row.totalValue} {row.firstToken.name}
                     </Typography>
                     {unitOfAccount === 'ADA' && row.firstToken.name === 'ADA' ? null : (
-                      <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium, textAlign: 'right' }}>
+                      <Typography variant="body2" sx={{ color: theme.palette.ds.gray_c600, textAlign: 'right' }}>
                         {row.totalValueUsd} {unitOfAccount}
                       </Typography>
                     )}

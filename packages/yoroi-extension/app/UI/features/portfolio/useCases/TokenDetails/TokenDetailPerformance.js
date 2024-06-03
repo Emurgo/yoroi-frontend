@@ -3,6 +3,7 @@ import { Box, Stack, Typography, Link } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useStrings } from '../../common/hooks/useStrings';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
+import { Skeleton } from '../../../../components/Skeleton';
 
 const PerformanceItemType = {
   FIAT: 'fiat',
@@ -10,7 +11,7 @@ const PerformanceItemType = {
   RANK: 'rank',
 };
 
-const TokenDetailPerformance = ({ tokenInfo }) => {
+const TokenDetailPerformance = ({ tokenInfo, isLoading }) => {
   const theme = useTheme();
   const strings = useStrings();
   const { unitOfAccount } = usePortfolio();
@@ -30,7 +31,7 @@ const TokenDetailPerformance = ({ tokenInfo }) => {
 
   return (
     <Box>
-      <Typography fontWeight="500" sx={{ marginBottom: theme.spacing(2) }}>
+      <Typography fontWeight="500" sx={{ marginBottom: theme.spacing(2), color: theme.palette.ds.gray_cmax }}>
         {strings.marketData}
       </Typography>
       <Stack direction="column" spacing={1}>
@@ -42,12 +43,16 @@ const TokenDetailPerformance = ({ tokenInfo }) => {
             alignItems="center"
             sx={{ paddingBottom: item.type === PerformanceItemType.RANK ? theme.spacing(1) : '' }}
           >
-            <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>{item.label}</Typography>
-            <Typography sx={{ color: theme.palette.ds.black_static }}>
-              {item.type === PerformanceItemType.RANK && '#'}
-              {tokenInfo.performance[index].value} {item.type === PerformanceItemType.FIAT && unitOfAccount}
-              {item.type === PerformanceItemType.TOKEN && tokenInfo.name}
-            </Typography>
+            <Typography sx={{ color: theme.palette.ds.gray_c600 }}>{item.label}</Typography>
+            {isLoading ? (
+              <Skeleton width="84px" height="20px" />
+            ) : (
+              <Typography sx={{ color: theme.palette.ds.gray_cmax }}>
+                {item.type === PerformanceItemType.RANK && '#'}
+                {tokenInfo.performance[index].value} {item.type === PerformanceItemType.FIAT && unitOfAccount}
+                {item.type === PerformanceItemType.TOKEN && tokenInfo.name}
+              </Typography>
+            )}
           </Stack>
         ))}
       </Stack>

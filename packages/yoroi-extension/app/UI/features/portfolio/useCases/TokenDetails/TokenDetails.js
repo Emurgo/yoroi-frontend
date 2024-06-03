@@ -22,17 +22,37 @@ const Header = styled(Box)({
 
 const TokenInfo = styled(Stack)({
   width: '100%',
-  marginTop: '25px',
 });
 
 const StyledButton = styled(Button)(({ theme }) => ({
   maxHeight: '40px',
   minWidth: '140.25px',
+
+  '&.MuiButton-contained': {
+    backgroundColor: theme.palette.ds.el_primary_medium,
+    color: theme.palette.ds.el_static_white,
+
+    '&:hover': {
+      backgroundColor: theme.palette.ds.el_primary_high,
+    },
+  },
+
+  '&.MuiButton-secondary': {
+    color: theme.palette.ds.text_primary_medium,
+  },
 }));
 
 const TabContent = styled(Box)({
   flex: 1,
 });
+
+const StyledSubMenu = styled(SubMenu)(({ theme }) => ({
+  '& > .SubMenuItem_enabled > button': {
+    padding: '11px 0 !important',
+    color: theme.palette.ds.el_primary_medium,
+    borderColor: theme.palette.ds.el_primary_medium,
+  },
+}));
 
 const TokenDetails = ({ tokenInfo, transactionHistory }) => {
   const theme = useTheme();
@@ -84,7 +104,7 @@ const TokenDetails = ({ tokenInfo, transactionHistory }) => {
           sx={{ color: theme.palette.ds.black_static, display: 'flex', gap: theme.spacing(2) }}
         >
           <BackIcon />
-          <Typography variant="body2" fontWeight="500">
+          <Typography variant="body2" fontWeight="500" sx={{ color: theme.palette.ds.text_gray_normal }}>
             {strings.backToPortfolio}
           </Typography>
         </Button>
@@ -101,75 +121,78 @@ const TokenDetails = ({ tokenInfo, transactionHistory }) => {
         </Stack>
       </Header>
 
-      <TokenInfo direction="row" spacing={theme.spacing(4)}>
-        <Card>
-          <Box sx={{ padding: theme.spacing(3) }}>
-            <Typography fontWeight="500" sx={{ marginBottom: theme.spacing(2), color: theme.palette.ds.text_gray_normal }}>
-              {isLoading ? <Skeleton width="82px" height="16px" /> : `${tokenInfo.name} ${strings.balance}`}
-            </Typography>
+      <Stack direction="column" spacing={theme.spacing(3)} sx={{ marginTop: theme.spacing(2) }}>
+        <TokenInfo direction="row" spacing={theme.spacing(3)}>
+          <Card>
+            <Stack direction="column" spacing={theme.spacing(2)} sx={{ padding: theme.spacing(3) }}>
+              <Typography fontWeight="500" sx={{ color: theme.palette.ds.gray_c900 }}>
+                {isLoading ? <Skeleton width="82px" height="16px" /> : `${tokenInfo.name} ${strings.balance}`}
+              </Typography>
 
-            <Stack direction="column" spacing={theme.spacing(0.5)}>
-              {isLoading ? (
-                <Skeleton width="146px" height="24px" />
-              ) : (
-                <Stack direction="row" spacing={theme.spacing(0.25)}>
-                  <Typography variant="h2" fontWeight="500">
-                    {tokenInfo.totalAmount}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    fontWeight="500"
-                    sx={{
-                      marginTop: '5px',
-                    }}
-                  >
-                    {tokenInfo.name}
-                  </Typography>
-                </Stack>
-              )}
+              <Stack direction="column" spacing={theme.spacing(0.5)}>
+                {isLoading ? (
+                  <Skeleton width="146px" height="24px" />
+                ) : (
+                  <Stack direction="row" spacing={theme.spacing(0.25)} alignItems="flex-end">
+                    <Typography variant="h2" fontWeight="500" sx={{ color: theme.palette.ds.gray_cmax }}>
+                      {tokenInfo.totalAmount}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      fontWeight="500"
+                      sx={{
+                        color: theme.palette.ds.black_static,
+                        padding: `${theme.spacing(1)} 0`,
+                      }}
+                    >
+                      {tokenInfo.name}
+                    </Typography>
+                  </Stack>
+                )}
 
-              {isLoading ? (
-                <Skeleton width="129px" height="16px" />
-              ) : (
-                <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
-                  {tokenInfo.totalAmountUsd} {unitOfAccount}
-                </Typography>
-              )}
+                {isLoading ? (
+                  <Skeleton width="129px" height="16px" />
+                ) : (
+                  <Typography sx={{ color: theme.palette.ds.gray_c600 }}>
+                    {tokenInfo.totalAmountUsd} {unitOfAccount}
+                  </Typography>
+                )}
+              </Stack>
             </Stack>
-          </Box>
 
-          <Divider />
+            <Divider />
 
-          <TokenDetailChart isLoading={isLoading} tokenInfo={tokenInfo} isAda={isAda} />
-        </Card>
+            <TokenDetailChart isLoading={isLoading} tokenInfo={tokenInfo} isAda={isAda} />
+          </Card>
 
-        <Card>
-          <Box sx={{ paddingTop: `${theme.spacing(2)}` }}>
-            <SubMenu
-              options={subMenuOptions}
-              onItemClick={route => setSelectedTab(route)}
-              isActiveItem={isActiveItem}
-              locationId="token-details"
-            />
-            <Divider sx={{ margin: `0 ${theme.spacing(2)}` }} />
-          </Box>
-          <Box sx={{ padding: theme.spacing(3) }}>
-            {selectedTab === subMenuOptions[0].route ? (
-              <TabContent>
-                <TokenDetailPerformance tokenInfo={tokenInfo} />
-              </TabContent>
-            ) : null}
+          <Card>
+            <Box sx={{ paddingTop: `${theme.spacing(2)}` }}>
+              <StyledSubMenu
+                options={subMenuOptions}
+                onItemClick={route => setSelectedTab(route)}
+                isActiveItem={isActiveItem}
+                locationId="token-details"
+              />
+              <Divider sx={{ margin: `0 ${theme.spacing(2)}` }} />
+            </Box>
+            <Box sx={{ padding: theme.spacing(3) }}>
+              {selectedTab === subMenuOptions[0].route ? (
+                <TabContent>
+                  <TokenDetailPerformance tokenInfo={tokenInfo} isLoading={isLoading} />
+                </TabContent>
+              ) : null}
 
-            {selectedTab === subMenuOptions[1].route ? (
-              <TabContent>
-                <TokenDetailOverview tokenInfo={tokenInfo} isLoading={isLoading} isAda={isAda} />
-              </TabContent>
-            ) : null}
-          </Box>
-        </Card>
-      </TokenInfo>
+              {selectedTab === subMenuOptions[1].route ? (
+                <TabContent>
+                  <TokenDetailOverview tokenInfo={tokenInfo} isLoading={isLoading} isAda={isAda} />
+                </TabContent>
+              ) : null}
+            </Box>
+          </Card>
+        </TokenInfo>
 
-      <TransactionTable history={transactionHistory} />
+        <TransactionTable history={transactionHistory} />
+      </Stack>
     </Box>
   );
 };

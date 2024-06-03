@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, Typography, Stack, Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { SortIcon } from '../../common/assets/icons/';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
 import { useStrings } from '../../common/hooks/useStrings';
 import adaPng from '../../../../../assets/images/ada.png';
@@ -12,6 +11,7 @@ import { Skeleton } from '../../../../components/Skeleton';
 import { truncateAddressShort } from '../../../../../utils/formatters';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import illustrationPng from '../../common/assets/images/illustration.png';
+import { Icon } from '../../../../components/icons';
 
 const TableRowSkeleton = ({ id, theme }) => (
   <TableRow
@@ -24,7 +24,7 @@ const TableRowSkeleton = ({ id, theme }) => (
       <Stack direction="row" alignItems="center" spacing={theme.spacing(1)}>
         <Skeleton width="24px" height="24px" />
         <Skeleton width="55px" height="24px" />
-        <Typography fontWeight="500" sx={{ color: theme.palette.ds.text_gray_normal }}>
+        <Typography fontWeight="500" sx={{ color: theme.palette.ds.gray_c900 }}>
           /
         </Typography>
         <Skeleton width="24px" height="24px" />
@@ -150,7 +150,7 @@ const OrderTable = ({ data, isLoading }) => {
                 <Typography variant="body2" sx={{ color: theme.palette.grayscale[600], userSelect: 'none' }}>
                   {label}
                 </Typography>
-                {disabledSort ? null : <SortIcon id={id} order={order} orderBy={orderBy} />}
+                {disabledSort ? null : <Icon.Sort id={id} order={order} orderBy={orderBy} />}
               </Stack>
             </TableCell>
           ))}
@@ -178,10 +178,10 @@ const OrderTable = ({ data, isLoading }) => {
                       component="img"
                       src={adaPng}
                     ></Box>
-                    <Typography fontWeight="500" sx={{ color: theme.palette.ds.text_gray_normal }}>
+                    <Typography fontWeight="500" sx={{ color: theme.palette.ds.gray_c900 }}>
                       {row.firstToken.name}
                     </Typography>
-                    <Typography fontWeight="500" sx={{ color: theme.palette.ds.text_gray_normal }}>
+                    <Typography fontWeight="500" sx={{ color: theme.palette.ds.gray_c900 }}>
                       /
                     </Typography>
                     <Box
@@ -193,7 +193,7 @@ const OrderTable = ({ data, isLoading }) => {
                       component="img"
                       src={hoskyPng}
                     ></Box>
-                    <Typography fontWeight="500" sx={{ color: theme.palette.ds.text_gray_normal }}>
+                    <Typography fontWeight="500" sx={{ color: theme.palette.ds.gray_c900 }}>
                       {row.secondToken.name}
                     </Typography>
                   </Stack>
@@ -220,18 +220,18 @@ const OrderTable = ({ data, isLoading }) => {
                       component="img"
                       src={minswapPng}
                     ></Box>
-                    <Typography fontWeight="500" sx={{ color: theme.palette.ds.text_primary_medium }}>
+                    <Typography fontWeight="500" sx={{ color: theme.palette.ds.primary_c600 }}>
                       {row.DEX}
                     </Typography>
                   </Stack>
                 </TableCell>
 
                 <TableCell>
-                  <Typography sx={{ color: theme.palette.ds.text_gray_normal }}>{row.assetPrice}</Typography>
+                  <Typography sx={{ color: theme.palette.ds.gray_c900 }}>{row.assetPrice}</Typography>
                 </TableCell>
 
                 <TableCell>
-                  <Typography sx={{ color: theme.palette.ds.text_gray_normal }}>{row.assetAmount}</Typography>
+                  <Typography sx={{ color: theme.palette.ds.gray_c900 }}>{row.assetAmount}</Typography>
                 </TableCell>
 
                 <TableCell>
@@ -241,7 +241,7 @@ const OrderTable = ({ data, isLoading }) => {
                         url: `https://cardanoscan.io/transaction/${row.transactionId}`,
                       })
                     }
-                    sx={{ color: theme.palette.ds.text_primary_medium, cursor: 'pointer' }}
+                    sx={{ color: theme.palette.ds.primary_c600, cursor: 'pointer' }}
                   >
                     {truncateAddressShort(row.transactionId, 10)}
                   </Typography>
@@ -249,11 +249,11 @@ const OrderTable = ({ data, isLoading }) => {
 
                 <TableCell>
                   <Stack direction="column" spacing={theme.spacing(0.25)}>
-                    <Typography sx={{ color: theme.palette.ds.text_gray_normal, textAlign: 'right' }}>
+                    <Typography sx={{ color: theme.palette.ds.gray_c900, textAlign: 'right' }}>
                       {row.totalValue} {row.firstToken.name}
                     </Typography>
                     {row.firstToken.name === 'ADA' && unitOfAccount === 'ADA' ? null : (
-                      <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium, textAlign: 'right' }}>
+                      <Typography variant="body2" sx={{ color: theme.palette.ds.gray_c600, textAlign: 'right' }}>
                         {row.totalValueUsd} {unitOfAccount}
                       </Typography>
                     )}
