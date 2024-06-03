@@ -8,7 +8,6 @@ import { usePortfolio } from '../../module/PortfolioContextProvider';
 import LiquidityTable from './LiquidityTable';
 import mockData from '../../common/mockData';
 import { ArrowIcon } from '../../common/assets/icons';
-import illustrationPng from '../../common/assets/images/illustration.png';
 import { Chip } from '../../common/components/Chip';
 import { Skeleton } from '../../../../components/Skeleton';
 import OrderTable from './OrderTable';
@@ -147,7 +146,7 @@ const PortfolioDapps = ({ data }) => {
               ) : (
                 <Typography sx={{ color: theme.palette.ds.text_gray_medium }}>
                   {isAdaMainUnit ? mockData.common.dappsBalance.usd : mockData.common.dappsBalance.ada}{' '}
-                  {isAdaMainUnit ? 'USD' : unitOfAccount}
+                  {isAdaMainUnit ? 'ADA' : unitOfAccount}
                 </Typography>
               )}
               {isLoading ? (
@@ -233,35 +232,9 @@ const PortfolioDapps = ({ data }) => {
           ))}
         </Stack>
 
-        {buttonProps[0].active ? (
-          liquidityList.length > 0 ? (
-            <LiquidityTable data={liquidityList} isLoading={isLoading} />
-          ) : (
-            <Stack width="full" justifyContent="center" alignItems="center" sx={{ flex: 1 }}>
-              <Stack direction="column" alignItems="center" spacing={theme.spacing(3)}>
-                <Box component="img" src={illustrationPng}></Box>
-                <Typography variant="h4" fontWeight="500" sx={{ color: theme.palette.ds.black_static }}>
-                  {strings.noResultsForThisSearch}
-                </Typography>
-              </Stack>
-            </Stack>
-          )
-        ) : null}
-        {buttonProps[1].active ? (
-          orderList.length > 0 ? (
-            <OrderTable data={orderList} isLoading={isLoading} />
-          ) : (
-            <Stack width="full" justifyContent="center" alignItems="center" sx={{ flex: 1 }}>
-              <Stack direction="column" alignItems="center" spacing={theme.spacing(3)}>
-                <Box component="img" src={illustrationPng}></Box>
-                <Typography variant="h4" fontWeight="500" sx={{ color: theme.palette.ds.black_static }}>
-                  {strings.noResultsForThisSearch}
-                </Typography>
-              </Stack>
-            </Stack>
-          )
-        ) : null}
-        {buttonProps[2].active ? <LendAndBorrow /> : null}
+        {buttonProps[0].active && <LiquidityTable data={liquidityList} isLoading={isLoading} />}
+        {buttonProps[1].active && <OrderTable data={orderList} isLoading={isLoading} />}
+        {buttonProps[2].active && <LendAndBorrow />}
       </Stack>
     </Box>
   );

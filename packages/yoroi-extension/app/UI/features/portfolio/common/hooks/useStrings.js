@@ -261,10 +261,6 @@ export const messages = Object.freeze(
       id: 'portfolio.liquidityTable.header.secondTokenValue',
       defaultMessage: '!!!Token value 2',
     },
-    pnl: {
-      id: 'portfolio.liquidityTable.header.pnl',
-      defaultMessage: '!!!PNL',
-    },
     lpTokens: {
       id: 'portfolio.liquidityTable.header.lpTokens',
       defaultMessage: '!!!LP tokens',
@@ -354,7 +350,6 @@ export const useStrings = () => {
     dex: intl.formatMessage(messages.dex),
     firstTokenValue: intl.formatMessage(messages.firstTokenValue),
     secondTokenValue: intl.formatMessage(messages.secondTokenValue),
-    pnl: intl.formatMessage(messages.pnl),
     lpTokens: intl.formatMessage(messages.lpTokens),
     totalValue: intl.formatMessage(messages.totalValue),
     pair: intl.formatMessage(messages.pair),

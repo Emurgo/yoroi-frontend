@@ -10,6 +10,7 @@ import minswapPng from '../../common/assets/images/minswap-dex.png';
 import { Chip } from '../../common/components/Chip';
 import { Skeleton } from '../../../../components/Skeleton';
 import { useStrings } from '../../common/hooks/useStrings';
+import illustrationPng from '../../common/assets/images/illustration.png';
 
 const TableRowSkeleton = ({ id, theme }) => (
   <TableRow
@@ -50,13 +51,6 @@ const TableRowSkeleton = ({ id, theme }) => (
     </TableCell>
 
     <TableCell>
-      <Stack direction="column" spacing={theme.spacing(0.25)}>
-        <Skeleton width="65px" height="24px" />
-        <Skeleton width="65px" height="20px" />
-      </Stack>
-    </TableCell>
-
-    <TableCell>
       <Skeleton width="146px" height="24px" />
     </TableCell>
 
@@ -85,7 +79,6 @@ const LiquidityTable = ({ data, isLoading }) => {
     { id: 'DEX', label: strings.dex, align: 'left', sortType: 'character' },
     { id: 'firstTokenValue', label: strings.firstTokenValue, align: 'left', sortType: 'numeric' },
     { id: 'secondTokenValue', label: strings.secondTokenValue, align: 'left', sortType: 'numeric' },
-    { id: 'PNLValue', label: strings.pnl, align: 'left', sortType: 'numeric' },
     {
       id: 'lpTokens',
       label: strings.lpTokens,
@@ -148,7 +141,7 @@ const LiquidityTable = ({ data, isLoading }) => {
     [order, orderBy, headCells]
   );
 
-  return (
+  return getSortedData(list).length > 0 ? (
     <Table aria-label="liquidity table">
       <TableHead>
         <TableRow>
@@ -173,7 +166,7 @@ const LiquidityTable = ({ data, isLoading }) => {
                   id={id}
                   order={order}
                   orderBy={orderBy}
-                  style={{ cursor: 'pointer ' }}
+                  style={{ cursor: 'pointer' }}
                   onClick={() => (index === 0 || index === headCells.length - 1 ? null : handleRequestSort(id))}
                 />
               </Stack>
@@ -224,7 +217,17 @@ const LiquidityTable = ({ data, isLoading }) => {
                 </TableCell>
 
                 <TableCell>
-                  <Stack direction="row" alignItems="center" spacing={theme.spacing(1)}>
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    spacing={theme.spacing(1)}
+                    onClick={() =>
+                      chrome.tabs.create({
+                        url: row.DEXLink,
+                      })
+                    }
+                    sx={{ width: 'fit-content', cursor: 'pointer' }}
+                  >
                     <Box
                       width="32px"
                       height="32px"
@@ -267,23 +270,6 @@ const LiquidityTable = ({ data, isLoading }) => {
                 </TableCell>
 
                 <TableCell>
-                  <Stack direction="column" spacing={theme.spacing(0.25)}>
-                    <Typography>
-                      {row.PNLValue} {row.firstToken.name}
-                    </Typography>
-                    <Chip
-                      active={row.PNLValueUsd > 0}
-                      label={
-                        <Typography variant="caption1">
-                          {row.PNLValueUsd > 0 && '+'}
-                          {row.PNLValueUsd} {unitOfAccount}
-                        </Typography>
-                      }
-                    />
-                  </Stack>
-                </TableCell>
-
-                <TableCell>
                   <Typography sx={{ color: theme.palette.ds.text_gray_normal }}>{row.lpTokens}</Typography>
                 </TableCell>
 
@@ -303,6 +289,15 @@ const LiquidityTable = ({ data, isLoading }) => {
             ))}
       </TableBody>
     </Table>
+  ) : (
+    <Stack width="full" justifyContent="center" alignItems="center" sx={{ flex: 1 }}>
+      <Stack direction="column" alignItems="center" spacing={theme.spacing(3)}>
+        <Box component="img" src={illustrationPng}></Box>
+        <Typography variant="h4" fontWeight="500" sx={{ color: theme.palette.ds.black_static }}>
+          {strings.noResultsForThisSearch}
+        </Typography>
+      </Stack>
+    </Stack>
   );
 };
 

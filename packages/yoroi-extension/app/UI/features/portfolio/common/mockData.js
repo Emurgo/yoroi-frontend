@@ -2,9 +2,7 @@ import { HistoryItemStatus, HistoryItemType } from '../useCases/TokenDetails/Tra
 
 // UTILS
 const getRandomTime = (startDate, endDate) => {
-  const date = new Date(
-    startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime())
-  );
+  const date = new Date(startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime()));
   return date.toISOString();
 };
 const startDate = new Date('01-01-2023 8:30');
@@ -48,8 +46,7 @@ const mockData = {
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
           website: 'https://www.cardano.org',
           detailOn: 'https://www.yoroiwallet.com',
-          policyId:
-            'asset155qynmnez65dr3tz5699wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzdv20el66l8j025e4g6k0kafjfv4ukawsly9ats',
+          policyId: 'asset155qynmnez65dr3tz5699wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzdv20el66l8j025e4g6k0kafjfv4ukawsly9ats',
           fingerprint:
             'asset399q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj1234',
         },
@@ -68,8 +65,8 @@ const mockData = {
         chartData: [
           {
             time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start24HoursAgo, now),
@@ -78,13 +75,13 @@ const mockData = {
           },
           {
             time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1WeekAgo, now),
@@ -98,13 +95,13 @@ const mockData = {
           },
           {
             time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1WeekAgo, now),
@@ -113,8 +110,8 @@ const mockData = {
           },
           {
             time: getRandomTime(start1MonthAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1MonthAgo, now),
@@ -123,8 +120,8 @@ const mockData = {
           },
           {
             time: getRandomTime(start1MonthAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -143,8 +140,8 @@ const mockData = {
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -153,8 +150,8 @@ const mockData = {
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -163,18 +160,18 @@ const mockData = {
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -208,8 +205,7 @@ const mockData = {
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
           website: 'https://www.cardano.org',
           detailOn: 'https://www.yoroiwallet.com',
-          policyId:
-            'asset155qynmnez65dr3tz5699wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzdv20el66l8j025e4g6k0kafjfv4ukawsly9ats',
+          policyId: 'asset155qynmnez65dr3tz5699wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzdv20el66l8j025e4g6k0kafjfv4ukawsly9ats',
           fingerprint:
             'asset399q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj1234',
         },
@@ -228,8 +224,8 @@ const mockData = {
         chartData: [
           {
             time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start24HoursAgo, now),
@@ -238,13 +234,13 @@ const mockData = {
           },
           {
             time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1WeekAgo, now),
@@ -258,13 +254,13 @@ const mockData = {
           },
           {
             time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1WeekAgo, now),
@@ -273,8 +269,8 @@ const mockData = {
           },
           {
             time: getRandomTime(start1MonthAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1MonthAgo, now),
@@ -283,8 +279,8 @@ const mockData = {
           },
           {
             time: getRandomTime(start1MonthAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -303,8 +299,8 @@ const mockData = {
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -313,8 +309,8 @@ const mockData = {
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -323,18 +319,18 @@ const mockData = {
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -368,8 +364,7 @@ const mockData = {
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
           website: 'https://www.cardano.org',
           detailOn: 'https://www.yoroiwallet.com',
-          policyId:
-            'asset155qynmnez65dr3tz5699wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzdv20el66l8j025e4g6k0kafjfv4ukawsly9ats',
+          policyId: 'asset155qynmnez65dr3tz5699wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzdv20el66l8j025e4g6k0kafjfv4ukawsly9ats',
           fingerprint:
             'asset399q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj1234',
         },
@@ -388,8 +383,8 @@ const mockData = {
         chartData: [
           {
             time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start24HoursAgo, now),
@@ -398,13 +393,13 @@ const mockData = {
           },
           {
             time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1WeekAgo, now),
@@ -418,13 +413,13 @@ const mockData = {
           },
           {
             time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1WeekAgo, now),
@@ -433,8 +428,8 @@ const mockData = {
           },
           {
             time: getRandomTime(start1MonthAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1MonthAgo, now),
@@ -443,8 +438,8 @@ const mockData = {
           },
           {
             time: getRandomTime(start1MonthAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -463,8 +458,8 @@ const mockData = {
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -473,8 +468,8 @@ const mockData = {
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -483,18 +478,18 @@ const mockData = {
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -528,8 +523,7 @@ const mockData = {
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
           website: 'https://www.cardano.org',
           detailOn: 'https://www.yoroiwallet.com',
-          policyId:
-            'asset155qynmnez65dr3tz5699wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzdv20el66l8j025e4g6k0kafjfv4ukawsly9ats',
+          policyId: 'asset155qynmnez65dr3tz5699wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzdv20el66l8j025e4g6k0kafjfv4ukawsly9ats',
           fingerprint:
             'asset399q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj1234',
         },
@@ -548,8 +542,8 @@ const mockData = {
         chartData: [
           {
             time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start24HoursAgo, now),
@@ -558,13 +552,13 @@ const mockData = {
           },
           {
             time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1WeekAgo, now),
@@ -578,13 +572,13 @@ const mockData = {
           },
           {
             time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1WeekAgo, now),
@@ -593,8 +587,8 @@ const mockData = {
           },
           {
             time: getRandomTime(start1MonthAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1MonthAgo, now),
@@ -603,8 +597,8 @@ const mockData = {
           },
           {
             time: getRandomTime(start1MonthAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -623,8 +617,8 @@ const mockData = {
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -633,8 +627,8 @@ const mockData = {
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -643,18 +637,18 @@ const mockData = {
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -688,8 +682,7 @@ const mockData = {
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
           website: 'https://www.cardano.org',
           detailOn: 'https://www.yoroiwallet.com',
-          policyId:
-            'asset155qynmnez65dr3tz5699wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzdv20el66l8j025e4g6k0kafjfv4ukawsly9ats',
+          policyId: 'asset155qynmnez65dr3tz5699wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzdv20el66l8j025e4g6k0kafjfv4ukawsly9ats',
           fingerprint:
             'asset399q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj1234',
         },
@@ -708,8 +701,8 @@ const mockData = {
         chartData: [
           {
             time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start24HoursAgo, now),
@@ -718,13 +711,13 @@ const mockData = {
           },
           {
             time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1WeekAgo, now),
@@ -738,13 +731,13 @@ const mockData = {
           },
           {
             time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1WeekAgo, now),
@@ -753,8 +746,8 @@ const mockData = {
           },
           {
             time: getRandomTime(start1MonthAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1MonthAgo, now),
@@ -763,8 +756,8 @@ const mockData = {
           },
           {
             time: getRandomTime(start1MonthAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -783,8 +776,8 @@ const mockData = {
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -793,8 +786,8 @@ const mockData = {
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -803,18 +796,18 @@ const mockData = {
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -848,8 +841,7 @@ const mockData = {
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
           website: 'https://www.cardano.org',
           detailOn: 'https://www.yoroiwallet.com',
-          policyId:
-            'asset155qynmnez65dr3tz5699wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzdv20el66l8j025e4g6k0kafjfv4ukawsly9ats',
+          policyId: 'asset155qynmnez65dr3tz5699wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzdv20el66l8j025e4g6k0kafjfv4ukawsly9ats',
           fingerprint:
             'asset399q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj1234',
         },
@@ -868,8 +860,8 @@ const mockData = {
         chartData: [
           {
             time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start24HoursAgo, now),
@@ -878,13 +870,13 @@ const mockData = {
           },
           {
             time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1WeekAgo, now),
@@ -898,13 +890,13 @@ const mockData = {
           },
           {
             time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1WeekAgo, now),
@@ -913,8 +905,8 @@ const mockData = {
           },
           {
             time: getRandomTime(start1MonthAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1MonthAgo, now),
@@ -923,8 +915,8 @@ const mockData = {
           },
           {
             time: getRandomTime(start1MonthAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -943,8 +935,8 @@ const mockData = {
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -953,8 +945,8 @@ const mockData = {
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -963,18 +955,18 @@ const mockData = {
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -1008,8 +1000,7 @@ const mockData = {
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
           website: 'https://www.cardano.org',
           detailOn: 'https://www.yoroiwallet.com',
-          policyId:
-            'asset155qynmnez65dr3tz5699wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzdv20el66l8j025e4g6k0kafjfv4ukawsly9ats',
+          policyId: 'asset155qynmnez65dr3tz5699wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzdv20el66l8j025e4g6k0kafjfv4ukawsly9ats',
           fingerprint:
             'asset399q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj1234',
         },
@@ -1028,8 +1019,8 @@ const mockData = {
         chartData: [
           {
             time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start24HoursAgo, now),
@@ -1038,13 +1029,13 @@ const mockData = {
           },
           {
             time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1WeekAgo, now),
@@ -1058,13 +1049,13 @@ const mockData = {
           },
           {
             time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1WeekAgo, now),
@@ -1073,8 +1064,8 @@ const mockData = {
           },
           {
             time: getRandomTime(start1MonthAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1MonthAgo, now),
@@ -1083,8 +1074,8 @@ const mockData = {
           },
           {
             time: getRandomTime(start1MonthAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -1103,8 +1094,8 @@ const mockData = {
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -1113,8 +1104,8 @@ const mockData = {
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -1123,18 +1114,18 @@ const mockData = {
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -1168,8 +1159,7 @@ const mockData = {
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
           website: 'https://www.cardano.org',
           detailOn: 'https://www.yoroiwallet.com',
-          policyId:
-            'asset155qynmnez65dr3tz5699wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzdv20el66l8j025e4g6k0kafjfv4ukawsly9ats',
+          policyId: 'asset155qynmnez65dr3tz5699wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzdv20el66l8j025e4g6k0kafjfv4ukawsly9ats',
           fingerprint:
             'asset399q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj1234',
         },
@@ -1188,8 +1178,8 @@ const mockData = {
         chartData: [
           {
             time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start24HoursAgo, now),
@@ -1198,13 +1188,13 @@ const mockData = {
           },
           {
             time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1WeekAgo, now),
@@ -1218,13 +1208,13 @@ const mockData = {
           },
           {
             time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1WeekAgo, now),
@@ -1233,8 +1223,8 @@ const mockData = {
           },
           {
             time: getRandomTime(start1MonthAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1MonthAgo, now),
@@ -1243,8 +1233,8 @@ const mockData = {
           },
           {
             time: getRandomTime(start1MonthAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -1263,8 +1253,8 @@ const mockData = {
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -1273,8 +1263,8 @@ const mockData = {
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -1283,18 +1273,18 @@ const mockData = {
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -1328,8 +1318,7 @@ const mockData = {
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
           website: 'https://www.cardano.org',
           detailOn: 'https://www.yoroiwallet.com',
-          policyId:
-            'asset155qynmnez65dr3tz5699wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzdv20el66l8j025e4g6k0kafjfv4ukawsly9ats',
+          policyId: 'asset155qynmnez65dr3tz5699wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzdv20el66l8j025e4g6k0kafjfv4ukawsly9ats',
           fingerprint:
             'asset399q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj1234',
         },
@@ -1348,8 +1337,8 @@ const mockData = {
         chartData: [
           {
             time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start24HoursAgo, now),
@@ -1358,13 +1347,13 @@ const mockData = {
           },
           {
             time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start24HoursAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1WeekAgo, now),
@@ -1378,13 +1367,13 @@ const mockData = {
           },
           {
             time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1WeekAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1WeekAgo, now),
@@ -1393,8 +1382,8 @@ const mockData = {
           },
           {
             time: getRandomTime(start1MonthAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(start1MonthAgo, now),
@@ -1403,8 +1392,8 @@ const mockData = {
           },
           {
             time: getRandomTime(start1MonthAgo, now),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -1423,8 +1412,8 @@ const mockData = {
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -1433,8 +1422,8 @@ const mockData = {
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -1443,18 +1432,18 @@ const mockData = {
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
-            value: Math.random().toFixed(3),
-            usd: Math.random().toFixed(3) * 1000,
+            value: -Math.random().toFixed(3),
+            usd: -Math.random().toFixed(3) * 1000,
           },
           {
             time: getRandomTime(startDate, endDate),
@@ -1488,8 +1477,7 @@ const mockData = {
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
           website: 'https://www.cardano.org',
           detailOn: 'https://www.yoroiwallet.com',
-          policyId:
-            'asset155qynmnez65dr3tz5699wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzdv20el66l8j025e4g6k0kafjfv4ukawsly9ats',
+          policyId: 'asset155qynmnez65dr3tz5699wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzdv20el66l8j025e4g6k0kafjfv4ukawsly9ats',
           fingerprint:
             'asset399q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj1234',
         },
@@ -1717,6 +1705,7 @@ const mockData = {
         id: Math.random(),
         tokenPair: 'ADA/LVLC',
         DEX: 'Minswap',
+        DEXLink: 'https://app.minswap.org/',
         firstToken: {
           name: 'ADA',
           id: 'ada',
@@ -1725,8 +1714,6 @@ const mockData = {
           name: 'LVLC',
           id: 'lvlc',
         },
-        PNLValue: (Math.random() * 10).toFixed(2),
-        PNLValueUsd: -(Math.random() * 10).toFixed(2),
         lpTokens: (Math.random() * 1000000).toFixed(2),
         totalValue: (Math.random() * 1000).toFixed(2),
         totalValueUsd: (Math.random() * 100).toFixed(2),
@@ -1739,6 +1726,7 @@ const mockData = {
         id: Math.random(),
         tokenPair: 'DOGE/Shiba',
         DEX: 'Sundaeswap',
+        DEXLink: 'https://v2.sundaeswap.finance/',
         firstToken: {
           name: 'DOGE',
           id: 'doge',
@@ -1747,8 +1735,6 @@ const mockData = {
           name: 'Shiba',
           id: 'shiba',
         },
-        PNLValue: (Math.random() * 10).toFixed(2),
-        PNLValueUsd: (Math.random() * 10).toFixed(2),
         lpTokens: (Math.random() * 1000000).toFixed(2),
         totalValue: (Math.random() * 1000).toFixed(2),
         totalValueUsd: (Math.random() * 100).toFixed(2),
@@ -1761,6 +1747,7 @@ const mockData = {
         id: Math.random(),
         tokenPair: 'DBZ/ADA',
         DEX: 'Sundaeswap',
+        DEXLink: 'https://v2.sundaeswap.finance/',
         firstToken: {
           name: 'DBZ',
           id: 'dbz',
@@ -1769,8 +1756,6 @@ const mockData = {
           name: 'ADA',
           id: 'ada',
         },
-        PNLValue: (Math.random() * 10).toFixed(2),
-        PNLValueUsd: (Math.random() * 10).toFixed(2),
         lpTokens: (Math.random() * 1000000).toFixed(2),
         totalValue: (Math.random() * 1000).toFixed(2),
         totalValueUsd: (Math.random() * 100).toFixed(2),
@@ -1783,6 +1768,7 @@ const mockData = {
         id: Math.random(),
         tokenPair: 'ADA/BRICKS',
         DEX: 'Minswap',
+        DEXLink: 'https://app.minswap.org/',
         firstToken: {
           name: 'ADA',
           id: 'ada',
@@ -1791,8 +1777,6 @@ const mockData = {
           name: 'BRICKS',
           id: 'bricks',
         },
-        PNLValue: (Math.random() * 10).toFixed(2),
-        PNLValueUsd: -(Math.random() * 10).toFixed(2),
         lpTokens: (Math.random() * 1000000).toFixed(2),
         totalValue: (Math.random() * 1000).toFixed(2),
         totalValueUsd: (Math.random() * 100).toFixed(2),
@@ -1805,6 +1789,7 @@ const mockData = {
         id: Math.random(),
         tokenPair: 'ADA/POPPA',
         DEX: 'Sundaeswap',
+        DEXLink: 'https://v2.sundaeswap.finance/',
         firstToken: {
           name: 'ADA',
           id: 'ada',
@@ -1813,8 +1798,6 @@ const mockData = {
           name: 'POPPA',
           id: 'poppa',
         },
-        PNLValue: (Math.random() * 10).toFixed(2),
-        PNLValueUsd: -(Math.random() * 10).toFixed(2),
         lpTokens: (Math.random() * 1000000).toFixed(2),
         totalValue: (Math.random() * 1000).toFixed(2),
         totalValueUsd: (Math.random() * 100).toFixed(2),
@@ -1827,6 +1810,7 @@ const mockData = {
         id: Math.random(),
         tokenPair: 'CUBY/VALDO',
         DEX: 'Sundaeswap',
+        DEXLink: 'https://v2.sundaeswap.finance/',
         firstToken: {
           name: 'CUBY',
           id: 'cuby',
@@ -1835,8 +1819,6 @@ const mockData = {
           name: 'VALDO',
           id: 'valdo',
         },
-        PNLValue: (Math.random() * 10).toFixed(2),
-        PNLValueUsd: (Math.random() * 10).toFixed(2),
         lpTokens: (Math.random() * 1000000).toFixed(2),
         totalValue: (Math.random() * 1000).toFixed(2),
         totalValueUsd: (Math.random() * 100).toFixed(2),
@@ -1849,6 +1831,7 @@ const mockData = {
         id: Math.random(),
         tokenPair: 'SNEK/USDTST',
         DEX: 'Minswap',
+        DEXLink: 'https://app.minswap.org/',
         firstToken: {
           name: 'SNEK',
           id: 'snek',
@@ -1857,8 +1840,6 @@ const mockData = {
           name: 'USDTST',
           id: 'usdtst',
         },
-        PNLValue: (Math.random() * 10).toFixed(2),
-        PNLValueUsd: (Math.random() * 10).toFixed(2),
         lpTokens: (Math.random() * 1000000).toFixed(2),
         totalValue: (Math.random() * 1000).toFixed(2),
         totalValueUsd: (Math.random() * 100).toFixed(2),
@@ -1871,6 +1852,7 @@ const mockData = {
         id: Math.random(),
         tokenPair: 'GERO/NMKR',
         DEX: 'Minswap',
+        DEXLink: 'https://app.minswap.org/',
         firstToken: {
           name: 'GERO',
           id: 'gero',
@@ -1879,8 +1861,6 @@ const mockData = {
           name: 'NMKR',
           id: 'nmkr',
         },
-        PNLValue: (Math.random() * 10).toFixed(2),
-        PNLValueUsd: -(Math.random() * 10).toFixed(2),
         lpTokens: (Math.random() * 1000000).toFixed(2),
         totalValue: (Math.random() * 1000).toFixed(2),
         totalValueUsd: (Math.random() * 100).toFixed(2),
@@ -1893,6 +1873,7 @@ const mockData = {
         id: Math.random(),
         tokenPair: 'SMOKES/CPASS',
         DEX: 'Minswap',
+        DEXLink: 'https://app.minswap.org/',
         firstToken: {
           name: 'SMOKES',
           id: 'smokes',
@@ -1901,8 +1882,6 @@ const mockData = {
           name: 'CPASS',
           id: 'cpass',
         },
-        PNLValue: (Math.random() * 10).toFixed(2),
-        PNLValueUsd: (Math.random() * 10).toFixed(2),
         lpTokens: (Math.random() * 1000000).toFixed(2),
         totalValue: (Math.random() * 1000).toFixed(2),
         totalValueUsd: (Math.random() * 100).toFixed(2),
@@ -1925,6 +1904,7 @@ const mockData = {
           id: 'lvlc',
         },
         DEX: 'Minswap',
+        DEXLink: 'https://app.minswap.org/',
         assetPrice: Math.round(Math.random() * 10),
         assetAmount: Math.round(Math.random() * 10),
         transactionId: '043a2bfbb1d66d9883a068059a4e35bb53b7bdc6f5637d7b934150c453ffb116',
@@ -1943,6 +1923,7 @@ const mockData = {
           id: 'lvlc',
         },
         DEX: 'Sundaeswap',
+        DEXLink: 'https://v2.sundaeswap.finance/',
         assetPrice: Math.round(Math.random() * 10),
         assetAmount: Math.round(Math.random() * 10),
         transactionId: 'a0a863e8eb398c04caebdbd3a3e50733bcb6c06e118c36eadb7f7b53424668a5',
@@ -1961,6 +1942,7 @@ const mockData = {
           id: 'wtab',
         },
         DEX: 'Minswap',
+        DEXLink: 'https://app.minswap.org/',
         assetPrice: Math.round(Math.random() * 10),
         assetAmount: Math.round(Math.random() * 10),
         transactionId: '043a2bfbb1d66d9883a068059a4e35bb53b7bdc6f5637d7b934150c453ffb116',
@@ -1979,6 +1961,7 @@ const mockData = {
           id: 'smokes',
         },
         DEX: 'Sundaeswap',
+        DEXLink: 'https://v2.sundaeswap.finance/',
         assetPrice: Math.round(Math.random() * 10),
         assetAmount: Math.round(Math.random() * 10),
         transactionId: 'a0a863e8eb398c04caebdbd3a3e50733bcb6c06e118c36eadb7f7b53424668a5',
@@ -1997,6 +1980,7 @@ const mockData = {
           id: 'hosky',
         },
         DEX: 'Minswap',
+        DEXLink: 'https://app.minswap.org/',
         assetPrice: Math.round(Math.random() * 10),
         assetAmount: Math.round(Math.random() * 10),
         transactionId: '043a2bfbb1d66d9883a068059a4e35bb53b7bdc6f5637d7b934150c453ffb116',
@@ -2015,6 +1999,7 @@ const mockData = {
           id: 'drip',
         },
         DEX: 'Sundaeswap',
+        DEXLink: 'https://v2.sundaeswap.finance/',
         assetPrice: Math.round(Math.random() * 10),
         assetAmount: Math.round(Math.random() * 10),
         transactionId: 'a0a863e8eb398c04caebdbd3a3e50733bcb6c06e118c36eadb7f7b53424668a5',
@@ -2033,6 +2018,7 @@ const mockData = {
           id: 'catsky',
         },
         DEX: 'Minswap',
+        DEXLink: 'https://app.minswap.org/',
         assetPrice: Math.round(Math.random() * 10),
         assetAmount: Math.round(Math.random() * 10),
         transactionId: '043a2bfbb1d66d9883a068059a4e35bb53b7bdc6f5637d7b934150c453ffb116',
@@ -2051,6 +2037,7 @@ const mockData = {
           id: 'usdc',
         },
         DEX: 'Minswap',
+        DEXLink: 'https://app.minswap.org/',
         assetPrice: Math.round(Math.random() * 10),
         assetAmount: Math.round(Math.random() * 10),
         transactionId: 'a0a863e8eb398c04caebdbd3a3e50733bcb6c06e118c36eadb7f7b53424668a5',
@@ -2069,6 +2056,7 @@ const mockData = {
           id: 'copi',
         },
         DEX: 'Sundaeswap',
+        DEXLink: 'https://v2.sundaeswap.finance/',
         assetPrice: Math.round(Math.random() * 10),
         assetAmount: Math.round(Math.random() * 10),
         transactionId: 'a0a863e8eb398c04caebdbd3a3e50733bcb6c06e118c36eadb7f7b53424668a5',

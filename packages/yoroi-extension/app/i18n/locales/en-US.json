@@ -1118,7 +1118,6 @@
   "portfolio.liquidityTable.header.tokenPair": "Token pair",
   "portfolio.liquidityTable.header.firstTokenValue": "Token value 1",
   "portfolio.liquidityTable.header.secondTokenValue": "Token value 2",
-  "portfolio.liquidityTable.header.pnl": "PNL",
   "portfolio.liquidityTable.header.lpTokens": "LP tokens",
   "portfolio.orderTable.header.pair": "Pair (From / To)",
   "portfolio.orderTable.header.assetPrice": "Asset price",

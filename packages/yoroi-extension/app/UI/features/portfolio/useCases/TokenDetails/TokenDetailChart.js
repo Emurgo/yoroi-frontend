@@ -197,7 +197,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
           ) : (
             <Stack direction="row" alignItems="center">
               <Typography fontWeight="500" sx={{ marginBottom: theme.spacing(0.1125) }}>
-                {detailInfo.value}
+                {detailInfo.usd}
               </Typography>
               <Typography variant="caption1">&nbsp;{unitOfAccount}</Typography>
             </Stack>
@@ -226,7 +226,9 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
                           transform: detailInfo.value > 0 ? '' : 'rotate(180deg)',
                         }}
                       />
-                      <Typography variant="caption1">{detailInfo.value}%</Typography>
+                      <Typography variant="caption1">
+                        {detailInfo.value > 0 ? detailInfo.value : -1 * detailInfo.value}%
+                      </Typography>
                     </Stack>
                   }
                 />
@@ -239,7 +241,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
                   active={detailInfo.usd > 0}
                   label={
                     <Typography variant="caption1">
-                      {detailInfo.usd > 0 ? '+' : '-'}
+                      {detailInfo.usd > 0 && '+'}
                       {detailInfo.usd} {unitOfAccount}
                     </Typography>
                   }
