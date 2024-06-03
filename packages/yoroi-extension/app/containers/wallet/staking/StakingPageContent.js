@@ -36,7 +36,6 @@ import {
   roundTwoDecimal,
 } from '../../../utils/formatters';
 import { compose, maybe } from '../../../coreUtils';
-import { Typography } from '@mui/material';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;

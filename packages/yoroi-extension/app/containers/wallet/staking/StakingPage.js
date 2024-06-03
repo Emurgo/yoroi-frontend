@@ -12,12 +12,10 @@ import SidebarContainer from '../../SidebarContainer';
 import NavBarContainerRevamp from '../../NavBarContainerRevamp';
 import TopBarLayout from '../../../components/layout/TopBarLayout';
 import NavBarTitle from '../../../components/topbar/NavBarTitle';
+import { PoolTransitionBanner } from './PoolTransitionBanner';
 
 export const StakingPageContentPromise: void => Promise<any> = () => import('./StakingPageContent');
 const StakingPageContent = lazy(StakingPageContentPromise);
-import { Box } from '@mui/material';
-import { Typography } from '@mui/material';
-import { PoolTransitionBanner } from './PoolTransitionBanner';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;

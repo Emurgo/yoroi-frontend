@@ -7,7 +7,6 @@ import type { PoolTransition } from '../../../../stores/toplevel/DelegationStore
 import { StakePoolCard } from './StakePoolCard';
 import { messages } from './dialog-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import Separator from '../../../../components/common/separator/Separator';
 import { ReactComponent as ArrowRightSvg } from '../../../../assets/images/revamp/icons/arrow-right.inline.svg';
 import { Box } from '@mui/material';
 

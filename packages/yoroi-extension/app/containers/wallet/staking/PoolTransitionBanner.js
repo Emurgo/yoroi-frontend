@@ -1,6 +1,5 @@
 // @flow
 
-import React from 'react';
 import type { Node } from 'react';
 import { styled } from '@mui/system';
 import { Alert, Typography } from '@mui/material';

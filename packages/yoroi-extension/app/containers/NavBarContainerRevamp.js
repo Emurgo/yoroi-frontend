@@ -18,8 +18,6 @@ import WalletListDialog from '../components/topbar/WalletListDialog';
 import BuySellAdaButton from '../components/topbar/BuySellAdaButton';
 import { ampli } from '../../ampli/index';
 import { MultiToken } from '../api/common/lib/MultiToken';
-import { Box } from '@mui/material';
-import { Typography } from '@mui/material';
 
 type Props = {|
   ...StoresAndActionsProps,
