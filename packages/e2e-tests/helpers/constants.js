@@ -66,6 +66,10 @@ export const WalletWordsSize = Object.freeze({
 });
 export const adaInLovelaces = 1000000;
 
+export const projectRootDir = path.resolve(__dirname, '..');
+
+export const dbSnapshotsDir = path.resolve(projectRootDir, 'helpers', 'wallet-dbSnapshots');
+
 export const testRunDir = browserName =>
   path.resolve(__dirname, '..', `testRunsData_${browserName}`);
 

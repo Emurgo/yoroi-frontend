@@ -157,7 +157,6 @@
     "@mui/material": "^5.0.4",
     "@mui/x-date-pickers": "^5.0.8",
     "@svgr/webpack": "5.5.0",
-    "@vespaiach/axios-fetch-adapter": "^0.3.0",
     "@yoroi/exchange": "2.0.1",
     "@yoroi/resolver": "2.0.2",
     "@yoroi/swap": "1.5.2",
