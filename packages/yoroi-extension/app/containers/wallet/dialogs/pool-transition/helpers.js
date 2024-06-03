@@ -1,19 +1,22 @@
 // @flow
 const ms_in_sec = 1000;
-const sec_in_day = 86400;
-const sec_in_hour = 3600;
-const sec_in_min = 60;
-export const formatTimeSpan: number => string = (ms: number) => {
-  if (ms < 0) return '';
+const ms_in_min = ms_in_sec * 60;
+const ms_in_hour = ms_in_min * 60;
+const ms_in_day = ms_in_hour * 24;
 
-  let seconds = Math.round(Math.abs(ms) / ms_in_sec);
-  const days = Math.floor(seconds / sec_in_day);
-  seconds = Math.floor(seconds % sec_in_day);
-  const hours = Math.floor(seconds / sec_in_hour);
-  seconds = Math.floor(seconds % sec_in_hour);
-  const minutes = Math.floor(seconds / sec_in_min);
-  const [dd, hh, mm] = [days, hours, minutes].map(item =>
-    item < 10 ? '0' + item : item.toString()
-  );
-  return `${dd}d : ${hh}h : ${mm}m`;
+export const formatTimeSpan = (futureMilliseconds: number, currentMilliseconds: number): string => {
+  let remainingMs = futureMilliseconds - currentMilliseconds;
+
+  if (remainingMs < 0) return 'Date is in the past';
+
+  const days = Math.floor(remainingMs / ms_in_day);
+  remainingMs %= ms_in_day;
+  const hours = Math.floor(remainingMs / ms_in_hour);
+  remainingMs %= ms_in_hour;
+  const minutes = Math.floor(remainingMs / ms_in_min);
+
+  const formatUnit = (unit: number) => (unit < 10 ? '0' + unit : unit.toString());
+  const result = `${days}d : ${formatUnit(hours)}h : ${formatUnit(minutes)}m`;
+
+  return result;
 };

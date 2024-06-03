@@ -55,6 +55,7 @@ export type PoolTransition = {|
   deadlineMilliseconds: ?number,
   shouldShowTransitionFunnel: boolean,
   suggestedPool: ?PoolInfo,
+  deadlinePassed: boolean,
 |};
 
 type PoolTransitionModal = {| show: 'open' | 'closed' | 'idle', shouldUpdatePool: boolean |};
@@ -109,7 +110,6 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     const { delegation } = this.actions;
     this.registerReactions([this._changeWallets]);
     delegation.setSelectedPage.listen(this._setSelectedPage);
-    this.checkPoolTransition();
   }
 
   @action
@@ -240,14 +240,16 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     const currentPool = this.getDelegatedPoolId(publicDeriver);
 
     try {
-      const transitionResult = await maybe(currentPool,
-          p => new PoolInfoApi().getTransition(p, RustModule.CrossCsl.init));
+      const transitionResult = await maybe(currentPool, p =>
+        new PoolInfoApi().getTransition(p, RustModule.CrossCsl.init)
+      );
 
       const response = {
         currentPool: transitionResult?.current,
         suggestedPool: transitionResult?.suggested,
         deadlineMilliseconds: transitionResult?.deadlineMilliseconds,
-        shouldShowTransitionFunnel: environment.isDev(),
+        shouldShowTransitionFunnel: environment.isDev() && transitionResult !== null,
+        deadlinePassed: Number(transitionResult?.deadlineMilliseconds) < Date.now(),
       };
 
       if (

@@ -14,6 +14,7 @@ type Props = {|
   fee?: string,
   deadlineMilliseconds?: number,
   suggestedPool?: boolean,
+  deadlinePassed: boolean,
   poolHash?: string,
   intl: $npm$ReactIntl$IntlFormat,
 |};
@@ -24,6 +25,7 @@ export const StakePoolCard = ({
   roa,
   fee,
   deadlineMilliseconds,
+  deadlinePassed,
   suggestedPool = false,
   intl,
   poolHash,
@@ -65,20 +67,20 @@ export const StakePoolCard = ({
       </Stack>
       <Stack direction="row">
         {!suggestedPool && (
-          <Box mr="4px">
+          <Box mr="4px" mt="2px">
             <WarningSvg />
           </Box>
         )}
         <Typography color={suggestedPool ? 'grayscale.max' : 'magenta.500'} component="span">
-          <Typography variant="body2" component="span">
-            {suggestedPool
-              ? intl.formatMessage(messages.poolContinues)
-              : intl.formatMessage(messages.poolStop)}
-          </Typography>
+          {suggestedPool && (
+            <Typography variant="body2" component="span">
+              {intl.formatMessage(messages.poolStop)}
+            </Typography>
+          )}
           {!suggestedPool && (
             <Typography variant="body2" fontWeight="500" component="span" pl={0.4}>
-              {deadlineMilliseconds
-                ? formatTimeSpan(deadlineMilliseconds)
+              {!deadlinePassed
+                ? formatTimeSpan(Number(deadlineMilliseconds), Date.now())
                 : intl.formatMessage(messages.poolNotGenerating)}
             </Typography>
           )}
@@ -95,5 +97,4 @@ const CustomCard = styled(Box)(({ theme, suggestedPool }) => ({
   borderWidth: 1,
   borderRadius: 8,
   border: `1px solid ${theme.palette.grayscale['200']}`,
-  boxShadow: 'none',
 }));

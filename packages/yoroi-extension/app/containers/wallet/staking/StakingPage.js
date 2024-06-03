@@ -15,6 +15,9 @@ import NavBarTitle from '../../../components/topbar/NavBarTitle';
 
 export const StakingPageContentPromise: void => Promise<any> = () => import('./StakingPageContent');
 const StakingPageContent = lazy(StakingPageContentPromise);
+import { Box } from '@mui/material';
+import { Typography } from '@mui/material';
+import { PoolTransitionBanner } from './PoolTransitionBanner';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -39,6 +42,12 @@ class StakingPage extends Component<StoresAndActionsProps> {
             title={
               <NavBarTitle
                 title={this.context.intl.formatMessage(globalMessages.stakingDashboard)}
+              />
+            }
+            pageBanner={
+              <PoolTransitionBanner
+                intl={this.context.intl}
+                showBanner={stores.delegation.poolTransitionRequestInfo?.shouldShowTransitionFunnel}
               />
             }
           />
