@@ -64,7 +64,6 @@ class WalletSummaryPage extends Component<AllProps> {
       hasMoreToLoad,
       recent,
       isLoadingMore,
-      lastSyncInfo,
       unconfirmedAmount,
       isExporting,
       exportError,
@@ -117,7 +116,7 @@ class WalletSummaryPage extends Component<AllProps> {
         walletTransactions = (
           <WalletTransactionsListComp
             transactions={recent}
-            lastSyncBlock={lastSyncInfo.Height}
+            lastSyncBlock={selected.lastSyncInfo.Height}
             memoMap={this.props.stores.memos.txMemoMap.get(walletId) || new Map()}
             selectedExplorer={
               this.props.stores.explorers.selectedExplorer.get(
@@ -129,9 +128,7 @@ class WalletSummaryPage extends Component<AllProps> {
             }
             isLoadingTransactions={isLoadingMore}
             hasMoreToLoad={hasMoreToLoad}
-            onLoadMore={() => actions.transactions.loadMoreTransactions.trigger({
-              publicDeriverId: selected.publicDeriverId
-            })}
+            onLoadMore={() => actions.transactions.loadMoreTransactions.trigger(selected)}
             assuranceMode={selected.assuranceMode}
             shouldHideBalance={profile.shouldHideBalance}
             onAddMemo={transaction =>
@@ -196,7 +193,7 @@ class WalletSummaryPage extends Component<AllProps> {
           submit={exportRequest =>
             exportTransactionsToFile.trigger({
               exportRequest,
-              publicDeriverId: selected.publicDeriverId,
+              publicDeriver: selected,
             })
           }
           toggleIncludeTxIds={this.props.stores.transactions.toggleIncludeTxIds}

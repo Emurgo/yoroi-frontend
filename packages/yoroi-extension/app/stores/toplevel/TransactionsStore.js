@@ -55,6 +55,7 @@ import type { HistoryRequest } from '../../api/ada/lib/state-fetch/types';
 import appConfig from '../../config';
 import { refreshTransactions } from '../../api/thunk';
 import type { LastSyncInfoRow, } from '../../api/ada/lib/storage/database/walletTypes/core/tables';
+import type { WalletState } from '../../../chrome/extension/background/types';
 
 export type TxHistoryState = {|
   publicDeriverId: number,
@@ -94,21 +95,6 @@ function newMultiToken(
   return new MultiToken(values, defaultTokenInfo);
 }
 
-type WalletStateForExport = {
-  publicDeriverId: number,
-  networkId: number,
-  +plate: {
-    TextPart: string,
-    ...
-  },
-  defaultTokenId: string,
-  allAddresses: {|
-    utxoAddresses: Array<$ReadOnly<AddressRow>>,
-    accountingAddresses: Array<$ReadOnly<AddressRow>>,
-  |},
-  ...
-};
-
 export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   /** Track transactions for a set of wallets */
   @observable txHistoryStates: Array<TxHistoryState> = [];
@@ -125,7 +111,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
    *
    * NOT PERSISTED
    */
-  @observable _processedWithdrawals: Array<number> = [];
+  @observable _processedWithdrawals: Set<number> = new Set;
 
   getTransactionRowsToExportRequest: LocalizedRequest<
     ((void) => Promise<void>) => Promise<void>
@@ -218,6 +204,12 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   };
   */
 
+  @computed get balance(): MultiToken | null {
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) return null;
+    return publicDeriver.balance;
+  }
+
   @computed get isLoadingMore(): boolean {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) {
@@ -279,15 +271,14 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     });
     */
     let submittedTransactionsChanged = false;
-    let addedProcessedWithdrawal = false;
+
     runInAction(() => {
       for (let i = 0; i < this._submittedTransactions.length; ) {
         const txId = this._submittedTransactions[i].transaction.txid;
         if (remoteTransactionIds.has(txId)) {
-          if (withdrawalIds.has(txId) && !addedProcessedWithdrawal) {
+          if (withdrawalIds.has(txId)) {
             // Set local processed withdrawals only if there was a pending local transaction
-            this._processedWithdrawals.push(publicDeriver.publicDeriverId);
-            addedProcessedWithdrawal = true;
+            this._processedWithdrawals.add(publicDeriver.publicDeriverId);
           }
           this._submittedTransactions.splice(i, 1);
           submittedTransactionsChanged = true;
@@ -306,7 +297,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
   /** Refresh transaction history and update wallet balance */
   @action _refreshTransactionData: {|
-    +publicDeriver: { publicDeriverId: number, networkId: number, ... },
+    +publicDeriver: WalletState,
     isLocalRequest: boolean,
   |} => Promise<void> = async (request) => {
     const { publicDeriverId } = request.publicDeriver;
@@ -345,7 +336,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
         /**
          * Adding received txs to the start of the existing history
          */
-        const { txs } = this.getTxHistoryState(publicDeriverId);
+        const { txs } = this.getTxHistoryState(request.publicDeriver.publicDeriverId);
         runInAction(() => {
           for (let i = 0; i < result.length; i++) {
             const tx = result[i];
@@ -360,7 +351,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     }
 
     // note: possible existing memos were modified on a difference instance, etc.e
-    await this.actions.memos.syncTxMemos.trigger(publicDeriverId);
+    await this.actions.memos.syncTxMemos.trigger(request.publicDeriver);
 
     await this._afterLoadingNewTxs(
       result,
@@ -436,7 +427,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   };
 
   @action _exportTransactionsToFile: ({|
-    publicDeriver: WalletStateForExport,
+    publicDeriver: WalletState,
     exportRequest: TransactionRowsToExportRequest,
   |}) => Promise<void> = async (request) => {
     try {
@@ -496,7 +487,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   };
 
   exportTransactionsToFile: ({|
-    +publicDeriver: WalletStateForExport,
+    +publicDeriver: WalletState,
     exportRequest: TransactionRowsToExportRequest,
   |}) => Promise<(void) => Promise<void>> = async request => {
     const txStore = this.stores.transactions;
@@ -635,7 +626,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   };
 
   _getTxsFromRemote: (
-    publicDeriver: WalletStateForExport,
+    publicDeriver: WalletState,
     startBlockHash: ?string,
     endBlockHash: string,
   ) => Promise<Array<TransactionExportRow>> = async (
@@ -708,6 +699,14 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     return result;
   }
 
+  hasProcessedWithdrawals: ({ publicDeriverId: number, ... }) => boolean = (publicDeriver) => {
+    return this._processedWithdrawals.has(publicDeriver.publicDeriverId);
+  }
+
+  clearProcessedWithdrawals: ({ publicDeriverId: number, ... }) => void = (publicDeriver) => {
+    this._processedWithdrawals.delete(publicDeriver.publicDeriverId);
+  }
+
   /*
   @action
   recordSubmittedTransaction: (
@@ -729,20 +728,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       .filter(({ publicDeriverId }) => publicDeriverId === publicDeriver.publicDeriverId)
       .map(tx => tx.transaction);
   };
-
-  hasProcessedWithdrawals: (PublicDeriver<>) => boolean = (publicDeriver) => {
-    return this._processedWithdrawals.includes(publicDeriver.publicDeriverId);
-  }
-
-  clearProcessedWithdrawals: (PublicDeriver<>) => void = (publicDeriver) => {
-    for (let i = 0; i < this._processedWithdrawals.length; ) {
-      if (this._processedWithdrawals[i] === publicDeriver.publicDeriverId) {
-        this._processedWithdrawals.splice(i, 1);
-      } else {
-        i++;
-      }
-    }
-  }
 
   @action
   clearSubmittedTransactions: (PublicDeriver<>) => void = publicDeriver => {

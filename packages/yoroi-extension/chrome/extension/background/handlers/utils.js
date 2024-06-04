@@ -193,6 +193,7 @@ export async function getWalletState(publicDeriver: PublicDeriver<>): Promise<Wa
       isBip44Wallet: publicDeriver.getParent() instanceof Bip44Wallet,
       isTestnet: isTestnet(network),
       isCardanoHaskell: isCardanoHaskell(network),
+      isRefreshing: false, // fixme
     };
   });
 }

@@ -65,7 +65,6 @@ export default class NavBarContainerRevamp extends Component<Props> {
       }
       const { plate }= selected;
 
-      const balance: ?MultiToken = this.props.stores.transactions.getBalance(selected.publicDeriverId);
       const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(
         selected.publicDeriverId,
         selected.networkId,
@@ -79,7 +78,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
           onUpdateHideBalance={this.updateHideBalance}
           shouldHideBalance={profile.shouldHideBalance}
           rewards={rewards}
-          walletAmount={balance}
+          walletAmount={selected.balance}
           getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
           defaultToken={this.props.stores.tokenInfoStore.getDefaultTokenInfo(
             selected.publicDeriverId,
@@ -115,10 +114,6 @@ export default class NavBarContainerRevamp extends Component<Props> {
 
   getDialog: void => Node = () => {
     const { selected, wallets } = this.props.stores.wallets;
-    let balance;
-    if (selected) {
-      balance = this.props.stores.transactions.getBalance(selected);
-    }
 
     if (this.props.stores.uiDialogs.isOpen(WalletListDialog)) {
       const cardanoWallets = [];
@@ -151,7 +146,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
           shouldHideBalance={this.props.stores.profile.shouldHideBalance}
           onUpdateHideBalance={this.updateHideBalance}
           getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
-          walletAmount={balance}
+          walletAmount={selected?.balance}
           onAddWallet={() => {
             this.props.actions.dialogs.closeActiveDialog.trigger();
             this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });

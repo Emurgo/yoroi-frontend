@@ -164,7 +164,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
       }
     );
 
-    if (this.stores.transactions.hasProcessedWithdrawals(publicDeriverId)) {
+    if (this.stores.transactions.hasProcessedWithdrawals({ publicDeriverId })) {
       // In case we have a processed withdrawal for the wallet
       // We cancel out any still present reward, in case it has not synced yet
       return defaultMultiToken;

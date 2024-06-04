@@ -50,4 +50,5 @@ export type WalletState = {|
   isBip44Wallet: boolean, // Byron wallet if true, probably no longer needed
   isTestnet: boolean,
   isCardanoHaskell: boolean,
+  isRefreshing: boolean,
 |};

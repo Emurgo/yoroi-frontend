@@ -48,7 +48,7 @@ export default class TokensPageRevamp extends Component<StoresAndActionsProps> {
         });
     })();
 
-    const assetDeposit = this.props.stores.transactions.getAssetDeposit(publicDeriver);
+    const assetDeposit = publicDeriver.assetDeposits;
     const isNonZeroDeposit = !assetDeposit?.isEmpty();
     return (
       <TokensPage

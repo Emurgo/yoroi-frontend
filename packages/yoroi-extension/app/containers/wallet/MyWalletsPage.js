@@ -196,20 +196,15 @@ class MyWalletsPage extends Component<AllProps> {
       );
     })();
 
-    const balance: ?MultiToken = this.props.stores.transactions.getBalance(wallet.publicDeriverId);
     const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(
       wallet.publicDeriverId,
       wallet.networkId,
       wallet.defaultTokenId,
     );
 
-    const plate = wallet.plate;
-
-    const isRefreshing = this.props.stores.transactions.isWalletRefreshing(wallet.publicDeriverId);
+    const { plate, lastSyncInfo } = wallet;
 
     const isLoading = this.props.stores.transactions.isWalletLoading(wallet.publicDeriverId);
-
-    const lastSyncInfo = this.props.stores.transactions.getLastSyncInfo(wallet.publicDeriverId);
 
     return (
       <WalletRow
@@ -218,13 +213,13 @@ class MyWalletsPage extends Component<AllProps> {
         onRowClicked={() => this.handleWalletNavItemClick(wallet.publicDeriverId)}
         walletSumDetails={
           <WalletDetails
-            walletAmount={balance}
+            walletAmount={wallet.balance}
             rewards={rewards}
             // TODO: This should be probably bound to an individual wallet
             onUpdateHideBalance={this.updateHideBalance}
             shouldHideBalance={this.props.stores.profile.shouldHideBalance}
             getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
-            isRefreshing={isRefreshing}
+            isRefreshing={wallet.isRefreshing}
           />
         }
         walletSumCurrencies={walletSumCurrencies}
@@ -233,7 +228,7 @@ class MyWalletsPage extends Component<AllProps> {
         walletSync={
           <WalletSync
             time={lastSyncInfo.Time ? moment(lastSyncInfo.Time).fromNow() : null}
-            isRefreshing={isRefreshing}
+            isRefreshing={wallet.isRefreshing}
             isLoading={isLoading}
           />
         }

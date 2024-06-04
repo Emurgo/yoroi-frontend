@@ -42,7 +42,7 @@ export default class WalletAssetsPage extends Component<StoresAndActionsProps> {
         });
       })();
 
-    const assetDeposit = this.props.stores.transactions.assetDeposit;
+    const assetDeposit = publicDeriver.assetDeposits;
 
     const isNonZeroDeposit = !assetDeposit?.isEmpty();
     return (

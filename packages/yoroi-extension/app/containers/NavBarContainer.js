@@ -54,13 +54,12 @@ export default class NavBarContainer extends Component<Props> {
     const { wallets } = walletsStore;
 
     const walletComponents = wallets.map(wallet => {
-      const balance: ?MultiToken = this.props.stores.transactions.getBalance(wallet.publicDeriverId);
       const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(
         wallet.publicDeriverId,
         wallet.networkId,
         wallet.defaultTokenId,
       );
-      const lastSyncInfo = this.props.stores.transactions.lastSyncInfo;
+      const { lastSyncInfo } = wallet;
 
       return (
         <NavDropdownRow
@@ -71,7 +70,7 @@ export default class NavBarContainer extends Component<Props> {
           syncTime={lastSyncInfo?.Time ? moment(lastSyncInfo.Time).fromNow() : null}
           detailComponent={
             <NavWalletDetails
-              walletAmount={balance}
+              walletAmount={wallet.balance}
               rewards={rewards}
               onUpdateHideBalance={this.updateHideBalance}
               shouldHideBalance={profile.shouldHideBalance}
@@ -105,7 +104,6 @@ export default class NavBarContainer extends Component<Props> {
           return <NoWalletsDropdown />;
         }
 
-        const balance: ?MultiToken = this.props.stores.transactions.getBalance(publicDeriver.publicDeriverId);
         const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(
           publicDeriver.publicDeriverId,
           publicDeriver.networkId,
@@ -117,7 +115,7 @@ export default class NavBarContainer extends Component<Props> {
             onUpdateHideBalance={this.updateHideBalance}
             shouldHideBalance={profile.shouldHideBalance}
             rewards={rewards}
-            walletAmount={balance}
+            walletAmount={publicDeriver.balance}
             getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
             defaultToken={this.props.stores.tokenInfoStore.getDefaultTokenInfo(
               publicDeriver.networkId

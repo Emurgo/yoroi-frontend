@@ -1,6 +1,8 @@
 // @flow
 import { AsyncAction, Action } from '../lib/Action';
 import { Moment } from 'moment';
+import type { AddressRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import type { WalletState } from '../../../chrome/extension/background/types';
 
 // ======= TRANSACTIONS ACTIONS =======
 
@@ -9,24 +11,10 @@ export type TransactionRowsToExportRequest = {|
   endDate: typeof Moment,
 |};
 
-type WalletStateForExport = {
-  publicDeriverId: number,
-  networkId: number,
-  +plate: {
-    TextPart: string,
-    ...
-  },
-  defaultTokenId: string,
-  allAddresses: {|
-    utxoAddresses: Array<$ReadOnly<AddressRow>>,
-    accountingAddresses: Array<$ReadOnly<AddressRow>>,
-  |},
-};
-
 export default class TransactionsActions {
   loadMoreTransactions: AsyncAction<{ publicDeriverId: number, networkId: number, ... }> = new AsyncAction();
   exportTransactionsToFile: AsyncAction<{|
-    publicDeriver: WalletStateForExport,
+    publicDeriver: WalletState,
     exportRequest: TransactionRowsToExportRequest,
   |}> = new AsyncAction();
   closeExportTransactionDialog: Action<void> = new Action();
