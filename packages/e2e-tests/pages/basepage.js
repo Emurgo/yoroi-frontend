@@ -10,6 +10,8 @@ import {
   halfSecond,
   oneSecond,
 } from '../helpers/timeConstants.js';
+import { getSnapshotObjectFromJSON } from '../utils/utils.js';
+import { dbSnapshotsDir } from '../helpers/constants.js';
 
 const writeFile = promisify(fs.writeFile);
 
@@ -141,7 +143,7 @@ class BasePage {
     this.logger.info(
       `BasePage::executeLocalStorageScript is called. Script: ${JSON.stringify(script)}`
     );
-    return await this.driver.executeScript(`return window.yoroi.api.localStorage.${script}`);
+    return await this.driver.executeScript(`return localStorage.${script}`);
   }
   async input(locator, value) {
     this.logger.info(
@@ -173,6 +175,14 @@ class BasePage {
     for (let i = 0; i < textLength; i++) {
       await input.sendKeys(Key.BACK_SPACE);
     }
+  }
+  async clearInputAll(locator) {
+    this.logger.info(`BasePage::clearInputAll is called. Locator: ${JSON.stringify(locator)}`);
+    const input = await this.findElement(locator);
+    await input.sendKeys(Key.chord(Key.COMMAND, 'a'));
+    await this.sleep(200);
+    await input.sendKeys(Key.NULL);
+    await input.sendKeys(Key.BACK_SPACE);
   }
   async getFromLocalStorage(key) {
     this.logger.info(`BasePage::getFromLocalStorage is called. Key: ${key}`);
@@ -340,10 +350,14 @@ class BasePage {
   }
   // tableNames are [ 'UtxoAtSafePointTable', 'UtxoDiffToBestBlock', 'UtxoTransactionInput', 'UtxoTransactionOutput']
   async getInfoFromIndexedDB(tableName) {
+    this.logger.info(`Webdriver::getInfoFromIndexedDB Table name "${tableName}"`);
+    let result;
     if (isFirefox()) {
-      return await this.getInfoFromIndexedDBFF(tableName);
+      result = await this.getInfoFromIndexedDBFF(tableName);
     }
-    return await this.getInfoFromIndexedDBChrome(tableName);
+    result = await this.getInfoFromIndexedDBChrome(tableName);
+    this.logger.info(`Webdriver::getInfoFromIndexedDB::result ${JSON.stringify(result)}`);
+    return result;
   }
   async getInfoFromIndexedDBFF(tableName) {
     await this.driver.executeScript(
@@ -405,6 +419,145 @@ class BasePage {
     }
 
     return tableContent;
+  }
+
+  async getFullIndexedDBFromChrome() {
+    this.logger.info(`BasePage::getFullIndexedDBFromChrome is called.`);
+    await this.driver.executeScript(() => {
+      window.allDBsPromise = window.indexedDB.databases();
+    });
+    const allDBs = await this.driver.executeAsyncScript((...args) => {
+      const callback = args[args.length - 1];
+      window.allDBsPromise.then(response => callback(response)).catch(err => callback(err));
+    });
+    const { name, version } = allDBs[0];
+
+    await this.driver.executeScript(
+      (dbName, dbVersion) => {
+        const request = window.indexedDB.open(dbName, dbVersion);
+        request.onsuccess = function (event) {
+          const db = event.target.result;
+          const allTables = db.objectStoreNames;
+          const fullDBData = {};
+          for (const table of allTables) {
+            const tableContentRequest = db
+              .transaction(table, 'readonly')
+              .objectStore(table)
+              .getAll();
+            tableContentRequest.onsuccess = function (event) {
+              const allInfo = event.target.result;
+              fullDBData[table] = allInfo;
+            };
+          }
+          window.fullDBData = fullDBData;
+        };
+      },
+      name,
+      version
+    );
+
+    let fullDBDataResult;
+    try {
+      fullDBDataResult = await this.driver.executeScript(() => window.fullDBData);
+    } catch (error) {
+      this.webDriverLogger.warn(error);
+      fullDBDataResult = {};
+    }
+    this.logger.info(`Webdriver::getFullIndexedDBFromChrome::allTables. DB is collected.`);
+
+    return fullDBDataResult;
+  }
+
+  async saveFullIndexedDBChrome(fileName, overwrite = false) {
+    this.logger.info(`BasePage::saveFullIndexedDBChrome is called. File name: "${fileName}"`);
+    const fullDB = await this.getFullIndexedDBFromChrome();
+    const dbfileName = `${fileName}.indexedDB.json`;
+    const snapshotPath = path.resolve(dbSnapshotsDir, dbfileName);
+    const fileExists = fs.existsSync(snapshotPath);
+    if (!fileExists || (fileExists && overwrite)) {
+      this.logger.info(
+        `BasePage::saveFullIndexedDBChrome Writting data to the file "${snapshotPath}"`
+      );
+      writeFile(snapshotPath, JSON.stringify(fullDB, null, 2));
+    } else {
+      throw new Error(`The file "${dbfileName}" exists. Overwritting the file is not allowed.`);
+    }
+  }
+
+  async setInfoToIndexedDBChrome(tableName, value) {
+    this.logger.info(`BasePage::setInfoToIndexedDBChrome is called for the table ${tableName}.`);
+    this.driver.executeScript(() => {
+      window.allDBsPromise = window.indexedDB.databases();
+    });
+
+    const allDBs = await this.driver.executeAsyncScript((...args) => {
+      const callback = args[args.length - 1];
+      window.allDBsPromise.then(response => callback(response)).catch(err => callback(err));
+    });
+    const { name, version } = allDBs[0];
+
+    for (const valueItem of value) {
+      await this.driver.executeScript(
+        (dbName, dbVersion, tableName, valueItem) => {
+          const request = window.indexedDB.open(dbName, dbVersion);
+          request.onsuccess = function (event) {
+            const db = event.target.result;
+            const tx = db.transaction(tableName, 'readwrite');
+            tx.oncomplete = function (event) {
+              console.log(
+                `-----> Transaction is completed. Data is added to the table "${tableName}"`
+              );
+            };
+            tx.onerror = function (event) {
+              console.log('-----> Error happend:', event.target.result);
+            };
+            const store = tx.objectStore(tableName);
+            const addRequest = store.put(valueItem);
+          };
+        },
+        name,
+        version,
+        tableName,
+        valueItem
+      );
+    }
+  }
+
+  async getInfoChromeLocalStorage(key) {
+    this.logger.info(`BasePage::getInfoChromeLocalStorage is called. Key: "${key}"`);
+    this.driver.executeScript(
+      `await chrome.storage.local.get('${key}', function (result) {window.someKeyValue = result})`
+    );
+    const result = await this.driver.executeScript(() => window.someKeyValue);
+    this.logger.info(`BasePage::getInfoChromeLocalStorage::result ${JSON.stringify(result)}`);
+    return result;
+  }
+
+  async setInfoChromeLocalStorage(key, value) {
+    this.logger.info(
+      `BasePage::setInfoChromeLocalStorage is called. Key: "${key}", value: "${value}"`
+    );
+    await this.driver.executeScript(`await chrome.storage.local.set({ "${key}": "${value}" })`);
+  }
+
+  async prepareDBAndStorage(templateName, useGeneralStorageInfo = true) {
+    // import info into the indexedDB
+    const dbSnapshot = getSnapshotObjectFromJSON(`${templateName}.indexedDB.json`);
+    for (const dbKey in dbSnapshot) {
+      await this.setInfoToIndexedDBChrome(dbKey, dbSnapshot[dbKey]);
+    }
+    // set info into the chrome local storage
+    const chromeStorageFileName = `${useGeneralStorageInfo ? 'general' : templateName}.chromeLocalStorage.json`;
+    const chromeStorageSnapshot = getSnapshotObjectFromJSON(chromeStorageFileName);
+    for (const storageKey in chromeStorageSnapshot) {
+      await this.setInfoChromeLocalStorage(storageKey, chromeStorageSnapshot[storageKey]);
+    }
+    // set info into regular storage
+    const commonStorageFileName = `${useGeneralStorageInfo ? 'general' : templateName}.localStorage.json`;
+    const commonStorageSnaphot = getSnapshotObjectFromJSON(commonStorageFileName);
+    for (const commonStorageKey in commonStorageSnaphot) {
+      await this.saveToLocalStorage(commonStorageKey, commonStorageSnaphot[commonStorageKey]);
+    }
   }
 }
 

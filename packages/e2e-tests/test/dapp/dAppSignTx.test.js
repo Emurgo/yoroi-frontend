@@ -54,7 +54,7 @@ describe('dApp, signTx, intrawallet Tx', function () {
       await customBeforeNestedDAppTest(this, windowManager);
     });
 
-    it('Request "signTx"', async function () {
+    it('Request signTx', async function () {
       // get a receiver address
       await mockedDApp.requestUnusedAddresses();
       const unusedAddresses = await mockedDApp.getAddresses();
@@ -65,7 +65,7 @@ describe('dApp, signTx, intrawallet Tx', function () {
       expectedFee = txFee;
     });
 
-    it('Checking "Sign Tx" pop-up appeared', async function () {
+    it('Checking Sign Tx pop-up appeared', async function () {
       // wait for the pop-up appears
       const dappSingTxPage = new DAppSignTx(webdriver, logger);
       const popUpAppeared = await dappSingTxPage.popUpIsDisplayed(windowManager);
@@ -141,7 +141,7 @@ describe('dApp, signTx, intrawallet Tx', function () {
       await customBeforeNestedDAppTest(this, windowManager);
     });
 
-    it('Request "signTx"', async function () {
+    it('Request signTx', async function () {
       // get a receiver address
       await mockedDApp.requestUnusedAddresses();
       const unusedAddresses = await mockedDApp.getAddresses();
@@ -151,7 +151,7 @@ describe('dApp, signTx, intrawallet Tx', function () {
       await mockedDApp.requestSigningTx(requestedAmount, receiverAddr);
     });
 
-    it('Checking "Sign Tx" pop-up appeared', async function () {
+    it('Checking Sign Tx pop-up appeared', async function () {
       // wait for the pop-up appears
       const dappSingTxPage = new DAppSignTx(webdriver, logger);
       const popUpAppeared = await dappSingTxPage.popUpIsDisplayed(windowManager);
@@ -181,7 +181,7 @@ describe('dApp, signTx, intrawallet Tx', function () {
       await customBeforeNestedDAppTest(this, windowManager);
     });
 
-    it('Request "signTx"', async function () {
+    it('Request signTx', async function () {
       // get a receiver address
       await mockedDApp.requestUnusedAddresses();
       const unusedAddresses = await mockedDApp.getAddresses();
@@ -191,7 +191,7 @@ describe('dApp, signTx, intrawallet Tx', function () {
       await mockedDApp.requestSigningTx(requestedAmount, receiverAddr);
     });
 
-    it('Checking "Sign Tx" pop-up appeared', async function () {
+    it('Checking Sign Tx pop-up appeared', async function () {
       // wait for the pop-up appears
       const dappSingTxPage = new DAppSignTx(webdriver, logger);
       const popUpAppeared = await dappSingTxPage.popUpIsDisplayed(windowManager);
@@ -214,14 +214,14 @@ describe('dApp, signTx, intrawallet Tx', function () {
       await customBeforeNestedDAppTest(this, windowManager);
     });
 
-    it('Request "signTx" for incorrect Tx', async function () {
+    it('Request signTx for incorrect Tx', async function () {
       // send sign request with incorrect request
       const uTxHex =
         'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
       await mockedDApp.requestSigningTxHex(uTxHex);
     });
 
-    it('Checking "Sign Tx" pop-up appeared', async function () {
+    it('Checking Sign Tx pop-up appeared', async function () {
       // wait for the pop-up appears
       const dappSingTxPage = new DAppSignTx(webdriver, logger);
       const popUpAppeared = await dappSingTxPage.popUpIsDisplayed(windowManager);

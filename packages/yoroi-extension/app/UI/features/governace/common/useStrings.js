@@ -5,74 +5,74 @@ import { useIntl } from '../../../context/IntlProvider';
 export const messages = Object.freeze(
   defineMessages({
     governanceStatus: {
-      id: 'gouvernace.governanceStatus',
+      id: 'governance.governanceStatus',
       defaultMessage: '!!!Governance status',
     },
     governanceStatusInfo: {
-      id: 'gouvernace.governanceStatusInfo',
+      id: 'governance.governanceStatusInfo',
       defaultMessage:
         '!!!You have selected undefined as your governance status. You can change it at any time by clicking in the card bellow',
     },
     abstain: {
-      id: 'gouvernace.abstain',
+      id: 'governance.abstain',
       defaultMessage: '!!!Abstain',
     },
     abstainInfo: {
-      id: 'gouvernace.abstainInfo',
+      id: 'governance.abstainInfo',
       defaultMessage: '!!!You are choosing not to cast a vote on all proposals now and in the future.',
     },
     noConfidence: {
-      id: 'gouvernace.noConfidence',
+      id: 'governance.noConfidence',
       defaultMessage: '!!!No Confidence',
     },
     noConfidenceInfo: {
-      id: 'gouvernace.noConfidenceInfo',
+      id: 'governance.noConfidenceInfo',
       defaultMessage: '!!!You are expressing a lack of trust for all proposals now and in the future.',
     },
     learnMore: {
-      id: 'gouvernace.learnMore',
+      id: 'governance.learnMore',
       defaultMessage: '!!!Learn more About Governance',
     },
     becomeADrep: {
-      id: 'gouvernace.becomeADrep',
+      id: 'governance.becomeADrep',
       defaultMessage: '!!!Want to became a Drep?',
     },
     drepId: {
-      id: 'gouvernace.drepId',
+      id: 'governance.drepId',
       defaultMessage: '!!!Drep ID:',
     },
     delegateToDRep: {
-      id: 'gouvernace.delegateToDRep',
+      id: 'governance.delegateToDRep',
       defaultMessage: '!!!Delegate to a DRep',
     },
     delegateingToDRep: {
-      id: 'gouvernace.delegateingToDRep',
+      id: 'governance.delegateingToDRep',
       defaultMessage: '!!!Delegating to a DRep',
     },
     designatingSomeoneElse: {
-      id: 'gouvernace.designatingSomeoneElse',
+      id: 'governance.designatingSomeoneElse',
       defaultMessage:
         '!!!You are designating someone else to cast your vote on your behalf for all proposals now and in the future.',
     },
     registerGovernance: {
-      id: 'gouvernace.registerGovernance',
+      id: 'governance.registerGovernance',
       defaultMessage: '!!!Register in Governance',
     },
     chooseDrep: {
-      id: 'gouvernace.chooseDrep',
+      id: 'governance.chooseDrep',
       defaultMessage: '!!!Choose your Drep',
     },
     reviewSelection: {
-      id: 'gouvernace.reviewSelection',
+      id: 'governance.reviewSelection',
       defaultMessage: '!!!Review the selections carefully to assign yourself a Governance Status',
     },
     statusSelected: {
-      id: 'gouvernace.statusSelected',
+      id: 'governance.statusSelected',
       defaultMessage:
         '!!!You have selected ${status} as your governance status. You can change it at any time by clicking in the card bellow',
     },
     designatedSomeone: {
-      id: 'gouvernace.designatedSomeone',
+      id: 'governance.designatedSomeone',
       defaultMessage:
         '!!! You are designating someone else to cast your vote on your behalf for all proposals now and in the future.',
     },
@@ -85,15 +85,15 @@ export const messages = Object.freeze(
       defaultMessage: '!!!Transaction details',
     },
     operations: {
-      id: 'gouvernace.operations',
+      id: 'governance.operations',
       defaultMessage: '!!!Operations',
     },
     selectAbstein: {
-      id: 'gouvernace.selectAbstein',
+      id: 'governance.selectAbstein',
       defaultMessage: '!!!Select abstain',
     },
     selectNoConfidenc: {
-      id: 'gouvernace.selectNoConfidenc',
+      id: 'governance.selectNoConfidenc',
       defaultMessage: '!!!Select no confidenc',
     },
     password: {

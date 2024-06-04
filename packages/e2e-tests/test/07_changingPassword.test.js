@@ -13,6 +13,7 @@ import WalletTab from '../pages/wallet/walletTab/walletTab.page.js';
 import SendSubTab from '../pages/wallet/walletTab/sendSubTab.page.js';
 import { PASSWORDS_DONT_MATCH, PASSWORD_TOO_SHORT, WRONG_PASSWORD } from '../helpers/messages.js';
 import driversPoolsManager from '../utils/driversPool.js';
+import AddNewWallet from '../pages/addNewWallet.page.js';
 
 describe('Changing wallet password', function () {
   this.timeout(2 * oneMinute);
@@ -25,8 +26,17 @@ describe('Changing wallet password', function () {
     done();
   });
 
-  it('Restore a 15-word wallet', async function () {
-    await restoreWallet(webdriver, logger, testWallet1);
+  it('Prepare DB and storages', async function () {
+    const addWalletPage = new AddNewWallet(webdriver, logger);
+    const state = await addWalletPage.isDisplayed();
+    expect(state).to.be.true;
+    await addWalletPage.prepareDBAndStorage('testWallet1');
+    await addWalletPage.refreshPage();
+  });
+
+  it('Check transactions page', async function () {
+    const transactionsPage = new TransactionsSubTab(webdriver, logger);
+    await transactionsPage.waitPrepareWalletBannerIsClosed();
   });
 
   const oldPassword = getPassword();
