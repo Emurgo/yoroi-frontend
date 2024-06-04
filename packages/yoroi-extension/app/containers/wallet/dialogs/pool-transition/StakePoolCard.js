@@ -74,15 +74,24 @@ export const StakePoolCard = ({
         <Typography color={suggestedPool ? 'grayscale.max' : 'magenta.500'} component="span">
           {suggestedPool && (
             <Typography variant="body2" component="span">
-              {intl.formatMessage(messages.poolStop)}
+              {intl.formatMessage(messages.poolContinues)}
             </Typography>
           )}
           {!suggestedPool && (
-            <Typography variant="body2" fontWeight="500" component="span" pl={0.4}>
-              {!deadlinePassed
-                ? formatTimeSpan(Number(deadlineMilliseconds), Date.now())
-                : intl.formatMessage(messages.poolNotGenerating)}
-            </Typography>
+            <>
+              {!deadlinePassed ? (
+                <Typography variant="body2">
+                  {intl.formatMessage(messages.poolStop)}
+                  <Typography variant="body2" fontWeight="500">
+                    {formatTimeSpan(Number(deadlineMilliseconds), Date.now())}
+                  </Typography>
+                </Typography>
+              ) : (
+                <Typography variant="body2" fontWeight="500" component="span" pl={0.4}>
+                  {intl.formatMessage(messages.poolNotGenerating)}
+                </Typography>
+              )}
+            </>
           )}
         </Typography>
       </Stack>

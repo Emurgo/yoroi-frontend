@@ -1,6 +1,6 @@
 // @flow
 import Dialog from '../../../../components/widgets/Dialog';
-import { Typography, Button, Grid, Stack } from '@mui/material';
+import { Typography, Button, Grid, Stack, Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 import type { PoolTransition } from '../../../../stores/toplevel/DelegationStore';
@@ -8,7 +8,6 @@ import { StakePoolCard } from './StakePoolCard';
 import { messages } from './dialog-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { ReactComponent as ArrowRightSvg } from '../../../../assets/images/revamp/icons/arrow-right.inline.svg';
-import { Box } from '@mui/material';
 
 type Props = {|
   onClose: () => void,
@@ -65,12 +64,7 @@ export const PoolTransitionDialog = ({
           intl={intl}
         />
       </Stack>
-      <Grid
-        container
-        justifyContent="space-between"
-        direction="column"
-        style={{ marginTop: 24, marginBottom: 24 }}
-      >
+      <Grid container justifyContent="space-between" direction="column" style={{ marginTop: 18 }}>
         <CustomButton variant="text" onClick={onClose} sx={{ color: '#242838' }}>
           {intl.formatMessage(messages.skipAndStop)}
         </CustomButton>
@@ -80,7 +74,7 @@ export const PoolTransitionDialog = ({
           color="primary"
           width="100%"
           onClick={onUpdatePool}
-          sx={{ marginTop: '12px' }}
+          sx={{ marginTop: '8px' }}
         >
           {intl.formatMessage(messages.updateNow)}
         </CustomButton>
