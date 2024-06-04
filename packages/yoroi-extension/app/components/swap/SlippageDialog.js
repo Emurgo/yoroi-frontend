@@ -12,9 +12,15 @@ type Props = {|
   slippageValue: string,
 |};
 
-export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValue }: Props): React$Node {
+export default function SlippageDialog({
+  onSetNewSlippage,
+  onClose,
+  slippageValue,
+}: Props): React$Node {
   const [selectedSlippage, setSelectedSlippage] = useState(slippageValue);
-  const [isManualSlippage, setIsManualSlippage] = useState(!defaultSlippages.includes(slippageValue));
+  const [isManualSlippage, setIsManualSlippage] = useState(
+    !defaultSlippages.includes(slippageValue)
+  );
 
   const handleSlippageApply = () => {
     try {
@@ -41,7 +47,7 @@ export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValu
   // <TODO:CHECK_INTL>
   return (
     <Dialog title="Slippage tolerance" onClose={onClose} withCloseButton closeOnOverlayClick>
-      <Box maxWidth="564px">
+      <Box maxWidth="612px" sx={{ margin: '0 auto', flex: 1 }}>
         <Box>
           <Typography component="div" variant="body1" color="grayscale.800">
             Default Slippage Tolerance
