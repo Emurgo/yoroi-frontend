@@ -49,7 +49,8 @@ export default function SelectAssetDialog({
       if (a == null) return false;
       if (!searchTerm) return true;
       return `${a.name};[${a.ticker}];${a.id};${a.fingerprint}`
-        .toLowerCase().includes(searchTerm.toLowerCase())
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
     }) || [];
 
   return (
@@ -61,12 +62,12 @@ export default function SelectAssetDialog({
       styleOverride={{ minWidth: '612px', maxWidth: '612px', minHeight: '600px' }}
       scrollableContentClass="scrollable-content"
     >
-      <Box mb="8px" position="relative">
+      <Box mb="8px" position="relative" height="40px">
         <Box
           sx={{
             position: 'absolute',
             left: '7px',
-            top: '50%',
+            top: '45%',
             transform: 'translateY(-50%)',
             display: 'inline-flex',
             color: 'grayscale.600',
@@ -86,6 +87,7 @@ export default function SelectAssetDialog({
             paddingLeft: '34px',
             outline: 'none',
             width: '100%',
+            fontSize: '14px',
             '&:focus': {
               borderWidth: '2px',
               borderColor: 'grayscale.max',
