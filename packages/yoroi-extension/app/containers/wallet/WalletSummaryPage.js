@@ -77,6 +77,7 @@ class WalletSummaryPage extends Component<AllProps> {
       Logger.error('[WalletSummaryPage::render] Active wallet required');
       return null;
     }
+    this.props.stores.delegation.checkPoolTransition();
 
     const { exportTransactionsToFile, closeExportTransactionDialog } = actions.transactions;
 

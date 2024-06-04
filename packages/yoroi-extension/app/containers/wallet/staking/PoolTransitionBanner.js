@@ -21,6 +21,10 @@ export const PoolTransitionBanner = ({
         '& .MuiAlert-icon': {
           color: 'magenta.500',
         },
+        '& .MuiSvgIcon-root ': {
+          width: '24px',
+          height: '24px',
+        },
       }}
     >
       <Typography variant="body2" mt="1px" ml="4px" color="grayscale.900">

@@ -203,32 +203,6 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     );
   };
 
-  //   exports.EMURGO_POOLS = {
-  //     old: {
-  //         emurgo: [
-  //             'pool14u30jkg45xwd27kmznz43hxy596lvrrpj0wz8w9a9k97kmt4p2d',
-  //             'pool1qs6h0y7czzt605kptmrv6cr85kxd6tajr2hs0etvxphv7tr7nqu',
-  //             'pool1cd987kw92e3nmjywcfwfws79a09rwp0p0xj5mdtr39qukxgp9uf',
-  //             'pool1c55n72ag3tz8g7rntzuu9a86u7eugsy008xl3xsje8kwgvz2vdz',
-  //             'pool13mas2wthxs28zftxskcsd8t87jk2w9ntc0u5uflt45sh7lcvs8h',
-  //             'pool1pmm654jfx088td54ekkkd0j28x6r5gnjdhnutzggursrxjnpk2y' // Pool [EMUR8] Emurgo #8
-  //         ],
-  //         yoroi: [
-  //             'pool1mut4phum9hegtl8m2r68gpjh5x8w8t6zwf75zrphhp3qwwrrpgt' // Pool [YOROI] Yoroi
-  //         ]
-  //     },
-  //     new: {
-  //         emurgo: [
-  //             'pool1m0drnjxsvnlesq0rwmur2rh6lenuql57jfzd6cf6aegj2cv7ugy',
-  //             'pool1xkwnlr34tjrnkz6u4c0p36cju3xuls4dyynsdkf6cv22ksuhz6q' // Pool [EMURB] Emurgo B
-  //         ],
-  //         yoroi: [
-  //             'pool192pfftt48zc4x5aellvpufk6l6zxllpldw0rx82vrhqrqfhhqs2',
-  //             'pool1kx0jm9ycs3t99tnwafw6w72jkdlzhj5ltxe2nrzkd9x2u5x343h' // Pool [YORO2] Yoroi pool 2
-  //         ]
-  //     }
-  // };
-
   checkPoolTransition: () => Promise<void> = async () => {
     const publicDeriver = this.stores.wallets.selected;
     if (publicDeriver === null) {
@@ -241,7 +215,10 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
 
     try {
       const transitionResult = await maybe(currentPool, p =>
-        new PoolInfoApi().getTransition(p, RustModule.CrossCsl.init)
+        new PoolInfoApi().getTransition(
+          'pool14u30jkg45xwd27kmznz43hxy596lvrrpj0wz8w9a9k97kmt4p2d',
+          RustModule.CrossCsl.init
+        )
       );
 
       const response = {
