@@ -150,7 +150,7 @@ const StatsTable = ({ data, isLoading }) => {
                 onClick={() => handleRequestSort(id)}
                 sx={{ float: align, cursor: 'pointer' }}
               >
-                <Typography variant="body2" sx={{ color: theme.palette.ds.gray_c600, userSelect: 'none' }}>
+                <Typography variant="body2" color="ds.gray_c600" sx={{ userSelect: 'none' }}>
                   {label}
                 </Typography>
                 <Icon.Sort id={id} order={order} orderBy={orderBy} />
@@ -188,10 +188,10 @@ const StatsTable = ({ data, isLoading }) => {
                       src={tokenPng}
                     ></Box>
                     <Stack direction="column">
-                      <Typography fontWeight="500" sx={{ color: theme.palette.ds.text_gray_normal }}>
+                      <Typography fontWeight="500" color="ds.text_gray_normal">
                         {row.name}
                       </Typography>
-                      <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium }}>
+                      <Typography variant="body2" color="ds.text_gray_medium">
                         {row.id}
                       </Typography>
                     </Stack>
@@ -199,7 +199,7 @@ const StatsTable = ({ data, isLoading }) => {
                 </TableCell>
 
                 <TableCell>
-                  <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium }}>
+                  <Typography variant="body2" color="ds.text_gray_medium">
                     {row.price} USD
                   </Typography>
                 </TableCell>
@@ -257,7 +257,7 @@ const StatsTable = ({ data, isLoading }) => {
                 </TableCell>
 
                 <TableCell>
-                  <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium }}>
+                  <Typography variant="body2" color="ds.text_gray_medium">
                     {row.portfolioPercents.toFixed(2)}&nbsp;%
                   </Typography>
                 </TableCell>
@@ -265,11 +265,11 @@ const StatsTable = ({ data, isLoading }) => {
                 <TableCell>
                   <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
                     <Stack direction="column">
-                      <Typography fontWeight="500" sx={{ color: theme.palette.ds.text_gray_normal }}>
+                      <Typography fontWeight="500" color="ds.text_gray_normal">
                         {row.totalAmount} {row.name}
                       </Typography>
                       {row.name === 'ADA' && unitOfAccount === 'ADA' ? null : (
-                        <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium, textAlign: 'right' }}>
+                        <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}>
                           {row.totalAmountUsd} {unitOfAccount}
                         </Typography>
                       )}
@@ -284,7 +284,7 @@ const StatsTable = ({ data, isLoading }) => {
     <Stack width="full" justifyContent="center" alignItems="center" sx={{ flex: 1 }}>
       <Stack direction="column" alignItems="center" spacing={theme.spacing(3)}>
         <Box component="img" src={illustrationPng}></Box>
-        <Typography variant="h4" fontWeight="500" sx={{ color: theme.palette.ds.black_static }}>
+        <Typography variant="h4" fontWeight="500" color="ds.black_static">
           {strings.noResultsForThisSearch}
         </Typography>
       </Stack>

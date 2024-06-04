@@ -143,7 +143,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
         {isLoading ? (
           <Skeleton width="131px" height="13px" />
         ) : (
-          <Typography fontWeight="500" sx={{ color: theme.palette.ds.gray_cmax }}>
+          <Typography fontWeight="500" color="ds.gray_cmax">
             {strings.marketPrice}
           </Typography>
         )}
@@ -151,7 +151,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
           {isLoading ? (
             <Skeleton width="64px" height="13px" />
           ) : (
-            <Stack direction="row" alignItems="flex-end" sx={{ color: theme.palette.ds.gray_cmax }}>
+            <Stack direction="row" alignItems="flex-end" color="ds.gray_cmax">
               <Typography fontWeight="500">{detailInfo.usd}</Typography>
               <Typography variant="caption1" sx={{ marginBottom: theme.spacing(0.25) }}>
                 &nbsp;{unitOfAccount}

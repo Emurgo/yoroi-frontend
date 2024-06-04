@@ -162,7 +162,7 @@ const LiquidityTable = ({ data, isLoading }) => {
                     width: isFirstOrLastElement ? 'fit-content' : '100%',
                   }}
                 >
-                  <Typography variant="body2" sx={{ color: theme.palette.grayscale[600], userSelect: 'none' }}>
+                  <Typography variant="body2" color="ds.gray_c600" sx={{ userSelect: 'none' }}>
                     {label}
                   </Typography>
                   <Icon.Sort
@@ -214,7 +214,7 @@ const LiquidityTable = ({ data, isLoading }) => {
                         src={hoskyPng}
                       ></Box>
                     </Stack>
-                    <Typography fontWeight="500" sx={{ color: theme.palette.ds.gray_c900 }}>
+                    <Typography fontWeight="500" color="ds.gray_c900">
                       {row.firstToken.name} - {row.secondToken.name}
                     </Typography>
                   </Stack>
@@ -241,7 +241,7 @@ const LiquidityTable = ({ data, isLoading }) => {
                       component="img"
                       src={minswapPng}
                     ></Box>
-                    <Typography fontWeight="500" sx={{ color: theme.palette.ds.primary_c600 }}>
+                    <Typography fontWeight="500" color="ds.primary_c600">
                       {row.DEX}
                     </Typography>
                   </Stack>
@@ -249,7 +249,7 @@ const LiquidityTable = ({ data, isLoading }) => {
 
                 <TableCell>
                   <Stack direction="column" spacing={theme.spacing(0.25)}>
-                    <Typography sx={{ color: theme.palette.ds.gray_c900 }}>
+                    <Typography color="ds.gray_c900">
                       {row.firstTokenValue} {row.firstToken.name}
                     </Typography>
                     {row.firstToken.name === 'ADA' && unitOfAccount === 'ADA' ? null : (
@@ -262,7 +262,7 @@ const LiquidityTable = ({ data, isLoading }) => {
 
                 <TableCell>
                   <Stack direction="column" spacing={theme.spacing(0.25)}>
-                    <Typography sx={{ color: theme.palette.ds.gray_c900 }}>
+                    <Typography color="ds.gray_c900">
                       {row.secondTokenValue} {row.secondToken.name}
                     </Typography>
                     {row.secondToken.name === 'ADA' && unitOfAccount === 'ADA' ? null : (
@@ -274,16 +274,16 @@ const LiquidityTable = ({ data, isLoading }) => {
                 </TableCell>
 
                 <TableCell>
-                  <Typography sx={{ color: theme.palette.ds.gray_c900 }}>{row.lpTokens}</Typography>
+                  <Typography color="ds.gray_c900">{row.lpTokens}</Typography>
                 </TableCell>
 
                 <TableCell>
                   <Stack direction="column" spacing={theme.spacing(0.25)}>
-                    <Typography sx={{ color: theme.palette.ds.gray_c900, textAlign: 'right' }}>
+                    <Typography color="ds.gray_c900" sx={{ textAlign: 'right' }}>
                       {row.totalValue} {row.firstToken.name}
                     </Typography>
                     {unitOfAccount === 'ADA' && row.firstToken.name === 'ADA' ? null : (
-                      <Typography variant="body2" sx={{ color: theme.palette.ds.gray_c600, textAlign: 'right' }}>
+                      <Typography variant="body2" color="ds.gray_c600" sx={{ textAlign: 'right' }}>
                         {row.totalValueUsd} {unitOfAccount}
                       </Typography>
                     )}
@@ -297,7 +297,7 @@ const LiquidityTable = ({ data, isLoading }) => {
     <Stack width="full" justifyContent="center" alignItems="center" sx={{ flex: 1 }}>
       <Stack direction="column" alignItems="center" spacing={theme.spacing(3)}>
         <Box component="img" src={illustrationPng}></Box>
-        <Typography variant="h4" fontWeight="500" sx={{ color: theme.palette.ds.black_static }}>
+        <Typography variant="h4" fontWeight="500" color="ds.black_static">
           {strings.noResultsForThisSearch}
         </Typography>
       </Stack>

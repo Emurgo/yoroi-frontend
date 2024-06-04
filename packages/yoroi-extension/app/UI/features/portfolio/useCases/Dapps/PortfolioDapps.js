@@ -118,21 +118,21 @@ const PortfolioDapps = ({ data }) => {
               {isLoading ? (
                 <Skeleton width="146px" height="24px" />
               ) : (
-                <Typography variant="h2" fontWeight="500" sx={{ color: theme.palette.ds.gray_cmax }}>
+                <Typography variant="h2" fontWeight="500" color="ds.gray_cmax">
                   {isAdaMainUnit ? mockData.common.dappsBalance.ada : mockData.common.dappsBalance.usd}
                 </Typography>
               )}
-              <Typography variant="body2" fontWeight="500" sx={{ color: theme.palette.ds.black_static }}>
+              <Typography variant="body2" fontWeight="500" color="ds.black_static">
                 {isAdaMainUnit ? settingFiatPairUnit.currency || 'USD' : 'ADA'}
                 <Typography
                   variant="body2"
                   fontWeight="500"
+                  color="ds.gray_c400"
                   onClick={handleCurrencyChange}
                   sx={{
                     cursor: 'pointer',
                     display: 'inline',
                     marginTop: '5px',
-                    color: theme.palette.ds.gray_c400,
                   }}
                 >
                   {isAdaMainUnit ? '/ADA' : `/${unitOfAccount}`}
@@ -144,7 +144,7 @@ const PortfolioDapps = ({ data }) => {
               {isLoading ? (
                 <Skeleton width="129px" height="16px" />
               ) : (
-                <Typography sx={{ color: theme.palette.ds.gray_c600 }}>
+                <Typography color="ds.gray_c600">
                   {isAdaMainUnit ? mockData.common.dappsBalance.usd : mockData.common.dappsBalance.ada}{' '}
                   {isAdaMainUnit ? 'ADA' : unitOfAccount}
                 </Typography>

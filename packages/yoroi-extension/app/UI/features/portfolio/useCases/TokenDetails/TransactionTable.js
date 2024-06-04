@@ -111,7 +111,7 @@ const TransactionTable = ({ history }) => {
     <Container>
       <Card>
         <Box sx={{ padding: theme.spacing(3) }}>
-          <Typography fontWeight="500" sx={{ color: theme.palette.ds.gray_cmax }}>
+          <Typography fontWeight="500" color="ds.gray_cmax">
             {strings.transactionHistory}
           </Typography>
           <Table
@@ -123,22 +123,22 @@ const TransactionTable = ({ history }) => {
             <TableHead>
               <TableRow>
                 <TableCell>
-                  <Typography variant="body2" sx={{ color: theme.palette.ds.gray_c600 }}>
+                  <Typography variant="body2" color="ds.gray_c600">
                     {strings.transactionType}
                   </Typography>
                 </TableCell>
                 <TableCell>
-                  <Typography variant="body2" sx={{ color: theme.palette.ds.gray_c600 }}>
+                  <Typography variant="body2" color="ds.gray_c600">
                     {strings.status}
                   </Typography>
                 </TableCell>
                 <TableCell align="center">
-                  <Typography variant="body2" sx={{ color: theme.palette.ds.gray_c600 }}>
+                  <Typography variant="body2" color="ds.gray_c600">
                     {strings.fee}
                   </Typography>
                 </TableCell>
                 <TableCell align="right">
-                  <Typography variant="body2" sx={{ color: theme.palette.ds.gray_c600 }}>
+                  <Typography variant="body2" color="ds.gray_c600">
                     {strings.amount}
                   </Typography>
                 </TableCell>
@@ -149,8 +149,8 @@ const TransactionTable = ({ history }) => {
                 <>
                   <Typography
                     variant="body2"
+                    color="ds.gray_c600"
                     sx={{
-                      color: theme.palette.ds.gray_c600,
                       marginTop: theme.spacing(3),
                     }}
                   >
@@ -211,29 +211,25 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount }) =
             {row.type === HistoryItemType.DELEGATE && <Icon.Staking fill={theme.palette.ds.primary_c600} />}
           </IconButton>
           <Stack direction="column">
-            <Typography sx={{ color: theme.palette.ds.gray_c900 }}>{row.label}</Typography>
-            <Typography variant="caption1" sx={{ color: theme.palette.ds.gray_c600 }}>
+            <Typography color="ds.gray_c900">{row.label}</Typography>
+            <Typography variant="caption1" color="ds.gray_c600">
               {moment.utc(row.time).local().format('h:mm A')}
             </Typography>
           </Stack>
         </Stack>
       </TableCell>
       <TableCell>
-        <Typography
-          sx={{
-            color: row.status === HistoryItemStatus.FAILED ? theme.palette.ds.sys_magenta_c500 : theme.palette.ds.gray_c900,
-          }}
-        >
+        <Typography color={row.status === HistoryItemStatus.FAILED ? 'ds.sys_magenta_c500' : 'ds.gray_c900'}>
           {row.status}
         </Typography>
       </TableCell>
       <TableCell align="center">
         <Stack direction="column">
-          <Typography fontWeight="500" sx={{ color: theme.palette.ds.text_gray_normal }}>
+          <Typography fontWeight="500" color="ds.text_gray_normal">
             {row.feeValue ? `${row.feeValue} ADA` : '-'}
           </Typography>
           {unitOfAccount === 'ADA' ? null : (
-            <Typography variant="body2" sx={{ color: theme.palette.ds.text_gray_medium }}>
+            <Typography variant="body2" color="ds.text_gray_medium">
               {row.feeValueUsd ? `${row.feeValueUsd} ${unitOfAccount}` : '-'}
             </Typography>
           )}
@@ -261,7 +257,7 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount }) =
           }
         >
           <Stack direction="column">
-            <Typography fontWeight="500" sx={{ textAlign: 'right', color: theme.palette.ds.gray_c900 }}>
+            <Typography fontWeight="500" color="ds.gray_c900" sx={{ textAlign: 'right' }}>
               {(row.type === HistoryItemType.RECEIVED ||
                 row.type === HistoryItemType.WITHDRAW ||
                 row.type === HistoryItemType.DELEGATE) &&
@@ -271,7 +267,7 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount }) =
             {isExpanded ? (
               <Box sx={{ transition: 'all ease 0.3s' }}>
                 {unitOfAccount === 'ADA' ? null : (
-                  <Typography variant="body2" sx={{ textAlign: 'right', color: theme.palette.ds.gray_c600 }}>
+                  <Typography variant="body2" color="ds.gray_c600" sx={{ textAlign: 'right' }}>
                     {(row.type === HistoryItemType.RECEIVED ||
                       row.type === HistoryItemType.WITHDRAW ||
                       row.type === HistoryItemType.DELEGATE) &&
@@ -280,12 +276,12 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount }) =
                   </Typography>
                 )}
                 {row.type === HistoryItemType.RECEIVED && (
-                  <Typography variant="body2" fontWeight="500" sx={{ textAlign: 'right', color: theme.palette.ds.gray_cmax }}>
+                  <Typography variant="body2" fontWeight="500" color="ds.gray_cmax" sx={{ textAlign: 'right' }}>
                     + {row.amountAsset} {strings.assets}
                   </Typography>
                 )}
                 {row.type === HistoryItemType.SENT && (
-                  <Typography variant="body2" fontWeight="500" sx={{ textAlign: 'right', color: theme.palette.ds.gray_cmax }}>
+                  <Typography variant="body2" fontWeight="500" color="ds.gray_cmax" sx={{ textAlign: 'right' }}>
                     {row.amountAsset}
                   </Typography>
                 )}

@@ -7,7 +7,6 @@ const StyledCard = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   border: '1px solid',
   borderColor: theme.palette.ds.gray_c200,
-  bgcolor: 'background.card',
 }));
 
 export const Card = props => {

@@ -30,7 +30,7 @@ const TokenDetailOverview = ({ tokenInfo, isLoading, isAda }) => {
         {isLoading ? (
           <Skeleton width="53px" height="16px" />
         ) : (
-          <Typography fontWeight="500" sx={{ color: theme.palette.ds.gray_c900 }}>
+          <Typography fontWeight="500" color="ds.gray_c900">
             {tokenInfo.name}
           </Typography>
         )}
@@ -40,7 +40,7 @@ const TokenDetailOverview = ({ tokenInfo, isLoading, isAda }) => {
         {isLoading ? (
           <Skeleton width="53px" height="16px" />
         ) : (
-          <Typography fontWeight="500" sx={{ color: theme.palette.ds.gray_c900 }}>
+          <Typography fontWeight="500" color="ds.gray_c900">
             {strings.description}
           </Typography>
         )}
@@ -51,7 +51,7 @@ const TokenDetailOverview = ({ tokenInfo, isLoading, isAda }) => {
             <Skeleton height="20px" width="127px" />
           </>
         ) : (
-          <Typography sx={{ color: theme.palette.ds.gray_c600 }}>{tokenInfo.overview.description}</Typography>
+          <Typography color="ds.gray_c600">{tokenInfo.overview.description}</Typography>
         )}
       </Stack>
 
@@ -59,7 +59,7 @@ const TokenDetailOverview = ({ tokenInfo, isLoading, isAda }) => {
         {isLoading ? (
           <Skeleton width="53px" height="16px" />
         ) : (
-          <Typography fontWeight="500" sx={{ color: theme.palette.ds.gray_c900 }}>
+          <Typography fontWeight="500" color="ds.gray_c900">
             {strings.website}
           </Typography>
         )}
@@ -78,7 +78,7 @@ const TokenDetailOverview = ({ tokenInfo, isLoading, isAda }) => {
             {isLoading ? (
               <Skeleton width="84px" height="20px" />
             ) : (
-              <Typography fontWeight="500" sx={{ color: theme.palette.ds.gray_c900 }}>
+              <Typography fontWeight="500" color="ds.gray_c900">
                 {strings.policyId}
               </Typography>
             )}
@@ -90,7 +90,7 @@ const TokenDetailOverview = ({ tokenInfo, isLoading, isAda }) => {
                   <Skeleton height="16px" width="53px" sx={{ marginTop: '5px' }} />
                 </Box>
               ) : (
-                <Typography sx={{ color: theme.palette.ds.gray_c600, wordBreak: 'break-word' }}>
+                <Typography color="ds.gray_c600" sx={{ wordBreak: 'break-word' }}>
                   {tokenInfo.overview.policyId}
                 </Typography>
               )}
@@ -102,7 +102,7 @@ const TokenDetailOverview = ({ tokenInfo, isLoading, isAda }) => {
             {isLoading ? (
               <Skeleton width="84px" height="20px" />
             ) : (
-              <Typography fontWeight="500" sx={{ color: theme.palette.ds.gray_c900 }}>
+              <Typography fontWeight="500" color="ds.gray_c900">
                 {strings.fingerprint}
               </Typography>
             )}
@@ -114,7 +114,7 @@ const TokenDetailOverview = ({ tokenInfo, isLoading, isAda }) => {
                   <Skeleton height="16px" width="53px" sx={{ marginTop: '5px' }} />
                 </Box>
               ) : (
-                <Typography sx={{ color: theme.palette.ds.gray_c600, wordBreak: 'break-word' }}>
+                <Typography color="ds.gray_c600" sx={{ wordBreak: 'break-word' }}>
                   {tokenInfo.overview.fingerprint}
                 </Typography>
               )}
@@ -128,7 +128,7 @@ const TokenDetailOverview = ({ tokenInfo, isLoading, isAda }) => {
         {isLoading ? (
           <Skeleton width="53px" height="16px" />
         ) : (
-          <Typography fontWeight="500" sx={{ color: theme.palette.ds.gray_c900 }}>
+          <Typography fontWeight="500" color="ds.gray_c900">
             {strings.detailsOn}
           </Typography>
         )}

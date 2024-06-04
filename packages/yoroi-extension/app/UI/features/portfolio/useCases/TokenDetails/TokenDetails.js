@@ -104,7 +104,7 @@ const TokenDetails = ({ tokenInfo, transactionHistory }) => {
           sx={{ color: theme.palette.ds.black_static, display: 'flex', gap: theme.spacing(2) }}
         >
           <BackIcon />
-          <Typography variant="body2" fontWeight="500" sx={{ color: theme.palette.ds.text_gray_normal }}>
+          <Typography variant="body2" fontWeight="500" color="ds.text_gray_normal">
             {strings.backToPortfolio}
           </Typography>
         </Button>
@@ -125,7 +125,7 @@ const TokenDetails = ({ tokenInfo, transactionHistory }) => {
         <TokenInfo direction="row" spacing={theme.spacing(3)}>
           <Card>
             <Stack direction="column" spacing={theme.spacing(2)} sx={{ padding: theme.spacing(3) }}>
-              <Typography fontWeight="500" sx={{ color: theme.palette.ds.gray_c900 }}>
+              <Typography fontWeight="500" color="ds.gray_c900">
                 {isLoading ? <Skeleton width="82px" height="16px" /> : `${tokenInfo.name} ${strings.balance}`}
               </Typography>
 
@@ -134,14 +134,14 @@ const TokenDetails = ({ tokenInfo, transactionHistory }) => {
                   <Skeleton width="146px" height="24px" />
                 ) : (
                   <Stack direction="row" spacing={theme.spacing(0.25)} alignItems="flex-end">
-                    <Typography variant="h2" fontWeight="500" sx={{ color: theme.palette.ds.gray_cmax }}>
+                    <Typography variant="h2" fontWeight="500" color="ds.gray_cmax">
                       {tokenInfo.totalAmount}
                     </Typography>
                     <Typography
                       variant="body2"
                       fontWeight="500"
+                      color="ds.black_static"
                       sx={{
-                        color: theme.palette.ds.black_static,
                         padding: `${theme.spacing(1)} 0`,
                       }}
                     >
@@ -153,7 +153,7 @@ const TokenDetails = ({ tokenInfo, transactionHistory }) => {
                 {isLoading ? (
                   <Skeleton width="129px" height="16px" />
                 ) : (
-                  <Typography sx={{ color: theme.palette.ds.gray_c600 }}>
+                  <Typography color="ds.gray_c600">
                     {tokenInfo.totalAmountUsd} {unitOfAccount}
                   </Typography>
                 )}

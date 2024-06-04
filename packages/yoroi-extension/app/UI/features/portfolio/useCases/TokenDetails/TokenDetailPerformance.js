@@ -31,7 +31,7 @@ const TokenDetailPerformance = ({ tokenInfo, isLoading }) => {
 
   return (
     <Box>
-      <Typography fontWeight="500" sx={{ marginBottom: theme.spacing(2), color: theme.palette.ds.gray_cmax }}>
+      <Typography fontWeight="500" color="ds.gray_cmax" sx={{ marginBottom: theme.spacing(2) }}>
         {strings.marketData}
       </Typography>
       <Stack direction="column" spacing={1}>
@@ -43,11 +43,11 @@ const TokenDetailPerformance = ({ tokenInfo, isLoading }) => {
             alignItems="center"
             sx={{ paddingBottom: item.type === PerformanceItemType.RANK ? theme.spacing(1) : '' }}
           >
-            <Typography sx={{ color: theme.palette.ds.gray_c600 }}>{item.label}</Typography>
+            <Typography color="ds.gray_c600">{item.label}</Typography>
             {isLoading ? (
               <Skeleton width="84px" height="20px" />
             ) : (
-              <Typography sx={{ color: theme.palette.ds.gray_cmax }}>
+              <Typography color="ds.gray_cmax">
                 {tokenInfo.performance[index].value ? (
                   <>
                     {item.type === PerformanceItemType.RANK && '#'}

@@ -71,21 +71,21 @@ const PortfolioWallet = ({ data }) => {
             {isLoading ? (
               <Skeleton width="146px" height="24px" />
             ) : (
-              <Typography variant="h2" fontWeight="500" sx={{ color: theme.palette.ds.gray_cmax }}>
+              <Typography variant="h2" fontWeight="500" color="ds.gray_cmax">
                 {isAdaMainUnit ? mockData.common.walletBalance.ada : mockData.common.walletBalance.usd}
               </Typography>
             )}
-            <Typography variant="body2" fontWeight="500" sx={{ color: theme.palette.ds.black_static }}>
+            <Typography variant="body2" fontWeight="500" color="ds.black_static">
               {isAdaMainUnit ? settingFiatPairUnit.currency || 'USD' : 'ADA'}
               <Typography
                 variant="body2"
                 fontWeight="500"
+                color="ds.text_gray_low"
                 onClick={handleCurrencyChange}
                 sx={{
                   cursor: 'pointer',
                   display: 'inline',
                   marginTop: '5px',
-                  color: theme.palette.ds.text_gray_low,
                 }}
               >
                 {isAdaMainUnit ? '/ADA' : `/${unitOfAccount}`}
@@ -97,7 +97,7 @@ const PortfolioWallet = ({ data }) => {
             {isLoading ? (
               <Skeleton width="129px" height="16px" />
             ) : (
-              <Typography sx={{ color: theme.palette.ds.gray_c600 }}>
+              <Typography color="ds.gray_c600">
                 {isAdaMainUnit ? mockData.common.walletBalance.usd : mockData.common.walletBalance.ada}{' '}
                 {isAdaMainUnit ? 'ADA' : unitOfAccount}
               </Typography>
