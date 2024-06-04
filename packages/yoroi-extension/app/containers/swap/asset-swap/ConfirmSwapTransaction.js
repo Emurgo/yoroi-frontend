@@ -95,7 +95,7 @@ export default function ConfirmSwapTransaction({
         <Box>
           <Box>
             <Typography component="div" variant="body1" color="grayscale.600">
-              Swap From
+              Swap from
             </Typography>
           </Box>
           <Box>
@@ -110,7 +110,7 @@ export default function ConfirmSwapTransaction({
         <Box>
           <Box>
             <Typography component="div" variant="body1" color="grayscale.600">
-              Swap To
+              Swap to
             </Typography>
           </Box>
           <Box>
