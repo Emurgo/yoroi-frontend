@@ -641,7 +641,10 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       after: undefined,
       untilBlock: endBlockHash,
       network,
-      addresses: toRequestAddresses(addresses),
+      addresses: toRequestAddresses({
+        utxoAddresses: addresses.utxoAddresses.map(({ address }) => address),
+        accountingAddresses: addresses.accountingAddresses.map(({ address }) => address),
+      }),
     };
     if (startBlockHash != null) {
       txsRequest.after = { block: startBlockHash };
@@ -649,8 +652,8 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const txsFromNetwork = await fetcher.getTransactionsHistoryForAddresses(txsRequest);
 
     const ownAddresses = new Set([
-      ...addresses.utxoAddresses.map(a => a.Hash),
-      ...addresses.accountingAddresses.map(a => a.Hash),
+      ...addresses.utxoAddresses.map(a => a.address.Hash),
+      ...addresses.accountingAddresses.map(a => a.address.Hash),
     ]);
 
     const result = [];

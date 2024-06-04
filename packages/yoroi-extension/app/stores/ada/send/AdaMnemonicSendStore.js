@@ -12,7 +12,7 @@ import { genOwnStakingKey } from '../../../api/ada/index';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 import type { ActionsMap } from '../../../actions/index';
 import type { StoresMap } from '../../index';
-import { signAndBroadcast } from '../../../api/thunk';
+import { signAndBroadcastTransaction } from '../../../api/thunk';
 
 export default class AdaMnemonicSendStore extends Store<StoresMap, ActionsMap> {
 
@@ -63,7 +63,7 @@ export default class AdaMnemonicSendStore extends Store<StoresMap, ActionsMap> {
     publicDeriverId: number,
   |} => Promise<{| txId: string |}> = async (request) => {
     try {
-      const { txId } = await signAndBroadcast(request);
+      const { txId } = await signAndBroadcastTransaction(request);
       return { txId };
     } catch (error) {
       Logger.error(`${nameof(AdaMnemonicSendStore)}::${nameof(this.signAndBroadcast)} error: ${fullErrStr(error)}` );

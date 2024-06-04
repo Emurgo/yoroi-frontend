@@ -32,7 +32,8 @@ import type {
   ChangeSigningPassword,
   RenamePublicDeriver,
   RenameConceptualWallet,
-  SignAndBroadcast,
+  SignAndBroadcastTransaction,
+  BroadcastTransaction,
   GetPrivateStakingKey,
   GetCardanoAssets,
   UpsertTxMemo,
@@ -152,7 +153,8 @@ const YOROI_MESSAGES = Object.freeze({
   CHANGE_SIGNING_PASSWORD: 'change-signing-password',
   RENAME_PUBLIC_DERIVER: 'rename-public-deriver',
   RENAME_CONCEPTUAL_WALLET: 'rename-conceptual-wallet',
-  SIGN_AND_BROADCAST: 'sign-and-broadcast',
+  SIGN_AND_BROADCAST_TRANSACTION: 'sign-and-broadcast-transaction',
+  BROADCAST_TRANSACTION: 'broadcast-transaction',
   GET_PRIVATE_STAKING_KEY: 'get-private-staking-key',
   GET_CARDANO_ASSETS: 'get-cardano-assets',
   UPSERT_TX_MEMO: 'upsert-tx-memo',
@@ -184,7 +186,8 @@ export async function yoroiMessageHandler(
     | ChangeSigningPassword
     | RenamePublicDeriver
     | RenameConceptualWallet
-    | SignAndBroadcast
+    | SignAndBroadcastTransaction
+    | BroadcastTransaction
     | GetPrivateStakingKey
     | GetCardanoAssets
     | UpsertTxMemo
@@ -662,7 +665,7 @@ export async function yoroiMessageHandler(
       }
     }
     sendResponse(null);
-  } else if (request.type === YOROI_MESSAGES.SIGN_AND_BROADCAST) {
+  } else if (request.type === YOROI_MESSAGES.SIGN_AND_BROADCAST_TRANSACTION) {
     const publicDeriver = await getPublicDeriverById(request.request.publicDeriverId);
     if (!publicDeriver) {
       sendResponse({ error: 'no public deriver' });
@@ -741,11 +744,16 @@ export async function yoroiMessageHandler(
     if (withStakingKey == null) {
       throw new Error('unexpected missing asGetAllAcccounting result');
     }
-    const stakingKey = await genOwnStakingKey({
-      publicDeriver: withStakingKey,
-      password: request.request.password,
-    });
-    sendResponse(stakingKey.to_hex());
+    try {
+      const stakingKey = await genOwnStakingKey({
+        publicDeriver: withStakingKey,
+        password: request.request.password,
+      });
+      sendResponse(stakingKey.to_hex());
+    } catch (error) {
+      // fixme
+      sendResponse({ error: 'wrong password' });
+    }
   } else if (request.type === YOROI_MESSAGES.GET_CARDANO_ASSETS) {
     // fixme: cache
     const db = await getDb();
@@ -873,6 +881,23 @@ export async function yoroiMessageHandler(
     }
     const txs = await adaApi.refreshTransactions(refreshTxRequest);
     sendResponse(txs);
+  } else if (request.type === YOROI_MESSAGES.BROADCAST_TRANSACTION) {
+    const publicDeriver: ?PublicDeriver<> = await getPublicDeriverById(request.request.publicDeriverId);
+    if (!publicDeriver) {
+      sendResponse({ error: 'no public dervier'});
+      return;
+    }
+    const stateFetcher = await getCardanoStateFetcher(new LocalStorageApi());
+    try {
+      await stateFetcher.sendTx({
+        network: publicDeriver.getParent().getNetworkInfo(),
+        id: '', // we know this is not important
+        encodedTx: Buffer.from(request.request.signedTxHex, 'hex'),
+      });
+      sendResponse(null);
+    } catch (error) {
+      sendResponse({ error: error.message });
+    }
   } else {
     console.error(`unknown message ${JSON.stringify(request)} from ${sender.tab.id}`)
   }

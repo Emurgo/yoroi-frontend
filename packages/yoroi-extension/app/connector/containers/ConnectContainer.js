@@ -9,10 +9,10 @@ import type { ConnectResponseData } from '../../../chrome/extension/connector/ty
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { LoadingWalletStates } from '../types';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import { createAuthEntry } from '../api';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { ampli } from '../../../ampli/index';
+import type { WalletState } from '../../../chrome/extension/background/types';
 
 declare var chrome;
 
@@ -20,7 +20,7 @@ type State = {|
   isAppAuth: boolean,
   selectedWallet: {|
     index: number,
-    deriver: ?PublicDeriver<>,
+    deriver: ?WalletState,
     checksum: ?WalletChecksum,
   |},
 |};
@@ -53,7 +53,7 @@ export default class ConnectContainer extends Component<
         this.props.stores.connector.loadingWallets === LoadingWalletStates.SUCCESS
       ) {
         ampli.dappPopupConnectWalletPageViewed({
-          wallet_count: this.props.stores.connector.filteredWallets.length,
+          wallet_count: this.props.stores.connector.wallets.length,
         });
       }
     });
@@ -67,7 +67,7 @@ export default class ConnectContainer extends Component<
   }
 
   onConnect: (
-    deriver: PublicDeriver<>,
+    deriver: WalletState,
     checksum: ?WalletChecksum,
     password: ?string
   ) => Promise<void> = async (deriver, checksum, password) => {
@@ -90,7 +90,7 @@ export default class ConnectContainer extends Component<
       authEntry = null;
     }
 
-    const publicDeriverId = deriver.getPublicDeriverId();
+    const { publicDeriverId } = deriver;
     const result = this.props.stores.connector.currentConnectorWhitelist;
 
     // Removing any previous whitelisted connections for the same url
@@ -125,13 +125,13 @@ export default class ConnectContainer extends Component<
     setTimeout(() => { connector.closeWindow.trigger(); }, 100);
   };
 
-  onSelectWallet: (deriver: PublicDeriver<>, checksum: ?WalletChecksum) => void = (
+  onSelectWallet: (deriver: WalletState, checksum: ?WalletChecksum) => void = (
     deriver,
     checksum
   ) => {
-    const wallets = this.props.stores.connector.filteredWallets;
+    const wallets = this.props.stores.connector.wallets;
     if (wallets) {
-      const index = deriver.getPublicDeriverId();
+      const index = deriver.publicDeriverId;
       this.setState(prevState => ({
         ...prevState,
         selectedWallet: {
@@ -173,13 +173,10 @@ export default class ConnectContainer extends Component<
 
   render(): Node {
     const responseMessage = this.props.stores.connector.connectingMessage;
-    const wallets = this.props.stores.connector.filteredWallets;
+    const wallets = this.props.stores.connector.wallets;
     const error = this.props.stores.connector.errorWallets;
     const loadingWallets = this.props.stores.connector.loadingWallets;
     const network = 'Cardano';
-    const isSelectWalletHardware =
-      this.state.selectedWallet.deriver?.getParent().getWalletType() !==
-      WalletTypeOption.WEB_WALLET;
 
     return (
       <ConnectPage
@@ -199,7 +196,6 @@ export default class ConnectContainer extends Component<
         unitOfAccount={this.props.stores.profile.unitOfAccount}
         getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
         onUpdateHideBalance={this.updateHideBalance}
-        isSelectWalletHardware={isSelectWalletHardware}
       />
     );
   }

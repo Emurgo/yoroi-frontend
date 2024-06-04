@@ -108,12 +108,7 @@ export async function renameConceptualWallet(
   await callBackground({ type: 'rename-conceputal-wallet', request, });
 }
 
-type UserSignAndBroadcastRequestType = {|
-  signRequest: HaskellShelleyTxSignRequest,
-  password: string,
-  publicDeriverId: number,
-|};
-export type SignAndBroadcastRequestType = {|
+export type SignAndBroadcastTransactionRequestType = {|
   publicDeriverId: number,
   senderUtxos: Array<CardanoAddressedUtxo>,
   unsignedTx: string,
@@ -123,11 +118,19 @@ export type SignAndBroadcastRequestType = {|
   password: string,
   txHash: string,
 |};
-export async function signAndBroadcast(request: UserSignAndBroadcastRequestType): Promise<{| txId: string |}> {
+type UserSignAndBroadcastTransactionRequestType = {|
+  signRequest: HaskellShelleyTxSignRequest,
+  password: string,
+  publicDeriverId: number,
+|};
+type SignAndBroadcastTransactionReturnType = {| |}; // fixme
+export async function signAndBroadcastTransaction(
+  request: UserSignAndBroadcastTransactionRequestType
+): Promise<{| txId: string |}> {
   const txBody = request.signRequest.unsignedTx.build();
   const txHash = RustModule.WalletV4.hash_transaction(txBody);
 
-  const serializableRequest: SignAndBroadcastRequestType = {
+  const serializableRequest: SignAndBroadcastTransactionRequestType = {
     senderUtxos: request.signRequest.senderUtxos,
     unsignedTx: txBody.to_hex(),
     metadata: request.signRequest.metadata?.to_hex(),
@@ -139,7 +142,16 @@ export async function signAndBroadcast(request: UserSignAndBroadcastRequestType)
   };
   txBody.free();
   txHash.free();
-  return await callBackground({ type: 'sign-and-broadcast', serializableRequest, });
+  const result = await callBackground({ type: 'sign-and-broadcast-transaction', serializableRequest, });
+  // fixme handle failures
+  return result;
+}
+export type BroadcastTransactionRequestType = {|
+  publicDeriverId: number,
+  signedTxHex: string
+|};
+export async function broadcastTransaction(request: BroadcastTransactionRequestType) {
+  const result = await callBackground({ type: 'broadcast-transaction', request });
 }
 
 // Only mnemonic wallet has private staking key.

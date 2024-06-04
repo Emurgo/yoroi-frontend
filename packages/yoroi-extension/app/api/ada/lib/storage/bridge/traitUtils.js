@@ -170,91 +170,16 @@ export async function getAllAddressesForDisplay(
   );
 }
 
-type AddressWithDerivationPath = {|
-  +address: string,
+export type AddressRowWithPath = {|
+  +address: AddressRow,
   +path: Array<number>,
 |};
-
-export async function getAllAddressesWithPaths(
-  publicDeriver: IPublicDeriver<ConceptualWallet>,
-): Promise<{|
-  utxoAddresses: Array<$ReadOnly<AddressWithDerivationPath>>,
-  accountingAddresses: Array<$ReadOnly<AddressWithDerivationPath>>,
-|}> {
-  const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
-  if (!withLevels) {
-    throw new Error(`${nameof(getAllAddressesWithPaths)} publicDerviver traits missing`);
-  }
-  const derivationTables = withLevels.getParent().getDerivationTables();
-  const deps = Object.freeze({
-    GetPathWithSpecific,
-    GetAddress,
-    GetDerivationSpecific,
-  });
-  const depTables = Object.keys(deps)
-    .map(key => deps[key])
-    .flatMap(table => getAllSchemaTables(publicDeriver.getDb(), table));
-
-  return await raii(
-    publicDeriver.getDb(),
-    [
-      ...depTables,
-      ...mapToTables(publicDeriver.getDb(), derivationTables),
-    ],
-    async dbTx => {
-      const utxoAddresses = [];
-      const accountingAddresses = [];
-      const withUtxos = asGetAllUtxos(publicDeriver);
-      if (withUtxos != null) {
-        const addrResponse = await withUtxos.rawGetAllUtxoAddresses(
-          dbTx,
-          {
-            GetPathWithSpecific: deps.GetPathWithSpecific,
-            GetAddress: deps.GetAddress,
-            GetDerivationSpecific: deps.GetDerivationSpecific,
-          },
-          undefined,
-          derivationTables,
-        );
-        for (const family of addrResponse) {
-          for (const addr of family.addrs) {
-            utxoAddresses.push({ address: addr.Hash, path: family.addressing.path });
-          }
-        }
-      }
-      const withAccounting = asGetAllAccounting(publicDeriver);
-      if (withAccounting != null) {
-        const addrResponse = await withAccounting.rawGetAllAccountingAddresses(
-          dbTx,
-          {
-            GetPathWithSpecific: deps.GetPathWithSpecific,
-            GetAddress: deps.GetAddress,
-            GetDerivationSpecific: deps.GetDerivationSpecific,
-          },
-          undefined,
-          derivationTables,
-        );
-        for (const family of addrResponse) {
-          for (const addr of family.addrs) {
-            accountingAddresses.push({ address: addr.Hash, path: family.addressing.path });
-          }
-        }
-      }
-
-      return {
-        utxoAddresses,
-        accountingAddresses,
-      };
-
-    },
-  );
-}
 
 export async function getAllAddressesForWallet(
   publicDeriver: PublicDeriver<>,
 ): Promise<{|
-  utxoAddresses: Array<$ReadOnly<AddressRow>>,
-  accountingAddresses: Array<$ReadOnly<AddressRow>>,
+  utxoAddresses: Array<$ReadOnly<AddressRowWithPath>>,
+  accountingAddresses: Array<$ReadOnly<AddressRowWithPath>>,
 |}> {
   const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
   if (!withLevels) {
@@ -285,45 +210,6 @@ export async function getAllAddressesForWallet(
   );
 }
 
-export async function getAddressRowsForWallet(
-  request: {|
-    publicDeriver: IPublicDeriver<ConceptualWallet>,
-  |},
-): Promise<Array<$ReadOnly<AddressRow>>> {
-  const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
-  const derivationTables = withLevels == null
-    ? new Map()
-    : withLevels.getParent().getDerivationTables();
-  const deps = Object.freeze({
-    GetAddress,
-    GetPathWithSpecific,
-    GetDerivationSpecific,
-  });
-  const depTables = Object
-    .keys(deps)
-    .map(key => deps[key])
-    .flatMap(table => getAllSchemaTables(request.publicDeriver.getDb(), table));
-  const result = await raii<PromisslessReturnType<typeof rawGetAddressRowsForWallet>>(
-    request.publicDeriver.getDb(),
-    [
-      ...depTables,
-      ...mapToTables(
-        request.publicDeriver.getDb(),
-        derivationTables
-      ),
-    ],
-    async tx => await rawGetAddressRowsForWallet(
-      tx,
-      deps,
-      {
-        publicDeriver: request.publicDeriver,
-      },
-      derivationTables,
-    )
-  );
-  return [...result.utxoAddresses, ...result.accountingAddresses];
-}
-
 export async function rawGetAddressRowsForWallet(
   tx: lf$Transaction,
   deps: {|
@@ -352,8 +238,8 @@ export async function rawGetAddressRowsForWallet(
       derivationTables,
     );
     for (const family of addrResponse) {
-      for (const addr of family.addrs) {
-        utxoAddresses.push(addr);
+      for (const address of family.addrs) {
+        utxoAddresses.push({ address, path: family.addressing.path });
       }
     }
   }
@@ -370,8 +256,8 @@ export async function rawGetAddressRowsForWallet(
       derivationTables,
     );
     for (const family of addrResponse) {
-      for (const addr of family.addrs) {
-        accountingAddresses.push(addr);
+      for (const address of family.addrs) {
+        accountingAddresses.push({ address, path: family.addressing.path });
       }
     }
   }

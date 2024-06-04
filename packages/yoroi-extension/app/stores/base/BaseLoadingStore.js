@@ -13,8 +13,6 @@ import { Logger, stringifyError } from '../../utils/logging';
 import { closeOtherInstances } from '../../utils/tabManager';
 import { importOldDb } from '../../api/ada/lib/storage/database/index';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import { subscribeWalletStateChanges } from '../../api/thunk';
-import type { WalletState } from '../../../chrome/extension/background/types';
 
 /** Load dependencies before launching the app */
 export default class BaseLoadingStore<TStores, TActions> extends Store<TStores, TActions> {
@@ -24,8 +22,6 @@ export default class BaseLoadingStore<TStores, TActions> extends Store<TStores, 
 
   @observable loadRustRequest: Request<void => Promise<void>>
     = new Request<void => Promise<void>>(RustModule.load.bind(RustModule));
-
-  @observable walletState: Array<WalletState> = [];
 
   __blockingLoadingRequests: Array<[Request<() => Promise<void>>, string]> = [];
 
@@ -43,10 +39,6 @@ export default class BaseLoadingStore<TStores, TActions> extends Store<TStores, 
       .all([
         // $FlowIgnore[invalid-tuple-arity]
         this.loadRustRequest.execute(rustLoadingParams),
-        (async () => {
-          const walletState = await subscribeWalletStateChanges();
-          this.walletState.replace(walletState);
-        })(),
         ...(this.__blockingLoadingRequests.map(([r]) => r.execute())),
       ])
       .then(async () => {

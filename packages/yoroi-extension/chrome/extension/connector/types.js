@@ -10,10 +10,11 @@ import type {
   CreateWalletRequestType,
   CreateHardwareWalletRequestType,
   ChangeSigningKeyPasswordRequestType,
-  SignAndBroadcastRequestType,
+  SignAndBroadcastTransactionRequestType,
   UpsertTxMemoRequestType,
   DeleteTxMemoRequestType,
   RefreshTransactionsRequestType,
+  BroadcastTransactionRequestType,
 } from '../../../app/api/thunk';
 
 // ----- Types used in the dApp <-> Yoroi connection bridge ----- //
@@ -265,9 +266,13 @@ export type RenameConceptualWallet = {|
   type: 'rename-conceptual-wallet',
   request: {| conceptualWalletId: number, newName: string |}
 |};
-export type SignAndBroadcast = {|
-  type: 'sign-and-broadcast',
-  request: SignAndBroadcastRequestType,
+export type SignAndBroadcastTransaction = {|
+  type: 'sign-and-broadcast-transaction',
+  request: SignAndBroadcastTransactionRequestType,
+|};
+export type BroadcastTransaction = {|
+  type: 'broadcast-transaction',
+  request: BroadcastTransactionRequestType,
 |};
 export type GetPrivateStakingKey = {|
   type: 'get-private-staking-key',
