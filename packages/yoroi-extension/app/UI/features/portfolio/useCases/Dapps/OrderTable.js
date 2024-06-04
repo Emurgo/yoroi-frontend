@@ -1,12 +1,12 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, Typography, Stack, Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useNavigateTo } from '../../common/hooks/useNavigateTo';
-import { useStrings } from '../../common/hooks/useStrings';
+import { useNavigateTo } from '../../common/useNavigateTo';
+import { useStrings } from '../../common/useStrings';
 import adaPng from '../../../../../assets/images/ada.png';
 import hoskyPng from '../../common/assets/images/hosky-token.png';
 import minswapPng from '../../common/assets/images/minswap-dex.png';
-import { Chip } from '../../common/components/Chip';
+import { Chip } from '../../../../components/chip';
 import { Skeleton } from '../../../../components/Skeleton';
 import { truncateAddressShort } from '../../../../../utils/formatters';
 import { usePortfolio } from '../../module/PortfolioContextProvider';

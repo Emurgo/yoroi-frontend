@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Stack, Typography, Link } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useStrings } from '../../common/hooks/useStrings';
+import { useStrings } from '../../common/useStrings';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { Skeleton } from '../../../../components/Skeleton';
 
@@ -48,9 +48,15 @@ const TokenDetailPerformance = ({ tokenInfo, isLoading }) => {
               <Skeleton width="84px" height="20px" />
             ) : (
               <Typography sx={{ color: theme.palette.ds.gray_cmax }}>
-                {item.type === PerformanceItemType.RANK && '#'}
-                {tokenInfo.performance[index].value} {item.type === PerformanceItemType.FIAT && unitOfAccount}
-                {item.type === PerformanceItemType.TOKEN && tokenInfo.name}
+                {tokenInfo.performance[index].value ? (
+                  <>
+                    {item.type === PerformanceItemType.RANK && '#'}
+                    {tokenInfo.performance[index].value} {item.type === PerformanceItemType.FIAT && unitOfAccount}
+                    {item.type === PerformanceItemType.TOKEN && tokenInfo.name}
+                  </>
+                ) : (
+                  '--'
+                )}
               </Typography>
             )}
           </Stack>

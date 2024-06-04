@@ -2,11 +2,11 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, Typography, Stack, Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import tokenPng from '../../common/assets/images/token.png';
-import { useNavigateTo } from '../../common/hooks/useNavigateTo';
+import { useNavigateTo } from '../../common/useNavigateTo';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
-import { Chip } from '../../common/components/Chip';
+import { Chip } from '../../../../components/chip';
 import { Skeleton } from '../../../../components/Skeleton';
-import { useStrings } from '../../common/hooks/useStrings';
+import { useStrings } from '../../common/useStrings';
 import { Icon } from '../../../../components/icons/index';
 import illustrationPng from '../../common/assets/images/illustration.png';
 
@@ -206,16 +206,16 @@ const StatsTable = ({ data, isLoading }) => {
 
                 <TableCell>
                   <Chip
-                    active={row['24h'] > 0}
+                    active={row['24h'] >= 0}
                     label={
                       <Stack direction="row" justifyContent="space-between" alignItems="center">
-                        {row['24h'] > 0 ? (
+                        {row['24h'] >= 0 ? (
                           <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
                         ) : (
                           <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
                         )}
 
-                        <Typography variant="caption1">{row['24h'] > 0 ? row['24h'] : -1 * row['24h']}%</Typography>
+                        <Typography variant="caption1">{row['24h'] >= 0 ? row['24h'] : -1 * row['24h']}%</Typography>
                       </Stack>
                     }
                     sx={{ cursor: 'pointer' }}
@@ -224,15 +224,15 @@ const StatsTable = ({ data, isLoading }) => {
 
                 <TableCell>
                   <Chip
-                    active={row['1W'] > 0}
+                    active={row['1W'] >= 0}
                     label={
                       <Stack direction="row" justifyContent="space-between" alignItems="center">
-                        {row['1W'] > 0 ? (
+                        {row['1W'] >= 0 ? (
                           <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
                         ) : (
                           <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
                         )}
-                        <Typography variant="caption1">{row['1W'] > 0 ? row['1W'] : -1 * row['1W']}%</Typography>
+                        <Typography variant="caption1">{row['1W'] >= 0 ? row['1W'] : -1 * row['1W']}%</Typography>
                       </Stack>
                     }
                     sx={{ cursor: 'pointer' }}
@@ -241,15 +241,15 @@ const StatsTable = ({ data, isLoading }) => {
 
                 <TableCell>
                   <Chip
-                    active={row['1M'] > 0}
+                    active={row['1M'] >= 0}
                     label={
                       <Stack direction="row" justifyContent="space-between" alignItems="center">
-                        {row['1M'] > 0 ? (
+                        {row['1M'] >= 0 ? (
                           <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
                         ) : (
                           <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
                         )}
-                        <Typography variant="caption1">{row['1M'] > 0 ? row['1M'] : -1 * row['1M']}%</Typography>
+                        <Typography variant="caption1">{row['1M'] >= 0 ? row['1M'] : -1 * row['1M']}%</Typography>
                       </Stack>
                     }
                     sx={{ cursor: 'pointer' }}

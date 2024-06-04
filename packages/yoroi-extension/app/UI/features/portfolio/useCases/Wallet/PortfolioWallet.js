@@ -6,9 +6,9 @@ import { defineMessages } from 'react-intl';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import StatsTable from './StatsTable';
 import mockData from '../../common/mockData';
-import { Chip } from '../../common/components/Chip';
+import { Chip } from '../../../../components/chip';
 import { Skeleton } from '../../../../components/Skeleton';
-import { useStrings } from '../../common/hooks/useStrings';
+import { useStrings } from '../../common/useStrings';
 import { Icon } from '../../../../components/icons/index';
 
 const PortfolioWallet = ({ data }) => {
@@ -19,8 +19,6 @@ const PortfolioWallet = ({ data }) => {
   const [isLoading, setIsLoading] = useState();
   const [tokenList, setTokenList] = useState([]);
   const [isAdaMainUnit, setIsAdaMainUnit] = useState(unitOfAccount === 'ADA');
-
-  console.log('token list ne', data);
 
   const handleCurrencyChange = () => {
     if (isAdaMainUnit) {
@@ -52,7 +50,11 @@ const PortfolioWallet = ({ data }) => {
     const lowercaseKeyword = keyword.toLowerCase();
 
     const temp = data.filter(item => {
-      return item.name.toLowerCase().includes(lowercaseKeyword) || item.id.toLowerCase().includes(lowercaseKeyword);
+      return (
+        item.name.toLowerCase().includes(lowercaseKeyword) ||
+        item.id.toLowerCase().includes(lowercaseKeyword) ||
+        item.overview.fingerprint.toLowerCase().includes(lowercaseKeyword)
+      );
     });
     if (temp && temp.length > 0) {
       setTokenList(temp);
@@ -118,17 +120,17 @@ const PortfolioWallet = ({ data }) => {
               >
                 <Stack direction="row" alignItems="center" spacing={theme.spacing(1)} sx={{ marginLeft: theme.spacing(2) }}>
                   <Chip
-                    active={mockData.common.walletBalance.percents > 0}
+                    active={mockData.common.walletBalance.percents >= 0}
                     label={
                       <Stack direction="row" justifyContent="space-between" alignItems="center">
-                        {mockData.common.walletBalance.percents > 0 ? (
+                        {mockData.common.walletBalance.percents >= 0 ? (
                           <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
                         ) : (
                           <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
                         )}
 
                         <Typography variant="caption1">
-                          {mockData.common.walletBalance.percents > 0
+                          {mockData.common.walletBalance.percents >= 0
                             ? mockData.common.walletBalance.percents
                             : -1 * mockData.common.walletBalance.percents}
                           %
@@ -137,10 +139,10 @@ const PortfolioWallet = ({ data }) => {
                     }
                   />
                   <Chip
-                    active={mockData.common.walletBalance.amount > 0}
+                    active={mockData.common.walletBalance.amount >= 0}
                     label={
                       <Typography variant="caption1">
-                        {mockData.common.walletBalance.amount > 0 && '+'}
+                        {mockData.common.walletBalance.amount >= 0 && '+'}
                         {mockData.common.walletBalance.amount} USD
                       </Typography>
                     }

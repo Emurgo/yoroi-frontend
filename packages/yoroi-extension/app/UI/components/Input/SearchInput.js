@@ -10,7 +10,7 @@ const StyledInput = styled(Input)(({ theme }) => ({
   border: '1px solid',
   borderColor: theme.palette.ds.gray_c400,
   'input::placeholder': {
-    color: theme.palette.gray_c600,
+    color: theme.palette.ds.gray_c600,
   },
 }));
 
@@ -19,7 +19,7 @@ const StyledInputAdornment = styled(InputAdornment)(({ theme }) => ({
     cursor: 'pointer',
   },
 
-  '> svg > use': {
+  '& > svg > use': {
     fill: theme.palette.ds.gray_c900,
   },
 }));

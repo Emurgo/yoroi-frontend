@@ -3,7 +3,7 @@ import { Box, Stack, Typography, IconButton, Table, TableCell, TableHead, TableB
 import { useTheme } from '@mui/material/styles';
 import { Card } from '../../../../components';
 import moment from 'moment';
-import { useStrings } from '../../common/hooks/useStrings';
+import { useStrings } from '../../common/useStrings';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { Icon } from '../../../../components/icons';
 
@@ -97,8 +97,13 @@ const TransactionTable = ({ history }) => {
             : new Date(title).getDate() === yesterday.getDate()
             ? strings.yesterday
             : moment(title).format('MMMM DD, YYYY'),
-        data,
+        data: _.chain(data)
+          .sortBy(item => new Date(item.time).getTime())
+          .reverse()
+          .value(),
       }))
+      .sortBy(group => new Date(group.data[0].time).getTime())
+      .reverse()
       .value();
   }, [history]);
 

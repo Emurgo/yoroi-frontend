@@ -1,6 +1,5 @@
 import { HistoryItemStatus, HistoryItemType } from '../useCases/TokenDetails/TransactionTable';
 
-// UTILS
 const startDate = new Date('01-01-2023 8:30');
 const endDate = new Date('05-28-2024 11:40');
 const now = new Date();
@@ -9,42 +8,11 @@ const start1WeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).getTime(
 const start1MonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate()).getTime();
 const start6MonthAgo = new Date(now.getFullYear(), now.getMonth() - 6, now.getDate()).getTime();
 const start1YearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate()).getTime();
-const getRandomTime = (startDate, endDate) => {
-  const date = new Date(startDate + Math.random() * (endDate - startDate));
-  return date.toISOString();
-};
-const getRandomNumber = (min, max, toFixed) => {
-  return (Math.random() * (max - min) + min).toFixed(toFixed);
-};
-const createChartData = (timePeriod: '24H' | '1W' | '1M' | '6M' | '1Y') => {
-  const quantity = getQuantityBasedOnTimePeriod(timePeriod);
-  const fromTime = getFromTime(timePeriod, now);
-  const interval = getInterval(timePeriod);
 
-  const tmp = Array.from({ length: quantity }).map((_, index) => {
-    const randomNumber = getRandomNumber(-20, 20, 2);
-    const time = new Date(fromTime + index * interval);
-    const utcString = `${time.getUTCFullYear()}-${pad(time.getUTCMonth() + 1, 2)}-${pad(time.getUTCDate(), 2)}T${pad(
-      time.getUTCHours(),
-      2
-    )}:${pad(time.getUTCMinutes(), 2)}:${pad(time.getUTCSeconds(), 2)}Z`;
-
-    const frequency = 5;
-    const value = Math.sin((index * Math.PI * 2 * frequency) / quantity);
-
-    return {
-      time: utcString,
-      value: value.toFixed(2),
-      usd: (value * 100).toFixed(3),
-    };
-  });
-  return tmp;
-};
-
-// HELPERS
-function pad(number: number, length: number) {
+// UTILS
+const pad = (number: number, length: number) => {
   return String(number).padStart(length, '0');
-}
+};
 const getQuantityBasedOnTimePeriod = (timePeriod: '24H' | '1W' | '1M' | '6M' | '1Y') => {
   switch (timePeriod) {
     case '24H':
@@ -52,8 +20,7 @@ const getQuantityBasedOnTimePeriod = (timePeriod: '24H' | '1W' | '1M' | '6M' | '
     case '1W':
       return 168; // Hourly data for a week
     case '1M':
-      const daysInMonth = new Date(now).getDate(); // Get number of days in current month
-      return Math.floor((daysInMonth * 24) / 4); // Approximately 4 values per day
+      return 120; // Approximately 4 data point per day
     case '6M':
       return 180; // Approximately 1 data point per day
     case '1Y':
@@ -85,12 +52,49 @@ const getInterval = (timePeriod: '24H' | '1W' | '1M' | '6M' | '1Y') => {
     case '1W':
       return 60 * 60 * 1000; // 1 hour in milliseconds
     case '1M':
+      return 6 * 60 * 60 * 1000; // 6 hours in milliseconds
     case '6M':
+      return 24 * 60 * 60 * 1000; // 24 hours in milliseconds
     case '1Y':
-      return (24 * 60 * 60 * 1000) / getQuantityBasedOnTimePeriod(timePeriod); // Interval based on quantity
+      return 4 * 24 * 60 * 60 * 1000; // 4 days in milliseconds
     default:
       throw new Error('Invalid time period');
   }
+};
+const getRandomTime = (startDate, endDate) => {
+  const date = new Date(startDate + Math.random() * (endDate - startDate));
+  return date.toISOString();
+};
+const getRandomNumber = (min, max, toFixed) => {
+  return (Math.random() * (max - min) + min).toFixed(toFixed);
+};
+const createChartData = (timePeriod: '24H' | '1W' | '1M' | '6M' | '1Y') => {
+  const quantity = getQuantityBasedOnTimePeriod(timePeriod);
+  const fromTime = getFromTime(timePeriod, now);
+  const interval = getInterval(timePeriod);
+
+  const tmp = Array.from({ length: quantity }).map((_, index) => {
+    const time = new Date(fromTime + index * interval);
+    const utcString = `${time.getUTCFullYear()}-${pad(time.getUTCMonth() + 1, 2)}-${pad(time.getUTCDate(), 2)}T${pad(
+      time.getUTCHours(),
+      2
+    )}:${pad(time.getUTCMinutes(), 2)}:${pad(time.getUTCSeconds(), 2)}Z`;
+
+    const volatility = 0.005;
+    const baseValue =
+      index >= quantity / 5
+        ? 2 * Math.exp(volatility * Math.abs(getRandomNumber(1, 80, 2))) * index
+        : -20 * Math.exp(volatility * Math.abs(getRandomNumber(1, 100, 2))) * index;
+    const randomChange = getRandomNumber(-5, 5, 2);
+    let value = baseValue * Math.exp(volatility * Math.abs(randomChange)) * index;
+
+    return {
+      time: utcString,
+      value: (value / 110).toFixed(2),
+      usd: (value / 100).toFixed(2),
+    };
+  });
+  return tmp;
 };
 
 // ALL THE MOCK DATA FOR RENDERING UI NEW
@@ -120,16 +124,16 @@ const mockData = {
         '24h': -(10 * Math.random()).toFixed(2),
         '1W': (10 * Math.random()).toFixed(2),
         '1M': (10 * Math.random()).toFixed(2),
-        totalAmount: Math.round(100000 * Math.random()),
-        totalAmountUsd: Math.round(100000 * Math.random()),
+        totalAmount: (100000 * Math.random()).toFixed(3),
+        totalAmountUsd: (100000 * Math.random()).toFixed(3),
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
           website: 'https://www.cardano.org',
           detailOn: 'https://www.yoroiwallet.com',
-          policyId: 'asset155qynmnez65dr3tz5699wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzdv20el66l8j025e4g6k0kafjfv4ukawsly9ats',
+          policyId: '2aa9c1557fcf8e7caa049fa0911a8724a1cdaf8037fe0b431c6ac664',
           fingerprint:
-            'asset399q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj1234',
+            'asset311q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj6789',
         },
         performance: [
           { value: Math.random().toFixed(3) },
@@ -137,11 +141,11 @@ const mockData = {
           { value: `${Math.round(1000 * Math.random())}M` },
           { value: `${Math.round(100 * Math.random())}M` },
           { value: `${Math.round(100 * Math.random())}` },
-          { value: (100 * Math.random()).toFixed(2) },
           { value: (1000 * Math.random()).toFixed(2) },
           { value: (1000 * Math.random()).toFixed(2) },
+          { value: null },
           { value: (10 * Math.random()).toFixed(2) },
-          { value: (10 * Math.random()).toFixed(5) },
+          { value: (Math.random() / 100).toFixed(5) },
         ],
         chartData: {
           start24HoursAgo: createChartData('24H'),
@@ -149,6 +153,7 @@ const mockData = {
           start1MonthAgo: createChartData('1M'),
           start6MonthAgo: createChartData('6M'),
           start1YearAgo: createChartData('1Y'),
+          ALL: createChartData('1Y'),
         },
       },
       {
@@ -159,28 +164,28 @@ const mockData = {
         '24h': -(10 * Math.random()).toFixed(2),
         '1W': (10 * Math.random()).toFixed(2),
         '1M': -(10 * Math.random()).toFixed(2),
-        totalAmount: Math.round(100000 * Math.random()),
-        totalAmountUsd: Math.round(100000 * Math.random()),
+        totalAmount: Math.round(100000 * Math.random()).toFixed(2),
+        totalAmountUsd: Math.round(100000 * Math.random()).toFixed(2),
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
           website: 'https://www.cardano.org',
           detailOn: 'https://www.yoroiwallet.com',
-          policyId: 'asset155qynmnez65dr3tz5699wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzdv20el66l8j025e4g6k0kafjfv4ukawsly9ats',
+          policyId: '2aa9c1557fcf8e7caa049fa0911a8724a1cdaf8037fe0b431c6ac664',
           fingerprint:
-            'asset399q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj1234',
+            'asset322q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj3456',
         },
         performance: [
           { value: Math.random().toFixed(3) },
           { value: Math.random().toFixed(2) },
           { value: `${Math.round(1000 * Math.random())}M` },
-          { value: `${Math.round(100 * Math.random())}M` },
+          { value: null },
           { value: `${Math.round(100 * Math.random())}` },
           { value: (100 * Math.random()).toFixed(2) },
           { value: (1000 * Math.random()).toFixed(2) },
-          { value: (1000 * Math.random()).toFixed(2) },
+          { value: null },
           { value: (10 * Math.random()).toFixed(2) },
-          { value: (10 * Math.random()).toFixed(5) },
+          { value: (Math.random() / 100).toFixed(5) },
         ],
         chartData: {
           start24HoursAgo: createChartData('24H'),
@@ -188,6 +193,7 @@ const mockData = {
           start1MonthAgo: createChartData('1M'),
           start6MonthAgo: createChartData('6M'),
           start1YearAgo: createChartData('1Y'),
+          ALL: createChartData('1Y'),
         },
       },
       {
@@ -198,16 +204,16 @@ const mockData = {
         '24h': (10 * Math.random()).toFixed(2),
         '1W': -(10 * Math.random()).toFixed(2),
         '1M': (10 * Math.random()).toFixed(2),
-        totalAmount: Math.round(100000 * Math.random()),
-        totalAmountUsd: Math.round(100000 * Math.random()),
+        totalAmount: Math.round(100000 * Math.random()).toFixed(2),
+        totalAmountUsd: Math.round(100000 * Math.random()).toFixed(2),
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
           website: 'https://www.cardano.org',
           detailOn: 'https://www.yoroiwallet.com',
-          policyId: 'asset155qynmnez65dr3tz5699wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzdv20el66l8j025e4g6k0kafjfv4ukawsly9ats',
+          policyId: '2aa9c1557fcf8e7caa049fa0911a8724a1cdaf8037fe0b431c6ac664',
           fingerprint:
-            'asset399q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj1234',
+            'asset333q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj1234',
         },
         performance: [
           { value: Math.random().toFixed(3) },
@@ -217,9 +223,9 @@ const mockData = {
           { value: `${Math.round(100 * Math.random())}` },
           { value: (100 * Math.random()).toFixed(2) },
           { value: (1000 * Math.random()).toFixed(2) },
-          { value: (1000 * Math.random()).toFixed(2) },
+          { value: '45B' },
           { value: (10 * Math.random()).toFixed(2) },
-          { value: (10 * Math.random()).toFixed(5) },
+          { value: (Math.random() / 100).toFixed(5) },
         ],
         chartData: {
           start24HoursAgo: createChartData('24H'),
@@ -227,6 +233,7 @@ const mockData = {
           start1MonthAgo: createChartData('1M'),
           start6MonthAgo: createChartData('6M'),
           start1YearAgo: createChartData('1Y'),
+          ALL: createChartData('1Y'),
         },
       },
       {
@@ -237,16 +244,16 @@ const mockData = {
         '24h': -(10 * Math.random()).toFixed(2),
         '1W': -(10 * Math.random()).toFixed(2),
         '1M': (10 * Math.random()).toFixed(2),
-        totalAmount: Math.round(100000 * Math.random()),
-        totalAmountUsd: Math.round(100000 * Math.random()),
+        totalAmount: Math.round(100000 * Math.random()).toFixed(2),
+        totalAmountUsd: Math.round(100000 * Math.random()).toFixed(2),
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
           website: 'https://www.cardano.org',
           detailOn: 'https://www.yoroiwallet.com',
-          policyId: 'asset155qynmnez65dr3tz5699wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzdv20el66l8j025e4g6k0kafjfv4ukawsly9ats',
+          policyId: '2aa9c1557fcf8e7caa049fa0911a8724a1cdaf8037fe0b431c6ac664',
           fingerprint:
-            'asset399q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj1234',
+            'asset344q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj3456',
         },
         performance: [
           { value: Math.random().toFixed(3) },
@@ -258,7 +265,7 @@ const mockData = {
           { value: (1000 * Math.random()).toFixed(2) },
           { value: (1000 * Math.random()).toFixed(2) },
           { value: (10 * Math.random()).toFixed(2) },
-          { value: (10 * Math.random()).toFixed(5) },
+          { value: (Math.random() / 100).toFixed(5) },
         ],
         chartData: {
           start24HoursAgo: createChartData('24H'),
@@ -266,6 +273,7 @@ const mockData = {
           start1MonthAgo: createChartData('1M'),
           start6MonthAgo: createChartData('6M'),
           start1YearAgo: createChartData('1Y'),
+          ALL: createChartData('1Y'),
         },
       },
       {
@@ -276,16 +284,16 @@ const mockData = {
         '24h': -(10 * Math.random()).toFixed(2),
         '1W': (10 * Math.random()).toFixed(2),
         '1M': -(10 * Math.random()).toFixed(2),
-        totalAmount: Math.round(100000 * Math.random()),
-        totalAmountUsd: Math.round(100000 * Math.random()),
+        totalAmount: Math.round(100000 * Math.random()).toFixed(2),
+        totalAmountUsd: Math.round(100000 * Math.random()).toFixed(2),
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
           website: 'https://www.cardano.org',
           detailOn: 'https://www.yoroiwallet.com',
-          policyId: 'asset155qynmnez65dr3tz5699wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzdv20el66l8j025e4g6k0kafjfv4ukawsly9ats',
+          policyId: '2aa9c1557fcf8e7caa049fa0911a8724a1cdaf8037fe0b431c6ac664',
           fingerprint:
-            'asset399q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj1234',
+            'asset355q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj3456',
         },
         performance: [
           { value: Math.random().toFixed(3) },
@@ -297,7 +305,7 @@ const mockData = {
           { value: (1000 * Math.random()).toFixed(2) },
           { value: (1000 * Math.random()).toFixed(2) },
           { value: (10 * Math.random()).toFixed(2) },
-          { value: (10 * Math.random()).toFixed(5) },
+          { value: (Math.random() / 100).toFixed(5) },
         ],
         chartData: {
           start24HoursAgo: createChartData('24H'),
@@ -305,6 +313,7 @@ const mockData = {
           start1MonthAgo: createChartData('1M'),
           start6MonthAgo: createChartData('6M'),
           start1YearAgo: createChartData('1Y'),
+          ALL: createChartData('1Y'),
         },
       },
       {
@@ -315,16 +324,16 @@ const mockData = {
         '24h': (10 * Math.random()).toFixed(2),
         '1W': (10 * Math.random()).toFixed(2),
         '1M': (10 * Math.random()).toFixed(2),
-        totalAmount: Math.round(100000 * Math.random()),
-        totalAmountUsd: Math.round(100000 * Math.random()),
+        totalAmount: Math.round(100000 * Math.random()).toFixed(2),
+        totalAmountUsd: Math.round(100000 * Math.random()).toFixed(2),
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
           website: 'https://www.cardano.org',
           detailOn: 'https://www.yoroiwallet.com',
-          policyId: 'asset155qynmnez65dr3tz5699wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzdv20el66l8j025e4g6k0kafjfv4ukawsly9ats',
+          policyId: '2aa9c1557fcf8e7caa049fa0911a8724a1cdaf8037fe0b431c6ac664',
           fingerprint:
-            'asset399q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj1234',
+            'asset366q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj3456',
         },
         performance: [
           { value: Math.random().toFixed(3) },
@@ -336,7 +345,7 @@ const mockData = {
           { value: (1000 * Math.random()).toFixed(2) },
           { value: (1000 * Math.random()).toFixed(2) },
           { value: (10 * Math.random()).toFixed(2) },
-          { value: (10 * Math.random()).toFixed(5) },
+          { value: (Math.random() / 100).toFixed(5) },
         ],
         chartData: {
           start24HoursAgo: createChartData('24H'),
@@ -344,6 +353,7 @@ const mockData = {
           start1MonthAgo: createChartData('1M'),
           start6MonthAgo: createChartData('6M'),
           start1YearAgo: createChartData('1Y'),
+          ALL: createChartData('1Y'),
         },
       },
       {
@@ -354,16 +364,16 @@ const mockData = {
         '24h': -(10 * Math.random()).toFixed(2),
         '1W': -(10 * Math.random()).toFixed(2),
         '1M': -(10 * Math.random()).toFixed(2),
-        totalAmount: Math.round(100000 * Math.random()),
-        totalAmountUsd: Math.round(100000 * Math.random()),
+        totalAmount: Math.round(100000 * Math.random()).toFixed(2),
+        totalAmountUsd: Math.round(100000 * Math.random()).toFixed(2),
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
           website: 'https://www.cardano.org',
           detailOn: 'https://www.yoroiwallet.com',
-          policyId: 'asset155qynmnez65dr3tz5699wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzdv20el66l8j025e4g6k0kafjfv4ukawsly9ats',
+          policyId: '2aa9c1557fcf8e7caa049fa0911a8724a1cdaf8037fe0b431c6ac664',
           fingerprint:
-            'asset399q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj1234',
+            'asset377q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj3456',
         },
         performance: [
           { value: Math.random().toFixed(3) },
@@ -375,7 +385,7 @@ const mockData = {
           { value: (1000 * Math.random()).toFixed(2) },
           { value: (1000 * Math.random()).toFixed(2) },
           { value: (10 * Math.random()).toFixed(2) },
-          { value: (10 * Math.random()).toFixed(5) },
+          { value: (Math.random() / 100).toFixed(5) },
         ],
         chartData: {
           start24HoursAgo: createChartData('24H'),
@@ -383,6 +393,7 @@ const mockData = {
           start1MonthAgo: createChartData('1M'),
           start6MonthAgo: createChartData('6M'),
           start1YearAgo: createChartData('1Y'),
+          ALL: createChartData('1Y'),
         },
       },
       {
@@ -393,16 +404,16 @@ const mockData = {
         '24h': -(10 * Math.random()).toFixed(2),
         '1W': (10 * Math.random()).toFixed(2),
         '1M': -(10 * Math.random()).toFixed(2),
-        totalAmount: Math.round(100000 * Math.random()),
-        totalAmountUsd: Math.round(100000 * Math.random()),
+        totalAmount: Math.round(100000 * Math.random()).toFixed(2),
+        totalAmountUsd: Math.round(100000 * Math.random()).toFixed(2),
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
           website: 'https://www.cardano.org',
           detailOn: 'https://www.yoroiwallet.com',
-          policyId: 'asset155qynmnez65dr3tz5699wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzdv20el66l8j025e4g6k0kafjfv4ukawsly9ats',
+          policyId: '2aa9c1557fcf8e7caa049fa0911a8724a1cdaf8037fe0b431c6ac664',
           fingerprint:
-            'asset399q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj1234',
+            'asset388q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj3456',
         },
         performance: [
           { value: Math.random().toFixed(3) },
@@ -414,7 +425,7 @@ const mockData = {
           { value: (1000 * Math.random()).toFixed(2) },
           { value: (1000 * Math.random()).toFixed(2) },
           { value: (10 * Math.random()).toFixed(2) },
-          { value: (10 * Math.random()).toFixed(5) },
+          { value: (Math.random() / 100).toFixed(5) },
         ],
         chartData: {
           start24HoursAgo: createChartData('24H'),
@@ -422,6 +433,7 @@ const mockData = {
           start1MonthAgo: createChartData('1M'),
           start6MonthAgo: createChartData('6M'),
           start1YearAgo: createChartData('1Y'),
+          ALL: createChartData('1Y'),
         },
       },
       {
@@ -432,16 +444,16 @@ const mockData = {
         '24h': (10 * Math.random()).toFixed(2),
         '1W': (10 * Math.random()).toFixed(2),
         '1M': (10 * Math.random()).toFixed(2),
-        totalAmount: Math.round(100000 * Math.random()),
-        totalAmountUsd: Math.round(100000 * Math.random()),
+        totalAmount: Math.round(100000 * Math.random()).toFixed(2),
+        totalAmountUsd: Math.round(100000 * Math.random()).toFixed(2),
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
           website: 'https://www.cardano.org',
           detailOn: 'https://www.yoroiwallet.com',
-          policyId: 'asset155qynmnez65dr3tz5699wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzdv20el66l8j025e4g6k0kafjfv4ukawsly9ats',
+          policyId: '2aa9c1557fcf8e7caa049fa0911a8724a1cdaf8037fe0b431c6ac664',
           fingerprint:
-            'asset399q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj1234',
+            'asset399q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj3456',
         },
         performance: [
           { value: Math.random().toFixed(3) },
@@ -453,7 +465,7 @@ const mockData = {
           { value: (1000 * Math.random()).toFixed(2) },
           { value: (1000 * Math.random()).toFixed(2) },
           { value: (10 * Math.random()).toFixed(2) },
-          { value: (10 * Math.random()).toFixed(5) },
+          { value: (Math.random() / 100).toFixed(5) },
         ],
         chartData: {
           start24HoursAgo: createChartData('24H'),
@@ -461,6 +473,7 @@ const mockData = {
           start1MonthAgo: createChartData('1M'),
           start6MonthAgo: createChartData('6M'),
           start1YearAgo: createChartData('1Y'),
+          ALL: createChartData('1Y'),
         },
       },
       {
@@ -471,16 +484,16 @@ const mockData = {
         '24h': (10 * Math.random()).toFixed(2),
         '1W': (10 * Math.random()).toFixed(2),
         '1M': -(10 * Math.random()).toFixed(2),
-        totalAmount: Math.round(100000 * Math.random()),
-        totalAmountUsd: Math.round(100000 * Math.random()),
+        totalAmount: Math.round(100000 * Math.random()).toFixed(2),
+        totalAmountUsd: Math.round(100000 * Math.random()).toFixed(2),
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
           website: 'https://www.cardano.org',
           detailOn: 'https://www.yoroiwallet.com',
-          policyId: 'asset155qynmnez65dr3tz5699wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzdv20el66l8j025e4g6k0kafjfv4ukawsly9ats',
+          policyId: '2aa9c1557fcf8e7caa049fa0911a8724a1cdaf8037fe0b431c6ac664',
           fingerprint:
-            'asset399q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj1234',
+            'asset400q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj3456',
         },
         performance: [
           { value: Math.random().toFixed(3) },
@@ -492,7 +505,7 @@ const mockData = {
           { value: (1000 * Math.random()).toFixed(2) },
           { value: (1000 * Math.random()).toFixed(2) },
           { value: (10 * Math.random()).toFixed(2) },
-          { value: (10 * Math.random()).toFixed(5) },
+          { value: (Math.random() / 100).toFixed(5) },
         ],
         chartData: {
           start24HoursAgo: createChartData('24H'),
@@ -500,6 +513,7 @@ const mockData = {
           start1MonthAgo: createChartData('1M'),
           start6MonthAgo: createChartData('6M'),
           start1YearAgo: createChartData('1Y'),
+          ALL: createChartData('1Y'),
         },
       },
     ],
@@ -509,7 +523,7 @@ const mockData = {
     liquidityList: [
       {
         id: Math.random(),
-        tokenPair: 'ADA/LVLC',
+        tokenPair: 'ADA/HOSKY',
         DEX: 'Minswap',
         DEXLink: 'https://app.minswap.org/',
         firstToken: {
@@ -517,8 +531,8 @@ const mockData = {
           id: 'ada',
         },
         secondToken: {
-          name: 'LVLC',
-          id: 'lvlc',
+          name: 'HOSKY',
+          id: 'hosky',
         },
         lpTokens: (Math.random() * 1000000).toFixed(2),
         totalValue: (Math.random() * 1000).toFixed(2),

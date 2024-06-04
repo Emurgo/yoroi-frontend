@@ -7,11 +7,11 @@ import { defineMessages } from 'react-intl';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import LiquidityTable from './LiquidityTable';
 import mockData from '../../common/mockData';
-import { Chip } from '../../common/components/Chip';
+import { Chip } from '../../../../components/chip';
 import { Skeleton } from '../../../../components/Skeleton';
 import OrderTable from './OrderTable';
 import LendAndBorrow from './LendAndBorrow';
-import { useStrings } from '../../common/hooks/useStrings';
+import { useStrings } from '../../common/useStrings';
 import { Icon } from '../../../../components/icons/index';
 
 const StyledButton = styled(Button)(({ theme }) => ({
@@ -169,17 +169,17 @@ const PortfolioDapps = ({ data }) => {
                 >
                   <Stack direction="row" alignItems="center" spacing={theme.spacing(1)} sx={{ marginLeft: theme.spacing(2) }}>
                     <Chip
-                      active={mockData.common.dappsBalance.percents > 0}
+                      active={mockData.common.dappsBalance.percents >= 0}
                       label={
                         <Stack direction="row" justifyContent="space-between" alignItems="center">
-                          {mockData.common.dappsBalance.percents > 0 ? (
+                          {mockData.common.dappsBalance.percents >= 0 ? (
                             <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
                           ) : (
                             <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
                           )}
 
                           <Typography variant="caption1">
-                            {mockData.common.dappsBalance.percents > 0
+                            {mockData.common.dappsBalance.percents >= 0
                               ? mockData.common.dappsBalance.percents
                               : -1 * mockData.common.dappsBalance.percents}
                             %
@@ -188,10 +188,10 @@ const PortfolioDapps = ({ data }) => {
                       }
                     />
                     <Chip
-                      active={mockData.common.dappsBalance.amount > 0}
+                      active={mockData.common.dappsBalance.amount >= 0}
                       label={
                         <Typography variant="caption1">
-                          {mockData.common.dappsBalance.amount > 0 && '+'}
+                          {mockData.common.dappsBalance.amount >= 0 && '+'}
                           {mockData.common.dappsBalance.amount} USD
                         </Typography>
                       }

@@ -12,7 +12,7 @@ import TopBarLayout from '../../components/layout/TopBarLayout';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { withLayout, type LayoutComponentMap } from '../../styles/context/layout';
-import PortfolioMenu from '../features/portfolio/common/components/PortfolioMenu';
+import PortfolioMenu from '../features/portfolio/common/PortfolioMenu';
 import NavBarContainer from '../../containers/NavBarContainer';
 import BannerContainer from '../../containers/banners/BannerContainer';
 import SidebarContainer from '../../containers/SidebarContainer';

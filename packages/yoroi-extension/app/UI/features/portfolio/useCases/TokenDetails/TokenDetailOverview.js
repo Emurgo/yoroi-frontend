@@ -3,8 +3,8 @@ import { Stack, Box, Typography, Link, Button } from '@mui/material';
 import { Skeleton } from '../../../../components/Skeleton';
 import { CopyButton } from '../../../../components/buttons/CopyButton';
 import { useTheme } from '@mui/material/styles';
-import adaPng from '../../../../../assets/images/ada.png';
-import { useStrings } from '../../common/hooks/useStrings';
+import tokenPng from '../../common/assets/images/token.png';
+import { useStrings } from '../../common/useStrings';
 
 const TokenDetailOverview = ({ tokenInfo, isLoading, isAda }) => {
   const theme = useTheme();
@@ -24,7 +24,7 @@ const TokenDetailOverview = ({ tokenInfo, isLoading, isAda }) => {
               borderRadius: `${theme.shape.borderRadius}px`,
             }}
             component="img"
-            src={adaPng}
+            src={tokenPng}
           ></Box>
         )}
         {isLoading ? (

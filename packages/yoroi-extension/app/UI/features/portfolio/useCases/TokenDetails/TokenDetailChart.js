@@ -1,12 +1,12 @@
-import { Box, Button, Stack, styled, Typography, Divider, SvgIcon } from '@mui/material';
+import { Box, Button, Stack, styled, Typography } from '@mui/material';
 import React, { useEffect, useMemo, useState } from 'react';
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Label, Tooltip as RechartTooltip } from 'recharts';
 import { useTheme } from '@mui/material/styles';
 import { Skeleton, Tooltip } from '../../../../components';
 import chartSkeletonPng from '../../common/assets/images/token-detail-chart-skeleton.png';
-import { Chip } from '../../common/components/Chip';
+import { Chip } from '../../../../components/chip';
 import moment from 'moment';
-import { useStrings } from '../../common/hooks/useStrings';
+import { useStrings } from '../../common/useStrings';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { Icon } from '../../../../components/icons';
 
@@ -42,15 +42,15 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
     { id: 'ALL', label: strings['ALL'], active: false },
   ]);
   const [detailInfo, setDetailInfo] = useState({
-    value: tokenInfo.chartData[buttonPeriodProps[0].id][0].value,
-    usd: tokenInfo.chartData[buttonPeriodProps[0].id][0].usd,
+    value: tokenInfo.chartData[buttonPeriodProps[0].id][tokenInfo.chartData[buttonPeriodProps[0].id].length - 1].value,
+    usd: tokenInfo.chartData[buttonPeriodProps[0].id][tokenInfo.chartData[buttonPeriodProps[0].id].length - 1].usd,
   });
 
   const CustomYAxisTick = props => {
     const { x, y, payload } = props;
 
     return (
-      <text x={x - 9} y={y} dy={4} textAnchor="end" fill={theme.palette.ds.black_static}>
+      <text x={x - 5} y={y} dy={4} textAnchor="end" fill={theme.palette.ds.black_static}>
         {payload.value}
       </text>
     );
@@ -138,8 +138,8 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
     -Infinity
   );
   return (
-    <Box sx={{ padding: theme.spacing(3) }}>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ marginBottom: theme.spacing(4) }}>
+    <Stack direction="column" spacing={theme.spacing(4)} sx={{ padding: theme.spacing(3) }}>
+      <Stack direction="row" justifyContent="space-between" alignItems="center">
         {isLoading ? (
           <Skeleton width="131px" height="13px" />
         ) : (
@@ -151,9 +151,11 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
           {isLoading ? (
             <Skeleton width="64px" height="13px" />
           ) : (
-            <Stack direction="row" alignItems="center" sx={{ color: theme.palette.ds.gray_cmax }}>
+            <Stack direction="row" alignItems="flex-end" sx={{ color: theme.palette.ds.gray_cmax }}>
               <Typography fontWeight="500">{detailInfo.usd}</Typography>
-              <Typography variant="caption1">&nbsp;{unitOfAccount}</Typography>
+              <Typography variant="caption1" sx={{ marginBottom: theme.spacing(0.25) }}>
+                &nbsp;{unitOfAccount}
+              </Typography>
             </Stack>
           )}
           <Tooltip
@@ -170,17 +172,17 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
                 <Skeleton width="35px" height="16px" />
               ) : (
                 <Chip
-                  active={detailInfo.value > 0}
+                  active={detailInfo.value >= 0}
                   label={
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
-                      {detailInfo.value > 0 ? (
+                      {detailInfo.value >= 0 ? (
                         <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
                       ) : (
                         <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
                       )}
 
                       <Typography variant="caption1">
-                        {detailInfo.value > 0 ? detailInfo.value : -1 * detailInfo.value}%
+                        {detailInfo.value >= 0 ? detailInfo.value : -1 * detailInfo.value}%
                       </Typography>
                     </Stack>
                   }
@@ -191,10 +193,10 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
                 <Skeleton width="35px" height="16px" />
               ) : (
                 <Chip
-                  active={detailInfo.usd > 0}
+                  active={detailInfo.usd >= 0}
                   label={
                     <Typography variant="caption1">
-                      {detailInfo.usd > 0 && '+'}
+                      {detailInfo.usd >= 0 && '+'}
                       {detailInfo.usd} {unitOfAccount}
                     </Typography>
                   }
@@ -210,7 +212,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
           component={isLoading ? 'img' : 'div'}
           src={chartSkeletonPng}
           sx={{
-            margin: `${theme.spacing(3)} 0 ${theme.spacing(3)} -${theme.spacing(1)}`,
+            marginLeft: `-${theme.spacing(1)}`,
             width: '100%',
             height: `${chartHeight}px`,
           }}
@@ -262,7 +264,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
           ))}
         </Stack>
       </Box>
-    </Box>
+    </Stack>
   );
 };
 

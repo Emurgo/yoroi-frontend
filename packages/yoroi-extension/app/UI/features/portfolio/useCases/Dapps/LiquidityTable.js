@@ -1,14 +1,14 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, Typography, Stack, Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useNavigateTo } from '../../common/hooks/useNavigateTo';
+import { useNavigateTo } from '../../common/useNavigateTo';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import adaPng from '../../../../../assets/images/ada.png';
 import hoskyPng from '../../common/assets/images/hosky-token.png';
 import minswapPng from '../../common/assets/images/minswap-dex.png';
-import { Chip } from '../../common/components/Chip';
+import { Chip } from '../../../../components/chip';
 import { Skeleton } from '../../../../components/Skeleton';
-import { useStrings } from '../../common/hooks/useStrings';
+import { useStrings } from '../../common/useStrings';
 import illustrationPng from '../../common/assets/images/illustration.png';
 import { Icon } from '../../../../components/icons/';
 
@@ -145,33 +145,37 @@ const LiquidityTable = ({ data, isLoading }) => {
     <Table aria-label="liquidity table">
       <TableHead>
         <TableRow>
-          {headCells.map(({ label, align, id }, index) => (
-            <TableCell key={id} align={align} sx={{ padding: `12.5px ${theme.spacing(2)}` }}>
-              <Stack
-                direction="row"
-                alignItems="center"
-                spacing={theme.spacing(1)}
-                onClick={() => (index === 0 || index === headCells.length - 1 ? handleRequestSort(id) : null)}
-                sx={{
-                  float: align,
-                  cursor: index === 0 || index === headCells.length - 1 ? 'pointer' : 'normal',
-                  justifyContent: index === 0 || index === headCells.length - 1 ? 'flex-start' : 'space-between',
-                  width: index === 0 || index === headCells.length - 1 ? 'fit-content' : '100%',
-                }}
-              >
-                <Typography variant="body2" sx={{ color: theme.palette.grayscale[600], userSelect: 'none' }}>
-                  {label}
-                </Typography>
-                <Icon.Sort
-                  id={id}
-                  order={order}
-                  orderBy={orderBy}
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => (index === 0 || index === headCells.length - 1 ? null : handleRequestSort(id))}
-                />
-              </Stack>
-            </TableCell>
-          ))}
+          {headCells.map(({ label, align, id }, index) => {
+            const isFirstOrLastElement = index === 0 || index === headCells.length - 1;
+
+            return (
+              <TableCell key={id} align={align} sx={{ padding: `12.5px ${theme.spacing(2)}` }}>
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  spacing={theme.spacing(1)}
+                  onClick={() => (isFirstOrLastElement ? handleRequestSort(id) : null)}
+                  sx={{
+                    float: align,
+                    cursor: isFirstOrLastElement ? 'pointer' : 'normal',
+                    justifyContent: isFirstOrLastElement ? 'flex-start' : 'space-between',
+                    width: isFirstOrLastElement ? 'fit-content' : '100%',
+                  }}
+                >
+                  <Typography variant="body2" sx={{ color: theme.palette.grayscale[600], userSelect: 'none' }}>
+                    {label}
+                  </Typography>
+                  <Icon.Sort
+                    id={id}
+                    order={order}
+                    orderBy={orderBy}
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => (isFirstOrLastElement ? null : handleRequestSort(id))}
+                  />
+                </Stack>
+              </TableCell>
+            );
+          })}
         </TableRow>
       </TableHead>
       <TableBody>
