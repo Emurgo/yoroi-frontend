@@ -199,7 +199,9 @@ export class TransactionsSubTab extends WalletTab {
     return result;
   }
   async getTxHashID(groupIndex, txIndex) {
-    this.logger.info(`TransactionsSubTab::getTxHashID is called. Group index: ${groupIndex}, tx index: ${txIndex}`);
+    this.logger.info(
+      `TransactionsSubTab::getTxHashID is called. Group index: ${groupIndex}, tx index: ${txIndex}`
+    );
     const txHashId = await this.getText(this.txHashIdTextLocator(groupIndex, txIndex));
     this.logger.info(`TransactionsSubTab::getTxHashID::txHashId ${txHashId}`);
     return txHashId;
@@ -434,6 +436,14 @@ export class TransactionsSubTab extends WalletTab {
     );
     const addMemoBtnLocator = this.txAddMemoButtonLocator(groupIndex, txIndex);
     await this.click(addMemoBtnLocator);
+    return new MemoWarningModal(this.driver, this.logger);
+  }
+  async clickEditMemo(groupIndex, txIndex) {
+    this.logger.info(
+      `TransactionsSubTab::clickEditMemo is called. Group index: ${groupIndex}, tx index: ${txIndex}`
+    );
+    const editMemoBtnLocator = this.txEditMemoButtonLocator(groupIndex, txIndex);
+    await this.click(editMemoBtnLocator);
     return new MemoWarningModal(this.driver, this.logger);
   }
   async getMemoMessage(groupIndex, txIndex) {

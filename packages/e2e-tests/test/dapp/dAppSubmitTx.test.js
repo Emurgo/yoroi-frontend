@@ -55,7 +55,7 @@ describe('dApp, submitTx', function () {
       await customBeforeNestedDAppTest(this, windowManager);
     });
 
-    it('Request "signTx"', async function () {
+    it('Request signTx', async function () {
       // get a receiver address
       await mockedDApp.requestUnusedAddresses();
       const unusedAddresses = await mockedDApp.getAddresses();
@@ -111,7 +111,7 @@ describe('dApp, submitTx', function () {
       await customBeforeNestedDAppTest(this, windowManager);
     });
 
-    it('Request "signTx"', async function () {
+    it('Request signTx', async function () {
       // get a receiver address
       await mockedDApp.requestUnusedAddresses();
       const unusedAddresses = await mockedDApp.getAddresses();

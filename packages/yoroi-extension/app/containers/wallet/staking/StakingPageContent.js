@@ -226,7 +226,7 @@ class StakingPageContent extends Component<AllProps> {
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingPageContent)} opened for non-reward wallet`);
     }
-    stores.delegation.checkGouvernanceStatus();
+    stores.delegation.checkGovernanceStatus();
     const balance = stores.transactions.getBalance(publicDeriver);
     const isWalletWithNoFunds = balance != null && balance.getDefaultEntry().amount.isZero();
 
@@ -238,7 +238,7 @@ class StakingPageContent extends Component<AllProps> {
     const currentlyDelegating = stores.delegation.isCurrentlyDelegating(publicDeriver);
     const delegatedUtxo = stores.delegation.getDelegatedUtxoBalance(publicDeriver);
     const delegatedRewards = stores.delegation.getRewardBalanceOrZero(publicDeriver);
-    const isParticipatingToGouvernance = stores.delegation.isParticipatingToGouvernance;
+    const isParticipatingToGovernance = stores.delegation.isParticipatingToGovernance;
 
     return (
       <Box>
@@ -255,7 +255,7 @@ class StakingPageContent extends Component<AllProps> {
                 })
               }
               withdrawRewards={
-                isParticipatingToGouvernance === false
+                isParticipatingToGovernance === false
                   ? async () => {
                       this.props.actions.dialogs.open.trigger({
                         dialog: GovernanceParticipateDialog,
@@ -311,7 +311,7 @@ class StakingPageContent extends Component<AllProps> {
             shouldHideBalance={this.props.stores.profile.shouldHideBalance}
             unitOfAccount={this.toUnitOfAccount}
             withdrawRewards={
-              isParticipatingToGouvernance === false
+              isParticipatingToGovernance === false
                 ? () => {
                     this.props.actions.dialogs.open.trigger({
                       dialog: GovernanceParticipateDialog,

@@ -8,6 +8,7 @@ import { oneMinute } from '../helpers/timeConstants.js';
 import { restoreWallet } from '../helpers/restoreWalletHelper.js';
 import driversPoolsManager from '../utils/driversPool.js';
 import { Colors } from '../helpers/constants.js';
+import AddNewWallet from '../pages/addNewWallet.page.js';
 
 describe('Export transactions, negative cases', function () {
   this.timeout(2 * oneMinute);
@@ -21,9 +22,21 @@ describe('Export transactions, negative cases', function () {
     done();
   });
 
-  it('Restore a 15-word wallet', async function () {
-    await restoreWallet(webdriver, logger, testWallet1);
+  it('Prepare DB and storages', async function () {
+    const addWalletPage = new AddNewWallet(webdriver, logger);
+    const state = await addWalletPage.isDisplayed();
+    expect(state).to.be.true;
+    await addWalletPage.prepareDBAndStorage('testWallet1');
+    await addWalletPage.refreshPage();
   });
+
+  it('Check transactions page', async function () {
+    const transactionsPage = new TransactionsSubTab(webdriver, logger);
+    await transactionsPage.waitPrepareWalletBannerIsClosed();
+    const txPageIsDisplayed = await transactionsPage.isDisplayed();
+    expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
+  });
+
   describe('Both dates are 00/00/0000', function () {
     it('Open the export modal window', async function () {
       const transactionsPage = new TransactionsSubTab(webdriver, logger);
