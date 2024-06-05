@@ -32,7 +32,12 @@ import { CoreAddressTypes, TxStatusCodes, } from './lib/storage/database/primiti
 import type { NetworkRow, TokenRow, } from './lib/storage/database/primitives/tables';
 import { TransactionType } from './lib/storage/database/primitives/tables';
 import { PublicDeriver, } from './lib/storage/models/PublicDeriver/index';
-import { asDisplayCutoff, asGetAllUtxos, asHasLevels, } from './lib/storage/models/PublicDeriver/traits';
+import {
+  asDisplayCutoff,
+  asGetAllUtxos,
+  asHasLevels,
+  asHasUtxoChains,
+} from './lib/storage/models/PublicDeriver/traits';
 import { ConceptualWallet } from './lib/storage/models/ConceptualWallet/index';
 import type { IHasLevels } from './lib/storage/models/ConceptualWallet/interfaces';
 import type {
@@ -148,6 +153,7 @@ import type { ForeignUtxoFetcher } from '../../connector/stores/ConnectorStore';
 import type WalletTransaction from '../../domain/WalletTransaction';
 import { derivePrivateByAddressing, derivePublicByAddressing } from './lib/cardanoCrypto/deriveByAddressing';
 import { genTimeToSlot } from './lib/storage/bridge/timeUtils';
+import { connectorGetUsedAddresses } from '../../../chrome/extension/connector/api';
 
 // ADA specific Request / Response params
 
@@ -498,6 +504,7 @@ export type GetTransactionRowsToExportFunc = (
 ) => Promise<GetTransactionRowsToExportResponse>;
 
 export const FETCH_TXS_BATCH_SIZE = 20;
+const MIN_REORG_OUTPUT_AMOUNT  = '1000000';
 
 export default class AdaApi {
 
@@ -2312,6 +2319,69 @@ export default class AdaApi {
       }
     }
     return utxos;
+  }
+
+  async createReorgTx(
+    publicDeriver: PublicDeriver<>,
+    usedUtxoIds: Array<string>,
+    reorgTargetAmount: string,
+    utxos: Array<CardanoAddressedUtxo>,
+    submittedTxs: Array<PersistedSubmittedTransaction>,
+    reorgTargetAddress?: string,
+  ): Promise<{|
+    unsignedTx: HaskellShelleyTxSignRequest,
+    collateralOutputAddressSet: Set<string>,
+  |}> {
+    const network = publicDeriver.getParent().getNetworkInfo();
+
+    const withUtxos = asGetAllUtxos(publicDeriver);
+    if (withUtxos == null) {
+      throw new Error(`missing utxo functionality`);
+    }
+
+    const withHasUtxoChains = asHasUtxoChains(withUtxos);
+    if (withHasUtxoChains == null) {
+      throw new Error(`missing chains functionality`);
+    }
+
+    const fullConfig = getCardanoHaskellBaseConfig(network);
+    const timeToSlot = await genTimeToSlot(fullConfig);
+    const absSlotNumber = new BigNumber(timeToSlot({
+      time: new Date(),
+    }).slot);
+    const targetAddress = reorgTargetAddress ?? (await connectorGetUsedAddresses(publicDeriver))[0];
+    if (targetAddress == null) {
+      throw new Error('unexpected: no target address or used addresses available');
+    }
+    const reorgOutputValue = BigNumber
+      .max(reorgTargetAmount, MIN_REORG_OUTPUT_AMOUNT)
+      .toString();
+    const includeTargets = [{
+      address: targetAddress,
+      isForeign: false,
+      value: reorgOutputValue,
+    }];
+    const collateralOutputAddressSet = new Set<string>([targetAddress]);
+    const dontUseUtxoIds = new Set(usedUtxoIds);
+    const unsignedTx = await this.createUnsignedTxForConnector(
+      {
+        publicDeriver: withHasUtxoChains,
+        absSlotNumber,
+        cardanoTxRequest: {
+          includeTargets,
+        },
+        utxos: (await this.addressedUtxosWithSubmittedTxs(
+          utxos,
+          publicDeriver,
+          submittedTxs,
+        )).filter(utxo => !dontUseUtxoIds.has(utxo.utxo_id)),
+        // we already factored in submitted transactions above, no need to handle it
+        // any more, so just use an empty array here
+        submittedTxs: [],
+      },
+      null,
+    );
+    return { unsignedTx, collateralOutputAddressSet };
   }
 }
 // ========== End of class AdaApi =========

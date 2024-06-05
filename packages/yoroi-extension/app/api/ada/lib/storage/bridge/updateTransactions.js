@@ -153,7 +153,7 @@ import type {
   DefaultTokenEntry,
 } from '../../../../common/lib/MultiToken';
 import { UtxoStorageApi } from '../models/utils';
-import { bytesToHex, createFilterUniqueBy, hexToBytes } from '../../../../../coreUtils';
+import { bytesToHex, createFilterUniqueBy, hexToBytes, listValues } from '../../../../../coreUtils';
 
 type TxData = {|
   addressLookupMap: Map<number, string>,
@@ -1470,12 +1470,11 @@ async function rawUpdateTransactions(
         },
       });
       const summaries: Array<TxSummary> =
-        // $FlowFixMe[incompatible-cast]
-        (Object.values(recentTxHashesResult).flat(): Array<TxSummary>)
+        listValues(recentTxHashesResult).flat()
           .filter(createFilterUniqueBy(x => x.txHash));
       summaries.sort((a: TxSummary, b: TxSummary) => {
         // DESC ordering (b < a)
-        return b.epoch - a.epoch || b.slot - a.slot;
+        return b.epoch - a.epoch || b.slot - a.slot || b.txBlockIndex - a.txBlockIndex;
       });
       txHashes = summaries.slice(0,20).map(x => x.txHash);
       txsFromNetwork = await getTransactionsByHashes({ network, txHashes });
