@@ -90,6 +90,7 @@ export default function SelectAssetDialog({
             outline: 'none',
             width: '100%',
             fontSize: '14px',
+            fontFamily: 'Rubik',
             height: '40px',
             '&:focus': {
               borderWidth: '2px',
