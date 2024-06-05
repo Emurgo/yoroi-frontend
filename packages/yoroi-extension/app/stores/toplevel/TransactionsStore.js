@@ -657,9 +657,9 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
         if (rewards != null) {
           const fullConfig = getCardanoHaskellBaseConfig(selectedNetwork);
 
-          const absSlotFunc = await timeUtils.genToAbsoluteSlotNumber(fullConfig);
-          const timeSinceGenFunc = await timeUtils.genTimeSinceGenesis(fullConfig);
-          const realTimeFunc = await timeUtils.genToRealTime(fullConfig);
+          const absSlotFunc = timeUtils.genToAbsoluteSlotNumber(fullConfig);
+          const timeSinceGenFunc = timeUtils.genTimeSinceGenesis(fullConfig);
+          const realTimeFunc = timeUtils.genToRealTime(fullConfig);
           const rewardRows = rewards.map(item => {
             const absSlot = absSlotFunc({
               epoch: item[0],
@@ -694,8 +694,8 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const config = getCardanoHaskellBaseConfig(
       request.publicDeriver.getParent().getNetworkInfo()
     )
-    const timeToSlot = await timeUtils.genTimeToSlot(config);
-    const toRelativeSlotNumber = await timeUtils.genToRelativeSlotNumber(config);
+    const timeToSlot = timeUtils.genTimeToSlot(config);
+    const toRelativeSlotNumber = timeUtils.genToRelativeSlotNumber(config);
 
     const dateFormat = 'YYYY-MM-DD';
     const dateToSlot = (date: string): [number, number] => {

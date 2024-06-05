@@ -1621,7 +1621,7 @@ export default class AdaApi {
       if (changeAddr == null) {
         throw new Error(`${nameof(this.createSimpleTx)} no internal addresses left. Should never happen`);
       }
-      const timeToSlot = await genTimeToSlot(fullConfig);
+      const timeToSlot = genTimeToSlot(fullConfig);
       const absSlotNumber = new BigNumber(
         timeToSlot({ time: new Date()}).slot
       );
@@ -2345,7 +2345,7 @@ export default class AdaApi {
     }
 
     const fullConfig = getCardanoHaskellBaseConfig(network);
-    const timeToSlot = await genTimeToSlot(fullConfig);
+    const timeToSlot = genTimeToSlot(fullConfig);
     const absSlotNumber = new BigNumber(timeToSlot({
       time: new Date(),
     }).slot);

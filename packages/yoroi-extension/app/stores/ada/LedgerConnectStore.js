@@ -219,7 +219,7 @@ export default class LedgerConnectStore
     const fullConfig = getCardanoHaskellBaseConfig(
       selectedNetwork
     );
-    const timeToSlot = await genTimeToSlot(fullConfig);
+    const timeToSlot = genTimeToSlot(fullConfig);
 
     try {
       await this.stores.substores.ada.yoroiTransfer.transferRequest.execute({

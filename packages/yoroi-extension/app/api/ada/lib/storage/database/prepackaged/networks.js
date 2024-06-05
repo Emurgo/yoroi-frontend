@@ -235,8 +235,8 @@ export async function createSlotToTimestampFunc(
   network: $ReadOnly<NetworkRow>,
 ): Promise<(number | string) => Date> {
   const fullConfig = getCardanoHaskellBaseConfig(network);
-  const timeSinceGenFunc = await timeUtils.genTimeSinceGenesis(fullConfig);
-  const realTimeFunc = await timeUtils.genToRealTime(fullConfig);
+  const timeSinceGenFunc = timeUtils.genTimeSinceGenesis(fullConfig);
+  const realTimeFunc = timeUtils.genToRealTime(fullConfig);
   return s => realTimeFunc({
     absoluteSlotNum: Number(s),
     timeSinceGenesisFunc: timeSinceGenFunc,

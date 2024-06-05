@@ -74,9 +74,6 @@ import type {
   UserAnnotation,
 } from '../../../transactions/types';
 import type {
-  ToAbsoluteSlotNumberFunc,
-} from '../../../../common/lib/storage/bridge/timeUtils';
-import type {
   UtxoTransactionInputInsert, UtxoTransactionOutputInsert,
 } from '../database/transactionModels/utxo/tables';
 import type {
@@ -154,6 +151,7 @@ import type {
 } from '../../../../common/lib/MultiToken';
 import { UtxoStorageApi } from '../models/utils';
 import { bytesToHex, createFilterUniqueBy, hexToBytes, listValues } from '../../../../../coreUtils';
+import type { ToAbsoluteSlotNumberFunc } from './timeUtils';
 
 type TxData = {|
   addressLookupMap: Map<number, string>,
@@ -1388,7 +1386,7 @@ async function rawUpdateTransactions(
 ): Promise<TxData> {
   const network = publicDeriver.getParent().getNetworkInfo();
   // TODO: consider passing this function in as an argument instead of generating it here
-  const toAbsoluteSlotNumber = await genToAbsoluteSlotNumber(
+  const toAbsoluteSlotNumber = genToAbsoluteSlotNumber(
     getCardanoHaskellBaseConfig(network)
   );
 

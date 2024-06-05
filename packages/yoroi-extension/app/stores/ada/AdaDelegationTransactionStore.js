@@ -117,7 +117,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     const basePubDeriver = withPublicKey;
 
     const fullConfig = getCardanoHaskellBaseConfig(withHasUtxoChains.getParent().getNetworkInfo());
-    const timeToSlot = await genTimeToSlot(fullConfig);
+    const timeToSlot = genTimeToSlot(fullConfig);
     const absSlotNumber = new BigNumber(
       timeToSlot({
         // use server time for TTL if connected to server
@@ -166,7 +166,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     const fullConfig = getCardanoHaskellBaseConfig(
       request.publicDeriver.getParent().getNetworkInfo()
     );
-    const timeToSlot = await genTimeToSlot(fullConfig);
+    const timeToSlot = genTimeToSlot(fullConfig);
     const absSlotNumber = new BigNumber(
       timeToSlot({
         // use server time for TTL if connected to server
