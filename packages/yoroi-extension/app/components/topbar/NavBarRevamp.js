@@ -11,6 +11,7 @@ type Props = {|
   +goToNotifications?: ?Function,
   +buyButton?: Node,
   +menu?: ?Node,
+  +pageBanner?: ?Node,
 |};
 
 @observer
@@ -21,21 +22,23 @@ class NavBarRevamp extends Component<Props> {
     goToNotifications: void,
     buyButton: void,
     menu: void,
+    pageBanner: boolean,
   |} = {
     children: undefined,
     goToNotifications: undefined,
     walletDetails: undefined,
     buyButton: undefined,
     menu: undefined,
+    pageBanner: false,
   };
 
   render(): Node {
-    const { title, children, walletDetails, menu, buyButton } = this.props;
+    const { title, children, walletDetails, menu, buyButton, pageBanner } = this.props;
     return (
       <Box
         sx={{
           backgroundColor: 'common.white',
-          borderBottom: '1px solid',
+          borderBottom: pageBanner ? 'none' : '1px solid',
           borderBottomColor: 'grayscale.200',
         }}
       >
@@ -47,7 +50,6 @@ class NavBarRevamp extends Component<Props> {
               display: 'flex',
               alignItems: 'center',
               height: 'inherit',
-
             }}
           >
             <Box
@@ -58,7 +60,6 @@ class NavBarRevamp extends Component<Props> {
                 justifyContent: 'space-between',
                 margin: '20px 24px',
                 marginBottom: menu != null ? '52px' : '',
-
               }}
             >
               <Box flex="0 0 auto">{title}</Box>
