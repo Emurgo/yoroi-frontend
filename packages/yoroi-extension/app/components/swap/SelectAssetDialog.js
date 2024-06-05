@@ -60,6 +60,7 @@ export default function SelectAssetDialog({
       withCloseButton
       closeOnOverlayClick
       styleOverride={{ minWidth: '612px', maxWidth: '612px', minHeight: '600px' }}
+      styleContentOverride={{ paddingTop: '16px' }}
       scrollableContentClass="scrollable-content"
     >
       <Box mb="8px" position="relative" height="40px">
@@ -67,10 +68,11 @@ export default function SelectAssetDialog({
           sx={{
             position: 'absolute',
             left: '7px',
-            top: '45%',
+            top: '30px',
             transform: 'translateY(-50%)',
             display: 'inline-flex',
             color: 'grayscale.600',
+            height: '40px',
           }}
         >
           <SearchIcon />
@@ -88,6 +90,7 @@ export default function SelectAssetDialog({
             outline: 'none',
             width: '100%',
             fontSize: '14px',
+            height: '40px',
             '&:focus': {
               borderWidth: '2px',
               borderColor: 'grayscale.max',
