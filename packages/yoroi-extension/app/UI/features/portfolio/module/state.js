@@ -14,7 +14,7 @@ export const PortfolioActionType = Object.freeze({
 });
 
 export type PortfolioAction = {|
-  type: typeof GouvernanceActionType.UnitOfAccountChanged,
+  type: typeof PortfolioActionType.UnitOfAccountChanged,
   unitOfAccount: currency,
 |};
 
