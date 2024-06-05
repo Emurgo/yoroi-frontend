@@ -10,6 +10,7 @@ import type {
 } from '../primitives/tables';
 import { PRIMARY_ASSET_CONSTANTS } from '../primitives/enums';
 import environment from '../../../../../../environment';
+import * as timeUtils from '../../bridge/timeUtils';
 
 export const CardanoForks = Object.freeze({
   Haskell: 0,
@@ -228,6 +229,18 @@ export function getCardanoHaskellBaseConfig(
 ): CardanoHaskellBaseConfig {
   if (!isCardanoHaskell(network)) throw new Error(`Incorrect network type ${JSON.stringify(network)}`);
   return (network.BaseConfig: any); // cast to return type
+}
+
+export async function createSlotToTimestampFunc(
+  network: $ReadOnly<NetworkRow>,
+): Promise<(number | string) => Date> {
+  const fullConfig = getCardanoHaskellBaseConfig(network);
+  const timeSinceGenFunc = await timeUtils.genTimeSinceGenesis(fullConfig);
+  const realTimeFunc = await timeUtils.genToRealTime(fullConfig);
+  return s => realTimeFunc({
+    absoluteSlotNum: Number(s),
+    timeSinceGenesisFunc: timeSinceGenFunc,
+  });
 }
 
 export const defaultAssets: Array<

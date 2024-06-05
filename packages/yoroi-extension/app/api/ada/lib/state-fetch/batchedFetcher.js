@@ -43,7 +43,7 @@ import type {
   FilterUsedRequest,
   FilterUsedResponse,
   FilterFunc,
-  GetSwapFeeTiersFunc,
+  GetSwapFeeTiersFunc, GetTransactionSlotsByHashesResponse, GetTransactionSlotsByHashesFunc, SignedBatchRequest,
 } from './types';
 import LocalizableError from '../../../../i18n/LocalizableError';
 
@@ -111,6 +111,14 @@ export class BatchedFetcher implements IFetcher {
       )(body)
     );
 
+  getTransactionSlotsByHashes
+  : GetTransactionsByHashesRequest => Promise<GetTransactionSlotsByHashesResponse>
+    = (body) => (
+      batchGetTransactionSlotsByHashes(
+        this.baseFetcher.getTransactionSlotsByHashes
+      )(body)
+    );
+
   getRewardHistory: RewardHistoryRequest => Promise<RewardHistoryResponse> = (body) => (
     batchGetRewardHistory(
       this.baseFetcher.getRewardHistory
@@ -122,9 +130,8 @@ export class BatchedFetcher implements IFetcher {
     this.baseFetcher.getBestBlock(body)
   )
 
-  sendTx: SignedRequest => Promise<SignedResponse> = (body) => (
+  sendTx: (SignedRequest | SignedBatchRequest) => Promise<SignedResponse> = (body) => (
     // We don't batch transaction sending (it's just a single request)
-    // TODO: Should we support batching a list of transactions?
     this.baseFetcher.sendTx(body)
   )
 
@@ -298,15 +305,31 @@ function batchGetTransactionsByHashes(
   return async function(
     body: GetTransactionsByHashesRequest
   ): Promise<GetTransactionsByHashesResponse> {
-    let txs = [];
-    for (const txHashes of chunk(body.txHashes, 100)) {
-      const batchResult = await getTransactionsByHashes({
+    const promises = chunk(body.txHashes, 100).map(txHashes => {
+      return getTransactionsByHashes({
         txHashes,
         network: body.network,
       });
-      txs = [ ...txs, ...batchResult ];
-    }
-    return txs;
+    });
+    const resultChunks = await Promise.all(promises);
+    return resultChunks.reduce((res, entry) => ([ ...res, ...entry ]), ([]: GetTransactionsByHashesResponse));
+  };
+}
+
+function batchGetTransactionSlotsByHashes(
+  getTransactionSlotsByHashes: GetTransactionSlotsByHashesFunc,
+): GetTransactionSlotsByHashesFunc {
+  return async function(
+    body: GetTransactionsByHashesRequest
+  ): Promise<GetTransactionSlotsByHashesResponse> {
+    const promises = chunk(body.txHashes, 100).map(txHashes => {
+      return getTransactionSlotsByHashes({
+        txHashes,
+        network: body.network,
+      });
+    });
+    const resultChunks = await Promise.all(promises);
+    return resultChunks.reduce((res, entry) => ({ ...res, ...entry }), ({}: GetTransactionSlotsByHashesResponse));
   };
 }
 

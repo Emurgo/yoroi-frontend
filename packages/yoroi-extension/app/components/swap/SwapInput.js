@@ -127,10 +127,18 @@ export default function SwapInput({
               component="button"
               variant="caption"
               fontWeight={500}
-              sx={{ p: '4px 8px', bgcolor: 'grayscale.50', borderRadius: '8px' }}
+              sx={{
+                p: '4px 8px',
+                bgcolor: 'grayscale.50',
+                borderRadius: '8px',
+                ':disabled': {
+                  cursor: 'not-allowed',
+                },
+              }}
               onClick={() => {
                 handleAmountChange(quantity);
               }}
+              disabled={disabled}
             >
               MAX
             </Typography>
