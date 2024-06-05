@@ -134,7 +134,7 @@ export default function SlippageDialog({
             />
           </Box>
         </Box>
-        <Box my="24px" p="16px" pb="16px" pt="12px" bgcolor="yellow.100" borderRadius="8px">
+        <Box my="24px" p="16px" pb="12px" pt="12px" bgcolor="yellow.100" borderRadius="8px">
           <Typography component="div" variant="body1" color="grayscale.max">
             When the slippage tolerance is set really high, it allows the transaction to still
             complete despite large price swings. This can open the door to front-running and
