@@ -31,7 +31,7 @@ export default function EditBuyAmount({ onAssetSelect, defaultTokenInfo }: Props
   return (
     <SwapInput
       key={tokenId}
-      label="Swap To"
+      label="Swap to"
       disabled={!isValidTickers}
       handleAmountChange={handleAmountChange}
       value={buyDisplayValue}

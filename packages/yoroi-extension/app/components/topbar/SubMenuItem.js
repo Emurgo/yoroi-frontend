@@ -44,7 +44,11 @@ class SubMenuItem extends Component<Props & InjectedProps> {
         onClick={onClick}
         id={locationId + '-' + subMenuItemId + 'SubTab-button'}
       >
-        <Typography variant="body1" fontWeight="500">
+        <Typography
+          variant="body1"
+          fontWeight="500"
+          color={active ? 'primary.500' : 'grayscale.600'}
+        >
           {label}
         </Typography>
       </Box>
