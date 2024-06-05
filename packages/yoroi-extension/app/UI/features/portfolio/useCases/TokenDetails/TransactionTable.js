@@ -181,6 +181,7 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount, hea
       <TableCell key={`${row.label} ${headCells[0].id}`}>
         <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
           <IconButton
+            disableRipple={true}
             sx={{
               width: '48px',
               height: '48px',
@@ -210,9 +211,11 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount, hea
           </IconButton>
           <Stack direction="column">
             <Typography color="ds.gray_c900">{row.label}</Typography>
-            <Typography variant="caption1" color="ds.gray_c600">
-              {moment.utc(row.time).local().format('h:mm A')}
-            </Typography>
+            {isExpanded && (
+              <Typography variant="caption1" color="ds.gray_c600">
+                {moment.utc(row.time).local().format('h:mm A')}
+              </Typography>
+            )}
           </Stack>
         </Stack>
       </TableCell>
@@ -226,11 +229,12 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount, hea
           <Typography fontWeight="500" color="ds.text_gray_normal">
             {row.feeValue ? `${row.feeValue} ADA` : '-'}
           </Typography>
-          {unitOfAccount === 'ADA' ? null : (
-            <Typography variant="body2" color="ds.text_gray_medium">
-              {row.feeValueUsd ? `${row.feeValueUsd} ${unitOfAccount}` : '-'}
-            </Typography>
-          )}
+          {isExpanded &&
+            (unitOfAccount === 'ADA' ? null : (
+              <Typography variant="body2" color="ds.text_gray_medium">
+                {row.feeValueUsd ? `${row.feeValueUsd} ${unitOfAccount}` : '-'}
+              </Typography>
+            ))}
         </Stack>
       </TableCell>
       <TableCell key={`${row.label} ${headCells[3].id}`}>
@@ -239,20 +243,9 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount, hea
           spacing={theme.spacing(2)}
           sx={{
             float: 'right',
-            cursor:
-              unitOfAccount === 'ADA' &&
-              (row.type === HistoryItemType.ERROR ||
-                row.type === HistoryItemType.WITHDRAW ||
-                row.type === HistoryItemType.DELEGATE)
-                ? 'normal'
-                : 'pointer',
+            cursor: 'pointer',
           }}
-          onClick={() =>
-            unitOfAccount === 'ADA' &&
-            (row.type === HistoryItemType.ERROR || row.type === HistoryItemType.WITHDRAW || row.type === HistoryItemType.DELEGATE)
-              ? null
-              : setIsExpanded(!isExpanded)
-          }
+          onClick={() => setIsExpanded(!isExpanded)}
         >
           <Stack direction="column">
             <Typography fontWeight="500" color="ds.gray_c900" sx={{ textAlign: 'right' }}>
@@ -290,13 +283,6 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount, hea
             style={{
               transition: 'all ease 0.3s',
               transform: isExpanded ? 'rotate(0deg)' : 'rotate(180deg)',
-              opacity:
-                unitOfAccount === 'ADA' &&
-                (row.type === HistoryItemType.ERROR ||
-                  row.type === HistoryItemType.WITHDRAW ||
-                  row.type === HistoryItemType.DELEGATE)
-                  ? 0
-                  : 1,
             }}
           />
         </Stack>
