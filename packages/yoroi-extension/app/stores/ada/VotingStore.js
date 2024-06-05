@@ -21,7 +21,7 @@ import {
   isCardanoHaskell,
   getCardanoHaskellBaseConfig,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import { genTimeToSlot } from '../../api/ada/lib/storage/bridge/timeUtils';
+import TimeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
 import { generatePrivateKeyForCatalyst } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import {
   isLedgerNanoWallet,
@@ -257,12 +257,10 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
       publicDeriver.getParent().getNetworkInfo()
     );
 
-    const timeToSlot = genTimeToSlot(fullConfig);
+    const timeToSlot = (time: Date) => TimeUtils.timeToAbsoluteSlot(fullConfig, time);
     const absSlotNumber = new BigNumber(
-      timeToSlot({
-        // use server time for TTL if connected to server
-        time: this.stores.serverConnectionStore.serverTime ?? new Date(),
-      }).slot
+      // use server time for TTL if connected to server
+      timeToSlot(this.stores.serverConnectionStore.serverTime ?? new Date())
     );
 
     const catalystPrivateKey = this.catalystPrivateKey;
@@ -270,7 +268,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
       throw new Error(`${nameof(this._createTransaction)} should never happen`);
     }
 
-    const nonce = timeToSlot({ time: new Date() }).slot;
+    const nonce = timeToSlot(new Date());
 
     const firstAddress = await this.stores.addresses.getFirstExternalAddress(publicDeriver);
 

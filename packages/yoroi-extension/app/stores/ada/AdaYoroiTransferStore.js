@@ -23,9 +23,7 @@ import {
   Bip44DerivationLevels,
 } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import {
-  genTimeToSlot,
-} from '../../api/ada/lib/storage/bridge/timeUtils';
+import TimeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
 import type {
   Address, Addressing
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
@@ -105,7 +103,7 @@ export default class AdaYoroiTransferStore extends Store<StoresMap, ActionsMap> 
     const config = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
 
     // note: no wallet selected so we call this directly
-    const timeToSlot = genTimeToSlot(fullConfig);
+    const timeToSlot = (time: Date) => TimeUtils.timeToAbsoluteSlot(fullConfig, time);
 
     const transferTx = await yoroiTransferTxFromAddresses({
       addresses,
@@ -125,10 +123,8 @@ export default class AdaYoroiTransferStore extends Store<StoresMap, ActionsMap> 
         poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
         networkId: selectedNetwork.NetworkId,
       },
-      absSlotNumber: new BigNumber(timeToSlot({
-        // use server time for TTL if connected to server
-        time: this.stores.serverConnectionStore.serverTime ?? new Date(),
-      }).slot),
+      // use server time for TTL if connected to server
+      absSlotNumber: new BigNumber(timeToSlot(this.stores.serverConnectionStore.serverTime ?? new Date())),
     });
     // Possible exception: NotEnoughMoneyToSendError
     return transferTx;

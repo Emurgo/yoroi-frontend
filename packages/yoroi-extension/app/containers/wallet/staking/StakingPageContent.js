@@ -130,7 +130,7 @@ class StakingPageContent extends Component<AllProps> {
 
   getEpochProgress: (PublicDeriver<>) => Node | void = publicDeriver => {
     const timeCalcRequests = this.props.stores.substores.ada.time.getTimeCalcRequests(publicDeriver);
-    const { toAbsoluteSlot, toRealTime, timeSinceGenesis, currentEpochLength } = timeCalcRequests.requests;
+    const { toAbsoluteSlot, toRealTime, currentEpochLength } = timeCalcRequests.requests;
 
     const currTimeRequests = this.props.stores.substores.ada.time.getCurrentTimeRequests(publicDeriver);
     const currentEpoch = currTimeRequests.currentEpoch;
@@ -143,7 +143,6 @@ class StakingPageContent extends Component<AllProps> {
           // Rewards are calculated at the start of the epoch but distributed at the end
           slot: epochLength,
         }),
-        timeSinceGenesisFunc: timeSinceGenesis,
       });
       return returnEpochTime ? epochTime : moment(epochTime).format('lll');
     };

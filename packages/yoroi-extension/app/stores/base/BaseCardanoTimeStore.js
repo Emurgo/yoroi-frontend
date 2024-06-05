@@ -6,24 +6,8 @@ import { PublicDeriver, } from '../../api/ada/lib/storage/models/PublicDeriver/i
 import Store from './Store';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import type {
-  CurrentEpochLengthFunc,
-  CurrentSlotLengthFunc,
-  TimeSinceGenesisFunc,
-  TimeToAbsoluteSlotFunc,
-  ToAbsoluteSlotNumberFunc,
-  ToRealTimeFunc,
-  ToRelativeSlotNumberFunc
-} from '../../api/ada/lib/storage/bridge/timeUtils';
-import {
-  genCurrentEpochLength,
-  genCurrentSlotLength,
-  genTimeSinceGenesis,
-  genTimeToSlot,
-  genToAbsoluteSlotNumber,
-  genToRealTime,
-  genToRelativeSlotNumber
-} from '../../api/ada/lib/storage/bridge/timeUtils';
+import type { RelativeSlot } from '../../api/ada/lib/storage/bridge/timeUtils';
+import TimeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
 import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { fail, maybe } from '../../coreUtils';
 
@@ -33,13 +17,12 @@ export type TimeCalcRequests = {|
   // so it depends how much the blockchain has synced for a given wallet
   publicDeriver: PublicDeriver<>,
   requests: {|
-    toAbsoluteSlot: ToAbsoluteSlotNumberFunc;
-    toRelativeSlotNumber: ToRelativeSlotNumberFunc;
-    timeToSlot: TimeToAbsoluteSlotFunc;
-    currentEpochLength: CurrentEpochLengthFunc;
-    currentSlotLength: CurrentSlotLengthFunc;
-    timeSinceGenesis: TimeSinceGenesisFunc,
-    toRealTime: ToRealTimeFunc;
+    toAbsoluteSlot: RelativeSlot => number;
+    toRelativeSlotNumber: number => RelativeSlot;
+    timeToSlot: {| time: Date |} => {| slot: number |};
+    currentEpochLength: () => number;
+    currentSlotLength: () => number;
+    toRealTime: {| absoluteSlotNum: number |} => Date;
   |},
 |};
 
@@ -50,7 +33,6 @@ export type CurrentTimeRequests = {|
   publicDeriver: PublicDeriver<>,
   currentEpoch: number,
   currentSlot: number,
-  msIntoSlot: number,
 |};
 
 /**
@@ -89,13 +71,12 @@ export default class BaseCardanoTimeStore extends Store<StoresMap, ActionsMap> {
     this.timeCalcRequests.push({
       publicDeriver,
       requests: {
-        toAbsoluteSlot: genToAbsoluteSlotNumber(baseConfig),
-        toRelativeSlotNumber: genToRelativeSlotNumber(baseConfig),
-        timeToSlot: genTimeToSlot(baseConfig),
-        currentEpochLength: genCurrentEpochLength(baseConfig),
-        currentSlotLength: genCurrentSlotLength(baseConfig),
-        timeSinceGenesis: genTimeSinceGenesis(baseConfig),
-        toRealTime: genToRealTime(baseConfig),
+        toAbsoluteSlot: (relativeSlot: RelativeSlot) => TimeUtils.toAbsoluteSlotNumber(baseConfig, relativeSlot),
+        toRelativeSlotNumber: absoluteSlot => TimeUtils.toRelativeSlotNumber(baseConfig, absoluteSlot),
+        timeToSlot: (req: {| time: Date |}) => ({ slot: TimeUtils.timeToAbsoluteSlot(baseConfig, req.time) }),
+        currentEpochLength: () => TimeUtils.currentEpochSlots(baseConfig),
+        currentSlotLength: () => TimeUtils.currentSlotSeconds(baseConfig),
+        toRealTime: (req: {| absoluteSlotNum: number |}) => TimeUtils.absoluteSlotToTime(baseConfig, req.absoluteSlotNum),
       },
     });
     this.currentTimeRequests.push({
@@ -103,7 +84,6 @@ export default class BaseCardanoTimeStore extends Store<StoresMap, ActionsMap> {
       // initial values that can be updated later
       currentEpoch: 0,
       currentSlot: 0,
-      msIntoSlot: 0,
     });
   }
 
@@ -143,7 +123,6 @@ export default class BaseCardanoTimeStore extends Store<StoresMap, ActionsMap> {
         currTimeRequests.currentEpoch = currentRelativeTime.epoch;
       }
       currTimeRequests.currentSlot = currentRelativeTime.slot;
-      currTimeRequests.msIntoSlot = currentAbsoluteSlot.msIntoSlot;
     });
   }
 }
