@@ -6,11 +6,11 @@ import {
 import type {
   NetworkRow,
   CardanoHaskellBaseConfig,
+  CardanoHaskellConfig,
   TokenInsert,
 } from '../primitives/tables';
 import { PRIMARY_ASSET_CONSTANTS } from '../primitives/enums';
 import environment from '../../../../../../environment';
-import type { CardanoHaskellConfig } from '../primitives/tables';
 
 export const CardanoForks = Object.freeze({
   Haskell: 0,
