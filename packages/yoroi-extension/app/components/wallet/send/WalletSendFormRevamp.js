@@ -62,6 +62,7 @@ import TrezorSendActions from '../../../actions/ada/trezor-send-actions';
 import LedgerSendActions from '../../../actions/ada/ledger-send-actions';
 import type { SendMoneyRequest } from '../../../stores/toplevel/WalletStore';
 import type { MaxSendableAmountRequest } from '../../../stores/toplevel/TransactionBuilderStore';
+import LoadingSpinner from '../../widgets/LoadingSpinner';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -278,7 +279,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
      * so instead we register a reaction to update it
      */
     this.amountFieldReactionDisposer = reaction(
-      () => [this.props.shouldSendAll, this.props.totalInput, this.props.maxSendableAmount],
+      () => [this.props.shouldSendAll, this.props.totalInput, this.props.maxSendableAmount.result],
       () => {
         const { maxSendableAmount } = this.props;
         const amountField = this.form.$('amount');
@@ -837,7 +838,9 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                       }
                     }}
                 >
-                  {intl.formatMessage(messages.max)}
+                  {maxSendableAmount.isExecuting ? (
+                    <LoadingSpinner small />
+                  ) : intl.formatMessage(messages.max)}
                 </Button>
               </Box>
               {showFiat && (

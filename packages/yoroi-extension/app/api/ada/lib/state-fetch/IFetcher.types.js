@@ -32,7 +32,7 @@ import type {
   MultiAssetSupplyResponse,
   FilterUsedRequest,
   FilterUsedResponse,
-  GetSwapFeeTiersFunc,
+  GetSwapFeeTiersFunc, GetTransactionSlotsByHashesResponse, SignedBatchRequest,
 } from './types';
 
 export interface IFetcher {
@@ -40,7 +40,7 @@ export interface IFetcher {
   getTransactionsHistoryForAddresses(body: HistoryRequest): Promise<HistoryResponse>;
   getRewardHistory(body: RewardHistoryRequest): Promise<RewardHistoryResponse>;
   getBestBlock(body: BestBlockRequest): Promise<BestBlockResponse>;
-  sendTx(body: SignedRequest): Promise<SignedResponse>;
+  sendTx(body: SignedRequest | SignedBatchRequest): Promise<SignedResponse>;
   getAccountState(body: AccountStateRequest): Promise<AccountStateResponse>;
   getPoolInfo(body: PoolInfoRequest): Promise<PoolInfoResponse>;
   getCatalystRoundInfo(body: CatalystRoundInfoRequest): Promise<CatalystRoundInfoResponse>;
@@ -56,6 +56,8 @@ export interface IFetcher {
     : GetRecentTransactionHashesRequest => Promise<GetRecentTransactionHashesResponse>;
   getTransactionsByHashes
     : GetTransactionsByHashesRequest => Promise<GetTransactionsByHashesResponse>;
+  getTransactionSlotsByHashes
+    : GetTransactionsByHashesRequest => Promise<GetTransactionSlotsByHashesResponse>;
   getSwapFeeTiers
     : GetSwapFeeTiersFunc;
 }

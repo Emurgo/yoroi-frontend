@@ -2,52 +2,52 @@
 
 import BigNumber from 'bignumber.js';
 import type {
-  HistoryRequest,
-  HistoryResponse,
-  HistoryFunc,
-  BestBlockRequest,
-  BestBlockResponse,
-  BestBlockFunc,
-  AddressUtxoRequest,
-  AddressUtxoResponse,
-  AddressUtxoFunc,
-  RewardHistoryFunc,
+  AccountStateFunc,
   AccountStateRequest,
   AccountStateResponse,
-  AccountStateFunc,
-  PoolInfoRequest,
-  PoolInfoResponse,
-  PoolInfoFunc,
-  RemoteTransaction,
-  RemoteUnspentOutput,
-  SignedRequestInternal,
-  RemoteTransactionInput,
-  TokenInfoFunc,
-  MultiAssetMintMetadataFunc,
-  GetTransactionsByHashesRequest,
-  GetTransactionsByHashesResponse,
-  GetTransactionsByHashesFunc,
+  AddressUtxoFunc,
+  AddressUtxoRequest,
+  AddressUtxoResponse,
+  BestBlockFunc,
+  BestBlockRequest,
+  BestBlockResponse,
+  FilterFunc,
+  FilterUsedRequest,
+  FilterUsedResponse,
+  GetRecentTransactionHashesFunc,
   GetRecentTransactionHashesRequest,
   GetRecentTransactionHashesResponse,
-  GetRecentTransactionHashesFunc,
-  MultiAssetSupplyFunc, FilterUsedRequest, FilterUsedResponse, FilterFunc,
+  GetTransactionsByHashesFunc,
+  GetTransactionsByHashesRequest,
+  GetTransactionsByHashesResponse,
+  HistoryFunc,
+  HistoryRequest,
+  HistoryResponse,
+  MultiAssetMintMetadataFunc,
+  MultiAssetSupplyFunc,
+  PoolInfoFunc,
+  PoolInfoRequest,
+  PoolInfoResponse,
+  RemoteTransaction,
+  RemoteTransactionInput,
+  RemoteUnspentOutput,
+  RewardHistoryFunc,
+  SignedRequestInternal,
+  TokenInfoFunc,
 } from './types';
+import { ShelleyCertificateTypes } from './types';
 import { RollbackApiError, } from '../../../common/errors';
-import { toEnterprise, addressToKind, toHexOrBase58 } from '../storage/bridge/utils';
-import { CoreAddressTypes } from '../storage/database/primitives/enums';
+import { addressToKind, toEnterprise, toHexOrBase58 } from '../storage/bridge/utils';
 import type { CoreAddressT } from '../storage/database/primitives/enums';
-import {
-  mnemonicToEntropy
-} from 'bip39';
-import {
-  WalletTypePurpose,
-} from '../../../../config/numbersConfig';
+import { CoreAddressTypes } from '../storage/database/primitives/enums';
+import { mnemonicToEntropy } from 'bip39';
+import { WalletTypePurpose, } from '../../../../config/numbersConfig';
 import type { NetworkRow } from '../storage/database/primitives/tables';
 
 import { RustModule } from '../cardanoCrypto/rustLoader';
 
 import { generateLedgerWalletRootKey } from '../cardanoCrypto/cryptoWallet';
-import { networks, getCardanoHaskellBaseConfig } from '../storage/database/prepackaged/networks';
+import { getCardanoHaskellBaseConfig, networks } from '../storage/database/prepackaged/networks';
 import { bech32 } from 'bech32';
 import { Bech32Prefix } from '../../../../config/stringConfig';
 import { parseTokenList } from '../../transactions/utils';
@@ -62,7 +62,7 @@ import type {
   UtxoDiffSincePointRequest
 } from '@emurgo/yoroi-lib/dist/utxo/models';
 import { UtxoApiResult, } from '@emurgo/yoroi-lib/dist/utxo/models';
-import { ShelleyCertificateTypes } from './types';
+import { forceNonNull, last } from '../../../../coreUtils';
 
 function byronAddressToHex(byronAddrOrHex: string): string {
   if (RustModule.WalletV4.ByronAddress.is_valid(byronAddrOrHex)) {
@@ -551,8 +551,8 @@ export function toRemoteByronTx(
   blockchain: Array<RemoteTransaction>,
   request: SignedRequestInternal,
 ): RemoteTransaction {
-  const signedTx = RustModule.WalletV4.Transaction
-    .from_bytes(Buffer.from(request.signedTx, 'base64'));
+  const tx = Array.isArray(request.signedTx) ? forceNonNull(last(request.signedTx)) : request.signedTx;
+  const signedTx = RustModule.WalletV4.Transaction.from_bytes(Buffer.from(tx, 'base64'));
 
   const body = signedTx.body();
   const hash = Buffer.from(RustModule.WalletV4.hash_transaction(body).to_bytes()).toString('hex');
