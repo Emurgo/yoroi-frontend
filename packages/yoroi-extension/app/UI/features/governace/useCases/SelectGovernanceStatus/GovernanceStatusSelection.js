@@ -57,10 +57,11 @@ export const GovernanceStatusSelection = (): Node => {
   const { createCertificate: createVotingCertificate, isLoading: isCreatingVotingCertificate } = useVotingCertificate({
     useErrorBoundary: true,
   });
+  console.log('governanceData', governanceData);
 
-  const pageTitle = governanceVote === 'none' ? strings.registerGovernance : strings.governanceStatus;
+  const pageTitle = governanceData?.kind === 'none' ? strings.registerGovernance : strings.governanceStatus;
   const statusRawText = mapStatus[governanceVote?.kind];
-  const pageSubtitle = governanceVote === 'none' ? strings.reviewSelection : strings.statusSelected(statusRawText);
+  const pageSubtitle = governanceData?.kind === 'none' ? strings.reviewSelection : strings.statusSelected(statusRawText);
 
   const openDRepIdModal = (onSubmit: (drepID: string) => void) => {
     openModal({
