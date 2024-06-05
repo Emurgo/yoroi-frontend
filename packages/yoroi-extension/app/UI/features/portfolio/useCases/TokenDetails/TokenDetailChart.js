@@ -45,35 +45,14 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
     value: tokenInfo.chartData[buttonPeriodProps[0].id][tokenInfo.chartData[buttonPeriodProps[0].id].length - 1].value,
     usd: tokenInfo.chartData[buttonPeriodProps[0].id][tokenInfo.chartData[buttonPeriodProps[0].id].length - 1].usd,
   });
-  const [isHolding, setIsHolding] = useState(false);
-  const [holdCoords, setHoldCoords] = useState(null);
-
-  const handleMouseDown = (event) => {
-    setHoldCoords({ x: event.clientX, y: event.clientY });
-    setIsHolding(true);
-
-    // Start the hold timer (replace 500 with your desired hold duration)
-    const holdTimer = setTimeout(() => {
-      if (isHolding && holdCoords) {
-        // Execute hold interaction logic here (e.g., display tooltip, highlight data point)
-        console.log('Hold detected!');
-      }
-    }, 500);
-
-    return () => clearTimeout(holdTimer); // Cleanup function for the timer
-  };
-
-  const handleMouseUp = () => {
-    setIsHolding(false);
-    setHoldCoords(null);
-  };
+  const [isDragging, setIsDragging] = useState(false);
 
   const CustomYAxisTick = props => {
     const { x, y, payload } = props;
 
     return (
       <text x={x - 5} y={y} dy={4} textAnchor="end" fill={theme.palette.ds.black_static}>
-        {payload.value}
+        {payload.value.toFixed(1)}
       </text>
     );
   };
@@ -93,39 +72,41 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
     const rectY = chartBottom - rectHeight;
 
     return (
-      <svg>
-        <g>
-          <circle cx={cx} cy={cy} r={5} fill={theme.palette.ds.primary_c500} />
+      isDragging && (
+        <svg>
+          <g>
+            <circle cx={cx} cy={cy} r={5} fill={theme.palette.ds.primary_c500} />
 
-          <line x1={cx} y1={cy} x2={cx} y2={rectY} stroke={theme.palette.ds.primary_c500} strokeDasharray="5,5" />
+            <line x1={cx} y1={cy} x2={cx} y2={rectY} stroke={theme.palette.ds.primary_c500} strokeDasharray="5,5" />
 
-          <Box
-            component="rect"
-            x={rectX}
-            y={rectY}
-            width={rectWidth}
-            height={rectHeight}
-            fill={theme.palette.ds.primary_c500}
-            rx={5}
-            ry={5}
-          ></Box>
-          <Box
-            component="text"
-            x={rectX + rectWidth / 2}
-            y={rectY + rectHeight / 2}
-            textAnchor="middle"
-            fill={theme.palette.ds.primary_c200}
-            alignmentBaseline="middle"
-            sx={{
-              fontFamily: theme.typography.fontFamily,
-              fontSize: '0.75rem',
-              fontWeight: 400,
-            }}
-          >
-            {moment(payload.time).format('MM/DD/YY H:mm')}
-          </Box>
-        </g>
-      </svg>
+            <Box
+              component="rect"
+              x={rectX}
+              y={rectY}
+              width={rectWidth}
+              height={rectHeight}
+              fill={theme.palette.ds.primary_c500}
+              rx={5}
+              ry={5}
+            ></Box>
+            <Box
+              component="text"
+              x={rectX + rectWidth / 2}
+              y={rectY + rectHeight / 2}
+              textAnchor="middle"
+              fill={theme.palette.ds.primary_c200}
+              alignmentBaseline="middle"
+              sx={{
+                fontFamily: theme.typography.fontFamily,
+                fontSize: '0.75rem',
+                fontWeight: 400,
+              }}
+            >
+              {moment(payload.time).format('MM/DD/YY H:mm')}
+            </Box>
+          </g>
+        </svg>
+      )
     );
   };
 
@@ -140,7 +121,14 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
     setButtonPeriodProps(tmp);
   };
 
-  const handleChangePrice = e => {
+  const handleMouseMove = e => {
+    if (!isDragging) return;
+
+    if (!e.isTooltipActive) {
+      handleMouseUp();
+      return;
+    }
+
     const value = e.activePayload && e.activePayload.length > 0 ? e.activePayload[0].payload.value : null;
     const usd = e.activePayload && e.activePayload.length > 0 ? e.activePayload[0].payload.usd : null;
 
@@ -151,14 +139,33 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
     });
   };
 
-  const minValue = tokenInfo.chartData[buttonPeriodProps.find(item => item.active).id].reduce(
-    (min, item) => Math.min(min, item.value),
-    Infinity
-  );
-  const maxValue = tokenInfo.chartData[buttonPeriodProps.find(item => item.active).id].reduce(
-    (max, item) => Math.max(max, item.value),
-    -Infinity
-  );
+  const handleMouseDown = event => {
+    if (!event || !event.activePayload || event.activePayload.length <= 0) return;
+
+    const value = event.activePayload[0].payload.value;
+    const usd = event.activePayload[0].payload.usd;
+
+    if (!value || !usd) return;
+    setDetailInfo({
+      value,
+      usd,
+    });
+    setIsDragging(true);
+  };
+
+  const handleMouseUp = () => {
+    const currentPeriod = buttonPeriodProps.find(item => item.active).id;
+    setDetailInfo({
+      value: tokenInfo.chartData[currentPeriod][tokenInfo.chartData[currentPeriod].length - 1].value,
+      usd: tokenInfo.chartData[currentPeriod][tokenInfo.chartData[currentPeriod].length - 1].usd,
+    });
+    setIsDragging(false);
+  };
+
+  const minValue = Math.min(...tokenInfo.chartData[buttonPeriodProps.find(item => item.active).id].map(item => item.value));
+
+  const maxValue = Math.max(...tokenInfo.chartData[buttonPeriodProps.find(item => item.active).id].map(item => item.value));
+
   return (
     <Stack direction="column" spacing={theme.spacing(4)} sx={{ padding: theme.spacing(3) }}>
       <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -234,22 +241,28 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
           component={isLoading ? 'img' : 'div'}
           src={chartSkeletonPng}
           sx={{
-            marginLeft: `-${theme.spacing(1)}`,
+            marginLeft: `${-theme.spacing(1)}`,
             width: '100%',
             height: `${chartHeight}px`,
           }}
         >
           {isLoading ? null : (
             <ResponsiveContainer width="100%" height={chartHeight} style={{ padding: 0 }}>
-              <LineChart data={tokenInfo.chartData[buttonPeriodProps.find(item => item.active).id]} onMouseDown={handleMouseDown}>
+              <LineChart
+                data={tokenInfo.chartData[buttonPeriodProps.find(item => item.active).id]}
+                onMouseDown={handleMouseDown}
+                onMouseUp={handleMouseUp}
+                onMouseMove={handleMouseMove}
+                onMouseLeave={handleMouseUp}
+              >
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <YAxis
                   domain={[minValue, maxValue]}
                   axisLine={false}
-                  allowDecimals={true}
                   tickLine={false}
                   type={'number'}
                   tick={CustomYAxisTick}
+                  tickCount={9}
                 ></YAxis>
                 <RechartTooltip cursor={false} content={<></>} />
                 <Line

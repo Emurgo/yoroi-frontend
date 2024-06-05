@@ -282,7 +282,7 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount, hea
           <Icon.Expand
             style={{
               transition: 'all ease 0.3s',
-              transform: isExpanded ? 'rotate(0deg)' : 'rotate(180deg)',
+              transform: isExpanded ? 'rotate(0deg)' : 'rotate(-180deg)',
             }}
           />
         </Stack>
