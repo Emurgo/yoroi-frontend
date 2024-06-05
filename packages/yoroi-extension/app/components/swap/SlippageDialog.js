@@ -12,9 +12,15 @@ type Props = {|
   slippageValue: string,
 |};
 
-export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValue }: Props): React$Node {
+export default function SlippageDialog({
+  onSetNewSlippage,
+  onClose,
+  slippageValue,
+}: Props): React$Node {
   const [selectedSlippage, setSelectedSlippage] = useState(slippageValue);
-  const [isManualSlippage, setIsManualSlippage] = useState(!defaultSlippages.includes(slippageValue));
+  const [isManualSlippage, setIsManualSlippage] = useState(
+    !defaultSlippages.includes(slippageValue)
+  );
 
   const handleSlippageApply = () => {
     try {
@@ -40,8 +46,14 @@ export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValu
 
   // <TODO:CHECK_INTL>
   return (
-    <Dialog title="Slippage tolerance" onClose={onClose} withCloseButton closeOnOverlayClick>
-      <Box maxWidth="564px">
+    <Dialog
+      title="Slippage tolerance"
+      onClose={onClose}
+      withCloseButton
+      closeOnOverlayClick
+      styleContentOverride={{ paddingTop: '16px' }}
+    >
+      <Box maxWidth="612px" sx={{ margin: '0 auto', flex: 1 }}>
         <Box>
           <Typography component="div" variant="body1" color="grayscale.800">
             Default Slippage Tolerance
@@ -122,7 +134,7 @@ export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValu
             />
           </Box>
         </Box>
-        <Box my="24px" p="16px" pt="12px" bgcolor="yellow.100" borderRadius="8px">
+        <Box my="24px" p="16px" pb="12px" pt="12px" bgcolor="yellow.100" borderRadius="8px">
           <Typography component="div" variant="body1" color="grayscale.max">
             When the slippage tolerance is set really high, it allows the transaction to still
             complete despite large price swings. This can open the door to front-running and
