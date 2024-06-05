@@ -2,20 +2,20 @@ import React from 'react';
 import { Chip as MuiChip, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
-export const Chip = props => {
+export const Chip = ({ label, active, sx, ...props }) => {
   const theme = useTheme();
 
   return (
     <MuiChip
-      label={props.label}
+      label={label}
       {...props}
       sx={{
         maxWidth: 'fit-content',
         padding: '2px 6px !important',
         borderRadius: '20px',
-        backgroundColor: props.active ? theme.palette.ds.secondary_c100 : theme.palette.ds.sys_magenta_c100,
-        color: props.active ? theme.palette.ds.secondary_c800 : theme.palette.ds.sys_magenta_c700,
-        ...props.sx,
+        backgroundColor: active ? theme.palette.ds.secondary_c100 : theme.palette.ds.sys_magenta_c100,
+        color: active ? theme.palette.ds.secondary_c800 : theme.palette.ds.sys_magenta_c700,
+        ...sx,
 
         '& .MuiChip-label': {
           padding: 0,

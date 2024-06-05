@@ -4,8 +4,8 @@ export const Staking = props => {
   return (
     <svg width="24" height="24" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" {...props}>
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M17 7C17 3.13401 13.866 0 10 0C6.13401 0 3 3.13401 3 7C3 10.866 6.13401 14 10 14C13.866 14 17 10.866 17 7ZM5 7C5 4.23858 7.23858 2 10 2C12.7614 2 15 4.23858 15 7C15 9.76142 12.7614 12 10 12C7.23858 12 5 9.76142 5 7Z"
         fill={props.fill}
       />

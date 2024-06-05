@@ -45,6 +45,28 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
     value: tokenInfo.chartData[buttonPeriodProps[0].id][tokenInfo.chartData[buttonPeriodProps[0].id].length - 1].value,
     usd: tokenInfo.chartData[buttonPeriodProps[0].id][tokenInfo.chartData[buttonPeriodProps[0].id].length - 1].usd,
   });
+  const [isHolding, setIsHolding] = useState(false);
+  const [holdCoords, setHoldCoords] = useState(null);
+
+  const handleMouseDown = (event) => {
+    setHoldCoords({ x: event.clientX, y: event.clientY });
+    setIsHolding(true);
+
+    // Start the hold timer (replace 500 with your desired hold duration)
+    const holdTimer = setTimeout(() => {
+      if (isHolding && holdCoords) {
+        // Execute hold interaction logic here (e.g., display tooltip, highlight data point)
+        console.log('Hold detected!');
+      }
+    }, 500);
+
+    return () => clearTimeout(holdTimer); // Cleanup function for the timer
+  };
+
+  const handleMouseUp = () => {
+    setIsHolding(false);
+    setHoldCoords(null);
+  };
 
   const CustomYAxisTick = props => {
     const { x, y, payload } = props;
@@ -118,7 +140,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
     setButtonPeriodProps(tmp);
   };
 
-  const handleMouseMove = e => {
+  const handleChangePrice = e => {
     const value = e.activePayload && e.activePayload.length > 0 ? e.activePayload[0].payload.value : null;
     const usd = e.activePayload && e.activePayload.length > 0 ? e.activePayload[0].payload.usd : null;
 
@@ -219,7 +241,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
         >
           {isLoading ? null : (
             <ResponsiveContainer width="100%" height={chartHeight} style={{ padding: 0 }}>
-              <LineChart data={tokenInfo.chartData[buttonPeriodProps.find(item => item.active).id]} onMouseMove={handleMouseMove}>
+              <LineChart data={tokenInfo.chartData[buttonPeriodProps.find(item => item.active).id]} onMouseDown={handleMouseDown}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <YAxis
                   domain={[minValue, maxValue]}

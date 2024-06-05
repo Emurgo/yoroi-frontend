@@ -10,9 +10,10 @@ import { useStrings } from '../../common/useStrings';
 import { Icon } from '../../../../components/icons/index';
 import illustrationPng from '../../common/assets/images/illustration.png';
 
-const TableRowSkeleton = ({ id, theme }) => (
+const TableRowSkeleton = ({ id, theme, ...props }) => (
   <TableRow
     key={id}
+    {...props}
     sx={{
       '& td': { border: 0 },
     }}
@@ -161,7 +162,7 @@ const StatsTable = ({ data, isLoading }) => {
       </TableHead>
       <TableBody>
         {isLoading
-          ? Array.from({ length: 6 }).map((item, index) => <TableRowSkeleton id={index} theme={theme} />)
+          ? Array.from({ length: 6 }).map((item, index) => <TableRowSkeleton key={index} id={index} theme={theme} />)
           : getSortedData(list).map(row => (
               <TableRow
                 key={row.id}

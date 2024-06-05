@@ -23,13 +23,20 @@ export const HistoryItemStatus = Object.freeze({
 
 const Container = styled(Box)(({ theme }) => ({
   width: '100%',
-  margin: '30px 0 100px',
+  margin: '30px 0',
 }));
 
 const TransactionTable = ({ history }) => {
   const theme = useTheme();
   const strings = useStrings();
   const { unitOfAccount } = usePortfolio();
+
+  const headCells = [
+    { id: 'transactionType', label: strings.transactionType, align: 'left' },
+    { id: 'status', label: strings.status, align: 'left' },
+    { id: 'fee', label: strings.fee, align: 'center' },
+    { id: 'amount', label: strings.amount, align: 'right' },
+  ];
 
   const mapStrings = arr =>
     arr.map(item => {
@@ -122,40 +129,30 @@ const TransactionTable = ({ history }) => {
           >
             <TableHead>
               <TableRow>
-                <TableCell>
-                  <Typography variant="body2" color="ds.gray_c600">
-                    {strings.transactionType}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="body2" color="ds.gray_c600">
-                    {strings.status}
-                  </Typography>
-                </TableCell>
-                <TableCell align="center">
-                  <Typography variant="body2" color="ds.gray_c600">
-                    {strings.fee}
-                  </Typography>
-                </TableCell>
-                <TableCell align="right">
-                  <Typography variant="body2" color="ds.gray_c600">
-                    {strings.amount}
-                  </Typography>
-                </TableCell>
+                {headCells.map(({ id, align, label }) => (
+                  <TableCell key={id} align={align}>
+                    <Typography variant="body2" color="ds.gray_c600">
+                      {label}
+                    </Typography>
+                  </TableCell>
+                ))}
               </TableRow>
             </TableHead>
             <TableBody>
               {groupedData.map((item, index) => (
                 <>
-                  <Typography
-                    variant="body2"
-                    color="ds.gray_c600"
+                  <Box
+                    component="tr"
+                    key={item.title}
+                    display="block"
                     sx={{
                       marginTop: theme.spacing(3),
                     }}
                   >
-                    {item.title}
-                  </Typography>
+                    <Typography key={item.title} component="th" variant="body2" color="ds.gray_c600">
+                      {item.title}
+                    </Typography>
+                  </Box>
                   {item.data.map((row, index) => (
                     <TransactionHistoryItem
                       index={index}
@@ -163,6 +160,7 @@ const TransactionTable = ({ history }) => {
                       theme={theme}
                       strings={strings}
                       unitOfAccount={unitOfAccount}
+                      headCells={headCells}
                     />
                   ))}
                 </>
@@ -175,12 +173,12 @@ const TransactionTable = ({ history }) => {
   );
 };
 
-const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount }) => {
+const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount, headCells }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <TableRow key={index} sx={{ '& td, & th': { border: 0 } }}>
-      <TableCell key={index}>
+    <TableRow key={`${row.label} ${index}`} sx={{ '& td, & th': { border: 0 } }}>
+      <TableCell key={`${row.label} ${headCells[0].id}`}>
         <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
           <IconButton
             sx={{
@@ -218,12 +216,12 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount }) =
           </Stack>
         </Stack>
       </TableCell>
-      <TableCell>
+      <TableCell key={`${row.label} ${headCells[1].id}`}>
         <Typography color={row.status === HistoryItemStatus.FAILED ? 'ds.sys_magenta_c500' : 'ds.gray_c900'}>
           {row.status}
         </Typography>
       </TableCell>
-      <TableCell align="center">
+      <TableCell key={`${row.label} ${headCells[2].id}`} align="center">
         <Stack direction="column">
           <Typography fontWeight="500" color="ds.text_gray_normal">
             {row.feeValue ? `${row.feeValue} ADA` : '-'}
@@ -235,7 +233,7 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount }) =
           )}
         </Stack>
       </TableCell>
-      <TableCell>
+      <TableCell key={`${row.label} ${headCells[3].id}`}>
         <Stack
           direction="row"
           spacing={theme.spacing(2)}

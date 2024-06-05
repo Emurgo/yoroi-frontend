@@ -125,6 +125,7 @@ const PortfolioDapps = ({ data }) => {
               <Typography variant="body2" fontWeight="500" color="ds.black_static">
                 {isAdaMainUnit ? settingFiatPairUnit.currency || 'USD' : 'ADA'}
                 <Typography
+                  component="span"
                   variant="body2"
                   fontWeight="500"
                   color="ds.gray_c400"
