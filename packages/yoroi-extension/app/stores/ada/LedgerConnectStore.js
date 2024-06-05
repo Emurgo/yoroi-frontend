@@ -219,9 +219,8 @@ export default class LedgerConnectStore
     const fullConfig = getCardanoHaskellBaseConfig(
       selectedNetwork
     );
-    const timeToSlot = (time: Date) => TimeUtils.timeToAbsoluteSlot(fullConfig, time);
-
     try {
+      const currentTime = this.stores.serverConnectionStore.serverTime ?? new Date();
       await this.stores.substores.ada.yoroiTransfer.transferRequest.execute({
         cip1852AccountPubKey,
         bip44AccountPubKey,
@@ -229,7 +228,7 @@ export default class LedgerConnectStore
         checkAddressesInUse: stateFetcher.checkAddressesInUse,
         getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,
         // use server time for TTL if connected to server
-        absSlotNumber: new BigNumber(timeToSlot(this.stores.serverConnectionStore.serverTime ?? new Date())),
+        absSlotNumber: new BigNumber(TimeUtils.timeToAbsoluteSlot(fullConfig, currentTime)),
         network: selectedNetwork,
         defaultToken: this.stores.tokenInfoStore.getDefaultTokenInfo(selectedNetwork.NetworkId),
       }).promise;

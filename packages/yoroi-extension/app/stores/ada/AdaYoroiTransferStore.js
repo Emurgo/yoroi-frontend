@@ -3,30 +3,20 @@ import { observable, } from 'mobx';
 import BigNumber from 'bignumber.js';
 import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
-import type {
-  TransferTx,
-} from '../../types/TransferTypes';
+import type { TransferTx, } from '../../types/TransferTypes';
 import { yoroiTransferTxFromAddresses } from '../../api/ada/transactions/transfer/legacyYoroi';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { generateWalletRootKey, } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
-import {
-  HARD_DERIVATION_START,
-  WalletTypePurpose,
-  CoinTypes,
-} from '../../config/numbersConfig';
+import { CoinTypes, HARD_DERIVATION_START, WalletTypePurpose, } from '../../config/numbersConfig';
 import type {
-  RestoreWalletForTransferResponse,
   RestoreWalletForTransferFunc,
+  RestoreWalletForTransferResponse,
   TransferToCip1852Func,
 } from '../../api/ada/index';
-import {
-  Bip44DerivationLevels,
-} from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
+import { Bip44DerivationLevels, } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import TimeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
-import type {
-  Address, Addressing
-} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { Address, Addressing } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 
@@ -103,8 +93,7 @@ export default class AdaYoroiTransferStore extends Store<StoresMap, ActionsMap> 
     const config = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
 
     // note: no wallet selected so we call this directly
-    const timeToSlot = (time: Date) => TimeUtils.timeToAbsoluteSlot(fullConfig, time);
-
+    const currentTime = this.stores.serverConnectionStore.serverTime ?? new Date();
     const transferTx = await yoroiTransferTxFromAddresses({
       addresses,
       outputAddr: destinationAddress,
@@ -124,7 +113,7 @@ export default class AdaYoroiTransferStore extends Store<StoresMap, ActionsMap> 
         networkId: selectedNetwork.NetworkId,
       },
       // use server time for TTL if connected to server
-      absSlotNumber: new BigNumber(timeToSlot(this.stores.serverConnectionStore.serverTime ?? new Date())),
+      absSlotNumber: new BigNumber(TimeUtils.timeToAbsoluteSlot(fullConfig, currentTime)),
     });
     // Possible exception: NotEnoughMoneyToSendError
     return transferTx;

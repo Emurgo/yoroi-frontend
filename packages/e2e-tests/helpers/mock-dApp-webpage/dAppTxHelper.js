@@ -26,9 +26,8 @@ export function getTtl() {
     },
   ];
   const defaultTtlOffset = 7200;
-  const timeToSlot = (time: Date) => TimeUtils.timeToAbsoluteSlot(fullConfig, time);
   const absSlotNumber = new BigNumber(
-    timeToSlot(new Date(1649261533360))
+    TimeUtils.timeToAbsoluteSlot(fullConfig, new Date(1649261533360))
   );
 
   return absSlotNumber.plus(defaultTtlOffset).toNumber();
