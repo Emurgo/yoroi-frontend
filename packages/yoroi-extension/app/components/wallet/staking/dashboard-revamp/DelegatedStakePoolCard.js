@@ -1,7 +1,7 @@
 // @flow
 import type { ComponentType, Node } from 'react';
 import { Box, styled } from '@mui/system';
-import { Alert, Button, Stack, Typography } from '@mui/material';
+import { Button, Stack, Typography } from '@mui/material';
 import { injectIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
@@ -63,7 +63,14 @@ function DelegatedStakePoolCard({
   };
 
   return (
-    <Card sx={{ border: '1px solid', borderColor: 'grayscale.200', bgcolor: 'background.card' }}>
+    <Card
+      sx={{
+        border: '1px solid',
+        borderColor: 'grayscale.200',
+        bgcolor: 'background.card',
+        paddingBottom: '24px',
+      }}
+    >
       <Stack direction="row" px={4} py={2} alignItems="center">
         <Typography component="div" variant="h5" color="common.black" fontWeight={500}>
           {intl.formatMessage(globalMessages.stakePoolDelegated)}
@@ -151,13 +158,6 @@ function DelegatedStakePoolCard({
           </Box>
         )}
       </Wrapper>
-      {poolTransition?.shouldShowTransitionFunnel && (
-        <SAlert severity="error">
-          <Typography variant="body2" mt="1px" ml="4px" color="grayscale.900">
-            {intl.formatMessage(globalMessages.poolNotGenerating)}
-          </Typography>
-        </SAlert>
-      )}
     </Card>
   );
 }
@@ -168,21 +168,6 @@ const Card = styled(Box)({
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'flex-end',
-});
-
-const SAlert = styled(Alert)({
-  width: '100%',
-  justifyContent: 'center',
-  backgroundColor: 'magenta.100',
-  borderTopLeftRadius: '0px',
-  borderTopRightRadius: '0px',
-  height: '40px',
-  padding: 0,
-  '& .MuiAlert-icon': {
-    color: 'magenta.500',
-    fontSize: '26px',
-    margin: '0',
-  },
 });
 
 const Wrapper: any = styled(Box)({
