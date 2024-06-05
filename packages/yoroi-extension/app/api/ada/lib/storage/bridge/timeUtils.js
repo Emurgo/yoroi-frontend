@@ -2,6 +2,7 @@
 
 import type { CardanoHaskellConfig } from '../database/primitives/tables';
 import { fail } from '../../../../../coreUtils';
+import { cardanoHaskellConfigCombine } from '../database/prepackaged/networks';
 
 export type RelativeSlot = {| epoch: number, slot: number |};
 
@@ -167,14 +168,14 @@ export default class TimeUtils {
   static currentEpochSlots(
     config: $ReadOnlyArray<CardanoHaskellConfig>,
   ): number {
-    const finalConfig = config.reduce((acc, next) => Object.assign(acc, next), {});
-    return finalConfig.SlotsPerEpoch;
+    return cardanoHaskellConfigCombine(config).SlotsPerEpoch
+      ?? fail(`${nameof(TimeUtils.currentEpochSlots)} missing slots per epoch`);
   }
 
   static currentSlotSeconds(
     config: $ReadOnlyArray<CardanoHaskellConfig>,
   ): number {
-    const finalConfig = config.reduce((acc, next) => Object.assign(acc, next), {});
-    return finalConfig.SlotDuration;
+    return cardanoHaskellConfigCombine(config).SlotDuration
+      ?? fail(`${nameof(TimeUtils.currentSlotSeconds)} missing slot duration`);
   }
 }

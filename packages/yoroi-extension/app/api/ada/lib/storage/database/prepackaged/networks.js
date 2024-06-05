@@ -10,6 +10,7 @@ import type {
 } from '../primitives/tables';
 import { PRIMARY_ASSET_CONSTANTS } from '../primitives/enums';
 import environment from '../../../../../../environment';
+import type { CardanoHaskellConfig } from '../primitives/tables';
 
 export const CardanoForks = Object.freeze({
   Haskell: 0,
@@ -228,6 +229,18 @@ export function getCardanoHaskellBaseConfig(
 ): CardanoHaskellBaseConfig {
   if (!isCardanoHaskell(network)) throw new Error(`Incorrect network type ${JSON.stringify(network)}`);
   return (network.BaseConfig: any); // cast to return type
+}
+
+
+export function cardanoHaskellConfigCombine(config: $ReadOnlyArray<CardanoHaskellConfig>): CardanoHaskellConfig {
+  // $FlowIgnore[incompatible-exact]
+  return (config.reduce((acc, next) => Object.assign(acc, next), {}): CardanoHaskellConfig);
+}
+
+export function getCardanoHaskellBaseConfigCombined(
+  network: $ReadOnly<NetworkRow>,
+): CardanoHaskellConfig {
+  return cardanoHaskellConfigCombine(getCardanoHaskellBaseConfig(network))
 }
 
 export const defaultAssets: Array<
