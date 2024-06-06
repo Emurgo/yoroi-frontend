@@ -3,7 +3,12 @@
 import type { AccountBalance, Address, Asset, CardanoTx, Paginate, TokenId, Value, } from './types';
 import { ConnectorError, TxSendErrorCodes } from './types';
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
-import type { Addressing, IPublicDeriver, } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type {
+  Addressing,
+  IPublicDeriver,
+  IGetAllUtxoAddressesResponse,
+  BaseSingleAddressPath,
+} from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { PublicDeriver, } from '../../../app/api/ada/lib/storage/models/PublicDeriver/index';
 import {
   asGetAllAccounting,
@@ -25,6 +30,7 @@ import { CoreAddressTypes, TxStatusCodes, } from '../../../app/api/ada/lib/stora
 import type { FullAddressPayload } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 import {
   getAllAddressesForDisplay,
+  getAllAddressesForWallet,
 } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 import { getReceiveAddress } from '../../../app/stores/stateless/addressStores';
 
@@ -62,7 +68,7 @@ import { cip8Sign } from '../../../app/connector/api';
 import type { ForeignUtxoFetcher } from '../../../app/connector/stores/ConnectorStore';
 import { GetToken } from '../../../app/api/ada/lib/storage/database/primitives/api/read';
 import { getAllSchemaTables, raii, } from '../../../app/api/ada/lib/storage/database/utils';
-import type { TokenRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
+import type { TokenRow, NetworkRow} from '../../../app/api/ada/lib/storage/database/primitives/tables';
 import fetchAdapter from '@vespaiach/axios-fetch-adapter';
 import { Amount, NativeAssets, UTxOSet, Value as LibValue, } from '@emurgo/yoroi-eutxo-txs/dist/classes';
 import { coinSelectionClassificationStrategy } from '@emurgo/yoroi-eutxo-txs/dist/tx-builder';
@@ -80,6 +86,7 @@ import {
   derivePrivateByAddressing,
   derivePublicByAddressing
 } from '../../../app/api/ada/lib/cardanoCrypto/deriveByAddressing';
+import type { DefaultTokenEntry } from '../../../app/api/common/lib/MultiToken';
 
 axios.defaults.adapter = fetchAdapter;
 
@@ -377,10 +384,10 @@ async function getCardanoRewardAddresses(
 }
 
 async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Promise<Address[]> {
-  const addresses = await getAddressRowsForWallet({ publicDeriver: wallet });
-  return addresses
-    .filter(a => a.IsUsed === usedFilter && a.Type === CoreAddressTypes.CARDANO_BASE)
-    .map(a => a.Hash);
+  const addresses = await getAllAddressesForWallet(wallet);
+  return [...addresses.utxoAddresses, ...addresses.accountingAddresses]
+    .filter(a => a.address.IsUsed === usedFilter && a.address.Type === CoreAddressTypes.CARDANO_BASE)
+    .map(a => a.address.Hash);
 }
 
 async function getOutputAddressesInSubmittedTxs(publicDeriverId: number) {
@@ -411,11 +418,16 @@ export async function connectorGetUsedAddresses(
 }
 
 export async function connectorGetUnusedAddresses(wallet: PublicDeriver<>): Promise<Address[]> {
-  const result = await getAllAddresses(wallet, false);
-  const outputAddressesInSubmittedTxs = new Set(
-    await getOutputAddressesInSubmittedTxs(wallet.publicDeriverId)
+  return _connectorGetUnusedAddresses(
+    await getAllAddresses(wallet, false),
+    new Set(await getOutputAddressesInSubmittedTxs(wallet.publicDeriverId)),
   );
-  return result.filter(address => !outputAddressesInSubmittedTxs.has(address));
+}
+export async function _connectorGetUnusedAddresses(
+  unusedAddresses: Array<Address>,
+  outputAddressesInSubmittedTxs: Set<Address>,
+): Promise<Address[]> {
+  return unusedAddresses.filter(address => !outputAddressesInSubmittedTxs.has(address));
 }
 
 export async function connectorGetDRepKey(
@@ -1144,24 +1156,55 @@ export async function connectorGenerateReorgTx(
   collateralOutputAddressSet: Set<string>,
 |}> {
   const network = publicDeriver.getParent().getNetworkInfo();
-
   const withUtxos = asGetAllUtxos(publicDeriver);
   if (withUtxos == null) {
     throw new Error(`missing utxo functionality`);
   }
+  const allUtxoAddresses = await withUtxos.getAllUtxoAddresses();
 
-  const withHasUtxoChains = asHasUtxoChains(withUtxos);
-  if (withHasUtxoChains == null) {
-    throw new Error(`missing chains functionality`);
+  const internal = await getReceiveAddress(publicDeriver);
+  if (internal == null) {
+    throw new Error(`no internal addresses left. Should never happen`);
   }
 
+  return _connectorGenerateReorgTx(
+    network,
+    publicDeriver.getParent().getDefaultToken(),
+    publicDeriver.publicDeriverId,
+    allUtxoAddresses,
+    internal,
+    await getAllAddresses(publicDeriver, false),
+    new Set(await getOutputAddressesInSubmittedTxs(publicDeriver.publicDeriverId)),
+    usedUtxoIds,
+    reorgTargetAmount,
+    utxos,
+    submittedTxs,
+  );
+}
+export async function _connectorGenerateReorgTx(
+  network: $ReadOnly<NetworkRow>,
+  defaultToken: DefaultTokenEntry,
+  publicDeriverId: number,
+  allUtxoAddresses: IGetAllUtxoAddressesResponse,
+  receiveAddress: BaseSingleAddressPath,
+  originalUnusedAddresses: Array<Address>,
+  outputAddressesInSubmittedTxs: Set<Address>,
+  usedUtxoIds: Array<string>,
+  reorgTargetAmount: string,
+  utxos: Array<CardanoAddressedUtxo>,
+  submittedTxs: Array<PersistedSubmittedTransaction>,
+): Promise<{|
+  unsignedTx: HaskellShelleyTxSignRequest,
+  collateralOutputAddressSet: Set<string>,
+|}> {
   const fullConfig = getCardanoHaskellBaseConfig(network);
   const timeToSlot = await genTimeToSlot(fullConfig);
   const absSlotNumber = new BigNumber(timeToSlot({
     time: new Date(),
   }).slot);
-  const unusedAddresses = await connectorGetUnusedAddresses(
-    publicDeriver
+  const unusedAddresses = await _connectorGetUnusedAddresses(
+    originalUnusedAddresses,
+    outputAddressesInSubmittedTxs,
   );
   if (unusedAddresses.length === 0) {
     throw new Error('unexpected: no unused addresses available');
@@ -1177,22 +1220,25 @@ export async function connectorGenerateReorgTx(
   const collateralOutputAddressSet = new Set<string>([unusedAddresses[0]]);
   const dontUseUtxoIds = new Set(usedUtxoIds);
   const adaApi = new AdaApi();
-  const unsignedTx = await adaApi.createUnsignedTxForConnector(
+  const unsignedTx = await adaApi._createUnsignedTxForConnector(
     {
-      publicDeriver: withHasUtxoChains,
-      absSlotNumber,
-      cardanoTxRequest: {
-        includeTargets,
-      },
-      utxos: (await adaApi.addressedUtxosWithSubmittedTxs(
-        utxos,
-        publicDeriver,
-        submittedTxs,
-      )).filter(utxo => !dontUseUtxoIds.has(utxo.utxo_id)),
-      // we already factored in submitted transactions above, no need to handle it
-      // any more, so just use an empty array here
-      submittedTxs: [],
+      includeTargets,
     },
+    defaultToken,
+    publicDeriverId,
+    allUtxoAddresses,
+    receiveAddress,
+    network,
+    absSlotNumber,
+    // we already factored in submitted transactions above, no need to handle it
+    // any more, so just use an empty array here
+    [],
+    (await adaApi._addressedUtxosWithSubmittedTxs(
+      utxos,
+      publicDeriverId,
+      allUtxoAddresses,
+      submittedTxs,
+    )).filter(utxo => !dontUseUtxoIds.has(utxo.utxo_id)),
     null,
   );
   return { unsignedTx, collateralOutputAddressSet };

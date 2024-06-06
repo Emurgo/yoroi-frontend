@@ -10,6 +10,7 @@ import { Box, Typography } from '@mui/material';
 import ConnectedWallet from '../../connect/ConnectedWallet';
 import { ReactComponent as NoDappIcon } from '../../../../assets/images/dapp-connector/no-dapp.inline.svg';
 import { connectorMessages } from '../../../../i18n/global-messages';
+import type { WalletState } from '../../../../../chrome/extension/background/types';
 
 const messages: Object = defineMessages({
   connectedTo: {
@@ -21,7 +22,7 @@ const messages: Object = defineMessages({
 
 type Props = {|
   connectedWebsite: ?WhitelistEntry,
-  connectedWallet: PublicDeriverCache,
+  connectedWallet: WalletState,
 |};
 
 function ConnectionInfo({ intl, connectedWebsite, connectedWallet }: Props & ConnectorIntl): Node {

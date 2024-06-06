@@ -15,6 +15,7 @@ import type {
   DeleteTxMemoRequestType,
   RefreshTransactionsRequestType,
   BroadcastTransactionRequestType,
+  ConnectorCreateAuthEntryRequestType,
 } from '../../../app/api/thunk';
 
 // ----- Types used in the dApp <-> Yoroi connection bridge ----- //
@@ -304,6 +305,10 @@ export type PopAddress = {|
 export type RefreshTransactions = {|
   type: 'refresh-transactions',
   request: RefreshTransactionsRequestType,
+                                   |};
+export type ConnectorCreateAuthEntry = {|
+  type: 'connector-create-auth-entry',
+  request: ConnectorCreateAuthEntryRequestType ,
 |};
 export type TxSignWindowRetrieveData = {|
   type: 'tx_sign_window_retrieve_data',

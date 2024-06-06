@@ -171,7 +171,7 @@ export async function getAllAddressesForDisplay(
 }
 
 export type AddressRowWithPath = {|
-  +address: AddressRow,
+  +address: $ReadOnly<AddressRow>,
   +path: Array<number>,
 |};
 
@@ -220,8 +220,8 @@ export async function rawGetAddressRowsForWallet(
   request: {| publicDeriver: IPublicDeriver<>, |},
   derivationTables: Map<number, string>,
 ): Promise<{|
-  utxoAddresses: Array<$ReadOnly<AddressRow>>,
-  accountingAddresses: Array<$ReadOnly<AddressRow>>,
+  utxoAddresses: Array<$ReadOnly<AddressRowWithPath>>,
+  accountingAddresses: Array<$ReadOnly<AddressRowWithPath>>,
 |}> {
   const utxoAddresses = [];
   const accountingAddresses = [];

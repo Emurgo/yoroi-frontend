@@ -13,6 +13,7 @@ import type { CardanoAddressedUtxo } from './ada/transactions/types';
 import type { HWFeatures, } from './ada/lib/storage/database/walletTypes/core/tables';
 import WalletTransaction from '../domain/WalletTransaction';
 import type { ReferenceTransaction } from './common';
+import type { WalletAuthEntry } from '../../chrome/extension/connector/types';
 
 /*::
 declare var chrome;
@@ -205,4 +206,15 @@ export async function refreshTransactions(
 ): Promise<Array<WalletTransaction>> {
   const txs = await callBackground({ type: 'refresh-transactions', request });
   return txs.map(txData => new WalletTransaction(txData));
+}
+
+export type ConnectorCreateAuthEntryRequestType = {|
+  appAuthID: ?string,
+  publicDeriverId: number,
+  password: string,
+|};
+export async function connectorCreateAuthEntry(
+  request: ConnectorCreateAuthEntryRequestType
+): Promise<?WalletAuthEntry> {
+  return await callBackground({ type: 'connector-create-auth-entry', request });
 }

@@ -47,6 +47,7 @@ import ConnectionInfo from './cardano/ConnectionInfo';
 import CardanoSignTxSummary from './cardano/SignTxSummary';
 import TextField from '../../../components/common/TextField';
 import ErrorBlock from '../../../components/widgets/ErrorBlock';
+import type { WalletState } from '../../../../chrome/extension/background/types';
 
 const messages = defineMessages({
   incorrectWalletPasswordError: {
@@ -89,11 +90,11 @@ type Props = {|
   +selectedExplorer: SelectedExplorer,
   +getCurrentPrice: (from: string, to: string) => ?string,
   +shouldHideBalance: boolean,
-  +selectedWallet: PublicDeriverCache,
+  +selectedWallet: WalletState,
   +connectedWebsite: ?WhitelistEntry,
   +submissionError: ?SignSubmissionErrorType,
   +signData: ?{| address: string, payload: string |},
-  +walletType: 'ledger' | 'trezor' | 'web',
+  +walletType: 'ledger' | 'trezor' | 'mnemonic',
   +hwWalletError: ?LocalizableError,
   +isHwWalletErrorRecoverable: ?boolean,
   +tx: ?string,

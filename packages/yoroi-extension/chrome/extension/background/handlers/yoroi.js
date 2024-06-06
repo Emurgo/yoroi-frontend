@@ -8,6 +8,7 @@ import {
   asGetSigningKey,
   asGetAllAccounting,
   asHasLevels,
+  asGetPublicKey,
 } from '../../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   CardanoTx,
@@ -42,6 +43,7 @@ import type {
   RemoveAllTransactions,
   PopAddress,
   RefreshTransactions,
+  ConnectorCreateAuthEntry,
 } from '../../connector/types';
 import {
   APIErrorCodes,
@@ -132,6 +134,8 @@ import {
 import { upsertTxMemo, deleteTxMemo, getAllTxMemo } from '../../../../app/api/ada/lib/storage/bridge/memos';
 import type { AdaGetTransactionsRequest } from '../../../../app/api/ada';
 import type { BaseGetTransactionsRequest } from '../../../../app/api/common';
+import { createAuthEntry } from '../../../../app/connector/api/';
+import { getWalletChecksum } from '../../../../app/api/export/utils';
 
 const YOROI_MESSAGES = Object.freeze({
   CONNECT_RESPONSE: 'connect_response',
@@ -163,6 +167,7 @@ const YOROI_MESSAGES = Object.freeze({
   REMOVE_ALL_TRANSACTIONS: 'remove-all-transactions',
   POP_ADDRESS: 'pop-address',
   REFRESH_TRANSACTIONS: 'refresh-transactions',
+  CONNECTOR_CREATE_AUTH_ENTRY: 'connector-create-auth-entry',
 });
 
 // messages from other parts of Yoroi (i.e. the UI for the connector)
@@ -196,6 +201,7 @@ export async function yoroiMessageHandler(
     | RemoveAllTransactions
     | PopAddress
     | RefreshTransactions
+    | ConnectorCreateAuthEntry
   ),
   sender: any,
   sendResponse: Function,
@@ -896,6 +902,30 @@ export async function yoroiMessageHandler(
       });
       sendResponse(null);
     } catch (error) {
+      sendResponse({ error: error.message });
+    }
+  } else if (request.type === YOROI_MESSAGES.CONNECTOR_CREATE_AUTH_ENTRY) {
+    const publicDeriver: ?PublicDeriver<> = await getPublicDeriverById(request.request.publicDeriverId);
+    if (!publicDeriver) {
+      sendResponse({ error: 'no public dervier'});
+      return;
+    }
+    const withPubKey = asGetPublicKey(publicDeriver);
+    if (withPubKey == null) {
+      throw new Error('unexpected missing asGetPublicKey result');
+    }
+    const publicKey = await withPubKey.getPublicKey();
+    const checksum = await getWalletChecksum(withPubKey);
+    try {
+      const result = await createAuthEntry({
+        appAuthID: request.request.appAuthID,
+        deriver: publicDeriver,
+        checksum,
+        password: request.request.password
+      });
+      sendResponse(result);
+    } catch (error) {
+      // fixme: handle wrong password
       sendResponse({ error: error.message });
     }
   } else {

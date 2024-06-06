@@ -47,7 +47,7 @@ import { MultiToken } from '../../api/common/lib/MultiToken';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { asAddressedUtxo, multiTokenFromCardanoValue, multiTokenFromRemote, } from '../../api/ada/transactions/utils';
 import {
-  connectorGenerateReorgTx,
+  _connectorGenerateReorgTx,
   connectorGetChangeAddress,
   connectorGetUnusedAddresses,
   connectorGetUsedAddresses,
@@ -314,9 +314,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     let sendData: ConfirmedSignData;
     if (signingMessage.sign.type === 'tx-reorg/cardano') {
       // sign and send the tx
-      let signedTx;
+      let txId;
       try {
-        signedTx = await this.signAndSendReorgTx(wallet, password);
+        txId = await this.signAndSendReorgTx(wallet, password);
       } catch (error) {
         if (error instanceof WrongPassphraseError) {
           runInAction(() => {
@@ -343,11 +343,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         // ignore
       }
       */
-      const utxos = this.getUtxosAfterReorg(
-        Buffer.from(RustModule.WalletV4.hash_transaction(signedTx.body()).to_bytes()).toString(
-          'hex'
-        )
-      );
+      const utxos = this.getUtxosAfterReorg(txId);
       sendData = {
         type: 'sign_confirmed',
         tx: utxos,
@@ -482,6 +478,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         `${nameof(ConnectorStore)}::${nameof(this.createAdaTransaction)} unexpected wallet type`
       );
     }
+    // fixme: read these from WalletState directly, mind submitted txs handling
     const response = await getUtxosAndAddresses(tabId, [
       'utxos',
       'usedAddresses',
@@ -494,9 +491,10 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
 
     const submittedTxs = await loadSubmittedTransactions() || [];
-    const addressedUtxos = await this.api.ada.addressedUtxosWithSubmittedTxs(
+    const addressedUtxos = await this.api.ada._addressedUtxosWithSubmittedTxs(
       asAddressedUtxo(response.utxos),
-      connectedWallet,
+      connectedWallet.publicDeriverId,
+      connectedWallet.allUtxoAddresses,
       submittedTxs
     );
     this.addressedUtxos = addressedUtxos;
@@ -897,8 +895,22 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     this.addressedUtxos = addressedUtxos;
     const submittedTxs = await loadSubmittedTransactions() || [];
 
-    const { unsignedTx, collateralOutputAddressSet } = await connectorGenerateReorgTx(
-      connectedWallet,
+    const { unsignedTx, collateralOutputAddressSet } = await _connectorGenerateReorgTx(
+      getNetworkById(connectedWallet.networkId),
+      {
+        defaultNetworkId: connectedWallet.networkId,
+        defaultIdentifier: connectedWallet.defaultTokenId,
+      },
+      connectedWallet.publicDeriverId,
+      connectedWallet.allUtxoAddresses,
+      connectedWallet.receiveAddress,
+      [
+        ...connectedWallet.allAddresses.utxoAddresses,
+        ...connectedWallet.allAddresses.accountingAddresses,
+      ].filter(a => a.address.IsUsed === usedFilter && a.address.Type === CoreAddressTypes.CARDANO_BASE)
+        .map(a => a.address.Hash),
+      new Set(await _getOutputAddressesInSubmittedTxs(
+      )),
       usedUtxoIds,
       reorgTargetAmount,
       addressedUtxos,
@@ -935,8 +947,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       };
     });
   };
-  signAndSendReorgTx: (WalletState, string) => Promise<void> = async (
-    { publicDeriver, type },
+  signAndSendReorgTx: (WalletState, string) => Promise<string> = async (
+    publicDeriver,
     password
   ) => {
     const signRequest = this.reorgTxSignRequest;
@@ -945,12 +957,25 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw new Error('unexpected nullish sign request');
     }
 
-    if (type === 'mnemonic') {
-      await signAndBroadcastTransaction({ signRequest, password, publicDeriverId });
+    if (publicDeriver.type === 'mnemonic') {
+      await signAndBroadcastTransaction({
+        signRequest,
+        password,
+        publicDeriverId: publicDeriver.publicDeriverId
+      });
     } else {
-      const signedTx = await this.hwSignTx(publicDeriver, Buffer.from(signRequest.unsignedTx.build().to_bytes()));
-      await broadcastTransaction({ signedTxHex: signedTx.to_hex(), publicDeriverId });
+      const signedTx = await this.hwSignTx(
+        publicDeriver,
+        Buffer.from(signRequest.unsignedTx.build().to_bytes())
+      );
+      await broadcastTransaction({
+        signedTxHex: signedTx.to_hex(),
+        publicDeriverId: publicDeriver.publicDeriverId
+      });
     }
+    return RustModule.WalletV4.hash_transaction(
+      signRequest.unsignedTx.build()
+    ).to_hex();
   };
   getUtxosAfterReorg: string => Array<RemoteUnspentOutput> = txId => {
     const allOutputs = this.adaTransaction?.outputs;
@@ -990,7 +1015,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         ...utxos.map(utxo => utxo.address),
         ...(await connectorGetUsedAddresses(publicDeriver, null)),
         ...(await connectorGetUnusedAddresses(publicDeriver)),
-        await connectorGetChangeAddress(publicDeriver),
+        publicDeriver.receiveAddress.addr.Hash,
       ]);
     }
 

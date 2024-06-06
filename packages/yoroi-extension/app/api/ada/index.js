@@ -56,6 +56,7 @@ import type {
   UsedStatus,
   Value,
   BaseSingleAddressPath,
+  IGetAllUtxoAddressesResponse,
 } from './lib/storage/models/PublicDeriver/interfaces';
 import type {
   BaseGetTransactionsRequest,
@@ -1013,6 +1014,43 @@ export default class AdaApi {
     request: CreateUnsignedTxForConnectorRequest,
     foreignUtxoFetcher: ?ForeignUtxoFetcher,
   ): Promise<CreateUnsignedTxResponse> {
+    const withUtxos = asGetAllUtxos(request.publicDeriver);
+    if (!withUtxos) {
+      throw new Error('unable to get UTxO addresses from public deriver');
+    }
+    const allUtxoAddresses = await withUtxos.getAllUtxoAddresses();
+
+    const internal = await getReceiveAddress(request.publicDeriver);
+    if (internal == null) {
+      throw new Error(`no internal addresses left. Should never happen`);
+    }
+
+    return this._createUnsignedTxForConnector(
+      request.cardanoTxRequest,
+      request.publicDeriver.getParent().getDefaultToken(),
+      request.publicDeriver.publicDeriverId,
+      allUtxoAddresses,
+      internal,
+      request.publicDeriver.getParent().getNetworkInfo(),
+      request.absSlotNumber,
+      request.submittedTxs,
+      request.utxos,
+      foreignUtxoFetcher
+    );
+  }
+
+  async _createUnsignedTxForConnector(
+    cardanoTxRequest: CardanoTxRequest,
+    defaultToken: DefaultTokenEntry,
+    publicDeriverId: number,
+    allUtxoAddresses: IGetAllUtxoAddressesResponse,
+    receiveAddress: BaseSingleAddressPath,
+    network: $ReadOnly<NetworkRow>,
+    absSlotNumber: BigNumber,
+    submittedTxs: Array<PersistedSubmittedTransaction>,
+    committedUtxos: Array<CardanoAddressedUtxo>,
+    foreignUtxoFetcher: ?ForeignUtxoFetcher,
+  ): Promise<CreateUnsignedTxResponse> {
     const {
       includeInputs,
       includeOutputs,
@@ -1022,7 +1060,7 @@ export default class AdaApi {
       validityIntervalStart,
       ttl,
       requiredSigners,
-    } = request.cardanoTxRequest;
+    } = cardanoTxRequest;
     const noneOrEmpty = a => {
       if (a != null && !Array.isArray(a)) {
         throw new Error(`Array is expected, got: ${JSON.stringify(a)}`);
@@ -1042,10 +1080,11 @@ export default class AdaApi {
       }
     }
 
-    const utxos = await this.addressedUtxosWithSubmittedTxs(
-      request.utxos,
-      request.publicDeriver,
-      request.submittedTxs
+    const utxos = await this._addressedUtxosWithSubmittedTxs(
+      committedUtxos,
+      publicDeriverId,
+      allUtxoAddresses,
+      submittedTxs
     );
 
     const allUtxoIds = new Set(utxos.map(utxo => utxo.utxo_id));
@@ -1088,16 +1127,11 @@ export default class AdaApi {
       }
     }
 
-    const internal = await getReceiveAddress(request.publicDeriver);
-    if (internal == null) {
-      throw new Error(`no internal addresses left. Should never happen`);
-    }
-    const changeAdaAddr = {
-      address: internal.addr.Hash,
-      addressing: internal.addressing,
-    };
 
-    const network = request.publicDeriver.getParent().getNetworkInfo();
+    const changeAdaAddr = {
+      address: receiveAddress.addr.Hash,
+      addressing: receiveAddress.addressing,
+    };
 
     const config = getCardanoHaskellBaseConfig(
       network
@@ -1109,10 +1143,8 @@ export default class AdaApi {
       linearFeeConstant: config.LinearFee.constant,
       coinsPerUtxoWord: config.CoinsPerUtxoWord,
       poolDeposit: config.PoolDeposit,
-      networkId: request.publicDeriver.getParent().networkInfo.NetworkId,
+      networkId: network.NetworkId,
     };
-
-    const defaultToken = request.publicDeriver.getParent().getDefaultToken();
 
     const outputs = [];
     const mint = [];
@@ -1282,7 +1314,7 @@ export default class AdaApi {
       changeAdaAddr,
       mustIncludeUtxos,
       coinSelectUtxos,
-      request.absSlotNumber,
+      absSlotNumber,
       validityIntervalStart,
       ttl,
       requiredSigners,
@@ -2080,7 +2112,7 @@ export default class AdaApi {
       ),
     );
     const ownAddresses = new Set(
-      utxoAddresses.map(a => a.Hash)
+      utxoAddresses.map(a => a.address.Hash)
     );
     const amount = publicDeriver.getParent().getDefaultMultiToken();
     for (const input of signRequest.inputs()) {
@@ -2182,8 +2214,29 @@ export default class AdaApi {
     publicDeriver: PublicDeriver<>,
     submittedTxs: Array<PersistedSubmittedTransaction>,
   ): Promise<Array<CardanoAddressedUtxo>> {
+    const withUtxos = asGetAllUtxos(publicDeriver);
+    if (!withUtxos) {
+      throw new Error('unable to get UTxO addresses from public deriver');
+    }
+    const allUtxoAddresses = await withUtxos.getAllUtxoAddresses();
+
+    return this._addressedUtxosWithSubmittedTxs(
+      originalUtxos,
+      publicDeriver.publicDeriverId,
+      allUtxoAddresses,
+      submittedTxs
+    );
+  }
+
+  // fixme: refactor this tmp function
+  async _addressedUtxosWithSubmittedTxs(
+    originalUtxos: Array<CardanoAddressedUtxo>,
+    publicDeriverId: number,
+    allUtxoAddresses: IGetAllUtxoAddressesResponse,
+    submittedTxs: Array<PersistedSubmittedTransaction>,
+  ): Promise<Array<CardanoAddressedUtxo>> {
     const filteredSubmittedTxs = submittedTxs.filter(
-      submittedTxRecord => submittedTxRecord.publicDeriverId === publicDeriver.publicDeriverId
+      submittedTxRecord => submittedTxRecord.publicDeriverId === publicDeriverId
     );
     const usedUtxoIds = new Set(
       filteredSubmittedTxs.flatMap(({ usedUtxos }) => usedUtxos.map(({ txHash, index }) => `${txHash}${index}`))
@@ -2191,12 +2244,6 @@ export default class AdaApi {
     // take out UTxOs consumed by submitted transactions
     const utxos = originalUtxos.filter(utxo => !usedUtxoIds.has(utxo.utxo_id));
     // put in UTxOs produced by submitted transactions
-    const withUtxos = asGetAllUtxos(publicDeriver);
-    if (!withUtxos) {
-      throw new Error('unable to get UTxO addresses from public deriver');
-    }
-    const allAddresses = await withUtxos.getAllUtxoAddresses();
-
     for (const { transaction } of filteredSubmittedTxs) {
       for (const [index, { address, value }] of transaction.addresses.to.entries()) {
         if (utxos.find(utxo => utxo.utxo_id === `${transaction.txid}${index}`)) {
@@ -2219,7 +2266,7 @@ export default class AdaApi {
             };
           });
         const findAddressing = () => {
-          for (const { addrs, addressing } of allAddresses) {
+          for (const { addrs, addressing } of allUtxoAddresses) {
             for (const { Hash } of addrs) {
               if (Hash === address) {
                 return addressing;

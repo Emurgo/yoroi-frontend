@@ -9,7 +9,7 @@ import type { ConnectResponseData } from '../../../chrome/extension/connector/ty
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { LoadingWalletStates } from '../types';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
-import { createAuthEntry } from '../api';
+import { connectorCreateAuthEntry } from '../../api/thunk';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { ampli } from '../../../ampli/index';
 import type { WalletState } from '../../../chrome/extension/background/types';
@@ -70,7 +70,7 @@ export default class ConnectContainer extends Component<
     deriver: WalletState,
     checksum: ?WalletChecksum,
     password: ?string
-  ) => Promise<void> = async (deriver, checksum, password) => {
+  ) => Promise<void> = async (deriver, _checksum, password) => {
     const chromeMessage = this.props.stores.connector.connectingMessage;
     if (chromeMessage == null) {
       throw new Error(
@@ -85,7 +85,11 @@ export default class ConnectContainer extends Component<
 
     let authEntry;
     if (password != null) {
-      authEntry = await createAuthEntry({ appAuthID, deriver, checksum, password });
+      authEntry = await connectorCreateAuthEntry({
+        appAuthID,
+        publicDeriverId: deriver.publicDeriverId,
+        password
+      });
     } else {
       authEntry = null;
     }

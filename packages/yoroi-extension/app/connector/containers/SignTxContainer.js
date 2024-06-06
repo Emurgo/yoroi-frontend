@@ -19,6 +19,9 @@ import {
   isTrezorTWallet,
 } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import type { WalletState } from '../../../chrome/extension/background/types';
+import { getPrivateStakingKey } from '../../api/thunk';
+import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 @observer
 export default class SignTxContainer extends Component<
@@ -196,7 +199,7 @@ export default class SignTxContainer extends Component<
             unitOfAccountSetting={this.props.stores.profile.unitOfAccount}
             submissionError={this.props.stores.connector.submissionError}
             signData={signData}
-            walletType={walletType}
+            walletType={selectedWallet.type}
             hwWalletError={this.props.stores.connector.hwWalletError}
             isHwWalletErrorRecoverable={this.props.stores.connector.isHwWalletErrorRecoverable}
             tx={tx}

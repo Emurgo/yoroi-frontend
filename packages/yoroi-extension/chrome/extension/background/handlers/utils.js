@@ -157,6 +157,8 @@ export async function getWalletState(publicDeriver: PublicDeriver<>): Promise<Wa
     }
     const foreignAddresses = await getForeignAddresses({ publicDeriver: withLevels });
 
+    const allUtxoAddresses = await withUtxos.getAllUtxoAddresses();
+
     const canGetBalance = asGetBalance(publicDeriver);
     if (canGetBalance == null) {
       throw new Error('unexpected missing asGetBalance result');
@@ -190,6 +192,7 @@ export async function getWalletState(publicDeriver: PublicDeriver<>): Promise<Wa
       externalAddressesByType,
       internalAddressesByType,
       allAddresses,
+      allUtxoAddresses,
       isBip44Wallet: publicDeriver.getParent() instanceof Bip44Wallet,
       isTestnet: isTestnet(network),
       isCardanoHaskell: isCardanoHaskell(network),

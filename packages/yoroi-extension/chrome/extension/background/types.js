@@ -4,7 +4,10 @@ import type { BaseSingleAddressPath } from '../../../app/api/ada/lib/storage/mod
 import type { Addressing } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { LastSyncInfoRow, } from '../../../app/api/ada/lib/storage/database/walletTypes/core/tables';
 import type { CoreAddressT } from '../../../app/api/ada/lib/storage/database/primitives/enums';
-import type { IGetAllUtxosResponse } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type {
+  IGetAllUtxosResponse,
+  IGetAllUtxoAddressesResponse,
+} from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { AssuranceMode } from '../../../app/types/transactionAssurance.types';
 import type { MultiToken } from '../../../app/api/common/lib/MultiToken';
 import type { FullAddressPayload, AddressRowWithPath} from '../../../app/api/ada/lib/storage/bridge/traitUtils';
@@ -46,6 +49,8 @@ export type WalletState = {|
     utxoAddresses: Array<$ReadOnly<AddressRowWithPath>>,
     accountingAddresses: Array<$ReadOnly<AddressRowWithPath>>,
   |},
+  // todo: this probably is redundent with the above
+  allUtxoAddresses: IGetAllUtxoAddressesResponse,
   isBip44Wallet: boolean, // Byron wallet if true, probably no longer needed
   isTestnet: boolean,
   isCardanoHaskell: boolean,
