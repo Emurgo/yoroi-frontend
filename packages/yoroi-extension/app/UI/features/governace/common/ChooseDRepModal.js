@@ -47,7 +47,7 @@ export const ChooseDRepModal = ({ onSubmit }: ChooseDRepModallProps): Node => {
 
   return (
     <Stack>
-      <Stack gap="24px" mb="24px">
+      <Stack gap="32px" mb="20px">
         <Typography variant="body1" textAlign="center">
           Identify your preferred DRep and enter their ID below to delegate your vote
         </Typography>

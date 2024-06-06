@@ -13,7 +13,7 @@ import { useCreateAndSendDrepDelegationTransaction } from '../../api/useCreateAn
 import { useStrings } from '../../common/useStrings';
 
 const Container = styled(Box)(({ theme }) => ({
-  paddingTop: '32px',
+  paddingTop: '23px',
   maxWidth: '506px',
   margin: '0 auto',
   height: '100%',
@@ -33,7 +33,7 @@ const TotalBox = styled(Box)(({ theme }) => ({
 }));
 
 const TransactionDetails = styled(Stack)(({ theme }) => ({
-  marginBottom: '34px',
+  marginBottom: '40px',
   gap: '16px',
 }));
 const Actions = styled(Stack)(({ theme }) => ({
@@ -60,7 +60,7 @@ export const DelagationForm = (): Node => {
     }
   };
   const idPasswordInvalid = passwaord.match(/\d+/g);
-
+  console.log('sssdsdsds', strings.total);
   return (
     <Container>
       <Stack>

@@ -24,6 +24,7 @@ const StyledCard = styled(Stack)(({ theme, selected, pending }) => ({
   flexDirection: 'column',
   alignItems: 'center',
   width: '294px',
+  height: '362px',
   borderRadius: '8px',
   ...(!selected && {
     backgroundImage: theme.palette.ds?.bg_gradient_1,
@@ -72,7 +73,7 @@ export const GovernanceVoteingCard = ({ title, description, icon, selected, onCl
     )}
     <CardContent>
       <IconContainer>{icon}</IconContainer>
-      <Typography variant="h3" fontWeight="500">
+      <Typography variant="h3" fontWeight="500" mt="16px">
         {title}
       </Typography>
       <Description variant="body2" color={'ds.gray_c800'}>

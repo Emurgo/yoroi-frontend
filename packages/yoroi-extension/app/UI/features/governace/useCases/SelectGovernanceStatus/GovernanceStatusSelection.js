@@ -57,7 +57,6 @@ export const GovernanceStatusSelection = (): Node => {
   const { createCertificate: createVotingCertificate, isLoading: isCreatingVotingCertificate } = useVotingCertificate({
     useErrorBoundary: true,
   });
-  console.log('governanceData', governanceData);
 
   const pageTitle = governanceData?.kind === 'none' ? strings.registerGovernance : strings.governanceStatus;
   const statusRawText = mapStatus[governanceVote?.kind];
@@ -72,6 +71,7 @@ export const GovernanceStatusSelection = (): Node => {
         </GovernanceProvider>
       ),
       width: '648px',
+      height: '336px',
     });
   };
 
@@ -188,11 +188,11 @@ export const GovernanceStatusSelection = (): Node => {
           </Typography>
         )}
         {governanceData?.kind === 'none' && (
-          <Link href={BECOME_DREP_LINK} target="_blank" rel="noopener" variant="body1">
+          <Link href={BECOME_DREP_LINK} target="_blank" rel="noopener" variant="body1" lineHeight="22px">
             {strings.becomeADrep}
           </Link>
         )}
-        <Link href={LEARN_MORE_LINK} target="_blank" rel="noopener" variant="body1">
+        <Link href={LEARN_MORE_LINK} target="_blank" rel="noopener" variant="body1" lineHeight="22px">
           {strings.learnMore}
         </Link>
       </Stack>
