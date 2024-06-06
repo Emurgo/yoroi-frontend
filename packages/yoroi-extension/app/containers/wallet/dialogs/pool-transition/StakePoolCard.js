@@ -14,6 +14,7 @@ type Props = {|
   fee?: string,
   deadlineMilliseconds?: number,
   suggestedPool?: boolean,
+  deadlinePassed: boolean,
   poolHash?: string,
   intl: $npm$ReactIntl$IntlFormat,
 |};
@@ -24,6 +25,7 @@ export const StakePoolCard = ({
   roa,
   fee,
   deadlineMilliseconds,
+  deadlinePassed,
   suggestedPool = false,
   intl,
   poolHash,
@@ -65,22 +67,31 @@ export const StakePoolCard = ({
       </Stack>
       <Stack direction="row">
         {!suggestedPool && (
-          <Box mr="4px">
+          <Box mr="4px" mt="2px">
             <WarningSvg />
           </Box>
         )}
         <Typography color={suggestedPool ? 'grayscale.max' : 'magenta.500'} component="span">
-          <Typography variant="body2" component="span">
-            {suggestedPool
-              ? intl.formatMessage(messages.poolContinues)
-              : intl.formatMessage(messages.poolStop)}
-          </Typography>
-          {!suggestedPool && (
-            <Typography variant="body2" fontWeight="500" component="span" pl={0.4}>
-              {deadlineMilliseconds
-                ? formatTimeSpan(deadlineMilliseconds)
-                : intl.formatMessage(messages.poolNotGenerating)}
+          {suggestedPool && (
+            <Typography variant="body2" component="span">
+              {intl.formatMessage(messages.poolContinues)}
             </Typography>
+          )}
+          {!suggestedPool && (
+            <>
+              {!deadlinePassed ? (
+                <Typography variant="body2">
+                  {intl.formatMessage(messages.poolStop)}
+                  <Typography variant="body2" fontWeight="500">
+                    {formatTimeSpan(Number(deadlineMilliseconds), Date.now())}
+                  </Typography>
+                </Typography>
+              ) : (
+                <Typography variant="body2" fontWeight="500" component="span" pl={0.4}>
+                  {intl.formatMessage(messages.poolNotGenerating)}
+                </Typography>
+              )}
+            </>
           )}
         </Typography>
       </Stack>
@@ -92,8 +103,8 @@ const CustomCard = styled(Box)(({ theme, suggestedPool }) => ({
   background: suggestedPool ? 'linear-gradient(312deg, #C6F7ED 0%, #E4E8F7 70.58%)' : 'transparent',
   padding: theme.spacing(2),
   width: '284px',
+  height: '228px',
   borderWidth: 1,
   borderRadius: 8,
   border: `1px solid ${theme.palette.grayscale['200']}`,
-  boxShadow: 'none',
 }));
