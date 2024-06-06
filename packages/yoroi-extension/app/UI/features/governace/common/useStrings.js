@@ -141,5 +141,8 @@ export const useStrings = () => {
     selectNoConfidenc: intl.formatMessage(messages.selectNoConfidenc),
     back: intl.formatMessage(messages.back),
     confirm: intl.formatMessage(messages.confirm),
+    total: intl.formatMessage(messages.total),
+    password: intl.formatMessage(messages.password),
+    wrongPassword: intl.formatMessage(messages.wrongPassword),
   }).current;
 };
