@@ -2,8 +2,8 @@
 import { cloneElement } from 'react';
 import { Table as MuiTable, TableBody, Stack, Box, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useStrings } from './useStrings';
-import illustrationPng from './assets/images/illustration.png';
+import { useStrings } from '../hooks/useStrings';
+import illustrationPng from '../assets/images/illustration.png';
 import SortableTableHead from './SortableTableHead';
 import type { IHeadCells } from './SortableTableHead';
 
@@ -14,21 +14,21 @@ interface Props {
   order: string;
   orderBy: string;
   handleRequestSort: (id: string) => void;
-  isLoading: Boolean;
-  TableRowSkeleton: Node;
-  children: Node;
+  isLoading: boolean;
+  TableRowSkeleton: React$Node;
+  children: React$Node;
 }
 
 const Table = ({
   name,
-  children,
-  TableRowSkeleton,
-  data,
-  isLoading,
   headCells,
+  data,
   order,
   orderBy,
   handleRequestSort,
+  isLoading,
+  TableRowSkeleton,
+  children,
 }: Props): Node => {
   const theme = useTheme();
   const strings = useStrings();

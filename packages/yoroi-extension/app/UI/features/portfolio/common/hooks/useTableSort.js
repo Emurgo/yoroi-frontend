@@ -1,6 +1,7 @@
 // @flow
 import { useCallback } from 'react';
-import type { IHeadCells } from './SortableTableHead';
+import type { IHeadCells } from '../components/SortableTableHead';
+
 interface Props {
   order: string;
   orderBy: string;

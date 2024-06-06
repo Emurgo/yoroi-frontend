@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { IconButton } from '@mui/material';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { Tooltip } from '../Tooltip';
-import { useStrings } from '../../features/portfolio/common/useStrings';
+import { useStrings } from '../../features/portfolio/common/hooks/useStrings';
 import { Icon } from '../icons/index';
 
 interface Props {

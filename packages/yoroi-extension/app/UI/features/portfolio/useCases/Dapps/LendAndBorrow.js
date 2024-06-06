@@ -2,7 +2,7 @@
 import React from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material';
-import { useStrings } from '../../common/useStrings';
+import { useStrings } from '../../common/hooks/useStrings';
 import illustrationPng from '../../common/assets/images/illustration.png';
 
 const LendAndBorrow = () => {

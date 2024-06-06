@@ -6,10 +6,10 @@ import tokenPng from '../../common/assets/images/token.png';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { Chip, Skeleton } from '../../../../components';
 import { Icon } from '../../../../components/icons';
-import { useNavigateTo } from '../../common/useNavigateTo';
-import { useStrings } from '../../common/useStrings';
-import useTableSort from '../../common/useTableSort';
-import Table from '../../common/Table';
+import { useNavigateTo } from '../../common/hooks/useNavigateTo';
+import { useStrings } from '../../common/hooks/useStrings';
+import useTableSort from '../../common/hooks/useTableSort';
+import Table from '../../common/components/Table';
 
 const TableRowSkeleton = ({ id, theme, ...props }) => (
   <TableRow

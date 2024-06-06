@@ -2,16 +2,16 @@
 import { useMemo, useState } from 'react';
 import { TableCell, TableRow, Typography, Stack, Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useNavigateTo } from '../../common/useNavigateTo';
+import { useNavigateTo } from '../../common/hooks/useNavigateTo';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import adaPng from '../../../../../assets/images/ada.png';
 import hoskyPng from '../../common/assets/images/hosky-token.png';
 import minswapPng from '../../common/assets/images/minswap-dex.png';
 import { Chip, Skeleton } from '../../../../components';
-import { useStrings } from '../../common/useStrings';
+import { useStrings } from '../../common/hooks/useStrings';
 import { Icon } from '../../../../components/icons/';
-import useTableSort from '../../common/useTableSort';
-import Table from '../../common/Table';
+import useTableSort from '../../common/hooks/useTableSort';
+import Table from '../../common/components/Table';
 
 const TableRowSkeleton = ({ id, theme, ...props }) => (
   <TableRow

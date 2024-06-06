@@ -1,10 +1,18 @@
 // @flow
 import React from 'react';
 import { defineMessages } from 'react-intl';
-import { useIntl } from '../../../context/IntlProvider';
+import { useIntl } from '../../../../context/IntlProvider';
 
 export const messages = Object.freeze(
   defineMessages({
+    headerWallet: {
+      id: 'portfolio.menu.wallet.link.label',
+      defaultMessage: '!!!Wallet',
+    },
+    headerDapps: {
+      id: 'portfolio.menu.dapps.link.label',
+      defaultMessage: '!!!Dapps',
+    },
     dapps: {
       id: 'portfolio.tooltip.dapps',
       defaultMessage: '!!!DApps',
@@ -299,6 +307,8 @@ export const messages = Object.freeze(
 export const useStrings = () => {
   const { intl } = useIntl();
   return React.useRef({
+    headerWallet: intl.formatMessage(messages.headerWallet),
+    headerDapps: intl.formatMessage(messages.headerDapps),
     dapps: intl.formatMessage(messages.dapps),
     copyToClipboard: intl.formatMessage(messages.copyToClipboard),
     copied: intl.formatMessage(messages.copied),

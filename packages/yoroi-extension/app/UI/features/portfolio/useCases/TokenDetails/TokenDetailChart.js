@@ -7,7 +7,7 @@ import { Skeleton, Tooltip } from '../../../../components';
 import chartSkeletonPng from '../../common/assets/images/token-detail-chart-skeleton.png';
 import { Chip } from '../../../../components/chip';
 import moment from 'moment';
-import { useStrings } from '../../common/useStrings';
+import { useStrings } from '../../common/hooks/useStrings';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { Icon } from '../../../../components/icons';
 

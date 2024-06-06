@@ -1,6 +1,6 @@
 // @flow
 import { TableHead, TableRow, TableCell, Stack, Typography } from '@mui/material';
-import { Icon } from '../../../components/icons';
+import { Icon } from '../../../../components/icons';
 import { useTheme } from '@mui/material/styles';
 
 export interface IHeadCells {

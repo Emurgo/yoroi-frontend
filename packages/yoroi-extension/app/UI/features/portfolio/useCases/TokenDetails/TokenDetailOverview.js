@@ -5,7 +5,7 @@ import { Skeleton } from '../../../../components/Skeleton';
 import { CopyButton } from '../../../../components/buttons/CopyButton';
 import { useTheme } from '@mui/material/styles';
 import tokenPng from '../../common/assets/images/token.png';
-import { useStrings } from '../../common/useStrings';
+import { useStrings } from '../../common/hooks/useStrings';
 
 const TokenDetailOverview = ({ tokenInfo, isLoading, isAda }) => {
   const theme = useTheme();

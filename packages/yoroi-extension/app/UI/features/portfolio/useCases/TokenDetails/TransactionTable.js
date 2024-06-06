@@ -4,7 +4,7 @@ import { Box, Stack, Typography, IconButton, Table, TableCell, TableHead, TableB
 import { useTheme } from '@mui/material/styles';
 import { Card } from '../../../../components';
 import moment from 'moment';
-import { useStrings } from '../../common/useStrings';
+import { useStrings } from '../../common/hooks/useStrings';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { Icon } from '../../../../components/icons';
 

@@ -2,7 +2,7 @@
 import React from 'react';
 import { Box, Stack, Typography, Link } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useStrings } from '../../common/useStrings';
+import { useStrings } from '../../common/hooks/useStrings';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { Skeleton } from '../../../../components/Skeleton';
 
