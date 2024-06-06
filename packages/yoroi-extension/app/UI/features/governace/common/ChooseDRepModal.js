@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import { CustomModal } from '../../../components/modals/CustomModal';
-import { TextInput } from '../../../components';
+import { TextInput } from '../../../components/index';
 import { parseDrepId, useIsValidDRepID } from '@yoroi/staking';
 import { isNonNullable } from '@yoroi/common';
 import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
