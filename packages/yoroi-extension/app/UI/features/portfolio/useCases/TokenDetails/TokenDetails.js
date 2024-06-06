@@ -1,3 +1,4 @@
+// @flow
 import React, { useEffect, useState } from 'react';
 import { Badge, Box, Button, Chip, Divider, IconButton, Link, Stack, Typography } from '@mui/material';
 import { ReactComponent as BackIcon } from '../../../../../assets/images/assets-page/back-arrow.inline.svg';

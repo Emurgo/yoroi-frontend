@@ -1,3 +1,4 @@
+// @flow
 import React from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material';

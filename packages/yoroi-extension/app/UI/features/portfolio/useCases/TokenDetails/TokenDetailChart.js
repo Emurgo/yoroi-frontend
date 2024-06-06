@@ -1,3 +1,4 @@
+// @flow
 import { Box, Button, Stack, styled, Typography } from '@mui/material';
 import React, { useEffect, useMemo, useState } from 'react';
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Label, Tooltip as RechartTooltip } from 'recharts';

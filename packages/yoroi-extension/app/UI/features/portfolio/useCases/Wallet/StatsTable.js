@@ -1,15 +1,15 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, Typography, Stack, Box } from '@mui/material';
+// @flow
+import { useMemo, useState } from 'react';
+import { TableCell, TableRow, Typography, Stack, Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import tokenPng from '../../common/assets/images/token.png';
-import { useNavigateTo } from '../../common/useNavigateTo';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
-import { Chip } from '../../../../components/chip';
-import { Skeleton } from '../../../../components/Skeleton';
+import { Chip, Skeleton } from '../../../../components';
+import { Icon } from '../../../../components/icons';
+import { useNavigateTo } from '../../common/useNavigateTo';
 import { useStrings } from '../../common/useStrings';
-import { Icon } from '../../../../components/icons/index';
-import illustrationPng from '../../common/assets/images/illustration.png';
 import useTableSort from '../../common/useTableSort';
+import Table from '../../common/Table';
 
 const TableRowSkeleton = ({ id, theme, ...props }) => (
   <TableRow
@@ -92,158 +92,134 @@ const StatsTable = ({ data, isLoading }) => {
   ];
   const { getSortedData, handleRequestSort } = useTableSort({ order, orderBy, setSortState, headCells, data });
 
-  return getSortedData(list).length > 0 ? (
-    <Table aria-label="stats table">
-      <TableHead>
-        <TableRow>
-          {headCells.map(({ label, align, id }) => (
-            <TableCell key={id} align={align} sx={{ padding: `12.5px ${theme.spacing(2)}` }}>
-              <Stack
-                direction="row"
-                alignItems="center"
-                spacing={theme.spacing(1)}
-                onClick={() => handleRequestSort(id)}
-                sx={{ float: align, cursor: 'pointer' }}
-              >
-                <Typography variant="body2" color="ds.gray_c600" sx={{ userSelect: 'none' }}>
-                  {label}
-                </Typography>
-                <Icon.Sort id={id} order={order} orderBy={orderBy} />
-              </Stack>
-            </TableCell>
-          ))}
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {isLoading
-          ? Array.from({ length: 6 }).map((item, index) => <TableRowSkeleton key={index} id={index} theme={theme} />)
-          : getSortedData(list).map(row => (
-              <TableRow
-                key={row.id}
-                onClick={() => navigateTo.portfolioDetail(row.id)}
+  return (
+    <Table
+      name="stat"
+      headCells={headCells}
+      data={getSortedData(list)}
+      order={order}
+      orderBy={orderBy}
+      handleRequestSort={handleRequestSort}
+      isLoading={isLoading}
+      TableRowSkeleton={<TableRowSkeleton />}
+    >
+      {getSortedData(list).map(row => (
+        <TableRow
+          key={row.id}
+          onClick={() => navigateTo.portfolioDetail(row.id)}
+          sx={{
+            cursor: 'pointer',
+            transition: 'all 0.3s ease-in-out',
+            borderRadius: `${theme.shape.borderRadius}px`,
+            '& td': { border: 0 },
+            '&:hover': {
+              backgroundColor: theme.palette.ds.gray_c50,
+            },
+          }}
+        >
+          <TableCell>
+            <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
+              <Box
+                width="40px"
+                height="40px"
                 sx={{
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease-in-out',
                   borderRadius: `${theme.shape.borderRadius}px`,
-                  '& td': { border: 0 },
-                  '&:hover': {
-                    backgroundColor: theme.palette.ds.gray_c50,
-                  },
                 }}
-              >
-                <TableCell>
-                  <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
-                    <Box
-                      width="40px"
-                      height="40px"
-                      sx={{
-                        borderRadius: `${theme.shape.borderRadius}px`,
-                      }}
-                      component="img"
-                      src={tokenPng}
-                    ></Box>
-                    <Stack direction="column">
-                      <Typography fontWeight="500" color="ds.text_gray_normal">
-                        {row.name}
-                      </Typography>
-                      <Typography variant="body2" color="ds.text_gray_medium">
-                        {row.id}
-                      </Typography>
-                    </Stack>
-                  </Stack>
-                </TableCell>
+                component="img"
+                src={tokenPng}
+              ></Box>
+              <Stack direction="column">
+                <Typography fontWeight="500" color="ds.text_gray_normal">
+                  {row.name}
+                </Typography>
+                <Typography variant="body2" color="ds.text_gray_medium">
+                  {row.id}
+                </Typography>
+              </Stack>
+            </Stack>
+          </TableCell>
 
-                <TableCell>
-                  <Typography variant="body2" color="ds.text_gray_medium">
-                    {row.price} USD
+          <TableCell>
+            <Typography variant="body2" color="ds.text_gray_medium">
+              {row.price} USD
+            </Typography>
+          </TableCell>
+
+          <TableCell>
+            <Chip
+              active={row['24h'] >= 0}
+              label={
+                <Stack direction="row" justifyContent="space-between" alignItems="center">
+                  {row['24h'] >= 0 ? (
+                    <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
+                  ) : (
+                    <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
+                  )}
+
+                  <Typography variant="caption1">{row['24h'] >= 0 ? row['24h'] : -1 * row['24h']}%</Typography>
+                </Stack>
+              }
+              sx={{ cursor: 'pointer' }}
+            />
+          </TableCell>
+
+          <TableCell>
+            <Chip
+              active={row['1W'] >= 0}
+              label={
+                <Stack direction="row" justifyContent="space-between" alignItems="center">
+                  {row['1W'] >= 0 ? (
+                    <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
+                  ) : (
+                    <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
+                  )}
+                  <Typography variant="caption1">{row['1W'] >= 0 ? row['1W'] : -1 * row['1W']}%</Typography>
+                </Stack>
+              }
+              sx={{ cursor: 'pointer' }}
+            />
+          </TableCell>
+
+          <TableCell>
+            <Chip
+              active={row['1M'] >= 0}
+              label={
+                <Stack direction="row" justifyContent="space-between" alignItems="center">
+                  {row['1M'] >= 0 ? (
+                    <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
+                  ) : (
+                    <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
+                  )}
+                  <Typography variant="caption1">{row['1M'] >= 0 ? row['1M'] : -1 * row['1M']}%</Typography>
+                </Stack>
+              }
+              sx={{ cursor: 'pointer' }}
+            />
+          </TableCell>
+
+          <TableCell>
+            <Typography variant="body2" color="ds.text_gray_medium">
+              {row.portfolioPercents.toFixed(2)}&nbsp;%
+            </Typography>
+          </TableCell>
+
+          <TableCell>
+            <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
+              <Stack direction="column">
+                <Typography fontWeight="500" color="ds.text_gray_normal">
+                  {row.totalAmount} {row.name}
+                </Typography>
+                {row.name === 'ADA' && unitOfAccount === 'ADA' ? null : (
+                  <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}>
+                    {row.totalAmountUsd} {unitOfAccount}
                   </Typography>
-                </TableCell>
-
-                <TableCell>
-                  <Chip
-                    active={row['24h'] >= 0}
-                    label={
-                      <Stack direction="row" justifyContent="space-between" alignItems="center">
-                        {row['24h'] >= 0 ? (
-                          <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
-                        ) : (
-                          <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
-                        )}
-
-                        <Typography variant="caption1">{row['24h'] >= 0 ? row['24h'] : -1 * row['24h']}%</Typography>
-                      </Stack>
-                    }
-                    sx={{ cursor: 'pointer' }}
-                  />
-                </TableCell>
-
-                <TableCell>
-                  <Chip
-                    active={row['1W'] >= 0}
-                    label={
-                      <Stack direction="row" justifyContent="space-between" alignItems="center">
-                        {row['1W'] >= 0 ? (
-                          <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
-                        ) : (
-                          <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
-                        )}
-                        <Typography variant="caption1">{row['1W'] >= 0 ? row['1W'] : -1 * row['1W']}%</Typography>
-                      </Stack>
-                    }
-                    sx={{ cursor: 'pointer' }}
-                  />
-                </TableCell>
-
-                <TableCell>
-                  <Chip
-                    active={row['1M'] >= 0}
-                    label={
-                      <Stack direction="row" justifyContent="space-between" alignItems="center">
-                        {row['1M'] >= 0 ? (
-                          <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
-                        ) : (
-                          <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
-                        )}
-                        <Typography variant="caption1">{row['1M'] >= 0 ? row['1M'] : -1 * row['1M']}%</Typography>
-                      </Stack>
-                    }
-                    sx={{ cursor: 'pointer' }}
-                  />
-                </TableCell>
-
-                <TableCell>
-                  <Typography variant="body2" color="ds.text_gray_medium">
-                    {row.portfolioPercents.toFixed(2)}&nbsp;%
-                  </Typography>
-                </TableCell>
-
-                <TableCell>
-                  <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
-                    <Stack direction="column">
-                      <Typography fontWeight="500" color="ds.text_gray_normal">
-                        {row.totalAmount} {row.name}
-                      </Typography>
-                      {row.name === 'ADA' && unitOfAccount === 'ADA' ? null : (
-                        <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}>
-                          {row.totalAmountUsd} {unitOfAccount}
-                        </Typography>
-                      )}
-                    </Stack>
-                  </Stack>
-                </TableCell>
-              </TableRow>
-            ))}
-      </TableBody>
+                )}
+              </Stack>
+            </Stack>
+          </TableCell>
+        </TableRow>
+      ))}
     </Table>
-  ) : (
-    <Stack width="full" justifyContent="center" alignItems="center" sx={{ flex: 1 }}>
-      <Stack direction="column" alignItems="center" spacing={theme.spacing(3)}>
-        <Box component="img" src={illustrationPng}></Box>
-        <Typography variant="h4" fontWeight="500" color="ds.black_static">
-          {strings.noResultsForThisSearch}
-        </Typography>
-      </Stack>
-    </Stack>
   );
 };
 

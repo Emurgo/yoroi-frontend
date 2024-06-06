@@ -1,3 +1,4 @@
+// @flow
 import { Input, InputAdornment, styled } from '@mui/material';
 import { ReactComponent as SearchIcon } from '../../../assets/images/assets-page/search.inline.svg';
 import { useRef } from 'react';

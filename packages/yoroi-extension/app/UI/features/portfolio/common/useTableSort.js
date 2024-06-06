@@ -1,6 +1,15 @@
+// @flow
 import { useCallback } from 'react';
+import type { IHeadCells } from './SortableTableHead';
+interface Props {
+  order: string;
+  orderBy: string;
+  setSortState: () => void;
+  headCells: IHeadCells[];
+  data: any[];
+}
 
-const useTableSort = ({ order, orderBy, setSortState, headCells, data }) => {
+const useTableSort = ({ order, orderBy, setSortState, headCells, data }: Props) => {
   const handleRequestSort = property => {
     let direction = 'asc';
     if (order === 'asc') {

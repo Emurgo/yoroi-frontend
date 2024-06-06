@@ -1,7 +1,13 @@
+// @flow
 import { Skeleton as MuiSkeleton } from '@mui/material';
+import type { SxProps } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
-export const Skeleton = props => {
+interface Props {
+  sx: SxProps;
+}
+
+export const Skeleton = ({ sx, ...props }: Props): Node => {
   const theme = useTheme();
 
   return (
@@ -13,7 +19,7 @@ export const Skeleton = props => {
         borderRadius: `${theme.shape.borderRadius}px`,
         backgroundColor: theme.palette.ds.gray_c100,
         opacity: 0.8,
-        ...props.sx,
+        ...sx,
       }}
     />
   );

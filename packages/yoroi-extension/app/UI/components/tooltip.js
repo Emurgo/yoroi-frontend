@@ -1,3 +1,4 @@
+// @flow
 import { styled } from '@mui/material';
 import { default as MuiTooltip, TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 
@@ -13,6 +14,10 @@ const StyledTooltip = styled(({ className, ...props }: TooltipProps) => (
   },
 }));
 
-export const Tooltip = ({ children, ...props }) => {
+interface Props {
+  children: Node;
+}
+
+export const Tooltip = ({ children, ...props }: Props): Node => {
   return <StyledTooltip {...props}>{children}</StyledTooltip>;
 };

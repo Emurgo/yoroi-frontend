@@ -1,8 +1,16 @@
+// @flow
 import React from 'react';
 import { Chip as MuiChip, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import type { SxProps } from '@mui/material';
 
-export const Chip = ({ label, active, sx, ...props }) => {
+interface Props {
+  label: string;
+  active: boolean;
+  sx: SxProps;
+}
+
+export const Chip = ({ label, active, sx, ...props }: Props): Node => {
   const theme = useTheme();
 
   return (

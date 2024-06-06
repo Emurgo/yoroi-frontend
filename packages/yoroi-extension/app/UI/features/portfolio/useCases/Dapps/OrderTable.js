@@ -1,18 +1,18 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, Typography, Stack, Box } from '@mui/material';
+// @flow
+import { useMemo, useState } from 'react';
+import { TableCell, TableRow, Typography, Stack, Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useNavigateTo } from '../../common/useNavigateTo';
 import { useStrings } from '../../common/useStrings';
 import adaPng from '../../../../../assets/images/ada.png';
 import hoskyPng from '../../common/assets/images/hosky-token.png';
 import minswapPng from '../../common/assets/images/minswap-dex.png';
-import { Chip } from '../../../../components/chip';
-import { Skeleton } from '../../../../components/Skeleton';
+import { Chip, Skeleton } from '../../../../components';
 import { truncateAddressShort } from '../../../../../utils/formatters';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
-import illustrationPng from '../../common/assets/images/illustration.png';
 import { Icon } from '../../../../components/icons';
 import useTableSort from '../../common/useTableSort';
+import Table from '../../common/Table';
 
 const TableRowSkeleton = ({ id, theme, ...props }) => (
   <TableRow
@@ -89,145 +89,121 @@ const OrderTable = ({ data, isLoading }) => {
   ];
   const { getSortedData, handleRequestSort } = useTableSort({ order, orderBy, setSortState, headCells, data });
 
-  return getSortedData(list).length > 0 ? (
-    <Table aria-label="order table">
-      <TableHead>
-        <TableRow>
-          {headCells.map(({ label, align, id, disabledSort }) => (
-            <TableCell key={id} align={align}>
-              <Stack
-                direction="row"
-                alignItems="center"
-                spacing={theme.spacing(1)}
-                onClick={() => !disabledSort && handleRequestSort(id)}
-                sx={{ float: align, cursor: disabledSort ? 'normal' : 'pointer' }}
-              >
-                <Typography variant="body2" color="ds.gray_c600" sx={{ userSelect: 'none' }}>
-                  {label}
-                </Typography>
-                {disabledSort ? null : <Icon.Sort id={id} order={order} orderBy={orderBy} />}
-              </Stack>
-            </TableCell>
-          ))}
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {isLoading
-          ? Array.from({ length: 6 }).map((item, index) => <TableRowSkeleton key={index} id={index} theme={theme} />)
-          : getSortedData(list).map(row => (
-              <TableRow
-                key={row.id}
+  return (
+    <Table
+      name="order"
+      headCells={headCells}
+      data={getSortedData(list)}
+      order={order}
+      orderBy={orderBy}
+      handleRequestSort={handleRequestSort}
+      isLoading={isLoading}
+      TableRowSkeleton={<TableRowSkeleton />}
+    >
+      {getSortedData(list).map(row => (
+        <TableRow
+          key={row.id}
+          sx={{
+            transition: 'all 0.3s ease-in-out',
+            '& td': { border: 0 },
+          }}
+        >
+          <TableCell>
+            <Stack direction="row" alignItems="center" spacing={theme.spacing(1)}>
+              <Box
+                width="24px"
+                height="24px"
                 sx={{
-                  transition: 'all 0.3s ease-in-out',
-                  '& td': { border: 0 },
+                  borderRadius: `${theme.shape.borderRadius}px`,
                 }}
-              >
-                <TableCell>
-                  <Stack direction="row" alignItems="center" spacing={theme.spacing(1)}>
-                    <Box
-                      width="24px"
-                      height="24px"
-                      sx={{
-                        borderRadius: `${theme.shape.borderRadius}px`,
-                      }}
-                      component="img"
-                      src={adaPng}
-                    ></Box>
-                    <Typography fontWeight="500" color="ds.gray_c900">
-                      {row.firstToken.name}
-                    </Typography>
-                    <Typography fontWeight="500" color="ds.gray_c900">
-                      /
-                    </Typography>
-                    <Box
-                      width="24px"
-                      height="24px"
-                      component="img"
-                      src={hoskyPng}
-                      sx={{
-                        borderRadius: `${theme.shape.borderRadius}px`,
-                      }}
-                    ></Box>
-                    <Typography fontWeight="500" color="ds.gray_c900">
-                      {row.secondToken.name}
-                    </Typography>
-                  </Stack>
-                </TableCell>
+                component="img"
+                src={adaPng}
+              ></Box>
+              <Typography fontWeight="500" color="ds.gray_c900">
+                {row.firstToken.name}
+              </Typography>
+              <Typography fontWeight="500" color="ds.gray_c900">
+                /
+              </Typography>
+              <Box
+                width="24px"
+                height="24px"
+                component="img"
+                src={hoskyPng}
+                sx={{
+                  borderRadius: `${theme.shape.borderRadius}px`,
+                }}
+              ></Box>
+              <Typography fontWeight="500" color="ds.gray_c900">
+                {row.secondToken.name}
+              </Typography>
+            </Stack>
+          </TableCell>
 
-                <TableCell>
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    spacing={theme.spacing(1)}
-                    onClick={() =>
-                      chrome.tabs.create({
-                        url: row.DEXLink,
-                      })
-                    }
-                    sx={{ width: 'fit-content', cursor: 'pointer' }}
-                  >
-                    <Box
-                      width="32px"
-                      height="32px"
-                      sx={{
-                        borderRadius: `${theme.shape.borderRadius}px`,
-                      }}
-                      component="img"
-                      src={minswapPng}
-                    ></Box>
-                    <Typography fontWeight="500" color="ds.primary_c600">
-                      {row.DEX}
-                    </Typography>
-                  </Stack>
-                </TableCell>
+          <TableCell>
+            <Stack
+              direction="row"
+              alignItems="center"
+              spacing={theme.spacing(1)}
+              onClick={() =>
+                chrome.tabs.create({
+                  url: row.DEXLink,
+                })
+              }
+              sx={{ width: 'fit-content', cursor: 'pointer' }}
+            >
+              <Box
+                width="32px"
+                height="32px"
+                sx={{
+                  borderRadius: `${theme.shape.borderRadius}px`,
+                }}
+                component="img"
+                src={minswapPng}
+              ></Box>
+              <Typography fontWeight="500" color="ds.primary_c600">
+                {row.DEX}
+              </Typography>
+            </Stack>
+          </TableCell>
 
-                <TableCell>
-                  <Typography color="ds.gray_c900">{row.assetPrice}</Typography>
-                </TableCell>
+          <TableCell>
+            <Typography color="ds.gray_c900">{row.assetPrice}</Typography>
+          </TableCell>
 
-                <TableCell>
-                  <Typography color="ds.gray_c900">{row.assetAmount}</Typography>
-                </TableCell>
+          <TableCell>
+            <Typography color="ds.gray_c900">{row.assetAmount}</Typography>
+          </TableCell>
 
-                <TableCell>
-                  <Typography
-                    onClick={() =>
-                      chrome.tabs.create({
-                        url: `https://cardanoscan.io/transaction/${row.transactionId}`,
-                      })
-                    }
-                    color="ds.primary_c600"
-                    sx={{ cursor: 'pointer' }}
-                  >
-                    {truncateAddressShort(row.transactionId, 10)}
-                  </Typography>
-                </TableCell>
+          <TableCell>
+            <Typography
+              onClick={() =>
+                chrome.tabs.create({
+                  url: `https://cardanoscan.io/transaction/${row.transactionId}`,
+                })
+              }
+              color="ds.primary_c600"
+              sx={{ cursor: 'pointer' }}
+            >
+              {truncateAddressShort(row.transactionId, 10)}
+            </Typography>
+          </TableCell>
 
-                <TableCell>
-                  <Stack direction="column" spacing={theme.spacing(0.25)}>
-                    <Typography color="ds.gray_c900" sx={{ textAlign: 'right' }}>
-                      {row.totalValue} {row.firstToken.name}
-                    </Typography>
-                    {row.firstToken.name === 'ADA' && unitOfAccount === 'ADA' ? null : (
-                      <Typography variant="body2" color="ds.gray_c600" sx={{ textAlign: 'right' }}>
-                        {row.totalValueUsd} {unitOfAccount}
-                      </Typography>
-                    )}
-                  </Stack>
-                </TableCell>
-              </TableRow>
-            ))}
-      </TableBody>
+          <TableCell>
+            <Stack direction="column" spacing={theme.spacing(0.25)}>
+              <Typography color="ds.gray_c900" sx={{ textAlign: 'right' }}>
+                {row.totalValue} {row.firstToken.name}
+              </Typography>
+              {row.firstToken.name === 'ADA' && unitOfAccount === 'ADA' ? null : (
+                <Typography variant="body2" color="ds.gray_c600" sx={{ textAlign: 'right' }}>
+                  {row.totalValueUsd} {unitOfAccount}
+                </Typography>
+              )}
+            </Stack>
+          </TableCell>
+        </TableRow>
+      ))}
     </Table>
-  ) : (
-    <Stack width="full" justifyContent="center" alignItems="center" sx={{ flex: 1 }}>
-      <Stack direction="column" alignItems="center" spacing={theme.spacing(3)}>
-        <Box component="img" src={illustrationPng}></Box>
-        <Typography variant="h4" fontWeight="500" color="ds.black_static">
-          {strings.noResultsForThisSearch}
-        </Typography>
-      </Stack>
-    </Stack>
   );
 };
 

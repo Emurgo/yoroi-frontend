@@ -1,3 +1,4 @@
+// @flow
 import { Typography, Stack, Box, Input, styled } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { Tooltip, SearchInput } from '../../../../components';

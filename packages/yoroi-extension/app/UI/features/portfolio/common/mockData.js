@@ -1,3 +1,4 @@
+// @flow
 import { HistoryItemStatus, HistoryItemType } from '../useCases/TokenDetails/TransactionTable';
 
 const startDate = new Date('01-01-2023 8:30');

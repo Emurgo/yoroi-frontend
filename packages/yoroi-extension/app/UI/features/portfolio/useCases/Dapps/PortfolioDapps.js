@@ -1,3 +1,4 @@
+// @flow
 import { Typography, Stack, Box, Input, InputAdornment, Button, styled } from '@mui/material';
 import { ReactComponent as Search } from '../../../../../assets/images/assets-page/search.inline.svg';
 import React, { useEffect, useState } from 'react';

@@ -1,3 +1,4 @@
+// @flow
 import { Box, styled } from '@mui/material';
 
 const StyledCard = styled(Box)(({ theme }) => ({
