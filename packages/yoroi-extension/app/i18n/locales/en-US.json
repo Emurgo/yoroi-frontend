@@ -1043,7 +1043,7 @@
   "governance.drepId":"Drep ID:",
   "governance.statusSelected":"You have selected {status} as your governance status. You can change it at any time by clicking in the card bellow",
   "governance.registerGovernance":"Register in Governance",
-  "governance.chooseDrep":"chooseDrep",
+  "governance.chooseDrep":"Choose your Drep",
   "governance.reviewSelection":"Review the selections carefully to assign yourself a Governance Status",
   "governance.participateDialog.title":"Withdraw warning",
   "governance.participateDialog.contentInfo":"To withdraw your rewards, you need to participate in the Cardano Governance. Your rewards will continue to accumulate, but you are only able to withdraw it once you join the Governance process.",

@@ -57,7 +57,6 @@ export const GovernanceStatusSelection = (): Node => {
   const { createCertificate: createVotingCertificate, isLoading: isCreatingVotingCertificate } = useVotingCertificate({
     useErrorBoundary: true,
   });
-  console.log('governanceData', governanceData);
 
   const pageTitle = governanceData?.kind === 'none' ? strings.registerGovernance : strings.governanceStatus;
   const statusRawText = mapStatus[governanceVote?.kind];
