@@ -1,5 +1,5 @@
 // @flow
-import React, { useMemo, useState } from 'react';
+import React, { Fragment, useMemo, useState } from 'react';
 import { Box, Stack, Typography, IconButton, Table, TableCell, TableHead, TableBody, TableRow, styled } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { Card } from '../../../../components';
@@ -141,7 +141,7 @@ const TransactionTable = ({ history }) => {
             </TableHead>
             <TableBody>
               {groupedData.map((item, index) => (
-                <>
+                <Fragment key={index}>
                   <Box
                     component="tr"
                     key={item.title}
@@ -164,7 +164,7 @@ const TransactionTable = ({ history }) => {
                       headCells={headCells}
                     />
                   ))}
-                </>
+                </Fragment>
               ))}
             </TableBody>
           </Table>
