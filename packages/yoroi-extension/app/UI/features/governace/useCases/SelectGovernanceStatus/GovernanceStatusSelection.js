@@ -188,11 +188,11 @@ export const GovernanceStatusSelection = (): Node => {
           </Typography>
         )}
         {governanceData?.kind === 'none' && (
-          <Link href={BECOME_DREP_LINK} target="_blank" rel="noopener" variant="body1">
+          <Link href={BECOME_DREP_LINK} target="_blank" rel="noopener" variant="body1" lineHeight="22px">
             {strings.becomeADrep}
           </Link>
         )}
-        <Link href={LEARN_MORE_LINK} target="_blank" rel="noopener" variant="body1">
+        <Link href={LEARN_MORE_LINK} target="_blank" rel="noopener" variant="body1" lineHeight="22px">
           {strings.learnMore}
         </Link>
       </Stack>
