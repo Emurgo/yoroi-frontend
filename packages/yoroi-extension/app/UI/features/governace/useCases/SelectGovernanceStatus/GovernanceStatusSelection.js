@@ -71,6 +71,7 @@ export const GovernanceStatusSelection = (): Node => {
         </GovernanceProvider>
       ),
       width: '648px',
+      height: '336px',
     });
   };
 
