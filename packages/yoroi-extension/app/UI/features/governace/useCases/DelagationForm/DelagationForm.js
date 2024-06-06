@@ -93,10 +93,18 @@ export const DelagationForm = (): Node => {
               <TransactionDetails>
                 {governanceVote.kind === 'delegate' && (
                   <>
-                    <Typography variant="body2">{`Delegate voting to ${governanceVote.drepID}`}</Typography>
-                    <Typography variant="body1" fontWeight="500">
-                      Transaction fee: 0.5 ADA
-                    </Typography>
+                    <Typography
+                      variant="body1"
+                      color="ds.text_gray_normal"
+                    >{`Delegate voting to ${governanceVote.drepID}`}</Typography>
+                    <Stack direction="row" justifyContent="space-between">
+                      <Typography variant="body1" fontWeight="500">
+                        Transaction fee
+                      </Typography>
+                      <Typography variant="body1" color="ds.text_gray_normal">
+                        0.5 ADA
+                      </Typography>
+                    </Stack>
                   </>
                 )}
                 {governanceVote.kind === 'abstain' && (
