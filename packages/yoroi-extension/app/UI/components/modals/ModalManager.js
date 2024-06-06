@@ -56,7 +56,7 @@ export const ModalManager = (): Node => {
       height={height}
     >
       <DialogTitle sx={{ textAlign: 'center', p: '24px' }} id={`${title}-dialog-title`}>
-        <Typography variant="body1" fontWeight="500">
+        <Typography variant="body1" fontWeight="500" lineHeight="22px">
           {title}
         </Typography>
       </DialogTitle>
