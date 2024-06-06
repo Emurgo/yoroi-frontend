@@ -1,19 +1,19 @@
 // @flow
 import React from 'react';
-import PortfolioPageLayout from '../../layout/PortfolioPageLayout';
 import PortfolioDapps from '../../features/portfolio/useCases/Dapps/PortfolioDapps';
 import mockData from '../../features/portfolio/common/mockData';
+import PortfolioLayout from './layout';
 
 type Props = {|
   stores: any,
   actions: any,
 |};
 
-const PortfolioDappsPage = ({ stores, actions }: Props) => {
+const PortfolioDappsPage = (props: Props) => {
   return (
-    <PortfolioPageLayout stores={stores} actions={actions}>
+    <PortfolioLayout {...props}>
       <PortfolioDapps data={mockData.dapps} />
-    </PortfolioPageLayout>
+    </PortfolioLayout>
   );
 };
 

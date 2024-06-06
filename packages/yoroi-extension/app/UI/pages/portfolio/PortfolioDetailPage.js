@@ -1,8 +1,8 @@
 // @flow
 import React from 'react';
 import TokenDetails from '../../features/portfolio/useCases/TokenDetails/TokenDetails';
-import PortfolioPageLayout from '../../layout/PortfolioPageLayout';
 import mockData from '../../features/portfolio/common/mockData';
+import PortfolioLayout from './layout';
 
 type Props = {|
   stores: any,
@@ -10,7 +10,7 @@ type Props = {|
   match: any,
 |};
 
-const PortfolioDetailPage = ({ stores, actions, match }: Props) => {
+const PortfolioDetailPage = ({ match, ...props }: Props) => {
   const tokenId = match.params.tokenId;
 
   const tokenInfo = React.useMemo(() => {
@@ -20,9 +20,9 @@ const PortfolioDetailPage = ({ stores, actions, match }: Props) => {
   }, [tokenId]);
 
   return (
-    <PortfolioPageLayout stores={stores} actions={actions}>
+    <PortfolioLayout {...props}>
       <TokenDetails tokenInfo={tokenInfo} transactionHistory={mockData.transactionHistory} />
-    </PortfolioPageLayout>
+    </PortfolioLayout>
   );
 };
 

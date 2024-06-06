@@ -1,19 +1,19 @@
 // @flow
 import React from 'react';
 import PortfolioWallet from '../../features/portfolio/useCases/Wallet/PortfolioWallet';
-import PortfolioPageLayout from '../../layout/PortfolioPageLayout';
 import mockData from '../../features/portfolio/common/mockData';
+import PortfolioLayout from './layout';
 
 type Props = {|
   stores: any,
   actions: any,
 |};
 
-const PortfolioPage = ({ stores, actions }: Props) => {
+const PortfolioPage = (props: Props) => {
   return (
-    <PortfolioPageLayout stores={stores} actions={actions}>
-      <PortfolioWallet data={mockData.wallet.tokenList}/>
-    </PortfolioPageLayout>
+    <PortfolioLayout {...props}>
+      <PortfolioWallet data={mockData.wallet.tokenList} />
+    </PortfolioLayout>
   );
 };
 

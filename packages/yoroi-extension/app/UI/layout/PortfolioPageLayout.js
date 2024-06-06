@@ -59,32 +59,7 @@ class PortfolioPageLayout extends Component<AllProps> {
       <PortfolioMenu onItemClick={route => actions.router.goToRoute.trigger({ route })} isActiveItem={this.isActivePage} />
     );
 
-    const PortfolioLayoutClassic = (
-      <IntlProvider intl={intl}>
-        <TopBarLayout
-          banner={<BannerContainer actions={actions} stores={stores} />}
-          sidebar={sidebarContainer}
-          navbar={
-            <NavBarContainer
-              actions={actions}
-              stores={stores}
-              title={
-                <NavBarTitle
-                  title={intl.formatMessage(
-                    isDetailPage ? globalMessages.portfolioDetailHeaderText : globalMessages.portfolioHeaderText
-                  )}
-                />
-              }
-            />
-          }
-          showInContainer
-          showAsCard
-        >
-          <SettingsLayout menu={menu}>{children}</SettingsLayout>
-        </TopBarLayout>
-      </IntlProvider>
-    );
-    const PortfolioLayoutRevamp = (
+    return (
       <IntlProvider intl={intl}>
         <TopBarLayout
           banner={<BannerContainer actions={actions} stores={stores} />}
@@ -110,10 +85,6 @@ class PortfolioPageLayout extends Component<AllProps> {
         </TopBarLayout>
       </IntlProvider>
     );
-    return this.props.renderLayoutComponent({
-      CLASSIC: PortfolioLayoutClassic,
-      REVAMP: PortfolioLayoutRevamp,
-    });
   }
 }
 export default (withLayout(PortfolioPageLayout): ComponentType<Props>);
