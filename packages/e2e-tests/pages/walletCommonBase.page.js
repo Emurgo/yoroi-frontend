@@ -121,8 +121,8 @@ class WalletCommonBase extends BasePage {
     const rawNameAndPlateText = await this.getText(this.walletNameAndPlateNumberTextLocator);
     const [walletName, walletPlate] = rawNameAndPlateText.split('\n');
 
-    await this.waitForElement(this.walletBalanceTextLocator);
-    const rawBalanceText = await this.getText(this.walletBalanceTextLocator);
+    const walletBalanceElem = await this.waitForElement(this.walletBalanceTextLocator);
+    const rawBalanceText = await walletBalanceElem.getText();
     const adaBalance = Number(rawBalanceText.split(' ')[0]);
 
     await this.waitForElement(this.walletFiatBalanceTextLocator);
@@ -201,7 +201,8 @@ class WalletCommonBase extends BasePage {
   }
   async openChangeWalletModal() {
     this.logger.info(`WalletCommonBase::openChangeWalletModal is called`);
-    await this.click(this.selectedWalletButtonLocator);
+    const selectWalletBtnElem = await this.waitForElement(this.selectedWalletButtonLocator);
+    await selectWalletBtnElem.click();
     await this.waitForElement(this.changeWalletDialogLocator);
   }
   async addNewWallet() {
