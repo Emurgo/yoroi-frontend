@@ -22,9 +22,10 @@ export const TextInput = ({ id, label, variant, onChange, value, error, helperTe
 };
 
 const SInput = styled(TextField)(({ theme, error }) => ({
+  margin: '0px 0px',
   '& .MuiFormHelperText-root': {
     position: 'absolute',
-    bottom: -2,
+    bottom: -22,
     left: -10,
   },
   '& .MuiInputLabel-root': {

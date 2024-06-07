@@ -46,9 +46,9 @@ export const ChooseDRepModal = ({ onSubmit }: ChooseDRepModallProps): Node => {
   const idInvalid = drepId.match(/\d+/g);
 
   return (
-    <Stack>
-      <Stack gap="32px" mb="20px">
-        <Typography variant="body1" textAlign="center">
+    <Stack justifyContent="flex-between">
+      <Stack pb="50px">
+        <Typography variant="body1" textAlign="center" mb="34px">
           Identify your preferred DRep and enter their ID below to delegate your vote
         </Typography>
         <TextInput
@@ -67,7 +67,7 @@ export const ChooseDRepModal = ({ onSubmit }: ChooseDRepModallProps): Node => {
         />
       </Stack>
 
-      <Button onClick={confirmDRep} fullWidth variant="primary" disabled={error || drepId.length === 0}>
+      <Button onClick={confirmDRep} fullWidth variant="primary" disabled={error || drepId.length === 0} fontSize="16px">
         Confirm
       </Button>
     </Stack>
