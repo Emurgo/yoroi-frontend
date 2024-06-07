@@ -96,6 +96,10 @@ export const messages = Object.freeze(
       id: 'governance.selectNoConfidenc',
       defaultMessage: '!!!Select no confidenc',
     },
+    identifyDrep: {
+      id: 'governance.identifyDrep',
+      defaultMessage: '!!!Identify your preferred DRep and enter their ID below to delegate your vote',
+    },
     password: {
       id: 'global.labels.password',
       defaultMessage: '!!!Password',
@@ -111,6 +115,10 @@ export const messages = Object.freeze(
     confirm: {
       id: 'global.labels.confirm',
       defaultMessage: '!!!confirm',
+    },
+    incorectFormat: {
+      id: 'global.labels.incorectFormat',
+      defaultMessage: '!!!Incorrect format',
     },
   })
 );
@@ -144,5 +152,7 @@ export const useStrings = () => {
     total: intl.formatMessage(messages.total),
     password: intl.formatMessage(messages.password),
     wrongPassword: intl.formatMessage(messages.wrongPassword),
+    identifyDrep: intl.formatMessage(messages.identifyDrep),
+    incorectFormat: intl.formatMessage(messages.incorectFormat),
   }).current;
 };

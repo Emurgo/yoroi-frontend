@@ -166,6 +166,7 @@
   "global.labels.stakingKeyHash": "Staking key hash",
   "global.labels.upgrade": "Upgrade",
   "global.labels.wrongPassword": "Wrong password",
+  "global.labels.incorectFormat": "Incorrect format",
   "global.language.chinese.simplified": "简体中文",
   "global.language.chinese.traditional": "繁體中文",
   "global.language.czech": "Czech",
@@ -1051,5 +1052,6 @@
   "governance.operations":"Operations",
   "governance.selectAbstein":"Select abstain",
   "governance.selectNoConfidenc":"Select no confidence",
+  "governance.identifyDrep":"Identify your preferred DRep and enter their ID below to delegate your vote",
   "governance.designatedSomeone":"You are designating someone else to cast your vote on your behalf for all proposals now and in the future."
 }

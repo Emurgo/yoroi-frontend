@@ -12,6 +12,7 @@ import { parseDrepId, useIsValidDRepID } from '@yoroi/staking';
 import { isNonNullable } from '@yoroi/common';
 import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { useGovernance } from '../module/GovernanceContextProvider';
+import { useStrings } from './useStrings';
 
 type ChooseDRepModallProps = {|
   onSubmit?: (drepId: string) => void,
@@ -22,6 +23,7 @@ export const ChooseDRepModal = ({ onSubmit }: ChooseDRepModallProps): Node => {
   const [error, setError] = React.useState(false);
 
   const { dRepIdChanged, governanceVoteChanged } = useGovernance();
+  const strings = useStrings();
 
   // TODO hook endpoint not working well
   // const { error, isFetched, isFetching } = useIsValidDRepID(drepId, {
@@ -49,11 +51,11 @@ export const ChooseDRepModal = ({ onSubmit }: ChooseDRepModallProps): Node => {
     <Stack justifyContent="flex-between">
       <Stack pb="50px">
         <Typography variant="body1" textAlign="center" mb="34px">
-          Identify your preferred DRep and enter their ID below to delegate your vote
+          {strings.identifyDrep}
         </Typography>
         <TextInput
           id="setDrepId"
-          label="DRep ID"
+          label={strings.drepId}
           variant="outlined"
           onChange={event => {
             dRepIdChanged(event.target.value);
@@ -62,13 +64,13 @@ export const ChooseDRepModal = ({ onSubmit }: ChooseDRepModallProps): Node => {
           }}
           value={drepId}
           error={error}
-          helperText={error ? 'Incorrect format' : ' '}
+          helperText={error ? strings.incorectFormat : ' '}
           defaultValue="drep1wn0dklu87w8d9pkuyr7jalulgvl9w2he0hn0fne9k5a6y4d55mt"
         />
       </Stack>
 
-      <Button onClick={confirmDRep} fullWidth variant="primary" disabled={error || drepId.length === 0} fontSize="16px">
-        Confirm
+      <Button onClick={confirmDRep} fullWidth variant="primary" disabled={error || drepId.length === 0}>
+        {strings.confirm}
       </Button>
     </Stack>
   );
