@@ -9,6 +9,7 @@ import { restoreWallet } from '../../helpers/restoreWalletHelper.js';
 import { getSpendableWallet } from '../../utils/testWallets.js';
 import ReceiveSubTab from '../../pages/wallet/walletTab/receiveSubTab.page.js';
 
+// The test case is based on the issue https://emurgo.atlassian.net/browse/YOEXT-965
 describe('Comparing balances on the top plate and on addresses', function () {
   this.timeout(2 * oneMinute);
   let webdriver = null;

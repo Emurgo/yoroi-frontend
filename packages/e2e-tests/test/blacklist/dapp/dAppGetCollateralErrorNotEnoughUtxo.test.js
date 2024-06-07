@@ -12,6 +12,7 @@ import { adaInLovelaces, getTestWalletName } from '../../../helpers/constants.js
 import { ApiErrorCode } from '../../../helpers/mock-dApp-webpage/cip30Errors.js';
 import driversPoolsManager from '../../../utils/driversPool.js';
 
+// Issue https://emurgo.atlassian.net/browse/YOEXT-1191
 describe('dApp, getCollateral, error, empty wallet, not auth', function () {
   const testWalletName = getTestWalletName();
   let newTestWallet = {
