@@ -64,7 +64,7 @@ export const GovernanceStatusSelection = (): Node => {
 
   const openDRepIdModal = (onSubmit: (drepID: string) => void) => {
     openModal({
-      title: strings.chooseDrep,
+      title: String(strings.chooseDrep).toUpperCase(),
       content: (
         <GovernanceProvider manager={governanceManager}>
           <ChooseDRepModal onSubmit={onSubmit} />

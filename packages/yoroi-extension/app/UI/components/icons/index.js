@@ -10,6 +10,8 @@ import { Send } from './Send';
 import { Cancel } from './Cancel';
 import { Staking } from './Staking';
 import { Expand } from './Expand';
+import { ChevronUp } from './ChevronUp';
+import { ChevronDown } from './ChevronDown';
 
 export const Icon = {
   CloseIcon,
@@ -24,4 +26,5 @@ export const Icon = {
   Cancel,
   Staking,
   Expand,
+  ChevronDown,
 };
