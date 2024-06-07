@@ -11,6 +11,7 @@ import { PasswordInput } from '../../../../components';
 import { useGovernance } from '../../module/GovernanceContextProvider';
 import { useCreateAndSendDrepDelegationTransaction } from '../../api/useCreateAndSendDrepDelegationTransaction';
 import { useStrings } from '../../common/useStrings';
+import { Collapsible } from '../../../../components';
 
 const Container = styled(Box)(({ theme }) => ({
   paddingTop: '23px',
@@ -33,7 +34,6 @@ const TotalBox = styled(Box)(({ theme }) => ({
 }));
 
 const TransactionDetails = styled(Stack)(({ theme }) => ({
-  marginBottom: '40px',
   gap: '16px',
 }));
 const Actions = styled(Stack)(({ theme }) => ({
@@ -86,29 +86,41 @@ export const DelagationForm = (): Node => {
         <Typography variant="body2" color="ds.gray_c600" mb="24px">
           {strings.transactionDetails}
         </Typography>
-        <TransactionDetails>
-          <Typography variant="body1" fontWeight="500">
-            {strings.operations}
-          </Typography>
-          {governanceVote.kind === 'delegate' && (
-            <>
-              <Typography variant="body2">{`Delegate voting to ${governanceVote.drepID}`}</Typography>
-              <Typography variant="body1" fontWeight="500">
-                Transaction fee: 0.5 ADA
-              </Typography>
-            </>
-          )}
-          {governanceVote.kind === 'abstain' && (
-            <>
-              <Typography variant="body2">{strings.selectAbstein}</Typography>
-            </>
-          )}
-          {governanceVote.kind === 'no-confidence' && (
-            <>
-              <Typography variant="body2">{strings.selectNoConfidenc}</Typography>
-            </>
-          )}
-        </TransactionDetails>
+        <Box mb="40px">
+          <Collapsible
+            title={strings.operations}
+            content={
+              <TransactionDetails>
+                {governanceVote.kind === 'delegate' && (
+                  <>
+                    <Typography
+                      variant="body1"
+                      color="ds.text_gray_normal"
+                    >{`Delegate voting to ${governanceVote.drepID}`}</Typography>
+                    <Stack direction="row" justifyContent="space-between">
+                      <Typography variant="body1" fontWeight="500">
+                        Transaction fee
+                      </Typography>
+                      <Typography variant="body1" color="ds.text_gray_normal">
+                        0.5 ADA
+                      </Typography>
+                    </Stack>
+                  </>
+                )}
+                {governanceVote.kind === 'abstain' && (
+                  <>
+                    <Typography variant="body2">{strings.selectAbstein}</Typography>
+                  </>
+                )}
+                {governanceVote.kind === 'no-confidence' && (
+                  <>
+                    <Typography variant="body2">{strings.selectNoConfidenc}</Typography>
+                  </>
+                )}
+              </TransactionDetails>
+            }
+          />
+        </Box>
         <PasswordInput
           label={strings.password}
           id="outlined-adornment-password"

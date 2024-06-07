@@ -53,7 +53,7 @@ export const PasswordInput = ({ id, label, variant, onChange, value, error, help
               onMouseDown={handleMouseDownPassword}
               edge="end"
             >
-              {showPassword ? <Icon.VisibilityOff /> : <Icon.VisibilityOn />}
+              {!showPassword ? <Icon.VisibilityOff /> : <Icon.VisibilityOn />}
             </IconButton>
           </InputAdornment>
         }
