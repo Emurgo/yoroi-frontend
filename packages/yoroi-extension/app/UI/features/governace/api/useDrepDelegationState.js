@@ -1,8 +1,8 @@
 import { useQuery } from 'react-query';
 
 type PoolTransition = {
-  kind: null | 'none' | 'delegate' | 'abstain' | 'no-confidence';
-  drepID: 'drep1c93a2zvs3aw8e4naez0ynpmc48jbc7yaa3n2k8ljhwfdt70yscts' | null;
+  kind: null | 'none' | 'delegate' | 'abstain' | 'no-confidence',
+  drepID: 'drep1c93a2zvs3aw8e4naez0ynpmc48jbc7yaa3n2k8ljhwfdt70yscts' | null,
 };
 
 // TODO mock impementation - add real endpoint
