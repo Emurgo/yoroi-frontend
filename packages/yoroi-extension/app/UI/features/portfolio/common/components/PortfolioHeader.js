@@ -1,28 +1,21 @@
 // @flow
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useStrings } from '../hooks/useStrings';
-import { Skeleton } from '../../../../components/Skeleton';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { Icon } from '../../../../components/icons';
-import { SearchInput, Tooltip, Chip } from '../../../../components';
-
-type Balance = {
-  ada: number,
-  usd: number,
-  percents: number,
-  amount: number,
-};
+import { SearchInput, Tooltip, Chip, Skeleton } from '../../../../components';
+import { BalanceType } from '../types/index';
 
 interface Props {
-  balance: Balance;
+  balance: BalanceType;
   setKeyword: (keyword: string) => void;
   isLoading: boolean;
-  tooltipTitle: React$Node;
+  tooltipTitle: ReactNode;
 }
 
-const PortfolioHeader = ({ balance, setKeyword, isLoading, tooltipTitle }: Props): Node => {
+const PortfolioHeader = ({ balance, setKeyword, isLoading, tooltipTitle }: Props): ReactNode => {
   const strings = useStrings();
   const theme = useTheme();
   const { unitOfAccount, settingFiatPairUnit, changeUnitOfAccount } = usePortfolio();

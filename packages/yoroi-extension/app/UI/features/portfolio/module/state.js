@@ -2,11 +2,11 @@
 import { invalid } from '@yoroi/common';
 import { produce } from 'immer';
 
-type currency = 'ADA' | 'USD' | 'BRL' | 'ETH' | 'BTC' | 'KRW' | 'CNY' | 'EUR' | 'JPY';
+export type CurrencyType = 'ADA' | 'USD' | 'BRL' | 'ETH' | 'BTC' | 'KRW' | 'CNY' | 'EUR' | 'JPY';
 
 // Define types
 export type PortfolioActions = {|
-  +unitOfAccountChanged: (currency: currency) => void,
+  +unitOfAccountChanged: (currency: CurrencyType) => void,
 |};
 
 export const PortfolioActionType = Object.freeze({
@@ -15,16 +15,18 @@ export const PortfolioActionType = Object.freeze({
 
 export type PortfolioAction = {|
   type: typeof PortfolioActionType.UnitOfAccountChanged,
-  unitOfAccount: currency,
+  unitOfAccount: CurrencyType,
 |};
 
 // Define state type
 export type PortfolioState = {|
-  unitOfAccount: currency,
+  unitOfAccount: CurrencyType,
 |};
 
 // Define default state
-export const defaultPortfolioState: PortfolioState = {};
+export const defaultPortfolioState: PortfolioState = {
+  unitOfAccount: 'ADA',
+};
 
 // Define action handlers
 export const defaultPortfolioActions: PortfolioActions = {

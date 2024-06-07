@@ -1,5 +1,5 @@
 // @flow
-import React, { useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { Badge, Box, Button, Chip, Divider, IconButton, Link, Stack, Typography } from '@mui/material';
 import { ReactComponent as BackIcon } from '../../../../../assets/images/assets-page/back-arrow.inline.svg';
 import { styled } from '@mui/material/styles';
@@ -15,6 +15,7 @@ import mockData from '../../common/mockData';
 import TokenDetailPerformance from './TokenDetailPerformance';
 import TokenDetailOverview from './TokenDetailOverview';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
+import { TokenType, TransactionItemType } from '../../common/types/index';
 
 const Header = styled(Box)({
   display: 'flex',
@@ -48,14 +49,22 @@ const TabContent = styled(Box)({
 });
 
 const StyledSubMenu = styled(SubMenu)(({ theme }) => ({
-  '& > .SubMenuItem_enabled > button': {
+  '& > button': {
     padding: '11px 0 !important',
+  },
+
+  '& > .SubMenuItem_enabled': {
     color: theme.palette.ds.el_primary_medium,
     borderColor: theme.palette.ds.el_primary_medium,
   },
 }));
 
-const TokenDetails = ({ tokenInfo, transactionHistory }) => {
+interface Props {
+  tokenInfo: TokenType;
+  transactionHistory: TransactionItemType[];
+}
+
+const TokenDetails = ({ tokenInfo, transactionHistory }: Props): ReactNode => {
   const theme = useTheme();
   const navigateTo = useNavigateTo();
   const strings = useStrings();

@@ -1,22 +1,22 @@
 // @flow
-import { cloneElement } from 'react';
+import { ReactNode, cloneElement } from 'react';
 import { Table as MuiTable, TableBody, Stack, Box, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useStrings } from '../hooks/useStrings';
 import illustrationPng from '../assets/images/illustration.png';
 import SortableTableHead from './SortableTableHead';
-import type { IHeadCells } from './SortableTableHead';
+import { IHeadCell } from '../types/table';
 
 interface Props {
   name: string;
-  headCells: IHeadCells[];
+  headCells: IHeadCell[];
   data: any[];
   order: string;
   orderBy: string;
   handleRequestSort: (id: string) => void;
   isLoading: boolean;
-  TableRowSkeleton: React$Node;
-  children: React$Node;
+  TableRowSkeleton: ReactNode;
+  children: ReactNode;
 }
 
 const Table = ({
@@ -29,7 +29,7 @@ const Table = ({
   isLoading,
   TableRowSkeleton,
   children,
-}: Props): Node => {
+}: Props): ReactNode => {
   const theme = useTheme();
   const strings = useStrings();
 
@@ -38,7 +38,7 @@ const Table = ({
       <SortableTableHead headCells={headCells} order={order} orderBy={orderBy} onRequestSort={handleRequestSort} />
       <TableBody>
         {isLoading
-          ? Array.from({ length: 6 }).map((item, index) => cloneElement(TableRowSkeleton, { id: index, key: index, theme }))
+          ? Array.from({ length: 6 }).map((item, index) => cloneElement(TableRowSkeleton, { key: index, theme }))
           : children}
       </TableBody>
     </MuiTable>

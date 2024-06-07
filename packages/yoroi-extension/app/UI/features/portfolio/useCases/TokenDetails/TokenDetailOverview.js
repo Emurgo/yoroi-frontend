@@ -1,13 +1,20 @@
 // @flow
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { Stack, Box, Typography, Link, Button } from '@mui/material';
 import { Skeleton } from '../../../../components/Skeleton';
 import { CopyButton } from '../../../../components/buttons/CopyButton';
 import { useTheme } from '@mui/material/styles';
 import tokenPng from '../../common/assets/images/token.png';
 import { useStrings } from '../../common/hooks/useStrings';
+import { TokenType } from '../../common/types/index';
 
-const TokenDetailOverview = ({ tokenInfo, isLoading, isAda }) => {
+interface Props {
+  tokenInfo: TokenType;
+  isLoading: boolean;
+  isAda: boolean;
+}
+
+const TokenDetailOverview = ({ tokenInfo, isLoading, isAda }: Props): ReactNode => {
   const theme = useTheme();
   const strings = useStrings();
 

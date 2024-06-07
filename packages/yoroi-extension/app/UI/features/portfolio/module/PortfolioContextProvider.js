@@ -9,6 +9,7 @@ import {
   defaultPortfolioState,
   PortfolioState,
   PortfolioActions,
+  CurrencyType,
 } from './state';
 
 const initialPortfolioProvider = {
@@ -17,7 +18,16 @@ const initialPortfolioProvider = {
 };
 const PortfolioContext = React.createContext(initialPortfolioProvider);
 
-type PortfolioProviderProps = any;
+type PortfolioProviderProps = {
+  children: React.ReactNode,
+  settingFiatPairUnit: {
+    currency: CurrencyType,
+    enabled: boolean,
+  },
+  initialState: {
+    unitOfAccount: CurrencyType,
+  },
+};
 
 export const PortfolioContextProvider = ({
   children,
@@ -32,7 +42,7 @@ export const PortfolioContextProvider = ({
   });
 
   const actions = React.useRef({
-    changeUnitOfAccount: (currency: string) => {
+    changeUnitOfAccount: (currency: CurrencyType) => {
       dispatch({
         type: PortfolioActionType.UnitOfAccountChanged,
         unitOfAccount: currency,

@@ -10,6 +10,7 @@ import LendAndBorrow from './LendAndBorrow';
 import { useStrings } from '../../common/hooks/useStrings';
 import { Icon } from '../../../../components/icons/index';
 import PortfolioHeader from '../../common/components/PortfolioHeader';
+import { LiquidityItemType, OrderItemType } from '../../common/types/index';
 
 const StyledButton = styled(Button)(({ theme }) => ({
   height: '40px',
@@ -24,13 +25,20 @@ const TableTabs = {
   LENDBORROW: 3,
 };
 
-const PortfolioDapps = ({ data }) => {
+interface Props {
+  data: {
+    liquidityList: LiquidityItemType[],
+    orderList: OrderItemType[],
+  };
+}
+
+const PortfolioDapps = ({ data }: Props) => {
   const theme = useTheme();
   const strings = useStrings();
-  const [keyword, setKeyword] = useState('');
+  const [keyword, setKeyword] = useState();
   const [isLoading, setIsLoading] = useState();
-  const [liquidityList, setLiquidlityList] = useState([]);
-  const [orderList, setOrderList] = useState([]);
+  const [liquidityList, setLiquidlityList] = useState(data.liquidityList);
+  const [orderList, setOrderList] = useState(data.orderList);
   const [buttonProps, setButtonProps] = useState([
     {
       id: TableTabs.LIQUIDITY,

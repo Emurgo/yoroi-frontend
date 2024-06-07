@@ -1,10 +1,11 @@
 // @flow
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { Box, Stack, Typography, Link } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useStrings } from '../../common/hooks/useStrings';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { Skeleton } from '../../../../components/Skeleton';
+import { TokenType } from '../../common/types/index';
 
 const PerformanceItemType = {
   FIAT: 'fiat',
@@ -12,7 +13,12 @@ const PerformanceItemType = {
   RANK: 'rank',
 };
 
-const TokenDetailPerformance = ({ tokenInfo, isLoading }) => {
+interface Props {
+  tokenInfo: TokenType;
+  isLoading: boolean;
+}
+
+const TokenDetailPerformance = ({ tokenInfo, isLoading }: Props): ReactNode => {
   const theme = useTheme();
   const strings = useStrings();
   const { unitOfAccount } = usePortfolio();

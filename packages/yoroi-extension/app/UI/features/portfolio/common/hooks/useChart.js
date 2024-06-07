@@ -1,15 +1,17 @@
 // @flow
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useStrings } from './useStrings';
 import { useTheme } from '@mui/material/styles';
 import { Box } from '@mui/material';
 import moment from 'moment';
+import { IPeriodButtonProps, IChartData } from '../types/chart';
+import { LineChartProps } from 'recharts';
 
-const useChart = (data) => {
+const useChart = (data: IChartData) => {
   const strings = useStrings();
   const theme = useTheme();
 
-  const [buttonPeriodProps, setButtonPeriodProps] = useState([
+  const [periodButtonProps, setPeriodButtonProps] = useState([
     { id: 'start24HoursAgo', label: strings['24H'], active: true },
     { id: 'start1WeekAgo', label: strings['1W'], active: false },
     { id: 'start1MonthAgo', label: strings['1M'], active: false },
@@ -18,14 +20,20 @@ const useChart = (data) => {
     { id: 'ALL', label: strings['ALL'], active: false },
   ]);
   const [detailInfo, setDetailInfo] = useState({
-    value: data[buttonPeriodProps[0].id][data[buttonPeriodProps[0].id].length - 1].value,
-    usd: data[buttonPeriodProps[0].id][data[buttonPeriodProps[0].id].length - 1].usd,
+    value: data[periodButtonProps[0].id][data[periodButtonProps[0].id].length - 1].value,
+    fiatValue: data[periodButtonProps[0].id][data[periodButtonProps[0].id].length - 1].fiatValue,
   });
   const [isDragging, setIsDragging] = useState(false);
 
-  const CustomYAxisTick = props => {
-    const { x, y, payload } = props;
-
+  const CustomYAxisTick = ({
+    x,
+    y,
+    payload,
+  }: {
+    x: number,
+    y: number,
+    payload: { value: number },
+  }): React.SVGProps<SVGTextElement> => {
     return (
       <text x={x - 5} y={y} dy={4} textAnchor="end" fill={theme.palette.ds.black_static}>
         {payload.value.toFixed(1)}
@@ -33,9 +41,25 @@ const useChart = (data) => {
     );
   };
 
-  const CustomActiveDot = props => {
-    const { cx, cy, payload, value, index, dataLength, chartBottom, rectWidth, rectHeight } = props;
-
+  const CustomActiveDot = ({
+    cx,
+    cy,
+    payload,
+    index,
+    dataLength,
+    chartBottom,
+    rectWidth,
+    rectHeight,
+  }: {
+    cx: number,
+    cy: number,
+    payload: { time: string },
+    index: number,
+    dataLength: number,
+    chartBottom: number,
+    rectWidth: number,
+    rectHeight: number,
+  }): React.SVGProps<SVGTextElement> => {
     let rectX = cx - rectWidth / 2;
     if (index === 0) {
       rectX = cx;
@@ -86,61 +110,61 @@ const useChart = (data) => {
     );
   };
 
-  const handleChoosePeriod = label => {
-    const tmp = buttonPeriodProps.map(item => {
-      if (item.label === label) return { ...item, active: true };
+  const handleChoosePeriod = (id: string) => {
+    const tmp = periodButtonProps.map(item => {
+      if (item.id === id) return { ...item, active: true };
       return {
         ...item,
         active: false,
       };
     });
-    setButtonPeriodProps(tmp);
+    setPeriodButtonProps(tmp);
   };
 
-  const handleMouseMove = e => {
+  const handleMouseMove = (props: LineChartProps) => {
     if (!isDragging) return;
 
-    if (!e.isTooltipActive) {
+    if (!props.isTooltipActive) {
       handleMouseUp();
       return;
     }
 
-    const value = e.activePayload && e.activePayload.length > 0 ? e.activePayload[0].payload.value : null;
-    const usd = e.activePayload && e.activePayload.length > 0 ? e.activePayload[0].payload.usd : null;
+    const value = props.activePayload && props.activePayload.length > 0 ? props.activePayload[0].payload.value : null;
+    const fiatValue = props.activePayload && props.activePayload.length > 0 ? props.activePayload[0].payload.fiatValue : null;
 
-    if (!value || !usd) return;
+    if (!value || !fiatValue) return;
     setDetailInfo({
       value,
-      usd,
+      fiatValue,
     });
   };
 
-  const handleMouseDown = event => {
-    if (!event || !event.activePayload || event.activePayload.length <= 0) return;
+  const handleMouseDown = (props: LineChartProps) => {
+    if (!props || !props.activePayload || props.activePayload.length <= 0) return;
 
-    const value = event.activePayload[0].payload.value;
-    const usd = event.activePayload[0].payload.usd;
+    const value = props.activePayload[0].payload.value;
+    const fiatValue = props.activePayload[0].payload.fiatValue;
 
-    if (!value || !usd) return;
+    if (!value || !fiatValue) return;
     setDetailInfo({
       value,
-      usd,
+      fiatValue,
     });
     setIsDragging(true);
   };
 
   const handleMouseUp = () => {
-    const currentPeriod = buttonPeriodProps.find(item => item.active).id;
+    const currentPeriod = periodButtonProps.find(item => item.active).id;
     setDetailInfo({
       value: data[currentPeriod][data[currentPeriod].length - 1].value,
-      usd: data[currentPeriod][data[currentPeriod].length - 1].usd,
+      fiatValue: data[currentPeriod][data[currentPeriod].length - 1].fiatValue,
     });
     setIsDragging(false);
   };
 
-  const minValue = Math.min(...data[buttonPeriodProps.find(item => item.active).id].map(item => item.value));
+  const minValue = Math.min(...data[periodButtonProps.find(item => item.active).id].map(item => item.value));
 
-  const maxValue = Math.max(...data[buttonPeriodProps.find(item => item.active).id].map(item => item.value));
+  const maxValue = Math.max(...data[periodButtonProps.find(item => item.active).id].map(item => item.value));
 
   return {
     CustomYAxisTick,
@@ -149,7 +173,7 @@ const useChart = (data) => {
     handleMouseMove,
     handleMouseDown,
     handleMouseUp,
-    buttonPeriodProps,
+    periodButtonProps,
     detailInfo,
     minValue,
     maxValue,

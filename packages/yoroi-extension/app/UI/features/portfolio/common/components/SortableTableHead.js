@@ -1,25 +1,18 @@
 // @flow
+import { ReactNode } from 'react';
 import { TableHead, TableRow, TableCell, Stack, Typography } from '@mui/material';
 import { Icon } from '../../../../components/icons';
 import { useTheme } from '@mui/material/styles';
-
-export interface IHeadCells {
-  id: string;
-  label: string;
-  align: string;
-  sortType?: string;
-  disabledSort?: boolean;
-  isPadding?: boolean;
-}
+import { IHeadCell } from '../types/table';
 
 interface Props {
-  headCells: IHeadCells[];
+  headCells: IHeadCell[];
   order: string;
   orderBy: string;
   onRequestSort: (id: string) => void;
 }
 
-const SortableTableHead = ({ headCells, order, orderBy, onRequestSort }: Props) => {
+const SortableTableHead = ({ headCells, order, orderBy, onRequestSort }: Props): ReactNode => {
   const theme = useTheme();
 
   return (

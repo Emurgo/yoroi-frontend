@@ -1,15 +1,21 @@
+// @flow
+
+// CONSTANTS
 export const now = new Date();
-export const start24HoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000).getTime();
-export const start1WeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).getTime();
-export const start1MonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate()).getTime();
-export const start6MonthAgo = new Date(now.getFullYear(), now.getMonth() - 6, now.getDate()).getTime();
-export const start1YearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate()).getTime();
+export const start24HoursAgo: number = new Date(now.getTime() - 24 * 60 * 60 * 1000).getTime();
+export const start1WeekAgo: number = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).getTime();
+export const start1MonthAgo: number = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate()).getTime();
+export const start6MonthAgo: number = new Date(now.getFullYear(), now.getMonth() - 6, now.getDate()).getTime();
+export const start1YearAgo: number = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate()).getTime();
+
+// TYPES
+type TimePeriodType = '24H' | '1W' | '1M' | '6M' | '1Y';
 
 // UTILS
 const pad = (number: number, length: number) => {
   return String(number).padStart(length, '0');
 };
-const getQuantityBasedOnTimePeriod = (timePeriod: '24H' | '1W' | '1M' | '6M' | '1Y') => {
+const getQuantityBasedOnTimePeriod = (timePeriod: TimePeriodType) => {
   switch (timePeriod) {
     case '24H':
       return 96; // 4 data points per hour (every 15 minutes)
@@ -25,7 +31,7 @@ const getQuantityBasedOnTimePeriod = (timePeriod: '24H' | '1W' | '1M' | '6M' | '
       throw new Error('Invalid time period');
   }
 };
-const getFromTime = (timePeriod: '24H' | '1W' | '1M' | '6M' | '1Y', now: number) => {
+const getFromTime = (timePeriod: TimePeriodType, now: number) => {
   switch (timePeriod) {
     case '24H':
       return start24HoursAgo;
@@ -41,7 +47,7 @@ const getFromTime = (timePeriod: '24H' | '1W' | '1M' | '6M' | '1Y', now: number)
       throw new Error('Invalid time period');
   }
 };
-const getInterval = (timePeriod: '24H' | '1W' | '1M' | '6M' | '1Y') => {
+const getInterval = (timePeriod: TimePeriodType) => {
   switch (timePeriod) {
     case '24H':
       return 15 * 60 * 1000; // 15 minutes in milliseconds
@@ -57,14 +63,14 @@ const getInterval = (timePeriod: '24H' | '1W' | '1M' | '6M' | '1Y') => {
       throw new Error('Invalid time period');
   }
 };
-export const getRandomTime = (startDate, endDate) => {
+export const getRandomTime = (startDate: number, endDate: number) => {
   const date = new Date(startDate + Math.random() * (endDate - startDate));
   return date.toISOString();
 };
-const getRandomNumber = (min, max, toFixed) => {
+const getRandomNumber = (min: number, max: number, toFixed: number) => {
   return (Math.random() * (max - min) + min).toFixed(toFixed);
 };
-export const createChartData = (timePeriod: '24H' | '1W' | '1M' | '6M' | '1Y') => {
+export const createChartData = (timePeriod: TimePeriodType) => {
   const quantity = getQuantityBasedOnTimePeriod(timePeriod);
   const fromTime = getFromTime(timePeriod, now);
   const interval = getInterval(timePeriod);
@@ -86,8 +92,8 @@ export const createChartData = (timePeriod: '24H' | '1W' | '1M' | '6M' | '1Y') =
 
     return {
       time: utcString,
-      value: (value / 110).toFixed(2),
-      usd: (value / 100).toFixed(2),
+      value: Number((value / 110).toFixed(2)),
+      fiatValue: Number((value / 100).toFixed(2)),
     };
   });
   return tmp;

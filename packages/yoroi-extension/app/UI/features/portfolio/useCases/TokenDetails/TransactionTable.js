@@ -7,84 +7,31 @@ import moment from 'moment';
 import { useStrings } from '../../common/hooks/useStrings';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { Icon } from '../../../../components/icons';
-
-export const HistoryItemType = Object.freeze({
-  SENT: 1,
-  RECEIVED: 2,
-  ERROR: 3,
-  WITHDRAW: 4,
-  DELEGATE: 5,
-});
-
-export const HistoryItemStatus = Object.freeze({
-  LOW: 'Low',
-  HIGH: 'High',
-  FAILED: 'Failed',
-});
+import { HistoryItemStatus, HistoryItemType } from '../../common/types/transaction';
+import { mapStrings } from '../../common/helpers/transactionHelper';
+import { TransactionItemType } from '../../common/types/transaction';
+import { IHeadCell } from '../../common/types/table';
 
 const Container = styled(Box)(({ theme }) => ({
   width: '100%',
   margin: '30px 0',
 }));
 
-const TransactionTable = ({ history }) => {
+interface Props {
+  history: TransactionItemType[];
+}
+
+const TransactionTable = ({ history }: Props): Node => {
   const theme = useTheme();
   const strings = useStrings();
   const { unitOfAccount } = usePortfolio();
 
-  const headCells = [
+  const headCells: IHeadCell[] = [
     { id: 'transactionType', label: strings.transactionType, align: 'left' },
     { id: 'status', label: strings.status, align: 'left' },
     { id: 'fee', label: strings.fee, align: 'center' },
     { id: 'amount', label: strings.amount, align: 'right' },
   ];
-
-  const mapStrings = arr =>
-    arr.map(item => {
-      let labelTemp = '';
-      let statusTemp = '';
-
-      switch (item.type) {
-        case HistoryItemType.SENT:
-          labelTemp = strings.sent;
-          break;
-        case HistoryItemType.RECEIVED:
-          labelTemp = strings.received;
-          break;
-        case HistoryItemType.ERROR:
-          labelTemp = strings.transactionError;
-          break;
-        case HistoryItemType.WITHDRAW:
-          labelTemp = strings.rewardWithdraw;
-          break;
-        case HistoryItemType.DELEGATE:
-          labelTemp = strings.stakeDelegate;
-          break;
-
-        default:
-          break;
-      }
-
-      switch (item.status) {
-        case HistoryItemStatus.LOW:
-          statusTemp = strings.low;
-          break;
-        case HistoryItemStatus.HIGH:
-          statusTemp = strings.high;
-          break;
-        case HistoryItemStatus.FAILED:
-          statusTemp = strings.failed;
-          break;
-        default:
-          break;
-      }
-
-      return {
-        ...item,
-        label: labelTemp,
-        status: statusTemp,
-      };
-    });
 
   const groupedData = useMemo(() => {
     if (!history) return [];
@@ -92,7 +39,7 @@ const TransactionTable = ({ history }) => {
     const yesterday = new Date();
     yesterday.setDate(today.getDate() - 1);
 
-    return _.chain(mapStrings(history))
+    return _.chain(mapStrings(history, strings))
       .groupBy(t => {
         const time = new Date(t.time);
         time.setHours(0, 0, 0, 0); // set the time to 00:00:00 for grouping by day
@@ -141,7 +88,7 @@ const TransactionTable = ({ history }) => {
             </TableHead>
             <TableBody>
               {groupedData.map((item, index) => (
-                <Fragment key={index}>
+                <Fragment key={item.title}>
                   <Box
                     component="tr"
                     key={item.title}

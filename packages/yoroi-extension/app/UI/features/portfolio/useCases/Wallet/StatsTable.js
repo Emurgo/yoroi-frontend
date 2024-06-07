@@ -10,10 +10,10 @@ import { useNavigateTo } from '../../common/hooks/useNavigateTo';
 import { useStrings } from '../../common/hooks/useStrings';
 import useTableSort from '../../common/hooks/useTableSort';
 import Table from '../../common/components/Table';
+import { IHeadCell } from '../../common/types/table';
 
-const TableRowSkeleton = ({ id, theme, ...props }) => (
+const TableRowSkeleton = ({ theme, ...props }) => (
   <TableRow
-    key={id}
     {...props}
     sx={{
       '& td': { border: 0 },
@@ -71,7 +71,7 @@ const StatsTable = ({ data, isLoading }) => {
   });
   const list = useMemo(() => [...data], [data]);
 
-  const headCells = [
+  const headCells: IHeadCell[] = [
     { id: 'name', label: strings.name, align: 'left', sortType: 'character' },
     { id: 'price', label: strings.price, align: 'left', sortType: 'numeric' },
     { id: '24h', label: strings['24H'], align: 'left', sortType: 'numeric' },

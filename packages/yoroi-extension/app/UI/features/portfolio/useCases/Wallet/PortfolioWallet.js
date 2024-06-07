@@ -1,19 +1,24 @@
 // @flow
 import { Typography, Stack, Box, Input, styled } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { Tooltip, SearchInput } from '../../../../components';
 import { useTheme } from '@mui/material/styles';
 import StatsTable from './StatsTable';
 import mockData from '../../common/mockData';
 import PortfolioHeader from '../../common/components/PortfolioHeader';
 import { useStrings } from '../../common/hooks/useStrings';
+import { TokenType } from '../../common/types/index';
 
-const PortfolioWallet = ({ data }) => {
+interface Props {
+  data: TokenType[];
+}
+
+const PortfolioWallet = ({ data }: Props): ReactNode => {
   const theme = useTheme();
   const strings = useStrings();
-  const [keyword, setKeyword] = useState('');
+  const [keyword, setKeyword] = useState();
   const [isLoading, setIsLoading] = useState();
-  const [tokenList, setTokenList] = useState([]);
+  const [tokenList, setTokenList] = useState(data);
 
   useEffect(() => {
     // FAKE FETCHING DATA TO SEE SKELETON

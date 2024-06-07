@@ -1,17 +1,19 @@
 // @flow
 import { useCallback } from 'react';
-import type { IHeadCells } from '../components/SortableTableHead';
+import { TokenType, IHeadCell } from '../types/index';
+
+export type TableSortType = 'character' | 'numeric';
 
 interface Props {
   order: string;
   orderBy: string;
-  setSortState: () => void;
-  headCells: IHeadCells[];
-  data: any[];
+  setSortState: (sortState: { order: string, orderBy: string }) => void;
+  headCells: IHeadCell[];
+  data: TokenType[];
 }
 
 const useTableSort = ({ order, orderBy, setSortState, headCells, data }: Props) => {
-  const handleRequestSort = property => {
+  const handleRequestSort = (property: string) => {
     let direction = 'asc';
     if (order === 'asc') {
       if (property === orderBy) {
@@ -28,7 +30,7 @@ const useTableSort = ({ order, orderBy, setSortState, headCells, data }: Props) 
     });
   };
 
-  const descendingComparator = (a, b, sortType) => {
+  const descendingComparator = (a: any, b: any, sortType: TableSortType) => {
     switch (sortType) {
       case 'numeric':
         if (parseFloat(b[orderBy]) < parseFloat(a[orderBy])) {
@@ -48,7 +50,7 @@ const useTableSort = ({ order, orderBy, setSortState, headCells, data }: Props) 
   };
 
   const getSortedData = useCallback(
-    arr => {
+    (arr: any[]) => {
       if (!orderBy || !order) return data;
       const sortColumn = headCells.find(cell => cell.id === orderBy);
       const sortType = sortColumn?.sortType ?? 'character';

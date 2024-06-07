@@ -1,4 +1,5 @@
 // @flow
+import { ReactNode } from 'react';
 import SubMenu from '../../../../../components/topbar/SubMenu';
 import type { SubMenuOption } from '../topbar/SubMenu';
 import { ROUTES } from '../../../../../routes-config';
@@ -10,7 +11,7 @@ interface Props {
   isActiveItem: string => boolean;
 }
 
-const PortfolioMenu = ({ onItemClick, isActiveItem }: Props): Node => {
+const PortfolioMenu = ({ onItemClick, isActiveItem }: Props): ReactNode => {
   const strings = useStrings();
 
   const portfolioOptions: SubMenuOption[] = [

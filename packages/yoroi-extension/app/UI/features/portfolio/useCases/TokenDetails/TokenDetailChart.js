@@ -1,6 +1,6 @@
 // @flow
 import { Box, Button, Stack, styled, Typography } from '@mui/material';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { ReactNode, useEffect, useMemo, useState } from 'react';
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Label, Tooltip as RechartTooltip } from 'recharts';
 import { useTheme } from '@mui/material/styles';
 import { Skeleton, Tooltip, Chip } from '../../../../components';
@@ -9,6 +9,7 @@ import { useStrings } from '../../common/hooks/useStrings';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { Icon } from '../../../../components/icons';
 import useChart from '../../common/hooks/useChart';
+import { TokenType } from '../../common/types/index';
 
 const StyledButton = styled(Button)(({ theme, disabled, variant }) => ({
   fontWeight: 500,
@@ -28,7 +29,13 @@ const StyledButton = styled(Button)(({ theme, disabled, variant }) => ({
   },
 }));
 
-const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
+interface Props {
+  isLoading: boolean;
+  tokenInfo: TokenType;
+  isAda: boolean;
+}
+
+const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): ReactNode => {
   const chartHeight = isAda ? 156 : 241;
   const theme = useTheme();
   const strings = useStrings();
@@ -40,7 +47,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
     handleMouseMove,
     handleMouseDown,
     handleMouseUp,
-    buttonPeriodProps,
+    periodButtonProps,
     detailInfo,
     minValue,
     maxValue,
@@ -61,7 +68,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
             <Skeleton width="64px" height="13px" />
           ) : (
             <Stack direction="row" alignItems="flex-end" color="ds.gray_cmax">
-              <Typography fontWeight="500">{detailInfo.usd}</Typography>
+              <Typography fontWeight="500">{detailInfo.fiatValue}</Typography>
               <Typography variant="caption1" sx={{ marginBottom: theme.spacing(0.25) }}>
                 &nbsp;{unitOfAccount}
               </Typography>
@@ -102,11 +109,11 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
                 <Skeleton width="35px" height="16px" />
               ) : (
                 <Chip
-                  active={detailInfo.usd >= 0}
+                  active={detailInfo.fiatValue >= 0}
                   label={
                     <Typography variant="caption1">
-                      {detailInfo.usd >= 0 && '+'}
-                      {detailInfo.usd} {unitOfAccount}
+                      {detailInfo.fiatValue >= 0 && '+'}
+                      {detailInfo.fiatValue} {unitOfAccount}
                     </Typography>
                   }
                 />
@@ -129,7 +136,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
           {isLoading ? null : (
             <ResponsiveContainer width="100%" height={chartHeight} style={{ padding: 0 }}>
               <LineChart
-                data={tokenInfo.chartData[buttonPeriodProps.find(item => item.active).id]}
+                data={tokenInfo.chartData[periodButtonProps.find(item => item.active).id]}
                 onMouseDown={handleMouseDown}
                 onMouseUp={handleMouseUp}
                 onMouseMove={handleMouseMove}
@@ -151,7 +158,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
                       chartBottom={chartHeight}
                       rectWidth={93}
                       rectHeight={34}
-                      dataLength={tokenInfo.chartData[buttonPeriodProps.find(item => item.active).id].length}
+                      dataLength={tokenInfo.chartData[periodButtonProps.find(item => item.active).id].length}
                       {...props}
                     />
                   )}
@@ -167,14 +174,14 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }) => {
         </Box>
 
         <Stack direction="row" justifyContent="space-between" sx={{ marginTop: theme.spacing(3) }}>
-          {buttonPeriodProps.map(period => (
+          {periodButtonProps.map(({ id, active, label }) => (
             <StyledButton
-              key={period.label}
-              variant={period.active ? 'contained' : 'text'}
+              key={id}
+              variant={active ? 'contained' : 'text'}
               disabled={isLoading}
-              onClick={() => handleChoosePeriod(period.label)}
+              onClick={() => handleChoosePeriod(id)}
             >
-              {period.label}
+              {label}
             </StyledButton>
           ))}
         </Stack>

@@ -1,5 +1,5 @@
 // @flow
-import { useMemo, useState } from 'react';
+import { ReactNode, useMemo, useState } from 'react';
 import { TableCell, TableRow, Typography, Stack, Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
@@ -13,10 +13,11 @@ import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { Icon } from '../../../../components/icons';
 import useTableSort from '../../common/hooks/useTableSort';
 import Table from '../../common/components/Table';
+import { IHeadCell } from '../../common/types/table';
+import { OrderItemType } from '../../common/types/index';
 
-const TableRowSkeleton = ({ id, theme, ...props }) => (
+const TableRowSkeleton = ({ theme, ...props }) => (
   <TableRow
-    key={id}
     {...props}
     sx={{
       '& td': { border: 0 },
@@ -62,18 +63,23 @@ const TableRowSkeleton = ({ id, theme, ...props }) => (
   </TableRow>
 );
 
-const OrderTable = ({ data, isLoading }) => {
+interface Props {
+  data: OrderItemType[];
+  isLoading: boolean;
+}
+
+const OrderTable = ({ data, isLoading }: Props): ReactNode => {
   const theme = useTheme();
   const navigateTo = useNavigateTo();
   const strings = useStrings();
   const { unitOfAccount } = usePortfolio();
   const [{ order, orderBy }, setSortState] = useState({
-    order: null,
-    orderBy: null,
+    order: '',
+    orderBy: '',
   });
   const list = useMemo(() => [...data], [data]);
 
-  const headCells = [
+  const headCells: IHeadCell[] = [
     { id: 'pair', label: strings.pair, align: 'left', disabledSort: true },
     { id: 'DEX', label: strings.dex, align: 'left', disabledSort: true },
     { id: 'assetPrice', label: strings.assetPrice, align: 'left', disabledSort: true },
