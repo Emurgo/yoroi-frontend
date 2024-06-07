@@ -8,7 +8,7 @@ import { useGovernance } from '../../features/governace/module/GovernanceContext
 type Props = {
   stores: any;
   actions: any;
-  children?: React.ReactNode;
+  children: React.ReactNode;
 };
 
 const GovernanceLayout = ({ stores, actions, children }: Props): any => {
