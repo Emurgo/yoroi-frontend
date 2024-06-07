@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import TopBarLayout from '../../components/layout/TopBarLayout';
@@ -9,7 +10,7 @@ import { ModalManager } from '../components/modals/ModalManager';
 import { IntlProvider } from '../context/IntlProvider';
 
 @observer
-class GeneralPageLayout extends ComponentType {
+class GeneralPageLayout extends React.Component {
   static defaultProps = {
     children: undefined,
   };

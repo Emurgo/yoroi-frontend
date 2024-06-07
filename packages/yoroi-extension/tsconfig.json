@@ -1,9 +1,11 @@
 {
     "compilerOptions": {
-      "declaration": true,
-      "baseUrl": "./app",
+      "allowJs": true,
       "allowUnreachableCode": false,
       "allowUnusedLabels": false,
+      "baseUrl": "./app",
+      "checkJs": false,
+      "declaration": true,
       "esModuleInterop": true,
       "forceConsistentCasingInFileNames": true,
       "jsx": "react",
