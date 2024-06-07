@@ -141,6 +141,7 @@
   },
   "dependencies": {
     "@amplitude/analytics-browser": "^2.1.3",
+    "@babel/preset-typescript": "^7.24.7",
     "@cardano-foundation/ledgerjs-hw-app-cardano": "6.0.0",
     "@emotion/react": "^11.4.1",
     "@emotion/styled": "^11.3.0",
@@ -218,6 +219,8 @@
     "stream-browserify": "3.0.0",
     "tinycolor2": "1.4.2",
     "trezor-connect-flow": "Emurgo/trezor-connect-flow#92d6d8c8faef25c0ea1d481aa1ecb4ba77ce539c",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.4.5",
     "ua-parser-js": "1.0.37",
     "util": "0.12.5"
   },
