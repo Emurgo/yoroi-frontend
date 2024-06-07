@@ -3,7 +3,7 @@ import { invalid } from '@yoroi/common';
 import { produce } from 'immer';
 
 type VoteKind = 'none' | 'delegate' | 'abstain' | 'no-confidence';
-type Vote = { kind: VoteKind; drepID?: string };
+export type Vote = { kind: VoteKind; drepID?: string };
 
 // Define types
 export type GovernanceActions = {

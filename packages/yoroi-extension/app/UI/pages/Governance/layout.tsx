@@ -1,20 +1,17 @@
+import React from 'react';
 import GeneralPageLayout from '../../layout/GeneralPageLayout';
-import { GovernanceStatusSelection } from '../../features/governace/useCases/SelectGovernanceStatus/GovernanceStatusSelection';
 import NavBarContainerRevamp from '../../../containers/NavBarContainerRevamp';
-import NavBar from '../../../components/topbar/NavBar';
 import NavBarTitle from '../../../components/topbar/NavBarTitle';
-import { TransactionSubmitted } from '../../components/TransactionSubmitted/TransactionSubmitted';
-import { GovernanceProvider as GovernanceExternalPackageProvider } from '@yoroi/staking';
-import { useGovernance } from '../../features/governace/module/GovernanceContextProvider';
+import { GovernanceProvider as GovernanceExternalPackageProvider, useGovernance } from '@yoroi/staking';
 
-type Props = {|
-  stores: any,
-  actions: any,
-  children?: React$Node,
-|};
+type Props = {
+  stores: any;
+  actions: any;
+  children?: React.ReactNode;
+};
 
 const GovernanceLayout = ({ stores, actions, children }: Props): any => {
-  const { governanceManager } = useGovernance();
+  const { manager } = useGovernance();
 
   return (
     <GeneralPageLayout
@@ -22,7 +19,7 @@ const GovernanceLayout = ({ stores, actions, children }: Props): any => {
       actions={actions}
       navbar={<NavBarContainerRevamp actions={actions} stores={stores} title={<NavBarTitle title={'Governance'} />} />}
     >
-      <GovernanceExternalPackageProvider manager={governanceManager}>{children}</GovernanceExternalPackageProvider>
+      <GovernanceExternalPackageProvider manager={manager}>{children}</GovernanceExternalPackageProvider>
     </GeneralPageLayout>
   );
 };

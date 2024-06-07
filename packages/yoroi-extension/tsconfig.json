@@ -1,28 +1,30 @@
 {
-    "compilerOptions": {
-      "allowJs": true,
-      "allowUnreachableCode": false,
-      "allowUnusedLabels": false,
-      "baseUrl": "./app",
-      "checkJs": false,
-      "declaration": true,
-      "esModuleInterop": true,
-      "forceConsistentCasingInFileNames": true,
-      "jsx": "react",
-      "lib": ["es6"],
-      "module": "esnext",
-      "moduleResolution": "node",
-      "noFallthroughCasesInSwitch": true,
-      "noImplicitReturns": true,
-      "noImplicitUseStrict": false,
-      "noStrictGenericChecks": false,
-      "noUncheckedIndexedAccess": true,
-      "noUnusedLocals": true,
-      "noUnusedParameters": true,
-      "resolveJsonModule": true,
-      "skipLibCheck": true,
-      "strict": true,
-      "target": "esnext"
-    }
-  }
-  
+  "compilerOptions": {
+    /* Language and Environment */
+    "declaration": true,
+    "target": "es2016",                     
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    /* Modules */
+    "esModuleInterop": true,
+    "module": "commonjs",                               
+    "forceConsistentCasingInFileNames": true,           
+    "jsx": "react",
+
+    /* Type Checking */
+    "moduleResolution": "node",
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noImplicitUseStrict": false,
+    "noStrictGenericChecks": false,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noImplicitAny": false
+  },
+  "include": ["app/UI/**/*"],
+
+}

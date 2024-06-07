@@ -20,6 +20,7 @@ export const TransactionSubmitted = () => {
         <FormattedMessage {...globalMessages.transactionSubmittedInfo} />
       </Typography>
       <Button
+        //  @ts-ignore
         variant="primary"
         onClick={() => {
           history.push(ROUTES.WALLETS.TRANSACTIONS);
