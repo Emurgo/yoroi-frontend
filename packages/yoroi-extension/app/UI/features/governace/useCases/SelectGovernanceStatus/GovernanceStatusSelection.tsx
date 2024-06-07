@@ -1,7 +1,4 @@
-// @flow
 import * as React from 'react';
-import type { Node } from 'react';
-import { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -11,7 +8,6 @@ import { useStrings } from '../../common/useStrings';
 import { Abstein } from '../../common/ilustrations/Abstein';
 import { NoConfidance } from '../../common/ilustrations/NoConfidance';
 import { Stack } from '@mui/material';
-import { Button } from '@mui/material';
 import Link from '@mui/material/Link';
 import { useModal } from '../../../../components/modals/ModalContext';
 import { ChooseDRepModal } from '../../common/ChooseDRepModal';
@@ -36,9 +32,9 @@ const mapStatus = {
   'no-confidence': 'No confidence',
 };
 
-export const GovernanceStatusSelection = (): Node => {
-  const [pendingVote, setPendingVote] = React.useState<boolean>(false);
-  const [pendingPage, setPendingPage] = React.useState<boolean>(false);
+export const GovernanceStatusSelection = () => {
+  const [pendingVote] = React.useState<boolean>(false);
+  const [pendingPage] = React.useState<boolean>(false);
   const navigateTo = useNavigateTo();
 
   const { openModal } = useModal();

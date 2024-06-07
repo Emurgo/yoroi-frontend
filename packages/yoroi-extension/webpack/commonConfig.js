@@ -44,7 +44,7 @@ const plugins = (folder /*: string */, _networkName /*: string */) /*: * */ => {
       template: path.join(__dirname, '../ledger/index.html'),
       favicon: path.join(__dirname, '../ledger/assets/img/favicon.ico'),
       chunks: ['ledger'],
-      alwaysWriteToDisk: true
+      alwaysWriteToDisk: true,
     }),
 
     /**
@@ -73,7 +73,7 @@ const plugins = (folder /*: string */, _networkName /*: string */) /*: * */ => {
   ];
 };
 
-const rules /*: boolean => Array<*> */ = (_isDev) => [
+const rules /*: boolean => Array<*> */ = _isDev => [
   // Pdfjs Worker webpack config, reference to issue: https://github.com/mozilla/pdf.js/issues/7612#issuecomment-315179422
   {
     test: /pdf\.worker(\.min)?\.js$/,
@@ -92,7 +92,7 @@ const rules /*: boolean => Array<*> */ = (_isDev) => [
           modules: {
             mode: 'local',
             localIdentName: '[name]__[local]___[hash:base64:5]',
-          }
+          },
         },
       },
       {
@@ -100,10 +100,10 @@ const rules /*: boolean => Array<*> */ = (_isDev) => [
         options: {
           postcssOptions: {
             plugins: () => [autoprefixer],
-          }
-        }
-      }
-    ]
+          },
+        },
+      },
+    ],
   },
   {
     test: /\.global\.scss$/,
@@ -119,8 +119,8 @@ const rules /*: boolean => Array<*> */ = (_isDev) => [
           },
         },
       },
-      'sass-loader'
-    ]
+      'sass-loader',
+    ],
   },
   {
     test: /^((?!\.global).)*\.scss$/,
@@ -135,15 +135,15 @@ const rules /*: boolean => Array<*> */ = (_isDev) => [
           modules: {
             mode: 'local',
             localIdentName: '[name]_[local]',
-          }
+          },
         },
       },
-      'sass-loader'
-    ]
+      'sass-loader',
+    ],
   },
   {
     test: /\.(eot|otf|ttf|woff|woff2|gif|png)$/,
-    include: [ path.resolve(__dirname, '../ledger') ],
+    include: [path.resolve(__dirname, '../ledger')],
     loader: 'file-loader',
     options: {
       esModule: false,
@@ -157,26 +157,32 @@ const rules /*: boolean => Array<*> */ = (_isDev) => [
   {
     test: /\.svg$/,
     issuer: { not: [/\.scss$/] },
-    use: [{
-      loader: '@svgr/webpack',
-      options: {
-        svgoConfig: {
-          plugins: [{
-            removeViewBox: false
-          }]
-        }
-      }
-    }, 'file-loader']
+    use: [
+      {
+        loader: '@svgr/webpack',
+        options: {
+          svgoConfig: {
+            plugins: [
+              {
+                removeViewBox: false,
+              },
+            ],
+          },
+        },
+      },
+      'file-loader',
+    ],
   },
   {
     test: /\.md$/,
-    use: [
-      'html-loader',
-      'markdown-loader',
-    ]
+    use: ['html-loader', 'markdown-loader'],
+  },
+  {
+    test: /\.tsx?$/,
+    use: 'ts-loader',
+    exclude: /node_modules/,
   },
 ];
-
 
 const optimization = {
   // https://github.com/webpack/webpack/issues/7470
@@ -187,11 +193,11 @@ const optimization = {
     chunks: 'all',
     // Firefox require all files to be <4MBs
     maxSize: 4000000,
-  }
+  },
 };
 
 const resolve = () /*: * */ => ({
-  extensions: ['*', '.js', '.wasm'],
+  extensions: ['*', '.tsx', '.ts', '.js', '.wasm'],
   fallback: {
     vm: false,
     fs: false,
@@ -203,7 +209,7 @@ const resolve = () /*: * */ => ({
     assert: require.resolve('assert/'),
     util: require.resolve('util/'),
   },
-  alias: { process: 'process/browser', }
+  alias: { process: 'process/browser' },
 });
 
 const definePlugin = (
@@ -216,21 +222,17 @@ const definePlugin = (
     'process.env': {
       NODE_ENV: JSON.stringify(isProd ? 'production' : 'development'),
       COMMIT: JSON.stringify(
-        shell.exec(
-          'if [ -e ../../COMMIT ]; then cat ../../COMMIT; else git rev-parse HEAD; fi',
-          { silent: true }
-        ).trim()
+        shell.exec('if [ -e ../../COMMIT ]; then cat ../../COMMIT; else git rev-parse HEAD; fi', { silent: true }).trim()
       ),
       BRANCH: JSON.stringify(
-        shell.exec(
-          'if [ -e ../../BRANCH ]; then cat ../../BRANCH; else git rev-parse --abbrev-ref HEAD; fi',
-          { silent: true }
-        ).trim()
+        shell
+          .exec('if [ -e ../../BRANCH ]; then cat ../../BRANCH; else git rev-parse --abbrev-ref HEAD; fi', { silent: true })
+          .trim()
       ),
       NIGHTLY: isNightly,
       POOLS_UI_URL_FOR_YOROI: JSON.stringify(manifestEnvs.POOLS_UI_URL_FOR_YOROI),
-      IS_LIGHT: isLight ,
-    }
+      IS_LIGHT: isLight,
+    },
   };
 };
 
@@ -240,5 +242,5 @@ module.exports = {
   optimization,
   resolve,
   definePlugin,
-  experiments: { syncWebAssembly: true }
+  experiments: { syncWebAssembly: true },
 };

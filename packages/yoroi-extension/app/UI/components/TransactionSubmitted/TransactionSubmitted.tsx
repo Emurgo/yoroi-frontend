@@ -2,9 +2,11 @@ import React from 'react';
 import { Stack, Typography, Button } from '@mui/material';
 import { SuccessIlustration } from './SuccessIlustration';
 import { useHistory } from 'react-router-dom';
+// @ts-ignore
 import { ROUTES } from '../../../routes-config';
-import { FormattedMessage } from 'react-intl';
+// @ts-ignore
 import globalMessages from '../../../i18n/global-messages';
+import { FormattedMessage } from 'react-intl';
 
 export const TransactionSubmitted = () => {
   const history = useHistory();

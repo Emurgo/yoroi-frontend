@@ -3,13 +3,13 @@ import { invalid } from '@yoroi/common';
 import { produce } from 'immer';
 
 type VoteKind = 'none' | 'delegate' | 'abstain' | 'no-confidence';
-type Vote = {| kind: VoteKind, drepID?: string |};
+type Vote = { kind: VoteKind; drepID?: string };
 
 // Define types
-export type GovernanceActions = {|
-  +governanceVoteChanged: (vote: Vote) => void,
-  +dRepIdChanged: (id: string) => void,
-|};
+export type GovernanceActions = {
+  governanceVoteChanged: (vote: Vote) => void;
+  dRepIdChanged: (id: string) => void;
+};
 
 export const GovernanceActionType = Object.freeze({
   GovernanceVoteChanged: 'governanceVoteChanged',
@@ -17,20 +17,20 @@ export const GovernanceActionType = Object.freeze({
 });
 
 export type GovernanceAction =
-  | {|
-      type: typeof GovernanceActionType.GovernanceVoteChanged,
-      governanceVote: Vote,
-    |}
-  | {|
-      type: typeof GovernanceActionType.DRepIdChanged,
-      dRepId: '',
-    |};
+  | {
+      type: typeof GovernanceActionType.GovernanceVoteChanged;
+      governanceVote: Vote;
+    }
+  | {
+      type: typeof GovernanceActionType.DRepIdChanged;
+      dRepId: '';
+    };
 
 // Define state type
-export type GovernanceState = {|
-  governanceVote: Vote,
-  dRepId: ?string,
-|};
+export type GovernanceState = {
+  governanceVote: Vote;
+  dRepId?: string;
+};
 
 // Define default state
 export const defaultGovernanceState: GovernanceState = {
