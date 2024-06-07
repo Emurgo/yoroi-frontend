@@ -36,6 +36,7 @@ export const PortfolioContextProvider = ({
     unitOfAccount: settingFiatPairUnit.enabled ? settingFiatPairUnit.currency : 'USD',
   },
 }: PortfolioProviderProps) => {
+
   const [state, dispatch] = React.useReducer(PortfolioReducer, {
     ...defaultPortfolioState,
     ...initialState,

@@ -996,14 +996,6 @@ const globalMessages: * = defineMessages({
     id: 'buysell.dialog.provider',
     defaultMessage: '!!!Provider',
   },
-  portfolioHeaderText: {
-    id: 'portfolio.main.header.text',
-    defaultMessage: '!!!Tokens',
-  },
-  portfolioDetailHeaderText: {
-    id: 'portfolio.detail.header.text',
-    defaultMessage: '!!!Token details',
-  },
 });
 export default globalMessages;
 

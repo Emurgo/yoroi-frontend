@@ -5,11 +5,19 @@ import { useIntl } from '../../../../context/IntlProvider';
 
 export const messages = Object.freeze(
   defineMessages({
-    headerWallet: {
+    mainHeaderText: {
+      id: 'portfolio.main.header.text',
+      defaultMessage: '!!!Tokens',
+    },
+    detailHeaderText: {
+      id: 'portfolio.detail.header.text',
+      defaultMessage: '!!!Token details',
+    },
+    menuWallet: {
       id: 'portfolio.menu.wallet.link.label',
       defaultMessage: '!!!Wallet',
     },
-    headerDapps: {
+    menuDapps: {
       id: 'portfolio.menu.dapps.link.label',
       defaultMessage: '!!!Dapps',
     },
@@ -307,8 +315,10 @@ export const messages = Object.freeze(
 export const useStrings = () => {
   const { intl } = useIntl();
   return React.useRef({
-    headerWallet: intl.formatMessage(messages.headerWallet),
-    headerDapps: intl.formatMessage(messages.headerDapps),
+    mainHeaderText: intl.formatMessage(messages.mainHeaderText),
+    detailHeaderText: intl.formatMessage(messages.detailHeaderText),
+    menuWallet: intl.formatMessage(messages.menuWallet),
+    menuDapps: intl.formatMessage(messages.menuDapps),
     dapps: intl.formatMessage(messages.dapps),
     copyToClipboard: intl.formatMessage(messages.copyToClipboard),
     copied: intl.formatMessage(messages.copied),

@@ -16,12 +16,12 @@ const PortfolioMenu = ({ onItemClick, isActiveItem }: Props): ReactNode => {
 
   const portfolioOptions: SubMenuOption[] = [
     {
-      label: `${strings.headerWallet} (${mockData.wallet.tokenList.length})`,
+      label: `${strings.menuWallet} (${mockData.wallet.tokenList.length})`,
       route: ROUTES.PORTFOLIO.ROOT,
       className: 'wallet',
     },
     {
-      label: `${strings.headerDapps} (${mockData.dapps.liquidityList.length + mockData.dapps.orderList.length})`,
+      label: `${strings.menuDapps} (${mockData.dapps.liquidityList.length + mockData.dapps.orderList.length})`,
       route: ROUTES.PORTFOLIO.DAPPS,
       className: 'dapps',
     },
