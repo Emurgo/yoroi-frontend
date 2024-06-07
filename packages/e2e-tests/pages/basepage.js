@@ -93,7 +93,8 @@ class BasePage {
   }
   async getText(locator) {
     this.logger.info(`BasePage::getText is called. Locator: ${JSON.stringify(locator)}`);
-    return await this.driver.findElement(getByLocator(locator)).getText();
+    const locatorElem = await this.waitForElement(locator);
+    return await locatorElem.getText();
   }
   async getCssValue(locator, cssStyleProperty) {
     this.logger.info(
