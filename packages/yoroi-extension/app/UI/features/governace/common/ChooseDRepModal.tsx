@@ -4,11 +4,11 @@ import * as React from 'react';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
-import { TextInput } from '../../../components/index';
 import { parseDrepId } from '@yoroi/staking';
 import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { useGovernance } from '../module/GovernanceContextProvider';
 import { useStrings } from './useStrings';
+import { TextInput } from '../../../components/Input/TextInput';
 
 type ChooseDRepModallProps = {
   onSubmit?: (drepId: string) => void;
@@ -43,8 +43,8 @@ export const ChooseDRepModal = ({ onSubmit }: ChooseDRepModallProps) => {
 
   return (
     <Stack justifyContent="flex-between">
-      <Stack pb="50px">
-        <Typography variant="body1" textAlign="center" mb="34px">
+      <Stack pb="48px">
+        <Typography variant="body1" textAlign="center" mb="24px">
           {strings.identifyDrep}
         </Typography>
         <TextInput
@@ -59,7 +59,7 @@ export const ChooseDRepModal = ({ onSubmit }: ChooseDRepModallProps) => {
           value={drepId}
           error={error}
           helperText={error ? strings.incorectFormat : ' '}
-          defaultValue="drep1wn0dklu87w8d9pkuyr7jalulgvl9w2he0hn0fne9k5a6y4d55mt"
+          // defaultValue="drep1wn0dklu87w8d9pkuyr7jalulgvl9w2he0hn0fne9k5a6y4d55mt"
         />
       </Stack>
       {/* @ts-ignore */}

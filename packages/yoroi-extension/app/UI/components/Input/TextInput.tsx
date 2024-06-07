@@ -1,5 +1,3 @@
-// @flow
-
 import React from 'react';
 import TextField from '@mui/material/TextField';
 import { styled } from '@mui/material/styles';
@@ -21,9 +19,10 @@ export const TextInput = ({ id, label, onChange, value, error, helperText }: Sty
 };
 
 const SInput = styled(TextField)(({ theme, error }: any) => ({
+  margin: '0px 0px',
   '& .MuiFormHelperText-root': {
     position: 'absolute',
-    bottom: -22,
+    bottom: -2,
     left: -10,
   },
   '& .MuiInputLabel-root': {
