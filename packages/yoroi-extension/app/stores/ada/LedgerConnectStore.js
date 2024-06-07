@@ -28,7 +28,7 @@ import { Logger, stringifyData, stringifyError } from '../../utils/logging';
 import { CoinTypes, HARD_DERIVATION_START, WalletTypePurpose, } from '../../config/numbersConfig';
 import { Bip44DerivationLevels, } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import { genTimeToSlot, } from '../../api/ada/lib/storage/bridge/timeUtils';
+import TimeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
 import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
@@ -219,19 +219,16 @@ export default class LedgerConnectStore
     const fullConfig = getCardanoHaskellBaseConfig(
       selectedNetwork
     );
-    const timeToSlot = genTimeToSlot(fullConfig);
-
     try {
+      const currentTime = this.stores.serverConnectionStore.serverTime ?? new Date();
       await this.stores.substores.ada.yoroiTransfer.transferRequest.execute({
         cip1852AccountPubKey,
         bip44AccountPubKey,
         accountIndex: this.derivationIndex,
         checkAddressesInUse: stateFetcher.checkAddressesInUse,
         getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,
-        absSlotNumber: new BigNumber(timeToSlot({
-          // use server time for TTL if connected to server
-          time: this.stores.serverConnectionStore.serverTime ?? new Date(),
-        }).slot),
+        // use server time for TTL if connected to server
+        absSlotNumber: new BigNumber(TimeUtils.timeToAbsoluteSlot(fullConfig, currentTime)),
         network: selectedNetwork,
         defaultToken: this.stores.tokenInfoStore.getDefaultTokenInfo(selectedNetwork.NetworkId),
       }).promise;

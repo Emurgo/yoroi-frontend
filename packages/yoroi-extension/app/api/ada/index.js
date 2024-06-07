@@ -106,7 +106,8 @@ import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 import type {
   AccountStateFunc,
   AddressUtxoFunc,
-  BestBlockFunc, FilterFunc,
+  BestBlockFunc,
+  FilterFunc,
   GetRecentTransactionHashesFunc,
   GetTransactionsByHashesFunc,
   HistoryFunc,
@@ -121,7 +122,8 @@ import type {
 import { getChainAddressesForDisplay, } from './lib/storage/models/utils';
 import { getAllAddressesForDisplay, rawGetAddressRowsForWallet, } from './lib/storage/bridge/traitUtils';
 import {
-  asAddressedUtxo, cardanoMinAdaRequiredFromAssets_coinsPerWord,
+  asAddressedUtxo,
+  cardanoMinAdaRequiredFromAssets_coinsPerWord,
   convertAdaTransactionsToExportRows,
   multiTokenFromCardanoValue,
   multiTokenFromRemote,
@@ -152,7 +154,7 @@ import type { PersistedSubmittedTransaction } from '../localStorage';
 import type { ForeignUtxoFetcher } from '../../connector/stores/ConnectorStore';
 import type WalletTransaction from '../../domain/WalletTransaction';
 import { derivePrivateByAddressing, derivePublicByAddressing } from './lib/cardanoCrypto/deriveByAddressing';
-import { genTimeToSlot } from './lib/storage/bridge/timeUtils';
+import TimeUtils from './lib/storage/bridge/timeUtils';
 import { connectorGetUsedAddresses } from '../../../chrome/extension/connector/api';
 
 // ADA specific Request / Response params
@@ -1621,10 +1623,7 @@ export default class AdaApi {
       if (changeAddr == null) {
         throw new Error(`${nameof(this.createSimpleTx)} no internal addresses left. Should never happen`);
       }
-      const timeToSlot = genTimeToSlot(fullConfig);
-      const absSlotNumber = new BigNumber(
-        timeToSlot({ time: new Date()}).slot
-      );
+      const absSlotNumber = new BigNumber(TimeUtils.timeToAbsoluteSlot(fullConfig, new Date()));
 
       const unsignedTx = await shelleyNewAdaUnsignedTx(
         request.entries,
@@ -2345,10 +2344,7 @@ export default class AdaApi {
     }
 
     const fullConfig = getCardanoHaskellBaseConfig(network);
-    const timeToSlot = genTimeToSlot(fullConfig);
-    const absSlotNumber = new BigNumber(timeToSlot({
-      time: new Date(),
-    }).slot);
+    const absSlotNumber = new BigNumber(TimeUtils.timeToAbsoluteSlot(fullConfig, new Date()));
     const targetAddress = reorgTargetAddress ?? (await connectorGetUsedAddresses(publicDeriver))[0];
     if (targetAddress == null) {
       throw new Error('unexpected: no target address or used addresses available');

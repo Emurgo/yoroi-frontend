@@ -47,7 +47,7 @@ import {
   toLibUTxO,
 } from '../../../app/api/ada/transactions/shelley/transactions';
 import { getCardanoHaskellBaseConfig, } from '../../../app/api/ada/lib/storage/database/prepackaged/networks';
-import { genTimeToSlot } from '../../../app/api/ada/lib/storage/bridge/timeUtils';
+import TimeUtils from '../../../app/api/ada/lib/storage/bridge/timeUtils';
 import type CardanoTxRequest from '../../../app/api/ada';
 import AdaApi from '../../../app/api/ada';
 import { bytesToHex, hexToBytes } from '../../../app/coreUtils';
@@ -886,10 +886,7 @@ export async function connectorCreateCardanoTx(
 
   const network = publicDeriver.getParent().getNetworkInfo();
   const fullConfig = getCardanoHaskellBaseConfig(network);
-  const timeToSlot = genTimeToSlot(fullConfig);
-  const absSlotNumber = new BigNumber(timeToSlot({
-    time: new Date(),
-  }).slot);
+  const absSlotNumber = new BigNumber(TimeUtils.timeToAbsoluteSlot(fullConfig, new Date()));
 
   const submittedTxs = await loadSubmittedTransactions() || [];
 

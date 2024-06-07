@@ -29,7 +29,6 @@ import type { QueriedUtxo } from '../../api/ada/lib/storage/models/PublicDeriver
 import { transactionHexToHash } from '../../api/ada/lib/cardanoCrypto/utils';
 import type { RemoteUnspentOutput } from '../../api/ada/lib/state-fetch/types';
 import type { CardanoConnectorSignRequest } from '../../connector/types';
-import { createSlotToTimestampFunc, } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { AddressDetails } from '../../api/ada';
 
 const FRONTEND_FEE_ADDRESS_MAINNET =
@@ -251,7 +250,9 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
     const network = wallet.getParent().getNetworkInfo();
     const globalSlotMap: { [string]: string } = await this.stores.substores.ada.stateFetchStore.fetcher
       .getTransactionSlotsByHashes({ network, txHashes: filteredTxHashes });
-    const slotToTimestamp: string => Date = await createSlotToTimestampFunc(network);
+    const timeCalcRequests = this.stores.substores.ada.time.getTimeCalcRequests(wallet);
+    const { toRealTime } = timeCalcRequests.requests;
+    const slotToTimestamp: string => Date = s => toRealTime({ absoluteSlotNum: Number(s) });
     runInAction(() => {
       for (const [tx,slot] of listEntries(globalSlotMap)) {
         this.transactionTimestamps[tx.toLowerCase()] = slotToTimestamp(slot);
