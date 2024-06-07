@@ -7,7 +7,7 @@ module.exports = {
     ecmaVersion: 6,
     sourceType: 'module',
     ecmaFeatures: {
-      legacyDecorators: true
+      legacyDecorators: true,
     },
   },
   extends: ['airbnb', 'prettier'],
@@ -15,7 +15,7 @@ module.exports = {
     browser: true,
     mocha: true,
     node: true,
-    jest: true
+    jest: true,
   },
   rules: {
     'func-names': 'off',
@@ -24,9 +24,12 @@ module.exports = {
     'consistent-return': 'off',
     'comma-dangle': 'off',
     'generator-star-spacing': 'off',
-    'import/no-unresolved': ['error', {
-      ignore: ['cardano-wallet-browser']
-    }],
+    'import/no-unresolved': [
+      'error',
+      {
+        ignore: ['cardano-wallet-browser'],
+      },
+    ],
     'import/no-extraneous-dependencies': 'off',
     'import/no-dynamic-require': 'off',
     'import/no-named-as-default': 'off',
@@ -92,6 +95,8 @@ module.exports = {
     'prefer-const': 1,
     'object-curly-spacing': 1,
     'spaced-comment': 0,
+    'simple-import-sort/exports': 'error',
+    'simple-import-sort/imports': 'error',
     quotes: ['error', 'single', { avoidEscape: true, allowTemplateLiterals: true }],
     'import/imports-first': 1,
     'react/jsx-indent': 1,
@@ -110,20 +115,13 @@ module.exports = {
     'react/jsx-first-prop-new-line': 0,
     'no-restricted-properties': [
       2,
-      { object: 'TrezorConnect', message: 'Use TrezorWrapper instead to minimize Trezor iframe lifespan', },
+      { object: 'TrezorConnect', message: 'Use TrezorWrapper instead to minimize Trezor iframe lifespan' },
     ],
     'import/no-unused-modules': [1, { unusedExports: true }],
-    'camelcase': 0,
+    camelcase: 0,
     'react/jsx-curly-brace-presence': 0,
   },
-  plugins: [
-    'import',
-    'promise',
-    'react',
-    'flowtype',
-    'no-floating-promise',
-    'prettier'
-  ],
+  plugins: ['import', 'promise', 'react', 'flowtype', 'no-floating-promise', 'prettier', 'eslint-plugin-simple-import-sort'],
   globals: {
     chrome: true,
     API: true,
@@ -132,5 +130,5 @@ module.exports = {
     CONFIG: true,
     yoroi: true,
     nameof: true,
-  }
+  },
 };

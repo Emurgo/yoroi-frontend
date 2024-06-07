@@ -20,23 +20,10 @@ export const Abstein = () => {
         d="M81.017 186.741L89.0735 180.635L194.422 243.604L186.366 249.722L81.017 186.741Z"
         fill="url(#paint2_linear_1598_4400)"
       />
-      <path
-        d="M89.2347 182.249L81.017 187.179V36.0272L89.2347 30V182.249Z"
-        fill="url(#paint3_linear_1598_4400)"
-      />
-      <path
-        opacity="0.8"
-        d="M186.205 250L81.017 187.35V35.0891L186.205 97.7513V250Z"
-        fill="#52FCFF"
-      />
-      <path
-        d="M194.422 244.757L186.204 249.687V98.535L194.422 92.5078V244.757Z"
-        fill="url(#paint4_linear_1598_4400)"
-      />
-      <path
-        d="M81.017 36.1063L89.0735 30L194.422 92.9693L186.366 99.0874L81.017 36.1063Z"
-        fill="url(#paint5_linear_1598_4400)"
-      />
+      <path d="M89.2347 182.249L81.017 187.179V36.0272L89.2347 30V182.249Z" fill="url(#paint3_linear_1598_4400)" />
+      <path opacity="0.8" d="M186.205 250L81.017 187.35V35.0891L186.205 97.7513V250Z" fill="#52FCFF" />
+      <path d="M194.422 244.757L186.204 249.687V98.535L194.422 92.5078V244.757Z" fill="url(#paint4_linear_1598_4400)" />
+      <path d="M81.017 36.1063L89.0735 30L194.422 92.9693L186.366 99.0874L81.017 36.1063Z" fill="url(#paint5_linear_1598_4400)" />
       <path
         opacity="0.8"
         d="M20.139 157.559L52.4696 176.445H52.4928L84.9622 157.791L52.6201 138.905L20.139 157.559Z"
@@ -119,14 +106,7 @@ export const Abstein = () => {
           <stop offset="0.89" stopColor="#3F71F1" />
           <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
-        <linearGradient
-          id="paint1_linear_1598_4400"
-          x1="216.194"
-          y1="226.98"
-          x2="260"
-          y2="226.98"
-          gradientUnits="userSpaceOnUse"
-        >
+        <linearGradient id="paint1_linear_1598_4400" x1="216.194" y1="226.98" x2="260" y2="226.98" gradientUnits="userSpaceOnUse">
           <stop stopColor="#17D1AA" />
           <stop offset="0.15" stopColor="#1ACBAF" />
           <stop offset="0.37" stopColor="#21B8BC" />

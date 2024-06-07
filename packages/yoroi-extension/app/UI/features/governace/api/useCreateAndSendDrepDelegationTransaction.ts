@@ -1,11 +1,11 @@
-// @flow
+import { Vote } from '../module/state';
 
 export const useCreateAndSendDrepDelegationTransaction = ({
   walletId,
   governanceVote,
-}: {|
-  walletId: string,
-  governanceVote: {| kind: string, drepID: string | null |},
-|}): void => {
+}: {
+  walletId: string;
+  governanceVote: Vote;
+}): void => {
   localStorage.setItem(`Governance - ${walletId}`, JSON.stringify(governanceVote));
 };

@@ -3,17 +3,16 @@
 import * as React from 'react';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import { TextInput } from '../../../components/index';
-import { parseDrepId, useIsValidDRepID } from '@yoroi/staking';
+import { parseDrepId } from '@yoroi/staking';
 import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { useGovernance } from '../module/GovernanceContextProvider';
 import { useStrings } from './useStrings';
 
-type ChooseDRepModallProps = {|
-  onSubmit?: (drepId: string) => void,
-|};
+type ChooseDRepModallProps = {
+  onSubmit?: (drepId: string) => void;
+};
 
 export const ChooseDRepModal = ({ onSubmit }: ChooseDRepModallProps) => {
   const [drepId, setDrepId] = React.useState('');
@@ -34,15 +33,13 @@ export const ChooseDRepModal = ({ onSubmit }: ChooseDRepModallProps) => {
 
   const confirmDRep = () => {
     parseDrepId(drepId, RustModule.CrossCsl.init('any'))
-      .then(parsedId => {
+      .then(_ => {
         onSubmit?.(drepId);
       })
-      .catch(err => {
+      .catch(_ => {
         setError(true);
       });
   };
-
-  const idInvalid = drepId.match(/\d+/g);
 
   return (
     <Stack justifyContent="flex-between">
@@ -65,7 +62,7 @@ export const ChooseDRepModal = ({ onSubmit }: ChooseDRepModallProps) => {
           defaultValue="drep1wn0dklu87w8d9pkuyr7jalulgvl9w2he0hn0fne9k5a6y4d55mt"
         />
       </Stack>
-
+      {/* @ts-ignore */}
       <Button onClick={confirmDRep} fullWidth variant="primary" disabled={error || drepId.length === 0}>
         {strings.confirm}
       </Button>
