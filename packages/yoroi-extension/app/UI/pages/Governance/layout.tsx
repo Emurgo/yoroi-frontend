@@ -1,4 +1,3 @@
-// @flow
 import GeneralPageLayout from '../../layout/GeneralPageLayout';
 import { GovernanceStatusSelection } from '../../features/governace/useCases/SelectGovernanceStatus/GovernanceStatusSelection';
 import NavBarContainerRevamp from '../../../containers/NavBarContainerRevamp';

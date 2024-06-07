@@ -1,5 +1,5 @@
 import React from 'react';
-import { defineMessages, IntlProvider } from 'react-intl';
+import { defineMessages } from 'react-intl';
 import { useIntl } from '../../../context/IntlProvider';
 
 export const messages = Object.freeze(

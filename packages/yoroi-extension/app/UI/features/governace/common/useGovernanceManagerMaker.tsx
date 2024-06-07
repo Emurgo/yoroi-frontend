@@ -1,6 +1,7 @@
 // @flow
 import React from 'react';
-import { governanceApiMaker, governanceManagerMaker, useStakingKeyState } from '@yoroi/staking';
+import { governanceApiMaker, governanceManagerMaker } from '@yoroi/staking';
+// @ts-ignore
 import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
 
 export const useGovernanceManagerMaker = (walletId: string, networkId: string): any => {

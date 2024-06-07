@@ -1,4 +1,3 @@
-// @flow
 import type { Node } from 'react';
 import type { StoresMap } from './stores/index';
 import type { ActionsMap } from './actions/index';

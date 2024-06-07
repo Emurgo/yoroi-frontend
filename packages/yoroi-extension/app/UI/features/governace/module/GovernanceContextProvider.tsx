@@ -1,4 +1,3 @@
-// flow
 import * as React from 'react';
 
 import {
@@ -11,9 +10,7 @@ import {
   GovernanceActions,
 } from './state';
 
-import { getStrings } from '../common/useStrings';
 import { useGovernanceManagerMaker } from '../common/useGovernanceManagerMaker';
-import type { Node } from 'react';
 
 const initialGovernanceProvider = {
   ...defaultGovernanceState,
@@ -22,8 +19,8 @@ const initialGovernanceProvider = {
 const GovernanceContext = React.createContext(initialGovernanceProvider);
 
 type GovernanceProviderProps = {
-  children: Node,
-  currentWallet: any, // TODO to be defined
+  children: Node;
+  currentWallet: any; // TODO to be defined
 };
 
 export const GovernanceContextProvider = ({ children, currentWallet }: GovernanceProviderProps) => {

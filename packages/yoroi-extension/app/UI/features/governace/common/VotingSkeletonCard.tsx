@@ -1,11 +1,10 @@
 // @flow
 import * as React from 'react';
-import type { Node } from 'react';
 import { Stack } from '@mui/material';
 import { Skeleton } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
-const StyledCard = styled(Stack)(({ theme, selected, pending }) => ({
+const StyledCard = styled(Stack)(({ theme }: any) => ({
   position: 'relative',
   display: 'flex',
   flexDirection: 'column',
@@ -18,7 +17,7 @@ const StyledCard = styled(Stack)(({ theme, selected, pending }) => ({
   boxShadow: 'inset 0 100vw white',
   border: '2px solid transparent',
 }));
-export const VotingSkeletonCard = (): Node => {
+export const VotingSkeletonCard = () => {
   return (
     <StyledCard>
       <Skeleton animation="wave" variant="rounded" width={157} height={180} sx={{ marginBottom: '22px' }} />
