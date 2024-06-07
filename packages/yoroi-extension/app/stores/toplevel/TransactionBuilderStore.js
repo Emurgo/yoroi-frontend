@@ -15,9 +15,6 @@ import type {
 import {
   isCardanoHaskell, getCardanoHaskellBaseConfig,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import {
-  genTimeToSlot,
-} from '../../api/ada/lib/storage/bridge/timeUtils';
 import type { TransactionMetadata } from '../../api/ada/lib/storage/bridge/metadataUtils';
 import {
   MultiToken,
@@ -342,8 +339,8 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
         throw new Error(`${nameof(this._updateTxBuilder)} missing chains functionality`);
       }
 
-      const fullConfig = getCardanoHaskellBaseConfig(network);
-      const timeToSlot = genTimeToSlot(fullConfig);
+      const { timeToSlot } = this.stores.substores.ada.time.getTimeCalcRequests(publicDeriver).requests;
+
       const absSlotNumber = new BigNumber(timeToSlot({
         // use server time for TTL if connected to server
         time: this.stores.serverConnectionStore.serverTime ?? new Date(),
@@ -377,10 +374,9 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       throw new Error(`${nameof(this._maxSendableAmount)} missing chains functionality`);
     }
 
+    const { timeToSlot } = this.stores.substores.ada.time.getTimeCalcRequests(publicDeriver).requests;
+
     this.shouldSendMax = true;
-    const network = publicDeriver.getParent().getNetworkInfo();
-    const fullConfig = getCardanoHaskellBaseConfig(network);
-    const timeToSlot = genTimeToSlot(fullConfig);
     const absSlotNumber = new BigNumber(timeToSlot({
       time: this.stores.serverConnectionStore.serverTime ?? new Date(),
     }).slot);

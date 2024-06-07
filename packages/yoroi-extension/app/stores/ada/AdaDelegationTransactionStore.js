@@ -14,8 +14,6 @@ import {
   asGetPublicKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import { genTimeToSlot } from '../../api/ada/lib/storage/bridge/timeUtils';
 import {
   isLedgerNanoWallet,
   isTrezorTWallet,
@@ -116,8 +114,8 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     }
     const basePubDeriver = withPublicKey;
 
-    const fullConfig = getCardanoHaskellBaseConfig(withHasUtxoChains.getParent().getNetworkInfo());
-    const timeToSlot = genTimeToSlot(fullConfig);
+    const { timeToSlot } = this.stores.substores.ada.time.getTimeCalcRequests(publicDeriver).requests;
+
     const absSlotNumber = new BigNumber(
       timeToSlot({
         // use server time for TTL if connected to server
@@ -163,10 +161,8 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
 
     const stakingKeyDbRow = await withStakingKey.getStakingKey();
 
-    const fullConfig = getCardanoHaskellBaseConfig(
-      request.publicDeriver.getParent().getNetworkInfo()
-    );
-    const timeToSlot = genTimeToSlot(fullConfig);
+    const { timeToSlot } = this.stores.substores.ada.time.getTimeCalcRequests(request.publicDeriver).requests;
+
     const absSlotNumber = new BigNumber(
       timeToSlot({
         // use server time for TTL if connected to server

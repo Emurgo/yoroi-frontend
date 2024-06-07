@@ -2,58 +2,67 @@
 
 import type { CardanoHaskellConfig } from '../database/primitives/tables';
 import { fail } from '../../../../../coreUtils';
+import { cardanoHaskellConfigCombine } from '../database/prepackaged/networks';
 
-export type ToAbsoluteSlotNumberFunc = {| epoch: number, slot: number |} => number;
+export type RelativeSlot = {| epoch: number, slot: number |};
 
-export function genToAbsoluteSlotNumber(
-  config: $ReadOnlyArray<CardanoHaskellConfig>,
-): ToAbsoluteSlotNumberFunc {
-  return request => {
-    let SlotsPerEpoch = config[0].SlotsPerEpoch;
+/**
+ * @return {Array<[startEpoch: number, endEpoch: number, nextConfig: CardanoHaskellConfig]>}
+ */
+function createEraBoundaries(config: $ReadOnlyArray<CardanoHaskellConfig>): Array<[number, number, CardanoHaskellConfig]> {
+  const res: Array<[number, number, CardanoHaskellConfig]> = [];
+  for (let i = 0; i < config.length - 1; i++) {
+    res.push([
+      config[i].StartAt ?? fail(`${nameof(createEraBoundaries)} missing start`),
+      config[i + 1].StartAt ?? fail(`${nameof(createEraBoundaries)} missing end`),
+      config[i + 1],
+    ]);
+  }
+  return res;
+}
+
+export default class TimeUtils {
+
+  static toAbsoluteSlotNumber(
+    config: $ReadOnlyArray<CardanoHaskellConfig>,
+    relativeSlot: RelativeSlot,
+  ): number {
+    let SlotsPerEpoch = config[0].SlotsPerEpoch ?? fail(`${nameof(TimeUtils.toAbsoluteSlotNumber)} missing slots per epoch`);
     let slotCount = 0;
-    let epochsLeft = request.epoch;
+    let epochsLeft = relativeSlot.epoch;
 
     // for pairs of config changes (x, x+1), get the time between these pairs
-    for (let i = 0; i < config.length - 1; i++) {
-      const start = config[i].StartAt ?? fail(`${nameof(genToAbsoluteSlotNumber)} missing start`);
-      const end = config[i + 1].StartAt ?? fail(`${nameof(genToAbsoluteSlotNumber)} missing end`);
+    for (const [startEpoch, endEpoch, nextConfig] of createEraBoundaries(config)) {
 
       // queried time is before the next protocol parameter choice
-      if (end > request.epoch) {
+      if (endEpoch > relativeSlot.epoch) {
         break;
       }
-      const numEpochs = end - start;
 
-      if (SlotsPerEpoch == null) throw new Error(`${nameof(genToAbsoluteSlotNumber)} missing params`);
+      const numEpochs = endEpoch - startEpoch;
+
       slotCount += SlotsPerEpoch * numEpochs;
       epochsLeft -= numEpochs;
 
-      SlotsPerEpoch = config[i + 1].SlotsPerEpoch ?? SlotsPerEpoch;
+      SlotsPerEpoch = nextConfig.SlotsPerEpoch ?? SlotsPerEpoch;
     }
-    if (SlotsPerEpoch == null) throw new Error(`${nameof(genToAbsoluteSlotNumber)} missing params`);
     // find how many slots in the epochs since the last update
     const slotsLeft = SlotsPerEpoch * epochsLeft;
-    return slotCount + slotsLeft + request.slot;
-  };
-}
+    return slotCount + slotsLeft + relativeSlot.slot;
+  }
 
-export type ToRelativeSlotNumberFunc = number => {| epoch: number, slot: number |};
-
-export function genToRelativeSlotNumber(
-  config: $ReadOnlyArray<CardanoHaskellConfig>,
-): ToRelativeSlotNumberFunc {
-  return absoluteSlot => {
-    let SlotsPerEpoch = config[0].SlotsPerEpoch;
+  static toRelativeSlotNumber(
+    config: $ReadOnlyArray<CardanoHaskellConfig>,
+    absoluteSlot: number,
+  ): RelativeSlot {
+    let SlotsPerEpoch = config[0].SlotsPerEpoch ?? fail(`${nameof(TimeUtils.toRelativeSlotNumber)} missing slots per epoch`);
     let epochCount = 0;
     let slotsLeft = absoluteSlot;
 
     // for pairs of config changes (x, x+1), get the time between these pairs
-    for (let i = 0; i < config.length - 1; i++) {
-      const start = config[i].StartAt ?? (() => { throw new Error(`${nameof(genToAbsoluteSlotNumber)} missing start`); })();
-      const end = config[i + 1].StartAt ?? (() => { throw new Error(`${nameof(genToAbsoluteSlotNumber)} missing end`); })();
-      const numEpochs = end - start;
+    for (const [startEpoch, endEpoch, nextConfig] of createEraBoundaries(config)) {
 
-      if (SlotsPerEpoch == null) throw new Error(`${nameof(genToAbsoluteSlotNumber)} missing params`);
+      const numEpochs = endEpoch - startEpoch;
 
       // queried time is before the next protocol parameter choice
       if (slotsLeft < SlotsPerEpoch * numEpochs) {
@@ -63,143 +72,97 @@ export function genToRelativeSlotNumber(
       slotsLeft -= SlotsPerEpoch * numEpochs;
       epochCount += numEpochs;
 
-      SlotsPerEpoch = config[i + 1].SlotsPerEpoch ?? SlotsPerEpoch;
+      SlotsPerEpoch = nextConfig.SlotsPerEpoch ?? SlotsPerEpoch;
     }
-
-    if (SlotsPerEpoch == null) throw new Error(`${nameof(genToAbsoluteSlotNumber)} missing params`);
-
     // find how many slots in the epochs since the last update
-    epochCount += Math.floor(slotsLeft / SlotsPerEpoch);
-
     return {
-      epoch: epochCount,
+      epoch: epochCount + Math.floor(slotsLeft / SlotsPerEpoch),
       slot: slotsLeft % SlotsPerEpoch,
     };
-  };
-}
+  }
 
-export type TimeToAbsoluteSlotFunc = {| time: Date |} => {| slot: number, msIntoSlot: number |};
-
-export function genTimeToSlot(
-  config: $ReadOnlyArray<CardanoHaskellConfig>,
-): TimeToAbsoluteSlotFunc {
-  return request => {
-    const { GenesisDate, } = config[0];
-    if (GenesisDate == null) throw new Error(`${nameof(genTimeToSlot)} missing genesis params`);
-    let SlotDuration = config[0].SlotDuration;
-    let SlotsPerEpoch = config[0].SlotsPerEpoch;
-    let timeLeftToTip = (
-      request.time.getTime() - new Date(Number.parseInt(GenesisDate, 10)).getTime()
-    );
+  static timeToAbsoluteSlot(
+    config: $ReadOnlyArray<CardanoHaskellConfig>,
+    time: Date,
+  ): number {
+    let GenesisDate = config[0].GenesisDate ?? fail(`${nameof(TimeUtils.timeToAbsoluteSlot)} missing genesis date`);
+    let SlotDuration = config[0].SlotDuration ?? fail(`${nameof(TimeUtils.timeToAbsoluteSlot)} missing slot duration`);
+    let SlotsPerEpoch = config[0].SlotsPerEpoch ?? fail(`${nameof(TimeUtils.timeToAbsoluteSlot)} missing slots per epoch`);
+    let timeLeftToTip = (time.getTime() - new Date(Number.parseInt(GenesisDate, 10)).getTime());
     let slotCount = 0;
 
     // for pairs of config changes (x, x+1), get the time between these pairs
-    for (let i = 0; i < config.length - 1; i++) {
-      const start = config[i].StartAt ?? (() => { throw new Error(`${nameof(genTimeToSlot)} missing start`); })();
-      const end = config[i + 1].StartAt ?? (() => { throw new Error(`${nameof(genTimeToSlot)} missing end`); })();
-      const numEpochs = end - start;
+    for (const [startEpoch, endEpoch, nextConfig] of createEraBoundaries(config)) {
 
-      if (SlotDuration == null || SlotsPerEpoch == null) throw new Error(`${nameof(genTimeToSlot)} missing params`);
+      const numEpochs = endEpoch - startEpoch;
 
       // queried time is before the next protocol parameter choice
       if (timeLeftToTip < (SlotsPerEpoch * SlotDuration * 1000) * numEpochs) {
         break;
       }
+
       slotCount += SlotsPerEpoch * numEpochs;
       timeLeftToTip -= (SlotsPerEpoch * SlotDuration * 1000) * numEpochs;
 
-      SlotDuration = config[i + 1].SlotDuration ?? SlotDuration;
-      SlotsPerEpoch = config[i + 1].SlotsPerEpoch ?? SlotsPerEpoch;
+      SlotDuration = nextConfig.SlotDuration ?? SlotDuration;
+      SlotsPerEpoch = nextConfig.SlotsPerEpoch ?? SlotsPerEpoch;
     }
-
-    if (SlotDuration == null || SlotsPerEpoch == null) throw new Error(`${nameof(genTimeToSlot)} missing params`);
-
     // find how many slots since the last update
     const secondsSinceLastUpdate = timeLeftToTip / 1000;
-    slotCount += Math.floor(secondsSinceLastUpdate / SlotDuration);
+    return slotCount + Math.floor(secondsSinceLastUpdate / SlotDuration);
+  }
 
-    const msIntoSlot = timeLeftToTip % 1000;
-    const secondsIntoSlot = secondsSinceLastUpdate % SlotDuration;
-    return {
-      slot: slotCount,
-      msIntoSlot: (1000 * secondsIntoSlot) + msIntoSlot,
-    };
-  };
-}
-
-export type CurrentEpochLengthFunc = () => number; /** slots per epoch */
-
-export function genCurrentEpochLength(
-  config: $ReadOnlyArray<CardanoHaskellConfig>,
-): CurrentEpochLengthFunc {
-  return () => {
-    const finalConfig = config.reduce((acc, next) => Object.assign(acc, next), {});
-    return finalConfig.SlotsPerEpoch;
-  };
-}
-
-export type CurrentSlotLengthFunc = () => number;
-
-export function genCurrentSlotLength(
-  config: $ReadOnlyArray<CardanoHaskellConfig>,
-): CurrentSlotLengthFunc {
-  return () => {
-    const finalConfig = config.reduce((acc, next) => Object.assign(acc, next), {});
-    return finalConfig.SlotDuration;
-  };
-}
-
-export type TimeSinceGenesisFunc = {| absoluteSlotNum: number |} => number; /* seconds */
-
-export function genTimeSinceGenesis(
-  config: $ReadOnlyArray<CardanoHaskellConfig>,
-): TimeSinceGenesisFunc {
-  return request => {
-    let SlotDuration = config[0].SlotDuration;
-    let SlotsPerEpoch = config[0].SlotsPerEpoch;
+  static secondsSinceGenesis(
+    config: $ReadOnlyArray<CardanoHaskellConfig>,
+    absoluteSlotNum: number,
+  ): number {
+    let SlotDuration = config[0].SlotDuration ?? fail(`${nameof(TimeUtils.secondsSinceGenesis)} missing slot duration`);
+    let SlotsPerEpoch = config[0].SlotsPerEpoch ?? fail(`${nameof(TimeUtils.secondsSinceGenesis)} missing slots per epoch`);
     let time = 0;
-    let slotsLeft = request.absoluteSlotNum;
+    let slotsLeft = absoluteSlotNum;
 
     // for pairs of config changes (x, x+1), get the time between these pairs
-    for (let i = 0; i < config.length - 1; i++) {
-      const start = config[i].StartAt ?? (() => { throw new Error(`${nameof(genTimeSinceGenesis)} missing start`); })();
-      const end = config[i + 1].StartAt ?? (() => { throw new Error(`${nameof(genTimeSinceGenesis)} missing end`); })();
-      const numEpochs = end - start;
+    for (const [startEpoch, endEpoch, nextConfig] of createEraBoundaries(config)) {
 
-      if (SlotDuration == null || SlotsPerEpoch == null) throw new Error(`${nameof(genTimeSinceGenesis)} missing params`);
+      const numEpochs = endEpoch - startEpoch;
 
       // queried time is before the next protocol parameter choice
       if (slotsLeft < SlotsPerEpoch * numEpochs) {
         break;
       }
+
       time += (SlotsPerEpoch * SlotDuration) * numEpochs;
       slotsLeft -= SlotsPerEpoch * numEpochs;
 
-      SlotDuration = config[i + 1].SlotDuration ?? SlotDuration;
-      SlotsPerEpoch = config[i + 1].SlotsPerEpoch ?? SlotsPerEpoch;
+      SlotDuration = nextConfig.SlotDuration ?? SlotDuration;
+      SlotsPerEpoch = nextConfig.SlotsPerEpoch ?? SlotsPerEpoch;
     }
-
-    if (SlotDuration == null || SlotsPerEpoch == null) throw new Error(`${nameof(genTimeSinceGenesis)} missing params`);
-
     // add seconds into the current update
-    time += slotsLeft * SlotDuration;
+    return time + (slotsLeft * SlotDuration);
+  }
 
-    return time;
-  };
-}
-
-export type ToRealTimeFunc = {| absoluteSlotNum: number, timeSinceGenesisFunc: TimeSinceGenesisFunc |} => Date;
-
-export function genToRealTime(
-  config: $ReadOnlyArray<CardanoHaskellConfig>,
-): ToRealTimeFunc {
-  return request => {
+  static absoluteSlotToTime(
+    config: $ReadOnlyArray<CardanoHaskellConfig>,
+    absoluteSlotNum: number,
+  ): Date {
     const { GenesisDate } = config[0];
-    if (GenesisDate == null) throw new Error(`${nameof(genToRealTime)} missing genesis start date`);
-    const secondsSinceGenesis = request.timeSinceGenesisFunc({
-      absoluteSlotNum: request.absoluteSlotNum,
-    });
+    if (GenesisDate == null) throw new Error(`${nameof(TimeUtils.absoluteSlotToTime)} missing genesis start date`);
+    const secondsSinceGenesis = TimeUtils.secondsSinceGenesis(config, absoluteSlotNum);
     const time = (new Date(Number.parseInt(GenesisDate, 10)).getTime() + (1000 * secondsSinceGenesis));
     return new Date(time);
-  };
+  }
+
+  static currentEpochSlots(
+    config: $ReadOnlyArray<CardanoHaskellConfig>,
+  ): number {
+    return cardanoHaskellConfigCombine(config).SlotsPerEpoch
+      ?? fail(`${nameof(TimeUtils.currentEpochSlots)} missing slots per epoch`);
+  }
+
+  static currentSlotSeconds(
+    config: $ReadOnlyArray<CardanoHaskellConfig>,
+  ): number {
+    return cardanoHaskellConfigCombine(config).SlotDuration
+      ?? fail(`${nameof(TimeUtils.currentSlotSeconds)} missing slot duration`);
+  }
 }

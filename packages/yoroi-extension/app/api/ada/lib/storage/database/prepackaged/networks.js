@@ -6,11 +6,11 @@ import {
 import type {
   NetworkRow,
   CardanoHaskellBaseConfig,
+  CardanoHaskellConfig,
   TokenInsert,
 } from '../primitives/tables';
 import { PRIMARY_ASSET_CONSTANTS } from '../primitives/enums';
 import environment from '../../../../../../environment';
-import * as timeUtils from '../../bridge/timeUtils';
 
 export const CardanoForks = Object.freeze({
   Haskell: 0,
@@ -231,16 +231,16 @@ export function getCardanoHaskellBaseConfig(
   return (network.BaseConfig: any); // cast to return type
 }
 
-export async function createSlotToTimestampFunc(
+
+export function cardanoHaskellConfigCombine(config: $ReadOnlyArray<CardanoHaskellConfig>): CardanoHaskellConfig {
+  // $FlowIgnore[incompatible-exact]
+  return (config.reduce((acc, next) => Object.assign(acc, next), {}): CardanoHaskellConfig);
+}
+
+export function getCardanoHaskellBaseConfigCombined(
   network: $ReadOnly<NetworkRow>,
-): Promise<(number | string) => Date> {
-  const fullConfig = getCardanoHaskellBaseConfig(network);
-  const timeSinceGenFunc = timeUtils.genTimeSinceGenesis(fullConfig);
-  const realTimeFunc = timeUtils.genToRealTime(fullConfig);
-  return s => realTimeFunc({
-    absoluteSlotNum: Number(s),
-    timeSinceGenesisFunc: timeSinceGenFunc,
-  });
+): CardanoHaskellConfig {
+  return cardanoHaskellConfigCombine(getCardanoHaskellBaseConfig(network))
 }
 
 export const defaultAssets: Array<

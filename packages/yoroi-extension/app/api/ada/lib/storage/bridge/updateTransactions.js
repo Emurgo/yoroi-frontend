@@ -111,9 +111,7 @@ import type { CardanoByronTxIO, CardanoShelleyTxIO } from '../database/transacti
 import {
   rawGetAddressRowsForWallet,
 } from  './traitUtils';
-import {
-  genToAbsoluteSlotNumber,
-} from './timeUtils';
+import TimeUtils from './timeUtils';
 import {
   rawGenHashToIdsFunc, rawGenFindOwnAddress,
 } from '../../../../common/lib/storage/bridge/hashMapper';
@@ -151,7 +149,7 @@ import type {
 } from '../../../../common/lib/MultiToken';
 import { UtxoStorageApi } from '../models/utils';
 import { bytesToHex, createFilterUniqueBy, hexToBytes, listValues } from '../../../../../coreUtils';
-import type { ToAbsoluteSlotNumberFunc } from './timeUtils';
+import type { RelativeSlot } from './timeUtils';
 
 type TxData = {|
   addressLookupMap: Map<number, string>,
@@ -1385,10 +1383,8 @@ async function rawUpdateTransactions(
   before: ?ReferenceTx,
 ): Promise<TxData> {
   const network = publicDeriver.getParent().getNetworkInfo();
-  // TODO: consider passing this function in as an argument instead of generating it here
-  const toAbsoluteSlotNumber = genToAbsoluteSlotNumber(
-    getCardanoHaskellBaseConfig(network)
-  );
+  const toAbsoluteSlotNumber = (slot: RelativeSlot) =>
+    TimeUtils.toAbsoluteSlotNumber(getCardanoHaskellBaseConfig(network), slot);
 
   if (before != null && after != null) {
     throw new Error('Only one of `before` or `after` should be used for a resync');
@@ -1593,7 +1589,7 @@ async function updateTransactionBatch(
   |},
   request: {|
     network: $ReadOnly<NetworkRow>,
-    toAbsoluteSlotNumber: ToAbsoluteSlotNumberFunc,
+    toAbsoluteSlotNumber: RelativeSlot => number,
     txIds: Array<number>,
     txsFromNetwork: Array<RemoteTransaction>,
     hashToIds: HashToIdsFunc,
@@ -2311,7 +2307,7 @@ async function networkTxToDbTx(
   newTxs: Array<RemoteTransaction>,
   hashToIds: HashToIdsFunc,
   findOwnAddress: FindOwnAddressFunc,
-  toAbsoluteSlotNumber: ToAbsoluteSlotNumberFunc,
+  toAbsoluteSlotNumber: RelativeSlot => number,
   TransactionSeed: number,
   BlockSeed: number,
   assetLookup: Map<string, $ReadOnly<TokenRow>>,
@@ -2498,7 +2494,7 @@ export function statusStringToCode(
 
 export function networkTxHeaderToDb(
   tx: RemoteTransaction,
-  toAbsoluteSlotNumber: ToAbsoluteSlotNumberFunc,
+  toAbsoluteSlotNumber: RelativeSlot => number,
   TransactionSeed: number,
   BlockSeed: number,
 ): {
