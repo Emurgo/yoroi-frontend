@@ -85,7 +85,7 @@ jobs:
             ./packages/e2e-tests/testRunsData_${{ matrix.browser }}
   
   E2E_tests_failing:
-    if: github.event.review  && contains(github.event.review.body, '/regression-check')
+    if: github.event.review  && contains(github.event.review.body, '/failing-tests')
     runs-on: macos-14
     strategy:
       matrix:
@@ -237,7 +237,7 @@ jobs:
             ./packages/e2e-tests/testRunsData_${{ matrix.browser }}
 
   E2E_dapp_tests_failing:
-    if: github.event.review && contains(github.event.review.body, '/dapp-check')
+    if: github.event.review && contains(github.event.review.body, '/failing-tests')
     runs-on: macos-14
     strategy:
       matrix:
