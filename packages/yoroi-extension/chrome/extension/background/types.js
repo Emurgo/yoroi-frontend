@@ -11,6 +11,7 @@ import type {
 import type { AssuranceMode } from '../../../app/types/transactionAssurance.types';
 import type { MultiToken } from '../../../app/api/common/lib/MultiToken';
 import type { FullAddressPayload, AddressRowWithPath} from '../../../app/api/ada/lib/storage/bridge/traitUtils';
+import type { SubmittedTransactionEntry } from '../../../app/api/localStorage';
 
 export type WalletType = 'trezor' | 'ledger' | 'mnemonic';
 
@@ -55,4 +56,5 @@ export type WalletState = {|
   isTestnet: boolean,
   isCardanoHaskell: boolean,
   isRefreshing: boolean,
+  submittedTransactions: Array<SubmittedTransactionEntry>,
 |};

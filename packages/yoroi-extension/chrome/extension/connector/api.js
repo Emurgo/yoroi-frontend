@@ -87,7 +87,7 @@ import {
   derivePublicByAddressing
 } from '../../../app/api/ada/lib/cardanoCrypto/deriveByAddressing';
 import type { DefaultTokenEntry } from '../../../app/api/common/lib/MultiToken';
-
+import type { SubmittedTransactionEntry } from '../../../app/api/localStorage';
 axios.defaults.adapter = fetchAdapter;
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
@@ -392,8 +392,16 @@ async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Pr
 
 async function getOutputAddressesInSubmittedTxs(publicDeriverId: number) {
   const submittedTxs = await loadSubmittedTransactions() || [];
-  return submittedTxs
-    .filter(submittedTxRecord => submittedTxRecord.publicDeriverId === publicDeriverId)
+  const walletSubmittedTxs = submittedTxs.filter(
+    submittedTxRecord => submittedTxRecord.publicDeriverId === publicDeriverId
+  );
+  return _getOutputAddressesInSubmittedTxs(walletSubmittedTxs);
+}
+
+export function _getOutputAddressesInSubmittedTxs(
+  walletSubmittedTxs: Array<SubmittedTransactionEntry>
+): Array<string> {
+  return walletSubmittedTxs
     .flatMap(({ transaction }) => {
       return transaction.addresses.to.map(({ address }) => address);
     });
@@ -404,12 +412,26 @@ export async function connectorGetUsedAddresses(
   paginate: ?Paginate
 ): Promise<Address[]> {
   const usedAddresses = await getAllAddresses(wallet, true);
-
+  const unusedAddresses = await getAllAddresses(wallet, false);
   const outputAddressesInSubmittedTxs = new Set(
     await getOutputAddressesInSubmittedTxs(wallet.publicDeriverId)
   );
-  const usedInSubmittedTxs = (await getAllAddresses(wallet, false))
-        .filter(address => outputAddressesInSubmittedTxs.has(address));
+  return _connectorGetUsedAddresses(
+    usedAddresses,
+    unusedAddresses,
+    outputAddressesInSubmittedTxs,
+    paginate,
+  );
+}
+export async function _connectorGetUsedAddresses(
+  usedAddresses: Array<string>,
+  unusedAddresses: Array<string>,
+  outputAddressesInSubmittedTxs: Set<string>,
+  paginate: ?Paginate
+): Promise<Address[]> {
+  const usedInSubmittedTxs = unusedAddresses.filter(
+    address => outputAddressesInSubmittedTxs.has(address)
+  );
 
   return paginateResults(
     [...usedAddresses, ...usedInSubmittedTxs],
@@ -418,15 +440,22 @@ export async function connectorGetUsedAddresses(
 }
 
 export async function connectorGetUnusedAddresses(wallet: PublicDeriver<>): Promise<Address[]> {
+  const submittedTxs = await loadSubmittedTransactions() || [];
+
   return _connectorGetUnusedAddresses(
     await getAllAddresses(wallet, false),
-    new Set(await getOutputAddressesInSubmittedTxs(wallet.publicDeriverId)),
+    submittedTxs.filter(
+      submittedTxRecord => submittedTxRecord.publicDeriverId === wallet.publicDeriverId
+    )
   );
 }
 export async function _connectorGetUnusedAddresses(
   unusedAddresses: Array<Address>,
-  outputAddressesInSubmittedTxs: Set<Address>,
+  walletSubmittedTxs: Array<SubmittedTransactionEntry>,
 ): Promise<Address[]> {
+  const outputAddressesInSubmittedTxs = new Set(
+    _getOutputAddressesInSubmittedTxs(walletSubmittedTxs)
+  );
   return unusedAddresses.filter(address => !outputAddressesInSubmittedTxs.has(address));
 }
 
@@ -1174,7 +1203,7 @@ export async function connectorGenerateReorgTx(
     allUtxoAddresses,
     internal,
     await getAllAddresses(publicDeriver, false),
-    new Set(await getOutputAddressesInSubmittedTxs(publicDeriver.publicDeriverId)),
+    await getOutputAddressesInSubmittedTxs(publicDeriver.publicDeriverId),
     usedUtxoIds,
     reorgTargetAmount,
     utxos,
@@ -1188,7 +1217,7 @@ export async function _connectorGenerateReorgTx(
   allUtxoAddresses: IGetAllUtxoAddressesResponse,
   receiveAddress: BaseSingleAddressPath,
   originalUnusedAddresses: Array<Address>,
-  outputAddressesInSubmittedTxs: Set<Address>,
+  outputAddressesInSubmittedTxs: Array<Address>,
   usedUtxoIds: Array<string>,
   reorgTargetAmount: string,
   utxos: Array<CardanoAddressedUtxo>,
@@ -1204,7 +1233,9 @@ export async function _connectorGenerateReorgTx(
   }).slot);
   const unusedAddresses = await _connectorGetUnusedAddresses(
     originalUnusedAddresses,
-    outputAddressesInSubmittedTxs,
+    submittedTxs.filter(
+      submittedTxRecord => submittedTxRecord.publicDeriverId === publicDeriverId
+    )
   );
   if (unusedAddresses.length === 0) {
     throw new Error('unexpected: no unused addresses available');

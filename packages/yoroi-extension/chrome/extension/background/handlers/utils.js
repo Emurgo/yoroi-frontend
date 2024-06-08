@@ -197,6 +197,7 @@ export async function getWalletState(publicDeriver: PublicDeriver<>): Promise<Wa
       isTestnet: isTestnet(network),
       isCardanoHaskell: isCardanoHaskell(network),
       isRefreshing: false, // fixme
+      submittedTransactions: [],
     };
   });
 }

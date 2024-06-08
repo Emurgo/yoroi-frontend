@@ -16,6 +16,7 @@ import {
 import type { ComplexityLevelType } from '../../types/complexityLevelType';
 import type { WhitelistEntry } from '../../../chrome/extension/connector/types';
 import type { CatalystRoundInfoResponse } from '../ada/lib/state-fetch/types'
+import type { CardanoShelleyTransactionCtorData } from '../../domain/CardanoShelleyTransaction';
 
 declare var chrome;
 declare var browser;
@@ -422,7 +423,14 @@ export async function persistSubmittedTransactions(
   });
 }
 
-export async function loadSubmittedTransactions(): any {
+export type SubmittedTransactionEntry = {|
+  networkId: number,
+  publicDeriverId: number,
+  transaction: CardanoShelleyTransactionCtorData,
+  usedUtxos: Array<{| txHash: string, index: number |}>,
+|};
+
+export async function loadSubmittedTransactions(): Promise<Array<SubmittedTransactionEntry>> {
   const stored = await new Promise(
     resolve => STORAGE_API.get(storageKeys.SUBMITTED_TRANSACTIONS, resolve)
   );

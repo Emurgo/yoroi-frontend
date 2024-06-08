@@ -49,12 +49,13 @@ import { asAddressedUtxo, multiTokenFromCardanoValue, multiTokenFromRemote, } fr
 import {
   _connectorGenerateReorgTx,
   connectorGetChangeAddress,
-  connectorGetUnusedAddresses,
-  connectorGetUsedAddresses,
+  _connectorGetUnusedAddresses,
+  _connectorGetUsedAddresses,
   connectorRecordSubmittedCardanoTransaction,
   connectorSendTxCardano,
   getScriptRequiredSigningKeys,
   resolveTxOrTxBody,
+  _getOutputAddressesInSubmittedTxs,
 } from '../../../chrome/extension/connector/api';
 import { getWalletChecksum } from '../../api/export/utils';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
@@ -85,6 +86,7 @@ import { ampli } from '../../../ampli/index';
 import { noop } from '../../coreUtils';
 import { getWallets, signAndBroadcastTransaction, broadcastTransaction } from '../../api/thunk';
 import type { WalletState } from '../../../chrome/extension/background/types';
+import { CoreAddressTypes, TxStatusCodes, } from '../../api/ada/lib/storage/database/primitives/enums';
 
 export function connectorCall<T, R>(message: T): Promise<R> {
   return new Promise((resolve, reject) => {
@@ -907,10 +909,11 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       [
         ...connectedWallet.allAddresses.utxoAddresses,
         ...connectedWallet.allAddresses.accountingAddresses,
-      ].filter(a => a.address.IsUsed === usedFilter && a.address.Type === CoreAddressTypes.CARDANO_BASE)
+      ].filter(a => !a.address.IsUsed && a.address.Type === CoreAddressTypes.CARDANO_BASE)
         .map(a => a.address.Hash),
-      new Set(await _getOutputAddressesInSubmittedTxs(
-      )),
+      connectedWallet.submittedTransactions.flatMap(({ transaction }) => {
+        return transaction.addresses.to.map(({ address }) => address);
+      }),
       usedUtxoIds,
       reorgTargetAmount,
       addressedUtxos,
@@ -1011,10 +1014,22 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     ownAddresses: ?Set<string>
   ): Promise<{| amount: MultiToken, total: MultiToken |}> {
     if (!ownAddresses) {
+      const allBaseAddresses = [
+        ...publicDeriver.allAddresses.utxoAddresses,
+        ...publicDeriver.allAddresses.accountingAddresses,
+      ].filter(a => a.address.Type === CoreAddressTypes.CARDANO_BASE)
       ownAddresses = new Set([
         ...utxos.map(utxo => utxo.address),
-        ...(await connectorGetUsedAddresses(publicDeriver, null)),
-        ...(await connectorGetUnusedAddresses(publicDeriver)),
+        ...(await _connectorGetUsedAddresses(
+          allBaseAddresses.filter(a => a.address.IsUsed).map(a => a.address.Hash),
+          allBaseAddresses.filter(a => !a.address.IsUsed).map(a => a.address.Hash),
+          new Set(_getOutputAddressesInSubmittedTxs(publicDeriver.submittedTransactions)),
+          null
+        )),
+        ...(await _connectorGetUnusedAddresses(
+          allBaseAddresses.filter(a => !a.address.IsUsed).map(a => a.address.Hash),
+          publicDeriver.submittedTransactions,
+        )),
         publicDeriver.receiveAddress.addr.Hash,
       ]);
     }
