@@ -1,6 +1,6 @@
 // @flow
 import { Typography, Stack } from '@mui/material';
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import StatsTable from './StatsTable';
 import mockData from '../../common/mockData';
@@ -12,7 +12,7 @@ interface Props {
   data: TokenType[];
 }
 
-const PortfolioWallet = ({ data }: Props): ReactNode => {
+const PortfolioWallet = ({ data }: Props): JSX.Element => {
   const theme = useTheme();
   const strings = useStrings();
   const [keyword, setKeyword] = useState<string>();

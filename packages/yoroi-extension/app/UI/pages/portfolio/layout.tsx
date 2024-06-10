@@ -12,7 +12,7 @@ type Props = {
   children: ReactNode;
 };
 
-const PortfolioLayout = ({ stores, actions, children }: Props): ReactNode => {
+const PortfolioLayout = ({ stores, actions, children }: Props): JSX.Element => {
   const isActivePage = (route: string) => {
     const { location } = stores.router;
     if (route && location) {

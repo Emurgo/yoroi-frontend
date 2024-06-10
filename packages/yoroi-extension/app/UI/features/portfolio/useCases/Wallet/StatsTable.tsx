@@ -1,5 +1,5 @@
 // @flow
-import React, { ReactNode } from 'react';
+import React from 'react';
 import { useMemo, useState } from 'react';
 import { TableCell, TableRow, Typography, Stack, Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
@@ -67,7 +67,7 @@ interface Props {
   isLoading: boolean;
 }
 
-const StatsTable = ({ data, isLoading }: Props): ReactNode => {
+const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
   const theme: any = useTheme();
   const navigateTo = useNavigateTo();
   const strings = useStrings();

@@ -1,23 +1,19 @@
 // @flow
 import React from 'react';
 import { Chip as MuiChip } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import type { SxProps } from '@mui/material';
 
 interface Props {
   label: string;
   active: boolean;
-  sx: SxProps;
+  sx: any;
 }
 
 export const Chip = ({ label, active, sx, ...props }: Props): JSX.Element => {
-  const theme: any = useTheme();
-
   return (
     <MuiChip
       label={label}
       {...props}
-      sx={{
+      sx={(theme: any) => ({
         maxWidth: 'fit-content',
         padding: '2px 6px !important',
         borderRadius: '20px',
@@ -28,7 +24,7 @@ export const Chip = ({ label, active, sx, ...props }: Props): JSX.Element => {
         '& .MuiChip-label': {
           padding: 0,
         },
-      }}
+      })}
     ></MuiChip>
   );
 };
