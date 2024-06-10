@@ -17,7 +17,7 @@ export const Search = props => (
         id="path-1"
       ></path>
     </defs>
-    <g id="icon/search" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+    <g id="icon/search" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
       <mask id="mask-2" fill="white">
         <use xlinkHref="#path-1"></use>
       </mask>

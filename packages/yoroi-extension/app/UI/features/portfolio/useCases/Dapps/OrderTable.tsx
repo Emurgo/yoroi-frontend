@@ -1,18 +1,18 @@
 // @flow
-import React from 'react';
-import { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { TableCell, TableRow, Typography, Stack, Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { usePortfolio } from '../../module/PortfolioContextProvider';
+import { useStrings } from '../../common/hooks/useStrings';
 import adaPng from '../../../../../assets/images/ada.png';
 import hoskyPng from '../../common/assets/images/hosky-token.png';
 import minswapPng from '../../common/assets/images/minswap-dex.png';
 import { Skeleton } from '../../../../components';
-import { useStrings } from '../../common/hooks/useStrings';
+import { truncateAddressShort } from '../../../../../utils/formatters';
+import { usePortfolio } from '../../module/PortfolioContextProvider';
 import useTableSort, { ISortState } from '../../common/hooks/useTableSort';
 import Table from '../../common/components/Table';
 import { IHeadCell } from '../../common/types/table';
-import { LiquidityItemType } from '../../common/types/index';
+import { OrderItemType } from '../../common/types/index';
 
 const TableRowSkeleton = ({ theme, ...props }) => (
   <TableRow
@@ -23,11 +23,13 @@ const TableRowSkeleton = ({ theme, ...props }) => (
   >
     <TableCell>
       <Stack direction="row" alignItems="center" spacing={theme.spacing(1)}>
-        <Stack direction="row" alignItems="center" sx={{ position: 'relative', width: '46px' }}>
-          <Skeleton width="24px" height="24px" />
-          <Skeleton width="24px" height="24px" sx={{ position: 'absolute', top: 0, left: '22px' }} />
-        </Stack>
-        <Skeleton width="146px" height="24px" />
+        <Skeleton width="24px" height="24px" />
+        <Skeleton width="55px" height="24px" />
+        <Typography fontWeight="500" sx={{ color: theme.palette.ds.gray_c900 }}>
+          /
+        </Typography>
+        <Skeleton width="24px" height="24px" />
+        <Skeleton width="55px" height="24px" />
       </Stack>
     </TableCell>
 
@@ -39,21 +41,15 @@ const TableRowSkeleton = ({ theme, ...props }) => (
     </TableCell>
 
     <TableCell>
-      <Stack direction="column" spacing={theme.spacing(0.25)}>
-        <Skeleton width="146px" height="24px" />
-        <Skeleton width="146px" height="16px" />
-      </Stack>
+      <Skeleton width="55px" height="24px" />
     </TableCell>
 
     <TableCell>
-      <Stack direction="column" spacing={theme.spacing(0.25)}>
-        <Skeleton width="146px" height="24px" />
-        <Skeleton width="146px" height="16px" />
-      </Stack>
+      <Skeleton width="55px" height="24px" />
     </TableCell>
 
     <TableCell>
-      <Skeleton width="146px" height="24px" />
+      <Skeleton width="126px" height="24px" />
     </TableCell>
 
     <TableCell>
@@ -66,12 +62,12 @@ const TableRowSkeleton = ({ theme, ...props }) => (
 );
 
 interface Props {
-  data: LiquidityItemType[];
+  data: OrderItemType[];
   isLoading: boolean;
 }
 
-const LiquidityTable = ({ data, isLoading }: Props): JSX.Element => {
-  const theme: any = useTheme();
+const OrderTable = ({ data, isLoading }: Props): JSX.Element => {
+  const theme = useTheme();
   const strings = useStrings();
   const { unitOfAccount } = usePortfolio();
   const [{ order, orderBy }, setSortState] = useState<ISortState>({
@@ -81,21 +77,16 @@ const LiquidityTable = ({ data, isLoading }: Props): JSX.Element => {
   const list = useMemo(() => [...data], [data]);
 
   const headCells: IHeadCell[] = [
-    { id: 'tokenPair', label: strings.tokenPair, align: 'left', sortType: 'character' },
-    { id: 'DEX', label: strings.dex, align: 'left', sortType: 'character', isPadding: true },
-    { id: 'firstTokenValue', label: strings.firstTokenValue, align: 'left', sortType: 'numeric', isPadding: true },
-    { id: 'secondTokenValue', label: strings.secondTokenValue, align: 'left', sortType: 'numeric', isPadding: true },
-    {
-      id: 'lpTokens',
-      label: strings.lpTokens,
-      align: 'left',
-      sortType: 'numeric',
-      isPadding: true,
-    },
+    { id: 'pair', label: strings.pair, align: 'left', disabledSort: true },
+    { id: 'DEX', label: strings.dex, align: 'left', disabledSort: true },
+    { id: 'assetPrice', label: strings.assetPrice, align: 'left', disabledSort: true },
+    { id: 'assetAmount', label: strings.assetAmount, align: 'left', disabledSort: true },
+    { id: 'transactionId', label: strings.transactionId, align: 'left', disabledSort: true },
     {
       id: 'totalValue',
       label: strings.totalValue,
       align: 'right',
+      disabledSort: false,
       sortType: 'numeric',
     },
   ];
@@ -103,7 +94,7 @@ const LiquidityTable = ({ data, isLoading }: Props): JSX.Element => {
 
   return (
     <Table
-      name="liquidity"
+      name="order"
       headCells={headCells}
       data={getSortedData(list)}
       order={order}
@@ -122,31 +113,32 @@ const LiquidityTable = ({ data, isLoading }: Props): JSX.Element => {
         >
           <TableCell>
             <Stack direction="row" alignItems="center" spacing={theme.spacing(1)}>
-              <Stack direction="row" alignItems="center" sx={{ position: 'relative', width: '46px' }}>
-                <Box
-                  width="24px"
-                  height="24px"
-                  sx={{
-                    borderRadius: `${theme.shape.borderRadius}px`,
-                  }}
-                  component="img"
-                  src={adaPng}
-                ></Box>
-                <Box
-                  width="24px"
-                  height="24px"
-                  sx={{
-                    borderRadius: `${theme.shape.borderRadius}px`,
-                    position: 'absolute',
-                    top: 0,
-                    left: '22px',
-                  }}
-                  component="img"
-                  src={hoskyPng}
-                ></Box>
-              </Stack>
+              <Box
+                width="24px"
+                height="24px"
+                sx={{
+                  borderRadius: `${theme.shape.borderRadius}px`,
+                }}
+                component="img"
+                src={adaPng}
+              ></Box>
               <Typography fontWeight="500" color="ds.gray_c900">
-                {row.firstToken.name} - {row.secondToken.name}
+                {row.firstToken.name}
+              </Typography>
+              <Typography fontWeight="500" color="ds.gray_c900">
+                /
+              </Typography>
+              <Box
+                width="24px"
+                height="24px"
+                component="img"
+                src={hoskyPng}
+                sx={{
+                  borderRadius: `${theme.shape.borderRadius}px`,
+                }}
+              ></Box>
+              <Typography fontWeight="500" color="ds.gray_c900">
+                {row.secondToken.name}
               </Typography>
             </Stack>
           </TableCell>
@@ -179,33 +171,25 @@ const LiquidityTable = ({ data, isLoading }: Props): JSX.Element => {
           </TableCell>
 
           <TableCell>
-            <Stack direction="column" spacing={theme.spacing(0.25)}>
-              <Typography color="ds.gray_c900">
-                {row.firstTokenValue} {row.firstToken.name}
-              </Typography>
-              {row.firstToken.name === 'ADA' && unitOfAccount === 'ADA' ? null : (
-                <Typography variant="body2" sx={{ color: theme.palette.ds.gray_c600 }}>
-                  {row.firstTokenValueUsd} {unitOfAccount}
-                </Typography>
-              )}
-            </Stack>
+            <Typography color="ds.gray_c900">{row.assetPrice}</Typography>
           </TableCell>
 
           <TableCell>
-            <Stack direction="column" spacing={theme.spacing(0.25)}>
-              <Typography color="ds.gray_c900">
-                {row.secondTokenValue} {row.secondToken.name}
-              </Typography>
-              {row.secondToken.name === 'ADA' && unitOfAccount === 'ADA' ? null : (
-                <Typography variant="body2" sx={{ color: theme.palette.ds.gray_c600 }}>
-                  {row.secondTokenValueUsd} {unitOfAccount}
-                </Typography>
-              )}
-            </Stack>
+            <Typography color="ds.gray_c900">{row.assetAmount}</Typography>
           </TableCell>
 
           <TableCell>
-            <Typography color="ds.gray_c900">{row.lpTokens}</Typography>
+            <Typography
+              onClick={() =>
+                chrome.tabs.create({
+                  url: `https://cardanoscan.io/transaction/${row.transactionId}`,
+                })
+              }
+              color="ds.primary_c600"
+              sx={{ cursor: 'pointer' }}
+            >
+              {truncateAddressShort(row.transactionId, 10)}
+            </Typography>
           </TableCell>
 
           <TableCell>
@@ -213,7 +197,7 @@ const LiquidityTable = ({ data, isLoading }: Props): JSX.Element => {
               <Typography color="ds.gray_c900" sx={{ textAlign: 'right' }}>
                 {row.totalValue} {row.firstToken.name}
               </Typography>
-              {unitOfAccount === 'ADA' && row.firstToken.name === 'ADA' ? null : (
+              {row.firstToken.name === 'ADA' && unitOfAccount === 'ADA' ? null : (
                 <Typography variant="body2" color="ds.gray_c600" sx={{ textAlign: 'right' }}>
                   {row.totalValueUsd} {unitOfAccount}
                 </Typography>
@@ -226,4 +210,4 @@ const LiquidityTable = ({ data, isLoading }: Props): JSX.Element => {
   );
 };
 
-export default LiquidityTable;
+export default OrderTable;

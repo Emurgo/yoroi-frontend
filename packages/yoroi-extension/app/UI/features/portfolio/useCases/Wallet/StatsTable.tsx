@@ -9,7 +9,7 @@ import { Chip, Skeleton } from '../../../../components';
 import { Icon } from '../../../../components/icons';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
 import { useStrings } from '../../common/hooks/useStrings';
-import useTableSort from '../../common/hooks/useTableSort';
+import useTableSort, { ISortState } from '../../common/hooks/useTableSort';
 import Table from '../../common/components/Table';
 import { IHeadCell } from '../../common/types/table';
 import { TokenType } from '../../common/types/index';
@@ -72,7 +72,7 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
   const navigateTo = useNavigateTo();
   const strings = useStrings();
   const { unitOfAccount } = usePortfolio();
-  const [{ order, orderBy }, setSortState] = useState({
+  const [{ order, orderBy }, setSortState] = useState<ISortState>({
     order: null,
     orderBy: null,
   });
