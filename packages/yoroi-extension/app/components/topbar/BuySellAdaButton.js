@@ -46,7 +46,7 @@ class BuySellAdaButton extends Component<Props & InjectedProps> {
         variant="secondary"
         onClick={() => this.props.onBuySellClick()}
       >
-        {intl.formatMessage(globalMessages.buyAda)}
+        {intl.formatMessage(globalMessages.buySellAda)}
       </Button>
     );
 
