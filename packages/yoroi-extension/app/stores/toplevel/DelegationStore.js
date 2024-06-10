@@ -205,7 +205,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
 
   checkPoolTransition: () => Promise<void> = async () => {
     const publicDeriver = this.stores.wallets.selected;
-    if (publicDeriver === null) {
+    if (publicDeriver === null || this.poolTransitionRequestInfo != null) {
       return;
     }
 
@@ -213,9 +213,15 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     const currentlyDelegating = this.stores.delegation.isCurrentlyDelegating(publicDeriver);
     const currentPool = this.getDelegatedPoolId(publicDeriver);
 
+    if (currentPool == null) {
+      return null;
+    }
+
     try {
+
+      const { BackendService } = publicDeriver.getParent().getNetworkInfo().Backend;
       const transitionResult = await maybe(currentPool, p =>
-        new PoolInfoApi().getTransition(p, RustModule.CrossCsl.init)
+        new PoolInfoApi(BackendService + '/api').getTransition(p, RustModule.CrossCsl.init)
       );
 
       const response = {
@@ -239,7 +245,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
         this.poolTransitionRequestInfo = { ...response };
       });
     } catch (error) {
-      console.warn(error);
+      console.warn('Failed to check pool transition', error);
     }
   };
 
