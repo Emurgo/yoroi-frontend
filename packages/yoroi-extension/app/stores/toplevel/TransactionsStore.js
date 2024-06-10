@@ -31,7 +31,6 @@ import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
 import { Logger, stringifyError } from '../../utils/logging';
 import type { TransactionRowsToExportRequest } from '../../actions/common/transactions-actions';
 import globalMessages from '../../i18n/global-messages';
-import * as timeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
 import {
   getCardanoHaskellBaseConfig,
   isCardanoHaskell,
@@ -655,20 +654,16 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       if (isCardanoHaskell(selectedNetwork) && delegationRequests) {
         const rewards = await delegationRequests.rewardHistory.promise;
         if (rewards != null) {
-          const fullConfig = getCardanoHaskellBaseConfig(selectedNetwork);
 
-          const absSlotFunc = await timeUtils.genToAbsoluteSlotNumber(fullConfig);
-          const timeSinceGenFunc = await timeUtils.genTimeSinceGenesis(fullConfig);
-          const realTimeFunc = await timeUtils.genToRealTime(fullConfig);
+          const timeCalcRequests = this.stores.substores.ada.time.getTimeCalcRequests(request.publicDeriver);
+          const { toRealTime, toAbsoluteSlot } = timeCalcRequests.requests;
+
           const rewardRows = rewards.map(item => {
-            const absSlot = absSlotFunc({
+            const absSlot = toAbsoluteSlot({
               epoch: item[0],
               slot: 0,
             });
-            const epochStartDate = realTimeFunc({
-              absoluteSlotNum: absSlot,
-              timeSinceGenesisFunc: timeSinceGenFunc,
-            });
+            const epochStartDate = toRealTime({ absoluteSlotNum: absSlot });
 
             const defaultInfo = item[1].getDefaultEntry();
             const tokenInfo = this.stores.tokenInfoStore.tokenInfo
@@ -691,11 +686,8 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
     const { startDate, endDate } = request.exportRequest;
 
-    const config = getCardanoHaskellBaseConfig(
-      request.publicDeriver.getParent().getNetworkInfo()
-    )
-    const timeToSlot = await timeUtils.genTimeToSlot(config);
-    const toRelativeSlotNumber = await timeUtils.genToRelativeSlotNumber(config);
+    const timeCalcRequests = this.stores.substores.ada.time.getTimeCalcRequests(request.publicDeriver);
+    const { timeToSlot, toRelativeSlotNumber } = timeCalcRequests.requests;
 
     const dateFormat = 'YYYY-MM-DD';
     const dateToSlot = (date: string): [number, number] => {

@@ -1,19 +1,17 @@
-// @flow
 import * as React from 'react';
 import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import type { Node } from 'react';
 import { Button } from '@mui/material';
 import { useNavigateTo } from '../../common/useNavigateTo';
-import { PasswordInput } from '../../../../components';
 import { useGovernance } from '../../module/GovernanceContextProvider';
-import { useCreateAndSendDrepDelegationTransaction } from '../../api/useCreateAndSendDrepDelegationTransaction';
 import { useStrings } from '../../common/useStrings';
-import { Collapsible } from '../../../../components';
+import { useCreateAndSendDrepDelegationTransaction } from '../../api/useCreateAndSendDrepDelegationTransaction';
+import { Collapsible } from '../../../../components/Collapsible/Collapsible';
+import { PasswordInput } from '../../../../components/Input/PasswordInput';
 
-const Container = styled(Box)(({ theme }) => ({
+const Container = styled(Box)(() => ({
   paddingTop: '23px',
   maxWidth: '506px',
   margin: '0 auto',
@@ -24,7 +22,7 @@ const Container = styled(Box)(({ theme }) => ({
   alignItems: 'center',
 }));
 
-const TotalBox = styled(Box)(({ theme }) => ({
+const TotalBox = styled(Box)(({ theme }: any) => ({
   display: 'flex',
   justifyContent: 'space-between',
   background: theme.palette.ds.bg_gradient_3,
@@ -33,21 +31,20 @@ const TotalBox = styled(Box)(({ theme }) => ({
   marginBottom: '24px',
 }));
 
-const TransactionDetails = styled(Stack)(({ theme }) => ({
+const TransactionDetails = styled(Stack)(() => ({
   gap: '16px',
 }));
-const Actions = styled(Stack)(({ theme }) => ({
+const Actions = styled(Stack)(() => ({
   marginBottom: '24px',
   '& .MuiButton-root': {
     width: '128px',
   },
 }));
 
-export const DelagationForm = (): Node => {
-  const [showPassword, setShowPassword] = React.useState(false);
+export const DelagationForm = () => {
   const [passwaord, setPassword] = React.useState('');
   const navigateTo = useNavigateTo();
-  const { dRepId, governanceVote, walletId } = useGovernance();
+  const { governanceVote, walletId } = useGovernance();
   const strings = useStrings();
 
   const confirmDelegation = () => {
@@ -60,7 +57,7 @@ export const DelagationForm = (): Node => {
     }
   };
   const idPasswordInvalid = passwaord.match(/\d+/g);
-  console.log('sssdsdsds', strings.total);
+
   return (
     <Container>
       <Stack>
@@ -131,9 +128,11 @@ export const DelagationForm = (): Node => {
         />
       </Stack>
       <Actions direction="row" spacing="24px">
+        {/* @ts-ignore */}
         <Button variant="secondary" onClick={() => navigateTo.selectStatus()}>
           {strings.back}
         </Button>
+        {/* @ts-ignore */}
         <Button variant="primary" disabled={passwaord.length === 0 || idPasswordInvalid} onClick={confirmDelegation}>
           {strings.confirm}
         </Button>

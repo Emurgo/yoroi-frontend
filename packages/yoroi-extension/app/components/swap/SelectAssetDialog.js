@@ -49,7 +49,8 @@ export default function SelectAssetDialog({
       if (a == null) return false;
       if (!searchTerm) return true;
       return `${a.name};[${a.ticker}];${a.id};${a.fingerprint}`
-        .toLowerCase().includes(searchTerm.toLowerCase())
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
     }) || [];
 
   return (
@@ -59,17 +60,19 @@ export default function SelectAssetDialog({
       withCloseButton
       closeOnOverlayClick
       styleOverride={{ minWidth: '612px', maxWidth: '612px', minHeight: '600px' }}
+      styleContentOverride={{ paddingTop: '16px' }}
       scrollableContentClass="scrollable-content"
     >
-      <Box mb="8px" position="relative">
+      <Box mb="8px" position="relative" height="40px">
         <Box
           sx={{
             position: 'absolute',
             left: '7px',
-            top: '50%',
+            top: '30px',
             transform: 'translateY(-50%)',
             display: 'inline-flex',
             color: 'grayscale.600',
+            height: '40px',
           }}
         >
           <SearchIcon />
@@ -86,6 +89,9 @@ export default function SelectAssetDialog({
             paddingLeft: '34px',
             outline: 'none',
             width: '100%',
+            fontSize: '14px',
+            fontFamily: 'Rubik',
+            height: '40px',
             '&:focus': {
               borderWidth: '2px',
               borderColor: 'grayscale.max',

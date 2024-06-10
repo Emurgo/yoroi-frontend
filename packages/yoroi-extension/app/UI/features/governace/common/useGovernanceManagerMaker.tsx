@@ -1,6 +1,6 @@
-// @flow
 import React from 'react';
-import { governanceApiMaker, governanceManagerMaker, useStakingKeyState } from '@yoroi/staking';
+import { governanceApiMaker, governanceManagerMaker } from '@yoroi/staking';
+// @ts-ignore
 import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
 
 export const useGovernanceManagerMaker = (walletId: string, networkId: string): any => {
@@ -11,9 +11,10 @@ export const useGovernanceManagerMaker = (walletId: string, networkId: string): 
     () =>
       governanceManagerMaker({
         walletId,
-        networkId,
-        api: governanceApiMaker({ networkId }),
+        networkId: Number(networkId),
+        api: governanceApiMaker({ networkId: Number(networkId) }),
         cardano: RustModule.CrossCsl.init('any'),
+        // @ts-ignore
         storage: 'wallet/${walletId}/staking-governance/',
       }),
     [networkId, walletId]

@@ -27,4 +27,5 @@ export const Icon = {
   Staking,
   Expand,
   ChevronDown,
+  ChevronUp,
 };

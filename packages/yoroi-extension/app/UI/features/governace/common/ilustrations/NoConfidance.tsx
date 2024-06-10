@@ -2,13 +2,7 @@ import React from 'react';
 
 export const NoConfidance = () => {
   return (
-    <svg
-      width="157"
-      height="180"
-      viewBox="0 0 280 280"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg width="157" height="180" viewBox="0 0 280 280" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
         opacity="0.8"
         d="M172.729 151.751L216.162 177.123H216.194L259.814 152.063L216.365 126.691L172.729 151.751Z"
@@ -26,23 +20,10 @@ export const NoConfidance = () => {
         d="M81.017 186.741L89.0735 180.635L194.422 243.604L186.366 249.722L81.017 186.741Z"
         fill="url(#paint2_linear_1598_4401)"
       />
-      <path
-        d="M89.2347 182.249L81.017 187.179V36.0272L89.2347 30V182.249Z"
-        fill="url(#paint3_linear_1598_4401)"
-      />
-      <path
-        opacity="0.8"
-        d="M186.205 250L81.017 187.35V35.0891L186.205 97.7513V250Z"
-        fill="#52FCFF"
-      />
-      <path
-        d="M194.422 244.757L186.205 249.687V98.535L194.422 92.5078V244.757Z"
-        fill="url(#paint4_linear_1598_4401)"
-      />
-      <path
-        d="M81.017 36.1063L89.0735 30L194.422 92.9693L186.366 99.0874L81.017 36.1063Z"
-        fill="url(#paint5_linear_1598_4401)"
-      />
+      <path d="M89.2347 182.249L81.017 187.179V36.0272L89.2347 30V182.249Z" fill="url(#paint3_linear_1598_4401)" />
+      <path opacity="0.8" d="M186.205 250L81.017 187.35V35.0891L186.205 97.7513V250Z" fill="#52FCFF" />
+      <path d="M194.422 244.757L186.205 249.687V98.535L194.422 92.5078V244.757Z" fill="url(#paint4_linear_1598_4401)" />
+      <path d="M81.017 36.1063L89.0735 30L194.422 92.9693L186.366 99.0874L81.017 36.1063Z" fill="url(#paint5_linear_1598_4401)" />
       <path
         opacity="0.8"
         d="M20.139 157.559L52.4696 176.445H52.4928L84.9622 157.791L52.6201 138.905L20.139 157.559Z"
@@ -103,34 +84,16 @@ export const NoConfidance = () => {
         d="M152.49 126.834L135.277 106.612L134.664 106.61L151.19 126.068L152.49 126.834Z"
         fill="url(#paint17_linear_1598_4401)"
       />
-      <path
-        d="M161.309 145.32L166.431 142.378L161.309 139.363L161.309 145.32Z"
-        fill="url(#paint18_linear_1598_4401)"
-      />
+      <path d="M161.309 145.32L166.431 142.378L161.309 139.363L161.309 145.32Z" fill="url(#paint18_linear_1598_4401)" />
       <path
         d="M151.963 152.644L151.964 155.407L151.964 156.632L157.086 153.691C155.277 152.995 153.557 152.653 151.963 152.644Z"
         fill="url(#paint19_linear_1598_4401)"
       />
-      <path
-        d="M145.732 143.485L150.855 146.501L150.855 140.544L145.732 143.485Z"
-        fill="url(#paint20_linear_1598_4401)"
-      />
-      <path
-        d="M127.04 132.48L132.162 135.496L132.162 129.538L127.04 132.48Z"
-        fill="url(#paint21_linear_1598_4401)"
-      />
-      <path
-        d="M133.271 155.869L133.272 161.826L138.394 158.885L133.271 155.869Z"
-        fill="url(#paint22_linear_1598_4401)"
-      />
-      <path
-        d="M114.579 144.863L114.579 150.821L119.701 147.879L114.579 144.863Z"
-        fill="url(#paint23_linear_1598_4401)"
-      />
-      <path
-        d="M108.347 121.474L113.47 124.49L113.47 118.533L108.347 121.474Z"
-        fill="url(#paint24_linear_1598_4401)"
-      />
+      <path d="M145.732 143.485L150.855 146.501L150.855 140.544L145.732 143.485Z" fill="url(#paint20_linear_1598_4401)" />
+      <path d="M127.04 132.48L132.162 135.496L132.162 129.538L127.04 132.48Z" fill="url(#paint21_linear_1598_4401)" />
+      <path d="M133.271 155.869L133.272 161.826L138.394 158.885L133.271 155.869Z" fill="url(#paint22_linear_1598_4401)" />
+      <path d="M114.579 144.863L114.579 150.821L119.701 147.879L114.579 144.863Z" fill="url(#paint23_linear_1598_4401)" />
+      <path d="M108.347 121.474L113.47 124.49L113.47 118.533L108.347 121.474Z" fill="url(#paint24_linear_1598_4401)" />
       <path
         d="M136.666 172.54C136.745 173.383 136.833 174.214 136.933 175.032C137.088 176.316 137.322 177.661 137.634 179.067L142.756 176.126L136.666 172.54Z"
         fill="url(#paint25_linear_1598_4401)"
@@ -191,14 +154,7 @@ export const NoConfidance = () => {
           <stop offset="0.89" stopColor="#3F71F1" />
           <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
-        <linearGradient
-          id="paint1_linear_1598_4401"
-          x1="216.193"
-          y1="226.98"
-          x2="260"
-          y2="226.98"
-          gradientUnits="userSpaceOnUse"
-        >
+        <linearGradient id="paint1_linear_1598_4401" x1="216.193" y1="226.98" x2="260" y2="226.98" gradientUnits="userSpaceOnUse">
           <stop stopColor="#17D1AA" />
           <stop offset="0.15" stopColor="#1ACBAF" />
           <stop offset="0.37" stopColor="#21B8BC" />
