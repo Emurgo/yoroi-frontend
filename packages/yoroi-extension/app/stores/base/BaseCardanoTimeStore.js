@@ -1,23 +1,15 @@
 // @flow
 
-import { action, observable, runInAction, } from 'mobx';
+import { action, computed, observable, runInAction, } from 'mobx';
 import { find } from 'lodash';
-import {
-  PublicDeriver,
-} from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import CachedRequest from '../lib/LocalizedCachedRequest';
+import { PublicDeriver, } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import Store from './Store';
-import type {
-  ToAbsoluteSlotNumberFunc,
-  ToRelativeSlotNumberFunc,
-  TimeToAbsoluteSlotFunc,
-  CurrentEpochLengthFunc,
-  CurrentSlotLengthFunc,
-  TimeSinceGenesisFunc,
-  ToRealTimeFunc,
-} from '../../api/common/lib/storage/bridge/timeUtils';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import type { RelativeSlot } from '../../api/ada/lib/storage/bridge/timeUtils';
+import TimeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
+import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { fail, maybe } from '../../coreUtils';
 
 export type TimeCalcRequests = {|
   // although time is network-specific
@@ -25,13 +17,12 @@ export type TimeCalcRequests = {|
   // so it depends how much the blockchain has synced for a given wallet
   publicDeriver: PublicDeriver<>,
   requests: {|
-    toAbsoluteSlot: CachedRequest<void => Promise<ToAbsoluteSlotNumberFunc>>;
-    toRelativeSlotNumber: CachedRequest<void => Promise<ToRelativeSlotNumberFunc>>;
-    timeToSlot: CachedRequest<void => Promise<TimeToAbsoluteSlotFunc>>;
-    currentEpochLength: CachedRequest<void => Promise<CurrentEpochLengthFunc>>;
-    currentSlotLength: CachedRequest<void => Promise<CurrentSlotLengthFunc>>;
-    timeSinceGenesis: CachedRequest<void => Promise<TimeSinceGenesisFunc>>,
-    toRealTime: CachedRequest<void => Promise<ToRealTimeFunc>>;
+    toAbsoluteSlot: RelativeSlot => number;
+    toRelativeSlotNumber: number => RelativeSlot;
+    timeToSlot: {| time: Date |} => {| slot: number |};
+    currentEpochLength: () => number;
+    currentSlotLength: () => number;
+    toRealTime: {| absoluteSlotNum: number |} => Date;
   |},
 |};
 
@@ -42,7 +33,6 @@ export type CurrentTimeRequests = {|
   publicDeriver: PublicDeriver<>,
   currentEpoch: number,
   currentSlot: number,
-  msIntoSlot: number,
 |};
 
 /**
@@ -59,25 +49,56 @@ export default class BaseCardanoTimeStore extends Store<StoresMap, ActionsMap> {
    * TODO: implement this once this is more formalized in Cardano
    */
   @observable timeCalcRequests: Array<TimeCalcRequests> = [];
-
   @observable currentTimeRequests: Array<CurrentTimeRequests> = [];
 
-  getTimeCalcRequests: PublicDeriver<> => TimeCalcRequests = (
-    publicDeriver
-  ) => {
-    const foundRequest = find(this.timeCalcRequests, { publicDeriver });
-    if (foundRequest) return foundRequest;
+  _intervalId: void | IntervalID;
 
-    throw new Error(`${nameof(BaseCardanoTimeStore)}::${nameof(this.getTimeCalcRequests)} missing for public deriver`);
+  setup(): void {
+    super.setup();
+    // note: doesn't await but that's okay
+    this._intervalId = setInterval(this._updateTime, 1000);
   }
 
-  getCurrentTimeRequests: PublicDeriver<> => CurrentTimeRequests = (
+  teardown(): void {
+    super.teardown();
+    if (this._intervalId) clearInterval(this._intervalId);
+  }
+
+  @action addObservedTime: PublicDeriver<> => void = (
     publicDeriver
   ) => {
-    const foundRequest = find(this.currentTimeRequests, { publicDeriver });
-    if (foundRequest) return foundRequest;
+    const baseConfig = getCardanoHaskellBaseConfig(publicDeriver.getParent().getNetworkInfo());
+    this.timeCalcRequests.push({
+      publicDeriver,
+      requests: {
+        toAbsoluteSlot: (relativeSlot: RelativeSlot) => TimeUtils.toAbsoluteSlotNumber(baseConfig, relativeSlot),
+        toRelativeSlotNumber: absoluteSlot => TimeUtils.toRelativeSlotNumber(baseConfig, absoluteSlot),
+        timeToSlot: (req: {| time: Date |}) => ({ slot: TimeUtils.timeToAbsoluteSlot(baseConfig, req.time) }),
+        currentEpochLength: () => TimeUtils.currentEpochSlots(baseConfig),
+        currentSlotLength: () => TimeUtils.currentSlotSeconds(baseConfig),
+        toRealTime: (req: {| absoluteSlotNum: number |}) => TimeUtils.absoluteSlotToTime(baseConfig, req.absoluteSlotNum),
+      },
+    });
+    this.currentTimeRequests.push({
+      publicDeriver,
+      // initial values that can be updated later
+      currentEpoch: 0,
+      currentSlot: 0,
+    });
+  }
 
-    throw new Error(`${nameof(BaseCardanoTimeStore)}::${nameof(this.getCurrentTimeRequests)} missing for public deriver`);
+  getTimeCalcRequests: PublicDeriver<> => TimeCalcRequests = (publicDeriver) => {
+    return find(this.timeCalcRequests, { publicDeriver })
+      ?? fail(`${nameof(this.getTimeCalcRequests)} missing for public deriver`);
+  }
+
+  getCurrentTimeRequests: PublicDeriver<> => CurrentTimeRequests = (publicDeriver) => {
+    return find(this.currentTimeRequests, { publicDeriver })
+      ?? fail(`${nameof(this.getCurrentTimeRequests)} missing for public deriver`)
+  }
+
+  @computed get currentTime(): ?CurrentTimeRequests {
+    return maybe(this.stores.wallets.selected, w => this.getCurrentTimeRequests(w));
   }
 
   @action _updateTime: void => Promise<void> = async () => {
@@ -90,16 +111,9 @@ export default class BaseCardanoTimeStore extends Store<StoresMap, ActionsMap> {
     const timeCalcRequests = this.getTimeCalcRequests(selected);
     const currTimeRequests = this.getCurrentTimeRequests(selected);
 
-    const timeToSlot = await timeCalcRequests.requests.timeToSlot.execute().promise;
-    if (!timeToSlot) throw new Error(`${nameof(this._updateTime)} should never happen`);
+    const { timeToSlot, toRelativeSlotNumber } = timeCalcRequests.requests;
 
-    const currentAbsoluteSlot = timeToSlot({
-      time: currTime
-    });
-
-    const toRelativeSlotNumber = await timeCalcRequests.requests
-      .toRelativeSlotNumber.execute().promise;
-    if (!toRelativeSlotNumber) throw new Error(`${nameof(this._updateTime)} should never happen`);
+    const currentAbsoluteSlot = timeToSlot({ time: currTime });
     const currentRelativeTime = toRelativeSlotNumber(currentAbsoluteSlot.slot);
 
     runInAction(() => {
@@ -109,7 +123,6 @@ export default class BaseCardanoTimeStore extends Store<StoresMap, ActionsMap> {
         currTimeRequests.currentEpoch = currentRelativeTime.epoch;
       }
       currTimeRequests.currentSlot = currentRelativeTime.slot;
-      currTimeRequests.msIntoSlot = currentAbsoluteSlot.msIntoSlot;
     });
   }
 }

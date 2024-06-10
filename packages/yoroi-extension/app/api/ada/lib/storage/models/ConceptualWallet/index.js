@@ -79,6 +79,13 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
   getWalletType: void => WalletType = () => {
     return this.walletType;
   }
+
+  getWalletVariant: void => 'web' | 'ledger' | 'trezor' = () => {
+    if (isLedgerNanoWallet(this)) return 'ledger';
+    if (isTrezorTWallet(this)) return 'trezor';
+    return 'web';
+  }
+
   /**
    * TODO: maybe  we shouldn't cache in this way
    * since information like device ID, firmware version, etc.

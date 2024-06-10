@@ -1,4 +1,4 @@
-export const mapStakingKeyStateToGovernanceAction = state => {
+export const mapStakingKeyStateToGovernanceAction = (state: any) => {
   if (!state.drepDelegation) return null;
   const vote = state.drepDelegation;
   return vote.action === 'abstain'
@@ -8,7 +8,7 @@ export const mapStakingKeyStateToGovernanceAction = state => {
     : { kind: 'delegate', drepID: vote.drepID };
 };
 
-const getStakePoolMeta = stores => {
+const getStakePoolMeta = (stores: any) => {
   const publicDeriver = stores.wallets.selected;
   const delegationStore = stores.delegation;
   const currentPool = delegationStore.getDelegatedPoolId(publicDeriver);
@@ -35,8 +35,8 @@ const getStakePoolMeta = stores => {
   };
 };
 
-export const createCurrrentWalletInfo = stores => {
-  const { wallets, delegation, substores } = stores;
+export const createCurrrentWalletInfo = (stores: any) => {
+  const { wallets } = stores;
   const walletCurrentPoolInfo = getStakePoolMeta(stores);
 
   const selectedWallet = wallets.selected;

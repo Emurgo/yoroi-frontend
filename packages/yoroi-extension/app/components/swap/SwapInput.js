@@ -53,7 +53,7 @@ export default function SwapInput({
         component="fieldset"
         sx={{
           borderStyle: 'solid',
-          borderWidth: tokenInfo.id?.length > 0 || error ? '2px' : '1px',
+          borderWidth: tokenInfo.id?.length > 0 && error ? '2px' : '1px',
           borderColor: error ? 'magenta.500' : isFocusedColor,
           borderRadius: '8px',
           p: '16px',
@@ -127,10 +127,18 @@ export default function SwapInput({
               component="button"
               variant="caption"
               fontWeight={500}
-              sx={{ p: '4px 8px', bgcolor: 'grayscale.50', borderRadius: '8px' }}
+              sx={{
+                p: '4px 8px',
+                bgcolor: 'grayscale.50',
+                borderRadius: '8px',
+                ':disabled': {
+                  cursor: 'not-allowed',
+                },
+              }}
               onClick={() => {
                 handleAmountChange(quantity);
               }}
+              disabled={disabled}
             >
               MAX
             </Typography>

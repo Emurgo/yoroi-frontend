@@ -1,24 +1,22 @@
 // @flow
 import * as React from 'react';
-import type { Node } from 'react';
 import { styled } from '@mui/material/styles';
-import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import { Stack } from '@mui/material';
 import LoadingSpinner from '../../../../components/widgets/LoadingSpinner';
 
-type Props = {|
-  title: string,
-  description: string,
-  icon: React.Node,
-  selected: boolean,
-  onClick: () => void,
-  pending: boolean,
-|};
+type Props = {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  selected: boolean;
+  onClick: () => void;
+  pending: boolean;
+};
 
-const StyledCard = styled(Stack)(({ theme, selected, pending }) => ({
+const StyledCard: any = styled(Stack)(({ theme, selected, pending }: any) => ({
   position: 'relative',
   display: 'flex',
   flexDirection: 'column',
@@ -49,7 +47,7 @@ const StyledCard = styled(Stack)(({ theme, selected, pending }) => ({
   },
 }));
 
-const IconContainer = styled(Box)(({ theme }) => ({
+const IconContainer = styled(Box)(() => ({
   display: 'flex',
   justifyContent: 'center',
 }));
@@ -58,14 +56,14 @@ const Description = styled(Typography)(({ theme }) => ({
   marginTop: theme.spacing(1),
 }));
 
-const SpinnerBox = styled(Box)(({ theme }) => ({
+const SpinnerBox = styled(Box)(() => ({
   position: 'absolute',
   right: 15,
   top: 15,
 }));
 
-export const GovernanceVoteingCard = ({ title, description, icon, selected, onClick, pending }: Props): Node => (
-  <StyledCard selected={selected} onClick={pending ? undefined : onClick} pending={pending}>
+export const GovernanceVoteingCard = ({ title, description, icon, selected, onClick, pending }: Props) => (
+  <StyledCard onClick={pending ? undefined : onClick} pending={pending} selected={selected}>
     {pending && selected && (
       <SpinnerBox>
         <LoadingSpinner />

@@ -9,4 +9,5 @@ export const Icon = {
   VisibilityOn,
   VisibilityOff,
   ChevronDown,
+  ChevronUp,
 };

@@ -14,6 +14,7 @@ export const TransactionFailed = () => {
       <Typography variant="body1" mb={2} color="ds.text_gray_medium">
         <FormattedMessage {...globalMessages.transactionFailedInfo} />
       </Typography>
+      {/* @ts-ignore */}
       <Button variant="primary">
         <FormattedMessage {...globalMessages.tryAgain} />
       </Button>

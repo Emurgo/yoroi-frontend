@@ -855,6 +855,7 @@ export class GetTxAndBlock {
         )
       )
       .orderBy(txTable[txTableMeta.properties.LastUpdateTime], lf.Order.DESC)
+      .orderBy(txTable[txTableMeta.properties.Ordinal], lf.Order.DESC)
       .where(op.and(
         txTable[txTableMeta.properties.TransactionId].in(request.txIds),
       ));

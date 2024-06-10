@@ -1,7 +1,6 @@
 // @flow
 
 import React from 'react';
-import type { Node } from 'react';
 import { styled } from '@mui/material/styles';
 
 import OutlinedInput from '@mui/material/OutlinedInput';
@@ -11,20 +10,18 @@ import FormControl from '@mui/material/FormControl';
 import IconButton from '@mui/material/IconButton';
 import InputLabel from '@mui/material/InputLabel';
 import { Icon } from '../icons/index';
-import { VisibilityOff } from '../icons/VisibilityOff';
-import { VisibilityOn } from '../icons/VisibilityOn';
 
-type StyledInputProps = {|
-  id: string,
-  label: string,
-  variant?: string,
-  onChange: (event: any) => void,
-  value?: string,
-  error?: boolean,
-  helperText?: string,
-|};
+type StyledInputProps = {
+  id: string;
+  label: string;
+  variant?: string;
+  onChange: (event: any) => void;
+  value?: string;
+  error?: boolean;
+  helperText?: string;
+};
 
-export const PasswordInput = ({ id, label, variant, onChange, value, error, helperText }: StyledInputProps): Node => {
+export const PasswordInput = ({ id, label, onChange, value, error, helperText }: StyledInputProps) => {
   const [showPassword, setShowPassword] = React.useState(false);
 
   const handleClickShowPassword = () => setShowPassword(show => !show);
@@ -42,7 +39,6 @@ export const PasswordInput = ({ id, label, variant, onChange, value, error, help
         fullWidth
         id={id}
         type={showPassword ? 'text' : 'password'}
-        variant="outlined"
         onChange={onChange}
         value={value}
         endAdornment={
@@ -69,7 +65,7 @@ export const PasswordInput = ({ id, label, variant, onChange, value, error, help
   );
 };
 
-const SOutlinedInput = styled(OutlinedInput)(({ theme, error }) => ({
+const SOutlinedInput = styled(OutlinedInput)(({ theme, error }: any) => ({
   '& .MuiFormHelperText-root': {
     marginLeft: '0px',
   },
@@ -78,7 +74,7 @@ const SOutlinedInput = styled(OutlinedInput)(({ theme, error }) => ({
     color: error && theme.palette.ds.sys_magenta_c500,
   },
 }));
-const SFormControl = styled(FormControl)(({ theme, error }) => ({
+const SFormControl = styled(FormControl)(({ theme, error }: any) => ({
   '& .MuiFormHelperText-root': {
     marginLeft: '0px',
   },

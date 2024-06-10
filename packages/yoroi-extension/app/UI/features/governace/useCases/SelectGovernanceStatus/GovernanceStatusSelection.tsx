@@ -1,7 +1,4 @@
-// @flow
 import * as React from 'react';
-import type { Node } from 'react';
-import { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -11,18 +8,18 @@ import { useStrings } from '../../common/useStrings';
 import { Abstein } from '../../common/ilustrations/Abstein';
 import { NoConfidance } from '../../common/ilustrations/NoConfidance';
 import { Stack } from '@mui/material';
-import { Button } from '@mui/material';
 import Link from '@mui/material/Link';
 import { useModal } from '../../../../components/modals/ModalContext';
 import { ChooseDRepModal } from '../../common/ChooseDRepModal';
 import { GovernanceVoteingCard } from '../../common/GovernanceVoteingCard';
-import { GovernanceProvider, useStakingKeyState, useDelegationCertificate, useVotingCertificate } from '@yoroi/staking';
+import { GovernanceProvider, useDelegationCertificate, useVotingCertificate } from '@yoroi/staking';
 import { useNavigateTo } from '../../common/useNavigateTo';
 import { useDrepDelegationState } from '../../api/useDrepDelegationState';
 import { VotingSkeletonCard } from '../../common/VotingSkeletonCard';
 import { BECOME_DREP_LINK, LEARN_MORE_LINK } from '../../common/constants';
+import { Vote } from '../../module/state';
 
-const Container = styled(Box)(({ theme }) => ({
+const Container = styled(Box)(() => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
@@ -36,13 +33,13 @@ const mapStatus = {
   'no-confidence': 'No confidence',
 };
 
-export const GovernanceStatusSelection = (): Node => {
-  const [pendingVote, setPendingVote] = React.useState<boolean>(false);
-  const [pendingPage, setPendingPage] = React.useState<boolean>(false);
+export const GovernanceStatusSelection = () => {
+  const [pendingVote] = React.useState<boolean>(false);
+  const [pendingPage] = React.useState<boolean>(false);
   const navigateTo = useNavigateTo();
 
   const { openModal } = useModal();
-  const { governanceVote, governanceManager, stakePoolKeyHash, dRepIdChanged, governanceVoteChanged, walletId } = useGovernance();
+  const { governanceVote, governanceManager, governanceVoteChanged, walletId } = useGovernance();
   const { data: governanceData } = useDrepDelegationState(walletId);
 
   const strings = useStrings();
@@ -51,9 +48,12 @@ export const GovernanceStatusSelection = (): Node => {
   // const { data: stakingStatus } = useStakingKeyState(stakePoolKeyHash, { suspense: true });
   // const action = stakingStatus ? mapStakingKeyStateToGovernanceAction(stakingStatus) : null
 
+  // @ts-ignore
   const { createCertificate, isLoading: isCreatingDelegationCertificate } = useDelegationCertificate({
     useErrorBoundary: true,
   });
+
+  // @ts-ignore
   const { createCertificate: createVotingCertificate, isLoading: isCreatingVotingCertificate } = useVotingCertificate({
     useErrorBoundary: true,
   });
@@ -63,6 +63,9 @@ export const GovernanceStatusSelection = (): Node => {
   const pageSubtitle = governanceData?.kind === 'none' ? strings.reviewSelection : strings.statusSelected(statusRawText);
 
   const openDRepIdModal = (onSubmit: (drepID: string) => void) => {
+    if (!governanceManager) {
+      return;
+    }
     openModal({
       title: String(strings.chooseDrep).toUpperCase(),
       content: (
@@ -77,7 +80,7 @@ export const GovernanceStatusSelection = (): Node => {
 
   const handleDelegate = () => {
     openDRepIdModal(drepID => {
-      const vote = { kind: 'delegate', drepID };
+      const vote: Vote = { kind: 'delegate', drepID };
       governanceVoteChanged(vote);
       navigateTo.delegationForm();
       // createCertificate(
@@ -97,7 +100,7 @@ export const GovernanceStatusSelection = (): Node => {
   };
 
   const handleAbstain = () => {
-    const vote = { kind: 'abstain' };
+    const vote: Vote = { kind: 'abstain' };
     // setPendingVote(vote.kind);
     governanceVoteChanged(vote);
     navigateTo.delegationForm();
@@ -112,7 +115,7 @@ export const GovernanceStatusSelection = (): Node => {
   };
 
   const handleNoConfidence = () => {
-    const vote = { kind: 'no-confidence' };
+    const vote: Vote = { kind: 'no-confidence' };
     // setPendingVote(vote.kind);
     governanceVoteChanged(vote);
     navigateTo.delegationForm();
