@@ -2212,10 +2212,11 @@ export async function genCardanoAssetMap(
     .map(tokenId => {
       const id = tokenId.split('.').join('');
 
-      let numberOfDecimals;
-      let ticker;
-      let lastUpdatedAt;
-      let longName;
+      let numberOfDecimals = 0;
+      let lastUpdatedAt = null;
+      let ticker = null;
+      let longName = null;
+      let logo = null;
 
       const tokenInfo = tokenInfoResponse[id];
       if (tokenInfo) {
@@ -2223,23 +2224,16 @@ export async function genCardanoAssetMap(
         ticker = tokenInfo.ticker ?? null;
         lastUpdatedAt = new Date().toISOString();
         longName = tokenInfo.name ?? null;
+        logo = tokenInfo.logo ?? null;
       } else if (tokenInfo === null) {
         // the token is not registered
-        numberOfDecimals = 0;
-        ticker = null;
         lastUpdatedAt = new Date().toISOString();
-        longName = null;
       } else {
         // failed to fetch token info
         if (existingRowsMap.has(tokenId)) {
           // the token entry exists, do not update
           return null;
         }
-        // the token entry doesn't exists, insert a placeholder row
-        numberOfDecimals = 0;
-        ticker = null;
-        lastUpdatedAt = null;
-        longName = null;
       }
 
       const parts = identifierToCardanoAsset(tokenId);
@@ -2277,6 +2271,7 @@ export async function genCardanoAssetMap(
         Metadata: {
           type: 'Cardano',
           ticker,
+          logo,
           longName,
           numberOfDecimals,
           assetName,

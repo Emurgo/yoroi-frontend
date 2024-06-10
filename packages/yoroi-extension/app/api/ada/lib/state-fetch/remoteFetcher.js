@@ -484,7 +484,10 @@ export class RemoteFetcher implements IFetcher {
         if (resp.data.ticker?.value) {
           v.ticker = resp.data.ticker.value;
         }
-        if (v.name || v.decimals || v.ticker) {
+        if (resp.data.logo?.value) {
+          v.logo = resp.data.logo.value;
+        }
+        if (v.name || v.decimals || v.ticker || v.logo) {
           res[resp.data.subject] = v;
         }
 

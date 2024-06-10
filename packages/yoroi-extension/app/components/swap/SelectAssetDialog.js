@@ -1,6 +1,6 @@
 // @flow
 import type { AssetAmount, PriceImpact } from './types';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { ReactComponent as NoAssetsFound } from '../../assets/images/revamp/no-assets-found.inline.svg';
 import { ReactComponent as SearchIcon } from '../../assets/images/revamp/icons/search.inline.svg';
@@ -28,6 +28,7 @@ type Props = {|
   onAssetSelected: any => void,
   onClose: void => void,
   defaultTokenInfo: RemoteTokenInfo,
+  getTokenInfo: string => Promise<RemoteTokenInfo>,
 |};
 
 export default function SelectAssetDialog({
@@ -36,6 +37,7 @@ export default function SelectAssetDialog({
   onAssetSelected,
   onClose,
   defaultTokenInfo,
+  getTokenInfo,
 }: Props): React$Node {
   const [searchTerm, setSearchTerm] = useState<string>('');
 
@@ -122,6 +124,7 @@ export default function SelectAssetDialog({
                 type={type}
                 onAssetSelected={handleAssetSelected}
                 defaultTokenInfo={defaultTokenInfo}
+                getTokenInfo={getTokenInfo}
               />
             );
           })}
@@ -160,6 +163,7 @@ export const AssetAndAmountRow = ({
   priceChange100 = '',
   onAssetSelected = null,
   defaultTokenInfo,
+  getTokenInfo,
   displayAmount = null,
   priceImpactState = null,
 }: {|
@@ -171,9 +175,13 @@ export const AssetAndAmountRow = ({
   priceChange100?: string,
   onAssetSelected?: AssetAmount => void,
   defaultTokenInfo: RemoteTokenInfo,
+  getTokenInfo: string => Promise<RemoteTokenInfo>,
   displayAmount?: ?string,
   priceImpactState?: ?PriceImpact,
 |}): React$Node => {
+
+  const [remoteTokenLogo, setRemoteTokenLogo] = useState<?string>(null);
+
   const isFrom = type === 'from';
 
   const { name = null, image = '', fingerprint: address, id, amount: assetAmount, ticker } = asset;
@@ -181,10 +189,19 @@ export const AssetAndAmountRow = ({
   const priceIncreased = priceChange100 && priceChange100.charAt(0) !== '-';
   const priceChange24h = priceChange100.replace('-', '') || '0%';
 
+  useEffect(async () => {
+    if (id != null) {
+      const tokenInfo = await getTokenInfo(id);
+      if (tokenInfo.logo != null) {
+        setRemoteTokenLogo(`data:image/png;base64,${tokenInfo.logo}`);
+      }
+    }
+  }, [id])
+
   const imgSrc =
     ticker === defaultTokenInfo.ticker
       ? adaTokenImage
-      : urlResolveForIpfsAndCorsproxy(image) ?? defaultTokenImage;
+      : remoteTokenLogo ?? urlResolveForIpfsAndCorsproxy(image) ?? defaultTokenImage;
 
   const amount = displayAmount ?? assetAmount;
 
