@@ -4,7 +4,14 @@ import type { lf$Transaction, } from 'lovefield';
 
 import { asDisplayCutoff, asGetAllAccounting, asGetAllUtxos, asHasLevels, } from '../models/PublicDeriver/traits';
 import { PublicDeriver } from '../models/PublicDeriver/index';
-import type { Addressing, AddressType, IPublicDeriver, UsedStatus, Value, } from '../models/PublicDeriver/interfaces';
+import type {
+  Address,
+  Addressing,
+  AddressType,
+  IPublicDeriver,
+  UsedStatus,
+  Value,
+} from '../models/PublicDeriver/interfaces';
 import { ConceptualWallet } from '../models/ConceptualWallet/index';
 
 import { getAllSchemaTables, mapToTables, raii, } from '../database/utils';
@@ -15,7 +22,6 @@ import { CoreAddressTypes } from '../database/primitives/enums';
 import { GetDerivationSpecific, } from '../database/walletTypes/common/api/read';
 import { GetUtxoTxOutputsWithTx, } from '../database/transactionModels/utxo/api/read';
 import { rawGetAddressesForDisplay, } from '../models/utils';
-import type { Address } from '../../../../../../chrome/extension/connector/types';
 import { getOutputAddressesInSubmittedTxs } from '../../../../localStorage';
 
 export async function rawGetAllAddressesForDisplay(
@@ -296,7 +302,7 @@ export async function getAddressRowsForWallet(
   return [...result.utxoAddresses, ...result.accountingAddresses];
 }
 
-export async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Promise<Address[]> {
+export async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Promise<string[]> {
   const addresses = await getAddressRowsForWallet({ publicDeriver: wallet });
   return addresses
     .filter(a => a.IsUsed === usedFilter && a.Type === CoreAddressTypes.CARDANO_BASE)
@@ -305,7 +311,7 @@ export async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boole
 
 export async function getAllUsedAddresses(
   wallet: PublicDeriver<>,
-): Promise<Address[]> {
+): Promise<string[]> {
   const usedAddresses = await getAllAddresses(wallet, true);
   const outputAddressesInSubmittedTxs = new Set(
     await getOutputAddressesInSubmittedTxs(wallet.publicDeriverId)

@@ -426,7 +426,7 @@ export async function loadSubmittedTransactions(): any {
   return JSON.parse(stored[storageKeys.SUBMITTED_TRANSACTIONS]);
 }
 
-export async function getOutputAddressesInSubmittedTxs(publicDeriverId: number) {
+export async function getOutputAddressesInSubmittedTxs(publicDeriverId: number): Promise<Array<string>> {
   const submittedTxs = await loadSubmittedTransactions() || [];
   return submittedTxs
     .filter(submittedTxRecord => submittedTxRecord.publicDeriverId === publicDeriverId)

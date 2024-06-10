@@ -384,7 +384,7 @@ async function getCardanoRewardAddresses(
 export async function connectorGetUsedAddressesWithPaginate(
   wallet: PublicDeriver<>,
   paginate: ?Paginate
-): Promise<Address[]> {
+): Promise<string[]> {
   return paginateResults(await getAllUsedAddresses(wallet), paginate);
 }
 
