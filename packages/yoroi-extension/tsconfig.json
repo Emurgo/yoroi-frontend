@@ -2,13 +2,13 @@
   "compilerOptions": {
     /* Language and Environment */
     "declaration": true,
-    "target": "es2016",                     
+    "target": "es2016",
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     /* Modules */
     "esModuleInterop": true,
-    "module": "commonjs",                               
-    "forceConsistentCasingInFileNames": true,           
+    "module": "commonjs",
+    "forceConsistentCasingInFileNames": true,
     "jsx": "react",
 
     /* Type Checking */
@@ -25,6 +25,5 @@
     "strict": true,
     "noImplicitAny": false
   },
-  "include": ["app/UI/**/*"],
-
+  "include": ["app/UI/**/*", ".d.ts"]
 }
