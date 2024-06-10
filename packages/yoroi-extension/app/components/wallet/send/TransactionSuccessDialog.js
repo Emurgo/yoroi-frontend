@@ -25,7 +25,7 @@ const messages = defineMessages({
     defaultMessage: '!!!Transaction has been submitted',
   },
   goToExchange: {
-    id: 'wallet.transactions.success.button.encryptus',
+    id: 'wallet.transactions.success.button.exchange',
     defaultMessage: '!!!Go to the exchange page',
   },
 });
