@@ -232,6 +232,9 @@ const resolve = () /*: * */ => ({
     zlib: require.resolve('browserify-zlib'),
     crypto: require.resolve('crypto-browserify'),
     buffer: require.resolve('buffer'),
+    assert: require.resolve('assert/'),
+    util: require.resolve('util/'),
+    url: require.resolve('url/'),
     // need these so that @yoroi/common (a dependent of @yoroi/exchange) doesn't break Webpack
     'react-native': false,
     'react-native-mmkv': false,
