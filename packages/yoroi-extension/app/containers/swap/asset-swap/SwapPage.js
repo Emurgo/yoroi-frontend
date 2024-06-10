@@ -332,6 +332,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
               userPasswordState={userPasswordState}
               txSubmitErrorState={txSubmitErrorState}
               defaultTokenInfo={defaultTokenInfo}
+              getTokenInfo={getTokenInfo}
               getFormattedPairingValue={getFormattedPairingValue}
             />
           )}

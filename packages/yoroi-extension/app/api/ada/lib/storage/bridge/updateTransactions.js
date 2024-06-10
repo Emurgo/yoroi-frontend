@@ -2228,12 +2228,9 @@ export async function genCardanoAssetMap(
       } else if (tokenInfo === null) {
         // the token is not registered
         lastUpdatedAt = new Date().toISOString();
-      } else {
-        // failed to fetch token info
-        if (existingRowsMap.has(tokenId)) {
-          // the token entry exists, do not update
-          return null;
-        }
+      } else if (existingRowsMap.has(tokenId)) {
+        // the token entry exists, do not update
+        return null;
       }
 
       const parts = identifierToCardanoAsset(tokenId);

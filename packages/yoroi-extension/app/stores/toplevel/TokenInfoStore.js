@@ -27,7 +27,6 @@ import type TransactionsStore from './TransactionsStore';
 import type { IFetcher as IFetcherCardano } from '../../api/ada/lib/state-fetch/IFetcher.types';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
 import { createTokenRowSummary } from '../stateless/tokenHelpers';
-import { second } from '../../coreUtils';
 
 export type TokenInfoMap = Map<
   string, // network ID. String because mobx requires string for observable maps

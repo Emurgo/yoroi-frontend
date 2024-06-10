@@ -47,12 +47,16 @@ export default function SwapInput({
 
   const isFocusedColor = focusState.value ? 'grayscale.max' : 'grayscale.400';
 
-  useEffect(async () => {
+  useEffect(() => {
     if (id != null) {
-      const tokenInfo = await getTokenInfo(id);
-      if (tokenInfo.logo != null) {
-        setRemoteTokenLogo(`data:image/png;base64,${tokenInfo.logo}`);
-      }
+      getTokenInfo(id).then(remoteTokenInfo => {
+        if (remoteTokenInfo.logo != null) {
+          setRemoteTokenLogo(`data:image/png;base64,${remoteTokenInfo.logo}`);
+        }
+        return null;
+      }).catch(e => {
+        console.warn('Failed to resolve remote info for token: ' + id, e);
+      });
     }
   }, [id])
 

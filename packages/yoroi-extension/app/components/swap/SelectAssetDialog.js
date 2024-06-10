@@ -189,12 +189,16 @@ export const AssetAndAmountRow = ({
   const priceIncreased = priceChange100 && priceChange100.charAt(0) !== '-';
   const priceChange24h = priceChange100.replace('-', '') || '0%';
 
-  useEffect(async () => {
+  useEffect(() => {
     if (id != null) {
-      const tokenInfo = await getTokenInfo(id);
-      if (tokenInfo.logo != null) {
-        setRemoteTokenLogo(`data:image/png;base64,${tokenInfo.logo}`);
-      }
+      getTokenInfo(id).then(tokenInfo => {
+        if (tokenInfo.logo != null) {
+          setRemoteTokenLogo(`data:image/png;base64,${tokenInfo.logo}`);
+        }
+        return null;
+      }).catch(e => {
+        console.warn('Failed to resolve remote info for token: ' + id, e);
+      });
     }
   }, [id])
 
