@@ -119,6 +119,18 @@ const useChart = (data: IChartData | undefined) => {
       };
     });
     setPeriodButtonProps(tmp);
+    setDetailInfo({
+      value: data
+        ? data[periodButtonProps.find(item => item.id === id)?.id || 0][
+            data[periodButtonProps.find(item => item.id === id)?.id || 0].length - 1
+          ].value
+        : 0,
+      fiatValue: data
+        ? data[periodButtonProps.find(item => item.id === id)?.id || 0][
+            data[periodButtonProps.find(item => item.id === id)?.id || 0].length - 1
+          ].fiatValue
+        : 0,
+    });
   };
 
   const handleMouseMove = (props: LineChartProps) => {
