@@ -22,13 +22,15 @@ import { CannotSendBelowMinimumValueError, NotEnoughMoneyToSendError, } from '..
 import { CoreAddressTypes, TxStatusCodes, } from '../../../app/api/ada/lib/storage/database/primitives/enums';
 import type { FullAddressPayload } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 import {
-  getAddressRowsForWallet,
+  getAllUsedAddresses,
+  getAllAddresses,
   getAllAddressesForDisplay,
 } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 import { getReceiveAddress } from '../../../app/stores/stateless/addressStores';
 
 import type { PersistedSubmittedTransaction } from '../../../app/api/localStorage';
 import LocalStorageApi, {
+  getOutputAddressesInSubmittedTxs,
   loadSubmittedTransactions,
   persistSubmittedTransactions,
 } from '../../../app/api/localStorage';
@@ -63,10 +65,10 @@ import { GetToken } from '../../../app/api/ada/lib/storage/database/primitives/a
 import { getAllSchemaTables, raii, } from '../../../app/api/ada/lib/storage/database/utils';
 import type { TokenRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
 import {
-  UTxOSet as LibUtxoSet,
-  Value as LibValue,
   Amount as LibAmount,
   NativeAssets as LibNativeAssets,
+  UTxOSet as LibUtxoSet,
+  Value as LibValue,
 } from '@emurgo/yoroi-eutxo-txs/dist/classes'
 import { coinSelectionClassificationStrategy } from '@emurgo/yoroi-eutxo-txs/dist/tx-builder'
 import { setRuntime } from '@emurgo/yoroi-eutxo-txs/dist/kernel'
@@ -379,38 +381,11 @@ async function getCardanoRewardAddresses(
   });
 }
 
-async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Promise<Address[]> {
-  const addresses = await getAddressRowsForWallet({ publicDeriver: wallet });
-  return addresses
-    .filter(a => a.IsUsed === usedFilter && a.Type === CoreAddressTypes.CARDANO_BASE)
-    .map(a => a.Hash);
-}
-
-async function getOutputAddressesInSubmittedTxs(publicDeriverId: number) {
-  const submittedTxs = await loadSubmittedTransactions() || [];
-  return submittedTxs
-    .filter(submittedTxRecord => submittedTxRecord.publicDeriverId === publicDeriverId)
-    .flatMap(({ transaction }) => {
-      return transaction.addresses.to.map(({ address }) => address);
-    });
-}
-
-export async function connectorGetUsedAddresses(
+export async function connectorGetUsedAddressesWithPaginate(
   wallet: PublicDeriver<>,
   paginate: ?Paginate
 ): Promise<Address[]> {
-  const usedAddresses = await getAllAddresses(wallet, true);
-
-  const outputAddressesInSubmittedTxs = new Set(
-    await getOutputAddressesInSubmittedTxs(wallet.publicDeriverId)
-  );
-  const usedInSubmittedTxs = (await getAllAddresses(wallet, false))
-        .filter(address => outputAddressesInSubmittedTxs.has(address));
-
-  return paginateResults(
-    [...usedAddresses, ...usedInSubmittedTxs],
-    paginate
-  );
+  return paginateResults(await getAllUsedAddresses(wallet), paginate);
 }
 
 export async function connectorGetUnusedAddresses(wallet: PublicDeriver<>): Promise<Address[]> {
