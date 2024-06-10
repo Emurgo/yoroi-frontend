@@ -857,6 +857,9 @@ const yoroiMessageHandler = async (
 
 chrome.runtime.onMessage.addListener(
   (message, sender, sendResponse) => {
+    if (handleExchangeRedirectMessage(message, sender)) {
+      return;
+    }
     if (isYoroiMessage(message)) {
       // Returning `true` is required by Firefox, see:
       // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage
@@ -1782,4 +1785,25 @@ async function transformCardanoUtxos(
       ).to_bech32(),
     };
   });
+}
+
+function handleExchangeRedirectMessage(message, sender) {
+  const url = new URL(sender.url);
+  if (url.hostname === 'yoroi-wallet.com') {
+    const { searchParams } = url;
+    const cardanoLink = decodeURIComponent(searchParams.get('link') || '');
+    const m = cardanoLink.match(/web\+cardano:([a-z0-9]+)\?amount=([0-9\.]+)/);
+    if (!m) {
+      return;
+    }
+    const addr = m[1];
+    const amount = m[2];
+    const redirectTo = searchParams.get('redirectTo');
+    // $FlowFixMe[prop-missing] flow doesn't know replaceAll
+    const redirectToFixed = redirectTo?.replaceAll('%253A', ':')?.replaceAll('%252F', '/') || '';
+    chrome.tabs.remove(sender.tab.id);
+    const extensionUrl = `main_window.html?action=sell-ada&addr=${addr}&amount=${amount}` +
+      `&redirect=${encodeURIComponent(redirectToFixed)}`;
+    chrome.tabs.create({ url: extensionUrl });
+  }
 }

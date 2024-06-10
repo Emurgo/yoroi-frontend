@@ -239,15 +239,12 @@ async function convertImgToBase64(origin, urls) {
     return reader.result;
 }
 
-// relay Banxa callback to the extension tab
+// relay Banxa/Encryptus callback to the extension tab
 window.addEventListener('message', function (event) {
   if (
     event.source === window &&
-    (
-      event.origin === 'http://localhost:8000' ||
-      event.origin === 'https://ramp-redirect.yoroiwallet.com'
-    ) &&
-    event.data?.type === 'banxa callback'
+      /https:\/\/([a-z-]+\.)?yoroi-?wallet\.com/.test(event.origin) &&
+      event.data?.type === 'exchange callback'
   ) {
     chrome.runtime.sendMessage(event.data);
   }

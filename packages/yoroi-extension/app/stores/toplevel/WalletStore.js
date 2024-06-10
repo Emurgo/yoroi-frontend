@@ -31,6 +31,8 @@ import { createProblematicWalletDialog } from '../../containers/wallet/dialogs/P
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { getWalletChecksum } from '../../api/export/utils';
+import { MultiToken } from '../../api/common/lib/MultiToken';
+import { BigNumber } from 'bignumber.js';
 
 type GroupedWallets = {|
   publicDerivers: Array<PublicDeriver<>>,
@@ -342,6 +344,31 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       this.actions.serverConnection.parallelSyncStateChange.listen(() => {
         this._startRefreshAllWallets();
       });
+      // todo: under the current architecture, the delay is required otherwise if we go to the send page
+      // immediately it would crash, but soon we will migrate to new architecture which allows for
+      // immediate transition
+      const { sellAdaParams } = this.stores.loading;
+      if (sellAdaParams) {
+        const { selected } = this;
+        if (!selected) {
+          throw new Error('unexpected');
+        }
+        const defaultToken = selected.getParent().getDefaultToken();
+        this.stores.loading.setUriParams({
+          address: sellAdaParams.addr,
+          amount: new MultiToken(
+            [{
+              identifier: defaultToken.defaultIdentifier,
+              networkId: defaultToken.defaultNetworkId,
+              amount: (new BigNumber(sellAdaParams.amount)).shiftedBy(6),
+            }],
+            defaultToken,
+          ),
+        });
+        this.actions.router.goToRoute.trigger({
+          route: ROUTES.WALLETS.SEND,
+        });
+      }
     }, 50); // let the UI render first so that the loading process is perceived faster
   };
 

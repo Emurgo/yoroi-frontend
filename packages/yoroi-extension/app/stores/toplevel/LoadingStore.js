@@ -17,6 +17,12 @@ import {
 } from '../../utils/tabManager';
 import type { lf$Database } from 'lovefield';
 
+type SellAdaParamsType = {|
+  addr: string,
+  redirect: string,
+  amount: string,
+|};
+
 export default class LoadingStore extends BaseLoadingStore<StoresMap, ActionsMap> {
   /**
    * null if app not opened from URI Scheme OR URI scheme was invalid
@@ -24,6 +30,7 @@ export default class LoadingStore extends BaseLoadingStore<StoresMap, ActionsMap
   @observable _uriParams: ?UriParams = null;
   @observable _shouldRedirect: boolean = false;
   @observable _redirectUri: string = '';
+  sellAdaParams: ?SellAdaParamsType = null;
 
   _originRoute: {|
     // internal route
@@ -35,6 +42,18 @@ export default class LoadingStore extends BaseLoadingStore<StoresMap, ActionsMap
 
   setup(): void {
     this.actions.loading.redirect.listen(this._redirect);
+    const params = new URLSearchParams(document.location.search);
+    if (params.get('action') === 'sell-ada') {
+      const addr = params.get('addr');
+      const redirect = params.get('redirect');
+      const amount = params.get('amount');
+      if (
+        typeof addr === 'string' && typeof redirect === 'string' &&
+          typeof amount === 'string'
+      ) {
+        this.sellAdaParams = { addr, redirect, amount, };
+      }
+    }
   }
 
   @computed get fromUriScheme(): boolean {
@@ -43,6 +62,12 @@ export default class LoadingStore extends BaseLoadingStore<StoresMap, ActionsMap
 
   @computed get uriParams(): ?UriParams {
     return this._uriParams;
+  }
+
+  setUriParams(uriParams: UriParams) {
+    runInAction(() => {
+      this._uriParams = uriParams;
+    });
   }
 
   @computed get shouldRedirect(): boolean {
