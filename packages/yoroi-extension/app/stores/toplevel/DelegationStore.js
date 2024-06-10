@@ -12,10 +12,10 @@ import { PoolMissingApiError } from '../../api/common/errors';
 import type { MangledAmountFunc, MangledAmountsResponse } from '../stateless/mangledAddresses';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import type { PoolInfo } from '@emurgo/yoroi-lib';
+import type { ExplorerPoolInfo as PoolInfo } from '@emurgo/yoroi-lib';
 import { PoolInfoApi } from '@emurgo/yoroi-lib';
 import { MultiToken } from '../../api/common/lib/MultiToken';
-import { maybe } from '../../coreUtils';
+import { forceNonNull, maybe } from '../../coreUtils';
 import type {
   GetDelegatedBalanceFunc,
   GetDelegatedBalanceResponse,
@@ -214,14 +214,14 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     const currentPool = this.getDelegatedPoolId(publicDeriver);
 
     if (currentPool == null) {
-      return null;
+      return;
     }
 
     try {
 
       const { BackendService } = publicDeriver.getParent().getNetworkInfo().Backend;
       const transitionResult = await maybe(currentPool, p =>
-        new PoolInfoApi(BackendService + '/api').getTransition(p, RustModule.CrossCsl.init)
+        new PoolInfoApi(forceNonNull(BackendService) + '/api').getTransition(p, RustModule.CrossCsl.init)
       );
 
       const response = {
