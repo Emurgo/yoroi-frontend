@@ -12,6 +12,7 @@ import { Staking } from './Staking';
 import { Expand } from './Expand';
 import { ChevronUp } from './ChevronUp';
 import { ChevronDown } from './ChevronDown';
+import { Search } from './Search';
 
 export const Icon = {
   CloseIcon,
@@ -28,4 +29,5 @@ export const Icon = {
   Expand,
   ChevronDown,
   ChevronUp,
+  Search,
 };
