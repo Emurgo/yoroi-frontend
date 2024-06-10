@@ -23,7 +23,8 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "types": ["chrome"]
   },
   "include": ["app/UI/**/*", ".d.ts"]
 }
