@@ -19,8 +19,6 @@ import BigNumber from 'bignumber.js';
 
 import { CannotSendBelowMinimumValueError, NotEnoughMoneyToSendError, } from '../../../app/api/common/errors';
 
-import axios from 'axios';
-
 import { CoreAddressTypes, TxStatusCodes, } from '../../../app/api/ada/lib/storage/database/primitives/enums';
 import type { FullAddressPayload } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 import {
@@ -49,7 +47,7 @@ import {
   toLibUTxO,
 } from '../../../app/api/ada/transactions/shelley/transactions';
 import { getCardanoHaskellBaseConfig, } from '../../../app/api/ada/lib/storage/database/prepackaged/networks';
-import { genTimeToSlot } from '../../../app/api/ada/lib/storage/bridge/timeUtils';
+import TimeUtils from '../../../app/api/ada/lib/storage/bridge/timeUtils';
 import type CardanoTxRequest from '../../../app/api/ada';
 import AdaApi from '../../../app/api/ada';
 import { bytesToHex, hexToBytes } from '../../../app/coreUtils';
@@ -64,7 +62,6 @@ import type { ForeignUtxoFetcher } from '../../../app/connector/stores/Connector
 import { GetToken } from '../../../app/api/ada/lib/storage/database/primitives/api/read';
 import { getAllSchemaTables, raii, } from '../../../app/api/ada/lib/storage/database/utils';
 import type { TokenRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
-import fetchAdapter from '@vespaiach/axios-fetch-adapter';
 import {
   UTxOSet as LibUtxoSet,
   Value as LibValue,
@@ -86,8 +83,8 @@ import {
   derivePrivateByAddressing,
   derivePublicByAddressing
 } from '../../../app/api/ada/lib/cardanoCrypto/deriveByAddressing';
-
-axios.defaults.adapter = fetchAdapter;
+import { transactionHexToHash } from '../../../app/api/ada/lib/cardanoCrypto/utils';
+import { sendTx } from '../../../app/api/ada/lib/state-fetch/remoteFetcher';
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -889,10 +886,7 @@ export async function connectorCreateCardanoTx(
 
   const network = publicDeriver.getParent().getNetworkInfo();
   const fullConfig = getCardanoHaskellBaseConfig(network);
-  const timeToSlot = await genTimeToSlot(fullConfig);
-  const absSlotNumber = new BigNumber(timeToSlot({
-    time: new Date(),
-  }).slot);
+  const absSlotNumber = new BigNumber(TimeUtils.timeToAbsoluteSlot(fullConfig, new Date()));
 
   const submittedTxs = await loadSubmittedTransactions() || [];
 
@@ -952,32 +946,21 @@ export async function connectorSendTxCardano(
   signedTx: Buffer,
   localStorage: LocalStorageApi,
 ): Promise<void> {
-  const signedTx64 = signedTx.toString('base64');
-  const network = wallet.getParent().getNetworkInfo();
-  const backend = network.Backend.BackendService;
-  if (backend == null) {
-    throw new Error('connectorSendTxCardano: missing backend url');
-  }
-  return axios(
-    `${backend}/api/txs/signed`,
-    {
-      method: 'post',
-      // 2 * CONFIG.app.walletRefreshInterval,
-      timeout: 2 * 20000,
-      data: { signedTx: signedTx64 },
-      headers: {
-        'yoroi-version': await localStorage.getLastLaunchVersion(),
-        'yoroi-locale': await localStorage.getUserLocale()
-      }
+  await sendTx({
+    body: {
+      network: wallet.getParent().getNetworkInfo(),
+      id: transactionHexToHash(bytesToHex(signedTx)),
+      encodedTx: signedTx,
+    },
+    lastLaunchVersion: await localStorage.getLastLaunchVersion() ?? '',
+    currentLocale: await localStorage.getUserLocale() ?? '',
+    errorHandler: error => {
+      const code = error.response?.status === 400
+        ? TxSendErrorCodes.REFUSED : TxSendErrorCodes.FAILURE;
+      const info = error.response?.data
+        ?? `Failed to submit transaction: ${String(error)}`;
+      throw new ConnectorError({ code, info });
     }
-  ).then(_response => {
-    return Promise.resolve();
-  }).catch((error) => {
-    const code = error.response?.status === 400
-      ? TxSendErrorCodes.REFUSED : TxSendErrorCodes.FAILURE;
-    const info = error.response?.data
-      ?? `Failed to submit transaction: ${String(error)}`;
-    throw new ConnectorError({ code, info });
   });
 }
 
@@ -1133,8 +1116,7 @@ export async function connectorRecordSubmittedCardanoTransaction(
   await persistSubmittedTransactions(submittedTxs);
 }
 
-const MIN_REORG_OUTPUT_AMOUNT  = '1000000';
-
+// <TODO:PENDING_REMOVAL> use the ada api function directly
 export async function connectorGenerateReorgTx(
   publicDeriver: PublicDeriver<>,
   usedUtxoIds: Array<string>,
@@ -1145,59 +1127,14 @@ export async function connectorGenerateReorgTx(
   unsignedTx: HaskellShelleyTxSignRequest,
   collateralOutputAddressSet: Set<string>,
 |}> {
-  const network = publicDeriver.getParent().getNetworkInfo();
-
-  const withUtxos = asGetAllUtxos(publicDeriver);
-  if (withUtxos == null) {
-    throw new Error(`missing utxo functionality`);
-  }
-
-  const withHasUtxoChains = asHasUtxoChains(withUtxos);
-  if (withHasUtxoChains == null) {
-    throw new Error(`missing chains functionality`);
-  }
-
-  const fullConfig = getCardanoHaskellBaseConfig(network);
-  const timeToSlot = await genTimeToSlot(fullConfig);
-  const absSlotNumber = new BigNumber(timeToSlot({
-    time: new Date(),
-  }).slot);
-  const unusedAddresses = await connectorGetUnusedAddresses(
-    publicDeriver
-  );
-  if (unusedAddresses.length === 0) {
-    throw new Error('unexpected: no unused addresses available');
-  }
-  const reorgOutputValue = BigNumber
-    .max(reorgTargetAmount, MIN_REORG_OUTPUT_AMOUNT)
-    .toString();
-  const includeTargets = [{
-    address: unusedAddresses[0],
-    isForeign: false,
-    value: reorgOutputValue,
-  }];
-  const collateralOutputAddressSet = new Set<string>([unusedAddresses[0]]);
-  const dontUseUtxoIds = new Set(usedUtxoIds);
   const adaApi = new AdaApi();
-  const unsignedTx = await adaApi.createUnsignedTxForConnector(
-    {
-      publicDeriver: withHasUtxoChains,
-      absSlotNumber,
-      cardanoTxRequest: {
-        includeTargets,
-      },
-      utxos: (await adaApi.addressedUtxosWithSubmittedTxs(
-        utxos,
-        publicDeriver,
-        submittedTxs,
-      )).filter(utxo => !dontUseUtxoIds.has(utxo.utxo_id)),
-      // we already factored in submitted transactions above, no need to handle it
-      // any more, so just use an empty array here
-      submittedTxs: [],
-    },
-    null,
+  return adaApi.createReorgTx(
+    publicDeriver,
+    usedUtxoIds,
+    reorgTargetAmount,
+    utxos,
+    submittedTxs,
   );
-  return { unsignedTx, collateralOutputAddressSet };
 }
 
 export async function getAddressing(

@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import type { AssetAmount } from './types';
 import { Box, Typography } from '@mui/material';
 import { ReactComponent as ChevronDownIcon } from '../../assets/images/revamp/icons/chevron-down.inline.svg';
-import adaTokenImage from '../../containers/swap/mockAssets/ada.inline.svg';
+import adaTokenImage from '../../assets/images/ada.inline.svg';
 import defaultTokenImage from '../../assets/images/revamp/token-default.inline.svg';
 import { urlResolveForIpfsAndCorsproxy } from '../../coreUtils';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
@@ -17,7 +17,7 @@ type Props = {|
   handleAmountChange: function,
   showMax?: boolean,
   value?: string,
-  touched?: boolean,
+  disabled?: boolean,
   focusState: State<boolean>,
   error: string | null,
 |};
@@ -25,6 +25,7 @@ type Props = {|
 export default function SwapInput({
   label,
   showMax = false,
+  disabled = false,
   onAssetSelect,
   error = '',
   handleAmountChange,
@@ -52,7 +53,7 @@ export default function SwapInput({
         component="fieldset"
         sx={{
           borderStyle: 'solid',
-          borderWidth: tokenInfo.id?.length > 0 || error ? '2px' : '1px',
+          borderWidth: tokenInfo.id?.length > 0 && error ? '2px' : '1px',
           borderColor: error ? 'magenta.500' : isFocusedColor,
           borderRadius: '8px',
           p: '16px',
@@ -93,8 +94,8 @@ export default function SwapInput({
           variant="body1"
           color="ds.gray_cmax"
           placeholder="0"
-          onChange={handleChange}
-          value={value}
+          onChange={disabled ? () => {} : handleChange}
+          value={disabled ? '' : value}
           onFocus={() => focusState.update(true)}
           onBlur={() => focusState.update(false)}
         />
@@ -126,10 +127,19 @@ export default function SwapInput({
               component="button"
               variant="caption"
               fontWeight={500}
-              sx={{ p: '4px 8px', bgcolor: 'ds.gray_c50', borderRadius: '8px' }}
+              sx={{
+                p: '4px 8px',
+                bgcolor: 'ds.gray_c50',
+                borderRadius: '8px',
+                borderRadius: '8px',
+                ':disabled': {
+                  cursor: 'not-allowed',
+                },
+              }}
               onClick={() => {
                 handleAmountChange(quantity);
               }}
+              disabled={disabled}
             >
               MAX
             </Typography>

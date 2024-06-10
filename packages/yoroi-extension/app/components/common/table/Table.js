@@ -4,6 +4,7 @@ import { Box, Typography } from '@mui/material';
 import Separator from '../separator/Separator';
 
 type Props = {|
+  columnKeys?: Array<string>,
   columnNames: Array<string>,
   gridTemplateColumns: string,
   children: Node,
@@ -18,6 +19,7 @@ export default function Table({
   children,
   rowGap,
   columnGap,
+  columnKeys,
   columnNames,
   gridTemplateColumns,
   columnAlignment = ['left'],
@@ -38,7 +40,7 @@ export default function Table({
         <Typography
           component="div"
           variant="body2"
-          key={name}
+          key={columnKeys?.[i] ?? name}
           textAlign={columnAlignment[i] ? columnAlignment[i] : 'right'}
           pt="13px"
           pb="5px" // 5px + 8px of gap = 13px
@@ -49,7 +51,10 @@ export default function Table({
           {name}
         </Typography>
       ))}
-      <Separator sx={{ gridColumn: '1/-1', mb: '8px' }} />
+      {columnNames.length > 0 && <Separator sx={{
+        gridColumn: '1/-1',
+        mb: '8px'
+      }}/>}
       {children}
     </Box>
   );

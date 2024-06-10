@@ -210,7 +210,7 @@ class LanguageSelectionForm extends Component<Props & InjectedLayoutProps, State
             shrink={false}
           >
             {languageOptions.map(option => (
-              <MenuItem key={option.value} value={option.value}>
+              <MenuItem key={option.value} value={option.value} id={'selectLanguage-' + option.value + '-menuItem'}>
                 <FlagLabel svg={option.svg} label={option.label} />
               </MenuItem>
             ))}
@@ -237,6 +237,7 @@ class LanguageSelectionForm extends Component<Props & InjectedLayoutProps, State
                 onChange={event => {
                   tosAgreement.value = event.target.checked;
                 }}
+                id='initialPage-tosAgreement-checkbox'
               />
             }
             sx={{
@@ -265,6 +266,7 @@ class LanguageSelectionForm extends Component<Props & InjectedLayoutProps, State
                   padding: '13px 24px',
                 },
               }}
+              id='initialPage-continue-button'
             >
               {intl.formatMessage(globalMessages.continue)}
             </LoadingButton>

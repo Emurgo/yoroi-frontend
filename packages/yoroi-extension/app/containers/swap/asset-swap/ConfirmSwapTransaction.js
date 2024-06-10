@@ -95,7 +95,7 @@ export default function ConfirmSwapTransaction({
         <Box>
           <Box>
             <Typography component="div" variant="body1" color="ds.gray_c500">
-              Swap From
+              Swap from
             </Typography>
           </Box>
           <Box>
@@ -110,7 +110,7 @@ export default function ConfirmSwapTransaction({
         <Box>
           <Box>
             <Typography component="div" variant="body1" color="ds.gray_c500">
-              Swap To
+              Swap to
             </Typography>
           </Box>
           <Box>
@@ -204,7 +204,7 @@ export default function ConfirmSwapTransaction({
 const SummaryRow = ({ col1, children, withInfo = false, infoText = '' }) => (
   <Box display="flex" alignItems="center" justifyContent="space-between">
     <Box display="flex" alignItems="center">
-      <Typography component="div" variant="body1" color="ds.gray_c500">
+      <Typography component="div" variant="body1" color="ds.gray_c600">
         {col1}
       </Typography>
       {withInfo ? (

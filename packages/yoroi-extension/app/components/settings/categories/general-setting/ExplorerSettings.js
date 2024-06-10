@@ -87,7 +87,7 @@ class ExplorerSettings extends Component<Props & InjectedLayoutProps> {
             onChange={this.selectExplorer}
           >
             {options.map(option => (
-              <MenuItem key={option.value.ExplorerId} value={option.value}>
+              <MenuItem key={option.value.ExplorerId} value={option.value} id={'selectExplorer-' + option.value.Name + '-menuItem'}>
                 {option.label}
               </MenuItem>
             ))}

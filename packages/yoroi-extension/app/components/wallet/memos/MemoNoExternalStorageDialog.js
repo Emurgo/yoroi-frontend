@@ -61,6 +61,7 @@ export default class MemoNoExternalStorageDialog extends Component<Props> {
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={onCancel}
+        id='memoNoExternalStorageDialog'
       >
         <div className={styles.content}>
           <div>{intl.formatMessage(messages.connectContent)}</div>

@@ -22,6 +22,7 @@ export type WalletTransactionCtorData = {|
   amount: MultiToken,
   fee: MultiToken,
   date: Date,
+  ordinal?: ?number,
   addresses: TransactionAddresses,
   state: TxStatusCodesType,
   errorMsg: null | string,
@@ -35,7 +36,8 @@ export default class WalletTransaction {
   @observable type: TransactionDirectionType;
   @observable amount: MultiToken; // fee included
   @observable fee: MultiToken;
-  @observable date: Date; // TODO: remove?
+  @observable date: Date;
+  @observable ordinal: ?number;
   @observable addresses: TransactionAddresses = { from: [], to: [] };
 
   // TODO: remove and turn it into a map

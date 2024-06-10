@@ -2,11 +2,6 @@
 import { useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import Dialog from '../widgets/Dialog/Dialog';
-// <TODO:CHECK_LINT>
-// eslint-disable-next-line no-unused-vars
-import { ReactComponent as AssetDefault } from '../../assets/images/revamp/asset-default.inline.svg';
-// eslint-disable-next-line no-unused-vars
-import { ReactComponent as NoAssetsFound } from '../../assets/images/revamp/no-assets-found.inline.svg';
 import Tabs from '../common/tabs/Tabs';
 
 const defaultSlippages = ['0', '0.1', '0.5', '1', '2', '3', '5', '10'];
@@ -17,9 +12,15 @@ type Props = {|
   slippageValue: string,
 |};
 
-export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValue }: Props): React$Node {
+export default function SlippageDialog({
+  onSetNewSlippage,
+  onClose,
+  slippageValue,
+}: Props): React$Node {
   const [selectedSlippage, setSelectedSlippage] = useState(slippageValue);
-  const [isManualSlippage, setIsManualSlippage] = useState(!defaultSlippages.includes(slippageValue));
+  const [isManualSlippage, setIsManualSlippage] = useState(
+    !defaultSlippages.includes(slippageValue)
+  );
 
   const handleSlippageApply = () => {
     try {
@@ -32,6 +33,9 @@ export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValu
 
   const handleSlippageChange = e => {
     let val = e.target.value.replace(/[^\d.]+/g, '');
+    const [int, dec] = val.split('.');
+    // only two decimal places
+    if (dec?.length > 2) val = val.substr(0, int.length + 3);
     const number = Number(val);
     if (number > 100) val = '100';
     else if (number < 0) val = '0';
@@ -42,8 +46,14 @@ export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValu
 
   // <TODO:CHECK_INTL>
   return (
-    <Dialog title="Slippage tolerance" onClose={onClose} withCloseButton closeOnOverlayClick>
-      <Box maxWidth="564px">
+    <Dialog
+      title="Slippage tolerance"
+      onClose={onClose}
+      withCloseButton
+      closeOnOverlayClick
+      styleContentOverride={{ paddingTop: '16px' }}
+    >
+      <Box maxWidth="612px" sx={{ margin: '0 auto', flex: 1 }}>
         <Box>
           <Typography component="div" variant="body1" color="ds.gray_c800">
             Default Slippage Tolerance

@@ -65,6 +65,7 @@ export default class URIDisplayDialog extends Component<Props> {
         closeButton={<DialogCloseButton />}
         onClose={onClose}
         backButton={<DialogBackButton onBack={onBack} />}
+        id='uriDisplayDialog'
       >
         <Box maxWidth="600px">
           <Box

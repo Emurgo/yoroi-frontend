@@ -24,7 +24,10 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../routes-config';
 import { getNetworkUrl, tokenMessages } from './TokenDetails';
-import type { CardanoAssetMintMetadata, NetworkRow, } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type {
+  CardanoAssetMintMetadata,
+  NetworkRow,
+} from '../../../api/ada/lib/storage/database/primitives/tables';
 import { NftImage } from './NFTsList';
 import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { truncateAddress, truncateAddressShort } from '../../../utils/formatters';
@@ -149,15 +152,13 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
         to={ROUTES.NFTS.ROOT}
         sx={{
           color: 'ds.gray_c900',
-          lineHeight: '27.5px',
-          fontSize: '14px',
           '&.MuiButton-sizeMedium': {
             padding: '13px 16px',
           },
         }}
         startIcon={<BackArrow />}
       >
-        {intl.formatMessage(messages.back)}
+        <Typography fontWeight="500">{intl.formatMessage(messages.back)}</Typography>
       </Button>
       <Grid
         container
@@ -181,12 +182,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
             }}
             onClick={() => nftImage !== null && setOpenAndTrack()}
           >
-            <NftImage
-              imageUrl={nftImage}
-              name={nftInfo.name || '-'}
-              width="100%"
-              height="auto"
-            />
+            <NftImage imageUrl={nftImage} name={nftInfo.name || '-'} width="100%" height="auto" />
           </ImageItem>
         </Grid>
 
@@ -276,7 +272,11 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                       textTransform: 'none',
                       fontWeight: 500,
                     }}
-                    label={intl.formatMessage(label)}
+                    label={
+                      <Typography variant="body1" fontWeight="500" pb="6px">
+                        {intl.formatMessage(label)}
+                      </Typography>
+                    }
                     value={id}
                     disableRipple
                   />
@@ -427,8 +427,12 @@ const ImageItem = styled(Box)({
 function LabelWithValue({ label, value }: {| label: string | Node, value: string | Node |}): Node {
   return (
     <Box>
-      <Typography component="div" color="var(--yoroi-palette-gray-600)">{label}</Typography>
-      <Typography component="div" color="var(--yoroi-palette-gray-900)">{value}</Typography>
+      <Typography component="div" color="var(--yoroi-palette-gray-600)">
+        {label}
+      </Typography>
+      <Typography component="div" color="var(--yoroi-palette-gray-900)">
+        {value}
+      </Typography>
     </Box>
   );
 }

@@ -3,29 +3,33 @@
 import Store from '../base/Store';
 import type { ActionsMap } from '../../actions';
 import type { StoresMap } from '../index';
-import { action, computed, observable } from 'mobx';
+import { action, computed, observable, runInAction } from 'mobx';
 import type { StorageField } from '../../api/localStorage';
-import { createStorageFlag } from '../../api/localStorage';
+import { createStorageFlag, loadSubmittedTransactions } from '../../api/localStorage';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
-import {
-  asGetAllUtxos,
-  asHasUtxoChains,
-} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { asGetAllUtxos, asHasUtxoChains, } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { createMetadata } from '../../api/ada/lib/storage/bridge/metadataUtils';
 import type { TxOutput } from '../../api/ada/transactions/shelley/transactions';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { Quantities } from '../../utils/quantities';
 import BigNumber from 'bignumber.js';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import { cast, fail, hexToBytes, noop } from '../../coreUtils';
-import { asAddressedUtxo, cardanoUtxoHexFromRemoteFormat} from '../../api/ada/transactions/utils';
+import { cast, fail, hexToBytes, listEntries, maybe, noop } from '../../coreUtils';
+import {
+  asAddressedUtxo as asAddressedUtxoCardano,
+  asAddressedUtxo,
+  cardanoUtxoHexFromRemoteFormat,
+  getTransactionFeeFromCbor,
+} from '../../api/ada/transactions/utils';
 import { genLookupOrFail, getTokenIdentifierIfExists, getTokenName } from '../stateless/tokenHelpers';
 import { splitAmount, truncateToken } from '../../utils/formatters';
-import adaLogo from '../../containers/swap/mockAssets/ada.inline.svg';
+import adaLogo from '../../assets/images/ada.inline.svg';
 import type { AssetAmount } from '../../components/swap/types';
 import type { QueriedUtxo } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { transactionHexToHash } from '../../api/ada/lib/cardanoCrypto/utils';
-import { signTransactionHex } from '../../api/ada/transactions/signTransactionHex';
+import type { RemoteUnspentOutput } from '../../api/ada/lib/state-fetch/types';
+import type { CardanoConnectorSignRequest } from '../../connector/types';
+import type { AddressDetails } from '../../api/ada';
 
 const FRONTEND_FEE_ADDRESS_MAINNET =
   'addr1q9ry6jfdgm0lcrtfpgwrgxg7qfahv80jlghhrthy6w8hmyjuw9ngccy937pm7yw0jjnxasm7hzxjrf8rzkqcj26788lqws5fke';
@@ -35,6 +39,7 @@ const FRONTEND_FEE_ADDRESS_PREPROD =
 export default class SwapStore extends Store<StoresMap, ActionsMap> {
   @observable limitOrderDisplayValue: string = '';
   @observable orderStep: number = 0;
+  @observable transactionTimestamps: { [string]: Date } = {};
 
   swapDisclaimerAcceptanceFlag: StorageField<boolean> = createStorageFlag(
     'SwapStore.swapDisclaimerAcceptanceFlag',
@@ -83,15 +88,71 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
       });
   }
 
-  getUtxoHexForCancelCollateral: ({| wallet: PublicDeriver<> |}) => Promise<string> = async ({
+  getCollateralUtxoHexForCancel: ({| wallet: PublicDeriver<> |}) => Promise<?string> = async ({
     wallet,
   }) => {
-    const utxo: QueriedUtxo = await this.stores.substores.ada.wallets.pickCollateralUtxo({
-      wallet,
-    });
-    const [addressedUtxo] = asAddressedUtxo([utxo]);
-    return cardanoUtxoHexFromRemoteFormat(cast(addressedUtxo));
+    const utxo: ?QueriedUtxo = await this.stores.substores.ada.wallets
+      .pickCollateralUtxo({ wallet });
+    return maybe(utxo, u => {
+      const [addressedUtxo] = asAddressedUtxo([u]);
+      return cardanoUtxoHexFromRemoteFormat(cast(addressedUtxo));
+    })
   };
+
+  createCollateralReorgForCancel: ({| wallet: PublicDeriver<> |}) => Promise<{|
+    unsignedTxHex: string,
+    txData: CardanoConnectorSignRequest,
+    collateralUtxoHex: string,
+  |}> = async ({
+    wallet,
+  }) => {
+    const withUtxos = asGetAllUtxos(wallet)
+    if (withUtxos == null) {
+      throw new Error('wallet doesn\'t support IGetAllUtxos');
+    }
+    const walletUtxos = await withUtxos.getAllUtxos();
+    const addressedUtxos = asAddressedUtxoCardano(walletUtxos);
+    const submittedTxs = await loadSubmittedTransactions() ?? [];
+    const reorgTargetAmount = '2000000';
+    const firstExternalAddress: AddressDetails = await this.stores.addresses.getFirstExternalAddress(wallet);
+    const { unsignedTx, collateralOutputAddressSet } = await this.api.ada.createReorgTx(
+      wallet,
+      [],
+      reorgTargetAmount,
+      addressedUtxos,
+      submittedTxs,
+      firstExternalAddress.address,
+    );
+    const unsignedTxHex = unsignedTx.unsignedTx.build_tx().to_hex();
+    const hash = transactionHexToHash(unsignedTxHex);
+    const collateralUtxo: RemoteUnspentOutput = {
+      utxo_id: `${hash}0`,
+      tx_hash: hash,
+      tx_index: 0,
+      receiver: [...collateralOutputAddressSet][0],
+      amount: reorgTargetAmount,
+      assets: [],
+    };
+    const collateralUtxoHex = cardanoUtxoHexFromRemoteFormat(collateralUtxo);
+    const defaultToken = wallet.getParent().getDefaultToken();
+    return {
+      unsignedTxHex,
+      collateralUtxoHex,
+      txData: {
+        inputs: [],
+        foreignInputs: [],
+        outputs: [],
+        fee: {
+          tokenId: defaultToken.defaultIdentifier,
+          networkId: defaultToken.defaultNetworkId,
+          amount: getTransactionFeeFromCbor(unsignedTxHex).toString(),
+        },
+        amount: wallet.getParent().getDefaultMultiToken(),
+        total: wallet.getParent().getDefaultMultiToken(),
+        cip95Info: [],
+      },
+    };
+  }
 
   createUnsignedSwapTx: ({|
     wallet: PublicDeriver<>,
@@ -156,25 +217,48 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
     });
   };
 
-  executeCancelTransaction: ({|
+  executeTransactionHexes: ({|
     wallet: PublicDeriver<>,
-    transactionHex: string,
-    password: string,
+    signedTransactionHexes: Array<string>,
   |}) => Promise<void> = async ({
     wallet,
-    transactionHex,
-    password,
+    signedTransactionHexes,
   }) => {
-    const signedTransactionHex =
-      await signTransactionHex(wallet, password, transactionHex);
     await this.stores.substores.ada.stateFetchStore.fetcher.sendTx({
-      id: transactionHexToHash(signedTransactionHex),
-      encodedTx: hexToBytes(signedTransactionHex),
       network: wallet.getParent().getNetworkInfo(),
+      txs: signedTransactionHexes.map(txHex => ({
+        id: transactionHexToHash(txHex),
+        encodedTx: hexToBytes(txHex),
+      }))
     });
-    // Refresh call is non-blocking on purpose
+    // refresh call is non-blocking
     noop(this.stores.wallets.refreshWalletFromRemote(wallet));
   };
+
+  fetchTransactionTimestamps: ({|
+    wallet: PublicDeriver<>,
+    txHashes: Array<string>,
+  |}) => Promise<void> = async ({
+    wallet,
+    txHashes,
+  }) => {
+    const existingSet = new Set(Object.keys(this.transactionTimestamps));
+    const filteredTxHashes = txHashes.filter(x => !existingSet.has(x.toLowerCase()));
+    if (filteredTxHashes.length === 0) {
+      return;
+    }
+    const network = wallet.getParent().getNetworkInfo();
+    const globalSlotMap: { [string]: string } = await this.stores.substores.ada.stateFetchStore.fetcher
+      .getTransactionSlotsByHashes({ network, txHashes: filteredTxHashes });
+    const timeCalcRequests = this.stores.substores.ada.time.getTimeCalcRequests(wallet);
+    const { toRealTime } = timeCalcRequests.requests;
+    const slotToTimestamp: string => Date = s => toRealTime({ absoluteSlotNum: Number(s) });
+    runInAction(() => {
+      for (const [tx,slot] of listEntries(globalSlotMap)) {
+        this.transactionTimestamps[tx.toLowerCase()] = slotToTimestamp(slot);
+      }
+    });
+  }
 }
 
 function createSwapFeFeeAmount({

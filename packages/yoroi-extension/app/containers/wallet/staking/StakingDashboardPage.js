@@ -1,6 +1,7 @@
 // @flow
-import { Component } from 'react';
 import type { Node } from 'react';
+import { Component } from 'react';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
 
@@ -14,13 +15,12 @@ import { handleExternalLinkClick } from '../../../utils/routing';
 import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer';
 import config from '../../../config';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import globalMessages from '../../../i18n/global-messages';
 import { observable, runInAction } from 'mobx';
 import DeregisterDialogContainer from '../../transfer/DeregisterDialogContainer';
 import WithdrawalTxDialogContainer from '../../transfer/WithdrawalTxDialogContainer';
-import { getTokenName, genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
+import { genLookupOrFail, getTokenName } from '../../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../../utils/formatters';
 import { generateGraphData } from '../../../utils/graph';
 import { maybe } from '../../../coreUtils';
@@ -32,20 +32,6 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
   };
 
   @observable notificationElementId: string = '';
-
-  async componentDidMount() {
-    const timeStore = this.props.stores.substores.ada.time;
-    const publicDeriver = this.props.stores.wallets.selected;
-    if (publicDeriver == null) {
-      throw new Error(`${nameof(StakingDashboardPage)} no public deriver. Should never happen`);
-    }
-    const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
-    await timeCalcRequests.requests.toAbsoluteSlot.execute().promise;
-    await timeCalcRequests.requests.toRealTime.execute().promise;
-    await timeCalcRequests.requests.currentEpochLength.execute().promise;
-    await timeCalcRequests.requests.currentSlotLength.execute().promise;
-    await timeCalcRequests.requests.timeSinceGenesis.execute().promise;
-  }
 
   componentWillUnmount() {
     this.props.actions.ada.delegationTransaction.reset.trigger({ justTransaction: false });
@@ -115,17 +101,10 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
   }
 
   getEpochLengthInDays: (PublicDeriver<>) => ?number = publicDeriver => {
-    const timeStore = this.props.stores.substores.ada.time;
-    const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
-    const getEpochLength = timeCalcRequests.requests.currentEpochLength.result;
-    if (getEpochLength == null) return null;
-
-    const getSlotLength = timeCalcRequests.requests.currentSlotLength.result;
-    if (getSlotLength == null) return null;
-
-    const epochLengthInSeconds = getEpochLength() * getSlotLength();
-    const epochLengthInDays = epochLengthInSeconds / (60 * 60 * 24);
-    return epochLengthInDays;
+    const timeCalcRequests = this.props.stores.substores.ada.time.getTimeCalcRequests(publicDeriver);
+    const { currentEpochLength, currentSlotLength } = timeCalcRequests.requests;
+    const epochLengthInSeconds = currentEpochLength() * currentSlotLength();
+    return epochLengthInSeconds / (60 * 60 * 24);
   };
 
   getStakePools: (PublicDeriver<>) => {| pools: null | Array<Node | void> |} = publicDeriver => {

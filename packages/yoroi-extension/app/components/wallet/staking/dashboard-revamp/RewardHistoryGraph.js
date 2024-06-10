@@ -41,7 +41,9 @@ export const RewardHistoryItem = ({
       <AccordionSummary aria-controls={poolId + '-content'} id={poolId + '-header'}>
         <Box>
           <Box display="block">
-            <Typography component="div" color="var(--yoroi-palette-gray-600)">Stake Pool</Typography>
+            <Typography component="div" color="var(--yoroi-palette-gray-600)">
+              Stake Pool
+            </Typography>
           </Box>
           <Box display="flex">
             <AvatarWrapper>
@@ -159,11 +161,7 @@ function RewardHistoryGraph({
   const rewardList = rewardsGraphData.items?.perEpochRewards;
   const title = intl.formatMessage(globalMessages.rewardHistory);
   return (
-    <Box
-      p="24px"
-      pt="4px"
-      sx={{ display: 'flex', flexFlow: 'column', justifyContent: 'space-between' }}
-    >
+    <Box p="24px" sx={{ display: 'flex', flexFlow: 'column', justifyContent: 'space-between' }}>
       <Box
         sx={{
           display: 'flex',

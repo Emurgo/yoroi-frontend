@@ -77,6 +77,7 @@ class WalletSummaryPage extends Component<AllProps> {
       Logger.error('[WalletSummaryPage::render] Active wallet required');
       return null;
     }
+    this.props.stores.delegation.checkPoolTransition();
 
     const { exportTransactionsToFile, closeExportTransactionDialog } = actions.transactions;
 
@@ -114,9 +115,9 @@ class WalletSummaryPage extends Component<AllProps> {
       const WalletTransactionsListComp = mapWalletTransactionLayout[this.props.selectedLayout];
 
       if (isLoading || hasAny) {
-        const {
-          assuranceMode,
-        } = this.props.stores.walletSettings.getPublicDeriverSettingsCache(publicDeriver);
+        const { assuranceMode } = this.props.stores.walletSettings.getPublicDeriverSettingsCache(
+          publicDeriver
+        );
         walletTransactions = (
           <WalletTransactionsListComp
             transactions={recent}
@@ -168,7 +169,7 @@ class WalletSummaryPage extends Component<AllProps> {
               addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())
             }
             complexityLevel={this.props.stores.profile.selectedComplexityLevel}
-            id='wallet:transaction-transactionsList-box'
+            id="wallet:transaction-transactionsList-box"
           />
         );
       } else {
@@ -463,8 +464,7 @@ class WalletSummaryPage extends Component<AllProps> {
 
   readyToExportHistory: (PublicDeriver<>) => boolean = publicDeriver => {
     const delegation = this.props.stores.delegation;
-    return !delegation.isRewardWallet(publicDeriver)
-      || delegation.hasRewardHistory(publicDeriver);
+    return !delegation.isRewardWallet(publicDeriver) || delegation.hasRewardHistory(publicDeriver);
   };
 }
 export default (withLayout(WalletSummaryPage): ComponentType<Props>);

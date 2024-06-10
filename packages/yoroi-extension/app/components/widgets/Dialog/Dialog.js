@@ -38,11 +38,13 @@ export type Props = {|
   +className?: string,
   +scrollableContentClass?: string,
   +styleOverride?: { ... },
+  +styleContentOverride?: { ... },
   +onClose?: ?(void) => PossiblyAsync<void>,
   +closeOnOverlayClick?: boolean,
   +isRevampLayout?: boolean,
   id?: string,
   +styleFlags?: StyleFlag,
+  +forceBottomDivider?: boolean,
 |};
 
 type InjectedProps = {| isRevampLayout: boolean |};
@@ -62,6 +64,7 @@ function Dialog(props: Props & InjectedProps): Node {
     scrollableContentClass,
     id,
     styleFlags,
+    forceBottomDivider,
   } = props;
 
   if (!isRevampLayout) return <LegacyDialog props={props} />;
@@ -145,12 +148,13 @@ function Dialog(props: Props & InjectedProps): Node {
             pt={styleFlags?.contentNoTopPadding ? '0px !important' : undefined}
             pb={contentHasScroll || !hasActions ? '24px' : '0px !important'}
             className="ModalContent"
+            style={props.styleContentOverride}
           >
             {children}
           </ModalContent>
         ) : null}
         {hasActions && (
-          <ModalFooter contentHasScroll={contentHasScroll}>
+          <ModalFooter hasDivider={forceBottomDivider || contentHasScroll}>
             {map(actions, (action, i: number) => {
               const buttonClasses = classnames([
                 // Keep classnames for testing
@@ -180,6 +184,7 @@ function Dialog(props: Props & InjectedProps): Node {
           <CloseButton
             onClose={onClose}
             closeButton={closeButton ? React.cloneElement(closeButton, { onClose }) : null}
+            idLocatorPath={id}
           />
         ) : null}
         {!hasSubmitting && backButton}
@@ -206,10 +211,12 @@ export const CloseButton = ({
   onClose,
   closeButton,
   sx,
+  idLocatorPath='modalWindow',
 }: {|
   onClose: ?(void) => PossiblyAsync<void>,
   closeButton: React$Node,
   sx?: any,
+  idLocatorPath?: string,
 |}): React$Node => (
   <Box
     sx={{
@@ -222,6 +229,7 @@ export const CloseButton = ({
       ...(sx ?? {}),
     }}
     onClick={onClose}
+    id={idLocatorPath + '-closeModal-button'}
   >
     {closeButton || (
       <IconButton>
@@ -271,7 +279,7 @@ const ModalContent = styled(Box)(() => ({
   flexGrow: 1,
 }));
 
-const ModalFooter = styled(Box)(({ theme, contentHasScroll }) => ({
+const ModalFooter = styled(Box)(({ theme, hasDivider }) => ({
   display: 'flex',
   gap: '24px',
   paddingLeft: '24px',
@@ -279,7 +287,7 @@ const ModalFooter = styled(Box)(({ theme, contentHasScroll }) => ({
   paddingTop: '24px',
   paddingBottom: '24px',
   marginTop: '0px',
-  borderTop: contentHasScroll ? '1px solid' : '',
+  borderTop: hasDivider ? '1px solid' : '',
   borderTopColor: theme.palette.grayscale['200'],
   '& button': {
     width: '50%',

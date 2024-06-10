@@ -35,25 +35,30 @@ export const CreateSwapOrder = ({
   priceImpactState,
 }: Props): React$Node => {
   const [openedDialog, setOpenedDialog] = useState('');
+  const [prevSelectedPoolId, setPrevSelectedPoolId] = useState<?string>(undefined);
 
   const {
     orderData: {
       amounts: { sell, buy },
       type: orderType,
+      selectedPoolCalculation,
     },
     // unsignedTxChanged,
     sellTokenInfoChanged,
     buyTokenInfoChanged,
   } = useSwap();
 
+  if (orderType === 'market') {
+    const selectedPoolId = selectedPoolCalculation?.pool.poolId;
+    if (selectedPoolId !== prevSelectedPoolId) {
+      setPrevSelectedPoolId(selectedPoolId);
+      swapStore.resetLimitOrderDisplayValue();
+    }
+  }
+
   useAsyncPools(sell.tokenId, buy.tokenId)
     .then(() => null)
     .catch(() => null);
-
-  const orderTypeTabs = [
-    { type: 'market', label: 'Market' },
-    { type: 'limit', label: 'Limit' },
-  ];
 
   return (
     <>
@@ -67,7 +72,7 @@ export const CreateSwapOrder = ({
         pb="20px"
       >
         {/* Order type and refresh */}
-        <TopActions orderTypeTabs={orderTypeTabs} orderType={orderType} />
+        <TopActions orderType={orderType} />
 
         {/* From Field */}
         <EditSellAmount
@@ -76,7 +81,7 @@ export const CreateSwapOrder = ({
         />
 
         {/* Clear and switch */}
-        <MiddleActions />
+        <MiddleActions swapStore={swapStore} />
 
         {/* To Field */}
         <EditBuyAmount
@@ -85,7 +90,10 @@ export const CreateSwapOrder = ({
         />
 
         {/* Price between assets */}
-        <SwapPriceInput swapStore={swapStore} priceImpactState={priceImpactState} />
+        <SwapPriceInput
+          swapStore={swapStore}
+          priceImpactState={priceImpactState}
+        />
 
         {/* Slippage settings */}
         <EditSlippage

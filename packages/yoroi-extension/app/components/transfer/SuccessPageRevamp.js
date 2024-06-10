@@ -47,7 +47,7 @@ export class SuccessPageRevamp extends Component<Props> {
           closeInfo ? <DialogCloseButton onClose={closeInfo.onClose} isRevampLayout /> : undefined
         }
       >
-        <Box maxWidth="600px" outline="10px solid green">
+        <Box maxWidth="600px">
           <Box
             sx={{
               display: 'flex',

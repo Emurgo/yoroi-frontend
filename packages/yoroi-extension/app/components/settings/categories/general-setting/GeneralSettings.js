@@ -99,7 +99,7 @@ class GeneralSettings extends Component<Props & InjectedLayoutProps> {
             )}
           >
             {languageOptions.map(option => (
-              <MenuItem key={option.value} value={option.value}>
+              <MenuItem key={option.value} value={option.value} id={'selectLanguage-' + option.value + '-menuItem'}>
                 <FlagLabel svg={option.svg} label={option.label} />
               </MenuItem>
             ))}

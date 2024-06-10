@@ -4,7 +4,7 @@ import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import styles from './SubMenuItem.scss';
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { withLayout } from '../../styles/context/layout';
 
 type Props = {|
@@ -31,10 +31,9 @@ class SubMenuItem extends Component<Props & InjectedProps> {
       state = styles.disabled;
     }
     const componentClasses = classNames([styles.component, state, className]);
-    let subMenuItemId = '';
-    if (typeof label === 'string') {
-      subMenuItemId = label.toLowerCase().replace(/[ \/]/gi, '');
-    }
+    const componentClassesArr = componentClasses.split(' ');
+    const lastClass = componentClassesArr[componentClassesArr.length - 1];
+    const subMenuItemId = lastClass.toLowerCase().replace(/[ \/]/gi, '');
 
     return (
       <Box
@@ -45,7 +44,13 @@ class SubMenuItem extends Component<Props & InjectedProps> {
         onClick={onClick}
         id={locationId + '-' + subMenuItemId + 'SubTab-button'}
       >
-        {label}
+        <Typography
+          variant="body1"
+          fontWeight="500"
+          color={active ? 'primary.500' : 'grayscale.600'}
+        >
+          {label}
+        </Typography>
       </Box>
     );
   }

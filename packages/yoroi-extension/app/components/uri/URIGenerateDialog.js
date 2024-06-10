@@ -148,6 +148,7 @@ export default class URIGenerateDialog extends Component<Props> {
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={onClose}
+        id="uriGenerateDialog"
       >
         <div>
           <div className={styles.receiverInput}>
