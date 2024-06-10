@@ -23,7 +23,7 @@ export const networks = Object.freeze({
     Backend: {
       BackendService: environment.isTest()
         ? 'http://localhost:21000'
-        : 'https://iohk-mainnet.yoroiwallet.com',
+        : 'https://api.yoroiwallet.com',
       TokenInfoService:
         'https://cdn.yoroiwallet.com',
     },
