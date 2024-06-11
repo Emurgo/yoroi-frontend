@@ -182,7 +182,7 @@ export function PriceImpactAlert({
       <Box display="flex" flexDirection="column">
         <PriceImpactWarningText isSevere />
       </Box>
-      <Box maxWidth="648px" display="flex" gap="24px" pt="24px">
+      <Box maxWidth="648px" display="flex" gap="24px" pt="23px">
         <Button fullWidth variant="secondary" onClick={onCancel}>
           Cancel
         </Button>
