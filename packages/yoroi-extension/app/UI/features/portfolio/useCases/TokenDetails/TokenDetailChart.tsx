@@ -1,5 +1,5 @@
 import { Box, Button, Stack, Typography, styled } from '@mui/material';
-import React from 'react';
+import React, { useState } from 'react';
 import { LineChart, Line, CartesianGrid, YAxis, ResponsiveContainer, Tooltip as RechartTooltip } from 'recharts';
 import { useTheme } from '@mui/material/styles';
 import { Skeleton, Tooltip, Chip } from '../../../../components';
@@ -50,12 +50,24 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
     detailInfo,
     minValue,
     maxValue,
-  } = useChart(tokenInfo?.chartData);
+  } = useChart(tokenInfo.chartData);
+  const [isFetching, setIsFetching] = useState(isLoading);
+
+  const handlePeriodChange = (id: string) => {
+    handleChoosePeriod(id);
+
+    // FAKE FETCHING DATA
+    setIsFetching(true);
+
+    setTimeout(() => {
+      setIsFetching(false);
+    }, 1000);
+  };
 
   return (
     <Stack direction="column" spacing={theme.spacing(4)} sx={{ padding: theme.spacing(3) }}>
       <Stack direction="row" justifyContent="space-between" alignItems="center">
-        {isLoading ? (
+        {isFetching ? (
           <Skeleton width="131px" height="13px" />
         ) : (
           <Typography fontWeight="500" color="ds.gray_cmax">
@@ -63,7 +75,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
           </Typography>
         )}
         <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
-          {isLoading ? (
+          {isFetching ? (
             <Skeleton width="64px" height="13px" />
           ) : (
             <Stack direction="row" alignItems="flex-end" color="ds.gray_cmax">
@@ -84,7 +96,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
             placement="top"
           >
             <Stack direction="row" alignItems="center" spacing={theme.spacing(0.5)}>
-              {isLoading ? (
+              {isFetching ? (
                 <Skeleton width="35px" height="16px" />
               ) : (
                 <Chip
@@ -105,7 +117,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
                 />
               )}
 
-              {isLoading ? (
+              {isFetching ? (
                 <Skeleton width="35px" height="16px" />
               ) : (
                 <Chip
@@ -126,7 +138,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
 
       <Box sx={{ userSelect: 'none', width: '100%' }}>
         <Box
-          component={isLoading ? 'img' : 'div'}
+          component={isFetching ? 'img' : 'div'}
           src={chartSkeletonPng}
           sx={{
             marginLeft: `${-theme.spacing(1)}`,
@@ -134,7 +146,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
             height: `${chartHeight}px`,
           }}
         >
-          {isLoading ? null : (
+          {isFetching ? null : (
             <ResponsiveContainer width="100%" height={chartHeight} style={{ padding: 0 }}>
               <LineChart
                 data={tokenInfo?.chartData[periodButtonProps.find(item => item?.active)?.id || 0]}
@@ -167,7 +179,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
                   type="monotone"
                   dataKey="value"
                   strokeWidth={2}
-                  stroke={isLoading ? theme.palette.ds.gray_c50 : theme.palette.ds.primary_c600}
+                  stroke={isFetching ? theme.palette.ds.gray_c50 : theme.palette.ds.primary_c600}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -179,8 +191,8 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
             <StyledButton
               key={id}
               variant={active ? 'contained' : 'text'}
-              disabled={isLoading}
-              onClick={() => handleChoosePeriod(id)}
+              disabled={isFetching}
+              onClick={() => handlePeriodChange(id)}
               theme={theme}
             >
               {label}
