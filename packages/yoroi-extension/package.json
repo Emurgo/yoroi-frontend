@@ -148,7 +148,7 @@
     "@emurgo/cip4-js": "1.0.5",
     "@emurgo/cross-csl-browser": "4.4.0",
     "@emurgo/yoroi-eutxo-txs": "0.0.2-alpha.8",
-    "@emurgo/yoroi-lib": "0.15.4",
+    "@emurgo/yoroi-lib": "0.15.5-alpha.8",
     "@ledgerhq/hw-transport-u2f": "5.36.0-deprecated",
     "@ledgerhq/hw-transport-webauthn": "5.36.0-deprecated",
     "@ledgerhq/hw-transport-webhid": "5.51.1",
@@ -215,7 +215,8 @@
     "tinycolor2": "1.4.2",
     "trezor-connect-flow": "Emurgo/trezor-connect-flow#92d6d8c8faef25c0ea1d481aa1ecb4ba77ce539c",
     "ua-parser-js": "1.0.37",
-    "util": "0.12.5"
+    "util": "0.12.5",
+    "url": "0.11.3"
   },
   "overrides": {
     "@babel/helpers": "7.16.0"

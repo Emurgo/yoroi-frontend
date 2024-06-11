@@ -1,18 +1,11 @@
 // @flow
 import type { SelectedExternalStorageProvider } from '../../domain/ExternalStorage';
 import environment from '../../environment';
-import { unitOfAccountDisabledValue } from '../../types/unitOfAccountType';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+import { unitOfAccountDisabledValue } from '../../types/unitOfAccountType';
 
-import {
-    getLocalItem,
-    setLocalItem,
-    removeLocalItem,
-    isEmptyStorage,
-} from './primitives';
-import {
-  TabIdKeys,
-} from '../../utils/tabManager';
+import { getLocalItem, isEmptyStorage, removeLocalItem, setLocalItem, } from './primitives';
+import { TabIdKeys, } from '../../utils/tabManager';
 import type { ComplexityLevelType } from '../../types/complexityLevelType';
 import type { WhitelistEntry } from '../../../chrome/extension/connector/types';
 import type { CatalystRoundInfoResponse } from '../ada/lib/state-fetch/types'
@@ -431,6 +424,15 @@ export async function loadSubmittedTransactions(): any {
     return [];
   }
   return JSON.parse(stored[storageKeys.SUBMITTED_TRANSACTIONS]);
+}
+
+export async function getOutputAddressesInSubmittedTxs(publicDeriverId: number): Promise<Array<string>> {
+  const submittedTxs = await loadSubmittedTransactions() || [];
+  return submittedTxs
+    .filter(submittedTxRecord => submittedTxRecord.publicDeriverId === publicDeriverId)
+    .flatMap(({ transaction }) => {
+      return transaction.addresses.to.map(({ address }) => address);
+    });
 }
 
 export async function loadCatalystRoundInfo(): Promise<?CatalystRoundInfoResponse> {
