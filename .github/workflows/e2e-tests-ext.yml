@@ -9,7 +9,7 @@ on:
 
 jobs:
   General:
-    if: github.event.review  && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check') || contains(github.event.review.body, '/ext-general'))
+    if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check') || contains(github.event.review.body, '/ext-general'))
     runs-on: macos-14
     strategy:
       matrix:
@@ -85,7 +85,7 @@ jobs:
             ./packages/e2e-tests/testRunsData_${{ matrix.browser }}
 
   Failing:
-    if: github.event.review  && contains(github.event.review.body, '/ext-failing')
+    if: github.event.review && contains(github.event.review.body, '/ext-failing')
     runs-on: macos-14
     strategy:
       matrix:
