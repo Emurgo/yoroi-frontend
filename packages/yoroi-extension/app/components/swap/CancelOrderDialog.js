@@ -76,7 +76,7 @@ export default function CancelSwapOrderDialog({
       onClose={onDialogClose}
       withCloseButton
       closeOnOverlayClick
-      styleOverride={{ width: '612px', height: '496px' }}
+      styleOverride={{ maxWidth: '612px', height: '496px', minWidth: '612px' }}
     >
       <Box display="flex" flexDirection="column" gap="12px">
         <Box>
