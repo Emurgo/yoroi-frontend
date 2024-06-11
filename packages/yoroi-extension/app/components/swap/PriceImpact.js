@@ -183,7 +183,10 @@ export function PriceImpactAlert({
           fullWidth
           variant="primary"
           onClick={onContinue}
-          sx={{ backgroundColor: 'magenta.500' }}
+          sx={{
+            backgroundColor: 'magenta.500',
+            '&:hover': { backgroundColor: 'magenta.600' },
+          }}
         >
           Continue
         </Button>
