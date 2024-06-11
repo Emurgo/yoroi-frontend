@@ -1150,5 +1150,7 @@
   "portfolio.orderTable.header.pair": "Pair (From / To)",
   "portfolio.orderTable.header.assetPrice": "Asset price",
   "portfolio.orderTable.header.assetAmount": "Asset amount",
-  "portfolio.orderTable.header.transactionId": "Transaction ID"
+  "portfolio.orderTable.header.transactionId": "Transaction ID",
+  "portfolio.welcomeBanner.title": "Welcome to Yoroi",
+  "portfolio.welcomeBanner.description": "With new features and upgraded performance, transactions can be done faster and more securely than ever before."
 }

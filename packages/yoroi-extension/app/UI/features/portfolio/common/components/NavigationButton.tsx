@@ -6,9 +6,10 @@ interface Props {
   onClick: () => void;
   variant: any;
   sx?: any;
+  width?: string;
 }
 
-const NavigationButton = ({ label, onClick, variant, sx, ...props }: Props) => {
+const NavigationButton = ({ label, onClick, variant, sx, width, ...props }: Props) => {
   return (
     <Button
       onClick={onClick}
@@ -16,7 +17,8 @@ const NavigationButton = ({ label, onClick, variant, sx, ...props }: Props) => {
       {...props}
       sx={(theme: any) => ({
         maxHeight: '40px',
-        minWidth: '140.25px',
+        width: width || '140.25px',
+        padding: '9px 20px 9px 20px !important',
 
         '&.MuiButton-contained': {
           backgroundColor: theme.palette.ds.el_primary_medium,

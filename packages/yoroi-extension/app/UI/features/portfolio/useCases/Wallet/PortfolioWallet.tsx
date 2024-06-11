@@ -6,6 +6,7 @@ import mockData from '../../common/mockData';
 import PortfolioHeader from '../../common/components/PortfolioHeader';
 import { useStrings } from '../../common/hooks/useStrings';
 import { TokenType } from '../../common/types/index';
+import WelcomeBanner from '../../common/components/WelcomeBanner';
 
 interface Props {
   data: TokenType[];
@@ -18,16 +19,16 @@ const PortfolioWallet = ({ data }: Props): JSX.Element => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [tokenList, setTokenList] = useState(data);
 
-  useEffect(() => {
-    // FAKE FETCHING DATA TO SEE SKELETON
-    setIsLoading(true);
+  // useEffect(() => {
+  //   // FAKE FETCHING DATA TO SEE SKELETON
+  //   setIsLoading(true);
 
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
+  //   const timer = setTimeout(() => {
+  //     setIsLoading(false);
+  //   }, 2000);
 
-    return () => clearTimeout(timer);
-  }, []);
+  //   return () => clearTimeout(timer);
+  // }, []);
 
   useEffect(() => {
     if (!keyword) {
@@ -66,6 +67,7 @@ const PortfolioWallet = ({ data }: Props): JSX.Element => {
         }
       />
       <StatsTable data={tokenList} isLoading={isLoading} />
+      <WelcomeBanner />
     </Stack>
   );
 };

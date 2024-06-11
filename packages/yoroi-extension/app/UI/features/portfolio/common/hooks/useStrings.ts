@@ -308,6 +308,15 @@ export const messages = Object.freeze(
       id: 'portfolio.orderTable.header.transactionId',
       defaultMessage: '!!!Transaction ID',
     },
+    welcomeBannerTitle: {
+      id: 'portfolio.welcomeBanner.title',
+      defaultMessage: '!!!Welcome to Yoroi',
+    },
+    welcomeBannerDesc: {
+      id: 'portfolio.welcomeBanner.description',
+      defaultMessage:
+        '!!!With new features and upgraded performance, transactions can be done faster and more securely than ever before.',
+    },
   })
 );
 
@@ -390,5 +399,7 @@ export const useStrings = () => {
     assetPrice: intl.formatMessage(messages.assetPrice),
     assetAmount: intl.formatMessage(messages.assetAmount),
     transactionId: intl.formatMessage(messages.transactionId),
+    welcomeBannerTitle: intl.formatMessage(messages.welcomeBannerTitle),
+    welcomeBannerDesc: intl.formatMessage(messages.welcomeBannerDesc),
   }).current;
 };
