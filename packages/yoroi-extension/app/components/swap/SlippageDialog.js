@@ -18,6 +18,7 @@ export default function SlippageDialog({
   slippageValue,
 }: Props): React$Node {
   const [selectedSlippage, setSelectedSlippage] = useState(slippageValue);
+  const [inputFocused, setInputFocused] = useState(false);
   const [isManualSlippage, setIsManualSlippage] = useState(
     !defaultSlippages.includes(slippageValue)
   );
@@ -89,8 +90,8 @@ export default function SlippageDialog({
           <Box
             component="fieldset"
             sx={{
-              border: '1px solid',
-              borderColor: 'grayscale.400',
+              border: inputFocused && !readonly ? '2px solid' : '1px solid',
+              borderColor: inputFocused && !readonly ? 'common.black' : 'grayscale.400',
               borderRadius: '8px',
               p: '16px',
               display: 'grid',
@@ -100,12 +101,22 @@ export default function SlippageDialog({
               bgcolor: readonly ? 'grayscale.50' : 'common.white',
               columnGap: '6px',
               rowGap: '8px',
+              ...(!inputFocused &&
+                !readonly && {
+                  '&:hover': {
+                    border: '1px solid',
+                    borderColor: 'common.black',
+                  },
+                }),
+              maxHeight: '56px',
             }}
+            onFocus={() => setInputFocused(true)}
+            onBlur={() => setInputFocused(false)}
           >
             <Box
               component="legend"
               sx={{
-                top: '-9px',
+                top: '-7px',
                 left: '16px',
                 position: 'absolute',
                 px: '4px',

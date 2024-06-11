@@ -66,6 +66,9 @@ export default function SwapInput({
           bgcolor: 'common.white',
           columnGap: '6px',
           rowGap: '8px',
+          '&:hover': {
+            borderColor: 'grayscale.max',
+          },
         }}
       >
         <Box

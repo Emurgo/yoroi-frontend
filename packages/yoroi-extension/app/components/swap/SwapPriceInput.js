@@ -31,7 +31,9 @@ function SwapPriceInput({ swapStore, priceImpactState }: Props): Node {
   const pricePlaceholder = isMarketOrder ? NO_PRICE_VALUE_PLACEHOLDER : '0';
   const marketPrice = orderData.selectedPoolCalculation?.prices.market;
 
-  const format = s => Quantities.format(s, orderData.tokens.priceDenomination, PRICE_PRECISION) + (s.endsWith('.') ? '.' : '');
+  const format = s =>
+    Quantities.format(s, orderData.tokens.priceDenomination, PRICE_PRECISION) +
+    (s.endsWith('.') ? '.' : '');
   const formattedPrice = marketPrice ? format(marketPrice) : pricePlaceholder;
 
   if (swapStore.limitOrderDisplayValue === '' && marketPrice != null) {
@@ -59,6 +61,12 @@ function SwapPriceInput({ swapStore, priceImpactState }: Props): Node {
           bgcolor: isReadonly ? 'grayscale.50' : 'common.white',
           columnGap: '6px',
           rowGap: '8px',
+          ...(!isReadonly && {
+            '&:hover': {
+              border: '1px solid',
+              borderColor: 'grayscale.max',
+            },
+          }),
         }}
       >
         <Box
