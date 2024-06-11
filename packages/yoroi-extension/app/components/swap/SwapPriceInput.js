@@ -68,6 +68,7 @@ function SwapPriceInput({ swapStore, priceImpactState }: Props): Node {
             },
           }),
         }}
+        height="56px"
       >
         <Box
           component="legend"
