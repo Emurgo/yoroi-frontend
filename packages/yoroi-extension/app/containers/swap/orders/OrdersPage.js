@@ -216,15 +216,6 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
     props.stores.explorers.selectedExplorer.get(network.NetworkId) ??
     fail('No explorer for wallet network');
 
-  // const richOpenOrders = useRichOpenOrders();
-  // const openOrders = richOpenOrders?.length
-  //   ? richOpenOrders.map(o => mapOpenOrder(o, defaultTokenInfo))
-  //   : [];
-  // const richCompleteOrders = useRichCompletedOrders();
-  // const completedOrders = richCompleteOrders?.length
-  //   ? richCompleteOrders.map(o => mapCompletedOrder(o, defaultTokenInfo))
-  //   : [];
-
   const openOrders = useRichOpenOrders().map(o => mapOpenOrder(o, defaultTokenInfo));
   const completedOrders = useRichCompletedOrders().map(o => mapCompletedOrder(o, defaultTokenInfo));
 
