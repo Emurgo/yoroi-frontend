@@ -6,7 +6,6 @@ import { Quantities } from '../../utils/quantities';
 import { useSwap } from '@yoroi/swap';
 import { PRICE_PRECISION } from './common';
 import { useSwapForm } from '../../containers/swap/context/swap-form';
-import SwapStore from '../../stores/ada/SwapStore';
 import { observer } from 'mobx-react';
 import {
   FormattedActualPrice,
@@ -16,14 +15,13 @@ import {
 } from './PriceImpact';
 
 type Props = {|
-  swapStore: SwapStore,
   priceImpactState: ?PriceImpact,
 |};
 
 const NO_PRICE_VALUE_PLACEHOLDER = ' ';
 
-function SwapPriceInput({ swapStore, priceImpactState }: Props): Node {
-  const { orderData, limitPriceChanged } = useSwap();
+function SwapPriceInput({ priceImpactState }: Props): Node {
+  const { orderData } = useSwap();
   const {
     sellTokenInfo,
     buyTokenInfo,
