@@ -8,7 +8,7 @@ import { useStrings } from '../../common/hooks/useStrings';
 import { TokenType } from '../../common/types/index';
 
 interface Props {
-  tokenInfo: TokenType | null;
+  tokenInfo: TokenType;
   isLoading: boolean;
   isAda: boolean;
 }

@@ -1,5 +1,6 @@
 import { TableCellProps } from '@mui/material';
-import { TableSortType } from '../hooks/useTableSort';
+
+export type TableSortType = 'character' | 'numeric';
 
 export interface IHeadCell {
   id: string;

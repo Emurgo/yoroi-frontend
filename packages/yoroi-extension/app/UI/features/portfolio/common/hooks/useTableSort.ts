@@ -1,7 +1,5 @@
 import { useCallback } from 'react';
-import { IHeadCell } from '../types/index';
-
-export type TableSortType = 'character' | 'numeric';
+import { IHeadCell, TableSortType } from '../types/table';
 
 export interface ISortState {
   order: string | null;

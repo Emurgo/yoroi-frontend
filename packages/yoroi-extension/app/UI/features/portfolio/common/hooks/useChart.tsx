@@ -1,4 +1,3 @@
-// @flow 
 import React, { useState } from 'react';
 import { useStrings } from './useStrings';
 import { useTheme } from '@mui/material/styles';
@@ -6,7 +5,7 @@ import { Box } from '@mui/material';
 import moment from 'moment';
 import { IPeriodButtonProps, IChartData } from '../types/chart';
 
-const useChart = (data: IChartData | undefined) => {
+const useChart = (data: IChartData) => {
   const strings = useStrings();
   const theme: any = useTheme();
   const [periodButtonProps, setPeriodButtonProps] = useState<IPeriodButtonProps[]>([

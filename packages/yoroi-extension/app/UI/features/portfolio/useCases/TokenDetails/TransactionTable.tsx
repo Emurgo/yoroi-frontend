@@ -6,7 +6,7 @@ import moment from 'moment';
 import { useStrings } from '../../common/hooks/useStrings';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { Icon } from '../../../../components/icons';
-import { HistoryItemStatus, HistoryItemType } from '../../common/types/transaction';
+import { HistoryItemStatus, HistoryItemType, TransactionItemType } from '../../common/types/transaction';
 import { mapStrings } from '../../common/helpers/transactionHelper';
 import { IHeadCell } from '../../common/types/table';
 import _ from 'lodash';
@@ -17,7 +17,7 @@ const Container = styled(Box)(() => ({
   margin: '30px 0',
 }));
 
-const TransactionTable = (): JSX.Element => {
+const TransactionTable = ({ history }: { history: TransactionItemType[] }): JSX.Element => {
   const theme = useTheme();
   const strings = useStrings();
   const { unitOfAccount } = usePortfolio();
@@ -30,15 +30,15 @@ const TransactionTable = (): JSX.Element => {
   ];
 
   const groupedData = useMemo(() => {
-    if (!mockData.transactionHistory) return [];
+    if (!history) return [];
     const today = new Date();
     const yesterday = new Date();
     yesterday.setDate(today.getDate() - 1);
 
-    return _.chain(mapStrings(mockData.transactionHistory, strings))
+    return _.chain(mapStrings(history, strings))
       .groupBy(t => {
         const time = new Date(t.time);
-        time.setHours(0, 0, 0, 0); // set the time to 00:00:00 for grouping by day
+        time.setHours(0, 0, 0, 0);
         return time.toISOString();
       })
       .map((data, title) => ({

@@ -13,12 +13,12 @@ export const HistoryItemStatus = Object.freeze({
 });
 
 export type TransactionItemType = {
-  type: typeof HistoryItemType,
-  status: typeof HistoryItemStatus,
-  time: number,
-  feeValue?: number,
-  feeValueUsd?: number,
-  amountTotal: number,
-  amountTotalUsd: number,
-  amountAsset: number | string,
+  type: number;
+  status: string;
+  time: string;
+  feeValue?: number;
+  feeValueUsd?: number;
+  amountTotal: number;
+  amountTotalUsd: number;
+  amountAsset: number | string;
 };

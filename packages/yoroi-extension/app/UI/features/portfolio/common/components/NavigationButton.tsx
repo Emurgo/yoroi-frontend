@@ -1,9 +1,18 @@
 import React from 'react';
 import { Button, Typography } from '@mui/material';
 
-const NavigationButton = ({ label, ...props }) => {
+interface Props {
+  label: string;
+  onClick: () => void;
+  variant: any;
+  sx?: any;
+}
+
+const NavigationButton = ({ label, onClick, variant, sx, ...props }: Props) => {
   return (
     <Button
+      onClick={onClick}
+      variant={variant}
       {...props}
       sx={(theme: any) => ({
         maxHeight: '40px',
@@ -21,7 +30,7 @@ const NavigationButton = ({ label, ...props }) => {
         '&.MuiButton-secondary': {
           color: theme.palette.ds.text_primary_medium,
         },
-        ...props.sx,
+        ...sx,
       })}
     >
       {/* @ts-ignore */}

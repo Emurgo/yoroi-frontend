@@ -9,7 +9,6 @@ import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { Icon } from '../../../../components/icons';
 import useChart from '../../common/hooks/useChart';
 import { TokenType } from '../../common/types/index';
-import mockData from '../../common/mockData';
 
 const StyledButton = styled(Button)(({ theme, disabled, variant }: { theme: any; disabled: boolean; variant: string }) => ({
   fontWeight: 500,
@@ -31,7 +30,7 @@ const StyledButton = styled(Button)(({ theme, disabled, variant }: { theme: any;
 
 interface Props {
   isLoading: boolean;
-  tokenInfo: TokenType | null;
+  tokenInfo: TokenType;
   isAda: boolean;
 }
 
@@ -51,7 +50,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
     detailInfo,
     minValue,
     maxValue,
-  } = useChart(tokenInfo?.chartData === undefined ? mockData.wallet.tokenList[0]?.chartData : tokenInfo?.chartData);
+  } = useChart(tokenInfo?.chartData);
 
   return (
     <Stack direction="column" spacing={theme.spacing(4)} sx={{ padding: theme.spacing(3) }}>

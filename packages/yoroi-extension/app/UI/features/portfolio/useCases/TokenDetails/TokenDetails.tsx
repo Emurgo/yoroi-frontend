@@ -14,6 +14,7 @@ import TokenDetailOverview from './TokenDetailOverview';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { TokenType } from '../../common/types/index';
 import NavigationButton from '../../common/components/NavigationButton';
+import mockData from '../../common/mockData';
 
 const Header = styled(Box)({
   display: 'flex',
@@ -40,7 +41,7 @@ const StyledSubMenu = styled(SubMenu)(({ theme }) => ({
 }));
 
 interface Props {
-  tokenInfo: TokenType | null;
+  tokenInfo: TokenType;
 }
 
 const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
@@ -145,7 +146,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
 
             <Divider />
 
-            <TokenDetailChart isLoading={isLoading} tokenInfo={tokenInfo || null} isAda={isAda} />
+            <TokenDetailChart isLoading={isLoading} tokenInfo={tokenInfo} isAda={isAda} />
           </Card>
 
           <Card>
@@ -174,7 +175,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
           </Card>
         </TokenInfo>
 
-        <TransactionTable />
+        <TransactionTable history={mockData.transactionHistory} />
       </Stack>
     </Box>
   );

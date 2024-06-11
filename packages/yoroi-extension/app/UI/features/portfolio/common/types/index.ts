@@ -1,9 +1,5 @@
 import { IChartData } from './chart';
 
-export * from './table';
-export * from './transaction';
-export * from './chart';
-
 export type BalanceType = {
   ada: number,
   usd: number,

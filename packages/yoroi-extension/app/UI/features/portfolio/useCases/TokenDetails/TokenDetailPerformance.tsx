@@ -13,7 +13,7 @@ const PerformanceItemType = {
 };
 
 interface Props {
-  tokenInfo: TokenType | null;
+  tokenInfo: TokenType;
   isLoading: boolean;
 }
 
