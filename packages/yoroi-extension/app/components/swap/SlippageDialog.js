@@ -53,20 +53,21 @@ export default function SlippageDialog({
       withCloseButton
       closeOnOverlayClick
       styleContentOverride={{ paddingTop: '16px' }}
+      styleOverride={{ maxWidth: '612px', height: '540px' }}
     >
       <Box maxWidth="612px" sx={{ margin: '0 auto', flex: 1 }}>
         <Box>
-          <Typography component="div" variant="body1" color="grayscale.800">
+          <Typography component="div" variant="body1" color="grayscale.900">
             Default Slippage Tolerance
           </Typography>
         </Box>
-        <Box py="8px">
+        <Box pb="16px" pt="8px">
           <Typography component="div" variant="body2" color="grayscale.700">
             Slippage tolerance is set as a percentage of the total swap value. Your transactions
             will not be executed if the price moves by more than this amount.
           </Typography>
         </Box>
-        <Box display="flex" justifyContent="flex-start">
+        <Box display="flex" justifyContent="flex-start" mb="32px">
           <Tabs
             tabs={defaultSlippages
               .map(val => ({
@@ -145,14 +146,14 @@ export default function SlippageDialog({
             />
           </Box>
         </Box>
-        <Box my="24px" p="16px" pb="12px" pt="12px" bgcolor="yellow.100" borderRadius="8px">
+        <Box my="24px" p="16px" pt="12px" bgcolor="yellow.100" borderRadius="8px">
           <Typography component="div" variant="body1" color="grayscale.max">
             When the slippage tolerance is set really high, it allows the transaction to still
             complete despite large price swings. This can open the door to front-running and
             sandwich attacks.
           </Typography>
         </Box>
-        <Box>
+        <Box pt="12px">
           <Button
             disabled={selectedSlippage.trim().length === 0}
             fullWidth
