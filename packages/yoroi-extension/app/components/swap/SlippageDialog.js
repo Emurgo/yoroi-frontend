@@ -53,9 +53,9 @@ export default function SlippageDialog({
       withCloseButton
       closeOnOverlayClick
       styleContentOverride={{ paddingTop: '16px' }}
-      styleOverride={{ maxWidth: '612px', height: '540px' }}
+      styleOverride={{ minWidth: '612px', height: '540px', maxWidth: '612px' }}
     >
-      <Box maxWidth="612px" sx={{ margin: '0 auto', flex: 1 }}>
+      <Box sx={{ margin: '0 auto', flex: 1 }}>
         <Box>
           <Typography component="div" variant="body1" color="grayscale.900">
             Default Slippage Tolerance
