@@ -19,19 +19,21 @@ const PortfolioWallet = ({ data }: Props): JSX.Element => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [tokenList, setTokenList] = useState(data);
 
-  // useEffect(() => {
-  //   // FAKE FETCHING DATA TO SEE SKELETON
-  //   setIsLoading(true);
+  useEffect(() => {
+    if (data.length < 2) return;
 
-  //   const timer = setTimeout(() => {
-  //     setIsLoading(false);
-  //   }, 2000);
+    // FAKE FETCHING DATA TO SEE SKELETON
+    setIsLoading(true);
 
-  //   return () => clearTimeout(timer);
-  // }, []);
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
-    if (!keyword) {
+    if (!keyword || data.length < 2) {
       setTokenList(data);
       return;
     }
@@ -67,7 +69,7 @@ const PortfolioWallet = ({ data }: Props): JSX.Element => {
         }
       />
       <StatsTable data={tokenList} isLoading={isLoading} />
-      <WelcomeBanner />
+      {data.length < 2 && <WelcomeBanner />}
     </Stack>
   );
 };
