@@ -24,11 +24,13 @@ const PortfolioMenu = ({ onItemClick, isActiveItem }: Props): JSX.Element => {
       route: ROUTES.PORTFOLIO.ROOT,
       className: 'wallet',
     },
-    {
-      label: `${strings.menuDapps} (${mockData.dapps.liquidityList.length + mockData.dapps.orderList.length})`,
-      route: ROUTES.PORTFOLIO.DAPPS,
-      className: 'dapps',
-    },
+    mockData.dapps.liquidityList.length + mockData.dapps.orderList.length > 0
+      ? {
+          label: `${strings.menuDapps} (${mockData.dapps.liquidityList.length + mockData.dapps.orderList.length})`,
+          route: ROUTES.PORTFOLIO.DAPPS,
+          className: 'dapps',
+        }
+      : ({} as SubMenuOption),
   ];
 
   return <SubMenu options={portfolioOptions} onItemClick={onItemClick} isActiveItem={isActiveItem} locationId="portfolio" />;
