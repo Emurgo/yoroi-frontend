@@ -352,6 +352,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
             display="flex"
             alignItems="center"
             justifyContent="center"
+            sx={{ height: '97px' }}
           >
             {orderStep === 1 && (
               <Button
