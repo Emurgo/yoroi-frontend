@@ -357,7 +357,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
               <Button
                 onClick={processBackToStart}
                 sx={{ minWidth: '128px', minHeight: '48px' }}
-                variant="outlined"
+                variant="secondary"
               >
                 Back
               </Button>
