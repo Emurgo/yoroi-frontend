@@ -67,7 +67,7 @@ export default function SwapInput({
           columnGap: '6px',
           rowGap: '8px',
           '&:hover': {
-            borderColor: 'grayscale.max',
+            borderColor: !error && 'grayscale.max',
           },
         }}
       >
