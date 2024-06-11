@@ -66,13 +66,15 @@ const messages = defineMessages({
 type Props = {|
   +onCancel: void => void,
   +onExchangeCallback: void => void,
-  +currentBalanceAda: string,
+  +currentBalanceAda: BigNumber,
   +receiveAdaAddressPromise: Promise<string | null>,
 |};
 
 type State = {|
   +isBuying: boolean,
-  +error: null | 'lessThanBuyMinimum' | 'notEnoughBalance' | 'lessThanSellMinimum',
+  +inputError: null | 'lessThanBuyMinimum' | 'notEnoughBalance' | 'lessThanSellMinimum',
+  // 'popOutDialog' is not really an error but is an temporary state
+  +urlGenenerationError: null | 'longLoading' | 'timeout' | 'fail',
   +amountAda: string,
   +isSubmitting: boolean,
 |};
@@ -151,6 +153,9 @@ const Disclaimer = styled(Box)({
   padding: 'var(--spacing-12, 12px) var(--spacing-16, 16px) var(--spacing-16, 16px) var(--spacing-16, 16px)'
 });
 
+const URL_GENERATION_LONG_LOADING_TIMEOUT = 2 * 1000;
+const URL_GENERATION_TIMEOUT = 30 * 1000;
+
 @observer
 export default class BuySellDialog extends Component<Props, State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
@@ -159,10 +164,13 @@ export default class BuySellDialog extends Component<Props, State> {
 
   state: State = {
     isBuying: true,
-    error: null,
+    inputError: null,
+    urlGenenerationError: null,
     amountAda: '',
     isSubmitting: false,
   };
+
+  urlGenerationTimeout: null | number = null;
 
   onSubmit: () => Promise<void> = async () => {
     const { state, props } = this;
@@ -200,7 +208,34 @@ export default class BuySellDialog extends Component<Props, State> {
       }
     }
 
-    const url = await manager.referralLink.create(params);
+    this.urlGenerationTimeout = setTimeout(
+      () => {
+        this.setState({ urlGenerationError: 'longLoading' });
+        this.urlGenerationTimeout = setTimeout(
+          () => {
+            this.setState({ urlGenrationError: 'timeout' });
+          },
+          URL_GENERATION_TIMEOUT - URL_GENERATION_LONG_LOADING_TIMEOUT
+        );
+      },
+      URL_GENERATION_LONG_LOADING_TIMEOUT 
+    );
+
+    let url;
+    try {
+      url = await manager.referralLink.create(params);
+    } catch {
+      this.setState({ urlGenerationError: 'fail' });
+      return;
+    } finally {
+      cancelTimeout(this.urlGenerationTimeout);
+    }
+
+    // if timeout already happened, give up the process
+    if (this.state.urlGenerationError === 'timeout') {
+      return;
+    }
+    this.setState({ urlGenrationError: null });
 
     const self = this;
     chrome.tabs.create({ url: url.href }, (exchangePageTab) => {
@@ -226,7 +261,7 @@ export default class BuySellDialog extends Component<Props, State> {
       return;
     }
 
-    const error = (() => {
+    const inputError = (() => {
       if (value === '') {
         return null;
       }
@@ -248,7 +283,7 @@ export default class BuySellDialog extends Component<Props, State> {
       return null;
     })();
 
-    this.setState({ amountAda: value, error });
+    this.setState({ amountAda: value, inputError });
   }
 
   renderBuySell(): Node {
@@ -263,11 +298,11 @@ export default class BuySellDialog extends Component<Props, State> {
 
     // set a place holder so that when it becomes an error message, the height doesn't change
     let helperText = ' ';
-    if (state.error === 'lessThanBuyMinimum') {
+    if (state.inputError === 'lessThanBuyMinimum') {
       helperText = intl.formatMessage(messages.lessThanMinimum, { amount: MINIMUM_BUY_ADA.toString() });
-    } else if (state.error === 'lessThanSellMinimum') {
+    } else if (state.inputError === 'lessThanSellMinimum') {
       helperText = intl.formatMessage(messages.lessThanMinimum, { amount: MINIMUM_SELL_ADA.toString() });
-    } else if (state.error === 'notEnoughBalance') {
+    } else if (state.inputError === 'notEnoughBalance') {
       helperText = intl.formatMessage(messages.notEnoughBalance);
     }
 
@@ -301,7 +336,7 @@ export default class BuySellDialog extends Component<Props, State> {
           }}
           value={state.amountAda}
           onChange={this.onChangeAmount}
-          error={state.error !== null}
+          error={state.inputError !== null}
           helperText={helperText}
           autoFocus
         />
@@ -332,6 +367,34 @@ export default class BuySellDialog extends Component<Props, State> {
     const { intl } = this.context;
     const { state, props } = this;
 
+    if (this.state.urlGenerationError === 'longLoading') {
+      return (
+        <Dialog
+          title={"wait"}
+          closeOnOverlayClick={false}
+        />
+      );
+    }
+
+    if (this.state.urlGenerationError === 'timeout') {
+      const dismissUrlGenerationError = () => {
+      };
+
+      return (
+        <Dialog
+          title={"fail"}
+          closeOnOverlayClick={false}
+          onClose={dismissUrlGenerationError}
+          actions={[
+            {
+              label: "ok",
+              onClick: dismissUrlGenerationError,
+            }
+          ]}
+        />
+      );
+    }
+      
     return (
       <Dialog
         title={intl.formatMessage(globalMessages.buyAda)}
@@ -343,7 +406,7 @@ export default class BuySellDialog extends Component<Props, State> {
           {
             label: intl.formatMessage(messages.proceed),
             primary: true,
-            disabled: state.amountAda === '' || state.error !== null,
+            disabled: state.amountAda === '' || state.inputError !== null,
             onClick: this.onSubmit,
             isSubmitting: state.isSubmitting,
           }

@@ -193,7 +193,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
             () => this.props.actions.router.goToRoute.trigger({ route: ROUTES.EXCHANGE_END })
           }
           currentBalanceAda={
-            balance.getDefault().shiftedBy(-numberOfDecimals).toFormat(numberOfDecimals)
+            balance.getDefault().shiftedBy(-numberOfDecimals)
           }
           receiveAdaAddressPromise={getReceiveAdaAddress()}
         />
