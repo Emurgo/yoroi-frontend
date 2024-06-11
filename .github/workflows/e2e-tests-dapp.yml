@@ -1,4 +1,4 @@
-name: E2e DApp tests
+name: E2E DApp tests
 
 on:
   workflow_dispatch:

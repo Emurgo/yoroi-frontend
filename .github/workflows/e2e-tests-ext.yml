@@ -1,4 +1,4 @@
-name: End-2-end tests
+name: E2E Ext tests
 
 on:
   workflow_dispatch:
