@@ -50,7 +50,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
   const strings = useStrings();
   const { unitOfAccount } = usePortfolio();
   const [isLoading, setIsLoading] = useState(false);
-  const isAda = tokenInfo?.name.toLowerCase() === 'ada';
+  const isAda = tokenInfo.name.toLowerCase() === 'ada';
 
   const subMenuOptions = [
     {
@@ -110,7 +110,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
           <Card>
             <Stack direction="column" spacing={theme.spacing(2)} sx={{ padding: theme.spacing(3) }}>
               <Typography fontWeight="500" color="ds.gray_c900">
-                {isLoading ? <Skeleton width="82px" height="16px" /> : `${tokenInfo?.name} ${strings.balance}`}
+                {isLoading ? <Skeleton width="82px" height="16px" /> : `${tokenInfo.name} ${strings.balance}`}
               </Typography>
 
               <Stack direction="column" spacing={theme.spacing(0.5)}>
@@ -119,7 +119,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
                 ) : (
                   <Stack direction="row" spacing={theme.spacing(0.25)} alignItems="flex-end">
                     <Typography variant="h2" fontWeight="500" color="ds.gray_cmax">
-                      {tokenInfo?.totalAmount}
+                      {tokenInfo.totalAmount}
                     </Typography>
                     <Typography
                       variant="body2"
@@ -129,7 +129,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
                         padding: `${theme.spacing(1)} 0`,
                       }}
                     >
-                      {tokenInfo?.name}
+                      {tokenInfo.name}
                     </Typography>
                   </Stack>
                 )}
@@ -138,7 +138,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
                   <Skeleton width="129px" height="16px" />
                 ) : (
                   <Typography color="ds.gray_c600">
-                    {tokenInfo?.totalAmountUsd} {unitOfAccount}
+                    {tokenInfo.totalAmountUsd} {unitOfAccount}
                   </Typography>
                 )}
               </Stack>

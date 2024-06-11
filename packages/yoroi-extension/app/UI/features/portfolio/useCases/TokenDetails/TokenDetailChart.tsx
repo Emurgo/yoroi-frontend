@@ -1,5 +1,5 @@
 import { Box, Button, Stack, Typography, styled } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { LineChart, Line, CartesianGrid, YAxis, ResponsiveContainer, Tooltip as RechartTooltip } from 'recharts';
 import { useTheme } from '@mui/material/styles';
 import { Skeleton, Tooltip, Chip } from '../../../../components';
@@ -51,7 +51,15 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
     minValue,
     maxValue,
   } = useChart(tokenInfo.chartData);
-  const [isFetching, setIsFetching] = useState(isLoading);
+  const [isFetching, setIsFetching] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (isLoading) {
+      setIsFetching(true);
+    } else {
+      setIsFetching(false);
+    }
+  }, [isLoading]);
 
   const handlePeriodChange = (id: string) => {
     handleChoosePeriod(id);
