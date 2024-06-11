@@ -102,7 +102,9 @@ export default function SwapPoolFullInfo({
             />
           )}
         </Box>
-        <Box>{liqFeeQuantity} ADA</Box>
+        <Box>
+          {liqFeeQuantity} {sellTokenInfo.ticker}
+        </Box>
       </Box>
     </Box>
   );
