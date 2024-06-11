@@ -1,4 +1,3 @@
-// @flow
 import { IChartData } from './chart';
 
 export * from './table';

@@ -1,4 +1,3 @@
-// @flow
 import React from 'react';
 import { useMemo, useState } from 'react';
 import { TableCell, TableRow, Typography, Stack, Box } from '@mui/material';
@@ -162,8 +161,8 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
                   ) : (
                     <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
                   )}
-
-                  <Typography sx={{ fontSize: '0.75rem' }}>{row['24h'] >= 0 ? row['24h'] : -1 * row['24h']}%</Typography>
+                  {/* @ts-ignore */}
+                  <Typography variant="caption1">{row['24h'] >= 0 ? row['24h'] : -1 * row['24h']}%</Typography>
                 </Stack>
               }
               sx={{ cursor: 'pointer' }}
@@ -180,7 +179,8 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
                   ) : (
                     <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
                   )}
-                  <Typography sx={{ fontSize: '0.75rem' }}>{row['1W'] >= 0 ? row['1W'] : -1 * row['1W']}%</Typography>
+                  {/* @ts-ignore */}
+                  <Typography variant="caption1">{row['1W'] >= 0 ? row['1W'] : -1 * row['1W']}%</Typography>
                 </Stack>
               }
               sx={{ cursor: 'pointer' }}
@@ -197,7 +197,8 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
                   ) : (
                     <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
                   )}
-                  <Typography sx={{ fontSize: '0.75rem' }}>{row['1M'] >= 0 ? row['1M'] : -1 * row['1M']}%</Typography>
+                  {/* @ts-ignore */}
+                  <Typography variant="caption1">{row['1M'] >= 0 ? row['1M'] : -1 * row['1M']}%</Typography>
                 </Stack>
               }
               sx={{ cursor: 'pointer' }}

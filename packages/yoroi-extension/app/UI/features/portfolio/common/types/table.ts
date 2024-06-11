@@ -1,7 +1,6 @@
 import { TableCellProps } from '@mui/material';
 import { TableSortType } from '../hooks/useTableSort';
 
-// @flow
 export interface IHeadCell {
   id: string;
   label: string;

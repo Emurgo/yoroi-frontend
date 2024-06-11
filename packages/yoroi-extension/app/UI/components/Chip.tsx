@@ -1,11 +1,10 @@
-// @flow
 import React from 'react';
 import { Chip as MuiChip } from '@mui/material';
 
 interface Props {
   label: string;
   active: boolean;
-  sx: any;
+  sx?: any;
 }
 
 export const Chip = ({ label, active, sx, ...props }: Props): JSX.Element => {

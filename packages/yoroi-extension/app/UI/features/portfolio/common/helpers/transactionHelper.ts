@@ -1,4 +1,3 @@
-// @flow
 import { HistoryItemStatus, HistoryItemType } from '../types/transaction';
 
 export const mapStrings = (arr: any[], strings: any) =>

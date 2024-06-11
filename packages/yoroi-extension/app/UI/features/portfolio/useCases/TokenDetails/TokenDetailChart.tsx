@@ -1,5 +1,4 @@
-// @flow
-import { Box, Button, Stack, styled } from '@mui/material';
+import { Box, Button, Stack, Typography, styled } from '@mui/material';
 import React from 'react';
 import { LineChart, Line, CartesianGrid, YAxis, ResponsiveContainer, Tooltip as RechartTooltip } from 'recharts';
 import { useTheme } from '@mui/material/styles';
@@ -10,7 +9,6 @@ import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { Icon } from '../../../../components/icons';
 import useChart from '../../common/hooks/useChart';
 import { TokenType } from '../../common/types/index';
-import Typography from '../../common/components/TextPrimitives';
 import mockData from '../../common/mockData';
 
 const StyledButton = styled(Button)(({ theme, disabled, variant }: { theme: any; disabled: boolean; variant: string }) => ({
@@ -71,6 +69,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
           ) : (
             <Stack direction="row" alignItems="flex-end" color="ds.gray_cmax">
               <Typography fontWeight="500">{detailInfo.fiatValue}</Typography>
+              {/* @ts-ignore */}
               <Typography variant="caption1" sx={{ marginBottom: theme.spacing(0.25) }}>
                 &nbsp;{unitOfAccount}
               </Typography>
@@ -98,7 +97,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
                       ) : (
                         <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
                       )}
-
+                      {/* @ts-ignore */}
                       <Typography variant="caption1">
                         {detailInfo.value >= 0 ? detailInfo.value : -1 * detailInfo.value}%
                       </Typography>
@@ -113,6 +112,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
                 <Chip
                   active={detailInfo.fiatValue >= 0}
                   label={
+                    // @ts-ignore
                     <Typography variant="caption1">
                       {detailInfo.fiatValue >= 0 && '+'}
                       {detailInfo.fiatValue} {unitOfAccount}

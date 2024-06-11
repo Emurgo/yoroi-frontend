@@ -1,4 +1,3 @@
-// @flow
 import React from 'react';
 import { defineMessages } from 'react-intl';
 import { useIntl } from '../../../../context/IntlProvider';

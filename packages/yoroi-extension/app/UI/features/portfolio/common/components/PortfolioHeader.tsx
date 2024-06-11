@@ -1,17 +1,15 @@
-// @flow
 import React, { useState } from 'react';
-import { Stack } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useStrings } from '../hooks/useStrings';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { Icon } from '../../../../components/icons';
 import { SearchInput, Tooltip, Chip, Skeleton } from '../../../../components';
 import { BalanceType } from '../types/index';
-import Typography from './TextPrimitives';
 
 interface Props {
   balance: BalanceType;
-  setKeyword: (string) => void;
+  setKeyword: (keyword: string) => void;
   isLoading: boolean;
   tooltipTitle: JSX.Element;
 }
@@ -87,7 +85,7 @@ const PortfolioHeader = ({ balance, setKeyword, isLoading, tooltipTitle }: Props
                       ) : (
                         <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
                       )}
-
+                      {/* @ts-ignore */}
                       <Typography variant="caption1">
                         {balance.percents >= 0 ? balance.percents : -1 * balance.percents}%
                       </Typography>
@@ -97,6 +95,7 @@ const PortfolioHeader = ({ balance, setKeyword, isLoading, tooltipTitle }: Props
                 <Chip
                   active={balance.amount >= 0}
                   label={
+                    // @ts-ignore
                     <Typography variant="caption1">
                       {balance.amount >= 0 && '+'}
                       {balance.amount} USD

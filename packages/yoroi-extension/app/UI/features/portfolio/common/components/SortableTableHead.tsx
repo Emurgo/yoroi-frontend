@@ -1,5 +1,3 @@
-// @flow
-// @ts-nocheck
 import React from 'react';
 import { TableHead, TableRow, TableCell, Stack, Typography } from '@mui/material';
 import { Icon } from '../../../../components/icons';
@@ -22,6 +20,7 @@ const SortableTableHead = ({ headCells, order, orderBy, onRequestSort }: Props):
         {headCells.map(({ label, align, id, isPadding, disabledSort }) => {
           return (
             <TableCell key={id} align={align} sx={{ padding: `12.5px ${theme.spacing(2)}` }}>
+              {/* @ts-ignore */}
               <Stack
                 direction="row"
                 alignItems="center"

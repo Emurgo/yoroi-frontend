@@ -1,4 +1,3 @@
-// flow
 import * as React from 'react';
 
 import { PortfolioActionType, PortfolioReducer, defaultPortfolioActions, defaultPortfolioState, CurrencyType } from './state';

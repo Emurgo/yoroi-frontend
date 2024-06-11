@@ -1,4 +1,3 @@
-// @flow
 import React, { ReactElement, ReactNode, cloneElement } from 'react';
 import { Table as MuiTable, TableBody, Stack, Box, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';

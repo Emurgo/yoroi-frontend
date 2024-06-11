@@ -1,4 +1,3 @@
-// @flow
 import { Typography, Stack } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
@@ -15,7 +14,7 @@ interface Props {
 const PortfolioWallet = ({ data }: Props): JSX.Element => {
   const theme = useTheme();
   const strings = useStrings();
-  const [keyword, setKeyword] = useState<string>();
+  const [keyword, setKeyword] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [tokenList, setTokenList] = useState(data);
 

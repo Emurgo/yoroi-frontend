@@ -1,4 +1,3 @@
-// @flow
 import { createChartData, getRandomTime, start1WeekAgo, start24HoursAgo } from './helpers/mockHelper';
 import { HistoryItemStatus, HistoryItemType } from './types/transaction';
 

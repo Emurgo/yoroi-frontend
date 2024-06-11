@@ -1,4 +1,3 @@
-// @flow
 import React from 'react';
 import { useMemo, useState } from 'react';
 import { TableCell, TableRow, Typography, Stack, Box } from '@mui/material';

@@ -1,4 +1,3 @@
-// @flow
 import { useHistory } from 'react-router-dom';
 import React from 'react';
 import { ROUTES } from '../../../../../routes-config';

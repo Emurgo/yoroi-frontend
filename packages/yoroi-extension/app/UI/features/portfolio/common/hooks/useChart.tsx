@@ -1,16 +1,14 @@
-// @flow
+// @flow 
 import React, { useState } from 'react';
 import { useStrings } from './useStrings';
 import { useTheme } from '@mui/material/styles';
 import { Box } from '@mui/material';
 import moment from 'moment';
 import { IPeriodButtonProps, IChartData } from '../types/chart';
-import { LineChartProps } from 'recharts';
 
 const useChart = (data: IChartData | undefined) => {
   const strings = useStrings();
   const theme: any = useTheme();
-
   const [periodButtonProps, setPeriodButtonProps] = useState<IPeriodButtonProps[]>([
     { id: 'start24HoursAgo', label: strings['24H'], active: true },
     { id: 'start1WeekAgo', label: strings['1W'], active: false },
@@ -133,7 +131,7 @@ const useChart = (data: IChartData | undefined) => {
     });
   };
 
-  const handleMouseMove = (props: LineChartProps) => {
+  const handleMouseMove = (props: any) => {
     if (!isDragging) return;
 
     if (!props.isTooltipActive) {
@@ -151,7 +149,7 @@ const useChart = (data: IChartData | undefined) => {
     });
   };
 
-  const handleMouseDown = (props: LineChartProps) => {
+  const handleMouseDown = (props: any) => {
     if (!props || !props.activePayload || props.activePayload.length <= 0) return;
 
     const value = props.activePayload[0].payload.value;

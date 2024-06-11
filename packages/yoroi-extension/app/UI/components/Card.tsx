@@ -1,9 +1,8 @@
-// @flow
 import React from 'react';
 import { Box, styled } from '@mui/material';
 
-const StyledCard = styled(Box)(({ theme }: { theme: any }) => ({
-  borderRadius: '8px',
+const StyledCard = styled(Box)(({ theme }: any) => ({
+  borderRadius: `${theme.shape.borderRadius}px`,
   flex: '1 1 100%',
   display: 'flex',
   flexDirection: 'column',

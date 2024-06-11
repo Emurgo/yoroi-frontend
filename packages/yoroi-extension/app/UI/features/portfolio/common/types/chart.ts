@@ -1,4 +1,3 @@
-// @flow
 export interface IPeriodButtonProps {
   id: string;
   label: string;

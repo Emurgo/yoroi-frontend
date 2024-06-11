@@ -1,4 +1,3 @@
-// @flow
 import React from 'react';
 import mockData from '../../features/portfolio/common/mockData';
 import PortfolioLayout from './layout';

@@ -1,4 +1,3 @@
-// @flow
 import { produce } from 'immer';
 
 export type CurrencyType = 'ADA' | 'USD' | 'BRL' | 'ETH' | 'BTC' | 'KRW' | 'CNY' | 'EUR' | 'JPY' | null;

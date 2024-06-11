@@ -1,6 +1,5 @@
-// @flow
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Divider, Stack } from '@mui/material';
+import { Box, Button, Divider, Stack, Typography } from '@mui/material';
 import { ReactComponent as BackIcon } from '../../../../../assets/images/assets-page/back-arrow.inline.svg';
 import { styled } from '@mui/material/styles';
 import { Skeleton, Card } from '../../../../components';
@@ -14,7 +13,6 @@ import TokenDetailPerformance from './TokenDetailPerformance';
 import TokenDetailOverview from './TokenDetailOverview';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { TokenType } from '../../common/types/index';
-import Typography from '../../common/components/TextPrimitives';
 import NavigationButton from '../../common/components/NavigationButton';
 
 const Header = styled(Box)({

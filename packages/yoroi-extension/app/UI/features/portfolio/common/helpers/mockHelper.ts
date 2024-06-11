@@ -1,5 +1,3 @@
-// @flow
-
 // CONSTANTS
 export const now = new Date();
 export const start24HoursAgo: number = new Date(now.getTime() - 24 * 60 * 60 * 1000).getTime();

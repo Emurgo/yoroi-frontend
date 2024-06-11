@@ -1,4 +1,3 @@
-// @flow
 import React, { useState } from 'react';
 import { IconButton } from '@mui/material';
 import { CopyToClipboard } from 'react-copy-to-clipboard';

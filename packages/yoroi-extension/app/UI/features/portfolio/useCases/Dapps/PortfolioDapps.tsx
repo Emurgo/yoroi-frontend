@@ -1,5 +1,4 @@
-// @flow
-import { Stack, Button, styled } from '@mui/material';
+import { Stack, Button, styled, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import LiquidityTable from './LiquidityTable';
@@ -9,7 +8,6 @@ import LendAndBorrow from './LendAndBorrow';
 import { useStrings } from '../../common/hooks/useStrings';
 import PortfolioHeader from '../../common/components/PortfolioHeader';
 import { LiquidityItemType, OrderItemType } from '../../common/types/index';
-import Typography from '../../common/components/TextPrimitives';
 
 const StyledButton = styled(Button)(({ theme }: any) => ({
   height: '40px',
@@ -36,7 +34,7 @@ interface Props {
 const PortfolioDapps = ({ data }: Props) => {
   const theme: any = useTheme();
   const strings = useStrings();
-  const [keyword, setKeyword] = useState<string>();
+  const [keyword, setKeyword] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [liquidityList, setLiquidlityList] = useState(data.liquidityList);
   const [orderList, setOrderList] = useState(data.orderList);
@@ -88,7 +86,7 @@ const PortfolioDapps = ({ data }: Props) => {
     }
   }, [keyword]);
 
-  const handleChangeTab = id => {
+  const handleChangeTab = (id: number) => {
     const temp = buttonProps.map(prop => {
       if (prop.id === id)
         return {
@@ -127,6 +125,7 @@ const PortfolioDapps = ({ data }: Props) => {
             onClick={() => handleChangeTab(button.id)}
             sx={{ backgroundColor: button.active ? theme.palette.ds.gray_c200 : 'transparent' }}
           >
+            {/* @ts-ignore */}
             <Typography variant="button1">
               {button.label} (
               {button.id === TableTabs.LIQUIDITY

@@ -1,4 +1,3 @@
-// @flow
 export const HistoryItemType = Object.freeze({
   SENT: 1,
   RECEIVED: 2,

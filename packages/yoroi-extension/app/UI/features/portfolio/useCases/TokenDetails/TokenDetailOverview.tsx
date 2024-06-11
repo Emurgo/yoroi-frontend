@@ -1,4 +1,3 @@
-// @flow
 import React from 'react';
 import { Stack, Box, Typography, Link } from '@mui/material';
 import { Skeleton } from '../../../../components/Skeleton';

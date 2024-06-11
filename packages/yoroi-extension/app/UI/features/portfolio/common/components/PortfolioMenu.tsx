@@ -1,4 +1,3 @@
-// @flow
 import React from 'react';
 import SubMenu from '../../../../../components/topbar/SubMenu';
 import { ROUTES } from '../../../../../routes-config';
@@ -12,8 +11,8 @@ interface SubMenuOption {
 }
 
 interface Props {
-  onItemClick: (string) => void;
-  isActiveItem: (string) => boolean;
+  onItemClick: (itemId: string) => void;
+  isActiveItem: (itemId: string) => boolean;
 }
 
 const PortfolioMenu = ({ onItemClick, isActiveItem }: Props): JSX.Element => {

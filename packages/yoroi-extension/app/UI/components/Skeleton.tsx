@@ -1,14 +1,7 @@
-// @flow
 import React from 'react';
-import { Skeleton as MuiSkeleton } from '@mui/material';
+import { Skeleton as MuiSkeleton, SkeletonProps } from '@mui/material';
 
-interface Props {
-  width: string;
-  height: string;
-  sx?: any;
-}
-
-export const Skeleton = ({ width, height, sx, ...props }: Props): JSX.Element => {
+export const Skeleton = ({ width, height, ...props }: SkeletonProps): JSX.Element => {
   return (
     <MuiSkeleton
       width={width}
@@ -20,7 +13,7 @@ export const Skeleton = ({ width, height, sx, ...props }: Props): JSX.Element =>
         borderRadius: `${theme.shape.borderRadius}px`,
         backgroundColor: theme.palette.ds.gray_c100,
         opacity: 0.8,
-        ...sx,
+        ...props.sx,
       })}
     />
   );
