@@ -18,9 +18,10 @@ const PortfolioWallet = ({ data }: Props): JSX.Element => {
   const [keyword, setKeyword] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [tokenList, setTokenList] = useState(data);
+  const isShownWelcomeBanner = data.length === 1; // assumming only have ADA as default -> first time user
 
   useEffect(() => {
-    if (data.length < 2) return;
+    if (isShownWelcomeBanner) return;
 
     // FAKE FETCHING DATA TO SEE SKELETON
     setIsLoading(true);
@@ -33,7 +34,7 @@ const PortfolioWallet = ({ data }: Props): JSX.Element => {
   }, []);
 
   useEffect(() => {
-    if (!keyword || data.length < 2) {
+    if (!keyword || isShownWelcomeBanner) {
       setTokenList(data);
       return;
     }
@@ -69,7 +70,7 @@ const PortfolioWallet = ({ data }: Props): JSX.Element => {
         }
       />
       <StatsTable data={tokenList} isLoading={isLoading} />
-      {data.length < 2 && <WelcomeBanner />}
+      {isShownWelcomeBanner && <WelcomeBanner />}
     </Stack>
   );
 };
