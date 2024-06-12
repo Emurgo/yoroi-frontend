@@ -3,12 +3,7 @@ import SubMenu from '../../../../../components/topbar/SubMenu';
 import { ROUTES } from '../../../../../routes-config';
 import { useStrings } from '../hooks/useStrings';
 import mockData from '../mockData';
-
-interface SubMenuOption {
-  label: string;
-  route: string;
-  className: string;
-}
+import { SubMenuOption } from '../types';
 
 interface Props {
   onItemClick: (itemId: string) => void;

@@ -109,7 +109,7 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
       isLoading={isLoading}
       TableRowSkeleton={<TableRowSkeleton theme={theme} />}
     >
-      {getSortedData(list).map(row => (
+      {getSortedData(list).map((row: TokenType) => (
         <TableRow
           key={row.id}
           onClick={() => navigateTo.portfolioDetail(row.id)}
@@ -207,14 +207,14 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
 
           <TableCell>
             <Typography variant="body2" color="ds.text_gray_medium">
-              {row.portfolioPercents.toFixed(2)}&nbsp;%
+              {row.portfolioPercents.toFixed(2)} %
             </Typography>
           </TableCell>
 
           <TableCell>
             <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
               <Stack direction="column">
-                <Typography fontWeight="500" color="ds.text_gray_normal">
+                <Typography color="ds.text_gray_normal">
                   {row.totalAmount} {row.name}
                 </Typography>
                 {row.name === 'ADA' && unitOfAccount === 'ADA' ? null : (

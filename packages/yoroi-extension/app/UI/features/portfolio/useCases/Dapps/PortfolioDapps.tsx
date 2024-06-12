@@ -24,12 +24,10 @@ const TableTabs = {
 };
 
 interface Props {
-  data:
-    | {
-        liquidityList: LiquidityItemType[];
-        orderList: OrderItemType[];
-      }
-    | any;
+  data: {
+    liquidityList: LiquidityItemType[];
+    orderList: OrderItemType[];
+  };
 }
 
 const PortfolioDapps = ({ data }: Props) => {

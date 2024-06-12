@@ -1,5 +1,11 @@
 import { IChartData } from './chart';
 
+export interface SubMenuOption {
+  label: string;
+  route: string;
+  className: string;
+}
+
 export type BalanceType = {
   ada: number,
   usd: number,

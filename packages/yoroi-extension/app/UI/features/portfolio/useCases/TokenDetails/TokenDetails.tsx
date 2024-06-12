@@ -12,7 +12,7 @@ import { useStrings } from '../../common/hooks/useStrings';
 import TokenDetailPerformance from './TokenDetailPerformance';
 import TokenDetailOverview from './TokenDetailOverview';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
-import { TokenType } from '../../common/types/index';
+import { SubMenuOption, TokenType } from '../../common/types/index';
 import NavigationButton from '../../common/components/NavigationButton';
 import mockData from '../../common/mockData';
 
@@ -52,7 +52,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
   const [isLoading, setIsLoading] = useState(false);
   const isAda = tokenInfo.name.toLowerCase() === 'ada';
 
-  const subMenuOptions = [
+  const subMenuOptions: SubMenuOption[] = [
     {
       label: strings.performance,
       className: 'performance',
@@ -138,7 +138,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
                   <Skeleton width="129px" height="16px" />
                 ) : (
                   <Typography color="ds.gray_c600">
-                    {tokenInfo.totalAmountUsd} {unitOfAccount}
+                    {tokenInfo.totalAmountUsd} {isAda && unitOfAccount === 'ADA' ? 'USD' : unitOfAccount}
                   </Typography>
                 )}
               </Stack>
@@ -153,7 +153,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
             <Box sx={{ paddingTop: `${theme.spacing(2)}` }}>
               <StyledSubMenu
                 options={subMenuOptions}
-                onItemClick={route => setSelectedTab(route)}
+                onItemClick={(route: string) => setSelectedTab(route)}
                 isActiveItem={isActiveItem}
                 locationId="token-details"
               />

@@ -111,7 +111,7 @@ const LiquidityTable = ({ data, isLoading }: Props): JSX.Element => {
       isLoading={isLoading}
       TableRowSkeleton={<TableRowSkeleton theme={theme} />}
     >
-      {getSortedData(list).map(row => (
+      {getSortedData(list).map((row: LiquidityItemType) => (
         <TableRow
           key={row.id}
           sx={{
