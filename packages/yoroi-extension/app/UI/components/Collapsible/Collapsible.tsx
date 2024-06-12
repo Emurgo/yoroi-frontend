@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import type { Node } from 'react';
 import { styled } from '@mui/material/styles';
 import MuiAccordion from '@mui/material/Accordion';
 import MuiAccordionSummary from '@mui/material/AccordionSummary';
@@ -8,9 +7,8 @@ import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import { Icon } from '../icons/index';
 import { IconButton } from '@mui/material';
-import { Box } from '@mui/material';
 
-const Accordion = styled(props => <MuiAccordion disableGutters elevation={0} square {...props} />)(({ theme }) => ({
+const Accordion: any = styled(MuiAccordion)(() => ({
   '&:not(:last-child)': {
     borderBottom: 0,
   },
@@ -26,31 +24,31 @@ const Accordion = styled(props => <MuiAccordion disableGutters elevation={0} squ
   },
 }));
 
-const AccordionSummary = styled(MuiAccordionSummary)(({ theme }) => ({
+const AccordionSummary = styled(MuiAccordionSummary)(() => ({
   '& .MuiAccordionSummary-content': {
     margin: '0px',
   },
 }));
 
-const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
+const AccordionDetails = styled(MuiAccordionDetails)(() => ({
   padding: 0,
   paddingTop: '16px',
 }));
 
-type Props = {|
-  title: string,
-  content: Node,
-|};
+type Props = {
+  title: string;
+  content: React.ReactNode;
+};
 
-export const Collapsible = ({ title, content }: Props): Node => {
-  const [expanded, setExpanded] = React.useState('none');
+export const Collapsible = ({ title, content }: Props) => {
+  const [expanded, setExpanded] = React.useState<any>('none');
 
-  const handleChange = panel => (event, newExpanded) => {
+  const handleChange = (panel: string | false) => (_: React.SyntheticEvent, newExpanded: boolean) => {
     setExpanded(newExpanded ? panel : false);
   };
 
   return (
-    <Accordion expanded={expanded === 'panel1'} onChange={handleChange('panel1')}>
+    <Accordion disableGutters elevation={0} square expanded={expanded === 'panel1'} onChange={handleChange('panel1')}>
       <AccordionSummary
         aria-controls="panel1d-content"
         id="panel1d-header"
