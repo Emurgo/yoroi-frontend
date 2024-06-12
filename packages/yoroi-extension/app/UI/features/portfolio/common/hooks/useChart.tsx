@@ -109,7 +109,13 @@ const useChart = (data: IChartData) => {
 
   const handleChoosePeriod = (id: string) => {
     const tmp = periodButtonProps.map(item => {
-      if (item.id === id) return { ...item, active: true };
+      if (item.id === id) {
+        if (item.active) {
+          return item;
+        } else {
+          return { ...item, active: true };
+        }
+      }
       return {
         ...item,
         active: false,
