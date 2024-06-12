@@ -9,11 +9,12 @@ import { useStrings } from '../../common/hooks/useStrings';
 import PortfolioHeader from '../../common/components/PortfolioHeader';
 import { LiquidityItemType, OrderItemType } from '../../common/types/index';
 
-const StyledButton = styled(Button)(({ theme }: any) => ({
+const StyledButton = styled(Button)(({ theme, isActive }: { theme: any; isActive: boolean }) => ({
   height: '40px',
   textTransform: 'none',
   color: theme.palette.ds.gray_cmax,
   padding: `${theme.spacing(1)} !important`,
+  backgroundColor: isActive ? theme.palette.ds.gray_c200 : 'transparent',
 }));
 
 const TableTabs = {
@@ -120,11 +121,7 @@ const PortfolioDapps = ({ data }: Props) => {
 
       <Stack direction="row">
         {buttonProps.map(button => (
-          <StyledButton
-            key={button.label}
-            onClick={() => handleChangeTab(button.id)}
-            sx={{ backgroundColor: button.active ? theme.palette.ds.gray_c200 : 'transparent' }}
-          >
+          <StyledButton key={button.label} isActive={button.active} theme={theme} onClick={() => handleChangeTab(button.id)}>
             {/* @ts-ignore */}
             <Typography variant="button1">
               {button.label} (

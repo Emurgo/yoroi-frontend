@@ -17,12 +17,10 @@ interface Props {
 const useTableSort = ({ order, orderBy, setSortState, headCells, data }: Props) => {
   const handleRequestSort = (property: string) => {
     let direction: string | null = 'asc';
-    if (order === 'asc') {
-      if (property === orderBy) {
+    if (property === orderBy) {
+      if (order === 'asc') {
         direction = 'desc';
-      }
-    } else if (order === 'desc') {
-      if (property === orderBy) {
+      } else if (order === 'desc') {
         direction = null;
       }
     }
