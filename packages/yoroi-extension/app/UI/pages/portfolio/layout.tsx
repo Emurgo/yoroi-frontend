@@ -5,6 +5,7 @@ import React, { ReactNode } from 'react';
 import GeneralPageLayout from '../../layout/GeneralPageLayout';
 import NavBarContainerRevamp from '../../../containers/NavBarContainerRevamp';
 import NavBarTitle from '../../../components/topbar/NavBarTitle';
+import mockData from '../../features/portfolio/common/mockData';
 
 type Props = {
   stores: any;
@@ -21,9 +22,10 @@ const PortfolioLayout = ({ stores, actions, children }: Props): JSX.Element => {
     return false;
   };
   const isDetailPage = stores.router.location.pathname.startsWith(`${ROUTES.PORTFOLIO.ROOT}/details`);
-  const menu = isDetailPage ? null : (
-    <PortfolioMenu onItemClick={(route: string) => actions.router.goToRoute.trigger({ route })} isActiveItem={isActivePage} />
-  );
+  const menu =
+    isDetailPage || mockData.dapps.liquidityList.length + mockData.dapps.orderList.length === 0 ? null : (
+      <PortfolioMenu onItemClick={(route: string) => actions.router.goToRoute.trigger({ route })} isActiveItem={isActivePage} />
+    );
 
   return (
     <GeneralPageLayout
