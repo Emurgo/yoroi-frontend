@@ -7,6 +7,7 @@ import { Icon } from '../../../../components/icons';
 import { SearchInput, Tooltip, Chip, Skeleton } from '../../../../components';
 import { BalanceType } from '../types/index';
 import { ChipTypes } from '../../../../components/Chip';
+import { formatNumber } from '../helpers/formatHelper';
 
 interface Props {
   balance: BalanceType;
@@ -39,7 +40,7 @@ const PortfolioHeader = ({ balance, setKeyword, isLoading, tooltipTitle }: Props
             <Skeleton width="146px" height="24px" />
           ) : (
             <Typography variant="h2" fontWeight="500" color="ds.gray_cmax">
-              {isAdaMainUnit ? balance.ada : balance.usd}
+              {isAdaMainUnit ? formatNumber(balance.ada) : formatNumber(balance.usd)}
             </Typography>
           )}
           <Typography variant="body2" fontWeight="500" color="ds.black_static">
@@ -66,7 +67,7 @@ const PortfolioHeader = ({ balance, setKeyword, isLoading, tooltipTitle }: Props
             <Skeleton width="129px" height="16px" />
           ) : (
             <Typography color="ds.gray_c600">
-              {isAdaMainUnit ? balance.usd : balance.ada} {isAdaMainUnit ? 'ADA' : unitOfAccount}
+              {isAdaMainUnit ? formatNumber(balance.usd) : formatNumber(balance.ada)} {isAdaMainUnit ? 'ADA' : unitOfAccount}
             </Typography>
           )}
           {isLoading ? (
@@ -88,7 +89,7 @@ const PortfolioHeader = ({ balance, setKeyword, isLoading, tooltipTitle }: Props
                       ) : null}
                       {/* @ts-ignore */}
                       <Typography variant="caption1">
-                        {balance.percents >= 0 ? balance.percents : -1 * balance.percents}%
+                        {balance.percents >= 0 ? formatNumber(balance.percents) : formatNumber(-1 * balance.percents)}%
                       </Typography>
                     </Stack>
                   }
@@ -99,7 +100,7 @@ const PortfolioHeader = ({ balance, setKeyword, isLoading, tooltipTitle }: Props
                     // @ts-ignore
                     <Typography variant="caption1">
                       {balance.amount > 0 && '+'}
-                      {balance.amount} USD
+                      {formatNumber(balance.amount)} USD
                     </Typography>
                   }
                 />

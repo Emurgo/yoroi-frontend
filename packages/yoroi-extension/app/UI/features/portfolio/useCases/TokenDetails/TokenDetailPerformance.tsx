@@ -5,6 +5,7 @@ import { useStrings } from '../../common/hooks/useStrings';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { Skeleton } from '../../../../components/Skeleton';
 import { TokenType } from '../../common/types/index';
+import { formatNumber } from '../../common/helpers/formatHelper';
 
 const PerformanceItemType = {
   FIAT: 'fiat',
@@ -57,7 +58,8 @@ const TokenDetailPerformance = ({ tokenInfo, isLoading }: Props): JSX.Element =>
                 {tokenInfo?.performance[index]?.value ? (
                   <>
                     {item.type === PerformanceItemType.RANK && '#'}
-                    {tokenInfo?.performance[index]?.value} {item.type === PerformanceItemType.FIAT && unitOfAccount}
+                    {formatNumber(tokenInfo?.performance[index]?.value as number)}{' '}
+                    {item.type === PerformanceItemType.FIAT && unitOfAccount}
                     {item.type === PerformanceItemType.TOKEN && tokenInfo?.name}
                   </>
                 ) : (

@@ -12,6 +12,7 @@ import useTableSort, { ISortState } from '../../common/hooks/useTableSort';
 import Table from '../../common/components/Table';
 import { IHeadCell } from '../../common/types/table';
 import { LiquidityItemType } from '../../common/types/index';
+import { formatNumber } from '../../common/helpers/formatHelper';
 
 const TableRowSkeleton = ({ theme, ...props }) => (
   <TableRow
@@ -180,11 +181,11 @@ const LiquidityTable = ({ data, isLoading }: Props): JSX.Element => {
           <TableCell>
             <Stack direction="column" spacing={theme.spacing(0.25)}>
               <Typography color="ds.gray_c900">
-                {row.firstTokenValue} {row.firstToken.name}
+                {formatNumber(row.firstTokenValue)} {row.firstToken.name}
               </Typography>
               {row.firstToken.name === 'ADA' && unitOfAccount === 'ADA' ? null : (
                 <Typography variant="body2" sx={{ color: theme.palette.ds.gray_c600 }}>
-                  {row.firstTokenValueUsd} {unitOfAccount}
+                  {formatNumber(row.firstTokenValueUsd)} {unitOfAccount}
                 </Typography>
               )}
             </Stack>
@@ -193,28 +194,28 @@ const LiquidityTable = ({ data, isLoading }: Props): JSX.Element => {
           <TableCell>
             <Stack direction="column" spacing={theme.spacing(0.25)}>
               <Typography color="ds.gray_c900">
-                {row.secondTokenValue} {row.secondToken.name}
+                {formatNumber(row.secondTokenValue)} {row.secondToken.name}
               </Typography>
               {row.secondToken.name === 'ADA' && unitOfAccount === 'ADA' ? null : (
                 <Typography variant="body2" sx={{ color: theme.palette.ds.gray_c600 }}>
-                  {row.secondTokenValueUsd} {unitOfAccount}
+                  {formatNumber(row.secondTokenValueUsd)} {unitOfAccount}
                 </Typography>
               )}
             </Stack>
           </TableCell>
 
           <TableCell>
-            <Typography color="ds.gray_c900">{row.lpTokens}</Typography>
+            <Typography color="ds.gray_c900">{formatNumber(row.lpTokens)}</Typography>
           </TableCell>
 
           <TableCell>
             <Stack direction="column" spacing={theme.spacing(0.25)}>
               <Typography color="ds.gray_c900" sx={{ textAlign: 'right' }}>
-                {row.totalValue} {row.firstToken.name}
+                {formatNumber(row.totalValue)} {row.firstToken.name}
               </Typography>
               {unitOfAccount === 'ADA' && row.firstToken.name === 'ADA' ? null : (
                 <Typography variant="body2" color="ds.gray_c600" sx={{ textAlign: 'right' }}>
-                  {row.totalValueUsd} {unitOfAccount}
+                  {formatNumber(row.totalValueUsd)} {unitOfAccount}
                 </Typography>
               )}
             </Stack>

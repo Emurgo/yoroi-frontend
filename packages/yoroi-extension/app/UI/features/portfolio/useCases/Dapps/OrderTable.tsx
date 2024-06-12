@@ -12,6 +12,7 @@ import useTableSort, { ISortState } from '../../common/hooks/useTableSort';
 import Table from '../../common/components/Table';
 import { IHeadCell } from '../../common/types/table';
 import { OrderItemType } from '../../common/types/index';
+import { formatNumber } from '../../common/helpers/formatHelper';
 
 const TableRowSkeleton = ({ theme, ...props }) => (
   <TableRow
@@ -194,11 +195,11 @@ const OrderTable = ({ data, isLoading }: Props): JSX.Element => {
           <TableCell>
             <Stack direction="column" spacing={theme.spacing(0.25)}>
               <Typography color="ds.gray_c900" sx={{ textAlign: 'right' }}>
-                {row.totalValue} {row.firstToken.name}
+                {formatNumber(row.totalValue)} {row.firstToken.name}
               </Typography>
               {row.firstToken.name === 'ADA' && unitOfAccount === 'ADA' ? null : (
                 <Typography variant="body2" color="ds.gray_c600" sx={{ textAlign: 'right' }}>
-                  {row.totalValueUsd} {unitOfAccount}
+                  {formatNumber(row.totalValueUsd)} {unitOfAccount}
                 </Typography>
               )}
             </Stack>

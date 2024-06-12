@@ -10,6 +10,7 @@ import { Icon } from '../../../../components/icons';
 import useChart from '../../common/hooks/useChart';
 import { TokenType } from '../../common/types/index';
 import { ChipTypes } from '../../../../components/Chip';
+import { formatNumber } from '../../common/helpers/formatHelper';
 
 const StyledButton = styled(Button)(({ theme, disabled, variant }: { theme: any; disabled: boolean; variant: string }) => ({
   fontWeight: 500,
@@ -88,7 +89,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
             <Skeleton width="64px" height="13px" />
           ) : (
             <Stack direction="row" alignItems="flex-end" color="ds.gray_cmax">
-              <Typography fontWeight="500">{detailInfo.fiatValue}</Typography>
+              <Typography fontWeight="500">{formatNumber(detailInfo.fiatValue)}</Typography>
               {/* @ts-ignore */}
               <Typography variant="caption1" sx={{ marginBottom: theme.spacing(0.25) }}>
                 &nbsp;{unitOfAccount}
@@ -119,7 +120,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
                       ) : null}
                       {/* @ts-ignore */}
                       <Typography variant="caption1">
-                        {detailInfo.value >= 0 ? detailInfo.value : -1 * detailInfo.value}%
+                        {detailInfo.value >= 0 ? formatNumber(detailInfo.value) : formatNumber(-1 * detailInfo.value)}%
                       </Typography>
                     </Stack>
                   }
@@ -141,7 +142,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
                     // @ts-ignore
                     <Typography variant="caption1">
                       {detailInfo.fiatValue > 0 && '+'}
-                      {detailInfo.fiatValue} {unitOfAccount}
+                      {formatNumber(detailInfo.fiatValue)} {unitOfAccount}
                     </Typography>
                   }
                 />

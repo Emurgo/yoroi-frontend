@@ -15,6 +15,7 @@ import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { SubMenuOption, TokenType } from '../../common/types/index';
 import NavigationButton from '../../common/components/NavigationButton';
 import mockData from '../../common/mockData';
+import { formatNumber } from '../../common/helpers/formatHelper';
 
 const Header = styled(Box)({
   display: 'flex',
@@ -119,7 +120,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
                 ) : (
                   <Stack direction="row" spacing={theme.spacing(0.25)} alignItems="flex-end">
                     <Typography variant="h2" fontWeight="500" color="ds.gray_cmax">
-                      {tokenInfo.totalAmount}
+                      {formatNumber(tokenInfo.totalAmount)}
                     </Typography>
                     <Typography
                       variant="body2"
@@ -138,7 +139,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
                   <Skeleton width="129px" height="16px" />
                 ) : (
                   <Typography color="ds.gray_c600">
-                    {tokenInfo.totalAmountUsd} {isAda && unitOfAccount === 'ADA' ? 'USD' : unitOfAccount}
+                    {formatNumber(tokenInfo.totalAmountUsd)} {isAda && unitOfAccount === 'ADA' ? 'USD' : unitOfAccount}
                   </Typography>
                 )}
               </Stack>

@@ -13,6 +13,7 @@ import Table from '../../common/components/Table';
 import { IHeadCell } from '../../common/types/table';
 import { TokenType } from '../../common/types/index';
 import { ChipTypes } from '../../../../components/Chip';
+import { formatNumber } from '../../common/helpers/formatHelper';
 
 const TableRowSkeleton = ({ theme, ...props }) => (
   <TableRow
@@ -148,7 +149,7 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
 
           <TableCell>
             <Typography variant="body2" color="ds.text_gray_medium">
-              {row.price} USD
+              {formatNumber(row.price)} USD
             </Typography>
           </TableCell>
 
@@ -163,7 +164,9 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
                     <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
                   ) : null}
                   {/* @ts-ignore */}
-                  <Typography variant="caption1">{row['24h'] >= 0 ? row['24h'] : -1 * row['24h']}%</Typography>
+                  <Typography variant="caption1">
+                    {row['24h'] >= 0 ? formatNumber(row['24h']) : formatNumber(-1 * row['24h'])}%
+                  </Typography>
                 </Stack>
               }
               sx={{ cursor: 'pointer' }}
@@ -181,7 +184,9 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
                     <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
                   ) : null}
                   {/* @ts-ignore */}
-                  <Typography variant="caption1">{row['1W'] >= 0 ? row['1W'] : -1 * row['1W']}%</Typography>
+                  <Typography variant="caption1">
+                    {row['1W'] >= 0 ? formatNumber(row['1W']) : formatNumber(-1 * row['1W'])}%
+                  </Typography>
                 </Stack>
               }
               sx={{ cursor: 'pointer' }}
@@ -199,7 +204,9 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
                     <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
                   ) : null}
                   {/* @ts-ignore */}
-                  <Typography variant="caption1">{row['1M'] >= 0 ? row['1M'] : -1 * row['1M']}%</Typography>
+                  <Typography variant="caption1">
+                    {row['1M'] >= 0 ? formatNumber(row['1M']) : formatNumber(-1 * row['1M'])}%
+                  </Typography>
                 </Stack>
               }
               sx={{ cursor: 'pointer' }}
@@ -208,7 +215,7 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
 
           <TableCell>
             <Typography variant="body2" color="ds.text_gray_medium">
-              {row.portfolioPercents.toFixed(2)} %
+              {formatNumber(row.portfolioPercents)} %
             </Typography>
           </TableCell>
 
@@ -216,11 +223,11 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
             <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
               <Stack direction="column">
                 <Typography color="ds.text_gray_normal">
-                  {row.totalAmount} {row.name}
+                  {formatNumber(row.totalAmount)} {row.name}
                 </Typography>
                 {row.name === 'ADA' && unitOfAccount === 'ADA' ? null : (
                   <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}>
-                    {row.totalAmountUsd} {unitOfAccount}
+                    {formatNumber(row.totalAmountUsd)} {unitOfAccount}
                   </Typography>
                 )}
               </Stack>

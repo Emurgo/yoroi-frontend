@@ -11,6 +11,7 @@ import { mapStrings } from '../../common/helpers/transactionHelper';
 import { IHeadCell } from '../../common/types/table';
 import _ from 'lodash';
 import mockData from '../../common/mockData';
+import { formatNumber } from '../../common/helpers/formatHelper';
 
 const Container = styled(Box)(() => ({
   width: '100%',
@@ -171,12 +172,12 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount, hea
       <TableCell key={`${row.label} ${headCells[2].id}`} align="center">
         <Stack direction="column">
           <Typography fontWeight="500" color="ds.text_gray_normal">
-            {row.feeValue ? `${row.feeValue} ADA` : '-'}
+            {row.feeValue ? `${row.feeValue.toFixed(2)} ADA` : '-'}
           </Typography>
           {isExpanded &&
             (unitOfAccount === 'ADA' ? null : (
               <Typography variant="body2" color="ds.text_gray_medium">
-                {row.feeValueUsd ? `${row.feeValueUsd} ${unitOfAccount}` : '-'}
+                {row.feeValueUsd ? `${row.feeValueUsd.toFixed(2)} ${unitOfAccount}` : '-'}
               </Typography>
             ))}
         </Stack>
@@ -197,7 +198,7 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount, hea
                 row.type === HistoryItemType.WITHDRAW ||
                 row.type === HistoryItemType.DELEGATE) &&
                 '+ '}
-              {row.amountTotal} ADA
+              {formatNumber(row.amountTotal)} ADA
             </Typography>
             {isExpanded ? (
               <Box sx={{ transition: 'all ease 0.3s' }}>
@@ -207,7 +208,7 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount, hea
                       row.type === HistoryItemType.WITHDRAW ||
                       row.type === HistoryItemType.DELEGATE) &&
                       '+ '}
-                    {row.amountTotalUsd} {unitOfAccount}
+                    {formatNumber(row.amountTotalUsd)} {unitOfAccount}
                   </Typography>
                 )}
                 {row.type === HistoryItemType.RECEIVED && (
