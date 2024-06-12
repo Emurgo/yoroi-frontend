@@ -1,6 +1,6 @@
 // @flow
 
-import { action, observable, runInAction } from 'mobx';
+import { action, observable } from 'mobx';
 import { find } from 'lodash';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
