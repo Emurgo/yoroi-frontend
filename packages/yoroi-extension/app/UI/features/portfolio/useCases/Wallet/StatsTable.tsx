@@ -12,6 +12,7 @@ import useTableSort, { ISortState } from '../../common/hooks/useTableSort';
 import Table from '../../common/components/Table';
 import { IHeadCell } from '../../common/types/table';
 import { TokenType } from '../../common/types/index';
+import { ChipTypes } from '../../../../components/Chip';
 
 const TableRowSkeleton = ({ theme, ...props }) => (
   <TableRow
@@ -153,14 +154,14 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
 
           <TableCell>
             <Chip
-              active={row['24h'] >= 0}
+              type={row['24h'] > 0 ? ChipTypes.ACTIVE : row['24h'] < 0 ? ChipTypes.INACTIVE : ChipTypes.DISABLED}
               label={
                 <Stack direction="row" justifyContent="space-between" alignItems="center">
-                  {row['24h'] >= 0 ? (
+                  {row['24h'] > 0 ? (
                     <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
-                  ) : (
+                  ) : row['24h'] < 0 ? (
                     <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
-                  )}
+                  ) : null}
                   {/* @ts-ignore */}
                   <Typography variant="caption1">{row['24h'] >= 0 ? row['24h'] : -1 * row['24h']}%</Typography>
                 </Stack>
@@ -171,14 +172,14 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
 
           <TableCell>
             <Chip
-              active={row['1W'] >= 0}
+              type={row['1W'] > 0 ? ChipTypes.ACTIVE : row['1W'] < 0 ? ChipTypes.INACTIVE : ChipTypes.DISABLED}
               label={
                 <Stack direction="row" justifyContent="space-between" alignItems="center">
-                  {row['1W'] >= 0 ? (
+                  {row['1W'] > 0 ? (
                     <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
-                  ) : (
+                  ) : row['1W'] < 0 ? (
                     <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
-                  )}
+                  ) : null}
                   {/* @ts-ignore */}
                   <Typography variant="caption1">{row['1W'] >= 0 ? row['1W'] : -1 * row['1W']}%</Typography>
                 </Stack>
@@ -189,14 +190,14 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
 
           <TableCell>
             <Chip
-              active={row['1M'] >= 0}
+              type={row['1M'] > 0 ? ChipTypes.ACTIVE : row['1M'] < 0 ? ChipTypes.INACTIVE : ChipTypes.DISABLED}
               label={
                 <Stack direction="row" justifyContent="space-between" alignItems="center">
-                  {row['1M'] >= 0 ? (
+                  {row['1M'] > 0 ? (
                     <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
-                  ) : (
+                  ) : row['1M'] < 0 ? (
                     <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
-                  )}
+                  ) : null}
                   {/* @ts-ignore */}
                   <Typography variant="caption1">{row['1M'] >= 0 ? row['1M'] : -1 * row['1M']}%</Typography>
                 </Stack>

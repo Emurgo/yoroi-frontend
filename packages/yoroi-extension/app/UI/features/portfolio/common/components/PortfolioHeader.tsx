@@ -6,6 +6,7 @@ import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { Icon } from '../../../../components/icons';
 import { SearchInput, Tooltip, Chip, Skeleton } from '../../../../components';
 import { BalanceType } from '../types/index';
+import { ChipTypes } from '../../../../components/Chip';
 
 interface Props {
   balance: BalanceType;
@@ -77,14 +78,14 @@ const PortfolioHeader = ({ balance, setKeyword, isLoading, tooltipTitle }: Props
             <Tooltip title={tooltipTitle} placement="right">
               <Stack direction="row" alignItems="center" spacing={theme.spacing(1)} sx={{ marginLeft: theme.spacing(2) }}>
                 <Chip
-                  active={balance.percents >= 0}
+                  type={balance.percents > 0 ? ChipTypes.ACTIVE : balance.percents < 0 ? ChipTypes.INACTIVE : ChipTypes.DISABLED}
                   label={
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
-                      {balance.percents >= 0 ? (
+                      {balance.percents > 0 ? (
                         <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
-                      ) : (
+                      ) : balance.percents < 0 ? (
                         <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
-                      )}
+                      ) : null}
                       {/* @ts-ignore */}
                       <Typography variant="caption1">
                         {balance.percents >= 0 ? balance.percents : -1 * balance.percents}%
@@ -93,11 +94,11 @@ const PortfolioHeader = ({ balance, setKeyword, isLoading, tooltipTitle }: Props
                   }
                 />
                 <Chip
-                  active={balance.amount >= 0}
+                  type={balance.amount > 0 ? ChipTypes.ACTIVE : balance.amount < 0 ? ChipTypes.INACTIVE : ChipTypes.DISABLED}
                   label={
                     // @ts-ignore
                     <Typography variant="caption1">
-                      {balance.amount >= 0 && '+'}
+                      {balance.amount > 0 && '+'}
                       {balance.amount} USD
                     </Typography>
                   }

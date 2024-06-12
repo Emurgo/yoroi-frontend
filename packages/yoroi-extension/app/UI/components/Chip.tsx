@@ -1,29 +1,52 @@
 import React from 'react';
-import { Chip as MuiChip } from '@mui/material';
+import { Chip as MuiChip, useTheme } from '@mui/material';
+
+export const ChipTypes = Object.freeze({
+  ACTIVE: 'active',
+  INACTIVE: 'inactive',
+  DISABLED: 'disabled',
+});
+
+type ChipType = 'active' | 'inactive' | 'disabled';
 
 interface Props {
   label: string;
-  active: boolean;
+  type: ChipType;
   sx?: any;
 }
 
-export const Chip = ({ label, active, sx, ...props }: Props): JSX.Element => {
+export const Chip = ({ label, type, sx, ...props }: Props): JSX.Element => {
+  const theme: any = useTheme();
+
+  const palettes = {
+    active: {
+      color: theme.palette.ds.secondary_c800,
+      backgroundColor: theme.palette.ds.secondary_c100,
+    },
+    inactive: {
+      color: theme.palette.ds.sys_magenta_c700,
+      backgroundColor: theme.palette.ds.sys_magenta_c100,
+    },
+    disabled: {
+      color: theme.palette.ds.gray_c600,
+      backgroundColor: theme.palette.ds.gray_c100,
+    },
+  };
+
   return (
     <MuiChip
       label={label}
       {...props}
-      sx={(theme: any) => ({
+      sx={{
         maxWidth: 'fit-content',
         padding: '2px 6px !important',
         borderRadius: '20px',
-        backgroundColor: active ? theme.palette.ds.secondary_c100 : theme.palette.ds.sys_magenta_c100,
-        color: active ? theme.palette.ds.secondary_c800 : theme.palette.ds.sys_magenta_c700,
-        ...sx,
-
         '& .MuiChip-label': {
           padding: 0,
         },
-      })}
-    ></MuiChip>
+        ...palettes[type],
+        ...sx,
+      }}
+    />
   );
 };

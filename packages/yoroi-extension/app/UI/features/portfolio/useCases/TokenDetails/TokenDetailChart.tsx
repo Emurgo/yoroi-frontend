@@ -9,6 +9,7 @@ import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { Icon } from '../../../../components/icons';
 import useChart from '../../common/hooks/useChart';
 import { TokenType } from '../../common/types/index';
+import { ChipTypes } from '../../../../components/Chip';
 
 const StyledButton = styled(Button)(({ theme, disabled, variant }: { theme: any; disabled: boolean; variant: string }) => ({
   fontWeight: 500,
@@ -108,14 +109,14 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
                 <Skeleton width="35px" height="16px" />
               ) : (
                 <Chip
-                  active={detailInfo.value >= 0}
+                  type={detailInfo.value > 0 ? ChipTypes.ACTIVE : detailInfo.value < 0 ? ChipTypes.INACTIVE : ChipTypes.DISABLED}
                   label={
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
-                      {detailInfo.value >= 0 ? (
+                      {detailInfo.value > 0 ? (
                         <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
-                      ) : (
+                      ) : detailInfo.value < 0 ? (
                         <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
-                      )}
+                      ) : null}
                       {/* @ts-ignore */}
                       <Typography variant="caption1">
                         {detailInfo.value >= 0 ? detailInfo.value : -1 * detailInfo.value}%
@@ -129,11 +130,17 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
                 <Skeleton width="35px" height="16px" />
               ) : (
                 <Chip
-                  active={detailInfo.fiatValue >= 0}
+                  type={
+                    detailInfo.fiatValue > 0
+                      ? ChipTypes.ACTIVE
+                      : detailInfo.fiatValue < 0
+                      ? ChipTypes.INACTIVE
+                      : ChipTypes.DISABLED
+                  }
                   label={
                     // @ts-ignore
                     <Typography variant="caption1">
-                      {detailInfo.fiatValue >= 0 && '+'}
+                      {detailInfo.fiatValue > 0 && '+'}
                       {detailInfo.fiatValue} {unitOfAccount}
                     </Typography>
                   }
