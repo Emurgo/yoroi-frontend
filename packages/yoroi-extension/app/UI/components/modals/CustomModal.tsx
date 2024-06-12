@@ -25,17 +25,7 @@ const BootstrapDialog: any = styled(Dialog)(({ width }: { width: string }) => ({
   },
 }));
 
-type CustomModalProps = {
-  onClose: () => void;
-  title: string;
-  confirmDRep: () => void;
-  dividers?: boolean;
-  width?: string;
-  content: Node;
-  actions: Node;
-};
-
-export const CustomModal = (): Node => {
+export const CustomModal = () => {
   const { width, closeModal, content, title, isOpen } = useModal();
 
   return (
@@ -52,7 +42,7 @@ export const CustomModal = (): Node => {
           position: 'absolute',
           right: 18,
           top: 22,
-          color: theme => theme.palette.ds.gray_c500,
+          color: (theme: any) => theme.palette.ds.gray_c500,
         }}
       >
         <Icon.CloseIcon />
