@@ -241,7 +241,7 @@ class Wallet extends Component<AllProps> {
   getDialogs: (any, any) => Node = (intl, currentPool) => {
     const isOpen = this.props.stores.uiDialogs.isOpen;
     const isRevampDialogOpen = isOpen(RevampAnnouncementDialog);
-    const poolTransitionInfo = this.props.stores.delegation.poolTransitionRequestInfo;
+    const poolTransitionInfo = this.props.stores.delegation.selectedPoolTransitionInfo;
 
     if (
       this.props.stores.delegation.poolTransitionConfig.show === 'open' &&

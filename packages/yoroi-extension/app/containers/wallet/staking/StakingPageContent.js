@@ -61,7 +61,7 @@ class StakingPageContent extends Component<AllProps> {
     }
 
     if (this.props.stores.delegation.poolTransitionConfig.shouldUpdatePool) {
-      const poolTransitionInfo = this.props.stores.delegation.poolTransitionRequestInfo;
+      const poolTransitionInfo = this.props.stores.delegation.selectedPoolTransitionInfo;
       if (poolTransitionInfo) {
         this.props.stores.delegation.delegateToSpecificPool(poolTransitionInfo.suggestedPool.hash);
         noop(this.props.stores.delegation.createDelegationTransaction());
@@ -118,7 +118,7 @@ class StakingPageContent extends Component<AllProps> {
 
     return (
       <DelegatedStakePoolCard
-        poolTransition={delegationStore.poolTransitionRequestInfo}
+        poolTransition={delegationStore.poolTransitionInfo(publicDeriver)}
         delegatedPool={delegatedPool}
         undelegate={async () => this.createWithdrawalTx(true)} // shouldDeregister=true
         delegateToSpecificPool={async (poolId): any => {

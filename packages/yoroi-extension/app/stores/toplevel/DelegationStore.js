@@ -62,7 +62,7 @@ type PoolTransitionModal = {| show: 'open' | 'closed' | 'idle', shouldUpdatePool
 
 export default class DelegationStore extends Store<StoresMap, ActionsMap> {
   @observable delegationRequests: Array<DelegationRequests> = [];
-  @observable poolTransitionRequestInfo: ?PoolTransition = null;
+  @observable poolTransitionRequestInfo: { [number]: ?PoolTransition } = {};
   @observable poolTransitionConfig: PoolTransitionModal = {
     show: 'closed',
     shouldUpdatePool: false,
@@ -203,9 +203,17 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     );
   };
 
+  poolTransitionInfo(publicDeriver: PublicDeriver<>): ?PoolTransition {
+    return this.poolTransitionRequestInfo[publicDeriver.getPublicDeriverId()];
+  }
+
+  get selectedPoolTransitionInfo(): ?PoolTransition {
+    return maybe(this.stores.wallets.selected, w => this.poolTransitionInfo(w));
+  }
+
   checkPoolTransition: () => Promise<void> = async () => {
     const publicDeriver = this.stores.wallets.selected;
-    if (publicDeriver === null || this.poolTransitionRequestInfo != null) {
+    if (publicDeriver === null || this.poolTransitionRequestInfo[publicDeriver.getPublicDeriverId()] != null) {
       return;
     }
 
@@ -242,7 +250,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
       }
 
       runInAction(() => {
-        this.poolTransitionRequestInfo = { ...response };
+        this.poolTransitionRequestInfo[publicDeriver.getPublicDeriverId()] = { ...response };
       });
     } catch (error) {
       console.warn('Failed to check pool transition', error);

@@ -45,7 +45,7 @@ class StakingPage extends Component<StoresAndActionsProps> {
             pageBanner={
               <PoolTransitionBanner
                 intl={this.context.intl}
-                showBanner={stores.delegation.poolTransitionRequestInfo?.shouldShowTransitionFunnel}
+                showBanner={stores.delegation.selectedPoolTransitionInfo?.shouldShowTransitionFunnel}
               />
             }
           />
