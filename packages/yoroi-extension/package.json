@@ -38,7 +38,8 @@
     "translations:manage": "node ./translations/translation-runner.js",
     "translations:purge": "rimraf ./translations/messages",
     "metrics:pull": "ampli pull extension",
-    "metrics:status": "babel-node scripts/checkMetrics.js"
+    "metrics:status": "babel-node scripts/checkMetrics.js",
+    "tsc": "tsc --project tsconfig.json --noEmit"
   },
   "repository": {
     "type": "git",

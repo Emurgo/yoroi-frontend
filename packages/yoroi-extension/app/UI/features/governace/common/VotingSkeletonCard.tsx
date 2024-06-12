@@ -1,8 +1,6 @@
-// @flow
-import * as React from 'react';
-import { Stack } from '@mui/material';
-import { Skeleton } from '@mui/material';
+import { Skeleton, Stack } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import * as React from 'react';
 
 const StyledCard = styled(Stack)(({ theme }: any) => ({
   position: 'relative',

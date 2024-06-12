@@ -1,7 +1,7 @@
 // flow
 import * as React from 'react';
 
-const IntlProviderContext = React.createContext<{ intl: any } | null>(null);
+const IntlProviderContext = React.createContext<{ intl: any }>({ intl: null });
 
 export const IntlProvider = ({ children, intl }: { children: React.ReactNode; intl: any }) => {
   return <IntlProviderContext.Provider value={{ intl }}>{children}</IntlProviderContext.Provider>;
