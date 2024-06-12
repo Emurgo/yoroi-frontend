@@ -60,8 +60,8 @@ class StakingPageContent extends Component<AllProps> {
       throw new Error(`${nameof(StakingPageContent)} no public deriver. Should never happen`);
     }
 
-    if (this.props.stores.delegation.poolTransitionConfig.shouldUpdatePool) {
-      const poolTransitionInfo = this.props.stores.delegation.selectedPoolTransitionInfo;
+    if (this.props.stores.delegation.getPoolTransitionConfig(publicDeriver).shouldUpdatePool) {
+      const poolTransitionInfo = this.props.stores.delegation.getPoolTransitionInfo(publicDeriver);
       if (poolTransitionInfo) {
         this.props.stores.delegation.delegateToSpecificPool(poolTransitionInfo.suggestedPool.hash);
         noop(this.props.stores.delegation.createDelegationTransaction());

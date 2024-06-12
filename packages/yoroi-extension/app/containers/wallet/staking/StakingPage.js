@@ -29,6 +29,7 @@ class StakingPage extends Component<StoresAndActionsProps> {
   render(): Node {
     const { actions, stores } = this.props;
     const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
+    const selectedWallet = stores.wallets.selected;
     return (
       <TopBarLayout
         banner={<BannerContainer actions={actions} stores={stores} />}
@@ -45,7 +46,7 @@ class StakingPage extends Component<StoresAndActionsProps> {
             pageBanner={
               <PoolTransitionBanner
                 intl={this.context.intl}
-                showBanner={stores.delegation.selectedPoolTransitionInfo?.shouldShowTransitionFunnel}
+                showBanner={stores.delegation.getPoolTransitionInfo(selectedWallet)?.shouldShowTransitionFunnel}
               />
             }
           />
