@@ -1,22 +1,30 @@
 import React from 'react';
-import { default as MuiTooltip, TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
+import { default as MuiTooltip, TooltipProps } from '@mui/material/Tooltip';
+import { useTheme } from '@mui/material';
 
 export const Tooltip = ({ children, ...props }: TooltipProps): JSX.Element => {
+  const theme: any = useTheme();
+
   return (
     <MuiTooltip
       arrow
-      classes={{ popper: props.className }}
-      sx={(theme: any) => ({
-        color: theme.palette.ds.text_primary_on,
-        [`& .${tooltipClasses.arrow}`]: {
-          color: theme.palette.ds.gray_c900,
+      componentsProps={{
+        tooltip: {
+          sx: {
+            color: theme.palette.ds.text_primary_on,
+            bgcolor: theme.palette.ds.gray_c900,
+            borderRadius: theme.spacing(0.5),
+            padding: '5px 12px',
+          },
         },
-        [`& .${tooltipClasses.tooltip}`]: {
-          backgroundColor: theme.palette.ds.gray_c900,
+        arrow: {
+          sx: { color: theme.palette.ds.gray_c900 },
         },
-        ...props.sx,
-      })}
+      }}
       {...props}
+      sx={{
+        ...props.sx,
+      }}
     >
       {children}
     </MuiTooltip>
