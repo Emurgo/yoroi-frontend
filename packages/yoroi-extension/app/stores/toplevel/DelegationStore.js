@@ -206,7 +206,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
 
     try {
       const transitionResult = await maybe(currentPool, p =>
-        new PoolInfoApi().getTransition('pool14u30jkg45xwd27kmznz43hxy596lvrrpj0wz8w9a9k97kmt4p2d', RustModule.CrossCsl.init)
+        new PoolInfoApi(forceNonNull(BackendService) + '/api').getTransition(p, RustModule.CrossCsl.init)
       );
 
       const response = {
