@@ -953,7 +953,7 @@
   "wallet.transaction.withdraw": "Withdraw",
   "wallet.transaction.withdrawalsLabel": "Withdrawals",
   "wallet.transactions.success.button.exchange": "Go to the exchange page",
-  "wallet.transactions.success.sell": "!!!Transaction has been submitted",
+  "wallet.transactions.success.sell": "Transaction has been submitted",
   "wallet.transfer.deregister.deregister": "Deregister",
   "wallet.transfer.deregister.keep": "Keep registered",
   "wallet.transfer.deregister.line1": "When withdrawing rewards, you also have the option to deregister the staking key",

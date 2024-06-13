@@ -231,7 +231,7 @@ export default class BuySellDialog extends Component<Props, State> {
           orderType: 'buy',
           returnUrl: EXCHANGE_CALLBACK_URL,
           coinAmount: Number(state.amountAda),
-          balance: props.currentBalanceAda,
+          balance: props.currentBalanceAda.toString(),
         }
       }
     } else {
@@ -244,7 +244,7 @@ export default class BuySellDialog extends Component<Props, State> {
           orderType: 'sell',
           returnUrl: EXCHANGE_CALLBACK_URL,
           coinAmount: Number(state.amountAda),
-          balance: props.currentBalanceAda,
+          balance: props.currentBalanceAda.toString(),
         }
       }
     }
@@ -272,7 +272,7 @@ export default class BuySellDialog extends Component<Props, State> {
     let url;
     try {
       url = await manager.referralLink.create(params);
-    } catch {
+    } catch (_error) {
       this.setState({ urlGenerationError: 'failed' });
       return;
     } finally {
@@ -441,7 +441,7 @@ export default class BuySellDialog extends Component<Props, State> {
 
     if (urlGenerationError === 'timeout' || urlGenerationError === 'failed') {
       const dismissUrlGenerationError = () => {
-        this.setState({ urlGenerationError: null });
+        this.setState({ urlGenerationError: null, isSubmitting: false, });
       };
 
       return (
@@ -464,7 +464,7 @@ export default class BuySellDialog extends Component<Props, State> {
       
     return (
       <Dialog
-        title={intl.formatMessage(globalMessages.buyAda)}
+        title={intl.formatMessage(messages.dialogTitle)}
         closeOnOverlayClick={false}
         onClose={props.onCancel}
         closeButton={<DialogCloseButton />}
