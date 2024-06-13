@@ -1,6 +1,7 @@
 // @flow
 import type { Node } from 'react';
 import type { PriceImpact } from './types';
+import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { Quantities } from '../../utils/quantities';
 import { useSwap } from '@yoroi/swap';
@@ -29,6 +30,7 @@ function SwapPriceInput({ priceImpactState }: Props): Node {
     onChangeLimitPrice,
     limitPrice,
   } = useSwapForm();
+  const [endsWithDot, setEndsWithDot] = useState(false);
 
   const isMarketOrder = orderData.type === 'market';
   const pricePlaceholder = isMarketOrder ? NO_PRICE_VALUE_PLACEHOLDER : '0';
@@ -42,6 +44,7 @@ function SwapPriceInput({ priceImpactState }: Props): Node {
   const displayValue = isMarketOrder ? formattedPrice : limitPrice.displayValue;
   const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
   const isReadonly = !isValidTickers || isMarketOrder;
+  const valueToDisplay = endsWithDot ? displayValue + '.' : displayValue;
 
   return (
     <Box mt="16px">
@@ -89,13 +92,20 @@ function SwapPriceInput({ priceImpactState }: Props): Node {
           placeholder="0"
           bgcolor={isReadonly ? 'grayscale.50' : 'common.white'}
           readOnly={isReadonly}
-          value={isValidTickers ? displayValue : NO_PRICE_VALUE_PLACEHOLDER}
+          value={isValidTickers ? valueToDisplay : NO_PRICE_VALUE_PLACEHOLDER}
           onChange={event => {
             const val = event.target.value;
             let value = val.replace(/[^\d.]+/g, '');
-            if (!value) value = '';
-            if (/^\d+\.?\d*$/.test(value) && !value.endsWith('.')) {
+            if (!value || value === '.') value = '';
+            if (value.endsWith('.')) {
+              setEndsWithDot(true);
+              value = value.replace('.', '');
               onChangeLimitPrice(value);
+              return;
+            }
+            if (/^[0-9]\d*(\.\d+)?$/gi.test(value) || !value) {
+              onChangeLimitPrice(value);
+              setEndsWithDot(false);
             }
           }}
           onFocus={() => !isMarketOrder && limitPriceFocusState.update(true)}

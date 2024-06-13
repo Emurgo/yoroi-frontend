@@ -12,6 +12,7 @@ import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import {
   FormattedActualPrice,
   FormattedMarketPrice,
+  FormattedLimitPrice,
   PriceImpactBanner,
   PriceImpactColored,
   PriceImpactIcon,
@@ -32,6 +33,19 @@ type Props = {|
   defaultTokenInfo: RemoteTokenInfo,
   getFormattedPairingValue: (amount: string) => string,
 |};
+
+const priceStrings = {
+  market: {
+    label: 'Market price',
+    info:
+      'Market price is the best price available on the market among several DEXes that lets you buy or sell an asset instantly',
+  },
+  limit: {
+    label: 'Limit price',
+    info:
+      "Limit price in a DEX is a specific pre-set price at which you can trade an asset. Unlike market orders, which execute immediately at the current market price, limit orders are set to execute only when the market reaches the trader's specified price.",
+  },
+};
 
 export default function ConfirmSwapTransaction({
   slippageValue,
@@ -136,16 +150,16 @@ export default function ConfirmSwapTransaction({
         <SummaryRow col1="Slippage tolerance">{slippageValue}%</SummaryRow>
         <SwapPoolFullInfo defaultTokenInfo={defaultTokenInfo} showMinAda />
         <SummaryRow
-          col1="Market price"
+          col1={priceStrings[orderData.type].label}
           withInfo
-          infoText="Market price is the best price available on the market among several DEXes that lets you buy or sell an asset instantly"
+          infoText={priceStrings[orderData.type].info}
         >
-          <FormattedMarketPrice />
+          {orderData.type === 'market' ? <FormattedMarketPrice /> : <FormattedLimitPrice />}
         </SummaryRow>
         <SummaryRow
           col1="Price impact"
           withInfo
-          infoText="Limit price in a DEX is a specific pre-set price at which you can trade an asset. Unlike market orders, which execute immediately at the current market price, limit orders are set to execute only when the market reaches the trader's specified price."
+          infoText="Price impact is a difference between the actual market price and your price due to trade size."
         >
           <PriceImpactColored priceImpactState={priceImpactState} sx={{ display: 'flex' }}>
             {priceImpactState && <PriceImpactIcon isSevere={priceImpactState.isSevere} />}
