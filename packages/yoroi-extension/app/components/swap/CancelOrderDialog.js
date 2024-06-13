@@ -68,13 +68,21 @@ export default function CancelSwapOrderDialog({
           hwWalletError={hwWalletError}
         />
       </Dialog>
-    )
+    );
   }
   return (
-    <Dialog title="Cancel order" onClose={onDialogClose} withCloseButton closeOnOverlayClick>
-      <Box display="flex" mt="8px" mb="24px" flexDirection="column" gap="16px">
+    <Dialog
+      title="Cancel order"
+      onClose={onDialogClose}
+      withCloseButton
+      closeOnOverlayClick
+      styleOverride={{ maxWidth: '612px', height: '496px', minWidth: '612px' }}
+    >
+      <Box display="flex" flexDirection="column" gap="12px">
         <Box>
-          <Typography component="div" variant="body1">Are you sure you want to cancel this order?</Typography>
+          <Typography component="div" variant="body1">
+            Are you sure you want to cancel this order?
+          </Typography>
         </Box>
         <AssetPair
           from={order.from.token}
@@ -88,13 +96,22 @@ export default function CancelSwapOrderDialog({
           <SummaryRow col1="Asset amount">
             {order.amount} {order.to.token.ticker}
           </SummaryRow>
-          <SummaryRow col1="Total returned" info='The amount returned to your wallet after cancelling the order'>
-            {transactionParams ? transactionParams.returnValues.map(v => (
-              <Box>{v.formattedValue} {v.ticker}</Box>
-            )) : (<LoadingSpinner small />)}
+          <SummaryRow
+            col1="Total returned"
+            info="The amount returned to your wallet after cancelling the order"
+          >
+            {transactionParams ? (
+              transactionParams.returnValues.map((v, index) => (
+                <>
+                  {index > 0 && ' +'} {v.formattedValue} {v.ticker}
+                </>
+              ))
+            ) : (
+              <LoadingSpinner small />
+            )}
           </SummaryRow>
           <SummaryRow col1="Cancellation fee">
-            {transactionParams ? transactionParams.formattedFee : (<LoadingSpinner small />)}
+            {transactionParams ? transactionParams.formattedFee : <LoadingSpinner small />}
           </SummaryRow>
         </Box>
         <Box>
@@ -112,7 +129,7 @@ export default function CancelSwapOrderDialog({
           />
         </Box>
       </Box>
-      <Box display="flex" gap="24px" mt="24px">
+      <Box display="flex" gap="24px">
         <Button fullWidth variant="secondary" onClick={onDialogClose}>
           Back
         </Button>
@@ -133,9 +150,7 @@ export default function CancelSwapOrderDialog({
           }}
           disabled={isLoading || password.length === 0}
         >
-          {isLoading ? (
-            <LoadingSpinner small light />
-          ) : 'Cancel order'}
+          {isLoading ? <LoadingSpinner small light /> : 'Cancel order'}
         </Button>
       </Box>
     </Dialog>
@@ -155,7 +170,9 @@ const SummaryRow = ({ col1, children, info = '' }) => (
       ) : null}
     </Box>
     <Box>
-      <Typography component="div" variant="body1">{children}</Typography>
+      <Typography component="div" variant="body1">
+        {children}
+      </Typography>
     </Box>
   </Box>
 );

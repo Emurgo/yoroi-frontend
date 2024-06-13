@@ -421,6 +421,7 @@ describe('app/api/ada/index', () => {
               assetName: '',
               ticker: 'TADA',
               longName: null,
+              logo: null,
               numberOfDecimals: 6
             }
           },
