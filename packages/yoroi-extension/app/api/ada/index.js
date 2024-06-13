@@ -120,7 +120,11 @@ import type {
   TokenInfoFunc,
 } from './lib/state-fetch/types';
 import { getChainAddressesForDisplay, } from './lib/storage/models/utils';
-import { getAllAddressesForDisplay, rawGetAddressRowsForWallet, } from './lib/storage/bridge/traitUtils';
+import {
+  getAllUsedAddresses,
+  getAllAddressesForDisplay,
+  rawGetAddressRowsForWallet,
+} from './lib/storage/bridge/traitUtils';
 import {
   asAddressedUtxo,
   cardanoMinAdaRequiredFromAssets_coinsPerWord,
@@ -155,7 +159,6 @@ import type { ForeignUtxoFetcher } from '../../connector/stores/ConnectorStore';
 import type WalletTransaction from '../../domain/WalletTransaction';
 import { derivePrivateByAddressing, derivePublicByAddressing } from './lib/cardanoCrypto/deriveByAddressing';
 import TimeUtils from './lib/storage/bridge/timeUtils';
-import { connectorGetUsedAddresses } from '../../../chrome/extension/connector/api';
 
 // ADA specific Request / Response params
 
@@ -2345,7 +2348,7 @@ export default class AdaApi {
 
     const fullConfig = getCardanoHaskellBaseConfig(network);
     const absSlotNumber = new BigNumber(TimeUtils.timeToAbsoluteSlot(fullConfig, new Date()));
-    const targetAddress = reorgTargetAddress ?? (await connectorGetUsedAddresses(publicDeriver))[0];
+    const targetAddress = reorgTargetAddress ?? (await getAllUsedAddresses(publicDeriver))[0];
     if (targetAddress == null) {
       throw new Error('unexpected: no target address or used addresses available');
     }

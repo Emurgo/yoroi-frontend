@@ -1,4 +1,3 @@
-// @flow
 import { invalid } from '@yoroi/common';
 import { produce } from 'immer';
 

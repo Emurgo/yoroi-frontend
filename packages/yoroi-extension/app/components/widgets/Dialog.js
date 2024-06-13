@@ -44,6 +44,7 @@ export type Props = {|
   id?: string,
   +styleFlags?: StyleFlag,
   +forceBottomDivider?: boolean,
+  +contentHeader?: Node,
 |};
 
 type InjectedProps = {| isRevampLayout: boolean |};
@@ -64,6 +65,7 @@ function Dialog(props: Props & InjectedProps): Node {
     id,
     styleFlags,
     forceBottomDivider,
+    contentHeader,
   } = props;
 
   const [contentHasScroll, setContentHasScroll] = useState(false);
@@ -81,7 +83,7 @@ function Dialog(props: Props & InjectedProps): Node {
         // el.style.marginRight = '-24px';
       } else {
         setContentHasScroll(false);
-        el.style.marginRight = '0';
+        // el.style.marginRight = '0';
       }
     }, 30);
 
@@ -146,7 +148,20 @@ function Dialog(props: Props & InjectedProps): Node {
             className="ModalContent"
             style={props.styleContentOverride}
           >
-            {children}
+            {contentHeader && <Box>{contentHeader}</Box>}
+            <Box
+              sx={{
+                maxHeight: '100%',
+                overflowY: 'auto',
+                overflowX: 'hidden',
+                flexGrow: 1,
+                // <TODO:STYLES> Check if needed
+                // maxWidth: 'calc(100% + 20px)',
+                // marginRight: '-20px',
+              }}
+            >
+              {children}
+            </Box>
           </ModalContent>
         ) : null}
         {hasActions && (
@@ -197,6 +212,7 @@ Dialog.defaultProps = {
   backButton: undefined,
   className: undefined,
   scrollableContentClass: undefined,
+  contentHeader: null,
   styleOverride: undefined,
   onClose: undefined,
   closeOnOverlayClick: false,
@@ -207,7 +223,7 @@ export const CloseButton = ({
   onClose,
   closeButton,
   sx,
-  idLocatorPath='modalWindow',
+  idLocatorPath = 'modalWindow',
 }: {|
   onClose: ?(void) => PossiblyAsync<void>,
   closeButton: React$Node,
@@ -283,6 +299,8 @@ const ModalContent = styled(Box)(({ theme }) => ({
   paddingTop: theme.name === 'classic' ? '0px' : '24px',
   paddingBottom: theme.name === 'classic' || theme.name === 'modern' ? '0px' : '24px',
   flexGrow: 1,
+  display: 'flex',
+  flexFlow: 'column',
 }));
 
 const ModalFooter = styled(Box)(({ theme, hasDivider }) => ({

@@ -1,10 +1,9 @@
-// @flow
-import * as React from 'react';
-import { styled } from '@mui/material/styles';
+import { Stack } from '@mui/material';
+import Box from '@mui/material/Box';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import { Stack } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import * as React from 'react';
 import LoadingSpinner from '../../../../components/widgets/LoadingSpinner';
 
 type Props = {

@@ -1,27 +1,19 @@
-// @flow
 import React from 'react';
-import type { Node } from 'react';
 
-type ModalState = {|
-  isOpen: boolean,
-  title: string,
-  content: Node,
-  height: string,
-  width: string,
-  isLoading: boolean,
-|};
-type ModalActions = {|
-  openModal: ({|
-    title: string,
-    content: Node,
-    height?: string,
-    width?: string,
-    onClose?: () => void,
-  |}) => void,
-  closeModal: () => void,
-  startLoading: () => void,
-  stopLoading: () => void,
-|};
+type ModalState = {
+  isOpen: boolean;
+  title: string;
+  content: React.ReactNode;
+  height: string;
+  width: string;
+  isLoading: boolean;
+};
+type ModalActions = {
+  openModal: any;
+  closeModal: () => void;
+  startLoading: () => void;
+  stopLoading: () => void;
+};
 
 const ModalContext = React.createContext(undefined);
 
@@ -33,14 +25,13 @@ export const useModal = (): any => {
   return value;
 };
 
-export const ModalProvider = ({ children, initialState }: {| children: Node, initialState?: ModalState |}): Node => {
+export const ModalProvider = ({ children, initialState }: { children: React.ReactNode; initialState?: ModalState }) => {
   const [state, dispatch] = React.useReducer(modalReducer, { ...defaultState, ...initialState });
-  const onCloseRef = React.useRef();
   const actions = React.useRef<ModalActions>({
     closeModal: () => {
       dispatch({ type: 'close' });
     },
-    openModal: payload => {
+    openModal: (payload: any) => {
       dispatch({
         type: 'open',
         title: payload.title,
@@ -53,7 +44,7 @@ export const ModalProvider = ({ children, initialState }: {| children: Node, ini
     stopLoading: () => dispatch({ type: 'stopLoading' }),
   }).current;
 
-  const context = React.useMemo(() => ({ ...state, ...actions }), [state, actions]);
+  const context: any = React.useMemo(() => ({ ...state, ...actions }), [state, actions]);
 
   return <ModalContext.Provider value={context}>{children}</ModalContext.Provider>;
 };
@@ -88,10 +79,10 @@ const modalReducer = (state: ModalState, action: ModalAction) => {
 };
 
 const defaultState: ModalState = Object.freeze({
+  isOpen: false,
+  title: '',
   content: null,
   height: '648px',
   width: '648px',
-  title: '',
-  isOpen: false,
   isLoading: false,
 });

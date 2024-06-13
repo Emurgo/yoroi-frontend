@@ -16,8 +16,8 @@ import { MultiToken } from '../../api/common/lib/MultiToken';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { PoolInfoApi } from '@emurgo/yoroi-lib';
-import { entriesIntoMap } from '../../coreUtils';
-import type { PoolInfo } from '@emurgo/yoroi-lib';
+import { entriesIntoMap, forceNonNull } from '../../coreUtils';
+import type { ExplorerPoolInfo as PoolInfo } from '@emurgo/yoroi-lib';
 import type { PoolInfoResponse, RemotePool } from '../../api/ada/lib/state-fetch/types';
 import type {
   GetDelegatedBalanceFunc,
@@ -167,8 +167,10 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
       network: request.network,
       poolIds: poolsToQuery,
     });
+
+    const { BackendService } = request.network.Backend;
     const remotePoolInfoPromises: Array<Promise<[string, PoolInfo | null]>> = poolsToQuery.map(id =>
-      new PoolInfoApi().getPool(id).then(res => [id, res])
+      new PoolInfoApi(forceNonNull(BackendService) + '/api').getPool(id).then(res => [id, res])
     );
     const [poolInfoResp, remotePoolInfoResps]: [
       PoolInfoResponse,
