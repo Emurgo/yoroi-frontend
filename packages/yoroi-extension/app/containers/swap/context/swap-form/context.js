@@ -26,7 +26,6 @@ const initialSwapFormContext: SwapFormContext = {
   canSwapChanged: missingInit,
   sellFocusState: ConstantState(false),
   buyFocusState: ConstantState(false),
-  limitPriceFocusState: ConstantState(false),
   onChangeSellQuantity: missingInit,
   onChangeBuyQuantity: missingInit,
   onChangeLimitPrice: missingInit,
