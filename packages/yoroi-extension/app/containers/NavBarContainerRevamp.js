@@ -1,5 +1,4 @@
 // @flow
-import BigNumber from 'bignumber.js';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { Node } from 'react';
 import type { StoresAndActionsProps } from '../types/injectedProps.types';
@@ -172,7 +171,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
     }
 
     if (this.props.stores.uiDialogs.isOpen(BuySellDialog)) {
-      if (!publicDeriver) {
+      if (!publicDeriver || !balance) {
         return null;
       }
       const getReceiveAdaAddress = async () => {
@@ -184,6 +183,9 @@ export default class NavBarContainerRevamp extends Component<Props> {
         );
       };
 
+      const tokenInfo = getTokenInfo(balance.getDefaultEntry());
+      const { numberOfDecimals } = tokenInfo.Metadata;
+
       return (
         <BuySellDialog
           onCancel={this.props.actions.dialogs.closeActiveDialog.trigger}
@@ -191,7 +193,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
             () => this.props.actions.router.goToRoute.trigger({ route: ROUTES.EXCHANGE_END })
           }
           currentBalanceAda={
-            new BigNumber('1000')
+            balance.getDefault().shiftedBy(-numberOfDecimals)
           }
           receiveAdaAddressPromise={getReceiveAdaAddress()}
         />
