@@ -30,6 +30,7 @@ type Props = {|
   txSubmitErrorState: State<?Error>,
   onRemoteOrderDataResolved: any => Promise<void>,
   defaultTokenInfo: RemoteTokenInfo,
+  getTokenInfo: string => Promise<RemoteTokenInfo>,
   getFormattedPairingValue: (amount: string) => string,
 |};
 
@@ -41,6 +42,7 @@ export default function ConfirmSwapTransaction({
   txSubmitErrorState,
   onRemoteOrderDataResolved,
   defaultTokenInfo,
+  getTokenInfo,
   getFormattedPairingValue,
 }: Props): React$Node {
   const { orderData } = useSwap();
@@ -104,6 +106,7 @@ export default function ConfirmSwapTransaction({
               displayAmount={sellQuantity.displayValue}
               type="from"
               defaultTokenInfo={defaultTokenInfo}
+              getTokenInfo={getTokenInfo}
             />
           </Box>
         </Box>
@@ -120,6 +123,7 @@ export default function ConfirmSwapTransaction({
                 displayAmount={buyQuantity.displayValue}
                 type="from"
                 defaultTokenInfo={defaultTokenInfo}
+                getTokenInfo={getTokenInfo}
                 priceImpactState={priceImpactState}
               />
             </Box>

@@ -7,7 +7,7 @@
         "NetworkId": 0,
         "NetworkName": "Cardano Mainnet",
         "Backend": {
-          "BackendService": "https://iohk-mainnet.yoroiwallet.com",
+          "BackendService": "https://api.yoroiwallet.com",
           "TokenInfoService": "https://cdn.yoroiwallet.com"
         },
         "BaseConfig": [
