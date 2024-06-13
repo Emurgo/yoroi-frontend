@@ -30,7 +30,6 @@ import RewardHistoryDialog from '../../../components/wallet/staking/dashboard-re
 import DelegatedStakePoolCard from '../../../components/wallet/staking/dashboard-revamp/DelegatedStakePoolCard';
 import WithdrawRewardsDialog from './WithdrawRewardsDialog';
 import { formatLovelacesHumanReadableShort, roundOneDecimal, roundTwoDecimal } from '../../../utils/formatters';
-import { getDrepDelegationState } from '../../../UI/features/governace/api/useDrepDelegationState';
 import { GovernanceParticipateDialog } from '../dialogs/GovernanceParticipateDialog';
 import { compose, maybe, noop } from '../../../coreUtils';
 

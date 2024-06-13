@@ -1,22 +1,23 @@
-import * as React from 'react';
-import { styled } from '@mui/material/styles';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import { useGovernance } from '../../module/GovernanceContextProvider';
-import { DRepIlustration } from '../../common/ilustrations/DRepIlustration';
-import { useStrings } from '../../common/useStrings';
-import { Abstein } from '../../common/ilustrations/Abstein';
-import { NoConfidance } from '../../common/ilustrations/NoConfidance';
 import { Stack } from '@mui/material';
+import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
+import Typography from '@mui/material/Typography';
+import { styled } from '@mui/material/styles';
+import { GovernanceProvider, useDelegationCertificate, useVotingCertificate } from '@yoroi/staking';
+
+import * as React from 'react';
 import { useModal } from '../../../../components/modals/ModalContext';
+import { useDrepDelegationState } from '../../api/useDrepDelegationState';
 import { ChooseDRepModal } from '../../common/ChooseDRepModal';
 import { GovernanceVoteingCard } from '../../common/GovernanceVoteingCard';
-import { GovernanceProvider, useDelegationCertificate, useVotingCertificate } from '@yoroi/staking';
-import { useNavigateTo } from '../../common/useNavigateTo';
-import { useDrepDelegationState } from '../../api/useDrepDelegationState';
 import { VotingSkeletonCard } from '../../common/VotingSkeletonCard';
 import { BECOME_DREP_LINK, LEARN_MORE_LINK } from '../../common/constants';
+import { Abstein } from '../../common/ilustrations/Abstein';
+import { DRepIlustration } from '../../common/ilustrations/DRepIlustration';
+import { NoConfidance } from '../../common/ilustrations/NoConfidance';
+import { useNavigateTo } from '../../common/useNavigateTo';
+import { useStrings } from '../../common/useStrings';
+import { useGovernance } from '../../module/GovernanceContextProvider';
 import { Vote } from '../../module/state';
 
 const Container = styled(Box)(() => ({
@@ -45,7 +46,10 @@ export const GovernanceStatusSelection = () => {
   const strings = useStrings();
 
   // TODO not woking - the sancho testnet is down and other networks throw error
-  // const { data: stakingStatus } = useStakingKeyState(stakePoolKeyHash, { suspense: true });
+  // const { data: stakingStatus } = useStakingKeyState('e09fe806015ff6b7c62331ba9d7a68160f9c9c41b7a0765966250c2ea8', {
+  //   suspense: true,
+  // });
+  // console.log('stakingStatus', stakingStatus);
   // const action = stakingStatus ? mapStakingKeyStateToGovernanceAction(stakingStatus) : null
 
   // @ts-ignore

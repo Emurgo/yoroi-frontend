@@ -47,10 +47,12 @@ export const createCurrrentWalletInfo = (stores: any) => {
   const currentWalletId = selectedWallet.getPublicDeriverId();
   const networkInfo = selectedWallet.getParent().getNetworkInfo();
   const networkId = networkInfo.NetworkId;
-
+  const backendService = selectedWallet.getParent().getNetworkInfo().Backend.BackendService;
   return {
     currentPool: walletCurrentPoolInfo,
     networkId,
     walletId: currentWalletId,
+    selectedWallet: selectedWallet,
+    backendService,
   };
 };
