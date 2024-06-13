@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useStrings } from './useStrings';
 import { useTheme } from '@mui/material/styles';
 import { Box } from '@mui/material';
 import moment from 'moment';
-import { IPeriodButtonProps, IChartData } from '../types/chart';
+import { IPeriodButtonProps, IChartData, IChartDataItem } from '../types/chart';
 
 const useChart = (data: IChartData) => {
   const strings = useStrings();
@@ -21,6 +21,8 @@ const useChart = (data: IChartData) => {
     fiatValue: data ? data[periodButtonProps[0]?.id || 0][data[periodButtonProps[0]?.id || 0].length - 1].fiatValue : 0,
   });
   const [isDragging, setIsDragging] = useState<boolean>(false);
+
+  const activePeriodId = useMemo(() => periodButtonProps.find(item => item.active)?.id || 'start24HoursAgo', [periodButtonProps]);
 
   const CustomYAxisTick = ({
     x,
@@ -124,13 +126,13 @@ const useChart = (data: IChartData) => {
     setPeriodButtonProps(tmp);
     setDetailInfo({
       value: data
-        ? data[periodButtonProps.find(item => item.id === id)?.id || 0][
-            data[periodButtonProps.find(item => item.id === id)?.id || 0].length - 1
+        ? data[periodButtonProps.find(item => item.id === id)?.id || 'start24HoursAgo'][
+            data[periodButtonProps.find(item => item.id === id)?.id || 'start24HoursAgo'].length - 1
           ].value
         : 0,
       fiatValue: data
-        ? data[periodButtonProps.find(item => item.id === id)?.id || 0][
-            data[periodButtonProps.find(item => item.id === id)?.id || 0].length - 1
+        ? data[periodButtonProps.find(item => item.id === id)?.id || 'start24HoursAgo'][
+            data[periodButtonProps.find(item => item.id === id)?.id || 'start24HoursAgo'].length - 1
           ].fiatValue
         : 0,
     });
@@ -144,8 +146,8 @@ const useChart = (data: IChartData) => {
       return;
     }
 
-    const value = props.activePayload && props.activePayload.length > 0 ? props.activePayload[0].payload.value : null;
-    const fiatValue = props.activePayload && props.activePayload.length > 0 ? props.activePayload[0].payload.fiatValue : null;
+    const value = props.activePayload && props.activePayload.length > 0 ? props.activePayload[0].payload.value : 0;
+    const fiatValue = props.activePayload && props.activePayload.length > 0 ? props.activePayload[0].payload.fiatValue : 0;
 
     if (!value || !fiatValue) return;
     setDetailInfo({
@@ -169,17 +171,16 @@ const useChart = (data: IChartData) => {
   };
 
   const handleMouseUp = () => {
-    const currentPeriod = periodButtonProps.find(item => item.active)?.id || 0;
     setDetailInfo({
-      value: data ? data[currentPeriod][data[currentPeriod].length - 1].value : 0,
-      fiatValue: data ? data[currentPeriod][data[currentPeriod].length - 1].fiatValue : 0,
+      value: data ? data[activePeriodId][data[activePeriodId].length - 1].value : 0,
+      fiatValue: data ? data[activePeriodId][data[activePeriodId].length - 1].fiatValue : 0,
     });
     setIsDragging(false);
   };
 
-  const minValue = data ? Math.min(...data[periodButtonProps.find(item => item.active)?.id || 0].map(item => item.value)) : 0;
+  const minValue = data ? Math.min(...data[activePeriodId].map((item: IChartDataItem) => item.value)) : 0;
 
-  const maxValue = data ? Math.max(...data[periodButtonProps.find(item => item.active)?.id || 0].map(item => item.value)) : 0;
+  const maxValue = data ? Math.max(...data[activePeriodId].map((item: IChartDataItem) => item.value)) : 0;
 
   return {
     CustomYAxisTick,
@@ -192,6 +193,7 @@ const useChart = (data: IChartData) => {
     detailInfo,
     minValue,
     maxValue,
+    activePeriodId,
   };
 };
 

@@ -5,7 +5,6 @@ import { Copy } from './Copy';
 import { Copied } from './Copied';
 import { ChipArrowUp } from './ChipArrowUp';
 import { ChipArrowDown } from './ChipArrowDown';
-import { Sort } from './Sort';
 import { Send } from './Send';
 import { Cancel } from './Cancel';
 import { Staking } from './Staking';
@@ -22,7 +21,6 @@ export const Icon = {
   Copied,
   ChipArrowUp,
   ChipArrowDown,
-  Sort,
   Send,
   Cancel,
   Staking,

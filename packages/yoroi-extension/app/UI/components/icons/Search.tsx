@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const Search = props => (
+export const Search = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
     width="24px"
     height="24px"

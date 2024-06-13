@@ -52,6 +52,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
     detailInfo,
     minValue,
     maxValue,
+    activePeriodId,
   } = useChart(tokenInfo.chartData);
   const [isFetching, setIsFetching] = useState<boolean>(false);
 
@@ -165,7 +166,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
           {isFetching ? null : (
             <ResponsiveContainer width="100%" height={chartHeight} style={{ padding: 0 }}>
               <LineChart
-                data={tokenInfo?.chartData[periodButtonProps.find(item => item?.active)?.id || 0]}
+                data={tokenInfo?.chartData[activePeriodId]}
                 onMouseDown={handleMouseDown}
                 onMouseUp={handleMouseUp}
                 onMouseMove={handleMouseMove}
@@ -182,12 +183,12 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
                 ></YAxis>
                 <RechartTooltip cursor={false} content={<></>} />
                 <Line
-                  activeDot={props => (
+                  activeDot={(props: any) => (
                     <CustomActiveDot
                       chartBottom={chartHeight}
                       rectWidth={93}
                       rectHeight={34}
-                      dataLength={tokenInfo?.chartData[periodButtonProps.find(item => item.active)?.id || 0].length}
+                      dataLength={tokenInfo?.chartData[activePeriodId].length}
                       {...props}
                     />
                   )}

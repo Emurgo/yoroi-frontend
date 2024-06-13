@@ -1,6 +1,6 @@
 import React from 'react';
 import { TableHead, TableRow, TableCell, Stack, Typography } from '@mui/material';
-import { Icon } from '../../../../components/icons';
+import { Sort as SortIcon } from '../../../../components/icons/Sort';
 import { useTheme } from '@mui/material/styles';
 import { IHeadCell } from '../types/table';
 
@@ -37,7 +37,7 @@ const SortableTableHead = ({ headCells, order, orderBy, onRequestSort }: Props):
                   {label}
                 </Typography>
                 {disabledSort ? null : (
-                  <Icon.Sort
+                  <SortIcon
                     id={id}
                     order={order}
                     orderBy={orderBy}

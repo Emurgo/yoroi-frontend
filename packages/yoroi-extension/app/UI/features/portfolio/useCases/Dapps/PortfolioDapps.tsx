@@ -1,4 +1,4 @@
-import { Stack, Button, styled, Typography } from '@mui/material';
+import { Stack, Button, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import LiquidityTable from './LiquidityTable';
@@ -9,19 +9,11 @@ import { useStrings } from '../../common/hooks/useStrings';
 import PortfolioHeader from '../../common/components/PortfolioHeader';
 import { LiquidityItemType, OrderItemType } from '../../common/types/index';
 
-const StyledButton = styled(Button)(({ theme, isActive }: { theme: any; isActive: boolean }) => ({
-  height: '40px',
-  textTransform: 'none',
-  color: theme.palette.ds.gray_cmax,
-  padding: `${theme.spacing(1)} !important`,
-  backgroundColor: isActive ? theme.palette.ds.gray_c200 : 'transparent',
-}));
-
-const TableTabs = {
+const TableTabs = Object.freeze({
   LIQUIDITY: 1,
   ORDER: 2,
   LENDBORROW: 3,
-};
+});
 
 interface Props {
   data: {
@@ -119,7 +111,17 @@ const PortfolioDapps = ({ data }: Props) => {
 
       <Stack direction="row">
         {buttonProps.map(button => (
-          <StyledButton key={button.label} isActive={button.active} theme={theme} onClick={() => handleChangeTab(button.id)}>
+          <Button
+            key={button.label}
+            onClick={() => handleChangeTab(button.id)}
+            sx={(theme: any) => ({
+              height: '40px',
+              textTransform: 'none',
+              color: theme.palette.ds.gray_cmax,
+              padding: `${theme.spacing(1)} !important`,
+              backgroundColor: button.active ? theme.palette.ds.gray_c200 : 'transparent',
+            })}
+          >
             {/* @ts-ignore */}
             <Typography variant="button1">
               {button.label} (
@@ -132,7 +134,7 @@ const PortfolioDapps = ({ data }: Props) => {
                 : null}
               )
             </Typography>
-          </StyledButton>
+          </Button>
         ))}
       </Stack>
 

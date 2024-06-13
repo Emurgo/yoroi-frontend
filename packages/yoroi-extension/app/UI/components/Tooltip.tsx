@@ -2,11 +2,17 @@ import React from 'react';
 import { default as MuiTooltip, TooltipProps } from '@mui/material/Tooltip';
 import { useTheme } from '@mui/material';
 
-export const Tooltip = ({ children, ...props }: TooltipProps): JSX.Element => {
+interface Props extends TooltipProps {
+  children: JSX.Element;
+  title: JSX.Element;
+}
+
+export const Tooltip = ({ children, title, ...props }: Props): JSX.Element => {
   const theme: any = useTheme();
 
   return (
     <MuiTooltip
+      title={title}
       arrow
       componentsProps={{
         tooltip: {
@@ -22,9 +28,6 @@ export const Tooltip = ({ children, ...props }: TooltipProps): JSX.Element => {
         },
       }}
       {...props}
-      sx={{
-        ...props.sx,
-      }}
     >
       {children}
     </MuiTooltip>
