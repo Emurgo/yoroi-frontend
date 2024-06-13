@@ -1237,7 +1237,7 @@ Object {
   "Network": Array [
     Object {
       "Backend": Object {
-        "BackendService": "https://iohk-mainnet.yoroiwallet.com",
+        "BackendService": "https://api.yoroiwallet.com",
         "TokenInfoService": "https://cdn.yoroiwallet.com",
       },
       "BaseConfig": Array [
