@@ -62,10 +62,13 @@ function SwapPage(props: StoresAndActionsProps): Node {
   const txSubmitErrorState = StateWrap(useState<?Error>(null));
   const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
 
-  useEffect(() => () => {
-    // UNMOUNT
-    setOrderStepValue(0);
-  }, []);
+  useEffect(
+    () => () => {
+      // UNMOUNT
+      setOrderStepValue(0);
+    },
+    []
+  );
 
   const swapFormCanContinue =
     selectedPoolCalculation != null &&
@@ -354,12 +357,13 @@ function SwapPage(props: StoresAndActionsProps): Node {
             display="flex"
             alignItems="center"
             justifyContent="center"
+            sx={{ height: '97px' }}
           >
             {orderStep === 1 && (
               <Button
                 onClick={processBackToStart}
                 sx={{ minWidth: '128px', minHeight: '48px' }}
-                variant="primary"
+                variant="secondary"
               >
                 Back
               </Button>

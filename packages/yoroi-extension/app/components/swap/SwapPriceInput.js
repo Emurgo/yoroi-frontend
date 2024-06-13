@@ -59,7 +59,14 @@ function SwapPriceInput({ swapStore, priceImpactState }: Props): Node {
           bgcolor: isReadonly ? 'grayscale.50' : 'common.white',
           columnGap: '6px',
           rowGap: '8px',
+          ...(!isReadonly && {
+            '&:hover': {
+              border: '1px solid',
+              borderColor: 'grayscale.max',
+            },
+          }),
         }}
+        height="56px"
       >
         <Box
           component="legend"
