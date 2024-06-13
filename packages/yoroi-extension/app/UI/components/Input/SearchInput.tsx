@@ -1,7 +1,19 @@
 import React from 'react';
-import { Input, InputAdornment, InputProps } from '@mui/material';
+import { Input, InputAdornment, InputProps, styled } from '@mui/material';
 import { useRef } from 'react';
 import { Icon } from './../icons/index';
+
+const StyledInput = styled(Input)(({ theme }: any) => ({
+  borderRadius: `${theme.shape.borderRadius}px`,
+  width: '320px',
+  height: '40px',
+  padding: `${theme.spacing(1)} ${theme.spacing(2)} ${theme.spacing(1)} ${theme.spacing(1)}`,
+  border: '1px solid',
+  borderColor: theme.palette.ds.gray_c400,
+  'input::placeholder': {
+    color: theme.palette.ds.gray_c600,
+  },
+}));
 
 export const SearchInput = (props: InputProps) => {
   const ref = useRef<HTMLInputElement>(null);
@@ -13,7 +25,7 @@ export const SearchInput = (props: InputProps) => {
   };
 
   return (
-    <Input
+    <StyledInput
       inputRef={ref}
       disableUnderline
       startAdornment={
@@ -33,18 +45,6 @@ export const SearchInput = (props: InputProps) => {
           <Icon.Search />
         </InputAdornment>
       }
-      sx={(theme: any) => ({
-        borderRadius: `${theme.shape.borderRadius}px`,
-        width: '320px',
-        height: '40px',
-        padding: `${theme.spacing(1)} ${theme.spacing(2)} ${theme.spacing(1)} ${theme.spacing(1)}`,
-        border: '1px solid',
-        borderColor: theme.palette.ds.gray_c400,
-        'input::placeholder': {
-          color: theme.palette.ds.gray_c600,
-        },
-        ...props.sx,
-      })}
       {...props}
     />
   );

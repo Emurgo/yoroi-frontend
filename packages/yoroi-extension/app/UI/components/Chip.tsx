@@ -10,7 +10,7 @@ export const ChipTypes = Object.freeze({
 type ChipType = 'active' | 'inactive' | 'disabled';
 
 interface Props {
-  label: string;
+  label: JSX.Element;
   type: ChipType;
   sx?: any;
 }

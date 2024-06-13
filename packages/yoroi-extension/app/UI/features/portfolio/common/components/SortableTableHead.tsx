@@ -20,12 +20,12 @@ const SortableTableHead = ({ headCells, order, orderBy, onRequestSort }: Props):
         {headCells.map(({ label, align, id, isPadding, disabledSort }) => {
           return (
             <TableCell key={id} align={align} sx={{ padding: `12.5px ${theme.spacing(2)}` }}>
-              {/* @ts-ignore */}
               <Stack
                 direction="row"
                 alignItems="center"
                 spacing={theme.spacing(1)}
                 onClick={() => (isPadding ? null : disabledSort ? null : onRequestSort(id))}
+                // @ts-ignore
                 sx={{
                   float: align,
                   cursor: isPadding || disabledSort ? 'normal' : 'pointer',
