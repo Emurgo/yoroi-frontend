@@ -23,6 +23,7 @@ import LoadingOverlay from '../../../components/swap/LoadingOverlay';
 import { IncorrectWalletPasswordError } from '../../../api/common/errors';
 import { observer } from 'mobx-react';
 import useSwapForm from '../context/swap-form/useSwapForm';
+import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 
 export const PRICE_IMPACT_MODERATE_RISK = 1;
 export const PRICE_IMPACT_HIGH_RISK = 10;
@@ -84,6 +85,8 @@ function SwapPage(props: StoresAndActionsProps): Node {
   const defaultTokenInfo = props.stores.tokenInfoStore.getDefaultTokenInfoSummary(
     network.NetworkId
   );
+  const getTokenInfo: (string => Promise<RemoteTokenInfo>) =
+      id => props.stores.tokenInfoStore.getLocalOrRemoteMetadata(network, id);
 
   const disclaimerFlag = props.stores.substores.ada.swapStore.swapDisclaimerAcceptanceFlag;
 
@@ -316,6 +319,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
               slippageValue={slippageValue}
               onSetNewSlippage={onSetNewSlippage}
               defaultTokenInfo={defaultTokenInfo}
+              getTokenInfo={getTokenInfo}
               priceImpactState={priceImpactState}
             />
           )}
@@ -328,6 +332,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
               userPasswordState={userPasswordState}
               txSubmitErrorState={txSubmitErrorState}
               defaultTokenInfo={defaultTokenInfo}
+              getTokenInfo={getTokenInfo}
               getFormattedPairingValue={getFormattedPairingValue}
             />
           )}

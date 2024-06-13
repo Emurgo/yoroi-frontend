@@ -1,12 +1,8 @@
 // @flow
 
-import { Type, ConstraintAction, ConstraintTiming } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
-import type {
-  TxStatusCodesType,
-  CertificateRelationType,
-  CoreAddressT,
-} from './enums';
+import { ConstraintAction, ConstraintTiming, Type } from 'lovefield';
+import type { CertificateRelationType, CoreAddressT, TxStatusCodesType, } from './enums';
 import typeof { CertificateKind } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 import type { KeyKindType } from '../../../cardanoCrypto/keys/types';
 import type { CoinTypesT } from '../../../../../../config/numbersConfig';
@@ -443,22 +439,19 @@ export type CardanoAssetMintMetadata = {|
   |}
 |}
 
-export type CommonMetadata = {|
-  numberOfDecimals: number,
-  ticker: null | string,
-  longName: null | string,
-  // If the token row is fetched from network, this is the ISO time string.
-  // Otherwise it is null or not present.
-  lastUpdatedAt?: ?string,
-|};
-
 export type TokenMetadata = {|
   +type: 'Cardano',
   // empty string for ADA
   +policyId: string,
   // empty string for ADA
   +assetName: string,
-  ...CommonMetadata,
+  numberOfDecimals: number,
+  ticker: null | string,
+  logo: null | string,
+  longName: null | string,
+  // If the token row is fetched from network, this is the ISO time string.
+  // Otherwise it is null or not present.
+  lastUpdatedAt?: ?string,
   +assetMintMetadata?: Array<CardanoAssetMintMetadata>
 |};
 
