@@ -1,4 +1,5 @@
 // @flow
+
 import { action, observable, runInAction } from 'mobx';
 import { find } from 'lodash';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
@@ -11,10 +12,10 @@ import { PoolMissingApiError } from '../../api/common/errors';
 import type { MangledAmountFunc, MangledAmountsResponse } from '../stateless/mangledAddresses';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import type { PoolInfo } from '@emurgo/yoroi-lib';
+import type { ExplorerPoolInfo as PoolInfo } from '@emurgo/yoroi-lib';
 import { PoolInfoApi } from '@emurgo/yoroi-lib';
 import { MultiToken } from '../../api/common/lib/MultiToken';
-import { maybe } from '../../coreUtils';
+import { forceNonNull, maybe } from '../../coreUtils';
 import type {
   GetDelegatedBalanceFunc,
   GetDelegatedBalanceResponse,
@@ -23,7 +24,6 @@ import type {
 
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { environment } from '../../environment';
-import { getDrepDelegationState } from '../../UI/features/governace/api/useDrepDelegationState';
 
 export type DelegationRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -62,7 +62,6 @@ type PoolTransitionModal = {| show: 'open' | 'closed' | 'idle', shouldUpdatePool
 
 export default class DelegationStore extends Store<StoresMap, ActionsMap> {
   @observable delegationRequests: Array<DelegationRequests> = [];
-  @observable isParticipatingToGovernance: boolean = false;
   @observable poolTransitionRequestInfo: ?PoolTransition = null;
   @observable poolTransitionConfig: PoolTransitionModal = {
     show: 'closed',
@@ -74,9 +73,9 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     this.poolTransitionConfig.shouldUpdatePool = config.shouldUpdatePool;
   };
 
-  @observable poolInfoQuery: LocalizedRequest<(Array<string>) => Promise<void>> = new LocalizedRequest<
+  @observable poolInfoQuery: LocalizedRequest<
     (Array<string>) => Promise<void>
-  >(async poolIds => {
+  > = new LocalizedRequest<(Array<string>) => Promise<void>>(async poolIds => {
     const { selectedNetwork } = this.stores.profile;
     if (selectedNetwork == null) throw new Error(`${nameof(DelegationStore)} no network selected`);
     await this.stores.substores.ada.delegation.updatePoolInfo({
@@ -141,12 +140,14 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
   };
 
   canUnmangleSomeUtxo: (PublicDeriver<>) => boolean = publicDeriver => {
-    const canUnmangleAmount: ?MultiToken = this.getDelegationRequests(publicDeriver)?.mangledAmounts.result?.canUnmangle;
+    const canUnmangleAmount: ?MultiToken = this.getDelegationRequests(publicDeriver)?.mangledAmounts
+      .result?.canUnmangle;
     return maybe(canUnmangleAmount, t => t.getDefault().gt(0)) ?? false;
   };
 
   getMangledAmountsOrZero: (PublicDeriver<>) => MangledAmountsResponse = publicDeriver => {
-    const resp: ?MangledAmountsResponse = this.getDelegationRequests(publicDeriver)?.mangledAmounts.result;
+    const resp: ?MangledAmountsResponse = this.getDelegationRequests(publicDeriver)?.mangledAmounts
+      .result;
     return {
       canUnmangle: resp?.canUnmangle ?? publicDeriver.getParent().getDefaultMultiToken(),
       cannotUnmangle: resp?.cannotUnmangle ?? publicDeriver.getParent().getDefaultMultiToken(),
@@ -167,7 +168,10 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
       // We cancel out any still present reward, in case it has not synced yet
       return publicDeriver.getParent().getDefaultMultiToken();
     }
-    return this._getDelegatedBalanceResult(publicDeriver)?.accountPart ?? publicDeriver.getParent().getDefaultMultiToken();
+    return (
+      this._getDelegatedBalanceResult(publicDeriver)?.accountPart ??
+      publicDeriver.getParent().getDefaultMultiToken()
+    );
   };
 
   getDelegatedUtxoBalance: (PublicDeriver<>) => ?MultiToken = publicDeriver => {
@@ -190,13 +194,18 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     return find(this.poolInfo, { networkId: network.NetworkId, poolId })?.poolInfo;
   };
 
-  getLocalRemotePoolInfo: ($ReadOnly<NetworkRow>, string) => void | PoolInfo = (network, poolId) => {
-    return find(this.poolInfo, { networkId: network.NetworkId, poolId })?.poolRemoteInfo ?? undefined;
+  getLocalRemotePoolInfo: ($ReadOnly<NetworkRow>, string) => void | PoolInfo = (
+    network,
+    poolId
+  ) => {
+    return (
+      find(this.poolInfo, { networkId: network.NetworkId, poolId })?.poolRemoteInfo ?? undefined
+    );
   };
 
   checkPoolTransition: () => Promise<void> = async () => {
     const publicDeriver = this.stores.wallets.selected;
-    if (publicDeriver == null) {
+    if (publicDeriver === null || this.poolTransitionRequestInfo != null) {
       return;
     }
 
@@ -204,9 +213,15 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     const currentlyDelegating = this.stores.delegation.isCurrentlyDelegating(publicDeriver);
     const currentPool = this.getDelegatedPoolId(publicDeriver);
 
+    if (currentPool == null) {
+      return;
+    }
+
     try {
+
+      const { BackendService } = publicDeriver.getParent().getNetworkInfo().Backend;
       const transitionResult = await maybe(currentPool, p =>
-        new PoolInfoApi().getTransition('pool14u30jkg45xwd27kmznz43hxy596lvrrpj0wz8w9a9k97kmt4p2d', RustModule.CrossCsl.init)
+        new PoolInfoApi(forceNonNull(BackendService) + '/api').getTransition(p, RustModule.CrossCsl.init)
       );
 
       const response = {
@@ -217,7 +232,12 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
         deadlinePassed: Number(transitionResult?.deadlineMilliseconds) < Date.now(),
       };
 
-      if (isStakeRegistered && currentlyDelegating && transitionResult && this.poolTransitionConfig.show === 'closed') {
+      if (
+        isStakeRegistered &&
+        currentlyDelegating &&
+        transitionResult &&
+        this.poolTransitionConfig.show === 'closed'
+      ) {
         this.setPoolTransitionConfig({ show: 'open' });
       }
 
@@ -225,23 +245,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
         this.poolTransitionRequestInfo = { ...response };
       });
     } catch (error) {
-      console.warn(error);
-    }
-  };
-  checkGovernanceStatus: () => Promise<void> = async () => {
-    const publicDeriver = this.stores.wallets.selected;
-    if (publicDeriver == null) {
-      return;
-    }
-    const walletId = publicDeriver?.getPublicDeriverId();
-    const governanceResult = await getDrepDelegationState(String(walletId));
-
-    try {
-      runInAction(() => {
-        this.isParticipatingToGovernance = governanceResult.kind !== 'none' && governanceResult.drepID !== null;
-      });
-    } catch (error) {
-      console.warn(error);
+      console.warn('Failed to check pool transition', error);
     }
   };
 

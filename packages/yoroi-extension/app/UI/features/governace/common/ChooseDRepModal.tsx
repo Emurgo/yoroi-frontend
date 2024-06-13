@@ -1,14 +1,12 @@
-// @flow
-
-import * as React from 'react';
 import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
 import { parseDrepId } from '@yoroi/staking';
+import * as React from 'react';
 import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
+import { TextInput } from '../../../components/Input/TextInput';
 import { useGovernance } from '../module/GovernanceContextProvider';
 import { useStrings } from './useStrings';
-import { TextInput } from '../../../components/Input/TextInput';
 
 type ChooseDRepModallProps = {
   onSubmit?: (drepId: string) => void;

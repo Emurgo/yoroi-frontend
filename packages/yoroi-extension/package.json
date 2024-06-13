@@ -38,7 +38,8 @@
     "translations:manage": "node ./translations/translation-runner.js",
     "translations:purge": "rimraf ./translations/messages",
     "metrics:pull": "ampli pull extension",
-    "metrics:status": "babel-node scripts/checkMetrics.js"
+    "metrics:status": "babel-node scripts/checkMetrics.js",
+    "tsc": "tsc --project tsconfig.json --noEmit"
   },
   "repository": {
     "type": "git",
@@ -153,7 +154,7 @@
     "@emurgo/cip4-js": "1.0.5",
     "@emurgo/cross-csl-browser": "4.4.0",
     "@emurgo/yoroi-eutxo-txs": "0.0.2-alpha.8",
-    "@emurgo/yoroi-lib": "0.15.4",
+    "@emurgo/yoroi-lib": "0.15.5-alpha.8",
     "@ledgerhq/hw-transport-u2f": "5.36.0-deprecated",
     "@ledgerhq/hw-transport-webauthn": "5.36.0-deprecated",
     "@ledgerhq/hw-transport-webhid": "5.51.1",
@@ -223,7 +224,8 @@
     "ts-loader": "^9.5.1",
     "typescript": "^5.4.5",
     "ua-parser-js": "1.0.37",
-    "util": "0.12.5"
+    "util": "0.12.5",
+    "url": "0.11.3"
   },
   "overrides": {
     "@babel/helpers": "7.16.0"
