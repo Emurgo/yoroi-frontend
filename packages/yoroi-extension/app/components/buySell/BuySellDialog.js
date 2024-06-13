@@ -20,6 +20,8 @@ import adaPng from '../../assets/images/ada.png';
 import banxaPng from '../../assets/images/banxa.png';
 import encryptusPng from '../../assets/images/encryptus.png';
 import { ReactComponent as InfoIcon } from '../../assets/images/info-icon-revamp.inline.svg';
+import { ReactComponent as YoroiIcon } from '../../assets/images/yoroi-logo-shape-blue.inline.svg';
+import { ReactComponent as FailIcon } from '../../assets/images/service-unavailable-error.svg';
 import { exchangeApiMaker, exchangeManagerMaker } from '@yoroi/exchange'
 
 declare var chrome;
@@ -55,11 +57,23 @@ const messages = defineMessages({
   },
   disclaimerText: {
     id: 'buysell.dialog.disclaimerText',
-    defaultMessage: '!!!Yoroi Wallet utilizes third-party web3 on-and-off ramp solutions for direct Fiat-ADA exchanges.  By clicking "Proceed," you acknowledge that you will be redirected to our partner\'s website, where you may need to accept their terms and conditions.  Please note, the third party web3 solution may have limitations based on your location and financial institution.'
+    defaultMessage: '!!!Yoroi Wallet utilizes third-party web3 on-and-off ramp solutions for direct Fiat-ADA exchanges. By clicking "Proceed," you acknowledge that you will be redirected to our partner\'s website, where you may need to accept their terms and conditions.  Please note, the third party web3 solution may have limitations based on your location and financial institution.'
   },
   proceed: {
     id: 'buysell.dialog.proceed',
     defaultMessage: 'PROCEED',
+  },
+  urlGenerationErrorDialogTitle: {
+    id: 'buysell.dialog.error.dialog.title',
+    defaultMessage: '!!!url generation',
+  },
+  longLoadingDialogText: {
+    id: 'buysell.dialog.longloading.text',
+    defaultMessage: '!!!We are redirecting you outside Yoroi. Please wait.',
+  },
+  failDialogText: {
+    id: 'buysell.dialog.fail.text',
+    defaultMessage: '!!!This service is currently unavailable. Please try again later.'
   },
 });
 
@@ -73,8 +87,8 @@ type Props = {|
 type State = {|
   +isBuying: boolean,
   +inputError: null | 'lessThanBuyMinimum' | 'notEnoughBalance' | 'lessThanSellMinimum',
-  // 'popOutDialog' is not really an error but is an temporary state
-  +urlGenenerationError: null | 'longLoading' | 'timeout' | 'fail',
+  // 'longLoading' is not really an error but is an temporary state
+  +urlGenerationError: null | 'longLoading' | 'timeout' | 'failed' | 'aborted',
   +amountAda: string,
   +isSubmitting: boolean,
 |};
@@ -153,6 +167,33 @@ const Disclaimer = styled(Box)({
   padding: 'var(--spacing-12, 12px) var(--spacing-16, 16px) var(--spacing-16, 16px) var(--spacing-16, 16px)'
 });
 
+const ErrorPopoutContent = styled(Box)({
+  height: '428px',
+  width: '343px',
+  // horizontally center the icon and text {
+  display: 'flex',
+  margin: 'auto',
+  '& .content': {
+    margin: 'auto',
+  },
+  // }
+  '& svg': {
+    // vertically center {
+    display: 'block',
+    margin: '0 auto',
+    // }
+    width: '137px',
+  },
+  '& .text': {
+    marginTop: '24px',
+    fontFamily: 'Rubik',
+    fontSize: '20px',
+    fontWeight: 500,
+    lineHeight: '30px',
+    textAlign: 'center',
+  },
+});
+
 const URL_GENERATION_LONG_LOADING_TIMEOUT = 2 * 1000;
 const URL_GENERATION_TIMEOUT = 30 * 1000;
 
@@ -165,17 +206,17 @@ export default class BuySellDialog extends Component<Props, State> {
   state: State = {
     isBuying: true,
     inputError: null,
-    urlGenenerationError: null,
+    urlGenerationError: null,
     amountAda: '',
     isSubmitting: false,
   };
 
-  urlGenerationTimeout: null | number = null;
+  urlGenerationTimeout: null | TimeoutID = null;
 
   onSubmit: () => Promise<void> = async () => {
     const { state, props } = this;
 
-    this.setState({ isSubmitting: true });
+    this.setState({ isSubmitting: true, urlGenerationError: null, });
     const api = exchangeApiMaker({ isProduction: true, partner: 'yoroi' });
     const manager = exchangeManagerMaker({ api });
 
@@ -210,10 +251,17 @@ export default class BuySellDialog extends Component<Props, State> {
 
     this.urlGenerationTimeout = setTimeout(
       () => {
+        // may already have failed
+        if (this.state.urlGenerationError) {
+          return;
+        }
         this.setState({ urlGenerationError: 'longLoading' });
         this.urlGenerationTimeout = setTimeout(
           () => {
-            this.setState({ urlGenrationError: 'timeout' });
+            if (this.state.urlGenerationError) {
+              return;
+            }
+            this.setState({ urlGenerationError: 'timeout' });
           },
           URL_GENERATION_TIMEOUT - URL_GENERATION_LONG_LOADING_TIMEOUT
         );
@@ -225,17 +273,19 @@ export default class BuySellDialog extends Component<Props, State> {
     try {
       url = await manager.referralLink.create(params);
     } catch {
-      this.setState({ urlGenerationError: 'fail' });
+      this.setState({ urlGenerationError: 'failed' });
       return;
     } finally {
-      cancelTimeout(this.urlGenerationTimeout);
+      clearTimeout(this.urlGenerationTimeout);
     }
 
-    // if timeout already happened, give up the process
-    if (this.state.urlGenerationError === 'timeout') {
+    // if timeout already happened or user aborted, give up on the process
+    const { urlGenerationError } = this.state;
+    if (urlGenerationError === 'timeout' || urlGenerationError === 'aborted') {
       return;
     }
-    this.setState({ urlGenrationError: null });
+    // may be in `longLoading` now
+    this.setState({ urlGenerationError: null });
 
     const self = this;
     chrome.tabs.create({ url: url.href }, (exchangePageTab) => {
@@ -366,32 +416,49 @@ export default class BuySellDialog extends Component<Props, State> {
   render(): Node {
     const { intl } = this.context;
     const { state, props } = this;
+    const { urlGenerationError } = state;
 
-    if (this.state.urlGenerationError === 'longLoading') {
+    if (urlGenerationError === 'longLoading') {
+      const abortUrlGeneration = () => {
+        this.setState({ urlGenerationError: 'aborted', isSubmitting: false, });
+      };
       return (
         <Dialog
-          title={"wait"}
+          title={intl.formatMessage(messages.urlGenerationErrorDialogTitle)}
           closeOnOverlayClick={false}
-        />
+          closeButton={<DialogCloseButton />}
+          onClose={abortUrlGeneration}
+        >
+          <ErrorPopoutContent>
+            <div class="content">
+              <YoroiIcon/>
+              <div class="text">{intl.formatMessage(messages.longLoadingDialogText)}</div>
+            </div>
+          </ErrorPopoutContent>
+        </Dialog>
       );
     }
 
-    if (this.state.urlGenerationError === 'timeout') {
+    if (urlGenerationError === 'timeout' || urlGenerationError === 'failed') {
       const dismissUrlGenerationError = () => {
+        this.setState({ urlGenerationError: null });
       };
 
       return (
         <Dialog
-          title={"fail"}
+          title={intl.formatMessage(messages.urlGenerationErrorDialogTitle)}
           closeOnOverlayClick={false}
+          closeButton={<DialogCloseButton />}
           onClose={dismissUrlGenerationError}
-          actions={[
-            {
-              label: "ok",
-              onClick: dismissUrlGenerationError,
-            }
-          ]}
-        />
+          closeOnOverlayClick={true}
+        >
+          <ErrorPopoutContent>
+            <div class="content">
+              <FailIcon/>
+              <div class="text">{intl.formatMessage(messages.failDialogText)}</div>
+            </div>
+          </ErrorPopoutContent>
+        </Dialog>
       );
     }
       
@@ -416,7 +483,7 @@ export default class BuySellDialog extends Component<Props, State> {
       >
         <Tabs
           value={state.isBuying ? 0 : 1}
-          onChange={() => this.setState({ isBuying: !state.isBuying })}
+          onChange={() => this.setState({ isBuying: !state.isBuying, inputError: null, })}
           sx={{
             width: '100%',
             [`& .${tabsClasses.indicator}`]: {
