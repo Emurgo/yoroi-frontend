@@ -64,52 +64,55 @@ export default function SelectAssetDialog({
       styleOverride={{ minWidth: '612px', maxWidth: '612px', minHeight: '600px' }}
       styleContentOverride={{ paddingTop: '16px' }}
       scrollableContentClass="scrollable-content"
+      contentHeader={
+        <>
+          <Box mb="8px" position="relative" height="40px">
+            <Box
+              sx={{
+                position: 'absolute',
+                left: '7px',
+                top: '30px',
+                transform: 'translateY(-50%)',
+                display: 'inline-flex',
+                color: 'grayscale.600',
+                height: '40px',
+              }}
+            >
+              <SearchIcon />
+            </Box>
+            <Box
+              component="input"
+              type="text"
+              placeholder="Search"
+              sx={{
+                border: '1px solid',
+                borderColor: 'grayscale.400',
+                borderRadius: '8px',
+                padding: '8px',
+                paddingLeft: '34px',
+                outline: 'none',
+                width: '100%',
+                fontSize: '14px',
+                fontFamily: 'Rubik',
+                height: '40px',
+                '&:focus': {
+                  borderWidth: '2px',
+                  borderColor: 'grayscale.max',
+                },
+              }}
+              onChange={e => {
+                setSearchTerm(e.target.value?.trim() ?? '');
+              }}
+            />
+          </Box>
+          <Box>
+            <Typography component="div" variant="body2" color="grayscale.700">
+              {filteredAssets.length} assets {searchTerm ? 'found' : 'available'}
+            </Typography>
+          </Box>
+        </>
+      }
     >
-      <Box mb="8px" position="relative" height="40px">
-        <Box
-          sx={{
-            position: 'absolute',
-            left: '7px',
-            top: '30px',
-            transform: 'translateY(-50%)',
-            display: 'inline-flex',
-            color: 'grayscale.600',
-            height: '40px',
-          }}
-        >
-          <SearchIcon />
-        </Box>
-        <Box
-          component="input"
-          type="text"
-          placeholder="Search"
-          sx={{
-            border: '1px solid',
-            borderColor: 'grayscale.400',
-            borderRadius: '8px',
-            padding: '8px',
-            paddingLeft: '34px',
-            outline: 'none',
-            width: '100%',
-            fontSize: '14px',
-            fontFamily: 'Rubik',
-            height: '40px',
-            '&:focus': {
-              borderWidth: '2px',
-              borderColor: 'grayscale.max',
-            },
-          }}
-          onChange={e => {
-            setSearchTerm(e.target.value?.trim() ?? '');
-          }}
-        />
-      </Box>
-      <Box>
-        <Typography component="div" variant="body2" color="grayscale.700">
-          {filteredAssets.length} assets {searchTerm ? 'found' : 'available'}
-        </Typography>
-      </Box>
-
       {filteredAssets.length !== 0 && (
         <Table
           rowGap="0px"

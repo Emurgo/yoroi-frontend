@@ -95,7 +95,6 @@ export const CreateSwapOrder = ({
 
         {/* Price between assets */}
         <SwapPriceInput
-          swapStore={swapStore}
           priceImpactState={priceImpactState}
         />
 
