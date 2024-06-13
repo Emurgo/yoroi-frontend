@@ -62,7 +62,7 @@ describe('Changing fiat currencies', function () {
           expect(walletInfo.fiatBalance, 'Fiat balance is different').to.equal(0);
         } else {
           expect(walletInfo.fiatCurrency, 'Fiat currency is different').to.equal(testDatum);
-          const reqResponse = await axios.get('https://iohk-mainnet.yoroiwallet.com/api/price/ADA/current');
+          const reqResponse = await axios.get('https://api.yoroiwallet.com/api/price/ADA/current');
           const prices = reqResponse.data.ticker.prices;
           const expectedFiatValue = roundUpCurrency(
             prices[testDatum] * walletInfo.balance,
