@@ -1,6 +1,6 @@
 // @flow
 
-import { action, observable, runInAction } from 'mobx';
+import { action, observable } from 'mobx';
 import { find } from 'lodash';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
@@ -58,19 +58,27 @@ export type PoolTransition = {|
   deadlinePassed: boolean,
 |};
 
-type PoolTransitionModal = {| show: 'open' | 'closed' | 'idle', shouldUpdatePool: boolean |};
+export type PoolTransitionModal = {| show: 'open' | 'closed' | 'idle', shouldUpdatePool?: boolean |};
 
 export default class DelegationStore extends Store<StoresMap, ActionsMap> {
   @observable delegationRequests: Array<DelegationRequests> = [];
-  @observable poolTransitionRequestInfo: ?PoolTransition = null;
-  @observable poolTransitionConfig: PoolTransitionModal = {
-    show: 'closed',
-    shouldUpdatePool: false,
-  };
+  @observable poolTransitionRequestInfo: { [number]: ?PoolTransition } = {};
+  @observable poolTransitionConfig: { [number]: PoolTransitionModal } = {};
 
-  @action setPoolTransitionConfig: any => void = (config: PoolTransitionModal) => {
-    this.poolTransitionConfig.show = config.show;
-    this.poolTransitionConfig.shouldUpdatePool = config.shouldUpdatePool;
+  getPoolTransitionConfig(publicDeriver: ?PublicDeriver<>): PoolTransitionModal {
+    return maybe(publicDeriver, w => this.poolTransitionConfig[w.getPublicDeriverId()]) ?? {
+      show: 'closed',
+      shouldUpdatePool: false,
+    };
+  }
+
+  @action setPoolTransitionConfig: (?PublicDeriver<>, PoolTransitionModal) => void = (publicDeriver: ?PublicDeriver<>, config: PoolTransitionModal) => {
+    if (publicDeriver != null) {
+      this.poolTransitionConfig[publicDeriver.getPublicDeriverId()] = {
+        show: config.show,
+        shouldUpdatePool: config.shouldUpdatePool,
+      };
+    }
   };
 
   @observable poolInfoQuery: LocalizedRequest<
@@ -203,9 +211,13 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     );
   };
 
-  checkPoolTransition: () => Promise<void> = async () => {
+  getPoolTransitionInfo(publicDeriver: ?PublicDeriver<>): ?PoolTransition {
+    return maybe(publicDeriver, w => this.poolTransitionRequestInfo[w.getPublicDeriverId()]);
+  }
+
+  @action checkPoolTransition: () => Promise<void> = async () => {
     const publicDeriver = this.stores.wallets.selected;
-    if (publicDeriver === null || this.poolTransitionRequestInfo != null) {
+    if (publicDeriver === null || this.poolTransitionRequestInfo[publicDeriver.getPublicDeriverId()] != null) {
       return;
     }
 
@@ -232,18 +244,18 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
         deadlinePassed: Number(transitionResult?.deadlineMilliseconds) < Date.now(),
       };
 
+      const walletId = publicDeriver.getPublicDeriverId();
+
       if (
         isStakeRegistered &&
         currentlyDelegating &&
         transitionResult &&
-        this.poolTransitionConfig.show === 'closed'
+        this.getPoolTransitionConfig(publicDeriver).show === 'closed'
       ) {
-        this.setPoolTransitionConfig({ show: 'open' });
+        this.setPoolTransitionConfig(publicDeriver, { show: 'open' });
       }
 
-      runInAction(() => {
-        this.poolTransitionRequestInfo = { ...response };
-      });
+      this.poolTransitionRequestInfo[walletId] = { ...response };
     } catch (error) {
       console.warn('Failed to check pool transition', error);
     }

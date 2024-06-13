@@ -5,7 +5,7 @@ import {
   useSwapOrdersByStatusCompleted,
   useSwapOrdersByStatusOpen,
   useSwapPoolsByPair,
-  useSwapTokensOnlyVerified
+  useSwapTokensOnlyVerified,
 } from '@yoroi/swap';
 import { Quantities } from '../../utils/quantities';
 import { useSwapForm } from './context/swap-form';
@@ -25,14 +25,16 @@ export async function useAsyncPools(tokenA: string, tokenB: string): Promise<voi
           runInAction(() => {
             setPrevUsedPair(pair);
             poolPairsChanged(pools);
-          })
+          });
         }
       },
     }
   );
 }
 
-export function useSwapFeeDisplay(defaultTokenInfo: RemoteTokenInfo): {|
+export function useSwapFeeDisplay(
+  defaultTokenInfo: RemoteTokenInfo
+): {|
   formattedFee: string,
   ptAmount: string,
   formattedPtAmount: string,
@@ -50,7 +52,7 @@ export function useSwapFeeDisplay(defaultTokenInfo: RemoteTokenInfo): {|
       ptAmount: '',
       formattedPtAmount: '',
       nonPtAmount: null,
-      formattedNonPtAmount: null
+      formattedNonPtAmount: null,
     };
   }
 
@@ -83,7 +85,8 @@ export function useSwapFeeDisplay(defaultTokenInfo: RemoteTokenInfo): {|
     };
   }
 
-  const formattedSell = Quantities.format(sellAmount, sellDecimals, sellDecimals) + ` ${sellTicker}`;
+  const formattedSell =
+    Quantities.format(sellAmount, sellDecimals, sellDecimals) + ` ${sellTicker}`;
   return {
     ptAmount: totalFeesPtToken,
     formattedPtAmount: formattedFee,
@@ -93,37 +96,50 @@ export function useSwapFeeDisplay(defaultTokenInfo: RemoteTokenInfo): {|
   };
 }
 
-export function useRichOpenOrders(): Array<any> {
-  const openOrders = useSwapOrdersByStatusOpen();
-  const { onlyVerifiedTokens } = useSwapTokensOnlyVerified();
-  const tokensMap = onlyVerifiedTokens.reduce((map, t) => ({ ...map, [t.id]: t }), {});
-  return openOrders.map(o => {
-    const fromToken = tokensMap[o.from.tokenId];
-    const toToken = tokensMap[o.to.tokenId];
-    return {
-      utxo: o.utxo,
-      from: { quantity: o.from.quantity, token: fromToken },
-      to: { quantity: o.to.quantity, token: toToken },
-      batcherFee: o.batcherFee,
-      valueAttached: o.valueAttached,
-      deposit: o.deposit,
-      provider: o.provider,
-      sender: o.sender,
-    };
-  })
+export function useRichOpenOrders(): any {
+  try {
+    const openOrders = useSwapOrdersByStatusOpen();
+    if (openOrders?.length === 0) return [];
+    const { onlyVerifiedTokens } = useSwapTokensOnlyVerified();
+    if (onlyVerifiedTokens.length === 0) return [];
+    const tokensMap = onlyVerifiedTokens.reduce((map, t) => ({ ...map, [t.id]: t }), {});
+    return openOrders.map(o => {
+      const fromToken = tokensMap[o.from.tokenId];
+      const toToken = tokensMap[o.to.tokenId];
+      return {
+        utxo: o.utxo,
+        from: { quantity: o.from.quantity, token: fromToken },
+        to: { quantity: o.to.quantity, token: toToken },
+        batcherFee: o.batcherFee,
+        valueAttached: o.valueAttached,
+        deposit: o.deposit,
+        provider: o.provider,
+        sender: o.sender,
+      };
+    });
+  } catch (error) {
+    console.warn(error);
+    return [];
+  }
 }
 
-export function useRichCompletedOrders(): Array<any> {
-  const completedOrders = useSwapOrdersByStatusCompleted();
-  const { onlyVerifiedTokens } = useSwapTokensOnlyVerified();
-  const tokensMap = onlyVerifiedTokens.reduce((map, t) => ({ ...map, [t.id]: t }), {});
-  return completedOrders.map(o => {
-    const fromToken = tokensMap[o.from.tokenId];
-    const toToken = tokensMap[o.to.tokenId];
-    return {
-      txHash: o.txHash,
-      from: { quantity: o.from.quantity, token: fromToken },
-      to: { quantity: o.to.quantity, token: toToken },
-    };
-  })
+export function useRichCompletedOrders(): any {
+  try {
+    const completedOrders = useSwapOrdersByStatusCompleted();
+    if (completedOrders?.length === 0) return [];
+    const { onlyVerifiedTokens } = useSwapTokensOnlyVerified();
+    const tokensMap = onlyVerifiedTokens.reduce((map, t) => ({ ...map, [t.id]: t }), {});
+    return completedOrders.map(o => {
+      const fromToken = tokensMap[o.from.tokenId];
+      const toToken = tokensMap[o.to.tokenId];
+      return {
+        txHash: o.txHash,
+        from: { quantity: o.from.quantity, token: fromToken },
+        to: { quantity: o.to.quantity, token: toToken },
+      };
+    });
+  } catch (error) {
+    console.warn(error);
+    return [];
+  }
 }

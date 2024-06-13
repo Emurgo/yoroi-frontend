@@ -436,6 +436,7 @@ export type RemoteTokenInfo = {|
   +name?: string,
   +decimals?: number,
   +ticker?: string,
+  +logo?: string,
 |};
 export type TokenInfoResponse = {|
   [key: string]: (RemoteTokenInfo | null),

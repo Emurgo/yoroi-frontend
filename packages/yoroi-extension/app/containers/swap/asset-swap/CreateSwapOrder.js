@@ -24,6 +24,7 @@ type Props = {|
   onSetNewSlippage: number => void,
   swapStore: SwapStore,
   defaultTokenInfo: RemoteTokenInfo,
+  getTokenInfo: string => Promise<RemoteTokenInfo>,
   priceImpactState: ?PriceImpact,
 |};
 
@@ -32,6 +33,7 @@ export const CreateSwapOrder = ({
   onSetNewSlippage,
   swapStore,
   defaultTokenInfo,
+  getTokenInfo,
   priceImpactState,
 }: Props): React$Node => {
   const [openedDialog, setOpenedDialog] = useState('');
@@ -77,6 +79,7 @@ export const CreateSwapOrder = ({
         {/* From Field */}
         <EditSellAmount
           defaultTokenInfo={defaultTokenInfo}
+          getTokenInfo={getTokenInfo}
           onAssetSelect={() => setOpenedDialog('from')}
         />
 
@@ -86,6 +89,7 @@ export const CreateSwapOrder = ({
         {/* To Field */}
         <EditBuyAmount
           defaultTokenInfo={defaultTokenInfo}
+          getTokenInfo={getTokenInfo}
           onAssetSelect={() => setOpenedDialog('to')}
         />
 
@@ -118,6 +122,7 @@ export const CreateSwapOrder = ({
             sellTokenInfoChanged(val);
           }}
           defaultTokenInfo={defaultTokenInfo}
+          getTokenInfo={getTokenInfo}
         />
       )}
       {openedDialog === 'to' && (
@@ -129,6 +134,7 @@ export const CreateSwapOrder = ({
             buyTokenInfoChanged(val);
           }}
           defaultTokenInfo={defaultTokenInfo}
+          getTokenInfo={getTokenInfo}
         />
       )}
       {openedDialog === 'slippage' && (
