@@ -250,9 +250,9 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
         isStakeRegistered &&
         currentlyDelegating &&
         transitionResult &&
-        this.poolTransitionConfig[walletId].show === 'closed'
+        this.getPoolTransitionConfig(publicDeriver).show === 'closed'
       ) {
-        this.poolTransitionConfig[walletId] = { show: 'open' };
+        this.setPoolTransitionConfig(publicDeriver, { show: 'open' });
       }
 
       this.poolTransitionRequestInfo[walletId] = { ...response };

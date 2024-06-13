@@ -118,7 +118,7 @@ class StakingPageContent extends Component<AllProps> {
 
     return (
       <DelegatedStakePoolCard
-        poolTransition={delegationStore.poolTransitionInfo(publicDeriver)}
+        poolTransition={delegationStore.getPoolTransitionInfo(publicDeriver)}
         delegatedPool={delegatedPool}
         undelegate={async () => this.createWithdrawalTx(true)} // shouldDeregister=true
         delegateToSpecificPool={async (poolId): any => {
