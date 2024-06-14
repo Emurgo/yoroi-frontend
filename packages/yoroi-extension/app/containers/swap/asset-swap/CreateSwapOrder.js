@@ -91,7 +91,7 @@ export const CreateSwapOrder = ({
         />
 
         {/* Clear and switch */}
-        <MiddleActions swapStore={swapStore} />
+        <MiddleActions />
 
         {/* To Field */}
         <EditBuyAmount
