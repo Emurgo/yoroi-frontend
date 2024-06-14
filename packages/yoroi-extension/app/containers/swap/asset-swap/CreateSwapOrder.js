@@ -64,6 +64,7 @@ export const CreateSwapOrder = ({
     }
   }
 
+  // TODO: refactor, this hook call will be removed and replaced with store function
   useAsyncPools(sell.tokenId, buy.tokenId)
     .then(() => null)
     .catch(() => null);
