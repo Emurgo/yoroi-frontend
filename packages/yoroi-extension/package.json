@@ -73,7 +73,7 @@
     "@babel/runtime": "7.12.18",
     "@babel/runtime-corejs3": "7.12.18",
     "@emurgo/cardano-message-signing-nodejs": "1.0.1",
-    "@emurgo/cardano-serialization-lib-nodejs": "12.0.0-alpha.26",
+    "@emurgo/cardano-serialization-lib-nodejs": "12.0.0-alpha.32",
     "@emurgo/cross-csl-nodejs": "4.4.0",
     "@pmmmwh/react-refresh-webpack-plugin": "0.5.11",
     "@yoroi/common": "1.5.0",
