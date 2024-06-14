@@ -43,9 +43,6 @@ function SwapPriceInput({ priceImpactState }: Props): Node {
 
   const formattedPrice = marketPrice ? format(marketPrice) : pricePlaceholder;
 
-  // if (limitPrice.displayValue === '' && marketPrice != null) {
-  //   onChangeLimitPrice(formattedPrice);
-  // }
   const displayValue = isMarketOrder ? formattedPrice : limitPrice.displayValue;
   const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
   const isReadonly = !isValidTickers || isMarketOrder;
