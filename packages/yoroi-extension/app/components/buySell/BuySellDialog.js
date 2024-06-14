@@ -447,7 +447,7 @@ export default class BuySellDialog extends Component<Props, State> {
       return (
         <Dialog
           title={intl.formatMessage(messages.urlGenerationErrorDialogTitle)}
-          closeOnOverlayClick={true}
+          closeOnOverlayClick
           closeButton={<DialogCloseButton />}
           onClose={dismissUrlGenerationError}
         >
