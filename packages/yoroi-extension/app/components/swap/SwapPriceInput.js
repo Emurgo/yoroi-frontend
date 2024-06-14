@@ -7,7 +7,6 @@ import { Quantities } from '../../utils/quantities';
 import { useSwap } from '@yoroi/swap';
 import { PRICE_PRECISION } from './common';
 import { useSwapForm } from '../../containers/swap/context/swap-form';
-import { runInAction } from 'mobx';
 import { observer } from 'mobx-react';
 import {
   FormattedActualPrice,
