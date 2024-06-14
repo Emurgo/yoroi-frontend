@@ -190,7 +190,6 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
   };
 
   const buyUpdateHandler = ({ input, quantity }) => {
-    console.log('🚀 ~ buyUpdateHandler ~ input:', input);
     if (quantity !== buyQuantity) {
       buyQuantityChanged(quantity);
     }
