@@ -430,9 +430,9 @@ export default class BuySellDialog extends Component<Props, State> {
           onClose={abortUrlGeneration}
         >
           <ErrorPopoutContent>
-            <div class="content">
+            <div className="content">
               <YoroiIcon/>
-              <div class="text">{intl.formatMessage(messages.longLoadingDialogText)}</div>
+              <div className="text">{intl.formatMessage(messages.longLoadingDialogText)}</div>
             </div>
           </ErrorPopoutContent>
         </Dialog>
@@ -447,15 +447,14 @@ export default class BuySellDialog extends Component<Props, State> {
       return (
         <Dialog
           title={intl.formatMessage(messages.urlGenerationErrorDialogTitle)}
-          closeOnOverlayClick={false}
+          closeOnOverlayClick={true}
           closeButton={<DialogCloseButton />}
           onClose={dismissUrlGenerationError}
-          closeOnOverlayClick={true}
         >
           <ErrorPopoutContent>
-            <div class="content">
+            <div className="content">
               <FailIcon/>
-              <div class="text">{intl.formatMessage(messages.failDialogText)}</div>
+              <div className="text">{intl.formatMessage(messages.failDialogText)}</div>
             </div>
           </ErrorPopoutContent>
         </Dialog>

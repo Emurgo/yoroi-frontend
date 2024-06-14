@@ -64,7 +64,7 @@ export default class LoadingStore extends BaseLoadingStore<StoresMap, ActionsMap
     return this._uriParams;
   }
 
-  setUriParams(uriParams: UriParams) {
+  setUriParams(uriParams: UriParams): void {
     runInAction(() => {
       this._uriParams = uriParams;
     });
