@@ -100,22 +100,27 @@ const PortfolioDapps = ({ data }: Props) => {
         isLoading={isLoading}
         tooltipTitle={
           <>
-            <Typography display={'block'}>% {strings.balancePerformance}</Typography>
-            <Typography display={'block'}>+/- {strings.balanceChange}</Typography>
-            <Typography display={'block'}>
+            <Typography variant="body2" display={'block'}>
+              % {strings.balancePerformance}
+            </Typography>
+            <Typography variant="body2" display={'block'}>
+              +/- {strings.balanceChange}
+            </Typography>
+            <Typography variant="body2" display={'block'}>
               {strings.in24hours} ({strings.dapps})
             </Typography>
           </>
         }
       />
 
-      <Stack direction="row">
+      <Stack direction="row" spacing={theme.spacing(0.5)}>
         {buttonProps.map(button => (
           <Button
             key={button.label}
             onClick={() => handleChangeTab(button.id)}
             sx={(theme: any) => ({
-              height: '40px',
+              height: '2.5rem',
+              width: '9rem',
               textTransform: 'none',
               color: theme.palette.ds.gray_cmax,
               padding: `${theme.spacing(1)} !important`,
@@ -123,7 +128,7 @@ const PortfolioDapps = ({ data }: Props) => {
             })}
           >
             {/* @ts-ignore */}
-            <Typography variant="button1">
+            <Typography variant="body1" fontWeight="500" sx={{ whiteSpace: 'nowrap' }}>
               {button.label} (
               {button.id === TableTabs.LIQUIDITY
                 ? liquidityList.length

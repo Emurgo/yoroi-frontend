@@ -76,7 +76,7 @@ const PortfolioHeader = ({ balance, setKeyword, isLoading, tooltipTitle }: Props
               <Skeleton width="65px" height="20px" />
             </Stack>
           ) : (
-            <Tooltip title={tooltipTitle} placement="right">
+            <Tooltip title={tooltipTitle} placement="right" sx={{ width: '182px', height: '76px' }}>
               <Stack direction="row" alignItems="center" spacing={theme.spacing(1)} sx={{ marginLeft: theme.spacing(2) }}>
                 <Chip
                   type={balance.percents > 0 ? ChipTypes.ACTIVE : balance.percents < 0 ? ChipTypes.INACTIVE : ChipTypes.DISABLED}

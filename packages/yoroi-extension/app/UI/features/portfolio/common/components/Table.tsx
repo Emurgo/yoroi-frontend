@@ -45,7 +45,7 @@ const Table = ({
     <Stack width="full" justifyContent="center" alignItems="center" sx={{ flex: 1 }}>
       <Stack direction="column" alignItems="center" spacing={theme.spacing(3)}>
         <Box component="img" src={noResultsPng}></Box>
-        <Typography variant="h4" fontWeight="500" color="ds.black_static">
+        <Typography variant="h4" fontWeight="500" color="ds.black_static" sx={{ lineHeight: '26px' }}>
           {strings.noResultsForThisSearch}
         </Typography>
       </Stack>

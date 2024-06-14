@@ -125,7 +125,7 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
             },
           }}
         >
-          <TableCell>
+          <TableCell sx={{ padding: '16.8px 1rem' }}>
             <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
               <Box
                 width="40px"
@@ -147,13 +147,13 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
             </Stack>
           </TableCell>
 
-          <TableCell>
+          <TableCell sx={{ padding: '16.8px 1rem' }}>
             <Typography variant="body2" color="ds.text_gray_medium">
               {formatNumber(row.price)} USD
             </Typography>
           </TableCell>
 
-          <TableCell>
+          <TableCell sx={{ padding: '16.8px 1rem' }}>
             <Chip
               type={row['24h'] > 0 ? ChipTypes.ACTIVE : row['24h'] < 0 ? ChipTypes.INACTIVE : ChipTypes.DISABLED}
               label={
@@ -173,7 +173,7 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
             />
           </TableCell>
 
-          <TableCell>
+          <TableCell sx={{ padding: '16.8px 1rem' }}>
             <Chip
               type={row['1W'] > 0 ? ChipTypes.ACTIVE : row['1W'] < 0 ? ChipTypes.INACTIVE : ChipTypes.DISABLED}
               label={
@@ -193,7 +193,7 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
             />
           </TableCell>
 
-          <TableCell>
+          <TableCell sx={{ padding: '16.8px 1rem' }}>
             <Chip
               type={row['1M'] > 0 ? ChipTypes.ACTIVE : row['1M'] < 0 ? ChipTypes.INACTIVE : ChipTypes.DISABLED}
               label={
@@ -213,13 +213,13 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
             />
           </TableCell>
 
-          <TableCell>
+          <TableCell sx={{ padding: '16.8px 1rem' }}>
             <Typography variant="body2" color="ds.text_gray_medium">
               {formatNumber(row.portfolioPercents)} %
             </Typography>
           </TableCell>
 
-          <TableCell>
+          <TableCell sx={{ padding: '16.8px 1rem' }}>
             <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
               <Stack direction="column">
                 <Typography color="ds.text_gray_normal">

@@ -19,7 +19,7 @@ const SortableTableHead = ({ headCells, order, orderBy, onRequestSort }: Props):
       <TableRow>
         {headCells.map(({ label, align, id, isPadding, disabledSort }) => {
           return (
-            <TableCell key={id} align={align} sx={{ padding: `12.5px ${theme.spacing(2)}` }}>
+            <TableCell key={id} align={align} sx={{ padding: `11.8px ${theme.spacing(2)}` }}>
               <Stack
                 direction="row"
                 alignItems="center"

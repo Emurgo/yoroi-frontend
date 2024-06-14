@@ -36,7 +36,8 @@ export const Chip = ({ label, type, sx, ...props }: Props): JSX.Element => {
       label={label}
       {...props}
       sx={{
-        maxWidth: 'fit-content',
+        minWidth: '63px',
+        height: '20px',
         padding: '2px 6px !important',
         borderRadius: '20px',
         '& .MuiChip-label': {

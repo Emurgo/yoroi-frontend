@@ -76,7 +76,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
   };
 
   return (
-    <Stack direction="column" spacing={theme.spacing(4)} sx={{ padding: theme.spacing(3) }}>
+    <Stack direction="column" spacing={theme.spacing(4)} sx={{ width: '100%', padding: theme.spacing(3) }}>
       <Stack direction="row" justifyContent="space-between" alignItems="center">
         {isFetching ? (
           <Skeleton width="131px" height="13px" />
@@ -100,8 +100,12 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
           <Tooltip
             title={
               <>
-                <Typography display={'block'}>{strings.tokenPriceChange}</Typography>
-                <Typography display={'block'}>{strings.in24hours}</Typography>
+                <Typography variant="body2" display={'block'}>
+                  {strings.tokenPriceChange}
+                </Typography>
+                <Typography variant="body2" display={'block'}>
+                  {strings.in24hours}
+                </Typography>
               </>
             }
             placement="top"
@@ -164,7 +168,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
           }}
         >
           {isFetching ? null : (
-            <ResponsiveContainer width="100%" height={chartHeight} style={{ padding: 0 }}>
+            <ResponsiveContainer width={'99%'} height={chartHeight}>
               <LineChart
                 data={tokenInfo?.chartData[activePeriodId]}
                 onMouseDown={handleMouseDown}

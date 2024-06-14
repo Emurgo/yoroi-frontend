@@ -63,9 +63,15 @@ const PortfolioWallet = ({ data }: Props): JSX.Element => {
         isLoading={isLoading}
         tooltipTitle={
           <>
-            <Typography display={'block'}>% {strings.balancePerformance}</Typography>
-            <Typography display={'block'}>+/- {strings.balanceChange}</Typography>
-            <Typography display={'block'}>{strings.in24hours}</Typography>
+            <Typography variant="body2" display={'block'}>
+              % {strings.balancePerformance}
+            </Typography>
+            <Typography variant="body2" display={'block'}>
+              +/- {strings.balanceChange}
+            </Typography>
+            <Typography variant="body2" display={'block'}>
+              {strings.in24hours}
+            </Typography>
           </>
         }
       />

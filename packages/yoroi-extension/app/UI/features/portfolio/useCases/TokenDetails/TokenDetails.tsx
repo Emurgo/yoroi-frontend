@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Divider, Stack, Typography } from '@mui/material';
+import { Box, Divider, Stack, Typography } from '@mui/material';
 import { ReactComponent as BackIcon } from '../../../../../assets/images/assets-page/back-arrow.inline.svg';
 import { styled } from '@mui/material/styles';
 import { Skeleton, Card } from '../../../../components';
@@ -77,17 +77,26 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
   }, []);
 
   return (
-    <Box>
+    <Box sx={{ width: '100%' }}>
       <Header>
-        <Button
+        <Box
+          height="40px"
           onClick={() => navigateTo.portfolio()}
-          sx={{ color: theme.palette.ds.black_static, display: 'flex', gap: theme.spacing(2) }}
+          sx={{
+            color: theme.palette.ds.black_static,
+            display: 'flex',
+            gap: theme.spacing(2),
+            alignItems: 'center',
+            '&:hover': {
+              cursor: 'pointer',
+            },
+          }}
         >
           <BackIcon />
           <Typography variant="body2" fontWeight="500" color="ds.text_gray_normal">
             {strings.backToPortfolio}
           </Typography>
-        </Button>
+        </Box>
         <Stack direction="row" spacing={theme.spacing(2)}>
           <NavigationButton variant="contained" onClick={() => navigateTo.swapPage()} label={strings.swap} />
           <NavigationButton variant="secondary" onClick={() => navigateTo.sendPage()} label={strings.send} />
