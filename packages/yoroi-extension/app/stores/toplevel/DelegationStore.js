@@ -18,6 +18,7 @@ import LocalizedRequest from '../lib/LocalizedRequest';
 import type { MangledAmountsResponse } from '../stateless/mangledAddresses';
 
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import { unwrapStakingKey } from '../../api/ada/lib/storage/bridge/utils';
 import { environment } from '../../environment';
 
 export type DelegationRequests = {|
@@ -62,10 +63,10 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     show: 'closed',
     shouldUpdatePool: false,
   };
-  @observable stakingKeyHash: ?string = null;
+  @observable governanceStatus: any = null;
 
-  @action setStagingKeyHash: any => void = (stakingHash: PoolTransitionModal) => {
-    this.stakingKeyHash = stakingHash;
+  @action setGovernanceStatus: any => void = (status: any) => {
+    this.governanceStatus = status;
   };
 
   @action setPoolTransitionConfig: any => void = (config: PoolTransitionModal) => {
@@ -257,7 +258,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     });
   };
 
-  getStakingKeyAndState: (PublicDeriver<any>) => any = async publicDeriver => {
+  checkGovernanceStatus: (PublicDeriver<any>) => any = async publicDeriver => {
     try {
       const withStakingKey = asGetStakingKey(publicDeriver);
       if (withStakingKey == null) {
@@ -269,24 +270,20 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
 
       const stakingKeyResp = await withStakingKey.getStakingKey();
 
-      this.setStagingKeyHash(stakingKeyResp.addr.Hash);
+      const skey = unwrapStakingKey(stakingKeyResp.addr.Hash).to_keyhash()?.to_hex();
+
       const backendService = publicDeriver.getParent().getNetworkInfo().Backend.BackendService;
-      console.log('stakingKeyResp.addr.Hash', stakingKeyResp.addr.Hash);
+      const backendServiceZero = publicDeriver.getParent().getNetworkInfo().Backend.BackendServiceZero;
 
       const govApi = new GovernanceApi({
         oldBackendUrl: String(backendService),
-        newBackendUrl: String(backendService),
+        newBackendUrl: String(backendServiceZero),
         networkId: networkId,
-        wasm: RustModule.CrossCsl.init('global'),
+        wasmFactory: RustModule.CrossCsl.init,
       });
 
-      return await stakingKeyResp.addr.Hash;
-      // console.log('govApi', govApi);
-      // return 'BLABLALALALA';
-
-      // const stakingState = await govApi.getAccountState(stakingKeyResp.addr.Hash, stakingKeyResp.addr.Hash);
-
-      // console.log('@@@@@@@@@stakingState', stakingState);
+      const governanceStatus = await govApi.getAccountState(skey, skey);
+      this.setGovernanceStatus(governanceStatus);
     } catch (e) {}
   };
 

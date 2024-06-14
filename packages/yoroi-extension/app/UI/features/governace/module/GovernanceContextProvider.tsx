@@ -29,7 +29,7 @@ export const GovernanceContextProvider = ({ children, currentWallet }: Governanc
   const [stakingKeyHash, setStakingKeyHash] = React.useState(null);
   const [stakingKeyHex, setStakingKeyHex] = React.useState(null);
 
-  const { walletId, networkId, currentPool, selectedWallet, backendService } = currentWallet;
+  const { walletId, networkId, currentPool, selectedWallet, backendService, backendServiceZero } = currentWallet;
   const governanceManager = useGovernanceManagerMaker(walletId, networkId);
 
   React.useEffect(() => {
@@ -50,7 +50,7 @@ export const GovernanceContextProvider = ({ children, currentWallet }: Governanc
 
         const govApi = new GovernanceApi({
           oldBackendUrl: String(backendService),
-          newBackendUrl: String(backendService),
+          newBackendUrl: String(backendServiceZero),
           networkId: networkId,
           wasmFactory: RustModule.CrossCsl.init,
         });
