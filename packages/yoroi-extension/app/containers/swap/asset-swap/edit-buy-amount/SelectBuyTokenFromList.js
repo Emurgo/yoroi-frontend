@@ -12,9 +12,10 @@ type Props = {|
   onClose(): void,
   onTokenInfoChanged: * => void,
   defaultTokenInfo: RemoteTokenInfo,
+  getTokenInfo: string => Promise<RemoteTokenInfo>,
 |};
 
-export default function SelectBuyTokenFromList({ store, onClose, onTokenInfoChanged, defaultTokenInfo }: Props): Node {
+export default function SelectBuyTokenFromList({ store, onClose, onTokenInfoChanged, defaultTokenInfo, getTokenInfo }: Props): Node {
   const {
     sellQuantity: { isTouched: isSellTouched },
     buyQuantity: { isTouched: isBuyTouched },
@@ -66,6 +67,7 @@ export default function SelectBuyTokenFromList({ store, onClose, onTokenInfoChan
       onAssetSelected={handleAssetSelected}
       onClose={onClose}
       defaultTokenInfo={defaultTokenInfo}
+      getTokenInfo={getTokenInfo}
     />
   );
 }

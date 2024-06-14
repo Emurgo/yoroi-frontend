@@ -56,7 +56,7 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
         }}
       >
         <Box display="flex" gap="8px" alignItems="center">
-          <Typography component="div" variant="body1" color="grayscale.500">
+          <Typography component="div" variant="body1" color="grayscale.600">
             DEX
           </Typography>
         </Box>
@@ -94,7 +94,7 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
           onClick={handleShowFullInfo}
         >
           {pool.provider && (
-            <Typography component="div" variant="body1" color="grayscale.max" mb="8px">
+            <Typography component="div" variant="body1" color="grayscale.max">
               {titleTotalFeesFormatted}
             </Typography>
           )}
@@ -104,7 +104,6 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
               display: 'flex',
               gap: '4px',
               alignItems: 'center',
-              marginBottom: '8px',
             }}
           >
             <Box sx={{ transform: showFullInfo ? 'rotate(180deg)' : 'rotate(0deg)' }}>

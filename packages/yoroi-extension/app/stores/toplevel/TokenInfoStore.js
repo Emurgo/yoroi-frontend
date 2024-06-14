@@ -81,7 +81,7 @@ export default class TokenInfoStore<
     if (remoteTokeninfo != null) {
       return remoteTokeninfo;
     }
-    return { name: undefined, ticker: undefined, decimals: undefined };
+    return { name: undefined, ticker: undefined, decimals: undefined, logo: undefined };
   }
 
   fetchMissingTokenInfo: (networkId: number, tokenIds: Array<string>) => Promise<void> = async (

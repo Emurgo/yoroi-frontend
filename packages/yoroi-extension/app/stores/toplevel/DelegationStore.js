@@ -1,6 +1,6 @@
 // @flow
 
-import { action, observable, runInAction } from 'mobx';
+import { action, observable } from 'mobx';
 import { find } from 'lodash';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
@@ -12,10 +12,10 @@ import { PoolMissingApiError } from '../../api/common/errors';
 import type { MangledAmountFunc, MangledAmountsResponse } from '../stateless/mangledAddresses';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import type { PoolInfo } from '@emurgo/yoroi-lib';
+import type { ExplorerPoolInfo as PoolInfo } from '@emurgo/yoroi-lib';
 import { PoolInfoApi } from '@emurgo/yoroi-lib';
 import { MultiToken } from '../../api/common/lib/MultiToken';
-import { maybe } from '../../coreUtils';
+import { forceNonNull, maybe } from '../../coreUtils';
 import type {
   GetDelegatedBalanceFunc,
   GetDelegatedBalanceResponse,
@@ -55,21 +55,30 @@ export type PoolTransition = {|
   deadlineMilliseconds: ?number,
   shouldShowTransitionFunnel: boolean,
   suggestedPool: ?PoolInfo,
+  deadlinePassed: boolean,
 |};
 
-type PoolTransitionModal = {| show: 'open' | 'closed' | 'idle', shouldUpdatePool: boolean |};
+export type PoolTransitionModal = {| show: 'open' | 'closed' | 'idle', shouldUpdatePool?: boolean |};
 
 export default class DelegationStore extends Store<StoresMap, ActionsMap> {
   @observable delegationRequests: Array<DelegationRequests> = [];
-  @observable poolTransitionRequestInfo: ?PoolTransition = null;
-  @observable poolTransitionConfig: PoolTransitionModal = {
-    show: 'closed',
-    shouldUpdatePool: false,
-  };
+  @observable poolTransitionRequestInfo: { [number]: ?PoolTransition } = {};
+  @observable poolTransitionConfig: { [number]: PoolTransitionModal } = {};
 
-  @action setPoolTransitionConfig: any => void = (config: PoolTransitionModal) => {
-    this.poolTransitionConfig.show = config.show;
-    this.poolTransitionConfig.shouldUpdatePool = config.shouldUpdatePool;
+  getPoolTransitionConfig(publicDeriver: ?PublicDeriver<>): PoolTransitionModal {
+    return maybe(publicDeriver, w => this.poolTransitionConfig[w.getPublicDeriverId()]) ?? {
+      show: 'closed',
+      shouldUpdatePool: false,
+    };
+  }
+
+  @action setPoolTransitionConfig: (?PublicDeriver<>, PoolTransitionModal) => void = (publicDeriver: ?PublicDeriver<>, config: PoolTransitionModal) => {
+    if (publicDeriver != null) {
+      this.poolTransitionConfig[publicDeriver.getPublicDeriverId()] = {
+        show: config.show,
+        shouldUpdatePool: config.shouldUpdatePool,
+      };
+    }
   };
 
   @observable poolInfoQuery: LocalizedRequest<
@@ -109,7 +118,6 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     const { delegation } = this.actions;
     this.registerReactions([this._changeWallets]);
     delegation.setSelectedPage.listen(this._setSelectedPage);
-    this.checkPoolTransition();
   }
 
   @action
@@ -203,35 +211,13 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     );
   };
 
-  //   exports.EMURGO_POOLS = {
-  //     old: {
-  //         emurgo: [
-  //             'pool14u30jkg45xwd27kmznz43hxy596lvrrpj0wz8w9a9k97kmt4p2d',
-  //             'pool1qs6h0y7czzt605kptmrv6cr85kxd6tajr2hs0etvxphv7tr7nqu',
-  //             'pool1cd987kw92e3nmjywcfwfws79a09rwp0p0xj5mdtr39qukxgp9uf',
-  //             'pool1c55n72ag3tz8g7rntzuu9a86u7eugsy008xl3xsje8kwgvz2vdz',
-  //             'pool13mas2wthxs28zftxskcsd8t87jk2w9ntc0u5uflt45sh7lcvs8h',
-  //             'pool1pmm654jfx088td54ekkkd0j28x6r5gnjdhnutzggursrxjnpk2y' // Pool [EMUR8] Emurgo #8
-  //         ],
-  //         yoroi: [
-  //             'pool1mut4phum9hegtl8m2r68gpjh5x8w8t6zwf75zrphhp3qwwrrpgt' // Pool [YOROI] Yoroi
-  //         ]
-  //     },
-  //     new: {
-  //         emurgo: [
-  //             'pool1m0drnjxsvnlesq0rwmur2rh6lenuql57jfzd6cf6aegj2cv7ugy',
-  //             'pool1xkwnlr34tjrnkz6u4c0p36cju3xuls4dyynsdkf6cv22ksuhz6q' // Pool [EMURB] Emurgo B
-  //         ],
-  //         yoroi: [
-  //             'pool192pfftt48zc4x5aellvpufk6l6zxllpldw0rx82vrhqrqfhhqs2',
-  //             'pool1kx0jm9ycs3t99tnwafw6w72jkdlzhj5ltxe2nrzkd9x2u5x343h' // Pool [YORO2] Yoroi pool 2
-  //         ]
-  //     }
-  // };
+  getPoolTransitionInfo(publicDeriver: ?PublicDeriver<>): ?PoolTransition {
+    return maybe(publicDeriver, w => this.poolTransitionRequestInfo[w.getPublicDeriverId()]);
+  }
 
-  checkPoolTransition: () => Promise<void> = async () => {
+  @action checkPoolTransition: () => Promise<void> = async () => {
     const publicDeriver = this.stores.wallets.selected;
-    if (publicDeriver === null) {
+    if (publicDeriver === null || this.poolTransitionRequestInfo[publicDeriver.getPublicDeriverId()] != null) {
       return;
     }
 
@@ -239,31 +225,39 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     const currentlyDelegating = this.stores.delegation.isCurrentlyDelegating(publicDeriver);
     const currentPool = this.getDelegatedPoolId(publicDeriver);
 
+    if (currentPool == null) {
+      return;
+    }
+
     try {
-      const transitionResult = await maybe(currentPool,
-          p => new PoolInfoApi().getTransition(p, RustModule.CrossCsl.init));
+
+      const { BackendService } = publicDeriver.getParent().getNetworkInfo().Backend;
+      const transitionResult = await maybe(currentPool, p =>
+        new PoolInfoApi(forceNonNull(BackendService) + '/api').getTransition(p, RustModule.CrossCsl.init)
+      );
 
       const response = {
         currentPool: transitionResult?.current,
         suggestedPool: transitionResult?.suggested,
         deadlineMilliseconds: transitionResult?.deadlineMilliseconds,
-        shouldShowTransitionFunnel: environment.isDev(),
+        shouldShowTransitionFunnel: environment.isDev() && transitionResult !== null,
+        deadlinePassed: Number(transitionResult?.deadlineMilliseconds) < Date.now(),
       };
+
+      const walletId = publicDeriver.getPublicDeriverId();
 
       if (
         isStakeRegistered &&
         currentlyDelegating &&
         transitionResult &&
-        this.poolTransitionConfig.show === 'closed'
+        this.getPoolTransitionConfig(publicDeriver).show === 'closed'
       ) {
-        this.setPoolTransitionConfig({ show: 'open' });
+        this.setPoolTransitionConfig(publicDeriver, { show: 'open' });
       }
 
-      runInAction(() => {
-        this.poolTransitionRequestInfo = { ...response };
-      });
+      this.poolTransitionRequestInfo[walletId] = { ...response };
     } catch (error) {
-      console.warn(error);
+      console.warn('Failed to check pool transition', error);
     }
   };
 

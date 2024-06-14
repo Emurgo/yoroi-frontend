@@ -1,6 +1,6 @@
 // @flow
 import type { AssetAmount, PriceImpact } from './types';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { ReactComponent as NoAssetsFound } from '../../assets/images/revamp/no-assets-found.inline.svg';
 import { ReactComponent as SearchIcon } from '../../assets/images/revamp/icons/search.inline.svg';
@@ -28,6 +28,7 @@ type Props = {|
   onAssetSelected: any => void,
   onClose: void => void,
   defaultTokenInfo: RemoteTokenInfo,
+  getTokenInfo: string => Promise<RemoteTokenInfo>,
 |};
 
 export default function SelectAssetDialog({
@@ -36,6 +37,7 @@ export default function SelectAssetDialog({
   onAssetSelected,
   onClose,
   defaultTokenInfo,
+  getTokenInfo,
 }: Props): React$Node {
   const [searchTerm, setSearchTerm] = useState<string>('');
 
@@ -49,7 +51,8 @@ export default function SelectAssetDialog({
       if (a == null) return false;
       if (!searchTerm) return true;
       return `${a.name};[${a.ticker}];${a.id};${a.fingerprint}`
-        .toLowerCase().includes(searchTerm.toLowerCase())
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
     }) || [];
 
   return (
@@ -59,49 +62,57 @@ export default function SelectAssetDialog({
       withCloseButton
       closeOnOverlayClick
       styleOverride={{ minWidth: '612px', maxWidth: '612px', minHeight: '600px' }}
+      styleContentOverride={{ paddingTop: '16px' }}
       scrollableContentClass="scrollable-content"
+      contentHeader={
+        <>
+          <Box mb="8px" position="relative" height="40px">
+            <Box
+              sx={{
+                position: 'absolute',
+                left: '7px',
+                top: '30px',
+                transform: 'translateY(-50%)',
+                display: 'inline-flex',
+                color: 'grayscale.600',
+                height: '40px',
+              }}
+            >
+              <SearchIcon />
+            </Box>
+            <Box
+              component="input"
+              type="text"
+              placeholder="Search"
+              sx={{
+                border: '1px solid',
+                borderColor: 'grayscale.400',
+                borderRadius: '8px',
+                padding: '8px',
+                paddingLeft: '34px',
+                outline: 'none',
+                width: '100%',
+                fontSize: '14px',
+                fontFamily: 'Rubik',
+                height: '40px',
+                '&:focus': {
+                  borderWidth: '2px',
+                  borderColor: 'grayscale.max',
+                },
+              }}
+              onChange={e => {
+                setSearchTerm(e.target.value?.trim() ?? '');
+              }}
+            />
+          </Box>
+          <Box>
+            <Typography component="div" variant="body2" color="grayscale.700">
+              {filteredAssets.length} assets {searchTerm ? 'found' : 'available'}
+            </Typography>
+          </Box>
+        </>
+      }
     >
-      <Box mb="8px" position="relative">
-        <Box
-          sx={{
-            position: 'absolute',
-            left: '7px',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            display: 'inline-flex',
-            color: 'grayscale.600',
-          }}
-        >
-          <SearchIcon />
-        </Box>
-        <Box
-          component="input"
-          type="text"
-          placeholder="Search"
-          sx={{
-            border: '1px solid',
-            borderColor: 'grayscale.400',
-            borderRadius: '8px',
-            padding: '8px',
-            paddingLeft: '34px',
-            outline: 'none',
-            width: '100%',
-            '&:focus': {
-              borderWidth: '2px',
-              borderColor: 'grayscale.max',
-            },
-          }}
-          onChange={e => {
-            setSearchTerm(e.target.value?.trim() ?? '');
-          }}
-        />
-      </Box>
-      <Box>
-        <Typography component="div" variant="body2" color="grayscale.700">
-          {filteredAssets.length} assets {searchTerm ? 'found' : 'available'}
-        </Typography>
-      </Box>
-
       {filteredAssets.length !== 0 && (
         <Table
           rowGap="0px"
@@ -116,6 +127,7 @@ export default function SelectAssetDialog({
                 type={type}
                 onAssetSelected={handleAssetSelected}
                 defaultTokenInfo={defaultTokenInfo}
+                getTokenInfo={getTokenInfo}
               />
             );
           })}
@@ -154,6 +166,7 @@ export const AssetAndAmountRow = ({
   priceChange100 = '',
   onAssetSelected = null,
   defaultTokenInfo,
+  getTokenInfo,
   displayAmount = null,
   priceImpactState = null,
 }: {|
@@ -165,9 +178,13 @@ export const AssetAndAmountRow = ({
   priceChange100?: string,
   onAssetSelected?: AssetAmount => void,
   defaultTokenInfo: RemoteTokenInfo,
+  getTokenInfo: string => Promise<RemoteTokenInfo>,
   displayAmount?: ?string,
   priceImpactState?: ?PriceImpact,
 |}): React$Node => {
+
+  const [remoteTokenLogo, setRemoteTokenLogo] = useState<?string>(null);
+
   const isFrom = type === 'from';
 
   const { name = null, image = '', fingerprint: address, id, amount: assetAmount, ticker } = asset;
@@ -175,10 +192,23 @@ export const AssetAndAmountRow = ({
   const priceIncreased = priceChange100 && priceChange100.charAt(0) !== '-';
   const priceChange24h = priceChange100.replace('-', '') || '0%';
 
+  useEffect(() => {
+    if (id != null) {
+      getTokenInfo(id).then(tokenInfo => {
+        if (tokenInfo.logo != null) {
+          setRemoteTokenLogo(`data:image/png;base64,${tokenInfo.logo}`);
+        }
+        return null;
+      }).catch(e => {
+        console.warn('Failed to resolve remote info for token: ' + id, e);
+      });
+    }
+  }, [id])
+
   const imgSrc =
     ticker === defaultTokenInfo.ticker
       ? adaTokenImage
-      : urlResolveForIpfsAndCorsproxy(image) ?? defaultTokenImage;
+      : remoteTokenLogo ?? urlResolveForIpfsAndCorsproxy(image) ?? defaultTokenImage;
 
   const amount = displayAmount ?? assetAmount;
 

@@ -41,7 +41,7 @@ import {
   connectorGetDRepKey,
   connectorGetStakeKey,
   connectorGetUnusedAddresses,
-  connectorGetUsedAddresses,
+  connectorGetUsedAddressesWithPaginate,
   connectorGetUtxosCardano,
   connectorRecordSubmittedCardanoTransaction,
   connectorSendTxCardano,
@@ -831,7 +831,7 @@ const yoroiMessageHandler = async (
             }
 
             const addressesMap = {
-              usedAddresses: async () => await connectorGetUsedAddresses(wallet, null),
+              usedAddresses: async () => await connectorGetUsedAddressesWithPaginate(wallet, null),
               unusedAddresses: async () => await connectorGetUnusedAddresses(wallet),
               changeAddress: async () => await connectorGetChangeAddress(wallet),
               utxos: async () =>  await withHasUtxoChains.getAllUtxos(),
@@ -1292,7 +1292,7 @@ async function handleInjectorMessage(message, sender) {
           await withSelectedWallet(
             tabId,
             async (wallet) => {
-              const addresses = await connectorGetUsedAddresses(wallet, paginate);
+              const addresses = await connectorGetUsedAddressesWithPaginate(wallet, paginate);
               if (!isCardano || isCBOR) {
                 rpcResponse({ ok: addresses });
               } else {

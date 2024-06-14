@@ -8,11 +8,13 @@ import defaultTokenImage from '../../assets/images/revamp/token-default.inline.s
 import { urlResolveForIpfsAndCorsproxy } from '../../coreUtils';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
 import type { State } from '../../containers/swap/context/swap-form/types';
+import { useEffect, useState } from 'react';
 
 type Props = {|
   label: string,
   tokenInfo: AssetAmount | Object,
   defaultTokenInfo: RemoteTokenInfo,
+  getTokenInfo: string => Promise<RemoteTokenInfo>,
   onAssetSelect: function,
   handleAmountChange: function,
   showMax?: boolean,
@@ -32,19 +34,36 @@ export default function SwapInput({
   value,
   tokenInfo,
   defaultTokenInfo,
+  getTokenInfo,
   focusState,
 }: Props): Node {
-  const { amount: quantity = undefined, image, ticker } = tokenInfo || {};
+
+  const [remoteTokenLogo, setRemoteTokenLogo] = useState<?string>(null);
+  const { id, amount: quantity = undefined, image, ticker } = tokenInfo || {};
 
   const handleChange = e => {
     handleAmountChange(e.target.value);
   };
 
   const isFocusedColor = focusState.value ? 'grayscale.max' : 'grayscale.400';
+
+  useEffect(() => {
+    if (id != null) {
+      getTokenInfo(id).then(remoteTokenInfo => {
+        if (remoteTokenInfo.logo != null) {
+          setRemoteTokenLogo(`data:image/png;base64,${remoteTokenInfo.logo}`);
+        }
+        return null;
+      }).catch(e => {
+        console.warn('Failed to resolve remote info for token: ' + id, e);
+      });
+    }
+  }, [id])
+
   const imgSrc =
     ticker === defaultTokenInfo.ticker
       ? adaTokenImage
-      : urlResolveForIpfsAndCorsproxy(image) ?? defaultTokenImage;
+      : remoteTokenLogo ?? urlResolveForIpfsAndCorsproxy(image) ?? defaultTokenImage;
 
   return (
     <Box>
@@ -53,7 +72,7 @@ export default function SwapInput({
         component="fieldset"
         sx={{
           borderStyle: 'solid',
-          borderWidth: tokenInfo.id?.length > 0 || error ? '2px' : '1px',
+          borderWidth: tokenInfo.id?.length > 0 && error ? '2px' : '1px',
           borderColor: error ? 'magenta.500' : isFocusedColor,
           borderRadius: '8px',
           p: '16px',
@@ -66,6 +85,9 @@ export default function SwapInput({
           bgcolor: 'common.white',
           columnGap: '6px',
           rowGap: '8px',
+          '&:hover': {
+            borderColor: !error && 'grayscale.max',
+          },
         }}
       >
         <Box
@@ -127,10 +149,18 @@ export default function SwapInput({
               component="button"
               variant="caption"
               fontWeight={500}
-              sx={{ p: '4px 8px', bgcolor: 'grayscale.50', borderRadius: '8px' }}
+              sx={{
+                p: '4px 8px',
+                bgcolor: 'grayscale.50',
+                borderRadius: '8px',
+                ':disabled': {
+                  cursor: 'not-allowed',
+                },
+              }}
               onClick={() => {
                 handleAmountChange(quantity);
               }}
+              disabled={disabled}
             >
               MAX
             </Typography>

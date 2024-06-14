@@ -202,6 +202,7 @@ const resolve = () /*: * */ => ({
     buffer: require.resolve('buffer'),
     assert: require.resolve('assert/'),
     util: require.resolve('util/'),
+    url: require.resolve('url/'),
   },
   alias: { process: 'process/browser', }
 });

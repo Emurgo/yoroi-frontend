@@ -10,35 +10,79 @@ import type { FormattedTokenValue } from '../../containers/swap/orders/OrdersPag
 import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import { stringifyError } from '../../utils/logging';
 import { InfoTooltip } from '../widgets/InfoTooltip';
+import AddCollateralPage from '../../connector/components/signin/AddCollateralPage';
+import type { CardanoConnectorSignRequest, SignSubmissionErrorType } from '../../connector/types';
+import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
+import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import { SelectedExplorer } from '../../domain/SelectedExplorer';
+import type LocalizableError from '../../i18n/LocalizableError';
 
 type Props = {|
   order: any,
+  reorgTxData: ?CardanoConnectorSignRequest,
   isSubmitting: boolean,
   transactionParams: ?{|
     formattedFee: string,
     returnValues: Array<FormattedTokenValue>,
   |},
+  onReorgConfirm: (order: any, password: string) => Promise<void>,
   onCancelOrder: (order: any, password: string) => Promise<void>,
   onDialogClose: void => void,
   defaultTokenInfo: RemoteTokenInfo,
+  getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => ?$ReadOnly<TokenRow>,
+  selectedExplorer: SelectedExplorer,
+  submissionError: ?SignSubmissionErrorType,
+  walletType: 'ledger' | 'trezor' | 'web',
+  hwWalletError: ?LocalizableError,
 |};
 
 export default function CancelSwapOrderDialog({
   order,
+  reorgTxData,
   isSubmitting,
   transactionParams,
+  onReorgConfirm,
   onCancelOrder,
   onDialogClose,
   defaultTokenInfo,
+  getTokenInfo,
+  selectedExplorer,
+  submissionError,
+  walletType,
+  hwWalletError,
 }: Props): React$Node {
   const [password, setPassword] = useState('');
   const [isIncorrectPassword, setIncorrectPassword] = useState(false);
   const isLoading = transactionParams == null || isSubmitting;
+  if (reorgTxData != null) {
+    return (
+      <Dialog title="Cancel order" onClose={onDialogClose} withCloseButton closeOnOverlayClick>
+        <AddCollateralPage
+          txData={reorgTxData}
+          onCancel={onDialogClose}
+          onConfirm={s => onReorgConfirm(order, s)}
+          getTokenInfo={getTokenInfo}
+          selectedExplorer={selectedExplorer}
+          submissionError={submissionError}
+          walletType={walletType}
+          hwWalletError={hwWalletError}
+        />
+      </Dialog>
+    );
+  }
   return (
-    <Dialog title="Cancel order" onClose={onDialogClose} withCloseButton closeOnOverlayClick>
-      <Box display="flex" mt="8px" mb="24px" flexDirection="column" gap="16px">
+    <Dialog
+      title="Cancel order"
+      onClose={onDialogClose}
+      withCloseButton
+      closeOnOverlayClick
+      styleOverride={{ maxWidth: '612px', height: '496px', minWidth: '612px' }}
+    >
+      <Box display="flex" flexDirection="column" gap="12px">
         <Box>
-          <Typography component="div" variant="body1">Are you sure you want to cancel this order?</Typography>
+          <Typography component="div" variant="body1">
+            Are you sure you want to cancel this order?
+          </Typography>
         </Box>
         <AssetPair
           from={order.from.token}
@@ -52,13 +96,22 @@ export default function CancelSwapOrderDialog({
           <SummaryRow col1="Asset amount">
             {order.amount} {order.to.token.ticker}
           </SummaryRow>
-          <SummaryRow col1="Total returned" info='The amount returned to your wallet after cancelling the order'>
-            {transactionParams ? transactionParams.returnValues.map(v => (
-              <Box>{v.formattedValue} {v.ticker}</Box>
-            )) : (<LoadingSpinner small />)}
+          <SummaryRow
+            col1="Total returned"
+            info="The amount returned to your wallet after cancelling the order"
+          >
+            {transactionParams ? (
+              transactionParams.returnValues.map((v, index) => (
+                <>
+                  {index > 0 && ' +'} {v.formattedValue} {v.ticker}
+                </>
+              ))
+            ) : (
+              <LoadingSpinner small />
+            )}
           </SummaryRow>
           <SummaryRow col1="Cancellation fee">
-            {transactionParams ? transactionParams.formattedFee : (<LoadingSpinner small />)}
+            {transactionParams ? transactionParams.formattedFee : <LoadingSpinner small />}
           </SummaryRow>
         </Box>
         <Box>
@@ -72,10 +125,11 @@ export default function CancelSwapOrderDialog({
               setPassword(e.target.value);
             }}
             error={isIncorrectPassword && 'Incorrect password!'}
+            disabled={isLoading}
           />
         </Box>
       </Box>
-      <Box display="flex" gap="24px" mt="24px">
+      <Box display="flex" gap="24px">
         <Button fullWidth variant="secondary" onClick={onDialogClose}>
           Back
         </Button>
@@ -96,9 +150,7 @@ export default function CancelSwapOrderDialog({
           }}
           disabled={isLoading || password.length === 0}
         >
-          {isLoading ? (
-            <LoadingSpinner small light />
-          ) : 'Cancel order'}
+          {isLoading ? <LoadingSpinner small light /> : 'Cancel order'}
         </Button>
       </Box>
     </Dialog>
@@ -118,7 +170,9 @@ const SummaryRow = ({ col1, children, info = '' }) => (
       ) : null}
     </Box>
     <Box>
-      <Typography component="div" variant="body1">{children}</Typography>
+      <Typography component="div" variant="body1">
+        {children}
+      </Typography>
     </Box>
   </Box>
 );

@@ -304,6 +304,7 @@ async function syncingSimpleTransaction(
               Identifier: '',
               Metadata: {
                 assetName: '',
+                logo: null,
                 longName: null,
                 numberOfDecimals: 6,
                 policyId: '',
@@ -418,6 +419,7 @@ async function syncingSimpleTransaction(
               Identifier: '',
               Metadata: {
                 assetName: '',
+                logo: null,
                 longName: null,
                 numberOfDecimals: 6,
                 policyId: '',
@@ -462,6 +464,7 @@ async function syncingSimpleTransaction(
               Identifier: '',
               Metadata: {
                 assetName: '',
+                logo: null,
                 longName: null,
                 numberOfDecimals: 6,
                 policyId: '',

@@ -23,6 +23,7 @@ type Props = {|
   ...StoresAndActionsProps,
   title: Node,
   menu?: Node,
+  pageBanner?: Node,
 |};
 
 @observer
@@ -49,7 +50,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
   };
 
   render(): Node {
-    const { stores } = this.props;
+    const { stores, pageBanner } = this.props;
     const { profile } = stores;
     const walletsStore = stores.wallets;
 
@@ -63,12 +64,12 @@ export default class NavBarContainerRevamp extends Component<Props> {
 
       const withPubKey = asGetPublicKey(publicDeriver);
       const plate =
-        withPubKey == null
-          ? null
-          : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
+        withPubKey == null ? null : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
 
       const balance: ?MultiToken = this.props.stores.transactions.getBalance(publicDeriver);
-      const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(publicDeriver);
+      const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(
+        publicDeriver
+      );
 
       return (
         <NavWalletDetailsRevamp
@@ -106,7 +107,9 @@ export default class NavBarContainerRevamp extends Component<Props> {
               }
             />
           }
+          pageBanner={pageBanner}
         />
+        {pageBanner && pageBanner}
       </>
     );
   }
@@ -126,13 +129,13 @@ export default class NavBarContainerRevamp extends Component<Props> {
         const walletAmount = this.props.stores.transactions.getBalance(wallet);
         const rewards = this.props.stores.delegation.getRewardBalanceOrZero(wallet);
         const parent = wallet.getParent();
-        const settingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(parent);
+        const settingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(
+          parent
+        );
 
         const withPubKey = asGetPublicKey(wallet);
         const plate =
-              withPubKey == null
-              ? null
-              : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
+          withPubKey == null ? null : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
 
         const walletMap = {
           walletId: wallet.getPublicDeriverId(),
