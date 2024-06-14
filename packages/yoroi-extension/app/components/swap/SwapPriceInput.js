@@ -7,7 +7,6 @@ import { Quantities } from '../../utils/quantities';
 import { useSwap } from '@yoroi/swap';
 import { PRICE_PRECISION } from './common';
 import { useSwapForm } from '../../containers/swap/context/swap-form';
-import SwapStore from '../../stores/ada/SwapStore';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react';
 import {
@@ -18,7 +17,6 @@ import {
 } from './PriceImpact';
 
 type Props = {|
-  swapStore: SwapStore,
   priceImpactState: ?PriceImpact,
 |};
 
@@ -39,15 +37,16 @@ function SwapPriceInput({ priceImpactState }: Props): Node {
   const pricePlaceholder = isMarketOrder ? NO_PRICE_VALUE_PLACEHOLDER : '0';
   const marketPrice = orderData.selectedPoolCalculation?.prices.market;
 
-  const format = s => Quantities.format(s, orderData.tokens.priceDenomination, PRICE_PRECISION) + (s.endsWith('.') ? '.' : '');
+  const format = s =>
+    Quantities.format(s, orderData.tokens.priceDenomination, PRICE_PRECISION) +
+    (s.endsWith('.') ? '.' : '');
+
   const formattedPrice = marketPrice ? format(marketPrice) : pricePlaceholder;
 
-  if (swapStore.limitOrderDisplayValue === '' && marketPrice != null) {
-    runInAction(() => {
-      swapStore.setLimitOrderDisplayValue(formattedPrice);
-    });
-  }
-  const displayValue = isMarketOrder ? formattedPrice : swapStore.limitOrderDisplayValue;
+  // if (limitPrice.displayValue === '' && marketPrice != null) {
+  //   onChangeLimitPrice(formattedPrice);
+  // }
+  const displayValue = isMarketOrder ? formattedPrice : limitPrice.displayValue;
   const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
   const isReadonly = !isValidTickers || isMarketOrder;
   const valueToDisplay = endsWithDot ? displayValue + '.' : displayValue;
@@ -121,6 +120,8 @@ function SwapPriceInput({ priceImpactState }: Props): Node {
               setEndsWithDot(false);
             }
           }}
+          onFocus={() => !isMarketOrder && limitPriceFocusState.update(true)}
+          onBlur={() => !isMarketOrder && limitPriceFocusState.update(false)}
         />
         <Box sx={{ justifySelf: 'end' }}>
           <Box height="100%" width="max-content" display="flex" alignItems="center">
