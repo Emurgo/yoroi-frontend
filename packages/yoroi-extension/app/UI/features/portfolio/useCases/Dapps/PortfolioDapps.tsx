@@ -7,7 +7,7 @@ import OrderTable from './OrderTable';
 import LendAndBorrow from './LendAndBorrow';
 import { useStrings } from '../../common/hooks/useStrings';
 import PortfolioHeader from '../../common/components/PortfolioHeader';
-import { LiquidityItemType, OrderItemType } from '../../common/types/index';
+import { ITabButtonProps, LiquidityItemType, OrderItemType } from '../../common/types/index';
 
 const TableTabs = Object.freeze({
   LIQUIDITY: 1,
@@ -27,9 +27,9 @@ const PortfolioDapps = ({ data }: Props) => {
   const strings = useStrings();
   const [keyword, setKeyword] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [liquidityList, setLiquidlityList] = useState(data.liquidityList);
-  const [orderList, setOrderList] = useState(data.orderList);
-  const [buttonProps, setButtonProps] = useState([
+  const [liquidityList, setLiquidlityList] = useState<LiquidityItemType[]>(data.liquidityList);
+  const [orderList, setOrderList] = useState<OrderItemType[]>(data.orderList);
+  const [buttonProps, setButtonProps] = useState<ITabButtonProps[]>([
     {
       id: TableTabs.LIQUIDITY,
       label: `${strings.liquidityPool}`,
@@ -77,7 +77,7 @@ const PortfolioDapps = ({ data }: Props) => {
     }
   }, [keyword]);
 
-  const handleChangeTab = (id: number) => {
+  const handleChangeTab = (id: number | string) => {
     const temp = buttonProps.map(prop => {
       if (prop.id === id)
         return {

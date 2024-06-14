@@ -5,7 +5,7 @@ import { useNavigateTo } from '../hooks/useNavigateTo';
 import { useStrings } from '../hooks/useStrings';
 import bannerYoroiWalletPng from '../assets/illustrations/banner-yoroi-wallet.png';
 
-const StyledBox = styled(Box)(({ theme }: any) => ({
+const Container = styled(Box)(({ theme }: any) => ({
   borderRadius: `${theme.shape.borderRadius}px !important`,
   backgroundImage: theme.palette.ds.bg_gradient_2,
 }));
@@ -16,7 +16,7 @@ const WelcomeBanner = () => {
   const strings = useStrings();
 
   return (
-    <StyledBox>
+    <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between">
         <Stack direction="column" spacing={theme.spacing(6)} sx={{ padding: theme.spacing(3) }}>
           <Stack direction="column" spacing={theme.spacing(1)} maxWidth={'450px'}>
@@ -35,7 +35,7 @@ const WelcomeBanner = () => {
 
         <Box component="img" src={bannerYoroiWalletPng} sx={{ marginRight: theme.spacing(11.5) }}></Box>
       </Stack>
-    </StyledBox>
+    </Container>
   );
 };
 export default WelcomeBanner;

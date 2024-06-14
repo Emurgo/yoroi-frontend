@@ -17,8 +17,8 @@ const PortfolioWallet = ({ data }: Props): JSX.Element => {
   const strings = useStrings();
   const [keyword, setKeyword] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [tokenList, setTokenList] = useState(data);
-  const isShownWelcomeBanner = data.length === 1; // assumming only have ADA as default -> first time user
+  const [tokenList, setTokenList] = useState<TokenType[]>(data);
+  const isShownWelcomeBanner: boolean = data.length === 1; // assumming only have ADA as default -> first time user
 
   useEffect(() => {
     if (isShownWelcomeBanner) return;

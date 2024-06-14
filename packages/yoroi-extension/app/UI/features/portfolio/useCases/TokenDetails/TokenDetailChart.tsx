@@ -209,7 +209,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
               key={id}
               variant={active ? 'contained' : 'text'}
               disabled={isFetching}
-              onClick={() => handlePeriodChange(id)}
+              onClick={() => handlePeriodChange(id.toString())}
               theme={theme}
             >
               {label}

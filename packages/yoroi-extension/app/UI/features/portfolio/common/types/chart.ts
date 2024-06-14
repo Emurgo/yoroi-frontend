@@ -1,9 +1,3 @@
-export interface IPeriodButtonProps {
-  id: string;
-  label: string;
-  active: boolean;
-}
-
 export interface IChartDataItem {
   time: string;
   value: number;

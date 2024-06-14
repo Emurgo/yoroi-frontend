@@ -3,12 +3,13 @@ import { useStrings } from './useStrings';
 import { useTheme } from '@mui/material/styles';
 import { Box } from '@mui/material';
 import moment from 'moment';
-import { IPeriodButtonProps, IChartData, IChartDataItem } from '../types/chart';
+import { IChartData, IChartDataItem } from '../types/chart';
+import { ITabButtonProps } from '../types';
 
 const useChart = (data: IChartData) => {
   const strings = useStrings();
   const theme: any = useTheme();
-  const [periodButtonProps, setPeriodButtonProps] = useState<IPeriodButtonProps[]>([
+  const [periodButtonProps, setPeriodButtonProps] = useState<ITabButtonProps[]>([
     { id: 'start24HoursAgo', label: strings['24H'], active: true },
     { id: 'start1WeekAgo', label: strings['1W'], active: false },
     { id: 'start1MonthAgo', label: strings['1M'], active: false },
@@ -22,7 +23,7 @@ const useChart = (data: IChartData) => {
   });
   const [isDragging, setIsDragging] = useState<boolean>(false);
 
-  const activePeriodId = useMemo(() => periodButtonProps.find(item => item.active)?.id || 'start24HoursAgo', [periodButtonProps]);
+  const activePeriodId = useMemo(() => periodButtonProps.find(item => item.active)?.id || 0, [periodButtonProps]);
 
   const CustomYAxisTick = ({
     x,
@@ -126,13 +127,13 @@ const useChart = (data: IChartData) => {
     setPeriodButtonProps(tmp);
     setDetailInfo({
       value: data
-        ? data[periodButtonProps.find(item => item.id === id)?.id || 'start24HoursAgo'][
-            data[periodButtonProps.find(item => item.id === id)?.id || 'start24HoursAgo'].length - 1
+        ? data[periodButtonProps.find(item => item.id === id)?.id || 0][
+            data[periodButtonProps.find(item => item.id === id)?.id || 0].length - 1
           ].value
         : 0,
       fiatValue: data
-        ? data[periodButtonProps.find(item => item.id === id)?.id || 'start24HoursAgo'][
-            data[periodButtonProps.find(item => item.id === id)?.id || 'start24HoursAgo'].length - 1
+        ? data[periodButtonProps.find(item => item.id === id)?.id || 0][
+            data[periodButtonProps.find(item => item.id === id)?.id || 0].length - 1
           ].fiatValue
         : 0,
     });

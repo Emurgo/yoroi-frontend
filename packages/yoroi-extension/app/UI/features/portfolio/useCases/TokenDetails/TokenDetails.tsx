@@ -30,17 +30,6 @@ const TabContent = styled(Box)({
   flex: 1,
 });
 
-const StyledSubMenu = styled(SubMenu)(({ theme }) => ({
-  '& > button': {
-    padding: '11px 0 !important',
-  },
-
-  '& > .SubMenuItem_enabled': {
-    color: theme.palette.ds.el_primary_medium,
-    borderColor: theme.palette.ds.el_primary_medium,
-  },
-}));
-
 interface Props {
   tokenInfo: TokenType;
 }
@@ -50,8 +39,8 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
   const navigateTo = useNavigateTo();
   const strings = useStrings();
   const { unitOfAccount } = usePortfolio();
-  const [isLoading, setIsLoading] = useState(false);
-  const isAda = tokenInfo.name.toLowerCase() === 'ada';
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const isAda: boolean = tokenInfo.name.toLowerCase() === 'ada';
 
   const subMenuOptions: SubMenuOption[] = [
     {
@@ -152,7 +141,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
 
           <Card>
             <Box sx={{ paddingTop: `${theme.spacing(2)}` }}>
-              <StyledSubMenu
+              <SubMenu
                 options={subMenuOptions}
                 onItemClick={(route: string) => setSelectedTab(route)}
                 isActiveItem={isActiveItem}
