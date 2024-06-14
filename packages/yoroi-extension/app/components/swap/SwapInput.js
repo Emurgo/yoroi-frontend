@@ -37,28 +37,31 @@ export default function SwapInput({
   getTokenInfo,
   focusState,
 }: Props): Node {
-
   const [remoteTokenLogo, setRemoteTokenLogo] = useState<?string>(null);
   const { id, amount: quantity = undefined, image, ticker } = tokenInfo || {};
 
   const handleChange = e => {
-    handleAmountChange(e.target.value);
+    if (!disabled && value !== quantity) {
+      handleAmountChange(e.target.value);
+    }
   };
 
   const isFocusedColor = focusState.value ? 'grayscale.max' : 'grayscale.400';
 
   useEffect(() => {
     if (id != null) {
-      getTokenInfo(id).then(remoteTokenInfo => {
-        if (remoteTokenInfo.logo != null) {
-          setRemoteTokenLogo(`data:image/png;base64,${remoteTokenInfo.logo}`);
-        }
-        return null;
-      }).catch(e => {
-        console.warn('Failed to resolve remote info for token: ' + id, e);
-      });
+      getTokenInfo(id)
+        .then(remoteTokenInfo => {
+          if (remoteTokenInfo.logo != null) {
+            setRemoteTokenLogo(`data:image/png;base64,${remoteTokenInfo.logo}`);
+          }
+          return null;
+        })
+        .catch(e => {
+          console.warn('Failed to resolve remote info for token: ' + id, e);
+        });
     }
-  }, [id])
+  }, [id]);
 
   const imgSrc =
     ticker === defaultTokenInfo.ticker
@@ -116,7 +119,7 @@ export default function SwapInput({
           variant="body1"
           color="grayscale.max"
           placeholder="0"
-          onChange={disabled ? () => {} : handleChange}
+          onChange={handleChange}
           value={disabled ? '' : value}
           onFocus={() => focusState.update(true)}
           onBlur={() => focusState.update(false)}

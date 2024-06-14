@@ -11,7 +11,11 @@ type Props = {|
   getTokenInfo: string => Promise<RemoteTokenInfo>,
 |};
 
-export default function EditBuyAmount({ onAssetSelect, defaultTokenInfo, getTokenInfo }: Props): Node {
+export default function EditBuyAmount({
+  onAssetSelect,
+  defaultTokenInfo,
+  getTokenInfo,
+}: Props): Node {
   const { orderData } = useSwap();
   const {
     buyQuantity: { displayValue: buyDisplayValue, error: fieldError },
@@ -27,14 +31,16 @@ export default function EditBuyAmount({ onAssetSelect, defaultTokenInfo, getToke
   const error = isInvalidPair ? 'Selected pair is not available in any liquidity pool' : fieldError;
 
   // Amount input is blocked in case invalid pair
-  const handleAmountChange = isInvalidPair ? () => {} : onChangeBuyQuantity;
+  const handleAmountChange = () => {
+    return isInvalidPair ? () => {} : onChangeBuyQuantity;
+  };
 
   return (
     <SwapInput
       key={tokenId}
       label="Swap to"
       disabled={!isValidTickers}
-      handleAmountChange={handleAmountChange}
+      handleAmountChange={handleAmountChange()}
       value={buyDisplayValue}
       tokenInfo={buyTokenInfo}
       defaultTokenInfo={defaultTokenInfo}
