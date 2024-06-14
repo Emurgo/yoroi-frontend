@@ -1,9 +1,9 @@
 //@flow
 import type { Node } from 'react';
-import { useCallback, useEffect, useReducer, useState } from 'react';
 import type { SwapFormAction, SwapFormState } from './types';
-import { StateWrap, SwapFormActionTypeValues } from './types';
 import type { AssetAmount } from '../../../../components/swap/types';
+import { useCallback, useEffect, useReducer, useState } from 'react';
+import { StateWrap, SwapFormActionTypeValues } from './types';
 import { useSwap } from '@yoroi/swap';
 import Context from './context';
 import { Quantities } from '../../../../utils/quantities';
