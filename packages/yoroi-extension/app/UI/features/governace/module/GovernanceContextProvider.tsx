@@ -52,7 +52,7 @@ export const GovernanceContextProvider = ({ children, currentWallet }: Governanc
           oldBackendUrl: String(backendService),
           newBackendUrl: String(backendService),
           networkId: networkId,
-          wasm: RustModule.CrossCsl.init('global'),
+          wasm: RustModule.CrossCsl.init,
         });
 
         const governanceStatus = await govApi.getAccountState(skey, skey);
