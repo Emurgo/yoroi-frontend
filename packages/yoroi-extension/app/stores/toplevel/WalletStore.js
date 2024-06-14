@@ -32,7 +32,7 @@ import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { getWalletChecksum } from '../../api/export/utils';
 import { MultiToken } from '../../api/common/lib/MultiToken';
-import { BigNumber, ROUND_UP } from 'bignumber.js';
+import { BigNumber } from 'bignumber.js';
 
 type GroupedWallets = {|
   publicDerivers: Array<PublicDeriver<>>,
@@ -360,7 +360,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
             [{
               identifier: defaultToken.defaultIdentifier,
               networkId: defaultToken.defaultNetworkId,
-              amount: (new BigNumber(sellAdaParams.amount)).shiftedBy(6).decimalPlaces(0, ROUND_UP),
+              amount: (new BigNumber(sellAdaParams.amount)).shiftedBy(6).decimalPlaces(0, 0/* ROUND_UP */),
             }],
             defaultToken,
           ),
