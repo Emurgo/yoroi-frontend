@@ -48,10 +48,6 @@ export const GovernanceContextProvider = ({ children, currentWallet }: Governanc
         }
         setStakingKeyHex(skey);
 
-        const stakeKey = (
-          await __pubKeyAndAddressingByChainAndIndex(wallet, ChainDerivations.CHIMERIC_ACCOUNT, STAKING_KEY_INDEX)
-        )[0];
-
         const govApi = new GovernanceApi({
           oldBackendUrl: String(backendService),
           newBackendUrl: String(backendService),
