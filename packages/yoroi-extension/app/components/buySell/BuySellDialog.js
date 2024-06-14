@@ -11,6 +11,8 @@ import DialogCloseButton from '../widgets/DialogCloseButton';
 import globalMessages from '../../i18n/global-messages';
 import { Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import Tab, { tabClasses } from '@mui/material/Tab';
+import Tabs, { tabsClasses } from '@mui/material/Tabs';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import BigNumber from 'bignumber.js';
@@ -19,6 +21,7 @@ import banxaPng from '../../assets/images/banxa.png';
 import encryptusPng from '../../assets/images/encryptus.png';
 import { ReactComponent as InfoIcon } from '../../assets/images/info-icon-revamp.inline.svg';
 import { exchangeApiMaker, exchangeManagerMaker } from '@yoroi/exchange'
+import environment from '../../environment';
 
 declare var chrome;
 
@@ -78,6 +81,24 @@ type State = {|
 const MINIMUM_BUY_ADA = new BigNumber('100');
 const MINIMUM_SELL_ADA = new BigNumber('1');
 const EXCHANGE_CALLBACK_URL = 'https://ramp-redirect.yoroiwallet.com/yoroi-extension-exchange-callback.html';
+
+const TabItem = styled(Tab)({
+  position: 'relative',
+  borderRadius: '8px',
+  textAlign: 'center',
+  transition: 'all .5s',
+  padding: '10px 15px',
+  color: '#555555',
+  height: 'auto',
+  margin: '10px 0',
+  float: 'none',
+  fontSize: '12px',
+  fontWeight: '500',
+  [`&.${tabClasses.selected}, &.${tabClasses.root}:hover`]: {
+    color: '#555555',
+    backgroundColor: '#dce0e9',
+  },
+});
 
 const ProviderRow = styled(Box)({
   display: 'flex',
@@ -331,6 +352,22 @@ export default class BuySellDialog extends Component<Props, State> {
         styleOverride={{ width: '648px' }}
         styleFlags={{ contentNoTopPadding: true }}
       >
+        {(environment.isDev() || environment.isNightly()) && (
+          <Tabs
+            value={state.isBuying ? 0 : 1}
+            onChange={() => this.setState({ isBuying: !state.isBuying })}
+            sx={{
+              width: '100%',
+              [`& .${tabsClasses.indicator}`]: {
+                display: 'none',
+              },
+              boxShadow: 'none',
+            }}
+          >
+            <TabItem disableRipple label={intl.formatMessage(globalMessages.buyAda)} />
+            <TabItem disableRipple label={intl.formatMessage(globalMessages.sellAda)} />
+          </Tabs>
+        )}
         {this.renderBuySell()}
       </Dialog>
     );
