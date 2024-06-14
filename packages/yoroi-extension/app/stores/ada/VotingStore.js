@@ -365,11 +365,16 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
         password: spendingPassword,
       });
 
+      const config = getCardanoHaskellBaseConfig(
+        publicDeriver.getParent().getNetworkInfo()
+      ).reduce((acc, next) => Object.assign(acc, next), {});
+
       const trxMeta = generateRegistration({
         stakePrivateKey: stakingKey,
         catalystPrivateKey,
         receiverAddress: allAddresses[0].address,
         slotNumber: nonce,
+        chainNetworkId: Number(config.ChainNetworkId),
       });
 
       votingRegTxPromise = this.createVotingRegTx.execute({

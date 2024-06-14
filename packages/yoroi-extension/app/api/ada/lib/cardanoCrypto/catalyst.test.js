@@ -29,7 +29,8 @@ test('Generate Catalyst registration tx', async () => {
       catalystPrivateKey,
       receiverAddress: Buffer.from(address.to_address().to_bytes()).toString('hex'),
       slotNumber: nonce,
-    });
+      chainNetworkId: 1,
+   });
 
     const result = Scope.WalletV4.GeneralTransactionMetadata.from_bytes(
       Scope.WalletV4.MetadataList.from_bytes(metadata.to_bytes()).get(0).to_bytes()

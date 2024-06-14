@@ -17,7 +17,7 @@ function prefix0x(hex: string): string {
 
 export function generateRegistrationMetadata(
   votingPublicKey: string,
-  stakingPublicKey: string,
+  stakingAddress: string,
   rewardAddress: string,
   nonce: number,
   signer: Uint8Array => string,
@@ -43,7 +43,7 @@ export function generateRegistrationMetadata(
   const registrationData = RustModule.WalletV4.encode_json_str_to_metadatum(
     JSON.stringify({
       '1': [[prefix0x(votingPublicKey), 1]],
-      '2': prefix0x(stakingPublicKey),
+      '2': prefix0x(stakingAddress),
       '3': prefix0x(rewardAddress),
       '4': nonce,
       '5': 0,
@@ -93,13 +93,21 @@ export function generateRegistration(request: {|
   catalystPrivateKey: RustModule.WalletV4.PrivateKey,
   receiverAddress: string,
   slotNumber: number,
+  chainNetworkId: number,
 |}): RustModule.WalletV4.AuxiliaryData {
-  return generateRegistrationMetadata(
-    Buffer.from(request.catalystPrivateKey.to_public().as_bytes()).toString('hex'),
-    Buffer.from(request.stakePrivateKey.to_public().as_bytes()).toString('hex'),
-    request.receiverAddress,
-    request.slotNumber,
-    (hashedMetadata) => request.stakePrivateKey.sign(hashedMetadata).to_hex(),
+  return RustModule.WasmScope(Scope =>
+    generateRegistrationMetadata(
+      Buffer.from(request.catalystPrivateKey.to_public().as_bytes()).toString('hex'),
+      Scope.WalletV4.RewardAddress.new(
+        request.chainNetworkId,
+        Scope.WalletV4.Credential.from_keyhash(
+          request.stakePrivateKey.to_public().hash()
+        ),
+      ).to_address().to_hex(),
+      request.receiverAddress,
+      request.slotNumber,
+      (hashedMetadata) => request.stakePrivateKey.sign(hashedMetadata).to_hex(),
+    )
   );
 }
 
