@@ -198,6 +198,10 @@ const ErrorPopoutContent = styled(Box)({
 const URL_GENERATION_LONG_LOADING_TIMEOUT = 2 * 1000;
 const URL_GENERATION_TIMEOUT = 30 * 1000;
 
+const dialogTitle = (environment.isDev() || environment.isNightly()) ?
+  messages.dialogTitle :
+  globalMessages.buyAda;
+
 @observer
 export default class BuySellDialog extends Component<Props, State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
@@ -464,7 +468,7 @@ export default class BuySellDialog extends Component<Props, State> {
       
     return (
       <Dialog
-        title={intl.formatMessage(messages.dialogTitle)}
+        title={intl.formatMessage(dialogTitle)}
         closeOnOverlayClick={false}
         onClose={props.onCancel}
         closeButton={<DialogCloseButton />}
@@ -481,7 +485,7 @@ export default class BuySellDialog extends Component<Props, State> {
         styleOverride={{ width: '648px' }}
         styleFlags={{ contentNoTopPadding: true }}
       >
-        {environment.isDev() && !environment.isNightly() && (
+        {environment.isDev() || environment.isNightly() && (
           <Tabs
             value={state.isBuying ? 0 : 1}
             onChange={() => this.setState({ isBuying: !state.isBuying, inputError: null, })}
