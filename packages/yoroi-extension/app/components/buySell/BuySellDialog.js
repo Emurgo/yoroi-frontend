@@ -484,7 +484,7 @@ export default class BuySellDialog extends Component<Props, State> {
         {environment.isDev() && !environment.isNightly() && (
           <Tabs
             value={state.isBuying ? 0 : 1}
-            onChange={() => this.setState({ isBuying: !state.isBuying })}
+            onChange={() => this.setState({ isBuying: !state.isBuying, inputError: null, })}
             sx={{
               width: '100%',
               [`& .${tabsClasses.indicator}`]: {
