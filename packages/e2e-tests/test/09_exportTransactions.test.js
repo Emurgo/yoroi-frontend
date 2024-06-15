@@ -12,7 +12,6 @@ import {
   parseExportedCSV,
 } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
-import { restoreWallet } from '../helpers/restoreWalletHelper.js';
 import driversPoolsManager from '../utils/driversPool.js';
 import { compareExportedTxsAndDisplayedTxs } from '../helpers/customChecks.js';
 import AddNewWallet from '../pages/addNewWallet.page.js';

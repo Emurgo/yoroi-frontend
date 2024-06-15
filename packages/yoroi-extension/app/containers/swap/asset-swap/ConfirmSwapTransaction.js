@@ -30,6 +30,7 @@ type Props = {|
   txSubmitErrorState: State<?Error>,
   onRemoteOrderDataResolved: any => Promise<void>,
   defaultTokenInfo: RemoteTokenInfo,
+  getTokenInfo: string => Promise<RemoteTokenInfo>,
   getFormattedPairingValue: (amount: string) => string,
 |};
 
@@ -41,6 +42,7 @@ export default function ConfirmSwapTransaction({
   txSubmitErrorState,
   onRemoteOrderDataResolved,
   defaultTokenInfo,
+  getTokenInfo,
   getFormattedPairingValue,
 }: Props): React$Node {
   const { orderData } = useSwap();
@@ -94,8 +96,8 @@ export default function ConfirmSwapTransaction({
       <Box display="flex" gap="16px" flexDirection="column">
         <Box>
           <Box>
-            <Typography component="div" variant="body1" color="grayscale.500">
-              Swap From
+            <Typography component="div" variant="body1" color="grayscale.600">
+              Swap from
             </Typography>
           </Box>
           <Box>
@@ -104,13 +106,14 @@ export default function ConfirmSwapTransaction({
               displayAmount={sellQuantity.displayValue}
               type="from"
               defaultTokenInfo={defaultTokenInfo}
+              getTokenInfo={getTokenInfo}
             />
           </Box>
         </Box>
         <Box>
           <Box>
-            <Typography component="div" variant="body1" color="grayscale.500">
-              Swap To
+            <Typography component="div" variant="body1" color="grayscale.600">
+              Swap to
             </Typography>
           </Box>
           <Box>
@@ -120,6 +123,7 @@ export default function ConfirmSwapTransaction({
                 displayAmount={buyQuantity.displayValue}
                 type="from"
                 defaultTokenInfo={defaultTokenInfo}
+                getTokenInfo={getTokenInfo}
                 priceImpactState={priceImpactState}
               />
             </Box>
@@ -204,7 +208,7 @@ export default function ConfirmSwapTransaction({
 const SummaryRow = ({ col1, children, withInfo = false, infoText = '' }) => (
   <Box display="flex" alignItems="center" justifyContent="space-between">
     <Box display="flex" alignItems="center">
-      <Typography component="div" variant="body1" color="grayscale.500">
+      <Typography variant="body1" color="grayscale.600">
         {col1}
       </Typography>
       {withInfo ? (

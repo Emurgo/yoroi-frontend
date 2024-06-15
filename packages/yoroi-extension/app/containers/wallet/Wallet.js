@@ -241,10 +241,12 @@ class Wallet extends Component<AllProps> {
   getDialogs: (any, any) => Node = (intl, currentPool) => {
     const isOpen = this.props.stores.uiDialogs.isOpen;
     const isRevampDialogOpen = isOpen(RevampAnnouncementDialog);
-    const poolTransitionInfo = this.props.stores.delegation.poolTransitionRequestInfo;
+    const selectedWallet = this.props.stores.wallets.selected;
+    const poolTransitionInfo = this.props.stores.delegation.getPoolTransitionInfo(selectedWallet);
+
 
     if (
-      this.props.stores.delegation.poolTransitionConfig.show === 'open' &&
+      this.props.stores.delegation.getPoolTransitionConfig(selectedWallet).show === 'open' &&
       !isRevampDialogOpen &&
       poolTransitionInfo?.shouldShowTransitionFunnel
     )
@@ -252,12 +254,12 @@ class Wallet extends Component<AllProps> {
         <PoolTransitionDialog
           intl={intl}
           onClose={() => {
-            this.props.stores.delegation.setPoolTransitionConfig({ show: 'idle' });
+            this.props.stores.delegation.setPoolTransitionConfig(selectedWallet, { show: 'idle' });
           }}
           poolTransition={poolTransitionInfo}
           currentPoolId={currentPool ?? ''}
           onUpdatePool={() => {
-            this.props.stores.delegation.setPoolTransitionConfig({
+            this.props.stores.delegation.setPoolTransitionConfig(selectedWallet, {
               show: 'idle',
               shouldUpdatePool: true,
             });

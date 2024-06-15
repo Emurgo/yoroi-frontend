@@ -20,7 +20,7 @@ export default function SwapPoolFullInfo({
   showMinAda,
 }: Props): React$Node {
   const { orderData } = useSwap();
-  const { buyTokenInfo } = useSwapForm();
+  const { buyTokenInfo, sellTokenInfo } = useSwapForm();
   const { formattedFee } = useSwapFeeDisplay(defaultTokenInfo);
 
   const buyToken = orderData.tokens?.buyInfo;
@@ -46,10 +46,14 @@ export default function SwapPoolFullInfo({
     <Box sx={{ display: 'flex', flexFlow: 'column', gap: '8px' }}>
       {showMinAda && (
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
+          <Box color="grayscale.600" display="flex" alignItems="center" gap="8px">
             <Typography>Min ADA</Typography>
             {withInfo && (
-              <InfoTooltip content={'A small ADA deposit that will be returned when your order is processed or canceled'} />
+              <InfoTooltip
+                content={
+                  'A small ADA deposit that will be returned when your order is processed or canceled'
+                }
+              />
             )}
           </Box>
           <Box>
@@ -58,7 +62,7 @@ export default function SwapPoolFullInfo({
         </Box>
       )}
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
+        <Box color="grayscale.600" display="flex" alignItems="center" gap="8px">
           <Typography>Fees</Typography>
           {withInfo && (
             <InfoTooltip
@@ -75,10 +79,12 @@ export default function SwapPoolFullInfo({
         <Box>{formattedFee}</Box>
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
+        <Box color="grayscale.600" display="flex" alignItems="center" gap="8px">
           <Typography>Minimum assets received</Typography>
           {withInfo && (
-            <InfoTooltip content={'The minimum amount you are guaranteed to receive in case of price slippage'} />
+            <InfoTooltip
+              content={'The minimum amount you are guaranteed to receive in case of price slippage'}
+            />
           )}
         </Box>
         <Box>
@@ -86,14 +92,18 @@ export default function SwapPoolFullInfo({
         </Box>
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
+        <Box color="grayscale.600" display="flex" alignItems="center" gap="8px">
           <Typography>Liquidity provider fee</Typography>
           {withInfo && (
-            <InfoTooltip content={'A fixed 0.3% operational fee paid to liquidity providers as a reward for supplying tokens, enabling traders to buy and sell assets on the decentralized Cardano network'} />
+            <InfoTooltip
+              content={
+                'A fixed 0.3% operational fee paid to liquidity providers as a reward for supplying tokens, enabling traders to buy and sell assets on the decentralized Cardano network'
+              }
+            />
           )}
         </Box>
         <Box>
-          {liqFeeQuantity} {buyTicker}
+          {liqFeeQuantity} {sellTokenInfo.ticker}
         </Box>
       </Box>
     </Box>

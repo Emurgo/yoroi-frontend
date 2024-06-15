@@ -6,6 +6,7 @@ import {
 import type {
   NetworkRow,
   CardanoHaskellBaseConfig,
+  CardanoHaskellConfig,
   TokenInsert,
 } from '../primitives/tables';
 import { PRIMARY_ASSET_CONSTANTS } from '../primitives/enums';
@@ -22,7 +23,7 @@ export const networks = Object.freeze({
     Backend: {
       BackendService: environment.isTest()
         ? 'http://localhost:21000'
-        : 'https://iohk-mainnet.yoroiwallet.com',
+        : 'https://api.yoroiwallet.com',
       TokenInfoService:
         'https://cdn.yoroiwallet.com',
     },
@@ -230,6 +231,18 @@ export function getCardanoHaskellBaseConfig(
   return (network.BaseConfig: any); // cast to return type
 }
 
+
+export function cardanoHaskellConfigCombine(config: $ReadOnlyArray<CardanoHaskellConfig>): CardanoHaskellConfig {
+  // $FlowIgnore[incompatible-exact]
+  return (config.reduce((acc, next) => Object.assign(acc, next), {}): CardanoHaskellConfig);
+}
+
+export function getCardanoHaskellBaseConfigCombined(
+  network: $ReadOnly<NetworkRow>,
+): CardanoHaskellConfig {
+  return cardanoHaskellConfigCombine(getCardanoHaskellBaseConfig(network))
+}
+
 export const defaultAssets: Array<
   $Diff<TokenInsert, {| Digest: number |}>
 > = Object.keys(networks)
@@ -252,6 +265,7 @@ export const defaultAssets: Array<
               || network === networks.CardanoSanchoTestnet)
               ? 'TADA'
               : 'ADA',
+          logo: null, // TODO: maybe put built-in ADA logo as base64 here
           longName: null,
           numberOfDecimals: 6,
         }

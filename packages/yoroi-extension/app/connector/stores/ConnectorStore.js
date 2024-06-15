@@ -58,7 +58,7 @@ import {
   connectorGenerateReorgTx,
   connectorGetChangeAddress,
   connectorGetUnusedAddresses,
-  connectorGetUsedAddresses,
+  connectorGetUsedAddressesWithPaginate,
   connectorRecordSubmittedCardanoTransaction,
   connectorSendTxCardano,
   getScriptRequiredSigningKeys,
@@ -1062,7 +1062,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (!ownAddresses) {
       ownAddresses = new Set([
         ...utxos.map(utxo => utxo.address),
-        ...(await connectorGetUsedAddresses(publicDeriver, null)),
+        ...(await connectorGetUsedAddressesWithPaginate(publicDeriver, null)),
         ...(await connectorGetUnusedAddresses(publicDeriver)),
         await connectorGetChangeAddress(publicDeriver),
       ]);

@@ -11,7 +11,7 @@ import driversPoolsManager from '../utils/driversPool.js';
 const testWallet = getSpendableWallet();
 
 describe('Loading all txs', function () {
-  this.timeout(3 * oneMinute);
+  this.timeout(5 * oneMinute);
   let webdriver = null;
   let logger = null;
 

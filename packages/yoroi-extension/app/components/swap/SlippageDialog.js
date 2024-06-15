@@ -12,9 +12,16 @@ type Props = {|
   slippageValue: string,
 |};
 
-export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValue }: Props): React$Node {
+export default function SlippageDialog({
+  onSetNewSlippage,
+  onClose,
+  slippageValue,
+}: Props): React$Node {
   const [selectedSlippage, setSelectedSlippage] = useState(slippageValue);
-  const [isManualSlippage, setIsManualSlippage] = useState(!defaultSlippages.includes(slippageValue));
+  const [inputFocused, setInputFocused] = useState(false);
+  const [isManualSlippage, setIsManualSlippage] = useState(
+    !defaultSlippages.includes(slippageValue)
+  );
 
   const handleSlippageApply = () => {
     try {
@@ -40,20 +47,27 @@ export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValu
 
   // <TODO:CHECK_INTL>
   return (
-    <Dialog title="Slippage tolerance" onClose={onClose} withCloseButton closeOnOverlayClick>
-      <Box maxWidth="564px">
+    <Dialog
+      title="Slippage tolerance"
+      onClose={onClose}
+      withCloseButton
+      closeOnOverlayClick
+      styleContentOverride={{ paddingTop: '16px' }}
+      styleOverride={{ minWidth: '612px', height: '540px', maxWidth: '612px' }}
+    >
+      <Box sx={{ margin: '0 auto', flex: 1 }}>
         <Box>
-          <Typography component="div" variant="body1" color="grayscale.800">
+          <Typography component="div" variant="body1" color="grayscale.900">
             Default Slippage Tolerance
           </Typography>
         </Box>
-        <Box py="8px">
+        <Box pb="16px" pt="8px">
           <Typography component="div" variant="body2" color="grayscale.700">
             Slippage tolerance is set as a percentage of the total swap value. Your transactions
             will not be executed if the price moves by more than this amount.
           </Typography>
         </Box>
-        <Box display="flex" justifyContent="flex-start">
+        <Box display="flex" justifyContent="flex-start" mb="32px">
           <Tabs
             tabs={defaultSlippages
               .map(val => ({
@@ -77,8 +91,8 @@ export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValu
           <Box
             component="fieldset"
             sx={{
-              border: '1px solid',
-              borderColor: 'grayscale.400',
+              border: inputFocused && !readonly ? '2px solid' : '1px solid',
+              borderColor: inputFocused && !readonly ? 'common.black' : 'grayscale.400',
               borderRadius: '8px',
               p: '16px',
               display: 'grid',
@@ -88,12 +102,22 @@ export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValu
               bgcolor: readonly ? 'grayscale.50' : 'common.white',
               columnGap: '6px',
               rowGap: '8px',
+              ...(!inputFocused &&
+                !readonly && {
+                  '&:hover': {
+                    border: '1px solid',
+                    borderColor: 'common.black',
+                  },
+                }),
+              maxHeight: '56px',
             }}
+            onFocus={() => setInputFocused(true)}
+            onBlur={() => setInputFocused(false)}
           >
             <Box
               component="legend"
               sx={{
-                top: '-9px',
+                top: '-7px',
                 left: '16px',
                 position: 'absolute',
                 px: '4px',
@@ -129,7 +153,7 @@ export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValu
             sandwich attacks.
           </Typography>
         </Box>
-        <Box>
+        <Box pt="12px">
           <Button
             disabled={selectedSlippage.trim().length === 0}
             fullWidth

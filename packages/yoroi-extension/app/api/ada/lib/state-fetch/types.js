@@ -45,12 +45,19 @@ export type BestBlockFunc = (body: BestBlockRequest) => Promise<BestBlockRespons
 // sendTx
 
 export type SignedRequestInternal = {|
-  signedTx: string,
+  signedTx: string | Array<string>,
 |};
 export type SignedRequest = {|
   ...BackendNetworkInfo,
   id: string,
   encodedTx: Uint8Array,
+|};
+export type SignedBatchRequest = {|
+  ...BackendNetworkInfo,
+  txs: Array<{|
+    id: string,
+    encodedTx: Uint8Array,
+  |}>
 |};
 export type SignedResponse = {| txId: string, |};
 export type SendFunc = (body: SignedRequest) => Promise<SignedResponse>;
@@ -429,6 +436,7 @@ export type RemoteTokenInfo = {|
   +name?: string,
   +decimals?: number,
   +ticker?: string,
+  +logo?: string,
 |};
 export type TokenInfoResponse = {|
   [key: string]: (RemoteTokenInfo | null),
@@ -567,6 +575,12 @@ export type GetTransactionsByHashesResponse = Array<RemoteTransaction>;
 export type GetTransactionsByHashesFunc = (
   body: GetTransactionsByHashesRequest
 ) => Promise<GetTransactionsByHashesResponse>;
+
+export type GetTransactionSlotsByHashesResponse = { [string]: string };
+
+export type GetTransactionSlotsByHashesFunc = (
+  body: GetTransactionsByHashesRequest
+) => Promise<GetTransactionSlotsByHashesResponse>;
 
 export type FilterUsedRequest = {|
   network: $ReadOnly<NetworkRow>,

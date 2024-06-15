@@ -171,11 +171,18 @@ export function PriceImpactAlert({
   onCancel: () => void,
 |}): Node {
   return (
-    <Dialog title="Warning" onClose={onCancel} withCloseButton closeOnOverlayClick>
-      <Box display="flex" maxWidth="648px" mt="-24px" flexDirection="column" gap="24px">
+    <Dialog
+      title="Warning"
+      onClose={onCancel}
+      withCloseButton
+      closeOnOverlayClick
+      styleOverride={{ width: '648px', height: '216px' }}
+      styleContentOverride={{ paddingTop: 0 }}
+    >
+      <Box display="flex" flexDirection="column">
         <PriceImpactWarningText isSevere />
       </Box>
-      <Box maxWidth="648px" display="flex" gap="24px" pt="24px">
+      <Box maxWidth="648px" display="flex" gap="24px" pt="23px">
         <Button fullWidth variant="secondary" onClick={onCancel}>
           Cancel
         </Button>
@@ -183,7 +190,10 @@ export function PriceImpactAlert({
           fullWidth
           variant="primary"
           onClick={onContinue}
-          sx={{ backgroundColor: 'magenta.500' }}
+          sx={{
+            backgroundColor: 'magenta.500',
+            '&:hover': { backgroundColor: 'magenta.600' },
+          }}
         >
           Continue
         </Button>

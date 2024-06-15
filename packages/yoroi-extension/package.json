@@ -1,6 +1,6 @@
 {
   "name": "yoroi",
-  "version": "5.1.422",
+  "version": "5.1.425",
   "description": "Cardano ADA wallet",
   "scripts": {
     "dev-mv2": "rimraf dev/ && NODE_OPTIONS=--openssl-legacy-provider babel-node scripts-mv2/build --type=debug --env 'mainnet'",
@@ -84,7 +84,7 @@
     "babel-plugin-add-module-exports": "1.0.4",
     "babel-plugin-dynamic-import-node": "2.3.3",
     "babel-plugin-module-resolver": "4.1.0",
-    "babel-plugin-nameof-js": "0.0.2",
+    "babel-plugin-ts-nameof": "4.2.1",
     "babel-plugin-react-intl": "5.1.18",
     "babel-preset-react-optimize": "1.0.1",
     "cardano-wallet": "1.2.2",
@@ -148,7 +148,7 @@
     "@emurgo/cip4-js": "1.0.5",
     "@emurgo/cross-csl-browser": "4.4.0",
     "@emurgo/yoroi-eutxo-txs": "0.0.2-alpha.8",
-    "@emurgo/yoroi-lib": "0.15.4",
+    "@emurgo/yoroi-lib": "0.15.5",
     "@ledgerhq/hw-transport-u2f": "5.36.0-deprecated",
     "@ledgerhq/hw-transport-webauthn": "5.36.0-deprecated",
     "@ledgerhq/hw-transport-webhid": "5.51.1",
@@ -157,7 +157,6 @@
     "@mui/material": "^5.0.4",
     "@mui/x-date-pickers": "^5.0.8",
     "@svgr/webpack": "5.5.0",
-    "@vespaiach/axios-fetch-adapter": "^0.3.0",
     "@yoroi/exchange": "2.0.1",
     "@yoroi/resolver": "2.0.2",
     "@yoroi/swap": "1.5.2",
@@ -216,7 +215,8 @@
     "tinycolor2": "1.4.2",
     "trezor-connect-flow": "Emurgo/trezor-connect-flow#92d6d8c8faef25c0ea1d481aa1ecb4ba77ce539c",
     "ua-parser-js": "1.0.37",
-    "util": "0.12.5"
+    "util": "0.12.5",
+    "url": "0.11.3"
   },
   "overrides": {
     "@babel/helpers": "7.16.0"

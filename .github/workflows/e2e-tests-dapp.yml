@@ -1,19 +1,19 @@
-name: End-2-end tests
+name: E2E DApp tests
 
 on:
   workflow_dispatch:
   pull_request:
-    types: [ opened, ready_for_review ]
+    types: [opened, ready_for_review]
   pull_request_review:
-    types: [ submitted ]
+    types: [submitted]
 
 jobs:
-  E2E_tests:
-    if: github.event.review  && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check') || contains(github.event.review.body, '/regression-check'))
+  General:
+    if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check') || contains(github.event.review.body, '/dapp-general'))
     runs-on: macos-14
     strategy:
       matrix:
-        browser: ['chrome']
+        browser: ["chrome"]
       fail-fast: false
 
     steps:
@@ -40,16 +40,17 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: '${{ steps.nvm.outputs.NVMRC }}'
+          node-version: "${{ steps.nvm.outputs.NVMRC }}"
 
-      - name: Cache extension node modules
-        # https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows
+      - name:
+          Cache extension node modules
+          # https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows
         uses: actions/cache@v4
         env:
           cache-name: cache-yoroi-extension-node-modules
         with:
-          # https://github.com/actions/cache/blob/main/examples.md#node---npm
           # It is recommended to cache the NPM cache (~/.npm) instead of node_modules.
+          # https://github.com/actions/cache/blob/main/examples.md#node---npm
           # But we put node version into the cache key and cache node_modules.
           path: packages/yoroi-extension/node_modules
           key: ${{ runner.os }}-build-${{ env.cache-name }}-node-${{ steps.nvm.outputs.NVMRC }}-${{ hashFiles('packages/yoroi-extension/package-lock.json') }}
@@ -73,7 +74,7 @@ jobs:
           SECOND_STATIC_TEST_WALLET: ${{ secrets.SECOND_STATIC_TEST_WALLET }}
           SECOND_SMOKE_TEST_WALLET: ${{ secrets.SECOND_SMOKE_TEST_WALLET }}
           SECOND_SMOKE_TEST_WALLET_FF: ${{ secrets.SECOND_SMOKE_TEST_WALLET_FF }}
-        run: npm run test:${{ matrix.browser }}
+        run: npm run test:${{ matrix.browser }}:dapp
 
       - name: Archive tests screenshots and logs
         if: ${{ failure() }}
@@ -84,8 +85,8 @@ jobs:
             ./packages/e2e-tests/mochawesome-report
             ./packages/e2e-tests/testRunsData_${{ matrix.browser }}
 
-  E2E_dapp_tests:
-    if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check') || contains(github.event.review.body, '/dapp-check'))
+  Failing:
+    if: github.event.review && contains(github.event.review.body, '/dapp-failing')
     runs-on: macos-14
     strategy:
       matrix:
@@ -149,7 +150,7 @@ jobs:
           SECOND_STATIC_TEST_WALLET: ${{ secrets.SECOND_STATIC_TEST_WALLET }}
           SECOND_SMOKE_TEST_WALLET: ${{ secrets.SECOND_SMOKE_TEST_WALLET }}
           SECOND_SMOKE_TEST_WALLET_FF: ${{ secrets.SECOND_SMOKE_TEST_WALLET_FF }}
-        run: npm run test:${{ matrix.browser }}:dapp
+        run: npm run test:${{ matrix.browser }}:dapp:bl
 
       - name: Archive tests screenshots and logs
         if: ${{ failure() }}
