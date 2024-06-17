@@ -113,7 +113,7 @@ const PortfolioDapps = ({ data }: Props) => {
         }
       />
 
-      <Stack direction="row" spacing={theme.spacing(0.5)}>
+      <Stack direction="row">
         {buttonProps.map(button => (
           <Button
             key={button.label}

@@ -35,9 +35,16 @@ const useChart = (data: IChartData) => {
     payload: { value: number };
   }): React.SVGProps<SVGTextElement> => {
     return (
-      <text x={x - 5} y={y} dy={4} textAnchor="end" fill={theme.palette.ds.black_static}>
+      <Box
+        component="text"
+        x={x - 9}
+        y={y}
+        dy={4}
+        textAnchor="end"
+        sx={{ color: theme.palette.ds.gray_c700, fontSize: '0.75rem', lineHeight: '1rem', fontWeight: 400 }}
+      >
         {payload.value.toFixed(1)}
-      </text>
+      </Box>
     );
   };
 

@@ -162,7 +162,6 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
           component={isFetching ? 'img' : 'div'}
           src={chartSkeletonPng}
           sx={{
-            marginLeft: `${-theme.spacing(1)}`,
             width: '100%',
             height: `${chartHeight}px`,
           }}
