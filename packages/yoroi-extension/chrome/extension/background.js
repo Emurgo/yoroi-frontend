@@ -1652,6 +1652,15 @@ async function handleInjectorMessage(message, sender) {
                 throw new Error('wallet doesn\'t support IGetAllUtxos');
               }
               const walletUtxos = await withUtxos.getAllUtxos();
+              if (walletUtxos.length === 0) {
+                rpcResponse({
+                  err: {
+                    code: APIErrorCodes.API_INTERNAL_ERROR,
+                    info: 'not enough UTXOs'
+                  }
+                });
+                return;
+              }
               const addressedUtxos = asAddressedUtxoCardano(walletUtxos);
               const submittedTxs = await loadSubmittedTransactions() || [];
               const {
