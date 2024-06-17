@@ -23,7 +23,6 @@ import type {
 } from '../../api/ada/lib/storage/bridge/delegationUtils';
 
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import { environment } from '../../environment';
 
 export type DelegationRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -240,7 +239,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
         currentPool: transitionResult?.current,
         suggestedPool: transitionResult?.suggested,
         deadlineMilliseconds: transitionResult?.deadlineMilliseconds,
-        shouldShowTransitionFunnel: environment.isDev() && transitionResult !== null,
+        shouldShowTransitionFunnel: transitionResult !== null,
         deadlinePassed: Number(transitionResult?.deadlineMilliseconds) < Date.now(),
       };
 
