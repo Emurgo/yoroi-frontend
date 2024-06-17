@@ -1,42 +1,43 @@
 import type { Node } from 'react';
-import type { StoresMap } from './stores/index';
-import type { ActionsMap } from './actions/index';
-import type { StoresAndActionsProps } from './types/injectedProps.types';
-import type { ConfigType } from '../config/config-types';
-import { Route, Redirect, Switch } from 'react-router-dom';
-import { ROUTES } from './routes-config';
 import React, { Suspense } from 'react';
-import StakingPage, { StakingPageContentPromise } from './containers/wallet/staking/StakingPage';
-import Transfer, { WalletTransferPagePromise } from './containers/transfer/Transfer';
-import VotingPage, { VotingPageContentPromise } from './containers/wallet/voting/VotingPage';
+import { Redirect, Route, Switch } from 'react-router-dom';
+import type { ConfigType } from '../config/config-types';
+import type { ActionsMap } from './actions/index';
 import ConnectedWebsitesPage, { ConnectedWebsitesPagePromise } from './containers/dapp-connector/ConnectedWebsitesContainer';
+import Transfer, { WalletTransferPagePromise } from './containers/transfer/Transfer';
 import AddWalletPage, { AddAnotherWalletPromise } from './containers/wallet/AddWalletPage';
+import StakingPage, { StakingPageContentPromise } from './containers/wallet/staking/StakingPage';
+import VotingPage, { VotingPageContentPromise } from './containers/wallet/voting/VotingPage';
+import { ROUTES } from './routes-config';
+import type { StoresMap } from './stores/index';
+import type { StoresAndActionsProps } from './types/injectedProps.types';
 // Todo: Add lazy loading
-import RestoreWalletPage, { RestoreWalletPagePromise } from './containers/wallet/restore/RestoreWalletPage';
-import CreateWalletPage, { CreateWalletPagePromise } from './containers/wallet/CreateWalletPageContainer';
+import { Stack } from '@mui/material';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import FullscreenLayout from './components/layout/FullscreenLayout';
+import LoadingSpinner from './components/widgets/LoadingSpinner';
 import LoadingPage from './containers/LoadingPage';
-import Wallet from './containers/wallet/Wallet';
 import Settings from './containers/settings/Settings';
 import SwapPageContainer from './containers/swap/SwapPageContainer';
-import AssetsWrapper from './containers/wallet/AssetsWrapper';
-import NFTsWrapper from './containers/wallet/NFTsWrapper';
 import SwapProvider from './containers/swap/SwapProvider';
-import { Stack } from '@mui/material';
-import LoadingSpinner from './components/widgets/LoadingSpinner';
-import FullscreenLayout from './components/layout/FullscreenLayout';
+import AssetsWrapper from './containers/wallet/AssetsWrapper';
+import CreateWalletPage, { CreateWalletPagePromise } from './containers/wallet/CreateWalletPageContainer';
+import NFTsWrapper from './containers/wallet/NFTsWrapper';
+import Wallet from './containers/wallet/Wallet';
+import RestoreWalletPage, { RestoreWalletPagePromise } from './containers/wallet/restore/RestoreWalletPage';
 
 // New UI pages
 import { GovernanceContextProvider } from './UI/features/governace/module/GovernanceContextProvider';
 import { createCurrrentWalletInfo } from './UI/features/governace/common/helpers';
-import GovernanceStatusPage from './UI/pages/Governance/GovernanceStatusPage';
+import { GovernanceContextProvider } from './UI/features/governace/module/GovernanceContextProvider';
 import GovernanceDelegationFormPage from './UI/pages/Governance/GovernanceDelegationFormPage';
-import GovernanceTransactionSubmittedPage from './UI/pages/Governance/GovernanceTransactionSubmittedPage';
+import GovernanceStatusPage from './UI/pages/Governance/GovernanceStatusPage';
 import GovernanceTransactionFailedPage from './UI/pages/Governance/GovernanceTransactionFailedPage';
 import { PortfolioContextProvider } from './UI/features/portfolio/module/PortfolioContextProvider';
 import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
 import PortfolioDappsPage from './UI/pages/portfolio/PortfolioDappsPage';
 import PortfolioDetailPage from './UI/pages/portfolio/PortfolioDetailPage';
+import GovernanceTransactionSubmittedPage from './UI/pages/Governance/GovernanceTransactionSubmittedPage';
 
 // PAGES
 const LanguageSelectionPagePromise = () => import('./containers/profile/LanguageSelectionPage');
