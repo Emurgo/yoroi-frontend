@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 // @flow
 import type { Node, Element, ComponentType } from 'react';
-import React, { Config, forwardRef, useEffect, useState } from 'react';
+import React, { forwardRef, useEffect, useState } from 'react';
 import classnames from 'classnames';
 import { map } from 'lodash';
 import { IconButton, Modal, Typography, alpha } from '@mui/material';
@@ -250,6 +250,7 @@ export const CloseButton = ({
   </Box>
 );
 
+// eslint-disable-next-line no-unused-vars
 const StyledBox = forwardRef(({ contentHasScroll, empty, hasDivider, ...props }, ref) => <Box {...props} ref={ref} />);
 
 export const ModalContainer: any => Node = styled(StyledBox)(

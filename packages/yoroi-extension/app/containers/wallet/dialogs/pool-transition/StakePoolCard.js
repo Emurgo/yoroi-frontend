@@ -100,6 +100,7 @@ export const StakePoolCard = ({
   );
 };
 
+// eslint-disable-next-line no-unused-vars
 const StyledBox = forwardRef(({ suggestedPool, ...props }, ref) => <Box {...props} ref={ref} />);
 
 const CustomCard = styled(StyledBox)(({ theme, suggestedPool }) => ({
