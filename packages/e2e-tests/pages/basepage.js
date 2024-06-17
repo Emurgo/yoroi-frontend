@@ -2,7 +2,13 @@ import { until, Key, logging } from 'selenium-webdriver';
 import path from 'path';
 import * as fs from 'node:fs';
 import { promisify } from 'util';
-import { createTestRunDataDir, getByLocator, isFirefox, isChrome } from '../utils/utils.js';
+import {
+  createTestRunDataDir,
+  getByLocator,
+  getSnapshotObjectFromJSON,
+  isFirefox,
+  isChrome,
+} from '../utils/utils.js';
 import { getExtensionUrl } from '../utils/driverBootstrap.js';
 import {
   defaultRepeatPeriod,
@@ -10,7 +16,6 @@ import {
   halfSecond,
   oneSecond,
 } from '../helpers/timeConstants.js';
-import { getSnapshotObjectFromJSON } from '../utils/utils.js';
 import { dbSnapshotsDir } from '../helpers/constants.js';
 
 const writeFile = promisify(fs.writeFile);
@@ -88,7 +93,8 @@ class BasePage {
   }
   async getText(locator) {
     this.logger.info(`BasePage::getText is called. Locator: ${JSON.stringify(locator)}`);
-    return await this.driver.findElement(getByLocator(locator)).getText();
+    const locatorElem = await this.waitForElement(locator);
+    return await locatorElem.getText();
   }
   async getCssValue(locator, cssStyleProperty) {
     this.logger.info(
@@ -512,7 +518,7 @@ class BasePage {
               console.log('-----> Error happend:', event.target.result);
             };
             const store = tx.objectStore(tableName);
-            const addRequest = store.put(valueItem);
+            store.put(valueItem);
           };
         },
         name,
