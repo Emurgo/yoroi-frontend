@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Divider, Stack, Typography } from '@mui/material';
 import { ReactComponent as BackIcon } from '../../../../../assets/images/assets-page/back-arrow.inline.svg';
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 import { Skeleton, Card } from '../../../../components';
 import TransactionTable from './TransactionTable';
 import TokenDetailChart from './TokenDetailChart';
-import SubMenu from '../../../../../components/topbar/SubMenu';
-import { useTheme } from '@mui/material/styles';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
 import { useStrings } from '../../common/hooks/useStrings';
 import TokenDetailPerformance from './TokenDetailPerformance';
@@ -16,6 +14,7 @@ import { SubMenuOption, TokenType } from '../../common/types/index';
 import NavigationButton from '../../common/components/NavigationButton';
 import mockData from '../../common/mockData';
 import { formatNumber } from '../../common/helpers/formatHelper';
+import Menu from '../../common/components/Menu';
 
 const Header = styled(Box)({
   display: 'flex',
@@ -150,12 +149,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
 
           <Card>
             <Box sx={{ paddingTop: `${theme.spacing(2)}` }}>
-              <SubMenu
-                options={subMenuOptions}
-                onItemClick={(route: string) => setSelectedTab(route)}
-                isActiveItem={isActiveItem}
-                locationId="token-details"
-              />
+              <Menu options={subMenuOptions} onItemClick={(route: string) => setSelectedTab(route)} isActiveItem={isActiveItem} />
               <Divider sx={{ margin: `0 ${theme.spacing(2)}` }} />
             </Box>
             <Box sx={{ padding: theme.spacing(3) }}>
