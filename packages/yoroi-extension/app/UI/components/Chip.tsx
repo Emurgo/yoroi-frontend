@@ -36,7 +36,7 @@ export const Chip = ({ label, type, sx, ...props }: Props): JSX.Element => {
       label={label}
       {...props}
       sx={{
-        minWidth: '63px',
+        minWidth: '61px',
         height: '20px',
         padding: '2px 6px !important',
         borderRadius: '20px',

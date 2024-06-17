@@ -29,7 +29,6 @@ import RestoreWalletPage, { RestoreWalletPagePromise } from './containers/wallet
 // New UI pages
 import { GovernanceContextProvider } from './UI/features/governace/module/GovernanceContextProvider';
 import { createCurrrentWalletInfo } from './UI/features/governace/common/helpers';
-import { GovernanceContextProvider } from './UI/features/governace/module/GovernanceContextProvider';
 import GovernanceDelegationFormPage from './UI/pages/Governance/GovernanceDelegationFormPage';
 import GovernanceStatusPage from './UI/pages/Governance/GovernanceStatusPage';
 import GovernanceTransactionFailedPage from './UI/pages/Governance/GovernanceTransactionFailedPage';

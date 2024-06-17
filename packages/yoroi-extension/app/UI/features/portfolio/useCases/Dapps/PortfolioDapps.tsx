@@ -120,7 +120,7 @@ const PortfolioDapps = ({ data }: Props) => {
             onClick={() => handleChangeTab(button.id)}
             sx={(theme: any) => ({
               height: '2.5rem',
-              width: '9rem',
+              minWidth: '9rem',
               textTransform: 'none',
               color: theme.palette.ds.gray_cmax,
               padding: `${theme.spacing(1)} !important`,

@@ -111,7 +111,7 @@ const OrderTable = ({ data, isLoading }: Props): JSX.Element => {
             '& td': { border: 0 },
           }}
         >
-          <TableCell sx={{ padding: '15.6px 16px 0' }}>
+          <TableCell sx={{ padding: '7.8px 16px' }}>
             <Stack direction="row" alignItems="center" spacing={theme.spacing(1)}>
               <Box
                 width="24px"
@@ -143,7 +143,7 @@ const OrderTable = ({ data, isLoading }: Props): JSX.Element => {
             </Stack>
           </TableCell>
 
-          <TableCell sx={{ padding: '15.6px 16px 0' }}>
+          <TableCell sx={{ padding: '7.8px 16px' }}>
             <Stack
               direction="row"
               alignItems="center"
@@ -170,15 +170,15 @@ const OrderTable = ({ data, isLoading }: Props): JSX.Element => {
             </Stack>
           </TableCell>
 
-          <TableCell sx={{ padding: '15.6px 16px 0' }}>
+          <TableCell sx={{ padding: '7.8px 16px' }}>
             <Typography color="ds.gray_c900">{row.assetPrice}</Typography>
           </TableCell>
 
-          <TableCell sx={{ padding: '15.6px 16px 0' }}>
+          <TableCell sx={{ padding: '7.8px 16px' }}>
             <Typography color="ds.gray_c900">{row.assetAmount}</Typography>
           </TableCell>
 
-          <TableCell sx={{ padding: '15.6px 16px 0' }}>
+          <TableCell sx={{ padding: '7.8px 16px' }}>
             <Typography
               onClick={() =>
                 chrome.tabs.create({
@@ -192,7 +192,7 @@ const OrderTable = ({ data, isLoading }: Props): JSX.Element => {
             </Typography>
           </TableCell>
 
-          <TableCell sx={{ padding: '15.6px 16px 0' }}>
+          <TableCell sx={{ padding: '7.8px 16px' }}>
             <Stack direction="column" spacing={theme.spacing(0.25)}>
               <Typography color="ds.gray_c900" sx={{ textAlign: 'right' }}>
                 {formatNumber(row.totalValue)} {row.firstToken.name}
