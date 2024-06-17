@@ -1,38 +1,33 @@
 // @flow
-import type { ComponentType, Node } from 'react';
-import { Component } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { intlShape } from 'react-intl';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
-import type { LayoutComponentMap } from '../../../styles/context/layout';
-import { withLayout } from '../../../styles/context/layout';
-import type { ConfigType } from '../../../../config/config-types';
-import type { TokenEntry } from '../../../api/common/lib/MultiToken';
 import { observer } from 'mobx-react';
 import moment from 'moment';
+import type { Node } from 'react';
+import { Component } from 'react';
+import { intlShape } from 'react-intl';
+import type { ConfigType } from '../../../../config/config-types';
+import { withLayout } from '../../../styles/context/layout';
 
-import globalMessages from '../../../i18n/global-messages';
-import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
-import WalletEmptyBanner from '../WalletEmptyBanner';
-import BuySellDialog from '../../../components/buySell/BuySellDialog';
-import CardanoStakingPage from './CardanoStakingPage';
 import { Box, styled } from '@mui/system';
-import SummaryCard from '../../../components/wallet/staking/dashboard-revamp/SummaryCard';
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
+import BuySellDialog from '../../../components/buySell/BuySellDialog';
+import DelegatedStakePoolCard from '../../../components/wallet/staking/dashboard-revamp/DelegatedStakePoolCard';
 import EpochProgressWrapper from '../../../components/wallet/staking/dashboard-revamp/EpochProgressWrapper';
 import OverviewModal from '../../../components/wallet/staking/dashboard-revamp/OverviewDialog';
-import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
-import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer';
-import DeregisterDialogContainer from '../../transfer/DeregisterDialogContainer';
-import { calculateAndFormatValue } from '../../../utils/unit-of-account';
-import WithdrawalTxDialogContainer from '../../transfer/WithdrawalTxDialogContainer';
-import { generateGraphData } from '../../../utils/graph';
 import RewardHistoryDialog from '../../../components/wallet/staking/dashboard-revamp/RewardHistoryDialog';
-import DelegatedStakePoolCard from '../../../components/wallet/staking/dashboard-revamp/DelegatedStakePoolCard';
-import WithdrawRewardsDialog from './WithdrawRewardsDialog';
-import { formatLovelacesHumanReadableShort, roundOneDecimal, roundTwoDecimal } from '../../../utils/formatters';
-import { getDrepDelegationState } from '../../../UI/features/governace/api/useDrepDelegationState';
-import { GovernanceParticipateDialog } from '../dialogs/GovernanceParticipateDialog';
+import SummaryCard from '../../../components/wallet/staking/dashboard-revamp/SummaryCard';
 import { compose, maybe, noop } from '../../../coreUtils';
+import globalMessages from '../../../i18n/global-messages';
+import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
+import { formatLovelacesHumanReadableShort, roundOneDecimal, roundTwoDecimal } from '../../../utils/formatters';
+import { generateGraphData } from '../../../utils/graph';
+import { calculateAndFormatValue } from '../../../utils/unit-of-account';
+import DeregisterDialogContainer from '../../transfer/DeregisterDialogContainer';
+import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer';
+import WithdrawalTxDialogContainer from '../../transfer/WithdrawalTxDialogContainer';
+import WalletEmptyBanner from '../WalletEmptyBanner';
+import { GovernanceParticipateDialog } from '../dialogs/GovernanceParticipateDialog';
+import CardanoStakingPage from './CardanoStakingPage';
+import WithdrawRewardsDialog from './WithdrawRewardsDialog';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -199,7 +194,7 @@ class StakingPageContent extends Component<AllProps> {
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingPageContent)} opened for non-reward wallet`);
     }
-    stores.delegation.checkGovernanceStatus();
+    stores.delegation.checkGovernanceStatus(publicDeriver);
     const balance = stores.transactions.getBalance(publicDeriver);
     const isWalletWithNoFunds = balance != null && balance.getDefaultEntry().amount.isZero();
 
@@ -211,7 +206,7 @@ class StakingPageContent extends Component<AllProps> {
     const currentlyDelegating = stores.delegation.isCurrentlyDelegating(publicDeriver);
     const delegatedUtxo = stores.delegation.getDelegatedUtxoBalance(publicDeriver);
     const delegatedRewards = stores.delegation.getRewardBalanceOrZero(publicDeriver);
-    const isParticipatingToGovernance = stores.delegation.isParticipatingToGovernance;
+    const isParticipatingToGovernance = stores.delegation.governanceStatus;
 
     return (
       <Box>

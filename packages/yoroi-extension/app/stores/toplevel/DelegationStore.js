@@ -1,28 +1,24 @@
 // @flow
 
-import { action, observable, runInAction } from 'mobx';
-import { find } from 'lodash';
-import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import LocalizedRequest from '../lib/LocalizedRequest';
-import Store from '../base/Store';
-import CachedRequest from '../lib/LocalizedCachedRequest';
-import LocalizableError from '../../i18n/LocalizableError';
-import { PoolMissingApiError } from '../../api/common/errors';
-import type { MangledAmountFunc, MangledAmountsResponse } from '../stateless/mangledAddresses';
-import type { ActionsMap } from '../../actions/index';
-import type { StoresMap } from '../index';
-import type { ExplorerPoolInfo as PoolInfo } from '@emurgo/yoroi-lib';
 import { PoolInfoApi } from '@emurgo/yoroi-lib';
+import { GovernanceApi } from '@emurgo/yoroi-lib/dist/governance/emurgo-api';
+import { find } from 'lodash';
+import { action, observable, runInAction } from 'mobx';
+import type { ActionsMap } from '../../actions/index';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import { asGetStakingKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { PoolMissingApiError } from '../../api/common/errors';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { forceNonNull, maybe } from '../../coreUtils';
-import type {
-  GetDelegatedBalanceFunc,
-  GetDelegatedBalanceResponse,
-  RewardHistoryFunc,
-} from '../../api/ada/lib/storage/bridge/delegationUtils';
+import LocalizableError from '../../i18n/LocalizableError';
+import Store from '../base/Store';
+import type { StoresMap } from '../index';
+import CachedRequest from '../lib/LocalizedCachedRequest';
+import LocalizedRequest from '../lib/LocalizedRequest';
+import type { MangledAmountsResponse } from '../stateless/mangledAddresses';
 
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import { unwrapStakingKey } from '../../api/ada/lib/storage/bridge/utils';
 import { environment } from '../../environment';
 
 export type DelegationRequests = {|
@@ -67,15 +63,20 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     show: 'closed',
     shouldUpdatePool: false,
   };
+  @observable governanceStatus: any = null;
+
+  @action setGovernanceStatus: any => void = (status: any) => {
+    this.governanceStatus = status;
+  };
 
   @action setPoolTransitionConfig: any => void = (config: PoolTransitionModal) => {
     this.poolTransitionConfig.show = config.show;
     this.poolTransitionConfig.shouldUpdatePool = config.shouldUpdatePool;
   };
 
-  @observable poolInfoQuery: LocalizedRequest<
+  @observable poolInfoQuery: LocalizedRequest<(Array<string>) => Promise<void>> = new LocalizedRequest<
     (Array<string>) => Promise<void>
-  > = new LocalizedRequest<(Array<string>) => Promise<void>>(async poolIds => {
+  >(async poolIds => {
     const { selectedNetwork } = this.stores.profile;
     if (selectedNetwork == null) throw new Error(`${nameof(DelegationStore)} no network selected`);
     await this.stores.substores.ada.delegation.updatePoolInfo({
@@ -140,14 +141,12 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
   };
 
   canUnmangleSomeUtxo: (PublicDeriver<>) => boolean = publicDeriver => {
-    const canUnmangleAmount: ?MultiToken = this.getDelegationRequests(publicDeriver)?.mangledAmounts
-      .result?.canUnmangle;
+    const canUnmangleAmount: ?MultiToken = this.getDelegationRequests(publicDeriver)?.mangledAmounts.result?.canUnmangle;
     return maybe(canUnmangleAmount, t => t.getDefault().gt(0)) ?? false;
   };
 
   getMangledAmountsOrZero: (PublicDeriver<>) => MangledAmountsResponse = publicDeriver => {
-    const resp: ?MangledAmountsResponse = this.getDelegationRequests(publicDeriver)?.mangledAmounts
-      .result;
+    const resp: ?MangledAmountsResponse = this.getDelegationRequests(publicDeriver)?.mangledAmounts.result;
     return {
       canUnmangle: resp?.canUnmangle ?? publicDeriver.getParent().getDefaultMultiToken(),
       cannotUnmangle: resp?.cannotUnmangle ?? publicDeriver.getParent().getDefaultMultiToken(),
@@ -168,10 +167,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
       // We cancel out any still present reward, in case it has not synced yet
       return publicDeriver.getParent().getDefaultMultiToken();
     }
-    return (
-      this._getDelegatedBalanceResult(publicDeriver)?.accountPart ??
-      publicDeriver.getParent().getDefaultMultiToken()
-    );
+    return this._getDelegatedBalanceResult(publicDeriver)?.accountPart ?? publicDeriver.getParent().getDefaultMultiToken();
   };
 
   getDelegatedUtxoBalance: (PublicDeriver<>) => ?MultiToken = publicDeriver => {
@@ -194,13 +190,8 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     return find(this.poolInfo, { networkId: network.NetworkId, poolId })?.poolInfo;
   };
 
-  getLocalRemotePoolInfo: ($ReadOnly<NetworkRow>, string) => void | PoolInfo = (
-    network,
-    poolId
-  ) => {
-    return (
-      find(this.poolInfo, { networkId: network.NetworkId, poolId })?.poolRemoteInfo ?? undefined
-    );
+  getLocalRemotePoolInfo: ($ReadOnly<NetworkRow>, string) => void | PoolInfo = (network, poolId) => {
+    return find(this.poolInfo, { networkId: network.NetworkId, poolId })?.poolRemoteInfo ?? undefined;
   };
 
   checkPoolTransition: () => Promise<void> = async () => {
@@ -218,7 +209,6 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     }
 
     try {
-
       const { BackendService } = publicDeriver.getParent().getNetworkInfo().Backend;
       const transitionResult = await maybe(currentPool, p =>
         new PoolInfoApi(forceNonNull(BackendService) + '/api').getTransition(p, RustModule.CrossCsl.init)
@@ -232,12 +222,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
         deadlinePassed: Number(transitionResult?.deadlineMilliseconds) < Date.now(),
       };
 
-      if (
-        isStakeRegistered &&
-        currentlyDelegating &&
-        transitionResult &&
-        this.poolTransitionConfig.show === 'closed'
-      ) {
+      if (isStakeRegistered && currentlyDelegating && transitionResult && this.poolTransitionConfig.show === 'closed') {
         this.setPoolTransitionConfig({ show: 'open' });
       }
 
@@ -271,6 +256,35 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
       poolRequest: delegationTransaction.selectedPools[0],
       publicDeriver: selectedWallet,
     });
+  };
+
+  checkGovernanceStatus: (PublicDeriver<any>) => any = async publicDeriver => {
+    try {
+      const withStakingKey = asGetStakingKey(publicDeriver);
+      if (withStakingKey == null) {
+        throw new Error(`missing staking key functionality`);
+      }
+
+      const networkInfo = publicDeriver.getParent().getNetworkInfo();
+      const networkId = networkInfo.NetworkId;
+
+      const stakingKeyResp = await withStakingKey.getStakingKey();
+
+      const skey = unwrapStakingKey(stakingKeyResp.addr.Hash).to_keyhash()?.to_hex();
+
+      const backendService = publicDeriver.getParent().getNetworkInfo().Backend.BackendService;
+      const backendServiceZero = publicDeriver.getParent().getNetworkInfo().Backend.BackendServiceZero;
+
+      const govApi = new GovernanceApi({
+        oldBackendUrl: String(backendService),
+        newBackendUrl: String(backendServiceZero),
+        networkId: networkId,
+        wasmFactory: RustModule.CrossCsl.init,
+      });
+
+      const governanceStatus = await govApi.getAccountState(skey, skey);
+      this.setGovernanceStatus(governanceStatus);
+    } catch (e) {}
   };
 
   @action.bound
