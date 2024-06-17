@@ -62,7 +62,7 @@ export type PoolTransitionModal = {| show: 'open' | 'closed' | 'idle', shouldUpd
 export default class DelegationStore extends Store<StoresMap, ActionsMap> {
   @observable delegationRequests: Array<DelegationRequests> = [];
   @observable poolTransitionRequestInfo: { [number]: ?PoolTransition } = {};
-  @observable poolTransitionConfig: { [number]: PoolTransitionModal } = {};
+  @observable poolTransitionConfig: { [number]: ?PoolTransitionModal } = {};
 
   getPoolTransitionConfig(publicDeriver: ?PublicDeriver<>): PoolTransitionModal {
     return maybe(publicDeriver, w => this.poolTransitionConfig[w.getPublicDeriverId()]) ?? {
@@ -212,6 +212,20 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
 
   getPoolTransitionInfo(publicDeriver: ?PublicDeriver<>): ?PoolTransition {
     return maybe(publicDeriver, w => this.poolTransitionRequestInfo[w.getPublicDeriverId()]);
+  }
+
+  disablePoolTransitionState(publicDeriver: ?PublicDeriver<>): void {
+    maybe(publicDeriver, w => {
+      runInAction(() => {
+        const publicDeriverId = w.getPublicDeriverId();
+        this.poolTransitionConfig[publicDeriverId] = undefined;
+        if (this.poolTransitionRequestInfo[publicDeriverId] != null) {
+          // we don't delete the suggestion state because then it would get fetched again automatically
+          // so just flag it as completely disabled for that wallet
+          this.poolTransitionRequestInfo[publicDeriverId].shouldShowTransitionFunnel = false;
+        }
+      });
+    });
   }
 
   @action checkPoolTransition: () => Promise<void> = async () => {
