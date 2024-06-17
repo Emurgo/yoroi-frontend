@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 // @flow
 import type { Node, Element, ComponentType } from 'react';
-import React, { useEffect, useState } from 'react';
+import React, { Config, forwardRef, useEffect, useState } from 'react';
 import classnames from 'classnames';
 import { map } from 'lodash';
 import { IconButton, Modal, Typography, alpha } from '@mui/material';
@@ -250,12 +250,15 @@ export const CloseButton = ({
   </Box>
 );
 
-export const ModalContainer: any => Node = styled(Box)(
+const StyledBox = forwardRef(({ contentHasScroll, empty, hasDivider, ...props }, ref) => <Box {...props} ref={ref} />);
+
+export const ModalContainer: any => Node = styled(StyledBox)(
   ({ theme, contentHasScroll, empty = false }) => {
     const normalMinWidth =
       theme.name === 'classic' || theme.name === 'modern'
         ? 'var(--yoroi-comp-dialog-min-width-md)'
         : '648px';
+    const revampBorder = contentHasScroll ? '1px solid' : '';
     return {
       position: 'relative',
       minWidth: empty ? '0px' : normalMinWidth,
@@ -276,11 +279,7 @@ export const ModalContainer: any => Node = styled(Box)(
         letterSpacing: 0,
         display: 'block',
         borderBottom:
-          theme.name === 'classic' || theme.name === 'modern'
-            ? ''
-            : contentHasScroll
-            ? '1px solid'
-            : '',
+          theme.name === 'classic' || theme.name === 'modern' ? '' : revampBorder,
         borderBottomColor:
           theme.name === 'classic' || theme.name === 'modern'
             ? theme.palette.gray['200']
@@ -303,7 +302,7 @@ const ModalContent = styled(Box)(({ theme }) => ({
   flexFlow: 'column',
 }));
 
-const ModalFooter = styled(Box)(({ theme, hasDivider }) => ({
+const ModalFooter = styled(StyledBox)(({ theme, hasDivider }) => ({
   display: 'flex',
   gap: '24px',
   paddingLeft: theme.name === 'classic' ? '30px' : '24px',

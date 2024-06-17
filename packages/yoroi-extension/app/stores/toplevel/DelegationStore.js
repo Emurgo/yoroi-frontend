@@ -1,6 +1,6 @@
 // @flow
 
-import { action, observable } from 'mobx';
+import { action, observable, runInAction } from 'mobx';
 import { find } from 'lodash';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
@@ -255,7 +255,9 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
         this.setPoolTransitionConfig(publicDeriver, { show: 'open' });
       }
 
-      this.poolTransitionRequestInfo[walletId] = { ...response };
+      runInAction(() => {
+        this.poolTransitionRequestInfo[walletId] = { ...response };
+      })
     } catch (error) {
       console.warn('Failed to check pool transition', error);
     }

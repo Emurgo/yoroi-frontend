@@ -125,9 +125,12 @@ export function useRichOpenOrders(): any {
 
 export function useRichCompletedOrders(): any {
   try {
+    console.log(11);
     const completedOrders = useSwapOrdersByStatusCompleted();
-    if (completedOrders?.length === 0) return [];
+    console.log(22);
     const { onlyVerifiedTokens } = useSwapTokensOnlyVerified();
+    console.log(33);
+    if (completedOrders?.length === 0) return [];
     const tokensMap = onlyVerifiedTokens.reduce((map, t) => ({ ...map, [t.id]: t }), {});
     return completedOrders.map(o => {
       const fromToken = tokensMap[o.from.tokenId];
@@ -139,6 +142,7 @@ export function useRichCompletedOrders(): any {
       };
     });
   } catch (error) {
+    console.log(99);
     console.warn(error);
     return [];
   }
