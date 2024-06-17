@@ -21,6 +21,7 @@ import banxaPng from '../../assets/images/banxa.png';
 import encryptusPng from '../../assets/images/encryptus.png';
 import { ReactComponent as InfoIcon } from '../../assets/images/info-icon-revamp.inline.svg';
 import { exchangeApiMaker, exchangeManagerMaker } from '@yoroi/exchange'
+import environment from '../../environment';
 
 declare var chrome;
 
@@ -351,21 +352,22 @@ export default class BuySellDialog extends Component<Props, State> {
         styleOverride={{ width: '648px' }}
         styleFlags={{ contentNoTopPadding: true }}
       >
-        <Tabs
-          value={state.isBuying ? 0 : 1}
-          onChange={() => this.setState({ isBuying: !state.isBuying })}
-          sx={{
-            width: '100%',
-            [`& .${tabsClasses.indicator}`]: {
-              display: 'none',
-            },
-            boxShadow: 'none',
-          }}
-        >
-          <TabItem disableRipple label={intl.formatMessage(globalMessages.buyAda)} />
-          <TabItem disableRipple label={intl.formatMessage(globalMessages.sellAda)} />
-        </Tabs>
-
+        {(environment.isDev() || environment.isNightly()) && (
+          <Tabs
+            value={state.isBuying ? 0 : 1}
+            onChange={() => this.setState({ isBuying: !state.isBuying })}
+            sx={{
+              width: '100%',
+              [`& .${tabsClasses.indicator}`]: {
+                display: 'none',
+              },
+              boxShadow: 'none',
+            }}
+          >
+            <TabItem disableRipple label={intl.formatMessage(globalMessages.buyAda)} />
+            <TabItem disableRipple label={intl.formatMessage(globalMessages.sellAda)} />
+          </Tabs>
+        )}
         {this.renderBuySell()}
       </Dialog>
     );
