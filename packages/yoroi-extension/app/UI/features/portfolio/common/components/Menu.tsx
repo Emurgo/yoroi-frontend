@@ -1,14 +1,22 @@
 import { Box, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material';
 import React from 'react';
+import { SubMenuOption } from '../types';
 
-const Menu = ({ options, onItemClick, isActiveItem }) => {
+interface Props {
+  options: SubMenuOption[];
+  onItemClick: (route: string) => void;
+  isActiveItem: (route: string) => boolean;
+}
+
+const Menu = ({ options, onItemClick, isActiveItem }: Props) => {
   const theme: any = useTheme();
 
   return (
     <Stack direction="row" spacing={theme.spacing(3)} sx={{ height: '3rem', paddingX: theme.spacing(3) }}>
-      {options.map(option => (
+      {options.map((option, index) => (
         <Box
+          key={index}
           onClick={() => onItemClick(option.route)}
           sx={{
             display: 'flex',
@@ -16,9 +24,7 @@ const Menu = ({ options, onItemClick, isActiveItem }) => {
             alignItems: 'center',
             borderBottom: '3px solid',
             borderColor: isActiveItem(option.route) ? 'ds.primary_c500' : 'transparent',
-            '&:hover': {
-              cursor: 'pointer',
-            },
+            cursor: 'pointer',
           }}
         >
           <Typography

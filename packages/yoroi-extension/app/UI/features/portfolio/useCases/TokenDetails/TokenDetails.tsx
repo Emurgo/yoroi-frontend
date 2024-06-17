@@ -86,9 +86,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
             display: 'flex',
             gap: theme.spacing(2),
             alignItems: 'center',
-            '&:hover': {
-              cursor: 'pointer',
-            },
+            cursor: 'pointer',
           }}
         >
           <BackIcon />
@@ -150,7 +148,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
           <Card>
             <Box sx={{ paddingTop: `${theme.spacing(2)}` }}>
               <Menu options={subMenuOptions} onItemClick={(route: string) => setSelectedTab(route)} isActiveItem={isActiveItem} />
-              <Divider sx={{ margin: `0 ${theme.spacing(2)}` }} />
+              <Divider sx={{ margin: `0 ${theme.spacing(3)}` }} />
             </Box>
             <Box sx={{ padding: theme.spacing(3) }}>
               {selectedTab === subMenuOptions[0]?.route ? (
@@ -168,7 +166,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
           </Card>
         </TokenInfo>
 
-        <TransactionTable history={mockData.transactionHistory} />
+        <TransactionTable history={mockData.transactionHistory} tokenName={tokenInfo.name} />
       </Stack>
     </Box>
   );

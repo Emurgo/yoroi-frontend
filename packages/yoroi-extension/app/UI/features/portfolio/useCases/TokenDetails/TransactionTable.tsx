@@ -18,7 +18,7 @@ const Container = styled(Box)(() => ({
   margin: '30px 0',
 }));
 
-const TransactionTable = ({ history }: { history: TransactionItemType[] }): JSX.Element => {
+const TransactionTable = ({ history, tokenName }: { history: TransactionItemType[]; tokenName: string }): JSX.Element => {
   const theme = useTheme();
   const strings = useStrings();
   const { unitOfAccount } = usePortfolio();
@@ -106,6 +106,7 @@ const TransactionTable = ({ history }: { history: TransactionItemType[] }): JSX.
                       strings={strings}
                       unitOfAccount={unitOfAccount}
                       headCells={headCells}
+                      tokenName={tokenName}
                     />
                   ))}
                 </Fragment>
@@ -118,7 +119,7 @@ const TransactionTable = ({ history }: { history: TransactionItemType[] }): JSX.
   );
 };
 
-const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount, headCells }) => {
+const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount, headCells, tokenName }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
@@ -198,7 +199,7 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount, hea
                 row.type === HistoryItemType.WITHDRAW ||
                 row.type === HistoryItemType.DELEGATE) &&
                 '+ '}
-              {formatNumber(row.amountTotal)} ADA
+              {formatNumber(row.amountTotal)} {tokenName}
             </Typography>
             {isExpanded ? (
               <Box sx={{ transition: 'all ease 0.3s' }}>
