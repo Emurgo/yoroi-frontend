@@ -81,8 +81,8 @@ export const StakePoolCard = ({
             <>
               {!deadlinePassed ? (
                 <Typography variant="body2">
-                  {intl.formatMessage(messages.poolStop)}
-                  <Typography variant="body2" fontWeight="500">
+                  {intl.formatMessage(messages.poolStop)}&nbsp;
+                  <Typography variant="body2" fontWeight="500" sx={{ display: 'inline' }}>
                     {formatTimeSpan(Number(deadlineMilliseconds), Date.now())}
                   </Typography>
                 </Typography>
