@@ -97,11 +97,21 @@ export function useSwapFeeDisplay(
 }
 
 export function useRichOpenOrders(): any {
+  let openOrders = [];
   try {
-    const openOrders = useSwapOrdersByStatusOpen();
-    if (openOrders?.length === 0) return [];
-    const { onlyVerifiedTokens } = useSwapTokensOnlyVerified();
-    if (onlyVerifiedTokens.length === 0) return [];
+    openOrders = useSwapOrdersByStatusOpen();
+  } catch (e) {
+    console.warn('useRichCompletedOrders.useSwapOrdersByStatusOpen', e);
+  }
+  let onlyVerifiedTokens = [];
+  try {
+    const res = useSwapTokensOnlyVerified();
+    onlyVerifiedTokens = res.onlyVerifiedTokens;
+  } catch (e) {
+    console.warn('useRichCompletedOrders.useSwapTokensOnlyVerified', e);
+  }
+  if ((openOrders?.length || 0) === 0 || (onlyVerifiedTokens?.length || 0) === 0) return [];
+  try {
     const tokensMap = onlyVerifiedTokens.reduce((map, t) => ({ ...map, [t.id]: t }), {});
     return openOrders.map(o => {
       const fromToken = tokensMap[o.from.tokenId];
@@ -117,20 +127,28 @@ export function useRichOpenOrders(): any {
         sender: o.sender,
       };
     });
-  } catch (error) {
-    console.warn(error);
+  } catch (e) {
+    console.warn('useRichOpenOrders', e);
     return [];
   }
 }
 
 export function useRichCompletedOrders(): any {
+  let completedOrders = [];
   try {
-    console.log(11);
-    const completedOrders = useSwapOrdersByStatusCompleted();
-    console.log(22);
-    const { onlyVerifiedTokens } = useSwapTokensOnlyVerified();
-    console.log(33);
-    if (completedOrders?.length === 0) return [];
+    completedOrders = useSwapOrdersByStatusCompleted();
+  } catch (e) {
+    console.warn('useRichCompletedOrders.useSwapOrdersByStatusCompleted', e);
+  }
+  let onlyVerifiedTokens = [];
+  try {
+    const res = useSwapTokensOnlyVerified();
+    onlyVerifiedTokens = res.onlyVerifiedTokens;
+  } catch (e) {
+    console.warn('useRichCompletedOrders.useSwapTokensOnlyVerified', e);
+  }
+  if ((completedOrders?.length || 0) === 0 || (onlyVerifiedTokens?.length || 0) === 0) return [];
+  try {
     const tokensMap = onlyVerifiedTokens.reduce((map, t) => ({ ...map, [t.id]: t }), {});
     return completedOrders.map(o => {
       const fromToken = tokensMap[o.from.tokenId];
@@ -141,9 +159,8 @@ export function useRichCompletedOrders(): any {
         to: { quantity: o.to.quantity, token: toToken },
       };
     });
-  } catch (error) {
-    console.log(99);
-    console.warn(error);
+  } catch (e) {
+    console.warn('useRichCompletedOrders', e);
     return [];
   }
 }
