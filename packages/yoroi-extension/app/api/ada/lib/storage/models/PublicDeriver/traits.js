@@ -289,6 +289,7 @@ const GetAllUtxosMixin = (
             assetName: tokenId.split('.')[1],
             numberOfDecimals: 0,
             ticker: null,
+            logo: null,
             longName: null
           },
         };

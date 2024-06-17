@@ -7,11 +7,12 @@ import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types'
 import { Box } from '@mui/material';
 
 type Props = {|
-  defaultTokenInfo: RemoteTokenInfo,
   onAssetSelect(): void,
+  defaultTokenInfo: RemoteTokenInfo,
+  getTokenInfo: string => Promise<RemoteTokenInfo>,
 |};
 
-export default function EditSellAmount({ onAssetSelect, defaultTokenInfo }: Props): Node {
+export default function EditSellAmount({ onAssetSelect, defaultTokenInfo, getTokenInfo }: Props): Node {
   const { orderData } = useSwap();
   const {
     sellQuantity: { displayValue: sellDisplayValue, error },
@@ -34,6 +35,7 @@ export default function EditSellAmount({ onAssetSelect, defaultTokenInfo }: Prop
         value={sellDisplayValue}
         tokenInfo={sellTokenInfo}
         defaultTokenInfo={defaultTokenInfo}
+        getTokenInfo={getTokenInfo}
         onAssetSelect={onAssetSelect}
         focusState={sellFocusState}
         error={error}

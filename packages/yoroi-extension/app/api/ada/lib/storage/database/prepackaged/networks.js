@@ -236,6 +236,7 @@ export const defaultAssets: Array<$Diff<TokenInsert, {| Digest: number |}>> = Ob
               network === networks.CardanoSanchoTestnet
                 ? 'TADA'
                 : 'ADA',
+            logo: null, // TODO: maybe put built-in ADA logo as base64 here
             longName: null,
             numberOfDecimals: 6,
           },

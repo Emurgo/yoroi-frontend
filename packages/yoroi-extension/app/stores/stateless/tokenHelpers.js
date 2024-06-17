@@ -87,12 +87,13 @@ export function getTokenIdentifierIfExists(
 }
 
 export function createTokenRowSummary(tokenRow: $ReadOnly<TokenRow>): RemoteTokenInfo {
-  const { numberOfDecimals, ticker } = tokenRow.Metadata;
+  const { numberOfDecimals, ticker, logo } = tokenRow.Metadata;
   const { name } = getTokenStrictName(tokenRow);
   return {
     ticker: ticker ?? undefined,
     name: name ?? undefined,
     decimals: numberOfDecimals ?? undefined,
+    logo: logo ?? undefined,
   };
 }
 
