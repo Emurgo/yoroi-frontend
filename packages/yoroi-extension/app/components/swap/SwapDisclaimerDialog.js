@@ -1,9 +1,9 @@
 // @flow
+import { Box, Button, Typography } from '@mui/material';
 import type { Node } from 'react';
 import { useState } from 'react';
-import { Box, Button, Typography } from '@mui/material';
-import Dialog from '../widgets/Dialog';
 import CheckboxLabel from '../common/CheckboxLabel';
+import Dialog from '../widgets/Dialog';
 
 type Props = {|
   onDialogConfirm: () => void,
@@ -17,8 +17,9 @@ export default function SwapDisclaimerDialog({ onDialogConfirm, onDialogRefuse }
       title="Swap Disclaimer"
       onClose={onDialogRefuse}
       styleOverride={{ width: '648px', height: '504px' }}
+      styleContentOverride={{ paddingTop: '0px' }}
     >
-      <Box display="flex" maxWidth="648px" mt="-24px" flexDirection="column" gap="24px">
+      <Box display="flex" maxWidth="648px" flexDirection="column" gap="24px">
         <Box>
           <Typography component="div" variant="body1" color="grayscale.900" align="justify">
             Please be aware that by proceeding to use the SWAP functionality within Yoroi, you
