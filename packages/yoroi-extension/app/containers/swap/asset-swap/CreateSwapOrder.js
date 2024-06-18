@@ -13,11 +13,12 @@ import SelectSellTokenFromList from './edit-sell-amount/SelectSellTokenFromList'
 import EditSwapPool from './edit-pool/EditPool';
 import SelectSwapPoolFromList from './edit-pool/SelectPoolFromList';
 import SwapStore from '../../../stores/ada/SwapStore';
-import { useAsyncPools } from '../hooks';
 import { TopActions } from './actions/TopActions';
 import { MiddleActions } from './actions/MiddleActions';
 import { EditSlippage } from './actions/EditSlippage';
 import { useSwapForm } from '../context/swap-form';
+import { runInAction } from 'mobx';
+import type { State } from '../context/swap-form/types';
 
 type Props = {|
   slippageValue: string,
@@ -27,6 +28,25 @@ type Props = {|
   getTokenInfo: string => Promise<RemoteTokenInfo>,
   priceImpactState: ?PriceImpact,
 |};
+
+function updatePoolsIfNeeded<T>(
+  tokenA: string,
+  tokenB: string,
+  state: State<?string>,
+  api: {| byPair: ({| tokenA: string, tokenB: string |}) => Promise<T> |},
+  submit: T => void) {
+  if (tokenA != null && tokenB != null && tokenA !== tokenB) {
+    const pair = `${tokenA}:${tokenB}`;
+    if (pair !== state.value) {
+      runInAction(() => {
+        state.update(pair);
+      });
+      api.byPair({ tokenA, tokenB })
+        .then(pools => submit(pools))
+        .catch(err => console.warn(`Failed to fetch pools for pair: ${pair}`, err));
+    }
+  }
+}
 
 export const CreateSwapOrder = ({
   slippageValue,
@@ -40,6 +60,7 @@ export const CreateSwapOrder = ({
   const [prevSelectedPoolId, setPrevSelectedPoolId] = useState<?string>(undefined);
 
   const {
+    pools,
     orderData: {
       amounts: { sell, buy },
       type: orderType,
@@ -48,9 +69,10 @@ export const CreateSwapOrder = ({
     // unsignedTxChanged,
     sellTokenInfoChanged,
     buyTokenInfoChanged,
+    poolPairsChanged,
   } = useSwap();
 
-  const { onChangeLimitPrice } = useSwapForm();
+  const { onChangeLimitPrice, selectedPairState } = useSwapForm();
 
   const resetLimitPrice = () => {
     onChangeLimitPrice('');
@@ -64,10 +86,13 @@ export const CreateSwapOrder = ({
     }
   }
 
-  // TODO: refactor, this hook call will be removed and replaced with store function
-  useAsyncPools(sell.tokenId, buy.tokenId)
-    .then(() => null)
-    .catch(() => null);
+  updatePoolsIfNeeded(
+    sell.tokenId,
+    buy.tokenId,
+    selectedPairState,
+    pools.list,
+    poolPairsChanged,
+  );
 
   return (
     <>

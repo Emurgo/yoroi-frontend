@@ -1,36 +1,13 @@
 //@flow
-import { useState } from 'react';
 import {
   useSwap,
   useSwapOrdersByStatusCompleted,
   useSwapOrdersByStatusOpen,
-  useSwapPoolsByPair,
   useSwapTokensOnlyVerified,
 } from '@yoroi/swap';
 import { Quantities } from '../../utils/quantities';
 import { useSwapForm } from './context/swap-form';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
-import { runInAction } from 'mobx';
-
-export async function useAsyncPools(tokenA: string, tokenB: string): Promise<void> {
-  const { poolPairsChanged } = useSwap();
-  const [prevUsedPair, setPrevUsedPair] = useState<?string>(null);
-  const pair = `${tokenA}:${tokenB}`;
-  const isSamePair = prevUsedPair === pair;
-  useSwapPoolsByPair(
-    { tokenA, tokenB },
-    {
-      onSuccess: pools => {
-        if (!isSamePair) {
-          runInAction(() => {
-            setPrevUsedPair(pair);
-            poolPairsChanged(pools);
-          });
-        }
-      },
-    }
-  );
-}
 
 export function useSwapFeeDisplay(
   defaultTokenInfo: RemoteTokenInfo

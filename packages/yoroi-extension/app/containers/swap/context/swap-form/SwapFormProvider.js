@@ -226,6 +226,7 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
     [actions, clearErrors, orderData.tokens.priceDenomination, limitPriceChanged, numberLocale]
   );
 
+  const selectedPairState = StateWrap<?string>(useState(null));
   const sellFocusState = StateWrap<boolean>(useState(false));
   const buyFocusState = StateWrap<boolean>(useState(false));
   const limitPriceFocusState = StateWrap<boolean>(useState(false));
@@ -277,6 +278,7 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
 
   const allActions = {
     ...actions,
+    selectedPairState,
     sellFocusState,
     buyFocusState,
     limitPriceFocusState,
