@@ -4,7 +4,6 @@ import {
   quarterSecond,
   twoSeconds,
 } from '../../../helpers/timeConstants.js';
-import BasePage from '../../basepage.js';
 import WalletTab from './walletTab.page.js';
 import ExportTransactionsModal from './transactionsModals/exportTransactionModal.page.js';
 import { convertPrettyDateToNormal, convertPrettyTimeToNormal } from '../../../utils/utils.js';
@@ -350,27 +349,40 @@ export class TransactionsSubTab extends WalletTab {
 
     return loaderIsNotDisplayed;
   }
-  async downloadAllTxs() {
-    this.logger.info(`TransactionsSubTab::downloadAllTxs is called`);
-    while (true) {
-      const showMoreIsDisplayed = this.showMoreBtnIsDisplayed();
-      const loaderIsDisplayed = this.loaderIsDisplayed();
-      if (!(await showMoreIsDisplayed) && !(await loaderIsDisplayed)) {
+  async _loadMore() {
+    const showMoreIsDisplayed = this.showMoreBtnIsDisplayed();
+    const loaderIsDisplayed = this.loaderIsDisplayed();
+    if (!(await showMoreIsDisplayed) && !(await loaderIsDisplayed)) {
+      return false;
+    }
+    if (await showMoreIsDisplayed) {
+      await this.scrollIntoView(this.showMoreTxsButtonLocator);
+      await this.click(this.showMoreTxsButtonLocator);
+      await this.sleep(quarterSecond);
+      return true;
+    }
+    if (await loaderIsDisplayed) {
+      await this.scrollIntoView(this.txsLoaderSpinnerLocator);
+      const result = await this.waitLoaderIsNotDisplayed(fiveSeconds, quarterSecond);
+      if (!result) {
+        throw new Error(`Transactions are still loading after ${fiveSeconds / 1000} seconds`);
+      }
+    }
+  }
+  async loadMoreTxs(amountOfLoads = 1) {
+    this.logger.info(`TransactionsSubTab::loadMoreTxs is called. Amount of loads ${amountOfLoads}`);
+    for (let tryNumber = 0; tryNumber < amountOfLoads; tryNumber++) {
+      const canLoadMore = await this._loadMore();
+      if (!canLoadMore) {
         break;
       }
-      if (await showMoreIsDisplayed) {
-        await this.scrollIntoView(this.showMoreTxsButtonLocator);
-        await this.click(this.showMoreTxsButtonLocator);
-        await this.sleep(quarterSecond);
-        continue;
-      }
-      if (await loaderIsDisplayed) {
-        await this.scrollIntoView(this.txsLoaderSpinnerLocator);
-        const result = await this.waitLoaderIsNotDisplayed(fiveSeconds, quarterSecond);
-        if (!result) {
-          throw new Error(`Transactions are still loading after ${fiveSeconds / 1000} seconds`);
-        }
-      }
+    }
+  }
+  async downloadAllTxs() {
+    this.logger.info(`TransactionsSubTab::downloadAllTxs is called`);
+    let canLoadMore = true;
+    while (canLoadMore) {
+      canLoadMore = await this._loadMore();
     }
   }
   async __getAddrsLinks(groupIndex, txIndex, addrsAmount, getLocatorFunc) {
