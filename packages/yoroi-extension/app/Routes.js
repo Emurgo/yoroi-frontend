@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import type { StoresMap } from './stores/index';
 import type { ActionsMap } from './actions/index';
-import type { StoresAndActionsProps } from './types/injectedPropsType';
+import type { StoresAndActionsProps } from './types/injectedProps.types';
 import type { ConfigType } from '../config/config-types';
 import { Route, Redirect, Switch } from 'react-router-dom';
 import { ROUTES } from './routes-config';
@@ -29,6 +29,9 @@ import SwapPageContainer from './containers/swap/SwapPageContainer';
 import AssetsWrapper from './containers/wallet/AssetsWrapper';
 import NFTsWrapper from './containers/wallet/NFTsWrapper';
 import SwapProvider from './containers/swap/SwapProvider';
+import { Stack } from '@mui/material';
+import LoadingSpinner from './components/widgets/LoadingSpinner';
+import FullscreenLayout from './components/layout/FullscreenLayout';
 
 // PAGES
 const LanguageSelectionPagePromise = () => import('./containers/profile/LanguageSelectionPage');
@@ -93,9 +96,6 @@ const StakingDashboardPage = React.lazy(StakingDashboardPagePromise);
 const CardanoStakingPagePromise = () => import('./containers/wallet/staking/CardanoStakingPage');
 const CardanoStakingPage = React.lazy(CardanoStakingPagePromise);
 
-const NoticeBoardPagePromise = () => import('./containers/notice-board/NoticeBoardPage');
-const NoticeBoardPage = React.lazy(NoticeBoardPagePromise);
-
 const ComplexityLevelSettingsPagePromise = () =>
   import('./containers/settings/categories/ComplexityLevelSettingsPage');
 const ComplexityLevelSettingsPage = React.lazy(ComplexityLevelSettingsPagePromise);
@@ -134,6 +134,9 @@ const SwapPage = React.lazy(SwapPagePromise);
 const SwapOrdersPagePromise = () => import('./containers/swap/orders/OrdersPage');
 const SwapOrdersPage = React.lazy(SwapOrdersPagePromise);
 
+const ExchangeEndPagePromise = () => import('./containers/ExchangeEndPage');
+const ExchangeEndPage = React.lazy(ExchangeEndPagePromise);
+
 export const LazyLoadPromises: Array<() => any> = [
   AddAnotherWalletPromise,
   StakingPageContentPromise,
@@ -159,7 +162,6 @@ export const LazyLoadPromises: Array<() => any> = [
   ReceivePromise,
   StakingDashboardPagePromise,
   CardanoStakingPagePromise,
-  NoticeBoardPagePromise,
   VotingPageContentPromise,
   ComplexityLevelSettingsPagePromise,
   ComplexityLevelPagePromise,
@@ -176,12 +178,12 @@ export const LazyLoadPromises: Array<() => any> = [
   SwapOrdersPagePromise,
   OptForAnalyticsPagePromise,
   AnalyticsSettingsPagePromise,
+  ExchangeEndPagePromise,
 ];
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 
-/* eslint-disable max-len */
 export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
   <Suspense fallback={null}>
     <Switch>
@@ -303,11 +305,6 @@ export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
       />
       <Route
         exact
-        path={ROUTES.NOTICE_BOARD.ROOT}
-        component={props => <NoticeBoardPage {...props} stores={stores} actions={actions} />}
-      />
-      <Route
-        exact
         path={ROUTES.SWITCH}
         component={props => <WalletSwitch {...props} stores={stores} actions={actions} />}
       />
@@ -315,6 +312,11 @@ export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
         exact
         path={ROUTES.REVAMP.CATALYST_VOTING}
         component={props => <VotingPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.EXCHANGE_END}
+        component={props => <ExchangeEndPage {...props} stores={stores} actions={actions} />}
       />
       <Redirect to={ROUTES.MY_WALLETS} />
     </Switch>
@@ -474,11 +476,18 @@ const NFTsSubPages = (stores, actions) => (
 
 export function wrapSwap(swapProps: StoresAndActionsProps, children: Node): Node {
   const queryClient = new QueryClient();
+  const loader = (
+    <FullscreenLayout bottomPadding={0}>
+      <Stack alignItems="center" justifyContent="center" height="50vh">
+        <LoadingSpinner />
+      </Stack>
+    </FullscreenLayout>
+  );
   return (
     <QueryClientProvider client={queryClient}>
       <SwapProvider publicDeriver={swapProps.stores.wallets.selected}>
         <SwapPageContainer {...swapProps}>
-          <Suspense fallback={null}>{children}</Suspense>
+          <Suspense fallback={loader}>{children}</Suspense>
         </SwapPageContainer>
       </SwapProvider>
     </QueryClientProvider>

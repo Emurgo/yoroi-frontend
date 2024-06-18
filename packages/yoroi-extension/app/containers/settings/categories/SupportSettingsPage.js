@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import SupportSettings from '../../../components/settings/categories/SupportSettings';
 import { downloadLogs } from '../../../utils/logging';
-import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import { asGetPublicKey } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
 import IncludePublicKeyDialog from './IncludePublicKeyDialog';
 import { ComplexityLevels } from '../../../types/complexityLevelType';

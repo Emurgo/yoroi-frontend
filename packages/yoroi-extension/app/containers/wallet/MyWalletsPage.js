@@ -1,21 +1,15 @@
 // @flow
 import type { Node, ComponentType } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { StoresAndActionsProps } from '../../types/injectedPropsType';
-import type { ConceptualWalletSettingsCache } from '../../stores/toplevel/WalletSettingsStore';
-import type { WalletInfo } from '../../components/buySell/BuySellDialog';
+import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import type { LayoutComponentMap } from '../../styles/context/layout';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import { ROUTES } from '../../routes-config';
-import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { asGetPublicKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { genLookupOrFail, getTokenName } from '../../stores/stateless/tokenHelpers';
-import { getReceiveAddress } from '../../stores/stateless/addressStores';
-import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
-import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { withLayout } from '../../styles/context/layout';
 import { Box } from '@mui/system';
 import MyWallets from '../../components/wallet/my-wallets/MyWallets';
@@ -36,6 +30,7 @@ import BuySellAdaButton from '../../components/topbar/BuySellAdaButton';
 import globalMessages from '../../i18n/global-messages';
 import BuySellDialog from '../../components/buySell/BuySellDialog';
 import NavBarRevamp from '../../components/topbar/NavBarRevamp';
+import { MultiToken } from '../../api/common/lib/MultiToken';
 
 type Props = StoresAndActionsProps;
 
@@ -81,7 +76,6 @@ class MyWalletsPage extends Component<AllProps> {
   render(): Node {
     const { intl } = this.context;
     const { actions, stores } = this.props;
-    const { uiDialogs } = stores;
 
     const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
     const wallets = this.props.stores.wallets.publicDerivers;
@@ -121,18 +115,6 @@ class MyWalletsPage extends Component<AllProps> {
 
     const walletsList = <Box flex={1}>{wallets.map(wallet => this.generateRow(wallet))}</Box>;
 
-    let activeDialog = null;
-    if (uiDialogs.isOpen(BuySellDialog)) {
-      activeDialog = (
-        <BuySellDialog
-          onCancel={this.onClose}
-          genWalletList={async () => {
-            return await this.generateUnusedAddressesPerWallet(wallets);
-          }}
-        />
-      );
-    }
-
     return (
       <TopBarLayout
         banner={<BannerContainer actions={actions} stores={stores} />}
@@ -141,50 +123,9 @@ class MyWalletsPage extends Component<AllProps> {
         showInContainer
       >
         <MyWallets>{walletsList}</MyWallets>
-        {activeDialog}
       </TopBarLayout>
     );
   }
-
-  generateUnusedAddressesPerWallet: (Array<PublicDeriver<>>) => Promise<Array<WalletInfo>> = async (
-    wallets: Array<PublicDeriver<>>
-  ) => {
-    const infoWallets = wallets.map(async (wallet: PublicDeriver<>) => {
-      // Wallet Name
-      const parent: ConceptualWallet = wallet.getParent();
-      const settingsCache: ConceptualWalletSettingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(
-        parent
-      );
-
-      // Currency Name
-      const defaultToken = this.props.stores.tokenInfoStore.getDefaultTokenInfo(
-        wallet.getParent().getNetworkInfo().NetworkId
-      );
-      const currencyName = getTokenName(defaultToken);
-
-      if (defaultToken.NetworkId !== networks.CardanoMainnet.NetworkId) {
-        return null;
-      }
-
-      const receiveAddress = await getReceiveAddress(wallet);
-      if (receiveAddress == null) return null;
-      const anAddressFormatted = addressToDisplayString(
-        receiveAddress.addr.Hash,
-        parent.getNetworkInfo()
-      );
-
-      return {
-        walletName: settingsCache.conceptualWalletName,
-        currencyName,
-        anAddressFormatted,
-      };
-    });
-    return (await Promise.all(infoWallets)).reduce((acc, next) => {
-      if (next == null) return acc;
-      acc.push(next);
-      return acc;
-    }, []);
-  };
 
   /*
    * TODO: this should operator on conceptual wallets
@@ -216,8 +157,8 @@ class MyWalletsPage extends Component<AllProps> {
       );
     })();
 
-    const balance = this.props.stores.transactions.getBalance(publicDeriver);
-    const rewards = this.props.stores.delegation.getRewardBalance(publicDeriver);
+    const balance: ?MultiToken = this.props.stores.transactions.getBalance(publicDeriver);
+    const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(publicDeriver);
 
     const withPubKey = asGetPublicKey(publicDeriver);
     const plate =

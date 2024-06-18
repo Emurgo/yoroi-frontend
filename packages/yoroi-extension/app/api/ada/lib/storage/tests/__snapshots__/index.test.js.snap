@@ -737,6 +737,7 @@ Object {
         "address": "https://adastat.net/addresses/",
         "pool": "https://adastat.net/pools/",
         "stakeAddress": "https://adastat.net/addresses/",
+        "token": "https://adastat.net/tokens/",
         "transaction": "https://adastat.net/transactions/",
       },
       "ExplorerId": 108,
@@ -756,14 +757,15 @@ Object {
     },
     Object {
       "Endpoints": Object {
-        "address": "https://adaex.org/",
-        "pool": "https://adapools.org/pool/",
-        "stakeAddress": "https://adaex.org/",
-        "transaction": "https://adaex.org/",
+        "address": "https://cexplorer.io/address/",
+        "pool": "https://cexplorer.io/pool/",
+        "stakeAddress": "https://cexplorer.io/stake/",
+        "token": "https://cexplorer.io/asset/",
+        "transaction": "https://cexplorer.io/tx/",
       },
       "ExplorerId": 100,
       "IsBackup": false,
-      "Name": "ADAex.org",
+      "Name": "Cexplorer",
       "NetworkId": 0,
     },
     Object {
@@ -835,15 +837,15 @@ Object {
     },
     Object {
       "Endpoints": Object {
-        "address": "https://preview.cardanoscan.io/address/",
-        "pool": "https://preview.cardanoscan.io/pool/",
-        "stakeAddress": "https://preview.cardanoscan.io/stakeKey/",
-        "token": "https://preview.cardanoscan.io/token/",
-        "transaction": "https://preview.cardanoscan.io/transaction/",
+        "address": "https://sancho.cexplorer.io/address/",
+        "pool": "https://sancho.cexplorer.io/pool/",
+        "stakeAddress": "https://sancho.cexplorer.io/stake/",
+        "token": "https://sancho.cexplorer.io/asset/",
+        "transaction": "https://sancho.cexplorer.io/tx/",
       },
       "ExplorerId": 650,
       "IsBackup": true,
-      "Name": "CardanoScan",
+      "Name": "Cexplorer",
       "NetworkId": 450,
     },
   ],
@@ -1235,9 +1237,8 @@ Object {
   "Network": Array [
     Object {
       "Backend": Object {
-        "BackendService": "https://iohk-mainnet.yoroiwallet.com",
+        "BackendService": "https://api.yoroiwallet.com",
         "TokenInfoService": "https://cdn.yoroiwallet.com",
-        "WebSocket": "wss://iohk-mainnet.yoroiwallet.com:443",
       },
       "BaseConfig": Array [
         Object {
@@ -1272,7 +1273,6 @@ Object {
       "Backend": Object {
         "BackendService": "https://testnet-backend.yoroiwallet.com",
         "TokenInfoService": "https://stage-cdn.yoroiwallet.com",
-        "WebSocket": "wss://testnet-backend.yoroiwallet.com:443",
       },
       "BaseConfig": Array [
         Object {
@@ -1307,7 +1307,6 @@ Object {
       "Backend": Object {
         "BackendService": "https://preprod-backend.yoroiwallet.com",
         "TokenInfoService": "https://stage-cdn.yoroiwallet.com",
-        "WebSocket": "wss://preprod-backend.yoroiwallet.com:443",
       },
       "BaseConfig": Array [
         Object {
@@ -1342,7 +1341,6 @@ Object {
       "Backend": Object {
         "BackendService": "https://preview-backend.emurgornd.com",
         "TokenInfoService": "https://stage-cdn.yoroiwallet.com",
-        "WebSocket": "wss://preview-backend.emurgornd.com:443",
       },
       "BaseConfig": Array [
         Object {
@@ -1377,7 +1375,6 @@ Object {
       "Backend": Object {
         "BackendService": "https://sanchonet-backend.yoroiwallet.com",
         "TokenInfoService": "https://stage-cdn.yoroiwallet.com",
-        "WebSocket": "wss://sanchonet-backend.yoroiwallet.com:443",
       },
       "BaseConfig": Array [
         Object {
@@ -1449,6 +1446,7 @@ Object {
       "IsNFT": false,
       "Metadata": Object {
         "assetName": "",
+        "logo": null,
         "longName": null,
         "numberOfDecimals": 6,
         "policyId": "",
@@ -1465,6 +1463,7 @@ Object {
       "IsNFT": false,
       "Metadata": Object {
         "assetName": "",
+        "logo": null,
         "longName": null,
         "numberOfDecimals": 6,
         "policyId": "",
@@ -1481,6 +1480,7 @@ Object {
       "IsNFT": false,
       "Metadata": Object {
         "assetName": "",
+        "logo": null,
         "longName": null,
         "numberOfDecimals": 6,
         "policyId": "",
@@ -1497,6 +1497,7 @@ Object {
       "IsNFT": false,
       "Metadata": Object {
         "assetName": "",
+        "logo": null,
         "longName": null,
         "numberOfDecimals": 6,
         "policyId": "",
@@ -1513,6 +1514,7 @@ Object {
       "IsNFT": false,
       "Metadata": Object {
         "assetName": "",
+        "logo": null,
         "longName": null,
         "numberOfDecimals": 6,
         "policyId": "",

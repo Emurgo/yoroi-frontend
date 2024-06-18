@@ -14,13 +14,10 @@ import {
   asGetPublicKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import { genTimeToSlot } from '../../api/ada/lib/storage/bridge/timeUtils';
 import {
   isLedgerNanoWallet,
   isTrezorTWallet,
 } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import { MultiToken } from '../../api/common/lib/MultiToken';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 
@@ -98,7 +95,8 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     publicDeriver: PublicDeriver<>,
     poolRequest: string | void,
   |}) => Promise<void> = async request => {
-    const withUtxos = asGetAllUtxos(request.publicDeriver);
+    const publicDeriver = request.publicDeriver;
+    const withUtxos = asGetAllUtxos(publicDeriver);
     if (withUtxos == null) {
       throw new Error(`${nameof(this._createTransaction)} missing utxo functionality`);
     }
@@ -116,22 +114,8 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     }
     const basePubDeriver = withPublicKey;
 
-    const delegationRequests = this.stores.delegation.getDelegationRequests(
-      request.publicDeriver
-    );
-    const adaDelegationRequests = this.stores.substores.ada.delegation.getDelegationRequests(
-      request.publicDeriver
-    );
-    if (delegationRequests == null || adaDelegationRequests == null) {
-      throw new Error(
-        `${nameof(AdaDelegationTransactionStore)}::${nameof(
-          this._createTransaction
-        )} called for non-reward wallet`
-      );
-    }
+    const { timeToSlot } = this.stores.substores.ada.time.getTimeCalcRequests(publicDeriver).requests;
 
-    const fullConfig = getCardanoHaskellBaseConfig(withHasUtxoChains.getParent().getNetworkInfo());
-    const timeToSlot = await genTimeToSlot(fullConfig);
     const absSlotNumber = new BigNumber(
       timeToSlot({
         // use server time for TTL if connected to server
@@ -139,14 +123,11 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
       }).slot
     );
 
-    const defaultToken = request.publicDeriver.getParent().getDefaultToken();
-
     const delegationTxPromise = this.createDelegationTx.execute({
       publicDeriver: basePubDeriver,
       poolRequest: request.poolRequest,
-      registrationStatus: delegationRequests.getDelegatedBalance.result?.stakeRegistered === true,
-      valueInAccount: delegationRequests.getDelegatedBalance.result?.accountPart
-        ?? new MultiToken([], defaultToken),
+      registrationStatus: this.stores.delegation.isStakeRegistered(publicDeriver) === true,
+      valueInAccount: this.stores.delegation.getRewardBalanceOrZero(publicDeriver),
       absSlotNumber,
     }).promise;
     if (delegationTxPromise == null) {
@@ -180,10 +161,8 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
 
     const stakingKeyDbRow = await withStakingKey.getStakingKey();
 
-    const fullConfig = getCardanoHaskellBaseConfig(
-      request.publicDeriver.getParent().getNetworkInfo()
-    );
-    const timeToSlot = await genTimeToSlot(fullConfig);
+    const { timeToSlot } = this.stores.substores.ada.time.getTimeCalcRequests(request.publicDeriver).requests;
+
     const absSlotNumber = new BigNumber(
       timeToSlot({
         // use server time for TTL if connected to server
@@ -219,6 +198,10 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     if (result == null) {
       throw new Error(`${nameof(this._signTransaction)} no tx to broadcast`);
     }
+    const refreshWallet = () => {
+      this.stores.delegation.disablePoolTransitionState(request.publicDeriver);
+      return this.stores.wallets.refreshWalletFromRemote(request.publicDeriver);
+    };
     if (isLedgerNanoWallet(request.publicDeriver.getParent())) {
       await this.stores.substores.ada.wallets.adaSendAndRefresh({
         broadcastRequest: {
@@ -227,7 +210,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
             publicDeriver: request.publicDeriver,
           },
         },
-        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
+        refreshWallet,
       });
       return;
     }
@@ -239,7 +222,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
             publicDeriver: request.publicDeriver,
           },
         },
-        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
+        refreshWallet,
       });
       return;
     }
@@ -257,7 +240,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
           signRequest: result.signTxRequest,
         },
       },
-      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
+      refreshWallet,
     });
     if (request.dialog) this.actions.dialogs.open.trigger({ dialog: request.dialog });
   };

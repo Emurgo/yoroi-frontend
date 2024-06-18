@@ -4,7 +4,7 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, } from 'react-intl';
 import validWords from 'bip39/src/wordlists/english.json';
-import type { StoresAndActionsProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import YoroiPaperWalletFormPage from './YoroiPaperWalletFormPage';
 import YoroiPlatePage from './YoroiPlatePage';
@@ -17,13 +17,9 @@ import { ROUTES } from '../../routes-config';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils';
-import { ChainDerivations } from '../../config/numbersConfig';
-import WithdrawalTxDialogContainer from './WithdrawalTxDialogContainer';
 import { genAddressLookup } from '../../stores/stateless/addressStores';
-import {
-  Bip44DerivationLevels,
-} from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
+import { isValidEnglishAdaPaperMnemonic } from '../../api/ada/lib/cardanoCrypto/paperWallet';
 
 // Stay this long on the success page, then jump to the wallet transactions page
 const SUCCESS_PAGE_STAY_TIME = 5 * 1000;
@@ -119,10 +115,10 @@ export default class YoroiTransferPage extends Component<StoresAndActionsProps> 
           <YoroiPaperWalletFormPage
             onSubmit={this.setupTransferFundsWithPaperMnemonic}
             onBack={this.backToUninitialized}
-            mnemonicValidator={mnemonic => this.props.stores.walletRestore.isValidMnemonic({
+            mnemonicValidator={mnemonic => isValidEnglishAdaPaperMnemonic(
               mnemonic,
-              mode: { type: 'bip44', extra: 'paper', length: config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT },
-            })}
+              config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT,
+            )}
             validWords={validWords}
             mnemonicLength={config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT}
             passwordMatches={_password => true}
@@ -147,33 +143,18 @@ export default class YoroiTransferPage extends Component<StoresAndActionsProps> 
           <YoroiTransferWaitingPage status={yoroiTransfer.status} />
         );
       case TransferStatus.READY_TO_TRANSFER: {
-        if (yoroiTransfer.transferTx == null) {
-          return null; // TODO: throw error? Shouldn't happen
-        }
         const { transferTx } = yoroiTransfer;
+        if (transferTx == null) {
+          return null; // don't care since this is pending removal
+        }
         const { intl } = this.context;
-        if (this.props.stores.yoroiTransfer.mode == null) {
-          throw new Error(`${nameof(YoroiTransferPage)} unknown mode`);
-        }
-        const { mode } = this.props.stores.yoroiTransfer;
-        if (
-          mode.chain === ChainDerivations.CHIMERIC_ACCOUNT ||
-          mode.derivationLevel === Bip44DerivationLevels.ADDRESS.level
-        ) {
-          return (
-            <WithdrawalTxDialogContainer
-              actions={actions}
-              stores={stores}
-              onClose={this.cancelTransferFunds}
-            />
-          );
-        }
         return (
           <TransferSummaryPage
             form={null}
             transferTx={transferTx}
             selectedExplorer={this.props.stores.explorers.selectedExplorer
-              .get(publicDeriver.getParent().getNetworkInfo().NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
+              .get(publicDeriver.getParent().getNetworkInfo().NetworkId)
+                ?? (() => { throw new Error('No explorer for wallet network'); })()
             }
             getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
             onSubmit={{

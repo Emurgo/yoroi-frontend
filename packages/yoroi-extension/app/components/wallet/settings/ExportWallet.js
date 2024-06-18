@@ -71,6 +71,7 @@ class ExportWallet extends Component<Props & InjectedProps> {
             marginTop: !isRevampLayout && '20px',
             width: isRevampLayout ? 'fit-content' : '400px',
           }}
+          id="settings:wallet-exportWallet-button"
         >
           {`${this.context.intl.formatMessage(globalMessages.exportButtonLabel)}`}
         </Button>

@@ -9,6 +9,12 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { HARD_DERIVATION_START } from '../../config/numbersConfig';
+import { asGetAllUtxos } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { fail, first, sorted } from '../../coreUtils';
+import type { QueriedUtxo } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import BigNumber from 'bignumber.js';
+
+const MAX_PICKED_COLLATERAL_UTXO_ADA = 10_000_000; // 10 ADA
 
 export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
   // REQUESTS
@@ -125,7 +131,6 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
     if (selectedNetwork == null) throw new Error(`${nameof(this._createInDb)} no network selected`);
     await this.stores.wallets.createWalletRequest.execute(async () => {
       const wallet = await this.api.ada.createWallet({
-        mode: 'cip1852',
         db: persistentDb,
         walletName: this.stores.walletBackup.name,
         walletPassword: this.stores.walletBackup.password,
@@ -150,7 +155,6 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
     if (selectedNetwork == null) throw new Error(`${nameof(this._createInDb)} no network selected`);
     await this.stores.wallets.createWalletRequest.execute(async () => {
       const wallet = await this.api.ada.createWallet({
-        mode: 'cip1852',
         db: persistentDb,
         walletName: request.walletName,
         walletPassword: request.walletPassword,
@@ -161,4 +165,20 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
       return wallet;
     }).promise;
   };
+
+  pickCollateralUtxo: ({| wallet: PublicDeriver<> |}) => Promise<?QueriedUtxo> = async ({ wallet }) => {
+    const withUtxos = asGetAllUtxos(wallet)
+      ?? fail(`${nameof(this.pickCollateralUtxo)} missing utxo functionality`);
+    const allUtxos: Array<QueriedUtxo> = await withUtxos.getAllUtxos();
+    if (allUtxos.length === 0) {
+      fail('Cannot pick a collateral utxo! No utxo available at all in the wallet!');
+    }
+    const utxoDefaultCoinAmount = (u: QueriedUtxo): BigNumber =>
+      new BigNumber(u.output.tokens.find(x => x.Token.Identifier === '')?.TokenList.Amount ?? 0);
+    const compareDefaultCoins = (a: QueriedUtxo, b: QueriedUtxo): number =>
+      utxoDefaultCoinAmount(a).comparedTo(utxoDefaultCoinAmount(b));
+    const smallPureUtxos = allUtxos
+      .filter(u => u.output.tokens.length === 1 && utxoDefaultCoinAmount(u).lte(MAX_PICKED_COLLATERAL_UTXO_ADA));
+    return first(sorted(smallPureUtxos, compareDefaultCoins));
+  }
 }

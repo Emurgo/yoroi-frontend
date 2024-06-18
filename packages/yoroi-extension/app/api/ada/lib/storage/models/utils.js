@@ -46,12 +46,11 @@ import {
 } from '../database/walletTypes/bip44/api/write';
 import type {
   TreeInsert
-} from '../database/walletTypes/common/utils';
+} from '../database/walletTypes/common/utils.types';
 import {
   GetAddress,
   GetPathWithSpecific,
   GetDerivationsByPath,
-  GetCertificates,
   GetKeyDerivation,
 } from '../database/primitives/api/read';
 import {
@@ -66,7 +65,6 @@ import type { UtxoTxOutput } from '../database/transactionModels/utxo/api/read';
 import { Bip44DerivationLevels } from '../database/walletTypes/bip44/api/utils';
 import type {
   GetPathWithSpecificByTreeRequest,
-  CertificateForKey,
 } from '../database/primitives/api/read';
 import {
   GetUtxoTxOutputsWithTx,
@@ -133,7 +131,7 @@ export async function rawGetDerivationsByPath<
   return result;
 }
 
-export async function rawGetBip44AddressesByPath(
+export async function rawGetAddressesByDerivationPath(
   db: lf$Database,
   tx: lf$Transaction,
   deps: {|
@@ -162,7 +160,7 @@ export async function rawGetBip44AddressesByPath(
   return canonicalAddresses.map(canonical => {
     const addrs = family.get(canonical.row.KeyDerivationId);
     if (addrs == null) {
-      throw new Error(`${nameof(rawGetBip44AddressesByPath)} should never happen`);
+      throw new Error(`${nameof(rawGetAddressesByDerivationPath)} should never happen`);
     }
     return {
       ...canonical,
@@ -538,34 +536,16 @@ export async function updateCutoffFromInsert(
   }
 }
 
-export async function getCertificates(
-  db: lf$Database,
-  addressIds: Array<number>,
-): Promise<Array<CertificateForKey>> {
-  const deps = Object.freeze({
-    GetCertificates,
-  });
-  const depTables = Object
-    .keys(deps)
-    .map(key => deps[key])
-    .flatMap(table => getAllSchemaTables(db, table));
-  return await raii<PromisslessReturnType<typeof getCertificates>>(
-    db,
-    depTables,
-    async dbTx => await deps.GetCertificates.forAddress(db, dbTx, { addressIds })
-  );
-}
-
-export function verifyFromBip44Root(request: $ReadOnly<{|
+export function verifyFromDerivationRoot(request: $ReadOnly<{|
   ...$PropertyType<Addressing, 'addressing'>,
 |}>): void {
   const accountPosition = request.startLevel;
   if (accountPosition !== Bip44DerivationLevels.PURPOSE.level) {
-    throw new Error(`${nameof(verifyFromBip44Root)} addressing does not start from root`);
+    throw new Error(`${nameof(verifyFromDerivationRoot)} addressing does not start from root`);
   }
   const lastLevelSpecified = request.startLevel + request.path.length - 1;
   if (lastLevelSpecified !== Bip44DerivationLevels.ADDRESS.level) {
-    throw new Error(`${nameof(verifyFromBip44Root)} incorrect addressing size`);
+    throw new Error(`${nameof(verifyFromDerivationRoot)} incorrect addressing size`);
   }
 }
 

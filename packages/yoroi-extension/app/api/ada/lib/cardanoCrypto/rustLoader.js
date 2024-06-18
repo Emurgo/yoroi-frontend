@@ -1,7 +1,6 @@
 // @flow
 
 import typeof * as WasmV2 from 'cardano-wallet-browser';
-import typeof * as WasmV3 from '@emurgo/js-chain-libs/js_chain_libs';
 import type {
   BigNum,
   LinearFee,
@@ -10,6 +9,7 @@ import type {
 import typeof * as WasmV4 from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 import typeof * as WasmMessageSigning from '@emurgo/cardano-message-signing-browser/cardano_message_signing';
 import typeof * as CrossCsl from '@emurgo/cross-csl-browser';
+import BigNumber from 'bignumber.js';
 
 // TODO: unmagic the constants
 const MAX_VALUE_BYTES = 5000;
@@ -148,7 +148,6 @@ function createWasmScope(): {|
 
 class Module {
   _wasmv2: WasmV2;
-  _wasmv3: WasmV3;
   _wasmv4: WasmV4;
   _messageSigning: WasmMessageSigning;
   _crossCsl: CrossCsl;
@@ -156,14 +155,11 @@ class Module {
   async load(flags: Array<RustModuleLoadFlags> = []): Promise<void> {
     if (
       this._wasmv2 != null
-        || this._wasmv3 != null
         || this._wasmv4 != null
         || this._messageSigning != null
         || this._crossCsl != null
     ) return;
     this._wasmv2 = await import('cardano-wallet-browser');
-    // this is used only by the now defunct jormungandr wallet
-    this._wasmv3 = ((null: any): WasmV3);
     this._wasmv4 = await import('@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib');
     if (flags.includes('dontLoadMessagesSigning')) {
       this._messageSigning = ((null: any): WasmMessageSigning);
@@ -235,13 +231,22 @@ class Module {
     return scopedResult.result;
   }
 
+  ScopeMonad<T>(callback: Module => T): WasmMonad<T> {
+    const WS = this.WasmScope.bind(this);
+    function InternalMonad<K>(mapper: Module => K): WasmMonad<K> {
+      return {
+        // $FlowIgnore[escaped-generic]
+        wasmMap: f => InternalMonad(M => f(mapper(M), M)),
+        // $FlowIgnore[escaped-generic]
+        unwrap: f => WS(M => f(mapper(M), M)),
+      }
+    }
+    return InternalMonad<T>(callback);
+  }
+
   // Need to expose through a getter to get Flow to detect the type correctly
   get WalletV2(): WasmV2 {
     return this._wasmv2;
-  }
-  // Need to expose through a getter to get Flow to detect the type correctly
-  get WalletV3(): WasmV3 {
-    return this._wasmv3;
   }
   // Need to expose through a getter to get Flow to detect the type correctly
   get WalletV4(): WasmV4 {
@@ -297,12 +302,22 @@ class Module {
       maxTxBytes,
     } = params;
     const w4 = this.WalletV4;
+
+    // Inlined to avoid dependency cycles
+    // <TODO:PENDING_REMOVAL> LEGACY
+    const coinsPerUtxoByte = w4.BigNum.from_str(
+      new BigNumber(coinsPerUtxoWord.to_str())
+        .div(8)
+        .integerValue(BigNumber.ROUND_FLOOR)
+        .toString(),
+    );
+
     return w4.TransactionBuilder.new(
       w4.TransactionBuilderConfigBuilder.new()
         .fee_algo(linearFee)
         .pool_deposit(poolDeposit)
         .key_deposit(keyDeposit)
-        .coins_per_utxo_word(coinsPerUtxoWord)
+        .coins_per_utxo_byte(coinsPerUtxoByte)
         .max_value_size(maxValueBytes ?? MAX_VALUE_BYTES)
         .max_tx_size(maxTxBytes ?? MAX_TX_BYTES)
         .ex_unit_prices(w4.ExUnitPrices.new(
@@ -324,6 +339,11 @@ class Module {
     return this._messageSigning;
   }
 }
+
+export type WasmMonad<T> = {|
+  wasmMap<R>(f: (T, Module) => R): WasmMonad<R>;
+  unwrap<R>(f: (T, Module) => R): R;
+|}
 
 // Need this otherwise Wallet's flow type isn't properly exported
 export const RustModule: Module = new Module();

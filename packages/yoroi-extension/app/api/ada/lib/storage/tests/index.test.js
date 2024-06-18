@@ -3,7 +3,7 @@
 import {
   schema,
 } from 'lovefield';
-import '../../test-config';
+import '../../test-config.forTests';
 import { loadLovefieldDB } from '../database/index';
 import {
   HARD_DERIVATION_START,
@@ -58,6 +58,7 @@ beforeAll(async () => {
   await RustModule.load();
 });
 
+// <TODO:PENDING_REMOVAL> bip44, test needs to be updated
 test('Can add and fetch address in wallet', async (done) => {
   const network =  networks.CardanoMainnet;
 

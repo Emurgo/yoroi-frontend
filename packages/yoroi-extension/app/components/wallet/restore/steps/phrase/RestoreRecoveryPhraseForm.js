@@ -66,7 +66,7 @@ type State = {|
 |};
 
 @observer
-export default class RestoreRecoveryPhraseFormClass extends Component<Props, State> {
+export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
   static defaultProps: {| error: void, initialRecoveryPhrase: string |} = {
     error: undefined,
     initialRecoveryPhrase: '',

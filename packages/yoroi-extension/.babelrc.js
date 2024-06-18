@@ -10,7 +10,6 @@ const nodePlugins = {
     ['module-resolver', {
       alias: {
         'cardano-wallet-browser': 'cardano-wallet',
-        '@emurgo/js-chain-libs': '@emurgo/js-chain-libs-node',
         '@emurgo/cardano-serialization-lib-browser': '@emurgo/cardano-serialization-lib-nodejs',
         '@emurgo/cardano-message-signing-browser': '@emurgo/cardano-message-signing-nodejs',
         '@emurgo/cross-csl-browser': '@emurgo/cross-csl-nodejs',
@@ -45,7 +44,7 @@ module.exports = function (api /*: ApiType */) /*: * */ {
     plugins: [
       '@babel/plugin-proposal-nullish-coalescing-operator',
       '@babel/plugin-proposal-optional-chaining',
-      'nameof-js',
+      'babel-plugin-ts-nameof',
       [
         '@babel/plugin-proposal-decorators',
         {
@@ -76,7 +75,6 @@ module.exports = function (api /*: ApiType */) /*: * */ {
       '@babel/plugin-proposal-export-namespace-from',
     ],
     env: {
-      cucumber: nodePlugins,
       test: nodePlugins,
       jest: nodePlugins,
     }

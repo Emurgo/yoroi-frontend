@@ -80,10 +80,6 @@ const globalMessages: * = defineMessages({
     id: 'global.errors.invalidWalletPassword',
     defaultMessage: '!!!Password requires at least 10 characters.',
   },
-  invalidPaperPassword: {
-    id: 'global.errors.invalidPaperPassword',
-    defaultMessage: '!!!Password requires at least 10 characters.',
-  },
   invalidRepeatPassword: {
     id: 'global.errors.invalidRepeatPassword',
     defaultMessage: '!!!Passwords do not match. Please retype.',
@@ -528,6 +524,10 @@ const globalMessages: * = defineMessages({
     id: 'global.uriExplanation.revamp',
     defaultMessage: '!!!Allow URLs to easily share invoices with friends and businesses',
   },
+  updatePool: {
+    id: 'global.updatePool',
+    defaultMessage: '!!!  UPDATE POOL',
+  },
   copyTooltipMessage: {
     id: 'global.copyTooltipMessage',
     defaultMessage: '!!!Copied',
@@ -581,10 +581,6 @@ const globalMessages: * = defineMessages({
   walletUpgrade: {
     id: 'wallet.backup.dialog.legacy.upgrade',
     defaultMessage: `!!!Wallet Upgrade`,
-  },
-  pdfGenDone: {
-    id: 'settings.paperWallet.dialog.createPaper.done',
-    defaultMessage: '!!!All done!',
   },
   dateToday: {
     id: 'wallet.summary.page.todayLabel',
@@ -935,6 +931,14 @@ const globalMessages: * = defineMessages({
     id: 'button.buyAda',
     defaultMessage: '!!!Buy ADA',
   },
+  sellAda: {
+    id: 'button.sellAda',
+    defaultMessage: '!!!Sell ADA',
+  },
+  buySellAda: {
+    id: 'button.buySellAda',
+    defaultMessage: '!!!Buy/Sell ADA',
+  },
   txConfirmationLedgerNanoLine2: {
     id: 'wallet.send.ledger.confirmationDialog.info.line.2',
     defaultMessage:
@@ -964,6 +968,18 @@ const globalMessages: * = defineMessages({
     id: 'profile.languageSelect.tosAgreement',
     defaultMessage:
       '!!!I agree with <span id="tosLink">Terms of Service Agreement</span> and <span id="privacyLink">Privacy Notice</span>',
+  },
+  poolNotGenerating: {
+    id: 'wallet.transitionDialog.poolNotGenerating',
+    defaultMessage: '!!!This pool is NOT generating staking rewards anymore',
+  },
+  goToTransactions: {
+    id: 'wallet.transaction.success.button.label',
+    defaultMessage: '!!!Go To Transactions',
+  },
+  provider: {
+    id: 'buysell.dialog.provider',
+    defaultMessage: '!!!Provider',
   },
 });
 export default globalMessages;

@@ -7,6 +7,7 @@ export const EPOCH_REWARD_DENOMINATOR: BigNumber = new BigNumber(10).pow(8);
 
 export const HARD_DERIVATION_START: 2147483648 = 0x80000000;
 
+// <TODO:PENDING_REMOVAL> bip44
 export const WalletTypePurpose = Object.freeze({
   BIP44: 2147483692, // HARD_DERIVATION_START + 44;
   CIP1852: 2147485500, // HARD_DERIVATION_START + 1852;

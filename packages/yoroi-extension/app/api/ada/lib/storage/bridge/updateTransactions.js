@@ -74,9 +74,6 @@ import type {
   UserAnnotation,
 } from '../../../transactions/types';
 import type {
-  ToAbsoluteSlotNumberFunc,
-} from '../../../../common/lib/storage/bridge/timeUtils';
-import type {
   UtxoTransactionInputInsert, UtxoTransactionOutputInsert,
 } from '../database/transactionModels/utxo/tables';
 import type {
@@ -114,9 +111,7 @@ import type { CardanoByronTxIO, CardanoShelleyTxIO } from '../database/transacti
 import {
   rawGetAddressRowsForWallet,
 } from  './traitUtils';
-import {
-  genToAbsoluteSlotNumber,
-} from './timeUtils';
+import TimeUtils from './timeUtils';
 import {
   rawGenHashToIdsFunc, rawGenFindOwnAddress,
 } from '../../../../common/lib/storage/bridge/hashMapper';
@@ -140,26 +135,21 @@ import type {
   MultiAssetMintMetadataResponse,
   MultiAssetSupplyResponse,
   TxSummary,
-  HistoryFunc,
+  HistoryFunc, FilterFunc,
 } from '../../state-fetch/types';
 import {
   ShelleyCertificateTypes,
   RemoteTransactionTypes,
 } from '../../state-fetch/types';
-import type {
-  FilterFunc,
-} from '../../../../common/lib/state-fetch/currencySpecificTypes';
 import { addressToKind, } from './utils';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 import { Bech32Prefix } from '../../../../../config/stringConfig';
-import {
-  MultiToken,
-} from '../../../../common/lib/MultiToken';
 import type {
   DefaultTokenEntry,
 } from '../../../../common/lib/MultiToken';
 import { UtxoStorageApi } from '../models/utils';
-import { bytesToHex, createFilterUniqueBy, hexToBytes } from '../../../../../coreUtils';
+import { bytesToHex, createFilterUniqueBy, hexToBytes, listValues } from '../../../../../coreUtils';
+import type { RelativeSlot } from './timeUtils';
 
 type TxData = {|
   addressLookupMap: Map<number, string>,
@@ -264,6 +254,7 @@ export async function rawGetTransactions(
   ...UserAnnotation,
 |}>,
 |}> {
+  const { publicDeriver } = request;
   const {
     addresses,
     txIds,
@@ -277,7 +268,7 @@ export async function rawGetTransactions(
       GetDerivationSpecific: deps.GetDerivationSpecific,
       GetCertificates: deps.GetCertificates,
     },
-    { publicDeriver: request.publicDeriver },
+    { publicDeriver },
     derivationTables,
   );
   const blockMap = new Map<number, null | $ReadOnly<BlockRow>>();
@@ -291,7 +282,7 @@ export async function rawGetTransactions(
       txs: txs
         .map(txWithBlock => txWithBlock.Transaction)
         .filter(tx => tx.Type === TransactionType.CardanoByron),
-      networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+      networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
     }
   );
   const shelleyWithIOs = await deps.CardanoShelleyAssociateTxWithIOs.getIOsForTx(
@@ -300,7 +291,7 @@ export async function rawGetTransactions(
       txs: txs
         .map(txWithBlock => txWithBlock.Transaction)
         .filter(tx => tx.Type === TransactionType.CardanoShelley),
-      networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+      networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
     }
   );
   const txsWithIOs = [
@@ -337,7 +328,7 @@ export async function rawGetTransactions(
     }
   }
 
-  const defaultToken = request.publicDeriver.getParent().getDefaultToken();
+  const defaultToken = publicDeriver.getParent().getDefaultToken();
 
   const result = txsWithIOs.map((tx: CardanoByronTxIO | CardanoShelleyTxIO) => ({
     ...tx,
@@ -362,10 +353,10 @@ export async function rawGetTransactions(
         *    So that wouldn't be quite accurate either.
         *    Again, it's easier to say it's just whoever gets it
       */
-      ownImplicitInput: new MultiToken([], defaultToken),
+      ownImplicitInput: publicDeriver.getParent().getDefaultMultiToken(),
       ownImplicitOutput: (() => {
         if (tx.txType === TransactionType.CardanoShelley) {
-          const implicitOutputSum = new MultiToken([], defaultToken);
+          const implicitOutputSum = publicDeriver.getParent().getDefaultMultiToken();
           for (const cert of tx.certificates) {
             if (
               cert.certificate.Kind !==
@@ -412,7 +403,7 @@ export async function rawGetTransactions(
           }
           return implicitOutputSum;
         }
-        return new MultiToken([], defaultToken);
+        return publicDeriver.getParent().getDefaultMultiToken();
       })(),
       defaultToken,
     })
@@ -1392,10 +1383,8 @@ async function rawUpdateTransactions(
   before: ?ReferenceTx,
 ): Promise<TxData> {
   const network = publicDeriver.getParent().getNetworkInfo();
-  // TODO: consider passing this function in as an argument instead of generating it here
-  const toAbsoluteSlotNumber = await genToAbsoluteSlotNumber(
-    getCardanoHaskellBaseConfig(network)
-  );
+  const toAbsoluteSlotNumber = (slot: RelativeSlot) =>
+    TimeUtils.toAbsoluteSlotNumber(getCardanoHaskellBaseConfig(network), slot);
 
   if (before != null && after != null) {
     throw new Error('Only one of `before` or `after` should be used for a resync');
@@ -1475,12 +1464,11 @@ async function rawUpdateTransactions(
         },
       });
       const summaries: Array<TxSummary> =
-        // $FlowFixMe[incompatible-cast]
-        (Object.values(recentTxHashesResult).flat(): Array<TxSummary>)
+        listValues(recentTxHashesResult).flat()
           .filter(createFilterUniqueBy(x => x.txHash));
       summaries.sort((a: TxSummary, b: TxSummary) => {
         // DESC ordering (b < a)
-        return b.epoch - a.epoch || b.slot - a.slot;
+        return b.epoch - a.epoch || b.slot - a.slot || b.txBlockIndex - a.txBlockIndex;
       });
       txHashes = summaries.slice(0,20).map(x => x.txHash);
       txsFromNetwork = await getTransactionsByHashes({ network, txHashes });
@@ -1601,7 +1589,7 @@ async function updateTransactionBatch(
   |},
   request: {|
     network: $ReadOnly<NetworkRow>,
-    toAbsoluteSlotNumber: ToAbsoluteSlotNumberFunc,
+    toAbsoluteSlotNumber: RelativeSlot => number,
     txIds: Array<number>,
     txsFromNetwork: Array<RemoteTransaction>,
     hashToIds: HashToIdsFunc,
@@ -1752,6 +1740,8 @@ async function updateTransactionBatch(
     genNextTokenListId,
   );
   const newsTxsIdSet = new Set();
+
+  // <TODO:PENDING_REMOVAL> Byron Legacy: this should be impossible now, we are not syncing history from pre-Shelley
   for (const newTx of byronTxs) {
     const result = await deps.ModifyCardanoByronTx.addTxWithIOs(
       db,
@@ -2222,10 +2212,11 @@ export async function genCardanoAssetMap(
     .map(tokenId => {
       const id = tokenId.split('.').join('');
 
-      let numberOfDecimals;
-      let ticker;
-      let lastUpdatedAt;
-      let longName;
+      let numberOfDecimals = 0;
+      let lastUpdatedAt = null;
+      let ticker = null;
+      let longName = null;
+      let logo = null;
 
       const tokenInfo = tokenInfoResponse[id];
       if (tokenInfo) {
@@ -2233,23 +2224,13 @@ export async function genCardanoAssetMap(
         ticker = tokenInfo.ticker ?? null;
         lastUpdatedAt = new Date().toISOString();
         longName = tokenInfo.name ?? null;
+        logo = tokenInfo.logo ?? null;
       } else if (tokenInfo === null) {
         // the token is not registered
-        numberOfDecimals = 0;
-        ticker = null;
         lastUpdatedAt = new Date().toISOString();
-        longName = null;
-      } else {
-        // failed to fetch token info
-        if (existingRowsMap.has(tokenId)) {
-          // the token entry exists, do not update
-          return null;
-        }
-        // the token entry doesn't exists, insert a placeholder row
-        numberOfDecimals = 0;
-        ticker = null;
-        lastUpdatedAt = null;
-        longName = null;
+      } else if (existingRowsMap.has(tokenId)) {
+        // the token entry exists, do not update
+        return null;
       }
 
       const parts = identifierToCardanoAsset(tokenId);
@@ -2287,6 +2268,7 @@ export async function genCardanoAssetMap(
         Metadata: {
           type: 'Cardano',
           ticker,
+          logo,
           longName,
           numberOfDecimals,
           assetName,
@@ -2317,7 +2299,7 @@ async function networkTxToDbTx(
   newTxs: Array<RemoteTransaction>,
   hashToIds: HashToIdsFunc,
   findOwnAddress: FindOwnAddressFunc,
-  toAbsoluteSlotNumber: ToAbsoluteSlotNumberFunc,
+  toAbsoluteSlotNumber: RelativeSlot => number,
   TransactionSeed: number,
   BlockSeed: number,
   assetLookup: Map<string, $ReadOnly<TokenRow>>,
@@ -2373,6 +2355,7 @@ async function networkTxToDbTx(
     return id;
   };
 
+  // <TODO:PENDING_REMOVAL> Byron Legacy: this should be impossible now, we are not syncing history from pre-Shelley
   const byronTxs = [];
   const shelleyTxs = [];
 
@@ -2384,6 +2367,7 @@ async function networkTxToDbTx(
       BlockSeed,
     );
 
+    // <TODO:PENDING_REMOVAL> Byron
     if (networkTx.type == null || networkTx.type === RemoteTransactionTypes.byron) {
       byronTxs.push({
         block,
@@ -2502,7 +2486,7 @@ export function statusStringToCode(
 
 export function networkTxHeaderToDb(
   tx: RemoteTransaction,
-  toAbsoluteSlotNumber: ToAbsoluteSlotNumberFunc,
+  toAbsoluteSlotNumber: RelativeSlot => number,
   TransactionSeed: number,
   BlockSeed: number,
 ): {
@@ -2979,6 +2963,126 @@ async function certificateToDb(
             ...info,
             CertificateId: certId,
           }))
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.VoteDelegation: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.VoteDelegation,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.StakeVoteDelegation: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.StakeAndVoteDelegation,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.StakeRegistrationDelegation: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.StakeRegistrationAndDelegation,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.VoteRegistrationDelegation: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.VoteRegistrationAndDelegation,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.StakeVoteRegistrationDelegation: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.StakeVoteRegistrationAndDelegation,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.AuthCommitteeHot: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.CommitteeHotAuth,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.ResignCommitteeCold: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.CommitteeColdResign,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.RegisterDrep: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.DrepRegistration,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.UnregisterDrep: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.DrepDeregistration,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.UpdateDrep: {
+        result.push((txId: number) => ({
+          certificate: {
+            Ordinal: cert.certIndex,
+            Kind: RustModule.WalletV4.CertificateKind.DrepUpdate,
+            Payload: '',
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => [],
         }));
         break;
       }

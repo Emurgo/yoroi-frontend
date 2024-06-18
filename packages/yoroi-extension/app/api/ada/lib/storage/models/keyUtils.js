@@ -22,11 +22,11 @@ import {
 import {
   KeyKind,
   KeySubkind,
-} from '../../../../common/lib/crypto/keys/types';
+} from '../../cardanoCrypto/keys/types';
 import type {
   IKey,
   KeySubkindType
-} from '../../../../common/lib/crypto/keys/types';
+} from '../../cardanoCrypto/keys/types';
 import {
   BIP32ED25519PrivateKey,
   BIP32ED25519PublicKey,
@@ -34,7 +34,7 @@ import {
   BIP32PublicKey,
   derivePath,
   asPrivateKeyInstance,
-} from '../../../../common/lib/crypto/keys/keyRepository';
+} from '../../cardanoCrypto/keys/keyRepository';
 
 import { WrongPassphraseError } from '../../cardanoCrypto/cryptoErrors';
 

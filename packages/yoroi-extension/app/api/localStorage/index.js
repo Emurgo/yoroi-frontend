@@ -1,21 +1,15 @@
 // @flow
 import type { SelectedExternalStorageProvider } from '../../domain/ExternalStorage';
 import environment from '../../environment';
-import { unitOfAccountDisabledValue } from '../../types/unitOfAccountType';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+import { unitOfAccountDisabledValue } from '../../types/unitOfAccountType';
 
-import {
-    getLocalItem,
-    setLocalItem,
-    removeLocalItem,
-    isEmptyStorage,
-} from './primitives';
-import {
-  TabIdKeys,
-} from '../../utils/tabManager';
+import { getLocalItem, isEmptyStorage, removeLocalItem, setLocalItem, } from './primitives';
+import { TabIdKeys, } from '../../utils/tabManager';
 import type { ComplexityLevelType } from '../../types/complexityLevelType';
 import type { WhitelistEntry } from '../../../chrome/extension/connector/types';
 import type { CatalystRoundInfoResponse } from '../ada/lib/state-fetch/types'
+import { maybe } from '../../coreUtils';
 
 declare var chrome;
 declare var browser;
@@ -432,6 +426,15 @@ export async function loadSubmittedTransactions(): any {
   return JSON.parse(stored[storageKeys.SUBMITTED_TRANSACTIONS]);
 }
 
+export async function getOutputAddressesInSubmittedTxs(publicDeriverId: number): Promise<Array<string>> {
+  const submittedTxs = await loadSubmittedTransactions() || [];
+  return submittedTxs
+    .filter(submittedTxRecord => submittedTxRecord.publicDeriverId === publicDeriverId)
+    .flatMap(({ transaction }) => {
+      return transaction.addresses.to.map(({ address }) => address);
+    });
+}
+
 export async function loadCatalystRoundInfo(): Promise<?CatalystRoundInfoResponse> {
   const json = await getLocalItem(storageKeys.CATALYST_ROUND_INFO);
   if (!json) {
@@ -442,4 +445,46 @@ export async function loadCatalystRoundInfo(): Promise<?CatalystRoundInfoRespons
 
 export async function saveCatalystRoundInfo(data: CatalystRoundInfoResponse): Promise<void> {
   await setLocalItem(storageKeys.CATALYST_ROUND_INFO, JSON.stringify(data));
+}
+
+export function asyncLocalStorageWrapper(): {|
+  getItem(key: string): Promise<string | null>,
+  setItem(key: string, value: string): Promise<void>,
+  removeItem(key: string): Promise<void>,
+|} {
+  return {
+    getItem: key => getLocalItem(key).then(x => x ?? null),
+    setItem: setLocalItem,
+    removeItem: removeLocalItem,
+  }
+}
+
+export type StorageField<T> = {|
+  get: () => Promise<T>;
+  set: T => Promise<void>;
+  remove: () => Promise<void>;
+  defaultValue: () => T,
+|}
+
+export function createStorageField<T>(
+  key: string,
+  serializer: T => string,
+  deserializer: string => T,
+  defaultValue: T,
+): StorageField<T> {
+  return Object.freeze({
+    get: async () => maybe(await getLocalItem(key), deserializer) ?? defaultValue,
+    set: t => setLocalItem(key, serializer(t)),
+    remove: () => removeLocalItem(key),
+    defaultValue: () => defaultValue,
+  });
+}
+
+export function createStorageFlag(
+  key: string,
+  defaultValue: boolean,
+): StorageField<boolean> {
+  const serializer = String;
+  const deserializer = s => s === 'true';
+  return createStorageField<boolean>(key, serializer, deserializer, defaultValue);
 }

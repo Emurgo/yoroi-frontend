@@ -45,7 +45,7 @@ import type {
 } from '../ConceptualWallet/interfaces';
 
 import {
-  rawGetBip44AddressesByPath,
+  rawGetAddressesByDerivationPath,
   rawGetNextUnusedIndex,
   updateCutoffFromInsert,
   getBalanceForUtxos,
@@ -136,6 +136,7 @@ import type {
   Utxo,
 } from '@emurgo/yoroi-lib/dist/utxo/models';
 import { derivePublicByAddressing } from '../../../cardanoCrypto/deriveByAddressing';
+import { addressBech32ToHex } from '../../../cardanoCrypto/utils';
 
 interface Empty {}
 type HasPrivateDeriverDependencies = IPublicDeriver<ConceptualWallet & IHasPrivateDeriver>;
@@ -220,109 +221,103 @@ const GetAllUtxosMixin = (
     _body,
     derivationTables,
   ) => {
-    // TODO: perhaps should use seperate types for Ergo and Cardano wallets instead
-    // of branching
-    if (isCardanoHaskell(this.getParent().getNetworkInfo())) {
-      const addresses = await this.rawGetAllUtxoAddresses(
-        tx,
-        {
-          GetAddress: deps.GetAddress,
-          GetPathWithSpecific: deps.GetPathWithSpecific,
-          GetDerivationSpecific: deps.GetDerivationSpecific,
-        },
-        undefined,
-        derivationTables,
-      );
+    const addresses = await this.rawGetAllUtxoAddresses(
+      tx,
+      {
+        GetAddress: deps.GetAddress,
+        GetPathWithSpecific: deps.GetPathWithSpecific,
+        GetDerivationSpecific: deps.GetDerivationSpecific,
+      },
+      undefined,
+      derivationTables,
+    );
+    const utxoStorageApi = this.getUtxoStorageApi();
+    utxoStorageApi.setDb(super.getDb());
+    utxoStorageApi.setDbTx(tx);
+    const utxosInStorage: Array<Utxo> = await this.getUtxoService().getAvailableUtxos();
+    const networkId = this.getParent().getNetworkInfo().NetworkId;
+    const tokenMap = new Map<string, $ReadOnly<TokenRow>>(
+      (await deps.GetToken.fromIdentifier(
+        super.getDb(), tx,
+        [
+          '',
+          ...utxosInStorage.flatMap(
+            ({ assets }) => assets.map(asset => asset.assetId)
+          )
+        ]
+      )).filter(token => token.NetworkId === networkId)
+        .map(token => [token.Identifier, token])
+    );
+    const addressingMap = new Map<string, {| ...Address, ...Addressing |}>(
+      addresses.flatMap(family => family.addrs.map(addr => [addr.Hash, {
+        addressing: family.addressing,
+        address: addr.Hash,
+      }]))
+    );
+    const addressedUtxos = utxosInStorage.map(utxo => {
+      let addressHash;
+      try {
+        addressHash = addressBech32ToHex(utxo.receiver);
+      } catch {
+        addressHash = utxo.receiver;
+      }
+      const addressingInfo = addressingMap.get(addressHash);
+      if (addressingInfo == null) {
+        throw new Error(`${nameof(GetAllUtxos)}::${nameof(this.rawGetAllUtxos)}: Addressing info not found. Should never happen`);
+      }
 
-      const utxoStorageApi = this.getUtxoStorageApi();
-      utxoStorageApi.setDb(super.getDb());
-      utxoStorageApi.setDbTx(tx);
-      const utxosInStorage: Array<Utxo> = await this.getUtxoService().getAvailableUtxos();
-
-      const networkId = this.getParent().getNetworkInfo().NetworkId;
-      const tokenMap = new Map<string, $ReadOnly<TokenRow>>(
-        (await deps.GetToken.fromIdentifier(
-          super.getDb(), tx,
-          [
-            '',
-            ...utxosInStorage.flatMap(
-              ({ assets }) => assets.map(asset => asset.assetId)
-            )
-          ]
-        )).filter(token => token.NetworkId === networkId)
-          .map(token => [ token.Identifier, token ])
-      );
-
-      const addressingMap = new Map<string, {| ...Address, ...Addressing |}>(
-        addresses.flatMap(family => family.addrs.map(addr => [addr.Hash, {
-          addressing: family.addressing,
-          address: addr.Hash,
-        }]))
-      );
-
-      const addressedUtxos = utxosInStorage.map(utxo => {
-        let addressHash;
-        try {
-          addressHash = Buffer.from(
-            RustModule.WalletV4.Address.from_bech32(utxo.receiver).to_bytes()
-          ).toString('hex')
-        } catch {
-          addressHash = utxo.receiver;
+      const tokens = ['', ...utxo.assets.map(asset => asset.assetId)].map((tokenId, i) => {
+        let amount;
+        if (i === 0) {
+          amount = utxo.amount;
+        } else {
+          amount = utxo.assets[i - 1].amount;
         }
-        const addressingInfo = addressingMap.get(addressHash);
-        if (addressingInfo == null) {
-          throw new Error(`${nameof(GetAllUtxos)}::${nameof(this.rawGetAllUtxos)}: Addressing info not found. Should never happen`);
-        }
-
-        const tokens = [ '', ...utxo.assets.map(asset => asset.assetId) ].map((tokenId, i) => {
-          let amount;
-          if (i === 0) {
-            amount = utxo.amount;
-          } else {
-            amount = utxo.assets[i-1].amount;
-          }
-          const token = tokenMap.get(tokenId) || {
-            // Note this is dummy placeholder value and only the `Identifier` value
-            // matters. The only scenario this is needed is when during `updateUtxos`,
-            // new UTXOs with unseen tokens are added and before it requests the token
-            // info.
-            TokenId: -1,
-            NetworkId: networkId,
-            IsDefault: false,
-            Digest: 0,
-            Identifier: tokenId,
-            Metadata: {
-              type: 'Cardano',
-              policyId: tokenId.split('.')[0],
-              assetName: tokenId.split('.')[1],
-              numberOfDecimals: 0,
-              ticker: null,
-              longName: null
-            },
-          };
-          return { Token: token, TokenList: { Amount: amount.toString() } };
-        });
-        return {
-          output: {
-            Transaction: { Hash: utxo.txHash },
-            UtxoTransactionOutput: {
-              OutputIndex: utxo.txIndex,
-              ErgoBoxId: null,
-              ErgoCreationHeight: null,
-              ErgoTree: null,
-              ErgoRegisters: null,
-            },
-            tokens,
+        const token = tokenMap.get(tokenId) || {
+          // Note this is dummy placeholder value and only the `Identifier` value
+          // matters. The only scenario this is needed is when during `updateUtxos`,
+          // new UTXOs with unseen tokens are added and before it requests the token
+          // info.
+          TokenId: -1,
+          NetworkId: networkId,
+          IsDefault: false,
+          Digest: 0,
+          Identifier: tokenId,
+          Metadata: {
+            type: 'Cardano',
+            policyId: tokenId.split('.')[0],
+            assetName: tokenId.split('.')[1],
+            numberOfDecimals: 0,
+            ticker: null,
+            logo: null,
+            longName: null
           },
-          addressing: addressingInfo.addressing,
-          address: addressingInfo.address,
+        };
+        return {
+          Token: token,
+          TokenList: { Amount: amount.toString() }
         };
       });
-      return addressedUtxos;
-    }
-    // Ergo:
-    return this.rawGetAllUtxosFromOldDb(tx, deps, _body, derivationTables);
+      return {
+        output: {
+          Transaction: { Hash: utxo.txHash },
+          UtxoTransactionOutput: {
+            OutputIndex: utxo.txIndex,
+            ErgoBoxId: null,
+            ErgoCreationHeight: null,
+            ErgoTree: null,
+            ErgoRegisters: null,
+          },
+          tokens,
+        },
+        addressing: addressingInfo.addressing,
+        address: addressingInfo.address,
+      };
+    });
+    return addressedUtxos;
   }
+
+  // <TODO:PENDING_REMOVAL> Legacy: used only in migration
   rawGetAllUtxosFromOldDb: (
     lf$Transaction,
     {|
@@ -453,7 +448,7 @@ const GetAllUtxosMixin = (
   ): Promise<IGetAllUtxoAddressesResponse> => {
     // TODO: some way to know if single chain is an account or not
     if (this.getParent().getPublicDeriverLevel() >= Bip44DerivationLevels.CHAIN.level) {
-      return rawGetBip44AddressesByPath(
+      return rawGetAddressesByDerivationPath(
         super.getDb(), tx,
         deps,
         {
@@ -467,7 +462,7 @@ const GetAllUtxosMixin = (
         derivationTables,
       );
     }
-    const externalAddresses = await rawGetBip44AddressesByPath(
+    const externalAddresses = await rawGetAddressesByDerivationPath(
       super.getDb(), tx,
       deps,
       {
@@ -480,7 +475,7 @@ const GetAllUtxosMixin = (
       },
       derivationTables,
     );
-    const internalAddresses = await rawGetBip44AddressesByPath(
+    const internalAddresses = await rawGetAddressesByDerivationPath(
       super.getDb(), tx,
       deps,
       {
@@ -569,7 +564,7 @@ const GetAllAccountingMixin = (
       // we only allow this on accounts instead of any level < ACCOUNT.level to simplify the code
       throw new Error(`${nameof(GetAllAccounting)}::${nameof(this.rawGetAllAccountingAddresses)} incorrect pubderiver level`);
     }
-    return rawGetBip44AddressesByPath(
+    return rawGetAddressesByDerivationPath(
       super.getDb(), tx,
       deps,
       {
@@ -1257,7 +1252,7 @@ const HasUtxoChainsMixin = (
     if (this.getParent().getPublicDeriverLevel() !== Bip44DerivationLevels.ACCOUNT.level) {
       throw new Error(`${nameof(HasUtxoChains)}::${nameof(this.rawGetAddressesForChain)} incorrect pubderiver level`);
     }
-    return rawGetBip44AddressesByPath(
+    return rawGetAddressesByDerivationPath(
       super.getDb(), tx,
       deps,
       {
@@ -2030,7 +2025,7 @@ const ScanUtxoChainAddressesMixin = (
       null
     );
 
-    const addresses = await rawGetBip44AddressesByPath(
+    const addresses = await rawGetAddressesByDerivationPath(
       super.getDb(), tx,
       {
         GetAddress: deps.GetAddress,

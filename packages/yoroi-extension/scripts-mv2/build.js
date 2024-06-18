@@ -1,4 +1,5 @@
 // @flow
+/* eslint-disable  import/no-unused-modules */
 
 const fs = require('fs');
 const shell = require('shelljs');
@@ -64,9 +65,7 @@ export function buildDev(env: string) {
 
   console.log('[Webpack Dev]');
   console.log('-'.repeat(80));
-  console.log('If you\'re developing Inject page,');
-  console.log(`please allow 'https://localhost:${connections.Ports.WebpackDev}' connections in Google Chrome,`);
-  console.log('and load unpacked extensions with `./dev` folder. (see https://developer.chrome.com/extensions/getstarted#unpacked)\n');
+  console.log('Please load unpacked extensions with `./dev` folder. (see https://developer.chrome.com/extensions/getstarted#unpacked)\n');
 
   const serverOpts: any = {
     host: 'localhost',

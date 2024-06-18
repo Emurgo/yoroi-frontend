@@ -1,6 +1,6 @@
 // @flow
 import type { Node, ComponentType } from 'react';
-import type { StoresAndActionsProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { LayoutComponentMap } from '../../styles/context/layout';
@@ -27,10 +27,6 @@ import WalletConnectHWOptionDialogContainer from './dialogs/WalletConnectHWOptio
 import WalletConnectHWOptionDialog from '../../components/wallet/add/option-dialog/WalletConnectHWOptionDialog';
 import WalletTrezorConnectDialogContainer from './dialogs/WalletTrezorConnectDialogContainer';
 import WalletLedgerConnectDialogContainer from './dialogs/WalletLedgerConnectDialogContainer';
-import WalletPaperDialog from '../../components/wallet/WalletPaperDialog';
-import WalletPaperDialogContainer from './dialogs/WalletPaperDialogContainer';
-import CreatePaperWalletDialogContainer from './dialogs/CreatePaperWalletDialogContainer';
-import UserPasswordDialog from '../../components/wallet/add/paper-wallets/UserPasswordDialog';
 import SidebarContainer from '../SidebarContainer';
 import NavBar from '../../components/topbar/NavBar';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
@@ -77,24 +73,24 @@ class AddWalletPage extends Component<AllProps> {
     const { actions, stores } = this.props;
     const { uiDialogs } = stores;
 
-    const openTrezorConnectDialog = (type: string) => {
+    const openTrezorConnectDialog = () => {
       if (selectedNetwork === undefined) {
         throw new Error(`${nameof(AddWalletPage)} no API selected`);
       }
       actions.dialogs.push.trigger({
         dialog: WalletTrezorConnectDialogContainer,
-        params: { restoreType: { type, extra: 'trezor' } },
       });
+      // <TODO:HW_REFACTOR>
       this.props.actions.ada.trezorConnect.init.trigger();
     };
-    const openLedgerConnectDialog = (type: string) => {
+    const openLedgerConnectDialog = () => {
       if (selectedNetwork === undefined) {
         throw new Error(`${nameof(AddWalletPage)} no API selected`);
       }
       actions.dialogs.push.trigger({
         dialog: WalletLedgerConnectDialogContainer,
-        params: { restoreType: { type, extra: 'ledger' } },
       });
+      // <TODO:HW_REFACTOR>
       this.props.actions.ada.ledgerConnect.init.trigger();
     };
 
@@ -121,22 +117,6 @@ class AddWalletPage extends Component<AllProps> {
           actions={actions}
           stores={stores}
           onClose={this.onClose}
-        />
-      );
-    } else if (uiDialogs.isOpen(WalletPaperDialog)) {
-      // <TODO:PENDING_REMOVAL> paper
-      activeDialog = (
-        <WalletPaperDialogContainer
-          actions={actions}
-          stores={stores}
-          onClose={this.onClose}
-        />
-      );
-    } else if (uiDialogs.isOpen(UserPasswordDialog)) {
-      activeDialog = (
-        <CreatePaperWalletDialogContainer
-          actions={actions}
-          stores={stores}
         />
       );
     } else if (uiDialogs.isOpen(WalletBackupDialog)) {
@@ -185,32 +165,24 @@ class AddWalletPage extends Component<AllProps> {
       activeDialog = (
         <WalletConnectHWOptionDialogContainer
           onClose={this.onClose}
-          onTrezor={() => openTrezorConnectDialog('cip1852')}
-          onLedger={() => openLedgerConnectDialog('cip1852')}
+          onTrezor={() => openTrezorConnectDialog()}
+          onLedger={() => openLedgerConnectDialog()}
         />
       );
     } else if (uiDialogs.isOpen(WalletTrezorConnectDialogContainer)) {
-      const mode = uiDialogs.getParam<RestoreModeType>('restoreType');
-      if (mode == null)
-        throw new Error(`${nameof(AddWalletPage)} no mode for restoration selected`);
       activeDialog = (
         <WalletTrezorConnectDialogContainer
           actions={actions}
           stores={stores}
-          mode={mode}
           onClose={this.onClose}
           onBack={() => actions.dialogs.pop.trigger()}
         />
       );
     } else if (uiDialogs.isOpen(WalletLedgerConnectDialogContainer)) {
-      const mode = uiDialogs.getParam<RestoreModeType>('restoreType');
-      if (mode == null)
-        throw new Error(`${nameof(AddWalletPage)} no mode for restoration selected`);
       activeDialog = (
         <WalletLedgerConnectDialogContainer
           actions={actions}
           stores={stores}
-          mode={mode}
           onClose={this.onClose}
           onBack={() => actions.dialogs.pop.trigger()}
         />

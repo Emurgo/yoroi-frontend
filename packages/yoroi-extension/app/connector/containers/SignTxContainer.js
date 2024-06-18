@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import type { ConnectorStoresAndActionsProps } from '../../types/injectedPropsType';
+import type { ConnectorStoresAndActionsProps } from '../../types/injectedProps.types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { observable, runInAction } from 'mobx';
@@ -86,11 +86,20 @@ export default class SignTxContainer extends Component<
     );
   }
 
+  renderError(errorMessage: string): Node {
+    return (
+      <FullscreenLayout bottomPadding={0}>
+        {errorMessage}
+      </FullscreenLayout>
+    );
+  }
+
   render(): Node {
     const actions = this.props.actions;
     const { uiNotifications } = this.props.stores;
 
-    const { signingMessage } = this.props.stores.connector;
+    const { signingMessage, unrecoverableError } = this.props.stores.connector;
+    if (unrecoverableError != null) return this.renderError(unrecoverableError);
     if (signingMessage == null) return this.renderLoading();
 
     const selectedWallet = this.props.stores.connector.filteredWallets.find(

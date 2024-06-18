@@ -6,7 +6,7 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { StoresAndActionsProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import { ComplexityLevels } from '../../types/complexityLevelType';
 import WarningBox from '../../components/widgets/WarningBox';
 
@@ -110,6 +110,7 @@ export default class DeregisterDialogContainer extends Component<Props> {
         }}
         isSubmitting={false}
         error={undefined}
+        id="deregisterDialog"
       >
         <div>{intl.formatMessage(dialogMessages.deregisterExplanationLine1)}</div>
         <div>{intl.formatMessage(dialogMessages.deregisterExplanationLine3)}</div>

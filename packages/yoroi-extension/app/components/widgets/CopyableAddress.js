@@ -9,7 +9,7 @@ import { ReactComponent as IconCopy } from '../../assets/images/copy.inline.svg'
 import { ReactComponent as IconCopied } from '../../assets/images/copied.inline.svg';
 import styles from './CopyableAddress.scss';
 import { Box, Tooltip, Typography } from '@mui/material';
-import type { Notification } from '../../types/notificationType';
+import type { Notification } from '../../types/notification.types';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 export const copyableMessages: Object = defineMessages({
@@ -32,6 +32,7 @@ type Props = {|
   +notification: ?Notification,
   +darkVariant?: boolean,
   +sx?: Object,
+  id: string,
 |};
 
 @observer
@@ -55,7 +56,7 @@ export default class CopyableAddress extends Component<Props> {
   };
 
   render(): Node {
-    const { hash, elementId, sx, onCopyAddress, notification, darkVariant } = this.props;
+    const { hash, elementId, sx, onCopyAddress, notification, darkVariant, id } = this.props;
     const { intl } = this.context;
 
     const Icon = notification && notification.id === elementId ? IconCopied : IconCopy;
@@ -70,7 +71,7 @@ export default class CopyableAddress extends Component<Props> {
         }
         placement={this.props.placementTooltip}
       >
-        <span className={styles.copyIconBig}>
+        <span className={styles.copyIconBig} id={id + '-copyAddress-button'}>
           <Icon />
         </span>
       </Tooltip>
@@ -80,9 +81,9 @@ export default class CopyableAddress extends Component<Props> {
       <Box
         sx={sx}
         className={classnames([styles.component, darkVariant === true && styles.componentDark])}
-        id="copyableAddress"
+        id={id + '-copyableAddress-box'}
       >
-        <span>{this.props.children}</span>
+        <span id={id + '-address-text'}>{this.props.children}</span>
         <CopyToClipboard
           text={hash}
           onCopy={onCopyAddress == null ? undefined : (_text, _result) => onCopyAddress()}

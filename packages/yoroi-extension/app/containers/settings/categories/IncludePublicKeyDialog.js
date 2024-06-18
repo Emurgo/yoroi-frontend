@@ -7,7 +7,7 @@ import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
-import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 
 import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
 
@@ -71,6 +71,7 @@ export default class IncludePublicKeyDialog extends Component<Props> {
             this.props.actions.dialogs.closeActiveDialog.trigger();
           }
         }}
+        id="includePublicKeyDialog"
       >
         <div><FormattedHTMLMessage {...dialogMessages.includeKeyExplanationLine1} /></div>
         <div><FormattedHTMLMessage {...globalMessages.publicKeyExplanation} /></div>

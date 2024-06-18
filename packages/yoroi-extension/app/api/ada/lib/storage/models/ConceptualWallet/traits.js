@@ -479,6 +479,7 @@ export async function refreshCip1852WalletFunctionality<
   return (instance: any);
 }
 
+// <TODO:PENDING_REMOVAL> bip44
 export async function refreshBip44WalletFunctionality<
   T: ConceptualWallet & IBip44Wallet & IHasPrivateDeriver & IHasLevels & IHasSign
 >(

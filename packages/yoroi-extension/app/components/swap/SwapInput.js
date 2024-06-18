@@ -1,51 +1,81 @@
 // @flow
 import type { Node } from 'react';
-import { useState } from 'react';
+import type { AssetAmount } from './types';
 import { Box, Typography } from '@mui/material';
 import { ReactComponent as ChevronDownIcon } from '../../assets/images/revamp/icons/chevron-down.inline.svg';
-import { ReactComponent as DefaultTokenImage } from '../../assets/images/revamp/token-default.inline.svg';
-import type { AssetAmount } from './types';
+import adaTokenImage from '../../assets/images/ada.inline.svg';
+import defaultTokenImage from '../../assets/images/revamp/token-default.inline.svg';
+import { urlResolveForIpfsAndCorsproxy } from '../../coreUtils';
+import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
+import type { State } from '../../containers/swap/context/swap-form/types';
+import { useEffect, useState } from 'react';
 
 type Props = {|
   label: string,
-  amount: AssetAmount,
+  tokenInfo: AssetAmount | Object,
+  defaultTokenInfo: RemoteTokenInfo,
+  getTokenInfo: string => Promise<RemoteTokenInfo>,
   onAssetSelect: function,
   handleAmountChange: function,
   showMax?: boolean,
   value?: string,
-  touched?: boolean,
-  inputRef?: any | null,
+  disabled?: boolean,
+  focusState: State<boolean>,
   error: string | null,
 |};
 
 export default function SwapInput({
   label,
   showMax = false,
+  disabled = false,
   onAssetSelect,
   error = '',
   handleAmountChange,
   value,
-  amount,
+  tokenInfo,
+  defaultTokenInfo,
+  getTokenInfo,
+  focusState,
 }: Props): Node {
-  const { amount: quantity = undefined, ...rest } = amount;
-
-  const [inputValue, setInputValue] = useState(value || '');
-  const [isFocused, setIsFocused] = useState(false);
+  const [remoteTokenLogo, setRemoteTokenLogo] = useState<?string>(null);
+  const { id, amount: quantity = undefined, image, ticker } = tokenInfo || {};
 
   const handleChange = e => {
-    handleAmountChange(e.target.value);
-    setInputValue(e.target.value);
+    if (!disabled && value !== quantity) {
+      handleAmountChange(e.target.value);
+    }
   };
 
-  const isFocusedColor = isFocused ? 'grayscale.max' : 'grayscale.400';
+  const isFocusedColor = focusState.value ? 'grayscale.max' : 'grayscale.400';
+
+  useEffect(() => {
+    if (id != null) {
+      getTokenInfo(id)
+        .then(remoteTokenInfo => {
+          if (remoteTokenInfo.logo != null) {
+            setRemoteTokenLogo(`data:image/png;base64,${remoteTokenInfo.logo}`);
+          }
+          return null;
+        })
+        .catch(e => {
+          console.warn('Failed to resolve remote info for token: ' + id, e);
+        });
+    }
+  }, [id]);
+
+  const imgSrc =
+    ticker === defaultTokenInfo.ticker
+      ? adaTokenImage
+      : remoteTokenLogo ?? urlResolveForIpfsAndCorsproxy(image) ?? defaultTokenImage;
 
   return (
     <Box>
       <Box
+        onClick={tokenInfo.name?.length > 0 ? undefined : onAssetSelect}
         component="fieldset"
         sx={{
           borderStyle: 'solid',
-          borderWidth: isFocused || error ? '2px' : '1px',
+          borderWidth: tokenInfo.id?.length > 0 && error ? '2px' : '1px',
           borderColor: error ? 'magenta.500' : isFocusedColor,
           borderRadius: '8px',
           p: '16px',
@@ -58,6 +88,9 @@ export default function SwapInput({
           bgcolor: 'common.white',
           columnGap: '6px',
           rowGap: '8px',
+          '&:hover': {
+            borderColor: !error && 'grayscale.max',
+          },
         }}
       >
         <Box
@@ -87,9 +120,9 @@ export default function SwapInput({
           color="grayscale.max"
           placeholder="0"
           onChange={handleChange}
-          value={inputValue}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
+          value={disabled ? '' : value}
+          onFocus={() => focusState.update(true)}
+          onBlur={() => focusState.update(false)}
         />
         <Box sx={{ justifySelf: 'end', cursor: 'pointer' }} onClick={onAssetSelect}>
           <Box height="100%" width="min-content" display="flex" gap="8px" alignItems="center">
@@ -98,13 +131,16 @@ export default function SwapInput({
               height="24px"
               sx={{ overflowY: 'hidden', '& > svg': { width: '100%', height: '100%' } }}
             >
-              {rest.image ? (
-                <img src={rest.image} alt="" width="100%" /> || <DefaultTokenImage />
-              ) : (
-                <DefaultTokenImage />
-              )}
+              <img
+                width="100%"
+                src={imgSrc}
+                alt=""
+                onError={e => {
+                  e.target.src = defaultTokenImage;
+                }}
+              />
             </Box>
-            <Box width="max-content">{rest.ticker || 'Select asset'}</Box>
+            <Box width="max-content">{ticker || 'Select asset'}</Box>
             <Box display="inline-flex">
               <ChevronDownIcon />
             </Box>
@@ -116,11 +152,18 @@ export default function SwapInput({
               component="button"
               variant="caption"
               fontWeight={500}
-              sx={{ p: '4px 8px', bgcolor: 'grayscale.50', borderRadius: '8px' }}
-              onClick={() => {
-                setInputValue(quantity);
-                // handleAmountChange(quantity);
+              sx={{
+                p: '4px 8px',
+                bgcolor: 'grayscale.50',
+                borderRadius: '8px',
+                ':disabled': {
+                  cursor: 'not-allowed',
+                },
               }}
+              onClick={() => {
+                handleAmountChange(quantity);
+              }}
+              disabled={disabled}
             >
               MAX
             </Typography>
@@ -130,7 +173,7 @@ export default function SwapInput({
         )}
         <Box sx={{ justifySelf: 'end', alignSelf: 'end' }}>
           <Typography component="div" variant="caption" color="grayscale.600">
-            Current balance: {quantity || 0} {rest.ticker}
+            Current balance: {quantity || 0} {ticker}
           </Typography>
         </Box>
       </Box>

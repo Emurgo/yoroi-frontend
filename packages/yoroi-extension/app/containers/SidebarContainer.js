@@ -3,7 +3,7 @@ import type { ComponentType, Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import Sidebar from '../components/topbar/Sidebar';
-import type { StoresAndActionsProps } from '../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../types/injectedProps.types';
 import { allCategories, allCategoriesRevamp } from '../stores/stateless/sidebarCategories';
 import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
 import SidebarRevamp from '../components/topbar/SidebarRevamp';
@@ -70,7 +70,7 @@ class SidebarContainer extends Component<AllProps> {
             selected: this.props.stores.wallets.selected,
             currentRoute: this.props.stores.app.currentRoute,
             isRewardWallet: (publicDeriver: PublicDeriver<>) =>
-              stores.delegation.getDelegationRequests(publicDeriver) != null,
+              stores.delegation.isRewardWallet(publicDeriver),
           })
         )}
       />

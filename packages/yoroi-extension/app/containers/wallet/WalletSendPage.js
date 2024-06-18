@@ -6,7 +6,7 @@ import { action, observable, runInAction } from 'mobx';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, intlShape } from 'react-intl';
 import { ROUTES } from '../../routes-config';
-import type { StoresAndActionsProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 
 import WalletSendFormClassic from '../../components/wallet/send/WalletSendForm';
 import WalletSendFormRevamp from '../../components/wallet/send/WalletSendFormRevamp';

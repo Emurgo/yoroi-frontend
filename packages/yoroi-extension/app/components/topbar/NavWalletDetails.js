@@ -28,8 +28,8 @@ type Props = {|
   +shouldHideBalance: boolean,
   +highlightTitle?: boolean,
   +showEyeIcon?: boolean,
-  +rewards: ?MultiToken,
-  +walletAmount: null | MultiToken,
+  +rewards: MultiToken,
+  +walletAmount: ?MultiToken,
   +infoText?: string,
   +showDetails?: boolean,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
@@ -82,7 +82,7 @@ export default class NavWalletDetails extends Component<Props> {
       <div className={styles.wrapper}>
         <div className={styles.outerWrapper}>
           {
-          !totalAmount || (totalAmount && showsRewards && (!rewards || !walletAmount)) ? (
+          !totalAmount || (totalAmount && showsRewards && !walletAmount) ? (
             <Box sx={{
               height: '100%',
               display: 'flex',
@@ -167,7 +167,7 @@ export default class NavWalletDetails extends Component<Props> {
 
   getTotalAmount: void => ?MultiToken = () => {
     return maybe(this.props.walletAmount,
-      w => this.props.rewards?.joinAddCopy(w) ?? w)
+      w => this.props.rewards.joinAddCopy(w))
   }
 
   renderAmountDisplay: {|

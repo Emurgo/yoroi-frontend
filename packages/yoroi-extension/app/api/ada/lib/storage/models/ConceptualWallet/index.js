@@ -26,9 +26,8 @@ import Config from '../../../../../../config';
 import type {
   NetworkRow, TokenRow,
 } from '../../database/primitives/tables';
-import type {
-  DefaultTokenEntry,
-} from '../../../../../common/lib/MultiToken';
+import type { DefaultTokenEntry } from '../../../../../common/lib/MultiToken';
+import { MultiToken } from '../../../../../common/lib/MultiToken';
 
 /** Snapshot of a ConceptualWallet in the database */
 export class ConceptualWallet implements IConceptualWallet, IRename {
@@ -69,6 +68,10 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
     };
   }
 
+  getDefaultMultiToken(): MultiToken {
+    return new MultiToken([], this.getDefaultToken());
+  }
+
   getConceptualWalletId(): number {
     return this.#conceptualWalletId;
   }
@@ -76,6 +79,13 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
   getWalletType: void => WalletType = () => {
     return this.walletType;
   }
+
+  getWalletVariant: void => 'web' | 'ledger' | 'trezor' = () => {
+    if (isLedgerNanoWallet(this)) return 'ledger';
+    if (isTrezorTWallet(this)) return 'trezor';
+    return 'web';
+  }
+
   /**
    * TODO: maybe  we shouldn't cache in this way
    * since information like device ID, firmware version, etc.

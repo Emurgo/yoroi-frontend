@@ -78,7 +78,13 @@ class SpendingPasswordSetting extends Component<Props & InjectedLayoutProps> {
           {intl.formatMessage(messages.passwordDescription)}
         </Typography>
 
-        <Button onClick={this.props.openDialog} size="flat" variant="contained" color="primary">
+        <Button
+          onClick={this.props.openDialog}
+          size="flat"
+          variant="contained"
+          color="primary"
+          id="settings:wallet-changePassword-button"
+        >
           {intl.formatMessage(messages.changePassword)}
         </Button>
       </Box>

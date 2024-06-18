@@ -22,7 +22,7 @@ import type {
   FetchFilenameExternalTxMemoRequest, FetchFilenameExternalTxMemoResponse,
   GetMetadataExternalTxMemoResponse, FetchFolderExternalTxMemoResponse,
   CreateFolderExternalTxMemoResponse
-} from './IProvider';
+} from './IProvider.types';
 
 export default class DropboxApi implements IProvider {
   authorizeUrl: string = `https://www.dropbox.com/oauth2/authorize?client_id=${DROPBOX_CLIENT_ID}&response_type=token&redirect_uri=${ROUTES.ROOT}#/`;

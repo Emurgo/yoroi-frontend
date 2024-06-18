@@ -1,11 +1,11 @@
 // @flow
-import type { Node, ComponentType } from 'react';
-import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import type { ManageDialogsProps } from '../../../dialogs/types';
+import type { ComponentType, Node } from 'react';
 import { useState } from 'react';
-import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
+import type { $npm$ReactIntl$IntlShape } from 'react-intl';
+import { defineMessages, FormattedHTMLMessage, injectIntl } from 'react-intl';
+import type { ManageDialogsProps } from '../../../dialogs/types';
 import { observer } from 'mobx-react';
-import { Stack, Box, Typography } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import { RESTORE_WALLET_STEPS } from '../../steps';
 import { PublicDeriver } from '../../../../../api/ada/lib/storage/models/PublicDeriver';
 import StepController from '../../../create-wallet/StepController';
@@ -14,6 +14,8 @@ import globalMessages from '../../../../../i18n/global-messages';
 import RestoreRecoveryPhraseForm from './RestoreRecoveryPhraseForm';
 import DuplicatedWalletDialog from './DuplicatedWalletDialog';
 import { TIPS_DIALOGS } from '../../../dialogs/constants';
+import type { RestoreModeType } from '../../../../../actions/common/wallet-restore-actions';
+import { fail } from '../../../../../coreUtils';
 
 const messages = defineMessages({
   description: {
@@ -28,23 +30,23 @@ type Intl = {|
 |};
 
 type Props = {|
-  walletData: any,
+  mode: ?RestoreModeType,
   initialRecoveryPhrase: string,
   duplicatedWalletData: any,
-  openDuplicatedWallet(duplicatedWallet: PublicDeriver<>): void,
-  setCurrentStep(stepId: string): void,
-  checkValidPhrase(enteredPhrase: string): boolean,
-  onSubmit(phrase: string): PossiblyAsync<PublicDeriver<> | typeof undefined>,
+  openDuplicatedWallet: PublicDeriver<> => void,
+  setCurrentStep: string => void,
+  checkValidPhrase: string => boolean,
+  onSubmit: string => PossiblyAsync<?PublicDeriver<>>,
   ...ManageDialogsProps,
 |};
 
-function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
+function EnterRecoveryPhraseStep(props: Props & Intl): Node {
   const [enableNext, setEnableNext] = useState(false);
   const [duplicatedWallet, setDuplicatedWallet] = useState(null);
   const {
     intl,
     setCurrentStep,
-    walletData,
+    mode,
     checkValidPhrase,
     onSubmit,
     openDuplicatedWallet,
@@ -57,16 +59,13 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
 
   const isActiveDialog = isDialogOpen(DuplicatedWalletDialog);
 
-  const mode = walletData.mode;
-
   function goNextStepCallback() {
     return () => setCurrentStep(RESTORE_WALLET_STEPS.ADD_WALLET_DETAILS);
   }
 
   function checkMnemonic(recoveryPhrase) {
     const phrase = recoveryPhrase.map(word => word.value).join(' ');
-    const isValid = checkValidPhrase(phrase);
-    return isValid;
+    return checkValidPhrase(phrase);
   }
 
   async function handleSubmit(recoveryPhrase) {
@@ -85,20 +84,23 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
     closeDialog(TIPS_DIALOGS.DUPLICATED_WALLET);
   }
 
+  // $FlowFixMe[prop-missing]
+  const { length } = mode ?? fail('No mnemonic length is selected!');
+
   return (
     <Stack alignItems="center" justifyContent="center" className={styles.component} id='enterRecoveryPhraseStepComponent'>
       <Stack
         direction="column"
         alignItems="left"
         justifyContent="center"
-        maxWidth={mode.length === 15 ? '636px' : '760px'}
+        maxWidth={length === 15 ? '636px' : '760px'}
       >
         <Typography component="div" mb="16px">
           <FormattedHTMLMessage {...messages.description} />
         </Typography>
 
         <RestoreRecoveryPhraseForm
-          numberOfMnemonics={mode.length}
+          numberOfMnemonics={length}
           isValidMnemonic={checkMnemonic}
           onSubmit={handleSubmit}
           initialRecoveryPhrase={initialRecoveryPhrase}
@@ -134,4 +136,4 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
   );
 }
 
-export default (injectIntl(observer(VerifyRecoveryPhraseStep)): ComponentType<Props>);
+export default (injectIntl(observer(EnterRecoveryPhraseStep)): ComponentType<Props>);

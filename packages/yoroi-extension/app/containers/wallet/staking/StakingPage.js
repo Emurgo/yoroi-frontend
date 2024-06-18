@@ -1,7 +1,7 @@
 // @flow
 import { Component, Suspense, lazy } from 'react';
 import type { Node } from 'react';
-import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import type { ConfigType } from '../../../../config/config-types';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -12,6 +12,7 @@ import SidebarContainer from '../../SidebarContainer';
 import NavBarContainerRevamp from '../../NavBarContainerRevamp';
 import TopBarLayout from '../../../components/layout/TopBarLayout';
 import NavBarTitle from '../../../components/topbar/NavBarTitle';
+import { PoolTransitionBanner } from './PoolTransitionBanner';
 
 export const StakingPageContentPromise: void => Promise<any> = () => import('./StakingPageContent');
 const StakingPageContent = lazy(StakingPageContentPromise);
@@ -28,6 +29,7 @@ class StakingPage extends Component<StoresAndActionsProps> {
   render(): Node {
     const { actions, stores } = this.props;
     const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
+    const selectedWallet = stores.wallets.selected;
     return (
       <TopBarLayout
         banner={<BannerContainer actions={actions} stores={stores} />}
@@ -39,6 +41,12 @@ class StakingPage extends Component<StoresAndActionsProps> {
             title={
               <NavBarTitle
                 title={this.context.intl.formatMessage(globalMessages.stakingDashboard)}
+              />
+            }
+            pageBanner={
+              <PoolTransitionBanner
+                intl={this.context.intl}
+                showBanner={stores.delegation.getPoolTransitionInfo(selectedWallet)?.shouldShowTransitionFunnel}
               />
             }
           />

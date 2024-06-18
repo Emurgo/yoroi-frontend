@@ -14,7 +14,7 @@ import {
 
 import type {
   TreeInsert,
-} from '../../database/walletTypes/common/utils';
+} from '../../database/walletTypes/common/utils.types';
 import type { Bip44ChainInsert } from '../../database/walletTypes/common/tables';
 import type { KeyInsert, NetworkRow } from '../../database/primitives/tables';
 import type { HWFeatures, } from '../../database/walletTypes/core/tables';
@@ -38,7 +38,7 @@ import type {
 import type { AddByHashFunc } from '../../../../../common/lib/storage/bridge/hashMapper';
 import { rawGenAddByHash } from '../../../../../common/lib/storage/bridge/hashMapper';
 import { addByronAddress } from '../../../../restoration/byron/scan';
-import { KeyKind } from '../../../../../common/lib/crypto/keys/types';
+import { KeyKind } from '../../../cardanoCrypto/keys/types';
 
 // TODO: maybe move this inside walletBuilder somehow so it's all done in the same transaction
 /**
@@ -46,6 +46,7 @@ import { KeyKind } from '../../../../../common/lib/crypto/keys/types';
  * This is because scanning depends on having an internet connection
  * But we need to ensure the address maintains the BIP44 gap regardless of internet connection
  */
+// <TODO:PENDING_REMOVAL> bip44
 export async function getAccountDefaultDerivations(
   settings: RustModule.WalletV2.BlockchainSettings,
   accountPublicKey: RustModule.WalletV2.Bip44AccountPublic,
@@ -120,6 +121,7 @@ export async function getAccountDefaultDerivations(
   ];
 }
 
+// <TODO:PENDING_REMOVAL> bip44 (used only in tests)
 export async function createStandardBip44Wallet(request: {|
   db: lf$Database,
   rootPk: RustModule.WalletV2.Bip44RootPrivateKey,
@@ -245,121 +247,7 @@ export async function createStandardBip44Wallet(request: {|
   return state;
 }
 
-export async function createHardwareWallet(request: {
-  db: lf$Database,
-  settings: RustModule.WalletV2.BlockchainSettings,
-  accountPublicKey: RustModule.WalletV2.Bip44AccountPublic,
-  accountIndex: number,
-  walletName: string,
-  accountName: string,
-  hwWalletMetaInsert: HWFeatures,
-  network: $ReadOnly<NetworkRow>,
-  ...
-}): Promise<HasConceptualWallet & HasBip44Wrapper & HasPublicDeriver<mixed>> {
-  if (request.accountIndex < HARD_DERIVATION_START) {
-    throw new Error(`${nameof(createHardwareWallet)} needs hardened index`);
-  }
-  const initialDerivations = await getAccountDefaultDerivations(
-    request.settings,
-    request.accountPublicKey,
-    rawGenAddByHash(new Set()),
-  );
-
-  let state;
-  {
-    state = await WalletBuilder
-      .start(
-        request.db,
-        Bip44TableMap,
-      )
-      .addConceptualWallet(
-        _finalState => ({
-          NetworkId: request.network.NetworkId,
-          Name: request.walletName,
-        })
-      )
-      .addFromRoot(
-        _finalState => ({
-          rootInsert: {
-            privateKeyInfo: null,
-            publicKeyInfo: null,
-            derivationInfo: keys => ({
-              PublicKeyId: keys.public,
-              PrivateKeyId: keys.private,
-              Parent: null,
-              Index: null,
-            }),
-            levelInfo: insertRequest => Promise.resolve({
-              KeyDerivationId: insertRequest.keyDerivationId,
-            }),
-          },
-          tree: rootDerivation => ({
-            derivationId: rootDerivation,
-            children: [],
-          }),
-        })
-      )
-      .addBip44Wrapper(
-        finalState => ({
-          ConceptualWalletId: finalState.conceptualWalletRow.ConceptualWalletId,
-          SignerLevel: null,
-          PublicDeriverLevel: Bip44DerivationLevels.ACCOUNT.level,
-          PrivateDeriverKeyDerivationId: null,
-          PrivateDeriverLevel: null,
-          RootKeyDerivationId: finalState.root.root.KeyDerivation.KeyDerivationId,
-        })
-      )
-      .addAdhocPublicDeriver(
-        finalState => ({
-          parentDerivationId: finalState.root.root.KeyDerivation.KeyDerivationId,
-          pathStartLevel: 1,
-          publicDeriverMeta: {
-            name: request.accountName,
-          },
-          pathToPublic: [
-            {
-              index: WalletTypePurpose.BIP44,
-              insert: insertRequest => Promise.resolve({
-                KeyDerivationId: insertRequest.keyDerivationId,
-              }),
-              publicKey: null,
-              privateKey: null,
-            },
-            {
-              index: CoinTypes.CARDANO,
-              insert: insertRequest => Promise.resolve({
-                KeyDerivationId: insertRequest.keyDerivationId,
-              }),
-              publicKey: null,
-              privateKey: null,
-            },
-            {
-              index: request.accountIndex,
-              insert: insertRequest => Promise.resolve({
-                KeyDerivationId: insertRequest.keyDerivationId,
-              }),
-              publicKey: {
-                Hash: request.accountPublicKey.key().to_hex(),
-                IsEncrypted: false,
-                PasswordLastUpdate: null,
-                Type: KeyKind.BIP32ED25519,
-              },
-              privateKey: null,
-            },
-          ],
-          initialDerivations,
-          hwWalletMetaInsert: {
-            ConceptualWalletId: finalState.conceptualWalletRow.ConceptualWalletId,
-            ...request.hwWalletMetaInsert
-          },
-        })
-      )
-      .commit();
-  }
-
-  return state;
-}
-
+// <TODO:PENDING_REMOVAL> legacy migration
 export async function migrateFromStorageV1(request: {
   db: lf$Database,
   settings: RustModule.WalletV2.BlockchainSettings,

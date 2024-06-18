@@ -5,57 +5,152 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
-import { truncateAddress } from '../../utils/formatters';
 import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
-import ChangellyFetcher from './ChangellyFetcher';
 
-import styles from './BuySellDialog.scss';
-import { ReactComponent as VerifyIcon } from '../../assets/images/verify-icon.inline.svg';
-import VerticalFlexContainer from '../layout/VerticalFlexContainer';
-import LoadingSpinner from '../widgets/LoadingSpinner';
 import globalMessages from '../../i18n/global-messages';
 import { Box } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import Tab, { tabClasses } from '@mui/material/Tab';
+import Tabs, { tabsClasses } from '@mui/material/Tabs';
+import TextField from '@mui/material/TextField';
+import InputAdornment from '@mui/material/InputAdornment';
+import BigNumber from 'bignumber.js';
+import adaPng from '../../assets/images/ada.png';
+import banxaPng from '../../assets/images/banxa.png';
+import encryptusPng from '../../assets/images/encryptus.png';
+import { ReactComponent as InfoIcon } from '../../assets/images/info-icon-revamp.inline.svg';
+import { exchangeApiMaker, exchangeManagerMaker } from '@yoroi/exchange'
+import environment from '../../environment';
+
+declare var chrome;
 
 const messages = defineMessages({
   dialogTitle: {
-    id: 'buy.dialog.title',
-    defaultMessage: '!!!Buy ADA',
+    id: 'buysell.dialog.title',
+    defaultMessage: '!!!Exchange ADA',
   },
-  dialogSelectAddress: {
-    id: 'buysell.dialog.selectAddress',
-    defaultMessage:
-      '!!!Please select the receiving address. This will be shared with the third party provider called Changelly for the buy / sell of ADA. ',
+  adaAmount: {
+    id: 'buysell.dialog.adaAmount',
+    defaultMessage: '!!!ADA Amount',
   },
-  dialogDescription: {
-    id: 'buysell.dialog.instructions',
-    defaultMessage:
-      '!!!Please select your preferences. On the next screen, confirm your selection by pressing the green arrow on the top right',
+  currentBalance: {
+    id: 'buysell.dialog.currentBalance',
+    defaultMessage: '!!!Current balance: {amount} ADA',
   },
-  dialogManual: {
-    id: 'buysell.dialog.manual',
-    defaultMessage: '!!!I will add my address manually',
+  lessThanMinimum: {
+    id: 'buysell.dialog.error.minimum',
+    defaultMessage: '!!!Minimum {amount} ADA required',
+  },
+  notEnoughBalance: {
+    id: 'buysell.dialog.error.not.enough',
+    defaultMessage: '!!!Not enough balance',
+  },
+  providerFee: {
+    id: 'buysell.dialog.providerFee',
+    defaultMessage: '!!!Provider fee',
+  },
+  disclaimer: {
+    id: 'buysell.dialog.disclaimer',
+    defaultMessage: '!!!Disclaimer',
+  },
+  disclaimerText: {
+    id: 'buysell.dialog.disclaimerText',
+    defaultMessage: '!!!Yoroi Wallet utilizes third-party web3 on-and-off ramp solutions for direct Fiat-ADA exchanges.  By clicking "Proceed," you acknowledge that you will be redirected to our partner\'s website, where you may need to accept their terms and conditions.  Please note, the third party web3 solution may have limitations based on your location and financial institution.'
+  },
+  proceed: {
+    id: 'buysell.dialog.proceed',
+    defaultMessage: 'PROCEED',
   },
 });
 
-export type WalletInfo = {|
-  walletName: string,
-  currencyName: string,
-  anAddressFormatted: string,
-|};
-
 type Props = {|
   +onCancel: void => void,
-  +genWalletList: () => Promise<Array<WalletInfo>>,
+  +onExchangeCallback: void => void,
+  +currentBalanceAda: string,
+  +receiveAdaAddressPromise: Promise<string | null>,
 |};
-
-const WIDGET_URL =
-  'https://widget.changelly.com?from=*&to=*&amount=200&fromDefault=usd&toDefault=ada&theme=default&merchant_id=g9qheu8vschp16jj&payment_id=&v=3';
 
 type State = {|
-  addressSelected: ?string,
-  walletList: ?Array<WalletInfo>,
+  +isBuying: boolean,
+  +error: null | 'lessThanBuyMinimum' | 'notEnoughBalance' | 'lessThanSellMinimum',
+  +amountAda: string,
+  +isSubmitting: boolean,
 |};
+
+const MINIMUM_BUY_ADA = new BigNumber('100');
+const MINIMUM_SELL_ADA = new BigNumber('1');
+const EXCHANGE_CALLBACK_URL = 'https://ramp-redirect.yoroiwallet.com/yoroi-extension-exchange-callback.html';
+
+const TabItem = styled(Tab)({
+  position: 'relative',
+  borderRadius: '8px',
+  textAlign: 'center',
+  transition: 'all .5s',
+  padding: '10px 15px',
+  color: '#555555',
+  height: 'auto',
+  margin: '10px 0',
+  float: 'none',
+  fontSize: '12px',
+  fontWeight: '500',
+  [`&.${tabClasses.selected}, &.${tabClasses.root}:hover`]: {
+    color: '#555555',
+    backgroundColor: '#dce0e9',
+  },
+});
+
+const ProviderRow = styled(Box)({
+  display: 'flex',
+  flexDirection: 'row',
+  marginBottom: '16px',
+  '& .provider-logo': {
+    width: '48px',
+    height: '48px',
+  },
+  '& .provider-name-fee': {
+    marginLeft: '10px',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+  },
+  '& .provider-name': {
+    fontFamily: 'Rubik',
+    fontSize: '16px',
+    fontWeight: 500,
+    lineHeight: '24px',
+    textAlign: 'left',
+  },
+  '& .provider-fee': {
+    fontFamily: 'Rubik',
+    fontSize: '12px',
+    fontWeight: 400,
+    lineHeight: '16px',
+    letterSpacing: '0.2px',
+    textAlign: 'left',
+  },
+});
+
+const Disclaimer = styled(Box)({
+  color: 'var(--grayscale-contrast-900, #242838)',
+  fontFeatureSettings: `'clig' off, 'liga' off`,
+  fontFamily: 'Rubik',
+  fontSize: '16px',
+  fontStyle: 'normal',
+  fontWeight: 400,
+  lineHeight: '24px',
+  marginBottom: '140px',
+  '& header': {
+    fontWeight: 500,
+    '& svg': {
+      verticalAlign: 'text-bottom',
+      marginRight: '8px',
+    },
+  },
+  borderRadius: 'var(--corner-radius-8, 8px)',
+  background: 'var(--gradient-light-green-blue, linear-gradient(340deg, #C6F7ED 10%, #E4E8F7 60%))',
+  padding: 'var(--spacing-12, 12px) var(--spacing-16, 16px) var(--spacing-16, 16px) var(--spacing-16, 16px)'
+});
 
 @observer
 export default class BuySellDialog extends Component<Props, State> {
@@ -64,99 +159,216 @@ export default class BuySellDialog extends Component<Props, State> {
   };
 
   state: State = {
-    addressSelected: null,
-    walletList: null,
+    isBuying: true,
+    error: null,
+    amountAda: '',
+    isSubmitting: false,
   };
 
-  async componentDidMount() {
-    const { intl } = this.context;
+  onSubmit: () => Promise<void> = async () => {
+    const { state, props } = this;
 
-    const resp = await this.props.genWalletList();
-    const wallets = [
-      ...resp,
-      {
-        walletName: intl.formatMessage(messages.dialogManual),
-        currencyName: '',
-        anAddressFormatted: '',
-      },
-    ];
-    this.setState({ walletList: wallets });
+    this.setState({ isSubmitting: true });
+    const api = exchangeApiMaker({ isProduction: true, partner: 'yoroi' });
+    const manager = exchangeManagerMaker({ api });
+
+    let params;
+    if (state.isBuying) {
+      params = {
+        providerId: 'banxa',
+        queries: {
+          fiatType: 'USD',
+          coinType: 'ADA',
+          walletAddress: await props.receiveAdaAddressPromise,
+          orderType: 'buy',
+          returnUrl: EXCHANGE_CALLBACK_URL,
+          coinAmount: Number(state.amountAda),
+          balance: props.currentBalanceAda,
+        }
+      }
+    } else {
+      params = {
+        providerId: 'encryptus',
+        queries: {
+          fiatType: 'USD',
+          coinType: 'ADA',
+          walletAddress: await props.receiveAdaAddressPromise,
+          orderType: 'sell',
+          returnUrl: EXCHANGE_CALLBACK_URL,
+          coinAmount: Number(state.amountAda),
+          balance: props.currentBalanceAda,
+        }
+      }
+    }
+
+    const url = await manager.referralLink.create(params);
+
+    const self = this;
+    chrome.tabs.create({ url: url.href }, (exchangePageTab) => {
+      chrome.tabs.onRemoved.addListener((tabId) => {
+        if (tabId === exchangePageTab.id) {
+          self.setState({ isSubmitting: false });
+        }
+      });
+
+      chrome.runtime.onMessage.addListener((message, sender) => {
+        if (message.type === 'exchange callback' && sender.tab.id === exchangePageTab.id) {
+          chrome.tabs.remove(sender.tab.id);
+          props.onExchangeCallback();
+        }
+      });
+    });
   }
 
-  createRows: ($npm$ReactIntl$IntlFormat, Array<WalletInfo>) => Node = (intl, wallets) =>
-    wallets.map((wallet, i) => {
-      return (
-        // eslint-disable-next-line react/no-array-index-key
-        <div key={i} className={styles.row}>
-          <div className={styles.left}>
-            <div className={styles.nameAndCurrency}>
-              {wallet.currencyName ? `(${wallet.currencyName}) ` : ''}
-              {wallet.walletName}
-            </div>
-            <div className={styles.address}>{truncateAddress(wallet.anAddressFormatted)}</div>
-          </div>
-          <div className={styles.right}>
-            {/* Verify Address action */}
-            <button
-              type="button"
-              onClick={() => this.setState({ addressSelected: wallet.anAddressFormatted })}
-            >
-              <div>
-                <span className={styles.verifyIcon}>
-                  <VerifyIcon />
-                </span>
-              </div>
-            </button>
-            {/* Action block end */}
-          </div>
-        </div>
-      );
-    });
+  onChangeAmount: (SyntheticInputEvent<HTMLInputElement>) => void = (event) => {
+    const { value } = event.target;
 
-  render(): Node {
-    const { intl } = this.context;
-
-    if (this.state.walletList == null) {
-      return (
-        <Dialog
-          title={intl.formatMessage(globalMessages.processingLabel)}
-          closeOnOverlayClick={false}
-        >
-          <VerticalFlexContainer>
-            <LoadingSpinner />
-          </VerticalFlexContainer>
-        </Dialog>
-      );
+    if (!value.match(/^\d*$/)) {
+      return;
     }
-    if (this.state.addressSelected == null) {
-      const addressNodes = this.createRows(intl, this.state.walletList);
 
-      return (
-        <Dialog
-          title={intl.formatMessage(messages.dialogTitle)}
-          closeOnOverlayClick={false}
-          onClose={this.props.onCancel}
-          closeButton={<DialogCloseButton />}
-        >
-          <div className={styles.content}>
-            <Box mb="24px">{intl.formatMessage(messages.dialogSelectAddress)}</Box>
-            {addressNodes}
-          </div>
-        </Dialog>
-      );
+    const error = (() => {
+      if (value === '') {
+        return null;
+      }
+      if (this.state.isBuying) {
+        if (MINIMUM_BUY_ADA.gt(value)) {
+          return 'lessThanBuyMinimum';
+        }
+      } else {
+        if (MINIMUM_SELL_ADA.gt(value)) {
+          return 'lessThanSellMinimum';
+        }
+        if (MINIMUM_SELL_ADA.gt(this.props.currentBalanceAda)) {
+          return 'notEnoughBalance';
+        }
+        if (new BigNumber(value).gt(this.props.currentBalanceAda)) {
+          return 'notEnoughBalance';
+        }
+      }
+      return null;
+    })();
+
+    this.setState({ amountAda: value, error });
+  }
+
+  renderBuySell(): Node {
+    const { intl } = this.context;
+    const { state, props } = this;
+
+    const [ providerLogo, providerName ] = state.isBuying ? [
+      banxaPng, 'Banxa'
+    ] : [
+      encryptusPng, 'Encryptus'
+    ];
+
+    // set a place holder so that when it becomes an error message, the height doesn't change
+    let helperText = ' ';
+    if (state.error === 'lessThanBuyMinimum') {
+      helperText = intl.formatMessage(messages.lessThanMinimum, { amount: MINIMUM_BUY_ADA.toString() });
+    } else if (state.error === 'lessThanSellMinimum') {
+      helperText = intl.formatMessage(messages.lessThanMinimum, { amount: MINIMUM_SELL_ADA.toString() });
+    } else if (state.error === 'notEnoughBalance') {
+      helperText = intl.formatMessage(messages.notEnoughBalance);
     }
 
     return (
+      <>
+        <TextField
+          label={intl.formatMessage(messages.adaAmount)}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <div style={{ position: 'relative' /* so that the balance line can align on the right side */ }}>
+                  <div style={{ marginBottom: '8px', color: '#000' }}>
+                    <img
+                      style={{ marginRight: '8px', borderRadius: '4px', verticalAlign: 'bottom' }}
+                      src={adaPng}
+                      alt=""
+                    />ADA
+                  </div>
+                  <Box sx={{ position: 'absolute', right: '0px', fontSize: '12px' }}>
+                    {intl.formatMessage(messages.currentBalance, { amount: props.currentBalanceAda })}
+                  </Box>
+                </div>
+              </InputAdornment>
+            ),
+            sx: {
+              paddingBottom: '1lh',
+            },
+          }}
+          sx={{
+            paddingBottom: 0,
+          }}
+          value={state.amountAda}
+          onChange={this.onChangeAmount}
+          error={state.error !== null}
+          helperText={helperText}
+          autoFocus
+        />
+
+        <ProviderRow>
+          <div className="provider-logo">
+            <img src={providerLogo} alt="" />
+          </div>
+          <div className="provider-name-fee">
+            <div className="provider-name">{providerName}</div>
+            <div className="provider-fee">2% fee</div>
+          </div>
+        </ProviderRow>
+
+
+        <Disclaimer>
+          <header>
+            <InfoIcon style={{ verticalAlign: 'middle' }} />
+            <span style={{ verticalAlign: 'middle' }}>{intl.formatMessage(messages.disclaimer)}</span>
+          </header>
+          {intl.formatMessage(messages.disclaimerText)}
+        </Disclaimer>
+      </>
+    );
+  }
+
+  render(): Node {
+    const { intl } = this.context;
+    const { state, props } = this;
+
+    return (
       <Dialog
-        title={intl.formatMessage(messages.dialogTitle)}
+        title={intl.formatMessage(globalMessages.buyAda)}
         closeOnOverlayClick={false}
-        onClose={this.props.onCancel}
+        onClose={props.onCancel}
         closeButton={<DialogCloseButton />}
+        forceBottomDivider
+        actions={[
+          {
+            label: intl.formatMessage(messages.proceed),
+            primary: true,
+            disabled: state.amountAda === '' || state.error !== null,
+            onClick: this.onSubmit,
+            isSubmitting: state.isSubmitting,
+          }
+        ]}
+        styleOverride={{ width: '648px' }}
+        styleFlags={{ contentNoTopPadding: true }}
       >
-        <div className={styles.component}>
-          <div className={styles.description}>{intl.formatMessage(messages.dialogDescription)}</div>
-          <ChangellyFetcher widgetURL={WIDGET_URL} address={this.state.addressSelected} />
-        </div>
+        {(environment.isDev() || environment.isNightly()) && (
+          <Tabs
+            value={state.isBuying ? 0 : 1}
+            onChange={() => this.setState({ isBuying: !state.isBuying })}
+            sx={{
+              width: '100%',
+              [`& .${tabsClasses.indicator}`]: {
+                display: 'none',
+              },
+              boxShadow: 'none',
+            }}
+          >
+            <TabItem disableRipple label={intl.formatMessage(globalMessages.buyAda)} />
+            <TabItem disableRipple label={intl.formatMessage(globalMessages.sellAda)} />
+          </Tabs>
+        )}
+        {this.renderBuySell()}
       </Dialog>
     );
   }

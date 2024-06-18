@@ -63,7 +63,6 @@ class WalletNameSetting extends Component<Props & InjectedLayoutProps> {
       onStopEditing,
       onCancelEditing,
       nameValidator,
-      activeField,
       isSubmitting,
       isInvalid,
       lastUpdatedField,
@@ -82,7 +81,7 @@ class WalletNameSetting extends Component<Props & InjectedLayoutProps> {
             className="walletName"
             inputFieldLabel={intl.formatMessage(messages.name)}
             inputFieldValue={walletName}
-            isActive={activeField === 'name'}
+            isActive={false}
             onStartEditing={() => onStartEditing('name')}
             onStopEditing={onStopEditing}
             onCancelEditing={onCancelEditing}
@@ -91,6 +90,7 @@ class WalletNameSetting extends Component<Props & InjectedLayoutProps> {
             validationErrorMessage={intl.formatMessage(globalMessages.invalidWalletName)}
             successfullyUpdated={!isSubmitting && lastUpdatedField === 'name' && !isInvalid}
             classicTheme={classicTheme}
+            id="settings:wallet:walletName"
           />
           {error && <div className={styles.error}>{intl.formatMessage(error, error.values)}</div>}
         </Box>

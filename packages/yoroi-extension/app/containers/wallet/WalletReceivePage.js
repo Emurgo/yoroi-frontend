@@ -1,33 +1,29 @@
 // @flow
-import type { Node, ComponentType } from 'react';
-import type { StoresAndActionsProps } from '../../types/injectedPropsType';
+import type { ComponentType, Node } from 'react';
+import { Component } from 'react';
+import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import type { StandardAddress } from '../../types/AddressFilterTypes';
+import {
+  AddressFilter,
+  addressGroupName,
+  AddressGroupTypes,
+  AddressSubgroup,
+  addressSubgroupName,
+} from '../../types/AddressFilterTypes';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { intlShape } from 'react-intl';
 import type {
   AddressSubgroupMeta,
-  IAddressTypeUiSubset,
   IAddressTypeStore,
+  IAddressTypeUiSubset,
 } from '../../stores/stateless/addressStores';
-import { Component } from 'react';
+import { allAddressSubgroups, applyAddressFilter, routeForStore, } from '../../stores/stateless/addressStores';
 import { observer } from 'mobx-react';
 import { observable, runInAction } from 'mobx';
-import { intlShape } from 'react-intl';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
-import {
-  addressGroupName,
-  addressSubgroupName,
-  AddressFilter,
-  AddressSubgroup,
-  AddressGroupTypes,
-} from '../../types/AddressFilterTypes';
 import { validateAmount } from '../../utils/validations';
 import { Logger } from '../../utils/logging';
-import {
-  routeForStore,
-  allAddressSubgroups,
-  applyAddressFilter,
-} from '../../stores/stateless/addressStores';
 import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { handleExternalLinkClick } from '../../utils/routing';
 import { genLookupOrFail, getTokenName } from '../../stores/stateless/tokenHelpers';
@@ -51,6 +47,7 @@ import globalMessages from '../../i18n/global-messages';
 import WalletReceiveRevamp from '../../components/wallet/WalletReceiveRevamp';
 import UnmangleTxDialogContainer from '../transfer/UnmangleTxDialogContainer';
 import StandardHeaderRevamp from '../../components/wallet/receive/StandardHeaderRevamp';
+import { maybe } from '../../coreUtils';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -182,15 +179,8 @@ class WalletReceivePage extends Component<AllProps> {
       }
       if (addressTypeStore.meta.name.subgroup === AddressSubgroup.mangled) {
 
-        const canUnmangle = (() => {
-          const selected = stores.wallets.selected;
-          if (selected == null) return false;
-          const requests = stores.delegation.getDelegationRequests(selected);
-          if (requests == null) return false;
-          const { result } = requests.mangledAmounts;
-          if (result == null) return false;
-          return result.canUnmangle.getDefault().gt(0);
-        })();
+        const canUnmangle = maybe(stores.wallets.selected,
+          w => stores.delegation.canUnmangleSomeUtxo(w)) ?? false;
 
         return (
           <MangledHeader

@@ -193,6 +193,7 @@ const optimization = {
 const resolve = () /*: * */ => ({
   extensions: ['*', '.js', '.wasm'],
   fallback: {
+    vm: false,
     fs: false,
     path: require.resolve('path-browserify'),
     stream: require.resolve('stream-browserify'),
@@ -201,6 +202,7 @@ const resolve = () /*: * */ => ({
     buffer: require.resolve('buffer'),
     assert: require.resolve('assert/'),
     util: require.resolve('util/'),
+    url: require.resolve('url/'),
   },
   alias: { process: 'process/browser', }
 });

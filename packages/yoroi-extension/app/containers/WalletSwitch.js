@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import type { StoresAndActionsProps } from '../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../types/injectedProps.types';
 
 import TopBarLayout from '../components/layout/TopBarLayout';
 

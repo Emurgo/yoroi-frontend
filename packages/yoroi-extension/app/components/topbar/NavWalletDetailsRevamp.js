@@ -26,8 +26,8 @@ type Props = {|
   +shouldHideBalance: boolean,
   +highlightTitle?: boolean,
   +showEyeIcon?: boolean,
-  +rewards: ?MultiToken,
-  +walletAmount: null | MultiToken,
+  +rewards: MultiToken,
+  +walletAmount: ?MultiToken,
   +infoText?: string,
   +showDetails?: boolean,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
@@ -91,6 +91,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
     const totalAmount = this.getTotalAmount();
     const showEyeIconSafe = showEyeIcon != null && showEyeIcon;
     const [accountPlateId, iconComponent] = plate ? constructPlate(plate, 0, styles.icon) : [];
+    const amountDisplayId = `topBar:selectedWallet`;
 
     return (
       <Box
@@ -132,6 +133,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
                     showFiat
                     unitOfAccountSetting={unitOfAccountSetting}
                     getCurrentPrice={getCurrentPrice}
+                    id={amountDisplayId}
                   />
                 </Box>
               </div>
@@ -166,6 +168,6 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
 
   getTotalAmount: void => ?MultiToken = () => {
     return maybe(this.props.walletAmount,
-      w => this.props.rewards?.joinAddCopy(w) ?? w)
+      w => this.props.rewards.joinAddCopy(w))
   };
 }

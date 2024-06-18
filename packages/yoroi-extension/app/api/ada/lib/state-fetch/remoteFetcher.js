@@ -29,13 +29,19 @@ import type {
   GetRecentTransactionHashesRequest,
   GetRecentTransactionHashesResponse,
   GetTransactionsByHashesRequest,
-  GetTransactionsByHashesResponse, MultiAssetSupplyResponse,
+  GetTransactionsByHashesResponse,
+  MultiAssetSupplyResponse,
+  FilterUsedRequest,
+  FilterUsedResponse,
+  GetSwapFeeTiersFunc,
+  GetSwapFeeTiersRequest,
+  GetSwapFeeTiersResponse, GetTransactionSlotsByHashesResponse, SignedBatchRequest,
 } from './types';
-import type { FilterUsedRequest, FilterUsedResponse, } from '../../../common/lib/state-fetch/currencySpecificTypes';
 
-import type { IFetcher } from './IFetcher';
+import type { IFetcher } from './IFetcher.types';
 
 import axios from 'axios';
+import type { $AxiosError } from 'axios';
 import { Logger, stringifyError } from '../../../../utils/logging';
 import {
   CheckAddressesInUseApiError,
@@ -51,19 +57,63 @@ import {
   SendTransactionApiError,
   GetUtxoDataError,
 } from '../../../common/errors';
-import { RustModule } from '../cardanoCrypto/rustLoader';
 
 import type { ConfigType } from '../../../../../config/config-types';
 import { bech32, } from 'bech32';
-import { bytesToHex } from '../../../../coreUtils';
+import { addressBech32ToHex } from '../cardanoCrypto/utils';
+import { bytesToBase64, forceNonNull, last } from '../../../../coreUtils';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 
-/**
- * Makes calls to Yoroi backend service
- * https://github.com/Emurgo/yoroi-graphql-migration-backend
- */
+export const sendTx: ({|
+  body: SignedRequest | SignedBatchRequest,
+  lastLaunchVersion: string,
+  currentLocale: string,
+  errorHandler?: $AxiosError<any, any> => void,
+|}) => Promise<SignedResponse> = ({
+  body,
+  lastLaunchVersion,
+  currentLocale,
+  errorHandler,
+}) => {
+  // $FlowIgnore[prop-missing]
+  const txs: Array<{| encodedTx: Uint8Array, id: string |}> = body.txs ?? [body];
+  if (txs.length === 0) throw new Error('At least one transaction is required for submit');
+  const signedTx64: Array<string> = txs.map(t => bytesToBase64(t.encodedTx));
+  const { BackendService } = body.network.Backend;
+  if (BackendService == null) throw new Error(`${nameof(sendTx)} missing backend url`);
+  return axios(
+    `${BackendService}/api/txs/signed`,
+    {
+      method: 'post',
+      timeout: 2 * CONFIG.app.walletRefreshInterval,
+      data: ({
+        signedTx: signedTx64
+      }: SignedRequestInternal),
+      headers: {
+        'yoroi-version': lastLaunchVersion,
+        'yoroi-locale': currentLocale,
+      }
+    }
+  ).then(() => ({
+    txId: forceNonNull(last(txs)).id,
+  })).catch((error) => {
+    if (errorHandler != null) {
+      errorHandler(error);
+    }
+    const err = {
+      msg: error.message,
+      res: error.response?.data || null,
+    }
+    Logger.error(`${nameof(RemoteFetcher)}::${nameof(sendTx)} error: ${stringifyError(err)}`);
+    if (error.request.response.includes('Invalid witness')) {
+      throw new InvalidWitnessError();
+    }
+    throw new SendTransactionApiError();
+  });
+}
+
 export class RemoteFetcher implements IFetcher {
 
   getLastLaunchVersion: () => string;
@@ -103,9 +153,7 @@ export class RemoteFetcher implements IFetcher {
       });
     return result.map(utxo => {
       if (utxo.receiver.startsWith('addr')) {
-        const fixedAddr = RustModule.WasmScope(Module => bytesToHex(
-          Module.WalletV4.Address.from_bech32(utxo.receiver).to_bytes()
-        ));
+        const fixedAddr = addressBech32ToHex(utxo.receiver);
         return {
           ...utxo,
           receiver: fixedAddr,
@@ -263,6 +311,26 @@ export class RemoteFetcher implements IFetcher {
       });
     }
 
+  getTransactionSlotsByHashes
+  : GetTransactionsByHashesRequest => Promise<GetTransactionSlotsByHashesResponse>
+    = (body) => {
+      const { network, txHashes } = body;
+      const { BackendService } = network.Backend;
+      if (BackendService == null) throw new Error(`${nameof(this.getTransactionsByHashes)} missing backend url`);
+      return axios(
+        `${BackendService}/api/v2.1/tx/status`,
+        {
+          method: 'post',
+          timeout: 2 * CONFIG.app.walletRefreshInterval,
+          data: { txHashes },
+          headers: {
+            'yoroi-version': this.getLastLaunchVersion(),
+            'yoroi-locale': this.getCurrentLocale()
+          }
+        }
+      ).then(response => response.data?.slot ?? {});
+    }
+
   getRewardHistory: RewardHistoryRequest => Promise<RewardHistoryResponse> = (body) => {
     const { network, ...rest } = body;
     const { BackendService } = network.Backend;
@@ -305,38 +373,12 @@ export class RemoteFetcher implements IFetcher {
       });
   }
 
-  sendTx: SignedRequest => Promise<SignedResponse> = (body) => {
-    const signedTx64 = Buffer.from(body.encodedTx).toString('base64');
-    const { BackendService } = body.network.Backend;
-    if (BackendService == null) throw new Error(`${nameof(this.sendTx)} missing backend url`);
-    return axios(
-      `${BackendService}/api/txs/signed`,
-      {
-        method: 'post',
-        timeout: 2 * CONFIG.app.walletRefreshInterval,
-        data: ({
-          signedTx: signedTx64
-        }: SignedRequestInternal),
-        headers: {
-          'yoroi-version': this.getLastLaunchVersion(),
-          'yoroi-locale': this.getCurrentLocale()
-        }
-      }
-    ).then(() => ({
-      txId: body.id
-    }))
-      .catch((error) => {
-        const err = {
-          msg: error.message,
-          res: error.response?.data || null,
-        }
-
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.sendTx)} error: ${stringifyError(err)}`);
-        if (error.request.response.includes('Invalid witness')) {
-          throw new InvalidWitnessError();
-        }
-        throw new SendTransactionApiError();
-      });
+  sendTx: (SignedRequest | SignedBatchRequest) => Promise<SignedResponse> = (body) => {
+    return sendTx({
+      body,
+      lastLaunchVersion: this.getLastLaunchVersion(),
+      currentLocale: this.getCurrentLocale(),
+    });
   }
 
   checkAddressesInUse: FilterUsedRequest => Promise<FilterUsedResponse> = (body) => {
@@ -442,7 +484,10 @@ export class RemoteFetcher implements IFetcher {
         if (resp.data.ticker?.value) {
           v.ticker = resp.data.ticker.value;
         }
-        if (v.name || v.decimals || v.ticker) {
+        if (resp.data.logo?.value) {
+          v.logo = resp.data.logo.value;
+        }
+        if (v.name || v.decimals || v.ticker || v.logo) {
           res[resp.data.subject] = v;
         }
 
@@ -557,4 +602,20 @@ export class RemoteFetcher implements IFetcher {
         }
       });
   }
+
+  getSwapFeeTiers: GetSwapFeeTiersFunc = async (body: GetSwapFeeTiersRequest): Promise<GetSwapFeeTiersResponse> => {
+    const { BackendService } = body.network.Backend;
+    if (BackendService == null) throw new Error(`${nameof(this.getSwapFeeTiers)} missing backend url`);
+    return await axios(
+      `${BackendService}/api/v2.1/swap/feesInfo`,
+      {
+        method: 'get',
+      }
+    ).then(response => response.data)
+      .catch((error) => {
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getCatalystRoundInfo)} error: ` + stringifyError(error));
+        throw new GetCatalystRoundInfoApiError();
+      });
+  }
+
 }

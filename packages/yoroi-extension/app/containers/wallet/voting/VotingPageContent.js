@@ -4,7 +4,7 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, intlShape } from 'react-intl';
-import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import Voting from '../../../components/wallet/voting/Voting';
 import VotingRegistrationDialogContainer from '../dialogs/voting/VotingRegistrationDialogContainer';
 import { handleExternalLinkClick } from '../../../utils/routing';
@@ -69,33 +69,6 @@ class VotingPageContent extends Component<StoresAndActionsProps> {
   start: void => void = () => {
     this.props.actions.dialogs.open.trigger({ dialog: VotingRegistrationDialogContainer });
   };
-
-  get isDelegated(): ?boolean {
-    const publicDeriver = this.props.stores.wallets.selected;
-    const delegationStore = this.props.stores.delegation;
-
-    if (!publicDeriver) {
-      throw new Error(`${nameof(this.isDelegated)} no public deriver. Should never happen`);
-    }
-
-    const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
-    if (delegationRequests == null) {
-      throw new Error(`${nameof(this.isDelegated)} called for non-reward wallet`);
-    }
-    const currentDelegation = delegationRequests.getDelegatedBalance;
-
-    if (
-      !currentDelegation.wasExecuted ||
-      currentDelegation.isExecuting ||
-      currentDelegation.result == null
-    ) {
-      return undefined;
-    }
-    if (currentDelegation.result.delegation == null) {
-      return false;
-    }
-    return true;
-  }
 
   render(): Node {
     const { intl } = this.context;
@@ -195,6 +168,13 @@ class VotingPageContent extends Component<StoresAndActionsProps> {
       );
     }
 
+    const publicDeriver = this.props.stores.wallets.selected;
+    if (!publicDeriver) {
+      throw new Error(`${nameof(this.render)} no public deriver. Should never happen`);
+    }
+    const delegationStore = this.props.stores.delegation;
+    const isDelegating = delegationStore.isCurrentlyDelegating(publicDeriver);
+
     /*
     At this point we are sure that we have current funds
     I added the "5" for two reasons
@@ -211,7 +191,7 @@ class VotingPageContent extends Component<StoresAndActionsProps> {
           start={this.start}
           hasAnyPending={this.props.stores.transactions.hasAnyPending}
           onExternalLinkClick={handleExternalLinkClick}
-          isDelegated={this.isDelegated === true}
+          isDelegated={isDelegating}
           name={fundName}
           walletType={walletType}
         />

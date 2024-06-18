@@ -2,6 +2,7 @@
 
 import typeof { MIRPot } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 import type { BackendNetworkInfo } from '../../../common/lib/state-fetch/types';
+import type { NetworkRow } from '../storage/database/primitives/tables';
 
 // getUTXOsForAddresses
 
@@ -44,12 +45,19 @@ export type BestBlockFunc = (body: BestBlockRequest) => Promise<BestBlockRespons
 // sendTx
 
 export type SignedRequestInternal = {|
-  signedTx: string,
+  signedTx: string | Array<string>,
 |};
 export type SignedRequest = {|
   ...BackendNetworkInfo,
   id: string,
   encodedTx: Uint8Array,
+|};
+export type SignedBatchRequest = {|
+  ...BackendNetworkInfo,
+  txs: Array<{|
+    id: string,
+    encodedTx: Uint8Array,
+  |}>
 |};
 export type SignedResponse = {| txId: string, |};
 export type SendFunc = (body: SignedRequest) => Promise<SignedResponse>;
@@ -88,30 +96,25 @@ export const RemoteTransactionTypes: RemoteTransactionTypeT = Object.freeze({
   byron: 'byron',
   shelley: 'shelley',
 });
+export type RemoteAsset = {
+  +amount: string,
+  +assetId: string,
+  +policyId: string,
+  +name: string,
+  ...
+};
 export type RemoteTransactionInput = {|
   +id: string,
   +index: number, // index of output we're consuming
   +txHash: string, // tx that created output we're consuming
   +address: string,
   +amount: string,
-  +assets: $ReadOnlyArray<$ReadOnly<{
-    +amount: string,
-    +assetId: string,
-    +policyId: string,
-    +name: string,
-    ...
-  }>>,
+  +assets: $ReadOnlyArray<$ReadOnly<RemoteAsset>>,
 |};
 export type RemoteTransactionOutput = {|
   +address: string,
   +amount: string,
-  +assets: $ReadOnlyArray<$ReadOnly<{
-    +amount: string,
-    +assetId: string,
-    +policyId: string,
-    +name: string,
-    ...
-  }>>,
+  +assets: $ReadOnlyArray<$ReadOnly<RemoteAsset>>,
 |};
 
 /**
@@ -149,13 +152,7 @@ export type RemoteUnspentOutput = {|
   +tx_index: number,
   +receiver: string,
   +amount: string,
-  +assets: $ReadOnlyArray<$ReadOnly<{
-    +amount: string,
-    +assetId: string,
-    +policyId: string,
-    +name: string,
-    ...
-  }>>,
+  +assets: $ReadOnlyArray<$ReadOnly<RemoteAsset>>,
   // +block_num: number,
 |};
 
@@ -172,6 +169,18 @@ export const ShelleyCertificateTypes = Object.freeze({
   PoolRetirement: 'PoolRetirement',
   GenesisKeyDelegation: 'GenesisKeyDelegation',
   MoveInstantaneousRewardsCert: 'MoveInstantaneousRewardsCert',
+  Registration: 'Registration',
+  Unregistration: 'Unregistration',
+  VoteDelegation: 'VoteDelegation',
+  StakeVoteDelegation: 'StakeVoteDelegation',
+  StakeRegistrationDelegation: 'StakeRegistrationDelegation',
+  VoteRegistrationDelegation: 'VoteRegistrationDelegation',
+  StakeVoteRegistrationDelegation: 'StakeVoteRegistrationDelegation',
+  AuthCommitteeHot: 'AuthCommitteeHot',
+  ResignCommitteeCold: 'ResignCommitteeCold',
+  RegisterDrep: 'RegisterDrep',
+  UnregisterDrep: 'UnregisterDrep',
+  UpdateDrep: 'UpdateDrep',
 });
 
 export type RemoteStakeRegistrationCert = {|
@@ -223,6 +232,81 @@ export type RemoteMoveInstantaneousRewardsCert = {|
   +pot: $Values<MIRPot>,
   +rewards: {| [stake_credential: string]: string /* coin */ |},
 |};
+export type RegistrationCert = {|
+  +addrKeyHash: string | null,
+  +scriptHash: string | null,
+  +coin: string,
+|};
+export type UnregistrationCert = {|
+  +addrKeyHash: string | null,
+  +scriptHash: string | null,
+  +coin: string,
+|};
+export type VoteDelegationCert = {|
+  +addrKeyHash: string | null,
+  +scriptHash: string | null,
+  +drep: Drep,
+|};
+export type StakeVoteDelegationCert = {|
+  +addrKeyHash: string | null,
+  +scriptHash: string | null,
+  +drep: Drep,
+  +poolKeyHash: string | null,
+|};
+export type StakeRegistrationDelegationCert = {|
+  +addrKeyHash: string | null,
+  +scriptHash: string | null,
+  +coin: string,
+  +poolKeyHash: string | null,
+|};
+export type VoteRegistrationDelegationCert = {|
+  +addrKeyHash: string | null,
+  +scriptHash: string | null,
+  +drep: Drep,
+  +coin: string
+|};
+export type Drep = {|
+  +type: 'addr_keyhash' | 'scripthash' | 'abstain' | 'no_confidence',
+  +addrKeyHash: string | null,
+  +scriptHash: string | null,
+|};
+export type StakeVoteRegistrationDelegationCert = {|
+  +addrKeyHash: string | null,
+  +scriptHash: string | null,
+  +poolKeyHash: string | null,
+  +drep: Drep,
+  +coin: string,
+|};
+export type AuthCommitteeHotCert = {|
+  +coldAddrKeyHash: string | null,
+  +coldScriptHash: string | null,
+  +hotdAddrKeyHash: string | null,
+  +hotScriptHash: string | null,
+|};
+export type ResignCommitteeColdCert = {|
+  +coldAddrKeyHash: string | null,
+  +coldScriptHash: string | null,
+|};
+type Anchor = {|
+  +anchor_url: string,
+  +anchor_data_hash: string,
+|};
+export type RegisterDrepCert = {|
+  +drepAddrKeyHash: string | null,
+  +drepScriptHash: string | null,
+  +coin: string,
+  +anchor: Anchor | null
+|};
+export type UnregisterDrepCert = {|
+  +drepAddrKeyHash: string | null,
+  +drepScriptHash: string | null,
+  +coin: string,
+|};
+export type UpdateDrepCert = {|
+  +drepAddrKeyHash: string | null,
+  +drepScriptHash: string | null,
+  +anchor: Anchor | null,
+|};
 export type RemoteCertificate = {|
   certIndex: number,
   ...({|
@@ -246,6 +330,42 @@ export type RemoteCertificate = {|
   |} | {|
     +kind: typeof ShelleyCertificateTypes.MoveInstantaneousRewardsCert,
     ...RemoteMoveInstantaneousRewardsCert,
+  |} | {|
+    +kind: typeof ShelleyCertificateTypes.Registration,
+    ...RegistrationCert,
+  |} | {|
+    +kind: typeof ShelleyCertificateTypes.Unregistration,
+    ...UnregistrationCert,
+  |} | {|
+    +kind: typeof ShelleyCertificateTypes.VoteDelegation,
+    ...VoteDelegationCert,
+  |} | {|
+    +kind: typeof ShelleyCertificateTypes.StakeVoteDelegation,
+    ...StakeVoteDelegationCert,
+  |} | {|
+    +kind: typeof ShelleyCertificateTypes.StakeRegistrationDelegation,
+    ...StakeRegistrationDelegationCert,
+  |} | {|
+    +kind: typeof ShelleyCertificateTypes.VoteRegistrationDelegation,
+    ...VoteRegistrationDelegationCert,
+  |} | {|
+    +kind: typeof ShelleyCertificateTypes.StakeVoteRegistrationDelegation,
+    ...StakeVoteRegistrationDelegationCert,
+  |} | {|
+    +kind: typeof ShelleyCertificateTypes.AuthCommitteeHot,
+    ...AuthCommitteeHotCert,
+  |} | {|
+    +kind: typeof ShelleyCertificateTypes.ResignCommitteeCold,
+    ...ResignCommitteeColdCert,
+  |} | {|
+    +kind: typeof ShelleyCertificateTypes.RegisterDrep,
+    ...RegisterDrepCert,
+  |} | {|
+    +kind: typeof ShelleyCertificateTypes.UnregisterDrep,
+    ...UnregisterDrepCert,
+  |} | {|
+    +kind: typeof ShelleyCertificateTypes.UpdateDrep,
+    ...UpdateDrepCert,
   |})
 |};
 
@@ -316,6 +436,7 @@ export type RemoteTokenInfo = {|
   +name?: string,
   +decimals?: number,
   +ticker?: string,
+  +logo?: string,
 |};
 export type TokenInfoResponse = {|
   [key: string]: (RemoteTokenInfo | null),
@@ -454,3 +575,24 @@ export type GetTransactionsByHashesResponse = Array<RemoteTransaction>;
 export type GetTransactionsByHashesFunc = (
   body: GetTransactionsByHashesRequest
 ) => Promise<GetTransactionsByHashesResponse>;
+
+export type GetTransactionSlotsByHashesResponse = { [string]: string };
+
+export type GetTransactionSlotsByHashesFunc = (
+  body: GetTransactionsByHashesRequest
+) => Promise<GetTransactionSlotsByHashesResponse>;
+
+export type FilterUsedRequest = {|
+  network: $ReadOnly<NetworkRow>,
+  addresses: Array<string>,
+|};
+export type FilterUsedResponse = Array<string>;
+export type FilterFunc = (body: FilterUsedRequest) => Promise<FilterUsedResponse>;
+
+export type GetSwapFeeTiersRequest = BackendNetworkInfo;
+
+export type GetSwapFeeTiersResponse = { [string]: any };
+
+export type GetSwapFeeTiersFunc = (
+  body: GetSwapFeeTiersRequest
+) => Promise<GetSwapFeeTiersResponse>;

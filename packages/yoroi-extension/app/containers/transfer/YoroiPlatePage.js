@@ -5,7 +5,7 @@ import { observable, runInAction } from 'mobx';
 import { observer } from 'mobx-react';
 import globalMessages from '../../i18n/global-messages';
 import WalletRestoreVerifyDialog from '../../components/wallet/WalletRestoreVerifyDialog';
-import type { StoresAndActionsProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import config from '../../config';
 import { generatePlates } from '../../stores/toplevel/WalletRestoreStore';
 import type { PlateWithMeta } from '../../stores/toplevel/WalletRestoreStore';
@@ -23,15 +23,9 @@ export default class YoroiPlatePage extends Component<Props> {
 
   async componentDidMount() {
     const { yoroiTransfer } = this.props.stores;
-
-    if (!yoroiTransfer.mode) {
-      throw new Error(`${nameof(YoroiPlatePage)} no mode selected`);
-    }
-
     const plates = generatePlates(
       yoroiTransfer.recoveryPhrase,
       this.props.accountIndex,
-      yoroiTransfer.mode,
       this.getSelectedNetwork(),
     );
     runInAction(() => {

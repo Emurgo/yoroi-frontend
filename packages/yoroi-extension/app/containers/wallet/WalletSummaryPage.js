@@ -2,16 +2,17 @@
 import type { ComponentType, Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { runInAction, observable } from 'mobx';
-import { intlShape, FormattedHTMLMessage } from 'react-intl';
+import { observable, runInAction } from 'mobx';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { FormattedHTMLMessage, intlShape } from 'react-intl';
 import { ROUTES } from '../../routes-config';
-import type { Notification } from '../../types/notificationType';
+import type { Notification } from '../../types/notification.types';
 import NotificationMessage from '../../components/widgets/NotificationMessage';
 import Dialog from '../../components/widgets/Dialog';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import globalMessages from '../../i18n/global-messages';
 import { ReactComponent as successIcon } from '../../assets/images/success-small.inline.svg';
-import type { StoresAndActionsProps } from '../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import WalletTransactionsList from '../../components/wallet/transactions/WalletTransactionsList';
 import WalletTransactionsListRevamp from '../../components/wallet/transactions/WalletTransactionsListRevamp';
 import WalletSummary from '../../components/wallet/summary/WalletSummary';
@@ -22,15 +23,13 @@ import EditMemoDialog from '../../components/wallet/memos/EditMemoDialog';
 import DeleteMemoDialog from '../../components/wallet/memos/DeleteMemoDialog';
 import MemoNoExternalStorageDialog from '../../components/wallet/memos/MemoNoExternalStorageDialog';
 import { Logger } from '../../utils/logging';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import config from '../../config';
-import type { DelegationRequests } from '../../stores/toplevel/DelegationStore';
 import { genAddressLookup } from '../../stores/stateless/addressStores';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import { genLookupOrFail, genLookupOrNull } from '../../stores/stateless/tokenHelpers';
-import { withLayout } from '../../styles/context/layout';
 import type { LayoutComponentMap } from '../../styles/context/layout';
+import { withLayout } from '../../styles/context/layout';
 import WalletSummaryRevamp from '../../components/wallet/summary/WalletSummaryRevamp';
 import BuySellDialog from '../../components/buySell/BuySellDialog';
 import WalletEmptyBanner from './WalletEmptyBanner';
@@ -78,6 +77,7 @@ class WalletSummaryPage extends Component<AllProps> {
       Logger.error('[WalletSummaryPage::render] Active wallet required');
       return null;
     }
+    this.props.stores.delegation.checkPoolTransition();
 
     const { exportTransactionsToFile, closeExportTransactionDialog } = actions.transactions;
 
@@ -115,9 +115,9 @@ class WalletSummaryPage extends Component<AllProps> {
       const WalletTransactionsListComp = mapWalletTransactionLayout[this.props.selectedLayout];
 
       if (isLoading || hasAny) {
-        const {
-          assuranceMode,
-        } = this.props.stores.walletSettings.getPublicDeriverSettingsCache(publicDeriver);
+        const { assuranceMode } = this.props.stores.walletSettings.getPublicDeriverSettingsCache(
+          publicDeriver
+        );
         walletTransactions = (
           <WalletTransactionsListComp
             transactions={recent}
@@ -169,6 +169,7 @@ class WalletSummaryPage extends Component<AllProps> {
               addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())
             }
             complexityLevel={this.props.stores.profile.selectedComplexityLevel}
+            id="wallet:transaction-transactionsList-box"
           />
         );
       } else {
@@ -189,10 +190,7 @@ class WalletSummaryPage extends Component<AllProps> {
       </Dialog>
     );
 
-    const delegationStore = this.props.stores.delegation;
-    const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
-
-    if (this.readyToExportHistory({ delegationRequests, publicDeriver })) {
+    if (this.readyToExportHistory(publicDeriver)) {
       exportDialog = (
         <ExportTransactionDialog
           isActionProcessing={isExporting}
@@ -464,19 +462,9 @@ class WalletSummaryPage extends Component<AllProps> {
     actions.dialogs.push.trigger({ dialog: DeleteMemoDialog });
   };
 
-  readyToExportHistory: ({|
-    delegationRequests?: DelegationRequests,
-    publicDeriver: PublicDeriver<>,
-  |}) => boolean = request => {
-    if (request.delegationRequests == null) {
-      // there aren't supposed to be any rewards
-      return true;
-    }
-    const history = request.delegationRequests.rewardHistory.result;
-    if (history !== null) {
-      return true;
-    }
-    return false;
+  readyToExportHistory: (PublicDeriver<>) => boolean = publicDeriver => {
+    const delegation = this.props.stores.delegation;
+    return !delegation.isRewardWallet(publicDeriver) || delegation.hasRewardHistory(publicDeriver);
   };
 }
 export default (withLayout(WalletSummaryPage): ComponentType<Props>);

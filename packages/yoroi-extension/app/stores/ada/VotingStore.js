@@ -1,7 +1,7 @@
 // @flow
 
 import BigNumber from 'bignumber.js';
-import { observable, action, runInAction, reaction } from 'mobx';
+import { action, observable, reaction, runInAction } from 'mobx';
 import Store from '../base/Store';
 import { Logger } from '../../utils/logging';
 import { encryptWithPassword } from '../../utils/catalystCipher';
@@ -9,33 +9,28 @@ import LocalizedRequest from '../lib/LocalizedRequest';
 import type { CreateVotingRegTxFunc } from '../../api/ada';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
-  asGetAllUtxos,
-  asHasUtxoChains,
-  asGetSigningKey,
   asGetAllAccounting,
-  asGetStakingKey,
+  asGetAllUtxos,
   asGetPublicKey,
+  asGetSigningKey,
+  asGetStakingKey,
   asHasLevels,
+  asHasUtxoChains,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import {
-  isCardanoHaskell,
   getCardanoHaskellBaseConfig,
+  isCardanoHaskell,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import { genTimeToSlot } from '../../api/ada/lib/storage/bridge/timeUtils';
+import TimeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
 import { generatePrivateKeyForCatalyst } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
-import {
-  isLedgerNanoWallet,
-  isTrezorTWallet,
-} from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import { isLedgerNanoWallet, isTrezorTWallet, } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { genOwnStakingKey } from '../../api/ada/index';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import type { StepStateEnum } from '../../components/widgets/ProgressSteps';
 import { StepState } from '../../components/widgets/ProgressSteps';
 import { ROUTES } from '../../routes-config';
-import {
-  convertToLocalizableError
-} from '../../domain/LedgerLocalizedError';
+import { convertToLocalizableError } from '../../domain/LedgerLocalizedError';
 import LocalizableError from '../../i18n/LocalizableError';
 import cryptoRandomString from 'crypto-random-string';
 import type { ActionsMap } from '../../actions/index';
@@ -43,11 +38,7 @@ import type { StoresMap } from '../index';
 import { generateRegistration } from '../../api/ada/lib/cardanoCrypto/catalyst';
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet'
 import type { CatalystRoundInfoResponse } from '../../api/ada/lib/state-fetch/types'
-import {
-  loadCatalystRoundInfo,
-  saveCatalystRoundInfo,
-} from '../../api/localStorage';
-import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
+import { loadCatalystRoundInfo, saveCatalystRoundInfo, } from '../../api/localStorage';
 import { derivePublicByAddressing } from '../../api/ada/lib/cardanoCrypto/deriveByAddressing';
 
 export const ProgressStep = Object.freeze({
@@ -258,25 +249,17 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
       publicDeriver.getParent().getNetworkInfo()
     );
 
-    const timeToSlot = await genTimeToSlot(fullConfig);
-    const absSlotNumber = new BigNumber(
-      timeToSlot({
-        // use server time for TTL if connected to server
-        time: this.stores.serverConnectionStore.serverTime ?? new Date(),
-      }).slot
-    );
+    // use server time for TTL if connected to server
+    const currentTime = this.stores.serverConnectionStore.serverTime ?? new Date();
+    const currentAbsoluteSlot = TimeUtils.timeToAbsoluteSlot(fullConfig, currentTime);
+    const absSlotNumber = new BigNumber(currentAbsoluteSlot);
 
     const catalystPrivateKey = this.catalystPrivateKey;
     if(catalystPrivateKey === undefined){
       throw new Error(`${nameof(this._createTransaction)} should never happen`);
     }
 
-    const nonce = timeToSlot({ time: new Date() }).slot;
-
-    const allAddresses = await this.api.ada.getAllAddressesForDisplay({
-      publicDeriver,
-      type: CoreAddressTypes.CARDANO_BASE,
-    });
+    const firstAddress = await this.stores.addresses.getFirstExternalAddress(publicDeriver);
 
     let votingRegTxPromise;
 
@@ -322,9 +305,9 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
             votingPublicKey,
             stakingKeyPath: stakingKeyResp.addressing.path,
             stakingKey: Buffer.from(stakingKey.as_bytes()).toString('hex'),
-            paymentKeyPath: allAddresses[0].addressing.path,
-            paymentAddress: allAddresses[0].address,
-            nonce,
+            paymentKeyPath: firstAddress.addressing.path,
+            paymentAddress: firstAddress.address,
+            nonce: currentAbsoluteSlot,
           },
         }).promise;
       } else if (isLedgerNanoWallet(publicDeriver.getParent())) {
@@ -335,9 +318,9 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
             votingPublicKey,
             stakingKeyPath: stakingKeyResp.addressing.path,
             stakingKey: Buffer.from(stakingKey.as_bytes()).toString('hex'),
-            paymentKeyPath: allAddresses[0].addressing.path,
-            paymentAddress: allAddresses[0].address,
-            nonce,
+            paymentKeyPath: firstAddress.addressing.path,
+            paymentAddress: firstAddress.address,
+            nonce: currentAbsoluteSlot,
           },
         }).promise;
       } else {
@@ -368,8 +351,8 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
       const trxMeta = generateRegistration({
         stakePrivateKey: stakingKey,
         catalystPrivateKey,
-        receiverAddress: allAddresses[0].address,
-        slotNumber: nonce,
+        receiverAddress: firstAddress.address,
+        slotNumber: currentAbsoluteSlot,
       });
 
       votingRegTxPromise = this.createVotingRegTx.execute({

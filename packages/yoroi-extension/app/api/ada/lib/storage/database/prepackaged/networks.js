@@ -6,6 +6,7 @@ import {
 import type {
   NetworkRow,
   CardanoHaskellBaseConfig,
+  CardanoHaskellConfig,
   TokenInsert,
 } from '../primitives/tables';
 import { PRIMARY_ASSET_CONSTANTS } from '../primitives/enums';
@@ -22,10 +23,7 @@ export const networks = Object.freeze({
     Backend: {
       BackendService: environment.isTest()
         ? 'http://localhost:21000'
-        : 'https://iohk-mainnet.yoroiwallet.com',
-      WebSocket: environment.isTest()
-        ? 'ws://localhost:21000'
-        : 'wss://iohk-mainnet.yoroiwallet.com:443',
+        : 'https://api.yoroiwallet.com',
       TokenInfoService:
         'https://cdn.yoroiwallet.com',
     },
@@ -64,9 +62,6 @@ export const networks = Object.freeze({
       BackendService: environment.isTest()
         ? 'http://localhost:21000'
         : 'https://testnet-backend.yoroiwallet.com',
-      WebSocket: environment.isTest()
-        ? 'ws://localhost:21000'
-        : 'wss://testnet-backend.yoroiwallet.com:443',
       TokenInfoService:
         'https://stage-cdn.yoroiwallet.com',
     },
@@ -104,9 +99,6 @@ export const networks = Object.freeze({
       BackendService: environment.isTest()
         ? 'http://localhost:21000'
         : 'https://preprod-backend.yoroiwallet.com',
-      WebSocket: environment.isTest()
-        ? 'ws://localhost:21000'
-        : 'wss://preprod-backend.yoroiwallet.com:443',
       TokenInfoService:
         'https://stage-cdn.yoroiwallet.com',
     },
@@ -144,9 +136,6 @@ export const networks = Object.freeze({
       BackendService: environment.isTest()
         ? 'http://localhost:21000'
         : 'https://preview-backend.emurgornd.com',
-      WebSocket: environment.isTest()
-        ? 'ws://localhost:21000'
-        : 'wss://preview-backend.emurgornd.com:443',
       TokenInfoService:
         'https://stage-cdn.yoroiwallet.com',
     },
@@ -184,9 +173,6 @@ export const networks = Object.freeze({
       BackendService: environment.isTest()
         ? 'http://localhost:21000'
         : 'https://sanchonet-backend.yoroiwallet.com',
-      WebSocket: environment.isTest()
-        ? 'ws://localhost:21000'
-        : 'wss://sanchonet-backend.yoroiwallet.com:443',
       TokenInfoService:
         'https://stage-cdn.yoroiwallet.com',
     },
@@ -245,6 +231,18 @@ export function getCardanoHaskellBaseConfig(
   return (network.BaseConfig: any); // cast to return type
 }
 
+
+export function cardanoHaskellConfigCombine(config: $ReadOnlyArray<CardanoHaskellConfig>): CardanoHaskellConfig {
+  // $FlowIgnore[incompatible-exact]
+  return (config.reduce((acc, next) => Object.assign(acc, next), {}): CardanoHaskellConfig);
+}
+
+export function getCardanoHaskellBaseConfigCombined(
+  network: $ReadOnly<NetworkRow>,
+): CardanoHaskellConfig {
+  return cardanoHaskellConfigCombine(getCardanoHaskellBaseConfig(network))
+}
+
 export const defaultAssets: Array<
   $Diff<TokenInsert, {| Digest: number |}>
 > = Object.keys(networks)
@@ -267,6 +265,7 @@ export const defaultAssets: Array<
               || network === networks.CardanoSanchoTestnet)
               ? 'TADA'
               : 'ADA',
+          logo: null, // TODO: maybe put built-in ADA logo as base64 here
           longName: null,
           numberOfDecimals: 6,
         }

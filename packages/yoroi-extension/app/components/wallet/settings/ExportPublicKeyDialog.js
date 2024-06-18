@@ -10,7 +10,7 @@ import CodeBlock from '../../widgets/CodeBlock';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import QrCodeWrapper from '../../widgets/QrCodeWrapper';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { toDerivationPathString } from '../../../api/common/lib/crypto/keys/path';
+import { toDerivationPathString } from '../../../api/ada/lib/cardanoCrypto/keys/path';
 
 export const messages: * = defineMessages({
   publicKeyExplanationLine1: {

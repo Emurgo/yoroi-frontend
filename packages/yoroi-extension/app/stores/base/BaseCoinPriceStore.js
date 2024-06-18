@@ -20,7 +20,7 @@ import type { GetAllPricesFunc } from '../../api/common/lib/storage/bridge/price
 import { verifyTicker, verifyPubKeyDataReplacement } from '../../api/verify';
 import type { ConfigType } from '../../../config/config-types';
 import BaseProfileActions from '../../actions/base/base-profile-actions';
-import type { IFetcher } from '../../api/common/lib/state-fetch/IFetcher';
+import type { IFetcher } from '../../api/common/lib/state-fetch/IFetcher.types';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 
 // populated by ConfigWebpackPlugin

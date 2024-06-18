@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import type { Notification } from '../../types/notificationType';
+import type { Notification } from '../../types/notification.types';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
@@ -65,6 +65,7 @@ export default class URIDisplayDialog extends Component<Props> {
         closeButton={<DialogCloseButton />}
         onClose={onClose}
         backButton={<DialogBackButton onBack={onBack} />}
+        id='uriDisplayDialog'
       >
         <Box maxWidth="600px">
           <Box
@@ -92,6 +93,7 @@ export default class URIDisplayDialog extends Component<Props> {
           </div>
           <div className={styles.uriDisplay}>
             <CopyableAddress
+              id='uriDisplayDialog'
               hash={uri}
               elementId={uriNotificationId}
               onCopyAddress={() => onCopyAddressTooltip(uriNotificationId)}

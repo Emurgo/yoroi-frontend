@@ -1,18 +1,21 @@
 .component {
   .token {
     cursor: pointer;
-    width: 100%;
     display: grid;
     grid-template-columns: 1.1fr 1fr 1fr;
     align-items: center;
-    justify-items: flex-start;
-    margin: 2px 0;
+    border-radius: 8px;
+    width: calc(100% - 6px);
+    border:2px solid transparent;
+    height: 56px;
+    margin-top: 20px;
 
-    & > div,
-    & > p {
-      padding: 16px 24px;
+    & > div {
+      padding: 10px 20px;
+      font-size: 16px;
+      line-height: 24px;
     }
-
+ 
     .name {
       display: flex;
       align-items: center;
@@ -29,16 +32,21 @@
     .amount {
       justify-self: flex-end;
     }
+
+    &:hover {
+      border:2px solid #DCE0E9;
+      border-radius: 8px;
+  }
   }
   .amountWrapper {
-    position: relative;
     display: grid;
     grid-template-columns: 1.1fr 1fr 1fr;
     align-items: center;
     border-radius: 8px;
     position: relative;
-    margin: 5px 0;
     width: calc(100% - 6px);
+    height: 56px;
+    margin-top: 20px;
 
     & > div {
       padding: 10px 24px;
@@ -46,11 +54,13 @@
 
     .error {
       position: absolute;
-      bottom: -16px;
-      right: 27px;
+      bottom: -20px;
+      right: 0;
       color: var(--yoroi-comp-input-error);
       font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
-      font-size: 0.75rem;
+      font-size:12px;
+      color:#FF1351;
+      padding: 0;
     }
 
     .amountTokenName {
@@ -65,7 +75,10 @@
 
     .amountInput {
       width: 100%;
-      margin: 0px 8px;
+      height:24px;
+      margin: 0 0;
+      padding:0;
+      margin-bottom: 6px;
       input {
         text-align: right;
         font-size: 16px;
@@ -77,6 +90,7 @@
         font-size: 16px;
         line-height: 24px;
       }
+
     }
 
     .close {
@@ -98,6 +112,11 @@
   }
 
   .amountError {
-    border: 2px solid var(--yoroi-palette-error-100);
+    border: 2px solid #FF1351;
+    color:#FF1351;
+  }
+
+  .inputFocused {
+    border:2px solid var(--yoroi-palette-gray-max)
   }
 }

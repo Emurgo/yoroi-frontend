@@ -13,13 +13,15 @@ import EnterRecoveryPhraseStep from './steps/phrase/EnterRecoveryPhraseStep';
 import AddWalletDetailsStep from '../create-wallet/AddWalletDetailsStep';
 import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { asGetPublicKey } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
-import { isWalletExist } from '../../../api/ada/lib/cardanoCrypto/utils';
 import { markDialogAsShown } from '../dialogs/utils';
 import { ROUTES } from '../../../routes-config';
 import SelectNetworkStep from '../create-wallet/SelectNetworkStep';
 import environment from '../../../environment';
 import { useRestoreWallet } from './hooks';
 import { ampli } from '../../../../ampli/index';
+import { runInAction } from 'mobx';
+import type { RestoreModeType } from '../../../actions/common/wallet-restore-actions';
+import { isWalletExist } from '../../../stores/toplevel/WalletRestoreStore';
 
 const messages: * = defineMessages({
   title: {
@@ -59,9 +61,9 @@ type Props = {|
 
 function RestoreWalletPage(props: Props & Intl): Node {
   const { intl, stores, actions, restoreWallet, isDialogOpen, openDialog, closeDialog } = props;
-  const { walletRestore, profile, router, wallets: walletsActions } = actions;
+  const { profile, router, wallets: walletsActions } = actions;
   const {
-    walletRestore: walletData,
+    walletRestore,
     profile: profileData,
     wallets,
     walletSettings,
@@ -70,6 +72,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
   } = stores;
 
   const [currentStep, setCurrentStep] = useState(getFirstRestorationStep());
+  const [selectedRestoreMode, setSelectedRestoreMode] = useState<?RestoreModeType>(null);
   const {
     recoveryPhrase,
     duplicatedWallet,
@@ -111,19 +114,6 @@ function RestoreWalletPage(props: Props & Intl): Node {
     },
   };
 
-  const recoveryPhraseStepProps = {
-    setCurrentStep: (step) => {
-      setCurrentStep(step);
-      ampli.restoreWalletDetailsStepViewed();
-    },
-    walletData,
-    isDialogOpen,
-    openDialog,
-    closeDialog,
-    duplicatedWalletData: getDuplicatedWalletData(),
-    initialRecoveryPhrase: recoveryPhrase,
-  };
-
   function handleGoToRoute(route) {
     router.goToRoute.trigger(route);
   }
@@ -154,21 +144,15 @@ function RestoreWalletPage(props: Props & Intl): Node {
         <SelectWalletTypeStep
           onNext={mode => {
             resetRestoreWalletData();
-
             if (!environment.isDev() && !environment.isNightly())
               profile.setSelectedNetwork.trigger(networks.CardanoMainnet);
-
-            walletRestore.setMode.trigger(mode);
-            setCurrentStep(RESTORE_WALLET_STEPS.ENTER_RECOVERY_PHRASE);
-            if (mode.length === 15) {
-              ampli.restoreWalletEnterPhraseStepViewed({
-                recovery_phrase_lenght: '15'
-              });
-            } else if (mode.length === 24) {
-              ampli.restoreWalletEnterPhraseStepViewed({
-                recovery_phrase_lenght: '24'
-              });
-            }
+            runInAction(() => {
+              setSelectedRestoreMode(mode);
+              setCurrentStep(RESTORE_WALLET_STEPS.ENTER_RECOVERY_PHRASE);
+            })
+            ampli.restoreWalletEnterPhraseStepViewed({
+              recovery_phrase_lenght: mode.length === 15 ? '15' : '24',
+            });
           }}
           goBack={() => {
             resetRestoreWalletData();
@@ -183,10 +167,19 @@ function RestoreWalletPage(props: Props & Intl): Node {
       message: messages.secondStep,
       component: (
         <EnterRecoveryPhraseStep
-          {...recoveryPhraseStepProps}
+          mode={selectedRestoreMode}
+          initialRecoveryPhrase={recoveryPhrase}
+          duplicatedWalletData={getDuplicatedWalletData()}
+          isDialogOpen={isDialogOpen}
+          openDialog={openDialog}
+          closeDialog={closeDialog}
+          setCurrentStep={(step) => {
+            setCurrentStep(step);
+            ampli.restoreWalletDetailsStepViewed();
+          }}
           checkValidPhrase={phrase => {
-            const isValid = walletData.isValidMnemonic(
-              { mnemonic: phrase, mode: walletData.mode }
+            const isValid = walletRestore.isValidMnemonic(
+              { mnemonic: phrase, mode: selectedRestoreMode }
             );
             ampli.restoreWalletEnterPhraseStepStatus(
               { recovery_prhase_status: isValid }
@@ -200,11 +193,10 @@ function RestoreWalletPage(props: Props & Intl): Node {
           }}
           onSubmit={async enteredRecoveryPhrase => {
             const importedWallets = wallets.publicDerivers;
-            const accountIndex = walletData.selectedAccount;
+            const accountIndex = walletRestore.selectedAccount;
 
             const existingWallet = await isWalletExist(
               importedWallets,
-              walletData.mode.type,
               enteredRecoveryPhrase,
               accountIndex,
               profileData.selectedNetwork

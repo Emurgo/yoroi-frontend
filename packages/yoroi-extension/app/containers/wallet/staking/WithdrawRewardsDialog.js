@@ -2,7 +2,7 @@
 
 import type { Node } from 'react';
 import { Component } from 'react';
-import type { StoresAndActionsProps } from '../../../types/injectedPropsType';
+import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, intlShape } from 'react-intl';
 import { Box, Typography } from '@mui/material';
@@ -16,16 +16,9 @@ import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/util
 import { truncateAddress } from '../../../utils/formatters';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { getDefaultEntryToken } from '../../../stores/toplevel/TokenInfoStore';
-import {
-  genFormatTokenAmount,
-  genLookupOrFail,
-  getTokenName,
-} from '../../../stores/stateless/tokenHelpers';
+import { genFormatTokenAmount, genLookupOrFail, getTokenName, } from '../../../stores/stateless/tokenHelpers';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
-import {
-  isLedgerNanoWallet,
-  isTrezorTWallet,
-} from '../../../api/ada/lib/storage/models/ConceptualWallet';
+import { isLedgerNanoWallet, isTrezorTWallet, } from '../../../api/ada/lib/storage/models/ConceptualWallet';
 import { asGetSigningKey } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
 import SpendingPasswordInput from '../../../components/widgets/forms/SpendingPasswordInput';
 import VerticallyCenteredLayout from '../../../components/layout/VerticallyCenteredLayout';
@@ -149,22 +142,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
       throw new Error(`${nameof(WithdrawRewardsDialog)} no public deriver. Should never happen`);
     }
 
-    const delegationStore = this.props.stores.delegation;
-    const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
-
-    if (delegationRequests == null) {
-      throw new Error(`${nameof(WithdrawRewardsDialog)} opened for non-reward wallet`);
-    }
-
-    if (
-      !delegationRequests.getDelegatedBalance.wasExecuted ||
-      delegationRequests.getDelegatedBalance.isExecuting ||
-      delegationRequests.getDelegatedBalance.result == null
-    ) {
-      return null;
-    }
-
-    const currentPool = delegationRequests.getDelegatedBalance.result.delegation;
+    const currentPool = this.props.stores.delegation.getDelegatedPoolId(publicDeriver);
     if (currentPool == null) return null;
 
     const network = publicDeriver.getParent().getNetworkInfo();

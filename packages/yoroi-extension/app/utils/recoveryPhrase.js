@@ -1,6 +1,6 @@
 // @flow
 
-export type SortedRecoveryPhraseEntry = {|
+type SortedRecoveryPhraseEntry = {|
   word: string,
   internalWordId: string,
 |};

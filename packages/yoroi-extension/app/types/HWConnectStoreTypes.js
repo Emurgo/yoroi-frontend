@@ -16,7 +16,7 @@ export const ProgressStep = Object.freeze({
   SAVE: 2,
   TRANSFER: 3,
 });
-export type ProgressStepEnum = $Values<typeof ProgressStep>;
+type ProgressStepEnum = $Values<typeof ProgressStep>;
 
 export interface ProgressInfo {
   currentStep: ProgressStepEnum,

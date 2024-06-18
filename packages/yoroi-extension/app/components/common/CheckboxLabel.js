@@ -17,6 +17,7 @@ type Props = {|
   checked: boolean,
   disabled?: boolean,
   onChange: () => void,
+  id?: string,
 |};
 function CheckboxLabel({
   label,
@@ -26,6 +27,7 @@ function CheckboxLabel({
   sx,
   labelSx,
   descriptionSx,
+  id,
   ...checkboxProps
 }: Props): Node {
   return (
@@ -36,6 +38,8 @@ function CheckboxLabel({
           icon={<OutlineIcon />}
           checkedIcon={<CheckedIcon />}
           {...checkboxProps}
+          // $FlowIgnore
+          id={id + '-checkbox'}
         />
       }
       label={
@@ -85,4 +89,5 @@ CheckboxLabel.defaultProps = {
   descriptionSx: null,
   disabled: false,
   description: null,
+  id: 'somewhere',
 };

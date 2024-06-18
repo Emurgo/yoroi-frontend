@@ -62,6 +62,7 @@ import TrezorSendActions from '../../../actions/ada/trezor-send-actions';
 import LedgerSendActions from '../../../actions/ada/ledger-send-actions';
 import type { SendMoneyRequest } from '../../../stores/toplevel/WalletStore';
 import type { MaxSendableAmountRequest } from '../../../stores/toplevel/TransactionBuilderStore';
+import LoadingSpinner from '../../widgets/LoadingSpinner';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -278,7 +279,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
      * so instead we register a reaction to update it
      */
     this.amountFieldReactionDisposer = reaction(
-      () => [this.props.shouldSendAll, this.props.totalInput, this.props.maxSendableAmount],
+      () => [this.props.shouldSendAll, this.props.totalInput, this.props.maxSendableAmount.result],
       () => {
         const { maxSendableAmount } = this.props;
         const amountField = this.form.$('amount');
@@ -674,6 +675,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     ? intl.formatMessage(memoMessages.memoLabel)
                     : intl.formatMessage(messages.memoFieldLabelInactive)
                 }
+                id="wallet:send:enterAddressStep-enterMemo-input"
               />
               <Typography component="div"
                 variant="caption1"
@@ -719,6 +721,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             )}
             <Box
               sx={{
+                height: '129px',
                 position: 'relative',
                 padding: '16px 0px',
                 borderRadius: '8px',
@@ -735,7 +738,8 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     }),
               }}
             >
-              <Typography component="div"
+              <Typography
+                component="div"
                 sx={{
                   position: 'absolute',
                   top: '-8px',
@@ -743,6 +747,10 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   backgroundColor: 'common.white',
                   paddingX: '4px',
                   color: shouldSendAll && 'grayscale.200',
+                  fontWeight: 400,
+                  fontSize: '12px',
+                  lineHeight: '16px',
+                  letterSpacing: '0.2px',
                 }}
                 variant="caption2"
               >
@@ -750,6 +758,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               </Typography>
               <Box
                 sx={{
+                  height: '32px',
                   margin: '0px 16px',
                   display: 'flex',
                   alignItems: 'center',
@@ -829,7 +838,9 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                       }
                     }}
                 >
-                  {intl.formatMessage(messages.max)}
+                  {maxSendableAmount.isExecuting ? (
+                    <LoadingSpinner small />
+                  ) : intl.formatMessage(messages.max)}
                 </Button>
               </Box>
               {showFiat && (
@@ -876,6 +887,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 onClick={() => this.props.openDialog(AddTokenDialog)}
                 disabled={this.props.shouldSendAll}
                 startIcon={<PlusIcon />}
+                id='wallet:send:addAssetsStep-addTokens-button'
               >
                 {intl.formatMessage(globalMessages.addToken)}
               </Button>
@@ -885,6 +897,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 onClick={() => this.props.openDialog(AddNFTDialog)}
                 disabled={this.props.shouldSendAll}
                 startIcon={<PlusIcon />}
+                id='wallet:send:addAssetsStep-addNFTs-button'
               >
                 {intl.formatMessage(globalMessages.addNft)}
               </Button>
@@ -954,6 +967,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             size="medium"
             onClick={() => this.onUpdateStep(SEND_FORM_STEP.AMOUNT)}
             disabled={invalidMemo || !receiverField.isValid}
+            id="wallet:send:enterAddressStep-nextToAddAssets-button"
           >
             {intl.formatMessage(globalMessages.nextButtonLabel)}
           </ActionButton>
@@ -966,6 +980,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               variant="secondary"
               size="medium"
               onClick={() => this.onUpdateStep(SEND_FORM_STEP.RECEIVER)}
+              id="wallet:send:addAssetsStep-backToEnterAddress-button"
             >
               {intl.formatMessage(globalMessages.backButtonLabel)}
             </ActionButton>
@@ -983,6 +998,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 invalidMemo ||
                 maxSendableAmount.isExecuting
               }
+              id="wallet:send:addAssetsStep-nextToConfirmTransaction-button"
             >
               {intl.formatMessage(globalMessages.nextButtonLabel)}
             </ActionButton>

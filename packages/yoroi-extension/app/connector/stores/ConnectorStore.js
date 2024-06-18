@@ -33,7 +33,7 @@ import type { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/she
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
 import { isLedgerNanoWallet, isTrezorTWallet, } from '../../api/ada/lib/storage/models/ConceptualWallet';
 import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import type { IFetcher } from '../../api/ada/lib/state-fetch/IFetcher';
+import type { IFetcher } from '../../api/ada/lib/state-fetch/IFetcher.types';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import BigNumber from 'bignumber.js';
 import { action, computed, observable, runInAction, toJS } from 'mobx';
@@ -58,7 +58,7 @@ import {
   connectorGenerateReorgTx,
   connectorGetChangeAddress,
   connectorGetUnusedAddresses,
-  connectorGetUsedAddresses,
+  connectorGetUsedAddressesWithPaginate,
   connectorRecordSubmittedCardanoTransaction,
   connectorSendTxCardano,
   getScriptRequiredSigningKeys,
@@ -92,6 +92,7 @@ import {
 import { wrapWithFrame } from '../../stores/lib/TrezorWrapper';
 import { ampli } from '../../../ampli/index';
 import { noop } from '../../coreUtils';
+import { addressBech32ToHex } from '../../api/ada/lib/cardanoCrypto/utils';
 
 export function connectorCall<T, R>(message: T): Promise<R> {
   return new Promise((resolve, reject) => {
@@ -192,7 +193,7 @@ export async function parseWalletsList(
     const canGetBalance = asGetBalance(currentWallet);
     const balance =
       canGetBalance == null
-        ? new MultiToken([], currentWallet.getParent().getDefaultToken())
+        ? currentWallet.getParent().getDefaultMultiToken()
         : await canGetBalance.getBalance();
     result.push({
       publicDeriver: currentWallet,
@@ -213,6 +214,7 @@ type SetWhitelistFunc = ({|
 export type ForeignUtxoFetcher = (Array<string>) => Promise<Array<?RemoteUnspentOutput>>;
 
 export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
+  @observable unrecoverableError: string | null = null;
   @observable connectingMessage: ?ConnectingMessage = null;
   @observable whiteList: Array<WhitelistEntry> = [];
 
@@ -567,13 +569,16 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       const transaction = RustModule.WalletV4.FixedTransaction.from_bytes(bytes);
       this.rawTxBody = Buffer.from(transaction.raw_body());
       txBody = transaction.body();
-    } catch (originalErr) {
+    } catch {
       try {
         // Try parsing as body for backward compatibility
         txBody = RustModule.WalletV4.TransactionBody.from_bytes(bytes);
         this.rawTxBody = bytes;
-      } catch (_e) {
-        throw originalErr;
+      } catch {
+        runInAction(() => {
+          this.unrecoverableError = 'Unable to parse input transaction.';
+        });
+        return;
       }
     }
 
@@ -652,6 +657,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       ownAddresses
     );
 
+    let foreignInputDetails = [];
     if (foreignInputs.length) {
       const foreignUtxos = await this.stores.substores.ada.stateFetchStore.fetcher.getUtxoData({
         network: connectedWallet.publicDeriver.getParent().networkInfo,
@@ -682,10 +688,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           return;
         }
         const value = multiTokenFromRemote(foreignUtxo.output, defaultToken.NetworkId);
-        inputs.push({
-          address: Buffer.from(
-            RustModule.WalletV4.Address.from_bech32(foreignUtxo.output.address).to_bytes()
-          ).toString('hex'),
+        foreignInputDetails.push({
+          address: addressBech32ToHex(foreignUtxo.output.address),
           value,
         });
       }
@@ -886,8 +890,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     runInAction(() => {
       this.adaTransaction = {
         inputs,
-        // $FlowFixMe[prop-missing]
-        foreignInputs,
+        foreignInputs: foreignInputDetails,
         outputs,
         fee,
         total,
@@ -1059,7 +1062,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (!ownAddresses) {
       ownAddresses = new Set([
         ...utxos.map(utxo => utxo.address),
-        ...(await connectorGetUsedAddresses(publicDeriver, null)),
+        ...(await connectorGetUsedAddressesWithPaginate(publicDeriver, null)),
         ...(await connectorGetUnusedAddresses(publicDeriver)),
         await connectorGetChangeAddress(publicDeriver),
       ]);

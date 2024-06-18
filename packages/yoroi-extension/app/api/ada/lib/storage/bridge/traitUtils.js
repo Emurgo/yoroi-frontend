@@ -1,50 +1,28 @@
 // @flow
 
-import type {
-  lf$Transaction,
-} from 'lovefield';
+import type { lf$Transaction, } from 'lovefield';
 
-import {
-  asDisplayCutoff,
-  asGetAllUtxos,
-  asGetAllAccounting,
-  asHasLevels,
-} from '../models/PublicDeriver/traits';
+import { asDisplayCutoff, asGetAllAccounting, asGetAllUtxos, asHasLevels, } from '../models/PublicDeriver/traits';
 import { PublicDeriver } from '../models/PublicDeriver/index';
 import type {
+  Address,
+  Addressing,
+  AddressType,
   IPublicDeriver,
-  Address, AddressType, Value, Addressing, UsedStatus,
+  UsedStatus,
+  Value,
 } from '../models/PublicDeriver/interfaces';
 import { ConceptualWallet } from '../models/ConceptualWallet/index';
 
-import {
-  getAllSchemaTables,
-  raii,
-  mapToTables,
-} from '../database/utils';
-import {
-  GetAddress,
-  GetPathWithSpecific,
-  GetToken,
-  AssociateToken,
-} from '../database/primitives/api/read';
-import type {
-  AddressRow,
-  TokenRow,
-  TokenListRow,
-} from '../database/primitives/tables';
-import type {
-  CoreAddressT
-} from '../database/primitives/enums';
-import {
-  GetDerivationSpecific,
-} from '../database/walletTypes/common/api/read';
-import {
-  GetUtxoTxOutputsWithTx,
-} from '../database/transactionModels/utxo/api/read';
-import {
-  rawGetAddressesForDisplay,
-} from '../models/utils';
+import { getAllSchemaTables, mapToTables, raii, } from '../database/utils';
+import { GetAddress, GetPathWithSpecific, } from '../database/primitives/api/read';
+import type { AddressRow, } from '../database/primitives/tables';
+import type { CoreAddressT } from '../database/primitives/enums';
+import { CoreAddressTypes } from '../database/primitives/enums';
+import { GetDerivationSpecific, } from '../database/walletTypes/common/api/read';
+import { GetUtxoTxOutputsWithTx, } from '../database/transactionModels/utxo/api/read';
+import { rawGetAddressesForDisplay, } from '../models/utils';
+import { getOutputAddressesInSubmittedTxs } from '../../../../localStorage';
 
 export async function rawGetAllAddressesForDisplay(
   tx: lf$Transaction,
@@ -324,6 +302,25 @@ export async function getAddressRowsForWallet(
   return [...result.utxoAddresses, ...result.accountingAddresses];
 }
 
+export async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Promise<string[]> {
+  const addresses = await getAddressRowsForWallet({ publicDeriver: wallet });
+  return addresses
+    .filter(a => a.IsUsed === usedFilter && a.Type === CoreAddressTypes.CARDANO_BASE)
+    .map(a => a.Hash);
+}
+
+export async function getAllUsedAddresses(
+  wallet: PublicDeriver<>,
+): Promise<string[]> {
+  const usedAddresses = await getAllAddresses(wallet, true);
+  const outputAddressesInSubmittedTxs = new Set(
+    await getOutputAddressesInSubmittedTxs(wallet.publicDeriverId)
+  );
+  const usedInSubmittedTxs = (await getAllAddresses(wallet, false))
+    .filter(address => outputAddressesInSubmittedTxs.has(address));
+  return [...usedAddresses, ...usedInSubmittedTxs];
+}
+
 export async function rawGetAddressRowsForWallet(
   tx: lf$Transaction,
   deps: {|
@@ -380,34 +377,4 @@ export async function rawGetAddressRowsForWallet(
     utxoAddresses,
     accountingAddresses,
   };
-}
-
-export async function buildTokenMap(
-  request: {|
-    publicDeriver: IPublicDeriver<ConceptualWallet>,
-    tokenListIds: Array<number>,
-  |},
-): Promise<$ReadOnlyArray<{|
-  TokenList: $ReadOnly<TokenListRow>,
-  Token: $ReadOnly<TokenRow>,
-|}>> {
-  const deps = Object.freeze({
-    AssociateToken,
-    GetToken,
-  });
-  const depTables = Object
-    .keys(deps)
-    .map(key => deps[key])
-    .flatMap(table => getAllSchemaTables(request.publicDeriver.getDb(), table));
-  return await raii<PromisslessReturnType<typeof buildTokenMap>>(
-    request.publicDeriver.getDb(),
-    depTables,
-    async tx => await deps.AssociateToken.join(
-      request.publicDeriver.getDb(), tx,
-      {
-        listIds: request.tokenListIds,
-        networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
-      }
-    )
-  );
 }

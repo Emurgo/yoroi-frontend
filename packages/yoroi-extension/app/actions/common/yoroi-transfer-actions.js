@@ -1,15 +1,12 @@
 // @flow
 import { AsyncAction, Action } from '../lib/Action';
-import type { RestoreModeType } from './wallet-restore-actions';
 import type {
   Address, Addressing
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 
 export default class YoroiTransferActions {
-  startTransferFunds: Action<{|
-    source: RestoreModeType,
-  |}> = new Action();
+  startTransferFunds: Action<void> = new Action();
   setupTransferFundsWithPaperMnemonic: Action<{|
     recoveryPhrase: string,
     paperPassword: string,

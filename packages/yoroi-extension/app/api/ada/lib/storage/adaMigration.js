@@ -25,7 +25,7 @@ import { asGetAllUtxos, asHasLevels, } from './models/PublicDeriver/traits';
 import { ConceptualWallet, isLedgerNanoWallet, } from './models/ConceptualWallet/index';
 import { loadWalletsFromStorage } from './models/load';
 import environment from '../../../../environment';
-import { KeyKind } from '../../../common/lib/crypto/keys/types';
+import { KeyKind } from '../cardanoCrypto/keys/types';
 import { getLocalItem, removeLocalItem, } from '../../../localStorage/primitives';
 import { isCardanoHaskell, networks } from './database/prepackaged/networks';
 import { getAllSchemaTables, raii, } from './database/utils';
@@ -197,6 +197,7 @@ async function bip44Migration(
  * This migrates to a new storage format to allow multiple wallets and different kinds of wallets
  * see v2 storage spec for more details
  */
+// <TODO:PENDING_REMOVAL> legacy migration
 export async function storageV2Migration(
   persistentDb: lf$Database,
 ): Promise<boolean> {
