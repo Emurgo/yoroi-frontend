@@ -2,38 +2,6 @@ import BigNumber from 'bignumber.js';
 import * as CSL from '@emurgo/cardano-serialization-lib-nodejs';
 import { protocolParams } from './networkConfig.js';
 
-export function getTtl() {
-  const fullConfig = [
-    {
-      StartAt: 0,
-      ChainNetworkId: '0',
-      ByronNetworkId: 1097911063,
-      GenesisDate: '1563999616000',
-      SlotsPerEpoch: 21600,
-      SlotDuration: 20,
-    },
-    {
-      StartAt: 74,
-      SlotsPerEpoch: 432000,
-      SlotDuration: 1,
-      PerEpochPercentageReward: 69344,
-      LinearFee: {
-        coefficient: '44',
-        constant: '155381',
-      },
-      MinimumUtxoVal: '1000000',
-      PoolDeposit: '500000000',
-      KeyDeposit: '2000000',
-    },
-  ];
-  const defaultTtlOffset = 7200;
-  const absSlotNumber = new BigNumber(
-    TimeUtils.timeToAbsoluteSlot(fullConfig, new Date(1649261533360))
-  );
-
-  return absSlotNumber.plus(defaultTtlOffset).toNumber();
-}
-
 export function bytesToHex(bytes) {
   return Buffer.from(bytes).toString('hex');
 }
