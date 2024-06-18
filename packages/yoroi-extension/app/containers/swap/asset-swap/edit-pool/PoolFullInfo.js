@@ -20,7 +20,7 @@ export default function SwapPoolFullInfo({
   showMinAda,
 }: Props): React$Node {
   const { orderData } = useSwap();
-  const { buyTokenInfo } = useSwapForm();
+  const { buyTokenInfo, sellTokenInfo } = useSwapForm();
   const { formattedFee } = useSwapFeeDisplay(defaultTokenInfo);
 
   const buyToken = orderData.tokens?.buyInfo;
@@ -103,7 +103,7 @@ export default function SwapPoolFullInfo({
           )}
         </Box>
         <Box>
-          {liqFeeQuantity} {buyTicker}
+          {liqFeeQuantity} {sellTokenInfo.ticker}
         </Box>
       </Box>
     </Box>

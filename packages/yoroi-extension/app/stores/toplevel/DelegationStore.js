@@ -1,24 +1,32 @@
 // @flow
 
-import { PoolInfoApi } from '@emurgo/yoroi-lib';
-import { GovernanceApi } from '@emurgo/yoroi-lib/dist/governance/emurgo-api';
+import { action, observable } from 'mobx';
 import { find } from 'lodash';
-import { action, observable, runInAction } from 'mobx';
-import type { ActionsMap } from '../../actions/index';
+import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import { asGetStakingKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import LocalizedRequest from '../lib/LocalizedRequest';
+import Store from '../base/Store';
+import { GovernanceApi } from '@emurgo/yoroi-lib/dist/governance/emurgo-api';
+import CachedRequest from '../lib/LocalizedCachedRequest';
+import LocalizableError from '../../i18n/LocalizableError';
 import { PoolMissingApiError } from '../../api/common/errors';
+import type { MangledAmountFunc, MangledAmountsResponse } from '../stateless/mangledAddresses';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
+import type { ExplorerPoolInfo as PoolInfo } from '@emurgo/yoroi-lib';
+import { PoolInfoApi } from '@emurgo/yoroi-lib';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { forceNonNull, maybe } from '../../coreUtils';
-import LocalizableError from '../../i18n/LocalizableError';
-import Store from '../base/Store';
-import type { StoresMap } from '../index';
-import CachedRequest from '../lib/LocalizedCachedRequest';
-import LocalizedRequest from '../lib/LocalizedRequest';
-import type { MangledAmountsResponse } from '../stateless/mangledAddresses';
+import { asGetStakingKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { unwrapStakingKey } from '../../api/ada/lib/storage/bridge/utils';
+
+import type {
+  GetDelegatedBalanceFunc,
+  GetDelegatedBalanceResponse,
+  RewardHistoryFunc,
+} from '../../api/ada/lib/storage/bridge/delegationUtils';
 
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import { unwrapStakingKey } from '../../api/ada/lib/storage/bridge/utils';
 import { environment } from '../../environment';
 
 export type DelegationRequests = {|
@@ -54,24 +62,38 @@ export type PoolTransition = {|
   deadlinePassed: boolean,
 |};
 
-type PoolTransitionModal = {| show: 'open' | 'closed' | 'idle', shouldUpdatePool: boolean |};
+export type PoolTransitionModal = {| show: 'open' | 'closed' | 'idle', shouldUpdatePool?: boolean |};
 
 export default class DelegationStore extends Store<StoresMap, ActionsMap> {
   @observable delegationRequests: Array<DelegationRequests> = [];
-  @observable poolTransitionRequestInfo: ?PoolTransition = null;
-  @observable poolTransitionConfig: PoolTransitionModal = {
-    show: 'closed',
-    shouldUpdatePool: false,
-  };
+
   @observable governanceStatus: any = null;
 
   @action setGovernanceStatus: any => void = (status: any) => {
     this.governanceStatus = status;
   };
+  @observable poolTransitionRequestInfo: { [number]: ?PoolTransition } = {};
+  @observable poolTransitionConfig: { [number]: PoolTransitionModal } = {};
 
-  @action setPoolTransitionConfig: any => void = (config: PoolTransitionModal) => {
-    this.poolTransitionConfig.show = config.show;
-    this.poolTransitionConfig.shouldUpdatePool = config.shouldUpdatePool;
+  getPoolTransitionConfig(publicDeriver: ?PublicDeriver<>): PoolTransitionModal {
+    return (
+      maybe(publicDeriver, w => this.poolTransitionConfig[w.getPublicDeriverId()]) ?? {
+        show: 'closed',
+        shouldUpdatePool: false,
+      }
+    );
+  }
+
+  @action setPoolTransitionConfig: (?PublicDeriver<>, PoolTransitionModal) => void = (
+    publicDeriver: ?PublicDeriver<>,
+    config: PoolTransitionModal
+  ) => {
+    if (publicDeriver != null) {
+      this.poolTransitionConfig[publicDeriver.getPublicDeriverId()] = {
+        show: config.show,
+        shouldUpdatePool: config.shouldUpdatePool,
+      };
+    }
   };
 
   @observable poolInfoQuery: LocalizedRequest<(Array<string>) => Promise<void>> = new LocalizedRequest<
@@ -194,9 +216,13 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     return find(this.poolInfo, { networkId: network.NetworkId, poolId })?.poolRemoteInfo ?? undefined;
   };
 
-  checkPoolTransition: () => Promise<void> = async () => {
+  getPoolTransitionInfo(publicDeriver: ?PublicDeriver<>): ?PoolTransition {
+    return maybe(publicDeriver, w => this.poolTransitionRequestInfo[w.getPublicDeriverId()]);
+  }
+
+  @action checkPoolTransition: () => Promise<void> = async () => {
     const publicDeriver = this.stores.wallets.selected;
-    if (publicDeriver === null || this.poolTransitionRequestInfo != null) {
+    if (publicDeriver === null || this.poolTransitionRequestInfo[publicDeriver.getPublicDeriverId()] != null) {
       return;
     }
 
@@ -222,13 +248,18 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
         deadlinePassed: Number(transitionResult?.deadlineMilliseconds) < Date.now(),
       };
 
-      if (isStakeRegistered && currentlyDelegating && transitionResult && this.poolTransitionConfig.show === 'closed') {
-        this.setPoolTransitionConfig({ show: 'open' });
+      const walletId = publicDeriver.getPublicDeriverId();
+
+      if (
+        isStakeRegistered &&
+        currentlyDelegating &&
+        transitionResult &&
+        this.getPoolTransitionConfig(publicDeriver).show === 'closed'
+      ) {
+        this.setPoolTransitionConfig(publicDeriver, { show: 'open' });
       }
 
-      runInAction(() => {
-        this.poolTransitionRequestInfo = { ...response };
-      });
+      this.poolTransitionRequestInfo[walletId] = { ...response };
     } catch (error) {
       console.warn('Failed to check pool transition', error);
     }
@@ -271,7 +302,9 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
       const stakingKeyResp = await withStakingKey.getStakingKey();
 
       const skey = unwrapStakingKey(stakingKeyResp.addr.Hash).to_keyhash()?.to_hex();
-
+      if (skey == null) {
+        throw new Error('Cannot get staking key from the wallet!');
+      }
       const backendService = publicDeriver.getParent().getNetworkInfo().Backend.BackendService;
       const backendServiceZero = publicDeriver.getParent().getNetworkInfo().Backend.BackendServiceZero;
 

@@ -470,6 +470,7 @@ async function baseTest(
               Identifier: '',
               Metadata: {
                 assetName: '',
+                logo: null,
                 longName: null,
                 numberOfDecimals: 6,
                 policyId: '',
@@ -608,6 +609,7 @@ async function baseTest(
               Identifier: '',
               Metadata: {
                 assetName: '',
+                logo: null,
                 longName: null,
                 numberOfDecimals: 6,
                 policyId: '',
@@ -675,6 +677,7 @@ async function baseTest(
               Identifier: '',
               Metadata: {
                 assetName: '',
+                logo: null,
                 longName: null,
                 numberOfDecimals: 6,
                 policyId: '',
@@ -801,6 +804,7 @@ async function baseTest(
               Identifier: '',
               Metadata: {
                 assetName: '',
+                logo: null,
                 longName: null,
                 numberOfDecimals: 6,
                 policyId: '',
@@ -868,6 +872,7 @@ async function baseTest(
               Identifier: '',
               Metadata: {
                 assetName: '',
+                logo: null,
                 longName: null,
                 numberOfDecimals: 6,
                 policyId: '',
@@ -1004,6 +1009,7 @@ async function baseTest(
                     type: 'Cardano',
                     policyId: '',
                     assetName: '',
+                    logo: null,
                     ticker: 'ADA',
                     longName: null,
                     numberOfDecimals: 6

@@ -44,7 +44,7 @@ module.exports = function (api /*: ApiType */) /*: * */ {
     plugins: [
       '@babel/plugin-proposal-nullish-coalescing-operator',
       '@babel/plugin-proposal-optional-chaining',
-      'nameof-js',
+      'babel-plugin-ts-nameof',
       [
         '@babel/plugin-proposal-decorators',
         {
