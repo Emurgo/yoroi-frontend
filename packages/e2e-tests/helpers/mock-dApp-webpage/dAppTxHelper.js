@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 import * as CSL from '@emurgo/cardano-serialization-lib-nodejs';
-import { protocolParams } from './networkConfig';
+import { protocolParams } from './networkConfig.js';
 
 export function getTtl() {
   const fullConfig = [
