@@ -163,7 +163,7 @@ export async function getPrivateStakingKey(
 }
 
 export async function getCardanoAssets(
-  request: {| networkId: number, tokenIds: Array<string> |}
+  request: {| networkId: number, tokenIds: Array<string> |} | null
 ): Promise<Array<$ReadOnly<TokenRow>>> {
   return await callBackground({ type: 'get-cardano-assets', request, });
 }

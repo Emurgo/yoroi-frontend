@@ -281,7 +281,7 @@ export type GetPrivateStakingKey = {|
 |};
 export type GetCardanoAssets = {|
   type: 'get-cardano-assets',
-  request: {| networkId: number, tokenIds: Array<string> |}
+  request: {| networkId: number, tokenIds: Array<string> |} | null,
 |};
 export type UpsertTxMemo = {|
   type: 'upsert-tx-memo',

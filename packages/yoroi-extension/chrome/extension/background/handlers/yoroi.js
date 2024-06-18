@@ -136,6 +136,7 @@ import type { AdaGetTransactionsRequest } from '../../../../app/api/ada';
 import type { BaseGetTransactionsRequest } from '../../../../app/api/common';
 import { createAuthEntry } from '../../../../app/connector/api/';
 import { getWalletChecksum } from '../../../../app/api/export/utils';
+import { getAllTokenInfo } from '../../../../app/api/common/lib/tokens/utils';
 
 const YOROI_MESSAGES = Object.freeze({
   CONNECT_RESPONSE: 'connect_response',
@@ -763,35 +764,41 @@ export async function yoroiMessageHandler(
   } else if (request.type === YOROI_MESSAGES.GET_CARDANO_ASSETS) {
     // fixme: cache
     const db = await getDb();
-    const network = getNetworkById(request.request.networkId);
-    const deps =  Object.freeze({
-      ModifyToken,
-      GetToken,
-    });
-    const depTables = Object
-          .keys(deps)
-          .map(key => deps[key])
-          .flatMap(table => getAllSchemaTables(db, table));
+    const params = request.request;
+    if (params) {
+      const network = getNetworkById(params.networkId);
+      const deps =  Object.freeze({
+        ModifyToken,
+        GetToken,
+      });
+      const depTables = Object
+            .keys(deps)
+            .map(key => deps[key])
+            .flatMap(table => getAllSchemaTables(db, table));
 
-    const stateFetcher = await getCardanoStateFetcher(new LocalStorageApi());
+      const stateFetcher = await getCardanoStateFetcher(new LocalStorageApi());
 
-    const assetMap = await raii(
-      db,
-      depTables,
-      dbTx => (
-        genCardanoAssetMap(
-          db,
-          dbTx,
-          deps,
-          request.request.tokenIds,
-          stateFetcher.getTokenInfo,
-          stateFetcher.getMultiAssetMintMetadata,
-          stateFetcher.getMultiAssetSupply,
-          network,
+      const assetMap = await raii(
+        db,
+        depTables,
+        dbTx => (
+          genCardanoAssetMap(
+            db,
+            dbTx,
+            deps,
+            params.tokenIds,
+            stateFetcher.getTokenInfo,
+            stateFetcher.getMultiAssetMintMetadata,
+            stateFetcher.getMultiAssetSupply,
+            network,
+          )
         )
-      )
-    );
-    sendResponse([... assetMap.values()]);
+      );
+      sendResponse([... assetMap.values()]);
+    } else {
+      const tokens = await getAllTokenInfo({ db });
+      sendResponse(tokens);
+    }
   } else if (request.type === YOROI_MESSAGES.UPSERT_TX_MEMO) {
     const db = await getDb();
     const response = await upsertTxMemo({ db, memo: request.request.memo });
