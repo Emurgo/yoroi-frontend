@@ -307,9 +307,7 @@ export class MockDAppWebpage {
       `MockDApp::requestSigningTx Requesting signing the transaction: amount="${amount}", toAddress="${toAddress}"`
     );
 
-    // the correct way is to request UTxOs for a required amount
-    // but currently we have this bug https://emurgo.atlassian.net/browse/YOEXT-932
-    const UTXOsreposne = await this.getUTXOs(undefined, false);
+    const UTXOsreposne = await this.getUTXOs(amount, false);
     this.logger.info(
       `MockDApp::requestSigningTx The UTXOsreposne: ${JSON.stringify(UTXOsreposne, null, 2)}`
     );
