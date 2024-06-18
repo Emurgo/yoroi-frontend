@@ -147,13 +147,13 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount, hea
               },
             }}
           >
-            {row.type === HistoryItemType.SENT && <Icon.Send stroke={theme.palette.ds.primary_c600} />}
+            {row.type === HistoryItemType.SENT && <Icon.Send stroke={theme.palette.ds.primary_c500} />}
             {row.type === HistoryItemType.RECEIVED && (
-              <Icon.Send stroke={theme.palette.ds.secondary_c400} style={{ transform: 'rotate(180deg)' }} />
+              <Icon.Send stroke={theme.palette.ds.secondary_c600} style={{ transform: 'rotate(180deg)' }} />
             )}
             {row.type === HistoryItemType.ERROR && <Icon.Cancel fill={theme.palette.ds.sys_magenta_c500} />}
-            {row.type === HistoryItemType.WITHDRAW && <Icon.Staking fill={theme.palette.ds.secondary_c400} />}
-            {row.type === HistoryItemType.DELEGATE && <Icon.Staking fill={theme.palette.ds.primary_c600} />}
+            {row.type === HistoryItemType.WITHDRAW && <Icon.Staking fill={theme.palette.ds.secondary_c600} />}
+            {row.type === HistoryItemType.DELEGATE && <Icon.Staking fill={theme.palette.ds.primary_c500} />}
           </IconButton>
           <Stack direction="column">
             <Typography color="ds.gray_c900">{row.label}</Typography>
