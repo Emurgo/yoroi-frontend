@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, InputAdornment, InputProps, styled } from '@mui/material';
+import { Input, InputAdornment, InputProps, styled, useTheme } from '@mui/material';
 import { useRef } from 'react';
 import { Icon } from './../icons/index';
 
@@ -17,6 +17,7 @@ const StyledInput = styled(Input)(({ theme }: any) => ({
 
 export const SearchInput = (props: InputProps) => {
   const ref = useRef<HTMLInputElement>(null);
+  const theme: any = useTheme();
 
   const focusInput = () => {
     if (ref.current) {
@@ -32,17 +33,11 @@ export const SearchInput = (props: InputProps) => {
         <InputAdornment
           position="start"
           onClick={focusInput}
-          sx={(theme: any) => ({
-            '&:hover': {
-              cursor: 'pointer',
-            },
-
-            '& > svg > g > use': {
-              fill: theme.palette.ds.gray_c900,
-            },
-          })}
+          sx={{
+            cursor: 'pointer',
+          }}
         >
-          <Icon.Search />
+          <Icon.Search fill={theme.palette.ds.gray_c900} />
         </InputAdornment>
       }
       {...props}

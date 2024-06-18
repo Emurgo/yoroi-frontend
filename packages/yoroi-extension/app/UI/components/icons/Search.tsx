@@ -21,7 +21,7 @@ export const Search = (props: React.SVGProps<SVGSVGElement>) => (
       <mask id="mask-2" fill="white">
         <use xlinkHref="#path-1"></use>
       </mask>
-      <use id="Fill-1" fill="#6B7384" xlinkHref="#path-1"></use>
+      <use id="Fill-1" fill={props.fill} xlinkHref="#path-1"></use>
     </g>
   </svg>
 );

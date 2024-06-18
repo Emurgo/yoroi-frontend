@@ -19,7 +19,7 @@ export const Tooltip = ({ children, title, ...props }: Props): JSX.Element => {
           sx: {
             color: theme.palette.ds.text_primary_on,
             bgcolor: theme.palette.ds.gray_c900,
-            borderRadius: theme.spacing(0.5),
+            borderRadius: `${theme.shape.borderRadius / 2}px`,
             padding: '5px 12px',
           },
         },

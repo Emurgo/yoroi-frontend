@@ -172,7 +172,7 @@ const LiquidityTable = ({ data, isLoading }: Props): JSX.Element => {
                 component="img"
                 src={minswapPng}
               ></Box>
-              <Typography fontWeight="500" color="ds.primary_c600">
+              <Typography fontWeight="500" color="ds.primary_c500">
                 {row.DEX}
               </Typography>
             </Stack>

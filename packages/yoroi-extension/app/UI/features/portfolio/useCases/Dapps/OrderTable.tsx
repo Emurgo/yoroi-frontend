@@ -111,7 +111,7 @@ const OrderTable = ({ data, isLoading }: Props): JSX.Element => {
             '& td': { border: 0 },
           }}
         >
-          <TableCell sx={{ padding: '7.8px 16px' }}>
+          <TableCell sx={{ padding: `${theme.spacing(1)} ${theme.spacing(2)}` }}>
             <Stack direction="row" alignItems="center" spacing={theme.spacing(1)}>
               <Box
                 width="24px"
@@ -143,7 +143,7 @@ const OrderTable = ({ data, isLoading }: Props): JSX.Element => {
             </Stack>
           </TableCell>
 
-          <TableCell sx={{ padding: '7.8px 16px' }}>
+          <TableCell sx={{ padding: `${theme.spacing(1)} ${theme.spacing(2)}` }}>
             <Stack
               direction="row"
               alignItems="center"
@@ -164,35 +164,35 @@ const OrderTable = ({ data, isLoading }: Props): JSX.Element => {
                 component="img"
                 src={minswapPng}
               ></Box>
-              <Typography fontWeight="500" color="ds.primary_c600">
+              <Typography fontWeight="500" color="ds.primary_c500">
                 {row.DEX}
               </Typography>
             </Stack>
           </TableCell>
 
-          <TableCell sx={{ padding: '7.8px 16px' }}>
+          <TableCell sx={{ padding: `${theme.spacing(1)} ${theme.spacing(2)}` }}>
             <Typography color="ds.gray_c900">{row.assetPrice}</Typography>
           </TableCell>
 
-          <TableCell sx={{ padding: '7.8px 16px' }}>
+          <TableCell sx={{ padding: `${theme.spacing(1)} ${theme.spacing(2)}` }}>
             <Typography color="ds.gray_c900">{row.assetAmount}</Typography>
           </TableCell>
 
-          <TableCell sx={{ padding: '7.8px 16px' }}>
+          <TableCell sx={{ padding: `${theme.spacing(1)} ${theme.spacing(2)}` }}>
             <Typography
               onClick={() =>
                 chrome.tabs.create({
                   url: `https://cardanoscan.io/transaction/${row.transactionId}`,
                 })
               }
-              color="ds.primary_c600"
+              color="ds.primary_c500"
               sx={{ cursor: 'pointer' }}
             >
               {truncateAddressShort(row.transactionId, 10)}
             </Typography>
           </TableCell>
 
-          <TableCell sx={{ padding: '7.8px 16px' }}>
+          <TableCell sx={{ padding: `${theme.spacing(1)} ${theme.spacing(2)}` }}>
             <Stack direction="column" spacing={theme.spacing(0.25)}>
               <Typography color="ds.gray_c900" sx={{ textAlign: 'right' }}>
                 {formatNumber(row.totalValue)} {row.firstToken.name}
