@@ -44,7 +44,7 @@
   "author": "Denis Nebytov (denis@emurgo.io)",
   "license": "ISC",
   "devDependencies": {
-    "@emurgo/cardano-serialization-lib-nodejs": "^11.5.0",
+    "@emurgo/cardano-serialization-lib-nodejs": "^12.0.0-alpha.26",
     "bignumber.js": "^9.1.2",
     "chai": "^4.3.10",
     "chromedriver": "^123.0.4",
