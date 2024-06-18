@@ -1,11 +1,9 @@
 import BasePage from '../pages/basepage.js';
 import { customAfterEach } from '../utils/customHooks.js';
 import TransactionsSubTab from '../pages/wallet/walletTab/walletTransactions.page.js';
-import { testWallet1 } from '../utils/testWallets.js';
 import { expect } from 'chai';
 import { cleanDownloads, getTestLogger, getListOfDownloadedFiles } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
-import { restoreWallet } from '../helpers/restoreWalletHelper.js';
 import driversPoolsManager from '../utils/driversPool.js';
 import { Colors } from '../helpers/constants.js';
 import AddNewWallet from '../pages/addNewWallet.page.js';

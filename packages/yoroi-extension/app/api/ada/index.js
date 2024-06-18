@@ -323,9 +323,6 @@ export type CreateUnsignedTxForConnectorRequest = {|
 |};
 export type CreateUnsignedTxResponse = HaskellShelleyTxSignRequest;
 export type CreateVotingRegTxResponse = HaskellShelleyTxSignRequest;
-export type CreateUnsignedTxFunc = (
-  request: CreateUnsignedTxRequest
-) => Promise<CreateUnsignedTxResponse>;
 
 // createUnsignedTxForUtxos
 

@@ -1,16 +1,16 @@
-import BasePage from '../pages/basepage.js';
-import { customAfterEach } from '../utils/customHooks.js';
-import AddNewWallet from '../pages/addNewWallet.page.js';
-import RestoreWalletStepOne from '../pages/newWalletPages/restoreWalletSteps/restoreWalletStepOne.page.js';
-import RestoreWalletStepTwo from '../pages/newWalletPages/restoreWalletSteps/restoreWalletStepTwo.page.js';
-import WalletDetails from '../pages/newWalletPages/walletDetails.page.js';
-import TransactionsSubTab from '../pages/wallet/walletTab/walletTransactions.page.js';
-import { testWallet1, testWallet2 } from '../utils/testWallets.js';
-import { getPassword } from '../helpers/constants.js';
+import BasePage from '../../pages/basepage.js';
+import { customAfterEach } from '../../utils/customHooks.js';
+import AddNewWallet from '../../pages/addNewWallet.page.js';
+import RestoreWalletStepOne from '../../pages/newWalletPages/restoreWalletSteps/restoreWalletStepOne.page.js';
+import RestoreWalletStepTwo from '../../pages/newWalletPages/restoreWalletSteps/restoreWalletStepTwo.page.js';
+import WalletDetails from '../../pages/newWalletPages/walletDetails.page.js';
+import TransactionsSubTab from '../../pages/wallet/walletTab/walletTransactions.page.js';
+import { testWallet1, testWallet2 } from '../../utils/testWallets.js';
+import { getPassword } from '../../helpers/constants.js';
 import { expect } from 'chai';
-import { getTestLogger } from '../utils/utils.js';
-import { oneMinute } from '../helpers/timeConstants.js';
-import driversPoolsManager from '../utils/driversPool.js';
+import { getTestLogger } from '../../utils/utils.js';
+import { oneMinute } from '../../helpers/timeConstants.js';
+import driversPoolsManager from '../../utils/driversPool.js';
 
 // The test case is based on the issue https://emurgo.atlassian.net/browse/YOEXT-811
 describe('Restoring 15-wallet, clear input and restore other 15-wallet', function () {

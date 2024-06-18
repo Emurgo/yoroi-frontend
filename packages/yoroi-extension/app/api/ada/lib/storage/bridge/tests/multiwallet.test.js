@@ -233,6 +233,7 @@ async function checkPub1HasTx(
             Identifier: '',
             Metadata: {
               assetName: '',
+              logo: null,
               longName: null,
               numberOfDecimals: 6,
               policyId: '',
@@ -352,6 +353,7 @@ async function checkPub2HasTx(
             Identifier: '',
             Metadata: {
               assetName: '',
+              logo: null,
               longName: null,
               numberOfDecimals: 6,
               policyId: '',

@@ -18,6 +18,7 @@ export default function SlippageDialog({
   slippageValue,
 }: Props): React$Node {
   const [selectedSlippage, setSelectedSlippage] = useState(slippageValue);
+  const [inputFocused, setInputFocused] = useState(false);
   const [isManualSlippage, setIsManualSlippage] = useState(
     !defaultSlippages.includes(slippageValue)
   );
@@ -52,20 +53,21 @@ export default function SlippageDialog({
       withCloseButton
       closeOnOverlayClick
       styleContentOverride={{ paddingTop: '16px' }}
+      styleOverride={{ minWidth: '612px', height: '540px', maxWidth: '612px' }}
     >
-      <Box maxWidth="612px" sx={{ margin: '0 auto', flex: 1 }}>
+      <Box sx={{ margin: '0 auto', flex: 1 }}>
         <Box>
-          <Typography component="div" variant="body1" color="grayscale.800">
+          <Typography component="div" variant="body1" color="grayscale.900">
             Default Slippage Tolerance
           </Typography>
         </Box>
-        <Box py="8px">
+        <Box pb="16px" pt="8px">
           <Typography component="div" variant="body2" color="grayscale.700">
             Slippage tolerance is set as a percentage of the total swap value. Your transactions
             will not be executed if the price moves by more than this amount.
           </Typography>
         </Box>
-        <Box display="flex" justifyContent="flex-start">
+        <Box display="flex" justifyContent="flex-start" mb="32px">
           <Tabs
             tabs={defaultSlippages
               .map(val => ({
@@ -89,8 +91,8 @@ export default function SlippageDialog({
           <Box
             component="fieldset"
             sx={{
-              border: '1px solid',
-              borderColor: 'grayscale.400',
+              border: inputFocused && !readonly ? '2px solid' : '1px solid',
+              borderColor: inputFocused && !readonly ? 'common.black' : 'grayscale.400',
               borderRadius: '8px',
               p: '16px',
               display: 'grid',
@@ -100,12 +102,22 @@ export default function SlippageDialog({
               bgcolor: readonly ? 'grayscale.50' : 'common.white',
               columnGap: '6px',
               rowGap: '8px',
+              ...(!inputFocused &&
+                !readonly && {
+                  '&:hover': {
+                    border: '1px solid',
+                    borderColor: 'common.black',
+                  },
+                }),
+              maxHeight: '56px',
             }}
+            onFocus={() => setInputFocused(true)}
+            onBlur={() => setInputFocused(false)}
           >
             <Box
               component="legend"
               sx={{
-                top: '-9px',
+                top: '-7px',
                 left: '16px',
                 position: 'absolute',
                 px: '4px',
@@ -134,14 +146,14 @@ export default function SlippageDialog({
             />
           </Box>
         </Box>
-        <Box my="24px" p="16px" pb="12px" pt="12px" bgcolor="yellow.100" borderRadius="8px">
+        <Box my="24px" p="16px" pt="12px" bgcolor="yellow.100" borderRadius="8px">
           <Typography component="div" variant="body1" color="grayscale.max">
             When the slippage tolerance is set really high, it allows the transaction to still
             complete despite large price swings. This can open the door to front-running and
             sandwich attacks.
           </Typography>
         </Box>
-        <Box>
+        <Box pt="12px">
           <Button
             disabled={selectedSlippage.trim().length === 0}
             fullWidth

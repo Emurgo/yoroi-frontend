@@ -1,9 +1,9 @@
 import { By } from 'selenium-webdriver';
-import { dbSnapshotsDir, testRunDir } from '../helpers/constants.js';
-import { TargetBrowser } from '../helpers/constants.js';
+import { dbSnapshotsDir, TargetBrowser, testRunDir } from '../helpers/constants.js';
 import * as fs from 'node:fs';
 import path from 'path';
 import pkg from 'simple-node-logger';
+import axios from 'axios';
 const { createSimpleFileLogger } = pkg;
 
 export function getMethod(locatorMethod) {
@@ -245,8 +245,24 @@ export const roundUpCurrency = (value, fiatCurrency) => {
   }
 };
 
-export const getSnapshotObjectFromJSON = (dbSnapshotName) => {
+export const diffIsLess1Perc = (valueA, valueB) => {
+  const valueA1Perc = valueA * 0.01;
+  return valueB >= valueA - valueA1Perc && valueB <= valueA + valueA1Perc;
+};
+
+export const getSnapshotObjectFromJSON = dbSnapshotName => {
   const dbSnapshotPath = path.resolve(dbSnapshotsDir, dbSnapshotName);
   const fileContent = getFileContent(dbSnapshotPath);
   return JSON.parse(fileContent);
-}
+};
+
+export const getCurrenciesPrices = async () => {
+  try {
+    const reqResponse = await axios.get(
+      'https://iohk-mainnet.yoroiwallet.com/api/price/ADA/current'
+    );
+    return reqResponse.data.ticker.prices;
+  } catch (error) {
+    throw new Error(`Error happen while getting currencies prices. Error: ${error}`);
+  }
+};

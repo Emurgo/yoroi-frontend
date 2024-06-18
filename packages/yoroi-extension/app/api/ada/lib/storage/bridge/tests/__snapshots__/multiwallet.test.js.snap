@@ -675,6 +675,7 @@ Array [
         "IsNFT": false,
         "Metadata": Object {
           "assetName": "",
+          "logo": null,
           "longName": null,
           "numberOfDecimals": 6,
           "policyId": "",
@@ -691,6 +692,7 @@ Array [
         "IsNFT": false,
         "Metadata": Object {
           "assetName": "",
+          "logo": null,
           "longName": null,
           "numberOfDecimals": 6,
           "policyId": "",
@@ -707,6 +709,7 @@ Array [
         "IsNFT": false,
         "Metadata": Object {
           "assetName": "",
+          "logo": null,
           "longName": null,
           "numberOfDecimals": 6,
           "policyId": "",
@@ -723,6 +726,7 @@ Array [
         "IsNFT": false,
         "Metadata": Object {
           "assetName": "",
+          "logo": null,
           "longName": null,
           "numberOfDecimals": 6,
           "policyId": "",
@@ -739,6 +743,7 @@ Array [
         "IsNFT": false,
         "Metadata": Object {
           "assetName": "",
+          "logo": null,
           "longName": null,
           "numberOfDecimals": 6,
           "policyId": "",

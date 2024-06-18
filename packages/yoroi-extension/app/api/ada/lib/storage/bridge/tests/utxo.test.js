@@ -347,6 +347,7 @@ async function syncingSimpleTransaction(
                       policyId: '',
                       assetName: '',
                       ticker: 'ADA',
+                      logo: null,
                       longName: null,
                       numberOfDecimals: 6
                     },
@@ -385,6 +386,7 @@ async function syncingSimpleTransaction(
                       policyId: '',
                       assetName: '',
                       ticker: 'ADA',
+                      logo: null,
                       longName: null,
                       numberOfDecimals: 6
                     },
@@ -467,6 +469,7 @@ async function syncingSimpleTransaction(
                       policyId: '',
                       assetName: '',
                       ticker: 'ADA',
+                      logo: null,
                       longName: null,
                       numberOfDecimals: 6
                     },
@@ -505,6 +508,7 @@ async function syncingSimpleTransaction(
                       policyId: '',
                       assetName: '',
                       ticker: 'ADA',
+                      logo: null,
                       longName: null,
                       numberOfDecimals: 6
                     },
@@ -543,6 +547,7 @@ async function syncingSimpleTransaction(
                       policyId: '',
                       assetName: '',
                       ticker: 'ADA',
+                      logo: null,
                       longName: null,
                       numberOfDecimals: 6
                     },
