@@ -47,6 +47,7 @@ export const getTestString = (basePart, stringLength, withCapitals) => {
   return __genString(stringLength, basePart, withCapitals);
 };
 
+export const DRIVERS_AMOUNT = 1;
 export const chromeExtIdUrl = `chrome-extension://bdlknlffjjmjckcldekkbejaogpkjphg`;
 export const firefoxExtensionId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 export const firefoxExtIdUrl = `moz-extension://${firefoxExtensionId}`;
