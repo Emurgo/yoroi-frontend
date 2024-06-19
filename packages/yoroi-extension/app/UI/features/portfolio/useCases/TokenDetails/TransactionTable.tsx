@@ -74,13 +74,14 @@ const TransactionTable = ({ history, tokenName }: { history: TransactionItemType
           >
             <TableHead>
               <TableRow>
-                {headCells.map(({ id, align, label }) => (
-                  <TableCell key={id} align={align}>
+                {headCells.map(({ id, align, label }, index) => (
+                  <TableCell key={id} align={align} sx={{ paddingX: index ? theme.spacing(2) : '0' }}>
                     <Typography variant="body2" color="ds.gray_c600">
                       {label}
                     </Typography>
                   </TableCell>
                 ))}
+                <TableCell key={'expand'} sx={{ width: '2.5rem' }}></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -124,7 +125,7 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount, hea
 
   return (
     <TableRow key={`${row.label} ${index}`} sx={{ '& td, & th': { border: 0 } }}>
-      <TableCell key={`${row.label} ${headCells[0].id}`}>
+      <TableCell key={`${row.label} ${headCells[0].id}`} sx={{ paddingX: 0 }}>
         <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
           <IconButton
             disableRipple={true}
@@ -225,13 +226,24 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount, hea
               </Box>
             ) : null}
           </Stack>
-          <Icon.Expand
-            style={{
-              transition: 'all ease 0.3s',
-              transform: isExpanded ? 'rotate(0deg)' : 'rotate(-180deg)',
-            }}
-          />
         </Stack>
+      </TableCell>
+      <TableCell
+        sx={{
+          paddingLeft: 0,
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        <Icon.Expand
+          onClick={() => setIsExpanded(!isExpanded)}
+          style={{
+            marginTop: isExpanded ? 0 : theme.spacing(1),
+            cursor: 'pointer',
+            transition: 'all ease 0.3s',
+            transform: isExpanded ? 'rotate(0deg)' : 'rotate(-180deg)',
+          }}
+        />
       </TableCell>
     </TableRow>
   );

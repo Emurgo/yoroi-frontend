@@ -1,4 +1,4 @@
-import { Stack, Button, Typography } from '@mui/material';
+import { Stack, Button, Typography, Box } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import LiquidityTable from './LiquidityTable';
@@ -115,20 +115,20 @@ const PortfolioDapps = ({ data }: Props) => {
 
       <Stack direction="row">
         {buttonProps.map(button => (
-          <Button
+          <Box
             key={button.label}
             onClick={() => handleChangeTab(button.id)}
             sx={(theme: any) => ({
               height: '2.5rem',
-              minWidth: '9rem',
               textTransform: 'none',
               color: theme.palette.ds.gray_cmax,
               padding: `${theme.spacing(1)} !important`,
               backgroundColor: button.active ? theme.palette.ds.gray_c200 : 'transparent',
+              borderRadius: `${theme.shape.borderRadius}px`,
+              cursor: 'pointer',
             })}
           >
-            {/* @ts-ignore */}
-            <Typography variant="body1" fontWeight="500" sx={{ whiteSpace: 'nowrap' }}>
+            <Typography fontWeight="500" sx={{ whiteSpace: 'nowrap' }}>
               {button.label} (
               {button.id === TableTabs.LIQUIDITY
                 ? liquidityList.length
@@ -139,7 +139,7 @@ const PortfolioDapps = ({ data }: Props) => {
                 : null}
               )
             </Typography>
-          </Button>
+          </Box>
         ))}
       </Stack>
 

@@ -37,7 +37,7 @@ interface Props {
 }
 
 const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element => {
-  const chartHeight = isAda ? 163 : 257;
+  const chartHeight = isAda ? 152 : 254;
   const theme: any = useTheme();
   const strings = useStrings();
   const { unitOfAccount } = usePortfolio();
