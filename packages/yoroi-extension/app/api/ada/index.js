@@ -222,7 +222,7 @@ export type SignAndBroadcastRequest = {|
   password: string,
   sendTx: SendFunc,
 |};
-export type SignAndBroadcastResponse = SignedResponse;
+export type SignAndBroadcastResponse = {| txId: string, signedTxHex: string |};
 export type SignAndBroadcastFunc = (
   request: SignAndBroadcastRequest
 ) => Promise<SignAndBroadcastResponse>;
@@ -727,16 +727,16 @@ export default class AdaApi {
         }
       })
 
-      const response = await request.sendTx({
+      const { txId } = await request.sendTx({
         network: request.publicDeriver.getParent().getNetworkInfo(),
         id: txHash,
         encodedTx,
       });
 
       Logger.debug(
-        `${nameof(AdaApi)}::${nameof(this.signAndBroadcast)} success: ` + stringifyData(response)
+        `${nameof(AdaApi)}::${nameof(this.signAndBroadcast)} success: ` + stringifyData({ txId })
       );
-      return response;
+      return { txId, signedTxHex: Buffer.from(encodedTx).toString('hex') };
     } catch (error) {
       if (error instanceof WrongPassphraseError) {
         throw new IncorrectWalletPasswordError();
@@ -777,29 +777,6 @@ export default class AdaApi {
     }
   }
 
-  async broadcastTrezorSignedTx(
-    request: BroadcastTrezorSignedTxRequest
-  ): Promise<BroadcastTrezorSignedTxResponse> {
-    Logger.debug(`${nameof(AdaApi)}::${nameof(this.broadcastTrezorSignedTx)} called`);
-    try {
-      Logger.debug(`trezorTx::${nameof(this.broadcastTrezorSignedTx)}: called`);
-      const backendResponse = await request.sendTx(request.signedTxRequest);
-
-      Logger.debug(`${nameof(AdaApi)}::${nameof(this.broadcastTrezorSignedTx)} success: ` + stringifyData(backendResponse));
-
-      return backendResponse;
-    } catch (error) {
-      Logger.error(`${nameof(AdaApi)}::${nameof(this.broadcastTrezorSignedTx)} error: ` + stringifyError(error));
-
-      if (error instanceof InvalidWitnessError) {
-        throw new InvalidWitnessError();
-      }
-
-      if (error instanceof LocalizableError) throw error;
-      throw new GenericApiError();
-    }
-  }
-
   async createLedgerSignTxData(
     request: CreateLedgerSignTxDataRequest
   ): Promise<CreateLedgerSignTxDataResponse> {
@@ -824,29 +801,6 @@ export default class AdaApi {
       };
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.createLedgerSignTxData)} error: ` + stringifyError(error));
-
-      if (error instanceof LocalizableError) throw error;
-      throw new GenericApiError();
-    }
-  }
-
-  async broadcastLedgerSignedTx(
-    request: BroadcastLedgerSignedTxRequest
-  ): Promise<BroadcastLedgerSignedTxResponse> {
-    Logger.debug(`${nameof(AdaApi)}::${nameof(this.broadcastLedgerSignedTx)} called`);
-    try {
-      Logger.debug(`ledgerTx::${nameof(this.broadcastLedgerSignedTx)}: called`);
-      const backendResponse = await request.sendTx(request.signedTxRequest);
-
-      Logger.debug(`${nameof(AdaApi)}::${nameof(this.broadcastLedgerSignedTx)} success: ` + stringifyData(backendResponse));
-
-      return backendResponse;
-    } catch (error) {
-      Logger.error(`${nameof(AdaApi)}::${nameof(this.broadcastLedgerSignedTx)} error: ` + stringifyError(error));
-
-      if (error instanceof InvalidWitnessError) {
-        throw new InvalidWitnessError();
-      }
 
       if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
@@ -2075,92 +2029,6 @@ export default class AdaApi {
     }
   }
 
-  async createSubmittedTransactionData(
-    publicDeriver: PublicDeriver<>,
-    signRequest: HaskellShelleyTxSignRequest,
-    txId: string,
-  ): Promise<{|
-    transaction: CardanoShelleyTransaction,
-    usedUtxos: Array<{| txHash: string, index: number |}>
-  |}> {
-    const p = asHasLevels<ConceptualWallet>(publicDeriver);
-    if (!p) {
-      throw new Error(`${nameof(this.createSubmittedTransactionData)} publicDerviver traits missing`);
-    }
-    const derivationTables = p.getParent().getDerivationTables();
-    const deps = Object.freeze({
-      GetPathWithSpecific,
-      GetAddress,
-      GetDerivationSpecific,
-    });
-    const depTables = Object
-      .keys(deps)
-      .map(key => deps[key])
-      .flatMap(table => getAllSchemaTables(publicDeriver.getDb(), table));
-
-    const { utxoAddresses } = await raii(
-      publicDeriver.getDb(),
-      [
-        ...depTables,
-        ...mapToTables(publicDeriver.getDb(), derivationTables),
-      ],
-      dbTx => rawGetAddressRowsForWallet(
-        dbTx,
-        deps,
-        { publicDeriver },
-        derivationTables,
-      ),
-    );
-    const ownAddresses = new Set(
-      utxoAddresses.map(a => a.address.Hash)
-    );
-    const amount = publicDeriver.getParent().getDefaultMultiToken();
-    for (const input of signRequest.inputs()) {
-      amount.joinSubtractMutable(input.value);
-    }
-    for (const withdrawal of signRequest.withdrawals()) {
-      amount.joinSubtractMutable(withdrawal.amount);
-    }
-    let isIntraWallet = true;
-    for (const output of signRequest.outputs()) {
-      if (ownAddresses.has(output.address)) {
-        amount.joinAddMutable(output.value);
-      } else {
-        isIntraWallet = false;
-      }
-    }
-    const usedUtxos = signRequest.senderUtxos.map(utxo => (
-      { txHash: utxo.tx_hash, index: utxo.tx_index }
-    ));
-    const metadata = signRequest.unsignedTx.get_auxiliary_data();
-
-    const transaction = CardanoShelleyTransaction.fromData({
-      txid: txId,
-      type: isIntraWallet ? 'self' : 'expend',
-      amount,
-      fee: signRequest.fee(),
-      date: new Date,
-      addresses: {
-        from: signRequest.inputs(),
-        to: signRequest.outputs(),
-      },
-      state: TxStatusCodes.SUBMITTED,
-      errorMsg: null,
-      block: null,
-      certificates: [],
-      ttl: new BigNumber(String(signRequest.unsignedTx.build().ttl())),
-      metadata: metadata
-        ? Buffer.from(metadata.to_bytes()).toString('hex')
-        : null,
-      withdrawals: signRequest.withdrawals().map(withdrawal => ({
-        address: withdrawal.address,
-        value: withdrawal.amount
-      })),
-      isValid: true,
-    });
-    return { usedUtxos, transaction };
-  }
-
   utxosWithSubmittedTxs(
     originalUtxos: Array<RemoteUnspentOutput>,
     publicDeriverId: number,
@@ -2170,7 +2038,9 @@ export default class AdaApi {
       submittedTxRecord => submittedTxRecord.publicDeriverId === publicDeriverId
     );
     const usedUtxoIds = new Set(
-      filteredSubmittedTxs.flatMap(({ usedUtxos }) => usedUtxos.map(({ txHash, index }) => `${txHash}${index}`))
+      filteredSubmittedTxs.flatMap(({ usedUtxos }) =>
+        (usedUtxos || []).map(({ txHash, index }) => `${txHash}${index}`)
+      )
     );
     // take out UTxOs consumed by submitted transactions
     const utxos = originalUtxos.filter(utxo => !usedUtxoIds.has(utxo.utxo_id));
@@ -2184,7 +2054,7 @@ export default class AdaApi {
 
         const amount =  value.values.find(
           ({ identifier }) => identifier === value.defaults.defaultIdentifier
-        )?.amount || '0';
+        )?.amount.toString() || '0';
         const assets = value.values
           .filter(({ identifier }) => identifier !== value.defaults.defaultIdentifier)
           .map(v => {
@@ -2192,7 +2062,7 @@ export default class AdaApi {
             return {
               policyId,
               name,
-              amount: v.amount,
+              amount: v.amount.toString(),
               assetId: v.identifier,
             };
           });
@@ -2239,7 +2109,9 @@ export default class AdaApi {
       submittedTxRecord => submittedTxRecord.publicDeriverId === publicDeriverId
     );
     const usedUtxoIds = new Set(
-      filteredSubmittedTxs.flatMap(({ usedUtxos }) => usedUtxos.map(({ txHash, index }) => `${txHash}${index}`))
+      filteredSubmittedTxs.flatMap(({ usedUtxos }) =>
+        (usedUtxos || []).map(({ txHash, index }) => `${txHash}${index}`)
+      )
     );
     // take out UTxOs consumed by submitted transactions
     const utxos = originalUtxos.filter(utxo => !usedUtxoIds.has(utxo.utxo_id));
@@ -2253,7 +2125,7 @@ export default class AdaApi {
 
         const amount =  value.values.find(
           ({ identifier }) => identifier === value.defaults.defaultIdentifier
-        )?.amount || '0';
+        )?.amount.toString() || '0';
         const assets = value.values
           .filter(({ identifier }) => identifier !== value.defaults.defaultIdentifier)
           .map(v => {
@@ -2261,7 +2133,7 @@ export default class AdaApi {
             return {
               policyId,
               name,
-              amount: v.amount,
+              amount: v.amount.toString(),
               assetId: v.identifier,
             };
           });

@@ -14,6 +14,7 @@ import type { HWFeatures, } from './ada/lib/storage/database/walletTypes/core/ta
 import WalletTransaction from '../domain/WalletTransaction';
 import type { ReferenceTransaction } from './common';
 import type { WalletAuthEntry } from '../../chrome/extension/connector/types';
+import { deserializeTransactionCtorData } from '../domain/CardanoShelleyTransaction';
 
 /*::
 declare var chrome;
@@ -47,7 +48,18 @@ export async function getDb(): Promise<lf$Database> {
 }
 
 export async function getWallets(): Promise<Array<WalletState>> {
-  return await callBackground({ type: 'get-wallets' });
+  const wallets = await callBackground({ type: 'get-wallets' });
+  for (const wallet of wallets) {
+    wallet.submittedTransactions = wallet.submittedTransactions.map(
+      ({ networkId, publicDeriverId, transaction, usedUtxos }) => ({
+        networkId,
+        publicDeriverId,
+        transaction: deserializeTransactionCtorData(transaction),
+        usedUtxos,
+      })
+    );
+  }
+  return wallets;
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -149,7 +161,8 @@ export async function signAndBroadcastTransaction(
 }
 export type BroadcastTransactionRequestType = {|
   publicDeriverId: number,
-  signedTxHex: string
+  signedTxHex: string,
+  addressedUtxos?: Array<CardanoAddressedUtxo>,
 |};
 export async function broadcastTransaction(request: BroadcastTransactionRequestType) {
   const result = await callBackground({ type: 'broadcast-transaction', request });

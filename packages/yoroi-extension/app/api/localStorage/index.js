@@ -17,6 +17,7 @@ import type { ComplexityLevelType } from '../../types/complexityLevelType';
 import type { WhitelistEntry } from '../../../chrome/extension/connector/types';
 import type { CatalystRoundInfoResponse } from '../ada/lib/state-fetch/types'
 import type { CardanoShelleyTransactionCtorData } from '../../domain/CardanoShelleyTransaction';
+import { deserializeTransactionCtorData } from '../../domain/CardanoShelleyTransaction';
 
 declare var chrome;
 declare var browser;
@@ -402,42 +403,40 @@ export default class LocalStorageApi {
 
 }
 
+
 export type PersistedSubmittedTransaction = {|
-  publicDeriverId: number,
   networkId: number,
-  transaction: Object,
-  usedUtxos: Array<{|
-    txHash: string,
-    index: number,
-  |}>,
+  publicDeriverId: number,
+  transaction: CardanoShelleyTransactionCtorData,
+  usedUtxos: ?Array<{| txHash: string, index: number |}>,
 |};
 
 const STORAGE_API =  window.browser?.storage.local // firefox mv2
   || window.chrome?.storage.local; // chrome mv2 and mv3
 
 export async function persistSubmittedTransactions(
-  submittedTransactions: any,
+  submittedTransactions: Array<PersistedSubmittedTransaction>,
 ): Promise<void> {
   await STORAGE_API.set({
     [storageKeys.SUBMITTED_TRANSACTIONS]: JSON.stringify(submittedTransactions)
   });
 }
 
-export type SubmittedTransactionEntry = {|
-  networkId: number,
-  publicDeriverId: number,
-  transaction: CardanoShelleyTransactionCtorData,
-  usedUtxos: Array<{| txHash: string, index: number |}>,
-|};
-
-export async function loadSubmittedTransactions(): Promise<Array<SubmittedTransactionEntry>> {
+export async function loadSubmittedTransactions(): Promise<Array<PersistedSubmittedTransaction>> {
   const stored = await new Promise(
     resolve => STORAGE_API.get(storageKeys.SUBMITTED_TRANSACTIONS, resolve)
   );
   if (stored == null || stored[storageKeys.SUBMITTED_TRANSACTIONS] == null) {
     return [];
   }
-  return JSON.parse(stored[storageKeys.SUBMITTED_TRANSACTIONS]);
+  return JSON.parse(stored[storageKeys.SUBMITTED_TRANSACTIONS]).map(
+    ({ networkId, publicDeriverId, transaction, usedUtxos }) => ({
+      networkId,
+      publicDeriverId,
+      transaction: deserializeTransactionCtorData(transaction),
+      usedUtxos,
+    })
+  );
 }
 
 export async function loadCatalystRoundInfo(): Promise<?CatalystRoundInfoResponse> {

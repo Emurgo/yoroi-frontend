@@ -122,7 +122,7 @@ import type { ConnectedSite } from './content';
 import { subscribeWalletStateChanges } from '../state';
 import AdaApi, { genOwnStakingKey } from '../../../../app/api/ada';
 import { loadWalletsFromStorage } from '../../../../app/api/ada/lib/storage/models/load';
-import { getWalletState } from './utils';
+import { getWalletState, batchLoadSubmittedTransactions } from './utils';
 import { getCardanoStateFetcher } from '../utils';
 import { removePublicDeriver } from '../../../../app/api/ada/lib/storage/bridge/walletBuilder/remove';
 import { GetToken } from '../../../../app/api/ada/lib/storage/database/primitives/api/read';
@@ -641,8 +641,9 @@ export async function yoroiMessageHandler(
   } else if (request.type === YOROI_MESSAGES.GET_WALLETS) {
     const db = await getDb();
     const publicDerivers = await loadWalletsFromStorage(db);
-    const result = await Promise.all(publicDerivers.map(getWalletState));
-    sendResponse(result);
+    const walletStates = await Promise.all(publicDerivers.map(getWalletState));
+    await batchLoadSubmittedTransactions(walletStates);
+    sendResponse(walletStates);
   } else if (request.type === YOROI_MESSAGES.CHANGE_SIGNING_PASSWORD) {
     const publicDeriver = await getPublicDeriverById(request.request.publicDeriverId);
     if (publicDeriver) {
@@ -726,13 +727,21 @@ export async function yoroiMessageHandler(
       };
       const stateFetcher = await getCardanoStateFetcher(new LocalStorageApi());
       const adaApi = new AdaApi();
-      const { txId } = await adaApi.signAndBroadcast({
+      const { txId, signedTxHex, } = await adaApi.signAndBroadcast({
         publicDeriver: withSigning,
         password: request.request.password,
         signRequest,
         sendTx: stateFetcher.sendTx,
       });
-
+      // fixme: notify submitted tx change
+      try {
+        await RustModule.WasmScope(Scope => connectorRecordSubmittedCardanoTransaction(
+          publicDeriver,
+          Scope.WalletV4.Transaction.from_hex(signedTxHex)
+        ));
+      } catch (_error) {
+        // ignore
+      }
       sendResponse({ txId });
     } catch (error) {
       sendResponse({ error: error.message });
@@ -907,6 +916,15 @@ export async function yoroiMessageHandler(
         id: '', // we know this is not important
         encodedTx: Buffer.from(request.request.signedTxHex, 'hex'),
       });
+      try {
+        await RustModule.WasmScope(Scope => connectorRecordSubmittedCardanoTransaction(
+          publicDeriver,
+          Scope.WalletV4.Transaction.from_hex(request.request.signedTxHex),
+          request.request.addressedUtxos,
+        ));
+      } catch (_error) {
+        // ignore
+      }
       sendResponse(null);
     } catch (error) {
       sendResponse({ error: error.message });

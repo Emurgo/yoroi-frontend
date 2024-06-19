@@ -38,6 +38,7 @@ import BigNumber from 'bignumber.js';
 import { asAddressedUtxo, cardanoValueFromRemoteFormat } from '../../../../app/api/ada/transactions/utils';
 import { MultiToken } from '../../../../app/api/common/lib/MultiToken';
 import { RustModule } from '../../../../app/api/ada/lib/cardanoCrypto/rustLoader';
+import { loadSubmittedTransactions } from '../../../../app/api/localStorage';
 
 export async function getWalletState(publicDeriver: PublicDeriver<>): Promise<WalletState> {
   return RustModule.WasmScope(async ({ WalletV4 }) => {
@@ -200,4 +201,19 @@ export async function getWalletState(publicDeriver: PublicDeriver<>): Promise<Wa
       submittedTransactions: [],
     };
   });
+}
+
+export async function batchLoadSubmittedTransactions(walletStates: Array<WalletState>) {
+  const walletStateByIdMap = new Map();
+  for (const walletState of walletStates) {
+    walletStateByIdMap.set(walletState.publicDeriverId, walletState);
+  }
+
+  const allSubmittedTxs = await loadSubmittedTransactions();
+  for (const submittedTx of allSubmittedTxs) {
+    const walletState = walletStateByIdMap.get(submittedTx.publicDeriverId);
+    if (walletState) {
+      walletState.submittedTransactions.push(submittedTx);
+    }
+  }
 }

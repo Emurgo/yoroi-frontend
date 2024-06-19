@@ -47,7 +47,6 @@ import { PRIMARY_ASSET_CONSTANTS } from '../../api/ada/lib/storage/database/prim
 import type { NetworkRow, AddressRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
 import moment from 'moment';
-import { loadSubmittedTransactions, persistSubmittedTransactions, } from '../../api/localStorage';
 import { getAllAddressesForWallet } from '../../api/ada/lib/storage/bridge/traitUtils';
 import { toRequestAddresses } from '../../api/ada/lib/storage/bridge/updateTransactions'
 import type { TransactionExportRow } from '../../api/export';
@@ -73,13 +72,6 @@ export type TxHistoryState = {|
 
 const EXPORT_START_DELAY = 800; // in milliseconds [1000 = 1sec]
 
-type SubmittedTransactionEntry = {|
-  networkId: number,
-  publicDeriverId: number,
-  transaction: WalletTransaction,
-  usedUtxos: Array<{| txHash: string, index: number |}>,
-|};
-
 function getCoinsPerUtxoWord(network: $ReadOnly<NetworkRow>): RustModule.WalletV4.BigNum {
   const config = getCardanoHaskellBaseConfig(network).reduce(
     (acc, next) => Object.assign(acc, next),
@@ -101,8 +93,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
   /** Track banners open status */
   @observable showDelegationBanner: boolean = true;
-
-  @observable _submittedTransactions: Array<SubmittedTransactionEntry> = [];
 
   /*
    * This transient state only used to store a flag that a reward withdrawal has been processed for some wallet.
@@ -132,14 +122,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     actions.exportTransactionsToFile.listen(this._exportTransactionsToFile);
     actions.closeExportTransactionDialog.listen(this._closeExportTransactionDialog);
     actions.closeDelegationBanner.listen(this._closeDelegationBanner);
-    /*
-    this._loadSubmittedTransactions();
-    window.chrome.runtime.onMessage.addListener(message => {
-      if (message === 'connector-tx-submitted') {
-        runInAction(this._loadSubmittedTransactions);
-      }
-    });
-    */
   }
 
   /** Calculate information about transactions that are still realistically reversible */
@@ -159,10 +141,10 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return [];
     const { txs } = this.getTxHistoryState(publicDeriver.publicDeriverId);
-    return  [
-      // ...this.getSubmittedTransactions(publicDeriver.publicDeriverId),
-      ...txs,
-    ];
+    const submittedTxs = publicDeriver.submittedTransactions.map(
+      ({ transaction }) => CardanoShelleyTransaction.fromData(transaction)
+    );
+    return  [ ...submittedTxs, ...txs ];
   }
 
   @computed get hasAny(): boolean {
@@ -270,26 +252,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       defaultToken: ticker,
     });
     */
-    let submittedTransactionsChanged = false;
-
-    runInAction(() => {
-      for (let i = 0; i < this._submittedTransactions.length; ) {
-        const txId = this._submittedTransactions[i].transaction.txid;
-        if (remoteTransactionIds.has(txId)) {
-          if (withdrawalIds.has(txId)) {
-            // Set local processed withdrawals only if there was a pending local transaction
-            this._processedWithdrawals.add(publicDeriver.publicDeriverId);
-          }
-          this._submittedTransactions.splice(i, 1);
-          submittedTransactionsChanged = true;
-        } else {
-          i++;
-        }
-      }
-    });
-    if (submittedTransactionsChanged) {
-      // this._persistSubmittedTransactions();
-    }
 
     // reload token info cache
     await this.stores.tokenInfoStore.refreshTokenInfo();
@@ -709,142 +671,4 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   clearProcessedWithdrawals: ({ publicDeriverId: number, ... }) => void = (publicDeriver) => {
     this._processedWithdrawals.delete(publicDeriver.publicDeriverId);
   }
-
-  /*
-  @action
-  recordSubmittedTransaction: (
-    PublicDeriver<>,
-    WalletTransaction,
-    Array<{| txHash: string, index: number |}>
-  ) => void = (publicDeriver, transaction, usedUtxos) => {
-    this._submittedTransactions.push({
-      publicDeriverId: publicDeriver.publicDeriverId,
-      networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
-      transaction,
-      usedUtxos,
-    });
-    this._persistSubmittedTransactions();
-  };
-
-  getSubmittedTransactions: (PublicDeriver<>) => Array<WalletTransaction> = publicDeriver => {
-    return this._submittedTransactions
-      .filter(({ publicDeriverId }) => publicDeriverId === publicDeriver.publicDeriverId)
-      .map(tx => tx.transaction);
-  };
-
-  @action
-  clearSubmittedTransactions: (PublicDeriver<>) => void = publicDeriver => {
-    for (let i = 0; i < this._submittedTransactions.length; ) {
-      if (this._submittedTransactions[i].publicDeriverId === publicDeriver.publicDeriverId) {
-        this._submittedTransactions.splice(i, 1);
-      } else {
-        i++;
-      }
-    }
-    this._persistSubmittedTransactions();
-  };
-
-  _persistSubmittedTransactions: () => void = () => {
-    persistSubmittedTransactions(this._submittedTransactions);
-  };
-
-  _loadSubmittedTransactions: () => Promise<void> = async () => {
-    try {
-      const data = await loadSubmittedTransactions();
-      if (!data) {
-        return;
-      }
-      // token id set in submitted transactions, grouped by the network id
-      const tokenIds: Map<number, Set<string>> = new Map();
-      const txs = data
-        .map(({ publicDeriverId, transaction, networkId }) => {
-          if (transaction.block) {
-            throw new Error('submitted transaction should not have block data');
-          }
-          const txCtorData = {
-            txid: transaction.txid,
-            block: null,
-            type: transaction.type,
-            amount: MultiToken.from(transaction.amount),
-            fee: MultiToken.from(transaction.fee),
-            date: new Date(transaction.date),
-            addresses: {
-              from: transaction.addresses.from.map(({ address, value }) => ({
-                address,
-                value: MultiToken.from(value),
-              })),
-              to: transaction.addresses.to.map(({ address, value }) => ({
-                address,
-                value: MultiToken.from(value),
-              })),
-            },
-            state: transaction.state,
-            errorMsg: transaction.errorMsg,
-          };
-          let tx;
-
-          const network: ?NetworkRow = (Object.values(networks): Array<any>).find(
-            ({ NetworkId }) => NetworkId === networkId
-          );
-          if (!network) {
-            return;
-          }
-
-          if (isCardanoHaskell(network)) {
-            runInAction(() => {
-              tx = new CardanoShelleyTransaction({
-                  ...txCtorData,
-                certificates: transaction.certificates,
-                ttl: new BigNumber(transaction.ttl),
-                metadata: transaction.metadata,
-                withdrawals: transaction.withdrawals.map(({ address, value }) => ({
-                  address,
-                  value: MultiToken.from(value)
-                })),
-                isValid: transaction.isValid,
-              });
-            });
-          } else {
-            return;
-          }
-
-          let tokenIdSet = tokenIds.get(networkId);
-          if (!tokenIdSet) {
-            tokenIdSet = new Set();
-            tokenIds.set(networkId, tokenIdSet);
-          }
-
-          // just to please flow
-          if (tx == null) {
-            return;
-          }
-
-          tx.addresses.from.flatMap(
-            ({ value }) => value.values.map(tokenEntry => tokenEntry.identifier)
-          ).forEach(tokenId => tokenIdSet?.add(tokenId));
-          tx.addresses.to.flatMap(
-            ({ value }) => value.values.map(tokenEntry => tokenEntry.identifier)
-          ).forEach(tokenId => tokenIdSet?.add(tokenId));
-
-          return {
-            publicDeriverId,
-            transaction: tx,
-            networkId,
-          };
-        })
-        .filter(Boolean);
-
-      for (const [networkId, tokenIdSet] of tokenIds.entries()) {
-        await this.stores.tokenInfoStore.fetchMissingTokenInfo(networkId, [...tokenIdSet]);
-      }
-
-      runInAction(() => {
-        this._submittedTransactions.splice(0, 0, ...txs);
-      });
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(error);
-    }
-  };
-  */
 }

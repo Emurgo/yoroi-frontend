@@ -28,6 +28,7 @@ import { generateRegistrationMetadata } from '../../../api/ada/lib/cardanoCrypto
 import { derivePublicByAddressing } from '../../../api/ada/lib/cardanoCrypto/deriveByAddressing';
 import type { Addressing } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackaged/networks.js';
+import { broadcastTransaction } from '../../../api/thunk';
 
 /** Note: Handles Trezor Signing */
 export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
@@ -216,13 +217,9 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
         RustModule.WalletV4.hash_transaction(txBody).to_bytes()
       ).toString('hex');
 
-      await this.api.ada.broadcastTrezorSignedTx({
-        signedTxRequest: {
-          network,
-          id: txId,
-          encodedTx: signedTx.to_bytes(),
-        },
-        sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
+      await broadcastTransaction({
+        publicDeriverId: request.wallet.publicDeriverId,
+        signedTxHex: signedTx.to_hex(),
       });
       return { txId };
     } catch (error) {

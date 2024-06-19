@@ -189,3 +189,35 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
     return features;
   }
 }
+
+// fix BigNumber and MultiToken values after deserialization
+export function deserializeTransactionCtorData(serializedData: Object): CardanoShelleyTransactionCtorData {
+  return {
+    txid: serializedData.txid,
+    block: null,
+    type: serializedData.type,
+    amount: MultiToken.from(serializedData.amount),
+    fee: MultiToken.from(serializedData.fee),
+    date: new Date(serializedData.date),
+    addresses: {
+      from: serializedData.addresses.from.map(({ address, value }) => ({
+        address,
+        value: MultiToken.from(value),
+      })),
+      to: serializedData.addresses.to.map(({ address, value }) => ({
+        address,
+        value: MultiToken.from(value),
+      })),
+    },
+    state: serializedData.state,
+    errorMsg: serializedData.errorMsg,
+    certificates: serializedData.certificates,
+    ttl: new BigNumber(serializedData.ttl),
+    metadata: serializedData.metadata,
+    withdrawals: serializedData.withdrawals.map(({ address, value }) => ({
+      address,
+      value: MultiToken.from(value)
+    })),
+    isValid: serializedData.isValid,
+  };
+}

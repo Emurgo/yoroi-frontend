@@ -46,6 +46,7 @@ import {
   generateCip15RegistrationMetadata,
 } from '../../../api/ada/lib/cardanoCrypto/catalyst';
 import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackaged/networks.js';
+import { broadcastTransaction } from '../../../api/thunk';
 
 /** Note: Handles Ledger Signing */
 export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
@@ -304,20 +305,12 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
         metadata,
       );
 
-      await this.api.ada.broadcastLedgerSignedTx({
-        signedTxRequest: {
-          network,
-          id: txId,
-          encodedTx: signedTx.to_bytes(),
-        },
-        sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
+      await broadcastTransaction({
+        publicDeriverId: request.publicDeriverId,
+        signedTxHex: signedTx.to_hex(),
       });
 
-      Logger.info('SUCCESS: ADA sent using Ledger SignTx');
-
-      return {
-        txId,
-      };
+      return { txId };
     } catch (error) {
       Logger.error(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcast)} error: ` + stringifyError(error));
       throw new convertToLocalizableError(error);

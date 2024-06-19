@@ -39,27 +39,4 @@ export default class AdaTransactionsStore extends Store<StoresMap, ActionsMap> {
   refreshPendingTransactions: RefreshPendingTransactionsFunc = (request) => {
     return this.api.ada.refreshPendingTransactions(request);
   }
-
-  recordSubmittedTransaction: (
-    PublicDeriver<>,
-    HaskellShelleyTxSignRequest,
-    string,
-  ) => Promise<void> = async (
-    publicDeriver,
-    signRequest,
-    txId,
-  ) => {
-    const { usedUtxos, transaction } = await this.api.ada.createSubmittedTransactionData(
-      publicDeriver,
-      signRequest,
-      txId,
-    );
-    /*
-    this.stores.transactions.recordSubmittedTransaction(
-      publicDeriver,
-      transaction,
-      usedUtxos,
-    );
-    */
-  }
 }

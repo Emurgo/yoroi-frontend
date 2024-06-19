@@ -51,7 +51,6 @@ import {
   connectorGetChangeAddress,
   _connectorGetUnusedAddresses,
   _connectorGetUsedAddresses,
-  connectorRecordSubmittedCardanoTransaction,
   connectorSendTxCardano,
   getScriptRequiredSigningKeys,
   resolveTxOrTxBody,
@@ -318,7 +317,11 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       // sign and send the tx
       let txId;
       try {
-        txId = await this.signAndSendReorgTx(wallet, password);
+        txId = await this.signAndSendReorgTx(
+          wallet,
+          password,
+          asAddressedUtxo(signingMessage.sign.tx.utxos),
+        );
       } catch (error) {
         if (error instanceof WrongPassphraseError) {
           runInAction(() => {
@@ -331,20 +334,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         });
         return;
       }
-      /*
-      try {
-        if (signingMessage.sign.type !== 'tx-reorg/cardano') {
-          throw new Error('unexpected signing data type');
-        }
-        await connectorRecordSubmittedCardanoTransaction(
-          wallet.publicDeriver,
-          signedTx,
-          asAddressedUtxo(signingMessage.sign.tx.utxos)
-        );
-      } catch {
-        // ignore
-      }
-      */
       const utxos = this.getUtxosAfterReorg(txId);
       sendData = {
         type: 'sign_confirmed',
@@ -950,9 +939,12 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       };
     });
   };
-  signAndSendReorgTx: (WalletState, string) => Promise<string> = async (
-    publicDeriver,
-    password
+  signAndSendReorgTx: (
+    WalletState,
+    string,
+    Array<CardanoAddressedUtxo>
+  ) => Promise<string> = async (
+    publicDeriver, password, addressedUtxos
   ) => {
     const signRequest = this.reorgTxSignRequest;
 
@@ -973,7 +965,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       );
       await broadcastTransaction({
         signedTxHex: signedTx.to_hex(),
-        publicDeriverId: publicDeriver.publicDeriverId
+        publicDeriverId: publicDeriver.publicDeriverId,
+        addressedUtxos,
       });
     }
     return RustModule.WalletV4.hash_transaction(

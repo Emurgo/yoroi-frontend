@@ -87,7 +87,6 @@ import {
   derivePublicByAddressing
 } from '../../../app/api/ada/lib/cardanoCrypto/deriveByAddressing';
 import type { DefaultTokenEntry } from '../../../app/api/common/lib/MultiToken';
-import type { SubmittedTransactionEntry } from '../../../app/api/localStorage';
 axios.defaults.adapter = fetchAdapter;
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
@@ -399,7 +398,7 @@ async function getOutputAddressesInSubmittedTxs(publicDeriverId: number) {
 }
 
 export function _getOutputAddressesInSubmittedTxs(
-  walletSubmittedTxs: Array<SubmittedTransactionEntry>
+  walletSubmittedTxs: Array<PersistedSubmittedTransaction>
 ): Array<string> {
   return walletSubmittedTxs
     .flatMap(({ transaction }) => {
@@ -451,7 +450,7 @@ export async function connectorGetUnusedAddresses(wallet: PublicDeriver<>): Prom
 }
 export async function _connectorGetUnusedAddresses(
   unusedAddresses: Array<Address>,
-  walletSubmittedTxs: Array<SubmittedTransactionEntry>,
+  walletSubmittedTxs: Array<PersistedSubmittedTransaction>,
 ): Promise<Address[]> {
   const outputAddressesInSubmittedTxs = new Set(
     _getOutputAddressesInSubmittedTxs(walletSubmittedTxs)
@@ -1023,7 +1022,7 @@ export async function connectorSendTxCardano(
 export async function connectorRecordSubmittedCardanoTransaction(
   publicDeriver: PublicDeriver<>,
   tx: RustModule.WalletV4.Transaction,
-  addressedUtxos?: Array<CardanoAddressedUtxo>,
+  addressedUtxos?: ?Array<CardanoAddressedUtxo>,
 ) {
   const withUtxos = asGetAllUtxos(publicDeriver);
   if (!withUtxos) {
