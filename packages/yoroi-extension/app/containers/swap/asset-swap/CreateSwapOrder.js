@@ -17,8 +17,6 @@ import { TopActions } from './actions/TopActions';
 import { MiddleActions } from './actions/MiddleActions';
 import { EditSlippage } from './actions/EditSlippage';
 import { useSwapForm } from '../context/swap-form';
-import { runInAction } from 'mobx';
-import type { State } from '../context/swap-form/types';
 
 type Props = {|
   slippageValue: string,
@@ -28,25 +26,6 @@ type Props = {|
   getTokenInfo: string => Promise<RemoteTokenInfo>,
   priceImpactState: ?PriceImpact,
 |};
-
-function updatePoolsIfNeeded<T>(
-  tokenA: string,
-  tokenB: string,
-  state: State<?string>,
-  api: {| byPair: ({| tokenA: string, tokenB: string |}) => Promise<T> |},
-  submit: T => void) {
-  if (tokenA != null && tokenB != null && tokenA !== tokenB) {
-    const pair = `${tokenA}:${tokenB}`;
-    if (pair !== state.value) {
-      runInAction(() => {
-        state.update(pair);
-      });
-      api.byPair({ tokenA, tokenB })
-        .then(pools => submit(pools))
-        .catch(err => console.warn(`Failed to fetch pools for pair: ${pair}`, err));
-    }
-  }
-}
 
 export const CreateSwapOrder = ({
   slippageValue,
@@ -60,19 +39,16 @@ export const CreateSwapOrder = ({
   const [prevSelectedPoolId, setPrevSelectedPoolId] = useState<?string>(undefined);
 
   const {
-    pools,
     orderData: {
-      amounts: { sell, buy },
       type: orderType,
       selectedPoolCalculation,
     },
     // unsignedTxChanged,
     sellTokenInfoChanged,
     buyTokenInfoChanged,
-    poolPairsChanged,
   } = useSwap();
 
-  const { onChangeLimitPrice, selectedPairState } = useSwapForm();
+  const { onChangeLimitPrice } = useSwapForm();
 
   const resetLimitPrice = () => {
     onChangeLimitPrice('');
@@ -85,14 +61,6 @@ export const CreateSwapOrder = ({
       resetLimitPrice();
     }
   }
-
-  updatePoolsIfNeeded(
-    sell.tokenId,
-    buy.tokenId,
-    selectedPairState,
-    pools.list,
-    poolPairsChanged,
-  );
 
   return (
     <>
