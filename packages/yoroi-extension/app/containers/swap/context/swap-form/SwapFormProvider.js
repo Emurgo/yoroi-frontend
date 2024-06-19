@@ -157,7 +157,6 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
   // on token pair changes
   useEffect(() => {
     if (sellTokenId != null && buyTokenId != null && sellTokenId !== buyTokenId) {
-      console.log('fetching pools for pair: ', sellTokenId, buyTokenId);
       pools.list.byPair({ tokenA: sellTokenId, tokenB: buyTokenId })
         .then(poolsArray => poolPairsChanged(poolsArray))
         .catch(err => console.error(`Failed to fetch pools for pair: ${sellTokenId}/${buyTokenId}`, err));
