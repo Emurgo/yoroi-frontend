@@ -13,7 +13,6 @@ import SelectSellTokenFromList from './edit-sell-amount/SelectSellTokenFromList'
 import EditSwapPool from './edit-pool/EditPool';
 import SelectSwapPoolFromList from './edit-pool/SelectPoolFromList';
 import SwapStore from '../../../stores/ada/SwapStore';
-import { useAsyncPools } from '../hooks';
 import { TopActions } from './actions/TopActions';
 import { MiddleActions } from './actions/MiddleActions';
 import { EditSlippage } from './actions/EditSlippage';
@@ -41,7 +40,6 @@ export const CreateSwapOrder = ({
 
   const {
     orderData: {
-      amounts: { sell, buy },
       type: orderType,
       selectedPoolCalculation,
     },
@@ -63,11 +61,6 @@ export const CreateSwapOrder = ({
       resetLimitPrice();
     }
   }
-
-  // TODO: refactor, this hook call will be removed and replaced with store function
-  useAsyncPools(sell.tokenId, buy.tokenId)
-    .then(() => null)
-    .catch(() => null);
 
   return (
     <>

@@ -20,11 +20,20 @@ const messages = defineMessages({
     id: 'wallet.transaction.success.explanation',
     defaultMessage: '!!!Check this transaction in the list of wallet transactions',
   },
+  sellSendDone: {
+    id: 'wallet.transactions.success.sell',
+    defaultMessage: '!!!Transaction has been submitted',
+  },
+  goToExchange: {
+    id: 'wallet.transactions.success.button.exchange',
+    defaultMessage: '!!!Go to the exchange page',
+  },
 });
 
 type Props = {|
   +onClose: void => PossiblyAsync<void>,
   +classicTheme: boolean,
+  +process: 'for-sell' | 'normal',
 |};
 
 @observer
@@ -41,7 +50,9 @@ export default class TransactionSuccessDialog extends Component<Props> {
         title={intl.formatMessage(messages.title)}
         actions={[
           {
-            label: intl.formatMessage(globalMessages.goToTransactions),
+            label: intl.formatMessage(
+              this.props.process === 'normal' ? globalMessages.goToTransactions : messages.goToExchange
+            ),
             onClick: this.props.onClose,
             primary: true,
           },
@@ -58,7 +69,9 @@ export default class TransactionSuccessDialog extends Component<Props> {
             textAlign="center"
             maxWidth="400px"
           >
-            {intl.formatMessage(messages.explanation)}
+            {intl.formatMessage(
+              this.props.process === 'normal' ? messages.explanation: messages.sellSendDone
+            )}
           </Typography>
         </Stack>
       </Dialog>
