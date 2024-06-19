@@ -40,11 +40,11 @@ const PortfolioHeader = ({ balance, setKeyword, isLoading, tooltipTitle }: Props
             <Skeleton width="146px" height="24px" />
           ) : (
             <Typography variant="h2" fontWeight="500" color="ds.gray_cmax">
-              {isAdaMainUnit ? formatNumber(balance.ada) : formatNumber(balance.usd)}
+              {isAdaMainUnit ? formatNumber(balance.usd) : formatNumber(balance.ada)}
             </Typography>
           )}
           <Typography variant="body2" fontWeight="500" color="ds.black_static">
-            {isAdaMainUnit ? settingFiatPairUnit.currency || 'USD' : 'ADA'}
+            {isAdaMainUnit ? 'ADA' : unitOfAccount}
             <Typography
               component="span"
               variant="body2"
@@ -57,7 +57,7 @@ const PortfolioHeader = ({ balance, setKeyword, isLoading, tooltipTitle }: Props
                 marginTop: '5px',
               }}
             >
-              {isAdaMainUnit ? '/ADA' : `/${unitOfAccount}`}
+              {isAdaMainUnit ? (settingFiatPairUnit.currency ? `/${settingFiatPairUnit.currency}` : '/USD') : '/ADA'}
             </Typography>
           </Typography>
         </Stack>
@@ -67,7 +67,8 @@ const PortfolioHeader = ({ balance, setKeyword, isLoading, tooltipTitle }: Props
             <Skeleton width="129px" height="16px" />
           ) : (
             <Typography color="ds.gray_c600">
-              {isAdaMainUnit ? formatNumber(balance.usd) : formatNumber(balance.ada)} {isAdaMainUnit ? 'ADA' : unitOfAccount}
+              {isAdaMainUnit ? formatNumber(balance.ada) : formatNumber(balance.usd)}{' '}
+              {isAdaMainUnit ? settingFiatPairUnit.currency || 'USD' : 'ADA'}
             </Typography>
           )}
           {isLoading ? (

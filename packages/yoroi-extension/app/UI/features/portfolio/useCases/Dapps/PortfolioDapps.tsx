@@ -1,4 +1,4 @@
-import { Stack, Button, Typography, Box } from '@mui/material';
+import { Stack, Typography, Box } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import LiquidityTable from './LiquidityTable';
