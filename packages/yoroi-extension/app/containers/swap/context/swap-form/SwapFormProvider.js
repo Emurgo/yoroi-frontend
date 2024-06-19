@@ -1,9 +1,9 @@
 //@flow
 import type { Node } from 'react';
-import type { SwapFormAction, SwapFormState } from './types';
-import type { AssetAmount } from '../../../../components/swap/types';
 import { useCallback, useEffect, useReducer, useState } from 'react';
+import type { SwapFormAction, SwapFormState } from './types';
 import { StateWrap, SwapFormActionTypeValues } from './types';
+import type { AssetAmount } from '../../../../components/swap/types';
 import { useSwap } from '@yoroi/swap';
 import Context from './context';
 import { Quantities } from '../../../../utils/quantities';
@@ -21,6 +21,7 @@ const numberLocale = { decimalSeparator: '.' };
 
 export default function SwapFormProvider({ swapStore, children }: Props): Node {
   const {
+    pools,
     orderData,
     resetState,
     buyQuantityChanged,
@@ -29,10 +30,11 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
     switchTokens,
     resetQuantities,
     limitPriceChanged,
+    poolPairsChanged,
   } = useSwap();
 
-  const { quantity: buyQuantity } = orderData.amounts.buy;
-  const { quantity: sellQuantity } = orderData.amounts.sell;
+  const { quantity: sellQuantity, tokenId: sellTokenId } = orderData.amounts.sell;
+  const { quantity: buyQuantity, tokenId: buyTokenId } = orderData.amounts.buy;
 
   const swapFormReducer = (state: SwapFormState, action: SwapFormAction) => {
     const draft = { ...state };
@@ -148,8 +150,18 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
       });
     }
   }, []);
+
   // on unmount
   useEffect(() => () => actions.resetSwapForm(), []);
+
+  // on token pair changes
+  useEffect(() => {
+    if (sellTokenId != null && buyTokenId != null && sellTokenId !== buyTokenId) {
+      pools.list.byPair({ tokenA: sellTokenId, tokenB: buyTokenId })
+        .then(poolsArray => poolPairsChanged(poolsArray))
+        .catch(err => console.error(`Failed to fetch pools for pair: ${sellTokenId}/${buyTokenId}`, err));
+    }
+  }, [sellTokenId, buyTokenId]);
 
   const clearErrors = useCallback(() => {
     if (swapFormState.sellQuantity.error != null) actions.sellAmountErrorChanged(null);
