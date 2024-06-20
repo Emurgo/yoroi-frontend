@@ -150,7 +150,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
               <Menu options={subMenuOptions} onItemClick={(route: string) => setSelectedTab(route)} isActiveItem={isActiveItem} />
               <Divider sx={{ margin: `0 ${theme.spacing(3)}` }} />
             </Box>
-            <Box sx={{ padding: theme.spacing(3) }}>
+            <Box sx={{ px: theme.spacing(3), pt: theme.spacing(3), pb: theme.spacing(2) }}>
               {selectedTab === subMenuOptions[0]?.route ? (
                 <TabContent>
                   <TokenDetailPerformance tokenInfo={tokenInfo} isLoading={isLoading} />

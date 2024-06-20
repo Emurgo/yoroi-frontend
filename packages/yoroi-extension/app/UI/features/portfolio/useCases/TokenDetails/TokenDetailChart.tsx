@@ -37,7 +37,7 @@ interface Props {
 }
 
 const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element => {
-  const chartHeight = isAda ? 152 : 254;
+  const chartHeight = isAda ? 153 : 257;
   const theme: any = useTheme();
   const strings = useStrings();
   const { unitOfAccount } = usePortfolio();
@@ -76,7 +76,11 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
   };
 
   return (
-    <Stack direction="column" spacing={theme.spacing(4)} sx={{ width: '100%', padding: theme.spacing(3) }}>
+    <Stack
+      direction="column"
+      spacing={theme.spacing(4)}  
+      sx={{ width: '100%', px: theme.spacing(3), pt: theme.spacing(2.5), pb: theme.spacing(3) }}
+    >
       <Stack direction="row" justifyContent="space-between" alignItems="center">
         {isFetching ? (
           <Skeleton width="131px" height="13px" />
