@@ -37,7 +37,6 @@ const FRONTEND_FEE_ADDRESS_PREPROD =
   'addr_test1qrgpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqzp57km';
 
 export default class SwapStore extends Store<StoresMap, ActionsMap> {
-  @observable limitOrderDisplayValue: string = '';
   @observable orderStep: number = 0;
   @observable transactionTimestamps: { [string]: Date } = {};
 
@@ -45,14 +44,6 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
     'SwapStore.swapDisclaimerAcceptanceFlag',
     false
   );
-
-  @action setLimitOrderDisplayValue: string => void = (val: string) => {
-    this.limitOrderDisplayValue = val;
-  };
-
-  @action resetLimitOrderDisplayValue: void => void = () => {
-    this.limitOrderDisplayValue = '';
-  };
 
   @action setOrderStepValue: number => void = (val: number) => {
     this.orderStep = val;
