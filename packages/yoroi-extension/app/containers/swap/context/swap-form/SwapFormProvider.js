@@ -10,7 +10,6 @@ import { Quantities } from '../../../../utils/quantities';
 import SwapStore from '../../../../stores/ada/SwapStore';
 import { defaultSwapFormState } from './DefaultSwapFormState';
 import { PRICE_PRECISION } from '../../../../components/swap/common';
-import { runInAction } from 'mobx';
 // const PRECISION = 14;
 
 type Props = {|
