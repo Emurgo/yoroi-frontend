@@ -8,19 +8,17 @@ import { TokenType } from '../../common/types/index';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import StatsTable from './StatsTable';
 
-interface Props {
-  data: TokenType[];
-}
-
-const PortfolioWallet = ({ data }: Props): JSX.Element => {
+const PortfolioWallet = (): JSX.Element => {
   const theme = useTheme();
   const strings = useStrings();
-  const { walletBalance } = usePortfolio();
+  const { walletBalance, assetList } = usePortfolio();
 
   const [keyword, setKeyword] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [tokenList, setTokenList] = useState<TokenType[]>(data);
-  const isShownWelcomeBanner: boolean = data.length === 1; // assumming only have ADA as default -> first time user
+  const [tokenList, setTokenList] = useState<TokenType[]>(assetList);
+  const isShownWelcomeBanner: boolean = assetList.length === 1; // assumming only have ADA as default -> first time user
+
+  console.log('assetList', assetList);
 
   useEffect(() => {
     if (isShownWelcomeBanner) return;
@@ -37,13 +35,13 @@ const PortfolioWallet = ({ data }: Props): JSX.Element => {
 
   useEffect(() => {
     if (!keyword || isShownWelcomeBanner) {
-      setTokenList(data);
+      setTokenList(assetList);
       return;
     }
 
     const lowercaseKeyword = keyword.toLowerCase();
 
-    const temp = data.filter(item => {
+    const temp = assetList.filter(item => {
       return (
         item.name.toLowerCase().includes(lowercaseKeyword) ||
         item.id.toLowerCase().includes(lowercaseKeyword) ||

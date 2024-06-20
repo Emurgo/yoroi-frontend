@@ -30,7 +30,7 @@ export const PortfolioContextProvider = ({
 }: PortfolioProviderProps) => {
   console.log('currentWalletInfo', currentWalletInfo);
 
-  const { walletBalance, primaryTokenInfo } = currentWalletInfo;
+  const { walletBalance, primaryTokenInfo, assetList } = currentWalletInfo;
   console.log('walletBalance', walletBalance);
   const [state, dispatch] = React.useReducer(PortfolioReducer, {
     ...defaultPortfolioState,
@@ -53,6 +53,7 @@ export const PortfolioContextProvider = ({
       settingFiatPairUnit,
       walletBalance,
       primaryTokenInfo,
+      assetList,
     }),
     [state, actions]
   );

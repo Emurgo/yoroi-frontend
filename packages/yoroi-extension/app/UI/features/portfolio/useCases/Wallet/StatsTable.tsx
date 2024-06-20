@@ -1,19 +1,18 @@
-import React from 'react';
-import { useMemo, useState } from 'react';
-import { TableCell, TableRow, Typography, Stack, Box } from '@mui/material';
+import { Box, Stack, TableCell, TableRow, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import tokenPng from '../../common/assets/images/token.png';
-import { usePortfolio } from '../../module/PortfolioContextProvider';
+import React, { useMemo, useState } from 'react';
 import { Chip, Skeleton } from '../../../../components';
+import { ChipTypes } from '../../../../components/Chip';
 import { Icon } from '../../../../components/icons';
+import tokenPng from '../../common/assets/images/token.png';
+import Table from '../../common/components/Table';
+import { formatNumber } from '../../common/helpers/formatHelper';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
 import { useStrings } from '../../common/hooks/useStrings';
 import useTableSort, { ISortState } from '../../common/hooks/useTableSort';
-import Table from '../../common/components/Table';
-import { IHeadCell } from '../../common/types/table';
 import { TokenType } from '../../common/types/index';
-import { ChipTypes } from '../../../../components/Chip';
-import { formatNumber } from '../../common/helpers/formatHelper';
+import { IHeadCell } from '../../common/types/table';
+import { usePortfolio } from '../../module/PortfolioContextProvider';
 
 const TableRowSkeleton = ({ theme, ...props }) => (
   <TableRow
@@ -134,14 +133,14 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
                   borderRadius: `${theme.shape.borderRadius}px`,
                 }}
                 component="img"
-                src={tokenPng}
+                src={row.tokenLogo || tokenPng}
               ></Box>
               <Stack direction="column">
                 <Typography fontWeight="500" color="ds.text_gray_normal">
                   {row.name}
                 </Typography>
                 <Typography variant="body2" color="ds.text_gray_medium">
-                  {row.id}
+                  {row.ticker}
                 </Typography>
               </Stack>
             </Stack>
@@ -149,7 +148,7 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
 
           <TableCell sx={{ padding: '16.8px 1rem' }}>
             <Typography variant="body2" color="ds.text_gray_medium">
-              {formatNumber(row.price)} USD
+              {formatNumber(row.price)} {unitOfAccount}
             </Typography>
           </TableCell>
 
