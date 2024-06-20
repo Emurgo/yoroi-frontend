@@ -41,7 +41,8 @@ import { RustModule } from '../../../../app/api/ada/lib/cardanoCrypto/rustLoader
 import { loadSubmittedTransactions } from '../../../../app/api/localStorage';
 
 export async function getWalletState(publicDeriver: PublicDeriver<>): Promise<WalletState> {
-  return RustModule.WasmScope(async ({ WalletV4 }) => {
+  await RustModule.load();
+  return RustModule.WasmScope(async (Scope) => {
     const conceptualWalletInfo = await publicDeriver.getParent().getFullConceptualWalletInfo();
     const network = publicDeriver.getParent().getNetworkInfo();
 
@@ -66,10 +67,10 @@ export async function getWalletState(publicDeriver: PublicDeriver<>): Promise<Wa
       (acc, next) => Object.assign(acc, next),
       {}
     );
-    const coinsPerUtxoWord = WalletV4.BigNum.from_str(config.CoinsPerUtxoWord);
+    const coinsPerUtxoWord = Scope.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord);
     const deposits: Array<RustModule.WalletV4.BigNum> = addressedUtxos.map(u => {
       try {
-        return WalletV4.min_ada_required(
+        return Scope.WalletV4.min_ada_required(
           // $FlowFixMe[prop-missing]
           cardanoValueFromRemoteFormat(u),
           utxoHasDataHash,
@@ -81,10 +82,10 @@ export async function getWalletState(publicDeriver: PublicDeriver<>): Promise<Wa
           `Failed to calculate min-required ADA for utxo: ${JSON.stringify(u)}`,
           e
         );
-        return WalletV4.BigNum.zero();
+        return Scope.WalletV4.BigNum.zero();
       }
     });
-    const sumDeposit = deposits.reduce((a, b) => a.checked_add(b), WalletV4.BigNum.zero());
+    const sumDeposit = deposits.reduce((a, b) => a.checked_add(b), Scope.WalletV4.BigNum.zero());
     const defaultTokenId = publicDeriver.getParent().getDefaultMultiToken().defaults.defaultIdentifier;
     const assetDeposits =  new MultiToken(
       [

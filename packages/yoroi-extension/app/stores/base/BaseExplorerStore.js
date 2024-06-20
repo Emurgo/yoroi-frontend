@@ -6,7 +6,7 @@ import {
 
 import Store from './Store';
 import Request from '../lib/LocalizedRequest';
-import { getSelectedExplorer, getAllExplorers, saveSelectedExplorer, } from '../../api/ada/lib/storage/bridge/explorers';
+import { getSelectedExplorer, getAllExplorers, saveSelectedExplorer, } from '../../api/thunk';
 import type {
   GetSelectedExplorerFunc,
   GetAllExplorersFunc, GetAllExplorersResponse,
@@ -28,14 +28,14 @@ export default class BaseExplorerStore
     TActions: { +explorers: ExplorerActions, ... },
   > extends Store<TStores, TActions> {
 
-  @observable getSelectedExplorerRequest: Request<GetSelectedExplorerFunc>
-    = new Request<GetSelectedExplorerFunc>(getSelectedExplorer);
+  @observable getSelectedExplorerRequest: Request<typeof getSelectedExplorer>
+    = new Request(getSelectedExplorer);
 
-  @observable setSelectedExplorerRequest: Request<SaveSelectedExplorerFunc>
-    = new Request<SaveSelectedExplorerFunc>(saveSelectedExplorer);
+  @observable setSelectedExplorerRequest: Request<typeof saveSelectedExplorer>
+    = new Request(saveSelectedExplorer);
 
-  @observable getAllExplorerRequest: Request<GetAllExplorersFunc>
-    = new Request<GetAllExplorersFunc>(getAllExplorers);
+  @observable getAllExplorerRequest: Request<typeof getAllExplorers>
+    = new Request(getAllExplorers);
 
   setup(): void {
     this.actions.explorers.updateSelectedExplorer.listen(this.setSelectedExplorer);
@@ -44,51 +44,32 @@ export default class BaseExplorerStore
   // ========== Selected Explorer ========== //
 
   @computed get selectedExplorer(): Map<number, SelectedExplorer> {
-    /*
-    const db = this.stores.loading.getDatabase();
-    if (db == null) throw new Error(`${nameof(BaseExplorerStore)}::${nameof(this.selectedExplorer)} called before storage was initialized`);
     if (this.getSelectedExplorerRequest.result == null) {
       // when still loading, just return the defaults
-      this.getSelectedExplorerRequest.execute({ db });
+      this.getSelectedExplorerRequest.execute();
       return defaultToSelectedExplorer();
     }
     const { result } = this.getSelectedExplorerRequest;
-    */
     const convertedMap: Map<number, SelectedExplorer> = new Map();
-    /*
     for (const [networkId, v] of result.entries()) {
       convertedMap.set(networkId, new SelectedExplorer({ backup: v.backup, selected: v.selected }));
     }
-    */
     return convertedMap;
   }
 
   @computed get allExplorers(): GetAllExplorersResponse {
-    /*
-    const db = this.stores.loading.getDatabase();
-    if (db == null) throw new Error(`${nameof(BaseExplorerStore)}::${nameof(this.allExplorers)} called before storage was initialized`);
     if (this.getAllExplorerRequest.result == null) {
       // when still loading, just return the defaults
-      this.getAllExplorerRequest.execute({ db });
-    */
+      this.getAllExplorerRequest.execute();
       return prepackagedExplorers;
-    /*
     }
     return this.getAllExplorerRequest.result;
-    */
   }
 
   setSelectedExplorer: {|
     explorer: $ReadOnly<ExplorerRow>,
   |} => Promise<void> = async (request): Promise<void> => {
-    /*
-    const db = this.stores.loading.getDatabase();
-    if (db == null) throw new Error(`${nameof(BaseExplorerStore)}::${nameof(this.setSelectedExplorer)} called before storage was initialized`);
-    await this.setSelectedExplorerRequest.execute({
-      db,
-      ...request
-    });
-    await this.getSelectedExplorerRequest.execute({ db }); // eagerly cache
-    */
+    await this.setSelectedExplorerRequest.execute(request);
+    await this.getSelectedExplorerRequest.execute(); // eagerly cache
   };
 }

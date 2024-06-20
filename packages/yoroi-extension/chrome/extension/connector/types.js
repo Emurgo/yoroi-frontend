@@ -17,6 +17,7 @@ import type {
   BroadcastTransactionRequestType,
   ConnectorCreateAuthEntryRequestType,
 } from '../../../app/api/thunk';
+import type { ExplorerRow } from '../../../app/api/ada/lib/storage/database/explorers/tables';
 
 // ----- Types used in the dApp <-> Yoroi connection bridge ----- //
 
@@ -305,7 +306,17 @@ export type PopAddress = {|
 export type RefreshTransactions = {|
   type: 'refresh-transactions',
   request: RefreshTransactionsRequestType,
-                                   |};
+|};
+export type GetAllExplorers = {|
+  type: 'get-all-explorers',
+|};
+export type GetSelectedExplorer = {|
+  type: 'get-selected-explorer',
+|};
+export type SaveSelectedExplorer = {|
+  type: 'save-selected-explorer',
+  request: {| explorer: $ReadOnly<ExplorerRow> |}
+|};
 export type ConnectorCreateAuthEntry = {|
   type: 'connector-create-auth-entry',
   request: ConnectorCreateAuthEntryRequestType ,

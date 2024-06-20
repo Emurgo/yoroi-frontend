@@ -14,7 +14,14 @@ import type { HWFeatures, } from './ada/lib/storage/database/walletTypes/core/ta
 import WalletTransaction from '../domain/WalletTransaction';
 import type { ReferenceTransaction } from './common';
 import type { WalletAuthEntry } from '../../chrome/extension/connector/types';
-import { deserializeTransactionCtorData } from '../domain/CardanoShelleyTransaction';
+import CardanoShelleyTransaction, {
+  deserializeTransactionCtorData as deserializeShelleyTransactionCtorData,
+} from '../domain/CardanoShelleyTransaction';
+import CardanoByronTransaction, {
+  deserializeTransactionCtorData as deserializeByronTransactionCtorData,
+} from '../domain/CardanoByronTransaction';
+import { MultiToken } from './common/lib/MultiToken';
+import type { ExplorerRow, PreferredExplorerRow } from './ada/lib/storage/database/explorers/tables';
 
 /*::
 declare var chrome;
@@ -54,10 +61,12 @@ export async function getWallets(): Promise<Array<WalletState>> {
       ({ networkId, publicDeriverId, transaction, usedUtxos }) => ({
         networkId,
         publicDeriverId,
-        transaction: deserializeTransactionCtorData(transaction),
+        transaction: deserializeShelleyTransactionCtorData(transaction),
         usedUtxos,
       })
     );
+    wallet.balance = MultiToken.from(wallet.balance);
+    wallet.assetDeposits = MultiToken.from(wallet.assetDeposits);
   }
   return wallets;
 }
@@ -176,7 +185,7 @@ export async function getPrivateStakingKey(
 }
 
 export async function getCardanoAssets(
-  request: {| networkId: number, tokenIds: Array<string> |} | null
+  request?: {| networkId: number, tokenIds: Array<string> |}
 ): Promise<Array<$ReadOnly<TokenRow>>> {
   return await callBackground({ type: 'get-cardano-assets', request, });
 }
@@ -218,7 +227,14 @@ export async function refreshTransactions(
   request: RefreshTransactionsRequestType
 ): Promise<Array<WalletTransaction>> {
   const txs = await callBackground({ type: 'refresh-transactions', request });
-  return txs.map(txData => new WalletTransaction(txData));
+  return txs.map(tx => {
+    // we know that there are only two types and only the Shelley one has the 'certificates'
+    // field
+    if (tx.hasOwnProperty('certificates')) {
+      return CardanoShelleyTransaction.fromData(deserializeShelleyTransactionCtorData(tx));
+    }
+    return CardanoByronTransaction.fromData(deserializeByronTransactionCtorData(tx));
+  });
 }
 
 export type ConnectorCreateAuthEntryRequestType = {|
@@ -230,4 +246,27 @@ export async function connectorCreateAuthEntry(
   request: ConnectorCreateAuthEntryRequestType
 ): Promise<?WalletAuthEntry> {
   return await callBackground({ type: 'connector-create-auth-entry', request });
+}
+
+export async function getSelectedExplorer(): Promise<$ReadOnlyMap<number, {|
+  backup: $ReadOnly<ExplorerRow>,
+  selected: $ReadOnly<ExplorerRow>,
+|}>> {
+  return new Map(
+    await callBackground({ type: 'get-selected-explorer' })
+  );
+}
+
+export async function getAllExplorers(): Promise<
+  $ReadOnlyMap<number, $ReadOnlyArray<$ReadOnly<ExplorerRow>>>
+> {
+  return new Map(
+    await callBackground({ type: 'get-all-explorers' })
+  );
+}
+
+export async function saveSelectedExplorer(request: {| explorer: $ReadOnly<ExplorerRow> |}): Promise<
+  $ReadOnlyArray<$ReadOnly<PreferredExplorerRow>>
+> {
+  return await callBackground({ type: 'save-selected-explorer', request });
 }

@@ -244,7 +244,7 @@ export default class YoroiTransferStore extends Store<StoresMap, ActionsMap> {
         refreshWallet: async () => {
           const selected = this.stores.wallets.selected;
           if (selected == null) return;
-          await this.stores.wallets.refreshWalletFromRemote(selected);
+          await this.stores.wallets.refreshWalletFromRemote(selected.publicDeriverId);
         }
       });
     } catch (e) {

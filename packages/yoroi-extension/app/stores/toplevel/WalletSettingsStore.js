@@ -19,6 +19,7 @@ import {
   renamePublicDeriver,
   renameConceptualWallet,
   removeAllTransactions,
+  refreshTransactions,
 } from '../../api/thunk';
 
 export type WarningList = {|
@@ -35,27 +36,8 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     = new Request(async (func) => { await func(); });
 
   @observable clearHistory: Request<RemoveAllTransactionsFunc>
-    = new Request(async (req) => {
-      const ongoingRefreshing = this.stores.transactions.ongoingRefreshing.get(
-        req.publicDeriver.publicDeriverId
-      );
-      if (ongoingRefreshing) {
-        try {
-          await ongoingRefreshing;
-        } catch {
-          // ignore any error because we are going to resync anyway
-        }
-      }
-
-      const promise = removeAllTransactions({ publicDeriverId: req.publicDeriver.publicDeriverId });
-
-      runInAction(() => {
-        this.stores.transactions.ongoingRefreshing.set(
-          req.publicDeriver.publicDeriverId,
-          promise,
-        );
-      });
-      return promise;
+    = new Request(async (req) => { 
+      return removeAllTransactions({ publicDeriverId: req.publicDeriver.publicDeriverId });
     });
 
   @observable removeWalletRequest: Request<typeof removeWalletFromDb>
@@ -144,32 +126,17 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     publicDeriverId: number,
   |} => Promise<void> = async (request) => {
     this.clearHistory.reset();
-    try {
-      await this.clearHistory.execute({
-        publicDeriver: { publicDeriverId: request.publicDeriverId },
-        refreshWallet: () => {
-          this.stores.transactions.clearCache(request.publicDeriverId);
-          // currently in the map the promise for this wallet is this resyncing process,
-          // we need to remove it before calling refreshing otherwise it's a deadlock
-          runInAction(() => {
-            this.stores.transactions.ongoingRefreshing.delete(
-              request.publicDeriverId,
-            );
-          });
-          // refresh
-          return this.stores.wallets.refreshWalletFromRemote(request.publicDeriverId);
-        }
-      }).promise;
-    } finally {
-      // if everything runs without any error, the promise should have already
-      // been removed, but here make sure it is, so that future refreshing
-      // is not affected
-      runInAction(() => {
-        this.stores.transactions.ongoingRefreshing.delete(
-          request.publicDeriverId,
-        );
-      });
-    }
+
+    await this.clearHistory.execute({
+      publicDeriver: { publicDeriverId: request.publicDeriverId },
+      refreshWallet: async () => {
+        this.stores.transactions.clearCache(request.publicDeriverId);
+        await refreshTransactions({
+          publicDeriverId: request.publicDeriverId,
+          isLocalRequest: false,
+        });
+      }
+    }).promise;
   };
 
   @action _removeWallet: {|

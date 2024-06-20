@@ -81,7 +81,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
           walletAmount={selected.balance}
           getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
           defaultToken={this.props.stores.tokenInfoStore.getDefaultTokenInfo(
-            selected.publicDeriverId,
+            selected.networkId,
           )}
           unitOfAccountSetting={profile.unitOfAccount}
           getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}

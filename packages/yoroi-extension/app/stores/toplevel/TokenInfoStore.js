@@ -67,7 +67,8 @@ export default class TokenInfoStore<
   }
 
   refreshTokenInfo: void => Promise<void> = async () => {
-    // no-op
+    const assets = await getCardanoAssets();
+    runInAction(() => { this._updateTokenInfo(assets) });
   }
 
   getDefaultTokenInfo: number => $ReadOnly<TokenRow> = (

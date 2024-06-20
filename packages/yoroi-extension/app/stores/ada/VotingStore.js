@@ -376,7 +376,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
           signRequest: result,
         },
       },
-      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet),
+      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
     });
   };
 

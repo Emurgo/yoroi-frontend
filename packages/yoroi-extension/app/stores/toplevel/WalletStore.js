@@ -119,6 +119,10 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     return this.wallets.length > 0;
   }
 
+  refreshWalletFromRemote: (number) => Promise<void> = async publicDeriverId => {
+    // todo: legacy code to be removed
+  }
+
   @action
   addHwWallet: (WalletState) => Promise<void> = async (wallet): Promise<void> => {
     this.registerObserversForNewWallet({
@@ -144,6 +148,9 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
         lastSyncInfo: publicDeriver.lastSyncInfo,
       });
       this._queueWarningIfNeeded(publicDeriver);
+      await this.stores.transactions.refreshTransactionData({
+        publicDeriver,
+      });
     }
 
     runInAction('refresh active wallet', () => {
@@ -170,6 +177,11 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     );
     delegation.addObservedWallet(request.publicDeriver);
     delegation.refreshDelegation(request.publicDeriver);
+
+    this.stores.walletSettings.walletWarnings.push({
+      publicDeriverId: request.publicDeriver.publicDeriverId,
+      dialogs: [],
+    });
   };
 
   // =================== ACTIVE WALLET ==================== //
@@ -313,9 +325,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   isInitialSyncing: (number) => boolean = (publicDeriverId) => {
     return this.initialSyncingWalletIds.includes(publicDeriverId);
   }
-
-  //fixme
-  async refreshWalletFromRemote(_: any): Promise<void> {}
 }
 
 export const WalletCreationNotifications: {| [key: string]: Notification |} = {

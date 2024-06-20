@@ -113,8 +113,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   @observable exportError: ?LocalizableError;
   @observable shouldIncludeTxIds: boolean = false;
 
-  ongoingRefreshing: Map<number, Promise<void>> = observable.map({});
-
   setup(): void {
     super.setup();
     const actions = this.actions.transactions;
@@ -161,31 +159,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     return this.getTxHistoryState(publicDeriver.publicDeriverId).hasMoreToLoad;
   }
 
-  // This method ensures that at any time, there is only one refreshing process
-  // for each wallet.
-  /*
-  refreshTransactionData: ({|
-    publicDeriverId: number,
-    isLocalRequest: boolean,
-  |}) => Promise<void> = async (request) => {
-    const { publicDeriverId } = request.publicDeriver;
-    if (this.ongoingRefreshing.has(publicDeriverId)) {
-      return this.ongoingRefreshing.get(publicDeriverId);
-    }
-    try {
-      const promise = this._refreshTransactionData(request);
-      runInAction(() => {
-        this.ongoingRefreshing.set(publicDeriverId, promise);
-      });
-      await promise;
-    } finally {
-      runInAction(() => {
-        this.ongoingRefreshing.delete(publicDeriverId);
-      });
-    }
-  };
-  */
-
+  // todo: legacy code to be removed
   @computed get balance(): MultiToken | null {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return null;
@@ -257,10 +231,8 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     await this.stores.tokenInfoStore.refreshTokenInfo();
   }
 
-  /** Refresh transaction history and update wallet balance */
-  @action _refreshTransactionData: {|
+  @action refreshTransactionData: {|
     +publicDeriver: WalletState,
-    isLocalRequest: boolean,
   |} => Promise<void> = async (request) => {
     const { publicDeriverId } = request.publicDeriver;
 
@@ -276,7 +248,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
        */
       result = await this._internalTailRequestForTxs({
         publicDeriver: request.publicDeriver,
-        isLocalRequest: request.isLocalRequest,
       });
     } else {
       /*
@@ -287,7 +258,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       headRequest.execute({
         publicDeriverId,
         // HEAD request is never local by logic
-        isLocalRequest: false,
+        isLocalRequest: true,
         afterTx: txHistoryState.txs[0],
       });
       if (headRequest.promise == null) {
@@ -323,10 +294,8 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
   _internalTailRequestForTxs: ({|
     +publicDeriver: { publicDeriverId: number, networkId: number, ... },
-    isLocalRequest?: boolean,
   |}) => Promise<GetTransactionsResponse> = async ({
     publicDeriver,
-    isLocalRequest = false,
   }) => {
     const { publicDeriverId } = publicDeriver;
     const state = this.getTxHistoryState(publicDeriverId);
@@ -337,7 +306,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     tailRequest.invalidate({ immediately: false });
     tailRequest.execute({
       publicDeriverId,
-      isLocalRequest,
+      isLocalRequest: true,
       beforeTx,
     });
     if (!tailRequest.promise) throw new Error('unexpected nullish tailRequest.promise');

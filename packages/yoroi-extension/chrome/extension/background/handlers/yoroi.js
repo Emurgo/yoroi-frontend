@@ -44,6 +44,9 @@ import type {
   PopAddress,
   RefreshTransactions,
   ConnectorCreateAuthEntry,
+  GetAllExplorers,
+  GetSelectedExplorer,
+  SaveSelectedExplorer,
 } from '../../connector/types';
 import {
   APIErrorCodes,
@@ -137,6 +140,11 @@ import type { BaseGetTransactionsRequest } from '../../../../app/api/common';
 import { createAuthEntry } from '../../../../app/connector/api/';
 import { getWalletChecksum } from '../../../../app/api/export/utils';
 import { getAllTokenInfo } from '../../../../app/api/common/lib/tokens/utils';
+import {
+  getAllExplorers,
+  getSelectedExplorer,
+  saveSelectedExplorer,
+} from '../../../../app/api/ada/lib/storage/bridge/explorers';
 
 const YOROI_MESSAGES = Object.freeze({
   CONNECT_RESPONSE: 'connect_response',
@@ -169,6 +177,9 @@ const YOROI_MESSAGES = Object.freeze({
   POP_ADDRESS: 'pop-address',
   REFRESH_TRANSACTIONS: 'refresh-transactions',
   CONNECTOR_CREATE_AUTH_ENTRY: 'connector-create-auth-entry',
+  GET_ALL_EXPLORERS: 'get-all-explorers',
+  GET_SELECTED_EXPLORER: 'get-selected-explorer',
+  SAVE_SELECTED_EXPLORER: 'save-selected-explorer',
 });
 
 // messages from other parts of Yoroi (i.e. the UI for the connector)
@@ -203,6 +214,9 @@ export async function yoroiMessageHandler(
     | PopAddress
     | RefreshTransactions
     | ConnectorCreateAuthEntry
+    | GetAllExplorers
+    | GetSelectedExplorer
+    | SaveSelectedExplorer
   ),
   sender: any,
   sendResponse: Function,
@@ -953,6 +967,18 @@ export async function yoroiMessageHandler(
       // fixme: handle wrong password
       sendResponse({ error: error.message });
     }
+  } else if (request.type === YOROI_MESSAGES.GET_ALL_EXPLORERS) {
+    const db = await getDb();
+    const result = await getAllExplorers({ db });
+    sendResponse([...result.entries()]);
+  } else if (request.type === YOROI_MESSAGES.GET_SELECTED_EXPLORER) {
+    const db = await getDb();
+    const result = await getSelectedExplorer({ db });
+    sendResponse([...result.entries()]);
+  } else if (request.type === YOROI_MESSAGES.SAVE_SELECTED_EXPLORER) {
+    const db = await getDb();
+    const result = await saveSelectedExplorer({ db, explorer: request.request.explorer });
+    sendResponse(result);
   } else {
     console.error(`unknown message ${JSON.stringify(request)} from ${sender.tab.id}`)
   }
