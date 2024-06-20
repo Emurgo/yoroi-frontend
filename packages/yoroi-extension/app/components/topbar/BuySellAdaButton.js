@@ -8,6 +8,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
 import { withLayout } from '../../styles/context/layout';
 import type { LayoutComponentMap } from '../../styles/context/layout';
+import environment from '../../environment';
 
 type Props = {|
   +onBuySellClick: void => void,
@@ -16,6 +17,10 @@ type Props = {|
 type InjectedProps = {|
   +renderLayoutComponent: LayoutComponentMap => Node,
 |};
+
+const buttonText = (environment.isDev() || environment.isNightly()) ?
+  globalMessages.buySellAda :
+  globalMessages.buyAda;
 
 @observer
 class BuySellAdaButton extends Component<Props & InjectedProps> {
@@ -33,7 +38,7 @@ class BuySellAdaButton extends Component<Props & InjectedProps> {
         className="secondary"
         onClick={() => this.props.onBuySellClick()}
       >
-        {intl.formatMessage(globalMessages.buyAda)}
+        {intl.formatMessage(buttonText)}
       </Button>
     );
 
@@ -46,7 +51,7 @@ class BuySellAdaButton extends Component<Props & InjectedProps> {
         variant="secondary"
         onClick={() => this.props.onBuySellClick()}
       >
-        {intl.formatMessage(globalMessages.buyAda)}
+        {intl.formatMessage(buttonText)}
       </Button>
     );
 

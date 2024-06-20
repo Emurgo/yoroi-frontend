@@ -198,6 +198,10 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     if (result == null) {
       throw new Error(`${nameof(this._signTransaction)} no tx to broadcast`);
     }
+    const refreshWallet = () => {
+      this.stores.delegation.disablePoolTransitionState(request.publicDeriver);
+      return this.stores.wallets.refreshWalletFromRemote(request.publicDeriver);
+    };
     if (isLedgerNanoWallet(request.publicDeriver.getParent())) {
       await this.stores.substores.ada.wallets.adaSendAndRefresh({
         broadcastRequest: {
@@ -206,7 +210,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
             publicDeriver: request.publicDeriver,
           },
         },
-        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
+        refreshWallet,
       });
       return;
     }
@@ -218,7 +222,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
             publicDeriver: request.publicDeriver,
           },
         },
-        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
+        refreshWallet,
       });
       return;
     }
@@ -236,7 +240,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
           signRequest: result.signTxRequest,
         },
       },
-      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
+      refreshWallet,
     });
     if (request.dialog) this.actions.dialogs.open.trigger({ dialog: request.dialog });
   };
