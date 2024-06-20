@@ -1,27 +1,24 @@
 // @flow
+import classnames from 'classnames';
+import { observer } from 'mobx-react';
 import type { Node } from 'react';
 import { Component } from 'react';
-import { observer } from 'mobx-react';
-import classnames from 'classnames';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { intlShape, } from 'react-intl';
+import { intlShape } from 'react-intl';
 import { truncateToken } from '../../utils/formatters';
 
-import globalMessages from '../../i18n/global-messages';
-import styles from './NavWalletDetails.scss';
-import { ReactComponent as IconEyeOpen } from '../../assets/images/my-wallets/icon_eye_open.inline.svg';
-import { ReactComponent as IconEyeClosed } from '../../assets/images/my-wallets/icon_eye_closed.inline.svg';
-import WalletCurrency from '../wallet/my-wallets/WalletCurrency';
-import { hiddenAmount } from '../../utils/strings';
-import type { TokenLookupKey, } from '../../api/common/lib/MultiToken';
-import { MultiToken } from '../../api/common/lib/MultiToken';
-import { getTokenName } from '../../stores/stateless/tokenHelpers';
-import { calculateAndFormatValue } from '../../utils/unit-of-account';
-import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
-import LoadingSpinner from '../widgets/LoadingSpinner';
 import { Box } from '@mui/system';
+import { MultiToken } from '../../api/common/lib/MultiToken';
+import { ReactComponent as IconEyeClosed } from '../../assets/images/my-wallets/icon_eye_closed.inline.svg';
+import { ReactComponent as IconEyeOpen } from '../../assets/images/my-wallets/icon_eye_open.inline.svg';
 import { maybe } from '../../coreUtils';
+import globalMessages from '../../i18n/global-messages';
+import { getTokenName } from '../../stores/stateless/tokenHelpers';
+import { hiddenAmount } from '../../utils/strings';
+import { calculateAndFormatValue } from '../../utils/unit-of-account';
+import WalletCurrency from '../wallet/my-wallets/WalletCurrency';
+import LoadingSpinner from '../widgets/LoadingSpinner';
+import styles from './NavWalletDetails.scss';
 
 type Props = {|
   +onUpdateHideBalance: void => Promise<void>,
@@ -32,7 +29,7 @@ type Props = {|
   +walletAmount: ?MultiToken,
   +infoText?: string,
   +showDetails?: boolean,
-  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
+  +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +defaultToken: $ReadOnly<TokenRow>,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?string,
@@ -41,7 +38,6 @@ type Props = {|
 
 @observer
 export default class NavWalletDetails extends Component<Props> {
-
   static defaultProps: {|
     highlightTitle: boolean,
     infoText: void,
@@ -54,7 +50,7 @@ export default class NavWalletDetails extends Component<Props> {
     showEyeIcon: true,
   };
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
@@ -68,7 +64,7 @@ export default class NavWalletDetails extends Component<Props> {
       infoText,
       showDetails,
       showEyeIcon,
-      purpose
+      purpose,
     } = this.props;
 
     const { intl } = this.context;
@@ -81,25 +77,22 @@ export default class NavWalletDetails extends Component<Props> {
     return (
       <div className={styles.wrapper}>
         <div className={styles.outerWrapper}>
-          {
-          !totalAmount || (totalAmount && showsRewards && !walletAmount) ? (
-            <Box sx={{
-              height: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: purpose === 'allWallets' ? '180px' : '100%'
-            }}
+          {!totalAmount || (totalAmount && showsRewards && !walletAmount) ? (
+            <Box
+              sx={{
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: purpose === 'allWallets' ? '180px' : '100%',
+              }}
             >
               <LoadingSpinner small />
             </Box>
           ) : (
             <>
               <div
-                className={classnames([
-                  styles.currency,
-                  (!unitOfAccountSetting.enabled && showsRewards) && styles.currencyAlign
-                ])}
+                className={classnames([styles.currency, !unitOfAccountSetting.enabled && showsRewards && styles.currencyAlign])}
               >
                 <WalletCurrency currency={getTokenName(this.props.defaultToken)} />
               </div>
@@ -107,12 +100,12 @@ export default class NavWalletDetails extends Component<Props> {
                 <div
                   className={classnames([
                     styles.amount,
-                    highlightTitle !== null && highlightTitle === true && styles.highlightAmount
+                    highlightTitle !== null && highlightTitle === true && styles.highlightAmount,
                   ])}
                 >
                   {this.renderAmountDisplay({
                     shouldHideBalance,
-                    amount: totalAmount
+                    amount: totalAmount,
                   })}
                 </div>
                 {unitOfAccountSetting.enabled ? (
@@ -125,68 +118,53 @@ export default class NavWalletDetails extends Component<Props> {
                   </div>
                 ) : (
                   <>
-                    {showsRewards &&
-                    <div className={styles.details}>
-                      <div>
-                        <div className={styles.label}>
-                          {intl.formatMessage(globalMessages.walletLabel)}&nbsp;
+                    {showsRewards && (
+                      <div className={styles.details}>
+                        <div>
+                          <div className={styles.label}>{intl.formatMessage(globalMessages.walletLabel)}&nbsp;</div>
+                          {this.renderAmountDisplay({ shouldHideBalance, amount: walletAmount })}
                         </div>
-                        {this.renderAmountDisplay({ shouldHideBalance, amount: walletAmount })}
-                      </div>
-                      <div>
-                        <div className={styles.label}>
-                          {intl.formatMessage(globalMessages.rewardsLabel)}&nbsp;
+                        <div>
+                          <div className={styles.label}>{intl.formatMessage(globalMessages.rewardsLabel)}&nbsp;</div>
+                          {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })}
                         </div>
-                        {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })}
                       </div>
-                    </div>
-                    }
+                    )}
                   </>
                 )}
               </div>
             </>
           )}
-          {showEyeIconSafe &&
-          <button
-            type="button"
-            className={styles.toggleButton}
-            onClick={onUpdateHideBalance}
-          >
-            {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
-          </button>
-          }
+          {showEyeIconSafe && (
+            <button type="button" className={styles.toggleButton} onClick={onUpdateHideBalance}>
+              {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
+            </button>
+          )}
         </div>
-        {infoText != null && (
-          <div className={styles.info}>
-            {infoText}
-          </div>
-        )}
+        {infoText != null && <div className={styles.info}>{infoText}</div>}
       </div>
     );
   }
 
   getTotalAmount: void => ?MultiToken = () => {
-    return maybe(this.props.walletAmount,
-      w => this.props.rewards.joinAddCopy(w))
-  }
+    return maybe(this.props.walletAmount, w => this.props.rewards.joinAddCopy(w));
+  };
 
-  renderAmountDisplay: {|
+  renderAmountDisplay: ({|
     shouldHideBalance: boolean,
     amount: ?MultiToken,
     convertToFiat?: ?boolean,
-  |} => Node = (request) => {
+  |}) => Node = request => {
+    console.log('renderAmountDisplay amount', request);
     if (request.amount == null) {
-      throw new Error('Amount is required to be rendered')
+      throw new Error('Amount is required to be rendered');
     }
 
     const defaultEntry = request.amount.getDefaultEntry();
     const tokenInfo = this.props.getTokenInfo(defaultEntry);
-    const shiftedAmount = defaultEntry.amount
-      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+    const shiftedAmount = defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
-    let balanceDisplay = shiftedAmount
-      .decimalPlaces(tokenInfo.Metadata.numberOfDecimals)
-      .toString();
+    let balanceDisplay = shiftedAmount.decimalPlaces(tokenInfo.Metadata.numberOfDecimals).toString();
 
     let unit = truncateToken(getTokenName(tokenInfo));
 
@@ -209,9 +187,13 @@ export default class NavWalletDetails extends Component<Props> {
     }
 
     if (request.shouldHideBalance) {
-      balanceDisplay = (<span>{hiddenAmount}</span>);
+      balanceDisplay = <span>{hiddenAmount}</span>;
     }
 
-    return (<>{balanceDisplay} {unit}</>);
-  }
+    return (
+      <>
+        {balanceDisplay} {unit}
+      </>
+    );
+  };
 }

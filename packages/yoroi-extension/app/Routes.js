@@ -20,7 +20,6 @@ import LoadingPage from './containers/LoadingPage';
 import Settings from './containers/settings/Settings';
 import SwapPageContainer from './containers/swap/SwapPageContainer';
 import SwapProvider from './containers/swap/SwapProvider';
-import AssetsWrapper from './containers/wallet/AssetsWrapper';
 import CreateWalletPage, { CreateWalletPagePromise } from './containers/wallet/CreateWalletPageContainer';
 import NFTsWrapper from './containers/wallet/NFTsWrapper';
 import Wallet from './containers/wallet/Wallet';
@@ -28,15 +27,15 @@ import RestoreWalletPage, { RestoreWalletPagePromise } from './containers/wallet
 
 // New UI pages
 import { GovernanceContextProvider } from './UI/features/governace/module/GovernanceContextProvider';
-import { createCurrrentWalletInfo } from './UI/features/governace/common/helpers';
+import { PortfolioContextProvider } from './UI/features/portfolio/module/PortfolioContextProvider';
 import GovernanceDelegationFormPage from './UI/pages/Governance/GovernanceDelegationFormPage';
 import GovernanceStatusPage from './UI/pages/Governance/GovernanceStatusPage';
 import GovernanceTransactionFailedPage from './UI/pages/Governance/GovernanceTransactionFailedPage';
-import { PortfolioContextProvider } from './UI/features/portfolio/module/PortfolioContextProvider';
-import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
+import GovernanceTransactionSubmittedPage from './UI/pages/Governance/GovernanceTransactionSubmittedPage';
 import PortfolioDappsPage from './UI/pages/portfolio/PortfolioDappsPage';
 import PortfolioDetailPage from './UI/pages/portfolio/PortfolioDetailPage';
-import GovernanceTransactionSubmittedPage from './UI/pages/Governance/GovernanceTransactionSubmittedPage';
+import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
+import { createCurrrentWalletInfo } from './UI/utils/createCurrrentWalletInfo';
 
 // PAGES
 const LanguageSelectionPagePromise = () => import('./containers/profile/LanguageSelectionPage');
@@ -526,8 +525,13 @@ export function wrapGovernance(governanceProps: StoresAndActionsProps, children:
   );
 }
 export function wrapPortfolio(portfolioProps: StoresAndActionsProps, children: Node): Node {
+  const currentWalletInfo = createCurrrentWalletInfo(portfolioProps.stores);
+
   return (
-    <PortfolioContextProvider settingFiatPairUnit={portfolioProps.stores.profile.unitOfAccount}>
+    <PortfolioContextProvider
+      currentWalletInfo={currentWalletInfo}
+      settingFiatPairUnit={portfolioProps.stores.profile.unitOfAccount}
+    >
       <Suspense fallback={null}>{children}</Suspense>
     </PortfolioContextProvider>
   );

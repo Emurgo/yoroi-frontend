@@ -1,23 +1,21 @@
 // @flow
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { observer } from 'mobx-react';
 import type { Node } from 'react';
-import type { StoresAndActionsProps } from '../types/injectedProps.types';
 import { Component } from 'react';
 import { intlShape } from 'react-intl';
-import { observer } from 'mobx-react';
-import { ROUTES } from '../routes-config';
-import { asGetPublicKey } from '../api/ada/lib/storage/models/PublicDeriver/traits';
-import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
-import { genLookupOrFail } from '../stores/stateless/tokenHelpers';
+import { ampli } from '../../ampli/index';
 import { addressToDisplayString } from '../api/ada/lib/storage/bridge/utils';
-import { getReceiveAddress } from '../stores/stateless/addressStores';
+import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
+import { asGetPublicKey } from '../api/ada/lib/storage/models/PublicDeriver/traits';
+import { MultiToken } from '../api/common/lib/MultiToken';
 import BuySellDialog from '../components/buySell/BuySellDialog';
+import BuySellAdaButton from '../components/topbar/BuySellAdaButton';
 import NavBarRevamp from '../components/topbar/NavBarRevamp';
 import NavWalletDetailsRevamp from '../components/topbar/NavWalletDetailsRevamp';
 import WalletListDialog from '../components/topbar/WalletListDialog';
-import BuySellAdaButton from '../components/topbar/BuySellAdaButton';
-import { ampli } from '../../ampli/index';
-import { MultiToken } from '../api/common/lib/MultiToken';
+import { ROUTES } from '../routes-config';
+import { getReceiveAddress } from '../stores/stateless/addressStores';
+import { genLookupOrFail } from '../stores/stateless/tokenHelpers';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -58,18 +56,13 @@ export default class NavBarContainerRevamp extends Component<Props> {
       const publicDeriver = walletsStore.selected;
       if (publicDeriver == null) return null;
       const parent = publicDeriver.getParent();
-      const settingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(
-        parent
-      );
+      const settingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(parent);
 
       const withPubKey = asGetPublicKey(publicDeriver);
-      const plate =
-        withPubKey == null ? null : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
+      const plate = withPubKey == null ? null : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
 
       const balance: ?MultiToken = this.props.stores.transactions.getBalance(publicDeriver);
-      const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(
-        publicDeriver
-      );
+      const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(publicDeriver);
 
       return (
         <NavWalletDetailsRevamp
@@ -101,11 +94,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
           menu={this.props.menu}
           walletDetails={walletsStore.selected !== null ? <DropdownHead /> : null}
           buyButton={
-            <BuySellAdaButton
-              onBuySellClick={() =>
-                this.props.actions.dialogs.open.trigger({ dialog: BuySellDialog })
-              }
-            />
+            <BuySellAdaButton onBuySellClick={() => this.props.actions.dialogs.open.trigger({ dialog: BuySellDialog })} />
           }
           pageBanner={pageBanner}
         />
@@ -129,13 +118,10 @@ export default class NavBarContainerRevamp extends Component<Props> {
         const walletAmount = this.props.stores.transactions.getBalance(wallet);
         const rewards = this.props.stores.delegation.getRewardBalanceOrZero(wallet);
         const parent = wallet.getParent();
-        const settingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(
-          parent
-        );
+        const settingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(parent);
 
         const withPubKey = asGetPublicKey(wallet);
-        const plate =
-          withPubKey == null ? null : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
+        const plate = withPubKey == null ? null : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
 
         const walletMap = {
           walletId: wallet.getPublicDeriverId(),
@@ -180,10 +166,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
       const getReceiveAdaAddress = async () => {
         const receiveAddress = await getReceiveAddress(publicDeriver);
         if (receiveAddress == null) return null;
-        return addressToDisplayString(
-          receiveAddress.addr.Hash,
-          publicDeriver.getParent().getNetworkInfo()
-        );
+        return addressToDisplayString(receiveAddress.addr.Hash, publicDeriver.getParent().getNetworkInfo());
       };
 
       const tokenInfo = getTokenInfo(balance.getDefaultEntry());
@@ -192,13 +175,8 @@ export default class NavBarContainerRevamp extends Component<Props> {
       return (
         <BuySellDialog
           onCancel={this.props.actions.dialogs.closeActiveDialog.trigger}
-          onExchangeCallback={() =>
-            this.props.actions.router.goToRoute.trigger({ route: ROUTES.EXCHANGE_END })
-          }
-          currentBalanceAda={balance
-            .getDefault()
-            .shiftedBy(-numberOfDecimals)
-            .toFormat(numberOfDecimals)}
+          onExchangeCallback={() => this.props.actions.router.goToRoute.trigger({ route: ROUTES.EXCHANGE_END })}
+          currentBalanceAda={balance.getDefault().shiftedBy(-numberOfDecimals).toFormat(numberOfDecimals)}
           receiveAdaAddressPromise={getReceiveAdaAddress()}
         />
       );

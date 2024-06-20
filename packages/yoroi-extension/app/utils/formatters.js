@@ -1,27 +1,23 @@
 // @flow
 import BigNumber from 'bignumber.js';
 
-
-export function splitAmount(
-  amount: BigNumber,
-  decimalPlaces: number,
-): [string, string] {
+export function splitAmount(amount: BigNumber, decimalPlaces: number): [string, string] {
   if (decimalPlaces === 0) {
-    return [amount.toFormat(0), '']
+    return [amount.toFormat(0), ''];
   }
   const valString = amount.toFormat(decimalPlaces);
   const startIndex = valString.length - decimalPlaces;
-  let beforeDecimal = valString.substring(0, startIndex)
-  const afterDecimal = valString.substring(startIndex).replace(/0+$/, '')
+  let beforeDecimal = valString.substring(0, startIndex);
+  const afterDecimal = valString.substring(startIndex).replace(/0+$/, '');
   // Remove the dots if no decimals
   if (!afterDecimal) {
-    beforeDecimal = beforeDecimal.slice(0, beforeDecimal.length - 1)
+    beforeDecimal = beforeDecimal.slice(0, beforeDecimal.length - 1);
   }
-  return [beforeDecimal, afterDecimal]
+  return [beforeDecimal, afterDecimal];
 }
 
 export const maxNameLengthBeforeTruncation = 15;
-export const truncateLongName: string => string = (walletName) => {
+export const truncateLongName: string => string = walletName => {
   return walletName.length > maxNameLengthBeforeTruncation
     ? walletName.substring(0, maxNameLengthBeforeTruncation - 3) + '...'
     : walletName;
@@ -40,10 +36,7 @@ export const formattedAmountToBigNumber = (amount: string): BigNumber => {
  * ensures correct decimal positions
  * shifts decimal places over to turn into a whole number
  */
-export const formattedAmountToNaturalUnits: (
-  string,
-  number
-) => string = (amount, decimalPlaces) => {
+export const formattedAmountToNaturalUnits: (string, number) => string = (amount, decimalPlaces) => {
   // pad number in the case of missing digits
   const split = amount.split('.');
   if (split.length === 2) {
@@ -62,7 +55,7 @@ function truncateFormatter(addr: string, cutoff: number): string {
   if (addr.length - shortener.length <= cutoff) {
     return addr;
   }
-  return addr.substring(0, cutoff / 2) + shortener + addr.substring(addr.length - (cutoff / 2), addr.length);
+  return addr.substring(0, cutoff / 2) + shortener + addr.substring(addr.length - cutoff / 2, addr.length);
 }
 
 export function truncateToken(addr: string): string {
@@ -102,7 +95,7 @@ export function formatLovelacesHumanReadableShort(num: string): string {
     // Divide to get SI Unit engineering style numbers (1e3,1e6,1e9, etc)
     const unit = Math.floor((fNum.toFixed(0).length - 1) / 3) * 3;
     // Calculate the remainder
-    const formattedNum = ((fNum / Number(`1e${unit}`))).toFixed(2);
+    const formattedNum = (fNum / Number(`1e${unit}`)).toFixed(2);
     const unitname = units[Math.floor(unit / 3) - 1];
     return `${formattedNum}${unitname}`;
   }
@@ -112,8 +105,8 @@ export function formatLovelacesHumanReadableShort(num: string): string {
 export function roundOneDecimal(num: number): string {
   const fNum = Number(num);
   const number = Math.round(fNum * 10) / 10;
-  if(number === 0) return number.toFixed(1)
-  return number.toString()
+  if (number === 0) return number.toFixed(1);
+  return number.toString();
 }
 
 export function roundTwoDecimal(num: number): string {

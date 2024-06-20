@@ -1,25 +1,22 @@
 // @flow
-import { Component } from 'react';
+import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import type { Node } from 'react';
-import classnames from 'classnames';
+import { Component } from 'react';
 import { intlShape } from 'react-intl';
 import { truncateLongName } from '../../utils/formatters';
 
-import styles from './NavWalletDetailsRevamp.scss';
-import { ReactComponent as IconEyeOpen } from '../../assets/images/my-wallets/icon_eye_opened_revamp.inline.svg';
-import { ReactComponent as IconEyeClosed } from '../../assets/images/my-wallets/icon_eye_closed_revamp.inline.svg';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { MultiToken } from '../../api/common/lib/MultiToken';
-import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
-import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { WalletChecksum } from '@emurgo/cip4-js';
-import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import WalletAccountIcon from './WalletAccountIcon';
-import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
-import AmountDisplay from '../common/AmountDisplay';
 import { Box, IconButton, Typography } from '@mui/material';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import { MultiToken } from '../../api/common/lib/MultiToken';
+import { ReactComponent as IconEyeClosed } from '../../assets/images/my-wallets/icon_eye_closed_revamp.inline.svg';
+import { ReactComponent as IconEyeOpen } from '../../assets/images/my-wallets/icon_eye_opened_revamp.inline.svg';
 import { maybe } from '../../coreUtils';
+import AmountDisplay from '../common/AmountDisplay';
+import styles from './NavWalletDetailsRevamp.scss';
+import WalletAccountIcon from './WalletAccountIcon';
 
 type Props = {|
   +onUpdateHideBalance: void => Promise<void>,
@@ -42,19 +39,11 @@ type Props = {|
   +openWalletInfoDialog: () => void,
 |};
 
-function constructPlate(
-  plate: WalletChecksum,
-  saturationFactor: number,
-  divClass: string
-): [string, React$Element<'div'>] {
+function constructPlate(plate: WalletChecksum, saturationFactor: number, divClass: string): [string, React$Element<'div'>] {
   return [
     plate.TextPart,
     <div className={divClass}>
-      <WalletAccountIcon
-        iconSeed={plate.ImagePart}
-        saturationFactor={saturationFactor}
-        scalePx={6}
-      />
+      <WalletAccountIcon iconSeed={plate.ImagePart} saturationFactor={saturationFactor} scalePx={6} />
     </div>,
   ];
 }
@@ -167,7 +156,6 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
   }
 
   getTotalAmount: void => ?MultiToken = () => {
-    return maybe(this.props.walletAmount,
-      w => this.props.rewards.joinAddCopy(w))
+    return maybe(this.props.walletAmount, w => this.props.rewards.joinAddCopy(w));
   };
 }

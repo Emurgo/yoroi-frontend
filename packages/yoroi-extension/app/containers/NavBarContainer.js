@@ -1,24 +1,22 @@
 // @flow
-import moment from 'moment';
-import { Component } from 'react';
-import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import type { StoresAndActionsProps } from '../types/injectedProps.types';
+import moment from 'moment';
+import type { Node } from 'react';
+import { Component } from 'react';
 import { intlShape } from 'react-intl';
+import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
+import { asGetPublicKey } from '../api/ada/lib/storage/models/PublicDeriver/traits';
+import { MultiToken } from '../api/common/lib/MultiToken';
+import BuySellDialog from '../components/buySell/BuySellDialog';
 import NavBar from '../components/topbar/NavBar';
+import NavDropdown from '../components/topbar/NavDropdown';
+import NavDropdownRow from '../components/topbar/NavDropdownRow';
 import NavPlate from '../components/topbar/NavPlate';
 import NavWalletDetails from '../components/topbar/NavWalletDetails';
 import NoWalletsDropdown from '../components/topbar/NoWalletsDropdown';
-import NavDropdown from '../components/topbar/NavDropdown';
-import NavDropdownRow from '../components/topbar/NavDropdownRow';
-import { ROUTES } from '../routes-config';
-import { asGetPublicKey } from '../api/ada/lib/storage/models/PublicDeriver/traits';
-import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { genLookupOrFail } from '../stores/stateless/tokenHelpers';
-import BuySellDialog from '../components/buySell/BuySellDialog';
 import globalMessages from '../i18n/global-messages';
-import { MultiToken } from '../api/common/lib/MultiToken';
+import { ROUTES } from '../routes-config';
+import { genLookupOrFail } from '../stores/stateless/tokenHelpers';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -62,15 +60,10 @@ export default class NavBarContainer extends Component<Props> {
       const lastSyncInfo = this.props.stores.transactions.lastSyncInfo;
 
       const parent = wallet.getParent();
-      const settingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(
-        parent
-      );
+      const settingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(parent);
 
       const withPubKey = asGetPublicKey(wallet);
-      const plate =
-        withPubKey == null
-          ? null
-          : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
+      const plate = withPubKey == null ? null : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
 
       return (
         <NavDropdownRow
@@ -86,13 +79,11 @@ export default class NavBarContainer extends Component<Props> {
               onUpdateHideBalance={this.updateHideBalance}
               shouldHideBalance={profile.shouldHideBalance}
               getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
-              defaultToken={this.props.stores.tokenInfoStore.getDefaultTokenInfo(
-                wallet.getParent().getNetworkInfo().NetworkId
-              )}
+              defaultToken={this.props.stores.tokenInfoStore.getDefaultTokenInfo(wallet.getParent().getNetworkInfo().NetworkId)}
               showEyeIcon={false}
               unitOfAccountSetting={profile.unitOfAccount}
               getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
-              purpose='allWallets'
+              purpose="allWallets"
             />
           }
         />
@@ -100,10 +91,7 @@ export default class NavBarContainer extends Component<Props> {
     });
     const dropdownContent = (
       <>
-        <NavDropdownRow
-          title={intl.formatMessage(globalMessages.allWalletsLabel)}
-          detailComponent={undefined}
-        />
+        <NavDropdownRow title={intl.formatMessage(globalMessages.allWalletsLabel)} detailComponent={undefined} />
         {walletComponents}
       </>
     );
@@ -117,7 +105,7 @@ export default class NavBarContainer extends Component<Props> {
 
         const balance: ?MultiToken = this.props.stores.transactions.getBalance(publicDeriver);
         const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(publicDeriver);
-
+        console.log('balance', balance);
         return (
           <NavWalletDetails
             onUpdateHideBalance={this.updateHideBalance}
@@ -130,7 +118,7 @@ export default class NavBarContainer extends Component<Props> {
             )}
             unitOfAccountSetting={profile.unitOfAccount}
             getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
-            purpose='topBar'
+            purpose="topBar"
           />
         );
       };
@@ -139,9 +127,7 @@ export default class NavBarContainer extends Component<Props> {
         <NavDropdown
           headerComponent={getDropdownHead()}
           contentComponents={dropdownContent}
-          onAddWallet={() =>
-            this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
-          }
+          onAddWallet={() => this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })}
           openBuySellDialog={() => this.openDialogWrapper(BuySellDialog)}
         />
       );
@@ -153,21 +139,14 @@ export default class NavBarContainer extends Component<Props> {
 
       const parent = publicDeriver.getParent();
 
-      const settingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(
-        parent
-      );
+      const settingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(parent);
 
       const withPubKey = asGetPublicKey(publicDeriver);
-      const plate =
-        withPubKey == null
-          ? null
-          : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
+      const plate = withPubKey == null ? null : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
 
       return <NavPlate plate={plate} wallet={settingsCache} />;
     };
 
-    return (
-      <NavBar title={this.props.title} walletPlate={getPlate()} walletDetails={dropdownComponent} />
-    );
+    return <NavBar title={this.props.title} walletPlate={getPlate()} walletDetails={dropdownComponent} />;
   }
 }

@@ -1,12 +1,12 @@
-import { Typography, Stack } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import StatsTable from './StatsTable';
-import mockData from '../../common/mockData';
+import React, { useEffect, useState } from 'react';
 import PortfolioHeader from '../../common/components/PortfolioHeader';
+import WelcomeBanner from '../../common/components/WelcomeBanner';
 import { useStrings } from '../../common/hooks/useStrings';
 import { TokenType } from '../../common/types/index';
-import WelcomeBanner from '../../common/components/WelcomeBanner';
+import { usePortfolio } from '../../module/PortfolioContextProvider';
+import StatsTable from './StatsTable';
 
 interface Props {
   data: TokenType[];
@@ -15,6 +15,8 @@ interface Props {
 const PortfolioWallet = ({ data }: Props): JSX.Element => {
   const theme = useTheme();
   const strings = useStrings();
+  const { walletBalance } = usePortfolio();
+
   const [keyword, setKeyword] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [tokenList, setTokenList] = useState<TokenType[]>(data);
@@ -58,7 +60,7 @@ const PortfolioWallet = ({ data }: Props): JSX.Element => {
   return (
     <Stack direction="column" spacing={theme.spacing(3)} sx={{ minHeight: 'calc(100vh - 220px)' }}>
       <PortfolioHeader
-        balance={mockData.common.walletBalance}
+        walletBalance={walletBalance}
         setKeyword={setKeyword}
         isLoading={isLoading}
         tooltipTitle={

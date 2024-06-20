@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { PortfolioActionType, PortfolioReducer, defaultPortfolioActions, defaultPortfolioState, CurrencyType } from './state';
+import { CurrencyType, PortfolioActionType, PortfolioReducer, defaultPortfolioActions, defaultPortfolioState } from './state';
 
 const initialPortfolioProvider = {
   ...defaultPortfolioState,
@@ -17,6 +17,7 @@ type PortfolioProviderProps = {
   initialState: {
     unitOfAccount: CurrencyType;
   };
+  currentWalletInfo: any; // TODO to be defined
 };
 
 export const PortfolioContextProvider = ({
@@ -25,7 +26,12 @@ export const PortfolioContextProvider = ({
   initialState = {
     unitOfAccount: settingFiatPairUnit.enabled ? settingFiatPairUnit.currency : 'USD',
   },
+  currentWalletInfo,
 }: PortfolioProviderProps) => {
+  console.log('currentWalletInfo', currentWalletInfo);
+
+  const { walletBalance, primaryTokenInfo } = currentWalletInfo;
+  console.log('walletBalance', walletBalance);
   const [state, dispatch] = React.useReducer(PortfolioReducer, {
     ...defaultPortfolioState,
     ...initialState,
@@ -45,6 +51,8 @@ export const PortfolioContextProvider = ({
       ...state,
       ...actions,
       settingFiatPairUnit,
+      walletBalance,
+      primaryTokenInfo,
     }),
     [state, actions]
   );

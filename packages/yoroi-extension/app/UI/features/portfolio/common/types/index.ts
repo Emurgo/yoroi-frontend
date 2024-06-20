@@ -14,7 +14,8 @@ export interface SubMenuOption {
 
 export type BalanceType = {
   ada: number;
-  usd: number;
+  usd: number; // TODO to be removed
+  fiatAmount: number;
   percents: number;
   amount: number;
 };

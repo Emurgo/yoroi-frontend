@@ -1,16 +1,14 @@
 // @flow
-import { observer } from 'mobx-react';
 import { BigNumber } from 'bignumber.js';
+import { observer } from 'mobx-react';
+import type { Node } from 'react';
 import { Component } from 'react';
+import type { MultiToken } from '../../api/common/lib/MultiToken';
 import { getTokenName } from '../../stores/stateless/tokenHelpers';
 import { splitAmount, truncateToken } from '../../utils/formatters';
 import { hiddenAmount } from '../../utils/strings';
+import { calculateAndFormatValue, formatValue } from '../../utils/unit-of-account';
 import styles from './AmountDisplay.scss';
-import type { MultiToken, TokenLookupKey } from '../../api/common/lib/MultiToken';
-import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import type { Node } from 'react';
-import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
-import { formatValue, calculateAndFormatValue } from '../../utils/unit-of-account';
 
 type Props = {|
   +showAmount?: boolean,
@@ -54,10 +52,7 @@ export default class AmountDisplay extends Component<Props> {
     } else {
       const shiftedAmount = defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
-      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-        shiftedAmount,
-        tokenInfo.Metadata.numberOfDecimals
-      );
+      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(shiftedAmount, tokenInfo.Metadata.numberOfDecimals);
 
       balanceDisplay = (
         <>
@@ -100,11 +95,7 @@ export default class AmountDisplay extends Component<Props> {
   }
 }
 
-export function FiatDisplay(props: {|
-  shouldHideBalance: boolean,
-  amount: BigNumber | null,
-  currency: string,
-|}): Node {
+export function FiatDisplay(props: {| shouldHideBalance: boolean, amount: BigNumber | null, currency: string |}): Node {
   if (props.shouldHideBalance) {
     return (
       <span className={styles.fiat}>
