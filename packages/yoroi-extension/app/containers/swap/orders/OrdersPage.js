@@ -138,12 +138,14 @@ function mapOrderAssets(
   to: any,
 |} {
   const price = Quantities.quotient(order.from.quantity, order.to.quantity);
-  const priceDenomination = order.from.token.decimals - order.to.token.decimals;
+  const fromDecimals = order.from.token?.decimals ?? 0;
+  const toDecimals = order.to.token?.decimals ?? 0;
+  const priceDenomination = fromDecimals - toDecimals;
   const formattedPrice = Quantities.format(price, priceDenomination, PRICE_PRECISION);
   const formattedToQuantity = Quantities.format(
     order.to.quantity,
-    order.to.token.decimals,
-    order.to.token.decimals
+    toDecimals,
+    toDecimals
   );
   const formattedAttachedValues = maybe(order.valueAttached, val =>
     createFormattedTokenValues({
@@ -474,7 +476,7 @@ const OrderRow = ({
       <Box textAlign="right">{order.amount}</Box>
       <Box textAlign="right">
         {(order.totalValues ?? []).map(v => (
-          <Box>
+          <Box key={v.ticker}>
             {v.formattedValue} {v.ticker}
           </Box>
         ))}

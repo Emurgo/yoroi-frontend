@@ -1,6 +1,6 @@
 // @flow
 
-import { action, observable } from 'mobx';
+import { action, observable, runInAction } from 'mobx';
 import { find } from 'lodash';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
@@ -27,7 +27,6 @@ import type {
 } from '../../api/ada/lib/storage/bridge/delegationUtils';
 
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import { environment } from '../../environment';
 
 export type DelegationRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -73,7 +72,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     this.governanceStatus = status;
   };
   @observable poolTransitionRequestInfo: { [number]: ?PoolTransition } = {};
-  @observable poolTransitionConfig: { [number]: PoolTransitionModal } = {};
+  @observable poolTransitionConfig: { [number]: ?PoolTransitionModal } = {};
 
   getPoolTransitionConfig(publicDeriver: ?PublicDeriver<>): PoolTransitionModal {
     return (
@@ -220,6 +219,20 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     return maybe(publicDeriver, w => this.poolTransitionRequestInfo[w.getPublicDeriverId()]);
   }
 
+  disablePoolTransitionState(publicDeriver: ?PublicDeriver<>): void {
+    maybe(publicDeriver, w => {
+      runInAction(() => {
+        const publicDeriverId = w.getPublicDeriverId();
+        this.poolTransitionConfig[publicDeriverId] = undefined;
+        if (this.poolTransitionRequestInfo[publicDeriverId] != null) {
+          // we don't delete the suggestion state because then it would get fetched again automatically
+          // so just flag it as completely disabled for that wallet
+          this.poolTransitionRequestInfo[publicDeriverId].shouldShowTransitionFunnel = false;
+        }
+      });
+    });
+  }
+
   @action checkPoolTransition: () => Promise<void> = async () => {
     const publicDeriver = this.stores.wallets.selected;
     if (publicDeriver === null || this.poolTransitionRequestInfo[publicDeriver.getPublicDeriverId()] != null) {
@@ -244,7 +257,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
         currentPool: transitionResult?.current,
         suggestedPool: transitionResult?.suggested,
         deadlineMilliseconds: transitionResult?.deadlineMilliseconds,
-        shouldShowTransitionFunnel: environment.isDev() && transitionResult !== null,
+        shouldShowTransitionFunnel: transitionResult !== null,
         deadlinePassed: Number(transitionResult?.deadlineMilliseconds) < Date.now(),
       };
 
@@ -259,7 +272,9 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
         this.setPoolTransitionConfig(publicDeriver, { show: 'open' });
       }
 
-      this.poolTransitionRequestInfo[walletId] = { ...response };
+      runInAction(() => {
+        this.poolTransitionRequestInfo[walletId] = { ...response };
+      })
     } catch (error) {
       console.warn('Failed to check pool transition', error);
     }
