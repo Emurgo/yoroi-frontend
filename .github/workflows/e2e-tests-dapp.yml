@@ -8,7 +8,7 @@ on:
     types: [submitted]
 
 jobs:
-  General:
+  Extension-General:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check') || contains(github.event.review.body, '/dapp-general'))
     runs-on: macos-14
     strategy:
@@ -85,7 +85,7 @@ jobs:
             ./packages/e2e-tests/mochawesome-report
             ./packages/e2e-tests/testRunsData_${{ matrix.browser }}
 
-  Failing:
+  Extension-Failing:
     if: github.event.review && contains(github.event.review.body, '/dapp-failing')
     runs-on: macos-14
     strategy:
