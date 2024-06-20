@@ -1,4 +1,5 @@
 // @flow
+import { forwardRef } from 'react';
 import { Typography, styled, Box, Stack } from '@mui/material';
 import { formatTimeSpan } from './helpers';
 
@@ -81,8 +82,8 @@ export const StakePoolCard = ({
             <>
               {!deadlinePassed ? (
                 <Typography variant="body2">
-                  {intl.formatMessage(messages.poolStop)}
-                  <Typography variant="body2" fontWeight="500">
+                  {intl.formatMessage(messages.poolStop)}&nbsp;
+                  <Typography component="span" variant="body2" fontWeight="500" sx={{ display: 'inline' }}>
                     {formatTimeSpan(Number(deadlineMilliseconds), Date.now())}
                   </Typography>
                 </Typography>
@@ -99,7 +100,10 @@ export const StakePoolCard = ({
   );
 };
 
-const CustomCard = styled(Box)(({ theme, suggestedPool }) => ({
+// eslint-disable-next-line no-unused-vars
+const StyledBox = forwardRef(({ suggestedPool, ...props }, ref) => <Box {...props} ref={ref} />);
+
+const CustomCard = styled(StyledBox)(({ theme, suggestedPool }) => ({
   background: suggestedPool ? 'linear-gradient(312deg, #C6F7ED 0%, #E4E8F7 70.58%)' : 'transparent',
   padding: theme.spacing(2),
   width: '284px',

@@ -74,8 +74,13 @@ class WalletSendPage extends Component<AllProps> {
   @observable showSupportedAddressDomainBanner: boolean = true;
 
   closeTransactionSuccessDialog: void => void = () => {
-    this.props.actions.dialogs.closeActiveDialog.trigger();
-    this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS });
+    const redirect = this.props.stores.loading.sellAdaParams?.redirect;
+    if (redirect) {
+      window.document.location = redirect;
+    } else {
+      this.props.actions.dialogs.closeActiveDialog.trigger();
+      this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS });
+    }
   };
 
   openTransactionSuccessDialog: void => void = () => {
@@ -293,8 +298,11 @@ class WalletSendPage extends Component<AllProps> {
       return this.noCloudWarningDialog();
     }
     if (uiDialogs.isOpen(TransactionSuccessDialog)) {
+      const process = this.props.stores.loading.sellAdaParams?.redirect ?
+        'for-sell' : 'normal';
       return (
         <TransactionSuccessDialog
+          process={process}
           onClose={this.closeTransactionSuccessDialog}
           classicTheme={this.props.stores.profile.isClassicTheme}
         />

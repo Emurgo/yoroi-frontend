@@ -6,7 +6,7 @@ export const formatTimeSpan = (futureMilliseconds: number, currentMilliseconds: 
   const currentTime = moment(currentMilliseconds);
   const duration = moment.duration(futureTime.diff(currentTime));
 
-  const days = duration.days();
+  const days = Math.floor(duration.asDays());
   const hours = duration.hours();
   const minutes = duration.minutes();
 

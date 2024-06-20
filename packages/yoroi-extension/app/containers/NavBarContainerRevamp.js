@@ -176,7 +176,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
         <BuySellDialog
           onCancel={this.props.actions.dialogs.closeActiveDialog.trigger}
           onExchangeCallback={() => this.props.actions.router.goToRoute.trigger({ route: ROUTES.EXCHANGE_END })}
-          currentBalanceAda={balance.getDefault().shiftedBy(-numberOfDecimals).toFormat(numberOfDecimals)}
+          currentBalanceAda={balance.getDefault().shiftedBy(-numberOfDecimals)}
           receiveAdaAddressPromise={getReceiveAdaAddress()}
         />
       );

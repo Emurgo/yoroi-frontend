@@ -88,8 +88,8 @@ function SwapPage(props: StoresAndActionsProps): Node {
   const defaultTokenInfo = props.stores.tokenInfoStore.getDefaultTokenInfoSummary(
     network.NetworkId
   );
-  const getTokenInfo: (string => Promise<RemoteTokenInfo>) =
-      id => props.stores.tokenInfoStore.getLocalOrRemoteMetadata(network, id);
+  const getTokenInfo: string => Promise<RemoteTokenInfo> = id =>
+    props.stores.tokenInfoStore.getLocalOrRemoteMetadata(network, id);
 
   const disclaimerFlag = props.stores.substores.ada.swapStore.swapDisclaimerAcceptanceFlag;
 

@@ -85,6 +85,7 @@ export type SwapFormContext = {|
   ...SwapFormActions,
   sellFocusState: State<boolean>,
   buyFocusState: State<boolean>,
+  limitPriceFocusState: State<boolean>,
   onChangeSellQuantity: (text: string) => void,
   onChangeBuyQuantity: (text: string) => void,
   onChangeLimitPrice: (text: string) => void,

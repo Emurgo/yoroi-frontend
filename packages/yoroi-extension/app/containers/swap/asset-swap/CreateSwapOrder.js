@@ -1,4 +1,6 @@
 // @flow
+import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
+import type { PriceImpact } from '../../../components/swap/types';
 import { useState } from 'react';
 import { Box } from '@mui/material';
 import SwapPriceInput from '../../../components/swap/SwapPriceInput';
@@ -11,13 +13,10 @@ import SelectSellTokenFromList from './edit-sell-amount/SelectSellTokenFromList'
 import EditSwapPool from './edit-pool/EditPool';
 import SelectSwapPoolFromList from './edit-pool/SelectPoolFromList';
 import SwapStore from '../../../stores/ada/SwapStore';
-import { useAsyncPools } from '../hooks';
-import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
-import type { PriceImpact } from '../../../components/swap/types';
-
 import { TopActions } from './actions/TopActions';
 import { MiddleActions } from './actions/MiddleActions';
 import { EditSlippage } from './actions/EditSlippage';
+import { useSwapForm } from '../context/swap-form';
 
 type Props = {|
   slippageValue: string,
@@ -41,7 +40,6 @@ export const CreateSwapOrder = ({
 
   const {
     orderData: {
-      amounts: { sell, buy },
       type: orderType,
       selectedPoolCalculation,
     },
@@ -50,17 +48,19 @@ export const CreateSwapOrder = ({
     buyTokenInfoChanged,
   } = useSwap();
 
+  const { onChangeLimitPrice } = useSwapForm();
+
+  const resetLimitPrice = () => {
+    onChangeLimitPrice('');
+  };
+
   if (orderType === 'market') {
     const selectedPoolId = selectedPoolCalculation?.pool.poolId;
     if (selectedPoolId !== prevSelectedPoolId) {
       setPrevSelectedPoolId(selectedPoolId);
-      swapStore.resetLimitOrderDisplayValue();
+      resetLimitPrice();
     }
   }
-
-  useAsyncPools(sell.tokenId, buy.tokenId)
-    .then(() => null)
-    .catch(() => null);
 
   return (
     <>
@@ -84,7 +84,7 @@ export const CreateSwapOrder = ({
         />
 
         {/* Clear and switch */}
-        <MiddleActions swapStore={swapStore} />
+        <MiddleActions />
 
         {/* To Field */}
         <EditBuyAmount
@@ -94,10 +94,7 @@ export const CreateSwapOrder = ({
         />
 
         {/* Price between assets */}
-        <SwapPriceInput
-          swapStore={swapStore}
-          priceImpactState={priceImpactState}
-        />
+        <SwapPriceInput priceImpactState={priceImpactState} />
 
         {/* Slippage settings */}
         <EditSlippage
@@ -118,7 +115,7 @@ export const CreateSwapOrder = ({
           store={swapStore}
           onClose={() => setOpenedDialog('')}
           onTokenInfoChanged={val => {
-            swapStore.resetLimitOrderDisplayValue();
+            resetLimitPrice();
             sellTokenInfoChanged(val);
           }}
           defaultTokenInfo={defaultTokenInfo}
@@ -130,7 +127,7 @@ export const CreateSwapOrder = ({
           store={swapStore}
           onClose={() => setOpenedDialog('')}
           onTokenInfoChanged={val => {
-            swapStore.resetLimitOrderDisplayValue();
+            resetLimitPrice();
             buyTokenInfoChanged(val);
           }}
           defaultTokenInfo={defaultTokenInfo}

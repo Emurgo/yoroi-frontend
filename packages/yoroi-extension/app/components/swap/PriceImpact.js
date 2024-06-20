@@ -135,6 +135,12 @@ export function FormattedMarketPrice(): Node {
   return <FormattedPrice price={marketPrice} />;
 }
 
+export function FormattedLimitPrice(): Node {
+  const { orderData } = useSwap();
+  const limitPrice = orderData.limitPrice ?? '0';
+  return <FormattedPrice price={limitPrice} />;
+}
+
 export function FormattedActualPrice(): Node {
   const { orderData } = useSwap();
   const actualPrice = orderData.selectedPoolCalculation?.prices.actualPrice ?? '0';
