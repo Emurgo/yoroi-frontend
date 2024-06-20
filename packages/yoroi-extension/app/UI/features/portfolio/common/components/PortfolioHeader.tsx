@@ -1,4 +1,4 @@
-import { Stack, Typography } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import React, { useState } from 'react';
 import { Chip, SearchInput, Skeleton, Tooltip } from '../../../../components';
@@ -88,7 +88,7 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
               <Skeleton width="65px" height="20px" />
             </Stack>
           ) : (
-            <Tooltip title={tooltipTitle} placement="right" sx={{ width: '182px', height: '76px' }}>
+            <Tooltip title={<Box minWidth="158px">{tooltipTitle}</Box>} placement="right">
               <Stack direction="row" alignItems="center" spacing={theme.spacing(1)} sx={{ marginLeft: theme.spacing(2) }}>
                 <Chip
                   type={
