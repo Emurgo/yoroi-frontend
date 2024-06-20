@@ -12,10 +12,10 @@ type Props = {|
   onClose(): void,
   onTokenInfoChanged: * => void,
   defaultTokenInfo: RemoteTokenInfo,
-  getTokenInfo: string => Promise<RemoteTokenInfo>,
+  getTokenInfoBatch: Array<string> => { [string]: Promise<RemoteTokenInfo> },
 |};
 
-export default function SelectSellTokenFromList({ store, onClose, onTokenInfoChanged, defaultTokenInfo, getTokenInfo }: Props): Node {
+export default function SelectSellTokenFromList({ store, onClose, onTokenInfoChanged, defaultTokenInfo, getTokenInfoBatch }: Props): Node {
   const { onlyVerifiedTokens } = useSwapTokensOnlyVerified();
   const assets = store.assets;
   const walletVerifiedAssets = useMemo(() => {
@@ -62,7 +62,7 @@ export default function SelectSellTokenFromList({ store, onClose, onTokenInfoCha
       onAssetSelected={handleAssetSelected}
       onClose={onClose}
       defaultTokenInfo={defaultTokenInfo}
-      getTokenInfo={getTokenInfo}
+      getTokenInfoBatch={getTokenInfoBatch}
     />
   );
 }

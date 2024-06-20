@@ -88,8 +88,10 @@ function SwapPage(props: StoresAndActionsProps): Node {
   const defaultTokenInfo = props.stores.tokenInfoStore.getDefaultTokenInfoSummary(
     network.NetworkId
   );
+  const getTokenInfoBatch: Array<string> => { [string]: Promise<RemoteTokenInfo> } = ids =>
+    props.stores.tokenInfoStore.fetchMissingAndGetLocalOrRemoteMetadata(network, ids);
   const getTokenInfo: string => Promise<RemoteTokenInfo> = id =>
-    props.stores.tokenInfoStore.getLocalOrRemoteMetadata(network, id);
+    getTokenInfoBatch([id])[id].then(res => res ?? {});
 
   const disclaimerFlag = props.stores.substores.ada.swapStore.swapDisclaimerAcceptanceFlag;
 
@@ -323,6 +325,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
               onSetNewSlippage={onSetNewSlippage}
               defaultTokenInfo={defaultTokenInfo}
               getTokenInfo={getTokenInfo}
+              getTokenInfoBatch={getTokenInfoBatch}
               priceImpactState={priceImpactState}
             />
           )}

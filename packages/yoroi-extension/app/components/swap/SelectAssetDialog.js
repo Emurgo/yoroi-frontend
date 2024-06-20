@@ -28,7 +28,7 @@ type Props = {|
   onAssetSelected: any => void,
   onClose: void => void,
   defaultTokenInfo: RemoteTokenInfo,
-  getTokenInfo: string => Promise<RemoteTokenInfo>,
+  getTokenInfoBatch: Array<string> => { [string]: Promise<RemoteTokenInfo> },
 |};
 
 export default function SelectAssetDialog({
@@ -37,7 +37,7 @@ export default function SelectAssetDialog({
   onAssetSelected,
   onClose,
   defaultTokenInfo,
-  getTokenInfo,
+  getTokenInfoBatch,
 }: Props): React$Node {
   const [searchTerm, setSearchTerm] = useState<string>('');
 
@@ -54,6 +54,9 @@ export default function SelectAssetDialog({
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
     }) || [];
+
+  const metadataPromiseMap: { [string]: Promise<RemoteTokenInfo> } =
+    getTokenInfoBatch(filteredAssets.map(a => a.id))
 
   return (
     <Dialog
@@ -127,7 +130,7 @@ export default function SelectAssetDialog({
                 type={type}
                 onAssetSelected={handleAssetSelected}
                 defaultTokenInfo={defaultTokenInfo}
-                getTokenInfo={getTokenInfo}
+                getTokenInfo={id => metadataPromiseMap[id]}
               />
             );
           })}

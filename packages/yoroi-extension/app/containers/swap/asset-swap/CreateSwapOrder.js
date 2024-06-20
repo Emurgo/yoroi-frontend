@@ -24,6 +24,7 @@ type Props = {|
   swapStore: SwapStore,
   defaultTokenInfo: RemoteTokenInfo,
   getTokenInfo: string => Promise<RemoteTokenInfo>,
+  getTokenInfoBatch: Array<string> => { [string]: Promise<RemoteTokenInfo> },
   priceImpactState: ?PriceImpact,
 |};
 
@@ -33,6 +34,7 @@ export const CreateSwapOrder = ({
   swapStore,
   defaultTokenInfo,
   getTokenInfo,
+  getTokenInfoBatch,
   priceImpactState,
 }: Props): React$Node => {
   const [openedDialog, setOpenedDialog] = useState('');
@@ -119,7 +121,7 @@ export const CreateSwapOrder = ({
             sellTokenInfoChanged(val);
           }}
           defaultTokenInfo={defaultTokenInfo}
-          getTokenInfo={getTokenInfo}
+          getTokenInfoBatch={getTokenInfoBatch}
         />
       )}
       {openedDialog === 'to' && (
@@ -131,7 +133,7 @@ export const CreateSwapOrder = ({
             buyTokenInfoChanged(val);
           }}
           defaultTokenInfo={defaultTokenInfo}
-          getTokenInfo={getTokenInfo}
+          getTokenInfoBatch={getTokenInfoBatch}
         />
       )}
       {openedDialog === 'slippage' && (
