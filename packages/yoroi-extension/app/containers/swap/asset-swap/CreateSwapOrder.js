@@ -38,31 +38,16 @@ export const CreateSwapOrder = ({
   priceImpactState,
 }: Props): React$Node => {
   const [openedDialog, setOpenedDialog] = useState('');
-  const [prevSelectedPoolId, setPrevSelectedPoolId] = useState<?string>(undefined);
 
   const {
     orderData: {
       type: orderType,
-      selectedPoolCalculation,
     },
-    // unsignedTxChanged,
     sellTokenInfoChanged,
     buyTokenInfoChanged,
   } = useSwap();
 
   const { onChangeLimitPrice } = useSwapForm();
-
-  const resetLimitPrice = () => {
-    onChangeLimitPrice('');
-  };
-
-  if (orderType === 'market') {
-    const selectedPoolId = selectedPoolCalculation?.pool.poolId;
-    if (selectedPoolId !== prevSelectedPoolId) {
-      setPrevSelectedPoolId(selectedPoolId);
-      resetLimitPrice();
-    }
-  }
 
   return (
     <>
@@ -117,7 +102,7 @@ export const CreateSwapOrder = ({
           store={swapStore}
           onClose={() => setOpenedDialog('')}
           onTokenInfoChanged={val => {
-            resetLimitPrice();
+            onChangeLimitPrice();
             sellTokenInfoChanged(val);
           }}
           defaultTokenInfo={defaultTokenInfo}
@@ -129,7 +114,7 @@ export const CreateSwapOrder = ({
           store={swapStore}
           onClose={() => setOpenedDialog('')}
           onTokenInfoChanged={val => {
-            resetLimitPrice();
+            onChangeLimitPrice();
             buyTokenInfoChanged(val);
           }}
           defaultTokenInfo={defaultTokenInfo}
