@@ -79,7 +79,7 @@ jobs:
           SECOND_STATIC_TEST_WALLET: ${{ secrets.SECOND_STATIC_TEST_WALLET }}
           SECOND_SMOKE_TEST_WALLET: ${{ secrets.SECOND_SMOKE_TEST_WALLET }}
           SECOND_SMOKE_TEST_WALLET_FF: ${{ secrets.SECOND_SMOKE_TEST_WALLET_FF }}
-        run: xvfb-run -a -e /dev/stdout -s "-screen 0 1920x1080x24" npm run test:${{ matrix.browser }}:dapp
+        run: npm run test:${{ matrix.browser }}:dapp
 
       - name: Archive tests screenshots and logs
         if: ${{ failure() }}
@@ -160,7 +160,7 @@ jobs:
           SECOND_STATIC_TEST_WALLET: ${{ secrets.SECOND_STATIC_TEST_WALLET }}
           SECOND_SMOKE_TEST_WALLET: ${{ secrets.SECOND_SMOKE_TEST_WALLET }}
           SECOND_SMOKE_TEST_WALLET_FF: ${{ secrets.SECOND_SMOKE_TEST_WALLET_FF }}
-        run: xvfb-run -a -e /dev/stdout -s "-screen 0 1920x1080x24" npm run test:${{ matrix.browser }}:dapp:bl
+        run: npm run test:${{ matrix.browser }}:dapp:bl
 
       - name: Archive tests screenshots and logs
         if: ${{ failure() }}
