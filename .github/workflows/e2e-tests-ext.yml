@@ -10,7 +10,7 @@ on:
 jobs:
   Ext-General:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check') || contains(github.event.review.body, '/ext-general'))
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         browser: ["chrome"]
@@ -36,7 +36,7 @@ jobs:
           wget -c "https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US" -O - | sudo tar -xj -C /opt
           sudo rm -rf /opt/firefoxdev
           sudo mv /opt/firefox /opt/firefoxdev
-          echo "FIREFOX_DEV=/opt/firefoxdev/firefox-bin" >> $GITHUB_ENV
+          echo "FIREFOX_BIN=/opt/firefoxdev/firefox-bin" >> $GITHUB_ENV
 
       - name: Read .nvmrc
         id: nvm
@@ -90,7 +90,7 @@ jobs:
 
   Ext-Failing:
     if: github.event.review && contains(github.event.review.body, '/ext-failing')
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         browser: ["chrome"]
@@ -116,7 +116,7 @@ jobs:
           wget -c "https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US" -O - | sudo tar -xj -C /opt
           sudo rm -rf /opt/firefoxdev
           sudo mv /opt/firefox /opt/firefoxdev
-          echo "FIREFOX_DEV=/opt/firefoxdev/firefox-bin" >> $GITHUB_ENV
+          echo "FIREFOX_BIN=/opt/firefoxdev/firefox-bin" >> $GITHUB_ENV
 
       - name: Read .nvmrc
         id: nvm
