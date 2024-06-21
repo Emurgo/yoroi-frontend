@@ -8,6 +8,7 @@ import {
 import { Quantities } from '../../utils/quantities';
 import { useSwapForm } from './context/swap-form';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
+import { useQuery } from 'react-query';
 
 export function useSwapFeeDisplay(
   defaultTokenInfo: RemoteTokenInfo
@@ -140,4 +141,71 @@ export function useRichCompletedOrders(): any {
     console.warn('useRichCompletedOrders', e);
     return [];
   }
+}
+
+export function useRichOrders(): {| openOrders: Array<any>, completedOrders: Array<any> |} {
+  const {order, tokens, stakingKey} = useSwap()
+
+  const verifiedTokensMapQuery = useQuery({
+    suspense: true,
+    queryKey: ['useSwapTokensOnlyVerified'],
+    queryFn: () => tokens.list.onlyVerified()
+      .then(tokens => tokens.reduce((map, t) => ({ ...map, [t.id]: t }), {}))
+      .catch(e => {
+        console.error('Failed to load verified tokens!', e);
+        throw e;
+      }),
+  });
+
+  const openOrdersQuery = useQuery({
+    suspense: true,
+    queryKey: ['useSwapOrdersByStatusOpen', stakingKey],
+    queryFn: () => order.list.byStatusOpen().catch(e => {
+      console.error('Failed to load open orders!', e);
+      throw e;
+    }),
+  });
+
+  const completedOrdersQuery = useQuery({
+    suspense: true,
+    queryKey: ['useSwapOrdersByStatusCompleted', stakingKey],
+    queryFn: () => order.list.byStatusCompleted().catch(e => {
+      console.error('Failed to load completed orders!', e);
+      throw e;
+    }),
+  });
+
+  let openOrders = [];
+  let completedOrders = [];
+  const tokensMap = verifiedTokensMapQuery.data;
+  if (tokensMap && openOrdersQuery.data) {
+    console.log('recalc open orders');
+    openOrders = openOrdersQuery.data.map(o => {
+      const fromToken = tokensMap[o.from.tokenId];
+      const toToken = tokensMap[o.to.tokenId];
+      return {
+        utxo: o.utxo,
+        from: { quantity: o.from.quantity, token: fromToken },
+        to: { quantity: o.to.quantity, token: toToken },
+        batcherFee: o.batcherFee,
+        valueAttached: o.valueAttached,
+        deposit: o.deposit,
+        provider: o.provider,
+        sender: o.sender,
+      };
+    });
+  }
+  if (tokensMap && completedOrdersQuery.data) {
+    console.log('recalc completed orders');
+    completedOrders = completedOrdersQuery.data.map(o => {
+      const fromToken = tokensMap[o.from.tokenId];
+      const toToken = tokensMap[o.to.tokenId];
+      return {
+        txHash: o.txHash,
+        from: { quantity: o.from.quantity, token: fromToken },
+        to: { quantity: o.to.quantity, token: toToken },
+      };
+    });
+  }
+  return { openOrders, completedOrders };
 }

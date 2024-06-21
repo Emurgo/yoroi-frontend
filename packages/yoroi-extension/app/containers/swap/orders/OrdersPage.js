@@ -6,7 +6,7 @@ import Table from '../../../components/common/table/Table';
 import CancelSwapOrderDialog from '../../../components/swap/CancelOrderDialog';
 import AssetPair from '../../../components/common/assets/AssetPair';
 import Tabs from '../../../components/common/tabs/Tabs';
-import { useRichCompletedOrders, useRichOpenOrders } from '../hooks';
+import { useRichCompletedOrders, useRichOpenOrders, useRichOrders } from '../hooks';
 import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import { SwapPoolLabel } from '../../../components/swap/SwapPoolComponents';
 import ExplorableHashContainer from '../../widgets/ExplorableHashContainer';
@@ -195,7 +195,7 @@ function mapCompletedOrder(order: any, defaultTokenInfo: RemoteTokenInfo): Mappe
 
 export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
   const {
-    order: { cancel: swapCancelOrder },
+    order: orderApi,
   } = useSwap();
 
   const [showCompletedOrders, setShowCompletedOrders] = useState<boolean>(false);
@@ -218,8 +218,11 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
     props.stores.explorers.selectedExplorer.get(network.NetworkId) ??
     fail('No explorer for wallet network');
 
-  const openOrders = useRichOpenOrders().map(o => mapOpenOrder(o, defaultTokenInfo));
-  const completedOrders = useRichCompletedOrders().map(o => mapCompletedOrder(o, defaultTokenInfo));
+  // const openOrders = useRichOpenOrders().map(o => mapOpenOrder(o, defaultTokenInfo));
+  // const completedOrders = useRichCompletedOrders().map(o => mapCompletedOrder(o, defaultTokenInfo));
+  let { openOrders, completedOrders } = useRichOrders();
+  openOrders = openOrders.map(o => mapOpenOrder(o, defaultTokenInfo));
+  completedOrders = completedOrders.map(o => mapCompletedOrder(o, defaultTokenInfo));
 
   const txHashes = [...openOrders, ...completedOrders].map(o => o.txId);
   noop(props.stores.substores.ada.swapStore.fetchTransactionTimestamps({ wallet, txHashes }));
@@ -270,7 +273,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
       throw new Error('Cannot cancel a completed order (sender == null)');
     }
     try {
-      const cancelTxCbor = await swapCancelOrder({
+      const cancelTxCbor = await orderApi.cancel({
         address: addressBech32ToHex(sender),
         utxos: {
           order: order.utxo,
