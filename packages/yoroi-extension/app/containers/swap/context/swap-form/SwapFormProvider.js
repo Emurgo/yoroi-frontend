@@ -35,6 +35,7 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
 
   const { quantity: sellQuantity, tokenId: sellTokenId } = orderData.amounts.sell;
   const { quantity: buyQuantity, tokenId: buyTokenId } = orderData.amounts.buy;
+  const { priceDenomination } = orderData.tokens;
 
   const swapFormReducer = (state: SwapFormState, action: SwapFormAction) => {
     const draft = { ...state };
@@ -171,13 +172,14 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
   const baseSwapFieldChangeHandler = (
     tokenInfo: any,
     handler: ({| input: string, quantity: string |}) => void
-  ) => (text: string) => {
+  ) => (text: string = '') => {
     if (tokenInfo.tokenId === '') {
       // empty input
       return;
     }
     const decimals = tokenInfo.decimals ?? 0;
-    const [input, quantity] = Quantities.parseFromText(text, decimals, numberLocale);
+    const precision = tokenInfo.precision ?? decimals;
+    const [input, quantity] = Quantities.parseFromText(text, decimals, numberLocale, precision);
     clearErrors();
     handler({ quantity, input: text === '' ? '' : input });
   };
@@ -193,7 +195,7 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
       const [, availableQuantity] = Quantities.parseFromText(
         sellAvailableAmount,
         decimals,
-        numberLocale
+        numberLocale,
       );
       if (Quantities.isGreaterThan(quantity, availableQuantity)) {
         actions.sellAmountErrorChanged('Not enough balance');
@@ -208,6 +210,13 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
     actions.buyInputValueChanged(input);
   };
 
+  const limitUpdateHandler = ({ input, quantity }) => {
+    if (quantity !== orderData.limitPrice) {
+      limitPriceChanged(quantity);
+    }
+    actions.limitPriceInputValueChanged(input);
+  };
+
   const onChangeSellQuantity = useCallback(
     baseSwapFieldChangeHandler(swapFormState.sellTokenInfo, sellUpdateHandler),
     [sellQuantityChanged, actions, clearErrors]
@@ -219,33 +228,21 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
   );
 
   const onChangeLimitPrice = useCallback(
-    (text = '') => {
-      const [formattedPrice, price] = Quantities.parseFromText(
-        text,
-        orderData.tokens.priceDenomination,
-        numberLocale,
-        PRICE_PRECISION
-      );
-      actions.limitPriceInputValueChanged(formattedPrice);
-      limitPriceChanged(price);
-
-      clearErrors();
-    },
-    [actions, clearErrors, orderData.tokens.priceDenomination, limitPriceChanged, numberLocale]
+    baseSwapFieldChangeHandler(
+      { tokenId: 'priceDenomination', decimals: priceDenomination, precision: PRICE_PRECISION },
+      limitUpdateHandler,
+    ),
+    [limitPriceChanged, actions, clearErrors, priceDenomination]
   );
-
-  // on selected best pool changes
-  useEffect(() => {
-    if (orderData.type === 'market') {
-      onChangeLimitPrice();
-    }
-  }, [orderData.selectedPoolCalculation?.pool.poolId]);
 
   const sellFocusState = StateWrap<boolean>(useState(false));
   const buyFocusState = StateWrap<boolean>(useState(false));
   const limitPriceFocusState = StateWrap<boolean>(useState(false));
 
-  const updateSellInput = useCallback(() => {
+  /**
+   * On sell quantity changes
+   */
+  useEffect(() => {
     if (swapFormState.sellQuantity.isTouched && !sellFocusState.value) {
       const decimals = swapFormState.sellTokenInfo.decimals ?? 0;
       const formatted = Quantities.format(sellQuantity, decimals);
@@ -253,7 +250,10 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
     }
   }, [sellQuantity, swapFormState.sellTokenInfo.decimals, swapFormState.sellQuantity.isTouched]);
 
-  const updateBuyInput = useCallback(() => {
+  /**
+   * On buy quantity changes
+   */
+  useEffect(() => {
     if (swapFormState.buyQuantity.isTouched && !buyFocusState.value) {
       const decimals = swapFormState.buyTokenInfo.decimals ?? 0;
       const formatted = Quantities.format(buyQuantity, decimals);
@@ -261,34 +261,25 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
     }
   }, [buyQuantity, swapFormState.buyTokenInfo.decimals, swapFormState.buyQuantity.isTouched]);
 
-  const updateLimitPrice = useCallback(() => {
-    if (orderData.type === 'limit' && !limitPriceFocusState.value) {
-      const formatted = Quantities.format(
-        orderData.limitPrice ?? Quantities.zero,
-        orderData.tokens.priceDenomination,
-        PRICE_PRECISION
-      );
-
-      actions.limitPriceInputValueChanged(formatted);
-    } else if (orderData.type === 'market') {
-      const formatted = Quantities.format(
-        orderData.selectedPoolCalculation?.prices.market ?? Quantities.zero,
-        orderData.tokens.priceDenomination,
-        PRICE_PRECISION
-      );
-
-      actions.limitPriceInputValueChanged(formatted);
-    }
+  /**
+   * Limit price updater
+   */
+  useEffect(() => {
+    const isLimit = orderData.type === 'limit';
+    if (isLimit && limitPriceFocusState.value) return;
+    const quantity = (isLimit ? orderData.limitPrice : orderData.selectedPoolCalculation?.prices.market) ?? Quantities.zero;
+    actions.limitPriceInputValueChanged(Quantities.format(
+      quantity,
+      priceDenomination,
+      PRICE_PRECISION
+    ));
   }, [
-    orderData.tokens.priceDenomination,
+    priceDenomination,
     orderData.limitPrice,
     orderData.selectedPoolCalculation?.prices.market,
+    orderData.selectedPoolCalculation?.pool.poolId,
     orderData.type,
   ]);
-
-  useEffect(updateSellInput, [updateSellInput]);
-  useEffect(updateBuyInput, [updateBuyInput]);
-  useEffect(updateLimitPrice, [updateLimitPrice]);
 
   const allActions = {
     ...actions,
