@@ -46,7 +46,7 @@ const getBraveBuilder = () => {
           '--disable-dev-shm-usage', // The /dev/shm partition is too small in certain VM environments, causing Chrome to fail or crash
           '--disable-setuid-sandbox', // Disable the setuid sandbox (Linux only)
           '--start-maximized', // Starts the browser maximized, regardless of any previous settings
-          '--headless=new', // Runs the browser in the headless mode
+          // '--headless=new' // Runs the browser in the headless mode
         )
         .addExtensions(path.resolve(__extensionDir, 'Yoroi-test.crx'))
     );
@@ -60,14 +60,12 @@ const getChromeBuilder = () => {
     .setChromeOptions(
       new chrome.Options()
         .addExtensions(path.resolve(__extensionDir, 'Yoroi-test.crx'))
-        .addArguments(
-          '--no-sandbox',
-          '--disable-gpu',
-          '--disable-dev-shm-usage',
-          '--disable-setuid-sandbox',
-          '--start-maximized',
-          // '--headless=new', // Runs the browser in the headless mode
-        )
+        .addArguments('--disable-dev-shm-usage')
+        .addArguments('--no-sandbox')
+        .addArguments('--disable-gpu')
+        .addArguments('--disable-setuid-sandbox')
+        .addArguments('--start-maximized')
+        // .addArguments('--headless=new')
         .setUserPreferences({ 'download.default_directory': downloadsDir })
     );
 };
