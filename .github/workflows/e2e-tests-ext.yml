@@ -8,7 +8,7 @@ on:
     types: [submitted]
 
 jobs:
-  DApp-General:
+  Ext-General:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check') || contains(github.event.review.body, '/ext-general'))
     runs-on: ubuntu-24.04
     strategy:
@@ -81,7 +81,6 @@ jobs:
         run: npm run test:${{ matrix.browser }}
 
       - name: Archive tests screenshots and logs
-        if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
           name: testRunsData_E2E_tests_${{ matrix.browser }}
@@ -89,7 +88,7 @@ jobs:
             ./packages/e2e-tests/mochawesome-report
             ./packages/e2e-tests/testRunsData_${{ matrix.browser }}
 
-  DApp-Failing:
+  Ext-Failing:
     if: github.event.review && contains(github.event.review.body, '/ext-failing')
     runs-on: ubuntu-24.04
     strategy:
