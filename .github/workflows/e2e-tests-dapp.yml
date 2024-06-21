@@ -10,7 +10,7 @@ on:
 jobs:
   Extension-General:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check') || contains(github.event.review.body, '/dapp-general'))
-    runs-on: macos-14
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         browser: ["chrome"]
@@ -20,18 +20,23 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: distutils hack
-        run: brew install python-setuptools
+        run: sudo apt-get install python3-setuptools
 
       - name: Forcefully update the Chrome browser
         if: matrix.browser=='chrome'
-        run: brew update && brew upgrade --cask google-chrome
+        run: |
+          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          sudo sh -c 'echo "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+          sudo apt-get update
+          sudo apt-get --only-upgrade install google-chrome-stable
 
       - name: Forcefully install Firefox for Developers browser
         if: matrix.browser=='firefox'
         run: |
-          brew update
-          brew tap homebrew/cask-versions && brew install --cask firefox-developer-edition
-          echo "FIREFOX_BIN=/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox-bin" >> $GITHUB_ENV
+          wget -c "https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US" -O - | sudo tar -xj -C /opt
+          sudo rm -rf /opt/firefoxdev
+          sudo mv /opt/firefox /opt/firefoxdev
+          echo "FIREFOX_DEV=/opt/firefoxdev/firefox-bin" >> $GITHUB_ENV
 
       - name: Read .nvmrc
         id: nvm
@@ -87,28 +92,33 @@ jobs:
 
   Extension-Failing:
     if: github.event.review && contains(github.event.review.body, '/dapp-failing')
-    runs-on: macos-14
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
-        browser: ['chrome']
+        browser: ["chrome"]
       fail-fast: false
-    
+
     steps:
       - uses: actions/checkout@v4
 
       - name: distutils hack
-        run: brew install python-setuptools
+        run: sudo apt-get install python3-setuptools
 
       - name: Forcefully update the Chrome browser
         if: matrix.browser=='chrome'
-        run: brew update && brew upgrade --cask google-chrome
+        run: |
+          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          sudo sh -c 'echo "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+          sudo apt-get update
+          sudo apt-get --only-upgrade install google-chrome-stable
 
       - name: Forcefully install Firefox for Developers browser
         if: matrix.browser=='firefox'
         run: |
-          brew update
-          brew tap homebrew/cask-versions && brew install --cask firefox-developer-edition
-          echo "FIREFOX_BIN=/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox-bin" >> $GITHUB_ENV
+          wget -c "https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US" -O - | sudo tar -xj -C /opt
+          sudo rm -rf /opt/firefoxdev
+          sudo mv /opt/firefox /opt/firefoxdev
+          echo "FIREFOX_DEV=/opt/firefoxdev/firefox-bin" >> $GITHUB_ENV
 
       - name: Read .nvmrc
         id: nvm
