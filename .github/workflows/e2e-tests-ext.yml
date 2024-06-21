@@ -67,6 +67,9 @@ jobs:
         run: |
           . install-all.sh
 
+      - name: ChromeDriver version
+        run: chromedriver --version
+
       - name: Build the test mainnet version
         working-directory: ./packages/yoroi-extension
         run: npm run test:build:mainnet
