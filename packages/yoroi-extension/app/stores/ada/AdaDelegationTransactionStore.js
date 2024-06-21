@@ -108,9 +108,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
       poolRequest: request.poolRequest,
       registrationStatus: this.stores.delegation.isStakeRegistered(request.wallet.publicDeriverId) === true,
       valueInAccount: this.stores.delegation.getRewardBalanceOrZero(
-        request.wallet.publicDeriverId,
-        request.wallet.networkId,
-        request.wallet.defaultTokenId
+        request.wallet
       ),
       absSlotNumber,
     }).promise;

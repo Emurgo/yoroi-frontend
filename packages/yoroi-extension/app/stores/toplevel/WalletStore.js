@@ -120,7 +120,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   }
 
   refreshWalletFromRemote: (number) => Promise<void> = async publicDeriverId => {
-    // todo: legacy code to be removed
+    // legacy code, no-op now, to be removed
   }
 
   @action
@@ -148,9 +148,10 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
         lastSyncInfo: publicDeriver.lastSyncInfo,
       });
       this._queueWarningIfNeeded(publicDeriver);
-      await this.stores.transactions.refreshTransactionData({
+      this.stores.transactions.refreshTransactionData({
         publicDeriver,
       });
+      this.stores.addresses.refreshAddressesFromDb(publicDeriver);
     }
 
     runInAction('refresh active wallet', () => {

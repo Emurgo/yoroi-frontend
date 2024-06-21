@@ -55,9 +55,7 @@ export default class NavBarContainer extends Component<Props> {
 
     const walletComponents = wallets.map(wallet => {
       const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(
-        wallet.publicDeriverId,
-        wallet.networkId,
-        wallet.defaultTokenId,
+        wallet
       );
       const { lastSyncInfo } = wallet;
 
@@ -105,9 +103,7 @@ export default class NavBarContainer extends Component<Props> {
         }
 
         const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(
-          publicDeriver.publicDeriverId,
-          publicDeriver.networkId,
-          publicDeriver.defaultTokenId
+          publicDeriver
         );
 
         return (

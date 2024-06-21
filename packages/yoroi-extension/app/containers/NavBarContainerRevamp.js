@@ -66,9 +66,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
       const { plate }= selected;
 
       const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(
-        selected.publicDeriverId,
-        selected.networkId,
-        selected.defaultTokenId
+        selected
       );
 
       return (
@@ -120,9 +118,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
 
       wallets.forEach(wallet => {
         const rewards = this.props.stores.delegation.getRewardBalanceOrZero(
-          wallet.publicDeriverId,
-          wallet.networkId,
-          wallet.defaultTokenId
+          wallet
         );
 
         const walletMap = {

@@ -85,9 +85,7 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
         hasAnyPending={this.props.stores.transactions.hasAnyPending}
         stakePools={stakePools}
         userSummary={this._generateUserSummary({
-          publicDeriverId: publicDeriver.publicDeriverId,
-          networkId: publicDeriver.networkId,
-          defaultTokenId: publicDeriver.defaultTokenId,
+          wallet: publicDeriver,
           showRewardAmount,
         })}
         graphData={generateGraphData({
@@ -290,13 +288,17 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
   };
 
   _generateUserSummary: ({|
-    publicDeriverId: number,
-    networkId: number,
-    defaultTokenId: string,
+    wallet: {
+      publicDeriverId: number,
+      networkId: number,
+      defaultTokenId: string,
+      ...
+    },
     showRewardAmount: boolean,
   |}) => Node = request => {
 
-    const { publicDeriverId, networkId, defaultTokenId, showRewardAmount } = request;
+    const { wallet, showRewardAmount } = request;
+    const { publicDeriverId, networkId, defaultTokenId } = wallet;
     const { stores } = this.props;
 
     const balance = this.props.stores.transactions.balance;
@@ -306,9 +308,7 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
       defaultTokenId
     );
     const rewardBalance = this.props.stores.delegation.getRewardBalanceOrZero(
-      publicDeriverId,
-      networkId,
-      defaultTokenId
+      wallet
     );
 
     const stakeRegistered =

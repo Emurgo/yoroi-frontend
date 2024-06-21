@@ -56,6 +56,18 @@ export async function getDb(): Promise<lf$Database> {
 
 export async function getWallets(): Promise<Array<WalletState>> {
   const wallets = await callBackground({ type: 'get-wallets' });
+
+  const deserializeAddressesByType = addressesByType => addressesByType.map(
+    addresses => addresses.map(
+      address => ({
+        ...address,
+        // note: address.values should be non-null according to the type definition, but a bug
+        // somewhere in the db layers actually returns null values
+        values: address.values  && MultiToken.from(address.values),
+      })
+    )
+  );
+
   for (const wallet of wallets) {
     wallet.submittedTransactions = wallet.submittedTransactions.map(
       ({ networkId, publicDeriverId, transaction, usedUtxos }) => ({
@@ -67,6 +79,10 @@ export async function getWallets(): Promise<Array<WalletState>> {
     );
     wallet.balance = MultiToken.from(wallet.balance);
     wallet.assetDeposits = MultiToken.from(wallet.assetDeposits);
+
+    wallet.allAddressesByType = deserializeAddressesByType(wallet.allAddressesByType);
+    wallet.internalAddressesByType = deserializeAddressesByType(wallet.internalAddressesByType);
+    wallet.externalAddressesByType = deserializeAddressesByType(wallet.externalAddressesByType);
   }
   return wallets;
 }
@@ -164,7 +180,10 @@ export async function signAndBroadcastTransaction(
   };
   txBody.free();
   txHash.free();
-  const result = await callBackground({ type: 'sign-and-broadcast-transaction', serializableRequest, });
+  const result = await callBackground({
+    type: 'sign-and-broadcast-transaction',
+    request: serializableRequest,
+  });
   // fixme handle failures
   return result;
 }

@@ -102,7 +102,7 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
         try {
           const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
           const accountStateResp = await stateFetcher.getAccountState({
-            network: getNetworkById(wallet.publicDeriverId),
+            network: getNetworkById(wallet.networkId),
             addresses: [wallet.stakingAddress],
           });
           const stateForStakingKey = accountStateResp[wallet.stakingAddress];

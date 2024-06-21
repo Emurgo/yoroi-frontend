@@ -31,21 +31,16 @@ import DelegatedStakePoolCard from '../../../components/wallet/staking/dashboard
 import WithdrawRewardsDialog from './WithdrawRewardsDialog';
 import { formatLovelacesHumanReadableShort, roundOneDecimal, roundTwoDecimal } from '../../../utils/formatters';
 import { compose, maybe } from '../../../coreUtils';
-import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
-type Props = {|
-  ...StoresAndActionsProps,
-  actions: any,
-  stores: any,
-|};
+
 type InjectedLayoutProps = {|
   +renderLayoutComponent: LayoutComponentMap => Node,
 |};
 
-type AllProps = {| ...Props, ...InjectedLayoutProps |};
+type AllProps = {| ...StoresAndActionsProps, ...InjectedLayoutProps |};
 @observer
 class StakingPageContent extends Component<AllProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
@@ -103,9 +98,8 @@ class StakingPageContent extends Component<AllProps> {
     const currentPool = delegationStore.getDelegatedPoolId(publicDeriverId);
     if (currentPool == null) return null;
 
-    const networkInfo = getNetworkById(networkId);
-    const poolMeta = delegationStore.getLocalPoolInfo(networkInfo, currentPool);
-    const { stake, roa, saturation, pic } = delegationStore.getLocalRemotePoolInfo(networkInfo, currentPool) ?? {};
+    const poolMeta = delegationStore.getLocalPoolInfo(networkId, currentPool);
+    const { stake, roa, saturation, pic } = delegationStore.getLocalRemotePoolInfo(networkId, currentPool) ?? {};
     if (poolMeta == null) {
       // server hasn't returned information about the stake pool yet
       return null;
@@ -208,7 +202,7 @@ class StakingPageContent extends Component<AllProps> {
     }
     const { actions, stores } = this.props;
     const { uiDialogs, delegation: delegationStore } = stores;
-    const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
+    const delegationRequests = delegationStore.getDelegationRequests(publicDeriver.publicDeriverId);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingPageContent)} opened for non-reward wallet`);
     }
@@ -223,7 +217,7 @@ class StakingPageContent extends Component<AllProps> {
     const isStakeRegistered = stores.delegation.isStakeRegistered(publicDeriver.publicDeriverId);
     const currentlyDelegating = stores.delegation.isCurrentlyDelegating(publicDeriver.publicDeriverId);
     const delegatedUtxo = stores.delegation.getDelegatedUtxoBalance(publicDeriver.publicDeriverId);
-    const delegatedRewards = stores.delegation.getRewardBalanceOrZero(publicDeriver.publicDeriverId);
+    const delegatedRewards = stores.delegation.getRewardBalanceOrZero(publicDeriver);
     const defaultMultiToken = new MultiToken(
       [],
       {
@@ -382,7 +376,7 @@ class StakingPageContent extends Component<AllProps> {
     );
   }
 }
-export default (withLayout(StakingPageContent): ComponentType<Props>);
+export default (withLayout(StakingPageContent): ComponentType<StoresAndActionsProps>);
 
 const WrapperCards = styled(Box)({
   display: 'flex',

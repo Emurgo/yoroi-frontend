@@ -151,11 +151,12 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     return this.getDelegationRequests(publicDeriverId)?.getDelegatedBalance.wasExecuted === true;
   }
 
-  getRewardBalanceOrZero: (number, number, string) => MultiToken = (
-    publicDeriverId,
-    networkId,
-    defaultTokenId,
-  ) => {
+  getRewardBalanceOrZero: ({
+    publicDeriverId: number,
+    networkId: number,
+    defaultTokenId: string,
+    ...
+  }) => MultiToken = ({ publicDeriverId, networkId, defaultTokenId, }) => {
     const defaultMultiToken = new MultiToken(
       [],
       {

@@ -197,9 +197,7 @@ class MyWalletsPage extends Component<AllProps> {
     })();
 
     const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(
-      wallet.publicDeriverId,
-      wallet.networkId,
-      wallet.defaultTokenId,
+      wallet
     );
 
     const { plate, lastSyncInfo } = wallet;

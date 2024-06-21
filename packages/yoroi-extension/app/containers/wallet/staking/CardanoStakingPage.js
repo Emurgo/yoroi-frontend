@@ -184,9 +184,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
     }
     const delegationStore = this.props.stores.delegation;
     const rewardBalance = delegationStore.getRewardBalanceOrZero(
-      publicDeriver.publicDeriverId,
-      publicDeriver.networkId,
-      publicDeriver.defaultTokenId
+      publicDeriver
     );
     const tokenInfo = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)(
       rewardBalance.getDefaultEntry()

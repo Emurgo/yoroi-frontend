@@ -135,9 +135,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         }
         const balance = duplicatedWallet.balance;
         const rewards = this.props.stores.delegation.getRewardBalanceOrZero(
-          duplicatedWallet.publicDeriverId,
-          duplicatedWallet.networkId,
-          duplicatedWallet.defaultTokenId,
+          duplicatedWallet
         );
 
         return (
