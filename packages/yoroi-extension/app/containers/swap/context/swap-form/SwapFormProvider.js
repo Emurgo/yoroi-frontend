@@ -268,11 +268,8 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
     const isLimit = orderData.type === 'limit';
     if (isLimit && limitPriceFocusState.value) return;
     const quantity = (isLimit ? orderData.limitPrice : orderData.selectedPoolCalculation?.prices.market) ?? Quantities.zero;
-    actions.limitPriceInputValueChanged(Quantities.format(
-      quantity,
-      priceDenomination,
-      PRICE_PRECISION
-    ));
+    const formatted = Quantities.format(quantity, priceDenomination, PRICE_PRECISION);
+    limitUpdateHandler({ input: formatted, quantity: orderData.limitPrice });
   }, [
     priceDenomination,
     orderData.limitPrice,
