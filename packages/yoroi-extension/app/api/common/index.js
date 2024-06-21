@@ -241,7 +241,7 @@ export default class CommonApi {
     try {
 
       const newAddress = await request.popFunc();
-      Logger.info(`${nameof(CommonApi)}::${nameof(this.createAddress)} success: ` + stringifyData(newAddress));
+      Logger.debug(`${nameof(CommonApi)}::${nameof(this.createAddress)} success: ` + stringifyData(newAddress));
       return newAddress;
     } catch (error) {
       Logger.error(`${nameof(CommonApi)}::${nameof(this.createAddress)} error: ` + stringifyError(error));
