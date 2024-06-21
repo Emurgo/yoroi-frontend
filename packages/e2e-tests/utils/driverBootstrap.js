@@ -66,7 +66,6 @@ const getChromeBuilder = () => {
           '--disable-dev-shm-usage',
           '--disable-setuid-sandbox',
           '--start-maximized',
-          '--remote-debugging-pipe',
           // '--headless=new', // Runs the browser in the headless mode
         )
         .setUserPreferences({ 'download.default_directory': downloadsDir })
