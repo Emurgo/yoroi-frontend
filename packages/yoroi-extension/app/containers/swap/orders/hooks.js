@@ -111,7 +111,7 @@ export function useRichOrders(
   const [transactionTimestamps, setTransactionTimestamps] = useState<{ [string]: Date }>({});
 
   /**
-   * Filter open orders by verified tokens when both are fetched
+   * Map open orders with verified tokens when both are fetched
    */
   useEffect(() => {
     if (tokensMap && openOrdersData) {
@@ -135,7 +135,7 @@ export function useRichOrders(
   }, [tokensMap, openOrdersData]);
 
   /**
-   * Filter completed orders by verified tokens when both are fetched
+   * Map completed orders with verified tokens when both are fetched
    */
   useEffect(() => {
     if (tokensMap && completedOrdersData) {
