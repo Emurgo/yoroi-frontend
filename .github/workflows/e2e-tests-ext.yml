@@ -8,9 +8,35 @@ on:
     types: [submitted]
 
 jobs:
+  Build-Extension:
+    if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check') || contains(github.event.review.body, '/ext-general') || contains(github.event.review.body, '/ext-failing'))
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: npm install
+        run: |
+          . install-all.sh
+
+      - name: Build the test mainnet version
+        working-directory: ./packages/yoroi-extension
+        run: npm run test:build:mainnet
+
+      - name: Archive tests screenshots and logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: builtApp
+          path: |
+            ./packages/yoroi-extension/Yoroi-test.crx
+            ./packages/yoroi-extension/Yoroi.xpi
+          retention-days: 1
+          overwrite: true
+
   Ext-General:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check') || contains(github.event.review.body, '/ext-general'))
-    runs-on: macos-14
+    runs-on: macos-latest
+    needs: Build-Extension
     strategy:
       matrix:
         browser: ["chrome"]
@@ -18,9 +44,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: distutils hack
-        run: brew install python-setuptools
 
       - name: Forcefully update the Chrome browser
         if: matrix.browser=='chrome'
@@ -59,12 +82,20 @@ jobs:
             ${{ runner.os }}-
 
       - name: npm install
+        working-directory: ./packages/e2e-tests
         run: |
-          . install-all.sh
+          nvm use
+          npm install
 
-      - name: Build the test mainnet version
+      - name: download app
+        uses: actions/download-artifact@v4
+        with:
+          name: builtApp
+          path: ./packages/yoroi-extension
+
+      - name: unzip app
         working-directory: ./packages/yoroi-extension
-        run: npm run test:build:mainnet
+        run: unzip builtApp.zip
 
       - name: Run tests
         working-directory: ./packages/e2e-tests
