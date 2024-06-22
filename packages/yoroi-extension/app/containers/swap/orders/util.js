@@ -9,13 +9,17 @@ export type FormattedTokenValue = {|
   ticker: string,
 |};
 
+export type OrderAsset = {| token: {| id: string, decimals: number, ticker: ?string |}, quantity: string |};
+
 export function createFormattedTokenValues({
   entries,
-  order,
+  from,
+  to,
   defaultTokenInfo,
 }: {|
   entries: Array<{| id: string, amount: string |}>,
-  order: any,
+  from: OrderAsset,
+  to: OrderAsset,
   defaultTokenInfo: RemoteTokenInfo,
 |}): Array<FormattedTokenValue> {
   const tokenAmountMap = entries.reduce(
@@ -35,7 +39,7 @@ export function createFormattedTokenValues({
       ticker: defaultTokenInfo.ticker ?? '-',
     },
   ];
-  [order.from.token, order.to.token].forEach(t => {
+  [from.token, to.token].forEach(t => {
     if (t.id !== '' && t.id !== '.') {
       maybe(tokenAmountMap[t.id], v => {
         const formattedValue = Quantities.format(v, t.decimals, t.decimals);

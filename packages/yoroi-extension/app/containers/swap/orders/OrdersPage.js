@@ -13,7 +13,7 @@ import { SwapPoolLabel } from '../../../components/swap/SwapPoolComponents';
 import ExplorableHashContainer from '../../widgets/ExplorableHashContainer';
 import { truncateAddressShort } from '../../../utils/formatters';
 import { Quantities } from '../../../utils/quantities';
-import { fail, forceNonNull, maybe, noop } from '../../../coreUtils';
+import { fail, forceNonNull, maybe } from '../../../coreUtils';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import { useSwap } from '@yoroi/swap';
 import { addressBech32ToHex } from '../../../api/ada/lib/cardanoCrypto/utils';
@@ -96,31 +96,31 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
     isSubmitting?: boolean,
   |}>(null);
 
-  const wallet = props.stores.wallets.selectedOrFail;
+  const { wallets, tokenInfoStore, explorers, substores: { ada: { swapStore } } } = props.stores;
+
+  const wallet = wallets.selectedOrFail;
   const network = wallet.getParent().getNetworkInfo();
   const walletVariant = wallet.getParent().getWalletVariant();
-  const defaultTokenInfo = props.stores.tokenInfoStore.getDefaultTokenInfoSummary(
+  const defaultTokenInfo = tokenInfoStore.getDefaultTokenInfoSummary(
     network.NetworkId
   );
 
   const selectedExplorer =
-    props.stores.explorers.selectedExplorer.get(network.NetworkId) ??
+    explorers.selectedExplorer.get(network.NetworkId) ??
     fail('No explorer for wallet network');
 
-  let { openOrders, completedOrders } = useRichOrders(defaultTokenInfo);
-
-  const txHashes = [...openOrders, ...completedOrders].map(o => o.txId);
-  noop(props.stores.substores.ada.swapStore.fetchTransactionTimestamps({ wallet, txHashes }));
+  const fetchTransactionTimestamps = txHashes => swapStore.fetchTransactionTimestamps({ wallet, txHashes });
+  let { openOrders, completedOrders, transactionTimestamps } = useRichOrders(defaultTokenInfo, fetchTransactionTimestamps);
 
   const txHashToRenderedTimestamp: string => string = txHash => {
-    const date = props.stores.substores.ada.swapStore.transactionTimestamps[txHash];
+    const date = transactionTimestamps[txHash];
     return date == null ? '-' : moment(date).format('MMM D, YYYY H:mm');
   };
 
   const handleCancelRequest = async order => {
     setCancellationState({ order, tx: null });
     try {
-      let utxoHex = await props.stores.substores.ada.swapStore.getCollateralUtxoHexForCancel({
+      let utxoHex = await swapStore.getCollateralUtxoHexForCancel({
         wallet,
       });
       let collateralReorgTxHex: ?string = null;
@@ -130,7 +130,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
           unsignedTxHex,
           txData,
           collateralUtxoHex,
-        } = await props.stores.substores.ada.swapStore.createCollateralReorgForCancel({ wallet });
+        } = await swapStore.createCollateralReorgForCancel({ wallet });
         collateralReorgTxHex = unsignedTxHex;
         collateralReorgTxData = txData;
         utxoHex = collateralUtxoHex;
@@ -174,7 +174,8 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
           id: e.identifier,
           amount: e.amount.toString(),
         })),
-        order,
+        from: order.from,
+        to: order.to,
         defaultTokenInfo,
       });
       const formattedFeeValue = Quantities.format(
@@ -246,7 +247,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
       signedCollateralReorgTx != null
         ? [signedCollateralReorgTx, signedCancelTx]
         : [signedCancelTx];
-    await props.stores.substores.ada.swapStore.executeTransactionHexes({
+    await swapStore.executeTransactionHexes({
       wallet,
       signedTransactionHexes,
     });
@@ -328,7 +329,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
           onCancelOrder={handleCancelConfirm}
           onDialogClose={() => setCancellationState(null)}
           defaultTokenInfo={defaultTokenInfo}
-          getTokenInfo={genLookupOrFail(props.stores.tokenInfoStore.tokenInfo)}
+          getTokenInfo={genLookupOrFail(tokenInfoStore.tokenInfo)}
           selectedExplorer={selectedExplorer}
           submissionError={null}
           walletType={walletVariant}
