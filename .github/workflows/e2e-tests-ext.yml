@@ -23,7 +23,7 @@ jobs:
         working-directory: ./packages/yoroi-extension
         run: npm run test:build:mainnet
 
-      - name: Archive tests screenshots and logs
+      - name: Archive built app
         uses: actions/upload-artifact@v4
         with:
           name: builtApp
@@ -84,6 +84,8 @@ jobs:
       - name: npm install
         working-directory: ./packages/e2e-tests
         run: |
+          export NVM_DIR=~/.nvm
+          source ~/.nvm/nvm.sh
           nvm use
           npm install
 
