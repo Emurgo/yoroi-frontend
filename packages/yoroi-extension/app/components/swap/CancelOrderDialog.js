@@ -102,9 +102,9 @@ export default function CancelSwapOrderDialog({
           >
             {transactionParams ? (
               transactionParams.returnValues.map((v, index) => (
-                <>
+                <Box key={v.ticker}>
                   {index > 0 && ' +'} {v.formattedValue} {v.ticker}
-                </>
+                </Box>
               ))
             ) : (
               <LoadingSpinner small />
