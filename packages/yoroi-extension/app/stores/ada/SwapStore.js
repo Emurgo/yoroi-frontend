@@ -233,6 +233,7 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
     wallet,
     txHashes,
   }) => {
+    console.log('fetchTransactionTimestamps');
     const existingSet = new Set(Object.keys(this.transactionTimestamps));
     const filteredTxHashes = txHashes.filter(x => !existingSet.has(x.toLowerCase()));
     if (filteredTxHashes.length === 0) {

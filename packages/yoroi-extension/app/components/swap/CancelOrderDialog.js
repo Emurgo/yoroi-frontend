@@ -6,7 +6,6 @@ import TextField from '../common/TextField';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 import { useState } from 'react';
-import type { FormattedTokenValue } from '../../containers/swap/orders/OrdersPage';
 import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import { stringifyError } from '../../utils/logging';
 import { InfoTooltip } from '../widgets/InfoTooltip';
@@ -16,6 +15,7 @@ import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type LocalizableError from '../../i18n/LocalizableError';
+import type { FormattedTokenValue } from '../../containers/swap/orders/util';
 
 type Props = {|
   order: any,
