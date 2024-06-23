@@ -45,8 +45,8 @@ const getBraveBuilder = () => {
           '--disable-gpu', // Disables GPU hardware acceleration. If software renderer is not in place, then the GPU process won't launch
           '--disable-dev-shm-usage', // The /dev/shm partition is too small in certain VM environments, causing Chrome to fail or crash
           '--disable-setuid-sandbox', // Disable the setuid sandbox (Linux only)
-          '--start-maximized', // Starts the browser maximized, regardless of any previous settings
-          '--headless=new', // Runs the browser in the headless mode
+          '--start-maximized' // Starts the browser maximized, regardless of any previous settings
+          // '--headless=new' // Runs the browser in the headless mode
         )
         .addExtensions(path.resolve(__extensionDir, 'Yoroi-test.crx'))
     );
@@ -54,22 +54,21 @@ const getBraveBuilder = () => {
 
 const getChromeBuilder = () => {
   const downloadsDir = getDownloadsDir();
+  const chromeOpts = new chrome.Options()
+    .addExtensions(path.resolve(__extensionDir, 'Yoroi-test.crx'))
+    .addArguments('--disable-dev-shm-usage')
+    .addArguments('--no-sandbox')
+    .addArguments('--disable-gpu')
+    .addArguments('--disable-setuid-sandbox')
+    .addArguments('--start-maximized')
+    .setUserPreferences({ 'download.default_directory': downloadsDir });
+  if (process.env.HEADLESS) {
+    chromeOpts.addArguments('--headless=new')
+  }
   return new Builder()
     .forBrowser(TargetBrowser.Chrome)
     .setLoggingPrefs(prefs)
-    .setChromeOptions(
-      new chrome.Options()
-        .addExtensions(path.resolve(__extensionDir, 'Yoroi-test.crx'))
-        .addArguments(
-          '--no-sandbox',
-          '--disable-gpu',
-          '--disable-dev-shm-usage',
-          '--disable-setuid-sandbox',
-          '--start-maximized',
-          // '--headless=new', // Runs the browser in the headless mode
-        )
-        .setUserPreferences({ 'download.default_directory': downloadsDir })
-    );
+    .setChromeOptions(chromeOpts);
 };
 
 const getFirefoxBuilder = () => {
