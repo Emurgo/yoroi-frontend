@@ -83,11 +83,7 @@ jobs:
 
       - name: npm install
         working-directory: ./packages/e2e-tests
-        run: |
-          export NVM_DIR=~/.nvm
-          source ~/.nvm/nvm.sh
-          nvm use
-          npm install
+        run: npm install
 
       - name: download app
         uses: actions/download-artifact@v4
