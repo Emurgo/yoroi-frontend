@@ -100,13 +100,6 @@ jobs:
           name: builtApp
           path: ./packages/yoroi-extension
 
-      - name: unzip app
-        working-directory: ./packages/yoroi-extension
-        run: |
-          ls -A
-          mv builtApp builtApp.zip 
-          unzip builtApp.zip
-
       - name: Run tests
         working-directory: ./packages/e2e-tests
         env:
