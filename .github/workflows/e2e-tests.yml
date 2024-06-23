@@ -120,7 +120,7 @@ jobs:
 
   Ext-Failing:
     if: github.event.review && contains(github.event.review.body, '/ext-failing')
-    runs-on: macos-14
+    runs-on: macos-latest
     needs: Build-Extension
     strategy:
       matrix:
@@ -196,7 +196,7 @@ jobs:
 
   DApp-General:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check') || contains(github.event.review.body, '/dapp-general'))
-    runs-on: macos-14
+    runs-on: macos-latest
     needs: Build-Extension
     strategy:
       matrix:
@@ -272,7 +272,7 @@ jobs:
 
   DApp-Failing:
     if: github.event.review && contains(github.event.review.body, '/dapp-failing')
-    runs-on: macos-14
+    runs-on: macos-latest
     needs: Build-Extension
     strategy:
       matrix:
