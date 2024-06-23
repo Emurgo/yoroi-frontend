@@ -15,6 +15,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Read .nvmrc
+        id: nvm
+        run: echo "NVMRC=$(cat .nvmrc)" >> $GITHUB_OUTPUT
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "${{ steps.nvm.outputs.NVMRC }}"
+
       - name: npm install
         run: |
           . install-all.sh
@@ -93,7 +102,10 @@ jobs:
 
       - name: unzip app
         working-directory: ./packages/yoroi-extension
-        run: unzip builtApp.zip
+        run:
+          ls -A
+          mv builtApp builtApp.zip 
+          unzip builtApp.zip
 
       - name: Run tests
         working-directory: ./packages/e2e-tests
