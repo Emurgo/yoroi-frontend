@@ -45,6 +45,7 @@ export const isBrave = () => getTargetBrowser() === TargetBrowser.Brave;
 
 export const getCurrentOS = () => process.platform;
 export const isLinux = () => getCurrentOS() === 'linux';
+export const isMacOS = () => getCurrentOS() === 'darwin';
 export const isHeadless = () => process.env.HEADLESS === 'true';
 
 export const createTestRunDataDir = testSuiteName => {
