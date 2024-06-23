@@ -43,6 +43,10 @@ export const isFirefox = () => getTargetBrowser() === TargetBrowser.FF;
 export const isChrome = () => getTargetBrowser() === TargetBrowser.Chrome;
 export const isBrave = () => getTargetBrowser() === TargetBrowser.Brave;
 
+export const getCurrentOS = () => process.platform;
+export const isLinux = () => getCurrentOS() === 'linux';
+export const isHeadless = () => process.env.HEADLESS === true;
+
 export const createTestRunDataDir = testSuiteName => {
   const clearedTestSuiteName = testSuiteName.replace(/[ |,]/gi, '_');
   const testsDataDir = testRunDir(getTargetBrowser());

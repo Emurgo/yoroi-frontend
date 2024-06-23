@@ -1,5 +1,6 @@
 import BasePage from '../../../basepage.js';
 import { twoSeconds, quarterSecond } from '../../../../helpers/timeConstants.js';
+import { isHeadless, isLinux } from '../../../../utils/utils.js';
 
 class ExportTransactionsModal extends BasePage {
   // locators
@@ -40,6 +41,10 @@ class ExportTransactionsModal extends BasePage {
     locator: '.ErrorBlock_component',
     method: 'css',
   };
+  exportUbuntuPenIconButtonLocator = {
+    locator: '.MuiPickersToolbar-penIconButton',
+    method: 'css',
+  }
   // methods
   async isDisplayed() {
     this.logger.info(`ExportTransactionsModal::isDisplayed is called`);
@@ -60,7 +65,12 @@ class ExportTransactionsModal extends BasePage {
   async setStartDate(dateString) {
     this.logger.info(`ExportTransactionsModal::setStartDate is called`);
     await this.click(this.exportStartDateInputLocator);
-    await this.input(this.exportStartDateInputLocator, dateString);
+    if (isLinux() && isHeadless()) {
+      await this.waitForElement(this.exportUbuntuPenIconButtonLocator);
+      await this.click(this.exportUbuntuPenIconButtonLocator);
+    } else {
+      await this.input(this.exportStartDateInputLocator, dateString);
+    }
   }
   async checkStartDateErrorMsg() {
     this.logger.info(`ExportTransactionsModal::checkStartDateErrorMsg is called`);
