@@ -41,8 +41,21 @@ class ExportTransactionsModal extends BasePage {
     locator: '.ErrorBlock_component',
     method: 'css',
   };
+  // locators only for headless ubuntu
   exportUbuntuPenIconButtonLocator = {
     locator: '.MuiPickersToolbar-penIconButton',
+    method: 'css',
+  }
+  exportUbuntuClickInputLocator = {
+    locator: '.MuiInputBase-formControl',
+    method: 'css',
+  }
+  exportUbuntuDateInputLocator = {
+    locator: '.MuiOutlinedInput-input',
+    method: 'css',
+  }
+  exportUbuntuOkButtonLocator = {
+    locator: 'div.MuiDialogActions-root > button:nth-child(2)',
     method: 'css',
   }
   // methods
@@ -62,12 +75,25 @@ class ExportTransactionsModal extends BasePage {
       return false;
     }
   }
+  async _ubuntuHeadlessSetDate(dateString){
+    await this.waitForElement(this.exportUbuntuPenIconButtonLocator);
+    await this.click(this.exportUbuntuPenIconButtonLocator);
+
+    const allForms = await this.findElements(this.exportUbuntuClickInputLocator);
+    const lastForm = allForms[allForms.length - 1];
+    await lastForm.click();
+
+    const allInputs = await this.findElements(this.exportUbuntuDateInputLocator);
+    const lastInput = allInputs[allInputs.length - 1];
+    await this.inputElem(lastInput, dateString);
+
+    await this.click(this.exportUbuntuOkButtonLocator);
+  }
   async setStartDate(dateString) {
     this.logger.info(`ExportTransactionsModal::setStartDate is called`);
     await this.click(this.exportStartDateInputLocator);
     if (isLinux() && isHeadless()) {
-      await this.waitForElement(this.exportUbuntuPenIconButtonLocator);
-      await this.click(this.exportUbuntuPenIconButtonLocator);
+      await this._ubuntuHeadlessSetDate(dateString);
     } else {
       await this.input(this.exportStartDateInputLocator, dateString);
     }
@@ -79,7 +105,11 @@ class ExportTransactionsModal extends BasePage {
   async setEndDate(dateString) {
     this.logger.info(`ExportTransactionsModal::setEndDate is called`);
     await this.click(this.exportEndDateInputLocator);
-    await this.input(this.exportEndDateInputLocator, dateString);
+    if (isLinux() && isHeadless()) {
+      await this._ubuntuHeadlessSetDate(dateString);
+    } else {
+      await this.input(this.exportEndDateInputLocator, dateString);
+    }
   }
   async checkEndDateErrorMsg() {
     this.logger.info(`ExportTransactionsModal::checkEndDateErrorMsg is called`);
