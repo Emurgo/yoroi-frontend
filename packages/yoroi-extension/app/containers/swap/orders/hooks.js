@@ -1,13 +1,14 @@
 //@flow
 import { useSwap, } from '@yoroi/swap';
 import { useQuery } from 'react-query';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import { Quantities } from '../../../utils/quantities';
 import { PRICE_PRECISION } from '../../../components/swap/common';
-import { maybe } from '../../../coreUtils';
+import { maybe} from '../../../coreUtils';
 import type { FormattedTokenValue, OrderAsset } from './util';
 import { createFormattedTokenValues } from './util';
+import { useAsyncMemo } from '../../../reactUtils';
 
 function mapOrderAssets(
   from: OrderAsset,
@@ -106,65 +107,59 @@ export function useRichOrders(
     }),
   });
 
-  const [openOrders, setOpenOrders] = useState<Array<MappedOrder>>([]);
-  const [completedOrders, setCompletedOrders] = useState<Array<MappedOrder>>([]);
-  const [transactionTimestamps, setTransactionTimestamps] = useState<{ [string]: Date }>({});
-
   /**
    * Map open orders with verified tokens when both are fetched
    */
-  useEffect(() => {
-    if (tokensMap && openOrdersData) {
-      setOpenOrders(
-        openOrdersData.map(o => {
-          const txId = (o.utxo.split('#')[0]);
-          const from = { quantity: o.from.quantity, token: tokensMap[o.from.tokenId] };
-          const to = { quantity: o.to.quantity, token: tokensMap[o.to.tokenId] };
-          return {
-            txId: txId.toLowerCase(),
-            utxo: o.utxo,
-            batcherFee: o.batcherFee,
-            deposit: o.deposit,
-            provider: o.provider,
-            sender: o.sender,
-            ...mapOrderAssets(from, to, o.valueAttached, defaultTokenInfo),
-          };
-        })
-      );
-    }
+  const openOrders: Array<MappedOrder> = useMemo(() => {
+    if (!tokensMap || !openOrdersData) return [];
+    return openOrdersData.map(o => {
+      const txId = (o.utxo.split('#')[0]);
+      const from = { quantity: o.from.quantity, token: tokensMap[o.from.tokenId] };
+      const to = { quantity: o.to.quantity, token: tokensMap[o.to.tokenId] };
+      return {
+        txId: txId.toLowerCase(),
+        utxo: o.utxo,
+        batcherFee: o.batcherFee,
+        deposit: o.deposit,
+        provider: o.provider,
+        sender: o.sender,
+        ...mapOrderAssets(from, to, o.valueAttached, defaultTokenInfo),
+      };
+    });
   }, [tokensMap, openOrdersData]);
 
   /**
    * Map completed orders with verified tokens when both are fetched
    */
-  useEffect(() => {
-    if (tokensMap && completedOrdersData) {
-      setCompletedOrders(
-        completedOrdersData.map(o => {
-          const from = { quantity: o.from.quantity, token: tokensMap[o.from.tokenId] };
-          const to = { quantity: o.to.quantity, token: tokensMap[o.to.tokenId] };
-          return {
-            txId: o.txHash.toLowerCase(),
-            ...mapOrderAssets(from, to, null, defaultTokenInfo),
-          };
-        })
-      );
-    }
+  const completedOrders: Array<MappedOrder> = useMemo(() => {
+    if (!tokensMap || !completedOrdersData) return [];
+    return completedOrdersData.map(o => {
+      const from = { quantity: o.from.quantity, token: tokensMap[o.from.tokenId] };
+      const to = { quantity: o.to.quantity, token: tokensMap[o.to.tokenId] };
+      return {
+        txId: o.txHash.toLowerCase(),
+        ...mapOrderAssets(from, to, null, defaultTokenInfo),
+      };
+    });
   }, [tokensMap, completedOrdersData]);
 
   /**
    * Fetch missing transaction timestamps any time open or completed orders change
    */
-  useEffect(() => {
+  const transactionTimestamps = useAsyncMemo<{ [string]: Date }>(async () => {
     const txHashes = [...openOrders, ...completedOrders].map(o => o.txId);
     const existingSet = new Set(Object.keys(transactionTimestamps));
     const filteredTxHashes = txHashes.filter(x => !existingSet.has(x));
-    if (filteredTxHashes.length === 0) return;
-    fetchTransactionTimestamps(filteredTxHashes).then(newTimestamps => {
-      setTransactionTimestamps(state => ({ ...state, ...newTimestamps }));
-      return null;
-    }).catch(e => console.error('Failed to load transaction timestamps!', e));
-  }, [openOrders, completedOrders]);
+    if (filteredTxHashes.length > 0) {
+      try {
+        const newTimestamps = await fetchTransactionTimestamps(filteredTxHashes);
+        return state => ({ ...state, ...newTimestamps });
+      } catch (e) {
+        console.error('Failed to load transaction timestamps!', e);
+      }
+    }
+    return useAsyncMemo.void;
+  }, [openOrders, completedOrders], {});
 
   return { openOrders, completedOrders, transactionTimestamps };
 }
