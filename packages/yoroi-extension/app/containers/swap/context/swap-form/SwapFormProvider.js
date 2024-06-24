@@ -101,6 +101,11 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
     ...defaultSwapFormState,
   });
 
+  const {
+    sellQuantity: { isTouched: sellTouched },
+    buyQuantity: { isTouched: buyTouched },
+  } = swapFormState;
+
   const actions = {
     sellTouched: (token?: AssetAmount) =>
       dispatch({ type: SwapFormActionTypeValues.SellTouched, token }),
@@ -162,7 +167,7 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
         .then(poolsArray => poolPairsChanged(poolsArray))
         .catch(err => console.error(`Failed to fetch pools for pair: ${sellTokenId}/${buyTokenId}`, err));
     }
-  }, [sellTokenId, buyTokenId]);
+  }, [sellTokenId, buyTokenId, sellTouched, buyTouched]);
 
   const clearErrors = useCallback(() => {
     if (swapFormState.sellQuantity.error != null) actions.sellAmountErrorChanged(null);
