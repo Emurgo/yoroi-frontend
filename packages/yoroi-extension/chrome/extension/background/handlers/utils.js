@@ -39,10 +39,13 @@ import { asAddressedUtxo, cardanoValueFromRemoteFormat } from '../../../../app/a
 import { MultiToken } from '../../../../app/api/common/lib/MultiToken';
 import { RustModule } from '../../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { loadSubmittedTransactions } from '../../../../app/api/localStorage';
+import { refreshingWalletIdSet } from '../state';
 
 export async function getWalletState(publicDeriver: PublicDeriver<>): Promise<WalletState> {
   await RustModule.load();
   return RustModule.WasmScope(async (Scope) => {
+    const publicDeriverId = publicDeriver.getPublicDeriverId();
+
     const conceptualWalletInfo = await publicDeriver.getParent().getFullConceptualWalletInfo();
     const network = publicDeriver.getParent().getNetworkInfo();
 
@@ -168,7 +171,7 @@ export async function getWalletState(publicDeriver: PublicDeriver<>): Promise<Wa
     const balance = await canGetBalance.getBalance();
 
     return {
-      publicDeriverId: publicDeriver.getPublicDeriverId(),
+      publicDeriverId,
       conceptualWalletId: publicDeriver.getParent().getConceptualWalletId(),
       utxos,
       transactions: [], // fixme
@@ -198,7 +201,7 @@ export async function getWalletState(publicDeriver: PublicDeriver<>): Promise<Wa
       isBip44Wallet: publicDeriver.getParent() instanceof Bip44Wallet,
       isTestnet: isTestnet(network),
       isCardanoHaskell: isCardanoHaskell(network),
-      isRefreshing: false, // fixme
+      isRefreshing: refreshingWalletIdSet.has(publicDeriverId),
       submittedTransactions: [],
     };
   });

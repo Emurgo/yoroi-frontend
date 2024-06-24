@@ -238,8 +238,9 @@ export type GetUtxosRequest = {|
 export type GetDb = {|
   type: 'get-db',
 |};
-export type SubscribeWalletStateChanges = {|
-  type: 'subscribe-wallet-state-changes',
+export type Subscribe = {|
+  type: 'subscribe',
+  request: {| activeWalletId: number |},
 |};
 export type CreateWallet = {|
   type: 'create-wallet',
@@ -255,6 +256,7 @@ export type RemoveWallet = {|
 |};
 export type GetWallets = {|
   type: 'get-wallets',
+  request: {| walletId: ?number |},
 |};
 export type ChangeSigningPassword = {|
   type: 'change-signing-password',

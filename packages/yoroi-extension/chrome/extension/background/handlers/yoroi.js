@@ -1,4 +1,6 @@
 // @flow
+// Handle messages from Yoroi extension pages, including connector.
+
 import { getWallets } from '../../../../app/api/common/index';
 import { PublicDeriver, } from '../../../../app/api/ada/lib/storage/models/PublicDeriver/index';
 import {
@@ -25,7 +27,7 @@ import type {
   SigningMessage,
   TxSignWindowRetrieveData,
   GetDb,
-  SubscribeWalletStateChanges,
+  Subscribe,
   CreateWallet,
   CreateHardwareWallet,
   RemoveWallet,
@@ -122,7 +124,7 @@ import {
   STORAGE_KEY_CONNECTION_PROTOCOL,
 } from './content';
 import type { ConnectedSite } from './content';
-import { subscribeWalletStateChanges } from '../state';
+import { subscribe } from '../state';
 import AdaApi, { genOwnStakingKey } from '../../../../app/api/ada';
 import { loadWalletsFromStorage } from '../../../../app/api/ada/lib/storage/models/load';
 import { getWalletState, batchLoadSubmittedTransactions } from './utils';
@@ -158,7 +160,7 @@ const YOROI_MESSAGES = Object.freeze({
   GET_PROTOCOL: 'get_protocol',
   GET_UTXOS_ADDRESSES: 'get_utxos/addresses',
   GET_DB: 'get-db',
-  SUBSCRIBE_WALLET_STATE_CHANGES: 'subscribe-wallet-state-changes',
+  SUBSCRIBE: 'subscribe',
   CREATE_WALLET: 'create-wallet',
   CREATE_HARDWARE_WALLET: 'create-hardware-wallet',
   REMOVE_WALLET: 'remove-wallet',
@@ -195,7 +197,7 @@ export async function yoroiMessageHandler(
     | GetConnectionProtocolData
     | GetUtxosRequest
     | GetDb
-    | SubscribeWalletStateChanges
+    | Subscribe
     | CreateWallet
     |  CreateHardwareWallet
     | RemoveWallet
@@ -599,9 +601,9 @@ export async function yoroiMessageHandler(
     const db = await getDb();
     const data = await db.export();
     sendResponse(JSON.stringify(data));
-  } else if (request.type === YOROI_MESSAGES.SUBSCRIBE_WALLET_STATE_CHANGES) {
-    const data = await subscribeWalletStateChanges(sender.tab.id);
-    sendResponse(JSON.stringify(data));
+  } else if (request.type === YOROI_MESSAGES.SUBSCRIBE) {
+    subscribe(sender.tab.id, request.request.activeWalletId);
+    sendResponse({ error: null });
   } else if (request.type === YOROI_MESSAGES.CREATE_WALLET) {
     try {
       const db = await getDb();
@@ -654,7 +656,17 @@ export async function yoroiMessageHandler(
     sendResponse(null);
   } else if (request.type === YOROI_MESSAGES.GET_WALLETS) {
     const db = await getDb();
-    const publicDerivers = await loadWalletsFromStorage(db);
+    let publicDerivers = await loadWalletsFromStorage(db);
+    if (request.request.walletId) {
+      const publicDeriver = publicDerivers.find(publicDeriver =>
+        publicDeriver.getPublicDeriverId() === request.request.walletId
+      );
+      if (publicDeriver) {
+        publicDerivers = [publicDeriver];
+      } else {
+        publicDerivers = [];
+      }
+    }
     const walletStates = await Promise.all(publicDerivers.map(getWalletState));
     await batchLoadSubmittedTransactions(walletStates);
     sendResponse(walletStates);

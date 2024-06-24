@@ -1,4 +1,6 @@
 // @flow
+// Handle messages from the content script injected into dApp pages.
+
 import { getWallets } from '../../../../app/api/common/index';
 import { PublicDeriver, } from '../../../../app/api/ada/lib/storage/models/PublicDeriver/index';
 import { asGetAllUtxos, asHasUtxoChains } from '../../../../app/api/ada/lib/storage/models/PublicDeriver/traits';

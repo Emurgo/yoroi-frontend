@@ -11,6 +11,7 @@ import type { StoresMap } from '../index';
 import { ComplexityLevels } from '../../types/complexityLevelType';
 import type { WalletsNavigation } from '../../api/localStorage'
 import { ampli } from '../../../ampli/index';
+import { subscribe } from '../../api/thunk';
 
 export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap> {
   @observable __selectedNetwork: void | $ReadOnly<NetworkRow> = undefined;
@@ -99,6 +100,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
         this.stores.coinPriceStore.startPoll();
 
         await wallets.restoreWalletsFromStorage();
+        subscribe();
         if (wallets.hasAnyWallets && this.stores.loading.fromUriScheme) {
           this.actions.router.goToRoute.trigger({ route: ROUTES.SEND_FROM_URI.ROOT });
         } else {

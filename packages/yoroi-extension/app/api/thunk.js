@@ -54,8 +54,8 @@ export async function getDb(): Promise<lf$Database> {
   return await loadLovefieldDBFromDump(schema.DataStoreType.MEMORY, data);
 }
 
-export async function getWallets(): Promise<Array<WalletState>> {
-  const wallets = await callBackground({ type: 'get-wallets' });
+export async function getWallets(walletId?: number): Promise<Array<WalletState>> {
+  const wallets = await callBackground({ type: 'get-wallets', request: { walletId } });
 
   const deserializeAddressesByType = addressesByType => addressesByType.map(
     addresses => addresses.map(
@@ -91,8 +91,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   //fixme: verify sender.id/origin
 });
 
-export async function subscribeWalletStateChanges(): Promise<Array<WalletState>> {
-  return await callBackground({ type: 'subscribe-wallet-state-changes' });
+export async function subscribe(activeWalletId: ?number): Promise<Array<WalletState>> {
+  return await callBackground({ type: 'subscribe', request: { activeWalletId } });
 }
 
 export type CreateWalletRequestType = {|

@@ -69,10 +69,8 @@ export type GetWalletsFunc = (
 export async function getWallets(
   request: GetWalletsRequest,
 ): Promise<GetWalletsResponse> {
-  Logger.debug(`${nameof(getWallets)} called`);
   try {
     const wallets = await loadWalletsFromStorage(request.db);
-    Logger.debug(`${nameof(getWallets)} success: ` + stringifyData(wallets));
     return wallets;
   } catch (error) {
     Logger.error(`${nameof(getWallets)} error: ` + stringifyError(error));

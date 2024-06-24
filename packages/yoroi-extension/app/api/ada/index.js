@@ -566,8 +566,6 @@ export default class AdaApi {
       ...AdaGetTransactionsRequest,
     |},
   ): Promise<Array<WalletTransaction>> {
-    Logger.debug(`${nameof(AdaApi)}::${nameof(this.refreshTransactions)} called`);
-
     try {
       let fetchedTxs;
       if (request.isLocalRequest) {
@@ -610,7 +608,6 @@ export default class AdaApi {
           resolveReference(request.beforeTx),
         );
       }
-      Logger.debug(`${nameof(AdaApi)}::${nameof(this.refreshTransactions)} success: ` + stringifyData(fetchedTxs));
 
       const mappedTransactions = fetchedTxs.txs.map(tx => {
         if (tx.txType === TransactionType.CardanoByron) {
