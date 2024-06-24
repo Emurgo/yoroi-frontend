@@ -242,6 +242,7 @@ export type RefreshTransactionsRequestType = {|
   skip?: number,
   limit?: number,
 |};
+// this is local refresh, i.e. load transactions from db, *not* syncing db with remote
 export async function refreshTransactions(
   request: RefreshTransactionsRequestType
 ): Promise<Array<WalletTransaction>> {

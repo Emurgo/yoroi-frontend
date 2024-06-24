@@ -9,7 +9,10 @@ import { asHasLevels } from '../../../../app/api/ada/lib/storage/models/PublicDe
 import environment from '../../../../app/environment';
 import { getDb } from './databaseManager';
 import { getSubscriptions, registerCallback } from './subscriptionManager';
-import LocalStorageApi from '../../../../app/api/localStorage/index';
+import LocalStorageApi, {
+  loadSubmittedTransactions,
+  persistSubmittedTransactions,
+} from '../../../../app/api/localStorage/index';
 
 let refreshRunning: boolean = false;
 
@@ -83,7 +86,7 @@ export async function syncWallet(publicDeriver: PublicDeriver<>): Promise<void> 
     }
 
     const adaApi = new AdaApi();
-    await adaApi.refreshTransactions({
+    const txs = await adaApi.refreshTransactions({
       // skip
       // number
       publicDeriver: withLevels,
@@ -99,6 +102,28 @@ export async function syncWallet(publicDeriver: PublicDeriver<>): Promise<void> 
       getMultiAssetSupply: stateFetcher.getMultiAssetSupply,
       getTransactionHistory: stateFetcher.getTransactionsHistoryForAddresses,
     });
+
+    const remoteTransactionIds = new Set();
+    for (const { txid } of txs) {
+      remoteTransactionIds.add(txid);
+    }
+
+    const submittedTransactions = await loadSubmittedTransactions();
+    let submittedTransactionsChanged = false;
+
+    for (let i = 0; i < submittedTransactions.length; ) {
+      const txId = submittedTransactions[i].transaction.txid;
+      if (remoteTransactionIds.has(txId)) {
+        submittedTransactions.splice(i, 1);
+        submittedTransactionsChanged = true;
+      } else {
+        i++;
+      }
+    }
+
+    if (submittedTransactionsChanged) {
+      persistSubmittedTransactions(submittedTransactions);
+    }
   } catch (e) {
     console.error(`Syncing failed: ${e}`);
   } finally {

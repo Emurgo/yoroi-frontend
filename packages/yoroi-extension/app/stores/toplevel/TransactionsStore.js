@@ -257,7 +257,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       headRequest.invalidate({ immediately: false });
       headRequest.execute({
         publicDeriverId,
-        // HEAD request is never local by logic
         isLocalRequest: true,
         afterTx: txHistoryState.txs[0],
       });
