@@ -6,7 +6,7 @@ import InitialStepsPage from '../pages/initialSteps.page.js';
 import { defaultWaitTimeout } from '../helpers/timeConstants.js';
 
 let instance = null;
-let poolOfDrivers = [];
+const poolOfDrivers = [];
 let driverGlobalCounter = 0;
 
 class DriversManager {
@@ -29,6 +29,10 @@ class DriversManager {
     return driver;
   }
 
+  /**
+   * Adding a new driver to the pool of drivers
+   * @returns {{driver: ThenableWebDriver, driverId: number}}
+   */
   addNewDriverToPool() {
     const newDriver = this.buildDriver();
     driverGlobalCounter++;
@@ -53,6 +57,11 @@ class DriversManager {
     }
   }
 
+  /**
+   * Preparing an extension for tests
+   * @param {{driver: ThenableWebDriver, driverId: number}} driverObject 
+   * @returns 
+   */
   async prepareExtension(driverObject) {
     this.logger.info(`DriversManager::prepareExtension driver ID ${driverObject.driverId}`);
     const logger = getTestLogger(`DriversManager_Page_${Date.now()}`, 'DriversManager');
