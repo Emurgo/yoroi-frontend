@@ -47,7 +47,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
     },
     frontendFeeTiersChanged,
   } = useSwap();
-  const { sellTokenInfo, buyTokenInfo } = useSwapForm();
+  const { sellTokenInfo, buyTokenInfo, resetSwapForm } = useSwapForm();
 
   const isMarketOrder = orderType === 'market';
   const impact = isMarketOrder ? Number(selectedPoolCalculation?.prices.priceImpact ?? 0) : 0;
@@ -239,6 +239,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
         refreshWallet: () => props.stores.wallets.refreshWalletFromRemote(wallet),
       });
       setOrderStepValue(2);
+      resetSwapForm();
     } catch (e) {
       handleTransactionError(e);
     } finally {
