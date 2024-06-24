@@ -14,16 +14,16 @@ import { useEffect, useState } from 'react';
 export function useAsyncMemo<T>(create: () => Promise<T | (T => T)>, inputs: any, defaultValue: T): T {
   const [res, setRes] = useState<T>(defaultValue);
   useEffect(() => {
-    create().then(res => {
-      if (res === useAsyncMemo.void) {
+    create().then(r => {
+      if (r === useAsyncMemo.void) {
         // ignore the void return
         // just a tiny optimisation
       } else {
         // update the state
-        setRes(res);
+        setRes(r);
       }
       return null;
-    });
+    }).catch(e => { throw e; });
   }, inputs)
   return res;
 }
