@@ -101,6 +101,11 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
     ...defaultSwapFormState,
   });
 
+  const {
+    sellTokenInfo: { ticker: sellTicker },
+    buyTokenInfo: { ticker: buyTicker },
+  } = swapFormState;
+
   const actions = {
     sellTouched: (token?: AssetAmount) =>
       dispatch({ type: SwapFormActionTypeValues.SellTouched, token }),
@@ -136,33 +141,43 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
       dispatch({ type: SwapFormActionTypeValues.SellAmountErrorChanged, error }),
   };
 
-  // on mount
-  useEffect(() => {
-    // RESET
-    actions.resetSwapForm();
-    // SELECT DEFAULT SELL
-    const assets = swapStore.assets;
-    const defaultAsset = assets[0];
-    if (defaultAsset != null) {
-      actions.sellTouched({ ...defaultAsset });
-      sellTokenInfoChanged({
-        id: defaultAsset.id,
-        decimals: defaultAsset.decimals,
-      });
-    }
-  }, []);
-
-  // on unmount
+  /**
+   * On mount
+   */
+  useEffect(() => actions.resetSwapForm(), []);
+  /**
+   * On unmount
+   */
   useEffect(() => () => actions.resetSwapForm(), []);
 
-  // on token pair changes
+  /**
+   * On sell asset changes - set default asset in case none is selected
+   */
+  useEffect(() => {
+    if (sellTokenId === '' && sellTicker == null) {
+      // SELECT DEFAULT SELL
+      const assets = swapStore.assets;
+      const defaultAsset = assets[0];
+      if (defaultAsset != null) {
+        actions.sellTouched({ ...defaultAsset });
+        sellTokenInfoChanged({
+          id: defaultAsset.id,
+          decimals: defaultAsset.decimals,
+        });
+      }
+    }
+  }, [sellTokenId, sellTicker]);
+
+  /**
+   * On token pair changes - fetch pools for pair
+   */
   useEffect(() => {
     if (sellTokenId != null && buyTokenId != null && sellTokenId !== buyTokenId) {
       pools.list.byPair({ tokenA: sellTokenId, tokenB: buyTokenId })
         .then(poolsArray => poolPairsChanged(poolsArray))
         .catch(err => console.error(`Failed to fetch pools for pair: ${sellTokenId}/${buyTokenId}`, err));
     }
-  }, [sellTokenId, buyTokenId]);
+  }, [sellTokenId, buyTokenId, sellTicker, buyTicker]);
 
   const clearErrors = useCallback(() => {
     if (swapFormState.sellQuantity.error != null) actions.sellAmountErrorChanged(null);

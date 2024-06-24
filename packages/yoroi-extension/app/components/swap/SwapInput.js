@@ -40,7 +40,7 @@ export default function SwapInput({
   const { id, amount: quantity = undefined, ticker } = tokenInfo || {};
 
   const handleChange = e => {
-    if (!disabled && value !== quantity) {
+    if (!disabled) {
       handleAmountChange(e.target.value);
     }
   };
