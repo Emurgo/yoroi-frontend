@@ -59,7 +59,7 @@ export const firefoxBin =
     : '/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox-bin';
 export const chromeBin = isMacOS()
   ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-  : '/usr/bin/google-chrome';
+  : '/usr/local/bin/chromedriver';
 export const TargetBrowser = Object.freeze({
   Chrome: 'chrome',
   Brave: 'brave',
