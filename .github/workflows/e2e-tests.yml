@@ -36,22 +36,6 @@ jobs:
         run: |
           . install-all.sh
 
-      - name: Cache yoroi-extension node modules
-        # https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows
-        uses: actions/cache@v4
-        env:
-          cache-name: cache-yoroi-extension-node-modules
-        with:
-          # https://github.com/actions/cache/blob/main/examples.md#node---npm
-          # It is recommended to cache the NPM cache (~/.npm) instead of node_modules.
-          # But we put node version into the cache key and cache node_modules.
-          path: packages/yoroi-extension/node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-node-${{ steps.nvm.outputs.NVMRC }}-${{ hashFiles('packages/yoroi-extension/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-
       - name: Build the test mainnet version
         working-directory: ./packages/yoroi-extension
         run: npm run test:build:mainnet
@@ -68,7 +52,7 @@ jobs:
 
   Ext-General:
     if: github.event.review && 
-      ( 
+      (
       github.event.review.state == 'approved' || 
       contains(github.event.review.body, '/check') || 
       contains(github.event.review.body, '/ext-general')
@@ -82,14 +66,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install ChromeDriver
-        uses: nanasess/setup-chromedriver@v2
-
-      - name: Run Xvfb
-        run: |
-          export DISPLAY=:99
-          sudo Xvfb -ac :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
 
       - name: Forcefully update the Chrome browser
         if: matrix.browser=='chrome'
@@ -141,6 +117,14 @@ jobs:
         with:
           name: builtApp
           path: ./packages/yoroi-extension
+
+      - name: Install ChromeDriver
+        uses: nanasess/setup-chromedriver@v2
+
+      - name: Run Xvfb
+        run: |
+            export DISPLAY=:99
+            sudo Xvfb -ac :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
 
       - name: Run tests
         working-directory: ./packages/e2e-tests
@@ -172,11 +156,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run Xvfb
-        run: |
-          export DISPLAY=:99
-          sudo Xvfb -ac :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
-
       - name: Forcefully update the Chrome browser
         if: matrix.browser=='chrome'
         run: |
@@ -227,6 +206,14 @@ jobs:
         with:
           name: builtApp
           path: ./packages/yoroi-extension
+
+      - name: Install ChromeDriver
+        uses: nanasess/setup-chromedriver@v2
+
+      - name: Run Xvfb
+        run: |
+            export DISPLAY=:99
+            sudo Xvfb -ac :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
 
       - name: Run tests
         working-directory: ./packages/e2e-tests
@@ -263,11 +250,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run Xvfb
-        run: |
-            export DISPLAY=:99
-            sudo Xvfb -ac :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
-
       - name: Forcefully update the Chrome browser
         if: matrix.browser=='chrome'
         run: |
@@ -318,6 +300,11 @@ jobs:
         with:
           name: builtApp
           path: ./packages/yoroi-extension
+
+      - name: Run Xvfb
+        run: |
+            export DISPLAY=:99
+            sudo Xvfb -ac :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
 
       - name: Run tests
         working-directory: ./packages/e2e-tests
@@ -345,14 +332,9 @@ jobs:
       matrix:
         browser: ["chrome"]
       fail-fast: false
-
+    
     steps:
       - uses: actions/checkout@v4
-
-      - name: Run Xvfb
-        run: |
-          export DISPLAY=:99
-          sudo Xvfb -ac :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
 
       - name: Forcefully update the Chrome browser
         if: matrix.browser=='chrome'
@@ -404,6 +386,11 @@ jobs:
         with:
           name: builtApp
           path: ./packages/yoroi-extension
+
+      - name: Run Xvfb
+        run: |
+            export DISPLAY=:99
+            sudo Xvfb -ac :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
 
       - name: Run tests
         working-directory: ./packages/e2e-tests
