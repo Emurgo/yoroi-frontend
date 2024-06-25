@@ -68,7 +68,7 @@ jobs:
 
   Ext-General:
     if: github.event.review && 
-      (
+      ( 
       github.event.review.state == 'approved' || 
       contains(github.event.review.body, '/check') || 
       contains(github.event.review.body, '/ext-general')
@@ -139,8 +139,8 @@ jobs:
 
       - name: Run Xvfb
         run: |
-            export DISPLAY=:99
-            sudo Xvfb -ac :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
+          export DISPLAY=:99
+          sudo Xvfb -ac :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
 
       - name: Run tests
         working-directory: ./packages/e2e-tests
@@ -228,8 +228,8 @@ jobs:
 
       - name: Run Xvfb
         run: |
-            export DISPLAY=:99
-            sudo Xvfb -ac :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
+          export DISPLAY=:99
+          sudo Xvfb -ac :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
 
       - name: Run tests
         working-directory: ./packages/e2e-tests
@@ -342,26 +342,31 @@ jobs:
 
   DApp-Failing:
     if: github.event.review && contains(github.event.review.body, '/dapp-failing')
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     needs: Build-Extension
     strategy:
       matrix:
-        browser: ['chrome']
+        browser: ["chrome"]
       fail-fast: false
-    
+
     steps:
       - uses: actions/checkout@v4
 
       - name: Forcefully update the Chrome browser
         if: matrix.browser=='chrome'
-        run: brew update && brew upgrade --cask google-chrome
+        run: |
+          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          sudo sh -c 'echo "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+          sudo apt-get update
+          sudo apt-get --only-upgrade install google-chrome-stable
 
-      - name: Forcefully install Firefox for Developers browser
+      - name: Install Firefox Developer Edition
         if: matrix.browser=='firefox'
         run: |
-          brew update
-          brew tap homebrew/cask-versions && brew install --cask firefox-developer-edition
-          echo "FIREFOX_BIN=/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox-bin" >> $GITHUB_ENV
+          wget -c "https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US" -O - | sudo tar -xj -C /opt
+          sudo rm -rf /opt/firefoxdev
+          sudo mv /opt/firefox /opt/firefoxdev
+          echo "FIREFOX_BIN=/opt/firefoxdev/firefox-bin" >> $GITHUB_ENV
 
       - name: Read .nvmrc
         id: nvm
@@ -370,7 +375,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: '${{ steps.nvm.outputs.NVMRC }}'
+          node-version: "${{ steps.nvm.outputs.NVMRC }}"
 
       - name: Install packages
         working-directory: ./packages/e2e-tests
@@ -380,7 +385,7 @@ jobs:
         # https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows
         uses: actions/cache@v4
         env:
-          cache-name: cache-yoroi-e2e-tests-node-modules
+          cache-name: cache-e2e-tests-node-modules
         with:
           # https://github.com/actions/cache/blob/main/examples.md#node---npm
           # It is recommended to cache the NPM cache (~/.npm) instead of node_modules.
@@ -398,6 +403,11 @@ jobs:
           name: builtApp
           path: ./packages/yoroi-extension
 
+      - name: Run Xvfb
+        run: |
+          export DISPLAY=:99
+          sudo Xvfb -ac :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
+
       - name: Run tests
         working-directory: ./packages/e2e-tests
         env:
@@ -405,7 +415,7 @@ jobs:
           SECOND_STATIC_TEST_WALLET: ${{ secrets.SECOND_STATIC_TEST_WALLET }}
           SECOND_SMOKE_TEST_WALLET: ${{ secrets.SECOND_SMOKE_TEST_WALLET }}
           SECOND_SMOKE_TEST_WALLET_FF: ${{ secrets.SECOND_SMOKE_TEST_WALLET_FF }}
-        run: npm run test:${{ matrix.browser }}:dapp:bl
+        run: xvfb-run -a -e /dev/stdout -s "-screen 0 1920x1080x24" npm run test:${{ matrix.browser }}:dapp:bl
 
       - name: Archive tests screenshots and logs
         if: ${{ failure() }}
