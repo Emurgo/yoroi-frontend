@@ -66,7 +66,7 @@ const getChromeBuilder = () => {
     .addArguments('--start-maximized')
     .setUserPreferences({ 'download.default_directory': downloadsDir });
   if (process.env.HEADLESS) {
-    chromeOpts.addArguments('--headless=new')
+    chromeOpts.addArguments('--headless=new');
   }
   return new Builder()
     .forBrowser(TargetBrowser.Chrome)
