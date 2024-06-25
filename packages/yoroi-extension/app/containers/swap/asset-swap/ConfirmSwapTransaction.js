@@ -27,7 +27,7 @@ type Props = {|
   slippageValue: string,
   walletAddress: ?string,
   priceImpactState: ?PriceImpact,
-  userPasswordState: State<string>,
+  userPasswordState: ?State<string>,
   txSubmitErrorState: State<?Error>,
   onRemoteOrderDataResolved: any => Promise<void>,
   defaultTokenInfo: RemoteTokenInfo,
@@ -202,19 +202,21 @@ export default function ConfirmSwapTransaction({
           </Typography>
         </Box>
       </Box>
-      <Box>
-        <TextField
-          className="walletPassword"
-          value={userPasswordState.value}
-          label="Password"
-          type="password"
-          onChange={e => {
-            txSubmitErrorState.update(null);
-            userPasswordState.update(e.target.value);
-          }}
-          error={isIncorrectPassword && 'Incorrect password!'}
-        />
-      </Box>
+      {userPasswordState != null && (
+        <Box>
+          <TextField
+            className="walletPassword"
+            value={userPasswordState.value}
+            label="Password"
+            type="password"
+            onChange={e => {
+              txSubmitErrorState.update(null);
+              userPasswordState.update(e.target.value);
+            }}
+            error={isIncorrectPassword && 'Incorrect password!'}
+          />
+        </Box>
+      )}
     </Box>
   );
 }

@@ -15,6 +15,7 @@ import SwapDisclaimerDialog from '../../../components/swap/SwapDisclaimerDialog'
 import { ROUTES } from '../../../routes-config';
 import type { PriceImpact } from '../../../components/swap/types';
 import { PriceImpactAlert } from '../../../components/swap/PriceImpact';
+import type { State } from '../context/swap-form/types';
 import { StateWrap } from '../context/swap-form/types';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import { addressHexToBech32 } from '../../../api/ada/lib/cardanoCrypto/utils';
@@ -24,6 +25,21 @@ import { IncorrectWalletPasswordError } from '../../../api/common/errors';
 import { observer } from 'mobx-react';
 import useSwapForm from '../context/swap-form/useSwapForm';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
+import globalMessages from '../../../i18n/global-messages';
+import type { $npm$ReactIntl$IntlShape } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
+
+const messages = defineMessages({
+  sendUsingLedgerNano: {
+    id: 'wallet.send.ledger.confirmationDialog.submit',
+    defaultMessage: '!!!Send using Ledger',
+  },
+  sendUsingTrezorT: {
+    id: 'wallet.send.trezor.confirmationDialog.submit',
+    defaultMessage: '!!!Send using Trezor',
+  },
+});
+
 
 export const PRICE_IMPACT_MODERATE_RISK = 1;
 export const PRICE_IMPACT_HIGH_RISK = 10;
@@ -31,7 +47,11 @@ export const LIMIT_PRICE_WARNING_THRESHOLD = 0.1;
 
 const SWAP_AGGREGATOR = 'muesliswap';
 
-function SwapPage(props: StoresAndActionsProps): Node {
+type Intl = {|
+  intl: $npm$ReactIntl$IntlShape,
+|};
+
+function SwapPage(props: StoresAndActionsProps & Intl): Node {
   const [openedDialog, setOpenedDialog] = useState('');
   const { orderStep, setOrderStepValue } = props.stores.substores.ada.swapStore;
 
@@ -55,6 +75,18 @@ function SwapPage(props: StoresAndActionsProps): Node {
     buyQuantity,
   } = useSwapForm();
 
+  const wallet = props.stores.wallets.selectedOrFail;
+  const walletType: string = wallet.getParent().getWalletVariant();
+  const isHardwareWallet = walletType !== 'web';
+  const network = wallet.getParent().getNetworkInfo();
+  const defaultTokenInfo = props.stores.tokenInfoStore.getDefaultTokenInfoSummary(
+    network.NetworkId
+  );
+  const getTokenInfoBatch: Array<string> => { [string]: Promise<RemoteTokenInfo> } = ids =>
+    props.stores.tokenInfoStore.fetchMissingAndGetLocalOrRemoteMetadata(network, ids);
+  const getTokenInfo: string => Promise<RemoteTokenInfo> = id =>
+    getTokenInfoBatch([id])[id].then(res => res ?? {});
+
   const isMarketOrder = orderType === 'market';
   const impact = isMarketOrder ? Number(selectedPoolCalculation?.prices.priceImpact ?? 0) : 0;
   const priceImpactState: PriceImpact | null =
@@ -64,7 +96,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
   const [selectedWalletAddress, setSelectedWalletAddress] = useState<?string>(null);
   const [slippageValue, setSlippageValue] = useState(String(defaultSlippage));
   const [signRequest, setSignRequest] = useState<?HaskellShelleyTxSignRequest>(null);
-  const userPasswordState = StateWrap(useState<string>(''));
+  const userPasswordState: ?State<string> = isHardwareWallet ? null : StateWrap(useState<string>(''));
   const txSubmitErrorState = StateWrap(useState<?Error>(null));
   const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
 
@@ -84,23 +116,15 @@ function SwapPage(props: StoresAndActionsProps): Node {
     && buyQuantity.error == null
     && isValidTickers;
 
-  const confirmationCanContinue = userPasswordState.value !== '' && signRequest != null;
+  const confirmationCanContinue =
+    (isHardwareWallet || userPasswordState.value !== '')
+    && signRequest != null;
 
   const isButtonLoader = orderStep === 1 && signRequest == null;
 
   const isSwapEnabled =
     (orderStep === 0 && swapFormCanContinue)
     || (orderStep === 1 && confirmationCanContinue);
-
-  const wallet = props.stores.wallets.selectedOrFail;
-  const network = wallet.getParent().getNetworkInfo();
-  const defaultTokenInfo = props.stores.tokenInfoStore.getDefaultTokenInfoSummary(
-    network.NetworkId
-  );
-  const getTokenInfoBatch: Array<string> => { [string]: Promise<RemoteTokenInfo> } = ids =>
-    props.stores.tokenInfoStore.fetchMissingAndGetLocalOrRemoteMetadata(network, ids);
-  const getTokenInfo: string => Promise<RemoteTokenInfo> = id =>
-    getTokenInfoBatch([id])[id].then(res => res ?? {});
 
   const disclaimerFlag = props.stores.substores.ada.swapStore.swapDisclaimerAcceptanceFlag;
 
@@ -190,7 +214,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
   function processBackToStart() {
     runInAction(() => {
       setOrderStepValue(0);
-      userPasswordState.update('');
+      userPasswordState?.update('');
       txSubmitErrorState.update(null);
       setSignRequest(null);
     });
@@ -234,7 +258,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
 
     validateSignRequestAndUserPassword();
     setOpenedDialog('loadingOverlay');
-    const password = userPasswordState.value;
+    const password = userPasswordState?.value;
 
     try {
       await props.stores.substores.ada.wallets.adaSendAndRefresh({
@@ -260,9 +284,10 @@ function SwapPage(props: StoresAndActionsProps): Node {
     if (signRequest == null) {
       throw new Error('Incorrect state! Order transaction is not prepared properly');
     }
-    const password = userPasswordState.value;
-    if (password === '') {
-      throw new Error('Incorrect state! User password is required');
+    if (!isHardwareWallet) {
+      if (userPasswordState.value === '') {
+        throw new Error('Incorrect state! User password is required');
+      }
     }
   }
 
@@ -319,6 +344,17 @@ function SwapPage(props: StoresAndActionsProps): Node {
       setSignRequest(txSignRequest);
     });
   };
+
+  function confirmationButtonMessage() {
+    if (walletType === 'ledger') return messages.sendUsingLedgerNano;
+    if (walletType === 'trezor') return messages.sendUsingTrezorT;
+    return globalMessages.confirm;
+  }
+
+  function intl(msg): string {
+    // noinspection JSUnresolvedFunction
+    return props.intl.formatMessage(msg);
+  }
 
   return (
     <>
@@ -387,7 +423,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
               variant="primary"
               disabled={!isSwapEnabled || isButtonLoader}
             >
-              {(isButtonLoader && <LoadingSpinner />) || (orderStep === 0 ? 'Swap' : 'Confirm')}
+              {(isButtonLoader && <LoadingSpinner />) || (orderStep === 0 ? 'Swap' : intl(confirmationButtonMessage()))}
             </Button>
           </Box>
         )}
@@ -427,4 +463,4 @@ function SwapPage(props: StoresAndActionsProps): Node {
   );
 }
 
-export default (observer(SwapPage): React$ComponentType<StoresAndActionsProps>);
+export default (injectIntl(observer(SwapPage)): React$ComponentType<StoresAndActionsProps>);
