@@ -240,7 +240,7 @@ jobs:
       contains(github.event.review.body, '/check') || 
       contains(github.event.review.body, '/dapp-general')
       )
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     needs: Build-Extension
     strategy:
       matrix:
