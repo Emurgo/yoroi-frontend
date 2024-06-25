@@ -306,8 +306,8 @@ jobs:
 
       - name: Run Xvfb
         run: |
-            export DISPLAY=:1
-            sudo Xvfb -ac :1 -screen 0 1920x1080x24 > /dev/null 2>&1 &
+            export DISPLAY=:99
+            sudo Xvfb -ac :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
 
       - name: Run tests
         working-directory: ./packages/e2e-tests

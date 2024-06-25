@@ -1,5 +1,6 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { isMacOS } from '../utils/utils.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -56,6 +57,9 @@ export const firefoxBin =
   process.env.FIREFOX_BIN != null
     ? process.env.FIREFOX_BIN
     : '/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox-bin';
+export const chromeBin = isMacOS()
+  ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+  : '/snap/bin/chromium.chromedriver';
 export const TargetBrowser = Object.freeze({
   Chrome: 'chrome',
   Brave: 'brave',
