@@ -96,11 +96,11 @@ jobs:
         working-directory: ./packages/e2e-tests
         run: npm install
 
-      - name: Cache extension node modules
+      - name: Cache e2e-tests node modules
         # https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows
         uses: actions/cache@v4
         env:
-          cache-name: cache-yoroi-extension-node-modules
+          cache-name: cache-e2e-tests-node-modules
         with:
           # https://github.com/actions/cache/blob/main/examples.md#node---npm
           # It is recommended to cache the NPM cache (~/.npm) instead of node_modules.
@@ -252,14 +252,19 @@ jobs:
 
       - name: Forcefully update the Chrome browser
         if: matrix.browser=='chrome'
-        run: brew update && brew upgrade --cask google-chrome
+        run: |
+          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          sudo sh -c 'echo "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+          sudo apt-get update
+          sudo apt-get --only-upgrade install google-chrome-stable
 
-      - name: Forcefully install Firefox for Developers browser
+      - name: Install Firefox Developer Edition
         if: matrix.browser=='firefox'
         run: |
-          brew update
-          brew tap homebrew/cask-versions && brew install --cask firefox-developer-edition
-          echo "FIREFOX_BIN=/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox-bin" >> $GITHUB_ENV
+          wget -c "https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US" -O - | sudo tar -xj -C /opt
+          sudo rm -rf /opt/firefoxdev
+          sudo mv /opt/firefox /opt/firefoxdev
+          echo "FIREFOX_BIN=/opt/firefoxdev/firefox-bin" >> $GITHUB_ENV
 
       - name: Read .nvmrc
         id: nvm
@@ -278,10 +283,10 @@ jobs:
         # https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows
         uses: actions/cache@v4
         env:
-          cache-name: cache-yoroi-e2e-tests-node-modules
+          cache-name: cache-e2e-tests-node-modules
         with:
-          # It is recommended to cache the NPM cache (~/.npm) instead of node_modules.
           # https://github.com/actions/cache/blob/main/examples.md#node---npm
+          # It is recommended to cache the NPM cache (~/.npm) instead of node_modules.
           # But we put node version into the cache key and cache node_modules.
           path: packages/e2e-tests/node_modules
           key: ${{ runner.os }}-build-${{ env.cache-name }}-node-${{ steps.nvm.outputs.NVMRC }}-${{ hashFiles('packages/e2e-tests/package-lock.json') }}
@@ -295,6 +300,14 @@ jobs:
         with:
           name: builtApp
           path: ./packages/yoroi-extension
+
+      - name: Install ChromeDriver
+        uses: nanasess/setup-chromedriver@v2
+
+      - name: Run Xvfb
+        run: |
+            export DISPLAY=:99
+            sudo Xvfb -ac :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
 
       - name: Run tests
         working-directory: ./packages/e2e-tests
