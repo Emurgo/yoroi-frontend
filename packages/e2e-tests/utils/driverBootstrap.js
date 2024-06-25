@@ -4,16 +4,26 @@ import firefox from 'selenium-webdriver/firefox.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import {
+  chromeBin,
   chromeExtIdUrl,
   firefoxBin,
   firefoxExtIdUrl,
   firefoxUuidMapping,
   TargetBrowser,
 } from '../helpers/constants.js';
-import { getDownloadsDir, getTargetBrowser, isBrave, isChrome, isFirefox } from './utils.js';
+import {
+  getDownloadsDir,
+  getTargetBrowser,
+  isBrave,
+  isChrome,
+  isDapp,
+  isFirefox,
+  isHeadless,
+} from './utils.js';
 
 const prefs = new logging.Preferences();
 prefs.setLevel(logging.Type.BROWSER, logging.Level.ALL);
+prefs.setLevel(logging.Type.DRIVER, logging.Level.INFO);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -62,8 +72,11 @@ const getChromeBuilder = () => {
     .addArguments('--disable-setuid-sandbox')
     .addArguments('--start-maximized')
     .setUserPreferences({ 'download.default_directory': downloadsDir });
-  if (process.env.HEADLESS) {
-    chromeOpts.addArguments('--headless=new')
+  if (isHeadless()) {
+    chromeOpts.addArguments('--headless=new');
+  }
+  if (isDapp()) {
+    chromeOpts.setChromeBinaryPath(chromeBin);
   }
   return new Builder()
     .forBrowser(TargetBrowser.Chrome)

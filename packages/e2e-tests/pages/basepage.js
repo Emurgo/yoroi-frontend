@@ -8,6 +8,7 @@ import {
   getSnapshotObjectFromJSON,
   isFirefox,
   isChrome,
+  isMacOS,
 } from '../utils/utils.js';
 import { getExtensionUrl } from '../utils/driverBootstrap.js';
 import {
@@ -185,7 +186,11 @@ class BasePage {
   async clearInputAll(locator) {
     this.logger.info(`BasePage::clearInputAll is called. Locator: ${JSON.stringify(locator)}`);
     const input = await this.findElement(locator);
-    await input.sendKeys(Key.chord(Key.COMMAND, 'a'));
+    if (isMacOS()) {
+      await input.sendKeys(Key.chord(Key.COMMAND, 'a'));
+    } else {
+      await input.sendKeys(Key.chord(Key.CONTROL, 'a'));
+    }
     await this.sleep(200);
     await input.sendKeys(Key.NULL);
     await input.sendKeys(Key.BACK_SPACE);
@@ -239,6 +244,18 @@ class BasePage {
       const jsonLogs = logEntries.map(l => JSON.stringify(l.toJSON(), null, 2));
       await writeFile(logsPaths, `[\n${jsonLogs.join(',\n')}\n]`);
     }
+  }
+  async getDriverLogs(testSuiteName, logFileName) {
+    this.logger.info(`BasePage::getDriverLogs is called.`);
+    const testRundDataDir = createTestRunDataDir(testSuiteName);
+    const cleanName = logFileName.replace(/ /gi, '_');
+    const driverLogsPaths = path.resolve(testRundDataDir, `driver_${cleanName}-log.json`);
+    const driverLogEntries = await this.driver
+      .manage()
+      .logs()
+      .get(logging.Type.DRIVER, logging.Level.INFO);
+    const jsonDriverLogs = driverLogEntries.map(l => JSON.stringify(l.toJSON(), null, 2));
+    await writeFile(driverLogsPaths, `[\n${jsonDriverLogs.join(',\n')}\n]`);
   }
   async waitForElementLocated(locator) {
     this.logger.info(
