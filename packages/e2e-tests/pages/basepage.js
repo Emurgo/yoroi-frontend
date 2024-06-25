@@ -245,6 +245,18 @@ class BasePage {
       await writeFile(logsPaths, `[\n${jsonLogs.join(',\n')}\n]`);
     }
   }
+  async getDriverLogs(testSuiteName, logFileName) {
+    this.logger.info(`BasePage::getDriverLogs is called.`);
+    const testRundDataDir = createTestRunDataDir(testSuiteName);
+    const cleanName = logFileName.replace(/ /gi, '_');
+    const driverLogsPaths = path.resolve(testRundDataDir, `driver_${cleanName}-log.json`);
+    const driverLogEntries = await this.driver
+      .manage()
+      .logs()
+      .get(logging.Type.DRIVER, logging.Level.INFO);
+    const jsonDriverLogs = driverLogEntries.map(l => JSON.stringify(l.toJSON(), null, 2));
+    await writeFile(driverLogsPaths, `[\n${jsonDriverLogs.join(',\n')}\n]`);
+  }
   async waitForElementLocated(locator) {
     this.logger.info(
       `BasePage::waitForElementLocated is called. Value: ${JSON.stringify(locator)}`

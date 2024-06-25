@@ -14,6 +14,7 @@ import { getDownloadsDir, getTargetBrowser, isBrave, isChrome, isFirefox } from 
 
 const prefs = new logging.Preferences();
 prefs.setLevel(logging.Type.BROWSER, logging.Level.ALL);
+prefs.setLevel(logging.Type.DRIVER, logging.Level.INFO);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

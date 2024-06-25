@@ -16,6 +16,7 @@ export const customAfterEach = async (mochaContext, webdriver, logger) => {
     basepage.takeSnapshot(mochaContext.test.parent.title, testCaseNameWithNumberInTestSuite);
     // taking browser console logs
     basepage.getBrowserLogs(mochaContext.test.parent.title, testCaseNameWithNumberInTestSuite);
+    basepage.getDriverLogs(mochaContext.test.parent.title, testCaseNameWithNumberInTestSuite);
   }
 };
 
