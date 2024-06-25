@@ -47,6 +47,7 @@ export const getCurrentOS = () => process.platform;
 export const isLinux = () => getCurrentOS() === 'linux';
 export const isMacOS = () => getCurrentOS() === 'darwin';
 export const isHeadless = () => process.env.HEADLESS === 'true';
+export const isDapp = () => process.env.ISDAPP === 'true';
 
 export const createTestRunDataDir = testSuiteName => {
   const clearedTestSuiteName = testSuiteName.replace(/[ |,]/gi, '_');

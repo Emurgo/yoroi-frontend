@@ -11,7 +11,15 @@ import {
   firefoxUuidMapping,
   TargetBrowser,
 } from '../helpers/constants.js';
-import { getDownloadsDir, getTargetBrowser, isBrave, isChrome, isFirefox } from './utils.js';
+import {
+  getDownloadsDir,
+  getTargetBrowser,
+  isBrave,
+  isChrome,
+  isDapp,
+  isFirefox,
+  isHeadless,
+} from './utils.js';
 
 const prefs = new logging.Preferences();
 prefs.setLevel(logging.Type.BROWSER, logging.Level.ALL);
@@ -57,7 +65,6 @@ const getBraveBuilder = () => {
 const getChromeBuilder = () => {
   const downloadsDir = getDownloadsDir();
   const chromeOpts = new chrome.Options()
-    .setChromeBinaryPath(chromeBin)
     .addExtensions(path.resolve(__extensionDir, 'Yoroi-test.crx'))
     .addArguments('--disable-dev-shm-usage')
     .addArguments('--no-sandbox')
@@ -65,8 +72,11 @@ const getChromeBuilder = () => {
     .addArguments('--disable-setuid-sandbox')
     .addArguments('--start-maximized')
     .setUserPreferences({ 'download.default_directory': downloadsDir });
-  if (process.env.HEADLESS) {
+  if (isHeadless()) {
     chromeOpts.addArguments('--headless=new');
+  }
+  if (isDapp()) {
+    chromeOpts.setChromeBinaryPath(chromeBin);
   }
   return new Builder()
     .forBrowser(TargetBrowser.Chrome)

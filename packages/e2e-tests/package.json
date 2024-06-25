@@ -26,7 +26,7 @@
     "test:chrome": "cross-env TARGETBROWSER=chrome HEADLESS=true npm run test:base:sequintel",
     "test:chrome:bl": "env TARGETBROWSER=chrome npm run test:base:sequintel:bl",
     "test:chrome:hw": "env TARGETBROWSER=chrome npm run test:hw:base:sequintel",
-    "test:chrome:dapp": "env TARGETBROWSER=chrome npm run test:dapp:base:sequintel",
+    "test:chrome:dapp": "cross-env TARGETBROWSER=chrome ISDAPP=true npm run test:dapp:base:sequintel",
     "test:chrome:dapp:bl": "env TARGETBROWSER=chrome npm run test:dapp:base:sequintel:bl",
     "test:chrome:parallel": "env TARGETBROWSER=chrome npm run test:base:parallel",
     "test:chrome:one": "env TARGETBROWSER=chrome npm run test:base:one",
