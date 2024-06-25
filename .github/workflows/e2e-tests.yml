@@ -301,9 +301,6 @@ jobs:
           name: builtApp
           path: ./packages/yoroi-extension
 
-      - name: Install ChromeDriver
-        uses: nanasess/setup-chromedriver@v2
-
       - name: Run Xvfb
         run: |
             export DISPLAY=:99
