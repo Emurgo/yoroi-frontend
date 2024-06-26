@@ -14,7 +14,7 @@ import type { PoolTransition } from '../../../../stores/toplevel/DelegationStore
 type Props = {|
   delegatedPool: PoolData,
   +undelegate: void | (void => Promise<void>),
-  poolTransition?: PoolTransition,
+  poolTransition: ?PoolTransition,
   delegateToSpecificPool: (id: ?string) => void,
 |};
 
