@@ -1,37 +1,5 @@
-import BigNumber from 'bignumber.js';
 import * as CSL from '@emurgo/cardano-serialization-lib-nodejs';
-
-export function getTtl() {
-  const fullConfig = [
-    {
-      StartAt: 0,
-      ChainNetworkId: '0',
-      ByronNetworkId: 1097911063,
-      GenesisDate: '1563999616000',
-      SlotsPerEpoch: 21600,
-      SlotDuration: 20,
-    },
-    {
-      StartAt: 74,
-      SlotsPerEpoch: 432000,
-      SlotDuration: 1,
-      PerEpochPercentageReward: 69344,
-      LinearFee: {
-        coefficient: '44',
-        constant: '155381',
-      },
-      MinimumUtxoVal: '1000000',
-      PoolDeposit: '500000000',
-      KeyDeposit: '2000000',
-    },
-  ];
-  const defaultTtlOffset = 7200;
-  const absSlotNumber = new BigNumber(
-    TimeUtils.timeToAbsoluteSlot(fullConfig, new Date(1649261533360))
-  );
-
-  return absSlotNumber.plus(defaultTtlOffset).toNumber();
-}
+import { protocolParams } from './networkConfig.js';
 
 export function bytesToHex(bytes) {
   return Buffer.from(bytes).toString('hex');
@@ -64,18 +32,27 @@ export const toInt = number => CSL.Int.new_i32(number);
 export const getTxBuilder = () => {
   return CSL.TransactionBuilder.new(
     CSL.TransactionBuilderConfigBuilder.new()
-      .fee_algo(CSL.LinearFee.new(CSL.BigNum.from_str('44'), CSL.BigNum.from_str('155381')))
-      .coins_per_utxo_word(CSL.BigNum.from_str('34482'))
-      .pool_deposit(CSL.BigNum.from_str('500000000'))
-      .key_deposit(CSL.BigNum.from_str('2000000'))
+      .fee_algo(
+        CSL.LinearFee.new(
+          CSL.BigNum.from_str(protocolParams.linearFee.minFeeA),
+          CSL.BigNum.from_str(protocolParams.linearFee.minFeeB)
+        )
+      )
+      .pool_deposit(CSL.BigNum.from_str(protocolParams.poolDeposit))
+      .key_deposit(CSL.BigNum.from_str(protocolParams.keyDeposit))
+      .coins_per_utxo_byte(
+        CSL.BigNum.from_str(
+          Math.floor(parseFloat(protocolParams.coinsPerUtxoWord) / 8).toString(10)
+        )
+      )
+      .max_value_size(protocolParams.maxValueSize)
+      .max_tx_size(protocolParams.maxTxSize)
       .ex_unit_prices(
         CSL.ExUnitPrices.new(
           CSL.UnitInterval.new(CSL.BigNum.from_str('577'), CSL.BigNum.from_str('10000')),
           CSL.UnitInterval.new(CSL.BigNum.from_str('721'), CSL.BigNum.from_str('10000000'))
         )
       )
-      .max_value_size(5000)
-      .max_tx_size(16384)
       .build()
   );
 };

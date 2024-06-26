@@ -15,6 +15,7 @@ class DAppBase extends BasePage {
     const windowTitle = await this.driver.getTitle();
     const result = windowTitle === popupConnectorWindowTitle;
     this.logger.info(`DAppBase::connectorPopUpIsDisplayed pop-up window is displayed: ${result}`);
+    await this.driver.manage().window().maximize();
 
     return result;
   }

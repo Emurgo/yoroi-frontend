@@ -16,7 +16,7 @@ import driversPoolsManager from '../utils/driversPool.js';
 import { compareExportedTxsAndDisplayedTxs } from '../helpers/customChecks.js';
 import AddNewWallet from '../pages/addNewWallet.page.js';
 
-describe('Export transactions', function () {
+describe('Export transactions, positive', function () {
   this.timeout(2 * oneMinute);
   let webdriver = null;
   let logger = null;

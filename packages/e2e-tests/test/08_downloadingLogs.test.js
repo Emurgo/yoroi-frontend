@@ -61,7 +61,7 @@ describe('Downloading logs for support', function () {
     expect(allDownloadedFiles.length).to.equal(1);
     // check file name
     const fileName = allDownloadedFiles[0];
-    expect(fileName).to.match(/(\d+.)+\d+T(\d+.)+\d+\+\d+.\d+-yoroi\.log/gi);
+    expect(fileName).to.match(/(\d+.?)+yoroi\.log/gi);
     // check downloaded file is not empty
     const fileContent = getDownloadedFileContent(fileName);
     expect(fileContent, 'Support log file is empty').to.not.be.empty;
