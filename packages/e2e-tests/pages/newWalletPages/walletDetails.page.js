@@ -54,8 +54,8 @@ class WalletDetails extends AddWalletBase {
   async closeTipsModalWindow() {
     this.logger.info(`WalletDetails::closeTipsModalWindow is called`);
     await this.waitForElement(this.tipsModalLocator);
-    await this.waitForElement(this.tipModalContinueButtonLocator);
-    await this.click(this.tipModalContinueButtonLocator);
+    const buttonElem = await this.waitForElement(this.tipModalContinueButtonLocator);
+    await buttonElem.click();
   }
   async enterWalletName(walletName) {
     this.logger.info(`WalletDetails::enterWalletName is called`);

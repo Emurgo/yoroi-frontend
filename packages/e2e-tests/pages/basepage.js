@@ -262,8 +262,7 @@ class BasePage {
   }
   async waitForElement(locator) {
     this.logger.info(`BasePage::waitForElement is called. Value: ${JSON.stringify(locator)}`);
-    await this.waitForElementLocated(locator);
-    const element = await this.findElement(locator);
+    const element = await this.waitForElementLocated(locator);
     return await this.driver.wait(until.elementIsVisible(element));
   }
   async waitEnable(locator) {
