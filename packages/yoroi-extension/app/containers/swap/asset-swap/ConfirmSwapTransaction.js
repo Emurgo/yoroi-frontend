@@ -1,27 +1,24 @@
 //@flow
 import { Box, Typography } from '@mui/material';
-import TextField from '../../../components/common/TextField';
-import { useSwapForm } from '../context/swap-form';
-import { AssetAndAmountRow } from '../../../components/swap/SelectAssetDialog';
 import { makeLimitOrder, makePossibleMarketOrder, useSwap, useSwapCreateOrder } from '@yoroi/swap';
-import { SwapPoolLabel } from '../../../components/swap/SwapPoolComponents';
-import SwapPoolFullInfo from './edit-pool/PoolFullInfo';
-import { useSwapFeeDisplay } from '../hooks';
-import type { PriceImpact } from '../../../components/swap/types';
-import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
+import { useEffect } from 'react';
+import { IncorrectWalletPasswordError } from '../../../api/common/errors';
+import TextField from '../../../components/common/TextField';
 import {
   FormattedActualPrice,
-  FormattedMarketPrice,
   FormattedLimitPrice,
+  FormattedMarketPrice,
   PriceImpactBanner,
   PriceImpactColored,
   PriceImpactIcon,
   PriceImpactPercent,
 } from '../../../components/swap/PriceImpact';
-import type { State } from '../context/swap-form/types';
-import { useEffect } from 'react';
-import { IncorrectWalletPasswordError } from '../../../api/common/errors';
+import { AssetAndAmountRow } from '../../../components/swap/SelectAssetDialog';
+import { SwapPoolLabel } from '../../../components/swap/SwapPoolComponents';
 import { InfoTooltip } from '../../../components/widgets/InfoTooltip';
+import { useSwapForm } from '../context/swap-form';
+import { useSwapFeeDisplay } from '../hooks';
+import SwapPoolFullInfo from './edit-pool/PoolFullInfo';
 
 type Props = {|
   slippageValue: string,
@@ -226,7 +223,7 @@ const SummaryRow = ({ col1, children, withInfo = false, infoText = '' }) => (
         {col1}
       </Typography>
       {withInfo ? (
-        <Box ml="8px">
+        <Box ml="8px" sx={{ height: '24px' }}>
           <InfoTooltip width={500} content={<Typography color="inherit">{infoText}</Typography>} />
         </Box>
       ) : null}
