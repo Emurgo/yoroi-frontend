@@ -1,15 +1,14 @@
 // @flow
-import type { Node } from 'react';
 import { Box, Button, Typography } from '@mui/material';
-import Dialog from '../widgets/Dialog';
+import { useSwap } from '@yoroi/swap';
+import type { Node } from 'react';
 import { ReactComponent as ErrorTriangleIcon } from '../../assets/images/revamp/error.triangle.svg';
 import { ReactComponent as ExclamationCircleIcon } from '../../assets/images/revamp/exclamation.circle.svg';
-import type { PriceImpact } from './types';
-import { useSwap } from '@yoroi/swap';
-import Percent from '../common/Percent';
-import { Quantities } from '../../utils/quantities';
-import { PRICE_PRECISION } from './common';
 import { useSwapForm } from '../../containers/swap/context/swap-form';
+import { Quantities } from '../../utils/quantities';
+import Percent from '../common/Percent';
+import Dialog from '../widgets/Dialog';
+import { PRICE_PRECISION } from './common';
 
 function colorsBySeverity(isSevere: boolean) {
   return isSevere ? { fg: '#FF1351', bg: '#FFF1F5' } : { fg: '#ED8600', bg: '#FDF7E2' };
@@ -52,6 +51,7 @@ export function PriceImpactIcon({
         height: sz,
         marginTop,
         marginRight,
+        marginLeft: '-3px',
       }}
     >
       {isSevere ? <ErrorTriangleIcon {...svgProp} /> : <ExclamationCircleIcon {...svgProp} />}
