@@ -690,6 +690,10 @@ const globalMessages: * = defineMessages({
     id: 'sidebar.wallets',
     defaultMessage: '!!!My wallets',
   },
+  sidebarAssets: {
+    id: 'sidebar.assets',
+    defaultMessage: '!!!Assets',
+  },
   sidebarSettings: {
     id: 'sidebar.settings',
     defaultMessage: '!!!Settings',
