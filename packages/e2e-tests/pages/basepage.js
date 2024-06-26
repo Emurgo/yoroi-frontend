@@ -326,7 +326,7 @@ class BasePage {
     const result = await this.customWaiter(
       async () => {
         const elemsPresented = await this.findElements(locator);
-        return elemsPresented === 1;
+        return elemsPresented.length === 1;
       },
       timeout,
       repeatPeriod
