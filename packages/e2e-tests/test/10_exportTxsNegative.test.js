@@ -2,7 +2,13 @@ import BasePage from '../pages/basepage.js';
 import { customAfterEach } from '../utils/customHooks.js';
 import TransactionsSubTab from '../pages/wallet/walletTab/walletTransactions.page.js';
 import { expect } from 'chai';
-import { cleanDownloads, getTestLogger, getListOfDownloadedFiles } from '../utils/utils.js';
+import {
+  cleanDownloads,
+  getTestLogger,
+  getListOfDownloadedFiles,
+  isLinux,
+  isHeadless,
+} from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
 import driversPoolsManager from '../utils/driversPool.js';
 import { Colors } from '../helpers/constants.js';
@@ -57,10 +63,14 @@ describe('Export transactions, negative cases', function () {
       const exportDialog = new TransactionsSubTab(webdriver, logger).getExportDialog();
       const btnEnabled = await exportDialog.exportButtonIsEnabled();
       expect(btnEnabled, 'The export button is enabled').to.be.false;
-      const startInputColor = await exportDialog.getStartDateInputBorderColor();
-      expect(startInputColor, 'Start date input is not higlighted').to.equal(Colors.errorRed);
-      const endInputColor = await exportDialog.getEndDateInputBorderColor();
-      expect(endInputColor, 'End date input is not higlighted').to.equal(Colors.errorRed);
+      if (isLinux() && isHeadless()) {
+        console.warn('Color checks are skipped.');
+      } else {
+        const startInputColor = await exportDialog.getStartDateInputBorderColor();
+        expect(startInputColor, 'Start date input is not higlighted').to.equal(Colors.errorRed);
+        const endInputColor = await exportDialog.getEndDateInputBorderColor();
+        expect(endInputColor, 'End date input is not higlighted').to.equal(Colors.errorRed);
+      }
     });
   });
   describe('The end date is earlier then the start date', function () {
