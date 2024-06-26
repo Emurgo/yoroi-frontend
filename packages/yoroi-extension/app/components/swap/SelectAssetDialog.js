@@ -107,7 +107,7 @@ export default function SelectAssetDialog({
               }}
             />
           </Box>
-          <Box sx={{ marginBottom: '24px' }}>
+          <Box sx={{ marginBottom: '16px' }}>
             <Typography component="div" variant="body2" color="grayscale.700">
               {filteredAssets.length} assets {searchTerm ? 'found' : 'available'}
             </Typography>
