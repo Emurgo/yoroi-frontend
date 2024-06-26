@@ -1,16 +1,15 @@
 // @flow
-import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
-import { ReactComponent as EditIcon } from '../../../../assets/images/revamp/icons/edit.inline.svg';
-import { ReactComponent as ChevronDownIcon } from '../../../../assets/images/revamp/icons/chevron-down.inline.svg';
 import { useSwap } from '@yoroi/swap';
 import { capitalize } from 'lodash';
+import { useState } from 'react';
+import { ReactComponent as ChevronDownIcon } from '../../../../assets/images/revamp/icons/chevron-down.inline.svg';
+import { ReactComponent as EditIcon } from '../../../../assets/images/revamp/icons/edit.inline.svg';
 import { SwapPoolIcon } from '../../../../components/swap/SwapPoolComponents';
-import SwapPoolFullInfo from './PoolFullInfo';
-import { useSwapForm } from '../../context/swap-form';
 import { maybe } from '../../../../coreUtils';
+import { useSwapForm } from '../../context/swap-form';
 import { useSwapFeeDisplay } from '../../hooks';
-import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
+import SwapPoolFullInfo from './PoolFullInfo';
 
 type Props = {|
   +defaultTokenInfo: RemoteTokenInfo,
@@ -90,6 +89,8 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            marginBottom: '8px',
+            cursor: 'pointer',
           }}
           onClick={handleShowFullInfo}
         >
