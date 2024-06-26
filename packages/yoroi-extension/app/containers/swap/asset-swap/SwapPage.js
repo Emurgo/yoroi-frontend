@@ -47,7 +47,13 @@ function SwapPage(props: StoresAndActionsProps): Node {
     },
     frontendFeeTiersChanged,
   } = useSwap();
-  const { sellTokenInfo, buyTokenInfo } = useSwapForm();
+  const {
+    sellTokenInfo,
+    buyTokenInfo,
+    resetSwapForm,
+    sellQuantity,
+    buyQuantity,
+  } = useSwapForm();
 
   const isMarketOrder = orderType === 'market';
   const impact = isMarketOrder ? Number(selectedPoolCalculation?.prices.priceImpact ?? 0) : 0;
@@ -71,25 +77,30 @@ function SwapPage(props: StoresAndActionsProps): Node {
   );
 
   const swapFormCanContinue =
-    selectedPoolCalculation != null &&
-    sell.quantity !== '0' &&
-    buy.quantity !== '0' &&
-    isValidTickers;
+    selectedPoolCalculation != null
+    && sell.quantity !== '0'
+    && buy.quantity !== '0'
+    && sellQuantity.error == null
+    && buyQuantity.error == null
+    && isValidTickers;
 
   const confirmationCanContinue = userPasswordState.value !== '' && signRequest != null;
 
   const isButtonLoader = orderStep === 1 && signRequest == null;
 
   const isSwapEnabled =
-    (orderStep === 0 && swapFormCanContinue) || (orderStep === 1 && confirmationCanContinue);
+    (orderStep === 0 && swapFormCanContinue)
+    || (orderStep === 1 && confirmationCanContinue);
 
   const wallet = props.stores.wallets.selectedOrFail;
   const network = wallet.getParent().getNetworkInfo();
   const defaultTokenInfo = props.stores.tokenInfoStore.getDefaultTokenInfoSummary(
     network.NetworkId
   );
+  const getTokenInfoBatch: Array<string> => { [string]: Promise<RemoteTokenInfo> } = ids =>
+    props.stores.tokenInfoStore.fetchMissingAndGetLocalOrRemoteMetadata(network, ids);
   const getTokenInfo: string => Promise<RemoteTokenInfo> = id =>
-    props.stores.tokenInfoStore.getLocalOrRemoteMetadata(network, id);
+    getTokenInfoBatch([id])[id].then(res => res ?? {});
 
   const disclaimerFlag = props.stores.substores.ada.swapStore.swapDisclaimerAcceptanceFlag;
 
@@ -237,6 +248,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
         refreshWallet: () => props.stores.wallets.refreshWalletFromRemote(wallet),
       });
       setOrderStepValue(2);
+      resetSwapForm();
     } catch (e) {
       handleTransactionError(e);
     } finally {
@@ -323,6 +335,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
               onSetNewSlippage={onSetNewSlippage}
               defaultTokenInfo={defaultTokenInfo}
               getTokenInfo={getTokenInfo}
+              getTokenInfoBatch={getTokenInfoBatch}
               priceImpactState={priceImpactState}
             />
           )}

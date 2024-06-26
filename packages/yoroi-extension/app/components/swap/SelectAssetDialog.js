@@ -12,7 +12,6 @@ import adaTokenImage from '../../assets/images/ada.inline.svg';
 import defaultTokenImage from '../../assets/images/revamp/asset-default.inline.svg';
 import Dialog from '../widgets/Dialog';
 import Table from '../common/table/Table';
-import { urlResolveForIpfsAndCorsproxy } from '../../coreUtils';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
 import { PriceImpactColored, PriceImpactIcon } from './PriceImpact';
 import { InfoTooltip } from '../widgets/InfoTooltip';
@@ -28,7 +27,7 @@ type Props = {|
   onAssetSelected: any => void,
   onClose: void => void,
   defaultTokenInfo: RemoteTokenInfo,
-  getTokenInfo: string => Promise<RemoteTokenInfo>,
+  getTokenInfoBatch: Array<string> => { [string]: Promise<RemoteTokenInfo> },
 |};
 
 export default function SelectAssetDialog({
@@ -37,7 +36,7 @@ export default function SelectAssetDialog({
   onAssetSelected,
   onClose,
   defaultTokenInfo,
-  getTokenInfo,
+  getTokenInfoBatch,
 }: Props): React$Node {
   const [searchTerm, setSearchTerm] = useState<string>('');
 
@@ -54,6 +53,9 @@ export default function SelectAssetDialog({
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
     }) || [];
+
+  const metadataPromiseMap: { [string]: Promise<RemoteTokenInfo> } =
+    getTokenInfoBatch(filteredAssets.map(a => a.id))
 
   return (
     <Dialog
@@ -127,7 +129,7 @@ export default function SelectAssetDialog({
                 type={type}
                 onAssetSelected={handleAssetSelected}
                 defaultTokenInfo={defaultTokenInfo}
-                getTokenInfo={getTokenInfo}
+                getTokenInfo={id => metadataPromiseMap[id]}
               />
             );
           })}
@@ -187,7 +189,7 @@ export const AssetAndAmountRow = ({
 
   const isFrom = type === 'from';
 
-  const { name = null, image = '', fingerprint: address, id, amount: assetAmount, ticker } = asset;
+  const { name = null, fingerprint: address, id, amount: assetAmount, ticker } = asset;
   const priceNotChanged = Number(priceChange100.replace('-', '').replace('%', '')) === 0;
   const priceIncreased = priceChange100 && priceChange100.charAt(0) !== '-';
   const priceChange24h = priceChange100.replace('-', '') || '0%';
@@ -208,7 +210,7 @@ export const AssetAndAmountRow = ({
   const imgSrc =
     ticker === defaultTokenInfo.ticker
       ? adaTokenImage
-      : remoteTokenLogo ?? urlResolveForIpfsAndCorsproxy(image) ?? defaultTokenImage;
+      : remoteTokenLogo ?? defaultTokenImage;
 
   const amount = displayAmount ?? assetAmount;
 

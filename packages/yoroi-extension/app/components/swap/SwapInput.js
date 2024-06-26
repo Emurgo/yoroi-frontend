@@ -5,7 +5,6 @@ import { Box, Typography } from '@mui/material';
 import { ReactComponent as ChevronDownIcon } from '../../assets/images/revamp/icons/chevron-down.inline.svg';
 import adaTokenImage from '../../assets/images/ada.inline.svg';
 import defaultTokenImage from '../../assets/images/revamp/token-default.inline.svg';
-import { urlResolveForIpfsAndCorsproxy } from '../../coreUtils';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
 import type { State } from '../../containers/swap/context/swap-form/types';
 import { useEffect, useState } from 'react';
@@ -38,10 +37,10 @@ export default function SwapInput({
   focusState,
 }: Props): Node {
   const [remoteTokenLogo, setRemoteTokenLogo] = useState<?string>(null);
-  const { id, amount: quantity = undefined, image, ticker } = tokenInfo || {};
+  const { id, amount: quantity = undefined, ticker } = tokenInfo || {};
 
   const handleChange = e => {
-    if (!disabled && value !== quantity) {
+    if (!disabled) {
       handleAmountChange(e.target.value);
     }
   };
@@ -66,7 +65,7 @@ export default function SwapInput({
   const imgSrc =
     ticker === defaultTokenInfo.ticker
       ? adaTokenImage
-      : remoteTokenLogo ?? urlResolveForIpfsAndCorsproxy(image) ?? defaultTokenImage;
+      : remoteTokenLogo ?? defaultTokenImage;
 
   return (
     <Box>

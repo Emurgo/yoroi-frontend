@@ -3,7 +3,7 @@
 import Store from '../base/Store';
 import type { ActionsMap } from '../../actions';
 import type { StoresMap } from '../index';
-import { action, computed, observable, runInAction } from 'mobx';
+import { action, computed, observable } from 'mobx';
 import type { StorageField } from '../../api/localStorage';
 import { createStorageFlag, loadSubmittedTransactions } from '../../api/localStorage';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
@@ -38,7 +38,6 @@ const FRONTEND_FEE_ADDRESS_PREPROD =
 
 export default class SwapStore extends Store<StoresMap, ActionsMap> {
   @observable orderStep: number = 0;
-  @observable transactionTimestamps: { [string]: Date } = {};
 
   swapDisclaimerAcceptanceFlag: StorageField<boolean> = createStorageFlag(
     'SwapStore.swapDisclaimerAcceptanceFlag',
@@ -229,26 +228,21 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
   fetchTransactionTimestamps: ({|
     wallet: PublicDeriver<>,
     txHashes: Array<string>,
-  |}) => Promise<void> = async ({
+  |}) => Promise<{ [string]: Date }> = async ({
     wallet,
     txHashes,
   }) => {
-    const existingSet = new Set(Object.keys(this.transactionTimestamps));
-    const filteredTxHashes = txHashes.filter(x => !existingSet.has(x.toLowerCase()));
-    if (filteredTxHashes.length === 0) {
-      return;
+    if (txHashes.length === 0) {
+      return {};
     }
     const network = wallet.getParent().getNetworkInfo();
     const globalSlotMap: { [string]: string } = await this.stores.substores.ada.stateFetchStore.fetcher
-      .getTransactionSlotsByHashes({ network, txHashes: filteredTxHashes });
+      .getTransactionSlotsByHashes({ network, txHashes });
     const timeCalcRequests = this.stores.substores.ada.time.getTimeCalcRequests(wallet);
     const { toRealTime } = timeCalcRequests.requests;
     const slotToTimestamp: string => Date = s => toRealTime({ absoluteSlotNum: Number(s) });
-    runInAction(() => {
-      for (const [tx,slot] of listEntries(globalSlotMap)) {
-        this.transactionTimestamps[tx.toLowerCase()] = slotToTimestamp(slot);
-      }
-    });
+    return listEntries(globalSlotMap).reduce((res, [tx,slot]) =>
+      ({ ...res, [tx.toLowerCase()]: slotToTimestamp(slot) }), ({}: { [string]: Date }))
   }
 }
 

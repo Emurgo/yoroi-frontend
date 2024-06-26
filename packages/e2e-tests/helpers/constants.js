@@ -1,5 +1,6 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { isMacOS } from '../utils/utils.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -47,6 +48,7 @@ export const getTestString = (basePart, stringLength, withCapitals) => {
   return __genString(stringLength, basePart, withCapitals);
 };
 
+export const DRIVERS_AMOUNT = 1;
 export const chromeExtIdUrl = `chrome-extension://bdlknlffjjmjckcldekkbejaogpkjphg`;
 export const firefoxExtensionId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 export const firefoxExtIdUrl = `moz-extension://${firefoxExtensionId}`;
@@ -55,6 +57,9 @@ export const firefoxBin =
   process.env.FIREFOX_BIN != null
     ? process.env.FIREFOX_BIN
     : '/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox-bin';
+export const chromeBin = isMacOS()
+  ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+  : '/usr/local/bin/chromedriver';
 export const TargetBrowser = Object.freeze({
   Chrome: 'chrome',
   Brave: 'brave',

@@ -1,16 +1,16 @@
-import BasePage from '../../pages/basepage.js';
-import { customAfterEach, customBeforeNestedDAppTest } from '../../utils/customHooks.js';
-import { getSpendableWallet } from '../../utils/testWallets.js';
+import BasePage from '../../../pages/basepage.js';
+import { customAfterEach, customBeforeNestedDAppTest } from '../../../utils/customHooks.js';
+import { getSpendableWallet } from '../../../utils/testWallets.js';
 import { expect } from 'chai';
-import { getTestLogger } from '../../utils/utils.js';
-import { oneMinute } from '../../helpers/timeConstants.js';
-import { restoreWallet } from '../../helpers/restoreWalletHelper.js';
-import { WindowManager, mockDAppName } from '../../helpers/windowManager.js';
-import { getMockServer, mockDAppUrl } from '../../helpers/mock-dApp-webpage/mockServer.js';
-import { MockDAppWebpage } from '../../helpers/mock-dApp-webpage/mockedDApp.js';
-import { connectNonAuth } from '../../helpers/mock-dApp-webpage/dAppHelper.js';
-import { adaInLovelaces } from '../../helpers/constants.js';
-import driversPoolsManager from '../../utils/driversPool.js';
+import { getTestLogger } from '../../../utils/utils.js';
+import { oneMinute } from '../../../helpers/timeConstants.js';
+import { restoreWallet } from '../../../helpers/restoreWalletHelper.js';
+import { WindowManager, mockDAppName } from '../../../helpers/windowManager.js';
+import { getMockServer, mockDAppUrl } from '../../../helpers/mock-dApp-webpage/mockServer.js';
+import { MockDAppWebpage } from '../../../helpers/mock-dApp-webpage/mockedDApp.js';
+import { connectNonAuth } from '../../../helpers/mock-dApp-webpage/dAppHelper.js';
+import { adaInLovelaces } from '../../../helpers/constants.js';
+import driversPoolsManager from '../../../utils/driversPool.js';
 
 describe('dApp, getCollateral, no popup, positive', function () {
   this.timeout(2 * oneMinute);

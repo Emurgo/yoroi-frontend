@@ -125,8 +125,8 @@ class WalletCommonBase extends BasePage {
     const rawBalanceText = await walletBalanceElem.getText();
     const adaBalance = Number(rawBalanceText.split(' ')[0]);
 
-    await this.waitForElement(this.walletFiatBalanceTextLocator);
-    const rawFiatBalanceText = await this.getText(this.walletFiatBalanceTextLocator);
+    const walletFiatBalanceElem = await this.waitForElement(this.walletFiatBalanceTextLocator);
+    const rawFiatBalanceText = await walletFiatBalanceElem.getText();
     const [fiatBalanceStr, fiatCurrency] = rawFiatBalanceText.split(' ');
     const fiatBalance = fiatBalanceStr === '-' ? 0 : Number(fiatBalanceStr);
 
