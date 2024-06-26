@@ -41,6 +41,7 @@ import {
 } from '../../../../config/numbersConfig';
 import cbor from 'cbor';
 import { derivePublicByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
+import { mergeWitnessSets } from '../utils';
 
 // ==================== LEDGER ==================== //
 /** Generate a payload for Ledger SignTx */
@@ -502,7 +503,7 @@ export function toLedgerAddressParameters(request: {|
 }
 
 export function buildSignedTransaction(
-  txBody: RustModule.WalletV4.TransactionBody,
+  tx: RustModule.WalletV4.Transaction,
   senderUtxos: Array<CardanoAddressedUtxo>,
   witnesses: Array<Witness>,
   publicKey: {|
@@ -622,10 +623,15 @@ export function buildSignedTransaction(
     }
     witSet.set_vkeys(vkeyWitWasm);
   }
+
+  const mergedWitnessSet = RustModule.WalletV4.TransactionWitnessSet.from_hex(
+    mergeWitnessSets(tx.witness_set().to_hex(), witSet.to_hex())
+  );
+
   // TODO: handle script witnesses
   return RustModule.WalletV4.Transaction.new(
-    txBody,
-    witSet,
+    tx.body(),
+    mergedWitnessSet,
     metadata
   );
 }

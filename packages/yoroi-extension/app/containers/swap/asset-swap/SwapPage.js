@@ -117,7 +117,7 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
     && isValidTickers;
 
   const confirmationCanContinue =
-    (isHardwareWallet || userPasswordState.value !== '')
+    (isHardwareWallet || userPasswordState?.value !== '')
     && signRequest != null;
 
   const isButtonLoader = orderStep === 1 && signRequest == null;
@@ -260,17 +260,15 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
     setOpenedDialog('loadingOverlay');
     const password = userPasswordState?.value;
 
+    const baseBroadcastRequest = { publicDeriver: wallet, signRequest };
+    const broadcastRequest = isHardwareWallet
+      ? { [walletType]: baseBroadcastRequest }
+      : { normal: { ...baseBroadcastRequest, password },
+    };
     try {
-      await props.stores.substores.ada.wallets.adaSendAndRefresh({
-        broadcastRequest: {
-          normal: {
-            publicDeriver: wallet,
-            password,
-            signRequest,
-          },
-        },
-        refreshWallet: () => props.stores.wallets.refreshWalletFromRemote(wallet),
-      });
+      const refreshWallet = () => props.stores.wallets.refreshWalletFromRemote(wallet);
+      // $FlowIgnore[incompatible-call]
+      await props.stores.substores.ada.wallets.adaSendAndRefresh({ broadcastRequest, refreshWallet });
       setOrderStepValue(2);
       resetSwapForm();
     } catch (e) {
@@ -285,7 +283,7 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
       throw new Error('Incorrect state! Order transaction is not prepared properly');
     }
     if (!isHardwareWallet) {
-      if (userPasswordState.value === '') {
+      if (userPasswordState?.value === '') {
         throw new Error('Incorrect state! User password is required');
       }
     }

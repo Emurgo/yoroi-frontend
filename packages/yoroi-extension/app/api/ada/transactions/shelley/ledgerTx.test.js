@@ -437,7 +437,7 @@ test('Create Ledger transaction', async () => {
   }: SignTransactionRequest));
 
   buildSignedTransaction(
-    txBuilder.build(),
+    txBuilder.build_tx(),
     signRequest.senderUtxos,
     [
       // this witnesses doesn't belong to the transaction / key. Just used to test wit generation

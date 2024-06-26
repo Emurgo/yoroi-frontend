@@ -1655,8 +1655,6 @@ export default class AdaApi {
           neededHashes: new Set(),
           wits: new Set(),
         },
-        trezorTCatalystRegistrationTxSignData: undefined,
-        ledgerNanoCatalystRegistrationTxSignData: undefined,
       });
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.createSimpleTx)} error: ` + stringifyError(error));
