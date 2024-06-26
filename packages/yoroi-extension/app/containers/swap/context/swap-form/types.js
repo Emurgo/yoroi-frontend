@@ -1,5 +1,6 @@
 // @flow
 import type { AssetAmount } from '../../../../components/swap/types';
+import { noop } from '../../../../coreUtils';
 
 export const SwapFormActionTypeValues = Object.freeze({
   SellTouched: 'sellTouched',
@@ -69,12 +70,22 @@ export type SwapFormActions = {|
   sellAmountErrorChanged: (error: string | null) => void,
 |};
 
+export type State<S> = {| value: S, update: ((S => S) | S) => void |}
+
+export function StateWrap<S>([value, update]: [S, ((S => S) | S) => void]): State<S> {
+  return { value, update };
+}
+
+export function ConstantState<S>(s: S): State<S> {
+  return { value: s, update: noop };
+}
+
 export type SwapFormContext = {|
   ...SwapFormState,
   ...SwapFormActions,
-  sellInputRef: any | null,
-  buyInputRef: any | null,
-  limitInputRef: any | null,
+  sellFocusState: State<boolean>,
+  buyFocusState: State<boolean>,
+  limitPriceFocusState: State<boolean>,
   onChangeSellQuantity: (text: string) => void,
   onChangeBuyQuantity: (text: string) => void,
   onChangeLimitPrice: (text: string) => void,

@@ -80,7 +80,6 @@ class MyWalletsPage extends Component<AllProps> {
   render(): Node {
     const { intl } = this.context;
     const { actions, stores } = this.props;
-    const { uiDialogs } = stores;
 
     const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
     const { wallets } = this.props.stores.wallets;
@@ -138,7 +137,6 @@ class MyWalletsPage extends Component<AllProps> {
         showInContainer
       >
         <MyWallets>{walletsList}</MyWallets>
-        {activeDialog}
       </TopBarLayout>
     );
   }

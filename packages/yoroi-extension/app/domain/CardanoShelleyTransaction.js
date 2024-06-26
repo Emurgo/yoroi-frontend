@@ -95,6 +95,7 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
     }
     return new CardanoShelleyTransaction({
       txid: tx.transaction.Hash,
+      ordinal: tx.transaction.Ordinal,
       block: tx.block,
       type: tx.type,
       // note: we use the explicitly fee in the transaction

@@ -50,7 +50,7 @@ import {
   _connectorGenerateReorgTx,
   connectorGetChangeAddress,
   _connectorGetUnusedAddresses,
-  _connectorGetUsedAddresses,
+  _connectorGetUsedAddressesWithPaginate,
   connectorSendTxCardano,
   getScriptRequiredSigningKeys,
   resolveTxOrTxBody,
@@ -86,6 +86,7 @@ import { noop } from '../../coreUtils';
 import { getWallets, signAndBroadcastTransaction, broadcastTransaction } from '../../api/thunk';
 import type { WalletState } from '../../../chrome/extension/background/types';
 import { CoreAddressTypes, TxStatusCodes, } from '../../api/ada/lib/storage/database/primitives/enums';
+import { addressBech32ToHex } from '../../api/ada/lib/cardanoCrypto/utils';
 
 export function connectorCall<T, R>(message: T): Promise<R> {
   return new Promise((resolve, reject) => {
@@ -622,9 +623,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         }
         const value = multiTokenFromRemote(foreignUtxo.output, defaultToken.NetworkId);
         foreignInputDetails.push({
-          address: Buffer.from(
-            RustModule.WalletV4.Address.from_bech32(foreignUtxo.output.address).to_bytes()
-          ).toString('hex'),
+          address: addressBech32ToHex(foreignUtxo.output.address),
           value,
         });
       }
@@ -1013,7 +1012,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       ].filter(a => a.address.Type === CoreAddressTypes.CARDANO_BASE)
       ownAddresses = new Set([
         ...utxos.map(utxo => utxo.address),
-        ...(await _connectorGetUsedAddresses(
+        ...(await _connectorGetUsedAddressesWithPaginate(
           allBaseAddresses.filter(a => a.address.IsUsed).map(a => a.address.Hash),
           allBaseAddresses.filter(a => !a.address.IsUsed).map(a => a.address.Hash),
           new Set(_getOutputAddressesInSubmittedTxs(publicDeriver.submittedTransactions)),

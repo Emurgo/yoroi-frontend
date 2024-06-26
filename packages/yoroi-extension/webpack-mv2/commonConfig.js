@@ -219,12 +219,19 @@ const optimization = {
 const resolve = () /*: * */ => ({
   extensions: ['*', '.js', '.wasm'],
   fallback: {
+    vm: false,
     fs: false,
     path: require.resolve('path-browserify'),
     stream: require.resolve('stream-browserify'),
     zlib: require.resolve('browserify-zlib'),
     crypto: require.resolve('crypto-browserify'),
     buffer: require.resolve('buffer'),
+    assert: require.resolve('assert/'),
+    util: require.resolve('util/'),
+    url: require.resolve('url/'),
+    // need these so that @yoroi/common (a dependent of @yoroi/exchange) doesn't break Webpack
+    'react-native': false,
+    'react-native-mmkv': false,
   },
   alias: { process: 'process/browser', }
 });

@@ -16,12 +16,13 @@ import AdaStateFetchStore from './AdaStateFetchStore';
 import AdaWalletRestoreStore from './AdaWalletRestoreStore';
 import AdaDelegationTransactionStore from './AdaDelegationTransactionStore';
 import AdaDelegationStore from './AdaDelegationStore';
-import AdaTimeStore from './AdaTimeStore';
 import AdaMnemonicSendStore from './send/AdaMnemonicSendStore';
 import VotingStore from './VotingStore';
+import SwapStore from './SwapStore';
 import type { ActionsMap } from '../../actions/index';
 import type { Api } from '../../api/index';
 import type { StoresMap } from '../index';
+import BaseCardanoTimeStore from '../base/BaseCardanoTimeStore';
 
 export const adaStoreClasses = Object.freeze({
   wallets: AdaWalletsStore,
@@ -37,9 +38,10 @@ export const adaStoreClasses = Object.freeze({
   delegationTransaction: AdaDelegationTransactionStore,
   walletRestore: AdaWalletRestoreStore,
   delegation: AdaDelegationStore,
-  time: AdaTimeStore,
+  time: BaseCardanoTimeStore,
   mnemonicSend: AdaMnemonicSendStore,
   votingStore: VotingStore,
+  swapStore: SwapStore,
 });
 
 export type AdaStoresMap = {|
@@ -56,9 +58,10 @@ export type AdaStoresMap = {|
   delegationTransaction: AdaDelegationTransactionStore,
   walletRestore: AdaWalletRestoreStore,
   delegation: AdaDelegationStore,
-  time: AdaTimeStore,
+  time: BaseCardanoTimeStore,
   mnemonicSend: AdaMnemonicSendStore,
   votingStore: VotingStore,
+  swapStore: SwapStore,
 |};
 
 const adaStores: WithNullableFields<AdaStoresMap> = observable({
@@ -78,6 +81,7 @@ const adaStores: WithNullableFields<AdaStoresMap> = observable({
   time: null,
   mnemonicSend: null,
   votingStore: null,
+  swapStore: null,
 });
 
 /** See `stores` index for description of this weird behavior

@@ -45,12 +45,19 @@ export type BestBlockFunc = (body: BestBlockRequest) => Promise<BestBlockRespons
 // sendTx
 
 export type SignedRequestInternal = {|
-  signedTx: string,
+  signedTx: string | Array<string>,
 |};
 export type SignedRequest = {|
   ...BackendNetworkInfo,
   id: string,
   encodedTx: Uint8Array,
+|};
+export type SignedBatchRequest = {|
+  ...BackendNetworkInfo,
+  txs: Array<{|
+    id: string,
+    encodedTx: Uint8Array,
+  |}>
 |};
 export type SignedResponse = {| txId: string, |};
 export type SendFunc = (body: SignedRequest) => Promise<SignedResponse>;
@@ -89,30 +96,25 @@ export const RemoteTransactionTypes: RemoteTransactionTypeT = Object.freeze({
   byron: 'byron',
   shelley: 'shelley',
 });
+export type RemoteAsset = {
+  +amount: string,
+  +assetId: string,
+  +policyId: string,
+  +name: string,
+  ...
+};
 export type RemoteTransactionInput = {|
   +id: string,
   +index: number, // index of output we're consuming
   +txHash: string, // tx that created output we're consuming
   +address: string,
   +amount: string,
-  +assets: $ReadOnlyArray<$ReadOnly<{
-    +amount: string,
-    +assetId: string,
-    +policyId: string,
-    +name: string,
-    ...
-  }>>,
+  +assets: $ReadOnlyArray<$ReadOnly<RemoteAsset>>,
 |};
 export type RemoteTransactionOutput = {|
   +address: string,
   +amount: string,
-  +assets: $ReadOnlyArray<$ReadOnly<{
-    +amount: string,
-    +assetId: string,
-    +policyId: string,
-    +name: string,
-    ...
-  }>>,
+  +assets: $ReadOnlyArray<$ReadOnly<RemoteAsset>>,
 |};
 
 /**
@@ -150,13 +152,7 @@ export type RemoteUnspentOutput = {|
   +tx_index: number,
   +receiver: string,
   +amount: string,
-  +assets: $ReadOnlyArray<$ReadOnly<{
-    +amount: string,
-    +assetId: string,
-    +policyId: string,
-    +name: string,
-    ...
-  }>>,
+  +assets: $ReadOnlyArray<$ReadOnly<RemoteAsset>>,
   // +block_num: number,
 |};
 
@@ -440,6 +436,7 @@ export type RemoteTokenInfo = {|
   +name?: string,
   +decimals?: number,
   +ticker?: string,
+  +logo?: string,
 |};
 export type TokenInfoResponse = {|
   [key: string]: (RemoteTokenInfo | null),
@@ -579,9 +576,23 @@ export type GetTransactionsByHashesFunc = (
   body: GetTransactionsByHashesRequest
 ) => Promise<GetTransactionsByHashesResponse>;
 
+export type GetTransactionSlotsByHashesResponse = { [string]: string };
+
+export type GetTransactionSlotsByHashesFunc = (
+  body: GetTransactionsByHashesRequest
+) => Promise<GetTransactionSlotsByHashesResponse>;
+
 export type FilterUsedRequest = {|
   network: $ReadOnly<NetworkRow>,
   addresses: Array<string>,
 |};
 export type FilterUsedResponse = Array<string>;
 export type FilterFunc = (body: FilterUsedRequest) => Promise<FilterUsedResponse>;
+
+export type GetSwapFeeTiersRequest = BackendNetworkInfo;
+
+export type GetSwapFeeTiersResponse = { [string]: any };
+
+export type GetSwapFeeTiersFunc = (
+  body: GetSwapFeeTiersRequest
+) => Promise<GetSwapFeeTiersResponse>;

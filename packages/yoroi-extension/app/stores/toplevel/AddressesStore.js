@@ -1,34 +1,29 @@
 // @flow
-import { observable, action, runInAction } from 'mobx';
+import { action, observable, runInAction } from 'mobx';
 import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
 import LocalizableError, { localizedError } from '../../i18n/LocalizableError';
-import type {
-  CreateAddressFunc,
-  CreateAddressResponse,
-} from '../../api/common';
-import type {
-  IHasUtxoChainsRequest,
-} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import {
-  Logger,
-} from '../../utils/logging';
+import type { CreateAddressFunc, CreateAddressResponse, } from '../../api/common';
+import type { IHasUtxoChainsRequest, } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import { Logger, } from '../../utils/logging';
 import type { AddressFilterKind, StandardAddress, AddressTypeName, } from '../../types/AddressFilterTypes';
+import type { AddressFilterKind, AddressTypeName, StandardAddress, } from '../../types/AddressFilterTypes';
 import { AddressFilter, } from '../../types/AddressFilterTypes';
-import {
-  ConceptualWallet
-} from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import { AddressTypeStore } from '../base/AddressSubgroupStore';
 import type { CoreAddressT } from '../../api/ada/lib/storage/database/primitives/enums';
+import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
+import type { IAddressTypeStore, IAddressTypeUiSubset } from '../stateless/addressStores';
 import { allAddressSubgroups } from '../stateless/addressStores';
-import type { IAddressTypeUiSubset, IAddressTypeStore } from '../stateless/addressStores';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { ChainDerivations } from '../../config/numbersConfig';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { popAddress } from '../../api/thunk';
 import type { WalletState } from '../../../chrome/extension/background/types';
+import type { AddressDetails } from '../../api/ada';
+import { forceNonNull } from '../../coreUtils';
 
 export default class AddressesStore extends Store<StoresMap, ActionsMap> {
 
@@ -208,5 +203,13 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
 
   @action _resetFilter: void => void = () => {
     this.addressFilter = AddressFilter.None;
+  }
+
+  getFirstExternalAddress: (PublicDeriver<>) => Promise<AddressDetails> = async (publicDeriver) => {
+    return (await this.api.ada.getChainAddressesForDisplay({
+      publicDeriver: forceNonNull(asHasUtxoChains(publicDeriver)),
+      type: CoreAddressTypes.CARDANO_BASE,
+      chainsRequest: { chainId: ChainDerivations.EXTERNAL },
+    }))[0];
   }
 }

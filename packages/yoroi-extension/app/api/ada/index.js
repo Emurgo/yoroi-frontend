@@ -4,12 +4,7 @@ import type { lf$Database } from 'lovefield';
 import { fullErrStr, Logger, stringifyData, stringifyError } from '../../utils/logging';
 import CardanoByronTransaction from '../../domain/CardanoByronTransaction';
 import CardanoShelleyTransaction from '../../domain/CardanoShelleyTransaction';
-import {
-  ChainDerivations,
-  CoinTypes,
-  HARD_DERIVATION_START,
-  WalletTypePurpose,
-} from '../../config/numbersConfig';
+import { ChainDerivations, CoinTypes, HARD_DERIVATION_START, WalletTypePurpose, } from '../../config/numbersConfig';
 import { createHardwareCip1852Wallet, createStandardCip1852Wallet, } from './lib/storage/bridge/walletBuilder/shelley';
 import type { ReferenceTx } from './lib/storage/bridge/updateTransactions';
 import {
@@ -37,7 +32,12 @@ import { CoreAddressTypes, TxStatusCodes, } from './lib/storage/database/primiti
 import type { NetworkRow, TokenRow, } from './lib/storage/database/primitives/tables';
 import { TransactionType } from './lib/storage/database/primitives/tables';
 import { PublicDeriver, } from './lib/storage/models/PublicDeriver/index';
-import { asDisplayCutoff, asGetAllUtxos, asHasLevels, } from './lib/storage/models/PublicDeriver/traits';
+import {
+  asDisplayCutoff,
+  asGetAllUtxos,
+  asHasLevels,
+  asHasUtxoChains,
+} from './lib/storage/models/PublicDeriver/traits';
 import { ConceptualWallet } from './lib/storage/models/ConceptualWallet/index';
 import type { IHasLevels } from './lib/storage/models/ConceptualWallet/interfaces';
 import type {
@@ -68,6 +68,7 @@ import type {
   RemoveAllTransactionsResponse,
 } from '../common/index';
 import { builtSendTokenList, hasSendAllDefault } from '../common/index';
+import type { TxOutput } from './transactions/shelley/transactions';
 import {
   newAdaUnsignedTx as shelleyNewAdaUnsignedTx,
   newAdaUnsignedTxForConnector as shelleyNewAdaUnsignedTxForConnector,
@@ -107,7 +108,8 @@ import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 import type {
   AccountStateFunc,
   AddressUtxoFunc,
-  BestBlockFunc, FilterFunc,
+  BestBlockFunc,
+  FilterFunc,
   GetRecentTransactionHashesFunc,
   GetTransactionsByHashesFunc,
   HistoryFunc,
@@ -120,10 +122,14 @@ import type {
   TokenInfoFunc,
 } from './lib/state-fetch/types';
 import { getChainAddressesForDisplay, } from './lib/storage/models/utils';
-import { getAllAddressesForDisplay, rawGetAddressRowsForWallet, } from './lib/storage/bridge/traitUtils';
+import {
+  getAllUsedAddresses,
+  getAllAddressesForDisplay,
+  rawGetAddressRowsForWallet,
+} from './lib/storage/bridge/traitUtils';
 import {
   asAddressedUtxo,
-  cardanoValueFromMultiToken,
+  cardanoMinAdaRequiredFromAssets_coinsPerWord,
   convertAdaTransactionsToExportRows,
   multiTokenFromCardanoValue,
   multiTokenFromRemote,
@@ -158,8 +164,13 @@ import type { ForeignUtxoFetcher } from '../../connector/stores/ConnectorStore';
 import type WalletTransaction from '../../domain/WalletTransaction';
 import { derivePrivateByAddressing, derivePublicByAddressing } from './lib/cardanoCrypto/deriveByAddressing';
 import type { WalletState } from '../../../chrome/extension/background/types';
+import TimeUtils from './lib/storage/bridge/timeUtils';
 
 // ADA specific Request / Response params
+
+export type AddressDetails = {|
+  ...Address, ...Value, ...Addressing, ...UsedStatus, ...AddressType,
+|};
 
 // getAllAddressesForDisplay
 
@@ -167,9 +178,7 @@ export type GetAllAddressesForDisplayRequest = {|
   publicDeriver: IPublicDeriver<>,
   type: CoreAddressT,
 |};
-export type GetAllAddressesForDisplayResponse = Array<{|
-  ...Address, ...Value, ...Addressing, ...UsedStatus, ...AddressType,
-|}>;
+export type GetAllAddressesForDisplayResponse = Array<AddressDetails>;
 export type GetAllAddressesForDisplayFunc = (
   request: GetAllAddressesForDisplayRequest
 ) => Promise<GetAllAddressesForDisplayResponse>;
@@ -181,9 +190,7 @@ export type GetChainAddressesForDisplayRequest = {|
   chainsRequest: IHasUtxoChainsRequest,
   type: CoreAddressT,
 |};
-export type GetChainAddressesForDisplayResponse = Array<{|
-  ...Address, ...AddressType, ...Value, ...Addressing, ...UsedStatus
-|}>;
+export type GetChainAddressesForDisplayResponse = Array<AddressDetails>;
 export type GetChainAddressesForDisplayFunc = (
   request: GetChainAddressesForDisplayRequest
 ) => Promise<GetChainAddressesForDisplayResponse>;
@@ -340,9 +347,6 @@ export type CreateUnsignedTxForConnectorRequest = {|
 |};
 export type CreateUnsignedTxResponse = HaskellShelleyTxSignRequest;
 export type CreateVotingRegTxResponse = HaskellShelleyTxSignRequest;
-export type CreateUnsignedTxFunc = (
-  request: CreateUnsignedTxRequest
-) => Promise<CreateUnsignedTxResponse>;
 
 // createUnsignedTxForUtxos
 
@@ -391,6 +395,11 @@ export type CreateVotingRegTxRequest = {|
   ledgerNanoWallet: LedgerNanoCatalystRegistrationTxSignData,
 |};
 
+export type CreateSimpleTxRequest = {|
+  publicDeriver: IPublicDeriver<ConceptualWallet> & IGetAllUtxos & IHasUtxoChains,
+  entries: Array<TxOutput>,
+  metadata: RustModule.WalletV4.AuxiliaryData,
+|};
 
 export type CreateDelegationTxResponse = {|
   signTxRequest: HaskellShelleyTxSignRequest,
@@ -518,6 +527,7 @@ export type GetTransactionRowsToExportFunc = (
 ) => Promise<GetTransactionRowsToExportResponse>;
 
 export const FETCH_TXS_BATCH_SIZE = 20;
+const MIN_REORG_OUTPUT_AMOUNT  = '1000000';
 
 export default class AdaApi {
 
@@ -1216,18 +1226,12 @@ export default class AdaApi {
           throw new Error(`Value is required for a valid tx output, got: ${JSON.stringify(target)}`);
         }
       } else {
-        RustModule.WasmScope(Scope => {
-          // ensureRequiredMinimalValue is true
-          const minAmount = Scope.WalletV4.min_ada_required(
-            cardanoValueFromMultiToken(amount),
-            dataHash != null,
-            RustModule.WalletV4.BigNum.from_str(protocolParams.coinsPerUtxoWord),
-          );
 
-          if ((new BigNumber(minAmount.to_str())).gt(new BigNumber(target.value ?? '0'))) {
-            amount = makeMultiToken(minAmount.to_str());
-          };
-        });
+        const minAmount =
+          cardanoMinAdaRequiredFromAssets_coinsPerWord(amount, new BigNumber(protocolParams.coinsPerUtxoWord));
+        if (minAmount.gt(target.value ?? '0')) {
+          amount = makeMultiToken(minAmount.toString());
+        }
       }
       outputs.push({
         address: target.address,
@@ -1571,6 +1575,73 @@ export default class AdaApi {
       if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
+  }
+
+  async createSimpleTx(
+    request: CreateSimpleTxRequest,
+  ): Promise<HaskellShelleyTxSignRequest> {
+    Logger.debug(`${nameof(AdaApi)}::${nameof(this.createSimpleTx)} called`);
+
+    try {
+      const fullConfig = getCardanoHaskellBaseConfig(request.publicDeriver.getParent().getNetworkInfo());
+      const config = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
+
+      const protocolParams = {
+        keyDeposit: config.KeyDeposit,
+        linearFeeCoefficient: config.LinearFee.coefficient,
+        linearFeeConstant: config.LinearFee.constant,
+        coinsPerUtxoWord: config.CoinsPerUtxoWord,
+        poolDeposit: config.PoolDeposit,
+        networkId: request.publicDeriver.getParent().networkInfo.NetworkId,
+      };
+
+      const allUtxo = await request.publicDeriver.getAllUtxos();
+      const addressedUtxo = asAddressedUtxo(allUtxo);
+      const changeAddr = await getReceiveAddress(request.publicDeriver);
+      if (changeAddr == null) {
+        throw new Error(`${nameof(this.createSimpleTx)} no internal addresses left. Should never happen`);
+      }
+      const absSlotNumber = new BigNumber(TimeUtils.timeToAbsoluteSlot(fullConfig, new Date()));
+
+      const unsignedTx = await shelleyNewAdaUnsignedTx(
+        request.entries,
+        {
+          address: changeAddr.addr.Hash,
+          addressing: changeAddr.addressing,
+        },
+        addressedUtxo,
+        absSlotNumber,
+        protocolParams,
+        [],
+        [],
+        false,
+        request.metadata,
+      );
+
+      return new HaskellShelleyTxSignRequest({
+        senderUtxos: unsignedTx.senderUtxos,
+        unsignedTx: unsignedTx.txBuilder,
+        changeAddr: unsignedTx.changeAddr,
+        metadata: request.metadata,
+        networkSettingSnapshot: {
+          ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
+          KeyDeposit: new BigNumber(config.KeyDeposit),
+          PoolDeposit: new BigNumber(config.PoolDeposit),
+          NetworkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+        },
+        neededStakingKeyHashes: {
+          neededHashes: new Set(),
+          wits: new Set(),
+        },
+        trezorTCatalystRegistrationTxSignData: undefined,
+        ledgerNanoCatalystRegistrationTxSignData: undefined,
+      });
+    } catch (error) {
+      Logger.error(`${nameof(AdaApi)}::${nameof(this.createSimpleTx)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
+      throw new GenericApiError();
+    }
+
   }
 
   async createVotingRegTx(
@@ -2158,6 +2229,66 @@ export default class AdaApi {
       }
     }
     return utxos;
+  }
+
+  async createReorgTx(
+    publicDeriver: PublicDeriver<>,
+    usedUtxoIds: Array<string>,
+    reorgTargetAmount: string,
+    utxos: Array<CardanoAddressedUtxo>,
+    submittedTxs: Array<PersistedSubmittedTransaction>,
+    reorgTargetAddress?: string,
+  ): Promise<{|
+    unsignedTx: HaskellShelleyTxSignRequest,
+    collateralOutputAddressSet: Set<string>,
+  |}> {
+    const network = publicDeriver.getParent().getNetworkInfo();
+
+    const withUtxos = asGetAllUtxos(publicDeriver);
+    if (withUtxos == null) {
+      throw new Error(`missing utxo functionality`);
+    }
+
+    const withHasUtxoChains = asHasUtxoChains(withUtxos);
+    if (withHasUtxoChains == null) {
+      throw new Error(`missing chains functionality`);
+    }
+
+    const fullConfig = getCardanoHaskellBaseConfig(network);
+    const absSlotNumber = new BigNumber(TimeUtils.timeToAbsoluteSlot(fullConfig, new Date()));
+    const targetAddress = reorgTargetAddress ?? (await getAllUsedAddresses(publicDeriver))[0];
+    if (targetAddress == null) {
+      throw new Error('unexpected: no target address or used addresses available');
+    }
+    const reorgOutputValue = BigNumber
+      .max(reorgTargetAmount, MIN_REORG_OUTPUT_AMOUNT)
+      .toString();
+    const includeTargets = [{
+      address: targetAddress,
+      isForeign: false,
+      value: reorgOutputValue,
+    }];
+    const collateralOutputAddressSet = new Set<string>([targetAddress]);
+    const dontUseUtxoIds = new Set(usedUtxoIds);
+    const unsignedTx = await this.createUnsignedTxForConnector(
+      {
+        publicDeriver: withHasUtxoChains,
+        absSlotNumber,
+        cardanoTxRequest: {
+          includeTargets,
+        },
+        utxos: (await this.addressedUtxosWithSubmittedTxs(
+          utxos,
+          publicDeriver,
+          submittedTxs,
+        )).filter(utxo => !dontUseUtxoIds.has(utxo.utxo_id)),
+        // we already factored in submitted transactions above, no need to handle it
+        // any more, so just use an empty array here
+        submittedTxs: [],
+      },
+      null,
+    );
+    return { unsignedTx, collateralOutputAddressSet };
   }
 }
 // ========== End of class AdaApi =========

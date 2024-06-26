@@ -2,7 +2,6 @@
 import type { MessageDescriptor } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import globalMessages, { connectorMessages } from '../../i18n/global-messages';
-import { matchRoute } from '../../utils/routing';
 import { ReactComponent as walletsIcon } from '../../assets/images/sidebar/my_wallets.inline.svg';
 import { ReactComponent as transferIcon } from '../../assets/images/sidebar/transfer_wallets.inline.svg';
 import { ReactComponent as settingsIcon } from '../../assets/images/sidebar/wallet-settings-2-ic.inline.svg';
@@ -42,8 +41,7 @@ export const MY_WALLETS: SidebarCategory = registerCategory({
   label: globalMessages.sidebarWallets,
   isVisible: request =>
     request.hasAnyWallets &&
-    request.selected == null &&
-    matchRoute(ROUTES.WALLETS.ADD, request.currentRoute) === false,
+    request.selected == null,
 });
 
 export const WALLETS_ROOT: SidebarCategory = registerCategory({
@@ -131,7 +129,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.SWAP.ROOT,
     icon: swapIcon,
     label: globalMessages.sidebarSwap,
-    isVisible: () => environment.isDev(),
+    isVisible: ({ selected }) => (environment.isDev() || environment.isNightly()) && !!selected?.isMainnet(),
   },
   {
     className: 'assets',

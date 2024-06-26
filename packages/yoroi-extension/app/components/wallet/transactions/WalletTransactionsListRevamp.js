@@ -135,17 +135,18 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
     } = this.props;
     const transactionsGroups = this.groupTransactionsByDay(transactions);
 
+    const baseIdPart = 'wallet:transactions:transactionsList';
+
     const loadingSpinner = isLoadingTransactions ? (
       <div className={styles.loading}>
         <LoadingSpinner
           ref={component => {
             this.loadingSpinner = component;
           }}
+          id={baseIdPart}
         />
       </div>
     ) : null;
-
-    const baseIdPart = 'wallet:transactions:transactionsList'
 
     return (
       <Box
@@ -218,6 +219,7 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
             disabled={isLoadingTransactions}
             onClick={onLoadMore}
             sx={{ margin: '30px auto', width: '400px', display: 'block' }}
+            id={baseIdPart + '-showMoreTxs-button'}
           >
             {intl.formatMessage(messages.showMoreTransactionsButtonLabel)}
           </Button>

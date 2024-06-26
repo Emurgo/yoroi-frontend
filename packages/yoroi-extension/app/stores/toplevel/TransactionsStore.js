@@ -29,7 +29,6 @@ import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
 import { Logger, stringifyError } from '../../utils/logging';
 import type { TransactionRowsToExportRequest } from '../../actions/common/transactions-actions';
 import globalMessages from '../../i18n/global-messages';
-import * as timeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
 import {
   getCardanoHaskellBaseConfig,
   isCardanoHaskell,
@@ -41,8 +40,10 @@ import { MultiToken } from '../../api/common/lib/MultiToken';
 import { genLookupOrFail, getTokenName } from '../stateless/tokenHelpers';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import { asAddressedUtxo, cardanoValueFromRemoteFormat } from '../../api/ada/transactions/utils';
-import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import {
+  asAddressedUtxo,
+  cardanoMinAdaRequiredFromRemoteFormat_coinsPerWord,
+} from '../../api/ada/transactions/utils';
 import { PRIMARY_ASSET_CONSTANTS } from '../../api/ada/lib/storage/database/primitives/enums';
 import type { NetworkRow, AddressRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
@@ -77,7 +78,7 @@ function getCoinsPerUtxoWord(network: $ReadOnly<NetworkRow>): RustModule.WalletV
     (acc, next) => Object.assign(acc, next),
     {}
   );
-  return RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord);
+  return new BigNumber(config.CoinsPerUtxoWord);
 }
 
 function newMultiToken(
@@ -435,20 +436,15 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       if (isCardanoHaskell(network) && delegationRequests) {
         const rewards = await delegationRequests.rewardHistory.promise;
         if (rewards != null) {
-          const fullConfig = getCardanoHaskellBaseConfig(network);
+          const timeCalcRequests = this.stores.substores.ada.time.getTimeCalcRequests(request.publicDeriver);
+          const { toRealTime, toAbsoluteSlot } = timeCalcRequests.requests;
 
-          const absSlotFunc = await timeUtils.genToAbsoluteSlotNumber(fullConfig);
-          const timeSinceGenFunc = await timeUtils.genTimeSinceGenesis(fullConfig);
-          const realTimeFunc = await timeUtils.genToRealTime(fullConfig);
           const rewardRows = rewards.map(item => {
-            const absSlot = absSlotFunc({
+            const absSlot = toAbsoluteSlot({
               epoch: item[0],
               slot: 0,
             });
-            const epochStartDate = realTimeFunc({
-              absoluteSlotNum: absSlot,
-              timeSinceGenesisFunc: timeSinceGenFunc,
-            });
+            const epochStartDate = toRealTime({ absoluteSlotNum: absSlot });
 
             const defaultInfo = item[1].getDefaultEntry();
             const tokenInfo = this.stores.tokenInfoStore.tokenInfo
@@ -471,9 +467,8 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
     const { startDate, endDate } = request.exportRequest;
 
-    const config = getCardanoHaskellBaseConfig(network);
-    const timeToSlot = await timeUtils.genTimeToSlot(config);
-    const toRelativeSlotNumber = await timeUtils.genToRelativeSlotNumber(config);
+    const timeCalcRequests = this.stores.substores.ada.time.getTimeCalcRequests(request.publicDeriver);
+    const { timeToSlot, toRelativeSlotNumber } = timeCalcRequests.requests;
 
     const dateFormat = 'YYYY-MM-DD';
     const dateToSlot = (date: string): [number, number] => {

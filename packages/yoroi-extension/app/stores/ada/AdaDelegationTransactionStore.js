@@ -11,7 +11,6 @@ import {
   getCardanoHaskellBaseConfig,
   getNetworkById,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import { genTimeToSlot } from '../../api/ada/lib/storage/bridge/timeUtils';
 import {
   isLedgerNanoWallet,
   isTrezorTWallet,
@@ -94,8 +93,8 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     wallet: WalletState,
     poolRequest: string | void,
   |}) => Promise<void> = async request => {
-    const fullConfig = getCardanoHaskellBaseConfig(getNetworkById(request.wallet.networkId));
-    const timeToSlot = await genTimeToSlot(fullConfig);
+    const { timeToSlot } = this.stores.substores.ada.time.getTimeCalcRequests(publicDeriver).requests;
+
     const absSlotNumber = new BigNumber(
       timeToSlot({
         // use server time for TTL if connected to server
@@ -126,10 +125,8 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
   |}) => Promise<void> = async request => {
     this.createWithdrawalTx.reset();
 
-    const fullConfig = getCardanoHaskellBaseConfig(
-      getNetworkById(request.wallet.publicDeriverId)
-    );
-    const timeToSlot = await genTimeToSlot(fullConfig);
+    const { timeToSlot } = this.stores.substores.ada.time.getTimeCalcRequests(request.publicDeriver).requests;
+
     const absSlotNumber = new BigNumber(
       timeToSlot({
         // use server time for TTL if connected to server
@@ -165,6 +162,11 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     if (result == null) {
       throw new Error(`${nameof(this._signTransaction)} no tx to broadcast`);
     }
+    const refreshWallet = () => {
+      this.stores.delegation.disablePoolTransitionState(request.publicDeriver);
+      return this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId);
+    };
+
     if (request.wallet.type === 'ledger') {
       await this.stores.substores.ada.wallets.adaSendAndRefresh({
         broadcastRequest: {
@@ -173,7 +175,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
             wallet: request.wallet,
           },
         },
-        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
+        refreshWallet,
       });
       return;
     }
@@ -185,7 +187,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
             wallet: request.wallet,
           },
         },
-        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
+        refreshWallet,
       });
       return;
     }
@@ -203,7 +205,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
           signRequest: result.signTxRequest,
         },
       },
-      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
+      refreshWallet,
     });
     if (request.dialog) this.actions.dialogs.open.trigger({ dialog: request.dialog });
   };

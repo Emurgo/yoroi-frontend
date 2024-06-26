@@ -239,3 +239,13 @@ async function convertImgToBase64(origin, urls) {
     return reader.result;
 }
 
+// relay Banxa/Encryptus callback to the extension tab
+window.addEventListener('message', function (event) {
+  if (
+    event.source === window &&
+      /https:\/\/([a-z-]+\.)?yoroi-?wallet\.com/.test(event.origin) &&
+      event.data?.type === 'exchange callback'
+  ) {
+    chrome.runtime.sendMessage(event.data);
+  }
+});

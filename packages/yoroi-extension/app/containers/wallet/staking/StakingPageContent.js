@@ -1,18 +1,17 @@
 // @flow
 import type { ComponentType, Node } from 'react';
+import { Component } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { intlShape } from 'react-intl';
 import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import type { LayoutComponentMap } from '../../../styles/context/layout';
+import { withLayout } from '../../../styles/context/layout';
 import type { ConfigType } from '../../../../config/config-types';
 import type { TokenEntry } from '../../../api/common/lib/MultiToken';
-
-import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
 import moment from 'moment';
 
 import globalMessages from '../../../i18n/global-messages';
-import { withLayout } from '../../../styles/context/layout';
 import WalletEmptyBanner from '../WalletEmptyBanner';
 import BuySellDialog from '../../../components/buySell/BuySellDialog';
 import CardanoStakingPage from './CardanoStakingPage';
@@ -30,7 +29,7 @@ import RewardHistoryDialog from '../../../components/wallet/staking/dashboard-re
 import DelegatedStakePoolCard from '../../../components/wallet/staking/dashboard-revamp/DelegatedStakePoolCard';
 import WithdrawRewardsDialog from './WithdrawRewardsDialog';
 import { formatLovelacesHumanReadableShort, roundOneDecimal, roundTwoDecimal } from '../../../utils/formatters';
-import { compose, maybe } from '../../../coreUtils';
+import { compose, maybe, noop } from '../../../coreUtils';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 
 // populated by ConfigWebpackPlugin
@@ -52,31 +51,25 @@ class StakingPageContent extends Component<AllProps> {
   };
 
   async componentDidMount() {
-    const timeStore = this.props.stores.substores.ada.time;
     const publicDeriver = this.props.stores.wallets.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(StakingPageContent)} no public deriver. Should never happen`);
     }
-    const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver.publicDeriverId);
-    await timeCalcRequests.requests.toAbsoluteSlot.execute().promise;
-    await timeCalcRequests.requests.toRealTime.execute().promise;
-    await timeCalcRequests.requests.currentEpochLength.execute().promise;
-    await timeCalcRequests.requests.currentSlotLength.execute().promise;
-    await timeCalcRequests.requests.timeSinceGenesis.execute().promise;
+
+    if (this.props.stores.delegation.getPoolTransitionConfig(publicDeriver).shouldUpdatePool) {
+      const poolTransitionInfo = this.props.stores.delegation.getPoolTransitionInfo(publicDeriver);
+      if (poolTransitionInfo) {
+        this.props.stores.delegation.delegateToSpecificPool(poolTransitionInfo.suggestedPool.hash);
+        noop(this.props.stores.delegation.createDelegationTransaction());
+      }
+    }
   }
 
-  getEpochLengthInDays: (number) => ?number = publicDeriverId => {
-    const timeStore = this.props.stores.substores.ada.time;
-    const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriverId);
-    const getEpochLength = timeCalcRequests.requests.currentEpochLength.result;
-    if (getEpochLength == null) return null;
-
-    const getSlotLength = timeCalcRequests.requests.currentSlotLength.result;
-    if (getSlotLength == null) return null;
-
-    const epochLengthInSeconds = getEpochLength() * getSlotLength();
-    const epochLengthInDays = epochLengthInSeconds / (60 * 60 * 24);
-    return epochLengthInDays;
+  getEpochLengthInDays: (PublicDeriver<>) => ?number = publicDeriver => {
+    const timeCalcRequests = this.props.stores.substores.ada.time.getTimeCalcRequests(publicDeriver);
+    const { currentEpochLength, currentSlotLength } = timeCalcRequests.requests;
+    const epochLengthInSeconds = currentEpochLength() * currentSlotLength();
+    return epochLengthInSeconds / (60 * 60 * 24);
   };
 
   createWithdrawalTx: (shouldDeregister: boolean) => void = shouldDeregister => {
@@ -99,7 +92,8 @@ class StakingPageContent extends Component<AllProps> {
     if (currentPool == null) return null;
 
     const poolMeta = delegationStore.getLocalPoolInfo(networkId, currentPool);
-    const { stake, roa, saturation, pic } = delegationStore.getLocalRemotePoolInfo(networkId, currentPool) ?? {};
+    const { stake, roa, saturation, pic } =
+      delegationStore.getLocalRemotePoolInfo(networkId, currentPool) ?? {};
     if (poolMeta == null) {
       // server hasn't returned information about the stake pool yet
       return null;
@@ -112,47 +106,41 @@ class StakingPageContent extends Component<AllProps> {
       avatar: pic,
       roa: maybe(roa, compose(Number, roundTwoDecimal)),
       poolSize: maybe(stake, formatLovelacesHumanReadableShort),
-      share: maybe(saturation, s => roundOneDecimal(Number(s)*100)),
+      share: maybe(saturation, s => roundOneDecimal(Number(s) * 100)),
       websiteUrl: poolMeta.info?.homepage,
       ticker: poolMeta.info?.ticker,
     };
+
     return (
       <DelegatedStakePoolCard
+        poolTransition={delegationStore.getPoolTransitionInfo(publicDeriver)}
         delegatedPool={delegatedPool}
         undelegate={async () => this.createWithdrawalTx(true)} // shouldDeregister=true
+        delegateToSpecificPool={async (poolId): any => {
+          this.props.stores.delegation.delegateToSpecificPool(poolId);
+          this.props.stores.delegation.createDelegationTransaction();
+        }}
       />
     );
   };
 
-  getEpochProgress: (number) => Node | void = publicDeriverId => {
-    const timeStore = this.props.stores.substores.ada.time;
-    const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriverId);
-    const currTimeRequests = timeStore.getCurrentTimeRequests(publicDeriverId);
-    const toAbsoluteSlot = timeCalcRequests.requests.toAbsoluteSlot.result;
-    if (toAbsoluteSlot == null) return undefined;
-    const toRealTime = timeCalcRequests.requests.toRealTime.result;
-    if (toRealTime == null) return undefined;
-    const timeSinceGenesis = timeCalcRequests.requests.timeSinceGenesis.result;
-    if (timeSinceGenesis == null) return undefined;
-    const getEpochLength = timeCalcRequests.requests.currentEpochLength.result;
-    if (getEpochLength == null) return undefined;
-    const currentEpoch = currTimeRequests.currentEpoch;
-    const epochLength = getEpochLength();
+  getEpochProgress: (PublicDeriver<>) => Node | void = publicDeriver => {
+    const timeCalcRequests = this.props.stores.substores.ada.time.getTimeCalcRequests(publicDeriver);
+    const { toAbsoluteSlot, toRealTime, currentEpochLength } = timeCalcRequests.requests;
 
+    const currTimeRequests = this.props.stores.substores.ada.time.getCurrentTimeRequests(publicDeriver);
+    const currentEpoch = currTimeRequests.currentEpoch;
+
+    const epochLength = currentEpochLength();
     const getDateFromEpoch = (epoch, returnEpochTime = false) => {
       const epochTime = toRealTime({
         absoluteSlotNum: toAbsoluteSlot({
           epoch,
           // Rewards are calculated at the start of the epoch but distributed at the end
-          slot: getEpochLength(),
+          slot: epochLength,
         }),
-        timeSinceGenesisFunc: timeSinceGenesis,
       });
-
-      if (returnEpochTime) return epochTime;
-
-      const epochMoment = moment(epochTime).format('lll');
-      return epochMoment;
+      return returnEpochTime ? epochTime : moment(epochTime).format('lll');
     };
 
     const endEpochDate = getDateFromEpoch(currentEpoch);
@@ -211,8 +199,8 @@ class StakingPageContent extends Component<AllProps> {
 
     const errorIfPresent = maybe(delegationRequests.error, error => ({ error }));
 
-    const showRewardAmount = errorIfPresent == null
-      && stores.delegation.isExecutedDelegatedBalance(publicDeriver.publicDeriverId);
+    const showRewardAmount =
+      errorIfPresent == null && stores.delegation.isExecutedDelegatedBalance(publicDeriverId);
 
     const isStakeRegistered = stores.delegation.isStakeRegistered(publicDeriver.publicDeriverId);
     const currentlyDelegating = stores.delegation.isCurrentlyDelegating(publicDeriver.publicDeriverId);
@@ -326,11 +314,7 @@ class StakingPageContent extends Component<AllProps> {
           />
         ) : null}
         {uiDialogs.isOpen(UnmangleTxDialogContainer) ? (
-          <UnmangleTxDialogContainer
-            actions={actions}
-            stores={stores}
-            onClose={this.onClose}
-          />
+          <UnmangleTxDialogContainer actions={actions} stores={stores} onClose={this.onClose} />
         ) : null}
         {uiDialogs.isOpen(WithdrawalTxDialogContainer) ? (
           <WithdrawalTxDialogContainer

@@ -18,7 +18,7 @@ test('Generate Catalyst registration tx', async () => {
 
     // stake_test1uzhr5zn6akj2affzua8ylcm8t872spuf5cf6tzjrvnmwemcehgcjm (e0ae3a0a7aeda4aea522e74e4fe36759fca80789a613a58a4364f6ecef)
     const address = Scope.WalletV4.RewardAddress.new(
-      Scope.WalletV4.NetworkInfo.testnet().network_id(),
+      Scope.WalletV4.NetworkInfo.testnet_preprod().network_id(),
       Scope.WalletV4.Credential.from_keyhash(stakePrivateKey.to_public().hash()),
     );
 

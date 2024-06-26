@@ -9,25 +9,31 @@ import Dialog from '../../widgets/Dialog';
 import { Stack, Typography } from '@mui/material';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import { ReactComponent as SuccessImg } from '../../../assets/images/transfer-success.inline.svg';
+import globalMessages from '../../../i18n/global-messages';
 
 const messages = defineMessages({
   title: {
     id: 'wallet.transaction.success.title',
     defaultMessage: '!!!Transaction submitted',
   },
-  buttonLabel: {
-    id: 'wallet.transaction.success.button.label',
-    defaultMessage: '!!!Go To Transactions',
-  },
   explanation: {
     id: 'wallet.transaction.success.explanation',
     defaultMessage: '!!!Check this transaction in the list of wallet transactions',
+  },
+  sellSendDone: {
+    id: 'wallet.transactions.success.sell',
+    defaultMessage: '!!!Transaction has been submitted',
+  },
+  goToExchange: {
+    id: 'wallet.transactions.success.button.exchange',
+    defaultMessage: '!!!Go to the exchange page',
   },
 });
 
 type Props = {|
   +onClose: void => PossiblyAsync<void>,
   +classicTheme: boolean,
+  +process: 'for-sell' | 'normal',
 |};
 
 @observer
@@ -44,7 +50,9 @@ export default class TransactionSuccessDialog extends Component<Props> {
         title={intl.formatMessage(messages.title)}
         actions={[
           {
-            label: intl.formatMessage(messages.buttonLabel),
+            label: intl.formatMessage(
+              this.props.process === 'normal' ? globalMessages.goToTransactions : messages.goToExchange
+            ),
             onClick: this.props.onClose,
             primary: true,
           },
@@ -61,7 +69,9 @@ export default class TransactionSuccessDialog extends Component<Props> {
             textAlign="center"
             maxWidth="400px"
           >
-            {intl.formatMessage(messages.explanation)}
+            {intl.formatMessage(
+              this.props.process === 'normal' ? messages.explanation: messages.sellSendDone
+            )}
           </Typography>
         </Stack>
       </Dialog>

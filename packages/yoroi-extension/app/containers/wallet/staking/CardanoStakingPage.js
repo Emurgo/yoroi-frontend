@@ -86,7 +86,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
         selectedWallet.publicDeriverId
       );
       const isWalletWithNoFunds = balance != null && balance.getDefaultEntry().amount.isZero();
-      const poolList = (delegatedPoolId != null && isStakeRegistered) ? [delegatedPoolId] : [];
+      const poolList = delegatedPoolId != null && isStakeRegistered ? [delegatedPoolId] : [];
 
       const classicCardanoStakingPage = (
         <div id="classicCardanoStakingPage">
@@ -97,9 +97,9 @@ class CardanoStakingPage extends Component<AllProps, State> {
             bias={stakingListBias}
             totalAda={totalAda}
             poolList={poolList}
-            stakepoolSelectedAction={async (poolId) => {
-              await this._updatePool(poolId);
-              await this._next();
+            stakepoolSelectedAction={async poolId => {
+              await this.props.stores.delegation.delegateToSpecificPool(poolId);
+              await this.props.stores.delegation.createDelegationTransaction();
             }}
           />
         </div>
@@ -111,8 +111,8 @@ class CardanoStakingPage extends Component<AllProps, State> {
             <WalletDelegationBanner
               isOpen={this.props.stores.transactions.showDelegationBanner}
               onDelegateClick={async poolId => {
-                await this._updatePool(poolId);
-                await this._next();
+                await this.props.stores.delegation.delegateToSpecificPool(poolId);
+                await this.props.stores.delegation.createDelegationTransaction();
               }}
               poolInfo={this.state.firstPool}
               isWalletWithNoFunds={isWalletWithNoFunds}
@@ -139,8 +139,8 @@ class CardanoStakingPage extends Component<AllProps, State> {
                 this.setState({ firstPool: pool });
               }}
               stakepoolSelectedAction={async poolId => {
-                await this._updatePool(poolId);
-                await this._next();
+                await this.props.stores.delegation.delegateToSpecificPool(poolId);
+                await this.props.stores.delegation.createDelegationTransaction();
               }}
             />
           </Box>
@@ -163,9 +163,9 @@ class CardanoStakingPage extends Component<AllProps, State> {
           updatePool={poolId => {
             /* note: it's okay for triggering a pool update to be async, so we don't await  */
             // eslint-disable-next-line no-unused-vars
-            const _ = this._updatePool(poolId);
+            const _ = this.props.stores.delegation.delegateToSpecificPool(poolId);
           }}
-          onNext={async () => this._next()}
+          onNext={async () => this.props.stores.delegation.createDelegationTransaction()}
         />
         {this._displayPoolInfo()}
       </div>
@@ -194,30 +194,6 @@ class CardanoStakingPage extends Component<AllProps, State> {
       .getDefaultEntry()
       .amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
       .toNumber();
-  };
-
-  _updatePool: (?string) => Promise<void> = async poolId => {
-    this.props.stores.delegation.poolInfoQuery.reset();
-    if (poolId == null) {
-      await this.props.actions.ada.delegationTransaction.setPools.trigger([]);
-      return;
-    }
-    await this.props.actions.ada.delegationTransaction.setPools.trigger([poolId]);
-  };
-
-  _next: void => Promise<void> = async () => {
-    const selectedWallet = this.props.stores.wallets.selected;
-    if (selectedWallet == null) {
-      return;
-    }
-    const { delegationTransaction } = this.props.stores.substores.ada;
-    if (delegationTransaction.selectedPools.length === 0) {
-      return;
-    }
-    await this.props.actions.ada.delegationTransaction.createTransaction.trigger({
-      poolRequest: delegationTransaction.selectedPools[0],
-      wallet: selectedWallet,
-    });
   };
 
   _displayPoolInfo: void => void | Node = () => {

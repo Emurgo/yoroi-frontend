@@ -3,13 +3,19 @@ import { useMemo, type Node } from 'react';
 import { useSwap, useSwapTokensOnlyVerified } from '@yoroi/swap';
 import SelectAssetDialog from '../../../../components/swap/SelectAssetDialog';
 import { useSwapForm } from '../../context/swap-form';
-import { useAssets } from '../../hooks';
+import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
+import SwapStore from '../../../../stores/ada/SwapStore';
+import { comparatorByGetter } from '../../../../coreUtils';
 
 type Props = {|
+  store: SwapStore,
   onClose(): void,
+  onTokenInfoChanged: * => void,
+  defaultTokenInfo: RemoteTokenInfo,
+  getTokenInfoBatch: Array<string> => { [string]: Promise<RemoteTokenInfo> },
 |};
 
-export default function SelectBuyTokenFromList({ onClose }: Props): Node {
+export default function SelectBuyTokenFromList({ store, onClose, onTokenInfoChanged, defaultTokenInfo, getTokenInfoBatch }: Props): Node {
   const {
     sellQuantity: { isTouched: isSellTouched },
     buyQuantity: { isTouched: isBuyTouched },
@@ -20,23 +26,20 @@ export default function SelectBuyTokenFromList({ onClose }: Props): Node {
   } = useSwapForm();
 
   const { onlyVerifiedTokens } = useSwapTokensOnlyVerified();
-  const walletAssets = useAssets();
+  const walletAssets = store.assets;
 
   const walletVerifiedAssets = useMemo(() => {
-    const isSellingPt = sellTokenInfo.id === '' && sellTokenInfo.decimals === 6;
+    const isSellingPt = sellTokenInfo.id === '';
     const pt = walletAssets.find(a => a.id === '');
-    return [isSellingPt ? undefined : pt]
-      .concat(
-        onlyVerifiedTokens.map(ovt => {
-          const vft = walletAssets.find(a => a.fingerprint === ovt.fingerprint);
-          if (vft) return { ...ovt, ...vft };
-          return ovt;
-        })
-      )
-      .filter(Boolean);
+    const nonPtAssets = onlyVerifiedTokens.map(ovt => {
+      if (ovt.id === '') return null;
+      const vft = walletAssets.find(a => a.fingerprint === ovt.fingerprint);
+      return { ...ovt, ...(vft ?? {}) };
+    }).filter(Boolean).sort(comparatorByGetter(a => a.name?.toLowerCase()));
+    return [...(isSellingPt ? [] : [pt]), ...nonPtAssets];
   }, [onlyVerifiedTokens, walletAssets, sellTokenInfo]);
 
-  const { buyTokenInfoChanged, orderData, resetQuantities } = useSwap();
+  const { orderData, resetQuantities } = useSwap();
 
   const handleAssetSelected = token => {
     const { id, decimals } = token;
@@ -50,7 +53,7 @@ export default function SelectBuyTokenFromList({ onClose }: Props): Node {
     }
 
     if (shouldUpdateToken) {
-      buyTokenInfoChanged({ decimals: decimals ?? 0, id });
+      onTokenInfoChanged({ decimals: decimals ?? 0, id });
       buyTouched(token);
     }
 
@@ -63,6 +66,8 @@ export default function SelectBuyTokenFromList({ onClose }: Props): Node {
       type="to"
       onAssetSelected={handleAssetSelected}
       onClose={onClose}
+      defaultTokenInfo={defaultTokenInfo}
+      getTokenInfoBatch={getTokenInfoBatch}
     />
   );
 }

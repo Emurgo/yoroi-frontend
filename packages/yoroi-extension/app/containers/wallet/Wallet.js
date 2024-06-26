@@ -24,6 +24,7 @@ import SubMenu from '../../components/topbar/SubMenu';
 import WalletSyncingOverlay from '../../components/wallet/syncingOverlay/WalletSyncingOverlay';
 import WalletLoadingAnimation from '../../components/wallet/WalletLoadingAnimation';
 import { RevampAnnouncementDialog } from './dialogs/RevampAnnouncementDialog';
+import { PoolTransitionDialog } from './dialogs/pool-transition/PoolTransitionDialog';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -72,7 +73,7 @@ class Wallet extends Component<AllProps> {
     if (publicDeriver == null) return;
 
     const spendableBalance = this.props.stores.transactions.balance;
-    const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
+    const walletHasAssets = !!spendableBalance?.nonDefaultEntries().length;
 
     const activeCategory = categories.find(category =>
       this.props.stores.app.currentRoute.startsWith(category.route)
@@ -87,8 +88,8 @@ class Wallet extends Component<AllProps> {
       walletHasAssets
     };
     if (
-      !activeCategory?.isVisible(visibilityContext)
-      && activeCategory?.isHiddenButAllowed !== true
+      !activeCategory?.isVisible(visibilityContext) &&
+      activeCategory?.isHiddenButAllowed !== true
     ) {
       const firstValidCategory = categories.find(c => c.isVisible(visibilityContext));
       if (firstValidCategory == null) {
@@ -132,6 +133,12 @@ class Wallet extends Component<AllProps> {
     const spendableBalance = stores.transactions.balance;
     const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
 
+    const publicDeriver = this.props.stores.wallets.selected;
+    if (publicDeriver == null) {
+      throw new Error(`${nameof(Wallet)} no public deriver. Should never happen`);
+    }
+    const currentPool = this.props.stores.delegation.getDelegatedPoolId(publicDeriver);
+
     const visibilityContext = {
       selected: selectedWallet.publicDeriverId,
       networkId: selectedWallet.networkId,
@@ -149,6 +156,7 @@ class Wallet extends Component<AllProps> {
           }))}
         onItemClick={route => actions.router.goToRoute.trigger({ route })}
         isActiveItem={route => this.props.stores.app.currentRoute.startsWith(route)}
+        locationId="wallet"
       />
     );
 
@@ -217,10 +225,10 @@ class Wallet extends Component<AllProps> {
         {warning}
         {isInitialSyncing ? (
           <WalletLoadingAnimation />
-        ): (
+        ) : (
           <>
             {this.props.children}
-            {this.getDialogs()}
+            {this.getDialogs(intl, currentPool)}
           </>
         )}
       </TopBarLayout>
@@ -237,9 +245,39 @@ class Wallet extends Component<AllProps> {
     return warnings[warnings.length - 1]();
   };
 
-  getDialogs: void => Node = () => {
+  getDialogs: (any, any) => Node = (intl, currentPool) => {
     const isOpen = this.props.stores.uiDialogs.isOpen;
-    if (isOpen(RevampAnnouncementDialog))
+    const isRevampDialogOpen = isOpen(RevampAnnouncementDialog);
+    const selectedWallet = this.props.stores.wallets.selected;
+    const poolTransitionInfo = this.props.stores.delegation.getPoolTransitionInfo(selectedWallet);
+
+
+    if (
+      this.props.stores.delegation.getPoolTransitionConfig(selectedWallet).show === 'open' &&
+      !isRevampDialogOpen &&
+      poolTransitionInfo?.shouldShowTransitionFunnel
+    )
+      return (
+        <PoolTransitionDialog
+          intl={intl}
+          onClose={() => {
+            this.props.stores.delegation.setPoolTransitionConfig(selectedWallet, { show: 'idle' });
+          }}
+          poolTransition={poolTransitionInfo}
+          currentPoolId={currentPool ?? ''}
+          onUpdatePool={() => {
+            this.props.stores.delegation.setPoolTransitionConfig(selectedWallet, {
+              show: 'idle',
+              shouldUpdatePool: true,
+            });
+            this.props.actions.router.goToRoute.trigger({
+              route: ROUTES.STAKING,
+            });
+          }}
+        />
+      );
+
+    if (isRevampDialogOpen)
       return (
         <RevampAnnouncementDialog
           onClose={() => {
@@ -248,6 +286,7 @@ class Wallet extends Component<AllProps> {
           }}
         />
       );
+
     return null;
   };
 }

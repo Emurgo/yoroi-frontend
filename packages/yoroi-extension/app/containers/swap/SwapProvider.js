@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import { useMemo, useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   supportedProviders,
   swapApiMaker,
@@ -10,6 +10,7 @@ import {
 } from '@yoroi/swap';
 import { unwrapStakingKey } from '../../api/ada/lib/storage/bridge/utils';
 import type { WalletState } from '../../../chrome/extension/background/types';
+import { asyncLocalStorageWrapper } from '../../api/localStorage';
 
 type Props = {|
   children?: Node,
@@ -28,28 +29,20 @@ function SwapProvider({ children, publicDeriver }: Props): Node {
   }, []);
 
   const swapStorage = useMemo(
-    () =>
-      swapStorageMaker({
-        // todo: storage api should be moved into its own file.
-        storage: {
-          getItem: (key: string) => Promise.resolve(localStorage.getItem(key)),
-          setItem: (key: string, value: string) =>
-            Promise.resolve(localStorage.setItem(key, value)),
-          removeItem: (key: string) => Promise.resolve(localStorage.removeItem(key)),
-        },
-      }),
+    () => swapStorageMaker({ storage: asyncLocalStorageWrapper() }),
     []
   );
 
   const swapApi = useMemo(
     () =>
       swapApiMaker({
+        // Preprod does not work atm so always mainnet
         isMainnet: true,
         stakingKey,
         primaryTokenId: publicDeriver.defaultTokenId,
         supportedProviders,
       }),
-    []
+    [stakingKey]
   );
 
   const swapManager = useMemo(() => swapManagerMaker({ swapApi, swapStorage }), [

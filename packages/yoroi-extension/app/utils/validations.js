@@ -1,11 +1,10 @@
 // @flow
 import BigNumber from 'bignumber.js';
-import isInt from 'validator/lib/isInt';
 import { MAX_MEMO_SIZE } from '../config/externalStorageConfig';
 import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
 import { defineMessages, } from 'react-intl';
 import type { NetworkRow, TokenRow } from '../api/ada/lib/storage/database/primitives/tables';
-import { isCardanoHaskell, getCardanoHaskellBaseConfig } from '../api/ada/lib/storage/database/prepackaged/networks';
+import { getCardanoHaskellBaseConfig, isCardanoHaskell } from '../api/ada/lib/storage/database/prepackaged/networks';
 import { getTokenName } from '../stores/stateless/tokenHelpers';
 import { truncateToken } from './formatters';
 
@@ -50,12 +49,10 @@ export const isValidMemoOptional: string => boolean = (memo) => (
 );
 
 export const isWithinSupply: (string, BigNumber) => boolean = (value, totalSupply) => {
-  const isNumeric = isInt(value, { allow_leading_zeroes: false });
-  if (!isNumeric) return false;
   const numericValue = new BigNumber(value);
-  const minValue = new BigNumber(1);
-  const isValid = numericValue.gte(minValue) && numericValue.lte(totalSupply);
-  return isValid;
+  return numericValue.isFinite()
+    && numericValue.gte(1)
+    && numericValue.lte(totalSupply);
 };
 
 export async function validateAmount(

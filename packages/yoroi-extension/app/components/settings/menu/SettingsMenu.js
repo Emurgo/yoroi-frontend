@@ -97,7 +97,12 @@ class SettingsMenu extends Component<Props & InjectedLayoutProps> {
     ];
 
     return (
-      <SubMenu options={settingOptions} onItemClick={onItemClick} isActiveItem={isActiveItem} />
+      <SubMenu
+        options={settingOptions}
+        onItemClick={onItemClick}
+        isActiveItem={isActiveItem}
+        locationId='settings'
+      />
     );
   }
 }

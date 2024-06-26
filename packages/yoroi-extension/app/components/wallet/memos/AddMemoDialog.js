@@ -135,6 +135,7 @@ export default class AddMemoDialog extends Component<Props, State> {
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={onCancel}
+        id='addMemoDialog'
       >
         <TextField
           className={styles.memoContent}

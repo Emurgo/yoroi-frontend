@@ -1,60 +1,110 @@
 // @flow
-import { Box } from '@mui/material';
-import { ReactComponent as InfoIcon } from '../../../../assets/images/revamp/icons/info.inline.svg';
+
+import { Box, Typography } from '@mui/material';
 import { useSwap } from '@yoroi/swap';
 import { useSwapForm } from '../../context/swap-form';
 import { Quantities } from '../../../../utils/quantities';
+import { useSwapFeeDisplay } from '../../hooks';
+import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
+import { InfoTooltip } from '../../../../components/widgets/InfoTooltip';
 
 type Props = {|
-  +totalFees: string,
-|}
+  +defaultTokenInfo: RemoteTokenInfo,
+  withInfo?: boolean,
+  showMinAda?: boolean,
+|};
 
-export default function SwapPoolFullInfo({ totalFees }: Props): React$Node {
+export default function SwapPoolFullInfo({
+  defaultTokenInfo,
+  withInfo,
+  showMinAda,
+}: Props): React$Node {
   const { orderData } = useSwap();
-  const { buyTokenInfo } = useSwapForm();
+  const { buyTokenInfo, sellTokenInfo } = useSwapForm();
+  const { formattedFee } = useSwapFeeDisplay(defaultTokenInfo);
+
   const buyToken = orderData.tokens?.buyInfo;
-  const selectedPool = orderData.selectedPoolCalculation;
+  const calculation = orderData.selectedPoolCalculation;
 
-  if (!selectedPool) return null;
+  if (!calculation) return null;
 
-  const { cost } = selectedPool;
+  const { cost } = calculation;
 
-  const minReceived = `${Quantities.format(
-    selectedPool.buyAmountWithSlippage.quantity,
+  const ptDecimals = defaultTokenInfo.decimals ?? 0;
+  const ptTicker = defaultTokenInfo.ticker ?? '';
+  const buyTicker = buyTokenInfo?.ticker ?? '';
+
+  const minReceived = Quantities.format(
+    calculation.buyAmountWithSlippage.quantity,
     buyToken.decimals
-  )} ${buyTokenInfo?.ticker ?? ''}`;
+  );
 
-  // TODO: do not hadcode pt decimals and ticker
-  const deposit = `${Quantities.format(cost.deposit.quantity, 6)} ADA`;
+  const deposit = Quantities.format(cost.deposit.quantity, ptDecimals);
+  const liqFeeQuantity = Quantities.format(cost.liquidityFee.quantity, ptDecimals ?? 0);
 
   return (
-    <Box sx={{ display: 'flex', flexFlow: 'column', gap: '8px', mt: '8px' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
-          Min ADA{' '}
-          <Box component="span" color="grayscale.900">
-            <InfoIcon />
+    <Box sx={{ display: 'flex', flexFlow: 'column', gap: '8px' }}>
+      {showMinAda && (
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Box color="grayscale.600" display="flex" alignItems="center" gap="8px">
+            <Typography>Min ADA</Typography>
+            {withInfo && (
+              <InfoTooltip
+                content={
+                  'A small ADA deposit that will be returned when your order is processed or canceled'
+                }
+              />
+            )}
+          </Box>
+          <Box>
+            {deposit} {ptTicker}
           </Box>
         </Box>
-        <Box>{deposit}</Box>
+      )}
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Box color="grayscale.600" display="flex" alignItems="center" gap="8px">
+          <Typography>Fees</Typography>
+          {withInfo && (
+            <InfoTooltip
+              content={
+                <>
+                  <Typography color="inherit">Fees included:</Typography>
+                  <Typography color="inherit">• DEX fee</Typography>
+                  <Typography color="inherit">• Frontend fee</Typography>
+                </>
+              }
+            />
+          )}
+        </Box>
+        <Box>{formattedFee}</Box>
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
-          Fees{' '}
-          <Box component="span" color="grayscale.900">
-            <InfoIcon />
-          </Box>
+        <Box color="grayscale.600" display="flex" alignItems="center" gap="8px">
+          <Typography>Minimum assets received</Typography>
+          {withInfo && (
+            <InfoTooltip
+              content={'The minimum amount you are guaranteed to receive in case of price slippage'}
+            />
+          )}
         </Box>
-        <Box>{totalFees} ADA</Box>
+        <Box>
+          {minReceived} {buyTicker}
+        </Box>
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Box color="grayscale.500" display="flex" alignItems="center" gap="8px">
-          Minimum assets received
-          <Box component="span" color="grayscale.900">
-            <InfoIcon />
-          </Box>
+        <Box color="grayscale.600" display="flex" alignItems="center" gap="8px">
+          <Typography>Liquidity provider fee</Typography>
+          {withInfo && (
+            <InfoTooltip
+              content={
+                'A fixed 0.3% operational fee paid to liquidity providers as a reward for supplying tokens, enabling traders to buy and sell assets on the decentralized Cardano network'
+              }
+            />
+          )}
         </Box>
-        <Box>{minReceived}</Box>
+        <Box>
+          {liqFeeQuantity} {sellTokenInfo.ticker}
+        </Box>
       </Box>
     </Box>
   );

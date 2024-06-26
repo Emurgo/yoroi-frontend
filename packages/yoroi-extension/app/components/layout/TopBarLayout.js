@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import styles from './TopBarLayout.scss';
 import { withLayout } from '../../styles/context/layout';
 import { Box } from '@mui/system';
-import { THEMES } from '../../styles/utils';
+import { THEMES } from '../../styles/themes';
 
 type Props = {|
   +banner?: Node,
@@ -147,7 +147,7 @@ function TopBarLayout({
             margin: 0,
             display: 'flex',
             flexDirection: 'column',
-            height: 'calc(100vh - 92px)',
+            height: 'calc(100vh - 25px)',
           }}
         >
           {content}

@@ -23,6 +23,7 @@ type Props = {|
   ...StoresAndActionsProps,
   title: Node,
   menu?: Node,
+  pageBanner?: Node,
 |};
 
 @observer
@@ -49,13 +50,8 @@ export default class NavBarContainerRevamp extends Component<Props> {
     this.props.actions.router.goToRoute.trigger({ route, publicDeriverId: newWalletId });
   };
 
-  openDialogWrapper: any => void = dialog => {
-    this.props.actions.router.goToRoute.trigger({ route: ROUTES.MY_WALLETS });
-    this.props.actions.dialogs.open.trigger({ dialog });
-  };
-
   render(): Node {
-    const { stores } = this.props;
+    const { stores, pageBanner } = this.props;
     const { profile } = stores;
     const { selected } = stores.wallets;
 
@@ -105,7 +101,9 @@ export default class NavBarContainerRevamp extends Component<Props> {
               }
             />
           }
+          pageBanner={pageBanner}
         />
+        {pageBanner && pageBanner}
       </>
     );
   }
@@ -154,6 +152,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
         />
       );
     }
+
     if (this.props.stores.uiDialogs.isOpen(BuySellDialog)) {
       if (!selected) {
         return null;
@@ -181,7 +180,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
         />
       );
     }
+
     return null;
   };
-
 }

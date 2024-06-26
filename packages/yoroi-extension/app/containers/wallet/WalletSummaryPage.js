@@ -76,6 +76,7 @@ class WalletSummaryPage extends Component<AllProps> {
       Logger.error('[WalletSummaryPage::render] Active wallet required');
       return null;
     }
+    this.props.stores.delegation.checkPoolTransition();
 
     const { exportTransactionsToFile, closeExportTransactionDialog } = actions.transactions;
 
@@ -164,7 +165,7 @@ class WalletSummaryPage extends Component<AllProps> {
               addressToDisplayString(addr, getNetworkById(selected.networkId))
             }
             complexityLevel={this.props.stores.profile.selectedComplexityLevel}
-            id='wallet:transaction-transactionsList-box'
+            id="wallet:transaction-transactionsList-box"
           />
         );
       } else {
