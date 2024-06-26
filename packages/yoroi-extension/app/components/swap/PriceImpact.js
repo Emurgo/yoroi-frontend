@@ -37,7 +37,7 @@ export function PriceImpactIcon({
   small?: boolean,
 |}): Node {
   const sz = `${small ? 16 : 24}px`;
-  const marginTop = `${small ? -2 : 0}px`;
+  const marginTop = `${small ? -1 : 0}px`;
   const marginRight = `6px`;
   const svgProp = small
     ? {
