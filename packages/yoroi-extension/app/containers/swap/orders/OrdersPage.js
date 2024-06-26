@@ -6,26 +6,25 @@ import Table from '../../../components/common/table/Table';
 import CancelSwapOrderDialog from '../../../components/swap/CancelOrderDialog';
 import AssetPair from '../../../components/common/assets/AssetPair';
 import Tabs from '../../../components/common/tabs/Tabs';
-import { useRichCompletedOrders, useRichOpenOrders } from '../hooks';
+import type { MappedOrder } from './hooks';
+import { useRichOrders } from './hooks';
 import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import { SwapPoolLabel } from '../../../components/swap/SwapPoolComponents';
 import ExplorableHashContainer from '../../widgets/ExplorableHashContainer';
 import { truncateAddressShort } from '../../../utils/formatters';
 import { Quantities } from '../../../utils/quantities';
-import { PRICE_PRECISION } from '../../../components/swap/common';
-import { fail, forceNonNull, maybe, noop } from '../../../coreUtils';
+import { fail, forceNonNull, maybe } from '../../../coreUtils';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import { useSwap } from '@yoroi/swap';
 import { addressBech32ToHex } from '../../../api/ada/lib/cardanoCrypto/utils';
-import {
-  getTransactionFeeFromCbor,
-  getTransactionTotalOutputFromCbor,
-} from '../../../api/ada/transactions/utils';
+import { getTransactionFeeFromCbor, getTransactionTotalOutputFromCbor, } from '../../../api/ada/transactions/utils';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { CardanoConnectorSignRequest } from '../../../connector/types';
 import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import moment from 'moment';
 import { signTransactionHex } from '../../../api/ada/transactions/signTransactionHex';
+import { createFormattedTokenValues } from './util';
+import type { FormattedTokenValue } from './util';
 
 type ColumnContext = {|
   completedOrders: boolean,
@@ -83,119 +82,9 @@ const orderColumns: Array<Column> = [
   },
 ];
 
-export type FormattedTokenValue = {|
-  value: string,
-  formattedValue: string,
-  ticker: string,
-|};
-
-function createFormattedTokenValues({
-  entries,
-  order,
-  defaultTokenInfo,
-}: {|
-  entries: Array<{| id: string, amount: string |}>,
-  order: any,
-  defaultTokenInfo: RemoteTokenInfo,
-|}): Array<FormattedTokenValue> {
-  const tokenAmountMap = entries.reduce(
-    (map, v) => ({ ...map, [v.id]: Quantities.sum([map[v.id] ?? '0', v.amount]) }),
-    {}
-  );
-  const ptDecimals = forceNonNull(defaultTokenInfo.decimals);
-  // $FlowIgnore[prop-missing]
-  const defaultTokenValue = tokenAmountMap[''] ?? tokenAmountMap['.'] ?? '0';
-  const formattedTokenValues = [
-    {
-      value: defaultTokenValue,
-      formattedValue: Quantities.format(defaultTokenValue, ptDecimals, ptDecimals),
-      ticker: defaultTokenInfo.ticker ?? '-',
-    },
-  ];
-  [order.from.token, order.to.token].forEach(t => {
-    if (t.id !== '' && t.id !== '.') {
-      maybe(tokenAmountMap[t.id], v => {
-        const formattedValue = Quantities.format(v, t.decimals, t.decimals);
-        formattedTokenValues.push({
-          value: v,
-          formattedValue,
-          ticker: t.ticker ?? '-',
-        });
-      });
-    }
-  });
-  return formattedTokenValues;
-}
-
-function mapOrderAssets(
-  order: any,
-  defaultTokenInfo: RemoteTokenInfo
-): {|
-  price: string,
-  amount: string,
-  totalValues: ?Array<FormattedTokenValue>,
-  from: any,
-  to: any,
-|} {
-  const price = Quantities.quotient(order.from.quantity, order.to.quantity);
-  const fromDecimals = order.from.token?.decimals ?? 0;
-  const toDecimals = order.to.token?.decimals ?? 0;
-  const priceDenomination = fromDecimals - toDecimals;
-  const formattedPrice = Quantities.format(price, priceDenomination, PRICE_PRECISION);
-  const formattedToQuantity = Quantities.format(
-    order.to.quantity,
-    toDecimals,
-    toDecimals
-  );
-  const formattedAttachedValues = maybe(order.valueAttached, val =>
-    createFormattedTokenValues({
-      entries: val.map(({ token: id, amount }) => ({ id, amount })),
-      order,
-      defaultTokenInfo,
-    })
-  );
-  return {
-    price: formattedPrice,
-    amount: formattedToQuantity,
-    totalValues: formattedAttachedValues,
-    from: order.from,
-    to: order.to,
-  };
-}
-
-type MappedOrder = {|
-  txId: string,
-  utxo?: string,
-  sender?: string,
-  provider?: string,
-  price: string,
-  amount: string,
-  totalValues: ?Array<FormattedTokenValue>,
-  from: any,
-  to: any,
-|};
-
-function mapOpenOrder(order: any, defaultTokenInfo: RemoteTokenInfo): MappedOrder {
-  const txId = order.utxo.split('#')[0];
-  return {
-    txId,
-    utxo: order.utxo,
-    sender: order.sender,
-    provider: order.provider,
-    ...mapOrderAssets(order, defaultTokenInfo),
-  };
-}
-
-function mapCompletedOrder(order: any, defaultTokenInfo: RemoteTokenInfo): MappedOrder {
-  return {
-    txId: order.txHash,
-    ...mapOrderAssets(order, defaultTokenInfo),
-  };
-}
-
 export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
   const {
-    order: { cancel: swapCancelOrder },
+    order: orderApi,
   } = useSwap();
 
   const [showCompletedOrders, setShowCompletedOrders] = useState<boolean>(false);
@@ -207,32 +96,31 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
     isSubmitting?: boolean,
   |}>(null);
 
-  const wallet = props.stores.wallets.selectedOrFail;
+  const { wallets, tokenInfoStore, explorers, substores: { ada: { swapStore } } } = props.stores;
+
+  const wallet = wallets.selectedOrFail;
   const network = wallet.getParent().getNetworkInfo();
   const walletVariant = wallet.getParent().getWalletVariant();
-  const defaultTokenInfo = props.stores.tokenInfoStore.getDefaultTokenInfoSummary(
+  const defaultTokenInfo = tokenInfoStore.getDefaultTokenInfoSummary(
     network.NetworkId
   );
 
   const selectedExplorer =
-    props.stores.explorers.selectedExplorer.get(network.NetworkId) ??
+    explorers.selectedExplorer.get(network.NetworkId) ??
     fail('No explorer for wallet network');
 
-  const openOrders = useRichOpenOrders().map(o => mapOpenOrder(o, defaultTokenInfo));
-  const completedOrders = useRichCompletedOrders().map(o => mapCompletedOrder(o, defaultTokenInfo));
-
-  const txHashes = [...openOrders, ...completedOrders].map(o => o.txId);
-  noop(props.stores.substores.ada.swapStore.fetchTransactionTimestamps({ wallet, txHashes }));
+  const fetchTransactionTimestamps = txHashes => swapStore.fetchTransactionTimestamps({ wallet, txHashes });
+  let { openOrders, completedOrders, transactionTimestamps } = useRichOrders(defaultTokenInfo, fetchTransactionTimestamps);
 
   const txHashToRenderedTimestamp: string => string = txHash => {
-    const date = props.stores.substores.ada.swapStore.transactionTimestamps[txHash];
+    const date = transactionTimestamps[txHash];
     return date == null ? '-' : moment(date).format('MMM D, YYYY H:mm');
   };
 
   const handleCancelRequest = async order => {
     setCancellationState({ order, tx: null });
     try {
-      let utxoHex = await props.stores.substores.ada.swapStore.getCollateralUtxoHexForCancel({
+      let utxoHex = await swapStore.getCollateralUtxoHexForCancel({
         wallet,
       });
       let collateralReorgTxHex: ?string = null;
@@ -242,7 +130,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
           unsignedTxHex,
           txData,
           collateralUtxoHex,
-        } = await props.stores.substores.ada.swapStore.createCollateralReorgForCancel({ wallet });
+        } = await swapStore.createCollateralReorgForCancel({ wallet });
         collateralReorgTxHex = unsignedTxHex;
         collateralReorgTxData = txData;
         utxoHex = collateralUtxoHex;
@@ -270,7 +158,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
       throw new Error('Cannot cancel a completed order (sender == null)');
     }
     try {
-      const cancelTxCbor = await swapCancelOrder({
+      const cancelTxCbor = await orderApi.cancel({
         address: addressBech32ToHex(sender),
         utxos: {
           order: order.utxo,
@@ -286,7 +174,8 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
           id: e.identifier,
           amount: e.amount.toString(),
         })),
-        order,
+        from: order.from,
+        to: order.to,
         defaultTokenInfo,
       });
       const formattedFeeValue = Quantities.format(
@@ -358,7 +247,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
       signedCollateralReorgTx != null
         ? [signedCollateralReorgTx, signedCancelTx]
         : [signedCancelTx];
-    await props.stores.substores.ada.swapStore.executeTransactionHexes({
+    await swapStore.executeTransactionHexes({
       wallet,
       signedTransactionHexes,
     });
@@ -440,7 +329,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
           onCancelOrder={handleCancelConfirm}
           onDialogClose={() => setCancellationState(null)}
           defaultTokenInfo={defaultTokenInfo}
-          getTokenInfo={genLookupOrFail(props.stores.tokenInfoStore.tokenInfo)}
+          getTokenInfo={genLookupOrFail(tokenInfoStore.tokenInfo)}
           selectedExplorer={selectedExplorer}
           submissionError={null}
           walletType={walletVariant}

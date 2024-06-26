@@ -24,6 +24,7 @@ type Props = {|
   swapStore: SwapStore,
   defaultTokenInfo: RemoteTokenInfo,
   getTokenInfo: string => Promise<RemoteTokenInfo>,
+  getTokenInfoBatch: Array<string> => { [string]: Promise<RemoteTokenInfo> },
   priceImpactState: ?PriceImpact,
 |};
 
@@ -33,34 +34,20 @@ export const CreateSwapOrder = ({
   swapStore,
   defaultTokenInfo,
   getTokenInfo,
+  getTokenInfoBatch,
   priceImpactState,
 }: Props): React$Node => {
   const [openedDialog, setOpenedDialog] = useState('');
-  const [prevSelectedPoolId, setPrevSelectedPoolId] = useState<?string>(undefined);
 
   const {
     orderData: {
       type: orderType,
-      selectedPoolCalculation,
     },
-    // unsignedTxChanged,
     sellTokenInfoChanged,
     buyTokenInfoChanged,
   } = useSwap();
 
   const { onChangeLimitPrice } = useSwapForm();
-
-  const resetLimitPrice = () => {
-    onChangeLimitPrice('');
-  };
-
-  if (orderType === 'market') {
-    const selectedPoolId = selectedPoolCalculation?.pool.poolId;
-    if (selectedPoolId !== prevSelectedPoolId) {
-      setPrevSelectedPoolId(selectedPoolId);
-      resetLimitPrice();
-    }
-  }
 
   return (
     <>
@@ -115,11 +102,11 @@ export const CreateSwapOrder = ({
           store={swapStore}
           onClose={() => setOpenedDialog('')}
           onTokenInfoChanged={val => {
-            resetLimitPrice();
+            onChangeLimitPrice();
             sellTokenInfoChanged(val);
           }}
           defaultTokenInfo={defaultTokenInfo}
-          getTokenInfo={getTokenInfo}
+          getTokenInfoBatch={getTokenInfoBatch}
         />
       )}
       {openedDialog === 'to' && (
@@ -127,11 +114,11 @@ export const CreateSwapOrder = ({
           store={swapStore}
           onClose={() => setOpenedDialog('')}
           onTokenInfoChanged={val => {
-            resetLimitPrice();
+            onChangeLimitPrice();
             buyTokenInfoChanged(val);
           }}
           defaultTokenInfo={defaultTokenInfo}
-          getTokenInfo={getTokenInfo}
+          getTokenInfoBatch={getTokenInfoBatch}
         />
       )}
       {openedDialog === 'slippage' && (
