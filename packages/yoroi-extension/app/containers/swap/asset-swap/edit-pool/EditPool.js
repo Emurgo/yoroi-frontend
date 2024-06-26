@@ -89,7 +89,7 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginBottom: '8px',
+            marginBottom: showFullInfo && '8px',
             cursor: 'pointer',
           }}
           onClick={handleShowFullInfo}
