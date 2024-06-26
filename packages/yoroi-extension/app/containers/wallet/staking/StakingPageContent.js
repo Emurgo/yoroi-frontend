@@ -1,11 +1,15 @@
 // @flow
 import { observer } from 'mobx-react';
 import moment from 'moment';
-import type { Node } from 'react';
+import type { ComponentType, Node } from 'react';
 import { Component } from 'react';
 import { intlShape } from 'react-intl';
 import type { ConfigType } from '../../../../config/config-types';
 import { withLayout } from '../../../styles/context/layout';
+import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
+import type { LayoutComponentMap } from '../../../styles/context/layout';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { TokenEntry } from '../../../api/common/lib/MultiToken';
 
 import { Box, styled } from '@mui/system';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
