@@ -1,13 +1,13 @@
-import { Stack, Typography, Box } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { Box, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import LiquidityTable from './LiquidityTable';
-import mockData from '../../common/mockData';
-import OrderTable from './OrderTable';
-import LendAndBorrow from './LendAndBorrow';
-import { useStrings } from '../../common/hooks/useStrings';
+import React, { useEffect, useState } from 'react';
 import PortfolioHeader from '../../common/components/PortfolioHeader';
+import { useStrings } from '../../common/hooks/useStrings';
 import { ITabButtonProps, LiquidityItemType, OrderItemType } from '../../common/types/index';
+import { usePortfolio } from '../../module/PortfolioContextProvider';
+import LendAndBorrow from './LendAndBorrow';
+import LiquidityTable from './LiquidityTable';
+import OrderTable from './OrderTable';
 
 const TableTabs = Object.freeze({
   LIQUIDITY: 1,
@@ -25,6 +25,9 @@ interface Props {
 const PortfolioDapps = ({ data }: Props) => {
   const theme: any = useTheme();
   const strings = useStrings();
+
+  const { walletBalance } = usePortfolio();
+
   const [keyword, setKeyword] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [liquidityList, setLiquidlityList] = useState<LiquidityItemType[]>(data.liquidityList);
@@ -95,7 +98,7 @@ const PortfolioDapps = ({ data }: Props) => {
   return (
     <Stack direction="column" spacing={theme.spacing(3)} sx={{ minHeight: 'calc(100vh - 220px)' }}>
       <PortfolioHeader
-        balance={mockData.common.dappsBalance}
+        walletBalance={walletBalance}
         setKeyword={setKeyword}
         isLoading={isLoading}
         tooltipTitle={

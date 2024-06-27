@@ -71,7 +71,7 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
   const theme: any = useTheme();
   const navigateTo = useNavigateTo();
   const strings = useStrings();
-  const { unitOfAccount } = usePortfolio();
+  const { unitOfAccount, accountPair } = usePortfolio();
   const [{ order, orderBy }, setSortState] = useState<ISortState>({
     order: null,
     orderBy: null,
@@ -222,11 +222,13 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
             <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
               <Stack direction="column">
                 <Typography color="ds.text_gray_normal">
-                  {formatNumber(row.totalAmount)} {row.name}
+                  {row.totalAmount} {row.name}
                 </Typography>
-                {row.name === 'ADA' && unitOfAccount === 'ADA' ? null : (
+                {row.name === accountPair?.to.name ? (
+                  <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}></Typography>
+                ) : (
                   <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}>
-                    {formatNumber(row.totalAmountUsd)} {unitOfAccount}
+                    {formatNumber(row.totalAmountFiat)} {accountPair?.to.name}
                   </Typography>
                 )}
               </Stack>

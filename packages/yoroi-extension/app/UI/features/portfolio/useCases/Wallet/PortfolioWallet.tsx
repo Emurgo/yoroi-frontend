@@ -11,26 +11,31 @@ import StatsTable from './StatsTable';
 const PortfolioWallet = (): JSX.Element => {
   const theme = useTheme();
   const strings = useStrings();
-  const { walletBalance, assetList } = usePortfolio();
+  const { walletBalance, assetList, changeUnitOfAccountPair, unitOfAccount } = usePortfolio();
 
   const [keyword, setKeyword] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [tokenList, setTokenList] = useState<TokenType[]>(assetList);
   const isShownWelcomeBanner: boolean = assetList.length === 1; // assumming only have ADA as default -> first time user
 
-  console.log('assetList', assetList);
+  useEffect(() => {
+    changeUnitOfAccountPair({
+      from: { name: 'ADA', value: walletBalance.ada },
+      to: { name: unitOfAccount || 'USD', value: walletBalance.fiatAmount },
+    });
+  }, [walletBalance, unitOfAccount]);
 
   useEffect(() => {
     if (isShownWelcomeBanner) return;
 
     // FAKE FETCHING DATA TO SEE SKELETON
-    setIsLoading(true);
+    // setIsLoading(true);
 
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
+    // const timer = setTimeout(() => {
+    //   setIsLoading(false);
+    // }, 2000);
 
-    return () => clearTimeout(timer);
+    // return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -45,7 +50,7 @@ const PortfolioWallet = (): JSX.Element => {
       return (
         item.name.toLowerCase().includes(lowercaseKeyword) ||
         item.id.toLowerCase().includes(lowercaseKeyword) ||
-        item.overview.fingerprint.toLowerCase().includes(lowercaseKeyword)
+        item.policyId.toLowerCase().includes(lowercaseKeyword)
       );
     });
     if (temp && temp.length > 0) {

@@ -41,7 +41,7 @@ export type TokenType = {
   '1W': number;
   '1M': number;
   totalAmount: number;
-  totalAmountUsd: number;
+  totalAmountFiat: number;
   overview: IDetailOverview;
   performance: IDetailPerformanceItem[];
   chartData: IChartData;

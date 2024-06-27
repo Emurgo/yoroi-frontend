@@ -1,6 +1,6 @@
 import { Box, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import React, { useState } from 'react';
+import React from 'react';
 import { Chip, SearchInput, Skeleton, Tooltip } from '../../../../components';
 import { ChipTypes } from '../../../../components/Chip';
 import { Icon } from '../../../../components/icons';
@@ -19,25 +19,16 @@ interface Props {
 const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }: Props): JSX.Element => {
   const strings = useStrings();
   const theme: any = useTheme();
-  const { unitOfAccount } = usePortfolio();
-
-  console.log('PortfolioHeader unitOfAccount', { unitOfAccount, walletBalance });
-
-  const [pairUnit, setPairUnit] = useState<any>({
-    from: { name: 'ADA', value: walletBalance.ada },
-    to: { name: unitOfAccount, value: walletBalance.fiatAmount },
-  });
+  const { unitOfAccount, changeUnitOfAccountPair, accountPair } = usePortfolio();
 
   const handleCurrencyChange = () => {
-    if (unitOfAccount !== pairUnit.from.name) {
-      // changeUnitOfAccount(unitOfAccount);
-      setPairUnit({
-        from: { name: unitOfAccount, value: walletBalance.fiatAmount },
+    if (unitOfAccount !== accountPair?.from.name) {
+      changeUnitOfAccountPair({
+        from: { name: unitOfAccount || 'USD', value: walletBalance.fiatAmount },
         to: { name: 'ADA', value: walletBalance.ada },
       });
     } else {
-      // changeUnitOfAccount('ADA');
-      setPairUnit({
+      changeUnitOfAccountPair({
         from: { name: 'ADA', value: walletBalance.ada },
         to: { name: unitOfAccount, value: walletBalance.fiatAmount },
       });
@@ -52,11 +43,11 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
             <Skeleton width="146px" height="24px" />
           ) : (
             <Typography variant="h2" fontWeight="500" color="ds.gray_cmax">
-              {pairUnit.from.value}
+              {String(accountPair?.from.value)}
             </Typography>
           )}
           <Typography variant="body2" fontWeight="500" color="ds.black_static">
-            {pairUnit.from.name}
+            {accountPair?.from.name}
             <Typography
               component="span"
               variant="body2"
@@ -69,7 +60,7 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
                 marginTop: '5px',
               }}
             >
-              /{pairUnit.to.name}
+              /{accountPair?.to.name}
             </Typography>
           </Typography>
         </Stack>
@@ -79,7 +70,7 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
             <Skeleton width="129px" height="16px" />
           ) : (
             <Typography color="ds.gray_c600">
-              {pairUnit.to.value} {pairUnit.to.name}
+              {accountPair?.to.value} {accountPair?.to.name}
             </Typography>
           )}
           {isLoading ? (

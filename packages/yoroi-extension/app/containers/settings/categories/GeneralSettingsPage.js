@@ -1,20 +1,19 @@
 // @flow
+import { Box, Typography } from '@mui/material';
+import { observer } from 'mobx-react';
 import type { Node } from 'react';
 import { Component } from 'react';
-import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import { handleExternalLinkClick } from '../../../utils/routing';
-import GeneralSettings from '../../../components/settings/categories/general-setting/GeneralSettings';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
-import ThemeSettingsBlock from '../../../components/settings/categories/general-setting/ThemeSettingsBlock';
-import AboutYoroiSettingsBlock from '../../../components/settings/categories/general-setting/AboutYoroiSettingsBlock';
-import UnitOfAccountSettings from '../../../components/settings/categories/general-setting/UnitOfAccountSettings';
 import { ReactComponent as AdaCurrency } from '../../../assets/images/currencies/ADA.inline.svg';
-import { unitOfAccountDisabledValue } from '../../../types/unitOfAccountType';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { Box, Typography } from '@mui/material';
+import AboutYoroiSettingsBlock from '../../../components/settings/categories/general-setting/AboutYoroiSettingsBlock';
+import GeneralSettings from '../../../components/settings/categories/general-setting/GeneralSettings';
+import ThemeSettingsBlock from '../../../components/settings/categories/general-setting/ThemeSettingsBlock';
+import UnitOfAccountSettings from '../../../components/settings/categories/general-setting/UnitOfAccountSettings';
 import { settingsMenuMessages } from '../../../components/settings/menu/SettingsMenu';
 import { THEMES } from '../../../styles/themes';
+import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
+import { unitOfAccountDisabledValue } from '../../../types/unitOfAccountType';
+import { handleExternalLinkClick } from '../../../utils/routing';
 
 const currencyLabels = defineMessages({
   USD: {
@@ -58,8 +57,7 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
   };
 
   onSelectUnitOfAccount: string => Promise<void> = async value => {
-    const unitOfAccount =
-      value === 'ADA' ? unitOfAccountDisabledValue : { enabled: true, currency: value };
+    const unitOfAccount = value === 'ADA' ? unitOfAccountDisabledValue : { enabled: true, currency: value };
     await this.props.actions.profile.updateUnitOfAccount.trigger(unitOfAccount);
   };
 
@@ -70,8 +68,7 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
 
     const isSubmittingLocale = profileStore.setProfileLocaleRequest.isExecuting;
     const isSubmittingUnitOfAccount =
-      profileStore.setUnitOfAccountRequest.isExecuting ||
-      coinPriceStore.refreshCurrentUnit.isExecuting;
+      profileStore.setUnitOfAccountRequest.isExecuting || coinPriceStore.refreshCurrentUnit.isExecuting;
     const { currentTheme } = profileStore;
 
     const currencies = profileStore.UNIT_OF_ACCOUNT_OPTIONS.map(c => {
@@ -92,9 +89,7 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
       svg: AdaCurrency,
     });
 
-    const unitOfAccountValue = profileStore.unitOfAccount.enabled
-      ? profileStore.unitOfAccount.currency
-      : 'ADA';
+    const unitOfAccountValue = profileStore.unitOfAccount.enabled ? profileStore.unitOfAccount.currency : 'USD';
 
     return (
       <Box sx={{ pb: profileStore.isRevampTheme ? '50px' : '0px' }}>

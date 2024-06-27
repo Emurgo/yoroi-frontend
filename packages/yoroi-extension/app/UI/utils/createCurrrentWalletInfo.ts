@@ -65,22 +65,20 @@ const getAssetWalletAssetList = stores => {
       const tokenLogo = `data:image/png;base64,${
         token.info.Metadata.policyId === '' ? cardanoAdaBase64Logo : token.info.Metadata.logo
       }`;
-
+      console.log(' token.info?.Metadata', token.info?.Metadata);
       return {
         name: tokenName,
         id: tokenId,
         totalAmount: [beforeDecimal, afterDecimal].join(''),
         amountForSorting: shiftedAmount,
-        // fiatCurrency: currency,
-        // fiatDisplay: fiatDisplay,
         tokenLogo: tokenLogo,
         ...token.info.Metadata,
-        price: 0.123, // MOCKED
+        totalAmountFiat: Math.round(100000 * Math.random()), // MOCKED
+        price: 0.223, // MOCKED
         '24h': -(10 * Math.random()), // MOCKED
         '1W': 10 * Math.random(), // MOCKED
         '1M': 10 * Math.random(), // MOCKED
         portfolioPercents: Math.round(100 * Math.random()), // MOCKED
-        totalAmountUsd: Math.round(100000 * Math.random()), // MOCKED
 
         // The below properties are used only in token details page
         chartData: {
@@ -103,6 +101,15 @@ const getAssetWalletAssetList = stores => {
           { value: 10 * Math.random() }, // MOCKED
           { value: Math.random() / 100 }, // MOCKED
         ],
+        overview: {
+          description:
+            "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
+          website: 'https://www.cardano.org',
+          detailOn: 'https://www.yoroiwallet.com',
+          policyId: '2aa9c1557fcf8e7caa049fa0911a8724a1cdaf8037fe0b431c6ac664',
+          fingerprint:
+            'asset311q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj6789',
+        },
       };
     });
 };
@@ -133,7 +140,6 @@ export const createCurrrentWalletInfo = (stores: any): any => {
     const defaultEntry = totalAmount?.getDefaultEntry();
     const getTokenInfo = genLookupOrFail(tokenInfoStore?.tokenInfo);
     const tokenInfo = getTokenInfo(defaultEntry);
-    console.log('tokenInfotokenInfotokenInfo', tokenInfo);
     const shiftedAmount = defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
     const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(shiftedAmount, tokenInfo.Metadata.numberOfDecimals);
 
@@ -141,7 +147,7 @@ export const createCurrrentWalletInfo = (stores: any): any => {
     const ticker = tokenInfo.Metadata.ticker;
     const { currency } = profile.unitOfAccount;
     const getFiatCurrentPrice = coinPriceStore.getCurrentPrice;
-    const fiatPrice = getFiatCurrentPrice(ticker, currency);
+    const fiatPrice = getFiatCurrentPrice(ticker, currency === null ? 'USD' : currency);
     const fiatDisplay = calculateAndFormatValue(shiftedAmount, fiatPrice);
 
     // Asset List
@@ -158,7 +164,7 @@ export const createCurrrentWalletInfo = (stores: any): any => {
       walletBalance: {
         ada: `${beforeDecimalRewards}${afterDecimalRewards}`,
         fiatAmount: fiatDisplay || 0,
-        currency: currency,
+        currency: currency === null ? 'USD' : currency,
         percents: 0.0, //(Math.random()), NOT USED - will be deteled
         amount: 0.0, //(Math.random()), NOT USED - will be deteled
       },

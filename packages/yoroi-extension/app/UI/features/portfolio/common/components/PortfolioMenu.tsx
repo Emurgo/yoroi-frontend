@@ -1,5 +1,6 @@
 import React from 'react';
 import { ROUTES } from '../../../../../routes-config';
+import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { useStrings } from '../hooks/useStrings';
 import mockData from '../mockData';
 import { SubMenuOption } from '../types';
@@ -12,10 +13,11 @@ interface Props {
 
 const PortfolioMenu = (props: Props): JSX.Element => {
   const strings = useStrings();
+  const { assetList } = usePortfolio();
 
   const portfolioOptions: SubMenuOption[] = [
     {
-      label: `${strings.menuWallet} (${mockData.wallet.tokenList.length})`,
+      label: `${strings.menuWallet} (${assetList?.length})`,
       route: ROUTES.PORTFOLIO.ROOT,
       className: 'wallet',
     },
