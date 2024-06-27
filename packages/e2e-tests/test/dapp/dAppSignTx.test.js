@@ -59,7 +59,7 @@ describe('dApp, signTx, intrawallet Tx', function () {
       await mockedDApp.requestUnusedAddresses();
       const unusedAddresses = await mockedDApp.getAddresses();
       receiverAddr = unusedAddresses.retValue[0];
-      const requestedAmount = String(1 * adaInLovelaces);
+      const requestedAmount = String(2 * adaInLovelaces);
       // send sign request with 1 ada
       const { txFee } = await mockedDApp.requestSigningTx(requestedAmount, receiverAddr);
       expectedFee = txFee;
@@ -103,7 +103,7 @@ describe('dApp, signTx, intrawallet Tx', function () {
       const addrAssets = filteredAddrs[0].assets;
       expect(addrAssets, 'No tokens for the receiver address').to.be.an('array').that.is.not.empty;
       const filteredAddrAssets = addrAssets.filter(assetInfo => assetInfo.tokenName === 'ADA');
-      expect(filteredAddrAssets.length, 'No ADA token for the receiver address').to.equal(1);
+      expect(filteredAddrAssets.length, 'No ADA token for the receiver address').to.equal(2);
       expect(
         filteredAddrAssets[0].tokenAmount,
         'Different amount for the receiver address'
