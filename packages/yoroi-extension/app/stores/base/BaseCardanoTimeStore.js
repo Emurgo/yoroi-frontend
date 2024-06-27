@@ -7,7 +7,10 @@ import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import type { RelativeSlot } from '../../api/ada/lib/storage/bridge/timeUtils';
 import TimeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
-import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import {
+  getCardanoHaskellBaseConfig,
+  getNetworkById,
+} from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { fail, maybe } from '../../coreUtils';
 
 export type TimeCalcRequests = {|
@@ -63,12 +66,12 @@ export default class BaseCardanoTimeStore extends Store<StoresMap, ActionsMap> {
     if (this._intervalId) clearInterval(this._intervalId);
   }
 
-  @action addObservedTime: PublicDeriver<> => void = (
-    publicDeriver
+  @action addObservedTime: { publicDeriverId: number, networkId: number, ... }  => void = (
+    wallet
   ) => {
-    const baseConfig = getCardanoHaskellBaseConfig(publicDeriver.getParent().getNetworkInfo());
+    const baseConfig = getCardanoHaskellBaseConfig(getNetworkById(wallet.networkId));
     this.timeCalcRequests.push({
-      publicDeriver,
+      publicDeriverId: wallet.publicDeriverId,
       requests: {
         toAbsoluteSlot: (relativeSlot: RelativeSlot) => TimeUtils.toAbsoluteSlotNumber(baseConfig, relativeSlot),
         toRelativeSlotNumber: absoluteSlot => TimeUtils.toRelativeSlotNumber(baseConfig, absoluteSlot),
@@ -79,20 +82,20 @@ export default class BaseCardanoTimeStore extends Store<StoresMap, ActionsMap> {
       },
     });
     this.currentTimeRequests.push({
-      publicDeriver,
+      publicDeriverId: wallet.publicDeriverId,
       // initial values that can be updated later
       currentEpoch: 0,
       currentSlot: 0,
     });
   }
 
-  getTimeCalcRequests: PublicDeriver<> => TimeCalcRequests = (publicDeriver) => {
-    return find(this.timeCalcRequests, { publicDeriver })
+  getTimeCalcRequests: ({ publicDeriverId: number, ... })=> TimeCalcRequests = ({ publicDeriverId }) => {
+    return find(this.timeCalcRequests, { publicDeriverId })
       ?? fail(`${nameof(this.getTimeCalcRequests)} missing for public deriver`);
   }
 
-  getCurrentTimeRequests: PublicDeriver<> => CurrentTimeRequests = (publicDeriver) => {
-    return find(this.currentTimeRequests, { publicDeriver })
+  getCurrentTimeRequests: ({ publicDeriverId: number, ... }) => CurrentTimeRequests = ({ publicDeriverId }) => {
+    return find(this.currentTimeRequests, { publicDeriverId })
       ?? fail(`${nameof(this.getCurrentTimeRequests)} missing for public deriver`)
   }
 
@@ -107,8 +110,8 @@ export default class BaseCardanoTimeStore extends Store<StoresMap, ActionsMap> {
     const selected = this.stores.wallets.selected;
     if (selected == null) return;
 
-    const timeCalcRequests = this.getTimeCalcRequests(selected.publicDeriverId);
-    const currTimeRequests = this.getCurrentTimeRequests(selected.publicDeriverId);
+    const timeCalcRequests = this.getTimeCalcRequests(selected);
+    const currTimeRequests = this.getCurrentTimeRequests(selected);
 
     const { timeToSlot, toRelativeSlotNumber } = timeCalcRequests.requests;
 

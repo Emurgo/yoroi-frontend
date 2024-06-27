@@ -93,7 +93,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     wallet: WalletState,
     poolRequest: string | void,
   |}) => Promise<void> = async request => {
-    const { timeToSlot } = this.stores.substores.ada.time.getTimeCalcRequests(publicDeriver).requests;
+    const { timeToSlot } = this.stores.substores.ada.time.getTimeCalcRequests(request.wallet).requests;
 
     const absSlotNumber = new BigNumber(
       timeToSlot({
@@ -125,7 +125,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
   |}) => Promise<void> = async request => {
     this.createWithdrawalTx.reset();
 
-    const { timeToSlot } = this.stores.substores.ada.time.getTimeCalcRequests(request.publicDeriver).requests;
+    const { timeToSlot } = this.stores.substores.ada.time.getTimeCalcRequests(request.wallet).requests;
 
     const absSlotNumber = new BigNumber(
       timeToSlot({
@@ -163,7 +163,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
       throw new Error(`${nameof(this._signTransaction)} no tx to broadcast`);
     }
     const refreshWallet = () => {
-      this.stores.delegation.disablePoolTransitionState(request.publicDeriver);
+      this.stores.delegation.disablePoolTransitionState(request.wallet);
       return this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId);
     };
 

@@ -422,14 +422,14 @@ export async function connectorGetUsedAddressesWithPaginate(
   const outputAddressesInSubmittedTxs = new Set(
     await getOutputAddressesInSubmittedTxs(wallet.publicDeriverId)
   );
-  return _connectorGetUsedAddresses(
+  return _connectorGetUsedAddressesWithPaginate(
     usedAddresses,
     unusedAddresses,
     outputAddressesInSubmittedTxs,
     paginate,
   );
 }
-export async function _connectorGetUsedAddresses(
+export async function _connectorGetUsedAddressesWithPaginate(
   usedAddresses: Array<string>,
   unusedAddresses: Array<string>,
   outputAddressesInSubmittedTxs: Set<string>,

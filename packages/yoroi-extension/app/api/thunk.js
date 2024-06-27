@@ -187,10 +187,15 @@ export async function signAndBroadcastTransaction(
   // fixme handle failures
   return result;
 }
+
 export type BroadcastTransactionRequestType = {|
   publicDeriverId: number,
-  signedTxHex: string,
-  addressedUtxos?: Array<CardanoAddressedUtxo>,
+  ...({|
+    signedTxHexArray: Array<string>,
+  |} | {|
+    addressedUtxos?: Array<CardanoAddressedUtxo>,
+    signedTxHex: string,
+  |})
 |};
 export async function broadcastTransaction(request: BroadcastTransactionRequestType) {
   const result = await callBackground({ type: 'broadcast-transaction', request });

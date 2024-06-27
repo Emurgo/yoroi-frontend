@@ -41,7 +41,7 @@ class SidebarContainer extends Component<AllProps> {
         categories={allCategories.filter(category =>
           category.isVisible({
             hasAnyWallets: stores.wallets.hasAnyWallets === true,
-            selected: stores.wallets.selected?.publicDeriverId,
+            selected: stores.wallets.selected,
             currentRoute: stores.app.currentRoute,
           })
         )}
@@ -67,10 +67,10 @@ class SidebarContainer extends Component<AllProps> {
         categories={allCategoriesRevamp.filter(category =>
           category.isVisible({
             hasAnyWallets: this.props.stores.wallets.hasAnyWallets === true,
-            selected: this.props.stores.wallets.selected?.publicDeriverId,
+            selected: this.props.stores.wallets.selected,
             currentRoute: this.props.stores.app.currentRoute,
-            isRewardWallet: (publicDeriverId: number) =>
-              stores.delegation.isRewardWallet(publicDeriverId),
+            isRewardWallet: (wallet) =>
+              stores.delegation.isRewardWallet(wallet.publicDeriverId),
           })
         )}
       />

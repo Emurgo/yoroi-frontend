@@ -6,7 +6,6 @@ import LocalizableError, { localizedError } from '../../i18n/LocalizableError';
 import type { CreateAddressFunc, CreateAddressResponse, } from '../../api/common';
 import type { IHasUtxoChainsRequest, } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { Logger, } from '../../utils/logging';
-import type { AddressFilterKind, StandardAddress, AddressTypeName, } from '../../types/AddressFilterTypes';
 import type { AddressFilterKind, AddressTypeName, StandardAddress, } from '../../types/AddressFilterTypes';
 import { AddressFilter, } from '../../types/AddressFilterTypes';
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
@@ -203,13 +202,5 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
 
   @action _resetFilter: void => void = () => {
     this.addressFilter = AddressFilter.None;
-  }
-
-  getFirstExternalAddress: (PublicDeriver<>) => Promise<AddressDetails> = async (publicDeriver) => {
-    return (await this.api.ada.getChainAddressesForDisplay({
-      publicDeriver: forceNonNull(asHasUtxoChains(publicDeriver)),
-      type: CoreAddressTypes.CARDANO_BASE,
-      chainsRequest: { chainId: ChainDerivations.EXTERNAL },
-    }))[0];
   }
 }

@@ -108,7 +108,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     return this.selected != null;
   }
 
-  @computed get selectedOrFail(): PublicDeriver<> {
+  @computed get selectedOrFail(): WalletState {
     if (this.selected == null) {
       throw new Error('A selected wallet is required!');
     }
@@ -193,10 +193,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     addresses.addObservedWallet(request.publicDeriver);
     transactions.addObservedWallet(request.publicDeriver);
     const { time, delegation } = substores.ada;
-    time.addObservedTime(
-      request.publicDeriver.publicDeriverId,
-      request.publicDeriver.networkId
-    );
+    time.addObservedTime(request.publicDeriver);
     delegation.addObservedWallet(request.publicDeriver);
     delegation.refreshDelegation(request.publicDeriver);
 
@@ -233,12 +230,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   };
 
   // =================== PRIVATE API ==================== //
-
-  @computed get _canRedirectToWallet(): boolean {
-    const currentRoute = this.stores.app.currentRoute;
-    const isRootRoute = matchRoute(ROUTES.WALLETS.ROOT, currentRoute) !== false;
-    return isRootRoute;
-  }
 
   // =================== NOTIFICATION ==================== //
   showLedgerWalletIntegratedNotification: void => void = (): void => {

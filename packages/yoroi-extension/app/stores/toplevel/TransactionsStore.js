@@ -73,7 +73,7 @@ export type TxHistoryState = {|
 
 const EXPORT_START_DELAY = 800; // in milliseconds [1000 = 1sec]
 
-function getCoinsPerUtxoWord(network: $ReadOnly<NetworkRow>): RustModule.WalletV4.BigNum {
+function getCoinsPerUtxoWord(network: $ReadOnly<NetworkRow>): BigNumber {
   const config = getCardanoHaskellBaseConfig(network).reduce(
     (acc, next) => Object.assign(acc, next),
     {}

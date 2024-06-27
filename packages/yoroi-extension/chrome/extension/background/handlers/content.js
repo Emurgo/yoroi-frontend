@@ -40,7 +40,7 @@ import {
   connectorGetChangeAddress,
   connectorGetCollateralUtxos,
   connectorGetUnusedAddresses,
-  connectorGetUsedAddresses,
+  connectorGetUsedAddressesWithPaginate,
   connectorGetUtxosCardano,
   connectorRecordSubmittedCardanoTransaction,
   connectorSendTxCardano,
@@ -77,7 +77,7 @@ import ConnectorStore from '../../../../app/connector/stores/ConnectorStore';
 import type { ForeignUtxoFetcher } from '../../../../app/connector/stores/ConnectorStore';
 import { find721metadata } from '../../../../app/utils/nftMetadata';
 import { hexToBytes } from '../../../../app/coreUtils';
-import { mergeWitnessSets } from '../../connector/utils';
+import { mergeWitnessSets } from '../../../../app/api/ada/transactions/utils';
 import { getDb, syncWallet } from '../state';
 import { getCardanoStateFetcher } from '../utils';
 
@@ -748,7 +748,7 @@ export async function handleInjectorMessage(message: any, sender: any) {
           await withSelectedWallet(
             tabId,
             async (wallet) => {
-              const addresses = await connectorGetUsedAddresses(wallet, paginate);
+              const addresses = await connectorGetUsedAddressesWithPaginate(wallet, paginate);
               if (!isCardano || isCBOR) {
                 rpcResponse({ ok: addresses });
               } else {

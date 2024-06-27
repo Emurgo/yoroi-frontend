@@ -110,6 +110,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
 
   getDialog: void => Node = () => {
     const { selected, wallets } = this.props.stores.wallets;
+    const getTokenInfo = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo);
 
     if (this.props.stores.uiDialogs.isOpen(WalletListDialog)) {
       const cardanoWallets = [];
@@ -139,7 +140,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
           close={this.props.actions.dialogs.closeActiveDialog.trigger}
           shouldHideBalance={this.props.stores.profile.shouldHideBalance}
           onUpdateHideBalance={this.updateHideBalance}
-          getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
+          getTokenInfo={getTokenInfo}
           walletAmount={selected?.balance}
           onAddWallet={() => {
             this.props.actions.dialogs.closeActiveDialog.trigger();
@@ -162,21 +163,23 @@ export default class NavBarContainerRevamp extends Component<Props> {
         getNetworkById(selected.networkId),
       );
 
+      const { numberOfDecimals } = getTokenInfo(selected.balance.getDefaultEntry()).Metadata;
+
+      const receiveAdaAddress = addressToDisplayString(
+        selected.receiveAddress.addr.Hash,
+        getNetworkById(selected.networkId)
+      );
+
       return (
         <BuySellDialog
           onCancel={this.props.actions.dialogs.closeActiveDialog.trigger}
-          walletList={wallets.map(wallet => {
-            const defaultToken = this.props.stores.tokenInfoStore.getDefaultTokenInfo(
-              selected.networkId,
-            );
-            const currencyName = getTokenName(defaultToken);
-
-            return {
-              walletName: selected.name,
-              currencyName,
-              anAddressFormatted: formattedAddress,
-            };
-          })}
+          onExchangeCallback={() =>
+            this.props.actions.router.goToRoute.trigger({ route: ROUTES.EXCHANGE_END })
+          }
+          currentBalanceAda={
+            selected.balance.getDefault().shiftedBy(-numberOfDecimals)
+          }
+          receiveAdaAddress={receiveAdaAddress}
         />
       );
     }

@@ -99,14 +99,12 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
   const { wallets, tokenInfoStore, explorers, substores: { ada: { swapStore } } } = props.stores;
 
   const wallet = wallets.selectedOrFail;
-  const network = wallet.getParent().getNetworkInfo();
-  const walletVariant = wallet.getParent().getWalletVariant();
   const defaultTokenInfo = tokenInfoStore.getDefaultTokenInfoSummary(
-    network.NetworkId
+    wallet.networkId
   );
 
   const selectedExplorer =
-    explorers.selectedExplorer.get(network.NetworkId) ??
+    explorers.selectedExplorer.get(wallet.networkId) ??
     fail('No explorer for wallet network');
 
   const fetchTransactionTimestamps = txHashes => swapStore.fetchTransactionTimestamps({ wallet, txHashes });
@@ -167,7 +165,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
       });
       const totalCancelOutput = getTransactionTotalOutputFromCbor(
         cancelTxCbor,
-        wallet.getParent().getDefaultToken()
+        wallet.balance.getDefaults()
       );
       const formattedCancelValues = createFormattedTokenValues({
         entries: totalCancelOutput.entries().map(e => ({
@@ -332,7 +330,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
           getTokenInfo={genLookupOrFail(tokenInfoStore.tokenInfo)}
           selectedExplorer={selectedExplorer}
           submissionError={null}
-          walletType={walletVariant}
+          walletType={wallet.type}
           hwWalletError={null}
         />
       )}

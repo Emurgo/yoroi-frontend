@@ -78,14 +78,14 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
           networkId: publicDeriver.networkId,
           defaultTokenId: publicDeriver.defaultTokenId,
           currentEpoch: this.props.stores.substores.ada.time.getCurrentTimeRequests(
-            publicDeriver.publicDeriverId
+            publicDeriver
           ).currentEpoch,
           shouldHideBalance: this.props.stores.profile.shouldHideBalance,
           getLocalPoolInfo: this.props.stores.delegation.getLocalPoolInfo,
           tokenInfo: this.props.stores.tokenInfoStore.tokenInfo,
         })}
         isUnregistered={!this.props.stores.delegation.isStakeRegistered(publicDeriver.publicDeriverId)}
-        epochLength={this.getEpochLengthInDays(publicDeriver.publicDeriverId)}
+        epochLength={this.getEpochLengthInDays(publicDeriver)}
         ticker={truncateToken(
           getTokenName(
             this.props.stores.tokenInfoStore.getDefaultTokenInfo(publicDeriver.networkId)
@@ -102,8 +102,8 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
     );
   }
 
-  getEpochLengthInDays: (PublicDeriver<>) => ?number = publicDeriver => {
-    const timeCalcRequests = this.props.stores.substores.ada.time.getTimeCalcRequests(publicDeriver);
+  getEpochLengthInDays: ({ publicDeriverId: number, ... }) => ?number = (wallet) => {
+    const timeCalcRequests = this.props.stores.substores.ada.time.getTimeCalcRequests(wallet);
     const { currentEpochLength, currentSlotLength } = timeCalcRequests.requests;
     const epochLengthInSeconds = currentEpochLength() * currentSlotLength();
     return epochLengthInSeconds / (60 * 60 * 24);

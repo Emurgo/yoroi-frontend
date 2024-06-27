@@ -65,7 +65,7 @@ class StakingPageContent extends Component<AllProps> {
     }
   }
 
-  getEpochLengthInDays: (PublicDeriver<>) => ?number = publicDeriver => {
+  getEpochLengthInDays: ({ publicDeriverId: number, ...}) => ?number = publicDeriver => {
     const timeCalcRequests = this.props.stores.substores.ada.time.getTimeCalcRequests(publicDeriver);
     const { currentEpochLength, currentSlotLength } = timeCalcRequests.requests;
     const epochLengthInSeconds = currentEpochLength() * currentSlotLength();
@@ -86,14 +86,16 @@ class StakingPageContent extends Component<AllProps> {
     });
   };
 
-  getStakePoolMeta: (number, number) => Node = (publicDeriverId, networkId) => {
+  getStakePoolMeta: ({ publicDeriverId: number, networkId: number, ... }) => Node = (
+    publicDeriver
+  ) => {
     const delegationStore = this.props.stores.delegation;
-    const currentPool = delegationStore.getDelegatedPoolId(publicDeriverId);
+    const currentPool = delegationStore.getDelegatedPoolId(publicDeriver.publicDeriverId);
     if (currentPool == null) return null;
 
-    const poolMeta = delegationStore.getLocalPoolInfo(networkId, currentPool);
+    const poolMeta = delegationStore.getLocalPoolInfo(publicDeriver.networkId, currentPool);
     const { stake, roa, saturation, pic } =
-      delegationStore.getLocalRemotePoolInfo(networkId, currentPool) ?? {};
+      delegationStore.getLocalRemotePoolInfo(publicDeriver.networkId, currentPool) ?? {};
     if (poolMeta == null) {
       // server hasn't returned information about the stake pool yet
       return null;
@@ -124,7 +126,7 @@ class StakingPageContent extends Component<AllProps> {
     );
   };
 
-  getEpochProgress: (PublicDeriver<>) => Node | void = publicDeriver => {
+  getEpochProgress: ({ publicDeriverId: number, ... }) => Node | void = publicDeriver => {
     const timeCalcRequests = this.props.stores.substores.ada.time.getTimeCalcRequests(publicDeriver);
     const { toAbsoluteSlot, toRealTime, currentEpochLength } = timeCalcRequests.requests;
 
@@ -200,7 +202,7 @@ class StakingPageContent extends Component<AllProps> {
     const errorIfPresent = maybe(delegationRequests.error, error => ({ error }));
 
     const showRewardAmount =
-      errorIfPresent == null && stores.delegation.isExecutedDelegatedBalance(publicDeriverId);
+      errorIfPresent == null && stores.delegation.isExecutedDelegatedBalance(publicDeriver.publicDeriverId);
 
     const isStakeRegistered = stores.delegation.isStakeRegistered(publicDeriver.publicDeriverId);
     const currentlyDelegating = stores.delegation.isCurrentlyDelegating(publicDeriver.publicDeriverId);
@@ -250,7 +252,7 @@ class StakingPageContent extends Component<AllProps> {
               graphData={generateGraphData({
                 delegationRequests,
                 currentEpoch: stores.substores.ada.time.getCurrentTimeRequests(
-                  publicDeriver.publicDeriverId
+                  publicDeriver
                 ).currentEpoch,
                 shouldHideBalance: stores.profile.shouldHideBalance,
                 getLocalPoolInfo: stores.delegation.getLocalPoolInfo,
@@ -266,8 +268,8 @@ class StakingPageContent extends Component<AllProps> {
             />
             <RightCardsWrapper>
               {errorIfPresent}
-              {!errorIfPresent && this.getStakePoolMeta(publicDeriver.publicDeriverId, publicDeriver.networkId)}
-              {!errorIfPresent && this.getEpochProgress(publicDeriver.publicDeriverId)}
+              {!errorIfPresent && this.getStakePoolMeta(publicDeriver)}
+              {!errorIfPresent && this.getEpochProgress(publicDeriver)}
             </RightCardsWrapper>
           </WrapperCards>
         ) : null}
@@ -346,7 +348,7 @@ class StakingPageContent extends Component<AllProps> {
             graphData={generateGraphData({
               delegationRequests,
               currentEpoch: stores.substores.ada.time.getCurrentTimeRequests(
-                publicDeriver.publicDeriverId
+                publicDeriver
               ).currentEpoch,
               shouldHideBalance: stores.profile.shouldHideBalance,
               getLocalPoolInfo: stores.delegation.getLocalPoolInfo,

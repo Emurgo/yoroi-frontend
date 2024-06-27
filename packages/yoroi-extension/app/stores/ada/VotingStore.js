@@ -29,6 +29,7 @@ import { generateRegistration } from '../../api/ada/lib/cardanoCrypto/catalyst';
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet'
 import type { CatalystRoundInfoResponse } from '../../api/ada/lib/state-fetch/types'
 import { loadCatalystRoundInfo, saveCatalystRoundInfo, } from '../../api/localStorage';
+import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 import { derivePublicByAddressing } from '../../api/ada/lib/cardanoCrypto/deriveByAddressing';
 import type { WalletState } from '../../../chrome/extension/background/types';
 import { getPrivateStakingKey } from '../../api/thunk';

@@ -23,7 +23,7 @@ export type SidebarCategory = {|
   +label?: MessageDescriptor,
   +isVisible: ({|
     hasAnyWallets: boolean,
-    selected: ?number,
+    selected: ?{ publicDeriverId: number, ... },
     currentRoute: string,
   |}) => boolean,
 |};
@@ -86,12 +86,12 @@ export const CONNECTED_WEBSITES: SidebarCategory = registerCategory({
 
 type isVisibleFunc = ({|
   hasAnyWallets: boolean,
-  selected: ?number,
+  selected: ?{ publicDeriverId: number, isTestnet: boolean, ... },
   currentRoute: string,
   isRewardWallet: isRewardWalletFunc,
 |}) => boolean;
 
-type isRewardWalletFunc = (publicDeriverId: number) => boolean;
+type isRewardWalletFunc = ({ publicDeriverId: number, ... }) => boolean;
 
 export type SidebarCategoryRevamp = {|
   +className: string,
@@ -129,7 +129,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.SWAP.ROOT,
     icon: swapIcon,
     label: globalMessages.sidebarSwap,
-    isVisible: ({ selected }) => (environment.isDev() || environment.isNightly()) && !!selected?.isMainnet(),
+    isVisible: ({ selected }) => (environment.isDev() || environment.isNightly()) && !selected?.isTestnet,
   },
   {
     className: 'assets',

@@ -208,11 +208,7 @@ export const networks = Object.freeze({
 export function isTestnet(
   network: $ReadOnly<NetworkRow>,
 ): boolean {
-  return network.NetworkId === networks.CardanoTestnet.NetworkId
-    || network.NetworkId === networks.CardanoPreprodTestnet.NetworkId
-    || network.NetworkId === networks.CardanoPreviewTestnet.NetworkId
-    || network.NetworkId === networks.CardanoSanchoTestnet.NetworkId;
-
+  return network.NetworkId !== networks.CardanoMainnet.NetworkId;
 }
 
 // <TODO:PENDING_REMOVAL> LEGACY

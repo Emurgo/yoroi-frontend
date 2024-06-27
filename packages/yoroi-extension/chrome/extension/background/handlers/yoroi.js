@@ -147,6 +147,7 @@ import {
   getSelectedExplorer,
   saveSelectedExplorer,
 } from '../../../../app/api/ada/lib/storage/bridge/explorers';
+import { transactionHexToHash } from '../../../../app/api/ada/lib/cardanoCrypto/utils';
 
 const YOROI_MESSAGES = Object.freeze({
   CONNECT_RESPONSE: 'connect_response',
@@ -935,19 +936,36 @@ export async function yoroiMessageHandler(
       sendResponse({ error: 'no public dervier'});
       return;
     }
+    let txs;
+    let addressedUtxoArray;
+    if (request.request.signedTxHexArray) {
+      txs = request.request.signedTxHexArray.map(txHex => ({
+        id: transactionHexToHash(txHex),
+        encodedTx: hexToBytes(txHex),
+      }));
+      addressedUtxoArray = [];
+    } else {
+      txs = [{
+        id: transactionHexToHash(request.request.signedTxHex),
+        encodedTx: hexToBytes(request.request.signedTxHex)
+      }];
+      addressedUtxoArray = [request.request.addressedUtxos];
+    }
+
     const stateFetcher = await getCardanoStateFetcher(new LocalStorageApi());
     try {
       await stateFetcher.sendTx({
         network: publicDeriver.getParent().getNetworkInfo(),
-        id: '', // we know this is not important
-        encodedTx: Buffer.from(request.request.signedTxHex, 'hex'),
+        txs,
       });
       try {
-        await RustModule.WasmScope(Scope => connectorRecordSubmittedCardanoTransaction(
-          publicDeriver,
-          Scope.WalletV4.Transaction.from_hex(request.request.signedTxHex),
-          request.request.addressedUtxos,
-        ));
+        for (let i = 0; i < txs.length; i++) {
+          await RustModule.WasmScope(Scope => connectorRecordSubmittedCardanoTransaction(
+            publicDeriver,
+            Scope.WalletV4.Transaction.from_bytes(txs[i].encodedTx),
+            addressedUtxoArray[i]
+          ));
+        }
       } catch (_error) {
         // ignore
       }

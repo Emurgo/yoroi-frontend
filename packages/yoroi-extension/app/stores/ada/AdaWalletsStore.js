@@ -14,6 +14,7 @@ import { asGetAllUtxos } from '../../api/ada/lib/storage/models/PublicDeriver/tr
 import { fail, first, sorted } from '../../coreUtils';
 import type { QueriedUtxo } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import BigNumber from 'bignumber.js';
+import type{ WalletState } from '../../../chrome/extension/background/types';
 
 const MAX_PICKED_COLLATERAL_UTXO_ADA = 10_000_000; // 10 ADA
 
@@ -184,7 +185,7 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
   };
 
   pickCollateralUtxo: ({| wallet: WalletState |}) => Promise<?QueriedUtxo> = async ({ wallet }) => {
-    const {allUtxos } = wallet;
+    const allUtxos = wallet.utxos;
     if (allUtxos.length === 0) {
       fail('Cannot pick a collateral utxo! No utxo available at all in the wallet!');
     }

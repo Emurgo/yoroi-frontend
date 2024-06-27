@@ -13,36 +13,6 @@ export function v4PublicToV2(
   return RustModule.WalletV2.PublicKey.from_hex(Buffer.from(v4Key.as_bytes()).toString('hex'));
 }
 
-export async function isWalletExist(
-  wallets: Array<WalletState>,
-  recoveryPhrase: string,
-  accountIndex: number,
-  selectedNetwork: $ReadOnly<NetworkRow>
-): Promise<WalletState | void> {
-  const rootPk = cardanoGenerateWalletRootKey(recoveryPhrase);
-  const accountPublicKey = rootPk
-    .derive(WalletTypePurpose.CIP1852)
-    .derive(CoinTypes.CARDANO)
-    .derive(accountIndex)
-    .to_public();
-  const publicKey = Buffer.from(accountPublicKey.as_bytes()).toString('hex');
-
-  for (const wallet of wallets) {
-    const existedPublicKey = wallet.publicKey;
-    const walletNetworkId = wallet.networkId
-    /**
-     * We will still allow to restore the wallet on a different networks even they are
-     * sharing the same recovery phrase but we are treating them differently
-     */
-    if (
-      publicKey === existedPublicKey &&
-      walletNetworkId === selectedNetwork.NetworkId
-    ) {
-      return wallet;
-    }
-  }
-}
-
 export function addressHexToBech32(hex: string): string {
   return RustModule.WasmScope(Module =>
     Module.WalletV4.Address.from_hex(hex).to_bech32());

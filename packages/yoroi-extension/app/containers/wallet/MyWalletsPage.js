@@ -2,15 +2,12 @@
 import type { Node, ComponentType } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { StoresAndActionsProps } from '../../types/injectedProps.types';
-import type { WalletInfo } from '../../components/buySell/BuySellDialog';
 import type { LayoutComponentMap } from '../../styles/context/layout';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import { ROUTES } from '../../routes-config';
-import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { genLookupOrFail, getTokenName } from '../../stores/stateless/tokenHelpers';
-import { getReceiveAddress } from '../../stores/stateless/addressStores';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import { networks, getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { withLayout } from '../../styles/context/layout';
@@ -119,16 +116,6 @@ class MyWalletsPage extends Component<AllProps> {
 
     const walletsList = <Box flex={1}>{wallets.map(wallet => this.generateRow(wallet))}</Box>;
 
-    let activeDialog = null;
-    if (uiDialogs.isOpen(BuySellDialog)) {
-      activeDialog = (
-        <BuySellDialog
-          onCancel={this.onClose}
-          walletList={this.generateUnusedAddressesPerWallet(wallets)}
-        />
-      );
-    }
-
     return (
       <TopBarLayout
         banner={<BannerContainer actions={actions} stores={stores} />}
@@ -140,40 +127,6 @@ class MyWalletsPage extends Component<AllProps> {
       </TopBarLayout>
     );
   }
-
-  generateUnusedAddressesPerWallet: (Array<WalletState>) => Array<WalletInfo> = (
-    wallets
-  ) => {
-    const infoWallets = wallets.map((wallet) => {
-      // Currency Name
-      const defaultToken = this.props.stores.tokenInfoStore.getDefaultTokenInfo(
-        wallet.networkId
-      );
-      const currencyName = getTokenName(defaultToken);
-
-      if (defaultToken.NetworkId !== networks.CardanoMainnet.NetworkId) {
-        return null;
-      }
-
-      const { receiveAddress } = wallet;
-
-      const anAddressFormatted = addressToDisplayString(
-        receiveAddress.addr.Hash,
-        getNetworkById(wallet.networkId),
-      );
-
-      return {
-        walletName: wallet.name,
-        currencyName,
-        anAddressFormatted,
-      };
-    });
-    return infoWallets.reduce((acc, next) => {
-      if (next == null) return acc;
-      acc.push(next);
-      return acc;
-    }, []);
-  };
 
   generateRow: (WalletState) => Node = wallet => {
     const walletSumCurrencies = (() => {

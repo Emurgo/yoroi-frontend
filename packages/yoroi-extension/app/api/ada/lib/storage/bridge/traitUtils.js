@@ -192,7 +192,7 @@ export async function getAddressRowsForWallet(
   request: {|
     publicDeriver: IPublicDeriver<ConceptualWallet>,
   |},
-): Promise<Array<$ReadOnly<AddressRow>>> {
+): Promise<Array<$ReadOnly<AddressRowWithPath>>> {
   const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
   const derivationTables = withLevels == null
     ? new Map()
@@ -230,8 +230,8 @@ export async function getAddressRowsForWallet(
 export async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Promise<string[]> {
   const addresses = await getAddressRowsForWallet({ publicDeriver: wallet });
   return addresses
-    .filter(a => a.IsUsed === usedFilter && a.Type === CoreAddressTypes.CARDANO_BASE)
-    .map(a => a.Hash);
+    .filter(a => a.address.IsUsed === usedFilter && a.address.Type === CoreAddressTypes.CARDANO_BASE)
+    .map(a => a.address.Hash);
 }
 
 export async function getAllUsedAddresses(

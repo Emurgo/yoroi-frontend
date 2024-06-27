@@ -137,7 +137,7 @@ class Wallet extends Component<AllProps> {
     if (publicDeriver == null) {
       throw new Error(`${nameof(Wallet)} no public deriver. Should never happen`);
     }
-    const currentPool = this.props.stores.delegation.getDelegatedPoolId(publicDeriver);
+    const currentPool = this.props.stores.delegation.getDelegatedPoolId(publicDeriver.publicDeriverId);
 
     const visibilityContext = {
       selected: selectedWallet.publicDeriverId,
