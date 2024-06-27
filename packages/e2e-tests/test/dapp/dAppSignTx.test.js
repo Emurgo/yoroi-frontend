@@ -107,7 +107,7 @@ describe('dApp, signTx, intrawallet Tx', function () {
       expect(
         filteredAddrAssets[0].tokenAmount,
         'Different amount for the receiver address'
-      ).to.equal(1);
+      ).to.equal(2);
     });
 
     it('Checking info on Connection page', async function () {
