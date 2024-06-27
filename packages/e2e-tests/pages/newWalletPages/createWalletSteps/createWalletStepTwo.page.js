@@ -1,3 +1,4 @@
+import { fiveSeconds, quarterSecond } from '../../../helpers/timeConstants.js';
 import AddWalletBase from '../addWalletBase.page.js';
 
 class CreateWalletStepTwo extends AddWalletBase {
@@ -37,9 +38,24 @@ class CreateWalletStepTwo extends AddWalletBase {
   }
   async closeTipsModalWindow() {
     this.logger.info(`CreateWalletStepTwo::closeTipsModalWindow is called`);
-    await this.waitForElement(this.tipsModalLocator);
-    await this.waitForElement(this.tipModalContinueButtonLocator);
-    await this.click(this.tipModalContinueButtonLocator);
+    const tipsModalState = await this.customWaitIsPresented(
+      this.tipsModalLocator,
+      fiveSeconds,
+      quarterSecond
+    );
+    if (!tipsModalState) {
+      throw new Error('The tips modal is not presented');
+    }
+    const continueBtnState = await this.customWaitIsPresented(
+      this.tipModalContinueButtonLocator,
+      fiveSeconds,
+      quarterSecond
+    );
+    if (continueBtnState) {
+      await this.click(this.tipModalContinueButtonLocator);
+    } else {
+      throw new Error('The Continue button on the tips modal is not found');
+    }
   }
   async recoveryPhraseIsBlurred() {
     this.logger.info(`CreateWalletStepTwo::recoveryPhraseIsBlurred is called`);
