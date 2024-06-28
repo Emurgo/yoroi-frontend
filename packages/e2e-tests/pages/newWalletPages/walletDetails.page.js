@@ -54,17 +54,15 @@ class WalletDetails extends AddWalletBase {
   //
   async closeTipsModalWindow() {
     this.logger.info(`WalletDetails::closeTipsModalWindow is called`);
-    await this.waitForElement(this.tipsModalLocator);
-    const buttonIsPresented = await this.customWaitIsPresented(
-      this.tipModalContinueButtonLocator,
-      fiveSeconds,
-      quarterSecond
+    await this.waitPresentedAndAct(
+      this.tipsModalLocator,
+      async () => {
+        await this.waitPresentedAndAct(
+          this.tipModalContinueButtonLocator,
+          async () => await this.click(this.tipModalContinueButtonLocator)
+        )
+      }
     );
-    if (buttonIsPresented) {
-      await this.click(this.tipModalContinueButtonLocator);
-    } else {
-      throw new Error('New wallet -> Details page -> Tips modal -> The continue button is not found.');
-    }
   }
   async enterWalletName(walletName) {
     this.logger.info(`WalletDetails::enterWalletName is called`);
