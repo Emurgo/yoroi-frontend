@@ -123,50 +123,32 @@ class WalletCommonBase extends BasePage {
   // functions
   async getSelectedWalletInfo() {
     this.logger.info(`WalletCommonBase::getSelectedWalletInfo is called`);
-    let walletName = '';
-    let walletPlate = '';
-    let adaBalance = 0;
-    let fiatBalance = 0;
-    let fiatBalanceStr = '';
-    let fiatCurrency = '';
 
-    await this.waitForElement(this.walletNameAndPlateNumberTextLocator);
-    const walletNavPanelState = await this.customWaitIsPresented(
+    const [walletName, walletPlate] = await this.waitPresentedAndAct(
       this.walletNameAndPlateNumberTextLocator,
-      fiveSeconds,
-      quarterSecond
+      async () => {
+        const rawNameAndPlateText = await this.getText(this.walletNameAndPlateNumberTextLocator);
+        return rawNameAndPlateText.split('\n');
+      }
     );
-    if (walletNavPanelState) {
-      const rawNameAndPlateText = await this.getText(this.walletNameAndPlateNumberTextLocator);
-      [walletName, walletPlate] = rawNameAndPlateText.split('\n');
-    } else {
-      throw new Error('Wallet navigation panel is not found');
-    }
 
-    const walletBalanceState = await this.customWaitIsPresented(
+    const adaBalance = await this.waitPresentedAndAct(
       this.walletBalanceTextLocator,
-      fiveSeconds,
-      quarterSecond
+      async () => {
+        const rawBalanceText = await this.getText(this.walletBalanceTextLocator);
+        return Number(rawBalanceText.split(' ')[0]);
+      }
     );
-    if (walletBalanceState) {
-      const rawBalanceText = await this.getText(this.walletBalanceTextLocator);
-      adaBalance = Number(rawBalanceText.split(' ')[0]);
-    } else {
-      throw new Error('Wallet balance is not found');
-    }
 
-    const walletFiatBalanceState = await this.customWaitIsPresented(
+    const [fiatBalance, fiatCurrency] = await this.waitPresentedAndAct(
       this.walletFiatBalanceTextLocator,
-      fiveSeconds,
-      quarterSecond
+      async () => {
+        const rawFiatBalanceText = await this.getText(this.walletFiatBalanceTextLocator);
+        const [fiatBalanceStr, fiatCurrencyInner] = rawFiatBalanceText.split(' ');
+        const fiatBalanceInner = fiatBalanceStr === '-' ? 0 : Number(fiatBalanceStr);
+        return [fiatBalanceInner, fiatCurrencyInner];
+      }
     );
-    if (walletFiatBalanceState) {
-      const rawFiatBalanceText = await this.getText(this.walletFiatBalanceTextLocator);
-      [fiatBalanceStr, fiatCurrency] = rawFiatBalanceText.split(' ');
-      fiatBalance = fiatBalanceStr === '-' ? 0 : Number(fiatBalanceStr);
-    } else {
-      throw new Error('Wallet fiat balance is not found');
-    }
 
     const walletInfo = {
       name: walletName,
