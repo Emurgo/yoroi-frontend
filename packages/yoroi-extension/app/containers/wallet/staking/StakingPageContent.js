@@ -35,16 +35,12 @@ import WithdrawRewardsDialog from './WithdrawRewardsDialog';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
-type Props = {|
-  ...StoresAndActionsProps,
-  actions: any,
-  stores: any,
-|};
+
 type InjectedLayoutProps = {|
   +renderLayoutComponent: LayoutComponentMap => Node,
 |};
 
-type AllProps = {| ...Props, ...InjectedLayoutProps |};
+type AllProps = {| ...StoresAndActionsProps, ...InjectedLayoutProps |};
 @observer
 class StakingPageContent extends Component<AllProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
@@ -63,7 +59,7 @@ class StakingPageContent extends Component<AllProps> {
 
     if (this.props.stores.delegation.getPoolTransitionConfig(publicDeriver).shouldUpdatePool) {
       const poolTransitionInfo = this.props.stores.delegation.getPoolTransitionInfo(publicDeriver);
-      if (poolTransitionInfo) {
+      if (poolTransitionInfo?.suggestedPool) {
         this.props.stores.delegation.delegateToSpecificPool(poolTransitionInfo.suggestedPool.hash);
         noop(this.props.stores.delegation.createDelegationTransaction());
       }
@@ -245,7 +241,7 @@ class StakingPageContent extends Component<AllProps> {
                 if (!showRewardAmount) return undefined;
                 return currentlyDelegating
                   ? maybe(delegatedUtxo, w => delegatedRewards.joinAddCopy(w))
-                  : publicDeriver.getDefaultMultiToken();
+                  : maybe(publicDeriver, w => w.getParent().getDefaultMultiToken());
               })()}
               graphData={generateGraphData({
                 publicDeriver,
@@ -363,7 +359,7 @@ class StakingPageContent extends Component<AllProps> {
     );
   }
 }
-export default (withLayout(StakingPageContent): ComponentType<Props>);
+export default (withLayout(StakingPageContent): ComponentType<StoresAndActionsProps>);
 
 const WrapperCards = styled(Box)({
   display: 'flex',
