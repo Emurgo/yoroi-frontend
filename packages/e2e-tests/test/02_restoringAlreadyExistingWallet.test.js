@@ -17,10 +17,9 @@ describe('Restoring already existing wallet', function () {
   let webdriver = null;
   let logger = null;
 
-  before(function (done) {
+  before(function () {
     webdriver = driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    done();
   });
 
   it('Restore a 15-word wallet', async function () {

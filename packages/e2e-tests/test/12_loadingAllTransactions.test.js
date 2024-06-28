@@ -15,10 +15,9 @@ describe('Show more txs 5 times', function () {
   let webdriver = null;
   let logger = null;
 
-  before(function (done) {
+  before(function () {
     webdriver = driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    done();
   });
 
   it(`Restore a 15-word test wallet ${testWallet.name}`, async function () {

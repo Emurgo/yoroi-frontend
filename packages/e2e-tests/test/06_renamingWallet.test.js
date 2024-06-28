@@ -16,10 +16,9 @@ describe('Renaming the wallet', function () {
   let logger = null;
   const newWalletName = 'newWalletName';
 
-  before(function (done) {
+  before(function () {
     webdriver = driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    done();
   });
 
   it('Prepare DB and storages', async function () {

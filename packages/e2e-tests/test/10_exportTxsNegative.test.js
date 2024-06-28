@@ -19,11 +19,10 @@ describe('Export transactions, negative cases', function () {
   let webdriver = null;
   let logger = null;
 
-  before(function (done) {
+  before(function () {
     webdriver = driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
     cleanDownloads();
-    done();
   });
 
   it('Prepare DB and storages', async function () {

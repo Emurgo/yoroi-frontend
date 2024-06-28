@@ -22,7 +22,7 @@ describe('dApp, CIP-95, signData', function () {
   let mockServer = null;
   let mockedDApp = null;
 
-  before(function (done) {
+  before(function () {
     webdriver = driversPoolsManager.getDriverFromPool();
     mockServer = getMockServer({});
     const wmLogger = getTestLogger('windowManager', this.test.parent.title);
@@ -31,7 +31,6 @@ describe('dApp, CIP-95, signData', function () {
     const dappLogger = getTestLogger('dApp', this.test.parent.title);
     mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
     logger = getTestLogger(this.test.parent.title);
-    done();
   });
 
   it('Restore a 15-word wallet', async function () {

@@ -15,10 +15,9 @@ describe('Generating a max amount of addresses', function () {
   let webdriver = null;
   let logger = null;
 
-  before(function (done) {
+  before(function () {
     webdriver = driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    done();
   });
 
   it('Create a 15-word wallet', async function () {

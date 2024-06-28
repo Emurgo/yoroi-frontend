@@ -15,10 +15,9 @@ describe('Changing fiat currencies', function () {
   let logger = null;
   let prices = {};
 
-  before(function (done) {
+  before(function () {
     webdriver = driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    done();
   });
 
   const testData = ['BRL', 'ETH', 'BTC', 'KRW', 'CNY', 'EUR', 'JPY', 'USD', 'ADA'];

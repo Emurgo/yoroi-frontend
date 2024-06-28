@@ -16,10 +16,9 @@ describe('Editing a memo', function () {
   const oldMemo = 'j1hKEo4Er4FDLFAtGBo07jIcXBSOqx9D16U0sUIl';
   const newMemoMessage = getTestString('', 40, true);
 
-  before(function (done) {
+  before(function () {
     webdriver = driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    done();
   });
 
   it('Prepare DB and storages', async function () {

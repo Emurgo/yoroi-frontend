@@ -17,10 +17,9 @@ describe('Comparing balances on the top plate and on addresses', function () {
   let topPlateBalance = 0;
   let balanceOnAddrs = 0;
 
-  before(function (done) {
+  before(function () {
     webdriver = driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    done();
   });
 
   it('Restore a 15-word wallet', async function () {

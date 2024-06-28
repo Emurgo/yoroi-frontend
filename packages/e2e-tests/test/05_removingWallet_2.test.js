@@ -17,10 +17,9 @@ describe('Removing the first wallet, two wallets is added', function () {
   let webdriver = null;
   let logger = null;
 
-  before(function (done) {
+  before(function () {
     webdriver = driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    done();
   });
 
   it('Prepare DB and storages', async function () {
