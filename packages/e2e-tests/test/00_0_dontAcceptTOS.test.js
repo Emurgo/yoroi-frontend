@@ -11,12 +11,11 @@ describe("Can't proceed without accepting the ToS", function () {
   let webdriver = null;
   let logger = null;
 
-  before(function (done) {
+  before(function () {
     webdriver = getDriver();
     logger = getTestLogger(this.test.parent.title);
     const basePage = new BasePage(webdriver, logger);
     basePage.goToExtension();
-    done();
   });
 
   it('Checking the continue button', async function () {

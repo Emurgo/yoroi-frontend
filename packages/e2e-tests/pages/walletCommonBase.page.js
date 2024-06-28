@@ -1,4 +1,11 @@
-import { halfSecond, oneMinute, oneSecond, defaultWaitTimeout } from '../helpers/timeConstants.js';
+import {
+  defaultWaitTimeout,
+  fiveSeconds,
+  halfSecond,
+  oneMinute,
+  oneSecond,
+  quarterSecond,
+} from '../helpers/timeConstants.js';
 import BasePage from './basepage.js';
 
 class WalletCommonBase extends BasePage {
@@ -117,18 +124,31 @@ class WalletCommonBase extends BasePage {
   async getSelectedWalletInfo() {
     this.logger.info(`WalletCommonBase::getSelectedWalletInfo is called`);
 
-    await this.waitForElement(this.walletNameAndPlateNumberTextLocator);
-    const rawNameAndPlateText = await this.getText(this.walletNameAndPlateNumberTextLocator);
-    const [walletName, walletPlate] = rawNameAndPlateText.split('\n');
+    const [walletName, walletPlate] = await this.waitPresentedAndAct(
+      this.walletNameAndPlateNumberTextLocator,
+      async () => {
+        const rawNameAndPlateText = await this.getText(this.walletNameAndPlateNumberTextLocator);
+        return rawNameAndPlateText.split('\n');
+      }
+    );
 
-    const walletBalanceElem = await this.waitForElement(this.walletBalanceTextLocator);
-    const rawBalanceText = await walletBalanceElem.getText();
-    const adaBalance = Number(rawBalanceText.split(' ')[0]);
+    const adaBalance = await this.waitPresentedAndAct(
+      this.walletBalanceTextLocator,
+      async () => {
+        const rawBalanceText = await this.getText(this.walletBalanceTextLocator);
+        return Number(rawBalanceText.split(' ')[0]);
+      }
+    );
 
-    const walletFiatBalanceElem = await this.waitForElement(this.walletFiatBalanceTextLocator);
-    const rawFiatBalanceText = await walletFiatBalanceElem.getText();
-    const [fiatBalanceStr, fiatCurrency] = rawFiatBalanceText.split(' ');
-    const fiatBalance = fiatBalanceStr === '-' ? 0 : Number(fiatBalanceStr);
+    const [fiatBalance, fiatCurrency] = await this.waitPresentedAndAct(
+      this.walletFiatBalanceTextLocator,
+      async () => {
+        const rawFiatBalanceText = await this.getText(this.walletFiatBalanceTextLocator);
+        const [fiatBalanceStr, fiatCurrencyInner] = rawFiatBalanceText.split(' ');
+        const fiatBalanceInner = fiatBalanceStr === '-' ? 0 : Number(fiatBalanceStr);
+        return [fiatBalanceInner, fiatCurrencyInner];
+      }
+    );
 
     const walletInfo = {
       name: walletName,

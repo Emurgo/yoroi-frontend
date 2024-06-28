@@ -80,11 +80,11 @@ class DriversManager {
     Promise.all(prepExtPromisesArr);
   }
 
-  getDriverFromPool() {
+  async getDriverFromPool() {
     const driverObject = poolOfDrivers.shift();
     this.logger.info(`DriversManager::getDriverFromPool Returning driver ${driverObject.driverId}`);
     const newDriverObject = this.addNewDriverToPool();
-    this.prepareExtension(newDriverObject);
+    await this.prepareExtension(newDriverObject);
 
     return driverObject.driver;
   }

@@ -15,10 +15,9 @@ describe('Adding a memo to a completed Tx', function () {
   let logger = null;
   const testMemoMessage = getTestString('', 40, true);
 
-  before(function (done) {
-    webdriver = driversPoolsManager.getDriverFromPool();
+  before(async function () {
+    webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    done();
   });
 
   it('Prepare DB and storages', async function () {

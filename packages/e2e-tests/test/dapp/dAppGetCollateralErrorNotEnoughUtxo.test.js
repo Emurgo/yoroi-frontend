@@ -26,8 +26,8 @@ describe('dApp, getCollateral, error, empty wallet, not auth', function () {
   let mockServer = null;
   let mockedDApp = null;
 
-  before(function (done) {
-    webdriver = driversPoolsManager.getDriverFromPool();
+  before(async function () {
+    webdriver = await driversPoolsManager.getDriverFromPool();
     mockServer = getMockServer({});
     const wmLogger = getTestLogger('windowManager', this.test.parent.title);
     windowManager = new WindowManager(webdriver, wmLogger);
@@ -37,7 +37,6 @@ describe('dApp, getCollateral, error, empty wallet, not auth', function () {
     logger = getTestLogger(this.test.parent.title);
     const basePage = new BasePage(webdriver, logger);
     basePage.goToExtension();
-    done();
   });
 
   it('Create an empty wallet', async function () {
