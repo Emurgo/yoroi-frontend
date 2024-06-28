@@ -20,8 +20,8 @@ describe('dApp, general functions, without pop-up', function () {
   let mockServer = null;
   let mockedDApp = null;
 
-  before(function () {
-    webdriver = driversPoolsManager.getDriverFromPool();
+  before(async function () {
+    webdriver = await driversPoolsManager.getDriverFromPool();
     mockServer = getMockServer({});
     const wmLogger = getTestLogger('windowManager', this.test.parent.title);
     windowManager = new WindowManager(webdriver, wmLogger);

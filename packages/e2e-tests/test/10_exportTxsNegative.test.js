@@ -19,8 +19,8 @@ describe('Export transactions, negative cases', function () {
   let webdriver = null;
   let logger = null;
 
-  before(function () {
-    webdriver = driversPoolsManager.getDriverFromPool();
+  before(async function () {
+    webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
     cleanDownloads();
   });

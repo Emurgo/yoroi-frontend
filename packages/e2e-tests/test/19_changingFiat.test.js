@@ -15,8 +15,8 @@ describe('Changing fiat currencies', function () {
   let logger = null;
   let prices = {};
 
-  before(function () {
-    webdriver = driversPoolsManager.getDriverFromPool();
+  before(async function () {
+    webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
   });
 

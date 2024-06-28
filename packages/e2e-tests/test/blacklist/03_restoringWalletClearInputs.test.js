@@ -18,8 +18,8 @@ describe('Restoring 15-wallet, clear input and restore other 15-wallet', functio
   let webdriver = null;
   let logger = null;
 
-  before(function () {
-    webdriver = driversPoolsManager.getDriverFromPool();
+  before(async function () {
+    webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
   });
 

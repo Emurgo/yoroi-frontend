@@ -17,8 +17,8 @@ describe('Comparing balances on the top plate and on addresses', function () {
   let topPlateBalance = 0;
   let balanceOnAddrs = 0;
 
-  before(function () {
-    webdriver = driversPoolsManager.getDriverFromPool();
+  before(async function () {
+    webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
   });
 

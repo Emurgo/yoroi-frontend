@@ -26,8 +26,8 @@ describe('dApp, signTx, intrawallet Tx', function () {
   const testWallet = getSpendableWallet();
   const adaAmount = 2;
 
-  before(function () {
-    webdriver = driversPoolsManager.getDriverFromPool();
+  before(async function () {
+    webdriver = await driversPoolsManager.getDriverFromPool();
     mockServer = getMockServer({});
     const wmLogger = getTestLogger('windowManager', this.test.parent.title);
     windowManager = new WindowManager(webdriver, wmLogger);
