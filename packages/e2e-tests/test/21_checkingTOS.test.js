@@ -14,10 +14,9 @@ describe('Checking Term Of Service Agreement', function () {
   let webdriver = null;
   let logger = null;
 
-  before(function (done) {
-    webdriver = driversPoolsManager.getDriverFromPool();
+  before(async function () {
+    webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    done();
   });
 
   it('Prepare DB and storages', async function () {

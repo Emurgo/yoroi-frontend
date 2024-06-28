@@ -27,7 +27,7 @@ describe('dApp, connection, no wallets', function () {
   let mockServer = null;
   let mockedDApp = null;
 
-  before(function (done) {
+  before(function () {
     webdriver = getDriver();
     mockServer = getMockServer({});
     const wmLogger = getTestLogger('windowManager', this.test.parent.title);
@@ -39,7 +39,6 @@ describe('dApp, connection, no wallets', function () {
     const basePage = new BasePage(webdriver, logger);
     // first open the dapp page
     basePage.goToUrl(mockDAppUrl);
-    done();
   });
 
   it('Request connection', async function () {

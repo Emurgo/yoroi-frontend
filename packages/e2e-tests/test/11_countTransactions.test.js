@@ -25,10 +25,9 @@ for (const testDatum of testData) {
     let webdriver = null;
     let logger = null;
 
-    before(function (done) {
-      webdriver = driversPoolsManager.getDriverFromPool();
+    before(async function () {
+      webdriver = await driversPoolsManager.getDriverFromPool();
       logger = getTestLogger(this.test.parent.title);
-      done();
     });
 
     it(`Restore a 15-word test wallet ${testDatum.testWallet.name}`, async function () {

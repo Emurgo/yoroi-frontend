@@ -162,13 +162,10 @@ export class TransactionsSubTab extends WalletTab {
   // methods
   async isDisplayed() {
     this.logger.info(`TransactionsSubTab::isDisplayed is called`);
-    try {
-      await this.waitForElement(this.transactionsSubmenuItemLocator);
-      await this.waitForElement(this.walletSummaryBoxLocator);
-      return true;
-    } catch (error) {
-      return false;
-    }
+      const submenuState = await this.customWaitIsPresented(this.transactionsSubmenuItemLocator, fiveSeconds, quarterSecond);
+      const summaryState = await this.customWaitIsPresented(this.walletSummaryBoxLocator, fiveSeconds, quarterSecond);
+      
+      return submenuState && summaryState;
   }
   async isWalletEmpty() {
     this.logger.info(`TransactionsSubTab::isWalletEmpty is called`);
@@ -307,29 +304,31 @@ export class TransactionsSubTab extends WalletTab {
   }
   async showMoreBtnIsDisplayed() {
     this.logger.info(`TransactionsSubTab::showMoreBtnIsDisplayed is called`);
-    await this.driver.manage().setTimeouts({ implicit: twoSeconds });
-    try {
-      await (await this.findElement(this.showMoreTxsButtonLocator)).isDisplayed();
+    const state = await this.customWaitIsPresented(
+      this.showMoreTxsButtonLocator,
+      twoSeconds,
+      quarterSecond
+    );
+    if (state) {
       this.logger.info(`TransactionsSubTab::showMoreBtnIsDisplayed is displayed`);
-      await this.driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
       return true;
-    } catch (error) {
+    } else {
       this.logger.warn(`TransactionsSubTab::showMoreBtnIsDisplayed is not displayed`);
-      await this.driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
       return false;
     }
   }
   async loaderIsDisplayed() {
     this.logger.info(`TransactionsSubTab::loaderIsDisplayed is called`);
-    await this.driver.manage().setTimeouts({ implicit: twoSeconds });
-    try {
-      await (await this.findElement(this.txsLoaderSpinnerLocator)).isDisplayed();
+    const state = await this.customWaitIsPresented(
+      this.txsLoaderSpinnerLocator,
+      twoSeconds,
+      quarterSecond
+    );
+    if (state) {
       this.logger.info(`TransactionsSubTab::loaderIsDisplayed is displayed`);
-      await this.driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
       return true;
-    } catch (error) {
+    } else {
       this.logger.warn(`TransactionsSubTab::loaderIsDisplayed is not displayed`);
-      await this.driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
       return false;
     }
   }
