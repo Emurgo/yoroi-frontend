@@ -29,16 +29,27 @@ import Wallet from './containers/wallet/Wallet';
 import RestoreWalletPage, { RestoreWalletPagePromise } from './containers/wallet/restore/RestoreWalletPage';
 
 // New UI pages
+// $FlowIgnore: suppressing this error
 import { createCurrrentWalletInfo } from './UI/features/governace/common/helpers';
+// $FlowIgnore: suppressing this error
 import { GovernanceContextProvider } from './UI/features/governace/module/GovernanceContextProvider';
+// $FlowIgnore: suppressing this error
 import { PortfolioContextProvider } from './UI/features/portfolio/module/PortfolioContextProvider';
+// $FlowIgnore: suppressing this error
 import GovernanceDelegationFormPage from './UI/pages/Governance/GovernanceDelegationFormPage';
+// $FlowIgnore: suppressing this error
 import GovernanceStatusPage from './UI/pages/Governance/GovernanceStatusPage';
+// $FlowIgnore: suppressing this error
 import GovernanceTransactionFailedPage from './UI/pages/Governance/GovernanceTransactionFailedPage';
+// $FlowIgnore: suppressing this error
 import GovernanceTransactionSubmittedPage from './UI/pages/Governance/GovernanceTransactionSubmittedPage';
+// $FlowIgnore: suppressing this error
 import PortfolioDappsPage from './UI/pages/portfolio/PortfolioDappsPage';
+// $FlowIgnore: suppressing this error
 import PortfolioDetailPage from './UI/pages/portfolio/PortfolioDetailPage';
+// $FlowIgnore: suppressing this error
 import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
+// $FlowIgnore: suppressing this error
 
 // PAGES
 const LanguageSelectionPagePromise = () => import('./containers/profile/LanguageSelectionPage');
