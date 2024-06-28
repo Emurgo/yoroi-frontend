@@ -207,7 +207,7 @@
     "react-intl": "2.9.0",
     "react-markdown": "5.0.3",
     "react-query": "^3.39.3",
-    "react-router": "5.2.0",
+    "react-router": "6.24.0",
     "react-router-dom": "5.2.0",
     "recharts": "1.8.5",
     "semver": "7.6.0",
