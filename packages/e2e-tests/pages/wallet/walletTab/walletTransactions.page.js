@@ -162,13 +162,10 @@ export class TransactionsSubTab extends WalletTab {
   // methods
   async isDisplayed() {
     this.logger.info(`TransactionsSubTab::isDisplayed is called`);
-    try {
-      await this.waitForElement(this.transactionsSubmenuItemLocator);
-      await this.waitForElement(this.walletSummaryBoxLocator);
-      return true;
-    } catch (error) {
-      return false;
-    }
+      const submenuState = await this.customWaitIsPresented(this.transactionsSubmenuItemLocator, fiveSeconds, quarterSecond);
+      const summaryState = await this.customWaitIsPresented(this.walletSummaryBoxLocator, fiveSeconds, quarterSecond);
+      
+      return submenuState && summaryState;
   }
   async isWalletEmpty() {
     this.logger.info(`TransactionsSubTab::isWalletEmpty is called`);
