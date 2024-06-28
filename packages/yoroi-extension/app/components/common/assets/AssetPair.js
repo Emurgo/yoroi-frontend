@@ -3,6 +3,8 @@ import { Box } from '@mui/material';
 import adaTokenImage from '../../../assets/images/ada.inline.svg';
 import defaultTokenImage from '../../../assets/images/revamp/token-default.inline.svg';
 import { urlResolveForIpfsAndCorsproxy } from '../../../coreUtils';
+import type { AssetAmount } from '../../swap/types';
+import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 
 type Props = {|
   from: AssetAmount,

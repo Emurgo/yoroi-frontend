@@ -19,6 +19,9 @@ import { InfoTooltip } from '../../../components/widgets/InfoTooltip';
 import { useSwapForm } from '../context/swap-form';
 import { useSwapFeeDisplay } from '../hooks';
 import SwapPoolFullInfo from './edit-pool/PoolFullInfo';
+import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
+import type { PriceImpact } from '../../../components/swap/types';
+import type { State } from '../context/swap-form/types';
 
 type Props = {|
   slippageValue: string,

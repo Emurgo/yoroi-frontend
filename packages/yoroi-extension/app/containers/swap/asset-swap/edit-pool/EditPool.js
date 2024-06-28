@@ -10,6 +10,7 @@ import { maybe } from '../../../../coreUtils';
 import { useSwapForm } from '../../context/swap-form';
 import { useSwapFeeDisplay } from '../../hooks';
 import SwapPoolFullInfo from './PoolFullInfo';
+import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
 
 type Props = {|
   +defaultTokenInfo: RemoteTokenInfo,

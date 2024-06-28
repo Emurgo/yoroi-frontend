@@ -2,6 +2,7 @@
 import { Box, Button, Typography } from '@mui/material';
 import { ReactComponent as TxFailureImage } from '../../../assets/images/revamp/tx-failure.inline.svg';
 import { ReactComponent as TxSuccessfulImage } from '../../../assets/images/revamp/tx-submitted.inline.svg';
+import type { State } from '../context/swap-form/types';
 
 type Props = {|
   txSubmitErrorState: State<?Error>,

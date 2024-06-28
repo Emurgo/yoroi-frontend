@@ -9,6 +9,7 @@ import { Quantities } from '../../utils/quantities';
 import Percent from '../common/Percent';
 import Dialog from '../widgets/Dialog';
 import { PRICE_PRECISION } from './common';
+import type { PriceImpact } from './types';
 
 function colorsBySeverity(isSevere: boolean) {
   return isSevere ? { fg: '#FF1351', bg: '#FFF1F5' } : { fg: '#ED8600', bg: '#FDF7E2' };

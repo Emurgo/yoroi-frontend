@@ -14,6 +14,7 @@ import Table from '../common/table/Table';
 import Dialog from '../widgets/Dialog';
 import { InfoTooltip } from '../widgets/InfoTooltip';
 import { PriceImpactColored, PriceImpactIcon } from './PriceImpact';
+import type { AssetAmount, PriceImpact } from './types';
 
 const fromTemplateColumns = '1fr minmax(auto, 136px)';
 const toTemplateColumns = '1fr minmax(auto, 152px) minmax(auto, 136px)';
