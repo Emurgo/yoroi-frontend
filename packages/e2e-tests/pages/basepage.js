@@ -344,7 +344,7 @@ class BasePage {
     this.logger.info(`BasePage::waitPresentedAndAct is called. Locator: '${locator.locator}'`);
     const elemState = await this.customWaitIsPresented(locator, timeout, repeatPeriod);
     if (elemState) {
-      await funcToCall();
+      return await funcToCall();
     } else {
       throw new Error(`The element is not found. Element: ${locator}`);
     }
