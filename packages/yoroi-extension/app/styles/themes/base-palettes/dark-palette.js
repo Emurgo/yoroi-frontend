@@ -1,7 +1,4 @@
-import { tokens } from '../tokens/tokens';
-
-const { opacity } = tokens;
-
+// @flow
 export const darkPalette = {
   primary_c900: '#E4E8F7',
   primary_c800: '#C4CFF5',

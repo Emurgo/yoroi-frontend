@@ -1,3 +1,4 @@
+// @flow
 import { darkPalette } from '../base-palettes/dark-palette';
 import { tokens } from '../tokens/tokens';
 
