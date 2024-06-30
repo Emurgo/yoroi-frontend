@@ -1,26 +1,27 @@
 // @flow
-import { Component } from 'react';
 import type { Node } from 'react';
+import type { RouterHistory } from 'react-router-dom';
+import type { StoresMap } from './stores';
+import type { ActionsMap } from './actions';
+import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Router } from 'react-router-dom';
-import type { RouterHistory } from 'react-router-dom';
 import { addLocaleData, IntlProvider } from 'react-intl';
 import { observable, autorun, runInAction } from 'mobx';
 import { Routes } from './Routes';
 import { locales, translations } from './i18n/translations';
-import type { StoresMap } from './stores';
-import type { ActionsMap } from './actions';
-import ThemeManager from './ThemeManager';
-import environment from './environment';
-import MaintenancePage from './containers/MaintenancePage';
-import CrashPage from './containers/CrashPage';
 import { Logger } from './utils/logging';
 import { LayoutProvider } from './styles/context/layout';
 import { ColorModeProvider } from './styles/context/mode';
 import { CssBaseline } from '@mui/material';
 import { globalStyles } from './styles/globalStyles';
-import Support from './components/widgets/Support';
 import { changeToplevelTheme, MuiThemes } from './styles/themes';
+import { THEMES } from './styles/themes';
+import ThemeManager from './ThemeManager';
+import environment from './environment';
+import MaintenancePage from './containers/MaintenancePage';
+import CrashPage from './containers/CrashPage';
+import Support from './components/widgets/Support';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData(locales);
@@ -81,7 +82,7 @@ class App extends Component<Props, State> {
       // which looks ugly but at least it's readable.
       '--default-font': !environment.isProduction() ? 'wingdings' : 'Times New Roman',
     });
-    const currentTheme = stores.profile.currentTheme;
+    const currentTheme = stores.profile.currentTheme || THEMES.YOROI_BASE;
 
     changeToplevelTheme(currentTheme);
 

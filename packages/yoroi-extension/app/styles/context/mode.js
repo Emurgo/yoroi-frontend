@@ -2,8 +2,8 @@
 import type { Node } from 'react';
 import React from 'react';
 import { ThemeProvider } from '@mui/material/styles';
-import { revampBaseTheme as revampBaseThemeLight } from '../themes/revamp/light-theme-mui';
-import { revampBaseTheme as revampBaseThemeDark } from '../themes/revamp/dark-theme-mui';
+import { baseLightTheme } from '../themes/light-theme-mui';
+import { baseDarkTheme } from '../themes/dark-theme-mui';
 import { MuiThemes, THEMES } from '../themes';
 
 export type Modes = 'light' | 'dark';
@@ -11,7 +11,7 @@ export type Modes = 'light' | 'dark';
 const ColorModeContext = React.createContext();
 
 function getDesignTokens(mode: string): Object {
-  return mode === 'light' ? revampBaseThemeLight : revampBaseThemeDark;
+  return mode === 'light' ? baseLightTheme : baseDarkTheme;
 }
 
 function ColorModeProvider({ children, currentTheme }: any): Node {
@@ -28,7 +28,7 @@ function ColorModeProvider({ children, currentTheme }: any): Node {
 
   // Update the theme only if the mode changes
   const theme = React.useMemo(() => {
-    if (currentTheme === THEMES.YOROI_REVAMP) return getDesignTokens(mode);
+    if (currentTheme === THEMES.YOROI_BASE) return getDesignTokens(mode);
     return MuiThemes[currentTheme];
   }, [mode, currentTheme]);
 
