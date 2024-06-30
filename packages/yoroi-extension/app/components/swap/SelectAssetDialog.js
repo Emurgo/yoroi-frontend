@@ -1,20 +1,20 @@
 // @flow
-import type { AssetAmount, PriceImpact } from './types';
-import { useEffect, useState } from 'react';
 import { Box, Typography } from '@mui/material';
-import { ReactComponent as NoAssetsFound } from '../../assets/images/revamp/no-assets-found.inline.svg';
-import { ReactComponent as SearchIcon } from '../../assets/images/revamp/icons/search.inline.svg';
-import { ReactComponent as WalletIcon } from '../../assets/images/revamp/icons/wallet.inline.svg';
-import { ReactComponent as ArrowTopIcon } from '../../assets/images/revamp/icons/arrow-top.inline.svg';
-import { ReactComponent as ArrowBottomIcon } from '../../assets/images/revamp/icons/arrow-bottom.inline.svg';
-import { truncateAddressShort } from '../../utils/formatters';
+import { useEffect, useState } from 'react';
+import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
 import adaTokenImage from '../../assets/images/ada.inline.svg';
 import defaultTokenImage from '../../assets/images/revamp/asset-default.inline.svg';
-import Dialog from '../widgets/Dialog';
+import { ReactComponent as ArrowBottomIcon } from '../../assets/images/revamp/icons/arrow-bottom.inline.svg';
+import { ReactComponent as ArrowTopIcon } from '../../assets/images/revamp/icons/arrow-top.inline.svg';
+import { ReactComponent as SearchIcon } from '../../assets/images/revamp/icons/search.inline.svg';
+import { ReactComponent as WalletIcon } from '../../assets/images/revamp/icons/wallet.inline.svg';
+import { ReactComponent as NoAssetsFound } from '../../assets/images/revamp/no-assets-found.inline.svg';
+import { truncateAddressShort } from '../../utils/formatters';
 import Table from '../common/table/Table';
-import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
-import { PriceImpactColored, PriceImpactIcon } from './PriceImpact';
+import Dialog from '../widgets/Dialog';
 import { InfoTooltip } from '../widgets/InfoTooltip';
+import { PriceImpactColored, PriceImpactIcon } from './PriceImpact';
+import type { AssetAmount, PriceImpact } from './types';
 
 const fromTemplateColumns = '1fr minmax(auto, 136px)';
 const toTemplateColumns = '1fr minmax(auto, 152px) minmax(auto, 136px)';
@@ -27,7 +27,7 @@ type Props = {|
   onAssetSelected: any => void,
   onClose: void => void,
   defaultTokenInfo: RemoteTokenInfo,
-  getTokenInfoBatch: Array<string> => { [string]: Promise<RemoteTokenInfo> },
+  getTokenInfoBatch: (Array<string>) => { [string]: Promise<RemoteTokenInfo> },
 |};
 
 export default function SelectAssetDialog({
@@ -54,8 +54,9 @@ export default function SelectAssetDialog({
         .includes(searchTerm.toLowerCase());
     }) || [];
 
-  const metadataPromiseMap: { [string]: Promise<RemoteTokenInfo> } =
-    getTokenInfoBatch(filteredAssets.map(a => a.id))
+  const metadataPromiseMap: { [string]: Promise<RemoteTokenInfo> } = getTokenInfoBatch(
+    filteredAssets.map(a => a.id)
+  );
 
   return (
     <Dialog
@@ -107,7 +108,7 @@ export default function SelectAssetDialog({
               }}
             />
           </Box>
-          <Box>
+          <Box sx={{ marginBottom: '16px' }}>
             <Typography component="div" variant="body2" color="grayscale.700">
               {filteredAssets.length} assets {searchTerm ? 'found' : 'available'}
             </Typography>
@@ -184,7 +185,6 @@ export const AssetAndAmountRow = ({
   displayAmount?: ?string,
   priceImpactState?: ?PriceImpact,
 |}): React$Node => {
-
   const [remoteTokenLogo, setRemoteTokenLogo] = useState<?string>(null);
 
   const isFrom = type === 'from';
@@ -196,21 +196,21 @@ export const AssetAndAmountRow = ({
 
   useEffect(() => {
     if (id != null) {
-      getTokenInfo(id).then(tokenInfo => {
-        if (tokenInfo.logo != null) {
-          setRemoteTokenLogo(`data:image/png;base64,${tokenInfo.logo}`);
-        }
-        return null;
-      }).catch(e => {
-        console.warn('Failed to resolve remote info for token: ' + id, e);
-      });
+      getTokenInfo(id)
+        .then(tokenInfo => {
+          if (tokenInfo.logo != null) {
+            setRemoteTokenLogo(`data:image/png;base64,${tokenInfo.logo}`);
+          }
+          return null;
+        })
+        .catch(e => {
+          console.warn('Failed to resolve remote info for token: ' + id, e);
+        });
     }
-  }, [id])
+  }, [id]);
 
   const imgSrc =
-    ticker === defaultTokenInfo.ticker
-      ? adaTokenImage
-      : remoteTokenLogo ?? defaultTokenImage;
+    ticker === defaultTokenInfo.ticker ? adaTokenImage : remoteTokenLogo ?? defaultTokenImage;
 
   const amount = displayAmount ?? assetAmount;
 

@@ -1,29 +1,32 @@
 // @flow
+import { Box, Button } from '@mui/material';
+import { useSwap } from '@yoroi/swap';
+import moment from 'moment';
 import type { Node } from 'react';
 import { useState } from 'react';
-import { Box, Button } from '@mui/material';
-import Table from '../../../components/common/table/Table';
-import CancelSwapOrderDialog from '../../../components/swap/CancelOrderDialog';
+import { addressBech32ToHex } from '../../../api/ada/lib/cardanoCrypto/utils';
+import { signTransactionHex } from '../../../api/ada/transactions/signTransactionHex';
+import {
+  getTransactionFeeFromCbor,
+  getTransactionTotalOutputFromCbor,
+} from '../../../api/ada/transactions/utils';
 import AssetPair from '../../../components/common/assets/AssetPair';
+import Table from '../../../components/common/table/Table';
 import Tabs from '../../../components/common/tabs/Tabs';
-import type { MappedOrder } from './hooks';
-import { useRichOrders } from './hooks';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
+import CancelSwapOrderDialog from '../../../components/swap/CancelOrderDialog';
 import { SwapPoolLabel } from '../../../components/swap/SwapPoolComponents';
-import ExplorableHashContainer from '../../widgets/ExplorableHashContainer';
+import type { CardanoConnectorSignRequest } from '../../../connector/types';
+import { fail, forceNonNull, maybe } from '../../../coreUtils';
+import { SelectedExplorer } from '../../../domain/SelectedExplorer';
+import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
+import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import { truncateAddressShort } from '../../../utils/formatters';
 import { Quantities } from '../../../utils/quantities';
-import { fail, forceNonNull, maybe } from '../../../coreUtils';
-import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
-import { useSwap } from '@yoroi/swap';
-import { addressBech32ToHex } from '../../../api/ada/lib/cardanoCrypto/utils';
-import { getTransactionFeeFromCbor, getTransactionTotalOutputFromCbor, } from '../../../api/ada/transactions/utils';
-import { SelectedExplorer } from '../../../domain/SelectedExplorer';
-import type { CardanoConnectorSignRequest } from '../../../connector/types';
-import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
-import moment from 'moment';
-import { signTransactionHex } from '../../../api/ada/transactions/signTransactionHex';
+import ExplorableHashContainer from '../../widgets/ExplorableHashContainer';
+import { useRichOrders } from './hooks';
 import { createFormattedTokenValues } from './util';
+import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
+import type { MappedOrder } from './hooks';
 import type { FormattedTokenValue } from './util';
 
 type ColumnContext = {|
@@ -83,9 +86,7 @@ const orderColumns: Array<Column> = [
 ];
 
 export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
-  const {
-    order: orderApi,
-  } = useSwap();
+  const { order: orderApi } = useSwap();
 
   const [showCompletedOrders, setShowCompletedOrders] = useState<boolean>(false);
   const [cancellationState, setCancellationState] = useState<?{|
@@ -96,21 +97,29 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
     isSubmitting?: boolean,
   |}>(null);
 
-  const { wallets, tokenInfoStore, explorers, substores: { ada: { swapStore } } } = props.stores;
+  const {
+    wallets,
+    tokenInfoStore,
+    explorers,
+    substores: {
+      ada: { swapStore },
+    },
+  } = props.stores;
 
   const wallet = wallets.selectedOrFail;
   const network = wallet.getParent().getNetworkInfo();
   const walletVariant = wallet.getParent().getWalletVariant();
-  const defaultTokenInfo = tokenInfoStore.getDefaultTokenInfoSummary(
-    network.NetworkId
-  );
+  const defaultTokenInfo = tokenInfoStore.getDefaultTokenInfoSummary(network.NetworkId);
 
   const selectedExplorer =
-    explorers.selectedExplorer.get(network.NetworkId) ??
-    fail('No explorer for wallet network');
+    explorers.selectedExplorer.get(network.NetworkId) ?? fail('No explorer for wallet network');
 
-  const fetchTransactionTimestamps = txHashes => swapStore.fetchTransactionTimestamps({ wallet, txHashes });
-  let { openOrders, completedOrders, transactionTimestamps } = useRichOrders(defaultTokenInfo, fetchTransactionTimestamps);
+  const fetchTransactionTimestamps = txHashes =>
+    swapStore.fetchTransactionTimestamps({ wallet, txHashes });
+  let { openOrders, completedOrders, transactionTimestamps } = useRichOrders(
+    defaultTokenInfo,
+    fetchTransactionTimestamps
+  );
 
   const txHashToRenderedTimestamp: string => string = txHash => {
     const date = transactionTimestamps[txHash];
@@ -293,6 +302,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
           columnLeftPaddings={columnLeftPaddings}
           gridTemplateColumns={gridTemplateColumns}
           columnGap="0px"
+          columnRightPaddings={['0px', '0px', '0px', '0px', '0px', '0px', '0px']}
         >
           {showCompletedOrders
             ? completedOrders.map(order => (

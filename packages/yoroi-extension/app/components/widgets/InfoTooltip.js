@@ -11,7 +11,7 @@ const STooltip = styled(({ className, ...props }: any) => (
   [`& .${tooltipClasses.tooltip}`]: {
     backgroundColor: theme.palette.grayscale[900],
     opacity: 0.8,
-    lineHeight: 22,
+    lineHeight: 18,
     fontSize: 14,
     maxWidth: width,
   },
@@ -24,13 +24,12 @@ type Props = {|
 |};
 
 export const InfoTooltip = ({ content, width, children }: Props): React$Node => {
-  const contentNode = typeof content === 'string' ? (
-    <Typography color="inherit">{content}</Typography>
-  ) : content;
+  const contentNode =
+    typeof content === 'string' ? <Typography color="inherit">{content}</Typography> : content;
   return (
     <STooltip title={contentNode} placement="top" arrow width={width}>
-      <Box component="span" color="grayscale.900">
-        {children ?? (<Info />)}
+      <Box component="span" color="grayscale.900" sx={{ p: 0, m: 0, height: '24px' }}>
+        {children ?? <Info />}
       </Box>
     </STooltip>
   );
