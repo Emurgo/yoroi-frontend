@@ -1,3 +1,4 @@
+// @flow
 export const lightPalette = {
   primary_c900: '#121F4D',
   primary_c800: '#122770',

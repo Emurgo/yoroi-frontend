@@ -1,3 +1,4 @@
+// @flow
 export const space = {
   none: 0,
   _2xs: 2,
