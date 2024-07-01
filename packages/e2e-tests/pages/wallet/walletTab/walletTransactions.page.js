@@ -1,5 +1,4 @@
 import {
-  defaultWaitTimeout,
   fiveSeconds,
   quarterSecond,
   twoSeconds,
@@ -162,10 +161,18 @@ export class TransactionsSubTab extends WalletTab {
   // methods
   async isDisplayed() {
     this.logger.info(`TransactionsSubTab::isDisplayed is called`);
-      const submenuState = await this.customWaitIsPresented(this.transactionsSubmenuItemLocator, fiveSeconds, quarterSecond);
-      const summaryState = await this.customWaitIsPresented(this.walletSummaryBoxLocator, fiveSeconds, quarterSecond);
-      
-      return submenuState && summaryState;
+    const submenuState = await this.customWaitIsPresented(
+      this.transactionsSubmenuItemLocator,
+      fiveSeconds,
+      quarterSecond
+    );
+    const summaryState = await this.customWaitIsPresented(
+      this.walletSummaryBoxLocator,
+      fiveSeconds,
+      quarterSecond
+    );
+
+    return submenuState && summaryState;
   }
   async isWalletEmpty() {
     this.logger.info(`TransactionsSubTab::isWalletEmpty is called`);
