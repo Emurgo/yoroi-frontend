@@ -357,18 +357,18 @@ export class TransactionsSubTab extends WalletTab {
     return loaderIsNotDisplayed;
   }
   async _loadMore() {
-    const showMoreIsDisplayed = this.showMoreBtnIsDisplayed();
-    const loaderIsDisplayed = this.loaderIsDisplayed();
-    if (!(await showMoreIsDisplayed) && !(await loaderIsDisplayed)) {
+    const showMoreIsDisplayed = await this.showMoreBtnIsDisplayed();
+    const loaderIsDisplayed = await this.loaderIsDisplayed();
+    if (!showMoreIsDisplayed && !loaderIsDisplayed) {
       return false;
     }
-    if (await showMoreIsDisplayed) {
+    if (showMoreIsDisplayed) {
       await this.scrollIntoView(this.showMoreTxsButtonLocator);
       await this.click(this.showMoreTxsButtonLocator);
       await this.sleep(quarterSecond);
       return true;
     }
-    if (await loaderIsDisplayed) {
+    if (loaderIsDisplayed) {
       await this.scrollIntoView(this.txsLoaderSpinnerLocator);
       const result = await this.waitLoaderIsNotDisplayed(fiveSeconds, quarterSecond);
       if (!result) {
