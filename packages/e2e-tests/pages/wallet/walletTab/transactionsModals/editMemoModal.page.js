@@ -56,7 +56,7 @@ class EditMemoDialog extends BasePage {
     await this.click(this.editMemoDialogCloseButtonLocator);
   }
   // * enter memo
-  async enterMemo(memoText, oldMessage) {
+  async enterMemo(memoText) {
     this.logger.info(`EditMemoDialog::enterMemo is called. Memo text: ${memoText}`);
     await this.click(this.editMemoDialogInputLocator);
     await this.clearInputAll(this.editMemoDialogInputLocator);
@@ -73,11 +73,8 @@ class EditMemoDialog extends BasePage {
   async pressSave() {
     this.logger.info(`EditMemoDialog::pressSave is called.`);
     await this.click(this.editMemoDialogSaveButtonLocator);
-    const modalIsNotDisplayed = await this.customWaiter(
-      async () => {
-        const modalsWebElems = await this.findElements(this.editMemoDialogWindowLocator);
-        return modalsWebElems.length === 0;
-      },
+    const modalIsNotDisplayed = await this.customWaitIsPresented(
+      this.editMemoDialogWindowLocator,
       fiveSeconds,
       quarterSecond
     );
