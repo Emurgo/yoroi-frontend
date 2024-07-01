@@ -74,7 +74,7 @@ class EditMemoDialog extends BasePage {
   async pressSave() {
     this.logger.info(`EditMemoDialog::pressSave is called.`);
     await this.click(this.editMemoDialogSaveButtonLocator);
-    const modalIsNotDisplayed = await this.customWaitIsPresented(
+    const modalIsNotDisplayed = await this.customWaitIsNotPresented(
       this.editMemoDialogWindowLocator,
       fiveSeconds,
       quarterSecond
