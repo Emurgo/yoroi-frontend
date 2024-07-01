@@ -24,9 +24,10 @@ describe('dApp, signTx, intrawallet Tx', function () {
   let expectedFee = 0;
   let receiverAddr = '';
   const testWallet = getSpendableWallet();
+  const adaAmount = 2;
 
-  before(function (done) {
-    webdriver = driversPoolsManager.getDriverFromPool();
+  before(async function () {
+    webdriver = await driversPoolsManager.getDriverFromPool();
     mockServer = getMockServer({});
     const wmLogger = getTestLogger('windowManager', this.test.parent.title);
     windowManager = new WindowManager(webdriver, wmLogger);
@@ -34,7 +35,6 @@ describe('dApp, signTx, intrawallet Tx', function () {
     const dappLogger = getTestLogger('dApp', this.test.parent.title);
     mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
     logger = getTestLogger(this.test.parent.title);
-    done();
   });
 
   it('Restore a 15-word wallet', async function () {
@@ -59,7 +59,7 @@ describe('dApp, signTx, intrawallet Tx', function () {
       await mockedDApp.requestUnusedAddresses();
       const unusedAddresses = await mockedDApp.getAddresses();
       receiverAddr = unusedAddresses.retValue[0];
-      const requestedAmount = String(1 * adaInLovelaces);
+      const requestedAmount = String(adaAmount * adaInLovelaces);
       // send sign request with 1 ada
       const { txFee } = await mockedDApp.requestSigningTx(requestedAmount, receiverAddr);
       expectedFee = txFee;
@@ -107,7 +107,7 @@ describe('dApp, signTx, intrawallet Tx', function () {
       expect(
         filteredAddrAssets[0].tokenAmount,
         'Different amount for the receiver address'
-      ).to.equal(1);
+      ).to.equal(adaAmount);
     });
 
     it('Checking info on Connection page', async function () {

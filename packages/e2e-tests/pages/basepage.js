@@ -14,8 +14,10 @@ import { getExtensionUrl } from '../utils/driverBootstrap.js';
 import {
   defaultRepeatPeriod,
   defaultWaitTimeout,
+  fiveSeconds,
   halfSecond,
   oneSecond,
+  quarterSecond,
 } from '../helpers/timeConstants.js';
 import { dbSnapshotsDir } from '../helpers/constants.js';
 
@@ -332,6 +334,20 @@ class BasePage {
       repeatPeriod
     );
     return result;
+  }
+  async waitPresentedAndAct(
+    locator,
+    funcToCall,
+    timeout = fiveSeconds,
+    repeatPeriod = quarterSecond
+  ) {
+    this.logger.info(`BasePage::waitPresentedAndAct is called. Locator: '${locator.locator}'`);
+    const elemState = await this.customWaitIsPresented(locator, timeout, repeatPeriod);
+    if (elemState) {
+      return await funcToCall();
+    } else {
+      throw new Error(`The element is not found. Element: ${locator}`);
+    }
   }
   async sleep(milliseconds) {
     this.logger.info(`BasePage::sleep is called. Value: ${milliseconds}`);

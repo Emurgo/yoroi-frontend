@@ -21,7 +21,7 @@ describe('dApp, getCollateral, no popup, positive', function () {
   let mockedDApp = null;
   const testWallet = getSpendableWallet();
 
-  before(function (done) {
+  before(function () {
     webdriver = driversPoolsManager.getDriverFromPool();
     mockServer = getMockServer({});
     const wmLogger = getTestLogger('windowManager', this.test.parent.title);
@@ -30,7 +30,6 @@ describe('dApp, getCollateral, no popup, positive', function () {
     const dappLogger = getTestLogger('dApp', this.test.parent.title);
     mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
     logger = getTestLogger(this.test.parent.title);
-    done();
   });
 
   it('Restore a 15-word wallet', async function () {

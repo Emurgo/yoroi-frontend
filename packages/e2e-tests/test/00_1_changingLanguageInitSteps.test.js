@@ -11,12 +11,11 @@ describe('Changing language on the initial screen', function () {
   let webdriver = null;
   let logger = null;
 
-  before(function (done) {
+  before(function () {
     webdriver = getDriver();
     logger = getTestLogger(this.test.parent.title);
     const basePage = new BasePage(webdriver, logger);
     basePage.goToExtension();
-    done();
   });
 
   const testData = [
