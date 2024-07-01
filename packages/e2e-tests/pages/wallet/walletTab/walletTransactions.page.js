@@ -1,6 +1,7 @@
 import {
   fiveSeconds,
   quarterSecond,
+  threeSeconds,
   twoSeconds,
 } from '../../../helpers/timeConstants.js';
 import WalletTab from './walletTab.page.js';
@@ -472,6 +473,21 @@ export class TransactionsSubTab extends WalletTab {
     const result = await this.getText(addMemoMsgLocator);
     this.logger.info(`TransactionsSubTab::getMemoMessage::result ${result}`);
     return result;
+  }
+  async thereIsNoMemo(groupIndex, txIndex) {
+    this.logger.info(
+      `TransactionsSubTab::thereIsNoMemo is called. Group index: ${groupIndex}, tx index: ${txIndex}`
+    );
+    const memoMsgLocator = this.txMemoContentTextLocator(groupIndex, txIndex);
+    const noMemoState = await this.customWaiter(
+      async () => {
+        const allElements = await this.findElements(memoMsgLocator);
+        return allElements.length === 0;
+      },
+      threeSeconds,
+      quarterSecond
+    );
+    return noMemoState;
   }
 }
 
