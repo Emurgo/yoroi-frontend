@@ -1,5 +1,6 @@
 import { fiveSeconds, quarterSecond } from '../../../../helpers/timeConstants.js';
 import BasePage from '../../../basepage.js';
+import DeleteMemoModal from './deleteMemoModal.page.js';
 
 class EditMemoDialog extends BasePage {
   // locators
@@ -81,6 +82,23 @@ class EditMemoDialog extends BasePage {
 
     if (!modalIsNotDisplayed) {
       throw new Error('Save memo modal is still displayed after 5 seconds');
+    }
+  }
+
+  // * delete message by pressing cross button
+  async deleteMemo(confrimDeleting = true) {
+    this.logger.info(`EditMemoDialog::deleteMemo is called`);
+    await this.click(this.editMemoDialogDeleteButtonLocator);
+    const deleteModal = new DeleteMemoModal(this.driver, this.logger);
+    const deleteModalState = await deleteModal.isDisplayed();
+    if (!deleteModalState) {
+      throw new Error('Save memo modal is still displayed after 5 seconds');
+    }
+    if (confrimDeleting) {
+      await deleteModal.confirmDeleting();
+      await deleteModal.isNotDisplayed();
+    } else {
+      await deleteModal.pressCancel();
     }
   }
 }
