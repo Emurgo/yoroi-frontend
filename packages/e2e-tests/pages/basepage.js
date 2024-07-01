@@ -335,6 +335,22 @@ class BasePage {
     );
     return result;
   }
+  async customWaitIsNotPresented(
+    locator,
+    timeout = defaultWaitTimeout,
+    repeatPeriod = defaultRepeatPeriod
+  ) {
+    this.logger.info(`BasePage::customWaitIsNotPresented is called.`);
+    const result = await this.customWaiter(
+      async () => {
+        const elemsPresented = await this.findElements(locator);
+        return elemsPresented.length === 0;
+      },
+      timeout,
+      repeatPeriod
+    );
+    return result;
+  }
   async waitPresentedAndAct(
     locator,
     funcToCall,
