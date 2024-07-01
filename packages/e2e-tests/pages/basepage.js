@@ -351,6 +351,14 @@ class BasePage {
     );
     return result;
   }
+  /**
+   * The function wait until the passed element is found and call the passed function
+   * @param {{locator: string, method: id}} locator Element locator
+   * @param {object} funcToCall A function that should be called when the element is found
+   * @param {number} timeout Total time of search in milliseconds. Default values is **5000** milliseconds
+   * @param {number} repeatPeriod The time after which it is necessary to repeat the check. Default value is **250** milliseconds
+   * @returns {Promise<any>}
+   */
   async waitPresentedAndAct(
     locator,
     funcToCall,
