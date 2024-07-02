@@ -1,6 +1,7 @@
 import BasePage from '../pages/basepage.js';
 import { customAfterEach } from '../utils/customHooks.js';
 import TransactionsSubTab from '../pages/wallet/walletTab/walletTransactions.page.js';
+import ReceiveSubTab from '../pages/wallet/walletTab/receiveSubTab.page.js';
 import { expect } from 'chai';
 import { getTestLogger } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
@@ -49,11 +50,24 @@ describe('Hide and show balance', function () {
     expect(expandedTxsBalanceHidden, 'Balance is not hidden in expanded txs').to.be.true;
   });
   // check balance on Receive tab
+  it('Check balances are hidden on Receive page', async function () {
+    const transactionsPage = new TransactionsSubTab(webdriver, logger);
+    await transactionsPage.goToReceiveSubMenu();
+    const receivePage = new ReceiveSubTab(webdriver, logger);
+    await receivePage.selectBaseExtHasBalanceAddrs();
+    const balanceExtAddrHidden = await receivePage.allAddressesBalancesHidden();
+    expect(balanceExtAddrHidden, 'Balances of external addresses are not hidden').to.be.true;
+    await receivePage.selectBaseInterHasBalanceAddrs();
+    const balanceInterAddrHidden = await receivePage.allAddressesBalancesHidden();
+    expect(balanceInterAddrHidden, 'Balances of internal addresses are not hidden').to.be.true;
+  });
   // add checking Staking page when testnetwork is added
   // click show balance
   it('Show balance', async function () {
+    const receivePage = new ReceiveSubTab(webdriver, logger);
+    await receivePage.goToWalletTab();
+    await receivePage.goToTransactionsSubMenu();
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
-    await transactionsPage.goToWalletTab();
     await transactionsPage.showHideBalance();
   });
   // check balance on the the top bar wallet info panel
@@ -75,6 +89,17 @@ describe('Hide and show balance', function () {
     expect(expandedTxsBalanceHidden, 'Balance is hidden in expanded txs').to.be.false;
   });
   // check balance on Receive tab
+  it('Check balances are shown on Receive page', async function () {
+    const transactionsPage = new TransactionsSubTab(webdriver, logger);
+    await transactionsPage.goToReceiveSubMenu();
+    const receivePage = new ReceiveSubTab(webdriver, logger);
+    await receivePage.selectBaseExtHasBalanceAddrs();
+    const balanceExtAddrHidden = await receivePage.allAddressesBalancesHidden();
+    expect(balanceExtAddrHidden, 'Balances of external addresses are hidden').to.be.false;
+    await receivePage.selectBaseInterHasBalanceAddrs();
+    const balanceInterAddrHidden = await receivePage.allAddressesBalancesHidden();
+    expect(balanceInterAddrHidden, 'Balances of internal addresses are hidden').to.be.false;
+  });
   // add checking Staking page when testnetwork is added
 
   afterEach(function (done) {
