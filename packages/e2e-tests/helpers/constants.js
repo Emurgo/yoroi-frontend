@@ -124,3 +124,5 @@ export const yoroiObject = Object.freeze({
 export const Colors = Object.freeze({
   errorRed: 'rgb(255, 19, 81)',
 });
+
+export const balanceReplacer = '******';
