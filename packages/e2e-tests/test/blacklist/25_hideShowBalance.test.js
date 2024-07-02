@@ -1,14 +1,15 @@
-import BasePage from '../pages/basepage.js';
-import { customAfterEach } from '../utils/customHooks.js';
-import TransactionsSubTab from '../pages/wallet/walletTab/walletTransactions.page.js';
-import ReceiveSubTab from '../pages/wallet/walletTab/receiveSubTab.page.js';
+import BasePage from '../../pages/basepage.js';
+import { customAfterEach } from '../../utils/customHooks.js';
+import TransactionsSubTab from '../../pages/wallet/walletTab/walletTransactions.page.js';
+import ReceiveSubTab from '../../pages/wallet/walletTab/receiveSubTab.page.js';
 import { expect } from 'chai';
-import { getTestLogger } from '../utils/utils.js';
-import { oneMinute } from '../helpers/timeConstants.js';
-import driversPoolsManager from '../utils/driversPool.js';
-import { preloadDBAndStorage, waitTxPage } from '../helpers/restoreWalletHelper.js';
-import { testWallet1 } from '../utils/testWallets.js';
+import { getTestLogger } from '../../utils/utils.js';
+import { oneMinute } from '../../helpers/timeConstants.js';
+import driversPoolsManager from '../../utils/driversPool.js';
+import { preloadDBAndStorage, waitTxPage } from '../../helpers/restoreWalletHelper.js';
+import { testWallet1 } from '../../utils/testWallets.js';
 
+// Issue https://emurgo.atlassian.net/browse/YOEXT-1218
 describe('Hide and show balance', function () {
   this.timeout(2 * oneMinute);
   let webdriver = null;
