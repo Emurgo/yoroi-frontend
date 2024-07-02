@@ -57,6 +57,10 @@ class WalletCommonBase extends BasePage {
     locator: 'topBar:selectedWallet-availableFiatBalance-text',
     method: 'id',
   };
+  walletGideBalanceButtonLocator = {
+    locator: 'topBar:selectedWallet-showHideBalance-button',
+    method: 'id',
+  }
   // change wallet modal window
   changeWalletDialogLocator = {
     locator: 'changeWalletDialog-dialogWindow-modalWindow',
