@@ -1,7 +1,7 @@
 //@flow
 import { Box, Button, Typography } from '@mui/material';
-import { ReactComponent as TxSuccessfulImage } from '../../../assets/images/revamp/tx-successful.inline.svg';
 import { ReactComponent as TxFailureImage } from '../../../assets/images/revamp/tx-failure.inline.svg';
+import { ReactComponent as TxSuccessfulImage } from '../../../assets/images/revamp/tx-submitted.inline.svg';
 import type { State } from '../context/swap-form/types';
 
 type Props = {|
@@ -22,9 +22,9 @@ export default function TxSubmittedStep({
       flexDirection="column"
       gap="16px"
       alignItems="center"
-      width="400px"
+      width="404px"
       mx="auto"
-      mt="80px"
+      mt="131px"
     >
       <Box>{isSuccessful ? <TxSuccessfulImage /> : <TxFailureImage />}</Box>
       <Box textAlign="center">
@@ -33,13 +33,13 @@ export default function TxSubmittedStep({
         </Typography>
         <Typography component="div" variant="body1" color="grayscale.600">
           {isSuccessful
-            ? 'Your transactions will be displayed both in the list of transaction and Open swap orders'
+            ? 'Check this transaction in the list of wallet transactions'
             : 'Your transaction has not been processed properly due to technical issues'}
         </Typography>
       </Box>
       <Box>
         <Button onClick={isSuccessful ? onSuccess : onTryAgain} variant="primary">
-          {isSuccessful ? 'Go to orders' : 'Try again'}
+          {isSuccessful ? 'Go to transactions' : 'Try again'}
         </Button>
       </Box>
       {!isSuccessful && (
