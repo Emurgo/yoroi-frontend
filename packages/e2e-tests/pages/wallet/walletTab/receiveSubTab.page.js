@@ -1,6 +1,7 @@
 import WalletTab from './walletTab.page.js';
 import BasePage from '../../basepage.js';
 import { twoSeconds, quarterSecond } from '../../../helpers/timeConstants.js';
+import { balanceReplacer } from '../../../helpers/constants.js';
 
 class GenerateURIModal extends BasePage {
   // locators
@@ -378,7 +379,7 @@ class ReceiveSubTab extends WalletTab {
     return allAddrs.length;
   }
   /**
-   * 
+   * Getting an address info from the Receive page
    * @param {number} rowIndex An index of a row in the addresses table starting from 0
    * @returns {Promise<{address: string, balance: number}>}
    */
@@ -442,7 +443,7 @@ class ReceiveSubTab extends WalletTab {
     return new DisplayURIModal(this.driver, this.logger);
   }
   /**
-   * 
+   * Generating the Payment URI with the selected address
    * @param {number} rowIndex An index of a row in the addresses table starting from 0
    * @param {string} adaAmount ADA amount to receive
    * @returns {Promise<{address: string, amount: string, genLink: string}>}
@@ -473,6 +474,16 @@ class ReceiveSubTab extends WalletTab {
     const address = await this.getText(this.currentAddressToUseTextLocator);
     this.logger.info(`ReceiveSubTab::getCurrentReceiveAddr::address - "${address}"`);
     return address;
+  }
+  async allAddressesBalancesHidden() {
+    this.logger.info(`ReceiveSubTab::allAddressesBalancesHidden is called.`);
+    const addrsAmount = await this.getAmountOfAddresses();
+    const allBalancesHidden = [];
+    for (let rowIndex = 0; rowIndex < addrsAmount; rowIndex++) {
+      const addrBalanceText = await this.getText(this.addressBalanceTextInRowLocator(rowIndex));
+      allBalancesHidden.push(addrBalanceText === balanceReplacer || '-');
+    }
+    return allBalancesHidden.every(addrBalance => addrBalance === true);
   }
 }
 
