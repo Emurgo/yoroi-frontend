@@ -158,6 +158,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
               },
             }}
             color="primary"
+            id={amountDisplayId + '-showHideBalance-button'}
           >
             {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
           </IconButton>
