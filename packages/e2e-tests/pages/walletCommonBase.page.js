@@ -132,13 +132,10 @@ class WalletCommonBase extends BasePage {
       }
     );
 
-    const adaBalance = await this.waitPresentedAndAct(
-      this.walletBalanceTextLocator,
-      async () => {
-        const rawBalanceText = await this.getText(this.walletBalanceTextLocator);
-        return Number(rawBalanceText.split(' ')[0]);
-      }
-    );
+    const adaBalance = await this.waitPresentedAndAct(this.walletBalanceTextLocator, async () => {
+      const rawBalanceText = await this.getText(this.walletBalanceTextLocator);
+      return Number(rawBalanceText.split(' ')[0]);
+    });
 
     const [fiatBalance, fiatCurrency] = await this.waitPresentedAndAct(
       this.walletFiatBalanceTextLocator,
@@ -221,8 +218,10 @@ class WalletCommonBase extends BasePage {
   }
   async openChangeWalletModal() {
     this.logger.info(`WalletCommonBase::openChangeWalletModal is called`);
-    const selectWalletBtnElem = await this.waitForElement(this.selectedWalletButtonLocator);
-    await selectWalletBtnElem.click();
+    await this.waitPresentedAndAct(
+      this.selectedWalletButtonLocator,
+      async () => await this.click(this.selectedWalletButtonLocator)
+    );
     await this.waitForElement(this.changeWalletDialogLocator);
   }
   async addNewWallet() {

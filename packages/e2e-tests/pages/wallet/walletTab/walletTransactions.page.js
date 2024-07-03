@@ -1,7 +1,7 @@
 import {
-  defaultWaitTimeout,
   fiveSeconds,
   quarterSecond,
+  threeSeconds,
   twoSeconds,
 } from '../../../helpers/timeConstants.js';
 import WalletTab from './walletTab.page.js';
@@ -162,10 +162,18 @@ export class TransactionsSubTab extends WalletTab {
   // methods
   async isDisplayed() {
     this.logger.info(`TransactionsSubTab::isDisplayed is called`);
-      const submenuState = await this.customWaitIsPresented(this.transactionsSubmenuItemLocator, fiveSeconds, quarterSecond);
-      const summaryState = await this.customWaitIsPresented(this.walletSummaryBoxLocator, fiveSeconds, quarterSecond);
-      
-      return submenuState && summaryState;
+    const submenuState = await this.customWaitIsPresented(
+      this.transactionsSubmenuItemLocator,
+      fiveSeconds,
+      quarterSecond
+    );
+    const summaryState = await this.customWaitIsPresented(
+      this.walletSummaryBoxLocator,
+      fiveSeconds,
+      quarterSecond
+    );
+
+    return submenuState && summaryState;
   }
   async isWalletEmpty() {
     this.logger.info(`TransactionsSubTab::isWalletEmpty is called`);
@@ -349,18 +357,18 @@ export class TransactionsSubTab extends WalletTab {
     return loaderIsNotDisplayed;
   }
   async _loadMore() {
-    const showMoreIsDisplayed = this.showMoreBtnIsDisplayed();
-    const loaderIsDisplayed = this.loaderIsDisplayed();
-    if (!(await showMoreIsDisplayed) && !(await loaderIsDisplayed)) {
+    const showMoreIsDisplayed = await this.showMoreBtnIsDisplayed();
+    const loaderIsDisplayed = await this.loaderIsDisplayed();
+    if (!showMoreIsDisplayed && !loaderIsDisplayed) {
       return false;
     }
-    if (await showMoreIsDisplayed) {
+    if (showMoreIsDisplayed) {
       await this.scrollIntoView(this.showMoreTxsButtonLocator);
       await this.click(this.showMoreTxsButtonLocator);
       await this.sleep(quarterSecond);
       return true;
     }
-    if (await loaderIsDisplayed) {
+    if (loaderIsDisplayed) {
       await this.scrollIntoView(this.txsLoaderSpinnerLocator);
       const result = await this.waitLoaderIsNotDisplayed(fiveSeconds, quarterSecond);
       if (!result) {
@@ -465,6 +473,21 @@ export class TransactionsSubTab extends WalletTab {
     const result = await this.getText(addMemoMsgLocator);
     this.logger.info(`TransactionsSubTab::getMemoMessage::result ${result}`);
     return result;
+  }
+  async thereIsNoMemo(groupIndex, txIndex) {
+    this.logger.info(
+      `TransactionsSubTab::thereIsNoMemo is called. Group index: ${groupIndex}, tx index: ${txIndex}`
+    );
+    const memoMsgLocator = this.txMemoContentTextLocator(groupIndex, txIndex);
+    const noMemoState = await this.customWaiter(
+      async () => {
+        const allElements = await this.findElements(memoMsgLocator);
+        return allElements.length === 0;
+      },
+      threeSeconds,
+      quarterSecond
+    );
+    return noMemoState;
   }
 }
 

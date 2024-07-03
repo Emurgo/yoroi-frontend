@@ -1,5 +1,6 @@
 import { fiveSeconds, quarterSecond } from '../../../../helpers/timeConstants.js';
 import BasePage from '../../../basepage.js';
+import DeleteMemoModal from './deleteMemoModal.page.js';
 
 class EditMemoDialog extends BasePage {
   // locators
@@ -56,7 +57,7 @@ class EditMemoDialog extends BasePage {
     await this.click(this.editMemoDialogCloseButtonLocator);
   }
   // * enter memo
-  async enterMemo(memoText, oldMessage) {
+  async enterMemo(memoText) {
     this.logger.info(`EditMemoDialog::enterMemo is called. Memo text: ${memoText}`);
     await this.click(this.editMemoDialogInputLocator);
     await this.clearInputAll(this.editMemoDialogInputLocator);
@@ -73,17 +74,31 @@ class EditMemoDialog extends BasePage {
   async pressSave() {
     this.logger.info(`EditMemoDialog::pressSave is called.`);
     await this.click(this.editMemoDialogSaveButtonLocator);
-    const modalIsNotDisplayed = await this.customWaiter(
-      async () => {
-        const modalsWebElems = await this.findElements(this.editMemoDialogWindowLocator);
-        return modalsWebElems.length === 0;
-      },
+    const modalIsNotDisplayed = await this.customWaitIsNotPresented(
+      this.editMemoDialogWindowLocator,
       fiveSeconds,
       quarterSecond
     );
 
     if (!modalIsNotDisplayed) {
       throw new Error('Save memo modal is still displayed after 5 seconds');
+    }
+  }
+
+  // * delete message by pressing cross button
+  async deleteMemo(confrimDeleting = true) {
+    this.logger.info(`EditMemoDialog::deleteMemo is called`);
+    await this.click(this.editMemoDialogDeleteButtonLocator);
+    const deleteModal = new DeleteMemoModal(this.driver, this.logger);
+    const deleteModalState = await deleteModal.isDisplayed();
+    if (!deleteModalState) {
+      throw new Error('Save memo modal is still displayed after 5 seconds');
+    }
+    if (confrimDeleting) {
+      await deleteModal.confirmDeleting();
+      await deleteModal.isNotDisplayed();
+    } else {
+      await deleteModal.pressCancel();
     }
   }
 }
