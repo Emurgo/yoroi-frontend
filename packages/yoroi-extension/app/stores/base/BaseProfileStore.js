@@ -356,7 +356,7 @@ export default class BaseProfileStore
     if (result != null) {
       if (!this.didUserMigratedToRevampTheme) {
         this.setUserRevampMigrationStatusRequest.execute(true);
-        this._updateTheme({ theme: THEMES.YOROI_BASE });
+        noop(this._updateTheme({ theme: THEMES.YOROI_BASE }));
         return THEMES.YOROI_BASE;
       }
 
