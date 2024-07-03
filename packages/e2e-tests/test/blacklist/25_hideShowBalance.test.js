@@ -18,7 +18,7 @@ describe('Hide and show balance', function () {
   before(async function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    await preloadDBAndStorage(webdriver, logger, 'testWallet1MemoAdded');
+    await preloadDBAndStorage(webdriver, logger, 'testWallet1');
     await waitTxPage(webdriver, logger);
   });
   // check the default state. The balance should be displayed
