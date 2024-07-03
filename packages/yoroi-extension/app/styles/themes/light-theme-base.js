@@ -62,7 +62,7 @@ const magenta = {
 
 const system = { magenta, cyan, yellow, orange };
 
-export const lightThemeBase = {
+export const lightThemeBase: any = {
   name: 'light-theme',
   palette: {
     mode: 'light',
