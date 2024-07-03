@@ -2,6 +2,7 @@ import WalletTab from './walletTab.page.js';
 import GenerateURIModal from './receiveModals/generateURIModal.page.js';
 import DisplayURIModal from './receiveModals/displayURIModal.page.js';
 import { balanceReplacer } from '../../../helpers/constants.js';
+import VerifyAddressModal from './receiveModals/verifyAddressModal.page.js';
 
 class ReceiveSubTab extends WalletTab {
   // locators
@@ -348,6 +349,12 @@ class ReceiveSubTab extends WalletTab {
       allBalancesHidden.push(addrBalanceText === balanceReplacer || '-');
     }
     return allBalancesHidden.every(addrBalance => addrBalance === true);
+  }
+  async callVerifyAddress(rowindex) {
+    this.logger.info(`ReceiveSubTab::callVerifyAddress is called.`);
+    const verifuAddrBtnLocator = this.verifyAddressButtonInRowLocator(rowindex);
+    await this.click(verifuAddrBtnLocator);
+    return new VerifyAddressModal(this.driver, this.logger);
   }
 }
 
