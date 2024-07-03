@@ -121,7 +121,7 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
         <ThemeSettingsBlock
           currentTheme={currentTheme}
           onSubmit={(theme: string) => {
-            if (theme === THEMES.YOROI_REVAMP) {
+            if (theme === THEMES.YOROI_BASE) {
               const { wallets } = this.props.stores;
               const publicDeriver = wallets.selected;
               const publicDerivers = wallets.publicDerivers;
