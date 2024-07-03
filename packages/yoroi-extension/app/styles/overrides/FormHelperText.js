@@ -1,44 +1,14 @@
 // @flow
-const ClassicFormHelperText = {
+
+const FormHelperText = {
   styleOverrides: {
-    root: {
-      color: 'var(--yoroi-comp-input-helper-text)',
-      marginLeft: 0,
-      marginTop: 0,
-      fontWeight: 400,
-      position: 'absolute',
-      bottom: '-2px',
-      '&.Mui-disabled': {
-        color: 'var(--yoroi-comp-input-helper-text-disabled)',
-      },
-      '&.Mui-error': {
-        color: 'var(--yoroi-comp-input-error)',
-      },
-    },
+    root: ({ theme }: any): any => ({
+      color: theme.palette.ds.gray_c600,
+      fontSize: '0.75rem',
+      '&.Mui-disabled': { color: theme.palette.ds.gray_c200 },
+      '&.Mui-error': { color: theme.palette.ds.sys_magenta_c500 },
+    }),
   },
-  defaultProps: {
-    variant: 'outlined',
-  },
+  defaultProps: { variant: 'outlined' },
 };
-const ModernFormHelperText = {
-  styleOverrides: {
-    root: {
-      color: 'var(--yoroi-comp-input-helper-text)',
-      marginTop: 0,
-      marginLeft: '14px',
-      fontWeight: 400,
-      position: 'absolute',
-      bottom: '-2px',
-      '&.Mui-disabled': {
-        color: 'var(--yoroi-comp-input-helper-text-disabled)',
-      },
-      '&.Mui-error': {
-        color: 'var(--yoroi-comp-input-error)',
-      },
-    },
-  },
-  defaultProps: {
-    variant: 'outlined',
-  },
-};
-export { ClassicFormHelperText, ModernFormHelperText };
+export { FormHelperText };
