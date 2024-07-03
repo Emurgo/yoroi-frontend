@@ -60,7 +60,7 @@ const magenta = {
 
 const system = { magenta, cyan, yellow, orange };
 
-export const darkThemeBase = {
+export const darkThemeBase: any = {
   name: 'dark-theme',
   palette: {
     mode: 'dark',
