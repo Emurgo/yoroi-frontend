@@ -95,6 +95,7 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={this.props.cancel}
+        id='verifyAddressDialog'
       >
         {this.renderQrCode()}
         {this.renderAddressBlock()}
@@ -183,7 +184,7 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
         <span className={this.getLabelStyle()}>
           {intl.formatMessage(globalMessages.stakingKeyHashLabel)}
         </span>
-        <div className="stakingKey">
+        <div className="stakingKey" id='verifyAddressDialog-stakingKeyHash-text'>
           <RawHash light={false} className={styles.hash}>
             {stakingKey}
           </RawHash>
@@ -275,7 +276,9 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
           {intl.formatMessage(globalMessages.derivationPathLabel)}
         </span>
         <div className={derivationClasses}>
-          <div className={styles.hash}>{toDerivationPathString(addressing.path)}</div>
+          <div className={styles.hash} id='verifyAddressDialog-derivationPath-text'>
+            {toDerivationPathString(addressing.path)}
+          </div>
         </div>
         <br />
       </>
