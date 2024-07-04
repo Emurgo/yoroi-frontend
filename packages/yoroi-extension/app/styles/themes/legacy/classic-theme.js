@@ -1,6 +1,6 @@
 // @flow
 import { createTheme } from '@mui/material/styles';
-import { SFUIDisplayFonts, RobotoMonoFonts } from '../fonts';
+import { SFUIDisplayFonts, RobotoMonoFonts } from '../../fonts';
 import {
   ClassicButton,
   ClassicCheckbox,
@@ -16,7 +16,7 @@ import {
   ClassicChip,
   ClassicTooltip,
   ClassicSelect,
-} from '../overrides';
+} from '../../overrides/legacy';
 import { commonTheme } from './common-theme';
 import { deepmerge } from '@mui/utils';
 

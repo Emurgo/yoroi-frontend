@@ -1,6 +1,6 @@
 // @flow
 import { createTheme } from '@mui/material/styles';
-import { RubikFonts, RobotoMonoFonts } from '../fonts';
+import { RubikFonts, RobotoMonoFonts } from '../../fonts';
 import {
   ModernButton,
   ModernCheckbox,
@@ -16,7 +16,7 @@ import {
   ModernTooltip,
   ModernInputLabel,
   ModernSelect,
-} from '../overrides';
+} from '../../overrides/legacy';
 import { commonTheme } from './common-theme';
 import { deepmerge } from '@mui/utils';
 

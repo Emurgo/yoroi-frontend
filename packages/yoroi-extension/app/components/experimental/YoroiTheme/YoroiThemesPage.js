@@ -3,8 +3,8 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import styles from './YoroiThemesPage.scss'
 import type { Node } from 'react';
-import { classicTheme } from '../../../styles/themes/classic-theme'
-import {  modernTheme } from '../../../styles/themes/modern-theme'
+import { classicTheme } from '../../../styles/themes/legacy/classic-theme';
+import { modernTheme } from '../../../styles/themes/legacy/modern-theme';
 import classNames from 'classnames';
 
 type Props = {||}
