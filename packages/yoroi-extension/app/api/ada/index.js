@@ -123,7 +123,7 @@ import type {
 } from './lib/state-fetch/types';
 import { getChainAddressesForDisplay, } from './lib/storage/models/utils';
 import {
-  getAllUsedAddresses,
+  getAllAddresses,
   getAllAddressesForDisplay,
   rawGetAddressRowsForWallet,
 } from './lib/storage/bridge/traitUtils';
@@ -2231,6 +2231,24 @@ export default class AdaApi {
     return utxos;
   }
 
+  async getAllUsedAddresses(
+    wallet: PublicDeriver<>,
+    submittedTxs: Array<PersistedSubmittedTransaction>,
+  ): Promise<string[]> {
+    const usedAddresses = await getAllAddresses(wallet, true);
+
+    const outputAddressesInSubmittedTxs = new Set(
+      submittedTxs
+        .filter(submittedTxRecord => submittedTxRecord.publicDeriverId === wallet.getPublicDeriverId())
+        .flatMap(({ transaction }) => {
+          return transaction.addresses.to.map(({ address }) => address);
+        })
+    );
+    const usedInSubmittedTxs = (await getAllAddresses(wallet, false))
+          .filter(address => outputAddressesInSubmittedTxs.has(address));
+    return [...usedAddresses, ...usedInSubmittedTxs];
+  }
+
   async createReorgTx(
     publicDeriver: PublicDeriver<>,
     usedUtxoIds: Array<string>,
@@ -2254,9 +2272,49 @@ export default class AdaApi {
       throw new Error(`missing chains functionality`);
     }
 
+    const receiveAddress = await getReceiveAddress(publicDeriver);
+    if (receiveAddress == null) {
+      throw new Error(`no receive addresses. Should never happen`);
+    }
+
+    return this._createReorgTx(
+      network,
+      publicDeriver.getParent().getDefaultToken(),
+      publicDeriver.getPublicDeriverId(),
+      await withUtxos.getAllUtxoAddresses(),
+      await this.getAllUsedAddresses(publicDeriver, submittedTxs),
+      receiveAddress,
+      usedUtxoIds,
+      reorgTargetAmount,
+      utxos,
+      submittedTxs,
+      reorgTargetAddress,
+    );
+  }
+
+  async _createReorgTx(
+    network: $ReadOnly<NetworkRow>,
+    defaultToken: DefaultTokenEntry, 
+    publicDeriverId: number,
+    allUtxoAddresses: IGetAllUtxoAddressesResponse,
+    allUsedAddresses: Array<string>,
+    receiveAddress: BaseSingleAddressPath,
+    usedUtxoIds: Array<string>,
+    reorgTargetAmount: string,
+    utxos: Array<CardanoAddressedUtxo>,
+    submittedTxs: Array<PersistedSubmittedTransaction>,
+    reorgTargetAddress: ?string,
+  ): Promise<{|
+    unsignedTx: HaskellShelleyTxSignRequest,
+    collateralOutputAddressSet: Set<string>,
+  |}> {
     const fullConfig = getCardanoHaskellBaseConfig(network);
     const absSlotNumber = new BigNumber(TimeUtils.timeToAbsoluteSlot(fullConfig, new Date()));
-    const targetAddress = reorgTargetAddress ?? (await getAllUsedAddresses(publicDeriver))[0];
+    const dontUseUtxoIds = new Set(usedUtxoIds);
+
+    const targetAddress = reorgTargetAddress ?? (
+      allUsedAddresses
+    )[0];
     if (targetAddress == null) {
       throw new Error('unexpected: no target address or used addresses available');
     }
@@ -2268,26 +2326,27 @@ export default class AdaApi {
       isForeign: false,
       value: reorgOutputValue,
     }];
-    const collateralOutputAddressSet = new Set<string>([targetAddress]);
-    const dontUseUtxoIds = new Set(usedUtxoIds);
-    const unsignedTx = await this.createUnsignedTxForConnector(
-      {
-        publicDeriver: withHasUtxoChains,
-        absSlotNumber,
-        cardanoTxRequest: {
-          includeTargets,
-        },
-        utxos: (await this.addressedUtxosWithSubmittedTxs(
-          utxos,
-          publicDeriver,
-          submittedTxs,
-        )).filter(utxo => !dontUseUtxoIds.has(utxo.utxo_id)),
-        // we already factored in submitted transactions above, no need to handle it
-        // any more, so just use an empty array here
-        submittedTxs: [],
-      },
+
+    const unsignedTx = await this._createUnsignedTxForConnector(
+      { includeTargets, },
+      defaultToken,
+      publicDeriverId,
+      allUtxoAddresses,
+      receiveAddress,
+      network,
+      absSlotNumber,
+      submittedTxs,
+      (await this._addressedUtxosWithSubmittedTxs(
+        utxos,
+        publicDeriverId,
+        allUtxoAddresses,
+        submittedTxs,
+      )).filter(utxo => !dontUseUtxoIds.has(utxo.utxo_id)),      
       null,
     );
+
+    const collateralOutputAddressSet = new Set<string>([targetAddress]);
+
     return { unsignedTx, collateralOutputAddressSet };
   }
 }

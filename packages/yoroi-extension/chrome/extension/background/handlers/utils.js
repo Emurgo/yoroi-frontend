@@ -35,7 +35,11 @@ import {
 } from '../../../../app/api/ada/lib/storage/database/prepackaged/networks';
 import AdaApi from '../../../../app/api/ada';
 import BigNumber from 'bignumber.js';
-import { asAddressedUtxo, cardanoValueFromRemoteFormat } from '../../../../app/api/ada/transactions/utils';
+import {
+  asAddressedUtxo,
+  cardanoValueFromRemoteFormat,
+  cardanoMinAdaRequiredFromRemoteFormat_coinsPerWord,
+} from '../../../../app/api/ada/transactions/utils';
 import { MultiToken } from '../../../../app/api/common/lib/MultiToken';
 import { RustModule } from '../../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { loadSubmittedTransactions } from '../../../../app/api/localStorage';
@@ -70,14 +74,12 @@ export async function getWalletState(publicDeriver: PublicDeriver<>): Promise<Wa
       (acc, next) => Object.assign(acc, next),
       {}
     );
-    const coinsPerUtxoWord = Scope.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord);
-    const deposits: Array<RustModule.WalletV4.BigNum> = addressedUtxos.map(u => {
+    const deposits: Array<BigNumber> = addressedUtxos.map(u => {
       try {
-        return Scope.WalletV4.min_ada_required(
-          // $FlowFixMe[prop-missing]
-          cardanoValueFromRemoteFormat(u),
-          utxoHasDataHash,
-          coinsPerUtxoWord
+        return cardanoMinAdaRequiredFromRemoteFormat_coinsPerWord(
+          // $FlowIgnore[prop-missing] property `addressing` is missing in  `RemoteUnspentOutput` [1] but exists in  `CardanoAddressedUtxo` [2]
+          u,
+          new BigNumber(config.CoinsPerUtxoWord),
         );
       } catch (e) {
         // eslint-disable-next-line no-console
@@ -85,16 +87,16 @@ export async function getWalletState(publicDeriver: PublicDeriver<>): Promise<Wa
           `Failed to calculate min-required ADA for utxo: ${JSON.stringify(u)}`,
           e
         );
-        return Scope.WalletV4.BigNum.zero();
+        return new BigNumber('0');
       }
     });
-    const sumDeposit = deposits.reduce((a, b) => a.checked_add(b), Scope.WalletV4.BigNum.zero());
+    const sumDeposit = deposits.reduce((a, b) => a.plus(b), new BigNumber('0'));
     const defaultTokenId = publicDeriver.getParent().getDefaultMultiToken().defaults.defaultIdentifier;
     const assetDeposits =  new MultiToken(
       [
         {
           identifier: defaultTokenId,
-          amount: new BigNumber(sumDeposit.to_str()),
+          amount: sumDeposit,
           networkId: network.NetworkId,
         },
       ],

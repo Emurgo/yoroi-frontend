@@ -61,13 +61,12 @@ import {
 } from '../../connector/types';
 import {
   connectorCreateCardanoTx,
-  connectorGenerateReorgTx,
   connectorGetBalance,
   connectorGetCardanoRewardAddresses,
   connectorGetChangeAddress,
   connectorGetCollateralUtxos,
   connectorGetUnusedAddresses,
-  connectorGetUsedAddresses,
+  connectorGetUsedAddressesWithPaginate,
   connectorGetUtxosCardano,
   connectorRecordSubmittedCardanoTransaction,
   connectorSendTxCardano,
@@ -102,12 +101,14 @@ import {
 import { authSignHexPayload } from '../../../../app/connector/api';
 import type { RemoteUnspentOutput } from '../../../../app/api/ada/lib/state-fetch/types';
 import { NotEnoughMoneyToSendError, } from '../../../../app/api/common/errors';
-import { asAddressedUtxo as asAddressedUtxoCardano, } from '../../../../app/api/ada/transactions/utils';
+import {
+  asAddressedUtxo as asAddressedUtxoCardano,
+  mergeWitnessSets,
+} from '../../../../app/api/ada/transactions/utils';
 import ConnectorStore from '../../../../app/connector/stores/ConnectorStore';
 import type { ForeignUtxoFetcher } from '../../../../app/connector/stores/ConnectorStore';
 import { find721metadata } from '../../../../app/utils/nftMetadata';
 import { hexToBytes } from '../../../../app/coreUtils';
-import { mergeWitnessSets } from '../../connector/utils';
 import { getDb, syncWallet } from '../state';
 import {
   withDb,
@@ -577,7 +578,7 @@ export async function yoroiMessageHandler(
             }
 
             const addressesMap = {
-              usedAddresses: async () => await connectorGetUsedAddresses(wallet, null),
+              usedAddresses: async () => await connectorGetUsedAddressesWithPaginate(wallet, null),
               unusedAddresses: async () => await connectorGetUnusedAddresses(wallet),
               changeAddress: async () => await connectorGetChangeAddress(wallet),
               utxos: async () =>  await withHasUtxoChains.getAllUtxos(),
@@ -945,11 +946,12 @@ export async function yoroiMessageHandler(
       }));
       addressedUtxoArray = [];
     } else {
-      txs = [{
-        id: transactionHexToHash(request.request.signedTxHex),
-        encodedTx: hexToBytes(request.request.signedTxHex)
-      }];
-      addressedUtxoArray = [request.request.addressedUtxos];
+      const { signedTxHex, addressedUtxos } = request.request;
+      if (typeof signedTxHex !== 'string') {
+        throw new Error('unexpected missing `signedTxHex` in request');
+      }
+      txs = [{ id: transactionHexToHash(signedTxHex), encodedTx: hexToBytes(signedTxHex) }];
+      addressedUtxoArray = [addressedUtxos];
     }
 
     const stateFetcher = await getCardanoStateFetcher(new LocalStorageApi());

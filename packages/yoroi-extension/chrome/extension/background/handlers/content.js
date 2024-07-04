@@ -34,7 +34,6 @@ import {
 } from '../../connector/types';
 import {
   connectorCreateCardanoTx,
-  connectorGenerateReorgTx,
   connectorGetBalance,
   connectorGetCardanoRewardAddresses,
   connectorGetChangeAddress,
@@ -80,6 +79,7 @@ import { hexToBytes } from '../../../../app/coreUtils';
 import { mergeWitnessSets } from '../../../../app/api/ada/transactions/utils';
 import { getDb, syncWallet } from '../state';
 import { getCardanoStateFetcher } from '../utils';
+import AdaApi from '../../../../app/api/ada';
 
 /*::
 declare var chrome;
@@ -1149,7 +1149,8 @@ export async function handleInjectorMessage(message: any, sender: any) {
                 // `requiredAmount` is the amount needed to respond
                 const usedUtxoIds = utxosToUse.map(utxo => utxo.utxo_id);
                 try {
-                  await connectorGenerateReorgTx(
+                  const adaApi = new AdaApi();
+                  await adaApi.createReorgTx(
                     wallet,
                     usedUtxoIds,
                     // `requiredAmount` is used here instead of the `reorgTargetAmount`

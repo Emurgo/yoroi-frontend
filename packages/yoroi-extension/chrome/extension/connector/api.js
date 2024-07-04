@@ -27,7 +27,6 @@ import { CannotSendBelowMinimumValueError, NotEnoughMoneyToSendError, } from '..
 import { CoreAddressTypes, TxStatusCodes, } from '../../../app/api/ada/lib/storage/database/primitives/enums';
 import type { FullAddressPayload } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 import {
-  getAllUsedAddresses,
   getAllAddresses,
   getAllAddressesForDisplay,
   getAllAddressesForWallet,
@@ -36,7 +35,6 @@ import { getReceiveAddress } from '../../../app/stores/stateless/addressStores';
 
 import type { PersistedSubmittedTransaction } from '../../../app/api/localStorage';
 import LocalStorageApi, {
-  getOutputAddressesInSubmittedTxs,
   loadSubmittedTransactions,
   persistSubmittedTransactions,
 } from '../../../app/api/localStorage';
@@ -92,7 +90,6 @@ import {
   derivePublicByAddressing
 } from '../../../app/api/ada/lib/cardanoCrypto/deriveByAddressing';
 import type { DefaultTokenEntry } from '../../../app/api/common/lib/MultiToken';
-axios.defaults.adapter = fetchAdapter;
 import { transactionHexToHash } from '../../../app/api/ada/lib/cardanoCrypto/utils';
 import { sendTx } from '../../../app/api/ada/lib/state-fetch/remoteFetcher';
 
@@ -387,13 +384,6 @@ async function getCardanoRewardAddresses(
       base58: a.address,
     };
   });
-}
-
-async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Promise<Address[]> {
-  const addresses = await getAllAddressesForWallet(wallet);
-  return [...addresses.utxoAddresses, ...addresses.accountingAddresses]
-    .filter(a => a.address.IsUsed === usedFilter && a.address.Type === CoreAddressTypes.CARDANO_BASE)
-    .map(a => a.address.Hash);
 }
 
 async function getOutputAddressesInSubmittedTxs(publicDeriverId: number) {
@@ -1158,69 +1148,6 @@ export async function connectorRecordSubmittedCardanoTransaction(
     usedUtxos,
   });
   await persistSubmittedTransactions(submittedTxs);
-}
-
-// <TODO:PENDING_REMOVAL> use the ada api function directly
-export async function connectorGenerateReorgTx(
-  publicDeriver: PublicDeriver<>,
-  usedUtxoIds: Array<string>,
-  reorgTargetAmount: string,
-  utxos: Array<CardanoAddressedUtxo>,
-  submittedTxs: Array<PersistedSubmittedTransaction>,
-): Promise<{|
-  unsignedTx: HaskellShelleyTxSignRequest,
-  collateralOutputAddressSet: Set<string>,
-|}> {
-  const network = publicDeriver.getParent().getNetworkInfo();
-  const withUtxos = asGetAllUtxos(publicDeriver);
-  if (withUtxos == null) {
-    throw new Error(`missing utxo functionality`);
-  }
-  const allUtxoAddresses = await withUtxos.getAllUtxoAddresses();
-
-  const internal = await getReceiveAddress(publicDeriver);
-  if (internal == null) {
-    throw new Error(`no internal addresses left. Should never happen`);
-  }
-
-  return _connectorGenerateReorgTx(
-    network,
-    publicDeriver.getParent().getDefaultToken(),
-    publicDeriver.publicDeriverId,
-    allUtxoAddresses,
-    internal,
-    await getAllAddresses(publicDeriver, false),
-    await getOutputAddressesInSubmittedTxs(publicDeriver.publicDeriverId),
-    usedUtxoIds,
-    reorgTargetAmount,
-    utxos,
-    submittedTxs,
-  );
-}
-export async function _connectorGenerateReorgTx(
-  network: $ReadOnly<NetworkRow>,
-  defaultToken: DefaultTokenEntry,
-  publicDeriverId: number,
-  allUtxoAddresses: IGetAllUtxoAddressesResponse,
-  receiveAddress: BaseSingleAddressPath,
-  originalUnusedAddresses: Array<Address>,
-  outputAddressesInSubmittedTxs: Array<Address>,
-  usedUtxoIds: Array<string>,
-  reorgTargetAmount: string,
-  utxos: Array<CardanoAddressedUtxo>,
-  submittedTxs: Array<PersistedSubmittedTransaction>,
-): Promise<{|
-  unsignedTx: HaskellShelleyTxSignRequest,
-  collateralOutputAddressSet: Set<string>,
-|}> {
-  const adaApi = new AdaApi();
-  return adaApi.createReorgTx(
-    publicDeriver,
-    usedUtxoIds,
-    reorgTargetAmount,
-    utxos,
-    submittedTxs,
-  );
 }
 
 export async function getAddressing(

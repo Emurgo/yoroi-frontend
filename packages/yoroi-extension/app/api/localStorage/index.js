@@ -433,15 +433,6 @@ export async function loadSubmittedTransactions(): Promise<Array<PersistedSubmit
   );
 }
 
-export async function getOutputAddressesInSubmittedTxs(publicDeriverId: number): Promise<Array<string>> {
-  const submittedTxs = await loadSubmittedTransactions() || [];
-  return submittedTxs
-    .filter(submittedTxRecord => submittedTxRecord.publicDeriverId === publicDeriverId)
-    .flatMap(({ transaction }) => {
-      return transaction.addresses.to.map(({ address }) => address);
-    });
-}
-
 export async function loadCatalystRoundInfo(): Promise<?CatalystRoundInfoResponse> {
   const json = await getLocalItem(storageKeys.CATALYST_ROUND_INFO);
   if (!json) {

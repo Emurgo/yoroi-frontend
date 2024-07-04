@@ -22,7 +22,6 @@ import { CoreAddressTypes } from '../database/primitives/enums';
 import { GetDerivationSpecific, } from '../database/walletTypes/common/api/read';
 import { GetUtxoTxOutputsWithTx, } from '../database/transactionModels/utxo/api/read';
 import { rawGetAddressesForDisplay, } from '../models/utils';
-import { getOutputAddressesInSubmittedTxs } from '../../../../localStorage';
 
 export async function rawGetAllAddressesForDisplay(
   tx: lf$Transaction,
@@ -161,7 +160,7 @@ export async function getAllAddressesForWallet(
 |}> {
   const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
   if (!withLevels) {
-    throw new Error(`${nameof(this.createSubmittedTransactionData)} publicDerviver traits missing`);
+    throw new Error(`${nameof(getAllAddressesForWallet)} publicDerviver traits missing`);
   }
   const derivationTables = withLevels.getParent().getDerivationTables();
   const deps = Object.freeze({
@@ -232,18 +231,6 @@ export async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boole
   return addresses
     .filter(a => a.address.IsUsed === usedFilter && a.address.Type === CoreAddressTypes.CARDANO_BASE)
     .map(a => a.address.Hash);
-}
-
-export async function getAllUsedAddresses(
-  wallet: PublicDeriver<>,
-): Promise<string[]> {
-  const usedAddresses = await getAllAddresses(wallet, true);
-  const outputAddressesInSubmittedTxs = new Set(
-    await getOutputAddressesInSubmittedTxs(wallet.publicDeriverId)
-  );
-  const usedInSubmittedTxs = (await getAllAddresses(wallet, false))
-    .filter(address => outputAddressesInSubmittedTxs.has(address));
-  return [...usedAddresses, ...usedInSubmittedTxs];
 }
 
 export async function rawGetAddressRowsForWallet(
