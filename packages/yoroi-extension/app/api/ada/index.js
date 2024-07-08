@@ -123,9 +123,12 @@ import type {
 } from './lib/state-fetch/types';
 import { getChainAddressesForDisplay, } from './lib/storage/models/utils';
 import {
-  getAllAddresses,
   getAllAddressesForDisplay,
   rawGetAddressRowsForWallet,
+  getAllAddressesForWallet,
+} from './lib/storage/bridge/traitUtils';
+import type {
+  AddressRowWithPath,
 } from './lib/storage/bridge/traitUtils';
 import {
   asAddressedUtxo,
@@ -2233,19 +2236,40 @@ export default class AdaApi {
 
   async getAllUsedAddresses(
     wallet: PublicDeriver<>,
-    submittedTxs: Array<PersistedSubmittedTransaction>,
+    submittedTransactions: Array<PersistedSubmittedTransaction>,
   ): Promise<string[]> {
-    const usedAddresses = await getAllAddresses(wallet, true);
+    const allAddresses  = await getAllAddressesForWallet(wallet);
+    return this._getAllUsedAddresses({
+      allAddresses,
+      submittedTransactions,
+      publicDeriverId: wallet.getPublicDeriverId(),
+    });
+      
+  }
+
+  async _getAllUsedAddresses(wallet: {
+    publicDeriverId: number,
+    +allAddresses: { utxoAddresses: Array<$ReadOnly<AddressRowWithPath>>, ... },
+    submittedTransactions: Array<PersistedSubmittedTransaction>,
+    ...
+  }): Promise<string[]> {
+    const usedAddresses = wallet.allAddresses.utxoAddresses.filter(a => a.address.IsUsed).map(
+      a => a.address.Hash
+    );
+    const unusedAddresses = wallet.allAddresses.utxoAddresses.filter(a => !a.address.IsUsed).map(
+      a => a.address.Hash
+    );
 
     const outputAddressesInSubmittedTxs = new Set(
-      submittedTxs
-        .filter(submittedTxRecord => submittedTxRecord.publicDeriverId === wallet.getPublicDeriverId())
+      wallet.submittedTransactions
+        .filter(submittedTxRecord => submittedTxRecord.publicDeriverId === wallet.publicDeriverId)
         .flatMap(({ transaction }) => {
           return transaction.addresses.to.map(({ address }) => address);
         })
     );
-    const usedInSubmittedTxs = (await getAllAddresses(wallet, false))
-          .filter(address => outputAddressesInSubmittedTxs.has(address));
+    const usedInSubmittedTxs = unusedAddresses.filter(
+      address => outputAddressesInSubmittedTxs.has(address)
+    );
     return [...usedAddresses, ...usedInSubmittedTxs];
   }
 
@@ -2277,18 +2301,23 @@ export default class AdaApi {
       throw new Error(`no receive addresses. Should never happen`);
     }
 
+    const usedAddresses = await this.getAllUsedAddresses(publicDeriver, submittedTxs);
+    const targetAddress = reorgTargetAddress || usedAddresses[0];
+    if (!targetAddress) {
+      throw new Error('unexpected: no target address or used addresses available');
+    }
+
     return this._createReorgTx(
       network,
       publicDeriver.getParent().getDefaultToken(),
       publicDeriver.getPublicDeriverId(),
       await withUtxos.getAllUtxoAddresses(),
-      await this.getAllUsedAddresses(publicDeriver, submittedTxs),
       receiveAddress,
       usedUtxoIds,
       reorgTargetAmount,
       utxos,
       submittedTxs,
-      reorgTargetAddress,
+      targetAddress,
     );
   }
 
@@ -2297,13 +2326,12 @@ export default class AdaApi {
     defaultToken: DefaultTokenEntry, 
     publicDeriverId: number,
     allUtxoAddresses: IGetAllUtxoAddressesResponse,
-    allUsedAddresses: Array<string>,
     receiveAddress: BaseSingleAddressPath,
     usedUtxoIds: Array<string>,
     reorgTargetAmount: string,
     utxos: Array<CardanoAddressedUtxo>,
     submittedTxs: Array<PersistedSubmittedTransaction>,
-    reorgTargetAddress: ?string,
+    targetAddress: string,
   ): Promise<{|
     unsignedTx: HaskellShelleyTxSignRequest,
     collateralOutputAddressSet: Set<string>,
@@ -2312,12 +2340,6 @@ export default class AdaApi {
     const absSlotNumber = new BigNumber(TimeUtils.timeToAbsoluteSlot(fullConfig, new Date()));
     const dontUseUtxoIds = new Set(usedUtxoIds);
 
-    const targetAddress = reorgTargetAddress ?? (
-      allUsedAddresses
-    )[0];
-    if (targetAddress == null) {
-      throw new Error('unexpected: no target address or used addresses available');
-    }
     const reorgOutputValue = BigNumber
       .max(reorgTargetAmount, MIN_REORG_OUTPUT_AMOUNT)
       .toString();

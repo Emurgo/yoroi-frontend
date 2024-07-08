@@ -47,7 +47,6 @@ import { MultiToken } from '../../api/common/lib/MultiToken';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { asAddressedUtxo, multiTokenFromCardanoValue, multiTokenFromRemote, } from '../../api/ada/transactions/utils';
 import {
-  _connectorGenerateReorgTx,
   connectorGetChangeAddress,
   _connectorGetUnusedAddresses,
   _connectorGetUsedAddressesWithPaginate,
@@ -87,6 +86,7 @@ import { getWallets, signAndBroadcastTransaction, broadcastTransaction } from '.
 import type { WalletState } from '../../../chrome/extension/background/types';
 import { CoreAddressTypes, TxStatusCodes, } from '../../api/ada/lib/storage/database/primitives/enums';
 import { addressBech32ToHex } from '../../api/ada/lib/cardanoCrypto/utils';
+import AdaApi from '../../api/ada';
 
 export function connectorCall<T, R>(message: T): Promise<R> {
   return new Promise((resolve, reject) => {
@@ -883,9 +883,14 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     const { usedUtxoIds, reorgTargetAmount, utxos } = signingMessage.sign.tx;
     const addressedUtxos = asAddressedUtxo(toJS(utxos));
     this.addressedUtxos = addressedUtxos;
-    const submittedTxs = await loadSubmittedTransactions() || [];
 
-    const { unsignedTx, collateralOutputAddressSet } = await _connectorGenerateReorgTx(
+    const adaApi = new AdaApi();
+    const usedAddress = (await adaApi._getAllUsedAddresses(connectedWallet))[0];
+    if (!usedAddress) {
+      throw new Error('wallet has no used address');
+    }
+
+    const { unsignedTx, collateralOutputAddressSet } = await adaApi._createReorgTx(
       getNetworkById(connectedWallet.networkId),
       {
         defaultNetworkId: connectedWallet.networkId,
@@ -894,18 +899,11 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       connectedWallet.publicDeriverId,
       connectedWallet.allUtxoAddresses,
       connectedWallet.receiveAddress,
-      [
-        ...connectedWallet.allAddresses.utxoAddresses,
-        ...connectedWallet.allAddresses.accountingAddresses,
-      ].filter(a => !a.address.IsUsed && a.address.Type === CoreAddressTypes.CARDANO_BASE)
-        .map(a => a.address.Hash),
-      connectedWallet.submittedTransactions.flatMap(({ transaction }) => {
-        return transaction.addresses.to.map(({ address }) => address);
-      }),
       usedUtxoIds,
       reorgTargetAmount,
       addressedUtxos,
-      submittedTxs
+      connectedWallet.submittedTransactions,
+      usedAddress,
     );
     // record the unsigned tx, so that after the user's approval, we can sign
     // it without re-generating
