@@ -21,7 +21,7 @@ export const light = {
   text_info: lightPalette.sys_cyan_c500, // info messages
 
   bg_color_high: lightPalette.gray_cmin, // bottom surface
-  bg_color_low: lightPalette.gray_c100, // upper surface
+  bg_color_low: lightPalette.white_static, // upper surface
 
   el_primary_high: lightPalette.primary_c600, // hover'nd pressed state, actianable elements
   el_primary_medium: lightPalette.primary_c500, // actionable elements

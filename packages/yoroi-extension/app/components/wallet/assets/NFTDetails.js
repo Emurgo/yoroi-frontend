@@ -1,38 +1,33 @@
 // @flow
-import type { ComponentType, Node } from 'react';
-import { useState } from 'react';
-import { Box, styled } from '@mui/system';
+import { TabContext, TabList, TabPanel } from '@mui/lab';
 import {
+  Button,
+  Grid,
+  IconButton,
   Link as LinkMui,
-  Typography,
+  Modal,
   Stack,
   Tab,
-  Modal,
-  Button,
-  IconButton,
-  Grid,
+  Typography,
 } from '@mui/material';
-import { TabContext, TabPanel, TabList } from '@mui/lab';
-import globalMessages from '../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { defineMessages, injectIntl } from 'react-intl';
-import { ReactComponent as BackArrow } from '../../../assets/images/assets-page/backarrow.inline.svg';
-import { ReactComponent as IconCopy } from '../../../assets/images/copy.inline.svg';
-import { ReactComponent as IconCopied } from '../../../assets/images/copied.inline.svg';
-import { ReactComponent as Chevron } from '../../../assets/images/assets-page/chevron-right.inline.svg';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { Box, styled } from '@mui/system';
+import type { Node } from 'react';
+import { useState } from 'react';
+import { defineMessages, injectIntl } from 'react-intl';
 import { Link } from 'react-router-dom';
-import { ROUTES } from '../../../routes-config';
-import { getNetworkUrl, tokenMessages } from './TokenDetails';
-import type {
-  CardanoAssetMintMetadata,
-  NetworkRow,
-} from '../../../api/ada/lib/storage/database/primitives/tables';
-import { NftImage } from './NFTsList';
-import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
-import { truncateAddress, truncateAddressShort } from '../../../utils/formatters';
-import { urlResolveForIpfsAndCorsproxy } from '../../../coreUtils';
 import { ampli } from '../../../../ampli/index';
+import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import { ReactComponent as BackArrow } from '../../../assets/images/assets-page/backarrow.inline.svg';
+import { ReactComponent as Chevron } from '../../../assets/images/assets-page/chevron-right.inline.svg';
+import { ReactComponent as IconCopied } from '../../../assets/images/copied.inline.svg';
+import { ReactComponent as IconCopy } from '../../../assets/images/copy.inline.svg';
+import { urlResolveForIpfsAndCorsproxy } from '../../../coreUtils';
+import globalMessages from '../../../i18n/global-messages';
+import { ROUTES } from '../../../routes-config';
+import { truncateAddress, truncateAddressShort } from '../../../utils/formatters';
+import { NftImage } from './NFTsList';
+import { getNetworkUrl, tokenMessages } from './TokenDetails';
 import { CopyAddress, TruncatedText } from './TruncatedText';
 
 type Props = {|
@@ -100,6 +95,18 @@ const tabs = [
   },
 ];
 
+const SButton = styled(Button)(({ theme, active }) => ({
+  color: theme.palette.ds.el_gray_normal,
+  '&.MuiButton-sizeMedium': {
+    padding: '13px 16px',
+  },
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_normal,
+    },
+  },
+}));
+
 function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props & Intl): Node {
   const nftImage = nftInfo?.image;
   const networkUrl = getNetworkUrl(network);
@@ -147,26 +154,16 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
 
   return (
     <Box sx={{ p: '24px', width: '100%' }}>
-      <Button
-        LinkComponent={Link}
-        to={ROUTES.NFTS.ROOT}
-        sx={{
-          color: 'grayscale.900',
-          '&.MuiButton-sizeMedium': {
-            padding: '13px 16px',
-          },
-        }}
-        startIcon={<BackArrow />}
-      >
+      <SButton LinkComponent={Link} to={ROUTES.NFTS.ROOT} startIcon={<BackArrow />}>
         <Typography fontWeight="500">{intl.formatMessage(messages.back)}</Typography>
-      </Button>
+      </SButton>
       <Grid
         container
         columns={10}
         sx={{
           margin: '0 auto',
           minHeight: '400px',
-          backgroundColor: 'common.white',
+          backgroundColor: 'ds.bg_color_low',
           borderRadius: '8px',
         }}
       >
@@ -179,6 +176,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
               img: {
                 objectFit: 'unset',
               },
+              backgroundColor: 'ds.bg_color_low',
             }}
             onClick={() => nftImage !== null && setOpenAndTrack()}
           >
@@ -209,7 +207,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                   variant="h2"
                   fontWeight={500}
                   sx={{ width: below1400 ? '200px' : '400px' }}
-                  color="common.black"
+                  color="ds.el_gray_normal"
                 >
                   {nftInfo.name}
                 </TruncatedText>
@@ -411,7 +409,6 @@ const ImageItem = styled(Box)({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  backgroundColor: 'var(--yoroi-palette-common-white)',
   borderRadius: '8px',
   img: {
     margin: '0 auto',
@@ -427,10 +424,10 @@ const ImageItem = styled(Box)({
 function LabelWithValue({ label, value }: {| label: string | Node, value: string | Node |}): Node {
   return (
     <Box>
-      <Typography component="div" color="var(--yoroi-palette-gray-600)">
+      <Typography component="div" color="ds.el_gray_medium">
         {label}
       </Typography>
-      <Typography component="div" color="var(--yoroi-palette-gray-900)">
+      <Typography component="div" color="ds.el_gray_normal">
         {value}
       </Typography>
     </Box>

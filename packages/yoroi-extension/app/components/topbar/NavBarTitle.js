@@ -1,11 +1,10 @@
 // @flow
-import { Component } from 'react';
-import type { Node, ComponentType } from 'react';
-import type { LayoutComponentMap } from '../../styles/context/layout';
-import styles from './NavBarTitle.scss';
-import { observer } from 'mobx-react';
-import { withLayout } from '../../styles/context/layout';
 import { Box } from '@mui/material';
+import { observer } from 'mobx-react';
+import type { Node } from 'react';
+import { Component } from 'react';
+import { withLayout } from '../../styles/context/layout';
+import styles from './NavBarTitle.scss';
 
 type Props = {|
   +title: string,
@@ -21,7 +20,7 @@ class NavBarTitle extends Component<Props & InjectedProps> {
 
     const navbarTitleClassic = <div className={styles.title}>{title}</div>;
     const navbarTitleRevamp = (
-      <Box id="navBarTitle" className={styles.titleRevamp} sx={{ color: 'grayscale.800' }}>
+      <Box id="navBarTitle" className={styles.titleRevamp} sx={{ color: 'ds.el_gray_normal' }}>
         {title}
       </Box>
     );

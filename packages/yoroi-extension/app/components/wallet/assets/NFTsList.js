@@ -1,33 +1,31 @@
 // @flow
-import type { ComponentType, Node } from 'react';
-import { Box, styled } from '@mui/system';
 import {
+  Button,
+  Grid,
+  IconButton,
   InputAdornment,
+  OutlinedInput,
+  Skeleton,
   Stack,
   Typography,
-  Skeleton,
-  OutlinedInput,
-  Button,
-  IconButton,
-  Grid,
 } from '@mui/material';
-import { ReactComponent as Search } from '../../../assets/images/assets-page/search.inline.svg';
-import { ReactComponent as DefaultNFT } from '../../../assets/images/default-nft.inline.svg';
-import { ReactComponent as NotFound } from '../../../assets/images/assets-page/no-nft-found.inline.svg';
+import { Box, styled } from '@mui/system';
+import type { Node } from 'react';
+import { ReactComponent as Close } from '../../../assets/images/assets-page/close.inline.svg';
 import { ReactComponent as Grid2x2 } from '../../../assets/images/assets-page/grid-2x2.inline.svg';
 import { ReactComponent as Grid3x3 } from '../../../assets/images/assets-page/grid-3x3.inline.svg';
-import { ReactComponent as Close } from '../../../assets/images/assets-page/close.inline.svg';
+import { ReactComponent as NotFound } from '../../../assets/images/assets-page/no-nft-found.inline.svg';
+import { ReactComponent as Search } from '../../../assets/images/assets-page/search.inline.svg';
+import { ReactComponent as DefaultNFT } from '../../../assets/images/default-nft.inline.svg';
 
-import { defineMessages, injectIntl } from 'react-intl';
-import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { Link } from 'react-router-dom';
-import { ROUTES } from '../../../routes-config';
-import { useState, useEffect, useCallback } from 'react';
-import globalMessages from '../../../i18n/global-messages';
-import { urlResolveForIpfsAndCorsproxy } from '../../../coreUtils';
-import classNames from 'classnames';
 import { debounce } from 'lodash';
+import { useCallback, useEffect, useState } from 'react';
+import { defineMessages, injectIntl } from 'react-intl';
+import { Link } from 'react-router-dom';
 import { ampli } from '../../../../ampli/index';
+import { urlResolveForIpfsAndCorsproxy } from '../../../coreUtils';
+import globalMessages from '../../../i18n/global-messages';
+import { ROUTES } from '../../../routes-config';
 
 const SEARCH_ACTIVATE_DEBOUNCE_WAIT = 1000;
 
@@ -102,8 +100,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
       sx={{
         height: 'content',
         width: '100%',
-        bgcolor: 'common.white',
-        borderRadius: '8px',
+        bgcolor: 'ds.bg_color_low',
         p: '24px',
       }}
     >
@@ -114,7 +111,13 @@ function NfTsList({ list, intl }: Props & Intl): Node {
         marginBottom="30px"
         paddingBottom="16px"
       >
-        <Typography component="div" variant="h5" color="common.black" fontWeight={500} fontSize="18px">
+        <Typography
+          component="div"
+          variant="h5"
+          color="ds.el_gray_normal"
+          fontWeight={500}
+          fontSize="18px"
+        >
           {list.length === 0
             ? intl.formatMessage(globalMessages.sidebarNfts)
             : intl.formatMessage(messages.nftsCount, { number: list.length })}
@@ -122,14 +125,14 @@ function NfTsList({ list, intl }: Props & Intl): Node {
         <Box display="flex" alignItems="center">
           <Stack direction="row" spacing={1} marginRight="30px">
             {listColumnViews.map(({ count, Icon, imageDims }) => (
-              <Button
+              <SButton
+                active={count === columns.count}
                 key={count}
                 onClick={() => setColumnsAndTrack({ count, Icon, imageDims })}
-                className={classNames(count === columns.count && 'active')}
                 variant="segmented"
               >
                 <Icon />
-              </Button>
+              </SButton>
             ))}
           </Stack>
           <SearchInput
@@ -280,7 +283,8 @@ function NftCardImage({ ipfsUrl, name }: {| ipfsUrl: string | null, name: string
         <NftImage imageUrl={ipfsUrl} name={name} width="100%" height="100%" />
       </Box>
       <Box>
-        <Typography component="div"
+        <Typography
+          component="div"
           mt="16px"
           sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
           color="grayscale.900"
@@ -302,3 +306,12 @@ const SearchInput = styled(OutlinedInput)({
 const SLink = styled(Link)({
   textDecoration: 'none',
 });
+
+const SButton = styled(Button)(({ theme, active }) => ({
+  backgroundColor: active && theme.palette.ds.gray_c200,
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_normal,
+    },
+  },
+}));

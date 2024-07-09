@@ -1,8 +1,8 @@
 // @flow
-import { Component } from 'react';
-import type { Node } from 'react';
+import { Box, Typography } from '@mui/material';
 import { observer } from 'mobx-react';
-import { Box } from '@mui/material';
+import type { Node } from 'react';
+import { Component } from 'react';
 
 type Props = {|
   +children?: ?Node,
@@ -37,7 +37,7 @@ class NavBarRevamp extends Component<Props> {
     return (
       <Box
         sx={{
-          backgroundColor: 'common.white',
+          backgroundColor: 'ds.bg_color_low',
           borderBottom: pageBanner ? 'none' : '1px solid',
           borderBottomColor: 'grayscale.200',
         }}
@@ -46,7 +46,7 @@ class NavBarRevamp extends Component<Props> {
           <Box
             as="header"
             sx={{
-              color: 'grayscale.800',
+              color: 'ds.el_gray_normal',
               display: 'flex',
               alignItems: 'center',
               height: 'inherit',
@@ -62,7 +62,9 @@ class NavBarRevamp extends Component<Props> {
                 marginBottom: menu != null ? '52px' : '',
               }}
             >
-              <Box flex="0 0 auto">{title}</Box>
+              <Box flex="0 0 auto">
+                <Typography color="ds.el_gray_normal">{title}</Typography>
+              </Box>
               <Box
                 sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}
               >
