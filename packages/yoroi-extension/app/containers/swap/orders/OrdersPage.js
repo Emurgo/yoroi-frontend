@@ -35,6 +35,8 @@ import NoOpenOrders from './NoOpenOrders';
 import { useRichOrders } from './hooks';
 import { createFormattedTokenValues } from './util';
 import type { FormattedTokenValue } from './util';
+import type { MappedOrder } from './hooks';
+import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 
 type ColumnContext = {|
   completedOrders: boolean,
