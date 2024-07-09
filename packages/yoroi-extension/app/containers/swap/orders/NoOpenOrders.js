@@ -3,9 +3,9 @@ import { ReactComponent as NoOpenOders } from '../../../assets/images/revamp/no-
 
 const NoOpenOrders = () => {
   return (
-    <Stack direction="column" justifyContent="center" alignItems="center" flex={1} pt="122px">
+    <Stack direction="column" justifyContent="center" alignItems="center" flex={1} pt="98px">
       <NoOpenOders />
-      <Typography variant="h4" fontWeight="500" color="ds.text_gray_normal" mt="66px" pb="8px">
+      <Typography variant="h4" fontWeight="500" color="ds.text_gray_normal" mt="52px" pb="8px">
         No orders available yet
       </Typography>
       <Typography variant="body1" color="ds.text_gray_medium" width="343px" textAlign="center">
