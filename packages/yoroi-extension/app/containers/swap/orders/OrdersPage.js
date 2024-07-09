@@ -22,7 +22,7 @@ import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { CardanoConnectorSignRequest } from '../../../connector/types';
 import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import moment from 'moment';
-import { signTransactionHex } from '../../../api/ada/transactions/signTransactionHex';
+import { signTransaction } from '../../../api/thunk';
 import { createFormattedTokenValues } from './util';
 import type { FormattedTokenValue } from './util';
 
@@ -218,11 +218,11 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
       console.log('Reorg transaction is not available. Ignoring.');
       return;
     }
-    const signedCollateralReorgTx = await signTransactionHex(
-      wallet,
+    const signedCollateralReorgTx = await signTransaction({
+      publicDeriverId: wallet.publicDeriverId,
       password,
-      collateralReorgTx.cbor
-    );
+      transactionHex: collateralReorgTx.cbor
+    });
     setCancellationState({ order, signedCollateralReorgTx, tx });
   };
 
@@ -240,7 +240,11 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
       return;
     }
     setCancellationState({ order, signedCollateralReorgTx, tx, isSubmitting: true });
-    const signedCancelTx = await signTransactionHex(wallet, password, tx.cbor);
+    const signedCancelTx = await signTransaction({
+      publicDeriverId: wallet.publicDeriverId,
+      password,
+      transactionHex: tx.cbor
+    });
     const signedTransactionHexes =
       signedCollateralReorgTx != null
         ? [signedCollateralReorgTx, signedCancelTx]

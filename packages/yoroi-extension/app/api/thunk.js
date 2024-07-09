@@ -146,6 +146,7 @@ export async function renameConceptualWallet(
   await callBackground({ type: 'rename-conceputal-wallet', request, });
 }
 
+// TODO: retire this API and replace with `signTransacton` and `broadcastTransaction`
 export type SignAndBroadcastTransactionRequestType = {|
   publicDeriverId: number,
   senderUtxos: Array<CardanoAddressedUtxo>,
@@ -294,4 +295,13 @@ export async function saveSelectedExplorer(request: {| explorer: $ReadOnly<Explo
   $ReadOnlyArray<$ReadOnly<PreferredExplorerRow>>
 > {
   return await callBackground({ type: 'save-selected-explorer', request });
+}
+
+export type SignTransactionRequestType = {|
+  publicDeriverId: number,
+  password: string,
+  transactionHex: string
+|};
+export async function signTransaction(request: SignTransactionRequestType): Promise<string> {
+  return await callBackground({ type: 'sign-tx', request });
 }

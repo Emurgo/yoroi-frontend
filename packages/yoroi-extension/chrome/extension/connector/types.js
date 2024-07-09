@@ -16,6 +16,7 @@ import type {
   RefreshTransactionsRequestType,
   BroadcastTransactionRequestType,
   ConnectorCreateAuthEntryRequestType,
+  SignTransactionRequestType,
 } from '../../../app/api/thunk';
 import type { ExplorerRow } from '../../../app/api/ada/lib/storage/database/explorers/tables';
 
@@ -318,6 +319,10 @@ export type GetSelectedExplorer = {|
 export type SaveSelectedExplorer = {|
   type: 'save-selected-explorer',
   request: {| explorer: $ReadOnly<ExplorerRow> |}
+|};
+export type SignTransaction = {|
+  type: 'sign-transaction',
+  request: SignTransactionRequestType,
 |};
 export type ConnectorCreateAuthEntry = {|
   type: 'connector-create-auth-entry',

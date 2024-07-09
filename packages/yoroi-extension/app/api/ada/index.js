@@ -399,7 +399,12 @@ export type CreateVotingRegTxRequest = {|
 |};
 
 export type CreateSimpleTxRequest = {|
-  publicDeriver: IPublicDeriver<ConceptualWallet> & IGetAllUtxos & IHasUtxoChains,
+  +publicDeriver: {
+    networkId: number,
+    utxos: IGetAllUtxosResponse,
+    receiveAddress: BaseSingleAddressPath,
+    ...
+  },
   entries: Array<TxOutput>,
   metadata: RustModule.WalletV4.AuxiliaryData,
 |};
@@ -1586,7 +1591,7 @@ export default class AdaApi {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.createSimpleTx)} called`);
 
     try {
-      const fullConfig = getCardanoHaskellBaseConfig(request.publicDeriver.getParent().getNetworkInfo());
+      const fullConfig = getCardanoHaskellBaseConfig(getNetworkById(request.publicDeriver.networkId));
       const config = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
 
       const protocolParams = {
@@ -1595,15 +1600,11 @@ export default class AdaApi {
         linearFeeConstant: config.LinearFee.constant,
         coinsPerUtxoWord: config.CoinsPerUtxoWord,
         poolDeposit: config.PoolDeposit,
-        networkId: request.publicDeriver.getParent().networkInfo.NetworkId,
+        networkId: request.publicDeriver.networkId,
       };
 
-      const allUtxo = await request.publicDeriver.getAllUtxos();
-      const addressedUtxo = asAddressedUtxo(allUtxo);
-      const changeAddr = await getReceiveAddress(request.publicDeriver);
-      if (changeAddr == null) {
-        throw new Error(`${nameof(this.createSimpleTx)} no internal addresses left. Should never happen`);
-      }
+      const addressedUtxo = asAddressedUtxo(request.publicDeriver.utxos);
+      const changeAddr = request.publicDeriver.receiveAddress;
       const absSlotNumber = new BigNumber(TimeUtils.timeToAbsoluteSlot(fullConfig, new Date()));
 
       const unsignedTx = await shelleyNewAdaUnsignedTx(
@@ -1630,7 +1631,7 @@ export default class AdaApi {
           ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
           KeyDeposit: new BigNumber(config.KeyDeposit),
           PoolDeposit: new BigNumber(config.PoolDeposit),
-          NetworkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+          NetworkId: request.publicDeriver.networkId,
         },
         neededStakingKeyHashes: {
           neededHashes: new Set(),

@@ -49,6 +49,7 @@ import type {
   GetAllExplorers,
   GetSelectedExplorer,
   SaveSelectedExplorer,
+  SignTransaction,
 } from '../../connector/types';
 import {
   APIErrorCodes,
@@ -148,7 +149,11 @@ import {
   getSelectedExplorer,
   saveSelectedExplorer,
 } from '../../../../app/api/ada/lib/storage/bridge/explorers';
-import { transactionHexToHash } from '../../../../app/api/ada/lib/cardanoCrypto/utils';
+import {
+  transactionHexToHash,
+  transactionHexReplaceWitnessSet, 
+  transactionHexToWitnessSet,
+} from '../../../../app/api/ada/lib/cardanoCrypto/utils';
 
 const YOROI_MESSAGES = Object.freeze({
   CONNECT_RESPONSE: 'connect_response',
@@ -184,6 +189,7 @@ const YOROI_MESSAGES = Object.freeze({
   GET_ALL_EXPLORERS: 'get-all-explorers',
   GET_SELECTED_EXPLORER: 'get-selected-explorer',
   SAVE_SELECTED_EXPLORER: 'save-selected-explorer',
+  SIGN_TRANSACTION: 'sign-transaction',
 });
 
 // messages from other parts of Yoroi (i.e. the UI for the connector)
@@ -221,6 +227,7 @@ export async function yoroiMessageHandler(
     | GetAllExplorers
     | GetSelectedExplorer
     | SaveSelectedExplorer
+    | SignTransaction
   ),
   sender: any,
   sendResponse: Function,
@@ -1011,6 +1018,28 @@ export async function yoroiMessageHandler(
     const db = await getDb();
     const result = await saveSelectedExplorer({ db, explorer: request.request.explorer });
     sendResponse(result);
+  } else if (request.type === YOROI_MESSAGES.SIGN_TRANSACTION) {
+    const { publicDeriverId, password, transactionHex } = request.request;
+    const publicDeriver: ?PublicDeriver<> = await getPublicDeriverById(publicDeriverId);
+    if (!publicDeriver) {
+      sendResponse({ error: 'no public dervier'});
+      return;
+    }
+    const signedWitnessSetHex = await connectorSignCardanoTx(
+      publicDeriver,
+      password,
+      {
+        tx: transactionHex,
+        tabId: -1,
+        partialSign: false
+      },
+    );
+
+    const mergedWitnessSetHex = mergeWitnessSets(
+      transactionHexToWitnessSet(transactionHex),
+      signedWitnessSetHex,
+    );
+    sendResponse(transactionHexReplaceWitnessSet(transactionHex, mergedWitnessSetHex));
   } else {
     console.error(`unknown message ${JSON.stringify(request)} from ${sender.tab.id}`)
   }

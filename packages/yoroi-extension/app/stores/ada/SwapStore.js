@@ -101,9 +101,13 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
     const addressedUtxos = asAddressedUtxoCardano(wallet.utxos);
     const submittedTxs = wallet.submittedTransactions;
     const reorgTargetAmount = '2000000';
-    const firstExternalAddress: AddressDetails = wallet.externalAddressesByType[CoreAddressTypes.BASE][0];
-    const { unsignedTx, collateralOutputAddressSet } = await this.api.ada.createReorgTx(
-      wallet,
+    const firstExternalAddress: AddressDetails = wallet.externalAddressesByType[CoreAddressTypes.CARDANO_BASE][0];
+    const { unsignedTx, collateralOutputAddressSet } = await this.api.ada._createReorgTx(
+      getNetworkById(wallet.networkId),
+      wallet.balance.getDefaults(),
+      wallet.publicDeriverId,
+      wallet.allUtxoAddresses,
+      wallet.receiveAddress,
       [],
       reorgTargetAmount,
       addressedUtxos,
