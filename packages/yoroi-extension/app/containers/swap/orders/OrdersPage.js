@@ -26,6 +26,14 @@ import type { CardanoConnectorSignRequest } from '../../../connector/types';
 import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import moment from 'moment';
 import { signTransactionHex } from '../../../api/ada/transactions/signTransactionHex';
+import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
+import { truncateAddressShort } from '../../../utils/formatters';
+import { Quantities } from '../../../utils/quantities';
+import ExplorableHashContainer from '../../widgets/ExplorableHashContainer';
+import NoCompleteOrders from './NoCompleteOrders';
+import NoOpenOrders from './NoOpenOrders';
+import { useRichOrders } from './hooks';
+import { createFormattedTokenValues } from './util';
 
 type ColumnContext = {|
   completedOrders: boolean,
@@ -378,8 +386,21 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
     .map(c => resolveValueOrGetter(c.width ?? 'auto', columnContext))
     .join(' ');
 
+  const isOpenOrdersEmpty = openOrders?.length === 0 && !showCompletedOrders;
+  const isCompleteOrdersEmpty = completedOrders?.length === 0 && showCompletedOrders;
+
+  const handleColumnNames = () => {
+    if (isOpenOrdersEmpty) {
+      return [];
+    }
+    if (isCompleteOrdersEmpty) {
+      return [];
+    }
+    return columnNames;
+  };
+
   return (
-    <>
+    <Box sx={{ border: '1px solid transparent' }}>
       <Box sx={{ mx: '24px' }}>
         <Box sx={{ my: '24px' }}>
           <Tabs
@@ -397,9 +418,10 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
             ]}
           />
         </Box>
+
         <Table
           columnKeys={columnKeys}
-          columnNames={columnNames}
+          columnNames={handleColumnNames()}
           columnAlignment={columnAlignment}
           columnLeftPaddings={columnLeftPaddings}
           gridTemplateColumns={gridTemplateColumns}
@@ -447,7 +469,9 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
           hwWalletError={null}
         />
       )}
-    </>
+      {isOpenOrdersEmpty && <NoOpenOrders />}
+      {isCompleteOrdersEmpty && <NoCompleteOrders />}
+    </Box>
   );
 }
 
