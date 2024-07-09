@@ -1,7 +1,10 @@
+// @flow
+
 import { Stack, Typography } from '@mui/material';
 import { ReactComponent as NoCompleteOders } from '../../../assets/images/revamp/no-complete-orders.inline.svg';
+import type { Node } from 'react';
 
-const NoCompleteOrders = () => {
+const NoCompleteOrders = (): Node => {
   return (
     <Stack direction="column" justifyContent="center" alignItems="center" flex={1} pt="98px">
       <NoCompleteOders />

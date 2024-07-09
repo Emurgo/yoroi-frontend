@@ -1,7 +1,10 @@
+// @flow
+
 import { Stack, Typography } from '@mui/material';
+import type { Node } from 'react';
 import { ReactComponent as NoOpenOders } from '../../../assets/images/revamp/no-open-orders.inline.svg';
 
-const NoOpenOrders = () => {
+const NoOpenOrders = (): Node => {
   return (
     <Stack direction="column" justifyContent="center" alignItems="center" flex={1} pt="98px">
       <NoOpenOders />
