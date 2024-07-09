@@ -34,6 +34,7 @@ import NoCompleteOrders from './NoCompleteOrders';
 import NoOpenOrders from './NoOpenOrders';
 import { useRichOrders } from './hooks';
 import { createFormattedTokenValues } from './util';
+import type { FormattedTokenValue } from './util';
 
 type ColumnContext = {|
   completedOrders: boolean,
