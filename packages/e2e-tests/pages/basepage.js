@@ -96,8 +96,13 @@ class BasePage {
   }
   async getText(locator) {
     this.logger.info(`BasePage::getText is called. Locator: ${JSON.stringify(locator)}`);
-    const locatorElem = await this.waitForElement(locator);
-    return await locatorElem.getText();
+    const locatorCondition = await this.customWaitIsPresented(locator, fiveSeconds, quarterSecond);
+    if(locatorCondition) {
+      const locatorElem = await this.findElement(locator);
+      return await locatorElem.getText();
+    }
+    throw new Error(`Element "${locator.locator} is not found"`);
+    
   }
   async getCssValue(locator, cssStyleProperty) {
     this.logger.info(
