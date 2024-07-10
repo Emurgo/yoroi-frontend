@@ -1,16 +1,17 @@
 import { expect } from 'chai';
 import BasePage from '../pages/basepage.js';
-import driversPoolsManager from '../utils/driversPool.js';
-import { getPassword, getTestWalletName } from '../helpers/constants.js';
 import AddNewWallet from '../pages/addNewWallet.page.js';
 import CreateWalletStepOne from '../pages/newWalletPages/createWalletSteps/createWalletStepOne.page.js';
 import CreateWalletStepTwo from '../pages/newWalletPages/createWalletSteps/createWalletStepTwo.page.js';
 import CreateWalletStepThree from '../pages/newWalletPages/createWalletSteps/createWalletStepThree.page.js';
 import WalletDetails from '../pages/newWalletPages/walletDetails.page.js';
 import TransactionsSubTab from '../pages/wallet/walletTab/walletTransactions.page.js';
+import driversPoolsManager from '../utils/driversPool.js';
+import { getPassword, getTestWalletName } from '../helpers/constants.js';
 import { customAfterEach } from '../utils/customHooks.js';
 import { getTestLogger } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
+import StakingTab from '../pages/wallet/stakingTab/stakingTab.page.js';
 
 describe('Creating wallet', function () {
   this.timeout(2 * oneMinute);
@@ -75,7 +76,7 @@ describe('Creating wallet', function () {
     await walletDetailsPage.continue();
   });
 
-  it('Check new wallet', async function () {
+  it('Check new wallet info', async function () {
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
     await transactionsPage.waitPrepareWalletBannerIsClosed();
     await transactionsPage.closeUpdatesModalWindow();
@@ -89,6 +90,26 @@ describe('Creating wallet', function () {
     expect(walletInfo.plate, `The wallet plate should be "${expWalletPlate}"`).to.equal(
       expWalletPlate
     );
+  });
+
+  // check amount of transactions
+  it('Check the wallet is empty', async function () {
+    const transactionsPage = new TransactionsSubTab(webdriver, logger);
+    const txsAmount = await transactionsPage.walletIsEmpty();
+    expect(txsAmount, 'A new wallet is not empty').to.be.true;
+  });
+
+  // check amount of addresses (external | internal)
+
+  // check wallet is not delegated
+  it('Check wallet is not delegated', async function () {
+    const transactionsPage = new TransactionsSubTab(webdriver, logger);
+    await transactionsPage.goToStakingTab();
+    const stakingPage = new StakingTab(webdriver, logger);
+    const walletIsNotDelegatedState = await stakingPage.walletIsNotDelegated();
+    expect(walletIsNotDelegatedState, 'There is no banner "Wallet is not delegated"').to.be.true;
+    await transactionsPage.takeScreenshot('STAKING', 'debug');
+    await transactionsPage.takeSnapshot('STAKING', 'debug');
   });
 
   afterEach(function (done) {
