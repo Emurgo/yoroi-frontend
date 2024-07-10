@@ -1,12 +1,5 @@
 import { balanceReplacer } from '../helpers/constants.js';
-import {
-  defaultWaitTimeout,
-  fiveSeconds,
-  halfSecond,
-  oneMinute,
-  oneSecond,
-  quarterSecond,
-} from '../helpers/timeConstants.js';
+import { defaultWaitTimeout, halfSecond, oneMinute, oneSecond } from '../helpers/timeConstants.js';
 import BasePage from './basepage.js';
 
 class WalletCommonBase extends BasePage {
