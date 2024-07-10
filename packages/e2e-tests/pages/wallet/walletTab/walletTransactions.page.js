@@ -148,7 +148,7 @@ export class TransactionsSubTab extends WalletTab {
   };
   // 'wallet is empty' banner
   walletEmptyBannerLocator = {
-    locator: 'wallet:transactions-emptyWalletBanner-box',
+    locator: 'wallet|staking-emptyWalletBanner-box',
     method: 'id',
   };
   // transaction
