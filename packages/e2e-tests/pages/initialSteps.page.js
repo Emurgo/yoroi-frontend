@@ -2,6 +2,7 @@ import BasePage from './basepage.js';
 import { isChrome } from '../utils/utils.js';
 import {
   defaultWaitTimeout,
+  fiveSeconds,
   oneSecond,
   quarterSecond,
   twoSeconds,
@@ -78,11 +79,17 @@ class InitialStepsPage extends BasePage {
   }
   async acceptToSPP() {
     this.logger.info(`InitialStepsPage::acceptToSPP is called`);
-    await this.waitForElement(this.languagesDropDownLocator);
-    await this.waitForElement(this.agreeCheckboxLocator);
-    await this.click(this.agreeCheckboxLocator);
-    await this.waitEnable(this.tosContinueButtonLocator);
-    await this.click(this.tosContinueButtonLocator);
+    await this.waitPresentedAndAct(
+      this.languagesDropDownLocator,
+      async () => {
+        await this.waitPresentedAndAct(
+          this.agreeCheckboxLocator,
+          async () => await this.click(this.agreeCheckboxLocator)
+        )
+      }
+    );
+    const buttonElem = await this.waitEnable(this.tosContinueButtonLocator);
+    await buttonElem.click();
   }
   async cantProceedWithoutToS() {
     this.logger.info(`InitialStepsPage::cantProceedWithoutToS is called`);
@@ -106,8 +113,10 @@ class InitialStepsPage extends BasePage {
   }
   async skipAnalytics() {
     this.logger.info(`InitialStepsPage::skipAnalytics is called`);
-    await this.waitForElement(this.analyticsSkipButtonLocator);
-    await this.click(this.analyticsSkipButtonLocator);
+    await this.waitPresentedAndAct(
+      this.analyticsSkipButtonLocator,
+      async () => await this.click(this.analyticsSkipButtonLocator)
+    );
   }
   async allowCardanoPaymentsUrls() {
     this.logger.info(`InitialStepsPage::allowCardanoPaymentsUrls is called`);
@@ -116,8 +125,10 @@ class InitialStepsPage extends BasePage {
   }
   async skipCardanoPaymentUrls() {
     this.logger.info(`InitialStepsPage::skipCardanoPaymentUrls is called`);
-    await this.waitForElement(this.cardanoUrlPromptFormLocator);
-    await this.click(this.cardanoPaymentUrlSkipButtonLocator);
+    await this.waitPresentedAndAct(
+      this.cardanoPaymentUrlSkipButtonLocator,
+      async () => await this.click(this.cardanoPaymentUrlSkipButtonLocator)
+    )
   }
   async skipInitialSteps() {
     this.logger.info(`InitialStepsPage::skipInitialSteps is called`);

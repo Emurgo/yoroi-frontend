@@ -7,7 +7,7 @@ import { getTestLogger } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
 import driversPoolsManager from '../utils/driversPool.js';
 import { getTestString } from '../helpers/constants.js';
-import AddNewWallet from '../pages/addNewWallet.page.js';
+import { preloadDBAndStorage, waitTxPage } from '../helpers/restoreWalletHelper.js';
 
 describe('Editing a memo', function () {
   this.timeout(2 * oneMinute);
@@ -16,25 +16,11 @@ describe('Editing a memo', function () {
   const oldMemo = 'j1hKEo4Er4FDLFAtGBo07jIcXBSOqx9D16U0sUIl';
   const newMemoMessage = getTestString('', 40, true);
 
-  before(function (done) {
-    webdriver = driversPoolsManager.getDriverFromPool();
+  before(async function () {
+    webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    done();
-  });
-
-  it('Prepare DB and storages', async function () {
-    const addWalletPage = new AddNewWallet(webdriver, logger);
-    const state = await addWalletPage.isDisplayed();
-    expect(state).to.be.true;
-    await addWalletPage.prepareDBAndStorage('testWallet1MemoAdded');
-    await addWalletPage.refreshPage();
-  });
-
-  it('Check transactions page', async function () {
-    const transactionsPage = new TransactionsSubTab(webdriver, logger);
-    await transactionsPage.waitPrepareWalletBannerIsClosed();
-    const txPageIsDisplayed = await transactionsPage.isDisplayed();
-    expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
+    await preloadDBAndStorage(webdriver, logger, 'testWallet1MemoAdded');
+    await waitTxPage(webdriver, logger);
   });
 
   it('Expand tx', async function () {

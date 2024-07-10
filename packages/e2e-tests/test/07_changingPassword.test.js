@@ -12,30 +12,18 @@ import WalletTab from '../pages/wallet/walletTab/walletTab.page.js';
 import SendSubTab from '../pages/wallet/walletTab/sendSubTab.page.js';
 import { PASSWORDS_DONT_MATCH, PASSWORD_TOO_SHORT, WRONG_PASSWORD } from '../helpers/messages.js';
 import driversPoolsManager from '../utils/driversPool.js';
-import AddNewWallet from '../pages/addNewWallet.page.js';
+import { preloadDBAndStorage, waitTxPage } from '../helpers/restoreWalletHelper.js';
 
 describe('Changing wallet password', function () {
   this.timeout(2 * oneMinute);
   let webdriver = null;
   let logger = null;
 
-  before(function (done) {
-    webdriver = driversPoolsManager.getDriverFromPool();
+  before(async function () {
+    webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    done();
-  });
-
-  it('Prepare DB and storages', async function () {
-    const addWalletPage = new AddNewWallet(webdriver, logger);
-    const state = await addWalletPage.isDisplayed();
-    expect(state).to.be.true;
-    await addWalletPage.prepareDBAndStorage('testWallet1');
-    await addWalletPage.refreshPage();
-  });
-
-  it('Check transactions page', async function () {
-    const transactionsPage = new TransactionsSubTab(webdriver, logger);
-    await transactionsPage.waitPrepareWalletBannerIsClosed();
+    await preloadDBAndStorage(webdriver, logger, 'testWallet1');
+    await waitTxPage(webdriver, logger);
   });
 
   const oldPassword = getPassword();
@@ -90,7 +78,13 @@ describe('Changing wallet password', function () {
     });
     it('Changing password, incorrect old one, correct new one', async function () {
       const walletSubTabPage = new WalletSubTab(webdriver, logger);
-      await walletSubTabPage.changeWalletPassword(oldPassword, newPassword, newPassword);
+      await walletSubTabPage.changeWalletPassword(
+        oldPassword,
+        newPassword,
+        newPassword,
+        true,
+        true
+      );
     });
     it('Checking the error message', async function () {
       const walletSubTabPage = new WalletSubTab(webdriver, logger);
@@ -114,7 +108,7 @@ describe('Changing wallet password', function () {
     });
     it('Changing password, correct old one, new one is too short', async function () {
       const walletSubTabPage = new WalletSubTab(webdriver, logger);
-      await walletSubTabPage.changeWalletPassword(newPassword, 'a', newPassword);
+      await walletSubTabPage.changeWalletPassword(newPassword, 'a', newPassword, true, true);
     });
     it('Checking the error message', async function () {
       const walletSubTabPage = new WalletSubTab(webdriver, logger);
@@ -140,7 +134,7 @@ describe('Changing wallet password', function () {
     });
     it('Changing password, correct old one, new passwords dont match', async function () {
       const walletSubTabPage = new WalletSubTab(webdriver, logger);
-      await walletSubTabPage.changeWalletPassword(newPassword, newPass1, newPass2);
+      await walletSubTabPage.changeWalletPassword(newPassword, newPass1, newPass2, true, true);
     });
     it('Checking the error message', async function () {
       const walletSubTabPage = new WalletSubTab(webdriver, logger);

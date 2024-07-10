@@ -1,0 +1,411 @@
+name: E2E tests
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, ready_for_review]
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  Build-Extension:
+    if: github.event.review && 
+      (
+      github.event.review.state == 'approved' || 
+      contains(github.event.review.body, '/check') || 
+      contains(github.event.review.body, '/ext-general') || 
+      contains(github.event.review.body, '/ext-failing') || 
+      contains(github.event.review.body, '/dapp-general') || 
+      contains(github.event.review.body, '/dapp-failing')
+      )
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read .nvmrc
+        id: nvm
+        run: echo "NVMRC=$(cat .nvmrc)" >> $GITHUB_OUTPUT
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "${{ steps.nvm.outputs.NVMRC }}"
+
+      - name: Install packages
+        run: |
+          . install-all.sh
+
+      - name: Build the test mainnet version
+        working-directory: ./packages/yoroi-extension
+        run: npm run test:build:mainnet
+
+      - name: Archive built app
+        uses: actions/upload-artifact@v4
+        with:
+          name: builtApp
+          path: |
+            ./packages/yoroi-extension/Yoroi-test.crx
+            ./packages/yoroi-extension/Yoroi.xpi
+          retention-days: 1
+          overwrite: true
+
+  Ext-General:
+    if: github.event.review && 
+      (
+      github.event.review.state == 'approved' || 
+      contains(github.event.review.body, '/check') || 
+      contains(github.event.review.body, '/ext-general')
+      )
+    runs-on: ubuntu-latest
+    needs: Build-Extension
+    strategy:
+      matrix:
+        browser: ["chrome"]
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Forcefully update the Chrome browser
+        if: matrix.browser=='chrome'
+        run: |
+          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          sudo sh -c 'echo "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+          sudo apt-get update
+          sudo apt-get --only-upgrade install google-chrome-stable
+
+      - name: Install Firefox Developer Edition
+        if: matrix.browser=='firefox'
+        run: |
+          wget -c "https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US" -O - | sudo tar -xj -C /opt
+          sudo rm -rf /opt/firefoxdev
+          sudo mv /opt/firefox /opt/firefoxdev
+          echo "FIREFOX_BIN=/opt/firefoxdev/firefox-bin" >> $GITHUB_ENV
+
+      - name: Read .nvmrc
+        id: nvm
+        run: echo "NVMRC=$(cat .nvmrc)" >> $GITHUB_OUTPUT
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "${{ steps.nvm.outputs.NVMRC }}"
+
+      - name: Install packages
+        working-directory: ./packages/e2e-tests
+        run: npm install
+
+      - name: Cache e2e-tests node modules
+        # https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows
+        uses: actions/cache@v4
+        env:
+          cache-name: cache-e2e-tests-node-modules
+        with:
+          # https://github.com/actions/cache/blob/main/examples.md#node---npm
+          # It is recommended to cache the NPM cache (~/.npm) instead of node_modules.
+          # But we put node version into the cache key and cache node_modules.
+          path: packages/e2e-tests/node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-node-${{ steps.nvm.outputs.NVMRC }}-${{ hashFiles('packages/e2e-tests/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Download app
+        uses: actions/download-artifact@v4
+        with:
+          name: builtApp
+          path: ./packages/yoroi-extension
+
+      - name: Install ChromeDriver
+        uses: nanasess/setup-chromedriver@v2
+
+      - name: Run Xvfb
+        run: |
+            export DISPLAY=:99
+            sudo Xvfb -ac :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
+
+      - name: Run tests
+        working-directory: ./packages/e2e-tests
+        env:
+          FIRST_SMOKE_TEST_WALLET: ${{ secrets.FIRST_SMOKE_TEST_WALLET }}
+          SECOND_STATIC_TEST_WALLET: ${{ secrets.SECOND_STATIC_TEST_WALLET }}
+          SECOND_SMOKE_TEST_WALLET: ${{ secrets.SECOND_SMOKE_TEST_WALLET }}
+          SECOND_SMOKE_TEST_WALLET_FF: ${{ secrets.SECOND_SMOKE_TEST_WALLET_FF }}
+        run: npm run test:${{ matrix.browser }}
+
+      - name: Archive tests screenshots and logs
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: testRunsData_E2E_tests_ext_general_${{ matrix.browser }}
+          path: |
+            ./packages/e2e-tests/mochawesome-report
+            ./packages/e2e-tests/testRunsData_${{ matrix.browser }}
+
+  Ext-Failing:
+    if: github.event.review && contains(github.event.review.body, '/ext-failing')
+    runs-on: ubuntu-latest
+    needs: Build-Extension
+    strategy:
+      matrix:
+        browser: ["chrome"]
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Forcefully update the Chrome browser
+        if: matrix.browser=='chrome'
+        run: |
+          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          sudo sh -c 'echo "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+          sudo apt-get update
+          sudo apt-get --only-upgrade install google-chrome-stable
+
+      - name: Install Firefox Developer Edition
+        if: matrix.browser=='firefox'
+        run: |
+          wget -c "https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US" -O - | sudo tar -xj -C /opt
+          sudo rm -rf /opt/firefoxdev
+          sudo mv /opt/firefox /opt/firefoxdev
+          echo "FIREFOX_BIN=/opt/firefoxdev/firefox-bin" >> $GITHUB_ENV
+
+      - name: Read .nvmrc
+        id: nvm
+        run: echo "NVMRC=$(cat .nvmrc)" >> $GITHUB_OUTPUT
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "${{ steps.nvm.outputs.NVMRC }}"
+
+      - name: Install packages
+        working-directory: ./packages/e2e-tests
+        run: npm install
+
+      - name: Cache e2e-tests node modules
+        # https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows
+        uses: actions/cache@v4
+        env:
+          cache-name: cache-e2e-tests-node-modules
+        with:
+          # https://github.com/actions/cache/blob/main/examples.md#node---npm
+          # It is recommended to cache the NPM cache (~/.npm) instead of node_modules.
+          # But we put node version into the cache key and cache node_modules.
+          path: packages/e2e-tests/node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-node-${{ steps.nvm.outputs.NVMRC }}-${{ hashFiles('packages/e2e-tests/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Download app
+        uses: actions/download-artifact@v4
+        with:
+          name: builtApp
+          path: ./packages/yoroi-extension
+
+      - name: Install ChromeDriver
+        uses: nanasess/setup-chromedriver@v2
+
+      - name: Run Xvfb
+        run: |
+            export DISPLAY=:99
+            sudo Xvfb -ac :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
+
+      - name: Run tests
+        working-directory: ./packages/e2e-tests
+        env:
+          FIRST_SMOKE_TEST_WALLET: ${{ secrets.FIRST_SMOKE_TEST_WALLET }}
+          SECOND_STATIC_TEST_WALLET: ${{ secrets.SECOND_STATIC_TEST_WALLET }}
+          SECOND_SMOKE_TEST_WALLET: ${{ secrets.SECOND_SMOKE_TEST_WALLET }}
+          SECOND_SMOKE_TEST_WALLET_FF: ${{ secrets.SECOND_SMOKE_TEST_WALLET_FF }}
+        run: npm run test:${{ matrix.browser }}:bl
+
+      - name: Archive tests screenshots and logs
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: testRunsData_E2E_tests_ext_failing_${{ matrix.browser }}
+          path: |
+            ./packages/e2e-tests/mochawesome-report
+            ./packages/e2e-tests/testRunsData_${{ matrix.browser }}
+
+  DApp-General:
+    if: github.event.review && 
+      (
+      github.event.review.state == 'approved' || 
+      contains(github.event.review.body, '/check') || 
+      contains(github.event.review.body, '/dapp-general')
+      )
+    runs-on: ubuntu-latest
+    needs: Build-Extension
+    strategy:
+      matrix:
+        browser: ["chrome"]
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Forcefully update the Chrome browser
+        if: matrix.browser=='chrome'
+        run: |
+          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          sudo sh -c 'echo "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+          sudo apt-get update
+          sudo apt-get --only-upgrade install google-chrome-stable
+
+      - name: Install Firefox Developer Edition
+        if: matrix.browser=='firefox'
+        run: |
+          wget -c "https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US" -O - | sudo tar -xj -C /opt
+          sudo rm -rf /opt/firefoxdev
+          sudo mv /opt/firefox /opt/firefoxdev
+          echo "FIREFOX_BIN=/opt/firefoxdev/firefox-bin" >> $GITHUB_ENV
+
+      - name: Read .nvmrc
+        id: nvm
+        run: echo "NVMRC=$(cat .nvmrc)" >> $GITHUB_OUTPUT
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "${{ steps.nvm.outputs.NVMRC }}"
+
+      - name: Install packages
+        working-directory: ./packages/e2e-tests
+        run: npm install
+
+      - name: Cache e2e-tests node modules
+        # https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows
+        uses: actions/cache@v4
+        env:
+          cache-name: cache-e2e-tests-node-modules
+        with:
+          # https://github.com/actions/cache/blob/main/examples.md#node---npm
+          # It is recommended to cache the NPM cache (~/.npm) instead of node_modules.
+          # But we put node version into the cache key and cache node_modules.
+          path: packages/e2e-tests/node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-node-${{ steps.nvm.outputs.NVMRC }}-${{ hashFiles('packages/e2e-tests/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Download app
+        uses: actions/download-artifact@v4
+        with:
+          name: builtApp
+          path: ./packages/yoroi-extension
+
+      - name: Run Xvfb
+        run: |
+            export DISPLAY=:99
+            sudo Xvfb -ac :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
+
+      - name: Run tests
+        working-directory: ./packages/e2e-tests
+        env:
+          FIRST_SMOKE_TEST_WALLET: ${{ secrets.FIRST_SMOKE_TEST_WALLET }}
+          SECOND_STATIC_TEST_WALLET: ${{ secrets.SECOND_STATIC_TEST_WALLET }}
+          SECOND_SMOKE_TEST_WALLET: ${{ secrets.SECOND_SMOKE_TEST_WALLET }}
+          SECOND_SMOKE_TEST_WALLET_FF: ${{ secrets.SECOND_SMOKE_TEST_WALLET_FF }}
+        run: xvfb-run -a -e /dev/stdout -s "-screen 0 1920x1080x24" npm run test:${{ matrix.browser }}:dapp
+
+      - name: Archive tests screenshots and logs
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: testRunsData_E2E_tests_dapp_general_${{ matrix.browser }}
+          path: |
+            ./packages/e2e-tests/mochawesome-report
+            ./packages/e2e-tests/testRunsData_${{ matrix.browser }}
+
+  DApp-Failing:
+    if: github.event.review && contains(github.event.review.body, '/dapp-failing')
+    runs-on: ubuntu-latest
+    needs: Build-Extension
+    strategy:
+      matrix:
+        browser: ["chrome"]
+      fail-fast: false
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Forcefully update the Chrome browser
+        if: matrix.browser=='chrome'
+        run: |
+          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          sudo sh -c 'echo "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+          sudo apt-get update
+          sudo apt-get --only-upgrade install google-chrome-stable
+
+      - name: Install Firefox Developer Edition
+        if: matrix.browser=='firefox'
+        run: |
+          wget -c "https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US" -O - | sudo tar -xj -C /opt
+          sudo rm -rf /opt/firefoxdev
+          sudo mv /opt/firefox /opt/firefoxdev
+          echo "FIREFOX_BIN=/opt/firefoxdev/firefox-bin" >> $GITHUB_ENV
+
+      - name: Read .nvmrc
+        id: nvm
+        run: echo "NVMRC=$(cat .nvmrc)" >> $GITHUB_OUTPUT
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "${{ steps.nvm.outputs.NVMRC }}"
+
+      - name: Install packages
+        working-directory: ./packages/e2e-tests
+        run: npm install
+
+      - name: Cache e2e-tests node modules
+        # https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows
+        uses: actions/cache@v4
+        env:
+          cache-name: cache-e2e-tests-node-modules
+        with:
+          # https://github.com/actions/cache/blob/main/examples.md#node---npm
+          # It is recommended to cache the NPM cache (~/.npm) instead of node_modules.
+          # But we put node version into the cache key and cache node_modules.
+          path: packages/e2e-tests/node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-node-${{ steps.nvm.outputs.NVMRC }}-${{ hashFiles('packages/e2e-tests/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Download app
+        uses: actions/download-artifact@v4
+        with:
+          name: builtApp
+          path: ./packages/yoroi-extension
+
+      - name: Run Xvfb
+        run: |
+            export DISPLAY=:99
+            sudo Xvfb -ac :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
+
+      - name: Run tests
+        working-directory: ./packages/e2e-tests
+        env:
+          FIRST_SMOKE_TEST_WALLET: ${{ secrets.FIRST_SMOKE_TEST_WALLET }}
+          SECOND_STATIC_TEST_WALLET: ${{ secrets.SECOND_STATIC_TEST_WALLET }}
+          SECOND_SMOKE_TEST_WALLET: ${{ secrets.SECOND_SMOKE_TEST_WALLET }}
+          SECOND_SMOKE_TEST_WALLET_FF: ${{ secrets.SECOND_SMOKE_TEST_WALLET_FF }}
+        run: xvfb-run -a -e /dev/stdout -s "-screen 0 1920x1080x24" npm run test:${{ matrix.browser }}:dapp:bl
+
+      - name: Archive tests screenshots and logs
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: testRunsData_E2E_tests_dapp_failing_${{ matrix.browser }}
+          path: |
+            ./packages/e2e-tests/mochawesome-report
+            ./packages/e2e-tests/testRunsData_${{ matrix.browser }}
