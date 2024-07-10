@@ -39,7 +39,7 @@ function WalletEmptyBanner({ onBuySellClick, intl }: Props & Intl): Node {
           position: 'relative',
           padding: '24px',
         }}
-        id='wallet:transactions-emptyWalletBanner-box'
+        id='wallet|staking-emptyWalletBanner-box'
       >
         <Box sx={{ position: 'absolute', right: '10%', top: '-10%' }}>
           <CoverBg />
