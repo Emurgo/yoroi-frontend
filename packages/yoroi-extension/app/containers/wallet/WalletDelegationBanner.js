@@ -104,7 +104,7 @@ function WalletDelegationBanner({
       <Box sx={{ position: 'absolute', bottom: '-4px', right: '20px' }}>
         <StakingIllustration height="300px" />
       </Box>
-      <Box>
+      <Box id='staking-delegationBanner-box'>
         <Typography
           component="div"
           variant="h3"
