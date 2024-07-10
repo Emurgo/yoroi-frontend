@@ -1,4 +1,5 @@
 import {
+  defaultWaitTimeout,
   fiveSeconds,
   quarterSecond,
   threeSeconds,
@@ -147,7 +148,7 @@ export class TransactionsSubTab extends WalletTab {
   };
   // 'wallet is empty' banner
   walletEmptyBannerLocator = {
-    locator: 'walletEmptyBanner',
+    locator: 'wallet:transactions-emptyWalletBanner-box',
     method: 'id',
   };
   // transaction
@@ -188,13 +189,13 @@ export class TransactionsSubTab extends WalletTab {
 
     return submenuState && summaryState;
   }
-  async isWalletEmpty() {
-    this.logger.info(`TransactionsSubTab::isWalletEmpty is called`);
+  async walletIsEmpty() {
+    this.logger.info(`TransactionsSubTab::walletIsEmpty is called`);
     const emptyBannerIsDisplayed = await (
       await this.findElement(this.walletEmptyBannerLocator)
     ).isDisplayed();
-    const displayedTxs = await this.findElements(this.transactionRowLocator);
-    return emptyBannerIsDisplayed && displayedTxs.length == 0;
+    const displayedTxsGroups = await this.__getTxsGroups();
+    return emptyBannerIsDisplayed && displayedTxsGroups == 0;
   }
   async __getTxsGroups() {
     const locatorForAllGroups = {
@@ -202,6 +203,7 @@ export class TransactionsSubTab extends WalletTab {
       method: 'xpath',
     };
     const result = [];
+    await this.driver.manage().setTimeouts({ implicit: twoSeconds });
     const allGroups = await this.findElements(locatorForAllGroups);
     for (let groupIndex = 0; groupIndex < allGroups.length; groupIndex++) {
       const groupDatePrettified = await this.getText(
@@ -213,6 +215,7 @@ export class TransactionsSubTab extends WalletTab {
         groupIndex,
       });
     }
+    await this.driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
     return result;
   }
   async getTxHashID(groupIndex, txIndex) {
