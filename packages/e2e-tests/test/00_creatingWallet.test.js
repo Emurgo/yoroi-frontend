@@ -117,8 +117,6 @@ describe('Creating wallet', function () {
     const stakingPage = new StakingTab(webdriver, logger);
     const walletIsNotDelegatedState = await stakingPage.walletIsNotDelegated();
     expect(walletIsNotDelegatedState, 'There is no banner "Wallet is not delegated"').to.be.true;
-    await transactionsPage.takeScreenshot('STAKING', 'debug');
-    await transactionsPage.takeSnapshot('STAKING', 'debug');
   });
 
   afterEach(function (done) {
