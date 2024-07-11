@@ -1,5 +1,5 @@
 import WalletTab from './walletTab.page.js';
-import { twoSeconds, quarterSecond, fiveSeconds } from '../../../helpers/timeConstants.js';
+import { quarterSecond, fiveSeconds } from '../../../helpers/timeConstants.js';
 
 class SendSubTab extends WalletTab {
   // locators
@@ -123,7 +123,7 @@ class SendSubTab extends WalletTab {
         const buttonlIsEnabled = await this.getAttribute(locator, 'disabled');
         return buttonlIsEnabled === null;
       },
-      twoSeconds,
+      fiveSeconds,
       quarterSecond
     );
 
