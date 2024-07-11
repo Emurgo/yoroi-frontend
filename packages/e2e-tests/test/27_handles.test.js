@@ -7,6 +7,8 @@ import { getTestLogger } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
 import { preloadDBAndStorage, waitTxPage } from '../helpers/restoreWalletHelper.js';
 import SendSubTab from '../pages/wallet/walletTab/sendSubTab.page.js';
+import { getTestString } from '../helpers/constants.js';
+import { INCORRECT_RECEIVER } from '../helpers/messages.js';
 
 describe('Handle handles', function () {
   this.timeout(2 * oneMinute);
@@ -35,8 +37,23 @@ describe('Handle handles', function () {
     },
   ];
 
+  const testDataNegative = [
+    {
+      userHandle: `${getTestString('$', 10, false)}`,
+      provider: 'ADA Handle',
+    },
+    {
+      userHandle: `${getTestString('', 7, false)}.ada`,
+      provider: 'Cardano Name Service (CNS)',
+    },
+    {
+      userHandle: `${getTestString('', 10, false)}.blockchain`,
+      provider: 'Unstoppable Domains',
+    },
+  ];
+
   for (const testDatum of testDataPositive) {
-    describe(`Postive case, ${testDatum.provider}`, function () {
+    describe(`Positive case, ${testDatum.provider}`, function () {
       it(`${testDatum.provider}. Refresh page`, async function () {
         const transactionsPage = new TransactionsSubTab(webdriver, logger);
         await transactionsPage.refreshPage();
@@ -84,6 +101,40 @@ describe('Handle handles', function () {
         const userHandle = userHandleRaw.trim();
         expect(provider, 'Handler provider is different').to.equal(testDatum.provider);
         expect(userHandle, 'User handler is different').to.equal(testDatum.userHandle);
+      });
+    });
+  }
+
+  for (const testNegativeDatum of testDataNegative) {
+    describe(`Negative case, ${testNegativeDatum.provider}`, function () {
+      it(`${testNegativeDatum.provider}. Refresh page`, async function () {
+        const transactionsPage = new TransactionsSubTab(webdriver, logger);
+        await transactionsPage.refreshPage();
+      });
+
+      it(`${testNegativeDatum.provider}. Go to Send page`, async function () {
+        const walletPage = new TransactionsSubTab(webdriver, logger);
+        await walletPage.goToSendSubMenu();
+        const sendPage = new SendSubTab(webdriver, logger);
+        const stepOneDisplayed = await sendPage.stepOneIsDisplayed();
+        expect(stepOneDisplayed, 'Step one is not displayed').to.be.true;
+      });
+
+      it(`${testNegativeDatum.provider}. Enter the value`, async function () {
+        const sendStep1Page = new SendSubTab(webdriver, logger);
+        await sendStep1Page.enterReceiver(testNegativeDatum.userHandle);
+      });
+
+      it(`${testNegativeDatum.provider}. Wait for domain resolver response`, async function () {
+        const sendStep1Page = new SendSubTab(webdriver, logger);
+        const errorMarkIsDisplayed = await sendStep1Page.receiverIsIncorrect();
+        expect(errorMarkIsDisplayed, 'There is no error for receiver').to.be.true;
+      });
+
+      it(`${testNegativeDatum.provider}. Check displayed info and continue`, async function () {
+        const sendStep1Page = new SendSubTab(webdriver, logger);
+        const helperText = await sendStep1Page.getReceiverHelperText();
+        expect(helperText, 'A different error message is displayed').to.equal(INCORRECT_RECEIVER);
       });
     });
   }
