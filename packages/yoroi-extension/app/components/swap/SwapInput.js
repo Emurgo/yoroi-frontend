@@ -82,7 +82,7 @@ export default function SwapInput({
           gridTemplateRows: '1fr 1fr',
           justifyContent: 'start',
           position: 'relative',
-          bgcolor: 'common.white',
+          bgcolor: 'ds.bg_color_low',
           columnGap: '6px',
           rowGap: '8px',
           '&:hover': {
@@ -97,8 +97,8 @@ export default function SwapInput({
             left: '16px',
             position: 'absolute',
             px: '4px',
-            bgcolor: 'common.white',
-            color: error ? 'magenta.500' : 'black',
+            bgcolor: 'ds.bg_color_low',
+            color: error ? 'magenta.500' : 'ds.text_gray_normal',
           }}
         >
           {label}
@@ -110,6 +110,7 @@ export default function SwapInput({
             border: '0',
             outline: 'none',
             '::placeholder': { color: 'grayscale.600' },
+            bgcolor: 'ds.bg_color_low',
           }}
           component="input"
           type="text"
@@ -160,6 +161,7 @@ export default function SwapInput({
                 ':disabled': {
                   cursor: 'not-allowed',
                 },
+                color: 'ds.text_gray_normal',
               }}
               onClick={() => {
                 handleAmountChange(quantity);
