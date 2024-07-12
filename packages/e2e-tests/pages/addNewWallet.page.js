@@ -56,8 +56,12 @@ class AddNewWallet extends WalletCommonBase {
   }
   async selectCreateNewWallet() {
     this.logger.info(`AddNewWallet::selectCreateNewWallet is called`);
-    await this.waitForElement(this.createWalletButtonLocator);
-    await this.click(this.createWalletButtonLocator);
+    await this.waitPresentedAndAct(
+      this.createWalletButtonLocator, 
+      async () => {
+        await this.click(this.createWalletButtonLocator);
+      },
+    );
   }
   async selectRestoreWallet() {
     this.logger.info(`AddNewWallet::selectRestoreWallet is called`);
