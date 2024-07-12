@@ -4,7 +4,12 @@ import { testWallet1, testWallet2 } from '../utils/testWallets.js';
 import { expect } from 'chai';
 import { getTestLogger } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
-import { checkCorrectWalletIsDisplayed, restoreWallet } from '../helpers/restoreWalletHelper.js';
+import {
+  checkCorrectWalletIsDisplayed,
+  restoreWallet,
+  preloadDBAndStorage,
+  waitTxPage,
+} from '../helpers/restoreWalletHelper.js';
 import SettingsTab from '../pages/wallet/settingsTab/settingsTab.page.js';
 import WalletSubTab from '../pages/wallet/settingsTab/walletSubTab.page.js';
 import WalletCommonBase from '../pages/walletCommonBase.page.js';
@@ -20,21 +25,8 @@ describe('Removing the first wallet, two wallets is added', function () {
   before(async function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-  });
-
-  it('Prepare DB and storages', async function () {
-    const addWalletPage = new AddNewWallet(webdriver, logger);
-    const state = await addWalletPage.isDisplayed();
-    expect(state).to.be.true;
-    await addWalletPage.prepareDBAndStorage('testWallet1');
-    await addWalletPage.refreshPage();
-  });
-
-  it('Check transactions page', async function () {
-    const transactionsPage = new TransactionsSubTab(webdriver, logger);
-    await transactionsPage.waitPrepareWalletBannerIsClosed();
-    const txPageIsDisplayed = await transactionsPage.isDisplayed();
-    expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
+    await preloadDBAndStorage(webdriver, logger, 'testWallet1');
+    await waitTxPage(webdriver, logger);
   });
 
   // restore the second wallet

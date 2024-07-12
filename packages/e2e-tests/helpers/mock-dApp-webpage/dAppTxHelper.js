@@ -87,6 +87,12 @@ export const getAddressFromBytes = changeAddress =>
 
 export const getAddressFromBech32 = addressBech32 => CSL.Address.from_bech32(addressBech32);
 
+export const getRewarKeyHashFromBech32 = rewardAddressBech32 =>
+  CSL.RewardAddress.from_address(CSL.Address.from_bech32(rewardAddressBech32))
+    .payment_cred()
+    .to_keyhash()
+    .to_hex();
+
 export const getTransactionFromBytes = txHex => CSL.Transaction.from_bytes(hexToBytes(txHex));
 
 export const getTransactionWitnessSetFromBytes = witnessHex =>

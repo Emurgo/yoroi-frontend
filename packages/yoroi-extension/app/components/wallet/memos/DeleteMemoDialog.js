@@ -83,6 +83,7 @@ export default class DeleteMemoDialog extends Component<Props, State> {
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={onClose}
+        id='deleteMemoDialog'
       >
         <div className={styles.content}>
           { error ? (<ErrorBlock error={error} />) : null }

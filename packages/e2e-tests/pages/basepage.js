@@ -335,6 +335,30 @@ class BasePage {
     );
     return result;
   }
+  async customWaitIsNotPresented(
+    locator,
+    timeout = defaultWaitTimeout,
+    repeatPeriod = defaultRepeatPeriod
+  ) {
+    this.logger.info(`BasePage::customWaitIsNotPresented is called.`);
+    const result = await this.customWaiter(
+      async () => {
+        const elemsPresented = await this.findElements(locator);
+        return elemsPresented.length === 0;
+      },
+      timeout,
+      repeatPeriod
+    );
+    return result;
+  }
+  /**
+   * The function wait until the passed element is found and call the passed function
+   * @param {{locator: string, method: id}} locator Element locator
+   * @param {object} funcToCall A function that should be called when the element is found
+   * @param {number} timeout Total time of search in milliseconds. Default values is **5000** milliseconds
+   * @param {number} repeatPeriod The time after which it is necessary to repeat the check. Default value is **250** milliseconds
+   * @returns {Promise<any>}
+   */
   async waitPresentedAndAct(
     locator,
     funcToCall,

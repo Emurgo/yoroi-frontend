@@ -1,13 +1,14 @@
 import {
-  defaultWaitTimeout,
   fiveSeconds,
   quarterSecond,
+  threeSeconds,
   twoSeconds,
 } from '../../../helpers/timeConstants.js';
 import WalletTab from './walletTab.page.js';
 import ExportTransactionsModal from './transactionsModals/exportTransactionModal.page.js';
 import { convertPrettyDateToNormal, convertPrettyTimeToNormal } from '../../../utils/utils.js';
 import MemoWarningModal from './transactionsModals/memoWarningModal.page.js';
+import { balanceReplacer } from '../../../helpers/constants.js';
 
 export class TransactionsSubTab extends WalletTab {
   // locators
@@ -44,8 +45,8 @@ export class TransactionsSubTab extends WalletTab {
   };
   txRowLocator = (groupIndex, txIndex) => {
     return {
-      locator: `wallet:transactions:transactionsList:transactionsGroup_${groupIndex}-transaction_${txIndex}-box`,
-      method: 'id',
+      locator: `#wallet\\:transactions\\:transactionsList\\:transactionsGroup_${groupIndex}-transaction_${txIndex}-box > div`,
+      method: 'css',
     };
   };
   txTypeTextLocator = (groupIndex, txIndex) => {
@@ -108,9 +109,21 @@ export class TransactionsSubTab extends WalletTab {
       method: 'id',
     };
   };
+  txFromAddressAmountTextLocator = (groupIndex, txIndex, fromAddressIndex) => {
+    return {
+      locator: `wallet:transactions:transactionsList:transactionsGroup_${groupIndex}:transaction_${txIndex}:txFullInfo:fromAddresses:address_${fromAddressIndex}-amount-text`,
+      method: 'id',
+    };
+  };
   txToAddressTextLocator = (groupIndex, txIndex, toAddressIndex) => {
     return {
       locator: `wallet:transactions:transactionsList:transactionsGroup_${groupIndex}:transaction_${txIndex}:txFullInfo:toAddresses:address_${toAddressIndex}-address-text`,
+      method: 'id',
+    };
+  };
+  txToAddressAmountTextLocator = (groupIndex, txIndex, toAddressIndex) => {
+    return {
+      locator: `wallet:transactions:transactionsList:transactionsGroup_${groupIndex}:transaction_${txIndex}:txFullInfo:toAddresses:address_${toAddressIndex}-amount-text`,
       method: 'id',
     };
   };
@@ -162,10 +175,18 @@ export class TransactionsSubTab extends WalletTab {
   // methods
   async isDisplayed() {
     this.logger.info(`TransactionsSubTab::isDisplayed is called`);
-      const submenuState = await this.customWaitIsPresented(this.transactionsSubmenuItemLocator, fiveSeconds, quarterSecond);
-      const summaryState = await this.customWaitIsPresented(this.walletSummaryBoxLocator, fiveSeconds, quarterSecond);
-      
-      return submenuState && summaryState;
+    const submenuState = await this.customWaitIsPresented(
+      this.transactionsSubmenuItemLocator,
+      fiveSeconds,
+      quarterSecond
+    );
+    const summaryState = await this.customWaitIsPresented(
+      this.walletSummaryBoxLocator,
+      fiveSeconds,
+      quarterSecond
+    );
+
+    return submenuState && summaryState;
   }
   async isWalletEmpty() {
     this.logger.info(`TransactionsSubTab::isWalletEmpty is called`);
@@ -224,9 +245,9 @@ export class TransactionsSubTab extends WalletTab {
       }
       const txAmountString = await this.getText(this.txAmountTextLocator(groupIndex, txIndex));
       const txAmount = parseFloat(txAmountString.split(' ')[0]);
-      await this.click(this.txRowLocator(groupIndex, txIndex));
+      await this.clickOnTxRow(groupIndex, txIndex);
       const txHashId = await this.getTxHashID(groupIndex, txIndex);
-      await this.click(this.txRowLocator(groupIndex, txIndex));
+      await this.clickOnTxRow(groupIndex, txIndex);
       const txInfo = {
         txType,
         txTime,
@@ -349,18 +370,18 @@ export class TransactionsSubTab extends WalletTab {
     return loaderIsNotDisplayed;
   }
   async _loadMore() {
-    const showMoreIsDisplayed = this.showMoreBtnIsDisplayed();
-    const loaderIsDisplayed = this.loaderIsDisplayed();
-    if (!(await showMoreIsDisplayed) && !(await loaderIsDisplayed)) {
+    const showMoreIsDisplayed = await this.showMoreBtnIsDisplayed();
+    const loaderIsDisplayed = await this.loaderIsDisplayed();
+    if (!showMoreIsDisplayed && !loaderIsDisplayed) {
       return false;
     }
-    if (await showMoreIsDisplayed) {
+    if (showMoreIsDisplayed) {
       await this.scrollIntoView(this.showMoreTxsButtonLocator);
       await this.click(this.showMoreTxsButtonLocator);
       await this.sleep(quarterSecond);
       return true;
     }
-    if (await loaderIsDisplayed) {
+    if (loaderIsDisplayed) {
       await this.scrollIntoView(this.txsLoaderSpinnerLocator);
       const result = await this.waitLoaderIsNotDisplayed(fiveSeconds, quarterSecond);
       if (!result) {
@@ -465,6 +486,85 @@ export class TransactionsSubTab extends WalletTab {
     const result = await this.getText(addMemoMsgLocator);
     this.logger.info(`TransactionsSubTab::getMemoMessage::result ${result}`);
     return result;
+  }
+  async thereIsNoMemo(groupIndex, txIndex) {
+    this.logger.info(
+      `TransactionsSubTab::thereIsNoMemo is called. Group index: ${groupIndex}, tx index: ${txIndex}`
+    );
+    const memoMsgLocator = this.txMemoContentTextLocator(groupIndex, txIndex);
+    const noMemoState = await this.customWaiter(
+      async () => {
+        const allElements = await this.findElements(memoMsgLocator);
+        return allElements.length === 0;
+      },
+      threeSeconds,
+      quarterSecond
+    );
+    return noMemoState;
+  }
+  async _allCollapsedTxsBalanceHiddenInGroup(groupObject) {
+    this.logger.info(`TransactionsSubTab::_allCollapsedTxsBalanceHiddenInGroup is called`);
+    const { groupIndex } = groupObject;
+    const result = [];
+    const allTxs = await this.findElements(this.txsInGroupLocator(groupIndex));
+    for (let txIndex = 0; txIndex < allTxs.length; txIndex++) {
+      const txFeeString = await this.getText(this.txFeeTextLocator(groupIndex, txIndex));
+      const txAmountRawString = await this.getText(this.txAmountTextLocator(groupIndex, txIndex));
+      const txAmountString = txAmountRawString.split(' ')[0];
+
+      const txFeeHiddenState = txFeeString === balanceReplacer || txFeeString === '-';
+      const txAmountHiddenState = txAmountString === balanceReplacer;
+
+      result.push(txFeeHiddenState && txAmountHiddenState);
+    }
+    return result;
+  }
+  async _allExpandedTxsBalanceHiddenInGroup(groupObject) {
+    this.logger.info(`TransactionsSubTab::_allCollapsedTxsBalanceHiddenInGroup is called`);
+    const { groupIndex } = groupObject;
+    const result = [];
+    const allTxs = await this.findElements(this.txsInGroupLocator(groupIndex));
+    for (let txIndex = 0; txIndex < allTxs.length; txIndex++) {
+      await this.clickOnTxRow(groupIndex, txIndex);
+      // check all from addresses
+      const amountFromAddrs = await this.__getAmountOfFromAddresses(groupIndex, txIndex);
+      for (let addrFromIndex = 0; addrFromIndex < amountFromAddrs; addrFromIndex++) {
+        const addrFromAmountRawStr = await this.getText(
+          this.txFromAddressAmountTextLocator(groupIndex, txIndex, addrFromIndex)
+        );
+        const addrFromAmountStr = addrFromAmountRawStr.split(' ')[0];
+        result.push(addrFromAmountStr === balanceReplacer);
+      }
+      // check all to addresses
+      const amountToAddrs = await this.__getAmountOfToAddresses(groupIndex, txIndex);
+      for (let addrToIndex = 0; addrToIndex < amountToAddrs; addrToIndex++) {
+        const addrToAmountRawStr = await this.getText(this.txToAddressAmountTextLocator(groupIndex, txIndex, addrToIndex));
+        const addrToAmountStr = addrToAmountRawStr.split(' ')[0];
+        result.push(addrToAmountStr === balanceReplacer);
+      }
+      await this.clickOnTxRow(groupIndex, txIndex);
+    }
+    return result;
+  }
+  async balanceIsHiddenInCollapsedTxs() {
+    this.logger.info(`TransactionsSubTab::balanceIsHiddenInCollapsedTxs is called`);
+    const allGroups = await this.__getTxsGroups();
+    const allTxsBalanceHidden = [];
+    for (const group of allGroups) {
+      const txsBalanceHiddenInGroup = await this._allCollapsedTxsBalanceHiddenInGroup(group);
+      allTxsBalanceHidden.push(...txsBalanceHiddenInGroup);
+    }
+    return allTxsBalanceHidden.every(txBalanceHidden => txBalanceHidden === true);
+  }
+  async balanceIsHiddenInExpandedTxs() {
+    this.logger.info(`TransactionsSubTab::balanceIsHiddenInCollapsedTxs is called`);
+    const allGroups = await this.__getTxsGroups();
+    const allTxsBalanceHidden = [];
+    for (const group of allGroups) {
+      const expandedTxsBalanceHiddenInGroup = await this._allExpandedTxsBalanceHiddenInGroup(group);
+      allTxsBalanceHidden.push(...expandedTxsBalanceHiddenInGroup);
+    }
+    return allTxsBalanceHidden.every(txBalanceHidden => txBalanceHidden === true);
   }
 }
 
