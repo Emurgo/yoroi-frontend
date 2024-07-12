@@ -274,7 +274,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
 
       runInAction(() => {
         this.poolTransitionRequestInfo[walletId] = { ...response };
-      })
+      });
     } catch (error) {
       console.warn('Failed to check pool transition', error);
     }
@@ -326,13 +326,15 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
       const govApi = new GovernanceApi({
         oldBackendUrl: String(backendService),
         newBackendUrl: String(backendServiceZero),
-        networkId: networkId,
+        networkId,
         wasmFactory: RustModule.CrossCsl.init,
       });
 
       const governanceStatus = await govApi.getAccountState(skey, skey);
       this.setGovernanceStatus(governanceStatus);
-    } catch (e) {}
+    } catch (e) {
+      console.warn(e);
+    }
   };
 
   @action.bound

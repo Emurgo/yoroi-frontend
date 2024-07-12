@@ -1,11 +1,10 @@
 // @flow
 import Dialog from '../../../components/widgets/Dialog';
-import { Typography, Button, Grid, Stack } from '@mui/material';
+import { Typography, Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages } from 'react-intl';
 
-import type { PoolTransition } from '../../../stores/toplevel/DelegationStore';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { ROUTES } from '../../../routes-config';
 
