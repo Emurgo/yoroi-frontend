@@ -8,7 +8,7 @@ import { oneMinute } from '../helpers/timeConstants.js';
 import { preloadDBAndStorage, waitTxPage } from '../helpers/restoreWalletHelper.js';
 import SendSubTab from '../pages/wallet/walletTab/sendSubTab.page.js';
 import { getTestString } from '../helpers/constants.js';
-import { INCORRECT_RECEIVER } from '../helpers/messages.js';
+import { RECEIVER_DOESNT_EXIST } from '../helpers/messages.js';
 
 describe('Handle handles', function () {
   this.timeout(2 * oneMinute);
@@ -134,7 +134,7 @@ describe('Handle handles', function () {
       it(`${testNegativeDatum.provider}. Check displayed info and continue`, async function () {
         const sendStep1Page = new SendSubTab(webdriver, logger);
         const helperText = await sendStep1Page.getReceiverHelperText();
-        expect(helperText, 'A different error message is displayed').to.equal(INCORRECT_RECEIVER);
+        expect(helperText, 'A different error message is displayed').to.equal(RECEIVER_DOESNT_EXIST);
       });
     });
   }
