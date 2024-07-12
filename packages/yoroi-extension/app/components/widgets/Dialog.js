@@ -4,7 +4,7 @@ import type { Node, Element, ComponentType } from 'react';
 import React, { forwardRef, useEffect, useState } from 'react';
 import classnames from 'classnames';
 import { map } from 'lodash';
-import { IconButton, Modal, Typography, alpha } from '@mui/material';
+import { IconButton, Modal, Typography, alpha, Button } from '@mui/material';
 import { Box, styled } from '@mui/system';
 import { LoadingButton } from '@mui/lab';
 import { withLayout } from '../../styles/context/layout';
@@ -137,6 +137,7 @@ function Dialog(props: Props & InjectedProps): Node {
             variant="body1"
             className="dialog__title"
             id={String(id) + '-dialogTitle-text'}
+            color="ds.text_gray_normal"
           >
             {title}
           </Typography>
@@ -243,15 +244,26 @@ export const CloseButton = ({
     id={idLocatorPath + '-closeModal-button'}
   >
     {closeButton || (
-      <IconButton>
+      <SIconBtn>
         <CrossIcon />
-      </IconButton>
+      </SIconBtn>
     )}
   </Box>
 );
 
 // eslint-disable-next-line no-unused-vars
-const StyledBox = forwardRef(({ contentHasScroll, empty, hasDivider, ...props }, ref) => <Box {...props} ref={ref} />);
+const StyledBox = forwardRef(({ contentHasScroll, empty, hasDivider, ...props }, ref) => (
+  <Box {...props} ref={ref} />
+));
+
+const SIconBtn = styled(Button)(({ theme, active }) => ({
+  backgroundColor: active && theme.palette.ds.gray_c200,
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_normal,
+    },
+  },
+}));
 
 export const ModalContainer: any => Node = styled(StyledBox)(
   ({ theme, contentHasScroll, empty = false }) => {
@@ -267,7 +279,7 @@ export const ModalContainer: any => Node = styled(StyledBox)(
       paddingTop: theme.name === 'classic' ? '25px' : '0px',
       paddingBottom: theme.name === 'classic' || theme.name === 'modern' ? '30px' : '0px',
       maxWidth: theme.name === 'classic' ? '785px' : '824px',
-      backgroundColor: empty ? undefined : 'var(--yoroi-comp-dialog-background)',
+      backgroundColor: empty ? undefined : theme.palette.ds.bg_color_low,
       color: 'var(--yoroi-comp-dialog-text)',
       maxHeight: '95vh',
 
@@ -279,8 +291,7 @@ export const ModalContainer: any => Node = styled(StyledBox)(
         textTransform: 'uppercase',
         letterSpacing: 0,
         display: 'block',
-        borderBottom:
-          theme.name === 'classic' || theme.name === 'modern' ? '' : revampBorder,
+        borderBottom: theme.name === 'classic' || theme.name === 'modern' ? '' : revampBorder,
         borderBottomColor:
           theme.name === 'classic' || theme.name === 'modern'
             ? theme.palette.gray['200']

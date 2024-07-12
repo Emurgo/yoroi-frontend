@@ -11,6 +11,7 @@ import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tab
 import type { Node } from 'react';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { formatValue, calculateAndFormatValue } from '../../utils/unit-of-account';
+import { Typography } from '@mui/material';
 
 type Props = {|
   +showAmount?: boolean,
@@ -31,7 +32,14 @@ export default class AmountDisplay extends Component<Props> {
   };
 
   render(): Node {
-    const { amount, shouldHideBalance, showFiat, showAmount, unitOfAccountSetting, id } = this.props;
+    const {
+      amount,
+      shouldHideBalance,
+      showFiat,
+      showAmount,
+      unitOfAccountSetting,
+      id,
+    } = this.props;
     if (amount == null) {
       return <div className={styles.isLoading} />;
     }
@@ -86,9 +94,14 @@ export default class AmountDisplay extends Component<Props> {
     return (
       <>
         {showAmount === true && (
-          <div className={styles.amount} id={id + '-availableBalance-text'}>
+          <Typography
+            variant="body1"
+            color="ds.text_gray_normal"
+            className={styles.amount}
+            id={id + '-availableBalance-text'}
+          >
             {balanceDisplay}&nbsp;{truncateToken(getTokenName(tokenInfo))}
-          </div>
+          </Typography>
         )}
         {showFiat === true && (
           <div className={styles.fiat} id={id + '-availableFiatBalance-text'}>

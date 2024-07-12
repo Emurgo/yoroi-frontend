@@ -8,6 +8,7 @@ import { ReactComponent as CloseCrossRevamp } from '../../assets/images/cross-da
 import { IconButton } from '@mui/material';
 import { withLayout } from '../../styles/context/layout';
 import type { InjectedLayoutProps } from '../../styles/context/layout';
+import { styled } from '@mui/material';
 
 type Props = {|
   +onClose?: void => PossiblyAsync<void>,
@@ -28,11 +29,20 @@ class DialogCloseButton extends Component<Props & InjectedLayoutProps> {
     const Svg = icon != null && icon !== '' ? icon : defaultIcon;
 
     return (
-      <IconButton onClick={onClose} sx={{ position: 'relative' }}>
+      <SIconBtn onClick={onClose} sx={{ position: 'relative' }}>
         <Svg />
-      </IconButton>
+      </SIconBtn>
     );
   }
 }
+
+const SIconBtn = styled(IconButton)(({ theme, active }) => ({
+  backgroundColor: active && theme.palette.ds.gray_c200,
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_normal,
+    },
+  },
+}));
 
 export default (withLayout(DialogCloseButton): ComponentType<Props>);
