@@ -10,7 +10,7 @@ import {
   Typography,
 } from '@mui/material';
 import { Box, styled } from '@mui/system';
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import { ReactComponent as Close } from '../../../assets/images/assets-page/close.inline.svg';
 import { ReactComponent as Grid2x2 } from '../../../assets/images/assets-page/grid-2x2.inline.svg';
 import { ReactComponent as Grid3x3 } from '../../../assets/images/assets-page/grid-3x3.inline.svg';
@@ -26,6 +26,7 @@ import { ampli } from '../../../../ampli/index';
 import { urlResolveForIpfsAndCorsproxy } from '../../../coreUtils';
 import globalMessages from '../../../i18n/global-messages';
 import { ROUTES } from '../../../routes-config';
+import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 
 const SEARCH_ACTIVATE_DEBOUNCE_WAIT = 1000;
 
@@ -167,7 +168,13 @@ function NfTsList({ list, intl }: Props & Intl): Node {
           spacing={2}
         >
           <NotFound />
-          <Typography component="div" variant="h5" fontWeight={500} color="common.black">
+          <Typography
+            component="div"
+            variant="h5"
+            fontWeight={500}
+            color="common.black"
+            color="ds.text_gray_normal"
+          >
             {intl.formatMessage(!list.length ? messages.noNFTsAdded : messages.noResultsFound)}
           </Typography>
         </Stack>
