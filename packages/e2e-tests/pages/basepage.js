@@ -278,6 +278,19 @@ class BasePage {
     const condition = until.elementIsEnabled(element);
     return this.driver.wait(condition);
   }
+  async buttonIsEnabled(locator) {
+    this.logger.info(`BasePage::buttonIsEnabled is called. Value: ${JSON.stringify(locator)}`);
+    const buttonIsEnabled = await this.customWaiter(
+      async () => {
+        const buttonlIsEnabled = await this.getAttribute(locator, 'disabled');
+        return buttonlIsEnabled === null;
+      },
+      fiveSeconds,
+      quarterSecond
+    );
+
+    return buttonIsEnabled;
+  }
   async waitDisabled(locator) {
     this.logger.info(`BasePage::waitDisabled is called. Value: ${JSON.stringify(locator)}`);
     const element = await this.findElement(locator);

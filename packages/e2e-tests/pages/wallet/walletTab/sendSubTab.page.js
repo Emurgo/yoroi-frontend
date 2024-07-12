@@ -117,18 +117,6 @@ class SendSubTab extends WalletTab {
     );
     return receiverState && memoState;
   }
-  async buttonIsEnabled(locator) {
-    const buttonIsEnabled = await this.customWaiter(
-      async () => {
-        const buttonlIsEnabled = await this.getAttribute(locator, 'disabled');
-        return buttonlIsEnabled === null;
-      },
-      fiveSeconds,
-      quarterSecond
-    );
-
-    return buttonIsEnabled;
-  }
   async enterReceiver(receiver) {
     this.logger.info(`SendSubTab::enterReceiver is called. Receiver: ${receiver}`);
     await this.click(this.receiverAddressInputLocator);
