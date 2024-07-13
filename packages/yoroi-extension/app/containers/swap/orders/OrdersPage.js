@@ -26,17 +26,8 @@ import type { CardanoConnectorSignRequest } from '../../../connector/types';
 import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import moment from 'moment';
 import { signTransactionHex } from '../../../api/ada/transactions/signTransactionHex';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
-import { truncateAddressShort } from '../../../utils/formatters';
-import { Quantities } from '../../../utils/quantities';
-import ExplorableHashContainer from '../../widgets/ExplorableHashContainer';
 import NoCompleteOrders from './NoCompleteOrders';
 import NoOpenOrders from './NoOpenOrders';
-import { useRichOrders } from './hooks';
-import { createFormattedTokenValues } from './util';
-import type { FormattedTokenValue } from './util';
-import type { MappedOrder } from './hooks';
-import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 
 type ColumnContext = {|
   completedOrders: boolean,
