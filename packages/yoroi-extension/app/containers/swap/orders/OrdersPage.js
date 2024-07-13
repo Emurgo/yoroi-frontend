@@ -380,18 +380,9 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
     .map(c => resolveValueOrGetter(c.width ?? 'auto', columnContext))
     .join(' ');
 
-  const isOpenOrdersEmpty = openOrders?.length === 0 && !showCompletedOrders;
-  const isCompleteOrdersEmpty = completedOrders?.length === 0 && showCompletedOrders;
-
-  const handleColumnNames = () => {
-    if (isOpenOrdersEmpty) {
-      return [];
-    }
-    if (isCompleteOrdersEmpty) {
-      return [];
-    }
-    return columnNames;
-  };
+  const isDisplayOpenOrdersEmpty = openOrders?.length === 0 && !showCompletedOrders;
+  const isDisplayCompletedOrdersEmpty = completedOrders?.length === 0 && showCompletedOrders;
+  const safeColumnNames = isDisplayOpenOrdersEmpty || isDisplayCompletedOrdersEmpty ? [] : columnNames;
 
   return (
     <Box sx={{ border: '1px solid transparent' }}>
@@ -415,7 +406,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
 
         <Table
           columnKeys={columnKeys}
-          columnNames={handleColumnNames()}
+          columnNames={safeColumnNames}
           columnAlignment={columnAlignment}
           columnLeftPaddings={columnLeftPaddings}
           gridTemplateColumns={gridTemplateColumns}
@@ -463,8 +454,8 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
           hwWalletError={null}
         />
       )}
-      {isOpenOrdersEmpty && <NoOpenOrders />}
-      {isCompleteOrdersEmpty && <NoCompleteOrders />}
+      {isDisplayOpenOrdersEmpty && <NoOpenOrders />}
+      {isDisplayCompletedOrdersEmpty && <NoCompleteOrders />}
     </Box>
   );
 }
