@@ -380,8 +380,8 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
     .map(c => resolveValueOrGetter(c.width ?? 'auto', columnContext))
     .join(' ');
 
-  const isDisplayOpenOrdersEmpty = openOrders?.length === 0 && !showCompletedOrders;
-  const isDisplayCompletedOrdersEmpty = completedOrders?.length === 0 && showCompletedOrders;
+  const isDisplayOpenOrdersEmpty = !showCompletedOrders && openOrders?.length === 0;
+  const isDisplayCompletedOrdersEmpty = showCompletedOrders && completedOrders?.length === 0;
   const safeColumnNames = isDisplayOpenOrdersEmpty || isDisplayCompletedOrdersEmpty ? [] : columnNames;
 
   return (
