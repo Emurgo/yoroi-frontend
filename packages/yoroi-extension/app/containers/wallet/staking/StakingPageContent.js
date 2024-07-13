@@ -257,7 +257,6 @@ class StakingPageContent extends Component<AllProps> {
               }
             />
             <RightCardsWrapper>
-              {errorIfPresent}
               {!errorIfPresent && this.getStakePoolMeta(publicDeriver)}
               {!errorIfPresent && this.getEpochProgress(publicDeriver)}
             </RightCardsWrapper>
