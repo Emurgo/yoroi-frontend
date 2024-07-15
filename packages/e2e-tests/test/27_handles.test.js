@@ -31,10 +31,11 @@ describe('Handle handles', function () {
       userHandle: 'rahul.ada',
       provider: 'Cardano Name Service (CNS)',
     },
-    {
-      userHandle: 'stackchain.blockchain',
-      provider: 'Unstoppable Domains',
-    },
+    // Commented because of this https://emurgo.slack.com/archives/GCN6JLZK7/p1720772972481959
+    // {
+    //   userHandle: 'stackchain.blockchain',
+    //   provider: 'Unstoppable Domains',
+    // },
   ];
 
   const testDataNegative = [
@@ -46,10 +47,11 @@ describe('Handle handles', function () {
       userHandle: `${getTestString('', 7, false)}.ada`,
       provider: 'Cardano Name Service (CNS)',
     },
-    {
-      userHandle: `${getTestString('', 10, false)}.blockchain`,
-      provider: 'Unstoppable Domains',
-    },
+    // Commented because of this https://emurgo.slack.com/archives/GCN6JLZK7/p1720772972481959
+    // {
+    //   userHandle: `${getTestString('', 10, false)}.blockchain`,
+    //   provider: 'Unstoppable Domains',
+    // },
   ];
 
   for (const testDatum of testDataPositive) {
