@@ -72,7 +72,7 @@ export default function SwapInput({
         component="fieldset"
         sx={{
           borderStyle: 'solid',
-          borderWidth: tokenInfo.id?.length > 0 && error ? '2px' : '1px',
+          borderWidth: (tokenInfo.id?.length > 0 && error) || focusState.value ? '2px' : '1px',
           borderColor: error ? 'magenta.500' : isFocusedColor,
           borderRadius: '8px',
           p: '16px',
@@ -85,6 +85,7 @@ export default function SwapInput({
           bgcolor: 'common.white',
           columnGap: '6px',
           rowGap: '8px',
+          maxHeight: '95px',
           '&:hover': {
             borderColor: !error && 'grayscale.max',
           },
