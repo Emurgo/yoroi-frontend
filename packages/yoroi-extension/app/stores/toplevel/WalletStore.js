@@ -167,19 +167,30 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       this.wallets.push(...result);
     });
 
-    listenForWalletStateUpdate(async ({ publicDeriverId, isRefreshing }) => {
-      const index = this.wallets.findIndex(wallet => wallet.publicDeriverId === publicDeriverId);
-      if (index === -1) {
-        return;
-      }
-      if (isRefreshing) {
-        runInAction(() => this.wallets[index].isRefreshing = true);
-      } else {
-        const newWalletState = await getWallets(publicDeriverId);
+    listenForWalletStateUpdate(async (params) => {
+      if (params.eventType === 'update') {
+        const index = this.wallets.findIndex(wallet => wallet.publicDeriverId === params.publicDeriverId);
+        if (index === -1) {
+          return;
+        }
+        if (params.isRefreshing) {
+          runInAction(() => this.wallets[index].isRefreshing = true);
+        } else {
+          const newWalletState = await getWallets(params.publicDeriverId);
+          runInAction(() => {
+            this.wallets.splice(index, 1, newWalletState[0]);
+          });
+        }
+      } else if (params.eventType === 'remove') {
+        const index = this.wallets.findIndex(wallet => wallet.publicDeriverId === params.publicDeriverId);
+        if (index === -1) {
+          return;
+        }
         runInAction(() => {
-          this.wallets.splice(index, 1, newWalletState[0]);
+          this.wallets.splice(index, 1);
         });
       }
+      // we don't handle (params.eventType === 'new') because currently there is only one open tab allowed
     });
   };
 

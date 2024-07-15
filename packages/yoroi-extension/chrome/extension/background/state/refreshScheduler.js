@@ -137,8 +137,11 @@ export async function syncWallet(publicDeriver: PublicDeriver<>): Promise<void> 
 function emitUpdate(publicDeriverId: number, isRefreshing: boolean): void {
   emitUpdateToSubscriptions({
     type: 'wallet-state-update',
-    publicDeriverId,
-    isRefreshing,
+    params: {
+      eventType: 'update',
+      publicDeriverId,
+      isRefreshing,
+    },
   });
 }
 

@@ -93,8 +93,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   //fixme: verify sender.id/origin
 });
 
-export async function subscribe(activeWalletId: ?number): Promise<Array<WalletState>> {
-  return await callBackground({ type: 'subscribe', request: { activeWalletId } });
+export async function subscribe(activeWalletId: ?number): Promise<void> {
+  await callBackground({ type: 'subscribe', request: { activeWalletId } });
 }
 
 export type CreateWalletRequestType = {|
@@ -106,7 +106,11 @@ export type CreateWalletRequestType = {|
 |};
 
 export async function createWallet(request: CreateWalletRequestType): Promise<WalletState> {
-  return await callBackground({ type: 'create-wallet', request, });
+  const resp = await callBackground({ type: 'create-wallet', request, });
+  if (resp.error) {
+    throw new Error(`error when creating wallet: ${resp.error}`);
+  }
+  return (await getWallets(resp.publicDeriverId))[0];
 }
 
 export type CreateHardwareWalletRequestType = {|
@@ -120,7 +124,11 @@ export type CreateHardwareWalletRequestType = {|
   network: $ReadOnly<NetworkRow>,
 |};
 export async function createHardwareWallet(request: CreateHardwareWalletRequestType): Promise<WalletState> {
-  return await callBackground({ type: 'create-hardware-wallet', request, });
+  const resp = await callBackground({ type: 'create-hardware-wallet', request, });
+  if (resp.error) {
+    throw new Error(`error when creating wallet: ${resp.error}`);
+  }
+  return (await getWallets(resp.publicDeriverId))[0];
 }
 
 export async function removeWalletFromDb(request: {| publicDeriverId: number |}): Promise<void> {
@@ -315,18 +323,22 @@ const callbacks = Object.freeze({
 });
 chrome.runtime.onMessage.addListener(async (message, sender) => {
   if (message.type === 'wallet-state-update') {
-    callbacks.walletStateUpdate.forEach(callback => callback({
-      publicDeriverId: message.publicDeriverId,
-      isRefreshing: message.isRefreshing,
-    }));
+    callbacks.walletStateUpdate.forEach(callback => callback(message.params));
   } else if (message.type === 'server-status-update') {
     callbacks.serverStatusUpdate.forEach(callback => callback(message.params));
   }
 });
 
 export type WalletStateUpdateParams = {|
+  eventType: 'update',
   publicDeriverId: number,
   isRefreshing: boolean,
+|} | {|
+  eventType: 'new',
+  publicDeriverId: number,
+|} | {|
+  eventType: 'remove',
+  publicDeriverId: number,
 |};
 export function listenForWalletStateUpdate(callback: (WalletStateUpdateParams) => Promise<void>) {
   callbacks.walletStateUpdate.push(callback);

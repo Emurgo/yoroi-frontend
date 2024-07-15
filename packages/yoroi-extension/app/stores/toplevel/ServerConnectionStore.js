@@ -12,7 +12,7 @@ import type { ServerStatus } from '../../../chrome/extension/background/types';
 import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export default class ServerConnectionStore extends Store<StoresMap, ActionsMap> {
-  @observable serverStatus: Array<ServerStatus>;
+  @observable serverStatus: Array<ServerStatus> = [];
 
   setup(): void {
     super.setup();

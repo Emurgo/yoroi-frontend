@@ -126,7 +126,7 @@ import {
   STORAGE_KEY_CONNECTION_PROTOCOL,
 } from './content';
 import type { ConnectedSite } from './content';
-import { subscribe } from '../subscriptionManager';
+import { subscribe, emitUpdateToSubscriptions } from '../subscriptionManager';
 import AdaApi, { genOwnStakingKey } from '../../../../app/api/ada';
 import { loadWalletsFromStorage } from '../../../../app/api/ada/lib/storage/models/load';
 import { getWalletState, batchLoadSubmittedTransactions } from './utils';
@@ -614,18 +614,28 @@ export async function yoroiMessageHandler(
     subscribe(sender.tab.id, request.request.activeWalletId);
     sendResponse({ error: null });
   } else if (request.type === YOROI_MESSAGES.CREATE_WALLET) {
+    await RustModule.load();
     try {
       const db = await getDb();
       const network = getNetworkById(request.request.networkId);
 
       const adaApi = new AdaApi();
-      await adaApi.createWallet({
+      const { publicDerivers } = await adaApi.createWallet({
         db,
         network,
         recoveryPhrase: request.request.recoveryPhrase,
         walletName: request.request.walletName,
         walletPassword: request.request.walletPassword,
         accountIndex: request.request.accountIndex,
+      });
+      const publicDeriverId = publicDerivers[0].getPublicDeriverId();
+      sendResponse({ publicDeriverId });
+      emitUpdateToSubscriptions({
+        type: 'wallet-state-update',
+        params: {
+          eventType: 'new',
+          publicDeriverId,
+        }
       });
     } catch(error) {
       sendResponse({ error: error.message });
@@ -639,7 +649,7 @@ export async function yoroiMessageHandler(
       const stateFetcher = await getCardanoStateFetcher(new LocalStorageApi());
 
       const adaApi = new AdaApi();
-      await adaApi.createHardwareWallet({
+      const { publicDeriver } = await adaApi.createHardwareWallet({
         db,
         network: request.request.network,
         walletName: request.request.walletName,
@@ -648,18 +658,33 @@ export async function yoroiMessageHandler(
         checkAddressesInUse: stateFetcher.checkAddressesInUse,
         addressing: request.request.addressing,
       });
+      const publicDeriverId = publicDeriver.getPublicDeriverId();
+      sendResponse({ publicDeriverId });
+      emitUpdateToSubscriptions({
+        type: 'wallet-state-update',
+        params: {
+          eventType: 'new',
+          publicDeriverId,
+        }
+      });
     } catch(error) {
       sendResponse({ error: error.message });
       return;
     }
     sendResponse({ error: null });
   } else if (request.type === YOROI_MESSAGES.REMOVE_WALLET) {
-    // fixme: notify all tabs
     const publicDeriver = await getPublicDeriverById(request.request.publicDeriverId);
     if (publicDeriver) {
       await removePublicDeriver({
         publicDeriver,
         conceptualWallet: publicDeriver.getParent(),
+      });
+      emitUpdateToSubscriptions({
+        type: 'wallet-state-update',
+        params: {
+          eventType: 'remove',
+          publicDeriverId: request.request.publicDeriverId,
+        }
       });
     }
     sendResponse(null);
