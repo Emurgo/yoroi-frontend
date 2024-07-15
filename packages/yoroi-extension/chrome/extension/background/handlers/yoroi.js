@@ -126,7 +126,7 @@ import {
   STORAGE_KEY_CONNECTION_PROTOCOL,
 } from './content';
 import type { ConnectedSite } from './content';
-import { subscribe } from '../state';
+import { subscribe } from '../subscriptionManager';
 import AdaApi, { genOwnStakingKey } from '../../../../app/api/ada';
 import { loadWalletsFromStorage } from '../../../../app/api/ada/lib/storage/models/load';
 import { getWalletState, batchLoadSubmittedTransactions } from './utils';
