@@ -8,7 +8,11 @@ import type { WalletState } from '../types';
 import { asHasLevels } from '../../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import environment from '../../../../app/environment';
 import { getDb } from './databaseManager';
-import { getSubscriptions, registerCallback } from './subscriptionManager';
+import {
+  getSubscriptions,
+  registerCallback,
+  emitUpdateToSubscriptions,
+} from '../subscriptionManager';
 import LocalStorageApi, {
   loadSubmittedTransactions,
   persistSubmittedTransactions,
@@ -42,8 +46,6 @@ export async function refreshMain(): Promise<void> {
 // return delay in ms for next run
 // this function should not have unhandled exception
 async function refreshAllParallel(): Promise<void> {
-  const subscriptions = getSubscriptions();
-
   const db = await getDb();
   const publicDerivers = await getWallets({ db });
 
@@ -132,18 +134,11 @@ export async function syncWallet(publicDeriver: PublicDeriver<>): Promise<void> 
   }
 }
 
-/*::
-declare var chrome;
-*/
 function emitUpdate(publicDeriverId: number, isRefreshing: boolean): void {
-  for (const { tabId } of getSubscriptions()) {
-    chrome.tabs.sendMessage(
-      tabId,
-      {
-        type: 'wallet-state-update',
-        publicDeriverId,
-        isRefreshing,
-      }
-    );
-  }    
+  emitUpdateToSubscriptions({
+    type: 'wallet-state-update',
+    publicDeriverId,
+    isRefreshing,
+  });
 }
+

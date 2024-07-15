@@ -4,55 +4,59 @@ import { action, observable, computed, runInAction } from 'mobx';
 import Store from '../base/Store';
 import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
-import environment from '../../environment';
 import type { ServerStatusResponse } from '../../api/common/lib/state-fetch/types';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import { listenForServerStatusUpdate } from '../../api/thunk';
+import type { ServerStatus } from '../../../chrome/extension/background/types';
+import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export default class ServerConnectionStore extends Store<StoresMap, ActionsMap> {
-  SERVER_STATUS_REFRESH_INTERVAL: number = environment.getServerStatusRefreshInterval();
-
-  @observable serverStatus: ServerStatusErrorType = ServerStatusErrors.Healthy;
-  @observable isMaintenance: boolean = false;
-  parallelSync: boolean = false;
-
-  // set to undefined as a starting value
-  // to detect if we've never managed to connect to the server (Yoroi running in offline mode)
-  @observable serverTime: void | Date = undefined;
+  @observable serverStatus: Array<ServerStatus>;
 
   setup(): void {
     super.setup();
 
-    // do not await on purpose -- it's okay if this is async
-    this._checkServerStatus();
-    setInterval(this._checkServerStatus, this.SERVER_STATUS_REFRESH_INTERVAL);
+    listenForServerStatusUpdate(async (serverStatus) => {
+      runInAction(() => {
+        this.serverStatus.splice(0, this.serverStatus.length, ...serverStatus);
+      });
+    });
+  }
+
+  get serverTime(): void | Date {
+    const serverStatus = this._getServerStatus();
+    if (serverStatus) {
+      return new Date(serverStatus.clockSkew + Date.now());
+    }
+    return undefined;
+  }
+
+  get isMaintenance(): boolean {
+    const serverStatus = this._getServerStatus();
+    if (serverStatus) {
+      return serverStatus.isMaintenance;
+    }
+    return false;
   }
 
   @computed get checkAdaServerStatus(): ServerStatusErrorType {
-    return this.serverStatus;
+    const serverStatus = this._getServerStatus();
+    if (serverStatus) {
+      return serverStatus.isServerOk ? ServerStatusErrors.Healthy : ServerStatusErrors.Server; 
+    }
+    // this is a temporary condition, we'll soon get an update
+    return ServerStatusErrors.Healthy;
   }
 
-  @action _checkServerStatus: void => Promise<void> = async () => {
-    const stateFetcher = this.stores.stateFetchStore.fetcher;
-    const checkServerStatusFunc = stateFetcher.checkServerStatus;
-    try {
-      const response: ServerStatusResponse = await checkServerStatusFunc();
-      runInAction('refresh server status', () => {
-        this.serverStatus = response.isServerOk === true
-          ? ServerStatusErrors.Healthy
-          : ServerStatusErrors.Server;
-        this.isMaintenance = response.isMaintenance || false;
-        const parallelSync = response.parallelSync || false;
-        if (parallelSync !== this.parallelSync) {
-          this.parallelSync = parallelSync;
-          this.actions.serverConnection.parallelSyncStateChange.trigger();
-        }
-        this.serverTime = new Date(response.serverTime);
-      });
-    } catch (err) {
-      runInAction('refresh server status', () => {
-        this.serverStatus = ServerStatusErrors.Network;
-      });
+  _getServerStatus(): ServerStatus | void {
+    let networkId;
+    const { selected } = this.stores.wallets;
+    if (selected) {
+      networkId = selected.networkId;
+    } else {
+      networkId = networks.CardanoMainnet.NetworkId;
     }
+    return this.serverStatus.find(s => s.networkId === networkId);
   }
 }

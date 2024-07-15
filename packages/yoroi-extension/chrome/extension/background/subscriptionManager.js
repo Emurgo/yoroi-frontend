@@ -63,3 +63,11 @@ export function registerCallback(callback: (Callback) => void) {
   callbacks.push(callback);
 }
 
+/*::
+declare var chrome;
+*/
+export function emitUpdateToSubscriptions(data: Object): void {
+  for (const { tabId } of getSubscriptions()) {
+    chrome.tabs.sendMessage(tabId, Object);
+  }    
+}

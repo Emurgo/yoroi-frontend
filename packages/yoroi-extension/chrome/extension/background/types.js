@@ -58,3 +58,11 @@ export type WalletState = {|
   isRefreshing: boolean,
   submittedTransactions: Array<PersistedSubmittedTransaction>,
 |};
+
+export type ServerStatus = {|
+  networkId: number,
+  isServerOk: boolean,
+  isMaintenance: boolean,
+  clockSkew: number,
+  lastUpdateTimestamp: number,
+|};

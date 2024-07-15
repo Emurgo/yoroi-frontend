@@ -25,7 +25,7 @@ import type { StoresMap } from '../index';
 import { getWalletChecksum } from '../../api/export/utils';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { WalletState } from '../../../chrome/extension/background/types';
-import { getWallets, subscribe } from '../../api/thunk';
+import { getWallets, subscribe, listenForWalletStateUpdate } from '../../api/thunk';
 /*::
 declare var chrome;
 */
@@ -167,20 +167,18 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       this.wallets.push(...result);
     });
 
-    chrome.runtime.onMessage.addListener(async (message, sender) => {
-      if (message.type === 'wallet-state-update') {
-        const index = this.wallets.findIndex(wallet => wallet.publicDeriverId === message.publicDeriverId);
-        if (index === -1) {
-          return;
-        }
-        if (message.isRefreshing) {
-          runInAction(() => this.wallets[index].isRefreshing = true);
-        } else {
-          const newWalletState = await getWallets(message.publicDeriverId);
-          runInAction(() => {
-            this.wallets.splice(index, 1, newWalletState[0]);
-          });
-        }
+    listenForWalletStateUpdate(async ({ publicDeriverId, isRefreshing }) => {
+      const index = this.wallets.findIndex(wallet => wallet.publicDeriverId === publicDeriverId);
+      if (index === -1) {
+        return;
+      }
+      if (isRefreshing) {
+        runInAction(() => this.wallets[index].isRefreshing = true);
+      } else {
+        const newWalletState = await getWallets(publicDeriverId);
+        runInAction(() => {
+          this.wallets.splice(index, 1, newWalletState[0]);
+        });
       }
     });
   };

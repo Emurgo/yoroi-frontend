@@ -3,7 +3,7 @@
 import { schema } from 'lovefield';
 import { loadLovefieldDBFromDump } from './ada/lib/storage/database';
 import type { lf$Database, } from 'lovefield';
-import type { WalletState } from '../../chrome/extension/background/types';
+import type { WalletState, ServerStatus } from '../../chrome/extension/background/types';
 import { HaskellShelleyTxSignRequest } from './ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type { NetworkRow, TokenRow } from './ada/lib/storage/database/primitives/tables';
 import type { TxMemoLookupKey, } from './ada/lib/storage/bridge/memos';
@@ -26,6 +26,8 @@ import type { ExplorerRow, PreferredExplorerRow } from './ada/lib/storage/databa
 /*::
 declare var chrome;
 */
+
+// UI -> background queries:
 
 function callBackground<T, R>(message: T): Promise<R> {
   return new Promise((resolve, reject) => {
@@ -304,4 +306,32 @@ export type SignTransactionRequestType = {|
 |};
 export async function signTransaction(request: SignTransactionRequestType): Promise<string> {
   return await callBackground({ type: 'sign-tx', request });
+}
+
+// Background -> UI notifications:
+const callbacks = Object.freeze({
+  walletStateUpdate: [],
+  serverStatusUpdate: [],
+});
+chrome.runtime.onMessage.addListener(async (message, sender) => {
+  if (message.type === 'wallet-state-update') {
+    callbacks.walletStateUpdate.forEach(callback => callback({
+      publicDeriverId: message.publicDeriverId,
+      isRefreshing: message.isRefreshing,
+    }));
+  } else if (message.type === 'server-status-update') {
+    callbacks.serverStatusUpdate.forEach(callback => callback(message.params));
+  }
+});
+
+export type WalletStateUpdateParams = {|
+  publicDeriverId: number,
+  isRefreshing: boolean,
+|};
+export function listenForWalletStateUpdate(callback: (WalletStateUpdateParams) => Promise<void>) {
+  callbacks.walletStateUpdate.push(callback);
+}
+
+export function listenForServerStatusUpdate(callback: (Array<ServerStatus>) => Promise<void>) {
+  callbacks.serverStatusUpdate.push(callback);
 }
