@@ -41,6 +41,10 @@ class SendSubTab extends WalletTab {
     locator: '//input[starts-with(@id, "amount--")]', // unfortunately, I didn't find a way to make a proper ID
     method: 'xpath',
   };
+  amountToSendHelperTextLocator = {
+    locator: 'wallet:send:addAssetsStep-amountError-text',
+    method: 'id',
+  };
   addTokenButtonLocator = {
     locator: 'wallet:send:addAssetsStep-addTokens-button',
     method: 'id',
@@ -69,7 +73,7 @@ class SendSubTab extends WalletTab {
   receiverHandleInfoTextLocator = {
     locator: 'wallet:send:confrimTransactionStep-receiverHandleInfo-text',
     method: 'id',
-  }
+  };
   receiverAddressTextLocator = {
     locator: 'wallet:send:confrimTransactionStep-receiverAddress-text',
     method: 'id',
@@ -137,7 +141,7 @@ class SendSubTab extends WalletTab {
   }
   async getReceiverHandlerAddress() {
     this.logger.info(`SendSubTab::getReceiverHandlerAddress is called.`);
-    return await this.getText(this.domainResolverAddressTextLocator)
+    return await this.getText(this.domainResolverAddressTextLocator);
   }
   async enterMemo(memo) {
     this.logger.info(`SendSubTab::enterMemo is called. Memo: ${memo}`);
@@ -181,6 +185,19 @@ class SendSubTab extends WalletTab {
       } else {
         throw new Error('The Next button is disabled');
       }
+    }
+  }
+  async getAmountHelperText() {
+    this.logger.info(`SendSubTab::getAmountHelperText is called.`);
+    const fieldIsNotEmpty = await this.customWaiter(async () => {
+      const fieldElem = await this.findElement(this.amountToSendHelperTextLocator);
+      const fieldText = await fieldElem.getText();
+      return fieldText !== '' && fieldText !== null && fieldText !== undefined;
+    });
+    if (fieldIsNotEmpty) {
+      return await this.getText(this.amountToSendHelperTextLocator);
+    } else {
+      throw new Error('There is no an error message');
     }
   }
   async getInfoFromConfirmTxPage() {
