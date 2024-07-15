@@ -28,8 +28,6 @@ import { createFormattedTokenValues } from './util';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import type { MappedOrder } from './hooks';
 import type { FormattedTokenValue } from './util';
-import moment from 'moment';
-import { signTransactionHex } from '../../../api/ada/transactions/signTransactionHex';
 import NoCompleteOrders from './NoCompleteOrders';
 import NoOpenOrders from './NoOpenOrders';
 
