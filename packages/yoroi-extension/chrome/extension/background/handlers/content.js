@@ -294,7 +294,7 @@ export async function withSelectedWallet<T>(
       return Promise.reject(new Error(`Public deriver index not found: ${String(publicDeriverId)}`));
     }
     if (shouldSyncWallet) {
-      await syncWallet(selectedWallet);
+      await syncWallet(selectedWallet, 'connector');
     }
 
     // we need to make sure this runs within the withDb call

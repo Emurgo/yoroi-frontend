@@ -39,7 +39,7 @@ export type SendMoneyRequest = Request<DeferredCall<{| txId: string |}>>;
 export default class WalletStore extends Store<StoresMap, ActionsMap> {
   ON_VISIBLE_DEBOUNCE_WAIT: number = 1000;
 
-  @observable initialSyncingWalletIds: Array<number> = [];
+  @observable initialSyncingWalletIds: Set<number> = new Set();
   @observable wallets: Array<WalletState> = [];
   @observable selected: null | WalletState;
   @observable getInitialWallets: Request<typeof getWallets> = new Request(getWallets);
@@ -95,7 +95,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
         publicDeriverId: newWallet.publicDeriverId,
       });
       this.actions.dialogs.closeActiveDialog.trigger();
-      this.initialSyncingWalletIds.push(newWallet.publicDeriverId);
+      this.initialSyncingWalletIds.add(newWallet.publicDeriverId);
       this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
     });
   };
@@ -142,7 +142,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
     runInAction(() => {
       this.wallets.push(wallet);
-      this.initialSyncingWalletIds.push(wallet.publicDeriverId);
+      this.initialSyncingWalletIds.add(wallet.publicDeriverId);
     });
   };
 
@@ -179,6 +179,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
           const newWalletState = await getWallets(params.publicDeriverId);
           runInAction(() => {
             this.wallets.splice(index, 1, newWalletState[0]);
+            this.initialSyncingWalletIds.delete(params.publicDeriverId);
           });
         }
       } else if (params.eventType === 'remove') {
@@ -346,7 +347,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   };
 
   isInitialSyncing: (number) => boolean = (publicDeriverId) => {
-    return this.initialSyncingWalletIds.includes(publicDeriverId);
+    return this.initialSyncingWalletIds.has(publicDeriverId);
   }
 }
 

@@ -17,16 +17,17 @@ import LocalStorageApi, {
   loadSubmittedTransactions,
   persistSubmittedTransactions,
 } from '../../../../app/api/localStorage/index';
-
-let refreshRunning: boolean = false;
+import { Queue } from 'async-await-queue';
 
 registerCallback((params) => {
   if (params.type === 'subscriptionChange') {
-    refreshMain();
+    refreshThreadMain();
   }
 });
 
-export async function refreshMain(): Promise<void> {
+let refreshRunning: boolean = false;
+// Start a "thread" to periodically refresh all wallets. Ensure only one such thread running.
+export async function refreshThreadMain(): Promise<void> {
   if (refreshRunning) {
     return;
   }
@@ -36,44 +37,57 @@ export async function refreshMain(): Promise<void> {
     if (getSubscriptions().length === 0) {
       break;
     }
-    await refreshAllParallel();
+    await refreshAll();
     await new Promise(resolve => setTimeout(resolve, environment.getWalletRefreshInterval()));
   }
 
   refreshRunning = false;
 }
 
-// return delay in ms for next run
-// this function should not have unhandled exception
-async function refreshAllParallel(): Promise<void> {
+async function refreshAll(): Promise<void> {
+  // this function should not have unhandled exception
   const db = await getDb();
   const publicDerivers = await getWallets({ db });
 
-  let counter = 0;
-  for (const publicDeriver of publicDerivers) {
-    console.log(
-      'syncing public deriver %s of %s ID %s "%s"',
-      counter += 1,
-      publicDerivers.length,
-      publicDeriver.getPublicDeriverId(),
-      (await publicDeriver.getParent().getFullConceptualWalletInfo()).Name,
-    );
-    const lastSyncInfo = await publicDeriver.getLastSyncInfo();
-    if (Date.now() - (lastSyncInfo.Time?.valueOf() || 0) < environment.getWalletRefreshInterval()) {
-      return;
-    }
+  for (let i = 0; i < publicDerivers.length; i++) {
     try {
-      await syncWallet(publicDeriver);
+      await syncWallet(
+        publicDerivers[i],
+        `periodical refresh ${i+1} of ${publicDerivers.length}`,
+      );
     } catch(error) {
-      console.error('Error when refreshing wallet', error);
+      console.error('Error when refreshing wallet.', error);
     }
   };
 }
 
+// Keep track of whether a wallet is being synced because the UI shows this.
 export const refreshingWalletIdSet: Set<number> = new Set();
+// There are multiple entry points to syncWallet. Ensure only one is running.
+const syncingQueue = new Queue();
 
-export async function syncWallet(publicDeriver: PublicDeriver<>): Promise<void> {
+export async function syncWallet(
+  publicDeriver: PublicDeriver<>,
+  logInfo: string,
+  priority: number = 0
+): Promise<void> {
+  return syncingQueue.run(() => _syncWallet(publicDeriver, logInfo), priority);
+}
+async function _syncWallet(publicDeriver: PublicDeriver<>, logInfo: string): Promise<void> {
   const publicDeriverId = publicDeriver.getPublicDeriverId();
+  console.log(
+    'Syncing wallet ID %s name "%s" for %s.',
+    publicDeriverId,
+    (await publicDeriver.getParent().getFullConceptualWalletInfo()).Name,
+    logInfo,
+  );
+
+  const lastSyncInfo = await publicDeriver.getLastSyncInfo();
+  if (Date.now() - (lastSyncInfo.Time?.valueOf() || 0) < environment.getWalletRefreshInterval()) {
+    console.log('last sync was %s, skip syncing', lastSyncInfo.Time);
+    return;
+  }
+
   refreshingWalletIdSet.add(publicDeriverId);
   emitUpdate(publicDeriverId, true);
 

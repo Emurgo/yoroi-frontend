@@ -637,6 +637,7 @@ export async function yoroiMessageHandler(
           publicDeriverId,
         }
       });
+      syncWallet(publicDerivers[0], 'new wallet', 1);
     } catch(error) {
       sendResponse({ error: error.message });
       return;
@@ -667,6 +668,7 @@ export async function yoroiMessageHandler(
           publicDeriverId,
         }
       });
+      syncWallet(publicDeriver, 'new wallet', 1);
     } catch(error) {
       sendResponse({ error: error.message });
       return;
