@@ -182,9 +182,9 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     if (!publicDeriver) {
       throw new Error(`${nameof(TransactionsStore)}::${nameof(this.isLoading)} no wallet selected`);
     }
-    const { headRequest, tailRequest } = this.getTxHistoryState(publicDeriver.publicDeriverId).requests;
+    const { tailRequest } = this.getTxHistoryState(publicDeriver.publicDeriverId).requests;
 
-    return !headRequest.wasExecuted && !tailRequest.wasExecuted;
+    return !tailRequest.wasExecuted;
   }
 
   isWalletLoading: number => boolean = (publicDeriverId) => {

@@ -129,7 +129,11 @@ import type { ConnectedSite } from './content';
 import { subscribe, emitUpdateToSubscriptions } from '../subscriptionManager';
 import AdaApi, { genOwnStakingKey } from '../../../../app/api/ada';
 import { loadWalletsFromStorage } from '../../../../app/api/ada/lib/storage/models/load';
-import { getWalletState, batchLoadSubmittedTransactions } from './utils';
+import {
+  getWalletState,
+  batchLoadSubmittedTransactions,
+  getPlaceHolderWalletState,
+ } from './utils';
 import { getCardanoStateFetcher } from '../utils';
 import { removePublicDeriver } from '../../../../app/api/ada/lib/storage/bridge/walletBuilder/remove';
 import { GetToken } from '../../../../app/api/ada/lib/storage/database/primitives/api/read';
@@ -628,13 +632,12 @@ export async function yoroiMessageHandler(
         walletPassword: request.request.walletPassword,
         accountIndex: request.request.accountIndex,
       });
-      const publicDeriverId = publicDerivers[0].getPublicDeriverId();
-      sendResponse({ publicDeriverId });
+      sendResponse({ placeHolderWalletState: await getPlaceHolderWalletState(publicDerivers[0]) });
       emitUpdateToSubscriptions({
         type: 'wallet-state-update',
         params: {
           eventType: 'new',
-          publicDeriverId,
+          publicDeriverId: publicDerivers[0].getPublicDeriverId(),
         }
       });
       syncWallet(publicDerivers[0], 'new wallet', 1);
@@ -659,13 +662,12 @@ export async function yoroiMessageHandler(
         checkAddressesInUse: stateFetcher.checkAddressesInUse,
         addressing: request.request.addressing,
       });
-      const publicDeriverId = publicDeriver.getPublicDeriverId();
-      sendResponse({ publicDeriverId });
+      sendResponse({ placeHolderWalletState: await getPlaceHolderWalletState(publicDeriver) });
       emitUpdateToSubscriptions({
         type: 'wallet-state-update',
         params: {
           eventType: 'new',
-          publicDeriverId,
+          publicDeriverId: publicDeriver.getPublicDeriverId(),
         }
       });
       syncWallet(publicDeriver, 'new wallet', 1);

@@ -39,9 +39,9 @@ export type SendMoneyRequest = Request<DeferredCall<{| txId: string |}>>;
 export default class WalletStore extends Store<StoresMap, ActionsMap> {
   ON_VISIBLE_DEBOUNCE_WAIT: number = 1000;
 
-  @observable initialSyncingWalletIds: Set<number> = new Set();
+  @observable initialSyncingWalletIds: Set<number> = observable.set();
   @observable wallets: Array<WalletState> = [];
-  @observable selected: null | WalletState;
+  @observable selectedIndex: null | number;
   @observable getInitialWallets: Request<typeof getWallets> = new Request(getWallets);
 
   @observable sendMoneyRequest: SendMoneyRequest = new Request<
@@ -76,6 +76,13 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     const { wallets } = this.actions;
     wallets.unselectWallet.listen(this._unsetActiveWallet);
     wallets.setActiveWallet.listen(this._setActiveWallet);
+  }
+
+  get selected(): null | WalletState {
+    if (typeof this.selectedIndex === 'number') {
+      return this.wallets[this.selectedIndex];
+    }
+    return null;
   }
 
   @action
@@ -166,6 +173,30 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     runInAction(() => {
       this.wallets.push(...result);
     });
+  };
+
+  @action registerObserversForNewWallet: ({|
+    publicDeriver: WalletState,
+    lastSyncInfo: IGetLastSyncInfoResponse,
+  |}) => void = request => {
+    const { addresses, transactions, substores } = this.stores;
+    addresses.addObservedWallet(request.publicDeriver);
+    transactions.addObservedWallet(request.publicDeriver);
+    const { time, delegation } = substores.ada;
+
+    time.addObservedTime(request.publicDeriver);
+
+    addresses.addObservedWallet(request.publicDeriver);
+
+    transactions.addObservedWallet(request.publicDeriver);
+
+    delegation.addObservedWallet(request.publicDeriver);
+    delegation.refreshDelegation(request.publicDeriver);
+
+    this.stores.walletSettings.walletWarnings.push({
+      publicDeriverId: request.publicDeriver.publicDeriverId,
+      dialogs: [],
+    });
 
     listenForWalletStateUpdate(async (params) => {
       if (params.eventType === 'update') {
@@ -193,39 +224,26 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       }
       // we don't handle (params.eventType === 'new') because currently there is only one open tab allowed
     });
-  };
 
-  @action registerObserversForNewWallet: ({|
-    publicDeriver: WalletState,
-    lastSyncInfo: IGetLastSyncInfoResponse,
-  |}) => void = request => {
-    const { addresses, transactions, substores } = this.stores;
-    addresses.addObservedWallet(request.publicDeriver);
-    transactions.addObservedWallet(request.publicDeriver);
-    const { time, delegation } = substores.ada;
-    time.addObservedTime(request.publicDeriver);
-    delegation.addObservedWallet(request.publicDeriver);
-    delegation.refreshDelegation(request.publicDeriver);
-
-    this.stores.walletSettings.walletWarnings.push({
-      publicDeriverId: request.publicDeriver.publicDeriverId,
-      dialogs: [],
+    this._queueWarningIfNeeded(request.publicDeriver);
+    transactions.refreshTransactionData({
+      publicDeriver: request.publicDeriver,
     });
   };
 
   // =================== ACTIVE WALLET ==================== //
 
   @action _setActiveWallet: ({| publicDeriverId: number |}) => void = ({ publicDeriverId }) => {
-    const wallet = this.wallets.find(wallet => wallet.publicDeriverId === publicDeriverId);
-    if (!wallet) {
+    const walletIndex = this.wallets.findIndex(wallet => wallet.publicDeriverId === publicDeriverId);
+    if (walletIndex === -1) {
       throw new Error('unexpected missing wallet id');
     }
     this.actions.profile.setSelectedNetwork.trigger(
-      getNetworkById(wallet.networkId)
+      getNetworkById(this.wallets[walletIndex].networkId)
     );
-    this.selected = wallet;
+    this.selectedIndex = walletIndex;
     // Cache select wallet
-    this.api.localStorage.setSelectedWalletId(wallet.publicDeriverId);
+    this.api.localStorage.setSelectedWalletId(publicDeriverId);
     subscribe(publicDeriverId);
   };
 
@@ -236,7 +254,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   @action _unsetActiveWallet: void => void = () => {
     this.actions.profile.setSelectedNetwork.trigger(undefined);
-    this.selected = null;
+    this.selectedIndex = null;
   };
 
   // =================== PRIVATE API ==================== //

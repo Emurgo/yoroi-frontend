@@ -140,8 +140,9 @@ async function _syncWallet(publicDeriver: PublicDeriver<>, logInfo: string): Pro
     if (submittedTransactionsChanged) {
       persistSubmittedTransactions(submittedTransactions);
     }
-  } catch (e) {
-    console.error(`Syncing failed: ${e}`);
+    console.log('Syncing wallet %s finished.', publicDeriverId);
+  } catch (error) {
+    console.error('Syncing wallet %s failed:', publicDeriverId, error);
   } finally {
     refreshingWalletIdSet.delete(publicDeriverId);
     emitUpdate(publicDeriverId, false);

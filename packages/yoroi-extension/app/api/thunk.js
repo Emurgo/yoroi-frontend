@@ -56,9 +56,7 @@ export async function getDb(): Promise<lf$Database> {
   return await loadLovefieldDBFromDump(schema.DataStoreType.MEMORY, data);
 }
 
-export async function getWallets(walletId?: number): Promise<Array<WalletState>> {
-  const wallets = await callBackground({ type: 'get-wallets', request: { walletId } });
-
+function patchWalletState(walletState: Object): WalletState {
   const deserializeAddressesByType = addressesByType => addressesByType.map(
     addresses => addresses.map(
       address => ({
@@ -70,21 +68,28 @@ export async function getWallets(walletId?: number): Promise<Array<WalletState>>
     )
   );
 
-  for (const wallet of wallets) {
-    wallet.submittedTransactions = wallet.submittedTransactions.map(
-      ({ networkId, publicDeriverId, transaction, usedUtxos }) => ({
-        networkId,
-        publicDeriverId,
-        transaction: deserializeShelleyTransactionCtorData(transaction),
-        usedUtxos,
-      })
-    );
-    wallet.balance = MultiToken.from(wallet.balance);
-    wallet.assetDeposits = MultiToken.from(wallet.assetDeposits);
+  walletState.submittedTransactions = walletState.submittedTransactions.map(
+    ({ networkId, publicDeriverId, transaction, usedUtxos }) => ({
+      networkId,
+      publicDeriverId,
+      transaction: deserializeShelleyTransactionCtorData(transaction),
+      usedUtxos,
+    })
+  );
+  walletState.balance = MultiToken.from(walletState.balance);
+  walletState.assetDeposits = MultiToken.from(walletState.assetDeposits);
 
-    wallet.allAddressesByType = deserializeAddressesByType(wallet.allAddressesByType);
-    wallet.internalAddressesByType = deserializeAddressesByType(wallet.internalAddressesByType);
-    wallet.externalAddressesByType = deserializeAddressesByType(wallet.externalAddressesByType);
+  walletState.allAddressesByType = deserializeAddressesByType(walletState.allAddressesByType);
+  walletState.internalAddressesByType = deserializeAddressesByType(walletState.internalAddressesByType);
+  walletState.externalAddressesByType = deserializeAddressesByType(walletState.externalAddressesByType);
+  return walletState;
+}
+
+export async function getWallets(walletId?: number): Promise<Array<WalletState>> {
+  const wallets = await callBackground({ type: 'get-wallets', request: { walletId } });
+
+  for (const wallet of wallets) {
+    patchWalletState(wallet);
   }
   return wallets;
 }
@@ -110,7 +115,7 @@ export async function createWallet(request: CreateWalletRequestType): Promise<Wa
   if (resp.error) {
     throw new Error(`error when creating wallet: ${resp.error}`);
   }
-  return (await getWallets(resp.publicDeriverId))[0];
+  return patchWalletState(resp.placeHolderWalletState);
 }
 
 export type CreateHardwareWalletRequestType = {|
@@ -128,7 +133,7 @@ export async function createHardwareWallet(request: CreateHardwareWalletRequestT
   if (resp.error) {
     throw new Error(`error when creating wallet: ${resp.error}`);
   }
-  return (await getWallets(resp.publicDeriverId))[0];
+  return patchWalletState(resp.placeHolderWalletState);
 }
 
 export async function removeWalletFromDb(request: {| publicDeriverId: number |}): Promise<void> {
@@ -322,6 +327,8 @@ const callbacks = Object.freeze({
   serverStatusUpdate: [],
 });
 chrome.runtime.onMessage.addListener(async (message, sender) => {
+  console.log('get message from background:', JSON.stringify(message, null, 2));
+
   if (message.type === 'wallet-state-update') {
     callbacks.walletStateUpdate.forEach(callback => callback(message.params));
   } else if (message.type === 'server-status-update') {

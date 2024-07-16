@@ -223,3 +223,70 @@ export async function batchLoadSubmittedTransactions(walletStates: Array<WalletS
     }
   }
 }
+
+
+export async function getPlaceHolderWalletState(publicDeriver: PublicDeriver<>): Promise<WalletState> {
+  const publicDeriverId = publicDeriver.getPublicDeriverId();
+
+  const conceptualWalletInfo = await publicDeriver.getParent().getFullConceptualWalletInfo();
+  const network = publicDeriver.getParent().getNetworkInfo();
+
+  const type = (() => {
+    if (isLedgerNanoWallet(publicDeriver.getParent())) {
+      return 'ledger';
+    } else if (isTrezorTWallet(publicDeriver.getParent())) {
+      return 'trezor';
+    }
+    return 'mnemonic';
+  })();
+
+  const zero = new MultiToken([], { defaultNetworkId: network.NetworkId, defaultIdentifier: '' });
+
+  return {
+    publicDeriverId,
+    conceptualWalletId: publicDeriver.getParent().getConceptualWalletId(),
+    utxos: [],
+    transactions: [], // fixme
+    networkId: network.NetworkId,
+    name: conceptualWalletInfo.Name,
+    type,
+    hardwareWalletDeviceId: publicDeriver.getParent().hardwareInfo?.DeviceId,
+    plate: { ImagePart: '', TextPart: '' },
+    publicKey: '',
+    receiveAddress: {
+      addr: { AddressId: 0, Digest: 0, Type: 0, Hash: '', IsUsed: false },
+      row: { CanonicalAddressId: 0, KeyDerivationId: 0 },
+      addressing: {
+        path: [],
+        startLevel: 0,
+      },
+    },
+    pathToPublic: [],
+    signingKeyUpdateDate: null,
+    stakingAddressing: { addressing: { path: [], startLevel: 0 } },
+    stakingAddress: '',
+    publicDeriverLevel: 0,
+    lastSyncInfo: {
+      LastSyncInfoId: 0,
+      Time: null,
+      SlotNum: null,
+      BlockHash: null,
+      Height: 0,
+    },
+    balance: zero,
+    assetDeposits: zero,
+    defaultTokenId: '',
+    assuranceMode: assuranceModes.NORMAL,
+    allAddressesByType: [],
+    foreignAddresses: [],
+    externalAddressesByType: [],
+    internalAddressesByType: [],
+    allAddresses: { utxoAddresses: [], accountingAddresses: [] },
+    allUtxoAddresses: [],
+    isBip44Wallet: publicDeriver.getParent() instanceof Bip44Wallet,
+    isTestnet: isTestnet(network),
+    isCardanoHaskell: isCardanoHaskell(network),
+    isRefreshing: true,
+    submittedTransactions: [],
+  };
+}
