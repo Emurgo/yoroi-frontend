@@ -560,6 +560,37 @@ class BasePage {
     }
   }
 
+  async setInfoToIndexedDBFirefox(tableName, value) {
+    this.logger.info(`BasePage::setInfoToIndexedDBFirefox is called for the table ${tableName}.`);
+    for (const valueItem of value) {
+      await this.driver.executeScript(
+        (dbName, tableName, valueItem) => {
+          const dbRequest = window.indexedDB.open(dbName);
+          dbRequest.onsuccess = function (event) {
+            const db = event.target.result;
+            const tableContentRequest = db
+              .transaction(tableName, 'readwrite')
+              .objectStore(tableName)
+              .put(valueItem);
+            tableContentRequest.onsuccess = function (event) {
+              console.log(`--> Tx is success.`);
+              console.log(`--> Tx result: ${event.target.result}`);
+            };
+            tableContentRequest.oncomplete = function (event) {
+              console.log(`--> Tx is complete. Result: ${event.target.result}`);
+            };
+            tableContentRequest.onerror = function (event) {
+              console.log('-----> Error happend:', event.target.result);
+            };
+          };
+        },
+        'yoroi-schema',
+        tableName,
+        valueItem,
+      );
+    }
+  }
+
   async setInfoToIndexedDBChrome(tableName, value) {
     this.logger.info(`BasePage::setInfoToIndexedDBChrome is called for the table ${tableName}.`);
     this.driver.executeScript(() => {
@@ -599,34 +630,36 @@ class BasePage {
     }
   }
 
-  async getInfoChromeLocalStorage(key) {
-    this.logger.info(`BasePage::getInfoChromeLocalStorage is called. Key: "${key}"`);
+  async getInfoBrowserLocalStorage(key) {
+    this.logger.info(`BasePage::getInfoBrowserLocalStorage is called. Key: "${key}"`);
     this.driver.executeScript(
       `await chrome.storage.local.get('${key}', function (result) {window.someKeyValue = result})`
     );
     const result = await this.driver.executeScript(() => window.someKeyValue);
-    this.logger.info(`BasePage::getInfoChromeLocalStorage::result ${JSON.stringify(result)}`);
+    this.logger.info(`BasePage::getInfoBrowserLocalStorage::result ${JSON.stringify(result)}`);
     return result;
   }
 
-  async setInfoChromeLocalStorage(key, value) {
+  async setInfoBrowserLocalStorage(key, value) {
     this.logger.info(
       `BasePage::setInfoChromeLocalStorage is called. Key: "${key}", value: "${value}"`
     );
-    await this.driver.executeScript(`await chrome.storage.local.set({ "${key}": "${value}" })`);
+    await this.driver.executeScript(`chrome.storage.local.set({ "${key}": "${value}" })`);
   }
 
   async prepareDBAndStorage(templateName, useGeneralStorageInfo = true) {
     // import info into the indexedDB
     const dbSnapshot = getSnapshotObjectFromJSON(`${templateName}.indexedDB.json`);
     for (const dbKey in dbSnapshot) {
-      await this.setInfoToIndexedDBChrome(dbKey, dbSnapshot[dbKey]);
+      isFirefox()
+        ? await this.setInfoToIndexedDBFirefox(dbKey, dbSnapshot[dbKey])
+        : await this.setInfoToIndexedDBChrome(dbKey, dbSnapshot[dbKey]);
     }
     // set info into the chrome local storage
-    const chromeStorageFileName = `${useGeneralStorageInfo ? 'general' : templateName}.chromeLocalStorage.json`;
-    const chromeStorageSnapshot = getSnapshotObjectFromJSON(chromeStorageFileName);
-    for (const storageKey in chromeStorageSnapshot) {
-      await this.setInfoChromeLocalStorage(storageKey, chromeStorageSnapshot[storageKey]);
+    const browserStorageFileName = `${useGeneralStorageInfo ? 'general' : templateName}.browserLocalStorage.json`;
+    const browserStorageSnapshot = getSnapshotObjectFromJSON(browserStorageFileName);
+    for (const storageKey in browserStorageSnapshot) {
+      await this.setInfoBrowserLocalStorage(storageKey, browserStorageSnapshot[storageKey]);
     }
     // set info into regular storage
     const commonStorageFileName = `${useGeneralStorageInfo ? 'general' : templateName}.localStorage.json`;
