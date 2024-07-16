@@ -426,32 +426,39 @@ class BasePage {
   }
   // tableNames are [ 'UtxoAtSafePointTable', 'UtxoDiffToBestBlock', 'UtxoTransactionInput', 'UtxoTransactionOutput']
   async getInfoFromIndexedDB(tableName) {
-    this.logger.info(`Webdriver::getInfoFromIndexedDB Table name "${tableName}"`);
+    this.logger.info(`BasePage::getInfoFromIndexedDB Table name "${tableName}"`);
     let result;
     if (isFirefox()) {
+      await this.sleep(500);
       result = await this.getInfoFromIndexedDBFF(tableName);
+    } else {
+      result = await this.getInfoFromIndexedDBChrome(tableName);
     }
-    result = await this.getInfoFromIndexedDBChrome(tableName);
-    this.logger.info(`Webdriver::getInfoFromIndexedDB::result ${JSON.stringify(result)}`);
+    this.logger.info(`BasePage::getInfoFromIndexedDB::result ${JSON.stringify(result)}`);
     return result;
   }
   async getInfoFromIndexedDBFF(tableName) {
+    this.logger.info(`BasePage::getInfoFromIndexedDBFF Table name "${tableName}"`);
     await this.driver.executeScript(
-      (dbName, table) => {
+      (table) => {
+        const dbName = 'yoroi-schema';
         const dbRequest = window.indexedDB.open(dbName);
         dbRequest.onsuccess = function (event) {
           const db = event.target.result;
-          const tableContentRequest = db.transaction(table, 'readonly').objectStore(table).getAll();
+          // without that it doesn't work
+          window.dataBase = db;
+          const tableContentRequest = db.transaction(table, 'readonly').objectStore(table).mozGetAll();
           tableContentRequest.onsuccess = function (event) {
             window.tableData = event.target.result;
           };
         };
       },
-      'yoroi-schema',
       tableName
     );
     let tableContent;
     try {
+      // without that it doesn't work
+      await this.driver.executeScript(() => window.dataBase);
       tableContent = await this.driver.executeScript(() => window.tableData);
     } catch (error) {
       this.webDriverLogger.warn(error);
