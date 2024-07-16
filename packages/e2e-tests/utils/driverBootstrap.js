@@ -87,7 +87,6 @@ const getChromeBuilder = () => {
 const getFirefoxBuilder = () => {
   const downloadsDir = getDownloadsDir();
   const options = new firefox.Options()
-    // .addArguments('--headless') // Runs the browser in the headless mode
     /**
      * For Firefox it is needed to use "Firefox for Developers" to load the unsigned extensions
      * Set the FIREFOX_BIN env variable to the "Firefox for Developers" executable
@@ -111,6 +110,9 @@ const getFirefoxBuilder = () => {
     )
     .setPreference('browser.download.manager.showAlertOnComplete', false)
     .addExtensions(path.resolve(__extensionDir, 'Yoroi.xpi'));
+  if(isHeadless()) {
+    options.addArguments('--headless');
+  }
 
   return new Builder()
     .withCapabilities({
