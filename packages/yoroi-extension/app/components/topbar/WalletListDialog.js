@@ -22,7 +22,6 @@ import WalletCard from './WalletCard';
 import globalMessages from '../../i18n/global-messages';
 import AmountDisplay, { FiatDisplay } from '../common/AmountDisplay';
 import { Typography } from '@mui/material';
-import { fontWeight } from '../../styles/themes/tokens/tokens';
 
 const messages = defineMessages({
   addWallet: {

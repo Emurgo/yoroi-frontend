@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { Box, styled } from '@mui/system';
-import type { Node } from 'react';
+import type { ComponentType, Node } from 'react';
 import { useState } from 'react';
 import { defineMessages, injectIntl } from 'react-intl';
 import { Link } from 'react-router-dom';
@@ -29,6 +29,11 @@ import { truncateAddress, truncateAddressShort } from '../../../utils/formatters
 import { NftImage } from './NFTsList';
 import { getNetworkUrl, tokenMessages } from './TokenDetails';
 import { CopyAddress, TruncatedText } from './TruncatedText';
+import type {
+  CardanoAssetMintMetadata,
+  NetworkRow,
+} from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 
 type Props = {|
   nftInfo: void | {
@@ -95,7 +100,7 @@ const tabs = [
   },
 ];
 
-const SButton = styled(Button)(({ theme, active }) => ({
+const SButton = styled(Button)(({ theme }) => ({
   color: theme.palette.ds.el_gray_normal,
   '&.MuiButton-sizeMedium': {
     padding: '13px 16px',

@@ -11,6 +11,8 @@ import environment from '../../../../environment';
 import globalMessages from '../../../../i18n/global-messages';
 import { THEMES } from '../../../../styles/themes';
 import ThemeToggler from '../../themeToggler';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { Theme } from '../../../../styles/themes';
 
 const messages = defineMessages({
   themeLabel: {
@@ -77,8 +79,8 @@ type Props = {|
   +onExternalLinkClick: MouseEvent => void,
 |};
 
-const NEW_THEME = THEMES.YOROI_BASE;
-const OLD_THEME = `${THEMES.YOROI_MODERN}-${THEMES.YOROI_CLASSIC}`;
+// const NEW_THEME = THEMES.YOROI_BASE;
+// const OLD_THEME = `${THEMES.YOROI_MODERN}-${THEMES.YOROI_CLASSIC}`;
 @observer
 export default class ThemeSettingsBlock extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {

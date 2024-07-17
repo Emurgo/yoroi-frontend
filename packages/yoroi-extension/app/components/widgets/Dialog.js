@@ -4,7 +4,7 @@ import type { Node, Element, ComponentType } from 'react';
 import React, { forwardRef, useEffect, useState } from 'react';
 import classnames from 'classnames';
 import { map } from 'lodash';
-import { IconButton, Modal, Typography, alpha, Button } from '@mui/material';
+import { Modal, Typography, alpha, Button } from '@mui/material';
 import { Box, styled } from '@mui/system';
 import { LoadingButton } from '@mui/lab';
 import { withLayout } from '../../styles/context/layout';

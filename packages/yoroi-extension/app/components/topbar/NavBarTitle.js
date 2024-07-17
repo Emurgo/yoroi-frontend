@@ -1,7 +1,8 @@
 // @flow
 import { Box } from '@mui/material';
 import { observer } from 'mobx-react';
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
+import type { LayoutComponentMap } from '../../styles/context/layout';
 import { Component } from 'react';
 import { withLayout } from '../../styles/context/layout';
 import styles from './NavBarTitle.scss';

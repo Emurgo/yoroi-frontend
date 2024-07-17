@@ -29,15 +29,7 @@ export default class LinkButton extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const {
-      url,
-      svg,
-      message,
-      svgClass,
-      textClassName,
-      onExternalLinkClick,
-      componentId,
-    } = this.props;
+    const { url, svg, message, svgClass, onExternalLinkClick, componentId } = this.props;
 
     const SvgElem = svg;
     return (

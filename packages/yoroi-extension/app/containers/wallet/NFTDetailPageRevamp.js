@@ -1,7 +1,7 @@
 // @flow
 import { Box } from '@mui/system';
 import { observer } from 'mobx-react';
-import type { Node } from 'react';
+import type { ComponentType, Node } from 'react';
 import { Component } from 'react';
 import type { Location, Match } from 'react-router-dom';
 import { withRouter } from 'react-router-dom';
@@ -17,6 +17,7 @@ import {
   getDescriptionFromTokenMetadata,
   getImageFromTokenMetadata,
 } from '../../utils/nftMetadata';
+import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 
 type Props = {|
   ...StoresAndActionsProps,

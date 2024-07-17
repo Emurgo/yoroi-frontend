@@ -23,8 +23,7 @@ import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import AmountDisplay from '../common/AmountDisplay';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import { maybe } from '../../coreUtils';
-import { Box } from '@mui/material';
-import { Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
 const messages = defineMessages({
   tokenTypes: {

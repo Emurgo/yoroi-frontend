@@ -1,7 +1,7 @@
 // @flow
 import { Box } from '@mui/system';
 import { observer } from 'mobx-react';
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 
 type Props = {|
   +children: Node,

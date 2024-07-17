@@ -5,10 +5,9 @@ import { observer } from 'mobx-react';
 
 import { ReactComponent as CloseCross } from '../../assets/images/cross-dark.inline.svg';
 import { ReactComponent as CloseCrossRevamp } from '../../assets/images/cross-dark-revamp.inline.svg';
-import { IconButton } from '@mui/material';
+import { IconButton, styled } from '@mui/material';
 import { withLayout } from '../../styles/context/layout';
 import type { InjectedLayoutProps } from '../../styles/context/layout';
-import { styled } from '@mui/material';
 
 type Props = {|
   +onClose?: void => PossiblyAsync<void>,
