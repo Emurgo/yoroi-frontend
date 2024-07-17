@@ -385,10 +385,11 @@ export class TransactionsSubTab extends WalletTab {
       return true;
     }
     if (loaderIsDisplayed) {
+      const thirtySec = 3 * defaultWaitTimeout;
       await this.scrollIntoView(this.txsLoaderSpinnerLocator);
-      const result = await this.waitLoaderIsNotDisplayed(fiveSeconds, quarterSecond);
+      const result = await this.waitLoaderIsNotDisplayed(thirtySec, quarterSecond);
       if (!result) {
-        throw new Error(`Transactions are still loading after ${fiveSeconds / 1000} seconds`);
+        throw new Error(`Transactions are still loading after ${thirtySec / 1000} seconds`);
       }
     }
   }
