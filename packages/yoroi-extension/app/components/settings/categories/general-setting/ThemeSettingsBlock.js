@@ -115,7 +115,7 @@ export default class ThemeSettingsBlock extends Component<Props> {
           py: !isRevampLayout && '24px',
         }}
       >
-        <Typography
+        {/* <Typography
           component="div"
           variant={isRevampLayout ? 'body1' : 'h5'}
           fontWeight={500}
@@ -123,14 +123,14 @@ export default class ThemeSettingsBlock extends Component<Props> {
           color="grayscale.900"
         >
           {intl.formatMessage(messages.version)}
-        </Typography>
-        <Box>
+        </Typography> */}
+        {/* <Box>
           <RadioGroup
             aria-labelledby="theme-switch-buttons"
             value={currentTheme === NEW_THEME ? NEW_THEME : OLD_THEME}
             onChange={e => {
               const theme = e.target.value === NEW_THEME ? NEW_THEME : THEMES.YOROI_MODERN;
-              onSubmit(theme);
+              onSubmit(NEW_THEME);
             }}
             sx={{
               display: 'flex',
@@ -160,7 +160,7 @@ export default class ThemeSettingsBlock extends Component<Props> {
               }}
             />
           </RadioGroup>
-        </Box>
+        </Box> */}
         {currentTheme === THEMES.YOROI_BASE && environment.isDev() && (
           <Box sx={{ mt: '20px' }}>
             <ThemeToggler />

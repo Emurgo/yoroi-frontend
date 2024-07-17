@@ -168,13 +168,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
           spacing={2}
         >
           <NotFound />
-          <Typography
-            component="div"
-            variant="h5"
-            fontWeight={500}
-            color="common.black"
-            color="ds.text_gray_normal"
-          >
+          <Typography component="div" variant="h5" fontWeight={500} color="ds.text_gray_normal">
             {intl.formatMessage(!list.length ? messages.noNFTsAdded : messages.noResultsFound)}
           </Typography>
         </Stack>

@@ -90,8 +90,10 @@ function SummaryCard({
 
   const renderAmountWithUnitOfAccount: (?MultiToken) => ?Node = token => {
     const unitOfAccountCalculated = maybe(token, t => unitOfAccount(t.getDefaultEntry()));
-    return maybe(unitOfAccountCalculated,
-      u => `${shouldHideBalance ? hiddenAmount : u.amount} ${u.currency}`);
+    return maybe(
+      unitOfAccountCalculated,
+      u => `${shouldHideBalance ? hiddenAmount : u.amount} ${u.currency}`
+    );
   };
 
   return (
@@ -106,7 +108,7 @@ function SummaryCard({
           alignItems: 'center',
         }}
       >
-        <Typography component="div" variant="h5" color="common.black" fontWeight={500}>
+        <Typography component="div" variant="h5" color="ds.text_gray_normal" fontWeight={500}>
           {intl.formatMessage(messages.summary)}
         </Typography>
         <Button
@@ -127,7 +129,8 @@ function SummaryCard({
         <InfoRow sx={{ borderColor: 'grayscale.200' }}>
           <StakingIcon />
           <InfoDetails>
-            <Typography component="div"
+            <Typography
+              component="div"
               variant="caption1"
               color="grayscale.600"
               sx={{ textTransform: 'uppercase' }}
@@ -136,7 +139,7 @@ function SummaryCard({
             </Typography>
           </InfoDetails>
           <InfoDetails>
-            <Typography component="div" variant="h2" color="common.black" fontWeight={500}>
+            <Typography component="div" variant="h2" color="ds.text_gray_normal" fontWeight={500}>
               {renderAmount(totalRewards)}
             </Typography>
             <Typography component="div" variant="body1" color="grayscale.600" fontWeight={500}>
@@ -150,7 +153,8 @@ function SummaryCard({
         <InfoRow sx={{ borderColor: 'grayscale.200' }}>
           <TotalDelegatedIcon />
           <InfoDetails>
-            <Typography component="div"
+            <Typography
+              component="div"
               variant="caption1"
               color="grayscale.600"
               marginBottom="4px"
@@ -161,7 +165,7 @@ function SummaryCard({
           </InfoDetails>
           <InfoDetails>
             {totalDelegated ? (
-              <Typography component="div" variant="h2" fontWeight="500" color="common.black">
+              <Typography component="div" variant="h2" fontWeight="500" color="ds.text_gray_normal">
                 {renderAmount(totalDelegated)}
               </Typography>
             ) : (

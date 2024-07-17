@@ -9,6 +9,7 @@ import type { ProvidersType } from '../../../api/externalStorage/index';
 import styles from './ExternalStorageSettings.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { withLayout } from '../../../styles/context/layout';
+import { Typography } from '@mui/material';
 
 const messages = defineMessages({
   sectionTitle: {
@@ -83,7 +84,9 @@ class ExternalStorageSettings extends Component<Props & InjectedProps> {
 
     return (
       <div className={styles.component}>
-        <h1>{this.context.intl.formatMessage(messages.sectionTitle)}</h1>
+        <Typography variant="h4" color="ds.text_gray_normal" mb="8px">
+          {this.context.intl.formatMessage(messages.sectionTitle)}
+        </Typography>
         <div>{this.context.intl.formatMessage(messages.sectionIntro)}</div>
         {providersButtons}
       </div>
