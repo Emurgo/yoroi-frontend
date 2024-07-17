@@ -3,7 +3,7 @@ import * as React from 'react';
 
 import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { unwrapStakingKey } from '../../../../api/ada/lib/storage/bridge/utils';
-import { asGetStakingKey } from '../../../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { asGetSigningKey, asGetStakingKey } from '../../../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { useGovernanceManagerMaker } from '../common/useGovernanceManagerMaker';
 import { GovernanceActionType, GovernanceReducer, defaultGovernanceActions, defaultGovernanceState } from './state';
 
@@ -12,7 +12,9 @@ const initialGovernanceProvider = {
   ...defaultGovernanceActions,
   walletId: '',
   governanceManager: null,
+  checkUserPassword: (_password: string) => Response,
 };
+
 const GovernanceContext = React.createContext(initialGovernanceProvider);
 
 type GovernanceProviderProps = {
@@ -21,7 +23,6 @@ type GovernanceProviderProps = {
 };
 
 export const GovernanceContextProvider = ({ children, currentWallet }: GovernanceProviderProps) => {
-  console.log('currentWallet', currentWallet);
   if (!currentWallet?.selectedWallet) throw new Error(`requires a wallet to be selected`);
   const [state, dispatch] = React.useReducer(GovernanceReducer, {
     ...defaultGovernanceState,
@@ -31,6 +32,25 @@ export const GovernanceContextProvider = ({ children, currentWallet }: Governanc
 
   const { walletId, networkId, currentPool, selectedWallet, backendService, backendServiceZero } = currentWallet;
   const governanceManager = useGovernanceManagerMaker(walletId, networkId);
+
+  // TODO to me moved in rootStore and use this globbaly whenever we need a wallet password check
+  const checkUserPassword = async (password: string): Promise<any> => {
+    try {
+      // check the password
+      const withSigningKey = asGetSigningKey(selectedWallet);
+      if (!withSigningKey) {
+        throw new Error(`[sign tx] no signing key`);
+      }
+      const signingKeyFromStorage = await withSigningKey.getSigningKey();
+      // will throw a WrongPasswordError
+      await withSigningKey.normalizeKey({
+        ...signingKeyFromStorage,
+        password,
+      });
+    } catch (error) {
+      return error;
+    }
+  };
 
   React.useEffect(() => {
     const withStakingKey = asGetStakingKey(selectedWallet);
@@ -86,6 +106,7 @@ export const GovernanceContextProvider = ({ children, currentWallet }: Governanc
     walletId: currentWallet.walletId,
     stakingKeyHash,
     stakingKeyHex,
+    checkUserPassword,
   };
 
   return <GovernanceContext.Provider value={context}>{children}</GovernanceContext.Provider>;
