@@ -19,6 +19,7 @@ import {
   isDapp,
   isFirefox,
   isHeadless,
+  isLinux,
 } from './utils.js';
 
 const prefs = new logging.Preferences();
@@ -88,11 +89,6 @@ const getFirefoxBuilder = () => {
   const downloadsDir = getDownloadsDir();
   const options = new firefox.Options()
     /**
-     * For Firefox it is needed to use "Firefox for Developers" to load the unsigned extensions
-     * Set the FIREFOX_BIN env variable to the "Firefox for Developers" executable
-     */
-    .setBinary(firefoxBin)
-    /**
      * Firefox disallows unsigned extensions by default. We solve this through a config change
      * The proper way to do this is to use the "temporary addon" feature of Firefox
      * However, our version of selenium doesn't support this yet
@@ -110,9 +106,29 @@ const getFirefoxBuilder = () => {
     )
     .setPreference('browser.download.manager.showAlertOnComplete', false)
     .addExtensions(path.resolve(__extensionDir, 'Yoroi.xpi'));
-  if(isHeadless()) {
+
+  if (isHeadless()) {
     options.addArguments('--headless');
   }
+
+  if (isLinux()) {
+    const service = new firefox.ServiceBuilder('/snap/bin/geckodriver').build();
+    return new Builder()
+      .withCapabilities({
+        chromeOptions: {
+          args: ['start-maximized'],
+        },
+      })
+      .forBrowser(TargetBrowser.FF)
+      .setFirefoxOptions(options)
+      .setFirefoxService(service);
+  }
+
+  /**
+   * For Firefox it is needed to use "Firefox for Developers" to load the unsigned extensions
+   * Set the FIREFOX_BIN env variable to the "Firefox for Developers" executable
+   */
+  options.setBinary(firefoxBin);
 
   return new Builder()
     .withCapabilities({
