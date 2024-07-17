@@ -61,7 +61,7 @@ jobs:
     needs: Build-Extension
     strategy:
       matrix:
-        browser: ["chrome"]
+        browser: ["chrome", "firefox"]
       fail-fast: false
 
     steps:
@@ -150,7 +150,7 @@ jobs:
     needs: Build-Extension
     strategy:
       matrix:
-        browser: ["chrome"]
+        browser: ["chrome", "firefox"]
       fail-fast: false
 
     steps:
@@ -244,7 +244,7 @@ jobs:
     needs: Build-Extension
     strategy:
       matrix:
-        browser: ["chrome"]
+        browser: ["chrome", "firefox"]
       fail-fast: false
 
     steps:
@@ -330,7 +330,7 @@ jobs:
     needs: Build-Extension
     strategy:
       matrix:
-        browser: ["chrome"]
+        browser: ["chrome", "firefox"]
       fail-fast: false
     
     steps:
