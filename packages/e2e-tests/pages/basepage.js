@@ -429,7 +429,6 @@ class BasePage {
     this.logger.info(`BasePage::getInfoFromIndexedDB Table name "${tableName}"`);
     let result;
     if (isFirefox()) {
-      await this.sleep(500);
       result = await this.getInfoFromIndexedDBFF(tableName);
     } else {
       result = await this.getInfoFromIndexedDBChrome(tableName);
