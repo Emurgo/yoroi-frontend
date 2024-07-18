@@ -78,9 +78,10 @@ jobs:
       - name: Install Firefox Developer Edition
         if: matrix.browser=='firefox'
         run: |
-          wget -c "https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US" -O - | sudo tar -xj -C $HOME/Downloads
-          sudo chown -R $USER:$USER $(pwd)/firefox
-          echo "FIREFOX_BIN=$HOME/Downloads/firefox/firefox-bin" >> $GITHUB_ENV
+          wget -c "https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US" -O - | sudo tar -xj -C /opt
+          sudo rm -rf /opt/firefoxdev
+          sudo mv /opt/firefox /opt/firefoxdev
+          echo "FIREFOX_BIN=/opt/firefoxdev/firefox-bin" >> $GITHUB_ENV
 
       - name: Read .nvmrc
         id: nvm
