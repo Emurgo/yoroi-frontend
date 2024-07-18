@@ -94,8 +94,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       lastSyncInfo: newWallet.lastSyncInfo,
     });
 
-    this._queueWarningIfNeeded(newWallet);
-
     runInAction(() => {
       this.wallets.push(newWallet);
       this._setActiveWallet({
@@ -145,7 +143,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       publicDeriver: wallet,
       lastSyncInfo: wallet.lastSyncInfo,
     });
-    this._queueWarningIfNeeded(wallet);
 
     runInAction(() => {
       this.wallets.push(wallet);
@@ -163,10 +160,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
         publicDeriver,
         lastSyncInfo: publicDeriver.lastSyncInfo,
       });
-      this._queueWarningIfNeeded(publicDeriver);
-      this.stores.transactions.refreshTransactionData({
-        publicDeriver,
-      });
+
       this.stores.addresses.refreshAddressesFromDb(publicDeriver);
     }
 
@@ -198,6 +192,8 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       dialogs: [],
     });
 
+    this._queueWarningIfNeeded(request.publicDeriver);
+
     listenForWalletStateUpdate(async (params) => {
       if (params.eventType === 'update') {
         const index = this.wallets.findIndex(wallet => wallet.publicDeriverId === params.publicDeriverId);
@@ -211,6 +207,9 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
           runInAction(() => {
             this.wallets.splice(index, 1, newWalletState[0]);
             this.initialSyncingWalletIds.delete(params.publicDeriverId);
+            transactions.refreshTransactionData({
+              publicDeriver: newWalletState[0],
+            });
           });
         }
       } else if (params.eventType === 'remove') {
