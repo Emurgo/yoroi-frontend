@@ -19,7 +19,6 @@ import {
   isDapp,
   isFirefox,
   isHeadless,
-  isLinux,
 } from './utils.js';
 
 const prefs = new logging.Preferences();
@@ -88,30 +87,30 @@ const getChromeBuilder = () => {
 const __getFFOptions = () => {
   const downloadsDir = getDownloadsDir();
   const options = new firefox.Options()
-  /**
-   * Firefox disallows unsigned extensions by default. We solve this through a config change
-   * The proper way to do this is to use the "temporary addon" feature of Firefox
-   * However, our version of selenium doesn't support this yet
-   * The config is deprecated and may be removed in the future.
-   */
-  .setPreference('xpinstall.signatures.required', false)
-  .setPreference('devtools.console.stdout.content', true)
-  .setPreference('extensions.webextensions.uuids', firefoxUuidMapping)
-  .setPreference('browser.download.folderList', 2)
-  .setPreference('browser.download.manager.showWhenStarting', false)
-  .setPreference('browser.download.dir', downloadsDir)
-  .setPreference(
-    'browser.helperApps.neverAsk.saveToDisk',
-    'application/csv, text/csv, application/pdfss, text/csv, application/excel'
-  )
-  .setPreference('browser.download.manager.showAlertOnComplete', false)
-  .addExtensions(path.resolve(__extensionDir, 'Yoroi.xpi'));
+    /**
+     * Firefox disallows unsigned extensions by default. We solve this through a config change
+     * The proper way to do this is to use the "temporary addon" feature of Firefox
+     * However, our version of selenium doesn't support this yet
+     * The config is deprecated and may be removed in the future.
+     */
+    .setPreference('xpinstall.signatures.required', false)
+    .setPreference('devtools.console.stdout.content', true)
+    .setPreference('extensions.webextensions.uuids', firefoxUuidMapping)
+    .setPreference('browser.download.folderList', 2)
+    .setPreference('browser.download.manager.showWhenStarting', false)
+    .setPreference('browser.download.dir', downloadsDir)
+    .setPreference(
+      'browser.helperApps.neverAsk.saveToDisk',
+      'application/csv, text/csv, application/pdfss, text/csv, application/excel'
+    )
+    .setPreference('browser.download.manager.showAlertOnComplete', false)
+    .addExtensions(path.resolve(__extensionDir, 'Yoroi.xpi'));
 
   if (isHeadless()) {
     options.addArguments('--headless');
   }
   return options;
-}
+};
 
 const getFirefoxBuilder = () => {
   const options = __getFFOptions();
@@ -130,12 +129,6 @@ const getFirefoxBuilder = () => {
     .setFirefoxOptions(options);
 };
 
-const getFirefoxSession = () => {
-  const options = __getFFOptions();
-  const service = new firefox.ServiceBuilder('/snap/bin/geckodriver').build();
-  return firefox.Driver.createSession(options, service);
-};
-
 // getting a builder according to a set browser
 export const getBuilder = () => {
   switch (getTargetBrowser()) {
@@ -152,7 +145,7 @@ export const getBuilder = () => {
 };
 // getting a driver
 export const getDriver = () => {
-  const driver = isLinux() && isFirefox() ? getFirefoxSession() : getBuilder().build();
+  const driver = getBuilder().build();
   driver.manage().setTimeouts({ implicit: 10000 });
   if (isFirefox()) {
     driver.manage().window().maximize();
