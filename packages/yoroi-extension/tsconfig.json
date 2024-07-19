@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    /* Language and Environment */
+    "declaration": true,
+    "target": "es2016",                     
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    /* Modules */
+    "esModuleInterop": true,
+    "module": "commonjs",                               
+    "forceConsistentCasingInFileNames": true,           
+    "jsx": "react",
+
+    /* Type Checking */
+    "moduleResolution": "node",
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noImplicitUseStrict": false,
+    "noStrictGenericChecks": false,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noImplicitAny": false
+  },
+  "include": ["app/UI/**/*"],
+
+}
