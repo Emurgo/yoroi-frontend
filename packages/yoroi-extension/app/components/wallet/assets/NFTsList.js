@@ -114,7 +114,13 @@ function NfTsList({ list, intl }: Props & Intl): Node {
         marginBottom="30px"
         paddingBottom="16px"
       >
-        <Typography component="div" variant="h5" color="common.black" fontWeight={500} fontSize="18px">
+        <Typography
+          component="div"
+          variant="h5"
+          color="common.black"
+          fontWeight={500}
+          fontSize="18px"
+        >
           {list.length === 0
             ? intl.formatMessage(globalMessages.sidebarNfts)
             : intl.formatMessage(messages.nftsCount, { number: list.length })}
@@ -280,7 +286,8 @@ function NftCardImage({ ipfsUrl, name }: {| ipfsUrl: string | null, name: string
         <NftImage imageUrl={ipfsUrl} name={name} width="100%" height="100%" />
       </Box>
       <Box>
-        <Typography component="div"
+        <Typography
+          component="div"
           mt="16px"
           sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
           color="grayscale.900"
