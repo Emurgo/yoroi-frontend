@@ -1,16 +1,5 @@
 // @flow
-import {
-  Button,
-  Grid,
-  IconButton,
-  InputAdornment,
-  OutlinedInput,
-  Skeleton,
-  Stack,
-  Typography,
-  Box,
-  styled,
-} from '@mui/material';
+import { Button, Grid, IconButton, InputAdornment, OutlinedInput, Skeleton, Stack, Typography, Box, styled } from '@mui/material';
 import type { Node, ComponentType } from 'react';
 import { ReactComponent as Close } from '../../../assets/images/assets-page/close.inline.svg';
 import { ReactComponent as Grid2x2 } from '../../../assets/images/assets-page/grid-2x2.inline.svg';
@@ -106,20 +95,8 @@ function NfTsList({ list, intl }: Props & Intl): Node {
         p: '24px',
       }}
     >
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="space-between"
-        marginBottom="30px"
-        paddingBottom="16px"
-      >
-        <Typography
-          component="div"
-          variant="h5"
-          color="ds.el_gray_normal"
-          fontWeight={500}
-          fontSize="18px"
-        >
+      <Box display="flex" alignItems="center" justifyContent="space-between" marginBottom="30px" paddingBottom="16px">
+        <Typography component="div" variant="h5" color="ds.el_gray_normal" fontWeight={500} fontSize="18px">
           {list.length === 0
             ? intl.formatMessage(globalMessages.sidebarNfts)
             : intl.formatMessage(messages.nftsCount, { number: list.length })}
@@ -241,7 +218,7 @@ export function NftImage({
       );
   }, [url]);
 
-  if (true)
+  if (error || url === null)
     return (
       <Box
         sx={{
