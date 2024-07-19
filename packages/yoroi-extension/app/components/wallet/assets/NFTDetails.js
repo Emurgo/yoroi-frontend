@@ -112,6 +112,26 @@ const SButton = styled(Button)(({ theme }) => ({
   },
 }));
 
+const CopyButton = styled(Button)(({ theme }) => ({
+  ml: '-8px',
+  mb: '24px',
+  fontSize: '14px',
+  color: 'grayscale.900',
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_normal,
+    },
+  },
+}));
+
+const SImageButton = styled(IconButton)(({ theme }) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_normal,
+    },
+  },
+}));
+
 function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props & Intl): Node {
   const nftImage = nftInfo?.image;
   const networkUrl = getNetworkUrl(network);
@@ -227,12 +247,12 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                     });
                   }}
                 >
-                  <IconButton
+                  <SImageButton
                     aria-label="Previous"
                     sx={{ transform: 'rotate(180deg)', width: '32px' }}
                   >
                     <Chevron />
-                  </IconButton>
+                  </SImageButton>
                 </Link>
                 <Link
                   to={ROUTES.NFTS.DETAILS.replace(':nftId', nextNftId) + `?tab=${activeTab}`}
@@ -242,9 +262,9 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                     });
                   }}
                 >
-                  <IconButton aria-label="Next" sx={{ width: '32px' }}>
+                  <SImageButton aria-label="Next" sx={{ width: '32px' }}>
                     <Chevron />
-                  </IconButton>
+                  </SImageButton>
                 </Link>
               </Stack>
             </Stack>
@@ -350,25 +370,20 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                 boxShadow: 'none',
                 bgcolor: 'transparent',
                 overflow: 'auto',
+                backgroundColor: 'ds.bg_color_low',
               }}
               value={tabs[1].id}
             >
               {nftInfo.metadata && (
-                <Button
+                <CopyButton
                   onClick={onCopyMetadata}
                   color="inherit"
-                  sx={{
-                    ml: '-8px',
-                    mb: '24px',
-                    fontSize: '14px',
-                    color: 'grayscale.900',
-                  }}
                   endIcon={isCopied ? <IconCopied /> : <IconCopy />}
                 >
                   {intl.formatMessage(messages.copyMetadata)}
-                </Button>
+                </CopyButton>
               )}
-              <Typography component="pre" variant="body3" lineHeight="22px" fontFamily="monospace">
+              <Typography component="pre" variant="body2" lineHeight="22px">
                 {nftInfo.metadata
                   ? JSON.stringify(nftInfo.metadata, null, 2)
                   : intl.formatMessage(messages.missingMetadata)}

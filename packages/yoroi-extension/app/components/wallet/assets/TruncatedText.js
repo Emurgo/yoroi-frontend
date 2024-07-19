@@ -34,10 +34,17 @@ export function CopyAddress({ text, children }: {| text: string, children: Node 
   };
 
   return (
-    <Stack direction="row" alignItems="center" justifyContent="space-between">
-      <TruncatedText sx={{ width: '90%' }}>{children}</TruncatedText>
-
-      <IconButton onClick={onCopy}>{isCopied ? <IconCopied /> : <IconCopy />}</IconButton>
+    <Stack direction="row" alignItems="center">
+      <TruncatedText>{children}</TruncatedText>
+      <SButton onClick={onCopy}>{isCopied ? <IconCopied /> : <IconCopy />}</SButton>
     </Stack>
   );
 }
+
+const SButton = styled(IconButton)(({ theme }) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_normal,
+    },
+  },
+}));
