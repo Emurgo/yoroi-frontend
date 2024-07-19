@@ -8,8 +8,9 @@ import {
   Skeleton,
   Stack,
   Typography,
+  Box,
+  styled,
 } from '@mui/material';
-import { Box, styled } from '@mui/system';
 import type { Node, ComponentType } from 'react';
 import { ReactComponent as Close } from '../../../assets/images/assets-page/close.inline.svg';
 import { ReactComponent as Grid2x2 } from '../../../assets/images/assets-page/grid-2x2.inline.svg';
@@ -306,8 +307,12 @@ const SLink = styled(Link)({
   textDecoration: 'none',
 });
 
-const SButton = styled(Button)(({ theme, active }) => ({
+const SButton = styled(IconButton)(({ theme, active }) => ({
   backgroundColor: active && theme.palette.ds.gray_c200,
+  maxWidth: '40px',
+  maxHeight: '40px',
+  padding: '8px',
+  borderRadius: '4px',
   '& svg': {
     '& path': {
       fill: theme.palette.ds.el_gray_normal,
