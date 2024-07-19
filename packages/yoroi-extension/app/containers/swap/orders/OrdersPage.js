@@ -28,6 +28,8 @@ import { createFormattedTokenValues } from './util';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import type { MappedOrder } from './hooks';
 import type { FormattedTokenValue } from './util';
+import NoCompleteOrders from './NoCompleteOrders';
+import NoOpenOrders from './NoOpenOrders';
 
 type ColumnContext = {|
   completedOrders: boolean,
@@ -281,8 +283,12 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
     .map(c => resolveValueOrGetter(c.width ?? 'auto', columnContext))
     .join(' ');
 
+  const isDisplayOpenOrdersEmpty = !showCompletedOrders && openOrders?.length === 0;
+  const isDisplayCompletedOrdersEmpty = showCompletedOrders && completedOrders?.length === 0;
+  const safeColumnNames = isDisplayOpenOrdersEmpty || isDisplayCompletedOrdersEmpty ? [] : columnNames;
+
   return (
-    <>
+    <Box sx={{ border: '1px solid transparent' }}>
       <Box sx={{ mx: '24px' }}>
         <Box sx={{ my: '24px' }}>
           <Tabs
@@ -300,9 +306,10 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
             ]}
           />
         </Box>
+
         <Table
           columnKeys={columnKeys}
-          columnNames={columnNames}
+          columnNames={safeColumnNames}
           columnAlignment={columnAlignment}
           columnLeftPaddings={columnLeftPaddings}
           gridTemplateColumns={gridTemplateColumns}
@@ -351,7 +358,9 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
           hwWalletError={null}
         />
       )}
-    </>
+      {isDisplayOpenOrdersEmpty && <NoOpenOrders />}
+      {isDisplayCompletedOrdersEmpty && <NoCompleteOrders />}
+    </Box>
   );
 }
 

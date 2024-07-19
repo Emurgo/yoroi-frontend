@@ -14,6 +14,7 @@ import { ReactComponent as nftsIcon } from '../../assets/images/sidebar/revamp/n
 import { ReactComponent as votingIcon } from '../../assets/images/sidebar/revamp/voting.inline.svg';
 import { ReactComponent as swapIcon } from '../../assets/images/sidebar/revamp/swap.inline.svg';
 import { ReactComponent as settingIcon } from '../../assets/images/sidebar/revamp/setting.inline.svg';
+import { ReactComponent as governanceIcon } from '../../assets/images/sidebar/revamp/governance.inline.svg';
 import environment from '../../environment';
 
 export type SidebarCategory = {|
@@ -39,9 +40,7 @@ export const MY_WALLETS: SidebarCategory = registerCategory({
   route: ROUTES.MY_WALLETS,
   icon: walletsIcon,
   label: globalMessages.sidebarWallets,
-  isVisible: request =>
-    request.hasAnyWallets &&
-    request.selected == null,
+  isVisible: request => request.hasAnyWallets && request.selected == null,
 });
 
 export const WALLETS_ROOT: SidebarCategory = registerCategory({
@@ -86,7 +85,7 @@ export const CONNECTED_WEBSITES: SidebarCategory = registerCategory({
 
 type isVisibleFunc = ({|
   hasAnyWallets: boolean,
-  selected: ?{ publicDeriverId: number, isTestnet: boolean, ... },
+  selected: ?{ publicDeriverId: number, isTestnet: boolean, networkId: number, ... },
   currentRoute: string,
   isRewardWallet: isRewardWalletFunc,
 |}) => boolean;
@@ -120,9 +119,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.STAKING,
     icon: stakingIcon,
     label: globalMessages.sidebarStaking,
-    isVisible: ({ selected, isRewardWallet }) =>
-      !!selected &&
-      isRewardWallet(selected),
+    isVisible: ({ selected, isRewardWallet }) => !!selected && isRewardWallet(selected),
   },
   {
     className: 'swap',
@@ -167,6 +164,13 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
   //   label: globalMessages.sidebarSwap,
   //   isVisible: _request => true,
   // },
+  {
+    className: 'governance',
+    route: '/governance',
+    icon: governanceIcon,
+    label: globalMessages.sidebarGovernance,
+    isVisible: ({ selected }) => environment.isDev() && selected?.networkId === 450,
+  },
   {
     className: 'settings',
     route: '/settings',

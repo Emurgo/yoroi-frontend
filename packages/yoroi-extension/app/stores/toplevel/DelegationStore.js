@@ -5,6 +5,7 @@ import { find } from 'lodash';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import Store from '../base/Store';
+import { GovernanceApi } from '@emurgo/yoroi-lib/dist/governance/emurgo-api';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import LocalizableError from '../../i18n/LocalizableError';
 import { PoolMissingApiError } from '../../api/common/errors';
@@ -15,6 +16,9 @@ import type { ExplorerPoolInfo as PoolInfo } from '@emurgo/yoroi-lib';
 import { PoolInfoApi } from '@emurgo/yoroi-lib';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { forceNonNull, maybe } from '../../coreUtils';
+import { asGetStakingKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { unwrapStakingKey } from '../../api/ada/lib/storage/bridge/utils';
+
 import type {
   GetDelegatedBalanceFunc,
   GetDelegatedBalanceResponse,
@@ -60,44 +64,52 @@ export type PoolTransitionModal = {| show: 'open' | 'closed' | 'idle', shouldUpd
 
 export default class DelegationStore extends Store<StoresMap, ActionsMap> {
   @observable delegationRequests: Array<DelegationRequests> = [];
+
+  @observable governanceStatus: any = null;
+
+  @action setGovernanceStatus: any => void = (status: any) => {
+    this.governanceStatus = status;
+  };
   @observable poolTransitionRequestInfo: { [number]: ?PoolTransition } = {};
   @observable poolTransitionConfig: { [number]: ?PoolTransitionModal } = {};
 
-  getPoolTransitionConfig(wallet: ?{ publicDeriverId: number, ... }): PoolTransitionModal {
-    return maybe(wallet, w => this.poolTransitionConfig[w.publicDeriverId]) ?? {
-      show: 'closed',
-      shouldUpdatePool: false,
-    };
+  getPoolTransitionConfig(publicDeriver: ?{ publicDeriverId: number, ... }): PoolTransitionModal {
+    return (
+      maybe(publicDeriver, w => this.poolTransitionConfig[w.publicDeriverId]) ?? {
+        show: 'closed',
+        shouldUpdatePool: false,
+      }
+    );
   }
 
   @action setPoolTransitionConfig: (?{ publicDeriverId: number, ... }, PoolTransitionModal) => void = (
-    wallet, config
+    publicDeriver, config
   ) => {
-    if (wallet != null) {
-      this.poolTransitionConfig[wallet.publicDeriverId] = {
+    if (publicDeriver != null) {
+      this.poolTransitionConfig[publicDeriver.publicDeriverId] = {
         show: config.show,
         shouldUpdatePool: config.shouldUpdatePool,
       };
     }
   };
 
-  @observable poolInfoQuery: LocalizedRequest<
-    (Array<string>) => Promise<void>
-  > = new LocalizedRequest<(Array<string>) => Promise<void>>(async poolIds => {
-    const { selected } = this.stores.wallets;
-    if (selected == null) throw new Error(`${nameof(DelegationStore)} no wallet selected`);
-    const network = getNetworkById(selected.networkId);
-    await this.stores.substores.ada.delegation.updatePoolInfo({
-      network,
-      allPoolIds: poolIds,
-    });
-    // make sure all the pools were found or throw an error
-    for (const poolId of poolIds) {
-      if (this.getLocalPoolInfo(selected.networkId, poolId) == null) {
-        throw new PoolMissingApiError();
+  @observable poolInfoQuery: LocalizedRequest<(Array<string>) => Promise<void>> = new LocalizedRequest(
+    async poolIds => {
+      const { selected } = this.stores.wallets;
+      if (selected == null) throw new Error(`${nameof(DelegationStore)} no wallet selected`);
+      const network = getNetworkById(selected.networkId);
+      await this.stores.substores.ada.delegation.updatePoolInfo({
+        network,
+        allPoolIds: poolIds,
+      });
+      // make sure all the pools were found or throw an error
+      for (const poolId of poolIds) {
+        if (this.getLocalPoolInfo(selected.networkId, poolId) == null) {
+          throw new PoolMissingApiError();
+        }
       }
     }
-  });
+  );
 
   @observable poolInfo: Array<{|
     // it's possible somebody creates a pool with the same ID on a testnet, etc. so we need this key
@@ -258,7 +270,6 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     }
 
     try {
-
       const { BackendService } = getNetworkById(publicDeriver.networkId).Backend;
       const transitionResult = await maybe(currentPool, p =>
         new PoolInfoApi(forceNonNull(BackendService) + '/api').getTransition(p, RustModule.CrossCsl.init)
@@ -311,6 +322,33 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
       poolRequest: delegationTransaction.selectedPools[0],
       wallet: selectedWallet,
     });
+  };
+
+  checkGovernanceStatus: ({
+    stakingAddress: string, networkId: number, ...
+  }) => Promise<void> = async publicDeriver => {
+    try {
+      const skey = unwrapStakingKey(publicDeriver.stakingAddress).to_keyhash()?.to_hex();
+      if (skey == null) {
+        throw new Error('Cannot get staking key from the wallet!');
+      }
+      const { Backend }  = getNetworkById(publicDeriver.networkId);
+      const { BackendService, BackendServiceZero } = Backend;
+      if (!BackendService || !BackendServiceZero) {
+        throw new Error('unexpectedly missing backend');
+      }
+      const govApi = new GovernanceApi({
+        oldBackendUrl: BackendService,
+        newBackendUrl: BackendServiceZero,
+        networkId: publicDeriver.networkId,
+        wasmFactory: RustModule.CrossCsl.init,
+      });
+
+      const governanceStatus = await govApi.getAccountState(skey, skey);
+      this.setGovernanceStatus(governanceStatus);
+    } catch (e) {
+      console.warn(e);
+    }
   };
 
   @action.bound

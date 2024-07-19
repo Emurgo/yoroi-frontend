@@ -55,8 +55,14 @@ class CardanoStakingPage extends Component<AllProps, State> {
   @observable notificationElementId: string = '';
 
   cancel: void => void = () => {
+    const selectedWallet = this.props.stores.wallets.selected;
+    this.props.stores.delegation.setPoolTransitionConfig(selectedWallet, {
+      shouldUpdatePool: false,
+      show: 'idle',
+    });
     this.props.actions.ada.delegationTransaction.reset.trigger({ justTransaction: true });
   };
+
   async componentWillUnmount() {
     this.props.actions.ada.delegationTransaction.reset.trigger({ justTransaction: false });
     await this.props.actions.ada.delegationTransaction.setPools.trigger([]);
