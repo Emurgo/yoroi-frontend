@@ -18,8 +18,7 @@ import {
   changeSigningKeyPassword,
   renamePublicDeriver,
   renameConceptualWallet,
-  removeAllTransactions,
-  refreshTransactions,
+  resyncWallet,
 } from '../../api/thunk';
 
 export type WarningList = {|
@@ -36,9 +35,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     = new Request(async (func) => { await func(); });
 
   @observable clearHistory: Request<RemoveAllTransactionsFunc>
-    = new Request(async (req) => { 
-      return removeAllTransactions({ publicDeriverId: req.publicDeriver.publicDeriverId });
-    });
+    = new Request(this.api.ada.removeAllTransactions);
 
   @observable removeWalletRequest: Request<typeof removeWalletFromDb>
     = new Request<typeof removeWalletFromDb>(removeWalletFromDb);
@@ -131,9 +128,8 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
       publicDeriver: { publicDeriverId: request.publicDeriverId },
       refreshWallet: async () => {
         this.stores.transactions.clearCache(request.publicDeriverId);
-        await refreshTransactions({
+        await resyncWallet({
           publicDeriverId: request.publicDeriverId,
-          isLocalRequest: false,
         });
       }
     }).promise;

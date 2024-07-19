@@ -45,6 +45,7 @@ import type {
   RemoveAllTransactions,
   PopAddress,
   RefreshTransactions,
+  ResyncWallet,
   ConnectorCreateAuthEntry,
   GetAllExplorers,
   GetSelectedExplorer,
@@ -194,6 +195,7 @@ const YOROI_MESSAGES = Object.freeze({
   GET_SELECTED_EXPLORER: 'get-selected-explorer',
   SAVE_SELECTED_EXPLORER: 'save-selected-explorer',
   SIGN_TRANSACTION: 'sign-transaction',
+  RESYNC_WALLET: 'resync-wallet',
 });
 
 // messages from other parts of Yoroi (i.e. the UI for the connector)
@@ -232,6 +234,7 @@ export async function yoroiMessageHandler(
     | GetSelectedExplorer
     | SaveSelectedExplorer
     | SignTransaction
+    | ResyncWallet
   ),
   sender: any,
   sendResponse: Function,
@@ -896,14 +899,6 @@ export async function yoroiMessageHandler(
     }
     await removeAllTransactions({ publicDeriver: withLevels });
 
-    for (let i = 0; i < this._submittedTransactions.length; ) {
-      if (this._submittedTransactions[i].publicDeriverId === publicDeriver.publicDeriverId) {
-        this._submittedTransactions.splice(i, 1);
-      } else {
-        i++;
-      }
-    }
-
     const txs = await loadSubmittedTransactions();
     if (!txs) {
       return;
@@ -1069,6 +1064,15 @@ export async function yoroiMessageHandler(
       signedWitnessSetHex,
     );
     sendResponse(transactionHexReplaceWitnessSet(transactionHex, mergedWitnessSetHex));
+  } else if (request.type === YOROI_MESSAGES.RESYNC_WALLET) {
+    const publicDeriver: ?PublicDeriver<> = await getPublicDeriverById(request.request.publicDeriverId);
+    if (!publicDeriver) {
+      sendResponse({ error: 'no public dervier'});
+      return;
+    }
+
+    await syncWallet(publicDeriver, 'UI resync');
+    sendResponse(null);
   } else {
     console.error(`unknown message ${JSON.stringify(request)} from ${sender.tab.id}`)
   }

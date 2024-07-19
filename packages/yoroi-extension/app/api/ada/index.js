@@ -11,7 +11,6 @@ import {
   getAllTransactions,
   getForeignAddresses,
   getPendingTransactions,
-  removeAllTransactions,
   updateTransactions,
   updateUtxos,
 } from './lib/storage/bridge/updateTransactions';
@@ -168,6 +167,7 @@ import type WalletTransaction from '../../domain/WalletTransaction';
 import { derivePrivateByAddressing, derivePublicByAddressing } from './lib/cardanoCrypto/deriveByAddressing';
 import type { WalletState } from '../../../chrome/extension/background/types';
 import TimeUtils from './lib/storage/bridge/timeUtils';
+import { removeAllTransactions } from '../thunk';
 
 // ADA specific Request / Response params
 
@@ -686,6 +686,26 @@ export default class AdaApi {
       return mappedTransactions;
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.refreshPendingTransactions)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
+      throw new GenericApiError();
+    }
+  }
+
+  async removeAllTransactions(
+    request: RemoveAllTransactionsRequest
+  ): Promise<RemoveAllTransactionsResponse> {
+    try {
+      // 1) clear existing history
+      await removeAllTransactions({ publicDeriverId: request.publicDeriver.publicDeriverId });
+
+      // 2) trigger a history sync
+      try {
+        await request.refreshWallet();
+      } catch (_e) {
+        Logger.warn(`${nameof(this.removeAllTransactions)} failed to connect to remote to resync. Data was still cleared locally`);
+      }
+    } catch (error) {
+      Logger.error(`${nameof(AdaApi)}::${nameof(this.removeAllTransactions)} error: ` + stringifyError(error));
       if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }

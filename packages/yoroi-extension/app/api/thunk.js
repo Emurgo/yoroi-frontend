@@ -248,7 +248,7 @@ export async function getAllTxMemos(): Promise<Array<TxMemoTableRow>>{
 }
 
 export async function removeAllTransactions(request: {| publicDeriverId: number |}): Promise<void> {
-  await callBackground({ type: 'remove-all-transactions' });
+  await callBackground({ type: 'remove-all-transactions', request });
 }
 
 export async function popAddress(request: { publicDeriverId: number, ... }): Promise<void> {
@@ -257,13 +257,14 @@ export async function popAddress(request: { publicDeriverId: number, ... }): Pro
 
 export type RefreshTransactionsRequestType = {|
   publicDeriverId: number,
-  isLocalRequest: boolean,
+  // this is local refresh, i.e. load transactions from db, *not* syncing db with remote
+  isLocalRequest: true,
   beforeTx?: ?ReferenceTransaction,
   afterTx?: ?ReferenceTransaction,
   skip?: number,
   limit?: number,
 |};
-// this is local refresh, i.e. load transactions from db, *not* syncing db with remote
+
 export async function refreshTransactions(
   request: RefreshTransactionsRequestType
 ): Promise<Array<WalletTransaction>> {
@@ -276,6 +277,12 @@ export async function refreshTransactions(
     }
     return CardanoByronTransaction.fromData(deserializeByronTransactionCtorData(tx));
   });
+}
+
+export async function resyncWallet(
+  request: {| publicDeriverId: number |}
+): Promise<void> {
+  return callBackground({ type: 'resync-wallet', request });
 }
 
 export type ConnectorCreateAuthEntryRequestType = {|

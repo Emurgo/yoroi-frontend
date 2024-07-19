@@ -310,6 +310,10 @@ export type RefreshTransactions = {|
   type: 'refresh-transactions',
   request: RefreshTransactionsRequestType,
 |};
+export type ResyncWallet = {|
+  type: 'resync-wallet',
+  request: {| publicDeriverId: number |},
+|};
 export type GetAllExplorers = {|
   type: 'get-all-explorers',
 |};
