@@ -241,15 +241,14 @@ export function NftImage({
       );
   }, [url]);
 
-  if (error || url === null)
+  if (true)
     return (
       <Box
         sx={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          width,
-          height,
+          height: '100%',
         }}
       >
         <DefaultNFT />

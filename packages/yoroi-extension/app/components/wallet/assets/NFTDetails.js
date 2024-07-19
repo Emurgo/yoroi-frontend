@@ -202,6 +202,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                 objectFit: 'unset',
               },
               backgroundColor: 'ds.bg_color_low',
+              height: '100%',
             }}
             onClick={() => nftImage !== null && setOpenAndTrack()}
           >
