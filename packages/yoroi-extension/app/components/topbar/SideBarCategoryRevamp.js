@@ -6,7 +6,7 @@ import { intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import styles from './SideBarCategoryRevamp.scss';
-import { Typography } from '@mui/material';
+import { Box, styled, Typography } from '@mui/material';
 
 type Props = {|
   +icon: string,
@@ -15,6 +15,13 @@ type Props = {|
   +onClick: void => void,
   +label: ?MessageDescriptor,
 |};
+
+const ItemWrapper = styled(Box)(({ theme, active }) => ({
+  cursor: 'pointer',
+  background: active && theme.palette.ds.special_web_bg_sidebar,
+  paddingTop: '8px',
+  paddingBottom: '8px',
+}));
 
 @observer
 export default class SideBarCategoryRevamp extends Component<Props> {
@@ -33,13 +40,14 @@ export default class SideBarCategoryRevamp extends Component<Props> {
     const isInternalLink = route.startsWith('/') || route.startsWith('#');
 
     return isInternalLink ? (
-      <button
+      <ItemWrapper
         type="button"
         className={componentStyles}
         // $FlowExpectedError[incompatible-use]
         id={label.id}
         onClick={onClick}
         disabled={active}
+        active={active}
       >
         <span className={styles.icon}>
           <SvgElem />
@@ -49,7 +57,7 @@ export default class SideBarCategoryRevamp extends Component<Props> {
             {intl.formatMessage(label)}
           </Typography>
         ) : null}
-      </button>
+      </ItemWrapper>
     ) : (
       <a
         href={route}
@@ -62,7 +70,11 @@ export default class SideBarCategoryRevamp extends Component<Props> {
         <span className={styles.icon}>
           <SvgElem />
         </span>
-        {label ? <Typography component="div" variant="caption2">{intl.formatMessage(label)}</Typography> : null}
+        {label ? (
+          <Typography component="div" variant="caption2">
+            {intl.formatMessage(label)}
+          </Typography>
+        ) : null}
       </a>
     );
   }
