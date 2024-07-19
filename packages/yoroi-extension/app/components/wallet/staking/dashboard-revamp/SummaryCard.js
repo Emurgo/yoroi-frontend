@@ -90,10 +90,7 @@ function SummaryCard({
 
   const renderAmountWithUnitOfAccount: (?MultiToken) => ?Node = token => {
     const unitOfAccountCalculated = maybe(token, t => unitOfAccount(t.getDefaultEntry()));
-    return maybe(
-      unitOfAccountCalculated,
-      u => `${shouldHideBalance ? hiddenAmount : u.amount} ${u.currency}`
-    );
+    return maybe(unitOfAccountCalculated, u => `${shouldHideBalance ? hiddenAmount : u.amount} ${u.currency}`);
   };
 
   return (
@@ -129,12 +126,7 @@ function SummaryCard({
         <InfoRow sx={{ borderColor: 'grayscale.200' }}>
           <StakingIcon />
           <InfoDetails>
-            <Typography
-              component="div"
-              variant="caption1"
-              color="grayscale.600"
-              sx={{ textTransform: 'uppercase' }}
-            >
+            <Typography component="div" variant="caption1" color="grayscale.600" sx={{ textTransform: 'uppercase' }}>
               {intl.formatMessage(globalMessages.totalRewardsLabel)}
             </Typography>
           </InfoDetails>
