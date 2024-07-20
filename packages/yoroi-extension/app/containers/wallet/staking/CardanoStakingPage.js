@@ -270,12 +270,11 @@ class CardanoStakingPage extends Component<AllProps, State> {
   };
 
   _getPoolInfo: (PublicDeriver<>) => void | PoolMeta = publicDeriver => {
-    const { delegationTransaction } = this.props.stores.substores.ada;
-    return delegationTransaction.selectedPools.length === 0
-      ? undefined
+    const selectedPoolId = this.state.selectedPoolId;
+    return selectedPoolId == null ? undefined
       : this.props.stores.delegation.getLocalPoolInfo(
           publicDeriver.getParent().getNetworkInfo(),
-          delegationTransaction.selectedPools[0]
+          selectedPoolId
         );
   };
 
@@ -378,7 +377,8 @@ class CardanoStakingPage extends Component<AllProps, State> {
     if (delegationTransaction.createDelegationTx.error != null) {
       return this._errorDialog(delegationTransaction.createDelegationTx.error);
     }
-    if (delegationTx != null && delegationTransaction.selectedPools.length >= 1 && showSignDialog) {
+    const selectedPoolId = this.state.selectedPoolId;
+    if (delegationTx != null && selectedPoolId != null && showSignDialog) {
       // may happen for a split second before backend query starts
       if (selectedPoolInfo == null) return null;
       return (
@@ -387,7 +387,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
           poolName={
             selectedPoolInfo.info?.name ?? intl.formatMessage(globalMessages.unknownPoolLabel)
           }
-          poolHash={delegationTransaction.selectedPools[0]}
+          poolHash={selectedPoolId}
           transactionFee={delegationTx.signTxRequest.fee()}
           amountToDelegate={delegationTx.totalAmountToDelegate}
           approximateReward={approximateReward(
