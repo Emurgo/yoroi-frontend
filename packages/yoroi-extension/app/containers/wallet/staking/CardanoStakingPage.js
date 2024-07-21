@@ -108,6 +108,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
             totalAda={totalAda}
             poolList={poolList}
             stakepoolSelectedAction={async poolId => {
+              this.setState({ selectedPoolId: poolId });
               await this.props.stores.delegation.createDelegationTransaction(poolId);
             }}
           />
@@ -120,6 +121,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
             <WalletDelegationBanner
               isOpen={this.props.stores.transactions.showDelegationBanner}
               onDelegateClick={async poolId => {
+                this.setState({ selectedPoolId: poolId });
                 await this.props.stores.delegation.createDelegationTransaction(poolId);
               }}
               poolInfo={this.state.firstPool}
@@ -147,6 +149,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
                 this.setState({ firstPool: pool });
               }}
               stakepoolSelectedAction={async poolId => {
+                this.setState({ selectedPoolId: poolId });
                 await this.props.stores.delegation.createDelegationTransaction(poolId);
               }}
             />
