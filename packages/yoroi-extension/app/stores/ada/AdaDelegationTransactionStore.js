@@ -30,9 +30,8 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
   > = new LocalizedRequest<DeferredCall<CreateWithdrawalTxResponse>>(request => request());
 
   @observable
-  createDelegationTx: LocalizedRequest<CreateDelegationTxFunc> = new LocalizedRequest<CreateDelegationTxFunc>(
-    this.api.ada.createDelegationTx
-  );
+  createDelegationTx: LocalizedRequest<CreateDelegationTxFunc> =
+    new LocalizedRequest<CreateDelegationTxFunc>(this.api.ada.createDelegationTx);
 
   @observable shouldDeregister: boolean = false;
 
@@ -75,6 +74,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     this.shouldDeregister = shouldDeregister;
   };
 
+  // <TODO:INLINE> This function is only called from one place via indirection. Can be simplified
   @action
   _createTransaction: ({|
     publicDeriver: PublicDeriver<>,
