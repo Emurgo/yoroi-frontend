@@ -1,10 +1,6 @@
 // @flow
 
 import { RustModule } from './rustLoader';
-import { generateWalletRootKey as cardanoGenerateWalletRootKey } from './cryptoWallet';
-import { CoinTypes, WalletTypePurpose } from '../../../../config/numbersConfig';
-import type { NetworkRow } from '../storage/database/primitives/tables';
-import type { WalletState } from '../../../../../chrome/extension/background/types';
 import { bytesToHex, hexToBytes } from '../../../../coreUtils';
 
 export function v4PublicToV2(

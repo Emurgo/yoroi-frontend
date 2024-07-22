@@ -16,7 +16,7 @@ import {
 
 const serverStatusByNetworkId: Map<number, ServerStatus> = new Map();
 
-async function getAllNetworks(): Promise<$ReadOnlyArray<NetworkRow>> {
+async function getUsedNetworks(): Promise<$ReadOnlyArray<NetworkRow>> {
   const db = await getDb();
   const allConceptualWallets = await raii<$ReadOnlyArray<ConceptualWalletRow>>(
     db,
@@ -33,10 +33,10 @@ async function getAllNetworks(): Promise<$ReadOnlyArray<NetworkRow>> {
 }
 
 async function updateServerStatus() {
-  const networks = await getAllNetworks();
+  const usedNetworks = await getUsedNetworks();
   const fetcher = await getCommonStateFetcher();
 
-  for (const network of networks) {
+  for (const network of usedNetworks) {
     const backend = network.Backend.BackendServiceZero;
     if (!backend) {
       throw new Error('unexpectedly missing backend zero');

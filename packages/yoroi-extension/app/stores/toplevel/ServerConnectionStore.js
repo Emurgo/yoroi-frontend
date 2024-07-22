@@ -1,10 +1,9 @@
 // @flow
 
-import { action, observable, computed, runInAction } from 'mobx';
+import { observable, computed, runInAction } from 'mobx';
 import Store from '../base/Store';
 import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
-import type { ServerStatusResponse } from '../../api/common/lib/state-fetch/types';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { listenForServerStatusUpdate } from '../../api/thunk';

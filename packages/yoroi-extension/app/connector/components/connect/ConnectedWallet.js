@@ -1,7 +1,6 @@
 // @flow
 import type { Node } from 'react';
 import type { WalletChecksum } from '@emurgo/cip4-js';
-import type { PublicDeriverCache } from '../../../../chrome/extension/connector/types';
 import { Component } from 'react';
 import { Box, Typography } from '@mui/material';
 import styles from './ConnectedWallet.scss';

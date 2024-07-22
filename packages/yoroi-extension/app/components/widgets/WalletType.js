@@ -3,7 +3,6 @@
 import { Component } from 'react';
 import type { Node } from 'react'
 import globalMessages from '../../i18n/global-messages';
-import { ConceptualWallet, isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$MessageDescriptor, $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { WalletType as WalletT } from '../../../chrome/extension/background/types';

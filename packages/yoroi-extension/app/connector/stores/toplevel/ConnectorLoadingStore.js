@@ -5,10 +5,6 @@ import type { StoresMap } from '../index';
 import {
   TabIdKeys,
 } from '../../../utils/tabManager';
-import { observable, runInAction } from 'mobx';
-import {
-  copyDbToMemory,
-} from '../../../api/ada/lib/storage/database/index';
 
 export default class ConnectorLoadingStore extends BaseLoadingStore<StoresMap, ActionsMap> {
 

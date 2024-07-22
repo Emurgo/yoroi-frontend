@@ -1,11 +1,7 @@
 // @flow
 // Interface of Hardware Wallet Connect dialog
 
-import LocalizedRequest from '../stores/lib/LocalizedRequest';
-
 import LocalizableError from '../i18n/LocalizableError';
-
-import type { CreateHardwareWalletRequest, CreateHardwareWalletFunc } from '../api/ada';
 import type { StepStateEnum } from '../components/widgets/ProgressSteps';
 import type { HWFeatures } from '../api/ada/lib/storage/database/walletTypes/core/tables';
 import type { WalletState } from '../../chrome/extension/background/types';

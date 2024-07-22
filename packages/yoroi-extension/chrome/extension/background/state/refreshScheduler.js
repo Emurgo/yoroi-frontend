@@ -4,7 +4,6 @@ import { getWallets } from '../../../../app/api/common/index';
 import { RustModule } from '../../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { getCardanoStateFetcher } from '../utils';
 import AdaApi from '../../../../app/api/ada';
-import type { WalletState } from '../types';
 import { asHasLevels } from '../../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import environment from '../../../../app/environment';
 import { getDb } from './databaseManager';

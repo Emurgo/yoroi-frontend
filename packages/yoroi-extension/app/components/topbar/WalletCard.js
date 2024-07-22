@@ -10,8 +10,6 @@ import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import classnames from 'classnames';
 import type { WalletChecksum } from '@emurgo/cip4-js';
-import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import { isLedgerNanoWallet, isTrezorTWallet, } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import globalMessages from '../../i18n/global-messages';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { ReactComponent as DragIcon } from '../../assets/images/add-wallet/wallet-list/drag.inline.svg';

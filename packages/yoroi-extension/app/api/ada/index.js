@@ -6,7 +6,6 @@ import CardanoByronTransaction from '../../domain/CardanoByronTransaction';
 import CardanoShelleyTransaction from '../../domain/CardanoShelleyTransaction';
 import { ChainDerivations, CoinTypes, HARD_DERIVATION_START, WalletTypePurpose, } from '../../config/numbersConfig';
 import { createHardwareCip1852Wallet, createStandardCip1852Wallet, } from './lib/storage/bridge/walletBuilder/shelley';
-import type { ReferenceTx } from './lib/storage/bridge/updateTransactions';
 import {
   getAllTransactions,
   getForeignAddresses,
@@ -27,14 +26,13 @@ import { Cip1852Wallet, } from './lib/storage/models/Cip1852Wallet/wrapper';
 import type { HWFeatures, } from './lib/storage/database/walletTypes/core/tables';
 import { Bip44DerivationLevels, flattenInsertTree, } from './lib/storage/database/walletTypes/bip44/api/utils';
 import type { CoreAddressT } from './lib/storage/database/primitives/enums';
-import { CoreAddressTypes, TxStatusCodes, } from './lib/storage/database/primitives/enums';
+import { CoreAddressTypes, } from './lib/storage/database/primitives/enums';
 import type { NetworkRow, TokenRow, } from './lib/storage/database/primitives/tables';
 import { TransactionType } from './lib/storage/database/primitives/tables';
 import { PublicDeriver, } from './lib/storage/models/PublicDeriver/index';
 import {
   asDisplayCutoff,
   asGetAllUtxos,
-  asHasLevels,
   asHasUtxoChains,
 } from './lib/storage/models/PublicDeriver/traits';
 import { ConceptualWallet } from './lib/storage/models/ConceptualWallet/index';
@@ -44,9 +42,7 @@ import type {
   Addressing,
   AddressType,
   IDisplayCutoff,
-  IGetAllUtxos,
   IGetAllUtxosResponse,
-  IGetPublic,
   IGetSigningKey,
   IGetStakingKey,
   IHasUtxoChains,
@@ -123,7 +119,6 @@ import type {
 import { getChainAddressesForDisplay, } from './lib/storage/models/utils';
 import {
   getAllAddressesForDisplay,
-  rawGetAddressRowsForWallet,
   getAllAddressesForWallet,
 } from './lib/storage/bridge/traitUtils';
 import type {
@@ -157,9 +152,6 @@ import type { DefaultTokenEntry } from '../common/lib/MultiToken';
 import { MultiToken } from '../common/lib/MultiToken';
 import { getReceiveAddress } from '../../stores/stateless/addressStores';
 import { generateRegistrationMetadata } from './lib/cardanoCrypto/catalyst';
-import { GetAddress, GetPathWithSpecific, } from './lib/storage/database/primitives/api/read';
-import { getAllSchemaTables, mapToTables, raii, } from './lib/storage/database/utils';
-import { GetDerivationSpecific, } from './lib/storage/database/walletTypes/common/api/read';
 import { bytesToHex, hexToBytes, hexToUtf } from '../../coreUtils';
 import type { PersistedSubmittedTransaction } from '../localStorage';
 import type { ForeignUtxoFetcher } from '../../connector/stores/ConnectorStore';

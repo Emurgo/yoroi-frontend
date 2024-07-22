@@ -1,5 +1,6 @@
 // @flow
 import { getDb } from './databaseManager';
+
 export { getDb };
 export { refreshingWalletIdSet, syncWallet } from './refreshScheduler';
 

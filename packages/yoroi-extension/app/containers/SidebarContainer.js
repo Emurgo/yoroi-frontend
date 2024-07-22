@@ -5,7 +5,6 @@ import { observer } from 'mobx-react';
 import Sidebar from '../components/topbar/Sidebar';
 import type { StoresAndActionsProps } from '../types/injectedProps.types';
 import { allCategories, allCategoriesRevamp } from '../stores/stateless/sidebarCategories';
-import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
 import SidebarRevamp from '../components/topbar/SidebarRevamp';
 import { withLayout } from '../styles/context/layout';
 import type { LayoutComponentMap } from '../styles/context/layout';

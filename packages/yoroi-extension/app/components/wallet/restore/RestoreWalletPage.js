@@ -12,7 +12,6 @@ import Stepper from '../../common/stepper/Stepper';
 import EnterRecoveryPhraseStep from './steps/phrase/EnterRecoveryPhraseStep';
 import AddWalletDetailsStep from '../create-wallet/AddWalletDetailsStep';
 import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
-import { asGetPublicKey } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { markDialogAsShown } from '../dialogs/utils';
 import { ROUTES } from '../../../routes-config';
 import SelectNetworkStep from '../create-wallet/SelectNetworkStep';
@@ -69,8 +68,6 @@ function RestoreWalletPage(props: Props & Intl): Node {
     walletRestore,
     profile: profileData,
     wallets,
-    walletSettings,
-    transactions,
     tokenInfoStore,
   } = stores;
 

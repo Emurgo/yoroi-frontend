@@ -10,10 +10,6 @@ import { addressToDisplayString } from '../../../../api/ada/lib/storage/bridge/u
 import type { ISignRequest } from '../../../../api/common/lib/transactions/ISignRequest';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import type { MultiToken, TokenLookupKey } from '../../../../api/common/lib/MultiToken';
-import {
-  isLedgerNanoWallet,
-  isTrezorTWallet,
-} from '../../../../api/ada/lib/storage/models/ConceptualWallet';
 import { ampli } from '../../../../../ampli/index';
 import TrezorSendActions from '../../../../actions/ada/trezor-send-actions';
 import LedgerSendActions from '../../../../actions/ada/ledger-send-actions';

@@ -2,7 +2,6 @@
 
 import { action, observable, runInAction } from 'mobx';
 import { find } from 'lodash';
-import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import Store from '../base/Store';
 import { GovernanceApi } from '@emurgo/yoroi-lib/dist/governance/emurgo-api';
@@ -16,7 +15,6 @@ import type { ExplorerPoolInfo as PoolInfo } from '@emurgo/yoroi-lib';
 import { PoolInfoApi } from '@emurgo/yoroi-lib';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { forceNonNull, maybe } from '../../coreUtils';
-import { asGetStakingKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { unwrapStakingKey } from '../../api/ada/lib/storage/bridge/utils';
 
 import type {

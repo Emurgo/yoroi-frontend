@@ -6,23 +6,11 @@ import Store from '../base/Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import CardanoShelleyTransaction from '../../domain/CardanoShelleyTransaction';
 import WalletTransaction from '../../domain/WalletTransaction';
-import type { GetBalanceFunc } from '../../api/common/types';
 import type {
   ExportTransactionsFunc,
-  GetTransactionsFunc,
   GetTransactionsResponse,
-  RefreshPendingTransactionsFunc,
 } from '../../api/common/index';
-import {
-  asGetAllUtxos,
-  asGetPublicKey,
-  asHasLevels,
-} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import type {
-  IGetLastSyncInfo,
-  IGetLastSyncInfoResponse,
-} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
+import type { IGetLastSyncInfoResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { UnconfirmedAmount } from '../../types/unconfirmedAmount.types';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
@@ -30,9 +18,7 @@ import { Logger, stringifyError } from '../../utils/logging';
 import type { TransactionRowsToExportRequest } from '../../actions/common/transactions-actions';
 import globalMessages from '../../i18n/global-messages';
 import {
-  getCardanoHaskellBaseConfig,
   isCardanoHaskell,
-  networks,
   getNetworkById,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { DefaultTokenEntry, TokenEntry } from '../../api/common/lib/MultiToken';
@@ -40,15 +26,7 @@ import { MultiToken } from '../../api/common/lib/MultiToken';
 import { genLookupOrFail, getTokenName } from '../stateless/tokenHelpers';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import {
-  asAddressedUtxo,
-  cardanoMinAdaRequiredFromRemoteFormat_coinsPerWord,
-} from '../../api/ada/transactions/utils';
-import { PRIMARY_ASSET_CONSTANTS } from '../../api/ada/lib/storage/database/primitives/enums';
-import type { NetworkRow, AddressRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
 import moment from 'moment';
-import { getAllAddressesForWallet } from '../../api/ada/lib/storage/bridge/traitUtils';
 import { toRequestAddresses } from '../../api/ada/lib/storage/bridge/updateTransactions'
 import type { TransactionExportRow } from '../../api/export';
 import type { HistoryRequest } from '../../api/ada/lib/state-fetch/types';
@@ -72,21 +50,6 @@ export type TxHistoryState = {|
 |};
 
 const EXPORT_START_DELAY = 800; // in milliseconds [1000 = 1sec]
-
-function getCoinsPerUtxoWord(network: $ReadOnly<NetworkRow>): BigNumber {
-  const config = getCardanoHaskellBaseConfig(network).reduce(
-    (acc, next) => Object.assign(acc, next),
-    {}
-  );
-  return new BigNumber(config.CoinsPerUtxoWord);
-}
-
-function newMultiToken(
-  defaultTokenInfo: DefaultTokenEntry,
-  values: Array<TokenEntry> = []
-): MultiToken {
-  return new MultiToken(values, defaultTokenInfo);
-}
 
 export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   /** Track transactions for a set of wallets */

@@ -27,8 +27,6 @@ import { PRIMARY_ASSET_CONSTANTS } from '../../lib/storage/database/primitives/e
 import { cardanoValueFromMultiToken, cardanoValueFromRemoteFormat, multiTokenFromCardanoValue, asAddressedUtxo, multiTokenFromRemote } from '../utils';
 import { hexToBytes, logErr } from '../../../../coreUtils';
 import { getCardanoHaskellBaseConfig, getNetworkById } from '../../lib/storage/database/prepackaged/networks';
-import { IPublicDeriver, IGetAllUtxos, IHasUtxoChains, } from '../../lib/storage/models/PublicDeriver/interfaces';
-import { ConceptualWallet } from '../../lib/storage/models/ConceptualWallet/index';
 import { builtSendTokenList } from '../../../common';
 import type { TokenRow } from '../../lib/storage/database/primitives/tables';
 import { setRuntime, WalletType } from '@emurgo/yoroi-eutxo-txs/dist/kernel'

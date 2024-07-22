@@ -10,7 +10,6 @@ import type { WalletChecksum } from '@emurgo/cip4-js';
 import { LoadingWalletStates } from '../types';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import { connectorCreateAuthEntry } from '../../api/thunk';
-import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { ampli } from '../../../ampli/index';
 import type { WalletState } from '../../../chrome/extension/background/types';
 

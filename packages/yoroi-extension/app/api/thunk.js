@@ -94,10 +94,6 @@ export async function getWallets(walletId?: number): Promise<Array<WalletState>>
   return wallets;
 }
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  //fixme: verify sender.id/origin
-});
-
 export async function subscribe(activeWalletId: ?number): Promise<void> {
   await callBackground({ type: 'subscribe', request: { activeWalletId } });
 }
@@ -177,7 +173,6 @@ type UserSignAndBroadcastTransactionRequestType = {|
   password: string,
   publicDeriverId: number,
 |};
-type SignAndBroadcastTransactionReturnType = {| |}; // fixme
 export async function signAndBroadcastTransaction(
   request: UserSignAndBroadcastTransactionRequestType
 ): Promise<{| txId: string |}> {
@@ -214,7 +209,7 @@ export type BroadcastTransactionRequestType = {|
   |})
 |};
 export async function broadcastTransaction(request: BroadcastTransactionRequestType) {
-  const result = await callBackground({ type: 'broadcast-transaction', request });
+  const _result = await callBackground({ type: 'broadcast-transaction', request });
 }
 
 // Only mnemonic wallet has private staking key.
@@ -333,7 +328,8 @@ const callbacks = Object.freeze({
   walletStateUpdate: [],
   serverStatusUpdate: [],
 });
-chrome.runtime.onMessage.addListener(async (message, sender) => {
+chrome.runtime.onMessage.addListener(async (message, _sender, _sendResponse) => {
+  //fixme: verify sender.id/origin
   console.log('get message from background:', JSON.stringify(message, null, 2));
 
   if (message.type === 'wallet-state-update') {

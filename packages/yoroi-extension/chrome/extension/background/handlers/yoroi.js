@@ -1,7 +1,6 @@
 // @flow
 // Handle messages from Yoroi extension pages, including connector.
 
-import { getWallets } from '../../../../app/api/common/index';
 import { PublicDeriver, } from '../../../../app/api/ada/lib/storage/models/PublicDeriver/index';
 import {
   asGetAllUtxos,
@@ -54,62 +53,30 @@ import type {
 } from '../../connector/types';
 import {
   APIErrorCodes,
-  asPaginate,
-  asTokenId,
-  asValue,
   ConnectorError,
   DataSignErrorCodes,
   TxSignErrorCodes,
 } from '../../connector/types';
 import {
-  connectorCreateCardanoTx,
-  connectorGetBalance,
-  connectorGetCardanoRewardAddresses,
   connectorGetChangeAddress,
-  connectorGetCollateralUtxos,
   connectorGetUnusedAddresses,
   connectorGetUsedAddressesWithPaginate,
-  connectorGetUtxosCardano,
   connectorRecordSubmittedCardanoTransaction,
-  connectorSendTxCardano,
   connectorSignCardanoTx,
   getAddressing,
   connectorSignData,
-  connectorGetAssets,
-  getTokenMetadataFromIds,
-  MAX_COLLATERAL,
-  connectorGetDRepKey, connectorGetStakeKey,
 } from '../../connector/api';
 import {
-  updateTransactions as cardanoUpdateTransactions,
   removeAllTransactions,
   genCardanoAssetMap,
 } from '../../../../app/api/ada/lib/storage/bridge/updateTransactions';
-import { environment } from '../../../../app/environment';
-import type { IFetcher as CardanoIFetcher } from '../../../../app/api/ada/lib/state-fetch/IFetcher.types';
-import { RemoteFetcher as CardanoRemoteFetcher } from '../../../../app/api/ada/lib/state-fetch/remoteFetcher';
-import { BatchedFetcher as CardanoBatchedFetcher } from '../../../../app/api/ada/lib/state-fetch/batchedFetcher';
 import LocalStorageApi, {
   loadSubmittedTransactions, persistSubmittedTransactions
 } from '../../../../app/api/localStorage/index';
 import { RustModule } from '../../../../app/api/ada/lib/cardanoCrypto/rustLoader';
-import { Logger, stringifyError } from '../../../../app/utils/logging';
-import type { lf$Database, } from 'lovefield';
-import {
-  getCardanoHaskellBaseConfig,
-  isCardanoHaskell,
-  getNetworkById,
-} from '../../../../app/api/ada/lib/storage/database/prepackaged/networks';
-import { authSignHexPayload } from '../../../../app/connector/api';
-import type { RemoteUnspentOutput } from '../../../../app/api/ada/lib/state-fetch/types';
-import { NotEnoughMoneyToSendError, } from '../../../../app/api/common/errors';
-import {
-  asAddressedUtxo as asAddressedUtxoCardano,
-  mergeWitnessSets,
-} from '../../../../app/api/ada/transactions/utils';
-import ConnectorStore from '../../../../app/connector/stores/ConnectorStore';
-import type { ForeignUtxoFetcher } from '../../../../app/connector/stores/ConnectorStore';
-import { find721metadata } from '../../../../app/utils/nftMetadata';
+import { Logger } from '../../../../app/utils/logging';
+import { getNetworkById } from '../../../../app/api/ada/lib/storage/database/prepackaged/networks';
+import { mergeWitnessSets } from '../../../../app/api/ada/transactions/utils';
 import { hexToBytes } from '../../../../app/coreUtils';
 import { getDb, syncWallet } from '../state';
 import {
@@ -699,8 +666,8 @@ export async function yoroiMessageHandler(
     const db = await getDb();
     let publicDerivers = await loadWalletsFromStorage(db);
     if (request.request.walletId) {
-      const publicDeriver = publicDerivers.find(publicDeriver =>
-        publicDeriver.getPublicDeriverId() === request.request.walletId
+      const publicDeriver = publicDerivers.find(pd =>
+        pd.getPublicDeriverId() === request.request.walletId
       );
       if (publicDeriver) {
         publicDerivers = [publicDeriver];
@@ -1016,7 +983,6 @@ export async function yoroiMessageHandler(
     if (withPubKey == null) {
       throw new Error('unexpected missing asGetPublicKey result');
     }
-    const publicKey = await withPubKey.getPublicKey();
     const checksum = await getWalletChecksum(withPubKey);
     try {
       const result = await createAuthEntry({

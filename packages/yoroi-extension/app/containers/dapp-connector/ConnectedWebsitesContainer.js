@@ -14,8 +14,6 @@ import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import FullscreenLayout from '../../components/layout/FullscreenLayout';
 import environment from '../../environment';
 import { ROUTES } from '../../routes-config';
-import type { WalletChecksum } from '@emurgo/cip4-js';
-import type { MultiToken } from '../../api/common/lib/MultiToken';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import { connectorMessages } from '../../i18n/global-messages';

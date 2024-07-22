@@ -10,10 +10,7 @@ import type {
 } from '../../../api/common/lib/MultiToken';
 import type { NetworkRow, TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
-import type {
-  PublicDeriverCache,
-  WhitelistEntry,
-} from '../../../../chrome/extension/connector/types';
+import type { WhitelistEntry } from '../../../../chrome/extension/connector/types';
 import type {
   CardanoConnectorSignRequest,
   SignSubmissionErrorType,

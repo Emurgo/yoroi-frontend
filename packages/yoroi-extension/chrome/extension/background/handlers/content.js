@@ -3,23 +3,8 @@
 
 import { getWallets } from '../../../../app/api/common/index';
 import { PublicDeriver, } from '../../../../app/api/ada/lib/storage/models/PublicDeriver/index';
-import { asGetAllUtxos, asHasUtxoChains } from '../../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
-  CardanoTx,
-  ConfirmedSignData,
-  ConnectedSites,
-  ConnectingMessage,
-  ConnectResponseData,
-  ConnectRetrieveData,
-  FailedSignData,
-  GetConnectedSitesData,
-  GetConnectionProtocolData,
-  GetUtxosRequest,
-  GetDb,
   PendingSignData,
-  RemoveWalletFromWhitelistData,
-  SigningMessage,
-  TxSignWindowRetrieveData,
   WalletAuthEntry,
   WhitelistEntry,
 } from '../../connector/types';
@@ -30,7 +15,6 @@ import {
   asValue,
   ConnectorError,
   DataSignErrorCodes,
-  TxSignErrorCodes,
 } from '../../connector/types';
 import {
   connectorCreateCardanoTx,
@@ -43,21 +27,13 @@ import {
   connectorGetUtxosCardano,
   connectorRecordSubmittedCardanoTransaction,
   connectorSendTxCardano,
-  connectorSignCardanoTx,
   getAddressing,
-  connectorSignData,
   connectorGetAssets,
   getTokenMetadataFromIds,
   MAX_COLLATERAL,
   connectorGetDRepKey, connectorGetStakeKey,
 } from '../../connector/api';
-import {
-  updateTransactions as cardanoUpdateTransactions
-} from '../../../../app/api/ada/lib/storage/bridge/updateTransactions';
-import { environment } from '../../../../app/environment';
 import type { IFetcher as CardanoIFetcher } from '../../../../app/api/ada/lib/state-fetch/IFetcher.types';
-import { RemoteFetcher as CardanoRemoteFetcher } from '../../../../app/api/ada/lib/state-fetch/remoteFetcher';
-import { BatchedFetcher as CardanoBatchedFetcher } from '../../../../app/api/ada/lib/state-fetch/batchedFetcher';
 import LocalStorageApi, {
   loadSubmittedTransactions,
 } from '../../../../app/api/localStorage/index';
@@ -75,8 +51,6 @@ import { asAddressedUtxo as asAddressedUtxoCardano, } from '../../../../app/api/
 import ConnectorStore from '../../../../app/connector/stores/ConnectorStore';
 import type { ForeignUtxoFetcher } from '../../../../app/connector/stores/ConnectorStore';
 import { find721metadata } from '../../../../app/utils/nftMetadata';
-import { hexToBytes } from '../../../../app/coreUtils';
-import { mergeWitnessSets } from '../../../../app/api/ada/transactions/utils';
 import { getDb, syncWallet } from '../state';
 import { getCardanoStateFetcher } from '../utils';
 import AdaApi from '../../../../app/api/ada';

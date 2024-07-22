@@ -6,7 +6,6 @@ import WalletTransaction from '../../domain/WalletTransaction';
 import LocalizableError from '../../i18n/LocalizableError';
 import type {
   TxMemoTableUpsert, TxMemoTablePreInsert, TxMemoPreLookupKey,
-  UpsertTxMemoFunc, DeleteTxMemoFunc, GetAllTxMemoFunc
 } from '../../api/ada/lib/storage/bridge/memos';
 import type { TxMemoTableRow } from '../../api/ada/lib/storage/database/memos/tables';
 import type { ProvidersType } from '../../api/externalStorage/index';

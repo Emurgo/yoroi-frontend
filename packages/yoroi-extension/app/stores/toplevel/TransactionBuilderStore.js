@@ -19,7 +19,6 @@ import { getDefaultEntryToken } from './TokenInfoStore';
 import {
   cardanoMinAdaRequiredFromAssets_coinsPerWord,
 } from '../../api/ada/transactions/utils';
-import { getReceiveAddress } from '../stateless/addressStores';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { maxSendableADA } from '../../api/ada/transactions/shelley/transactions';

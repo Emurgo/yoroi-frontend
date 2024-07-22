@@ -25,8 +25,8 @@ import { observer } from 'mobx-react';
 import useSwapForm from '../context/swap-form/useSwapForm';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import { CoreAddressTypes } from '../../../api/ada/lib/storage/database/primitives/enums';
-
 import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+
 export const PRICE_IMPACT_MODERATE_RISK = 1;
 export const PRICE_IMPACT_HIGH_RISK = 10;
 export const LIMIT_PRICE_WARNING_THRESHOLD = 0.1;

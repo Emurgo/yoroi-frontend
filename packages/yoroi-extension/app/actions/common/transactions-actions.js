@@ -1,7 +1,6 @@
 // @flow
 import { AsyncAction, Action } from '../lib/Action';
 import { Moment } from 'moment';
-import type { AddressRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { WalletState } from '../../../chrome/extension/background/types';
 
 // ======= TRANSACTIONS ACTIONS =======

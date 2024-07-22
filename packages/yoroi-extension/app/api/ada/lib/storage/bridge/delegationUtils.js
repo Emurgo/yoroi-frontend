@@ -3,7 +3,7 @@
 import BigNumber from 'bignumber.js';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 import { normalizeToAddress, unwrapStakingKey, } from './utils';
-import type { IGetAllUtxosResponse, IGetStakingKey, } from '../models/PublicDeriver/interfaces';
+import type { IGetAllUtxosResponse, } from '../models/PublicDeriver/interfaces';
 import { MultiToken, } from '../../../../common/lib/MultiToken';
 import type { WalletState } from '../../../../../../chrome/extension/background/types';
 
@@ -100,7 +100,7 @@ export function filterAddressesByStakingKey<T: { +address: string, ... }>(
 
 export async function getUtxoDelegatedBalance(
   wallet: WalletState,
-  stakingAddress: string,
+  _stakingAddress: string,
 ): Promise<MultiToken> {
   // TODO: need to also deal with pointer address summing
   // can get most recent pointer from getCurrentDelegation result

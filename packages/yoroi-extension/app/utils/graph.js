@@ -7,7 +7,6 @@ import {
   getNetworkById,
 } from '../api/ada/lib/storage/database/prepackaged/networks';
 import { MultiToken } from '../api/common/lib/MultiToken';
-import type { NetworkRow } from '../api/ada/lib/storage/database/primitives/tables';
 import type { PoolMeta, DelegationRequests } from '../stores/toplevel/DelegationStore';
 import type { TokenInfoMap } from '../stores/toplevel/TokenInfoStore';
 

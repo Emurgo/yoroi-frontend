@@ -15,10 +15,7 @@ import ConnectedWallet from './ConnectedWallet';
 import globalMessages, { connectorMessages } from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
-import type {
-  PublicDeriverCache,
-  ConnectingMessage,
-} from '../../../../chrome/extension/connector/types';
+import type { ConnectingMessage } from '../../../../chrome/extension/connector/types';
 import { LoadingWalletStates } from '../../types';
 import ProgressBar from '../ProgressBar';
 import { environment } from '../../../environment';

@@ -6,7 +6,6 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, intlShape } from 'react-intl';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { MultiToken, TokenLookupKey } from '../../../api/common/lib/MultiToken';
-import type { WalletChecksum } from '@emurgo/cip4-js';
 import { observer } from 'mobx-react';
 import { ReactComponent as NoDappsFoundImg } from '../../../assets/images/dapp-connector/no-dapps-connected.inline.svg';
 import { ReactComponent as NoDappsConnected } from '../../../assets/images/revamp/no-dapps-connected.inline.svg';
@@ -18,7 +17,6 @@ import WalletRowRevamp from './WalletRowRevamp';
 import { Box, Typography } from '@mui/material';
 import type { WalletState } from '../../../../chrome/extension/background/types';
 
-type WalletInfo = {| balance: null | MultiToken |};
 type Props = {|
   +whitelistEntries: ?Array<WhitelistEntry>,
   +activeSites: Array<string>,

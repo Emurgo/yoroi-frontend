@@ -1,16 +1,10 @@
 // @flow
-import { action, observable, runInAction } from 'mobx';
+import { action, observable } from 'mobx';
 import type { Node } from 'react';
 import { find, } from 'lodash';
 import Store from '../base/Store';
-import type {
-  ChangeModelPasswordFunc,
-  RemoveAllTransactionsFunc,
-  RenameModelFunc
-} from '../../api/common';
+import type { RemoveAllTransactionsFunc } from '../../api/common';
 import Request from '../lib/LocalizedRequest';
-import type { IConceptualWallet, } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
-import type { IPublicDeriver, } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import {
@@ -89,7 +83,6 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     oldPassword: string,
     newPassword: string
   |} => Promise<void> = async (request) => {
-    const newUpdateDate = new Date(Date.now());
     await this.changeSigningKeyRequest.execute(async () => {
       await changeSigningKeyPassword(request);
     });

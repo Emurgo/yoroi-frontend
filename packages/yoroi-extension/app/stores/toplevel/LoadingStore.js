@@ -15,7 +15,6 @@ import type { StoresMap } from '../index';
 import {
   TabIdKeys,
 } from '../../utils/tabManager';
-import type { lf$Database } from 'lovefield';
 
 type SellAdaParamsType = {|
   addr: string,

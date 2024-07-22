@@ -23,7 +23,6 @@ import type {
   TransferTx,
 } from '../../types/TransferTypes';
 import { genAddressLookup } from '../../stores/stateless/addressStores';
-import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 

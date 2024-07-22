@@ -14,11 +14,6 @@ import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import { Box } from '@mui/material';
 import AddCollateralPage from '../components/signin/AddCollateralPage';
-import {
-  isLedgerNanoWallet,
-  isTrezorTWallet,
-} from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import type { WalletState } from '../../../chrome/extension/background/types';
 import { getPrivateStakingKey } from '../../api/thunk';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';

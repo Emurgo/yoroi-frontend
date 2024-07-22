@@ -12,8 +12,6 @@ import NoWalletsDropdown from '../components/topbar/NoWalletsDropdown';
 import NavDropdown from '../components/topbar/NavDropdown';
 import NavDropdownRow from '../components/topbar/NavDropdownRow';
 import { ROUTES } from '../routes-config';
-import { asGetPublicKey } from '../api/ada/lib/storage/models/PublicDeriver/traits';
-import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { genLookupOrFail } from '../stores/stateless/tokenHelpers';
 import BuySellDialog from '../components/buySell/BuySellDialog';

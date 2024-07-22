@@ -12,11 +12,7 @@ import { Typography, Tooltip } from '@mui/material';
 import { truncateLongName, maxNameLengthBeforeTruncation } from '../../utils/formatters';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor } from 'react-intl';
-import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import { Bip44Wallet, } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import globalMessages from '../../i18n/global-messages';
-import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import type { WalletType } from '../../../chrome/extension/background/types';
 
 type Props = {|

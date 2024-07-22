@@ -29,8 +29,6 @@ import type { ISignRequest } from '../../api/common/lib/transactions/ISignReques
 import type { GetUtxoDataResponse, RemoteUnspentOutput, UtxoData, } from '../../api/ada/lib/state-fetch/types';
 import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import type { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
-import { isLedgerNanoWallet, isTrezorTWallet, } from '../../api/ada/lib/storage/models/ConceptualWallet';
 import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { IFetcher } from '../../api/ada/lib/state-fetch/IFetcher.types';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
@@ -47,18 +45,13 @@ import { MultiToken } from '../../api/common/lib/MultiToken';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { asAddressedUtxo, multiTokenFromCardanoValue, multiTokenFromRemote, } from '../../api/ada/transactions/utils';
 import {
-  connectorGetChangeAddress,
   _connectorGetUnusedAddresses,
   _connectorGetUsedAddressesWithPaginate,
-  connectorSendTxCardano,
   getScriptRequiredSigningKeys,
   resolveTxOrTxBody,
   _getOutputAddressesInSubmittedTxs,
 } from '../../../chrome/extension/connector/api';
-import { getWalletChecksum } from '../../api/export/utils';
-import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { loadSubmittedTransactions } from '../../api/localStorage';
-import { signTransaction as shelleySignTransaction } from '../../api/ada/transactions/shelley/transactions';
 import { LedgerConnect } from '../../utils/hwConnectHandler';
 import {
   buildConnectorSignedTransaction as buildSignedLedgerTransaction,
@@ -84,7 +77,7 @@ import { ampli } from '../../../ampli/index';
 import { noop } from '../../coreUtils';
 import { getWallets, signAndBroadcastTransaction, broadcastTransaction } from '../../api/thunk';
 import type { WalletState } from '../../../chrome/extension/background/types';
-import { CoreAddressTypes, TxStatusCodes, } from '../../api/ada/lib/storage/database/primitives/enums';
+import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 import { addressBech32ToHex } from '../../api/ada/lib/cardanoCrypto/utils';
 import AdaApi from '../../api/ada';
 

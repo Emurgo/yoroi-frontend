@@ -3,7 +3,6 @@
 import type { PublicDeriver } from '../../../../app/api/ada/lib/storage/models/PublicDeriver/index';
 import type { WalletState } from '../types';
 import {
-  asDisplayCutoff,
   asGetAllUtxos,
   asHasLevels,
   asGetPublicKey,
@@ -37,7 +36,6 @@ import AdaApi from '../../../../app/api/ada';
 import BigNumber from 'bignumber.js';
 import {
   asAddressedUtxo,
-  cardanoValueFromRemoteFormat,
   cardanoMinAdaRequiredFromRemoteFormat_coinsPerWord,
 } from '../../../../app/api/ada/transactions/utils';
 import { MultiToken } from '../../../../app/api/common/lib/MultiToken';
@@ -56,7 +54,8 @@ export async function getWalletState(publicDeriver: PublicDeriver<>): Promise<Wa
     const type = (() => {
       if (isLedgerNanoWallet(publicDeriver.getParent())) {
         return 'ledger';
-      } else if (isTrezorTWallet(publicDeriver.getParent())) {
+      }
+      if (isTrezorTWallet(publicDeriver.getParent())) {
         return 'trezor';
       }
       return 'mnemonic';
@@ -68,8 +67,6 @@ export async function getWalletState(publicDeriver: PublicDeriver<>): Promise<Wa
     }
     const utxos = await withUtxos.getAllUtxos();
     const addressedUtxos = asAddressedUtxo(utxos).filter(u => u.assets.length > 0);
-    //   // <TODO:PLUTUS_SUPPORT>
-    const utxoHasDataHash = false;
     const config = getCardanoHaskellBaseConfig(network).reduce(
       (acc, next) => Object.assign(acc, next),
       {}
@@ -127,8 +124,6 @@ export async function getWalletState(publicDeriver: PublicDeriver<>): Promise<Wa
       throw new Error('unexpected missing asGetAllAccounting result');
     }
     const stakingKeyDbRow = await withStakingKey.getStakingKey();
-
-    const adaApi = new AdaApi();
 
     const withUtxoChains = asHasUtxoChains(publicDeriver);
     if (withUtxoChains == null) {
@@ -234,7 +229,8 @@ export async function getPlaceHolderWalletState(publicDeriver: PublicDeriver<>):
   const type = (() => {
     if (isLedgerNanoWallet(publicDeriver.getParent())) {
       return 'ledger';
-    } else if (isTrezorTWallet(publicDeriver.getParent())) {
+    }
+    if (isTrezorTWallet(publicDeriver.getParent())) {
       return 'trezor';
     }
     return 'mnemonic';

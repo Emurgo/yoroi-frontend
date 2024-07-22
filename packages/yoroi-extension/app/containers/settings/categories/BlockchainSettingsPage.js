@@ -10,7 +10,6 @@ import registerProtocols from '../../../uri-protocols';
 import environment from '../../../environment';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import NoWalletMessage from '../../wallet/NoWalletMessage';
-import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { Typography } from '@mui/material';
 import { settingsMenuMessages } from '../../../components/settings/menu/SettingsMenu';
 

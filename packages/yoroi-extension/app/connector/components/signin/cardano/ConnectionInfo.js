@@ -1,9 +1,6 @@
 // @flow
 import type { Node, ComponentType } from 'react';
-import type {
-  PublicDeriverCache,
-  WhitelistEntry,
-} from '../../../../../chrome/extension/connector/types';
+import type { WhitelistEntry } from '../../../../../chrome/extension/connector/types';
 import type { ConnectorIntl } from '../../../types';
 import { defineMessages, injectIntl } from 'react-intl';
 import { Box, Typography } from '@mui/material';
