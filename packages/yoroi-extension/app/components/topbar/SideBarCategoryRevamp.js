@@ -21,6 +21,7 @@ const ItemWrapper = styled(Box)(({ theme, active }) => ({
   background: active && theme.palette.ds.special_web_bg_sidebar,
   paddingTop: '8px',
   paddingBottom: '8px',
+  width: '100%',
 }));
 
 @observer
