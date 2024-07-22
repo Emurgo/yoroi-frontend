@@ -12,6 +12,7 @@ import type { Node } from 'react';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { formatValue, calculateAndFormatValue } from '../../utils/unit-of-account';
 import { Typography } from '@mui/material';
+import { fontWeight } from '../../styles/themes/tokens/tokens';
 
 type Props = {|
   +showAmount?: boolean,
@@ -32,14 +33,7 @@ export default class AmountDisplay extends Component<Props> {
   };
 
   render(): Node {
-    const {
-      amount,
-      shouldHideBalance,
-      showFiat,
-      showAmount,
-      unitOfAccountSetting,
-      id,
-    } = this.props;
+    const { amount, shouldHideBalance, showFiat, showAmount, unitOfAccountSetting, id } = this.props;
     if (amount == null) {
       return <div className={styles.isLoading} />;
     }
@@ -62,10 +56,7 @@ export default class AmountDisplay extends Component<Props> {
     } else {
       const shiftedAmount = defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
-      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-        shiftedAmount,
-        tokenInfo.Metadata.numberOfDecimals
-      );
+      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(shiftedAmount, tokenInfo.Metadata.numberOfDecimals);
 
       balanceDisplay = (
         <>
@@ -94,30 +85,21 @@ export default class AmountDisplay extends Component<Props> {
     return (
       <>
         {showAmount === true && (
-          <Typography
-            variant="body1"
-            color="ds.text_gray_normal"
-            className={styles.amount}
-            id={id + '-availableBalance-text'}
-          >
+          <Typography variant="body2" color="ds.text_gray_normal" fontWeight="500" id={id + '-availableBalance-text'} mt="10px">
             {balanceDisplay}&nbsp;{truncateToken(getTokenName(tokenInfo))}
           </Typography>
         )}
         {showFiat === true && (
-          <div className={styles.fiat} id={id + '-availableFiatBalance-text'}>
+          <Typography mb="5px" color="ds.text_gray_medium" fontSize="12px" id={id + '-availableFiatBalance-text'}>
             {fiatDisplay || '-'} {currency || 'USD'}
-          </div>
+          </Typography>
         )}
       </>
     );
   }
 }
 
-export function FiatDisplay(props: {|
-  shouldHideBalance: boolean,
-  amount: BigNumber | null,
-  currency: string,
-|}): Node {
+export function FiatDisplay(props: {| shouldHideBalance: boolean, amount: BigNumber | null, currency: string |}): Node {
   if (props.shouldHideBalance) {
     return (
       <span className={styles.fiat}>
