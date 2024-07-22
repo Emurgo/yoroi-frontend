@@ -95,7 +95,9 @@ async function updateServerStatusTick() {
 export function startMonitorServerStatus() {
   registerCallback(params => {
     if (params.type === 'subscriptionChange') {
-      updateServerStatusTick();
+      updateServerStatusTick().catch(error => {
+        console.error('error when updating server status', error)
+      });
     }
   });
 }

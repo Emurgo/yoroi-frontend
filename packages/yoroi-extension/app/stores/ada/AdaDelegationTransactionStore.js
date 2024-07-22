@@ -7,14 +7,6 @@ import LocalizedRequest from '../lib/LocalizedRequest';
 import type { CreateDelegationTxFunc, CreateWithdrawalTxResponse } from '../../api/ada';
 import { buildRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
-import {
-  getCardanoHaskellBaseConfig,
-  getNetworkById,
-} from '../../api/ada/lib/storage/database/prepackaged/networks';
-import {
-  isLedgerNanoWallet,
-  isTrezorTWallet,
-} from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import type { WalletState } from '../../../chrome/extension/background/types';

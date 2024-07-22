@@ -9,7 +9,6 @@ import { LedgerConnect } from '../../utils/hwConnectHandler';
 import Config from '../../config';
 
 import Store from '../base/Store';
-import LocalizedRequest from '../lib/LocalizedRequest';
 import { ROUTES } from '../../routes-config';
 import { convertToLocalizableError } from '../../domain/LedgerLocalizedError';
 
@@ -384,8 +383,6 @@ export default class LedgerConnectStore
 
     const { selectedNetwork } = this.stores.profile;
     if (selectedNetwork == null) throw new Error(`${nameof(this._prepareCreateHWReqParams)} no network selected`);
-
-    const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
 
     return {
       addressing: {

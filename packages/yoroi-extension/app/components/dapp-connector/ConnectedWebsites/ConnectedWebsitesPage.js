@@ -5,7 +5,7 @@ import type { WhitelistEntry } from '../../../../chrome/extension/connector/type
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, intlShape } from 'react-intl';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import type { MultiToken, TokenLookupKey } from '../../../api/common/lib/MultiToken';
+import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import { observer } from 'mobx-react';
 import { ReactComponent as NoDappsFoundImg } from '../../../assets/images/dapp-connector/no-dapps-connected.inline.svg';
 import { ReactComponent as NoDappsConnected } from '../../../assets/images/revamp/no-dapps-connected.inline.svg';

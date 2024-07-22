@@ -8,7 +8,6 @@ import type { ConfigType } from '../../../../config/config-types';
 import { withLayout } from '../../../styles/context/layout';
 import type { TokenEntry } from '../../../api/common/lib/MultiToken';
 import { Box, styled } from '@mui/system';
-import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import BuySellDialog from '../../../components/buySell/BuySellDialog';
 import DelegatedStakePoolCard from '../../../components/wallet/staking/dashboard-revamp/DelegatedStakePoolCard';
 import EpochProgressWrapper from '../../../components/wallet/staking/dashboard-revamp/EpochProgressWrapper';

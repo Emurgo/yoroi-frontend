@@ -5,7 +5,7 @@ import moment from 'moment/moment';
 import Store from './Store';
 import Request from '../lib/LocalizedRequest';
 import environment from '../../environment';
-import { getCSSCustomPropObject} from '../../styles/utils';
+import { getCSSCustomPropObject } from '../../styles/utils';
 import { LANGUAGES } from '../../i18n/translations';
 import type { LanguageType } from '../../i18n/translations';
 import type { SetCustomUserThemeRequest } from '../../api/localStorage/index';

@@ -1,6 +1,5 @@
 // @flow
 import { action, computed, observable, runInAction } from 'mobx';
-import { debounce, find } from 'lodash';
 import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
 import { ROUTES } from '../../routes-config';
@@ -8,21 +7,13 @@ import environment from '../../environment';
 import config from '../../config';
 import globalMessages from '../../i18n/global-messages';
 import type { Notification } from '../../types/notification.types';
-import type { CreateWalletResponse, RestoreWalletResponse } from '../../api/common/types';
-import type {
-  IGetLastSyncInfoResponse,
-  IGetPublic,
-  IGetSigningKey,
-} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import type { IGetLastSyncInfoResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { Logger, stringifyError } from '../../utils/logging';
-import { assuranceModes } from '../../config/transactionAssuranceConfig';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { createDebugWalletDialog } from '../../containers/wallet/dialogs/DebugWalletDialogContainer';
 import { createProblematicWalletDialog } from '../../containers/wallet/dialogs/ProblematicWalletDialogContainer';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import { getWalletChecksum } from '../../api/export/utils';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { WalletState } from '../../../chrome/extension/background/types';
 import { getWallets, subscribe, listenForWalletStateUpdate } from '../../api/thunk';
@@ -133,7 +124,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     return this.wallets.length > 0;
   }
 
-  refreshWalletFromRemote: (number) => Promise<void> = async publicDeriverId => {
+  refreshWalletFromRemote: (number) => Promise<void> = async _publicDeriverId => {
     // legacy code, no-op now, to be removed
   }
 
@@ -201,7 +192,9 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
           return;
         }
         if (params.isRefreshing) {
-          runInAction(() => this.wallets[index].isRefreshing = true);
+          runInAction(() => {
+            this.wallets[index].isRefreshing = true;
+          });
         } else {
           const newWalletState = await getWallets(params.publicDeriverId);
           runInAction(() => {

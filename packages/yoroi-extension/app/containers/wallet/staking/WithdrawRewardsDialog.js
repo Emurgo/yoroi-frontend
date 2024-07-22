@@ -18,7 +18,6 @@ import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { getDefaultEntryToken } from '../../../stores/toplevel/TokenInfoStore';
 import { genFormatTokenAmount, genLookupOrFail, getTokenName, } from '../../../stores/stateless/tokenHelpers';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
-import { isLedgerNanoWallet, isTrezorTWallet, } from '../../../api/ada/lib/storage/models/ConceptualWallet';
 import SpendingPasswordInput from '../../../components/widgets/forms/SpendingPasswordInput';
 import VerticallyCenteredLayout from '../../../components/layout/VerticallyCenteredLayout';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';

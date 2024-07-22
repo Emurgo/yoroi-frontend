@@ -3,6 +3,7 @@
 
 import { getWallets } from '../../../../app/api/common/index';
 import { PublicDeriver, } from '../../../../app/api/ada/lib/storage/models/PublicDeriver/index';
+import { asGetAllUtxos, } from '../../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   PendingSignData,
   WalletAuthEntry,

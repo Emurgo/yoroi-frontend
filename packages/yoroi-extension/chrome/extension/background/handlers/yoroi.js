@@ -113,7 +113,7 @@ import {
 import { upsertTxMemo, deleteTxMemo, getAllTxMemo } from '../../../../app/api/ada/lib/storage/bridge/memos';
 import type { AdaGetTransactionsRequest } from '../../../../app/api/ada';
 import type { BaseGetTransactionsRequest } from '../../../../app/api/common';
-import { createAuthEntry } from '../../../../app/connector/api/';
+import { createAuthEntry } from '../../../../app/connector/api';
 import { getWalletChecksum } from '../../../../app/api/export/utils';
 import { getAllTokenInfo } from '../../../../app/api/common/lib/tokens/utils';
 import {
@@ -123,7 +123,7 @@ import {
 } from '../../../../app/api/ada/lib/storage/bridge/explorers';
 import {
   transactionHexToHash,
-  transactionHexReplaceWitnessSet, 
+  transactionHexReplaceWitnessSet,
   transactionHexToWitnessSet,
 } from '../../../../app/api/ada/lib/cardanoCrypto/utils';
 
@@ -701,7 +701,7 @@ export async function yoroiMessageHandler(
     sendResponse(null);
   } else if (request.type === YOROI_MESSAGES.RENAME_CONCEPTUAL_WALLET) {
     const db = await getDb();
-    for (let publicDeriver of await loadWalletsFromStorage(db)) {
+    for (const publicDeriver of await loadWalletsFromStorage(db)) {
       if (publicDeriver.getParent().getConceptualWalletId() === request.request.conceptualWalletId) {
         await publicDeriver.getParent().rename({ newName: request.request.newName });
       }
@@ -857,7 +857,7 @@ export async function yoroiMessageHandler(
   } else if (request.type === YOROI_MESSAGES.REMOVE_ALL_TRANSACTIONS) {
     const publicDeriver: ?PublicDeriver<> = await getPublicDeriverById(request.request.publicDeriverId);
     if (!publicDeriver) {
-      sendResponse({ error: 'no public dervier'});
+      sendResponse({ error: 'no public dervier' });
       return;
     }
     const withLevels = asHasLevels(publicDeriver);
@@ -878,7 +878,7 @@ export async function yoroiMessageHandler(
   } else if (request.type === YOROI_MESSAGES.POP_ADDRESS) {
     const publicDeriver = await getPublicDeriverById(request.request.publicDeriverId);
     if (!publicDeriver) {
-      sendResponse({ error: 'no public dervier'});
+      sendResponse({ error: 'no public dervier' });
       return;
     }
     const withDisplayCutoff = asDisplayCutoff(publicDeriver);
@@ -890,7 +890,7 @@ export async function yoroiMessageHandler(
   } else if (request.type === YOROI_MESSAGES.REFRESH_TRANSACTIONS) {
     const publicDeriver: ?PublicDeriver<> = await getPublicDeriverById(request.request.publicDeriverId);
     if (!publicDeriver) {
-      sendResponse({ error: 'no public dervier'});
+      sendResponse({ error: 'no public dervier' });
       return;
     }
     const withLevels = asHasLevels(publicDeriver);
@@ -932,7 +932,7 @@ export async function yoroiMessageHandler(
   } else if (request.type === YOROI_MESSAGES.BROADCAST_TRANSACTION) {
     const publicDeriver: ?PublicDeriver<> = await getPublicDeriverById(request.request.publicDeriverId);
     if (!publicDeriver) {
-      sendResponse({ error: 'no public dervier'});
+      sendResponse({ error: 'no public dervier' });
       return;
     }
     let txs;
@@ -976,7 +976,7 @@ export async function yoroiMessageHandler(
   } else if (request.type === YOROI_MESSAGES.CONNECTOR_CREATE_AUTH_ENTRY) {
     const publicDeriver: ?PublicDeriver<> = await getPublicDeriverById(request.request.publicDeriverId);
     if (!publicDeriver) {
-      sendResponse({ error: 'no public dervier'});
+      sendResponse({ error: 'no public dervier' });
       return;
     }
     const withPubKey = asGetPublicKey(publicDeriver);
@@ -1012,7 +1012,7 @@ export async function yoroiMessageHandler(
     const { publicDeriverId, password, transactionHex } = request.request;
     const publicDeriver: ?PublicDeriver<> = await getPublicDeriverById(publicDeriverId);
     if (!publicDeriver) {
-      sendResponse({ error: 'no public dervier'});
+      sendResponse({ error: 'no public dervier' });
       return;
     }
     const signedWitnessSetHex = await connectorSignCardanoTx(
@@ -1033,7 +1033,7 @@ export async function yoroiMessageHandler(
   } else if (request.type === YOROI_MESSAGES.RESYNC_WALLET) {
     const publicDeriver: ?PublicDeriver<> = await getPublicDeriverById(request.request.publicDeriverId);
     if (!publicDeriver) {
-      sendResponse({ error: 'no public dervier'});
+      sendResponse({ error: 'no public dervier' });
       return;
     }
 
@@ -1050,7 +1050,7 @@ export function isYoroiMessage({ type }: {| type: string |}): boolean {
 
 async function getPublicDeriverById(publicDeriverId: number): Promise<?PublicDeriver<>> {
   const db = await getDb();
-  for (let publicDeriver of await loadWalletsFromStorage(db)) {
+  for (const publicDeriver of await loadWalletsFromStorage(db)) {
     if (publicDeriver.getPublicDeriverId() === publicDeriverId) {
       return publicDeriver;
     }

@@ -208,8 +208,8 @@ export type BroadcastTransactionRequestType = {|
     signedTxHex: string,
   |})
 |};
-export async function broadcastTransaction(request: BroadcastTransactionRequestType) {
-  const _result = await callBackground({ type: 'broadcast-transaction', request });
+export async function broadcastTransaction(request: BroadcastTransactionRequestType): Promise<void> {
+  await callBackground({ type: 'broadcast-transaction', request });
 }
 
 // Only mnemonic wallet has private staking key.
@@ -267,7 +267,7 @@ export async function refreshTransactions(
   return txs.map(tx => {
     // we know that there are only two types and only the Shelley one has the 'certificates'
     // field
-    if (tx.hasOwnProperty('certificates')) {
+    if (Object.prototype.hasOwnProperty.call(tx, 'certificates')) {
       return CardanoShelleyTransaction.fromData(deserializeShelleyTransactionCtorData(tx));
     }
     return CardanoByronTransaction.fromData(deserializeByronTransactionCtorData(tx));
@@ -350,10 +350,10 @@ export type WalletStateUpdateParams = {|
   eventType: 'remove',
   publicDeriverId: number,
 |};
-export function listenForWalletStateUpdate(callback: (WalletStateUpdateParams) => Promise<void>) {
+export function listenForWalletStateUpdate(callback: (WalletStateUpdateParams) => Promise<void>): void {
   callbacks.walletStateUpdate.push(callback);
 }
 
-export function listenForServerStatusUpdate(callback: (Array<ServerStatus>) => Promise<void>) {
+export function listenForServerStatusUpdate(callback: (Array<ServerStatus>) => Promise<void>): void {
   callbacks.serverStatusUpdate.push(callback);
 }

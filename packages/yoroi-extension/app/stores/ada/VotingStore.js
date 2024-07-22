@@ -13,9 +13,6 @@ import {
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import TimeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
 import { generatePrivateKeyForCatalyst } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
-import { isLedgerNanoWallet, isTrezorTWallet, } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
-import { genOwnStakingKey } from '../../api/ada/index';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import type { StepStateEnum } from '../../components/widgets/ProgressSteps';
 import { StepState } from '../../components/widgets/ProgressSteps';
@@ -26,7 +23,6 @@ import cryptoRandomString from 'crypto-random-string';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { generateRegistration } from '../../api/ada/lib/cardanoCrypto/catalyst';
-import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet'
 import type { CatalystRoundInfoResponse } from '../../api/ada/lib/state-fetch/types'
 import { loadCatalystRoundInfo, saveCatalystRoundInfo, } from '../../api/localStorage';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';

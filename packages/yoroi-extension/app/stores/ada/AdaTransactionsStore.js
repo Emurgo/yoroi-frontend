@@ -9,12 +9,6 @@ import type {
 } from '../../api/common';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import {
-  PublicDeriver,
-} from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import {
-  HaskellShelleyTxSignRequest,
-} from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 
 export default class AdaTransactionsStore extends Store<StoresMap, ActionsMap> {
 

@@ -31,9 +31,6 @@ import {
 import { LedgerConnect } from '../../../utils/hwConnectHandler';
 import { ROUTES } from '../../../routes-config';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
-import {
-  ConceptualWallet
-} from '../../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { HaskellShelleyTxSignRequest } from '../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type {
   Addressing,

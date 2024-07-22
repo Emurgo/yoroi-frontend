@@ -8,7 +8,6 @@ import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import Voting from '../../../components/wallet/voting/Voting';
 import VotingRegistrationDialogContainer from '../dialogs/voting/VotingRegistrationDialogContainer';
 import { handleExternalLinkClick } from '../../../utils/routing';
-import { WalletTypeOption } from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import VerticallyCenteredLayout from '../../../components/layout/VerticallyCenteredLayout';
 import { CATALYST_DISPLAYED_MIN_AMOUNT, CATALYST_MIN_AMOUNT } from '../../../config/numbersConfig';
@@ -16,7 +15,6 @@ import InsufficientFundsPage from './InsufficientFundsPage';
 import { genLookupOrFail, getTokenName } from '../../../stores/stateless/tokenHelpers';
 import environment from '../../../environment';
 import RegistrationOver from './RegistrationOver';
-import { isLedgerNanoWallet, isTrezorTWallet, } from '../../../api/ada/lib/storage/models/ConceptualWallet/index';
 
 const messages: * = defineMessages({
   mainTitle: {

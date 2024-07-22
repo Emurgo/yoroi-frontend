@@ -64,7 +64,6 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
     const { phrase } = this.stores.walletRestore.recoveryResult;
     const { walletName, walletPassword } = this.stores.walletRestore.walletRestoreMeta;
 
-    const accountIndex = this.stores.walletRestore.selectedAccount;
     await this._restoreWallet({ walletName, walletPassword, recoveryPhrase: phrase });
   };
 

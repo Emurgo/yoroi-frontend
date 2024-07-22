@@ -21,9 +21,6 @@ import type { ActionsMap } from '../../../actions/index';
 import type { StoresMap } from '../../index';
 import { buildSignedTransaction } from '../../../api/ada/transactions/shelley/trezorTx';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
-import type {
-  ConceptualWallet
-} from '../../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { generateRegistrationMetadata } from '../../../api/ada/lib/cardanoCrypto/catalyst';
 import { derivePublicByAddressing } from '../../../api/ada/lib/cardanoCrypto/deriveByAddressing';
 import type { Addressing } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';

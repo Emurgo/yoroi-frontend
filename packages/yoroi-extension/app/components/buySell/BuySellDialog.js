@@ -271,7 +271,7 @@ export default class BuySellDialog extends Component<Props, State> {
           URL_GENERATION_TIMEOUT - URL_GENERATION_LONG_LOADING_TIMEOUT
         );
       },
-      URL_GENERATION_LONG_LOADING_TIMEOUT 
+      URL_GENERATION_LONG_LOADING_TIMEOUT
     );
 
     let url;
@@ -465,7 +465,7 @@ export default class BuySellDialog extends Component<Props, State> {
         </Dialog>
       );
     }
-      
+
     return (
       <Dialog
         title={intl.formatMessage(dialogTitle)}

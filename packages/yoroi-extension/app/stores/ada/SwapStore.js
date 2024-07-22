@@ -5,14 +5,14 @@ import type { ActionsMap } from '../../actions';
 import type { StoresMap } from '../index';
 import { action, computed, observable } from 'mobx';
 import type { StorageField } from '../../api/localStorage';
-import { createStorageFlag, loadSubmittedTransactions } from '../../api/localStorage';
+import { createStorageFlag } from '../../api/localStorage';
 import { createMetadata } from '../../api/ada/lib/storage/bridge/metadataUtils';
 import type { TxOutput } from '../../api/ada/transactions/shelley/transactions';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { Quantities } from '../../utils/quantities';
 import BigNumber from 'bignumber.js';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import { cast, fail, hexToBytes, listEntries, maybe, noop } from '../../coreUtils';
+import { cast, listEntries, maybe, noop } from '../../coreUtils';
 import {
   asAddressedUtxo as asAddressedUtxoCardano,
   asAddressedUtxo,
@@ -214,7 +214,7 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
       publicDeriverId: wallet.publicDeriverId,
       signedTxHexArray: signedTransactionHexes,
     });
-      
+
     // refresh call is non-blocking
     noop(this.stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId));
   };

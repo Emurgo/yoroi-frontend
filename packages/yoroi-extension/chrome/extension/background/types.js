@@ -10,7 +10,7 @@ import type { LastSyncInfoRow, } from '../../../app/api/ada/lib/storage/database
 import type { CoreAddressT } from '../../../app/api/ada/lib/storage/database/primitives/enums';
 import type { AssuranceMode } from '../../../app/types/transactionAssurance.types';
 import type { MultiToken } from '../../../app/api/common/lib/MultiToken';
-import type { FullAddressPayload, AddressRowWithPath} from '../../../app/api/ada/lib/storage/bridge/traitUtils';
+import type { FullAddressPayload, AddressRowWithPath } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 import type { PersistedSubmittedTransaction } from '../../../app/api/localStorage';
 
 export type WalletType = 'trezor' | 'ledger' | 'mnemonic';

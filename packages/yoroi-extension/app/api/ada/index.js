@@ -2257,7 +2257,7 @@ export default class AdaApi {
       submittedTransactions,
       publicDeriverId: wallet.getPublicDeriverId(),
     });
-      
+
   }
 
   async _getAllUsedAddresses(wallet: {
@@ -2336,7 +2336,7 @@ export default class AdaApi {
 
   async _createReorgTx(
     network: $ReadOnly<NetworkRow>,
-    defaultToken: DefaultTokenEntry, 
+    defaultToken: DefaultTokenEntry,
     publicDeriverId: number,
     allUtxoAddresses: IGetAllUtxoAddressesResponse,
     receiveAddress: BaseSingleAddressPath,
@@ -2376,7 +2376,7 @@ export default class AdaApi {
         publicDeriverId,
         allUtxoAddresses,
         submittedTxs,
-      )).filter(utxo => !dontUseUtxoIds.has(utxo.utxo_id)),      
+      )).filter(utxo => !dontUseUtxoIds.has(utxo.utxo_id)),
       null,
     );
 

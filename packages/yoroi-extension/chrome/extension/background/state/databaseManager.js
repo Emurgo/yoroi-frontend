@@ -15,7 +15,7 @@ export async function getDb(): Promise<lf$Database> {
   if (!dbCache) {
     dbCache = await loadLovefieldDB(schema.DataStoreType.INDEXED_DB);
   }
-  
+
   if (!migratePromiseCache) {
     migratePromiseCache =  migrateNoRefresh({
       localStorageApi,

@@ -20,7 +20,9 @@ import { Queue } from 'async-await-queue';
 
 registerCallback((params) => {
   if (params.type === 'subscriptionChange') {
-    refreshThreadMain();
+    refreshThreadMain().catch(error => {
+      console.error('error when refreshing:', error)
+    });
   }
 });
 

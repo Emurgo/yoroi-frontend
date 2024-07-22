@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import { Quantities } from '../../../utils/quantities';
 import { PRICE_PRECISION } from '../../../components/swap/common';
-import { maybe} from '../../../coreUtils';
+import { maybe } from '../../../coreUtils';
 import type { FormattedTokenValue, OrderAsset } from './util';
 import { createFormattedTokenValues } from './util';
 import { useAsyncMemo } from '../../../reactUtils';
@@ -69,7 +69,7 @@ export function useRichOrders(
   completedOrders: Array<MappedOrder>,
   transactionTimestamps: { [string]: Date },
 |} {
-  const {order, tokens, stakingKey} = useSwap()
+  const { order, tokens, stakingKey } = useSwap()
 
   /**
    * Fetch verified tokens list converted to map

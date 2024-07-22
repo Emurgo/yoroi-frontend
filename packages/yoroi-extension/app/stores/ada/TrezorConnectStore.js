@@ -2,24 +2,18 @@
 // Handles Connect to Trezor Hardware Wallet dialog
 
 import { action, observable } from 'mobx';
-
 import type { CardanoPublicKey, DeviceEvent, Success, UiEvent, Unsuccessful, } from 'trezor-connect-flow';
 import TrezorConnect from 'trezor-connect-flow';
-
 import Store from '../base/Store';
-import LocalizedRequest from '../lib/LocalizedRequest';
-
 import globalMessages from '../../i18n/global-messages';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
 import { CheckAddressesInUseApiError } from '../../api/common/errors';
 import { getTrezorManifest, wrapWithFrame, wrapWithoutFrame } from '../lib/TrezorWrapper';
 import { ROUTES } from '../../routes-config';
 import Config from '../../config';
-
 // This is actually just an interface
 import { HWConnectStoreTypes, HWDeviceInfo, ProgressInfo, ProgressStep } from '../../types/HWConnectStoreTypes';
 import { StepState } from '../../components/widgets/ProgressSteps';
-
 import { Logger, stringifyError } from '../../utils/logging';
 import { CoinTypes, HARD_DERIVATION_START, WalletTypePurpose, } from '../../config/numbersConfig';
 import { Bip44DerivationLevels, } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
@@ -339,8 +333,6 @@ export default class TrezorConnectStore
 
     const { selectedNetwork } = this.stores.profile;
     if (selectedNetwork == null) throw new Error(`${nameof(this._prepareCreateHWReqParams)} no network selected`);
-
-    const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
 
     return {
       addressing: {

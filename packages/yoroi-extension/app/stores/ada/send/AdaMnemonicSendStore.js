@@ -8,8 +8,6 @@ import {
 } from '../../../utils/logging';
 import { ROUTES } from '../../../routes-config';
 import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
-import { genOwnStakingKey } from '../../../api/ada/index';
-import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 import type { ActionsMap } from '../../../actions/index';
 import type { StoresMap } from '../../index';
 import { signAndBroadcastTransaction } from '../../../api/thunk';

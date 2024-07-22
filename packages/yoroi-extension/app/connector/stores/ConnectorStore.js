@@ -584,7 +584,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       ownAddresses
     );
 
-    let foreignInputDetails = [];
+    const foreignInputDetails = [];
     if (foreignInputs.length) {
       const foreignUtxos = await this.stores.substores.ada.stateFetchStore.fetcher.getUtxoData({
         network,

@@ -10,7 +10,6 @@ import URILandingDialog from '../../components/uri/URILandingDialog';
 import URIVerifyDialog from '../../components/uri/URIVerifyDialog';
 import URIInvalidDialog from '../../components/uri/URIInvalidDialog';
 import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 
 type Props = {|

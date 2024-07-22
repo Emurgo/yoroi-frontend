@@ -54,7 +54,8 @@ export default function Table({
       {columnNames.length > 0 && <Separator sx={{
         gridColumn: '1/-1',
         mb: '8px'
-      }}/>}
+      }}
+      />}
       {children}
     </Box>
   );

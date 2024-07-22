@@ -1,6 +1,5 @@
 // @flow
 
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
   AddressBookSubgroup,
   ByronAllAddressesSubgroup,
@@ -13,13 +12,9 @@ import {
   EnterpriseInternalAddressesSubgroup,
   RewardAddressesSubgroup,
 } from '../base/AddressSubgroupStore';
-import { CoinTypes, } from '../../config/numbersConfig';
-import type { CoinTypesT, } from '../../config/numbersConfig';
 import {
-  asHasUtxoChains, asHasLevels, asGetAllUtxos, asPickReceive,
+  asHasUtxoChains, asGetAllUtxos, asPickReceive,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
-import { Cip1852Wallet } from '../../api/ada/lib/storage/models/Cip1852Wallet/wrapper';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import type { AddressFilterKind, StandardAddress, AddressTypeName } from '../../types/AddressFilterTypes';
 import {
@@ -29,17 +24,11 @@ import {
   addressSubgroupName,
   addressGroupName,
 } from '../../types/AddressFilterTypes';
-import {
-  ConceptualWallet
-} from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import type { StoresMap } from '../index';
 import type { ActionsMap } from '../../actions';
 import { ROUTES } from '../../routes-config';
 import { buildRoute } from '../../utils/routing';
-import {
-  CardanoForks,
-  getNetworkById,
-} from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
 import type {
   Addressing,
@@ -80,19 +69,6 @@ function registerAddressSubgroup<T: IAddressTypeStore>(
 ): AddressSubgroupMeta<T> {
   allAddressSubgroups.push(category);
   return category;
-}
-
-function matchCoinType(
-  networkId: number,
-  match: CoinTypesT => boolean
-): boolean {
-  return match(getNetworkById(networkId).CoinType);
-}
-function matchForkType(
-  networkId: number,
-  match: number => boolean
-): boolean {
-  return match(getNetworkById(networkId).Fork);
 }
 
 const standardFilter = [
@@ -369,6 +345,7 @@ export function genAddressLookup(
 
 export const mangledStores = [BASE_MANGLED];
 
+// fixme: this function shouldn't be here
 export async function getReceiveAddress(
   publicDeriver: IPublicDeriver<>,
 ): Promise<void | BaseSingleAddressPath> {

@@ -96,7 +96,8 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
           key={option.value}
           value={option.value}
           sx={{ height: '80px' }}
-          id={'selectFiat-' + option.value + '-menuItem'}>
+          id={'selectFiat-' + option.value + '-menuItem'}
+        >
           <Box sx={{ display: 'flex' }}>
             <Box>
               <SvgElem className={styles.flag} width="38px" height="38px" />

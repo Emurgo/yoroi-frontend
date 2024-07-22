@@ -36,7 +36,7 @@ function addSubscription(tabId: number, activeWalletId: ?number) {
   dispatchCallbacks({ type: 'subscriptionChange' });
 }
 
-// we know that the frontend always opens 
+// we know that the frontend always opens
 export function subscribe(tabId: number, activeWalletId: ?number) {
   const subscription = findSubscriptionByTabId(tabId);
   if (subscription) {
@@ -69,5 +69,5 @@ declare var chrome;
 export function emitUpdateToSubscriptions(data: Object): void {
   for (const { tabId } of getSubscriptions()) {
     chrome.tabs.sendMessage(tabId, data);
-  }    
+  }
 }

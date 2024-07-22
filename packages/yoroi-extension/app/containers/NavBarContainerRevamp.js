@@ -156,10 +156,6 @@ export default class NavBarContainerRevamp extends Component<Props> {
       if (!selected) {
         return null;
       }
-      const formattedAddress = addressToDisplayString(
-        selected.receiveAddress.addr.Hash,
-        getNetworkById(selected.networkId),
-      );
 
       const { numberOfDecimals } = getTokenInfo(selected.balance.getDefaultEntry()).Metadata;
 

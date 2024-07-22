@@ -119,7 +119,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
 
   const fetchTransactionTimestamps = txHashes =>
     swapStore.fetchTransactionTimestamps({ wallet, txHashes });
-  let { openOrders, completedOrders, transactionTimestamps } = useRichOrders(
+  const { openOrders, completedOrders, transactionTimestamps } = useRichOrders(
     defaultTokenInfo,
     fetchTransactionTimestamps
   );
@@ -318,23 +318,23 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
         >
           {showCompletedOrders
             ? completedOrders.map(order => (
-                <OrderRow
-                  key={order.txId}
-                  order={order}
-                  defaultTokenInfo={defaultTokenInfo}
-                  selectedExplorer={selectedExplorer}
-                  txHashToRenderedTimestamp={txHashToRenderedTimestamp}
-                />
+              <OrderRow
+                key={order.txId}
+                order={order}
+                defaultTokenInfo={defaultTokenInfo}
+                selectedExplorer={selectedExplorer}
+                txHashToRenderedTimestamp={txHashToRenderedTimestamp}
+              />
               ))
             : openOrders.map(order => (
-                <OrderRow
-                  key={order.utxo}
-                  order={order}
-                  defaultTokenInfo={defaultTokenInfo}
-                  selectedExplorer={selectedExplorer}
-                  handleCancel={() => handleCancelRequest(order)}
-                  txHashToRenderedTimestamp={txHashToRenderedTimestamp}
-                />
+              <OrderRow
+                key={order.utxo}
+                order={order}
+                defaultTokenInfo={defaultTokenInfo}
+                selectedExplorer={selectedExplorer}
+                handleCancel={() => handleCancelRequest(order)}
+                txHashToRenderedTimestamp={txHashToRenderedTimestamp}
+              />
               ))}
         </Table>
       </Box>

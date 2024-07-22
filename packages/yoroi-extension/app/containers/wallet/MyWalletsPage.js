@@ -8,8 +8,6 @@ import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import { genLookupOrFail, getTokenName } from '../../stores/stateless/tokenHelpers';
-import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
-import { networks, getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { withLayout } from '../../styles/context/layout';
 import { Box } from '@mui/system';
 import MyWallets from '../../components/wallet/my-wallets/MyWallets';
@@ -173,7 +171,7 @@ class MyWalletsPage extends Component<AllProps> {
         }
         walletSumCurrencies={walletSumCurrencies}
         walletSubRow={() => this.createSubrow(wallet)}
-          walletPlate={<NavPlate plate={plate} walletType={wallet.type} name={wallet.name}/>}
+        walletPlate={<NavPlate plate={plate} walletType={wallet.type} name={wallet.name}/>}
         walletSync={
           <WalletSync
             time={lastSyncInfo.Time ? moment(lastSyncInfo.Time).fromNow() : null}

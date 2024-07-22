@@ -27,7 +27,6 @@ import WalletAlreadyExistDialog from '../../../components/wallet/WalletAlreadyEx
 import NavPlate from '../../../components/topbar/NavPlate';
 import WalletDetails from '../../../components/wallet/my-wallets/WalletDetails';
 import { ROUTES } from '../../../routes-config';
-import { MultiToken } from '../../../api/common/lib/MultiToken';
 
 const messages = defineMessages({
   walletUpgradeNoop: {

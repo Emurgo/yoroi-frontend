@@ -20,10 +20,8 @@ import type {
 import { allAddressSubgroups, applyAddressFilter, routeForStore, } from '../../stores/stateless/addressStores';
 import { observer } from 'mobx-react';
 import { observable, runInAction } from 'mobx';
-import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { validateAmount } from '../../utils/validations';
 import { Logger } from '../../utils/logging';
-import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { handleExternalLinkClick } from '../../utils/routing';
 import { genLookupOrFail, getTokenName } from '../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../utils/formatters';

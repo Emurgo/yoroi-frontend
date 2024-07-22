@@ -42,7 +42,7 @@ export default class ServerConnectionStore extends Store<StoresMap, ActionsMap> 
   @computed get checkAdaServerStatus(): ServerStatusErrorType {
     const serverStatus = this._getServerStatus();
     if (serverStatus) {
-      return serverStatus.isServerOk ? ServerStatusErrors.Healthy : ServerStatusErrors.Server; 
+      return serverStatus.isServerOk ? ServerStatusErrors.Healthy : ServerStatusErrors.Server;
     }
     // this is a temporary condition, we'll soon get an update
     return ServerStatusErrors.Healthy;

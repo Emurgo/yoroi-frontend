@@ -9,10 +9,11 @@ import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { HARD_DERIVATION_START } from '../../config/numbersConfig';
 import { createWallet } from '../../api/thunk';
-import type { Addressing } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import { asGetAllUtxos } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import type {
+  Addressing,
+  QueriedUtxo,
+} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { fail, first, sorted } from '../../coreUtils';
-import type { QueriedUtxo } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import BigNumber from 'bignumber.js';
 import type{ WalletState } from '../../../chrome/extension/background/types';
 
@@ -100,7 +101,7 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
       broadcastRequest = async () => {
         return await this.stores.substores.ada.trezorSend.signAndBroadcast({
           params: { signRequest },
-          wallet: wallet,
+          wallet,
         });
       };
       publicDeriverId = request.broadcastRequest.trezor.wallet.publicDeriverId;

@@ -21,7 +21,6 @@ import {
   isCardanoHaskell,
   getNetworkById,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import type { DefaultTokenEntry, TokenEntry } from '../../api/common/lib/MultiToken';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { genLookupOrFail, getTokenName } from '../stateless/tokenHelpers';
 import type { ActionsMap } from '../../actions/index';
@@ -290,7 +289,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
   /** Add a new public deriver to track and refresh the data */
   @action addObservedWallet: ({
-    publicDeriverId: number, lastSyncInfo: $ReadOnly<LastSyncInfoRow>, ... 
+    publicDeriverId: number, lastSyncInfo: $ReadOnly<LastSyncInfoRow>, ...
   }) => void = (
     publicDeriver
   ) => {

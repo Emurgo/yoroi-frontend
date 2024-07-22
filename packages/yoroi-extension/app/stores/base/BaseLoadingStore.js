@@ -1,17 +1,11 @@
 // @flow
-import type { lf$Database, lf$lovefieldExport, } from 'lovefield';
-import { schema, } from 'lovefield';
 import { computed, observable, runInAction } from 'mobx';
 import Store from './Store';
-import environment from '../../environment';
 import LocalizableError from '../../i18n/LocalizableError';
 import { UnableToLoadError } from '../../i18n/errors';
 import Request from '../lib/LocalizedRequest';
-import type { MigrationRequest } from '../../api/common/migration';
-import { migrateAndRefresh } from '../../api/common/migration';
 import { Logger, stringifyError } from '../../utils/logging';
 import { closeOtherInstances } from '../../utils/tabManager';
-import { importOldDb } from '../../api/ada/lib/storage/database/index';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
 /** Load dependencies before launching the app */

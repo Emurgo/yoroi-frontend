@@ -18,7 +18,6 @@ import ErrorBlock from '../../../components/widgets/ErrorBlock';
 import AnnotatedLoader from '../../../components/transfer/AnnotatedLoader';
 import DelegationSuccessDialog from '../../../components/wallet/staking/DelegationSuccessDialog';
 import type { PoolMeta } from '../../../stores/toplevel/DelegationStore';
-import { WalletTypeOption } from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import DelegationTxDialog from '../../../components/wallet/staking/DelegationTxDialog';
 import StakePool from '../../../components/wallet/staking/dashboard/StakePool';
 import SeizaFetcher from './SeizaFetcher';
