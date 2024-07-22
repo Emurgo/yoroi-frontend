@@ -226,6 +226,7 @@ export function NftImage({
           alignItems: 'center',
           justifyContent: 'center',
           height: '100%',
+          backgroundColor: 'ds.gray_c100',
         }}
       >
         <DefaultNFT />
@@ -288,7 +289,7 @@ const SButton = styled(IconButton)(({ theme, active }) => ({
   maxWidth: '40px',
   maxHeight: '40px',
   padding: '8px',
-  borderRadius: '4px',
+  borderRadius: '8px',
   '& svg': {
     '& path': {
       fill: theme.palette.ds.el_gray_normal,
