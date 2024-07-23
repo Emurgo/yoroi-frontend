@@ -190,11 +190,10 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                 objectFit: 'unset',
               },
               backgroundColor: 'ds.bg_color_low',
-              // height: '100%',
             }}
             onClick={() => nftImage !== null && setOpenAndTrack()}
           >
-            <NftImage imageUrl={nftImage} name={nftInfo.name || '-'} width="100%" height="auto" />
+            <NftImage imageUrl={nftImage} name={nftInfo.name || '-'} width="100%" height="auto" contentHeight="502px" />
           </ImageItem>
         </Grid>
 
@@ -397,8 +396,7 @@ const ImageItem = styled(Box)({
   alignItems: 'center',
   justifyContent: 'center',
   borderRadius: '8px',
-  height: '100%',
-  maxHeight: '502px',
+  // height: '100%',
   img: {
     margin: '0 auto',
     overflow: 'hidden',

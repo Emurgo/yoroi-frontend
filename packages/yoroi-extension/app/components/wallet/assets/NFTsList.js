@@ -188,12 +188,12 @@ function imageExists(imageSrc: string, onload: void => void, onerror: void => vo
   img.src = imageSrc;
 }
 
-const SvgWrapper = styled(Box)(({ theme }) => ({
+const SvgWrapper = styled(Box)(({ theme, height }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  height: '100%',
   backgroundColor: theme.palette.ds.gray_c100,
+  height,
   '& svg': {
     '& path': {
       fill: theme.palette.ds.el_gray_medium,
@@ -206,11 +206,13 @@ export function NftImage({
   name,
   width,
   height,
+  contentHeight,
 }: {|
   imageUrl: ?string,
   name: string,
   width: string,
   height: string,
+  contentHeight?: string,
 |}): Node {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -233,7 +235,7 @@ export function NftImage({
 
   if (error || url === null)
     return (
-      <SvgWrapper>
+      <SvgWrapper height={contentHeight}>
         <DefaultNFT />
       </SvgWrapper>
     );
@@ -264,7 +266,7 @@ function NftCardImage({ ipfsUrl, name }: {| ipfsUrl: string | null, name: string
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ borderRadius: '4px', overflow: 'hidden', flex: '1 1 auto' }}>
-        <NftImage imageUrl={ipfsUrl} name={name} width="100%" height="100%" />
+        <NftImage imageUrl={ipfsUrl} name={name} width="100%" height="100%" contentHeight="334px" />
       </Box>
       <Box>
         <Typography
