@@ -1,15 +1,6 @@
 // @flow
 import { TabContext, TabList, TabPanel } from '@mui/lab';
-import {
-  Button,
-  Grid,
-  IconButton,
-  Link as LinkMui,
-  Modal,
-  Stack,
-  Tab,
-  Typography,
-} from '@mui/material';
+import { Button, Grid, IconButton, Link as LinkMui, Modal, Stack, Tab, Typography } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { Box, styled } from '@mui/system';
 import type { ComponentType, Node } from 'react';
@@ -29,10 +20,7 @@ import { truncateAddress, truncateAddressShort } from '../../../utils/formatters
 import { NftImage } from './NFTsList';
 import { getNetworkUrl, tokenMessages } from './TokenDetails';
 import { CopyAddress, TruncatedText } from './TruncatedText';
-import type {
-  CardanoAssetMintMetadata,
-  NetworkRow,
-} from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { CardanoAssetMintMetadata, NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 
 type Props = {|
@@ -202,7 +190,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                 objectFit: 'unset',
               },
               backgroundColor: 'ds.bg_color_low',
-              height: '100%',
+              // height: '100%',
             }}
             onClick={() => nftImage !== null && setOpenAndTrack()}
           >
@@ -248,10 +236,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                     });
                   }}
                 >
-                  <SImageButton
-                    aria-label="Previous"
-                    sx={{ transform: 'rotate(180deg)', width: '32px' }}
-                  >
+                  <SImageButton aria-label="Previous" sx={{ transform: 'rotate(180deg)', width: '32px' }}>
                     <Chevron />
                   </SImageButton>
                 </Link>
@@ -318,14 +303,8 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
               value={tabs[0].id}
             >
               <Stack spacing="24px">
-                <LabelWithValue
-                  label={intl.formatMessage(messages.description)}
-                  value={nftInfo.description || '-'}
-                />
-                <LabelWithValue
-                  label={intl.formatMessage(messages.author)}
-                  value={nftInfo.author || '-'}
-                />
+                <LabelWithValue label={intl.formatMessage(messages.description)} value={nftInfo.description || '-'} />
+                <LabelWithValue label={intl.formatMessage(messages.author)} value={nftInfo.author || '-'} />
                 <LabelWithValue
                   label={intl.formatMessage(globalMessages.fingerprint)}
                   value={<CopyAddress text={nftInfo.id}>{displayAddr(nftInfo.id)}</CopyAddress>}
@@ -333,11 +312,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
 
                 <LabelWithValue
                   label={intl.formatMessage(tokenMessages.policyId)}
-                  value={
-                    <CopyAddress text={nftInfo.policyId}>
-                      {displayAddr(nftInfo.policyId)}
-                    </CopyAddress>
-                  }
+                  value={<CopyAddress text={nftInfo.policyId}>{displayAddr(nftInfo.policyId)}</CopyAddress>}
                 />
 
                 {isCardanoHaskell(network) && (
@@ -350,10 +325,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                     value={
                       <LinkMui
                         target="_blank"
-                        href={
-                          networkUrl != null &&
-                          `${networkUrl}/${nftInfo.policyId}${nftInfo.assetName}`
-                        }
+                        href={networkUrl != null && `${networkUrl}/${nftInfo.policyId}${nftInfo.assetName}`}
                         disabled={networkUrl == null}
                         rel="noopener noreferrer"
                         sx={{ textDecoration: 'none' }}
@@ -376,18 +348,12 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
               value={tabs[1].id}
             >
               {nftInfo.metadata && (
-                <CopyButton
-                  onClick={onCopyMetadata}
-                  color="inherit"
-                  endIcon={isCopied ? <IconCopied /> : <IconCopy />}
-                >
+                <CopyButton onClick={onCopyMetadata} color="inherit" endIcon={isCopied ? <IconCopied /> : <IconCopy />}>
                   {intl.formatMessage(messages.copyMetadata)}
                 </CopyButton>
               )}
               <Typography component="pre" variant="body2" lineHeight="22px">
-                {nftInfo.metadata
-                  ? JSON.stringify(nftInfo.metadata, null, 2)
-                  : intl.formatMessage(messages.missingMetadata)}
+                {nftInfo.metadata ? JSON.stringify(nftInfo.metadata, null, 2) : intl.formatMessage(messages.missingMetadata)}
               </Typography>
             </TabPanel>
           </TabContext>
@@ -431,12 +397,15 @@ const ImageItem = styled(Box)({
   alignItems: 'center',
   justifyContent: 'center',
   borderRadius: '8px',
+  height: '100%',
+  maxHeight: '502px',
   img: {
     margin: '0 auto',
     overflow: 'hidden',
     display: 'block',
     maxWidth: '365px',
     height: '100%',
+    objectFit: 'cover',
     objectFit: 'cover',
     borderRadius: '8px',
   },

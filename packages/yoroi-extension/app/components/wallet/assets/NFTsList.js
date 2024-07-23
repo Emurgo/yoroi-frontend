@@ -188,6 +188,19 @@ function imageExists(imageSrc: string, onload: void => void, onerror: void => vo
   img.src = imageSrc;
 }
 
+const SvgWrapper = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  height: '100%',
+  backgroundColor: theme.palette.ds.gray_c100,
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_medium,
+    },
+  },
+}));
+
 export function NftImage({
   imageUrl,
   name,
@@ -220,17 +233,9 @@ export function NftImage({
 
   if (error || url === null)
     return (
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: '100%',
-          backgroundColor: 'ds.gray_c100',
-        }}
-      >
+      <SvgWrapper>
         <DefaultNFT />
-      </Box>
+      </SvgWrapper>
     );
 
   if (loading) return <Skeleton variant="rectangular" animation="wave" sx={{ width, height }} />;
