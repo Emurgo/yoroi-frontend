@@ -12,16 +12,10 @@ type Props = {|
   slippageValue: string,
 |};
 
-export default function SlippageDialog({
-  onSetNewSlippage,
-  onClose,
-  slippageValue,
-}: Props): React$Node {
+export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValue }: Props): React$Node {
   const [selectedSlippage, setSelectedSlippage] = useState(slippageValue);
   const [inputFocused, setInputFocused] = useState(false);
-  const [isManualSlippage, setIsManualSlippage] = useState(
-    !defaultSlippages.includes(slippageValue)
-  );
+  const [isManualSlippage, setIsManualSlippage] = useState(!defaultSlippages.includes(slippageValue));
 
   const handleSlippageApply = () => {
     try {
@@ -56,15 +50,15 @@ export default function SlippageDialog({
       styleOverride={{ minWidth: '612px', height: '540px', maxWidth: '612px' }}
     >
       <Box sx={{ margin: '0 auto', flex: 1 }}>
-        <Box>
-          <Typography component="div" variant="body1" color="grayscale.900">
+        <Box sx={{ bg: 'ds.bg_color_low' }}>
+          <Typography component="div" variant="body1" color="ds.text_gray_normal">
             Default Slippage Tolerance
           </Typography>
         </Box>
         <Box pb="16px" pt="8px">
           <Typography component="div" variant="body2" color="grayscale.700">
-            Slippage tolerance is set as a percentage of the total swap value. Your transactions
-            will not be executed if the price moves by more than this amount.
+            Slippage tolerance is set as a percentage of the total swap value. Your transactions will not be executed if the price
+            moves by more than this amount.
           </Typography>
         </Box>
         <Box display="flex" justifyContent="flex-start" mb="32px">
@@ -99,7 +93,7 @@ export default function SlippageDialog({
               gridTemplateColumns: '1fr auto',
               justifyContent: 'start',
               position: 'relative',
-              bgcolor: readonly ? 'grayscale.50' : 'common.white',
+              bgcolor: readonly ? 'grayscale.50' : 'ds.bg_color_low',
               columnGap: '6px',
               rowGap: '8px',
               ...(!inputFocused &&
@@ -121,7 +115,8 @@ export default function SlippageDialog({
                 left: '16px',
                 position: 'absolute',
                 px: '4px',
-                bgcolor: 'common.white',
+                bgcolor: 'ds.bg_color_low',
+                color: 'ds.text_gray_normal',
               }}
             >
               Slippage tolerance
@@ -137,7 +132,7 @@ export default function SlippageDialog({
               component="input"
               type="text"
               variant="body1"
-              color="#000"
+              color="ds.text_gray_normal"
               placeholder="0"
               onChange={handleSlippageChange}
               bgcolor={readonly ? 'grayscale.50' : 'common.white'}
@@ -148,18 +143,12 @@ export default function SlippageDialog({
         </Box>
         <Box my="24px" p="16px" pt="12px" bgcolor="yellow.100" borderRadius="8px">
           <Typography component="div" variant="body1" color="grayscale.max">
-            When the slippage tolerance is set really high, it allows the transaction to still
-            complete despite large price swings. This can open the door to front-running and
-            sandwich attacks.
+            When the slippage tolerance is set really high, it allows the transaction to still complete despite large price
+            swings. This can open the door to front-running and sandwich attacks.
           </Typography>
         </Box>
         <Box pt="12px">
-          <Button
-            disabled={selectedSlippage.trim().length === 0}
-            fullWidth
-            onClick={handleSlippageApply}
-            variant="primary"
-          >
+          <Button disabled={selectedSlippage.trim().length === 0} fullWidth onClick={handleSlippageApply} variant="primary">
             Apply
           </Button>
         </Box>
