@@ -141,7 +141,6 @@ class WalletCommonBase extends BasePage {
       const rawBalanceText = await this.getText(this.walletBalanceTextLocator);
       const [numberPart, ] = rawBalanceText.split(' ');
       const digits = numberPart.split('\n');
-      console.log('digits', digits);
       return Number(digits.join(''));
     });
 
