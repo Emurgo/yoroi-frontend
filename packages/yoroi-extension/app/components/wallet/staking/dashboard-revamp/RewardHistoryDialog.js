@@ -58,7 +58,7 @@ function RewardHistoryDialog({ graphData, onClose, intl }: Props & Intl): Node {
       onClose={onClose}
     >
       <Box maxWidth="600px">
-        <Typography component="div" mb="24px" variant="body1" fontWeight={500}>
+        <Typography component="div" mb="24px" variant="body1" fontWeight={500} color="ds.text_gray_normal">
           {intl.formatMessage(globalMessages.rewardsListLabel)} ({rewardList.length})
         </Typography>
         <Box>

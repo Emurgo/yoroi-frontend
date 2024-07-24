@@ -53,13 +53,13 @@ type InjectedProps = {|
 
 type AllProps = {| ...Props, ...InjectedProps |};
 
-const StyledIframe = styled('iframe')({
-  backgroundColor: '#222',
+const StyledIframe = styled('iframe')(({ theme }) => ({
+  backgroundColor: theme.palette.ds.bg_color_low,
   filter: 'invert(0.9) hue-rotate(180deg)',
   width: '100%',
   height: '100%',
   border: 'none',
-});
+}));
 
 @observer
 class SeizaFetcher extends Component<AllProps> {
