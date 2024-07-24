@@ -20,6 +20,7 @@ import {
   isFirefox,
   isHeadless,
 } from './utils.js';
+import { defaultWaitTimeout } from '../helpers/timeConstants.js';
 
 const prefs = new logging.Preferences();
 prefs.setLevel(logging.Type.BROWSER, logging.Level.ALL);
@@ -146,7 +147,7 @@ export const getBuilder = () => {
 // getting a driver
 export const getDriver = () => {
   const driver = getBuilder().build();
-  driver.manage().setTimeouts({ implicit: 10000 });
+  driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
   if (isFirefox()) {
     driver.manage().window().maximize();
   }

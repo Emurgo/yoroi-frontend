@@ -2,7 +2,6 @@ import BasePage from './basepage.js';
 import { isChrome } from '../utils/utils.js';
 import {
   defaultWaitTimeout,
-  fiveSeconds,
   oneSecond,
   quarterSecond,
   twoSeconds,
@@ -132,13 +131,13 @@ class InitialStepsPage extends BasePage {
   }
   async skipInitialSteps() {
     this.logger.info(`InitialStepsPage::skipInitialSteps is called`);
-    await this.driver.manage().setTimeouts({ implicit: oneSecond });
+    await this.setImplicitTimeout(oneSecond, this.skipInitialSteps.name);
     await this.acceptToSPP();
     await this.skipAnalytics();
     if (isChrome()) {
       await this.skipCardanoPaymentUrls();
     }
-    await this.driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
+    await this.setImplicitTimeout(defaultWaitTimeout, this.skipInitialSteps.name);
   }
 }
 

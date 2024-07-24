@@ -210,9 +210,9 @@ class WalletCommonBase extends BasePage {
   }
   async goToSettingsTab() {
     this.logger.info(`WalletCommonBase::goToSettingsTab is called`);
-    await this.driver.manage().setTimeouts({ implicit: oneSecond });
+    await this.setImplicitTimeout(oneSecond, this.goToSettingsTab.name);
     await this.click(this.settingTabButtonLocator);
-    await this.driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
+    await this.setImplicitTimeout(defaultWaitTimeout, this.goToSettingsTab.name);
   }
   async openChangeWalletModal() {
     this.logger.info(`WalletCommonBase::openChangeWalletModal is called`);

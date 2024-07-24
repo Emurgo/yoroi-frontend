@@ -203,7 +203,7 @@ export class TransactionsSubTab extends WalletTab {
       method: 'xpath',
     };
     const result = [];
-    await this.driver.manage().setTimeouts({ implicit: twoSeconds });
+    await this.setImplicitTimeout(twoSeconds, this.__getTxsGroups.name);
     const allGroups = await this.findElements(locatorForAllGroups);
     for (let groupIndex = 0; groupIndex < allGroups.length; groupIndex++) {
       const groupDatePrettified = await this.getText(
@@ -215,7 +215,7 @@ export class TransactionsSubTab extends WalletTab {
         groupIndex,
       });
     }
-    await this.driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
+    await this.setImplicitTimeout(defaultWaitTimeout, this.__getTxsGroups.name);
     return result;
   }
   async getTxHashID(groupIndex, txIndex) {

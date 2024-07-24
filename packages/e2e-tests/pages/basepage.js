@@ -53,13 +53,13 @@ class BasePage {
   }
   async goToExtension() {
     this.logger.info('BasePage::goToExtension is called');
-    await this.driver.manage().setTimeouts({ implicit: halfSecond });
+    await this.setImplicitTimeout(halfSecond, this.goToExtension.name);
 
     const extURL = getExtensionUrl();
     await this.driver.get(extURL);
     await this.waitForElementLocated(this.rootLocator);
 
-    await this.driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
+    await this.setImplicitTimeout(defaultWaitTimeout, this.goToExtension.name);
   }
   async click(locator) {
     this.logger.info(`BasePage::click is called. Locator: ${JSON.stringify(locator)}`);
@@ -168,7 +168,7 @@ class BasePage {
   }
   async inputElem(webElement, value) {
     this.logger.info(
-      `BasePage::inputElem is called. WebElement: ${JSON.stringify(webElement)}, Value: ${value}`
+      `BasePage::inputElem is called. Value: ${value}`
     );
     await webElement.sendKeys(value);
   }
@@ -197,6 +197,10 @@ class BasePage {
     await this.sleep(200);
     await input.sendKeys(Key.NULL);
     await input.sendKeys(Key.DELETE);
+  }
+  async setImplicitTimeout(timeoutMs, functionName) {
+    this.logger.info(`BasePage::setImplicitTimeout is called. Function: ${functionName}. Timeout: ${timeoutMs}`);
+    await this.driver.manage().setTimeouts({ implicit: timeoutMs });
   }
   async getFromLocalStorage(key) {
     this.logger.info(`BasePage::getFromLocalStorage is called. Key: ${key}`);
@@ -323,18 +327,18 @@ class BasePage {
   ) {
     this.logger.info(`BasePage::customWaiter is called.`);
     const endTime = Date.now() + timeout;
-    await this.driver.manage().setTimeouts({ implicit: oneSecond });
+    await this.setImplicitTimeout(oneSecond, this.customWaiter.name);
 
     while (endTime >= Date.now()) {
       const conditionState = await conditionFunc();
       this.logger.info(`BasePage::customWaiter conditionState is ${conditionState}.`);
       if (conditionState) {
-        await this.driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
+        await this.setImplicitTimeout(defaultWaitTimeout, this.customWaiter.name);
         return true;
       }
       await this.sleep(repeatPeriod);
     }
-    await this.driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
+    await this.setImplicitTimeout(defaultWaitTimeout, this.customWaiter.name);
     return false;
   }
   async customWaitIsPresented(
@@ -399,18 +403,18 @@ class BasePage {
     this.logger.info(
       `BasePage::checkIfExists: Checking if element exists "${JSON.stringify(locator)}"`
     );
-    await this.driver.manage().setTimeouts({ implicit: oneSecond });
+    await this.setImplicitTimeout(oneSecond, this.checkIfExists.name);
     try {
       await this.findElement(locator);
       this.logger.info(`BasePage::checkIfExists: The element "${JSON.stringify(locator)}" exists`);
-      await this.driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
+      await this.setImplicitTimeout(defaultWaitTimeout, this.checkIfExists.name);
       return true;
     } catch (error) {
       this.logger.error(
         `BasePage::checkIfExists: The element "${JSON.stringify(locator)}" does not exists`
       );
       this.logger.error(`BasePage::checkIfExists: The error: ${JSON.stringify(error, null, 2)}`);
-      await this.driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
+      await this.setImplicitTimeout(defaultWaitTimeout, this.checkIfExists.name);
       return false;
     }
   }
