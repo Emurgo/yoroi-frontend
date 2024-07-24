@@ -1,15 +1,15 @@
-import * as React from 'react';
-import { styled } from '@mui/material/styles';
-import Typography from '@mui/material/Typography';
+import { Button } from '@mui/material';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import { Button } from '@mui/material';
-import { useNavigateTo } from '../../common/useNavigateTo';
-import { useGovernance } from '../../module/GovernanceContextProvider';
-import { useStrings } from '../../common/useStrings';
-import { useCreateAndSendDrepDelegationTransaction } from '../../api/useCreateAndSendDrepDelegationTransaction';
+import { styled } from '@mui/material/styles';
+import Typography from '@mui/material/Typography';
+import * as React from 'react';
 import { Collapsible } from '../../../../components/Collapsible/Collapsible';
 import { PasswordInput } from '../../../../components/Input/PasswordInput';
+import { useCreateAndSendDrepDelegationTransaction } from '../../api/useCreateAndSendDrepDelegationTransaction';
+import { useNavigateTo } from '../../common/useNavigateTo';
+import { useStrings } from '../../common/useStrings';
+import { useGovernance } from '../../module/GovernanceContextProvider';
 
 const Container = styled(Box)(() => ({
   paddingTop: '23px',
@@ -43,20 +43,27 @@ const Actions = styled(Stack)(() => ({
 
 export const DelagationForm = () => {
   const [passwaord, setPassword] = React.useState('');
+  const [isIncorectPasswaord, setIsIncorectPassword] = React.useState(false);
   const navigateTo = useNavigateTo();
-  const { governanceVote, walletId } = useGovernance();
+  const { governanceVote, walletId, checkUserPassword } = useGovernance();
   const strings = useStrings();
 
-  const confirmDelegation = () => {
-    // TODO mock functionality
-    if (passwaord.includes('oo')) {
-      navigateTo.transactionFail();
+  const confirmDelegation = async () => {
+    const response = await checkUserPassword(passwaord);
+    if (response?.name === 'WrongPassphraseError') {
+      setIsIncorectPassword(true);
+      // TODO - add this path once we have the submit api
+      // navigateTo.transactionFail();
     } else {
+      alert('Submit functionality is mocked and not yet implemented');
       navigateTo.transactionSubmited();
       useCreateAndSendDrepDelegationTransaction({ walletId, governanceVote });
     }
   };
-  const idPasswordInvalid = passwaord.match(/\d+/g);
+
+  React.useEffect(() => {
+    setIsIncorectPassword(false);
+  }, [passwaord]);
 
   return (
     <Container>
@@ -123,8 +130,8 @@ export const DelagationForm = () => {
           id="outlined-adornment-password"
           onChange={event => setPassword(event.target.value)}
           value={passwaord}
-          error={!!idPasswordInvalid}
-          helperText={idPasswordInvalid ? strings.wrongPassword : ' '}
+          error={!!isIncorectPasswaord}
+          helperText={isIncorectPasswaord ? strings.wrongPassword : ' '}
         />
       </Stack>
       <Actions direction="row" spacing="24px">
@@ -133,7 +140,7 @@ export const DelagationForm = () => {
           {strings.back}
         </Button>
         {/* @ts-ignore */}
-        <Button variant="primary" disabled={passwaord.length === 0 || idPasswordInvalid} onClick={confirmDelegation}>
+        <Button variant="primary" disabled={passwaord.length === 0} onClick={async () => confirmDelegation()}>
           {strings.confirm}
         </Button>
       </Actions>

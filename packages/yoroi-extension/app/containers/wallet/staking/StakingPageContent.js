@@ -6,9 +6,6 @@ import { Component } from 'react';
 import { intlShape } from 'react-intl';
 import type { ConfigType } from '../../../../config/config-types';
 import { withLayout } from '../../../styles/context/layout';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
-import type { LayoutComponentMap } from '../../../styles/context/layout';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { TokenEntry } from '../../../api/common/lib/MultiToken';
 
 import { Box, styled } from '@mui/system';
@@ -32,6 +29,9 @@ import WalletEmptyBanner from '../WalletEmptyBanner';
 import { GovernanceParticipateDialog } from '../dialogs/GovernanceParticipateDialog';
 import CardanoStakingPage from './CardanoStakingPage';
 import WithdrawRewardsDialog from './WithdrawRewardsDialog';
+import type { LayoutComponentMap } from '../../../styles/context/layout';
+import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -194,7 +194,6 @@ class StakingPageContent extends Component<AllProps> {
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingPageContent)} opened for non-reward wallet`);
     }
-    stores.delegation.checkGovernanceStatus(publicDeriver);
     const balance = stores.transactions.getBalance(publicDeriver);
     const isWalletWithNoFunds = balance != null && balance.getDefaultEntry().amount.isZero();
 
