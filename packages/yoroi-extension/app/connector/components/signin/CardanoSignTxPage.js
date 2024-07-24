@@ -44,7 +44,7 @@ import ConnectionInfo from './cardano/ConnectionInfo';
 import CardanoSignTxSummary from './cardano/SignTxSummary';
 import TextField from '../../../components/common/TextField';
 import ErrorBlock from '../../../components/widgets/ErrorBlock';
-import type { WalletState } from '../../../../chrome/extension/background/types';
+import type { WalletType, WalletState } from '../../../../chrome/extension/background/types';
 
 const messages = defineMessages({
   incorrectWalletPasswordError: {
@@ -91,7 +91,7 @@ type Props = {|
   +connectedWebsite: ?WhitelistEntry,
   +submissionError: ?SignSubmissionErrorType,
   +signData: ?{| address: string, payload: string |},
-  +walletType: 'ledger' | 'trezor' | 'mnemonic',
+  +walletType: WalletType,
   +hwWalletError: ?LocalizableError,
   +isHwWalletErrorRecoverable: ?boolean,
   +tx: ?string,
@@ -152,7 +152,7 @@ class SignTxPage extends Component<Props, State> {
   );
 
   submit(): void {
-    if (this.props.walletType === 'web') {
+    if (this.props.walletType === 'mnemonic') {
       this.form.submit({
         onSuccess: form => {
           const { walletPassword } = form.values();
@@ -489,7 +489,7 @@ class SignTxPage extends Component<Props, State> {
               variant="contained"
               color="primary"
               fullWidth
-              disabled={(walletType === 'web' && !walletPasswordField.isValid) || isSubmitting}
+              disabled={(walletType === 'mnemonic' && !walletPasswordField.isValid) || isSubmitting}
               onClick={this.submit.bind(this)}
               sx={{ minWidth: 0 }}
               id="confirmButton"
