@@ -506,7 +506,7 @@ export class MockDAppWebpage {
         });
     }, signedTxHex);
     this.logger.info(
-      `MockDApp::getBalance The response is ${JSON.stringify(submitResponse, null, 2)}`
+      `MockDApp::submitTx The response is ${JSON.stringify(submitResponse, null, 2)}`
     );
     return submitResponse;
   }
