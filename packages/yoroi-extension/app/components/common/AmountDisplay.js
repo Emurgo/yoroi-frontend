@@ -12,7 +12,6 @@ import type { Node } from 'react';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { formatValue, calculateAndFormatValue } from '../../utils/unit-of-account';
 import { Typography } from '@mui/material';
-import { fontWeight } from '../../styles/themes/tokens/tokens';
 
 type Props = {|
   +showAmount?: boolean,
