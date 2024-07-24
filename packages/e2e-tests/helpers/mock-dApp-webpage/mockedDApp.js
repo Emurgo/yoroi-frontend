@@ -307,7 +307,8 @@ export class MockDAppWebpage {
       `MockDApp::requestSigningTx Requesting signing the transaction: amount="${amount}", toAddress="${toAddress}"`
     );
 
-    const UTXOsreposne = await this.getUTXOs(amount, false);
+    const utxoAmount = Number(amount) + 1000000;
+    const UTXOsreposne = await this.getUTXOs(String(utxoAmount), false);
     this.logger.info(
       `MockDApp::requestSigningTx The UTXOsreposne: ${JSON.stringify(UTXOsreposne, null, 2)}`
     );
