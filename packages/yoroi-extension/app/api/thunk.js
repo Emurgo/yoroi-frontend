@@ -154,7 +154,7 @@ export async function renamePublicDeriver(
 export async function renameConceptualWallet(
   request: {| conceptualWalletId: number, newName: string |}
 ): Promise<void> {
-  await callBackground({ type: 'rename-conceputal-wallet', request, });
+  await callBackground({ type: 'rename-conceptual-wallet', request, });
 }
 
 // TODO: retire this API and replace with `signTransacton` and `broadcastTransaction`
