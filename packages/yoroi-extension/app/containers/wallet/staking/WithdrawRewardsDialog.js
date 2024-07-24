@@ -16,9 +16,9 @@ import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/util
 import { truncateAddress } from '../../../utils/formatters';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { getDefaultEntryToken } from '../../../stores/toplevel/TokenInfoStore';
-import { genFormatTokenAmount, genLookupOrFail, getTokenName, } from '../../../stores/stateless/tokenHelpers';
+import { genFormatTokenAmount, genLookupOrFail, getTokenName } from '../../../stores/stateless/tokenHelpers';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
-import { isLedgerNanoWallet, isTrezorTWallet, } from '../../../api/ada/lib/storage/models/ConceptualWallet';
+import { isLedgerNanoWallet, isTrezorTWallet } from '../../../api/ada/lib/storage/models/ConceptualWallet';
 import { asGetSigningKey } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
 import SpendingPasswordInput from '../../../components/widgets/forms/SpendingPasswordInput';
 import VerticallyCenteredLayout from '../../../components/layout/VerticallyCenteredLayout';
@@ -82,8 +82,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
   submit: void => Promise<void> = async () => {
     const selected = this.props.stores.wallets.selected;
     if (selected == null) throw new Error(`${nameof(WithdrawRewardsDialog)} no wallet selected`);
-    const signRequest = this.props.stores.substores.ada.delegationTransaction.createWithdrawalTx
-      .result;
+    const signRequest = this.props.stores.substores.ada.delegationTransaction.createWithdrawalTx.result;
     if (signRequest == null) return;
 
     if (this.spendingPasswordForm == null) {
@@ -155,10 +154,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
     const avatarSource = toSvg(currentPool, 36, { padding: 0 });
     const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
 
-    const {
-      createWithdrawalTx,
-      shouldDeregister,
-    } = this.props.stores.substores.ada.delegationTransaction;
+    const { createWithdrawalTx, shouldDeregister } = this.props.stores.substores.ada.delegationTransaction;
 
     if (this.props.stores.profile.selectedNetwork == null) {
       throw new Error(`${nameof(WithdrawRewardsDialog)} no selected network`);
@@ -167,26 +163,15 @@ export default class WithdrawRewardsDialog extends Component<Props> {
       this.props.stores.profile.selectedNetwork.NetworkId
     );
     const ticker = getTokenName(defaultToken);
-    const formatValue = genFormatTokenAmount(
-      genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)
-    );
+    const formatValue = genFormatTokenAmount(genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo));
 
     if (createWithdrawalTx.error != null)
-      return (
-        <YoroiTransferErrorPage
-          error={createWithdrawalTx.error}
-          onCancel={this.props.onClose}
-          classicTheme={false}
-        />
-      );
+      return <YoroiTransferErrorPage error={createWithdrawalTx.error} onCancel={this.props.onClose} classicTheme={false} />;
 
     const tentativeTx = createWithdrawalTx.result;
     if (!tentativeTx)
       return (
-        <Dialog
-          title={intl.formatMessage(globalMessages.processingLabel)}
-          closeOnOverlayClick={false}
-        >
+        <Dialog title={intl.formatMessage(globalMessages.processingLabel)} closeOnOverlayClick={false}>
           <Box width="350px">
             <LegacyTransferLayout>
               <VerticallyCenteredLayout>
@@ -234,9 +219,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
             onClick: this.props.onClose,
           },
           {
-            label: intl.formatMessage(
-              shouldDeregister ? messages.undelegateAnyway : globalMessages.confirm
-            ),
+            label: intl.formatMessage(shouldDeregister ? messages.undelegateAnyway : globalMessages.confirm),
             onClick: this.submit,
             primary: true,
             isSubmitting,
@@ -252,7 +235,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
           {shouldDeregister && (
             <Box mb="24px">
               <Warning>
-                <Typography component="div" variant="body1">
+                <Typography component="div" variant="body1" color="ds.text_gray_normal">
                   {intl.formatMessage(messages.deregistrationWarning)}
                 </Typography>
               </Warning>

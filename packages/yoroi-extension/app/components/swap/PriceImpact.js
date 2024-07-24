@@ -1,5 +1,5 @@
 // @flow
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Typography, useTheme } from '@mui/material';
 import { useSwap } from '@yoroi/swap';
 import type { Node } from 'react';
 import { ReactComponent as ErrorTriangleIcon } from '../../assets/images/revamp/error.triangle.svg';
@@ -12,7 +12,10 @@ import { PRICE_PRECISION } from './common';
 import type { PriceImpact } from './types';
 
 function colorsBySeverity(isSevere: boolean) {
-  return isSevere ? { fg: '#FF1351', bg: '#FFF1F5' } : { fg: '#ED8600', bg: '#FDF7E2' };
+  const theme = useTheme();
+  return isSevere
+    ? { fg: theme.palette.ds.text_error, bg: theme.palette.ds.sys_magenta_c100 }
+    : { fg: theme.palette.ds.sys_yellow_c500, bg: theme.palette.ds.sys_yellow_c100 };
 }
 
 export function PriceImpactColored({
@@ -53,15 +56,16 @@ export function PriceImpactIcon({ isSevere, small }: {| isSevere: boolean, small
 }
 
 function PriceImpactWarningText({ isSevere }: {| isSevere: boolean |}): Node {
+  const { palette } = useTheme();
   return isSevere ? (
-    <Typography component="div" variant="body1" color="ds.text_gray_normal">
-      <Typography component="span" fontWeight="500">
+    <Typography variant="body1" sx={{ color: palette.ds.text_gray_normal }}>
+      <Typography component="span" fontWeight="500" color="ds.text_gray_normal">
         Price impact over 10%&nbsp;
       </Typography>
       may cause a significant loss of funds. Please bear this in mind and proceed with an extra caution.
     </Typography>
   ) : (
-    <Typography component="div" variant="body1" color="ds.text_gray_normal">
+    <Typography component="div" variant="body1" color={palette.ds.text_gray_normal}>
       <Typography component="span" fontWeight="500">
         Price impact over 1%&nbsp;
       </Typography>
