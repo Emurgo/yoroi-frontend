@@ -198,7 +198,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
         } else {
           const newWalletState = await getWallets(params.publicDeriverId);
           runInAction(() => {
-            this.wallets.splice(index, 1, newWalletState[0]);
+            Object.assign(this.wallets[index], newWalletState[0]);
             this.initialSyncingWalletIds.delete(params.publicDeriverId);
             transactions.refreshTransactionData({
               publicDeriver: newWalletState[0],
