@@ -195,7 +195,7 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
 export function deserializeTransactionCtorData(serializedData: Object): CardanoShelleyTransactionCtorData {
   return {
     txid: serializedData.txid,
-    block: { ...serializedData, BlockTime: new Date(serializedData.block.BlockTime) },
+    block: { ...serializedData.block, BlockTime: new Date(serializedData.block.BlockTime) },
     type: serializedData.type,
     amount: MultiToken.from(serializedData.amount),
     fee: MultiToken.from(serializedData.fee),
