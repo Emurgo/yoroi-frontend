@@ -22,6 +22,7 @@ import CardanoByronTransaction, {
 } from '../domain/CardanoByronTransaction';
 import { MultiToken } from './common/lib/MultiToken';
 import type { ExplorerRow, PreferredExplorerRow } from './ada/lib/storage/database/explorers/tables';
+import { WrongPassphraseError } from './ada/lib/cardanoCrypto/cryptoErrors';
 
 /*::
 declare var chrome;
@@ -195,8 +196,7 @@ export async function signAndBroadcastTransaction(
     type: 'sign-and-broadcast-transaction',
     request: serializableRequest,
   });
-  // fixme handle failures
-  return result;
+  return handleWrongPassword(result);
 }
 
 export type BroadcastTransactionRequestType = {|
@@ -216,7 +216,8 @@ export async function broadcastTransaction(request: BroadcastTransactionRequestT
 export async function getPrivateStakingKey(
   request: {| publicDeriverId: number, password: string |}
 ): Promise<?string> {
-  return await callBackground({ type: 'get-private-staking-key', request });
+  const result = await callBackground({ type: 'get-private-staking-key', request });
+  return handleWrongPassword(result);
 }
 
 export async function getCardanoAssets(
@@ -320,7 +321,8 @@ export type SignTransactionRequestType = {|
   transactionHex: string
 |};
 export async function signTransaction(request: SignTransactionRequestType): Promise<string> {
-  return await callBackground({ type: 'sign-tx', request });
+  const result = await callBackground({ type: 'sign-tx', request });
+  return handleWrongPassword(result);
 }
 
 // Background -> UI notifications:
@@ -356,4 +358,14 @@ export function listenForWalletStateUpdate(callback: (WalletStateUpdateParams) =
 
 export function listenForServerStatusUpdate(callback: (Array<ServerStatus>) => Promise<void>): void {
   callbacks.serverStatusUpdate.push(callback);
+}
+
+function handleWrongPassword<T>(result: T): T {
+  if (result.error === 'IncorrectWalletPasswordError') {
+    throw new WrongPassphraseError();
+  }
+  if (result.error) {
+    throw new Error(result.error);
+  }
+  return result;
 }

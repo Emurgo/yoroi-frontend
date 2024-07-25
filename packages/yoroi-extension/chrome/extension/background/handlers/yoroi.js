@@ -801,8 +801,7 @@ export async function yoroiMessageHandler(
       });
       sendResponse(stakingKey.to_hex());
     } catch (error) {
-      // fixme
-      sendResponse({ error: 'wrong password' });
+      sendResponse({ error: error.name });
     }
   } else if (request.type === YOROI_MESSAGES.GET_CARDANO_ASSETS) {
     // fixme: cache
@@ -1015,21 +1014,25 @@ export async function yoroiMessageHandler(
       sendResponse({ error: 'no public dervier' });
       return;
     }
-    const signedWitnessSetHex = await connectorSignCardanoTx(
-      publicDeriver,
-      password,
-      {
-        tx: transactionHex,
-        tabId: -1,
-        partialSign: false
-      },
-    );
+    try {
+      const signedWitnessSetHex = await connectorSignCardanoTx(
+        publicDeriver,
+        password,
+        {
+          tx: transactionHex,
+          tabId: -1,
+          partialSign: false
+        },
+      );
 
-    const mergedWitnessSetHex = mergeWitnessSets(
-      transactionHexToWitnessSet(transactionHex),
-      signedWitnessSetHex,
-    );
-    sendResponse(transactionHexReplaceWitnessSet(transactionHex, mergedWitnessSetHex));
+      const mergedWitnessSetHex = mergeWitnessSets(
+        transactionHexToWitnessSet(transactionHex),
+        signedWitnessSetHex,
+      );
+      sendResponse(transactionHexReplaceWitnessSet(transactionHex, mergedWitnessSetHex));
+    } catch (error) {
+      sendResponse({ error: error.name });
+    }
   } else if (request.type === YOROI_MESSAGES.RESYNC_WALLET) {
     const publicDeriver: ?PublicDeriver<> = await getPublicDeriverById(request.request.publicDeriverId);
     if (!publicDeriver) {
