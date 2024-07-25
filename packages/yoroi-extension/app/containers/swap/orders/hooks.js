@@ -22,11 +22,12 @@ function mapOrderAssets(
   from: any,
   to: any,
 |} {
-  const price = Quantities.quotient(from.quantity, from.quantity);
+  const price = Quantities.quotient(from.quantity, to.quantity);
   const fromDecimals = from.token?.decimals ?? 0;
   const toDecimals = to.token?.decimals ?? 0;
   const priceDenomination = fromDecimals - toDecimals;
   const formattedPrice = Quantities.format(price, priceDenomination, PRICE_PRECISION);
+  console.log(price, formattedPrice, fromDecimals, toDecimals, priceDenomination);
   const formattedToQuantity = Quantities.format(
     to.quantity,
     toDecimals,
