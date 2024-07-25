@@ -3,7 +3,7 @@ import type { Node, ComponentType } from 'react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { injectIntl } from 'react-intl';
 import { observer } from 'mobx-react';
-import { Stack, Box, Typography } from '@mui/material';
+import { Stack, Box, Typography, styled } from '@mui/material';
 import { ReactComponent as StepMarkIcon } from '../../../assets/images/add-wallet/step-mark.inline.svg';
 import styles from './Stepper.scss';
 
@@ -19,6 +19,14 @@ type Props = {|
   setCurrentStep(stepId: string): void,
   sx?: Object,
 |};
+
+const IconWrapper = styled(Box)(({ theme, active }) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_normal,
+    },
+  },
+}));
 
 function Stepper(props: Props & Intl): Node {
   const { intl, steps, currentStep, setCurrentStep, sx } = props;
@@ -69,12 +77,15 @@ function Stepper(props: Props & Intl): Node {
               }}
             >
               {isPrevStep ? (
-                <StepMarkIcon />
+                <IconWrapper>
+                  <StepMarkIcon />
+                </IconWrapper>
               ) : (
-                <Typography component="div"
+                <Typography
+                  component="div"
                   variant="body2"
                   fontWeight={500}
-                  color={isCurrentStep ? 'common.white' : stepColor}
+                  color={isCurrentStep ? 'ds.text_gray_normal' : stepColor}
                   lineHeight="27px"
                 >
                   {idx + 1}
