@@ -360,7 +360,7 @@ export function listenForServerStatusUpdate(callback: (Array<ServerStatus>) => P
   callbacks.serverStatusUpdate.push(callback);
 }
 
-function handleWrongPassword<T>(result: T): T {
+function handleWrongPassword<T: { error?: string, ... }>(result: T): T {
   if (result.error === 'IncorrectWalletPasswordError') {
     throw new WrongPassphraseError();
   }
