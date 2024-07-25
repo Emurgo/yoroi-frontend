@@ -20,7 +20,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 
 @observer
-export default class WalletSettingsPage extends Component<StoresAndActionsProps> {
+export default class WalletSettingsPage extends Component <StoresAndActionsProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -37,8 +37,8 @@ export default class WalletSettingsPage extends Component<StoresAndActionsProps>
       renameConceptualWallet,
     } = actions.walletSettings;
 
-    const walletsStore = this.props.stores.wallets;
-    if (walletsStore.selected == null) {
+    const { selected: selectedWallet, selectedWalletName } = this.props.stores.wallets;
+    if (selectedWallet == null) {
       return (
         <>
           {this.getDialog(undefined)}
@@ -46,7 +46,10 @@ export default class WalletSettingsPage extends Component<StoresAndActionsProps>
         </>
       );
     }
-    const selectedWallet = walletsStore.selected;
+    if (selectedWalletName == null) {
+      throw new Error('unexpected nullish wallet name');
+    }
+
     let signingKeyUpdateDate = null;
     if (selectedWallet.signingKeyUpdateDate) {
       signingKeyUpdateDate = new Date(selectedWallet.signingKeyUpdateDate);
@@ -105,7 +108,7 @@ export default class WalletSettingsPage extends Component<StoresAndActionsProps>
           })}
         />
         <RemoveWallet
-          walletName={selectedWallet.name}
+          walletName={selectedWalletName}
           openDialog={() =>
             actions.dialogs.open.trigger({
               dialog: RemoveWalletDialogContainer,

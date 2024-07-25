@@ -32,7 +32,10 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   @observable initialSyncingWalletIds: Set<number> = observable.set();
   @observable wallets: Array<WalletState> = [];
-  @observable selectedIndex: null | number;
+  @observable selectedIndex: null | number = null;
+  // mobx is not smart enough to update the wallet name on the nav bar without this
+  @observable selectedWalletName: null | string = null;
+
   @observable getInitialWallets: Request<typeof getWallets> = new Request(getWallets);
 
   @observable sendMoneyRequest: SendMoneyRequest = new Request<
@@ -69,7 +72,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     wallets.setActiveWallet.listen(this._setActiveWallet);
   }
 
-  get selected(): null | WalletState {
+  @computed get selected(): null | WalletState {
     if (typeof this.selectedIndex === 'number') {
       return this.wallets[this.selectedIndex];
     }
@@ -234,6 +237,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       getNetworkById(this.wallets[walletIndex].networkId)
     );
     this.selectedIndex = walletIndex;
+    this.selectedWalletName = this.wallets[walletIndex].name;
     // Cache select wallet
     this.api.localStorage.setSelectedWalletId(publicDeriverId);
     subscribe(publicDeriverId);
@@ -247,6 +251,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   @action _unsetActiveWallet: void => void = () => {
     this.actions.profile.setSelectedNetwork.trigger(undefined);
     this.selectedIndex = null;
+    this.selectedWalletName = null;
   };
 
   // =================== PRIVATE API ==================== //
@@ -358,6 +363,10 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   isInitialSyncing: (number) => boolean = (publicDeriverId) => {
     return this.initialSyncingWalletIds.has(publicDeriverId);
+  }
+
+  @action onRenameSelectedWallet: (string) => void = (newName) => {
+    this.selectedWalletName = newName;
   }
 }
 

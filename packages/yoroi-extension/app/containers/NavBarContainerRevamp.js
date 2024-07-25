@@ -50,11 +50,11 @@ export default class NavBarContainerRevamp extends Component<Props> {
 
   render(): Node {
     const { stores, pageBanner } = this.props;
-    const { profile } = stores;
-    const { selected } = stores.wallets;
+    const { profile, wallets} = stores;
+    const { selected, selectedWalletName } = wallets;
 
     const DropdownHead = () => {
-      if (!selected) {
+      if (!selected || !selectedWalletName) {
         return null;
       }
       const { plate }= selected;
@@ -66,7 +66,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
       return (
         <NavWalletDetailsRevamp
           plate={plate}
-          name={selected.name}
+          name={selectedWalletName}
           onUpdateHideBalance={this.updateHideBalance}
           shouldHideBalance={profile.shouldHideBalance}
           rewards={rewards}

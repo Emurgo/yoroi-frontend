@@ -101,15 +101,15 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     //fixme: update memory directly?
   };
 
-  @action _renameConceptualWallet: {|
+   _renameConceptualWallet: {|
     conceptualWalletId: number,
     newName: string
   |} => Promise<void> = async (request) => {
-    // update the meta-parameters in the internal wallet representation
+    this.stores.wallets.onRenameSelectedWallet(request.newName);
+
     await this.renameModelRequest.execute(async () => {
       await renameConceptualWallet(request);
     });
-    //fixme: update memory directly?
   };
 
   @action _resyncHistory: {|

@@ -134,9 +134,9 @@ export default class NavBarContainer extends Component<Props> {
     })();
 
     const getPlate = () => {
-      const { selected } = walletsStore;
-      if (selected == null) return null;
-      return <NavPlate plate={selected.plate} walletType={selected.type} name={selected.name} />;
+      const { selected, selectedWalletName } = walletsStore;
+      if (selected == null || selectedWalletName == null) return null;
+      return <NavPlate plate={selected.plate} walletType={selected.type} name={selectedWalletName} />;
     };
 
     return (
