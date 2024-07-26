@@ -47,7 +47,11 @@ export default class BlockchainSettingsPage extends Component<StoresAndActionsPr
           </Typography>
         )}
         <ExplorerSettings
-          onSelectExplorer={this.props.actions.explorers.updateSelectedExplorer.trigger}
+          onSelectExplorer={({ explorerId }) =>
+            this.props.actions.explorers.updateSelectedExplorer.trigger(
+              { explorerId, networkId: selected.networkId }
+            )
+          }
           isSubmitting={isSubmittingExplorer}
           explorers={
             this.props.stores.explorers.allExplorers.get(selected.networkId) ??

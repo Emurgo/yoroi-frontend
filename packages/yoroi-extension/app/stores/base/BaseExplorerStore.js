@@ -62,9 +62,15 @@ export default class BaseExplorerStore
   }
 
   setSelectedExplorer: {|
-    explorer: $ReadOnly<ExplorerRow>,
+    networkId: number, explorerId: string,
   |} => Promise<void> = async (request): Promise<void> => {
-    await this.setSelectedExplorerRequest.execute(request);
+    const explorer = this.allExplorers.get(request.networkId)?.find(
+      ({ ExplorerId }) => request.explorerId === ExplorerId
+    );
+    if (!explorer) {
+      return;
+    }
+    await this.setSelectedExplorerRequest.execute({ explorer });
     await this.getSelectedExplorerRequest.execute(); // eagerly cache
   };
 }
