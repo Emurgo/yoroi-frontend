@@ -287,7 +287,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     }
     this.stores.delegation.poolInfoQuery.reset();
     await this.stores.delegation.poolInfoQuery.execute([poolId]);
-    await this.actions.ada.delegationTransaction.createTransaction.trigger({
+    await this.stores.substores.ada.delegationTransaction.createTransaction({
       poolRequest: poolId,
       publicDeriver: selectedWallet,
     });

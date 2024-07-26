@@ -61,7 +61,6 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     super.setup();
     this.reset({ justTransaction: false });
     const { ada } = this.actions;
-    ada.delegationTransaction.createTransaction.listen(this._createTransaction);
     ada.delegationTransaction.signTransaction.listen(this._signTransaction);
     ada.delegationTransaction.complete.listen(this._complete);
     ada.delegationTransaction.setShouldDeregister.listen(this._setShouldDeregister);
@@ -74,28 +73,27 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     this.shouldDeregister = shouldDeregister;
   };
 
-  // <TODO:INLINE> This function is only called from one place via indirection. Can be simplified
   @action
-  _createTransaction: ({|
+  createTransaction: ({|
     publicDeriver: PublicDeriver<>,
     poolRequest: string | void,
   |}) => Promise<void> = async request => {
     const publicDeriver = request.publicDeriver;
     const withUtxos = asGetAllUtxos(publicDeriver);
     if (withUtxos == null) {
-      throw new Error(`${nameof(this._createTransaction)} missing utxo functionality`);
+      throw new Error(`${nameof(this.createTransaction)} missing utxo functionality`);
     }
     const withHasUtxoChains = asHasUtxoChains(withUtxos);
     if (withHasUtxoChains == null) {
-      throw new Error(`${nameof(this._createTransaction)} missing chains functionality`);
+      throw new Error(`${nameof(this.createTransaction)} missing chains functionality`);
     }
     const withStakingKey = asGetAllAccounting(withHasUtxoChains);
     if (withStakingKey == null) {
-      throw new Error(`${nameof(this._createTransaction)} missing staking key functionality`);
+      throw new Error(`${nameof(this.createTransaction)} missing staking key functionality`);
     }
     const withPublicKey = asGetPublicKey(withStakingKey);
     if (withPublicKey == null) {
-      throw new Error(`${nameof(this._createTransaction)} missing public key functionality`);
+      throw new Error(`${nameof(this.createTransaction)} missing public key functionality`);
     }
     const basePubDeriver = withPublicKey;
 
@@ -116,7 +114,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
       absSlotNumber,
     }).promise;
     if (delegationTxPromise == null) {
-      throw new Error(`${nameof(this._createTransaction)} should never happen`);
+      throw new Error(`${nameof(this.createTransaction)} should never happen`);
     }
     await delegationTxPromise;
 
