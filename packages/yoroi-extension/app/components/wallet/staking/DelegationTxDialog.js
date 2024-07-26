@@ -371,9 +371,9 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
                 }
                 placement="top"
               >
-                <Box component="span" sx={{ cursor: 'pointer' }}>
+                <IconWrapper component="span" sx={{ cursor: 'pointer' }}>
                   <InfoIcon />
-                </Box>
+                </IconWrapper>
               </Tooltip>
             </Box>
             <Typography component="div" color="grayscale.900">
@@ -392,9 +392,9 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
                   </Typography>
                 }
               >
-                <Box component="span" sx={{ cursor: 'pointer' }}>
+                <IconWrapper component="span" sx={{ cursor: 'pointer' }}>
                   <InfoIcon />
-                </Box>
+                </IconWrapper>
               </Tooltip>
             </Box>
             <Typography component="div" color="grayscale.900">
