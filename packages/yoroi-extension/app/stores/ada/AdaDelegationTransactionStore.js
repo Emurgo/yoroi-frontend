@@ -76,7 +76,8 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
   @action
   createTransaction: ({|
     publicDeriver: PublicDeriver<>,
-    poolRequest: string | void,
+    poolRequest?: string,
+    drepCredential?: string,
   |}) => Promise<void> = async request => {
     const publicDeriver = request.publicDeriver;
     const withUtxos = asGetAllUtxos(publicDeriver);
@@ -109,6 +110,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     const delegationTxPromise = this.createDelegationTx.execute({
       publicDeriver: basePubDeriver,
       poolRequest: request.poolRequest,
+      drepCredential: request.drepCredential,
       registrationStatus: this.stores.delegation.isStakeRegistered(publicDeriver) === true,
       valueInAccount: this.stores.delegation.getRewardBalanceOrZero(publicDeriver),
       absSlotNumber,

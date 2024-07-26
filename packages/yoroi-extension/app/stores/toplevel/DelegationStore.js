@@ -281,15 +281,18 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
   };
 
   createDelegationTransaction: (string) => Promise<void> = async poolId => {
-    const selectedWallet = this.stores.wallets.selected;
-    if (selectedWallet == null) {
-      return;
-    }
     this.stores.delegation.poolInfoQuery.reset();
     await this.stores.delegation.poolInfoQuery.execute([poolId]);
     await this.stores.substores.ada.delegationTransaction.createTransaction({
       poolRequest: poolId,
-      publicDeriver: selectedWallet,
+      publicDeriver: this.stores.wallets.selectedOrFail,
+    });
+  };
+
+  createDrepDelegationTransaction: (string) => Promise<void> = async drepCredential => {
+    await this.stores.substores.ada.delegationTransaction.createTransaction({
+      drepCredential,
+      publicDeriver: this.stores.wallets.selectedOrFail,
     });
   };
 
