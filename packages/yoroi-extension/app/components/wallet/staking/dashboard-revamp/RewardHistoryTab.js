@@ -29,8 +29,9 @@ const ExpandMoreIcon = () => (
 
 const Accordion = styled((props /* AccordionProps */) => (
   <MuiAccordion TransitionProps={{ timeout: { exit: 500 } }} disableGutters elevation={0} square {...props} />
-))(() => ({
-  borderBottom: `1px solid var(--yoroi-palette-gray-50)`,
+))(({ theme }) => ({
+  backgroundColor: theme.palette.ds.bg_color_low,
+  borderBottom: theme.palette.ds.bg_color_low,
   '&:not(:last-child)': {
     borderBottom: 0,
   },

@@ -17,6 +17,7 @@ import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import VerticallyCenteredLayout from '../../../layout/VerticallyCenteredLayout';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import { groupByPoolName } from '../utils';
+import { useTheme } from '@mui/material';
 
 const messages = defineMessages({
   epoch: {
@@ -49,6 +50,7 @@ function RewardHistoryDialog({ graphData, onClose, intl }: Props & Intl): Node {
   const rewardItems = graphData.rewardsGraphData.items;
   const rewardList = rewardItems?.perEpochRewards.filter(p => Boolean(p.primary)) ?? [];
   const rewardsByPoolName = useMemo(() => groupByPoolName(rewardList), []);
+  const { palette } = useTheme();
 
   return (
     <Dialog
@@ -56,6 +58,7 @@ function RewardHistoryDialog({ graphData, onClose, intl }: Props & Intl): Node {
       closeOnOverlayClick={false}
       closeButton={<DialogCloseButton onClose={onClose} />}
       onClose={onClose}
+      styleContentOverride={{ background: palette.ds.bg_color_low }}
     >
       <Box maxWidth="600px">
         <Typography component="div" mb="24px" variant="body1" fontWeight={500} color="ds.text_gray_normal">
