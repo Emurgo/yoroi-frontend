@@ -1,11 +1,7 @@
 // @flow
-import { Component } from 'react';
-import type { Node } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { Box } from '@mui/system';
 import type { GraphItems } from '../dashboard/GraphWrapper';
-import { Stack, Typography } from '@mui/material';
-import { useTheme } from '@mui/material';
+import { Stack, Typography, Box } from '@mui/material';
 
 const graphVars = {
   barWidth: 10,
@@ -25,7 +21,6 @@ type Props = {|
 
 const RewardGraphClean = (props: Props): any => {
   const { hideYAxis, data, xAxisLabel, yAxisLabel, primaryBarLabel, epochTitle, stakepoolNameTitle } = props;
-  const { palette } = useTheme();
 
   const formatYAxis = value => (!hideYAxis ? value : '∗∗∗ ');
   const GraphTooltip = ({ active, payload, label }: {| active: boolean, payload: ?[any], label: string |}) => {

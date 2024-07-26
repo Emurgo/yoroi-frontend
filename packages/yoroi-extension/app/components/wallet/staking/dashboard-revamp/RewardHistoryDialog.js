@@ -5,11 +5,10 @@ import { useMemo } from 'react';
 import { observer } from 'mobx-react';
 import globalMessages from '../../../../i18n/global-messages';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
-import { Typography } from '@mui/material';
+import { Typography, Box, useTheme } from '@mui/material';
 import Dialog from '../../../widgets/Dialog';
 import { injectIntl, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { Box } from '@mui/system';
 import { RewardHistoryItem } from './RewardHistoryTab';
 import InvalidURIImg from '../../../../assets/images/uri/invalid-uri.inline.svg';
 import ErrorBlock from '../../../widgets/ErrorBlock';
@@ -17,7 +16,6 @@ import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import VerticallyCenteredLayout from '../../../layout/VerticallyCenteredLayout';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import { groupByPoolName } from '../utils';
-import { useTheme } from '@mui/material';
 
 const messages = defineMessages({
   epoch: {

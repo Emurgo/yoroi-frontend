@@ -1,5 +1,5 @@
 // @flow
-import { Button, Grid, IconButton, InputAdornment, OutlinedInput, Skeleton, Stack, Typography, Box, styled } from '@mui/material';
+import { Grid, IconButton, InputAdornment, OutlinedInput, Skeleton, Stack, Typography, Box, styled } from '@mui/material';
 import type { Node, ComponentType } from 'react';
 import { ReactComponent as Close } from '../../../assets/images/assets-page/close.inline.svg';
 import { ReactComponent as Grid2x2 } from '../../../assets/images/assets-page/grid-2x2.inline.svg';
@@ -275,7 +275,7 @@ function NftCardImage({ ipfsUrl, name }: {| ipfsUrl: string | null, name: string
   );
 }
 
-const SearchInput = styled(OutlinedInput)(({ theme }) => ({
+const SearchInput = styled(OutlinedInput)(() => ({
   width: '370px',
   height: '40px',
   padding: '10px 12px',
