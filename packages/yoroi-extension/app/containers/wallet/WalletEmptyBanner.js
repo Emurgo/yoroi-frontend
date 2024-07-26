@@ -32,7 +32,7 @@ function WalletEmptyBanner({ onBuySellClick, intl }: Props & Intl): Node {
     <Box>
       <Box
         sx={{
-          background: theme => theme.palette.background.gradients.walletEmptyCard,
+          background: theme => theme.palette.ds.bg_gradient_1,
           marginBottom: '40px',
           borderRadius: '8px',
           overflowY: 'hidden',
@@ -45,22 +45,10 @@ function WalletEmptyBanner({ onBuySellClick, intl }: Props & Intl): Node {
           <CoverBg />
         </Box>
         <Box>
-          <Typography
-            component="div"
-            variant="h3"
-            color="ds.text_gray_normal"
-            fontWeight={500}
-            mb="8px"
-          >
+          <Typography component="div" variant="h3" color="ds.text_gray_normal" fontWeight={500} mb="8px">
             {intl.formatMessage(messages.welcomeMessage)}
           </Typography>
-          <Typography
-            component="div"
-            variant="body1"
-            color="ds.text_gray_normal"
-            maxWidth="500px"
-            mb="40px"
-          >
+          <Typography component="div" variant="body1" color="ds.text_gray_normal" maxWidth="500px" mb="40px">
             {intl.formatMessage(messages.welcomeMessageSubtitle)}
           </Typography>
         </Box>

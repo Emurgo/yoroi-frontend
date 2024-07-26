@@ -10,28 +10,16 @@ type Props = {|
   onSuccess: void => void,
 |};
 
-export default function TxSubmittedStep({
-  txSubmitErrorState,
-  onTryAgain,
-  onSuccess,
-}: Props): React$Node {
+export default function TxSubmittedStep({ txSubmitErrorState, onTryAgain, onSuccess }: Props): React$Node {
   const isSuccessful = txSubmitErrorState.value == null;
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      gap="16px"
-      alignItems="center"
-      width="404px"
-      mx="auto"
-      mt="131px"
-    >
+    <Box display="flex" flexDirection="column" gap="16px" alignItems="center" width="404px" mx="auto" mt="131px">
       <Box>{isSuccessful ? <TxSuccessfulImage /> : <TxFailureImage />}</Box>
       <Box textAlign="center">
-        <Typography component="div" variant="h3" fontWeight={500} mb="4px">
+        <Typography component="div" variant="h3" fontWeight={500} mb="4px" color="ds.text_gray_normal">
           Transaction {isSuccessful ? 'submitted' : 'failed'}
         </Typography>
-        <Typography component="div" variant="body1" color="grayscale.600">
+        <Typography component="div" variant="body1" color="ds.text_gray_normal">
           {isSuccessful
             ? 'Check this transaction in the list of wallet transactions'
             : 'Your transaction has not been processed properly due to technical issues'}

@@ -141,21 +141,6 @@ class SeizaFetcher extends Component<AllProps> {
     intl: intlShape.isRequired,
   };
 
-  @action
-  applyIframeStyles: void => void = () => {
-    if (this.iframe == null) return;
-
-    const styles = `
-      document.body.style.backgroundColor = "#222";
-      document.body.style.filter = "invert(0.9) hue-rotate(180deg)";
-      setTimeout(() => 
-        [...document.images].forEach(i => i.style = 'filter:invert(1) hue-rotate(180deg)')
-      , 1000);
-    `;
-
-    // this.iframe.contentWindow.postMessage(styles, '*');
-  };
-
   render(): Node {
     const { urlTemplate, locale, bias, totalAda } = this.props;
 
@@ -247,16 +232,6 @@ class SeizaFetcher extends Component<AllProps> {
     // adds selected layout to customize revamp design
     finalURL += `&layout=${this.props.selectedLayout}`;
     finalURL += `&bias=${bias}`;
-
-    //   const styles = `
-    //   document.body.style.backgroundColor = "#222";
-    //   document.body.style.filter = "invert(0.9) hue-rotate(180deg)";
-    //   setTimeout(() => {
-    //     [...document.images].forEach(i => i.style.filter = "invert(1) hue-rotate(180deg)");
-    //   }, 1000);
-    // `;
-    //   const script = `javascript:(function() { ${styles} })()`;
-    //   finalURL += `&injectScript=${encodeURIComponent(script)}`;
 
     return finalURL;
   }

@@ -29,7 +29,7 @@ import { getTokenName, genFormatTokenAmount } from '../../../stores/stateless/to
 import { ReactComponent as InfoIcon } from '../../../assets/images/info-icon-revamp.inline.svg';
 
 import WarningBox from '../../widgets/WarningBox';
-import { Box, Tooltip, Typography } from '@mui/material';
+import { Box, Tooltip, Typography, styled } from '@mui/material';
 import { withLayout } from '../../../styles/context/layout';
 import type { InjectedLayoutProps } from '../../../styles/context/layout';
 import { toSvg } from 'jdenticon';
@@ -74,10 +74,17 @@ const messages = defineMessages({
   },
   amountToDelegateTip: {
     id: 'wallet.delegation.transaction.amountToDelegateTip',
-    defaultMessage:
-      '!!!Amount to delegate equals to your wallet balance at the moment of delegation',
+    defaultMessage: '!!!Amount to delegate equals to your wallet balance at the moment of delegation',
   },
 });
+
+const IconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_normal,
+    },
+  },
+}));
 
 type Props = {|
   +staleTx: boolean,
@@ -148,25 +155,17 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
       </div>
     );
 
-    const confirmButtonClasses = classnames([
-      'confirmButton',
-      this.props.isSubmitting ? styles.submitButtonSpinning : null,
-    ]);
+    const confirmButtonClasses = classnames(['confirmButton', this.props.isSubmitting ? styles.submitButtonSpinning : null]);
 
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
 
-    const decimalPlaces = this.props.getTokenInfo(this.props.amountToDelegate.getDefaultEntry())
-      .Metadata.numberOfDecimals;
-    const delegatingValue = new BigNumber(
-      this.props.amountToDelegate.getDefaultEntry().amount
-    ).shiftedBy(-decimalPlaces);
+    const decimalPlaces = this.props.getTokenInfo(this.props.amountToDelegate.getDefaultEntry()).Metadata.numberOfDecimals;
+    const delegatingValue = new BigNumber(this.props.amountToDelegate.getDefaultEntry().amount).shiftedBy(-decimalPlaces);
 
     const classicLayout = (
       <Dialog
         title={intl.formatMessage(
-          isRevampLayout
-            ? globalMessages.delegateLabel
-            : globalMessages.walletSendConfirmationDialogTitle
+          isRevampLayout ? globalMessages.delegateLabel : globalMessages.walletSendConfirmationDialogTitle
         )}
         actions={[
           {
@@ -198,9 +197,7 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
         </ul>
         <div className={styles.headerBlock}>
           <div className={styles.header}>{intl.formatMessage(messages.stakePoolName)}</div>
-          <div className={styles.content}>
-            {this.props.poolName ?? intl.formatMessage(globalMessages.unknownPoolLabel)}
-          </div>
+          <div className={styles.content}>{this.props.poolName ?? intl.formatMessage(globalMessages.unknownPoolLabel)}</div>
         </div>
         <div className={styles.headerBlock}>
           <div className={styles.header}>{intl.formatMessage(globalMessages.stakePoolHash)}</div>
@@ -223,9 +220,7 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
             label={intl.formatMessage(globalMessages.amountLabel)}
             decimalPlaces={decimalPlaces}
             disabled
-            currency={getTokenName(
-              this.props.getTokenInfo(this.props.amountToDelegate.getDefaultEntry())
-            )}
+            currency={getTokenName(this.props.getTokenInfo(this.props.amountToDelegate.getDefaultEntry()))}
             fees={formatValue(this.props.transactionFee.getDefaultEntry())}
             // note: we purposely don't put "total" since it doesn't really make sense here
             // since the fee is unrelated to the amount you're about to stake
@@ -245,25 +240,19 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
           </div>
         </div>
         {this.props.error ? (
-          <div className={styles.error}>
-            {intl.formatMessage(this.props.error, this.props.error.values)}
-          </div>
+          <div className={styles.error}>{intl.formatMessage(this.props.error, this.props.error.values)}</div>
         ) : null}
       </Dialog>
     );
 
     const avatarSource = toSvg(this.props.poolHash, 36, { padding: 0 });
     const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
-    const tokenTicker = getTokenName(
-      this.props.getTokenInfo(this.props.amountToDelegate.getDefaultEntry())
-    );
+    const tokenTicker = getTokenName(this.props.getTokenInfo(this.props.amountToDelegate.getDefaultEntry()));
 
     const revampLayout = (
       <Dialog
         title={intl.formatMessage(
-          isRevampLayout
-            ? globalMessages.delegateLabel
-            : globalMessages.walletSendConfirmationDialogTitle
+          isRevampLayout ? globalMessages.delegateLabel : globalMessages.walletSendConfirmationDialogTitle
         )}
         actions={[
           {
@@ -281,15 +270,17 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
         {this.props.staleTx && staleTxWarning}
         <Box
           sx={{
-            background: theme => theme.palette.gradients['blue-green-banner'],
+            background: theme => theme.palette.ds.bg_gradient_1,
             mb: '24px',
             p: '12px 16px 8px 16px',
             borderRadius: '8px',
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px', mb: '8px' }}>
-            <InfoIcon />
-            <Typography component="div" variant="body1" fontWeight={500} color="grayscale.900">
+            <IconWrapper>
+              <InfoIcon />
+            </IconWrapper>
+            <Typography component="div" variant="body1" fontWeight={500} color="ds.text_gray_normal">
               {intl.formatMessage(messages.delegationTips)}
             </Typography>
           </Box>
@@ -300,22 +291,20 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
             }}
             component="ul"
           >
-            {[messages.explanationLine1, messages.explanationLine2, messages.explanationLine3].map(
-              msg => {
-                const message = intl.formatMessage(msg);
-                return (
-                  <Box component="li" key={message}>
-                    <Typography component="div" variant="body1" color="grayscale.900">
-                      {message}
-                    </Typography>
-                  </Box>
-                );
-              }
-            )}
+            {[messages.explanationLine1, messages.explanationLine2, messages.explanationLine3].map(msg => {
+              const message = intl.formatMessage(msg);
+              return (
+                <Box component="li" key={message}>
+                  <Typography component="div" variant="body1" color="ds.text_gray_normal">
+                    {message}
+                  </Typography>
+                </Box>
+              );
+            })}
           </Box>
         </Box>
         <Box mb="16px">
-          <Typography component="div" variant="body1" color="grayscale.600" mb="4px">
+          <Typography component="div" variant="body1" color="ds.text_gray_normal" mb="4px">
             {intl.formatMessage(globalMessages.stakePoolChecksumAndName)}
           </Typography>
           <Box sx={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
@@ -332,7 +321,7 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
           </Box>
         </Box>
         <Box mb="24px">
-          <Typography component="div" variant="body1" color="grayscale.600">
+          <Typography component="div" variant="body1" color="ds.text_gray_normal">
             {intl.formatMessage(globalMessages.stakePoolHash)}
           </Typography>
           <Box>
@@ -371,7 +360,7 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
         >
           <Box>
             <Box display="flex" gap="6px" alignItems="center">
-              <Typography component="div" color="grayscale.600" variant="body1">
+              <Typography component="div" color="ds.text_gray_normal" variant="body1">
                 {intl.formatMessage(messages.amountToDelegate)}
               </Typography>
               <Tooltip
@@ -382,9 +371,9 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
                 }
                 placement="top"
               >
-                <Box component="span" sx={{ cursor: 'pointer' }}>
+                <IconWrapper component="span" sx={{ cursor: 'pointer' }}>
                   <InfoIcon />
-                </Box>
+                </IconWrapper>
               </Tooltip>
             </Box>
             <Typography component="div" color="grayscale.900">
@@ -393,7 +382,7 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
           </Box>
           <Box>
             <Box display="flex" gap="6px" alignItems="center">
-              <Typography component="div" color="grayscale.600" variant="body1">
+              <Typography component="div" color="ds.text_gray_normal" variant="body1">
                 {intl.formatMessage(messages.epochRewardLabel)}
               </Typography>
               <Tooltip
@@ -403,9 +392,9 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
                   </Typography>
                 }
               >
-                <Box component="span" sx={{ cursor: 'pointer' }}>
+                <IconWrapper component="span" sx={{ cursor: 'pointer' }}>
                   <InfoIcon />
-                </Box>
+                </IconWrapper>
               </Tooltip>
             </Box>
             <Typography component="div" color="grayscale.900">
@@ -417,7 +406,7 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
             </Typography>
           </Box>
           <Box>
-            <Typography component="div" color="grayscale.600" variant="body1">
+            <Typography component="div" color="ds.text_gray_normal" variant="body1">
               {intl.formatMessage(globalMessages.feeLabel)}
             </Typography>
             <Typography component="div" color="grayscale.900">
