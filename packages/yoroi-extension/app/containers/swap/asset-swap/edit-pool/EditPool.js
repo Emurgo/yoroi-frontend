@@ -53,14 +53,14 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
         }}
       >
         <Box display="flex" gap="8px" alignItems="center">
-          <Typography component="div" variant="body1" color="grayscale.600">
+          <Typography component="div" variant="body1" color="ds.text_gray_normal">
             DEX
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
           <Box display="flex" gap="8px" alignItems="center">
             <SwapPoolIcon provider={pool.provider} />
-            <Typography component="div" variant="body1" color="grayscale.max">
+            <Typography component="div" variant="body1" color="ds.text_gray_normal">
               {maybe(pool.provider, p => `${capitalize(p)} ${isAutoPool ? '(Auto)' : ''}`) ?? 'No pool found'}
             </Typography>
             {isLimitOrder && (
@@ -92,7 +92,7 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
           onClick={handleShowFullInfo}
         >
           {pool.provider && (
-            <Typography component="div" variant="body1" color="grayscale.max">
+            <Typography component="div" variant="body1" color="ds.text_gray_normal">
               {titleTotalFeesFormatted}
             </Typography>
           )}

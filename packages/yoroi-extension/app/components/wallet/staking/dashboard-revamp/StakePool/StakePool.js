@@ -43,12 +43,7 @@ const SocialExternalLink = ({ href, children }: {| href: string, children: Node 
   </StyledLink>
 );
 
-const StakingPoolSocialMedia = ({
-  socialLinks,
-  websiteUrl,
-  color,
-  isRevampLayout,
-}: Props & InjectedLayoutProps): Node => {
+const StakingPoolSocialMedia = ({ socialLinks, websiteUrl, color, isRevampLayout }: Props & InjectedLayoutProps): Node => {
   const twitter = socialLinks?.tw;
   const telegram = socialLinks?.tg;
   const facebook = socialLinks?.fb;
@@ -95,9 +90,7 @@ const StakingPoolSocialMedia = ({
         </SocialExternalLink>
       ) : null}
       {websiteUrl != null ? (
-        <SocialExternalLink href={websiteUrl}>
-          {isRevampLayout ? <PersonalIconRevamp /> : <PersonalIcon />}
-        </SocialExternalLink>
+        <SocialExternalLink href={websiteUrl}>{isRevampLayout ? <PersonalIconRevamp /> : <PersonalIcon />}</SocialExternalLink>
       ) : null}
     </List>
   );
@@ -109,14 +102,14 @@ type HelperTooltipProps = {|
   +message: string | Node,
   +placement?: string,
 |};
-const HelperTooltipComp = ({
-  message,
-  isRevampLayout,
-  placement,
-}: HelperTooltipProps & InjectedLayoutProps): Node => {
+const HelperTooltipComp = ({ message, isRevampLayout, placement }: HelperTooltipProps & InjectedLayoutProps): Node => {
   return (
     <Tooltip
-      title={<Typography component="div" variant="body2">{message}</Typography>}
+      title={
+        <Typography component="div" variant="body2">
+          {message}
+        </Typography>
+      }
       arrow
       placement={placement || 'right'}
     >

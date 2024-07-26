@@ -95,6 +95,7 @@ export default function SelectAssetDialog({
                 fontFamily: 'Rubik',
                 height: '40px',
                 backgroundColor: 'ds.bg_color_low',
+                color: 'ds.text_gray_normal',
                 '&:focus': {
                   borderWidth: '2px',
                   borderColor: 'grayscale.max',
@@ -139,7 +140,7 @@ export default function SelectAssetDialog({
             <Box mt="60px">
               <NoAssetsFound />
             </Box>
-            <Typography component="div" variant="body1" fontWeight={500}>
+            <Typography component="div" variant="body1" fontWeight={500} color="ds.text_gray_medium">
               {type === 'from' ? `No tokens found for “${searchTerm}”` : 'No asset was found to swap'}
             </Typography>
           </Box>

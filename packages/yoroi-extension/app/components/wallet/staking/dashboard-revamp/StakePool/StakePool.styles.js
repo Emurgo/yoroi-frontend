@@ -7,7 +7,12 @@ export const List: any = styled(Box)({
   alignItems: 'center',
 });
 
-export const StyledLink: any = styled(Link)({
+export const StyledLink: any = styled(Link)(({ theme }) => ({
   marginRight: '5px',
   color: 'inherit',
-});
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_normal,
+    },
+  },
+}));
