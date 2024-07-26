@@ -193,9 +193,9 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
 
 // fix Date, BigNumber and MultiToken values after deserialization
 export function deserializeTransactionCtorData(serializedData: Object): CardanoShelleyTransactionCtorData {
-  return {
+  const result: CardanoShelleyTransactionCtorData = {
     txid: serializedData.txid,
-    block: { ...serializedData.block, BlockTime: new Date(serializedData.block.BlockTime) },
+    block: undefined,
     type: serializedData.type,
     amount: MultiToken.from(serializedData.amount),
     fee: MultiToken.from(serializedData.fee),
@@ -221,4 +221,13 @@ export function deserializeTransactionCtorData(serializedData: Object): CardanoS
     })),
     isValid: serializedData.isValid,
   };
+
+  if (Object.prototype.hasOwnProperty.call(serializedData, 'ordinal')) {
+    result.ordinal = serializedData.ordinal;
+  }
+  if (Object.prototype.hasOwnProperty.call(serializedData, 'block')) {
+    result.block = { ...serializedData.block, BlockTime: new Date(serializedData.block.BlockTime) };
+  }
+
+  return result;
 }
