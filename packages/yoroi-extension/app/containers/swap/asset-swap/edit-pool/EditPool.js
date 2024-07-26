@@ -1,5 +1,5 @@
 // @flow
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, styled } from '@mui/material';
 import { useSwap } from '@yoroi/swap';
 import { capitalize } from 'lodash';
 import { useState } from 'react';
@@ -11,6 +11,14 @@ import { useSwapForm } from '../../context/swap-form';
 import { useSwapFeeDisplay } from '../../hooks';
 import SwapPoolFullInfo from './PoolFullInfo';
 import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
+
+const IconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_normal,
+    },
+  },
+}));
 
 type Props = {|
   +defaultTokenInfo: RemoteTokenInfo,
@@ -64,9 +72,9 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
               {maybe(pool.provider, p => `${capitalize(p)} ${isAutoPool ? '(Auto)' : ''}`) ?? 'No pool found'}
             </Typography>
             {isLimitOrder && (
-              <Box sx={{ cursor: 'pointer' }} onClick={isLimitOrder ? handleEditPool : undefined}>
+              <IconWrapper sx={{ cursor: 'pointer' }} onClick={isLimitOrder ? handleEditPool : undefined}>
                 <EditIcon />
-              </Box>
+              </IconWrapper>
             )}
           </Box>
         </Box>
