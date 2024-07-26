@@ -215,7 +215,7 @@
     "react-query": "^3.39.3",
     "react-router": "5.2.0",
     "react-router-dom": "5.2.0",
-    "recharts": "1.8.5",
+    "recharts": "2.12.7",
     "semver": "7.6.0",
     "stream-browserify": "3.0.0",
     "tinycolor2": "1.4.2",
