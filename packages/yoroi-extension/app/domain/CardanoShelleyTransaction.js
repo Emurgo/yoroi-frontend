@@ -192,22 +192,27 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
 }
 
 // fix Date, BigNumber and MultiToken values after deserialization
-export function deserializeTransactionCtorData(serializedData: Object): CardanoShelleyTransactionCtorData {
+// note: although the input is of `CardanoShelleyTransactionCtorData` type, its value is actually
+// serialized-and-deserialized
+export function deserializeTransactionCtorData(
+  serializedData: CardanoShelleyTransactionCtorData
+): CardanoShelleyTransactionCtorData {
   const result: CardanoShelleyTransactionCtorData = {
     txid: serializedData.txid,
     block: undefined,
     type: serializedData.type,
-    amount: MultiToken.from(serializedData.amount),
-    fee: MultiToken.from(serializedData.fee),
+    amount: MultiToken.from((serializedData.amount: any)),
+    fee: MultiToken.from((serializedData.fee: any)),
     date: new Date(serializedData.date),
     addresses: {
       from: serializedData.addresses.from.map(({ address, value }) => ({
         address,
-        value: MultiToken.from(value),
+        value: MultiToken.from((value: any)),
       })),
-      to: serializedData.addresses.to.map(({ address, value }) => ({
+      to: serializedData.addresses.to.map(({ address, value, isForeign }) => ({
         address,
-        value: MultiToken.from(value),
+        isForeign,
+        value: MultiToken.from((value: any)),
       })),
     },
     state: serializedData.state,
@@ -217,7 +222,7 @@ export function deserializeTransactionCtorData(serializedData: Object): CardanoS
     metadata: serializedData.metadata,
     withdrawals: serializedData.withdrawals.map(({ address, value }) => ({
       address,
-      value: MultiToken.from(value)
+      value: MultiToken.from((value: any))
     })),
     isValid: serializedData.isValid,
   };
@@ -225,7 +230,7 @@ export function deserializeTransactionCtorData(serializedData: Object): CardanoS
   if (Object.prototype.hasOwnProperty.call(serializedData, 'ordinal')) {
     result.ordinal = serializedData.ordinal;
   }
-  if (typeof serializedData.block === 'object') {
+  if (typeof serializedData.block === 'object' && serializedData.block !== null) {
     result.block = { ...serializedData.block, BlockTime: new Date(serializedData.block.BlockTime) };
   }
 
