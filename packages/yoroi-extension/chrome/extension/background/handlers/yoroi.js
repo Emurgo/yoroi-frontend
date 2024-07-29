@@ -126,6 +126,7 @@ import {
   transactionHexReplaceWitnessSet,
   transactionHexToWitnessSet,
 } from '../../../../app/api/ada/lib/cardanoCrypto/utils';
+import { fixMemoDate } from '../../../../app/api/thunk';
 
 const YOROI_MESSAGES = Object.freeze({
   CONNECT_RESPONSE: 'connect_response',
@@ -843,7 +844,7 @@ export async function yoroiMessageHandler(
     }
   } else if (request.type === YOROI_MESSAGES.UPSERT_TX_MEMO) {
     const db = await getDb();
-    const response = await upsertTxMemo({ db, memo: request.request.memo });
+    const response = await upsertTxMemo({ db, memo: fixMemoDate(request.request.memo) });
     sendResponse(response);
   } else if (request.type === YOROI_MESSAGES.DELETE_TX_MEMO) {
     const db = await getDb();

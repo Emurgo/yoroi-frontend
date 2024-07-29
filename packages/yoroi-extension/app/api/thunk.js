@@ -240,7 +240,8 @@ export async function deleteTxMemo(request: DeleteTxMemoRequestType): Promise<vo
 }
 
 export async function getAllTxMemos(): Promise<Array<TxMemoTableRow>>{
-  return await callBackground({ type: 'get-all-tx-memos' });
+  const result = await callBackground({ type: 'get-all-tx-memos' });
+  return result.map(fixMemoDate);
 }
 
 export async function removeAllTransactions(request: {| publicDeriverId: number |}): Promise<void> {
@@ -368,4 +369,9 @@ function handleWrongPassword<T: { error?: string, ... }>(result: T): T {
     throw new Error(result.error);
   }
   return result;
+}
+
+export function fixMemoDate(memo: TxMemoTableInsert | TxMemoTableRow): TxMemoTableInsert | TxMemoTableRow {
+  memo.LastUpdated = new Date(memo.LastUpdated);
+  return memo;
 }
