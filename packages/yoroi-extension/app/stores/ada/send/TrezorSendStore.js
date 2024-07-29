@@ -1,5 +1,5 @@
 // @flow
-import { action, observable } from 'mobx';
+import { action, observable  } from 'mobx';
 
 import Store from '../../base/Store';
 
@@ -124,9 +124,11 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
         network,
       });
 
-      const trezorSignTxResp = await wrapWithFrame(trezor => trezor.cardanoSignTransaction(
-        { ...trezorSignTxDataResp.trezorSignTxPayload }
-      ));
+      const trezorSignTxResp = await wrapWithFrame(trezor => {
+        return trezor.cardanoSignTransaction(
+          JSON.parse(JSON.stringify({ ...trezorSignTxDataResp.trezorSignTxPayload }))
+        );
+      });
 
       if (trezorSignTxResp && trezorSignTxResp.payload && trezorSignTxResp.payload.error != null) {
         // this Error will be converted to LocalizableError()
