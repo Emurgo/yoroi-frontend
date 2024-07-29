@@ -225,7 +225,7 @@ export function deserializeTransactionCtorData(serializedData: Object): CardanoS
   if (Object.prototype.hasOwnProperty.call(serializedData, 'ordinal')) {
     result.ordinal = serializedData.ordinal;
   }
-  if (Object.prototype.hasOwnProperty.call(serializedData, 'block')) {
+  if (serializedData?.block?.BlockTime instanceof Date) {
     result.block = { ...serializedData.block, BlockTime: new Date(serializedData.block.BlockTime) };
   }
 
