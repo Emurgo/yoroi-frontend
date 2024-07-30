@@ -182,13 +182,11 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     if (ticker == null) {
       throw new Error('unexpected default token type');
     }
-    /* fixme
+
     await this.stores.coinPriceStore.updateTransactionPriceData({
-      db: publicDeriver.getDb(),
       timestamps: Array.from(timestamps),
       defaultToken: ticker,
     });
-    */
 
     // reload token info cache
     await this.stores.tokenInfoStore.refreshTokenInfo();

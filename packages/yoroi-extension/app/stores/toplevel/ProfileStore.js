@@ -97,7 +97,6 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
         await this.stores.memos.loadFromStorage();
         await this.stores.tokenInfoStore.refreshTokenInfo();
         await this.stores.coinPriceStore.loadFromStorage();
-        this.stores.coinPriceStore.startPoll();
 
         await wallets.restoreWalletsFromStorage();
         subscribe();

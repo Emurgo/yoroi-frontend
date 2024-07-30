@@ -17,6 +17,7 @@ import type {
   BroadcastTransactionRequestType,
   ConnectorCreateAuthEntryRequestType,
   SignTransactionRequestType,
+  HistoricalCoinPricesRequest,
 } from '../../../app/api/thunk';
 import type { ExplorerRow } from '../../../app/api/ada/lib/storage/database/explorers/tables';
 
@@ -327,6 +328,13 @@ export type SaveSelectedExplorer = {|
 export type SignTransaction = {|
   type: 'sign-transaction',
   request: SignTransactionRequestType,
+|};
+export type RefreshCurrentCoinPrice = {|
+  type: 'refresh-current-coin-price',
+|};
+export type GetHistoricalCoinPrices = {|
+  type: 'get-historical-coin-prices',
+  request: HistoricalCoinPricesRequest,
 |};
 export type ConnectorCreateAuthEntry = {|
   type: 'connector-create-auth-entry',

@@ -4,6 +4,7 @@ import { handleInjectorMessage } from './handlers/content';
 import { isYoroiMessage, yoroiMessageHandler } from './handlers/yoroi';
 import { init } from './state';
 import { startMonitorServerStatus } from './serverStatus';
+import { startPoll } from './coinPrice';
 
 /*::
 declare var chrome;
@@ -36,3 +37,4 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 init().catch(console.error);
 startMonitorServerStatus();
+startPoll();

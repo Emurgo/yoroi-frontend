@@ -45,6 +45,8 @@ import type {
   PopAddress,
   RefreshTransactions,
   ResyncWallet,
+  RefreshCurrentCoinPrice,
+  GetHistoricalCoinPrices,
   ConnectorCreateAuthEntry,
   GetAllExplorers,
   GetSelectedExplorer,
@@ -127,6 +129,7 @@ import {
   transactionHexToWitnessSet,
 } from '../../../../app/api/ada/lib/cardanoCrypto/utils';
 import { fixMemoDate } from '../../../../app/api/thunk';
+import { refreshCurrentCoinPrice, getHistoricalCoinPrices } from '../coinPrice';
 
 const YOROI_MESSAGES = Object.freeze({
   CONNECT_RESPONSE: 'connect_response',
@@ -164,6 +167,8 @@ const YOROI_MESSAGES = Object.freeze({
   SAVE_SELECTED_EXPLORER: 'save-selected-explorer',
   SIGN_TRANSACTION: 'sign-transaction',
   RESYNC_WALLET: 'resync-wallet',
+  REFRESH_CURRENT_COIN_PRICE: 'refresh-current-coin-price',
+  GET_HISTORICAL_COIN_PRICES: 'get-historical-coin-prices',
 });
 
 // messages from other parts of Yoroi (i.e. the UI for the connector)
@@ -203,6 +208,8 @@ export async function yoroiMessageHandler(
     | SaveSelectedExplorer
     | SignTransaction
     | ResyncWallet
+    | GetHistoricalCoinPrices
+    | RefreshCurrentCoinPrice
   ),
   sender: any,
   sendResponse: Function,
@@ -1043,6 +1050,19 @@ export async function yoroiMessageHandler(
 
     await syncWallet(publicDeriver, 'UI resync');
     sendResponse(null);
+  } else if (request.type === YOROI_MESSAGES.REFRESH_CURRENT_COIN_PRICE) {
+    refreshCurrentCoinPrice('UI').catch(error => {
+      console.error('unexpected error when refreshing current coin price:', error);
+    });
+    sendResponse(null);
+  } else if (request.type === YOROI_MESSAGES.GET_HISTORICAL_COIN_PRICES) {
+    try {
+      const result = await getHistoricalCoinPrices(request.request);
+      sendResponse(result);
+    } catch (error) {
+      console.error('error when getting historical coin prices:', error);
+      sendResponse({ error: error.message });
+    }
   } else {
     console.error(`unknown message ${JSON.stringify(request)} from ${sender.tab.id}`)
   }

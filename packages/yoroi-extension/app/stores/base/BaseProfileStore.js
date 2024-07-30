@@ -21,10 +21,6 @@ import { noop } from '../../coreUtils';
 import type { Theme } from '../../styles/themes';
 import { THEMES } from '../../styles/themes';
 
-interface CoinPriceStore {
-  refreshCurrentUnit: Request<(void) => Promise<void>>;
-}
-
 interface LoadingStore {
   +registerBlockingLoadingRequest: (promise: Promise<void>, name: string) => void
 }
@@ -32,7 +28,6 @@ interface LoadingStore {
 export default class BaseProfileStore
   <
     TStores: {
-      +coinPriceStore: CoinPriceStore,
       +loading: LoadingStore,
       ...
     },
@@ -561,8 +556,6 @@ export default class BaseProfileStore
   _updateUnitOfAccount: UnitOfAccountSettingType => Promise<void> = async currency => {
     await this.setUnitOfAccountRequest.execute(currency);
     await this.getUnitOfAccountRequest.execute(); // eagerly cache
-
-    await this.stores.coinPriceStore.refreshCurrentUnit.execute().promise;
   };
 
   @computed get hasLoadedUnitOfAccount(): boolean {

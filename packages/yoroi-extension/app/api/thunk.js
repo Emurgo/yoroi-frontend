@@ -23,7 +23,7 @@ import CardanoByronTransaction, {
 import { MultiToken } from './common/lib/MultiToken';
 import type { ExplorerRow, PreferredExplorerRow } from './ada/lib/storage/database/explorers/tables';
 import { WrongPassphraseError } from './ada/lib/cardanoCrypto/cryptoErrors';
-
+import type { ResponseTicker } from './common/lib/state-fetch/types';
 /*::
 declare var chrome;
 */
@@ -326,10 +326,31 @@ export async function signTransaction(request: SignTransactionRequestType): Prom
   return handleWrongPassword(result);
 }
 
+export type HistoricalCoinPricesRequest = {|
+  from: string,
+  timestamps: Array<number>,
+|};
+export type HistoricalCoinPriceResponse = Array<$ReadOnly<{|
+  From: string,
+  To: string,
+  Time: Date,
+  Price: number,
+|}>>;
+export async function getHistoricalCoinPrices(
+  request: HistoricalCoinPricesRequest
+): Promise<HistoricalCoinPriceResponse> {
+  return await callBackground({ type: 'get-historical-coin-prices', request });
+}
+
+export function refreshCurrentCoinPrice(): void {
+  callBackground({ type: 'refresh-current-coin-price' });
+}
+
 // Background -> UI notifications:
 const callbacks = Object.freeze({
   walletStateUpdate: [],
   serverStatusUpdate: [],
+  coinPriceUpdate: [],
 });
 chrome.runtime.onMessage.addListener(async (message, _sender, _sendResponse) => {
   //fixme: verify sender.id/origin
@@ -339,6 +360,8 @@ chrome.runtime.onMessage.addListener(async (message, _sender, _sendResponse) => 
     callbacks.walletStateUpdate.forEach(callback => callback(message.params));
   } else if (message.type === 'server-status-update') {
     callbacks.serverStatusUpdate.forEach(callback => callback(message.params));
+  } else if (message.type === 'coin-price-update') {
+    callbacks.coinPriceUpdate.forEach(callback => callback(message.params));
   }
 });
 
@@ -353,12 +376,21 @@ export type WalletStateUpdateParams = {|
   eventType: 'remove',
   publicDeriverId: number,
 |};
+
+type CoinPriceUpdateParams = {|
+  ticker: ResponseTicker,
+|};
+                              
 export function listenForWalletStateUpdate(callback: (WalletStateUpdateParams) => Promise<void>): void {
   callbacks.walletStateUpdate.push(callback);
 }
 
 export function listenForServerStatusUpdate(callback: (Array<ServerStatus>) => Promise<void>): void {
   callbacks.serverStatusUpdate.push(callback);
+}
+
+export function listenForCoinPriceUpdate(callback: (CoinPriceUpdateParams) => void): void {
+  callbacks.coinPriceUpdate.push(callback);
 }
 
 function handleWrongPassword<T: { error?: string, ... }>(result: T): T {

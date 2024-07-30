@@ -70,8 +70,7 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
 
     const isSubmittingLocale = profileStore.setProfileLocaleRequest.isExecuting;
     const isSubmittingUnitOfAccount =
-      profileStore.setUnitOfAccountRequest.isExecuting ||
-      coinPriceStore.refreshCurrentUnit.isExecuting;
+      profileStore.setUnitOfAccountRequest.isExecuting;
     const { currentTheme } = profileStore;
 
     const currencies = profileStore.UNIT_OF_ACCOUNT_OPTIONS.map(c => {
