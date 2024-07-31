@@ -1,6 +1,6 @@
 // @flow
-import { observable, action, computed, isObservableArray } from 'mobx';
 import { isEqual } from 'lodash/fp';
+import { action, computed, isObservableArray, observable } from 'mobx';
 import { defineMessages } from 'react-intl';
 import LocalizableError from '../../i18n/LocalizableError';
 
@@ -12,7 +12,7 @@ const messages = defineMessages({
   promiseNotCalledYetError: {
     id: 'api.errors.PromiseNotCalledYetError',
     defaultMessage: '!!!Result accessed before execution finished.',
-  }
+  },
 });
 
 export type ApiCallType<Func: Function> = {|
@@ -22,7 +22,6 @@ export type ApiCallType<Func: Function> = {|
 
 // Note: Do not use this class directly. Only use LocalizedRequest or CachedLocalizedRequest
 export default class Request<Func: (...args: any) => Promise<any>, Err> {
-
   @observable result: ?PromisslessReturnType<Func> = null;
   @observable error: ?Err = null;
   @observable isExecuting: boolean = false;
@@ -45,9 +44,12 @@ export default class Request<Func: (...args: any) => Promise<any>, Err> {
 
     // This timeout is necessary to avoid warnings from mobx
     // regarding triggering actions as side-effect of getters
-    setTimeout(action('Request::execute (setting this.isExecuting)', () => {
-      this.isExecuting = true;
-    }), 0);
+    setTimeout(
+      action('Request::execute (setting this.isExecuting)', () => {
+        this.isExecuting = true;
+      }),
+      0
+    );
 
     const executionId = Math.random();
     this.currentlyExecuting.add(executionId);
@@ -57,44 +59,53 @@ export default class Request<Func: (...args: any) => Promise<any>, Err> {
         reject(new ApiMethodNotYetImplementedError());
       }
       this._method(...callArgs)
-        .then((result) => {
+        .then(result => {
           if (this.currentlyExecuting.has(executionId)) {
             this.currentlyExecuting.delete(executionId);
           } else {
             resolve(result);
             return;
           }
-          setTimeout(action('Request::execute/then', () => {
-            if (this.result != null && isObservableArray(this.result) && Array.isArray(result)) {
-              this.result.replace(result);
-            } else {
-              this.result = result;
-            }
-            if (this._currentApiCall) this._currentApiCall.result = result;
-            this.isExecuting = false;
-            this.wasExecuted = true;
-            this.error = null;
-            this._isWaitingForResponse = false;
-            resolve(result);
-          }), 1);
+          setTimeout(
+            action('Request::execute/then', () => {
+              if (this.result != null && isObservableArray(this.result) && Array.isArray(result)) {
+                this.result.replace(result);
+              } else {
+                this.result = result;
+              }
+              if (this._currentApiCall) this._currentApiCall.result = result;
+              this.isExecuting = false;
+              this.wasExecuted = true;
+              this.error = null;
+              this._isWaitingForResponse = false;
+              resolve(result);
+            }),
+            1
+          );
+          console.log('EXECUTE RESULT', result);
           return result;
         })
-        .catch(action('Request::execute/catch', (error) => {
-          if (this.currentlyExecuting.has(executionId)) {
-            this.currentlyExecuting.delete(executionId);
-          } else {
-            reject(error);
-            return;
-          }
-          setTimeout(action(() => {
-            this.error = error;
-            this.result = null;
-            this.isExecuting = false;
-            this.wasExecuted = true;
-            this._isWaitingForResponse = false;
-            reject(error);
-          }), 1);
-        }));
+        .catch(
+          action('Request::execute/catch', error => {
+            if (this.currentlyExecuting.has(executionId)) {
+              this.currentlyExecuting.delete(executionId);
+            } else {
+              reject(error);
+              return;
+            }
+            setTimeout(
+              action(() => {
+                this.error = error;
+                this.result = null;
+                this.isExecuting = false;
+                this.wasExecuted = true;
+                this._isWaitingForResponse = false;
+                reject(error);
+              }),
+              1
+            );
+          })
+        );
     });
 
     this._isWaitingForResponse = true;
@@ -103,11 +114,7 @@ export default class Request<Func: (...args: any) => Promise<any>, Err> {
   }
 
   isExecutingWithArgs(...args: Arguments<Func>): boolean {
-    return (
-      this.isExecuting &&
-      (this._currentApiCall != null)
-      && isEqual(this._currentApiCall.args, args)
-    );
+    return this.isExecuting && this._currentApiCall != null && isEqual(this._currentApiCall.args, args);
   }
 
   @computed get isExecutingFirstTime(): boolean {
@@ -135,16 +142,17 @@ export default class Request<Func: (...args: any) => Promise<any>, Err> {
    *
    * @returns {Promise}
    */
-  patch(
-    modify: PromisslessReturnType<Func> => ?PromisslessReturnType<Func>
-  ): Promise<Request<Func, Err>> {
-    return new Promise((resolve) => {
-      setTimeout(action(() => {
-        const override = modify(this.result);
-        if (override !== undefined) this.result = override;
-        if (this._currentApiCall) this._currentApiCall.result = this.result;
-        resolve(this);
-      }), 0);
+  patch(modify: (PromisslessReturnType<Func>) => ?PromisslessReturnType<Func>): Promise<Request<Func, Err>> {
+    return new Promise(resolve => {
+      setTimeout(
+        action(() => {
+          const override = modify(this.result);
+          if (override !== undefined) this.result = override;
+          if (this._currentApiCall) this._currentApiCall.result = this.result;
+          resolve(this);
+        }),
+        0
+      );
     });
   }
 

@@ -17,9 +17,10 @@ type StyledInputProps = {
   value?: string;
   error?: boolean;
   helperText?: string;
+  disabled?: boolean;
 };
 
-export const PasswordInput = ({ id, label, onChange, value, error, helperText }: StyledInputProps) => {
+export const PasswordInput = ({ id, label, onChange, value, error, disabled, helperText }: StyledInputProps) => {
   const [showPassword, setShowPassword] = React.useState(false);
 
   const handleClickShowPassword = () => setShowPassword(show => !show);
@@ -39,6 +40,7 @@ export const PasswordInput = ({ id, label, onChange, value, error, helperText }:
         type={showPassword ? 'text' : 'password'}
         onChange={onChange}
         value={value}
+        disabled={disabled}
         endAdornment={
           <InputAdornment position="end">
             <IconButton

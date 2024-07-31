@@ -1,3 +1,4 @@
+import { LoadingButton } from '@mui/lab';
 import { Button } from '@mui/material';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
@@ -6,7 +7,6 @@ import Typography from '@mui/material/Typography';
 import * as React from 'react';
 import { Collapsible } from '../../../../components/Collapsible/Collapsible';
 import { PasswordInput } from '../../../../components/Input/PasswordInput';
-import { useCreateAndSendDrepDelegationTransaction } from '../../api/useCreateAndSendDrepDelegationTransaction';
 import { useNavigateTo } from '../../common/useNavigateTo';
 import { useStrings } from '../../common/useStrings';
 import { useGovernance } from '../../module/GovernanceContextProvider';
@@ -42,28 +42,65 @@ const Actions = styled(Stack)(() => ({
 }));
 
 export const DelagationForm = () => {
-  const [passwaord, setPassword] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [formLoading, setFormLoading] = React.useState(false);
   const [isIncorectPasswaord, setIsIncorectPassword] = React.useState(false);
   const navigateTo = useNavigateTo();
-  const { governanceVote, walletId, checkUserPassword } = useGovernance();
+  const {
+    governanceVote,
+    checkUserPassword,
+    createDrepDelegationTransaction,
+    txDelegationResult,
+    txDelegationError,
+    selectedWallet,
+    signDelegationTransaction,
+  } = useGovernance();
+
   const strings = useStrings();
 
+  React.useEffect(() => {
+    console.log('txDelegationError', txDelegationError);
+    console.log('txDelegationResult', txDelegationResult);
+    const signTx = async () => {
+      const result = await signDelegationTransaction({
+        password,
+        publicDeriver: selectedWallet,
+        dialog: null,
+      });
+
+      navigateTo.transactionSubmited();
+      try {
+      } catch (error) {
+        console.log('ERROR on signDelegationTransaction', error);
+        setFormLoading(false);
+        navigateTo.transactionFail();
+      }
+    };
+
+    if (txDelegationResult != null && password.length > 0) {
+      signTx();
+    }
+  }, [txDelegationResult, txDelegationError]);
+
   const confirmDelegation = async () => {
-    const response = await checkUserPassword(passwaord);
+    const response = await checkUserPassword(password);
     if (response?.name === 'WrongPassphraseError') {
       setIsIncorectPassword(true);
-      // TODO - add this path once we have the submit api
-      // navigateTo.transactionFail();
     } else {
-      alert('Submit functionality is mocked and not yet implemented');
-      navigateTo.transactionSubmited();
-      useCreateAndSendDrepDelegationTransaction({ walletId, governanceVote });
+      try {
+        setFormLoading(true);
+        await createDrepDelegationTransaction(governanceVote.kind === 'delegate' ? governanceVote.drepID : governanceVote.kind);
+      } catch (error) {
+        console.log('ERROR on createDrepDelegationTransaction', error);
+        setFormLoading(false);
+        navigateTo.transactionFail();
+      }
     }
   };
 
   React.useEffect(() => {
     setIsIncorectPassword(false);
-  }, [passwaord]);
+  }, [password]);
 
   return (
     <Container>
@@ -129,9 +166,10 @@ export const DelagationForm = () => {
           label={strings.password}
           id="outlined-adornment-password"
           onChange={event => setPassword(event.target.value)}
-          value={passwaord}
+          value={password}
           error={!!isIncorectPasswaord}
           helperText={isIncorectPasswaord ? strings.wrongPassword : ' '}
+          disabled={formLoading}
         />
       </Stack>
       <Actions direction="row" spacing="24px">
@@ -139,10 +177,15 @@ export const DelagationForm = () => {
         <Button variant="secondary" onClick={() => navigateTo.selectStatus()}>
           {strings.back}
         </Button>
-        {/* @ts-ignore */}
-        <Button variant="primary" disabled={passwaord.length === 0} onClick={async () => confirmDelegation()}>
+        <LoadingButton
+          //  @ts-ignore
+          variant="primary"
+          loading={formLoading}
+          disabled={password.length === 0}
+          onClick={async () => confirmDelegation()}
+        >
           {strings.confirm}
-        </Button>
+        </LoadingButton>
       </Actions>
     </Container>
   );

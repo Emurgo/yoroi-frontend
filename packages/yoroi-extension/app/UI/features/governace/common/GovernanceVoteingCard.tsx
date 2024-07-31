@@ -61,8 +61,8 @@ const SpinnerBox = styled(Box)(() => ({
   top: 15,
 }));
 
-export const GovernanceVoteingCard = ({ title, description, icon, selected, onClick, pending }: Props) => (
-  <StyledCard onClick={pending ? undefined : onClick} pending={pending} selected={selected}>
+export const GovernanceVoteingCard = ({ title, description, icon, selected, onClick, pending = false }: Props) => (
+  <StyledCard onClick={pending ? undefined : onClick} pending={pending === true ? 'true' : undefined} selected={selected}>
     {pending && selected && (
       <SpinnerBox>
         <LoadingSpinner />

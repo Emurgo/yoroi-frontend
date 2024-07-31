@@ -7,12 +7,20 @@ import { asGetSigningKey, asGetStakingKey } from '../../../../api/ada/lib/storag
 import { useGovernanceManagerMaker } from '../common/useGovernanceManagerMaker';
 import { GovernanceActionType, GovernanceReducer, defaultGovernanceActions, defaultGovernanceState } from './state';
 
+type drepDelegation = string | null;
+
 const initialGovernanceProvider = {
   ...defaultGovernanceState,
   ...defaultGovernanceActions,
   walletId: '',
   governanceManager: null,
   checkUserPassword: (_password: string) => Response,
+  txDelegationResult: null,
+  txDelegationError: null,
+  createDrepDelegationTransaction: async (_drepCredential: string) => Response,
+  signDelegationTransaction: async (_params: any) => Response,
+  selectedWallet: null,
+  governanceStatus: undefined,
 };
 
 const GovernanceContext = React.createContext(initialGovernanceProvider);
@@ -20,20 +28,31 @@ const GovernanceContext = React.createContext(initialGovernanceProvider);
 type GovernanceProviderProps = {
   children: React.ReactNode;
   currentWallet: any; // TODO to be defined
+  createDrepDelegationTransaction: (drepCredential: String) => Promise<void>;
+  txDelegationResult: any;
+  txDelegationError: any;
+  signDelegationTransaction: (params: any) => Promise<void>;
 };
 
-export const GovernanceContextProvider = ({ children, currentWallet }: GovernanceProviderProps) => {
+export const GovernanceContextProvider = ({
+  children,
+  currentWallet,
+  createDrepDelegationTransaction,
+  txDelegationResult,
+  txDelegationError,
+  signDelegationTransaction,
+}: GovernanceProviderProps) => {
   if (!currentWallet?.selectedWallet) throw new Error(`requires a wallet to be selected`);
   const [state, dispatch] = React.useReducer(GovernanceReducer, {
     ...defaultGovernanceState,
   });
   const [stakingKeyHash, setStakingKeyHash] = React.useState(null);
   const [stakingKeyHex, setStakingKeyHex] = React.useState(null);
-
+  const [governanceStatus, setGovernanceStatus] = React.useState<drepDelegation>(null);
   const { walletId, networkId, currentPool, selectedWallet, backendService, backendServiceZero } = currentWallet;
   const governanceManager = useGovernanceManagerMaker(walletId, networkId);
 
-  // TODO to me moved in rootStore and use this globbaly whenever we need a wallet password check
+  // TODO to me moved in rootStore and use this globbaly whenever we need just a wallet password check
   const checkUserPassword = async (password: string): Promise<any> => {
     try {
       // check the password
@@ -57,7 +76,6 @@ export const GovernanceContextProvider = ({ children, currentWallet }: Governanc
     if (withStakingKey == null) {
       throw new Error(`missing staking key functionality`);
     }
-
     withStakingKey
       .getStakingKey()
       .then(async stakingKeyResp => {
@@ -67,23 +85,33 @@ export const GovernanceContextProvider = ({ children, currentWallet }: Governanc
           throw new Error('Cannot get staking key from the wallet!');
         }
         setStakingKeyHex(skey);
-
-        const govApi = new GovernanceApi({
-          oldBackendUrl: String(backendService),
-          newBackendUrl: String(backendServiceZero),
-          networkId: networkId,
-          wasmFactory: RustModule.CrossCsl.init,
-        });
-
-        const governanceStatus = await govApi.getAccountState(skey, skey);
-        console.log('governanceStatus', governanceStatus);
-
-        return null;
       })
       .catch(err => {
         console.error(`unexpected erorr: failed to get wallet staking key: ${err}`);
       });
   }, []);
+
+  React.useEffect(() => {
+    if (stakingKeyHex) {
+      getGovApiState().catch(err => {
+        console.log('ERROR on getGovApiState', err);
+      });
+    }
+  }, [stakingKeyHex]);
+
+  const getGovApiState = async () => {
+    const govApi = new GovernanceApi({
+      oldBackendUrl: String(backendService),
+      newBackendUrl: String(backendServiceZero),
+      networkId: networkId,
+      wasmFactory: RustModule.CrossCsl.init,
+    });
+    console.log('[getGovApiState stakingKeyHex]', stakingKeyHex);
+
+    const governanceStatusState = await govApi.getAccountState(stakingKeyHex || '', stakingKeyHex || '');
+
+    setGovernanceStatus(governanceStatusState?.drepDelegation?.drep || null);
+  };
 
   const actions = React.useRef({
     governanceVoteChanged: (vote: any) => {
@@ -96,8 +124,7 @@ export const GovernanceContextProvider = ({ children, currentWallet }: Governanc
       dispatch({ type: GovernanceActionType.DRepIdChanged, dRepId });
     },
   }).current;
-  console.log('stakingKeyHash', stakingKeyHash);
-  console.log('stakingKeyHex', stakingKeyHex);
+
   const context: any = {
     ...state,
     ...actions,
@@ -107,6 +134,12 @@ export const GovernanceContextProvider = ({ children, currentWallet }: Governanc
     stakingKeyHash,
     stakingKeyHex,
     checkUserPassword,
+    createDrepDelegationTransaction,
+    txDelegationResult,
+    txDelegationError,
+    signDelegationTransaction,
+    governanceStatus,
+    selectedWallet: currentWallet.selectedWallet,
   };
 
   return <GovernanceContext.Provider value={context}>{children}</GovernanceContext.Provider>;

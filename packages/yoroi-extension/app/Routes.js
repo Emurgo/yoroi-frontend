@@ -513,8 +513,20 @@ export function wrapReceive(receiveProps: StoresAndActionsProps, children: Node)
 // NEW UI - TODO: to be refactred
 export function wrapGovernance(governanceProps: StoresAndActionsProps, children: Node): Node {
   const currentWalletInfo = createCurrrentWalletInfo(governanceProps.stores);
+
+  const { delegationTransaction } = governanceProps.stores.substores.ada;
+  const delegationTxResult = delegationTransaction.createDelegationTx.result;
+  const delegationTxError = delegationTransaction.createDelegationTx.error;
+  console.log('delegationTx result', delegationTxResult);
+
   return (
-    <GovernanceContextProvider currentWallet={currentWalletInfo}>
+    <GovernanceContextProvider
+      currentWallet={currentWalletInfo}
+      createDrepDelegationTransaction={governanceProps.stores.delegation.createDrepDelegationTransaction}
+      signDelegationTransaction={governanceProps.actions.ada.delegationTransaction.signTransaction.trigger}
+      txDelegationResult={delegationTxResult}
+      txDelegationError={delegationTxError}
+    >
       <Suspense fallback={null}>{children}</Suspense>;
     </GovernanceContextProvider>
   );

@@ -1,30 +1,22 @@
 // @flow
 
-import { action, observable, runInAction } from 'mobx';
-import { find } from 'lodash';
-import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import LocalizedRequest from '../lib/LocalizedRequest';
-import Store from '../base/Store';
-import { GovernanceApi } from '@emurgo/yoroi-lib/dist/governance/emurgo-api';
-import CachedRequest from '../lib/LocalizedCachedRequest';
-import LocalizableError from '../../i18n/LocalizableError';
-import { PoolMissingApiError } from '../../api/common/errors';
-import type { MangledAmountFunc, MangledAmountsResponse } from '../stateless/mangledAddresses';
-import type { ActionsMap } from '../../actions/index';
-import type { StoresMap } from '../index';
-import type { ExplorerPoolInfo as PoolInfo } from '@emurgo/yoroi-lib';
 import { PoolInfoApi } from '@emurgo/yoroi-lib';
+import { GovernanceApi } from '@emurgo/yoroi-lib/dist/governance/emurgo-api';
+import { find } from 'lodash';
+import { action, observable, runInAction } from 'mobx';
+import type { ActionsMap } from '../../actions/index';
+import { unwrapStakingKey } from '../../api/ada/lib/storage/bridge/utils';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import { asGetStakingKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { PoolMissingApiError } from '../../api/common/errors';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { forceNonNull, maybe } from '../../coreUtils';
-import { asGetStakingKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import { unwrapStakingKey } from '../../api/ada/lib/storage/bridge/utils';
-
-import type {
-  GetDelegatedBalanceFunc,
-  GetDelegatedBalanceResponse,
-  RewardHistoryFunc,
-} from '../../api/ada/lib/storage/bridge/delegationUtils';
+import LocalizableError from '../../i18n/LocalizableError';
+import Store from '../base/Store';
+import type { StoresMap } from '../index';
+import CachedRequest from '../lib/LocalizedCachedRequest';
+import LocalizedRequest from '../lib/LocalizedRequest';
+import type { MangledAmountsResponse } from '../stateless/mangledAddresses';
 
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
@@ -280,7 +272,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     }
   };
 
-  createDelegationTransaction: (string) => Promise<void> = async poolId => {
+  createDelegationTransaction: string => Promise<void> = async poolId => {
     this.stores.delegation.poolInfoQuery.reset();
     await this.stores.delegation.poolInfoQuery.execute([poolId]);
     await this.stores.substores.ada.delegationTransaction.createTransaction({
@@ -289,7 +281,8 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     });
   };
 
-  createDrepDelegationTransaction: (string) => Promise<void> = async drepCredential => {
+  createDrepDelegationTransaction: string => Promise<void> = async drepCredential => {
+    console.log('STORE CREATE DELEGATION drepCredential ', drepCredential);
     await this.stores.substores.ada.delegationTransaction.createTransaction({
       drepCredential,
       publicDeriver: this.stores.wallets.selectedOrFail,

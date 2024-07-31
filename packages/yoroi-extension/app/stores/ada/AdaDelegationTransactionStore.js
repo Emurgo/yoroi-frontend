@@ -1,37 +1,34 @@
 // @flow
 
-import { observable, action, reaction } from 'mobx';
 import BigNumber from 'bignumber.js';
-import Store from '../base/Store';
-import LocalizedRequest from '../lib/LocalizedRequest';
+import { action, observable, reaction } from 'mobx';
+import type { ActionsMap } from '../../actions/index';
 import type { CreateDelegationTxFunc, CreateWithdrawalTxResponse } from '../../api/ada';
-import { buildRoute } from '../../utils/routing';
-import { ROUTES } from '../../routes-config';
-import {
-  asGetAllUtxos,
-  asHasUtxoChains,
-  asGetAllAccounting,
-  asGetPublicKey,
-} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
-  isLedgerNanoWallet,
-  isTrezorTWallet,
-} from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import type { ActionsMap } from '../../actions/index';
+  asGetAllAccounting,
+  asGetAllUtxos,
+  asGetPublicKey,
+  asHasUtxoChains,
+} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { ROUTES } from '../../routes-config';
+import { buildRoute } from '../../utils/routing';
+import Store from '../base/Store';
 import type { StoresMap } from '../index';
+import LocalizedRequest from '../lib/LocalizedRequest';
 
-export type CreateWithdrawalTxRequest =
-  LocalizedRequest<DeferredCall<CreateWithdrawalTxResponse>>;
+export type CreateWithdrawalTxRequest = LocalizedRequest<DeferredCall<CreateWithdrawalTxResponse>>;
 
 export default class AdaDelegationTransactionStore extends Store<StoresMap, ActionsMap> {
-  @observable createWithdrawalTx: LocalizedRequest<
+  @observable createWithdrawalTx: LocalizedRequest<DeferredCall<CreateWithdrawalTxResponse>> = new LocalizedRequest<
     DeferredCall<CreateWithdrawalTxResponse>
-  > = new LocalizedRequest<DeferredCall<CreateWithdrawalTxResponse>>(request => request());
+  >(request => request());
 
   @observable
-  createDelegationTx: LocalizedRequest<CreateDelegationTxFunc> =
-    new LocalizedRequest<CreateDelegationTxFunc>(this.api.ada.createDelegationTx);
+  createDelegationTx: LocalizedRequest<CreateDelegationTxFunc> = new LocalizedRequest<CreateDelegationTxFunc>(
+    this.api.ada.createDelegationTx
+  );
 
   @observable shouldDeregister: boolean = false;
 
@@ -115,10 +112,13 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
       valueInAccount: this.stores.delegation.getRewardBalanceOrZero(publicDeriver),
       absSlotNumber,
     }).promise;
+
+    console.log('delegationTxPromise', delegationTxPromise);
     if (delegationTxPromise == null) {
       throw new Error(`${nameof(this.createTransaction)} should never happen`);
     }
     await delegationTxPromise;
+    console.log('await delegationTxPromise response', delegationTxPromise);
 
     this.markStale(false);
   };
@@ -139,9 +139,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     }
     const withStakingKey = asGetAllAccounting(withHasUtxoChains);
     if (withStakingKey == null) {
-      throw new Error(
-        `${nameof(this._createWithdrawalTxForWallet)} missing staking key functionality`
-      );
+      throw new Error(`${nameof(this._createWithdrawalTxForWallet)} missing staking key functionality`);
     }
 
     const stakingKeyDbRow = await withStakingKey.getStakingKey();
@@ -213,9 +211,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     }
     // normal password-based wallet
     if (request.password == null) {
-      throw new Error(
-        `${nameof(this._signTransaction)} missing password for non-hardware signing`
-      );
+      throw new Error(`${nameof(this._signTransaction)} missing password for non-hardware signing`);
     }
     await this.stores.substores.ada.wallets.adaSendAndRefresh({
       broadcastRequest: {
