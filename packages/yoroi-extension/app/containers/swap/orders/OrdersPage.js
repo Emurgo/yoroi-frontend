@@ -120,6 +120,21 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
     return date == null ? '-' : moment(date).format('MMM D, YYYY H:mm');
   };
 
+  const getComparableDate = txHash => {
+    const renderedTimestamp = txHashToRenderedTimestamp(txHash);
+    return renderedTimestamp === '-' ? null : moment(renderedTimestamp, 'MMM D, YYYY H:mm').toDate();
+  };
+
+  const sortOrdersByDate = orders => {
+    return orders.sort((a, b) => {
+      const dateA = getComparableDate(a.txId);
+      const dateB = getComparableDate(b.txId);
+      if (dateA && dateB) {
+        return dateB - dateA; // Sort descending
+      }
+      return dateA ? -1 : 1; // Handle null dates
+    });
+  };
   const handleCancelRequest = async order => {
     setCancellationState({ order, tx: null });
     try {
@@ -244,6 +259,9 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
   const isDisplayCompletedOrdersEmpty = showCompletedOrders && completedOrders?.length === 0;
   const safeColumnNames = isDisplayOpenOrdersEmpty || isDisplayCompletedOrdersEmpty ? [] : columnNames;
 
+  const sortedCompletedOrders = sortOrdersByDate(completedOrders);
+
+  console.log('completedOrders', completedOrders);
   return (
     <Box sx={{ border: '1px solid transparent' }}>
       <Box sx={{ mx: '24px' }}>
@@ -274,7 +292,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
           columnRightPaddings={['0px', '0px', '0px', '0px', '0px', '0px', '0px']}
         >
           {showCompletedOrders
-            ? completedOrders.map(order => (
+            ? sortedCompletedOrders.map(order => (
                 <OrderRow
                   key={order.txId}
                   order={order}
@@ -334,6 +352,7 @@ const OrderRow = ({
   handleCancel?: () => Promise<void>,
   txHashToRenderedTimestamp: string => string,
 |}) => {
+  console.log('transactionTimestamps[txHash]', txHashToRenderedTimestamp(order.txId));
   return (
     <>
       <AssetPair sx={{ py: '20px' }} from={order.from.token} to={order.to.token} defaultTokenInfo={defaultTokenInfo} />
