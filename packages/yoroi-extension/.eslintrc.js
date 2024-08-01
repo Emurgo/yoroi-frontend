@@ -30,6 +30,8 @@ module.exports = {
         ignore: ['cardano-wallet-browser'],
       },
     ],
+    'import/no-unresolved': 'off',
+    'import/extensions': 'off',
     'import/no-extraneous-dependencies': 'off',
     'import/no-dynamic-require': 'off',
     'import/no-named-as-default': 'off',
