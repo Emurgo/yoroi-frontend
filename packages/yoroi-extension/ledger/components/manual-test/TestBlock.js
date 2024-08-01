@@ -7,13 +7,12 @@ import React from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import {
-  utils,
   AddressType,
   CertificateType,
   TransactionSigningMode,
   TxAuxiliaryDataType,
   TxOutputDestinationType,
-  StakeCredentialParamsType,
+  CredentialParamsType,
   CIP36VoteRegistrationFormat,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
@@ -374,7 +373,7 @@ export default class TestBlock extends React.Component<Props, State> {
               type: CertificateType.STAKE_REGISTRATION,
               params: {
                 stakeCredential: {
-                  type: StakeCredentialParamsType.KEY_PATH,
+                  type: CredentialParamsType.KEY_PATH,
                   keyPath: strToPath("1852'/1815'/0'/2/0"),
                 },
               }
@@ -383,7 +382,7 @@ export default class TestBlock extends React.Component<Props, State> {
               type: CertificateType.STAKE_DELEGATION,
               params: {
                 stakeCredential: {
-                  type: StakeCredentialParamsType.KEY_PATH,
+                  type: CredentialParamsType.KEY_PATH,
                   keyPath: strToPath("1852'/1815'/0'/2/0"),
                 },
                 poolKeyHashHex: 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207',
@@ -393,14 +392,14 @@ export default class TestBlock extends React.Component<Props, State> {
               type: CertificateType.STAKE_DEREGISTRATION,
               params: {
                 stakeCredential: {
-                  type: StakeCredentialParamsType.KEY_PATH,
+                  type: CredentialParamsType.KEY_PATH,
                   keyPath: strToPath("1852'/1815'/0'/2/0"),
                 },
               },
             }],
             withdrawals: [{
               stakeCredential: {
-                type: StakeCredentialParamsType.KEY_PATH,
+                type: CredentialParamsType.KEY_PATH,
                 keyPath: strToPath("1852'/1815'/0'/2/0"),
               },
               amount: '1000000',
