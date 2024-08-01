@@ -261,7 +261,6 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
 
   const sortedCompletedOrders = sortOrdersByDate(completedOrders);
 
-  console.log('completedOrders', completedOrders);
   return (
     <Box sx={{ border: '1px solid transparent' }}>
       <Box sx={{ mx: '24px' }}>
@@ -352,7 +351,6 @@ const OrderRow = ({
   handleCancel?: () => Promise<void>,
   txHashToRenderedTimestamp: string => string,
 |}) => {
-  console.log('transactionTimestamps[txHash]', txHashToRenderedTimestamp(order.txId));
   return (
     <>
       <AssetPair sx={{ py: '20px' }} from={order.from.token} to={order.to.token} defaultTokenInfo={defaultTokenInfo} />
