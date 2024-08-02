@@ -166,3 +166,10 @@ export function cast<T>(t: any): T {
   // $FlowIgnore
   return t;
 }
+
+/**
+ * Returns true in case the argument is a null, undefined, or an empty array
+ */
+export function nullOrEmptyArray(t: any): boolean {
+  return t == null || (Array.isArray(t) && t.length === 0);
+}
