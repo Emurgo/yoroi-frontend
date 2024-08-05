@@ -7,6 +7,8 @@ import { PublicDeriver, } from '../models/PublicDeriver/index';
 import { normalizeToAddress, unwrapStakingKey, } from './utils';
 import type { IGetAllUtxosResponse, IGetStakingKey, } from '../models/PublicDeriver/interfaces';
 import { MultiToken, } from '../../../../common/lib/MultiToken';
+import { maybe, fail } from '../../../../../coreUtils';
+import { isHex } from '@emurgo/yoroi-lib/dist/internals/utils/index';
 
 export type GetDelegatedBalanceRequest = {|
   publicDeriver: PublicDeriver<> & IGetStakingKey,
@@ -134,24 +136,48 @@ export async function getUtxoDelegatedBalance(
   return utxoSum;
 }
 
+export const DREP_ALWAYS_ABSTAIN = 'ALWAYS_ABSTAIN';
+export const DREP_ALWAYS_NO_CONFIDENCE = 'ALWAYS_NO_CONFIDENCE';
+
+// <TODO:WASM_MONAD>
+function parseKey(key: string): RustModule.WalletV4.Ed25519KeyHash {
+  return isHex(key)
+    ? RustModule.WalletV4.Ed25519KeyHash.from_hex(key)
+    : RustModule.WalletV4.Ed25519KeyHash.from_bech32(key);
+}
+
+// <TODO:WASM_MONAD>
+function parseDrep(drepCredential: string): RustModule.WalletV4.DRep {
+  const DRep = RustModule.WalletV4.DRep;
+  if (drepCredential === DREP_ALWAYS_ABSTAIN) return DRep.new_always_abstain();
+  if (drepCredential === DREP_ALWAYS_NO_CONFIDENCE) return DRep.new_always_no_confidence();
+  // <TODO:FIX> to handle script hashes
+  const credential = RustModule.WalletV4.Credential.from_keyhash(parseKey(drepCredential));
+  return maybe(credential.to_keyhash(), k => DRep.new_key_hash(k))
+    ?? maybe(credential.to_scripthash(), s => DRep.new_script_hash(s))
+    ?? fail('weird credential cannot be converted into a drep: ' + credential.to_hex())
+}
+
+// <TODO:WASM_MONAD>
 export function createCertificate(
-  stakingKey: RustModule.WalletV4.PublicKey,
+  stakingKeyHashHex: string,
   isRegistered: boolean,
   poolRequest: void | string,
+  drepCredential: void | string,
 ): Array<RustModule.WalletV4.Certificate> {
   const credential = RustModule.WalletV4.Credential.from_keyhash(
-    stakingKey.hash()
+    RustModule.WalletV4.Ed25519KeyHash.from_hex(stakingKeyHashHex)
   );
-
-  if (poolRequest == null) {
+  if (poolRequest == null && drepCredential == null) {
     if (isRegistered) {
-      return [RustModule.WalletV4.Certificate.new_stake_deregistration(
-        RustModule.WalletV4.StakeDeregistration.new(credential)
-      )];
+      return [
+        RustModule.WalletV4.Certificate.new_stake_deregistration(
+          RustModule.WalletV4.StakeDeregistration.new(credential)
+        )
+      ];
     }
     return []; // no need to undelegate if no staking key registered
   }
-
   const result = [];
   if (!isRegistered) {
     // if unregistered, need to register first
@@ -159,12 +185,17 @@ export function createCertificate(
       RustModule.WalletV4.StakeRegistration.new(credential)
     ));
   }
-  result.push(RustModule.WalletV4.Certificate.new_stake_delegation(
-    RustModule.WalletV4.StakeDelegation.new(
-      credential,
-      RustModule.WalletV4.Ed25519KeyHash.from_bytes(Buffer.from(poolRequest, 'hex'))
-    )
-  ));
+  if (poolRequest != null) {
+    const poolKeyHash = RustModule.WalletV4.Ed25519KeyHash.from_hex(poolRequest);
+    result.push(RustModule.WalletV4.Certificate.new_stake_delegation(
+      RustModule.WalletV4.StakeDelegation.new(credential, poolKeyHash),
+    ));
+  }
+  if (drepCredential != null) {
+    result.push(RustModule.WalletV4.Certificate.new_vote_delegation(
+      RustModule.WalletV4.VoteDelegation.new(credential, parseDrep(drepCredential)),
+    ));
+  }
   return result;
 }
 
