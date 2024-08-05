@@ -298,26 +298,23 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     }
   };
 
-  delegateToSpecificPool: (?string) => Promise<void> = async poolId => {
+  createDelegationTransaction: (string) => Promise<void> = async poolId => {
     this.stores.delegation.poolInfoQuery.reset();
-    if (poolId == null) {
-      await this.actions.ada.delegationTransaction.setPools.trigger([]);
-      return;
-    }
-    await this.actions.ada.delegationTransaction.setPools.trigger([poolId]);
+    await this.stores.delegation.poolInfoQuery.execute([poolId]);
+    await this.stores.substores.ada.delegationTransaction.createTransaction({
+      poolRequest: poolId,
+      wallet: this.stores.wallets.selectedOrFail,
+    });
   };
 
-  createDelegationTransaction: void => Promise<void> = async () => {
+  createDrepDelegationTransaction: (string) => Promise<void> = async drepCredential => {
     const selectedWallet = this.stores.wallets.selected;
     if (selectedWallet == null) {
       return;
     }
-    const { delegationTransaction } = this.stores.substores.ada;
-    if (delegationTransaction.selectedPools.length === 0) {
-      return;
-    }
-    await this.actions.ada.delegationTransaction.createTransaction.trigger({
-      poolRequest: delegationTransaction.selectedPools[0],
+
+    await this.stores.substores.ada.delegationTransaction.createTransaction({
+      drepCredential,
       wallet: selectedWallet,
     });
   };

@@ -1,3 +1,5 @@
+// @flow
+
 import type { Node } from 'react';
 import React, { Suspense } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
@@ -27,12 +29,27 @@ import Wallet from './containers/wallet/Wallet';
 import RestoreWalletPage, { RestoreWalletPagePromise } from './containers/wallet/restore/RestoreWalletPage';
 
 // New UI pages
+// $FlowIgnore: suppressing this error
 import { createCurrrentWalletInfo } from './UI/features/governace/common/helpers';
+// $FlowIgnore: suppressing this error
 import { GovernanceContextProvider } from './UI/features/governace/module/GovernanceContextProvider';
+// $FlowIgnore: suppressing this error
+import { PortfolioContextProvider } from './UI/features/portfolio/module/PortfolioContextProvider';
+// $FlowIgnore: suppressing this error
 import GovernanceDelegationFormPage from './UI/pages/Governance/GovernanceDelegationFormPage';
+// $FlowIgnore: suppressing this error
 import GovernanceStatusPage from './UI/pages/Governance/GovernanceStatusPage';
+// $FlowIgnore: suppressing this error
 import GovernanceTransactionFailedPage from './UI/pages/Governance/GovernanceTransactionFailedPage';
+// $FlowIgnore: suppressing this error
 import GovernanceTransactionSubmittedPage from './UI/pages/Governance/GovernanceTransactionSubmittedPage';
+// $FlowIgnore: suppressing this error
+import PortfolioDappsPage from './UI/pages/portfolio/PortfolioDappsPage';
+// $FlowIgnore: suppressing this error
+import PortfolioDetailPage from './UI/pages/portfolio/PortfolioDetailPage';
+// $FlowIgnore: suppressing this error
+import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
+// $FlowIgnore: suppressing this error
 
 // PAGES
 const LanguageSelectionPagePromise = () => import('./containers/profile/LanguageSelectionPage');
@@ -298,6 +315,11 @@ export const Routes = (stores: StoresMap, actions: ActionsMap): Node => {
             path={ROUTES.Governance.ROOT}
             component={props => wrapGovernance({ ...props, stores, actions }, GovernanceSubpages(stores, actions))}
           />
+          <Route
+            path={ROUTES.PORTFOLIO.ROOT}
+            component={props => wrapPortfolio({ ...props, stores, actions }, PortfolioSubpages(stores, actions))}
+          />
+
           <Redirect to={ROUTES.MY_WALLETS} />
         </Switch>
       </Suspense>
@@ -403,17 +425,22 @@ const SettingsSubpages = (stores, actions) => (
   </Switch>
 );
 
-const AssetsSubpages = (stores, actions) => (
+const PortfolioSubpages = (stores, actions) => (
   <Switch>
     <Route
       exact
-      path={ROUTES.ASSETS.ROOT}
-      component={props => <TokensPageRevamp {...props} stores={stores} actions={actions} />}
+      path={ROUTES.PORTFOLIO.ROOT}
+      component={props => <PortfolioPage {...props} stores={stores} actions={actions} />}
     />
     <Route
       exact
-      path={ROUTES.ASSETS.DETAILS}
-      component={props => <TokensDetailPageRevamp {...props} stores={stores} actions={actions} />}
+      path={ROUTES.PORTFOLIO.DAPPS}
+      component={props => <PortfolioDappsPage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.PORTFOLIO.DETAILS}
+      component={props => <PortfolioDetailPage {...props} stores={stores} actions={actions} />}
     />
   </Switch>
 );
@@ -425,6 +452,21 @@ const NFTsSubPages = (stores, actions) => (
       exact
       path={ROUTES.NFTS.DETAILS}
       component={props => <NFTDetailPageRevamp {...props} stores={stores} actions={actions} />}
+    />
+  </Switch>
+);
+
+const AssetsSubpages = (stores, actions) => (
+  <Switch>
+    <Route
+      exact
+      path={ROUTES.ASSETS.ROOT}
+      component={props => <TokensPageRevamp {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.ASSETS.DETAILS}
+      component={props => <TokensDetailPageRevamp {...props} stores={stores} actions={actions} />}
     />
   </Switch>
 );
@@ -517,5 +559,12 @@ export function wrapGovernance(governanceProps: StoresAndActionsProps, children:
     <GovernanceContextProvider currentWallet={currentWalletInfo}>
       <Suspense fallback={null}>{children}</Suspense>;
     </GovernanceContextProvider>
+  );
+}
+export function wrapPortfolio(portfolioProps: StoresAndActionsProps, children: Node): Node {
+  return (
+    <PortfolioContextProvider settingFiatPairUnit={portfolioProps.stores.profile.unitOfAccount}>
+      <Suspense fallback={null}>{children}</Suspense>
+    </PortfolioContextProvider>
   );
 }

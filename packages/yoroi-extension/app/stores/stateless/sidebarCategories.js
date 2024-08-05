@@ -2,19 +2,20 @@
 import type { MessageDescriptor } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import globalMessages, { connectorMessages } from '../../i18n/global-messages';
+import { ReactComponent as dappConnectorIcon } from '../../assets/images/dapp-connector/dapp-connector.inline.svg';
 import { ReactComponent as walletsIcon } from '../../assets/images/sidebar/my_wallets.inline.svg';
+import { ReactComponent as assetsIcon } from '../../assets/images/sidebar/revamp/assets.inline.svg';
+import { ReactComponent as governanceIcon } from '../../assets/images/sidebar/revamp/governance.inline.svg';
+import { ReactComponent as nftsIcon } from '../../assets/images/sidebar/revamp/nfts.inline.svg';
+import { ReactComponent as portfolioIcon } from '../../assets/images/sidebar/revamp/portfolio.inline.svg';
+import { ReactComponent as settingIcon } from '../../assets/images/sidebar/revamp/setting.inline.svg';
+import { ReactComponent as stakingIcon } from '../../assets/images/sidebar/revamp/staking.inline.svg';
+import { ReactComponent as swapIcon } from '../../assets/images/sidebar/revamp/swap.inline.svg';
+import { ReactComponent as votingIcon } from '../../assets/images/sidebar/revamp/voting.inline.svg';
+import { ReactComponent as walletIcon } from '../../assets/images/sidebar/revamp/wallet.inline.svg';
 import { ReactComponent as transferIcon } from '../../assets/images/sidebar/transfer_wallets.inline.svg';
 import { ReactComponent as settingsIcon } from '../../assets/images/sidebar/wallet-settings-2-ic.inline.svg';
 import { ReactComponent as goBackIcon } from '../../assets/images/top-bar/back-arrow-white.inline.svg';
-import { ReactComponent as dappConnectorIcon } from '../../assets/images/dapp-connector/dapp-connector.inline.svg';
-import { ReactComponent as walletIcon } from '../../assets/images/sidebar/revamp/wallet.inline.svg';
-import { ReactComponent as stakingIcon } from '../../assets/images/sidebar/revamp/staking.inline.svg';
-import { ReactComponent as assetsIcon } from '../../assets/images/sidebar/revamp/assets.inline.svg';
-import { ReactComponent as nftsIcon } from '../../assets/images/sidebar/revamp/nfts.inline.svg';
-import { ReactComponent as votingIcon } from '../../assets/images/sidebar/revamp/voting.inline.svg';
-import { ReactComponent as swapIcon } from '../../assets/images/sidebar/revamp/swap.inline.svg';
-import { ReactComponent as settingIcon } from '../../assets/images/sidebar/revamp/setting.inline.svg';
-import { ReactComponent as governanceIcon } from '../../assets/images/sidebar/revamp/governance.inline.svg';
 import environment from '../../environment';
 
 export type SidebarCategory = {|
@@ -134,6 +135,13 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     icon: assetsIcon,
     label: globalMessages.sidebarAssets,
     isVisible: _request => _request.selected !== null,
+  },
+  {
+    className: 'portfolio',
+    route: ROUTES.PORTFOLIO.ROOT,
+    icon: portfolioIcon,
+    label: globalMessages.sidebarPortfolio,
+    isVisible: ({ selected }) => environment.isDev() && selected?.networkId === 250,
   },
   {
     className: 'nfts',

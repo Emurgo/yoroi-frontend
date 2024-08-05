@@ -53,7 +53,7 @@ const orderColumns: Array<Column> = [
   {
     name: 'Pair (From / To)',
     align: 'left',
-    width: '176px',
+    width: ({ completedOrders }) => (completedOrders ? 'auto' : '176px'),
   },
   {
     name: 'Asset price',
@@ -61,24 +61,24 @@ const orderColumns: Array<Column> = [
   },
   {
     name: 'Asset amount',
-    width: '166px',
+    width: ({ completedOrders }) => (completedOrders ? 'auto' : '166px'),
   },
   {
     name: 'Total',
-    width: '150px',
+    width: ({ completedOrders }) => (completedOrders ? 'auto' : '150px'),
     openOrdersOnly: true,
   },
   {
     name: 'DEX',
     align: 'left',
     leftPadding: '32px',
-    width: '216px',
+    width: ({ completedOrders }) => (completedOrders ? '0px' : '216px'),
     openOrdersOnly: true,
   },
   {
     name: ({ completedOrders }) => (completedOrders ? 'Time executed' : 'Time created'),
     align: 'left',
-    width: '240px',
+    width: ({ completedOrders }) => (completedOrders ? 'auto' : '240px'),
   },
   {
     name: 'Transaction ID',
@@ -114,8 +114,9 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
     wallet.networkId
   );
 
-  const selectedExplorer =
-    explorers.selectedExplorer.get(wallet.networkId) ?? fail('No explorer for wallet network');
+  const selectedExplorer = explorers.selectedExplorer.get(wallet.networkId) ??
+    fail('No explorer for wallet network');
+
 
   const fetchTransactionTimestamps = txHashes =>
     swapStore.fetchTransactionTimestamps({ wallet, txHashes });
@@ -129,6 +130,21 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
     return date == null ? '-' : moment(date).format('MMM D, YYYY H:mm');
   };
 
+  const getComparableDate = txHash => {
+    const renderedTimestamp = txHashToRenderedTimestamp(txHash);
+    return renderedTimestamp === '-' ? null : moment(renderedTimestamp, 'MMM D, YYYY H:mm').toDate();
+  };
+
+  const sortOrdersByDate = orders => {
+    return orders.sort((a, b) => {
+      const dateA = getComparableDate(a.txId);
+      const dateB = getComparableDate(b.txId);
+      if (dateA && dateB) {
+        return dateB - dateA; // Sort descending
+      }
+      return dateA ? -1 : 1; // Handle null dates
+    });
+  };
   const handleCancelRequest = async order => {
     setCancellationState({ order, tx: null });
     try {
@@ -138,33 +154,19 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
       let collateralReorgTxHex: ?string = null;
       let collateralReorgTxData: ?CardanoConnectorSignRequest = null;
       if (utxoHex == null) {
-        const {
-          unsignedTxHex,
-          txData,
-          collateralUtxoHex,
-        } = await swapStore.createCollateralReorgForCancel({ wallet });
+        const { unsignedTxHex, txData, collateralUtxoHex } = await swapStore.createCollateralReorgForCancel({ wallet });
         collateralReorgTxHex = unsignedTxHex;
         collateralReorgTxData = txData;
         utxoHex = collateralUtxoHex;
       }
-      return handleCreateCancelTransaction(
-        order,
-        utxoHex,
-        collateralReorgTxHex,
-        collateralReorgTxData
-      );
+      return handleCreateCancelTransaction(order, utxoHex, collateralReorgTxHex, collateralReorgTxData);
     } catch (e) {
       console.error('Failed to prepare a collateral utxo for cancel', e);
       throw e;
     }
   };
 
-  const handleCreateCancelTransaction = async (
-    order,
-    utxoHex,
-    collateralReorgTx,
-    collateralReorgTxData
-  ) => {
+  const handleCreateCancelTransaction = async (order, utxoHex, collateralReorgTx, collateralReorgTxData) => {
     const sender = order.sender;
     if (sender == null) {
       throw new Error('Cannot cancel a completed order (sender == null)');
@@ -203,9 +205,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
         return {
           order: s.order,
           collateralReorgTx:
-            collateralReorgTx && collateralReorgTxData
-              ? { cbor: collateralReorgTx, txData: collateralReorgTxData }
-              : undefined,
+            collateralReorgTx && collateralReorgTxData ? { cbor: collateralReorgTx, txData: collateralReorgTxData } : undefined,
           tx: {
             cbor: cancelTxCbor,
             formattedFee: formattedFeeValue,
@@ -259,10 +259,9 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
       password,
       transactionHex: tx.cbor
     });
-    const signedTransactionHexes =
-      signedCollateralReorgTx != null
-        ? [signedCollateralReorgTx, signedCancelTx]
-        : [signedCancelTx];
+    const signedTransactionHexes = signedCollateralReorgTx != null
+      ? [signedCollateralReorgTx, signedCancelTx]
+      : [signedCancelTx];
     await swapStore.executeTransactionHexes({
       wallet,
       signedTransactionHexes,
@@ -276,16 +275,14 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
     showCompletedOrders && c.openOrdersOnly ? '' : resolveValueOrGetter(c.name, columnContext)
   );
   const columnAlignment = orderColumns.map(c => resolveValueOrGetter(c.align ?? '', columnContext));
-  const columnLeftPaddings = orderColumns.map(c =>
-    resolveValueOrGetter(c.leftPadding ?? '', columnContext)
-  );
-  const gridTemplateColumns = orderColumns
-    .map(c => resolveValueOrGetter(c.width ?? 'auto', columnContext))
-    .join(' ');
+  const columnLeftPaddings = orderColumns.map(c => resolveValueOrGetter(c.leftPadding ?? '', columnContext));
+  const gridTemplateColumns = orderColumns.map(c => resolveValueOrGetter(c.width ?? 'auto', columnContext)).join(' ');
 
   const isDisplayOpenOrdersEmpty = !showCompletedOrders && openOrders?.length === 0;
   const isDisplayCompletedOrdersEmpty = showCompletedOrders && completedOrders?.length === 0;
   const safeColumnNames = isDisplayOpenOrdersEmpty || isDisplayCompletedOrdersEmpty ? [] : columnNames;
+
+  const sortedCompletedOrders = sortOrdersByDate(completedOrders);
 
   return (
     <Box sx={{ border: '1px solid transparent' }}>
@@ -317,14 +314,14 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
           columnRightPaddings={['0px', '0px', '0px', '0px', '0px', '0px', '0px']}
         >
           {showCompletedOrders
-            ? completedOrders.map(order => (
-              <OrderRow
-                key={order.txId}
-                order={order}
-                defaultTokenInfo={defaultTokenInfo}
-                selectedExplorer={selectedExplorer}
-                txHashToRenderedTimestamp={txHashToRenderedTimestamp}
-              />
+            ? sortedCompletedOrders.map(order => (
+                <OrderRow
+                  key={order.txId}
+                  order={order}
+                  defaultTokenInfo={defaultTokenInfo}
+                  selectedExplorer={selectedExplorer}
+                  txHashToRenderedTimestamp={txHashToRenderedTimestamp}
+                />
               ))
             : openOrders.map(order => (
               <OrderRow
@@ -379,12 +376,7 @@ const OrderRow = ({
 |}) => {
   return (
     <>
-      <AssetPair
-        sx={{ py: '20px' }}
-        from={order.from.token}
-        to={order.to.token}
-        defaultTokenInfo={defaultTokenInfo}
-      />
+      <AssetPair sx={{ py: '20px' }} from={order.from.token} to={order.to.token} defaultTokenInfo={defaultTokenInfo} />
       <Box textAlign="right">{order.price}</Box>
       <Box textAlign="right">{order.amount}</Box>
       <Box textAlign="right">
@@ -401,11 +393,7 @@ const OrderRow = ({
       </Box>
       <Box textAlign="left">{txHashToRenderedTimestamp(order.txId)}</Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" gap="12px">
-        <ExplorableHashContainer
-          selectedExplorer={selectedExplorer}
-          linkType="transaction"
-          hash={order.txId}
-        >
+        <ExplorableHashContainer selectedExplorer={selectedExplorer} linkType="transaction" hash={order.txId}>
           <span>{truncateAddressShort(order.txId)}</span>
         </ExplorableHashContainer>
         {maybe(handleCancel, f => (

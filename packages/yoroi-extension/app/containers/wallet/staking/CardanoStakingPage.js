@@ -40,7 +40,10 @@ type Props = {|
 type InjectedLayoutProps = {|
   +renderLayoutComponent: LayoutComponentMap => Node,
 |};
-type State = {| firstPool: PoolData | void |};
+type State = {|
+  firstPool: PoolData | void,
+  selectedPoolId: ?string,
+|};
 type AllProps = {| ...Props, ...InjectedLayoutProps |};
 
 @observer
@@ -50,6 +53,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
   };
   state: State = {
     firstPool: undefined,
+    selectedPoolId: undefined,
   };
   @observable notificationElementId: string = '';
 
@@ -64,7 +68,6 @@ class CardanoStakingPage extends Component<AllProps, State> {
 
   async componentWillUnmount() {
     this.props.actions.ada.delegationTransaction.reset.trigger({ justTransaction: false });
-    await this.props.actions.ada.delegationTransaction.setPools.trigger([]);
     this.props.stores.delegation.poolInfoQuery.reset();
   }
 
@@ -103,8 +106,8 @@ class CardanoStakingPage extends Component<AllProps, State> {
             totalAda={totalAda}
             poolList={poolList}
             stakepoolSelectedAction={async poolId => {
-              await this.props.stores.delegation.delegateToSpecificPool(poolId);
-              await this.props.stores.delegation.createDelegationTransaction();
+              this.setState({ selectedPoolId: poolId });
+              await this.props.stores.delegation.createDelegationTransaction(poolId);
             }}
           />
         </div>
@@ -116,8 +119,8 @@ class CardanoStakingPage extends Component<AllProps, State> {
             <WalletDelegationBanner
               isOpen={this.props.stores.transactions.showDelegationBanner}
               onDelegateClick={async poolId => {
-                await this.props.stores.delegation.delegateToSpecificPool(poolId);
-                await this.props.stores.delegation.createDelegationTransaction();
+                this.setState({ selectedPoolId: poolId });
+                await this.props.stores.delegation.createDelegationTransaction(poolId);
               }}
               poolInfo={this.state.firstPool}
               isWalletWithNoFunds={isWalletWithNoFunds}
@@ -144,8 +147,8 @@ class CardanoStakingPage extends Component<AllProps, State> {
                 this.setState({ firstPool: pool });
               }}
               stakepoolSelectedAction={async poolId => {
-                await this.props.stores.delegation.delegateToSpecificPool(poolId);
-                await this.props.stores.delegation.createDelegationTransaction();
+                this.setState({ selectedPoolId: poolId });
+                await this.props.stores.delegation.createDelegationTransaction(poolId);
               }}
             />
           </Box>
@@ -166,11 +169,13 @@ class CardanoStakingPage extends Component<AllProps, State> {
           poolQueryError={this.props.stores.delegation.poolInfoQuery.error}
           isProcessing={this.props.stores.delegation.poolInfoQuery.isExecuting}
           updatePool={poolId => {
-            /* note: it's okay for triggering a pool update to be async, so we don't await  */
-            // eslint-disable-next-line no-unused-vars
-            const _ = this.props.stores.delegation.delegateToSpecificPool(poolId);
+            this.setState({ selectedPoolId: poolId });
           }}
-          onNext={async () => this.props.stores.delegation.createDelegationTransaction()}
+          onNext={async () => {
+            if (this.state.selectedPoolId != null) {
+              return this.props.stores.delegation.createDelegationTransaction(this.state.selectedPoolId);
+            }
+          }}
         />
         {this._displayPoolInfo()}
       </div>
@@ -206,7 +211,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
     const selectedWallet = this.props.stores.wallets.selected;
     if (selectedWallet == null) return null;
 
-    const selectedPoolInfo = this._getPoolInfo(selectedWallet.publicDeriverId);
+    const selectedPoolInfo = this._getPoolInfo(selectedWallet);
     if (selectedPoolInfo == null) return;
 
     const tooltipNotification = {
@@ -267,13 +272,12 @@ class CardanoStakingPage extends Component<AllProps, State> {
     );
   };
 
-  _getPoolInfo: (number) => void | PoolMeta = networkId => {
-    const { delegationTransaction } = this.props.stores.substores.ada;
-    return delegationTransaction.selectedPools.length === 0
-      ? undefined
+  _getPoolInfo: ({ networkId: number, ... }) => void | PoolMeta = publicDeriver => {
+    const selectedPoolId = this.state.selectedPoolId;
+    return selectedPoolId == null ? undefined
       : this.props.stores.delegation.getLocalPoolInfo(
-          networkId,
-          delegationTransaction.selectedPools[0]
+          publicDeriver.networkId,
+          selectedPoolId
         );
   };
 
@@ -343,7 +347,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
       !this.props.stores.wallets.sendMoneyRequest.wasExecuted ||
       this.props.stores.wallets.sendMoneyRequest.error != null;
 
-    const selectedPoolInfo = this._getPoolInfo(selectedWallet.networkId);
+    const selectedPoolInfo = this._getPoolInfo(selectedWallet);
     if (this.props.stores.delegation.poolInfoQuery.error != null) {
       return undefined;
     }
@@ -376,7 +380,8 @@ class CardanoStakingPage extends Component<AllProps, State> {
     if (delegationTransaction.createDelegationTx.error != null) {
       return this._errorDialog(delegationTransaction.createDelegationTx.error);
     }
-    if (delegationTx != null && delegationTransaction.selectedPools.length >= 1 && showSignDialog) {
+    const selectedPoolId = this.state.selectedPoolId;
+    if (delegationTx != null && selectedPoolId != null && showSignDialog) {
       // may happen for a split second before backend query starts
       if (selectedPoolInfo == null) return null;
       return (
@@ -385,7 +390,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
           poolName={
             selectedPoolInfo.info?.name ?? intl.formatMessage(globalMessages.unknownPoolLabel)
           }
-          poolHash={delegationTransaction.selectedPools[0]}
+          poolHash={selectedPoolId}
           transactionFee={delegationTx.signTxRequest.fee()}
           amountToDelegate={delegationTx.totalAmountToDelegate}
           approximateReward={approximateReward(

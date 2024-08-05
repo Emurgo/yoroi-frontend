@@ -3,11 +3,6 @@ import { AsyncAction, Action } from '../lib/Action';
 import type { WalletState } from '../../../chrome/extension/background/types';
 
 export default class DelegationTransactionActions {
-  setPools: AsyncAction<Array<string>> = new AsyncAction();
-  createTransaction: AsyncAction<{|
-    wallet: WalletState,
-    poolRequest: string | void,
-  |}> = new AsyncAction();
   createWithdrawalTxForWallet: AsyncAction<{|
     wallet: WalletState,
   |}> = new AsyncAction();

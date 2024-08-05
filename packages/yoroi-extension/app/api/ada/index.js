@@ -368,7 +368,8 @@ export type CreateDelegationTxRequest = {|
  wallet: WalletState,
   absSlotNumber: BigNumber,
   registrationStatus: boolean,
-  poolRequest: void | string,
+  poolRequest?: string,
+  drepCredential?: string,
   valueInAccount: MultiToken,
 |};
 
@@ -1347,11 +1348,12 @@ export default class AdaApi {
         },
       }).to_raw_key();
 
-      const stakeDelegationCert = createCertificate(
-        stakingKey,
+      const delegationCerts = createCertificate(
+        stakingKey.hash().to_hex(),
         request.registrationStatus,
-        request.poolRequest
-      );
+        request.poolRequest,
+        request.drepCredential,
+      )
 
       const allUtxo = wallet.utxos;
       const addressedUtxo = asAddressedUtxo(allUtxo);
@@ -1366,7 +1368,7 @@ export default class AdaApi {
         addressedUtxo,
         request.absSlotNumber,
         protocolParams,
-        stakeDelegationCert,
+        delegationCerts,
         [],
         false,
       );

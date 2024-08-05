@@ -17,6 +17,7 @@ import { MultiToken } from '../api/common/lib/MultiToken';
 import { parseMetadata } from '../api/ada/lib/storage/bridge/metadataUtils';
 import { CatalystLabels } from '../api/ada/lib/cardanoCrypto/catalyst';
 import { RustModule } from '../api/ada/lib/cardanoCrypto/rustLoader';
+import { isEmptyArray } from '../coreUtils';
 
 export type CardanoShelleyTransactionFeature =
   | 'CatalystVotingRegistration'
@@ -137,7 +138,7 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
   }
 
   isCatalystVotingRegistration(): boolean {
-    if (this.metadata === null) {
+    if (this.metadata == null || isEmptyArray(this.metadata)) {
       return false;
     }
     const metadataString = parseMetadata(this.metadata);

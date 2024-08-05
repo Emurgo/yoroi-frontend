@@ -51,11 +51,14 @@ export default function Table({
           {name}
         </Typography>
       ))}
-      {columnNames.length > 0 && <Separator sx={{
-        gridColumn: '1/-1',
-        mb: '8px'
-      }}
-      />}
+      {columnNames.length > 0 && (
+        <Separator
+          sx={{
+            gridColumn: '1/-1',
+            mb: '8px',
+          }}
+        />
+      )}
       {children}
     </Box>
   );

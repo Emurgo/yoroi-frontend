@@ -15,16 +15,13 @@ export type CreateWithdrawalTxRequest =
   LocalizedRequest<DeferredCall<CreateWithdrawalTxResponse>>;
 
 export default class AdaDelegationTransactionStore extends Store<StoresMap, ActionsMap> {
-  @observable selectedPools: Array<string>;
+  @observable createWithdrawalTx: LocalizedRequest<
+    DeferredCall<CreateWithdrawalTxResponse>
+  > = new LocalizedRequest<DeferredCall<CreateWithdrawalTxResponse>>(request => request());
 
   @observable
-  createWithdrawalTx: CreateWithdrawalTxRequest
-    = new LocalizedRequest<DeferredCall<CreateWithdrawalTxResponse>>(request => request());
-
-  @observable
-  createDelegationTx: LocalizedRequest<CreateDelegationTxFunc> = new LocalizedRequest<CreateDelegationTxFunc>(
-    this.api.ada.createDelegationTx
-  );
+  createDelegationTx: LocalizedRequest<CreateDelegationTxFunc> =
+    new LocalizedRequest<CreateDelegationTxFunc>(this.api.ada.createDelegationTx);
 
   @observable shouldDeregister: boolean = false;
 
@@ -45,18 +42,6 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     }
   );
 
-  @action
-  _setPools: (Array<string>) => Promise<void> = async pools => {
-    this.selectedPools = pools;
-    if (pools.length > 0) {
-      try {
-        await this.stores.delegation.poolInfoQuery.execute(pools);
-      } catch (_e) {
-        /* error handled by request */
-      }
-    }
-  };
-
   @action.bound
   markStale: boolean => void = status => {
     this.isStale = status;
@@ -66,10 +51,8 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     super.setup();
     this.reset({ justTransaction: false });
     const { ada } = this.actions;
-    ada.delegationTransaction.createTransaction.listen(this._createTransaction);
     ada.delegationTransaction.signTransaction.listen(this._signTransaction);
     ada.delegationTransaction.complete.listen(this._complete);
-    ada.delegationTransaction.setPools.listen(this._setPools);
     ada.delegationTransaction.setShouldDeregister.listen(this._setShouldDeregister);
     ada.delegationTransaction.createWithdrawalTxForWallet.listen(this._createWithdrawalTxForWallet);
     ada.delegationTransaction.reset.listen(this.reset);
@@ -81,9 +64,10 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
   };
 
   @action
-  _createTransaction: ({|
+  createTransaction: ({|
     wallet: WalletState,
-    poolRequest: string | void,
+    poolRequest?: string,
+    drepCredential?: string,
   |}) => Promise<void> = async request => {
     const { timeToSlot } = this.stores.substores.ada.time.getTimeCalcRequests(request.wallet).requests;
 
@@ -98,13 +82,12 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
       wallet: request.wallet,
       poolRequest: request.poolRequest,
       registrationStatus: this.stores.delegation.isStakeRegistered(request.wallet.publicDeriverId) === true,
-      valueInAccount: this.stores.delegation.getRewardBalanceOrZero(
-        request.wallet
-      ),
+      valueInAccount: this.stores.delegation.getRewardBalanceOrZero(request.wallet),
+      drepCredential: request.drepCredential,
       absSlotNumber,
     }).promise;
     if (delegationTxPromise == null) {
-      throw new Error(`${nameof(this._createTransaction)} should never happen`);
+      throw new Error(`${nameof(this.createTransaction)} should never happen`);
     }
     await delegationTxPromise;
 
@@ -219,7 +202,6 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     this.createDelegationTx.reset();
     if (!request.justTransaction) {
       this.isStale = false;
-      this.selectedPools = [];
     }
   }
 }
