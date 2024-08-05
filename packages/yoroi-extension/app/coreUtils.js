@@ -168,8 +168,8 @@ export function cast<T>(t: any): T {
 }
 
 /**
- * Returns true in case the argument is a null, undefined, or an empty array
+ * Returns true in case the argument is an empty array
  */
-export function nullOrEmptyArray(t: any): boolean {
-  return t == null || (Array.isArray(t) && t.length === 0);
+export function isEmptyArray(t: any): boolean {
+  return Array.isArray(t) && t.length === 0;
 }
