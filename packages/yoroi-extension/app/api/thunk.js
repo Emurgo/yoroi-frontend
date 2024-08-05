@@ -252,28 +252,32 @@ export async function popAddress(request: { publicDeriverId: number, ... }): Pro
   await callBackground({ type: 'pop-address', request });
 }
 
+type RefreshTransactionForInitialLoad = {|
+|};
+type RefreshTransactionToLoadMore = {|
+  beforeTx: ReferenceTransaction,
+  skip: number,
+  limit: number,
+|};
 export type RefreshTransactionsRequestType = {|
   publicDeriverId: number,
-  // this is local refresh, i.e. load transactions from db, *not* syncing db with remote
-  isLocalRequest: true,
-  beforeTx?: ?ReferenceTransaction,
-  afterTx?: ?ReferenceTransaction,
-  skip?: number,
-  limit?: number,
+  ...(RefreshTransactionForInitialLoad | RefreshTransactionToLoadMore)
 |};
+
+function deserializeTx(tx: any): WalletTransaction {
+  // we know that there are only two types and only the Shelley one has the 'certificates'
+  // field
+  if (Object.prototype.hasOwnProperty.call(tx, 'certificates')) {
+    return CardanoShelleyTransaction.fromData(deserializeShelleyTransactionCtorData(tx));
+  }
+  return CardanoByronTransaction.fromData(deserializeByronTransactionCtorData(tx));
+}
 
 export async function refreshTransactions(
   request: RefreshTransactionsRequestType
 ): Promise<Array<WalletTransaction>> {
   const txs = await callBackground({ type: 'refresh-transactions', request });
-  return txs.map(tx => {
-    // we know that there are only two types and only the Shelley one has the 'certificates'
-    // field
-    if (Object.prototype.hasOwnProperty.call(tx, 'certificates')) {
-      return CardanoShelleyTransaction.fromData(deserializeShelleyTransactionCtorData(tx));
-    }
-    return CardanoByronTransaction.fromData(deserializeByronTransactionCtorData(tx));
-  });
+  return txs.map(deserializeTx);
 }
 
 export async function resyncWallet(
@@ -357,6 +361,12 @@ chrome.runtime.onMessage.addListener(async (message, _sender, _sendResponse) => 
   console.log('get message from background:', JSON.stringify(message, null, 2));
 
   if (message.type === 'wallet-state-update') {
+    if (message.params.newTxs) {
+      message.params.newTxs = message.params.newTxs.map(deserializeTx);
+    }
+    if (message.params.walletState) {
+      patchWalletState(message.params.walletState);
+    }
     callbacks.walletStateUpdate.forEach(callback => callback(message.params));
   } else if (message.type === 'server-status-update') {
     callbacks.serverStatusUpdate.forEach(callback => callback(message.params));
@@ -365,11 +375,20 @@ chrome.runtime.onMessage.addListener(async (message, _sender, _sendResponse) => 
   }
 });
 
+type Update = {|
+  isRefreshing: true,
+|} | {|
+  isRefreshing: false,
+  walletState: WalletState,
+  newTxs: Array<WalletTransaction>,
+|};
+                     
 export type WalletStateUpdateParams = {|
   eventType: 'update',
   publicDeriverId: number,
-  isRefreshing: boolean,
+  ...Update,
 |} | {|
+  // in case we have multiple UI tabs and one tab creates a new wallet, this message notifies other tabs
   eventType: 'new',
   publicDeriverId: number,
 |} | {|

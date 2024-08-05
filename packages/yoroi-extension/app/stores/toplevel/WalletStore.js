@@ -199,14 +199,12 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
             this.wallets[index].isRefreshing = true;
           });
         } else {
-          const newWalletState = await getWallets(params.publicDeriverId);
+          const newWalletState = params.walletState;
           runInAction(() => {
-            Object.assign(this.wallets[index], newWalletState[0]);
+            Object.assign(this.wallets[index], newWalletState);
             this.initialSyncingWalletIds.delete(params.publicDeriverId);
-            transactions.refreshTransactionData({
-              publicDeriver: newWalletState[0],
-            });
           });
+          transactions.updateNewTransactions(params.newTxs, params.publicDeriverId);
         }
       } else if (params.eventType === 'remove') {
         const index = this.wallets.findIndex(wallet => wallet.publicDeriverId === params.publicDeriverId);
@@ -221,9 +219,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     });
 
     this._queueWarningIfNeeded(request.publicDeriver);
-    transactions.refreshTransactionData({
-      publicDeriver: request.publicDeriver,
-    });
   };
 
   // =================== ACTIVE WALLET ==================== //

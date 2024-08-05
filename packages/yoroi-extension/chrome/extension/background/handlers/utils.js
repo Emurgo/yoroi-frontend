@@ -41,8 +41,28 @@ import { MultiToken } from '../../../../app/api/common/lib/MultiToken';
 import { RustModule } from '../../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { loadSubmittedTransactions } from '../../../../app/api/localStorage';
 import { refreshingWalletIdSet } from '../state';
+import { getDb } from '../state';
+import { loadWalletsFromStorage } from '../../../../app/api/ada/lib/storage/models/load';
 
-export async function getWalletState(publicDeriver: PublicDeriver<>): Promise<WalletState> {
+export async function getWalletsState(publicDeriverId: ?number): Promise<Array<WalletState>> {
+  const db = await getDb();
+  let publicDerivers = await loadWalletsFromStorage(db);
+  if (typeof publicDeriverId === 'number') {
+    const publicDeriver = publicDerivers.find(pd =>
+      pd.getPublicDeriverId() === publicDeriverId
+    );
+    if (publicDeriver) {
+      publicDerivers = [publicDeriver];
+    } else {
+      publicDerivers = [];
+    }
+  }
+  const walletStates = await Promise.all(publicDerivers.map(getWalletState));
+  await batchLoadSubmittedTransactions(walletStates);
+  return walletStates;
+}
+
+async function getWalletState(publicDeriver: PublicDeriver<>): Promise<WalletState> {
   await RustModule.load();
 
   const publicDeriverId = publicDeriver.getPublicDeriverId();

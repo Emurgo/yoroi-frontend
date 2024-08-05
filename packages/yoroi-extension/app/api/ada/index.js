@@ -581,11 +581,12 @@ export default class AdaApi {
       if (request.isLocalRequest) {
         fetchedTxs = await getAllTransactions({
           publicDeriver: request.publicDeriver,
-          skip: 0,
-          limit: FETCH_TXS_BATCH_SIZE,
+          skip: request.skip || 0,
+          limit: request.limit || FETCH_TXS_BATCH_SIZE,
         });
       } else {
         if (!request.beforeTx) {
+          // we are "loading more" old transactions, no need to update utxos
           await updateUtxos(
             request.publicDeriver.getDb(),
             request.publicDeriver,

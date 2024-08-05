@@ -40,11 +40,12 @@ export type TxHistoryState = {|
   txs: Array<WalletTransaction>,
   hasMoreToLoad: boolean,
   requests: {|
-    // used to initially load the saved txs and then periodically refresh for
-    // new txs
+    // used to *only* initially load the saved txs
     headRequest: CachedRequest<typeof refreshTransactions>,
-    // used to "load more transactions"
+    // used to *only* load more older transactions
     tailRequest: CachedRequest<typeof refreshTransactions>,
+    // note we do *not* proactively load new transactions, instead, we listen for the wallet state
+    // update event from background for new transactions
   |},
 |};
 
@@ -144,9 +145,9 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     if (!publicDeriver) {
       throw new Error(`${nameof(TransactionsStore)}::${nameof(this.isLoading)} no wallet selected`);
     }
-    const { tailRequest } = this.getTxHistoryState(publicDeriver.publicDeriverId).requests;
+    const { headRequest } = this.getTxHistoryState(publicDeriver.publicDeriverId).requests;
 
-    return !tailRequest.wasExecuted;
+    return !headRequest.wasExecuted;
   }
 
   isWalletLoading: number => boolean = (publicDeriverId) => {
@@ -192,71 +193,9 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     await this.stores.tokenInfoStore.refreshTokenInfo();
   }
 
-  @action refreshTransactionData: {|
-    +publicDeriver: WalletState,
-  |} => Promise<void> = async (request) => {
-    const { publicDeriverId } = request.publicDeriver;
-
-    const txHistoryState = this.getTxHistoryState(publicDeriverId);
-    const isEmptyHistory = txHistoryState.txs.length === 0;
-
-    const { headRequest, } = txHistoryState.requests;
-
-    let result;
-    if (isEmptyHistory) {
-      /*
-       * TAIL REQUEST IS USED WHEN FIRST SYNC OR EMPTY WALLET
-       */
-      result = await this._internalTailRequestForTxs({
-        publicDeriver: request.publicDeriver,
-      });
-    } else {
-      /*
-       * HEAD REQUEST IS USED WITH `AFTER` REFERENCE
-       * WHEN NON-EMPTY WALLET
-       */
-      headRequest.invalidate({ immediately: false });
-      headRequest.execute({
-        publicDeriverId,
-        isLocalRequest: true,
-        afterTx: txHistoryState.txs[0],
-      });
-      if (headRequest.promise == null) {
-        throw new Error('unexpected nullish headRequest.promise');
-      }
-      result = await headRequest.promise;
-      {
-        /**
-         * Adding received txs to the start of the existing history
-         */
-        const { txs } = this.getTxHistoryState(request.publicDeriver.publicDeriverId);
-        runInAction(() => {
-          for (let i = 0; i < result.length; i++) {
-            const tx = result[i];
-            if (tx.txid === txs[0]?.txid) {
-              // In case received tx matches with the existing one - stop
-              break;
-            }
-            txs.splice(i, 0, tx);
-          }
-        });
-      }
-    }
-
-    // note: possible existing memos were modified on a difference instance, etc.e
-    await this.actions.memos.syncTxMemos.trigger(request.publicDeriver);
-
-    await this._afterLoadingNewTxs(
-      result,
-      request.publicDeriver,
-    );
-  }
-
-  _internalTailRequestForTxs: ({|
-    +publicDeriver: { publicDeriverId: number, networkId: number, ... },
-  |}) => Promise<GetTransactionsResponse> = async ({
-    publicDeriver,
-  }) => {
+  @action _loadMore: (
+    { networkId: number, publicDeriverId: number, ... },
+  ) => Promise<void> = async (publicDeriver) => {
     const { publicDeriverId } = publicDeriver;
     const state = this.getTxHistoryState(publicDeriverId);
     const { tailRequest } = state.requests;
@@ -266,8 +205,9 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     tailRequest.invalidate({ immediately: false });
     tailRequest.execute({
       publicDeriverId,
-      isLocalRequest: true,
       beforeTx,
+      skip: state.txs.length,
+      limit: appConfig.wallets.MAX_RECENT_TXS_PER_LOAD,
     });
     if (!tailRequest.promise) throw new Error('unexpected nullish tailRequest.promise');
     const result = await tailRequest.promise;
@@ -275,13 +215,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       state.txs.splice(state.txs.length, 0, ...result);
       state.hasMoreToLoad = result.length >= appConfig.wallets.MAX_RECENT_TXS_PER_LOAD;
     });
-    return result;
-  }
 
-  @action _loadMore: (
-    { networkId: number, publicDeriverId: number, ... },
-  ) => Promise<void> = async (publicDeriver) => {
-    const result = await this._internalTailRequestForTxs({ publicDeriver });
     await this._afterLoadingNewTxs(result, publicDeriver);
   }
 
@@ -297,6 +231,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     if (foundRequest != null) {
       return;
     }
+
     this.txHistoryStates.push({
       publicDeriverId,
       lastSyncInfo: publicDeriver.lastSyncInfo,
@@ -306,6 +241,19 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
         headRequest: new CachedRequest(refreshTransactions),
         tailRequest: new CachedRequest(refreshTransactions),
       },
+    });
+    const { headRequest } = this.getTxHistoryState(publicDeriverId).requests;
+    headRequest.execute({
+      publicDeriverId,
+    });
+    if (headRequest.promise == null) {
+      throw new Error('unexpected nullish headRequest.promise');
+    }
+    headRequest.promise.then(result => {
+      const { txs } = this.getTxHistoryState(publicDeriverId);
+      runInAction(() => {
+        txs.splice(0, 0, ...result);
+      });
     });
   }
 
@@ -593,5 +541,13 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
   clearProcessedWithdrawals: ({ publicDeriverId: number, ... }) => void = (publicDeriver) => {
     this._processedWithdrawals.delete(publicDeriver.publicDeriverId);
+  }
+
+  // the wallet store gets update of new transactions and calls this function to display them
+  updateNewTransactions(newTxs: Array<WalletTransaction>, publicDeriverId: number): void {
+    const { txs } = this.getTxHistoryState(publicDeriverId);
+    runInAction(() => {
+      txs.splice(0, 0, ...newTxs);
+    });
   }
 }

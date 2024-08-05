@@ -17,6 +17,9 @@ import LocalStorageApi, {
   persistSubmittedTransactions,
 } from '../../../../app/api/localStorage/index';
 import { Queue } from 'async-await-queue';
+import type { WalletState } from '../types';
+import WalletTransaction from '../../../../app/domain/WalletTransaction';
+import { getWalletsState } from '../handlers/utils';
 
 registerCallback((params) => {
   if (params.type === 'subscriptionChange') {
@@ -103,11 +106,11 @@ async function _syncWallet(publicDeriver: PublicDeriver<>, logInfo: string): Pro
     }
 
     const adaApi = new AdaApi();
-    const txs = await adaApi.refreshTransactions({
+    const localTxs = await adaApi.refreshTransactions({
       // skip
-      // number
+      limit: 1,
       publicDeriver: withLevels,
-      isLocalRequest: false,
+      isLocalRequest: true,
       beforeTx: undefined,
       afterTx: undefined,
       getRecentTransactionHashes: stateFetcher.getRecentTransactionHashes,
@@ -120,8 +123,25 @@ async function _syncWallet(publicDeriver: PublicDeriver<>, logInfo: string): Pro
       getTransactionHistory: stateFetcher.getTransactionsHistoryForAddresses,
     });
 
+    const newTxs = await adaApi.refreshTransactions({
+      // skip
+      // number
+      publicDeriver: withLevels,
+      isLocalRequest: false,
+      beforeTx: undefined,
+      afterTx: localTxs[0],
+      getRecentTransactionHashes: stateFetcher.getRecentTransactionHashes,
+      getTransactionsByHashes: stateFetcher.getTransactionsByHashes,
+      checkAddressesInUse: stateFetcher.checkAddressesInUse,
+      getBestBlock: stateFetcher.getBestBlock,
+      getTokenInfo: stateFetcher.getTokenInfo,
+      getMultiAssetMetadata: stateFetcher.getMultiAssetMintMetadata,
+      getMultiAssetSupply: stateFetcher.getMultiAssetSupply,
+      getTransactionHistory: stateFetcher.getTransactionsHistoryForAddresses,
+    });
+
     const remoteTransactionIds = new Set();
-    for (const { txid } of txs) {
+    for (const { txid } of newTxs) {
       remoteTransactionIds.add(txid);
     }
 
@@ -142,21 +162,33 @@ async function _syncWallet(publicDeriver: PublicDeriver<>, logInfo: string): Pro
       persistSubmittedTransactions(submittedTransactions);
     }
     console.log('Syncing wallet %s finished.', publicDeriverId);
+    emitUpdate(
+      publicDeriverId,
+      false,
+      (await getWalletsState(publicDeriverId))[0],
+      newTxs
+    );
   } catch (error) {
     console.error('Syncing wallet %s failed:', publicDeriverId, error);
   } finally {
     refreshingWalletIdSet.delete(publicDeriverId);
-    emitUpdate(publicDeriverId, false);
   }
 }
 
-function emitUpdate(publicDeriverId: number, isRefreshing: boolean): void {
+function emitUpdate(
+  publicDeriverId: number,
+  isRefreshing: boolean,
+  walletState?: ?WalletState,
+  newTxs?: Array<WalletTransaction>,
+): void {
   emitUpdateToSubscriptions({
     type: 'wallet-state-update',
     params: {
       eventType: 'update',
       publicDeriverId,
       isRefreshing,
+      walletState,
+      newTxs,
     },
   });
 }

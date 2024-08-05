@@ -236,15 +236,14 @@ export async function rawGetTransactions(
     GetDerivationSpecific: Class<GetDerivationSpecific>,
     GetCertificates: Class<GetCertificates>,
   |},
-  request: {|
+  request: {
     publicDeriver: IPublicDeriver<ConceptualWallet>,
     getTxAndBlock: (txIds: Array<number>) => Promise<$ReadOnlyArray<{|
       Block: null | $ReadOnly<BlockRow>,
       Transaction: $ReadOnly<TransactionRow>,
     |}>>,
-    skip?: number,
-    limit?: number,
-  |},
+    ...
+  },
   derivationTables: Map<number, string>,
 ): Promise<{|
   addressLookupMap: Map<number, string>,

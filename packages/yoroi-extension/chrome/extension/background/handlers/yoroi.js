@@ -100,8 +100,7 @@ import { subscribe, emitUpdateToSubscriptions } from '../subscriptionManager';
 import AdaApi, { genOwnStakingKey } from '../../../../app/api/ada';
 import { loadWalletsFromStorage } from '../../../../app/api/ada/lib/storage/models/load';
 import {
-  getWalletState,
-  batchLoadSubmittedTransactions,
+  getWalletsState,
   getPlaceHolderWalletState,
  } from './utils';
 import { getCardanoStateFetcher } from '../utils';
@@ -671,20 +670,7 @@ export async function yoroiMessageHandler(
     }
     sendResponse(null);
   } else if (request.type === YOROI_MESSAGES.GET_WALLETS) {
-    const db = await getDb();
-    let publicDerivers = await loadWalletsFromStorage(db);
-    if (request.request.walletId) {
-      const publicDeriver = publicDerivers.find(pd =>
-        pd.getPublicDeriverId() === request.request.walletId
-      );
-      if (publicDeriver) {
-        publicDerivers = [publicDeriver];
-      } else {
-        publicDerivers = [];
-      }
-    }
-    const walletStates = await Promise.all(publicDerivers.map(getWalletState));
-    await batchLoadSubmittedTransactions(walletStates);
+    const walletStates = await getWalletsState(request.request.walletId);
     sendResponse(walletStates);
   } else if (request.type === YOROI_MESSAGES.CHANGE_SIGNING_PASSWORD) {
     const publicDeriver = await getPublicDeriverById(request.request.publicDeriverId);
@@ -775,7 +761,7 @@ export async function yoroiMessageHandler(
         signRequest,
         sendTx: stateFetcher.sendTx,
       });
-      // fixme: notify submitted tx change
+
       try {
         await RustModule.WasmScope(Scope => connectorRecordSubmittedCardanoTransaction(
           publicDeriver,
@@ -785,6 +771,7 @@ export async function yoroiMessageHandler(
         // ignore
       }
       sendResponse({ txId });
+      emitUpdateForTxSubmission(request.request.publicDeriverId);
     } catch (error) {
       sendResponse({ error: error.message });
     }
@@ -912,7 +899,7 @@ export async function yoroiMessageHandler(
       ...AdaGetTransactionsRequest,
     |} = {
       publicDeriver: withLevels,
-      isLocalRequest: request.request.isLocalRequest,
+      isLocalRequest: true,
       getRecentTransactionHashes: stateFetcher.getRecentTransactionHashes,
       getTransactionsByHashes: stateFetcher.getTransactionsByHashes,
       checkAddressesInUse: stateFetcher.checkAddressesInUse,
@@ -922,19 +909,28 @@ export async function yoroiMessageHandler(
       getMultiAssetSupply: stateFetcher.getMultiAssetSupply,
       getTransactionHistory: stateFetcher.getTransactionsHistoryForAddresses,
     };
-    if (request.request.skip) {
-      refreshTxRequest.skip = request.request.skip;
+
+    let txs;
+    if (typeof request.request.skip === 'number' && request.request.limit && request.request.beforeTx) {
+      const { skip, limit, beforeTx } = request.request;
+      // load more
+      // first try to load locally
+      refreshTxRequest.skip = skip;
+      refreshTxRequest.limit = limit;
+      const localTxs = await adaApi.refreshTransactions(refreshTxRequest);
+      if (localTxs.length === limit) {
+        txs = localTxs;
+      } else {
+        // not enough in db, must request network
+        refreshTxRequest.beforeTx = localTxs.length ? localTxs[localTxs.length - 1] : beforeTx;
+        refreshTxRequest.isLocalRequest = false;
+        const remoteTxs = await adaApi.refreshTransactions(refreshTxRequest);
+        txs = [...localTxs, ...remoteTxs.slice(0, limit - localTxs.length)];
+      }
+    } else {
+      // initial transaction list loading
+      txs = await adaApi.refreshTransactions(refreshTxRequest);
     }
-    if (request.request.limit) {
-      refreshTxRequest.limit = request.request.limit;
-    }
-    if (request.request.beforeTx) {
-      refreshTxRequest.beforeTx = request.request.beforeTx;
-    }
-    if (request.request.afterTx) {
-      refreshTxRequest.afterTx = request.request.afterTx;
-    }
-    const txs = await adaApi.refreshTransactions(refreshTxRequest);
     sendResponse(txs);
   } else if (request.type === YOROI_MESSAGES.BROADCAST_TRANSACTION) {
     const publicDeriver: ?PublicDeriver<> = await getPublicDeriverById(request.request.publicDeriverId);
@@ -977,6 +973,7 @@ export async function yoroiMessageHandler(
         // ignore
       }
       sendResponse(null);
+      emitUpdateForTxSubmission(request.request.publicDeriverId);
     } catch (error) {
       sendResponse({ error: error.message });
     }
@@ -1081,4 +1078,19 @@ async function getPublicDeriverById(publicDeriverId: number): Promise<?PublicDer
   }
   // todo: refactor to throw an exception
   return null;
+}
+
+function emitUpdateForTxSubmission(publicDeriverId: number) {
+  (async () => {
+    emitUpdateToSubscriptions({
+      type: 'wallet-state-update',
+      params: {
+        eventType: 'update',
+        publicDeriverId,
+        isRefreshing: false,
+        walletState: (await getWalletsState(publicDeriverId))[0],
+        newTxs: [],
+      },
+    });
+  })().catch(console.error)
 }
