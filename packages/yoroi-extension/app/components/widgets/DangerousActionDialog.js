@@ -49,11 +49,7 @@ class DangerousActionDialog extends Component<Props & InjectedLayoutProps> {
 
     const dialogClasses = classnames(['removeWalletDialog', styles.dialog]);
 
-    const confirmButtonClasses = classnames([
-      'confirmButton',
-      styles.removeButton,
-      isSubmitting ? styles.isSubmitting : null,
-    ]);
+    const confirmButtonClasses = classnames(['confirmButton', styles.removeButton, isSubmitting ? styles.isSubmitting : null]);
 
     const actions = [
       {
@@ -91,14 +87,14 @@ class DangerousActionDialog extends Component<Props & InjectedLayoutProps> {
     const revampLayout = (
       <Box maxWidth="600px">
         {this.props.children}
-        <Box mb="24px">
+        <Box mb="24px" ml="3px">
           <FormControlLabel
             label={this.props.checkboxAcknowledge}
             control={
               <MuiCheckbox
                 onChange={this.props.toggleCheck}
                 checked={this.props.isSubmitting || this.props.isChecked}
-                sx={{ marginRight: '8px', width: '16px', height: '16px' }}
+                sx={{ marginRight: '8px', width: '16px', height: '16px', fontSize: '16px' }}
               />
             }
             id={id + '-acknowledgeAction-checkbox'}

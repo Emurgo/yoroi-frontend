@@ -2,11 +2,10 @@
 
 import type { lf$schema$Builder } from 'lovefield';
 import { ConstraintAction, ConstraintTiming, Type } from 'lovefield';
-
 import type { CertificateRelationType, CoreAddressT, TxStatusCodesType } from './enums';
+import typeof { CertificateKind } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 import type { KeyKindType } from '../../../cardanoCrypto/keys/types';
 import type { CoinTypesT } from '../../../../../../config/numbersConfig';
-import typeof { CertificateKind } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 
 export type CommonBaseConfig = {|
   /**
