@@ -14,10 +14,16 @@ import { forceNonNull, maybe } from '../../coreUtils';
 import LocalizableError from '../../i18n/LocalizableError';
 import Store from '../base/Store';
 import type { StoresMap } from '../index';
+import type {
+  GetDelegatedBalanceFunc,
+  GetDelegatedBalanceResponse,
+  RewardHistoryFunc,
+} from '../../api/ada/lib/storage/bridge/delegationUtils';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import LocalizedRequest from '../lib/LocalizedRequest';
-import type { MangledAmountsResponse } from '../stateless/mangledAddresses';
-
+import type { MangledAmountsResponse, MangledAmountFunc } from '../stateless/mangledAddresses';
+import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import type { ExplorerPoolInfo as PoolInfo } from '@emurgo/yoroi-lib';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
 export type DelegationRequests = {|
