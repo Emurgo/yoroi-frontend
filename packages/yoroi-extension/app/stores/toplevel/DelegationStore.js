@@ -282,7 +282,6 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
   };
 
   createDrepDelegationTransaction: string => Promise<void> = async drepCredential => {
-    console.log('STORE CREATE DELEGATION drepCredential ', drepCredential);
     await this.stores.substores.ada.delegationTransaction.createTransaction({
       drepCredential,
       publicDeriver: this.stores.wallets.selectedOrFail,
