@@ -40,8 +40,7 @@ import {
 import { MultiToken } from '../../../../app/api/common/lib/MultiToken';
 import { RustModule } from '../../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { loadSubmittedTransactions } from '../../../../app/api/localStorage';
-import { refreshingWalletIdSet } from '../state';
-import { getDb } from '../state';
+import { refreshingWalletIdSet, getDb } from '../state';
 import { loadWalletsFromStorage } from '../../../../app/api/ada/lib/storage/models/load';
 
 export async function getWalletsState(publicDeriverId: ?number): Promise<Array<WalletState>> {
@@ -222,7 +221,7 @@ async function getWalletState(publicDeriver: PublicDeriver<>): Promise<WalletSta
   };
 }
 
-export async function batchLoadSubmittedTransactions(walletStates: Array<WalletState>) {
+async function batchLoadSubmittedTransactions(walletStates: Array<WalletState>) {
   const walletStateByIdMap = new Map();
   for (const walletState of walletStates) {
     walletStateByIdMap.set(walletState.publicDeriverId, walletState);

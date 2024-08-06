@@ -1,33 +1,20 @@
 // @flow
 
-import type { lf$Database } from 'lovefield';
-import { debounce, } from 'lodash';
-import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { action, observable, runInAction } from 'mobx';
 import Store from './Store';
 import {
   Logger,
   stringifyError
 } from '../../utils/logging';
-import Request from '../lib/LocalizedRequest';
-import type {
-  CurrentCoinPriceResponse,
-  HistoricalCoinPriceResponse,
-} from '../../api/common/lib/state-fetch/types';
 import type { Ticker, PriceDataRow } from '../../api/ada/lib/storage/database/prices/tables';
-import { getPrice, upsertPrices, getAllPrices, getPriceKey } from '../../api/common/lib/storage/bridge/prices';
-import type { GetAllPricesFunc } from '../../api/common/lib/storage/bridge/prices';
-import { verifyTicker, verifyPubKeyDataReplacement } from '../../api/verify';
+import { getPrice, getPriceKey } from '../../api/common/lib/storage/bridge/prices';
 import type { ConfigType } from '../../../config/config-types';
 import BaseProfileActions from '../../actions/base/base-profile-actions';
-import type { IFetcher } from '../../api/common/lib/state-fetch/IFetcher.types';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { listenForCoinPriceUpdate, getHistoricalCoinPrices, refreshCurrentCoinPrice } from '../../api/thunk';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
-
-const SOURCE_CURRENCIES = ['ADA'];
 
 export default class BaseCoinPriceStore
   <
@@ -63,14 +50,14 @@ export default class BaseCoinPriceStore
           )
         );
 
-        for (const ticker of tickers) {
+        for (const t of tickers) {
           const index = this.currentPriceTickers.findIndex(
-            ({ From, To }) => From === ticker.From && To === ticker.To
+            ({ From, To }) => From === t.From && To === t.To
           );
           if (index === -1) {
-            this.currentPriceTickers.push(ticker);
+            this.currentPriceTickers.push(t);
           } else {
-            this.currentPriceTickers[index].Price = ticker.Price;
+            this.currentPriceTickers[index].Price = t.Price;
           }
         }
         this.lastUpdateTimestamp = ticker.timestamp;

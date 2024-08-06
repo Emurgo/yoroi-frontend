@@ -6,7 +6,7 @@ import { emitUpdateToSubscriptions, getSubscriptions } from './subscriptionManag
 import type { ConfigType } from '../../../config/config-types';
 import type { HistoricalCoinPriceResponse, HistoricalCoinPricesRequest } from '../../../app/api/thunk';
 import type { Ticker, PriceDataRow } from '../../../app/api/ada/lib/storage/database/prices/tables';
-import { upsertPrices, getAllPrices, getPriceKey } from '../../../app/api/common/lib/storage/bridge/prices';
+import { upsertPrices, getAllPrices } from '../../../app/api/common/lib/storage/bridge/prices';
 import { getDb } from './state';
 
 declare var CONFIG: ConfigType;
@@ -19,40 +19,44 @@ export function startPoll(): void {
 const SOURCE_CURRENCY = 'ADA';
 let currentPriceTicker: ResponseTicker | null = null;
 
-export async function refreshCurrentCoinPrice(why: 'UI' | 'poll') {
-  const localStorageApi = new LocalStorageApi();
-  const unitOfAccountSetting = await localStorageApi.getUnitOfAccount();
-  if (!unitOfAccountSetting.enabled) {
-    return;
-  }
-
-  if (why === 'poll' && getSubscriptions().length === 0) {
-    return;
-  }
-
-  const stateFetcher = await getCommonStateFetcher();
-
-  if (Date.now() - (currentPriceTicker?.timestamp || 0) > CONFIG.app.coinPriceRefreshInterval / 2) {
-    const from = SOURCE_CURRENCY;
-    try {
-      const response = await stateFetcher.getCurrentCoinPrice({
-        from,
-      });
-
-      if (response.error != null) {
-        console.error('coin price backend error: ' + response.error);
-      }
-
-      currentPriceTicker = response.ticker;
-    } catch (error) {
-      console.error('error when fetching price data for %s: %s', from, error);
+export function refreshCurrentCoinPrice(why: 'UI' | 'poll'): void {
+  (async () => {
+    const localStorageApi = new LocalStorageApi();
+    const unitOfAccountSetting = await localStorageApi.getUnitOfAccount();
+    if (!unitOfAccountSetting.enabled) {
+      return;
     }
-  }
-  emitUpdateToSubscriptions({
-    type: 'coin-price-update',
-    params: {
-      ticker: currentPriceTicker,
-    },
+
+    if (why === 'poll' && getSubscriptions().length === 0) {
+      return;
+    }
+
+    const stateFetcher = await getCommonStateFetcher();
+
+    if (Date.now() - (currentPriceTicker?.timestamp || 0) > CONFIG.app.coinPriceRefreshInterval / 2) {
+      const from = SOURCE_CURRENCY;
+      try {
+        const response = await stateFetcher.getCurrentCoinPrice({
+          from,
+        });
+
+        if (response.error != null) {
+          console.error('coin price backend error: ' + response.error);
+        }
+
+        currentPriceTicker = response.ticker;
+      } catch (error) {
+        console.error('error when fetching price data for %s: %s', from, error);
+      }
+    }
+    emitUpdateToSubscriptions({
+      type: 'coin-price-update',
+      params: {
+        ticker: currentPriceTicker,
+      },
+    });
+  })().catch(error => {
+    console.error('error when refreshing current coin price', error);
   });
 }
 

@@ -1,8 +1,5 @@
 // @flow
 
-import { schema } from 'lovefield';
-import { loadLovefieldDBFromDump } from './ada/lib/storage/database';
-import type { lf$Database, } from 'lovefield';
 import type { WalletState, ServerStatus } from '../../chrome/extension/background/types';
 import { HaskellShelleyTxSignRequest } from './ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type { NetworkRow, TokenRow } from './ada/lib/storage/database/primitives/tables';
@@ -41,20 +38,6 @@ function callBackground<T, R>(message: T): Promise<R> {
       resolve(response);
     });
   });
-}
-
-const DATE_REGEX = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*))(?:Z|(\+|-)([\d|:]*))?$/;
-
-//fixme: remove
-export async function getDb(): Promise<lf$Database> {
-  const dataStr = await callBackground({ type: 'get-db' });
-  const data = JSON.parse(dataStr, (key, value) => {
-    if (typeof value === 'string' && DATE_REGEX.exec(value)) {
-      return new Date(value);
-    }
-    return value;
-  });
-  return await loadLovefieldDBFromDump(schema.DataStoreType.MEMORY, data);
 }
 
 function patchWalletState(walletState: Object): WalletState {
@@ -347,7 +330,9 @@ export async function getHistoricalCoinPrices(
 }
 
 export function refreshCurrentCoinPrice(): void {
-  callBackground({ type: 'refresh-current-coin-price' });
+  callBackground({ type: 'refresh-current-coin-price' }).catch(error => {
+    console.error('error refreshing current coin price:', error.message)
+  });
 }
 
 // Background -> UI notifications:
@@ -382,8 +367,7 @@ type Update = {|
   walletState: WalletState,
   newTxs: Array<WalletTransaction>,
 |};
-                     
-export type WalletStateUpdateParams = {|
+type WalletStateUpdateParams = {|
   eventType: 'update',
   publicDeriverId: number,
   ...Update,
@@ -399,7 +383,7 @@ export type WalletStateUpdateParams = {|
 type CoinPriceUpdateParams = {|
   ticker: ResponseTicker,
 |};
-                              
+
 export function listenForWalletStateUpdate(callback: (WalletStateUpdateParams) => Promise<void>): void {
   callbacks.walletStateUpdate.push(callback);
 }

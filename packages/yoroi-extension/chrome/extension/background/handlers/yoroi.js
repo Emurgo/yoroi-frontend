@@ -1048,9 +1048,7 @@ export async function yoroiMessageHandler(
     await syncWallet(publicDeriver, 'UI resync');
     sendResponse(null);
   } else if (request.type === YOROI_MESSAGES.REFRESH_CURRENT_COIN_PRICE) {
-    refreshCurrentCoinPrice('UI').catch(error => {
-      console.error('unexpected error when refreshing current coin price:', error);
-    });
+    refreshCurrentCoinPrice('UI');
     sendResponse(null);
   } else if (request.type === YOROI_MESSAGES.GET_HISTORICAL_COIN_PRICES) {
     try {

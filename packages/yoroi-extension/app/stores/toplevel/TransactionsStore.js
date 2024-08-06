@@ -6,10 +6,7 @@ import Store from '../base/Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import CardanoShelleyTransaction from '../../domain/CardanoShelleyTransaction';
 import WalletTransaction from '../../domain/WalletTransaction';
-import type {
-  ExportTransactionsFunc,
-  GetTransactionsResponse,
-} from '../../api/common/index';
+import type { ExportTransactionsFunc, } from '../../api/common/index';
 import type { IGetLastSyncInfoResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { UnconfirmedAmount } from '../../types/unconfirmedAmount.types';
 import LocalizedRequest from '../lib/LocalizedRequest';
@@ -34,7 +31,7 @@ import { refreshTransactions } from '../../api/thunk';
 import type { LastSyncInfoRow, } from '../../api/ada/lib/storage/database/walletTypes/core/tables';
 import type { WalletState } from '../../../chrome/extension/background/types';
 
-export type TxHistoryState = {|
+type TxHistoryState = {|
   publicDeriverId: number,
   lastSyncInfo: IGetLastSyncInfoResponse,
   txs: Array<WalletTransaction>,
@@ -254,6 +251,9 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       runInAction(() => {
         txs.splice(0, 0, ...result);
       });
+      return undefined;
+    }).catch(error => {
+      console.error('error when loading transaction list head', error)
     });
   }
 
