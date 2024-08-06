@@ -70,6 +70,36 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     const { wallets } = this.actions;
     wallets.unselectWallet.listen(this._unsetActiveWallet);
     wallets.setActiveWallet.listen(this._setActiveWallet);
+
+    listenForWalletStateUpdate(async (params) => {
+      if (params.eventType === 'update') {
+        const index = this.wallets.findIndex(wallet => wallet.publicDeriverId === params.publicDeriverId);
+        if (index === -1) {
+          return;
+        }
+        if (params.isRefreshing) {
+          runInAction(() => {
+            this.wallets[index].isRefreshing = true;
+          });
+        } else {
+          const newWalletState = params.walletState;
+          runInAction(() => {
+            Object.assign(this.wallets[index], newWalletState);
+            this.initialSyncingWalletIds.delete(params.publicDeriverId);
+          });
+          this.stores.transactions.updateNewTransactions(params.newTxs, params.publicDeriverId);
+        }
+      } else if (params.eventType === 'remove') {
+        const index = this.wallets.findIndex(wallet => wallet.publicDeriverId === params.publicDeriverId);
+        if (index === -1) {
+          return;
+        }
+        runInAction(() => {
+          this.wallets.splice(index, 1);
+        });
+      }
+      // we don't handle (params.eventType === 'new') because currently there is only one open tab allowed
+    });
   }
 
   @computed get selected(): null | WalletState {
@@ -184,38 +214,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     this.stores.walletSettings.walletWarnings.push({
       publicDeriverId: request.publicDeriver.publicDeriverId,
       dialogs: [],
-    });
-
-    this._queueWarningIfNeeded(request.publicDeriver);
-
-    listenForWalletStateUpdate(async (params) => {
-      if (params.eventType === 'update') {
-        const index = this.wallets.findIndex(wallet => wallet.publicDeriverId === params.publicDeriverId);
-        if (index === -1) {
-          return;
-        }
-        if (params.isRefreshing) {
-          runInAction(() => {
-            this.wallets[index].isRefreshing = true;
-          });
-        } else {
-          const newWalletState = params.walletState;
-          runInAction(() => {
-            Object.assign(this.wallets[index], newWalletState);
-            this.initialSyncingWalletIds.delete(params.publicDeriverId);
-          });
-          transactions.updateNewTransactions(params.newTxs, params.publicDeriverId);
-        }
-      } else if (params.eventType === 'remove') {
-        const index = this.wallets.findIndex(wallet => wallet.publicDeriverId === params.publicDeriverId);
-        if (index === -1) {
-          return;
-        }
-        runInAction(() => {
-          this.wallets.splice(index, 1);
-        });
-      }
-      // we don't handle (params.eventType === 'new') because currently there is only one open tab allowed
     });
 
     this._queueWarningIfNeeded(request.publicDeriver);
