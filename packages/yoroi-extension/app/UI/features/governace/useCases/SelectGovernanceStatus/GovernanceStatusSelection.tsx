@@ -89,7 +89,7 @@ export const GovernanceStatusSelection = () => {
       icon: <DRepIlustration />,
       selected: governanceStatus !== null ? true : false,
       onClick: handleDelegate,
-      pending: pendingVote,
+      pending: governanceStatus === null,
     },
     {
       title: strings.abstain,
@@ -97,7 +97,7 @@ export const GovernanceStatusSelection = () => {
       icon: <Abstein />,
       selected: governanceStatus === 'abstain' ? true : false,
       onClick: handleAbstain,
-      pending: pendingVote,
+      pending: governanceStatus === null,
     },
     {
       title: strings.noConfidence,
@@ -105,7 +105,7 @@ export const GovernanceStatusSelection = () => {
       icon: <NoConfidance />,
       selected: governanceStatus === 'no-confidence' ? true : false,
       onClick: handleNoConfidence,
-      pending: pendingVote,
+      pending: governanceStatus === null,
     },
   ];
 
@@ -140,7 +140,7 @@ export const GovernanceStatusSelection = () => {
       <Stack gap="17px" mt="42px">
         {governanceStatus && (
           <Typography variant="body2" align="center" color="textSecondary" gutterBottom>
-            `${strings.drepId} ${governanceStatus}`
+            {strings.drepId} {governanceStatus}
           </Typography>
         )}
         {governanceStatus === null && (

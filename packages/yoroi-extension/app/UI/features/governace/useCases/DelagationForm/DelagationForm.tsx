@@ -59,15 +59,14 @@ export const DelagationForm = () => {
   const strings = useStrings();
 
   React.useEffect(() => {
-    console.log('txDelegationError', txDelegationError);
-    console.log('txDelegationResult', txDelegationResult);
     const signTx = async () => {
       const result = await signDelegationTransaction({
         password,
         publicDeriver: selectedWallet,
         dialog: null,
       });
-
+      console.log('result', result);
+      setFormLoading(false);
       navigateTo.transactionSubmited();
       try {
       } catch (error) {
@@ -80,7 +79,7 @@ export const DelagationForm = () => {
     if (txDelegationResult != null && password.length > 0) {
       signTx();
     }
-  }, [txDelegationResult, txDelegationError]);
+  }, [txDelegationResult, txDelegationError, password]);
 
   const confirmDelegation = async () => {
     const response = await checkUserPassword(password);
@@ -88,8 +87,9 @@ export const DelagationForm = () => {
       setIsIncorectPassword(true);
     } else {
       try {
-        setFormLoading(true);
         await createDrepDelegationTransaction(governanceVote.kind === 'delegate' ? governanceVote.drepID : governanceVote.kind);
+        setFormLoading(false);
+        setPassword('');
       } catch (error) {
         console.log('ERROR on createDrepDelegationTransaction', error);
         setFormLoading(false);
