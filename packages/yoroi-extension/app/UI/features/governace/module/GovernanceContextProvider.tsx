@@ -4,10 +4,11 @@ import * as React from 'react';
 import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { unwrapStakingKey } from '../../../../api/ada/lib/storage/bridge/utils';
 import { asGetSigningKey, asGetStakingKey } from '../../../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE } from '../common/constants';
 import { useGovernanceManagerMaker } from '../common/useGovernanceManagerMaker';
 import { GovernanceActionType, GovernanceReducer, defaultGovernanceActions, defaultGovernanceState } from './state';
 
-type drepDelegation = string | null;
+type drepDelegation = { status: string | null; drep: string | null };
 
 const initialGovernanceProvider = {
   ...defaultGovernanceState,
@@ -20,7 +21,7 @@ const initialGovernanceProvider = {
   createDrepDelegationTransaction: async (_drepCredential: string) => Response,
   signDelegationTransaction: async (_params: any) => Response,
   selectedWallet: null,
-  governanceStatus: undefined,
+  governanceStatus: { status: null, drep: null },
 };
 
 const GovernanceContext = React.createContext(initialGovernanceProvider);
@@ -48,7 +49,7 @@ export const GovernanceContextProvider = ({
   });
   const [stakingKeyHash, setStakingKeyHash] = React.useState(null);
   const [stakingKeyHex, setStakingKeyHex] = React.useState(null);
-  const [governanceStatus, setGovernanceStatus] = React.useState<drepDelegation>(null);
+  const [governanceStatus, setGovernanceStatus] = React.useState<drepDelegation>({ status: null, drep: null });
   const { walletId, networkId, currentPool, selectedWallet, backendService, backendServiceZero } = currentWallet;
   const governanceManager = useGovernanceManagerMaker(walletId, networkId);
 
@@ -106,11 +107,18 @@ export const GovernanceContextProvider = ({
       networkId: networkId,
       wasmFactory: RustModule.CrossCsl.init,
     });
-    console.log('[getGovApiState stakingKeyHex]', stakingKeyHex);
 
-    const governanceStatusState = await govApi.getAccountState(stakingKeyHex || '', stakingKeyHex || '');
+    const governanceStatusState: any = await govApi.getAccountState(stakingKeyHex || '', stakingKeyHex || '');
 
-    setGovernanceStatus(governanceStatusState?.drepDelegation?.drep || null);
+    if (governanceStatusState && governanceStatusState.drepDelegation?.drep === 'abstain') {
+      setGovernanceStatus({ status: DREP_ALWAYS_ABSTAIN, drep: null });
+    } else if (governanceStatusState && governanceStatusState.drepDelegation?.drep === 'no_confidence') {
+      setGovernanceStatus({ status: DREP_ALWAYS_NO_CONFIDENCE, drep: null });
+    } else if (governanceStatusState !== null && governanceStatusState.drepDelegation?.drep.length > 0) {
+      setGovernanceStatus({ status: 'delegate', drep: governanceStatusState.drepDelegation?.drep || null });
+    } else {
+      setGovernanceStatus({ status: 'none', drep: null });
+    }
   };
 
   const actions = React.useRef({

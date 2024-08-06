@@ -82,7 +82,6 @@ export default class Request<Func: (...args: any) => Promise<any>, Err> {
             }),
             1
           );
-          console.log('EXECUTE RESULT', result);
           return result;
         })
         .catch(

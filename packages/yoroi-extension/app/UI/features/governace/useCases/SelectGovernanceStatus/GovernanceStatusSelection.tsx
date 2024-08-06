@@ -29,22 +29,19 @@ const Container = styled(Box)(() => ({
 
 export const mapStatus = {
   delegate: 'Delegate to a Drep',
-  DREP_ALWAYS_ABSTAIN: 'Abstaining',
-  DREP_ALWAYS_NO_CONFIDENCE: 'No confidence',
+  ALWAYS_ABSTAIN: 'Abstaining',
+  ALWAYS_NO_CONFIDENCE: 'No confidence',
 };
 
 export const GovernanceStatusSelection = () => {
-  const [pendingVote] = React.useState<boolean>(false);
   const { governanceStatus, governanceManager, governanceVoteChanged } = useGovernance();
   const navigateTo = useNavigateTo();
   const { openModal } = useModal();
   const strings = useStrings();
 
-  console.log('[governanceStatus]', governanceStatus);
-
-  const pageTitle = governanceStatus ? strings.governanceStatus : strings.registerGovernance;
-  const statusRawText = mapStatus['delegate'];
-  const pageSubtitle = governanceStatus === null ? strings.reviewSelection : strings.statusSelected(statusRawText);
+  const pageTitle = governanceStatus.status !== 'none' ? strings.governanceStatus : strings.registerGovernance;
+  const statusRawText = mapStatus[governanceStatus.status || ''];
+  const pageSubtitle = governanceStatus.status === 'none' ? strings.reviewSelection : strings.statusSelected(statusRawText);
 
   const openDRepIdModal = (onSubmit: (drepID: string) => void) => {
     if (!governanceManager) {
@@ -84,28 +81,28 @@ export const GovernanceStatusSelection = () => {
 
   const optionsList = [
     {
-      title: governanceStatus ? strings.delegateingToDRep : strings.delegateToDRep,
+      title: governanceStatus.status === 'delegate' ? strings.delegateingToDRep : strings.delegateToDRep,
       description: strings.designatingSomeoneElse,
       icon: <DRepIlustration />,
-      selected: governanceStatus !== null ? true : false,
+      selected: governanceStatus.status === 'delegate' ? true : false,
       onClick: handleDelegate,
-      pending: governanceStatus === null,
+      pending: governanceStatus.status === null,
     },
     {
       title: strings.abstain,
       description: strings.abstainInfo,
       icon: <Abstein />,
-      selected: governanceStatus === 'abstain' ? true : false,
+      selected: governanceStatus.status === DREP_ALWAYS_ABSTAIN ? true : false,
       onClick: handleAbstain,
-      pending: governanceStatus === null,
+      pending: governanceStatus.status === null,
     },
     {
       title: strings.noConfidence,
       description: strings.noConfidenceInfo,
       icon: <NoConfidance />,
-      selected: governanceStatus === 'no-confidence' ? true : false,
+      selected: governanceStatus.status === DREP_ALWAYS_NO_CONFIDENCE ? true : false,
       onClick: handleNoConfidence,
-      pending: governanceStatus === null,
+      pending: governanceStatus.status === null,
     },
   ];
 
@@ -138,12 +135,12 @@ export const GovernanceStatusSelection = () => {
       </Box>
 
       <Stack gap="17px" mt="42px">
-        {governanceStatus && (
+        {governanceStatus.drep !== null && (
           <Typography variant="body2" align="center" color="textSecondary" gutterBottom>
-            {strings.drepId} {governanceStatus}
+            {strings.drepId} {governanceStatus.drep}
           </Typography>
         )}
-        {governanceStatus === null && (
+        {governanceStatus.status === 'none' && (
           <Link href={BECOME_DREP_LINK} target="_blank" rel="noopener" variant="body1" lineHeight="22px">
             {strings.becomeADrep}
           </Link>

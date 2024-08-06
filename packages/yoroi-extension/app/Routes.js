@@ -517,7 +517,6 @@ export function wrapGovernance(governanceProps: StoresAndActionsProps, children:
   const { delegationTransaction } = governanceProps.stores.substores.ada;
   const delegationTxResult = delegationTransaction.createDelegationTx.result;
   const delegationTxError = delegationTransaction.createDelegationTx.error;
-  console.log('delegationTx result', delegationTxResult);
 
   return (
     <GovernanceContextProvider
