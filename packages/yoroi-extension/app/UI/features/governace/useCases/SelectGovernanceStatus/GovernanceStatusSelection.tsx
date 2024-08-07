@@ -81,7 +81,7 @@ export const GovernanceStatusSelection = () => {
 
   const optionsList = [
     {
-      title: governanceStatus.status === 'delegate' ? strings.delegateingToDRep : strings.delegateToDRep,
+      title: governanceStatus.status === 'delegate' ? strings.delegatingToDRep : strings.delegateToDRep,
       description: strings.designatingSomeoneElse,
       icon: <DRepIlustration />,
       selected: governanceStatus.status === 'delegate' ? true : false,

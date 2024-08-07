@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography';
 import * as React from 'react';
 import { Collapsible } from '../../../../components/Collapsible/Collapsible';
 import { PasswordInput } from '../../../../components/Input/PasswordInput';
+import { DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE } from '../../common/constants';
 import { useNavigateTo } from '../../common/useNavigateTo';
 import { useStrings } from '../../common/useStrings';
 import { useGovernance } from '../../module/GovernanceContextProvider';
@@ -114,30 +115,11 @@ export const DelagationForm = () => {
             content={
               <TransactionDetails>
                 {governanceVote.kind === 'delegate' && (
-                  <>
-                    <Typography
-                      variant="body1"
-                      color="ds.text_gray_normal"
-                    >{`Delegate voting to ${governanceVote.drepID}`}</Typography>
-                    <Stack direction="row" justifyContent="space-between">
-                      <Typography variant="body1" fontWeight="500">
-                        Transaction fee
-                      </Typography>
-                      <Typography variant="body1" color="ds.text_gray_normal">
-                        0.5 ADA
-                      </Typography>
-                    </Stack>
-                  </>
+                  <OperationInfo label={`Delegate voting to ${governanceVote.drepID}`} fee="0.5" />
                 )}
-                {governanceVote.kind === 'abstain' && (
-                  <>
-                    <Typography variant="body2">{strings.selectAbstein}</Typography>
-                  </>
-                )}
-                {governanceVote.kind === 'no-confidence' && (
-                  <>
-                    <Typography variant="body2">{strings.selectNoConfidenc}</Typography>
-                  </>
+                {governanceVote.kind === DREP_ALWAYS_ABSTAIN && <OperationInfo label={strings.selectAbstein} fee="0.5" />}
+                {governanceVote.kind === DREP_ALWAYS_NO_CONFIDENCE && (
+                  <OperationInfo label={strings.selectNoConfidence} fee="0.5" />
                 )}
               </TransactionDetails>
             }
@@ -169,5 +151,28 @@ export const DelagationForm = () => {
         </LoadingButton>
       </Actions>
     </Container>
+  );
+};
+
+type OperationInfoProps = {
+  label: string;
+  fee: string;
+};
+
+const OperationInfo = ({ label, fee }: OperationInfoProps) => {
+  return (
+    <>
+      <Typography variant="body1" color="ds.text_gray_normal">
+        {label}
+      </Typography>
+      <Stack direction="row" justifyContent="space-between">
+        <Typography variant="body1" fontWeight="500">
+          Transaction fee
+        </Typography>
+        <Typography variant="body1" color="ds.text_gray_normal">
+          {fee} ADA
+        </Typography>
+      </Stack>
+    </>
   );
 };
