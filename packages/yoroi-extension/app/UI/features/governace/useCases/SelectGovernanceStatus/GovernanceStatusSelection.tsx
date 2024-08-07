@@ -1,4 +1,4 @@
-import { Stack } from '@mui/material';
+import { Alert, Stack } from '@mui/material';
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
@@ -150,11 +150,7 @@ export const GovernanceStatusSelection = () => {
       </Box>
 
       <Stack gap="17px" mt="42px">
-        {error && (
-          <Typography variant="body2" sx={{ color: 'ds.sys_magenta_c500' }}>
-            {error}
-          </Typography>
-        )}
+        {error && <Alert severity="error"> {error}</Alert>}
         {governanceStatus.drep !== null && (
           <Typography variant="body2" align="center" color="textSecondary" gutterBottom>
             {strings.drepId} {governanceStatus.drep}
