@@ -85,6 +85,11 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
           const newWalletState = params.walletState;
           runInAction(() => {
             Object.assign(this.wallets[index], newWalletState);
+          });
+          if (this.initialSyncingWalletIds.has(params.publicDeriverId)) {
+            this.stores.addresses.refreshAddressesFromDb(this.wallets[index]);
+          }
+          runInAction(() => {
             this.initialSyncingWalletIds.delete(params.publicDeriverId);
           });
           this.stores.transactions.updateNewTransactions(params.newTxs, params.publicDeriverId);
