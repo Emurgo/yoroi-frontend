@@ -18,7 +18,7 @@ export default class ServerConnectionStore extends Store<StoresMap, ActionsMap> 
 
     listenForServerStatusUpdate(async (serverStatus) => {
       runInAction(() => {
-        this.serverStatus.splice(0, this.serverStatus.length, ...serverStatus);
+        //this.serverStatus.splice(0, this.serverStatus.length, ...serverStatus);
       });
     });
   }
