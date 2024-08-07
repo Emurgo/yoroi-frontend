@@ -14,7 +14,6 @@ import {
   emitUpdateToSubscriptions,
 } from './subscriptionManager';
 
-const serverStatusByNetworkId: Map<number, ServerStatus> = new Map();
 
 async function getUsedNetworks(): Promise<$ReadOnlyArray<NetworkRow>> {
   const db = await getDb();
@@ -26,65 +25,53 @@ async function getUsedNetworks(): Promise<$ReadOnlyArray<NetworkRow>> {
       ConceptualWalletSchema.name,
     )
   );
+  console.log('>>>conceptual wallets:', allConceptualWallets.map(w=>w.Name));
   const allNetworkIdSet = new Set(allConceptualWallets.map(w => w.NetworkId));
   return Object.keys(networks).map(n => networks[n]).filter(
     ({ NetworkId }) => allNetworkIdSet.has(NetworkId)
   );
 }
 
-async function updateServerStatus() {
-  const usedNetworks = await getUsedNetworks();
-  const fetcher = await getCommonStateFetcher();
-
-  for (const network of usedNetworks) {
-    const backend = network.Backend.BackendService;
-    if (!backend) {
-      throw new Error('unexpectedly missing backend zero');
-    }
-    const startTime = Date.now();
-    let resp;
-    try {
-      resp = await fetcher.checkServerStatus({ backend });
-    } catch {
-      resp = {
-        isServerOk: false,
-        isMaintenance: false,
-        serverTime: Date.now(),
-      };
-    }
-    const endTime = Date.now();
-    const roundtripTime = endTime - startTime;
-
-    serverStatusByNetworkId.set(
-      network.NetworkId,
-      {
-        networkId: network.NetworkId,
-        isServerOk: resp.isServerOk,
-        isMaintenance: resp.isMaintenance || false,
-        // server time = local time + clock skew
-        clockSkew: resp.serverTime + roundtripTime  / 2 - endTime,
-        lastUpdateTimestamp: startTime + roundtripTime / 2,
-      }
-    );
-  }
-}
-
 let lastUpdateTimestamp: number = 0;
-let updatePromise: null | Promise<void> = null;
+const serverStatusByNetworkId: Map<number, ServerStatus> = new Map();
+  
+async function updateServerStatus() {
+  if (Date.now() - lastUpdateTimestamp > environment.getServerStatusRefreshInterval()) {
+    const usedNetworks = await getUsedNetworks();
+    const fetcher = await getCommonStateFetcher();
 
-async function updateServerStatusTick() {
-  const refreshInterval = environment.getServerStatusRefreshInterval();
+    for (const network of usedNetworks) {
+      const backend = network.Backend.BackendService;
+      if (!backend) {
+        throw new Error('unexpectedly missing backend zero');
+      }
+      const startTime = Date.now();
+      let resp;
+      try {
+        resp = await fetcher.checkServerStatus({ backend });
+      } catch {
+        resp = {
+          isServerOk: false,
+          isMaintenance: false,
+          serverTime: Date.now(),
+        };
+      }
+      const endTime = Date.now();
+      const roundtripTime = endTime - startTime;
 
-  if (getSubscriptions().length === 0) {
-    return;
-  }
-
-  if (Date.now() - lastUpdateTimestamp > refreshInterval) {
-    if (!updatePromise) {
-      updatePromise = updateServerStatus();
+      serverStatusByNetworkId.set(
+        network.NetworkId,
+        {
+          networkId: network.NetworkId,
+          isServerOk: resp.isServerOk,
+          isMaintenance: resp.isMaintenance || false,
+          // server time = local time + clock skew
+          clockSkew: resp.serverTime + roundtripTime  / 2 - endTime,
+          lastUpdateTimestamp: Math.floor(startTime + roundtripTime / 2),
+        }
+      );
     }
-    await updatePromise;
-    updatePromise = null;
+
     lastUpdateTimestamp = Date.now();
   }
 
@@ -92,14 +79,31 @@ async function updateServerStatusTick() {
     type: 'server-status-update',
     params: [...serverStatusByNetworkId.values()],
   });
+}
 
-  setTimeout(updateServerStatusTick, refreshInterval);
+let isRunning: boolean = false;
+
+async function updateServerStatusThreadMain() {
+  if (isRunning) {
+    return;
+  }
+  isRunning = true;
+
+  for (;;) {
+    if (getSubscriptions().length === 0) {
+      isRunning = false;
+      return;
+    }
+    await updateServerStatus();
+
+    await new Promise(resolve => setTimeout(resolve, environment.getServerStatusRefreshInterval()));
+  }
 }
 
 export function startMonitorServerStatus() {
   registerCallback(params => {
     if (params.type === 'subscriptionChange') {
-      updateServerStatusTick().catch(error => {
+      updateServerStatusThreadMain().catch(error => {
         console.error('error when updating server status', error)
       });
     }

@@ -11,14 +11,30 @@ import type { ServerStatus } from '../../../chrome/extension/background/types';
 import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export default class ServerConnectionStore extends Store<StoresMap, ActionsMap> {
-  @observable serverStatus: Array<ServerStatus> = [];
+  @observable serverStatusByNetworkId: {| [networkId: number]: ServerStatus |} = {};
 
   setup(): void {
     super.setup();
 
+    for (const networkName of Object.keys(networks)) {
+      const network = networks[networkName];
+      this.serverStatusByNetworkId[network.NetworkId] = {
+        networkId: network.NetworkId,
+        isServerOk: true,
+        isMaintenance: false,
+        clockSkew: 0,
+        lastUpdateTimestamp: Date.now(),
+      };
+    }
+
     listenForServerStatusUpdate(async (serverStatus) => {
       runInAction(() => {
-        //this.serverStatus.splice(0, this.serverStatus.length, ...serverStatus);
+        for (const s of serverStatus) {
+          const oldStatus = this.serverStatusByNetworkId[s.networkId];
+          if (oldStatus) {
+            Object.assign(oldStatus, s);
+          }
+        }
       });
     });
   }
@@ -56,6 +72,6 @@ export default class ServerConnectionStore extends Store<StoresMap, ActionsMap> 
     } else {
       networkId = networks.CardanoMainnet.NetworkId;
     }
-    return this.serverStatus.find(s => s.networkId === networkId);
+    return this.serverStatusByNetworkId[networkId];
   }
 }
