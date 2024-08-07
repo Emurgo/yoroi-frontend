@@ -20,7 +20,7 @@ async function getUsedNetworks(): Promise<$ReadOnlyArray<NetworkRow>> {
   const db = await getDb();
   const allConceptualWallets = await raii<$ReadOnlyArray<ConceptualWalletRow>>(
     db,
-    [],
+    [db.getSchema().table(ConceptualWalletSchema.name)],
     tx => getAll(
       db, tx,
       ConceptualWalletSchema.name,
@@ -37,7 +37,7 @@ async function updateServerStatus() {
   const fetcher = await getCommonStateFetcher();
 
   for (const network of usedNetworks) {
-    const backend = network.Backend.BackendServiceZero;
+    const backend = network.Backend.BackendService;
     if (!backend) {
       throw new Error('unexpectedly missing backend zero');
     }
@@ -46,7 +46,11 @@ async function updateServerStatus() {
     try {
       resp = await fetcher.checkServerStatus({ backend });
     } catch {
-      continue;
+      resp = {
+        isServerOk: false,
+        isMaintenance: false,
+        serverTime: Date.now(),
+      };
     }
     const endTime = Date.now();
     const roundtripTime = endTime - startTime;
