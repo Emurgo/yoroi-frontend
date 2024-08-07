@@ -51,8 +51,9 @@ export const lightPalette = {
   sys_orange_c500: '#ED8600',
   sys_orange_c100: '#FFF2E2',
 
-  bg_gradient_1: 'linear-gradient(312.19deg, #C6F7ED 0%, #E4E8F7 100%)',
-  bg_gradient_2: 'linear-gradient(180deg, #93F5E1 0%, #C6F7ED 100%)',
-  bg_gradient_3: 'linear-gradient(30.09deg, #244abf 0%, #4760ff 176.73%)',
+  bg_gradient_1: 'linear-gradient(180deg, #93F5E1 100%, #E4E8F7 100%)',
+  bg_gradient_2: 'linear-gradient(180deg, #93F5E1 100%, #C6F7ED 100%)',
+  bg_gradient_3: 'linear-gradient(180deg, #244ABF 100%, #4760FF 100%)',
+
   special_web_bg_sidebar: 'rgba(0, 0, 0, 0.16)',
 };
