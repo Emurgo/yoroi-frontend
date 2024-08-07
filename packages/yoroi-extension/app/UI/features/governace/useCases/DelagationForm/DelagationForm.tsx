@@ -11,6 +11,7 @@ import { DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE } from '../../common/con
 import { useNavigateTo } from '../../common/useNavigateTo';
 import { useStrings } from '../../common/useStrings';
 import { useGovernance } from '../../module/GovernanceContextProvider';
+import { mapStatus } from '../SelectGovernanceStatus/GovernanceStatusSelection';
 
 const Container = styled(Box)(() => ({
   paddingTop: '23px',
@@ -88,7 +89,7 @@ export const DelagationForm = () => {
     <Container>
       <Stack>
         <Typography variant="body2" color="ds.gray_c600" mb="4px">
-          {strings.delegateToDRep}
+          {mapStatus[governanceVote.kind || '']}
         </Typography>
         <Typography variant="body1" mb="24px">
           {strings.designatedSomeone}

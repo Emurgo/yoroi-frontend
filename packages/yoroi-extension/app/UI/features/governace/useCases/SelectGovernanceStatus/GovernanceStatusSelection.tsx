@@ -117,7 +117,7 @@ export const GovernanceStatusSelection = () => {
         {pageSubtitle}
       </Typography>
       <Box display="flex" justifyContent="center" gap="24px">
-        {true
+        {governanceStatus.status !== null
           ? optionsList.map((option, index) => {
               return (
                 <GovernanceVoteingCard
