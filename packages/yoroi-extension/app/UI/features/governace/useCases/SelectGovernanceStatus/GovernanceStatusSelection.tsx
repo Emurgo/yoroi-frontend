@@ -4,8 +4,8 @@ import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import { GovernanceProvider } from '@yoroi/staking';
-
 import * as React from 'react';
+import { NotEnoughMoneyToSendError } from '../../../../../api/common/errors';
 import { useModal } from '../../../../components/modals/ModalContext';
 import { ChooseDRepModal } from '../../common/ChooseDRepModal';
 import { GovernanceVoteingCard } from '../../common/GovernanceVoteingCard';
@@ -34,9 +34,10 @@ export const mapStatus = {
 };
 
 export const GovernanceStatusSelection = () => {
-  const { governanceStatus, governanceManager, governanceVoteChanged } = useGovernance();
+  const { governanceStatus, governanceManager, governanceVoteChanged, createDrepDelegationTransaction } = useGovernance();
+  const [error, setError] = React.useState<string | null>(null);
   const navigateTo = useNavigateTo();
-  const { openModal } = useModal();
+  const { openModal, closeModal } = useModal();
   const strings = useStrings();
 
   const pageTitle = governanceStatus.status !== 'none' ? strings.governanceStatus : strings.registerGovernance;
@@ -59,24 +60,38 @@ export const GovernanceStatusSelection = () => {
     });
   };
 
-  const handleDelegate = () => {
+  const handleDelegate = async () => {
     openDRepIdModal(drepID => {
       const vote: Vote = { kind: 'delegate', drepID };
+      createUnsignTx(drepID);
       governanceVoteChanged(vote);
-      navigateTo.delegationForm();
     });
   };
 
-  const handleAbstain = () => {
+  const handleAbstain = async () => {
+    await createUnsignTx(DREP_ALWAYS_ABSTAIN);
     const vote: Vote = { kind: DREP_ALWAYS_ABSTAIN };
     governanceVoteChanged(vote);
-    navigateTo.delegationForm();
   };
 
-  const handleNoConfidence = () => {
+  const handleNoConfidence = async () => {
+    await createUnsignTx(DREP_ALWAYS_NO_CONFIDENCE);
     const vote: Vote = { kind: DREP_ALWAYS_NO_CONFIDENCE };
     governanceVoteChanged(vote);
-    navigateTo.delegationForm();
+  };
+
+  const createUnsignTx = async kind => {
+    try {
+      await createDrepDelegationTransaction(kind);
+      setError(null);
+      navigateTo.delegationForm();
+    } catch (e) {
+      if (e instanceof NotEnoughMoneyToSendError) {
+        setError('Not enoght ADA to Vote');
+        closeModal();
+      }
+      return;
+    }
   };
 
   const optionsList = [
@@ -135,6 +150,11 @@ export const GovernanceStatusSelection = () => {
       </Box>
 
       <Stack gap="17px" mt="42px">
+        {error && (
+          <Typography variant="body2" sx={{ color: 'ds.sys_magenta_c500' }}>
+            {error}
+          </Typography>
+        )}
         {governanceStatus.drep !== null && (
           <Typography variant="body2" align="center" color="textSecondary" gutterBottom>
             {strings.drepId} {governanceStatus.drep}

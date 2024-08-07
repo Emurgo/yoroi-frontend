@@ -5,6 +5,7 @@ import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import * as React from 'react';
+import { genFormatTokenAmount, genLookupOrFail } from '../../../../../stores/stateless/tokenHelpers';
 import { Collapsible } from '../../../../components/Collapsible/Collapsible';
 import { PasswordInput } from '../../../../components/Input/PasswordInput';
 import { DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE } from '../../common/constants';
@@ -46,6 +47,7 @@ const Actions = styled(Stack)(() => ({
 export const DelagationForm = () => {
   const [password, setPassword] = React.useState('');
   const [formLoading, setFormLoading] = React.useState(false);
+  const [txFee, setTxFee] = React.useState('');
   const [isIncorectPasswaord, setIsIncorectPassword] = React.useState(false);
   const navigateTo = useNavigateTo();
   const {
@@ -54,7 +56,18 @@ export const DelagationForm = () => {
     createDrepDelegationTransaction,
     selectedWallet,
     signDelegationTransaction,
+    txDelegationResult,
+    tokenInfo,
   } = useGovernance();
+
+  React.useEffect(() => {
+    if (txDelegationResult != null) {
+      const rawFee = txDelegationResult?.signTxRequest.fee();
+      const getTokenInfo = genLookupOrFail(tokenInfo);
+      const formatValue = genFormatTokenAmount(getTokenInfo);
+      setTxFee(formatValue(rawFee.getDefaultEntry()));
+    }
+  }, [txDelegationResult]);
 
   const strings = useStrings();
   const confirmDelegation = async () => {
@@ -100,7 +113,7 @@ export const DelagationForm = () => {
           </Typography>
           <Box textAlign="right">
             <Typography variant="h4" fontWeight="500" color="ds.gray_cmin">
-              0.5 ADA
+              {txFee} ADA
             </Typography>
             <Typography variant="body2" color="ds.gray_c300">
               0.15 USD
@@ -116,11 +129,11 @@ export const DelagationForm = () => {
             content={
               <TransactionDetails>
                 {governanceVote.kind === 'delegate' && (
-                  <OperationInfo label={`Delegate voting to ${governanceVote.drepID}`} fee="0.5" />
+                  <OperationInfo label={`Delegate voting to ${governanceVote.drepID}`} fee={txFee} />
                 )}
-                {governanceVote.kind === DREP_ALWAYS_ABSTAIN && <OperationInfo label={strings.selectAbstein} fee="0.5" />}
+                {governanceVote.kind === DREP_ALWAYS_ABSTAIN && <OperationInfo label={strings.selectAbstein} fee={txFee} />}
                 {governanceVote.kind === DREP_ALWAYS_NO_CONFIDENCE && (
-                  <OperationInfo label={strings.selectNoConfidence} fee="0.5" />
+                  <OperationInfo label={strings.selectNoConfidence} fee={txFee} />
                 )}
               </TransactionDetails>
             }

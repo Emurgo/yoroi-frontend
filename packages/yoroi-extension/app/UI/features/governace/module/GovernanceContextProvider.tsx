@@ -33,6 +33,7 @@ type GovernanceProviderProps = {
   txDelegationResult: any;
   txDelegationError: any;
   signDelegationTransaction: (params: any) => Promise<void>;
+  tokenInfo: any;
 };
 
 export const GovernanceContextProvider = ({
@@ -42,6 +43,7 @@ export const GovernanceContextProvider = ({
   txDelegationResult,
   txDelegationError,
   signDelegationTransaction,
+  tokenInfo,
 }: GovernanceProviderProps) => {
   if (!currentWallet?.selectedWallet) throw new Error(`requires a wallet to be selected`);
   const [state, dispatch] = React.useReducer(GovernanceReducer, {
@@ -52,7 +54,6 @@ export const GovernanceContextProvider = ({
   const [governanceStatus, setGovernanceStatus] = React.useState<drepDelegation>({ status: null, drep: null });
   const { walletId, networkId, currentPool, selectedWallet, backendService, backendServiceZero } = currentWallet;
   const governanceManager = useGovernanceManagerMaker(walletId, networkId);
-
   // TODO to me moved in rootStore and use this globbaly whenever we need just a wallet password check
   const checkUserPassword = async (password: string): Promise<any> => {
     try {
@@ -148,6 +149,7 @@ export const GovernanceContextProvider = ({
     signDelegationTransaction,
     governanceStatus,
     selectedWallet: currentWallet.selectedWallet,
+    tokenInfo,
   };
 
   return <GovernanceContext.Provider value={context}>{children}</GovernanceContext.Provider>;

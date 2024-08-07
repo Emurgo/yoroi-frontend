@@ -559,7 +559,7 @@ export function wrapGovernance(governanceProps: StoresAndActionsProps, children:
   const { delegationTransaction } = governanceProps.stores.substores.ada;
   const delegationTxResult = delegationTransaction.createDelegationTx.result;
   const delegationTxError = delegationTransaction.createDelegationTx.error;
-
+  console.log('delegationTxResult', delegationTxResult);
   return (
     <GovernanceContextProvider
       currentWallet={currentWalletInfo}
@@ -567,6 +567,7 @@ export function wrapGovernance(governanceProps: StoresAndActionsProps, children:
       signDelegationTransaction={governanceProps.actions.ada.delegationTransaction.signTransaction.trigger}
       txDelegationResult={delegationTxResult}
       txDelegationError={delegationTxError}
+      tokenInfo={governanceProps.stores.tokenInfoStore.tokenInfo}
     >
       <Suspense fallback={null}>{children}</Suspense>;
     </GovernanceContextProvider>
