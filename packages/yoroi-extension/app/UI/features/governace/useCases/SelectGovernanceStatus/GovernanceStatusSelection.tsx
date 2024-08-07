@@ -87,7 +87,7 @@ export const GovernanceStatusSelection = () => {
       navigateTo.delegationForm();
     } catch (e) {
       if (e instanceof NotEnoughMoneyToSendError) {
-        setError('Not enoght ADA to Vote');
+        setError('Not enough ADA to Vote');
         closeModal();
       }
       return;
