@@ -21,6 +21,7 @@ const initialGovernanceProvider = {
   txDelegationError: null,
   tokenInfo: null,
   getFormattedPairingAmount: (_amount: string) => Response,
+  isHardwareWallet: false,
   createDrepDelegationTransaction: async (_drepCredential: string) => Response,
   signDelegationTransaction: async (_params: any) => Response,
   selectedWallet: null,
