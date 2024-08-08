@@ -181,7 +181,9 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: '/governance',
     icon: governanceIcon,
     label: globalMessages.sidebarGovernance,
-    isVisible: ({ selected }) => environment.isDev() && selected?.getParent().getNetworkInfo().NetworkId === 450,
+    isVisible: ({ selected }) =>
+      (environment.isDev() && selected?.getParent().getNetworkInfo().NetworkId === 450) ||
+      (environment.isDev() && selected?.getParent().getNetworkInfo().NetworkId === 350),
   },
   {
     className: 'settings',
