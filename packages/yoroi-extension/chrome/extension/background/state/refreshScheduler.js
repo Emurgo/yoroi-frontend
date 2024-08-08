@@ -31,7 +31,7 @@ registerCallback((params) => {
 
 let refreshRunning: boolean = false;
 // Start a "thread" to periodically refresh all wallets. Ensure only one such thread running.
-export async function refreshThreadMain(): Promise<void> {
+async function refreshThreadMain(): Promise<void> {
   if (refreshRunning) {
     return;
   }

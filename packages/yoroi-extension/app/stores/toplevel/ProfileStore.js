@@ -278,7 +278,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
   };
 }
 
-export function getPaperWalletIntro(currentLocale: string, defaultLocale: string): string {
+function getPaperWalletIntro(currentLocale: string, defaultLocale: string): string {
   try {
     return require(`../../i18n/locales/paper-wallets/intro/${currentLocale}.md`).default;
   } catch {

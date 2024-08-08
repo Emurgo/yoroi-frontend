@@ -34,7 +34,7 @@ async function getUsedNetworks(): Promise<$ReadOnlyArray<NetworkRow>> {
 
 let lastUpdateTimestamp: number = 0;
 const serverStatusByNetworkId: Map<number, ServerStatus> = new Map();
-  
+
 async function updateServerStatus() {
   if (Date.now() - lastUpdateTimestamp > environment.getServerStatusRefreshInterval()) {
     const usedNetworks = await getUsedNetworks();
