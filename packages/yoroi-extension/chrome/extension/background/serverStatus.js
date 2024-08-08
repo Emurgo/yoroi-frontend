@@ -25,7 +25,7 @@ async function getUsedNetworks(): Promise<$ReadOnlyArray<NetworkRow>> {
       ConceptualWalletSchema.name,
     )
   );
-  console.log('>>>conceptual wallets:', allConceptualWallets.map(w=>w.Name));
+
   const allNetworkIdSet = new Set(allConceptualWallets.map(w => w.NetworkId));
   return Object.keys(networks).map(n => networks[n]).filter(
     ({ NetworkId }) => allNetworkIdSet.has(NetworkId)
