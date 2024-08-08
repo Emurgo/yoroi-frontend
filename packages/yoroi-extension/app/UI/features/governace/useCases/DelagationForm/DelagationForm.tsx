@@ -47,7 +47,7 @@ const Actions = styled(Stack)(() => ({
 export const DelagationForm = () => {
   const [password, setPassword] = React.useState('');
   const [formLoading, setFormLoading] = React.useState(false);
-  const [txFee, setTxFee] = React.useState('');
+  const [txFee, setTxFee] = React.useState<string>('');
   const [isIncorectPasswaord, setIsIncorectPassword] = React.useState(false);
   const navigateTo = useNavigateTo();
   const {
@@ -58,11 +58,13 @@ export const DelagationForm = () => {
     signDelegationTransaction,
     txDelegationResult,
     tokenInfo,
+    getFormattedPairingAmount,
   } = useGovernance();
 
   React.useEffect(() => {
     if (txDelegationResult != null) {
-      const rawFee = txDelegationResult?.signTxRequest.fee();
+      // @ts-ignore
+      const rawFee = txDelegationResult.signTxRequest.fee();
       const getTokenInfo = genLookupOrFail(tokenInfo);
       const formatValue = genFormatTokenAmount(getTokenInfo);
       setTxFee(formatValue(rawFee.getDefaultEntry()));
@@ -116,7 +118,7 @@ export const DelagationForm = () => {
               {txFee} ADA
             </Typography>
             <Typography variant="body2" color="ds.gray_c300">
-              0.15 USD
+              {String(getFormattedPairingAmount(String(Number(txFee) * 1000000)))}
             </Typography>
           </Box>
         </TotalBox>

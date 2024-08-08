@@ -5,6 +5,7 @@ import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { unwrapStakingKey } from '../../../../api/ada/lib/storage/bridge/utils';
 import { asGetSigningKey, asGetStakingKey } from '../../../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE } from '../common/constants';
+import { getFormattedPairingValue } from '../common/helpers';
 import { useGovernanceManagerMaker } from '../common/useGovernanceManagerMaker';
 import { GovernanceActionType, GovernanceReducer, defaultGovernanceActions, defaultGovernanceState } from './state';
 
@@ -18,6 +19,8 @@ const initialGovernanceProvider = {
   checkUserPassword: (_password: string) => Response,
   txDelegationResult: null,
   txDelegationError: null,
+  tokenInfo: null,
+  getFormattedPairingAmount: (_amount: string) => Response,
   createDrepDelegationTransaction: async (_drepCredential: string) => Response,
   signDelegationTransaction: async (_params: any) => Response,
   selectedWallet: null,
@@ -52,7 +55,17 @@ export const GovernanceContextProvider = ({
   const [stakingKeyHash, setStakingKeyHash] = React.useState(null);
   const [stakingKeyHex, setStakingKeyHex] = React.useState(null);
   const [governanceStatus, setGovernanceStatus] = React.useState<drepDelegation>({ status: null, drep: null });
-  const { walletId, networkId, currentPool, selectedWallet, backendService, backendServiceZero } = currentWallet;
+  const {
+    walletId,
+    networkId,
+    currentPool,
+    selectedWallet,
+    backendService,
+    defaultTokenInfo,
+    unitOfAccount,
+    getCurrentPrice,
+    backendServiceZero,
+  } = currentWallet;
   const governanceManager = useGovernanceManagerMaker(walletId, networkId);
   // TODO to me moved in rootStore and use this globbaly whenever we need just a wallet password check
   const checkUserPassword = async (password: string): Promise<any> => {
@@ -150,6 +163,8 @@ export const GovernanceContextProvider = ({
     governanceStatus,
     selectedWallet: currentWallet.selectedWallet,
     tokenInfo,
+    getFormattedPairingAmount: (amount: string) =>
+      getFormattedPairingValue(getCurrentPrice, defaultTokenInfo, unitOfAccount, amount),
   };
 
   return <GovernanceContext.Provider value={context}>{children}</GovernanceContext.Provider>;
