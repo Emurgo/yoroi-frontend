@@ -1,22 +1,22 @@
 // @flow
 
+import { observable, action, reaction } from 'mobx';
 import BigNumber from 'bignumber.js';
-import { action, observable, reaction } from 'mobx';
-import type { ActionsMap } from '../../actions/index';
-import type { CreateDelegationTxFunc, CreateWithdrawalTxResponse } from '../../api/ada';
-import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import {
-  asGetAllAccounting,
-  asGetAllUtxos,
-  asGetPublicKey,
-  asHasUtxoChains,
-} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import { ROUTES } from '../../routes-config';
-import { buildRoute } from '../../utils/routing';
 import Store from '../base/Store';
-import type { StoresMap } from '../index';
 import LocalizedRequest from '../lib/LocalizedRequest';
+import type { CreateDelegationTxFunc, CreateWithdrawalTxResponse } from '../../api/ada';
+import { buildRoute } from '../../utils/routing';
+import { ROUTES } from '../../routes-config';
+import {
+  asGetAllUtxos,
+  asHasUtxoChains,
+  asGetAllAccounting,
+  asGetPublicKey,
+} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
 export type CreateWithdrawalTxRequest = LocalizedRequest<DeferredCall<CreateWithdrawalTxResponse>>;
 
@@ -112,13 +112,10 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
       valueInAccount: this.stores.delegation.getRewardBalanceOrZero(publicDeriver),
       absSlotNumber,
     }).promise;
-
-    console.log('delegationTxPromise', delegationTxPromise);
     if (delegationTxPromise == null) {
       throw new Error(`${nameof(this.createTransaction)} should never happen`);
     }
     await delegationTxPromise;
-    console.log('await delegationTxPromise response', delegationTxPromise);
 
     this.markStale(false);
   };

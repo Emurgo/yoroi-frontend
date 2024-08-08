@@ -1,6 +1,6 @@
 // @flow
+import { observable, action, computed, isObservableArray } from 'mobx';
 import { isEqual } from 'lodash/fp';
-import { action, computed, isObservableArray, observable } from 'mobx';
 import { defineMessages } from 'react-intl';
 import LocalizableError from '../../i18n/LocalizableError';
 
