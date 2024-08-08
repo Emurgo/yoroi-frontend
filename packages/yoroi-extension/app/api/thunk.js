@@ -20,6 +20,7 @@ import CardanoByronTransaction, {
 import { MultiToken } from './common/lib/MultiToken';
 import type { ExplorerRow, PreferredExplorerRow } from './ada/lib/storage/database/explorers/tables';
 import { WrongPassphraseError } from './ada/lib/cardanoCrypto/cryptoErrors';
+import { SendTransactionApiError } from './common/errors';
 import type { ResponseTicker } from './common/lib/state-fetch/types';
 /*::
 declare var chrome;
@@ -401,7 +402,7 @@ function handleWrongPassword<T: { error?: string, ... }>(result: T): T {
     throw new WrongPassphraseError();
   }
   if (result.error) {
-    throw new Error(result.error);
+    throw new SendTransactionApiError();
   }
   return result;
 }
