@@ -74,7 +74,7 @@ export const GovernanceVoteingCard = ({
   pending = false,
 }: Props) => {
   const [hover, onHover] = React.useState(false);
-  console.log('titleHover', titleHover);
+
   return (
     <div onMouseOver={() => onHover(true)} onMouseLeave={() => onHover(false)}>
       <StyledCard onClick={pending ? undefined : onClick} pending={pending === true ? 'true' : undefined} selected={selected}>
