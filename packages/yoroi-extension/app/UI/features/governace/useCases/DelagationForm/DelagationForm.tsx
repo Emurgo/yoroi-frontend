@@ -74,24 +74,30 @@ export const DelagationForm = () => {
   const strings = useStrings();
   const confirmDelegation = async () => {
     const response = await checkUserPassword(password);
-    if (response?.name === 'WrongPassphraseError') {
+    if (isHardwareWallet) {
+      signGovernanceTx();
+    } else if (response?.name === 'WrongPassphraseError') {
       setIsIncorectPassword(true);
     } else {
-      try {
-        setFormLoading(true);
-        await signDelegationTransaction({
-          password,
-          publicDeriver: selectedWallet,
-          dialog: null,
-        });
-        setFormLoading(false);
-        navigateTo.transactionSubmited();
-        setPassword('');
-      } catch (error) {
-        console.warn('[createDrepDelegationTransaction,signDelegationTransaction]', error);
-        setFormLoading(false);
-        navigateTo.transactionFail();
-      }
+      signGovernanceTx();
+    }
+  };
+
+  const signGovernanceTx = async () => {
+    try {
+      setFormLoading(true);
+      await signDelegationTransaction({
+        password,
+        publicDeriver: selectedWallet,
+        dialog: null,
+      });
+      setFormLoading(false);
+      navigateTo.transactionSubmited();
+      setPassword('');
+    } catch (error) {
+      console.warn('[createDrepDelegationTransaction,signDelegationTransaction]', error);
+      setFormLoading(false);
+      navigateTo.transactionFail();
     }
   };
 
@@ -169,7 +175,7 @@ export const DelagationForm = () => {
           //  @ts-ignore
           variant="primary"
           loading={formLoading}
-          disabled={password.length === 0}
+          disabled={isHardwareWallet ? false : password.length === 0}
           onClick={async () => confirmDelegation()}
         >
           {strings.confirm}

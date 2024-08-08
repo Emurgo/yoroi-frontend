@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
-import { calculateAndFormatValue } from '../../../../utils/unit-of-account';
 import { WalletTypeOption } from '../../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import { calculateAndFormatValue } from '../../../../utils/unit-of-account';
 
 export const mapStakingKeyStateToGovernanceAction = (state: any) => {
   if (!state.drepDelegation) return null;
