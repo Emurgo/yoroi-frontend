@@ -53,7 +53,6 @@ export const DelagationForm = () => {
   const {
     governanceVote,
     checkUserPassword,
-    createDrepDelegationTransaction,
     selectedWallet,
     signDelegationTransaction,
     txDelegationResult,
@@ -79,7 +78,6 @@ export const DelagationForm = () => {
     } else {
       try {
         setFormLoading(true);
-        await createDrepDelegationTransaction(governanceVote.kind === 'delegate' ? governanceVote.drepID : governanceVote.kind);
         await signDelegationTransaction({
           password,
           publicDeriver: selectedWallet,
@@ -96,6 +94,12 @@ export const DelagationForm = () => {
     }
   };
 
+  const mapStatusDescription = {
+    delegate: strings.designatedSomeone,
+    ALWAYS_ABSTAIN: 'You are choosing not to cast a vote on all proposals now and in the future.',
+    ALWAYS_NO_CONFIDENCE: 'You are expressing a lack of trust for all proposals now and in the future.',
+  };
+
   React.useEffect(() => {
     setIsIncorectPassword(false);
   }, [password]);
@@ -107,7 +111,7 @@ export const DelagationForm = () => {
           {mapStatus[governanceVote.kind || '']}
         </Typography>
         <Typography variant="body1" mb="24px">
-          {strings.designatedSomeone}
+          {mapStatusDescription[governanceVote.kind || '']}
         </Typography>
         <TotalBox>
           <Typography variant="h4" color="ds.gray_cmin">
