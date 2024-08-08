@@ -58,6 +58,7 @@ export const DelagationForm = () => {
     txDelegationResult,
     tokenInfo,
     getFormattedPairingAmount,
+    isHardwareWallet,
   } = useGovernance();
 
   React.useEffect(() => {
@@ -145,15 +146,19 @@ export const DelagationForm = () => {
             }
           />
         </Box>
-        <PasswordInput
-          label={strings.password}
-          id="outlined-adornment-password"
-          onChange={event => setPassword(event.target.value)}
-          value={password}
-          error={!!isIncorectPasswaord}
-          helperText={isIncorectPasswaord ? strings.wrongPassword : ' '}
-          disabled={formLoading}
-        />
+        {isHardwareWallet ? (
+          <> </>
+        ) : (
+          <PasswordInput
+            label={strings.password}
+            id="outlined-adornment-password"
+            onChange={event => setPassword(event.target.value)}
+            value={password}
+            error={!!isIncorectPasswaord}
+            helperText={isIncorectPasswaord ? strings.wrongPassword : ' '}
+            disabled={formLoading}
+          />
+        )}
       </Stack>
       <Actions direction="row" spacing="24px">
         {/* @ts-ignore */}

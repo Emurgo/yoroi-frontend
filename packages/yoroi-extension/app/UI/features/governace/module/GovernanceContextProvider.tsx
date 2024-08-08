@@ -64,6 +64,7 @@ export const GovernanceContextProvider = ({
     defaultTokenInfo,
     unitOfAccount,
     getCurrentPrice,
+    isHardwareWallet,
     backendServiceZero,
   } = currentWallet;
   const governanceManager = useGovernanceManagerMaker(walletId, networkId);
@@ -163,6 +164,7 @@ export const GovernanceContextProvider = ({
     governanceStatus,
     selectedWallet: currentWallet.selectedWallet,
     tokenInfo,
+    isHardwareWallet,
     getFormattedPairingAmount: (amount: string) =>
       getFormattedPairingValue(getCurrentPrice, defaultTokenInfo, unitOfAccount, amount),
   };

@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js';
 import { calculateAndFormatValue } from '../../../../utils/unit-of-account';
+import { WalletTypeOption } from '../../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 
 export const mapStakingKeyStateToGovernanceAction = (state: any) => {
   if (!state.drepDelegation) return null;
@@ -47,6 +48,7 @@ export const createCurrrentWalletInfo = (stores: any) => {
     throw new Error(`no selected Wallet. Should never happen`);
   }
 
+  const isHardware = selectedWallet.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET;
   const currentWalletId = selectedWallet.getPublicDeriverId();
   const networkInfo = selectedWallet.getParent().getNetworkInfo();
   const networkId = networkInfo.NetworkId;
@@ -60,6 +62,7 @@ export const createCurrrentWalletInfo = (stores: any) => {
     unitOfAccount: stores.profile.unitOfAccount,
     defaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfoSummary(networkId),
     getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
+    isHardwareWallet: isHardware,
     backendService,
     backendServiceZero,
   };
