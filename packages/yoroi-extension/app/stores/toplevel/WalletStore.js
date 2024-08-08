@@ -92,7 +92,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
           runInAction(() => {
             this.initialSyncingWalletIds.delete(params.publicDeriverId);
           });
-          this.stores.transactions.updateNewTransactions(params.newTxs, params.publicDeriverId);
+          await this.stores.transactions.updateNewTransactions(params.newTxs, this.wallets[index]);
         }
       } else if (params.eventType === 'remove') {
         const index = this.wallets.findIndex(wallet => wallet.publicDeriverId === params.publicDeriverId);
@@ -222,6 +222,8 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     });
 
     this._queueWarningIfNeeded(request.publicDeriver);
+
+    this.stores.tokenInfoStore.refreshTokenInfo().catch(console.error);
   };
 
   // =================== ACTIVE WALLET ==================== //

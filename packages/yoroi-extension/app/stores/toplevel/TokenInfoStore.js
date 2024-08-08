@@ -82,6 +82,7 @@ export default class TokenInfoStore<
     networkId,
     tokenIds
   ) => {
+    // todo: filter out tokenIds already in this.tokenInfo
     const assets = await getCardanoAssets({ networkId, tokenIds });
     runInAction(() => { this._updateTokenInfo(assets) });
   }

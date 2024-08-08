@@ -187,6 +187,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     });
 
     // reload token info cache
+    // todo: use fetchMissingTokenInfo to fetch only missing tokens
     await this.stores.tokenInfoStore.refreshTokenInfo();
   }
 
@@ -218,7 +219,10 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
   /** Add a new public deriver to track and refresh the data */
   @action addObservedWallet: ({
-    publicDeriverId: number, lastSyncInfo: $ReadOnly<LastSyncInfoRow>, ...
+    publicDeriverId: number,
+    lastSyncInfo: $ReadOnly<LastSyncInfoRow>,
+    networkId: number,
+    ...
   }) => void = (
     publicDeriver
   ) => {
@@ -251,7 +255,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       runInAction(() => {
         txs.splice(0, 0, ...result);
       });
-      return undefined;
+      return this._afterLoadingNewTxs(result, publicDeriver);
     }).catch(error => {
       console.error('error when loading transaction list head', error)
     });
@@ -544,10 +548,18 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   }
 
   // the wallet store gets update of new transactions and calls this function to display them
-  updateNewTransactions(newTxs: Array<WalletTransaction>, publicDeriverId: number): void {
-    const { txs } = this.getTxHistoryState(publicDeriverId);
+  async updateNewTransactions(
+    newTxs: Array<WalletTransaction>,
+    publicDeriver: {
+      publicDeriverId: number,
+      networkId: number,
+      ...
+    },
+  ): Promise<void> {
+    const { txs } = this.getTxHistoryState(publicDeriver.publicDeriverId);
     runInAction(() => {
       txs.splice(0, 0, ...newTxs);
     });
+    await this._afterLoadingNewTxs(txs, publicDeriver);
   }
 }
