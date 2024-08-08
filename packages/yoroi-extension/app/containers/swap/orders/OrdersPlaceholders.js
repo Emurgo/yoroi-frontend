@@ -1,9 +1,14 @@
 // @flow
+import type { Node } from 'react';
 import styles from './OrdersPage.scss';
 import Table from '../../../components/common/table/Table';
 import { Box } from '@mui/material';
 
-export const LoadingOpenOrders = ({ columnLeftPaddings }) => {
+type LoadingCompProps = {|
+  columnLeftPaddings: Array<string>,
+|};
+
+export const LoadingOpenOrders = ({ columnLeftPaddings }: LoadingCompProps): Node => {
   const renderPlaceholderRow = () => (
     <>
       <Box width="100%" className={styles.fadeIn0}>
@@ -37,7 +42,7 @@ export const LoadingOpenOrders = ({ columnLeftPaddings }) => {
       <Table
         columnKeys={[]}
         columnNames={[]}
-        columnAlignment={'center'}
+        columnAlignment={[]}
         columnLeftPaddings={columnLeftPaddings}
         gridTemplateColumns="176px 150px 166px 150px 216px 240px auto"
         columnGap="0px"
@@ -53,7 +58,7 @@ export const LoadingOpenOrders = ({ columnLeftPaddings }) => {
   );
 };
 
-export const LoadingCompletedOrders = ({ columnLeftPaddings }) => {
+export const LoadingCompletedOrders = ({ columnLeftPaddings }: LoadingCompProps): Node => {
   const renderPlaceholderRow = () => (
     <>
       <Box width="100%" className={styles.fadeIn0}>
@@ -62,7 +67,7 @@ export const LoadingCompletedOrders = ({ columnLeftPaddings }) => {
       <Box width="100%" className={styles.fadeIn0}>
         <Box bgcolor="ds.gray_c100" width="150px" height="24px" borderRadius="8px" />
       </Box>
-      <Box width="100%"></Box>
+      <Box width="100%" />
       <Box width="100%" className={styles.fadeIn0}>
         <Box bgcolor="ds.gray_c100" width="100px" height="24px" borderRadius="8px" />
       </Box>
@@ -82,7 +87,7 @@ export const LoadingCompletedOrders = ({ columnLeftPaddings }) => {
       <Table
         columnKeys={[]}
         columnNames={[]}
-        columnAlignment="center"
+        columnAlignment={[]}
         columnLeftPaddings={columnLeftPaddings}
         gridTemplateColumns="auto 150px auto auto 0px auto auto"
         columnGap="0px"
