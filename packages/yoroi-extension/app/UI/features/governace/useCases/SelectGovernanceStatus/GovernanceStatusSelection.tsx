@@ -97,7 +97,12 @@ export const GovernanceStatusSelection = () => {
   const optionsList = [
     {
       title: governanceStatus.status === 'delegate' ? strings.delegatingToDRep : strings.delegateToDRep,
+      titleHover: governanceStatus.status === 'delegate' ? 'Change DRep' : strings.delegateToDRep,
       description: strings.designatingSomeoneElse,
+      descriptionHover:
+        governanceStatus.status === 'delegate'
+          ? `Current DRep selection: ${governanceStatus.drep}`
+          : strings.designatingSomeoneElse,
       icon: <DRepIlustration />,
       selected: governanceStatus.status === 'delegate' ? true : false,
       onClick: handleDelegate,
@@ -138,7 +143,9 @@ export const GovernanceStatusSelection = () => {
                 <GovernanceVoteingCard
                   key={index}
                   title={option.title}
+                  titleHover={option?.titleHover}
                   description={option.description}
+                  descriptionHover={option?.descriptionHover}
                   icon={option.icon}
                   selected={option.selected}
                   onClick={option.onClick}

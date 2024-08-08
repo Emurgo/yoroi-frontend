@@ -8,7 +8,9 @@ import LoadingSpinner from '../../../../components/widgets/LoadingSpinner';
 
 type Props = {
   title: string;
+  titleHover?: string;
   description: string;
+  descriptionHover?: string;
   icon: React.ReactNode;
   selected: boolean;
   onClick: () => void;
@@ -61,21 +63,36 @@ const SpinnerBox = styled(Box)(() => ({
   top: 15,
 }));
 
-export const GovernanceVoteingCard = ({ title, description, icon, selected, onClick, pending = false }: Props) => (
-  <StyledCard onClick={pending ? undefined : onClick} pending={pending === true ? 'true' : undefined} selected={selected}>
-    {pending && selected && (
-      <SpinnerBox>
-        <LoadingSpinner />
-      </SpinnerBox>
-    )}
-    <CardContent>
-      <IconContainer>{icon}</IconContainer>
-      <Typography variant="h3" fontWeight="500" mt="16px">
-        {title}
-      </Typography>
-      <Description variant="body2" color={'ds.gray_c800'}>
-        {description}
-      </Description>
-    </CardContent>
-  </StyledCard>
-);
+export const GovernanceVoteingCard = ({
+  title,
+  description,
+  descriptionHover,
+  titleHover,
+  icon,
+  selected,
+  onClick,
+  pending = false,
+}: Props) => {
+  const [hover, onHover] = React.useState(false);
+  console.log('titleHover', titleHover);
+  return (
+    <div onMouseOver={() => onHover(true)} onMouseLeave={() => onHover(false)}>
+      <StyledCard onClick={pending ? undefined : onClick} pending={pending === true ? 'true' : undefined} selected={selected}>
+        {pending && selected && (
+          <SpinnerBox>
+            <LoadingSpinner />
+          </SpinnerBox>
+        )}
+        <CardContent>
+          <IconContainer>{icon}</IconContainer>
+          <Typography variant="h3" fontWeight="500" mt="16px">
+            {hover && titleHover ? titleHover : title}
+          </Typography>
+          <Description variant="body2" color={'ds.gray_c800'} style={{ wordWrap: 'break-word', maxWidth: '260px' }}>
+            {descriptionHover && hover ? descriptionHover : description}
+          </Description>
+        </CardContent>
+      </StyledCard>
+    </div>
+  );
+};
