@@ -124,7 +124,7 @@ export const GovernanceContextProvider = ({
   const getGovApiState = async () => {
     const govApi = new GovernanceApi({
       oldBackendUrl: String(backendService),
-      newBackendUrl: String(networkId === 350 ? backendService : backendServiceZero),
+      newBackendUrl: String(backendServiceZero),
       networkId: networkId,
       wasmFactory: RustModule.CrossCsl.init,
     });
