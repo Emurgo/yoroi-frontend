@@ -159,7 +159,7 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
                     textAlign: 'center',
                     p: '1px',
                     border: 'solid 1px transparent',
-                    background: theme => (isSelected ? theme.palette.ds.bg_gradient_1 : theme.palette.ds.bg_gradient_3),
+                    background: theme => (isSelected ? theme.palette.ds.bg_gradient_1 : theme.palette.ds.bg_gradient_2),
                     backgroundClip: 'content-box, border-box',
                     backgroundOrigin: 'border-box',
                     borderRadius: '8px',
