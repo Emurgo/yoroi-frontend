@@ -49,6 +49,15 @@ export default class NavBarContainerRevamp extends Component<Props> {
     this.props.actions.router.goToRoute.trigger({ route, publicDeriver: newWallet });
   };
 
+  checkAndResetGovRoutes: void => void = () => {
+    if (
+      this.props.stores.app.currentRoute === ROUTES.Governance.FAIL ||
+      this.props.stores.app.currentRoute === ROUTES.Governance.SUBMITTED
+    ) {
+      this.props.actions.router.goToRoute.trigger({ route: ROUTES.Governance.ROOT });
+    }
+  };
+
   render(): Node {
     const { stores, pageBanner } = this.props;
     const { profile } = stores;
@@ -142,15 +151,13 @@ export default class NavBarContainerRevamp extends Component<Props> {
       return (
         <WalletListDialog
           cardanoWallets={cardanoWallets}
-          onSelect={this.onSelectWallet}
+          onSelect={publicDeriver => {
+            this.checkAndResetGovRoutes();
+            this.onSelectWallet(publicDeriver);
+          }}
           selectedWallet={this.props.stores.wallets.selected}
           close={() => {
-            if (
-              this.props.stores.app.currentRoute === ROUTES.Governance.FAIL ||
-              this.props.stores.app.currentRoute === ROUTES.Governance.SUBMITTED
-            ) {
-              this.props.actions.router.goToRoute.trigger({ route: ROUTES.Governance.ROOT });
-            }
+            this.checkAndResetGovRoutes();
             this.props.actions.dialogs.closeActiveDialog.trigger();
           }}
           shouldHideBalance={this.props.stores.profile.shouldHideBalance}
