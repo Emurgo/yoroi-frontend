@@ -25,7 +25,9 @@ const initialGovernanceProvider = {
   createDrepDelegationTransaction: async (_drepCredential: string) => Response,
   signDelegationTransaction: async (_params: any) => Response,
   selectedWallet: null,
+  walletAdaBalance: null,
   governanceStatus: { status: null, drep: null },
+  triggerBuySellAdaDialog: null,
 };
 
 const GovernanceContext = React.createContext(initialGovernanceProvider);
@@ -38,6 +40,7 @@ type GovernanceProviderProps = {
   txDelegationError: any;
   signDelegationTransaction: (params: any) => Promise<void>;
   tokenInfo: any;
+  triggerBuySellAdaDialog: any;
 };
 
 export const GovernanceContextProvider = ({
@@ -48,6 +51,7 @@ export const GovernanceContextProvider = ({
   txDelegationError,
   signDelegationTransaction,
   tokenInfo,
+  triggerBuySellAdaDialog,
 }: GovernanceProviderProps) => {
   if (!currentWallet?.selectedWallet) throw new Error(`requires a wallet to be selected`);
   const [state, dispatch] = React.useReducer(GovernanceReducer, {
@@ -66,6 +70,7 @@ export const GovernanceContextProvider = ({
     unitOfAccount,
     getCurrentPrice,
     isHardwareWallet,
+    walletAdaBalance,
     backendServiceZero,
   } = currentWallet;
   const governanceManager = useGovernanceManagerMaker(walletId, networkId);
@@ -166,8 +171,10 @@ export const GovernanceContextProvider = ({
     selectedWallet: currentWallet.selectedWallet,
     tokenInfo,
     isHardwareWallet,
+    walletAdaBalance,
     getFormattedPairingAmount: (amount: string) =>
       getFormattedPairingValue(getCurrentPrice, defaultTokenInfo, unitOfAccount, amount),
+    triggerBuySellAdaDialog,
   };
 
   return <GovernanceContext.Provider value={context}>{children}</GovernanceContext.Provider>;

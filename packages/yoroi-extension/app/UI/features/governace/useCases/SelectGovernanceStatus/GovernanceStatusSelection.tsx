@@ -1,11 +1,11 @@
-import { Alert, Stack } from '@mui/material';
+import { Alert, Button, Stack } from '@mui/material';
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import { GovernanceProvider } from '@yoroi/staking';
 import * as React from 'react';
-import { NotEnoughMoneyToSendError } from '../../../../../api/common/errors';
+import { NoTransactions } from '../../../../components/ilustrations/NoTransactions';
 import { useModal } from '../../../../components/modals/ModalContext';
 import { ChooseDRepModal } from '../../common/ChooseDRepModal';
 import { GovernanceVoteingCard } from '../../common/GovernanceVoteingCard';
@@ -34,11 +34,18 @@ export const mapStatus = {
 };
 
 export const GovernanceStatusSelection = () => {
-  const { governanceStatus, governanceManager, governanceVoteChanged, createDrepDelegationTransaction } = useGovernance();
+  const {
+    governanceStatus,
+    governanceManager,
+    governanceVoteChanged,
+    createDrepDelegationTransaction,
+    walletAdaBalance,
+    triggerBuySellAdaDialog,
+  } = useGovernance();
   const [error, setError] = React.useState<string | null>(null);
   const navigateTo = useNavigateTo();
-  const { openModal, closeModal } = useModal();
   const strings = useStrings();
+  const { openModal, closeModal } = useModal();
 
   const pageTitle = governanceStatus.status !== 'none' ? strings.governanceStatus : strings.registerGovernance;
   const statusRawText = mapStatus[governanceStatus.status || ''];
@@ -86,11 +93,8 @@ export const GovernanceStatusSelection = () => {
       setError(null);
       navigateTo.delegationForm();
     } catch (e) {
-      if (e instanceof NotEnoughMoneyToSendError) {
-        setError('Not enough ADA to Vote');
-        closeModal();
-      }
-      return;
+      setError('Error trying to Vote. Please try again later');
+      closeModal();
     }
   };
 
@@ -127,6 +131,21 @@ export const GovernanceStatusSelection = () => {
   ];
 
   const skeletonsCards = new Array(optionsList.length).fill(null);
+
+  if (walletAdaBalance !== null && walletAdaBalance === 0) {
+    return (
+      <Stack mt="185px" alignItems="center">
+        <NoTransactions />
+        <Typography variant="h3" fontWeight="500" mt="84px">
+          To participate in governance you need to have ADA in your wallet.
+        </Typography>
+        {/* @ts-ignore */}
+        <Button variant="primary" sx={{ marginTop: '16px' }} onClick={() => triggerBuySellAdaDialog()}>
+          Buy Ada
+        </Button>
+      </Stack>
+    );
+  }
 
   return (
     <Container>

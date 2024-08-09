@@ -1,5 +1,7 @@
 import BigNumber from 'bignumber.js';
 import { WalletTypeOption } from '../../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import { maybe } from '../../../../coreUtils';
+import { genLookupOrFail } from '../../../../stores/stateless/tokenHelpers';
 import { calculateAndFormatValue } from '../../../../utils/unit-of-account';
 
 export const mapStakingKeyStateToGovernanceAction = (state: any) => {
@@ -48,6 +50,8 @@ export const createCurrrentWalletInfo = (stores: any) => {
     throw new Error(`no selected Wallet. Should never happen`);
   }
 
+  const walletAdaBalance = getWalletTotalAdaBalance(stores, selectedWallet);
+
   const isHardware = selectedWallet.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET;
   const currentWalletId = selectedWallet.getPublicDeriverId();
   const networkInfo = selectedWallet.getParent().getNetworkInfo();
@@ -59,6 +63,7 @@ export const createCurrrentWalletInfo = (stores: any) => {
     networkId,
     walletId: currentWalletId,
     selectedWallet: selectedWallet,
+    walletAdaBalance: walletAdaBalance.toNumber(),
     unitOfAccount: stores.profile.unitOfAccount,
     defaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfoSummary(networkId),
     getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
@@ -76,4 +81,18 @@ export const getFormattedPairingValue = (getCurrentPrice, defaultTokenInfo, unit
   const shiftedAmount = new BigNumber(lovelaces).shiftedBy(-(defaultTokenInfo.decimals ?? 0));
   const val = price ? calculateAndFormatValue(shiftedAmount, price) : '-';
   return `${val} ${currency}`;
+};
+
+const getTotalAmount = (walletAmount, rewards) => {
+  return maybe(walletAmount, w => rewards.joinAddCopy(w));
+};
+
+const getWalletTotalAdaBalance = (stores, selectedWallet) => {
+  const totalAmount = stores.transactions.getBalance(selectedWallet);
+  const rewards = stores.delegation.getRewardBalanceOrZero(selectedWallet);
+  const amount = getTotalAmount(totalAmount, rewards);
+  const defaultEntry = amount.getDefaultEntry();
+  const getTokenInfo = genLookupOrFail(stores.tokenInfoStore.tokenInfo);
+  const tokenInfo = getTokenInfo(defaultEntry);
+  return defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 };
