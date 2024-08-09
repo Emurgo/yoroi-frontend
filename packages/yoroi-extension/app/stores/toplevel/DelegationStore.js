@@ -317,12 +317,13 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
 
       const govApi = new GovernanceApi({
         oldBackendUrl: String(backendService),
-        newBackendUrl: String(backendServiceZero),
+        newBackendUrl: String(networkId === 350 ? backendService : backendServiceZero),
         networkId,
         wasmFactory: RustModule.CrossCsl.init,
       });
 
       const governanceStatus = await govApi.getAccountState(skey, skey);
+
       this.setGovernanceStatus(governanceStatus);
     } catch (e) {
       console.warn(e);
