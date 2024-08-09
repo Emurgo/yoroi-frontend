@@ -121,7 +121,7 @@ export const networks = Object.freeze({
     Backend: {
       BackendService: environment.isTest() ? 'http://localhost:21000' : 'https://preview-backend.emurgornd.com',
       TokenInfoService: 'https://stage-cdn.yoroiwallet.com',
-      BackendServiceZero: 'https://yoroi-backend-zero-previes.emurgornd.com',
+      BackendServiceZero: 'https://yoroi-backend-zero-preview.emurgornd.com',
     },
     BaseConfig: ([
       Object.freeze({
