@@ -336,6 +336,62 @@ function formatLedgerWithdrawals(
   }
   return result;
 }
+
+type LedgerCertificateHandler<CslCert> = {|
+  getter: RustModule.WalletV4.Certificate => ?CslCert,
+  converter: (CslCert, RustModule.WalletV4.Credential => number[]) => Certificate,
+|}
+
+function createLedgerCertificateHandler<CslCert>(
+  getter: RustModule.WalletV4.Certificate => ?CslCert,
+  converter: (CslCert, RustModule.WalletV4.Credential => number[]) => Certificate,
+): LedgerCertificateHandler<CslCert> {
+  return { getter, converter };
+}
+
+const CERTIFICATE_CONVERTERS: { [$Values<typeof RustModule.WalletV4.CertificateKind>]: LedgerCertificateHandler<any> } = {
+  [RustModule.WalletV4.CertificateKind.StakeRegistration]:
+    createLedgerCertificateHandler<RustModule.WalletV4.StakeRegistration>(
+      cert => cert.as_stake_registration(),
+      (registrationCert, getPath) => ({
+        type: CertificateType.STAKE_REGISTRATION,
+        params: {
+          stakeCredential: {
+            type: CredentialParamsType.KEY_PATH,
+            keyPath: getPath(registrationCert.stake_credential()),
+          },
+        },
+      }),
+    ),
+  [RustModule.WalletV4.CertificateKind.StakeDeregistration]:
+    createLedgerCertificateHandler<RustModule.WalletV4.StakeDeregistration > (
+      cert => cert.as_stake_deregistration(),
+      (deregistrationCert, getPath) => ({
+        type: CertificateType.STAKE_DEREGISTRATION,
+        params: {
+          stakeCredential: {
+            type: CredentialParamsType.KEY_PATH,
+            keyPath: getPath(deregistrationCert.stake_credential()),
+          },
+        },
+      }),
+    ),
+  [RustModule.WalletV4.CertificateKind.StakeDelegation]:
+    createLedgerCertificateHandler<RustModule.WalletV4.StakeDelegation > (
+      cert => cert.as_stake_delegation(),
+      (delegationCert, getPath) => ({
+        type: CertificateType.STAKE_DELEGATION,
+        params: {
+          stakeCredential: {
+            type: CredentialParamsType.KEY_PATH,
+            keyPath: getPath(delegationCert.stake_credential()),
+          },
+          poolKeyHashHex: delegationCert.pool_keyhash().to_hex(),
+        },
+      }),
+    ),
+};
+
 function formatLedgerCertificates(
   networkId: number,
   certificates: RustModule.WalletV4.Certificates,
@@ -348,7 +404,7 @@ function formatLedgerCertificates(
       networkId,
       stakeCredential
     );
-    const addressPayload = Buffer.from(rewardAddr.to_address().to_bytes()).toString('hex');
+    const addressPayload = rewardAddr.to_address().to_hex();
     const addressing = addressingMap(addressPayload);
     if (addressing == null) {
       throw new Error(`${nameof(getPath)} Ledger only supports certificates from own address ${addressPayload}`);
@@ -360,47 +416,17 @@ function formatLedgerCertificates(
   for (let i = 0; i < certificates.len(); i++) {
     const cert = certificates.get(i);
 
-    const registrationCert = cert.as_stake_registration();
-    if (registrationCert != null) {
-      result.push({
-        type: CertificateType.STAKE_REGISTRATION,
-        params: {
-          stakeCredential: {
-            type: CredentialParamsType.KEY_PATH,
-            keyPath: getPath(registrationCert.stake_credential()),
-          },
-        }
-      });
-      continue;
+    const converter = CERTIFICATE_CONVERTERS[cert.kind()]
+    if (converter == null) {
+      throw new Error(`${nameof(formatLedgerCertificates)} Ledger doesn't support this certificate type! ` + cert.to_hex());
     }
-    const deregistrationCert = cert.as_stake_deregistration();
-    if (deregistrationCert != null) {
-      result.push({
-        type: CertificateType.STAKE_DEREGISTRATION,
-        params: {
-          stakeCredential: {
-            type: CredentialParamsType.KEY_PATH,
-            keyPath: getPath(deregistrationCert.stake_credential()),
-          },
-        },
-      });
-      continue;
+
+    const cslCert = converter.getter(cert);
+    if (cslCert == null) {
+      throw new Error(`${nameof(formatLedgerCertificates)} Certificate converter did not extract a correct certificate type! ` + cert.to_hex());
     }
-    const delegationCert = cert.as_stake_delegation();
-    if (delegationCert != null) {
-      result.push({
-        type: CertificateType.STAKE_DELEGATION,
-        params: {
-          stakeCredential: {
-            type: CredentialParamsType.KEY_PATH,
-            keyPath: getPath(delegationCert.stake_credential()),
-          },
-          poolKeyHashHex: Buffer.from(delegationCert.pool_keyhash().to_bytes()).toString('hex'),
-        },
-      });
-      continue;
-    }
-    throw new Error(`${nameof(formatLedgerCertificates)} Ledger doesn't support this certificate type`);
+
+    result.push(converter.converter(cslCert, getPath));
   }
   return result;
 }

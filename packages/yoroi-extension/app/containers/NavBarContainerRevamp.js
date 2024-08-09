@@ -151,9 +151,9 @@ export default class NavBarContainerRevamp extends Component<Props> {
       return (
         <WalletListDialog
           cardanoWallets={cardanoWallets}
-          onSelect={publicDeriver => {
+          onSelect={wallet => {
             this.checkAndResetGovRoutes();
-            this.onSelectWallet(publicDeriver);
+            this.onSelectWallet(wallet);
           }}
           selectedWallet={this.props.stores.wallets.selected}
           close={() => {
