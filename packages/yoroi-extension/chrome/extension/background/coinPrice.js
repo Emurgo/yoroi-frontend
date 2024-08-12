@@ -4,7 +4,7 @@ import LocalStorageApi from '../../../app/api/localStorage/index';
 import type { ResponseTicker } from '../../../app/api/common/lib/state-fetch/types';
 import { emitUpdateToSubscriptions, getSubscriptions } from './subscriptionManager';
 import type { ConfigType } from '../../../config/config-types';
-import type { HistoricalCoinPriceResponse, HistoricalCoinPricesRequest } from '../../../app/api/thunk';
+import type { HistoricalCoinPricesResponse, HistoricalCoinPricesRequest } from './handlers/yoroi/coinPrice';
 import type { Ticker, PriceDataRow } from '../../../app/api/ada/lib/storage/database/prices/tables';
 import { upsertPrices, getAllPrices } from '../../../app/api/common/lib/storage/bridge/prices';
 import { getDb } from './state';
@@ -62,7 +62,7 @@ export function refreshCurrentCoinPrice(why: 'UI' | 'poll'): void {
 
 export async function getHistoricalCoinPrices(
   request: HistoricalCoinPricesRequest
-): Promise<HistoricalCoinPriceResponse> {
+): Promise<HistoricalCoinPricesResponse> {
   const priceMap: Map<number, Array<$ReadOnly<PriceDataRow>>> = new Map();
 
   const db = await getDb();

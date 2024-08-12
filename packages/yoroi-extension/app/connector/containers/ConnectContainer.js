@@ -5,11 +5,10 @@ import ConnectPage from '../components/connect/ConnectPage';
 import { observer } from 'mobx-react';
 import { autorun } from 'mobx';
 import type { ConnectorStoresAndActionsProps } from '../../types/injectedProps.types';
-import type { ConnectResponseData } from '../../../chrome/extension/connector/types';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { LoadingWalletStates } from '../types';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
-import { connectorCreateAuthEntry } from '../../api/thunk';
+import { connectorCreateAuthEntry, userConnectResponse } from '../../api/thunk';
 import { ampli } from '../../../ampli/index';
 import type { WalletState } from '../../../chrome/extension/background/types';
 
@@ -39,8 +38,7 @@ export default class ConnectContainer extends Component<
   };
   onUnload: () => void = () => {
     const chromeMessage = this.props.stores.connector.connectingMessage;
-    chrome.runtime.sendMessage({
-      type: 'connect_response',
+    userConnectResponse({
       accepted: false,
       tabId: chromeMessage?.tabId,
     });
@@ -113,15 +111,12 @@ export default class ConnectContainer extends Component<
 
     await ampli.dappPopupConnectWalletPasswordPageViewed();
 
-    chrome.runtime.sendMessage(
-      ({
-        type: 'connect_response',
-        accepted: true,
-        publicDeriverId,
-        auth: authEntry,
-        tabId: chromeMessage.tabId,
-      }: ConnectResponseData)
-    );
+    userConnectResponse({
+      accepted: true,
+      publicDeriverId,
+      auth: authEntry,
+      tabId: chromeMessage.tabId,
+    });
 
     // if we close the window immediately, the previous message may not be able to
     // to reach the service worker
@@ -155,13 +150,10 @@ export default class ConnectContainer extends Component<
 
   onCancel: void => void = () => {
     const chromeMessage = this.props.stores.connector.connectingMessage;
-    chrome.runtime.sendMessage(
-      ({
-        type: 'connect_response',
-        accepted: false,
-        tabId: chromeMessage?.tabId,
-      }: ConnectResponseData)
-    );
+    userConnectResponse({
+      accepted: false,
+      tabId: chromeMessage?.tabId,
+    });
 
     this.props.actions.connector.closeWindow.trigger();
   };

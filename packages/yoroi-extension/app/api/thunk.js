@@ -2,14 +2,8 @@
 
 import type { WalletState, ServerStatus } from '../../chrome/extension/background/types';
 import { HaskellShelleyTxSignRequest } from './ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import type { NetworkRow, TokenRow } from './ada/lib/storage/database/primitives/tables';
-import type { TxMemoLookupKey, } from './ada/lib/storage/bridge/memos';
-import type { TxMemoTableInsert, TxMemoTableRow, } from './ada/lib/storage/database/memos/tables';
 import { RustModule } from './ada/lib/cardanoCrypto/rustLoader';
-import type { CardanoAddressedUtxo } from './ada/transactions/types';
-import type { HWFeatures, } from './ada/lib/storage/database/walletTypes/core/tables';
 import WalletTransaction from '../domain/WalletTransaction';
-import type { ReferenceTransaction } from './common';
 import type { WalletAuthEntry } from '../../chrome/extension/connector/types';
 import CardanoShelleyTransaction, {
   deserializeTransactionCtorData as deserializeShelleyTransactionCtorData,
@@ -18,17 +12,90 @@ import CardanoByronTransaction, {
   deserializeTransactionCtorData as deserializeByronTransactionCtorData,
 } from '../domain/CardanoByronTransaction';
 import { MultiToken } from './common/lib/MultiToken';
-import type { ExplorerRow, PreferredExplorerRow } from './ada/lib/storage/database/explorers/tables';
+import type { ExplorerRow } from './ada/lib/storage/database/explorers/tables';
 import { WrongPassphraseError } from './ada/lib/cardanoCrypto/cryptoErrors';
 import { SendTransactionApiError } from './common/errors';
 import type { ResponseTicker } from './common/lib/state-fetch/types';
-/*::
-declare var chrome;
+import type { HandlerType } from '../../chrome/extension/background/handlers/yoroi/type';
+import {
+  GetHistoricalCoinPrices,
+  RefreshCurrentCoinPrice
+} from '../../chrome/extension/background/handlers/yoroi/coinPrice';
+import {
+  UpsertTxMemo,
+  DeleteTxMemo,
+  GetAllTxMemos,
+} from '../../chrome/extension/background/handlers/yoroi/memo';
+import {
+  CreateWallet,
+  CreateHardwareWallet,
+  RemoveWallet,
+  RenameConceptualWallet,
+  RenamePublicDeriver,
+  GetWallets,
+  ResyncWallet,
+  ChangeSigningPassword,
+  GetPrivateStakingKey,
+  RemoveAllTransactions,
+  PopAddress,
+  RefreshTransactions,
+} from '../../chrome/extension/background/handlers/yoroi/wallet';
+import {
+  GetAllExplorers,
+  GetSelectedExplorer,
+  SaveSelectedExplorer,
+} from '../../chrome/extension/background/handlers/yoroi/explorer';
+import {
+  GetCardanoAssets,
+} from '../../chrome/extension/background/handlers/yoroi/token';
+import {
+  SignAndBroadcastTransaction,
+  SignTransaction,
+  BroadcastTransaction,
+} from '../../chrome/extension/background/handlers/yoroi/transaction';
+import type {
+  SignAndBroadcastTransactionRequestType,
+  BroadcastTransactionRequestType,
+  SignTransactionRequestType,
+} from '../../chrome/extension/background/handlers/yoroi/transaction';
+import {
+  UserConnectResponse,
+  CreateAuthEntry,
+  type ConnectorCreateAuthEntryRequestType,
+  UserSignConfirm,
+  UserSignReject,
+  SignFail,
+  SignWindowRetrieveData,
+  ConnectWindowRetrieveData,
+  RemoveWalletFromWhiteList,
+  GetConnectedSites,
+} from '../../chrome/extension/background/handlers/yoroi/connector';
+
+export type { CreateHardwareWalletRequest } from '../../chrome/extension/background/handlers/yoroi/wallet';
+
+/*
+Neither this:
+
+type _GetEntryFuncType = <RequestType, ResponseType, _T>(HandlerType<RequestType, ResponseType, _T>) => (
+  (RequestType) => Promise<ResponseType>
+);
+type GetEntryFuncType<HandlerT> = $Call<_GetEntryFuncType, HandlerT>;
+
+nor this:
+
+type _GetRequestType = <RequestType, _R, _T>(HandlerType<RequestType, _R, _T>) => RequestType;
+type _GetResponseType = <_R, ResponseType, _T>(HandlerType<_R, ResponseType, _T>) => ResponseType;
+type GetEntryFuncType<HandlerT> = $Call<_GetRequestType, HandlerT> => Promise<$Call<_GetResponseType, HandlerT>>;
+works as expected.
 */
+type GetEntryFuncType<HandlerT> = $PropertyType<HandlerT, 'handle'>;
+
+declare var chrome;
+
 
 // UI -> background queries:
 
-function callBackground<T, R>(message: T): Promise<R> {
+export function callBackground<T, R>(message: T): Promise<R> {
   return new Promise((resolve, reject) => {
     window.chrome.runtime.sendMessage(message, response => {
       if (window.chrome.runtime.lastError) {
@@ -71,7 +138,7 @@ function patchWalletState(walletState: Object): WalletState {
 }
 
 export async function getWallets(walletId?: number): Promise<Array<WalletState>> {
-  const wallets = await callBackground({ type: 'get-wallets', request: { walletId } });
+  const wallets = await callBackground({ type: GetWallets.typeTag, request: { walletId } });
 
   for (const wallet of wallets) {
     patchWalletState(wallet);
@@ -83,83 +150,45 @@ export async function subscribe(activeWalletId: ?number): Promise<void> {
   await callBackground({ type: 'subscribe', request: { activeWalletId } });
 }
 
-export type CreateWalletRequestType = {|
-  networkId: number,
-  recoveryPhrase: string,
-  walletName: string,
-  walletPassword: string,
-  accountIndex: number,
-|};
-
-export async function createWallet(request: CreateWalletRequestType): Promise<WalletState> {
-  const resp = await callBackground({ type: 'create-wallet', request, });
+export const createWallet: GetEntryFuncType<typeof CreateWallet> = async (request) => {
+  const resp = await callBackground({ type: CreateWallet.typeTag, request, });
   if (resp.error) {
     throw new Error(`error when creating wallet: ${resp.error}`);
   }
-  return patchWalletState(resp.placeHolderWalletState);
+  return patchWalletState(resp);
 }
 
-export type CreateHardwareWalletRequestType = {|
-  walletName: string,
-  publicKey: string,
-  addressing: {|
-    path: Array<number>,
-    startLevel: number,
-  |},
-  hwFeatures: HWFeatures,
-  network: $ReadOnly<NetworkRow>,
-|};
-export async function createHardwareWallet(request: CreateHardwareWalletRequestType): Promise<WalletState> {
+export const createHardwareWallet: GetEntryFuncType<typeof CreateHardwareWallet> = async (request) => {
   const resp = await callBackground({ type: 'create-hardware-wallet', request, });
   if (resp.error) {
     throw new Error(`error when creating wallet: ${resp.error}`);
   }
-  return patchWalletState(resp.placeHolderWalletState);
+  return patchWalletState(resp);
 }
 
-export async function removeWalletFromDb(request: {| publicDeriverId: number |}): Promise<void> {
-  await callBackground({ type: 'remove-wallet', request, });
+export const removeWalletFromDb: GetEntryFuncType<typeof RemoveWallet> = async (request) => {
+  await callBackground({ type: RemoveWallet.typeTag, request, });
+};
+
+export const changeSigningKeyPassword: GetEntryFuncType<typeof ChangeSigningPassword> = async (request) => {
+  await callBackground({ type: ChangeSigningPassword.typeTag, request, });
 }
 
-export type ChangeSigningKeyPasswordRequestType = {|
-  publicDeriverId: number,
-  oldPassword: string,
-  newPassword: string,
-|};
-export async function changeSigningKeyPassword(request: ChangeSigningKeyPasswordRequestType): Promise<void> {
-  await callBackground({ type: 'change-signing-password', request, });
+export const renamePublicDeriver: GetEntryFuncType<typeof RenamePublicDeriver> = async (request) => {
+  await callBackground({ type: RenamePublicDeriver.typeTag, request, });
 }
 
-export async function renamePublicDeriver(
-  request: {| publicDeriverId: number, newName: string |}
-): Promise<void> {
-  await callBackground({ type: 'rename-public-deriver', request, });
-}
-
-export async function renameConceptualWallet(
-  request: {| conceptualWalletId: number, newName: string |}
-): Promise<void> {
-  await callBackground({ type: 'rename-conceptual-wallet', request, });
+export const renameConceptualWallet: GetEntryFuncType<typeof RenameConceptualWallet> = async (request) => {
+  await callBackground({ type: RenameConceptualWallet.typeTag, request, });
 }
 
 // TODO: retire this API and replace with `signTransacton` and `broadcastTransaction`
-export type SignAndBroadcastTransactionRequestType = {|
-  publicDeriverId: number,
-  senderUtxos: Array<CardanoAddressedUtxo>,
-  unsignedTx: string,
-  metadata: ?string,
-  neededHashes: Array<string>,
-  wits: Array<string>,
-  password: string,
-  txHash: string,
-|};
-type UserSignAndBroadcastTransactionRequestType = {|
-  signRequest: HaskellShelleyTxSignRequest,
-  password: string,
-  publicDeriverId: number,
-|};
 export async function signAndBroadcastTransaction(
-  request: UserSignAndBroadcastTransactionRequestType
+  request: {|
+    signRequest: HaskellShelleyTxSignRequest,
+    password: string,
+    publicDeriverId: number,
+  |}
 ): Promise<{| txId: string |}> {
   const txBody = request.signRequest.unsignedTx.build();
   const txHash = RustModule.WalletV4.hash_transaction(txBody);
@@ -177,76 +206,50 @@ export async function signAndBroadcastTransaction(
   txBody.free();
   txHash.free();
   const result = await callBackground({
-    type: 'sign-and-broadcast-transaction',
+    type: SignAndBroadcastTransaction.typeTag,
     request: serializableRequest,
   });
   return handleWrongPassword(result);
 }
 
-export type BroadcastTransactionRequestType = {|
-  publicDeriverId: number,
-  ...({|
-    signedTxHexArray: Array<string>,
-  |} | {|
-    addressedUtxos?: Array<CardanoAddressedUtxo>,
-    signedTxHex: string,
-  |})
-|};
 export async function broadcastTransaction(request: BroadcastTransactionRequestType): Promise<void> {
-  await callBackground({ type: 'broadcast-transaction', request });
+  const result = await callBackground({ type: BroadcastTransaction.typeTag, request });
+  if (result.error) {
+    throw new Error(result.error);
+  }
+  return result;
 }
 
 // Only mnemonic wallet has private staking key.
 export async function getPrivateStakingKey(
   request: {| publicDeriverId: number, password: string |}
-): Promise<?string> {
-  const result = await callBackground({ type: 'get-private-staking-key', request });
+): Promise<string> {
+  const result = await callBackground({ type: GetPrivateStakingKey.typeTag, request });
   return handleWrongPassword(result);
 }
 
-export async function getCardanoAssets(
-  request?: {| networkId: number, tokenIds: Array<string> |}
-): Promise<Array<$ReadOnly<TokenRow>>> {
-  return await callBackground({ type: 'get-cardano-assets', request, });
+export const getCardanoAssets: GetEntryFuncType<typeof GetCardanoAssets> = async (request) => {
+  return await callBackground({ type: GetCardanoAssets.typeTag, request, });
 }
 
-export type UpsertTxMemoRequestType = {|
-  publicDeriverId: number,
-  memo: TxMemoTableInsert | TxMemoTableRow,
-|};
-export async function upsertTxMemo(request: UpsertTxMemoRequestType): Promise<TxMemoTableRow> {
-  return await callBackground({ type: 'upsert-tx-memo', request, });
+export const upsertTxMemo: GetEntryFuncType<typeof UpsertTxMemo> = async (request) => {
+  return await callBackground({ type: UpsertTxMemo.typeTag, request, });
+}
+export const deleteTxMemo: GetEntryFuncType<typeof  DeleteTxMemo> = async (request) => {
+  await callBackground({ type:  DeleteTxMemo.typeTag, request, });
+};
+export const getAllTxMemos: GetEntryFuncType<typeof  GetAllTxMemos> = async () => {
+  const result = await callBackground({ type: GetAllTxMemos.typeTag, });
+  return result.map(GetAllTxMemos.fixMemoDate);
 }
 
-export type DeleteTxMemoRequestType = {| publicDeriverId: number, key: TxMemoLookupKey, |};
-export async function deleteTxMemo(request: DeleteTxMemoRequestType): Promise<void> {
-  await callBackground({ type: 'delete-tx-memo', request, });
+export const removeAllTransactions: GetEntryFuncType<typeof RemoveAllTransactions> = async (request) => {
+  await callBackground({ type: RemoveAllTransactions.typeTag, request });
 }
 
-export async function getAllTxMemos(): Promise<Array<TxMemoTableRow>>{
-  const result = await callBackground({ type: 'get-all-tx-memos' });
-  return result.map(fixMemoDate);
+export const popAddress: GetEntryFuncType<typeof PopAddress> = async (request) => {
+  await callBackground({ type: PopAddress.typeTag, request });
 }
-
-export async function removeAllTransactions(request: {| publicDeriverId: number |}): Promise<void> {
-  await callBackground({ type: 'remove-all-transactions', request });
-}
-
-export async function popAddress(request: { publicDeriverId: number, ... }): Promise<void> {
-  await callBackground({ type: 'pop-address', request });
-}
-
-type RefreshTransactionForInitialLoad = {|
-|};
-type RefreshTransactionToLoadMore = {|
-  beforeTx: ReferenceTransaction,
-  skip: number,
-  limit: number,
-|};
-export type RefreshTransactionsRequestType = {|
-  publicDeriverId: number,
-  ...(RefreshTransactionForInitialLoad | RefreshTransactionToLoadMore)
-|};
 
 function deserializeTx(tx: any): WalletTransaction {
   // we know that there are only two types and only the Shelley one has the 'certificates'
@@ -257,28 +260,20 @@ function deserializeTx(tx: any): WalletTransaction {
   return CardanoByronTransaction.fromData(deserializeByronTransactionCtorData(tx));
 }
 
-export async function refreshTransactions(
-  request: RefreshTransactionsRequestType
-): Promise<Array<WalletTransaction>> {
+export const refreshTransactions: GetEntryFuncType<typeof RefreshTransactions> = async (request) => {
   const txs = await callBackground({ type: 'refresh-transactions', request });
   return txs.map(deserializeTx);
 }
 
-export async function resyncWallet(
-  request: {| publicDeriverId: number |}
-): Promise<void> {
-  return callBackground({ type: 'resync-wallet', request });
+export const resyncWallet: GetEntryFuncType<typeof ResyncWallet> = async (request) => {
+  await callBackground({ type: 'resync-wallet', request });
 }
 
-export type ConnectorCreateAuthEntryRequestType = {|
-  appAuthID: ?string,
-  publicDeriverId: number,
-  password: string,
-|};
 export async function connectorCreateAuthEntry(
   request: ConnectorCreateAuthEntryRequestType
 ): Promise<?WalletAuthEntry> {
-  return await callBackground({ type: 'connector-create-auth-entry', request });
+  const result = await callBackground({ type: CreateAuthEntry.typeTag, request });
+  return handleWrongPassword(result);
 }
 
 export async function getSelectedExplorer(): Promise<$ReadOnlyMap<number, {|
@@ -286,7 +281,7 @@ export async function getSelectedExplorer(): Promise<$ReadOnlyMap<number, {|
   selected: $ReadOnly<ExplorerRow>,
 |}>> {
   return new Map(
-    await callBackground({ type: 'get-selected-explorer' })
+    await callBackground({ type: GetSelectedExplorer.typeTag })
   );
 }
 
@@ -294,46 +289,57 @@ export async function getAllExplorers(): Promise<
   $ReadOnlyMap<number, $ReadOnlyArray<$ReadOnly<ExplorerRow>>>
 > {
   return new Map(
-    await callBackground({ type: 'get-all-explorers' })
+    await callBackground({ type: GetAllExplorers.typeTag })
   );
 }
 
-export async function saveSelectedExplorer(request: {| explorer: $ReadOnly<ExplorerRow> |}): Promise<
-  $ReadOnlyArray<$ReadOnly<PreferredExplorerRow>>
-> {
-  return await callBackground({ type: 'save-selected-explorer', request });
+export const saveSelectedExplorer: GetEntryFuncType<typeof SaveSelectedExplorer> = async (request) => {
+  return await callBackground({ type: SaveSelectedExplorer.typeTag, request });
 }
 
-export type SignTransactionRequestType = {|
-  publicDeriverId: number,
-  password: string,
-  transactionHex: string
-|};
 export async function signTransaction(request: SignTransactionRequestType): Promise<string> {
-  const result = await callBackground({ type: 'sign-tx', request });
+  const result = await callBackground({ type: SignTransaction.typeTag, request });
   return handleWrongPassword(result);
 }
 
-export type HistoricalCoinPricesRequest = {|
-  from: string,
-  timestamps: Array<number>,
-|};
-export type HistoricalCoinPriceResponse = Array<$ReadOnly<{|
-  From: string,
-  To: string,
-  Time: Date,
-  Price: number,
-|}>>;
-export async function getHistoricalCoinPrices(
-  request: HistoricalCoinPricesRequest
-): Promise<HistoricalCoinPriceResponse> {
-  return await callBackground({ type: 'get-historical-coin-prices', request });
+export const getHistoricalCoinPrices: GetEntryFuncType<typeof GetHistoricalCoinPrices> = async (request) => {
+  return await callBackground({ type: GetHistoricalCoinPrices.typeTag, request });
 }
 
-export function refreshCurrentCoinPrice(): void {
-  callBackground({ type: 'refresh-current-coin-price' }).catch(error => {
-    console.error('error refreshing current coin price:', error.message)
-  });
+export const refreshCurrentCoinPrice: GetEntryFuncType<typeof RefreshCurrentCoinPrice> = async () => {
+  await callBackground({ type: RefreshCurrentCoinPrice.typeTag, });
+}
+
+export const userConnectResponse: GetEntryFuncType<typeof UserConnectResponse> = async () => {
+  await callBackground({ type: UserConnectResponse.typeTag });
+}
+
+export const userSignConfirm: GetEntryFuncType<typeof UserSignConfirm> = async (request) => {
+  await callBackground({ type: UserSignConfirm.typeTag, request });
+}
+
+export const userSignReject: GetEntryFuncType<typeof UserSignReject> = async (request) => {
+  await callBackground({ type: UserSignReject.typeTag, request });
+}
+
+export const signFail: GetEntryFuncType<typeof SignFail> = async (request) => {
+  await callBackground({ type: SignFail.typeTag, request });
+}
+
+export const signWindowRetrieveData: GetEntryFuncType<typeof SignWindowRetrieveData> = async () => {
+  return await callBackground({ type: SignWindowRetrieveData.typeTag });
+}
+
+export const connectWindowRetrieveData: GetEntryFuncType<typeof ConnectWindowRetrieveData> = async () => {
+  return await callBackground({ type: ConnectWindowRetrieveData.typeTag });
+}
+
+export const removeWalletFromWhiteList: GetEntryFuncType<typeof RemoveWalletFromWhiteList> = async (request) => {
+  await callBackground({ type: RemoveWalletFromWhiteList.typeTag, request });
+}
+
+export const getConnectedSites: GetEntryFuncType<typeof GetConnectedSites> = async () => {
+  return await callBackground({ type: GetConnectedSites.typeTag });
 }
 
 // Background -> UI notifications:
@@ -405,9 +411,4 @@ function handleWrongPassword<T: { error?: string, ... }>(result: T): T {
     throw new SendTransactionApiError();
   }
   return result;
-}
-
-export function fixMemoDate(memo: TxMemoTableInsert | TxMemoTableRow): TxMemoTableInsert | TxMemoTableRow {
-  memo.LastUpdated = new Date(memo.LastUpdated);
-  return memo;
 }

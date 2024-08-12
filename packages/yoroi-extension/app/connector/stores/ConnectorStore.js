@@ -1,18 +1,9 @@
 /* eslint-disable promise/always-return */
 // @flow
 import type {
-  ConfirmedSignData,
   ConnectedSites,
   ConnectingMessage,
-  ConnectRetrieveData,
-  FailedSignData,
-  GetConnectedSitesData,
-  GetConnectionProtocolData,
-  GetUtxosRequest,
-  Protocol,
-  RemoveWalletFromWhitelistData,
   SigningMessage,
-  TxSignWindowRetrieveData,
   WhitelistEntry,
 } from '../../../chrome/extension/connector/types';
 import type { ActionsMap } from '../actions/index';
@@ -75,36 +66,28 @@ import {
 import { wrapWithFrame } from '../../stores/lib/TrezorWrapper';
 import { ampli } from '../../../ampli/index';
 import { noop } from '../../coreUtils';
-import { getWallets, signAndBroadcastTransaction, broadcastTransaction } from '../../api/thunk';
+import {
+  getWallets,
+  signAndBroadcastTransaction,
+  broadcastTransaction,
+  userSignConfirm,
+  userSignReject,
+  signFail,
+  signWindowRetrieveData,
+  connectWindowRetrieveData,
+  removeWalletFromWhiteList,
+  getConnectedSites,
+} from '../../api/thunk';
 import type { WalletState } from '../../../chrome/extension/background/types';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 import { addressBech32ToHex } from '../../api/ada/lib/cardanoCrypto/utils';
 import AdaApi from '../../api/ada';
 
-export function connectorCall<T, R>(message: T): Promise<R> {
-  return new Promise((resolve, reject) => {
-    window.chrome.runtime.sendMessage(message, response => {
-      if (window.chrome.runtime.lastError) {
-        // eslint-disable-next-line prefer-promise-reject-errors
-        reject(
-          `Could not establish connection: ${JSON.stringify(
-            typeof message === 'object' ? message : ''
-          )}`
-        );
-        return;
-      }
-      resolve(response);
-    });
-  });
-}
-
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
 async function sendMsgConnect(): Promise<?ConnectingMessage> {
   if (!initedConnecting) {
-    const res = await connectorCall<ConnectRetrieveData, ConnectingMessage>({
-      type: 'connect_retrieve_data',
-    });
+    const res = await connectWindowRetrieveData();
     initedConnecting = true;
     return res;
   }
@@ -114,59 +97,10 @@ async function sendMsgConnect(): Promise<?ConnectingMessage> {
 let initedSigning = false;
 async function sendMsgSigningTx(): Promise<?SigningMessage> {
   if (!initedSigning) {
-    const res = await connectorCall<TxSignWindowRetrieveData, SigningMessage>({
-      type: 'tx_sign_window_retrieve_data',
-    });
+    const res = await signWindowRetrieveData();
     initedSigning = true;
     return res;
   }
-}
-
-export async function getProtocol(): Promise<?Protocol> {
-  return connectorCall<GetConnectionProtocolData, Protocol>({ type: 'get_protocol' });
-}
-
-export function getUtxosAndAddresses(
-  tabId: number,
-  select: string[]
-): Promise<{|
-  utxos: IGetAllUtxosResponse,
-  usedAddresses: string[],
-  unusedAddresses: string[],
-  changeAddress: string,
-|}> {
-  return new Promise((resolve, reject) => {
-    window.chrome.runtime.sendMessage(
-      ({ type: 'get_utxos/addresses', tabId, select }: GetUtxosRequest),
-      response => {
-        if (window.chrome.runtime.lastError) {
-          // eslint-disable-next-line prefer-promise-reject-errors
-          reject('Could not establish connection: get_utxos/cardano ');
-          return;
-        }
-
-        resolve(response);
-      }
-    );
-  });
-}
-
-export function getConnectedSites(): Promise<ConnectedSites> {
-  return new Promise((resolve, reject) => {
-    if (!initedSigning)
-      window.chrome.runtime.sendMessage(
-        ({ type: 'get_connected_sites' }: GetConnectedSitesData),
-        response => {
-          if (window.chrome.runtime.lastError) {
-            // eslint-disable-next-line prefer-promise-reject-errors
-            reject('Could not establish connection: get_connected_sites ');
-            return;
-          }
-
-          resolve(response);
-        }
-      );
-  });
 }
 
 type GetWhitelistFunc = void => Promise<?Array<WhitelistEntry>>;
@@ -185,7 +119,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @observable errorWallets: string = '';
   @observable wallets: Array<WalletState> = [];
 
-  @observable protocol: ?string = '';
   @observable getConnectorWhitelist: Request<GetWhitelistFunc> = new Request<GetWhitelistFunc>(
     this.api.localStorage.getWhitelist
   );
@@ -228,7 +161,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     this._getConnectorWhitelist();
     this._getConnectingMsg();
     this._getSigningMsg();
-    this._getProtocol();
     noop(this.currentConnectorWhitelist);
   }
 
@@ -253,14 +185,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       })
       // eslint-disable-next-line no-console
       .catch(err => console.error(err));
-  };
-
-  @action
-  _getProtocol: () => Promise<void> = async () => {
-    const protocol = await getProtocol();
-    runInAction(() => {
-      this.protocol = protocol?.type;
-    });
   };
 
   @action
@@ -306,7 +230,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw new Error('unexpected nullish wallet');
     }
 
-    let sendData: ConfirmedSignData;
     if (signingMessage.sign.type === 'tx-reorg/cardano') {
       // sign and send the tx
       let txId;
@@ -329,13 +252,12 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         return;
       }
       const utxos = this.getUtxosAfterReorg(txId);
-      sendData = {
-        type: 'sign_confirmed',
+      userSignConfirm({
         tx: utxos,
         uid: signingMessage.sign.uid,
         tabId: signingMessage.tabId,
-        pw: password,
-      };
+        password,
+      });
     } else if (
       signingMessage.sign.type === 'tx' ||
       signingMessage.sign.type === 'tx_input' ||
@@ -363,36 +285,32 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           .witness_set()
           .to_hex();
 
-        sendData = {
-          type: 'sign_confirmed',
+        userSignConfirm({
           tx,
           uid: signingMessage.sign.uid,
           tabId: signingMessage.tabId,
           witnessSetHex,
-          pw: '',
-        };
+          password: '',
+        });
       } else {
-        sendData = {
-          type: 'sign_confirmed',
+        userSignConfirm( {
           tx,
           uid: signingMessage.sign.uid,
           tabId: signingMessage.tabId,
-          pw: password,
-        };
+          password,
+        });
       }
     } else if (signingMessage.sign.type === 'data') {
-      sendData = {
-        type: 'sign_confirmed',
+      userSignConfirm({
         tx: null,
         uid: signingMessage.sign.uid,
         tabId: signingMessage.tabId,
-        pw: password,
-      };
+        password,
+      });
     } else {
       throw new Error(`unkown sign data type ${signingMessage.sign.type}`);
     }
 
-    window.chrome.runtime.sendMessage(sendData);
     this.actions.connector.cancelSignInTx.remove(this._cancelSignInTx);
     await ampli.dappPopupSignTransactionSubmitted();
     this._closeWindow();
@@ -405,12 +323,10 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       );
     }
     const { signingMessage } = this;
-    const sendData: FailedSignData = {
-      type: 'sign_rejected',
+    userSignReject({
       uid: signingMessage.sign.uid,
       tabId: signingMessage.tabId,
-    };
-    window.chrome.runtime.sendMessage(sendData);
+    });
   };
 
   // ========== wallets info ========== //
@@ -454,7 +370,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (!signingMessage.sign.tx) return undefined;
     // Invoked only for Cardano, so we know the type of `tx` must be `CardanoTx`.
     // $FlowFixMe[prop-missing]
-    const { tx /* , partialSign */, tabId } = signingMessage.sign.tx;
+    const { tx /* , partialSign, tabId */ } = signingMessage.sign.tx;
 
     const network = getNetworkById(connectedWallet.networkId);
 
@@ -463,21 +379,10 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         `${nameof(ConnectorStore)}::${nameof(this.createAdaTransaction)} unexpected wallet type`
       );
     }
-    // fixme: read these from WalletState directly, mind submitted txs handling
-    const response = await getUtxosAndAddresses(tabId, [
-      'utxos',
-      'usedAddresses',
-      'unusedAddresses',
-      'changeAddress',
-    ]);
-
-    if (!response.utxos) {
-      throw new Error('Missgin utxos for signing tx');
-    }
 
     const submittedTxs = await loadSubmittedTransactions() || [];
     const addressedUtxos = await this.api.ada._addressedUtxosWithSubmittedTxs(
-      asAddressedUtxo(response.utxos),
+      asAddressedUtxo(connectedWallet.utxos),
       connectedWallet.publicDeriverId,
       connectedWallet.allUtxoAddresses,
       submittedTxs
@@ -520,8 +425,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       const txHash = Buffer.from(input.transaction_id().to_bytes()).toString('hex');
       const txIndex = input.index();
       if (allUsedUtxoIdsSet.has(`${txHash}${txIndex}`)) {
-        window.chrome.runtime.sendMessage({
-          type: 'sign_error',
+        signFail({
           errorType: 'spent_utxo',
           data: `${txHash}${txIndex}`,
           uid: signingMessage.sign.uid,
@@ -546,12 +450,11 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       }
     }
 
+    // todo: review this:
     const ownAddresses = new Set([
-      ...response.utxos.map(utxo => utxo.address),
-      ...response.usedAddresses,
-      ...response.unusedAddresses,
-      response.changeAddress,
-    ]);
+      ...connectedWallet.allAddresses.utxoAddresses,
+      ...connectedWallet.allAddresses.accountingAddresses,
+    ].map(a => a.address.Hash));
 
     const outputs: Array<TxDataOutput> = [];
     for (let i = 0; i < txBody.outputs().len(); i++) {
@@ -580,7 +483,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       inputs,
       outputs,
       fee,
-      response.utxos,
+      connectedWallet.utxos,
       ownAddresses
     );
 
@@ -593,8 +496,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       for (let i = 0; i < foreignUtxos.length; i++) {
         const foreignUtxo = foreignUtxos[i];
         if (foreignUtxo == null || typeof foreignUtxo !== 'object') {
-          window.chrome.runtime.sendMessage({
-            type: 'sign_error',
+          signFail({
             errorType: 'missing_utxo',
             data: `${foreignInputs[i].txHash}${foreignInputs[i].txIndex}`,
             uid: signingMessage.sign.uid,
@@ -604,8 +506,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           return;
         }
         if (foreignUtxo.spendingTxHash != null) {
-          window.chrome.runtime.sendMessage({
-            type: 'sign_error',
+          signFail({
             errorType: 'spent_utxo',
             data: `${foreignInputs[i].txHash}${foreignInputs[i].txIndex}`,
             uid: signingMessage.sign.uid,
@@ -1096,12 +997,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       whitelist: filter,
     });
     await this.getConnectorWhitelist.execute();
-    window.chrome.runtime.sendMessage(
-      ({
-        type: 'remove_wallet_from_whitelist',
-        url: request.url,
-      }: RemoveWalletFromWhitelistData)
-    );
+    await removeWalletFromWhiteList({ url: request.url });
   };
 
   _refreshActiveSites: void => Promise<void> = async () => {
