@@ -51,14 +51,16 @@ import {
 } from '../../../app/api/ada/transactions/shelley/transactions';
 import { getCardanoHaskellBaseConfig, } from '../../../app/api/ada/lib/storage/database/prepackaged/networks';
 import TimeUtils from '../../../app/api/ada/lib/storage/bridge/timeUtils';
-import type CardanoTxRequest from '../../../app/api/ada';
+import type {
+  CardanoTxRequest,
+  ForeignUtxoFetcher,
+} from '../../../app/api/ada';
 import AdaApi from '../../../app/api/ada';
 import { bytesToHex, hexToBytes } from '../../../app/coreUtils';
 import { MultiToken } from '../../../app/api/common/lib/MultiToken';
 import type { CardanoShelleyTransactionCtorData } from '../../../app/domain/CardanoShelleyTransaction';
 import type { CardanoAddressedUtxo, } from '../../../app/api/ada/transactions/types';
 import { cip8Sign } from '../../../app/connector/api';
-import type { ForeignUtxoFetcher } from '../../../app/connector/stores/ConnectorStore';
 import { GetToken } from '../../../app/api/ada/lib/storage/database/primitives/api/read';
 import { getAllSchemaTables, raii, } from '../../../app/api/ada/lib/storage/database/utils';
   import type { TokenRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
@@ -1265,3 +1267,4 @@ export function getTokenMetadataFromIds(
     }
   );
 }
+

@@ -49,8 +49,6 @@ import { authSignHexPayload } from '../../../../app/connector/api';
 import type { RemoteUnspentOutput } from '../../../../app/api/ada/lib/state-fetch/types';
 import { NotEnoughMoneyToSendError, } from '../../../../app/api/common/errors';
 import { asAddressedUtxo as asAddressedUtxoCardano, } from '../../../../app/api/ada/transactions/utils';
-import ConnectorStore from '../../../../app/connector/stores/ConnectorStore';
-import type { ForeignUtxoFetcher } from '../../../../app/connector/stores/ConnectorStore';
 import { find721metadata } from '../../../../app/utils/nftMetadata';
 import { getDb, syncWallet } from '../state';
 import { getCardanoStateFetcher } from '../utils';
@@ -910,8 +908,8 @@ export async function handleInjectorMessage(message: any, sender: any) {
                 const stateFetcher: CardanoIFetcher =
                       await getCardanoStateFetcher(localStorageApi);
                 const networkInfo = wallet.getParent().getNetworkInfo();
-                const foreignUtxoFetcher: ForeignUtxoFetcher =
-                      ConnectorStore.createForeignUtxoFetcher(stateFetcher, networkInfo);
+                const adaApi = new AdaApi();
+                const foreignUtxoFetcher = adaApi.createForeignUtxoFetcher(stateFetcher, networkInfo);
                 const resp = await connectorCreateCardanoTx(
                   wallet,
                   null,

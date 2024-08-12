@@ -59,8 +59,6 @@ import type {
   GetForeignAddressesResponse,
   RefreshPendingTransactionsRequest,
   RefreshPendingTransactionsResponse,
-  RemoveAllTransactionsRequest,
-  RemoveAllTransactionsResponse,
 } from '../common/index';
 import { builtSendTokenList, hasSendAllDefault } from '../common/index';
 import type { TxOutput } from './transactions/shelley/transactions';
@@ -115,6 +113,8 @@ import type {
   SignedRequest,
   SignedResponse,
   TokenInfoFunc,
+  GetUtxoDataResponse,
+  UtxoData,
 } from './lib/state-fetch/types';
 import { getChainAddressesForDisplay, } from './lib/storage/models/utils';
 import {
@@ -154,12 +154,11 @@ import { getReceiveAddress } from '../../stores/stateless/addressStores';
 import { generateRegistrationMetadata } from './lib/cardanoCrypto/catalyst';
 import { bytesToHex, hexToBytes, hexToUtf } from '../../coreUtils';
 import type { PersistedSubmittedTransaction } from '../localStorage';
-import type { ForeignUtxoFetcher } from '../../connector/stores/ConnectorStore';
 import type WalletTransaction from '../../domain/WalletTransaction';
 import { derivePrivateByAddressing, derivePublicByAddressing } from './lib/cardanoCrypto/deriveByAddressing';
 import type { WalletState } from '../../../chrome/extension/background/types';
 import TimeUtils from './lib/storage/bridge/timeUtils';
-import { removeAllTransactions } from '../thunk';
+import type { IFetcher } from './lib/state-fetch/IFetcher.types';
 
 // ADA specific Request / Response params
 
@@ -527,6 +526,8 @@ export type GetTransactionRowsToExportFunc = (
   request: GetTransactionRowsToExportRequest
 ) => Promise<GetTransactionRowsToExportResponse>;
 
+export type ForeignUtxoFetcher = (Array<string>) => Promise<Array<?RemoteUnspentOutput>>;
+
 export const FETCH_TXS_BATCH_SIZE = 20;
 const MIN_REORG_OUTPUT_AMOUNT  = '1000000';
 
@@ -680,26 +681,6 @@ export default class AdaApi {
       return mappedTransactions;
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.refreshPendingTransactions)} error: ` + stringifyError(error));
-      if (error instanceof LocalizableError) throw error;
-      throw new GenericApiError();
-    }
-  }
-
-  async removeAllTransactions(
-    request: RemoveAllTransactionsRequest
-  ): Promise<RemoveAllTransactionsResponse> {
-    try {
-      // 1) clear existing history
-      await removeAllTransactions({ publicDeriverId: request.publicDeriver.publicDeriverId });
-
-      // 2) trigger a history sync
-      try {
-        await request.refreshWallet();
-      } catch (_e) {
-        Logger.warn(`${nameof(this.removeAllTransactions)} failed to connect to remote to resync. Data was still cleared locally`);
-      }
-    } catch (error) {
-      Logger.error(`${nameof(AdaApi)}::${nameof(this.removeAllTransactions)} error: ` + stringifyError(error));
       if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
@@ -2387,6 +2368,45 @@ export default class AdaApi {
 
     return { unsignedTx, collateralOutputAddressSet };
   }
+
+  createForeignUtxoFetcher(
+    fetcher: IFetcher, networkInfo: $ReadOnly<NetworkRow>
+  ): ForeignUtxoFetcher {
+    return async (utxoIds: Array<string>): Promise<Array<?RemoteUnspentOutput>> => {
+      const foreignInputs = utxoIds.map((id: string) => {
+        // tx hash length is 64
+        if ((id.length ?? 0) < 65) {
+          throw new Error(`Invalid utxo ID "${id}", expected \`{hash}{index}\` with no separator`);
+        }
+        try {
+          return {
+            txHash: id.substring(0, 64),
+            txIndex: parseInt(id.substring(64), 10),
+          };
+        } catch (e) {
+          throw new Error(`Failed to parse utxo ID "${id}": ${String(e)}`);
+        }
+      });
+      const fetchedData: GetUtxoDataResponse = await fetcher.getUtxoData({
+        network: networkInfo,
+        utxos: foreignInputs,
+      });
+      return fetchedData.map((data: UtxoData | null, i): ?RemoteUnspentOutput => {
+        if (data == null) {
+          return null;
+        }
+        const { txHash, txIndex } = foreignInputs[i];
+        return {
+          utxo_id: utxoIds[i],
+          tx_hash: txHash,
+          tx_index: txIndex,
+          receiver: data.output.address,
+          amount: data.output.amount,
+          assets: data.output.assets,
+        };
+      });
+    };
+  };
 }
 // ========== End of class AdaApi =========
 

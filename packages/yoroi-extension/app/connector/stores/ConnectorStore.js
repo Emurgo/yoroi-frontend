@@ -17,11 +17,10 @@ import type {
 } from '../types';
 import { LoadingWalletStates } from '../types';
 import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
-import type { GetUtxoDataResponse, RemoteUnspentOutput, UtxoData, } from '../../api/ada/lib/state-fetch/types';
+import type { RemoteUnspentOutput } from '../../api/ada/lib/state-fetch/types';
 import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import type { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import type { IFetcher } from '../../api/ada/lib/state-fetch/IFetcher.types';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import BigNumber from 'bignumber.js';
 import { action, computed, observable, runInAction, toJS } from 'mobx';
@@ -107,8 +106,6 @@ type GetWhitelistFunc = void => Promise<?Array<WhitelistEntry>>;
 type SetWhitelistFunc = ({|
   whitelist: Array<WhitelistEntry> | void,
 |}) => Promise<void>;
-
-export type ForeignUtxoFetcher = (Array<string>) => Promise<Array<?RemoteUnspentOutput>>;
 
 export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @observable unrecoverableError: string | null = null;
@@ -726,46 +723,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         cip95Info,
       };
     });
-  };
-
-  static createForeignUtxoFetcher: (IFetcher, $ReadOnly<NetworkRow>) => ForeignUtxoFetcher = (
-    fetcher,
-    networkInfo
-  ) => {
-    return async (utxoIds: Array<string>): Promise<Array<?RemoteUnspentOutput>> => {
-      const foreignInputs = utxoIds.map((id: string) => {
-        // tx hash length is 64
-        if ((id.length ?? 0) < 65) {
-          throw new Error(`Invalid utxo ID "${id}", expected \`{hash}{index}\` with no separator`);
-        }
-        try {
-          return {
-            txHash: id.substring(0, 64),
-            txIndex: parseInt(id.substring(64), 10),
-          };
-        } catch (e) {
-          throw new Error(`Failed to parse utxo ID "${id}": ${String(e)}`);
-        }
-      });
-      const fetchedData: GetUtxoDataResponse = await fetcher.getUtxoData({
-        network: networkInfo,
-        utxos: foreignInputs,
-      });
-      return fetchedData.map((data: UtxoData | null, i): ?RemoteUnspentOutput => {
-        if (data == null) {
-          return null;
-        }
-        const { txHash, txIndex } = foreignInputs[i];
-        return {
-          utxo_id: utxoIds[i],
-          tx_hash: txHash,
-          tx_index: txIndex,
-          receiver: data.output.address,
-          amount: data.output.amount,
-          assets: data.output.assets,
-        };
-      });
-    };
   };
 
   generateReorgTransaction: void => Promise<void> = async () => {

@@ -13,6 +13,7 @@ import {
   renamePublicDeriver,
   renameConceptualWallet,
   resyncWallet,
+  removeAllTransactions,
 } from '../../api/thunk';
 
 export type WarningList = {|
@@ -29,7 +30,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     = new Request(async (func) => { await func(); });
 
   @observable clearHistory: Request<RemoveAllTransactionsFunc>
-    = new Request(this.api.ada.removeAllTransactions);
+    = new Request(removeAllTransactions);
 
   @observable removeWalletRequest: Request<typeof removeWalletFromDb>
     = new Request<typeof removeWalletFromDb>(removeWalletFromDb);

@@ -14,9 +14,9 @@ import CardanoByronTransaction, {
 import { MultiToken } from './common/lib/MultiToken';
 import type { ExplorerRow } from './ada/lib/storage/database/explorers/tables';
 import { WrongPassphraseError } from './ada/lib/cardanoCrypto/cryptoErrors';
-import { SendTransactionApiError } from './common/errors';
+import { SendTransactionApiError, GenericApiError } from './common/errors';
 import type { ResponseTicker } from './common/lib/state-fetch/types';
-import type { HandlerType } from '../../chrome/extension/background/handlers/yoroi/type';
+//import type { HandlerType } from '../../chrome/extension/background/handlers/yoroi/type';
 import {
   GetHistoricalCoinPrices,
   RefreshCurrentCoinPrice
@@ -70,6 +70,13 @@ import {
   RemoveWalletFromWhiteList,
   GetConnectedSites,
 } from '../../chrome/extension/background/handlers/yoroi/connector';
+import type {
+  RemoveAllTransactionsRequest,
+  RemoveAllTransactionsResponse,
+} from './common';
+import { Logger, stringifyError } from '../utils/logging';
+import LocalizableError from '../i18n/LocalizableError';
+
 
 export type { CreateHardwareWalletRequest } from '../../chrome/extension/background/handlers/yoroi/wallet';
 
@@ -236,15 +243,35 @@ export const upsertTxMemo: GetEntryFuncType<typeof UpsertTxMemo> = async (reques
   return await callBackground({ type: UpsertTxMemo.typeTag, request, });
 }
 export const deleteTxMemo: GetEntryFuncType<typeof  DeleteTxMemo> = async (request) => {
-  await callBackground({ type:  DeleteTxMemo.typeTag, request, });
+  await callBackground({ type: DeleteTxMemo.typeTag, request, });
 };
 export const getAllTxMemos: GetEntryFuncType<typeof  GetAllTxMemos> = async () => {
   const result = await callBackground({ type: GetAllTxMemos.typeTag, });
   return result.map(GetAllTxMemos.fixMemoDate);
 }
 
-export const removeAllTransactions: GetEntryFuncType<typeof RemoveAllTransactions> = async (request) => {
+const _removeAllTransactions: GetEntryFuncType<typeof RemoveAllTransactions> = async (request) => {
   await callBackground({ type: RemoveAllTransactions.typeTag, request });
+}
+
+export async function removeAllTransactions(
+  request: RemoveAllTransactionsRequest
+): Promise<RemoveAllTransactionsResponse> {
+  try {
+    // 1) clear existing history
+    await _removeAllTransactions({ publicDeriverId: request.publicDeriver.publicDeriverId });
+
+    // 2) trigger a history sync
+    try {
+      await request.refreshWallet();
+    } catch (_e) {
+      Logger.warn(`${nameof(this.removeAllTransactions)} failed to connect to remote to resync. Data was still cleared locally`);
+    }
+  } catch (error) {
+    Logger.error(`removeAllTransactions error: ` + stringifyError(error));
+    if (error instanceof LocalizableError) throw error;
+    throw new GenericApiError();
+  }
 }
 
 export const popAddress: GetEntryFuncType<typeof PopAddress> = async (request) => {
