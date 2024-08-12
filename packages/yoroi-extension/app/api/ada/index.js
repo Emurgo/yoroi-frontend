@@ -1384,16 +1384,16 @@ export default class AdaApi {
       );
 
       const utxoSum = allUtxosForKey.reduce(
-      (sum, utxo) => sum.joinAddMutable(new MultiToken(
-        utxo.output.tokens.map(token => ({
-          identifier: token.Token.Identifier,
-          amount: new BigNumber(token.TokenList.Amount),
-          networkId: token.Token.NetworkId,
-        })),
-        publicDeriver.getParent().getDefaultToken()
-      )),
+        (sum, utxo) => sum.joinAddMutable(new MultiToken(
+          utxo.output.tokens.map(token => ({
+            identifier: token.Token.Identifier,
+            amount: new BigNumber(token.TokenList.Amount),
+            networkId: token.Token.NetworkId,
+          })),
+          publicDeriver.getParent().getDefaultToken()
+        )),
         publicDeriver.getParent().getDefaultMultiToken()
-    );
+      );
 
       const differenceAfterTx = getDifferenceAfterTx(
         unsignedTx,

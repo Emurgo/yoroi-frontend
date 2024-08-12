@@ -349,48 +349,51 @@ function createLedgerCertificateHandler<CslCert>(
   return { getter, converter };
 }
 
-const CERTIFICATE_CONVERTERS: { [$Values<typeof RustModule.WalletV4.CertificateKind>]: LedgerCertificateHandler<any> } = {
-  [RustModule.WalletV4.CertificateKind.StakeRegistration]:
-    createLedgerCertificateHandler<RustModule.WalletV4.StakeRegistration>(
-      cert => cert.as_stake_registration(),
-      (registrationCert, getPath) => ({
-        type: CertificateType.STAKE_REGISTRATION,
-        params: {
-          stakeCredential: {
-            type: CredentialParamsType.KEY_PATH,
-            keyPath: getPath(registrationCert.stake_credential()),
+const getCertificateConverter: number => ?LedgerCertificateHandler<any> = (certificateKind) => {
+  switch (certificateKind) {
+    case RustModule.WalletV4.CertificateKind.StakeRegistration:
+      return createLedgerCertificateHandler<RustModule.WalletV4.StakeRegistration>(
+        cert => cert.as_stake_registration(),
+        (registrationCert, getPath) => ({
+          type: CertificateType.STAKE_REGISTRATION,
+          params: {
+            stakeCredential: {
+              type: CredentialParamsType.KEY_PATH,
+              keyPath: getPath(registrationCert.stake_credential()),
+            },
           },
-        },
-      }),
-    ),
-  [RustModule.WalletV4.CertificateKind.StakeDeregistration]:
-    createLedgerCertificateHandler<RustModule.WalletV4.StakeDeregistration > (
-      cert => cert.as_stake_deregistration(),
-      (deregistrationCert, getPath) => ({
-        type: CertificateType.STAKE_DEREGISTRATION,
-        params: {
-          stakeCredential: {
-            type: CredentialParamsType.KEY_PATH,
-            keyPath: getPath(deregistrationCert.stake_credential()),
+        }),
+      );
+    case RustModule.WalletV4.CertificateKind.StakeDeregistration:
+      return createLedgerCertificateHandler<RustModule.WalletV4.StakeDeregistration > (
+        cert => cert.as_stake_deregistration(),
+        (deregistrationCert, getPath) => ({
+          type: CertificateType.STAKE_DEREGISTRATION,
+          params: {
+            stakeCredential: {
+              type: CredentialParamsType.KEY_PATH,
+              keyPath: getPath(deregistrationCert.stake_credential()),
+            },
           },
-        },
-      }),
-    ),
-  [RustModule.WalletV4.CertificateKind.StakeDelegation]:
-    createLedgerCertificateHandler<RustModule.WalletV4.StakeDelegation > (
-      cert => cert.as_stake_delegation(),
-      (delegationCert, getPath) => ({
-        type: CertificateType.STAKE_DELEGATION,
-        params: {
-          stakeCredential: {
-            type: CredentialParamsType.KEY_PATH,
-            keyPath: getPath(delegationCert.stake_credential()),
+        }),
+      );
+    case RustModule.WalletV4.CertificateKind.StakeDelegation:
+      return createLedgerCertificateHandler<RustModule.WalletV4.StakeDelegation > (
+        cert => cert.as_stake_delegation(),
+        (delegationCert, getPath) => ({
+          type: CertificateType.STAKE_DELEGATION,
+          params: {
+            stakeCredential: {
+              type: CredentialParamsType.KEY_PATH,
+              keyPath: getPath(delegationCert.stake_credential()),
+            },
+            poolKeyHashHex: delegationCert.pool_keyhash().to_hex(),
           },
-          poolKeyHashHex: delegationCert.pool_keyhash().to_hex(),
-        },
-      }),
-    ),
-};
+        }),
+      );
+  }
+  return null;
+}
 
 function formatLedgerCertificates(
   networkId: number,
@@ -416,7 +419,7 @@ function formatLedgerCertificates(
   for (let i = 0; i < certificates.len(); i++) {
     const cert = certificates.get(i);
 
-    const converter = CERTIFICATE_CONVERTERS[cert.kind()]
+    const converter = getCertificateConverter(cert.kind())
     if (converter == null) {
       throw new Error(`${nameof(formatLedgerCertificates)} Ledger doesn't support this certificate type! ` + cert.to_hex());
     }
