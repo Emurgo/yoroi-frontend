@@ -45,7 +45,8 @@ class ExportWallet extends Component<Props & InjectedProps> {
           borderColor: !isRevampLayout && 'var(--yoroi-palette-gray-200)',
         }}
       >
-        <Typography component="div"
+        <Typography
+          component="div"
           variant={isRevampLayout ? 'body1' : 'h5'}
           fontWeight={500}
           mb={isRevampLayout ? '16px' : '12px'}
@@ -54,9 +55,10 @@ class ExportWallet extends Component<Props & InjectedProps> {
           {intl.formatMessage(messages.titleLabel)}
         </Typography>
 
-        <Typography component="div"
+        <Typography
+          component="div"
           variant={isRevampLayout ? 'body1' : 'body2'}
-          color="common.black"
+          color="ds.text_gray_normal"
           mb={isRevampLayout ? '16px' : '12px'}
         >
           {intl.formatMessage(messages.exportExplanation)}

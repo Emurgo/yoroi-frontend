@@ -1,23 +1,23 @@
 // @flow
+import { Box } from '@mui/system';
 import { observer } from 'mobx-react';
-import { Component } from 'react';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import type { ComponentType, Node } from 'react';
+import { Component } from 'react';
+import type { Location, Match } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
+import NFTDetails from '../../components/wallet/assets/NFTDetails';
 import {
   genLookupOrFail,
   getTokenIdentifierIfExists,
   getTokenStrictName,
 } from '../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../utils/formatters';
-import type { Match, Location } from 'react-router-dom';
-import { withRouter } from 'react-router-dom';
-import { Box } from '@mui/system';
-import NFTDetails from '../../components/wallet/assets/NFTDetails';
 import {
   getAuthorFromTokenMetadata,
   getDescriptionFromTokenMetadata,
   getImageFromTokenMetadata,
 } from '../../utils/nftMetadata';
+import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -92,7 +92,7 @@ class NFTDetailPageRevamp extends Component<AllProps> {
     const tab = urlPrams.get('tab');
 
     return (
-      <Box sx={{ width: '100%' }}>
+      <Box sx={{ width: '100%', backgroundColor: 'ds.bg_color_low' }}>
         <NFTDetails
           nftInfo={nftInfo}
           network={network}

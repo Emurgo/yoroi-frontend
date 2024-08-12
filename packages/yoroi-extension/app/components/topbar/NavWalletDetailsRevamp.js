@@ -1,25 +1,25 @@
 // @flow
-import { Component } from 'react';
+import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import type { Node } from 'react';
-import classnames from 'classnames';
+import { Component } from 'react';
 import { intlShape } from 'react-intl';
 import { truncateLongName } from '../../utils/formatters';
 
-import styles from './NavWalletDetailsRevamp.scss';
-import { ReactComponent as IconEyeOpen } from '../../assets/images/my-wallets/icon_eye_opened_revamp.inline.svg';
-import { ReactComponent as IconEyeClosed } from '../../assets/images/my-wallets/icon_eye_closed_revamp.inline.svg';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { WalletChecksum } from '@emurgo/cip4-js';
+import { Box, IconButton, Typography } from '@mui/material';
+import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { MultiToken } from '../../api/common/lib/MultiToken';
+import { ReactComponent as IconEyeClosed } from '../../assets/images/my-wallets/icon_eye_closed_revamp.inline.svg';
+import { ReactComponent as IconEyeOpen } from '../../assets/images/my-wallets/icon_eye_opened_revamp.inline.svg';
+import { maybe } from '../../coreUtils';
+import AmountDisplay from '../common/AmountDisplay';
+import styles from './NavWalletDetailsRevamp.scss';
+import WalletAccountIcon from './WalletAccountIcon';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import type { WalletChecksum } from '@emurgo/cip4-js';
-import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import WalletAccountIcon from './WalletAccountIcon';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
-import AmountDisplay from '../common/AmountDisplay';
-import { Box, IconButton, Typography } from '@mui/material';
-import { maybe } from '../../coreUtils';
 
 type Props = {|
   +onUpdateHideBalance: void => Promise<void>,
@@ -107,6 +107,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
             borderColor: 'primary.600',
           },
           transition: 'border-color 300ms ease',
+          backgroundColor: 'ds.bg_color_low',
         }}
       >
         <div className={styles.outerWrapper}>
@@ -114,7 +115,12 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
             <div className={classnames([styles.plate])}>{iconComponent}</div>
             <div className={styles.content}>
               <div className={styles.walletInfo}>
-                <Typography component="div" variant="body2" fontWeight={500} sx={{ color: 'grayscale.900' }}>
+                <Typography
+                  component="div"
+                  variant="body2"
+                  fontWeight={500}
+                  sx={{ color: 'grayscale.900' }}
+                >
                   {truncateLongName(this.props.wallet.conceptualWalletName)}
                 </Typography>
                 <Typography component="div" variant="caption1" sx={{ color: 'grayscale.600' }}>
@@ -158,7 +164,6 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
               },
             }}
             color="primary"
-            id={amountDisplayId + '-showHideBalance-button'}
           >
             {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
           </IconButton>
@@ -168,7 +173,6 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
   }
 
   getTotalAmount: void => ?MultiToken = () => {
-    return maybe(this.props.walletAmount,
-      w => this.props.rewards.joinAddCopy(w))
+    return maybe(this.props.walletAmount, w => this.props.rewards.joinAddCopy(w));
   };
 }

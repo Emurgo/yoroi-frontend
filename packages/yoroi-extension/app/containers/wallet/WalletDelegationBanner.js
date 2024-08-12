@@ -114,7 +114,7 @@ function WalletDelegationBanner({
         >
           {intl.formatMessage(emptyDashboardMessages.title, { ticker })}
         </Typography>
-        <Typography component="div" variant="body1" color="common.black">
+        <Typography component="div" variant="body1" color="ds.text_gray_normal">
           {intl.formatMessage(messages.delegateNow)}
         </Typography>
         <Box sx={{ display: 'flex', mb: '16px', mt: '24px' }}>
@@ -125,7 +125,7 @@ function WalletDelegationBanner({
               <AvatarImg src={avatarGenerated} alt={name} />
             )}
           </AvatarWrapper>
-          <Typography component="div" color="common.black" variant="body1" fontWeight={500}>
+          <Typography component="div" color="ds.text_gray_normal" variant="body1" fontWeight={500}>
             {name}
           </Typography>
         </Box>
@@ -139,7 +139,12 @@ function WalletDelegationBanner({
         >
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Typography component="div" variant="body1" fontWeight={500} color="common.black">
+              <Typography
+                component="div"
+                variant="body1"
+                fontWeight={500}
+                color="ds.text_gray_normal"
+              >
                 {intl.formatMessage(globalMessages.roa30d)}
               </Typography>
               <HelperTooltip
@@ -147,13 +152,18 @@ function WalletDelegationBanner({
                 placement="top"
               />
             </Box>
-            <Typography component="div" variant="body1" color="common.black">
+            <Typography component="div" variant="body1" color="ds.text_gray_normal">
               {estimatedRoa30d}
             </Typography>
           </Box>
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Typography component="div" variant="body1" fontWeight={500} color="common.black">
+              <Typography
+                component="div"
+                variant="body1"
+                fontWeight={500}
+                color="ds.text_gray_normal"
+              >
                 {intl.formatMessage(messages.firstReward)}
               </Typography>
               <HelperTooltip
@@ -161,16 +171,21 @@ function WalletDelegationBanner({
                 placement="top"
               />
             </Box>
-            <Typography component="div" variant="body1" color="common.black">
+            <Typography component="div" variant="body1" color="ds.text_gray_normal">
               {intl.formatMessage(messages.firstRewardDetails)}
             </Typography>
           </Box>
           <Box>
-            <Typography component="div" variant="body1" fontWeight={500} color="common.black">
+            <Typography
+              component="div"
+              variant="body1"
+              fontWeight={500}
+              color="ds.text_gray_normal"
+            >
               {intl.formatMessage(messages.socialMedia)}
             </Typography>
             <SocialMediaStakePool
-              color="common.black"
+              color="ds.text_gray_normal"
               socialLinks={socialLinks}
               websiteUrl={websiteUrl}
             />
