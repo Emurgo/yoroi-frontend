@@ -30,6 +30,7 @@ import {
   DatumType,
   TxOutputFormat,
   CIP36VoteDelegationType,
+  DRepParamsType,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
@@ -41,6 +42,7 @@ import {
 } from '../../../../config/numbersConfig';
 import cbor from 'cbor';
 import { derivePublicByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
+import { forceNonNull } from '../../../../coreUtils';
 
 // ==================== LEDGER ==================== //
 /** Generate a payload for Ledger SignTx */
@@ -354,28 +356,38 @@ const getCertificateConverter: number => ?LedgerCertificateHandler<any> = (certi
     case RustModule.WalletV4.CertificateKind.StakeRegistration:
       return createLedgerCertificateHandler<RustModule.WalletV4.StakeRegistration>(
         cert => cert.as_stake_registration(),
-        (registrationCert, getPath) => ({
-          type: CertificateType.STAKE_REGISTRATION,
-          params: {
-            stakeCredential: {
-              type: CredentialParamsType.KEY_PATH,
-              keyPath: getPath(registrationCert.stake_credential()),
-            },
-          },
-        }),
+        (registrationCert, getPath) => {
+          const stakeCredential = {
+            type: CredentialParamsType.KEY_PATH,
+            keyPath: getPath(registrationCert.stake_credential()),
+          };
+          const coin = registrationCert.coin();
+          return coin == null ? {
+            type: CertificateType.STAKE_REGISTRATION,
+            params: { stakeCredential },
+          } : {
+            type: CertificateType.STAKE_REGISTRATION_CONWAY,
+            params: { stakeCredential, deposit: coin.to_str() },
+          };
+        },
       );
     case RustModule.WalletV4.CertificateKind.StakeDeregistration:
       return createLedgerCertificateHandler<RustModule.WalletV4.StakeDeregistration > (
         cert => cert.as_stake_deregistration(),
-        (deregistrationCert, getPath) => ({
-          type: CertificateType.STAKE_DEREGISTRATION,
-          params: {
-            stakeCredential: {
-              type: CredentialParamsType.KEY_PATH,
-              keyPath: getPath(deregistrationCert.stake_credential()),
-            },
-          },
-        }),
+        (deregistrationCert, getPath) => {
+          const stakeCredential = {
+            type: CredentialParamsType.KEY_PATH,
+            keyPath: getPath(deregistrationCert.stake_credential()),
+          };
+          const coin = deregistrationCert.coin();
+          return coin == null ? {
+            type: CertificateType.STAKE_DEREGISTRATION,
+            params: { stakeCredential },
+          } : {
+            type: CertificateType.STAKE_DEREGISTRATION_CONWAY,
+            params: { stakeCredential, deposit: coin.to_str() },
+          };
+        },
       );
     case RustModule.WalletV4.CertificateKind.StakeDelegation:
       return createLedgerCertificateHandler<RustModule.WalletV4.StakeDelegation > (
@@ -390,6 +402,71 @@ const getCertificateConverter: number => ?LedgerCertificateHandler<any> = (certi
             poolKeyHashHex: delegationCert.pool_keyhash().to_hex(),
           },
         }),
+      );
+    case RustModule.WalletV4.CertificateKind.VoteDelegation:
+      return createLedgerCertificateHandler<RustModule.WalletV4.VoteDelegation > (
+        cert => cert.as_vote_delegation(),
+        (delegationCert, getPath) => {
+          const wasmDrep = delegationCert.drep();
+          let dRep;
+          switch (wasmDrep.kind()) {
+            case RustModule.WalletV4.DRepKind.KeyHash:
+              dRep = {
+                type: DRepParamsType.KEY_HASH,
+                keyHashHex: forceNonNull(wasmDrep.to_key_hash()).to_hex(),
+              };
+              break;
+            case RustModule.WalletV4.DRepKind.ScriptHash:
+              dRep = {
+                type: DRepParamsType.SCRIPT_HASH,
+                scriptHashHex: forceNonNull(wasmDrep.to_script_hash()).to_hex(),
+              };
+              break;
+            case RustModule.WalletV4.DRepKind.AlwaysAbstain:
+              dRep = {
+                type: DRepParamsType.ABSTAIN,
+              };
+              break;
+            case RustModule.WalletV4.DRepKind.AlwaysNoConfidence:
+              dRep = {
+                type: DRepParamsType.NO_CONFIDENCE,
+              };
+              break;
+            default:
+              throw new Error('Ledger: Unsupported dRep kind: ' + wasmDrep.to_hex());
+          }
+          return {
+            type: CertificateType.VOTE_DELEGATION,
+            params: {
+              stakeCredential: {
+                type: CredentialParamsType.KEY_PATH,
+                keyPath: getPath(delegationCert.stake_credential()),
+              },
+              dRep,
+            },
+          };
+        },
+      );
+    case RustModule.WalletV4.CertificateKind.DrepRegistration:
+      return createLedgerCertificateHandler<RustModule.WalletV4.DrepRegistration> (
+        cert => cert.as_drep_registration(),
+        (registrationCert, getPath) => {
+          const wasmAnchor = registrationCert.anchor();
+          return {
+            type: CertificateType.DREP_REGISTRATION,
+            params: {
+              dRepCredential: {
+                type: CredentialParamsType.KEY_PATH,
+                keyPath: getPath(registrationCert.voting_credential()),
+              },
+              deposit: registrationCert.coin().to_str(),
+              anchor: wasmAnchor == null ? undefined : {
+                url: wasmAnchor.url().url(),
+                hashHex: wasmAnchor.anchor_data_hash().to_hex(),
+              },
+            },
+          };
+        },
       );
   }
   return null;
