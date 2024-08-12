@@ -332,7 +332,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
               txSubmitErrorState={txSubmitErrorState}
               onTryAgain={processBackToStart}
               onSuccess={() => {
-                props.actions.router.goToRoute.trigger({ route: ROUTES.SWAP.ORDERS });
+                props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
               }}
             />
           )}

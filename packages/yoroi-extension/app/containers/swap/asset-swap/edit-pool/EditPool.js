@@ -117,7 +117,7 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
             </Box>
           </Box>
         </Box>
-        {showFullInfo && <SwapPoolFullInfo defaultTokenInfo={defaultTokenInfo} withInfo />}
+        {showFullInfo && <SwapPoolFullInfo defaultTokenInfo={defaultTokenInfo} withInfo showMinAda />}
       </Box>
     </Box>
   );

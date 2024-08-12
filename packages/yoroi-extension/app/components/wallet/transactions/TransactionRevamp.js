@@ -270,7 +270,7 @@ export default class TransactionRevamp extends Component<Props, State> {
     }
 
     return (
-      <Typography variant="body1" fontWeight={500} color="grayscale.900">
+      <Typography variant="body1" fontWeight={500} color="grayscale.900" textAlign="right">
         {this.renderAmountDisplay({ entry: request.entry })} {this.getTicker(request.entry)}
       </Typography>
     );

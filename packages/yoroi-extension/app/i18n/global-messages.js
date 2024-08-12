@@ -690,6 +690,10 @@ const globalMessages: * = defineMessages({
     id: 'sidebar.wallets',
     defaultMessage: '!!!My wallets',
   },
+  sidebarAssets: {
+    id: 'sidebar.assets',
+    defaultMessage: '!!!Assets',
+  },
   sidebarSettings: {
     id: 'sidebar.settings',
     defaultMessage: '!!!Settings',
@@ -711,9 +715,9 @@ const globalMessages: * = defineMessages({
     id: 'sidebar.staking',
     defaultMessage: '!!!Staking',
   },
-  sidebarAssets: {
-    id: 'sidebar.assets',
-    defaultMessage: '!!!Assets',
+  sidebarPortfolio: {
+    id: 'sidebar.portfolio',
+    defaultMessage: '!!!Portfolio',
   },
   sidebarNfts: {
     id: 'sidebar.nfts',
