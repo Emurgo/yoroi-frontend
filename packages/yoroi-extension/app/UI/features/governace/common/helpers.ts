@@ -70,7 +70,7 @@ export const createCurrrentWalletInfo = (stores: any) => {
     unitOfAccount: stores.profile.unitOfAccount,
     defaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfoSummary(networkId),
     getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
-    recentTransactions: groupedTx,
+    recentTransactions: groupedTx ? groupedTx : [],
     isHardwareWallet: isHardware,
     backendService,
     backendServiceZero,
@@ -95,7 +95,7 @@ const getWalletTotalAdaBalance = (stores, selectedWallet) => {
   const totalAmount = stores.transactions.getBalance(selectedWallet);
   const rewards = stores.delegation.getRewardBalanceOrZero(selectedWallet);
   const amount = getTotalAmount(totalAmount, rewards);
-  const defaultEntry = amount.getDefaultEntry();
+  const defaultEntry = amount?.getDefaultEntry();
   const getTokenInfo = genLookupOrFail(stores.tokenInfoStore.tokenInfo);
   const tokenInfo = getTokenInfo(defaultEntry);
   return defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);

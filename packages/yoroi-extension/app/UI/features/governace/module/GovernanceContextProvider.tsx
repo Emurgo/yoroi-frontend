@@ -28,6 +28,7 @@ const initialGovernanceProvider = {
   walletAdaBalance: null,
   governanceStatus: { status: null, drep: null },
   triggerBuySellAdaDialog: null,
+  recentTransactions: [],
 };
 
 const GovernanceContext = React.createContext(initialGovernanceProvider);

@@ -47,12 +47,12 @@ export const GovernanceStatusSelection = () => {
   const navigateTo = useNavigateTo();
   const strings = useStrings();
   const { openModal, closeModal } = useModal();
-
+  console.log('governanceStatus', governanceStatus);
   const pageTitle = governanceStatus.status !== 'none' ? strings.governanceStatus : strings.registerGovernance;
   const statusRawText = mapStatus[governanceStatus.status || ''];
   const pageSubtitle = governanceStatus.status === 'none' ? strings.reviewSelection : strings.statusSelected(statusRawText);
 
-  console.log('recentTransactions', recentTransactions[0].transactions[0].certificates);
+  console.log('1recentTransactions', recentTransactions);
   // console.log('recentTransactions pending', recentTransactions?.transactions[0]);
   const openDRepIdModal = (onSubmit: (drepID: string) => void) => {
     if (!governanceManager) {
@@ -113,7 +113,7 @@ export const GovernanceStatusSelection = () => {
       icon: <DRepIlustration />,
       selected: governanceStatus.status === 'delegate' ? true : false,
       onClick: handleDelegate,
-      pending: recentTransactions[0].transactions[0].state === -4,
+      pending: recentTransactions && recentTransactions[0].transactions[0].state === -4,
     },
     {
       title: strings.abstain,
