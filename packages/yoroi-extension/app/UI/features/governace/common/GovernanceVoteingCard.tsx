@@ -56,11 +56,11 @@ const Description = styled(Typography)(({ theme }) => ({
   marginTop: theme.spacing(1),
 }));
 
-const SpinnerBox = styled(Box)(() => ({
-  position: 'absolute',
-  right: 15,
-  top: 15,
-}));
+// const SpinnerBox = styled(Box)(() => ({
+//   position: 'absolute',
+//   right: 15,
+//   top: 15,
+// }));
 
 export const GovernanceVoteingCard = ({
   title,

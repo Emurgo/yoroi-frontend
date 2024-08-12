@@ -113,7 +113,8 @@ export const GovernanceStatusSelection = () => {
       icon: <DRepIlustration />,
       selected: governanceStatus.status === 'delegate' ? true : false,
       onClick: handleDelegate,
-      pending: recentTransactions && recentTransactions[0].transactions[0].state === -4,
+      // @ts-ignore
+      pending: recentTransactions[0].transactions[0].state === -4,
     },
     {
       title: strings.abstain,
@@ -121,7 +122,8 @@ export const GovernanceStatusSelection = () => {
       icon: <Abstein />,
       selected: governanceStatus.status === DREP_ALWAYS_ABSTAIN ? true : false,
       onClick: handleAbstain,
-      pending: recentTransactions[0].transactions[0].state === -4,
+      // @ts-ignore
+      pending: recentTransactions[0]?.transactions[0].state === -4,
     },
     {
       title: strings.noConfidence,
@@ -129,7 +131,8 @@ export const GovernanceStatusSelection = () => {
       icon: <NoConfidance />,
       selected: governanceStatus.status === DREP_ALWAYS_NO_CONFIDENCE ? true : false,
       onClick: handleNoConfidence,
-      pending: recentTransactions[0].transactions[0].state === -4,
+      // @ts-ignore
+      pending: recentTransactions[0]?.transactions[0].state === -4,
     },
   ];
 
