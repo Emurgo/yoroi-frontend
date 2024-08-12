@@ -1,4 +1,4 @@
-import { Stack, useTheme } from '@mui/material';
+import { Stack } from '@mui/material';
 import Box from '@mui/material/Box';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
@@ -15,7 +15,7 @@ type Props = {
   pending: boolean;
 };
 
-const StyledCard: any = styled(Stack)(({ theme, selected, pending, isLight }: any) => ({
+const StyledCard: any = styled(Stack)(({ theme, selected, pending }: any) => ({
   position: 'relative',
   display: 'flex',
   flexDirection: 'column',
@@ -63,9 +63,8 @@ const SpinnerBox = styled(Box)(() => ({
 }));
 
 export const GovernanceVoteingCard = ({ title, description, icon, selected, onClick, pending }: Props) => {
-  const { name } = useTheme();
   return (
-    <StyledCard onClick={pending ? undefined : onClick} pending={pending} selected={selected} isLight={name === 'light-theme'}>
+    <StyledCard onClick={pending ? undefined : onClick} pending={pending} selected={selected}>
       {pending && selected && (
         <SpinnerBox>
           <LoadingSpinner />
