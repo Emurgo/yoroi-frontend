@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js';
+import moment from 'moment';
 import { WalletTypeOption } from '../../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { maybe } from '../../../../coreUtils';
 import { genLookupOrFail } from '../../../../stores/stateless/tokenHelpers';
@@ -58,6 +59,8 @@ export const createCurrrentWalletInfo = (stores: any) => {
   const networkId = networkInfo.NetworkId;
   const backendService = selectedWallet.getParent().getNetworkInfo().Backend.BackendService;
   const backendServiceZero = selectedWallet.getParent().getNetworkInfo().Backend.BackendServiceZero;
+
+  const groupedTx = groupTransactionsByDay(stores.transactions.recent);
   return {
     currentPool: walletCurrentPoolInfo,
     networkId,
@@ -67,6 +70,7 @@ export const createCurrrentWalletInfo = (stores: any) => {
     unitOfAccount: stores.profile.unitOfAccount,
     defaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfoSummary(networkId),
     getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
+    recentTransactions: groupedTx,
     isHardwareWallet: isHardware,
     backendService,
     backendServiceZero,
@@ -95,4 +99,22 @@ const getWalletTotalAdaBalance = (stores, selectedWallet) => {
   const getTokenInfo = genLookupOrFail(stores.tokenInfoStore.tokenInfo);
   const tokenInfo = getTokenInfo(defaultEntry);
   return defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+};
+
+const dateFormat = 'YYYY-MM-DD';
+
+const groupTransactionsByDay = transactions => {
+  const groups: any = [];
+  for (const transaction of transactions) {
+    const date: string = moment(transaction.date).format(dateFormat);
+    // find the group this transaction belongs in
+    let group = groups.find(g => g.date === date);
+    // if first transaction in this group, create the group
+    if (!group) {
+      group = { date, transactions: [] };
+      groups.push(group);
+    }
+    group.transactions.push(transaction);
+  }
+  return groups.sort((a, b) => b.transactions[0].date.getTime() - a.transactions[0].date.getTime());
 };

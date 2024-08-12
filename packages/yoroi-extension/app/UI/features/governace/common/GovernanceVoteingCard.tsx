@@ -4,7 +4,6 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import * as React from 'react';
-import LoadingSpinner from '../../../../components/widgets/LoadingSpinner';
 
 type Props = {
   title: string;
@@ -26,22 +25,22 @@ const StyledCard: any = styled(Stack)(({ theme, selected, pending }: any) => ({
   height: '362px',
   borderRadius: '8px',
   ...(!selected && {
-    backgroundImage: theme.palette.ds?.bg_gradient_1,
+    backgroundImage: !pending && theme.palette.ds?.bg_gradient_1,
     backgroundOrigin: 'border-box',
     boxShadow: 'inset 0 100vw white',
     border: '2px solid transparent',
   }),
   ...(selected && {
-    background: theme.palette.ds.bg_gradient_2,
+    background: !pending && theme.palette.ds.bg_gradient_2,
     border: 'none',
   }),
   cursor: 'pointer',
   ...(pending && {
-    opacity: selected ? 1 : 0.5,
+    opacity: 0.5,
     cursor: 'not-allowed',
   }),
   '&:hover': {
-    backgroundImage: theme.palette.ds.bg_gradient_1,
+    backgroundImage: !pending && theme.palette.ds.bg_gradient_1,
     backgroundOrigin: 'content-box',
     boxShadow: 'none',
     transition: 'all 250ms ease-in-out',
@@ -78,11 +77,11 @@ export const GovernanceVoteingCard = ({
   return (
     <div onMouseOver={() => onHover(true)} onMouseLeave={() => onHover(false)}>
       <StyledCard onClick={pending ? undefined : onClick} pending={pending === true ? 'true' : undefined} selected={selected}>
-        {pending && selected && (
+        {/* {pending && selected && (
           <SpinnerBox>
             <LoadingSpinner />
           </SpinnerBox>
-        )}
+        )} */}
         <CardContent>
           <IconContainer>{icon}</IconContainer>
           <Typography variant="h3" fontWeight="500" mt="16px">

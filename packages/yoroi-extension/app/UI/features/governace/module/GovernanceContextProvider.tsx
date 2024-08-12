@@ -72,6 +72,7 @@ export const GovernanceContextProvider = ({
     isHardwareWallet,
     walletAdaBalance,
     backendServiceZero,
+    recentTransactions,
   } = currentWallet;
   const governanceManager = useGovernanceManagerMaker(walletId, networkId);
   // TODO to me moved in rootStore and use this globbaly whenever we need just a wallet password check
@@ -175,6 +176,7 @@ export const GovernanceContextProvider = ({
     getFormattedPairingAmount: (amount: string) =>
       getFormattedPairingValue(getCurrentPrice, defaultTokenInfo, unitOfAccount, amount),
     triggerBuySellAdaDialog,
+    recentTransactions,
   };
 
   return <GovernanceContext.Provider value={context}>{children}</GovernanceContext.Provider>;

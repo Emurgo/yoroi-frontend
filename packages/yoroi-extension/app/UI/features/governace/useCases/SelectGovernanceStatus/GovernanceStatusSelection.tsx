@@ -41,6 +41,7 @@ export const GovernanceStatusSelection = () => {
     createDrepDelegationTransaction,
     walletAdaBalance,
     triggerBuySellAdaDialog,
+    recentTransactions,
   } = useGovernance();
   const [error, setError] = React.useState<string | null>(null);
   const navigateTo = useNavigateTo();
@@ -51,6 +52,8 @@ export const GovernanceStatusSelection = () => {
   const statusRawText = mapStatus[governanceStatus.status || ''];
   const pageSubtitle = governanceStatus.status === 'none' ? strings.reviewSelection : strings.statusSelected(statusRawText);
 
+  console.log('recentTransactions', recentTransactions[0].transactions[0].certificates);
+  // console.log('recentTransactions pending', recentTransactions?.transactions[0]);
   const openDRepIdModal = (onSubmit: (drepID: string) => void) => {
     if (!governanceManager) {
       return;
@@ -110,7 +113,7 @@ export const GovernanceStatusSelection = () => {
       icon: <DRepIlustration />,
       selected: governanceStatus.status === 'delegate' ? true : false,
       onClick: handleDelegate,
-      pending: governanceStatus.status === null,
+      pending: recentTransactions[0].transactions[0].state === -4,
     },
     {
       title: strings.abstain,
@@ -118,7 +121,7 @@ export const GovernanceStatusSelection = () => {
       icon: <Abstein />,
       selected: governanceStatus.status === DREP_ALWAYS_ABSTAIN ? true : false,
       onClick: handleAbstain,
-      pending: governanceStatus.status === null,
+      pending: recentTransactions[0].transactions[0].state === -4,
     },
     {
       title: strings.noConfidence,
@@ -126,7 +129,7 @@ export const GovernanceStatusSelection = () => {
       icon: <NoConfidance />,
       selected: governanceStatus.status === DREP_ALWAYS_NO_CONFIDENCE ? true : false,
       onClick: handleNoConfidence,
-      pending: governanceStatus.status === null,
+      pending: recentTransactions[0].transactions[0].state === -4,
     },
   ];
 
