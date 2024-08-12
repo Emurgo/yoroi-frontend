@@ -11,13 +11,7 @@ type Props = {|
   +endEpochDate: string | Date,
 |};
 
-export function EpochProgressCard({
-  percentage,
-  days,
-  currentEpoch,
-  startEpochDate,
-  endEpochDate,
-}: Props): Node {
+export function EpochProgressCard({ percentage, days, currentEpoch, startEpochDate, endEpochDate }: Props): Node {
   return (
     <Box>
       <Stack direction="row" spacing={2} justifyContent="flex-start">
@@ -55,15 +49,12 @@ type InfoColumnProps = {|
 const LabelWithValue = ({ label, value }: InfoColumnProps): Node => {
   return (
     <Box>
-      <Typography component="div"
-        style={{ textTransform: 'uppercase' }}
-        variant="caption"
-        mb="4px"
-        color="grayscale.600"
-      >
+      <Typography component="div" style={{ textTransform: 'uppercase' }} variant="caption" mb="4px" color="grayscale.600">
         {label}
       </Typography>
-      <Typography component="div" color="grayscale.900">{value}</Typography>
+      <Typography component="div" color="grayscale.900">
+        {value}
+      </Typography>
     </Box>
   );
 };
@@ -83,13 +74,7 @@ const Graph = ({ value, days }): Node => {
           zIndex: 1,
         }}
       />
-      <CircularProgress
-        size={120}
-        thickness={7}
-        variant="determinate"
-        sx={{ color: 'grayscale.50' }}
-        value={100}
-      />
+      <CircularProgress size={120} thickness={7} variant="determinate" sx={{ color: 'ds.gray_c100' }} value={100} />
       <Box
         position="absolute"
         sx={{

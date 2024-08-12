@@ -69,7 +69,7 @@ export default class ExplorableHash extends Component<Props> {
                 color: 'primary.600',
                 outlineWidth: '2px',
                 outlineStyle: 'solid',
-                outlineColor: theme => theme.palette.yellow[500],
+                outlineColor: theme => theme.palette.ds.sys_yellow_c500,
               },
               '&:disabled': {
                 color: 'primary.300',
@@ -79,11 +79,7 @@ export default class ExplorableHash extends Component<Props> {
             {this.props.children}
           </Box>
         ) : (
-          <a
-            className={styles.url}
-            href={this.props.url}
-            onClick={event => onExternalLinkClick(event)}
-          >
+          <a className={styles.url} href={this.props.url} onClick={event => onExternalLinkClick(event)}>
             <span className={addressClass}>{this.props.children}</span>
           </a>
         )}

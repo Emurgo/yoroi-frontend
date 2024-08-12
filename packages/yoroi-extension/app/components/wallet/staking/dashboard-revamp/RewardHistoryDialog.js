@@ -5,11 +5,10 @@ import { useMemo } from 'react';
 import { observer } from 'mobx-react';
 import globalMessages from '../../../../i18n/global-messages';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
-import { Typography } from '@mui/material';
+import { Typography, Box, useTheme } from '@mui/material';
 import Dialog from '../../../widgets/Dialog';
 import { injectIntl, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { Box } from '@mui/system';
 import { RewardHistoryItem } from './RewardHistoryTab';
 import InvalidURIImg from '../../../../assets/images/uri/invalid-uri.inline.svg';
 import ErrorBlock from '../../../widgets/ErrorBlock';
@@ -49,6 +48,7 @@ function RewardHistoryDialog({ graphData, onClose, intl }: Props & Intl): Node {
   const rewardItems = graphData.rewardsGraphData.items;
   const rewardList = rewardItems?.perEpochRewards.filter(p => Boolean(p.primary)) ?? [];
   const rewardsByPoolName = useMemo(() => groupByPoolName(rewardList), []);
+  const { palette } = useTheme();
 
   return (
     <Dialog
@@ -56,9 +56,10 @@ function RewardHistoryDialog({ graphData, onClose, intl }: Props & Intl): Node {
       closeOnOverlayClick={false}
       closeButton={<DialogCloseButton onClose={onClose} />}
       onClose={onClose}
+      styleContentOverride={{ background: palette.ds.bg_color_low }}
     >
       <Box maxWidth="600px">
-        <Typography component="div" mb="24px" variant="body1" fontWeight={500}>
+        <Typography component="div" mb="24px" variant="body1" fontWeight={500} color="ds.text_gray_normal">
           {intl.formatMessage(globalMessages.rewardsListLabel)} ({rewardList.length})
         </Typography>
         <Box>
