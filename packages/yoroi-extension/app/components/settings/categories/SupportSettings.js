@@ -104,7 +104,13 @@ class SupportSettings extends Component<Props & InjectedProps> {
     return (
       <Box>
         {isRevampLayout && (
-          <Typography component="h5" variant="h5" mb="24px" color="common.black" fontWeight={500}>
+          <Typography
+            component="h5"
+            variant="h5"
+            mb="24px"
+            color="ds.text_gray_normal"
+            fontWeight={500}
+          >
             {intl.formatMessage(globalMessages.support)}
           </Typography>
         )}
@@ -119,22 +125,24 @@ class SupportSettings extends Component<Props & InjectedProps> {
           {sections.map(({ title, text }) => {
             return (
               <Box key={title.id}>
-                <Typography component="div"
+                <Typography
+                  component="div"
                   variant={isRevampLayout ? 'body1' : 'h5'}
-                  color={isRevampLayout ? 'grayscale.900' : 'var(--yoroi-support-settings-text)'}
+                  color="ds.text_gray_normal"
                   fontWeight={500}
                   mb="8px"
                 >
                   {intl.formatMessage(title)}
                 </Typography>
-                <Typography component="div"
+                <Typography
+                  component="div"
                   sx={{
                     '& a': {
-                      color: isRevampLayout ? 'primary.500' : 'var(--yoroi-support-settings-text)',
+                      color: 'ds.primary_c500',
                       textDecoration: isRevampLayout ? 'none' : 'underline',
                     },
                   }}
-                  color={isRevampLayout ? 'common.black' : 'var(--yoroi-support-settings-text)'}
+                  color="ds.text_gray_normal"
                   variant={isRevampLayout ? 'body1' : 'body2'}
                 >
                   {text}

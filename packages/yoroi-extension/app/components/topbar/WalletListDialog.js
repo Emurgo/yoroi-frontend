@@ -22,6 +22,7 @@ import globalMessages from '../../i18n/global-messages';
 import AmountDisplay, { FiatDisplay } from '../common/AmountDisplay';
 import type { WalletType } from '../../../chrome/extension/background/types';
 import type { WalletChecksum } from '@emurgo/cip4-js';
+import { Typography } from '@mui/material';
 
 const messages = defineMessages({
   addWallet: {
@@ -209,8 +210,17 @@ export default class WalletListDialog extends Component<Props, State> {
             <div className={styles.totalInfo}>
               {walletsTotal !== undefined && (
                 <div className={styles.amount}>
-                  <div className={styles.label}>{intl.formatMessage(messages.totalBalance)}</div>
-                  <div className={styles.value}>{walletsTotal}</div>
+                  <Typography variant="body2" mb="4px" color="ds.text_gray_normal">
+                    {intl.formatMessage(messages.totalBalance)}
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    mt="10px"
+                    fontWeight="500"
+                    color="ds.text_gray_normal"
+                  >
+                    {walletsTotal}
+                  </Typography>
                 </div>
               )}
               <button type="button" className={styles.toggleButton} onClick={onUpdateHideBalance}>
@@ -273,12 +283,7 @@ export default class WalletListDialog extends Component<Props, State> {
   }
 
   renderWalletsTotal(): ?Node {
-    const {
-      unitOfAccountSetting,
-      cardanoWallets,
-      shouldHideBalance,
-      getCurrentPrice,
-    } = this.props;
+    const { unitOfAccountSetting, cardanoWallets, shouldHideBalance, getCurrentPrice } = this.props;
     if (unitOfAccountSetting.enabled) {
       const adaFiat = this.sumWallets(cardanoWallets).fiat;
       if (adaFiat != null) {

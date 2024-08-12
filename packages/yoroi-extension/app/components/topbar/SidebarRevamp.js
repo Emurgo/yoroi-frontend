@@ -5,7 +5,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { SidebarCategoryRevamp } from '../../stores/stateless/sidebarCategories';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
-import { Box, Link } from '@mui/material';
+import { Box, Link, styled } from '@mui/material';
 import { ReactComponent as YoroiLogo } from '../../assets/images/sidebar/revamp/yoroi-logo.inline.svg';
 import SideBarCategoryRevamp from './SideBarCategoryRevamp';
 import styles from './SidebarRevamp.scss';
@@ -44,7 +44,7 @@ export default class SidebarRevamp extends Component<Props> {
     const { categories, isActiveCategory, onCategoryClicked, onLogoClick } = this.props;
 
     return (
-      <Box className={styles.wrapper}>
+      <Wrapper className={styles.wrapper}>
         {this.props.children}
         <div className={styles.header}>
           {onLogoClick ? (
@@ -88,7 +88,11 @@ export default class SidebarRevamp extends Component<Props> {
         >
           {intl.formatMessage(globalMessages.sidebarFaq)}
         </Link>
-      </Box>
+      </Wrapper>
     );
   }
 }
+
+const Wrapper = styled(Box)(({ theme }) => ({
+  background: theme.palette.ds.bg_gradient_3,
+}));

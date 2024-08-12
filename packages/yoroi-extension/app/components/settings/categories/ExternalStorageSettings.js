@@ -3,7 +3,7 @@ import { Component } from 'react';
 import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import { Button } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 import type { SelectedExternalStorageProvider } from '../../../domain/ExternalStorage';
 import type { ProvidersType } from '../../../api/externalStorage/index';
 import styles from './ExternalStorageSettings.scss';
@@ -83,7 +83,9 @@ class ExternalStorageSettings extends Component<Props & InjectedProps> {
 
     return (
       <div className={styles.component}>
-        <h1>{this.context.intl.formatMessage(messages.sectionTitle)}</h1>
+        <Typography variant="h4" color="ds.text_gray_normal" mb="8px">
+          {this.context.intl.formatMessage(messages.sectionTitle)}
+        </Typography>
         <div>{this.context.intl.formatMessage(messages.sectionIntro)}</div>
         {providersButtons}
       </div>
