@@ -21,7 +21,6 @@ import type { RemoteUnspentOutput } from '../../api/ada/lib/state-fetch/types';
 import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import type { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import BigNumber from 'bignumber.js';
 import { action, computed, observable, runInAction, toJS } from 'mobx';
 import Request from '../../stores/lib/LocalizedRequest';

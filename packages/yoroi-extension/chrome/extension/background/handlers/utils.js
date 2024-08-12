@@ -40,7 +40,8 @@ import {
 import { MultiToken } from '../../../../app/api/common/lib/MultiToken';
 import { RustModule } from '../../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { loadSubmittedTransactions } from '../../../../app/api/localStorage';
-import { refreshingWalletIdSet, getDb } from '../state';
+import { getDb } from '../state/databaseManager';
+import { refreshingWalletIdSet } from '../state/refreshScheduler';
 import { loadWalletsFromStorage } from '../../../../app/api/ada/lib/storage/models/load';
 
 export async function getWalletsState(publicDeriverId: ?number): Promise<Array<WalletState>> {

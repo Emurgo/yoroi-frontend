@@ -9,9 +9,6 @@ import Request from '../lib/LocalizedRequest';
 import { getSelectedExplorer, getAllExplorers, saveSelectedExplorer, } from '../../api/thunk';
 import type { GetAllExplorersResponse } from '../../api/ada/lib/storage/bridge/explorers';
 import { prepackagedExplorers, } from '../../api/ada/lib/storage/database/prepackaged/explorers';
-import type {
-  ExplorerRow
-} from '../../api/ada/lib/storage/database/explorers/tables';
 import { SelectedExplorer, defaultToSelectedExplorer } from '../../domain/SelectedExplorer';
 import ExplorerActions from '../../actions/common/explorer-actions';
 

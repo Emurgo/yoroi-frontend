@@ -68,7 +68,7 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
         <Box sx={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
           <Box display="flex" gap="8px" alignItems="center">
             <SwapPoolIcon provider={pool.provider} />
-           <Typography component="div" variant="body1" color="ds.text_gray_normal">
+            <Typography component="div" variant="body1" color="ds.text_gray_normal">
               {maybe(pool.provider, p => `${capitalize(p)} ${isAutoPool ? '(Auto)' : ''}`) ?? 'No pool found'}
             </Typography>
             {isLimitOrder && (
