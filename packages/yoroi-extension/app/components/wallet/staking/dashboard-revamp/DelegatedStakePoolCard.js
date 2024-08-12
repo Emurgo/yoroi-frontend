@@ -37,7 +37,7 @@ function DelegatedStakePoolCard({
       return (
         <UpdatePoolButton
           variant="danger"
-          onClick={() => delegateToSpecificPool(poolTransition.suggestedPool?.hash ?? '')}
+          onClick={() => delegateToSpecificPool(poolTransition.suggestedPool?.hash)}
         >
           {intl.formatMessage(globalMessages.updatePool)}
         </UpdatePoolButton>
