@@ -6,10 +6,7 @@ import type { TransactionDirectionType } from '../../../api/ada/transactions/typ
 import type { AssuranceLevel } from '../../../types/transactionAssurance.types';
 import type { TxDataOutput, TxDataInput } from '../../../api/common/types';
 import type { TxStatusCodesType } from '../../../api/ada/lib/storage/database/primitives/enums';
-import type {
-  CertificateRow,
-  TokenRow,
-} from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { CertificateRow, TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos/tables';
 import type { Notification } from '../../../types/notification.types';
 import type { TokenLookupKey, TokenEntry } from '../../../api/common/lib/MultiToken';
@@ -38,15 +35,8 @@ import CopyableAddress from '../../widgets/CopyableAddress';
 import { genAddressLookup } from '../../../stores/stateless/addressStores';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { hiddenAmount } from '../../../utils/strings';
-import {
-  getTokenName,
-  getTokenIdentifierIfExists,
-  assetNameFromIdentifier,
-} from '../../../stores/stateless/tokenHelpers';
-import {
-  parseMetadata,
-  parseMetadataDetailed,
-} from '../../../api/ada/lib/storage/bridge/metadataUtils';
+import { getTokenName, getTokenIdentifierIfExists, assetNameFromIdentifier } from '../../../stores/stateless/tokenHelpers';
+import { parseMetadata, parseMetadataDetailed } from '../../../api/ada/lib/storage/bridge/metadataUtils';
 import CodeBlock from '../../widgets/CodeBlock';
 import BigNumber from 'bignumber.js';
 import { ComplexityLevels } from '../../../types/complexityLevelType';
@@ -286,9 +276,7 @@ export default class Transaction extends Component<Props, State> {
         const features = data.getFeatures();
         if (
           (features.includes('Withdrawal') && features.length === 1) ||
-          (features.includes('Withdrawal') &&
-            features.includes('StakeDeregistration') &&
-            features.length === 2)
+          (features.includes('Withdrawal') && features.includes('StakeDeregistration') && features.length === 2)
         ) {
           return intl.formatMessage(messages.rewardWithdrawn);
         }
@@ -297,9 +285,7 @@ export default class Transaction extends Component<Props, State> {
         }
         if (
           (features.includes('StakeDelegation') && features.length === 1) ||
-          (features.includes('StakeDelegation') &&
-            features.includes('StakeRegistration') &&
-            features.length === 2)
+          (features.includes('StakeDelegation') && features.includes('StakeRegistration') && features.length === 2)
         ) {
           return intl.formatMessage(messages.stakeDelegated);
         }
@@ -326,12 +312,7 @@ export default class Transaction extends Component<Props, State> {
     return '???';
   }
 
-  getStatusString(
-    intl: $npm$ReactIntl$IntlFormat,
-    state: number,
-    assuranceLevel: AssuranceLevel,
-    isValid: boolean
-  ): string {
+  getStatusString(intl: $npm$ReactIntl$IntlFormat, state: number, assuranceLevel: AssuranceLevel, isValid: boolean): string {
     if (!isValid) {
       return intl.formatMessage(stateTranslations.failed);
     }
@@ -360,15 +341,10 @@ export default class Transaction extends Component<Props, State> {
     const numberOfDecimals = tokenInfo?.Metadata.numberOfDecimals ?? 0;
     const shiftedAmount = request.entry.amount.shiftedBy(-numberOfDecimals);
 
-    const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-      shiftedAmount,
-      numberOfDecimals
-    );
+    const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(shiftedAmount, numberOfDecimals);
 
     // we may need to explicitly add + for positive values
-    const adjustedBefore = beforeDecimalRewards.startsWith('-')
-      ? beforeDecimalRewards
-      : '+' + beforeDecimalRewards;
+    const adjustedBefore = beforeDecimalRewards.startsWith('-') ? beforeDecimalRewards : '+' + beforeDecimalRewards;
 
     return (
       <>
@@ -412,9 +388,7 @@ export default class Transaction extends Component<Props, State> {
       if (price != null) {
         const amount = calculateAndFormatValue(shiftedAmount, price);
         const [beforeDecimal, afterDecimal] = amount.split('.');
-        const beforeDecimalWithSign = beforeDecimal.startsWith('-')
-          ? beforeDecimal
-          : '+' + beforeDecimal;
+        const beforeDecimalWithSign = beforeDecimal.startsWith('-') ? beforeDecimal : '+' + beforeDecimal;
         fiatDisplay = (
           <>
             {beforeDecimalWithSign}
@@ -464,10 +438,7 @@ export default class Transaction extends Component<Props, State> {
     const numberOfDecimals = tokenInfo.Metadata.numberOfDecimals ?? 0;
     const shiftedAmount = defaultEntry.amount.shiftedBy(-numberOfDecimals);
 
-    const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-      shiftedAmount.abs(),
-      numberOfDecimals
-    );
+    const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(shiftedAmount.abs(), numberOfDecimals);
 
     if (false && /* temporarily disable */ this.props.unitOfAccountSetting.enabled) {
       const { currency } = this.props.unitOfAccountSetting;
@@ -497,8 +468,7 @@ export default class Transaction extends Component<Props, State> {
           </div>
           <div className={styles.amountSmall}>
             {beforeDecimalRewards}
-            <span className={styles.afterDecimal}>{afterDecimalRewards}</span>{' '}
-            {this.getTicker(defaultEntry)}
+            <span className={styles.afterDecimal}>{afterDecimalRewards}</span> {this.getTicker(defaultEntry)}
           </div>
         </>
       );
@@ -514,9 +484,7 @@ export default class Transaction extends Component<Props, State> {
 
   getTicker: TokenEntry => string = tokenEntry => {
     const tokenInfo = this.props.getTokenInfo(tokenEntry);
-    return tokenInfo != null
-      ? truncateToken(getTokenName(tokenInfo))
-      : assetNameFromIdentifier(tokenEntry.identifier);
+    return tokenInfo != null ? truncateToken(getTokenName(tokenInfo)) : assetNameFromIdentifier(tokenEntry.identifier);
   };
 
   getFingerprint: TokenEntry => string | void = tokenEntry => {
@@ -590,12 +558,7 @@ export default class Transaction extends Component<Props, State> {
             },
           })}{' '}
           {fingerprint !== undefined ? (
-            <ExplorableHashContainer
-              selectedExplorer={this.props.selectedExplorer}
-              hash={fingerprint}
-              light
-              linkType="token"
-            >
+            <ExplorableHashContainer selectedExplorer={this.props.selectedExplorer} hash={fingerprint} light linkType="token">
               <span className={styles.rowData}>{this.getTicker(entry)}</span>
             </ExplorableHashContainer>
           ) : (
@@ -607,17 +570,12 @@ export default class Transaction extends Component<Props, State> {
 
     return (
       // eslint-disable-next-line react/no-array-index-key
-      <div
-        key={divKey(request.address.value.getDefaultEntry().identifier)}
-        className={styles.addressItem}
-      >
+      <div key={divKey(request.address.value.getDefaultEntry().identifier)} className={styles.addressItem}>
         <CopyableAddress
-          id='transaction'
+          id="transaction"
           hash={this.props.addressToDisplayString(request.address.address)}
           elementId={notificationElementId}
-          onCopyAddress={() =>
-            this.props.onCopyAddressTooltip(request.address.address, notificationElementId)
-          }
+          onCopyAddress={() => this.props.onCopyAddressTooltip(request.address.address, notificationElementId)}
           notification={this.props.notification}
           placementTooltip="bottom-start"
         >
@@ -667,10 +625,7 @@ export default class Transaction extends Component<Props, State> {
       isExpanded ? styles.shadow : null,
     ]);
 
-    const detailsStyles = classnames([
-      styles.details,
-      isExpanded ? styles.expanded : styles.closed,
-    ]);
+    const detailsStyles = classnames([styles.details, isExpanded ? styles.expanded : styles.closed]);
 
     const labelOkClasses = classnames([styles.status, styles[assuranceLevel]]);
 
@@ -687,18 +642,11 @@ export default class Transaction extends Component<Props, State> {
     return (
       <div className={componentStyles}>
         {/* ==== Clickable Header -> toggles details ==== */}
-        <div
-          className={styles.toggler}
-          onClick={this.toggleDetails.bind(this)}
-          role="presentation"
-          aria-hidden
-        >
+        <div className={styles.toggler} onClick={this.toggleDetails.bind(this)} role="presentation" aria-hidden>
           <div className={styles.togglerContent}>
             <div className={styles.header}>
               <div className={styles.time}>{moment(data.date).format('hh:mm:ss A')}</div>
-              <div className={styles.type}>
-                {this.getTxTypeMsg(intl, this.getTicker(data.amount.getDefaultEntry()), data)}
-              </div>
+              <div className={styles.type}>{this.getTxTypeMsg(intl, this.getTicker(data.amount.getDefaultEntry()), data)}</div>
               {state === TxStatusCodes.IN_BLOCK && isValidTransaction ? (
                 <div className={labelOkClasses}>{status}</div>
               ) : (
@@ -808,12 +756,10 @@ export default class Transaction extends Component<Props, State> {
                 light
                 linkType="transaction"
               >
-                <span className={classnames([styles.rowData, styles.hash, 'txid' /* for tests */])}>
-                  {data.txid}
-                </span>
+                <span className={classnames([styles.rowData, styles.hash, 'txid' /* for tests */])}>{data.txid}</span>
               </ExplorableHashContainer>
 
-              {this.getMetadata(data)}
+              {/* {this.getMetadata(data)} */}
               {this.props.memo != null ? (
                 <div className={styles.row}>
                   <h2>
@@ -877,11 +823,7 @@ export default class Transaction extends Component<Props, State> {
       );
     }
     return (
-      <button
-        type="button"
-        className={classnames([styles.status, styles.typeAddress])}
-        onClick={addressInfo.goToRoute}
-      >
+      <button type="button" className={classnames([styles.status, styles.typeAddress])} onClick={addressInfo.goToRoute}>
         {addressInfo.name}
       </button>
     );
@@ -953,11 +895,7 @@ export default class Transaction extends Component<Props, State> {
 
     const wrapCertificateText = (node, manyCerts) => (
       <>
-        <h2>
-          {manyCerts
-            ? intl.formatMessage(messages.certificatesLabel)
-            : intl.formatMessage(messages.certificateLabel)}
-        </h2>
+        <h2>{manyCerts ? intl.formatMessage(messages.certificatesLabel) : intl.formatMessage(messages.certificateLabel)}</h2>
         <span className={styles.rowData}>{node}</span>
       </>
     );
@@ -1005,19 +943,17 @@ export default class Transaction extends Component<Props, State> {
           // do nothing for simple user
         }
         if (jsonData !== null) {
-          metadata = (<CodeBlock code={jsonData} />);
+          metadata = <CodeBlock code={jsonData} />;
         } else {
-          metadata = (<span>0x{data.metadata}</span>);
+          metadata = <span>0x{data.metadata}</span>;
         }
       } else {
-        metadata = (<CodeBlock code={JSON.stringify(data.metadata)} />);
+        metadata = <></>;
       }
       return (
         <div className={styles.row}>
-          <h2>{intl.formatMessage(messages.transactionMetadata)}</h2>
-          <span className={styles.rowData}>
-            {metadata}
-          </span>
+          <h2>{intl.formatMessage(messages.transactionMetadata)}sdsdsd</h2>
+          <span className={styles.rowData}>{metadata}</span>
         </div>
       );
     }

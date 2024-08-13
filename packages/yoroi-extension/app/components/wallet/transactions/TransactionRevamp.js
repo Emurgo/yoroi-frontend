@@ -1040,7 +1040,8 @@ export default class TransactionRevamp extends Component<Props, State> {
       return (
         <div className={styles.row}>
           <h2>{intl.formatMessage(messages.transactionMetadata)}</h2>
-          <span className={styles.rowData}>{metadata}</span>
+
+          <Typography className={styles.rowData}>{metadata}</Typography>
         </div>
       );
     }
