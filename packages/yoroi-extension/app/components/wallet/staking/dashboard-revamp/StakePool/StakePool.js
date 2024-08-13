@@ -17,7 +17,7 @@ import { ReactComponent as GithubIconRevamp } from '../../../../../assets/images
 import { ReactComponent as PersonalIcon } from '../../../../../assets/images/social/revamp/personal.inline.svg';
 import { ReactComponent as PersonalIconRevamp } from '../../../../../assets/images/social/revamp/personal-site-24x24.inline.svg';
 import { List, StyledLink } from './StakePool.styles';
-import { Tooltip, Typography } from '@mui/material';
+import { Tooltip, Typography, styled } from '@mui/material';
 import { Box } from '@mui/system';
 import { ReactComponent as QuestionMarkIcon } from '../../../../../assets/images/question-mark.inline.svg';
 import { ReactComponent as InfoIconRevamp } from '../../../../../assets/images/info-icon-revamp.inline.svg';
@@ -43,12 +43,7 @@ const SocialExternalLink = ({ href, children }: {| href: string, children: Node 
   </StyledLink>
 );
 
-const StakingPoolSocialMedia = ({
-  socialLinks,
-  websiteUrl,
-  color,
-  isRevampLayout,
-}: Props & InjectedLayoutProps): Node => {
+const StakingPoolSocialMedia = ({ socialLinks, websiteUrl, color, isRevampLayout }: Props & InjectedLayoutProps): Node => {
   const twitter = socialLinks?.tw;
   const telegram = socialLinks?.tg;
   const facebook = socialLinks?.fb;
@@ -95,9 +90,7 @@ const StakingPoolSocialMedia = ({
         </SocialExternalLink>
       ) : null}
       {websiteUrl != null ? (
-        <SocialExternalLink href={websiteUrl}>
-          {isRevampLayout ? <PersonalIconRevamp /> : <PersonalIcon />}
-        </SocialExternalLink>
+        <SocialExternalLink href={websiteUrl}>{isRevampLayout ? <PersonalIconRevamp /> : <PersonalIcon />}</SocialExternalLink>
       ) : null}
     </List>
   );
@@ -109,18 +102,18 @@ type HelperTooltipProps = {|
   +message: string | Node,
   +placement?: string,
 |};
-const HelperTooltipComp = ({
-  message,
-  isRevampLayout,
-  placement,
-}: HelperTooltipProps & InjectedLayoutProps): Node => {
+const HelperTooltipComp = ({ message, isRevampLayout, placement }: HelperTooltipProps & InjectedLayoutProps): Node => {
   return (
     <Tooltip
-      title={<Typography component="div" variant="body2">{message}</Typography>}
+      title={
+        <Typography component="div" variant="body2">
+          {message}
+        </Typography>
+      }
       arrow
       placement={placement || 'right'}
     >
-      <Box display="inline-flex">{isRevampLayout ? <InfoIconRevamp /> : <QuestionMarkIcon />}</Box>
+      <IconWrapper display="inline-flex">{isRevampLayout ? <InfoIconRevamp /> : <QuestionMarkIcon />}</IconWrapper>
     </Tooltip>
   );
 };
@@ -130,3 +123,11 @@ HelperTooltipComp.defaultProps = {
 };
 
 export const HelperTooltip = (withLayout(HelperTooltipComp): ComponentType<HelperTooltipProps>);
+
+const IconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_normal,
+    },
+  },
+}));

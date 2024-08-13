@@ -28,15 +28,10 @@ const ExpandMoreIcon = () => (
 );
 
 const Accordion = styled((props /* AccordionProps */) => (
-  <MuiAccordion
-    TransitionProps={{ timeout: { exit: 500 } }}
-    disableGutters
-    elevation={0}
-    square
-    {...props}
-  />
-))(() => ({
-  borderBottom: `1px solid var(--yoroi-palette-gray-50)`,
+  <MuiAccordion TransitionProps={{ timeout: { exit: 500 } }} disableGutters elevation={0} square {...props} />
+))(({ theme }) => ({
+  backgroundColor: theme.palette.ds.bg_color_low,
+  borderBottom: theme.palette.ds.bg_color_low,
   '&:not(:last-child)': {
     borderBottom: 0,
   },
@@ -87,12 +82,7 @@ type RewardHistoryItemProps = {|
 |};
 type Intl = {| intl: $npm$ReactIntl$IntlShape |};
 
-export const RewardHistoryItem = ({
-  poolId,
-  poolName,
-  poolAvatar,
-  historyList,
-}: RewardHistoryItemProps): Node => {
+export const RewardHistoryItem = ({ poolId, poolName, poolAvatar, historyList }: RewardHistoryItemProps): Node => {
   const avatarGenerated = getAvatarFromPoolId(poolId || poolName);
 
   return (
@@ -100,14 +90,13 @@ export const RewardHistoryItem = ({
       <AccordionSummary aria-controls={poolId + '-content'} id={poolId || poolName + '-header'}>
         <Box>
           <Box display="block">
-            <Typography component="div" color="grayscale.600">Stake Pool</Typography>
+            <Typography component="div" color="ds.text_gray_medium">
+              Stake Pool
+            </Typography>
           </Box>
           <Box display="flex">
             <AvatarWrapper>
-              <AvatarImg
-                src={poolAvatar != null ? poolAvatar : avatarGenerated}
-                alt="stake pool logo"
-              />
+              <AvatarImg src={poolAvatar != null ? poolAvatar : avatarGenerated} alt="stake pool logo" />
             </AvatarWrapper>
             <Typography component="div">{poolName}</Typography>
           </Box>
@@ -119,14 +108,14 @@ export const RewardHistoryItem = ({
             // eslint-disable-next-line react/no-array-index-key
             <Box key={idx} display="flex" justifyContent="space-between" alignItems="center">
               <Box>
-                <Typography component="div" mb="2px" color="var(--yoroi-palette-gray-900)">
+                <Typography component="div" mb="2px" color="ds.text_gray_medium">
                   {type}
                 </Typography>
-                <Typography component="div" variant="body2" color="var(--yoroi-palette-gray-600)">
+                <Typography component="div" variant="body2" color="ds.text_gray_medium">
                   {date}
                 </Typography>
               </Box>
-              <Typography component="div" fontWeight={500} variant="body2">
+              <Typography component="div" fontWeight={500} variant="body2" color="ds.text_gray_normal">
                 + {balance}
               </Typography>
             </Box>
@@ -142,11 +131,7 @@ type RewardHistoryTabProps = {|
   onOpenRewardList: () => void,
 |};
 
-function RewardHistoryTab({
-  graphData,
-  onOpenRewardList,
-  intl,
-}: RewardHistoryTabProps & Intl): Node {
+function RewardHistoryTab({ graphData, onOpenRewardList, intl }: RewardHistoryTabProps & Intl): Node {
   const rewardList = graphData.items;
   const rewardsByPoolName = useMemo(() => groupByPoolName(rewardList), []);
   return (
