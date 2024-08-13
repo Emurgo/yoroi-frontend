@@ -13,8 +13,11 @@ import CardanoByronTransaction, {
 } from '../domain/CardanoByronTransaction';
 import { MultiToken } from './common/lib/MultiToken';
 import type { ExplorerRow } from './ada/lib/storage/database/explorers/tables';
-import { WrongPassphraseError } from './ada/lib/cardanoCrypto/cryptoErrors';
-import { SendTransactionApiError, GenericApiError } from './common/errors';
+import {
+  SendTransactionApiError,
+  GenericApiError,
+  IncorrectWalletPasswordError,
+} from './common/errors';
 import type { ResponseTicker } from './common/lib/state-fetch/types';
 //import type { HandlerType } from '../../chrome/extension/background/handlers/yoroi/type';
 import {
@@ -432,7 +435,7 @@ export function listenForCoinPriceUpdate(callback: (CoinPriceUpdateParams) => vo
 
 function handleWrongPassword<T: { error?: string, ... }>(result: T): T {
   if (result.error === 'IncorrectWalletPasswordError') {
-    throw new WrongPassphraseError();
+    throw new IncorrectWalletPasswordError();
   }
   if (result.error) {
     throw new SendTransactionApiError();

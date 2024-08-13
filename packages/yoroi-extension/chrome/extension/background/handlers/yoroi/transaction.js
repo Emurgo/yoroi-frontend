@@ -146,7 +146,7 @@ export const SignAndBroadcastTransaction: HandlerType<
       emitUpdateForTxSubmission(request.publicDeriverId);
       return { txId };
     } catch (error) {
-      return { error: error.message };
+      return { error: error.name };
     }
   },
 });
