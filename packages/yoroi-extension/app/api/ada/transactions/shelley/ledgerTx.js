@@ -12,7 +12,10 @@ import type {
   Token,
   TxOutput,
   TxInput,
-  SignTransactionRequest, AnchorParams, CredentialParams, DRepParams, StakeDelegationParams,
+  SignTransactionRequest,
+  AnchorParams,
+  CredentialParams,
+  DRepParams,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import type {
   Address, Value, Addressing,
@@ -339,19 +342,11 @@ function formatLedgerWithdrawals(
   return result;
 }
 
-type LedgerCertificateHandler<CslCert> = {|
-  getter: RustModule.WalletV4.Certificate => ?CslCert,
-  converter: (CslCert, RustModule.WalletV4.Credential => number[]) => Array<Certificate>,
-|}
+type WasmCertWithAnchor =
+  RustModule.WalletV4.DrepRegistration
+  | RustModule.WalletV4.DrepUpdate;
 
-function createLedgerCertificateHandler<CslCert>(
-  getter: RustModule.WalletV4.Certificate => ?CslCert,
-  converter: (CslCert, RustModule.WalletV4.Credential => number[]) => Array<Certificate>,
-): LedgerCertificateHandler<CslCert> {
-  return { getter, converter };
-}
-
-function wasmCertToAnchor(wasmCert: any): ?AnchorParams {
+function wasmCertToAnchor(wasmCert: WasmCertWithAnchor): ?AnchorParams {
   const wasmAnchor = wasmCert.anchor();
   return wasmAnchor == null ? undefined : {
     url: wasmAnchor.url().url(),
@@ -359,21 +354,42 @@ function wasmCertToAnchor(wasmCert: any): ?AnchorParams {
   };
 }
 
-function wasmCertToStakeCredential(wasmCert: any, getPath: RustModule.WalletV4.Credential => number[]): CredentialParams {
+type WasmCertWithStakeCredential =
+  RustModule.WalletV4.StakeRegistration
+  | RustModule.WalletV4.StakeDeregistration
+  | RustModule.WalletV4.StakeDelegation
+  | RustModule.WalletV4.VoteDelegation
+  | RustModule.WalletV4.StakeAndVoteDelegation
+  | RustModule.WalletV4.StakeRegistrationAndDelegation
+  | RustModule.WalletV4.VoteRegistrationAndDelegation
+  | RustModule.WalletV4.StakeVoteRegistrationAndDelegation;
+
+function wasmCertToStakeCredential(wasmCert: WasmCertWithStakeCredential, getPath: RustModule.WalletV4.Credential => number[]): CredentialParams {
   return {
     type: CredentialParamsType.KEY_PATH,
     keyPath: getPath(wasmCert.stake_credential()),
   };
 }
 
-function wasmCertToDRepCredential(wasmCert: any, getPath: RustModule.WalletV4.Credential => number[]): CredentialParams {
+type WasmCertWithDrepCredential =
+  RustModule.WalletV4.DrepRegistration
+  | RustModule.WalletV4.DrepUpdate
+  | RustModule.WalletV4.DrepDeregistration;
+
+function wasmCertToDRepCredential(wasmCert: WasmCertWithDrepCredential, getPath: RustModule.WalletV4.Credential => number[]): CredentialParams {
   return {
     type: CredentialParamsType.KEY_PATH,
     keyPath: getPath(wasmCert.voting_credential()),
   };
 }
 
-function wasmCertToDrep(wasmCert: any): DRepParams {
+type WasmCertWithDrepDelegation =
+  RustModule.WalletV4.VoteDelegation
+  | RustModule.WalletV4.StakeAndVoteDelegation
+  | RustModule.WalletV4.VoteRegistrationAndDelegation
+  | RustModule.WalletV4.StakeVoteRegistrationAndDelegation;
+
+function wasmCertToDrep(wasmCert: WasmCertWithDrepDelegation): DRepParams {
   const wasmDrep = wasmCert.drep();
   switch (wasmDrep.kind()) {
     case RustModule.WalletV4.DRepKind.KeyHash:
@@ -395,19 +411,28 @@ function wasmCertToDrep(wasmCert: any): DRepParams {
   }
 }
 
-function wasmCertToStakeRegistration(wasmCert: any, getPath: RustModule.WalletV4.Credential => number[]): Certificate {
+type WasmCertWithStakeRegistration =
+  RustModule.WalletV4.StakeRegistration
+  | RustModule.WalletV4.StakeRegistrationAndDelegation
+  | RustModule.WalletV4.VoteRegistrationAndDelegation
+  | RustModule.WalletV4.StakeVoteRegistrationAndDelegation;
+
+function wasmCertToStakeRegistration(wasmCert: WasmCertWithStakeRegistration, getPath: RustModule.WalletV4.Credential => number[]): Certificate {
   const stakeCredential = wasmCertToStakeCredential(wasmCert, getPath);
   const coin = wasmCert.coin();
   return coin == null ? {
     type: CertificateType.STAKE_REGISTRATION,
-    params: { stakeCredential: stakeCredential },
+    params: { stakeCredential },
   } : {
     type: CertificateType.STAKE_REGISTRATION_CONWAY,
-    params: { stakeCredential: stakeCredential, deposit: coin.to_str() },
+    params: { stakeCredential, deposit: coin.to_str() },
   };
 }
 
-function wasmCertToStakeDeregistration(wasmCert: any, getPath: RustModule.WalletV4.Credential => number[]): Certificate {
+type WasmCertWithStakeDeregistration =
+  | RustModule.WalletV4.StakeDeregistration;
+
+function wasmCertToStakeDeregistration(wasmCert: WasmCertWithStakeDeregistration, getPath: RustModule.WalletV4.Credential => number[]): Certificate {
   const stakeCredential = wasmCertToStakeCredential(wasmCert, getPath);
   const coin = wasmCert.coin();
   return coin == null ? {
@@ -419,7 +444,14 @@ function wasmCertToStakeDeregistration(wasmCert: any, getPath: RustModule.Wallet
   };
 }
 
-function wasmCertToStakeDelegation(wasmCert: any, getPath: RustModule.WalletV4.Credential => number[]): Certificate {
+
+type WasmCertWithStakeDelegation =
+  | RustModule.WalletV4.StakeDelegation
+  | RustModule.WalletV4.StakeAndVoteDelegation
+  | RustModule.WalletV4.StakeRegistrationAndDelegation
+  | RustModule.WalletV4.StakeVoteRegistrationAndDelegation;
+
+function wasmCertToStakeDelegation(wasmCert: WasmCertWithStakeDelegation, getPath: RustModule.WalletV4.Credential => number[]): Certificate {
   return {
     type: CertificateType.STAKE_DELEGATION,
     params: {
@@ -429,7 +461,7 @@ function wasmCertToStakeDelegation(wasmCert: any, getPath: RustModule.WalletV4.C
   };
 }
 
-function wasmCertToVoteDelegation(wasmCert: any, getPath: RustModule.WalletV4.Credential => number[]): Certificate {
+function wasmCertToVoteDelegation(wasmCert: WasmCertWithDrepDelegation, getPath: RustModule.WalletV4.Credential => number[]): Certificate {
   return {
     type: CertificateType.VOTE_DELEGATION,
     params: {
@@ -439,96 +471,89 @@ function wasmCertToVoteDelegation(wasmCert: any, getPath: RustModule.WalletV4.Cr
   };
 }
 
-const getCertificateConverter: number => ?LedgerCertificateHandler<any> = (certificateKind) => {
-  switch (certificateKind) {
-    case RustModule.WalletV4.CertificateKind.StakeRegistration:
-      return createLedgerCertificateHandler<RustModule.WalletV4.StakeRegistration>(
-        cert => cert.as_stake_registration(),
-        (wasmCert, getPath) => [wasmCertToStakeRegistration(wasmCert, getPath)],
-      );
-    case RustModule.WalletV4.CertificateKind.StakeDeregistration:
-      return createLedgerCertificateHandler<RustModule.WalletV4.StakeDeregistration > (
-        cert => cert.as_stake_deregistration(),
-        (wasmCert, getPath) => [wasmCertToStakeDeregistration(wasmCert, getPath)],
-      );
-    case RustModule.WalletV4.CertificateKind.StakeDelegation:
-      return createLedgerCertificateHandler<RustModule.WalletV4.StakeDelegation > (
-        cert => cert.as_stake_delegation(),
-        (wasmCert, getPath) => [wasmCertToStakeDelegation(wasmCert, getPath)],
-      );
-    case RustModule.WalletV4.CertificateKind.VoteDelegation:
-      return createLedgerCertificateHandler<RustModule.WalletV4.VoteDelegation > (
-        cert => cert.as_vote_delegation(),
-        (wasmCert, getPath) => [wasmCertToVoteDelegation(wasmCert, getPath)],
-      );
-    case RustModule.WalletV4.CertificateKind.StakeAndVoteDelegation:
-      return createLedgerCertificateHandler<RustModule.WalletV4.StakeAndVoteDelegation> (
-        cert => cert.as_stake_and_vote_delegation(),
-        (wasmCert, getPath) => [
-            wasmCertToStakeDelegation(wasmCert, getPath),
-            wasmCertToVoteDelegation(wasmCert, getPath),
-      ]);
-    case RustModule.WalletV4.CertificateKind.StakeRegistrationAndDelegation:
-      return createLedgerCertificateHandler<RustModule.WalletV4.StakeRegistrationAndDelegation> (
-        cert => cert.as_stake_registration_and_delegation(),
-        (wasmCert, getPath) => [
-          wasmCertToStakeRegistration(wasmCert, getPath),
-          wasmCertToStakeDelegation(wasmCert, getPath),
-        ],
-      );
-    case RustModule.WalletV4.CertificateKind.VoteRegistrationAndDelegation:
-      return createLedgerCertificateHandler<RustModule.WalletV4.VoteRegistrationAndDelegation> (
-        cert => cert.as_vote_registration_and_delegation(),
-        (wasmCert, getPath) => [
-          wasmCertToStakeRegistration(wasmCert, getPath),
-          wasmCertToVoteDelegation(wasmCert, getPath),
-        ],
-      );
-    case RustModule.WalletV4.CertificateKind.StakeVoteRegistrationAndDelegation:
-      return createLedgerCertificateHandler<RustModule.WalletV4.StakeVoteRegistrationAndDelegation> (
-        cert => cert.as_stake_vote_registration_and_delegation(),
-        (wasmCert, getPath) => [
-          wasmCertToStakeRegistration(wasmCert, getPath),
-          wasmCertToStakeDelegation(wasmCert, getPath),
-          wasmCertToVoteDelegation(wasmCert, getPath),
-        ],
-      );
-    case RustModule.WalletV4.CertificateKind.DrepRegistration:
-      return createLedgerCertificateHandler<RustModule.WalletV4.DrepRegistration> (
-        cert => cert.as_drep_registration(),
-        (wasmCert, getPath) => [{
-          type: CertificateType.DREP_REGISTRATION,
-          params: {
-            dRepCredential: wasmCertToDRepCredential(wasmCert, getPath),
-            anchor: wasmCertToAnchor(wasmCert),
-            deposit: wasmCert.coin().to_str(),
-          },
-        }],
-      );
-    case RustModule.WalletV4.CertificateKind.DrepUpdate:
-      return createLedgerCertificateHandler<RustModule.WalletV4.DrepUpdate> (
-        cert => cert.as_drep_update(),
-        (wasmCert, getPath) => [{
-          type: CertificateType.DREP_UPDATE,
-          params: {
-            dRepCredential: wasmCertToDRepCredential(wasmCert, getPath),
-            anchor: wasmCertToAnchor(wasmCert),
-          },
-        }],
-      );
-    case RustModule.WalletV4.CertificateKind.DrepDeregistration:
-      return createLedgerCertificateHandler<RustModule.WalletV4.DrepDeregistration> (
-        cert => cert.as_drep_deregistration(),
-        (wasmCert, getPath) => [{
-          type: CertificateType.DREP_DEREGISTRATION,
-          params: {
-            dRepCredential: wasmCertToDRepCredential(wasmCert, getPath),
-            deposit: wasmCert.coin().to_str(),
-          },
-        }],
-      );
+function convertCertificate(
+  wasmCertificateWrap: RustModule.WalletV4.Certificate,
+  getPath: RustModule.WalletV4.Credential => number[]
+): Array<Certificate> {
+  switch (wasmCertificateWrap.kind()) {
+    case RustModule.WalletV4.CertificateKind.StakeRegistration: {
+      const wasmCert = forceNonNull(wasmCertificateWrap.as_stake_registration());
+      return [wasmCertToStakeRegistration(wasmCert, getPath)];
+    }
+    case RustModule.WalletV4.CertificateKind.StakeDeregistration: {
+      const wasmCert = forceNonNull(wasmCertificateWrap.as_stake_deregistration());
+      return [wasmCertToStakeDeregistration(wasmCert, getPath)];
+    }
+    case RustModule.WalletV4.CertificateKind.StakeDelegation: {
+      const wasmCert = forceNonNull(wasmCertificateWrap.as_stake_delegation());
+      return [wasmCertToStakeDelegation(wasmCert, getPath)];
+    }
+    case RustModule.WalletV4.CertificateKind.VoteDelegation: {
+      const wasmCert = forceNonNull(wasmCertificateWrap.as_vote_delegation());
+      return [wasmCertToVoteDelegation(wasmCert, getPath)];
+    }
+    case RustModule.WalletV4.CertificateKind.StakeAndVoteDelegation: {
+      const wasmCert = forceNonNull(wasmCertificateWrap.as_stake_and_vote_delegation());
+      return [
+        wasmCertToStakeDelegation(wasmCert, getPath),
+        wasmCertToVoteDelegation(wasmCert, getPath),
+      ];
+    }
+    case RustModule.WalletV4.CertificateKind.StakeRegistrationAndDelegation: {
+      const wasmCert = forceNonNull(wasmCertificateWrap.as_stake_registration_and_delegation());
+      return [
+        wasmCertToStakeRegistration(wasmCert, getPath),
+        wasmCertToStakeDelegation(wasmCert, getPath),
+      ];
+    }
+    case RustModule.WalletV4.CertificateKind.VoteRegistrationAndDelegation: {
+      const wasmCert = forceNonNull(wasmCertificateWrap.as_vote_registration_and_delegation());
+      return [
+        wasmCertToStakeRegistration(wasmCert, getPath),
+        wasmCertToVoteDelegation(wasmCert, getPath),
+      ];
+    }
+    case RustModule.WalletV4.CertificateKind.StakeVoteRegistrationAndDelegation: {
+      const wasmCert = forceNonNull(wasmCertificateWrap.as_stake_vote_registration_and_delegation());
+      return [
+        wasmCertToStakeRegistration(wasmCert, getPath),
+        wasmCertToStakeDelegation(wasmCert, getPath),
+        wasmCertToVoteDelegation(wasmCert, getPath),
+      ];
+    }
+    case RustModule.WalletV4.CertificateKind.DrepRegistration: {
+      const wasmCert = forceNonNull(wasmCertificateWrap.as_drep_registration());
+      return [{
+        type: CertificateType.DREP_REGISTRATION,
+        params: {
+          dRepCredential: wasmCertToDRepCredential(wasmCert, getPath),
+          anchor: wasmCertToAnchor(wasmCert),
+          deposit: wasmCert.coin().to_str(),
+        },
+      }];
+    }
+    case RustModule.WalletV4.CertificateKind.DrepUpdate: {
+      const wasmCert = forceNonNull(wasmCertificateWrap.as_drep_update());
+      return [{
+        type: CertificateType.DREP_UPDATE,
+        params: {
+          dRepCredential: wasmCertToDRepCredential(wasmCert, getPath),
+          anchor: wasmCertToAnchor(wasmCert),
+        },
+      }];
+    }
+    case RustModule.WalletV4.CertificateKind.DrepDeregistration: {
+      const wasmCert = forceNonNull(wasmCertificateWrap.as_drep_deregistration());
+      return [{
+        type: CertificateType.DREP_DEREGISTRATION,
+        params: {
+          dRepCredential: wasmCertToDRepCredential(wasmCert, getPath),
+          deposit: wasmCert.coin().to_str(),
+        },
+      }];
+    }
     default:
-      return null;
+      throw new Error(`${nameof(formatLedgerCertificates)} Ledger doesn't support this certificate type! ` + wasmCertificateWrap.to_hex());
   }
 }
 
@@ -555,18 +580,7 @@ function formatLedgerCertificates(
   const result = [];
   for (let i = 0; i < certificates.len(); i++) {
     const cert = certificates.get(i);
-
-    const converter = getCertificateConverter(cert.kind())
-    if (converter == null) {
-      throw new Error(`${nameof(formatLedgerCertificates)} Ledger doesn't support this certificate type! ` + cert.to_hex());
-    }
-
-    const cslCert = converter.getter(cert);
-    if (cslCert == null) {
-      throw new Error(`${nameof(formatLedgerCertificates)} Certificate converter did not extract a correct certificate type! ` + cert.to_hex());
-    }
-
-    result.push(...converter.converter(cslCert, getPath));
+    result.push(...convertCertificate(cert, getPath));
   }
   return result;
 }
