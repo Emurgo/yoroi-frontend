@@ -5,6 +5,7 @@ import { yoroiMessageHandler } from './handlers/yoroi';
 import { init } from './state';
 import { startMonitorServerStatus } from './serverStatus';
 import { startPoll } from './coinPrice';
+import { environment } from '../../../app/environment';
 
 /*::
 declare var chrome;
@@ -25,7 +26,9 @@ if (chrome.action) {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   //fixme: verify sender.id === extension id
-  console.debug(`get message ${JSON.stringify(message)} from ${sender.tab.id}`);
+  if (environment.isDev()) {
+    console.debug(`get message ${JSON.stringify(message)} from ${sender.tab.id}`);
+  }
   if (yoroiMessageHandler(message, sender, sendResponse)) {
     // Returning `true` is required by Firefox, see:
     // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage
