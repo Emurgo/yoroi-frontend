@@ -1,7 +1,7 @@
 // @flow
 import debounce from 'lodash/debounce';
 import { handleInjectorMessage } from './handlers/content';
-import { yoroiMessageHandler } from './handlers/yoroi';
+import { getHandler } from './handlers/yoroi';
 import { init } from './state';
 import { startMonitorServerStatus } from './serverStatus';
 import { startPoll } from './coinPrice';
@@ -29,7 +29,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (environment.isDev()) {
     console.debug(`get message ${JSON.stringify(message)} from ${sender.tab.id}`);
   }
-  if (yoroiMessageHandler(message, sender, sendResponse)) {
+  const handler = getHandler(message.type);
+  if (handler) {
+    handler(message, sender, sendResponse);
     // Returning `true` is required by Firefox, see:
     // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage
     return true;

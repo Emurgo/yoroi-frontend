@@ -85,26 +85,31 @@ const handlerMap = Object.freeze({
   [GetConnectedSites.typeTag]: GetConnectedSites.handle,
 });
 
-export async function yoroiMessageHandler(
+type Handler = (
   request: Object,
   sender: Object,
   sendResponse: Function,
-): Promise<boolean> {
-  if (request.type === 'subscribe') {
-    subscribe(sender.tab.id, request.request.activeWalletId);
-    sendResponse(undefined);
-    return true;
+) => Promise<void>;
+
+export function getHandler(typeTag: string): ?Handler {
+  if (typeTag === 'subscribe') {
+    return async (request, sender, sendResponse) => {
+      subscribe(sender.tab.id, request.request.activeWalletId);
+      sendResponse(undefined);
+    };
   }
 
-  const handler = handlerMap[request.type];
-  if (!handler) {
-    return false;
+  const handler = handlerMap[typeTag];
+  if (handler) {
+    return async (request, send, sendResponse) => {
+      try {
+        const result = await handler(request.request);
+        sendResponse(result);
+      } catch (error) {
+        sendResponse({ error: error.message });
+      }
+    }
   }
-  try {
-    const result = await handler(request.request);
-    sendResponse(result);
-  } catch (error) {
-    sendResponse({ error: error.message });
-  }
-  return true;
+  return undefined;
 }
+
