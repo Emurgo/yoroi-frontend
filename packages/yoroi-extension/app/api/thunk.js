@@ -340,8 +340,8 @@ export const refreshCurrentCoinPrice: GetEntryFuncType<typeof RefreshCurrentCoin
   await callBackground({ type: RefreshCurrentCoinPrice.typeTag, });
 }
 
-export const userConnectResponse: GetEntryFuncType<typeof UserConnectResponse> = async () => {
-  await callBackground({ type: UserConnectResponse.typeTag });
+export const userConnectResponse: GetEntryFuncType<typeof UserConnectResponse> = async (request) => {
+  await callBackground({ type: UserConnectResponse.typeTag, request });
 }
 
 export const userSignConfirm: GetEntryFuncType<typeof UserSignConfirm> = async (request) => {
