@@ -7,7 +7,7 @@ import { intlShape } from 'react-intl';
 import { truncateLongName } from '../../utils/formatters';
 
 import type { WalletChecksum } from '@emurgo/cip4-js';
-import { Box, IconButton, Typography } from '@mui/material';
+import { Box, IconButton, Typography, styled } from '@mui/material';
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { ReactComponent as IconEyeClosed } from '../../assets/images/my-wallets/icon_eye_closed_revamp.inline.svg';
@@ -20,6 +20,15 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+
+const IconWrapper = styled(Box)(({ theme }) => ({
+  marginTop: '4px',
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.white_static,
+    },
+  },
+}));
 
 type Props = {|
   +onUpdateHideBalance: void => Promise<void>,
@@ -42,19 +51,11 @@ type Props = {|
   +openWalletInfoDialog: () => void,
 |};
 
-function constructPlate(
-  plate: WalletChecksum,
-  saturationFactor: number,
-  divClass: string
-): [string, React$Element<'div'>] {
+function constructPlate(plate: WalletChecksum, saturationFactor: number, divClass: string): [string, React$Element<'div'>] {
   return [
     plate.TextPart,
     <div className={divClass}>
-      <WalletAccountIcon
-        iconSeed={plate.ImagePart}
-        saturationFactor={saturationFactor}
-        scalePx={6}
-      />
+      <WalletAccountIcon iconSeed={plate.ImagePart} saturationFactor={saturationFactor} scalePx={6} />
     </div>,
   ];
 }
@@ -115,12 +116,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
             <div className={classnames([styles.plate])}>{iconComponent}</div>
             <div className={styles.content}>
               <div className={styles.walletInfo}>
-                <Typography
-                  component="div"
-                  variant="body2"
-                  fontWeight={500}
-                  sx={{ color: 'grayscale.900' }}
-                >
+                <Typography component="div" variant="body2" fontWeight={500} sx={{ color: 'grayscale.900' }}>
                   {truncateLongName(this.props.wallet.conceptualWalletName)}
                 </Typography>
                 <Typography component="div" variant="caption1" sx={{ color: 'grayscale.600' }}>
@@ -165,7 +161,15 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
             }}
             color="primary"
           >
-            {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
+            {shouldHideBalance ? (
+              <IconWrapper>
+                <IconEyeClosed />
+              </IconWrapper>
+            ) : (
+              <IconWrapper>
+                <IconEyeOpen />
+              </IconWrapper>
+            )}
           </IconButton>
         </div>
       </Box>
