@@ -86,6 +86,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
           runInAction(() => {
             Object.assign(this.wallets[index], newWalletState);
           });
+          await this.stores.tokenInfoStore.refreshTokenInfo();
           if (this.initialSyncingWalletIds.has(params.publicDeriverId)) {
             this.stores.addresses.refreshAddressesFromDb(this.wallets[index]);
           }
