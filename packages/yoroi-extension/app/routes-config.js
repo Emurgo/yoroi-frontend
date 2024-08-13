@@ -85,4 +85,9 @@ export const ROUTES = {
     SUBMITTED: '/governance/submitted',
     FAIL: '/governance/failed',
   },
+  PORTFOLIO: {
+    ROOT: '/portfolio',
+    DAPPS: '/portfolio/dapps',
+    DETAILS: '/portfolio/details/:tokenId',
+  },
 };

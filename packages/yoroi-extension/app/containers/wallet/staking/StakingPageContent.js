@@ -60,8 +60,7 @@ class StakingPageContent extends Component<AllProps> {
     if (this.props.stores.delegation.getPoolTransitionConfig(publicDeriver).shouldUpdatePool) {
       const poolTransitionInfo = this.props.stores.delegation.getPoolTransitionInfo(publicDeriver);
       if (poolTransitionInfo?.suggestedPool) {
-        this.props.stores.delegation.delegateToSpecificPool(poolTransitionInfo.suggestedPool.hash);
-        noop(this.props.stores.delegation.createDelegationTransaction());
+        noop(this.props.stores.delegation.createDelegationTransaction(poolTransitionInfo.suggestedPool.hash));
       }
     }
   }
@@ -118,8 +117,9 @@ class StakingPageContent extends Component<AllProps> {
         delegatedPool={delegatedPool}
         undelegate={async () => this.createWithdrawalTx(true)} // shouldDeregister=true
         delegateToSpecificPool={async (poolId): any => {
-          this.props.stores.delegation.delegateToSpecificPool(poolId);
-          this.props.stores.delegation.createDelegationTransaction();
+          if (poolId != null) {
+            return this.props.stores.delegation.createDelegationTransaction(poolId);
+          }
         }}
       />
     );
@@ -194,7 +194,6 @@ class StakingPageContent extends Component<AllProps> {
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingPageContent)} opened for non-reward wallet`);
     }
-    stores.delegation.checkGovernanceStatus(publicDeriver);
     const balance = stores.transactions.getBalance(publicDeriver);
     const isWalletWithNoFunds = balance != null && balance.getDefaultEntry().amount.isZero();
 
