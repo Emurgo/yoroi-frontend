@@ -79,6 +79,7 @@ import type {
 } from './common';
 import { Logger, stringifyError } from '../utils/logging';
 import LocalizableError from '../i18n/LocalizableError';
+import { WrongPassphraseError } from './ada/lib/cardanoCrypto/cryptoErrors';
 
 
 export type { CreateHardwareWalletRequest } from '../../chrome/extension/background/handlers/yoroi/wallet';
@@ -219,7 +220,7 @@ export async function signAndBroadcastTransaction(
     type: SignAndBroadcastTransaction.typeTag,
     request: serializableRequest,
   });
-  return handleWrongPassword(result);
+  return handleWrongPassword(result, IncorrectWalletPasswordError);
 }
 
 export async function broadcastTransaction(request: BroadcastTransactionRequestType): Promise<void> {
@@ -235,7 +236,7 @@ export async function getPrivateStakingKey(
   request: {| publicDeriverId: number, password: string |}
 ): Promise<string> {
   const result = await callBackground({ type: GetPrivateStakingKey.typeTag, request });
-  return handleWrongPassword(result);
+  return handleWrongPassword(result, WrongPassphraseError);
 }
 
 export const getCardanoAssets: GetEntryFuncType<typeof GetCardanoAssets> = async (request) => {
@@ -303,7 +304,7 @@ export async function connectorCreateAuthEntry(
   request: ConnectorCreateAuthEntryRequestType
 ): Promise<?WalletAuthEntry> {
   const result = await callBackground({ type: CreateAuthEntry.typeTag, request });
-  return handleWrongPassword(result);
+  return handleWrongPassword(result, WrongPassphraseError);
 }
 
 export async function getSelectedExplorer(): Promise<$ReadOnlyMap<number, {|
@@ -329,7 +330,7 @@ export const saveSelectedExplorer: GetEntryFuncType<typeof SaveSelectedExplorer>
 
 export async function signTransaction(request: SignTransactionRequestType): Promise<string> {
   const result = await callBackground({ type: SignTransaction.typeTag, request });
-  return handleWrongPassword(result);
+  return handleWrongPassword(result, IncorrectWalletPasswordError);
 }
 
 export const getHistoricalCoinPrices: GetEntryFuncType<typeof GetHistoricalCoinPrices> = async (request) => {
@@ -433,9 +434,14 @@ export function listenForCoinPriceUpdate(callback: (CoinPriceUpdateParams) => vo
   callbacks.coinPriceUpdate.push(callback);
 }
 
-function handleWrongPassword<T: { error?: string, ... }>(result: T): T {
+function handleWrongPassword<
+  T: { error?: string, ... }
+>(
+  result: T,
+  passwordErrorClass: typeof Error
+): T {
   if (result.error === 'IncorrectWalletPasswordError') {
-    throw new IncorrectWalletPasswordError();
+    throw new passwordErrorClass();
   }
   if (result.error) {
     throw new SendTransactionApiError();
