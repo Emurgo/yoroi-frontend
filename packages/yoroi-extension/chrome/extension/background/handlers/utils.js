@@ -41,6 +41,7 @@ import { MultiToken } from '../../../../app/api/common/lib/MultiToken';
 import { RustModule } from '../../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { loadSubmittedTransactions } from '../../../../app/api/localStorage';
 import { getDb } from '../state/databaseManager';
+// eslint-disable-next-line import/no-cycle
 import { refreshingWalletIdSet } from '../state/refreshScheduler';
 import { loadWalletsFromStorage } from '../../../../app/api/ada/lib/storage/models/load';
 

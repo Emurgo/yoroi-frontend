@@ -19,6 +19,7 @@ import LocalStorageApi, {
 import { Queue } from 'async-await-queue';
 import type { WalletState } from '../types';
 import WalletTransaction from '../../../../app/domain/WalletTransaction';
+// eslint-disable-next-line import/no-cycle
 import { getWalletsState } from '../handlers/utils';
 
 registerCallback((params) => {
