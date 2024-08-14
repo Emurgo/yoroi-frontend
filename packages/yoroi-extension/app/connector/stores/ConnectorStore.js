@@ -854,24 +854,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     ownAddresses: ?Set<string>
   ): Promise<{| amount: MultiToken, total: MultiToken |}> {
     if (!ownAddresses) {
-      const allBaseAddresses = [
-        ...publicDeriver.allAddresses.utxoAddresses,
-        ...publicDeriver.allAddresses.accountingAddresses,
-      ].filter(a => a.address.Type === CoreAddressTypes.CARDANO_BASE)
-      ownAddresses = new Set([
-        ...utxos.map(utxo => utxo.address),
-        ...(await _connectorGetUsedAddressesWithPaginate(
-          allBaseAddresses.filter(a => a.address.IsUsed).map(a => a.address.Hash),
-          allBaseAddresses.filter(a => !a.address.IsUsed).map(a => a.address.Hash),
-          new Set(_getOutputAddressesInSubmittedTxs(publicDeriver.submittedTransactions)),
-          null
-        )),
-        ...(await _connectorGetUnusedAddresses(
-          allBaseAddresses.filter(a => !a.address.IsUsed).map(a => a.address.Hash),
-          publicDeriver.submittedTransactions,
-        )),
-        publicDeriver.receiveAddress.addr.Hash,
-      ]);
+      ownAddresses = new Set(publicDeriver.allAddresses.utxoAddresses.map(a => a.address.Hash));
+      ownAddresses.add(publicDeriver.receiveAddress);
     }
 
     const defaultToken = {
@@ -899,6 +883,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         total.joinAddMutable(output.value);
       }
     }
+
     const amount = total.joinAddCopy(
       new MultiToken(
         [
