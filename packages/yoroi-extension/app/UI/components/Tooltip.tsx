@@ -18,13 +18,13 @@ export const Tooltip = ({ children, title, ...props }: Props): JSX.Element => {
         tooltip: {
           sx: {
             color: theme.palette.ds.text_primary_on,
-            bgcolor: theme.palette.ds.gray_c900,
+            bgcolor: theme.palette.ds.gray_900,
             borderRadius: `${theme.shape.borderRadius / 2}px`,
             padding: '5px 12px',
           },
         },
         arrow: {
-          sx: { color: theme.palette.ds.gray_c900 },
+          sx: { color: theme.palette.ds.gray_900 },
         },
       }}
       {...props}

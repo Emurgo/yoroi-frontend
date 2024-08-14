@@ -80,15 +80,11 @@ export default function CancelSwapOrderDialog({
     >
       <Box display="flex" flexDirection="column" gap="12px">
         <Box>
-          <Typography component="div" variant="body1">
+          <Typography component="div" variant="body1" color="ds.text_gray_medium">
             Are you sure you want to cancel this order?
           </Typography>
         </Box>
-        <AssetPair
-          from={order.from.token}
-          to={order.to.token}
-          defaultTokenInfo={defaultTokenInfo}
-        />
+        <AssetPair from={order.from.token} to={order.to.token} defaultTokenInfo={defaultTokenInfo} />
         <Box display="flex" flexDirection="column" gap="8px">
           <SummaryRow col1="Asset price">
             {order.price} {order.from.token.ticker}
@@ -96,10 +92,7 @@ export default function CancelSwapOrderDialog({
           <SummaryRow col1="Asset amount">
             {order.amount} {order.to.token.ticker}
           </SummaryRow>
-          <SummaryRow
-            col1="Total returned"
-            info="The amount returned to your wallet after cancelling the order"
-          >
+          <SummaryRow col1="Total returned" info="The amount returned to your wallet after cancelling the order">
             {transactionParams ? (
               transactionParams.returnValues.map((v, index) => (
                 <Box key={v.ticker}>
@@ -170,7 +163,7 @@ const SummaryRow = ({ col1, children, info = '' }) => (
       ) : null}
     </Box>
     <Box>
-      <Typography component="div" variant="body1">
+      <Typography component="div" variant="body1" color="ds.text_gray_medium">
         {children}
       </Typography>
     </Box>

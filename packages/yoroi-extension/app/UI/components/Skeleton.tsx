@@ -3,7 +3,7 @@ import { Skeleton as MuiSkeleton, SkeletonProps, styled } from '@mui/material';
 
 const StyledSkeleton = styled(MuiSkeleton)(({ theme }: any) => ({
   borderRadius: `${theme.shape.borderRadius}px`,
-  backgroundColor: theme.palette.ds.gray_c100,
+  backgroundColor: theme.palette.ds.gray_100,
   opacity: 0.8,
 }));
 

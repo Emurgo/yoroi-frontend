@@ -15,16 +15,17 @@ export default function Warning({ children }: Props): Node {
       sx={{
         p: '12px 15px 16px 16px',
         width: '100%',
-        backgroundColor: theme => theme.palette.yellow[100],
+        backgroundColor: theme => theme.palette.ds.sys_yellow_100,
         borderRadius: '8px',
       }}
     >
       <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px', mb: '8px' }}>
         <InfoWarningIcon />
-        <Typography component="div"
+        <Typography
+          component="div"
           variant="body1"
           fontWeight={500}
-          color={theme => theme.palette.yellow[500]}
+          color={theme => theme.palette.ds.sys_yellow_500}
           sx={{
             display: 'flex',
             alignItems: 'center',

@@ -20,13 +20,13 @@ const StyledButton = styled(Button)(({ theme, disabled, variant }: { theme: any;
   padding: '6px !important',
   minWidth: '36px',
   backgroundColor:
-    variant === 'contained' ? (disabled ? theme.palette.ds.gray_c100 : theme.palette.ds.el_primary_medium) : `transparent`,
+    variant === 'contained' ? (disabled ? theme.palette.ds.gray_100 : theme.palette.ds.el_primary_medium) : `transparent`,
 
   '&.MuiButton-contained': {
-    color: theme.palette.ds.el_static_white,
+    color: theme.palette.ds.white_static,
   },
   '&.MuiButton-secondary': {
-    color: disabled ? theme.palette.ds.gray_c100 : theme.palette.ds.text_primary_medium,
+    color: disabled ? theme.palette.ds.gray_100 : theme.palette.ds.text_primary_medium,
   },
 }));
 
@@ -78,14 +78,14 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
   return (
     <Stack
       direction="column"
-      spacing={theme.spacing(4)}  
+      spacing={theme.spacing(4)}
       sx={{ width: '100%', px: theme.spacing(3), pt: theme.spacing(2.5), pb: theme.spacing(3) }}
     >
       <Stack direction="row" justifyContent="space-between" alignItems="center">
         {isFetching ? (
           <Skeleton width="131px" height="13px" />
         ) : (
-          <Typography fontWeight="500" color="ds.gray_cmax">
+          <Typography fontWeight="500" color="ds.gray_max">
             {strings.marketPrice}
           </Typography>
         )}
@@ -93,7 +93,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
           {isFetching ? (
             <Skeleton width="64px" height="13px" />
           ) : (
-            <Stack direction="row" alignItems="flex-end" color="ds.gray_cmax">
+            <Stack direction="row" alignItems="flex-end" color="ds.gray_max">
               <Typography fontWeight="500">{formatNumber(detailInfo.fiatValue)}</Typography>
               {/* @ts-ignore */}
               <Typography variant="caption1" sx={{ marginBottom: theme.spacing(0.25) }}>
@@ -123,9 +123,9 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
                   label={
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
                       {detailInfo.value > 0 ? (
-                        <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
+                        <Icon.ChipArrowUp fill={theme.palette.ds.secondary_800} />
                       ) : detailInfo.value < 0 ? (
-                        <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
+                        <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_700} />
                       ) : null}
                       {/* @ts-ignore */}
                       <Typography variant="caption1">
@@ -203,7 +203,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
                   type="monotone"
                   dataKey="value"
                   strokeWidth={2}
-                  stroke={isFetching ? theme.palette.ds.gray_c50 : theme.palette.ds.primary_c600}
+                  stroke={isFetching ? theme.palette.ds.gray_50 : theme.palette.ds.primary_600}
                 />
               </LineChart>
             </ResponsiveContainer>

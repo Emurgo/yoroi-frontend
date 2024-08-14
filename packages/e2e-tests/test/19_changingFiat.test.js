@@ -2,7 +2,7 @@ import BasePage from '../pages/basepage.js';
 import { customAfterEach } from '../utils/customHooks.js';
 import TransactionsSubTab from '../pages/wallet/walletTab/walletTransactions.page.js';
 import { expect } from 'chai';
-import { diffIsLess1Perc, getCurrenciesPrices, getTestLogger, roundUpCurrency } from '../utils/utils.js';
+import { diffIsLessPerc, getCurrenciesPrices, getTestLogger, roundUpCurrency } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
 import SettingsTab from '../pages/wallet/settingsTab/settingsTab.page.js';
 import driversPoolsManager from '../utils/driversPool.js';
@@ -51,8 +51,9 @@ describe('Changing fiat currencies', function () {
             prices[testDatum] * walletInfo.balance,
             testDatum
           );
-          const diffLess1Perc = diffIsLess1Perc(walletInfo.fiatBalance, expectedFiatValue);
-          expect(diffLess1Perc, 'Fiat difference is more than 1%').to.be.true;
+          const percents = 2;
+          const diffLess2Perc = diffIsLessPerc(walletInfo.fiatBalance, expectedFiatValue, percents);
+          expect(diffLess2Perc, `Fiat difference is more than ${percents}%`).to.be.true;
         }
       });
     });

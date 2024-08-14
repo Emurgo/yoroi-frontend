@@ -9,9 +9,9 @@ const StyledInput = styled(Input)(({ theme }: any) => ({
   height: '40px',
   padding: `${theme.spacing(1)} ${theme.spacing(2)} ${theme.spacing(1)} ${theme.spacing(1)}`,
   border: '1px solid',
-  borderColor: theme.palette.ds.gray_c400,
+  borderColor: theme.palette.ds.gray_400,
   'input::placeholder': {
-    color: theme.palette.ds.gray_c600,
+    color: theme.palette.ds.gray_600,
   },
 }));
 
@@ -37,7 +37,7 @@ export const SearchInput = (props: InputProps) => {
             cursor: 'pointer',
           }}
         >
-          <Icon.Search fill={theme.palette.ds.gray_c900} />
+          <Icon.Search fill={theme.palette.ds.gray_900} />
         </InputAdornment>
       }
       {...props}

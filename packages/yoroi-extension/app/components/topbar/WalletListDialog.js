@@ -9,8 +9,8 @@ import { BigNumber } from 'bignumber.js';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import { ReactComponent as IconEyeOpen } from '../../assets/images/my-wallets/icon_eye_open.inline.svg';
-import { ReactComponent as IconEyeClosed } from '../../assets/images/my-wallets/icon_eye_closed.inline.svg';
+import { ReactComponent as IconEyeOpen } from '../../assets/images/my-wallets/icon_eye_opened_revamp.inline.svg';
+import { ReactComponent as IconEyeClosed } from '../../assets/images/my-wallets/icon_eye_closed_revamp.inline.svg';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { Box } from '@mui/system';
@@ -21,6 +21,7 @@ import styles from './WalletListDialog.scss';
 import WalletCard from './WalletCard';
 import globalMessages from '../../i18n/global-messages';
 import AmountDisplay, { FiatDisplay } from '../common/AmountDisplay';
+import { Typography, styled } from '@mui/material';
 
 const messages = defineMessages({
   addWallet: {
@@ -40,6 +41,15 @@ const messages = defineMessages({
     defaultMessage: '!!!Cardano, ADA',
   },
 });
+
+const IconWrapper = styled(Box)(({ theme }) => ({
+  marginTop: '32px',
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_medium,
+    },
+  },
+}));
 
 type Props = {|
   +close: void => void,
@@ -122,11 +132,7 @@ export default class WalletListDialog extends Component<Props, State> {
 
     this.setState(
       prev => {
-        const walletListIdx = reorder(
-          prev.cardanoWalletsIdx,
-          result.source.index,
-          result.destination.index
-        );
+        const walletListIdx = reorder(prev.cardanoWalletsIdx, result.source.index, result.destination.index);
         return {
           cardanoWalletsIdx: walletListIdx,
         };
@@ -147,8 +153,7 @@ export default class WalletListDialog extends Component<Props, State> {
   };
 
   isCurrentWallet(wallet: PublicDeriver<>, compareWith: 'local' | 'global'): boolean {
-    const selectedWallet =
-      compareWith === 'local' ? this.state.selectedWallet : this.props.selectedWallet;
+    const selectedWallet = compareWith === 'local' ? this.state.selectedWallet : this.props.selectedWallet;
     return wallet.getPublicDeriverId() === selectedWallet?.getPublicDeriverId();
   }
 
@@ -185,9 +190,7 @@ export default class WalletListDialog extends Component<Props, State> {
             id: 'changeWalletDialog-applyWallet-button',
             onClick: this.onSelect,
             size: 'large',
-            disabled:
-              this.state.selectedWallet === null ||
-              this.isCurrentWallet(this.state.selectedWallet, 'global'),
+            disabled: this.state.selectedWallet === null || this.isCurrentWallet(this.state.selectedWallet, 'global'),
             primary: true,
             label: intl.formatMessage(messages.applyWallet),
           },
@@ -200,12 +203,24 @@ export default class WalletListDialog extends Component<Props, State> {
             <div className={styles.totalInfo}>
               {walletsTotal !== undefined && (
                 <div className={styles.amount}>
-                  <div className={styles.label}>{intl.formatMessage(messages.totalBalance)}</div>
-                  <div className={styles.value}>{walletsTotal}</div>
+                  <Typography variant="body2" mb="4px" color="ds.text_gray_medium">
+                    {intl.formatMessage(messages.totalBalance)}
+                  </Typography>
+                  <Typography variant="body1" mt="10px" fontWeight="500" color="ds.text_gray_medium">
+                    {walletsTotal}
+                  </Typography>
                 </div>
               )}
               <button type="button" className={styles.toggleButton} onClick={onUpdateHideBalance}>
-                {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
+                {shouldHideBalance ? (
+                  <IconWrapper>
+                    <IconEyeClosed />
+                  </IconWrapper>
+                ) : (
+                  <IconWrapper>
+                    <IconEyeOpen />
+                  </IconWrapper>
+                )}
               </button>
             </div>
           </div>
@@ -257,24 +272,13 @@ export default class WalletListDialog extends Component<Props, State> {
   }
 
   renderWalletsTotal(): ?Node {
-    const {
-      unitOfAccountSetting,
-      cardanoWallets,
-      shouldHideBalance,
-      getCurrentPrice,
-    } = this.props;
+    const { unitOfAccountSetting, cardanoWallets, shouldHideBalance, getCurrentPrice } = this.props;
     if (unitOfAccountSetting.enabled) {
       const adaFiat = this.sumWallets(cardanoWallets).fiat;
       if (adaFiat != null) {
         const totalFiat = adaFiat;
         const { currency } = unitOfAccountSetting;
-        return (
-          <FiatDisplay
-            shouldHideBalance={shouldHideBalance}
-            amount={totalFiat}
-            currency={currency}
-          />
-        );
+        return <FiatDisplay shouldHideBalance={shouldHideBalance} amount={totalFiat} currency={currency} />;
       }
     }
     // either unit of account is not enabled, or fails to convert to fiat

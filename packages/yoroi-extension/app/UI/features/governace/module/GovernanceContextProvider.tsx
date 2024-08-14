@@ -76,7 +76,7 @@ export const GovernanceContextProvider = ({ children, currentWallet }: Governanc
         });
 
         const governanceStatus = await govApi.getAccountState(skey, skey);
-        console.log('governanceStatus', governanceStatus);
+        console.log('[governanceStatus]', governanceStatus);
 
         return null;
       })

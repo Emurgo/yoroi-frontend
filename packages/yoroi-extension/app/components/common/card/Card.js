@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, styled } from '@mui/material';
 import styles from './Card.scss';
 
 type Props = {|
@@ -12,14 +12,19 @@ type Props = {|
   style?: Object,
 |};
 
+const CardWrapper = styled('button')(({ theme }) => ({
+  background: theme.palette.ds.bg_gradient_1,
+}));
+
 export default function Card(props: Props): Node {
   const { label, description, imageSrc, onClick, style } = props;
   return (
-    <button onClick={onClick} className={styles.component} style={style}>
+    <CardWrapper onClick={onClick} className={styles.component} style={style}>
       <Box>
         <img src={imageSrc} alt={label} />
       </Box>
-      <Typography component="div"
+      <Typography
+        component="div"
         variant="h3"
         color="grayscale.max"
         fontWeight={500}
@@ -34,6 +39,6 @@ export default function Card(props: Props): Node {
         {description}
       </Typography>
       {props.children}
-    </button>
+    </CardWrapper>
   );
 }

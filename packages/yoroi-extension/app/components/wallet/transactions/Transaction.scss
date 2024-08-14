@@ -210,18 +210,13 @@
       margin-bottom: 8px;
     }
   }
-  .notLast {
-    .closed {
-      border-bottom: 1px solid var(--yoroi-palette-gray-200);
-    }
-  }
+  
 
   .details {
     height: auto;
 
     .addressContent {
       display: flex;
-      border-bottom: 1px solid var(--yoroi-palette-gray-200);
       & > div {
         flex: 1 1 50%;
         padding-top: 16px;
@@ -265,7 +260,6 @@
         padding-top: 16px;
         padding-left: 24px;
         padding-right: 24px;
-        border-bottom: 1px solid var(--yoroi-palette-gray-200);
       }
 
       & > div:last-child {
@@ -330,7 +324,7 @@
       }
 
       span {
-        color: var(--yoroi-palette-gray-800);
+        color: #242838;
         font-weight: 400;
         font-size: 14px;
         margin-left: 6px;

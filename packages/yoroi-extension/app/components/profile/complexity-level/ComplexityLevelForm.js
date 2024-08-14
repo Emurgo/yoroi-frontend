@@ -57,6 +57,7 @@ type Props = {|
   +onSubmit: ComplexityLevelType => PossiblyAsync<void>,
   +isSubmitting: boolean,
   +error?: ?LocalizableError,
+  +baseTheme?: string,
 |};
 
 type InjectedProps = {| +isRevampLayout: boolean |};
@@ -72,7 +73,7 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
 
   render(): Node {
     const { intl } = this.context;
-    const { complexityLevel, isSubmitting, isRevampLayout } = this.props;
+    const { complexityLevel, isSubmitting, isRevampLayout, baseTheme } = this.props;
 
     const levels = [
       {
@@ -92,18 +93,13 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
     return (
       <Box className={styles.component}>
         {isRevampLayout && (
-          <Typography component="div"
-            textAlign="center"
-            color="grayscale.900"
-            mb="16px"
-            variant="h3"
-            fontWeight={500}
-          >
+          <Typography component="div" textAlign="center" color="grayscale.900" mb="16px" variant="h3" fontWeight={500}>
             {intl.formatMessage(settingsMenuMessages.levelOfComplexity)}
           </Typography>
         )}
 
-        <Typography component="div"
+        <Typography
+          component="div"
           textAlign="center"
           variant="body1"
           color={isRevampLayout ? 'grayscale.800' : 'var(--yoroi-palette-gray-600)'}
@@ -112,7 +108,8 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
         </Typography>
 
         {complexityLevel && (
-          <Typography component="div"
+          <Typography
+            component="div"
             variant="body1"
             my="1rem"
             mx="auto"
@@ -129,9 +126,7 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
               {...messages.selectedLevelLabel}
               values={{
                 level: intl.formatMessage(
-                  complexityLevel === ComplexityLevels.Advanced
-                    ? messages.titleAdvancedLevel
-                    : messages.titleSimpleLevel
+                  complexityLevel === ComplexityLevels.Advanced ? messages.titleAdvancedLevel : messages.titleSimpleLevel
                 ),
               }}
             />
@@ -167,8 +162,12 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
                     border: 'solid 1px transparent',
                     background: theme =>
                       isSelected
-                        ? theme.palette.gradients.green
-                        : 'linear-gradient( 0deg, var(--yoroi-palette-common-white), var(--yoroi-palette-common-white)), linear-gradient(180deg, #e4e8f7 0%, #c6f7f7 100%)',
+                        ? baseTheme === 'light-theme'
+                          ? theme.palette.gradients.green
+                          : theme.palette.gradients_2
+                        : baseTheme === 'light-theme'
+                        ? 'linear-gradient( 0deg, var(--yoroi-palette-common-white), var(--yoroi-palette-common-white)), linear-gradient(180deg, #e4e8f7 0%, #c6f7f7 100%)'
+                        : theme.palette.ds.bg_gradient_3,
                     backgroundClip: 'content-box, border-box',
                     backgroundOrigin: 'border-box',
                     borderRadius: '8px',
@@ -201,7 +200,9 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
                       <Typography component="div" mb="4px" variant="h3" fontWeight={500}>
                         {level.name}
                       </Typography>
-                      <Typography component="div" variant="body2">{level.description}</Typography>
+                      <Typography component="div" variant="body2">
+                        {level.description}
+                      </Typography>
                     </Box>
                   </Box>
                 </Box>
@@ -212,9 +213,7 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
           <div className={styles.cardsWrapper}>
             {levels.map(level => (
               <div className={styles.card} key={level.key}>
-                <div className={classnames([styles.cardImage, styles[level.key]])}>
-                  {level.image}
-                </div>
+                <div className={classnames([styles.cardImage, styles[level.key]])}>{level.image}</div>
                 <div className={styles.cardContent}>
                   <div>
                     <h3>{level.name}</h3>

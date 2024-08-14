@@ -41,7 +41,7 @@ const useChart = (data: IChartData) => {
         y={y}
         dy={4}
         textAnchor="end"
-        sx={{ color: theme.palette.ds.gray_c700, fontSize: '0.75rem', lineHeight: '1rem', fontWeight: 400 }}
+        sx={{ color: theme.palette.ds.gray_700, fontSize: '0.75rem', lineHeight: '1rem', fontWeight: 400 }}
       >
         {payload.value.toFixed(1)}
       </Box>
@@ -82,9 +82,9 @@ const useChart = (data: IChartData) => {
       <svg>
         {isDragging && (
           <g>
-            <circle cx={cx} cy={cy} r={5} fill={theme.palette.ds.primary_c500} />
+            <circle cx={cx} cy={cy} r={5} fill={theme.palette.ds.primary_500} />
 
-            <line x1={cx} y1={cy} x2={cx} y2={rectY} stroke={theme.palette.ds.primary_c500} strokeDasharray="5,5" />
+            <line x1={cx} y1={cy} x2={cx} y2={rectY} stroke={theme.palette.ds.primary_500} strokeDasharray="5,5" />
 
             <Box
               component="rect"
@@ -92,7 +92,7 @@ const useChart = (data: IChartData) => {
               y={rectY}
               width={rectWidth}
               height={rectHeight}
-              fill={theme.palette.ds.primary_c500}
+              fill={theme.palette.ds.primary_500}
               rx={5}
               ry={5}
             ></Box>
@@ -101,7 +101,7 @@ const useChart = (data: IChartData) => {
               x={rectX + rectWidth / 2}
               y={rectY + rectHeight / 2}
               textAnchor="middle"
-              fill={theme.palette.ds.primary_c200}
+              fill={theme.palette.ds.primary_200}
               alignmentBaseline="middle"
               sx={{
                 fontFamily: theme.typography.fontFamily,

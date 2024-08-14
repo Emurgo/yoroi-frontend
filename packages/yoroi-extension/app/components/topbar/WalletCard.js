@@ -11,7 +11,7 @@ import { MultiToken } from '../../api/common/lib/MultiToken';
 import classnames from 'classnames';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import { isLedgerNanoWallet, isTrezorTWallet, } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import globalMessages from '../../i18n/global-messages';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { ReactComponent as DragIcon } from '../../assets/images/add-wallet/wallet-list/drag.inline.svg';
@@ -20,6 +20,7 @@ import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import AmountDisplay from '../common/AmountDisplay';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import { maybe } from '../../coreUtils';
+import { Box, Typography } from '@mui/material';
 
 const messages = defineMessages({
   tokenTypes: {
@@ -58,11 +59,7 @@ export function constructPlate(
   return [
     plate.TextPart,
     <div className={divClass}>
-      <WalletAccountIcon
-        iconSeed={plate.ImagePart}
-        saturationFactor={saturationFactor}
-        scalePx={6}
-      />
+      <WalletAccountIcon iconSeed={plate.ImagePart} saturationFactor={saturationFactor} scalePx={6} />
     </div>,
   ];
 }
@@ -103,19 +100,10 @@ export default class WalletCard extends Component<Props, State> {
 
   render(): Node {
     const { intl } = this.context;
-    const {
-      shouldHideBalance,
-      walletId,
-      idx,
-      unitOfAccountSetting,
-      getCurrentPrice,
-      id,
-    } = this.props;
+    const { shouldHideBalance, walletId, idx, unitOfAccountSetting, getCurrentPrice, id } = this.props;
     const { isActionsShow } = this.state;
 
-    const [, iconComponent] = this.props.plate
-      ? constructPlate(this.props.plate, 0, styles.icon)
-      : [];
+    const [, iconComponent] = this.props.plate ? constructPlate(this.props.plate, 0, styles.icon) : [];
 
     const typeText = [this.getType(this.props.settingsCache.conceptualWallet)]
       .filter(text => text != null)
@@ -130,102 +118,113 @@ export default class WalletCard extends Component<Props, State> {
     const walletNFTsAmountId = `${id}:walletCard_${idx}-walletNFTsAmount-text`;
 
     return (
-      <Draggable draggableId={walletId.toString()} index={idx}>
-        {(provided, snapshot) => (
-          <div
-            tabIndex="0"
-            role="button"
-            className={classnames(
-              styles.cardWrapper,
-              this.props.isCurrentWallet === true && styles.currentCardWrapper,
-              snapshot.isDragging === true && styles.isDragging
-            )}
-            onMouseEnter={this.showActions}
-            onMouseLeave={this.hideActions}
-            {...provided.draggableProps}
-            ref={provided.innerRef}
-          >
+      <Box sx={{ background: 'ds.bg_color_min' }} mb="16px">
+        <Draggable draggableId={walletId.toString()} index={idx}>
+          {(provided, snapshot) => (
             <div
-              className={styles.main}
-              role="button"
               tabIndex="0"
-              onClick={this.props.onSelect}
-              onKeyDown={this.props.onSelect}
-              id={buttonId}
-            >
-              <div className={styles.header}>
-                <h5 className={styles.name} id={walletNameId}>{this.props.settingsCache.conceptualWalletName}</h5>
-                {' ·  '}
-                <div className={styles.type}>{typeText}</div>
-              </div>
-              <div className={styles.body}>
-                <div>{iconComponent}</div>
-                <div className={styles.content}>
-                  <AmountDisplay
-                    shouldHideBalance={shouldHideBalance}
-                    amount={totalAmount}
-                    getTokenInfo={this.props.getTokenInfo}
-                    showFiat
-                    showAmount
-                    unitOfAccountSetting={unitOfAccountSetting}
-                    getCurrentPrice={getCurrentPrice}
-                    id={walletBalanceId}
-                  />
-                </div>
-                <div className={styles.extraInfo}>
-                  <div className={styles.label}>
-                    {intl.formatMessage(messages.tokenTypes)}{' '}
-                    <span className={styles.value} id={walletTokensAmountId}>{tokenTypes}</span>
-                  </div>
-                  <div className={styles.label}>
-                    NFTs <span className={styles.value} id={walletNFTsAmountId}>{nfts}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div
+              role="button"
               className={classnames(
-                styles.actions,
-                (isActionsShow === true || snapshot.isDragging === true) && styles.showActions
+                styles.cardWrapper,
+                this.props.isCurrentWallet === true && styles.currentCardWrapper,
+                snapshot.isDragging === true && styles.isDragging
               )}
+              onMouseEnter={this.showActions}
+              onMouseLeave={this.hideActions}
+              {...provided.draggableProps}
+              ref={provided.innerRef}
             >
-              <div {...provided.dragHandleProps}>
-                <DragIcon />
+              <div
+                className={styles.main}
+                role="button"
+                tabIndex="0"
+                onClick={this.props.onSelect}
+                onKeyDown={this.props.onSelect}
+                id={buttonId}
+              >
+                <div className={styles.header}>
+                  <Typography id={walletNameId} variant="body2" color="ds.text_gray_medium" mr="5px">
+                    {this.props.settingsCache.conceptualWalletName}
+                  </Typography>
+                  {' ·  '}
+                  <Typography variant="body2" color="ds.text_gray_medium" ml="5px">
+                    {typeText}
+                  </Typography>
+                </div>
+                <div className={styles.body}>
+                  <div>{iconComponent}</div>
+                  <div className={styles.content}>
+                    <AmountDisplay
+                      shouldHideBalance={shouldHideBalance}
+                      amount={totalAmount}
+                      getTokenInfo={this.props.getTokenInfo}
+                      showFiat
+                      showAmount
+                      unitOfAccountSetting={unitOfAccountSetting}
+                      getCurrentPrice={getCurrentPrice}
+                      id={walletBalanceId}
+                    />
+                  </div>
+                  <div className={styles.extraInfo}>
+                    <div className={styles.label}>
+                      {intl.formatMessage(messages.tokenTypes)}{' '}
+                      <span className={styles.value} id={walletTokensAmountId}>
+                        {tokenTypes}
+                      </span>
+                    </div>
+                    <div className={styles.label}>
+                      NFTs{' '}
+                      <span className={styles.value} id={walletNFTsAmountId}>
+                        {nfts}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                className={classnames(
+                  styles.actions,
+                  (isActionsShow === true || snapshot.isDragging === true) && styles.showActions
+                )}
+              >
+                <div {...provided.dragHandleProps}>
+                  <DragIcon />
+                </div>
               </div>
             </div>
-          </div>
-        )}
-      </Draggable>
+          )}
+        </Draggable>
+      </Box>
     );
   }
 
   getTotalAmount: void => ?MultiToken = () => {
-    return maybe(this.props.walletAmount,
-      w => this.props.rewards?.joinAddCopy(w) ?? w)
+    return maybe(this.props.walletAmount, w => this.props.rewards?.joinAddCopy(w) ?? w);
   };
 
-  countTokenTypes: void => {|tokenTypes: number, nfts: number|} = () => {
-    if (this.props.walletAmount
-      && this.props.walletAmount.values
-      && Array.isArray(this.props.walletAmount.values)) {
-      const count = this.props.walletAmount.values.reduce((prev, curr) => {
-        const tokenInfo = this.props.getTokenInfo(curr);
-        if (tokenInfo.Identifier !== '' && !tokenInfo.IsDefault) {
-          if (tokenInfo.IsNFT === true) {
-            prev.nfts++;
-          } else {
-            prev.tokenTypes++;
+  countTokenTypes: void => {| tokenTypes: number, nfts: number |} = () => {
+    if (this.props.walletAmount && this.props.walletAmount.values && Array.isArray(this.props.walletAmount.values)) {
+      const count = this.props.walletAmount.values.reduce(
+        (prev, curr) => {
+          const tokenInfo = this.props.getTokenInfo(curr);
+          if (tokenInfo.Identifier !== '' && !tokenInfo.IsDefault) {
+            if (tokenInfo.IsNFT === true) {
+              prev.nfts++;
+            } else {
+              prev.tokenTypes++;
+            }
           }
-        }
-        return prev;
-      }, { tokenTypes: 0, nfts: 0 });
+          return prev;
+        },
+        { tokenTypes: 0, nfts: 0 }
+      );
 
       return count;
     }
 
     return {
       tokenTypes: 0,
-      nfts: 0
+      nfts: 0,
     };
   };
 }

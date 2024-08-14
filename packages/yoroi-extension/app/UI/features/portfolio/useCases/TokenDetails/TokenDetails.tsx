@@ -90,7 +90,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
           }}
         >
           <BackIcon />
-          <Typography variant="body2" fontWeight="500" color="ds.text_gray_normal" sx={{ textTransform: 'uppercase' }}>
+          <Typography variant="body2" fontWeight="500" color="ds.text_gray_medium" sx={{ textTransform: 'uppercase' }}>
             {strings.backToPortfolio}
           </Typography>
         </Box>
@@ -105,7 +105,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
         <TokenInfo direction="row" spacing={theme.spacing(3)}>
           <Card>
             <Stack direction="column" spacing={theme.spacing(2)} sx={{ padding: theme.spacing(3) }}>
-              <Typography fontWeight="500" color="ds.gray_c900">
+              <Typography fontWeight="500" color="ds.gray_900">
                 {isLoading ? <Skeleton width="82px" height="16px" /> : `${tokenInfo.name} ${strings.balance}`}
               </Typography>
 
@@ -114,7 +114,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
                   <Skeleton width="146px" height="24px" />
                 ) : (
                   <Stack direction="row" spacing={theme.spacing(0.25)} alignItems="flex-end">
-                    <Typography variant="h2" fontWeight="500" color="ds.gray_cmax">
+                    <Typography variant="h2" fontWeight="500" color="ds.gray_max">
                       {formatNumber(tokenInfo.totalAmount)}
                     </Typography>
                     <Typography
@@ -133,7 +133,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
                 {isLoading ? (
                   <Skeleton width="129px" height="16px" />
                 ) : (
-                  <Typography color="ds.gray_c600">
+                  <Typography color="ds.gray_600">
                     {formatNumber(tokenInfo.totalAmountUsd)} {isAda && unitOfAccount === 'ADA' ? 'USD' : unitOfAccount}
                   </Typography>
                 )}

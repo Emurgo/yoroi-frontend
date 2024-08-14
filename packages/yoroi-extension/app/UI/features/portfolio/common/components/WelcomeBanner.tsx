@@ -20,10 +20,10 @@ const WelcomeBanner = () => {
       <Stack direction="row" alignItems="center" justifyContent="space-between">
         <Stack direction="column" spacing={theme.spacing(6)} sx={{ padding: theme.spacing(3) }}>
           <Stack direction="column" spacing={theme.spacing(1)} maxWidth={'450px'}>
-            <Typography variant="h3" fontWeight="500" color="ds.gray_cmax">
+            <Typography variant="h3" fontWeight="500" color="ds.gray_max">
               {strings.welcomeBannerTitle}
             </Typography>
-            <Typography color="ds.gray_cmax">{strings.welcomeBannerDesc}</Typography>
+            <Typography color="ds.gray_max">{strings.welcomeBannerDesc}</Typography>
           </Stack>
 
           <Stack direction="row" spacing={theme.spacing(2)}>

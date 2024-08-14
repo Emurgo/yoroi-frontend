@@ -41,7 +41,7 @@ const TokenDetailPerformance = ({ tokenInfo, isLoading }: Props): JSX.Element =>
 
   return (
     <Stack direction="column">
-      <Typography fontWeight="500" color="ds.gray_cmax" sx={{ marginBottom: theme.spacing(2) }}>
+      <Typography fontWeight="500" color="ds.gray_max" sx={{ marginBottom: theme.spacing(2) }}>
         {strings.marketData}
       </Typography>
       <Stack direction="column" spacing={1}>
@@ -53,11 +53,11 @@ const TokenDetailPerformance = ({ tokenInfo, isLoading }: Props): JSX.Element =>
             alignItems="center"
             sx={{ paddingBottom: item.type === PerformanceItemType.RANK ? theme.spacing(1) : '' }}
           >
-            <Typography color="ds.gray_c600">{item.label}</Typography>
+            <Typography color="ds.gray_600">{item.label}</Typography>
             {isLoading ? (
               <Skeleton width="84px" height="20px" />
             ) : (
-              <Typography color="ds.gray_cmax">
+              <Typography color="ds.gray_max">
                 {tokenInfo?.performance[index]?.value ? (
                   <>
                     {item.type === PerformanceItemType.RANK && '#'}
@@ -76,11 +76,11 @@ const TokenDetailPerformance = ({ tokenInfo, isLoading }: Props): JSX.Element =>
       <Stack direction="column" spacing={'0.375rem'} sx={{ marginTop: theme.spacing(1) }}>
         {secondPerformanceItemList.map((item, index) => (
           <Stack key={item.id} direction="row" justifyContent="space-between" alignItems="center">
-            <Typography color="ds.gray_c600">{item.label}</Typography>
+            <Typography color="ds.gray_600">{item.label}</Typography>
             {isLoading ? (
               <Skeleton width="84px" height="20px" />
             ) : (
-              <Typography color="ds.gray_cmax">
+              <Typography color="ds.gray_max">
                 {tokenInfo?.performance[index]?.value ? (
                   <>
                     {item.type === PerformanceItemType.RANK && '#'}
