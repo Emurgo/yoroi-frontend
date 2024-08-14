@@ -148,18 +148,18 @@ export const DarkButton: any = {
 
 function getContainedStyles(variant: 'primary' | 'secondary', themePalette: Object): Object {
   return {
-    backgroundColor: themePalette[`${variant}_c500`],
+    backgroundColor: themePalette[`${variant}_500`],
     color: themePalette.gray_min,
-    ':hover': { backgroundColor: themePalette[`${variant}_c600`] },
-    ':active': { backgroundColor: themePalette[`${variant}_c700`] },
+    ':hover': { backgroundColor: themePalette[`${variant}_600`] },
+    ':active': { backgroundColor: themePalette[`${variant}_700`] },
     ':focus': {
-      backgroundColor: themePalette[`${variant}_c500`],
+      backgroundColor: themePalette[`${variant}_500`],
       outline: '2px solid',
       outlineColor: themePalette.sys_yellow_500,
     },
     '&.Mui-disabled': {
       color: themePalette.gray_min,
-      backgroundColor: themePalette[`${variant}_c300`],
+      backgroundColor: themePalette[`${variant}_300`],
       cursor: 'not-allowed',
       pointerEvents: 'unset',
     },
@@ -172,44 +172,44 @@ function getContainedStyles(variant: 'primary' | 'secondary', themePalette: Obje
 function getOutlinedStyles(variant: 'primary' | 'secondary', themePalette: Object): Object {
   return {
     backgroundColor: 'transparent',
-    color: themePalette[`${variant}_c500`],
+    color: themePalette[`${variant}_500`],
     border: '2px solid',
-    borderColor: themePalette[`${variant}_c500`],
+    borderColor: themePalette[`${variant}_500`],
     ':hover': {
       border: '2px solid',
-      color: themePalette[`${variant}_c600`],
-      borderColor: themePalette[`${variant}_c600`],
+      color: themePalette[`${variant}_600`],
+      borderColor: themePalette[`${variant}_600`],
     },
-    ':active': { borderColor: themePalette[`${variant}_c700`] },
+    ':active': { borderColor: themePalette[`${variant}_700`] },
     ':focus': {
-      borderColor: themePalette[`${variant}_c500`],
+      borderColor: themePalette[`${variant}_500`],
       outline: '2px solid',
       outlineColor: themePalette.sys_yellow_500,
     },
     '&.Mui-disabled': {
       border: '2px solid',
-      borderColor: themePalette[`${variant}_c200`],
-      color: themePalette[`${variant}_c200`],
+      borderColor: themePalette[`${variant}_200`],
+      color: themePalette[`${variant}_200`],
       cursor: 'not-allowed',
       pointerEvents: 'unset',
     },
-    '& .MuiLoadingButton-loadingIndicator': { color: themePalette[`${variant}_c600`] },
-    '& .MuiButton-startIcon svg': { fill: themePalette[`${variant}_c500`] },
-    '& .MuiButton-startIcon svg path': { fill: themePalette[`${variant}_c500`] },
+    '& .MuiLoadingButton-loadingIndicator': { color: themePalette[`${variant}_600`] },
+    '& .MuiButton-startIcon svg': { fill: themePalette[`${variant}_500`] },
+    '& .MuiButton-startIcon svg path': { fill: themePalette[`${variant}_500`] },
   };
 }
 
 function getTertiaryStyles(variant: 'primary' | 'grayscale', themePalette: Object): Object {
   return {
     backgroundColor: 'transparent',
-    color: themePalette[`${variant}_c500`],
+    color: themePalette[`${variant}_500`],
     ':hover': {
       backgroundColor: themePalette.gray_50,
-      color: themePalette[`${variant}_c600`],
+      color: themePalette[`${variant}_600`],
     },
     ':active': {
       backgroundColor: themePalette.gray_100,
-      color: themePalette[`${variant}_c700`],
+      color: themePalette[`${variant}_700`],
     },
     ':focus': {
       outline: '2px solid',
@@ -217,13 +217,13 @@ function getTertiaryStyles(variant: 'primary' | 'grayscale', themePalette: Objec
     },
     '&.Mui-disabled': {
       border: '2px solid',
-      borderColor: themePalette[`${variant}_c200`],
-      color: themePalette[`${variant}_c200`],
+      borderColor: themePalette[`${variant}_200`],
+      color: themePalette[`${variant}_200`],
       cursor: 'not-allowed',
       pointerEvents: 'unset',
     },
-    '& .MuiLoadingButton-loadingIndicator': { color: themePalette[`${variant}_c600`] },
-    '& .MuiButton-startIcon svg': { fill: themePalette[`${variant}_c500`] },
-    '& .MuiButton-startIcon svg path': { fill: themePalette[`${variant}_c500`] },
+    '& .MuiLoadingButton-loadingIndicator': { color: themePalette[`${variant}_600`] },
+    '& .MuiButton-startIcon svg': { fill: themePalette[`${variant}_500`] },
+    '& .MuiButton-startIcon svg path': { fill: themePalette[`${variant}_500`] },
   };
 }
