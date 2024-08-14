@@ -159,7 +159,7 @@ export default class WalletRowRevamp extends Component<Props, State> {
 const SIconButton = styled(Box)(({ theme, active }) => ({
   '& svg': {
     '& path': {
-      fill: theme.palette.ds.el_gray_normal,
+      fill: theme.palette.ds.el_gray_medium,
     },
   },
 }));

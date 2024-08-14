@@ -46,7 +46,7 @@ class NavBarRevamp extends Component<Props> {
           <Box
             as="header"
             sx={{
-              color: 'ds.el_gray_normal',
+              color: 'ds.el_gray_medium',
               display: 'flex',
               alignItems: 'center',
               height: 'inherit',
@@ -63,7 +63,7 @@ class NavBarRevamp extends Component<Props> {
               }}
             >
               <Box flex="0 0 auto">
-                <Typography color="ds.el_gray_normal">{title}</Typography>
+                <Typography color="ds.el_gray_medium">{title}</Typography>
               </Box>
               <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
                 {children}

@@ -127,7 +127,7 @@ export const HelperTooltip = (withLayout(HelperTooltipComp): ComponentType<Helpe
 const IconWrapper = styled(Box)(({ theme }) => ({
   '& svg': {
     '& path': {
-      fill: theme.palette.ds.el_gray_normal,
+      fill: theme.palette.ds.el_gray_medium,
     },
   },
 }));

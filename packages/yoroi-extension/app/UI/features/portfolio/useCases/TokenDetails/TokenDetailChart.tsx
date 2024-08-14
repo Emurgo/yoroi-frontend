@@ -23,7 +23,7 @@ const StyledButton = styled(Button)(({ theme, disabled, variant }: { theme: any;
     variant === 'contained' ? (disabled ? theme.palette.ds.gray_c100 : theme.palette.ds.el_primary_medium) : `transparent`,
 
   '&.MuiButton-contained': {
-    color: theme.palette.ds.el_static_white,
+    color: theme.palette.ds.white_static,
   },
   '&.MuiButton-secondary': {
     color: disabled ? theme.palette.ds.gray_c100 : theme.palette.ds.text_primary_medium,
@@ -78,7 +78,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
   return (
     <Stack
       direction="column"
-      spacing={theme.spacing(4)}  
+      spacing={theme.spacing(4)}
       sx={{ width: '100%', px: theme.spacing(3), pt: theme.spacing(2.5), pb: theme.spacing(3) }}
     >
       <Stack direction="row" justifyContent="space-between" alignItems="center">

@@ -89,13 +89,13 @@ const tabs = [
 ];
 
 const SButton = styled(Button)(({ theme }) => ({
-  color: theme.palette.ds.el_gray_normal,
+  color: theme.palette.ds.el_gray_medium,
   '&.MuiButton-sizeMedium': {
     padding: '13px 16px',
   },
   '& svg': {
     '& path': {
-      fill: theme.palette.ds.el_gray_normal,
+      fill: theme.palette.ds.el_gray_medium,
     },
   },
 }));
@@ -107,7 +107,7 @@ const CopyButton = styled(Button)(({ theme }) => ({
   color: 'grayscale.900',
   '& svg': {
     '& path': {
-      fill: theme.palette.ds.el_gray_normal,
+      fill: theme.palette.ds.el_gray_medium,
     },
   },
 }));
@@ -115,7 +115,7 @@ const CopyButton = styled(Button)(({ theme }) => ({
 const SImageButton = styled(IconButton)(({ theme }) => ({
   '& svg': {
     '& path': {
-      fill: theme.palette.ds.el_gray_normal,
+      fill: theme.palette.ds.el_gray_medium,
     },
   },
 }));
@@ -220,7 +220,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                   variant="h2"
                   fontWeight={500}
                   sx={{ width: below1400 ? '200px' : '400px' }}
-                  color="ds.el_gray_normal"
+                  color="ds.el_gray_medium"
                 >
                   {nftInfo.name}
                 </TruncatedText>
@@ -410,10 +410,10 @@ const ImageItem = styled(Box)({
 function LabelWithValue({ label, value }: {| label: string | Node, value: string | Node |}): Node {
   return (
     <Box>
-      <Typography component="div" color="ds.el_gray_medium">
+      <Typography component="div" color="ds.el_gray_low">
         {label}
       </Typography>
-      <Typography component="div" color="ds.el_gray_normal">
+      <Typography component="div" color="ds.el_gray_medium">
         {value}
       </Typography>
     </Box>

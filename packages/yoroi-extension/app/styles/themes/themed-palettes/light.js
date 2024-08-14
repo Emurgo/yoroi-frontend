@@ -26,12 +26,14 @@ export const light = {
 
   el_primary_max: lightPalette.primary_c600, // hover'nd pressed state, actianable elements
   el_primary_medium: lightPalette.primary_c500, // actionable elements
-  el_primary_low: lightPalette.primary_c300, // disabled elements, icons
-  el_gray_high: lightPalette.gray_cmax, // hover and pressed, icons, shapes, lines in buttons, icons in banners
-  el_gray_normal: lightPalette.gray_c900, // icons, shapes, lines in buttons, chips, tabs, checkboxes, readio, switch
-  el_gray_medium: lightPalette.gray_c600, // icons, shapes, inputs, bottom navigation bar
-  el_gray_low: lightPalette.gray_c400, // input stroke, disabled state for most components
-  el_secondary_medium: lightPalette.secondary_c400, // success state
+  el_primary_min: lightPalette.primary_c300, // disabled elements, icons
+
+  el_gray_max: lightPalette.gray_cmax, // hover and pressed, icons, shapes, lines in buttons, icons in banners
+  el_gray_medium: lightPalette.gray_c900, // icons, shapes, lines in buttons, chips, tabs, checkboxes, readio, switch
+  el_gray_low: lightPalette.gray_c600, // icons, shapes, inputs, bottom navigation bar
+  el_gray_min: lightPalette.gray_c400, // input stroke, disabled state for most components
+
+  el_secondary: lightPalette.secondary_c400, // success state
 
   web_overlay: `${lightPalette.black_static}${opacity._70}`, // extension modal overlay
   web_sidebar_item_active: `${lightPalette.black_static}${opacity._16}`, // extension active sidebar item background

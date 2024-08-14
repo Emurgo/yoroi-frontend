@@ -96,7 +96,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
       }}
     >
       <Box display="flex" alignItems="center" justifyContent="space-between" marginBottom="30px" paddingBottom="16px">
-        <Typography component="div" variant="h5" color="ds.el_gray_normal" fontWeight={500} fontSize="18px">
+        <Typography component="div" variant="h5" color="ds.el_gray_medium" fontWeight={500} fontSize="18px">
           {list.length === 0
             ? intl.formatMessage(globalMessages.sidebarNfts)
             : intl.formatMessage(messages.nftsCount, { number: list.length })}
@@ -196,7 +196,7 @@ const SvgWrapper = styled(Box)(({ theme, height }) => ({
   height,
   '& svg': {
     '& path': {
-      fill: theme.palette.ds.el_gray_medium,
+      fill: theme.palette.ds.el_gray_low,
     },
   },
 }));
@@ -300,7 +300,7 @@ const SButton = styled(IconButton)(({ theme, active }) => ({
   borderRadius: '8px',
   '& svg': {
     '& path': {
-      fill: theme.palette.ds.el_gray_normal,
+      fill: theme.palette.ds.el_gray_medium,
     },
   },
 }));

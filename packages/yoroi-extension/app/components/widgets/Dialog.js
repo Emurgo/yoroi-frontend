@@ -255,7 +255,7 @@ const SIconBtn = styled(Button)(({ theme, active }) => ({
   backgroundColor: active && theme.palette.ds.gray_c200,
   '& svg': {
     '& path': {
-      fill: theme.palette.ds.el_gray_normal,
+      fill: theme.palette.ds.el_gray_medium,
     },
   },
 }));

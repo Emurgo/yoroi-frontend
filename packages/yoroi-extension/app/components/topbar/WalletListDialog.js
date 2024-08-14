@@ -46,7 +46,7 @@ const IconWrapper = styled(Box)(({ theme }) => ({
   marginTop: '32px',
   '& svg': {
     '& path': {
-      fill: theme.palette.ds.el_gray_normal,
+      fill: theme.palette.ds.el_gray_medium,
     },
   },
 }));
