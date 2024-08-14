@@ -855,7 +855,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   ): Promise<{| amount: MultiToken, total: MultiToken |}> {
     if (!ownAddresses) {
       ownAddresses = new Set(publicDeriver.allAddresses.utxoAddresses.map(a => a.address.Hash));
-      ownAddresses.add(publicDeriver.receiveAddress);
+      ownAddresses.add(publicDeriver.receiveAddress.addr.Hash);
     }
 
     const defaultToken = {
