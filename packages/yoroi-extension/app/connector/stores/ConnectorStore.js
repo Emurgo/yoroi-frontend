@@ -34,11 +34,8 @@ import { MultiToken } from '../../api/common/lib/MultiToken';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { asAddressedUtxo, multiTokenFromCardanoValue, multiTokenFromRemote, } from '../../api/ada/transactions/utils';
 import {
-  _connectorGetUnusedAddresses,
-  _connectorGetUsedAddressesWithPaginate,
   getScriptRequiredSigningKeys,
   resolveTxOrTxBody,
-  _getOutputAddressesInSubmittedTxs,
 } from '../../../chrome/extension/connector/api';
 import { loadSubmittedTransactions } from '../../api/localStorage';
 import { LedgerConnect } from '../../utils/hwConnectHandler';
@@ -77,7 +74,6 @@ import {
   getConnectedSites,
 } from '../../api/thunk';
 import type { WalletState } from '../../../chrome/extension/background/types';
-import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 import { addressBech32ToHex } from '../../api/ada/lib/cardanoCrypto/utils';
 import AdaApi from '../../api/ada';
 
