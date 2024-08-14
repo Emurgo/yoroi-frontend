@@ -62,8 +62,7 @@ export default function SwapInput({
     }
   }, [id]);
 
-  const imgSrc =
-    ticker === defaultTokenInfo.ticker ? adaTokenImage : remoteTokenLogo ?? defaultTokenImage;
+  const imgSrc = ticker === defaultTokenInfo.ticker ? adaTokenImage : remoteTokenLogo ?? defaultTokenImage;
 
   return (
     <Box>
@@ -82,7 +81,7 @@ export default function SwapInput({
           gridTemplateRows: '1fr 1fr',
           justifyContent: 'start',
           position: 'relative',
-          bgcolor: 'ds.bg_color_low',
+          bgcolor: 'ds.bg_color_min',
           columnGap: '6px',
           rowGap: '8px',
           maxHeight: '95px',
@@ -98,8 +97,8 @@ export default function SwapInput({
             left: '16px',
             position: 'absolute',
             px: '4px',
-            bgcolor: 'ds.bg_color_low',
-            color: error ? 'magenta.500' : 'ds.text_gray_normal',
+            bgcolor: 'ds.bg_color_min',
+            color: error ? 'magenta.500' : 'ds.text_gray_medium',
           }}
         >
           {label}
@@ -111,7 +110,7 @@ export default function SwapInput({
             border: '0',
             outline: 'none',
             '::placeholder': { color: 'grayscale.600' },
-            bgcolor: 'ds.bg_color_low',
+            bgcolor: 'ds.bg_color_min',
           }}
           component="input"
           type="text"
@@ -162,7 +161,7 @@ export default function SwapInput({
                 ':disabled': {
                   cursor: 'not-allowed',
                 },
-                color: 'ds.text_gray_normal',
+                color: 'ds.text_gray_medium',
               }}
               onClick={() => {
                 handleAmountChange(quantity);

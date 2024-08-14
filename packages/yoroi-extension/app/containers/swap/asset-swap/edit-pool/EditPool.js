@@ -15,7 +15,7 @@ import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types'
 const IconWrapper = styled(Box)(({ theme }) => ({
   '& svg': {
     '& path': {
-      fill: theme.palette.ds.el_gray_normal,
+      fill: theme.palette.ds.el_gray_medium,
     },
   },
 }));
@@ -61,14 +61,14 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
         }}
       >
         <Box display="flex" gap="8px" alignItems="center">
-          <Typography component="div" variant="body1" color="ds.text_gray_normal">
+          <Typography component="div" variant="body1" color="ds.text_gray_medium">
             DEX
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
           <Box display="flex" gap="8px" alignItems="center">
             <SwapPoolIcon provider={pool.provider} />
-            <Typography component="div" variant="body1" color="ds.text_gray_normal">
+            <Typography component="div" variant="body1" color="ds.text_gray_medium">
               {maybe(pool.provider, p => `${capitalize(p)} ${isAutoPool ? '(Auto)' : ''}`) ?? 'No pool found'}
             </Typography>
             {isLimitOrder && (
@@ -85,7 +85,7 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
           borderColor: 'grayscale.400',
           borderRadius: '8px',
           position: 'relative',
-          bgcolor: 'ds.bg_color_low',
+          bgcolor: 'ds.bg_color_min',
           p: '16px',
         }}
       >
@@ -100,7 +100,7 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
           onClick={handleShowFullInfo}
         >
           {pool.provider && (
-            <Typography component="div" variant="body1" color="ds.text_gray_normal">
+            <Typography component="div" variant="body1" color="ds.text_gray_medium">
               {titleTotalFeesFormatted}
             </Typography>
           )}

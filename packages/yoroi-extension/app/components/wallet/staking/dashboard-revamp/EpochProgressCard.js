@@ -74,7 +74,7 @@ const Graph = ({ value, days }): Node => {
           zIndex: 1,
         }}
       />
-      <CircularProgress size={120} thickness={7} variant="determinate" sx={{ color: 'ds.gray_c100' }} value={100} />
+      <CircularProgress size={120} thickness={7} variant="determinate" sx={{ color: 'ds.gray_100' }} value={100} />
       <Box
         position="absolute"
         sx={{

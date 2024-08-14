@@ -72,27 +72,27 @@ export default function SelectPoolDialog({
                 <Box width="32px" height="32px">
                   <SwapPoolIcon provider={provider} />
                 </Box>
-                <Typography component="span" variant="body1" fontWeight={500} color="ds.text_gray_normal">
+                <Typography component="span" variant="body1" fontWeight={500} color="ds.text_gray_medium">
                   {provider}
                 </Typography>
               </Box>
               <Box textAlign="right">
-                <Typography component="span" variant="body1" color="ds.text_gray_normal">
+                <Typography component="span" variant="body1" color="ds.text_gray_medium">
                   {formattedMarketPrice}
                 </Typography>
               </Box>
               <Box textAlign="right">
-                <Typography component="span" variant="body1" color="ds.text_gray_normal">
+                <Typography component="span" variant="body1" color="ds.text_gray_medium">
                   {formattedTvl} {ptTicker}
                 </Typography>
               </Box>
               <Box textAlign="right">
-                <Typography component="span" variant="body1" color="ds.text_gray_normal">
+                <Typography component="span" variant="body1" color="ds.text_gray_medium">
                   {formattedPoolFee} {ptTicker}
                 </Typography>
               </Box>
               <Box textAlign="right">
-                <Typography component="span" variant="body1" color="ds.text_gray_normal">
+                <Typography component="span" variant="body1" color="ds.text_gray_medium">
                   {fee}%
                 </Typography>
               </Box>

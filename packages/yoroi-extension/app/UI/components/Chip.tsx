@@ -18,16 +18,16 @@ export const Chip = ({ label, type, sx, ...props }: Props): JSX.Element => {
 
   const palettes = {
     active: {
-      color: theme.palette.ds.secondary_c800,
-      backgroundColor: theme.palette.ds.secondary_c100,
+      color: theme.palette.ds.secondary_800,
+      backgroundColor: theme.palette.ds.secondary_100,
     },
     inactive: {
-      color: theme.palette.ds.sys_magenta_c700,
-      backgroundColor: theme.palette.ds.sys_magenta_c100,
+      color: theme.palette.ds.sys_magenta_700,
+      backgroundColor: theme.palette.ds.sys_magenta_100,
     },
     disabled: {
-      color: theme.palette.ds.gray_c600,
-      backgroundColor: theme.palette.ds.gray_c100,
+      color: theme.palette.ds.gray_600,
+      backgroundColor: theme.palette.ds.gray_100,
     },
   };
 

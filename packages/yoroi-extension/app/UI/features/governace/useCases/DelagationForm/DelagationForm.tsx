@@ -68,26 +68,26 @@ export const DelagationForm = () => {
   return (
     <Container>
       <Stack>
-        <Typography variant="body2" color="ds.gray_c600" mb="4px">
+        <Typography variant="body2" color="ds.gray_600" mb="4px">
           {strings.delegateToDRep}
         </Typography>
         <Typography variant="body1" mb="24px">
           {strings.designatedSomeone}
         </Typography>
         <TotalBox>
-          <Typography variant="h4" color="ds.gray_cmin">
+          <Typography variant="h4" color="ds.gray_min">
             {strings.total}
           </Typography>
           <Box textAlign="right">
-            <Typography variant="h4" fontWeight="500" color="ds.gray_cmin">
+            <Typography variant="h4" fontWeight="500" color="ds.gray_min">
               0.5 ADA
             </Typography>
-            <Typography variant="body2" color="ds.gray_c300">
+            <Typography variant="body2" color="ds.gray_300">
               0.15 USD
             </Typography>
           </Box>
         </TotalBox>
-        <Typography variant="body2" color="ds.gray_c600" mb="24px">
+        <Typography variant="body2" color="ds.gray_600" mb="24px">
           {strings.transactionDetails}
         </Typography>
         <Box mb="40px">
@@ -99,13 +99,13 @@ export const DelagationForm = () => {
                   <>
                     <Typography
                       variant="body1"
-                      color="ds.text_gray_normal"
+                      color="ds.text_gray_medium"
                     >{`Delegate voting to ${governanceVote.drepID}`}</Typography>
                     <Stack direction="row" justifyContent="space-between">
                       <Typography variant="body1" fontWeight="500">
                         Transaction fee
                       </Typography>
-                      <Typography variant="body1" color="ds.text_gray_normal">
+                      <Typography variant="body1" color="ds.text_gray_medium">
                         0.5 ADA
                       </Typography>
                     </Stack>

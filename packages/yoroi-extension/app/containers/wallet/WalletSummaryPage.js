@@ -102,9 +102,7 @@ class WalletSummaryPage extends Component<AllProps> {
         });
       }
     };
-    const notificationToolTip = uiNotifications.getTooltipActiveNotification(
-      this.notificationElementId
-    );
+    const notificationToolTip = uiNotifications.getTooltipActiveNotification(this.notificationElementId);
 
     if (recent.length > 0) {
       const mapWalletTransactionLayout = {
@@ -115,18 +113,14 @@ class WalletSummaryPage extends Component<AllProps> {
       const WalletTransactionsListComp = mapWalletTransactionLayout[this.props.selectedLayout];
 
       if (isLoading || hasAny) {
-        const { assuranceMode } = this.props.stores.walletSettings.getPublicDeriverSettingsCache(
-          publicDeriver
-        );
+        const { assuranceMode } = this.props.stores.walletSettings.getPublicDeriverSettingsCache(publicDeriver);
         walletTransactions = (
           <WalletTransactionsListComp
             transactions={recent}
             lastSyncBlock={lastSyncInfo.Height}
             memoMap={this.props.stores.memos.txMemoMap.get(walletId) || new Map()}
             selectedExplorer={
-              this.props.stores.explorers.selectedExplorer.get(
-                publicDeriver.getParent().getNetworkInfo().NetworkId
-              ) ??
+              this.props.stores.explorers.selectedExplorer.get(publicDeriver.getParent().getNetworkInfo().NetworkId) ??
               (() => {
                 throw new Error('No explorer for wallet network');
               })()
@@ -165,9 +159,7 @@ class WalletSummaryPage extends Component<AllProps> {
             )}
             onCopyAddressTooltip={onCopyAddressTooltip}
             notification={notificationToolTip}
-            addressToDisplayString={addr =>
-              addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())
-            }
+            addressToDisplayString={addr => addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())}
             complexityLevel={this.props.stores.profile.selectedComplexityLevel}
             id="wallet:transaction-transactionsList-box"
           />
@@ -180,10 +172,7 @@ class WalletSummaryPage extends Component<AllProps> {
     const notification = this._getThisPageActiveNotification();
 
     let exportDialog = (
-      <Dialog
-        title={intl.formatMessage(globalMessages.processingLabel)}
-        closeOnOverlayClick={false}
-      >
+      <Dialog title={intl.formatMessage(globalMessages.processingLabel)} closeOnOverlayClick={false}>
         <VerticalFlexContainer>
           <LoadingSpinner />
         </VerticalFlexContainer>
@@ -242,8 +231,7 @@ class WalletSummaryPage extends Component<AllProps> {
           <AddMemoDialog
             selectedWallet={publicDeriver}
             selectedTransaction={(() => {
-              if (memos.selectedTransaction == null)
-                throw new Error('no selected transaction. Should never happen');
+              if (memos.selectedTransaction == null) throw new Error('no selected transaction. Should never happen');
               return memos.selectedTransaction;
             })()}
             error={memos.error}
@@ -272,8 +260,7 @@ class WalletSummaryPage extends Component<AllProps> {
           <EditMemoDialog
             selectedWallet={publicDeriver}
             existingMemo={(() => {
-              if (memos.selectedTransaction == null)
-                throw new Error('no selected transaction. Should never happen');
+              if (memos.selectedTransaction == null) throw new Error('no selected transaction. Should never happen');
               const txid = memos.selectedTransaction.txid;
               const memo = this.props.stores.memos.txMemoMap.get(walletId)?.get(txid);
               if (memo == null) throw new Error('Should never happen');
@@ -292,8 +279,7 @@ class WalletSummaryPage extends Component<AllProps> {
         {uiDialogs.isOpen(DeleteMemoDialog) ? (
           <DeleteMemoDialog
             selectedTransaction={(() => {
-              if (memos.selectedTransaction == null)
-                throw new Error('no selected transaction. Should never happen');
+              if (memos.selectedTransaction == null) throw new Error('no selected transaction. Should never happen');
               return memos.selectedTransaction;
             })()}
             error={memos.error}
@@ -330,11 +316,7 @@ class WalletSummaryPage extends Component<AllProps> {
           getHistoricalPrice={this.props.stores.coinPriceStore.getHistoricalPrice}
           shouldShowEmptyBanner={!isLoading && !hasAny}
           emptyBannerComponent={
-            <WalletEmptyBanner
-              onBuySellClick={() =>
-                this.props.actions.dialogs.open.trigger({ dialog: BuySellDialog })
-              }
-            />
+            <WalletEmptyBanner onBuySellClick={() => this.props.actions.dialogs.open.trigger({ dialog: BuySellDialog })} />
           }
         />
 
@@ -346,8 +328,7 @@ class WalletSummaryPage extends Component<AllProps> {
           <AddMemoDialog
             selectedWallet={publicDeriver}
             selectedTransaction={(() => {
-              if (memos.selectedTransaction == null)
-                throw new Error('no selected transaction. Should never happen');
+              if (memos.selectedTransaction == null) throw new Error('no selected transaction. Should never happen');
               return memos.selectedTransaction;
             })()}
             error={memos.error}
@@ -376,8 +357,7 @@ class WalletSummaryPage extends Component<AllProps> {
           <EditMemoDialog
             selectedWallet={publicDeriver}
             existingMemo={(() => {
-              if (memos.selectedTransaction == null)
-                throw new Error('no selected transaction. Should never happen');
+              if (memos.selectedTransaction == null) throw new Error('no selected transaction. Should never happen');
               const txid = memos.selectedTransaction.txid;
               const memo = this.props.stores.memos.txMemoMap.get(walletId)?.get(txid);
               if (memo == null) throw new Error('Should never happen');
@@ -396,8 +376,7 @@ class WalletSummaryPage extends Component<AllProps> {
         {uiDialogs.isOpen(DeleteMemoDialog) ? (
           <DeleteMemoDialog
             selectedTransaction={(() => {
-              if (memos.selectedTransaction == null)
-                throw new Error('no selected transaction. Should never happen');
+              if (memos.selectedTransaction == null) throw new Error('no selected transaction. Should never happen');
               return memos.selectedTransaction;
             })()}
             error={memos.error}
@@ -426,9 +405,7 @@ class WalletSummaryPage extends Component<AllProps> {
     let notification = null;
 
     const { mostRecentActiveNotification } = this.props.stores.uiNotifications;
-    const activeNotificationId = mostRecentActiveNotification
-      ? mostRecentActiveNotification.id
-      : '';
+    const activeNotificationId = mostRecentActiveNotification ? mostRecentActiveNotification.id : '';
     if (targetNotificationIds.includes(activeNotificationId)) {
       notification = mostRecentActiveNotification;
     }

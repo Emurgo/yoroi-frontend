@@ -13,10 +13,7 @@ import { AmountInputRevamp } from '../../common/NumericInputRP';
 import styles from './WalletSendFormRevamp.scss';
 import globalMessages, { memoMessages } from '../../../i18n/global-messages';
 import type { UriParams } from '../../../utils/URIHandling';
-import {
-  getAddressPayload,
-  isValidReceiveAddress,
-} from '../../../api/ada/lib/storage/bridge/utils';
+import { getAddressPayload, isValidReceiveAddress } from '../../../api/ada/lib/storage/bridge/utils';
 import { MAX_MEMO_SIZE } from '../../../config/externalStorageConfig';
 import type { TokenRow, NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import {
@@ -83,7 +80,7 @@ const messages = defineMessages({
   },
   receiverFieldLabelUnresolvedAddress: {
     id: 'wallet.send.form.receiver.label.unresolvedAddress',
-    defaultMessage: '!!!Receiver address, ADA Handle or domain you entered doesn\'t exist. Please double-check it and try again',
+    defaultMessage: "!!!Receiver address, ADA Handle or domain you entered doesn't exist. Please double-check it and try again",
   },
   receiverFieldLabelForbiddenAccess: {
     id: 'wallet.send.form.receiver.label.forbiddenAccess',
@@ -287,10 +284,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
           const numberOfDecimals = this.getNumDecimals();
           amountField.set(
             'value',
-            maxSendableAmount.result
-              ?.shiftedBy(-numberOfDecimals)
-              .decimalPlaces(numberOfDecimals)
-              .toString()
+            maxSendableAmount.result?.shiftedBy(-numberOfDecimals).decimalPlaces(numberOfDecimals).toString()
           );
         } else if (maxSendableAmount.error) {
           amountField.set('value', '0');
@@ -322,7 +316,9 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     }
   }
 
-  @action async resolveDomainAddress(handle: string): Promise<{|
+  @action async resolveDomainAddress(
+    handle: string
+  ): Promise<{|
     isDomainResolvable: boolean,
     domainResolverMessage: ?string,
     resolvedAddress: ?string,
@@ -338,8 +334,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
         this.setState({ domainResolverIsLoading: true });
         const res: ?DomainResolverResponse = await resolveDomainAddress(handle);
         if (res == null) {
-          domainResolverMessage = this.context.intl
-            .formatMessage(messages.receiverFieldLabelUnresolvedAddress);
+          domainResolverMessage = this.context.intl.formatMessage(messages.receiverFieldLabelUnresolvedAddress);
         } else if (res.address != null) {
           resolvedAddress = res.address;
           domainResolverResult = {
@@ -348,26 +343,26 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             nameServer: res.nameServer,
           };
         } else if (res.error === 'forbidden') {
-          domainResolverMessage = `${res.nameServer}: ${
-            this.context.intl.formatMessage(messages.receiverFieldLabelForbiddenAccess)
-          }`;
+          domainResolverMessage = `${res.nameServer}: ${this.context.intl.formatMessage(
+            messages.receiverFieldLabelForbiddenAccess
+          )}`;
         } else {
-          domainResolverMessage = `${res.nameServer}: ${
-            this.context.intl.formatMessage(messages.receiverFieldLabelUnexpectedError)
-          }`;
+          domainResolverMessage = `${res.nameServer}: ${this.context.intl.formatMessage(
+            messages.receiverFieldLabelUnexpectedError
+          )}`;
         }
       }
       this.setState({
         domainResolverResult,
         domainResolverMessage,
-        domainResolverIsLoading: false
+        domainResolverIsLoading: false,
       });
     }
     return {
       isDomainResolvable,
       domainResolverMessage,
       resolvedAddress,
-    }
+    };
   }
 
   // FORM VALIDATION
@@ -376,9 +371,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
       fields: {
         receiver: {
           label: this.context.intl.formatMessage(messages.receiverFieldLabelDefault),
-          placeholder: this.props.isClassicTheme
-            ? this.context.intl.formatMessage(messages.receiverHint)
-            : '',
+          placeholder: this.props.isClassicTheme ? this.context.intl.formatMessage(messages.receiverHint) : '',
           value: this.props.uriParams ? this.props.uriParams.address : '',
           validators: [
             async ({ field }) => {
@@ -388,26 +381,22 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 this.setState({
                   domainResolverResult: null,
                   domainResolverMessage: null,
-                  domainResolverIsLoading: false
+                  domainResolverIsLoading: false,
                 });
                 return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
               }
               const updateReceiver = (isValid: boolean) => {
                 if (isValid) {
-                  this.props.updateReceiver(
-                    getAddressPayload(receiverValue, this.props.selectedNetwork)
-                  );
+                  this.props.updateReceiver(getAddressPayload(receiverValue, this.props.selectedNetwork));
                 } else {
                   this.props.updateReceiver();
                 }
               };
 
               // DOMAIN RESOLVER
-              const {
-                isDomainResolvable,
-                domainResolverMessage,
-                resolvedAddress,
-              } = await this.resolveDomainAddress(receiverValue);
+              const { isDomainResolvable, domainResolverMessage, resolvedAddress } = await this.resolveDomainAddress(
+                receiverValue
+              );
               if (resolvedAddress != null) {
                 receiverValue = resolvedAddress;
               }
@@ -422,10 +411,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               updateReceiver(result);
               const fieldError = isDomainResolvable
                 ? domainResolverMessage
-                : this.context.intl.formatMessage(errorType === 1
-                  ? messages.receiverFieldLabelInvalidAddress
-                  : errorMessage
-                );
+                : this.context.intl.formatMessage(errorType === 1 ? messages.receiverFieldLabelInvalidAddress : errorMessage);
               return [isValid[0], fieldError];
             },
           ],
@@ -435,9 +421,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
           placeholder: this.props.isClassicTheme ? `0.${'0'.repeat(this.getNumDecimals())}` : '',
           value: (() => {
             const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
-            return this.props.uriParams
-              ? formatValue(this.props.uriParams.amount.getDefaultEntry())
-              : null;
+            return this.props.uriParams ? formatValue(this.props.uriParams.amount.getDefaultEntry()) : null;
           })(),
           validators: [
             async ({ field }) => {
@@ -457,9 +441,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 this.props.onRemoveTokens([defaultTokenInfo]);
                 return true;
               }
-              const formattedAmount = new BigNumber(
-                formattedAmountToNaturalUnits(amountValue, this.getNumDecimals())
-              );
+              const formattedAmount = new BigNumber(formattedAmountToNaturalUnits(amountValue, this.getNumDecimals()));
               this.props.updateAmount(formattedAmount);
               return [true, null];
             },
@@ -493,15 +475,9 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     this.setState({ isMemoFieldActive });
   };
 
-  getTokensAndNFTs: MultiToken => [
-    FormattedTokenDisplay[],
-    FormattedNFTDisplay[]
-  ] = totalAmount => {
+  getTokensAndNFTs: MultiToken => [FormattedTokenDisplay[], FormattedNFTDisplay[]] = totalAmount => {
     if (this.props.shouldSendAll)
-      return [
-        getTokens(totalAmount, this.props.getTokenInfo),
-        getNFTs(totalAmount, this.props.getTokenInfo),
-      ];
+      return [getTokens(totalAmount, this.props.getTokenInfo), getNFTs(totalAmount, this.props.getTokenInfo)];
     const { plannedTxInfoMap } = this.props;
     const tokens = plannedTxInfoMap
       .filter(({ token }) => token.IsNFT === false && token.IsDefault === false)
@@ -514,9 +490,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
           : undefined;
 
         return {
-          label: truncateToken(
-            getTokenStrictName(token).name ?? getTokenIdentifierIfExists(token) ?? '-'
-          ),
+          label: truncateToken(getTokenStrictName(token).name ?? getTokenIdentifierIfExists(token) ?? '-'),
           amount: formattedAmount,
           info: token,
           id: getTokenIdentifierIfExists(token) ?? '-',
@@ -614,20 +588,17 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
       networkId: this.props.defaultToken.NetworkId,
     });
 
-    const showFiat =
-      this.props.unitOfAccountSetting.enabled && this.props.unitOfAccountSetting.currency;
+    const showFiat = this.props.unitOfAccountSetting.enabled && this.props.unitOfAccountSetting.currency;
 
     const domainResolverResult = this.state.domainResolverResult;
     const domainResolverSupported = this.props.resolveDomainAddress != null;
     switch (step) {
       case SEND_FORM_STEP.RECEIVER:
         return (
-          <div className={styles.receiverStep}>
-            {(domainResolverSupported && this.props.supportedAddressDomainBannerState.isDisplayed) ? (
+          <Box className={styles.receiverStep} sx={{ background: 'ds.bg_color_min' }}>
+            {domainResolverSupported && this.props.supportedAddressDomainBannerState.isDisplayed ? (
               <Box pb="10px">
-                <SupportedAddressDomainsBanner
-                  onClose={this.props.supportedAddressDomainBannerState.onClose}
-                />
+                <SupportedAddressDomainsBanner onClose={this.props.supportedAddressDomainBannerState.onClose} />
               </Box>
             ) : null}
             <Box sx={{ position: 'relative' }}>
@@ -645,7 +616,8 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 }
               />
               {domainResolverResult != null ? (
-                <Typography component="div"
+                <Typography
+                  component="div"
                   variant="caption1"
                   color={invalidMemo ? 'magenta.500' : 'grayscale.600'}
                   sx={{ position: 'absolute', bottom: '10px', right: '0' }}
@@ -677,7 +649,8 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 }
                 id="wallet:send:enterAddressStep-enterMemo-input"
               />
-              <Typography component="div"
+              <Typography
+                component="div"
                 variant="caption1"
                 color={invalidMemo ? 'magenta.500' : 'grayscale.600'}
                 sx={{ position: 'absolute', bottom: '5px', right: '0' }}
@@ -685,13 +658,14 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 {memo ? memo.length : 0}/{MAX_MEMO_SIZE}
               </Typography>
             </Box>
-          </div>
+          </Box>
         );
       case SEND_FORM_STEP.AMOUNT:
         return (
           <Box className={styles.amountStep}>
             {isCalculatingFee && (
-              <Typography component="div"
+              <Typography
+                component="div"
                 variant="caption1"
                 sx={{
                   position: 'absolute',
@@ -706,7 +680,8 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             )}
 
             {!isDefaultIncluded && (
-              <Typography component="div"
+              <Typography
+                component="div"
                 variant="caption1"
                 sx={{
                   position: 'absolute',
@@ -773,11 +748,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               >
                 <AmountInputRevamp
                   {...amountFieldProps}
-                  value={
-                    amountFieldProps.value === ''
-                      ? null
-                      : formattedAmountToBigNumber(amountFieldProps.value)
-                  }
+                  value={amountFieldProps.value === '' ? null : formattedAmountToBigNumber(amountFieldProps.value)}
                   className="send_form_amount"
                   label={intl.formatMessage(globalMessages.amountLabel)}
                   decimalPlaces={this.getNumDecimals()}
@@ -810,37 +781,31 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   color="secondary"
                   size="small"
                   sx={{
-                      '&.MuiButton-sizeSmall': {
-                        lineHeight: '17px',
-                      },
-                    }}
+                    '&.MuiButton-sizeSmall': {
+                      lineHeight: '17px',
+                    },
+                  }}
                   disabled={maxSendableAmount.isExecuting}
-                  className={classnames([
-                      styles.maxBtn,
-                      maxSendableAmount.isExecuting && styles.maxButtonSpinning,
-                    ])}
+                  className={classnames([styles.maxBtn, maxSendableAmount.isExecuting && styles.maxButtonSpinning])}
                   onClick={() => {
-                      const hasTokens =
-                        spendableBalance && spendableBalance.nonDefaultEntries().length !== 0;
-                      if (hasTokens || !spendableBalance) {
-                        this.props.calculateMaxAmount();
-                        return;
-                      }
+                    const hasTokens = spendableBalance && spendableBalance.nonDefaultEntries().length !== 0;
+                    if (hasTokens || !spendableBalance) {
+                      this.props.calculateMaxAmount();
+                      return;
+                    }
 
-                      if (shouldSendAll) {
-                        amountField.reset();
-                        this.props.onRemoveTokens([defaultTokenInfo]);
-                      } else {
-                        this.props.onAddToken({
-                          shouldReset: true,
-                        });
-                        this.props.updateSendAllStatus(true);
-                      }
-                    }}
+                    if (shouldSendAll) {
+                      amountField.reset();
+                      this.props.onRemoveTokens([defaultTokenInfo]);
+                    } else {
+                      this.props.onAddToken({
+                        shouldReset: true,
+                      });
+                      this.props.updateSendAllStatus(true);
+                    }
+                  }}
                 >
-                  {maxSendableAmount.isExecuting ? (
-                    <LoadingSpinner small />
-                  ) : intl.formatMessage(messages.max)}
+                  {maxSendableAmount.isExecuting ? <LoadingSpinner small /> : intl.formatMessage(messages.max)}
                 </Button>
               </Box>
               {showFiat && (
@@ -858,7 +823,8 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 </Box>
               )}
               {isDefaultIncluded && (
-                <Typography component="div"
+                <Typography
+                  component="div"
                   sx={{
                     position: 'absolute',
                     bottom: '-25px',
@@ -887,7 +853,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 onClick={() => this.props.openDialog(AddTokenDialog)}
                 disabled={this.props.shouldSendAll}
                 startIcon={<PlusIcon />}
-                id='wallet:send:addAssetsStep-addTokens-button'
+                id="wallet:send:addAssetsStep-addTokens-button"
               >
                 {intl.formatMessage(globalMessages.addToken)}
               </Button>
@@ -897,7 +863,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 onClick={() => this.props.openDialog(AddNFTDialog)}
                 disabled={this.props.shouldSendAll}
                 startIcon={<PlusIcon />}
-                id='wallet:send:addAssetsStep-addNFTs-button'
+                id="wallet:send:addAssetsStep-addNFTs-button"
               >
                 {intl.formatMessage(globalMessages.addNft)}
               </Button>
@@ -939,10 +905,14 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             trezorSend={this.props.trezorSend}
             selectedExplorer={this.props.selectedExplorer}
             selectedWallet={this.props.selectedWallet}
-            receiverHandle={domainResolverResult ? {
-              nameServer: domainResolverResult.nameServer,
-              handle: domainResolverResult.handle,
-            } : null}
+            receiverHandle={
+              domainResolverResult
+                ? {
+                    nameServer: domainResolverResult.nameServer,
+                    handle: domainResolverResult.handle,
+                  }
+                : null
+            }
           />
         );
       default:
@@ -992,12 +962,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 this.props.onSubmit();
                 this.onUpdateStep(SEND_FORM_STEP.PREVIEW);
               }}
-              disabled={
-                !this.props.fee ||
-                this.props.hasAnyPending ||
-                invalidMemo ||
-                maxSendableAmount.isExecuting
-              }
+              disabled={!this.props.fee || this.props.hasAnyPending || invalidMemo || maxSendableAmount.isExecuting}
               id="wallet:send:addAssetsStep-nextToConfirmTransaction-button"
             >
               {intl.formatMessage(globalMessages.nextButtonLabel)}
@@ -1014,8 +979,8 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     const { bodyRef } = this;
     return (
       <>
-        <div className={styles.component}>
-          <Box className={styles.wrapper} sx={{ bgcolor: 'common.white', height: '100%' }}>
+        <Box className={styles.component} sx={{ backgroundColor: 'ds.bg_color_min' }}>
+          <Box className={styles.wrapper} sx={{ height: '100%' }}>
             <SendFormHeader step={currentStep} onUpdateStep={this.onUpdateStep.bind(this)} />
             <Box
               ref={ref => {
@@ -1027,9 +992,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             </Box>
             {currentStep !== SEND_FORM_STEP.PREVIEW && (
               <Box
-                borderTop={
-                  bodyRef && bodyRef.scrollHeight > bodyRef.clientHeight ? '1px solid' : '0'
-                }
+                borderTop={bodyRef && bodyRef.scrollHeight > bodyRef.clientHeight ? '1px solid' : '0'}
                 borderColor="grayscale.200"
                 display="flex"
                 alignItems="center"
@@ -1043,7 +1006,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               </Box>
             )}
           </Box>
-        </div>
+        </Box>
       </>
     );
   }

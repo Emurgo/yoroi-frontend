@@ -47,12 +47,12 @@ export default function AssetPair({ from, to, defaultTokenInfo, sx = {} }: Props
     <Box display="flex" alignItems="center" gap="8px" sx={sx}>
       <Box display="flex" alignItems="center" gap="8px">
         {tokenImg(from, defaultTokenInfo)}
-        <Box fontWeight={500} sx={{ color: 'ds.text_gray_normal' }}>
+        <Box fontWeight={500} sx={{ color: 'ds.text_gray_medium' }}>
           {from?.ticker ?? '-'}
         </Box>
       </Box>
       <Box>/</Box>
-      <Box display="flex" alignItems="center" gap="8px" sx={{ color: 'ds.text_gray_normal' }}>
+      <Box display="flex" alignItems="center" gap="8px" sx={{ color: 'ds.text_gray_medium' }}>
         {tokenImg(to, defaultTokenInfo)}
         <Box fontWeight={500}>{to?.ticker ?? '-'}</Box>
       </Box>

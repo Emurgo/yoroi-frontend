@@ -11,8 +11,8 @@ import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ProgressStepBlock from './ProgressStepBlock';
 import { ProgressInfo } from '../../../stores/ada/VotingStore';
 import QrCodeWrapper from '../../widgets/QrCodeWrapper';
+import { Typography } from '@mui/material';
 import type { StepsList } from './types';
-
 import styles from './QrCodeDialog.scss';
 import { downloadQrCode } from '../../../utils/qrcode';
 
@@ -23,20 +23,22 @@ const messages = defineMessages({
   },
   line2: {
     id: 'wallet.voting.dialog.step.qr.line2',
-    defaultMessage: '!!!The following QR code is the generated certificate required by the Catalyst App to be able to participate in the voting process of Cardano.',
+    defaultMessage:
+      '!!!The following QR code is the generated certificate required by the Catalyst App to be able to participate in the voting process of Cardano.',
   },
   line3: {
     id: 'wallet.voting.dialog.step.qr.line3',
-    defaultMessage: '!!!Also we suggest to take a screenshot of it as a backup — you won’t be able to access this QR code after clicking Complete.',
+    defaultMessage:
+      '!!!Also we suggest to take a screenshot of it as a backup — you won’t be able to access this QR code after clicking Complete.',
   },
   actionButton: {
     id: 'wallet.voting.dialog.step.qr.actionButton',
-    defaultMessage: '!!!Confirm that I saved the QR code'
+    defaultMessage: '!!!Confirm that I saved the QR code',
   },
   downloadQrCode: {
     id: 'wallet.voting.dialog.step.qr.downloadQrCode',
     defaultMessage: '!!!Download QR code',
-  }
+  },
 });
 
 type Props = {|
@@ -70,7 +72,7 @@ export default class QrCodeDialog extends Component<Props> {
         label: intl.formatMessage(messages.downloadQrCode),
         primary: true,
         onClick: () => downloadQrCode(QR_ID, 'Voting key'),
-      }
+      },
     ];
 
     return (
@@ -82,34 +84,24 @@ export default class QrCodeDialog extends Component<Props> {
         closeButton={<DialogCloseButton />}
         onClose={cancel}
       >
-        <ProgressStepBlock
-          stepsList={stepsList}
-          progressInfo={progressInfo}
-          classicTheme={classicTheme}
-        />
+        <ProgressStepBlock stepsList={stepsList} progressInfo={progressInfo} classicTheme={classicTheme} />
 
-        <div className={classnames([styles.lineTitle, styles.firstItem])}>
+        <Typography className={classnames([styles.lineTitle, styles.firstItem])} color="ds.text_gray_medium">
           {intl.formatMessage(messages.lineTitle)}
-        </div>
+        </Typography>
 
-        <div className={styles.lineText}>
+        <Typography className={styles.lineText} color="ds.text_gray_medium">
           {intl.formatMessage(messages.line2)}
-        </div>
+        </Typography>
 
-        <div className={classnames([styles.lineBold, styles.importantText])}>
+        <Typography className={classnames([styles.lineBold, styles.importantText])} color="ds.sys_magenta_500">
           {intl.formatMessage(messages.line3)}
-        </div>
+        </Typography>
 
         <div className={classnames([styles.qrCodeContainer, styles.lastItem])}>
           {votingKey !== null ? (
             <div className={styles.qrCode}>
-              <QrCodeWrapper
-                value={votingKey}
-                size={720}
-                addBg={false}
-                includeMargin
-                id={QR_ID}
-              />
+              <QrCodeWrapper value={votingKey} size={720} addBg={false} includeMargin id={QR_ID} />
             </div>
           ) : (
             ''

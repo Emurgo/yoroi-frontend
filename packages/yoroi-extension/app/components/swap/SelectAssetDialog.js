@@ -94,8 +94,8 @@ export default function SelectAssetDialog({
                 fontSize: '14px',
                 fontFamily: 'Rubik',
                 height: '40px',
-                backgroundColor: 'ds.bg_color_low',
-                color: 'ds.text_gray_normal',
+                backgroundColor: 'ds.bg_color_min',
+                color: 'ds.text_gray_medium',
                 '&:focus': {
                   borderWidth: '2px',
                   borderColor: 'grayscale.max',
@@ -140,7 +140,7 @@ export default function SelectAssetDialog({
             <Box mt="60px">
               <NoAssetsFound />
             </Box>
-            <Typography component="div" variant="body1" fontWeight={500} color="ds.text_gray_medium">
+            <Typography component="div" variant="body1" fontWeight={500} color="ds.text_gray_low">
               {type === 'from' ? `No tokens found for “${searchTerm}”` : 'No asset was found to swap'}
             </Typography>
           </Box>
@@ -251,7 +251,7 @@ export const AssetAndAmountRow = ({
         </Box>
         <Box flexGrow="1" width="100%">
           <Box display="flex" alignItems="center" gap="8px">
-            <Typography component="div" fontWeight={500} variant="body1" color="ds.text_gray_normal">
+            <Typography component="div" fontWeight={500} variant="body1" color="ds.text_gray_medium">
               {(name !== address || name !== id) && name !== ticker && `[${ticker}]`} {name}
             </Typography>
             {!isFrom && amount != null && (

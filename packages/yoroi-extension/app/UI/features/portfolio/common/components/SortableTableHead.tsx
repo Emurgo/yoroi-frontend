@@ -33,7 +33,7 @@ const SortableTableHead = ({ headCells, order, orderBy, onRequestSort }: Props):
                   width: isPadding ? '100%' : 'fit-content',
                 }}
               >
-                <Typography variant="body2" color="ds.gray_c600" sx={{ userSelect: 'none' }}>
+                <Typography variant="body2" color="ds.gray_600" sx={{ userSelect: 'none' }}>
                   {label}
                 </Typography>
                 {disabledSort ? null : (

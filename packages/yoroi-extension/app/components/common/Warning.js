@@ -15,7 +15,7 @@ export default function Warning({ children }: Props): Node {
       sx={{
         p: '12px 15px 16px 16px',
         width: '100%',
-        backgroundColor: theme => theme.palette.ds.sys_yellow_c100,
+        backgroundColor: theme => theme.palette.ds.sys_yellow_100,
         borderRadius: '8px',
       }}
     >
@@ -25,7 +25,7 @@ export default function Warning({ children }: Props): Node {
           component="div"
           variant="body1"
           fontWeight={500}
-          color={theme => theme.palette.ds.sys_yellow_c500}
+          color={theme => theme.palette.ds.sys_yellow_500}
           sx={{
             display: 'flex',
             alignItems: 'center',

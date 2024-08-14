@@ -72,9 +72,7 @@ function Dialog(props: Props & InjectedProps): Node {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      const el = document.querySelector(
-        scrollableContentClass ? `.${scrollableContentClass}` : '.ModalContent'
-      );
+      const el = document.querySelector(scrollableContentClass ? `.${scrollableContentClass}` : '.ModalContent');
 
       if (!el) return;
 
@@ -96,8 +94,7 @@ function Dialog(props: Props & InjectedProps): Node {
 
   const hasCloseButton = withCloseButton || closeButton;
 
-  const hasSubmitting =
-    actions != null && actions.filter(action => action.isSubmitting === true).length > 0;
+  const hasSubmitting = actions != null && actions.filter(action => action.isSubmitting === true).length > 0;
 
   return (
     <Modal
@@ -137,7 +134,7 @@ function Dialog(props: Props & InjectedProps): Node {
             variant="body1"
             className="dialog__title"
             id={String(id) + '-dialogTitle-text'}
-            color="ds.text_gray_normal"
+            color="ds.text_gray_medium"
           >
             {title}
           </Typography>
@@ -252,54 +249,45 @@ export const CloseButton = ({
 );
 
 // eslint-disable-next-line no-unused-vars
-const StyledBox = forwardRef(({ contentHasScroll, empty, hasDivider, ...props }, ref) => (
-  <Box {...props} ref={ref} />
-));
+const StyledBox = forwardRef(({ contentHasScroll, empty, hasDivider, ...props }, ref) => <Box {...props} ref={ref} />);
 
 const SIconBtn = styled(Button)(({ theme, active }) => ({
-  backgroundColor: active && theme.palette.ds.gray_c200,
+  backgroundColor: active && theme.palette.ds.gray_200,
   '& svg': {
     '& path': {
-      fill: theme.palette.ds.el_gray_normal,
+      fill: theme.palette.ds.el_gray_medium,
     },
   },
 }));
 
-export const ModalContainer: any => Node = styled(StyledBox)(
-  ({ theme, contentHasScroll, empty = false }) => {
-    const normalMinWidth =
-      theme.name === 'classic' || theme.name === 'modern'
-        ? 'var(--yoroi-comp-dialog-min-width-md)'
-        : '648px';
-    const revampBorder = contentHasScroll ? '1px solid' : '';
-    return {
-      position: 'relative',
-      minWidth: empty ? '0px' : normalMinWidth,
-      borderRadius: theme.name === 'classic' ? 0 : 8,
-      paddingTop: theme.name === 'classic' ? '25px' : '0px',
-      paddingBottom: theme.name === 'classic' || theme.name === 'modern' ? '30px' : '0px',
-      maxWidth: theme.name === 'classic' ? '785px' : '824px',
-      backgroundColor: empty ? undefined : theme.palette.ds.bg_color_low,
-      color: 'var(--yoroi-comp-dialog-text)',
-      maxHeight: '95vh',
+export const ModalContainer: any => Node = styled(StyledBox)(({ theme, contentHasScroll, empty = false }) => {
+  const normalMinWidth = theme.name === 'classic' || theme.name === 'modern' ? 'var(--yoroi-comp-dialog-min-width-md)' : '648px';
+  const revampBorder = contentHasScroll ? '1px solid' : '';
+  return {
+    position: 'relative',
+    minWidth: empty ? '0px' : normalMinWidth,
+    borderRadius: theme.name === 'classic' ? 0 : 8,
+    paddingTop: theme.name === 'classic' ? '25px' : '0px',
+    paddingBottom: theme.name === 'classic' || theme.name === 'modern' ? '30px' : '0px',
+    maxWidth: theme.name === 'classic' ? '785px' : '824px',
+    backgroundColor: empty ? undefined : theme.palette.ds.bg_color_min,
+    color: 'var(--yoroi-comp-dialog-text)',
+    maxHeight: '95vh',
 
-      '& .dialog__title': {
-        marginBottom: theme.name === 'classic' ? '22px' : '0px',
-        padding: theme.name === 'classic' ? '0' : '24px',
-        fontWeight: 500,
-        textAlign: 'center',
-        textTransform: 'uppercase',
-        letterSpacing: 0,
-        display: 'block',
-        borderBottom: theme.name === 'classic' || theme.name === 'modern' ? '' : revampBorder,
-        borderBottomColor:
-          theme.name === 'classic' || theme.name === 'modern'
-            ? theme.palette.gray['200']
-            : theme.palette.grayscale['200'],
-      },
-    };
-  }
-);
+    '& .dialog__title': {
+      marginBottom: theme.name === 'classic' ? '22px' : '0px',
+      padding: theme.name === 'classic' ? '0' : '24px',
+      fontWeight: 500,
+      textAlign: 'center',
+      textTransform: 'uppercase',
+      letterSpacing: 0,
+      display: 'block',
+      borderBottom: theme.name === 'classic' || theme.name === 'modern' ? '' : revampBorder,
+      borderBottomColor:
+        theme.name === 'classic' || theme.name === 'modern' ? theme.palette.gray['200'] : theme.palette.grayscale['200'],
+    },
+  };
+});
 
 const ModalContent = styled(Box)(({ theme }) => ({
   overflowX: 'hidden',
@@ -322,12 +310,9 @@ const ModalFooter = styled(StyledBox)(({ theme, hasDivider }) => ({
   paddingTop: theme.name === 'classic' || theme.name === 'modern' ? '0' : '24px',
   paddingBottom: theme.name === 'classic' || theme.name === 'modern' ? '0' : '24px',
   marginTop: theme.name === 'classic' ? '20px' : '0px',
-  borderTop:
-    theme.name === 'classic' || theme.name === 'modern' ? '' : hasDivider ? '1px solid' : '',
+  borderTop: theme.name === 'classic' || theme.name === 'modern' ? '' : hasDivider ? '1px solid' : '',
   borderTopColor:
-    theme.name === 'classic' || theme.name === 'modern'
-      ? theme.palette.gray['200']
-      : theme.palette.grayscale['200'],
+    theme.name === 'classic' || theme.name === 'modern' ? theme.palette.gray['200'] : theme.palette.grayscale['200'],
   '& button': {
     width: '50%',
     '&:only-child': { width: '100%' },

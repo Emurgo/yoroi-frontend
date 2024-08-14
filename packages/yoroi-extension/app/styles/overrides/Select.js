@@ -3,7 +3,7 @@
 const Select = {
   styleOverrides: {
     icon: {
-      color: 'ds.gray_c600',
+      color: 'ds.gray_600',
       right: '15px',
     },
   },
