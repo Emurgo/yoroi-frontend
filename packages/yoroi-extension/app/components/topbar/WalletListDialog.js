@@ -203,10 +203,10 @@ export default class WalletListDialog extends Component<Props, State> {
             <div className={styles.totalInfo}>
               {walletsTotal !== undefined && (
                 <div className={styles.amount}>
-                  <Typography variant="body2" mb="4px" color="ds.text_gray_normal">
+                  <Typography variant="body2" mb="4px" color="ds.text_gray_medium">
                     {intl.formatMessage(messages.totalBalance)}
                   </Typography>
-                  <Typography variant="body1" mt="10px" fontWeight="500" color="ds.text_gray_normal">
+                  <Typography variant="body1" mt="10px" fontWeight="500" color="ds.text_gray_medium">
                     {walletsTotal}
                   </Typography>
                 </div>

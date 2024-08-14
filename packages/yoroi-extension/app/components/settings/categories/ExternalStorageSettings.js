@@ -21,8 +21,7 @@ const messages = defineMessages({
   },
   sectionIntro: {
     id: 'settings.externalStorage.intro',
-    defaultMessage:
-      '!!!Select an external storage service to connect your account and save your memo notes.',
+    defaultMessage: '!!!Select an external storage service to connect your account and save your memo notes.',
   },
   buttonDisconnect: {
     id: 'settings.externalStorage.button.disconnect',
@@ -46,22 +45,15 @@ class ExternalStorageSettings extends Component<Props & InjectedProps> {
   };
 
   render(): Node {
-    const {
-      onConnect,
-      onDisconnect,
-      externalStorageProviders,
-      selectedExternalStorage,
-    } = this.props;
+    const { onConnect, onDisconnect, externalStorageProviders, selectedExternalStorage } = this.props;
     const { intl } = this.context;
     const { isRevampLayout } = this.props;
 
     const providersButtons = [];
     for (const provider of Object.keys(externalStorageProviders)) {
       const authorizeUrl = externalStorageProviders[provider].authorizeUrl;
-      const showDisconnect =
-        selectedExternalStorage && selectedExternalStorage.provider === provider;
-      const disabledCondition =
-        selectedExternalStorage && selectedExternalStorage.provider !== provider;
+      const showDisconnect = selectedExternalStorage && selectedExternalStorage.provider === provider;
+      const disabledCondition = selectedExternalStorage && selectedExternalStorage.provider !== provider;
       providersButtons.push(
         <Button
           key={provider}
@@ -83,7 +75,7 @@ class ExternalStorageSettings extends Component<Props & InjectedProps> {
 
     return (
       <div className={styles.component}>
-        <Typography variant="h4" color="ds.text_gray_normal" mb="8px">
+        <Typography variant="h4" color="ds.text_gray_medium" mb="8px">
           {this.context.intl.formatMessage(messages.sectionTitle)}
         </Typography>
         <div>{this.context.intl.formatMessage(messages.sectionIntro)}</div>

@@ -84,12 +84,12 @@ export default class AmountDisplay extends Component<Props> {
     return (
       <>
         {showAmount === true && (
-          <Typography variant="body2" color="ds.text_gray_normal" fontWeight="500" id={id + '-availableBalance-text'} mt="10px">
+          <Typography variant="body2" color="ds.text_gray_medium" fontWeight="500" id={id + '-availableBalance-text'} mt="10px">
             {balanceDisplay}&nbsp;{truncateToken(getTokenName(tokenInfo))}
           </Typography>
         )}
         {showFiat === true && (
-          <Typography mb="5px" color="ds.text_gray_normal" fontSize="12px" id={id + '-availableFiatBalance-text'}>
+          <Typography mb="5px" color="ds.text_gray_medium" fontSize="12px" id={id + '-availableFiatBalance-text'}>
             {fiatDisplay || '-'} {currency || 'USD'}
           </Typography>
         )}
@@ -101,7 +101,7 @@ export default class AmountDisplay extends Component<Props> {
 export function FiatDisplay(props: {| shouldHideBalance: boolean, amount: BigNumber | null, currency: string |}): Node {
   if (props.shouldHideBalance) {
     return (
-      <Typography className={styles.fiat} variant="body2" color="ds.text_gray_normal" fontWeight="500">
+      <Typography className={styles.fiat} variant="body2" color="ds.text_gray_medium" fontWeight="500">
         {hiddenAmount} {props.currency}
       </Typography>
     );
@@ -112,7 +112,7 @@ export function FiatDisplay(props: {| shouldHideBalance: boolean, amount: BigNum
   }
 
   return (
-    <Typography variant="body2" className={styles.fiat} color="ds.text_gray_normal" fontWeight="500">
+    <Typography variant="body2" className={styles.fiat} color="ds.text_gray_medium" fontWeight="500">
       {formatValue(props.amount)} {props.currency}
     </Typography>
   );

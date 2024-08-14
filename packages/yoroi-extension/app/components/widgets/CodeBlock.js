@@ -14,7 +14,7 @@ const CodeBlock: any = observer(({ code }: Props) => {
   return (
     <Box
       className={styles.component}
-      sx={{ background: name === 'light-theme' ? '#f4f4f4' : 'ds.bg_color_low', border: '1px solid #ddd' }}
+      sx={{ background: name === 'light-theme' ? '#f4f4f4' : 'ds.bg_color_min', border: '1px solid #ddd' }}
     >
       <code>{code}</code>
     </Box>

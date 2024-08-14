@@ -6,7 +6,7 @@ const OutlinedInput = {
       paddingRight: '16px',
       '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: theme.palette.ds.gray_c900 },
       '& .MuiOutlinedInput-notchedOutline': {
-        borderColor: theme.palette.ds.text_gray_low,
+        borderColor: theme.palette.ds.text_gray_min,
         borderRadius: 8,
         backgroundColor: 'transparent',
         letterSpacing: 'initial',

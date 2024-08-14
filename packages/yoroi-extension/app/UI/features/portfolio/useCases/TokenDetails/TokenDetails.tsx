@@ -90,7 +90,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
           }}
         >
           <BackIcon />
-          <Typography variant="body2" fontWeight="500" color="ds.text_gray_normal" sx={{ textTransform: 'uppercase' }}>
+          <Typography variant="body2" fontWeight="500" color="ds.text_gray_medium" sx={{ textTransform: 'uppercase' }}>
             {strings.backToPortfolio}
           </Typography>
         </Box>

@@ -595,7 +595,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     switch (step) {
       case SEND_FORM_STEP.RECEIVER:
         return (
-          <Box className={styles.receiverStep} sx={{ background: 'ds.bg_color_low' }}>
+          <Box className={styles.receiverStep} sx={{ background: 'ds.bg_color_min' }}>
             {domainResolverSupported && this.props.supportedAddressDomainBannerState.isDisplayed ? (
               <Box pb="10px">
                 <SupportedAddressDomainsBanner onClose={this.props.supportedAddressDomainBannerState.onClose} />
@@ -979,7 +979,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     const { bodyRef } = this;
     return (
       <>
-        <Box className={styles.component} sx={{ backgroundColor: 'ds.bg_color_low' }}>
+        <Box className={styles.component} sx={{ backgroundColor: 'ds.bg_color_min' }}>
           <Box className={styles.wrapper} sx={{ height: '100%' }}>
             <SendFormHeader step={currentStep} onUpdateStep={this.onUpdateStep.bind(this)} />
             <Box

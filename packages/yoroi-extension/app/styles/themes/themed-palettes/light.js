@@ -7,22 +7,24 @@ const { opacity } = tokens;
 export const light = {
   ...lightPalette,
 
-  text_primary_high: lightPalette.primary_c600, // hover, text, button, links, text in tabs, chips
+  text_primary_max: lightPalette.primary_c600, // hover, text, button, links, text in tabs, chips
   text_primary_medium: lightPalette.primary_c500, // links, tabs, chips, special cases
-  text_primary_low: lightPalette.primary_c300, // disabled, buttons, links
+  text_primary_min: lightPalette.primary_c300, // disabled, buttons, links
+
   text_gray_max: lightPalette.gray_cmax, // hover and pressed
-  text_gray_normal: lightPalette.gray_c900, // draws attention
-  text_gray_medium: lightPalette.gray_c600, // accent or additional text
-  text_gray_low: lightPalette.gray_c400, // disabled text
+  text_gray_medium: lightPalette.gray_c900, // draws attention
+  text_gray_low: lightPalette.gray_c600, // accent or additional text
+  text_gray_min: lightPalette.gray_c400, // disabled text
+
   text_error: lightPalette.sys_magenta_c500, // error messages
   text_warning: lightPalette.sys_orange_c500, // warning messages
   text_success: lightPalette.secondary_c500, // success messages
   text_info: lightPalette.sys_cyan_c500, // info messages
 
-  bg_color_high: lightPalette.gray_cmin, // bottom surface
-  bg_color_low: lightPalette.gray_c100, // upper surface
+  bg_color_max: lightPalette.gray_cmin, // bottom surface
+  bg_color_min: lightPalette.gray_c100, // upper surface
 
-  el_primary_high: lightPalette.primary_c600, // hover'nd pressed state, actianable elements
+  el_primary_max: lightPalette.primary_c600, // hover'nd pressed state, actianable elements
   el_primary_medium: lightPalette.primary_c500, // actionable elements
   el_primary_low: lightPalette.primary_c300, // disabled elements, icons
   el_gray_high: lightPalette.gray_cmax, // hover and pressed, icons, shapes, lines in buttons, icons in banners

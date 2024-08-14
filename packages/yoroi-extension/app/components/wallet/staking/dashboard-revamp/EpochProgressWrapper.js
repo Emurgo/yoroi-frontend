@@ -41,7 +41,7 @@ function EpochProgressWrapper({ epochProgress, intl }: Props & Intl): Node {
           borderColor: 'grayscale.200',
         }}
       >
-        <Typography component="div" variant="h5" color="ds.text_gray_normal" fontWeight={500}>
+        <Typography component="div" variant="h5" color="ds.text_gray_medium" fontWeight={500}>
           {intl.formatMessage(globalMessages.epochProgress)}
         </Typography>
       </Box>

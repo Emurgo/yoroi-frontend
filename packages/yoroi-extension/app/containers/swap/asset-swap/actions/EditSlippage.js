@@ -18,7 +18,7 @@ export const EditSlippage = ({ setOpenedDialog, slippageValue }: EditSlippagePro
       }}
     >
       <Box display="flex" gap="8px" alignItems="center">
-        <Typography component="div" variant="body1" color="ds.text_gray_normal">
+        <Typography component="div" variant="body1" color="ds.text_gray_medium">
           Slippage tolerance
         </Typography>
         <InfoTooltip
@@ -28,7 +28,7 @@ export const EditSlippage = ({ setOpenedDialog, slippageValue }: EditSlippagePro
         />
       </Box>
       <IconWrapper onClick={setOpenedDialog} sx={{ cursor: 'pointer', display: 'flex', gap: '4px', alignItems: 'center' }}>
-        <Typography component="div" variant="body1" color="ds.text_gray_normal">
+        <Typography component="div" variant="body1" color="ds.text_gray_medium">
           {slippageValue}%
         </Typography>
         <EditIcon />

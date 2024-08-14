@@ -86,11 +86,11 @@ export default class QrCodeDialog extends Component<Props> {
       >
         <ProgressStepBlock stepsList={stepsList} progressInfo={progressInfo} classicTheme={classicTheme} />
 
-        <Typography className={classnames([styles.lineTitle, styles.firstItem])} color="ds.text_gray_normal">
+        <Typography className={classnames([styles.lineTitle, styles.firstItem])} color="ds.text_gray_medium">
           {intl.formatMessage(messages.lineTitle)}
         </Typography>
 
-        <Typography className={styles.lineText} color="ds.text_gray_normal">
+        <Typography className={styles.lineText} color="ds.text_gray_medium">
           {intl.formatMessage(messages.line2)}
         </Typography>
 

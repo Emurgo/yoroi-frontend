@@ -235,7 +235,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
           {shouldDeregister && (
             <Box mb="24px">
               <Warning>
-                <Typography component="div" variant="body1" color="ds.text_gray_normal">
+                <Typography component="div" variant="body1" color="ds.text_gray_medium">
                   {intl.formatMessage(messages.deregistrationWarning)}
                 </Typography>
               </Warning>

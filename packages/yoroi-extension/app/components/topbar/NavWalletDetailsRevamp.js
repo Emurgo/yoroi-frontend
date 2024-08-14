@@ -108,7 +108,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
             borderColor: 'primary.600',
           },
           transition: 'border-color 300ms ease',
-          backgroundColor: 'ds.bg_color_low',
+          backgroundColor: 'ds.bg_color_min',
         }}
       >
         <div className={styles.outerWrapper}>

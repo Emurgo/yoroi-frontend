@@ -92,7 +92,7 @@ export const lightThemeBase: any = {
       blue: 'linear-gradient(30.09deg, #244ABF 0%, #4760FF 176.73%)',
     },
     background: {
-      bg_color_low: light.gray_cmin,
+      bg_color_min: light.gray_cmin,
       bg_color_medium: grayscale['100'],
       // legacy ones
       card: '#fff',

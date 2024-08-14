@@ -174,7 +174,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
       );
 
     return (
-      <Box id="wallet:transactions-walletSummary-box" sx={{ bgcolor: 'ds.bg_color_low' }}>
+      <Box id="wallet:transactions-walletSummary-box" sx={{ bgcolor: 'ds.bg_color_min' }}>
         <Box
           sx={{
             marginBottom: '16px',
@@ -183,7 +183,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
             alignItems: 'center',
           }}
         >
-          <Typography variant="h2" as="p" fontSize="18px" sx={{ fontWeight: 500, color: 'ds.text_gray_normal' }}>
+          <Typography variant="h2" as="p" fontSize="18px" sx={{ fontWeight: 500, color: 'ds.text_gray_medium' }}>
             {intl.formatMessage({ id: 'wallet.navigation.transactions' })}
           </Typography>
           {!isLoadingTransactions && (

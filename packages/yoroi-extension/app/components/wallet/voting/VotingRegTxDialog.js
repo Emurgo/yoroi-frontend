@@ -97,7 +97,7 @@ export default class VotingRegTxDialog extends Component<Props> {
 
     if (walletType === 'mnemonic') {
       return (
-        <Typography className={classnames([styles.lineText, styles.firstItem])} color="ds.text_gray_normal">
+        <Typography className={classnames([styles.lineText, styles.firstItem])} color="ds.text_gray_medium">
           {intl.formatMessage(messages.line1)}
         </Typography>
       );

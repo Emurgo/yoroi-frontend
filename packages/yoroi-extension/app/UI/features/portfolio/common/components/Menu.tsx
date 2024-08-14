@@ -30,7 +30,7 @@ const Menu = ({ options, onItemClick, isActiveItem }: Props) => {
           <Typography
             variant="body1"
             fontWeight="500"
-            sx={{ color: isActiveItem(option.route) ? theme.palette.ds.primary_c500 : theme.palette.ds.text_gray_medium }}
+            sx={{ color: isActiveItem(option.route) ? theme.palette.ds.primary_c500 : theme.palette.ds.text_gray_low }}
           >
             {option.label}
           </Typography>

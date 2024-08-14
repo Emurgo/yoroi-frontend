@@ -32,7 +32,7 @@ const RewardGraphClean = (props: Props): any => {
           sx={{
             padding: '8px 12px 8px 8px',
             bgcolor: theme => theme.palette.ds.gray_c900,
-            color: 'ds.bg_color_low',
+            color: 'ds.bg_color_min',
             lineHeight: '14px',
             borderRadius: '4px',
           }}

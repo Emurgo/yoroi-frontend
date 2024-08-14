@@ -60,10 +60,10 @@ function SupportedAddressDomainsBanner({ onClose, intl }: Props & Intl): Node {
           }}
         />
         <Box>
-          <Typography component="div" color="ds.text_gray_normal" fontWeight={500} fontSize="16px" mb="8px">
+          <Typography component="div" color="ds.text_gray_medium" fontWeight={500} fontSize="16px" mb="8px">
             {intl.formatMessage(messages.title)}
           </Typography>
-          <Typography component="div" color="ds.text_gray_normal" fontWeight={400} fontSize="16px">
+          <Typography component="div" color="ds.text_gray_medium" fontWeight={400} fontSize="16px">
             {intl.formatMessage(messages.message)}
           </Typography>
           <Typography component="div" fontWeight={500} paddingLeft="10px">

@@ -280,7 +280,7 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
             <IconWrapper>
               <InfoIcon />
             </IconWrapper>
-            <Typography component="div" variant="body1" fontWeight={500} color="ds.text_gray_normal">
+            <Typography component="div" variant="body1" fontWeight={500} color="ds.text_gray_medium">
               {intl.formatMessage(messages.delegationTips)}
             </Typography>
           </Box>
@@ -295,7 +295,7 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
               const message = intl.formatMessage(msg);
               return (
                 <Box component="li" key={message}>
-                  <Typography component="div" variant="body1" color="ds.text_gray_normal">
+                  <Typography component="div" variant="body1" color="ds.text_gray_medium">
                     {message}
                   </Typography>
                 </Box>
@@ -304,7 +304,7 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
           </Box>
         </Box>
         <Box mb="16px">
-          <Typography component="div" variant="body1" color="ds.text_gray_normal" mb="4px">
+          <Typography component="div" variant="body1" color="ds.text_gray_medium" mb="4px">
             {intl.formatMessage(globalMessages.stakePoolChecksumAndName)}
           </Typography>
           <Box sx={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
@@ -321,7 +321,7 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
           </Box>
         </Box>
         <Box mb="24px">
-          <Typography component="div" variant="body1" color="ds.text_gray_normal">
+          <Typography component="div" variant="body1" color="ds.text_gray_medium">
             {intl.formatMessage(globalMessages.stakePoolHash)}
           </Typography>
           <Box>
@@ -360,7 +360,7 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
         >
           <Box>
             <Box display="flex" gap="6px" alignItems="center">
-              <Typography component="div" color="ds.text_gray_normal" variant="body1">
+              <Typography component="div" color="ds.text_gray_medium" variant="body1">
                 {intl.formatMessage(messages.amountToDelegate)}
               </Typography>
               <Tooltip
@@ -382,7 +382,7 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
           </Box>
           <Box>
             <Box display="flex" gap="6px" alignItems="center">
-              <Typography component="div" color="ds.text_gray_normal" variant="body1">
+              <Typography component="div" color="ds.text_gray_medium" variant="body1">
                 {intl.formatMessage(messages.epochRewardLabel)}
               </Typography>
               <Tooltip
@@ -406,7 +406,7 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
             </Typography>
           </Box>
           <Box>
-            <Typography component="div" color="ds.text_gray_normal" variant="body1">
+            <Typography component="div" color="ds.text_gray_medium" variant="body1">
               {intl.formatMessage(globalMessages.feeLabel)}
             </Typography>
             <Typography component="div" color="grayscale.900">

@@ -99,13 +99,13 @@ export const DelagationForm = () => {
                   <>
                     <Typography
                       variant="body1"
-                      color="ds.text_gray_normal"
+                      color="ds.text_gray_medium"
                     >{`Delegate voting to ${governanceVote.drepID}`}</Typography>
                     <Stack direction="row" justifyContent="space-between">
                       <Typography variant="body1" fontWeight="500">
                         Transaction fee
                       </Typography>
-                      <Typography variant="body1" color="ds.text_gray_normal">
+                      <Typography variant="body1" color="ds.text_gray_medium">
                         0.5 ADA
                       </Typography>
                     </Stack>

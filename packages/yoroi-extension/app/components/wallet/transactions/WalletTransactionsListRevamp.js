@@ -147,7 +147,7 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
     return (
       <Box
         sx={{
-          bgcolor: 'ds.bg_color_low',
+          bgcolor: 'ds.bg_color_min',
           padding: '20px 0',
           overflow: 'auto',
         }}

@@ -70,17 +70,11 @@ class SpendingPasswordSetting extends Component<Props & InjectedLayoutProps> {
 
     const revampLayout = (
       <Box mt="13px">
-        <Typography
-          component="div"
-          variant="body1"
-          fontWeight={500}
-          color="grayscale.900"
-          mb="16px"
-        >
+        <Typography component="div" variant="body1" fontWeight={500} color="grayscale.900" mb="16px">
           {intl.formatMessage(messages.title)}
         </Typography>
 
-        <Typography component="div" variant="body1" color="ds.text_gray_normal" mb="16px">
+        <Typography component="div" variant="body1" color="ds.text_gray_medium" mb="16px">
           {intl.formatMessage(messages.passwordDescription)}
         </Typography>
 

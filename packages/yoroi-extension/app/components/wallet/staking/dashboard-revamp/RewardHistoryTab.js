@@ -30,8 +30,8 @@ const ExpandMoreIcon = () => (
 const Accordion = styled((props /* AccordionProps */) => (
   <MuiAccordion TransitionProps={{ timeout: { exit: 500 } }} disableGutters elevation={0} square {...props} />
 ))(({ theme }) => ({
-  backgroundColor: theme.palette.ds.bg_color_low,
-  borderBottom: theme.palette.ds.bg_color_low,
+  backgroundColor: theme.palette.ds.bg_color_min,
+  borderBottom: theme.palette.ds.bg_color_min,
   '&:not(:last-child)': {
     borderBottom: 0,
   },
@@ -90,7 +90,7 @@ export const RewardHistoryItem = ({ poolId, poolName, poolAvatar, historyList }:
       <AccordionSummary aria-controls={poolId + '-content'} id={poolId || poolName + '-header'}>
         <Box>
           <Box display="block">
-            <Typography component="div" color="ds.text_gray_medium">
+            <Typography component="div" color="ds.text_gray_low">
               Stake Pool
             </Typography>
           </Box>
@@ -108,14 +108,14 @@ export const RewardHistoryItem = ({ poolId, poolName, poolAvatar, historyList }:
             // eslint-disable-next-line react/no-array-index-key
             <Box key={idx} display="flex" justifyContent="space-between" alignItems="center">
               <Box>
-                <Typography component="div" mb="2px" color="ds.text_gray_medium">
+                <Typography component="div" mb="2px" color="ds.text_gray_low">
                   {type}
                 </Typography>
-                <Typography component="div" variant="body2" color="ds.text_gray_medium">
+                <Typography component="div" variant="body2" color="ds.text_gray_low">
                   {date}
                 </Typography>
               </Box>
-              <Typography component="div" fontWeight={500} variant="body2" color="ds.text_gray_normal">
+              <Typography component="div" fontWeight={500} variant="body2" color="ds.text_gray_medium">
                 + {balance}
               </Typography>
             </Box>

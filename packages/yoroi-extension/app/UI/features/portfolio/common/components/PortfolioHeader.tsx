@@ -49,7 +49,7 @@ const PortfolioHeader = ({ balance, setKeyword, isLoading, tooltipTitle }: Props
               component="span"
               variant="body2"
               fontWeight="500"
-              color="ds.text_gray_low"
+              color="ds.text_gray_min"
               onClick={handleCurrencyChange}
               sx={{
                 cursor: 'pointer',

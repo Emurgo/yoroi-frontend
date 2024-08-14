@@ -173,12 +173,12 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount, hea
       </TableCell>
       <TableCell key={`${row.label} ${headCells[2].id}`} align="center">
         <Stack direction="column">
-          <Typography fontWeight="500" color="ds.text_gray_normal">
+          <Typography fontWeight="500" color="ds.text_gray_medium">
             {row.feeValue ? `${row.feeValue.toFixed(2)} ADA` : '-'}
           </Typography>
           {isExpanded &&
             (unitOfAccount === 'ADA' ? null : (
-              <Typography variant="body2" color="ds.text_gray_medium">
+              <Typography variant="body2" color="ds.text_gray_low">
                 {row.feeValueUsd ? `${row.feeValueUsd.toFixed(2)} ${unitOfAccount}` : '-'}
               </Typography>
             ))}

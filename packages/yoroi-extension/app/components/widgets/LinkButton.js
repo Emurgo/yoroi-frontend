@@ -41,7 +41,7 @@ export default class LinkButton extends Component<Props> {
                 <SvgElem />
               </span>
             </div>
-            <Typography variant="body3" color="ds.text_gray_normal">
+            <Typography variant="body3" color="ds.text_gray_medium">
               {intl.formatMessage(message)}
             </Typography>
           </a>

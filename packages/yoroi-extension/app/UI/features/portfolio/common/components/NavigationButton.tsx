@@ -25,7 +25,7 @@ const NavigationButton = ({ label, onClick, variant, sx, width, ...props }: Prop
           color: theme.palette.ds.el_static_white,
 
           '&:hover': {
-            backgroundColor: theme.palette.ds.el_primary_high,
+            backgroundColor: theme.palette.ds.el_primary_max,
           },
         },
 

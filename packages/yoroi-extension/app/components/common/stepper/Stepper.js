@@ -85,7 +85,7 @@ function Stepper(props: Props & Intl): Node {
                   component="div"
                   variant="body2"
                   fontWeight={500}
-                  color={isCurrentStep ? 'ds.text_gray_normal' : stepColor}
+                  color={isCurrentStep ? 'ds.text_gray_medium' : stepColor}
                   lineHeight="27px"
                 >
                   {idx + 1}

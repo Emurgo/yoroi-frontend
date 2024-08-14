@@ -119,7 +119,7 @@ export default class WalletCard extends Component<Props, State> {
     const walletNFTsAmountId = `${id}:walletCard_${idx}-walletNFTsAmount-text`;
 
     return (
-      <Box sx={{ background: 'ds.bg_color_low' }} mb="16px">
+      <Box sx={{ background: 'ds.bg_color_min' }} mb="16px">
         <Draggable draggableId={walletId.toString()} index={idx}>
           {(provided, snapshot) => (
             <div
@@ -144,11 +144,11 @@ export default class WalletCard extends Component<Props, State> {
                 id={buttonId}
               >
                 <div className={styles.header}>
-                  <Typography id={walletNameId} variant="body2" color="ds.text_gray_normal" mr="5px">
+                  <Typography id={walletNameId} variant="body2" color="ds.text_gray_medium" mr="5px">
                     {this.props.settingsCache.conceptualWalletName}
                   </Typography>
                   {' ·  '}
-                  <Typography variant="body2" color="ds.text_gray_normal" ml="5px">
+                  <Typography variant="body2" color="ds.text_gray_medium" ml="5px">
                     {typeText}
                   </Typography>
                 </div>

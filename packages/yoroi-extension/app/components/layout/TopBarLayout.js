@@ -64,7 +64,7 @@ function TopBarLayout({
             boxShadow: !isRevamp && showAsCard === true && '0 2px 12px 0 rgba(0, 0, 0, 0.06)',
             borderRadius: !isRevamp && showAsCard === true && '8px',
             ...(showInContainer === true && {
-              bgcolor: 'ds.bg_color_low',
+              bgcolor: 'ds.bg_color_min',
               width: '100%',
               overflow: 'hidden',
               display: 'flex',
@@ -78,7 +78,7 @@ function TopBarLayout({
           {isRevamp ? (
             <Box
               sx={{
-                bgcolor: bgcolor || 'ds.bg_color_low',
+                bgcolor: bgcolor || 'ds.bg_color_min',
                 height: '100%',
                 width: '100%',
                 maxWidth: '1872px',
@@ -96,10 +96,9 @@ function TopBarLayout({
                   sx={{
                     height: '100%',
                     minHeight: '200px',
-                    padding:
-                      typeof withPadding === 'undefined' || withPadding === true ? '24px' : '0px',
+                    padding: typeof withPadding === 'undefined' || withPadding === true ? '24px' : '0px',
                     pb: 0,
-                    bgcolor: 'ds.bg_color_low',
+                    bgcolor: 'ds.bg_color_min',
                   }}
                 >
                   {children}
@@ -124,7 +123,7 @@ function TopBarLayout({
       const boxProperties = {
         height: '100%',
         minHeight: '200px',
-        backgroundColor: isRevamp ? 'ds.bg_color_low' : 'var(--yoroi-palette-gray-50)',
+        backgroundColor: isRevamp ? 'ds.bg_color_min' : 'var(--yoroi-palette-gray-50)',
         maxWidth: '1295px',
         paddingLeft: '40px',
         paddingRight: '40px',
@@ -164,7 +163,7 @@ function TopBarLayout({
   return (
     <Box
       sx={{
-        backgroundColor: 'ds.bg_color_low',
+        backgroundColor: 'ds.bg_color_min',
         boxShadow: isModern ? '0 0 70px 0 rgba(0, 0, 0, 0.75)' : 'none',
         display: 'flex',
         flexDirection: 'column',
@@ -192,7 +191,7 @@ function TopBarLayout({
             display: 'flex',
             flexDirection: 'column',
             position: 'relative',
-            backgroundColor: isRevamp ? 'ds.bg_color_low' : 'var(--yoroi-palette-gray-50)',
+            backgroundColor: isRevamp ? 'ds.bg_color_min' : 'var(--yoroi-palette-gray-50)',
           }}
         >
           {banner}
