@@ -57,7 +57,7 @@ type Props = {|
   +onSubmit: ComplexityLevelType => PossiblyAsync<void>,
   +isSubmitting: boolean,
   +error?: ?LocalizableError,
-  +baseTheme: string,
+  +baseTheme?: string,
 |};
 
 type InjectedProps = {| +isRevampLayout: boolean |};
