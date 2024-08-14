@@ -25,7 +25,7 @@ class SubMenuItem extends Component<Props & InjectedProps> {
   };
 
   render(): Node {
-    const { label, active, disabled, onClick, className, isRevampLayout, locationId } = this.props;
+    const { label, active, disabled, onClick, className, locationId } = this.props;
     let state = styles.enabled;
     if (disabled === true) {
       state = styles.disabled;

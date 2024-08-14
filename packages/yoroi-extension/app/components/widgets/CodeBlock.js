@@ -1,9 +1,7 @@
 // @flow
-import React from 'react';
 import { observer } from 'mobx-react';
 import styles from './CodeBlock.scss';
-import { Box } from '@mui/material';
-import { useTheme } from '@mui/material';
+import { Box, useTheme } from '@mui/material';
 
 type Props = {|
   code: string,

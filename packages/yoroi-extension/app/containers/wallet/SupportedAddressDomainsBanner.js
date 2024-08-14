@@ -10,7 +10,6 @@ import { resolveAddressDomainNameServerName } from '../../stores/ada/AdaAddresse
 import DialogCloseButton from '../../components/widgets/DialogCloseButton';
 import { CloseButton } from '../../components/widgets/Dialog';
 import { listValues, sorted } from '../../coreUtils';
-import { useTheme } from '@mui/material';
 
 type Props = {|
   onClose: () => void,
@@ -34,7 +33,6 @@ const messages = defineMessages({
 
 function SupportedAddressDomainsBanner({ onClose, intl }: Props & Intl): Node {
   const nameServerNames = sorted(listValues<string>(Resolver.NameServer).map(resolveAddressDomainNameServerName));
-  const theme = useTheme();
   return (
     <Box>
       <Box

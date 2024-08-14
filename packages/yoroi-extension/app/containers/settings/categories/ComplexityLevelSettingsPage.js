@@ -1,6 +1,5 @@
 // @flow
 
-import React from 'react';
 import { observer } from 'mobx-react';
 import ComplexityLevel from '../../../components/profile/complexity-level/ComplexityLevelForm';
 import { useTheme } from '@mui/material';

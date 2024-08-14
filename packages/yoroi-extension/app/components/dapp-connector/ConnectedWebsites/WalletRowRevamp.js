@@ -16,7 +16,6 @@ import { splitAmount, truncateToken } from '../../../utils/formatters';
 import { Box, Typography, styled } from '@mui/material';
 import { constructPlate } from '../../topbar/NavPlate';
 import styles from './WalletRow.scss';
-import { IconButton } from '@mui/material';
 
 type Props = {|
   +url: ?string,
@@ -156,7 +155,7 @@ export default class WalletRowRevamp extends Component<Props, State> {
   }
 }
 
-const SIconButton = styled(Box)(({ theme, active }) => ({
+const SIconButton = styled(Box)(({ theme }) => ({
   '& svg': {
     '& path': {
       fill: theme.palette.ds.el_gray_medium,
