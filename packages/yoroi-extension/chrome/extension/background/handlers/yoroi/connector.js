@@ -3,24 +3,22 @@
 
 import type { HandlerType } from './type';
 import {
-  withDb,
-  withSelectedWallet,
   getConnectedSite,
   connectContinuation,
   setConnectedSite,
   deleteConnectedSite,
-  sendToInjector,
-  transformCardanoUtxos,
   getAllConnectedSites,
-  getFromStorage,
-  STORAGE_KEY_IMG_BASE64,
-} from '../content';
+  getConnectedWallet,
+} from '../content/connect';
+import { sendToInjector } from '../content/utils';
+
 import { getPublicDeriverById } from './utils';
 import { asGetPublicKey } from '../../../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import {
   getAddressing,
   connectorSignData,
   connectorSignCardanoTx,
+  transformCardanoUtxos,
 } from '../../../connector/api';
 import { createAuthEntry } from '../../../../../app/connector/api';
 import { getWalletChecksum } from '../../../../../app/api/export/utils';
@@ -142,7 +140,6 @@ export const UserSignConfirm: HandlerType<
         request.tabId,
         {
           type: 'connector_rpc_response',
-          protocol: responseData.protocol,
           uid: request.uid,
           return: response
         }
@@ -166,6 +163,8 @@ export const UserSignConfirm: HandlerType<
       });
     }
 
+    const wallet = await getConnectedWallet(request.tabId, false);
+
     switch (responseData.request.type) {
       case 'tx/cardano':
       {
@@ -173,10 +172,10 @@ export const UserSignConfirm: HandlerType<
         try {
           let signedTxWitnessSetHex;
           if (request.password) {
-            signedTxWitnessSetHex = await signCardanoTx(
-              (request.tx: any),
+            signedTxWitnessSetHex = await connectorSignCardanoTx(
+              wallet,
               request.password,
-              request.tabId
+              (request.tx: any),
             );
           } else if (request.witnessSetHex) {
             signedTxWitnessSetHex = request.witnessSetHex;
@@ -239,27 +238,17 @@ export const UserSignConfirm: HandlerType<
         const { address, payload } = responseData.continuationData;
         let dataSig;
         try {
-          dataSig = await withDb(async (db, localStorageApi) => {
-            return await withSelectedWallet(
-              request.tabId,
-              async (wallet) => {
-                const addressing = await getAddressing(wallet, address);
-                if (!addressing) {
-                  throw new Error('key derivation path does not exist');
-                }
-                return await connectorSignData(
-                  wallet,
-                  request.password,
-                  addressing,
-                  address,
-                  payload,
-                );
-              },
-              db,
-              localStorageApi,
-              false,
-            );
-          });
+          const addressing = await getAddressing(wallet, address);
+          if (!addressing) {
+            throw new Error('key derivation path does not exist');
+          }
+          dataSig = await connectorSignData(
+            wallet,
+            request.password,
+            addressing,
+            address,
+            payload,
+          );
         } catch (error) {
           Logger.error(`error when signing data ${error}`);
           rpcResponse(
@@ -299,30 +288,6 @@ export const UserSignConfirm: HandlerType<
   },
 });
 
-/**
- * Returns HEX of a serialised witness set
- */
-async function signCardanoTx(
-  tx: CardanoTx,
-  password: string,
-  tabId: number
-): Promise<string> {
-  return await withDb(async (db, localStorageApi) => {
-    return await withSelectedWallet(
-      tabId,
-      async (wallet) => {
-        return await connectorSignCardanoTx(
-          wallet,
-          password,
-          tx,
-        );
-      },
-      db,
-      localStorageApi
-    );
-  });
-}
-
 export const UserSignReject: HandlerType<
   {|
     uid: RpcUid,
@@ -344,7 +309,6 @@ export const UserSignReject: HandlerType<
         request.tabId,
         {
           type: 'connector_rpc_response',
-          protocol: responseData.protocol,
           uid: request.uid,
           return: {
             err: {
@@ -386,7 +350,6 @@ export const SignFail: HandlerType<
         request.tabId,
         {
           type: 'connector_rpc_response',
-          protocol: responseData.protocol,
           uid: request.uid,
           return: {
             err: {
@@ -451,12 +414,11 @@ export const ConnectWindowRetrieveData: HandlerType<
       const connection = connectedSites[tabId];
       if (connection.status?.requestType) {
         connection.status.openedWindow = true;
-        const imgBase64Url = await getFromStorage(STORAGE_KEY_IMG_BASE64);
+
         return {
           url: connection.url,
-          protocol: connection.protocol,
           appAuthID: connection.appAuthID,
-          imgBase64Url,
+          imgBase64Url: connection.imgBase64Url,
           tabId: Number(tabId),
         };
       }
