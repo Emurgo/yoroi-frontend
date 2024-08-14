@@ -10,6 +10,7 @@ import { resolveAddressDomainNameServerName } from '../../stores/ada/AdaAddresse
 import DialogCloseButton from '../../components/widgets/DialogCloseButton';
 import { CloseButton } from '../../components/widgets/Dialog';
 import { listValues, sorted } from '../../coreUtils';
+import { useTheme } from '@mui/material';
 
 type Props = {|
   onClose: () => void,
@@ -32,14 +33,16 @@ const messages = defineMessages({
 });
 
 function SupportedAddressDomainsBanner({ onClose, intl }: Props & Intl): Node {
-  const nameServerNames = sorted(
-    listValues<string>(Resolver.NameServer).map(resolveAddressDomainNameServerName)
-  );
+  const nameServerNames = sorted(listValues<string>(Resolver.NameServer).map(resolveAddressDomainNameServerName));
+  const theme = useTheme();
   return (
     <Box>
       <Box
         sx={{
-          background: theme => theme.palette.background.gradients.supportedAddressDomainsBanner,
+          background: theme =>
+            theme.name === 'light-theme'
+              ? theme.palette.background.gradients.supportedAddressDomainsBanner
+              : theme.palette.ds.bg_gradient_1,
           borderRadius: '8px',
           overflowY: 'hidden',
           position: 'relative',
@@ -57,13 +60,7 @@ function SupportedAddressDomainsBanner({ onClose, intl }: Props & Intl): Node {
           }}
         />
         <Box>
-          <Typography
-            component="div"
-            color="ds.text_gray_normal"
-            fontWeight={500}
-            fontSize="16px"
-            mb="8px"
-          >
+          <Typography component="div" color="ds.text_gray_normal" fontWeight={500} fontSize="16px" mb="8px">
             {intl.formatMessage(messages.title)}
           </Typography>
           <Typography component="div" color="ds.text_gray_normal" fontWeight={400} fontSize="16px">
