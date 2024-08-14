@@ -83,10 +83,13 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
           });
         } else {
           const newWalletState = params.walletState;
+          // Reloading token info must happen before updating the wallet state because if there is
+          // a new transaction that brings a never-seen-before token and we are on the assets page
+          // then it crashes due to missing token.
+          await this.stores.tokenInfoStore.refreshTokenInfo();
           runInAction(() => {
             Object.assign(this.wallets[index], newWalletState);
           });
-          await this.stores.tokenInfoStore.refreshTokenInfo();
           if (this.initialSyncingWalletIds.has(params.publicDeriverId)) {
             this.stores.addresses.refreshAddressesFromDb(this.wallets[index]);
           }
