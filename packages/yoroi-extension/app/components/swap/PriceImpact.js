@@ -14,8 +14,8 @@ import type { PriceImpact } from './types';
 function colorsBySeverity(isSevere: boolean) {
   const theme = useTheme();
   return isSevere
-    ? { fg: theme.palette.ds.text_error, bg: theme.palette.ds.sys_magenta_c100 }
-    : { fg: theme.palette.ds.sys_yellow_c500, bg: theme.palette.ds.sys_yellow_c100 };
+    ? { fg: theme.palette.ds.text_error, bg: theme.palette.ds.sys_magenta_100 }
+    : { fg: theme.palette.ds.sys_yellow_500, bg: theme.palette.ds.sys_yellow_100 };
 }
 
 export function PriceImpactColored({

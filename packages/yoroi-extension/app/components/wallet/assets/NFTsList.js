@@ -192,7 +192,7 @@ const SvgWrapper = styled(Box)(({ theme, height }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  backgroundColor: theme.palette.ds.gray_c100,
+  backgroundColor: theme.palette.ds.gray_100,
   height,
   '& svg': {
     '& path': {
@@ -293,7 +293,7 @@ const SLink = styled(Link)({
 });
 
 const SButton = styled(IconButton)(({ theme, active }) => ({
-  backgroundColor: active && theme.palette.ds.gray_c200,
+  backgroundColor: active && theme.palette.ds.gray_200,
   maxWidth: '40px',
   maxHeight: '40px',
   padding: '8px',

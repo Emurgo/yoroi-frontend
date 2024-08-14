@@ -252,7 +252,7 @@ export const CloseButton = ({
 const StyledBox = forwardRef(({ contentHasScroll, empty, hasDivider, ...props }, ref) => <Box {...props} ref={ref} />);
 
 const SIconBtn = styled(Button)(({ theme, active }) => ({
-  backgroundColor: active && theme.palette.ds.gray_c200,
+  backgroundColor: active && theme.palette.ds.gray_200,
   '& svg': {
     '& path': {
       fill: theme.palette.ds.el_gray_medium,

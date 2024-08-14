@@ -652,7 +652,7 @@ export default class TransactionRevamp extends Component<Props, State> {
             mt: '8px',
           }}
         >
-          <Box className={detailsStyles} sx={{ borderBottom: isExpanded ?? '1px solid', borderColor: 'ds.gray_c200' }}>
+          <Box className={detailsStyles} sx={{ borderBottom: isExpanded ?? '1px solid', borderColor: 'ds.gray_200' }}>
             {/* converting assets is not implemented but we may use it in the future for tokens */}
             {data.type === transactionTypes.EXCHANGE && (
               <div className={styles.conversion}>
@@ -665,7 +665,7 @@ export default class TransactionRevamp extends Component<Props, State> {
               </div>
             )}
             <Box sx={{ overflowX: 'overlay', bgcolor: 'ds.bg_color_min' }}>
-              <Box className={styles.addressContent} sx={{ border: '1px solid', borderColor: 'ds.gray_c200' }}>
+              <Box className={styles.addressContent} sx={{ border: '1px solid', borderColor: 'ds.gray_200' }}>
                 <div>
                   <Box
                     sx={{
@@ -693,7 +693,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                   </Box>
                   <Box
                     className={styles.addressList}
-                    sx={{ color: 'grayscale.600', borderBottom: '1px solid', borderColor: 'ds.gray_c200' }}
+                    sx={{ color: 'grayscale.600', borderBottom: '1px solid', borderColor: 'ds.gray_200' }}
                   >
                     {data.addresses.from.map((address, addressIndex) => {
                       const addressRowId = `${txIdFullInfoBasePart}:fromAddresses:address_${addressIndex}`;
@@ -930,7 +930,7 @@ export default class TransactionRevamp extends Component<Props, State> {
       return null;
     }
     return (
-      <Box className={styles.addressContent} sx={{ borderBottom: '1px solid', borderColor: 'ds.gray_c200' }}>
+      <Box className={styles.addressContent} sx={{ borderBottom: '1px solid', borderColor: 'ds.gray_200' }}>
         <div>
           <Box
             sx={{

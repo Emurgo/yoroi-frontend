@@ -39,7 +39,7 @@ const PortfolioHeader = ({ balance, setKeyword, isLoading, tooltipTitle }: Props
           {isLoading ? (
             <Skeleton width="146px" height="24px" />
           ) : (
-            <Typography variant="h2" fontWeight="500" color="ds.gray_cmax">
+            <Typography variant="h2" fontWeight="500" color="ds.gray_max">
               {isAdaMainUnit ? formatNumber(balance.usd) : formatNumber(balance.ada)}
             </Typography>
           )}
@@ -66,7 +66,7 @@ const PortfolioHeader = ({ balance, setKeyword, isLoading, tooltipTitle }: Props
           {isLoading ? (
             <Skeleton width="129px" height="16px" />
           ) : (
-            <Typography color="ds.gray_c600">
+            <Typography color="ds.gray_600">
               {isAdaMainUnit ? formatNumber(balance.ada) : formatNumber(balance.usd)}{' '}
               {isAdaMainUnit ? settingFiatPairUnit.currency || 'USD' : 'ADA'}
             </Typography>
@@ -84,9 +84,9 @@ const PortfolioHeader = ({ balance, setKeyword, isLoading, tooltipTitle }: Props
                   label={
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
                       {balance.percents > 0 ? (
-                        <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
+                        <Icon.ChipArrowUp fill={theme.palette.ds.secondary_800} />
                       ) : balance.percents < 0 ? (
-                        <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
+                        <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_700} />
                       ) : null}
                       {/* @ts-ignore */}
                       <Typography variant="caption1">

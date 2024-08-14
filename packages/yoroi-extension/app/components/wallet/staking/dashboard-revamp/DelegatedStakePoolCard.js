@@ -163,13 +163,13 @@ const UpdatePoolButton: any = styled(Button)(({ theme }) => ({
   // width: 'unset',
   width: '140px',
   marginLeft: 'auto',
-  background: theme.palette.ds.sys_magenta_c500,
+  background: theme.palette.ds.sys_magenta_500,
   color: 'white',
   height: '40px',
   padding: '0px !important',
   fontSize: '14px',
   '&:hover': {
-    backgroundColor: theme.palette.ds.sys_magenta_c500,
+    backgroundColor: theme.palette.ds.sys_magenta_500,
     color: 'white',
   },
 }));

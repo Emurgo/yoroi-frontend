@@ -94,7 +94,7 @@ export default class QrCodeDialog extends Component<Props> {
           {intl.formatMessage(messages.line2)}
         </Typography>
 
-        <Typography className={classnames([styles.lineBold, styles.importantText])} color="ds.sys_magenta_c500">
+        <Typography className={classnames([styles.lineBold, styles.importantText])} color="ds.sys_magenta_500">
           {intl.formatMessage(messages.line3)}
         </Typography>
 

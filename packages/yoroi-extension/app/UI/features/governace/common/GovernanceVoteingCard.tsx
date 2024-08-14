@@ -75,7 +75,7 @@ export const GovernanceVoteingCard = ({ title, description, icon, selected, onCl
         <Typography variant="h3" fontWeight="500" mt="16px">
           {title}
         </Typography>
-        <Description variant="body2" color={'ds.gray_c800'}>
+        <Description variant="body2" color={'ds.gray_800'}>
           {description}
         </Description>
       </CardContent>

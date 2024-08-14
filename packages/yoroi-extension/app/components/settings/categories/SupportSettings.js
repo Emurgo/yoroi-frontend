@@ -128,7 +128,7 @@ class SupportSettings extends Component<Props & InjectedProps> {
                   component="div"
                   sx={{
                     '& a': {
-                      color: 'ds.primary_c500',
+                      color: 'ds.primary_500',
                       textDecoration: isRevampLayout ? 'none' : 'underline',
                     },
                   }}

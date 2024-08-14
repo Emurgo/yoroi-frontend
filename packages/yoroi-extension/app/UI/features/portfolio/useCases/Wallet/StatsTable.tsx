@@ -121,7 +121,7 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
             borderRadius: `${theme.shape.borderRadius}px`,
             '& td': { border: 0 },
             '&:hover': {
-              backgroundColor: theme.palette.ds.gray_c50,
+              backgroundColor: theme.palette.ds.gray_50,
             },
           }}
         >
@@ -159,9 +159,9 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
               label={
                 <Stack direction="row" justifyContent="space-between" alignItems="center">
                   {row['24h'] > 0 ? (
-                    <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
+                    <Icon.ChipArrowUp fill={theme.palette.ds.secondary_800} />
                   ) : row['24h'] < 0 ? (
-                    <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
+                    <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_700} />
                   ) : null}
                   {/* @ts-ignore */}
                   <Typography variant="caption1">
@@ -179,9 +179,9 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
               label={
                 <Stack direction="row" justifyContent="space-between" alignItems="center">
                   {row['1W'] > 0 ? (
-                    <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
+                    <Icon.ChipArrowUp fill={theme.palette.ds.secondary_800} />
                   ) : row['1W'] < 0 ? (
-                    <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
+                    <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_700} />
                   ) : null}
                   {/* @ts-ignore */}
                   <Typography variant="caption1">
@@ -199,9 +199,9 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
               label={
                 <Stack direction="row" justifyContent="space-between" alignItems="center">
                   {row['1M'] > 0 ? (
-                    <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
+                    <Icon.ChipArrowUp fill={theme.palette.ds.secondary_800} />
                   ) : row['1M'] < 0 ? (
-                    <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
+                    <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_700} />
                   ) : null}
                   {/* @ts-ignore */}
                   <Typography variant="caption1">

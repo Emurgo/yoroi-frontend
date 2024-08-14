@@ -92,7 +92,7 @@ export const lightThemeBase: any = {
       blue: 'linear-gradient(30.09deg, #244ABF 0%, #4760FF 176.73%)',
     },
     background: {
-      bg_color_min: light.gray_cmin,
+      bg_color_min: light.gray_min,
       bg_color_medium: grayscale['100'],
       // legacy ones
       card: '#fff',
@@ -118,7 +118,7 @@ export const lightThemeBase: any = {
       },
       on_primary: staticColors.white,
       gray: {
-        max: light.gray_cmax,
+        max: light.gray_max,
         normal: grayscale['900'],
         medium: grayscale['600'],
         low: grayscale['400'],
@@ -135,7 +135,7 @@ export const lightThemeBase: any = {
         low: primary['300'],
       },
       gray: {
-        high: light.gray_cmax,
+        high: light.gray_max,
         normal: grayscale['900'],
         medium: grayscale['600'],
         low: grayscale['400'],

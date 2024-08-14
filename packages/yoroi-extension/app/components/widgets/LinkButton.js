@@ -34,7 +34,7 @@ export default class LinkButton extends Component<Props> {
     const SvgElem = svg;
     return (
       <div className={styles.component} id={componentId || 'somewhere-someValue-linkButton'}>
-        <Box sx={{ borderRadius: '4px', '&:hover': { backgroundColor: 'ds.gray_c200' } }}>
+        <Box sx={{ borderRadius: '4px', '&:hover': { backgroundColor: 'ds.gray_200' } }}>
           <a href={url} onClick={event => onExternalLinkClick(event)} className={styles.block}>
             <div className={styles.icon}>
               <span className={svgClass}>

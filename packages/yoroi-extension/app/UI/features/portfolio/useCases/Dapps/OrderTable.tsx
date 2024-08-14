@@ -25,7 +25,7 @@ const TableRowSkeleton = ({ theme, ...props }) => (
       <Stack direction="row" alignItems="center" spacing={theme.spacing(1)}>
         <Skeleton width="24px" height="24px" />
         <Skeleton width="55px" height="24px" />
-        <Typography fontWeight="500" sx={{ color: theme.palette.ds.gray_c900 }}>
+        <Typography fontWeight="500" sx={{ color: theme.palette.ds.gray_900 }}>
           /
         </Typography>
         <Skeleton width="24px" height="24px" />
@@ -122,10 +122,10 @@ const OrderTable = ({ data, isLoading }: Props): JSX.Element => {
                 component="img"
                 src={adaPng}
               ></Box>
-              <Typography fontWeight="500" color="ds.gray_c900">
+              <Typography fontWeight="500" color="ds.gray_900">
                 {row.firstToken.name}
               </Typography>
-              <Typography fontWeight="500" color="ds.gray_c900">
+              <Typography fontWeight="500" color="ds.gray_900">
                 /
               </Typography>
               <Box
@@ -137,7 +137,7 @@ const OrderTable = ({ data, isLoading }: Props): JSX.Element => {
                   borderRadius: `${theme.shape.borderRadius}px`,
                 }}
               ></Box>
-              <Typography fontWeight="500" color="ds.gray_c900">
+              <Typography fontWeight="500" color="ds.gray_900">
                 {row.secondToken.name}
               </Typography>
             </Stack>
@@ -164,18 +164,18 @@ const OrderTable = ({ data, isLoading }: Props): JSX.Element => {
                 component="img"
                 src={minswapPng}
               ></Box>
-              <Typography fontWeight="500" color="ds.primary_c500">
+              <Typography fontWeight="500" color="ds.primary_500">
                 {row.DEX}
               </Typography>
             </Stack>
           </TableCell>
 
           <TableCell sx={{ padding: `${theme.spacing(1)} ${theme.spacing(2)}` }}>
-            <Typography color="ds.gray_c900">{row.assetPrice}</Typography>
+            <Typography color="ds.gray_900">{row.assetPrice}</Typography>
           </TableCell>
 
           <TableCell sx={{ padding: `${theme.spacing(1)} ${theme.spacing(2)}` }}>
-            <Typography color="ds.gray_c900">{row.assetAmount}</Typography>
+            <Typography color="ds.gray_900">{row.assetAmount}</Typography>
           </TableCell>
 
           <TableCell sx={{ padding: `${theme.spacing(1)} ${theme.spacing(2)}` }}>
@@ -185,7 +185,7 @@ const OrderTable = ({ data, isLoading }: Props): JSX.Element => {
                   url: `https://cardanoscan.io/transaction/${row.transactionId}`,
                 })
               }
-              color="ds.primary_c500"
+              color="ds.primary_500"
               sx={{ cursor: 'pointer' }}
             >
               {truncateAddressShort(row.transactionId, 10)}
@@ -194,11 +194,11 @@ const OrderTable = ({ data, isLoading }: Props): JSX.Element => {
 
           <TableCell sx={{ padding: `${theme.spacing(1)} ${theme.spacing(2)}` }}>
             <Stack direction="column" spacing={theme.spacing(0.25)}>
-              <Typography color="ds.gray_c900" sx={{ textAlign: 'right' }}>
+              <Typography color="ds.gray_900" sx={{ textAlign: 'right' }}>
                 {formatNumber(row.totalValue)} {row.firstToken.name}
               </Typography>
               {row.firstToken.name === 'ADA' && unitOfAccount === 'ADA' ? null : (
-                <Typography variant="body2" color="ds.gray_c600" sx={{ textAlign: 'right' }}>
+                <Typography variant="body2" color="ds.gray_600" sx={{ textAlign: 'right' }}>
                   {formatNumber(row.totalValueUsd)} {unitOfAccount}
                 </Typography>
               )}
