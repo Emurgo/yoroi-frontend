@@ -109,9 +109,7 @@ function Dialog(props: Props & InjectedProps): Node {
             }
       }
       sx={{
-        bgcolor: isRevampLayout
-          ? alpha('#121F4D', 0.7) // primary.900 70%
-          : 'var(--yoroi-comp-dialog-overlay-background-color)',
+        bgcolor: isRevampLayout ? 'ds.special_web_overlay' : 'var(--yoroi-comp-dialog-overlay-background-color)',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -173,11 +171,11 @@ function Dialog(props: Props & InjectedProps): Node {
               const buttonLabel = action.label.toLowerCase().replace(/ /gi, '');
               return (
                 <LoadingButton
+                  variant="primary"
                   // $FlowIgnore
                   id={action.id ?? id + '-' + buttonLabel + '-button'}
                   key={i}
                   {...getBtnVariant(action.danger, action.primary, isRevampLayout)}
-                  className={buttonClasses}
                   loading={action.isSubmitting}
                   onClick={action.onClick}
                   disabled={action.disabled === true || action.isSubmitting === true}
@@ -270,7 +268,7 @@ export const ModalContainer: any => Node = styled(StyledBox)(({ theme, contentHa
     paddingTop: theme.name === 'classic' ? '25px' : '0px',
     paddingBottom: theme.name === 'classic' || theme.name === 'modern' ? '30px' : '0px',
     maxWidth: theme.name === 'classic' ? '785px' : '824px',
-    backgroundColor: empty ? undefined : theme.palette.ds.bg_color_min,
+    backgroundColor: empty ? undefined : theme.palette.ds.bg_color_max,
     color: 'var(--yoroi-comp-dialog-text)',
     maxHeight: '95vh',
 
