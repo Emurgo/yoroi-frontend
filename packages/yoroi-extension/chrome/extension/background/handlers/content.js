@@ -1,26 +1,14 @@
 // @flow
-import debounce from 'lodash/debounce';
-import { getWallets } from '../../app/api/common/index';
-import { PublicDeriver, } from '../../app/api/ada/lib/storage/models/PublicDeriver/index';
-import { asGetAllUtxos, asHasUtxoChains } from '../../app/api/ada/lib/storage/models/PublicDeriver/traits';
+// Handle messages from the content script injected into dApp pages.
+
+import { getWallets } from '../../../../app/api/common/index';
+import { PublicDeriver, } from '../../../../app/api/ada/lib/storage/models/PublicDeriver/index';
+import { asGetAllUtxos, } from '../../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
-  CardanoTx,
-  ConfirmedSignData,
-  ConnectedSites,
-  ConnectingMessage,
-  ConnectResponseData,
-  ConnectRetrieveData,
-  FailedSignData,
-  GetConnectedSitesData,
-  GetConnectionProtocolData,
-  GetUtxosRequest,
   PendingSignData,
-  RemoveWalletFromWhitelistData,
-  SigningMessage,
-  TxSignWindowRetrieveData,
   WalletAuthEntry,
   WhitelistEntry,
-} from './connector/types';
+} from '../../connector/types';
 import {
   APIErrorCodes,
   asPaginate,
@@ -28,76 +16,47 @@ import {
   asValue,
   ConnectorError,
   DataSignErrorCodes,
-  TxSignErrorCodes,
-} from './connector/types';
+} from '../../connector/types';
 import {
   connectorCreateCardanoTx,
-  connectorGenerateReorgTx,
-  connectorGetAssets,
   connectorGetBalance,
   connectorGetCardanoRewardAddresses,
   connectorGetChangeAddress,
   connectorGetCollateralUtxos,
-  connectorGetDRepKey,
-  connectorGetStakeKey,
   connectorGetUnusedAddresses,
   connectorGetUsedAddressesWithPaginate,
   connectorGetUtxosCardano,
   connectorRecordSubmittedCardanoTransaction,
   connectorSendTxCardano,
-  connectorSignCardanoTx,
-  connectorSignData,
   getAddressing,
+  connectorGetAssets,
   getTokenMetadataFromIds,
   MAX_COLLATERAL,
-} from './connector/api';
-import { updateUtxos } from '../../app/api/ada/lib/storage/bridge/updateTransactions';
-import { environment } from '../../app/environment';
-import type { IFetcher as CardanoIFetcher } from '../../app/api/ada/lib/state-fetch/IFetcher.types';
-import { RemoteFetcher as CardanoRemoteFetcher } from '../../app/api/ada/lib/state-fetch/remoteFetcher';
-import { BatchedFetcher as CardanoBatchedFetcher } from '../../app/api/ada/lib/state-fetch/batchedFetcher';
-import LocalStorageApi, { loadSubmittedTransactions, } from '../../app/api/localStorage/index';
-import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
-import { Logger, stringifyError } from '../../app/utils/logging';
+  connectorGetDRepKey, connectorGetStakeKey,
+} from '../../connector/api';
+import type { IFetcher as CardanoIFetcher } from '../../../../app/api/ada/lib/state-fetch/IFetcher.types';
+import LocalStorageApi, {
+  loadSubmittedTransactions,
+} from '../../../../app/api/localStorage/index';
+import { RustModule } from '../../../../app/api/ada/lib/cardanoCrypto/rustLoader';
+import { Logger, stringifyError } from '../../../../app/utils/logging';
 import type { lf$Database, } from 'lovefield';
-import { schema } from 'lovefield';
-import { copyDbToMemory, loadLovefieldDB, } from '../../app/api/ada/lib/storage/database/index';
-import { migrateNoRefresh } from '../../app/api/common/migration';
-import { Mutex, } from 'async-mutex';
 import {
   getCardanoHaskellBaseConfig,
   isCardanoHaskell
-} from '../../app/api/ada/lib/storage/database/prepackaged/networks';
-import { authSignHexPayload } from '../../app/connector/api';
-import type { RemoteUnspentOutput } from '../../app/api/ada/lib/state-fetch/types';
-import { NotEnoughMoneyToSendError, } from '../../app/api/common/errors';
-import {
-  asAddressedUtxo as asAddressedUtxoCardano,
-  assetToRustMultiasset,
-  cardanoUtxoHexFromRemoteFormat,
-  mergeWitnessSets,
-} from '../../app/api/ada/transactions/utils';
-import type { ForeignUtxoFetcher } from '../../app/connector/stores/ConnectorStore';
-import ConnectorStore from '../../app/connector/stores/ConnectorStore';
-import { find721metadata } from '../../app/utils/nftMetadata';
-import { hexToBytes } from '../../app/coreUtils';
-import { addressHexToBech32 } from '../../app/api/ada/lib/cardanoCrypto/utils';
+} from '../../../../app/api/ada/lib/storage/database/prepackaged/networks';
+import { authSignHexPayload } from '../../../../app/connector/api';
+import type { RemoteUnspentOutput } from '../../../../app/api/ada/lib/state-fetch/types';
+import { NotEnoughMoneyToSendError, } from '../../../../app/api/common/errors';
+import { asAddressedUtxo as asAddressedUtxoCardano, } from '../../../../app/api/ada/transactions/utils';
+import { find721metadata } from '../../../../app/utils/nftMetadata';
+import { getDb, syncWallet } from '../state';
+import { getCardanoStateFetcher } from '../utils';
+import AdaApi from '../../../../app/api/ada';
 
 /*::
 declare var chrome;
 */
-
-const onYoroiIconClicked = () => {
-  chrome.tabs.create({ url: 'main_window.html' });
-};
-
-if (chrome.action) {
-  // manifest v3
-  chrome.action.onClicked.addListener(debounce(onYoroiIconClicked, 500, { leading: true }));
-} else {
-  // manifest v2
-  chrome.browserAction.onClicked.addListener(debounce(onYoroiIconClicked, 500, { leading: true }));
-}
 
 const STORAGE_KEY_PREFIX = 'background-';
 
@@ -109,7 +68,7 @@ async function setInStorage(key: string, value: any): Promise<void> {
   await STORAGE_API.set({ [STORAGE_KEY_PREFIX + key]: value });
 }
 
-async function getFromStorage(key: string): Promise<any> {
+export async function getFromStorage(key: string): Promise<any> {
   const storageKey = STORAGE_KEY_PREFIX + key;
   return new Promise(resolve => {
     // the chrome mv3 and firefox mv2 API also support returning the result as a promise
@@ -124,7 +83,7 @@ async function getFromStorage(key: string): Promise<any> {
   });
 }
 
-function sendToInjector(tabId: number, message: any) {
+export function sendToInjector(tabId: number, message: any) {
   chrome.tabs.sendMessage(tabId, message);
 }
 
@@ -176,7 +135,7 @@ type PendingSign = {|
   uid: string,
 |}
 
-type ConnectedSite = {|
+export type ConnectedSite = {|
   url: string,
   // <TODO:PENDING_REMOVAL> Legacy
   protocol: 'cardano',
@@ -185,15 +144,15 @@ type ConnectedSite = {|
   pendingSigns: {| [uid: string]: PendingSign |},
 |};
 
-const STORAGE_KEY_CONNECTION_PROTOCOL = 'connectionProtocol';
-const STORAGE_KEY_IMG_BASE64 = 'imgBase64Url';
+export const STORAGE_KEY_CONNECTION_PROTOCOL = 'connectionProtocol';
+export const STORAGE_KEY_IMG_BASE64 = 'imgBase64Url';
 const STORAGE_KEY_CONNECTED_SITES = 'connectedSites';
 
-async function getAllConnectedSites(): Promise<{| [tabId: string]: ConnectedSite |}> {
+export async function getAllConnectedSites(): Promise<{| [tabId: string]: ConnectedSite |}> {
   return (await getFromStorage(STORAGE_KEY_CONNECTED_SITES)) || {};
 }
 
-async function getConnectedSite(tabId: number): Promise<?ConnectedSite> {
+export async function getConnectedSite(tabId: number): Promise<?ConnectedSite> {
   const connectedSites = await getFromStorage(STORAGE_KEY_CONNECTED_SITES);
   if (!connectedSites) {
     return null;
@@ -201,13 +160,13 @@ async function getConnectedSite(tabId: number): Promise<?ConnectedSite> {
   return connectedSites[String(tabId)];
 }
 
-async function deleteConnectedSite(tabId: number): Promise<void> {
+export async function deleteConnectedSite(tabId: number): Promise<void> {
   const connectedSites = await getFromStorage(STORAGE_KEY_CONNECTED_SITES) || {};
   delete connectedSites[String(tabId)];
   await setInStorage(STORAGE_KEY_CONNECTED_SITES, connectedSites);
 }
 
-async function setConnectedSite(tabId: number, connectedSite: ConnectedSite): Promise<void> {
+export async function setConnectedSite(tabId: number, connectedSite: ConnectedSite): Promise<void> {
   const connectedSites = await getFromStorage(STORAGE_KEY_CONNECTED_SITES) || {};
   connectedSites[String(tabId)] = connectedSite;
   await setInStorage(STORAGE_KEY_CONNECTED_SITES, connectedSites);
@@ -264,125 +223,14 @@ const popupProps: {|width: number, height: number, focused: boolean, type: strin
   type: 'popup',
 };
 
-/**
-* need to make sure JS tasks run in an order where no two of them have different DB instances
-* Otherwise, caching logic may make things go wrong
-* TODO: this doesn't help if the Yoroi Extension or a Web Worker makes a query during this execution
-*/
-const dbAccessMutex = new Mutex();
-
-/**
- * Performs wallet version migration if needed
- * Then calls the continuation with storage objects
- * Note: the DB returns is an IN-MEMORY COPY of the real DB
- * This is to avoid DB modifications corrupting the state of the Yoroi Extension
- * If the Yoroi Extension is running at the same time
- */
-async function withDb<T>(
+export async function withDb<T>(
   continuation: (lf$Database, LocalStorageApi) => Promise<T>
 ): Promise<T> {
-  return await dbAccessMutex.runExclusive(async () => {
-    // note: lovefield internally caches queries an optimization
-    // this doesn't work for us because the DB can change under our feet through the Yoroi Extension
-    // so instead, we create the DB, use it, then close the connection
-    const db = await loadLovefieldDB(schema.DataStoreType.INDEXED_DB);
-    let inMemoryDb: void | lf$Database = undefined;
-    try {
-      // process migration here before anything involving storage is cached
-      // as dApp can't easily recover from refreshing a page to wipe cache after storage migration
-      const localStorageApi = new LocalStorageApi();
-      // note: it's safe that this call modifies the DB that is shared with the main extension
-      // since if a migration actually needs to be processed,
-      // it means the extension hasn't been launched since the Yoroi version updated
-      // which means it's not running at the same time as the connector
-      await migrateNoRefresh({
-        localStorageApi,
-        persistentDb: db,
-        currVersion: environment.getVersion(),
-      })
-
-      // note: we can't close the persistent DB connection here after copying it
-      // since lovefield closes some shared workers causing the in-memory connection to fail as well
-      inMemoryDb = await copyDbToMemory(db);
-
-      return await continuation(inMemoryDb, localStorageApi);
-    } catch (e) {
-      Logger.error(`DB continuation call failed due to internal error: ${e}\n${e.stack}`);
-      throw e;
-    } finally {
-      inMemoryDb?.close();
-      db.close();
-    }
-  });
-}
-
-async function createFetcher(
-  fetcherType: Function,
-  localStorageApi: LocalStorageApi,
-): * {
-  const locale = await localStorageApi.getUserLocale() ?? 'en-US';
-  return new fetcherType(
-    () => environment.getVersion(),
-    () => locale,
-    () => {
-      if (environment.userAgentInfo.isFirefox()) {
-        return 'firefox';
-      }
-      if (environment.userAgentInfo.isChrome()) {
-        return 'chrome';
-      }
-      return '-';
-    },
-  )
-}
-
-async function getCardanoStateFetcher(
-  localStorageApi: LocalStorageApi,
-): Promise<CardanoIFetcher> {
-  return new CardanoBatchedFetcher(await createFetcher(CardanoRemoteFetcher, localStorageApi));
-}
-
-// This is a temporary workaround to DB duplicate key constraint violations
-// that is happening when multiple DBs are loaded at the same time, or possibly
-// this one being loaded while Yoroi's main App is doing DB operations.
-// Promise<void>
-let syncing: ?boolean = null;
-async function syncWallet(
-  wallet: PublicDeriver<>,
-  localStorageApi: LocalStorageApi,
-): Promise<void> {
-  const isCardano = isCardanoHaskell(wallet.getParent().getNetworkInfo());
-  try {
-    const lastSync = await wallet.getLastSyncInfo();
-    // don't sync more than every 30 seconds
-    const now = Date.now();
-    if (lastSync.Time == null || now - lastSync.Time.getTime() > 30*1000) {
-      if (syncing == null) {
-        syncing = true;
-        await RustModule.load();
-        Logger.debug('sync started');
-        if (isCardano) {
-          const stateFetcher: CardanoIFetcher =
-            await getCardanoStateFetcher(localStorageApi);
-          await updateUtxos(
-            wallet.getDb(),
-            wallet,
-            stateFetcher.checkAddressesInUse,
-            stateFetcher.getTokenInfo,
-            stateFetcher.getMultiAssetMintMetadata,
-            stateFetcher.getMultiAssetSupply,
-          )
-        } else {
-          throw new Error('non-cardano wallet. Should not happen');
-        }
-        Logger.debug('sync ended');
-      }
-    }
-  } catch (e) {
-    Logger.error(`Syncing failed: ${e}`);
-  } finally {
-    syncing = null;
-  }
+  const localStorageApi = new LocalStorageApi();
+  const db = await getDb();
+  return await continuation(db, localStorageApi);
+  // note: calling close() "is not mandatory nor recommended":
+  // https://github.com/google/lovefield/blob/master/docs/spec/03_life_of_db.md
 }
 
 async function withSelectedSiteConnection<T>(
@@ -399,7 +247,7 @@ async function withSelectedSiteConnection<T>(
   return Promise.reject(new Error(`could not find tabId ${tabId} in connected sites`));
 }
 
-async function withSelectedWallet<T>(
+export async function withSelectedWallet<T>(
   tabId: number,
   continuation: (PublicDeriver<>, ?ConnectedSite) => Promise<T>,
   db: lf$Database,
@@ -419,7 +267,7 @@ async function withSelectedWallet<T>(
       return Promise.reject(new Error(`Public deriver index not found: ${String(publicDeriverId)}`));
     }
     if (shouldSyncWallet) {
-      await syncWallet(selectedWallet, localStorageApi);
+      await syncWallet(selectedWallet, 'connector');
     }
 
     // we need to make sure this runs within the withDb call
@@ -428,7 +276,7 @@ async function withSelectedWallet<T>(
   });
 }
 
-function connectContinuation(
+export function connectContinuation(
   connectType: ConnectRequestType,
   connectedWallet: ?PublicDeriverId,
   auth: ?WalletAuthEntry,
@@ -446,429 +294,6 @@ function connectContinuation(
 
   }
 }
-
-const YOROI_MESSAGES = Object.freeze({
-  CONNECT_RESPONSE: 'connect_response',
-  SIGN_CONFIRMED: 'sign_confirmed',
-  SIGN_REJECTED: 'sign_rejected',
-  SIGN_ERROR: 'sign_error',
-  SIGN_WINDOW_RETRIEVE_DATA: 'tx_sign_window_retrieve_data',
-  CONNECT_WINDOW_RETRIEVE_DATA: 'connect_retrieve_data',
-  REMOVE_WALLET_FROM_WHITELIST: 'remove_wallet_from_whitelist',
-  GET_CONNECTED_SITES: 'get_connected_sites',
-  GET_PROTOCOL: 'get_protocol',
-  GET_UTXOS_ADDRESSES: 'get_utxos/addresses',
-});
-
-const isYoroiMessage = ({ type }) => Object.values(YOROI_MESSAGES).includes(type);
-
-// messages from other parts of Yoroi (i.e. the UI for the connector)
-const yoroiMessageHandler = async (
-  request: (
-    ConnectResponseData
-    | ConfirmedSignData
-    | FailedSignData
-    | TxSignWindowRetrieveData
-    | ConnectRetrieveData
-    | RemoveWalletFromWhitelistData
-    | GetConnectedSitesData
-    | GetConnectionProtocolData
-    | GetUtxosRequest
-  ),
-  sender,
-  sendResponse
-) => {
-  /**
-   * Returns HEX of a serialised witness set
-   */
-  async function signCardanoTx(
-    tx: CardanoTx,
-    password: string,
-    tabId: number
-  ): Promise<string> {
-    return await withDb(async (db, localStorageApi) => {
-      return await withSelectedWallet(
-        tabId,
-        async (wallet) => {
-          return await connectorSignCardanoTx(
-            wallet,
-            password,
-            tx,
-          );
-        },
-        db,
-        localStorageApi
-      );
-    });
-  }
-
-  if (request.type === YOROI_MESSAGES.CONNECT_RESPONSE) {
-    const { tabId } = request;
-    if (tabId == null) return;
-    const connection = await getConnectedSite(tabId);
-    if (connection?.status?.requestType != null) {
-      if (request.accepted === true) {
-        connectContinuation(
-          connection?.status?.requestType,
-          request.publicDeriverId,
-          request.auth,
-          tabId,
-        );
-        connection.status = {
-          publicDeriverId: request.publicDeriverId,
-          auth: request.auth,
-        };
-        await setConnectedSite(tabId, connection);
-      } else {
-        connectContinuation(
-          connection?.status?.requestType,
-          null,
-          null,
-          tabId,
-        );
-        await deleteConnectedSite(tabId);
-      }
-    }
-  } else if (request.type === YOROI_MESSAGES.SIGN_CONFIRMED) {
-    const connection = await getConnectedSite(request.tabId);
-    if (connection == null) {
-      throw new ConnectorError({
-        code: APIErrorCodes.API_INTERNAL_ERROR,
-        info: 'Connection has failed. Please retry.',
-      });
-    }
-    const responseData = connection.pendingSigns[String(request.uid)];
-    if (!responseData) {
-      throw new ConnectorError({
-        code: APIErrorCodes.API_INTERNAL_ERROR,
-        info: `Sign request data is not available after confirmation (uid=${request.uid}). Please retry.`,
-      });
-    }
-    const password = request.pw;
-
-    const rpcResponse = (response: {| ok: any |} | {| err: any |}) => {
-      sendToInjector(
-        request.tabId,
-        {
-          type: 'connector_rpc_response',
-          protocol: responseData.protocol,
-          uid: request.uid,
-          return: response
-        }
-      );
-    };
-
-
-    switch (responseData.request.type) {
-      case 'tx/cardano':
-      {
-        let resp;
-        try {
-          let signedTxWitnessSetHex;
-          if (password) {
-            signedTxWitnessSetHex = await signCardanoTx(
-              (request.tx: any),
-              password,
-              request.tabId
-            );
-          } else if (request.witnessSetHex) {
-            signedTxWitnessSetHex = request.witnessSetHex;
-          } else {
-            throw new Error('missing password or witness from connector dialog');
-          }
-          resp = { ok: signedTxWitnessSetHex };
-        } catch (error) {
-          resp = { err: 'transaction signing failed' };
-        }
-        if (responseData.continuationData.type !== 'cardano-tx') {
-          rpcResponse({ err: 'unexpected error' });
-          return;
-        }
-        const { tx, returnTx } = responseData.continuationData;
-        if (resp?.ok == null) {
-          rpcResponse(resp);
-        } else {
-          const resultWitnessSetHex: string = resp.ok;
-          if (returnTx) {
-            const inputWitnessSetHex: string | null = RustModule.WasmScope(Scope => {
-              try {
-                const fullTx = Scope.WalletV4.FixedTransaction.from_hex(tx);
-                return fullTx.witness_set().to_hex();
-              } catch {
-                // no input witness set
-                return null;
-              }
-            });
-            const isFullTx = inputWitnessSetHex != null;
-            const finalWitnessSetHex = inputWitnessSetHex == null
-                  ? resultWitnessSetHex
-                  : mergeWitnessSets(inputWitnessSetHex, resultWitnessSetHex);
-            RustModule.WasmScope(Scope => {
-              let fullTx;
-              if (isFullTx) {
-                fullTx = Scope.WalletV4.FixedTransaction.from_hex(tx);
-                fullTx.set_witness_set(hexToBytes(finalWitnessSetHex));
-              } else {
-                fullTx = Scope.WalletV4.FixedTransaction.new(
-                  hexToBytes(tx),
-                  hexToBytes(finalWitnessSetHex),
-                  true,
-                );
-              }
-              rpcResponse({ ok: fullTx.to_hex() });
-            });
-          } else {
-            rpcResponse({ ok: resultWitnessSetHex });
-          }
-        }
-      }
-        break;
-      case 'data':
-      {
-        if (responseData.continuationData.type !== 'cardano-data') {
-          rpcResponse({ err: 'unexpected error' });
-          return;
-        }
-        const { address, payload } = responseData.continuationData;
-        let dataSig;
-        try {
-          dataSig = await withDb(async (db, localStorageApi) => {
-            return await withSelectedWallet(
-              request.tabId,
-              async (wallet) => {
-                const addressing = await getAddressing(wallet, address);
-                if (!addressing) {
-                  throw new Error('key derivation path does not exist');
-                }
-                return await connectorSignData(
-                  wallet,
-                  password,
-                  addressing,
-                  address,
-                  payload,
-                );
-              },
-              db,
-              localStorageApi,
-              false,
-            );
-          });
-        } catch (error) {
-          Logger.error(`error when signing data ${error}`);
-          rpcResponse(
-            {
-              err: {
-                code: DataSignErrorCodes.DATA_SIGN_PROOF_GENERATION,
-                info: error.message,
-              }
-            }
-          );
-          return;
-        }
-        rpcResponse({ ok: dataSig });
-      }
-        break;
-      case 'tx-reorg/cardano':
-      {
-        if (responseData.continuationData.type !== 'cardano-reorg-tx') {
-          rpcResponse({ err: 'unexpected error' });
-          return;
-        }
-        const { isCBOR } = responseData.continuationData;
-        const utxos = await transformCardanoUtxos(
-          // Only one utxo from the result of the reorg transaction is packed and returned here
-          [...(request.tx: any)],
-          isCBOR
-        );
-        rpcResponse({ ok: utxos });
-      }
-        break;
-      default:
-        // log?
-        break;
-    }
-    delete connection.pendingSigns[String(request.uid)];
-    await setConnectedSite(request.tabId, connection);
-  } else if (request.type === YOROI_MESSAGES.SIGN_REJECTED) {
-    const connection = await getConnectedSite(request.tabId);
-    const responseData = connection?.pendingSigns[String(request.uid)];
-    if (connection && responseData) {
-      const code = responseData.request?.type === 'data'
-        ? DataSignErrorCodes.DATA_SIGN_USER_DECLINED
-        : TxSignErrorCodes.USER_DECLINED;
-
-      sendToInjector(
-        request.tabId,
-        {
-          type: 'connector_rpc_response',
-          protocol: responseData.protocol,
-          uid: request.uid,
-          return: {
-            err: {
-              code,
-              info: 'User rejected'
-            },
-          },
-        }
-      );
-      delete connection.pendingSigns[String(request.uid)];
-      await setConnectedSite(request.tabId, connection);
-    } else {
-      // eslint-disable-next-line no-console
-      console.error(`couldn't find tabId: ${request.tabId}`);
-    }
-  } else if (request.type === YOROI_MESSAGES.SIGN_ERROR) {
-    const connection = await getConnectedSite(request.tabId);
-    const responseData = connection?.pendingSigns[String(request.uid)];
-    if (connection && responseData) {
-      const code = responseData.request?.type === 'data'
-        ? DataSignErrorCodes.DATA_SIGN_PROOF_GENERATION
-        : TxSignErrorCodes.PROOF_GENERATION;
-
-      sendToInjector(
-        request.tabId,
-        {
-          type: 'connector_rpc_response',
-          protocol: responseData.protocol,
-          uid: request.uid,
-          return: {
-            err: {
-              code,
-              info: `utxo error: ${request.errorType} (${request.data})`
-            },
-          },
-        }
-      );
-      delete connection.pendingSigns[String(request.uid)];
-      await setConnectedSite(request.tabId, connection);
-    } else {
-      // eslint-disable-next-line no-console
-      console.error(`couldn't find tabId: ${request.tabId}`);
-    }
-  } else if (request.type === YOROI_MESSAGES.SIGN_WINDOW_RETRIEVE_DATA) {
-    await new Promise(resolve => { setTimeout(resolve, 1); });
-    const connectedSites = await getAllConnectedSites();
-    for (const tabId of Object.keys(connectedSites)) {
-      const connection = connectedSites[tabId];
-      for (const uid of Object.keys(connection.pendingSigns)) {
-        const responseData = connection.pendingSigns[uid];
-        if (!responseData.openedWindow) {
-          responseData.openedWindow = true;
-          await setConnectedSite(Number(tabId), connection);
-          if (connection.status?.publicDeriverId == null) {
-            throw new Error(`${request.type} no public deriver set for request`);
-          }
-          sendResponse(({
-            publicDeriverId: connection.status.publicDeriverId,
-            sign: responseData.request,
-            tabId: Number(tabId),
-            requesterUrl: connection.url,
-          }: SigningMessage));
-          return;
-        }
-      }
-    }
-  } else if (request.type === YOROI_MESSAGES.CONNECT_WINDOW_RETRIEVE_DATA) {
-    const connectedSites = await getAllConnectedSites();
-
-    for (const tabId of Object.keys(connectedSites)) {
-      const connection = connectedSites[tabId];
-      if (connection.status != null) {
-        if (connection.status.requestType) {
-          connection.status.openedWindow = true;
-          const imgBase64Url = await getFromStorage(STORAGE_KEY_IMG_BASE64);
-          sendResponse(({
-            url: connection.url,
-            protocol: connection.protocol,
-            appAuthID: connection.appAuthID,
-            imgBase64Url,
-            tabId: Number(tabId),
-          }: ConnectingMessage));
-          return;
-        }
-      }
-    }
-    sendResponse(null);
-  } else if (request.type === YOROI_MESSAGES.REMOVE_WALLET_FROM_WHITELIST) {
-    const connectedSites = await getAllConnectedSites();
-    for (const tabId of Object.keys(connectedSites)) {
-      const site = connectedSites[tabId];
-      if (site.url === request.url) {
-        sendToInjector(Number(tabId), { type: 'disconnect' });
-        break;
-      }
-    }
-  } else if (request.type === YOROI_MESSAGES.GET_CONNECTED_SITES) {
-    const activeSites: Array<ConnectedSite> =
-      (Object.values(await getAllConnectedSites()): any);
-
-    sendResponse(({
-      sites: activeSites.map(site => site.url),
-    }: ConnectedSites));
-  } else if (request.type === YOROI_MESSAGES.GET_PROTOCOL) {
-    const connectionProtocol = await getFromStorage(STORAGE_KEY_CONNECTION_PROTOCOL) ||
-      'cardano';
-    sendResponse({ type: connectionProtocol })
-  } else if (request.type === YOROI_MESSAGES.GET_UTXOS_ADDRESSES) {
-    try {
-      await withDb(async (db, localStorageApi) => {
-        await withSelectedWallet(
-          request.tabId,
-          async (wallet, connection) => {
-            if (connection == null) {
-              Logger.error(`ERR - sign_tx could not find connection with tabId = ${request.tabId}`);
-              sendResponse({ utxos: null })
-              return
-            }
-            const withUtxos = asGetAllUtxos(wallet)
-
-            if (withUtxos == null) {
-              throw new Error(`missing utxo functionality`);
-            }
-            const withHasUtxoChains = asHasUtxoChains(withUtxos);
-            if (withHasUtxoChains == null) {
-              throw new Error(`missing chains functionality`);
-            }
-
-            const addressesMap = {
-              usedAddresses: async () => await connectorGetUsedAddressesWithPaginate(wallet, null),
-              unusedAddresses: async () => await connectorGetUnusedAddresses(wallet),
-              changeAddress: async () => await connectorGetChangeAddress(wallet),
-              utxos: async () =>  await withHasUtxoChains.getAllUtxos(),
-            }
-
-            const response = {}
-
-            for(const key of request.select) {
-              response[key] = await addressesMap[key]()
-            }
-
-            sendResponse(response)
-          },
-          db,
-          localStorageApi,
-        )
-      });
-    } catch (error) {
-      Logger.error(`Get utxos faild for tabId = ${request.tabId}`);
-    }
-  }
-};
-
-chrome.runtime.onMessage.addListener(
-  (message, sender, sendResponse) => {
-    if (handleExchangeRedirectMessage(message, sender)) {
-      return;
-    }
-    if (isYoroiMessage(message)) {
-      // Returning `true` is required by Firefox, see:
-      // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage
-      yoroiMessageHandler(message, sender, sendResponse);
-      return true;
-    }
-    return handleInjectorMessage(message, sender);
-  }
-);
 
 async function removeWallet(
   tabId: number,
@@ -999,7 +424,7 @@ async function confirmConnect(
   });
 }
 
-async function handleInjectorMessage(message, sender) {
+export async function handleInjectorMessage(message: any, sender: any) {
   const tabId = sender.tab.id;
   const isCardano = message.protocol === 'cardano';
 
@@ -1040,7 +465,11 @@ async function handleInjectorMessage(message, sender) {
   }
   async function addressesToBech(addressesHex: string[]): Promise<string[]> {
     await RustModule.load();
-    return addressesHex.map(addressHexToBech32);
+    return addressesHex.map(a =>
+                            RustModule.WalletV4.Address.from_bytes(
+                              Buffer.from(a, 'hex'),
+                            ).to_bech32()
+                           );
   }
   const connectParameters = () => ({
     protocol: message.protocol,
@@ -1479,8 +908,8 @@ async function handleInjectorMessage(message, sender) {
                 const stateFetcher: CardanoIFetcher =
                       await getCardanoStateFetcher(localStorageApi);
                 const networkInfo = wallet.getParent().getNetworkInfo();
-                const foreignUtxoFetcher: ForeignUtxoFetcher =
-                      ConnectorStore.createForeignUtxoFetcher(stateFetcher, networkInfo);
+                const adaApi = new AdaApi();
+                const foreignUtxoFetcher = adaApi.createForeignUtxoFetcher(stateFetcher, networkInfo);
                 const resp = await connectorCreateCardanoTx(
                   wallet,
                   null,
@@ -1655,15 +1084,6 @@ async function handleInjectorMessage(message, sender) {
                 throw new Error('wallet doesn\'t support IGetAllUtxos');
               }
               const walletUtxos = await withUtxos.getAllUtxos();
-              if (walletUtxos.length === 0) {
-                rpcResponse({
-                  err: {
-                    code: APIErrorCodes.API_INTERNAL_ERROR,
-                    info: 'not enough UTXOs'
-                  }
-                });
-                return;
-              }
               const addressedUtxos = asAddressedUtxoCardano(walletUtxos);
               const submittedTxs = await loadSubmittedTransactions() || [];
               const {
@@ -1702,7 +1122,8 @@ async function handleInjectorMessage(message, sender) {
                 // `requiredAmount` is the amount needed to respond
                 const usedUtxoIds = utxosToUse.map(utxo => utxo.utxo_id);
                 try {
-                  await connectorGenerateReorgTx(
+                  const adaApi = new AdaApi();
+                  await adaApi.createReorgTx(
                     wallet,
                     usedUtxoIds,
                     // `requiredAmount` is used here instead of the `reorgTargetAmount`
@@ -1775,15 +1196,55 @@ async function handleInjectorMessage(message, sender) {
 }
 
 
-async function transformCardanoUtxos(
+function assetToRustMultiasset(jsonAssets): RustModule.WalletV4.MultiAsset {
+  const groupedAssets = jsonAssets.reduce((res, a) => {
+    (res[a.policyId] = (res[a.policyId]||[])).push(a);
+    return res;
+  }, {})
+  const W4 = RustModule.WalletV4;
+  const multiasset = W4.MultiAsset.new();
+  for (const policyHex of Object.keys(groupedAssets)) {
+    const assetGroup = groupedAssets[policyHex];
+    const policyId = W4.ScriptHash.from_bytes(Buffer.from(policyHex, 'hex'));
+    const assets = RustModule.WalletV4.Assets.new();
+    for (const asset of assetGroup) {
+      assets.insert(
+        W4.AssetName.new(Buffer.from(asset.name, 'hex')),
+        W4.BigNum.from_str(asset.amount),
+      );
+    }
+    multiasset.insert(policyId, assets);
+  }
+  return multiasset;
+}
+
+export async function transformCardanoUtxos(
   utxos: Array<RemoteUnspentOutput>,
   isCBOR: boolean,
-) {
+): any {
   const cardanoUtxos: $ReadOnlyArray<$ReadOnly<RemoteUnspentOutput>> = utxos;
   await RustModule.load();
   const W4 = RustModule.WalletV4;
   if (isCBOR) {
-    return cardanoUtxos.map(cardanoUtxoHexFromRemoteFormat)
+    return cardanoUtxos.map(u => {
+      const input = W4.TransactionInput.new(
+        W4.TransactionHash.from_bytes(
+          Buffer.from(u.tx_hash, 'hex')
+        ),
+        u.tx_index,
+      );
+      const value = W4.Value.new(W4.BigNum.from_str(u.amount));
+      if ((u.assets || []).length > 0) {
+        value.set_multiasset(assetToRustMultiasset(u.assets));
+      }
+      const output = W4.TransactionOutput.new(
+        W4.Address.from_bytes(Buffer.from(u.receiver, 'hex')),
+        value,
+      );
+      return Buffer.from(
+        W4.TransactionUnspentOutput.new(input, output).to_bytes(),
+      ).toString('hex');
+    })
   }
 
   return cardanoUtxos.map(u => {
@@ -1794,25 +1255,4 @@ async function transformCardanoUtxos(
       ).to_bech32(),
     };
   });
-}
-
-function handleExchangeRedirectMessage(message, sender) {
-  const url = new URL(sender.url);
-  if (url.hostname === 'yoroi-wallet.com') {
-    const { searchParams } = url;
-    const cardanoLink = decodeURIComponent(searchParams.get('link') || '');
-    const m = cardanoLink.match(/web\+cardano:([a-z0-9]+)\?amount=([0-9\.]+)/);
-    if (!m) {
-      return;
-    }
-    const addr = m[1];
-    const amount = m[2];
-    const redirectTo = searchParams.get('redirectTo');
-    // $FlowFixMe[prop-missing] flow doesn't know replaceAll
-    const redirectToFixed = redirectTo?.replaceAll('%253A', ':')?.replaceAll('%252F', '/') || '';
-    chrome.tabs.remove(sender.tab.id);
-    const extensionUrl = `main_window.html?action=sell-ada&addr=${addr}&amount=${amount}` +
-      `&redirect=${encodeURIComponent(redirectToFixed)}`;
-    chrome.tabs.create({ url: extensionUrl });
-  }
 }

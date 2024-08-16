@@ -12,7 +12,6 @@ import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import ComplexityLevel from '../../components/profile/complexity-level/ComplexityLevelForm';
-import { isTestnet } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 const messages = defineMessages({
   title: {
@@ -32,9 +31,7 @@ export default class ComplexityLevelPage extends Component<StoresAndActionsProps
     const { checkAdaServerStatus } = this.props.stores.serverConnectionStore;
 
     const { selected } = this.props.stores.wallets;
-    const isWalletTestnet = selected == null
-      ? false
-      : isTestnet(selected.getParent().getNetworkInfo());
+    const isWalletTestnet = Boolean(selected && selected.isTestnet);
     const displayedBanner = checkAdaServerStatus === ServerStatusErrors.Healthy
       ? <TestnetWarningBanner isTestnet={isWalletTestnet} />
       : <ServerErrorBanner errorType={checkAdaServerStatus} />;

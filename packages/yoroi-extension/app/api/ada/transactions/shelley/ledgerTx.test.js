@@ -19,7 +19,7 @@ import {
   CertificateType,
   TransactionSigningMode,
   TxOutputDestinationType,
-  StakeCredentialParamsType,
+  CredentialParamsType,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import type { DeviceOwnedAddress, SignTransactionRequest } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { networks } from '../../lib/storage/database/prepackaged/networks';
@@ -418,7 +418,7 @@ test('Create Ledger transaction', async () => {
       certificates: [{
         params: {
           stakeCredential: {
-            type: StakeCredentialParamsType.KEY_PATH,
+            type: CredentialParamsType.KEY_PATH,
             keyPath: [
               WalletTypePurpose.CIP1852,
               CoinTypes.CARDANO,

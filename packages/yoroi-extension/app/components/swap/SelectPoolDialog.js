@@ -9,7 +9,7 @@ import { SwapPoolIcon } from './SwapPoolComponents';
 import BigNumber from 'bignumber.js';
 
 const tableColumns = ['DEX name', 'Price', 'TVL', 'DEX fee', 'Liquidity provider fee'];
-const templateColumns = 'minmax(auto, 208px) 120px 200px 90px 160px';
+const templateColumns = 'minmax(auto, 208px) 120px 200px 90px 158px';
 const PRECISION = 10;
 
 type Props = {|
@@ -31,7 +31,6 @@ export default function SelectPoolDialog({
   onPoolSelected,
   onClose,
 }: Props): React$Node {
-
   const handlePoolSelected = poolId => {
     onPoolSelected(poolId);
     onClose();
@@ -45,19 +44,12 @@ export default function SelectPoolDialog({
       <Table gridTemplateColumns={templateColumns} columnNames={tableColumns}>
         {poolList.map(pool => {
           const { provider, fee, batcherFee, poolId } = pool;
-          const tvl = new BigNumber(pool.tokenA.quantity)
-            .dividedBy(pool.ptPriceTokenA)
-            .multipliedBy(2)
-            .toString(10);
+          const tvl = new BigNumber(pool.tokenA.quantity).dividedBy(pool.ptPriceTokenA).multipliedBy(2).toString(10);
           const formattedTvl = Quantities.format(tvl, ptDecimals, 0);
           const marketPrice = getMarketPrice(pool, sellTokenId);
-          const formattedMarketPrice = denomination >= 0 ? Quantities.format(
-            marketPrice ?? Quantities.zero,
-            denomination,
-            PRECISION,
-          ) : '-';
-          const formattedPoolFee = Quantities
-            .format(batcherFee.quantity, ptDecimals, ptDecimals);
+          const formattedMarketPrice =
+            denomination >= 0 ? Quantities.format(marketPrice ?? Quantities.zero, denomination, PRECISION) : '-';
+          const formattedPoolFee = Quantities.format(batcherFee.quantity, ptDecimals, ptDecimals);
           return (
             <Box
               key={poolId}
@@ -80,27 +72,27 @@ export default function SelectPoolDialog({
                 <Box width="32px" height="32px">
                   <SwapPoolIcon provider={provider} />
                 </Box>
-                <Typography component="span" variant="body1" fontWeight={500}>
+                <Typography component="span" variant="body1" fontWeight={500} color="ds.text_gray_medium">
                   {provider}
                 </Typography>
               </Box>
               <Box textAlign="right">
-                <Typography component="span" variant="body1">
+                <Typography component="span" variant="body1" color="ds.text_gray_medium">
                   {formattedMarketPrice}
                 </Typography>
               </Box>
               <Box textAlign="right">
-                <Typography component="span" variant="body1">
+                <Typography component="span" variant="body1" color="ds.text_gray_medium">
                   {formattedTvl} {ptTicker}
                 </Typography>
               </Box>
               <Box textAlign="right">
-                <Typography component="span" variant="body1">
+                <Typography component="span" variant="body1" color="ds.text_gray_medium">
                   {formattedPoolFee} {ptTicker}
                 </Typography>
               </Box>
               <Box textAlign="right">
-                <Typography component="span" variant="body1">
+                <Typography component="span" variant="body1" color="ds.text_gray_medium">
                   {fee}%
                 </Typography>
               </Box>

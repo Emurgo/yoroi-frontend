@@ -2,9 +2,9 @@
 
 import { Box, Button } from '@mui/material';
 import { useState } from 'react';
-import { useThemeMode } from '../../../styles/context/mode';
-import { ReactComponent as IconSun } from '../../../assets/images/top-bar/sun.inline.svg';
 import { ReactComponent as IconMoon } from '../../../assets/images/top-bar/moon.inline.svg';
+import { ReactComponent as IconSun } from '../../../assets/images/top-bar/sun.inline.svg';
+import { useThemeMode } from '../../../styles/context/mode';
 
 export default function ThemeToggler(): any {
   const [mode, setMode] = useState(false);

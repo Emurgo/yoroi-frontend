@@ -69,10 +69,8 @@ export type GetWalletsFunc = (
 export async function getWallets(
   request: GetWalletsRequest,
 ): Promise<GetWalletsResponse> {
-  Logger.debug(`${nameof(getWallets)} called`);
   try {
     const wallets = await loadWalletsFromStorage(request.db);
-    Logger.debug(`${nameof(getWallets)} success: ` + stringifyData(wallets));
     return wallets;
   } catch (error) {
     Logger.error(`${nameof(getWallets)} error: ` + stringifyError(error));
@@ -94,8 +92,7 @@ export type RefreshPendingTransactionsFunc = (
 // removeAllTransactions
 
 export type RemoveAllTransactionsRequest = {|
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
-  publicDeriverId: number,
+  +publicDeriver: { publicDeriverId: number, ... },
   refreshWallet: () => Promise<void>,
 |};
 export type RemoveAllTransactionsResponse = void;
@@ -132,12 +129,21 @@ export type GetTransactionsRequestOptions = {|
   skip: number,
   limit: number,
 |};
+// a subset of WalletTransaction
+export type ReferenceTransaction = {
+  +block: ?$ReadOnly<{
+    Hash: string,
+    ...
+  }>,
+  txid: string,
+  ...
+};
 export type BaseGetTransactionsRequest = {|
   ...InexactSubset<GetTransactionsRequestOptions>,
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetLastSyncInfo,
   isLocalRequest: boolean,
-  beforeTx?: ?WalletTransaction,
-  afterTx?: ?WalletTransaction,
+  +beforeTx?: ?ReferenceTransaction,
+  +afterTx?: ?ReferenceTransaction,
 |};
 export type GetTransactionsResponse = Array<WalletTransaction>;
 

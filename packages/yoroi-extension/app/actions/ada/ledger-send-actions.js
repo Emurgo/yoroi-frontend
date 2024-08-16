@@ -2,7 +2,6 @@
 import { AsyncAction, Action } from '../lib/Action';
 import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 import type { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import type {
   Addressing,
@@ -19,8 +18,17 @@ export default class LedgerSendActions {
   cancel: Action<void> = new Action();
   sendUsingLedgerWallet: AsyncAction<{|
     params: SendUsingLedgerParams,
-    publicDeriver: PublicDeriver<>,
     onSuccess?: void => void,
+    +wallet: {
+      publicDeriverId: number,
+      stakingAddressing: Addressing,
+      publicKey: string,
+      pathToPublic: Array<number>,
+      networkId: number,
+      hardwareWalletDeviceId: ?string,
+      +plate: { TextPart: string, ... },
+      ...
+    },
   |}> = new AsyncAction();
   sendUsingLedgerKey: AsyncAction<{|
     signRequest: HaskellShelleyTxSignRequest,
@@ -28,8 +36,9 @@ export default class LedgerSendActions {
       key: RustModule.WalletV4.Bip32PublicKey,
       ...Addressing,
     |},
-    publicDeriver: PublicDeriver<>,
+    publicDeriverId: number,
     addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
     expectedSerial: string | void,
+    networkId: number,
   |}> = new AsyncAction();
 }

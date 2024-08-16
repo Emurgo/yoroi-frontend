@@ -82,7 +82,7 @@ type Props = {|
   +onCancel: void => void,
   +onExchangeCallback: void => void,
   +currentBalanceAda: BigNumber,
-  +receiveAdaAddressPromise: Promise<string | null>,
+  +receiveAdaAddress: string,
 |};
 
 type State = {|
@@ -232,7 +232,7 @@ export default class BuySellDialog extends Component<Props, State> {
         queries: {
           fiatType: 'USD',
           coinType: 'ADA',
-          walletAddress: await props.receiveAdaAddressPromise,
+          walletAddress: props.receiveAdaAddress,
           orderType: 'buy',
           returnUrl: EXCHANGE_CALLBACK_URL,
           coinAmount: Number(state.amountAda),
@@ -245,7 +245,7 @@ export default class BuySellDialog extends Component<Props, State> {
         queries: {
           fiatType: 'USD',
           coinType: 'ADA',
-          walletAddress: await props.receiveAdaAddressPromise,
+          walletAddress: props.receiveAdaAddress,
           orderType: 'sell',
           returnUrl: EXCHANGE_CALLBACK_URL,
           coinAmount: Number(state.amountAda),
@@ -271,7 +271,7 @@ export default class BuySellDialog extends Component<Props, State> {
           URL_GENERATION_TIMEOUT - URL_GENERATION_LONG_LOADING_TIMEOUT
         );
       },
-      URL_GENERATION_LONG_LOADING_TIMEOUT 
+      URL_GENERATION_LONG_LOADING_TIMEOUT
     );
 
     let url;
@@ -465,7 +465,7 @@ export default class BuySellDialog extends Component<Props, State> {
         </Dialog>
       );
     }
-      
+
     return (
       <Dialog
         title={intl.formatMessage(dialogTitle)}

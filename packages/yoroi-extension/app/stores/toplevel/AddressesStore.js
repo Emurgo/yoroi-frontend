@@ -3,25 +3,21 @@ import { action, observable, runInAction } from 'mobx';
 import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
 import LocalizableError, { localizedError } from '../../i18n/LocalizableError';
-import type { CreateAddressFunc, CreateAddressResponse, } from '../../api/common';
-import { PublicDeriver, } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import { asDisplayCutoff, asHasLevels, asHasUtxoChains, } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import type { CreateAddressResponse, } from '../../api/common';
 import type { IHasUtxoChainsRequest, } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import { Logger, } from '../../utils/logging';
 import type { AddressFilterKind, AddressTypeName, StandardAddress, } from '../../types/AddressFilterTypes';
 import { AddressFilter, } from '../../types/AddressFilterTypes';
-import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import { AddressTypeStore } from '../base/AddressSubgroupStore';
 import type { CoreAddressT } from '../../api/ada/lib/storage/database/primitives/enums';
-import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 import type { IAddressTypeStore, IAddressTypeUiSubset } from '../stateless/addressStores';
 import { allAddressSubgroups } from '../stateless/addressStores';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import type { AddressDetails } from '../../api/ada';
 import { ChainDerivations } from '../../config/numbersConfig';
-import { forceNonNull } from '../../coreUtils';
+import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { popAddress } from '../../api/thunk';
+import type { WalletState } from '../../../chrome/extension/background/types';
 
 export default class AddressesStore extends Store<StoresMap, ActionsMap> {
 
@@ -35,8 +31,8 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
   addressBook: AddressTypeStore;
 
   // REQUESTS
-  @observable createAddressRequest: Request<CreateAddressFunc>
-    = new Request<CreateAddressFunc>(this.api.common.createAddress);
+  @observable createAddressRequest: Request<typeof popAddress>
+    = new Request<typeof popAddress>(popAddress);
 
   setup(): void {
     super.setup();
@@ -60,7 +56,7 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
     return this._addressSubgroupMap;
   }
 
-  _createAddress: PublicDeriver<> => Promise<void> = async (
+  _createAddress: WalletState => Promise<void> = async (
     publicDeriver
   ) => {
     try {
@@ -73,17 +69,10 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
       runInAction('set error', () => { this.error = localizedError(error); });
     }
   };
-  _baseCreateAddress: PublicDeriver<> => Promise<?CreateAddressResponse> = async (
+  _baseCreateAddress: WalletState => Promise<?CreateAddressResponse> = async (
     publicDeriver
   ) => {
-    const withDisplayCutoff = asDisplayCutoff(publicDeriver);
-    if (withDisplayCutoff == null) {
-      Logger.error(`${nameof(this._createAddress)} incorrect public deriver`);
-      return;
-    }
-    const address = await this.createAddressRequest.execute({
-      popFunc: withDisplayCutoff.popAddress
-    }).promise;
+    const address = await this.createAddressRequest.execute(publicDeriver).promise;
     return address;
   };
 
@@ -91,27 +80,23 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
     this.error = null;
   };
 
-  addObservedWallet: PublicDeriver<> => void = (
+  addObservedWallet: WalletState => void = (
     publicDeriver
   ) => {
     allAddressSubgroups
-      .filter(store => store.isRelated({
-        selected: publicDeriver
-      }))
+      .filter(store => store.isRelated())
       .map(store => store.class)
       .forEach(
         storeClass => this._addressSubgroupMap.get(storeClass)?.addObservedWallet(publicDeriver)
       );
   }
 
-  refreshAddressesFromDb: PublicDeriver<> => Promise<void> = async (
+  refreshAddressesFromDb: WalletState => Promise<void> = async (
     publicDeriver
   ) => {
     await Promise.all(
       allAddressSubgroups
-        .filter(store => store.isRelated({
-          selected: publicDeriver
-        }))
+        .filter(store => store.isRelated())
         .map(store => store.class)
         .map(storeClass => (
           this._addressSubgroupMap.get(storeClass)?.refreshAddressesFromDb(publicDeriver)
@@ -120,15 +105,11 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
   }
 
   _wrapForAllAddresses: {|
-    publicDeriver: PublicDeriver<>,
+    publicDeriver: WalletState,
     storeName: AddressTypeName,
     type: CoreAddressT,
   |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
-    const allAddresses = await this.api.ada.getAllAddressesForDisplay({
-      publicDeriver: request.publicDeriver,
-      type: request.type,
-    });
-
+    const allAddresses = request.publicDeriver.allAddressesByType[request.type];
     return this.storewiseFilter({
       publicDeriver: request.publicDeriver,
       storeName: request.storeName,
@@ -136,23 +117,17 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
         ...addrInfo,
         address: addressToDisplayString(
           addrInfo.address,
-          request.publicDeriver.getParent().getNetworkInfo()
+          getNetworkById(request.publicDeriver.networkId),
         ),
       })),
     });
   }
 
   _wrapForeign: {|
-    publicDeriver: PublicDeriver<>,
+    publicDeriver: WalletState,
     storeName: AddressTypeName,
   |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
-    const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
-    if (withLevels == null) {
-      throw new Error(`${nameof(this._wrapForeign)} missing levels`);
-    }
-    const allAddresses = await this.api.ada.getForeignAddresses({
-      publicDeriver: withLevels,
-    });
+    const allAddresses = request.publicDeriver.foreignAddresses;
 
     return this.storewiseFilter({
       publicDeriver: request.publicDeriver,
@@ -161,7 +136,7 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
         type: addrInfo.type,
         address: addressToDisplayString(
           addrInfo.address,
-          request.publicDeriver.getParent().getNetworkInfo()
+          getNetworkById(request.publicDeriver.networkId),
         ),
         label: 'asdf',
       })),
@@ -169,23 +144,16 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
   }
 
   _wrapForChainAddresses: {|
-    publicDeriver: PublicDeriver<>,
+    publicDeriver: WalletState,
     storeName: AddressTypeName,
     type: CoreAddressT,
     chainsRequest: IHasUtxoChainsRequest,
   |}=> Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
-    const withHasUtxoChains = asHasUtxoChains(
-      request.publicDeriver
-    );
-    if (withHasUtxoChains == null) {
-      Logger.error(`${nameof(this._wrapForChainAddresses)} incorrect public deriver`);
-      return Promise.resolve([]);
-    }
-    const addresses = await this.api.ada.getChainAddressesForDisplay({
-      publicDeriver: withHasUtxoChains,
-      chainsRequest: request.chainsRequest,
-      type: request.type,
-    });
+    const addresses = (
+      request.chainsRequest.chainId === ChainDerivations.EXTERNAL ?
+        request.publicDeriver.externalAddressesByType :
+        request.publicDeriver.internalAddressesByType
+    )[request.type];
 
     return this.storewiseFilter({
       publicDeriver: request.publicDeriver,
@@ -194,14 +162,14 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
         ...addrInfo,
         address: addressToDisplayString(
           addrInfo.address,
-          request.publicDeriver.getParent().getNetworkInfo()
+          getNetworkById(request.publicDeriver.networkId),
         ),
       })),
     });
   }
 
   storewiseFilter: {|
-    publicDeriver: PublicDeriver<>,
+    publicDeriver: WalletState,
     storeName: AddressTypeName,
     addresses: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
   |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
@@ -209,7 +177,7 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
   }
 
   _createAddressIfNeeded: {|
-    publicDeriver: PublicDeriver<>,
+    publicDeriver: WalletState,
     genAddresses: () => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>>,
   |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
     const addresses = await request.genAddresses();
@@ -229,13 +197,5 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
 
   @action _resetFilter: void => void = () => {
     this.addressFilter = AddressFilter.None;
-  }
-
-  getFirstExternalAddress: (PublicDeriver<>) => Promise<AddressDetails> = async (publicDeriver) => {
-    return (await this.api.ada.getChainAddressesForDisplay({
-      publicDeriver: forceNonNull(asHasUtxoChains(publicDeriver)),
-      type: CoreAddressTypes.CARDANO_BASE,
-      chainsRequest: { chainId: ChainDerivations.EXTERNAL },
-    }))[0];
   }
 }

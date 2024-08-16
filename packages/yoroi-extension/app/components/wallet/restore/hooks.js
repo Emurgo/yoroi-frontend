@@ -1,12 +1,13 @@
 // @flow
 import { useState } from 'react';
-import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
+import type { WalletState } from '../../../../chrome/extension/background/types';
+
 
 type RestoreWalletDataReturnValue = {|
   recoveryPhrase: string,
   walletName: string,
   walletPassword: string,
-  duplicatedWallet: null | PublicDeriver<>,
+  duplicatedWallet: null | WalletState,
   plates: Array<any>,
   setRestoreWalletData(data: any): void,
   resetRestoreWalletData(): void,

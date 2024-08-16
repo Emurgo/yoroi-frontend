@@ -94,9 +94,7 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
       }
       group.transactions.push(transaction);
     }
-    return groups.sort(
-      (a, b) => b.transactions[0].date.getTime() - a.transactions[0].date.getTime()
-    );
+    return groups.sort((a, b) => b.transactions[0].date.getTime() - a.transactions[0].date.getTime());
   }
 
   localizedDate(date: string): string {
@@ -114,9 +112,7 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
       return firstTransaction.uniqueKey;
     }
     // this branch should not happen
-    Logger.error(
-      '[WalletTransactionsList::getTransactionKey] tried to render empty transaction group'
-    );
+    Logger.error('[WalletTransactionsList::getTransactionKey] tried to render empty transaction group');
     return '';
   }
 
@@ -151,7 +147,7 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
     return (
       <Box
         sx={{
-          bgcolor: 'common.white',
+          bgcolor: 'ds.bg_color_min',
           padding: '20px 0',
           overflow: 'auto',
         }}
@@ -188,15 +184,8 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
                   data={transaction}
                   isLastInList={transactionIndex === group.transactions.length - 1}
                   state={transaction.state}
-                  numberOfConfirmations={
-                    transaction.block == null
-                      ? null
-                      : this.props.lastSyncBlock - transaction.block.Height
-                  }
-                  assuranceLevel={transaction.getAssuranceLevelForMode(
-                    assuranceMode,
-                    this.props.lastSyncBlock
-                  )}
+                  numberOfConfirmations={transaction.block == null ? null : this.props.lastSyncBlock - transaction.block.Height}
+                  assuranceLevel={transaction.getAssuranceLevelForMode(assuranceMode, this.props.lastSyncBlock)}
                   onAddMemo={onAddMemo}
                   onEditMemo={onEditMemo}
                   shouldHideBalance={this.props.shouldHideBalance}

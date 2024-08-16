@@ -24,7 +24,7 @@ import {
   TransactionSigningMode,
   TxOutputDestinationType,
   TxAuxiliaryDataType,
-  StakeCredentialParamsType,
+  CredentialParamsType,
   CIP36VoteRegistrationFormat,
   TxRequiredSignerType,
   DatumType,
@@ -329,7 +329,7 @@ function formatLedgerWithdrawals(
     result.push({
       amount: withdrawalAmount.to_str(),
       stakeCredential: {
-        type: StakeCredentialParamsType.KEY_PATH,
+        type: CredentialParamsType.KEY_PATH,
         keyPath: addressing.path,
       },
     });
@@ -366,7 +366,7 @@ function formatLedgerCertificates(
         type: CertificateType.STAKE_REGISTRATION,
         params: {
           stakeCredential: {
-            type: StakeCredentialParamsType.KEY_PATH,
+            type: CredentialParamsType.KEY_PATH,
             keyPath: getPath(registrationCert.stake_credential()),
           },
         }
@@ -379,7 +379,7 @@ function formatLedgerCertificates(
         type: CertificateType.STAKE_DEREGISTRATION,
         params: {
           stakeCredential: {
-            type: StakeCredentialParamsType.KEY_PATH,
+            type: CredentialParamsType.KEY_PATH,
             keyPath: getPath(deregistrationCert.stake_credential()),
           },
         },
@@ -392,7 +392,7 @@ function formatLedgerCertificates(
         type: CertificateType.STAKE_DELEGATION,
         params: {
           stakeCredential: {
-            type: StakeCredentialParamsType.KEY_PATH,
+            type: CredentialParamsType.KEY_PATH,
             keyPath: getPath(delegationCert.stake_credential()),
           },
           poolKeyHashHex: Buffer.from(delegationCert.pool_keyhash().to_bytes()).toString('hex'),
