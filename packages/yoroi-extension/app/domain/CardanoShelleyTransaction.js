@@ -17,6 +17,7 @@ import { MultiToken } from '../api/common/lib/MultiToken';
 import { parseMetadata } from '../api/ada/lib/storage/bridge/metadataUtils';
 import { CatalystLabels } from '../api/ada/lib/cardanoCrypto/catalyst';
 import { RustModule } from '../api/ada/lib/cardanoCrypto/rustLoader';
+import { isEmptyArray } from '../coreUtils';
 
 export type CardanoShelleyTransactionFeature =
   | 'CatalystVotingRegistration'
@@ -137,7 +138,7 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
   }
 
   isCatalystVotingRegistration(): boolean {
-    if (this.metadata === null) {
+    if (this.metadata == null || isEmptyArray(this.metadata)) {
       return false;
     }
     const metadataString = parseMetadata(this.metadata);
@@ -189,4 +190,50 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
 
     return features;
   }
+}
+
+// fix Date, BigNumber and MultiToken values after deserialization
+// note: although the input is of `CardanoShelleyTransactionCtorData` type, its value is actually
+// serialized-and-deserialized
+export function deserializeTransactionCtorData(
+  serializedData: CardanoShelleyTransactionCtorData
+): CardanoShelleyTransactionCtorData {
+  const result: CardanoShelleyTransactionCtorData = {
+    txid: serializedData.txid,
+    block: undefined,
+    type: serializedData.type,
+    amount: MultiToken.from((serializedData.amount: any)),
+    fee: MultiToken.from((serializedData.fee: any)),
+    date: new Date(serializedData.date),
+    addresses: {
+      from: serializedData.addresses.from.map(({ address, value }) => ({
+        address,
+        value: MultiToken.from((value: any)),
+      })),
+      to: serializedData.addresses.to.map(({ address, value, isForeign }) => ({
+        address,
+        isForeign,
+        value: MultiToken.from((value: any)),
+      })),
+    },
+    state: serializedData.state,
+    errorMsg: serializedData.errorMsg,
+    certificates: serializedData.certificates,
+    ttl: serializedData.ttl && new BigNumber(serializedData.ttl),
+    metadata: serializedData.metadata,
+    withdrawals: serializedData.withdrawals.map(({ address, value }) => ({
+      address,
+      value: MultiToken.from((value: any))
+    })),
+    isValid: serializedData.isValid,
+  };
+
+  if (Object.prototype.hasOwnProperty.call(serializedData, 'ordinal')) {
+    result.ordinal = serializedData.ordinal;
+  }
+  if (typeof serializedData.block === 'object' && serializedData.block !== null) {
+    result.block = { ...serializedData.block, BlockTime: new Date(serializedData.block.BlockTime) };
+  }
+
+  return result;
 }

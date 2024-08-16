@@ -6,6 +6,7 @@ import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import { genLookupOrFail, getTokenIdentifierIfExists, getTokenStrictName } from '../../stores/stateless/tokenHelpers';
 import { splitAmount, truncateToken } from '../../utils/formatters';
 import AssetsPage from '../../components/wallet/assets/AssetsPage';
+import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 @observer
 export default class WalletAssetsPage extends Component<StoresAndActionsProps> {
@@ -14,7 +15,7 @@ export default class WalletAssetsPage extends Component<StoresAndActionsProps> {
     const publicDeriver = this.props.stores.wallets.selected;
     // Guard against potential null values
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(WalletAssetsPage)}.`);
-    const network = publicDeriver.getParent().getNetworkInfo()
+    const network = getNetworkById(publicDeriver.networkId);
     const spendableBalance = this.props.stores.transactions.balance;
     const getTokenInfo= genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)
 
@@ -41,7 +42,7 @@ export default class WalletAssetsPage extends Component<StoresAndActionsProps> {
         });
       })();
 
-    const assetDeposit = this.props.stores.transactions.assetDeposit;
+    const assetDeposit = publicDeriver.assetDeposits;
 
     const isNonZeroDeposit = !assetDeposit?.isEmpty();
     return (

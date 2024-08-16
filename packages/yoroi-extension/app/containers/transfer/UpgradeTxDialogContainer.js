@@ -12,7 +12,6 @@ import type {
   TransferTx,
 } from '../../types/TransferTypes';
 import { genAddressLookup, genAddressingLookup, allAddressSubgroups } from '../../stores/stateless/addressStores';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import Dialog from '../../components/widgets/Dialog';
 import LegacyTransferLayout from '../../components/transfer/LegacyTransferLayout';
@@ -24,6 +23,7 @@ import type {
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { getTokenName, genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../utils/formatters';
+import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -52,9 +52,10 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
       key: RustModule.WalletV4.Bip32PublicKey,
       ...Addressing,
     |},
-    publicDeriver: PublicDeriver<>,
+    publicDeriverId: number,
     addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
     expectedSerial: string | void,
+    networkId: number,
   |} => Promise<void> = async (request) => {
     await this.props.actions.ada.ledgerSend.sendUsingLedgerKey.trigger({
       ...request,
@@ -72,7 +73,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
 
     // only display the upgrade dialog once we've populated the address info for the wallet
     for (const addressStore of allAddressSubgroups) {
-      if (!addressStore.isRelated({ selected })) {
+      if (!addressStore.isRelated()) {
         continue;
       }
       const store = this.props.stores.addresses.addressSubgroupMap.get(addressStore.class);
@@ -135,8 +136,11 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
     if (selected == null) {
       throw new Error(`${nameof(UpgradeTxDialogContainer)} no wallet selected`);
     }
-    const network = selected.getParent().getNetworkInfo();
-    const defaultToken = selected.getParent().getDefaultToken();
+    const network = getNetworkById(selected.networkId);
+    const defaultToken = {
+      defaultNetworkId: selected.networkId,
+      defaultIdentifier: selected.defaultTokenId,
+    };
     const defaultTokenInfo = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)({
       identifier: defaultToken.defaultIdentifier,
       networkId: defaultToken.defaultNetworkId,
@@ -153,7 +157,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
       </div>
     );
 
-    const expectedSerial = selected.getParent().hardwareInfo?.DeviceId || '';
+    const expectedSerial = selected.hardwareWalletDeviceId || '';
 
     return (
       <TransferSummaryPage
@@ -166,13 +170,14 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
         getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
         onSubmit={{
           trigger: async () => await this.submit({
-            publicDeriver: selected,
+            publicDeriverId: selected.publicDeriverId,
             addressingMap: genAddressingLookup(
-              selected,
+              selected.networkId,
               this.props.stores.addresses.addressSubgroupMap
             ),
             ...tentativeTx,
             expectedSerial,
+            networkId: selected.networkId,
           }),
           label: intl.formatMessage(globalMessages.upgradeLabel),
         }}
@@ -186,13 +191,13 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
         getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
         unitOfAccountSetting={this.props.stores.profile.unitOfAccount}
         addressLookup={genAddressLookup(
-          selected,
+          selected.networkId,
           intl,
           undefined, // don't want to go to route from within a dialog
           this.props.stores.addresses.addressSubgroupMap,
         )}
         addressToDisplayString={
-          addr => addressToDisplayString(addr, selected.getParent().getNetworkInfo())
+          addr => addressToDisplayString(addr, network)
         }
       />
     );

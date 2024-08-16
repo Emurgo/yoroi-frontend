@@ -1,0 +1,15 @@
+.fadeIn0 {
+    animation: fade-out-placeholder 2s ease-in 0s infinite;
+}
+
+@keyframes fade-out-placeholder {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
+    100% {
+        opacity: 1;
+    }
+}

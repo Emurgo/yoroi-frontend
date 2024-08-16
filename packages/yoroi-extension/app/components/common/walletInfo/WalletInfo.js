@@ -19,7 +19,7 @@ import { hiddenAmount } from '../../../utils/strings';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';
 import styles from './WalletInfo.scss';
-import WalletAccountIcon from './WalletAccountIcon';
+import WalletAccountIcon from '../../topbar/WalletAccountIcon';
 
 type Props = {|
   +onUpdateHideBalance: void => Promise<void>,

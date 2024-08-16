@@ -5,7 +5,6 @@ import { observer } from 'mobx-react';
 import Sidebar from '../components/topbar/Sidebar';
 import type { StoresAndActionsProps } from '../types/injectedProps.types';
 import { allCategories, allCategoriesRevamp } from '../stores/stateless/sidebarCategories';
-import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
 import SidebarRevamp from '../components/topbar/SidebarRevamp';
 import { withLayout } from '../styles/context/layout';
 import type { LayoutComponentMap } from '../styles/context/layout';
@@ -40,7 +39,7 @@ class SidebarContainer extends Component<AllProps> {
         isActiveCategory={category => stores.app.currentRoute.startsWith(category.route)}
         categories={allCategories.filter(category =>
           category.isVisible({
-            hasAnyWallets: stores.wallets.hasAnyWallets,
+            hasAnyWallets: stores.wallets.hasAnyWallets === true,
             selected: stores.wallets.selected,
             currentRoute: stores.app.currentRoute,
           })
@@ -55,7 +54,7 @@ class SidebarContainer extends Component<AllProps> {
         onLogoClick={() => {
           actions.router.goToRoute.trigger({
             route: ROUTES.WALLETS.TRANSACTIONS,
-            publicDeriver: stores.wallets.selected,
+            publicDeriverId: stores.wallets.selected?.publicDeriverId,
           });
         }}
         onCategoryClicked={category => {
@@ -66,11 +65,11 @@ class SidebarContainer extends Component<AllProps> {
         isActiveCategory={category => stores.app.currentRoute.startsWith(category.route)}
         categories={allCategoriesRevamp.filter(category =>
           category.isVisible({
-            hasAnyWallets: this.props.stores.wallets.hasAnyWallets,
+            hasAnyWallets: this.props.stores.wallets.hasAnyWallets === true,
             selected: this.props.stores.wallets.selected,
             currentRoute: this.props.stores.app.currentRoute,
-            isRewardWallet: (publicDeriver: PublicDeriver<>) =>
-              stores.delegation.isRewardWallet(publicDeriver),
+            isRewardWallet: (wallet) =>
+              stores.delegation.isRewardWallet(wallet.publicDeriverId),
           })
         )}
       />

@@ -37,7 +37,7 @@ type Props = {|
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => ?$ReadOnly<TokenRow>,
   +selectedExplorer: SelectedExplorer,
   +submissionError: ?SignSubmissionErrorType,
-  +walletType: 'ledger' | 'trezor' | 'web',
+  +walletType: 'ledger' | 'trezor' | 'mnemonic',
   +hwWalletError: ?LocalizableError,
 |};
 
@@ -110,7 +110,7 @@ class AddCollateralPage extends Component<Props, State> {
   );
 
   submit(): void {
-    if (this.props.walletType === 'web') {
+    if (this.props.walletType === 'mnemonic') {
       this.form.submit({
         onSuccess: form => {
           const { walletPassword } = form.values();
@@ -318,7 +318,7 @@ class AddCollateralPage extends Component<Props, State> {
               </Box>
             </Box>
           </Box>
-          {walletType === 'web' && (
+          {walletType === 'mnemonic' && (
             <Box mt="24px">
               <TextField
                 type="password"
@@ -367,7 +367,7 @@ class AddCollateralPage extends Component<Props, State> {
               sx={{ minWidth: 'auto' }}
               variant="contained"
               fullWidth
-              disabled={walletType === 'web' && !walletPasswordField.isValid}
+              disabled={walletType === 'mnemonic' && !walletPasswordField.isValid}
               onClick={this.submit.bind(this)}
               loading={isSubmitting}
               id="confirmButton"

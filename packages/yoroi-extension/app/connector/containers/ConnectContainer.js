@@ -5,14 +5,12 @@ import ConnectPage from '../components/connect/ConnectPage';
 import { observer } from 'mobx-react';
 import { autorun } from 'mobx';
 import type { ConnectorStoresAndActionsProps } from '../../types/injectedProps.types';
-import type { ConnectResponseData } from '../../../chrome/extension/connector/types';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { LoadingWalletStates } from '../types';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
-import { createAuthEntry } from '../api';
-import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import { connectorCreateAuthEntry, userConnectResponse } from '../../api/thunk';
 import { ampli } from '../../../ampli/index';
+import type { WalletState } from '../../../chrome/extension/background/types';
 
 declare var chrome;
 
@@ -20,7 +18,7 @@ type State = {|
   isAppAuth: boolean,
   selectedWallet: {|
     index: number,
-    deriver: ?PublicDeriver<>,
+    deriver: ?WalletState,
     checksum: ?WalletChecksum,
   |},
 |};
@@ -40,8 +38,7 @@ export default class ConnectContainer extends Component<
   };
   onUnload: () => void = () => {
     const chromeMessage = this.props.stores.connector.connectingMessage;
-    chrome.runtime.sendMessage({
-      type: 'connect_response',
+    userConnectResponse({
       accepted: false,
       tabId: chromeMessage?.tabId,
     });
@@ -53,7 +50,7 @@ export default class ConnectContainer extends Component<
         this.props.stores.connector.loadingWallets === LoadingWalletStates.SUCCESS
       ) {
         ampli.dappPopupConnectWalletPageViewed({
-          wallet_count: this.props.stores.connector.filteredWallets.length,
+          wallet_count: this.props.stores.connector.wallets.length,
         });
       }
     });
@@ -67,10 +64,10 @@ export default class ConnectContainer extends Component<
   }
 
   onConnect: (
-    deriver: PublicDeriver<>,
+    deriver: WalletState,
     checksum: ?WalletChecksum,
     password: ?string
-  ) => Promise<void> = async (deriver, checksum, password) => {
+  ) => Promise<void> = async (deriver, _checksum, password) => {
     const chromeMessage = this.props.stores.connector.connectingMessage;
     if (chromeMessage == null) {
       throw new Error(
@@ -85,12 +82,16 @@ export default class ConnectContainer extends Component<
 
     let authEntry;
     if (password != null) {
-      authEntry = await createAuthEntry({ appAuthID, deriver, checksum, password });
+      authEntry = await connectorCreateAuthEntry({
+        appAuthID,
+        publicDeriverId: deriver.publicDeriverId,
+        password
+      });
     } else {
       authEntry = null;
     }
 
-    const publicDeriverId = deriver.getPublicDeriverId();
+    const { publicDeriverId } = deriver;
     const result = this.props.stores.connector.currentConnectorWhitelist;
 
     // Removing any previous whitelisted connections for the same url
@@ -110,28 +111,25 @@ export default class ConnectContainer extends Component<
 
     await ampli.dappPopupConnectWalletPasswordPageViewed();
 
-    chrome.runtime.sendMessage(
-      ({
-        type: 'connect_response',
-        accepted: true,
-        publicDeriverId,
-        auth: authEntry,
-        tabId: chromeMessage.tabId,
-      }: ConnectResponseData)
-    );
+    userConnectResponse({
+      accepted: true,
+      publicDeriverId,
+      auth: authEntry,
+      tabId: chromeMessage.tabId,
+    });
 
     // if we close the window immediately, the previous message may not be able to
     // to reach the service worker
     setTimeout(() => { connector.closeWindow.trigger(); }, 100);
   };
 
-  onSelectWallet: (deriver: PublicDeriver<>, checksum: ?WalletChecksum) => void = (
+  onSelectWallet: (deriver: WalletState, checksum: ?WalletChecksum) => void = (
     deriver,
     checksum
   ) => {
-    const wallets = this.props.stores.connector.filteredWallets;
+    const wallets = this.props.stores.connector.wallets;
     if (wallets) {
-      const index = deriver.getPublicDeriverId();
+      const index = deriver.publicDeriverId;
       this.setState(prevState => ({
         ...prevState,
         selectedWallet: {
@@ -152,13 +150,10 @@ export default class ConnectContainer extends Component<
 
   onCancel: void => void = () => {
     const chromeMessage = this.props.stores.connector.connectingMessage;
-    chrome.runtime.sendMessage(
-      ({
-        type: 'connect_response',
-        accepted: false,
-        tabId: chromeMessage?.tabId,
-      }: ConnectResponseData)
-    );
+    userConnectResponse({
+      accepted: false,
+      tabId: chromeMessage?.tabId,
+    });
 
     this.props.actions.connector.closeWindow.trigger();
   };
@@ -173,13 +168,10 @@ export default class ConnectContainer extends Component<
 
   render(): Node {
     const responseMessage = this.props.stores.connector.connectingMessage;
-    const wallets = this.props.stores.connector.filteredWallets;
+    const wallets = this.props.stores.connector.wallets;
     const error = this.props.stores.connector.errorWallets;
     const loadingWallets = this.props.stores.connector.loadingWallets;
     const network = 'Cardano';
-    const isSelectWalletHardware =
-      this.state.selectedWallet.deriver?.getParent().getWalletType() !==
-      WalletTypeOption.WEB_WALLET;
 
     return (
       <ConnectPage
@@ -199,7 +191,6 @@ export default class ConnectContainer extends Component<
         unitOfAccount={this.props.stores.profile.unitOfAccount}
         getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
         onUpdateHideBalance={this.updateHideBalance}
-        isSelectWalletHardware={isSelectWalletHardware}
       />
     );
   }

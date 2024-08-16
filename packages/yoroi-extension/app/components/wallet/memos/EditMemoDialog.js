@@ -12,7 +12,6 @@ import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import TextField from '../../common/TextField';
 import type { TxMemoTableUpsert } from '../../../api/ada/lib/storage/bridge/memos';
-import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import { isValidMemo } from '../../../utils/validations';
 import globalMessages, { memoMessages, } from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
@@ -25,7 +24,8 @@ import { IconButton, InputAdornment } from '@mui/material';
 import { ReactComponent as CloseIcon }  from '../../../assets/images/forms/close.inline.svg'
 
 type Props = {|
-  selectedWallet: PublicDeriver<>,
+  selectedWalletId: number,
+  plateTextPart: string,
   existingMemo: $ReadOnly<TxMemoTableRow>,
   error: ?LocalizableError,
   onCancel: void => void,
@@ -85,7 +85,8 @@ export default class EditMemoDialog extends Component<Props, State> {
         this.setState({ isSubmitting: true });
         const { memoContent } = form.values();
         const memoRequest = {
-          publicDeriver: this.props.selectedWallet,
+          publicDeriverId: this.props.selectedWalletId,
+          plateTextPart: this.props.plateTextPart,
           memo: {
             Content: memoContent.replace(/ +/g, ' '),
             TransactionHash: this.props.existingMemo.TransactionHash,

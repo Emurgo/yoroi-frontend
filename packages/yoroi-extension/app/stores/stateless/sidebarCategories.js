@@ -2,21 +2,20 @@
 import type { MessageDescriptor } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import globalMessages, { connectorMessages } from '../../i18n/global-messages';
-import { asGetStakingKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { ReactComponent as dappConnectorIcon } from '../../assets/images/dapp-connector/dapp-connector.inline.svg';
 import { ReactComponent as walletsIcon } from '../../assets/images/sidebar/my_wallets.inline.svg';
+import { ReactComponent as assetsIcon } from '../../assets/images/sidebar/revamp/assets.inline.svg';
+import { ReactComponent as governanceIcon } from '../../assets/images/sidebar/revamp/governance.inline.svg';
+import { ReactComponent as nftsIcon } from '../../assets/images/sidebar/revamp/nfts.inline.svg';
+import { ReactComponent as portfolioIcon } from '../../assets/images/sidebar/revamp/portfolio.inline.svg';
+import { ReactComponent as settingIcon } from '../../assets/images/sidebar/revamp/setting.inline.svg';
+import { ReactComponent as stakingIcon } from '../../assets/images/sidebar/revamp/staking.inline.svg';
+import { ReactComponent as swapIcon } from '../../assets/images/sidebar/revamp/swap.inline.svg';
+import { ReactComponent as votingIcon } from '../../assets/images/sidebar/revamp/voting.inline.svg';
+import { ReactComponent as walletIcon } from '../../assets/images/sidebar/revamp/wallet.inline.svg';
 import { ReactComponent as transferIcon } from '../../assets/images/sidebar/transfer_wallets.inline.svg';
 import { ReactComponent as settingsIcon } from '../../assets/images/sidebar/wallet-settings-2-ic.inline.svg';
 import { ReactComponent as goBackIcon } from '../../assets/images/top-bar/back-arrow-white.inline.svg';
-import { ReactComponent as dappConnectorIcon } from '../../assets/images/dapp-connector/dapp-connector.inline.svg';
-import { ReactComponent as walletIcon } from '../../assets/images/sidebar/revamp/wallet.inline.svg';
-import { ReactComponent as stakingIcon } from '../../assets/images/sidebar/revamp/staking.inline.svg';
-import { ReactComponent as assetsIcon } from '../../assets/images/sidebar/revamp/assets.inline.svg';
-import { ReactComponent as nftsIcon } from '../../assets/images/sidebar/revamp/nfts.inline.svg';
-import { ReactComponent as votingIcon } from '../../assets/images/sidebar/revamp/voting.inline.svg';
-import { ReactComponent as swapIcon } from '../../assets/images/sidebar/revamp/swap.inline.svg';
-import { ReactComponent as settingIcon } from '../../assets/images/sidebar/revamp/setting.inline.svg';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
-import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import environment from '../../environment';
 
 export type SidebarCategory = {|
@@ -26,7 +25,7 @@ export type SidebarCategory = {|
   +label?: MessageDescriptor,
   +isVisible: ({|
     hasAnyWallets: boolean,
-    selected: null | PublicDeriver<>,
+    selected: ?{ publicDeriverId: number, ... },
     currentRoute: string,
   |}) => boolean,
 |};
@@ -42,9 +41,7 @@ export const MY_WALLETS: SidebarCategory = registerCategory({
   route: ROUTES.MY_WALLETS,
   icon: walletsIcon,
   label: globalMessages.sidebarWallets,
-  isVisible: request =>
-    request.hasAnyWallets &&
-    request.selected == null,
+  isVisible: request => request.hasAnyWallets && request.selected == null,
 });
 
 export const WALLETS_ROOT: SidebarCategory = registerCategory({
@@ -89,12 +86,12 @@ export const CONNECTED_WEBSITES: SidebarCategory = registerCategory({
 
 type isVisibleFunc = ({|
   hasAnyWallets: boolean,
-  selected: null | PublicDeriver<>,
+  selected: ?{ publicDeriverId: number, isTestnet: boolean, networkId: number, ... },
   currentRoute: string,
   isRewardWallet: isRewardWalletFunc,
 |}) => boolean;
 
-type isRewardWalletFunc = (PublicDeriver<>) => boolean;
+type isRewardWalletFunc = ({ publicDeriverId: number, ... }) => boolean;
 
 export type SidebarCategoryRevamp = {|
   +className: string,
@@ -123,17 +120,14 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.STAKING,
     icon: stakingIcon,
     label: globalMessages.sidebarStaking,
-    isVisible: ({ selected, isRewardWallet }) =>
-      !!selected &&
-      isCardanoHaskell(selected.getParent().getNetworkInfo()) &&
-      isRewardWallet(selected),
+    isVisible: ({ selected, isRewardWallet }) => !!selected && isRewardWallet(selected),
   },
   {
     className: 'swap',
     route: ROUTES.SWAP.ROOT,
     icon: swapIcon,
     label: globalMessages.sidebarSwap,
-    isVisible: ({ selected }) => (environment.isDev() || environment.isNightly()) && !!selected?.isMainnet(),
+    isVisible: ({ selected }) => (environment.isDev() || environment.isNightly()) && !selected?.isTestnet,
   },
   {
     className: 'assets',
@@ -141,6 +135,13 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     icon: assetsIcon,
     label: globalMessages.sidebarAssets,
     isVisible: _request => _request.selected !== null,
+  },
+  {
+    className: 'portfolio',
+    route: ROUTES.PORTFOLIO.ROOT,
+    icon: portfolioIcon,
+    label: globalMessages.sidebarPortfolio,
+    isVisible: ({ selected }) => environment.isDev() && selected?.networkId === 250,
   },
   {
     className: 'nfts',
@@ -155,7 +156,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     icon: votingIcon,
     label: globalMessages.sidebarVoting,
     // $FlowFixMe[prop-missing]
-    isVisible: request => asGetStakingKey(request.selected) != null,
+    isVisible: request => request.selected != null,
   },
   {
     className: 'connected-websites',
@@ -171,6 +172,13 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
   //   label: globalMessages.sidebarSwap,
   //   isVisible: _request => true,
   // },
+  {
+    className: 'governance',
+    route: '/governance',
+    icon: governanceIcon,
+    label: globalMessages.sidebarGovernance,
+    isVisible: ({ selected }) => environment.isDev() && selected?.networkId === 450,
+  },
   {
     className: 'settings',
     route: '/settings',

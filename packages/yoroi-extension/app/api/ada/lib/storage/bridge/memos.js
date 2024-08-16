@@ -5,7 +5,6 @@ import {
   getAllSchemaTables,
   raii,
 } from '../database/utils';
-import { PublicDeriver } from '../models/PublicDeriver/index';
 import type { TxMemoTableInsertCommon, TxMemoTableInsert, TxMemoTableRow } from '../database/memos/tables';
 import { GetTxMemo } from '../database/memos/api/read';
 import { ModifyTxMemo } from '../database/memos/api/write';
@@ -15,7 +14,8 @@ export type TxMemoPreLookupKey = {|
    * Should be checksum of public deriver
    * But for wallets without a public key, it can be something else
    */
-  publicDeriver: PublicDeriver<>,
+  publicDeriverId: number,
+  plateTextPart: string,
   txHash: string,
 |};
 export type TxMemoLookupKey = {|
@@ -28,7 +28,8 @@ export type TxMemoTablePreInsert = {|
    * Should be checksum of public deriver
    * But for wallets without a public key, it can be something else
    */
-  publicDeriver: PublicDeriver<>,
+  publicDeriverId: number,
+  plateTextPart: string,
   memo: TxMemoTableInsertCommon,
 |}
 
@@ -38,7 +39,8 @@ export type TxMemoTableUpsert = {|
    * Should be checksum of public deriver
    * But for wallets without a public key, it can be something else
    */
-  publicDeriver: PublicDeriver<>,
+  publicDeriverId: number,
+  plateTextPart: string,
   memo: TxMemoTableInsertCommon,
 |}
 
