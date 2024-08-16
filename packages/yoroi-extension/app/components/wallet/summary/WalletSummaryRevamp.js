@@ -63,10 +63,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
       balanceDisplay = <span>{hiddenAmount}</span>;
     } else {
       const shiftedAmount = defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
-      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-        shiftedAmount,
-        tokenInfo.Metadata.numberOfDecimals
-      );
+      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(shiftedAmount, tokenInfo.Metadata.numberOfDecimals);
 
       balanceDisplay = (
         <>
@@ -83,20 +80,12 @@ export default class WalletSummaryRevamp extends Component<Props> {
     );
   };
 
-  renderPendingAmount(
-    timestampedAmount: Array<{| amount: MultiToken, timestamp: number |}>,
-    label: string
-  ): Node {
+  renderPendingAmount(timestampedAmount: Array<{| amount: MultiToken, timestamp: number |}>, label: string): Node {
     if (!timestampedAmount.length) {
       return null;
     }
 
-    const {
-      getHistoricalPrice,
-      unitOfAccountSetting,
-      shouldHideBalance,
-      getTokenInfo,
-    } = this.props;
+    const { getHistoricalPrice, unitOfAccountSetting, shouldHideBalance, getTokenInfo } = this.props;
 
     let pendingAmount = null;
     if (unitOfAccountSetting.enabled) {
@@ -185,7 +174,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
       );
 
     return (
-      <Box id="wallet:transactions-walletSummary-box" sx={{ bgcolor: 'common.white' }}>
+      <Box id="wallet:transactions-walletSummary-box" sx={{ bgcolor: 'ds.bg_color_min' }}>
         <Box
           sx={{
             marginBottom: '16px',
@@ -194,12 +183,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
             alignItems: 'center',
           }}
         >
-          <Typography
-            variant="h2"
-            as="p"
-            fontSize="18px"
-            sx={{ fontWeight: 500, color: 'common.black' }}
-          >
+          <Typography variant="h2" as="p" fontSize="18px" sx={{ fontWeight: 500, color: 'ds.text_gray_medium' }}>
             {intl.formatMessage({ id: 'wallet.navigation.transactions' })}
           </Typography>
           {!isLoadingTransactions && (
@@ -222,16 +206,10 @@ export default class WalletSummaryRevamp extends Component<Props> {
         </Box>
         <Box sx={{ pb: hasPendingAmount ? '16px' : 0 }}>
           <Typography component="div" variant="body1">
-            {this.renderPendingAmount(
-              pendingAmount.incoming,
-              intl.formatMessage(messages.pendingIncomingConfirmationLabel)
-            )}
+            {this.renderPendingAmount(pendingAmount.incoming, intl.formatMessage(messages.pendingIncomingConfirmationLabel))}
           </Typography>
           <Typography component="div" variant="body1">
-            {this.renderPendingAmount(
-              pendingAmount.outgoing,
-              intl.formatMessage(messages.pendingOutgoingConfirmationLabel)
-            )}
+            {this.renderPendingAmount(pendingAmount.outgoing, intl.formatMessage(messages.pendingOutgoingConfirmationLabel))}
           </Typography>
         </Box>
         {shouldShowEmptyBanner && <Box>{emptyBannerComponent}</Box>}
@@ -256,7 +234,9 @@ export default class WalletSummaryRevamp extends Component<Props> {
               </Typography>
             </Grid>
             <Grid item xs={2} sx={{ textAlign: 'right' }}>
-              <Typography component="div" variant="body2">{intl.formatMessage(globalMessages.feeLabel)}</Typography>
+              <Typography component="div" variant="body2">
+                {intl.formatMessage(globalMessages.feeLabel)}
+              </Typography>
             </Grid>
             <Grid item xs={4} sx={{ textAlign: 'right', pr: '30px' }}>
               <Typography component="div" variant="body2">

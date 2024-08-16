@@ -30,11 +30,7 @@ export default class Receive extends Component<Props> {
     if (publicDeriver == null) throw new Error(`${nameof(Receive)} no public deriver`);
     const rootRoute = buildRoute(ROUTES.WALLETS.RECEIVE.ROOT);
 
-    const storesForWallet = allAddressSubgroups.filter(store =>
-      store.isRelated({
-        selected: publicDeriver,
-      })
-    );
+    const storesForWallet = allAddressSubgroups.filter(store => store.isRelated());
     if (this.props.stores.app.currentRoute === rootRoute) {
       // if no store is specified, we just send the user to the first store in the list
       const firstRoute = routeForStore(storesForWallet[0].name);
@@ -62,7 +58,7 @@ export default class Receive extends Component<Props> {
     if (publicDeriver == null) throw new Error(`${nameof(Receive)} no public deriver`);
 
     const storesForWallet = allAddressSubgroups
-      .filter(store => store.isRelated({ selected: publicDeriver }))
+      .filter(store => store.isRelated())
       .map(store => {
         const request = this.props.stores.addresses.addressSubgroupMap.get(store.class);
         if (request == null) throw new Error('Should never happen');

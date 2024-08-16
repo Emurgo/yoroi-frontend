@@ -6,17 +6,11 @@ import {
   fullErrStr,
   Logger,
 } from '../../../utils/logging';
-import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
-import {
-  asGetSigningKey,
-  asGetAllAccounting,
-} from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { ROUTES } from '../../../routes-config';
 import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
-import { genOwnStakingKey } from '../../../api/ada/index';
-import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 import type { ActionsMap } from '../../../actions/index';
 import type { StoresMap } from '../../index';
+import { signAndBroadcastTransaction } from '../../../api/thunk';
 
 export default class AdaMnemonicSendStore extends Store<StoresMap, ActionsMap> {
 
@@ -30,7 +24,11 @@ export default class AdaMnemonicSendStore extends Store<StoresMap, ActionsMap> {
   _sendMoney:  {|
     signRequest: ISignRequest<any>,
     password: string,
-    publicDeriver: PublicDeriver<>,
+    +wallet: {
+      publicDeriverId: number,
+      +plate: { TextPart: string, ... },
+      ...
+    },
     onSuccess?: void => void,
   |} => Promise<void> = async (request) => {
     if (!(request.signRequest instanceof HaskellShelleyTxSignRequest)) {
@@ -40,12 +38,12 @@ export default class AdaMnemonicSendStore extends Store<StoresMap, ActionsMap> {
     await this.stores.substores.ada.wallets.adaSendAndRefresh({
       broadcastRequest: {
         normal: {
-          publicDeriver: request.publicDeriver,
+          wallet: request.wallet,
           password: request.password,
           signRequest: request.signRequest,
         },
       },
-      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
+      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
     });
 
     this.actions.dialogs.closeActiveDialog.trigger();
@@ -60,59 +58,10 @@ export default class AdaMnemonicSendStore extends Store<StoresMap, ActionsMap> {
   signAndBroadcast: {|
     signRequest: HaskellShelleyTxSignRequest,
     password: string,
-    publicDeriver: PublicDeriver<>,
+    publicDeriverId: number,
   |} => Promise<{| txId: string |}> = async (request) => {
     try {
-      const withSigning = (asGetSigningKey(request.publicDeriver));
-      if (withSigning == null) {
-        throw new Error(`${nameof(this.signAndBroadcast)} public deriver missing signing functionality.`);
-      }
-
-      const { neededStakingKeyHashes } = request.signRequest;
-      if (neededStakingKeyHashes.neededHashes.size - neededStakingKeyHashes.wits.size >= 2) {
-        throw new Error(`${nameof(this.signAndBroadcast)} Too many missing witnesses`);
-      }
-      if (neededStakingKeyHashes.neededHashes.size !== neededStakingKeyHashes.wits.size) {
-        const withStakingKey = asGetAllAccounting(withSigning);
-        if (withStakingKey == null) {
-          throw new Error(`${nameof(this.signAndBroadcast)} missing staking key functionality`);
-        }
-        const stakingKey = await genOwnStakingKey({
-          publicDeriver: withStakingKey,
-          password: request.password,
-        });
-        if (request.signRequest.neededStakingKeyHashes.neededHashes.has(
-          Buffer.from(
-            RustModule.WalletV4.Credential.from_keyhash(
-              stakingKey.to_public().hash()
-            ).to_bytes()
-          ).toString('hex')
-        )) {
-          neededStakingKeyHashes.wits.add(
-            Buffer.from(RustModule.WalletV4.make_vkey_witness(
-              RustModule.WalletV4.hash_transaction(
-                request.signRequest.unsignedTx.build()
-              ),
-              stakingKey
-            ).to_bytes()).toString('hex')
-          );
-        } else {
-          throw new Error(`${nameof(this.signAndBroadcast)} Missing witness but it was not ours`);
-        }
-      }
-
-      const { txId } = await this.api.ada.signAndBroadcast({
-        publicDeriver: withSigning,
-        password: request.password,
-        signRequest: request.signRequest,
-        sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
-      });
-
-      await this.stores.substores.ada.transactions.recordSubmittedTransaction(
-        request.publicDeriver,
-        request.signRequest,
-        txId,
-      );
+      const { txId } = await signAndBroadcastTransaction(request);
       return { txId };
     } catch (error) {
       Logger.error(`${nameof(AdaMnemonicSendStore)}::${nameof(this.signAndBroadcast)} error: ${fullErrStr(error)}` );

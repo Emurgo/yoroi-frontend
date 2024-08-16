@@ -87,7 +87,7 @@ const backgroundServiceWorkerConfig = (env /*: EnvParams */) /*: * */ => ({
   resolve: commonConfig.resolve(),
   entry: {
     background: [
-      path.join(__dirname, '../chrome/extension/background')
+      path.join(__dirname, '../chrome/extension/background/index')
     ],
   },
   output: {

@@ -11,6 +11,7 @@ import type { StoresMap } from '../index';
 import { ComplexityLevels } from '../../types/complexityLevelType';
 import type { WalletsNavigation } from '../../api/localStorage'
 import { ampli } from '../../../ampli/index';
+import { subscribe } from '../../api/thunk';
 
 export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap> {
   @observable __selectedNetwork: void | $ReadOnly<NetworkRow> = undefined;
@@ -96,14 +97,14 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
         await this.stores.memos.loadFromStorage();
         await this.stores.tokenInfoStore.refreshTokenInfo();
         await this.stores.coinPriceStore.loadFromStorage();
-        this.stores.coinPriceStore.startPoll();
 
         await wallets.restoreWalletsFromStorage();
+        subscribe();
         if (wallets.hasAnyWallets && this.stores.loading.fromUriScheme) {
           this.actions.router.goToRoute.trigger({ route: ROUTES.SEND_FROM_URI.ROOT });
         } else {
           const firstWallet =
-            wallets.publicDerivers.length !== 0 ? wallets.publicDerivers[0] : null;
+            wallets.wallets.length !== 0 ? wallets.wallets[0] : null;
           if (firstWallet == null) {
             this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
             return;
@@ -113,13 +114,13 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
             const lastSelectedWallet = this.stores.wallets.getLastSelectedWallet();
             this.actions.router.goToRoute.trigger({
               route: ROUTES.WALLETS.ROOT,
-              publicDeriver: lastSelectedWallet ?? firstWallet,
+              publicDeriverId: lastSelectedWallet?.publicDeriverId ?? firstWallet.publicDeriverId,
             });
-          } else if (wallets.publicDerivers.length === 1) {
+          } else if (wallets.wallets.length === 1) {
             // if user only has 1 wallet, just go to it directly as a shortcut
             this.actions.router.goToRoute.trigger({
               route: ROUTES.WALLETS.ROOT,
-              publicDeriver: firstWallet,
+              publicDeriverId: firstWallet.publicDeriverId,
             });
           } else {
             this.actions.router.goToRoute.trigger({
@@ -277,7 +278,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
   };
 }
 
-export function getPaperWalletIntro(currentLocale: string, defaultLocale: string): string {
+function getPaperWalletIntro(currentLocale: string, defaultLocale: string): string {
   try {
     return require(`../../i18n/locales/paper-wallets/intro/${currentLocale}.md`).default;
   } catch {

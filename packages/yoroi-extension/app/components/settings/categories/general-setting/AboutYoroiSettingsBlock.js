@@ -16,11 +16,9 @@ import { ReactComponent as mediumSvg } from '../../../../assets/images/social/me
 
 import environment from '../../../../environment';
 import LinkButton from '../../../widgets/LinkButton';
-import { isTestnet } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 import RawHash from '../../../widgets/hashWrappers/RawHash';
 import ExplorableHash from '../../../widgets/hashWrappers/ExplorableHash';
 import { handleExternalLinkClick } from '../../../../utils/routing';
-import { PublicDeriver } from '../../../../api/ada/lib/storage/models/PublicDeriver';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Box, Link, Typography } from '@mui/material';
 import { withLayout } from '../../../../styles/context/layout';
@@ -136,7 +134,7 @@ const socialMediaLinks = [
 const baseGithubUrl = 'https://github.com/Emurgo/yoroi-frontend/';
 
 type Props = {|
-  wallet: null | PublicDeriver<>,
+  wallet: null | { isTestnet: boolean, ... }
 |};
 
 @observer
@@ -148,12 +146,7 @@ class AboutYoroiSettingsBlock extends Component<Props & InjectedLayoutProps> {
   render(): Node {
     const { intl } = this.context;
     const { wallet, isRevampLayout, renderLayoutComponent } = this.props;
-    let network;
-
-    if (wallet) {
-      const result = isTestnet(wallet.getParent().getNetworkInfo());
-      network = result === true ? 'testnet' : 'mainnet';
-    }
+    const network = wallet && wallet.isTestnet ? 'testnet' : 'mainnet';
 
     const classicLayout = (
       <Box

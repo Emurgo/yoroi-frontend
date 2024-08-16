@@ -20,7 +20,7 @@ type Props = {|
   +explorers: $ReadOnlyArray<$ReadOnly<ExplorerRow>>,
   +selectedExplorer: SelectedExplorer,
   +onSelectExplorer: ({|
-    explorer: $ReadOnly<ExplorerRow>,
+    explorerId: string,
   |}) => PossiblyAsync<void>,
   +isSubmitting: boolean,
   +error?: ?LocalizableError,
@@ -43,15 +43,15 @@ class ExplorerSettings extends Component<Props & InjectedLayoutProps> {
     intl: intlShape.isRequired,
   };
 
-  selectExplorer: ($ReadOnly<ExplorerRow>) => Promise<void> = async explorer => {
-    await this.props.onSelectExplorer({ explorer });
+  selectExplorer: (string) => Promise<void> = async explorerId => {
+    await this.props.onSelectExplorer({ explorerId });
   };
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       explorerId: {
         label: this.context.intl.formatMessage(globalMessages.blockchainExplorer),
-        value: this.props.selectedExplorer.selected,
+        value: this.props.selectedExplorer.selected.ExplorerId,
       },
     },
   });
@@ -79,15 +79,14 @@ class ExplorerSettings extends Component<Props & InjectedLayoutProps> {
         )}
         <Box sx={{ width: isRevampLayout ? '506px' : '100%' }}>
           <Select
-            options={options}
             disabled={isSubmitting}
             labelId="explorer-select"
             {...explorerId.bind()}
-            value={this.props.selectedExplorer.selected}
+            value={this.props.selectedExplorer.selected.ExplorerId}
             onChange={this.selectExplorer}
           >
             {options.map(option => (
-              <MenuItem key={option.value.ExplorerId} value={option.value} id={'selectExplorer-' + option.value.Name + '-menuItem'}>
+              <MenuItem key={option.value.ExplorerId} value={option.value.ExplorerId} id={'selectExplorer-' + option.value.Name + '-menuItem'}>
                 {option.label}
               </MenuItem>
             ))}

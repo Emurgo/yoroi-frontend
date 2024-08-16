@@ -46,6 +46,9 @@ export default class WalletAccountIcon extends Component<Props> {
 
   render(): Node {
     const { iconSeed, scalePx, size, saturationFactor } = this.props;
+    if (iconSeed === '') {
+      return (<div style={{ width: '42px', height: '42px' }} />);
+    }
     const colorIdx = Buffer.from(iconSeed, 'hex')[0] % COLORS.length;
     const color = COLORS[colorIdx];
     return (<Blockies

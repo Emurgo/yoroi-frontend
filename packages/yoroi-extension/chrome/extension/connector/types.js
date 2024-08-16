@@ -3,8 +3,6 @@
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { PublicDeriver } from '../../../app/api/ada/lib/storage/models/PublicDeriver/index';
 import { MultiToken } from '../../../app/api/common/lib/MultiToken';
-import type CardanoTxRequest from '../../../app/api/ada';
-import type { RemoteUnspentOutput } from '../../../app/api/ada/lib/state-fetch/types';
 import type { IGetAllUtxosResponse } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 // ----- Types used in the dApp <-> Yoroi connection bridge ----- //
@@ -160,11 +158,7 @@ export type ConnectedSites = {|
   sites: Array<string>,
 |};
 
-export type Protocol = {|
-  type: 'cardano'
-|}
-export type RpcUid = number;
-
+type RpcUid = number;
 export type PendingSignData = {|
   type: 'data',
   uid: RpcUid,
@@ -183,65 +177,6 @@ export type PendingSignData = {|
     utxos: IGetAllUtxosResponse,
   |},
 |};
-
-export type ConfirmedSignData = {|
-  type: 'sign_confirmed',
-  tx: CardanoTx | CardanoTxRequest | Array<RemoteUnspentOutput> | null,
-  uid: RpcUid,
-  tabId: number,
-  pw: string,
-  // hardware wallet:
-  witnessSetHex?: ?string,
-|};
-
-export type FailedSignData = {|
-  type: 'sign_rejected',
-  uid: RpcUid,
-  tabId: number,
-|} | {|
-  type: 'sign_error',
-  errorType: 'string',
-  data: string,
-  uid: RpcUid,
-  tabId: number,
-|}
-export type ConnectResponseData = {|
-  type: 'connect_response',
-  accepted: true,
-  publicDeriverId: number,
-  auth: ?WalletAuthEntry,
-  tabId: ?number,
-|} | {|
-  type: 'connect_response',
-  accepted: false,
-  tabId: ?number,
-|}
-
-export type GetUtxosRequest = {|
-  type: 'get_utxos/addresses',
-  tabId: number,
-  select: string[],
-|}
-
-export type TxSignWindowRetrieveData = {|
-  type: 'tx_sign_window_retrieve_data',
-|}
-export type ConnectRetrieveData = {|
-  type: 'connect_retrieve_data',
-|}
-
-export type RemoveWalletFromWhitelistData = {|
-  type: 'remove_wallet_from_whitelist',
-  url: string,
-|}
-
-export type GetConnectedSitesData = {|
-  type: 'get_connected_sites',
-|}
-
-export type GetConnectionProtocolData = {|
-  type: 'get_protocol',
-|}
 
 // Errors: Yoroi-only
 

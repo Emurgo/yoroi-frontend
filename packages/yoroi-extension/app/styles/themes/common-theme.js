@@ -12,6 +12,7 @@ export const commonTheme: Object = {
       `,
     },
   },
+
   /**
    * Note: all typography tokens are named based on the regular
    * variant`{token}-{num}-regular` (e.g. `heading-1-regular, body-1-regular`).

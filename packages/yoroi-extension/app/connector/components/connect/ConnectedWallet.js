@@ -1,14 +1,14 @@
 // @flow
 import type { Node } from 'react';
 import type { WalletChecksum } from '@emurgo/cip4-js';
-import type { PublicDeriverCache } from '../../../../chrome/extension/connector/types';
 import { Component } from 'react';
 import { Box, Typography } from '@mui/material';
 import styles from './ConnectedWallet.scss';
 import WalletAccountIcon from '../../../components/topbar/WalletAccountIcon';
+import type { WalletState } from '../../../../chrome/extension/background/types';
 
 type Props = {|
-  +publicDeriver: PublicDeriverCache,
+  +publicDeriver: WalletState,
   +walletBalance?: Node,
 |};
 
@@ -38,11 +38,11 @@ export default class WalletCard extends Component<Props> {
   render(): Node {
     const { publicDeriver, walletBalance } = this.props;
     // eslint-disable-next-line no-unused-vars
-    const [_, iconComponent] = publicDeriver.checksum
-      ? constructPlate(publicDeriver.checksum, 0, styles.icon)
+    const [_, iconComponent] = publicDeriver.plate
+      ? constructPlate(publicDeriver.plate, 0, styles.icon)
       : [];
 
-    const checksum = this.props.publicDeriver.checksum?.TextPart;
+    const checksum = this.props.publicDeriver.plate?.TextPart;
 
     return (
       <Box className={styles.card}>

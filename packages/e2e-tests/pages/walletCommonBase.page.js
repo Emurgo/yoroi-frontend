@@ -132,7 +132,9 @@ class WalletCommonBase extends BasePage {
 
     const adaBalance = await this.waitPresentedAndAct(this.walletBalanceTextLocator, async () => {
       const rawBalanceText = await this.getText(this.walletBalanceTextLocator);
-      return Number(rawBalanceText.split(' ')[0]);
+      const [numberPart, ] = rawBalanceText.split(' ');
+      const digits = numberPart.split('\n');
+      return Number(digits.join(''));
     });
 
     const [fiatBalance, fiatCurrency] = await this.waitPresentedAndAct(
