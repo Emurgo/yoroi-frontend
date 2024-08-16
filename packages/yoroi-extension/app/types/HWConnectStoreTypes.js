@@ -1,14 +1,10 @@
 // @flow
 // Interface of Hardware Wallet Connect dialog
 
-import LocalizedRequest from '../stores/lib/LocalizedRequest';
-
 import LocalizableError from '../i18n/LocalizableError';
-
-import type { CreateHardwareWalletRequest, CreateHardwareWalletFunc } from '../api/ada';
 import type { StepStateEnum } from '../components/widgets/ProgressSteps';
-import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
 import type { HWFeatures } from '../api/ada/lib/storage/database/walletTypes/core/tables';
+import type { WalletState } from '../../chrome/extension/background/types';
 
 export const ProgressStep = Object.freeze({
   CHECK: 0,
@@ -52,8 +48,6 @@ export interface HWConnectStoreTypes<ConnectionResponse> {
   get isActionProcessing(): boolean;
   // =================== VIEW RELATED =================== //
 
-  // =================== API RELATED =================== //
-  createHWRequest: LocalizedRequest<CreateHardwareWalletFunc>;
 
   /** While hardware wallet creation is taking place, we need to block users from starting a
     * hardware wallet creation on a separate wallet and explain to them why the action is blocked */
@@ -109,11 +103,7 @@ export interface HWConnectStoreTypes<ConnectionResponse> {
     walletName: string,
   ): Promise<void>;
 
-  _prepareCreateHWReqParams(
-    walletName: string,
-  ): CreateHardwareWalletRequest;
-
-  _onSaveSuccess(publicDeriver: PublicDeriver<>): Promise<void>;
+  _onSaveSuccess(wallet: WalletState): Promise<void>;
   // =================== SAVE =================== //
 
   // =================== API =================== //

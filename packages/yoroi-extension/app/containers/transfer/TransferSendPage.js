@@ -23,11 +23,8 @@ import type {
   TransferTx,
 } from '../../types/TransferTypes';
 import { genAddressLookup } from '../../stores/stateless/addressStores';
-import {
-  asGetSigningKey,
-} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
+import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -84,16 +81,16 @@ export default class TransferSendPage extends Component<Props> {
     const signRequest = this.props.transactionRequest.result;
     if (signRequest == null) return;
     if (this.spendingPasswordForm == null) {
-      if (isTrezorTWallet(selected.getParent())) {
+      if (selected.type === 'trezor') {
         await this.props.actions.ada.trezorSend.sendUsingTrezor.trigger({
           params: { signRequest },
-          publicDeriver: selected,
+          wallet: selected,
         });
       }
-      if (isLedgerNanoWallet(selected.getParent())) {
+      if (selected.type === 'ledger') {
         await this.props.actions.ada.ledgerSend.sendUsingLedgerWallet.trigger({
           params: { signRequest },
-          publicDeriver: selected,
+          wallet: selected,
         });
       }
       if (this.props.stores.wallets.sendMoneyRequest.error == null) {
@@ -106,7 +103,7 @@ export default class TransferSendPage extends Component<Props> {
           await this.props.actions.wallets.sendMoney.trigger({
             signRequest,
             password: walletPassword,
-            publicDeriver: selected,
+            wallet: selected,
           });
           if (this.props.stores.wallets.sendMoneyRequest.error == null) {
             this.props.onSubmit.trigger();
@@ -158,17 +155,14 @@ export default class TransferSendPage extends Component<Props> {
       throw new Error(`${nameof(TransferSendPage)} no wallet selected`);
     }
 
-    const withSigning = asGetSigningKey(selected);
-
-    const spendingPasswordForm = withSigning == null
-      ? undefined
-      : (
+    const spendingPasswordForm = selected.type === 'mnemonic'
+      ? (
         <SpendingPasswordInput
           setForm={(form) => this.setSpendingPasswordForm(form)}
           classicTheme={this.props.stores.profile.isClassicTheme}
           isSubmitting={this.props.stores.wallets.sendMoneyRequest.isExecuting}
         />
-      );
+      ) : null;
 
     const { intl } = this.context;
 
@@ -177,7 +171,7 @@ export default class TransferSendPage extends Component<Props> {
         header={this.props.header}
         form={spendingPasswordForm}
         selectedExplorer={this.props.stores.explorers.selectedExplorer
-          .get(selected.getParent().getNetworkInfo().NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
+          .get(selected.networkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
         }
         transferTx={this.props.toTransferTx(tentativeTx)}
         getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
@@ -192,13 +186,13 @@ export default class TransferSendPage extends Component<Props> {
         getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
         unitOfAccountSetting={this.props.stores.profile.unitOfAccount}
         addressLookup={genAddressLookup(
-          selected,
+          selected.networkId,
           intl,
           undefined, // don't want to go to route from within a dialog
           this.props.stores.addresses.addressSubgroupMap,
         )}
         addressToDisplayString={
-          addr => addressToDisplayString(addr, selected.getParent().getNetworkInfo())
+          addr => addressToDisplayString(addr, getNetworkById(selected.networkId))
         }
       />
     );

@@ -14,7 +14,7 @@ import {
   AddressType,
   CertificateType,
   TxAuxiliaryDataType,
-  StakeCredentialParamsType,
+  CredentialParamsType,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import {
   pathToString,
@@ -209,10 +209,11 @@ export default class SendTxHintBlock extends React.Component<Props> {
 
     if (request.cert.type === CertificateType.STAKE_REGISTRATION) {
       const { params } = request.cert;
-      if (request.cert.params.stakeCredential.type !== StakeCredentialParamsType.KEY_PATH) {
+      if (params.stakeCredential.type !== CredentialParamsType.KEY_PATH) {
         throw new Error('unsupported stake credential type');
       }
-      const { keyPath } = request.cert.params.stakeCredential;
+      // $FLowIgnore
+      const { keyPath } = params.stakeCredential;
       const imgRegister = require(`../../../../assets/img/nano-${this.props.deviceCode}/hint-registration.png`);
       const imgRegisterConfirm = require(`../../../../assets/img/nano-${this.props.deviceCode}/hint-registration-confirm.png`);
       const firstStep = request.getAndIncrementStep();
@@ -245,10 +246,11 @@ export default class SendTxHintBlock extends React.Component<Props> {
     }
     if (request.cert.type === CertificateType.STAKE_DELEGATION) {
       const { params } = request.cert;
-      if (request.cert.params.stakeCredential.type !== StakeCredentialParamsType.KEY_PATH) {
+      if (params.stakeCredential.type !== CredentialParamsType.KEY_PATH) {
         throw new Error('unsupported stake credential type');
       }
-      const { keyPath } = request.cert.params.stakeCredential;
+      // $FLowIgnore
+      const { keyPath } = params.stakeCredential;
       const imgDelegatePool = require(`../../../../assets/img/nano-${this.props.deviceCode}/hint-delegation-pool.png`);
       const imgDelegateConfirm = require(`../../../../assets/img/nano-${this.props.deviceCode}/hint-delegation-confirm.png`);
       const firstStep = request.getAndIncrementStep();
@@ -298,10 +300,11 @@ export default class SendTxHintBlock extends React.Component<Props> {
     }
     if (request.cert.type === CertificateType.STAKE_DEREGISTRATION) {
       const { params } = request.cert;
-      if (request.cert.params.stakeCredential.type !== StakeCredentialParamsType.KEY_PATH) {
+      if (params.stakeCredential.type !== CredentialParamsType.KEY_PATH) {
         throw new Error('unsupported stake credential type');
       }
-      const { keyPath } = request.cert.params.stakeCredential;
+      // $FLowIgnore
+      const { keyPath } = params.stakeCredential;
       const imgDeregister = require(`../../../../assets/img/nano-${this.props.deviceCode}/hint-deregister-key.png`);
       const imgDeregisterConfirm = require(`../../../../assets/img/nano-${this.props.deviceCode}/hint-deregister-confirm.png`);
       const firstStep = request.getAndIncrementStep();

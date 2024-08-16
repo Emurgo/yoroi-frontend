@@ -15,8 +15,7 @@ const messages = defineMessages({
   },
   faqContent: {
     id: 'settings.support.faq.content',
-    defaultMessage:
-      '!!!If you are experiencing issues, please see the {faqLink} for guidance on known issues.',
+    defaultMessage: '!!!If you are experiencing issues, please see the {faqLink} for guidance on known issues.',
   },
   faqLink: {
     id: 'settings.support.faq.faqLink',
@@ -28,8 +27,7 @@ const messages = defineMessages({
   },
   reportProblemContent: {
     id: 'settings.support.reportProblem.content',
-    defaultMessage:
-      '!!!If the FAQ does not solve the issue you are experiencing, please use our {supportRequestLink} feature.',
+    defaultMessage: '!!!If the FAQ does not solve the issue you are experiencing, please use our {supportRequestLink} feature.',
   },
   supportRequestLink: {
     id: 'settings.support.reportProblem.link',
@@ -91,9 +89,7 @@ class SupportSettings extends Component<Props & InjectedProps> {
       },
       {
         title: messages.reportProblemTitle,
-        text: (
-          <FormattedMessage {...messages.reportProblemContent} values={{ supportRequestLink }} />
-        ),
+        text: <FormattedMessage {...messages.reportProblemContent} values={{ supportRequestLink }} />,
       },
       {
         title: messages.logsTitle,
@@ -104,7 +100,7 @@ class SupportSettings extends Component<Props & InjectedProps> {
     return (
       <Box>
         {isRevampLayout && (
-          <Typography component="h5" variant="h5" mb="24px" color="common.black" fontWeight={500}>
+          <Typography component="h5" variant="h5" mb="24px" color="ds.text_gray_medium" fontWeight={500}>
             {intl.formatMessage(globalMessages.support)}
           </Typography>
         )}
@@ -119,22 +115,24 @@ class SupportSettings extends Component<Props & InjectedProps> {
           {sections.map(({ title, text }) => {
             return (
               <Box key={title.id}>
-                <Typography component="div"
+                <Typography
+                  component="div"
                   variant={isRevampLayout ? 'body1' : 'h5'}
-                  color={isRevampLayout ? 'grayscale.900' : 'var(--yoroi-support-settings-text)'}
+                  color="ds.text_gray_medium"
                   fontWeight={500}
                   mb="8px"
                 >
                   {intl.formatMessage(title)}
                 </Typography>
-                <Typography component="div"
+                <Typography
+                  component="div"
                   sx={{
                     '& a': {
-                      color: isRevampLayout ? 'primary.500' : 'var(--yoroi-support-settings-text)',
+                      color: 'ds.primary_500',
                       textDecoration: isRevampLayout ? 'none' : 'underline',
                     },
                   }}
-                  color={isRevampLayout ? 'common.black' : 'var(--yoroi-support-settings-text)'}
+                  color="ds.text_gray_medium"
                   variant={isRevampLayout ? 'body1' : 'body2'}
                 >
                   {text}

@@ -15,8 +15,7 @@ export const messages: * = defineMessages({
   },
   removeExplanation: {
     id: 'wallet.settings.remove.explanation',
-    defaultMessage:
-      '!!!Removing a wallet does not affect the wallet balance. Your wallet can be restored again at any time.',
+    defaultMessage: '!!!Removing a wallet does not affect the wallet balance. Your wallet can be restored again at any time.',
   },
 });
 
@@ -58,7 +57,7 @@ class RemoveWallet extends Component<Props & InjectedProps> {
 
         <Typography
           variant={isRevampLayout ? 'body1' : 'body2'}
-          color="common.black"
+          color="ds.text_gray_medium"
           mb={isRevampLayout ? '16px' : '12px'}
         >
           {intl.formatMessage(messages.removeExplanation)}

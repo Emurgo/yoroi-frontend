@@ -8,7 +8,9 @@ export type BackendNetworkInfo = {|
 
 // checkServer
 
-export type ServerStatusRequest = void;
+export type ServerStatusRequest = {|
+  backend: string,
+|};
 export type ServerStatusResponse = {|
   isServerOk: boolean,
   isMaintenance: boolean,

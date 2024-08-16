@@ -14,15 +14,13 @@ import ResyncWalletDialogContainer from './ResyncWalletDialogContainer';
 import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import { isValidWalletName } from '../../../utils/validations';
 import ChangeWalletPasswordDialogContainer from '../../wallet/dialogs/ChangeWalletPasswordDialogContainer';
-import { asGetSigningKey } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
-import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import { Typography } from '@mui/material';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 
 @observer
-export default class WalletSettingsPage extends Component<StoresAndActionsProps> {
+export default class WalletSettingsPage extends Component <StoresAndActionsProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -39,8 +37,8 @@ export default class WalletSettingsPage extends Component<StoresAndActionsProps>
       renameConceptualWallet,
     } = actions.walletSettings;
 
-    const walletsStore = this.props.stores.wallets;
-    if (walletsStore.selected == null) {
+    const { selected: selectedWallet, selectedWalletName } = this.props.stores.wallets;
+    if (selectedWallet == null) {
       return (
         <>
           {this.getDialog(undefined)}
@@ -48,16 +46,18 @@ export default class WalletSettingsPage extends Component<StoresAndActionsProps>
         </>
       );
     }
-    const selectedWallet = walletsStore.selected;
-    const withSigning = asGetSigningKey(selectedWallet);
-    const parent = selectedWallet.getParent();
-    const settingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(
-      parent
-    );
+    if (selectedWalletName == null) {
+      throw new Error('unexpected nullish wallet name');
+    }
+
+    let signingKeyUpdateDate = null;
+    if (selectedWallet.signingKeyUpdateDate) {
+      signingKeyUpdateDate = new Date(selectedWallet.signingKeyUpdateDate);
+    }
 
     return (
       <div id="walletSettingsPage">
-        {this.getDialog(selectedWallet)}
+        {this.getDialog(selectedWallet.publicDeriverId)}
         {profile.isRevampTheme && (
           <Typography component="div" variant="h5" fontWeight={500} mb="24px">
             {intl.formatMessage(globalMessages.walletLabel)}
@@ -65,14 +65,14 @@ export default class WalletSettingsPage extends Component<StoresAndActionsProps>
         )}
         <WalletNameSetting
           error={renameModelRequest.error}
-          walletName={settingsCache.conceptualWalletName}
+          walletName={selectedWallet.name}
           isSubmitting={renameModelRequest.isExecuting}
           isInvalid={renameModelRequest.wasExecuted && renameModelRequest.result === false}
           lastUpdatedField={lastUpdatedWalletField}
           onFieldValueChange={async (field, value) => {
             if (field === 'name') {
               await renameConceptualWallet.trigger({
-                publicDeriver: selectedWallet,
+                conceptualWalletId: selectedWallet.conceptualWalletId,
                 newName: value,
               });
             }
@@ -84,16 +84,14 @@ export default class WalletSettingsPage extends Component<StoresAndActionsProps>
           nameValidator={name => isValidWalletName(name)}
           classicTheme={profile.isClassicTheme}
         />
-        {withSigning != null && (
+        {selectedWallet.type === 'mnemonic' && (
           <SpendingPasswordSetting
             openDialog={() =>
               actions.dialogs.open.trigger({
                 dialog: ChangeWalletPasswordDialogContainer,
               })
             }
-            walletPasswordUpdateDate={
-              this.props.stores.wallets.getSigningKeyCache(withSigning).signingKeyUpdateDate
-            }
+            walletPasswordUpdateDate={signingKeyUpdateDate}
             classicTheme={profile.isClassicTheme}
           />
         )}
@@ -110,7 +108,7 @@ export default class WalletSettingsPage extends Component<StoresAndActionsProps>
           })}
         />
         <RemoveWallet
-          walletName={settingsCache.conceptualWalletName}
+          walletName={selectedWalletName}
           openDialog={() =>
             actions.dialogs.open.trigger({
               dialog: RemoveWalletDialogContainer,
@@ -121,43 +119,45 @@ export default class WalletSettingsPage extends Component<StoresAndActionsProps>
     );
   }
 
-  getDialog: (void | PublicDeriver<>) => Node = publicDeriver => {
+  getDialog: (void | number) => Node = publicDeriverId => {
     const { actions, stores } = this.props;
     const { isOpen } = this.props.stores.uiDialogs;
-    if (publicDeriver != null && isOpen(ChangeWalletPasswordDialogContainer)) {
+    if (publicDeriverId != null && isOpen(ChangeWalletPasswordDialogContainer)) {
       return (
         <ChangeWalletPasswordDialogContainer
           actions={actions}
           stores={stores}
-          publicDeriver={publicDeriver}
+          publicDeriverId={publicDeriverId}
         />
       );
     }
-    if (publicDeriver != null && isOpen(ExportWalletDialogContainer)) {
+    if (publicDeriverId != null && isOpen(ExportWalletDialogContainer)) {
       return (
         <ExportWalletDialogContainer
           actions={actions}
           stores={stores}
-          publicDeriver={publicDeriver}
         />
       );
     }
     // selected wallet becomes null as we delete it
     if (isOpen(RemoveWalletDialogContainer)) {
+      if (publicDeriverId == null) {
+        return null;
+      }
       return (
         <RemoveWalletDialogContainer
           actions={actions}
           stores={stores}
-          publicDeriver={publicDeriver}
+          publicDeriverId={publicDeriverId}
         />
       );
     }
-    if (publicDeriver != null && isOpen(ResyncWalletDialogContainer)) {
+    if (publicDeriverId != null && isOpen(ResyncWalletDialogContainer)) {
       return (
         <ResyncWalletDialogContainer
           actions={actions}
           stores={stores}
-          publicDeriver={publicDeriver}
+          publicDeriverId={publicDeriverId}
         />
       );
     }

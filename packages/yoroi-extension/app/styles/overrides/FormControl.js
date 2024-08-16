@@ -8,9 +8,9 @@ const FormControl = {
       marginTop: '7px',
       '&:hover': {
         '& .MuiInputLabel-root': {
-          color: theme.palette.ds.gray_c900,
-          '&.Mui-disabled': { color: theme.palette.ds.gray_c200 },
-          '&.Mui-error': { color: theme.palette.ds.sys_magenta_c500 },
+          color: theme.palette.ds.gray_900,
+          '&.Mui-disabled': { color: theme.palette.ds.gray_200 },
+          '&.Mui-error': { color: theme.palette.ds.sys_magenta_500 },
         },
       },
     }),

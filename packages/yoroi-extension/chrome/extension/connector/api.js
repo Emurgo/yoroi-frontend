@@ -3,7 +3,10 @@
 import type { AccountBalance, Address, Asset, CardanoTx, Paginate, TokenId, Value, } from './types';
 import { ConnectorError, TxSendErrorCodes } from './types';
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
-import type { Addressing, IPublicDeriver, } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type {
+  Addressing,
+  IPublicDeriver,
+} from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { PublicDeriver, } from '../../../app/api/ada/lib/storage/models/PublicDeriver/index';
 import {
   asGetAllAccounting,
@@ -22,7 +25,6 @@ import { CannotSendBelowMinimumValueError, NotEnoughMoneyToSendError, } from '..
 import { CoreAddressTypes, TxStatusCodes, } from '../../../app/api/ada/lib/storage/database/primitives/enums';
 import type { FullAddressPayload } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 import {
-  getAllUsedAddresses,
   getAllAddresses,
   getAllAddressesForDisplay,
 } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
@@ -30,7 +32,6 @@ import { getReceiveAddress } from '../../../app/stores/stateless/addressStores';
 
 import type { PersistedSubmittedTransaction } from '../../../app/api/localStorage';
 import LocalStorageApi, {
-  getOutputAddressesInSubmittedTxs,
   loadSubmittedTransactions,
   persistSubmittedTransactions,
 } from '../../../app/api/localStorage';
@@ -50,20 +51,19 @@ import {
 } from '../../../app/api/ada/transactions/shelley/transactions';
 import { getCardanoHaskellBaseConfig, } from '../../../app/api/ada/lib/storage/database/prepackaged/networks';
 import TimeUtils from '../../../app/api/ada/lib/storage/bridge/timeUtils';
-import type CardanoTxRequest from '../../../app/api/ada';
+import type {
+  CardanoTxRequest,
+  ForeignUtxoFetcher,
+} from '../../../app/api/ada';
 import AdaApi from '../../../app/api/ada';
 import { bytesToHex, hexToBytes } from '../../../app/coreUtils';
 import { MultiToken } from '../../../app/api/common/lib/MultiToken';
 import type { CardanoShelleyTransactionCtorData } from '../../../app/domain/CardanoShelleyTransaction';
-import type {
-  HaskellShelleyTxSignRequest
-} from '../../../app/api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type { CardanoAddressedUtxo, } from '../../../app/api/ada/transactions/types';
 import { cip8Sign } from '../../../app/connector/api';
-import type { ForeignUtxoFetcher } from '../../../app/connector/stores/ConnectorStore';
 import { GetToken } from '../../../app/api/ada/lib/storage/database/primitives/api/read';
 import { getAllSchemaTables, raii, } from '../../../app/api/ada/lib/storage/database/utils';
-import type { TokenRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
+  import type { TokenRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
 import {
   Amount as LibAmount,
   NativeAssets as LibNativeAssets,
@@ -381,19 +381,73 @@ async function getCardanoRewardAddresses(
   });
 }
 
+async function getOutputAddressesInSubmittedTxs(publicDeriverId: number) {
+  const submittedTxs = await loadSubmittedTransactions() || [];
+  const walletSubmittedTxs = submittedTxs.filter(
+    submittedTxRecord => submittedTxRecord.publicDeriverId === publicDeriverId
+  );
+  return _getOutputAddressesInSubmittedTxs(walletSubmittedTxs);
+}
+
+export function _getOutputAddressesInSubmittedTxs(
+  walletSubmittedTxs: Array<PersistedSubmittedTransaction>
+): Array<string> {
+  return walletSubmittedTxs
+    .flatMap(({ transaction }) => {
+      return transaction.addresses.to.map(({ address }) => address);
+    });
+}
+
 export async function connectorGetUsedAddressesWithPaginate(
   wallet: PublicDeriver<>,
   paginate: ?Paginate
-): Promise<string[]> {
-  return paginateResults(await getAllUsedAddresses(wallet), paginate);
-}
-
-export async function connectorGetUnusedAddresses(wallet: PublicDeriver<>): Promise<Address[]> {
-  const result = await getAllAddresses(wallet, false);
+): Promise<Address[]> {
+  const usedAddresses = await getAllAddresses(wallet, true);
+  const unusedAddresses = await getAllAddresses(wallet, false);
   const outputAddressesInSubmittedTxs = new Set(
     await getOutputAddressesInSubmittedTxs(wallet.publicDeriverId)
   );
-  return result.filter(address => !outputAddressesInSubmittedTxs.has(address));
+  return _connectorGetUsedAddressesWithPaginate(
+    usedAddresses,
+    unusedAddresses,
+    outputAddressesInSubmittedTxs,
+    paginate,
+  );
+}
+export async function _connectorGetUsedAddressesWithPaginate(
+  usedAddresses: Array<string>,
+  unusedAddresses: Array<string>,
+  outputAddressesInSubmittedTxs: Set<string>,
+  paginate: ?Paginate
+): Promise<Address[]> {
+  const usedInSubmittedTxs = unusedAddresses.filter(
+    address => outputAddressesInSubmittedTxs.has(address)
+  );
+
+  return paginateResults(
+    [...usedAddresses, ...usedInSubmittedTxs],
+    paginate
+  );
+}
+
+export async function connectorGetUnusedAddresses(wallet: PublicDeriver<>): Promise<Address[]> {
+  const submittedTxs = await loadSubmittedTransactions() || [];
+
+  return _connectorGetUnusedAddresses(
+    await getAllAddresses(wallet, false),
+    submittedTxs.filter(
+      submittedTxRecord => submittedTxRecord.publicDeriverId === wallet.publicDeriverId
+    )
+  );
+}
+export async function _connectorGetUnusedAddresses(
+  unusedAddresses: Array<Address>,
+  walletSubmittedTxs: Array<PersistedSubmittedTransaction>,
+): Promise<Address[]> {
+  const outputAddressesInSubmittedTxs = new Set(
+    _getOutputAddressesInSubmittedTxs(walletSubmittedTxs)
+  );
+  return unusedAddresses.filter(address => !outputAddressesInSubmittedTxs.has(address));
 }
 
 export async function connectorGetDRepKey(
@@ -942,7 +996,7 @@ export async function connectorSendTxCardano(
 export async function connectorRecordSubmittedCardanoTransaction(
   publicDeriver: PublicDeriver<>,
   tx: RustModule.WalletV4.Transaction,
-  addressedUtxos?: Array<CardanoAddressedUtxo>,
+  addressedUtxos?: ?Array<CardanoAddressedUtxo>,
 ) {
   const withUtxos = asGetAllUtxos(publicDeriver);
   if (!withUtxos) {
@@ -1091,27 +1145,6 @@ export async function connectorRecordSubmittedCardanoTransaction(
   await persistSubmittedTransactions(submittedTxs);
 }
 
-// <TODO:PENDING_REMOVAL> use the ada api function directly
-export async function connectorGenerateReorgTx(
-  publicDeriver: PublicDeriver<>,
-  usedUtxoIds: Array<string>,
-  reorgTargetAmount: string,
-  utxos: Array<CardanoAddressedUtxo>,
-  submittedTxs: Array<PersistedSubmittedTransaction>,
-): Promise<{|
-  unsignedTx: HaskellShelleyTxSignRequest,
-  collateralOutputAddressSet: Set<string>,
-|}> {
-  const adaApi = new AdaApi();
-  return adaApi.createReorgTx(
-    publicDeriver,
-    usedUtxoIds,
-    reorgTargetAmount,
-    utxos,
-    submittedTxs,
-  );
-}
-
 export async function getAddressing(
   publicDeriver: PublicDeriver<>,
   address: string,
@@ -1234,3 +1267,4 @@ export function getTokenMetadataFromIds(
     }
   );
 }
+

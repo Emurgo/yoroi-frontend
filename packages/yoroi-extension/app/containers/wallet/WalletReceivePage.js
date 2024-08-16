@@ -20,11 +20,8 @@ import type {
 import { allAddressSubgroups, applyAddressFilter, routeForStore, } from '../../stores/stateless/addressStores';
 import { observer } from 'mobx-react';
 import { observable, runInAction } from 'mobx';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { validateAmount } from '../../utils/validations';
 import { Logger } from '../../utils/logging';
-import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { handleExternalLinkClick } from '../../utils/routing';
 import { genLookupOrFail, getTokenName } from '../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../utils/formatters';
@@ -86,7 +83,7 @@ class WalletReceivePage extends Component<AllProps> {
   closeNotification: void => void = () => {
     const publicDeriver = this.props.stores.wallets.selected;
     if (publicDeriver) {
-      const notificationId = `${publicDeriver.getPublicDeriverId()}-copyNotification`;
+      const notificationId = `${publicDeriver.publicDeriverId}-copyNotification`;
       this.props.actions.notifications.closeActiveNotification.trigger({ id: notificationId });
     }
   };
@@ -121,8 +118,7 @@ class WalletReceivePage extends Component<AllProps> {
       message: globalMessages.copyTooltipMessage,
     };
 
-    const walletType = publicDeriver.getParent().getWalletType();
-    const isHwWallet = walletType === WalletTypeOption.HARDWARE_WALLET;
+    const isHwWallet = publicDeriver.type !== 'mnemonic';
 
     const onCopyAddressTooltip = (address, elementId) => {
       if (!uiNotifications.isOpen(elementId)) {
@@ -141,13 +137,16 @@ class WalletReceivePage extends Component<AllProps> {
 
     const selectedExplorerForNetwork =
       this.props.stores.explorers.selectedExplorer.get(
-        publicDeriver.getParent().getNetworkInfo().NetworkId
+        publicDeriver.networkId
       ) ??
       (() => {
         throw new Error('No explorer for wallet network');
       })();
 
-    const defaultToken = publicDeriver.getParent().getDefaultToken();
+    const defaultToken = {
+      defaultNetworkId: publicDeriver.networkId,
+      defaultIdentifier: publicDeriver.defaultTokenId,
+    };
     const defaultTokenInfo = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)({
       identifier: defaultToken.defaultIdentifier,
       networkId: defaultToken.defaultNetworkId,
@@ -180,7 +179,7 @@ class WalletReceivePage extends Component<AllProps> {
       if (addressTypeStore.meta.name.subgroup === AddressSubgroup.mangled) {
 
         const canUnmangle = maybe(stores.wallets.selected,
-          w => stores.delegation.canUnmangleSomeUtxo(w)) ?? false;
+          w => stores.delegation.canUnmangleSomeUtxo(w.publicDeriverId)) ?? false;
 
         return (
           <MangledHeader
@@ -254,7 +253,6 @@ class WalletReceivePage extends Component<AllProps> {
             this.openVerifyAddressDialog();
           }}
           onGeneratePaymentURI={
-            !isCardanoHaskell(publicDeriver.getParent().getNetworkInfo()) ||
             addressTypeStore.meta.name.group === AddressGroupTypes.reward ||
             (addressTypeStore.meta.name.subgroup !== AddressSubgroup.external &&
               addressTypeStore.meta.name.subgroup !== AddressSubgroup.all)
@@ -366,13 +364,13 @@ class WalletReceivePage extends Component<AllProps> {
   }
 
   getTypeStore: (
-    PublicDeriver<>
+    any // unused for now
   ) => void | {|
     +request: IAddressTypeUiSubset,
     +meta: AddressSubgroupMeta<IAddressTypeStore>,
-  |} = publicDeriver => {
+  |} = _publicDeriver => {
     for (const addressStore of allAddressSubgroups) {
-      if (!addressStore.isRelated({ selected: publicDeriver })) {
+      if (!addressStore.isRelated()) {
         continue;
       }
       if (this.props.stores.app.currentRoute.startsWith(routeForStore(addressStore.name))) {
