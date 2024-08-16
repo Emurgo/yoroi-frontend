@@ -14,7 +14,6 @@ import UnsupportedWallet from '../wallet/UnsupportedWallet';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import NavBarContainer from '../NavBarContainer';
 import globalMessages from '../../i18n/global-messages';
-import { CoinTypes } from '../../config/numbersConfig';
 import HorizontalLine from '../../components/widgets/HorizontalLine';
 import type { LayoutComponentMap } from '../../styles/context/layout';
 import { withLayout } from '../../styles/context/layout';
@@ -74,7 +73,7 @@ class Transfer extends Component<AllProps> {
       return <NoWalletMessage />;
     }
     // temporary solution: will need to handle more cases later for different currencies
-    if (wallet.getParent().getNetworkInfo().CoinType !== CoinTypes.CARDANO) {
+    if (wallet.isCardanoHaskell) {
       return <UnsupportedWallet />;
     }
     return (

@@ -16,10 +16,8 @@ import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/util
 import { truncateAddress } from '../../../utils/formatters';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { getDefaultEntryToken } from '../../../stores/toplevel/TokenInfoStore';
-import { genFormatTokenAmount, genLookupOrFail, getTokenName, } from '../../../stores/stateless/tokenHelpers';
+import { genFormatTokenAmount, genLookupOrFail, getTokenName } from '../../../stores/stateless/tokenHelpers';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
-import { isLedgerNanoWallet, isTrezorTWallet, } from '../../../api/ada/lib/storage/models/ConceptualWallet';
-import { asGetSigningKey } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
 import SpendingPasswordInput from '../../../components/widgets/forms/SpendingPasswordInput';
 import VerticallyCenteredLayout from '../../../components/layout/VerticallyCenteredLayout';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
@@ -29,6 +27,7 @@ import ExplorableHashContainer from '../../widgets/ExplorableHashContainer';
 import RawHash from '../../../components/widgets/hashWrappers/RawHash';
 import Warning from '../../../components/common/Warning';
 import Dialog from '../../../components/widgets/Dialog';
+import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -82,25 +81,20 @@ export default class WithdrawRewardsDialog extends Component<Props> {
   submit: void => Promise<void> = async () => {
     const selected = this.props.stores.wallets.selected;
     if (selected == null) throw new Error(`${nameof(WithdrawRewardsDialog)} no wallet selected`);
-    const signRequest = this.props.stores.substores.ada.delegationTransaction.createWithdrawalTx
-      .result;
+    const signRequest = this.props.stores.substores.ada.delegationTransaction.createWithdrawalTx.result;
     if (signRequest == null) return;
 
     if (this.spendingPasswordForm == null) {
-      if (isTrezorTWallet(selected.getParent())) {
+      if (selected.type === 'trezor') {
         await this.props.actions.ada.trezorSend.sendUsingTrezor.trigger({
-          params: {
-            signRequest,
-          },
-          publicDeriver: selected,
+          params: { signRequest },
+          wallet: selected,
         });
       }
-      if (isLedgerNanoWallet(selected.getParent())) {
+      if (selected.type === 'ledger') {
         await this.props.actions.ada.ledgerSend.sendUsingLedgerWallet.trigger({
-          params: {
-            signRequest,
-          },
-          publicDeriver: selected,
+          params: { signRequest },
+          wallet: selected,
         });
       }
     } else {
@@ -110,7 +104,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
           await this.props.actions.wallets.sendMoney.trigger({
             signRequest,
             password: walletPassword,
-            publicDeriver: selected,
+            wallet: selected,
           });
         },
         onError: () => {},
@@ -142,11 +136,11 @@ export default class WithdrawRewardsDialog extends Component<Props> {
       throw new Error(`${nameof(WithdrawRewardsDialog)} no public deriver. Should never happen`);
     }
 
-    const currentPool = this.props.stores.delegation.getDelegatedPoolId(publicDeriver);
+    const currentPool = this.props.stores.delegation.getDelegatedPoolId(publicDeriver.publicDeriverId);
     if (currentPool == null) return null;
 
-    const network = publicDeriver.getParent().getNetworkInfo();
-    const meta = this.props.stores.delegation.getLocalPoolInfo(network, String(currentPool));
+    const network = getNetworkById(publicDeriver.networkId);
+    const meta = this.props.stores.delegation.getLocalPoolInfo(publicDeriver.networkId, String(currentPool));
     if (meta == null) {
       // server hasn't returned information about the stake pool yet
       return null;
@@ -155,10 +149,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
     const avatarSource = toSvg(currentPool, 36, { padding: 0 });
     const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
 
-    const {
-      createWithdrawalTx,
-      shouldDeregister,
-    } = this.props.stores.substores.ada.delegationTransaction;
+    const { createWithdrawalTx, shouldDeregister } = this.props.stores.substores.ada.delegationTransaction;
 
     if (this.props.stores.profile.selectedNetwork == null) {
       throw new Error(`${nameof(WithdrawRewardsDialog)} no selected network`);
@@ -167,26 +158,15 @@ export default class WithdrawRewardsDialog extends Component<Props> {
       this.props.stores.profile.selectedNetwork.NetworkId
     );
     const ticker = getTokenName(defaultToken);
-    const formatValue = genFormatTokenAmount(
-      genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)
-    );
+    const formatValue = genFormatTokenAmount(genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo));
 
     if (createWithdrawalTx.error != null)
-      return (
-        <YoroiTransferErrorPage
-          error={createWithdrawalTx.error}
-          onCancel={this.props.onClose}
-          classicTheme={false}
-        />
-      );
+      return <YoroiTransferErrorPage error={createWithdrawalTx.error} onCancel={this.props.onClose} classicTheme={false} />;
 
     const tentativeTx = createWithdrawalTx.result;
     if (!tentativeTx)
       return (
-        <Dialog
-          title={intl.formatMessage(globalMessages.processingLabel)}
-          closeOnOverlayClick={false}
-        >
+        <Dialog title={intl.formatMessage(globalMessages.processingLabel)} closeOnOverlayClick={false}>
           <Box width="350px">
             <LegacyTransferLayout>
               <VerticallyCenteredLayout>
@@ -208,11 +188,10 @@ export default class WithdrawRewardsDialog extends Component<Props> {
     const txFee = tentativeTx.fee();
     const finalRewards = this.getTotalBalance(recoveredBalance, txFee, deregistrations);
 
-    const withSigning = asGetSigningKey(publicDeriver);
     const isSubmitting = this.props.stores.wallets.sendMoneyRequest.isExecuting;
     const error = this.props.stores.wallets.sendMoneyRequest.error;
     const spendingPasswordForm =
-      withSigning == null ? undefined : (
+      publicDeriver.type !== 'mnemonic' ? undefined : (
         <SpendingPasswordInput
           setForm={form => this.setSpendingPasswordForm(form)}
           classicTheme={false}
@@ -221,7 +200,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
       );
 
     const selectedExplorer = this.props.stores.explorers.selectedExplorer.get(
-      publicDeriver.getParent().getNetworkInfo().NetworkId
+      publicDeriver.networkId
     );
     if (!selectedExplorer) throw new Error('No explorer for wallet network');
 
@@ -234,9 +213,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
             onClick: this.props.onClose,
           },
           {
-            label: intl.formatMessage(
-              shouldDeregister ? messages.undelegateAnyway : globalMessages.confirm
-            ),
+            label: intl.formatMessage(shouldDeregister ? messages.undelegateAnyway : globalMessages.confirm),
             onClick: this.submit,
             primary: true,
             isSubmitting,
@@ -252,7 +229,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
           {shouldDeregister && (
             <Box mb="24px">
               <Warning>
-                <Typography component="div" variant="body1">
+                <Typography component="div" variant="body1" color="ds.text_gray_medium">
                   {intl.formatMessage(messages.deregistrationWarning)}
                 </Typography>
               </Warning>

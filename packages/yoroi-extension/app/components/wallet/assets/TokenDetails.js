@@ -10,9 +10,7 @@ import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { assetsMessage } from './AssetsList';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../routes-config';
-import {
-  isTestnet,
-} from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import { isTestnet } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { CopyAddress } from './TruncatedText';
 
@@ -70,9 +68,7 @@ export const tokenMessages: Object = defineMessages({
 });
 
 export const getNetworkUrl: ($ReadOnly<NetworkRow>) => string | void = network => {
-  return isTestnet(network)
-    ? 'https://testnet.cardanoscan.io/token'
-    : 'https://cardanoscan.io/token';
+  return isTestnet(network) ? 'https://testnet.cardanoscan.io/token' : 'https://cardanoscan.io/token';
 };
 
 function TokenDetails({ tokenInfo, network, intl }: Props & Intl): Node {
@@ -123,7 +119,7 @@ function TokenDetails({ tokenInfo, network, intl }: Props & Intl): Node {
         }}
       >
         <Box display="flex" alignItems="center" py="20px">
-          <Typography component="div" variant="h2" fontWeight={500} color="common.black">
+          <Typography component="div" variant="h2" fontWeight={500} color="ds.text_gray_medium">
             {tokenInfo.name}
           </Typography>
         </Box>
@@ -138,10 +134,7 @@ function TokenDetails({ tokenInfo, network, intl }: Props & Intl): Node {
 
         {tokenInfo.description && (
           <Box>
-            <LabelWithValue
-              label={intl.formatMessage(tokenMessages.details)}
-              value={tokenInfo.description}
-            />
+            <LabelWithValue label={intl.formatMessage(tokenMessages.details)} value={tokenInfo.description} />
           </Box>
         )}
 
@@ -197,11 +190,7 @@ function TokenDetails({ tokenInfo, network, intl }: Props & Intl): Node {
           <Typography component="div" variant="body1" color="grayscale.900" mt="6px">
             <LinkMui
               target="_blank"
-              href={
-                networkUrl != null
-                  ? `${networkUrl}/${tokenInfo.policyId}${tokenInfo.assetName}`
-                  : ''
-              }
+              href={networkUrl != null ? `${networkUrl}/${tokenInfo.policyId}${tokenInfo.assetName}` : ''}
               disabled={networkUrl === null}
               rel="noopener noreferrer"
               sx={{ textDecoration: 'none' }}
@@ -220,8 +209,12 @@ export default (injectIntl(TokenDetails): ComponentType<Props>);
 function LabelWithValue({ label, value }: {| label: string | Node, value: string | Node |}): Node {
   return (
     <Box>
-      <Typography component="div" color="grayscale.600">{label}</Typography>
-      <Typography component="div" color="grayscale.900">{value}</Typography>
+      <Typography component="div" color="grayscale.600">
+        {label}
+      </Typography>
+      <Typography component="div" color="grayscale.900">
+        {value}
+      </Typography>
     </Box>
   );
 }

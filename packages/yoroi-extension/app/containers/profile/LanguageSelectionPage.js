@@ -14,7 +14,6 @@ import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner
 import IntroBanner from '../../components/profile/language-selection/IntroBanner';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { isTestnet } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 const messages = defineMessages({
   title: {
@@ -58,9 +57,7 @@ export default class LanguageSelectionPage extends Component<StoresAndActionsPro
       <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
     );
     const { selected } = this.props.stores.wallets;
-    const isWalletTestnet = selected == null
-      ? false
-      : isTestnet(selected.getParent().getNetworkInfo());
+    const isWalletTestnet = Boolean(selected && selected.isTestnet);
     const topBar = props.stores.profile.isClassicTheme ? (
       <TopBar
         title={topBarTitle}

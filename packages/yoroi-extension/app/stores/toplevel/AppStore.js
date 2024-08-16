@@ -3,7 +3,6 @@ import { computed } from 'mobx';
 import Store from '../base/Store';
 import { buildRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 
@@ -32,20 +31,20 @@ export default class AppStore extends Store<StoresMap, ActionsMap> {
   _updateRouteLocation: {|
     route: string,
     params: ?Object,
-    publicDeriver?: null | PublicDeriver<>,
+    publicDeriverId?: null | number,
   |} => void = (
     options
   ) => {
     const routePath = buildRoute(options.route, options.params);
     const currentRoute = this.stores.router.location.pathname;
     if (
-      options.publicDeriver !== undefined &&
-      options.publicDeriver !== this.stores.wallets.selected
+      options.publicDeriverId !== undefined &&
+      options.publicDeriverId !== this.stores.wallets.selected?.publicDeriverId
     ) {
-      if (options.publicDeriver == null) {
+      if (options.publicDeriverId == null) {
         this.actions.wallets.unselectWallet.trigger();
       } else {
-        this.actions.wallets.setActiveWallet.trigger({ wallet: options.publicDeriver });
+        this.actions.wallets.setActiveWallet.trigger({ publicDeriverId: options.publicDeriverId });
       }
       // we can't clear the browser history programmatically (requires root privilege)
       // so instead, we route the user to a page that blocks the back button

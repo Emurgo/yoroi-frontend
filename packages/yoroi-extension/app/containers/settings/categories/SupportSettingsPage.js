@@ -6,7 +6,6 @@ import { handleExternalLinkClick } from '../../../utils/routing';
 import SupportSettings from '../../../components/settings/categories/SupportSettings';
 import { downloadLogs } from '../../../utils/logging';
 import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
-import { asGetPublicKey } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
 import IncludePublicKeyDialog from './IncludePublicKeyDialog';
 import { ComplexityLevels } from '../../../types/complexityLevelType';
 
@@ -17,12 +16,7 @@ export default class SupportSettingsPage extends Component<StoresAndActionsProps
     if (selected == null) {
       return undefined;
     }
-    const withPublicKey = asGetPublicKey(selected);
-    if (withPublicKey == null) {
-      return undefined;
-    }
-    const { publicKey } = this.props.stores.wallets.getPublicKeyCache(withPublicKey);
-    return publicKey;
+    return selected.publicKey;
   };
 
   handleDownloadLogs: () => void = () => {

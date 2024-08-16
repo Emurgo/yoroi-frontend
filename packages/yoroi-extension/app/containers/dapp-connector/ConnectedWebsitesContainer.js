@@ -12,13 +12,8 @@ import type { LayoutComponentMap } from '../../styles/context/layout';
 import SidebarContainer from '../SidebarContainer';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import FullscreenLayout from '../../components/layout/FullscreenLayout';
-import type { ConceptualWalletSettingsCache } from '../../stores/toplevel/WalletSettingsStore';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
-import { asGetPublicKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import environment from '../../environment';
 import { ROUTES } from '../../routes-config';
-import type { WalletChecksum } from '@emurgo/cip4-js';
-import type { MultiToken } from '../../api/common/lib/MultiToken';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import { connectorMessages } from '../../i18n/global-messages';
@@ -59,33 +54,10 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
     });
   };
 
-  getConceptualWallet(publicDeriver: PublicDeriver<>): ConceptualWalletSettingsCache {
-    const settingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(
-      publicDeriver.getParent()
-    );
-
-    return settingsCache;
-  }
-
-  getWalletInfo(
-    publicDeriver: PublicDeriver<>
-  ): {| balance: null | MultiToken, plate: null | WalletChecksum |} {
-    const balance = this.props.stores.transactions.getBalance(publicDeriver);
-
-    const withPubKey = asGetPublicKey(publicDeriver);
-    const plate =
-      withPubKey == null ? null : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
-
-    return {
-      balance,
-      plate,
-    };
-  }
-
   render(): Node {
     const { actions, stores } = this.props;
     const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
-    const wallets = this.props.stores.wallets.publicDerivers;
+    const wallets = this.props.stores.wallets.wallets;
     const { intl } = this.context;
 
     return (
@@ -109,8 +81,6 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
               activeSites={this.props.stores.connector.activeSites.sites}
               getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
               shouldHideBalance={this.props.stores.profile.shouldHideBalance}
-              getConceptualWallet={this.getConceptualWallet.bind(this)}
-              getWalletInfo={this.getWalletInfo.bind(this)}
             />
           </Suspense>
         </FullscreenLayout>

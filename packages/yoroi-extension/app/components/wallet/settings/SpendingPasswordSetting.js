@@ -74,7 +74,7 @@ class SpendingPasswordSetting extends Component<Props & InjectedLayoutProps> {
           {intl.formatMessage(messages.title)}
         </Typography>
 
-        <Typography component="div" variant="body1" color="common.black" mb="16px">
+        <Typography component="div" variant="body1" color="ds.text_gray_medium" mb="16px">
           {intl.formatMessage(messages.passwordDescription)}
         </Typography>
 
