@@ -37,7 +37,7 @@ class NavBarRevamp extends Component<Props> {
     return (
       <Box
         sx={{
-          backgroundColor: 'ds.bg_color_low',
+          backgroundColor: 'ds.bg_color_min',
           borderBottom: pageBanner ? 'none' : '1px solid',
           borderBottomColor: 'grayscale.200',
         }}
@@ -46,7 +46,7 @@ class NavBarRevamp extends Component<Props> {
           <Box
             as="header"
             sx={{
-              color: 'ds.el_gray_normal',
+              color: 'ds.el_gray_medium',
               display: 'flex',
               alignItems: 'center',
               height: 'inherit',
@@ -63,23 +63,17 @@ class NavBarRevamp extends Component<Props> {
               }}
             >
               <Box flex="0 0 auto">
-                <Typography color="ds.el_gray_normal">{title}</Typography>
+                <Typography color="ds.el_gray_medium">{title}</Typography>
               </Box>
-              <Box
-                sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}
-              >
+              <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
                 {children}
                 {buyButton && <Box sx={{ marginLeft: '25px' }}>{buyButton}</Box>}
                 {walletDetails != null && (
-                  <Box sx={{ flex: '0 0 auto', marginLeft: '24px', minWidth: '280px' }}>
-                    {walletDetails}
-                  </Box>
+                  <Box sx={{ flex: '0 0 auto', marginLeft: '24px', minWidth: '280px' }}>{walletDetails}</Box>
                 )}
               </Box>
             </Box>
-            {menu != null ? (
-              <Box sx={{ position: 'absolute', bottom: 0, left: 0 }}>{menu}</Box>
-            ) : null}
+            {menu != null ? <Box sx={{ position: 'absolute', bottom: 0, left: 0 }}>{menu}</Box> : null}
           </Box>
         </Box>
       </Box>

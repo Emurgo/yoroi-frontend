@@ -69,7 +69,7 @@ export default class ExplorableHash extends Component<Props> {
                 color: 'primary.600',
                 outlineWidth: '2px',
                 outlineStyle: 'solid',
-                outlineColor: theme => theme.palette.ds.sys_yellow_c500,
+                outlineColor: theme => theme.palette.ds.sys_yellow_500,
               },
               '&:disabled': {
                 color: 'primary.300',

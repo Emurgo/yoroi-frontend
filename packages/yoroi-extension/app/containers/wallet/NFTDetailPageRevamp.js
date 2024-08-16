@@ -6,11 +6,7 @@ import { Component } from 'react';
 import type { Location, Match } from 'react-router-dom';
 import { withRouter } from 'react-router-dom';
 import NFTDetails from '../../components/wallet/assets/NFTDetails';
-import {
-  genLookupOrFail,
-  getTokenIdentifierIfExists,
-  getTokenStrictName,
-} from '../../stores/stateless/tokenHelpers';
+import { genLookupOrFail, getTokenIdentifierIfExists, getTokenStrictName } from '../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../utils/formatters';
 import {
   getAuthorFromTokenMetadata,
@@ -35,8 +31,7 @@ class NFTDetailPageRevamp extends Component<AllProps> {
   render(): Node {
     const publicDeriver = this.props.stores.wallets.selected;
     // Guard against potential null values
-    if (!publicDeriver)
-      throw new Error(`Active wallet requiTokenDetails for ${nameof(NFTDetailPageRevamp)}.`);
+    if (!publicDeriver) throw new Error(`Active wallet requiTokenDetails for ${nameof(NFTDetailPageRevamp)}.`);
     const spendableBalance = this.props.stores.transactions.balance;
     const getTokenInfo = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo);
     const network = getNetworkById(publicDeriver.networkId);
@@ -67,11 +62,7 @@ class NFTDetailPageRevamp extends Component<AllProps> {
                 assetName: assetNameHex,
                 id: getTokenIdentifierIfExists(token.info) ?? '-',
                 image: getImageFromTokenMetadata(policyId, assetNameHex, token.info.Metadata),
-                description: getDescriptionFromTokenMetadata(
-                  policyId,
-                  fullName,
-                  token.info.Metadata
-                ),
+                description: getDescriptionFromTokenMetadata(policyId, fullName, token.info.Metadata),
                 author: getAuthorFromTokenMetadata(policyId, fullName, token.info.Metadata),
                 // $FlowFixMe[prop-missing]
                 metadata: token.info.Metadata?.assetMintMetadata?.[0] || null,
@@ -83,24 +74,16 @@ class NFTDetailPageRevamp extends Component<AllProps> {
     const nftsCount = nftsList.length;
     const nftInfo = nftsList[currentNftIdx];
 
-    const nextNftId =
-      currentNftIdx === nftsCount - 1 ? nftsList[0]?.id : nftsList[currentNftIdx + 1]?.id;
+    const nextNftId = currentNftIdx === nftsCount - 1 ? nftsList[0]?.id : nftsList[currentNftIdx + 1]?.id;
 
-    const prevNftId =
-      currentNftIdx === 0 ? nftsList[nftsCount - 1]?.id : nftsList[currentNftIdx - 1]?.id;
+    const prevNftId = currentNftIdx === 0 ? nftsList[nftsCount - 1]?.id : nftsList[currentNftIdx - 1]?.id;
 
     const urlPrams = new URLSearchParams(this.props.location.search);
     const tab = urlPrams.get('tab');
 
     return (
-      <Box sx={{ width: '100%', backgroundColor: 'ds.bg_color_low' }}>
-        <NFTDetails
-          nftInfo={nftInfo}
-          network={network}
-          nextNftId={nextNftId}
-          prevNftId={prevNftId}
-          tab={tab}
-        />
+      <Box sx={{ width: '100%', backgroundColor: 'ds.bg_color_min' }}>
+        <NFTDetails nftInfo={nftInfo} network={network} nextNftId={nextNftId} prevNftId={prevNftId} tab={tab} />
       </Box>
     );
   }

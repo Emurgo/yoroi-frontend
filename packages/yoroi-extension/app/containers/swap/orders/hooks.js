@@ -1,12 +1,12 @@
-//@flow
+// @flow
+import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
+import type { FormattedTokenValue, OrderAsset } from './util';
 import { useSwap, } from '@yoroi/swap';
 import { useQuery } from 'react-query';
 import { useMemo } from 'react';
-import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import { Quantities } from '../../../utils/quantities';
 import { PRICE_PRECISION } from '../../../components/swap/common';
-import { maybe } from '../../../coreUtils';
-import type { FormattedTokenValue, OrderAsset } from './util';
+import { maybe} from '../../../coreUtils';
 import { createFormattedTokenValues } from './util';
 import { useAsyncMemo } from '../../../reactUtils';
 
@@ -68,6 +68,8 @@ export function useRichOrders(
   openOrders: Array<MappedOrder>,
   completedOrders: Array<MappedOrder>,
   transactionTimestamps: { [string]: Date },
+  openOrdersLoading: boolean,
+  completedOrdersLoading: boolean
 |} {
   const { order, tokens, stakingKey } = useSwap()
 
@@ -88,7 +90,7 @@ export function useRichOrders(
   /**
    * Fetch open orders
    */
-  const { data: openOrdersData } = useQuery({
+  const { data: openOrdersData, isLoading: openOrdersLoading } = useQuery({
     queryKey: ['useSwapOrdersByStatusOpen', stakingKey],
     queryFn: () => order.list.byStatusOpen().catch(e => {
       console.error('Failed to load open orders!', e);
@@ -99,7 +101,7 @@ export function useRichOrders(
   /**
    * Fetch completed orders
    */
-  const { data: completedOrdersData } = useQuery({
+  const { data: completedOrdersData, isLoading: completedOrdersLoading } = useQuery({
     queryKey: ['useSwapOrdersByStatusCompleted', stakingKey],
     queryFn: () => order.list.byStatusCompleted().catch(e => {
       console.error('Failed to load completed orders!', e);
@@ -161,5 +163,5 @@ export function useRichOrders(
     return useAsyncMemo.void;
   }, [openOrders, completedOrders], {});
 
-  return { openOrders, completedOrders, transactionTimestamps };
+  return { openOrders, completedOrders, transactionTimestamps, openOrdersLoading, completedOrdersLoading };
 }

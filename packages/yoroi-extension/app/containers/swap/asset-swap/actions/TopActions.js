@@ -57,10 +57,10 @@ export const TopActions = ({ orderType }: TopActionsProps): React$Node => {
 
 const ButtonWrapper = styled(Box)(({ theme, isDisabled }) => ({
   cursor: 'pointer',
-  '& path': { fill: isDisabled ? '#A0A4A8' : 'ds.el_gray_normal' },
+  '& path': { fill: isDisabled ? '#A0A4A8' : 'ds.el_gray_medium' },
   '& svg': {
     '& path': {
-      fill: theme.palette.ds.el_gray_normal,
+      fill: theme.palette.ds.el_gray_medium,
     },
   },
 }));

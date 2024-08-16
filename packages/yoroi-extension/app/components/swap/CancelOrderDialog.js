@@ -80,7 +80,7 @@ export default function CancelSwapOrderDialog({
     >
       <Box display="flex" flexDirection="column" gap="12px">
         <Box>
-          <Typography component="div" variant="body1" color="ds.text_gray_normal">
+          <Typography component="div" variant="body1" color="ds.text_gray_medium">
             Are you sure you want to cancel this order?
           </Typography>
         </Box>
@@ -163,7 +163,7 @@ const SummaryRow = ({ col1, children, info = '' }) => (
       ) : null}
     </Box>
     <Box>
-      <Typography component="div" variant="body1" color="ds.text_gray_normal">
+      <Typography component="div" variant="body1" color="ds.text_gray_medium">
         {children}
       </Typography>
     </Box>

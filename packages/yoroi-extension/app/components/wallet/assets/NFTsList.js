@@ -91,12 +91,12 @@ function NfTsList({ list, intl }: Props & Intl): Node {
       sx={{
         height: 'content',
         width: '100%',
-        bgcolor: 'ds.bg_color_low',
+        bgcolor: 'ds.bg_color_min',
         p: '24px',
       }}
     >
       <Box display="flex" alignItems="center" justifyContent="space-between" marginBottom="30px" paddingBottom="16px">
-        <Typography component="div" variant="h5" color="ds.el_gray_normal" fontWeight={500} fontSize="18px">
+        <Typography component="div" variant="h5" color="ds.el_gray_medium" fontWeight={500} fontSize="18px">
           {list.length === 0
             ? intl.formatMessage(globalMessages.sidebarNfts)
             : intl.formatMessage(messages.nftsCount, { number: list.length })}
@@ -146,7 +146,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
           spacing={2}
         >
           <NotFound />
-          <Typography component="div" variant="h5" fontWeight={500} color="ds.text_gray_normal">
+          <Typography component="div" variant="h5" fontWeight={500} color="ds.text_gray_medium">
             {intl.formatMessage(!list.length ? messages.noNFTsAdded : messages.noResultsFound)}
           </Typography>
         </Stack>
@@ -192,11 +192,11 @@ const SvgWrapper = styled(Box)(({ theme, height }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  backgroundColor: theme.palette.ds.gray_c100,
+  backgroundColor: theme.palette.ds.gray_100,
   height,
   '& svg': {
     '& path': {
-      fill: theme.palette.ds.el_gray_medium,
+      fill: theme.palette.ds.el_gray_low,
     },
   },
 }));
@@ -293,14 +293,14 @@ const SLink = styled(Link)({
 });
 
 const SButton = styled(IconButton)(({ theme, active }) => ({
-  backgroundColor: active && theme.palette.ds.gray_c200,
+  backgroundColor: active && theme.palette.ds.gray_200,
   maxWidth: '40px',
   maxHeight: '40px',
   padding: '8px',
   borderRadius: '8px',
   '& svg': {
     '& path': {
-      fill: theme.palette.ds.el_gray_normal,
+      fill: theme.palette.ds.el_gray_medium,
     },
   },
 }));

@@ -14,8 +14,8 @@ import type { PriceImpact } from './types';
 function colorsBySeverity(isSevere: boolean) {
   const theme = useTheme();
   return isSevere
-    ? { fg: theme.palette.ds.text_error, bg: theme.palette.ds.sys_magenta_c100 }
-    : { fg: theme.palette.ds.sys_yellow_c500, bg: theme.palette.ds.sys_yellow_c100 };
+    ? { fg: theme.palette.ds.text_error, bg: theme.palette.ds.sys_magenta_100 }
+    : { fg: theme.palette.ds.sys_yellow_500, bg: theme.palette.ds.sys_yellow_100 };
 }
 
 export function PriceImpactColored({
@@ -58,14 +58,14 @@ export function PriceImpactIcon({ isSevere, small }: {| isSevere: boolean, small
 function PriceImpactWarningText({ isSevere }: {| isSevere: boolean |}): Node {
   const { palette } = useTheme();
   return isSevere ? (
-    <Typography variant="body1" sx={{ color: palette.ds.text_gray_normal }}>
-      <Typography component="span" fontWeight="500" color="ds.text_gray_normal">
+    <Typography variant="body1" sx={{ color: palette.ds.text_gray_medium }}>
+      <Typography component="span" fontWeight="500" color="ds.text_gray_medium">
         Price impact over 10%&nbsp;
       </Typography>
       may cause a significant loss of funds. Please bear this in mind and proceed with an extra caution.
     </Typography>
   ) : (
-    <Typography component="div" variant="body1" color={palette.ds.text_gray_normal}>
+    <Typography component="div" variant="body1" color={palette.ds.text_gray_medium}>
       <Typography component="span" fontWeight="500">
         Price impact over 1%&nbsp;
       </Typography>

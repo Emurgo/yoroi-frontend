@@ -16,10 +16,10 @@ export default function TxSubmittedStep({ txSubmitErrorState, onTryAgain, onSucc
     <Box display="flex" flexDirection="column" gap="16px" alignItems="center" width="404px" mx="auto" mt="131px">
       <Box>{isSuccessful ? <TxSuccessfulImage /> : <TxFailureImage />}</Box>
       <Box textAlign="center">
-        <Typography component="div" variant="h3" fontWeight={500} mb="4px" color="ds.text_gray_normal">
+        <Typography component="div" variant="h3" fontWeight={500} mb="4px" color="ds.text_gray_medium">
           Transaction {isSuccessful ? 'submitted' : 'failed'}
         </Typography>
-        <Typography component="div" variant="body1" color="ds.text_gray_normal">
+        <Typography component="div" variant="body1" color="ds.text_gray_medium">
           {isSuccessful
             ? 'Check this transaction in the list of wallet transactions'
             : 'Your transaction has not been processed properly due to technical issues'}

@@ -55,7 +55,7 @@ class ResyncBlock extends Component<Props & InjectedProps> {
         </Typography>
         <Typography
           variant={isRevampLayout ? 'body1' : 'body2'}
-          color="ds.text_gray_normal"
+          color="ds.text_gray_medium"
           mb={isRevampLayout ? '16px' : '12px'}
         >
           {intl.formatMessage(messages.resyncExplanation)}

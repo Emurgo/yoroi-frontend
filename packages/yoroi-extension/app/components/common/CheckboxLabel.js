@@ -58,7 +58,7 @@ function CheckboxLabel({
             component="div"
             marginBottom={description !== null ? '8px' : 0}
             sx={{
-              color: 'ds.text_gray_normal',
+              color: 'ds.text_gray_medium',
               fontWeight: 300,
               ...(labelSx !== null && labelSx),
             }}

@@ -57,12 +57,12 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl, poolTransitio
       sx={{
         border: '1px solid',
         borderColor: 'grayscale.200',
-        bgcolor: 'background.card',
+        bgcolor: 'ds.bg_color_min',
         paddingBottom: '24px',
       }}
     >
       <Stack direction="row" px={4} py={2} alignItems="center">
-        <Typography component="div" variant="h5" color="ds.text_gray_normal" fontWeight={500}>
+        <Typography component="div" variant="h5" color="ds.text_gray_medium" fontWeight={500}>
           {intl.formatMessage(globalMessages.stakePoolDelegated)}
         </Typography>
         {renderDelegationBtn()}
@@ -163,13 +163,13 @@ const UpdatePoolButton: any = styled(Button)(({ theme }) => ({
   // width: 'unset',
   width: '140px',
   marginLeft: 'auto',
-  background: theme.palette.ds.sys_magenta_c500,
+  background: theme.palette.ds.sys_magenta_500,
   color: 'white',
   height: '40px',
   padding: '0px !important',
   fontSize: '14px',
   '&:hover': {
-    backgroundColor: theme.palette.ds.sys_magenta_c500,
+    backgroundColor: theme.palette.ds.sys_magenta_500,
     color: 'white',
   },
 }));

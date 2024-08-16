@@ -121,9 +121,9 @@ const PortfolioDapps = ({ data }: Props) => {
             sx={(theme: any) => ({
               height: '2.5rem',
               textTransform: 'none',
-              color: theme.palette.ds.gray_cmax,
+              color: theme.palette.ds.gray_max,
               padding: `${theme.spacing(1)} !important`,
-              backgroundColor: button.active ? theme.palette.ds.gray_c200 : 'transparent',
+              backgroundColor: button.active ? theme.palette.ds.gray_200 : 'transparent',
               borderRadius: `${theme.shape.borderRadius}px`,
               cursor: 'pointer',
             })}

@@ -27,7 +27,7 @@ const TokenDetailOverview = ({ tokenInfo, isLoading, isAda }: Props): JSX.Elemen
             width="32px"
             height="32px"
             sx={{
-              backgroundColor: theme.palette.ds.gray_c300,
+              backgroundColor: theme.palette.ds.gray_300,
               borderRadius: `${theme.shape.borderRadius}px`,
             }}
             component="img"
@@ -37,7 +37,7 @@ const TokenDetailOverview = ({ tokenInfo, isLoading, isAda }: Props): JSX.Elemen
         {isLoading ? (
           <Skeleton width="53px" height="16px" />
         ) : (
-          <Typography fontWeight="500" color="ds.gray_c900">
+          <Typography fontWeight="500" color="ds.gray_900">
             {tokenInfo?.name}
           </Typography>
         )}
@@ -47,7 +47,7 @@ const TokenDetailOverview = ({ tokenInfo, isLoading, isAda }: Props): JSX.Elemen
         {isLoading ? (
           <Skeleton width="53px" height="16px" />
         ) : (
-          <Typography fontWeight="500" color="ds.gray_c900">
+          <Typography fontWeight="500" color="ds.gray_900">
             {strings.description}
           </Typography>
         )}
@@ -58,7 +58,7 @@ const TokenDetailOverview = ({ tokenInfo, isLoading, isAda }: Props): JSX.Elemen
             <Skeleton height="20px" width="127px" />
           </>
         ) : (
-          <Typography color="ds.gray_c600">{tokenInfo?.overview.description}</Typography>
+          <Typography color="ds.gray_600">{tokenInfo?.overview.description}</Typography>
         )}
       </Stack>
 
@@ -66,7 +66,7 @@ const TokenDetailOverview = ({ tokenInfo, isLoading, isAda }: Props): JSX.Elemen
         {isLoading ? (
           <Skeleton width="53px" height="16px" />
         ) : (
-          <Typography fontWeight="500" color="ds.gray_c900">
+          <Typography fontWeight="500" color="ds.gray_900">
             {strings.website}
           </Typography>
         )}
@@ -85,7 +85,7 @@ const TokenDetailOverview = ({ tokenInfo, isLoading, isAda }: Props): JSX.Elemen
             {isLoading ? (
               <Skeleton width="84px" height="20px" />
             ) : (
-              <Typography fontWeight="500" color="ds.gray_c900">
+              <Typography fontWeight="500" color="ds.gray_900">
                 {strings.policyId}
               </Typography>
             )}
@@ -97,7 +97,7 @@ const TokenDetailOverview = ({ tokenInfo, isLoading, isAda }: Props): JSX.Elemen
                   <Skeleton height="16px" width="53px" sx={{ marginTop: '5px' }} />
                 </Box>
               ) : (
-                <Typography color="ds.gray_c600" sx={{ wordBreak: 'break-word' }}>
+                <Typography color="ds.gray_600" sx={{ wordBreak: 'break-word' }}>
                   {tokenInfo?.overview.policyId}
                 </Typography>
               )}
@@ -109,7 +109,7 @@ const TokenDetailOverview = ({ tokenInfo, isLoading, isAda }: Props): JSX.Elemen
             {isLoading ? (
               <Skeleton width="84px" height="20px" />
             ) : (
-              <Typography fontWeight="500" color="ds.gray_c900">
+              <Typography fontWeight="500" color="ds.gray_900">
                 {strings.fingerprint}
               </Typography>
             )}
@@ -121,7 +121,7 @@ const TokenDetailOverview = ({ tokenInfo, isLoading, isAda }: Props): JSX.Elemen
                   <Skeleton height="16px" width="53px" sx={{ marginTop: '5px' }} />
                 </Box>
               ) : (
-                <Typography color="ds.gray_c600" sx={{ wordBreak: 'break-word' }}>
+                <Typography color="ds.gray_600" sx={{ wordBreak: 'break-word' }}>
                   {tokenInfo?.overview.fingerprint}
                 </Typography>
               )}
@@ -135,7 +135,7 @@ const TokenDetailOverview = ({ tokenInfo, isLoading, isAda }: Props): JSX.Elemen
         {isLoading ? (
           <Skeleton width="53px" height="16px" />
         ) : (
-          <Typography fontWeight="500" color="ds.gray_c900">
+          <Typography fontWeight="500" color="ds.gray_900">
             {strings.detailsOn}
           </Typography>
         )}

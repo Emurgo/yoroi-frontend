@@ -51,7 +51,7 @@ export const ModalManager = () => {
           position: 'absolute',
           right: 18,
           top: 22,
-          color: (theme: any) => theme.palette.ds.gray_c500,
+          color: (theme: any) => theme.palette.ds.gray_500,
         }}
       >
         <Icon.CloseIcon />

@@ -54,7 +54,7 @@ type InjectedProps = {|
 type AllProps = {| ...Props, ...InjectedProps |};
 
 const StyledIframe = styled('iframe')(({ theme }) => ({
-  backgroundColor: theme.palette.ds.bg_color_low,
+  backgroundColor: theme.palette.ds.bg_color_min,
   filter: 'invert(0.9) hue-rotate(180deg)',
   width: '100%',
   height: '100%',

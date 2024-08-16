@@ -12,7 +12,7 @@ import { ReactComponent as DeleteIcon } from '../../../assets/images/revamp/dele
 import { ReactComponent as NoDappImage } from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
 import { intlShape } from 'react-intl';
 import { splitAmount, truncateToken } from '../../../utils/formatters';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, styled } from '@mui/material';
 import { constructPlate } from '../../topbar/NavPlate';
 import styles from './WalletRow.scss';
 
@@ -66,10 +66,7 @@ export default class WalletRowRevamp extends Component<Props, State> {
     if (request.shouldHideBalance) {
       balanceDisplay = <span>{hiddenAmount}</span>;
     } else {
-      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-        shiftedAmount,
-        tokenInfo.Metadata.numberOfDecimals
-      );
+      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(shiftedAmount, tokenInfo.Metadata.numberOfDecimals);
 
       balanceDisplay = (
         <>
@@ -145,7 +142,8 @@ export default class WalletRowRevamp extends Component<Props, State> {
           <Box width="32px" height="32px" borderRadius="50%" overflow="hidden">
             {websiteIcon ? <img width="100%" src={websiteIcon} alt={url} /> : <NoDappImage />}
           </Box>
-          <Typography component="div"
+          <Typography
+            component="div"
             variant="body1"
             color="grayscale.900"
             sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
@@ -155,13 +153,21 @@ export default class WalletRowRevamp extends Component<Props, State> {
           </Typography>
         </Box>
         {showDeleteIcon && (
-          <Box position="absolute" right="16px" top="16px">
+          <SIconButton position="absolute" right="16px" top="16px">
             <button onClick={() => onRemoveWallet({ url, protocol })} type="button" id="removeWalletButton">
               <DeleteIcon />
             </button>
-          </Box>
+          </SIconButton>
         )}
       </Box>
     );
   }
 }
+
+const SIconButton = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_medium,
+    },
+  },
+}));

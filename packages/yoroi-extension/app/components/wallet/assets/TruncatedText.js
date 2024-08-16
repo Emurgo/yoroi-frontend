@@ -44,7 +44,7 @@ export function CopyAddress({ text, children }: {| text: string, children: Node 
 const SButton = styled(IconButton)(({ theme }) => ({
   '& svg': {
     '& path': {
-      fill: theme.palette.ds.el_gray_normal,
+      fill: theme.palette.ds.el_gray_medium,
     },
   },
 }));

@@ -50,8 +50,8 @@ export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValu
       styleOverride={{ minWidth: '612px', height: '540px', maxWidth: '612px' }}
     >
       <Box sx={{ margin: '0 auto', flex: 1 }}>
-        <Box sx={{ bg: 'ds.bg_color_low' }}>
-          <Typography component="div" variant="body1" color="ds.text_gray_normal">
+        <Box sx={{ bg: 'ds.bg_color_min' }}>
+          <Typography component="div" variant="body1" color="ds.text_gray_medium">
             Default Slippage Tolerance
           </Typography>
         </Box>
@@ -93,7 +93,7 @@ export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValu
               gridTemplateColumns: '1fr auto',
               justifyContent: 'start',
               position: 'relative',
-              bgcolor: readonly ? 'grayscale.50' : 'ds.bg_color_low',
+              bgcolor: readonly ? 'grayscale.50' : 'ds.bg_color_min',
               columnGap: '6px',
               rowGap: '8px',
               ...(!inputFocused &&
@@ -115,8 +115,8 @@ export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValu
                 left: '16px',
                 position: 'absolute',
                 px: '4px',
-                bgcolor: 'ds.bg_color_low',
-                color: 'ds.text_gray_normal',
+                bgcolor: 'ds.bg_color_min',
+                color: 'ds.text_gray_medium',
               }}
             >
               Slippage tolerance
@@ -132,7 +132,7 @@ export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValu
               component="input"
               type="text"
               variant="body1"
-              color="ds.text_gray_normal"
+              color="ds.text_gray_medium"
               placeholder="0"
               onChange={handleSlippageChange}
               bgcolor={readonly ? 'grayscale.50' : 'common.white'}

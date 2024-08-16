@@ -54,11 +54,7 @@ export function constructPlate(
   return [
     plate.TextPart,
     <div className={divClass}>
-      <WalletAccountIcon
-        iconSeed={plate.ImagePart}
-        saturationFactor={saturationFactor}
-        scalePx={6}
-      />
+      <WalletAccountIcon iconSeed={plate.ImagePart} saturationFactor={saturationFactor} scalePx={6} />
     </div>,
   ];
 }
@@ -99,19 +95,10 @@ export default class WalletCard extends Component<Props, State> {
 
   render(): Node {
     const { intl } = this.context;
-    const {
-      shouldHideBalance,
-      walletId,
-      idx,
-      unitOfAccountSetting,
-      getCurrentPrice,
-      id,
-    } = this.props;
+    const { shouldHideBalance, walletId, idx, unitOfAccountSetting, getCurrentPrice, id } = this.props;
     const { isActionsShow } = this.state;
 
-    const [, iconComponent] = this.props.plate
-      ? constructPlate(this.props.plate, 0, styles.icon)
-      : [];
+    const [, iconComponent] = this.props.plate ? constructPlate(this.props.plate, 0, styles.icon) : [];
 
     const typeText = [this.getType(this.props.type)]
       .filter(text => text != null)
@@ -126,7 +113,7 @@ export default class WalletCard extends Component<Props, State> {
     const walletNFTsAmountId = `${id}:walletCard_${idx}-walletNFTsAmount-text`;
 
     return (
-      <Box sx={{ background: 'ds.bg_color_low' }} mb="16px">
+      <Box sx={{ background: 'ds.bg_color_min' }} mb="16px">
         <Draggable draggableId={walletId.toString()} index={idx}>
           {(provided, snapshot) => (
             <div
@@ -151,11 +138,11 @@ export default class WalletCard extends Component<Props, State> {
                 id={buttonId}
               >
                 <div className={styles.header}>
-                  <Typography id={walletNameId} variant="h5" color="ds.text_gray_medium" mr="5px">
+                  <Typography id={walletNameId} variant="body2" color="ds.text_gray_medium" mr="5px">
                     {this.props.name}
                   </Typography>
                   {' ·  '}
-                  <Typography color="ds.text_gray_medium" ml="5px">
+                  <Typography variant="body2" color="ds.text_gray_medium" ml="5px">
                     {typeText}
                   </Typography>
                 </div>
@@ -211,11 +198,7 @@ export default class WalletCard extends Component<Props, State> {
   };
 
   countTokenTypes: void => {| tokenTypes: number, nfts: number |} = () => {
-    if (
-      this.props.walletAmount &&
-      this.props.walletAmount.values &&
-      Array.isArray(this.props.walletAmount.values)
-    ) {
+    if (this.props.walletAmount && this.props.walletAmount.values && Array.isArray(this.props.walletAmount.values)) {
       const count = this.props.walletAmount.values.reduce(
         (prev, curr) => {
           const tokenInfo = this.props.getTokenInfo(curr);

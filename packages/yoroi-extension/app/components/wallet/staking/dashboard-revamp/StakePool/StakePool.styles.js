@@ -12,7 +12,7 @@ export const StyledLink: any = styled(Link)(({ theme }) => ({
   color: 'inherit',
   '& svg': {
     '& path': {
-      fill: theme.palette.ds.el_gray_normal,
+      fill: theme.palette.ds.el_gray_medium,
     },
   },
 }));
