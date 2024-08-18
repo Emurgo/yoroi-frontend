@@ -46,7 +46,7 @@ import {
   cardanoMinAdaRequiredFromRemoteFormat_coinsPerWord,
 } from '../../api/ada/transactions/utils';
 import { PRIMARY_ASSET_CONSTANTS } from '../../api/ada/lib/storage/database/primitives/enums';
-import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import type { CertificatePart, NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
 import moment from 'moment';
 import { loadSubmittedTransactions, persistSubmittedTransactions, } from '../../api/localStorage';
@@ -55,6 +55,7 @@ import { toRequestAddresses } from '../../api/ada/lib/storage/bridge/updateTrans
 import type { TransactionExportRow } from '../../api/export';
 import type { HistoryRequest } from '../../api/ada/lib/state-fetch/types';
 import appConfig from '../../config';
+import { isCertificateKindDrepDelegation } from '../../api/ada/lib/storage/bridge/utils';
 
 export type TxHistoryState = {|
   publicDeriver: PublicDeriver<>,
@@ -86,6 +87,7 @@ type SubmittedTransactionEntry = {|
   publicDeriverId: number,
   transaction: WalletTransaction,
   usedUtxos: Array<{| txHash: string, index: number |}>,
+  isDrepDelegation?: boolean,
 |};
 
 function getCoinsPerUtxoWord(network: $ReadOnly<NetworkRow>): BigNumber {
@@ -851,11 +853,16 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     WalletTransaction,
     Array<{| txHash: string, index: number |}>
   ) => void = (publicDeriver, transaction, usedUtxos) => {
+
+    const isDrepDelegation = transaction instanceof CardanoShelleyTransaction
+      && transaction.certificates.some((c: CertificatePart) => isCertificateKindDrepDelegation(c.certificate.Kind))
+
     this._submittedTransactions.push({
       publicDeriverId: publicDeriver.publicDeriverId,
       networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
       transaction,
       usedUtxos,
+      isDrepDelegation,
     });
     this._persistSubmittedTransactions();
   };
