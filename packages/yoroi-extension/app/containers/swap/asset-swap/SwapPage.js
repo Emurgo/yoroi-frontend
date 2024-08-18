@@ -24,6 +24,8 @@ import { IncorrectWalletPasswordError } from '../../../api/common/errors';
 import { observer } from 'mobx-react';
 import useSwapForm from '../context/swap-form/useSwapForm';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
+import { CoreAddressTypes } from '../../../api/ada/lib/storage/database/primitives/enums';
+import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 
 export const PRICE_IMPACT_MODERATE_RISK = 1;
 export const PRICE_IMPACT_HIGH_RISK = 10;
@@ -85,8 +87,10 @@ function SwapPage(props: StoresAndActionsProps): Node {
   const isSwapEnabled = (orderStep === 0 && swapFormCanContinue) || (orderStep === 1 && confirmationCanContinue);
 
   const wallet = props.stores.wallets.selectedOrFail;
-  const network = wallet.getParent().getNetworkInfo();
-  const defaultTokenInfo = props.stores.tokenInfoStore.getDefaultTokenInfoSummary(network.NetworkId);
+  const network = getNetworkById(wallet.networkId);
+  const defaultTokenInfo = props.stores.tokenInfoStore.getDefaultTokenInfoSummary(
+    network.NetworkId
+  );
   const getTokenInfoBatch: (Array<string>) => { [string]: Promise<RemoteTokenInfo> } = ids =>
     props.stores.tokenInfoStore.fetchMissingAndGetLocalOrRemoteMetadata(network, ids);
   const getTokenInfo: string => Promise<RemoteTokenInfo> = id => getTokenInfoBatch([id])[id].then(res => res ?? {});
@@ -117,12 +121,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
       .catch(e => {
         console.error('Failed to load stored slippage', e);
       });
-    props.stores.addresses
-      .getFirstExternalAddress(wallet)
-      .then(a => setSelectedWalletAddress(addressHexToBech32(a.address)))
-      .catch(e => {
-        console.error('Failed to load wallet address', e);
-      });
+    setSelectedWalletAddress(addressHexToBech32(wallet.externalAddressesByType[CoreAddressTypes.CARDANO_BASE][0].address))
     props.stores.substores.ada.stateFetchStore.fetcher
       .getSwapFeeTiers({ network })
       .then(feeTiers => {
@@ -229,12 +228,12 @@ function SwapPage(props: StoresAndActionsProps): Node {
       await props.stores.substores.ada.wallets.adaSendAndRefresh({
         broadcastRequest: {
           normal: {
-            publicDeriver: wallet,
+            wallet,
             password,
             signRequest,
           },
         },
-        refreshWallet: () => props.stores.wallets.refreshWalletFromRemote(wallet),
+        refreshWallet: () => props.stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId),
       });
       setOrderStepValue(2);
       resetSwapForm();

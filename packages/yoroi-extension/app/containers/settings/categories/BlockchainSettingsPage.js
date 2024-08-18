@@ -10,7 +10,6 @@ import registerProtocols from '../../../uri-protocols';
 import environment from '../../../environment';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import NoWalletMessage from '../../wallet/NoWalletMessage';
-import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { Typography } from '@mui/material';
 import { settingsMenuMessages } from '../../../components/settings/menu/SettingsMenu';
 
@@ -21,12 +20,11 @@ export default class BlockchainSettingsPage extends Component<StoresAndActionsPr
   };
 
   render(): Node {
-    const walletsStore = this.props.stores.wallets;
     const profileStore = this.props.stores.profile;
-    if (walletsStore.selected == null) {
+    const { selected } = this.props.stores.wallets;
+    if (selected == null) {
       return <NoWalletMessage />;
     }
-    const networkInfo = walletsStore.selected.getParent().getNetworkInfo();
 
     const { stores } = this.props;
     const { intl } = this.context;
@@ -34,7 +32,7 @@ export default class BlockchainSettingsPage extends Component<StoresAndActionsPr
     const isSubmittingExplorer = stores.explorers.setSelectedExplorerRequest.isExecuting;
 
     const uriSettings =
-      isCardanoHaskell(networkInfo) && environment.userAgentInfo.canRegisterProtocol() ? (
+      selected.isCardanoHaskell && environment.userAgentInfo.canRegisterProtocol() ? (
         <UriSettingsBlock
           registerUriScheme={() => registerProtocols()}
           isFirefox={environment.userAgentInfo.isFirefox()}
@@ -49,16 +47,20 @@ export default class BlockchainSettingsPage extends Component<StoresAndActionsPr
           </Typography>
         )}
         <ExplorerSettings
-          onSelectExplorer={this.props.actions.explorers.updateSelectedExplorer.trigger}
+          onSelectExplorer={({ explorerId }) =>
+            this.props.actions.explorers.updateSelectedExplorer.trigger(
+              { explorerId, networkId: selected.networkId }
+            )
+          }
           isSubmitting={isSubmittingExplorer}
           explorers={
-            this.props.stores.explorers.allExplorers.get(networkInfo.NetworkId) ??
+            this.props.stores.explorers.allExplorers.get(selected.networkId) ??
             (() => {
               throw new Error('No explorer for wallet network');
             })()
           }
           selectedExplorer={
-            stores.explorers.selectedExplorer.get(networkInfo.NetworkId) ??
+            stores.explorers.selectedExplorer.get(selected.networkId) ??
             (() => {
               throw new Error('No explorer for wallet network');
             })()

@@ -12,6 +12,7 @@ import { ReactComponent as ExpandArrow } from '../../../assets/images/arrow-expa
 import { connectorMessages } from '../../../../i18n/global-messages';
 import ErrorBlock from '../../../../components/widgets/ErrorBlock';
 import LocalizableError from '../../../../i18n/LocalizableError';
+import type { WalletType } from '../../../../../chrome/extension/background/types';
 
 const messages: Object = defineMessages({
   transactionFee: {
@@ -43,7 +44,7 @@ type Props = {|
   renderExplorerHashLink: Function,
   passwordFormField: Node,
   hwWalletError: ?LocalizableError,
-  walletType: string,
+  walletType: WalletType,
   cip95Info: Array<Cip95Info>,
 |};
 
@@ -102,7 +103,7 @@ function CardanoSignTx({
           />
         </>
       )}
-      {walletType === 'web' && <Box mt="32px">{passwordFormField}</Box>}
+      {walletType === 'mnemonic' && <Box mt="32px">{passwordFormField}</Box>}
 
       <ErrorBlock error={hwWalletError} />
     </Box>

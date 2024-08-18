@@ -23,7 +23,6 @@ import EditMemoDialog from '../../components/wallet/memos/EditMemoDialog';
 import DeleteMemoDialog from '../../components/wallet/memos/DeleteMemoDialog';
 import MemoNoExternalStorageDialog from '../../components/wallet/memos/MemoNoExternalStorageDialog';
 import { Logger } from '../../utils/logging';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import config from '../../config';
 import { genAddressLookup } from '../../stores/stateless/addressStores';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
@@ -34,6 +33,7 @@ import WalletSummaryRevamp from '../../components/wallet/summary/WalletSummaryRe
 import BuySellDialog from '../../components/buySell/BuySellDialog';
 import WalletEmptyBanner from './WalletEmptyBanner';
 import { Box } from '@mui/material';
+import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 type Props = StoresAndActionsProps;
 type InjectedLayoutProps = {|
@@ -64,16 +64,15 @@ class WalletSummaryPage extends Component<AllProps> {
       hasMoreToLoad,
       recent,
       isLoadingMore,
-      lastSyncInfo,
       unconfirmedAmount,
       isExporting,
       exportError,
       isLoading,
     } = this.props.stores.transactions;
-    const publicDeriver = wallets.selected;
+    const { selected } = wallets;
     let walletTransactions = null;
     // Guard against potential null values
-    if (publicDeriver == null) {
+    if (selected == null) {
       Logger.error('[WalletSummaryPage::render] Active wallet required');
       return null;
     }
@@ -81,7 +80,7 @@ class WalletSummaryPage extends Component<AllProps> {
 
     const { exportTransactionsToFile, closeExportTransactionDialog } = actions.transactions;
 
-    const walletId = this.props.stores.memos.getIdForWallet(publicDeriver);
+    const walletId = selected.plate.TextPart;
 
     const { uiDialogs, profile, memos, uiNotifications } = this.props.stores;
 
@@ -113,22 +112,23 @@ class WalletSummaryPage extends Component<AllProps> {
       const WalletTransactionsListComp = mapWalletTransactionLayout[this.props.selectedLayout];
 
       if (isLoading || hasAny) {
-        const { assuranceMode } = this.props.stores.walletSettings.getPublicDeriverSettingsCache(publicDeriver);
         walletTransactions = (
           <WalletTransactionsListComp
             transactions={recent}
-            lastSyncBlock={lastSyncInfo.Height}
+            lastSyncBlock={selected.lastSyncInfo.Height}
             memoMap={this.props.stores.memos.txMemoMap.get(walletId) || new Map()}
             selectedExplorer={
-              this.props.stores.explorers.selectedExplorer.get(publicDeriver.getParent().getNetworkInfo().NetworkId) ??
+              this.props.stores.explorers.selectedExplorer.get(
+                selected.networkId
+              ) ??
               (() => {
                 throw new Error('No explorer for wallet network');
               })()
             }
             isLoadingTransactions={isLoadingMore}
             hasMoreToLoad={hasMoreToLoad}
-            onLoadMore={() => actions.transactions.loadMoreTransactions.trigger(publicDeriver)}
-            assuranceMode={assuranceMode}
+            onLoadMore={() => actions.transactions.loadMoreTransactions.trigger(selected)}
+            assuranceMode={selected.assuranceMode}
             shouldHideBalance={profile.shouldHideBalance}
             onAddMemo={transaction =>
               this.showMemoDialog({
@@ -152,14 +152,16 @@ class WalletSummaryPage extends Component<AllProps> {
             getHistoricalPrice={this.props.stores.coinPriceStore.getHistoricalPrice}
             getTokenInfo={genLookupOrNull(this.props.stores.tokenInfoStore.tokenInfo)}
             addressLookup={genAddressLookup(
-              publicDeriver,
+              selected.networkId,
               intl,
               route => this.props.actions.router.goToRoute.trigger({ route }),
               this.props.stores.addresses.addressSubgroupMap
             )}
             onCopyAddressTooltip={onCopyAddressTooltip}
             notification={notificationToolTip}
-            addressToDisplayString={addr => addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())}
+            addressToDisplayString={addr =>
+              addressToDisplayString(addr, getNetworkById(selected.networkId))
+            }
             complexityLevel={this.props.stores.profile.selectedComplexityLevel}
             id="wallet:transaction-transactionsList-box"
           />
@@ -179,7 +181,7 @@ class WalletSummaryPage extends Component<AllProps> {
       </Dialog>
     );
 
-    if (this.readyToExportHistory(publicDeriver)) {
+    if (this.readyToExportHistory(selected.publicDeriverId)) {
       exportDialog = (
         <ExportTransactionDialog
           isActionProcessing={isExporting}
@@ -187,7 +189,7 @@ class WalletSummaryPage extends Component<AllProps> {
           submit={exportRequest =>
             exportTransactionsToFile.trigger({
               exportRequest,
-              publicDeriver,
+              publicDeriver: selected,
             })
           }
           toggleIncludeTxIds={this.props.stores.transactions.toggleIncludeTxIds}
@@ -229,7 +231,7 @@ class WalletSummaryPage extends Component<AllProps> {
 
         {uiDialogs.isOpen(AddMemoDialog) ? (
           <AddMemoDialog
-            selectedWallet={publicDeriver}
+            selectedWalletId={selected.publicDeriverId}
             selectedTransaction={(() => {
               if (memos.selectedTransaction == null) throw new Error('no selected transaction. Should never happen');
               return memos.selectedTransaction;
@@ -240,6 +242,7 @@ class WalletSummaryPage extends Component<AllProps> {
               return actions.memos.saveTxMemo.trigger(values);
             }}
             classicTheme={profile.isClassicTheme}
+            plateTextPart={selected.plate.TextPart}
           />
         ) : null}
 
@@ -258,7 +261,7 @@ class WalletSummaryPage extends Component<AllProps> {
 
         {uiDialogs.isOpen(EditMemoDialog) ? (
           <EditMemoDialog
-            selectedWallet={publicDeriver}
+            selectedWalletId={selected.publicDeriverId}
             existingMemo={(() => {
               if (memos.selectedTransaction == null) throw new Error('no selected transaction. Should never happen');
               const txid = memos.selectedTransaction.txid;
@@ -273,6 +276,7 @@ class WalletSummaryPage extends Component<AllProps> {
               return actions.memos.updateTxMemo.trigger(values);
             }}
             classicTheme={profile.isClassicTheme}
+            plateTextPart={selected.plate.TextPart}
           />
         ) : null}
 
@@ -289,7 +293,8 @@ class WalletSummaryPage extends Component<AllProps> {
             onClose={actions.memos.closeMemoDialog.trigger}
             onDelete={txHash => {
               return actions.memos.deleteTxMemo.trigger({
-                publicDeriver,
+                publicDeriverId: selected.publicDeriverId,
+                plateTextPart: selected.plate.TextPart,
                 txHash,
               });
             }}
@@ -326,7 +331,7 @@ class WalletSummaryPage extends Component<AllProps> {
 
         {uiDialogs.isOpen(AddMemoDialog) ? (
           <AddMemoDialog
-            selectedWallet={publicDeriver}
+            selectedWalletId={selected.publicDeriverId}
             selectedTransaction={(() => {
               if (memos.selectedTransaction == null) throw new Error('no selected transaction. Should never happen');
               return memos.selectedTransaction;
@@ -337,6 +342,7 @@ class WalletSummaryPage extends Component<AllProps> {
               return actions.memos.saveTxMemo.trigger(values);
             }}
             classicTheme={profile.isClassicTheme}
+            plateTextPart={selected.plate.TextPart}
           />
         ) : null}
 
@@ -355,7 +361,7 @@ class WalletSummaryPage extends Component<AllProps> {
 
         {uiDialogs.isOpen(EditMemoDialog) ? (
           <EditMemoDialog
-            selectedWallet={publicDeriver}
+            selectedWalletId={selected.publicDeriverId}
             existingMemo={(() => {
               if (memos.selectedTransaction == null) throw new Error('no selected transaction. Should never happen');
               const txid = memos.selectedTransaction.txid;
@@ -370,6 +376,7 @@ class WalletSummaryPage extends Component<AllProps> {
               return actions.memos.updateTxMemo.trigger(values);
             }}
             classicTheme={profile.isClassicTheme}
+            plateTextPart={selected.plate.TextPart}
           />
         ) : null}
 
@@ -386,7 +393,8 @@ class WalletSummaryPage extends Component<AllProps> {
             onClose={actions.memos.closeMemoDialog.trigger}
             onDelete={txHash => {
               return actions.memos.deleteTxMemo.trigger({
-                publicDeriver,
+                publicDeriverId: selected.publicDeriverId,
+                plateTextPart: selected.plate.TextPart,
                 txHash,
               });
             }}
@@ -439,9 +447,10 @@ class WalletSummaryPage extends Component<AllProps> {
     actions.dialogs.push.trigger({ dialog: DeleteMemoDialog });
   };
 
-  readyToExportHistory: (PublicDeriver<>) => boolean = publicDeriver => {
+  readyToExportHistory: (number) => boolean = publicDeriverId => {
     const delegation = this.props.stores.delegation;
-    return !delegation.isRewardWallet(publicDeriver) || delegation.hasRewardHistory(publicDeriver);
+    return !delegation.isRewardWallet(publicDeriverId)
+      || delegation.hasRewardHistory(publicDeriverId);
   };
 }
 export default (withLayout(WalletSummaryPage): ComponentType<Props>);

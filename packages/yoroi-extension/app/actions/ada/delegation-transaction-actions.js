@@ -1,14 +1,14 @@
 // @flow
 import { AsyncAction, Action } from '../lib/Action';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import type { WalletState } from '../../../chrome/extension/background/types';
 
 export default class DelegationTransactionActions {
   createWithdrawalTxForWallet: AsyncAction<{|
-    publicDeriver: PublicDeriver<>,
+    wallet: WalletState,
   |}> = new AsyncAction();
   signTransaction: AsyncAction<{|
     password?: string,
-    publicDeriver: PublicDeriver<>,
+    wallet: WalletState,
     dialog?: any,
   |}> = new AsyncAction();
   setShouldDeregister: Action<boolean> = new Action();

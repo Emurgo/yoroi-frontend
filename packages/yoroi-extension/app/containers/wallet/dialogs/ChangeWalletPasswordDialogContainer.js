@@ -4,11 +4,10 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import ChangeWalletPasswordDialog from '../../../components/wallet/settings/ChangeWalletPasswordDialog';
 import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
-import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 
 type Props = {|
   ...StoresAndActionsProps,
-  publicDeriver: PublicDeriver<>,
+  publicDeriverId: number,
 |};
 
 @observer
@@ -31,7 +30,7 @@ export default class ChangeWalletPasswordDialogContainer extends Component<Props
         onSave={async (values) => {
           const { oldPassword, newPassword } = values;
           await actions.walletSettings.updateSigningPassword.trigger({
-            publicDeriver: this.props.publicDeriver,
+            publicDeriverId: this.props.publicDeriverId,
             oldPassword,
             newPassword
           });

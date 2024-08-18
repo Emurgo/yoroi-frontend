@@ -6,21 +6,19 @@ import { find } from 'lodash';
 import type { StoresMap } from '../index';
 import type { ActionsMap } from '../../actions';
 import type { StandardAddress, } from '../../types/AddressFilterTypes';
-import {
-  PublicDeriver,
-} from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { ChainDerivations } from '../../config/numbersConfig';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 import type { SubgroupCtorData, IAddressTypeStore } from '../stateless/addressStores';
+import type { WalletState } from '../../../chrome/extension/background/types';
 
 type SubRequestType = {|
-  publicDeriver: PublicDeriver<>,
+  publicDeriver: WalletState,
 |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>>;
 
 export class AddressTypeStore {
 
   @observable addressesRequests: Array<{|
-    publicDeriver: PublicDeriver<>,
+    publicDeriverId: number,
     cachedRequest: CachedRequest<SubRequestType>,
   |}> = [];
 
@@ -40,7 +38,7 @@ export class AddressTypeStore {
   @computed get all(): $ReadOnlyArray<$ReadOnly<StandardAddress>> {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return [];
-    const result = this._flowCoerceResult(this._getRequest(publicDeriver));
+    const result = this._flowCoerceResult(this._getRequest(publicDeriver.publicDeriverId));
     if (result == null) return [];
     return result;
   }
@@ -48,14 +46,14 @@ export class AddressTypeStore {
   @computed get wasExecuted(): boolean {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return false;
-    return this._getRequest(publicDeriver).wasExecuted;
+    return this._getRequest(publicDeriver.publicDeriverId).wasExecuted;
   }
 
   /** Refresh addresses from database */
-  @action refreshAddressesFromDb: PublicDeriver<> => Promise<void> = async (
-    publicDeriver,
+  @action refreshAddressesFromDb: WalletState => Promise<void> = async (
+    publicDeriver
   ) => {
-    const allRequest = this._getRequest(publicDeriver);
+    const allRequest = this._getRequest(publicDeriver.publicDeriverId);
     allRequest.invalidate({ immediately: false });
     await allRequest.execute({ publicDeriver }).promise;
   };
@@ -68,20 +66,20 @@ export class AddressTypeStore {
     return (request.result: any);
   }
 
-  _getRequest: (PublicDeriver<>) => CachedRequest<SubRequestType> = (publicDeriver) => {
-    const foundRequest = find(this.addressesRequests, { publicDeriver });
+  _getRequest: (number) => CachedRequest<SubRequestType> = (publicDeriverId) => {
+    const foundRequest = find(this.addressesRequests, { publicDeriverId });
     if (foundRequest && foundRequest.cachedRequest) {
       return foundRequest.cachedRequest;
     }
     return new CachedRequest<SubRequestType>(this.request);
   };
 
-  @action addObservedWallet: PublicDeriver<> => void = (
-    publicDeriver
+  @action addObservedWallet: WalletState => void = (
+    { publicDeriverId }
   ) => {
     this.addressesRequests.push({
-      publicDeriver,
-      cachedRequest: this._getRequest(publicDeriver),
+      publicDeriverId,
+      cachedRequest: this._getRequest(publicDeriverId),
     });
   }
 }

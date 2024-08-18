@@ -10,16 +10,14 @@ import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import classnames from 'classnames';
 import type { WalletChecksum } from '@emurgo/cip4-js';
-import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import globalMessages from '../../i18n/global-messages';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { ReactComponent as DragIcon } from '../../assets/images/add-wallet/wallet-list/drag.inline.svg';
 import { Draggable } from 'react-beautiful-dnd';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import AmountDisplay from '../common/AmountDisplay';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import { maybe } from '../../coreUtils';
+import type { WalletType } from '../../../chrome/extension/background/types';
 import { Box, Typography } from '@mui/material';
 
 const messages = defineMessages({
@@ -31,18 +29,15 @@ const messages = defineMessages({
 
 type Props = {|
   +plate: null | WalletChecksum,
-  +settingsCache: {|
-    conceptualWallet: ConceptualWallet,
-    conceptualWalletName: string,
-  |},
-  +wallet: PublicDeriver<>,
+  +type: WalletType,
+  +name: string,
   +rewards: null | void | MultiToken,
   +shouldHideBalance: boolean,
   +walletAmount: null | MultiToken,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +isCurrentWallet?: boolean,
   +onSelect: void => void,
-  +walletId: string,
+  +walletId: number,
   +idx: number,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?string,
@@ -80,11 +75,11 @@ export default class WalletCard extends Component<Props, State> {
     isActionsShow: false,
   };
 
-  getType: ConceptualWallet => $Exact<$npm$ReactIntl$MessageDescriptor> = wallet => {
-    if (isLedgerNanoWallet(wallet)) {
+  getType: WalletType => $Exact<$npm$ReactIntl$MessageDescriptor> = type => {
+    if (type === 'ledger') {
       return globalMessages.ledgerWallet;
     }
-    if (isTrezorTWallet(wallet)) {
+    if (type === 'trezor') {
       return globalMessages.trezorWallet;
     }
     return globalMessages.standardWallet;
@@ -105,7 +100,7 @@ export default class WalletCard extends Component<Props, State> {
 
     const [, iconComponent] = this.props.plate ? constructPlate(this.props.plate, 0, styles.icon) : [];
 
-    const typeText = [this.getType(this.props.settingsCache.conceptualWallet)]
+    const typeText = [this.getType(this.props.type)]
       .filter(text => text != null)
       .map(text => intl.formatMessage(text))
       .join(' - ');
@@ -144,7 +139,7 @@ export default class WalletCard extends Component<Props, State> {
               >
                 <div className={styles.header}>
                   <Typography id={walletNameId} variant="body2" color="ds.text_gray_medium" mr="5px">
-                    {this.props.settingsCache.conceptualWalletName}
+                    {this.props.name}
                   </Typography>
                   {' ·  '}
                   <Typography variant="body2" color="ds.text_gray_medium" ml="5px">

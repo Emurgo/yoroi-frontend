@@ -71,7 +71,7 @@ export function useRichOrders(
   openOrdersLoading: boolean,
   completedOrdersLoading: boolean
 |} {
-  const {order, tokens, stakingKey} = useSwap()
+  const { order, tokens, stakingKey } = useSwap()
 
   /**
    * Fetch verified tokens list converted to map

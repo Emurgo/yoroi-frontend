@@ -1,8 +1,7 @@
 // @flow
 import type { MessageDescriptor } from 'react-intl';
-import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
-import { asGetStakingKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { ROUTES } from '../../routes-config';
+import globalMessages, { connectorMessages } from '../../i18n/global-messages';
 import { ReactComponent as dappConnectorIcon } from '../../assets/images/dapp-connector/dapp-connector.inline.svg';
 import { ReactComponent as walletsIcon } from '../../assets/images/sidebar/my_wallets.inline.svg';
 import { ReactComponent as assetsIcon } from '../../assets/images/sidebar/revamp/assets.inline.svg';
@@ -18,8 +17,6 @@ import { ReactComponent as transferIcon } from '../../assets/images/sidebar/tran
 import { ReactComponent as settingsIcon } from '../../assets/images/sidebar/wallet-settings-2-ic.inline.svg';
 import { ReactComponent as goBackIcon } from '../../assets/images/top-bar/back-arrow-white.inline.svg';
 import environment from '../../environment';
-import globalMessages, { connectorMessages } from '../../i18n/global-messages';
-import { ROUTES } from '../../routes-config';
 
 export type SidebarCategory = {|
   +className: string,
@@ -28,7 +25,7 @@ export type SidebarCategory = {|
   +label?: MessageDescriptor,
   +isVisible: ({|
     hasAnyWallets: boolean,
-    selected: null | PublicDeriver<>,
+    selected: ?{ publicDeriverId: number, ... },
     currentRoute: string,
   |}) => boolean,
 |};
@@ -89,12 +86,12 @@ export const CONNECTED_WEBSITES: SidebarCategory = registerCategory({
 
 type isVisibleFunc = ({|
   hasAnyWallets: boolean,
-  selected: null | PublicDeriver<>,
+  selected: ?{ publicDeriverId: number, isTestnet: boolean, networkId: number, ... },
   currentRoute: string,
   isRewardWallet: isRewardWalletFunc,
 |}) => boolean;
 
-type isRewardWalletFunc = (PublicDeriver<>) => boolean;
+type isRewardWalletFunc = ({ publicDeriverId: number, ... }) => boolean;
 
 export type SidebarCategoryRevamp = {|
   +className: string,
@@ -123,15 +120,14 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.STAKING,
     icon: stakingIcon,
     label: globalMessages.sidebarStaking,
-    isVisible: ({ selected, isRewardWallet }) =>
-      !!selected && isCardanoHaskell(selected.getParent().getNetworkInfo()) && isRewardWallet(selected),
+    isVisible: ({ selected, isRewardWallet }) => !!selected && isRewardWallet(selected),
   },
   {
     className: 'swap',
     route: ROUTES.SWAP.ROOT,
     icon: swapIcon,
     label: globalMessages.sidebarSwap,
-    isVisible: ({ selected }) => (environment.isDev() || environment.isNightly()) && !!selected?.isMainnet(),
+    isVisible: ({ selected }) => (environment.isDev() || environment.isNightly()) && !selected?.isTestnet,
   },
   {
     className: 'assets',
@@ -145,7 +141,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.PORTFOLIO.ROOT,
     icon: portfolioIcon,
     label: globalMessages.sidebarPortfolio,
-    isVisible: ({ selected }) => environment.isDev() && selected?.getParent().getNetworkInfo().NetworkId === 250,
+    isVisible: ({ selected }) => environment.isDev() && selected?.networkId === 250,
   },
   {
     className: 'nfts',
@@ -160,7 +156,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     icon: votingIcon,
     label: globalMessages.sidebarVoting,
     // $FlowFixMe[prop-missing]
-    isVisible: request => asGetStakingKey(request.selected) != null,
+    isVisible: request => request.selected != null,
   },
   {
     className: 'connected-websites',
@@ -181,7 +177,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: '/governance',
     icon: governanceIcon,
     label: globalMessages.sidebarGovernance,
-    isVisible: ({ selected }) => environment.isDev() && selected?.getParent().getNetworkInfo().NetworkId === 450,
+    isVisible: ({ selected }) => environment.isDev() && selected?.networkId === 450,
   },
   {
     className: 'settings',

@@ -2,8 +2,6 @@
 
 import { action, observable, runInAction } from 'mobx';
 import { find } from 'lodash';
-import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import Store from '../base/Store';
 import { GovernanceApi } from '@emurgo/yoroi-lib/dist/governance/emurgo-api';
@@ -17,7 +15,6 @@ import type { ExplorerPoolInfo as PoolInfo } from '@emurgo/yoroi-lib';
 import { PoolInfoApi } from '@emurgo/yoroi-lib';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { forceNonNull, maybe } from '../../coreUtils';
-import { asGetStakingKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { unwrapStakingKey } from '../../api/ada/lib/storage/bridge/utils';
 
 import type {
@@ -25,11 +22,11 @@ import type {
   GetDelegatedBalanceResponse,
   RewardHistoryFunc,
 } from '../../api/ada/lib/storage/bridge/delegationUtils';
-
+import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
 export type DelegationRequests = {|
-  publicDeriver: PublicDeriver<>,
+  publicDeriverId: number,
   getDelegatedBalance: CachedRequest<GetDelegatedBalanceFunc>,
   rewardHistory: CachedRequest<RewardHistoryFunc>,
   mangledAmounts: CachedRequest<MangledAmountFunc>,
@@ -74,45 +71,43 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
   @observable poolTransitionRequestInfo: { [number]: ?PoolTransition } = {};
   @observable poolTransitionConfig: { [number]: ?PoolTransitionModal } = {};
 
-  getPoolTransitionConfig(publicDeriver: ?PublicDeriver<>): PoolTransitionModal {
+  getPoolTransitionConfig(publicDeriver: ?{ publicDeriverId: number, ... }): PoolTransitionModal {
     return (
-      maybe(publicDeriver, w => this.poolTransitionConfig[w.getPublicDeriverId()]) ?? {
+      maybe(publicDeriver, w => this.poolTransitionConfig[w.publicDeriverId]) ?? {
         show: 'closed',
         shouldUpdatePool: false,
       }
     );
   }
 
-  @action setPoolTransitionConfig: (?PublicDeriver<>, PoolTransitionModal) => void = (
-    publicDeriver: ?PublicDeriver<>,
-    config: PoolTransitionModal
+  @action setPoolTransitionConfig: (?{ publicDeriverId: number, ... }, PoolTransitionModal) => void = (
+    publicDeriver, config
   ) => {
     if (publicDeriver != null) {
-      this.poolTransitionConfig[publicDeriver.getPublicDeriverId()] = {
+      this.poolTransitionConfig[publicDeriver.publicDeriverId] = {
         show: config.show,
         shouldUpdatePool: config.shouldUpdatePool,
       };
     }
   };
 
-  @observable poolInfoQuery: LocalizedRequest<(Array<string>) => Promise<void>> = new LocalizedRequest<
-    (Array<string>) => Promise<void>
-  >(async poolIds => {
-    const { selectedNetwork } = this.stores.profile;
-    if (selectedNetwork == null) throw new Error(`${nameof(DelegationStore)} no network selected`);
-    await this.stores.substores.ada.delegation.updatePoolInfo({
-      network: selectedNetwork,
-      allPoolIds: poolIds,
-    });
-    if (this.stores.substores.ada.delegation) {
+  @observable poolInfoQuery: LocalizedRequest<(Array<string>) => Promise<void>> = new LocalizedRequest(
+    async poolIds => {
+      const { selected } = this.stores.wallets;
+      if (selected == null) throw new Error(`${nameof(DelegationStore)} no wallet selected`);
+      const network = getNetworkById(selected.networkId);
+      await this.stores.substores.ada.delegation.updatePoolInfo({
+        network,
+        allPoolIds: poolIds,
+      });
       // make sure all the pools were found or throw an error
       for (const poolId of poolIds) {
-        if (this.getLocalPoolInfo(selectedNetwork, poolId) == null) {
+        if (this.getLocalPoolInfo(selected.networkId, poolId) == null) {
           throw new PoolMissingApiError();
         }
       }
     }
-  });
+  );
 
   @observable poolInfo: Array<{|
     // it's possible somebody creates a pool with the same ID on a testnet, etc. so we need this key
@@ -147,82 +142,107 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     this.selectedPage = 0;
   };
 
-  getDelegationRequests: (PublicDeriver<>) => void | DelegationRequests = publicDeriver => {
-    return find(this.delegationRequests, { publicDeriver });
-  };
+  getDelegationRequests: number => void | DelegationRequests = (publicDeriverId) => {
+    return find(this.delegationRequests, { publicDeriverId });
+  }
 
-  _getDelegatedBalanceResult: (PublicDeriver<>) => ?GetDelegatedBalanceResponse = publicDeriver => {
-    const delegationRequest = this.getDelegationRequests(publicDeriver);
+  _getDelegatedBalanceResult: number => ?GetDelegatedBalanceResponse = (publicDeriverId) => {
+    const delegationRequest = this.getDelegationRequests(publicDeriverId);
     return delegationRequest?.getDelegatedBalance.result || null;
   };
 
   // <TODO:PENDING_REMOVAL> legacy after removing bip44
-  isRewardWallet: (PublicDeriver<>) => boolean = publicDeriver => {
-    return this.getDelegationRequests(publicDeriver) != null;
-  };
+  isRewardWallet: number => boolean = (publicDeriverId) => {
+    return this.getDelegationRequests(publicDeriverId) != null;
+  }
 
-  canUnmangleSomeUtxo: (PublicDeriver<>) => boolean = publicDeriver => {
-    const canUnmangleAmount: ?MultiToken = this.getDelegationRequests(publicDeriver)?.mangledAmounts.result?.canUnmangle;
+  canUnmangleSomeUtxo: number => boolean = (publicDeriverId) => {
+    const canUnmangleAmount: ?MultiToken = this.getDelegationRequests(publicDeriverId)
+      ?.mangledAmounts.result?.canUnmangle;
     return maybe(canUnmangleAmount, t => t.getDefault().gt(0)) ?? false;
   };
 
-  getMangledAmountsOrZero: (PublicDeriver<>) => MangledAmountsResponse = publicDeriver => {
-    const resp: ?MangledAmountsResponse = this.getDelegationRequests(publicDeriver)?.mangledAmounts.result;
+  getMangledAmountsOrZero: (number, number, string) => MangledAmountsResponse = (
+    publicDeriverId,
+    networkId,
+    defaultTokenId,
+  ) => {
+    const defaultMultiToken = new MultiToken(
+      [],
+      {
+        defaultNetworkId: networkId,
+        defaultIdentifier: defaultTokenId,
+      }
+    );
+    const resp: ?MangledAmountsResponse = this.getDelegationRequests(publicDeriverId)?.mangledAmounts.result;
     return {
-      canUnmangle: resp?.canUnmangle ?? publicDeriver.getParent().getDefaultMultiToken(),
-      cannotUnmangle: resp?.cannotUnmangle ?? publicDeriver.getParent().getDefaultMultiToken(),
+      canUnmangle: resp?.canUnmangle ?? defaultMultiToken,
+      cannotUnmangle: resp?.cannotUnmangle ?? defaultMultiToken,
     };
   };
 
-  hasRewardHistory: (PublicDeriver<>) => boolean = publicDeriver => {
-    return this.getDelegationRequests(publicDeriver)?.rewardHistory.result != null;
-  };
-
-  isExecutedDelegatedBalance: (PublicDeriver<>) => boolean = publicDeriver => {
-    return this.getDelegationRequests(publicDeriver)?.getDelegatedBalance.wasExecuted === true;
-  };
-
-  getRewardBalanceOrZero: (PublicDeriver<>) => MultiToken = publicDeriver => {
-    if (this.stores.transactions.hasProcessedWithdrawals(publicDeriver)) {
-      // In case we have a processed withdrawal for the wallet
-      // We cancel out any still present reward, in case it has not synced yet
-      return publicDeriver.getParent().getDefaultMultiToken();
-    }
-    return this._getDelegatedBalanceResult(publicDeriver)?.accountPart ?? publicDeriver.getParent().getDefaultMultiToken();
-  };
-
-  getDelegatedUtxoBalance: (PublicDeriver<>) => ?MultiToken = publicDeriver => {
-    return this._getDelegatedBalanceResult(publicDeriver)?.utxoPart ?? null;
-  };
-
-  getDelegatedPoolId: (PublicDeriver<>) => ?string = publicDeriver => {
-    return this._getDelegatedBalanceResult(publicDeriver)?.delegation ?? null;
-  };
-
-  isCurrentlyDelegating: (PublicDeriver<>) => boolean = publicDeriver => {
-    return this.getDelegatedPoolId(publicDeriver) != null;
-  };
-
-  isStakeRegistered: (PublicDeriver<>) => ?boolean = publicDeriver => {
-    return this._getDelegatedBalanceResult(publicDeriver)?.stakeRegistered ?? null;
-  };
-
-  getLocalPoolInfo: ($ReadOnly<NetworkRow>, string) => void | PoolMeta = (network, poolId) => {
-    return find(this.poolInfo, { networkId: network.NetworkId, poolId })?.poolInfo;
-  };
-
-  getLocalRemotePoolInfo: ($ReadOnly<NetworkRow>, string) => void | PoolInfo = (network, poolId) => {
-    return find(this.poolInfo, { networkId: network.NetworkId, poolId })?.poolRemoteInfo ?? undefined;
-  };
-
-  getPoolTransitionInfo(publicDeriver: ?PublicDeriver<>): ?PoolTransition {
-    return maybe(publicDeriver, w => this.poolTransitionRequestInfo[w.getPublicDeriverId()]);
+  hasRewardHistory: number => boolean = (publicDeriverId) => {
+    return this.getDelegationRequests(publicDeriverId)?.rewardHistory.result != null;
   }
 
-  disablePoolTransitionState(publicDeriver: ?PublicDeriver<>): void {
-    maybe(publicDeriver, w => {
+  isExecutedDelegatedBalance: number => boolean = (publicDeriverId) => {
+    return this.getDelegationRequests(publicDeriverId)?.getDelegatedBalance.wasExecuted === true;
+  }
+
+  getRewardBalanceOrZero: ({
+    publicDeriverId: number,
+    networkId: number,
+    defaultTokenId: string,
+    ...
+  }) => MultiToken = ({ publicDeriverId, networkId, defaultTokenId, }) => {
+    const defaultMultiToken = new MultiToken(
+      [],
+      {
+        defaultNetworkId: networkId,
+        defaultIdentifier: defaultTokenId,
+      }
+    );
+
+    if (this.stores.transactions.hasProcessedWithdrawals({ publicDeriverId })) {
+      // In case we have a processed withdrawal for the wallet
+      // We cancel out any still present reward, in case it has not synced yet
+      return defaultMultiToken;
+    }
+    return this._getDelegatedBalanceResult(publicDeriverId)?.accountPart ?? defaultMultiToken;
+  }
+
+  getDelegatedUtxoBalance: number => ?MultiToken = (publicDeriverId) => {
+    return this._getDelegatedBalanceResult(publicDeriverId)?.utxoPart ?? null;
+  }
+
+  getDelegatedPoolId: number => ?string = (publicDeriverId) => {
+    return this._getDelegatedBalanceResult(publicDeriverId)?.delegation ?? null;
+  }
+
+  isCurrentlyDelegating: number => boolean = (publicDeriverId) => {
+    return this.getDelegatedPoolId(publicDeriverId) != null;
+  }
+
+  isStakeRegistered: number => ?boolean = (publicDeriverId) => {
+    return this._getDelegatedBalanceResult(publicDeriverId)?.stakeRegistered ?? null;
+  }
+
+  getLocalPoolInfo: (number, string) => void | PoolMeta = (networkId, poolId) => {
+    return find(this.poolInfo, { networkId, poolId })?.poolInfo;
+  }
+
+  getLocalRemotePoolInfo: (number, string) => void | PoolInfo = (networkId, poolId) => {
+    return find(this.poolInfo, { networkId, poolId })?.poolRemoteInfo ?? undefined;
+  }
+
+  getPoolTransitionInfo(wallet: ?{ publicDeriverId: number, ... }): ?PoolTransition {
+    return maybe(wallet, w => this.poolTransitionRequestInfo[w.publicDeriverId]);
+  }
+
+  disablePoolTransitionState(wallet: ?{ publicDeriverId: number, ... }): void {
+    maybe(wallet, w => {
       runInAction(() => {
-        const publicDeriverId = w.getPublicDeriverId();
+        const { publicDeriverId } = w;
         this.poolTransitionConfig[publicDeriverId] = undefined;
         if (this.poolTransitionRequestInfo[publicDeriverId] != null) {
           // we don't delete the suggestion state because then it would get fetched again automatically
@@ -235,20 +255,20 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
 
   @action checkPoolTransition: () => Promise<void> = async () => {
     const publicDeriver = this.stores.wallets.selected;
-    if (publicDeriver === null || this.poolTransitionRequestInfo[publicDeriver.getPublicDeriverId()] != null) {
+    if (publicDeriver === null || this.poolTransitionRequestInfo[publicDeriver.publicDeriverId] != null) {
       return;
     }
 
-    const isStakeRegistered = this.stores.delegation.isStakeRegistered(publicDeriver);
-    const currentlyDelegating = this.stores.delegation.isCurrentlyDelegating(publicDeriver);
-    const currentPool = this.getDelegatedPoolId(publicDeriver);
+    const isStakeRegistered = this.stores.delegation.isStakeRegistered(publicDeriver.publicDeriverId);
+    const currentlyDelegating = this.stores.delegation.isCurrentlyDelegating(publicDeriver.publicDeriverId);
+    const currentPool = this.getDelegatedPoolId(publicDeriver.publicDeriverId);
 
     if (currentPool == null) {
       return;
     }
 
     try {
-      const { BackendService } = publicDeriver.getParent().getNetworkInfo().Backend;
+      const { BackendService } = getNetworkById(publicDeriver.networkId).Backend;
       const transitionResult = await maybe(currentPool, p =>
         new PoolInfoApi(forceNonNull(BackendService) + '/api').getTransition(p, RustModule.CrossCsl.init)
       );
@@ -261,8 +281,6 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
         deadlinePassed: Number(transitionResult?.deadlineMilliseconds) < Date.now(),
       };
 
-      const walletId = publicDeriver.getPublicDeriverId();
-
       if (
         isStakeRegistered &&
         currentlyDelegating &&
@@ -273,8 +291,8 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
       }
 
       runInAction(() => {
-        this.poolTransitionRequestInfo[walletId] = { ...response };
-      });
+        this.poolTransitionRequestInfo[publicDeriver.publicDeriverId] = { ...response };
+      })
     } catch (error) {
       console.warn('Failed to check pool transition', error);
     }
@@ -285,40 +303,39 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     await this.stores.delegation.poolInfoQuery.execute([poolId]);
     await this.stores.substores.ada.delegationTransaction.createTransaction({
       poolRequest: poolId,
-      publicDeriver: this.stores.wallets.selectedOrFail,
+      wallet: this.stores.wallets.selectedOrFail,
     });
   };
 
   createDrepDelegationTransaction: (string) => Promise<void> = async drepCredential => {
+    const selectedWallet = this.stores.wallets.selected;
+    if (selectedWallet == null) {
+      return;
+    }
+
     await this.stores.substores.ada.delegationTransaction.createTransaction({
       drepCredential,
-      publicDeriver: this.stores.wallets.selectedOrFail,
+      wallet: selectedWallet,
     });
   };
 
-  checkGovernanceStatus: (PublicDeriver<any>) => any = async publicDeriver => {
+  checkGovernanceStatus: ({
+    stakingAddress: string, networkId: number, ...
+  }) => Promise<void> = async publicDeriver => {
     try {
-      const withStakingKey = asGetStakingKey(publicDeriver);
-      if (withStakingKey == null) {
-        throw new Error(`missing staking key functionality`);
-      }
-
-      const networkInfo = publicDeriver.getParent().getNetworkInfo();
-      const networkId = networkInfo.NetworkId;
-
-      const stakingKeyResp = await withStakingKey.getStakingKey();
-
-      const skey = unwrapStakingKey(stakingKeyResp.addr.Hash).to_keyhash()?.to_hex();
+      const skey = unwrapStakingKey(publicDeriver.stakingAddress).to_keyhash()?.to_hex();
       if (skey == null) {
         throw new Error('Cannot get staking key from the wallet!');
       }
-      const backendService = publicDeriver.getParent().getNetworkInfo().Backend.BackendService;
-      const backendServiceZero = publicDeriver.getParent().getNetworkInfo().Backend.BackendServiceZero;
-
+      const { Backend }  = getNetworkById(publicDeriver.networkId);
+      const { BackendService, BackendServiceZero } = Backend;
+      if (!BackendService || !BackendServiceZero) {
+        throw new Error('unexpectedly missing backend');
+      }
       const govApi = new GovernanceApi({
-        oldBackendUrl: String(backendService),
-        newBackendUrl: String(backendServiceZero),
-        networkId,
+        oldBackendUrl: BackendService,
+        newBackendUrl: BackendServiceZero,
+        networkId: publicDeriver.networkId,
         wasmFactory: RustModule.CrossCsl.init,
       });
 

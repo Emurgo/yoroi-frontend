@@ -4,7 +4,9 @@ import type { CardanoByronTxIO } from '../api/ada/lib/storage/database/transacti
 import type { DbBlock, NetworkRow } from '../api/ada/lib/storage/database/primitives/tables';
 import type { DefaultTokenEntry } from '../api/common/lib/MultiToken';
 import { action } from 'mobx';
-import WalletTransaction, { toAddr } from './WalletTransaction';
+import WalletTransaction, { toAddr, } from './WalletTransaction';
+import type { WalletTransactionCtorData } from './WalletTransaction';
+import { MultiToken } from '../api/common/lib/MultiToken';
 
 export default class CardanoByronTransaction extends WalletTransaction {
   @action
@@ -40,4 +42,33 @@ export default class CardanoByronTransaction extends WalletTransaction {
       errorMsg: tx.transaction.ErrorMessage,
     });
   }
+
+  @action
+  static fromData(data: WalletTransactionCtorData): CardanoByronTransaction {
+    return new CardanoByronTransaction(data);
+  }
+}
+
+// fix BigNumber and MultiToken values after deserialization
+export function deserializeTransactionCtorData(serializedData: Object): WalletTransactionCtorData {
+  return {
+    txid: serializedData.txid,
+    block: null,
+    type: serializedData.type,
+    amount: MultiToken.from(serializedData.amount),
+    fee: MultiToken.from(serializedData.fee),
+    date: new Date(serializedData.date),
+    addresses: {
+      from: serializedData.addresses.from.map(({ address, value }) => ({
+        address,
+        value: MultiToken.from(value),
+      })),
+      to: serializedData.addresses.to.map(({ address, value }) => ({
+        address,
+        value: MultiToken.from(value),
+      })),
+    },
+    state: serializedData.state,
+    errorMsg: serializedData.errorMsg,
+  };
 }

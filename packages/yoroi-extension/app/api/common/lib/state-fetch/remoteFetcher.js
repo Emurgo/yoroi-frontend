@@ -68,9 +68,9 @@ export class RemoteFetcher implements IFetcher {
     this.getPlatform = getPlatform;
   }
 
-  checkServerStatus: ServerStatusRequest => Promise<ServerStatusResponse> = (_body) => (
+  checkServerStatus: ServerStatusRequest => Promise<ServerStatusResponse> = (param) => (
     axios(
-      `${getEndpoint()}/api/status`,
+      `${param.backend || getEndpoint()}/api/status`,
       {
         method: 'get',
         timeout: 2 * CONFIG.app.walletRefreshInterval,

@@ -20,6 +20,7 @@ import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils'
 import { genAddressLookup } from '../../stores/stateless/addressStores';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import { isValidEnglishAdaPaperMnemonic } from '../../api/ada/lib/cardanoCrypto/paperWallet';
+import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 // Stay this long on the success page, then jump to the wallet transactions page
 const SUCCESS_PAGE_STAY_TIME = 5 * 1000;
@@ -66,11 +67,11 @@ export default class YoroiTransferPage extends Component<StoresAndActionsProps> 
       throw new Error(`${nameof(this.transferFunds)} no wallet selected`);
     }
     await this.props.actions.yoroiTransfer.transferFunds.trigger({
-      network: publicDeriver.getParent().getNetworkInfo(),
+      network: getNetworkById(publicDeriver.networkId),
       next: async () => {
         const preRefreshTime = new Date().getTime();
         try {
-          await walletsStore.refreshWalletFromRemote(publicDeriver);
+          await walletsStore.refreshWalletFromRemote(publicDeriver.publicDeriverId);
         } catch (_e) {
           // still need to re-route even if refresh failed
         }
@@ -153,7 +154,7 @@ export default class YoroiTransferPage extends Component<StoresAndActionsProps> 
             form={null}
             transferTx={transferTx}
             selectedExplorer={this.props.stores.explorers.selectedExplorer
-              .get(publicDeriver.getParent().getNetworkInfo().NetworkId)
+              .get(publicDeriver.networkId)
                 ?? (() => { throw new Error('No explorer for wallet network'); })()
             }
             getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
@@ -170,14 +171,14 @@ export default class YoroiTransferPage extends Component<StoresAndActionsProps> 
             dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
             getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
             addressLookup={genAddressLookup(
-              publicDeriver,
+              publicDeriver.networkId,
               intl,
               undefined, // don't want to go to route from within a dialog
               this.props.stores.addresses.addressSubgroupMap,
             )}
             unitOfAccountSetting={stores.profile.unitOfAccount}
             addressToDisplayString={
-              addr => addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())
+              addr => addressToDisplayString(addr, getNetworkById(publicDeriver.networkId))
             }
           />
         );
