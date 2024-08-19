@@ -22,8 +22,9 @@ import encryptusPng from '../../assets/images/encryptus.png';
 import { ReactComponent as InfoIcon } from '../../assets/images/info-icon-revamp.inline.svg';
 import { ReactComponent as YoroiIcon } from '../../assets/images/yoroi-logo-shape-blue.inline.svg';
 import { ReactComponent as FailIcon } from '../../assets/images/service-unavailable-error.svg';
-import { exchangeApiMaker, exchangeManagerMaker } from '@yoroi/exchange'
+import { exchangeApiMaker, exchangeManagerMaker } from '@yoroi/exchange';
 import environment from '../../environment';
+import { Typography } from '@mui/material';
 
 declare var chrome;
 
@@ -58,7 +59,8 @@ const messages = defineMessages({
   },
   disclaimerText: {
     id: 'buysell.dialog.disclaimerText',
-    defaultMessage: '!!!Yoroi Wallet utilizes third-party web3 on-and-off ramp solutions for direct Fiat-ADA exchanges. By clicking "Proceed," you acknowledge that you will be redirected to our partner\'s website, where you may need to accept their terms and conditions.  Please note, the third party web3 solution may have limitations based on your location and financial institution.'
+    defaultMessage:
+      '!!!Yoroi Wallet utilizes third-party web3 on-and-off ramp solutions for direct Fiat-ADA exchanges. By clicking "Proceed," you acknowledge that you will be redirected to our partner\'s website, where you may need to accept their terms and conditions.  Please note, the third party web3 solution may have limitations based on your location and financial institution.',
   },
   proceed: {
     id: 'buysell.dialog.proceed',
@@ -74,7 +76,7 @@ const messages = defineMessages({
   },
   failDialogText: {
     id: 'buysell.dialog.fail.text',
-    defaultMessage: '!!!This service is currently unavailable. Please try again later.'
+    defaultMessage: '!!!This service is currently unavailable. Please try again later.',
   },
 });
 
@@ -165,7 +167,7 @@ const Disclaimer = styled(Box)({
   },
   borderRadius: 'var(--corner-radius-8, 8px)',
   background: 'var(--gradient-light-green-blue, linear-gradient(340deg, #C6F7ED 10%, #E4E8F7 60%))',
-  padding: 'var(--spacing-12, 12px) var(--spacing-16, 16px) var(--spacing-16, 16px) var(--spacing-16, 16px)'
+  padding: 'var(--spacing-12, 12px) var(--spacing-16, 16px) var(--spacing-16, 16px) var(--spacing-16, 16px)',
 });
 
 const ErrorPopoutContent = styled(Box)({
@@ -198,9 +200,7 @@ const ErrorPopoutContent = styled(Box)({
 const URL_GENERATION_LONG_LOADING_TIMEOUT = 2 * 1000;
 const URL_GENERATION_TIMEOUT = 30 * 1000;
 
-const dialogTitle = (environment.isDev() || environment.isNightly()) ?
-  messages.dialogTitle :
-  globalMessages.buyAda;
+const dialogTitle = environment.isDev() || environment.isNightly() ? messages.dialogTitle : globalMessages.buyAda;
 
 @observer
 export default class BuySellDialog extends Component<Props, State> {
@@ -221,7 +221,7 @@ export default class BuySellDialog extends Component<Props, State> {
   onSubmit: () => Promise<void> = async () => {
     const { state, props } = this;
 
-    this.setState({ isSubmitting: true, urlGenerationError: null, });
+    this.setState({ isSubmitting: true, urlGenerationError: null });
     const api = exchangeApiMaker({ isProduction: true, partner: 'yoroi' });
     const manager = exchangeManagerMaker({ api });
 
@@ -237,8 +237,8 @@ export default class BuySellDialog extends Component<Props, State> {
           returnUrl: EXCHANGE_CALLBACK_URL,
           coinAmount: Number(state.amountAda),
           balance: props.currentBalanceAda.toString(),
-        }
-      }
+        },
+      };
     } else {
       params = {
         providerId: 'encryptus',
@@ -250,29 +250,23 @@ export default class BuySellDialog extends Component<Props, State> {
           returnUrl: EXCHANGE_CALLBACK_URL,
           coinAmount: Number(state.amountAda),
           balance: props.currentBalanceAda.toString(),
-        }
-      }
+        },
+      };
     }
 
-    this.urlGenerationTimeout = setTimeout(
-      () => {
-        // may already have failed
+    this.urlGenerationTimeout = setTimeout(() => {
+      // may already have failed
+      if (this.state.urlGenerationError) {
+        return;
+      }
+      this.setState({ urlGenerationError: 'longLoading' });
+      this.urlGenerationTimeout = setTimeout(() => {
         if (this.state.urlGenerationError) {
           return;
         }
-        this.setState({ urlGenerationError: 'longLoading' });
-        this.urlGenerationTimeout = setTimeout(
-          () => {
-            if (this.state.urlGenerationError) {
-              return;
-            }
-            this.setState({ urlGenerationError: 'timeout' });
-          },
-          URL_GENERATION_TIMEOUT - URL_GENERATION_LONG_LOADING_TIMEOUT
-        );
-      },
-      URL_GENERATION_LONG_LOADING_TIMEOUT 
-    );
+        this.setState({ urlGenerationError: 'timeout' });
+      }, URL_GENERATION_TIMEOUT - URL_GENERATION_LONG_LOADING_TIMEOUT);
+    }, URL_GENERATION_LONG_LOADING_TIMEOUT);
 
     let url;
     try {
@@ -293,8 +287,8 @@ export default class BuySellDialog extends Component<Props, State> {
     this.setState({ urlGenerationError: null });
 
     const self = this;
-    chrome.tabs.create({ url: url.href }, (exchangePageTab) => {
-      chrome.tabs.onRemoved.addListener((tabId) => {
+    chrome.tabs.create({ url: url.href }, exchangePageTab => {
+      chrome.tabs.onRemoved.addListener(tabId => {
         if (tabId === exchangePageTab.id) {
           self.setState({ isSubmitting: false });
         }
@@ -307,9 +301,9 @@ export default class BuySellDialog extends Component<Props, State> {
         }
       });
     });
-  }
+  };
 
-  onChangeAmount: (SyntheticInputEvent<HTMLInputElement>) => void = (event) => {
+  onChangeAmount: (SyntheticInputEvent<HTMLInputElement>) => void = event => {
     const { value } = event.target;
 
     if (!value.match(/^\d*$/)) {
@@ -339,17 +333,13 @@ export default class BuySellDialog extends Component<Props, State> {
     })();
 
     this.setState({ amountAda: value, inputError });
-  }
+  };
 
   renderBuySell(): Node {
     const { intl } = this.context;
     const { state, props } = this;
 
-    const [ providerLogo, providerName ] = state.isBuying ? [
-      banxaPng, 'Banxa'
-    ] : [
-      encryptusPng, 'Encryptus'
-    ];
+    const [providerLogo, providerName] = state.isBuying ? [banxaPng, 'Banxa'] : [encryptusPng, 'Encryptus'];
 
     // set a place holder so that when it becomes an error message, the height doesn't change
     let helperText = ' ';
@@ -369,12 +359,11 @@ export default class BuySellDialog extends Component<Props, State> {
             endAdornment: (
               <InputAdornment position="end">
                 <div style={{ position: 'relative' /* so that the balance line can align on the right side */ }}>
-                  <div style={{ marginBottom: '8px', color: '#000' }}>
-                    <img
-                      style={{ marginRight: '8px', borderRadius: '4px', verticalAlign: 'bottom' }}
-                      src={adaPng}
-                      alt=""
-                    />ADA
+                  <div style={{ marginBottom: '8px', color: '#000', display: 'flex' }}>
+                    <img style={{ marginRight: '8px', borderRadius: '4px', verticalAlign: 'bottom' }} src={adaPng} alt="" />
+                    <Typography variant="body2" color="ds.text_gray_medium">
+                      ADA
+                    </Typography>
                   </div>
                   <Box sx={{ position: 'absolute', right: '0px', fontSize: '12px' }}>
                     {intl.formatMessage(messages.currentBalance, { amount: props.currentBalanceAda })}
@@ -401,11 +390,14 @@ export default class BuySellDialog extends Component<Props, State> {
             <img src={providerLogo} alt="" />
           </div>
           <div className="provider-name-fee">
-            <div className="provider-name">{providerName}</div>
-            <div className="provider-fee">2% fee</div>
+            <Typography variant="body2" color="ds.text_gray_medium" className="provider-name">
+              {providerName}
+            </Typography>
+            <Typography variant="body2" color="ds.text_gray_medium" className="provider-fee">
+              2% fee
+            </Typography>
           </div>
         </ProviderRow>
-
 
         <Disclaimer>
           <header>
@@ -425,7 +417,7 @@ export default class BuySellDialog extends Component<Props, State> {
 
     if (urlGenerationError === 'longLoading') {
       const abortUrlGeneration = () => {
-        this.setState({ urlGenerationError: 'aborted', isSubmitting: false, });
+        this.setState({ urlGenerationError: 'aborted', isSubmitting: false });
       };
       return (
         <Dialog
@@ -436,7 +428,7 @@ export default class BuySellDialog extends Component<Props, State> {
         >
           <ErrorPopoutContent>
             <div className="content">
-              <YoroiIcon/>
+              <YoroiIcon />
               <div className="text">{intl.formatMessage(messages.longLoadingDialogText)}</div>
             </div>
           </ErrorPopoutContent>
@@ -446,7 +438,7 @@ export default class BuySellDialog extends Component<Props, State> {
 
     if (urlGenerationError === 'timeout' || urlGenerationError === 'failed') {
       const dismissUrlGenerationError = () => {
-        this.setState({ urlGenerationError: null, isSubmitting: false, });
+        this.setState({ urlGenerationError: null, isSubmitting: false });
       };
 
       return (
@@ -458,14 +450,16 @@ export default class BuySellDialog extends Component<Props, State> {
         >
           <ErrorPopoutContent>
             <div className="content">
-              <FailIcon/>
-              <div className="text">{intl.formatMessage(messages.failDialogText)}</div>
+              <FailIcon />
+              <Typography variant="h1" color="ds.text_gray_medium" className="text">
+                {intl.formatMessage(messages.failDialogText)}
+              </Typography>
             </div>
           </ErrorPopoutContent>
         </Dialog>
       );
     }
-      
+
     return (
       <Dialog
         title={intl.formatMessage(dialogTitle)}
@@ -480,27 +474,28 @@ export default class BuySellDialog extends Component<Props, State> {
             disabled: state.amountAda === '' || state.inputError !== null,
             onClick: this.onSubmit,
             isSubmitting: state.isSubmitting,
-          }
+          },
         ]}
         styleOverride={{ width: '648px' }}
         styleFlags={{ contentNoTopPadding: true }}
       >
-        {environment.isDev() || environment.isNightly() && (
-          <Tabs
-            value={state.isBuying ? 0 : 1}
-            onChange={() => this.setState({ isBuying: !state.isBuying, inputError: null, })}
-            sx={{
-              width: '100%',
-              [`& .${tabsClasses.indicator}`]: {
-                display: 'none',
-              },
-              boxShadow: 'none',
-            }}
-          >
-            <TabItem disableRipple label={intl.formatMessage(globalMessages.buyAda)} />
-            <TabItem disableRipple label={intl.formatMessage(globalMessages.sellAda)} />
-          </Tabs>
-        )}
+        {environment.isDev() ||
+          (environment.isNightly() && (
+            <Tabs
+              value={state.isBuying ? 0 : 1}
+              onChange={() => this.setState({ isBuying: !state.isBuying, inputError: null })}
+              sx={{
+                width: '100%',
+                [`& .${tabsClasses.indicator}`]: {
+                  display: 'none',
+                },
+                boxShadow: 'none',
+              }}
+            >
+              <TabItem disableRipple label={intl.formatMessage(globalMessages.buyAda)} />
+              <TabItem disableRipple label={intl.formatMessage(globalMessages.sellAda)} />
+            </Tabs>
+          ))}
         {this.renderBuySell()}
       </Dialog>
     );
