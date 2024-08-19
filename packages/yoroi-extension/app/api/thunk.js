@@ -201,12 +201,13 @@ export async function signAndBroadcastTransaction(
     publicDeriverId: number,
   |}
 ): Promise<{| txId: string |}> {
-  const txBody = request.signRequest.unsignedTx.build();
+  const tx = request.signRequest.unsignedTx.build_tx();
+  const txBody = tx.body();
   const txHash = RustModule.WalletV4.hash_transaction(txBody);
 
   const serializableRequest: SignAndBroadcastTransactionRequestType = {
     senderUtxos: request.signRequest.senderUtxos,
-    unsignedTx: txBody.to_hex(),
+    unsignedTx: tx.to_hex(),
     metadata: request.signRequest.metadata?.to_hex(),
     neededHashes: [...request.signRequest.neededStakingKeyHashes.neededHashes],
     wits: [...request.signRequest.neededStakingKeyHashes.wits],
@@ -214,6 +215,7 @@ export async function signAndBroadcastTransaction(
     publicDeriverId: request.publicDeriverId,
     txHash: txHash.to_hex(),
   };
+  tx.free();
   txBody.free();
   txHash.free();
   const result = await callBackground({
