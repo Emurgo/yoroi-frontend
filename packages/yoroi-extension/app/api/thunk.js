@@ -381,7 +381,7 @@ const callbacks = Object.freeze({
 });
 chrome.runtime.onMessage.addListener(async (message, _sender, _sendResponse) => {
   //fixme: verify sender.id/origin
-  console.log('get message from background:', JSON.stringify(message, null, 2));
+  Logger.debug('get message from background:', JSON.stringify(message, null, 2));
 
   if (message.type === 'wallet-state-update') {
     if (message.params.newTxs) {
