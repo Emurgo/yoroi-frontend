@@ -725,7 +725,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   position: 'absolute',
                   top: '-8px',
                   left: '6px',
-                  backgroundColor: 'common.white',
+                  backgroundColor: 'ds.bg_color_min',
                   paddingX: '4px',
                   color: shouldSendAll && 'grayscale.200',
                   fontWeight: 400,
