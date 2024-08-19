@@ -25,8 +25,6 @@ import { getWalletChecksum } from '../../../../../app/api/export/utils';
 import type CardanoTxRequest from '../../../../../app/api/ada';
 import type { RemoteUnspentOutput } from '../../../../../app/api/ada/lib/state-fetch/types';
 import {
-  APIErrorCodes,
-  ConnectorError,
   DataSignErrorCodes,
   TxSignErrorCodes,
   type WalletAuthEntry,
@@ -154,19 +152,13 @@ export const UserSignConfirm: HandlerType<
   handle: async (request) => {
     const connection = await getConnectedSite(request.tabId);
     if (connection == null) {
-      // fixme: should response with `rpcResponse`
-      throw new ConnectorError({
-        code: APIErrorCodes.API_INTERNAL_ERROR,
-        info: 'Connection has failed. Please retry.',
-      });
+      console.error('Handling user sign confirmation but lost connection to dApp site.');
+      return;
     }
     const responseData = connection.pendingSigns[String(request.uid)];
     if (!responseData) {
-      // fixme: should response with `rpcResponse`
-      throw new ConnectorError({
-        code: APIErrorCodes.API_INTERNAL_ERROR,
-        info: `Sign request data is not available after confirmation (uid=${request.uid}). Please retry.`,
-      });
+      console.error('Handling user sign confirmation but signing request is unexpectedly missing..');
+      return;
     }
 
     const wallet = await getConnectedWallet(request.tabId, false);
