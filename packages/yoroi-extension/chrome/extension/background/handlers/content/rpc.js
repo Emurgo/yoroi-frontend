@@ -655,7 +655,9 @@ function sendRpcResponse(response: Object, tabId: number, messageUid: number) {
     {
       type: 'connector_rpc_response',
       uid: messageUid,
-      return: response
+      return: response,
+      // the content script expects this:
+      protocol: 'cardano',
     }
   );
 }

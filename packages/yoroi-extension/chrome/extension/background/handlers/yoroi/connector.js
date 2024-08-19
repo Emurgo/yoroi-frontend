@@ -42,6 +42,23 @@ import { Logger } from '../../../../../app/utils/logging';
 
 type RpcUid = number;
 
+function rpcResponse(
+  tabId: number,
+  uid: RpcUid,
+  response: {| ok: any |} | {| err: any |}
+) {
+  sendToInjector(
+    tabId,
+    {
+      type: 'connector_rpc_response',
+      uid,
+      return: response,
+      protocol: 'cardano',
+    }
+  );
+};
+
+
 export const UserConnectResponse: HandlerType<
   {|
     accepted: true,
@@ -135,17 +152,6 @@ export const UserSignConfirm: HandlerType<
   typeTag: 'user-sign-confirm',
 
   handle: async (request) => {
-    const rpcResponse = (response: {| ok: any |} | {| err: any |}) => {
-      sendToInjector(
-        request.tabId,
-        {
-          type: 'connector_rpc_response',
-          uid: request.uid,
-          return: response
-        }
-      );
-    };
-
     const connection = await getConnectedSite(request.tabId);
     if (connection == null) {
       // fixme: should response with `rpcResponse`
@@ -187,12 +193,12 @@ export const UserSignConfirm: HandlerType<
           resp = { err: 'transaction signing failed' };
         }
         if (responseData.continuationData.type !== 'cardano-tx') {
-          rpcResponse({ err: 'unexpected error' });
+          rpcResponse(request.tabId, request.uid, { err: 'unexpected error' });
           return;
         }
         const { tx, returnTx } = responseData.continuationData;
         if (resp?.ok == null) {
-          rpcResponse(resp);
+          rpcResponse(request.tabId, request.uid, resp);
         } else {
           const resultWitnessSetHex: string = resp.ok;
           if (returnTx) {
@@ -221,10 +227,10 @@ export const UserSignConfirm: HandlerType<
                   true,
                 );
               }
-              rpcResponse({ ok: fullTx.to_hex() });
+              rpcResponse(request.tabId, request.uid, { ok: fullTx.to_hex() });
             });
           } else {
-            rpcResponse({ ok: resultWitnessSetHex });
+            rpcResponse(request.tabId, request.uid, { ok: resultWitnessSetHex });
           }
         }
       }
@@ -232,7 +238,7 @@ export const UserSignConfirm: HandlerType<
       case 'data':
       {
         if (responseData.continuationData.type !== 'cardano-data') {
-          rpcResponse({ err: 'unexpected error' });
+          rpcResponse(request.tabId, request.uid, { err: 'unexpected error' });
           return;
         }
         const { address, payload } = responseData.continuationData;
@@ -252,6 +258,8 @@ export const UserSignConfirm: HandlerType<
         } catch (error) {
           Logger.error(`error when signing data ${error}`);
           rpcResponse(
+            request.tabId,
+            request.uid,
             {
               err: {
                 code: DataSignErrorCodes.DATA_SIGN_PROOF_GENERATION,
@@ -261,13 +269,13 @@ export const UserSignConfirm: HandlerType<
           );
           return;
         }
-        rpcResponse({ ok: dataSig });
+        rpcResponse(request.tabId, request.uid, { ok: dataSig });
       }
         break;
       case 'tx-reorg/cardano':
       {
         if (responseData.continuationData.type !== 'cardano-reorg-tx') {
-          rpcResponse({ err: 'unexpected error' });
+          rpcResponse(request.tabId, request.uid, { err: 'unexpected error' });
           return;
         }
         const { isCBOR } = responseData.continuationData;
@@ -276,7 +284,7 @@ export const UserSignConfirm: HandlerType<
           [...(request.tx: any)],
           isCBOR
         );
-        rpcResponse({ ok: utxos });
+        rpcResponse(request.tabId, request.uid, { ok: utxos });
       }
         break;
       default:
@@ -305,16 +313,13 @@ export const UserSignReject: HandlerType<
         ? DataSignErrorCodes.DATA_SIGN_USER_DECLINED
         : TxSignErrorCodes.USER_DECLINED;
 
-      sendToInjector(
+      rpcResponse(
         request.tabId,
+        request.uid,
         {
-          type: 'connector_rpc_response',
-          uid: request.uid,
-          return: {
-            err: {
-              code,
-              info: 'User rejected'
-            },
+          err: {
+            code,
+            info: 'User rejected'
           },
         }
       );
@@ -346,16 +351,13 @@ export const SignFail: HandlerType<
         ? DataSignErrorCodes.DATA_SIGN_PROOF_GENERATION
         : TxSignErrorCodes.PROOF_GENERATION;
 
-      sendToInjector(
+      rpcResponse(
         request.tabId,
+        request.uid,
         {
-          type: 'connector_rpc_response',
-          uid: request.uid,
-          return: {
-            err: {
-              code,
-              info: `utxo error: ${request.errorType} (${request.data})`
-            },
+          err: {
+            code,
+            info: `utxo error: ${request.errorType} (${request.data})`
           },
         }
       );
