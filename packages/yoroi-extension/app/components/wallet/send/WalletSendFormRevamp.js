@@ -224,6 +224,12 @@ type Props = {|
   +trezorSend: TrezorSendActions,
 |};
 
+const SMemoTextField = styled(MemoTextField)(({ theme }) => ({
+  'input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active': {
+    WebkitBoxShadow: `0 0 0 30px ${theme.palette.ds.bg_color_min} inset !important`,
+  },
+}));
+
 type State = {|
   currentStep: number,
   invalidMemo: boolean,
@@ -628,7 +634,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               ) : null}
             </Box>
             <Box sx={{ position: 'relative', mt: '8px' }}>
-              <MemoTextField
+              <SMemoTextField
                 onChange={e => this.onUpdateMemo(e.target.value)}
                 helperText={
                   invalidMemo
