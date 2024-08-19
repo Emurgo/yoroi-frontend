@@ -28,7 +28,6 @@ import type { TransactionExportRow } from '../../api/export';
 import type { HistoryRequest } from '../../api/ada/lib/state-fetch/types';
 import appConfig from '../../config';
 import { refreshTransactions } from '../../api/thunk';
-import type { LastSyncInfoRow, } from '../../api/ada/lib/storage/database/walletTypes/core/tables';
 import type { WalletState } from '../../../chrome/extension/background/types';
 
 type TxHistoryState = {|
@@ -160,7 +159,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   // various actions that need to be performed after getting new transactions
   _afterLoadingNewTxs: (
     Array<WalletTransaction>,
-    { networkId: number, publicDeriverId: number, ... },
+    WalletState
   ) => Promise<void> = async (result, publicDeriver) => {
     const timestamps: Set<number> = new Set();
     const remoteTransactionIds: Set<string> = new Set();
@@ -186,14 +185,15 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       defaultToken: ticker,
     });
 
-    // reload token info cache
-    // todo: use fetchMissingTokenInfo to fetch only missing tokens
-    await this.stores.tokenInfoStore.refreshTokenInfo();
+    await Promise.all([
+      // reload token info cache
+      // todo: use fetchMissingTokenInfo to fetch only missing tokens
+      this.stores.tokenInfoStore.refreshTokenInfo(),
+      this.stores.addresses.refreshAddressesFromDb(publicDeriver)
+    ]);
   }
 
-  @action _loadMore: (
-    { networkId: number, publicDeriverId: number, ... },
-  ) => Promise<void> = async (publicDeriver) => {
+  @action _loadMore: (WalletState) => Promise<void> = async (publicDeriver) => {
     const { publicDeriverId } = publicDeriver;
     const state = this.getTxHistoryState(publicDeriverId);
     const { tailRequest } = state.requests;
@@ -218,12 +218,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   }
 
   /** Add a new public deriver to track and refresh the data */
-  @action addObservedWallet: ({
-    publicDeriverId: number,
-    lastSyncInfo: $ReadOnly<LastSyncInfoRow>,
-    networkId: number,
-    ...
-  }) => void = (
+  @action addObservedWallet: (WalletState) => void = (
     publicDeriver
   ) => {
     const { publicDeriverId } = publicDeriver;
@@ -550,11 +545,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   // the wallet store gets update of new transactions and calls this function to display them
   async updateNewTransactions(
     newTxs: Array<WalletTransaction>,
-    publicDeriver: {
-      publicDeriverId: number,
-      networkId: number,
-      ...
-    },
+    publicDeriver: WalletState,
   ): Promise<void> {
     const { txs } = this.getTxHistoryState(publicDeriver.publicDeriverId);
     runInAction(() => {

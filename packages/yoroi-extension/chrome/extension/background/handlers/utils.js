@@ -257,6 +257,18 @@ export async function getPlaceHolderWalletState(publicDeriver: PublicDeriver<>):
 
   const zero = new MultiToken([], { defaultNetworkId: network.NetworkId, defaultIdentifier: '' });
 
+  const allAddressesByType = [];
+  const externalAddressesByType = [];
+  const internalAddressesByType = [];
+
+  for (const typeName of Object.keys(CoreAddressTypes)) {
+    const addrType = CoreAddressTypes[typeName];
+
+    allAddressesByType[addrType] = [];
+    externalAddressesByType[addrType] = [];
+    internalAddressesByType[addrType] = [];
+  }
+
   return {
     publicDeriverId,
     conceptualWalletId: publicDeriver.getParent().getConceptualWalletId(),
@@ -292,10 +304,10 @@ export async function getPlaceHolderWalletState(publicDeriver: PublicDeriver<>):
     assetDeposits: zero,
     defaultTokenId: '',
     assuranceMode: assuranceModes.NORMAL,
-    allAddressesByType: [],
+    allAddressesByType,
     foreignAddresses: [],
-    externalAddressesByType: [],
-    internalAddressesByType: [],
+    externalAddressesByType,
+    internalAddressesByType,
     allAddresses: { utxoAddresses: [], accountingAddresses: [] },
     allUtxoAddresses: [],
     isBip44Wallet: publicDeriver.getParent() instanceof Bip44Wallet,
