@@ -269,6 +269,12 @@ export async function getPlaceHolderWalletState(publicDeriver: PublicDeriver<>):
     internalAddressesByType[addrType] = [];
   }
 
+  const withStakingKey = asGetStakingKey(publicDeriver);
+  if (withStakingKey == null) {
+    throw new Error('unexpected missing asGetAllAccounting result');
+  }
+  const stakingKeyDbRow = await withStakingKey.getStakingKey();
+
   return {
     publicDeriverId,
     conceptualWalletId: publicDeriver.getParent().getConceptualWalletId(),
@@ -290,8 +296,8 @@ export async function getPlaceHolderWalletState(publicDeriver: PublicDeriver<>):
     },
     pathToPublic: [],
     signingKeyUpdateDate: null,
-    stakingAddressing: { addressing: { path: [], startLevel: 0 } },
-    stakingAddress: '',
+    stakingAddressing: { addressing: stakingKeyDbRow.addressing },
+    stakingAddress: stakingKeyDbRow.addr.Hash,
     publicDeriverLevel: 0,
     lastSyncInfo: {
       LastSyncInfoId: 0,
