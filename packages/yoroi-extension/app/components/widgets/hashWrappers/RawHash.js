@@ -5,8 +5,7 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import classnames from 'classnames';
 import styles from './RawHash.scss';
-import { Box } from '@mui/material';
-import { Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
 type Props = {|
   +children: ?Node,

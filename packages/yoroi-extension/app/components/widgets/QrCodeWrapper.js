@@ -1,7 +1,5 @@
 // @flow
-import React from 'react';
 import type { Node } from 'react';
-import { observer } from 'mobx-react';
 import QRCode from 'qrcode.react';
 import { readCssVar } from '../../styles/utils';
 import { useTheme } from '@mui/material';

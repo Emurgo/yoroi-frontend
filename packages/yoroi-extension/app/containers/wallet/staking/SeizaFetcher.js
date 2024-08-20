@@ -11,7 +11,7 @@ import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import { observer } from 'mobx-react';
 import { withLayout } from '../../../styles/context/layout';
 import type { Layouts } from '../../../styles/context/layout';
-import { Box, styled, useTheme } from '@mui/material';
+import { Box, useTheme } from '@mui/material';
 
 export type SocialLinks = {|
   tw?: string,
@@ -52,14 +52,6 @@ type InjectedProps = {|
 |};
 
 type AllProps = {| ...Props, ...InjectedProps |};
-
-const StyledIframe = styled('iframe')(({ theme }) => ({
-  backgroundColor: theme.palette.ds.bg_color_min,
-  filter: 'invert(0.9) hue-rotate(180deg)',
-  width: '100%',
-  height: '100%',
-  border: 'none',
-}));
 
 @observer
 class SeizaFetcher extends Component<AllProps> {

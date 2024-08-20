@@ -8,8 +8,7 @@ import { ReactComponent as InvalidURIImg } from '../../../assets/images/uri/inva
 import VerticallyCenteredLayout from '../../layout/VerticallyCenteredLayout';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { Box } from '@mui/material';
-import { Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
 type Props = {|
   +message: Node,

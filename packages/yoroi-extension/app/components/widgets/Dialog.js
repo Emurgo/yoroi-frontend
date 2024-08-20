@@ -2,9 +2,8 @@
 // @flow
 import type { Node, Element, ComponentType } from 'react';
 import React, { forwardRef, useEffect, useState } from 'react';
-import classnames from 'classnames';
 import { map } from 'lodash';
-import { Modal, Typography, alpha, Button } from '@mui/material';
+import { Modal, Typography, Button } from '@mui/material';
 import { Box, styled } from '@mui/system';
 import { LoadingButton } from '@mui/lab';
 import { withLayout } from '../../styles/context/layout';
@@ -163,11 +162,6 @@ function Dialog(props: Props & InjectedProps): Node {
         {hasActions && (
           <ModalFooter hasDivider={forceBottomDivider || contentHasScroll}>
             {map(actions, (action, i: number) => {
-              const buttonClasses = classnames([
-                // Keep classnames for testing
-                action.className != null ? action.className : null,
-                action.primary === true ? 'primary' : 'secondary',
-              ]);
               const buttonLabel = action.label.toLowerCase().replace(/ /gi, '');
               return (
                 <LoadingButton

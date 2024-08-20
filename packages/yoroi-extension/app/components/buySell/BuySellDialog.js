@@ -9,8 +9,7 @@ import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 
 import globalMessages from '../../i18n/global-messages';
-import { Box } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { Box, Typography, styled } from '@mui/material';
 import Tab, { tabClasses } from '@mui/material/Tab';
 import Tabs, { tabsClasses } from '@mui/material/Tabs';
 import TextField from '@mui/material/TextField';
@@ -24,7 +23,6 @@ import { ReactComponent as YoroiIcon } from '../../assets/images/yoroi-logo-shap
 import { ReactComponent as FailIcon } from '../../assets/images/service-unavailable-error.svg';
 import { exchangeApiMaker, exchangeManagerMaker } from '@yoroi/exchange';
 import environment from '../../environment';
-import { Typography } from '@mui/material';
 
 declare var chrome;
 
