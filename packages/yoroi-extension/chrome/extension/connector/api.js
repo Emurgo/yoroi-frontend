@@ -85,7 +85,7 @@ import {
   derivePrivateByAddressing,
   derivePublicByAddressing
 } from '../../../app/api/ada/lib/cardanoCrypto/deriveByAddressing';
-import { transactionHexToHash } from '../../../app/api/ada/lib/cardanoCrypto/utils';
+import { pubKeyHashToRewardAddress, transactionHexToHash } from '../../../app/api/ada/lib/cardanoCrypto/utils';
 import { sendTx } from '../../../app/api/ada/lib/state-fetch/remoteFetcher';
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
@@ -450,6 +450,18 @@ async function _getDRepKeyAndAddressing(
     ChainDerivations.GOVERNANCE_DREP_KEYS,
     DREP_KEY_INDEX,
   );
+}
+
+export async function getDrepRewardAddressHexAndAddressing(
+  wallet: PublicDeriver<>,
+): Promise<[string, Addressing]> {
+  const [pubKey, addressing] = await __pubKeyAndAddressingByChainAndIndex(
+    wallet,
+    ChainDerivations.GOVERNANCE_DREP_KEYS,
+    DREP_KEY_INDEX,
+  );
+  const network = getCardanoHaskellBaseConfig(wallet.getParent().getNetworkInfo()).ChainNetworkId;
+  return [pubKeyHashToRewardAddress(pubKey.hash().to_hex(), network), addressing];
 }
 
 export async function connectorGetStakeKey(
