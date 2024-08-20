@@ -10,8 +10,6 @@ import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner
 import IncorrectTimeBanner from '../../components/topbar/banners/IncorrectTimeBanner';
 import environment from '../../environment';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
-import { isTestnet, isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import { getTokenName, genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../utils/formatters';
 
@@ -22,9 +20,7 @@ export default class BannerContainer extends Component<StoresAndActionsProps> {
     const serverStatus = this.props.stores.serverConnectionStore.checkAdaServerStatus;
 
     const { selected } = this.props.stores.wallets;
-    const isWalletTestnet = selected == null
-      ? false
-      : isTestnet(selected.getParent().getNetworkInfo());
+    const isWalletTestnet = Boolean(selected && selected.isTestnet);
 
     const deprecationBanner = this.getDeprecationBanner();
     return (
@@ -50,13 +46,16 @@ export default class BannerContainer extends Component<StoresAndActionsProps> {
     if (selected == null) {
       return null;
     }
-    if (!isCardanoHaskell(selected.getParent().getNetworkInfo())) {
+    if (!selected.isCardanoHaskell) {
       return null;
     }
-    if (!(selected.getParent() instanceof Bip44Wallet)) {
+    if (!selected.isBip44Wallet) {
       return null;
     }
-    const defaultToken = selected.getParent().getDefaultToken();
+    const defaultToken = {
+      defaultNetworkId: selected.networkId,
+      defaultIdentifier: selected.defaultTokenId,
+    };
     const defaultTokenInfo = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)({
       identifier: defaultToken.defaultIdentifier,
       networkId: defaultToken.defaultNetworkId,

@@ -50,7 +50,6 @@ import { CannotSendBelowMinimumValueError } from '../../../api/common/errors';
 import { getImageFromTokenMetadata } from '../../../utils/nftMetadata';
 import WalletSendPreviewStepContainer from './WalletSendFormSteps/WalletSendPreviewStepContainer';
 import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
-import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import { ampli } from '../../../../ampli/index';
 import type { DomainResolverFunc, DomainResolverResponse } from '../../../stores/ada/AdaAddressesStore';
 import { isResolvableDomain } from '@yoroi/resolver';
@@ -59,6 +58,7 @@ import TrezorSendActions from '../../../actions/ada/trezor-send-actions';
 import LedgerSendActions from '../../../actions/ada/ledger-send-actions';
 import type { SendMoneyRequest } from '../../../stores/toplevel/WalletStore';
 import type { MaxSendableAmountRequest } from '../../../stores/toplevel/TransactionBuilderStore';
+import type { WalletState } from '../../../../chrome/extension/background/types';
 import LoadingSpinner from '../../widgets/LoadingSpinner';
 
 const messages = defineMessages({
@@ -164,7 +164,7 @@ type Props = {|
     onClose: () => void,
   |},
   +selectedNetwork: $ReadOnly<NetworkRow>,
-  +selectedWallet: PublicDeriver<>,
+  +selectedWallet: WalletState,
   +selectedExplorer: Map<number, SelectedExplorer>,
   +hasAnyPending: boolean,
   +onSubmit: void => void,
@@ -214,7 +214,11 @@ type Props = {|
   +sendMoneyRequest: SendMoneyRequest,
   +sendMoney: (params: {|
     password: string,
-    publicDeriver: PublicDeriver<>,
+    +wallet: {
+      publicDeriverId: number,
+      +plate: { TextPart: string, ... },
+      ...
+    },
     signRequest: ISignRequest<any>,
     onSuccess?: void => void,
   |}) => Promise<void>,

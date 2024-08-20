@@ -21,22 +21,19 @@ import {
 import {
   convertToLocalizableError as trezorErrorToLocalized
 } from '../../domain/TrezorLocalizedError';
-import {
-  isTrezorTWallet,
-  isLedgerNanoWallet,
-} from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import {
-  PublicDeriver,
-} from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { normalizeToAddress, } from '../../api/ada/lib/storage/bridge/utils';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import {
+  getNetworkById,
+  getCardanoHaskellBaseConfig,
+} from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { toTrezorAddressParameters } from '../../api/ada/transactions/shelley/trezorTx';
 import { toLedgerAddressParameters } from '../../api/ada/transactions/shelley/ledgerTx';
 import type { StandardAddress } from '../../types/AddressFilterTypes';
 import { genAddressingLookup } from '../stateless/addressStores';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import type { WalletState } from '../../../chrome/extension/background/types';
 
 export default class HWVerifyAddressStore extends Store<StoresMap, ActionsMap> {
   @observable isActionProcessing: boolean = false;
@@ -52,8 +49,8 @@ export default class HWVerifyAddressStore extends Store<StoresMap, ActionsMap> {
     actions.closeAddressDetailDialog.listen(this._closeAddressDetailDialog);
   }
 
-  @action _verifyAddress: (PublicDeriver<>) => Promise<void> = async (
-    publicDeriver,
+  @action _verifyAddress: (WalletState) => Promise<void> = async (
+    wallet,
   ) => {
     Logger.info(`${nameof(HWVerifyAddressStore)}::${nameof(this._verifyAddress)} called`);
 
@@ -70,15 +67,13 @@ export default class HWVerifyAddressStore extends Store<StoresMap, ActionsMap> {
     const path = toJS(selectedAddress.addressing.path);
     const address = toJS(selectedAddress.address);
 
-    const conceptualWallet = publicDeriver.getParent();
-
     this._setError(null);
     this._setActionProcessing(true);
 
-    if (isLedgerNanoWallet(conceptualWallet)) {
-      await this.ledgerVerifyAddress(path, address, publicDeriver);
-    } else if (isTrezorTWallet(conceptualWallet)) {
-      await this.trezorVerifyAddress(path, address, publicDeriver.getParent().getNetworkInfo());
+    if (wallet.type === 'ledger') {
+      await this.ledgerVerifyAddress(path, address, wallet);
+    } else if (wallet.type === 'trezor') {
+      await this.trezorVerifyAddress(path, address, getNetworkById(wallet.networkId));
     } else {
       throw new Error(`${nameof(HWVerifyAddressStore)}::${nameof(this._verifyAddress)} called with unrecognized hardware wallet`);
     }
@@ -114,10 +109,10 @@ export default class HWVerifyAddressStore extends Store<StoresMap, ActionsMap> {
     }
   }
 
-  ledgerVerifyAddress: (BIP32Path, string, PublicDeriver<>) => Promise<void> = async (
+  ledgerVerifyAddress: (BIP32Path, string, WalletState) => Promise<void> = async (
     path,
     expectedAddr,
-    publicDeriver,
+    wallet,
   ) => {
     try {
       this.ledgerConnect = new LedgerConnect({
@@ -127,7 +122,7 @@ export default class HWVerifyAddressStore extends Store<StoresMap, ActionsMap> {
       Logger.info(`${nameof(HWVerifyAddressStore)}::${nameof(this.ledgerVerifyAddress)} show path ` + JSON.stringify(path));
 
       const config = getCardanoHaskellBaseConfig(
-        publicDeriver.getParent().getNetworkInfo()
+        getNetworkById(wallet.networkId)
       ).reduce((acc, next) => Object.assign(acc, next), {});
 
       const wasmAddr = normalizeToAddress(expectedAddr);
@@ -136,10 +131,10 @@ export default class HWVerifyAddressStore extends Store<StoresMap, ActionsMap> {
         address: wasmAddr,
         path,
         networkId: Number.parseInt(config.ChainNetworkId, 10),
-        addressingMap: genAddressingLookup(publicDeriver, this.stores.addresses.addressSubgroupMap),
+        addressingMap: genAddressingLookup(wallet.networkId, this.stores.addresses.addressSubgroupMap),
       });
 
-      const expectedSerial = publicDeriver.getParent().hardwareInfo?.DeviceId || '';
+      const expectedSerial = wallet.hardwareWalletDeviceId || '';
       if (this.ledgerConnect) {
         await this.ledgerConnect.showAddress({
           params: {

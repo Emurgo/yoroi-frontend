@@ -5,20 +5,17 @@ import { observer } from 'mobx-react';
 import WalletSendPreviewStep from './WalletSendPreviewStep';
 import type { UnitOfAccountSettingType } from '../../../../types/unitOfAccountType';
 import LocalizableError from '../../../../i18n/LocalizableError';
-import { PublicDeriver } from '../../../../api/ada/lib/storage/models/PublicDeriver/index';
 import { SelectedExplorer } from '../../../../domain/SelectedExplorer';
 import { addressToDisplayString } from '../../../../api/ada/lib/storage/bridge/utils';
 import type { ISignRequest } from '../../../../api/common/lib/transactions/ISignRequest';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import type { MultiToken, TokenLookupKey } from '../../../../api/common/lib/MultiToken';
-import {
-  isLedgerNanoWallet,
-  isTrezorTWallet,
-} from '../../../../api/ada/lib/storage/models/ConceptualWallet';
 import { ampli } from '../../../../../ampli/index';
 import TrezorSendActions from '../../../../actions/ada/trezor-send-actions';
 import LedgerSendActions from '../../../../actions/ada/ledger-send-actions';
 import type { SendMoneyRequest } from '../../../../stores/toplevel/WalletStore';
+import { getNetworkById } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
+import type { WalletState } from '../../../../../chrome/extension/background/types';
 
 // TODO: unmagic the constants
 const MAX_VALUE_BYTES = 5000;
@@ -43,7 +40,11 @@ type Props = {|
   +sendMoneyRequest: SendMoneyRequest,
   +sendMoney: (params: {|
     password: string,
-    publicDeriver: PublicDeriver<>,
+    +wallet: {
+      publicDeriverId: number,
+      +plate: { TextPart: string, ... },
+      ...
+    },
     signRequest: ISignRequest<any>,
     onSuccess?: void => void,
   |}) => Promise<void>,
@@ -52,7 +53,7 @@ type Props = {|
   +ledgerSend: LedgerSendActions,
   +trezorSend: TrezorSendActions,
   selectedExplorer: Map<number, SelectedExplorer>,
-  selectedWallet: PublicDeriver<>,
+  +selectedWallet: WalletState,
   receiverHandle: ?{|
     nameServer: string,
     handle: string,
@@ -71,32 +72,30 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
     const { signRequest, openTransactionSuccessDialog } = this.props;
     const { ledgerSend, trezorSend, sendMoney, selectedWallet } = this.props;
 
-    if (selectedWallet == null) throw new Error(`Unexpected missing active wallet`);
     if (signRequest == null) throw new Error('Unexpected missing active signing request');
 
     ampli.sendSummarySubmitted({
       asset_count: signRequest.totalInput().nonDefaultEntries().length,
     });
 
-    const walletType = this. _getWalletType(selectedWallet);
-    if (walletType === 'ledger') {
+    if (selectedWallet.type === 'ledger') {
       await ledgerSend.sendUsingLedgerWallet.trigger({
         params: { signRequest },
-        publicDeriver: selectedWallet,
         onSuccess: openTransactionSuccessDialog,
-      });
-    } else if (walletType === 'trezor') {
+        wallet: selectedWallet,
+     });
+    } else if (selectedWallet.type === 'trezor') {
       await trezorSend.sendUsingTrezor.trigger({
         params: { signRequest },
-        publicDeriver: selectedWallet,
         onSuccess: openTransactionSuccessDialog,
+        wallet: selectedWallet,
       });
     } else {
       // walletType === 'mnemonic'
       await sendMoney({
         signRequest,
         password,
-        publicDeriver: selectedWallet,
+        wallet: selectedWallet,
         onSuccess: openTransactionSuccessDialog,
       });
     }
@@ -128,13 +127,14 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
     const showSize =
       size != null && (size.full > MAX_TX_BYTES - 1000 || maxOutput > MAX_VALUE_BYTES - 1000);
     const receivers = signRequest.receivers(false);
+    const network = getNetworkById(selectedWallet.networkId);
 
     return (
       <WalletSendPreviewStep
         receiverHandle={receiverHandle}
         staleTx={this.props.staleTx}
         selectedExplorer={
-          selectedExplorer.get(selectedWallet.getParent().getNetworkInfo().NetworkId) ??
+          selectedExplorer.get(selectedWallet.networkId) ??
           (() => {
             throw new Error('No explorer for wallet network');
           })()
@@ -154,30 +154,16 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
         isSubmitting={sendMoneyRequest.isExecuting}
         classicTheme={isClassicTheme}
         unitOfAccountSetting={unitOfAccountSetting}
-        addressToDisplayString={addr =>
-          addressToDisplayString(addr, selectedWallet.getParent().getNetworkInfo())
-        }
-        selectedNetwork={selectedWallet.getParent().getNetworkInfo()}
+        addressToDisplayString={addr => addressToDisplayString(addr, network)}
+        selectedNetwork={network}
         isDefaultIncluded={this.props.isDefaultIncluded}
         plannedTxInfoMap={this.props.plannedTxInfoMap}
         minAda={this.props.minAda}
-        walletType={this._getWalletType(selectedWallet)}
+        walletType={selectedWallet.type}
         ledgerSendError={this.props.ledgerSendError}
         trezorSendError={this.props.trezorSendError}
         onUpdateStep={onUpdateStep}
       />
     );
-  }
-
-  _getWalletType(selectedWallet: PublicDeriver<>): 'trezor' | 'ledger' | 'mnemonic' {
-    const conceptualWallet = selectedWallet.getParent();
-
-    if (isTrezorTWallet(conceptualWallet)) {
-      return 'trezor';
-    }
-    if (isLedgerNanoWallet(conceptualWallet)) {
-      return 'ledger';
-    }
-    return 'mnemonic';
   }
 }

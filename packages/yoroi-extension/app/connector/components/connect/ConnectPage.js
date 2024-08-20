@@ -15,11 +15,10 @@ import ConnectedWallet from './ConnectedWallet';
 import globalMessages, { connectorMessages } from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
-import type { PublicDeriverCache, ConnectingMessage } from '../../../../chrome/extension/connector/types';
+import type { ConnectingMessage } from '../../../../chrome/extension/connector/types';
 import { LoadingWalletStates } from '../../types';
 import ProgressBar from '../ProgressBar';
 import { environment } from '../../../environment';
-import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
 import { Box } from '@mui/system';
 import TextField from '../../../components/common/TextField';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
@@ -32,6 +31,7 @@ import { ReactComponent as IconEyeOpen } from '../../../assets/images/my-wallets
 import { ReactComponent as IconEyeClosed } from '../../../assets/images/my-wallets/icon_eye_closed.inline.svg';
 import { withLayout } from '../../../styles/context/layout';
 import AmountDisplay from '../../../components/common/AmountDisplay';
+import type { WalletState } from '../../../../chrome/extension/background/types';
 
 const messages = defineMessages({
   subtitle: {
@@ -77,27 +77,26 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +publicDerivers: Array<PublicDeriverCache>,
+  +publicDerivers: Array<WalletState>,
   +loading: $Values<typeof LoadingWalletStates>,
   +error: string,
   +isAppAuth: boolean,
   +hidePasswordForm: void => void,
-  +onConnect: (deriver: PublicDeriver<>, checksum: ?WalletChecksum, password: ?string) => Promise<void>,
+  +onConnect: (deriver: WalletState, checksum: ?WalletChecksum, password: ?string) => Promise<void>,
   +onCancel: void => void,
   +selectedWallet: {|
     index: number,
-    deriver: ?PublicDeriver<>,
+    deriver: ?WalletState,
     checksum: ?WalletChecksum,
   |},
   +message: ?ConnectingMessage,
-  +onSelectWallet: (PublicDeriver<>, ?WalletChecksum) => void,
+  +onSelectWallet: (WalletState, ?WalletChecksum) => void,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +network: string,
   +shouldHideBalance: boolean,
   +unitOfAccount: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?string,
   +onUpdateHideBalance: void => Promise<void>,
-  +isSelectWalletHardware: boolean,
 |};
 
 type InjectedProps = {| +isRevampLayout: boolean |};
@@ -187,8 +186,8 @@ class ConnectPage extends Component<Props & InjectedProps> {
       shouldHideBalance,
       isAppAuth,
       onUpdateHideBalance,
-      isSelectWalletHardware,
       isRevampLayout,
+      selectedWallet,
     } = this.props;
     const isNightly = environment.isNightly();
     const componentClasses = classNames([styles.component, isNightly && styles.isNightly]);
@@ -196,6 +195,7 @@ class ConnectPage extends Component<Props & InjectedProps> {
     const isLoading = loading === LoadingWalletStates.IDLE || loading === LoadingWalletStates.PENDING;
     const isSuccess = loading === LoadingWalletStates.SUCCESS;
     const isError = loading === LoadingWalletStates.REJECTED;
+    const isSelectWalletHardware = selectedWallet.deriver?.type !== 'mnemonic';
 
     const url = message?.url ?? '';
     const faviconUrl = message?.imgBase64Url;
@@ -310,8 +310,8 @@ class ConnectPage extends Component<Props & InjectedProps> {
 
                   <ul className={styles.list}>
                     {publicDerivers.map((wallet, idx) => (
-                      <li key={wallet.publicDeriver.getPublicDeriverId()} className={styles.listItem}>
-                        <WalletButton onClick={() => onSelectWallet(wallet.publicDeriver, wallet.checksum)}>
+                      <li key={wallet.publicDeriverId} className={styles.listItem}>
+                        <WalletButton onClick={() => onSelectWallet(wallet, wallet.plate)}>
                           <ConnectedWallet
                             publicDeriver={wallet}
                             walletBalance={

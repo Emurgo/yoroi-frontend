@@ -3,7 +3,6 @@
 import type { Node } from 'react';
 import type { MultiToken, TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import type { ConceptualWalletSettingsCache } from '../../../stores/toplevel/WalletSettingsStore';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { Component } from 'react';
@@ -23,7 +22,7 @@ type Props = {|
   +shouldHideBalance: boolean,
   +onRemoveWallet: ({| url: ?string, protocol: ?string |}) => void,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
-  +settingsCache: ConceptualWalletSettingsCache,
+  +walletName: string,
   +websiteIcon: string,
   +balance: MultiToken | null,
   +plate: WalletChecksum,
@@ -85,7 +84,17 @@ export default class WalletRowRevamp extends Component<Props, State> {
   };
 
   render(): Node {
-    const { url, protocol, plate, onRemoveWallet, balance, shouldHideBalance, settingsCache, websiteIcon, id } = this.props;
+    const {
+      url,
+      protocol,
+      plate,
+      onRemoveWallet,
+      balance,
+      shouldHideBalance,
+      walletName,
+      websiteIcon,
+      id,
+    } = this.props;
     const { showDeleteIcon } = this.state;
 
     const [, plateIcon] = constructPlate(plate, 0, '');
@@ -119,7 +128,7 @@ export default class WalletRowRevamp extends Component<Props, State> {
           </Box>
           <div>
             <Typography component="div" variant="caption1" color="grayscale.900" id="connectedWalletNameLabel">
-              {settingsCache.conceptualWalletName}
+              {walletName}
             </Typography>
             <Typography component="div" variant="body2" fontWeight={500} id="connectedWalletBalanceLabel">
               {this.renderAmountDisplay({

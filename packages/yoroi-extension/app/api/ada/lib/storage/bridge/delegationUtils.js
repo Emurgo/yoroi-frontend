@@ -2,16 +2,15 @@
 
 import BigNumber from 'bignumber.js';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
-import { asGetAllUtxos, } from '../models/PublicDeriver/traits';
-import { PublicDeriver, } from '../models/PublicDeriver/index';
 import { normalizeToAddress, unwrapStakingKey, } from './utils';
-import type { IGetAllUtxosResponse, IGetStakingKey, } from '../models/PublicDeriver/interfaces';
+import type { IGetAllUtxosResponse, } from '../models/PublicDeriver/interfaces';
 import { MultiToken, } from '../../../../common/lib/MultiToken';
+import type { WalletState } from '../../../../../../chrome/extension/background/types';
 import { maybe, fail } from '../../../../../coreUtils';
 import { isHex } from '@emurgo/yoroi-lib/dist/internals/utils/index';
 
 export type GetDelegatedBalanceRequest = {|
-  publicDeriver: PublicDeriver<> & IGetStakingKey,
+  wallet: WalletState,
   rewardBalance: MultiToken,
   stakingAddress: string,
   delegation: string | null,
@@ -42,7 +41,7 @@ export async function getDelegatedBalance(
   request: GetDelegatedBalanceRequest,
 ): Promise<GetDelegatedBalanceResponse> {
   const utxoPart = await getUtxoDelegatedBalance(
-    request.publicDeriver,
+    request.wallet,
     request.stakingAddress,
   );
 
@@ -102,25 +101,25 @@ export function filterAddressesByStakingKey<T: { +address: string, ... }>(
 }
 
 export async function getUtxoDelegatedBalance(
-  publicDeriver: PublicDeriver<>,
-  stakingAddress: string,
+  wallet: WalletState,
+  _stakingAddress: string,
 ): Promise<MultiToken> {
-  const withUtxos = asGetAllUtxos(publicDeriver);
-  if (withUtxos == null) {
-    return publicDeriver.getParent().getDefaultMultiToken();
-  }
-  const basePubDeriver = withUtxos;
-
   // TODO: need to also deal with pointer address summing
   // can get most recent pointer from getCurrentDelegation result
 
-  const stakingKey = unwrapStakingKey(stakingAddress);
-  const allUtxo = await basePubDeriver.getAllUtxos();
+  const stakingKey = unwrapStakingKey(wallet.stakingAddress);
+  const allUtxo = wallet.utxos;
   const allUtxosForKey = filterAddressesByStakingKey<ElementOf<IGetAllUtxosResponse>>(
     stakingKey,
     allUtxo,
     false,
   );
+  const defaultToken = {
+    defaultNetworkId: wallet.networkId,
+    defaultIdentifier: wallet.defaultTokenId,
+  };
+  const defaultMultiToken = new MultiToken([], defaultToken);
+
   const utxoSum = allUtxosForKey.reduce(
     (sum, utxo) => sum.joinAddMutable(new MultiToken(
       utxo.output.tokens.map(token => ({
@@ -128,9 +127,9 @@ export async function getUtxoDelegatedBalance(
         amount: new BigNumber(token.TokenList.Amount),
         networkId: token.Token.NetworkId,
       })),
-      publicDeriver.getParent().getDefaultToken()
+      defaultToken,
     )),
-    publicDeriver.getParent().getDefaultMultiToken(),
+    defaultMultiToken,
   );
 
   return utxoSum;

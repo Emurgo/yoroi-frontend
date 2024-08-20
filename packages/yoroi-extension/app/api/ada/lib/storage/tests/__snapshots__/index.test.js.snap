@@ -1238,7 +1238,7 @@ Object {
     Object {
       "Backend": Object {
         "BackendService": "https://api.yoroiwallet.com",
-        "BackendServiceZero": "https://yoroi-backend-zero-mainnet.emurgornd.com",
+        "BackendServiceZero": "https://zero.yoroiwallet.com",
         "TokenInfoService": "https://cdn.yoroiwallet.com",
       },
       "BaseConfig": Array [
@@ -1342,7 +1342,7 @@ Object {
     Object {
       "Backend": Object {
         "BackendService": "https://preview-backend.emurgornd.com",
-        "BackendServiceZero": "https://yoroi-backend-zero-previes.emurgornd.com",
+        "BackendServiceZero": "https://yoroi-backend-zero-preview.emurgornd.com",
         "TokenInfoService": "https://stage-cdn.yoroiwallet.com",
       },
       "BaseConfig": Array [

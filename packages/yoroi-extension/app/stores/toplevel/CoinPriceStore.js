@@ -8,7 +8,4 @@ export default class CoinPriceStore extends BaseCoinPriceStore<StoresMap, Action
   setup(): void {
     super.setup();
   }
-  async updatePricesForWallet(): ?Promise<void> {
-    await this.refreshCurrentCoinPrice();
-  }
 }

@@ -84,7 +84,7 @@ type Props = {|
   +onCancel: void => void,
   +onExchangeCallback: void => void,
   +currentBalanceAda: BigNumber,
-  +receiveAdaAddressPromise: Promise<string | null>,
+  +receiveAdaAddress: string,
 |};
 
 type State = {|
@@ -232,7 +232,7 @@ export default class BuySellDialog extends Component<Props, State> {
         queries: {
           fiatType: 'USD',
           coinType: 'ADA',
-          walletAddress: await props.receiveAdaAddressPromise,
+          walletAddress: props.receiveAdaAddress,
           orderType: 'buy',
           returnUrl: EXCHANGE_CALLBACK_URL,
           coinAmount: Number(state.amountAda),
@@ -245,7 +245,7 @@ export default class BuySellDialog extends Component<Props, State> {
         queries: {
           fiatType: 'USD',
           coinType: 'ADA',
-          walletAddress: await props.receiveAdaAddressPromise,
+          walletAddress: props.receiveAdaAddress,
           orderType: 'sell',
           returnUrl: EXCHANGE_CALLBACK_URL,
           coinAmount: Number(state.amountAda),
@@ -359,7 +359,7 @@ export default class BuySellDialog extends Component<Props, State> {
             endAdornment: (
               <InputAdornment position="end">
                 <div style={{ position: 'relative' /* so that the balance line can align on the right side */ }}>
-                  <div style={{ marginBottom: '8px', color: '#000', display: 'flex' }}>
+                  <div style={{ marginBottom: '8px', color: '#000' }}>
                     <img style={{ marginRight: '8px', borderRadius: '4px', verticalAlign: 'bottom' }} src={adaPng} alt="" />
                     <Typography variant="body2" color="ds.text_gray_medium">
                       ADA
@@ -429,7 +429,9 @@ export default class BuySellDialog extends Component<Props, State> {
           <ErrorPopoutContent>
             <div className="content">
               <YoroiIcon />
-              <div className="text">{intl.formatMessage(messages.longLoadingDialogText)}</div>
+              <Typography variant="h1" color="ds.text_gray_medium" className="text">
+                {intl.formatMessage(messages.failDialogText)}
+              </Typography>
             </div>
           </ErrorPopoutContent>
         </Dialog>
@@ -451,9 +453,7 @@ export default class BuySellDialog extends Component<Props, State> {
           <ErrorPopoutContent>
             <div className="content">
               <FailIcon />
-              <Typography variant="h1" color="ds.text_gray_medium" className="text">
-                {intl.formatMessage(messages.failDialogText)}
-              </Typography>
+              <div className="text">{intl.formatMessage(messages.failDialogText)}</div>
             </div>
           </ErrorPopoutContent>
         </Dialog>

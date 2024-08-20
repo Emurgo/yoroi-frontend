@@ -8,6 +8,7 @@ import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType'
 import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
 import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
 import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
+import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 
 // TODO: unmagic the constants
 const MAX_VALUE_BYTES = 5000;
@@ -62,7 +63,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
         staleTx={this.props.staleTx}
         selectedExplorer={stores.explorers.selectedExplorer
           .get(
-            publicDeriver.getParent().getNetworkInfo().NetworkId
+            publicDeriver.networkId
           ) ?? (() => { throw new Error('No explorer for wallet network'); })()
         }
         getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
@@ -76,7 +77,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
           await sendMoney.trigger({
             signRequest,
             password,
-            publicDeriver,
+            wallet: publicDeriver,
             onSuccess: openTransactionSuccessDialog,
           });
         }}
@@ -89,7 +90,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
         classicTheme={profile.isClassicTheme}
         unitOfAccountSetting={unitOfAccountSetting}
         addressToDisplayString={
-          addr => addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())
+          addr => addressToDisplayString(addr, getNetworkById(publicDeriver.networkId))
         }
       />
     );

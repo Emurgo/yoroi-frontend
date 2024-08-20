@@ -8,7 +8,12 @@ import { withRouter } from 'react-router-dom';
 import NFTDetails from '../../components/wallet/assets/NFTDetails';
 import { genLookupOrFail, getTokenIdentifierIfExists, getTokenStrictName } from '../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../utils/formatters';
-import { getAuthorFromTokenMetadata, getDescriptionFromTokenMetadata, getImageFromTokenMetadata } from '../../utils/nftMetadata';
+import {
+  getAuthorFromTokenMetadata,
+  getDescriptionFromTokenMetadata,
+  getImageFromTokenMetadata,
+} from '../../utils/nftMetadata';
+import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 
 type Props = {|
@@ -29,7 +34,7 @@ class NFTDetailPageRevamp extends Component<AllProps> {
     if (!publicDeriver) throw new Error(`Active wallet requiTokenDetails for ${nameof(NFTDetailPageRevamp)}.`);
     const spendableBalance = this.props.stores.transactions.balance;
     const getTokenInfo = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo);
-    const network = publicDeriver.getParent().getNetworkInfo();
+    const network = getNetworkById(publicDeriver.networkId);
 
     const nftsList =
       spendableBalance == null

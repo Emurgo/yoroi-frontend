@@ -18,7 +18,6 @@ import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import registerProtocols from '../../uri-protocols';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { isTestnet } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 @observer
 export default class UriPromptPage extends Component<StoresAndActionsProps> {
@@ -70,9 +69,7 @@ export default class UriPromptPage extends Component<StoresAndActionsProps> {
   render(): Node {
     const { checkAdaServerStatus } = this.props.stores.serverConnectionStore;
     const { selected } = this.props.stores.wallets;
-    const isWalletTestnet = selected == null
-      ? false
-      : isTestnet(selected.getParent().getNetworkInfo());
+    const isWalletTestnet = Boolean(selected && selected.isTestnet);
 
     const displayedBanner = checkAdaServerStatus === ServerStatusErrors.Healthy
       ? <TestnetWarningBanner isTestnet={isWalletTestnet} />

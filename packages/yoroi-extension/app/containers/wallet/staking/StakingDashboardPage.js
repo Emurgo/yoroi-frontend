@@ -14,8 +14,6 @@ import { digestForHash } from '../../../api/ada/lib/storage/database/primitives/
 import { handleExternalLinkClick } from '../../../utils/routing';
 import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer';
 import config from '../../../config';
-import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
-
 import globalMessages from '../../../i18n/global-messages';
 import { observable, runInAction } from 'mobx';
 import DeregisterDialogContainer from '../../transfer/DeregisterDialogContainer';
@@ -24,6 +22,7 @@ import { genLookupOrFail, getTokenName } from '../../../stores/stateless/tokenHe
 import { truncateToken } from '../../../utils/formatters';
 import { generateGraphData } from '../../../utils/graph';
 import { maybe } from '../../../coreUtils';
+import type { WalletState } from '../../../../chrome/extension/background/types';
 
 @observer
 export default class StakingDashboardPage extends Component<StoresAndActionsProps> {
@@ -43,16 +42,19 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
       throw new Error(`${nameof(StakingDashboardPage)} no public deriver. Should never happen`);
     }
     const delegationStore = this.props.stores.delegation;
-    const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
+    const delegationRequests = delegationStore.getDelegationRequests(publicDeriver.publicDeriverId);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
     }
 
     const errorIfPresent = maybe(delegationRequests.error, error => ({ error }));
-    const stakePools = errorIfPresent ?? this.getStakePools(publicDeriver);
+    const stakePools = errorIfPresent ?? this.getStakePools(
+      publicDeriver.publicDeriverId,
+      publicDeriver.networkId
+    );
 
     const showRewardAmount = errorIfPresent == null
-      && this.props.stores.delegation.isExecutedDelegatedBalance(publicDeriver);
+      && this.props.stores.delegation.isExecutedDelegatedBalance(publicDeriver.publicDeriverId);
 
     const dashboard = (
       <StakingDashboard
@@ -68,25 +70,25 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
         hasAnyPending={this.props.stores.transactions.hasAnyPending}
         stakePools={stakePools}
         userSummary={this._generateUserSummary({
-          publicDeriver,
+          wallet: publicDeriver,
           showRewardAmount,
         })}
         graphData={generateGraphData({
           delegationRequests,
-          publicDeriver,
-          currentEpoch: this.props.stores.substores.ada.time.getCurrentTimeRequests(publicDeriver)
-            .currentEpoch,
+          networkId: publicDeriver.networkId,
+          defaultTokenId: publicDeriver.defaultTokenId,
+          currentEpoch: this.props.stores.substores.ada.time.getCurrentTimeRequests(
+            publicDeriver
+          ).currentEpoch,
           shouldHideBalance: this.props.stores.profile.shouldHideBalance,
           getLocalPoolInfo: this.props.stores.delegation.getLocalPoolInfo,
           tokenInfo: this.props.stores.tokenInfoStore.tokenInfo,
         })}
-        isUnregistered={!this.props.stores.delegation.isStakeRegistered(publicDeriver)}
+        isUnregistered={!this.props.stores.delegation.isStakeRegistered(publicDeriver.publicDeriverId)}
         epochLength={this.getEpochLengthInDays(publicDeriver)}
         ticker={truncateToken(
           getTokenName(
-            this.props.stores.tokenInfoStore.getDefaultTokenInfo(
-              publicDeriver.getParent().getNetworkInfo().NetworkId
-            )
+            this.props.stores.tokenInfoStore.getDefaultTokenInfo(publicDeriver.networkId)
           )
         )}
       />
@@ -100,16 +102,16 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
     );
   }
 
-  getEpochLengthInDays: (PublicDeriver<>) => ?number = publicDeriver => {
-    const timeCalcRequests = this.props.stores.substores.ada.time.getTimeCalcRequests(publicDeriver);
+  getEpochLengthInDays: ({ publicDeriverId: number, ... }) => ?number = (wallet) => {
+    const timeCalcRequests = this.props.stores.substores.ada.time.getTimeCalcRequests(wallet);
     const { currentEpochLength, currentSlotLength } = timeCalcRequests.requests;
     const epochLengthInSeconds = currentEpochLength() * currentSlotLength();
     return epochLengthInSeconds / (60 * 60 * 24);
   };
 
-  getStakePools: (PublicDeriver<>) => {| pools: null | Array<Node | void> |} = publicDeriver => {
+  getStakePools: (number, number) => {| pools: null | Array<Node | void> |} = (publicDeriverId, networkId) => {
     const delegationStore = this.props.stores.delegation;
-    const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
+    const delegationRequests = delegationStore.getDelegationRequests(publicDeriverId);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
     }
@@ -136,7 +138,7 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
     return {
       pools: currentPools.map(pool => {
         const meta = this.props.stores.delegation.getLocalPoolInfo(
-          publicDeriver.getParent().getNetworkInfo(),
+          networkId,
           pool[0]
         );
         if (meta == null) {
@@ -174,7 +176,7 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
             data={stakePoolMeta}
             selectedExplorer={
               this.props.stores.explorers.selectedExplorer.get(
-                publicDeriver.getParent().getNetworkInfo().NetworkId
+                networkId
               ) ??
               (() => {
                 throw new Error('No explorer for wallet network');
@@ -207,7 +209,7 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
     };
   };
 
-  getDialog: (PublicDeriver<>) => Node = publicDeriver => {
+  getDialog: (WalletState) => Node = wallet => {
     const { actions, stores } = this.props;
     const uiDialogs = this.props.stores.uiDialogs;
 
@@ -238,7 +240,7 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
           onNext={() => {
             // note: purposely don't await since the next dialog will properly render the spinner
             this.props.actions.ada.delegationTransaction.createWithdrawalTxForWallet.trigger({
-              publicDeriver,
+              wallet,
             });
             this.props.actions.dialogs.open.trigger({ dialog: WithdrawalTxDialogContainer });
           }}
@@ -264,29 +266,41 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
   };
 
   _generateUserSummary: ({|
-    publicDeriver: PublicDeriver<>,
+    wallet: {
+      publicDeriverId: number,
+      networkId: number,
+      defaultTokenId: string,
+      ...
+    },
     showRewardAmount: boolean,
   |}) => Node = request => {
 
-    const { publicDeriver, showRewardAmount } = request;
+    const { wallet, showRewardAmount } = request;
+    const { publicDeriverId, networkId, defaultTokenId } = wallet;
     const { stores } = this.props;
 
     const balance = this.props.stores.transactions.balance;
-    const mangledAmounts = stores.delegation.getMangledAmountsOrZero(publicDeriver);
-    const rewardBalance = this.props.stores.delegation.getRewardBalanceOrZero(publicDeriver);
+    const mangledAmounts = stores.delegation.getMangledAmountsOrZero(
+      publicDeriverId,
+      networkId,
+      defaultTokenId
+    );
+    const rewardBalance = this.props.stores.delegation.getRewardBalanceOrZero(
+      wallet
+    );
 
     const stakeRegistered =
-      this.props.stores.delegation.isStakeRegistered(publicDeriver) === true;
+      this.props.stores.delegation.isStakeRegistered(publicDeriverId) === true;
 
     const currentlyDelegating =
-      this.props.stores.delegation.getDelegatedPoolId(publicDeriver) != null;
+      this.props.stores.delegation.getDelegatedPoolId(publicDeriverId) != null;
 
     return (
       <UserSummary
         canUnmangleSum={mangledAmounts.canUnmangle}
         cannotUnmangleSum={mangledAmounts.cannotUnmangle}
         defaultTokenInfo={this.props.stores.tokenInfoStore.getDefaultTokenInfo(
-          publicDeriver.getParent().getNetworkInfo().NetworkId
+          networkId
         )}
         getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
         onUnmangle={() =>

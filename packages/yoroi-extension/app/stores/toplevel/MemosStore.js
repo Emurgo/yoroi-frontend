@@ -6,15 +6,8 @@ import WalletTransaction from '../../domain/WalletTransaction';
 import LocalizableError from '../../i18n/LocalizableError';
 import type {
   TxMemoTableUpsert, TxMemoTablePreInsert, TxMemoPreLookupKey,
-  UpsertTxMemoFunc, DeleteTxMemoFunc, GetAllTxMemoFunc
-} from '../../api/ada/lib/storage/bridge/memos';
-import {
-  upsertTxMemo, deleteTxMemo, getAllTxMemo
 } from '../../api/ada/lib/storage/bridge/memos';
 import type { TxMemoTableRow } from '../../api/ada/lib/storage/database/memos/tables';
-import {
-  asGetPublicKey,
-} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type { ProvidersType } from '../../api/externalStorage/index';
 import type {
   UploadExternalTxMemoFunc, DeleteExternalTxMemoFunc,
@@ -23,9 +16,14 @@ import type {
   CreateFolderExternalTxMemoFunc
 } from '../../api/externalStorage/providers/IProvider.types';
 import type { SelectedExternalStorageProvider } from '../../domain/ExternalStorage';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import type { WalletState } from '../../../chrome/extension/background/types';
+import {
+  getAllTxMemos,
+  deleteTxMemo,
+  upsertTxMemo,
+} from '../../api/thunk';
 
 export type MemosForWallet = Map<string, $ReadOnly<TxMemoTableRow>>;
 
@@ -75,15 +73,6 @@ export default class MemosStore extends Store<StoresMap, ActionsMap> {
   @observable createFolderExternalTxMemoRequest: Request<CreateFolderExternalTxMemoFunc>
     = new Request<CreateFolderExternalTxMemoFunc>(this.api.externalStorage.createFolder);
 
-  @observable saveTxMemoRequest: Request<UpsertTxMemoFunc>
-    = new Request<UpsertTxMemoFunc>(upsertTxMemo);
-
-  @observable deleteTxMemoRequest: Request<DeleteTxMemoFunc>
-    = new Request<DeleteTxMemoFunc>(deleteTxMemo);
-
-  @observable getAllTxMemos: Request<GetAllTxMemoFunc>
-    = new Request<GetAllTxMemoFunc>(getAllTxMemo);
-
   @observable
   revokeTokenStorageProvideRequest: Request<void => Promise<void>>
     = new Request<void => Promise<void>>(this.api.externalStorage.revokeToken);
@@ -115,7 +104,7 @@ export default class MemosStore extends Store<StoresMap, ActionsMap> {
   _initMemosForWallet: void => void = () => {
     const { selected } = this.stores.wallets;
     if (selected == null) return undefined;
-    const walletId = this.getIdForWallet(selected);
+    const walletId = selected.plate.TextPart;
     const memos = this.txMemoMap.get(walletId);
     if (memos != null) return;
 
@@ -132,11 +121,7 @@ export default class MemosStore extends Store<StoresMap, ActionsMap> {
     // note: only need to care about persistent storage
     // since this is called only once when the app launches
     // so there should be no transient storage when the app loads anyway
-    const db = this.stores.loading.getDatabase();
-    if (db == null) throw new Error(`${nameof(MemosStore)}::${nameof(this.loadFromStorage)} called before storage was initialized`);
-    const allTxMemos = await this.getAllTxMemos.execute({
-      db,
-    }).promise;
+    const allTxMemos = await getAllTxMemos();
     if (allTxMemos == null) throw new Error('Should never happen');
     for (const txMemo of allTxMemos) {
       let walletTxMemos = this.txMemoMap.get(txMemo.WalletId);
@@ -196,7 +181,7 @@ export default class MemosStore extends Store<StoresMap, ActionsMap> {
   }
 
   @action _saveTxMemo: TxMemoTablePreInsert => Promise<void> = async (request) => {
-    const walletId = this.getIdForWallet(request.publicDeriver);
+    const walletId = request.plateTextPart;
     const memo = {
       ...request.memo,
       WalletId: walletId,
@@ -204,11 +189,11 @@ export default class MemosStore extends Store<StoresMap, ActionsMap> {
     if (this.hasSetSelectedExternalStorageProvider) {
       await this.uploadExternalTxMemoRequest.execute({ memo });
     }
-    const savedMemo = await this.saveTxMemoRequest.execute({
-      db: request.publicDeriver.getDb(),
+    const savedMemo = await upsertTxMemo({
+      publicDeriverId: request.publicDeriverId,
       memo,
-    }).promise;
-    if (savedMemo == null) throw new Error('Should never happen');
+    });
+
     runInAction(() => {
       this.txMemoMap.get(walletId)?.set(request.memo.TransactionHash, savedMemo);
     });
@@ -216,7 +201,7 @@ export default class MemosStore extends Store<StoresMap, ActionsMap> {
   };
 
   @action _updateTxMemo: TxMemoTableUpsert => Promise<void> = async (request) => {
-    const walletId = this.getIdForWallet(request.publicDeriver);
+    const walletId = request.plateTextPart;
     const memo = {
       ...request.memo,
       WalletId: walletId,
@@ -224,10 +209,10 @@ export default class MemosStore extends Store<StoresMap, ActionsMap> {
     if (this.hasSetSelectedExternalStorageProvider) {
       await this.uploadAndOverwriteExternalTxMemoRequest.execute({ memo });
     }
-    const savedMemo = await this.saveTxMemoRequest.execute({
-      db: request.publicDeriver.getDb(),
+    const savedMemo = await upsertTxMemo({
+      publicDeriverId: request.publicDeriverId,
       memo,
-    }).promise;
+    });
     if (savedMemo == null) throw new Error('Should never happen');
     runInAction(() => {
       this.txMemoMap.get(walletId)?.set(request.memo.TransactionHash, savedMemo);
@@ -236,7 +221,7 @@ export default class MemosStore extends Store<StoresMap, ActionsMap> {
   };
 
   @action _deleteTxMemo: TxMemoPreLookupKey => Promise<void> = async (request) => {
-    const walletId = this.getIdForWallet(request.publicDeriver);
+    const walletId = request.plateTextPart;
     const memoToDelete = {
       walletId,
       txHash: request.txHash,
@@ -244,8 +229,8 @@ export default class MemosStore extends Store<StoresMap, ActionsMap> {
     if (this.hasSetSelectedExternalStorageProvider) {
       await this.deleteExternalTxMemoRequest.execute(memoToDelete);
     }
-    await this.deleteTxMemoRequest.execute({
-      db: request.publicDeriver.getDb(),
+    await deleteTxMemo({
+      publicDeriverId: request.publicDeriverId,
       key: memoToDelete,
     });
     runInAction(() => {
@@ -258,29 +243,29 @@ export default class MemosStore extends Store<StoresMap, ActionsMap> {
     request
   ) => {
     if (this.hasSetSelectedExternalStorageProvider) {
-      const walletId = this.getIdForWallet(request.publicDeriver);
+      const walletId = request.plateTextPart;
       const memo = await this.downloadExternalTxMemoRequest.execute({
         walletId,
         txHash: request.txHash,
       }).promise;
       if (memo == null) throw new Error('Should never happen');
-      const memoRow = await this.saveTxMemoRequest.execute({
-        db: request.publicDeriver.getDb(),
+      const memoRow = await upsertTxMemo({
+        publicDeriverId: request.publicDeriverId,
         memo: {
           WalletId: walletId,
           Content: memo.content,
           TransactionHash: request.txHash,
           LastUpdated: memo.lastUpdated
         }
-      }).promise;
-      if (memoRow == null) throw new Error('Should never happen');
+      });
+
       runInAction(() => {
         this.txMemoMap.get(walletId)?.set(request.txHash, memoRow);
       });
     }
   };
 
-  @action _syncTxMemos: PublicDeriver<> => Promise<void> = async (publicDeriver) => {
+  @action _syncTxMemos: WalletState => Promise<void> = async (publicDeriver) => {
     if (this.hasSetSelectedExternalStorageProvider) {
       // 1st check if root folder exists. If not, we create it
       {
@@ -294,7 +279,7 @@ export default class MemosStore extends Store<StoresMap, ActionsMap> {
       }
 
       // 2nd check if wallet folder exists. If not, we create it
-      const walletId = this.getIdForWallet(publicDeriver);
+      const walletId = publicDeriver.plate.TextPart;
       {
         // Check if wallet folder exists
         const walletFolderStatus = await this.fetchFolderExternalTxMemoRequest.execute({
@@ -318,9 +303,9 @@ export default class MemosStore extends Store<StoresMap, ActionsMap> {
 
   _updateLocaleFromRemote: {|
     remoteResponse: FetchFilenameExternalTxMemoResponse,
-    publicDeriver: PublicDeriver<>,
+    publicDeriver: WalletState,
   |} => Promise<void> = async (request) => {
-    const walletId = this.getIdForWallet(request.publicDeriver);
+    const walletId = request.publicDeriver.plate.TextPart;
     const txMemosForWallet = this.txMemoMap.get(walletId);
     if (txMemosForWallet == null) return; // shouldn't happen
 
@@ -330,8 +315,8 @@ export default class MemosStore extends Store<StoresMap, ActionsMap> {
       if (localMemo != null) {
         // delete local copy if file was deleted on external storage
         if (memo.deleted === true) {
-          await this.deleteTxMemoRequest.execute({
-            db: request.publicDeriver.getDb(),
+          await deleteTxMemo({
+            publicDeriverId: request.publicDeriver.publicDeriverId,
             key: {
               walletId,
               txHash: memo.tx,
@@ -340,7 +325,8 @@ export default class MemosStore extends Store<StoresMap, ActionsMap> {
         } else if (localMemo.LastUpdated < memo.lastUpdated) {
           // only update if the file is newer
           await this._downloadAndSaveTxMemo({
-            publicDeriver: request.publicDeriver,
+            publicDeriverId: request.publicDeriver.publicDeriverId,
+            plateTextPart: request.publicDeriver.plate.TextPart,
             txHash: memo.tx
           });
         }
@@ -348,7 +334,8 @@ export default class MemosStore extends Store<StoresMap, ActionsMap> {
       } else {
         // save memo locally
         await this._downloadAndSaveTxMemo({
-          publicDeriver: request.publicDeriver,
+          publicDeriverId: request.publicDeriver.publicDeriverId,
+          plateTextPart: request.publicDeriver.plate.TextPart,
           txHash: memo.tx
         });
       }
@@ -375,14 +362,5 @@ export default class MemosStore extends Store<StoresMap, ActionsMap> {
         await this.setSelectedProviderRequest.execute(selected);
       }
     }
-  }
-
-  getIdForWallet: PublicDeriver<> => string = (wallet) => {
-    const withPubKey = asGetPublicKey(wallet);
-    // probably if there isn't a public key,
-    // we should combine a unique install ID + the publicDeriver's auto-increment key number
-    if (withPubKey == null) throw new Error('Not implemented yet');
-    const { plate } = this.stores.wallets.getPublicKeyCache(withPubKey);
-    return plate.TextPart;
   }
 }

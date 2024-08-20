@@ -2,32 +2,26 @@
 // Handles Connect to Trezor Hardware Wallet dialog
 
 import { action, observable } from 'mobx';
-
 import type { CardanoPublicKey, DeviceEvent, Success, UiEvent, Unsuccessful, } from 'trezor-connect-flow';
 import TrezorConnect from 'trezor-connect-flow';
-
 import Store from '../base/Store';
-import LocalizedRequest from '../lib/LocalizedRequest';
-
 import globalMessages from '../../i18n/global-messages';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
 import { CheckAddressesInUseApiError } from '../../api/common/errors';
 import { getTrezorManifest, wrapWithFrame, wrapWithoutFrame } from '../lib/TrezorWrapper';
 import { ROUTES } from '../../routes-config';
 import Config from '../../config';
-
 // This is actually just an interface
 import { HWConnectStoreTypes, HWDeviceInfo, ProgressInfo, ProgressStep } from '../../types/HWConnectStoreTypes';
 import { StepState } from '../../components/widgets/ProgressSteps';
-
 import { Logger, stringifyError } from '../../utils/logging';
-
-import type { CreateHardwareWalletFunc, CreateHardwareWalletRequest, } from '../../api/ada';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import { CoinTypes, HARD_DERIVATION_START, WalletTypePurpose, } from '../../config/numbersConfig';
 import { Bip44DerivationLevels, } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import { createHardwareWallet } from '../../api/thunk';
+import type { CreateHardwareWalletRequest } from '../../api/thunk';
+import type { WalletState } from '../../../chrome/extension/background/types';
 
 type TrezorConnectionResponse = {|
   trezorResp: Success<CardanoPublicKey> | Unsuccessful,
@@ -70,10 +64,6 @@ export default class TrezorConnectStore
   trezorEventDevice: ?DeviceEvent;
   // =================== VIEW RELATED =================== //
 
-  // =================== API RELATED =================== //
-  createHWRequest: LocalizedRequest<CreateHardwareWalletFunc>
-    = new LocalizedRequest<CreateHardwareWalletFunc>(this.api.ada.createHardwareWallet);
-
   /** While trezor wallet creation is taking place, we need to block users from starting a
     * trezor wallet creation on a seperate wallet and explain to them why the action is blocked */
   @observable isCreateHWActive: boolean = false;
@@ -105,11 +95,6 @@ export default class TrezorConnectStore
   }
 
   teardown(): void {
-    if (!this.createHWRequest.isExecuting) {
-      // Trezor Connect request should be reset only in case connect is finished/errored
-      this.createHWRequest.reset();
-    }
-
     this._reset();
     super.teardown();
   }
@@ -302,17 +287,14 @@ export default class TrezorConnectStore
     try {
       Logger.debug(`${nameof(TrezorConnectStore)}::${nameof(this._saveHW)}:: stated`);
       this._setIsCreateHWActive(true);
-      this.createHWRequest.reset();
 
       const reqParams = this._prepareCreateHWReqParams(
         walletName,
       );
-      this.createHWRequest.execute(reqParams);
-      if (!this.createHWRequest.promise) throw new Error('should never happen');
 
-      const newWallet = await this.createHWRequest.promise;
+      const newWallet = await createHardwareWallet(reqParams);
 
-      await this._onSaveSuccess(newWallet.publicDeriver);
+      await this._onSaveSuccess(newWallet);
     } catch (error) {
       Logger.error(`${nameof(TrezorConnectStore)}::${nameof(this._saveHW)}::error ${stringifyError(error)}`);
 
@@ -335,7 +317,6 @@ export default class TrezorConnectStore
       }
       this._goToSaveError();
     } finally {
-      this.createHWRequest.reset();
       this._setIsCreateHWActive(false);
     }
   };
@@ -350,18 +331,10 @@ export default class TrezorConnectStore
     }
     const { publicMasterKey, hwFeatures } = this.hwDeviceInfo;
 
-    const persistentDb = this.stores.loading.getDatabase();
-    if (persistentDb == null) {
-      throw new Error(`${nameof(this._prepareCreateHWReqParams)} db not loaded. Should never happen`);
-    }
-
     const { selectedNetwork } = this.stores.profile;
     if (selectedNetwork == null) throw new Error(`${nameof(this._prepareCreateHWReqParams)} no network selected`);
 
-    const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
-
     return {
-      db: persistentDb,
       addressing: {
         path: this.getPath(),
         startLevel: Bip44DerivationLevels.PURPOSE.level,
@@ -370,7 +343,6 @@ export default class TrezorConnectStore
       publicKey: publicMasterKey,
       hwFeatures,
       network: selectedNetwork,
-      checkAddressesInUse: stateFetcher.checkAddressesInUse,
     };
   }
 
@@ -383,20 +355,17 @@ export default class TrezorConnectStore
     this.progressInfo.stepState = StepState.ERROR;
   };
 
-  _onSaveSuccess: (PublicDeriver<>) => Promise<void> = async (publicDeriver) => {
+  _onSaveSuccess: (WalletState) => Promise<void> = async (wallet) => {
     // close the active dialog
     Logger.debug(`${nameof(TrezorConnectStore)}::${nameof(this._onSaveSuccess)} success, closing dialog`);
     this.actions.dialogs.closeActiveDialog.trigger();
 
-    const { wallets } = this.stores;
-    await wallets.addHwWallet(publicDeriver);
-    this.actions.wallets.setActiveWallet.trigger({
-      wallet: publicDeriver
-    });
+    await this.stores.wallets.addHwWallet(wallet);
+    this.actions.wallets.setActiveWallet.trigger({ publicDeriverId: wallet.publicDeriverId });
     this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
 
     // show success notification
-    wallets.showTrezorTWalletIntegratedNotification();
+    this.stores.wallets.showTrezorTWalletIntegratedNotification();
 
     this.teardown();
     Logger.info('SUCCESS: Trezor Connected Wallet created and loaded');

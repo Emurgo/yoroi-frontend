@@ -32,7 +32,7 @@ type Props = {|
   getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => ?$ReadOnly<TokenRow>,
   selectedExplorer: SelectedExplorer,
   submissionError: ?SignSubmissionErrorType,
-  walletType: 'ledger' | 'trezor' | 'web',
+  walletType: 'ledger' | 'trezor' | 'mnemonic',
   hwWalletError: ?LocalizableError,
 |};
 
