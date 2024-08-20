@@ -37,7 +37,7 @@ export function transactionHexReplaceWitnessSet(txHex: string, witnessSetHex: st
   });
 }
 
-export function pubKeyHashToRewardAddress(hex: string, network: number) {
+export function pubKeyHashToRewardAddress(hex: string, network: number): string {
   return RustModule.WasmScope(Module =>
     Module.WalletV4.RewardAddress.new(
       network,
