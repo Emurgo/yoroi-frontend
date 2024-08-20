@@ -22,9 +22,9 @@ import { CannotSendBelowMinimumValueError, NotEnoughMoneyToSendError, } from '..
 import { CoreAddressTypes, TxStatusCodes, } from '../../../app/api/ada/lib/storage/database/primitives/enums';
 import type { FullAddressPayload } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 import {
-  getAllUsedAddresses,
   getAllAddresses,
   getAllAddressesForDisplay,
+  getAllUsedAddresses,
 } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 import { getReceiveAddress } from '../../../app/stores/stateless/addressStores';
 
@@ -85,7 +85,7 @@ import {
   derivePrivateByAddressing,
   derivePublicByAddressing
 } from '../../../app/api/ada/lib/cardanoCrypto/deriveByAddressing';
-import { transactionHexToHash } from '../../../app/api/ada/lib/cardanoCrypto/utils';
+import { pubKeyHashToRewardAddress, transactionHexToHash } from '../../../app/api/ada/lib/cardanoCrypto/utils';
 import { sendTx } from '../../../app/api/ada/lib/state-fetch/remoteFetcher';
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
@@ -450,6 +450,22 @@ async function _getDRepKeyAndAddressing(
     ChainDerivations.GOVERNANCE_DREP_KEYS,
     DREP_KEY_INDEX,
   );
+}
+
+export async function getDrepRewardAddressHexAndAddressing(
+  wallet: PublicDeriver<>,
+): Promise<[string, Addressing]> {
+  const [pubKey, addressing] = await __pubKeyAndAddressingByChainAndIndex(
+    wallet,
+    ChainDerivations.GOVERNANCE_DREP_KEYS,
+    DREP_KEY_INDEX,
+  );
+  // <TODO:ENCAPSULATE> Make this part of wallet API
+  const config = getCardanoHaskellBaseConfig(
+    wallet.getParent().getNetworkInfo()
+  ).reduce((acc, next) => Object.assign(acc, next), {});
+  const network = parseInt(config.ChainNetworkId, 10);
+  return [pubKeyHashToRewardAddress(pubKey.hash().to_hex(), network), addressing];
 }
 
 export async function connectorGetStakeKey(

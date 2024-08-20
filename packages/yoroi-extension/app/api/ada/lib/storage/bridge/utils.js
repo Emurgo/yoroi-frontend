@@ -8,6 +8,7 @@ import { isCardanoHaskell } from '../database/prepackaged/networks';
 import { defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import { bech32 as bech32Module } from 'bech32';
+import typeof { CertificateKind } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 
 export function tryAddressToKind(
   address: string,
@@ -385,4 +386,11 @@ export function unwrapStakingKey(stakingAddress: string): RustModule.WalletV4.Cr
   const stakingKey = accountAddress.payment_cred();
 
   return stakingKey;
+}
+
+export function isCertificateKindDrepDelegation(kind: $Values<CertificateKind>): boolean {
+  return kind === RustModule.WalletV4.CertificateKind.VoteDelegation
+    || kind === RustModule.WalletV4.CertificateKind.StakeAndVoteDelegation
+    || kind === RustModule.WalletV4.CertificateKind.VoteRegistrationAndDelegation
+    || kind === RustModule.WalletV4.CertificateKind.StakeVoteRegistrationAndDelegation;
 }

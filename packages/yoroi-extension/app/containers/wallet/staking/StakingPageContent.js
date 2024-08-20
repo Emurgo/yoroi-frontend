@@ -219,7 +219,7 @@ class StakingPageContent extends Component<AllProps> {
           <WalletEmptyBanner onBuySellClick={() => this.props.actions.dialogs.open.trigger({ dialog: BuySellDialog })} />
         ) : null}
 
-        {isStakeRegistered ? (
+        {currentlyDelegating ? (
           <WrapperCards>
             <SummaryCard
               onOverviewClick={() =>
