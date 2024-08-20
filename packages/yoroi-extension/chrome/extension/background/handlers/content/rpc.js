@@ -1,11 +1,10 @@
 // @flow
-import type { lf$Database, } from 'lovefield';
 import { PublicDeriver, } from '../../../../../app/api/ada/lib/storage/models/PublicDeriver/index';
 import LocalStorageApi, {
   loadSubmittedTransactions,
 } from '../../../../../app/api/localStorage';
 import { RustModule } from '../../../../../app/api/ada/lib/cardanoCrypto/rustLoader';
-import { Logger, stringifyError } from '../../../../../app/utils/logging';
+import { Logger } from '../../../../../app/utils/logging';
 import { NotEnoughMoneyToSendError, } from '../../../../../app/api/common/errors';
 import {
   type PendingSignData,
@@ -49,7 +48,6 @@ import { authSignHexPayload } from '../../../../../app/connector/api';
 import {
   getCardanoHaskellBaseConfig,
 } from '../../../../../app/api/ada/lib/storage/database/prepackaged/networks';
-import type { RemoteUnspentOutput } from '../../../../../app/api/ada/lib/state-fetch/types';
 import {
   sendToInjector,
   getBoundsForTabWindow,
@@ -58,7 +56,6 @@ import {
 import { asGetAllUtxos, } from '../../../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import { asAddressedUtxo as asAddressedUtxoCardano, } from '../../../../../app/api/ada/transactions/utils';
 import {
-  deleteConnectedSite,
   getConnectedSite,
   setConnectedSite,
   findWhitelistedConnection,
@@ -96,13 +93,13 @@ async function confirmSign(
   });
 }
 
-
 declare function _MaybeWallet(cond: true): PublicDeriver<>;
+// eslint-disable-next-line no-redeclare
 declare function _MaybeWallet(cond: false): void;
 
 type RequestType<NeedConnectedWallet, ParamT> = {|
   wallet: $Call<typeof _MaybeWallet, NeedConnectedWallet>,
-  tabId: number,                                                
+  tabId: number,
   message: {|
     uid: number,
     params: ParamT,
@@ -215,7 +212,7 @@ const Handlers = Object.freeze({
       connectError(tabId, error);
     }
   }),
-  
+
   'sign_tx/cardano': defineHandler<
     [
       {|
@@ -314,7 +311,7 @@ const Handlers = Object.freeze({
     } catch (e) {
       if (e instanceof NotEnoughMoneyToSendError) {
         return { ok: null };
-      } 
+      }
       return { err: (e.message: string) };
     }
   }),
@@ -328,9 +325,8 @@ const Handlers = Object.freeze({
     const addresses = await connectorGetUsedAddressesWithPaginate(wallet, paginate);
     if (message.returnType === 'cbor') {
       return { ok: addresses };
-    } else {
-      return { ok: await addressesToBech(addresses) };
     }
+    return { ok: await addressesToBech(addresses) };
   }),
 
   'get_unused_addresses': defineHandler<
@@ -355,15 +351,15 @@ const Handlers = Object.freeze({
     return { ok: await addressesToBech(addresses) };
   }),
 
-  'get_drep_key':  defineHandler<
-    void,  
+  'get_drep_key': defineHandler<
+    void,
     string,
   >().toBe(true, false, async ({ wallet }) => {
     const dRepKey = await connectorGetDRepKey(wallet);
     return { ok: dRepKey };
   }),
 
-  'get_stake_key':  defineHandler<
+  'get_stake_key': defineHandler<
     void,
     {| key: string, isRegistered: boolean |}
   >().toBe(true, false, async ({ wallet }) => {
@@ -386,12 +382,10 @@ const Handlers = Object.freeze({
     return { ok: (await addressesToBech([address]))[0] };
   }),
 
-  'submit_tx':  defineHandler<
+  'submit_tx': defineHandler<
     [ string /* tx hex */ ],
     string,
   >().toBe(true, false, async ({ wallet, message }) => {
-    let id;
-
     const txBuffer = Buffer.from(message.params[0], 'hex');
     await connectorSendTxCardano(
       wallet,
@@ -401,7 +395,7 @@ const Handlers = Object.freeze({
     const tx = RustModule.WalletV4.Transaction.from_bytes(
       txBuffer
     );
-    id = Buffer.from(
+    const id = Buffer.from(
       RustModule.WalletV4.hash_transaction(tx.body()).to_bytes()
     ).toString('hex');
     try {
@@ -418,7 +412,7 @@ const Handlers = Object.freeze({
     return { ok: id };
   }),
 
-  'ping':  defineHandler<void, boolean>().toBe(false, false, async () => {
+  'ping': defineHandler<void, boolean>().toBe(false, false, async () => {
     return { ok: true };
   }),
 
@@ -430,7 +424,7 @@ const Handlers = Object.freeze({
     if (connection == null) { // shouldn't happen
       Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
       return;
-    } 
+    }
     const stateFetcher: CardanoIFetcher = await getCardanoStateFetcher(new LocalStorageApi());
     const networkInfo = wallet.getParent().getNetworkInfo();
     const adaApi = new AdaApi();
