@@ -158,6 +158,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
               ':disabled': {
                 bgcolor: 'primary.200',
               },
+              backgroundColor: 'ds.primary_500',
             }}
             color="primary"
           >

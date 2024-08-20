@@ -1,5 +1,4 @@
 .component {
-  border-bottom: 1px solid var(--yoroi-palette-gray-200);
   margin-bottom: 30px;
   padding-bottom: 30px;
   position: relative;
@@ -9,14 +8,13 @@
 
     .warningSection {
       border-radius: 8px;
-      background-color: rgba(255, 19, 81, 0.06);
       box-shadow: var(--yoroi-warning-box-bg-shadow);
       width: 80%;
       .attentionLabel {
         font-weight: 500;
         font-size: 16px;
         line-height: 19px;
-        color: var(--yoroi-palette-error-200);
+        // color: var(--yoroi-palette-error-200);
 
         padding-top: 24px;
         margin-bottom: 12px;
@@ -26,7 +24,7 @@
         font-weight: 400;
         font-size: 14px;
         line-height: 22px;
-        color: var(--yoroi-palette-gray-900);
+        // color: var(--yoroi-palette-gray-900);
         padding-top: 8px;
         padding-bottom: 12px;
         padding-right: 12px;
