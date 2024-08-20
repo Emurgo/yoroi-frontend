@@ -7,7 +7,7 @@
   font-size: 1rem;
   &:hover {
     cursor: pointer;
-    background: var(--yoroi-palette-common-white);
+    // background: var(--yoroi-palette-common-white);
   }
 }
 
@@ -21,7 +21,7 @@
 }
 
 .active {
-  background: var(--yoroi-palette-common-white);
+  // background: var(--yoroi-palette-common-white);
   color: var(--yoroi-palette-gray-600);
   .label {
     font-weight: 500;

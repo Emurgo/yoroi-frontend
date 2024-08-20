@@ -24,22 +24,13 @@ export type Props = {|
 type InjectedProps = {|
   +renderLayoutComponent: LayoutComponentMap => Node,
 |};
-function ReceiveWithNavigation({
-  addressStores,
-  setFilter,
-  activeFilter,
-  children,
-}: Props & InjectedProps): Node {
+function ReceiveWithNavigation({ addressStores, setFilter, activeFilter, children }: Props & InjectedProps): Node {
   const { renderLayoutComponent } = useLayout();
 
   const classicReceiveNav = (
     <Box sx={{ display: 'flex', overflow: 'hidden', height: '100%', width: '100%' }}>
       <Box sx={{ flexShrink: 0, height: '100%' }}>
-        <ReceiveNavigation
-          addressStores={addressStores}
-          setFilter={setFilter}
-          activeFilter={activeFilter}
-        />
+        <ReceiveNavigation addressStores={addressStores} setFilter={setFilter} activeFilter={activeFilter} />
       </Box>
       <Box
         sx={{
@@ -60,17 +51,13 @@ function ReceiveWithNavigation({
         display: 'flex',
         overflow: 'hidden',
         height: '100%',
-        bgcolor: 'common.white',
+        bgcolor: 'ds.bg_color_min',
         borderRadius: '8px',
         width: '100%',
       }}
     >
       <Box sx={{ flexShrink: 0, height: '100%' }}>
-        <ReceiveNavigationRevamp
-          addressStores={addressStores}
-          setFilter={setFilter}
-          activeFilter={activeFilter}
-        />
+        <ReceiveNavigationRevamp addressStores={addressStores} setFilter={setFilter} activeFilter={activeFilter} />
       </Box>
       <Box sx={{ height: '100%', minHeight: '200px', overflow: 'auto', flex: 1 }}>{children}</Box>
     </Box>

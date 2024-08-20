@@ -65,7 +65,7 @@ export default class ReceiveNavigationRevamp extends Component<Props> {
     const store = stores[0];
     if (stores.length === 1 && stores[0].name.subgroup === AddressSubgroup.all) {
       return (
-        <div className={store.name.group}>
+        <Box className={store.name.group}>
           <ReceiveNavButtonRevamp
             className={classNames([store.name.subgroup, store.name.group])}
             icon={store.name.group === AddressGroupTypes.reward ? AttentionIcon : undefined}
@@ -75,7 +75,7 @@ export default class ReceiveNavigationRevamp extends Component<Props> {
             isToplevel
             tooltip={this.genTooltip(stores[0])}
           />
-        </div>
+        </Box>
       );
     }
 
@@ -101,8 +101,7 @@ export default class ReceiveNavigationRevamp extends Component<Props> {
             key={type.name.subgroup}
             className={classNames([type.name.subgroup, type.name.group])}
             icon={
-              type.name.subgroup === AddressSubgroup.internal ||
-              type.name.subgroup === AddressSubgroup.mangled
+              type.name.subgroup === AddressSubgroup.internal || type.name.subgroup === AddressSubgroup.mangled
                 ? AttentionIcon
                 : undefined
             }
@@ -131,9 +130,7 @@ export default class ReceiveNavigationRevamp extends Component<Props> {
       existingGroup.push(store);
     }
 
-    return groups.map(group => (
-      <Box key={group[0].name.group}>{this.createAccordionForGroup(group)}</Box>
-    ));
+    return groups.map(group => <Box key={group[0].name.group}>{this.createAccordionForGroup(group)}</Box>);
   };
 
   generateFilterSection: void => ?Node = () => {
@@ -163,14 +160,7 @@ export default class ReceiveNavigationRevamp extends Component<Props> {
 
   render(): Node {
     return (
-      <Box
-        display="flex"
-        justifyContent="flex-start"
-        minWidth="240px"
-        height="100%"
-        flexDirection="column"
-        paddingBottom="24px"
-      >
+      <Box display="flex" justifyContent="flex-start" minWidth="240px" height="100%" flexDirection="column" paddingBottom="24px">
         <Box
           sx={{
             pt: '14px',
@@ -194,6 +184,7 @@ export default class ReceiveNavigationRevamp extends Component<Props> {
             borderTopLeftRadius: 0,
             borderTopRightRadius: 0,
             height: 'min-content',
+            background: 'ds.bg_color_min',
           }}
         >
           {this.generateFilterSection()}
