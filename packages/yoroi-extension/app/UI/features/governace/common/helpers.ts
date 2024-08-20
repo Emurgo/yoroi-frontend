@@ -1,3 +1,5 @@
+import { getNetworkById } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
+
 export const mapStakingKeyStateToGovernanceAction = (state: any) => {
   if (!state.drepDelegation) return null;
   const vote = state.drepDelegation;
@@ -44,17 +46,16 @@ export const createCurrrentWalletInfo = (stores: any) => {
     throw new Error(`no selected Wallet. Should never happen`);
   }
 
-  const currentWalletId = selectedWallet.getPublicDeriverId();
-  const networkInfo = selectedWallet.getParent().getNetworkInfo();
-  const networkId = networkInfo.NetworkId;
-  const backendService = selectedWallet.getParent().getNetworkInfo().Backend.BackendService;
-  const backendServiceZero = selectedWallet.getParent().getNetworkInfo().Backend.BackendServiceZero;
+  const currentWalletId = selectedWallet.publicDeriverId;
+  const networkId = selectedWallet.networkId;
+  const { Backend } = getNetworkById(networkId);
+
   return {
     currentPool: walletCurrentPoolInfo,
     networkId,
     walletId: currentWalletId,
     selectedWallet: selectedWallet,
-    backendService,
-    backendServiceZero,
+    backendService: Backend.BackendService,
+    backendServiceZero: Backend.BackendServiceZero,
   };
 };
