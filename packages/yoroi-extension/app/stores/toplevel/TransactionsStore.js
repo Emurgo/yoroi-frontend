@@ -81,7 +81,7 @@ export type TxHistoryState = {|
 
 const EXPORT_START_DELAY = 800; // in milliseconds [1000 = 1sec]
 
-type SubmittedTransactionEntry = {|
+export type SubmittedTransactionEntry = {|
   networkId: number,
   publicDeriverId: number,
   transaction: WalletTransaction,
@@ -180,6 +180,10 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       ...this.getSubmittedTransactions(publicDeriver),
       ...txs,
     ];
+  }
+
+  @computed get submitted(): Array<SubmittedTransactionEntry> {
+    return Object.freeze(this._submittedTransactions);
   }
 
   @computed get hasAny(): boolean {
