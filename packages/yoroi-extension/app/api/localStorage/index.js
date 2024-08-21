@@ -486,4 +486,4 @@ export function createStorageFlag(
   const deserializer = s => s === 'true';
   return createStorageField<boolean>(key, serializer, deserializer, defaultValue);
 }
-window.getWhitelist = (new LocalStorageApi()).getWhitelist();
+
