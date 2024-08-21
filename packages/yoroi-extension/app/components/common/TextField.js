@@ -130,9 +130,9 @@ function TextField({
         ) : (
           <InputAdornment position="end">
             {Boolean(error) === true && !isRevampTheme ? (
-              <ErrorIcon />
+              <ErrorIcon id='input-error-icon'/>
             ) : (done === true && !isRevampTheme) || greenCheck ? (
-              <DoneIcon />
+              <DoneIcon id='input-done-icon'/>
             ) : null}
           </InputAdornment>
         ),
