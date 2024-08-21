@@ -837,6 +837,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     color: 'magenta.500',
                     fontSize: '12px',
                   }}
+                  id='wallet:send:addAssetsStep-amountError-text'
                 >
                   {amountInputError}
                 </Typography>
