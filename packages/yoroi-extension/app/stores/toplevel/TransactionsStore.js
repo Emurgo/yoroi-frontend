@@ -183,7 +183,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   }
 
   @computed get submitted(): Array<SubmittedTransactionEntry> {
-    return Object.freeze(this._submittedTransactions);
+   this._submittedTransactions
   }
 
   @computed get hasAny(): boolean {
