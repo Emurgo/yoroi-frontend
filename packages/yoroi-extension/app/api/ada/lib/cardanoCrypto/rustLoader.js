@@ -260,7 +260,7 @@ class Module {
       +coefficient: string,
       +constant: string,
     |};
-    +CoinsPerUtxoWord: string,
+    +CoinsPerUtxoByte: string,
     +PoolDeposit: string,
     +KeyDeposit: string,
     ...
@@ -270,7 +270,7 @@ class Module {
         RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
         RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
       ),
-      coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord),
+      coinsPerUtxoByte: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoByte),
       poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
       keyDeposit: RustModule.WalletV4.BigNum.from_str(config.KeyDeposit),
     });
@@ -278,7 +278,7 @@ class Module {
   // Need to expose through a getter to get Flow to detect the type correctly
   WalletV4TxBuilder(params: {
     linearFee: LinearFee,
-    coinsPerUtxoWord: BigNum,
+    coinsPerUtxoByte: BigNum,
     poolDeposit: BigNum,
     keyDeposit: BigNum,
     maxValueBytes: ?number,
@@ -286,14 +286,14 @@ class Module {
     ...
   } | {
     linearFee: LinearFee,
-    coinsPerUtxoWord: BigNum,
+    coinsPerUtxoByte: BigNum,
     poolDeposit: BigNum,
     keyDeposit: BigNum,
     ...
   }): TransactionBuilder {
     const {
       linearFee,
-      coinsPerUtxoWord,
+      coinsPerUtxoByte,
       poolDeposit,
       keyDeposit,
       // $FlowFixMe[prop-missing]
@@ -302,15 +302,6 @@ class Module {
       maxTxBytes,
     } = params;
     const w4 = this.WalletV4;
-
-    // Inlined to avoid dependency cycles
-    // <TODO:PENDING_REMOVAL> LEGACY
-    const coinsPerUtxoByte = w4.BigNum.from_str(
-      new BigNumber(coinsPerUtxoWord.to_str())
-        .div(8)
-        .integerValue(BigNumber.ROUND_FLOOR)
-        .toString(),
-    );
 
     return w4.TransactionBuilder.new(
       w4.TransactionBuilderConfigBuilder.new()

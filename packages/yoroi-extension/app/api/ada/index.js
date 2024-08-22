@@ -126,7 +126,6 @@ import type {
 } from './lib/storage/bridge/traitUtils';
 import {
   asAddressedUtxo,
-  cardanoMinAdaRequiredFromAssets_coinsPerWord,
   convertAdaTransactionsToExportRows,
   multiTokenFromCardanoValue,
   multiTokenFromRemote,
@@ -846,7 +845,7 @@ export default class AdaApi {
               RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
               RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
             ),
-            coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord),
+            coinsPerUtxoByte: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoByte),
             poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
             networkId: request.network.NetworkId,
           },
@@ -904,7 +903,7 @@ export default class AdaApi {
             keyDeposit: config.KeyDeposit,
             linearFeeCoefficient: config.LinearFee.coefficient,
             linearFeeConstant: config.LinearFee.constant,
-            coinsPerUtxoWord: config.CoinsPerUtxoWord,
+            coinsPerUtxoByte: config.CoinsPerUtxoByte,
             poolDeposit: config.PoolDeposit,
             networkId: request.network.NetworkId,
           },
@@ -1106,7 +1105,7 @@ export default class AdaApi {
       keyDeposit: config.KeyDeposit,
       linearFeeCoefficient: config.LinearFee.coefficient,
       linearFeeConstant: config.LinearFee.constant,
-      coinsPerUtxoWord: config.CoinsPerUtxoWord,
+      coinsPerUtxoByte: config.CoinsPerUtxoByte,
       poolDeposit: config.PoolDeposit,
       networkId: network.NetworkId,
     };
@@ -1232,7 +1231,7 @@ export default class AdaApi {
       } else {
 
         const minAmount =
-          cardanoMinAdaRequiredFromAssets_coinsPerWord(amount, new BigNumber(protocolParams.coinsPerUtxoWord));
+          cardanoMinAdaRequiredFromAssets_coinsPerWord(amount, new BigNumber(protocolParams.coinsPerUtxoByte));
         if (minAmount.gt(target.value ?? '0')) {
           amount = makeMultiToken(minAmount.toString());
         }
@@ -1313,7 +1312,7 @@ export default class AdaApi {
         keyDeposit: config.KeyDeposit,
         linearFeeCoefficient: config.LinearFee.coefficient,
         linearFeeConstant: config.LinearFee.constant,
-        coinsPerUtxoWord: config.CoinsPerUtxoWord,
+        coinsPerUtxoByte: config.CoinsPerUtxoByte,
         poolDeposit: config.PoolDeposit,
         networkId: networkInfo.NetworkId,
       };
@@ -1438,7 +1437,7 @@ export default class AdaApi {
         keyDeposit: config.KeyDeposit,
         linearFeeCoefficient: config.LinearFee.coefficient,
         linearFeeConstant: config.LinearFee.constant,
-        coinsPerUtxoWord: config.CoinsPerUtxoWord,
+        coinsPerUtxoByte: config.CoinsPerUtxoByte,
         poolDeposit: config.PoolDeposit,
         networkId: request.wallet.networkId,
       };
@@ -1595,7 +1594,7 @@ export default class AdaApi {
         keyDeposit: config.KeyDeposit,
         linearFeeCoefficient: config.LinearFee.coefficient,
         linearFeeConstant: config.LinearFee.constant,
-        coinsPerUtxoWord: config.CoinsPerUtxoWord,
+        coinsPerUtxoByte: config.CoinsPerUtxoByte,
         poolDeposit: config.PoolDeposit,
         networkId: request.publicDeriver.networkId,
       };
@@ -1659,7 +1658,7 @@ export default class AdaApi {
         keyDeposit: config.KeyDeposit,
         linearFeeCoefficient: config.LinearFee.coefficient,
         linearFeeConstant: config.LinearFee.constant,
-        coinsPerUtxoWord: config.CoinsPerUtxoWord,
+        coinsPerUtxoByte: config.CoinsPerUtxoByte,
         poolDeposit: config.PoolDeposit,
         networkId: request.wallet.networkId,
       };

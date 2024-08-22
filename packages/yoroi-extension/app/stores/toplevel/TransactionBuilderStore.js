@@ -16,13 +16,11 @@ import {
 } from '../../api/common/lib/MultiToken';
 import type { TokenRow, } from '../../api/ada/lib/storage/database/primitives/tables';
 import { getDefaultEntryToken } from './TokenInfoStore';
-import {
-  cardanoMinAdaRequiredFromAssets_coinsPerWord,
-} from '../../api/ada/transactions/utils';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { maxSendableADA } from '../../api/ada/transactions/shelley/transactions';
 import type { WalletState } from '../../../chrome/extension/background/types';
+import { cardanoMinAdaRequiredFromAssets } from '../../api/ada/transactions/utils';
 
 export type SetupSelfTxRequest = {|
   publicDeriver: WalletState,
@@ -117,12 +115,11 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   }
 
   @computed get
-  minAda(): ?MultiToken {
+  minAda(): MultiToken {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) throw new Error(`${nameof(this.minAda)} requires wallet to be selected`);
     const network = getNetworkById(publicDeriver.networkId);
     const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId)
-    if (!isCardanoHaskell(network)) return;
 
     let minAmount;
     if (this.isDefaultIncluded && this.plannedTxInfoMap.length === 1) {
@@ -268,7 +265,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
 
   calculateMinAda: (tokens: Array<{| token: $ReadOnly<TokenRow> |}>) => string = (tokens) => {
     const publicDeriver = this.stores.wallets.selected;
-    if (!publicDeriver) throw new Error(`${nameof(this.minAda)} requires wallet to be selected`);
+    if (!publicDeriver) throw new Error(`${nameof(this.calculateMinAda)} requires wallet to be selected`);
     const network = getNetworkById(publicDeriver.networkId);
     const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId)
     if (!isCardanoHaskell(network)) return '0';
@@ -291,9 +288,12 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       getDefaultEntryToken(defaultToken)
     );
 
-    const minAmount = cardanoMinAdaRequiredFromAssets_coinsPerWord(
+    const protocolParameters = this.stores.protocolParameters.getProtocolParameters(
+      publicDeriver.networkId
+    );
+    const minAmount = cardanoMinAdaRequiredFromAssets(
       fakeMultitoken,
-      new BigNumber(squashedConfig.CoinsPerUtxoWord),
+      new BigNumber(protocolParameters.coinsPerUtxoByte),
     );
     return minAmount.toString();
   }
