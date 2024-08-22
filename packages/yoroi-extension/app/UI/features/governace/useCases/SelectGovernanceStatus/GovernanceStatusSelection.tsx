@@ -41,19 +41,17 @@ export const GovernanceStatusSelection = () => {
     createDrepDelegationTransaction,
     walletAdaBalance,
     triggerBuySellAdaDialog,
-    recentTransactions,
+    submitedTransactions,
   } = useGovernance();
   const [error, setError] = React.useState<string | null>(null);
   const navigateTo = useNavigateTo();
   const strings = useStrings();
   const { openModal, closeModal } = useModal();
-  console.log('governanceStatus', governanceStatus);
   const pageTitle = governanceStatus.status !== 'none' ? strings.governanceStatus : strings.registerGovernance;
   const statusRawText = mapStatus[governanceStatus.status || ''];
   const pageSubtitle = governanceStatus.status === 'none' ? strings.reviewSelection : strings.statusSelected(statusRawText);
+  const isPendindDrepDelegationTx = submitedTransactions.length > 0 && submitedTransactions[0]?.isDrepDelegation === true;
 
-  console.log('1recentTransactions', recentTransactions);
-  // console.log('recentTransactions pending', recentTransactions?.transactions[0]);
   const openDRepIdModal = (onSubmit: (drepID: string) => void) => {
     if (!governanceManager) {
       return;
@@ -113,8 +111,7 @@ export const GovernanceStatusSelection = () => {
       icon: <DRepIlustration />,
       selected: governanceStatus.status === 'delegate' ? true : false,
       onClick: handleDelegate,
-      // @ts-ignore
-      pending: recentTransactions[0].transactions[0].state === -4,
+      pending: isPendindDrepDelegationTx,
     },
     {
       title: strings.abstain,
@@ -122,8 +119,7 @@ export const GovernanceStatusSelection = () => {
       icon: <Abstein />,
       selected: governanceStatus.status === DREP_ALWAYS_ABSTAIN ? true : false,
       onClick: handleAbstain,
-      // @ts-ignore
-      pending: recentTransactions[0]?.transactions[0].state === -4,
+      pending: isPendindDrepDelegationTx,
     },
     {
       title: strings.noConfidence,
@@ -131,8 +127,7 @@ export const GovernanceStatusSelection = () => {
       icon: <NoConfidance />,
       selected: governanceStatus.status === DREP_ALWAYS_NO_CONFIDENCE ? true : false,
       onClick: handleNoConfidence,
-      // @ts-ignore
-      pending: recentTransactions[0]?.transactions[0].state === -4,
+      pending: isPendindDrepDelegationTx,
     },
   ];
 

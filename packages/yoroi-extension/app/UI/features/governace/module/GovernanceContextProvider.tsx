@@ -29,6 +29,7 @@ const initialGovernanceProvider = {
   governanceStatus: { status: null, drep: null },
   triggerBuySellAdaDialog: null,
   recentTransactions: [],
+  submitedTransactions: [{ isDrepDelegation: false }],
 };
 
 const GovernanceContext = React.createContext(initialGovernanceProvider);
@@ -74,8 +75,10 @@ export const GovernanceContextProvider = ({
     walletAdaBalance,
     backendServiceZero,
     recentTransactions,
+    submitedTransactions,
   } = currentWallet;
   const governanceManager = useGovernanceManagerMaker(walletId, networkId);
+
   // TODO to me moved in rootStore and use this globbaly whenever we need just a wallet password check
   const checkUserPassword = async (password: string): Promise<any> => {
     try {
@@ -178,6 +181,7 @@ export const GovernanceContextProvider = ({
       getFormattedPairingValue(getCurrentPrice, defaultTokenInfo, unitOfAccount, amount),
     triggerBuySellAdaDialog,
     recentTransactions,
+    submitedTransactions,
   };
 
   return <GovernanceContext.Provider value={context}>{children}</GovernanceContext.Provider>;
