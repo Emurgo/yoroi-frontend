@@ -29,8 +29,8 @@ const Container = styled(Box)(() => ({
 
 export const mapStatus = {
   delegate: 'Delegate to a Drep',
-  ALWAYS_ABSTAIN: 'Abstain',
-  ALWAYS_NO_CONFIDENCE: 'No Confidence',
+  [DREP_ALWAYS_ABSTAIN]: 'Abstain',
+  [DREP_ALWAYS_NO_CONFIDENCE]: 'No Confidence',
 };
 
 export const GovernanceStatusSelection = () => {
