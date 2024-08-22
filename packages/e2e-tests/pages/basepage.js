@@ -196,7 +196,7 @@ class BasePage {
     await input.sendKeys(Key.chord(isMacOS() ? Key.COMMAND : Key.CONTROL, 'a'));
     await this.sleep(200);
     await input.sendKeys(Key.NULL);
-    await input.sendKeys(Key.BACK_SPACE);
+    await input.sendKeys(Key.DELETE);
   }
   async getFromLocalStorage(key) {
     this.logger.info(`BasePage::getFromLocalStorage is called. Key: ${key}`);
@@ -277,6 +277,19 @@ class BasePage {
     const element = await this.findElement(locator);
     const condition = until.elementIsEnabled(element);
     return this.driver.wait(condition);
+  }
+  async buttonIsEnabled(locator) {
+    this.logger.info(`BasePage::buttonIsEnabled is called. Value: ${JSON.stringify(locator)}`);
+    const buttonIsEnabled = await this.customWaiter(
+      async () => {
+        const buttonlIsEnabled = await this.getAttribute(locator, 'disabled');
+        return buttonlIsEnabled === null;
+      },
+      fiveSeconds,
+      quarterSecond
+    );
+
+    return buttonIsEnabled;
   }
   async waitDisabled(locator) {
     this.logger.info(`BasePage::waitDisabled is called. Value: ${JSON.stringify(locator)}`);
@@ -375,7 +388,7 @@ class BasePage {
     if (elemState) {
       return await funcToCall();
     } else {
-      throw new Error(`The element is not found. Element: ${locator}`);
+      throw new Error(`The element is not found. Element: ${locator.locator}`);
     }
   }
   async sleep(milliseconds) {

@@ -428,6 +428,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
                       color: 'grayscale.900',
                       overflowWrap: 'break-word',
                     }}
+                    id='wallet:send:confrimTransactionStep-receiverHandleInfo-text'
                   >
                     {receiverHandle.nameServer}: {receiverHandle.handle}
                   </Typography>
