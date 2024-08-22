@@ -625,6 +625,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   variant="caption1"
                   color={invalidMemo ? 'magenta.500' : 'grayscale.600'}
                   sx={{ position: 'absolute', bottom: '10px', right: '0' }}
+                  id='wallet:send:enterAddressStep-domainResolverAddress-text'
                 >
                   {intl.formatMessage(messages.receiverFieldLabelResolvedAddress)}:&nbsp;
                   {truncateAddressShort(domainResolverResult.address)}
@@ -836,6 +837,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     color: 'magenta.500',
                     fontSize: '12px',
                   }}
+                  id='wallet:send:addAssetsStep-amountError-text'
                 >
                   {amountInputError}
                 </Typography>
