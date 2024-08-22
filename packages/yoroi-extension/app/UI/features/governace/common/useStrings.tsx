@@ -45,8 +45,8 @@ export const messages = Object.freeze(
       id: 'governance.delegateToDRep',
       defaultMessage: '!!!Delegate to a DRep',
     },
-    delegateingToDRep: {
-      id: 'governance.delegateingToDRep',
+    delegatingToDRep: {
+      id: 'governance.delegatingToDRep',
       defaultMessage: '!!!Delegating to a DRep',
     },
     designatingSomeoneElse: {
@@ -127,7 +127,7 @@ export const useStrings = () => {
   const { intl } = useIntl();
   return React.useRef({
     delegateToDRep: intl.formatMessage(messages.delegateToDRep),
-    delegateingToDRep: intl.formatMessage(messages.delegateingToDRep),
+    delegatingToDRep: intl.formatMessage(messages.delegatingToDRep),
     designatingSomeoneElse: intl.formatMessage(messages.designatingSomeoneElse),
     governanceStatus: intl.formatMessage(messages.governanceStatus),
     governanceStatusInfo: intl.formatMessage(messages.governanceStatusInfo),
@@ -146,7 +146,7 @@ export const useStrings = () => {
     transactionDetails: intl.formatMessage(messages.transactionDetails),
     operations: intl.formatMessage(messages.operations),
     selectAbstein: intl.formatMessage(messages.selectAbstein),
-    selectNoConfidenc: intl.formatMessage(messages.selectNoConfidenc),
+    selectNoConfidence: intl.formatMessage(messages.selectNoConfidenc),
     back: intl.formatMessage(messages.back),
     confirm: intl.formatMessage(messages.confirm),
     total: intl.formatMessage(messages.total),

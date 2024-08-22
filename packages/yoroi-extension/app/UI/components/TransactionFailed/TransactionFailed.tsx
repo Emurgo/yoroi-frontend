@@ -1,10 +1,12 @@
+import { Button, Stack, Typography } from '@mui/material';
 import React from 'react';
-import { Stack, Typography, Button } from '@mui/material';
-import { FailedIlustration } from './FailedIlustration';
 import { FormattedMessage } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
+import { useNavigateTo } from '../../features/governace/common/useNavigateTo';
+import { FailedIlustration } from './FailedIlustration';
 
 export const TransactionFailed = () => {
+  const navigate = useNavigateTo();
   return (
     <Stack alignItems="center" mt="110px">
       <FailedIlustration />
@@ -15,7 +17,7 @@ export const TransactionFailed = () => {
         <FormattedMessage {...globalMessages.transactionFailedInfo} />
       </Typography>
       {/* @ts-ignore */}
-      <Button variant="primary">
+      <Button variant="primary" onClick={() => navigate.selectStatus()}>
         <FormattedMessage {...globalMessages.tryAgain} />
       </Button>
     </Stack>

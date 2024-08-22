@@ -1,15 +1,18 @@
+import { LoadingButton } from '@mui/lab';
 import { Button } from '@mui/material';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import * as React from 'react';
+import { genFormatTokenAmount, genLookupOrFail } from '../../../../../stores/stateless/tokenHelpers';
 import { Collapsible } from '../../../../components/Collapsible/Collapsible';
 import { PasswordInput } from '../../../../components/Input/PasswordInput';
-import { useCreateAndSendDrepDelegationTransaction } from '../../api/useCreateAndSendDrepDelegationTransaction';
+import { DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE } from '../../common/constants';
 import { useNavigateTo } from '../../common/useNavigateTo';
 import { useStrings } from '../../common/useStrings';
 import { useGovernance } from '../../module/GovernanceContextProvider';
+import { mapStatus } from '../SelectGovernanceStatus/GovernanceStatusSelection';
 
 const Container = styled(Box)(() => ({
   paddingTop: '23px',
@@ -42,37 +45,80 @@ const Actions = styled(Stack)(() => ({
 }));
 
 export const DelagationForm = () => {
-  const [passwaord, setPassword] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [formLoading, setFormLoading] = React.useState(false);
+  const [txFee, setTxFee] = React.useState<string>('');
   const [isIncorectPasswaord, setIsIncorectPassword] = React.useState(false);
   const navigateTo = useNavigateTo();
-  const { governanceVote, walletId, checkUserPassword } = useGovernance();
-  const strings = useStrings();
+  const {
+    governanceVote,
+    checkUserPassword,
+    selectedWallet,
+    signDelegationTransaction,
+    txDelegationResult,
+    tokenInfo,
+    getFormattedPairingAmount,
+    isHardwareWallet,
+  } = useGovernance();
 
-  const confirmDelegation = async () => {
-    const response = await checkUserPassword(passwaord);
-    if (response?.name === 'WrongPassphraseError') {
-      setIsIncorectPassword(true);
-      // TODO - add this path once we have the submit api
-      // navigateTo.transactionFail();
-    } else {
-      alert('Submit functionality is mocked and not yet implemented');
-      navigateTo.transactionSubmited();
-      useCreateAndSendDrepDelegationTransaction({ walletId, governanceVote });
+  React.useEffect(() => {
+    if (txDelegationResult != null) {
+      // @ts-ignore
+      const rawFee = txDelegationResult.signTxRequest.fee();
+      const getTokenInfo = genLookupOrFail(tokenInfo);
+      const formatValue = genFormatTokenAmount(getTokenInfo);
+      setTxFee(formatValue(rawFee.getDefaultEntry()));
     }
+  }, [txDelegationResult]);
+
+  const strings = useStrings();
+  const confirmDelegation = async () => {
+    const response = await checkUserPassword(password);
+    if (isHardwareWallet) {
+      signGovernanceTx();
+    } else if (response?.name === 'WrongPassphraseError') {
+      setIsIncorectPassword(true);
+    } else {
+      signGovernanceTx();
+    }
+  };
+
+  const signGovernanceTx = async () => {
+    try {
+      setFormLoading(true);
+      await signDelegationTransaction({
+        password,
+        publicDeriver: selectedWallet,
+        dialog: null,
+      });
+      setFormLoading(false);
+      navigateTo.transactionSubmited();
+      setPassword('');
+    } catch (error) {
+      console.warn('[createDrepDelegationTransaction,signDelegationTransaction]', error);
+      setFormLoading(false);
+      navigateTo.transactionFail();
+    }
+  };
+
+  const mapStatusDescription = {
+    delegate: strings.designatedSomeone,
+    ALWAYS_ABSTAIN: 'You are choosing not to cast a vote on all proposals now and in the future.',
+    ALWAYS_NO_CONFIDENCE: 'You are expressing a lack of trust for all proposals now and in the future.',
   };
 
   React.useEffect(() => {
     setIsIncorectPassword(false);
-  }, [passwaord]);
+  }, [password]);
 
   return (
     <Container>
       <Stack>
         <Typography variant="body2" color="ds.gray_c600" mb="4px">
-          {strings.delegateToDRep}
+          {mapStatus[governanceVote.kind || '']}
         </Typography>
         <Typography variant="body1" mb="24px">
-          {strings.designatedSomeone}
+          {mapStatusDescription[governanceVote.kind || '']}
         </Typography>
         <TotalBox>
           <Typography variant="h4" color="ds.gray_cmin">
@@ -80,10 +126,10 @@ export const DelagationForm = () => {
           </Typography>
           <Box textAlign="right">
             <Typography variant="h4" fontWeight="500" color="ds.gray_cmin">
-              0.5 ADA
+              {txFee} ADA
             </Typography>
             <Typography variant="body2" color="ds.gray_c300">
-              0.15 USD
+              {String(getFormattedPairingAmount(String(Number(txFee) * 1000000)))}
             </Typography>
           </Box>
         </TotalBox>
@@ -96,54 +142,68 @@ export const DelagationForm = () => {
             content={
               <TransactionDetails>
                 {governanceVote.kind === 'delegate' && (
-                  <>
-                    <Typography
-                      variant="body1"
-                      color="ds.text_gray_normal"
-                    >{`Delegate voting to ${governanceVote.drepID}`}</Typography>
-                    <Stack direction="row" justifyContent="space-between">
-                      <Typography variant="body1" fontWeight="500">
-                        Transaction fee
-                      </Typography>
-                      <Typography variant="body1" color="ds.text_gray_normal">
-                        0.5 ADA
-                      </Typography>
-                    </Stack>
-                  </>
+                  <OperationInfo label={`Delegate voting to ${governanceVote.drepID}`} fee={txFee} />
                 )}
-                {governanceVote.kind === 'abstain' && (
-                  <>
-                    <Typography variant="body2">{strings.selectAbstein}</Typography>
-                  </>
-                )}
-                {governanceVote.kind === 'no-confidence' && (
-                  <>
-                    <Typography variant="body2">{strings.selectNoConfidenc}</Typography>
-                  </>
+                {governanceVote.kind === DREP_ALWAYS_ABSTAIN && <OperationInfo label={strings.selectAbstein} fee={txFee} />}
+                {governanceVote.kind === DREP_ALWAYS_NO_CONFIDENCE && (
+                  <OperationInfo label={strings.selectNoConfidence} fee={txFee} />
                 )}
               </TransactionDetails>
             }
           />
         </Box>
-        <PasswordInput
-          label={strings.password}
-          id="outlined-adornment-password"
-          onChange={event => setPassword(event.target.value)}
-          value={passwaord}
-          error={!!isIncorectPasswaord}
-          helperText={isIncorectPasswaord ? strings.wrongPassword : ' '}
-        />
+        {isHardwareWallet ? (
+          <> </>
+        ) : (
+          <PasswordInput
+            label={strings.password}
+            id="outlined-adornment-password"
+            onChange={event => setPassword(event.target.value)}
+            value={password}
+            error={!!isIncorectPasswaord}
+            helperText={isIncorectPasswaord ? strings.wrongPassword : ' '}
+            disabled={formLoading}
+          />
+        )}
       </Stack>
       <Actions direction="row" spacing="24px">
         {/* @ts-ignore */}
         <Button variant="secondary" onClick={() => navigateTo.selectStatus()}>
           {strings.back}
         </Button>
-        {/* @ts-ignore */}
-        <Button variant="primary" disabled={passwaord.length === 0} onClick={async () => confirmDelegation()}>
+        <LoadingButton
+          //  @ts-ignore
+          variant="primary"
+          loading={formLoading}
+          disabled={isHardwareWallet ? false : password.length === 0}
+          onClick={async () => confirmDelegation()}
+        >
           {strings.confirm}
-        </Button>
+        </LoadingButton>
       </Actions>
     </Container>
+  );
+};
+
+type OperationInfoProps = {
+  label: string;
+  fee: string;
+};
+
+const OperationInfo = ({ label, fee }: OperationInfoProps) => {
+  return (
+    <>
+      <Typography variant="body1" color="ds.text_gray_normal">
+        {label}
+      </Typography>
+      <Stack direction="row" justifyContent="space-between">
+        <Typography variant="body1" fontWeight="500">
+          Transaction fee
+        </Typography>
+        <Typography variant="body1" color="ds.text_gray_normal">
+          {fee} ADA
+        </Typography>
+      </Stack>
+    </>
   );
 };

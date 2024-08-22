@@ -1,17 +1,16 @@
-import { Stack } from '@mui/material';
+import { Alert, Button, Stack } from '@mui/material';
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
-import { GovernanceProvider, useDelegationCertificate, useVotingCertificate } from '@yoroi/staking';
-
+import { GovernanceProvider } from '@yoroi/staking';
 import * as React from 'react';
+import { NoTransactions } from '../../../../components/ilustrations/NoTransactions';
 import { useModal } from '../../../../components/modals/ModalContext';
-import { useDrepDelegationState } from '../../api/useDrepDelegationState';
 import { ChooseDRepModal } from '../../common/ChooseDRepModal';
 import { GovernanceVoteingCard } from '../../common/GovernanceVoteingCard';
 import { VotingSkeletonCard } from '../../common/VotingSkeletonCard';
-import { BECOME_DREP_LINK, LEARN_MORE_LINK } from '../../common/constants';
+import { BECOME_DREP_LINK, DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE, LEARN_MORE_LINK } from '../../common/constants';
 import { Abstein } from '../../common/ilustrations/Abstein';
 import { DRepIlustration } from '../../common/ilustrations/DRepIlustration';
 import { NoConfidance } from '../../common/ilustrations/NoConfidance';
@@ -28,43 +27,30 @@ const Container = styled(Box)(() => ({
   paddingTop: '24px',
 }));
 
-const mapStatus = {
-  drep: 'Delegate to a Drep',
-  abstain: 'Abstaining',
-  'no-confidence': 'No confidence',
+export const mapStatus = {
+  delegate: 'Delegate to a Drep',
+  [DREP_ALWAYS_ABSTAIN]: 'Abstain',
+  [DREP_ALWAYS_NO_CONFIDENCE]: 'No Confidence',
 };
 
 export const GovernanceStatusSelection = () => {
-  const [pendingVote] = React.useState<boolean>(false);
-  const [pendingPage] = React.useState<boolean>(false);
+  const {
+    governanceStatus,
+    governanceManager,
+    governanceVoteChanged,
+    createDrepDelegationTransaction,
+    walletAdaBalance,
+    triggerBuySellAdaDialog,
+    submitedTransactions,
+  } = useGovernance();
+  const [error, setError] = React.useState<string | null>(null);
   const navigateTo = useNavigateTo();
-
-  const { openModal } = useModal();
-  const { governanceVote, governanceManager, governanceVoteChanged, walletId } = useGovernance();
-  const { data: governanceData } = useDrepDelegationState(walletId);
-
   const strings = useStrings();
-
-  // TODO not woking - the sancho testnet is down and other networks throw error
-  // const { data: stakingStatus } = useStakingKeyState('e09fe806015ff6b7c62331ba9d7a68160f9c9c41b7a0765966250c2ea8', {
-  //   suspense: true,
-  // });
-  // console.log('stakingStatus', stakingStatus);
-  // const action = stakingStatus ? mapStakingKeyStateToGovernanceAction(stakingStatus) : null
-
-  // @ts-ignore
-  const { createCertificate, isLoading: isCreatingDelegationCertificate } = useDelegationCertificate({
-    useErrorBoundary: true,
-  });
-
-  // @ts-ignore
-  const { createCertificate: createVotingCertificate, isLoading: isCreatingVotingCertificate } = useVotingCertificate({
-    useErrorBoundary: true,
-  });
-
-  const pageTitle = governanceData?.kind === 'none' ? strings.registerGovernance : strings.governanceStatus;
-  const statusRawText = mapStatus[governanceVote?.kind];
-  const pageSubtitle = governanceData?.kind === 'none' ? strings.reviewSelection : strings.statusSelected(statusRawText);
+  const { openModal, closeModal } = useModal();
+  const pageTitle = governanceStatus.status !== 'none' ? strings.governanceStatus : strings.registerGovernance;
+  const statusRawText = mapStatus[governanceStatus.status || ''];
+  const pageSubtitle = governanceStatus.status === 'none' ? strings.reviewSelection : strings.statusSelected(statusRawText);
+  const isPendindDrepDelegationTx = submitedTransactions.length > 0 && submitedTransactions[0]?.isDrepDelegation === true;
 
   const openDRepIdModal = (onSubmit: (drepID: string) => void) => {
     if (!governanceManager) {
@@ -82,85 +68,85 @@ export const GovernanceStatusSelection = () => {
     });
   };
 
-  const handleDelegate = () => {
+  const handleDelegate = async () => {
     openDRepIdModal(drepID => {
       const vote: Vote = { kind: 'delegate', drepID };
+      createUnsignTx(drepID);
       governanceVoteChanged(vote);
-      navigateTo.delegationForm();
-      // createCertificate(
-      //   { drepID, stakePoolKeyHash },
-      //   {
-      //     onSuccess: async certificate => {
-      //       // const unsignedTx = await createGovernanceTxMutation TODO - should be implemented
-      //       const vote = { kind: 'delegate', drepID };
-      //       setPendingVote(vote.kind);
-      //       dRepIdChanged(drepID);
-      //       governanceStatusChanged(drepID);
-      //       navigateTo.delegationForm('delegate');
-      //     },
-      //   }
-      // );
     });
   };
 
-  const handleAbstain = () => {
-    const vote: Vote = { kind: 'abstain' };
-    // setPendingVote(vote.kind);
+  const handleAbstain = async () => {
+    await createUnsignTx(DREP_ALWAYS_ABSTAIN);
+    const vote: Vote = { kind: DREP_ALWAYS_ABSTAIN };
     governanceVoteChanged(vote);
-    navigateTo.delegationForm();
-    // createVotingCertificate(
-    //   { vote: 'abstain', stakingKey },
-    //   {
-    //     onSuccess: async certificate => {
-    //        navigateTo.delegationForm('delegate');
-    //     },
-    //   }
-    // );
   };
 
-  const handleNoConfidence = () => {
-    const vote: Vote = { kind: 'no-confidence' };
-    // setPendingVote(vote.kind);
+  const handleNoConfidence = async () => {
+    await createUnsignTx(DREP_ALWAYS_NO_CONFIDENCE);
+    const vote: Vote = { kind: DREP_ALWAYS_NO_CONFIDENCE };
     governanceVoteChanged(vote);
-    navigateTo.delegationForm();
-    // createVotingCertificate(
-    //   { vote: 'no-confidence', stakePoolKeyHash },
-    //   {
-    //     onSuccess: async certificate => {
-    //       navigateTo.confirmTx({ unsignedTx, vote });
-    //     },
-    //   }
-    // );
+  };
+
+  const createUnsignTx = async kind => {
+    try {
+      await createDrepDelegationTransaction(kind);
+      setError(null);
+      navigateTo.delegationForm();
+    } catch (e) {
+      setError('Error trying to Vote. Please try again later');
+      closeModal();
+    }
   };
 
   const optionsList = [
     {
-      title: governanceData?.kind === 'delegate' ? strings.delegateingToDRep : strings.delegateToDRep,
+      title: governanceStatus.status === 'delegate' ? strings.delegatingToDRep : strings.delegateToDRep,
+      titleHover: governanceStatus.status === 'delegate' ? 'Change DRep' : strings.delegateToDRep,
       description: strings.designatingSomeoneElse,
+      descriptionHover:
+        governanceStatus.status === 'delegate'
+          ? `Current DRep selection: ${governanceStatus.drep}`
+          : strings.designatingSomeoneElse,
       icon: <DRepIlustration />,
-      selected: governanceData?.kind === 'delegate',
+      selected: governanceStatus.status === 'delegate' ? true : false,
       onClick: handleDelegate,
-      pending: pendingVote,
+      pending: isPendindDrepDelegationTx,
     },
     {
       title: strings.abstain,
       description: strings.abstainInfo,
       icon: <Abstein />,
-      selected: governanceData?.kind === 'abstain',
+      selected: governanceStatus.status === DREP_ALWAYS_ABSTAIN ? true : false,
       onClick: handleAbstain,
-      pending: pendingVote,
+      pending: isPendindDrepDelegationTx,
     },
     {
       title: strings.noConfidence,
       description: strings.noConfidenceInfo,
       icon: <NoConfidance />,
-      selected: governanceData?.kind === 'no-confidence',
+      selected: governanceStatus.status === DREP_ALWAYS_NO_CONFIDENCE ? true : false,
       onClick: handleNoConfidence,
-      pending: pendingVote,
+      pending: isPendindDrepDelegationTx,
     },
   ];
 
   const skeletonsCards = new Array(optionsList.length).fill(null);
+
+  if (walletAdaBalance !== null && walletAdaBalance === 0) {
+    return (
+      <Stack mt="185px" alignItems="center">
+        <NoTransactions />
+        <Typography variant="h3" fontWeight="500" mt="84px">
+          To participate in governance you need to have ADA in your wallet.
+        </Typography>
+        {/* @ts-ignore */}
+        <Button variant="primary" sx={{ marginTop: '16px' }} onClick={() => triggerBuySellAdaDialog()}>
+          Buy Ada
+        </Button>
+      </Stack>
+    );
+  }
 
   return (
     <Container>
@@ -171,13 +157,15 @@ export const GovernanceStatusSelection = () => {
         {pageSubtitle}
       </Typography>
       <Box display="flex" justifyContent="center" gap="24px">
-        {!pendingPage
+        {governanceStatus.status !== null
           ? optionsList.map((option, index) => {
               return (
                 <GovernanceVoteingCard
                   key={index}
                   title={option.title}
+                  titleHover={option?.titleHover}
                   description={option.description}
+                  descriptionHover={option?.descriptionHover}
                   icon={option.icon}
                   selected={option.selected}
                   onClick={option.onClick}
@@ -189,12 +177,13 @@ export const GovernanceStatusSelection = () => {
       </Box>
 
       <Stack gap="17px" mt="42px">
-        {governanceData?.kind === 'delegate' && (
+        {error && <Alert severity="error"> {error}</Alert>}
+        {governanceStatus.drep !== null && (
           <Typography variant="body2" align="center" color="textSecondary" gutterBottom>
-            `${strings.drepId} ${governanceData?.drepID}`
+            {strings.drepId} {governanceStatus.drep}
           </Typography>
         )}
-        {governanceData?.kind === 'none' && (
+        {governanceStatus.status === 'none' && (
           <Link href={BECOME_DREP_LINK} target="_blank" rel="noopener" variant="body1" lineHeight="22px">
             {strings.becomeADrep}
           </Link>

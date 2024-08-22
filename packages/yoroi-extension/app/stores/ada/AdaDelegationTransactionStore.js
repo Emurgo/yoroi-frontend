@@ -14,24 +14,21 @@ import {
   asGetPublicKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import {
-  isLedgerNanoWallet,
-  isTrezorTWallet,
-} from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 
-export type CreateWithdrawalTxRequest =
-  LocalizedRequest<DeferredCall<CreateWithdrawalTxResponse>>;
+export type CreateWithdrawalTxRequest = LocalizedRequest<DeferredCall<CreateWithdrawalTxResponse>>;
 
 export default class AdaDelegationTransactionStore extends Store<StoresMap, ActionsMap> {
-  @observable createWithdrawalTx: LocalizedRequest<
+  @observable createWithdrawalTx: LocalizedRequest<DeferredCall<CreateWithdrawalTxResponse>> = new LocalizedRequest<
     DeferredCall<CreateWithdrawalTxResponse>
-  > = new LocalizedRequest<DeferredCall<CreateWithdrawalTxResponse>>(request => request());
+  >(request => request());
 
   @observable
-  createDelegationTx: LocalizedRequest<CreateDelegationTxFunc> =
-    new LocalizedRequest<CreateDelegationTxFunc>(this.api.ada.createDelegationTx);
+  createDelegationTx: LocalizedRequest<CreateDelegationTxFunc> = new LocalizedRequest<CreateDelegationTxFunc>(
+    this.api.ada.createDelegationTx
+  );
 
   @observable shouldDeregister: boolean = false;
 
@@ -139,9 +136,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     }
     const withStakingKey = asGetAllAccounting(withHasUtxoChains);
     if (withStakingKey == null) {
-      throw new Error(
-        `${nameof(this._createWithdrawalTxForWallet)} missing staking key functionality`
-      );
+      throw new Error(`${nameof(this._createWithdrawalTxForWallet)} missing staking key functionality`);
     }
 
     const stakingKeyDbRow = await withStakingKey.getStakingKey();
@@ -213,9 +208,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     }
     // normal password-based wallet
     if (request.password == null) {
-      throw new Error(
-        `${nameof(this._signTransaction)} missing password for non-hardware signing`
-      );
+      throw new Error(`${nameof(this._signTransaction)} missing password for non-hardware signing`);
     }
     await this.stores.substores.ada.wallets.adaSendAndRefresh({
       broadcastRequest: {

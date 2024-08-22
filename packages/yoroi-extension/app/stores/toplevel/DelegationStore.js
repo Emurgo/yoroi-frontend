@@ -280,7 +280,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     }
   };
 
-  createDelegationTransaction: (string) => Promise<void> = async poolId => {
+  createDelegationTransaction: string => Promise<void> = async poolId => {
     this.stores.delegation.poolInfoQuery.reset();
     await this.stores.delegation.poolInfoQuery.execute([poolId]);
     await this.stores.substores.ada.delegationTransaction.createTransaction({
@@ -289,7 +289,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     });
   };
 
-  createDrepDelegationTransaction: (string) => Promise<void> = async drepCredential => {
+  createDrepDelegationTransaction: string => Promise<void> = async drepCredential => {
     await this.stores.substores.ada.delegationTransaction.createTransaction({
       drepCredential,
       publicDeriver: this.stores.wallets.selectedOrFail,
@@ -323,6 +323,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
       });
 
       const governanceStatus = await govApi.getAccountState(skey, skey);
+
       this.setGovernanceStatus(governanceStatus);
     } catch (e) {
       console.warn(e);

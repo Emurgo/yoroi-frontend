@@ -56,7 +56,13 @@ class StakingPageContent extends Component<AllProps> {
     if (publicDeriver == null) {
       throw new Error(`${nameof(StakingPageContent)} no public deriver. Should never happen`);
     }
+    const networkInfo = publicDeriver.getParent().getNetworkInfo();
+    const networkId = networkInfo.NetworkId;
 
+    // Check governance only for certain network
+    if (networkId === 350 || networkId === 450) {
+      this.props.stores.delegation.checkGovernanceStatus(publicDeriver);
+    }
     if (this.props.stores.delegation.getPoolTransitionConfig(publicDeriver).shouldUpdatePool) {
       const poolTransitionInfo = this.props.stores.delegation.getPoolTransitionInfo(publicDeriver);
       if (poolTransitionInfo?.suggestedPool) {
@@ -205,7 +211,7 @@ class StakingPageContent extends Component<AllProps> {
     const currentlyDelegating = stores.delegation.isCurrentlyDelegating(publicDeriver);
     const delegatedUtxo = stores.delegation.getDelegatedUtxoBalance(publicDeriver);
     const delegatedRewards = stores.delegation.getRewardBalanceOrZero(publicDeriver);
-    const isParticipatingToGovernance = stores.delegation.governanceStatus;
+    const isParticipatingToGovernance = stores.delegation.governanceStatus?.drepDelegation !== null;
 
     return (
       <Box>
@@ -213,7 +219,7 @@ class StakingPageContent extends Component<AllProps> {
           <WalletEmptyBanner onBuySellClick={() => this.props.actions.dialogs.open.trigger({ dialog: BuySellDialog })} />
         ) : null}
 
-        {isStakeRegistered ? (
+        {currentlyDelegating ? (
           <WrapperCards>
             <SummaryCard
               onOverviewClick={() =>
