@@ -6,6 +6,7 @@ import { useSwapForm } from '../../context/swap-form';
 import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
 import SwapStore from '../../../../stores/ada/SwapStore';
 import { comparatorByGetter } from '../../../../coreUtils';
+import { useVerifiedSwapTokens } from '../hooks';
 
 type Props = {|
   store: SwapStore,
@@ -16,15 +17,8 @@ type Props = {|
 |};
 
 export default function SelectSellTokenFromList({ store, onClose, onTokenInfoChanged, defaultTokenInfo, getTokenInfoBatch }: Props): Node {
-  const { onlyVerifiedTokens } = useSwapTokensOnlyVerified();
-  const assets = store.assets;
-  const walletVerifiedAssets = useMemo(() => {
-    return assets.map(a => {
-      const vft = onlyVerifiedTokens.find(ovt => ovt.fingerprint === a.fingerprint);
-      return a.id === '' || vft ? { ...a, ...vft } : undefined;
-    }).filter(Boolean).sort(comparatorByGetter(a => a.name?.toLowerCase()));
-  }, [onlyVerifiedTokens, assets]);
-
+  const {walletVerifiedAssets} = useVerifiedSwapTokens(store.assets)
+  
   const { orderData, resetQuantities } = useSwap();
   const {
     buyQuantity: { isTouched: isBuyTouched },

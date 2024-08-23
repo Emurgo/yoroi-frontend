@@ -6,16 +6,23 @@ import { useSwapForm } from '../../context/swap-form';
 import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
 import SwapStore from '../../../../stores/ada/SwapStore';
 import { comparatorByGetter } from '../../../../coreUtils';
+import { useVerifiedSwapTokens } from '../hooks';
 
 type Props = {|
   store: SwapStore,
   onClose(): void,
-  onTokenInfoChanged: * => void,
+  onTokenInfoChanged: (*) => void,
   defaultTokenInfo: RemoteTokenInfo,
-  getTokenInfoBatch: Array<string> => { [string]: Promise<RemoteTokenInfo> },
+  getTokenInfoBatch: (Array<string>) => { [string]: Promise<RemoteTokenInfo> },
 |};
 
-export default function SelectBuyTokenFromList({ store, onClose, onTokenInfoChanged, defaultTokenInfo, getTokenInfoBatch }: Props): Node {
+export default function SelectBuyTokenFromList({
+  store,
+  onClose,
+  onTokenInfoChanged,
+  defaultTokenInfo,
+  getTokenInfoBatch,
+}: Props): Node {
   const {
     sellQuantity: { isTouched: isSellTouched },
     buyQuantity: { isTouched: isBuyTouched },
@@ -25,26 +32,13 @@ export default function SelectBuyTokenFromList({ store, onClose, onTokenInfoChan
     switchTokens,
   } = useSwapForm();
 
-  const { onlyVerifiedTokens } = useSwapTokensOnlyVerified();
-  const walletAssets = store.assets;
-
-  const walletVerifiedAssets = useMemo(() => {
-    const isSellingPt = sellTokenInfo.id === '';
-    const pt = walletAssets.find(a => a.id === '');
-    const nonPtAssets = onlyVerifiedTokens.map(ovt => {
-      if (ovt.id === '') return null;
-      const vft = walletAssets.find(a => a.fingerprint === ovt.fingerprint);
-      return { ...ovt, ...(vft ?? {}) };
-    }).filter(Boolean).sort(comparatorByGetter(a => a.name?.toLowerCase()));
-    return [...(isSellingPt ? [] : [pt]), ...nonPtAssets];
-  }, [onlyVerifiedTokens, walletAssets, sellTokenInfo]);
+  const { walletVerifiedAssets } = useVerifiedSwapTokens(store.assets);
 
   const { orderData, resetQuantities } = useSwap();
 
   const handleAssetSelected = token => {
     const { id, decimals } = token;
-    const shouldUpdateToken =
-      id !== orderData.amounts.buy.tokenId || !isBuyTouched || decimals !== buyTokenInfo.decimals;
+    const shouldUpdateToken = id !== orderData.amounts.buy.tokenId || !isBuyTouched || decimals !== buyTokenInfo.decimals;
     const shouldSwitchTokens = id === orderData.amounts.sell.tokenId && isSellTouched;
     // useCase - switch tokens when selecting the same already selected token on the other side
     if (shouldSwitchTokens) {
