@@ -127,13 +127,11 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
     return date == null ? '-' : moment(date).format('MMM D, YYYY H:mm');
   };
 
-  // todo
   const getComparableDate = txHash => {
     const renderedTimestamp = txHashToRenderedTimestamp(txHash);
     return renderedTimestamp === '-' ? null : moment(renderedTimestamp, 'MMM D, YYYY H:mm').toDate();
   };
 
-  // todo
   const sortOrdersByDate = orders => {
     return orders.sort((a, b) => {
       const dateA = getComparableDate(a.txId);
