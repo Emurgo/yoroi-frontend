@@ -27,9 +27,6 @@ import { Quantities } from '../../../utils/quantities';
 import ExplorableHashContainer from '../../widgets/ExplorableHashContainer';
 import { useRichOrders } from './hooks';
 import { createFormattedTokenValues } from './util';
-import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
-import type { MappedOrder } from './hooks';
-import type { FormattedTokenValue } from './util';
 import { signTransaction } from '../../../api/thunk';
 import NoCompleteOrders from './NoCompleteOrders';
 import NoOpenOrders from './NoOpenOrders';
@@ -336,7 +333,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
           columnRightPaddings={['0px', '0px', '0px', '0px', '0px', '0px', '0px']}
         >
           {showCompletedOrders
-            ? completedOrders.map(order => (
+            ? sortedCompletedOrders.map(order => (
                 <OrderRow
                   key={order.txId}
                   order={order}
@@ -381,7 +378,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
       {showCompletedOrders && completedOrdersLoading && <LoadingCompletedOrders columnLeftPaddings={columnLeftPaddings} />}
       {!openOrdersLoading && isDisplayOpenOrdersEmpty && <NoOpenOrders />}
       {!completedOrdersLoading && isDisplayCompletedOrdersEmpty && <NoCompleteOrders />}
-    </Box>
+    </>
   );
 }
 
