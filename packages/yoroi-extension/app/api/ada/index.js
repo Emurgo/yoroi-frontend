@@ -129,6 +129,7 @@ import {
   convertAdaTransactionsToExportRows,
   multiTokenFromCardanoValue,
   multiTokenFromRemote,
+  cardanoMinAdaRequiredFromAssets,
 } from './transactions/utils';
 import type { TransactionExportRow } from '../export';
 
@@ -146,7 +147,7 @@ import {
   getCardanoHaskellBaseConfig,
   getNetworkById,
 } from './lib/storage/database/prepackaged/networks';
-import { toSenderUtxos, } from './transactions/transfer/utils';
+import { toSenderUtxos } from './transactions/transfer/utils';
 import type { DefaultTokenEntry } from '../common/lib/MultiToken';
 import { MultiToken } from '../common/lib/MultiToken';
 import { getReceiveAddress } from '../../stores/stateless/addressStores';
@@ -158,6 +159,7 @@ import { derivePrivateByAddressing, derivePublicByAddressing } from './lib/carda
 import type { WalletState } from '../../../chrome/extension/background/types';
 import TimeUtils from './lib/storage/bridge/timeUtils';
 import type { IFetcher } from './lib/state-fetch/IFetcher.types';
+import type { ProtocolParameters } from '@emurgo/yoroi-lib/dist/protocol-parameters/models';
 
 // ADA specific Request / Response params
 
@@ -294,6 +296,7 @@ export type CreateUnsignedTxRequest = {|
   filter: ElementOf<IGetAllUtxosResponse> => boolean,
   tokens: SendTokenList,
   metadata: Array<TransactionMetadata> | void,
+  protocolParameters: ProtocolParameters,
 |};
 export type CardanoTxRequestMintMetadata = {|
   tag: number | string, // the metadata tag, e.g. 721 for NFTs
@@ -338,6 +341,7 @@ export type CreateUnsignedTxForConnectorRequest = {|
   absSlotNumber: BigNumber,
   submittedTxs: Array<PersistedSubmittedTransaction>,
   utxos: Array<CardanoAddressedUtxo>,
+  protocolParameters: ProtocolParameters,
 |};
 export type CreateUnsignedTxResponse = HaskellShelleyTxSignRequest;
 export type CreateVotingRegTxResponse = HaskellShelleyTxSignRequest;
@@ -355,6 +359,7 @@ export type CreateUnsignedTxForUtxosRequest = {|
   tokens: SendTokenList,
   utxos: Array<CardanoAddressedUtxo>,
   metadata: Array<TransactionMetadata> | void,
+  protocolParameters: ProtocolParameters,
 |};
 export type CreateUnsignedTxForUtxosResponse = HaskellShelleyTxSignRequest;
 export type CreateUnsignedTxForUtxosFunc = (
@@ -370,11 +375,13 @@ export type CreateDelegationTxRequest = {|
   poolRequest?: string,
   drepCredential?: string,
   valueInAccount: MultiToken,
+  protocolParameters: ProtocolParameters,
 |};
 
 type CreateVotingRegTxRequestCommon = {|
   wallet: WalletState,
   absSlotNumber: BigNumber,
+  protocolParameters: ProtocolParameters,
 |};
 
 export type CreateVotingRegTxRequest = {|
@@ -399,6 +406,7 @@ export type CreateSimpleTxRequest = {|
   },
   entries: Array<TxOutput>,
   metadata: RustModule.WalletV4.AuxiliaryData,
+  protocolParameters: ProtocolParameters,
 |};
 
 export type CreateDelegationTxResponse = {|
@@ -431,6 +439,7 @@ export type CreateWithdrawalTxRequest = {|
      */
     shouldDeregister: boolean,
   |}>,
+  protocolParameters: ProtocolParameters,
 |};
 export type CreateWithdrawalTxResponse = HaskellShelleyTxSignRequest;
 
@@ -484,6 +493,7 @@ export type TransferToCip1852Request = {|
   getUTXOsForAddresses: AddressUtxoFunc,
   network: $ReadOnly<NetworkRow>,
   defaultToken: $ReadOnly<TokenRow>,
+  protocolParameters: ProtocolParameters,
 |};
 export type TransferToCip1852Response = {|
   signRequest: CreateUnsignedTxResponse,
@@ -822,13 +832,11 @@ export default class AdaApi {
   ): Promise<CreateUnsignedTxForUtxosResponse> {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.createUnsignedTxForUtxos)} called`);
     try {
-      const config = getCardanoHaskellBaseConfig(
-        request.network
-      ).reduce((acc, next) => Object.assign(acc, next), {});
-
       let unsignedTxResponse;
       const trxMetadata =
         request.metadata !== undefined ? createMetadata(request.metadata): undefined;
+
+      const { protocolParameters } = request;
 
       if (hasSendAllDefault(request.tokens)) {
         if (request.receivers.length !== 1) {
@@ -840,13 +848,13 @@ export default class AdaApi {
           request.utxos,
           request.absSlotNumber,
           {
-            keyDeposit: RustModule.WalletV4.BigNum.from_str(config.KeyDeposit),
+            keyDeposit: RustModule.WalletV4.BigNum.from_str(protocolParameters.keyDeposit),
             linearFee: RustModule.WalletV4.LinearFee.new(
-              RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
-              RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
+              RustModule.WalletV4.BigNum.from_str(protocolParameters.linearFee.coefficient),
+              RustModule.WalletV4.BigNum.from_str(protocolParameters.linearFee.constant),
             ),
-            coinsPerUtxoByte: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoByte),
-            poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
+            coinsPerUtxoByte: RustModule.WalletV4.BigNum.from_str(protocolParameters.coinsPerUtxoByte),
+            poolDeposit: RustModule.WalletV4.BigNum.from_str(protocolParameters.poolDeposit),
             networkId: request.network.NetworkId,
           },
           trxMetadata,
@@ -900,11 +908,11 @@ export default class AdaApi {
           request.utxos,
           request.absSlotNumber,
           {
-            keyDeposit: config.KeyDeposit,
-            linearFeeCoefficient: config.LinearFee.coefficient,
-            linearFeeConstant: config.LinearFee.constant,
-            coinsPerUtxoByte: config.CoinsPerUtxoByte,
-            poolDeposit: config.PoolDeposit,
+            keyDeposit: protocolParameters.keyDeposit,
+            linearFeeCoefficient: protocolParameters.linearFee.coefficient,
+            linearFeeConstant: protocolParameters.linearFee.constant,
+            coinsPerUtxoByte: protocolParameters.coinsPerUtxoByte,
+            poolDeposit: protocolParameters.poolDeposit,
             networkId: request.network.NetworkId,
           },
           [],
@@ -922,9 +930,9 @@ export default class AdaApi {
         changeAddr: unsignedTxResponse.changeAddr,
         metadata: trxMetadata,
         networkSettingSnapshot: {
-          ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
-          KeyDeposit: new BigNumber(config.KeyDeposit),
-          PoolDeposit: new BigNumber(config.PoolDeposit),
+          ChainNetworkId: Number(getCardanoHaskellBaseConfig(request.network)[0].ChainNetworkId),
+          KeyDeposit: new BigNumber(protocolParameters.keyDeposit),
+          PoolDeposit: new BigNumber(protocolParameters.poolDeposit),
           NetworkId: request.network.NetworkId,
         },
         neededStakingKeyHashes: {
@@ -971,6 +979,7 @@ export default class AdaApi {
       utxos: addressedUtxo,
       tokens: request.tokens,
       metadata: request.metadata,
+      protocolParameters: request.protocolParameters,
     });
   }
 
@@ -999,6 +1008,7 @@ export default class AdaApi {
       request.absSlotNumber,
       request.submittedTxs,
       request.utxos,
+      request.protocolParameters,
       foreignUtxoFetcher
     );
   }
@@ -1013,6 +1023,7 @@ export default class AdaApi {
     absSlotNumber: BigNumber,
     submittedTxs: Array<PersistedSubmittedTransaction>,
     committedUtxos: Array<CardanoAddressedUtxo>,
+    protocolParameters: ProtocolParameters,
     foreignUtxoFetcher: ?ForeignUtxoFetcher,
   ): Promise<CreateUnsignedTxResponse> {
     const {
@@ -1097,19 +1108,6 @@ export default class AdaApi {
       addressing: receiveAddress.addressing,
     };
 
-    const config = getCardanoHaskellBaseConfig(
-      network
-    ).reduce((acc, next) => Object.assign(acc, next), {});
-
-    const protocolParams = {
-      keyDeposit: config.KeyDeposit,
-      linearFeeCoefficient: config.LinearFee.coefficient,
-      linearFeeConstant: config.LinearFee.constant,
-      coinsPerUtxoByte: config.CoinsPerUtxoByte,
-      poolDeposit: config.PoolDeposit,
-      networkId: network.NetworkId,
-    };
-
     const outputs = [];
     const mint = [];
     const mintMetadata = {};
@@ -1169,7 +1167,7 @@ export default class AdaApi {
         const values = [
           {
             identifier: defaultToken.defaultIdentifier,
-            networkId: protocolParams.networkId,
+            networkId: network.NetworkId,
             amount: new BigNumber(adaValue),
           },
         ];
@@ -1178,7 +1176,7 @@ export default class AdaApi {
           if (assetValue != null) {
             values.push({
               identifier: assetId,
-              networkId: protocolParams.networkId,
+              networkId: network.NetworkId,
               amount: new BigNumber(assetValue),
             });
           }
@@ -1186,7 +1184,7 @@ export default class AdaApi {
         return new MultiToken(
           values,
           {
-            defaultNetworkId: protocolParams.networkId,
+            defaultNetworkId: network.NetworkId,
             defaultIdentifier: defaultToken.defaultIdentifier,
           },
         );
@@ -1229,9 +1227,10 @@ export default class AdaApi {
           throw new Error(`Value is required for a valid tx output, got: ${JSON.stringify(target)}`);
         }
       } else {
-
-        const minAmount =
-          cardanoMinAdaRequiredFromAssets_coinsPerWord(amount, new BigNumber(protocolParams.coinsPerUtxoByte));
+        const minAmount = cardanoMinAdaRequiredFromAssets(
+          amount,
+          new BigNumber(protocolParameters.coinsPerUtxoByte)
+        );
         if (minAmount.gt(target.value ?? '0')) {
           amount = makeMultiToken(minAmount.toString());
         }
@@ -1276,7 +1275,14 @@ export default class AdaApi {
       validityIntervalStart,
       ttl,
       requiredSigners,
-      protocolParams,
+      {
+        linearFeeCoefficient: protocolParameters.linearFee.coefficient,
+        linearFeeConstant: protocolParameters.linearFee.constant,
+        coinsPerUtxoByte: protocolParameters.coinsPerUtxoByte,
+        poolDeposit: protocolParameters.poolDeposit,
+        keyDeposit: protocolParameters.keyDeposit,
+        networkId: network.NetworkId,
+      },
     );
 
     return new HaskellShelleyTxSignRequest({
@@ -1285,10 +1291,10 @@ export default class AdaApi {
       changeAddr: unsignedTxResponse.changeAddr,
       metadata: undefined,
       networkSettingSnapshot: {
-        ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
-        KeyDeposit: new BigNumber(config.KeyDeposit),
-        PoolDeposit: new BigNumber(config.PoolDeposit),
-        NetworkId: protocolParams.networkId,
+        ChainNetworkId: Number(getCardanoHaskellBaseConfig(network)[0].ChainNetworkId),
+        KeyDeposit: new BigNumber(protocolParameters.keyDeposit),
+        PoolDeposit: new BigNumber(protocolParameters.poolDeposit),
+        NetworkId: network.NetworkId,
       },
       neededStakingKeyHashes: {
         neededHashes: new Set(),
@@ -1305,15 +1311,13 @@ export default class AdaApi {
     try {
       const { wallet } = request;
       const networkInfo = getNetworkById(wallet.networkId);
-      const config = getCardanoHaskellBaseConfig(networkInfo)
-        .reduce((acc, next) => Object.assign(acc, next), {});
 
       const protocolParams = {
-        keyDeposit: config.KeyDeposit,
-        linearFeeCoefficient: config.LinearFee.coefficient,
-        linearFeeConstant: config.LinearFee.constant,
-        coinsPerUtxoByte: config.CoinsPerUtxoByte,
-        poolDeposit: config.PoolDeposit,
+        keyDeposit: request.protocolParameters.keyDeposit,
+        linearFeeCoefficient: request.protocolParameters.linearFee.coefficient,
+        linearFeeConstant: request.protocolParameters.linearFee.constant,
+        coinsPerUtxoByte: request.protocolParameters.coinsPerUtxoByte,
+        poolDeposit: request.protocolParameters.poolDeposit,
         networkId: networkInfo.NetworkId,
       };
 
@@ -1402,9 +1406,9 @@ export default class AdaApi {
         changeAddr: unsignedTx.changeAddr,
         metadata: undefined,
         networkSettingSnapshot: {
-          ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
-          KeyDeposit: new BigNumber(config.KeyDeposit),
-          PoolDeposit: new BigNumber(config.PoolDeposit),
+          ChainNetworkId: Number(getCardanoHaskellBaseConfig(networkInfo)[0].ChainNetworkId),
+          KeyDeposit: new BigNumber(request.protocolParameters.keyDeposit),
+          PoolDeposit: new BigNumber(request.protocolParameters.poolDeposit),
           NetworkId: networkInfo.NetworkId,
         },
         neededStakingKeyHashes: {
@@ -1434,11 +1438,11 @@ export default class AdaApi {
       ).reduce((acc, next) => Object.assign(acc, next), {});
 
       const protocolParams = {
-        keyDeposit: config.KeyDeposit,
-        linearFeeCoefficient: config.LinearFee.coefficient,
-        linearFeeConstant: config.LinearFee.constant,
-        coinsPerUtxoByte: config.CoinsPerUtxoByte,
-        poolDeposit: config.PoolDeposit,
+        keyDeposit: request.protocolParameters.keyDeposit,
+        linearFeeCoefficient: request.protocolParameters.linearFee.coefficient,
+        linearFeeConstant: request.protocolParameters.linearFee.constant,
+        coinsPerUtxoByte: request.protocolParameters.coinsPerUtxoByte,
+        poolDeposit: request.protocolParameters.poolDeposit,
         networkId: request.wallet.networkId,
       };
 
@@ -1565,8 +1569,8 @@ export default class AdaApi {
         metadata: undefined,
         networkSettingSnapshot: {
           ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
-          KeyDeposit: new BigNumber(config.KeyDeposit),
-          PoolDeposit: new BigNumber(config.PoolDeposit),
+          KeyDeposit: new BigNumber(request.protocolParameters.keyDeposit),
+          PoolDeposit: new BigNumber(request.protocolParameters.poolDeposit),
           NetworkId: request.wallet.networkId,
         },
         neededStakingKeyHashes: neededKeys,
@@ -1591,11 +1595,11 @@ export default class AdaApi {
       const config = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
 
       const protocolParams = {
-        keyDeposit: config.KeyDeposit,
-        linearFeeCoefficient: config.LinearFee.coefficient,
-        linearFeeConstant: config.LinearFee.constant,
-        coinsPerUtxoByte: config.CoinsPerUtxoByte,
-        poolDeposit: config.PoolDeposit,
+        keyDeposit: request.protocolParameters.keyDeposit,
+        linearFeeCoefficient: request.protocolParameters.linearFee.coefficient,
+        linearFeeConstant: request.protocolParameters.linearFee.constant,
+        coinsPerUtxoByte: request.protocolParameters.coinsPerUtxoByte,
+        poolDeposit: request.protocolParameters.poolDeposit,
         networkId: request.publicDeriver.networkId,
       };
 
@@ -1625,8 +1629,8 @@ export default class AdaApi {
         metadata: request.metadata,
         networkSettingSnapshot: {
           ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
-          KeyDeposit: new BigNumber(config.KeyDeposit),
-          PoolDeposit: new BigNumber(config.PoolDeposit),
+          KeyDeposit: new BigNumber(request.protocolParameters.keyDeposit),
+          PoolDeposit: new BigNumber(request.protocolParameters.poolDeposit),
           NetworkId: request.publicDeriver.networkId,
         },
         neededStakingKeyHashes: {
@@ -1655,11 +1659,11 @@ export default class AdaApi {
       ).reduce((acc, next) => Object.assign(acc, next), {});
 
       const protocolParams = {
-        keyDeposit: config.KeyDeposit,
-        linearFeeCoefficient: config.LinearFee.coefficient,
-        linearFeeConstant: config.LinearFee.constant,
-        coinsPerUtxoByte: config.CoinsPerUtxoByte,
-        poolDeposit: config.PoolDeposit,
+        keyDeposit: request.protocolParameters.keyDeposit,
+        linearFeeCoefficient: request.protocolParameters.linearFee.coefficient,
+        linearFeeConstant: request.protocolParameters.linearFee.constant,
+        coinsPerUtxoByte: request.protocolParameters.coinsPerUtxoByte,
+        poolDeposit: request.protocolParameters.poolDeposit,
         networkId: request.wallet.networkId,
       };
 
@@ -1710,8 +1714,8 @@ export default class AdaApi {
         metadata: trxMetadata,
         networkSettingSnapshot: {
           ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
-          KeyDeposit: new BigNumber(config.KeyDeposit),
-          PoolDeposit: new BigNumber(config.PoolDeposit),
+          KeyDeposit: new BigNumber(request.protocolParameters.keyDeposit),
+          PoolDeposit: new BigNumber(request.protocolParameters.poolDeposit),
           NetworkId: request.wallet.networkId,
         },
         neededStakingKeyHashes: {
@@ -2016,6 +2020,7 @@ export default class AdaApi {
           }],
           utxos,
           metadata: undefined,
+          protocolParameters: request.protocolParameters,
         })
       };
     } catch (error) {
@@ -2276,6 +2281,7 @@ export default class AdaApi {
     reorgTargetAmount: string,
     utxos: Array<CardanoAddressedUtxo>,
     submittedTxs: Array<PersistedSubmittedTransaction>,
+    protocolParameters: ProtocolParameters,
     reorgTargetAddress?: string,
   ): Promise<{|
     unsignedTx: HaskellShelleyTxSignRequest,
@@ -2315,6 +2321,7 @@ export default class AdaApi {
       utxos,
       submittedTxs,
       targetAddress,
+      protocolParameters,
     );
   }
 
@@ -2329,6 +2336,7 @@ export default class AdaApi {
     utxos: Array<CardanoAddressedUtxo>,
     submittedTxs: Array<PersistedSubmittedTransaction>,
     targetAddress: string,
+    protocolParameters: ProtocolParameters,
   ): Promise<{|
     unsignedTx: HaskellShelleyTxSignRequest,
     collateralOutputAddressSet: Set<string>,
@@ -2361,6 +2369,7 @@ export default class AdaApi {
         allUtxoAddresses,
         submittedTxs,
       )).filter(utxo => !dontUseUtxoIds.has(utxo.utxo_id)),
+      protocolParameters,
       null,
     );
 

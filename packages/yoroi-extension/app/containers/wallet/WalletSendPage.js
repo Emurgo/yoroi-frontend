@@ -94,6 +94,9 @@ class WalletSendPage extends Component<AllProps> {
       this.showSupportedAddressDomainBanner =
         this.props.stores.substores.ada.addresses.getSupportedAddressDomainBannerState();
     });
+    const { loadProtocolParametersRequest } = this.props.stores.protocolParameters;
+    loadProtocolParametersRequest.reset();
+    loadProtocolParametersRequest.execute();
     ampli.sendInitiated();
   }
 
@@ -134,9 +137,17 @@ class WalletSendPage extends Component<AllProps> {
     const { selected } = this.props.stores.wallets;
     if (!selected) throw new Error(`Active wallet required for ${nameof(WalletSendPage)}.`);
 
-    const { transactionBuilderStore } = this.props.stores;
+    const {
+      uiDialogs,
+      profile,
+      transactionBuilderStore,
+      protocolParameters,
+    } = this.props.stores;
 
-    const { uiDialogs, profile } = this.props.stores;
+    if (!protocolParameters.loadProtocolParametersRequest.wasExecuted) {
+      return null;
+    }
+
     const { actions } = this.props;
     const { hasAnyPending } = this.props.stores.transactions;
     const { txBuilderActions } = this.props.actions;

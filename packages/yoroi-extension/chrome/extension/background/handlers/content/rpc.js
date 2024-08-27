@@ -66,6 +66,7 @@ import {
 } from './connect';
 import type { CardanoTxRequest } from '../../../../../app/api/ada';
 import type { NFTMetadata } from '../../../../../app/api/ada/lib/storage/database/primitives/tables';
+import { getProtocolParameters } from '../yoroi/protocolParameters';
 
 declare var chrome;
 
@@ -434,6 +435,7 @@ const Handlers = Object.freeze({
       null,
       message.params[0],
       foreignUtxoFetcher,
+      await getProtocolParameters(wallet.getParent().getNetworkInfo().NetworkId),
     );
     return { ok: resp };
   }),
@@ -599,6 +601,7 @@ const Handlers = Object.freeze({
           requiredAmount,
           addressedUtxos,
           submittedTxs,
+          await getProtocolParameters(wallet.getParent().getNetworkInfo().NetworkId),
         );
       } catch (error) {
         if (error instanceof NotEnoughMoneyToSendError) {

@@ -28,7 +28,7 @@ import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import type { GetExtendedPublicKeyResponse, } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import { createHardwareWallet } from '../../api/thunk';
+import { createHardwareWallet, getProtocolParameters } from '../../api/thunk';
 import type { CreateHardwareWalletRequest } from '../../api/thunk';
 import type { WalletState } from '../../../chrome/extension/background/types';
 
@@ -211,6 +211,7 @@ export default class LedgerConnectStore
     const fullConfig = getCardanoHaskellBaseConfig(
       selectedNetwork
     );
+    const protocolParameters = await getProtocolParameters({ networkId: selectedNetwork.NetworkId });
     try {
       const currentTime = this.stores.serverConnectionStore.serverTime ?? new Date();
       await this.stores.substores.ada.yoroiTransfer.transferRequest.execute({
@@ -223,6 +224,7 @@ export default class LedgerConnectStore
         absSlotNumber: new BigNumber(TimeUtils.timeToAbsoluteSlot(fullConfig, currentTime)),
         network: selectedNetwork,
         defaultToken: this.stores.tokenInfoStore.getDefaultTokenInfo(selectedNetwork.NetworkId),
+        protocolParameters,
       }).promise;
     } catch (_e) {
       // usually this means no internet connection or not enough ADA to upgrade

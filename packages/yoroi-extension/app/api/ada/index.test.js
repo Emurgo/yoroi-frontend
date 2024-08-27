@@ -434,6 +434,16 @@ describe('app/api/ada/index', () => {
         }
       ],
       metadata: undefined,
+      protocolParameters: {
+        linearFee: {
+          constant: '155381',
+          coefficient: '44',
+        },
+        coinsPerUtxoByte: '4310',
+        poolDeposit: '500000000',
+        keyDeposit: '2000000',
+
+      },
     }
     const response = await AdaApi.prototype.createUnsignedTxForUtxos(createTxRequest);
 

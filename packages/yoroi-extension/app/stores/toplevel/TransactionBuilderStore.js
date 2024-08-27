@@ -7,13 +7,9 @@ import LocalizedRequest from '../lib/LocalizedRequest';
 
 import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import {
-  isCardanoHaskell, getCardanoHaskellBaseConfig, getNetworkById,
-} from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { isCardanoHaskell, getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { TransactionMetadata } from '../../api/ada/lib/storage/bridge/metadataUtils';
-import {
-  MultiToken,
-} from '../../api/common/lib/MultiToken';
+import { MultiToken } from '../../api/common/lib/MultiToken';
 import type { TokenRow, } from '../../api/ada/lib/storage/database/primitives/tables';
 import { getDefaultEntryToken } from './TokenInfoStore';
 import type { ActionsMap } from '../../actions/index';
@@ -21,6 +17,7 @@ import type { StoresMap } from '../index';
 import { maxSendableADA } from '../../api/ada/transactions/shelley/transactions';
 import type { WalletState } from '../../../chrome/extension/background/types';
 import { cardanoMinAdaRequiredFromAssets } from '../../api/ada/transactions/utils';
+import { getProtocolParameters } from '../../api/thunk';
 
 export type SetupSelfTxRequest = {|
   publicDeriver: WalletState,
@@ -271,8 +268,6 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     if (!isCardanoHaskell(network)) return '0';
     const filteredTokens = tokens.filter(({ token }) => !token.IsDefault);
     if (filteredTokens.length === 0) return String(1_000_000);
-    const fullConfig = getCardanoHaskellBaseConfig(network);
-    const squashedConfig = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
     const fakeAmount = new BigNumber('1000000');
     const fakeMultitoken = new MultiToken(
       [{
@@ -331,6 +326,8 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
         time: this.stores.serverConnectionStore.serverTime ?? new Date(),
       }).slot);
 
+      const protocolParameters = await getProtocolParameters(publicDeriver);
+
       await this.createUnsignedTx.execute(() => this.api.ada.createUnsignedTx({
         publicDeriver,
         receiver,
@@ -338,6 +335,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
         filter: this.filter,
         absSlotNumber,
         metadata: this.metadata,
+        protocolParameters,
       }));
     } else {
       throw new Error(`${nameof(TransactionBuilderStore)}::${nameof(this._updateTxBuilder)} network not supported`);
