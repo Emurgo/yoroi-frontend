@@ -10,6 +10,7 @@ import type { ComplexityLevelType } from '../../types/complexityLevelType';
 import type { WhitelistEntry } from '../../../chrome/extension/connector/types';
 import type { CatalystRoundInfoResponse } from '../ada/lib/state-fetch/types'
 import { maybe } from '../../coreUtils';
+import type { StorageAPI } from '@emurgo/yoroi-lib/dist/flags';
 
 declare var chrome;
 declare var browser;
@@ -487,4 +488,11 @@ export function createStorageFlag(
   const serializer = String;
   const deserializer = s => s === 'true';
   return createStorageField<boolean>(key, serializer, deserializer, defaultValue);
+}
+
+export function createFlagStorage(): StorageAPI {
+    return {
+      get: async s => (await getLocalItem(s)) ?? null,
+      set: setLocalItem,
+    };
 }

@@ -8,6 +8,7 @@ module.exports = {
     '@emurgo/cardano-message-signing-browser': '@emurgo/cardano-message-signing-nodejs',
     '@emurgo/cross-csl-browser': '@emurgo/cross-csl-nodejs',
     '\\.png$': 'lodash/noop.js',
+    "^axios$": "axios/dist/node/axios.cjs",
   },
   transformIgnorePatterns: [
     '<rootDir>/node_modules/(?!@emurgo/ledger-connect-handler)'
