@@ -37,6 +37,9 @@ import { FlagsApi } from '@emurgo/yoroi-lib/dist/flags';
 import type { StorageAPI } from '@emurgo/yoroi-lib/dist/flags';
 import { createFlagStorage } from '../../api/localStorage';
 import { forceNonNull, timeCached } from '../../coreUtils';
+import type { BestBlockResponse } from '../../api/ada/lib/state-fetch/types';
+import TimeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
+import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 type GroupedWallets = {|
   publicDerivers: Array<PublicDeriver<>>,
@@ -152,7 +155,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   };
 
   flagStorage: StorageAPI;
-  bestblockGetters: { [string]: () => Promise<number> } = {};
+  absoluteSlotGetters: { [string]: () => Promise<number> } = {};
 
   setup(): void {
     super.setup();
@@ -177,20 +180,28 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     const networkName = network.NetworkFeatureName;
     if (networkName == null) return null;
 
-    let bestblockGetter = this.bestblockGetters[networkName];
-    if (bestblockGetter == null) {
+    let absoluteSlotGetter = this.absoluteSlotGetters[networkName];
+    if (absoluteSlotGetter == null) {
       const fetcher = this.stores.substores.ada.stateFetchStore.fetcher;
-      bestblockGetter = timeCached(
-        async () => (await fetcher.getBestBlock({ network })).height,
+      absoluteSlotGetter = timeCached(
+        async () => {
+          const bestblockInfo: BestBlockResponse = await fetcher.getBestBlock({ network });
+          const { epoch, slot } = bestblockInfo;
+          if (epoch != null && slot != null) {
+            return TimeUtils.toAbsoluteSlotNumber(getCardanoHaskellBaseConfig(network), { epoch, slot });
+          }
+          console.warn('Failing to resolve absolute slot, bestblock info without epoch or slot: ', bestblockInfo);
+          return -1;
+        },
         60_000, // 1 minute
       );
-      this.bestblockGetters[networkName] = bestblockGetter;
+      this.absoluteSlotGetters[networkName] = absoluteSlotGetter;
     }
 
-    const bestblock = await bestblockGetter();
+    const absoluteSlot = await absoluteSlotGetter();
 
     return await new FlagsApi(forceNonNull(network.Backend.BackendService) + '/api', this.flagStorage)
-      .readFlag(feature, networkName, bestblock);
+      .readFlag(feature, networkName, absoluteSlot);
   }
 
   @action
