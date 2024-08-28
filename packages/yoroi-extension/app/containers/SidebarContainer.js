@@ -5,6 +5,7 @@ import { observer } from 'mobx-react';
 import Sidebar from '../components/topbar/Sidebar';
 import type { StoresAndActionsProps } from '../types/injectedProps.types';
 import { allCategories, allCategoriesRevamp } from '../stores/stateless/sidebarCategories';
+import type { SidebarCategoryRevamp } from '../stores/stateless/sidebarCategories';
 import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
 import SidebarRevamp from '../components/topbar/SidebarRevamp';
 import { withLayout } from '../styles/context/layout';
@@ -20,11 +21,45 @@ type InjectedLayoutProps = {|
 |};
 type AllProps = {| ...Props, ...InjectedLayoutProps |};
 
+type State = {|
+  featureFlags: { [string]: boolean },
+|};
+
 @observer
-class SidebarContainer extends Component<AllProps> {
+class SidebarContainer extends Component<AllProps, State> {
+
+  state: State = {
+    featureFlags: {},
+  };
+
   toggleSidebar: void => Promise<void> = async () => {
     await this.props.actions.profile.toggleSidebar.trigger();
   };
+
+  componentDidMount(): * {
+    allCategoriesRevamp.forEach(c => {
+      const feature = c.featureFlagName;
+      if (feature != null) {
+        this.props.stores.wallets.getRemoteFeatureFlag(feature)
+          .then((flag: ?boolean) => {
+            console.log('> ', feature, flag);
+            if (flag) {
+              this.setState(s => ({
+                featureFlags: { ...s.featureFlags, [feature]: true },
+              }))
+            }
+            return null;
+          })
+          .catch(e => {
+            console.error('Failed to resolve remote flag for feature: ' + feature, e);
+          });
+      }
+    })
+  }
+
+  categoryFeatureFlagEnabled(category: SidebarCategoryRevamp): boolean {
+    return category.featureFlagName == null || this.state.featureFlags[category.featureFlagName];
+  }
 
   render(): Node {
     const { stores, actions } = this.props;
@@ -72,6 +107,7 @@ class SidebarContainer extends Component<AllProps> {
             isRewardWallet: (publicDeriver: PublicDeriver<>) =>
               stores.delegation.isRewardWallet(publicDeriver),
           })
+          && this.categoryFeatureFlagEnabled(category)
         )}
       />
     );

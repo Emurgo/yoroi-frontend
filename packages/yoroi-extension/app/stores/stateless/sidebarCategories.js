@@ -102,6 +102,7 @@ export type SidebarCategoryRevamp = {|
   +icon: string,
   +label?: MessageDescriptor,
   +isVisible: isVisibleFunc,
+  +featureFlagName?: string,
 |};
 
 // TODO: Fix routes and isVisible prop
@@ -181,9 +182,8 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: '/governance',
     icon: governanceIcon,
     label: globalMessages.sidebarGovernance,
-    isVisible: ({ selected }) =>
-      (environment.isDev() && selected?.getParent().getNetworkInfo().NetworkId === 450) ||
-      (environment.isDev() && selected?.getParent().getNetworkInfo().NetworkId === 350),
+    isVisible: _request => true,
+    featureFlagName: 'governance',
   },
   {
     className: 'settings',

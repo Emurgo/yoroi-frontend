@@ -33,6 +33,10 @@ import type { StoresMap } from '../index';
 import { getWalletChecksum } from '../../api/export/utils';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { BigNumber } from 'bignumber.js';
+import { FlagsApi } from '@emurgo/yoroi-lib/dist/flags';
+import type { StorageAPI } from '@emurgo/yoroi-lib/dist/flags';
+import { createFlagStorage } from '../../api/localStorage';
+import { forceNonNull, timeCached } from '../../coreUtils';
 
 type GroupedWallets = {|
   publicDerivers: Array<PublicDeriver<>>,
@@ -147,6 +151,9 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     );
   };
 
+  flagStorage: StorageAPI;
+  bestblockGetters: { [string]: () => Promise<number> } = {};
+
   setup(): void {
     super.setup();
     this.publicDerivers = [];
@@ -158,6 +165,32 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       'visibilitychange',
       debounce(_e => this._pollRefresh(), this.ON_VISIBLE_DEBOUNCE_WAIT)
     );
+    this.flagStorage = createFlagStorage();
+  }
+
+
+  // <TODO:ENCAPSULATE> make it a part of the wallet.network api
+  async getRemoteFeatureFlag(feature: string): Promise<?boolean> {
+    const wallet: ?PublicDeriver<> = this.selected;
+    if (wallet == null) return null;
+    const network = wallet.getParent().getNetworkInfo();
+    const networkName = network.NetworkFeatureName;
+    if (networkName == null) return null;
+
+    let bestblockGetter = this.bestblockGetters[networkName];
+    if (bestblockGetter == null) {
+      const fetcher = this.stores.substores.ada.stateFetchStore.fetcher;
+      bestblockGetter = timeCached(
+        async () => (await fetcher.getBestBlock({ network })).height,
+        60_000, // 1 minute
+      );
+      this.bestblockGetters[networkName] = bestblockGetter;
+    }
+
+    const bestblock = await bestblockGetter();
+
+    return await new FlagsApi(forceNonNull(network.Backend.BackendService) + '/api', this.flagStorage)
+      .readFlag(feature, networkName, bestblock);
   }
 
   @action
