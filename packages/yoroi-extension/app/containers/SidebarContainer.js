@@ -11,6 +11,7 @@ import SidebarRevamp from '../components/topbar/SidebarRevamp';
 import { withLayout } from '../styles/context/layout';
 import type { LayoutComponentMap } from '../styles/context/layout';
 import { ROUTES } from '../routes-config';
+import { runInAction } from 'mobx';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -42,11 +43,12 @@ class SidebarContainer extends Component<AllProps, State> {
       if (feature != null) {
         this.props.stores.wallets.getRemoteFeatureFlag(feature)
           .then((flag: ?boolean) => {
-            console.log('> ', feature, flag);
             if (flag) {
-              this.setState(s => ({
-                featureFlags: { ...s.featureFlags, [feature]: true },
-              }))
+              runInAction(() => {
+                this.setState(s => ({
+                  featureFlags: { ...s.featureFlags, [feature]: true },
+                }));
+              });
             }
             return null;
           })
