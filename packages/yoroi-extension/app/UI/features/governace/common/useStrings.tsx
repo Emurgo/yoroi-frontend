@@ -71,6 +71,27 @@ export const messages = Object.freeze(
       defaultMessage:
         '!!!You have selected ${status} as your governance status. You can change it at any time by clicking in the card bellow',
     },
+    statusPending: {
+      id: 'governance.statusPending',
+      defaultMessage: '!!!You have chosen your governance status, this process may take a while.',
+    },
+    thanksForParticipation: {
+      id: 'governance.thanksForParticipation',
+      defaultMessage: '!!!Thank you for participating in Governance.',
+    },
+    theTransactionCanTake: {
+      id: 'governance.theTransactionCanTake',
+      defaultMessage: '!!!This transaction can take a while!',
+    },
+    participatingInGovernance: {
+      id: 'governance.participatingInGovernance',
+      defaultMessage:
+        '!!!Participating in the Cardano Governance gives you the opportunity to participate in the voting as well as withdraw your staking rewards',
+    },
+    goToGovernance: {
+      id: 'governance.goToGovernance',
+      defaultMessage: '!!!GO to governance',
+    },
     designatedSomeone: {
       id: 'governance.designatedSomeone',
       defaultMessage:
@@ -125,6 +146,7 @@ export const messages = Object.freeze(
 
 export const useStrings = () => {
   const { intl } = useIntl();
+
   return React.useRef({
     delegateToDRep: intl.formatMessage(messages.delegateToDRep),
     delegatingToDRep: intl.formatMessage(messages.delegatingToDRep),
@@ -154,5 +176,10 @@ export const useStrings = () => {
     wrongPassword: intl.formatMessage(messages.wrongPassword),
     identifyDrep: intl.formatMessage(messages.identifyDrep),
     incorectFormat: intl.formatMessage(messages.incorectFormat),
+    statusPending: intl.formatMessage(messages.statusPending),
+    thanksForParticipation: intl.formatMessage(messages.thanksForParticipation),
+    theTransactionCanTake: intl.formatMessage(messages.theTransactionCanTake),
+    participatingInGovernance: intl.formatMessage(messages.participatingInGovernance),
+    goToGovernance: intl.formatMessage(messages.goToGovernance),
   }).current;
 };

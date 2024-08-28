@@ -154,7 +154,7 @@ export const GovernanceStatusSelection = () => {
         {pageTitle}
       </Typography>
       <Typography variant="body1" mb="64px" gutterBottom>
-        {pageSubtitle}
+        {isPendindDrepDelegationTx ? strings.statusPending : pageSubtitle}
       </Typography>
       <Box display="flex" justifyContent="center" gap="24px">
         {governanceStatus.status !== null
@@ -173,7 +173,7 @@ export const GovernanceStatusSelection = () => {
                 />
               );
             })
-          : skeletonsCards.map(() => <VotingSkeletonCard />)}
+          : skeletonsCards.map((_, index) => <VotingSkeletonCard key={index} />)}
       </Box>
 
       <Stack gap="17px" mt="42px">
