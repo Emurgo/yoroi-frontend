@@ -134,7 +134,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
                   <Skeleton width="129px" height="16px" />
                 ) : (
                   <Typography color="ds.gray_600">
-                    {formatNumber(tokenInfo.totalAmountUsd)} {isAda && unitOfAccount === 'ADA' ? 'USD' : unitOfAccount}
+                    {formatNumber(tokenInfo.totalAmountFiat)} {isAda && unitOfAccount === 'ADA' ? 'USD' : unitOfAccount}
                   </Typography>
                 )}
               </Stack>

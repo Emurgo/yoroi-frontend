@@ -30,7 +30,7 @@ import RestoreWalletPage, { RestoreWalletPagePromise } from './containers/wallet
 
 // New UI pages
 // $FlowIgnore: suppressing this error
-import { createCurrrentWalletInfo } from './UI/features/governace/common/helpers';
+import { createCurrrentWalletInfo } from './UI/utils/createCurrentWalletInfo';
 // $FlowIgnore: suppressing this error
 import { GovernanceContextProvider } from './UI/features/governace/module/GovernanceContextProvider';
 // $FlowIgnore: suppressing this error
@@ -562,9 +562,19 @@ export function wrapGovernance(governanceProps: StoresAndActionsProps, children:
   );
 }
 export function wrapPortfolio(portfolioProps: StoresAndActionsProps, children: Node): Node {
+  const currentWalletInfo = createCurrrentWalletInfo(portfolioProps.stores);
+
+  console.log('currentWalletInfo', currentWalletInfo);
+
   return (
     <PortfolioContextProvider settingFiatPairUnit={portfolioProps.stores.profile.unitOfAccount}>
-      <Suspense fallback={null}>{children}</Suspense>
+      <Suspense
+        fallback={null}
+        currentWalletInfo={currentWalletInfo}
+        settingFiatPairUnit={portfolioProps.stores.profile.unitOfAccount}
+      >
+        {children}
+      </Suspense>
     </PortfolioContextProvider>
   );
 }

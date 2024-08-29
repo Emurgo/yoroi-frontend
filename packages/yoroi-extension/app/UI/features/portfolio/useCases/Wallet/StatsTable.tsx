@@ -227,7 +227,7 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
                 </Typography>
                 {row.name === 'ADA' && unitOfAccount === 'ADA' ? null : (
                   <Typography variant="body2" color="ds.text_gray_low" sx={{ textAlign: 'right' }}>
-                    {formatNumber(row.totalAmountUsd)} {unitOfAccount}
+                    {formatNumber(row.totalAmountFiat)} {unitOfAccount}
                   </Typography>
                 )}
               </Stack>

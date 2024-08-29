@@ -30,7 +30,7 @@ const mockData = {
         '1W': 10 * Math.random(),
         '1M': 10 * Math.random(),
         totalAmount: 0.0,
-        totalAmountUsd: 0.0,
+        totalAmountFiat: 0.0,
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
@@ -70,7 +70,7 @@ const mockData = {
         '1W': 10 * Math.random(),
         '1M': -(10 * Math.random()),
         totalAmount: Math.round(100000 * Math.random()),
-        totalAmountUsd: Math.round(100000 * Math.random()),
+        totalAmountFiat: Math.round(100000 * Math.random()),
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
@@ -110,7 +110,7 @@ const mockData = {
         '1W': -(10 * Math.random()),
         '1M': 10 * Math.random(),
         totalAmount: Math.round(100000 * Math.random()),
-        totalAmountUsd: Math.round(100000 * Math.random()),
+        totalAmountFiat: Math.round(100000 * Math.random()),
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
@@ -150,7 +150,7 @@ const mockData = {
         '1W': -(10 * Math.random()),
         '1M': 10 * Math.random(),
         totalAmount: Math.round(100000 * Math.random()),
-        totalAmountUsd: Math.round(100000 * Math.random()),
+        totalAmountFiat: Math.round(100000 * Math.random()),
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
@@ -190,7 +190,7 @@ const mockData = {
         '1W': 10 * Math.random(),
         '1M': -(10 * Math.random()),
         totalAmount: Math.round(100000 * Math.random()),
-        totalAmountUsd: Math.round(100000 * Math.random()),
+        totalAmountFiat: Math.round(100000 * Math.random()),
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
@@ -230,7 +230,7 @@ const mockData = {
         '1W': 10 * Math.random(),
         '1M': 10 * Math.random(),
         totalAmount: Math.round(100000 * Math.random()),
-        totalAmountUsd: Math.round(100000 * Math.random()),
+        totalAmountFiat: Math.round(100000 * Math.random()),
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
@@ -270,7 +270,7 @@ const mockData = {
         '1W': -(10 * Math.random()),
         '1M': -(10 * Math.random()),
         totalAmount: Math.round(100000 * Math.random()),
-        totalAmountUsd: Math.round(100000 * Math.random()),
+        totalAmountFiat: Math.round(100000 * Math.random()),
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
@@ -310,7 +310,7 @@ const mockData = {
         '1W': 10 * Math.random(),
         '1M': -(10 * Math.random()),
         totalAmount: Math.round(100000 * Math.random()),
-        totalAmountUsd: Math.round(100000 * Math.random()),
+        totalAmountFiat: Math.round(100000 * Math.random()),
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
@@ -350,7 +350,7 @@ const mockData = {
         '1W': 10 * Math.random(),
         '1M': 10 * Math.random(),
         totalAmount: Math.round(100000 * Math.random()),
-        totalAmountUsd: Math.round(100000 * Math.random()),
+        totalAmountFiat: Math.round(100000 * Math.random()),
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
@@ -390,7 +390,7 @@ const mockData = {
         '1W': 10 * Math.random(),
         '1M': -(10 * Math.random()),
         totalAmount: Math.round(100000 * Math.random()),
-        totalAmountUsd: Math.round(100000 * Math.random()),
+        totalAmountFiat: Math.round(100000 * Math.random()),
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
