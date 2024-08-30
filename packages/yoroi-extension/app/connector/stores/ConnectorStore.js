@@ -852,11 +852,11 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           cip95Info.push({
             type: 'VotingProcedure',
             voterType: voter.kind(),
-            voterHash: voter.to_constitutional_committee_hot_cred()?.to_scripthash()?.to_hex() ||
-              voter.to_constitutional_committee_hot_cred()?.to_keyhash()?.to_hex() ||
-              voter.to_drep_cred()?.to_scripthash()?.to_hex() ||
-              voter.to_drep_cred()?.to_keyhash()?.to_hex() ||
-              voter.to_staking_pool_key_hash()?.to_hex() ||
+            voterHash: voter.to_constitutional_committee_hot_credential()?.to_scripthash()?.to_hex() ||
+              voter.to_constitutional_committee_hot_credential()?.to_keyhash()?.to_hex() ||
+              voter.to_drep_credential()?.to_scripthash()?.to_hex() ||
+              voter.to_drep_credential()?.to_keyhash()?.to_hex() ||
+              voter.to_stake_pool_key_hash()?.to_hex() ||
               (() => { throw new Error('unexpected voter'); })(),
             govActionTxId: govActionId.transaction_id().to_hex(),
             govActionIndex: govActionId.index(),

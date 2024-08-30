@@ -1070,7 +1070,7 @@
   "governance.noConfidenceInfo": "You are expressing a lack of trust for all proposals now and in the future.",
   "governance.learnMore": "Learn more About Governance",
   "governance.becomeADrep": "Want to became a Drep?",
-  "governance.drepId": "Drep ID:",
+  "governance.drepId": "Drep ID (Fingerprint):",
   "governance.statusSelected": "You have selected {status} as your governance status. You can change it at any time by clicking in the card bellow",
   "governance.statusPending": "You have chosen your governance status, this process may take a while.",
   "governance.registerGovernance": "Register in Governance",

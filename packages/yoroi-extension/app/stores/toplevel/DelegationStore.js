@@ -250,7 +250,9 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
     try {
       const { BackendService } = publicDeriver.getParent().getNetworkInfo().Backend;
       const transitionResult = await maybe(currentPool, p =>
-        new PoolInfoApi(forceNonNull(BackendService) + '/api').getTransition(p, RustModule.CrossCsl.init)
+        new PoolInfoApi(forceNonNull(BackendService) + '/api')
+          // $FlowIgnore
+          .getTransition(p, RustModule.CrossCsl.init)
       );
 
       const response = {
@@ -319,6 +321,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
         oldBackendUrl: String(backendService),
         newBackendUrl: String(backendServiceZero),
         networkId,
+        // $FlowIgnore
         wasmFactory: RustModule.CrossCsl.init,
       });
 

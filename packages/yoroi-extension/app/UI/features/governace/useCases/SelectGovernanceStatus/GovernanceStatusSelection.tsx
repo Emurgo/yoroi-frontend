@@ -54,7 +54,7 @@ export const GovernanceStatusSelection = () => {
   const pageSubtitle = governanceStatus.status === 'none' ? strings.reviewSelection : strings.statusSelected(statusRawText);
   const isPendindDrepDelegationTx = submitedTransactions.length > 0 && submitedTransactions[0]?.isDrepDelegation === true;
 
-  const openDRepIdModal = (onSubmit: (drepID: string) => void) => {
+  const openDRepIdModal = (onSubmit: (drepID: string, drepCredential: string) => void) => {
     if (!governanceManager) {
       return;
     }
@@ -72,10 +72,10 @@ export const GovernanceStatusSelection = () => {
   };
 
   const handleDelegate = async () => {
-    openDRepIdModal(drepID => {
+    openDRepIdModal((drepID, drepCredential) => {
       const vote: Vote = { kind: 'delegate', drepID };
       governanceVoteChanged(vote);
-      createUnsignTx(drepID);
+      createUnsignTx(drepCredential);
     });
   };
 

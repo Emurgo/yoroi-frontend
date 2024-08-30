@@ -1,16 +1,15 @@
 import { LoadingButton } from '@mui/lab';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { parseDrepId } from '@yoroi/staking';
 import * as React from 'react';
-import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
+import { dRepToMaybeCredentialHex } from '../../../../api/ada/lib/cardanoCrypto/utils';
 import { TextInput } from '../../../components/Input/TextInput';
 import { useModal } from '../../../components/modals/ModalContext';
 import { useGovernance } from '../module/GovernanceContextProvider';
 import { useStrings } from './useStrings';
 
 type ChooseDRepModallProps = {
-  onSubmit?: (drepId: string) => void;
+  onSubmit?: (drepId: string, drepCredential: string) => void;
 };
 
 export const ChooseDRepModal = ({ onSubmit }: ChooseDRepModallProps) => {
@@ -25,13 +24,12 @@ export const ChooseDRepModal = ({ onSubmit }: ChooseDRepModallProps) => {
   }, [drepId]);
 
   const confirmDRep = () => {
-    parseDrepId(drepId, RustModule.CrossCsl.init('any'))
-      .then(_ => {
-        onSubmit?.(drepId);
-      })
-      .catch(_ => {
-        setError(true);
-      });
+    const dRepCredentialHex: string | null = dRepToMaybeCredentialHex(drepId);
+    if (dRepCredentialHex == null) {
+      setError(true);
+    } else {
+      onSubmit?.(drepId, dRepCredentialHex);
+    }
   };
 
   return (
