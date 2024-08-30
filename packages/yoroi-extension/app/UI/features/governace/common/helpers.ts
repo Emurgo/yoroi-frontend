@@ -1,7 +1,6 @@
 import BigNumber from 'bignumber.js';
 import moment from 'moment';
 import { WalletTypeOption } from '../../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
-import { maybe } from '../../../../coreUtils';
 import { genLookupOrFail } from '../../../../stores/stateless/tokenHelpers';
 import { calculateAndFormatValue } from '../../../../utils/unit-of-account';
 
@@ -89,7 +88,9 @@ export const getFormattedPairingValue = (getCurrentPrice, defaultTokenInfo, unit
 };
 
 const getTotalAmount = (walletAmount, rewards) => {
-  return maybe(walletAmount, w => rewards.joinAddCopy(w));
+  return walletAmount && rewards
+    ? walletAmount.joinAddCopy(rewards)
+    : (walletAmount ?? rewards);
 };
 
 const getWalletTotalAdaBalance = (stores, selectedWallet) => {
@@ -97,6 +98,7 @@ const getWalletTotalAdaBalance = (stores, selectedWallet) => {
   const rewards = stores.delegation.getRewardBalanceOrZero(selectedWallet);
   const amount = getTotalAmount(totalAmount, rewards);
   const defaultEntry = amount?.getDefaultEntry();
+  if (defaultEntry == null) return new BigNumber(0);
   const getTokenInfo = genLookupOrFail(stores.tokenInfoStore.tokenInfo);
   const tokenInfo = getTokenInfo(defaultEntry);
   return defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
