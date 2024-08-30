@@ -10,6 +10,7 @@ import DialogCloseButton from '../../widgets/DialogCloseButton';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './MemoDialogCommon.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { Typography } from '@mui/material';
 
 const messages = defineMessages({
   connectTitle: {
@@ -18,7 +19,8 @@ const messages = defineMessages({
   },
   connectContent: {
     id: 'settings.noexternal.dialog.content',
-    defaultMessage: '!!!Your memos are stored locally. They will not automatically sync with other Yoroi instances and will be lost if you delete Yoroi',
+    defaultMessage:
+      '!!!Your memos are stored locally. They will not automatically sync with other Yoroi instances and will be lost if you delete Yoroi',
   },
 });
 
@@ -30,14 +32,13 @@ type Props = {|
 
 @observer
 export default class MemoNoExternalStorageDialog extends Component<Props> {
-
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   render(): Node {
     const { intl } = this.context;
-    const { onCancel, onAcknowledge, } = this.props;
+    const { onCancel, onAcknowledge } = this.props;
 
     const acknowledgeAction = {
       label: this.context.intl.formatMessage(globalMessages.uriLandingDialogConfirmLabel),
@@ -48,7 +49,7 @@ export default class MemoNoExternalStorageDialog extends Component<Props> {
       // TODO: replace cancel with addExternal once we add external memo storage
       {
         label: intl.formatMessage(globalMessages.cancel),
-        onClick: onCancel
+        onClick: onCancel,
       },
       acknowledgeAction,
     ];
@@ -61,11 +62,12 @@ export default class MemoNoExternalStorageDialog extends Component<Props> {
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={onCancel}
-        id='memoNoExternalStorageDialog'
+        id="memoNoExternalStorageDialog"
       >
         <div className={styles.content}>
-          <div>{intl.formatMessage(messages.connectContent)}</div>
+          <Typography color="ds.text_gray_medium">{intl.formatMessage(messages.connectContent)}</Typography>
         </div>
-      </Dialog>);
+      </Dialog>
+    );
   }
 }

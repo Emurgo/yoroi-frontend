@@ -158,7 +158,7 @@ function getContainedStyles(variant: 'primary' | 'secondary', themePalette: Obje
       outlineColor: themePalette.sys_yellow_500,
     },
     '&.Mui-disabled': {
-      color: themePalette.white_static,
+      color: themePalette.gray_min,
       backgroundColor: themePalette[`${variant}_200`],
       opacity: '0.8',
       cursor: 'not-allowed',

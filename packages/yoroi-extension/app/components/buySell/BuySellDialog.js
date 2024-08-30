@@ -147,7 +147,15 @@ const ProviderRow = styled(Box)({
   },
 });
 
-const Disclaimer = styled(Box)({
+const IconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_medium,
+    },
+  },
+}));
+
+const Disclaimer = styled(Box)(({ theme }) => ({
   color: 'var(--grayscale-contrast-900, #242838)',
   fontFeatureSettings: `'clig' off, 'liga' off`,
   fontFamily: 'Rubik',
@@ -164,9 +172,9 @@ const Disclaimer = styled(Box)({
     },
   },
   borderRadius: 'var(--corner-radius-8, 8px)',
-  background: 'var(--gradient-light-green-blue, linear-gradient(340deg, #C6F7ED 10%, #E4E8F7 60%))',
+  background: theme.palette.ds.sys_yellow_100,
   padding: 'var(--spacing-12, 12px) var(--spacing-16, 16px) var(--spacing-16, 16px) var(--spacing-16, 16px)',
-});
+}));
 
 const ErrorPopoutContent = styled(Box)({
   height: '428px',
@@ -357,7 +365,7 @@ export default class BuySellDialog extends Component<Props, State> {
             endAdornment: (
               <InputAdornment position="end">
                 <div style={{ position: 'relative' /* so that the balance line can align on the right side */ }}>
-                  <div style={{ marginBottom: '8px', color: '#000' }}>
+                  <div style={{ marginBottom: '8px', color: '#000', display: 'flex', alignItems: 'center' }}>
                     <img style={{ marginRight: '8px', borderRadius: '4px', verticalAlign: 'bottom' }} src={adaPng} alt="" />
                     <Typography variant="body2" color="ds.text_gray_medium">
                       ADA
@@ -398,11 +406,15 @@ export default class BuySellDialog extends Component<Props, State> {
         </ProviderRow>
 
         <Disclaimer>
-          <header>
-            <InfoIcon style={{ verticalAlign: 'middle' }} />
-            <span style={{ verticalAlign: 'middle' }}>{intl.formatMessage(messages.disclaimer)}</span>
+          <header style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+            <IconWrapper>
+              <InfoIcon style={{ verticalAlign: 'middle' }} />
+            </IconWrapper>
+            <Typography style={{ verticalAlign: 'middle' }} color="ds.text_gray_medium">
+              {intl.formatMessage(messages.disclaimer)}
+            </Typography>
           </header>
-          {intl.formatMessage(messages.disclaimerText)}
+          <Typography color="ds.text_gray_medium">{intl.formatMessage(messages.disclaimerText)}</Typography>
         </Disclaimer>
       </>
     );
