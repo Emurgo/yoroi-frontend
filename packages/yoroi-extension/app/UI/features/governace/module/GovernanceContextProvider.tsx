@@ -1,4 +1,5 @@
 import { GovernanceApi } from '@emurgo/yoroi-lib/dist/governance/emurgo-api';
+import { bech32 } from 'bech32';
 import * as React from 'react';
 
 import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
@@ -141,7 +142,9 @@ export const GovernanceContextProvider = ({
     } else if (governanceStatusState && governanceStatusState.drepDelegation?.drep === 'no_confidence') {
       setGovernanceStatus({ status: DREP_ALWAYS_NO_CONFIDENCE, drep: null });
     } else if (governanceStatusState !== null && governanceStatusState.drepDelegation?.drep.length > 0) {
-      setGovernanceStatus({ status: 'delegate', drep: governanceStatusState.drepDelegation?.drep || null });
+      const words = bech32.toWords(Buffer.from(governanceStatusState.drepDelegation?.drep, 'hex'));
+      const encoded = bech32.encode('drep', words, 64);
+      setGovernanceStatus({ status: 'delegate', drep: encoded || null });
     } else {
       setGovernanceStatus({ status: 'none', drep: null });
     }
