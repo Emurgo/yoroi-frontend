@@ -42,11 +42,13 @@ export const GovernanceStatusSelection = () => {
     walletAdaBalance,
     triggerBuySellAdaDialog,
     submitedTransactions,
+    governanceVote,
   } = useGovernance();
   const [error, setError] = React.useState<string | null>(null);
+  const [loadingUnsignTx, setLoadingUnsignTx] = React.useState<boolean>(false);
   const navigateTo = useNavigateTo();
   const strings = useStrings();
-  const { openModal, closeModal } = useModal();
+  const { openModal, closeModal, startLoading } = useModal();
   const pageTitle = governanceStatus.status !== 'none' ? strings.governanceStatus : strings.registerGovernance;
   const statusRawText = mapStatus[governanceStatus.status || ''];
   const pageSubtitle = governanceStatus.status === 'none' ? strings.reviewSelection : strings.statusSelected(statusRawText);
@@ -65,40 +67,46 @@ export const GovernanceStatusSelection = () => {
       ),
       width: '648px',
       height: '336px',
+      isLoading: loadingUnsignTx,
     });
   };
 
   const handleDelegate = async () => {
     openDRepIdModal(drepID => {
       const vote: Vote = { kind: 'delegate', drepID };
-      createUnsignTx(drepID);
       governanceVoteChanged(vote);
+      createUnsignTx(drepID);
     });
   };
 
   const handleAbstain = async () => {
-    await createUnsignTx(DREP_ALWAYS_ABSTAIN);
     const vote: Vote = { kind: DREP_ALWAYS_ABSTAIN };
     governanceVoteChanged(vote);
+    await createUnsignTx(DREP_ALWAYS_ABSTAIN);
   };
 
   const handleNoConfidence = async () => {
-    await createUnsignTx(DREP_ALWAYS_NO_CONFIDENCE);
     const vote: Vote = { kind: DREP_ALWAYS_NO_CONFIDENCE };
     governanceVoteChanged(vote);
+    await createUnsignTx(DREP_ALWAYS_NO_CONFIDENCE);
   };
 
   const createUnsignTx = async kind => {
     try {
-      await createDrepDelegationTransaction(kind);
-      setError(null);
-      navigateTo.delegationForm();
+      setLoadingUnsignTx(true);
+      startLoading();
+      setTimeout(async () => {
+        await createDrepDelegationTransaction(kind);
+        navigateTo.delegationForm();
+        setLoadingUnsignTx(false);
+        setError(null);
+      }, 200);
     } catch (e) {
       setError('Error trying to Vote. Please try again later');
       closeModal();
+      setLoadingUnsignTx(false);
     }
   };
-
   const optionsList = [
     {
       title: governanceStatus.status === 'delegate' ? strings.delegatingToDRep : strings.delegateToDRep,
@@ -111,7 +119,8 @@ export const GovernanceStatusSelection = () => {
       icon: <DRepIlustration />,
       selected: governanceStatus.status === 'delegate' ? true : false,
       onClick: handleDelegate,
-      pending: isPendindDrepDelegationTx,
+      pending: isPendindDrepDelegationTx || loadingUnsignTx,
+      loading: loadingUnsignTx && governanceVote.kind === 'delegate',
     },
     {
       title: strings.abstain,
@@ -119,7 +128,8 @@ export const GovernanceStatusSelection = () => {
       icon: <Abstein />,
       selected: governanceStatus.status === DREP_ALWAYS_ABSTAIN ? true : false,
       onClick: handleAbstain,
-      pending: isPendindDrepDelegationTx,
+      pending: isPendindDrepDelegationTx || loadingUnsignTx,
+      loading: loadingUnsignTx && governanceVote.kind === DREP_ALWAYS_ABSTAIN,
     },
     {
       title: strings.noConfidence,
@@ -127,7 +137,8 @@ export const GovernanceStatusSelection = () => {
       icon: <NoConfidance />,
       selected: governanceStatus.status === DREP_ALWAYS_NO_CONFIDENCE ? true : false,
       onClick: handleNoConfidence,
-      pending: isPendindDrepDelegationTx,
+      pending: isPendindDrepDelegationTx || loadingUnsignTx,
+      loading: loadingUnsignTx && governanceVote.kind === DREP_ALWAYS_NO_CONFIDENCE,
     },
   ];
 
@@ -170,6 +181,7 @@ export const GovernanceStatusSelection = () => {
                   selected={option.selected}
                   onClick={option.onClick}
                   pending={option.pending}
+                  loading={option.loading}
                 />
               );
             })
