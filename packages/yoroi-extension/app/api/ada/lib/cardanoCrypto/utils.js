@@ -48,7 +48,7 @@ export function dRepToMaybeCredentialHex(s: string): ?string {
         return Module.WalletV4.Credential
           .from_scripthash(Module.WalletV4.ScriptHash.from_bech32(s)).to_hex();
       }
-    } catch {}
+    } catch {} // eslint-disable-line no-empty
     return null;
   })
 }

@@ -150,6 +150,7 @@ function parseDrep(drepCredential: string): RustModule.WalletV4.DRep {
       ?? fail('weird credential cannot be converted into a drep: ' + credential.to_hex())
   } catch (e) {
     console.log('Fail to parse a drep credential: ' + drepCredential, e);
+    throw e;
   }
 }
 
