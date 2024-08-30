@@ -1,5 +1,6 @@
 import { Key } from 'selenium-webdriver';
 import SettingsTab from './settingsTab.page.js';
+import { fiveSeconds, quarterSecond } from '../../../helpers/timeConstants.js';
 
 class WalletSubTab extends SettingsTab {
   // locator
@@ -109,7 +110,13 @@ class WalletSubTab extends SettingsTab {
       await this.click(this.walletNameCancelChangesButtonLocator);
     }
   }
-  async changeWalletPassword(oldPassword, newPassword, repeatNewPassword, confirm = true) {
+  async changeWalletPassword(
+    oldPassword,
+    newPassword,
+    repeatNewPassword,
+    confirm = true,
+    expectError = false
+  ) {
     this.logger.info(
       `WalletSubTab::getWalletExportInfo is called.` +
         `The old password: ${oldPassword}, the new password: ${newPassword}, the repeat new password: ${repeatNewPassword}`
@@ -128,6 +135,20 @@ class WalletSubTab extends SettingsTab {
 
     if (confirm) {
       await this.click(this.changePasswordSaveButtonLocator);
+    }
+
+    if (!expectError) {
+      const modalState = await this.customWaiter(
+        async () => {
+          const elems = await this.findElements(this.changePasswordDialogLocator);
+          return elems.length === 0;
+        },
+        fiveSeconds,
+        quarterSecond
+      );
+      if (!modalState) {
+        throw new Error('Change password modal is still displayed.')
+      }
     }
   }
   async getPasswordErrorMsg() {

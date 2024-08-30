@@ -10,15 +10,14 @@ import driversPoolsManager from '../utils/driversPool.js';
 
 const testWallet = getSpendableWallet();
 
-describe('Loading all txs', function () {
+describe('Show more txs 5 times', function () {
   this.timeout(5 * oneMinute);
   let webdriver = null;
   let logger = null;
 
-  before(function (done) {
-    webdriver = driversPoolsManager.getDriverFromPool();
+  before(async function () {
+    webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    done();
   });
 
   it(`Restore a 15-word test wallet ${testWallet.name}`, async function () {
@@ -34,9 +33,9 @@ describe('Loading all txs', function () {
     expect(displayedTxsAmount, 'Incorrect amount of txs is displayed').to.equal(20);
   });
 
-  it('Load all txs and check amount', async function () {
+  it('Load txs and check amount', async function () {
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
-    await transactionsPage.downloadAllTxs();
+    await transactionsPage.loadMoreTxs(5);
     const displayedTxsAmount = await transactionsPage.getAmountOfTxs();
     expect(displayedTxsAmount, 'The amount of txs is different from expected').to.be.at.least(
       testWallet.minTxs

@@ -47,7 +47,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
     },
     frontendFeeTiersChanged,
   } = useSwap();
-  const { sellTokenInfo, buyTokenInfo } = useSwapForm();
+  const { sellTokenInfo, buyTokenInfo, resetSwapForm, sellQuantity, buyQuantity } = useSwapForm();
 
   const isMarketOrder = orderType === 'market';
   const impact = isMarketOrder ? Number(selectedPoolCalculation?.prices.priceImpact ?? 0) : 0;
@@ -74,22 +74,22 @@ function SwapPage(props: StoresAndActionsProps): Node {
     selectedPoolCalculation != null &&
     sell.quantity !== '0' &&
     buy.quantity !== '0' &&
+    sellQuantity.error == null &&
+    buyQuantity.error == null &&
     isValidTickers;
 
   const confirmationCanContinue = userPasswordState.value !== '' && signRequest != null;
 
   const isButtonLoader = orderStep === 1 && signRequest == null;
 
-  const isSwapEnabled =
-    (orderStep === 0 && swapFormCanContinue) || (orderStep === 1 && confirmationCanContinue);
+  const isSwapEnabled = (orderStep === 0 && swapFormCanContinue) || (orderStep === 1 && confirmationCanContinue);
 
   const wallet = props.stores.wallets.selectedOrFail;
   const network = wallet.getParent().getNetworkInfo();
-  const defaultTokenInfo = props.stores.tokenInfoStore.getDefaultTokenInfoSummary(
-    network.NetworkId
-  );
-  const getTokenInfo: string => Promise<RemoteTokenInfo> = id =>
-    props.stores.tokenInfoStore.getLocalOrRemoteMetadata(network, id);
+  const defaultTokenInfo = props.stores.tokenInfoStore.getDefaultTokenInfoSummary(network.NetworkId);
+  const getTokenInfoBatch: (Array<string>) => { [string]: Promise<RemoteTokenInfo> } = ids =>
+    props.stores.tokenInfoStore.fetchMissingAndGetLocalOrRemoteMetadata(network, ids);
+  const getTokenInfo: string => Promise<RemoteTokenInfo> = id => getTokenInfoBatch([id])[id].then(res => res ?? {});
 
   const disclaimerFlag = props.stores.substores.ada.swapStore.swapDisclaimerAcceptanceFlag;
 
@@ -237,6 +237,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
         refreshWallet: () => props.stores.wallets.refreshWalletFromRemote(wallet),
       });
       setOrderStepValue(2);
+      resetSwapForm();
     } catch (e) {
       handleTransactionError(e);
     } finally {
@@ -267,21 +268,13 @@ function SwapPage(props: StoresAndActionsProps): Node {
     }
   }
 
-  const onRemoteOrderDataResolved: any => Promise<void> = async ({
-    contractAddress,
-    datum,
-    datumHash,
-  }) => {
+  const onRemoteOrderDataResolved: any => Promise<void> = async ({ contractAddress, datum, datumHash }) => {
     // creating tx
     if (selectedPoolCalculation == null) {
-      throw new Error(
-        'Incorrect state. Pool calculations are not available to prepare the transaction'
-      );
+      throw new Error('Incorrect state. Pool calculations are not available to prepare the transaction');
     }
     if (contractAddress == null || datum == null || datumHash == null) {
-      throw new Error(
-        `Incorrect remote order resolve! ${JSON.stringify({ contractAddress, datum, datumHash })}`
-      );
+      throw new Error(`Incorrect remote order resolve! ${JSON.stringify({ contractAddress, datum, datumHash })}`);
     }
     const {
       pool: { provider: poolProvider, deposit, batcherFee },
@@ -300,9 +293,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
       ptFees,
       poolProvider,
     };
-    const txSignRequest: HaskellShelleyTxSignRequest = await props.stores.substores.ada.swapStore.createUnsignedSwapTx(
-      swapTxReq
-    );
+    const txSignRequest: HaskellShelleyTxSignRequest = await props.stores.substores.ada.swapStore.createUnsignedSwapTx(swapTxReq);
     runInAction(() => {
       setSignRequest(txSignRequest);
     });
@@ -311,11 +302,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
   return (
     <>
       <Box display="flex" flexDirection="column" height="100%">
-        <Box
-          sx={{ flexGrow: '1', overflowY: 'auto', p: '24px' }}
-          borderBottom="1px solid"
-          borderColor="grayscale.200"
-        >
+        <Box sx={{ flexGrow: '1', overflowY: 'auto', p: '24px' }} borderBottom="1px solid" borderColor="grayscale.200">
           {orderStep === 0 && (
             <CreateSwapOrder
               swapStore={props.stores.substores.ada.swapStore}
@@ -323,6 +310,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
               onSetNewSlippage={onSetNewSlippage}
               defaultTokenInfo={defaultTokenInfo}
               getTokenInfo={getTokenInfo}
+              getTokenInfoBatch={getTokenInfoBatch}
               priceImpactState={priceImpactState}
             />
           )}
@@ -344,7 +332,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
               txSubmitErrorState={txSubmitErrorState}
               onTryAgain={processBackToStart}
               onSuccess={() => {
-                props.actions.router.goToRoute.trigger({ route: ROUTES.SWAP.ORDERS });
+                props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
               }}
             />
           )}
@@ -360,11 +348,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
             sx={{ height: '97px' }}
           >
             {orderStep === 1 && (
-              <Button
-                onClick={processBackToStart}
-                sx={{ minWidth: '128px', minHeight: '48px' }}
-                variant="secondary"
-              >
+              <Button onClick={processBackToStart} sx={{ minWidth: '128px', minHeight: '48px' }} variant="secondary">
                 Back
               </Button>
             )}

@@ -49,7 +49,7 @@ export default class AdaTransactionsStore extends Store<StoresMap, ActionsMap> {
     signRequest,
     txId,
   ) => {
-    const { usedUtxos, transaction } = await this.api.ada.createSubmittedTransactionData(
+    const { usedUtxos, transaction, isDrepDelegation } = await this.api.ada.createSubmittedTransactionData(
       publicDeriver,
       signRequest,
       txId,
@@ -58,6 +58,7 @@ export default class AdaTransactionsStore extends Store<StoresMap, ActionsMap> {
       publicDeriver,
       transaction,
       usedUtxos,
+      isDrepDelegation,
     );
   }
 }

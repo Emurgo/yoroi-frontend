@@ -36,3 +36,14 @@ export function transactionHexReplaceWitnessSet(txHex: string, witnessSetHex: st
     return fixedTransaction.to_hex();
   });
 }
+
+export function pubKeyHashToRewardAddress(hex: string, network: number): string {
+  return RustModule.WasmScope(Module =>
+    Module.WalletV4.RewardAddress.new(
+      network,
+      Module.WalletV4.Credential.from_keyhash(
+        Module.WalletV4.Ed25519KeyHash.from_hex(hex),
+      ),
+    ).to_address().to_hex(),
+  );
+}

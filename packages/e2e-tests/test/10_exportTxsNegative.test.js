@@ -2,37 +2,29 @@ import BasePage from '../pages/basepage.js';
 import { customAfterEach } from '../utils/customHooks.js';
 import TransactionsSubTab from '../pages/wallet/walletTab/walletTransactions.page.js';
 import { expect } from 'chai';
-import { cleanDownloads, getTestLogger, getListOfDownloadedFiles } from '../utils/utils.js';
+import {
+  cleanDownloads,
+  getTestLogger,
+  getListOfDownloadedFiles,
+  isLinux,
+  isHeadless,
+} from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
 import driversPoolsManager from '../utils/driversPool.js';
 import { Colors } from '../helpers/constants.js';
-import AddNewWallet from '../pages/addNewWallet.page.js';
+import { preloadDBAndStorage, waitTxPage } from '../helpers/restoreWalletHelper.js';
 
 describe('Export transactions, negative cases', function () {
   this.timeout(2 * oneMinute);
   let webdriver = null;
   let logger = null;
 
-  before(function (done) {
-    webdriver = driversPoolsManager.getDriverFromPool();
+  before(async function () {
+    webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
+    await preloadDBAndStorage(webdriver, logger, 'testWallet1');
+    await waitTxPage(webdriver, logger);
     cleanDownloads();
-    done();
-  });
-
-  it('Prepare DB and storages', async function () {
-    const addWalletPage = new AddNewWallet(webdriver, logger);
-    const state = await addWalletPage.isDisplayed();
-    expect(state).to.be.true;
-    await addWalletPage.prepareDBAndStorage('testWallet1');
-    await addWalletPage.refreshPage();
-  });
-
-  it('Check transactions page', async function () {
-    const transactionsPage = new TransactionsSubTab(webdriver, logger);
-    await transactionsPage.waitPrepareWalletBannerIsClosed();
-    const txPageIsDisplayed = await transactionsPage.isDisplayed();
-    expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
   });
 
   describe('Both dates are 00/00/0000', function () {
@@ -57,10 +49,14 @@ describe('Export transactions, negative cases', function () {
       const exportDialog = new TransactionsSubTab(webdriver, logger).getExportDialog();
       const btnEnabled = await exportDialog.exportButtonIsEnabled();
       expect(btnEnabled, 'The export button is enabled').to.be.false;
-      const startInputColor = await exportDialog.getStartDateInputBorderColor();
-      expect(startInputColor, 'Start date input is not higlighted').to.equal(Colors.errorRed);
-      const endInputColor = await exportDialog.getEndDateInputBorderColor();
-      expect(endInputColor, 'End date input is not higlighted').to.equal(Colors.errorRed);
+      if (isLinux() && isHeadless()) {
+        console.warn('Color checks are skipped.');
+      } else {
+        const startInputColor = await exportDialog.getStartDateInputBorderColor();
+        expect(startInputColor, 'Start date input is not higlighted').to.equal(Colors.errorRed);
+        const endInputColor = await exportDialog.getEndDateInputBorderColor();
+        expect(endInputColor, 'End date input is not higlighted').to.equal(Colors.errorRed);
+      }
     });
   });
   describe('The end date is earlier then the start date', function () {

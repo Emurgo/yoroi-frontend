@@ -1,37 +1,56 @@
 // @flow
+
 import type { Node } from 'react';
-import type { StoresMap } from './stores/index';
-import type { ActionsMap } from './actions/index';
-import type { StoresAndActionsProps } from './types/injectedProps.types';
-import type { ConfigType } from '../config/config-types';
-import { Route, Redirect, Switch } from 'react-router-dom';
-import { ROUTES } from './routes-config';
 import React, { Suspense } from 'react';
-import StakingPage, { StakingPageContentPromise } from './containers/wallet/staking/StakingPage';
+import { Redirect, Route, Switch } from 'react-router-dom';
+import type { ConfigType } from '../config/config-types';
+import type { ActionsMap } from './actions/index';
+import ConnectedWebsitesPage, { ConnectedWebsitesPagePromise } from './containers/dapp-connector/ConnectedWebsitesContainer';
 import Transfer, { WalletTransferPagePromise } from './containers/transfer/Transfer';
-import VotingPage, { VotingPageContentPromise } from './containers/wallet/voting/VotingPage';
-import ConnectedWebsitesPage, {
-  ConnectedWebsitesPagePromise,
-} from './containers/dapp-connector/ConnectedWebsitesContainer';
 import AddWalletPage, { AddAnotherWalletPromise } from './containers/wallet/AddWalletPage';
+import StakingPage, { StakingPageContentPromise } from './containers/wallet/staking/StakingPage';
+import VotingPage, { VotingPageContentPromise } from './containers/wallet/voting/VotingPage';
+import { ROUTES } from './routes-config';
+import type { StoresMap } from './stores/index';
+import type { StoresAndActionsProps } from './types/injectedProps.types';
 // Todo: Add lazy loading
-import RestoreWalletPage, {
-  RestoreWalletPagePromise,
-} from './containers/wallet/restore/RestoreWalletPage';
-import CreateWalletPage, {
-  CreateWalletPagePromise,
-} from './containers/wallet/CreateWalletPageContainer';
+import { Stack } from '@mui/material';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import FullscreenLayout from './components/layout/FullscreenLayout';
+import LoadingSpinner from './components/widgets/LoadingSpinner';
 import LoadingPage from './containers/LoadingPage';
-import Wallet from './containers/wallet/Wallet';
 import Settings from './containers/settings/Settings';
 import SwapPageContainer from './containers/swap/SwapPageContainer';
-import AssetsWrapper from './containers/wallet/AssetsWrapper';
-import NFTsWrapper from './containers/wallet/NFTsWrapper';
 import SwapProvider from './containers/swap/SwapProvider';
-import { Stack } from '@mui/material';
-import LoadingSpinner from './components/widgets/LoadingSpinner';
-import FullscreenLayout from './components/layout/FullscreenLayout';
+import AssetsWrapper from './containers/wallet/AssetsWrapper';
+import CreateWalletPage, { CreateWalletPagePromise } from './containers/wallet/CreateWalletPageContainer';
+import NFTsWrapper from './containers/wallet/NFTsWrapper';
+import Wallet from './containers/wallet/Wallet';
+import RestoreWalletPage, { RestoreWalletPagePromise } from './containers/wallet/restore/RestoreWalletPage';
+
+// New UI pages
+// $FlowIgnore: suppressing this error
+import { createCurrrentWalletInfo } from './UI/features/governace/common/helpers';
+// $FlowIgnore: suppressing this error
+import { GovernanceContextProvider } from './UI/features/governace/module/GovernanceContextProvider';
+// $FlowIgnore: suppressing this error
+import { PortfolioContextProvider } from './UI/features/portfolio/module/PortfolioContextProvider';
+// $FlowIgnore: suppressing this error
+import GovernanceDelegationFormPage from './UI/pages/Governance/GovernanceDelegationFormPage';
+// $FlowIgnore: suppressing this error
+import GovernanceStatusPage from './UI/pages/Governance/GovernanceStatusPage';
+// $FlowIgnore: suppressing this error
+import GovernanceTransactionFailedPage from './UI/pages/Governance/GovernanceTransactionFailedPage';
+// $FlowIgnore: suppressing this error
+import GovernanceTransactionSubmittedPage from './UI/pages/Governance/GovernanceTransactionSubmittedPage';
+// $FlowIgnore: suppressing this error
+import PortfolioDappsPage from './UI/pages/portfolio/PortfolioDappsPage';
+// $FlowIgnore: suppressing this error
+import PortfolioDetailPage from './UI/pages/portfolio/PortfolioDetailPage';
+// $FlowIgnore: suppressing this error
+import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
+import BuySellDialog from './components/buySell/BuySellDialog';
+// $FlowIgnore: suppressing this error
 
 // PAGES
 const LanguageSelectionPagePromise = () => import('./containers/profile/LanguageSelectionPage');
@@ -44,25 +63,19 @@ const OptForAnalyticsPagePromise = () => import('./containers/profile/OptForAnal
 const OptForAnalyticsPage = React.lazy(OptForAnalyticsPagePromise);
 
 // SETTINGS
-const GeneralSettingsPagePromise = () =>
-  import('./containers/settings/categories/GeneralSettingsPage');
+const GeneralSettingsPagePromise = () => import('./containers/settings/categories/GeneralSettingsPage');
 const GeneralSettingsPage = React.lazy(GeneralSettingsPagePromise);
-const WalletSettingsPagePromise = () =>
-  import('./containers/settings/categories/WalletSettingsPage');
+const WalletSettingsPagePromise = () => import('./containers/settings/categories/WalletSettingsPage');
 const WalletSettingsPage = React.lazy(WalletSettingsPagePromise);
-const ExternalStorageSettingsPagePromise = () =>
-  import('./containers/settings/categories/ExternalStorageSettingsPage');
+const ExternalStorageSettingsPagePromise = () => import('./containers/settings/categories/ExternalStorageSettingsPage');
 const ExternalStorageSettingsPage = React.lazy(ExternalStorageSettingsPagePromise);
 const OAuthDropboxPagePromise = () => import('./containers/settings/categories/OAuthDropboxPage');
 const OAuthDropboxPage = React.lazy(OAuthDropboxPagePromise);
-const TermsOfUseSettingsPagePromise = () =>
-  import('./containers/settings/categories/TermsOfUseSettingsPage');
+const TermsOfUseSettingsPagePromise = () => import('./containers/settings/categories/TermsOfUseSettingsPage');
 const TermsOfUseSettingsPage = React.lazy(TermsOfUseSettingsPagePromise);
-const SupportSettingsPagePromise = () =>
-  import('./containers/settings/categories/SupportSettingsPage');
+const SupportSettingsPagePromise = () => import('./containers/settings/categories/SupportSettingsPage');
 const SupportSettingsPage = React.lazy(SupportSettingsPagePromise);
-const AnalyticsSettingsPagePromise = () =>
-  import('./containers/settings/categories/AnalyticsSettingsPage');
+const AnalyticsSettingsPagePromise = () => import('./containers/settings/categories/AnalyticsSettingsPage');
 const AnalyticsSettingsPage = React.lazy(AnalyticsSettingsPagePromise);
 
 const NightlyPagePromise = () => import('./containers/profile/NightlyPage');
@@ -89,22 +102,19 @@ const URILandingPage = React.lazy(URILandingPagePromise);
 const ReceivePromise = () => import('./containers/wallet/Receive');
 const Receive = React.lazy(ReceivePromise);
 
-const StakingDashboardPagePromise = () =>
-  import('./containers/wallet/staking/StakingDashboardPage');
+const StakingDashboardPagePromise = () => import('./containers/wallet/staking/StakingDashboardPage');
 const StakingDashboardPage = React.lazy(StakingDashboardPagePromise);
 
 const CardanoStakingPagePromise = () => import('./containers/wallet/staking/CardanoStakingPage');
 const CardanoStakingPage = React.lazy(CardanoStakingPagePromise);
 
-const ComplexityLevelSettingsPagePromise = () =>
-  import('./containers/settings/categories/ComplexityLevelSettingsPage');
+const ComplexityLevelSettingsPagePromise = () => import('./containers/settings/categories/ComplexityLevelSettingsPage');
 const ComplexityLevelSettingsPage = React.lazy(ComplexityLevelSettingsPagePromise);
 
 const ComplexityLevelPagePromise = () => import('./containers/profile/ComplexityLevelPage');
 const ComplexityLevelPage = React.lazy(ComplexityLevelPagePromise);
 
-const BlockchainSettingsPagePromise = () =>
-  import('./containers/settings/categories/BlockchainSettingsPage');
+const BlockchainSettingsPagePromise = () => import('./containers/settings/categories/BlockchainSettingsPage');
 const BlockchainSettingsPage = React.lazy(BlockchainSettingsPagePromise);
 
 const WalletSwitchPromise = () => import('./containers/WalletSwitch');
@@ -184,144 +194,139 @@ export const LazyLoadPromises: Array<() => any> = [
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 
-export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
-  <Suspense fallback={null}>
-    <Switch>
-      <Route
-        exact
-        path={ROUTES.ROOT}
-        component={props => <LoadingPage {...props} stores={stores} actions={actions} />}
-      />
-      <Route
-        exact
-        path={ROUTES.NIGHTLY_INFO}
-        component={props => <NightlyPage {...props} stores={stores} actions={actions} />}
-      />
-      <Route
-        exact
-        path={ROUTES.PROFILE.LANGUAGE_SELECTION}
-        component={props => <LanguageSelectionPage {...props} stores={stores} actions={actions} />}
-      />
-      <Route
-        exact
-        path={ROUTES.PROFILE.COMPLEXITY_LEVEL}
-        component={props => <ComplexityLevelPage {...props} stores={stores} actions={actions} />}
-      />
-      <Route
-        exact
-        path={ROUTES.PROFILE.TERMS_OF_USE}
-        component={props => <TermsOfUsePage {...props} stores={stores} actions={actions} />}
-      />
-      <Route
-        exact
-        path={ROUTES.PROFILE.URI_PROMPT}
-        component={props => <UriPromptPage {...props} stores={stores} actions={actions} />}
-      />
-      <Route
-        exact
-        path={ROUTES.PROFILE.OPT_FOR_ANALYTICS}
-        component={props => <OptForAnalyticsPage {...props} stores={stores} actions={actions} />}
-      />
-      <Route
-        exact
-        path={ROUTES.MY_WALLETS}
-        component={props => <MyWalletsPage {...props} stores={stores} actions={actions} />}
-      />
-      <Route
-        exact
-        path={ROUTES.STAKING}
-        component={props => <StakingPage {...props} stores={stores} actions={actions} />}
-      />
-      <Route
-        path={ROUTES.ASSETS.ROOT}
-        component={props =>
-          wrapAssets({ ...props, stores, actions }, AssetsSubpages(stores, actions))
-        }
-      />
-      <Route
-        path={ROUTES.NFTS.ROOT}
-        component={props => wrapNFTs({ ...props, stores, actions }, NFTsSubPages(stores, actions))}
-      />
-      <Route
-        exact
-        path={ROUTES.WALLETS.ADD}
-        component={props => <AddWalletPage {...props} stores={stores} actions={actions} />}
-      />
-      <Route
-        exact
-        path={ROUTES.WALLETS.RESTORE_WALLET}
-        component={props => <RestoreWalletPage {...props} stores={stores} actions={actions} />}
-      />
-      <Route
-        exact
-        path={ROUTES.WALLETS.CREATE_NEW_WALLET}
-        component={props => <CreateWalletPage {...props} stores={stores} actions={actions} />}
-      />
-      <Route
-        exact
-        path={ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES}
-        component={props => <ConnectedWebsitesPage {...props} stores={stores} actions={actions} />}
-      />
-      <Route
-        exact
-        path={ROUTES.EXPERIMENTAL.YOROI_PALETTE}
-        component={props => <YoroiPalettePage {...props} stores={stores} actions={actions} />}
-      />
-      <Route
-        exact
-        path={ROUTES.EXPERIMENTAL.THEMES}
-        component={props => <YoroiThemesPage {...props} stores={stores} actions={actions} />}
-      />
-      <Route
-        path={ROUTES.WALLETS.ROOT}
-        component={props =>
-          wrapWallet({ ...props, stores, actions }, WalletsSubpages(stores, actions))
-        }
-      />
-      <Route
-        path={ROUTES.SETTINGS.ROOT}
-        component={props =>
-          wrapSettings({ ...props, stores, actions }, SettingsSubpages(stores, actions))
-        }
-      />
+export const Routes = (stores: StoresMap, actions: ActionsMap): Node => {
+  const queryClient = new QueryClient();
 
-      <Route
-        path={ROUTES.SWAP.ROOT}
-        component={props => wrapSwap({ ...props, stores, actions }, SwapSubpages(stores, actions))}
-      />
-      <Route
-        path={ROUTES.TRANSFER.ROOT}
-        component={props => <Transfer {...props} stores={stores} actions={actions} />}
-      />
-      <Route
-        exact
-        path={ROUTES.SEND_FROM_URI.ROOT}
-        component={props => <URILandingPage {...props} stores={stores} actions={actions} />}
-      />
-      <Route
-        exact
-        path={ROUTES.OAUTH_FROM_EXTERNAL.DROPBOX}
-        component={props => <OAuthDropboxPage {...props} stores={stores} actions={actions} />}
-      />
-      <Route
-        exact
-        path={ROUTES.SWITCH}
-        component={props => <WalletSwitch {...props} stores={stores} actions={actions} />}
-      />
-      <Route
-        exact
-        path={ROUTES.REVAMP.CATALYST_VOTING}
-        component={props => <VotingPage {...props} stores={stores} actions={actions} />}
-      />
-      <Route
-        exact
-        path={ROUTES.EXCHANGE_END}
-        component={props => <ExchangeEndPage {...props} stores={stores} actions={actions} />}
-      />
-      <Redirect to={ROUTES.MY_WALLETS} />
-    </Switch>
-  </Suspense>
-);
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Suspense fallback={null}>
+        <Switch>
+          <Route exact path={ROUTES.ROOT} component={props => <LoadingPage {...props} stores={stores} actions={actions} />} />
+          <Route
+            exact
+            path={ROUTES.NIGHTLY_INFO}
+            component={props => <NightlyPage {...props} stores={stores} actions={actions} />}
+          />
+          <Route
+            exact
+            path={ROUTES.PROFILE.LANGUAGE_SELECTION}
+            component={props => <LanguageSelectionPage {...props} stores={stores} actions={actions} />}
+          />
+          <Route
+            exact
+            path={ROUTES.PROFILE.COMPLEXITY_LEVEL}
+            component={props => <ComplexityLevelPage {...props} stores={stores} actions={actions} />}
+          />
+          <Route
+            exact
+            path={ROUTES.PROFILE.TERMS_OF_USE}
+            component={props => <TermsOfUsePage {...props} stores={stores} actions={actions} />}
+          />
+          <Route
+            exact
+            path={ROUTES.PROFILE.URI_PROMPT}
+            component={props => <UriPromptPage {...props} stores={stores} actions={actions} />}
+          />
+          <Route
+            exact
+            path={ROUTES.PROFILE.OPT_FOR_ANALYTICS}
+            component={props => <OptForAnalyticsPage {...props} stores={stores} actions={actions} />}
+          />
+          <Route
+            exact
+            path={ROUTES.MY_WALLETS}
+            component={props => <MyWalletsPage {...props} stores={stores} actions={actions} />}
+          />
+          <Route exact path={ROUTES.STAKING} component={props => <StakingPage {...props} stores={stores} actions={actions} />} />
+          <Route
+            path={ROUTES.ASSETS.ROOT}
+            component={props => wrapAssets({ ...props, stores, actions }, AssetsSubpages(stores, actions))}
+          />
+          <Route
+            path={ROUTES.NFTS.ROOT}
+            component={props => wrapNFTs({ ...props, stores, actions }, NFTsSubPages(stores, actions))}
+          />
+          <Route
+            exact
+            path={ROUTES.WALLETS.ADD}
+            component={props => <AddWalletPage {...props} stores={stores} actions={actions} />}
+          />
+          <Route
+            exact
+            path={ROUTES.WALLETS.RESTORE_WALLET}
+            component={props => <RestoreWalletPage {...props} stores={stores} actions={actions} />}
+          />
+          <Route
+            exact
+            path={ROUTES.WALLETS.CREATE_NEW_WALLET}
+            component={props => <CreateWalletPage {...props} stores={stores} actions={actions} />}
+          />
+          <Route
+            exact
+            path={ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES}
+            component={props => <ConnectedWebsitesPage {...props} stores={stores} actions={actions} />}
+          />
+          <Route
+            exact
+            path={ROUTES.EXPERIMENTAL.YOROI_PALETTE}
+            component={props => <YoroiPalettePage {...props} stores={stores} actions={actions} />}
+          />
+          <Route
+            exact
+            path={ROUTES.EXPERIMENTAL.THEMES}
+            component={props => <YoroiThemesPage {...props} stores={stores} actions={actions} />}
+          />
+          <Route
+            path={ROUTES.WALLETS.ROOT}
+            component={props => wrapWallet({ ...props, stores, actions }, WalletsSubpages(stores, actions))}
+          />
+          <Route
+            path={ROUTES.SETTINGS.ROOT}
+            component={props => wrapSettings({ ...props, stores, actions }, SettingsSubpages(stores, actions))}
+          />
+          <Route
+            path={ROUTES.SWAP.ROOT}
+            component={props => wrapSwap({ ...props, stores, actions }, SwapSubpages(stores, actions))}
+          />
+          <Route path={ROUTES.TRANSFER.ROOT} component={props => <Transfer {...props} stores={stores} actions={actions} />} />
+          <Route
+            exact
+            path={ROUTES.SEND_FROM_URI.ROOT}
+            component={props => <URILandingPage {...props} stores={stores} actions={actions} />}
+          />
+          <Route
+            exact
+            path={ROUTES.OAUTH_FROM_EXTERNAL.DROPBOX}
+            component={props => <OAuthDropboxPage {...props} stores={stores} actions={actions} />}
+          />
+          <Route exact path={ROUTES.SWITCH} component={props => <WalletSwitch {...props} stores={stores} actions={actions} />} />
+          <Route
+            exact
+            path={ROUTES.REVAMP.CATALYST_VOTING}
+            component={props => <VotingPage {...props} stores={stores} actions={actions} />}
+          />
+          <Route
+            exact
+            path={ROUTES.EXCHANGE_END}
+            component={props => <ExchangeEndPage {...props} stores={stores} actions={actions} />}
+          />
+
+          {/* NEW UI Routes */}
+          <Route
+            path={ROUTES.Governance.ROOT}
+            component={props => wrapGovernance({ ...props, stores, actions }, GovernanceSubpages(stores, actions))}
+          />
+          <Route
+            path={ROUTES.PORTFOLIO.ROOT}
+            component={props => wrapPortfolio({ ...props, stores, actions }, PortfolioSubpages(stores, actions))}
+          />
+
+          <Redirect to={ROUTES.MY_WALLETS} />
+        </Switch>
+      </Suspense>
+    </QueryClientProvider>
+  );
+};
 
 const WalletsSubpages = (stores, actions) => (
   <Switch>
@@ -335,17 +340,11 @@ const WalletsSubpages = (stores, actions) => (
       path={ROUTES.WALLETS.SEND}
       component={props => <WalletSendPage {...props} stores={stores} actions={actions} />}
     />
-    <Route
-      path={ROUTES.WALLETS.ASSETS}
-      component={props => <WalletAssetsPage {...props} stores={stores} actions={actions} />}
-    />
+    <Route path={ROUTES.WALLETS.ASSETS} component={props => <WalletAssetsPage {...props} stores={stores} actions={actions} />} />
     <Route
       path={ROUTES.WALLETS.RECEIVE.ROOT}
       component={props =>
-        wrapReceive(
-          { ...props, stores, actions },
-          <WalletReceivePage {...props} stores={stores} actions={actions} />
-        )
+        wrapReceive({ ...props, stores, actions }, <WalletReceivePage {...props} stores={stores} actions={actions} />)
       }
     />
     <Route
@@ -357,12 +356,7 @@ const WalletsSubpages = (stores, actions) => (
       exact
       path={ROUTES.WALLETS.ADAPOOL_DELEGATION_SIMPLE}
       component={props => (
-        <CardanoStakingPage
-          {...props}
-          stores={stores}
-          actions={actions}
-          urlTemplate={CONFIG.poolExplorer.simpleTemplate}
-        />
+        <CardanoStakingPage {...props} stores={stores} actions={actions} urlTemplate={CONFIG.poolExplorer.simpleTemplate} />
       )}
     />
     <Route
@@ -380,16 +374,8 @@ const WalletsSubpages = (stores, actions) => (
 
 const SwapSubpages = (stores, actions) => (
   <Switch>
-    <Route
-      exact
-      path={ROUTES.SWAP.ROOT}
-      component={props => <SwapPage {...props} stores={stores} actions={actions} />}
-    />
-    <Route
-      exact
-      path={ROUTES.SWAP.ORDERS}
-      component={props => <SwapOrdersPage {...props} stores={stores} actions={actions} />}
-    />
+    <Route exact path={ROUTES.SWAP.ROOT} component={props => <SwapPage {...props} stores={stores} actions={actions} />} />
+    <Route exact path={ROUTES.SWAP.ORDERS} component={props => <SwapOrdersPage {...props} stores={stores} actions={actions} />} />
     <Redirect to={ROUTES.SWAP.ROOT} />
   </Switch>
 );
@@ -419,9 +405,7 @@ const SettingsSubpages = (stores, actions) => (
     <Route
       exact
       path={ROUTES.SETTINGS.EXTERNAL_STORAGE}
-      component={props => (
-        <ExternalStorageSettingsPage {...props} stores={stores} actions={actions} />
-      )}
+      component={props => <ExternalStorageSettingsPage {...props} stores={stores} actions={actions} />}
     />
     <Route
       exact
@@ -431,9 +415,7 @@ const SettingsSubpages = (stores, actions) => (
     <Route
       exact
       path={ROUTES.SETTINGS.LEVEL_OF_COMPLEXITY}
-      component={props => (
-        <ComplexityLevelSettingsPage {...props} stores={stores} actions={actions} />
-      )}
+      component={props => <ComplexityLevelSettingsPage {...props} stores={stores} actions={actions} />}
     />
     <Route
       exact
@@ -441,6 +423,37 @@ const SettingsSubpages = (stores, actions) => (
       component={props => <AnalyticsSettingsPage {...props} stores={stores} actions={actions} />}
     />
     <Redirect to={ROUTES.SETTINGS.GENERAL} />
+  </Switch>
+);
+
+const PortfolioSubpages = (stores, actions) => (
+  <Switch>
+    <Route
+      exact
+      path={ROUTES.PORTFOLIO.ROOT}
+      component={props => <PortfolioPage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.PORTFOLIO.DAPPS}
+      component={props => <PortfolioDappsPage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.PORTFOLIO.DETAILS}
+      component={props => <PortfolioDetailPage {...props} stores={stores} actions={actions} />}
+    />
+  </Switch>
+);
+
+const NFTsSubPages = (stores, actions) => (
+  <Switch>
+    <Route exact path={ROUTES.NFTS.ROOT} component={props => <NFTsPageRevamp {...props} stores={stores} actions={actions} />} />
+    <Route
+      exact
+      path={ROUTES.NFTS.DETAILS}
+      component={props => <NFTDetailPageRevamp {...props} stores={stores} actions={actions} />}
+    />
   </Switch>
 );
 
@@ -459,23 +472,33 @@ const AssetsSubpages = (stores, actions) => (
   </Switch>
 );
 
-const NFTsSubPages = (stores, actions) => (
+const GovernanceSubpages = (stores, actions) => (
   <Switch>
     <Route
       exact
-      path={ROUTES.NFTS.ROOT}
-      component={props => <NFTsPageRevamp {...props} stores={stores} actions={actions} />}
+      path={ROUTES.Governance.ROOT}
+      component={props => <GovernanceStatusPage {...props} stores={stores} actions={actions} />}
     />
     <Route
       exact
-      path={ROUTES.NFTS.DETAILS}
-      component={props => <NFTDetailPageRevamp {...props} stores={stores} actions={actions} />}
+      path={ROUTES.Governance.DELEGATE}
+      component={props => <GovernanceDelegationFormPage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.Governance.SUBMITTED}
+      component={props => <GovernanceTransactionSubmittedPage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.Governance.FAIL}
+      component={props => <GovernanceTransactionFailedPage {...props} stores={stores} actions={actions} />}
     />
   </Switch>
 );
 
 export function wrapSwap(swapProps: StoresAndActionsProps, children: Node): Node {
-  const queryClient = new QueryClient();
+  // const queryClient = new QueryClient();
   const loader = (
     <FullscreenLayout bottomPadding={0}>
       <Stack alignItems="center" justifyContent="center" height="50vh">
@@ -484,20 +507,17 @@ export function wrapSwap(swapProps: StoresAndActionsProps, children: Node): Node
     </FullscreenLayout>
   );
   return (
-    <QueryClientProvider client={queryClient}>
-      <SwapProvider publicDeriver={swapProps.stores.wallets.selected}>
-        <SwapPageContainer {...swapProps}>
-          <Suspense fallback={loader}>{children}</Suspense>
-        </SwapPageContainer>
-      </SwapProvider>
-    </QueryClientProvider>
+    // <QueryClientProvider client={queryClient}>
+    <SwapProvider publicDeriver={swapProps.stores.wallets.selected}>
+      <SwapPageContainer {...swapProps}>
+        <Suspense fallback={loader}>{children}</Suspense>
+      </SwapPageContainer>
+    </SwapProvider>
+    // </QueryClientProvider>
   );
 }
 
-export function wrapSettings(
-  settingsProps: StoresAndActionsProps,
-  children: Node
-): Node {
+export function wrapSettings(settingsProps: StoresAndActionsProps, children: Node): Node {
   return (
     <Settings {...settingsProps}>
       <Suspense fallback={null}>{children}</Suspense>
@@ -531,4 +551,34 @@ export function wrapWallet(walletProps: StoresAndActionsProps, children: Node): 
 
 export function wrapReceive(receiveProps: StoresAndActionsProps, children: Node): Node {
   return <Receive {...receiveProps}>{children}</Receive>;
+}
+
+// NEW UI - TODO: to be refactred
+export function wrapGovernance(governanceProps: StoresAndActionsProps, children: Node): Node {
+  const currentWalletInfo = createCurrrentWalletInfo(governanceProps.stores);
+
+  const { delegationTransaction } = governanceProps.stores.substores.ada;
+  const delegationTxResult = delegationTransaction.createDelegationTx.result;
+  const delegationTxError = delegationTransaction.createDelegationTx.error;
+
+  return (
+    <GovernanceContextProvider
+      currentWallet={currentWalletInfo}
+      createDrepDelegationTransaction={governanceProps.stores.delegation.createDrepDelegationTransaction}
+      signDelegationTransaction={governanceProps.actions.ada.delegationTransaction.signTransaction.trigger}
+      txDelegationResult={delegationTxResult}
+      txDelegationError={delegationTxError}
+      tokenInfo={governanceProps.stores.tokenInfoStore.tokenInfo}
+      triggerBuySellAdaDialog={() => governanceProps.actions.dialogs.open.trigger({ dialog: BuySellDialog })}
+    >
+      <Suspense fallback={null}>{children}</Suspense>;
+    </GovernanceContextProvider>
+  );
+}
+export function wrapPortfolio(portfolioProps: StoresAndActionsProps, children: Node): Node {
+  return (
+    <PortfolioContextProvider settingFiatPairUnit={portfolioProps.stores.profile.unitOfAccount}>
+      <Suspense fallback={null}>{children}</Suspense>
+    </PortfolioContextProvider>
+  );
 }

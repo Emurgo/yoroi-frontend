@@ -84,6 +84,7 @@ class GeneralSubTab extends SettingsTab {
     this.logger.info(`GeneralSubTab::selectLanguage is called. Country code: "${countryCode}"`);
     await this.openLanguageSelection();
     await this.pickLanguage(countryCode);
+    await this.sleep(200);
   }
   async openFiatSelection() {
     this.logger.info(`GeneralSubTab::openFiatSelection is called`);
@@ -100,6 +101,7 @@ class GeneralSubTab extends SettingsTab {
     this.logger.info(`GeneralSubTab::selectFiat is called. Country code: "${fiatCode}"`);
     await this.openFiatSelection();
     await this.pickFiat(fiatCode);
+    await this.sleep(200);
   }
   async getNetworkText() {
     this.logger.info(`GeneralSubTab::getNetworkText is called`);

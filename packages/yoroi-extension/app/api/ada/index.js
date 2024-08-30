@@ -159,6 +159,7 @@ import type { ForeignUtxoFetcher } from '../../connector/stores/ConnectorStore';
 import type WalletTransaction from '../../domain/WalletTransaction';
 import { derivePrivateByAddressing, derivePublicByAddressing } from './lib/cardanoCrypto/deriveByAddressing';
 import TimeUtils from './lib/storage/bridge/timeUtils';
+import { isCertificateKindDrepDelegation } from './lib/storage/bridge/utils';
 
 // ADA specific Request / Response params
 
@@ -352,7 +353,8 @@ export type CreateDelegationTxRequest = {|
   ),
   absSlotNumber: BigNumber,
   registrationStatus: boolean,
-  poolRequest: void | string,
+  poolRequest?: string,
+  drepCredential?: string,
   valueInAccount: MultiToken,
 |};
 
@@ -1349,11 +1351,12 @@ export default class AdaApi {
         },
       }).to_raw_key();
 
-      const stakeDelegationCert = createCertificate(
-        stakingKey,
+      const delegationCerts = createCertificate(
+        stakingKey.hash().to_hex(),
         request.registrationStatus,
-        request.poolRequest
-      );
+        request.poolRequest,
+        request.drepCredential,
+      )
 
       const allUtxo = await publicDeriver.getAllUtxos();
       const addressedUtxo = asAddressedUtxo(allUtxo);
@@ -1370,7 +1373,7 @@ export default class AdaApi {
         addressedUtxo,
         request.absSlotNumber,
         protocolParams,
-        stakeDelegationCert,
+        delegationCerts,
         [],
         false,
       );
@@ -1382,16 +1385,16 @@ export default class AdaApi {
       );
 
       const utxoSum = allUtxosForKey.reduce(
-      (sum, utxo) => sum.joinAddMutable(new MultiToken(
-        utxo.output.tokens.map(token => ({
-          identifier: token.Token.Identifier,
-          amount: new BigNumber(token.TokenList.Amount),
-          networkId: token.Token.NetworkId,
-        })),
-        publicDeriver.getParent().getDefaultToken()
-      )),
+        (sum, utxo) => sum.joinAddMutable(new MultiToken(
+          utxo.output.tokens.map(token => ({
+            identifier: token.Token.Identifier,
+            amount: new BigNumber(token.TokenList.Amount),
+            networkId: token.Token.NetworkId,
+          })),
+          publicDeriver.getParent().getDefaultToken()
+        )),
         publicDeriver.getParent().getDefaultMultiToken()
-    );
+      );
 
       const differenceAfterTx = getDifferenceAfterTx(
         unsignedTx,
@@ -2125,7 +2128,8 @@ export default class AdaApi {
     txId: string,
   ): Promise<{|
     transaction: CardanoShelleyTransaction,
-    usedUtxos: Array<{| txHash: string, index: number |}>
+    usedUtxos: Array<{| txHash: string, index: number |}>,
+    isDrepDelegation: boolean,
   |}> {
     const p = asHasLevels<ConceptualWallet>(publicDeriver);
     if (!p) {
@@ -2202,7 +2206,9 @@ export default class AdaApi {
       })),
       isValid: true,
     });
-    return { usedUtxos, transaction };
+
+    const isDrepDelegation = signRequest.certificates().some(c => isCertificateKindDrepDelegation(c.kind));
+    return { usedUtxos, transaction, isDrepDelegation };
   }
 
   utxosWithSubmittedTxs(

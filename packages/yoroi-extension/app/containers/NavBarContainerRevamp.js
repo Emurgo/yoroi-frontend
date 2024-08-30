@@ -49,6 +49,15 @@ export default class NavBarContainerRevamp extends Component<Props> {
     this.props.actions.router.goToRoute.trigger({ route, publicDeriver: newWallet });
   };
 
+  checkAndResetGovRoutes: void => void = () => {
+    if (
+      this.props.stores.app.currentRoute === ROUTES.Governance.FAIL ||
+      this.props.stores.app.currentRoute === ROUTES.Governance.SUBMITTED
+    ) {
+      this.props.actions.router.goToRoute.trigger({ route: ROUTES.Governance.ROOT });
+    }
+  };
+
   render(): Node {
     const { stores, pageBanner } = this.props;
     const { profile } = stores;
@@ -58,18 +67,13 @@ export default class NavBarContainerRevamp extends Component<Props> {
       const publicDeriver = walletsStore.selected;
       if (publicDeriver == null) return null;
       const parent = publicDeriver.getParent();
-      const settingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(
-        parent
-      );
+      const settingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(parent);
 
       const withPubKey = asGetPublicKey(publicDeriver);
-      const plate =
-        withPubKey == null ? null : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
+      const plate = withPubKey == null ? null : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
 
       const balance: ?MultiToken = this.props.stores.transactions.getBalance(publicDeriver);
-      const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(
-        publicDeriver
-      );
+      const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(publicDeriver);
 
       return (
         <NavWalletDetailsRevamp
@@ -101,11 +105,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
           menu={this.props.menu}
           walletDetails={walletsStore.selected !== null ? <DropdownHead /> : null}
           buyButton={
-            <BuySellAdaButton
-              onBuySellClick={() =>
-                this.props.actions.dialogs.open.trigger({ dialog: BuySellDialog })
-              }
-            />
+            <BuySellAdaButton onBuySellClick={() => this.props.actions.dialogs.open.trigger({ dialog: BuySellDialog })} />
           }
           pageBanner={pageBanner}
         />
@@ -129,13 +129,10 @@ export default class NavBarContainerRevamp extends Component<Props> {
         const walletAmount = this.props.stores.transactions.getBalance(wallet);
         const rewards = this.props.stores.delegation.getRewardBalanceOrZero(wallet);
         const parent = wallet.getParent();
-        const settingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(
-          parent
-        );
+        const settingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(parent);
 
         const withPubKey = asGetPublicKey(wallet);
-        const plate =
-          withPubKey == null ? null : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
+        const plate = withPubKey == null ? null : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
 
         const walletMap = {
           walletId: wallet.getPublicDeriverId(),
@@ -154,9 +151,15 @@ export default class NavBarContainerRevamp extends Component<Props> {
       return (
         <WalletListDialog
           cardanoWallets={cardanoWallets}
-          onSelect={this.onSelectWallet}
+          onSelect={wallet => {
+            this.checkAndResetGovRoutes();
+            this.onSelectWallet(wallet);
+          }}
           selectedWallet={this.props.stores.wallets.selected}
-          close={this.props.actions.dialogs.closeActiveDialog.trigger}
+          close={() => {
+            this.checkAndResetGovRoutes();
+            this.props.actions.dialogs.closeActiveDialog.trigger();
+          }}
           shouldHideBalance={this.props.stores.profile.shouldHideBalance}
           onUpdateHideBalance={this.updateHideBalance}
           getTokenInfo={getTokenInfo}
@@ -180,10 +183,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
       const getReceiveAdaAddress = async () => {
         const receiveAddress = await getReceiveAddress(publicDeriver);
         if (receiveAddress == null) return null;
-        return addressToDisplayString(
-          receiveAddress.addr.Hash,
-          publicDeriver.getParent().getNetworkInfo()
-        );
+        return addressToDisplayString(receiveAddress.addr.Hash, publicDeriver.getParent().getNetworkInfo());
       };
 
       const tokenInfo = getTokenInfo(balance.getDefaultEntry());
@@ -192,13 +192,8 @@ export default class NavBarContainerRevamp extends Component<Props> {
       return (
         <BuySellDialog
           onCancel={this.props.actions.dialogs.closeActiveDialog.trigger}
-          onExchangeCallback={() =>
-            this.props.actions.router.goToRoute.trigger({ route: ROUTES.EXCHANGE_END })
-          }
-          currentBalanceAda={balance
-            .getDefault()
-            .shiftedBy(-numberOfDecimals)
-            .toFormat(numberOfDecimals)}
+          onExchangeCallback={() => this.props.actions.router.goToRoute.trigger({ route: ROUTES.EXCHANGE_END })}
+          currentBalanceAda={balance.getDefault().shiftedBy(-numberOfDecimals)}
           receiveAdaAddressPromise={getReceiveAdaAddress()}
         />
       );

@@ -1,4 +1,12 @@
-import { halfSecond, oneMinute, oneSecond, defaultWaitTimeout } from '../helpers/timeConstants.js';
+import { balanceReplacer } from '../helpers/constants.js';
+import {
+  defaultWaitTimeout,
+  fiveSeconds,
+  halfSecond,
+  oneMinute,
+  oneSecond,
+  quarterSecond,
+} from '../helpers/timeConstants.js';
 import BasePage from './basepage.js';
 
 class WalletCommonBase extends BasePage {
@@ -48,6 +56,10 @@ class WalletCommonBase extends BasePage {
   };
   walletFiatBalanceTextLocator = {
     locator: 'topBar:selectedWallet-availableFiatBalance-text',
+    method: 'id',
+  };
+  walletBalanceVisibilityButtonLocator = {
+    locator: 'topBar:selectedWallet-showHideBalance-button',
     method: 'id',
   };
   // change wallet modal window
@@ -117,18 +129,28 @@ class WalletCommonBase extends BasePage {
   async getSelectedWalletInfo() {
     this.logger.info(`WalletCommonBase::getSelectedWalletInfo is called`);
 
-    await this.waitForElement(this.walletNameAndPlateNumberTextLocator);
-    const rawNameAndPlateText = await this.getText(this.walletNameAndPlateNumberTextLocator);
-    const [walletName, walletPlate] = rawNameAndPlateText.split('\n');
+    const [walletName, walletPlate] = await this.waitPresentedAndAct(
+      this.walletNameAndPlateNumberTextLocator,
+      async () => {
+        const rawNameAndPlateText = await this.getText(this.walletNameAndPlateNumberTextLocator);
+        return rawNameAndPlateText.split('\n');
+      }
+    );
 
-    const walletBalanceElem = await this.waitForElement(this.walletBalanceTextLocator);
-    const rawBalanceText = await walletBalanceElem.getText();
-    const adaBalance = Number(rawBalanceText.split(' ')[0]);
+    const adaBalance = await this.waitPresentedAndAct(this.walletBalanceTextLocator, async () => {
+      const rawBalanceText = await this.getText(this.walletBalanceTextLocator);
+      return Number(rawBalanceText.split(' ')[0]);
+    });
 
-    await this.waitForElement(this.walletFiatBalanceTextLocator);
-    const rawFiatBalanceText = await this.getText(this.walletFiatBalanceTextLocator);
-    const [fiatBalanceStr, fiatCurrency] = rawFiatBalanceText.split(' ');
-    const fiatBalance = fiatBalanceStr === '-' ? 0 : Number(fiatBalanceStr);
+    const [fiatBalance, fiatCurrency] = await this.waitPresentedAndAct(
+      this.walletFiatBalanceTextLocator,
+      async () => {
+        const rawFiatBalanceText = await this.getText(this.walletFiatBalanceTextLocator);
+        const [fiatBalanceStr, fiatCurrencyInner] = rawFiatBalanceText.split(' ');
+        const fiatBalanceInner = fiatBalanceStr === '-' ? 0 : Number(fiatBalanceStr);
+        return [fiatBalanceInner, fiatCurrencyInner];
+      }
+    );
 
     const walletInfo = {
       name: walletName,
@@ -201,8 +223,10 @@ class WalletCommonBase extends BasePage {
   }
   async openChangeWalletModal() {
     this.logger.info(`WalletCommonBase::openChangeWalletModal is called`);
-    const selectWalletBtnElem = await this.waitForElement(this.selectedWalletButtonLocator);
-    await selectWalletBtnElem.click();
+    await this.waitPresentedAndAct(
+      this.selectedWalletButtonLocator,
+      async () => await this.click(this.selectedWalletButtonLocator)
+    );
     await this.waitForElement(this.changeWalletDialogLocator);
   }
   async addNewWallet() {
@@ -261,6 +285,34 @@ class WalletCommonBase extends BasePage {
       tokens,
       nfts,
     };
+  }
+  async showHideBalance() {
+    this.logger.info(`WalletCommonBase::showHideBalance is called`);
+    await this.click(this.walletBalanceVisibilityButtonLocator);
+    await this.sleep(500);
+  }
+  async balanceIsHiddenOnTopPanel() {
+    this.logger.info(`WalletCommonBase::showHideBalance is called`);
+
+    const adaBalanceIsHidden = await this.waitPresentedAndAct(
+      this.walletBalanceTextLocator,
+      async () => {
+        const rawBalanceText = await this.getText(this.walletBalanceTextLocator);
+        const balanceStr = rawBalanceText.split(' ')[0];
+        return balanceStr === balanceReplacer;
+      }
+    );
+
+    const fiatBalanceIsHidden = await this.waitPresentedAndAct(
+      this.walletFiatBalanceTextLocator,
+      async () => {
+        const rawFiatBalanceText = await this.getText(this.walletFiatBalanceTextLocator);
+        const fiatBalanceStr = rawFiatBalanceText.split(' ')[0];
+        return fiatBalanceStr === balanceReplacer;
+      }
+    );
+
+    return adaBalanceIsHidden && fiatBalanceIsHidden;
   }
 }
 

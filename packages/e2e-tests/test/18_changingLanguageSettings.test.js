@@ -7,17 +7,18 @@ import { oneMinute } from '../helpers/timeConstants.js';
 import SettingsTab from '../pages/wallet/settingsTab/settingsTab.page.js';
 import driversPoolsManager from '../utils/driversPool.js';
 import GeneralSubTab from '../pages/wallet/settingsTab/generalSubTab.page.js';
-import AddNewWallet from '../pages/addNewWallet.page.js';
+import { preloadDBAndStorage, waitTxPage } from '../helpers/restoreWalletHelper.js';
 
 describe('Changing language through the Settings', function () {
   this.timeout(2 * oneMinute);
   let webdriver = null;
   let logger = null;
 
-  before(function (done) {
-    webdriver = driversPoolsManager.getDriverFromPool();
+  before(async function () {
+    webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    done();
+    await preloadDBAndStorage(webdriver, logger, 'testWallet1');
+    await waitTxPage(webdriver, logger);
   });
 
   const testData = [
@@ -46,21 +47,6 @@ describe('Changing language through the Settings', function () {
       btnTransalation: 'General',
     },
   ];
-
-  it('Prepare DB and storages', async function () {
-    const addWalletPage = new AddNewWallet(webdriver, logger);
-    const state = await addWalletPage.isDisplayed();
-    expect(state).to.be.true;
-    await addWalletPage.prepareDBAndStorage('testWallet1');
-    await addWalletPage.refreshPage();
-  });
-
-  it('Check transactions page', async function () {
-    const transactionsPage = new TransactionsSubTab(webdriver, logger);
-    await transactionsPage.waitPrepareWalletBannerIsClosed();
-    const txPageIsDisplayed = await transactionsPage.isDisplayed();
-    expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
-  });
 
   it('Open General settings', async function () {
     const transactionsPage = new TransactionsSubTab(webdriver, logger);

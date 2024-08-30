@@ -81,11 +81,12 @@ export type TxHistoryState = {|
 
 const EXPORT_START_DELAY = 800; // in milliseconds [1000 = 1sec]
 
-type SubmittedTransactionEntry = {|
+export type SubmittedTransactionEntry = {|
   networkId: number,
   publicDeriverId: number,
   transaction: WalletTransaction,
   usedUtxos: Array<{| txHash: string, index: number |}>,
+  isDrepDelegation?: boolean,
 |};
 
 function getCoinsPerUtxoWord(network: $ReadOnly<NetworkRow>): BigNumber {
@@ -179,6 +180,10 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       ...this.getSubmittedTransactions(publicDeriver),
       ...txs,
     ];
+  }
+
+  @computed get submitted(): Array<SubmittedTransactionEntry> {
+    return this._submittedTransactions;
   }
 
   @computed get hasAny(): boolean {
@@ -847,15 +852,18 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
   @action
   recordSubmittedTransaction: (
-    PublicDeriver<>,
-    WalletTransaction,
-    Array<{| txHash: string, index: number |}>
-  ) => void = (publicDeriver, transaction, usedUtxos) => {
+    publicDeriver: PublicDeriver<>,
+    transaction: WalletTransaction,
+    usedUtxos: Array<{| txHash: string, index: number |}>,
+    isDrepDelegation: boolean,
+  ) => void = (publicDeriver, transaction, usedUtxos, isDrepDelegation) => {
+
     this._submittedTransactions.push({
       publicDeriverId: publicDeriver.publicDeriverId,
       networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
       transaction,
       usedUtxos,
+      isDrepDelegation,
     });
     this._persistSubmittedTransactions();
   };

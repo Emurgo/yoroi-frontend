@@ -9,7 +9,7 @@ import { SwapPoolIcon } from './SwapPoolComponents';
 import BigNumber from 'bignumber.js';
 
 const tableColumns = ['DEX name', 'Price', 'TVL', 'DEX fee', 'Liquidity provider fee'];
-const templateColumns = 'minmax(auto, 208px) 120px 200px 90px 160px';
+const templateColumns = 'minmax(auto, 208px) 120px 200px 90px 158px';
 const PRECISION = 10;
 
 type Props = {|
@@ -31,7 +31,6 @@ export default function SelectPoolDialog({
   onPoolSelected,
   onClose,
 }: Props): React$Node {
-
   const handlePoolSelected = poolId => {
     onPoolSelected(poolId);
     onClose();
@@ -51,13 +50,11 @@ export default function SelectPoolDialog({
             .toString(10);
           const formattedTvl = Quantities.format(tvl, ptDecimals, 0);
           const marketPrice = getMarketPrice(pool, sellTokenId);
-          const formattedMarketPrice = denomination >= 0 ? Quantities.format(
-            marketPrice ?? Quantities.zero,
-            denomination,
-            PRECISION,
-          ) : '-';
-          const formattedPoolFee = Quantities
-            .format(batcherFee.quantity, ptDecimals, ptDecimals);
+          const formattedMarketPrice =
+            denomination >= 0
+              ? Quantities.format(marketPrice ?? Quantities.zero, denomination, PRECISION)
+              : '-';
+          const formattedPoolFee = Quantities.format(batcherFee.quantity, ptDecimals, ptDecimals);
           return (
             <Box
               key={poolId}

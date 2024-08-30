@@ -1,15 +1,15 @@
 // @flow
-import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
-import { ReactComponent as EditIcon } from '../../../../assets/images/revamp/icons/edit.inline.svg';
-import { ReactComponent as ChevronDownIcon } from '../../../../assets/images/revamp/icons/chevron-down.inline.svg';
 import { useSwap } from '@yoroi/swap';
 import { capitalize } from 'lodash';
+import { useState } from 'react';
+import { ReactComponent as ChevronDownIcon } from '../../../../assets/images/revamp/icons/chevron-down.inline.svg';
+import { ReactComponent as EditIcon } from '../../../../assets/images/revamp/icons/edit.inline.svg';
 import { SwapPoolIcon } from '../../../../components/swap/SwapPoolComponents';
-import SwapPoolFullInfo from './PoolFullInfo';
-import { useSwapForm } from '../../context/swap-form';
 import { maybe } from '../../../../coreUtils';
+import { useSwapForm } from '../../context/swap-form';
 import { useSwapFeeDisplay } from '../../hooks';
+import SwapPoolFullInfo from './PoolFullInfo';
 import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
 
 type Props = {|
@@ -33,10 +33,7 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
 
   const { pool } = calculation;
 
-  const formattedTotal =
-    formattedNonPtAmount == null
-      ? formattedPtAmount
-      : `${formattedNonPtAmount} + ${formattedPtAmount}`;
+  const formattedTotal = formattedNonPtAmount == null ? formattedPtAmount : `${formattedNonPtAmount} + ${formattedPtAmount}`;
   const titleTotalFeesFormatted = `Total: ${formattedTotal}`;
 
   const isLimitOrder = type === 'limit';
@@ -64,8 +61,7 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
           <Box display="flex" gap="8px" alignItems="center">
             <SwapPoolIcon provider={pool.provider} />
             <Typography component="div" variant="body1" color="grayscale.max">
-              {maybe(pool.provider, p => `${capitalize(p)} ${isAutoPool ? '(Auto)' : ''}`) ??
-                'No pool found'}
+              {maybe(pool.provider, p => `${capitalize(p)} ${isAutoPool ? '(Auto)' : ''}`) ?? 'No pool found'}
             </Typography>
             {isLimitOrder && (
               <Box sx={{ cursor: 'pointer' }} onClick={isLimitOrder ? handleEditPool : undefined}>
@@ -90,6 +86,8 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            marginBottom: showFullInfo && '8px',
+            cursor: 'pointer',
           }}
           onClick={handleShowFullInfo}
         >
@@ -111,7 +109,7 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
             </Box>
           </Box>
         </Box>
-        {showFullInfo && <SwapPoolFullInfo defaultTokenInfo={defaultTokenInfo} withInfo />}
+        {showFullInfo && <SwapPoolFullInfo defaultTokenInfo={defaultTokenInfo} withInfo showMinAda />}
       </Box>
     </Box>
   );

@@ -1,23 +1,25 @@
 // @flow
 import type { MessageDescriptor } from 'react-intl';
-import { ROUTES } from '../../routes-config';
-import globalMessages, { connectorMessages } from '../../i18n/global-messages';
+import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import { asGetStakingKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { ReactComponent as dappConnectorIcon } from '../../assets/images/dapp-connector/dapp-connector.inline.svg';
 import { ReactComponent as walletsIcon } from '../../assets/images/sidebar/my_wallets.inline.svg';
+import { ReactComponent as assetsIcon } from '../../assets/images/sidebar/revamp/assets.inline.svg';
+import { ReactComponent as governanceIcon } from '../../assets/images/sidebar/revamp/governance.inline.svg';
+import { ReactComponent as nftsIcon } from '../../assets/images/sidebar/revamp/nfts.inline.svg';
+import { ReactComponent as portfolioIcon } from '../../assets/images/sidebar/revamp/portfolio.inline.svg';
+import { ReactComponent as settingIcon } from '../../assets/images/sidebar/revamp/setting.inline.svg';
+import { ReactComponent as stakingIcon } from '../../assets/images/sidebar/revamp/staking.inline.svg';
+import { ReactComponent as swapIcon } from '../../assets/images/sidebar/revamp/swap.inline.svg';
+import { ReactComponent as votingIcon } from '../../assets/images/sidebar/revamp/voting.inline.svg';
+import { ReactComponent as walletIcon } from '../../assets/images/sidebar/revamp/wallet.inline.svg';
 import { ReactComponent as transferIcon } from '../../assets/images/sidebar/transfer_wallets.inline.svg';
 import { ReactComponent as settingsIcon } from '../../assets/images/sidebar/wallet-settings-2-ic.inline.svg';
 import { ReactComponent as goBackIcon } from '../../assets/images/top-bar/back-arrow-white.inline.svg';
-import { ReactComponent as dappConnectorIcon } from '../../assets/images/dapp-connector/dapp-connector.inline.svg';
-import { ReactComponent as walletIcon } from '../../assets/images/sidebar/revamp/wallet.inline.svg';
-import { ReactComponent as stakingIcon } from '../../assets/images/sidebar/revamp/staking.inline.svg';
-import { ReactComponent as assetsIcon } from '../../assets/images/sidebar/revamp/assets.inline.svg';
-import { ReactComponent as nftsIcon } from '../../assets/images/sidebar/revamp/nfts.inline.svg';
-import { ReactComponent as votingIcon } from '../../assets/images/sidebar/revamp/voting.inline.svg';
-import { ReactComponent as swapIcon } from '../../assets/images/sidebar/revamp/swap.inline.svg';
-import { ReactComponent as settingIcon } from '../../assets/images/sidebar/revamp/setting.inline.svg';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
-import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import environment from '../../environment';
+import globalMessages, { connectorMessages } from '../../i18n/global-messages';
+import { ROUTES } from '../../routes-config';
 
 export type SidebarCategory = {|
   +className: string,
@@ -42,9 +44,7 @@ export const MY_WALLETS: SidebarCategory = registerCategory({
   route: ROUTES.MY_WALLETS,
   icon: walletsIcon,
   label: globalMessages.sidebarWallets,
-  isVisible: request =>
-    request.hasAnyWallets &&
-    request.selected == null,
+  isVisible: request => request.hasAnyWallets && request.selected == null,
 });
 
 export const WALLETS_ROOT: SidebarCategory = registerCategory({
@@ -102,6 +102,7 @@ export type SidebarCategoryRevamp = {|
   +icon: string,
   +label?: MessageDescriptor,
   +isVisible: isVisibleFunc,
+  +featureFlagName?: string,
 |};
 
 // TODO: Fix routes and isVisible prop
@@ -124,9 +125,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     icon: stakingIcon,
     label: globalMessages.sidebarStaking,
     isVisible: ({ selected, isRewardWallet }) =>
-      !!selected &&
-      isCardanoHaskell(selected.getParent().getNetworkInfo()) &&
-      isRewardWallet(selected),
+      !!selected && isCardanoHaskell(selected.getParent().getNetworkInfo()) && isRewardWallet(selected),
   },
   {
     className: 'swap',
@@ -141,6 +140,13 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     icon: assetsIcon,
     label: globalMessages.sidebarAssets,
     isVisible: _request => _request.selected !== null,
+  },
+  {
+    className: 'portfolio',
+    route: ROUTES.PORTFOLIO.ROOT,
+    icon: portfolioIcon,
+    label: globalMessages.sidebarPortfolio,
+    isVisible: ({ selected }) => environment.isDev() && selected?.getParent().getNetworkInfo().NetworkId === 250,
   },
   {
     className: 'nfts',
@@ -171,6 +177,14 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
   //   label: globalMessages.sidebarSwap,
   //   isVisible: _request => true,
   // },
+  {
+    className: 'governance',
+    route: '/governance',
+    icon: governanceIcon,
+    label: globalMessages.sidebarGovernance,
+    isVisible: _request => true,
+    featureFlagName: 'governance',
+  },
   {
     className: 'settings',
     route: '/settings',

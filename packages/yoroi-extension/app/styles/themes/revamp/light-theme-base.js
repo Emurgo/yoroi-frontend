@@ -1,4 +1,5 @@
 // @flow
+import { light } from './themed-palettes/light';
 
 const cyan = { '400': '#59B1F4', '100': '#F2F9FF' };
 const yellow = { '500': '#ECBA09', '100': '#FDF7E2' };
@@ -16,6 +17,9 @@ export const lightTheme = {
   palette: {
     mode: 'light',
     /* `main` is added since MUI required it but we don't use it at all */
+    ds: {
+      ...light,
+    },
     primary: {
       main: '#4B6DDE',
       '900': '#121F4D',

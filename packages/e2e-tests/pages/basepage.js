@@ -8,13 +8,16 @@ import {
   getSnapshotObjectFromJSON,
   isFirefox,
   isChrome,
+  isMacOS,
 } from '../utils/utils.js';
 import { getExtensionUrl } from '../utils/driverBootstrap.js';
 import {
   defaultRepeatPeriod,
   defaultWaitTimeout,
+  fiveSeconds,
   halfSecond,
   oneSecond,
+  quarterSecond,
 } from '../helpers/timeConstants.js';
 import { dbSnapshotsDir } from '../helpers/constants.js';
 
@@ -185,7 +188,7 @@ class BasePage {
   async clearInputAll(locator) {
     this.logger.info(`BasePage::clearInputAll is called. Locator: ${JSON.stringify(locator)}`);
     const input = await this.findElement(locator);
-    await input.sendKeys(Key.chord(Key.COMMAND, 'a'));
+    await input.sendKeys(Key.chord(isMacOS() ? Key.COMMAND : Key.CONTROL, 'a'));
     await this.sleep(200);
     await input.sendKeys(Key.NULL);
     await input.sendKeys(Key.BACK_SPACE);
@@ -240,6 +243,18 @@ class BasePage {
       await writeFile(logsPaths, `[\n${jsonLogs.join(',\n')}\n]`);
     }
   }
+  async getDriverLogs(testSuiteName, logFileName) {
+    this.logger.info(`BasePage::getDriverLogs is called.`);
+    const testRundDataDir = createTestRunDataDir(testSuiteName);
+    const cleanName = logFileName.replace(/ /gi, '_');
+    const driverLogsPaths = path.resolve(testRundDataDir, `driver_${cleanName}-log.json`);
+    const driverLogEntries = await this.driver
+      .manage()
+      .logs()
+      .get(logging.Type.DRIVER, logging.Level.INFO);
+    const jsonDriverLogs = driverLogEntries.map(l => JSON.stringify(l.toJSON(), null, 2));
+    await writeFile(driverLogsPaths, `[\n${jsonDriverLogs.join(',\n')}\n]`);
+  }
   async waitForElementLocated(locator) {
     this.logger.info(
       `BasePage::waitForElementLocated is called. Value: ${JSON.stringify(locator)}`
@@ -249,8 +264,7 @@ class BasePage {
   }
   async waitForElement(locator) {
     this.logger.info(`BasePage::waitForElement is called. Value: ${JSON.stringify(locator)}`);
-    await this.waitForElementLocated(locator);
-    const element = await this.findElement(locator);
+    const element = await this.waitForElementLocated(locator);
     return await this.driver.wait(until.elementIsVisible(element));
   }
   async waitEnable(locator) {
@@ -314,12 +328,50 @@ class BasePage {
     const result = await this.customWaiter(
       async () => {
         const elemsPresented = await this.findElements(locator);
-        return elemsPresented === 1;
+        return elemsPresented.length === 1;
       },
       timeout,
       repeatPeriod
     );
     return result;
+  }
+  async customWaitIsNotPresented(
+    locator,
+    timeout = defaultWaitTimeout,
+    repeatPeriod = defaultRepeatPeriod
+  ) {
+    this.logger.info(`BasePage::customWaitIsNotPresented is called.`);
+    const result = await this.customWaiter(
+      async () => {
+        const elemsPresented = await this.findElements(locator);
+        return elemsPresented.length === 0;
+      },
+      timeout,
+      repeatPeriod
+    );
+    return result;
+  }
+  /**
+   * The function wait until the passed element is found and call the passed function
+   * @param {{locator: string, method: id}} locator Element locator
+   * @param {object} funcToCall A function that should be called when the element is found
+   * @param {number} timeout Total time of search in milliseconds. Default values is **5000** milliseconds
+   * @param {number} repeatPeriod The time after which it is necessary to repeat the check. Default value is **250** milliseconds
+   * @returns {Promise<any>}
+   */
+  async waitPresentedAndAct(
+    locator,
+    funcToCall,
+    timeout = fiveSeconds,
+    repeatPeriod = quarterSecond
+  ) {
+    this.logger.info(`BasePage::waitPresentedAndAct is called. Locator: '${locator.locator}'`);
+    const elemState = await this.customWaitIsPresented(locator, timeout, repeatPeriod);
+    if (elemState) {
+      return await funcToCall();
+    } else {
+      throw new Error(`The element is not found. Element: ${locator}`);
+    }
   }
   async sleep(milliseconds) {
     this.logger.info(`BasePage::sleep is called. Value: ${milliseconds}`);

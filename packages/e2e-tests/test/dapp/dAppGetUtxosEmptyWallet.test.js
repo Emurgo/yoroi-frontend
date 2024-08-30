@@ -25,8 +25,8 @@ describe('dApp, getUtxos, empty wallet, not auth', function () {
   let mockServer = null;
   let mockedDApp = null;
 
-  before(function (done) {
-    webdriver = driversPoolsManager.getDriverFromPool();
+  before(async function () {
+    webdriver = await driversPoolsManager.getDriverFromPool();
     mockServer = getMockServer({});
     const wmLogger = getTestLogger('windowManager', this.test.parent.title);
     windowManager = new WindowManager(webdriver, wmLogger);
@@ -34,7 +34,6 @@ describe('dApp, getUtxos, empty wallet, not auth', function () {
     const dappLogger = getTestLogger('dApp', this.test.parent.title);
     mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
     logger = getTestLogger(this.test.parent.title);
-    done();
   });
 
   it('Create an empty wallet', async function () {

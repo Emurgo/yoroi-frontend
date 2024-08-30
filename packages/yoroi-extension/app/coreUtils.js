@@ -166,3 +166,39 @@ export function cast<T>(t: any): T {
   // $FlowIgnore
   return t;
 }
+
+/**
+ * Async pause, does nothing except stops time and yields when awaited
+ */
+export async function delay(time: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, time));
+}
+
+/**
+ * Returns true in case the argument is an empty array
+ */
+export function isEmptyArray(t: any): boolean {
+  return Array.isArray(t) && t.length === 0;
+}
+
+/**
+ * Wraps sync or async func and returns another func that caches results for the specified time
+ *
+ * @param fun - the original function to be wrapped and cached
+ * @param ttl - caching time millis: no caching if zero, infinite caching if negative
+ * @return {function(): (R)} - wrapped caching function
+ */
+export function timeCached<R>(fun: () => R, ttl: number): () => R {
+  const cache: [?{| value: R, time: number |}] = [null];
+  return () => {
+    const time = Date.now();
+    if (cache[0] != null && ttl !== 0) {
+      if (ttl < 0 || time < (cache[0].time + ttl)) {
+        return cache[0].value;
+      }
+    }
+    const value = fun();
+    cache[0] = { value, time };
+    return value;
+  }
+}

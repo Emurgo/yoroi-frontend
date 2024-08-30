@@ -1,10 +1,11 @@
 import driversPoolsManager from './driversPool.js';
 import { defaultWaitTimeout } from '../helpers/timeConstants.js';
+import { DRIVERS_AMOUNT } from '../helpers/constants.js';
 
 export const mochaHooks = {
   beforeAll(done) {
     this.timeout(defaultWaitTimeout);
-    driversPoolsManager.createPoolOfDrivers(2);
+    driversPoolsManager.createPoolOfDrivers(DRIVERS_AMOUNT);
     driversPoolsManager.prepareExtensions();
     done();
   },

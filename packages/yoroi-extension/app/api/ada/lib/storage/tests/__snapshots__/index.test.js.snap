@@ -1238,6 +1238,7 @@ Object {
     Object {
       "Backend": Object {
         "BackendService": "https://api.yoroiwallet.com",
+        "BackendServiceZero": "https://yoroi-backend-zero-mainnet.emurgornd.com",
         "TokenInfoService": "https://cdn.yoroiwallet.com",
       },
       "BaseConfig": Array [
@@ -1266,6 +1267,7 @@ Object {
       ],
       "CoinType": 2147485463,
       "Fork": 0,
+      "NetworkFeatureName": "mainnet",
       "NetworkId": 0,
       "NetworkName": "Cardano Mainnet",
     },
@@ -1306,6 +1308,7 @@ Object {
     Object {
       "Backend": Object {
         "BackendService": "https://preprod-backend.yoroiwallet.com",
+        "BackendServiceZero": "https://yoroi-backend-zero-preprod.emurgornd.com",
         "TokenInfoService": "https://stage-cdn.yoroiwallet.com",
       },
       "BaseConfig": Array [
@@ -1334,12 +1337,14 @@ Object {
       ],
       "CoinType": 2147485463,
       "Fork": 0,
+      "NetworkFeatureName": "preprod",
       "NetworkId": 250,
       "NetworkName": "Cardano Preprod Testnet",
     },
     Object {
       "Backend": Object {
         "BackendService": "https://preview-backend.emurgornd.com",
+        "BackendServiceZero": "https://yoroi-backend-zero-preview.emurgornd.com",
         "TokenInfoService": "https://stage-cdn.yoroiwallet.com",
       },
       "BaseConfig": Array [
@@ -1368,12 +1373,14 @@ Object {
       ],
       "CoinType": 2147485463,
       "Fork": 0,
+      "NetworkFeatureName": "preview",
       "NetworkId": 350,
       "NetworkName": "Cardano Preview Testnet",
     },
     Object {
       "Backend": Object {
         "BackendService": "https://sanchonet-backend.yoroiwallet.com",
+        "BackendServiceZero": "https://yoroi-backend-zero-sanchonet.emurgornd.com",
         "TokenInfoService": "https://stage-cdn.yoroiwallet.com",
       },
       "BaseConfig": Array [
@@ -1402,6 +1409,7 @@ Object {
       ],
       "CoinType": 2147485463,
       "Fork": 0,
+      "NetworkFeatureName": "sanchonet",
       "NetworkId": 450,
       "NetworkName": "Cardano Sancho Testnet",
     },

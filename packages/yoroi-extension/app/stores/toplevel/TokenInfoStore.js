@@ -84,6 +84,14 @@ export default class TokenInfoStore<
     return { name: undefined, ticker: undefined, decimals: undefined, logo: undefined };
   }
 
+  fetchMissingAndGetLocalOrRemoteMetadata(network: $ReadOnly<NetworkRow>, tokenIds: Array<string>): { [string]: Promise<RemoteTokenInfo> } {
+    const fetchPromise = this.fetchMissingTokenInfo(network.NetworkId, tokenIds);
+    return tokenIds.reduce((res, id) => {
+      res[id] = fetchPromise.then(() => this.getLocalOrRemoteMetadata(network, id));
+      return res;
+    }, {});
+  }
+
   fetchMissingTokenInfo: (networkId: number, tokenIds: Array<string>) => Promise<void> = async (
     networkId,
     tokenIds

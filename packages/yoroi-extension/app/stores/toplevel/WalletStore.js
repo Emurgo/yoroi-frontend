@@ -31,6 +31,15 @@ import { createProblematicWalletDialog } from '../../containers/wallet/dialogs/P
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { getWalletChecksum } from '../../api/export/utils';
+import { MultiToken } from '../../api/common/lib/MultiToken';
+import { BigNumber } from 'bignumber.js';
+import { FlagsApi } from '@emurgo/yoroi-lib/dist/flags';
+import type { StorageAPI } from '@emurgo/yoroi-lib/dist/flags';
+import { createFlagStorage } from '../../api/localStorage';
+import { forceNonNull, timeCached } from '../../coreUtils';
+import type { BestBlockResponse } from '../../api/ada/lib/state-fetch/types';
+import TimeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
+import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 type GroupedWallets = {|
   publicDerivers: Array<PublicDeriver<>>,
@@ -145,6 +154,9 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     );
   };
 
+  flagStorage: StorageAPI;
+  absoluteSlotGetters: { [string]: () => Promise<number> } = {};
+
   setup(): void {
     super.setup();
     this.publicDerivers = [];
@@ -156,6 +168,40 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       'visibilitychange',
       debounce(_e => this._pollRefresh(), this.ON_VISIBLE_DEBOUNCE_WAIT)
     );
+    this.flagStorage = createFlagStorage();
+  }
+
+
+  // <TODO:ENCAPSULATE> make it a part of the wallet.network api
+  async getRemoteFeatureFlag(feature: string): Promise<?boolean> {
+    const wallet: ?PublicDeriver<> = this.selected;
+    if (wallet == null) return null;
+    const network = wallet.getParent().getNetworkInfo();
+    const networkName = network.NetworkFeatureName;
+    if (networkName == null) return null;
+
+    let absoluteSlotGetter = this.absoluteSlotGetters[networkName];
+    if (absoluteSlotGetter == null) {
+      const fetcher = this.stores.substores.ada.stateFetchStore.fetcher;
+      absoluteSlotGetter = timeCached(
+        async () => {
+          const bestblockInfo: BestBlockResponse = await fetcher.getBestBlock({ network });
+          const { epoch, slot } = bestblockInfo;
+          if (epoch != null && slot != null) {
+            return TimeUtils.toAbsoluteSlotNumber(getCardanoHaskellBaseConfig(network), { epoch, slot });
+          }
+          console.warn('Failing to resolve absolute slot, bestblock info without epoch or slot: ', bestblockInfo);
+          return -1;
+        },
+        60_000, // 1 minute
+      );
+      this.absoluteSlotGetters[networkName] = absoluteSlotGetter;
+    }
+
+    const absoluteSlot = await absoluteSlotGetter();
+
+    return await new FlagsApi(forceNonNull(network.Backend.BackendService) + '/api', this.flagStorage)
+      .readFlag(feature, networkName, absoluteSlot);
   }
 
   @action
@@ -342,6 +388,31 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       this.actions.serverConnection.parallelSyncStateChange.listen(() => {
         this._startRefreshAllWallets();
       });
+      // todo: under the current architecture, the delay is required otherwise if we go to the send page
+      // immediately it would crash, but soon we will migrate to new architecture which allows for
+      // immediate transition
+      const { sellAdaParams } = this.stores.loading;
+      if (sellAdaParams) {
+        const { selected } = this;
+        if (!selected) {
+          throw new Error('unexpected');
+        }
+        const defaultToken = selected.getParent().getDefaultToken();
+        this.stores.loading.setUriParams({
+          address: sellAdaParams.addr,
+          amount: new MultiToken(
+            [{
+              identifier: defaultToken.defaultIdentifier,
+              networkId: defaultToken.defaultNetworkId,
+              amount: (new BigNumber(sellAdaParams.amount)).shiftedBy(6).decimalPlaces(0, 0/* ROUND_UP */),
+            }],
+            defaultToken,
+          ),
+        });
+        this.actions.router.goToRoute.trigger({
+          route: ROUTES.WALLETS.SEND,
+        });
+      }
     }, 50); // let the UI render first so that the loading process is perceived faster
   };
 
