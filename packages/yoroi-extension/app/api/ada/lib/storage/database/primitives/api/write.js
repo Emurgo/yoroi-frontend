@@ -18,7 +18,7 @@ import type {
   CertificateInsert, CertificateRow,
   CertificateAddressInsert, CertificateAddressRow,
   DbBlock,
-  NetworkInsert, NetworkRow,
+  NetworkRow,
   TokenRow, TokenUpsert, TokenUpsertWithDigest,
   TokenListInsert, TokenListRow,
 } from '../tables';
@@ -637,9 +637,9 @@ export class ModifyNetworks {
   static async upsert(
     db: lf$Database,
     tx: lf$Transaction,
-    rows: $ReadOnlyArray<NetworkInsert>,
+    rows: $ReadOnlyArray<NetworkRow>,
   ): Promise<$ReadOnlyArray<NetworkRow>> {
-    const result = await addOrReplaceRows<NetworkInsert, NetworkRow>(
+    const result = await addOrReplaceRows<NetworkRow, NetworkRow>(
       db, tx,
       rows,
       ModifyNetworks.ownTables[Tables.NetworkSchema.name].name,

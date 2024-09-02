@@ -213,6 +213,7 @@ export function isCardanoHaskell(network: $ReadOnly<NetworkRow>): boolean {
   return network.CoinType === CoinTypes.CARDANO && network.Fork === CardanoForks.Haskell;
 }
 
+// <TODO:WALLET_API>
 export function getCardanoHaskellBaseConfig(network: $ReadOnly<NetworkRow>): CardanoHaskellBaseConfig {
   if (!isCardanoHaskell(network)) throw new Error(`Incorrect network type ${JSON.stringify(network)}`);
   return (network.BaseConfig: any); // cast to return type

@@ -41,6 +41,7 @@ const getStakePoolMeta = (stores: any) => {
   };
 };
 
+// <TODO:POST_MERGE> check
 export const createCurrrentWalletInfo = (stores: any) => {
   const { wallets } = stores;
   const walletCurrentPoolInfo = getStakePoolMeta(stores);

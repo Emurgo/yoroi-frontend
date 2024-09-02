@@ -1,7 +1,5 @@
 // @flow
 import type { MessageDescriptor } from 'react-intl';
-import { ROUTES } from '../../routes-config';
-import globalMessages, { connectorMessages } from '../../i18n/global-messages';
 import { ReactComponent as dappConnectorIcon } from '../../assets/images/dapp-connector/dapp-connector.inline.svg';
 import { ReactComponent as walletsIcon } from '../../assets/images/sidebar/my_wallets.inline.svg';
 import { ReactComponent as assetsIcon } from '../../assets/images/sidebar/revamp/assets.inline.svg';
@@ -20,6 +18,7 @@ import environment from '../../environment';
 import globalMessages, { connectorMessages } from '../../i18n/global-messages';
 import { ROUTES } from '../../routes-config';
 import { isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
+import type { WalletState } from '../../../chrome/extension/background/types';
 
 export type SidebarCategory = {|
   +className: string,
@@ -89,7 +88,7 @@ export const CONNECTED_WEBSITES: SidebarCategory = registerCategory({
 
 type isVisibleFunc = ({|
   hasAnyWallets: boolean,
-  selected: ?{ publicDeriverId: number, isTestnet: boolean, networkId: number, ... },
+  selected: ?WalletState,
   currentRoute: string,
   isRewardWallet: isRewardWalletFunc,
 |}) => boolean;
@@ -181,7 +180,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: '/governance',
     icon: governanceIcon,
     label: globalMessages.sidebarGovernance,
-    isVisible: ({ selected }) => selected != null && !isTrezorTWallet(selected.getParent()),
+    isVisible: ({ selected }) => selected != null && selected.type !== 'trezor',
     featureFlagName: 'governance',
   },
   {

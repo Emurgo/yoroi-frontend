@@ -127,9 +127,9 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   // <TODO:POST_MERGE> check
   // <TODO:ENCAPSULATE> make it a part of the wallet.network api
   async getRemoteFeatureFlag(feature: string): Promise<?boolean> {
-    const wallet: ?PublicDeriver<> = this.selected;
+    const wallet: ?WalletState = this.selected;
     if (wallet == null) return null;
-    const network = wallet.getParent().getNetworkInfo();
+    const network = getNetworkById(wallet.networkId);
     const networkName = network.NetworkFeatureName;
     if (networkName == null) return null;
 

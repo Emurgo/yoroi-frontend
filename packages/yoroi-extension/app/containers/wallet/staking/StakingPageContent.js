@@ -51,19 +51,16 @@ class StakingPageContent extends Component<AllProps> {
   };
 
   async componentDidMount() {
-    const publicDeriver = this.props.stores.wallets.selected;
-    if (publicDeriver == null) {
+    const wallet = this.props.stores.wallets.selected;
+    if (wallet == null) {
       throw new Error(`${nameof(StakingPageContent)} no public deriver. Should never happen`);
     }
-    const networkInfo = publicDeriver.getParent().getNetworkInfo();
-    const networkId = networkInfo.NetworkId;
-
     // Check governance only for certain network
-    if (networkId === 350 || networkId === 450) {
-      this.props.stores.delegation.checkGovernanceStatus(publicDeriver);
+    if (wallet.type !== 'trezor') {
+      noop(this.props.stores.delegation.checkGovernanceStatus(wallet));
     }
-    if (this.props.stores.delegation.getPoolTransitionConfig(publicDeriver).shouldUpdatePool) {
-      const poolTransitionInfo = this.props.stores.delegation.getPoolTransitionInfo(publicDeriver);
+    if (this.props.stores.delegation.getPoolTransitionConfig(wallet).shouldUpdatePool) {
+      const poolTransitionInfo = this.props.stores.delegation.getPoolTransitionInfo(wallet);
       if (poolTransitionInfo?.suggestedPool) {
         noop(this.props.stores.delegation.createDelegationTransaction(poolTransitionInfo.suggestedPool.hash));
       }

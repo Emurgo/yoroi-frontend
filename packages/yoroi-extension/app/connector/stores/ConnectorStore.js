@@ -34,12 +34,6 @@ import { MultiToken } from '../../api/common/lib/MultiToken';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { asAddressedUtxo, multiTokenFromCardanoValue, multiTokenFromRemote, } from '../../api/ada/transactions/utils';
 import {
-  connectorGenerateReorgTx,
-  connectorGetChangeAddress,
-  connectorGetUnusedAddresses,
-  connectorGetUsedAddressesWithPaginate,
-  connectorRecordSubmittedCardanoTransaction,
-  connectorSendTxCardano,
   getDrepRewardAddressHexAndAddressing,
   getScriptRequiredSigningKeys,
   resolveTxOrTxBody,
@@ -1098,8 +1092,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
     const txBody = RustModule.WalletV4.TransactionBody.from_bytes(rawTxBody);
 
-    // <TODO:POST_MERGE> check
-    const [drepAddressHex, drepAddressing] = await getDrepRewardAddressHexAndAddressing(publicDeriver);
+    const [drepAddressHex, drepAddressing] = getDrepRewardAddressHexAndAddressing(publicDeriver);
     ownStakeAddressMap[drepAddressHex] = drepAddressing.addressing.path;
 
     let ledgerSignTxPayload;

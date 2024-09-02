@@ -30,6 +30,7 @@ import appConfig from '../../config';
 import { refreshTransactions } from '../../api/thunk';
 import type { LastSyncInfoRow, } from '../../api/ada/lib/storage/database/walletTypes/core/tables';
 import type { WalletState } from '../../../chrome/extension/background/types';
+import type { PersistedSubmittedTransaction } from '../../api/localStorage';
 
 type TxHistoryState = {|
   publicDeriverId: number,
@@ -106,9 +107,9 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     return  [ ...submittedTxs, ...txs ];
   }
 
-  // <TODO:POST_MERGE> check
-  @computed get submitted(): Array<SubmittedTransactionEntry> {
-    return this._submittedTransactions;
+  // <TODO:PENDING_REMOVAL> wallet state should be used directly
+  @computed get submitted(): Array<PersistedSubmittedTransaction> {
+    return this.stores.wallets.selected?.submittedTransactions ?? [];
   }
 
   @computed get hasAny(): boolean {

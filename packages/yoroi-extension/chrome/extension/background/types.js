@@ -12,6 +12,7 @@ import type { AssuranceMode } from '../../../app/types/transactionAssurance.type
 import type { MultiToken } from '../../../app/api/common/lib/MultiToken';
 import type { FullAddressPayload, AddressRowWithPath } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 import type { PersistedSubmittedTransaction } from '../../../app/api/localStorage';
+import type { NetworkRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
 
 export type WalletType = 'trezor' | 'ledger' | 'mnemonic';
 
@@ -19,6 +20,7 @@ export type WalletType = 'trezor' | 'ledger' | 'mnemonic';
 // CoreAddressT are integers 0 ~ 4 so we use an array here.
 type AddressesByType = Array<Array<FullAddressPayload>>;
 
+// <TODO:THIS_NEEDS_TO_BE_A_CLASS>
 export type WalletState = {|
   publicDeriverId: number,
   conceptualWalletId: number,

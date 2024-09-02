@@ -312,7 +312,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
   createDrepDelegationTransaction: string => Promise<void> = async drepCredential => {
     await this.stores.substores.ada.delegationTransaction.createTransaction({
       drepCredential,
-      publicDeriver: this.stores.wallets.selectedOrFail,
+      wallet: this.stores.wallets.selectedOrFail,
     });
   };
 
@@ -333,6 +333,7 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
         oldBackendUrl: BackendService,
         newBackendUrl: BackendServiceZero,
         networkId: publicDeriver.networkId,
+        // $FlowIgnore
         wasmFactory: RustModule.CrossCsl.init,
       });
 

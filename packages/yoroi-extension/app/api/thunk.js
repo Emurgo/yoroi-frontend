@@ -80,6 +80,7 @@ import type {
 import { Logger, stringifyError } from '../utils/logging';
 import LocalizableError from '../i18n/LocalizableError';
 import { WrongPassphraseError } from './ada/lib/cardanoCrypto/cryptoErrors';
+import { getNetworkById } from './ada/lib/storage/database/prepackaged/networks';
 
 
 export type { CreateHardwareWalletRequest } from '../../chrome/extension/background/handlers/yoroi/wallet';
