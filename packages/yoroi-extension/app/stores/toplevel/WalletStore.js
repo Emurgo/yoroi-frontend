@@ -123,7 +123,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     });
   }
 
-  // <TODO:POST_MERGE> check
   // <TODO:ENCAPSULATE> make it a part of the wallet.network api
   async getRemoteFeatureFlag(feature: string): Promise<?boolean> {
     const wallet: ?WalletState = this.selected;

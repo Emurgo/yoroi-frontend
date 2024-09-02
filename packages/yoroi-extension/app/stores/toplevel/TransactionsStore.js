@@ -116,9 +116,8 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     return this.recent.length > 0;
   }
 
-  // <TODO:POST_MERGE> check
   @computed get hasAnyPending(): boolean {
-    return false;
+    return this.submitted.length > 0;
   }
 
   @computed get hasMoreToLoad(): boolean {
