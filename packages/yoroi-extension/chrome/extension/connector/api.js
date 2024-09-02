@@ -27,6 +27,7 @@ import type { FullAddressPayload } from '../../../app/api/ada/lib/storage/bridge
 import {
   getAllAddresses,
   getAllAddressesForDisplay,
+  getAllUsedAddresses,
 } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 import { getReceiveAddress } from '../../../app/stores/stateless/addressStores';
 
@@ -85,7 +86,7 @@ import {
   derivePrivateByAddressing,
   derivePublicByAddressing
 } from '../../../app/api/ada/lib/cardanoCrypto/deriveByAddressing';
-import { transactionHexToHash } from '../../../app/api/ada/lib/cardanoCrypto/utils';
+import { pubKeyHashToRewardAddress, transactionHexToHash } from '../../../app/api/ada/lib/cardanoCrypto/utils';
 import { sendTx } from '../../../app/api/ada/lib/state-fetch/remoteFetcher';
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
@@ -506,6 +507,22 @@ async function _getDRepKeyAndAddressing(
   );
 }
 
+export async function getDrepRewardAddressHexAndAddressing(
+  wallet: PublicDeriver<>,
+): Promise<[string, Addressing]> {
+  const [pubKey, addressing] = await __pubKeyAndAddressingByChainAndIndex(
+    wallet,
+    ChainDerivations.GOVERNANCE_DREP_KEYS,
+    DREP_KEY_INDEX,
+  );
+  // <TODO:ENCAPSULATE> Make this part of wallet API
+  const config = getCardanoHaskellBaseConfig(
+    wallet.getParent().getNetworkInfo()
+  ).reduce((acc, next) => Object.assign(acc, next), {});
+  const network = parseInt(config.ChainNetworkId, 10);
+  return [pubKeyHashToRewardAddress(pubKey.hash().to_hex(), network), addressing];
+}
+
 export async function connectorGetStakeKey(
   wallet: PublicDeriver<>,
   getAccountState: AccountStateRequest => Promise<AccountStateResponse>,
@@ -619,15 +636,15 @@ const CERT_TO_KEYHASH_FUNCS = [
   ([
     cert => cert.as_drep_registration(),
     cert => cert.voting_credential().to_keyhash(),
-  ]: CertToKeyhashFuncs<RustModule.WalletV4.DrepRegistration>),
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.DRepRegistration>),
   ([
     cert => cert.as_drep_deregistration(),
     cert => cert.voting_credential().to_keyhash(),
-  ]: CertToKeyhashFuncs<RustModule.WalletV4.DrepDeregistration>),
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.DRepDeregistration>),
   ([
     cert => cert.as_drep_update(),
     cert => cert.voting_credential().to_keyhash(),
-  ]: CertToKeyhashFuncs<RustModule.WalletV4.DrepUpdate>),
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.DRepUpdate>),
   ([
     cert => cert.as_pool_registration(),
     cert => {
@@ -678,7 +695,7 @@ function getCertificatesRequiredSignKeys(
       if (!voter) {
         throw new Error('unexpectedly missing voter');
       }
-      const keyHash = voter.to_drep_cred()?.to_keyhash();
+      const keyHash = voter.to_drep_credential()?.to_keyhash();
       if (keyHash) {
         result.add(keyHash.to_hex());
       }

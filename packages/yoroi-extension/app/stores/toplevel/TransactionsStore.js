@@ -106,10 +106,16 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     return  [ ...submittedTxs, ...txs ];
   }
 
+  // <TODO:POST_MERGE> check
+  @computed get submitted(): Array<SubmittedTransactionEntry> {
+    return this._submittedTransactions;
+  }
+
   @computed get hasAny(): boolean {
     return this.recent.length > 0;
   }
 
+  // <TODO:POST_MERGE> check
   @computed get hasAnyPending(): boolean {
     return false;
   }
@@ -121,6 +127,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   }
 
   // todo: legacy code to be removed
+  // <TODO:PENDING_REMOVAL>
   @computed get balance(): MultiToken | null {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return null;

@@ -58,6 +58,7 @@ export type CardanoHaskellConfig = $ReadOnly<
 export type NetworkInsert = {|
   NetworkId: number,
   NetworkName: string,
+  NetworkFeatureName?: string,
   CoinType: CoinTypesT,
   Backend: {|
     BackendService?: string,

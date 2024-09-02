@@ -17,6 +17,9 @@ import { ReactComponent as transferIcon } from '../../assets/images/sidebar/tran
 import { ReactComponent as settingsIcon } from '../../assets/images/sidebar/wallet-settings-2-ic.inline.svg';
 import { ReactComponent as goBackIcon } from '../../assets/images/top-bar/back-arrow-white.inline.svg';
 import environment from '../../environment';
+import globalMessages, { connectorMessages } from '../../i18n/global-messages';
+import { ROUTES } from '../../routes-config';
+import { isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
 
 export type SidebarCategory = {|
   +className: string,
@@ -99,6 +102,7 @@ export type SidebarCategoryRevamp = {|
   +icon: string,
   +label?: MessageDescriptor,
   +isVisible: isVisibleFunc,
+  +featureFlagName?: string,
 |};
 
 // TODO: Fix routes and isVisible prop
@@ -177,7 +181,8 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: '/governance',
     icon: governanceIcon,
     label: globalMessages.sidebarGovernance,
-    isVisible: ({ selected }) => environment.isDev() && selected?.networkId === 450,
+    isVisible: ({ selected }) => selected != null && !isTrezorTWallet(selected.getParent()),
+    featureFlagName: 'governance',
   },
   {
     className: 'settings',

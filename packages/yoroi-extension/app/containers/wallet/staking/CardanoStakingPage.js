@@ -93,6 +93,8 @@ class CardanoStakingPage extends Component<AllProps, State> {
       const isStakeRegistered = this.props.stores.delegation.isStakeRegistered(
         selectedWallet.publicDeriverId
       );
+      // <TODO:POST_MERGE> check
+      const isCurrentlyDelegating = this.props.stores.delegation.isCurrentlyDelegating(publicDeriver);
       const isWalletWithNoFunds = balance != null && balance.getDefaultEntry().amount.isZero();
       const poolList = delegatedPoolId != null && isStakeRegistered ? [delegatedPoolId] : [];
 
@@ -115,7 +117,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
 
       const revampCardanoStakingPage = (
         <>
-          {!isStakeRegistered ? (
+          {!isCurrentlyDelegating ? (
             <WalletDelegationBanner
               isOpen={this.props.stores.transactions.showDelegationBanner}
               onDelegateClick={async poolId => {

@@ -5,10 +5,13 @@ import { observer } from 'mobx-react';
 import Sidebar from '../components/topbar/Sidebar';
 import type { StoresAndActionsProps } from '../types/injectedProps.types';
 import { allCategories, allCategoriesRevamp } from '../stores/stateless/sidebarCategories';
+import type { SidebarCategoryRevamp } from '../stores/stateless/sidebarCategories';
+import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
 import SidebarRevamp from '../components/topbar/SidebarRevamp';
 import { withLayout } from '../styles/context/layout';
 import type { LayoutComponentMap } from '../styles/context/layout';
 import { ROUTES } from '../routes-config';
+import { runInAction } from 'mobx';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -19,11 +22,46 @@ type InjectedLayoutProps = {|
 |};
 type AllProps = {| ...Props, ...InjectedLayoutProps |};
 
+type State = {|
+  featureFlags: { [string]: boolean },
+|};
+
 @observer
-class SidebarContainer extends Component<AllProps> {
+class SidebarContainer extends Component<AllProps, State> {
+
+  state: State = {
+    featureFlags: {},
+  };
+
   toggleSidebar: void => Promise<void> = async () => {
     await this.props.actions.profile.toggleSidebar.trigger();
   };
+
+  componentDidMount(): * {
+    allCategoriesRevamp.forEach(c => {
+      const feature = c.featureFlagName;
+      if (feature != null) {
+        this.props.stores.wallets.getRemoteFeatureFlag(feature)
+          .then((flag: ?boolean) => {
+            if (flag) {
+              runInAction(() => {
+                this.setState(s => ({
+                  featureFlags: { ...s.featureFlags, [feature]: true },
+                }));
+              });
+            }
+            return null;
+          })
+          .catch(e => {
+            console.error('Failed to resolve remote flag for feature: ' + feature, e);
+          });
+      }
+    })
+  }
+
+  categoryFeatureFlagEnabled(category: SidebarCategoryRevamp): boolean {
+    return category.featureFlagName == null || this.state.featureFlags[category.featureFlagName];
+  }
 
   render(): Node {
     const { stores, actions } = this.props;
@@ -71,6 +109,7 @@ class SidebarContainer extends Component<AllProps> {
             isRewardWallet: (wallet) =>
               stores.delegation.isRewardWallet(wallet.publicDeriverId),
           })
+          && this.categoryFeatureFlagEnabled(category)
         )}
       />
     );

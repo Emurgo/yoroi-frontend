@@ -36,3 +36,30 @@ export function transactionHexReplaceWitnessSet(txHex: string, witnessSetHex: st
     return fixedTransaction.to_hex();
   });
 }
+
+export function dRepToMaybeCredentialHex(s: string): ?string {
+  return RustModule.WasmScope(Module => {
+    try {
+      if (s.startsWith('drep1')) {
+        return Module.WalletV4.Credential
+          .from_keyhash(Module.WalletV4.Ed25519KeyHash.from_bech32(s)).to_hex();
+      }
+      if (s.startsWith('drep_script1')) {
+        return Module.WalletV4.Credential
+          .from_scripthash(Module.WalletV4.ScriptHash.from_bech32(s)).to_hex();
+      }
+    } catch {} // eslint-disable-line no-empty
+    return null;
+  })
+}
+
+export function pubKeyHashToRewardAddress(hex: string, network: number): string {
+  return RustModule.WasmScope(Module =>
+    Module.WalletV4.RewardAddress.new(
+      network,
+      Module.WalletV4.Credential.from_keyhash(
+        Module.WalletV4.Ed25519KeyHash.from_hex(hex),
+      ),
+    ).to_address().to_hex(),
+  );
+}

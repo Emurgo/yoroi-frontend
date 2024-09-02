@@ -159,6 +159,7 @@ import { derivePrivateByAddressing, derivePublicByAddressing } from './lib/carda
 import type { WalletState } from '../../../chrome/extension/background/types';
 import TimeUtils from './lib/storage/bridge/timeUtils';
 import type { IFetcher } from './lib/state-fetch/IFetcher.types';
+import { isCertificateKindDrepDelegation } from './lib/storage/bridge/utils';
 
 // ADA specific Request / Response params
 
@@ -1360,6 +1361,7 @@ export default class AdaApi {
         false,
       );
 
+      // <TODO:WALLET_API>
       const defaultToken = {
         defaultNetworkId: wallet.networkId,
         defaultIdentifier: wallet.defaultTokenId,
