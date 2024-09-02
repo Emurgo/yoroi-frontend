@@ -581,15 +581,15 @@ const CERT_TO_KEYHASH_FUNCS = [
   ([
     cert => cert.as_drep_registration(),
     cert => cert.voting_credential().to_keyhash(),
-  ]: CertToKeyhashFuncs<RustModule.WalletV4.DrepRegistration>),
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.DRepRegistration>),
   ([
     cert => cert.as_drep_deregistration(),
     cert => cert.voting_credential().to_keyhash(),
-  ]: CertToKeyhashFuncs<RustModule.WalletV4.DrepDeregistration>),
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.DRepDeregistration>),
   ([
     cert => cert.as_drep_update(),
     cert => cert.voting_credential().to_keyhash(),
-  ]: CertToKeyhashFuncs<RustModule.WalletV4.DrepUpdate>),
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.DRepUpdate>),
   ([
     cert => cert.as_pool_registration(),
     cert => {
@@ -640,7 +640,7 @@ function getCertificatesRequiredSignKeys(
       if (!voter) {
         throw new Error('unexpectedly missing voter');
       }
-      const keyHash = voter.to_drep_cred()?.to_keyhash();
+      const keyHash = voter.to_drep_credential()?.to_keyhash();
       if (keyHash) {
         result.add(keyHash.to_hex());
       }

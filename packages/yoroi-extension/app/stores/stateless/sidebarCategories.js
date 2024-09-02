@@ -20,6 +20,7 @@ import { ReactComponent as goBackIcon } from '../../assets/images/top-bar/back-a
 import environment from '../../environment';
 import globalMessages, { connectorMessages } from '../../i18n/global-messages';
 import { ROUTES } from '../../routes-config';
+import { isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
 
 export type SidebarCategory = {|
   +className: string,
@@ -182,7 +183,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: '/governance',
     icon: governanceIcon,
     label: globalMessages.sidebarGovernance,
-    isVisible: _request => true,
+    isVisible: ({ selected }) => selected != null && !isTrezorTWallet(selected.getParent()),
     featureFlagName: 'governance',
   },
   {

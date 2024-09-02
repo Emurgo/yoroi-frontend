@@ -4,6 +4,8 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import * as React from 'react';
+import LoadingSpinner from '../../../../components/widgets/LoadingSpinner';
+import { useGovernance } from '../module/GovernanceContextProvider';
 
 type Props = {
   title: string;
@@ -14,9 +16,10 @@ type Props = {
   selected: boolean;
   onClick: () => void;
   pending: boolean;
+  loading: boolean;
 };
 
-const StyledCard: any = styled(Stack)(({ theme, selected, pending }: any) => ({
+const StyledCard: any = styled(Stack)(({ theme, selected, pending, isDrepSelected }: any) => ({
   position: 'relative',
   display: 'flex',
   flexDirection: 'column',
@@ -33,6 +36,7 @@ const StyledCard: any = styled(Stack)(({ theme, selected, pending }: any) => ({
   ...(selected && {
     background: !pending && theme.palette.ds.bg_gradient_2,
     border: 'none',
+    pointerEvents: !isDrepSelected && 'none',
   }),
   cursor: 'pointer',
   ...(pending && {
@@ -56,11 +60,11 @@ const Description = styled(Typography)(({ theme }) => ({
   marginTop: theme.spacing(1),
 }));
 
-// const SpinnerBox = styled(Box)(() => ({
-//   position: 'absolute',
-//   right: 15,
-//   top: 15,
-// }));
+const SpinnerBox = styled(Box)(() => ({
+  position: 'absolute',
+  right: 15,
+  top: 15,
+}));
 
 export const GovernanceVoteingCard = ({
   title,
@@ -71,17 +75,23 @@ export const GovernanceVoteingCard = ({
   selected,
   onClick,
   pending = false,
+  loading = false,
 }: Props) => {
   const [hover, onHover] = React.useState(false);
-
+  const { governanceStatus } = useGovernance();
   return (
     <div onMouseOver={() => onHover(true)} onMouseLeave={() => onHover(false)}>
-      <StyledCard onClick={pending ? undefined : onClick} pending={pending === true ? 'true' : undefined} selected={selected}>
-        {/* {pending && selected && (
+      <StyledCard
+        onClick={pending ? undefined : onClick}
+        pending={pending === true ? 'true' : undefined}
+        selected={selected}
+        isDrepSelected={governanceStatus.status === 'delegate'}
+      >
+        {loading && (
           <SpinnerBox>
             <LoadingSpinner />
           </SpinnerBox>
-        )} */}
+        )}
         <CardContent>
           <IconContainer>{icon}</IconContainer>
           <Typography variant="h3" fontWeight="500" mt="16px">

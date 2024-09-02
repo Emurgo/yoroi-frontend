@@ -343,8 +343,8 @@ function formatLedgerWithdrawals(
 }
 
 type WasmCertWithAnchor =
-  RustModule.WalletV4.DrepRegistration
-  | RustModule.WalletV4.DrepUpdate;
+  RustModule.WalletV4.DRepRegistration
+  | RustModule.WalletV4.DRepUpdate;
 
 function wasmCertToAnchor(wasmCert: WasmCertWithAnchor): ?AnchorParams {
   const wasmAnchor = wasmCert.anchor();
@@ -372,9 +372,9 @@ function wasmCertToStakeCredential(wasmCert: WasmCertWithStakeCredential, getPat
 }
 
 type WasmCertWithDrepCredential =
-  RustModule.WalletV4.DrepRegistration
-  | RustModule.WalletV4.DrepUpdate
-  | RustModule.WalletV4.DrepDeregistration;
+  RustModule.WalletV4.DRepRegistration
+  | RustModule.WalletV4.DRepUpdate
+  | RustModule.WalletV4.DRepDeregistration;
 
 function wasmCertToDRepCredential(wasmCert: WasmCertWithDrepCredential, getPath: RustModule.WalletV4.Credential => number[]): CredentialParams {
   return {
@@ -521,7 +521,7 @@ function convertCertificate(
         wasmCertToVoteDelegation(wasmCert, getPath),
       ];
     }
-    case RustModule.WalletV4.CertificateKind.DrepRegistration: {
+    case RustModule.WalletV4.CertificateKind.DRepRegistration: {
       const wasmCert = forceNonNull(wasmCertificateWrap.as_drep_registration());
       return [{
         type: CertificateType.DREP_REGISTRATION,
@@ -532,7 +532,7 @@ function convertCertificate(
         },
       }];
     }
-    case RustModule.WalletV4.CertificateKind.DrepUpdate: {
+    case RustModule.WalletV4.CertificateKind.DRepUpdate: {
       const wasmCert = forceNonNull(wasmCertificateWrap.as_drep_update());
       return [{
         type: CertificateType.DREP_UPDATE,
@@ -542,7 +542,7 @@ function convertCertificate(
         },
       }];
     }
-    case RustModule.WalletV4.CertificateKind.DrepDeregistration: {
+    case RustModule.WalletV4.CertificateKind.DRepDeregistration: {
       const wasmCert = forceNonNull(wasmCertificateWrap.as_drep_deregistration());
       return [{
         type: CertificateType.DREP_DEREGISTRATION,

@@ -39,7 +39,7 @@ export const messages = Object.freeze(
     },
     drepId: {
       id: 'governance.drepId',
-      defaultMessage: '!!!Drep ID:',
+      defaultMessage: '!!!Drep ID (Fingerprint):',
     },
     delegateToDRep: {
       id: 'governance.delegateToDRep',

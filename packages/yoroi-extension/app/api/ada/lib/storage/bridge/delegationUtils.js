@@ -8,7 +8,6 @@ import { normalizeToAddress, unwrapStakingKey, } from './utils';
 import type { IGetAllUtxosResponse, IGetStakingKey, } from '../models/PublicDeriver/interfaces';
 import { MultiToken, } from '../../../../common/lib/MultiToken';
 import { maybe, fail } from '../../../../../coreUtils';
-import { isHex } from '@emurgo/yoroi-lib/dist/internals/utils/index';
 
 export type GetDelegatedBalanceRequest = {|
   publicDeriver: PublicDeriver<> & IGetStakingKey,
@@ -140,22 +139,19 @@ export const DREP_ALWAYS_ABSTAIN = 'ALWAYS_ABSTAIN';
 export const DREP_ALWAYS_NO_CONFIDENCE = 'ALWAYS_NO_CONFIDENCE';
 
 // <TODO:WASM_MONAD>
-function parseKey(key: string): RustModule.WalletV4.Ed25519KeyHash {
-  return isHex(key)
-    ? RustModule.WalletV4.Ed25519KeyHash.from_hex(key)
-    : RustModule.WalletV4.Ed25519KeyHash.from_bech32(key);
-}
-
-// <TODO:WASM_MONAD>
 function parseDrep(drepCredential: string): RustModule.WalletV4.DRep {
-  const DRep = RustModule.WalletV4.DRep;
-  if (drepCredential === DREP_ALWAYS_ABSTAIN) return DRep.new_always_abstain();
-  if (drepCredential === DREP_ALWAYS_NO_CONFIDENCE) return DRep.new_always_no_confidence();
-  // <TODO:FIX> to handle script hashes
-  const credential = RustModule.WalletV4.Credential.from_keyhash(parseKey(drepCredential));
-  return maybe(credential.to_keyhash(), k => DRep.new_key_hash(k))
-    ?? maybe(credential.to_scripthash(), s => DRep.new_script_hash(s))
-    ?? fail('weird credential cannot be converted into a drep: ' + credential.to_hex())
+  try {
+    const DRep = RustModule.WalletV4.DRep;
+    if (drepCredential === DREP_ALWAYS_ABSTAIN) return DRep.new_always_abstain();
+    if (drepCredential === DREP_ALWAYS_NO_CONFIDENCE) return DRep.new_always_no_confidence();
+    const credential = RustModule.WalletV4.Credential.from_hex(drepCredential);
+    return maybe(credential.to_keyhash(), k => DRep.new_key_hash(k))
+      ?? maybe(credential.to_scripthash(), s => DRep.new_script_hash(s))
+      ?? fail('weird credential cannot be converted into a drep: ' + credential.to_hex())
+  } catch (e) {
+    console.log('Fail to parse a drep credential: ' + drepCredential, e);
+    throw e;
+  }
 }
 
 // <TODO:WASM_MONAD>

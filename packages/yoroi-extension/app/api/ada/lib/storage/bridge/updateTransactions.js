@@ -3054,7 +3054,7 @@ async function certificateToDb(
         result.push((txId: number) => ({
           certificate: {
             Ordinal: cert.certIndex,
-            Kind: RustModule.WalletV4.CertificateKind.DrepRegistration,
+            Kind: RustModule.WalletV4.CertificateKind.DRepRegistration,
             Payload: '',
             TransactionId: txId,
           },
@@ -3066,7 +3066,7 @@ async function certificateToDb(
         result.push((txId: number) => ({
           certificate: {
             Ordinal: cert.certIndex,
-            Kind: RustModule.WalletV4.CertificateKind.DrepDeregistration,
+            Kind: RustModule.WalletV4.CertificateKind.DRepDeregistration,
             Payload: '',
             TransactionId: txId,
           },
@@ -3078,7 +3078,7 @@ async function certificateToDb(
         result.push((txId: number) => ({
           certificate: {
             Ordinal: cert.certIndex,
-            Kind: RustModule.WalletV4.CertificateKind.DrepUpdate,
+            Kind: RustModule.WalletV4.CertificateKind.DRepUpdate,
             Payload: '',
             TransactionId: txId,
           },
