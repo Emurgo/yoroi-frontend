@@ -12,7 +12,6 @@ import type { AssuranceMode } from '../../../app/types/transactionAssurance.type
 import type { MultiToken } from '../../../app/api/common/lib/MultiToken';
 import type { FullAddressPayload, AddressRowWithPath } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 import type { PersistedSubmittedTransaction } from '../../../app/api/localStorage';
-import type { NetworkRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
 
 export type WalletType = 'trezor' | 'ledger' | 'mnemonic';
 

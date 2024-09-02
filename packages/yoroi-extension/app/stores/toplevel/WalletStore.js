@@ -14,7 +14,7 @@ import { createDebugWalletDialog } from '../../containers/wallet/dialogs/DebugWa
 import { createProblematicWalletDialog } from '../../containers/wallet/dialogs/ProblematicWalletDialogContainer';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { getNetworkById, getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { WalletState } from '../../../chrome/extension/background/types';
 import { getWallets, subscribe, listenForWalletStateUpdate } from '../../api/thunk';
 import { FlagsApi } from '@emurgo/yoroi-lib/dist/flags';
@@ -23,7 +23,6 @@ import { createFlagStorage } from '../../api/localStorage';
 import { forceNonNull, timeCached } from '../../coreUtils';
 import type { BestBlockResponse } from '../../api/ada/lib/state-fetch/types';
 import TimeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
-import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 /*::
 declare var chrome;

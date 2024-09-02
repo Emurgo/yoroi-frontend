@@ -219,11 +219,13 @@ export function getCardanoHaskellBaseConfig(network: $ReadOnly<NetworkRow>): Car
   return (network.BaseConfig: any); // cast to return type
 }
 
+// <TODO:WALLET_API>
 export function cardanoHaskellConfigCombine(config: $ReadOnlyArray<CardanoHaskellConfig>): CardanoHaskellConfig {
   // $FlowIgnore[incompatible-exact]
   return (config.reduce((acc, next) => Object.assign(acc, next), {}): CardanoHaskellConfig);
 }
 
+// <TODO:WALLET_API>
 export function getCardanoHaskellBaseConfigCombined(network: $ReadOnly<NetworkRow>): CardanoHaskellConfig {
   return cardanoHaskellConfigCombine(getCardanoHaskellBaseConfig(network));
 }

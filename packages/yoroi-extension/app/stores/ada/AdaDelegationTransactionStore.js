@@ -7,19 +7,9 @@ import LocalizedRequest from '../lib/LocalizedRequest';
 import type { CreateDelegationTxFunc, CreateWithdrawalTxResponse } from '../../api/ada';
 import { buildRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
-import {
-  asGetAllUtxos,
-  asHasUtxoChains,
-  asGetAllAccounting,
-  asGetPublicKey,
-} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import type { WalletState } from '../../../chrome/extension/background/types';
-
-export type CreateWithdrawalTxRequest = LocalizedRequest<DeferredCall<CreateWithdrawalTxResponse>>;
 
 export default class AdaDelegationTransactionStore extends Store<StoresMap, ActionsMap> {
   @observable createWithdrawalTx: LocalizedRequest<DeferredCall<CreateWithdrawalTxResponse>> = new LocalizedRequest<
