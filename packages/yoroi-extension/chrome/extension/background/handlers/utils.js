@@ -68,18 +68,14 @@ async function getWalletState(publicDeriver: PublicDeriver<>): Promise<WalletSta
 
   const publicDeriverId = publicDeriver.getPublicDeriverId();
 
-  const conceptualWalletInfo = await publicDeriver.getParent().getFullConceptualWalletInfo();
-  const network = publicDeriver.getParent().getNetworkInfo();
+  const conceptualWallet = publicDeriver.getParent();
+  const conceptualWalletInfo = await conceptualWallet.getFullConceptualWalletInfo();
+  const network = conceptualWallet.getNetworkInfo();
 
-  const type = (() => {
-    if (isLedgerNanoWallet(publicDeriver.getParent())) {
-      return 'ledger';
-    }
-    if (isTrezorTWallet(publicDeriver.getParent())) {
-      return 'trezor';
-    }
-    return 'mnemonic';
-  })();
+  const isLedger = isLedgerNanoWallet(conceptualWallet);
+  const isTrezor = isTrezorTWallet(conceptualWallet);
+  const isHardware = isLedger || isTrezor;
+  const type = (isLedger ? 'ledger' : (isTrezor ? 'trezor' : ('mnemonic')));
 
   const withUtxos = asGetAllUtxos(publicDeriver);
   if (withUtxos == null) {
@@ -108,7 +104,7 @@ async function getWalletState(publicDeriver: PublicDeriver<>): Promise<WalletSta
     }
   });
   const sumDeposit = deposits.reduce((a, b) => a.plus(b), new BigNumber('0'));
-  const defaultTokenId = publicDeriver.getParent().getDefaultMultiToken().defaults.defaultIdentifier;
+  const defaultTokenId = conceptualWallet.getDefaultMultiToken().defaults.defaultIdentifier;
   const assetDeposits =  new MultiToken(
     [
       {
@@ -186,16 +182,18 @@ async function getWalletState(publicDeriver: PublicDeriver<>): Promise<WalletSta
     throw new Error('unexpected missing asGetBalance result');
   }
   const balance = await canGetBalance.getBalance();
+  const rewardBalance = await canGetBalance.getBalance();
 
   return {
     publicDeriverId,
-    conceptualWalletId: publicDeriver.getParent().getConceptualWalletId(),
+    conceptualWalletId: conceptualWallet.getConceptualWalletId(),
     utxos,
     transactions: [], // fixme
     networkId: network.NetworkId,
     name: conceptualWalletInfo.Name,
     type,
-    hardwareWalletDeviceId: publicDeriver.getParent().hardwareInfo?.DeviceId,
+    isHardware,
+    hardwareWalletDeviceId: conceptualWallet.hardwareInfo?.DeviceId,
     plate,
     publicKey: publicKey.Hash,
     receiveAddress,
@@ -206,6 +204,7 @@ async function getWalletState(publicDeriver: PublicDeriver<>): Promise<WalletSta
     publicDeriverLevel: withLevels.getParent().getPublicDeriverLevel(),
     lastSyncInfo: await publicDeriver.getLastSyncInfo(),
     balance,
+    rewardBalance,
     assetDeposits,
     defaultTokenId,
     assuranceMode: assuranceModes.NORMAL,
@@ -215,7 +214,7 @@ async function getWalletState(publicDeriver: PublicDeriver<>): Promise<WalletSta
     internalAddressesByType,
     allAddresses,
     allUtxoAddresses,
-    isBip44Wallet: publicDeriver.getParent() instanceof Bip44Wallet,
+    isBip44Wallet: conceptualWallet instanceof Bip44Wallet,
     isTestnet: isTestnet(network),
     isCardanoHaskell: isCardanoHaskell(network),
     isRefreshing: refreshingWalletIdSet.has(publicDeriverId),
@@ -245,15 +244,10 @@ export async function getPlaceHolderWalletState(publicDeriver: PublicDeriver<>):
   const conceptualWalletInfo = await publicDeriver.getParent().getFullConceptualWalletInfo();
   const network = publicDeriver.getParent().getNetworkInfo();
 
-  const type = (() => {
-    if (isLedgerNanoWallet(publicDeriver.getParent())) {
-      return 'ledger';
-    }
-    if (isTrezorTWallet(publicDeriver.getParent())) {
-      return 'trezor';
-    }
-    return 'mnemonic';
-  })();
+  const isLedger = isLedgerNanoWallet(publicDeriver.getParent());
+  const isTrezor = isTrezorTWallet(publicDeriver.getParent());
+  const isHardware = isLedger || isTrezor;
+  const type = (isLedger ? 'ledger' : (isTrezor ? 'trezor' : ('mnemonic')));
 
   const zero = new MultiToken([], { defaultNetworkId: network.NetworkId, defaultIdentifier: '' });
 
@@ -265,6 +259,7 @@ export async function getPlaceHolderWalletState(publicDeriver: PublicDeriver<>):
     networkId: network.NetworkId,
     name: conceptualWalletInfo.Name,
     type,
+    isHardware,
     hardwareWalletDeviceId: publicDeriver.getParent().hardwareInfo?.DeviceId,
     plate: { ImagePart: '', TextPart: '' },
     publicKey: '',
@@ -289,6 +284,7 @@ export async function getPlaceHolderWalletState(publicDeriver: PublicDeriver<>):
       Height: 0,
     },
     balance: zero,
+    rewardBalance: zero,
     assetDeposits: zero,
     defaultTokenId: '',
     assuranceMode: assuranceModes.NORMAL,

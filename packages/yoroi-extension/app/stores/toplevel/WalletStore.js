@@ -162,6 +162,13 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     return null;
   }
 
+  @computed get selectedOrFail(): WalletState {
+    if (this.selected == null) {
+      throw new Error('A selected wallet is required!');
+    }
+    return this.selected;
+  }
+
   @action
   _baseAddNewWallet: WalletState => Promise<void> = async newWallet => {
     this.showWalletCreatedNotification();
@@ -188,13 +195,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   @computed get hasActiveWallet(): boolean {
     return this.selected != null;
-  }
-
-  @computed get selectedOrFail(): WalletState {
-    if (this.selected == null) {
-      throw new Error('A selected wallet is required!');
-    }
-    return this.selected;
   }
 
   @computed get activeWalletPlate(): ?WalletChecksum {
