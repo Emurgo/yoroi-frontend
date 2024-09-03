@@ -1,11 +1,10 @@
 import { ROUTES } from '../../../routes-config';
-import { buildRoute } from '../../../utils/routing';
-import PortfolioMenu from '../../features/portfolio/common/components/PortfolioMenu';
+// import { buildRoute } from '../../../utils/routing';
+// import PortfolioMenu from '../../features/portfolio/common/components/PortfolioMenu';
 import React, { ReactNode } from 'react';
-import GeneralPageLayout from '../../layout/GeneralPageLayout';
-import NavBarContainerRevamp from '../../../containers/NavBarContainerRevamp';
 import NavBarTitle from '../../../components/topbar/NavBarTitle';
-import mockData from '../../features/portfolio/common/mockData';
+import NavBarContainerRevamp from '../../../containers/NavBarContainerRevamp';
+import GeneralPageLayout from '../../layout/GeneralPageLayout';
 
 type Props = {
   stores: any;
@@ -14,18 +13,18 @@ type Props = {
 };
 
 const PortfolioLayout = ({ stores, actions, children }: Props): JSX.Element => {
-  const isActivePage = (route: string) => {
-    const { location } = stores.router;
-    if (route && location) {
-      return location.pathname === buildRoute(route);
-    }
-    return false;
-  };
+  // const isActivePage = (route: string) => {
+  //   const { location } = stores.router;
+  //   if (route && location) {
+  //     return location.pathname === buildRoute(route);
+  //   }
+  //   return false;
+  // };
   const isDetailPage = stores.router.location.pathname.startsWith(`${ROUTES.PORTFOLIO.ROOT}/details`);
-  const menu =
-    isDetailPage || mockData.dapps.liquidityList.length + mockData.dapps.orderList.length === 0 ? null : (
-      <PortfolioMenu onItemClick={(route: string) => actions.router.goToRoute.trigger({ route })} isActiveItem={isActivePage} />
-    );
+  // const menu =
+  //   isDetailPage || mockData.dapps.liquidityList.length + mockData.dapps.orderList.length === 0 ? null : (
+  //     <PortfolioMenu onItemClick={(route: string) => actions.router.goToRoute.trigger({ route })} isActiveItem={isActivePage} />
+  //   );
 
   return (
     <GeneralPageLayout
@@ -36,7 +35,7 @@ const PortfolioLayout = ({ stores, actions, children }: Props): JSX.Element => {
           actions={actions}
           stores={stores}
           title={<NavBarTitle title={isDetailPage ? 'Token details' : 'Tokens'} />}
-          menu={menu}
+          // menu={menu}
         />
       }
     >

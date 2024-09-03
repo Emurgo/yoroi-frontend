@@ -1,34 +1,37 @@
-import React, { useState } from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useStrings } from '../hooks/useStrings';
-import { usePortfolio } from '../../module/PortfolioContextProvider';
-import { Icon } from '../../../../components/icons';
-import { SearchInput, Tooltip, Chip, Skeleton } from '../../../../components';
-import { BalanceType } from '../types/index';
+import React from 'react';
+import { Chip, SearchInput, Skeleton, Tooltip } from '../../../../components';
 import { ChipTypes } from '../../../../components/Chip';
+import { Icon } from '../../../../components/icons';
+import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { formatNumber } from '../helpers/formatHelper';
+import { useStrings } from '../hooks/useStrings';
+import { BalanceType } from '../types/index';
 
 interface Props {
-  balance: BalanceType;
+  walletBalance: BalanceType;
   setKeyword: (keyword: string) => void;
   isLoading: boolean;
   tooltipTitle: JSX.Element;
 }
 
-const PortfolioHeader = ({ balance, setKeyword, isLoading, tooltipTitle }: Props): JSX.Element => {
+const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }: Props): JSX.Element => {
   const strings = useStrings();
   const theme: any = useTheme();
-  const { unitOfAccount, settingFiatPairUnit, changeUnitOfAccount } = usePortfolio();
-  const [isAdaMainUnit, setIsAdaMainUnit] = useState(unitOfAccount === 'ADA');
+  const { unitOfAccount, changeUnitOfAccountPair, accountPair } = usePortfolio();
 
   const handleCurrencyChange = () => {
-    if (isAdaMainUnit) {
-      changeUnitOfAccount(settingFiatPairUnit.currency || 'USD');
-      setIsAdaMainUnit(false);
+    if (unitOfAccount !== accountPair?.from.name) {
+      changeUnitOfAccountPair({
+        from: { name: unitOfAccount || 'USD', value: walletBalance.fiatAmount },
+        to: { name: 'ADA', value: walletBalance.ada },
+      });
     } else {
-      changeUnitOfAccount('ADA');
-      setIsAdaMainUnit(true);
+      changeUnitOfAccountPair({
+        from: { name: 'ADA', value: walletBalance.ada },
+        to: { name: unitOfAccount, value: walletBalance.fiatAmount },
+      });
     }
   };
 
@@ -39,17 +42,17 @@ const PortfolioHeader = ({ balance, setKeyword, isLoading, tooltipTitle }: Props
           {isLoading ? (
             <Skeleton width="146px" height="24px" />
           ) : (
-            <Typography variant="h2" fontWeight="500" color="ds.gray_max">
-              {isAdaMainUnit ? formatNumber(balance.usd) : formatNumber(balance.ada)}
+            <Typography variant="h2" fontWeight="500" color="ds.gray_cmax">
+              {String(accountPair?.from.value)}
             </Typography>
           )}
           <Typography variant="body2" fontWeight="500" color="ds.black_static">
-            {isAdaMainUnit ? 'ADA' : unitOfAccount}
+            {accountPair?.from.name}
             <Typography
               component="span"
               variant="body2"
               fontWeight="500"
-              color="ds.text_gray_min"
+              color="ds.text_gray_low"
               onClick={handleCurrencyChange}
               sx={{
                 cursor: 'pointer',
@@ -57,7 +60,7 @@ const PortfolioHeader = ({ balance, setKeyword, isLoading, tooltipTitle }: Props
                 marginTop: '5px',
               }}
             >
-              {isAdaMainUnit ? (settingFiatPairUnit.currency ? `/${settingFiatPairUnit.currency}` : '/USD') : '/ADA'}
+              /{accountPair?.to.name}
             </Typography>
           </Typography>
         </Stack>
@@ -66,9 +69,8 @@ const PortfolioHeader = ({ balance, setKeyword, isLoading, tooltipTitle }: Props
           {isLoading ? (
             <Skeleton width="129px" height="16px" />
           ) : (
-            <Typography color="ds.gray_600">
-              {isAdaMainUnit ? formatNumber(balance.ada) : formatNumber(balance.usd)}{' '}
-              {isAdaMainUnit ? settingFiatPairUnit.currency || 'USD' : 'ADA'}
+            <Typography color="ds.gray_c600">
+              {accountPair?.to.value} {accountPair?.to.name}
             </Typography>
           )}
           {isLoading ? (
@@ -80,28 +82,43 @@ const PortfolioHeader = ({ balance, setKeyword, isLoading, tooltipTitle }: Props
             <Tooltip title={<Box minWidth="158px">{tooltipTitle}</Box>} placement="right">
               <Stack direction="row" alignItems="center" spacing={theme.spacing(1)} sx={{ marginLeft: theme.spacing(2) }}>
                 <Chip
-                  type={balance.percents > 0 ? ChipTypes.ACTIVE : balance.percents < 0 ? ChipTypes.INACTIVE : ChipTypes.DISABLED}
+                  type={
+                    walletBalance.percents > 0
+                      ? ChipTypes.ACTIVE
+                      : walletBalance.percents < 0
+                      ? ChipTypes.INACTIVE
+                      : ChipTypes.DISABLED
+                  }
                   label={
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
-                      {balance.percents > 0 ? (
-                        <Icon.ChipArrowUp fill={theme.palette.ds.secondary_800} />
-                      ) : balance.percents < 0 ? (
-                        <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_700} />
+                      {walletBalance.percents > 0 ? (
+                        <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
+                      ) : walletBalance.percents < 0 ? (
+                        <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
                       ) : null}
                       {/* @ts-ignore */}
                       <Typography variant="caption1">
-                        {balance.percents >= 0 ? formatNumber(balance.percents) : formatNumber(-1 * balance.percents)}%
+                        {walletBalance.percents >= 0
+                          ? formatNumber(walletBalance.percents)
+                          : formatNumber(-1 * walletBalance.percents)}
+                        %
                       </Typography>
                     </Stack>
                   }
                 />
                 <Chip
-                  type={balance.amount > 0 ? ChipTypes.ACTIVE : balance.amount < 0 ? ChipTypes.INACTIVE : ChipTypes.DISABLED}
+                  type={
+                    walletBalance.amount > 0
+                      ? ChipTypes.ACTIVE
+                      : walletBalance.amount < 0
+                      ? ChipTypes.INACTIVE
+                      : ChipTypes.DISABLED
+                  }
                   label={
                     // @ts-ignore
                     <Typography variant="caption1">
-                      {balance.amount > 0 && '+'}
-                      {formatNumber(balance.amount)} USD
+                      {walletBalance.amount > 0 && '+'}
+                      {formatNumber(walletBalance.amount)} {unitOfAccount}
                     </Typography>
                   }
                 />

@@ -564,10 +564,13 @@ export function wrapGovernance(governanceProps: StoresAndActionsProps, children:
 export function wrapPortfolio(portfolioProps: StoresAndActionsProps, children: Node): Node {
   const currentWalletInfo = createCurrrentWalletInfo(portfolioProps.stores);
 
-  console.log('currentWalletInfo', currentWalletInfo);
+  console.log('ROUTES currentWalletInfo', currentWalletInfo);
 
   return (
-    <PortfolioContextProvider settingFiatPairUnit={portfolioProps.stores.profile.unitOfAccount}>
+    <PortfolioContextProvider
+      settingFiatPairUnit={portfolioProps.stores.profile.unitOfAccount}
+      currentWalletInfo={currentWalletInfo}
+    >
       <Suspense
         fallback={null}
         currentWalletInfo={currentWalletInfo}

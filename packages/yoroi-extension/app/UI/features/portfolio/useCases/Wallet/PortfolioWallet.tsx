@@ -1,51 +1,56 @@
-import { Typography, Stack } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import StatsTable from './StatsTable';
-import mockData from '../../common/mockData';
+import React, { useEffect, useState } from 'react';
 import PortfolioHeader from '../../common/components/PortfolioHeader';
+import WelcomeBanner from '../../common/components/WelcomeBanner';
 import { useStrings } from '../../common/hooks/useStrings';
 import { TokenType } from '../../common/types/index';
-import WelcomeBanner from '../../common/components/WelcomeBanner';
+import { usePortfolio } from '../../module/PortfolioContextProvider';
+import StatsTable from './StatsTable';
 
-interface Props {
-  data: TokenType[];
-}
-
-const PortfolioWallet = ({ data }: Props): JSX.Element => {
+const PortfolioWallet = (): JSX.Element => {
   const theme = useTheme();
   const strings = useStrings();
+  const { walletBalance, assetList, changeUnitOfAccountPair, unitOfAccount } = usePortfolio();
+
   const [keyword, setKeyword] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [tokenList, setTokenList] = useState<TokenType[]>(data);
-  const isShownWelcomeBanner: boolean = data.length === 1; // assumming only have ADA as default -> first time user
+  const [tokenList, setTokenList] = useState<TokenType[]>(assetList);
+  const isShownWelcomeBanner: boolean = assetList.length === 1; // assumming only have ADA as default -> first time user
+
+  useEffect(() => {
+    changeUnitOfAccountPair({
+      from: { name: 'ADA', value: walletBalance.ada },
+      to: { name: unitOfAccount || 'USD', value: walletBalance.fiatAmount },
+    });
+  }, [walletBalance, unitOfAccount]);
 
   useEffect(() => {
     if (isShownWelcomeBanner) return;
 
     // FAKE FETCHING DATA TO SEE SKELETON
-    setIsLoading(true);
+    // setIsLoading(true);
 
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
+    // const timer = setTimeout(() => {
+    //   setIsLoading(false);
+    // }, 2000);
 
-    return () => clearTimeout(timer);
+    // return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
     if (!keyword || isShownWelcomeBanner) {
-      setTokenList(data);
+      setTokenList(assetList);
       return;
     }
 
     const lowercaseKeyword = keyword.toLowerCase();
 
-    const temp = data.filter(item => {
+    const temp = assetList.filter(item => {
       return (
         item.name.toLowerCase().includes(lowercaseKeyword) ||
         item.id.toLowerCase().includes(lowercaseKeyword) ||
-        item.overview.fingerprint.toLowerCase().includes(lowercaseKeyword)
+        item.policyId.toLowerCase().includes(lowercaseKeyword)
       );
     });
     if (temp && temp.length > 0) {
@@ -58,7 +63,7 @@ const PortfolioWallet = ({ data }: Props): JSX.Element => {
   return (
     <Stack direction="column" spacing={theme.spacing(3)} sx={{ minHeight: 'calc(100vh - 220px)' }}>
       <PortfolioHeader
-        balance={mockData.common.walletBalance}
+        walletBalance={walletBalance}
         setKeyword={setKeyword}
         isLoading={isLoading}
         tooltipTitle={

@@ -1,19 +1,18 @@
-import React from 'react';
-import { useMemo, useState } from 'react';
-import { TableCell, TableRow, Typography, Stack, Box } from '@mui/material';
+import { Box, Stack, TableCell, TableRow, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import tokenPng from '../../common/assets/images/token.png';
-import { usePortfolio } from '../../module/PortfolioContextProvider';
+import React, { useMemo, useState } from 'react';
 import { Chip, Skeleton } from '../../../../components';
+import { ChipTypes } from '../../../../components/Chip';
 import { Icon } from '../../../../components/icons';
+import tokenPng from '../../common/assets/images/token.png';
+import Table from '../../common/components/Table';
+import { formatNumber } from '../../common/helpers/formatHelper';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
 import { useStrings } from '../../common/hooks/useStrings';
 import useTableSort, { ISortState } from '../../common/hooks/useTableSort';
-import Table from '../../common/components/Table';
-import { IHeadCell } from '../../common/types/table';
 import { TokenType } from '../../common/types/index';
-import { ChipTypes } from '../../../../components/Chip';
-import { formatNumber } from '../../common/helpers/formatHelper';
+import { IHeadCell } from '../../common/types/table';
+import { usePortfolio } from '../../module/PortfolioContextProvider';
 
 const TableRowSkeleton = ({ theme, ...props }) => (
   <TableRow
@@ -72,7 +71,7 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
   const theme: any = useTheme();
   const navigateTo = useNavigateTo();
   const strings = useStrings();
-  const { unitOfAccount } = usePortfolio();
+  const { unitOfAccount, accountPair } = usePortfolio();
   const [{ order, orderBy }, setSortState] = useState<ISortState>({
     order: null,
     orderBy: null,
@@ -121,7 +120,7 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
             borderRadius: `${theme.shape.borderRadius}px`,
             '& td': { border: 0 },
             '&:hover': {
-              backgroundColor: theme.palette.ds.gray_50,
+              backgroundColor: theme.palette.ds.gray_c50,
             },
           }}
         >
@@ -134,22 +133,22 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
                   borderRadius: `${theme.shape.borderRadius}px`,
                 }}
                 component="img"
-                src={tokenPng}
+                src={row.tokenLogo || tokenPng}
               ></Box>
               <Stack direction="column">
-                <Typography fontWeight="500" color="ds.text_gray_medium">
+                <Typography fontWeight="500" color="ds.text_gray_normal">
                   {row.name}
                 </Typography>
-                <Typography variant="body2" color="ds.text_gray_low">
-                  {row.id}
+                <Typography variant="body2" color="ds.text_gray_medium">
+                  {row.ticker}
                 </Typography>
               </Stack>
             </Stack>
           </TableCell>
 
           <TableCell sx={{ padding: '16.8px 1rem' }}>
-            <Typography variant="body2" color="ds.text_gray_low">
-              {formatNumber(row.price)} USD
+            <Typography variant="body2" color="ds.text_gray_medium">
+              {formatNumber(row.price)} {unitOfAccount}
             </Typography>
           </TableCell>
 
@@ -159,9 +158,9 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
               label={
                 <Stack direction="row" justifyContent="space-between" alignItems="center">
                   {row['24h'] > 0 ? (
-                    <Icon.ChipArrowUp fill={theme.palette.ds.secondary_800} />
+                    <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
                   ) : row['24h'] < 0 ? (
-                    <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_700} />
+                    <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
                   ) : null}
                   {/* @ts-ignore */}
                   <Typography variant="caption1">
@@ -179,9 +178,9 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
               label={
                 <Stack direction="row" justifyContent="space-between" alignItems="center">
                   {row['1W'] > 0 ? (
-                    <Icon.ChipArrowUp fill={theme.palette.ds.secondary_800} />
+                    <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
                   ) : row['1W'] < 0 ? (
-                    <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_700} />
+                    <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
                   ) : null}
                   {/* @ts-ignore */}
                   <Typography variant="caption1">
@@ -199,9 +198,9 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
               label={
                 <Stack direction="row" justifyContent="space-between" alignItems="center">
                   {row['1M'] > 0 ? (
-                    <Icon.ChipArrowUp fill={theme.palette.ds.secondary_800} />
+                    <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
                   ) : row['1M'] < 0 ? (
-                    <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_700} />
+                    <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
                   ) : null}
                   {/* @ts-ignore */}
                   <Typography variant="caption1">
@@ -214,7 +213,7 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
           </TableCell>
 
           <TableCell sx={{ padding: '16.8px 1rem' }}>
-            <Typography variant="body2" color="ds.text_gray_low">
+            <Typography variant="body2" color="ds.text_gray_medium">
               {formatNumber(row.portfolioPercents)} %
             </Typography>
           </TableCell>
@@ -222,12 +221,14 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
           <TableCell sx={{ padding: '16.8px 1rem' }}>
             <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
               <Stack direction="column">
-                <Typography color="ds.text_gray_medium">
-                  {formatNumber(row.totalAmount)} {row.name}
+                <Typography color="ds.text_gray_normal">
+                  {row.totalAmount} {row.name}
                 </Typography>
-                {row.name === 'ADA' && unitOfAccount === 'ADA' ? null : (
-                  <Typography variant="body2" color="ds.text_gray_low" sx={{ textAlign: 'right' }}>
-                    {formatNumber(row.totalAmountFiat)} {unitOfAccount}
+                {row.name === accountPair?.to.name ? (
+                  <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}></Typography>
+                ) : (
+                  <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}>
+                    {formatNumber(row.totalAmountFiat)} {accountPair?.to.name}
                   </Typography>
                 )}
               </Stack>

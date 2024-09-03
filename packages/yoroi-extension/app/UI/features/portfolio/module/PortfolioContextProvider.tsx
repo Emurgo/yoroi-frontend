@@ -1,6 +1,13 @@
 import * as React from 'react';
 
-import { PortfolioActionType, PortfolioReducer, defaultPortfolioActions, defaultPortfolioState, CurrencyType } from './state';
+import {
+  AccountPair,
+  CurrencyType,
+  PortfolioActionType,
+  PortfolioReducer,
+  defaultPortfolioActions,
+  defaultPortfolioState,
+} from './state';
 
 const initialPortfolioProvider = {
   ...defaultPortfolioState,
@@ -16,7 +23,9 @@ type PortfolioProviderProps = {
   };
   initialState: {
     unitOfAccount: CurrencyType;
+    accountPair: AccountPair;
   };
+  currentWalletInfo: any; // TODO to be defined
 };
 
 export const PortfolioContextProvider = ({
@@ -24,8 +33,17 @@ export const PortfolioContextProvider = ({
   settingFiatPairUnit,
   initialState = {
     unitOfAccount: settingFiatPairUnit.enabled ? settingFiatPairUnit.currency : 'USD',
+    accountPair: null,
   },
+  currentWalletInfo,
 }: PortfolioProviderProps) => {
+  if (currentWalletInfo === undefined) {
+    return <></>;
+  }
+  console.log('CONTEXTTTTT currentWalletInfo', currentWalletInfo);
+
+  const { walletBalance, primaryTokenInfo, assetList } = currentWalletInfo;
+
   const [state, dispatch] = React.useReducer(PortfolioReducer, {
     ...defaultPortfolioState,
     ...initialState,
@@ -38,6 +56,15 @@ export const PortfolioContextProvider = ({
         unitOfAccount: currency,
       });
     },
+    changeUnitOfAccountPair: (payload: any) => {
+      dispatch({
+        type: PortfolioActionType.changeUnitOfAccountPair,
+        accountPair: {
+          from: { name: payload.from.name, value: payload.from.value },
+          to: { name: payload.to.name, value: payload.to.value },
+        },
+      });
+    },
   }).current;
 
   const context = React.useMemo(
@@ -45,6 +72,9 @@ export const PortfolioContextProvider = ({
       ...state,
       ...actions,
       settingFiatPairUnit,
+      walletBalance,
+      primaryTokenInfo,
+      assetList,
     }),
     [state, actions]
   );
