@@ -87,6 +87,7 @@ export function sendAllUnsignedTx(
     networkId: number,
   |},
   metadata: RustModule.WalletV4.AuxiliaryData | void,
+  networkId: number,
 ): V4UnsignedTxAddressedUtxoResponse {
   const addressingMap = new Map<RemoteUnspentOutput, CardanoAddressedUtxo>();
   for (const utxo of allUtxos) {
@@ -105,6 +106,7 @@ export function sendAllUnsignedTx(
     absSlotNumber,
     protocolParams,
     metadata,
+    networkId,
   );
 
   const addressedUtxos = unsignedTxResponse.senderUtxos.map(
@@ -143,9 +145,7 @@ function addUtxoInput(
   input: RemoteUnspentOutput,
   /* don't add the input if the amount is smaller than the fee to add it to the tx */
   excludeIfSmall: boolean,
-  protocolParams: {|
-    networkId: number,
-  |},
+  networkId: number,
   witness?: ?CardanoUtxoScriptWitness,
 ): $Values<typeof AddInputResult> {
   const wasmAddr = normalizeToAddress(input.receiver);
@@ -180,7 +180,7 @@ function addUtxoInput(
     if (remaining == null) return skipOverflow();
 
     const defaultEntry = {
-      defaultNetworkId: protocolParams.networkId,
+      defaultNetworkId: networkId,
       defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
     };
     const tokenSetInInput = new Set(input.assets.map(asset => asset.assetId));
@@ -298,6 +298,7 @@ export function sendAllUnsignedTxFromUtxo(
     networkId: number,
   |},
   metadata: RustModule.WalletV4.AuxiliaryData | void,
+  networkId: number,
 ): V4UnsignedTxUtxoResponse {
   const totalBalance = allUtxos
     .map(utxo => new BigNumber(utxo.amount))
@@ -318,7 +319,7 @@ export function sendAllUnsignedTxFromUtxo(
       undefined,
       input,
       false,
-      { networkId: protocolParams.networkId }
+      networkId,
     ) === AddInputResult.OVERFLOW) {
       // for the send all case, prefer to throw an error
       // instead of skipping inputs that would cause an error
@@ -409,6 +410,7 @@ export async function newAdaUnsignedTx(
   |}>,
   allowNoOutputs: boolean,
   metadata: RustModule.WalletV4.AuxiliaryData | void,
+  networkId: number,
 ): Promise<V4UnsignedTxAddressedUtxoResponse> {
   const addressingMap = new Map<RemoteUnspentOutput, CardanoAddressedUtxo>();
   for (const utxo of allUtxos) {
@@ -431,6 +433,7 @@ export async function newAdaUnsignedTx(
     withdrawals,
     allowNoOutputs,
     metadata,
+    networkId,
   );
 
   const addressedUtxos = unsignedTxResponse.senderUtxos.map(
@@ -470,6 +473,7 @@ export async function newAdaUnsignedTxForConnector(
     keyDeposit: string,
     networkId: number,
   |},
+  networkId: number,
 ): Promise<V4UnsignedTxAddressedUtxoResponse> {
   const toRemoteUnspentOutput = (utxo: CardanoAddressedUtxo): RemoteUnspentOutput => ({
     amount: utxo.amount,
@@ -502,6 +506,7 @@ export async function newAdaUnsignedTxForConnector(
     ttl,
     requiredSigners,
     protocolParams,
+    networkId,
   );
 
   const addressedUtxos = unsignedTxResponse.senderUtxos.map(
@@ -549,11 +554,13 @@ export async function newAdaUnsignedTxFromUtxo(
   |}>,
   allowNoOutputs: boolean,
   auxiliaryData: RustModule.WalletV4.AuxiliaryData | void,
+  networkId: number,
 ): Promise<V4UnsignedTxUtxoResponse> {
   await RustModule.load();
   setRuntime(RustModule.CrossCsl.init);
 
   const defaultNetworkConfig = {
+    networkId: protocolParams.networkId,
     linearFee: {
       coefficient: protocolParams.linearFeeCoefficient,
       constant: protocolParams.linearFeeConstant,
@@ -567,6 +574,8 @@ export async function newAdaUnsignedTxFromUtxo(
     memPriceTo: 1000,
     stepPriceFrom: 721,
     stepPriceTo: 10000000,
+    // todo remove this after updating the eUtxo lib
+    coinsPerUtxoWord: 34482,
   };
 
   const utxoSet = new LibUtxoSet(
@@ -690,7 +699,7 @@ export async function newAdaUnsignedTxFromUtxo(
       },
       values: libValueToMultiToken(
         unsignedTx.change.value,
-        protocolParams.networkId,
+        networkId,
         PRIMARY_ASSET_CONSTANTS.Cardano
       ),
     });
@@ -769,7 +778,7 @@ export async function maxSendableADA(
           cardanoValueFromMultiToken(builtSendTokenList(
             defaultToken,
             request.tokens,
-            addressedUtxo.map(utxo => multiTokenFromRemote(utxo, protocolParams.networkId))
+            addressedUtxo.map(utxo => multiTokenFromRemote(utxo, request.publicDeriver.networkId))
           )),
         )
       )
@@ -788,7 +797,7 @@ export async function maxSendableADA(
           assets: input.assets,
         },
         false,
-        { networkId: network.NetworkId }
+        network.NetworkId,
       ) === AddInputResult.OVERFLOW) {
         throw new AssetOverflowError();
       }
@@ -842,6 +851,7 @@ async function newAdaUnsignedTxFromUtxoForConnector(
     keyDeposit: string,
     networkId: number,
   |},
+  networkId: number,
 ): Promise<V4UnsignedTxUtxoResponse> {
   await RustModule.load();
   setRuntime(RustModule.CrossCsl.init);
@@ -860,6 +870,8 @@ async function newAdaUnsignedTxFromUtxoForConnector(
     memPriceTo: 1000,
     stepPriceFrom: 721,
     stepPriceTo: 10000000,
+    // todo remove this after updating the eUtxo lib
+    coinsPerUtxoWord: 34482,
   };
 
   const utxoSet = new LibUtxoSet(
@@ -990,7 +1002,7 @@ async function newAdaUnsignedTxFromUtxoForConnector(
       },
       values: libValueToMultiToken(
         unsignedTx.change.value,
-        protocolParams.networkId,
+        networkId,
         PRIMARY_ASSET_CONSTANTS.Cardano
       ),
     });

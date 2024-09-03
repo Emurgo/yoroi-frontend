@@ -46,5 +46,6 @@ export async function yoroiTransferTxFromAddresses(payload: {|
     senderUtxos,
     protocolParams: payload.protocolParams,
     absSlotNumber: payload.absSlotNumber,
+    networkId: payload.network.NetworkId,
   });
 }

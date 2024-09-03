@@ -46,6 +46,7 @@ export async function buildYoroiTransferTx(payload: {|
     poolDeposit: RustModule.WalletV4.BigNum,
     networkId: number,
   |},
+  networkId: number,
 |}): Promise<TransferTx> {
   try {
     const { senderUtxos, } = payload;
@@ -71,6 +72,8 @@ export async function buildYoroiTransferTx(payload: {|
       senderUtxos,
       payload.absSlotNumber,
       payload.protocolParams,
+      undefined,
+      payload.networkId,
     );
 
     const fee = new MultiToken(

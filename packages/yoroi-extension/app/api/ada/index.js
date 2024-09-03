@@ -855,9 +855,10 @@ export default class AdaApi {
             ),
             coinsPerUtxoByte: RustModule.WalletV4.BigNum.from_str(protocolParameters.coinsPerUtxoByte),
             poolDeposit: RustModule.WalletV4.BigNum.from_str(protocolParameters.poolDeposit),
-            networkId: request.network.NetworkId,
+            networkId: Number(request.network.BaseConfig[0].ChainNetworkId),
           },
           trxMetadata,
+          request.network.NetworkId,
         );
       } else {
         const changeAddresses = request.receivers.reduce(
@@ -913,12 +914,13 @@ export default class AdaApi {
             linearFeeConstant: protocolParameters.linearFee.constant,
             coinsPerUtxoByte: protocolParameters.coinsPerUtxoByte,
             poolDeposit: protocolParameters.poolDeposit,
-            networkId: request.network.NetworkId,
+            networkId: Number(request.network.BaseConfig[0].ChainNetworkId),
           },
           [],
           [],
           false,
           trxMetadata,
+          request.network.NetworkId,
         );
       }
       Logger.debug(
@@ -1283,6 +1285,7 @@ export default class AdaApi {
         keyDeposit: protocolParameters.keyDeposit,
         networkId: network.NetworkId,
       },
+      network.NetworkId,
     );
 
     return new HaskellShelleyTxSignRequest({
@@ -1356,6 +1359,8 @@ export default class AdaApi {
         delegationCerts,
         [],
         false,
+        undefined,
+        request.wallet.networkId,
       );
 
       const allUtxosForKey = filterAddressesByStakingKey<ElementOf<IGetAllUtxosResponse>>(
@@ -1539,6 +1544,8 @@ export default class AdaApi {
         certificates,
         finalWithdrawals,
         false,
+        undefined,
+        request.wallet.networkId,
       );
       // there wasn't enough in the withdrawal to send anything to us
       if (unsignedTxResponse.changeAddr.length === 0) {
@@ -1620,6 +1627,7 @@ export default class AdaApi {
         [],
         false,
         request.metadata,
+        request.publicDeriver.networkId,
       );
 
       return new HaskellShelleyTxSignRequest({
@@ -1705,6 +1713,7 @@ export default class AdaApi {
         [],
         false,
         trxMetadata,
+        request.wallet.networkId,
       );
 
       return new HaskellShelleyTxSignRequest({
