@@ -28,6 +28,10 @@ import NFTsWrapper from './containers/wallet/NFTsWrapper';
 import Wallet from './containers/wallet/Wallet';
 import RestoreWalletPage, { RestoreWalletPagePromise } from './containers/wallet/restore/RestoreWalletPage';
 
+// GOLABL Context
+// $FlowIgnore: suppressing this error
+import { CurrencyProvider } from './UI/context/CurrencyContext';
+
 // New UI pages
 // $FlowIgnore: suppressing this error
 import { createCurrrentWalletInfo } from './UI/utils/createCurrentWalletInfo';
@@ -564,20 +568,22 @@ export function wrapGovernance(governanceProps: StoresAndActionsProps, children:
 export function wrapPortfolio(portfolioProps: StoresAndActionsProps, children: Node): Node {
   const currentWalletInfo = createCurrrentWalletInfo(portfolioProps.stores);
 
-  console.log('ROUTES currentWalletInfo', currentWalletInfo);
+  console.log('ROUTES currentWalletInfo', portfolioProps.stores.profile.unitOfAccount);
 
   return (
-    <PortfolioContextProvider
-      settingFiatPairUnit={portfolioProps.stores.profile.unitOfAccount}
-      currentWalletInfo={currentWalletInfo}
-    >
-      <Suspense
-        fallback={null}
-        currentWalletInfo={currentWalletInfo}
+    <CurrencyProvider currency={portfolioProps.stores.profile.unitOfAccount.currency || 'USD'}>
+      <PortfolioContextProvider
         settingFiatPairUnit={portfolioProps.stores.profile.unitOfAccount}
+        currentWalletInfo={currentWalletInfo}
       >
-        {children}
-      </Suspense>
-    </PortfolioContextProvider>
+        <Suspense
+          fallback={null}
+          currentWalletInfo={currentWalletInfo}
+          settingFiatPairUnit={portfolioProps.stores.profile.unitOfAccount}
+        >
+          {children}
+        </Suspense>
+      </PortfolioContextProvider>
+    </CurrencyProvider>
   );
 }

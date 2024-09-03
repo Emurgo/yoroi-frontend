@@ -1,13 +1,12 @@
-import { Box, Stack, Typography } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
+import { Box, Stack, Typography, useTheme } from '@mui/material';
 import React from 'react';
-import { Chip, SearchInput, Skeleton, Tooltip } from '../../../../components';
-import { ChipTypes } from '../../../../components/Chip';
-import { Icon } from '../../../../components/icons';
+import { SearchInput, Skeleton, Tooltip } from '../../../../components';
+import { useCurrencyPairing } from '../../../../context/CurrencyContext';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
-import { formatNumber } from '../helpers/formatHelper';
+import { formatPriceChange, priceChange } from '../helpers/priceChange';
 import { useStrings } from '../hooks/useStrings';
 import { BalanceType } from '../types/index';
+import PnlTag from './PlnTag';
 
 interface Props {
   walletBalance: BalanceType;
@@ -20,6 +19,13 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
   const strings = useStrings();
   const theme: any = useTheme();
   const { unitOfAccount, changeUnitOfAccountPair, accountPair } = usePortfolio();
+
+  const {
+    ptActivity: { close, open },
+    config,
+  } = useCurrencyPairing();
+
+  const { changeValue, changePercent, variantPnl } = priceChange(open, close);
 
   const handleCurrencyChange = () => {
     if (unitOfAccount !== accountPair?.from.name) {
@@ -81,7 +87,10 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
           ) : (
             <Tooltip title={<Box minWidth="158px">{tooltipTitle}</Box>} placement="right">
               <Stack direction="row" alignItems="center" spacing={theme.spacing(1)} sx={{ marginLeft: theme.spacing(2) }}>
-                <Chip
+                <PnlPercentChange variantPnl={variantPnl} changePercent={formatPriceChange(changePercent)} />
+                <PnlPairedChange variantPnl={variantPnl} changeValue={formatPriceChange(changeValue, config.decimals)} />
+
+                {/* <Chip
                   type={
                     walletBalance.percents > 0
                       ? ChipTypes.ACTIVE
@@ -96,7 +105,6 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
                       ) : walletBalance.percents < 0 ? (
                         <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
                       ) : null}
-                      {/* @ts-ignore */}
                       <Typography variant="caption1">
                         {walletBalance.percents >= 0
                           ? formatNumber(walletBalance.percents)
@@ -115,13 +123,12 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
                       : ChipTypes.DISABLED
                   }
                   label={
-                    // @ts-ignore
                     <Typography variant="caption1">
                       {walletBalance.amount > 0 && '+'}
                       {formatNumber(walletBalance.amount)} {unitOfAccount}
                     </Typography>
                   }
-                />
+                /> */}
               </Stack>
             </Tooltip>
           )}
@@ -130,6 +137,29 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
 
       <SearchInput onChange={e => setKeyword(e.target.value)} placeholder={strings.search} />
     </Stack>
+  );
+};
+
+type PnlPercentChangeProps = { variantPnl: 'danger' | 'success' | 'neutral'; changePercent: string };
+const PnlPercentChange = ({ variantPnl, changePercent }: PnlPercentChangeProps) => {
+  return (
+    <PnlTag variant={variantPnl} withIcon>
+      <Typography>{changePercent}%</Typography>
+    </PnlTag>
+  );
+};
+
+type PnlPairedChangeProps = {
+  variantPnl: 'danger' | 'success' | 'neutral';
+  changeValue: string;
+};
+const PnlPairedChange = ({ variantPnl, changeValue }: PnlPairedChangeProps) => {
+  const { currency } = useCurrencyPairing();
+
+  return (
+    <PnlTag variant={variantPnl}>
+      <Typography>{`${Number(changeValue) > 0 ? '+' : ''}${changeValue} ${currency}`}</Typography>
+    </PnlTag>
   );
 };
 
