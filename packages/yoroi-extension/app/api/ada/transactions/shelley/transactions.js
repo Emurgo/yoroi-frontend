@@ -575,7 +575,7 @@ export async function newAdaUnsignedTxFromUtxo(
     stepPriceFrom: 721,
     stepPriceTo: 10000000,
     // todo remove this after updating the eUtxo lib
-    coinsPerUtxoWord: 34482,
+    coinsPerUtxoWord: protocolParams.coinsPerUtxoByte * 8 + 2,
   };
 
   const utxoSet = new LibUtxoSet(
@@ -871,7 +871,7 @@ async function newAdaUnsignedTxFromUtxoForConnector(
     stepPriceFrom: 721,
     stepPriceTo: 10000000,
     // todo remove this after updating the eUtxo lib
-    coinsPerUtxoWord: 34482,
+    coinsPerUtxoWord: protocolParams.coinsPerUtxoByte * 8 + 2,
   };
 
   const utxoSet = new LibUtxoSet(
