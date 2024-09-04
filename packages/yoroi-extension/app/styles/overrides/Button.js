@@ -149,7 +149,7 @@ export const DarkButton: any = {
 function getContainedStyles(variant: 'primary' | 'secondary', themePalette: Object): Object {
   return {
     backgroundColor: themePalette[`${variant}_500`],
-    color: themePalette.gray_min,
+    color: themePalette.white_static,
     ':hover': { backgroundColor: themePalette[`${variant}_600`] },
     ':active': { backgroundColor: themePalette[`${variant}_700`] },
     ':focus': {
@@ -159,7 +159,8 @@ function getContainedStyles(variant: 'primary' | 'secondary', themePalette: Obje
     },
     '&.Mui-disabled': {
       color: themePalette.gray_min,
-      backgroundColor: themePalette[`${variant}_300`],
+      backgroundColor: themePalette[`${variant}_200`],
+      opacity: '0.8',
       cursor: 'not-allowed',
       pointerEvents: 'unset',
     },

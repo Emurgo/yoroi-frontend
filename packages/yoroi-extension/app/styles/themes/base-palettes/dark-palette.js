@@ -54,4 +54,6 @@ export const darkPalette = {
   bg_gradient_1: 'linear-gradient(195.39deg,  #1AE3BB 26%, #4B6DDE 10%,#4B6DDE 16%)',
   bg_gradient_2: 'linear-gradient(205.51deg, #0B997D 48%, #08C29D 8%)',
   bg_gradient_3: 'linear-gradient(23deg, #2E4BB0 100%, #2B3E7D 100%)',
+  special_web_overlay: 'rgba(31, 35, 46, 0.80)',
+  special_web_bg_sidebar: 'rgba(0, 0, 0, 0.16)',
 };

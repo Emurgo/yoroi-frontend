@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { Button } from '@mui/material';
+import { Button, Box } from '@mui/material';
 import TextField from '../../common/TextField';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
@@ -11,9 +11,9 @@ import BorderedBox from '../../widgets/BorderedBox';
 import styles from './DelegationSendForm.scss';
 import globalMessages from '../../../i18n/global-messages';
 import WarningBox from '../../widgets/WarningBox';
-import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import LocalizableError from '../../../i18n/LocalizableError';
-import { bech32, } from 'bech32';
+import { bech32 } from 'bech32';
 import { isHex } from '@emurgo/yoroi-lib/dist/internals/utils/index';
 
 const messages = defineMessages({
@@ -31,20 +31,15 @@ type Props = {|
   +isProcessing: boolean,
 |};
 
-function validateAndSetPool(
-  poolId: string,
-  updatePool: (void | string) => void,
-): boolean {
-  const validateHex: string => boolean = (id) => {
+function validateAndSetPool(poolId: string, updatePool: (void | string) => void): boolean {
+  const validateHex: string => boolean = id => {
     if (id.length !== 56) {
       return false;
     }
     return isHex(id);
-  }
+  };
   try {
-    const payload = Buffer.from(
-      bech32.fromWords(bech32.decode(poolId, 1000).words)
-    ).toString('hex');
+    const payload = Buffer.from(bech32.fromWords(bech32.decode(poolId, 1000).words)).toString('hex');
     if (validateHex(payload)) {
       updatePool(payload);
       return true;
@@ -61,43 +56,47 @@ function validateAndSetPool(
 
 @observer
 export default class DelegationSendForm extends Component<Props> {
-
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   // FORM VALIDATION
-  form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
-    fields: {
-      poolId: {
-        label: this.context.intl.formatMessage(globalMessages.stakePoolHash),
-        placeholder: '',
-        value: '',
-        validators: [({ field }) => {
-          const poolIdValue = field.value;
-          if (poolIdValue === '') {
-            this.props.updatePool(undefined);
-            return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
-          }
-          const isValid = validateAndSetPool(poolIdValue, this.props.updatePool);
-          if (this.props.poolQueryError != null) {
-            return [false]; // no error message since container already displays one
-          }
-          return [isValid, this.context.intl.formatMessage(messages.invalidPoolId)];
-        }],
+  form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
+    {
+      fields: {
+        poolId: {
+          label: this.context.intl.formatMessage(globalMessages.stakePoolHash),
+          placeholder: '',
+          value: '',
+          validators: [
+            ({ field }) => {
+              const poolIdValue = field.value;
+              if (poolIdValue === '') {
+                this.props.updatePool(undefined);
+                return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
+              }
+              const isValid = validateAndSetPool(poolIdValue, this.props.updatePool);
+              if (this.props.poolQueryError != null) {
+                return [false]; // no error message since container already displays one
+              }
+              return [isValid, this.context.intl.formatMessage(messages.invalidPoolId)];
+            },
+          ],
+        },
       },
     },
-  }, {
-    options: {
-      showErrorsOnInit: false, // TODO: support URI
-      validateOnBlur: false,
-      validateOnChange: true,
-      validationDebounceWait: 0,
-    },
-    plugins: {
-      vjf: vjf()
-    },
-  });
+    {
+      options: {
+        showErrorsOnInit: false, // TODO: support URI
+        validateOnBlur: false,
+        validateOnChange: true,
+        validationDebounceWait: 0,
+      },
+      plugins: {
+        vjf: vjf(),
+      },
+    }
+  );
 
   render(): Node {
     const { form } = this;
@@ -107,23 +106,18 @@ export default class DelegationSendForm extends Component<Props> {
 
     const pendingTxWarningComponent = (
       <div className={styles.warningBox}>
-        <WarningBox>
-          {intl.formatMessage(globalMessages.pendingTxWarning)}
-        </WarningBox>
+        <WarningBox>{intl.formatMessage(globalMessages.pendingTxWarning)}</WarningBox>
       </div>
     );
 
-    const poolQueryError = this.props.poolQueryError == null
-      ? this.props.poolQueryError
-      : intl.formatMessage(this.props.poolQueryError);
+    const poolQueryError =
+      this.props.poolQueryError == null ? this.props.poolQueryError : intl.formatMessage(this.props.poolQueryError);
 
     return (
-      <div className={styles.component}>
-
+      <Box className={styles.component}>
         {this.props.hasAnyPending && pendingTxWarningComponent}
 
         <BorderedBox>
-
           <div className={styles.poolInput}>
             <TextField
               className="poolId"
@@ -133,10 +127,8 @@ export default class DelegationSendForm extends Component<Props> {
             />
           </div>
           {this._makeInvokeConfirmationButton()}
-
         </BorderedBox>
-
-      </div>
+      </Box>
     );
   }
 
@@ -147,14 +139,11 @@ export default class DelegationSendForm extends Component<Props> {
       <Button
         variant="primary"
         onClick={this.props.onNext}
-        disabled={
-          this.props.hasAnyPending ||
-          this.props.isProcessing ||
-          this.props.poolQueryError != null
-        }
+        disabled={this.props.hasAnyPending || this.props.isProcessing || this.props.poolQueryError != null}
         sx={{ margin: '30px auto 0', display: 'block' }}
       >
         {intl.formatMessage(globalMessages.nextButtonLabel)}
-      </Button>);
+      </Button>
+    );
   }
 }

@@ -5,7 +5,7 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import classnames from 'classnames';
 import styles from './RawHash.scss';
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
 type Props = {|
   +children: ?Node,
@@ -35,7 +35,7 @@ export default class RawHash extends Component<Props> {
       <Box
         component="span"
         sx={{
-          color: 'primary.500',
+          color: 'ds.text_gray_medium',
           '&:hover': {
             color: 'primary.600',
           },
@@ -53,7 +53,9 @@ export default class RawHash extends Component<Props> {
         {this.props.children}
       </Box>
     ) : (
-      <span className={addressClasses}>{this.props.children}</span>
+      <Typography color="ds.text_gray_low" varinat="body1" className={addressClasses}>
+        {this.props.children}
+      </Typography>
     );
   }
 }
