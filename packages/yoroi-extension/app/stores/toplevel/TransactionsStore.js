@@ -30,7 +30,6 @@ import appConfig from '../../config';
 import { refreshTransactions } from '../../api/thunk';
 import type { LastSyncInfoRow, } from '../../api/ada/lib/storage/database/walletTypes/core/tables';
 import type { WalletState } from '../../../chrome/extension/background/types';
-import type { PersistedSubmittedTransaction } from '../../api/localStorage';
 
 type TxHistoryState = {|
   publicDeriverId: number,
