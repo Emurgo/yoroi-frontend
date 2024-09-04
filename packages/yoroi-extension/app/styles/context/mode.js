@@ -1,12 +1,11 @@
 // @flow
 import type { Node } from 'react';
-import React from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import { baseLightTheme } from '../themes/light-theme-mui';
 import { baseDarkTheme } from '../themes/dark-theme-mui';
 import { MuiThemes, THEMES } from '../themes';
 import LocalStorageApi from '../../api/localStorage/index';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 
 export type Modes = 'light' | 'dark';
 
@@ -26,7 +25,7 @@ function ColorModeProvider({ children, currentTheme }: any): Node {
 
   const colorMode = React.useMemo(
     () => ({
-      toggleColorMode: mode => {
+      toggleColorMode: () => {
         setMode((prevMode: Modes) => (prevMode === 'light' ? 'dark' : 'light'));
       },
     }),
@@ -34,9 +33,9 @@ function ColorModeProvider({ children, currentTheme }: any): Node {
   );
 
   const getCurrentThemeFromStorage = async () => {
-    const currentTheme = await localStorageApi.getUserThemeMode();
-    if (currentTheme) {
-      setMode(currentTheme === 'light' ? 'light' : 'dark');
+    const currentThemeMode = await localStorageApi.getUserThemeMode();
+    if (currentThemeMode) {
+      setMode(currentThemeMode === 'light' ? 'light' : 'dark');
     }
   };
 

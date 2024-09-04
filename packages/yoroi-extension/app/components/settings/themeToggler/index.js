@@ -2,15 +2,10 @@
 
 import { Box, FormControlLabel, Radio, RadioGroup, useTheme } from '@mui/material';
 import type { Node } from 'react';
-import { useState } from 'react';
 import { useThemeMode } from '../../../styles/context/mode';
-import { setLocalItem } from '../../../api/localStorage/primitives';
 import LocalStorageApi from '../../../api/localStorage';
-import { useEffect } from 'react';
 
 const ThemeToggler = (): Node => {
-  const [mode, setMode] = useState(false);
-  const [themeMode, setThemeMode] = useState(false);
   const { toggleColorMode } = useThemeMode();
   const localStorageApi = new LocalStorageApi();
   const { name } = useTheme();
@@ -22,7 +17,6 @@ const ThemeToggler = (): Node => {
           aria-labelledby="theme-switch-buttons"
           value={name === 'light-theme' ? 'light' : 'dark'}
           onChange={async e => {
-            setMode(md => !md);
             toggleColorMode(e.target.value);
             await localStorageApi.setUserThemeMode(e.target.value);
           }}
