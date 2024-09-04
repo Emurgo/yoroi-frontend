@@ -107,17 +107,13 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     return  [ ...submittedTxs, ...txs ];
   }
 
-  // <TODO:PENDING_REMOVAL> wallet state should be used directly
-  @computed get submitted(): Array<PersistedSubmittedTransaction> {
-    return this.stores.wallets.selected?.submittedTransactions ?? [];
-  }
-
   @computed get hasAny(): boolean {
     return this.recent.length > 0;
   }
 
+  // <TODO:PENDING_REMOVAL> wallet state should be used directly
   @computed get hasAnyPending(): boolean {
-    return this.submitted.length > 0;
+    return (this.stores.wallets.selected?.submittedTransactions.length ?? 0) > 0;
   }
 
   @computed get hasMoreToLoad(): boolean {

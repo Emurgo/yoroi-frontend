@@ -65,7 +65,7 @@ export const createCurrrentWalletInfo = (stores: any) => {
     defaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfoSummary(networkId),
     getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
     recentTransactions: groupedTx ? groupedTx : [],
-    submitedTransactions: stores.transactions.submitted,
+    submitedTransactions: selectedWallet.submittedTransactions,
     isHardwareWallet: isHardware,
     backendService: BackendService,
     backendServiceZero: BackendServiceZero,
