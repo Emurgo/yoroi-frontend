@@ -1,8 +1,8 @@
 import BigNumber from 'bignumber.js';
 import moment from 'moment';
+import { getNetworkById } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 import { genLookupOrFail } from '../../../../stores/stateless/tokenHelpers';
 import { calculateAndFormatValue } from '../../../../utils/unit-of-account';
-import { getNetworkById } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 
 export const mapStakingKeyStateToGovernanceAction = (state: any) => {
   if (!state.drepDelegation) return null;
@@ -45,13 +45,13 @@ export const createCurrrentWalletInfo = (stores: any) => {
   const { wallets } = stores;
   const walletCurrentPoolInfo = getStakePoolMeta(stores);
 
-  const selectedWallet/*: WalletState */ = wallets.selectedOrFail;
-  const walletAdaBalance/*: MultiToken */ = getWalletTotalAdaBalance(stores, selectedWallet);
+  const selectedWallet /*: WalletState */ = wallets.selectedOrFail;
+  const walletAdaBalance /*: MultiToken */ = getWalletTotalAdaBalance(stores, selectedWallet);
 
   const isHardware: boolean = selectedWallet.isHardware;
   const walletId: number = selectedWallet.publicDeriverId;
   const networkId = selectedWallet.networkId;
-  const networkInfo/*: $ReadOnly<NetworkRow> */ = getNetworkById(selectedWallet.networkId);
+  const networkInfo /*: $ReadOnly<NetworkRow> */ = getNetworkById(selectedWallet.networkId);
   const { BackendService, BackendServiceZero } = networkInfo.Backend;
 
   const groupedTx = groupTransactionsByDay(stores.transactions.recent);
@@ -69,6 +69,7 @@ export const createCurrrentWalletInfo = (stores: any) => {
     isHardwareWallet: isHardware,
     backendService: BackendService,
     backendServiceZero: BackendServiceZero,
+    stakingAddress: selectedWallet.stakingAddress,
   };
 };
 
@@ -82,19 +83,14 @@ export const getFormattedPairingValue = (getCurrentPrice, defaultTokenInfo, unit
   return `${val} ${currency}`;
 };
 
-const combinedMultiToken = (
-  walletAmount/*: MultiToken */,
-  rewards/*: MultiToken */,
-)/*: MultiToken */ => {
-  return walletAmount && rewards
-    ? walletAmount.joinAddCopy(rewards)
-    : (walletAmount ?? rewards);
+const combinedMultiToken = (walletAmount /*: MultiToken */, rewards /*: MultiToken */) /*: MultiToken */ => {
+  return walletAmount && rewards ? walletAmount.joinAddCopy(rewards) : walletAmount ?? rewards;
 };
 
-const getWalletTotalAdaBalance = (stores, selectedWallet/*: WalletState */)/*: MultiToken */ => {
+const getWalletTotalAdaBalance = (stores, selectedWallet /*: WalletState */) /*: MultiToken */ => {
   const balance = selectedWallet.balance;
-  const rewardBalance/*: MultiToken */ = stores.delegation.getRewardBalanceOrZero(selectedWallet);
-  const totalBalance/*: MultiToken */ = combinedMultiToken(balance, rewardBalance);
+  const rewardBalance /*: MultiToken */ = stores.delegation.getRewardBalanceOrZero(selectedWallet);
+  const totalBalance /*: MultiToken */ = combinedMultiToken(balance, rewardBalance);
   const defaultEntry = totalBalance?.getDefaultEntry();
   if (defaultEntry == null) return new BigNumber(0);
   const getTokenInfo = genLookupOrFail(stores.tokenInfoStore.tokenInfo);

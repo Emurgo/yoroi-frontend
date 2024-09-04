@@ -88,7 +88,7 @@ export const DelagationForm = () => {
       setFormLoading(true);
       await signDelegationTransaction({
         password,
-        publicDeriver: selectedWallet,
+        wallet: selectedWallet,
         dialog: null,
       });
       setFormLoading(false);
