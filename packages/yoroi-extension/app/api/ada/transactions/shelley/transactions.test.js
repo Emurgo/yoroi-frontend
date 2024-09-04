@@ -462,13 +462,13 @@ describe('Create unsigned TX from UTXO', () => {
     try {
       expect(new Set([utxos[4], utxos[2]])).toEqual(new Set(unsignedTxResponse.senderUtxos));
       expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('12000002');
-      expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('11998058');
-      expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('1944');
+      expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('11998054');
+      expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('1948');
     } catch {
       expect(new Set([utxos[4], utxos[3]])).toEqual(new Set(unsignedTxResponse.senderUtxos));
       expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('32000001');
-      expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('31998335');
-      expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('1666');
+      expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('31998331');
+      expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('1670');
     }
 
     function assertMultiAsset(masset: any, policy: string, name: string, amount: string): void {
