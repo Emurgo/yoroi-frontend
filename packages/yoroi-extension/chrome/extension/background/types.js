@@ -40,7 +40,6 @@ export type WalletState = {|
   publicDeriverLevel: number,
   lastSyncInfo: $ReadOnly<LastSyncInfoRow>,
   balance: MultiToken,
-  rewardBalance: MultiToken,
   assetDeposits: MultiToken,
   defaultTokenId: string,
   assuranceMode: AssuranceMode,

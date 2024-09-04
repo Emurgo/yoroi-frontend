@@ -182,7 +182,6 @@ async function getWalletState(publicDeriver: PublicDeriver<>): Promise<WalletSta
     throw new Error('unexpected missing asGetBalance result');
   }
   const balance = await canGetBalance.getBalance();
-  const rewardBalance = await canGetBalance.getBalance();
 
   return {
     publicDeriverId,
@@ -204,7 +203,6 @@ async function getWalletState(publicDeriver: PublicDeriver<>): Promise<WalletSta
     publicDeriverLevel: withLevels.getParent().getPublicDeriverLevel(),
     lastSyncInfo: await publicDeriver.getLastSyncInfo(),
     balance,
-    rewardBalance,
     assetDeposits,
     defaultTokenId,
     assuranceMode: assuranceModes.NORMAL,
@@ -284,7 +282,6 @@ export async function getPlaceHolderWalletState(publicDeriver: PublicDeriver<>):
       Height: 0,
     },
     balance: zero,
-    rewardBalance: zero,
     assetDeposits: zero,
     defaultTokenId: '',
     assuranceMode: assuranceModes.NORMAL,
