@@ -8,7 +8,7 @@ import CopyToClipboard from 'react-copy-to-clipboard';
 import { ReactComponent as IconCopy } from '../../assets/images/copy.inline.svg';
 import { ReactComponent as IconCopied } from '../../assets/images/copied.inline.svg';
 import styles from './CopyableAddress.scss';
-import { Box, Tooltip, Typography } from '@mui/material';
+import { Box, Tooltip, Typography, styled } from '@mui/material';
 import type { Notification } from '../../types/notification.types';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
@@ -22,6 +22,14 @@ export const copyableMessages: Object = defineMessages({
     defaultMessage: '!!!Copied',
   },
 });
+
+const IconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_medium,
+    },
+  },
+}));
 
 type Props = {|
   +children: Node,
@@ -72,7 +80,9 @@ export default class CopyableAddress extends Component<Props> {
         placement={this.props.placementTooltip}
       >
         <span className={styles.copyIconBig} id={id + '-copyAddress-button'}>
-          <Icon />
+          <IconWrapper>
+            <Icon />
+          </IconWrapper>
         </span>
       </Tooltip>
     );
@@ -84,10 +94,7 @@ export default class CopyableAddress extends Component<Props> {
         id={id + '-copyableAddress-box'}
       >
         <span id={id + '-address-text'}>{this.props.children}</span>
-        <CopyToClipboard
-          text={hash}
-          onCopy={onCopyAddress == null ? undefined : (_text, _result) => onCopyAddress()}
-        >
+        <CopyToClipboard text={hash} onCopy={onCopyAddress == null ? undefined : (_text, _result) => onCopyAddress()}>
           {tooltipComponent}
         </CopyToClipboard>
       </Box>

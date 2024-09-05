@@ -54,6 +54,6 @@ export const lightPalette = {
   bg_gradient_1: 'linear-gradient(180deg, #93F5E1 100%, #E4E8F7 100%)',
   bg_gradient_2: 'linear-gradient(180deg, #93F5E1 100%, #C6F7ED 100%)',
   bg_gradient_3: 'linear-gradient(180deg, #244ABF 100%, #4760FF 100%)',
-
-  special_web_bg_sidebar: 'rgba(0, 0, 0, 0.16)',
+  special_web_overlay: 'rgba(31, 35, 46, 0.80)',
+  special_web_bg_sidebar: '#1F232ECC',
 };
