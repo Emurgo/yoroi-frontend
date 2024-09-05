@@ -4,15 +4,20 @@ import React, { useMemo, useState } from 'react';
 import { Chip, Skeleton } from '../../../../components';
 import { ChipTypes } from '../../../../components/Chip';
 import { Icon } from '../../../../components/icons';
+import { useMultiTokenActivity } from '../../../../utils/useMultiTokenActivity';
 import tokenPng from '../../common/assets/images/token.png';
+import PnlTag from '../../common/components/PlnTag';
 import Table from '../../common/components/Table';
 import { formatNumber } from '../../common/helpers/formatHelper';
+import { priceChange } from '../../common/helpers/priceChange';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
 import { useStrings } from '../../common/hooks/useStrings';
 import useTableSort, { ISortState } from '../../common/hooks/useTableSort';
 import { TokenType } from '../../common/types/index';
 import { IHeadCell } from '../../common/types/table';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
+
+// import { isPrimaryToken } from '@yoroi/portfolio';
 
 const TableRowSkeleton = ({ theme, ...props }) => (
   <TableRow
@@ -76,7 +81,20 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
     order: null,
     orderBy: null,
   });
+
   const list = useMemo(() => [...data], [data]);
+
+  const listForActivity = list.filter(item => item.policyId.length > 0).map(item => `${item.policyId}.${item.assetName}`); //
+
+  const { mutate: get24hActivity, data: data24h } = useMultiTokenActivity('24h');
+  // const { mutate: get48hActivity, data: data48h } = useMultiTokenActivity('1W');
+  // const { mutate: get72hActivity, data: data72h } = useMultiTokenActivity('1M');
+
+  React.useEffect(() => {
+    get24hActivity(listForActivity);
+    // get48hActivity(listForActivity);
+    // get72hActivity(listForActivity);
+  }, [get24hActivity]);
 
   const headCells: IHeadCell[] = [
     { id: 'name', label: strings.name, align: 'left', sortType: 'character' },
@@ -97,6 +115,7 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
       sortType: 'numeric',
     },
   ];
+
   const { getSortedData, handleRequestSort } = useTableSort({ order, orderBy, setSortState, headCells, data });
 
   return (
@@ -153,7 +172,11 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
           </TableCell>
 
           <TableCell sx={{ padding: '16.8px 1rem' }}>
-            <Chip
+            <TokenPriceChangeChip
+              priceData={data24h && data24h[`${row.policyId}.${row.assetName}`]}
+              isPrimaryToken={row.policyId.length === 0}
+            />
+            {/* <Chip
               type={row['24h'] > 0 ? ChipTypes.ACTIVE : row['24h'] < 0 ? ChipTypes.INACTIVE : ChipTypes.DISABLED}
               label={
                 <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -162,14 +185,13 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
                   ) : row['24h'] < 0 ? (
                     <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
                   ) : null}
-                  {/* @ts-ignore */}
                   <Typography variant="caption1">
                     {row['24h'] >= 0 ? formatNumber(row['24h']) : formatNumber(-1 * row['24h'])}%
                   </Typography>
                 </Stack>
               }
               sx={{ cursor: 'pointer' }}
-            />
+            /> */}
           </TableCell>
 
           <TableCell sx={{ padding: '16.8px 1rem' }}>
@@ -241,3 +263,20 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
 };
 
 export default StatsTable;
+
+const TokenPriceChangeChip = ({ priceData, isPrimaryToken }) => {
+  console.log('TokenPriceChangeChip PROPS', { isPrimaryToken, priceData });
+  if (priceData === undefined) {
+    return <p>loafing</p>;
+  }
+  const { close, open } = priceData[1].price;
+
+  const { changePercent, variantPnl } = priceChange(open, close);
+  console.log('variantPnl', { changePercent, variantPnl });
+
+  return (
+    <PnlTag variant={variantPnl} withIcon>
+      <Typography>{changePercent}%</Typography>
+    </PnlTag>
+  );
+};

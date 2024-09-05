@@ -168,6 +168,7 @@
     "@yoroi/staking": "^1.5.1",
     "@yoroi/swap": "1.5.2",
     "@yoroi/types": "1.5.4",
+    "@yoroi/portfolio": "1.0.3",
     "assert": "2.1.0",
     "async-await-queue": "2.1.4",
     "axios": "0.21.1",

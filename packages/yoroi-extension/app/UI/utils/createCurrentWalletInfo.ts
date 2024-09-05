@@ -4,7 +4,6 @@ import { genLookupOrFail, getTokenIdentifierIfExists, getTokenStrictName } from 
 import { splitAmount, truncateToken } from '../../utils/formatters.js';
 import { calculateAndFormatValue } from '../../utils/unit-of-account';
 import { cardanoAdaBase64Logo } from '../features/portfolio/common/helpers/constants';
-import { createChartData } from '../features/portfolio/common/helpers/mockHelper';
 
 export const mapStakingKeyStateToGovernanceAction = (state: any) => {
   if (!state.drepDelegation) return null;
@@ -81,26 +80,8 @@ const getAssetWalletAssetList = stores => {
         portfolioPercents: Math.round(100 * Math.random()), // MOCKED
 
         // The below properties are used only in token details page
-        chartData: {
-          start24HoursAgo: createChartData('24H'), // MOCKED
-          start1WeekAgo: createChartData('1W'), // MOCKED
-          start1MonthAgo: createChartData('1M'), // MOCKED
-          start6MonthAgo: createChartData('6M'), // MOCKED
-          start1YearAgo: createChartData('1Y'), // MOCKED
-          ALL: createChartData('1Y'), // MOCKED
-        },
-        performance: [
-          { value: Math.random() }, // MOCKED
-          { value: Math.random() }, // MOCKED
-          { value: `${Math.round(1000 * Math.random())}M` }, // MOCKED
-          { value: `${Math.round(100 * Math.random())}M` }, // MOCKED
-          { value: `${Math.round(100 * Math.random())}` }, // MOCKED
-          { value: 100 * Math.random() }, // MOCKED
-          { value: 1000 * Math.random() }, // MOCKED
-          { value: '45B' }, // MOCKED
-          { value: 10 * Math.random() }, // MOCKED
-          { value: Math.random() / 100 }, // MOCKED
-        ],
+        chartData: {},
+        performance: [],
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
@@ -124,8 +105,6 @@ export const createCurrrentWalletInfo = (stores: any): any => {
     if (selectedWallet == null) {
       throw new Error(`no selected Wallet. Should never happen`);
     }
-    console.log('createCurrrentWalletInfo selectedWallet', selectedWallet);
-    // newwwwwwwwww
 
     const currentWalletId = selectedWallet.publicDeriverId;
     const networkId = selectedWallet.networkId;
