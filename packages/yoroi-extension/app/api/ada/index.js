@@ -1360,6 +1360,7 @@ export default class AdaApi {
         false,
       );
 
+      // <TODO:WALLET_API>
       const defaultToken = {
         defaultNetworkId: wallet.networkId,
         defaultIdentifier: wallet.defaultTokenId,

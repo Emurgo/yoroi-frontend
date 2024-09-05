@@ -1,42 +1,35 @@
-import Button from '@mui/material/Button';
+import { LoadingButton } from '@mui/lab';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { parseDrepId } from '@yoroi/staking';
 import * as React from 'react';
-import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
+import { dRepToMaybeCredentialHex } from '../../../../api/ada/lib/cardanoCrypto/utils';
 import { TextInput } from '../../../components/Input/TextInput';
+import { useModal } from '../../../components/modals/ModalContext';
 import { useGovernance } from '../module/GovernanceContextProvider';
 import { useStrings } from './useStrings';
 
 type ChooseDRepModallProps = {
-  onSubmit?: (drepId: string) => void;
+  onSubmit?: (drepId: string, drepCredential: string) => void;
 };
 
 export const ChooseDRepModal = ({ onSubmit }: ChooseDRepModallProps) => {
   const [drepId, setDrepId] = React.useState('');
   const [error, setError] = React.useState(false);
-
   const { dRepIdChanged, governanceVoteChanged } = useGovernance();
+  const { isLoading } = useModal();
   const strings = useStrings();
-
-  // TODO hook endpoint not working well
-  // const { error, isFetched, isFetching } = useIsValidDRepID(drepId, {
-  //   retry: false,
-  //   enabled: drepId.length > 0,
-  // });
 
   React.useEffect(() => {
     setError(false);
   }, [drepId]);
 
   const confirmDRep = () => {
-    parseDrepId(drepId, RustModule.CrossCsl.init('any'))
-      .then(_ => {
-        onSubmit?.(drepId);
-      })
-      .catch(_ => {
-        setError(true);
-      });
+    const dRepCredentialHex: string | null = dRepToMaybeCredentialHex(drepId);
+    if (dRepCredentialHex == null) {
+      setError(true);
+    } else {
+      onSubmit?.(drepId, dRepCredentialHex);
+    }
   };
 
   return (
@@ -57,13 +50,18 @@ export const ChooseDRepModal = ({ onSubmit }: ChooseDRepModallProps) => {
           value={drepId}
           error={error}
           helperText={error ? strings.incorectFormat : ' '}
-          // defaultValue="drep1wn0dklu87w8d9pkuyr7jalulgvl9w2he0hn0fne9k5a6y4d55mt"
         />
       </Stack>
-      {/* @ts-ignore */}
-      <Button onClick={confirmDRep} fullWidth variant="primary" disabled={error || drepId.length === 0}>
+      <LoadingButton
+        loading={isLoading}
+        onClick={confirmDRep}
+        fullWidth
+        // @ts-ignore
+        variant="primary"
+        disabled={error || drepId.length === 0}
+      >
         {strings.confirm}
-      </Button>
+      </LoadingButton>
     </Stack>
   );
 };

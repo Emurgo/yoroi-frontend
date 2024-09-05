@@ -908,11 +908,11 @@ export default class TransactionRevamp extends Component<Props, State> {
           return intl.formatMessage(shelleyCertificateKinds.CommitteeHotAuth);
         case Scope.WalletV4.CertificateKind.CommitteeColdResign:
           return intl.formatMessage(shelleyCertificateKinds.CommitteeColdResign);
-        case Scope.WalletV4.CertificateKind.DrepRegistration:
+        case Scope.WalletV4.CertificateKind.DRepRegistration:
           return intl.formatMessage(shelleyCertificateKinds.DrepRegistration);
-        case Scope.WalletV4.CertificateKind.DrepDeregistration:
+        case Scope.WalletV4.CertificateKind.DRepDeregistration:
           return intl.formatMessage(shelleyCertificateKinds.DrepDeregistration);
-        case Scope.WalletV4.CertificateKind.DrepUpdate:
+        case Scope.WalletV4.CertificateKind.DRepUpdate:
           return intl.formatMessage(shelleyCertificateKinds.DrepUpdate);
         default: {
           throw new Error(`${nameof(this.shelleyCertificateToText)} unexpected kind ${kind}`);

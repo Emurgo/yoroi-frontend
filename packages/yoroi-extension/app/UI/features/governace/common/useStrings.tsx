@@ -39,14 +39,14 @@ export const messages = Object.freeze(
     },
     drepId: {
       id: 'governance.drepId',
-      defaultMessage: '!!!Drep ID:',
+      defaultMessage: '!!!Drep ID (Fingerprint):',
     },
     delegateToDRep: {
       id: 'governance.delegateToDRep',
       defaultMessage: '!!!Delegate to a DRep',
     },
-    delegateingToDRep: {
-      id: 'governance.delegateingToDRep',
+    delegatingToDRep: {
+      id: 'governance.delegatingToDRep',
       defaultMessage: '!!!Delegating to a DRep',
     },
     designatingSomeoneElse: {
@@ -70,6 +70,27 @@ export const messages = Object.freeze(
       id: 'governance.statusSelected',
       defaultMessage:
         '!!!You have selected ${status} as your governance status. You can change it at any time by clicking in the card bellow',
+    },
+    statusPending: {
+      id: 'governance.statusPending',
+      defaultMessage: '!!!You have chosen your governance status, this process may take a while.',
+    },
+    thanksForParticipation: {
+      id: 'governance.thanksForParticipation',
+      defaultMessage: '!!!Thank you for participating in Governance.',
+    },
+    theTransactionCanTake: {
+      id: 'governance.theTransactionCanTake',
+      defaultMessage: '!!!This transaction can take a while!',
+    },
+    participatingInGovernance: {
+      id: 'governance.participatingInGovernance',
+      defaultMessage:
+        '!!!Participating in the Cardano Governance gives you the opportunity to participate in the voting as well as withdraw your staking rewards',
+    },
+    goToGovernance: {
+      id: 'governance.goToGovernance',
+      defaultMessage: '!!!GO to governance',
     },
     designatedSomeone: {
       id: 'governance.designatedSomeone',
@@ -125,9 +146,10 @@ export const messages = Object.freeze(
 
 export const useStrings = () => {
   const { intl } = useIntl();
+
   return React.useRef({
     delegateToDRep: intl.formatMessage(messages.delegateToDRep),
-    delegateingToDRep: intl.formatMessage(messages.delegateingToDRep),
+    delegatingToDRep: intl.formatMessage(messages.delegatingToDRep),
     designatingSomeoneElse: intl.formatMessage(messages.designatingSomeoneElse),
     governanceStatus: intl.formatMessage(messages.governanceStatus),
     governanceStatusInfo: intl.formatMessage(messages.governanceStatusInfo),
@@ -146,7 +168,7 @@ export const useStrings = () => {
     transactionDetails: intl.formatMessage(messages.transactionDetails),
     operations: intl.formatMessage(messages.operations),
     selectAbstein: intl.formatMessage(messages.selectAbstein),
-    selectNoConfidenc: intl.formatMessage(messages.selectNoConfidenc),
+    selectNoConfidence: intl.formatMessage(messages.selectNoConfidenc),
     back: intl.formatMessage(messages.back),
     confirm: intl.formatMessage(messages.confirm),
     total: intl.formatMessage(messages.total),
@@ -154,5 +176,10 @@ export const useStrings = () => {
     wrongPassword: intl.formatMessage(messages.wrongPassword),
     identifyDrep: intl.formatMessage(messages.identifyDrep),
     incorectFormat: intl.formatMessage(messages.incorectFormat),
+    statusPending: intl.formatMessage(messages.statusPending),
+    thanksForParticipation: intl.formatMessage(messages.thanksForParticipation),
+    theTransactionCanTake: intl.formatMessage(messages.theTransactionCanTake),
+    participatingInGovernance: intl.formatMessage(messages.participatingInGovernance),
+    goToGovernance: intl.formatMessage(messages.goToGovernance),
   }).current;
 };

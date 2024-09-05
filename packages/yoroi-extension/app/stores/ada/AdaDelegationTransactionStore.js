@@ -11,17 +11,15 @@ import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import type { WalletState } from '../../../chrome/extension/background/types';
 
-export type CreateWithdrawalTxRequest =
-  LocalizedRequest<DeferredCall<CreateWithdrawalTxResponse>>;
-
 export default class AdaDelegationTransactionStore extends Store<StoresMap, ActionsMap> {
-  @observable createWithdrawalTx: LocalizedRequest<
+  @observable createWithdrawalTx: LocalizedRequest<DeferredCall<CreateWithdrawalTxResponse>> = new LocalizedRequest<
     DeferredCall<CreateWithdrawalTxResponse>
-  > = new LocalizedRequest<DeferredCall<CreateWithdrawalTxResponse>>(request => request());
+  >(request => request());
 
   @observable
-  createDelegationTx: LocalizedRequest<CreateDelegationTxFunc> =
-    new LocalizedRequest<CreateDelegationTxFunc>(this.api.ada.createDelegationTx);
+  createDelegationTx: LocalizedRequest<CreateDelegationTxFunc> = new LocalizedRequest<CreateDelegationTxFunc>(
+    this.api.ada.createDelegationTx
+  );
 
   @observable shouldDeregister: boolean = false;
 
@@ -168,9 +166,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     }
     // normal password-based wallet
     if (request.password == null) {
-      throw new Error(
-        `${nameof(this._signTransaction)} missing password for non-hardware signing`
-      );
+      throw new Error(`${nameof(this._signTransaction)} missing password for non-hardware signing`);
     }
     await this.stores.substores.ada.wallets.adaSendAndRefresh({
       broadcastRequest: {
