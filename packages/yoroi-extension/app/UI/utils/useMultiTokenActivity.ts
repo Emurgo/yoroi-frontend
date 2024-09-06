@@ -11,7 +11,7 @@ interface ApiError {
 }
 
 export const useMultiTokenActivity = (
-  interval: '24h' | '48h' | '72h'
+  interval: '24h' | '1w' | '1m'
 ): UseMutationResult<TokenActivityResponse, AxiosError<ApiError>, string[]> => {
   const postTokenActivity = async (tokenIds: string[]): Promise<TokenActivityResponse> => {
     const response = await axios.post(`https://zero.yoroiwallet.com/tokens/activity/multi/${interval}`, tokenIds, {

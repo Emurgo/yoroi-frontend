@@ -10,7 +10,11 @@ module.exports = {
       legacyDecorators: true,
     },
   },
-  extends: ['airbnb', 'prettier'],
+  extends: [
+    'airbnb',
+    'prettier',
+    'plugin:@typescript-eslint/recommended', // Enable recommended rules from the TypeScript plugin
+  ],
   env: {
     browser: true,
     mocha: true,
@@ -125,7 +129,16 @@ module.exports = {
     camelcase: 0,
     'react/jsx-curly-brace-presence': 0,
   },
-  plugins: ['import', 'promise', 'react', 'flowtype', 'no-floating-promise', 'prettier', 'eslint-plugin-simple-import-sort'],
+  plugins: [
+    'import',
+    'promise',
+    'react',
+    'flowtype',
+    'no-floating-promise',
+    'prettier',
+    'eslint-plugin-simple-import-sort',
+    '@typescript-eslint', // Add TypeScript plugin
+  ],
   globals: {
     chrome: true,
     API: true,

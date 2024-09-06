@@ -4,6 +4,7 @@ import { ROUTES } from '../../../routes-config';
 import React, { ReactNode } from 'react';
 import NavBarTitle from '../../../components/topbar/NavBarTitle';
 import NavBarContainerRevamp from '../../../containers/NavBarContainerRevamp';
+import { PortfolioTokenActivityProvider } from '../../features/portfolio/module/PortfolioTokenActivityProvider';
 import GeneralPageLayout from '../../layout/GeneralPageLayout';
 
 type Props = {
@@ -39,7 +40,7 @@ const PortfolioLayout = ({ stores, actions, children }: Props): JSX.Element => {
         />
       }
     >
-      {children}
+      <PortfolioTokenActivityProvider>{children}</PortfolioTokenActivityProvider>
     </GeneralPageLayout>
   );
 };

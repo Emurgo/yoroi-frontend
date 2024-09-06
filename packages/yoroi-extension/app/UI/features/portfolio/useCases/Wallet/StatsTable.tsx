@@ -4,7 +4,6 @@ import React, { useMemo, useState } from 'react';
 import { Chip, Skeleton } from '../../../../components';
 import { ChipTypes } from '../../../../components/Chip';
 import { Icon } from '../../../../components/icons';
-import { useMultiTokenActivity } from '../../../../utils/useMultiTokenActivity';
 import tokenPng from '../../common/assets/images/token.png';
 import PnlTag from '../../common/components/PlnTag';
 import Table from '../../common/components/Table';
@@ -16,8 +15,7 @@ import useTableSort, { ISortState } from '../../common/hooks/useTableSort';
 import { TokenType } from '../../common/types/index';
 import { IHeadCell } from '../../common/types/table';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
-
-// import { isPrimaryToken } from '@yoroi/portfolio';
+import { usePortfolioTokenActivity } from '../../module/PortfolioTokenActivityProvider';
 
 const TableRowSkeleton = ({ theme, ...props }) => (
   <TableRow
@@ -84,17 +82,9 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
 
   const list = useMemo(() => [...data], [data]);
 
-  const listForActivity = list.filter(item => item.policyId.length > 0).map(item => `${item.policyId}.${item.assetName}`); //
-
-  const { mutate: get24hActivity, data: data24h } = useMultiTokenActivity('24h');
-  // const { mutate: get48hActivity, data: data48h } = useMultiTokenActivity('1W');
-  // const { mutate: get72hActivity, data: data72h } = useMultiTokenActivity('1M');
-
-  React.useEffect(() => {
-    get24hActivity(listForActivity);
-    // get48hActivity(listForActivity);
-    // get72hActivity(listForActivity);
-  }, [get24hActivity]);
+  const {
+    tokenActivity: { data24h },
+  } = usePortfolioTokenActivity();
 
   const headCells: IHeadCell[] = [
     { id: 'name', label: strings.name, align: 'left', sortType: 'character' },
@@ -272,7 +262,6 @@ const TokenPriceChangeChip = ({ priceData, isPrimaryToken }) => {
   const { close, open } = priceData[1].price;
 
   const { changePercent, variantPnl } = priceChange(open, close);
-  console.log('variantPnl', { changePercent, variantPnl });
 
   return (
     <PnlTag variant={variantPnl} withIcon>
