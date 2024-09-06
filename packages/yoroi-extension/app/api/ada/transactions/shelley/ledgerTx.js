@@ -474,55 +474,55 @@ function wasmCertToVoteDelegation(wasmCert: WasmCertWithDrepDelegation, getPath:
 function convertCertificate(
   wasmCertificateWrap: RustModule.WalletV4.Certificate,
   getPath: RustModule.WalletV4.Credential => number[]
-): Array<Certificate> {
+): Certificate {
   const kind = wasmCertificateWrap.kind();
   switch (kind) {
     case RustModule.WalletV4.CertificateKind.StakeRegistration: {
       const wasmCert = forceNonNull(wasmCertificateWrap.as_stake_registration());
-      return [wasmCertToStakeRegistration(wasmCert, getPath)];
+      return wasmCertToStakeRegistration(wasmCert, getPath);
     }
     case RustModule.WalletV4.CertificateKind.StakeDeregistration: {
       const wasmCert = forceNonNull(wasmCertificateWrap.as_stake_deregistration());
-      return [wasmCertToStakeDeregistration(wasmCert, getPath)];
+      return wasmCertToStakeDeregistration(wasmCert, getPath);
     }
     case RustModule.WalletV4.CertificateKind.StakeDelegation: {
       const wasmCert = forceNonNull(wasmCertificateWrap.as_stake_delegation());
-      return [wasmCertToStakeDelegation(wasmCert, getPath)];
+      return wasmCertToStakeDelegation(wasmCert, getPath);
     }
     case RustModule.WalletV4.CertificateKind.VoteDelegation: {
       const wasmCert = forceNonNull(wasmCertificateWrap.as_vote_delegation());
-      return [wasmCertToVoteDelegation(wasmCert, getPath)];
+      return wasmCertToVoteDelegation(wasmCert, getPath);
     }
     case RustModule.WalletV4.CertificateKind.DRepRegistration: {
       const wasmCert = forceNonNull(wasmCertificateWrap.as_drep_registration());
-      return [{
+      return {
         type: CertificateType.DREP_REGISTRATION,
         params: {
           dRepCredential: wasmCertToDRepCredential(wasmCert, getPath),
           anchor: wasmCertToAnchor(wasmCert),
           deposit: wasmCert.coin().to_str(),
         },
-      }];
+      };
     }
     case RustModule.WalletV4.CertificateKind.DRepUpdate: {
       const wasmCert = forceNonNull(wasmCertificateWrap.as_drep_update());
-      return [{
+      return {
         type: CertificateType.DREP_UPDATE,
         params: {
           dRepCredential: wasmCertToDRepCredential(wasmCert, getPath),
           anchor: wasmCertToAnchor(wasmCert),
         },
-      }];
+      };
     }
     case RustModule.WalletV4.CertificateKind.DRepDeregistration: {
       const wasmCert = forceNonNull(wasmCertificateWrap.as_drep_deregistration());
-      return [{
+      return {
         type: CertificateType.DREP_DEREGISTRATION,
         params: {
           dRepCredential: wasmCertToDRepCredential(wasmCert, getPath),
           deposit: wasmCert.coin().to_str(),
         },
-      }];
+      };
     }
     case RustModule.WalletV4.CertificateKind.StakeAndVoteDelegation:
     case RustModule.WalletV4.CertificateKind.StakeRegistrationAndDelegation:
@@ -557,7 +557,7 @@ function formatLedgerCertificates(
   const result = [];
   for (let i = 0; i < certificates.len(); i++) {
     const cert = certificates.get(i);
-    result.push(...convertCertificate(cert, getPath));
+    result.push(convertCertificate(cert, getPath));
   }
   return result;
 }
