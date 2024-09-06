@@ -18,7 +18,7 @@ export const dark = {
   text_info: darkPalette.sys_cyan_500, // info messages
 
   bg_color_max: darkPalette.gray_50, // bottom surface
-  bg_color_max: darkPalette.gray_100, // upper surface
+  bg_color_min: darkPalette.gray_100, // upper surface
 
   el_primary_max: darkPalette.primary_700, // hover'nd pressed state, actianable elements
   el_primary_medium: darkPalette.primary_600, // actionable elements
