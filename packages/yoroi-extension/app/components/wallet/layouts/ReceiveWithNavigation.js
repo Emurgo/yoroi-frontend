@@ -51,7 +51,7 @@ function ReceiveWithNavigation({ addressStores, setFilter, activeFilter, childre
         display: 'flex',
         overflow: 'hidden',
         height: '100%',
-        bgcolor: 'ds.bg_color_min',
+        bgcolor: 'ds.bg_color_max',
         borderRadius: '8px',
         width: '100%',
       }}

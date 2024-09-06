@@ -85,7 +85,7 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
           borderColor: 'grayscale.400',
           borderRadius: '8px',
           position: 'relative',
-          bgcolor: 'ds.bg_color_min',
+          bgcolor: 'ds.bg_color_max',
           p: '16px',
         }}
       >

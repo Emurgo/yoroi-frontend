@@ -184,7 +184,7 @@ export default class ReceiveNavigationRevamp extends Component<Props> {
             borderTopLeftRadius: 0,
             borderTopRightRadius: 0,
             height: 'min-content',
-            background: 'ds.bg_color_min',
+            background: 'ds.bg_color_max',
           }}
         >
           {this.generateFilterSection()}

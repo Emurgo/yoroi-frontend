@@ -256,7 +256,7 @@ export default class TransactionRevamp extends Component<Props, State> {
             flexDirection: 'column',
             alignItems: 'flex-end',
             justifyContent: 'center',
-            backgroundColor: 'ds.bg_color_min',
+            backgroundColor: 'ds.bg_color_max',
           }}
         >
           <Typography variant="body1" fontWeight={500} color="grayscale.900">
@@ -509,7 +509,7 @@ export default class TransactionRevamp extends Component<Props, State> {
       <Box
         className={styles.component}
         id={this.props.id + '-transaction_' + this.props.txIndex + '-box'}
-        sx={{ backgroundColor: 'ds.bg_color_min' }}
+        sx={{ backgroundColor: 'ds.bg_color_max' }}
       >
         {/* ==== Clickable Header -> toggles details ==== */}
         <Box
@@ -645,7 +645,7 @@ export default class TransactionRevamp extends Component<Props, State> {
           className={contentStyles}
           sx={{
             overflowX: 'overlay',
-            bgcolor: 'ds.bg_color_min',
+            bgcolor: 'ds.bg_color_max',
             border: isExpanded ? '1px solid' : 'none',
             borderColor: 'grayscale.200',
             borderRadius: '8px',
@@ -664,7 +664,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                 </div>
               </div>
             )}
-            <Box sx={{ overflowX: 'overlay', bgcolor: 'ds.bg_color_min' }}>
+            <Box sx={{ overflowX: 'overlay', bgcolor: 'ds.bg_color_max' }}>
               <Box className={styles.addressContent} sx={{ border: '1px solid', borderColor: 'ds.gray_200' }}>
                 <div>
                   <Box

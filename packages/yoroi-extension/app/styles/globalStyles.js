@@ -356,7 +356,7 @@ const globalStyles = (theme: Object): Node => {
         body: {
           /* To remove background color for Chrome Inputs */
           'input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active': {
-            WebkitBoxShadow: `0 0 0 30px ${theme.palette.ds.bg_color_min} inset !important`,
+            WebkitBoxShadow: `0 0 0 30px ${theme.palette.ds.bg_color_max} inset !important`,
           },
           lineHeight: 1,
           fontFamily: theme.typography.fontFamily,

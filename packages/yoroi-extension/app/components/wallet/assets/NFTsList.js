@@ -91,7 +91,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
       sx={{
         height: 'content',
         width: '100%',
-        bgcolor: 'ds.bg_color_min',
+        bgcolor: 'ds.bg_color_max',
         p: '24px',
       }}
     >
