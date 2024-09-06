@@ -8,11 +8,7 @@ import { withRouter } from 'react-router-dom';
 import NFTDetails from '../../components/wallet/assets/NFTDetails';
 import { genLookupOrFail, getTokenIdentifierIfExists, getTokenStrictName } from '../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../utils/formatters';
-import {
-  getAuthorFromTokenMetadata,
-  getDescriptionFromTokenMetadata,
-  getImageFromTokenMetadata,
-} from '../../utils/nftMetadata';
+import { getAuthorFromTokenMetadata, getDescriptionFromTokenMetadata, getImageFromTokenMetadata } from '../../utils/nftMetadata';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 
@@ -82,7 +78,7 @@ class NFTDetailPageRevamp extends Component<AllProps> {
     const tab = urlPrams.get('tab');
 
     return (
-      <Box sx={{ width: '100%', backgroundColor: 'ds.bg_color_min' }}>
+      <Box sx={{ width: '100%', backgroundColor: 'ds.bg_color_max' }}>
         <NFTDetails nftInfo={nftInfo} network={network} nextNftId={nextNftId} prevNftId={prevNftId} tab={tab} />
       </Box>
     );

@@ -18,7 +18,7 @@ export const light = {
   text_info: lightPalette.sys_cyan_500, // info messages
 
   bg_color_max: lightPalette.gray_min, // bottom surface
-  bg_color_min: lightPalette.gray_100, // upper surface
+  bg_color_max: lightPalette.gray_100, // upper surface
 
   el_primary_max: lightPalette.primary_600, // hover'nd pressed state, actianable elements
   el_primary_medium: lightPalette.primary_500, // actionable elements

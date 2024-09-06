@@ -81,7 +81,7 @@ export default function SwapInput({
           gridTemplateRows: '1fr 1fr',
           justifyContent: 'start',
           position: 'relative',
-          bgcolor: 'ds.bg_color_min',
+          bgcolor: 'ds.bg_color_max',
           columnGap: '6px',
           rowGap: '8px',
           maxHeight: '95px',
@@ -97,7 +97,7 @@ export default function SwapInput({
             left: '16px',
             position: 'absolute',
             px: '4px',
-            bgcolor: 'ds.bg_color_min',
+            bgcolor: 'ds.bg_color_max',
             color: error ? 'magenta.500' : 'ds.text_gray_medium',
           }}
         >
@@ -110,7 +110,7 @@ export default function SwapInput({
             border: '0',
             outline: 'none',
             '::placeholder': { color: 'grayscale.600' },
-            bgcolor: 'ds.bg_color_min',
+            bgcolor: 'ds.bg_color_max',
           }}
           component="input"
           type="text"
