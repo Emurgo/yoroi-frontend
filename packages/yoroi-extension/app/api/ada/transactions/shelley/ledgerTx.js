@@ -475,7 +475,8 @@ function convertCertificate(
   wasmCertificateWrap: RustModule.WalletV4.Certificate,
   getPath: RustModule.WalletV4.Credential => number[]
 ): Array<Certificate> {
-  switch (wasmCertificateWrap.kind()) {
+  const kind = wasmCertificateWrap.kind();
+  switch (kind) {
     case RustModule.WalletV4.CertificateKind.StakeRegistration: {
       const wasmCert = forceNonNull(wasmCertificateWrap.as_stake_registration());
       return [wasmCertToStakeRegistration(wasmCert, getPath)];
@@ -491,35 +492,6 @@ function convertCertificate(
     case RustModule.WalletV4.CertificateKind.VoteDelegation: {
       const wasmCert = forceNonNull(wasmCertificateWrap.as_vote_delegation());
       return [wasmCertToVoteDelegation(wasmCert, getPath)];
-    }
-    case RustModule.WalletV4.CertificateKind.StakeAndVoteDelegation: {
-      const wasmCert = forceNonNull(wasmCertificateWrap.as_stake_and_vote_delegation());
-      return [
-        wasmCertToStakeDelegation(wasmCert, getPath),
-        wasmCertToVoteDelegation(wasmCert, getPath),
-      ];
-    }
-    case RustModule.WalletV4.CertificateKind.StakeRegistrationAndDelegation: {
-      const wasmCert = forceNonNull(wasmCertificateWrap.as_stake_registration_and_delegation());
-      return [
-        wasmCertToStakeRegistration(wasmCert, getPath),
-        wasmCertToStakeDelegation(wasmCert, getPath),
-      ];
-    }
-    case RustModule.WalletV4.CertificateKind.VoteRegistrationAndDelegation: {
-      const wasmCert = forceNonNull(wasmCertificateWrap.as_vote_registration_and_delegation());
-      return [
-        wasmCertToStakeRegistration(wasmCert, getPath),
-        wasmCertToVoteDelegation(wasmCert, getPath),
-      ];
-    }
-    case RustModule.WalletV4.CertificateKind.StakeVoteRegistrationAndDelegation: {
-      const wasmCert = forceNonNull(wasmCertificateWrap.as_stake_vote_registration_and_delegation());
-      return [
-        wasmCertToStakeRegistration(wasmCert, getPath),
-        wasmCertToStakeDelegation(wasmCert, getPath),
-        wasmCertToVoteDelegation(wasmCert, getPath),
-      ];
     }
     case RustModule.WalletV4.CertificateKind.DRepRegistration: {
       const wasmCert = forceNonNull(wasmCertificateWrap.as_drep_registration());
@@ -552,6 +524,11 @@ function convertCertificate(
         },
       }];
     }
+    case RustModule.WalletV4.CertificateKind.StakeAndVoteDelegation:
+    case RustModule.WalletV4.CertificateKind.StakeRegistrationAndDelegation:
+    case RustModule.WalletV4.CertificateKind.VoteRegistrationAndDelegation:
+    case RustModule.WalletV4.CertificateKind.StakeVoteRegistrationAndDelegation:
+      throw new Error(`${nameof(formatLedgerCertificates)} Ledger doesn't support combinatory certificate types (${kind}), use multiple simple certificates instead! ` + wasmCertificateWrap.to_hex());
     default:
       throw new Error(`${nameof(formatLedgerCertificates)} Ledger doesn't support this certificate type! ` + wasmCertificateWrap.to_hex());
   }
